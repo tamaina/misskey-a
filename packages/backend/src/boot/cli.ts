@@ -3,47 +3,41 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import 'reflect-metadata';
 import { EventEmitter } from 'node:events';
-import { NestFactory } from '@nestjs/core';
-import { CommandModule } from '@/cli/CommandModule.js';
-import { NestLogger } from '@/NestLogger.js';
-import { CommandService } from '@/cli/CommandService.js';
+import { runCli } from '@misskey-a/boot/backend';
 
 process.title = 'Misskey Cli';
-
 Error.stackTraceLimit = Infinity;
 EventEmitter.defaultMaxListeners = 128;
 
-const app = await NestFactory.createApplicationContext(CommandModule, {
-	logger: new NestLogger(),
-});
-
-const commandService = app.get(CommandService);
-
-const command = process.argv[2] ?? 'help';
-
-switch (command) {
-	case 'help': {
-		console.log('Available commands:');
-		console.log('  help - Displays this help message');
-		console.log('  reset-captcha - Resets the captcha');
-		break;
-	}
-	case 'ping': {
-		await commandService.ping();
-		break;
-	}
-	case 'reset-captcha': {
-		await commandService.resetCaptcha();
-		console.log('Captcha has been reset.');
-		break;
-	}
-	default: {
-		console.error(`Unrecognized command: ${command}`);
-		console.error('Use "help" to see available commands.');
-		process.exit(1);
-	}
+try {
+	process.exitCode = await runCli(process.argv[2] ?? 'help', {
+		ping: {
+			description: 'Prints pong',
+			run: () => { console.log('pong'); },
+		},
+		'reset-captcha': {
+			description: 'Resets the captcha',
+			async run() {
+				// Transitional adapter: only this command needs the legacy container.
+				await import('reflect-metadata');
+				const [{ NestFactory }, { CommandModule }, { NestLogger }, { CommandService }] = await Promise.all([
+					import('@nestjs/core'),
+					import('@/cli/CommandModule.js'),
+					import('@/NestLogger.js'),
+					import('@/cli/CommandService.js'),
+				]);
+				const app = await NestFactory.createApplicationContext(CommandModule, { logger: new NestLogger() });
+				try {
+					await app.get(CommandService).resetCaptcha();
+					console.log('Captcha has been reset.');
+				} finally {
+					await app.close();
+				}
+			},
+		},
+	}, console);
+} catch (error) {
+	console.error(error);
+	process.exitCode = 1;
 }
-
-process.exit(0);

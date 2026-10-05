@@ -77,5 +77,8 @@ input and cache conditions; do not claim an unmeasured improvement.
 - Upstream snapshot imported; SDK baseline: 14 tests pass.
 - Boot resource coordinator: isolated tests cover ordering, rollback, cleanup
   errors, concurrent calls, stop during startup and independent role lifetimes.
-- Existing Nest runtime is still active. Wiring and replacing it, endpoint
+- CLI dispatch now uses the boot feature: help, ping and unknown commands do not
+  construct the legacy container. The reset-captcha adapter still uses Nest and
+  closes its context in a finally block; database execution is not yet verified.
+- Existing server/queue Nest runtime is still active. Wiring and replacing it, endpoint
   contracts, SDK integration and VVI migration remain work to do.

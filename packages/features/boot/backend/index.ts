@@ -5,3 +5,5 @@
 
 export { createRuntime } from './runtime.js';
 export type { BootStep, Dispose, RuntimeState } from './runtime.js';
+export { runCli } from './cli.js';
+export type { Command, ConsoleOutput } from './cli.js';
