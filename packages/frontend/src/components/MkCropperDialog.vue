@@ -14,7 +14,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 	@ok="ok()"
 	@closed="emit('closed')"
 >
-	<template #header>{{ i18n.ts.cropImage }}</template>
+	<template #header>{{ $locale.sfc.cropImage }}</template>
 	<div class="mk-cropper-dialog" :style="`--vw: 100%; --vh: 100%;`">
 		<Transition name="fade">
 			<div v-if="loading" class="loading">
@@ -35,7 +35,6 @@ import Cropper from 'cropperjs';
 import tinycolor from 'tinycolor2';
 import MkModalWindow from '@features/ui/frontend/components/MkModalWindow.vue';
 import { themeManager } from '@/theme.js';
-import { i18n } from '@/i18n.js';
 
 const props = defineProps<{
 	imageFile: F;
@@ -180,3 +179,171 @@ onUnmounted(() => {
 	}
 }
 </style>
+
+<locale locale="ar-SA" lang="json">
+{
+  "cropImage": "اقتصاص الصورة"
+}
+</locale>
+
+<locale locale="ca-ES" lang="json">
+{
+  "cropImage": "Retalla la imatge"
+}
+</locale>
+
+<locale locale="cs-CZ" lang="json">
+{
+  "cropImage": "Oříznout obrázek"
+}
+</locale>
+
+<locale locale="da-DK" lang="json">
+{
+  "cropImage": "Crop image"
+}
+</locale>
+
+<locale locale="de-DE" lang="json">
+{
+  "cropImage": "Bild zuschneiden"
+}
+</locale>
+
+<locale locale="en-US" lang="json">
+{
+  "cropImage": "Crop image"
+}
+</locale>
+
+<locale locale="es-ES" lang="json">
+{
+  "cropImage": "Recortar Imagen"
+}
+</locale>
+
+<locale locale="fr-FR" lang="json">
+{
+  "cropImage": "Recadrer l'image"
+}
+</locale>
+
+<locale locale="id-ID" lang="json">
+{
+  "cropImage": "potong gambar"
+}
+</locale>
+
+<locale locale="it-IT" lang="json">
+{
+  "cropImage": "Ritaglia l'immagine"
+}
+</locale>
+
+<locale locale="ja-JP" lang="json">
+{
+  "cropImage": "画像のクロップ"
+}
+</locale>
+
+<locale locale="ja-KS" lang="json">
+{
+  "cropImage": "画像切り取り"
+}
+</locale>
+
+<locale locale="kab-KAB" lang="json">
+{
+  "cropImage": "Crop image"
+}
+</locale>
+
+<locale locale="kn-IN" lang="json">
+{
+  "cropImage": "Crop image"
+}
+</locale>
+
+<locale locale="ko-KR" lang="json">
+{
+  "cropImage": "이미지 자르기"
+}
+</locale>
+
+<locale locale="nl-NL" lang="json">
+{
+  "cropImage": "Afbeelding bijsnijden"
+}
+</locale>
+
+<locale locale="no-NO" lang="json">
+{
+  "cropImage": "Crop image"
+}
+</locale>
+
+<locale locale="pl-PL" lang="json">
+{
+  "cropImage": "Przytnij obraz"
+}
+</locale>
+
+<locale locale="pt-PT" lang="json">
+{
+  "cropImage": "Recortar imagem"
+}
+</locale>
+
+<locale locale="ru-RU" lang="json">
+{
+  "cropImage": "Кадрирование"
+}
+</locale>
+
+<locale locale="sk-SK" lang="json">
+{
+  "cropImage": "Orezanie obrázku"
+}
+</locale>
+
+<locale locale="th-TH" lang="json">
+{
+  "cropImage": "ครอบตัดรูปภาพ"
+}
+</locale>
+
+<locale locale="tr-TR" lang="json">
+{
+  "cropImage": "Görüntüyü kırp"
+}
+</locale>
+
+<locale locale="ug-CN" lang="json">
+{
+  "cropImage": "Crop image"
+}
+</locale>
+
+<locale locale="uk-UA" lang="json">
+{
+  "cropImage": "Кадрування"
+}
+</locale>
+
+<locale locale="vi-VN" lang="json">
+{
+  "cropImage": "Cắt hình ảnh"
+}
+</locale>
+
+<locale locale="zh-CN" lang="json">
+{
+  "cropImage": "裁剪图像"
+}
+</locale>
+
+<locale locale="zh-TW" lang="json">
+{
+  "cropImage": "圖片裁剪"
+}
+</locale>

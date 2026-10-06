@@ -17,7 +17,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			>
 				<template #consentAdditionalInfo>
 					<div v-if="callback != null" class="_gaps_s" :class="$style.redirectRoot">
-						<div>{{ i18n.ts._auth.byClickingYouWillBeRedirectedToThisUrl }}</div>
+						<div>{{ $locale.sfc.byClickingYouWillBeRedirectedToThisUrl }}</div>
 						<div class="_monospace" :class="$style.redirectUrl">{{ callback }}</div>
 					</div>
 				</template>
@@ -31,7 +31,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 import { computed, useTemplateRef } from 'vue';
 import * as Misskey from 'misskey-js';
 import MkAuthConfirm from '@features/auth/frontend/components/MkAuthConfirm.vue';
-import { i18n } from '@/i18n.js';
 import { misskeyApi } from '@/utility/misskey-api.js';
 import { definePage } from '@/page.js';
 
@@ -116,3 +115,171 @@ definePage(() => ({
 	white-space: nowrap;
 }
 </style>
+
+<locale locale="ar-SA" lang="json">
+{
+  "byClickingYouWillBeRedirectedToThisUrl": "When access is granted, you will automatically be redirected to the following URL"
+}
+</locale>
+
+<locale locale="ca-ES" lang="json">
+{
+  "byClickingYouWillBeRedirectedToThisUrl": "Si es garanteix l'accés, seràs redirigit automàticament a la següent adreça URL"
+}
+</locale>
+
+<locale locale="cs-CZ" lang="json">
+{
+  "byClickingYouWillBeRedirectedToThisUrl": "When access is granted, you will automatically be redirected to the following URL"
+}
+</locale>
+
+<locale locale="da-DK" lang="json">
+{
+  "byClickingYouWillBeRedirectedToThisUrl": "When access is granted, you will automatically be redirected to the following URL"
+}
+</locale>
+
+<locale locale="de-DE" lang="json">
+{
+  "byClickingYouWillBeRedirectedToThisUrl": "Wenn der Zugang gewährt wird, wirst du automatisch zu folgender URL weitergeleitet"
+}
+</locale>
+
+<locale locale="en-US" lang="json">
+{
+  "byClickingYouWillBeRedirectedToThisUrl": "When access is granted, you will automatically be redirected to the following URL"
+}
+</locale>
+
+<locale locale="es-ES" lang="json">
+{
+  "byClickingYouWillBeRedirectedToThisUrl": "Cuando el acceso es concedido, serás automáticamente redireccionado a la siguiente URL"
+}
+</locale>
+
+<locale locale="fr-FR" lang="json">
+{
+  "byClickingYouWillBeRedirectedToThisUrl": "When access is granted, you will automatically be redirected to the following URL"
+}
+</locale>
+
+<locale locale="id-ID" lang="json">
+{
+  "byClickingYouWillBeRedirectedToThisUrl": "When access is granted, you will automatically be redirected to the following URL"
+}
+</locale>
+
+<locale locale="it-IT" lang="json">
+{
+  "byClickingYouWillBeRedirectedToThisUrl": "Consentendo l'accesso, si verrà reindirizzati presso questo indirizzo URL"
+}
+</locale>
+
+<locale locale="ja-JP" lang="json">
+{
+  "byClickingYouWillBeRedirectedToThisUrl": "アクセスを許可すると、自動で以下のURLに遷移します"
+}
+</locale>
+
+<locale locale="ja-KS" lang="json">
+{
+  "byClickingYouWillBeRedirectedToThisUrl": "アクセスを許したら、自動で下のURLに遷移するで"
+}
+</locale>
+
+<locale locale="kab-KAB" lang="json">
+{
+  "byClickingYouWillBeRedirectedToThisUrl": "When access is granted, you will automatically be redirected to the following URL"
+}
+</locale>
+
+<locale locale="kn-IN" lang="json">
+{
+  "byClickingYouWillBeRedirectedToThisUrl": "When access is granted, you will automatically be redirected to the following URL"
+}
+</locale>
+
+<locale locale="ko-KR" lang="json">
+{
+  "byClickingYouWillBeRedirectedToThisUrl": "접근을 허용하면 자동으로 다음 URL로 이동합니다."
+}
+</locale>
+
+<locale locale="nl-NL" lang="json">
+{
+  "byClickingYouWillBeRedirectedToThisUrl": "When access is granted, you will automatically be redirected to the following URL"
+}
+</locale>
+
+<locale locale="no-NO" lang="json">
+{
+  "byClickingYouWillBeRedirectedToThisUrl": "When access is granted, you will automatically be redirected to the following URL"
+}
+</locale>
+
+<locale locale="pl-PL" lang="json">
+{
+  "byClickingYouWillBeRedirectedToThisUrl": "When access is granted, you will automatically be redirected to the following URL"
+}
+</locale>
+
+<locale locale="pt-PT" lang="json">
+{
+  "byClickingYouWillBeRedirectedToThisUrl": "Quando o acesso for permitido, você será redirecionado para o seguinte endereço"
+}
+</locale>
+
+<locale locale="ru-RU" lang="json">
+{
+  "byClickingYouWillBeRedirectedToThisUrl": "When access is granted, you will automatically be redirected to the following URL"
+}
+</locale>
+
+<locale locale="sk-SK" lang="json">
+{
+  "byClickingYouWillBeRedirectedToThisUrl": "When access is granted, you will automatically be redirected to the following URL"
+}
+</locale>
+
+<locale locale="th-TH" lang="json">
+{
+  "byClickingYouWillBeRedirectedToThisUrl": "หากอนุญาตการเข้าถึง ระบบจะเปลี่ยนเส้นทางไปยัง URL ด้านล่างโดยอัตโนมัติ"
+}
+</locale>
+
+<locale locale="tr-TR" lang="json">
+{
+  "byClickingYouWillBeRedirectedToThisUrl": "Erişim izni verildiğinde, otomatik olarak aşağıdaki URL'ye yönlendirileceksin."
+}
+</locale>
+
+<locale locale="ug-CN" lang="json">
+{
+  "byClickingYouWillBeRedirectedToThisUrl": "When access is granted, you will automatically be redirected to the following URL"
+}
+</locale>
+
+<locale locale="uk-UA" lang="json">
+{
+  "byClickingYouWillBeRedirectedToThisUrl": "When access is granted, you will automatically be redirected to the following URL"
+}
+</locale>
+
+<locale locale="vi-VN" lang="json">
+{
+  "byClickingYouWillBeRedirectedToThisUrl": "When access is granted, you will automatically be redirected to the following URL"
+}
+</locale>
+
+<locale locale="zh-CN" lang="json">
+{
+  "byClickingYouWillBeRedirectedToThisUrl": "允许访问后将会自动重定向到以下 URL"
+}
+</locale>
+
+<locale locale="zh-TW" lang="json">
+{
+  "byClickingYouWillBeRedirectedToThisUrl": "如果授予存取權限，就會自動導向到以下的網址"
+}
+</locale>

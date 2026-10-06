@@ -39,7 +39,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 	</div>
 	<div :class="$style.caption"><slot name="caption"></slot></div>
 
-	<MkButton v-if="manualSave && changed" primary :class="$style.save" @click="updated"><i class="ti ti-check"></i> {{ i18n.ts.save }}</MkButton>
+	<MkButton v-if="manualSave && changed" primary :class="$style.save" @click="updated"><i class="ti ti-check"></i> {{ $locale.sfc.save }}</MkButton>
 </div>
 </template>
 
@@ -57,7 +57,6 @@ import { throttle, debounce } from 'throttle-debounce';
 import type { InputHTMLAttributes } from 'vue';
 import type { SuggestionType } from '@features/discovery/frontend/utility/autocomplete.js';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
-import { i18n } from '@/i18n.js';
 import { Autocomplete } from '@features/discovery/frontend/utility/autocomplete.js';
 import { genId } from '@/utility/id.js';
 
@@ -315,3 +314,171 @@ defineExpose({
 	margin: 8px 0 0 0;
 }
 </style>
+
+<locale locale="ar-SA" lang="json">
+{
+  "save": "حفظ"
+}
+</locale>
+
+<locale locale="ca-ES" lang="json">
+{
+  "save": "Desa"
+}
+</locale>
+
+<locale locale="cs-CZ" lang="json">
+{
+  "save": "Uložit"
+}
+</locale>
+
+<locale locale="da-DK" lang="json">
+{
+  "save": "Save"
+}
+</locale>
+
+<locale locale="de-DE" lang="json">
+{
+  "save": "Speichern"
+}
+</locale>
+
+<locale locale="en-US" lang="json">
+{
+  "save": "Save"
+}
+</locale>
+
+<locale locale="es-ES" lang="json">
+{
+  "save": "Guardar"
+}
+</locale>
+
+<locale locale="fr-FR" lang="json">
+{
+  "save": "Enregistrer"
+}
+</locale>
+
+<locale locale="id-ID" lang="json">
+{
+  "save": "Simpan"
+}
+</locale>
+
+<locale locale="it-IT" lang="json">
+{
+  "save": "Salva"
+}
+</locale>
+
+<locale locale="ja-JP" lang="json">
+{
+  "save": "保存"
+}
+</locale>
+
+<locale locale="ja-KS" lang="json">
+{
+  "save": "とっとく"
+}
+</locale>
+
+<locale locale="kab-KAB" lang="json">
+{
+  "save": "Sekles"
+}
+</locale>
+
+<locale locale="kn-IN" lang="json">
+{
+  "save": "ಉಳಿಸಿ"
+}
+</locale>
+
+<locale locale="ko-KR" lang="json">
+{
+  "save": "저장"
+}
+</locale>
+
+<locale locale="nl-NL" lang="json">
+{
+  "save": "Opslaan"
+}
+</locale>
+
+<locale locale="no-NO" lang="json">
+{
+  "save": "Lagre"
+}
+</locale>
+
+<locale locale="pl-PL" lang="json">
+{
+  "save": "Zapisz"
+}
+</locale>
+
+<locale locale="pt-PT" lang="json">
+{
+  "save": "Salvar"
+}
+</locale>
+
+<locale locale="ru-RU" lang="json">
+{
+  "save": "Сохранить"
+}
+</locale>
+
+<locale locale="sk-SK" lang="json">
+{
+  "save": "Uložiť"
+}
+</locale>
+
+<locale locale="th-TH" lang="json">
+{
+  "save": "บันทึก"
+}
+</locale>
+
+<locale locale="tr-TR" lang="json">
+{
+  "save": "Kaydet"
+}
+</locale>
+
+<locale locale="ug-CN" lang="json">
+{
+  "save": "Save"
+}
+</locale>
+
+<locale locale="uk-UA" lang="json">
+{
+  "save": "Зберегти"
+}
+</locale>
+
+<locale locale="vi-VN" lang="json">
+{
+  "save": "Lưu"
+}
+</locale>
+
+<locale locale="zh-CN" lang="json">
+{
+  "save": "保存"
+}
+</locale>
+
+<locale locale="zh-TW" lang="json">
+{
+  "save": "儲存"
+}
+</locale>

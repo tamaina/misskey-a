@@ -4,7 +4,9 @@
  */
 
 import { afterEach, assert, describe, test } from 'vitest';
-import { cleanup, render, type RenderResult } from '@testing-library/vue';
+import { cleanup, render } from '@testing-library/vue';
+import type { RenderResult } from '@testing-library/vue';
+import { createInternationalization } from 'virtual:vite-vue-internationalization';
 import * as Misskey from 'misskey-js';
 import { directives } from '@/directives/index.js';
 import { components } from '@/components/index.js';
@@ -12,10 +14,13 @@ import XHome from '@features/users/frontend/pages/user/home.vue';
 import 'intersection-observer';
 
 describe('XHome', () => {
-	const renderHome = (user: Partial<Misskey.entities.UserDetailed>): RenderResult => {
+	const renderHome = async (user: Partial<Misskey.entities.UserDetailed>): Promise<RenderResult> => {
+		const internationalization = createInternationalization({ initialLocale: 'ja-JP' });
+		await internationalization.ready;
+		await internationalization.loadLocale('ja-JP');
 		return render(XHome, {
 			props: { user: user as Misskey.entities.UserDetailed, disableNotes: true },
-			global: { directives, components },
+			global: { directives, components, plugins: [internationalization] },
 		});
 	};
 
@@ -24,7 +29,7 @@ describe('XHome', () => {
 	});
 
 	test('Should render the remote caution when user.host exists', async () => {
-		const home = renderHome({
+		const home = await renderHome({
 			id: 'blobcat',
 			name: 'blobcat',
 			host: 'example.com',
@@ -44,7 +49,7 @@ describe('XHome', () => {
 	});
 
 	test('The remote caution should fall back to uri if url is null', async () => {
-		const home = renderHome({
+		const home = await renderHome({
 			id: 'blobcat',
 			name: 'blobcat',
 			host: 'example.com',

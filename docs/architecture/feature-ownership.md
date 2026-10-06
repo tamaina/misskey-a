@@ -214,3 +214,21 @@ Settings/admin search-index generation scans retained host pages and feature pag
 including the feature-owned navigation indexes for HMR. Its regression test checks
 coverage against the page allocation, so source placement cannot silently remove
 settings or administration search entries.
+
+The endpoint placement checkpoint moves 365 complete legacy endpoint classes into
+their domain's backend/endpoints directory. The endpoint allocation table records
+eight held routes and their proposed ownership. Existing transport modules reexport
+the same implementation as default with meta/paramDef (and the existing Antenna
+type where applicable). Canonical classes use a named EndpointImplementation export
+to avoid NodeNext default-namespace ambiguity outside the backend package scope.
+Class bodies, singleton state, decorators, authentication metadata, request defaults
+and responses are preserved. This is physical placement: 65 routes currently use
+portable oRPC/Valibot contracts; these additional 365 retain legacy schema/handler
+semantics until their dedicated contract and DI conversion.
+
+A bounded locale pass converts 37 single-message, template-only SFC references to
+VVI locale tags. Each component carries the exact effective message for all 28
+active languages, including legacy English/primary-language fallbacks; global
+Crowdin YAML is untouched. A regression test verifies all 1,036 copied values,
+and the browser fixture exercises a migrated component across locale/reload cases.
+Dynamic, interpolated, multi-message and non-SFC localization remains separate.

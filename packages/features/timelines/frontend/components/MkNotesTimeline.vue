@@ -5,7 +5,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <template>
 <MkPagination :paginator="paginator" :direction="direction" :autoLoad="autoLoad" :pullToRefresh="pullToRefresh" :withControl="withControl" :forceDisableInfiniteScroll="forceDisableInfiniteScroll">
-	<template #empty><MkResult type="empty" :text="i18n.ts.noNotes"/></template>
+	<template #empty><MkResult type="empty" :text="$locale.sfc.noNotes"/></template>
 
 	<template #default="{ items: notes }">
 		<div :class="[$style.root, { [$style.noGap]: noGap, '_gaps': !noGap }]">
@@ -44,7 +44,6 @@ import type { MkPaginationOptions } from '../../../ui/frontend/components/MkPagi
 import type { IPaginator } from '@features/ui/frontend/utility/paginator.js';
 import MkNote from '@features/notes/frontend/components/MkNote.vue';
 import MkPagination from '../../../ui/frontend/components/MkPagination.vue';
-import { i18n } from '@/i18n.js';
 import { useGlobalEvent } from '@/events.js';
 import { isSeparatorNeeded, getSeparatorInfo } from '@features/timelines/frontend/utility/timeline-date-separate.js';
 
@@ -120,3 +119,171 @@ defineExpose({
 	display: none;
 }
 </style>
+
+<locale locale="ar-SA" lang="json">
+{
+  "noNotes": "لم يُعثر على أية ملاحظات"
+}
+</locale>
+
+<locale locale="ca-ES" lang="json">
+{
+  "noNotes": "Cap nota"
+}
+</locale>
+
+<locale locale="cs-CZ" lang="json">
+{
+  "noNotes": "Žádné poznámky"
+}
+</locale>
+
+<locale locale="da-DK" lang="json">
+{
+  "noNotes": "No notes"
+}
+</locale>
+
+<locale locale="de-DE" lang="json">
+{
+  "noNotes": "Keine Notizen gefunden"
+}
+</locale>
+
+<locale locale="en-US" lang="json">
+{
+  "noNotes": "No notes"
+}
+</locale>
+
+<locale locale="es-ES" lang="json">
+{
+  "noNotes": "No hay notas"
+}
+</locale>
+
+<locale locale="fr-FR" lang="json">
+{
+  "noNotes": "Aucune note"
+}
+</locale>
+
+<locale locale="id-ID" lang="json">
+{
+  "noNotes": "Belum ada catatan"
+}
+</locale>
+
+<locale locale="it-IT" lang="json">
+{
+  "noNotes": "Nessuna nota!"
+}
+</locale>
+
+<locale locale="ja-JP" lang="json">
+{
+  "noNotes": "ノートはありません"
+}
+</locale>
+
+<locale locale="ja-KS" lang="json">
+{
+  "noNotes": "ノートはあらへん"
+}
+</locale>
+
+<locale locale="kab-KAB" lang="json">
+{
+  "noNotes": "No notes"
+}
+</locale>
+
+<locale locale="kn-IN" lang="json">
+{
+  "noNotes": "ಟಿಪ್ಪಣಿಗಳಿಲ್ಲ"
+}
+</locale>
+
+<locale locale="ko-KR" lang="json">
+{
+  "noNotes": "노트가 없습니다"
+}
+</locale>
+
+<locale locale="nl-NL" lang="json">
+{
+  "noNotes": "Geen notities"
+}
+</locale>
+
+<locale locale="no-NO" lang="json">
+{
+  "noNotes": "Ingen Notes"
+}
+</locale>
+
+<locale locale="pl-PL" lang="json">
+{
+  "noNotes": "Brak wpisów"
+}
+</locale>
+
+<locale locale="pt-PT" lang="json">
+{
+  "noNotes": "Sem notas"
+}
+</locale>
+
+<locale locale="ru-RU" lang="json">
+{
+  "noNotes": "Нет ни одной заметки"
+}
+</locale>
+
+<locale locale="sk-SK" lang="json">
+{
+  "noNotes": "Žiadne poznámky"
+}
+</locale>
+
+<locale locale="th-TH" lang="json">
+{
+  "noNotes": "ไม่มีโน้ต"
+}
+</locale>
+
+<locale locale="tr-TR" lang="json">
+{
+  "noNotes": "Not yok"
+}
+</locale>
+
+<locale locale="ug-CN" lang="json">
+{
+  "noNotes": "No notes"
+}
+</locale>
+
+<locale locale="uk-UA" lang="json">
+{
+  "noNotes": "Немає нотаток"
+}
+</locale>
+
+<locale locale="vi-VN" lang="json">
+{
+  "noNotes": "Chưa có bài viết nào."
+}
+</locale>
+
+<locale locale="zh-CN" lang="json">
+{
+  "noNotes": "没有帖子"
+}
+</locale>
+
+<locale locale="zh-TW" lang="json">
+{
+  "noNotes": "無貼文"
+}
+</locale>

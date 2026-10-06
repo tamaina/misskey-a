@@ -41,7 +41,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 					<span style="margin-left: 8px; opacity: 0.7;">({{ number(job[1]) }} jobs)</span>
 				</div>
 			</div>
-			<span v-else style="opacity: 0.5;">{{ i18n.ts.noJobs }}</span>
+			<span v-else style="opacity: 0.5;">{{ $locale.sfc.noJobs }}</span>
 		</div>
 	</MkFolder>
 </div>
@@ -55,7 +55,6 @@ import type { ApQueueDomain } from '@features/operations/frontend/pages/admin/fe
 import number from '@features/ui/frontend/filters/number.js';
 import { misskeyApi } from '@/utility/misskey-api.js';
 import { useStream } from '@/stream.js';
-import { i18n } from '@/i18n.js';
 import MkFolder from '@/components/MkFolder.vue';
 import { genId } from '@/utility/id.js';
 
@@ -159,3 +158,171 @@ onUnmounted(() => {
 	opacity: 0.6;
 }
 </style>
+
+<locale locale="ar-SA" lang="json">
+{
+  "noJobs": "لا توجد مهام"
+}
+</locale>
+
+<locale locale="ca-ES" lang="json">
+{
+  "noJobs": "No hi ha feines"
+}
+</locale>
+
+<locale locale="cs-CZ" lang="json">
+{
+  "noJobs": "Žádné úlohy"
+}
+</locale>
+
+<locale locale="da-DK" lang="json">
+{
+  "noJobs": "There are no jobs"
+}
+</locale>
+
+<locale locale="de-DE" lang="json">
+{
+  "noJobs": "Keine Jobs vorhanden"
+}
+</locale>
+
+<locale locale="en-US" lang="json">
+{
+  "noJobs": "There are no jobs"
+}
+</locale>
+
+<locale locale="es-ES" lang="json">
+{
+  "noJobs": "No hay trabajos"
+}
+</locale>
+
+<locale locale="fr-FR" lang="json">
+{
+  "noJobs": "Il n’y a aucune tâche planifiée"
+}
+</locale>
+
+<locale locale="id-ID" lang="json">
+{
+  "noJobs": "Tidak ada kerja"
+}
+</locale>
+
+<locale locale="it-IT" lang="json">
+{
+  "noJobs": "Nessun lavoro"
+}
+</locale>
+
+<locale locale="ja-JP" lang="json">
+{
+  "noJobs": "ジョブはありません"
+}
+</locale>
+
+<locale locale="ja-KS" lang="json">
+{
+  "noJobs": "ジョブはあらへん"
+}
+</locale>
+
+<locale locale="kab-KAB" lang="json">
+{
+  "noJobs": "There are no jobs"
+}
+</locale>
+
+<locale locale="kn-IN" lang="json">
+{
+  "noJobs": "There are no jobs"
+}
+</locale>
+
+<locale locale="ko-KR" lang="json">
+{
+  "noJobs": "작업이 없습니다"
+}
+</locale>
+
+<locale locale="nl-NL" lang="json">
+{
+  "noJobs": "Er zijn geen taken"
+}
+</locale>
+
+<locale locale="no-NO" lang="json">
+{
+  "noJobs": "Det er ingen jobber"
+}
+</locale>
+
+<locale locale="pl-PL" lang="json">
+{
+  "noJobs": "Brak zadań"
+}
+</locale>
+
+<locale locale="pt-PT" lang="json">
+{
+  "noJobs": "Não há tarefas"
+}
+</locale>
+
+<locale locale="ru-RU" lang="json">
+{
+  "noJobs": "Нет заданий"
+}
+</locale>
+
+<locale locale="sk-SK" lang="json">
+{
+  "noJobs": "Žiadne úlohy"
+}
+</locale>
+
+<locale locale="th-TH" lang="json">
+{
+  "noJobs": "ไม่มีงาน"
+}
+</locale>
+
+<locale locale="tr-TR" lang="json">
+{
+  "noJobs": "Hiç ş yok"
+}
+</locale>
+
+<locale locale="ug-CN" lang="json">
+{
+  "noJobs": "There are no jobs"
+}
+</locale>
+
+<locale locale="uk-UA" lang="json">
+{
+  "noJobs": "Немає завдань"
+}
+</locale>
+
+<locale locale="vi-VN" lang="json">
+{
+  "noJobs": "Không có công việc"
+}
+</locale>
+
+<locale locale="zh-CN" lang="json">
+{
+  "noJobs": "没有任务"
+}
+</locale>
+
+<locale locale="zh-TW" lang="json">
+{
+  "noJobs": "沒有任務"
+}
+</locale>

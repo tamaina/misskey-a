@@ -7,14 +7,13 @@ SPDX-License-Identifier: AGPL-3.0-only
 <div ref="content" :class="[$style.content, { [$style.omitted]: omitted }]">
 	<slot></slot>
 	<button v-if="omitted" :class="$style.fade" class="_button" @click="() => { ignoreOmit = true; omitted = false; }">
-		<span :class="$style.fadeLabel">{{ i18n.ts.showMore }}</span>
+		<span :class="$style.fadeLabel">{{ $locale.sfc.showMore }}</span>
 	</button>
 </div>
 </template>
 
 <script lang="ts" setup>
 import { onMounted, onUnmounted, useTemplateRef, ref } from 'vue';
-import { i18n } from '@/i18n.js';
 
 const props = withDefaults(defineProps<{
 	maxHeight?: number;
@@ -82,3 +81,171 @@ onUnmounted(() => {
 	}
 }
 </style>
+
+<locale locale="ar-SA" lang="json">
+{
+  "showMore": "عرض المزيد"
+}
+</locale>
+
+<locale locale="ca-ES" lang="json">
+{
+  "showMore": "Veure més"
+}
+</locale>
+
+<locale locale="cs-CZ" lang="json">
+{
+  "showMore": "Zobrazit více"
+}
+</locale>
+
+<locale locale="da-DK" lang="json">
+{
+  "showMore": "Show more"
+}
+</locale>
+
+<locale locale="de-DE" lang="json">
+{
+  "showMore": "Mehr anzeigen"
+}
+</locale>
+
+<locale locale="en-US" lang="json">
+{
+  "showMore": "Show more"
+}
+</locale>
+
+<locale locale="es-ES" lang="json">
+{
+  "showMore": "Ver más"
+}
+</locale>
+
+<locale locale="fr-FR" lang="json">
+{
+  "showMore": "Voir plus"
+}
+</locale>
+
+<locale locale="id-ID" lang="json">
+{
+  "showMore": "Selebihnya"
+}
+</locale>
+
+<locale locale="it-IT" lang="json">
+{
+  "showMore": "Espandi"
+}
+</locale>
+
+<locale locale="ja-JP" lang="json">
+{
+  "showMore": "もっと見る"
+}
+</locale>
+
+<locale locale="ja-KS" lang="json">
+{
+  "showMore": "まだまだあるで！"
+}
+</locale>
+
+<locale locale="kab-KAB" lang="json">
+{
+  "showMore": "Wali ugar"
+}
+</locale>
+
+<locale locale="kn-IN" lang="json">
+{
+  "showMore": "ಇನ್ನಷ್ಟು ನೋಡು"
+}
+</locale>
+
+<locale locale="ko-KR" lang="json">
+{
+  "showMore": "더 보기"
+}
+</locale>
+
+<locale locale="nl-NL" lang="json">
+{
+  "showMore": "Toon meer"
+}
+</locale>
+
+<locale locale="no-NO" lang="json">
+{
+  "showMore": "Vis mer"
+}
+</locale>
+
+<locale locale="pl-PL" lang="json">
+{
+  "showMore": "Załaduj więcej"
+}
+</locale>
+
+<locale locale="pt-PT" lang="json">
+{
+  "showMore": "Ver mais"
+}
+</locale>
+
+<locale locale="ru-RU" lang="json">
+{
+  "showMore": "Показать ещё"
+}
+</locale>
+
+<locale locale="sk-SK" lang="json">
+{
+  "showMore": "Zobraziť viac"
+}
+</locale>
+
+<locale locale="th-TH" lang="json">
+{
+  "showMore": "แสดงเพิ่มเติม"
+}
+</locale>
+
+<locale locale="tr-TR" lang="json">
+{
+  "showMore": "Daha fazlasını göster"
+}
+</locale>
+
+<locale locale="ug-CN" lang="json">
+{
+  "showMore": "Show more"
+}
+</locale>
+
+<locale locale="uk-UA" lang="json">
+{
+  "showMore": "Показати більше"
+}
+</locale>
+
+<locale locale="vi-VN" lang="json">
+{
+  "showMore": "Xem thêm"
+}
+</locale>
+
+<locale locale="zh-CN" lang="json">
+{
+  "showMore": "查看更多"
+}
+</locale>
+
+<locale locale="zh-TW" lang="json">
+{
+  "showMore": "載入更多"
+}
+</locale>

@@ -208,7 +208,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 		</template>
 
 		<span v-if="items2 == null || items2.length === 0" tabindex="-1" :class="[$style.none, $style.item]">
-			<span>{{ i18n.ts.none }}</span>
+			<span>{{ $locale.sfc.none }}</span>
 		</span>
 
 		<div
@@ -238,7 +238,6 @@ import type { MenuItem, InnerMenuItem, MenuPending, MenuAction, MenuSwitch, Menu
 import type { Keymap } from '@features/ui/frontend/utility/hotkey.js';
 import MkSwitchButton from '@features/ui/frontend/components/MkSwitch.button.vue';
 import * as os from '@/os.js';
-import { i18n } from '@/i18n.js';
 import { isTouchUsing } from '@features/ui/frontend/utility/touch.js';
 import { isFocusable } from '@features/ui/frontend/utility/focus.js';
 import { getNodeOrNull } from '@features/ui/frontend/utility/get-dom-node-or-null.js';
@@ -852,3 +851,171 @@ function guardMouseMove(ev: MouseEvent) {
 	}
 }
 </style>
+
+<locale locale="ar-SA" lang="json">
+{
+  "none": "لا شيء"
+}
+</locale>
+
+<locale locale="ca-ES" lang="json">
+{
+  "none": "Res"
+}
+</locale>
+
+<locale locale="cs-CZ" lang="json">
+{
+  "none": "Žádný"
+}
+</locale>
+
+<locale locale="da-DK" lang="json">
+{
+  "none": "None"
+}
+</locale>
+
+<locale locale="de-DE" lang="json">
+{
+  "none": "Nichts"
+}
+</locale>
+
+<locale locale="en-US" lang="json">
+{
+  "none": "None"
+}
+</locale>
+
+<locale locale="es-ES" lang="json">
+{
+  "none": "Ninguna"
+}
+</locale>
+
+<locale locale="fr-FR" lang="json">
+{
+  "none": "Rien"
+}
+</locale>
+
+<locale locale="id-ID" lang="json">
+{
+  "none": "Tidak ada"
+}
+</locale>
+
+<locale locale="it-IT" lang="json">
+{
+  "none": "Nessuna"
+}
+</locale>
+
+<locale locale="ja-JP" lang="json">
+{
+  "none": "なし"
+}
+</locale>
+
+<locale locale="ja-KS" lang="json">
+{
+  "none": "なし"
+}
+</locale>
+
+<locale locale="kab-KAB" lang="json">
+{
+  "none": "None"
+}
+</locale>
+
+<locale locale="kn-IN" lang="json">
+{
+  "none": "None"
+}
+</locale>
+
+<locale locale="ko-KR" lang="json">
+{
+  "none": "없음"
+}
+</locale>
+
+<locale locale="nl-NL" lang="json">
+{
+  "none": "Niets"
+}
+</locale>
+
+<locale locale="no-NO" lang="json">
+{
+  "none": "Ingen"
+}
+</locale>
+
+<locale locale="pl-PL" lang="json">
+{
+  "none": "Brak"
+}
+</locale>
+
+<locale locale="pt-PT" lang="json">
+{
+  "none": "Nenhum"
+}
+</locale>
+
+<locale locale="ru-RU" lang="json">
+{
+  "none": "Ничего"
+}
+</locale>
+
+<locale locale="sk-SK" lang="json">
+{
+  "none": "Žiadne"
+}
+</locale>
+
+<locale locale="th-TH" lang="json">
+{
+  "none": "ไม่มี"
+}
+</locale>
+
+<locale locale="tr-TR" lang="json">
+{
+  "none": "Hiçbiri"
+}
+</locale>
+
+<locale locale="ug-CN" lang="json">
+{
+  "none": "None"
+}
+</locale>
+
+<locale locale="uk-UA" lang="json">
+{
+  "none": "Відсутній"
+}
+</locale>
+
+<locale locale="vi-VN" lang="json">
+{
+  "none": "Không"
+}
+</locale>
+
+<locale locale="zh-CN" lang="json">
+{
+  "none": "无"
+}
+</locale>
+
+<locale locale="zh-TW" lang="json">
+{
+  "none": "無"
+}
+</locale>

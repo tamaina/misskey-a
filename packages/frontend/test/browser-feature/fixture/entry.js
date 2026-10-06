@@ -9,6 +9,7 @@ import { loadNotFoundPage } from '@features/navigation/frontend';
 import { startComponentLocales } from '@features/boot/frontend';
 import MkResult from '@features/ui/frontend/components/global/MkResult.vue';
 import MkError from '@features/ui/frontend/components/global/MkError.vue';
+import MkGoogle from '@/components/MkGoogle.vue';
 
 try {
 	const locale = new URL(window.location.href).searchParams.get('locale') ?? 'en-US';
@@ -19,6 +20,7 @@ try {
 		setup: () => () => h('div', [
 			h('section', { id: 'not-found' }, [h(NotFoundPage, { showLoginPopup: true })]),
 			h('section', { id: 'emoji-catalog' }, [h(EmojiCatalog)]),
+			h('section', { id: 'local-search' }, [h(MkGoogle, { q: 'fixture query' })]),
 			h('section', { id: 'empty' }, [h(MkResult, { type: 'empty' })]),
 			h('section', { id: 'error' }, [h(MkError, { onRetry() { window.document.querySelector('#retry-count').textContent = String(++retries); } })]),
 		]),

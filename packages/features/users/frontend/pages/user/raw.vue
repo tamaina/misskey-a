@@ -25,7 +25,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<template #value><span class="_monospace">{{ user.id }}</span></template>
 			</MkKeyValue>
 			<MkKeyValue oneline>
-				<template #key>{{ i18n.ts.createdAt }}</template>
+				<template #key>{{ $locale.sfc.createdAt }}</template>
 				<template #value><span class="_monospace"><MkTime :time="user.createdAt" :mode="'detail'"/></span></template>
 			</MkKeyValue>
 		</div>
@@ -42,7 +42,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 import { computed } from 'vue';
 import * as Misskey from 'misskey-js';
 import { acct } from '@features/users/frontend/filters/user.js';
-import { i18n } from '@/i18n.js';
 import MkKeyValue from '@features/ui/frontend/components/MkKeyValue.vue';
 import FormSection from '@features/ui/frontend/components/form/section.vue';
 import MkObjectView from '@features/ui/frontend/components/MkObjectView.vue';
@@ -128,3 +127,171 @@ const suspended = computed(() => props.user.isSuspended ?? false);
 	}
 }
 </style>
+
+<locale locale="ar-SA" lang="json">
+{
+  "createdAt": "أُنشئ في"
+}
+</locale>
+
+<locale locale="ca-ES" lang="json">
+{
+  "createdAt": "Creat el"
+}
+</locale>
+
+<locale locale="cs-CZ" lang="json">
+{
+  "createdAt": "Vytvořeno"
+}
+</locale>
+
+<locale locale="da-DK" lang="json">
+{
+  "createdAt": "Created at"
+}
+</locale>
+
+<locale locale="de-DE" lang="json">
+{
+  "createdAt": "Erstellt am"
+}
+</locale>
+
+<locale locale="en-US" lang="json">
+{
+  "createdAt": "Created at"
+}
+</locale>
+
+<locale locale="es-ES" lang="json">
+{
+  "createdAt": "Fecha de creación"
+}
+</locale>
+
+<locale locale="fr-FR" lang="json">
+{
+  "createdAt": "Date de création"
+}
+</locale>
+
+<locale locale="id-ID" lang="json">
+{
+  "createdAt": "Dibuat pada"
+}
+</locale>
+
+<locale locale="it-IT" lang="json">
+{
+  "createdAt": "Data di creazione"
+}
+</locale>
+
+<locale locale="ja-JP" lang="json">
+{
+  "createdAt": "作成日時"
+}
+</locale>
+
+<locale locale="ja-KS" lang="json">
+{
+  "createdAt": "作成した日"
+}
+</locale>
+
+<locale locale="kab-KAB" lang="json">
+{
+  "createdAt": "Created at"
+}
+</locale>
+
+<locale locale="kn-IN" lang="json">
+{
+  "createdAt": "Created at"
+}
+</locale>
+
+<locale locale="ko-KR" lang="json">
+{
+  "createdAt": "생성된 날짜"
+}
+</locale>
+
+<locale locale="nl-NL" lang="json">
+{
+  "createdAt": "Aangemaakt at"
+}
+</locale>
+
+<locale locale="no-NO" lang="json">
+{
+  "createdAt": "Created at"
+}
+</locale>
+
+<locale locale="pl-PL" lang="json">
+{
+  "createdAt": "Utworzono"
+}
+</locale>
+
+<locale locale="pt-PT" lang="json">
+{
+  "createdAt": "Data de criação"
+}
+</locale>
+
+<locale locale="ru-RU" lang="json">
+{
+  "createdAt": "Создано"
+}
+</locale>
+
+<locale locale="sk-SK" lang="json">
+{
+  "createdAt": "Vytvorené"
+}
+</locale>
+
+<locale locale="th-TH" lang="json">
+{
+  "createdAt": "สร้างเมื่อ"
+}
+</locale>
+
+<locale locale="tr-TR" lang="json">
+{
+  "createdAt": "Oluşturuldu"
+}
+</locale>
+
+<locale locale="ug-CN" lang="json">
+{
+  "createdAt": "Created at"
+}
+</locale>
+
+<locale locale="uk-UA" lang="json">
+{
+  "createdAt": "Створено"
+}
+</locale>
+
+<locale locale="vi-VN" lang="json">
+{
+  "createdAt": "Ngày tạo"
+}
+</locale>
+
+<locale locale="zh-CN" lang="json">
+{
+  "createdAt": "创建日期"
+}
+</locale>
+
+<locale locale="zh-TW" lang="json">
+{
+  "createdAt": "建立於"
+}
+</locale>

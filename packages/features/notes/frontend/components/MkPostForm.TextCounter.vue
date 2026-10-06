@@ -5,7 +5,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <template>
 <div :class="[$style.textCountRoot]">
-	<div :class="$style.textCountLabel">{{ i18n.ts.textCount }}</div>
+	<div :class="$style.textCountLabel">{{ $locale.sfc.textCount }}</div>
 	<div
 		:class="[$style.textCount,
 			{ [$style.danger]: textCountPercentage > 100 },
@@ -21,7 +21,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script lang="ts" setup>
 import { computed, useTemplateRef } from 'vue';
 import { instance } from '@/instance.js';
-import { i18n } from '@/i18n.js';
 import number from '@features/ui/frontend/filters/number.js';
 
 const props = defineProps<{
@@ -93,3 +92,171 @@ const textCountPercentage = computed(() => {
 	}
 }
 </style>
+
+<locale locale="ar-SA" lang="json">
+{
+  "textCount": "Character count"
+}
+</locale>
+
+<locale locale="ca-ES" lang="json">
+{
+  "textCount": "Nombre de caràcters "
+}
+</locale>
+
+<locale locale="cs-CZ" lang="json">
+{
+  "textCount": "Character count"
+}
+</locale>
+
+<locale locale="da-DK" lang="json">
+{
+  "textCount": "Character count"
+}
+</locale>
+
+<locale locale="de-DE" lang="json">
+{
+  "textCount": "Zeichenanzahl"
+}
+</locale>
+
+<locale locale="en-US" lang="json">
+{
+  "textCount": "Character count"
+}
+</locale>
+
+<locale locale="es-ES" lang="json">
+{
+  "textCount": "caracteres"
+}
+</locale>
+
+<locale locale="fr-FR" lang="json">
+{
+  "textCount": "Character count"
+}
+</locale>
+
+<locale locale="id-ID" lang="json">
+{
+  "textCount": "Character count"
+}
+</locale>
+
+<locale locale="it-IT" lang="json">
+{
+  "textCount": "Quantità di caratteri"
+}
+</locale>
+
+<locale locale="ja-JP" lang="json">
+{
+  "textCount": "文字数"
+}
+</locale>
+
+<locale locale="ja-KS" lang="json">
+{
+  "textCount": "文字数"
+}
+</locale>
+
+<locale locale="kab-KAB" lang="json">
+{
+  "textCount": "Character count"
+}
+</locale>
+
+<locale locale="kn-IN" lang="json">
+{
+  "textCount": "Character count"
+}
+</locale>
+
+<locale locale="ko-KR" lang="json">
+{
+  "textCount": "문자 수"
+}
+</locale>
+
+<locale locale="nl-NL" lang="json">
+{
+  "textCount": "Character count"
+}
+</locale>
+
+<locale locale="no-NO" lang="json">
+{
+  "textCount": "Character count"
+}
+</locale>
+
+<locale locale="pl-PL" lang="json">
+{
+  "textCount": "Character count"
+}
+</locale>
+
+<locale locale="pt-PT" lang="json">
+{
+  "textCount": "Contagem de caracteres"
+}
+</locale>
+
+<locale locale="ru-RU" lang="json">
+{
+  "textCount": "Количество символов"
+}
+</locale>
+
+<locale locale="sk-SK" lang="json">
+{
+  "textCount": "Character count"
+}
+</locale>
+
+<locale locale="th-TH" lang="json">
+{
+  "textCount": "จำนวนอักขระ"
+}
+</locale>
+
+<locale locale="tr-TR" lang="json">
+{
+  "textCount": "Karakter sayısı"
+}
+</locale>
+
+<locale locale="ug-CN" lang="json">
+{
+  "textCount": "Character count"
+}
+</locale>
+
+<locale locale="uk-UA" lang="json">
+{
+  "textCount": "Кількість символів"
+}
+</locale>
+
+<locale locale="vi-VN" lang="json">
+{
+  "textCount": "Character count"
+}
+</locale>
+
+<locale locale="zh-CN" lang="json">
+{
+  "textCount": "字数"
+}
+</locale>
+
+<locale locale="zh-TW" lang="json">
+{
+  "textCount": "字數"
+}
+</locale>

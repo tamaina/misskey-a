@@ -36,6 +36,8 @@ jobs:
       - run: cp .github/misskey/test.yml .config/test.yml
       - run: pnpm --filter frontend... -r build
       - run: pnpm --filter frontend exec vue-tsc --noEmit
+        env:
+          NODE_OPTIONS: --max-old-space-size=4096
       - run: pnpm --filter frontend exec vitest run --config vitest.config.unit.ts
       - run: pnpm --filter frontend exec playwright install --with-deps chromium
       - run: pnpm --filter frontend exec node --import tsx test/browser-feature/run.mjs

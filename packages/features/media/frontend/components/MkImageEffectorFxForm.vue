@@ -44,7 +44,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 		</MkInput>
 	</div>
 	<div v-if="Object.keys(paramDefs).length === 0" :class="$style.nothingToConfigure">
-		{{ i18n.ts.nothingToConfigure }}
+		{{ $locale.sfc.nothingToConfigure }}
 	</div>
 </div>
 </template>
@@ -55,7 +55,6 @@ import MkInput from '@features/ui/frontend/components/MkInput.vue';
 import MkRadios from '@features/ui/frontend/components/MkRadios.vue';
 import MkSwitch from '@features/ui/frontend/components/MkSwitch.vue';
 import MkRange from '@features/ui/frontend/components/MkRange.vue';
-import { i18n } from '@/i18n.js';
 
 defineProps<{
 	paramDefs: ImageEffectorFxParamDefs;
@@ -90,3 +89,171 @@ function getRgb(hex: string | number): ImageEffectorRGB | null {
 	padding: 0 10px;
 }
 </style>
+
+<locale locale="ar-SA" lang="json">
+{
+  "nothingToConfigure": "No configurable options available"
+}
+</locale>
+
+<locale locale="ca-ES" lang="json">
+{
+  "nothingToConfigure": "No hi ha res a configurar"
+}
+</locale>
+
+<locale locale="cs-CZ" lang="json">
+{
+  "nothingToConfigure": "No configurable options available"
+}
+</locale>
+
+<locale locale="da-DK" lang="json">
+{
+  "nothingToConfigure": "No configurable options available"
+}
+</locale>
+
+<locale locale="de-DE" lang="json">
+{
+  "nothingToConfigure": "Es sind keine Einstellungen verfügbar"
+}
+</locale>
+
+<locale locale="en-US" lang="json">
+{
+  "nothingToConfigure": "No configurable options available"
+}
+</locale>
+
+<locale locale="es-ES" lang="json">
+{
+  "nothingToConfigure": "No hay nada que configurar"
+}
+</locale>
+
+<locale locale="fr-FR" lang="json">
+{
+  "nothingToConfigure": "No configurable options available"
+}
+</locale>
+
+<locale locale="id-ID" lang="json">
+{
+  "nothingToConfigure": "No configurable options available"
+}
+</locale>
+
+<locale locale="it-IT" lang="json">
+{
+  "nothingToConfigure": "Niente da configurare"
+}
+</locale>
+
+<locale locale="ja-JP" lang="json">
+{
+  "nothingToConfigure": "設定項目はありません"
+}
+</locale>
+
+<locale locale="ja-KS" lang="json">
+{
+  "nothingToConfigure": "設定項目はありません"
+}
+</locale>
+
+<locale locale="kab-KAB" lang="json">
+{
+  "nothingToConfigure": "No configurable options available"
+}
+</locale>
+
+<locale locale="kn-IN" lang="json">
+{
+  "nothingToConfigure": "No configurable options available"
+}
+</locale>
+
+<locale locale="ko-KR" lang="json">
+{
+  "nothingToConfigure": "설정 항목이 없습니다."
+}
+</locale>
+
+<locale locale="nl-NL" lang="json">
+{
+  "nothingToConfigure": "No configurable options available"
+}
+</locale>
+
+<locale locale="no-NO" lang="json">
+{
+  "nothingToConfigure": "No configurable options available"
+}
+</locale>
+
+<locale locale="pl-PL" lang="json">
+{
+  "nothingToConfigure": "No configurable options available"
+}
+</locale>
+
+<locale locale="pt-PT" lang="json">
+{
+  "nothingToConfigure": "No configurable options available"
+}
+</locale>
+
+<locale locale="ru-RU" lang="json">
+{
+  "nothingToConfigure": "Нечего менять"
+}
+</locale>
+
+<locale locale="sk-SK" lang="json">
+{
+  "nothingToConfigure": "No configurable options available"
+}
+</locale>
+
+<locale locale="th-TH" lang="json">
+{
+  "nothingToConfigure": "ไม่มีอะไรให้ต้ังค่า"
+}
+</locale>
+
+<locale locale="tr-TR" lang="json">
+{
+  "nothingToConfigure": "Ayarlar seçeneği bulunmamaktadır."
+}
+</locale>
+
+<locale locale="ug-CN" lang="json">
+{
+  "nothingToConfigure": "No configurable options available"
+}
+</locale>
+
+<locale locale="uk-UA" lang="json">
+{
+  "nothingToConfigure": "Немає доступних параметрів для налаштування"
+}
+</locale>
+
+<locale locale="vi-VN" lang="json">
+{
+  "nothingToConfigure": "No configurable options available"
+}
+</locale>
+
+<locale locale="zh-CN" lang="json">
+{
+  "nothingToConfigure": "没有项目"
+}
+</locale>
+
+<locale locale="zh-TW" lang="json">
+{
+  "nothingToConfigure": "無可設定的項目"
+}
+</locale>

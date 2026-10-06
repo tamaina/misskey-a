@@ -40,7 +40,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			:customEmojiTree="child.children"
 			@chosen="nestedChosen"
 		>
-			{{ child.value || i18n.ts.other }}
+			{{ child.value || $locale.sfc.other }}
 		</MkEmojiPickerSection>
 	</div>
 	<div v-if="shown" class="body">
@@ -65,7 +65,6 @@ import { ref, computed } from 'vue';
 import { getEmojiName } from '@@/js/emojilist.js';
 import type { Ref } from 'vue';
 import type { CustomEmojiFolderTree } from '@@/js/emojilist.js';
-import { i18n } from '@/i18n.js';
 import { customEmojis } from '@/custom-emojis.js';
 import MkEmojiPickerSection from '@features/emojis/frontend/components/MkEmojiPicker.section.vue';
 
@@ -96,3 +95,171 @@ function nestedChosen(emoji: string, ev: PointerEvent) {
 	emit('chosen', emoji, ev);
 }
 </script>
+
+<locale locale="ar-SA" lang="json">
+{
+  "other": "منوعات"
+}
+</locale>
+
+<locale locale="ca-ES" lang="json">
+{
+  "other": "Altres"
+}
+</locale>
+
+<locale locale="cs-CZ" lang="json">
+{
+  "other": "Ostatní"
+}
+</locale>
+
+<locale locale="da-DK" lang="json">
+{
+  "other": "Other"
+}
+</locale>
+
+<locale locale="de-DE" lang="json">
+{
+  "other": "Anderes"
+}
+</locale>
+
+<locale locale="en-US" lang="json">
+{
+  "other": "Other"
+}
+</locale>
+
+<locale locale="es-ES" lang="json">
+{
+  "other": "Otro"
+}
+</locale>
+
+<locale locale="fr-FR" lang="json">
+{
+  "other": "Autre"
+}
+</locale>
+
+<locale locale="id-ID" lang="json">
+{
+  "other": "Lainnya"
+}
+</locale>
+
+<locale locale="it-IT" lang="json">
+{
+  "other": "Eccetera"
+}
+</locale>
+
+<locale locale="ja-JP" lang="json">
+{
+  "other": "その他"
+}
+</locale>
+
+<locale locale="ja-KS" lang="json">
+{
+  "other": "その他"
+}
+</locale>
+
+<locale locale="kab-KAB" lang="json">
+{
+  "other": "Wiyyaḍ"
+}
+</locale>
+
+<locale locale="kn-IN" lang="json">
+{
+  "other": "Other"
+}
+</locale>
+
+<locale locale="ko-KR" lang="json">
+{
+  "other": "기타"
+}
+</locale>
+
+<locale locale="nl-NL" lang="json">
+{
+  "other": "Ander"
+}
+</locale>
+
+<locale locale="no-NO" lang="json">
+{
+  "other": "Andre"
+}
+</locale>
+
+<locale locale="pl-PL" lang="json">
+{
+  "other": "Inne"
+}
+</locale>
+
+<locale locale="pt-PT" lang="json">
+{
+  "other": "Outros"
+}
+</locale>
+
+<locale locale="ru-RU" lang="json">
+{
+  "other": "Другие"
+}
+</locale>
+
+<locale locale="sk-SK" lang="json">
+{
+  "other": "Ostatní"
+}
+</locale>
+
+<locale locale="th-TH" lang="json">
+{
+  "other": "อื่น ๆ"
+}
+</locale>
+
+<locale locale="tr-TR" lang="json">
+{
+  "other": "Diğer"
+}
+</locale>
+
+<locale locale="ug-CN" lang="json">
+{
+  "other": "Other"
+}
+</locale>
+
+<locale locale="uk-UA" lang="json">
+{
+  "other": "Інше"
+}
+</locale>
+
+<locale locale="vi-VN" lang="json">
+{
+  "other": "Khác"
+}
+</locale>
+
+<locale locale="zh-CN" lang="json">
+{
+  "other": "其他"
+}
+</locale>
+
+<locale locale="zh-TW" lang="json">
+{
+  "other": "其他"
+}
+</locale>

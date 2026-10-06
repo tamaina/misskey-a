@@ -13,7 +13,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			</span>
 			<span>@{{ acct(user) }}</span>
 		</li>
-		<li tabindex="-1" :class="$style.item" @click="chooseUser()" @keydown="onKeydown">{{ i18n.ts.selectUser }}</li>
+		<li tabindex="-1" :class="$style.item" @click="chooseUser()" @keydown="onKeydown">{{ $locale.sfc.selectUser }}</li>
 	</ol>
 	<ol v-else-if="type === 'hashtag' && hashtags.length > 0" ref="suggests" :class="$style.list">
 		<li v-for="hashtag in hashtags" tabindex="-1" :class="$style.item" @click="complete(type, hashtag)" @keydown="onKeydown">
@@ -56,7 +56,6 @@ import { acct } from '@features/users/frontend/filters/user.js';
 import * as os from '@/os.js';
 import { misskeyApi } from '@/utility/misskey-api.js';
 import { store } from '@/store.js';
-import { i18n } from '@/i18n.js';
 import { miLocalStorage } from '@/local-storage.js';
 import { customEmojis } from '@/custom-emojis.js';
 import { searchEmoji, searchEmojiExact } from '@features/emojis/frontend/utility/search-emoji.js';
@@ -517,3 +516,171 @@ onBeforeUnmount(() => {
 	margin: 0 0 0 8px;
 }
 </style>
+
+<locale locale="ar-SA" lang="json">
+{
+  "selectUser": "حدّد مستخدمًا"
+}
+</locale>
+
+<locale locale="ca-ES" lang="json">
+{
+  "selectUser": "Selecciona usuari/a"
+}
+</locale>
+
+<locale locale="cs-CZ" lang="json">
+{
+  "selectUser": "Vyberte uživatele"
+}
+</locale>
+
+<locale locale="da-DK" lang="json">
+{
+  "selectUser": "Select a user"
+}
+</locale>
+
+<locale locale="de-DE" lang="json">
+{
+  "selectUser": "Benutzer auswählen"
+}
+</locale>
+
+<locale locale="en-US" lang="json">
+{
+  "selectUser": "Select a user"
+}
+</locale>
+
+<locale locale="es-ES" lang="json">
+{
+  "selectUser": "Elegir usuario"
+}
+</locale>
+
+<locale locale="fr-FR" lang="json">
+{
+  "selectUser": "Sélectionner un·e utilisateur·rice"
+}
+</locale>
+
+<locale locale="id-ID" lang="json">
+{
+  "selectUser": "Pilih pengguna"
+}
+</locale>
+
+<locale locale="it-IT" lang="json">
+{
+  "selectUser": "Seleziona profilo"
+}
+</locale>
+
+<locale locale="ja-JP" lang="json">
+{
+  "selectUser": "ユーザーを選択"
+}
+</locale>
+
+<locale locale="ja-KS" lang="json">
+{
+  "selectUser": "ユーザーを選ぶ"
+}
+</locale>
+
+<locale locale="kab-KAB" lang="json">
+{
+  "selectUser": "Select a user"
+}
+</locale>
+
+<locale locale="kn-IN" lang="json">
+{
+  "selectUser": "Select a user"
+}
+</locale>
+
+<locale locale="ko-KR" lang="json">
+{
+  "selectUser": "유저 선택"
+}
+</locale>
+
+<locale locale="nl-NL" lang="json">
+{
+  "selectUser": "Kies een gebruiker"
+}
+</locale>
+
+<locale locale="no-NO" lang="json">
+{
+  "selectUser": "Velg en bruker"
+}
+</locale>
+
+<locale locale="pl-PL" lang="json">
+{
+  "selectUser": "Wybierz użytkownika"
+}
+</locale>
+
+<locale locale="pt-PT" lang="json">
+{
+  "selectUser": "Selecionar usuário"
+}
+</locale>
+
+<locale locale="ru-RU" lang="json">
+{
+  "selectUser": "Выберите пользователя"
+}
+</locale>
+
+<locale locale="sk-SK" lang="json">
+{
+  "selectUser": "Vyberte používateľa"
+}
+</locale>
+
+<locale locale="th-TH" lang="json">
+{
+  "selectUser": "เลือกผู้ใช้งาน"
+}
+</locale>
+
+<locale locale="tr-TR" lang="json">
+{
+  "selectUser": "Kullanıcı seç"
+}
+</locale>
+
+<locale locale="ug-CN" lang="json">
+{
+  "selectUser": "Select a user"
+}
+</locale>
+
+<locale locale="uk-UA" lang="json">
+{
+  "selectUser": "Виберіть користувача"
+}
+</locale>
+
+<locale locale="vi-VN" lang="json">
+{
+  "selectUser": "Chọn người dùng"
+}
+</locale>
+
+<locale locale="zh-CN" lang="json">
+{
+  "selectUser": "选择用户"
+}
+</locale>
+
+<locale locale="zh-TW" lang="json">
+{
+  "selectUser": "選取使用者"
+}
+</locale>

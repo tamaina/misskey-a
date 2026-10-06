@@ -4,7 +4,7 @@
  */
 import { mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { join, resolve } from 'node:path';
+import { join } from 'node:path';
 import { describe, expect, test } from 'vitest';
 import { pluginVvi } from '../../../lib/vite-plugin-vvi.js';
 
@@ -35,19 +35,29 @@ describe('VVI SFC subrequest guard', () => {
 	});
 
 	test.each(['serve', 'build'])('keeps complete dictionaries after style/template requests during %s', command => {
-		const plugin = pluginVvi();
-		const root = resolve(process.cwd());
-		hook(plugin.configResolved, { root, command, base: '/' });
-		hook(plugin.buildStart);
-		const id = resolve(root, '../features/ui/frontend/components/global/MkResult.vue');
-		hook(plugin.transform, readFileSync(id, 'utf8'), id);
-		const localeId = '\0virtual:vite-vue-internationalization/locale/ja-JP';
-		const before = hook(plugin.load, localeId);
-		expect(before).toContain('/features/ui/frontend/components/global/MkResult.vue');
-		expect(before).toContain('/features/ui/frontend/components/global/MkError.vue');
-		for (const query of ['?vue&type=style&index=0&lang.scss', '?vue&type=template', '?vue&type=script&setup=true&lang.ts']) {
-			expect(hook(plugin.transform, '/* compiled fragment without locale blocks */', id + query)).toBeNull();
-			expect(hook(plugin.load, localeId)).toBe(before);
+		const root = mkdtempSync(join(tmpdir(), 'misskey-a-vvi-subrequest-'));
+		try {
+			const frontend = join(root, 'frontend');
+			const components = join(root, 'features/ui/frontend/components');
+			mkdirSync(join(frontend, 'src'), { recursive: true });
+			mkdirSync(components, { recursive: true });
+			const id = join(components, 'Result.vue');
+			writeFileSync(id, '<template><p>{{ $locale.sfc.text }}</p></template><locale locale="ja-JP" lang="json">{"text":"Result"}</locale>');
+			writeFileSync(join(components, 'Error.vue'), '<template><p>{{ $locale.sfc.text }}</p></template><locale locale="ja-JP" lang="json">{"text":"Error"}</locale>');
+			const plugin = pluginVvi();
+			hook(plugin.configResolved, { root: frontend, command, base: '/' });
+			hook(plugin.buildStart);
+			hook(plugin.transform, readFileSync(id, 'utf8'), id);
+			const localeId = '\0virtual:vite-vue-internationalization/locale/ja-JP';
+			const before = hook(plugin.load, localeId);
+			expect(before).toContain('/features/ui/frontend/components/Result.vue');
+			expect(before).toContain('/features/ui/frontend/components/Error.vue');
+			for (const query of ['?vue&type=style&index=0&lang.scss', '?vue&type=template', '?vue&type=script&setup=true&lang.ts']) {
+				expect(hook(plugin.transform, '/* compiled fragment without locale blocks */', id + query)).toBeNull();
+				expect(hook(plugin.load, localeId)).toBe(before);
+			}
+		} finally {
+			rmSync(root, { recursive: true, force: true });
 		}
 	});
 });

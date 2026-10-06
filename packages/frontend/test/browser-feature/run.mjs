@@ -64,6 +64,8 @@ try {
 					assert.equal(await page.locator('#not-found').innerText(), locales[locale].notFoundDescription);
 					assert.equal(await page.title(), locales[locale].notFound);
 					assert.equal(await page.locator('#empty').innerText(), locales[locale].nothing);
+					assert.equal((await page.locator('#local-search button').innerText()).trim(), locales[locale].searchByGoogle);
+					assert.equal(await page.locator('#local-search input').inputValue(), 'fixture query');
 					assert.equal(await page.locator('#error button').innerText(), locales[locale].retry);
 					assert.ok((await page.locator('#error').innerText()).includes(locales[locale].somethingHappened));
 					assert.equal(await page.locator('html').getAttribute('data-login-path'), '/');
