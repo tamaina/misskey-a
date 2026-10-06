@@ -1442,15 +1442,10 @@ type EndpointResponse = operations['endpoint']['responses']['200']['content']['a
 
 // Warning: (ae-forgotten-export) The symbol "Overwrite" needs to be exported by the entry point index.d.ts
 // Warning: (ae-forgotten-export) The symbol "Endpoints_2" needs to be exported by the entry point index.d.ts
-// Warning: (ae-forgotten-export) The symbol "InstanceEndpoints" needs to be exported by the entry point index.d.ts
-// Warning: (ae-forgotten-export) The symbol "StatisticsEndpoints" needs to be exported by the entry point index.d.ts
-// Warning: (ae-forgotten-export) The symbol "AvatarDecorationEndpoints" needs to be exported by the entry point index.d.ts
-// Warning: (ae-forgotten-export) The symbol "EmojiEndpoints" needs to be exported by the entry point index.d.ts
-// Warning: (ae-forgotten-export) The symbol "OperationsEndpoints" needs to be exported by the entry point index.d.ts
-// Warning: (ae-forgotten-export) The symbol "PortabilityEndpoints" needs to be exported by the entry point index.d.ts
+// Warning: (ae-forgotten-export) The symbol "FeatureEndpoints" needs to be exported by the entry point index.d.ts
 //
 // @public (undocumented)
-export type Endpoints = Overwrite<Overwrite<Endpoints_2, InstanceEndpoints & StatisticsEndpoints & AvatarDecorationEndpoints & EmojiEndpoints & OperationsEndpoints & PortabilityEndpoints>, {
+export type Endpoints = Overwrite<Overwrite<Endpoints_2, FeatureEndpoints>, {
     'users/show': {
         req: UsersShowRequest;
         res: {

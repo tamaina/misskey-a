@@ -5,6 +5,7 @@
 
 import * as fs from 'node:fs';
 import _Ajv from 'ajv';
+import { misskeyIdPattern } from '@features/api/contract';
 import type { Schema, SchemaType } from '@/misc/json-schema.js';
 import type { MiLocalUser } from '@/models/User.js';
 import type { MiAccessToken } from '@/models/AccessToken.js';
@@ -17,7 +18,7 @@ const ajv = new Ajv({
 	useDefaults: true,
 });
 
-ajv.addFormat('misskey:id', /^[a-zA-Z0-9]+$/);
+ajv.addFormat('misskey:id', misskeyIdPattern);
 
 export type Response = Record<string, any> | void;
 

@@ -6,7 +6,7 @@
 import { oc } from '@orpc/contract';
 import type { InferContractRouterInputs, InferContractRouterOutputs } from '@orpc/contract';
 import * as v from 'valibot';
-import { objectParams } from '../../api/contract/index.js';
+import { misskeyId, objectParams } from '../../api/contract/index.js';
 
 const emojiId = v.pipe(v.string(), v.metadata({ format: 'id' }));
 
@@ -43,6 +43,25 @@ export type EmojiPacked = {
 export const emojisResult = v.object({ emojis: v.array(emojiSimpleResult) });
 export const emojiInput = v.object({ name: v.string() });
 
+const emojiIdsInput = v.array(misskeyId);
+const emojiAliasesInput = v.array(v.string());
+
+export const emojiAdministrationInputs = {
+	'admin/emoji/set-category-bulk': v.looseObject({
+		ids: emojiIdsInput,
+		category: v.pipe(v.exactOptional(v.nullable(v.string())), v.metadata({ description: 'Use `null` to reset the category.' })),
+	}),
+	'admin/emoji/set-license-bulk': v.looseObject({
+		ids: emojiIdsInput,
+		license: v.pipe(v.exactOptional(v.nullable(v.string())), v.metadata({ description: 'Use `null` to reset the license.' })),
+	}),
+	'admin/emoji/set-aliases-bulk': v.looseObject({ ids: emojiIdsInput, aliases: emojiAliasesInput }),
+	'admin/emoji/add-aliases-bulk': v.looseObject({ ids: emojiIdsInput, aliases: emojiAliasesInput }),
+	'admin/emoji/remove-aliases-bulk': v.looseObject({ ids: emojiIdsInput, aliases: emojiAliasesInput }),
+};
+
+const voidOutput = v.void();
+
 export const emojisContract = {
 	emojis: oc.route({ method: 'POST', path: '/emojis', tags: ['meta'] })
 		.input(v.optional(objectParams, {}))
@@ -50,6 +69,21 @@ export const emojisContract = {
 	emoji: oc.route({ method: 'POST', path: '/emoji', tags: ['meta'] })
 		.input(emojiInput)
 		.output(emojiDetailedResult),
+	'admin/emoji/set-category-bulk': oc.route({ method: 'POST', path: '/admin/emoji/set-category-bulk', tags: ['admin'] })
+		.input(emojiAdministrationInputs['admin/emoji/set-category-bulk'])
+		.output(voidOutput),
+	'admin/emoji/set-license-bulk': oc.route({ method: 'POST', path: '/admin/emoji/set-license-bulk', tags: ['admin'] })
+		.input(emojiAdministrationInputs['admin/emoji/set-license-bulk'])
+		.output(voidOutput),
+	'admin/emoji/set-aliases-bulk': oc.route({ method: 'POST', path: '/admin/emoji/set-aliases-bulk', tags: ['admin'] })
+		.input(emojiAdministrationInputs['admin/emoji/set-aliases-bulk'])
+		.output(voidOutput),
+	'admin/emoji/add-aliases-bulk': oc.route({ method: 'POST', path: '/admin/emoji/add-aliases-bulk', tags: ['admin'] })
+		.input(emojiAdministrationInputs['admin/emoji/add-aliases-bulk'])
+		.output(voidOutput),
+	'admin/emoji/remove-aliases-bulk': oc.route({ method: 'POST', path: '/admin/emoji/remove-aliases-bulk', tags: ['admin'] })
+		.input(emojiAdministrationInputs['admin/emoji/remove-aliases-bulk'])
+		.output(voidOutput),
 };
 
 type Inputs = InferContractRouterInputs<typeof emojisContract>;

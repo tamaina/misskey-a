@@ -1,9 +1,4 @@
-import type { OperationsEndpoints } from '#feature-contracts/operations';
-import type { PortabilityEndpoints } from '#feature-contracts/portability';
-import type { EmojiEndpoints } from '#feature-contracts/emojis';
-import type { AvatarDecorationEndpoints } from '#feature-contracts/avatar-decorations';
-import type { StatisticsEndpoints } from '#feature-contracts/statistics';
-import type { InstanceEndpoints } from '#feature-contracts/instance';
+import type { FeatureEndpoints } from '#feature-contracts/index';
 import { Endpoints as Gen } from './autogen/endpoint.js';
 import { UserDetailed } from './autogen/models.js';
 import {
@@ -73,7 +68,7 @@ export type SwitchCaseResponseType<E extends keyof Endpoints, P extends Endpoint
 /* eslint-enable @stylistic/indent */
 
 export type Endpoints = Overwrite<
-	Overwrite<Gen, InstanceEndpoints & StatisticsEndpoints & AvatarDecorationEndpoints & EmojiEndpoints & OperationsEndpoints & PortabilityEndpoints>,
+	Overwrite<Gen, FeatureEndpoints>,
 	{
 		'users/show': {
 			req: UsersShowRequest;

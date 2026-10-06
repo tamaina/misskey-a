@@ -1,0 +1,273 @@
+{
+	"chat/read-all": {
+		"tags": [
+			"chat"
+		],
+		"requireCredential": true,
+		"kind": "write:chat",
+		"errors": {}
+	},
+	"chat/rooms/join": {
+		"tags": [
+			"chat"
+		],
+		"requireCredential": true,
+		"kind": "write:chat",
+		"errors": {
+			"noSuchRoom": {
+				"message": "No such room.",
+				"code": "NO_SUCH_ROOM",
+				"id": "84416476-5ce8-4a2c-b568-9569f1b10733"
+			}
+		}
+	},
+	"chat/rooms/leave": {
+		"tags": [
+			"chat"
+		],
+		"requireCredential": true,
+		"kind": "write:chat",
+		"errors": {
+			"noSuchRoom": {
+				"message": "No such room.",
+				"code": "NO_SUCH_ROOM",
+				"id": "cb7f3179-50e8-4389-8c30-dbe2650a67c9"
+			}
+		}
+	},
+	"chat/rooms/mute": {
+		"tags": [
+			"chat"
+		],
+		"requireCredential": true,
+		"kind": "write:chat",
+		"errors": {
+			"noSuchRoom": {
+				"message": "No such room.",
+				"code": "NO_SUCH_ROOM",
+				"id": "c2cde4eb-8d0f-42f1-8f2f-c4d6bfc8e5df"
+			}
+		}
+	},
+	"chat/rooms/delete": {
+		"tags": [
+			"chat"
+		],
+		"requireCredential": true,
+		"kind": "write:chat",
+		"errors": {
+			"noSuchRoom": {
+				"message": "No such room.",
+				"code": "NO_SUCH_ROOM",
+				"id": "d4e3753d-97bf-4a19-ab8e-21080fbc0f4b"
+			}
+		}
+	},
+	"chat/rooms/invitations/ignore": {
+		"tags": [
+			"chat"
+		],
+		"requireCredential": true,
+		"kind": "write:chat",
+		"errors": {
+			"noSuchRoom": {
+				"message": "No such room.",
+				"code": "NO_SUCH_ROOM",
+				"id": "5130557e-5a11-4cfb-9cc5-fe60cda5de0d"
+			}
+		}
+	},
+	"chat/messages/react": {
+		"tags": [
+			"chat"
+		],
+		"requireCredential": true,
+		"kind": "write:chat",
+		"errors": {
+			"noSuchMessage": {
+				"message": "No such message.",
+				"code": "NO_SUCH_MESSAGE",
+				"id": "9b5839b9-0ba0-4351-8c35-37082093d200"
+			}
+		}
+	},
+	"chat/messages/unreact": {
+		"tags": [
+			"chat"
+		],
+		"requireCredential": true,
+		"kind": "write:chat",
+		"errors": {
+			"noSuchMessage": {
+				"message": "No such message.",
+				"code": "NO_SUCH_MESSAGE",
+				"id": "c39ea42f-e3ca-428a-ad57-390e0a711595"
+			}
+		}
+	},
+	"chat/messages/delete": {
+		"tags": [
+			"chat"
+		],
+		"requireCredential": true,
+		"kind": "write:chat",
+		"errors": {
+			"noSuchMessage": {
+				"message": "No such message.",
+				"code": "NO_SUCH_MESSAGE",
+				"id": "36b67f0e-66a6-414b-83df-992a55294f17"
+			}
+		}
+	},
+	"admin/emoji/set-category-bulk": {
+		"tags": [
+			"admin"
+		],
+		"requireCredential": true,
+		"requiredRolePolicy": "canManageCustomEmojis",
+		"kind": "write:admin:emoji"
+	},
+	"admin/emoji/set-license-bulk": {
+		"tags": [
+			"admin"
+		],
+		"requireCredential": true,
+		"requiredRolePolicy": "canManageCustomEmojis",
+		"kind": "write:admin:emoji"
+	},
+	"admin/emoji/set-aliases-bulk": {
+		"tags": [
+			"admin"
+		],
+		"requireCredential": true,
+		"requiredRolePolicy": "canManageCustomEmojis",
+		"kind": "write:admin:emoji"
+	},
+	"admin/emoji/add-aliases-bulk": {
+		"tags": [
+			"admin"
+		],
+		"requireCredential": true,
+		"requiredRolePolicy": "canManageCustomEmojis",
+		"kind": "write:admin:emoji"
+	},
+	"admin/emoji/remove-aliases-bulk": {
+		"tags": [
+			"admin"
+		],
+		"requireCredential": true,
+		"requiredRolePolicy": "canManageCustomEmojis",
+		"kind": "write:admin:emoji"
+	},
+	"notifications/create": {
+		"tags": [
+			"notifications"
+		],
+		"requireCredential": true,
+		"kind": "write:notifications",
+		"limit": {
+			"duration": 60000,
+			"max": 10
+		},
+		"errors": {}
+	},
+	"notifications/flush": {
+		"tags": [
+			"notifications",
+			"account"
+		],
+		"requireCredential": true,
+		"kind": "write:notifications"
+	},
+	"notifications/mark-all-as-read": {
+		"tags": [
+			"notifications",
+			"account"
+		],
+		"requireCredential": true,
+		"kind": "write:notifications"
+	},
+	"notifications/test-notification": {
+		"tags": [
+			"notifications"
+		],
+		"requireCredential": true,
+		"kind": "write:notifications",
+		"limit": {
+			"duration": 60000,
+			"max": 10
+		}
+	},
+	"clips/delete": {
+		"tags": [
+			"clips"
+		],
+		"requireCredential": true,
+		"kind": "write:account",
+		"errors": {
+			"noSuchClip": {
+				"message": "No such clip.",
+				"code": "NO_SUCH_CLIP",
+				"id": "70ca08ba-6865-4630-b6fb-8494759aa754"
+			}
+		}
+	},
+	"clips/add-note": {
+		"tags": [
+			"account",
+			"notes",
+			"clips"
+		],
+		"requireCredential": true,
+		"prohibitMoved": true,
+		"kind": "write:account",
+		"limit": {
+			"duration": 3600000,
+			"max": 20
+		},
+		"errors": {
+			"noSuchClip": {
+				"message": "No such clip.",
+				"code": "NO_SUCH_CLIP",
+				"id": "d6e76cc0-a1b5-4c7c-a287-73fa9c716dcf"
+			},
+			"noSuchNote": {
+				"message": "No such note.",
+				"code": "NO_SUCH_NOTE",
+				"id": "fc8c0b49-c7a3-4664-a0a6-b418d386bb8b"
+			},
+			"alreadyClipped": {
+				"message": "The note has already been clipped.",
+				"code": "ALREADY_CLIPPED",
+				"id": "734806c4-542c-463a-9311-15c512803965"
+			},
+			"tooManyClipNotes": {
+				"message": "You cannot add notes to the clip any more.",
+				"code": "TOO_MANY_CLIP_NOTES",
+				"id": "f0dba960-ff73-4615-8df4-d6ac5d9dc118"
+			}
+		}
+	},
+	"clips/remove-note": {
+		"tags": [
+			"account",
+			"notes",
+			"clips"
+		],
+		"requireCredential": true,
+		"prohibitMoved": true,
+		"kind": "write:account",
+		"errors": {
+			"noSuchClip": {
+				"message": "No such clip.",
+				"code": "NO_SUCH_CLIP",
+				"id": "b80525c6-97f7-49d7-a42d-ebccd49cfd52"
+			},
+			"noSuchNote": {
+				"message": "No such note.",
+				"code": "NO_SUCH_NOTE",
+				"id": "aff017de-190e-434b-893e-33a9ff5049d8"
+			}
+		}
+	}
+}

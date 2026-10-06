@@ -4,25 +4,34 @@
  */
 
 import * as os from 'node:os';
-import { createOperations } from '@features/operations/backend';
-import type { OperationsFeature } from '@features/operations/backend';
-import { createPortability } from '@features/portability/backend';
-import type { PortabilityFeature } from '@features/portability/backend';
+import {
+	createChatCommands,
+	createCollectionCommands,
+	createEmojiAdministration,
+	createNotifications,
+	createOperations,
+	createPortability,
+	createInstance,
+	createStatistics,
+	createAvatarDecorations,
+	createEmojis,
+} from '@features/index/backend';
+import type { FeatureApis } from '@features/index/backend';
+import { ChatService, ChatMessageAccessError } from '@/core/ChatService.js';
+import { ClipService } from '@/core/ClipService.js';
+import { CustomEmojiService } from '@/core/CustomEmojiService.js';
+import { NotificationService } from '@/core/NotificationService.js';
+import type { MiChatRoom } from '@/models/ChatRoom.js';
+import type { MiChatMessage } from '@/models/ChatMessage.js';
+import type { MiLocalUser } from '@/models/User.js';
+import { ApiError } from './error.js';
 import { QueueService } from '@/core/QueueService.js';
 import { ModerationLogService } from '@/core/ModerationLogService.js';
 import { MoreThan, IsNull } from 'typeorm';
 import { USER_ONLINE_THRESHOLD } from '@/const.js';
-import { createEmojis } from '@features/emojis/backend';
-import type { EmojisFeature } from '@features/emojis/backend';
 import { EmojiEntityService } from '@/core/entities/EmojiEntityService.js';
-import { createInstance } from '@features/instance/backend';
-import type { InstanceFeature } from '@features/instance/backend';
-import { createAvatarDecorations } from '@features/avatar-decorations/backend';
-import type { AvatarDecorationsFeature } from '@features/avatar-decorations/backend';
 import { AvatarDecorationService } from '@/core/AvatarDecorationService.js';
 import { RoleService } from '@/core/RoleService.js';
-import { createStatistics } from '@features/statistics/backend';
-import type { StatisticsFeature } from '@features/statistics/backend';
 import NotesChart from '@/core/chart/charts/notes.js';
 import UsersChart from '@/core/chart/charts/users.js';
 import { DI } from '@/di-symbols.js';
@@ -32,15 +41,12 @@ import type { Provider } from '@nestjs/common';
 
 // Transitional composition boundary: Nest resolves a feature, not each handler.
 // The feature itself receives narrow dependencies and has no container access.
-export interface ApiFeatures {
-	operations: OperationsFeature;
-	portability: PortabilityFeature;
-	instance: InstanceFeature;
-	statistics: StatisticsFeature;
-	avatarDecorations: AvatarDecorationsFeature;
-	emojis: EmojisFeature;
-}
+export type ApiFeatures = FeatureApis<MiChatRoom, MiChatMessage, MiLocalUser>;
 export const featureTokens = {
+	chatCommands: Symbol('chat command API feature'),
+	collectionCommands: Symbol('collection command API feature'),
+	emojiAdministration: Symbol('emoji administration API feature'),
+	notifications: Symbol('notifications API feature'),
 	operations: Symbol('operations API feature'),
 	portability: Symbol('portability API feature'),
 	instance: Symbol('instance API feature'),
@@ -49,6 +55,61 @@ export const featureTokens = {
 	emojis: Symbol('emojis API feature'),
 } satisfies Record<keyof ApiFeatures, symbol>;
 export const featureProviders: Provider[] = [{
+	provide: featureTokens.chatCommands,
+	inject: [ChatService],
+	useFactory: (chat: ChatService) => createChatCommands<MiChatRoom, MiChatMessage, MiLocalUser>({
+		checkChatAvailability: (id, permission) => chat.checkChatAvailability(id, permission),
+		readAllChatMessages: id => chat.readAllChatMessages(id),
+		joinToRoom: (id, roomId) => chat.joinToRoom(id, roomId),
+		leaveRoom: (id, roomId) => chat.leaveRoom(id, roomId),
+		muteRoom: (id, roomId, mute) => chat.muteRoom(id, roomId, mute),
+		ignoreRoomInvitation: (id, roomId) => chat.ignoreRoomInvitation(id, roomId),
+		react: (messageId, id, reaction) => chat.react(messageId, id, reaction),
+		unreact: (messageId, id, reaction) => chat.unreact(messageId, id, reaction),
+		findMyMessageById: (id, messageId) => chat.findMyMessageById(id, messageId),
+		deleteMessage: message => chat.deleteMessage(message),
+		findRoomById: roomId => chat.findRoomById(roomId),
+		hasPermissionToDeleteRoom: (id, room) => chat.hasPermissionToDeleteRoom(id, room),
+		deleteRoom: (room, actor) => chat.deleteRoom(room, actor),
+		isMessageAccessError: error => error instanceof ChatMessageAccessError,
+		createError: definition => new ApiError(definition),
+	}),
+}, {
+	provide: featureTokens.collectionCommands,
+	inject: [ClipService],
+	useFactory: (clips: ClipService) => createCollectionCommands({
+		delete: (actor, clipId) => clips.delete(actor, clipId),
+		addNote: (actor, clipId, noteId) => clips.addNote(actor, clipId, noteId),
+		removeNote: (actor, clipId, noteId) => clips.removeNote(actor, clipId, noteId),
+		classifyError: error => {
+			if (error instanceof ClipService.NoSuchClipError) return 'noSuchClip';
+			if (error instanceof ClipService.NoSuchNoteError) return 'noSuchNote';
+			if (error instanceof ClipService.AlreadyAddedError) return 'alreadyAdded';
+			if (error instanceof ClipService.TooManyClipNotesError) return 'tooManyClipNotes';
+			return undefined;
+		},
+		createError: definition => new ApiError(definition),
+	}),
+}, {
+	provide: featureTokens.emojiAdministration,
+	inject: [CustomEmojiService],
+	useFactory: (emojis: CustomEmojiService) => createEmojiAdministration({
+		setCategoryBulk: (ids, category) => emojis.setCategoryBulk(ids, category),
+		setLicenseBulk: (ids, license) => emojis.setLicenseBulk(ids, license),
+		setAliasesBulk: (ids, aliases) => emojis.setAliasesBulk(ids, aliases),
+		addAliasesBulk: (ids, aliases) => emojis.addAliasesBulk(ids, aliases),
+		removeAliasesBulk: (ids, aliases) => emojis.removeAliasesBulk(ids, aliases),
+	}),
+}, {
+	provide: featureTokens.notifications,
+	inject: [NotificationService],
+	useFactory: (notifications: NotificationService) => createNotifications({
+		createAppNotification: (id, data) => notifications.createNotification(id, 'app', data),
+		createTestNotification: id => notifications.createNotification(id, 'test', {}),
+		flushAllNotifications: id => notifications.flushAllNotifications(id),
+		readAllNotification: (id, forCurrentUser) => notifications.readAllNotification(id, forCurrentUser),
+	}),
+}, {
 	provide: featureTokens.operations,
 	inject: [QueueService, ModerationLogService],
 	useFactory: (queue: QueueService, audit: ModerationLogService) => createOperations({

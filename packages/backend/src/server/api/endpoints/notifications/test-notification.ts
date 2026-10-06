@@ -3,9 +3,10 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Injectable } from '@nestjs/common';
+import { legacyNotificationsSchemas } from '@features/notifications/backend';
+import type { Schema } from '@/misc/json-schema.js';
 import { Endpoint } from '@/server/api/endpoint-base.js';
-import { NotificationService } from '@/core/NotificationService.js';
+import { defineFeatureEndpoint } from '@/server/api/feature-endpoint.js';
 
 export const meta = {
 	tags: ['notifications'],
@@ -20,19 +21,7 @@ export const meta = {
 	},
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {},
-	required: [],
-} as const;
+export const paramDef = legacyNotificationsSchemas['notifications/test-notification'].input as Schema;
 
-@Injectable()
-export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-disable-line import/no-default-export
-	constructor(
-		private notificationService: NotificationService,
-	) {
-		super(meta, paramDef, async (ps, user) => {
-			this.notificationService.createNotification(user.id, 'test', {});
-		});
-	}
-}
+export const { feature, createEndpoint } = defineFeatureEndpoint('notifications', notifications => new Endpoint(meta, paramDef, async (params, user) =>
+	notifications['notifications/test-notification'](params, { context: { actor: { id: user.id }, token: null } })));

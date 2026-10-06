@@ -3,7 +3,7 @@
 This is the placement plan for the modular-monolith migration, not a claim that
 all listed code has already moved. Public routes, authentication, database
 schema and wire responses stay compatible. The inventory currently contains
-438 registered API modules (415 legacy classes, 23 feature factories after the first batch), 94 core
+438 registered API modules (394 legacy classes, 44 feature-backed endpoints), 94 core
 services, 39 entity serializers, 35 job processors and 19 server-rendered view
 files. The frontend has 245 Vue files under `pages`; these are not 245 distinct
 routes (the router has 151 direct path bindings to 136 distinct page files).
@@ -29,6 +29,11 @@ The [file allocation table](feature-file-allocation.tsv) records 419 service, se
 - A feature consumes another feature's public contract or narrow injected port.
   `boot` assembles implementations and starts/stops them. Do not import another
   feature's private repository, service implementation or Vue internals.
+- `features/index/{contract,backend,frontend}` are separate composition entries for
+  the host packages. The contract entry exports types only; the backend entry
+  gathers factories and their API types; the frontend entry keeps page loaders
+  lazy. Domain implementations must not import these aggregation entries. There
+  is no mixed root barrel and no additional package or build configuration.
 - Temporary old-path reexports are allowed for mechanical placement migration,
   explicitly marked as compatibility bridges. A move alone is not DI conversion
   or contract-first completion.

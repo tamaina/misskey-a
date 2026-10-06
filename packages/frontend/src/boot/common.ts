@@ -5,7 +5,7 @@
 
 import { watch, version as vueVersion } from 'vue';
 import { createInternationalization } from 'virtual:vite-vue-internationalization';
-import { startComponentLocales } from '@features/boot/frontend';
+import { startComponentLocales } from '@features/index/frontend';
 import { compareVersions } from 'compare-versions';
 import { version, lang, isSafeMode } from '@@/js/config.js';
 import defaultLightTheme from '@@/themes/l-light.json5';

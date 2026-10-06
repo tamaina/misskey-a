@@ -3,10 +3,11 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Inject, Injectable } from '@nestjs/common';
+import { collectionsErrors } from '@features/collections/contract';
+import { legacyCollectionsSchemas } from '@features/collections/backend';
+import type { Schema } from '@/misc/json-schema.js';
 import { Endpoint } from '@/server/api/endpoint-base.js';
-import { ClipService } from '@/core/ClipService.js';
-import { ApiError } from '../../error.js';
+import { defineFeatureEndpoint } from '@/server/api/feature-endpoint.js';
 
 export const meta = {
 	tags: ['clips'],
@@ -15,37 +16,11 @@ export const meta = {
 
 	kind: 'write:account',
 
-	errors: {
-		noSuchClip: {
-			message: 'No such clip.',
-			code: 'NO_SUCH_CLIP',
-			id: '70ca08ba-6865-4630-b6fb-8494759aa754',
-		},
-	},
+	errors: collectionsErrors['clips/delete'],
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {
-		clipId: { type: 'string', format: 'misskey:id' },
-	},
-	required: ['clipId'],
-} as const;
+export const paramDef = legacyCollectionsSchemas['clips/delete'].input as Schema;
 
-@Injectable()
-export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-disable-line import/no-default-export
-	constructor(
-		private clipService: ClipService,
-	) {
-		super(meta, paramDef, async (ps, me) => {
-			try {
-				await this.clipService.delete(me, ps.clipId);
-			} catch (e) {
-				if (e instanceof ClipService.NoSuchClipError) {
-					throw new ApiError(meta.errors.noSuchClip);
-				}
-				throw e;
-			}
-		});
-	}
-}
+export const { feature, createEndpoint } = defineFeatureEndpoint('collectionCommands', commands => new Endpoint(meta, paramDef, async (params, user) => commands['clips/delete'](params, {
+	context: { actor: { id: user.id } },
+})));

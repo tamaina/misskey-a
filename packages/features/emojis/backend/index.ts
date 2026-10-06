@@ -67,3 +67,9 @@ export const legacyEmojiSchemas: { input: JsonSchema; output: JsonSchema } = {
 	input: legacyEmojiInput,
 	output: legacyEmojiOutput,
 };
+
+export {
+	createEmojiAdministration,
+	legacyEmojiAdministrationSchemas,
+} from './administration.js';
+export type { EmojiAdministrationDependencies, EmojiAdministrationFeature } from './administration.js';

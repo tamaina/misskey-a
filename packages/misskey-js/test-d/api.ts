@@ -128,3 +128,24 @@ test('queue operations and exports use the feature contract types', async () => 
 	// @ts-expect-error following export filter must be boolean
 	cli.request('i/export-following', { excludeMuting: 'yes' });
 });
+
+test('chat, collection, emoji administration and notification commands derive from contracts', async () => {
+	const cli = new Misskey.api.APIClient({ origin: 'https://misskey.test' });
+	expectType<void>(await cli.request('chat/read-all'));
+	expectType<void>(await cli.request('chat/rooms/mute', { roomId: 'room1', mute: true }));
+	expectType<void>(await cli.request('chat/messages/react', { messageId: 'message1', reaction: '👍' }));
+	expectType<void>(await cli.request('clips/add-note', { clipId: 'clip1', noteId: 'note1' }));
+	expectType<void>(await cli.request('admin/emoji/set-category-bulk', { ids: [], category: null }));
+	expectType<void>(await cli.request('admin/emoji/add-aliases-bulk', { ids: ['emoji1'], aliases: [] }));
+	expectType<void>(await cli.request('notifications/create', { body: 'hello', header: null }));
+	// @ts-expect-error room identifiers remain strings
+	cli.request('chat/rooms/join', { roomId: 1 });
+	// @ts-expect-error mute is a required boolean
+	cli.request('chat/rooms/mute', { roomId: 'room1' });
+	// @ts-expect-error note identifiers are required
+	cli.request('clips/add-note', { clipId: 'clip1' });
+	// @ts-expect-error ids are strings
+	cli.request('admin/emoji/set-category-bulk', { ids: [1] });
+	// @ts-expect-error notification body is required
+	cli.request('notifications/create', { header: 'hello' });
+});

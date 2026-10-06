@@ -5,7 +5,7 @@
 
 import { defineAsyncComponent } from 'vue';
 import type { AsyncComponentLoader } from 'vue';
-import { loadNotFoundPage } from '@features/navigation/frontend';
+import { loadNotFoundPage } from '@features/index/frontend';
 import type { RouteDef } from '@/lib/nirax.js';
 import { $i, iAmModerator } from '@/i.js';
 import MkLoading from '@/pages/_loading_.vue';

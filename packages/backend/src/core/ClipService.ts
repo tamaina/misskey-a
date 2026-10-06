@@ -75,7 +75,7 @@ export class ClipService {
 	}
 
 	@bindThis
-	public async delete(me: MiLocalUser, clipId: MiClip['id']): Promise<void> {
+	public async delete(me: Pick<MiLocalUser, 'id'>, clipId: MiClip['id']): Promise<void> {
 		const clip = await this.clipsRepository.findOneBy({
 			id: clipId,
 			userId: me.id,
@@ -89,7 +89,7 @@ export class ClipService {
 	}
 
 	@bindThis
-	public async addNote(me: MiLocalUser, clipId: MiClip['id'], noteId: MiNote['id']): Promise<void> {
+	public async addNote(me: Pick<MiLocalUser, 'id'>, clipId: MiClip['id'], noteId: MiNote['id']): Promise<void> {
 		const clip = await this.clipsRepository.findOneBy({
 			id: clipId,
 			userId: me.id,
@@ -132,7 +132,7 @@ export class ClipService {
 	}
 
 	@bindThis
-	public async removeNote(me: MiLocalUser, clipId: MiClip['id'], noteId: MiNote['id']): Promise<void> {
+	public async removeNote(me: Pick<MiLocalUser, 'id'>, clipId: MiClip['id'], noteId: MiNote['id']): Promise<void> {
 		const clip = await this.clipsRepository.findOneBy({
 			id: clipId,
 			userId: me.id,

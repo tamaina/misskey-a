@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { createCustomEmojiStore } from '@features/emojis/frontend';
+import { createCustomEmojiStore } from '@features/index/frontend';
 import { misskeyApi, misskeyApiGet } from '@/utility/misskey-api.js';
 import { get, set } from '@/utility/idb-proxy.js';
 

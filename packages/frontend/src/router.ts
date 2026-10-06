@@ -4,7 +4,7 @@
  */
 
 import { inject } from 'vue';
-import { loadNotFoundPage } from '@features/navigation/frontend';
+import { loadNotFoundPage } from '@features/index/frontend';
 import { page } from '@/router.definition.js';
 import { $i } from '@/i.js';
 import { Nirax } from '@/lib/nirax.js';
