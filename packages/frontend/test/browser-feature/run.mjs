@@ -9,7 +9,7 @@ import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { build, preview } from 'vite';
 import vue from '@vitejs/plugin-vue';
-import { chromium } from '@playwright/test';
+import { chromium, expect } from '@playwright/test';
 import locales from 'i18n';
 import { pluginVvi } from '../../lib/vite-plugin-vvi.ts';
 
@@ -75,7 +75,9 @@ try {
 					await page.waitForFunction(() => globalThis.document.querySelectorAll('#emoji-catalog [data-foldable]').length === 3);
 					assert.equal(await search.locator('h3').innerText(), locales[locale].searchResult);
 					assert.equal(await search.locator('button').count(), 1);
-					assert.ok((await search.innerText()).includes('feature_fox'));
+					// Rows use content-visibility:auto; wait for actual rendering in the viewport.
+					await search.locator('button').scrollIntoViewIfNeeded();
+					await expect(search.locator('button')).toContainText('feature_fox', { useInnerText: true });
 					await query.fill(':feature_cat:');
 					await page.waitForFunction(() => globalThis.document.querySelector('#emoji-catalog [data-foldable]')?.textContent.includes('feature_cat'));
 					assert.equal(await search.locator('button').count(), 1);
