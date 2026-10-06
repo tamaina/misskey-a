@@ -27,6 +27,7 @@
 		"lint": "pnpm typecheck && pnpm eslint",
 		"test": "pnpm build:unit && cross-env NODE_ENV=test pnpm compile-config && vitest --config vitest.config.unit.ts",
 		"test:e2e": "pnpm build:e2e && cross-env NODE_ENV=test pnpm compile-config && vitest --config vitest.config.e2e.ts",
+		"test:maintenance": "pnpm build && cross-env NODE_ENV=test pnpm compile-config && cross-env NODE_ENV=test node --test test/integration/*.test.mjs",
 		"test:fed": "cross-env NODE_ENV=test pnpm compile-config && vitest --config vitest.config.fed.ts",
 		"test-and-coverage": "pnpm build:unit && cross-env NODE_ENV=test pnpm compile-config && vitest --coverage --config vitest.config.unit.ts",
 		"test-and-coverage:e2e": "pnpm build:e2e && cross-env NODE_ENV=test pnpm compile-config && vitest --coverage --config vitest.config.e2e.ts",

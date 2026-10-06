@@ -40,3 +40,6 @@ const { $schema: _outputDialect, ...output } = toJsonSchema(pingResult);
 export const legacyPingSchemas: { input: JsonSchema; output: JsonSchema } = { input, output };
 const { $schema: _serverInfoDialect, ...serverInfoOutput } = toJsonSchema(serverInfoResult);
 export const legacyServerInfoSchemas: { input: JsonSchema; output: JsonSchema } = { input, output: serverInfoOutput };
+
+export { createResetCaptcha } from './reset-captcha.js';
+export type { CaptchaReset } from './reset-captcha.js';

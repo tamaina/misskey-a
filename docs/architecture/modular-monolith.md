@@ -99,8 +99,14 @@ rendering. Only then extend the migration to additional feature-owned views.
 - Boot resource coordinator: isolated tests cover ordering, rollback, cleanup
   errors, concurrent calls, stop during startup and independent role lifetimes.
 - CLI dispatch now uses the boot feature: help, ping and unknown commands do not
-  construct the legacy container. The reset-captcha adapter still uses Nest and
-  closes its context in a finally block; database execution is not yet verified.
+  construct the legacy container. The reset-captcha command now uses an explicit,
+  typed factory with only PostgreSQL and a Redis publisher. Boot starts/closes
+  those resources; no Nest service graph, timers or subscribers are constructed.
+  Its database update shares the legacy metadata transaction adapter and awaits
+  the existing internal event before shutdown. Isolated database/Redis integration
+  verifies existing/absent metadata rows, duplicate-row selection, unrelated fields,
+  publication and process exit. Maintenance never synchronizes database schema.
+  This is the first removed container path, not a completed server/queue DI rewrite.
 - The first migrated endpoint is instance/ping. Its Valibot input/output and
   oRPC contract live under the instance feature. The server implements that
   contract; misskey-js derives ping request/response types from the contract.
@@ -133,3 +139,12 @@ rendering. Only then extend the migration to additional feature-owned views.
   database setup; feature tests add null/undefined, empty text/CW and empty-file
   cases. This does not replace NoteCreateService's remaining dependencies or
   claim database/federation integration coverage.
+
+## Current integration limits
+
+The cloud can run isolated PostgreSQL 18 and Redis 7 test services. The complete
+legacy backend E2E bootstrap currently stops when cacheable-lookup enumerates
+network interfaces (uv_interface_addresses is denied by the environment).
+Do not report the full server suite as passed or mock that call to disguise this
+limit. The maintenance command's narrower dependencies are tested with real
+PostgreSQL/Redis without constructing that unrelated HTTP client.

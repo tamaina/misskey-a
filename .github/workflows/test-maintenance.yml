@@ -1,0 +1,54 @@
+name: Test feature maintenance
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - packages/features/**
+      - packages/backend/**
+      - packages/misskey-js/**
+      - pnpm-lock.yaml
+      - .github/workflows/test-maintenance.yml
+  pull_request:
+    paths:
+      - packages/features/**
+      - packages/backend/**
+      - packages/misskey-js/**
+      - pnpm-lock.yaml
+      - .github/workflows/test-maintenance.yml
+
+permissions:
+  contents: read
+
+jobs:
+  maintenance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    services:
+      postgres:
+        image: postgres:18
+        ports: ['54312:5432']
+        env:
+          POSTGRES_DB: test-misskey
+          POSTGRES_HOST_AUTH_METHOD: trust
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+      redis:
+        image: redis:8
+        ports: ['56312:6379']
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: pnpm/action-setup@v6.0.10
+      - uses: actions/setup-node@v7.0.0
+        with:
+          node-version-file: .node-version
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: cp .github/misskey/test.yml .config/test.yml
+      - run: pnpm --filter 'backend^...' -r build
+      - run: pnpm --filter '@misskey-a/*' -r test
+      - run: pnpm --filter backend test:maintenance

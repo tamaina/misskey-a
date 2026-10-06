@@ -8,6 +8,7 @@ import { DataSource } from 'typeorm';
 import * as Redis from 'ioredis';
 import { DI } from '@/di-symbols.js';
 import { MiMeta } from '@/models/Meta.js';
+import { updateInstanceMeta } from '@/models/update-instance-meta.js';
 import { GlobalEventService } from '@/core/GlobalEventService.js';
 import { bindThis } from '@/decorators.js';
 import type { GlobalEvents } from '@/core/GlobalEventService.js';
@@ -100,34 +101,7 @@ export class MetaService implements OnApplicationShutdown {
 
 	@bindThis
 	public async update(data: Partial<MiMeta>): Promise<MiMeta> {
-		let before: MiMeta | undefined;
-
-		const updated = await this.db.transaction(async transactionalEntityManager => {
-			const metas = await transactionalEntityManager.find(MiMeta, {
-				order: {
-					id: 'DESC',
-				},
-			});
-
-			before = metas[0];
-
-			if (before) {
-				await transactionalEntityManager.update(MiMeta, before.id, data);
-			} else {
-				await transactionalEntityManager.save(MiMeta, {
-					...data,
-					id: 'x',
-				});
-			}
-
-			const afters = await transactionalEntityManager.find(MiMeta, {
-				order: {
-					id: 'DESC',
-				},
-			});
-
-			return afters[0];
-		});
+		const { before, after: updated } = await updateInstanceMeta(this.db, data);
 
 		if (data.hiddenTags) {
 			process.nextTick(() => {
