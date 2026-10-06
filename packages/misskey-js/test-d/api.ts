@@ -51,4 +51,12 @@ describe('feature contracts', () => {
 		expectType<{ pong: number }>(await cli.request('ping'));
 		expectType<{ pong: number }>(await cli.request('ping', {}));
 	});
+	test('server-info is inferred from its oRPC contract', async () => {
+		const cli = new Misskey.api.APIClient({ origin: 'https://misskey.test' });
+		const result = await cli.request('server-info');
+		expectType<string>(result.machine);
+		expectType<number>(result.cpu.cores);
+		expectType<number>(result.mem.total);
+		expectType<number>(result.fs.used);
+	});
 });

@@ -1441,8 +1441,7 @@ type EndpointResponse = operations['endpoint']['responses']['200']['content']['a
 // Warning: (ae-forgotten-export) The symbol "Endpoints_2" needs to be exported by the entry point index.d.ts
 //
 // @public (undocumented)
-export type Endpoints = Overwrite<Endpoints_2, {
-    'ping': InstanceEndpoints['ping'];
+export type Endpoints = Overwrite<Overwrite<Endpoints_2, InstanceEndpoints>, {
     'users/show': {
         req: UsersShowRequest;
         res: {

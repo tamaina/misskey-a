@@ -107,6 +107,13 @@ rendering. Only then extend the migration to additional feature-owned views.
   A temporary adapter retains the existing API policy/error pipeline and
   derives legacy JSON Schema documentation from Valibot. Generated SDK models
   are unchanged for this endpoint.
+- Instance/server-info uses the same contract-first path. The feature receives
+  a current-settings predicate and a machine-information reader, so its privacy
+  behavior is testable without probing the host. The legacy adapter retains
+  anonymous access, GET support and the 60-second cache policy. Generated
+  OpenAPI remains identical; machine statistics are never read by the feature
+  while the setting is disabled. The SDK overlays the complete instance contract
+  type map, so adding a contract does not require a per-endpoint SDK type copy.
 - SDK contract dependencies currently resolve through the workspace. Packaging
   independently publishable SDK/contract artifacts remains a migration task;
   do not publish these private feature packages as-is.

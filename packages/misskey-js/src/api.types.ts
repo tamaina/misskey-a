@@ -68,9 +68,8 @@ export type SwitchCaseResponseType<E extends keyof Endpoints, P extends Endpoint
 /* eslint-enable @stylistic/indent */
 
 export type Endpoints = Overwrite<
-	Gen,
+	Overwrite<Gen, InstanceEndpoints>,
 	{
-		'ping': InstanceEndpoints['ping'];
 		'users/show': {
 			req: UsersShowRequest;
 			res: {
