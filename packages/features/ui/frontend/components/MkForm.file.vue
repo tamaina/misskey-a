@@ -13,10 +13,10 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script setup lang="ts">
 import * as Misskey from 'misskey-js';
 import { computed, ref } from 'vue';
-import { i18n } from '@/i18n.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import { selectFile } from '@features/drive/frontend/utility/drive.js';
-import { misskeyApi } from '@/utility/misskey-api.js';
+import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 
 const props = defineProps<{
 	fileId?: string | null;

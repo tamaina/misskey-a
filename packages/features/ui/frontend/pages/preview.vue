@@ -11,9 +11,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import { computed } from 'vue';
-import MkSample from '@/components/MkPreview.vue';
-import { i18n } from '@/i18n.js';
-import { definePage } from '@/page.js';
+import MkSample from '@features/markup/frontend/components/MkPreview.vue';
+import { i18n } from '@features/runtime/frontend/i18n.js';
+import { definePage } from '@features/navigation/frontend/page.js';
 
 const headerActions = computed(() => []);
 

@@ -52,7 +52,7 @@ import MkSwitch from '@features/ui/frontend/components/MkSwitch.vue';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import { formatDateTimeString } from '@features/ui/frontend/utility/format-time-string.js';
 import { addTime } from '@features/ui/frontend/utility/time.js';
-import { i18n } from '@/i18n.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
 import { useMkSelect } from '@features/ui/frontend/composables/use-mkselect.js';
 
 export type PollEditorModelValue = {

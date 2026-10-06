@@ -68,15 +68,15 @@ import { entities } from 'misskey-js';
 import type { MkSystemWebhookResult } from '@features/integrations/frontend/components/MkSystemWebhookEditor.impl.js';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import MkModalWindow from '@features/ui/frontend/components/MkModalWindow.vue';
-import { i18n } from '@/i18n.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
 import MkInput from '@features/ui/frontend/components/MkInput.vue';
-import { misskeyApi } from '@/utility/misskey-api.js';
+import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 import { useMkSelect } from '@features/ui/frontend/composables/use-mkselect.js';
 import MkSelect from '@features/ui/frontend/components/MkSelect.vue';
 import { showSystemWebhookEditorDialog } from '@features/integrations/frontend/components/MkSystemWebhookEditor.impl.js';
 import MkSwitch from '@features/ui/frontend/components/MkSwitch.vue';
 import MkDivider from '@features/ui/frontend/components/MkDivider.vue';
-import * as os from '@/os.js';
+import * as os from '@features/ui/frontend/os.js';
 
 const emit = defineEmits<{
 	(ev: 'submitted'): void;

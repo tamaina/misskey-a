@@ -76,12 +76,12 @@ import MkInfo from '@features/ui/frontend/components/MkInfo.vue';
 import MkMediaList from '@features/media/frontend/components/MkMediaList.vue';
 import MkKeyValue from '@features/ui/frontend/components/MkKeyValue.vue';
 import bytes from '@features/ui/frontend/filters/bytes.js';
-import { i18n } from '@/i18n.js';
-import * as os from '@/os.js';
-import { misskeyApi } from '@/utility/misskey-api.js';
-import { useRouter } from '@/router.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
+import * as os from '@features/ui/frontend/os.js';
+import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
+import { useRouter } from '@features/navigation/frontend/router.js';
 import { selectDriveFolder } from '@features/drive/frontend/utility/drive.js';
-import { globalEvents } from '@/events.js';
+import { globalEvents } from '@features/runtime/frontend/events.js';
 
 const router = useRouter();
 

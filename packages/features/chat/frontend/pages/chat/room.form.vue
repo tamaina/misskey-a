@@ -39,14 +39,14 @@ import * as Misskey from 'misskey-js';
 //import insertTextAtCursor from 'insert-text-at-cursor';
 import { formatTimeString } from '@features/ui/frontend/utility/format-time-string.js';
 import { selectFile } from '@features/drive/frontend/utility/drive.js';
-import * as os from '@/os.js';
-import { i18n } from '@/i18n.js';
-import { miLocalStorage } from '@/local-storage.js';
-import { misskeyApi } from '@/utility/misskey-api.js';
-import { prefer } from '@/preferences.js';
+import * as os from '@features/ui/frontend/os.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
+import { miLocalStorage } from '@features/preferences/frontend/local-storage.js';
+import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
+import { prefer } from '@features/preferences/frontend/preferences.js';
 import { Autocomplete } from '@features/discovery/frontend/utility/autocomplete.js';
 import { emojiPicker } from '@features/emojis/frontend/utility/emoji-picker.js';
-import { checkDragDataType, getDragData } from '@/drag-and-drop.js';
+import { checkDragDataType, getDragData } from '@features/ui/frontend/drag-and-drop.js';
 
 const props = defineProps<{
 	user?: Misskey.entities.UserDetailed | null;

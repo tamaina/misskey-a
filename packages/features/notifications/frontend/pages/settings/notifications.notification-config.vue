@@ -43,7 +43,7 @@ import { ref, computed } from 'vue';
 import MkSelect from '@features/ui/frontend/components/MkSelect.vue';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import { useMkSelect } from '@features/ui/frontend/composables/use-mkselect.js';
-import { i18n } from '@/i18n.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
 
 const props = defineProps<{
 	value: NotificationConfig;

@@ -84,13 +84,13 @@ SPDX-License-Identifier: AGPL-3.0-only
 import { computed, ref, watch } from 'vue';
 import * as Misskey from 'misskey-js';
 import XGame from '@features/games/frontend/pages/drop-and-fusion.game.vue';
-import { definePage } from '@/page.js';
+import { definePage } from '@features/navigation/frontend/page.js';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
-import { i18n } from '@/i18n.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
 import { useMkSelect } from '@features/ui/frontend/composables/use-mkselect.js';
 import MkSelect from '@features/ui/frontend/components/MkSelect.vue';
 import MkSwitch from '@features/ui/frontend/components/MkSwitch.vue';
-import { misskeyApiGet } from '@/utility/misskey-api.js';
+import { misskeyApiGet } from '@features/api/frontend/utility/misskey-api.js';
 
 const {
 	model: gameMode,

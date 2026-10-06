@@ -3,10 +3,10 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { $i } from '@/i.js';
-import { instance } from '@/instance.js';
-import { i18n } from '@/i18n.js';
-import { popupAsyncWithDialog } from '@/os.js';
+import { $i } from '@features/auth/frontend/i.js';
+import { instance } from '@features/instance/frontend/instance.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
+import { popupAsyncWithDialog } from '@features/ui/frontend/os.js';
 
 export type OpenOnRemoteOptions = {
 	/**

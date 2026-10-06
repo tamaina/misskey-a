@@ -13,7 +13,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import MkClickerGame from '@features/games/frontend/components/MkClickerGame.vue';
-import { definePage } from '@/page.js';
+import { definePage } from '@features/navigation/frontend/page.js';
 
 definePage(() => ({
 	title: '🍪👈',

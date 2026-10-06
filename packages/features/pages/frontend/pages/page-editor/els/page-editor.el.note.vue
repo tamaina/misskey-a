@@ -30,7 +30,7 @@ import MkInput from '@features/ui/frontend/components/MkInput.vue';
 import MkSwitch from '@features/ui/frontend/components/MkSwitch.vue';
 import MkNote from '@features/notes/frontend/components/MkNote.vue';
 import MkNoteDetailed from '@features/notes/frontend/components/MkNoteDetailed.vue';
-import { misskeyApi } from '@/utility/misskey-api.js';
+import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 
 const props = defineProps<{
 	dragStartCallback?: (ev: DragEvent) => void;

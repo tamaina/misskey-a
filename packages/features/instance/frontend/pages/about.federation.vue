@@ -38,7 +38,7 @@ import MkSelect from '@features/ui/frontend/components/MkSelect.vue';
 import MkPagination from '@features/ui/frontend/components/MkPagination.vue';
 import MkInstanceCardMini from '@features/federation/frontend/components/MkInstanceCardMini.vue';
 import FormSplit from '@features/ui/frontend/components/form/split.vue';
-import { i18n } from '@/i18n.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
 import { useMkSelect } from '@features/ui/frontend/composables/use-mkselect.js';
 import { Paginator } from '@features/ui/frontend/utility/paginator.js';
 

@@ -53,16 +53,16 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script lang="ts" setup>
 import { onUnmounted, reactive, ref } from 'vue';
 import * as Misskey from 'misskey-js';
-import { useWidgetPropsManager } from '../../../../frontend/src/widgets/widget.js';
-import type { WidgetComponentEmits, WidgetComponentExpose, WidgetComponentProps } from '../../../../frontend/src/widgets/widget.js';
+import { useWidgetPropsManager } from '../../../ui/frontend/widgets/widget.js';
+import type { WidgetComponentEmits, WidgetComponentExpose, WidgetComponentProps } from '../../../ui/frontend/widgets/widget.js';
 import type { FormWithDefault, GetFormResultType } from '@features/ui/frontend/utility/form.js';
-import { useStream } from '@/stream.js';
+import { useStream } from '@features/api/frontend/stream.js';
 import kmg from '@features/ui/frontend/filters/kmg.js';
-import * as sound from '@/utility/sound.js';
-import { deepClone } from '@/utility/clone.js';
-import { prefer } from '@/preferences.js';
-import { genId } from '@/utility/id.js';
-import { i18n } from '@/i18n.js';
+import * as sound from '@features/preferences/frontend/utility/sound.js';
+import { deepClone } from '@features/runtime/frontend/utility/clone.js';
+import { prefer } from '@features/preferences/frontend/preferences.js';
+import { genId } from '@features/runtime/frontend/utility/id.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
 
 const name = 'jobQueue';
 

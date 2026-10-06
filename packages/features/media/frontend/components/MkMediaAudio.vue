@@ -82,11 +82,11 @@ SPDX-License-Identifier: AGPL-3.0-only
 import { ref } from 'vue';
 import * as Misskey from 'misskey-js';
 import bytes from '@features/ui/frontend/filters/bytes.js';
-import { i18n } from '@/i18n.js';
-import { prefer } from '@/preferences.js';
-import * as os from '@/os.js';
-import { getFileMenu } from '@/utility/get-file-menu.js';
-import { shouldHideFileByDefault, canRevealFile } from '@/utility/sensitive-file.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
+import { prefer } from '@features/preferences/frontend/preferences.js';
+import * as os from '@features/ui/frontend/os.js';
+import { getFileMenu } from '@features/drive/frontend/utility/get-file-menu.js';
+import { shouldHideFileByDefault, canRevealFile } from '@features/drive/frontend/utility/sensitive-file.js';
 
 const props = defineProps<{
 	audio: Misskey.entities.DriveFile;

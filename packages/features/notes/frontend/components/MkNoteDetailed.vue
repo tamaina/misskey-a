@@ -242,15 +242,15 @@ SPDX-License-Identifier: AGPL-3.0-only
 import { inject, provide, ref, useTemplateRef, markRaw, computed } from 'vue';
 import * as Misskey from 'misskey-js';
 import { useNote } from '@features/notes/frontend/composables/use-note.js';
-import { prefer } from '@/preferences.js';
-import { i18n } from '@/i18n.js';
+import { prefer } from '@features/preferences/frontend/preferences.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
 import { userPage } from '@features/users/frontend/filters/user.js';
 import { notePage } from '@features/notes/frontend/filters/note.js';
-import { isEnabledUrlPreview } from '@/utility/url-preview.js';
+import { isEnabledUrlPreview } from '@features/markup/frontend/utility/url-preview.js';
 import { Paginator } from '@features/ui/frontend/utility/paginator.js';
-import { misskeyApi } from '@/utility/misskey-api.js';
+import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 import number from '@features/ui/frontend/filters/number.js';
-import { DI } from '@/di.js';
+import { DI } from '@features/ui/frontend/di.js';
 import type { Keymap } from '@features/ui/frontend/utility/hotkey.js';
 
 // コンポーネント外部の依存関係

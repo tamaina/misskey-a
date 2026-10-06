@@ -36,9 +36,9 @@ import { useTemplateRef, shallowRef, ref, computed, watch, onBeforeUnmount } fro
 import * as Misskey from 'misskey-js';
 import tinycolor from 'tinycolor2';
 import type { Content } from '@features/media/frontend/components/MkLightbox.item.vue';
-import { i18n } from '@/i18n.js';
-import { themeManager } from '@/theme.js';
-import { prefer } from '@/preferences.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
+import { themeManager } from '@features/preferences/frontend/theme.js';
+import { prefer } from '@features/preferences/frontend/preferences.js';
 
 // クリック等のフォールスルーはキャンバスに渡す (ルートは全面を覆うので、その外側は背景として扱わせる)
 defineOptions({

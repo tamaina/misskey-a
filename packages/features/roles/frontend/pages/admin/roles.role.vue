@@ -57,16 +57,16 @@ SPDX-License-Identifier: AGPL-3.0-only
 import { computed, markRaw, reactive, ref } from 'vue';
 import * as Misskey from 'misskey-js';
 import XEditor from '@features/roles/frontend/pages/admin/roles.editor.vue';
-import MkFolder from '@/components/MkFolder.vue';
-import * as os from '@/os.js';
-import { misskeyApi } from '@/utility/misskey-api.js';
-import { i18n } from '@/i18n.js';
-import { definePage } from '@/page.js';
+import MkFolder from '@features/ui/frontend/components/MkFolder.vue';
+import * as os from '@features/ui/frontend/os.js';
+import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
+import { definePage } from '@features/navigation/frontend/page.js';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import MkUserCardMini from '@features/users/frontend/components/MkUserCardMini.vue';
 import MkInfo from '@features/ui/frontend/components/MkInfo.vue';
 import MkPagination from '@features/ui/frontend/components/MkPagination.vue';
-import { useRouter } from '@/router.js';
+import { useRouter } from '@features/navigation/frontend/router.js';
 import { Paginator } from '@features/ui/frontend/utility/paginator.js';
 
 const router = useRouter();

@@ -101,13 +101,13 @@ import MkInput from '@features/ui/frontend/components/MkInput.vue';
 import MkColorInput from '@features/ui/frontend/components/MkColorInput.vue';
 import MkSelect from '@features/ui/frontend/components/MkSelect.vue';
 import MkTextarea from '@features/ui/frontend/components/MkTextarea.vue';
-import MkFolder from '@/components/MkFolder.vue';
+import MkFolder from '@features/ui/frontend/components/MkFolder.vue';
 import MkSwitch from '@features/ui/frontend/components/MkSwitch.vue';
 import FormSlot from '@features/ui/frontend/components/form/slot.vue';
 import XPolicyEditor from '@features/roles/frontend/pages/admin/roles.policy-editor.vue';
-import { i18n } from '@/i18n.js';
-import { instance } from '@/instance.js';
-import { deepClone } from '@/utility/clone.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
+import { instance } from '@features/instance/frontend/instance.js';
+import { deepClone } from '@features/runtime/frontend/utility/clone.js';
 import type { PolicyMeta } from '@features/roles/frontend/pages/admin/roles.policy-editor.vue';
 
 type RoleLike = Pick<Misskey.entities.Role, 'name' | 'description' | 'isAdministrator' | 'isModerator' | 'color' | 'iconUrl' | 'target' | 'isPublic' | 'isExplorable' | 'asBadge' | 'canEditMembersByModerator' | 'displayOrder' | 'preserveAssignmentOnMoveAccount'> & {

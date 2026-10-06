@@ -19,11 +19,11 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script lang="ts" setup>
 import { computed } from 'vue';
 import MkKeyValue from '@features/ui/frontend/components/MkKeyValue.vue';
-import { misskeyApi } from '@/utility/misskey-api.js';
+import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 import bytes from '@features/ui/frontend/filters/bytes.js';
 import number from '@features/ui/frontend/filters/number.js';
-import { i18n } from '@/i18n.js';
-import { definePage } from '@/page.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
+import { definePage } from '@features/navigation/frontend/page.js';
 
 const databasePromiseFactory = () => misskeyApi('admin/get-table-stats').then(res => Object.entries(res).sort((a, b) => b[1].size - a[1].size));
 

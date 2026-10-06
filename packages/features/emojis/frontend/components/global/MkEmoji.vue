@@ -13,12 +13,12 @@ SPDX-License-Identifier: AGPL-3.0-only
 import { computed, inject } from 'vue';
 import { colorizeEmoji, getEmojiName } from '@@/js/emojilist.js';
 import { char2fluentEmojiFilePath, char2twemojiFilePath } from '@@/js/emoji-base.js';
-import type { MenuItem } from '@/types/menu.js';
-import * as os from '@/os.js';
+import type { MenuItem } from '@features/navigation/frontend/types/menu.js';
+import * as os from '@features/ui/frontend/os.js';
 import { copyToClipboard } from '@features/ui/frontend/utility/copy-to-clipboard.js';
-import { i18n } from '@/i18n.js';
-import { prefer } from '@/preferences.js';
-import { DI } from '@/di.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
+import { prefer } from '@features/preferences/frontend/preferences.js';
+import { DI } from '@features/ui/frontend/di.js';
 import { mute as muteEmoji, unmute as unmuteEmoji, checkMuted as checkMutedEmoji } from '@features/emojis/frontend/utility/emoji-mute.js';
 import { addToEmojiPalette } from '@features/emojis/frontend/utility/emoji-palette.js';
 

@@ -92,9 +92,9 @@ import FormSection from '@features/ui/frontend/components/form/section.vue';
 import MkUserCardMini from '@features/users/frontend/components/MkUserCardMini.vue';
 import MkInfo from '@features/ui/frontend/components/MkInfo.vue';
 import bytes from '@features/ui/frontend/filters/bytes.js';
-import * as os from '@/os.js';
-import { i18n } from '@/i18n.js';
-import { iAmAdmin, iAmModerator } from '@/i.js';
+import * as os from '@features/ui/frontend/os.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
+import { iAmAdmin, iAmModerator } from '@features/auth/frontend/i.js';
 import MkTabs from '@features/ui/frontend/components/MkTabs.vue';
 
 const props = defineProps<{

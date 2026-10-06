@@ -198,20 +198,20 @@ export function calculateSourceTransform({
 
 <script lang="ts" setup>
 import { computed, nextTick, ref, useTemplateRef, markRaw, watch, provide, onBeforeUnmount, defineAsyncComponent } from 'vue';
-import MkBlurhash from '@/components/MkBlurhash.vue';
+import MkBlurhash from '@features/media/frontend/components/MkBlurhash.vue';
 import XControl from '@features/media/frontend/components/MkLightbox.item.controls.vue';
 import type XAudioVisualizer__TypeReferenceOnly from '@features/media/frontend/components/MkLightbox.item.audio-visualizer.vue';
 import XFileInfo from '@features/media/frontend/components/MkLightbox.item.fileinfo.vue';
-import type { MenuItem } from '@/types/menu.js';
-import { DI } from '@/di.js';
-import * as os from '@/os.js';
-import { prefer } from '@/preferences.js';
-import { i18n } from '@/i18n.js';
-import { shouldHideFileByDefault, canRevealFile } from '@/utility/sensitive-file.js';
+import type { MenuItem } from '@features/navigation/frontend/types/menu.js';
+import { DI } from '@features/ui/frontend/di.js';
+import * as os from '@features/ui/frontend/os.js';
+import { prefer } from '@features/preferences/frontend/preferences.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
+import { shouldHideFileByDefault, canRevealFile } from '@features/drive/frontend/utility/sensitive-file.js';
 import { makeDoubleTapDetector } from '@features/ui/frontend/utility/double-tap.js';
 import { deviceKind } from '@features/ui/frontend/utility/device-kind.js';
 import { isTouchUsing } from '@features/ui/frontend/utility/touch.js';
-import { getFileMenu } from '@/utility/get-file-menu.js';
+import { getFileMenu } from '@features/drive/frontend/utility/get-file-menu.js';
 
 const props = withDefaults(defineProps<{
 	content: Content;

@@ -20,11 +20,11 @@ import { ref, watch, computed } from 'vue';
 import MkCodeEditor from '@features/markup/frontend/components/MkCodeEditor.vue';
 import FormInfo from '@features/ui/frontend/components/MkInfo.vue';
 import { isSafeMode } from '@@/js/config.js';
-import * as os from '@/os.js';
-import { unisonReload } from '@/utility/unison-reload.js';
-import { i18n } from '@/i18n.js';
-import { definePage } from '@/page.js';
-import { miLocalStorage } from '@/local-storage.js';
+import * as os from '@features/ui/frontend/os.js';
+import { unisonReload } from '@features/runtime/frontend/utility/unison-reload.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
+import { definePage } from '@features/navigation/frontend/page.js';
+import { miLocalStorage } from '@features/preferences/frontend/local-storage.js';
 
 const localCustomCss = ref(miLocalStorage.getItem('customCss') ?? '');
 

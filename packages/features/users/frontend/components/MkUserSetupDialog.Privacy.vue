@@ -45,11 +45,11 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import { ref, watch } from 'vue';
-import { i18n } from '@/i18n.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
 import MkSwitch from '@features/ui/frontend/components/MkSwitch.vue';
 import MkInfo from '@features/ui/frontend/components/MkInfo.vue';
-import MkFolder from '@/components/MkFolder.vue';
-import { misskeyApi } from '@/utility/misskey-api.js';
+import MkFolder from '@features/ui/frontend/components/MkFolder.vue';
+import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 
 const isLocked = ref(false);
 const hideOnlineStatus = ref(false);

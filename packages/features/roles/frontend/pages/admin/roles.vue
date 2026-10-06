@@ -47,18 +47,18 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script lang="ts" setup>
 import { computed, reactive, ref } from 'vue';
 import MkInput from '@features/ui/frontend/components/MkInput.vue';
-import MkFolder from '@/components/MkFolder.vue';
+import MkFolder from '@features/ui/frontend/components/MkFolder.vue';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import MkRolePreview from '@features/roles/frontend/components/MkRolePreview.vue';
 import XPolicyEditor from '@features/roles/frontend/pages/admin/roles.policy-editor.vue';
-import * as os from '@/os.js';
-import { misskeyApi } from '@/utility/misskey-api.js';
-import { i18n } from '@/i18n.js';
-import { definePage } from '@/page.js';
-import { instance, fetchInstance } from '@/instance.js';
+import * as os from '@features/ui/frontend/os.js';
+import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
+import { definePage } from '@features/navigation/frontend/page.js';
+import { instance, fetchInstance } from '@features/instance/frontend/instance.js';
 import MkFoldableSection from '@features/ui/frontend/components/MkFoldableSection.vue';
-import { useRouter } from '@/router.js';
-import { deepClone } from '@/utility/clone.js';
+import { useRouter } from '@features/navigation/frontend/router.js';
+import { deepClone } from '@features/runtime/frontend/utility/clone.js';
 
 const router = useRouter();
 const baseRoleQ = ref('');

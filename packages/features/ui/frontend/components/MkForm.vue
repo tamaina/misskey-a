@@ -57,7 +57,7 @@ import MkSelect from '@features/ui/frontend/components/MkSelect.vue';
 import MkRange from '@features/ui/frontend/components/MkRange.vue';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import MkRadios from '@features/ui/frontend/components/MkRadios.vue';
-import { i18n } from '@/i18n.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
 import type { MkSelectItem } from '@features/ui/frontend/components/MkSelect.vue';
 import type { MkRadiosOption } from '@features/ui/frontend/components/MkRadios.vue';
 import type { Form, EnumFormItem, RadioFormItem } from '@features/ui/frontend/utility/form.js';

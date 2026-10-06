@@ -8,8 +8,8 @@ import { cleanup, render } from '@testing-library/vue';
 import type { RenderResult } from '@testing-library/vue';
 import { createInternationalization } from 'virtual:vite-vue-internationalization';
 import * as Misskey from 'misskey-js';
-import { directives } from '@/directives/index.js';
-import { components } from '@/components/index.js';
+import { directives } from '@features/index/frontend/directives.js';
+import { components } from '@features/index/frontend/components.js';
 import XHome from '@features/users/frontend/pages/user/home.vue';
 import 'intersection-observer';
 

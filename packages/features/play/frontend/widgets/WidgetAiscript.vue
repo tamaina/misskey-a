@@ -21,16 +21,16 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script lang="ts" setup>
 import { ref } from 'vue';
 import { Interpreter, Parser, utils } from '@syuilo/aiscript';
-import { useWidgetPropsManager } from '../../../../frontend/src/widgets/widget.js';
-import type { WidgetComponentEmits, WidgetComponentExpose, WidgetComponentProps } from '../../../../frontend/src/widgets/widget.js';
+import { useWidgetPropsManager } from '../../../ui/frontend/widgets/widget.js';
+import type { WidgetComponentEmits, WidgetComponentExpose, WidgetComponentProps } from '../../../ui/frontend/widgets/widget.js';
 import type { FormWithDefault, GetFormResultType } from '@features/ui/frontend/utility/form.js';
 import type { Value } from '@syuilo/aiscript/interpreter/value.js';
-import * as os from '@/os.js';
+import * as os from '@features/ui/frontend/os.js';
 import MkContainer from '@features/ui/frontend/components/MkContainer.vue';
 import { aiScriptReadline, createAiScriptEnv } from '@features/play/frontend/services/aiscript/api.js';
-import { $i } from '@/i.js';
-import { i18n } from '@/i18n.js';
-import { genId } from '@/utility/id.js';
+import { $i } from '@features/auth/frontend/i.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
+import { genId } from '@features/runtime/frontend/utility/id.js';
 
 const name = 'aiscript';
 

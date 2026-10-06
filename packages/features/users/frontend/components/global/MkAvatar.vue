@@ -48,10 +48,10 @@ import * as Misskey from 'misskey-js';
 import { extractAvgColorFromBlurhash } from '@@/js/extract-avg-color-from-blurhash.js';
 import MkImgWithBlurhash from '@features/media/frontend/components/MkImgWithBlurhash.vue';
 import MkA from '@features/navigation/frontend/components/global/MkA.vue';
-import { getStaticImageUrl } from '@/utility/media-proxy.js';
+import { getStaticImageUrl } from '@features/media/frontend/utility/media-proxy.js';
 import { acct, userPage } from '@features/users/frontend/filters/user.js';
 import MkUserOnlineIndicator from '@features/users/frontend/components/MkUserOnlineIndicator.vue';
-import { prefer } from '@/preferences.js';
+import { prefer } from '@features/preferences/frontend/preferences.js';
 
 const animation = ref(prefer.s.animation);
 const squareAvatars = ref(prefer.s.squareAvatars);

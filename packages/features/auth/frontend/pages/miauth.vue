@@ -31,8 +31,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 import { computed, useTemplateRef } from 'vue';
 import * as Misskey from 'misskey-js';
 import MkAuthConfirm from '@features/auth/frontend/components/MkAuthConfirm.vue';
-import { misskeyApi } from '@/utility/misskey-api.js';
-import { definePage } from '@/page.js';
+import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
+import { definePage } from '@features/navigation/frontend/page.js';
 
 const props = defineProps<{
 	session: string;

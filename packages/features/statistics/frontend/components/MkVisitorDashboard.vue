@@ -56,18 +56,18 @@ SPDX-License-Identifier: AGPL-3.0-only
 import { ref } from 'vue';
 import * as Misskey from 'misskey-js';
 import { instanceName } from '@@/js/config.js';
-import type { MenuItem } from '@/types/menu.js';
+import type { MenuItem } from '@features/navigation/frontend/types/menu.js';
 import XSigninDialog from '@features/auth/frontend/components/MkSigninDialog.vue';
 import XSignupDialog from '@features/auth/frontend/components/MkSignupDialog.vue';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import MkStreamingNotesTimeline from '@features/timelines/frontend/components/MkStreamingNotesTimeline.vue';
 import MkInfo from '@features/ui/frontend/components/MkInfo.vue';
-import * as os from '@/os.js';
-import { misskeyApi } from '@/utility/misskey-api.js';
-import { instance } from '@/instance.js';
+import * as os from '@features/ui/frontend/os.js';
+import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
+import { instance } from '@features/instance/frontend/instance.js';
 import MkNumber from '@features/ui/frontend/components/MkNumber.vue';
 import XActiveUsersChart from '@features/statistics/frontend/components/MkVisitorDashboard.ActiveUsersChart.vue';
-import { openInstanceMenu } from '@/ui/_common_/common.js';
+import { openInstanceMenu } from '@features/navigation/frontend/ui/_common_/common.js';
 
 const stats = ref<Misskey.entities.StatsResponse | null>(null);
 

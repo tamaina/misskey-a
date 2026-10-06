@@ -22,12 +22,12 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script lang="ts" setup>
 import { computed, markRaw, ref } from 'vue';
 import { notificationTypes } from 'misskey-js';
-import type { PageHeaderItem } from '@/types/page-header.js';
+import type { PageHeaderItem } from '@features/navigation/frontend/types/page-header.js';
 import MkStreamingNotificationsTimeline from '@features/notifications/frontend/components/MkStreamingNotificationsTimeline.vue';
 import MkNotesTimeline from '@features/timelines/frontend/components/MkNotesTimeline.vue';
-import * as os from '@/os.js';
-import { i18n } from '@/i18n.js';
-import { definePage } from '@/page.js';
+import * as os from '@features/ui/frontend/os.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
+import { definePage } from '@features/navigation/frontend/page.js';
 import { Paginator } from '@features/ui/frontend/utility/paginator.js';
 
 const tab = ref('all');

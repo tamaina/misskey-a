@@ -4,8 +4,8 @@
  */
 
 import type { Component } from 'vue';
-import { Nirax } from '@/lib/nirax.js';
-import type { RouteDef } from '@/lib/nirax.js';
+import { Nirax } from '@features/navigation/frontend/lib/nirax.js';
+import type { RouteDef } from '@features/navigation/frontend/lib/nirax.js';
 
 export const homeComponent = { name: 'home-page' } as Component;
 export const postComponent = { name: 'post-page' } as Component;

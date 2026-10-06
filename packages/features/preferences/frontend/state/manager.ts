@@ -8,13 +8,13 @@ import { EventEmitter } from 'eventemitter3';
 import { host, version } from '@@/js/config.js';
 import { PREF_DEF } from '@features/preferences/frontend/state/def.js';
 import type { Ref } from 'vue';
-import type { MenuItem } from '@/types/menu.js';
-import { genId } from '@/utility/id.js';
+import type { MenuItem } from '@features/navigation/frontend/types/menu.js';
+import { genId } from '@features/runtime/frontend/utility/id.js';
 import { copyToClipboard } from '@features/ui/frontend/utility/copy-to-clipboard.js';
-import { i18n } from '@/i18n.js';
-import * as os from '@/os.js';
-import { deepEqual } from '@/utility/deep-equal.js';
-import { deepClone } from '@/utility/clone.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
+import * as os from '@features/ui/frontend/os.js';
+import { deepEqual } from '@features/runtime/frontend/utility/deep-equal.js';
+import { deepClone } from '@features/runtime/frontend/utility/clone.js';
 
 // NOTE: 明示的な設定値のひとつとして null もあり得るため、設定が存在しないかどうかを判定する目的で null で比較したり ?? を使ってはいけない
 

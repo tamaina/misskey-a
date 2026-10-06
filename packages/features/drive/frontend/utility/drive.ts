@@ -6,17 +6,17 @@
 import { defineAsyncComponent } from 'vue';
 import * as Misskey from 'misskey-js';
 import { apiUrl } from '@@/js/config.js';
-import type { UploaderFeatures } from '@/composables/use-uploader.js';
-import * as os from '@/os.js';
-import { misskeyApi } from '@/utility/misskey-api.js';
-import { useStream } from '@/stream.js';
-import { i18n } from '@/i18n.js';
-import { prefer } from '@/preferences.js';
-import { $i } from '@/i.js';
-import { instance } from '@/instance.js';
-import { globalEvents } from '@/events.js';
-import { getProxiedImageUrl } from '@/utility/media-proxy.js';
-import { genId } from '@/utility/id.js';
+import type { UploaderFeatures } from '@features/drive/frontend/composables/use-uploader.js';
+import * as os from '@features/ui/frontend/os.js';
+import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
+import { useStream } from '@features/api/frontend/stream.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
+import { prefer } from '@features/preferences/frontend/preferences.js';
+import { $i } from '@features/auth/frontend/i.js';
+import { instance } from '@features/instance/frontend/instance.js';
+import { globalEvents } from '@features/runtime/frontend/events.js';
+import { getProxiedImageUrl } from '@features/media/frontend/utility/media-proxy.js';
+import { genId } from '@features/runtime/frontend/utility/id.js';
 
 type UploadReturnType = {
 	filePromise: Promise<Misskey.entities.DriveFile>;

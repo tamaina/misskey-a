@@ -6,7 +6,7 @@
 import type { CellValue, GridCell } from '@features/ui/frontend/components/grid/cell.js';
 import type { GridColumn } from '@features/ui/frontend/components/grid/column.js';
 import type { GridRow } from '@features/ui/frontend/components/grid/row.js';
-import { i18n } from '@/i18n.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
 
 export type ValidatorParams = {
 	column: GridColumn;

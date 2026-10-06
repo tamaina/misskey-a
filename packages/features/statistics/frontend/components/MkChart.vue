@@ -49,8 +49,8 @@ export type ChartSrc =
 import { onMounted, onUnmounted, ref, useTemplateRef, watch } from 'vue';
 import { Chart } from 'chart.js';
 import * as Misskey from 'misskey-js';
-import { misskeyApiGet } from '@/utility/misskey-api.js';
-import { store } from '@/store.js';
+import { misskeyApiGet } from '@features/api/frontend/utility/misskey-api.js';
+import { store } from '@features/preferences/frontend/store.js';
 import { useChartTooltip } from '@features/statistics/frontend/composables/use-chart-tooltip.js';
 import { chartVLine } from '@features/statistics/frontend/utility/chart-vline.js';
 import { alpha } from '@features/ui/frontend/utility/color.js';

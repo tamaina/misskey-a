@@ -21,7 +21,7 @@ import {
 	useTemplateRef,
 	inject,
 } from 'vue';
-import { DI } from '@/di.js';
+import { DI } from '@features/ui/frontend/di.js';
 
 const props = defineProps<{
 	markerId?: string;

@@ -55,7 +55,7 @@ import MkSelect from '@features/ui/frontend/components/MkSelect.vue';
 import type { MkSelectItem } from '@features/ui/frontend/components/MkSelect.vue';
 import type { OptionValue } from '@features/ui/frontend/types/option-value.js';
 import { useMkSelect } from '@features/ui/frontend/composables/use-mkselect.js';
-import { i18n } from '@/i18n.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
 
 type Input = {
 	type?: 'text' | 'number' | 'password' | 'email' | 'url' | 'date' | 'time' | 'search' | 'datetime-local';

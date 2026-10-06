@@ -36,22 +36,22 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script setup lang="ts">
 import { computed, onActivated, onMounted, onUnmounted, ref, useTemplateRef, watch } from 'vue';
-import type { PageMetadata } from '@/page.js';
+import type { PageMetadata } from '@features/navigation/frontend/page.js';
 import type { SuperMenuDef } from '@features/navigation/frontend/components/MkSuperMenu.vue';
-import { i18n } from '@/i18n.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
 import MkInfo from '@features/ui/frontend/components/MkInfo.vue';
 import MkSuperMenu from '@features/navigation/frontend/components/MkSuperMenu.vue';
-import { $i } from '@/i.js';
-import { clearCache } from '@/utility/clear-cache.js';
-import { instance } from '@/instance.js';
-import { definePage, provideMetadataReceiver, provideReactiveMetadata } from '@/page.js';
-import * as os from '@/os.js';
-import { useRouter } from '@/router.js';
+import { $i } from '@features/auth/frontend/i.js';
+import { clearCache } from '@features/runtime/frontend/utility/clear-cache.js';
+import { instance } from '@features/instance/frontend/instance.js';
+import { definePage, provideMetadataReceiver, provideReactiveMetadata } from '@features/navigation/frontend/page.js';
+import * as os from '@features/ui/frontend/os.js';
+import { useRouter } from '@features/navigation/frontend/router.js';
 import { enableAutoBackup, getPreferencesProfileMenu } from '@features/preferences/frontend/state/utility.js';
-import { store } from '@/store.js';
-import { signout } from '@/signout.js';
+import { store } from '@features/preferences/frontend/store.js';
+import { signout } from '@features/auth/frontend/signout.js';
 import { genSearchIndexes } from '@features/discovery/frontend/utility/inapp-search.js';
-import { enableStoragePersistence, getStoragePersistenceStatusRef, storagePersistenceSupported, skipStoragePersistence } from '@/utility/storage.js';
+import { enableStoragePersistence, getStoragePersistenceStatusRef, storagePersistenceSupported, skipStoragePersistence } from '@features/runtime/frontend/utility/storage.js';
 
 const searchIndex = await import('search-index:settings').then(({ searchIndexes }) => genSearchIndexes(searchIndexes));
 

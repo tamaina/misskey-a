@@ -6,13 +6,13 @@
 import * as Misskey from 'misskey-js';
 import { defineAsyncComponent } from 'vue';
 import { selectDriveFolder } from '@features/drive/frontend/utility/drive.js';
-import type { MenuItem } from '@/types/menu.js';
-import { i18n } from '@/i18n.js';
+import type { MenuItem } from '@features/navigation/frontend/types/menu.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
 import { copyToClipboard } from '@features/ui/frontend/utility/copy-to-clipboard.js';
-import * as os from '@/os.js';
-import { misskeyApi } from '@/utility/misskey-api.js';
-import { prefer } from '@/preferences.js';
-import { globalEvents } from '@/events.js';
+import * as os from '@features/ui/frontend/os.js';
+import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
+import { prefer } from '@features/preferences/frontend/preferences.js';
+import { globalEvents } from '@features/runtime/frontend/events.js';
 
 function rename(file: Misskey.entities.DriveFile) {
 	os.inputText({

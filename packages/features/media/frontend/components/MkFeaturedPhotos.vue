@@ -8,7 +8,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { instance } from '@/instance.js';
+import { instance } from '@features/instance/frontend/instance.js';
 </script>
 
 <style lang="scss" module>

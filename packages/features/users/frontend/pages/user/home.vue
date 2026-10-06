@@ -174,17 +174,17 @@ import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import { getUserMenu } from '@features/users/frontend/utility/get-user-menu.js';
 import number from '@features/ui/frontend/filters/number.js';
 import { userPage } from '@features/users/frontend/filters/user.js';
-import * as os from '@/os.js';
-import { i18n } from '@/i18n.js';
-import { $i, iAmModerator } from '@/i.js';
+import * as os from '@features/ui/frontend/os.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
+import { $i, iAmModerator } from '@features/auth/frontend/i.js';
 import { dateString } from '@features/ui/frontend/filters/date.js';
 import { confetti } from '@features/ui/frontend/utility/confetti.js';
-import { misskeyApi } from '@/utility/misskey-api.js';
-import { isFollowingVisibleForMe, isFollowersVisibleForMe } from '@/utility/isFfVisibleForMe.js';
-import { useRouter } from '@/router.js';
-import { getStaticImageUrl } from '@/utility/media-proxy.js';
+import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
+import { isFollowingVisibleForMe, isFollowersVisibleForMe } from '@features/relationships/frontend/utility/isFfVisibleForMe.js';
+import { useRouter } from '@features/navigation/frontend/router.js';
+import { getStaticImageUrl } from '@features/media/frontend/utility/media-proxy.js';
 import MkSparkle from '@features/ui/frontend/components/MkSparkle.vue';
-import { prefer } from '@/preferences.js';
+import { prefer } from '@features/preferences/frontend/preferences.js';
 import MkPullToRefresh from '@features/ui/frontend/components/MkPullToRefresh.vue';
 import { isBirthday } from '@features/users/frontend/utility/is-birthday.js';
 import type XTimeline_TypeReferenceOnly from '@features/timelines/frontend/pages/user/index.timeline.vue';
@@ -205,7 +205,7 @@ function calcAge(birthdate: string): number {
 }
 
 const XFiles = defineAsyncComponent(() => import('@features/notes/frontend/pages/user/index.files.vue'));
-const XActivity = defineAsyncComponent(() => import('@/pages/user/index.activity.vue'));
+const XActivity = defineAsyncComponent(() => import('@features/statistics/frontend/pages/user/index.activity.vue'));
 const XTimeline = defineAsyncComponent(() => import('@features/timelines/frontend/pages/user/index.timeline.vue'));
 
 const props = withDefaults(defineProps<{

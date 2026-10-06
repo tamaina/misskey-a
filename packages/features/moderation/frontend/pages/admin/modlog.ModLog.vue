@@ -234,8 +234,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 import * as Misskey from 'misskey-js';
 import { CodeDiff } from 'v-code-diff';
 import JSON5 from 'json5';
-import { i18n } from '@/i18n.js';
-import MkFolder from '@/components/MkFolder.vue';
+import { i18n } from '@features/runtime/frontend/i18n.js';
+import MkFolder from '@features/ui/frontend/components/MkFolder.vue';
 
 const props = defineProps<{
 	log: Misskey.entities.ModerationLog;

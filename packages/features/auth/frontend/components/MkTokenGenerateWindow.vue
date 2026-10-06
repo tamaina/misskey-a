@@ -54,8 +54,8 @@ import MkSwitch from '@features/ui/frontend/components/MkSwitch.vue';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import MkInfo from '@features/ui/frontend/components/MkInfo.vue';
 import MkModalWindow from '@features/ui/frontend/components/MkModalWindow.vue';
-import { i18n } from '@/i18n.js';
-import { iAmAdmin } from '@/i.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
+import { iAmAdmin } from '@features/auth/frontend/i.js';
 
 const props = withDefaults(defineProps<{
 	title?: string | null;

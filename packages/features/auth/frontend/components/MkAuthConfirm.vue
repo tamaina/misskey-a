@@ -118,12 +118,12 @@ SPDX-License-Identifier: AGPL-3.0-only
 import { ref, computed } from 'vue';
 import * as Misskey from 'misskey-js';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
-import { $i } from '@/i.js';
-import { getAccounts, getAccountWithSigninDialog, getAccountWithSignupDialog } from '@/accounts.js';
-import { i18n } from '@/i18n.js';
-import * as os from '@/os.js';
-import { getProxiedImageUrl } from '@/utility/media-proxy.js';
-import { misskeyApi } from '@/utility/misskey-api.js';
+import { $i } from '@features/auth/frontend/i.js';
+import { getAccounts, getAccountWithSigninDialog, getAccountWithSignupDialog } from '@features/auth/frontend/accounts.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
+import * as os from '@features/ui/frontend/os.js';
+import { getProxiedImageUrl } from '@features/media/frontend/utility/media-proxy.js';
+import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 
 const props = defineProps<{
 	name?: string;

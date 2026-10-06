@@ -23,8 +23,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import { computed, ref, defineAsyncComponent } from 'vue';
-import { i18n } from '@/i18n.js';
-import { definePage } from '@/page.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
+import { definePage } from '@features/navigation/frontend/page.js';
 import MkSwiper from '@features/ui/frontend/components/MkSwiper.vue';
 
 const props = defineProps<{

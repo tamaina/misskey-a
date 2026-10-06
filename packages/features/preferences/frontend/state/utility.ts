@@ -5,16 +5,16 @@
 
 import { ref, watch } from 'vue';
 import type { PreferencesProfile } from '@features/preferences/frontend/state/manager.js';
-import type { MenuItem } from '@/types/menu.js';
+import type { MenuItem } from '@features/navigation/frontend/types/menu.js';
 import { copyToClipboard } from '@features/ui/frontend/utility/copy-to-clipboard.js';
-import { i18n } from '@/i18n.js';
-import { miLocalStorage } from '@/local-storage.js';
-import { prefer } from '@/preferences.js';
-import * as os from '@/os.js';
-import { store } from '@/store.js';
-import { $i } from '@/i.js';
-import { misskeyApi } from '@/utility/misskey-api.js';
-import { unisonReload } from '@/utility/unison-reload.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
+import { miLocalStorage } from '@features/preferences/frontend/local-storage.js';
+import { prefer } from '@features/preferences/frontend/preferences.js';
+import * as os from '@features/ui/frontend/os.js';
+import { store } from '@features/preferences/frontend/store.js';
+import { $i } from '@features/auth/frontend/i.js';
+import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
+import { unisonReload } from '@features/runtime/frontend/utility/unison-reload.js';
 
 function canAutoBackup() {
 	return prefer.profile.name != null && prefer.profile.name.trim() !== '';

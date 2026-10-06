@@ -11,9 +11,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import { onMounted, onUnmounted, useTemplateRef } from 'vue';
-import { useWidgetPropsManager } from '../../../../frontend/src/widgets/widget.js';
-import { i18n } from '@/i18n.js';
-import type { WidgetComponentProps, WidgetComponentEmits, WidgetComponentExpose } from '../../../../frontend/src/widgets/widget.js';
+import { useWidgetPropsManager } from '../../../ui/frontend/widgets/widget.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
+import type { WidgetComponentProps, WidgetComponentEmits, WidgetComponentExpose } from '../../../ui/frontend/widgets/widget.js';
 import type { FormWithDefault, GetFormResultType } from '@features/ui/frontend/utility/form.js';
 
 const name = 'aichan';

@@ -55,12 +55,12 @@ import XDecoration from '@features/avatar-decorations/frontend/pages/settings/av
 import XDialog from '@features/avatar-decorations/frontend/pages/settings/avatar-decoration.dialog.vue';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import MkFoldableSection from '@features/ui/frontend/components/MkFoldableSection.vue';
-import * as os from '@/os.js';
-import { misskeyApi } from '@/utility/misskey-api.js';
-import { i18n } from '@/i18n.js';
-import { ensureSignin } from '@/i.js';
+import * as os from '@features/ui/frontend/os.js';
+import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
+import { ensureSignin } from '@features/auth/frontend/i.js';
 import MkInfo from '@features/ui/frontend/components/MkInfo.vue';
-import { definePage } from '@/page.js';
+import { definePage } from '@features/navigation/frontend/page.js';
 import { groupAvatarDecorations } from '@features/avatar-decorations/frontend/utility/group-avatar-decorations.js';
 
 const $i = ensureSignin();

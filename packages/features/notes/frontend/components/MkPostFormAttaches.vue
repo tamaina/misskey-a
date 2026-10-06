@@ -42,16 +42,16 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script lang="ts" setup>
 import { inject } from 'vue';
 import * as Misskey from 'misskey-js';
-import type { MenuItem } from '@/types/menu';
+import type { MenuItem } from '@features/navigation/frontend/types/menu';
 import { copyToClipboard } from '@features/ui/frontend/utility/copy-to-clipboard.js';
 import MkDriveFileThumbnail from '@features/drive/frontend/components/MkDriveFileThumbnail.vue';
 import MkDraggable from '@features/ui/frontend/components/MkDraggable.vue';
-import * as os from '@/os.js';
-import { misskeyApi } from '@/utility/misskey-api.js';
-import { i18n } from '@/i18n.js';
-import { prefer } from '@/preferences.js';
-import { DI } from '@/di.js';
-import { globalEvents } from '@/events.js';
+import * as os from '@features/ui/frontend/os.js';
+import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
+import { prefer } from '@features/preferences/frontend/preferences.js';
+import { DI } from '@features/ui/frontend/di.js';
+import { globalEvents } from '@features/runtime/frontend/events.js';
 import type { Content } from '@features/media/frontend/components/MkLightbox.item.vue';
 import { isPreviewable, getType } from '@features/media/frontend/utility/lightbox.js';
 
@@ -186,7 +186,7 @@ function showFileMenu(file: Misskey.entities.DriveFile, ev: PointerEvent | Keybo
 					file: item,
 					//sourceElement: TODO
 				}));
-				const { dispose } = await os.popupAsyncWithDialog(import('@/components/MkLightbox.vue').then(x => x.default), {
+				const { dispose } = await os.popupAsyncWithDialog(import('@features/media/frontend/components/MkLightbox.vue').then(x => x.default), {
 					defaultIndex: constents.findIndex(content => content.id === file.id),
 					contents: constents,
 					initiallyRevealedContentIds: [file.id],

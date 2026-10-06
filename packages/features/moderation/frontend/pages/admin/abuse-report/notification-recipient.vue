@@ -41,13 +41,13 @@ SPDX-License-Identifier: AGPL-3.0-only
 import { entities } from 'misskey-js';
 import { computed, defineAsyncComponent, onMounted, ref } from 'vue';
 import XRecipient from '@features/moderation/frontend/pages/admin/abuse-report/notification-recipient.item.vue';
-import { misskeyApi } from '@/utility/misskey-api.js';
+import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 import MkInput from '@features/ui/frontend/components/MkInput.vue';
 import MkSelect from '@features/ui/frontend/components/MkSelect.vue';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
-import * as os from '@/os.js';
+import * as os from '@features/ui/frontend/os.js';
 import MkDivider from '@features/ui/frontend/components/MkDivider.vue';
-import { i18n } from '@/i18n.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
 import { useMkSelect } from '@features/ui/frontend/composables/use-mkselect.js';
 
 const recipients = ref<entities.AbuseReportNotificationRecipient[]>([]);

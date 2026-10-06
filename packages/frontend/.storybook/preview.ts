@@ -20,7 +20,7 @@ let moduleInitialized = false;
 let unobserve = () => {};
 let misskeyOS = null;
 
-function loadTheme(themeMaganer: typeof import('../src/theme')['themeManager']) {
+function loadTheme(themeMaganer: typeof import('../../features/preferences/frontend/theme')['themeManager']) {
 	unobserve();
 	const theme = themes[window.document.documentElement.dataset.misskeyTheme];
 	if (theme) {
@@ -62,12 +62,12 @@ initialize({
 initLocalStorage();
 queueMicrotask(() => {
 	Promise.all([
-		import('../src/components/index.js'),
-		import('../src/directives/index.js'),
-		import('../src/widgets/index.js'),
-		import('../src/theme.js'),
-		import('../src/preferences.js'),
-		import('../src/os.js'),
+		import('../../features/index/frontend/components.js'),
+		import('../../features/index/frontend/directives.js'),
+		import('../../features/index/frontend/widgets.js'),
+		import('../../features/preferences/frontend/theme.js'),
+		import('../../features/preferences/frontend/preferences.js'),
+		import('../../features/ui/frontend/os.js'),
 	]).then(([{ default: components }, { default: directives }, { default: widgets }, { applyTheme }, { prefer }, os]) => {
 		setup((app) => {
 			moduleInitialized = true;
@@ -102,7 +102,7 @@ const preview = {
 							}
 						}).catch(() => {})
 					: Promise.resolve();
-				const resetDefaultStorePromise = import('../src/store').then(({ store }) => {
+				const resetDefaultStorePromise = import('../../features/preferences/frontend/store').then(({ store }) => {
 					// @ts-expect-error
 					store.init();
 				}).catch(() => {});

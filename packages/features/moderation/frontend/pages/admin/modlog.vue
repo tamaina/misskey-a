@@ -49,9 +49,9 @@ import XModLog from '@features/moderation/frontend/pages/admin/modlog.ModLog.vue
 import MkSelect from '@features/ui/frontend/components/MkSelect.vue';
 import MkInput from '@features/ui/frontend/components/MkInput.vue';
 import MkTl from '@features/ui/frontend/components/MkTl.vue';
-import { i18n } from '@/i18n.js';
-import { definePage } from '@/page.js';
-import { prefer } from '@/preferences.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
+import { definePage } from '@features/navigation/frontend/page.js';
+import { prefer } from '@features/preferences/frontend/preferences.js';
 import { useMkSelect } from '@features/ui/frontend/composables/use-mkselect.js';
 import MkPullToRefresh from '@features/ui/frontend/components/MkPullToRefresh.vue';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';

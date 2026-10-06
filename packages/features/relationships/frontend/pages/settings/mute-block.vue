@@ -179,19 +179,19 @@ import XInstanceMute from '@features/relationships/frontend/pages/settings/mute-
 import XWordMute from '@features/relationships/frontend/pages/settings/mute-block.word-mute.vue';
 import MkPagination from '@features/ui/frontend/components/MkPagination.vue';
 import { userPage } from '@features/users/frontend/filters/user.js';
-import { i18n } from '@/i18n.js';
-import { definePage } from '@/page.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
+import { definePage } from '@features/navigation/frontend/page.js';
 import MkUserCardMini from '@features/users/frontend/components/MkUserCardMini.vue';
-import * as os from '@/os.js';
-import { instance } from '@/instance.js';
-import { ensureSignin } from '@/i.js';
+import * as os from '@features/ui/frontend/os.js';
+import { instance } from '@features/instance/frontend/instance.js';
+import { ensureSignin } from '@features/auth/frontend/i.js';
 import MkInfo from '@features/ui/frontend/components/MkInfo.vue';
-import MkFolder from '@/components/MkFolder.vue';
+import MkFolder from '@features/ui/frontend/components/MkFolder.vue';
 import MkSwitch from '@features/ui/frontend/components/MkSwitch.vue';
-import { prefer } from '@/preferences.js';
-import MkFeatureBanner from '@/components/MkFeatureBanner.vue';
+import { prefer } from '@features/preferences/frontend/preferences.js';
+import MkFeatureBanner from '@features/web/frontend/components/MkFeatureBanner.vue';
 import { Paginator } from '@features/ui/frontend/utility/paginator.js';
-import { suggestReload } from '@/utility/reload-suggest.js';
+import { suggestReload } from '@features/boot/frontend/utility/reload-suggest.js';
 
 const $i = ensureSignin();
 

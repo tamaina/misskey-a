@@ -40,11 +40,11 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import { ref } from 'vue';
-import * as os from '@/os.js';
-import { fetchInstance, instance } from '@/instance.js';
+import * as os from '@features/ui/frontend/os.js';
+import { fetchInstance, instance } from '@features/instance/frontend/instance.js';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import MkInput from '@features/ui/frontend/components/MkInput.vue';
-import MkFolder from '@/components/MkFolder.vue';
+import MkFolder from '@features/ui/frontend/components/MkFolder.vue';
 import MkDraggable from '@features/ui/frontend/components/MkDraggable.vue';
 
 const serverRules = ref<{ text: string; id: string; }[]>(instance.serverRules.map(text => ({ text, id: Math.random().toString() })));

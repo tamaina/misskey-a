@@ -30,11 +30,11 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script lang="ts" setup>
 import { ref, computed, defineAsyncComponent } from 'vue';
 import * as Misskey from 'misskey-js';
-import { ensureSignin } from '@/i.js';
-import * as os from '@/os.js';
-import { misskeyApi } from '@/utility/misskey-api.js';
-import { i18n } from '@/i18n.js';
-import { definePage } from '@/page.js';
+import { ensureSignin } from '@features/auth/frontend/i.js';
+import * as os from '@features/ui/frontend/os.js';
+import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
+import { definePage } from '@features/navigation/frontend/page.js';
 import MkFoldableSection from '@features/ui/frontend/components/MkFoldableSection.vue';
 import { groupAvatarDecorations } from '@features/avatar-decorations/frontend/utility/group-avatar-decorations.js';
 

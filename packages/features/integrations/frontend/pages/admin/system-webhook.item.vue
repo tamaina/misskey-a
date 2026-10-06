@@ -44,7 +44,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script lang="ts" setup>
 import { entities } from 'misskey-js';
 import { toRefs } from 'vue';
-import MkFolder from '@/components/MkFolder.vue';
+import MkFolder from '@features/ui/frontend/components/MkFolder.vue';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import MkKeyValue from '@features/ui/frontend/components/MkKeyValue.vue';
 

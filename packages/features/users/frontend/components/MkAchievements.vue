@@ -54,8 +54,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script lang="ts" setup>
 import * as Misskey from 'misskey-js';
 import { onMounted, ref, computed } from 'vue';
-import { misskeyApi } from '@/utility/misskey-api.js';
-import { i18n } from '@/i18n.js';
+import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
 import { ACHIEVEMENT_TYPES, ACHIEVEMENT_BADGES, claimAchievement } from '@features/users/frontend/utility/achievements.js';
 
 const props = withDefaults(defineProps<{

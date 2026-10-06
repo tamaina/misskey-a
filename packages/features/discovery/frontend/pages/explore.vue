@@ -22,8 +22,8 @@ import { computed, watch, ref, useTemplateRef } from 'vue';
 import XFeatured from '@features/discovery/frontend/pages/explore.featured.vue';
 import XUsers from '@features/discovery/frontend/pages/explore.users.vue';
 import XRoles from '@features/roles/frontend/pages/explore.roles.vue';
-import { definePage } from '@/page.js';
-import { i18n } from '@/i18n.js';
+import { definePage } from '@features/navigation/frontend/page.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
 
 const props = withDefaults(defineProps<{
 	initialTab?: string;

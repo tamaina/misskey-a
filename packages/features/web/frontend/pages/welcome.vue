@@ -18,8 +18,8 @@ import { instanceName } from '@@/js/config.js';
 import XSetup from '@features/boot/frontend/pages/welcome.setup.vue';
 import XEntranceClassic from '@features/web/frontend/pages/welcome.entrance.classic.vue';
 import XEntranceSimple from '@features/web/frontend/pages/welcome.entrance.simple.vue';
-import { definePage } from '@/page.js';
-import { fetchInstance } from '@/instance.js';
+import { definePage } from '@features/navigation/frontend/page.js';
+import { fetchInstance } from '@features/instance/frontend/instance.js';
 
 const instance = ref<Misskey.entities.MetaDetailed | null>(null);
 

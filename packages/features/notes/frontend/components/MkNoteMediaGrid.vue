@@ -43,8 +43,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 import { ref } from 'vue';
 import * as Misskey from 'misskey-js';
 import { notePage } from '@features/notes/frontend/filters/note.js';
-import { prefer } from '@/preferences.js';
-import { shouldHideFileByDefault, canRevealFile } from '@/utility/sensitive-file.js';
+import { prefer } from '@features/preferences/frontend/preferences.js';
+import { shouldHideFileByDefault, canRevealFile } from '@features/drive/frontend/utility/sensitive-file.js';
 import bytes from '@features/ui/frontend/filters/bytes.js';
 
 import MkDriveFileThumbnail from '@features/drive/frontend/components/MkDriveFileThumbnail.vue';

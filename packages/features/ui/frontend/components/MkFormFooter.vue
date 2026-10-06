@@ -17,7 +17,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 import { } from 'vue';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import type { useForm } from '@features/ui/frontend/composables/use-form.js';
-import { i18n } from '@/i18n.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
 
 const props = withDefaults(defineProps<{
 	form: ReturnType<typeof useForm>;

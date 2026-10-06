@@ -18,9 +18,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script lang="ts" setup>
 import { onUnmounted, ref, watch } from 'vue';
 import { createVisibilityAwareInterval } from '@@/js/interval.js';
-import { useWidgetPropsManager } from '../../../../frontend/src/widgets/widget.js';
-import { i18n } from '@/i18n.js';
-import type { WidgetComponentEmits, WidgetComponentExpose, WidgetComponentProps } from '../../../../frontend/src/widgets/widget.js';
+import { useWidgetPropsManager } from './widget.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
+import type { WidgetComponentEmits, WidgetComponentExpose, WidgetComponentProps } from './widget.js';
 import type { FormWithDefault, GetFormResultType } from '@features/ui/frontend/utility/form.js';
 
 const name = 'unixClock';

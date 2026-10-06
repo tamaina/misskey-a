@@ -22,11 +22,11 @@ import { nextTick, ref, computed } from 'vue';
 import MkCodeEditor from '@features/markup/frontend/components/MkCodeEditor.vue';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import FormInfo from '@features/ui/frontend/components/MkInfo.vue';
-import * as os from '@/os.js';
-import { i18n } from '@/i18n.js';
-import { definePage } from '@/page.js';
-import { installPlugin } from '@/plugin.js';
-import { useRouter } from '@/router.js';
+import * as os from '@features/ui/frontend/os.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
+import { definePage } from '@features/navigation/frontend/page.js';
+import { installPlugin } from '@features/integrations/frontend/plugin.js';
+import { useRouter } from '@features/navigation/frontend/router.js';
 
 const router = useRouter();
 const code = ref<string | null>(null);

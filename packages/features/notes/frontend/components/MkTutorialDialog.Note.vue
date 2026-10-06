@@ -25,11 +25,11 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script setup lang="ts">
 import * as Misskey from 'misskey-js';
 import { ref, reactive } from 'vue';
-import { i18n } from '@/i18n.js';
-import { globalEvents } from '@/events.js';
-import { $i } from '@/i.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
+import { globalEvents } from '@features/runtime/frontend/events.js';
+import { $i } from '@features/auth/frontend/i.js';
 import MkNote from '@features/notes/frontend/components/MkNote.vue';
-import { genId } from '@/utility/id.js';
+import { genId } from '@features/runtime/frontend/utility/id.js';
 
 const props = defineProps<{
 	phase: 'aboutNote' | 'howToReact';

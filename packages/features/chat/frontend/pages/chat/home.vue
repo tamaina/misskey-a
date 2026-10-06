@@ -21,8 +21,8 @@ import XHome from '@features/chat/frontend/pages/chat/home.home.vue';
 import XInvitations from '@features/chat/frontend/pages/chat/home.invitations.vue';
 import XJoiningRooms from '@features/chat/frontend/pages/chat/home.joiningRooms.vue';
 import XOwnedRooms from '@features/chat/frontend/pages/chat/home.ownedRooms.vue';
-import { i18n } from '@/i18n.js';
-import { definePage } from '@/page.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
+import { definePage } from '@features/navigation/frontend/page.js';
 import MkPolkadots from '@features/ui/frontend/components/MkPolkadots.vue';
 
 const tab = ref('home');

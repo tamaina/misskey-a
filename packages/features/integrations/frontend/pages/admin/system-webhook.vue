@@ -30,12 +30,12 @@ import { computed, onMounted, ref } from 'vue';
 import { entities } from 'misskey-js';
 import XItem from '@features/integrations/frontend/pages/admin/system-webhook.item.vue';
 import FormSection from '@features/ui/frontend/components/form/section.vue';
-import { definePage } from '@/page.js';
-import { i18n } from '@/i18n.js';
+import { definePage } from '@features/navigation/frontend/page.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
-import { misskeyApi } from '@/utility/misskey-api.js';
+import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 import { showSystemWebhookEditorDialog } from '@features/integrations/frontend/components/MkSystemWebhookEditor.impl.js';
-import * as os from '@/os.js';
+import * as os from '@features/ui/frontend/os.js';
 
 const webhooks = ref<entities.SystemWebhook[]>([]);
 

@@ -16,16 +16,16 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script lang="ts" setup>
 import { onMounted, ref, watch } from 'vue';
 import { Interpreter, Parser } from '@syuilo/aiscript';
-import { useWidgetPropsManager } from '../../../../frontend/src/widgets/widget.js';
+import { useWidgetPropsManager } from '../../../ui/frontend/widgets/widget.js';
 import type { Ref } from 'vue';
-import type { WidgetComponentEmits, WidgetComponentExpose, WidgetComponentProps } from '../../../../frontend/src/widgets/widget.js';
+import type { WidgetComponentEmits, WidgetComponentExpose, WidgetComponentProps } from '../../../ui/frontend/widgets/widget.js';
 import type { FormWithDefault, GetFormResultType } from '@features/ui/frontend/utility/form.js';
 import type { AsUiComponent, AsUiRoot } from '@features/play/frontend/services/aiscript/ui.js';
-import * as os from '@/os.js';
+import * as os from '@features/ui/frontend/os.js';
 import { aiScriptReadline, createAiScriptEnv } from '@features/play/frontend/services/aiscript/api.js';
-import { $i } from '@/i.js';
-import { i18n } from '@/i18n.js';
-import MkAsUi from '@/components/MkAsUi.vue';
+import { $i } from '@features/auth/frontend/i.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
+import MkAsUi from '@features/play/frontend/components/MkAsUi.vue';
 import MkContainer from '@features/ui/frontend/components/MkContainer.vue';
 import { registerAsUiLib } from '@features/play/frontend/services/aiscript/ui.js';
 

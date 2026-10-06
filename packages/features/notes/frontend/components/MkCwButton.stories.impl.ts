@@ -10,7 +10,7 @@ import { action } from 'storybook/actions';
 import { expect, userEvent, within } from '@storybook/test';
 import { file } from '../../../../frontend/.storybook/fakes.js';
 import MkCwButton from '@features/notes/frontend/components/MkCwButton.vue';
-import { i18n } from '@/i18n.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
 
 export const Default = {
 	render(args) {

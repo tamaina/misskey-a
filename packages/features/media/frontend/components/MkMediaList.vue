@@ -61,10 +61,10 @@ import XBanner from '@features/media/frontend/components/MkMediaBanner.vue';
 import XAudio from '@features/media/frontend/components/MkMediaAudio.vue';
 import XImage from '@features/media/frontend/components/MkMediaImage.vue';
 import XVideo from '@features/media/frontend/components/MkMediaVideo.vue';
-import * as os from '@/os.js';
-import { prefer } from '@/preferences.js';
+import * as os from '@features/ui/frontend/os.js';
+import { prefer } from '@features/preferences/frontend/preferences.js';
 import { isPreviewable, getType } from '@features/media/frontend/utility/lightbox.js';
-import { genId } from '@/utility/id.js';
+import { genId } from '@features/runtime/frontend/utility/id.js';
 
 const props = defineProps<{
 	mediaList: Misskey.entities.DriveFile[];
@@ -172,7 +172,7 @@ async function openGallery(id?: string) {
 		.filter(content => mediaComponents.get(content.id)?.isRevealed() === true)
 		.map(content => content.id);
 
-	const { dispose } = await os.popupAsyncWithDialog(import('@/components/MkLightbox.vue').then(x => x.default), {
+	const { dispose } = await os.popupAsyncWithDialog(import('@features/media/frontend/components/MkLightbox.vue').then(x => x.default), {
 		defaultIndex: contents.findIndex(conten => conten.id === id),
 		contents: contents,
 		initiallyRevealedContentIds,

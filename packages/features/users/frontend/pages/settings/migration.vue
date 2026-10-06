@@ -63,13 +63,13 @@ import * as Misskey from 'misskey-js';
 import FormInfo from '@features/ui/frontend/components/MkInfo.vue';
 import MkInput from '@features/ui/frontend/components/MkInput.vue';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
-import MkFolder from '@/components/MkFolder.vue';
+import MkFolder from '@features/ui/frontend/components/MkFolder.vue';
 import MkUserInfo from '@features/users/frontend/components/MkUserInfo.vue';
-import * as os from '@/os.js';
-import { misskeyApi } from '@/utility/misskey-api.js';
-import { i18n } from '@/i18n.js';
-import { ensureSignin } from '@/i.js';
-import { unisonReload } from '@/utility/unison-reload.js';
+import * as os from '@features/ui/frontend/os.js';
+import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
+import { ensureSignin } from '@features/auth/frontend/i.js';
+import { unisonReload } from '@features/runtime/frontend/utility/unison-reload.js';
 
 const $i = ensureSignin();
 

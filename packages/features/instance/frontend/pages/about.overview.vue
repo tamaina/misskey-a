@@ -127,16 +127,16 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import { host, version } from '@@/js/config.js';
-import { i18n } from '@/i18n.js';
-import { instance } from '@/instance.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
+import { instance } from '@features/instance/frontend/instance.js';
 import number from '@features/ui/frontend/filters/number.js';
-import { misskeyApi } from '@/utility/misskey-api.js';
+import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 import FormLink from '@features/ui/frontend/components/form/link.vue';
 import FormSection from '@features/ui/frontend/components/form/section.vue';
 import FormSplit from '@features/ui/frontend/components/form/split.vue';
-import MkFolder from '@/components/MkFolder.vue';
+import MkFolder from '@features/ui/frontend/components/MkFolder.vue';
 import MkKeyValue from '@features/ui/frontend/components/MkKeyValue.vue';
-import MkLink from '@/components/MkLink.vue';
+import MkLink from '@features/navigation/frontend/components/MkLink.vue';
 import MkInfo from '@features/ui/frontend/components/MkInfo.vue';
 
 const initStats = () => misskeyApi('stats', {});

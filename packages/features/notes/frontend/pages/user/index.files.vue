@@ -23,7 +23,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script lang="ts" setup>
 import { onMounted, ref } from 'vue';
 import * as Misskey from 'misskey-js';
-import { misskeyApi } from '@/utility/misskey-api.js';
+import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import MkContainer from '@features/ui/frontend/components/MkContainer.vue';
 import MkNoteMediaGrid from '@features/notes/frontend/components/MkNoteMediaGrid.vue';

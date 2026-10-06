@@ -62,18 +62,18 @@ import type { ChartSrc } from '@features/statistics/frontend/components/MkChart.
 import MkSelect from '@features/ui/frontend/components/MkSelect.vue';
 import MkChart from '@features/statistics/frontend/components/MkChart.vue';
 import { useChartTooltip } from '@features/statistics/frontend/composables/use-chart-tooltip.js';
-import { $i } from '@/i.js';
-import * as os from '@/os.js';
-import { misskeyApiGet } from '@/utility/misskey-api.js';
-import { instance } from '@/instance.js';
-import { i18n } from '@/i18n.js';
+import { $i } from '@features/auth/frontend/i.js';
+import * as os from '@features/ui/frontend/os.js';
+import { misskeyApiGet } from '@features/api/frontend/utility/misskey-api.js';
+import { instance } from '@features/instance/frontend/instance.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
 import MkHeatmap from '@features/statistics/frontend/components/MkHeatmap.vue';
 import MkFoldableSection from '@features/ui/frontend/components/MkFoldableSection.vue';
 import MkRetentionHeatmap from '@features/statistics/frontend/components/MkRetentionHeatmap.vue';
 import MkRetentionLineChart from '@features/statistics/frontend/components/MkRetentionLineChart.vue';
 import { initChart } from '@features/statistics/frontend/utility/init-chart.js';
 import { useMkSelect } from '@features/ui/frontend/composables/use-mkselect.js';
-import { themeManager } from '@/theme.js';
+import { themeManager } from '@features/preferences/frontend/theme.js';
 
 initChart();
 

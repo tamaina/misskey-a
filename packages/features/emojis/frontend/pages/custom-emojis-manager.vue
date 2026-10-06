@@ -80,12 +80,12 @@ import MkRemoteEmojiEditDialog from '@features/emojis/frontend/components/MkRemo
 import MkSwitch from '@features/ui/frontend/components/MkSwitch.vue';
 import FormSplit from '@features/ui/frontend/components/form/split.vue';
 import { selectFile } from '@features/drive/frontend/utility/drive.js';
-import * as os from '@/os.js';
-import { misskeyApi } from '@/utility/misskey-api.js';
-import { getProxiedImageUrl } from '@/utility/media-proxy.js';
-import { i18n } from '@/i18n.js';
-import { iAmAdmin } from '@/i.js';
-import { definePage } from '@/page.js';
+import * as os from '@features/ui/frontend/os.js';
+import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
+import { getProxiedImageUrl } from '@features/media/frontend/utility/media-proxy.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
+import { iAmAdmin } from '@features/auth/frontend/i.js';
+import { definePage } from '@features/navigation/frontend/page.js';
 import { Paginator } from '@features/ui/frontend/utility/paginator.js';
 
 const tab = ref('local');

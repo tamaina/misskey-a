@@ -45,8 +45,8 @@ import MkInput from '@features/ui/frontend/components/MkInput.vue';
 import FormSection from '@features/ui/frontend/components/form/section.vue';
 import MkSwitch from '@features/ui/frontend/components/MkSwitch.vue';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
-import * as os from '@/os.js';
-import { definePage } from '@/page.js';
+import * as os from '@features/ui/frontend/os.js';
+import { definePage } from '@features/navigation/frontend/page.js';
 
 const name = ref('');
 const url = ref('');

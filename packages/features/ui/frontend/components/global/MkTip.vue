@@ -15,11 +15,11 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { i18n } from '@/i18n.js';
-import { store } from '@/store.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
+import { store } from '@features/preferences/frontend/store.js';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
-import * as os from '@/os.js';
-import { TIPS, hideAllTips, closeTip } from '@/tips.js';
+import * as os from '@features/ui/frontend/os.js';
+import { TIPS, hideAllTips, closeTip } from '@features/web/frontend/tips.js';
 
 const props = withDefaults(defineProps<{
 	k: typeof TIPS[number];

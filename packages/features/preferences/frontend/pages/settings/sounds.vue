@@ -61,20 +61,20 @@ SPDX-License-Identifier: AGPL-3.0-only
 import { computed, ref } from 'vue';
 import XSound from '@features/preferences/frontend/pages/settings/sounds.sound.vue';
 import type { Ref } from 'vue';
-import type { SoundType, OperationType } from '@/utility/sound.js';
+import type { SoundType, OperationType } from '@features/preferences/frontend/utility/sound.js';
 import type { SoundStore } from '@features/preferences/frontend/state/def.js';
-import { prefer } from '@/preferences.js';
+import { prefer } from '@features/preferences/frontend/preferences.js';
 import MkRange from '@features/ui/frontend/components/MkRange.vue';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import FormSection from '@features/ui/frontend/components/form/section.vue';
-import MkFolder from '@/components/MkFolder.vue';
-import { i18n } from '@/i18n.js';
-import { definePage } from '@/page.js';
-import { operationTypes } from '@/utility/sound.js';
+import MkFolder from '@features/ui/frontend/components/MkFolder.vue';
+import { i18n } from '@features/runtime/frontend/i18n.js';
+import { definePage } from '@features/navigation/frontend/page.js';
+import { operationTypes } from '@features/preferences/frontend/utility/sound.js';
 import MkSwitch from '@features/ui/frontend/components/MkSwitch.vue';
 import MkPreferenceContainer from '@features/preferences/frontend/components/MkPreferenceContainer.vue';
 import { PREF_DEF } from '@features/preferences/frontend/state/def.js';
-import MkFeatureBanner from '@/components/MkFeatureBanner.vue';
+import MkFeatureBanner from '@features/web/frontend/components/MkFeatureBanner.vue';
 import { getInitialPrefValue } from '@features/preferences/frontend/state/manager.js';
 
 const notUseSound = prefer.model('sound.notUseSound');

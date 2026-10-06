@@ -6,8 +6,8 @@
 import { describe, test, assert, afterEach } from 'vitest';
 import { render, cleanup, type RenderResult } from '@testing-library/vue';
 import * as Misskey from 'misskey-js';
-import { components } from '@/components/index.js';
-import { directives } from '@/directives/index.js';
+import { components } from '@features/index/frontend/components.js';
+import { directives } from '@features/index/frontend/directives.js';
 import MkMediaImage from '@features/media/frontend/components/MkMediaImage.vue';
 
 describe('MkMediaImage', () => {

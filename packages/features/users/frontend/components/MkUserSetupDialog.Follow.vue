@@ -35,7 +35,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import { markRaw } from 'vue';
-import MkFolder from '@/components/MkFolder.vue';
+import MkFolder from '@features/ui/frontend/components/MkFolder.vue';
 import XUser from '@features/users/frontend/components/MkUserSetupDialog.User.vue';
 import MkPagination from '@features/ui/frontend/components/MkPagination.vue';
 import { Paginator } from '@features/ui/frontend/utility/paginator.js';

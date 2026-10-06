@@ -28,7 +28,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 import * as Misskey from 'misskey-js';
 import { ref } from 'vue';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
-import { misskeyApi } from '@/utility/misskey-api.js';
+import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 
 const props = defineProps<{
 	user: Misskey.entities.UserDetailed;

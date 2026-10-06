@@ -1,7 +1,9 @@
 {
+	"extends": "../tsconfig.json",
 	"compilerOptions": {
 		"target": "es2022",
 		"module": "Node16",
+		"moduleResolution": "Node16",
 		"strict": true,
 		"allowUnusedLabels": false,
 		"allowUnreachableCode": false,
@@ -26,5 +28,12 @@
 		"./generate.tsx",
 		"./preload-locale.ts",
 		"./preload-theme.ts"
-	]
+	],
+	"include": [
+		"../src/**/*.stories.ts",
+		"../features/*/frontend/**/*.stories.ts",
+		"../features/*/frontend/**/*.stories.impl.ts",
+		"../features/*/frontend/**/*.msw.ts"
+	],
+	"exclude": ["../features/media/frontend/workers/**/*.ts"]
 }

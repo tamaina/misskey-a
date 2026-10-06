@@ -71,16 +71,16 @@ import { browserSupportsWebAuthn } from '@simplewebauthn/browser';
 import type { PublicKeyCredentialRequestOptionsJSON, AuthenticationResponseJSON } from '@simplewebauthn/browser';
 import type { OpenOnRemoteOptions } from '@features/auth/frontend/utility/please-login.js';
 import type { PwResponse } from '@features/auth/frontend/components/MkSignin.password.vue';
-import { misskeyApi } from '@/utility/misskey-api.js';
-import { showSuspendedDialog } from '@/utility/show-suspended-dialog.js';
-import { i18n } from '@/i18n.js';
-import * as os from '@/os.js';
+import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
+import { showSuspendedDialog } from '@features/moderation/frontend/utility/show-suspended-dialog.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
+import * as os from '@features/ui/frontend/os.js';
 
 import XInput from '@features/auth/frontend/components/MkSignin.input.vue';
 import XPassword from '@features/auth/frontend/components/MkSignin.password.vue';
 import XTotp from '@features/auth/frontend/components/MkSignin.totp.vue';
 import XPasskey from '@features/auth/frontend/components/MkSignin.passkey.vue';
-import { login } from '@/accounts.js';
+import { login } from '@features/auth/frontend/accounts.js';
 
 const emit = defineEmits<{
 	(ev: 'login', v: Misskey.entities.SigninFlowResponse & { finished: true }): void;

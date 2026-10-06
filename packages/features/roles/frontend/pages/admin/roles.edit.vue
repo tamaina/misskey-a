@@ -22,14 +22,14 @@ SPDX-License-Identifier: AGPL-3.0-only
 import { computed, ref } from 'vue';
 import * as Misskey from 'misskey-js';
 import XEditor from '@features/roles/frontend/pages/admin/roles.editor.vue';
-import { genId } from '@/utility/id.js';
-import * as os from '@/os.js';
-import { misskeyApi } from '@/utility/misskey-api.js';
-import { i18n } from '@/i18n.js';
-import { definePage } from '@/page.js';
+import { genId } from '@features/runtime/frontend/utility/id.js';
+import * as os from '@features/ui/frontend/os.js';
+import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
+import { definePage } from '@features/navigation/frontend/page.js';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
-import { rolesCache } from '@/cache.js';
-import { useRouter } from '@/router.js';
+import { rolesCache } from '@features/runtime/frontend/cache.js';
+import { useRouter } from '@features/navigation/frontend/router.js';
 
 const router = useRouter();
 

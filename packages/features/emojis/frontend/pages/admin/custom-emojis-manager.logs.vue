@@ -29,7 +29,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script setup lang="ts">
 import { computed, ref, toRefs } from 'vue';
-import { i18n } from '@/i18n.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
 import MkGrid from '@features/ui/frontend/components/grid/MkGrid.vue';
 import MkSwitch from '@features/ui/frontend/components/MkSwitch.vue';
 import { copyGridDataToClipboard } from '@features/ui/frontend/components/grid/grid-utils.js';

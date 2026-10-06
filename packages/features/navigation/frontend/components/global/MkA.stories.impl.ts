@@ -7,7 +7,7 @@
 import { expect, userEvent, within } from '@storybook/test';
 import type { StoryObj } from '@storybook/vue3';
 import MkA from '@features/navigation/frontend/components/global/MkA.vue';
-import { tick } from '@/utility/test-utils.js';
+import { tick } from '../../../../../frontend/lib/test-utils.js';
 export const Default = {
 	render(args) {
 		return {

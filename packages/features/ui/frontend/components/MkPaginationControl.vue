@@ -41,7 +41,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 import { ref, watch } from 'vue';
 import type { IPaginator } from '@features/ui/frontend/utility/paginator.js';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
-import { i18n } from '@/i18n.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
 import MkSelect from '@features/ui/frontend/components/MkSelect.vue';
 import MkInput from '@features/ui/frontend/components/MkInput.vue';
 import { formatDateTimeString } from '@features/ui/frontend/utility/format-time-string.js';

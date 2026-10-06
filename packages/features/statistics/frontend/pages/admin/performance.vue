@@ -178,15 +178,15 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import { ref, computed } from 'vue';
-import * as os from '@/os.js';
-import { misskeyApi } from '@/utility/misskey-api.js';
-import { fetchInstance } from '@/instance.js';
-import { i18n } from '@/i18n.js';
-import { definePage } from '@/page.js';
+import * as os from '@features/ui/frontend/os.js';
+import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
+import { fetchInstance } from '@features/instance/frontend/instance.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
+import { definePage } from '@features/navigation/frontend/page.js';
 import MkSwitch from '@features/ui/frontend/components/MkSwitch.vue';
-import MkFolder from '@/components/MkFolder.vue';
+import MkFolder from '@features/ui/frontend/components/MkFolder.vue';
 import MkInput from '@features/ui/frontend/components/MkInput.vue';
-import MkLink from '@/components/MkLink.vue';
+import MkLink from '@features/navigation/frontend/components/MkLink.vue';
 import { useForm } from '@features/ui/frontend/composables/use-form.js';
 import MkFormFooter from '@features/ui/frontend/components/MkFormFooter.vue';
 

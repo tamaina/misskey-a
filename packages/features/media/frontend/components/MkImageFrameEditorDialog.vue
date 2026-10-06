@@ -157,21 +157,21 @@ import { ref, useTemplateRef, watch, onMounted, onUnmounted, reactive, nextTick 
 import ExifReader from 'exifreader';
 import { throttle } from 'throttle-debounce';
 import MkPreviewWithControls from '@features/markup/frontend/components/MkPreviewWithControls.vue';
-import type { ImageFrameParams, ImageFramePreset } from '@/utility/image-frame-renderer/ImageFrameRenderer.js';
-import { ImageFrameRenderer } from '@/utility/image-frame-renderer/ImageFrameRenderer.js';
-import { i18n } from '@/i18n.js';
+import type { ImageFrameParams, ImageFramePreset } from '@features/media/frontend/utility/image-frame-renderer/ImageFrameRenderer.js';
+import { ImageFrameRenderer } from '@features/media/frontend/utility/image-frame-renderer/ImageFrameRenderer.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
 import MkModalWindow from '@features/ui/frontend/components/MkModalWindow.vue';
 import MkSelect from '@features/ui/frontend/components/MkSelect.vue';
-import MkFolder from '@/components/MkFolder.vue';
+import MkFolder from '@features/ui/frontend/components/MkFolder.vue';
 import MkSwitch from '@features/ui/frontend/components/MkSwitch.vue';
 import MkRange from '@features/ui/frontend/components/MkRange.vue';
 import MkInput from '@features/ui/frontend/components/MkInput.vue';
 import MkTextarea from '@features/ui/frontend/components/MkTextarea.vue';
 import MkInfo from '@features/ui/frontend/components/MkInfo.vue';
-import * as os from '@/os.js';
-import { deepClone } from '@/utility/clone.js';
-import { ensureSignin } from '@/i.js';
-import { genId } from '@/utility/id.js';
+import * as os from '@features/ui/frontend/os.js';
+import { deepClone } from '@features/runtime/frontend/utility/clone.js';
+import { ensureSignin } from '@features/auth/frontend/i.js';
+import { genId } from '@features/runtime/frontend/utility/id.js';
 
 const $i = ensureSignin();
 

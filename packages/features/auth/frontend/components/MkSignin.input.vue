@@ -59,8 +59,8 @@ import { toUnicode } from 'punycode.js';
 import { query, extractDomain } from '@@/js/url.js';
 import { host as configHost } from '@@/js/config.js';
 import type { OpenOnRemoteOptions } from '@features/auth/frontend/utility/please-login.js';
-import { i18n } from '@/i18n.js';
-import * as os from '@/os.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
+import * as os from '@features/ui/frontend/os.js';
 
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import MkInput from '@features/ui/frontend/components/MkInput.vue';

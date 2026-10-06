@@ -6,7 +6,7 @@
 import { defineAsyncComponent, ref } from 'vue';
 import type { Directive } from 'vue';
 import * as Misskey from 'misskey-js';
-import { popup } from '@/os.js';
+import { popup } from '@features/ui/frontend/os.js';
 import { isTouchUsing } from '@features/ui/frontend/utility/touch.js';
 
 export class UserPreview {

@@ -12,8 +12,8 @@ const mocks = vi.hoisted(() => ({
 	get: vi.fn(), set: vi.fn(), post: vi.fn(), getApi: vi.fn(),
 	cleanup: [] as Array<() => void>,
 }));
-vi.mock('@/utility/idb-proxy.js', () => ({ get: mocks.get, set: mocks.set }));
-vi.mock('@/utility/misskey-api.js', () => ({ misskeyApi: mocks.post, misskeyApiGet: mocks.getApi }));
+vi.mock('@features/runtime/frontend/utility/idb-proxy.js', () => ({ get: mocks.get, set: mocks.set }));
+vi.mock('@features/api/frontend/utility/misskey-api.js', () => ({ misskeyApi: mocks.post, misskeyApiGet: mocks.getApi }));
 vi.mock('@features/emojis/frontend', async importOriginal => {
 	const actual = await importOriginal<typeof import('../../../features/emojis/frontend/index.js')>();
 	return {
@@ -47,7 +47,7 @@ afterEach(() => {
 
 test.each([undefined, null, 1, 'invalid', {}])('non-array stored cache starts empty (%s)', async cached => {
 	mocks.cached = cached;
-	const store = await import('@/custom-emojis.js');
+	const store = await import('@features/emojis/frontend/custom-emojis.js');
 	expect(store.customEmojis.value).toEqual([]);
 	expect(mocks.get.mock.calls).toEqual([['emojis']]);
 	expect(mocks.set).not.toHaveBeenCalled();
@@ -58,14 +58,14 @@ test.each([undefined, null, 1, 'invalid', {}])('non-array stored cache starts em
 test('accepts an array cache and persists mutations under the existing key', async () => {
 	const cached = [emoji('cached')];
 	mocks.cached = cached;
-	const store = await import('@/custom-emojis.js');
+	const store = await import('@features/emojis/frontend/custom-emojis.js');
 	expect(store.customEmojis.value).toBe(cached);
 	store.addCustomEmoji(emoji('added'));
 	expect(mocks.set).toHaveBeenCalledWith('emojis', store.customEmojis.value);
 });
 
 test('normal refresh uses GET and writes emojis before the original start timestamp', async () => {
-	const store = await import('@/custom-emojis.js');
+	const store = await import('@features/emojis/frontend/custom-emojis.js');
 	await store.fetchCustomEmojis();
 	expect(mocks.get.mock.calls).toEqual([['emojis'], ['lastEmojisFetchedAt']]);
 	expect(mocks.getApi).toHaveBeenCalledExactlyOnceWith('emojis', {});
@@ -75,7 +75,7 @@ test('normal refresh uses GET and writes emojis before the original start timest
 
 test('forced refresh uses POST and does not read the cached timestamp', async () => {
 	mocks.lastFetched = 9_999;
-	const store = await import('@/custom-emojis.js');
+	const store = await import('@features/emojis/frontend/custom-emojis.js');
 	await store.fetchCustomEmojis(true);
 	expect(mocks.get.mock.calls).toEqual([['emojis']]);
 	expect(mocks.post).toHaveBeenCalledExactlyOnceWith('emojis', {});
@@ -85,7 +85,7 @@ test('forced refresh uses POST and does not read the cached timestamp', async ()
 
 test('a recent timestamp skips network and persistence', async () => {
 	mocks.lastFetched = 9_999;
-	const store = await import('@/custom-emojis.js');
+	const store = await import('@features/emojis/frontend/custom-emojis.js');
 	await store.fetchCustomEmojis();
 	expect(mocks.getApi).not.toHaveBeenCalled();
 	expect(mocks.post).not.toHaveBeenCalled();
@@ -97,7 +97,7 @@ test('API failures do not replace cached state or write persistence', async () =
 	mocks.cached = cached;
 	const failure = new Error('fixture failure');
 	mocks.getApi.mockRejectedValue(failure);
-	const store = await import('@/custom-emojis.js');
+	const store = await import('@features/emojis/frontend/custom-emojis.js');
 	await expect(store.fetchCustomEmojis()).rejects.toBe(failure);
 	expect(store.customEmojis.value).toBe(cached);
 	expect(mocks.set).not.toHaveBeenCalled();

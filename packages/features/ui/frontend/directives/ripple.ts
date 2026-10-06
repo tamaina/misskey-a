@@ -5,8 +5,8 @@
 
 import type { Directive } from 'vue';
 import MkRippleEffect from '@features/ui/frontend/components/MkRippleEffect.vue';
-import { prefer } from '@/preferences.js';
-import { popup } from '@/os.js';
+import { prefer } from '@features/preferences/frontend/preferences.js';
+import { popup } from '@features/ui/frontend/os.js';
 
 const abortControllers = new WeakMap<HTMLElement, AbortController>();
 

@@ -83,14 +83,14 @@ import * as Misskey from 'misskey-js';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import MkSwitch from '@features/ui/frontend/components/MkSwitch.vue';
 import MkKeyValue from '@features/ui/frontend/components/MkKeyValue.vue';
-import * as os from '@/os.js';
-import { i18n } from '@/i18n.js';
+import * as os from '@features/ui/frontend/os.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
 import { dateString } from '@features/ui/frontend/filters/date.js';
-import MkFolder from '@/components/MkFolder.vue';
+import MkFolder from '@features/ui/frontend/components/MkFolder.vue';
 import RouterView from '@features/navigation/frontend/components/global/RouterView.vue';
 import MkTextarea from '@features/ui/frontend/components/MkTextarea.vue';
 import { copyToClipboard } from '@features/ui/frontend/utility/copy-to-clipboard.js';
-import { createRouter } from '@/router.js';
+import { createRouter } from '@features/navigation/frontend/router.js';
 
 const props = defineProps<{
 	report: Misskey.entities.AdminAbuseUserReportsResponse[number];

@@ -68,11 +68,11 @@ import { onMounted, computed, watch, unref } from 'vue';
 import type { UnwrapRef } from 'vue';
 import type { IPaginator } from '@features/ui/frontend/utility/paginator.js';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
-import { i18n } from '@/i18n.js';
-import { prefer } from '@/preferences.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
+import { prefer } from '@features/preferences/frontend/preferences.js';
 import MkPullToRefresh from '@features/ui/frontend/components/MkPullToRefresh.vue';
 import MkPaginationControl from '@features/ui/frontend/components/MkPaginationControl.vue';
-import * as os from '@/os.js';
+import * as os from '@features/ui/frontend/os.js';
 
 const props = withDefaults(defineProps<MkPaginationOptions & {
 	paginator: T;

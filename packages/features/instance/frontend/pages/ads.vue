@@ -15,9 +15,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { definePage } from '@/page.js';
-import { i18n } from '@/i18n.js';
-import { instance } from '@/instance.js';
+import { definePage } from '@features/navigation/frontend/page.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
+import { instance } from '@features/instance/frontend/instance.js';
 
 definePage(() => ({
 	title: i18n.ts.ads,

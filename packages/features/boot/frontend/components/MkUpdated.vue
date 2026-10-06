@@ -21,7 +21,7 @@ import { version } from '@@/js/config.js';
 import MkModal from '@features/ui/frontend/components/MkModal.vue';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import MkSparkle from '@features/ui/frontend/components/MkSparkle.vue';
-import { i18n } from '@/i18n.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
 import { confetti } from '@features/ui/frontend/utility/confetti.js';
 
 const modal = useTemplateRef('modal');

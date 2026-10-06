@@ -22,8 +22,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script lang="ts" setup>
 import { onUnmounted, ref } from 'vue';
 import * as Misskey from 'misskey-js';
-import { useWidgetPropsManager } from '../../../../../frontend/src/widgets/widget.js';
-import type { WidgetComponentProps, WidgetComponentEmits, WidgetComponentExpose } from '../../../../../frontend/src/widgets/widget.js';
+import { useWidgetPropsManager } from '../../../../ui/frontend/widgets/widget.js';
+import type { WidgetComponentProps, WidgetComponentEmits, WidgetComponentExpose } from '../../../../ui/frontend/widgets/widget.js';
 import XCpuMemory from '@features/statistics/frontend/widgets/server-metric/cpu-mem.vue';
 import XNet from '@features/statistics/frontend/widgets/server-metric/net.vue';
 import XCpu from '@features/statistics/frontend/widgets/server-metric/cpu.vue';
@@ -31,9 +31,9 @@ import XMemory from '@features/statistics/frontend/widgets/server-metric/mem.vue
 import XDisk from '@features/statistics/frontend/widgets/server-metric/disk.vue';
 import MkContainer from '@features/ui/frontend/components/MkContainer.vue';
 import type { FormWithDefault, GetFormResultType } from '@features/ui/frontend/utility/form.js';
-import { misskeyApiGet } from '@/utility/misskey-api.js';
-import { useStream } from '@/stream.js';
-import { i18n } from '@/i18n.js';
+import { misskeyApiGet } from '@features/api/frontend/utility/misskey-api.js';
+import { useStream } from '@features/api/frontend/stream.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
 
 const name = 'serverMetric';
 

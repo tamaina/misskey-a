@@ -18,16 +18,14 @@ describe('VVI SFC subrequest guard', () => {
 	test('scans sibling feature views before a locale module is first loaded', () => {
 		const root = mkdtempSync(join(tmpdir(), 'misskey-a-vvi-feature-'));
 		try {
-			mkdirSync(join(root, 'frontend/src'), { recursive: true });
+			mkdirSync(join(root, 'frontend'), { recursive: true });
 			mkdirSync(join(root, 'features/navigation/frontend'), { recursive: true });
 			const sfc = '<template><p>{{ $locale.sfc.title }}</p></template><locale locale="ja-JP" lang="json">{"title":"Fixture"}</locale>';
-			writeFileSync(join(root, 'frontend/src/Page.vue'), sfc);
 			writeFileSync(join(root, 'features/navigation/frontend/Page.vue'), sfc);
 			const plugin = pluginVvi();
 			hook(plugin.configResolved, { root: join(root, 'frontend'), command: 'serve', base: '/' });
 			hook(plugin.buildStart);
 			const locale = hook(plugin.load, '\0virtual:vite-vue-internationalization/locale/ja-JP');
-			expect(locale).toContain('/frontend/src/Page.vue');
 			expect(locale).toContain('/features/navigation/frontend/Page.vue');
 		} finally {
 			rmSync(root, { recursive: true, force: true });
@@ -39,7 +37,7 @@ describe('VVI SFC subrequest guard', () => {
 		try {
 			const frontend = join(root, 'frontend');
 			const components = join(root, 'features/ui/frontend/components');
-			mkdirSync(join(frontend, 'src'), { recursive: true });
+			mkdirSync(frontend, { recursive: true });
 			mkdirSync(components, { recursive: true });
 			const id = join(components, 'Result.vue');
 			writeFileSync(id, '<template><p>{{ $locale.sfc.text }}</p></template><locale locale="ja-JP" lang="json">{"text":"Result"}</locale>');

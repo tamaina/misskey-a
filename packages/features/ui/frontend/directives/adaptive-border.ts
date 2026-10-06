@@ -5,7 +5,7 @@
 
 import type { Directive } from 'vue';
 import { getBgColor } from '@features/ui/frontend/utility/get-bg-color.js';
-import { themeManager } from '@/theme.js';
+import { themeManager } from '@features/preferences/frontend/theme.js';
 
 const handlerMap = new WeakMap<HTMLElement, () => void>();
 

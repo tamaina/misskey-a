@@ -87,11 +87,11 @@ import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import MkInput from '@features/ui/frontend/components/MkInput.vue';
 import type { Captcha } from '@features/auth/frontend/components/MkCaptcha.vue';
 import MkCaptcha from '@features/auth/frontend/components/MkCaptcha.vue';
-import * as os from '@/os.js';
-import { misskeyApi } from '@/utility/misskey-api.js';
-import { instance } from '@/instance.js';
-import { i18n } from '@/i18n.js';
-import { login } from '@/accounts.js';
+import * as os from '@features/ui/frontend/os.js';
+import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
+import { instance } from '@features/instance/frontend/instance.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
+import { login } from '@features/auth/frontend/accounts.js';
 
 const props = withDefaults(defineProps<{
 	autoSet?: boolean;

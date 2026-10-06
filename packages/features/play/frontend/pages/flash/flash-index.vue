@@ -57,9 +57,9 @@ import MkFlashPreview from '@features/play/frontend/components/MkFlashPreview.vu
 import MkPagination from '@features/ui/frontend/components/MkPagination.vue';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import MkInput from '@features/ui/frontend/components/MkInput.vue';
-import { i18n } from '@/i18n.js';
-import { definePage } from '@/page.js';
-import { useRouter } from '@/router.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
+import { definePage } from '@features/navigation/frontend/page.js';
+import { useRouter } from '@features/navigation/frontend/router.js';
 import { Paginator } from '@features/ui/frontend/utility/paginator.js';
 
 const router = useRouter();

@@ -43,7 +43,7 @@ export default [
 			parserOptions: {
 				extraFileExtensions: ['.vue'],
 				parser: tsParser,
-				project: ['./tsconfig.json'],
+				project: ['./tsconfig.json', './workers/tsconfig.json'],
 				sourceType: 'module',
 				tsconfigRootDir: import.meta.dirname,
 			},

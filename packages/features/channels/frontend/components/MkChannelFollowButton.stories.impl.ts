@@ -10,7 +10,7 @@ import { channel } from '../../../../frontend/.storybook/fakes.js';
 import { commonHandlers } from '../../../../frontend/.storybook/mocks.js';
 import MkChannelFollowButton from '@features/channels/frontend/components/MkChannelFollowButton.vue';
 import type { StoryObj } from '@storybook/vue3';
-import { i18n } from '@/i18n.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
 
 function sleep(ms: number) {
 	return new Promise(resolve => window.setTimeout(resolve, ms));

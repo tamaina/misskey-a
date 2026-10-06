@@ -24,6 +24,9 @@ import { pluginRemoveUnrefI18n } from '../frontend-builder/rollup-plugin-remove-
 import { Features } from 'lightningcss';
 
 const fluentEmojiDirectory = path.dirname(createRequire(import.meta.url).resolve('@misskey-dev/emoji-assets/fluent-emoji/1f3c6.png'));
+const frontendDependencyAliases = {
+	buraha: createRequire(import.meta.url).resolve('buraha'),
+};
 
 const url = process.env.NODE_ENV === 'development' ? (loadYaml(await fsp.readFile('../../.config/default.yml', 'utf-8')) as any).url : null;
 const host = url ? (new URL(url)).hostname : undefined;
@@ -136,7 +139,11 @@ export function getConfig(): UserConfig {
 			pluginFeatureDependencies(__dirname, path.resolve(__dirname, '../features')),
 			pluginVvi(),
 			pluginWatchLocales(),
-			...searchIndexes.map(options => pluginCreateSearchIndex(options)),
+			...searchIndexes.map(options => pluginCreateSearchIndex({
+				...options,
+				// VVI scans from packages/ and uses it as the runtime SFC module-ID root.
+				componentLocaleRoot: path.resolve(__dirname, '..'),
+			})),
 			pluginVue(),
 			pluginRemoveUnrefI18n(),
 			pluginUnwindCssModuleClassName(),
@@ -159,6 +166,7 @@ export function getConfig(): UserConfig {
 			// Feature sources have no package manifests; use this consumer's runtime.
 			dedupe: ['vue', 'i18n', 'vitest', 'vite-vue-internationalization'],
 			alias: {
+				...frontendDependencyAliases,
 				'@/': __dirname + '/src/',
 				'@@/': __dirname + '/../frontend-shared/',
 				'@features/': __dirname + '/../features/',
@@ -206,7 +214,7 @@ export function getConfig(): UserConfig {
 					nativeMagicString: true,
 				},
 				input: {
-					i18n: './src/i18n.ts',
+					i18n: '../features/runtime/frontend/i18n.ts',
 					entry: './src/_boot_.ts',
 				},
 				external: externalPackages.map(p => p.match),
@@ -252,6 +260,9 @@ export function getConfig(): UserConfig {
 
 		worker: {
 			format: 'es',
+			rolldownOptions: {
+				resolve: { alias: frontendDependencyAliases },
+			},
 		},
 	};
 }

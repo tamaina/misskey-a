@@ -12,11 +12,11 @@ import lightTheme from '@@/themes/_light.json5';
 import darkTheme from '@@/themes/_dark.json5';
 import defaultLightTheme from '@@/themes/l-light.json5';
 import defaultDarkTheme from '@@/themes/d-green-lime.json5';
-import { unique } from '@/utility/array.js';
-import { deepClone } from '@/utility/clone.js';
-import { deepMerge } from '@/utility/merge.js';
+import { unique } from '@features/runtime/frontend/utility/array.js';
+import { deepClone } from '@features/runtime/frontend/utility/clone.js';
+import { deepMerge } from '@features/runtime/frontend/utility/merge.js';
 import type { HighlighterCore, LanguageRegistration, ThemeRegistration, ThemeRegistrationRaw } from 'shiki/core';
-import { prefer } from '@/preferences.js';
+import { prefer } from '@features/preferences/frontend/preferences.js';
 
 let _highlighter: HighlighterCore | null = null;
 

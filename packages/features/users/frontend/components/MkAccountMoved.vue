@@ -16,7 +16,7 @@ import { ref } from 'vue';
 import * as Misskey from 'misskey-js';
 import MkMention from '@features/users/frontend/components/MkMention.vue';
 import { host as localHost } from '@@/js/config.js';
-import { misskeyApi } from '@/utility/misskey-api.js';
+import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 
 const user = ref<Misskey.entities.UserLite>();
 

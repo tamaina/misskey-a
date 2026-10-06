@@ -32,13 +32,13 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script lang="ts" setup>
 import { onMounted, ref, useTemplateRef } from 'vue';
 import * as Misskey from 'misskey-js';
-import * as os from '@/os.js';
-import { misskeyApi } from '@/utility/misskey-api.js';
+import * as os from '@features/ui/frontend/os.js';
+import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 import MkModal from '@features/ui/frontend/components/MkModal.vue';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
-import { i18n } from '@/i18n.js';
-import { $i } from '@/i.js';
-import { updateCurrentAccountPartial } from '@/accounts.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
+import { $i } from '@features/auth/frontend/i.js';
+import { updateCurrentAccountPartial } from '@features/auth/frontend/accounts.js';
 
 const props = defineProps<{
 	announcement: Misskey.entities.Announcement;

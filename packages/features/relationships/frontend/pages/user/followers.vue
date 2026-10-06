@@ -21,9 +21,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 import { computed, watch, ref } from 'vue';
 import * as Misskey from 'misskey-js';
 import XFollowList from '@features/relationships/frontend/pages/user/follow-list.vue';
-import { misskeyApi } from '@/utility/misskey-api.js';
-import { definePage } from '@/page.js';
-import { i18n } from '@/i18n.js';
+import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
+import { definePage } from '@features/navigation/frontend/page.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
 
 const props = withDefaults(defineProps<{
 	acct: string;

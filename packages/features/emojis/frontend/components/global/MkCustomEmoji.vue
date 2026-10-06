@@ -39,17 +39,17 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script lang="ts" setup>
 import { computed, defineAsyncComponent, inject, ref } from 'vue';
 import { normalizeCustomEmojiName, isLocalCustomEmojiName, getCustomEmojiImagePath } from '@@/js/emoji-name.js';
-import type { MenuItem } from '@/types/menu.js';
-import { getProxiedImageUrl, getStaticImageUrl } from '@/utility/media-proxy.js';
-import { customEmojisMap } from '@/custom-emojis.js';
-import * as os from '@/os.js';
-import { misskeyApi, misskeyApiGet } from '@/utility/misskey-api.js';
+import type { MenuItem } from '@features/navigation/frontend/types/menu.js';
+import { getProxiedImageUrl, getStaticImageUrl } from '@features/media/frontend/utility/media-proxy.js';
+import { customEmojisMap } from '@features/emojis/frontend/custom-emojis.js';
+import * as os from '@features/ui/frontend/os.js';
+import { misskeyApi, misskeyApiGet } from '@features/api/frontend/utility/misskey-api.js';
 import { copyToClipboard } from '@features/ui/frontend/utility/copy-to-clipboard.js';
-import { i18n } from '@/i18n.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
 import MkCustomEmojiDetailedDialog from '@features/emojis/frontend/components/MkCustomEmojiDetailedDialog.vue';
-import { $i } from '@/i.js';
-import { prefer } from '@/preferences.js';
-import { DI } from '@/di.js';
+import { $i } from '@features/auth/frontend/i.js';
+import { prefer } from '@features/preferences/frontend/preferences.js';
+import { DI } from '@features/ui/frontend/di.js';
 import { makeEmojiMuteKey, mute as muteEmoji, unmute as unmuteEmoji, checkMuted as checkEmojiMuted } from '@features/emojis/frontend/utility/emoji-mute.js';
 import { addToEmojiPalette } from '@features/emojis/frontend/utility/emoji-palette.js';
 

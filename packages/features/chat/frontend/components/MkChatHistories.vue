@@ -36,8 +36,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 import { onActivated, onDeactivated, onMounted, ref } from 'vue';
 import * as Misskey from 'misskey-js';
 import { useInterval } from '@@/js/use-interval.js';
-import { misskeyApi } from '@/utility/misskey-api.js';
-import { ensureSignin } from '@/i.js';
+import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
+import { ensureSignin } from '@features/auth/frontend/i.js';
 
 const $i = ensureSignin();
 

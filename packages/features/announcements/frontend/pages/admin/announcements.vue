@@ -98,13 +98,13 @@ import MkSelect from '@features/ui/frontend/components/MkSelect.vue';
 import MkSwitch from '@features/ui/frontend/components/MkSwitch.vue';
 import MkRadios from '@features/ui/frontend/components/MkRadios.vue';
 import MkInfo from '@features/ui/frontend/components/MkInfo.vue';
-import * as os from '@/os.js';
-import { misskeyApi } from '@/utility/misskey-api.js';
-import { i18n } from '@/i18n.js';
-import { definePage } from '@/page.js';
-import MkFolder from '@/components/MkFolder.vue';
+import * as os from '@features/ui/frontend/os.js';
+import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
+import { definePage } from '@features/navigation/frontend/page.js';
+import MkFolder from '@features/ui/frontend/components/MkFolder.vue';
 import MkTextarea from '@features/ui/frontend/components/MkTextarea.vue';
-import { genId } from '@/utility/id.js';
+import { genId } from '@features/runtime/frontend/utility/id.js';
 import { useMkSelect } from '@features/ui/frontend/composables/use-mkselect.js';
 
 const {

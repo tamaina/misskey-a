@@ -97,7 +97,7 @@ import type { CellValue, GridCell } from '@features/ui/frontend/components/grid/
 import type { GridRowSetting } from '@features/ui/frontend/components/grid/row.js';
 import { GridEventEmitter } from '@features/ui/frontend/components/grid/grid.js';
 import { useTooltip } from '@features/ui/frontend/composables/use-tooltip.js';
-import * as os from '@/os.js';
+import * as os from '@features/ui/frontend/os.js';
 import { equalCellAddress, getCellAddress } from '@features/ui/frontend/components/grid/grid-utils.js';
 
 const emit = defineEmits<{

@@ -32,10 +32,10 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import MkFolder from '@/components/MkFolder.vue';
+import MkFolder from '@features/ui/frontend/components/MkFolder.vue';
 import MkSwitch from '@features/ui/frontend/components/MkSwitch.vue';
 import MkRange from '@features/ui/frontend/components/MkRange.vue';
-import { i18n } from '@/i18n.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
 import type { PolicyMeta } from '@features/roles/frontend/pages/admin/roles.policy-editor.vue';
 
 const props = defineProps<{

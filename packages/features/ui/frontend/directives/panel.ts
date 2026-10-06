@@ -4,7 +4,7 @@
  */
 
 import type { Directive } from 'vue';
-import { themeManager } from '@/theme.js';
+import { themeManager } from '@features/preferences/frontend/theme.js';
 import { getBgColor } from '@features/ui/frontend/utility/get-bg-color.js';
 
 export const panelDirective = {

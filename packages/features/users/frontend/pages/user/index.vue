@@ -28,11 +28,11 @@ SPDX-License-Identifier: AGPL-3.0-only
 import { defineAsyncComponent, computed, watch, ref } from 'vue';
 import * as Misskey from 'misskey-js';
 import { acct as getAcct } from '@features/users/frontend/filters/user.js';
-import { misskeyApi } from '@/utility/misskey-api.js';
-import { definePage } from '@/page.js';
-import { i18n } from '@/i18n.js';
-import { $i } from '@/i.js';
-import { serverContext, assertServerContext } from '@/server-context.js';
+import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
+import { definePage } from '@features/navigation/frontend/page.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
+import { $i } from '@features/auth/frontend/i.js';
+import { serverContext, assertServerContext } from '@features/runtime/frontend/server-context.js';
 
 const XHome = defineAsyncComponent(() => import('@features/users/frontend/pages/user/home.vue'));
 const XNotes = defineAsyncComponent(() => import('@features/notes/frontend/pages/user/notes.vue'));

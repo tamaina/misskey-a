@@ -28,7 +28,7 @@ async function buildAllLocale() {
 		outputDir,
 		logger,
 		scriptsDir: 'scripts',
-		i18nFile: 'src/i18n.ts',
+		i18nFile: '../features/runtime/frontend/i18n.ts',
 	})
 
 	await inliner.loadFiles();

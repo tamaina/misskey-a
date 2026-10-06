@@ -19,8 +19,8 @@ import { ref, watch } from 'vue';
 import MkTextarea from '@features/ui/frontend/components/MkTextarea.vue';
 import MkInfo from '@features/ui/frontend/components/MkInfo.vue';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
-import { ensureSignin } from '@/i.js';
-import { misskeyApi } from '@/utility/misskey-api.js';
+import { ensureSignin } from '@features/auth/frontend/i.js';
+import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 
 const $i = ensureSignin();
 

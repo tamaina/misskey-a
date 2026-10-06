@@ -35,10 +35,10 @@ import * as Misskey from 'misskey-js';
 import MkInput from '@features/ui/frontend/components/MkInput.vue';
 import MkSelect from '@features/ui/frontend/components/MkSelect.vue';
 import MkFileListForAdmin from '@features/drive/frontend/components/MkFileListForAdmin.vue';
-import * as os from '@/os.js';
-import { lookupFile } from '@/utility/admin-lookup.js';
-import { i18n } from '@/i18n.js';
-import { definePage } from '@/page.js';
+import * as os from '@features/ui/frontend/os.js';
+import { lookupFile } from '@features/moderation/frontend/utility/admin-lookup.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
+import { definePage } from '@features/navigation/frontend/page.js';
 import { useMkSelect } from '@features/ui/frontend/composables/use-mkselect.js';
 import { Paginator } from '@features/ui/frontend/utility/paginator.js';
 

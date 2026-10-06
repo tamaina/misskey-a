@@ -42,14 +42,14 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import { ref } from 'vue';
-import { i18n } from '@/i18n.js';
-import { instance } from '@/instance.js';
-import { definePage } from '@/page.js';
-import { getUserEnvironment } from '@/utility/get-user-environment.js';
-import type { UserEnvironment } from '@/utility/get-user-environment.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
+import { instance } from '@features/instance/frontend/instance.js';
+import { definePage } from '@features/navigation/frontend/page.js';
+import { getUserEnvironment } from '@features/users/frontend/utility/get-user-environment.js';
+import type { UserEnvironment } from '@features/users/frontend/utility/get-user-environment.js';
 import MkKeyValue from '@features/ui/frontend/components/MkKeyValue.vue';
-import MkFolder from '@/components/MkFolder.vue';
-import MkLink from '@/components/MkLink.vue';
+import MkFolder from '@features/ui/frontend/components/MkFolder.vue';
+import MkLink from '@features/navigation/frontend/components/MkLink.vue';
 import MkCode from '@features/markup/frontend/components/MkCode.vue';
 
 const userEnv = ref<UserEnvironment | null>(null);

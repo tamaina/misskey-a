@@ -24,7 +24,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script lang="ts" setup>
 import { nextTick, onMounted, onUnmounted, ref, useTemplateRef } from 'vue';
 import { calcPopupPosition } from '@features/ui/frontend/utility/popup-position.js';
-import * as os from '@/os.js';
+import * as os from '@features/ui/frontend/os.js';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 
 const props = withDefaults(defineProps<{
@@ -334,7 +334,7 @@ onUnmounted(() => {
 <locale locale="th-TH" lang="json">
 {
   "goBack": "ย้อนกลับ",
-  "next": "ถัด​ไป",
+  "next": "ถัด\u200Bไป",
   "done": "เสร็จสิ้น"
 }
 </locale>

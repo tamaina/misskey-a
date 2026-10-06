@@ -42,22 +42,22 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import { ref, computed, nextTick } from 'vue';
-import type { Extension } from '@/components/MkExtensionInstaller.vue';
-import type { AiScriptPluginMeta } from '@/plugin.js';
+import type { Extension } from '@features/integrations/frontend/components/MkExtensionInstaller.vue';
+import type { AiScriptPluginMeta } from '@features/integrations/frontend/plugin.js';
 import MkLoading from '@features/ui/frontend/components/global/MkLoading.vue';
-import MkExtensionInstaller from '@/components/MkExtensionInstaller.vue';
+import MkExtensionInstaller from '@features/integrations/frontend/components/MkExtensionInstaller.vue';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import MkKeyValue from '@features/ui/frontend/components/MkKeyValue.vue';
 import MkUrl from '@features/markup/frontend/components/global/MkUrl.vue';
 import FormSection from '@features/ui/frontend/components/form/section.vue';
-import * as os from '@/os.js';
-import { misskeyApi } from '@/utility/misskey-api.js';
-import { parsePluginMeta, installPlugin } from '@/plugin.js';
-import { installTheme } from '@/theme.js';
+import * as os from '@features/ui/frontend/os.js';
+import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
+import { parsePluginMeta, installPlugin } from '@features/integrations/frontend/plugin.js';
+import { installTheme } from '@features/preferences/frontend/theme.js';
 import { parseThemeCode } from '@@/js/theme.js';
-import { unisonReload } from '@/utility/unison-reload.js';
-import { i18n } from '@/i18n.js';
-import { definePage } from '@/page.js';
+import { unisonReload } from '@features/runtime/frontend/utility/unison-reload.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
+import { definePage } from '@features/navigation/frontend/page.js';
 
 const uiPhase = ref<'fetching' | 'confirm' | 'error'>('fetching');
 const errorKV = ref<{

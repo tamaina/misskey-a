@@ -13,8 +13,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script setup lang="ts">
 import { computed, ref } from 'vue';
-import { i18n } from '@/i18n.js';
-import { definePage } from '@/page.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
+import { definePage } from '@features/navigation/frontend/page.js';
 import XGridLocalComponent from '@features/emojis/frontend/pages/admin/custom-emojis-manager.local.list.vue';
 import XGridRemoteComponent from '@features/emojis/frontend/pages/admin/custom-emojis-manager.remote.vue';
 import XRegisterComponent from '@features/emojis/frontend/pages/admin/custom-emojis-manager.register.vue';

@@ -7,24 +7,24 @@ import * as Misskey from 'misskey-js';
 import { url } from '@@/js/config.js';
 import { claimAchievement } from '@features/users/frontend/utility/achievements.js';
 import type { Ref, ShallowRef } from 'vue';
-import type { MenuItem } from '@/types/menu.js';
-import { $i } from '@/i.js';
-import { i18n } from '@/i18n.js';
-import { instance } from '@/instance.js';
-import * as os from '@/os.js';
-import { misskeyApi } from '@/utility/misskey-api.js';
+import type { MenuItem } from '@features/navigation/frontend/types/menu.js';
+import { $i } from '@features/auth/frontend/i.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
+import { instance } from '@features/instance/frontend/instance.js';
+import * as os from '@features/ui/frontend/os.js';
+import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 import { copyToClipboard } from '@features/ui/frontend/utility/copy-to-clipboard.js';
-import { store } from '@/store.js';
-import { miLocalStorage } from '@/local-storage.js';
+import { store } from '@features/preferences/frontend/store.js';
+import { miLocalStorage } from '@features/preferences/frontend/local-storage.js';
 import { getUserMenu } from '@features/users/frontend/utility/get-user-menu.js';
-import { clipsCache, favoritedChannelsCache } from '@/cache.js';
+import { clipsCache, favoritedChannelsCache } from '@features/runtime/frontend/cache.js';
 import MkRippleEffect from '@features/ui/frontend/components/MkRippleEffect.vue';
 import { isSupportShare } from '@features/navigation/frontend/utility/navigator.js';
 import { getAppearNote } from '@features/notes/frontend/utility/get-appear-note.js';
-import { genEmbedCode } from '@/utility/get-embed-code.js';
-import { prefer } from '@/preferences.js';
-import { getPluginHandlers } from '@/plugin.js';
-import { globalEvents } from '@/events.js';
+import { genEmbedCode } from '@features/web/frontend/utility/get-embed-code.js';
+import { prefer } from '@features/preferences/frontend/preferences.js';
+import { getPluginHandlers } from '@features/integrations/frontend/plugin.js';
+import { globalEvents } from '@features/runtime/frontend/events.js';
 
 const isInBrowserTranslationAvailable = (
 	'LanguageDetector' in window &&

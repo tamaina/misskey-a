@@ -14,7 +14,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { themeManager } from '@/theme.js';
+import { themeManager } from '@features/preferences/frontend/theme.js';
 
 function restore() {
 	themeManager.clearPreview();

@@ -6,7 +6,7 @@
 import { ref, shallowRef, triggerRef } from 'vue';
 import * as Misskey from 'misskey-js';
 import type { ComputedRef, Ref, ShallowRef, UnwrapRef } from 'vue';
-import { misskeyApi } from '@/utility/misskey-api.js';
+import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 
 const MAX_ITEMS = 30;
 const MAX_QUEUE_ITEMS = 100;

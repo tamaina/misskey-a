@@ -42,13 +42,13 @@ const migrations = [
 	{ file: 'packages/features/ui/frontend/components/MkOmit.vue', keyPath: 'showMore' },
 	{ file: 'packages/features/users/frontend/components/MkAccountMoved.vue', keyPath: 'accountMoved' },
 	{ file: 'packages/features/users/frontend/pages/user/raw.vue', keyPath: 'createdAt' },
-	{ file: 'packages/frontend/src/components/MkCropperDialog.vue', keyPath: 'cropImage' },
-	{ file: 'packages/frontend/src/components/MkGoogle.vue', keyPath: 'searchByGoogle' },
-	{ file: 'packages/frontend/src/components/MkUserList.vue', keyPath: 'noUsers' },
-	{ file: 'packages/frontend/src/ui/deck/direct-column.vue', keyPath: '_deck._columns.direct' },
-	{ file: 'packages/frontend/src/ui/deck/mentions-column.vue', keyPath: '_deck._columns.mentions' },
-	{ file: 'packages/frontend/src/ui/visitor.vue', keyPath: 'signup' },
-	{ file: 'packages/frontend/src/ui/zen.vue', keyPath: 'goToDeck' },
+	{ file: 'packages/features/media/frontend/components/MkCropperDialog.vue', keyPath: 'cropImage' },
+	{ file: 'packages/features/integrations/frontend/components/MkGoogle.vue', keyPath: 'searchByGoogle' },
+	{ file: 'packages/features/relationships/frontend/components/MkUserList.vue', keyPath: 'noUsers' },
+	{ file: 'packages/features/relationships/frontend/ui/deck/direct-column.vue', keyPath: '_deck._columns.direct' },
+	{ file: 'packages/features/relationships/frontend/ui/deck/mentions-column.vue', keyPath: '_deck._columns.mentions' },
+	{ file: 'packages/features/navigation/frontend/ui/visitor.vue', keyPath: 'signup' },
+	{ file: 'packages/features/navigation/frontend/ui/zen.vue', keyPath: 'goToDeck' },
 ] as const;
 
 const featureMigrations = [

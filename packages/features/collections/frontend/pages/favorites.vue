@@ -21,8 +21,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 import { markRaw } from 'vue';
 import MkPagination from '@features/ui/frontend/components/MkPagination.vue';
 import MkNote from '@features/notes/frontend/components/MkNote.vue';
-import { i18n } from '@/i18n.js';
-import { definePage } from '@/page.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
+import { definePage } from '@features/navigation/frontend/page.js';
 import { Paginator } from '@features/ui/frontend/utility/paginator.js';
 
 const paginator = markRaw(new Paginator('i/favorites', {

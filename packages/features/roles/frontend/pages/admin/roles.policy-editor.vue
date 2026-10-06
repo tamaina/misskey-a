@@ -402,7 +402,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts">
 import * as Misskey from 'misskey-js';
-import { instance } from '@/instance.js';
+import { instance } from '@features/instance/frontend/instance.js';
 
 export type PolicyMeta = {
 	useDefault: boolean;
@@ -416,7 +416,7 @@ type PolicyMetaRecord = {
 
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
-import { i18n } from '@/i18n.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
 import XFolder from '@features/roles/frontend/pages/admin/roles.policy-editor.folder.vue';
 
 import MkInput from '@features/ui/frontend/components/MkInput.vue';

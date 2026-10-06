@@ -33,17 +33,17 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script lang="ts" setup>
 import { onActivated, onMounted, onUnmounted, provide, watch, ref, computed } from 'vue';
 import type { SuperMenuDef } from '@features/navigation/frontend/components/MkSuperMenu.vue';
-import type { PageMetadata } from '@/page.js';
-import { i18n } from '@/i18n.js';
+import type { PageMetadata } from '@features/navigation/frontend/page.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
 import MkSuperMenu from '@features/navigation/frontend/components/MkSuperMenu.vue';
 import MkInfo from '@features/ui/frontend/components/MkInfo.vue';
-import { instance } from '@/instance.js';
-import { lookup } from '@/utility/lookup.js';
-import * as os from '@/os.js';
-import { misskeyApi } from '@/utility/misskey-api.js';
-import { lookupUser, lookupUserByEmail, lookupFile } from '@/utility/admin-lookup.js';
-import { definePage, provideMetadataReceiver, provideReactiveMetadata } from '@/page.js';
-import { useRouter } from '@/router.js';
+import { instance } from '@features/instance/frontend/instance.js';
+import { lookup } from '@features/discovery/frontend/utility/lookup.js';
+import * as os from '@features/ui/frontend/os.js';
+import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
+import { lookupUser, lookupUserByEmail, lookupFile } from '@features/moderation/frontend/utility/admin-lookup.js';
+import { definePage, provideMetadataReceiver, provideReactiveMetadata } from '@features/navigation/frontend/page.js';
+import { useRouter } from '@features/navigation/frontend/router.js';
 import { genSearchIndexes } from '@features/discovery/frontend/utility/inapp-search.js';
 
 const searchIndex = await import('search-index:admin').then(({ searchIndexes }) => genSearchIndexes(searchIndexes));

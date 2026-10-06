@@ -75,11 +75,11 @@ import MkInput from '@features/ui/frontend/components/MkInput.vue';
 import FormSection from '@features/ui/frontend/components/form/section.vue';
 import MkSwitch from '@features/ui/frontend/components/MkSwitch.vue';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
-import * as os from '@/os.js';
-import { misskeyApi } from '@/utility/misskey-api.js';
-import { i18n } from '@/i18n.js';
-import { definePage } from '@/page.js';
-import { useRouter } from '@/router.js';
+import * as os from '@features/ui/frontend/os.js';
+import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
+import { definePage } from '@features/navigation/frontend/page.js';
+import { useRouter } from '@features/navigation/frontend/router.js';
 
 const router = useRouter();
 

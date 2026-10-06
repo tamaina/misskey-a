@@ -62,14 +62,14 @@ import { onMounted, ref } from 'vue';
 import * as Misskey from 'misskey-js';
 import MkFollowButton from '@features/relationships/frontend/components/MkFollowButton.vue';
 import { userPage } from '@features/users/frontend/filters/user.js';
-import * as os from '@/os.js';
-import { misskeyApi } from '@/utility/misskey-api.js';
+import * as os from '@features/ui/frontend/os.js';
+import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 import { getUserMenu } from '@features/users/frontend/utility/get-user-menu.js';
 import number from '@features/ui/frontend/filters/number.js';
-import { prefer } from '@/preferences.js';
-import { $i } from '@/i.js';
-import { isFollowingVisibleForMe, isFollowersVisibleForMe } from '@/utility/isFfVisibleForMe.js';
-import { getStaticImageUrl } from '@/utility/media-proxy.js';
+import { prefer } from '@features/preferences/frontend/preferences.js';
+import { $i } from '@features/auth/frontend/i.js';
+import { isFollowingVisibleForMe, isFollowersVisibleForMe } from '@features/relationships/frontend/utility/isFfVisibleForMe.js';
+import { getStaticImageUrl } from '@features/media/frontend/utility/media-proxy.js';
 
 const props = defineProps<{
 	showing: boolean;

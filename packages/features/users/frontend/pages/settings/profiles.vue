@@ -17,9 +17,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script lang="ts" setup>
 import { computed } from 'vue';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
-import MkFolder from '@/components/MkFolder.vue';
-import { i18n } from '@/i18n.js';
-import { definePage } from '@/page.js';
+import MkFolder from '@features/ui/frontend/components/MkFolder.vue';
+import { i18n } from '@features/runtime/frontend/i18n.js';
+import { definePage } from '@features/navigation/frontend/page.js';
 import { deleteCloudBackup, listCloudBackups } from '@features/preferences/frontend/state/utility.js';
 
 const backups = await listCloudBackups();

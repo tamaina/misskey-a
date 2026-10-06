@@ -128,11 +128,11 @@ import { ref } from 'vue';
 import { host, version } from '@@/js/config.js';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import MkInput from '@features/ui/frontend/components/MkInput.vue';
-import * as os from '@/os.js';
-import { misskeyApi } from '@/utility/misskey-api.js';
-import { i18n } from '@/i18n.js';
-import { login } from '@/accounts.js';
-import MkLink from '@/components/MkLink.vue';
+import * as os from '@features/ui/frontend/os.js';
+import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
+import { login } from '@features/auth/frontend/accounts.js';
+import MkLink from '@features/navigation/frontend/components/MkLink.vue';
 import MkServerSetupWizard from '@features/boot/frontend/components/MkServerSetupWizard.vue';
 
 const username = ref('');

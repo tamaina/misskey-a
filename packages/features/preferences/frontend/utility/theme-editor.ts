@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { genId } from '@/utility/id.js';
+import { genId } from '@features/runtime/frontend/utility/id.js';
 
 import type { Theme } from '@@/js/theme.js';
 import { themeProps } from '@@/js/theme.js';

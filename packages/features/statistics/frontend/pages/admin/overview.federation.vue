@@ -49,11 +49,11 @@ SPDX-License-Identifier: AGPL-3.0-only
 import { onMounted, ref } from 'vue';
 import XPie from '@features/statistics/frontend/pages/admin/overview.pie.vue';
 import type { InstanceForPie } from '@features/statistics/frontend/pages/admin/overview.pie.vue';
-import * as os from '@/os.js';
-import { misskeyApiGet } from '@/utility/misskey-api.js';
+import * as os from '@features/ui/frontend/os.js';
+import { misskeyApiGet } from '@features/api/frontend/utility/misskey-api.js';
 import number from '@features/ui/frontend/filters/number.js';
 import MkNumberDiff from '@features/ui/frontend/components/MkNumberDiff.vue';
-import { i18n } from '@/i18n.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
 import { useChartTooltip } from '@features/statistics/frontend/composables/use-chart-tooltip.js';
 
 const topSubInstancesForPie = ref<InstanceForPie[] | null>(null);

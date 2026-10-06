@@ -13,14 +13,14 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import { Interpreter, Parser } from '@syuilo/aiscript';
-import { useWidgetPropsManager } from '../../../../frontend/src/widgets/widget.js';
-import type { WidgetComponentEmits, WidgetComponentExpose, WidgetComponentProps } from '../../../../frontend/src/widgets/widget.js';
+import { useWidgetPropsManager } from './widget.js';
+import type { WidgetComponentEmits, WidgetComponentExpose, WidgetComponentProps } from './widget.js';
 import type { FormWithDefault, GetFormResultType } from '@features/ui/frontend/utility/form.js';
-import * as os from '@/os.js';
+import * as os from '@features/ui/frontend/os.js';
 import { aiScriptReadline, createAiScriptEnv } from '@features/play/frontend/services/aiscript/api.js';
-import { $i } from '@/i.js';
+import { $i } from '@features/auth/frontend/i.js';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
-import { i18n } from '@/i18n.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
 
 const name = 'button';
 

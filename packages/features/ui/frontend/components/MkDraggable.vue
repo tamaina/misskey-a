@@ -59,8 +59,8 @@ let dropCallback: ((targetInstanceId: string) => void) | null = null;
 
 <script lang="ts" setup generic="T extends { id: string; }">
 import { nextTick } from 'vue';
-import { getDragData, setDragData } from '@/drag-and-drop.js';
-import { genId } from '@/utility/id.js';
+import { getDragData, setDragData } from '@features/ui/frontend/drag-and-drop.js';
+import { genId } from '@features/runtime/frontend/utility/id.js';
 
 const slots = defineSlots<{
 	default(props: { item: T; index: number; dragStart: (ev: DragEvent) => void }): any;

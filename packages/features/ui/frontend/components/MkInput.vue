@@ -58,7 +58,7 @@ import type { InputHTMLAttributes } from 'vue';
 import type { SuggestionType } from '@features/discovery/frontend/utility/autocomplete.js';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import { Autocomplete } from '@features/discovery/frontend/utility/autocomplete.js';
-import { genId } from '@/utility/id.js';
+import { genId } from '@features/runtime/frontend/utility/id.js';
 
 const props = defineProps<{
 	modelValue: ModelValueType<T> | null;

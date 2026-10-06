@@ -108,18 +108,18 @@ SPDX-License-Identifier: AGPL-3.0-only
 import { markRaw, onDeactivated, onMounted, onUnmounted, ref } from 'vue';
 import * as Misskey from 'misskey-js';
 import { useInterval } from '@@/js/use-interval.js';
-import { misskeyApi } from '@/utility/misskey-api.js';
-import { definePage } from '@/page.js';
-import { useStream } from '@/stream.js';
+import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
+import { definePage } from '@features/navigation/frontend/page.js';
+import { useStream } from '@features/api/frontend/stream.js';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
-import MkFolder from '@/components/MkFolder.vue';
-import { i18n } from '@/i18n.js';
-import { $i } from '@/i.js';
+import MkFolder from '@features/ui/frontend/components/MkFolder.vue';
+import { i18n } from '@features/runtime/frontend/i18n.js';
+import { $i } from '@features/auth/frontend/i.js';
 import MkPagination from '@features/ui/frontend/components/MkPagination.vue';
-import { useRouter } from '@/router.js';
-import * as os from '@/os.js';
+import { useRouter } from '@features/navigation/frontend/router.js';
+import * as os from '@features/ui/frontend/os.js';
 import { pleaseLogin } from '@features/auth/frontend/utility/please-login.js';
-import * as sound from '@/utility/sound.js';
+import * as sound from '@features/preferences/frontend/utility/sound.js';
 import { Paginator } from '@features/ui/frontend/utility/paginator.js';
 
 const myGamesPaginator = markRaw(new Paginator('reversi/games', {

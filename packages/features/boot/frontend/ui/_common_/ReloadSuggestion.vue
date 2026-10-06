@@ -14,8 +14,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { shouldSuggestReload } from '@/utility/reload-suggest.js';
-import { unisonReload } from '@/utility/unison-reload.js';
+import { shouldSuggestReload } from '@features/boot/frontend/utility/reload-suggest.js';
+import { unisonReload } from '@features/runtime/frontend/utility/unison-reload.js';
 
 function reload() {
 	unisonReload();

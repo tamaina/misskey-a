@@ -33,16 +33,16 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script lang="ts" setup>
 import { markRaw, ref, shallowRef, toRef } from 'vue';
 import type { Endpoints } from 'misskey-js';
-import MkUserList from '@/components/MkUserList.vue';
+import MkUserList from '@features/relationships/frontend/components/MkUserList.vue';
 import MkInput from '@features/ui/frontend/components/MkInput.vue';
 import MkRadios from '@features/ui/frontend/components/MkRadios.vue';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
-import { i18n } from '@/i18n.js';
-import { instance } from '@/instance.js';
-import * as os from '@/os.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
+import { instance } from '@features/instance/frontend/instance.js';
+import * as os from '@features/ui/frontend/os.js';
 import MkFoldableSection from '@features/ui/frontend/components/MkFoldableSection.vue';
-import { misskeyApi } from '@/utility/misskey-api.js';
-import { useRouter } from '@/router.js';
+import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
+import { useRouter } from '@features/navigation/frontend/router.js';
 import { Paginator } from '@features/ui/frontend/utility/paginator.js';
 
 const props = withDefaults(defineProps<{

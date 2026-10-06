@@ -6,7 +6,7 @@
 import { expect, userEvent, waitFor, within } from '@storybook/test';
 import MkAd from '@features/instance/frontend/components/global/MkAd.vue';
 import type { StoryObj } from '@storybook/vue3';
-import { i18n } from '@/i18n.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
 
 const common = {
 	render(args) {

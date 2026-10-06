@@ -42,16 +42,16 @@ import { computed, ref } from 'vue';
 import * as Misskey from 'misskey-js';
 import { AISCRIPT_VERSION } from '@syuilo/aiscript';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
-import * as os from '@/os.js';
-import { misskeyApi } from '@/utility/misskey-api.js';
-import { i18n } from '@/i18n.js';
-import { definePage } from '@/page.js';
+import * as os from '@features/ui/frontend/os.js';
+import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
+import { definePage } from '@features/navigation/frontend/page.js';
 import MkTextarea from '@features/ui/frontend/components/MkTextarea.vue';
 import MkCodeEditor from '@features/markup/frontend/components/MkCodeEditor.vue';
 import MkInput from '@features/ui/frontend/components/MkInput.vue';
 import MkSelect from '@features/ui/frontend/components/MkSelect.vue';
 import { useMkSelect } from '@features/ui/frontend/composables/use-mkselect.js';
-import { useRouter } from '@/router.js';
+import { useRouter } from '@features/navigation/frontend/router.js';
 
 const PRESET_DEFAULT = `/// @ ${AISCRIPT_VERSION}
 

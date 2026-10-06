@@ -52,16 +52,16 @@ import MkNoteDetailed from '@features/notes/frontend/components/MkNoteDetailed.v
 import MkNotesTimeline from '@features/timelines/frontend/components/MkNotesTimeline.vue';
 import MkRemoteCaution from '@features/federation/frontend/components/MkRemoteCaution.vue';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
-import { misskeyApi } from '@/utility/misskey-api.js';
-import { definePage } from '@/page.js';
-import { i18n } from '@/i18n.js';
+import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
+import { definePage } from '@features/navigation/frontend/page.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
 import { dateString } from '@features/ui/frontend/filters/date.js';
 import MkClipPreview from '@features/collections/frontend/components/MkClipPreview.vue';
-import { prefer } from '@/preferences.js';
+import { prefer } from '@features/preferences/frontend/preferences.js';
 import { pleaseLogin } from '@features/auth/frontend/utility/please-login.js';
 import { getAppearNote } from '@features/notes/frontend/utility/get-appear-note.js';
-import { serverContext, assertServerContext } from '@/server-context.js';
-import { $i } from '@/i.js';
+import { serverContext, assertServerContext } from '@features/runtime/frontend/server-context.js';
+import { $i } from '@features/auth/frontend/i.js';
 import { Paginator } from '@features/ui/frontend/utility/paginator.js';
 
 // contextは非ログイン状態の情報しかないためログイン時は利用できない

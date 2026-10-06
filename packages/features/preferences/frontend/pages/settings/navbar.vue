@@ -63,14 +63,14 @@ import MkContainer from '@features/ui/frontend/components/MkContainer.vue';
 import MkSwitch from '@features/ui/frontend/components/MkSwitch.vue';
 import MkPreferenceContainer from '@features/preferences/frontend/components/MkPreferenceContainer.vue';
 import MkDraggable from '@features/ui/frontend/components/MkDraggable.vue';
-import * as os from '@/os.js';
-import { navbarItemDef } from '@/navbar.js';
-import { store } from '@/store.js';
-import { i18n } from '@/i18n.js';
-import { definePage } from '@/page.js';
-import { prefer } from '@/preferences.js';
+import * as os from '@features/ui/frontend/os.js';
+import { navbarItemDef } from '@features/navigation/frontend/navbar.js';
+import { store } from '@features/preferences/frontend/store.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
+import { definePage } from '@features/navigation/frontend/page.js';
+import { prefer } from '@features/preferences/frontend/preferences.js';
 import { getInitialPrefValue } from '@features/preferences/frontend/state/manager.js';
-import { genId } from '@/utility/id.js';
+import { genId } from '@features/runtime/frontend/utility/id.js';
 
 const items = ref(prefer.s.menu.map(x => ({
 	id: genId(),

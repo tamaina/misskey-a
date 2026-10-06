@@ -4,8 +4,8 @@
  */
 
 import { MFM_TAGS } from '@@/js/const.js';
-import * as os from '@/os.js';
-import { i18n } from '@/i18n.js';
+import * as os from '@features/ui/frontend/os.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
 
 /**
  * MFMの装飾のリストを表示する

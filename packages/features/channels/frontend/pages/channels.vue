@@ -70,11 +70,11 @@ import MkInput from '@features/ui/frontend/components/MkInput.vue';
 import MkRadios from '@features/ui/frontend/components/MkRadios.vue';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import MkFoldableSection from '@features/ui/frontend/components/MkFoldableSection.vue';
-import { definePage } from '@/page.js';
-import { i18n } from '@/i18n.js';
-import { useRouter } from '@/router.js';
+import { definePage } from '@features/navigation/frontend/page.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
+import { useRouter } from '@features/navigation/frontend/router.js';
 import { Paginator } from '@features/ui/frontend/utility/paginator.js';
-import { $i } from '@/i.js';
+import { $i } from '@features/auth/frontend/i.js';
 
 const router = useRouter();
 

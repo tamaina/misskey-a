@@ -40,11 +40,11 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import { ref, shallowRef, inject, computed, watch, onBeforeUnmount } from 'vue';
-import type { MenuItem } from '@/types/menu.js';
-import { DI } from '@/di.js';
+import type { MenuItem } from '@features/navigation/frontend/types/menu.js';
+import { DI } from '@features/ui/frontend/di.js';
 import { hms } from '@features/ui/frontend/filters/hms.js';
-import { i18n } from '@/i18n.js';
-import * as os from '@/os.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
+import * as os from '@features/ui/frontend/os.js';
 import hasAudio from '@features/media/frontend/utility/media-has-audio.js';
 import MkMediaRange from '@features/media/frontend/components/MkMediaRange.vue';
 

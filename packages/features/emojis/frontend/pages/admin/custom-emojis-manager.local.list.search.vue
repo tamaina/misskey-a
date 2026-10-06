@@ -130,15 +130,15 @@ import MkWindow from '@features/ui/frontend/components/MkWindow.vue';
 import MkInput from '@features/ui/frontend/components/MkInput.vue';
 import MkSelect from '@features/ui/frontend/components/MkSelect.vue';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
-import MkFolder from '@/components/MkFolder.vue';
+import MkFolder from '@features/ui/frontend/components/MkFolder.vue';
 import MkSortOrderEditor from '@features/preferences/frontend/components/MkSortOrderEditor.vue';
 
 import {
 	gridSortOrderKeys,
 } from '@features/emojis/frontend/pages/admin/custom-emojis-manager.impl.js';
 
-import { i18n } from '@/i18n.js';
-import * as os from '@/os.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
+import * as os from '@features/ui/frontend/os.js';
 
 import type { EmojiSearchQuery } from '@features/emojis/frontend/pages/admin/custom-emojis-manager.local.list.vue';
 import type { SortOrder } from '@features/preferences/frontend/components/MkSortOrderEditor.define.js';

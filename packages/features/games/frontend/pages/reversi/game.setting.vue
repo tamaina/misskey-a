@@ -114,17 +114,17 @@ SPDX-License-Identifier: AGPL-3.0-only
 import { computed, watch, ref, onUnmounted } from 'vue';
 import * as Misskey from 'misskey-js';
 import * as Reversi from 'misskey-reversi';
-import type { MenuItem } from '@/types/menu.js';
-import { i18n } from '@/i18n.js';
-import { $i } from '@/i.js';
-import { deepClone } from '@/utility/clone.js';
+import type { MenuItem } from '@features/navigation/frontend/types/menu.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
+import { $i } from '@features/auth/frontend/i.js';
+import { deepClone } from '@features/runtime/frontend/utility/clone.js';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import MkRadios from '@features/ui/frontend/components/MkRadios.vue';
 import MkSwitch from '@features/ui/frontend/components/MkSwitch.vue';
-import MkFolder from '@/components/MkFolder.vue';
-import * as os from '@/os.js';
+import MkFolder from '@features/ui/frontend/components/MkFolder.vue';
+import * as os from '@features/ui/frontend/os.js';
 import type { MkRadiosOption } from '@features/ui/frontend/components/MkRadios.vue';
-import { useRouter } from '@/router.js';
+import { useRouter } from '@features/navigation/frontend/router.js';
 
 const router = useRouter();
 

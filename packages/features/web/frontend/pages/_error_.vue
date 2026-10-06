@@ -29,14 +29,14 @@ import { ref, computed } from 'vue';
 import * as Misskey from 'misskey-js';
 import { version } from '@@/js/config.js';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
-import MkLink from '@/components/MkLink.vue';
-import { misskeyApi } from '@/utility/misskey-api.js';
-import { unisonReload } from '@/utility/unison-reload.js';
-import { i18n } from '@/i18n.js';
-import { definePage } from '@/page.js';
-import { miLocalStorage } from '@/local-storage.js';
-import { prefer } from '@/preferences.js';
-import { instance } from '@/instance.js';
+import MkLink from '@features/navigation/frontend/components/MkLink.vue';
+import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
+import { unisonReload } from '@features/runtime/frontend/utility/unison-reload.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
+import { definePage } from '@features/navigation/frontend/page.js';
+import { miLocalStorage } from '@features/preferences/frontend/local-storage.js';
+import { prefer } from '@features/preferences/frontend/preferences.js';
+import { instance } from '@features/instance/frontend/instance.js';
 
 const props = withDefaults(defineProps<{
 	error?: Error;

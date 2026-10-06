@@ -13,8 +13,8 @@ if (import.meta.env.DEV) {
 }
 
 import '@/style.scss';
-import { mainBoot } from '@/boot/main-boot.js';
-import { subBoot } from '@/boot/sub-boot.js';
+import { mainBoot } from '@features/boot/frontend/boot/main-boot.js';
+import { subBoot } from '@features/boot/frontend/boot/sub-boot.js';
 
 const subBootPaths = ['/share', '/auth', '/miauth', '/oauth', '/signup-complete', '/verify-email', '/install-extensions'];
 

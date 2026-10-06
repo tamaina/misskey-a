@@ -61,14 +61,14 @@ SPDX-License-Identifier: AGPL-3.0-only
 import { computed, ref, watch } from 'vue';
 import * as Misskey from 'misskey-js';
 import type { GetMkSelectValueTypesFromDef, MkSelectItem } from '@features/ui/frontend/components/MkSelect.vue';
-import { genId } from '@/utility/id.js';
+import { genId } from '@features/runtime/frontend/utility/id.js';
 import MkInput from '@features/ui/frontend/components/MkInput.vue';
 import MkSelect from '@features/ui/frontend/components/MkSelect.vue';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import MkDraggable from '@features/ui/frontend/components/MkDraggable.vue';
-import { i18n } from '@/i18n.js';
-import { deepClone } from '@/utility/clone.js';
-import { rolesCache } from '@/cache.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
+import { deepClone } from '@features/runtime/frontend/utility/clone.js';
+import { rolesCache } from '@features/runtime/frontend/cache.js';
 
 const emit = defineEmits<{
 	(ev: 'update:modelValue', value: Misskey.entities.Role['condFormula']): void;

@@ -131,15 +131,15 @@ import type {
 } from '@@/js/emojilist.js';
 import XSection from '@features/emojis/frontend/components/MkEmojiPicker.section.vue';
 import MkRippleEffect from '@features/ui/frontend/components/MkRippleEffect.vue';
-import * as os from '@/os.js';
+import * as os from '@features/ui/frontend/os.js';
 import { isTouchUsing } from '@features/ui/frontend/utility/touch.js';
 import { deviceKind } from '@features/ui/frontend/utility/device-kind.js';
-import { store } from '@/store.js';
-import { customEmojiCategories, customEmojis, customEmojisMap } from '@/custom-emojis.js';
-import { $i } from '@/i.js';
+import { store } from '@features/preferences/frontend/store.js';
+import { customEmojiCategories, customEmojis, customEmojisMap } from '@features/emojis/frontend/custom-emojis.js';
+import { $i } from '@features/auth/frontend/i.js';
 import { checkReactionPermissions } from '@features/notes/frontend/utility/check-reaction-permissions.js';
-import { prefer } from '@/preferences.js';
-import { useRouter } from '@/router.js';
+import { prefer } from '@features/preferences/frontend/preferences.js';
+import { useRouter } from '@features/navigation/frontend/router.js';
 import { haptic } from '@features/ui/frontend/utility/haptic.js';
 
 const router = useRouter();

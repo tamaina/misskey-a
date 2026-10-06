@@ -148,17 +148,17 @@ import * as Reversi from 'misskey-reversi';
 import { useInterval } from '@@/js/use-interval.js';
 import { url } from '@@/js/config.js';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
-import MkFolder from '@/components/MkFolder.vue';
+import MkFolder from '@features/ui/frontend/components/MkFolder.vue';
 import MkSwitch from '@features/ui/frontend/components/MkSwitch.vue';
-import { deepClone } from '@/utility/clone.js';
-import { $i } from '@/i.js';
-import { i18n } from '@/i18n.js';
-import { misskeyApi } from '@/utility/misskey-api.js';
+import { deepClone } from '@features/runtime/frontend/utility/clone.js';
+import { $i } from '@features/auth/frontend/i.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
+import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 import { userPage } from '@features/users/frontend/filters/user.js';
-import * as sound from '@/utility/sound.js';
-import * as os from '@/os.js';
+import * as sound from '@features/preferences/frontend/utility/sound.js';
+import * as os from '@features/ui/frontend/os.js';
 import { confetti } from '@features/ui/frontend/utility/confetti.js';
-import { genId } from '@/utility/id.js';
+import { genId } from '@features/runtime/frontend/utility/id.js';
 
 const props = defineProps<{
 	game: Misskey.entities.ReversiGameDetailed;

@@ -65,13 +65,13 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import { computed, ref } from 'vue';
-import { instance } from '@/instance.js';
-import { i18n } from '@/i18n.js';
+import { instance } from '@features/instance/frontend/instance.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
-import MkFolder from '@/components/MkFolder.vue';
+import MkFolder from '@features/ui/frontend/components/MkFolder.vue';
 import MkSwitch from '@features/ui/frontend/components/MkSwitch.vue';
 import MkInfo from '@features/ui/frontend/components/MkInfo.vue';
-import * as os from '@/os.js';
+import * as os from '@features/ui/frontend/os.js';
 
 const availableServerRules = instance.serverRules.length > 0;
 const availableTos = instance.tosUrl != null && instance.tosUrl !== '';

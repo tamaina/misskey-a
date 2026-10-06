@@ -34,7 +34,7 @@ import { ref } from 'vue';
 import * as Misskey from 'misskey-js';
 import XMessage from '@features/chat/frontend/pages/chat/XMessage.vue';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
-import { misskeyApi } from '@/utility/misskey-api.js';
+import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 import MkInput from '@features/ui/frontend/components/MkInput.vue';
 import MkFoldableSection from '@features/ui/frontend/components/MkFoldableSection.vue';
 

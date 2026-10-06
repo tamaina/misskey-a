@@ -35,7 +35,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 import * as Misskey from 'misskey-js';
 import { computed, ref } from 'vue';
 import MkImgWithBlurhash from '@features/media/frontend/components/MkImgWithBlurhash.vue';
-import { prefer } from '@/preferences.js';
+import { prefer } from '@features/preferences/frontend/preferences.js';
 
 const props = defineProps<{
 	post: Misskey.entities.GalleryPost;

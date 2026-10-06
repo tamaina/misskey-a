@@ -17,7 +17,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 import { ref } from 'vue';
 import * as Misskey from 'misskey-js';
 import MkRolePreview from '@features/roles/frontend/components/MkRolePreview.vue';
-import { misskeyApi } from '@/utility/misskey-api.js';
+import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 
 const roles = ref<Misskey.entities.Role[] | null>(null);
 const loading = ref(true);

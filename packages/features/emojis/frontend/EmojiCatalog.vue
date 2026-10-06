@@ -36,8 +36,8 @@ import EmojiCatalogItem from './EmojiCatalogItem.vue';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import MkInput from '@features/ui/frontend/components/MkInput.vue';
 import MkFoldableSection from '@features/ui/frontend/components/MkFoldableSection.vue';
-import { customEmojis, customEmojiCategories } from '@/custom-emojis.js';
-import { $i } from '@/i.js';
+import { customEmojis, customEmojiCategories } from '@features/emojis/frontend/custom-emojis.js';
+import { $i } from '@features/auth/frontend/i.js';
 import { searchEmojiCatalog } from './search.js';
 
 const q = ref('');

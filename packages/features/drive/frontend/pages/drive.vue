@@ -13,8 +13,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 import { computed, ref, useTemplateRef } from 'vue';
 import * as Misskey from 'misskey-js';
 import MkDrive from '@features/drive/frontend/components/MkDrive.vue';
-import { i18n } from '@/i18n.js';
-import { definePage } from '@/page.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
+import { definePage } from '@features/navigation/frontend/page.js';
 import { useScrollPositionKeeper } from '@features/ui/frontend/composables/use-scroll-position-keeper.js';
 
 const scrollContainer = useTemplateRef('scrollContainer');

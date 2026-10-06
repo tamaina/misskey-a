@@ -20,9 +20,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 import { ref, onMounted } from 'vue';
 import * as Misskey from 'misskey-js';
 import XMessage from '@features/chat/frontend/pages/chat/XMessage.vue';
-import { i18n } from '@/i18n.js';
-import { misskeyApi } from '@/utility/misskey-api.js';
-import { definePage } from '@/page.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
+import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
+import { definePage } from '@features/navigation/frontend/page.js';
 
 const props = defineProps<{
 	messageId: string;

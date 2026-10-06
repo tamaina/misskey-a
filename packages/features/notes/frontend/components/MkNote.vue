@@ -200,14 +200,14 @@ import { inject, ref, useTemplateRef, provide, computed } from 'vue';
 import type { Ref } from 'vue';
 import * as Misskey from 'misskey-js';
 import { useNote } from '@features/notes/frontend/composables/use-note.js';
-import { prefer } from '@/preferences.js';
-import { i18n } from '@/i18n.js';
+import { prefer } from '@features/preferences/frontend/preferences.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
 import { userPage } from '@features/users/frontend/filters/user.js';
 import { getNoteSummary } from '@features/notes/frontend/utility/get-note-summary.js';
-import { isEnabledUrlPreview } from '@/utility/url-preview.js';
+import { isEnabledUrlPreview } from '@features/markup/frontend/utility/url-preview.js';
 import { focusPrev, focusNext } from '@features/ui/frontend/utility/focus.js';
 import number from '@features/ui/frontend/filters/number.js';
-import { DI } from '@/di.js';
+import { DI } from '@features/ui/frontend/di.js';
 import type { Keymap } from '@features/ui/frontend/utility/hotkey.js';
 
 // コンポーネント外部の依存関係

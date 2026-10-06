@@ -20,15 +20,15 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import { computed, markRaw, ref } from 'vue';
-import type { PageHeaderItem } from '@/types/page-header.js';
+import type { PageHeaderItem } from '@features/navigation/frontend/types/page-header.js';
 import MkNotesTimeline from '@features/timelines/frontend/components/MkNotesTimeline.vue';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
-import { definePage } from '@/page.js';
-import { i18n } from '@/i18n.js';
-import { $i } from '@/i.js';
-import { store } from '@/store.js';
-import * as os from '@/os.js';
-import { genEmbedCode } from '@/utility/get-embed-code.js';
+import { definePage } from '@features/navigation/frontend/page.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
+import { $i } from '@features/auth/frontend/i.js';
+import { store } from '@features/preferences/frontend/store.js';
+import * as os from '@features/ui/frontend/os.js';
+import { genEmbedCode } from '@features/web/frontend/utility/get-embed-code.js';
 import { Paginator } from '@features/ui/frontend/utility/paginator.js';
 
 const props = defineProps<{

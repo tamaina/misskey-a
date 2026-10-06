@@ -51,6 +51,7 @@ The [file allocation table](feature-file-allocation.tsv) records 419 service, se
 | `navigation` | frontend route composition and navigation lifecycle | application router, not-found, shell navigation |
 | `ui` | domain-independent Vue primitives | button/input/select/dialog/form/layout primitives; no business state |
 | `auth` | Signup, UserAuth, WebAuthn, Captcha; auth-session/signin/app serializers | sign-in/up, passwords, MFA, tokens, OAuth/MiAuth and OAuth SSR page |
+| `share` | frontend-only share-surface composition; no separate API/backend behavior | `/share` form and QR profile sharing/read/show views; posts through notes-owned UI/API ports |
 | `users` | User, AccountUpdate, AccountMove, DeleteAccount, SystemAccount, Achievement; user serializers | profiles/account lifecycle, user pages; `user.tsx` |
 | `relationships` | UserFollowing, UserBlocking, UserMuting, UserRenoteMuting, UserList; corresponding serializers/jobs | follow/block/mute/lists and relationship UI |
 | `roles` | RoleService and RoleEntityService | role CRUD/policies/assignments, including admin role screens |
@@ -184,8 +185,9 @@ adapters stay in the backend package; feature sources retain the same providers
 and business logic. This is placement, not conversion of every Nest service.
 
 The same checkpoint moves 237 approved page/companion files (231 Vue SFCs) into
-feature frontend directories. Dynamic routes remain lazy, and the 14 review/split
-page rows remain in the host until their ownership is resolved. Frontend build,
+feature frontend directories. Dynamic routes remain lazy. The final source-directory batch
+places the 14 held pages at their allocated targets without splitting business
+behavior; QR and `/share` surfaces are grouped under `share`. Frontend build,
 dependency resolution and Storybook generation remain package-owned; generated
 feature stories are ignored just like host stories. No feature package manifests,
 tsconfigs or lint configurations are introduced.

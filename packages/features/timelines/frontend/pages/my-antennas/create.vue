@@ -11,10 +11,10 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import { computed } from 'vue';
-import { i18n } from '@/i18n.js';
-import { definePage } from '@/page.js';
-import { antennasCache } from '@/cache.js';
-import { useRouter } from '@/router.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
+import { definePage } from '@features/navigation/frontend/page.js';
+import { antennasCache } from '@features/runtime/frontend/cache.js';
+import { useRouter } from '@features/navigation/frontend/router.js';
 import MkAntennaEditor from '@features/timelines/frontend/components/MkAntennaEditor.vue';
 
 const router = useRouter();

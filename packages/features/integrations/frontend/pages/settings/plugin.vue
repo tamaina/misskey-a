@@ -97,21 +97,21 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script lang="ts" setup>
 import { nextTick, ref, computed } from 'vue';
 import { isSafeMode } from '@@/js/config.js';
-import type { Plugin } from '@/plugin.js';
+import type { Plugin } from '@features/integrations/frontend/plugin.js';
 import FormLink from '@features/ui/frontend/components/form/link.vue';
 import MkSwitch from '@features/ui/frontend/components/MkSwitch.vue';
 import FormSection from '@features/ui/frontend/components/form/section.vue';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import MkCode from '@features/markup/frontend/components/MkCode.vue';
-import MkFolder from '@/components/MkFolder.vue';
+import MkFolder from '@features/ui/frontend/components/MkFolder.vue';
 import MkKeyValue from '@features/ui/frontend/components/MkKeyValue.vue';
-import MkFeatureBanner from '@/components/MkFeatureBanner.vue';
+import MkFeatureBanner from '@features/web/frontend/components/MkFeatureBanner.vue';
 import MkInfo from '@features/ui/frontend/components/MkInfo.vue';
-import { i18n } from '@/i18n.js';
-import { definePage } from '@/page.js';
-import { changePluginActive, configPlugin, pluginLogs, uninstallPlugin, reloadPlugin } from '@/plugin.js';
-import { prefer } from '@/preferences.js';
-import * as os from '@/os.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
+import { definePage } from '@features/navigation/frontend/page.js';
+import { changePluginActive, configPlugin, pluginLogs, uninstallPlugin, reloadPlugin } from '@features/integrations/frontend/plugin.js';
+import { prefer } from '@features/preferences/frontend/preferences.js';
+import * as os from '@features/ui/frontend/os.js';
 
 const plugins = prefer.r.plugins;
 

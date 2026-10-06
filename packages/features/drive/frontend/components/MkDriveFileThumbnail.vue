@@ -46,7 +46,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 import { computed } from 'vue';
 import * as Misskey from 'misskey-js';
 import MkImgWithBlurhash from '@features/media/frontend/components/MkImgWithBlurhash.vue';
-import { prefer } from '@/preferences.js';
+import { prefer } from '@features/preferences/frontend/preferences.js';
 
 const props = defineProps<{
 	file: Misskey.entities.DriveFile;

@@ -51,7 +51,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script lang="ts">
 import type { SortOrder } from '@features/preferences/frontend/components/MkSortOrderEditor.define.js';
 import type { GridSortOrderKey } from '@features/emojis/frontend/pages/admin/custom-emojis-manager.impl.js';
-import type { PageHeaderItem } from '@/types/page-header.js';
+import type { PageHeaderItem } from '@features/navigation/frontend/types/page-header.js';
 
 export type EmojiSearchQuery = {
 	name: string | null;
@@ -75,7 +75,7 @@ import * as Misskey from 'misskey-js';
 import type { RequestLogItem } from '@features/emojis/frontend/pages/admin/custom-emojis-manager.impl.js';
 import type { GridCellValidationEvent, GridCellValueChangeEvent, GridEvent } from '@features/ui/frontend/components/grid/grid-event.js';
 import type { GridSetting } from '@features/ui/frontend/components/grid/grid.js';
-import * as os from '@/os.js';
+import * as os from '@features/ui/frontend/os.js';
 import {
 	emptyStrToEmptyArray,
 	emptyStrToNull,
@@ -83,10 +83,10 @@ import {
 	roleIdsParser,
 } from '@features/emojis/frontend/pages/admin/custom-emojis-manager.impl.js';
 import MkGrid from '@features/ui/frontend/components/grid/MkGrid.vue';
-import { i18n } from '@/i18n.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import { validators } from '@features/ui/frontend/components/grid/cell-validators.js';
-import { misskeyApi } from '@/utility/misskey-api.js';
+import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 import MkPagingButtons from '@features/ui/frontend/components/MkPagingButtons.vue';
 import { selectFile } from '@features/drive/frontend/utility/drive.js';
 import { copyGridDataToClipboard, removeDataFromGrid } from '@features/ui/frontend/components/grid/grid-utils.js';

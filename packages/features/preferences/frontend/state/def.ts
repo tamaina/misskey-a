@@ -9,15 +9,15 @@ import { DEFAULT_EMOJIS } from '@@/js/const.js';
 import { prefersReducedMotion } from '@@/js/config.js';
 import { definePreferences } from '@features/preferences/frontend/state/manager.js';
 import type { Theme } from '@@/js/theme.js';
-import type { SoundType } from '@/utility/sound.js';
-import type { Plugin } from '@/plugin.js';
+import type { SoundType } from '@features/preferences/frontend/utility/sound.js';
+import type { Plugin } from '@features/integrations/frontend/plugin.js';
 import type { DeviceKind } from '@features/ui/frontend/utility/device-kind.js';
-import type { DeckProfile } from '@/deck.js';
-import type { WatermarkPreset } from '@/utility/watermark/WatermarkRenderer.js';
-import type { ImageFramePreset } from '@/utility/image-frame-renderer/ImageFrameRenderer.js';
-import { genId } from '@/utility/id.js';
+import type { DeckProfile } from '@features/preferences/frontend/deck.js';
+import type { WatermarkPreset } from '@features/media/frontend/utility/watermark/WatermarkRenderer.js';
+import type { ImageFramePreset } from '@features/media/frontend/utility/image-frame-renderer/ImageFrameRenderer.js';
+import { genId } from '@features/runtime/frontend/utility/id.js';
 import { DEFAULT_DEVICE_KIND } from '@features/ui/frontend/utility/device-kind.js';
-import { deepEqual } from '@/utility/deep-equal.js';
+import { deepEqual } from '@features/runtime/frontend/utility/deep-equal.js';
 
 /** サウンド設定 */
 export type SoundStore = {

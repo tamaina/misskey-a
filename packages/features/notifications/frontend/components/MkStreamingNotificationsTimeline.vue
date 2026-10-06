@@ -50,10 +50,10 @@ import { useDocumentVisibility } from '@@/js/use-document-visibility.js';
 import { getScrollContainer, scrollToTop } from '@@/js/scroll.js';
 import XNotification from '@features/notifications/frontend/components/MkNotification.vue';
 import MkNote from '@features/notes/frontend/components/MkNote.vue';
-import { useStream } from '@/stream.js';
+import { useStream } from '@features/api/frontend/stream.js';
 import MkPullToRefresh from '@features/ui/frontend/components/MkPullToRefresh.vue';
-import { prefer } from '@/preferences.js';
-import { store } from '@/store.js';
+import { prefer } from '@features/preferences/frontend/preferences.js';
+import { store } from '@features/preferences/frontend/store.js';
 import { isSeparatorNeeded, getSeparatorInfo } from '@features/timelines/frontend/utility/timeline-date-separate.js';
 import { Paginator } from '@features/ui/frontend/utility/paginator.js';
 

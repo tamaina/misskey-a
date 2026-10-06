@@ -62,10 +62,10 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script lang="ts" setup>
 import { computed } from 'vue';
 import * as Misskey from 'misskey-js';
-import MkFolder from '@/components/MkFolder.vue';
+import MkFolder from '@features/ui/frontend/components/MkFolder.vue';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import { copyToClipboard } from '@features/ui/frontend/utility/copy-to-clipboard.js';
-import * as os from '@/os.js';
+import * as os from '@features/ui/frontend/os.js';
 
 const props = defineProps<{
 	invite: Misskey.entities.InviteCode;

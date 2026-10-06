@@ -13,11 +13,11 @@ SPDX-License-Identifier: AGPL-3.0-only
 import { ref, computed } from 'vue';
 import * as Misskey from 'misskey-js';
 import MkAntennaEditor from '@features/timelines/frontend/components/MkAntennaEditor.vue';
-import { misskeyApi } from '@/utility/misskey-api.js';
-import { i18n } from '@/i18n.js';
-import { definePage } from '@/page.js';
-import { antennasCache } from '@/cache.js';
-import { useRouter } from '@/router.js';
+import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
+import { definePage } from '@features/navigation/frontend/page.js';
+import { antennasCache } from '@features/runtime/frontend/cache.js';
+import { useRouter } from '@features/navigation/frontend/router.js';
 
 const router = useRouter();
 

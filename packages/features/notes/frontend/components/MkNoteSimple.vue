@@ -30,7 +30,7 @@ import * as Misskey from 'misskey-js';
 import MkNoteHeader from '@features/notes/frontend/components/MkNoteHeader.vue';
 import MkSubNoteContent from '@features/notes/frontend/components/MkSubNoteContent.vue';
 import MkCwButton from '@features/notes/frontend/components/MkCwButton.vue';
-import { prefer } from '@/preferences.js';
+import { prefer } from '@features/preferences/frontend/preferences.js';
 
 const props = defineProps<{
 	note: Misskey.entities.Note | null;

@@ -14,9 +14,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script lang="ts" setup>
 import { onActivated, onDeactivated, onMounted, onUnmounted } from 'vue';
 import MkAchievements from '@features/users/frontend/components/MkAchievements.vue';
-import { i18n } from '@/i18n.js';
-import { definePage } from '@/page.js';
-import { ensureSignin } from '@/i.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
+import { definePage } from '@features/navigation/frontend/page.js';
+import { ensureSignin } from '@features/auth/frontend/i.js';
 import { claimAchievement } from '@features/users/frontend/utility/achievements.js';
 
 const $i = ensureSignin();

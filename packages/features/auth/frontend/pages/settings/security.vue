@@ -63,11 +63,11 @@ import FormSection from '@features/ui/frontend/components/form/section.vue';
 import FormSlot from '@features/ui/frontend/components/form/slot.vue';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import MkPagination from '@features/ui/frontend/components/MkPagination.vue';
-import * as os from '@/os.js';
-import { misskeyApi } from '@/utility/misskey-api.js';
-import { i18n } from '@/i18n.js';
-import { definePage } from '@/page.js';
-import MkFeatureBanner from '@/components/MkFeatureBanner.vue';
+import * as os from '@features/ui/frontend/os.js';
+import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
+import { definePage } from '@features/navigation/frontend/page.js';
+import MkFeatureBanner from '@features/web/frontend/components/MkFeatureBanner.vue';
 import { Paginator } from '@features/ui/frontend/utility/paginator.js';
 
 const paginator = markRaw(new Paginator('i/signin-history', {

@@ -54,9 +54,9 @@ export type PwResponse = {
 import { ref, computed, useTemplateRef, defineAsyncComponent } from 'vue';
 import * as Misskey from 'misskey-js';
 
-import { instance } from '@/instance.js';
-import { i18n } from '@/i18n.js';
-import * as os from '@/os.js';
+import { instance } from '@features/instance/frontend/instance.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
+import * as os from '@features/ui/frontend/os.js';
 
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import MkInput from '@features/ui/frontend/components/MkInput.vue';

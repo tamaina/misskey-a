@@ -40,10 +40,10 @@ import * as Misskey from 'misskey-js';
 import MkFollowButton from '@features/relationships/frontend/components/MkFollowButton.vue';
 import number from '@features/ui/frontend/filters/number.js';
 import { userPage } from '@features/users/frontend/filters/user.js';
-import { $i } from '@/i.js';
-import { isFollowingVisibleForMe, isFollowersVisibleForMe } from '@/utility/isFfVisibleForMe.js';
-import { getStaticImageUrl } from '@/utility/media-proxy.js';
-import { prefer } from '@/preferences.js';
+import { $i } from '@features/auth/frontend/i.js';
+import { isFollowingVisibleForMe, isFollowersVisibleForMe } from '@features/relationships/frontend/utility/isFfVisibleForMe.js';
+import { getStaticImageUrl } from '@features/media/frontend/utility/media-proxy.js';
+import { prefer } from '@features/preferences/frontend/preferences.js';
 
 defineProps<{
 	user: Misskey.entities.UserDetailed;

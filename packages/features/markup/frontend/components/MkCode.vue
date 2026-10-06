@@ -44,7 +44,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script lang="ts" setup>
 import { defineAsyncComponent, ref } from 'vue';
 import { copyToClipboard } from '@features/ui/frontend/utility/copy-to-clipboard.js';
-import { prefer } from '@/preferences.js';
+import { prefer } from '@features/preferences/frontend/preferences.js';
 
 const props = withDefaults(defineProps<{
 	code: string;

@@ -40,12 +40,12 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import { ref } from 'vue';
-import type { MenuItem } from '@/types/menu';
+import type { MenuItem } from '@features/navigation/frontend/types/menu';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import MkSwitch from '@features/ui/frontend/components/MkSwitch.vue';
-import * as os from '@/os.js';
-import { i18n } from '@/i18n.js';
-import { prefer } from '@/preferences.js';
+import * as os from '@features/ui/frontend/os.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
+import { prefer } from '@features/preferences/frontend/preferences.js';
 import {
 	mute as muteEmoji,
 	unmute as unmuteEmoji,

@@ -53,13 +53,13 @@ import { MFM_TAGS, MFM_PARAMS } from '@@/js/const.js';
 import type { EmojiDef } from '@features/emojis/frontend/utility/search-emoji.js';
 import { elementContains } from '@features/ui/frontend/utility/element-contains.js';
 import { acct } from '@features/users/frontend/filters/user.js';
-import * as os from '@/os.js';
-import { misskeyApi } from '@/utility/misskey-api.js';
-import { store } from '@/store.js';
-import { miLocalStorage } from '@/local-storage.js';
-import { customEmojis } from '@/custom-emojis.js';
+import * as os from '@features/ui/frontend/os.js';
+import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
+import { store } from '@features/preferences/frontend/store.js';
+import { miLocalStorage } from '@features/preferences/frontend/local-storage.js';
+import { customEmojis } from '@features/emojis/frontend/custom-emojis.js';
 import { searchEmoji, searchEmojiExact } from '@features/emojis/frontend/utility/search-emoji.js';
-import { prefer } from '@/preferences.js';
+import { prefer } from '@features/preferences/frontend/preferences.js';
 
 export type CompleteInfo = {
 	user: {

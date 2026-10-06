@@ -43,8 +43,8 @@ import { onMounted, useTemplateRef, ref } from 'vue';
 import MkInput from '@features/ui/frontend/components/MkInput.vue';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import MkModalWindow from '@features/ui/frontend/components/MkModalWindow.vue';
-import { i18n } from '@/i18n.js';
-import { ensureSignin } from '@/i.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
+import { ensureSignin } from '@features/auth/frontend/i.js';
 
 const $i = ensureSignin();
 

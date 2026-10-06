@@ -20,7 +20,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 import MkFeaturedPhotos from '@features/media/frontend/components/MkFeaturedPhotos.vue';
 import misskeysvg from '/client-assets/misskey.svg';
 import MkVisitorDashboard from '@features/statistics/frontend/components/MkVisitorDashboard.vue';
-import { instance as meta } from '@/instance.js';
+import { instance as meta } from '@features/instance/frontend/instance.js';
 </script>
 
 <style lang="scss" module>

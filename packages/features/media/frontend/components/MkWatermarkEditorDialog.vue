@@ -64,21 +64,21 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script setup lang="ts">
 import { ref, useTemplateRef, watch, onMounted, onUnmounted, reactive, nextTick } from 'vue';
-import type { WatermarkLayers, WatermarkPreset } from '@/utility/watermark/WatermarkRenderer.js';
-import { WatermarkRenderer } from '@/utility/watermark/WatermarkRenderer.js';
-import { i18n } from '@/i18n.js';
+import type { WatermarkLayers, WatermarkPreset } from '@features/media/frontend/utility/watermark/WatermarkRenderer.js';
+import { WatermarkRenderer } from '@features/media/frontend/utility/watermark/WatermarkRenderer.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
 import MkModalWindow from '@features/ui/frontend/components/MkModalWindow.vue';
 import MkPreviewWithControls from '@features/markup/frontend/components/MkPreviewWithControls.vue';
 import MkSelect from '@features/ui/frontend/components/MkSelect.vue';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
-import MkFolder from '@/components/MkFolder.vue';
+import MkFolder from '@features/ui/frontend/components/MkFolder.vue';
 import XLayer from '@features/media/frontend/components/MkWatermarkEditorDialog.Layer.vue';
-import * as os from '@/os.js';
-import { deepClone } from '@/utility/clone.js';
-import { ensureSignin } from '@/i.js';
-import { genId } from '@/utility/id.js';
+import * as os from '@features/ui/frontend/os.js';
+import { deepClone } from '@features/runtime/frontend/utility/clone.js';
+import { ensureSignin } from '@features/auth/frontend/i.js';
+import { genId } from '@features/runtime/frontend/utility/id.js';
 import { useMkSelect } from '@features/ui/frontend/composables/use-mkselect.js';
-import { prefer } from '@/preferences.js';
+import { prefer } from '@features/preferences/frontend/preferences.js';
 
 const $i = ensureSignin();
 

@@ -31,7 +31,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script setup lang="ts">
 import { entities } from 'misskey-js';
 import { computed, toRefs } from 'vue';
-import { i18n } from '@/i18n.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
 
 const emit = defineEmits<{
 	(ev: 'edit', id: entities.AbuseReportNotificationRecipient['id']): void;

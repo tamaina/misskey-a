@@ -69,14 +69,14 @@ import MkWindow from '@features/ui/frontend/components/MkWindow.vue';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import MkInput from '@features/ui/frontend/components/MkInput.vue';
 import MkInfo from '@features/ui/frontend/components/MkInfo.vue';
-import MkFolder from '@/components/MkFolder.vue';
-import * as os from '@/os.js';
-import { misskeyApi } from '@/utility/misskey-api.js';
-import { i18n } from '@/i18n.js';
+import MkFolder from '@features/ui/frontend/components/MkFolder.vue';
+import * as os from '@features/ui/frontend/os.js';
+import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
 import MkSwitch from '@features/ui/frontend/components/MkSwitch.vue';
 import MkRolePreview from '@features/roles/frontend/components/MkRolePreview.vue';
 import MkTextarea from '@features/ui/frontend/components/MkTextarea.vue';
-import { ensureSignin } from '@/i.js';
+import { ensureSignin } from '@features/auth/frontend/i.js';
 
 const $i = ensureSignin();
 

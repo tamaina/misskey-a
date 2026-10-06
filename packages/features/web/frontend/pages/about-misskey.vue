@@ -143,14 +143,14 @@ import FormLink from '@features/ui/frontend/components/form/link.vue';
 import FormSection from '@features/ui/frontend/components/form/section.vue';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import MkInfo from '@features/ui/frontend/components/MkInfo.vue';
-import { physics } from '@/utility/physics.js';
-import { i18n } from '@/i18n.js';
-import { instance } from '@/instance.js';
-import * as os from '@/os.js';
-import { definePage } from '@/page.js';
+import { physics } from '@features/media/frontend/utility/physics.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
+import { instance } from '@features/instance/frontend/instance.js';
+import * as os from '@features/ui/frontend/os.js';
+import { definePage } from '@features/navigation/frontend/page.js';
 import { claimAchievement, claimedAchievements } from '@features/users/frontend/utility/achievements.js';
-import { $i } from '@/i.js';
-import { prefer } from '@/preferences.js';
+import { $i } from '@features/auth/frontend/i.js';
+import { prefer } from '@features/preferences/frontend/preferences.js';
 
 const patronsWithIcon = [{
 	name: 'カイヤン',

@@ -105,17 +105,17 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import { computed, defineAsyncComponent, ref, watch } from 'vue';
-import { openInstanceMenu } from '@/ui/_common_/common.js';
-import * as os from '@/os.js';
-import { navbarItemDef } from '@/navbar.js';
-import { store } from '@/store.js';
-import { i18n } from '@/i18n.js';
-import { instance } from '@/instance.js';
+import { openInstanceMenu } from '@features/navigation/frontend/ui/_common_/common.js';
+import * as os from '@features/ui/frontend/os.js';
+import { navbarItemDef } from '@features/navigation/frontend/navbar.js';
+import { store } from '@features/preferences/frontend/store.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
+import { instance } from '@features/instance/frontend/instance.js';
 import { getHTMLElementOrNull } from '@features/ui/frontend/utility/get-dom-node-or-null.js';
-import { useRouter } from '@/router.js';
-import { prefer } from '@/preferences.js';
-import { getAccountMenu } from '@/accounts.js';
-import { $i } from '@/i.js';
+import { useRouter } from '@features/navigation/frontend/router.js';
+import { prefer } from '@features/preferences/frontend/preferences.js';
+import { getAccountMenu } from '@features/auth/frontend/accounts.js';
+import { $i } from '@features/auth/frontend/i.js';
 
 const router = useRouter();
 

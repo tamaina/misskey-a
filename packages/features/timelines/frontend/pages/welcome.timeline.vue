@@ -24,7 +24,7 @@ import * as Misskey from 'misskey-js';
 import { onUpdated, ref, useTemplateRef } from 'vue';
 import { getScrollContainer } from '@@/js/scroll.js';
 import XNote from '@features/notes/frontend/pages/welcome.timeline.note.vue';
-import { misskeyApiGet } from '@/utility/misskey-api.js';
+import { misskeyApiGet } from '@features/api/frontend/utility/misskey-api.js';
 
 const notes = ref<Misskey.entities.Note[]>([]);
 const isScrolling = ref(false);

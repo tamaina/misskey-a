@@ -16,7 +16,7 @@ export default mergeConfig(getConfig(), defineConfig({
 				},
 			},
 		},
-		includeSource: ['src/**/*.ts'],
+		includeSource: ['src/**/*.ts', '../features/*/frontend/**/*.ts'],
 	},
 }));
 

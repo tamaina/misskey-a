@@ -46,8 +46,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import { computed, nextTick, useTemplateRef, watch, ref } from 'vue';
-import { prefer } from '@/preferences.js';
-import MkBlurhash from '@/components/MkBlurhash.vue';
+import { prefer } from '@features/preferences/frontend/preferences.js';
+import MkBlurhash from '@features/media/frontend/components/MkBlurhash.vue';
 
 const props = withDefaults(defineProps<{
 	transition?: {

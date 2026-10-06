@@ -78,13 +78,13 @@ import XRetention from '@features/statistics/frontend/pages/admin/overview.reten
 import XModerators from '@features/statistics/frontend/pages/admin/overview.moderators.vue';
 import XHeatmap from '@features/statistics/frontend/pages/admin/overview.heatmap.vue';
 import type { InstanceForPie } from '@features/statistics/frontend/pages/admin/overview.pie.vue';
-import * as os from '@/os.js';
-import { misskeyApi, misskeyApiGet } from '@/utility/misskey-api.js';
-import { useStream } from '@/stream.js';
-import { i18n } from '@/i18n.js';
-import { definePage } from '@/page.js';
+import * as os from '@features/ui/frontend/os.js';
+import { misskeyApi, misskeyApiGet } from '@features/api/frontend/utility/misskey-api.js';
+import { useStream } from '@features/api/frontend/stream.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
+import { definePage } from '@features/navigation/frontend/page.js';
 import MkFoldableSection from '@features/ui/frontend/components/MkFoldableSection.vue';
-import { genId } from '@/utility/id.js';
+import { genId } from '@features/runtime/frontend/utility/id.js';
 
 const rootEl = useTemplateRef('rootEl');
 const serverInfo = ref<Misskey.entities.ServerInfoResponse | null>(null);

@@ -28,15 +28,15 @@ SPDX-License-Identifier: AGPL-3.0-only
 import { ref } from 'vue';
 import * as Misskey from 'misskey-js';
 import { useInterval } from '@@/js/use-interval.js';
-import { useWidgetPropsManager } from '../../../../frontend/src/widgets/widget.js';
-import type { WidgetComponentEmits, WidgetComponentExpose, WidgetComponentProps } from '../../../../frontend/src/widgets/widget.js';
+import { useWidgetPropsManager } from '../../../ui/frontend/widgets/widget.js';
+import type { WidgetComponentEmits, WidgetComponentExpose, WidgetComponentProps } from '../../../ui/frontend/widgets/widget.js';
 import type { FormWithDefault, GetFormResultType } from '@features/ui/frontend/utility/form.js';
 import MkContainer from '@features/ui/frontend/components/MkContainer.vue';
 import MkMiniChart from '@features/statistics/frontend/components/MkMiniChart.vue';
-import { misskeyApi, misskeyApiGet } from '@/utility/misskey-api.js';
-import { i18n } from '@/i18n.js';
-import { getProxiedImageUrlNullable } from '@/utility/media-proxy.js';
-import { prefer } from '@/preferences.js';
+import { misskeyApi, misskeyApiGet } from '@features/api/frontend/utility/misskey-api.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
+import { getProxiedImageUrlNullable } from '@features/media/frontend/utility/media-proxy.js';
+import { prefer } from '@features/preferences/frontend/preferences.js';
 
 const name = 'federation';
 

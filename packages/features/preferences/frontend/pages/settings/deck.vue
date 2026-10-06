@@ -105,12 +105,12 @@ import MkSwitch from '@features/ui/frontend/components/MkSwitch.vue';
 import MkRadios from '@features/ui/frontend/components/MkRadios.vue';
 import MkRange from '@features/ui/frontend/components/MkRange.vue';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
-import { i18n } from '@/i18n.js';
-import { definePage } from '@/page.js';
-import { prefer } from '@/preferences.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
+import { definePage } from '@features/navigation/frontend/page.js';
+import { prefer } from '@features/preferences/frontend/preferences.js';
 import MkPreferenceContainer from '@features/preferences/frontend/components/MkPreferenceContainer.vue';
 import { selectFile } from '@features/drive/frontend/utility/drive.js';
-import { suggestReload } from '@/utility/reload-suggest.js';
+import { suggestReload } from '@features/boot/frontend/utility/reload-suggest.js';
 
 const navWindow = prefer.model('deck.navWindow');
 const useSimpleUiForNonRootPages = prefer.model('deck.useSimpleUiForNonRootPages');

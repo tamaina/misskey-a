@@ -36,9 +36,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 import { onMounted, ref } from 'vue';
 import * as Misskey from 'misskey-js';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
-import { misskeyApi } from '@/utility/misskey-api.js';
-import { useRouter } from '@/router.js';
-import MkFolder from '@/components/MkFolder.vue';
+import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
+import { useRouter } from '@features/navigation/frontend/router.js';
+import MkFolder from '@features/ui/frontend/components/MkFolder.vue';
 
 const router = useRouter();
 

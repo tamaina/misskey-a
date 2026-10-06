@@ -30,19 +30,19 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script lang="ts" setup>
 import { computed, onMounted, onUnmounted, provide, ref, useTemplateRef, nextTick } from 'vue';
 import { url } from '@@/js/config.js';
-import type { PageMetadata } from '@/page.js';
+import type { PageMetadata } from '@features/navigation/frontend/page.js';
 import RouterView from '@features/navigation/frontend/components/global/RouterView.vue';
 import MkWindow from '@features/ui/frontend/components/MkWindow.vue';
-import { popout as _popout } from '@/utility/popout.js';
+import { popout as _popout } from '@features/ui/frontend/utility/popout.js';
 import { copyToClipboard } from '@features/ui/frontend/utility/copy-to-clipboard.js';
-import { i18n } from '@/i18n.js';
-import { provideMetadataReceiver, provideReactiveMetadata } from '@/page.js';
-import { openingWindowsCount } from '@/os.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
+import { provideMetadataReceiver, provideReactiveMetadata } from '@features/navigation/frontend/page.js';
+import { openingWindowsCount } from '@features/ui/frontend/os.js';
 import { claimAchievement } from '@features/users/frontend/utility/achievements.js';
-import { createRouter, mainRouter } from '@/router.js';
-import { analytics } from '@/analytics.js';
-import { DI } from '@/di.js';
-import { prefer } from '@/preferences.js';
+import { createRouter, mainRouter } from '@features/navigation/frontend/router.js';
+import { analytics } from '@features/statistics/frontend/analytics.js';
+import { DI } from '@features/ui/frontend/di.js';
+import { prefer } from '@features/preferences/frontend/preferences.js';
 
 const props = defineProps<{
 	initialPath: string;

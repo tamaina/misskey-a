@@ -42,10 +42,10 @@ import MkInput from '@features/ui/frontend/components/MkInput.vue';
 import MkTextarea from '@features/ui/frontend/components/MkTextarea.vue';
 import MkSwitch from '@features/ui/frontend/components/MkSwitch.vue';
 import { selectFile } from '@features/drive/frontend/utility/drive.js';
-import * as os from '@/os.js';
-import { misskeyApi } from '@/utility/misskey-api.js';
-import { i18n } from '@/i18n.js';
-import { useRouter } from '@/router.js';
+import * as os from '@features/ui/frontend/os.js';
+import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
+import { useRouter } from '@features/navigation/frontend/router.js';
 
 const router = useRouter();
 

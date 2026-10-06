@@ -21,15 +21,15 @@ SPDX-License-Identifier: AGPL-3.0-only
 import { shallowRef, useTemplateRef } from 'vue';
 import * as Misskey from 'misskey-js';
 import { useInterval } from '@@/js/use-interval.js';
-import { useWidgetPropsManager } from '../../../../frontend/src/widgets/widget.js';
-import type { WidgetComponentEmits, WidgetComponentExpose, WidgetComponentProps } from '../../../../frontend/src/widgets/widget.js';
+import { useWidgetPropsManager } from '../../../ui/frontend/widgets/widget.js';
+import type { WidgetComponentEmits, WidgetComponentExpose, WidgetComponentProps } from '../../../ui/frontend/widgets/widget.js';
 import type { FormWithDefault, GetFormResultType } from '@features/ui/frontend/utility/form.js';
 import MkContainer from '@features/ui/frontend/components/MkContainer.vue';
 import MkTagCloud from '@features/discovery/frontend/components/MkTagCloud.vue';
-import * as os from '@/os.js';
-import { misskeyApi } from '@/utility/misskey-api.js';
-import { getProxiedImageUrlNullable } from '@/utility/media-proxy.js';
-import { i18n } from '@/i18n.js';
+import * as os from '@features/ui/frontend/os.js';
+import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
+import { getProxiedImageUrlNullable } from '@features/media/frontend/utility/media-proxy.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
 
 const name = 'instanceCloud';
 

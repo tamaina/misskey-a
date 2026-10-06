@@ -35,10 +35,10 @@ import { TransitionGroup } from 'vue';
 import { isSupportedEmoji } from '@@/js/emojilist.js';
 import { getEmojiNameFromReaction, isLocalCustomEmojiReaction } from '@@/js/emoji-name.js';
 import XReaction from '@features/notes/frontend/components/MkReactionsViewer.reaction.vue';
-import { $i } from '@/i.js';
-import { prefer } from '@/preferences.js';
-import { customEmojisMap } from '@/custom-emojis.js';
-import { DI } from '@/di.js';
+import { $i } from '@features/auth/frontend/i.js';
+import { prefer } from '@features/preferences/frontend/preferences.js';
+import { customEmojisMap } from '@features/emojis/frontend/custom-emojis.js';
+import { DI } from '@features/ui/frontend/di.js';
 
 const props = withDefaults(defineProps<{
 	noteId: Misskey.entities.Note['id'];

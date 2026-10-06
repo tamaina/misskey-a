@@ -41,10 +41,10 @@ import { computed, ref } from 'vue';
 import * as Misskey from 'misskey-js';
 import MkDriveFileThumbnail from '@features/drive/frontend/components/MkDriveFileThumbnail.vue';
 import bytes from '@features/ui/frontend/filters/bytes.js';
-import * as os from '@/os.js';
-import { $i } from '@/i.js';
+import * as os from '@features/ui/frontend/os.js';
+import { $i } from '@features/auth/frontend/i.js';
 import { getDriveFileMenu } from '@features/drive/frontend/utility/get-drive-file-menu.js';
-import { setDragData } from '@/drag-and-drop.js';
+import { setDragData } from '@features/ui/frontend/drag-and-drop.js';
 
 const props = withDefaults(defineProps<{
 	file: Misskey.entities.DriveFile;

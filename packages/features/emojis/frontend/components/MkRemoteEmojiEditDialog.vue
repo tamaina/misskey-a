@@ -62,7 +62,7 @@ import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import MkInput from '@features/ui/frontend/components/MkInput.vue';
 import MkTextarea from '@features/ui/frontend/components/MkTextarea.vue';
 import MkWindow from '@features/ui/frontend/components/MkWindow.vue';
-import * as os from '@/os.js';
+import * as os from '@features/ui/frontend/os.js';
 
 const props = defineProps<{
 	emoji: {

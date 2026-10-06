@@ -22,10 +22,10 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import { computed, defineAsyncComponent, ref, watch } from 'vue';
-import { instance } from '@/instance.js';
-import { i18n } from '@/i18n.js';
+import { instance } from '@features/instance/frontend/instance.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
 import { claimAchievement } from '@features/users/frontend/utility/achievements.js';
-import { definePage } from '@/page.js';
+import { definePage } from '@features/navigation/frontend/page.js';
 import { loadEmojiCatalog } from '@features/index/frontend';
 
 const XOverview = defineAsyncComponent(() => import('@features/instance/frontend/pages/about.overview.vue'));

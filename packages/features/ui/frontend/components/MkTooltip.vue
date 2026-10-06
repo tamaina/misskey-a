@@ -25,9 +25,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import { nextTick, onMounted, onUnmounted, useTemplateRef } from 'vue';
-import * as os from '@/os.js';
+import * as os from '@features/ui/frontend/os.js';
 import { calcPopupPosition } from '@features/ui/frontend/utility/popup-position.js';
-import { prefer } from '@/preferences.js';
+import { prefer } from '@features/preferences/frontend/preferences.js';
 
 const props = withDefaults(defineProps<{
 	showing: boolean;

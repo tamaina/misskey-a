@@ -90,12 +90,12 @@ import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import MkInfo from '@features/ui/frontend/components/MkInfo.vue';
 import MkSwitch from '@features/ui/frontend/components/MkSwitch.vue';
 import FormSection from '@features/ui/frontend/components/form/section.vue';
-import MkFolder from '@/components/MkFolder.vue';
-import MkLink from '@/components/MkLink.vue';
-import * as os from '@/os.js';
-import { ensureSignin } from '@/i.js';
-import { i18n } from '@/i18n.js';
-import { updateCurrentAccountPartial } from '@/accounts.js';
+import MkFolder from '@features/ui/frontend/components/MkFolder.vue';
+import MkLink from '@features/navigation/frontend/components/MkLink.vue';
+import * as os from '@features/ui/frontend/os.js';
+import { ensureSignin } from '@features/auth/frontend/i.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
+import { updateCurrentAccountPartial } from '@features/auth/frontend/accounts.js';
 
 const $i = ensureSignin();
 

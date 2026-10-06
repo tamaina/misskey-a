@@ -16,10 +16,10 @@ export type MkABehavior = 'window' | 'browser' | null;
 <script lang="ts" setup>
 import { computed, inject, useTemplateRef } from 'vue';
 import { url } from '@@/js/config.js';
-import * as os from '@/os.js';
+import * as os from '@features/ui/frontend/os.js';
 import { copyToClipboard } from '@features/ui/frontend/utility/copy-to-clipboard.js';
-import { i18n } from '@/i18n.js';
-import { useRouter } from '@/router.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
+import { useRouter } from '@features/navigation/frontend/router.js';
 
 const props = withDefaults(defineProps<{
 	to: string;

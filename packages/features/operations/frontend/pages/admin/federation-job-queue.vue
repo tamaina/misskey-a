@@ -21,9 +21,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 import { ref, computed } from 'vue';
 import XQueue from '@features/operations/frontend/pages/admin/federation-job-queue.chart.vue';
 import type { Ref } from 'vue';
-import * as os from '@/os.js';
-import { i18n } from '@/i18n.js';
-import { definePage } from '@/page.js';
+import * as os from '@features/ui/frontend/os.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
+import { definePage } from '@features/navigation/frontend/page.js';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 
 export type ApQueueDomain = 'deliver' | 'inbox';

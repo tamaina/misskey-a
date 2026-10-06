@@ -112,13 +112,13 @@ import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import MkModalWindow from '@features/ui/frontend/components/MkModalWindow.vue';
 import MkKeyValue from '@features/ui/frontend/components/MkKeyValue.vue';
 import MkInput from '@features/ui/frontend/components/MkInput.vue';
-import { i18n } from '@/i18n.js';
-import * as os from '@/os.js';
-import MkFolder from '@/components/MkFolder.vue';
+import { i18n } from '@features/runtime/frontend/i18n.js';
+import * as os from '@features/ui/frontend/os.js';
+import MkFolder from '@features/ui/frontend/components/MkFolder.vue';
 import MkInfo from '@features/ui/frontend/components/MkInfo.vue';
-import MkLink from '@/components/MkLink.vue';
+import MkLink from '@features/navigation/frontend/components/MkLink.vue';
 import { confetti } from '@features/ui/frontend/utility/confetti.js';
-import { ensureSignin } from '@/i.js';
+import { ensureSignin } from '@features/auth/frontend/i.js';
 
 const $i = ensureSignin();
 

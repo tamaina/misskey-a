@@ -39,10 +39,10 @@ import { computed, markRaw, ref, watch } from 'vue';
 import MkPagination from '@features/ui/frontend/components/MkPagination.vue';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import { userPage, acct } from '@features/users/frontend/filters/user.js';
-import * as os from '@/os.js';
-import { i18n } from '@/i18n.js';
-import { definePage } from '@/page.js';
-import { $i } from '@/i.js';
+import * as os from '@features/ui/frontend/os.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
+import { definePage } from '@features/navigation/frontend/page.js';
+import { $i } from '@features/auth/frontend/i.js';
 import { Paginator } from '@features/ui/frontend/utility/paginator.js';
 
 const tab = ref($i?.isLocked ? 'list' : 'sent');

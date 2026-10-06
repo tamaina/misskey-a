@@ -37,7 +37,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script setup lang="ts">
 import * as Misskey from 'misskey-js';
 import { reactive } from 'vue';
-import { i18n } from '@/i18n.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
 import MkNote from '@features/notes/frontend/components/MkNote.vue';
 import MkPostForm from '@features/notes/frontend/components/MkPostForm.vue';
 import MkFormSection from '@features/ui/frontend/components/form/section.vue';

@@ -79,6 +79,7 @@
 	],
 	"exclude": [
 		"./src/**/*.stories.ts",
-		"../features/*/frontend/**/*.stories.ts"
+		"../features/*/frontend/**/*.stories.ts",
+		"../features/media/frontend/workers/**/*.ts"
 	]
 }

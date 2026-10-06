@@ -50,9 +50,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 import { useTemplateRef, ref, computed, onBeforeUnmount, onMounted } from 'vue';
 import MkPreviewWithControls from '@features/markup/frontend/components/MkPreviewWithControls.vue';
 import type { Form } from '@features/ui/frontend/utility/form.js';
-import type { WidgetName } from '@/widgets/index.js';
-import { deepClone } from '@/utility/clone.js';
-import { i18n } from '@/i18n.js';
+import type { WidgetName } from '@features/index/frontend/widgets.js';
+import { deepClone } from '@features/runtime/frontend/utility/clone.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
 import MkModalWindow from '@features/ui/frontend/components/MkModalWindow.vue';
 import MkForm from '@features/ui/frontend/components/MkForm.vue';
 

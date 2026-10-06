@@ -97,10 +97,10 @@ import MkSwitch from '@features/ui/frontend/components/MkSwitch.vue';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import MkCode from '@features/markup/frontend/components/MkCode.vue';
 import MkInfo from '@features/ui/frontend/components/MkInfo.vue';
-import { i18n } from '@/i18n.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
 import { useMkSelect } from '@features/ui/frontend/composables/use-mkselect.js';
 import { copyToClipboard } from '@features/ui/frontend/utility/copy-to-clipboard.js';
-import { normalizeEmbedParams, getEmbedCode } from '@/utility/get-embed-code.js';
+import { normalizeEmbedParams, getEmbedCode } from '@features/web/frontend/utility/get-embed-code.js';
 
 const emit = defineEmits<{
 	(ev: 'ok'): void;

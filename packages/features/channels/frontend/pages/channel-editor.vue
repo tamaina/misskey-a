@@ -74,15 +74,15 @@ import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import MkInput from '@features/ui/frontend/components/MkInput.vue';
 import MkColorInput from '@features/ui/frontend/components/MkColorInput.vue';
 import { selectFile } from '@features/drive/frontend/utility/drive.js';
-import * as os from '@/os.js';
-import { misskeyApi } from '@/utility/misskey-api.js';
-import { definePage } from '@/page.js';
-import { i18n } from '@/i18n.js';
-import MkFolder from '@/components/MkFolder.vue';
+import * as os from '@features/ui/frontend/os.js';
+import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
+import { definePage } from '@features/navigation/frontend/page.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
+import MkFolder from '@features/ui/frontend/components/MkFolder.vue';
 import MkSwitch from '@features/ui/frontend/components/MkSwitch.vue';
 import MkTextarea from '@features/ui/frontend/components/MkTextarea.vue';
 import MkDraggable from '@features/ui/frontend/components/MkDraggable.vue';
-import { useRouter } from '@/router.js';
+import { useRouter } from '@features/navigation/frontend/router.js';
 
 const router = useRouter();
 

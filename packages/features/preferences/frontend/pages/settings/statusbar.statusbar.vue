@@ -94,10 +94,10 @@ import MkSwitch from '@features/ui/frontend/components/MkSwitch.vue';
 import MkRadios from '@features/ui/frontend/components/MkRadios.vue';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import MkRange from '@features/ui/frontend/components/MkRange.vue';
-import { i18n } from '@/i18n.js';
-import { instance } from '@/instance.js';
-import { deepClone } from '@/utility/clone.js';
-import { prefer } from '@/preferences.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
+import { instance } from '@features/instance/frontend/instance.js';
+import { deepClone } from '@features/runtime/frontend/utility/clone.js';
+import { prefer } from '@features/preferences/frontend/preferences.js';
 import type { MkSelectItem } from '@features/ui/frontend/components/MkSelect.vue';
 import type { StatusbarStore } from '@features/preferences/frontend/state/def.js';
 

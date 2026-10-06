@@ -25,7 +25,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script lang="ts" setup>
 import { ref } from 'vue';
 import * as Misskey from 'misskey-js';
-import { shouldHideFileByDefault, canRevealFile } from '@/utility/sensitive-file.js';
+import { shouldHideFileByDefault, canRevealFile } from '@features/drive/frontend/utility/sensitive-file.js';
 
 const props = defineProps<{
 	media: Misskey.entities.DriveFile;

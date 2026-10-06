@@ -67,11 +67,11 @@ import { host as currentHost, hostname } from '@@/js/config.js';
 import MkInput from '@features/ui/frontend/components/MkInput.vue';
 import FormSplit from '@features/ui/frontend/components/form/split.vue';
 import MkModalWindow from '@features/ui/frontend/components/MkModalWindow.vue';
-import { misskeyApi } from '@/utility/misskey-api.js';
-import { store } from '@/store.js';
-import { i18n } from '@/i18n.js';
-import { $i } from '@/i.js';
-import { instance } from '@/instance.js';
+import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
+import { store } from '@features/preferences/frontend/store.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
+import { $i } from '@features/auth/frontend/i.js';
+import { instance } from '@features/instance/frontend/instance.js';
 
 const emit = defineEmits<{
 	(ev: 'ok', selected: Misskey.entities.UserDetailed): void;

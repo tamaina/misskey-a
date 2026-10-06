@@ -29,22 +29,22 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script lang="ts" setup>
 import { computed, watch, provide, useTemplateRef, ref, onMounted, onActivated } from 'vue';
 import type { Tab } from '@features/navigation/frontend/components/global/MkPageHeader.tabs.vue';
-import type { MenuItem } from '@/types/menu.js';
-import type { BasicTimelineType } from '@/timelines.js';
-import type { PageHeaderItem } from '@/types/page-header.js';
+import type { MenuItem } from '@features/navigation/frontend/types/menu.js';
+import type { BasicTimelineType } from '@features/timelines/frontend/timelines.js';
+import type { PageHeaderItem } from '@features/navigation/frontend/types/page-header.js';
 import MkStreamingNotesTimeline from '@features/timelines/frontend/components/MkStreamingNotesTimeline.vue';
 import MkPostForm from '@features/notes/frontend/components/MkPostForm.vue';
-import * as os from '@/os.js';
-import { store } from '@/store.js';
-import { i18n } from '@/i18n.js';
-import { $i } from '@/i.js';
-import { definePage } from '@/page.js';
-import { antennasCache, userListsCache, favoritedChannelsCache } from '@/cache.js';
+import * as os from '@features/ui/frontend/os.js';
+import { store } from '@features/preferences/frontend/store.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
+import { $i } from '@features/auth/frontend/i.js';
+import { definePage } from '@features/navigation/frontend/page.js';
+import { antennasCache, userListsCache, favoritedChannelsCache } from '@features/runtime/frontend/cache.js';
 import { deviceKind } from '@features/ui/frontend/utility/device-kind.js';
-import { deepMerge } from '@/utility/merge.js';
-import { miLocalStorage } from '@/local-storage.js';
-import { availableBasicTimelines, hasWithReplies, isAvailableBasicTimeline, isBasicTimeline, basicTimelineIconClass } from '@/timelines.js';
-import { prefer } from '@/preferences.js';
+import { deepMerge } from '@features/runtime/frontend/utility/merge.js';
+import { miLocalStorage } from '@features/preferences/frontend/local-storage.js';
+import { availableBasicTimelines, hasWithReplies, isAvailableBasicTimeline, isBasicTimeline, basicTimelineIconClass } from '@features/timelines/frontend/timelines.js';
+import { prefer } from '@features/preferences/frontend/preferences.js';
 
 const tlComponent = useTemplateRef('tlComponent');
 

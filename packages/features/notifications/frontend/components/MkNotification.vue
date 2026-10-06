@@ -183,9 +183,9 @@ import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import { getNoteSummary } from '@features/notes/frontend/utility/get-note-summary.js';
 import { notePage } from '@features/notes/frontend/filters/note.js';
 import { userPage } from '@features/users/frontend/filters/user.js';
-import { i18n } from '@/i18n.js';
-import { misskeyApi } from '@/utility/misskey-api.js';
-import { ensureSignin } from '@/i.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
+import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
+import { ensureSignin } from '@features/auth/frontend/i.js';
 
 const $i = ensureSignin();
 

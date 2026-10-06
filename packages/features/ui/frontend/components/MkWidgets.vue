@@ -48,14 +48,14 @@ export type DefaultStoredWidget = {
 import { computed } from 'vue';
 import { isLink } from '@@/js/is-link.js';
 import type { Component } from 'vue';
-import { genId } from '@/utility/id.js';
+import { genId } from '@features/runtime/frontend/utility/id.js';
 import MkSelect from '@features/ui/frontend/components/MkSelect.vue';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import MkDraggable from '@features/ui/frontend/components/MkDraggable.vue';
-import { widgets as widgetDefs, federationWidgets } from '@/widgets/index.js';
-import * as os from '@/os.js';
-import { i18n } from '@/i18n.js';
-import { instance } from '@/instance.js';
+import { widgets as widgetDefs, federationWidgets } from '@features/index/frontend/widgets.js';
+import * as os from '@features/ui/frontend/os.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
+import { instance } from '@features/instance/frontend/instance.js';
 import { useMkSelect } from '@features/ui/frontend/composables/use-mkselect.js';
 
 const props = defineProps<{

@@ -14,7 +14,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { $i } from '@/i.js';
+import { $i } from '@features/auth/frontend/i.js';
 import { hideRestoreBackupSuggestion, restoreFromCloudBackup } from '@features/preferences/frontend/state/utility.js';
 
 function restore() {

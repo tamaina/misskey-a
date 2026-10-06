@@ -27,9 +27,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import { computed, defineAsyncComponent, ref, toRef } from 'vue';
-import { $i } from '@/i.js';
-import { i18n } from '@/i18n.js';
-import { definePage } from '@/page.js';
+import { $i } from '@features/auth/frontend/i.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
+import { definePage } from '@features/navigation/frontend/page.js';
 import { notesSearchAvailable, usersSearchAvailable } from '@features/roles/frontend/utility/check-permissions.js';
 import MkInfo from '@features/ui/frontend/components/MkInfo.vue';
 
