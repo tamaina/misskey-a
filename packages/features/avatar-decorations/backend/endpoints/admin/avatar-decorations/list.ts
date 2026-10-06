@@ -3,11 +3,13 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Inject, Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
-import { DI } from '@/di-symbols.js';
+import { Injectable } from '@nestjs/common';
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { listAvatarDecorationsDefinition, listAvatarDecorationsInput, listAvatarDecorationsOutput } from '../../../../contract/index.js';
 import { IdService } from '../../../../../runtime/backend/services/IdService.js';
 import { AvatarDecorationService } from '../../../services/AvatarDecorationService.js';
+
+const contractProjection = projectEndpointContract(listAvatarDecorationsDefinition);
 
 export const meta = {
 	tags: ['admin'],
@@ -15,80 +17,18 @@ export const meta = {
 	requireCredential: true,
 	requiredRolePolicy: 'canManageAvatarDecorations',
 	kind: 'read:admin:avatar-decorations',
-
-	res: {
-		type: 'array',
-		optional: false, nullable: false,
-		items: {
-			type: 'object',
-			optional: false, nullable: false,
-			properties: {
-				id: {
-					type: 'string',
-					optional: false, nullable: false,
-					format: 'id',
-					example: 'xxxxxxxxxx',
-				},
-				createdAt: {
-					type: 'string',
-					optional: false, nullable: false,
-					format: 'date-time',
-				},
-				updatedAt: {
-					type: 'string',
-					optional: false, nullable: true,
-					format: 'date-time',
-				},
-				name: {
-					type: 'string',
-					optional: false, nullable: false,
-				},
-				description: {
-					type: 'string',
-					optional: false, nullable: false,
-				},
-				url: {
-					type: 'string',
-					optional: false, nullable: false,
-				},
-				roleIdsThatCanBeUsedThisDecoration: {
-					type: 'array',
-					optional: false, nullable: false,
-					items: {
-						type: 'string',
-						optional: false, nullable: false,
-						format: 'id',
-					},
-				},
-				category: {
-					type: 'string',
-					optional: true, nullable: true,
-				},
-			},
-		},
-	},
+	res: contractProjection.response,
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {
-		limit: { type: 'integer', minimum: 1, maximum: 100, default: 10 },
-		sinceId: { type: 'string', format: 'misskey:id' },
-		untilId: { type: 'string', format: 'misskey:id' },
-		sinceDate: { type: 'integer' },
-		untilDate: { type: 'integer' },
-		userId: { type: 'string', format: 'misskey:id', nullable: true },
-	},
-	required: [],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof listAvatarDecorationsInput, typeof listAvatarDecorationsOutput> {
 	constructor(
 		private avatarDecorationService: AvatarDecorationService,
 		private idService: IdService,
 	) {
-		super(meta, paramDef, async (ps, me) => {
+		super(meta, contractProjection, async (ps, me) => {
 			const avatarDecorations = await this.avatarDecorationService.getAll(true);
 
 			return avatarDecorations.map(avatarDecoration => ({

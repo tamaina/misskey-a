@@ -305,6 +305,24 @@ response boundary still copies packed objects and omits own `undefined` properti
 as JSON serialization would; it does not mutate the packer's object. Decoration
 category retains the same absent-property semantics.
 
+## Native endpoint contracts on the existing transport
+
+`defineEndpointContract` keeps feature-owned Valibot input/output schemas together
+with the oRPC contract. The API host's `ContractEndpoint` derives callback types
+from those schemas without using `SchemaType`. Its projection adapts documentation
+requiredness to the legacy OpenAPI writer. Request validation remains in the
+existing AJV transport, including defaults, unknown keys and `INVALID_PARAM`
+details; authentication, role policies, rate limits and file cleanup keep their
+existing owners. Responses are not newly parsed or rewritten by this adapter.
+
+The bridge accepts an audited, JSON-schema-projectable input subset. Runtime
+transformations, fallbacks, dynamic defaults, lazy inputs and optional root bodies
+are rejected instead of silently pretending AJV executes them. String length
+constraints use `jsonString` for JSON Schema Unicode-code-point semantics.
+The avatar-decoration create/list routes exercise this path; legacy inference
+remains for routes not yet converted. This is distinct from the existing feature
+procedures that intentionally run oRPC input/output validation.
+
 ## Emoji catalog frontend
 
 The catalog and its row menu now live beside the emoji backend/contract under

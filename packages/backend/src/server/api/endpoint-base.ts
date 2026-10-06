@@ -27,18 +27,23 @@ type File = {
 	path: string;
 };
 
-// TODO: paramsの型をT['params']のスキーマ定義から推論する
-type Executor<T extends IEndpointMeta, Ps extends Schema> =
-	(params: SchemaType<Ps>, user: T['requireCredential'] extends true ? MiLocalUser : MiLocalUser | null, token: MiAccessToken | null, file?: File, cleanup?: () => any, ip?: string | null, headers?: Record<string, string> | null) =>
-		Promise<T['res'] extends undefined ? Response : SchemaType<NonNullable<T['res']>>>;
+// The transport callback is independent of either legacy or portable schema inference.
+export type EndpointExecutor<T extends IEndpointMeta, Input, Output> =
+	(params: Input, user: T['requireCredential'] extends true ? MiLocalUser : MiLocalUser | null, token: MiAccessToken | null, file?: File, cleanup?: () => any, ip?: string | null, headers?: Record<string, string> | null) =>
+		Promise<Output>;
 
-export class Endpoint<T extends IEndpointMeta, Ps extends Schema> {
-	public exec: (params: any, user: T['requireCredential'] extends true ? MiLocalUser : MiLocalUser | null, token: MiAccessToken | null, file?: File, ip?: string | null, headers?: Record<string, string> | null) => Promise<any>;
+export class Endpoint<
+	T extends IEndpointMeta,
+	Ps extends Schema,
+	Input = SchemaType<Ps>,
+	Output = T['res'] extends undefined ? Response : SchemaType<NonNullable<T['res']>>,
+> {
+	public exec: (params: unknown, user: T['requireCredential'] extends true ? MiLocalUser : MiLocalUser | null, token: MiAccessToken | null, file?: File, ip?: string | null, headers?: Record<string, string> | null) => Promise<Output>;
 
-	constructor(meta: T, paramDef: Ps, cb: Executor<T, Ps>) {
-		const validate = ajv.compile(paramDef);
+	constructor(meta: T, paramDef: Ps, cb: EndpointExecutor<T, Input, Output>) {
+		const validate = ajv.compile<Input>(paramDef);
 
-		this.exec = (params: any, user: T['requireCredential'] extends true ? MiLocalUser : MiLocalUser | null, token: MiAccessToken | null, file?: File, ip?: string | null, headers?: Record<string, string> | null) => {
+		this.exec = (params: unknown, user: T['requireCredential'] extends true ? MiLocalUser : MiLocalUser | null, token: MiAccessToken | null, file?: File, ip?: string | null, headers?: Record<string, string> | null) => {
 			let cleanup: undefined | (() => void) = undefined;
 
 			if (meta.requireFile) {
@@ -69,7 +74,7 @@ export class Endpoint<T extends IEndpointMeta, Ps extends Schema> {
 				return Promise.reject(err);
 			}
 
-			return cb(params as SchemaType<Ps>, user, token, file, cleanup, ip, headers);
+			return cb(params, user, token, file, cleanup, ip, headers);
 		};
 	}
 }
