@@ -30,7 +30,7 @@ try {
 				{ find: '@/components/MkInput.vue', replacement: resolve(fixture, 'EmojiInput.vue') },
 				{ find: '@/components/MkFoldableSection.vue', replacement: resolve(fixture, 'EmojiSection.vue') },
 				{ find: '@/components/MkCustomEmojiDetailedDialog.vue', replacement: resolve(fixture, 'EmojiDialog.vue') },
-				{ find: '@/pages/emoji-edit-dialog.vue', replacement: resolve(fixture, 'EmojiDialog.vue') },
+				{ find: '@features/emojis/frontend/pages/emoji-edit-dialog.vue', replacement: resolve(fixture, 'EmojiDialog.vue') },
 				{ find: '@features', replacement: resolve(root, '../features') },
 				{ find: '@', replacement: resolve(root, 'src') },
 			],
