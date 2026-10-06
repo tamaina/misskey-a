@@ -9,6 +9,14 @@ const _filename = fileURLToPath(import.meta.url);
 const _dirname = dirname(_filename);
 const _package = JSON.parse(fs.readFileSync(_dirname + '/package.json', 'utf-8'));
 
+// Workspace contracts expose generated declarations. A standalone SDK build
+// must build its workspace dependencies first, including on a clean CI runner.
+await execa('pnpm', ['--filter', `${_package.name}^...`, '-r', 'build'], {
+	cwd: _dirname,
+	stdout: process.stdout,
+	stderr: process.stderr,
+});
+
 const entryPoints = fs.globSync('./src/**/**.{ts,tsx}');
 
 /** @type {import('esbuild').BuildOptions} */

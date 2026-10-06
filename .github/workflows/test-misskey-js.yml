@@ -8,11 +8,15 @@ on:
     branches: [ develop ]
     paths:
       - packages/misskey-js/**
+      - packages/features/**
+      - pnpm-lock.yaml
       - .github/workflows/test-misskey-js.yml
   pull_request:
     branches: [ develop ]
     paths:
       - packages/misskey-js/**
+      - packages/features/**
+      - pnpm-lock.yaml
       - .github/workflows/test-misskey-js.yml
 jobs:
   test:

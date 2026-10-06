@@ -4,12 +4,16 @@ on:
   push:
     paths:
       - packages/misskey-js/**
+      - packages/features/**
+      - pnpm-lock.yaml
       - .github/workflows/api-misskey-js.yml
   pull_request:
     branches-ignore:
       - master
     paths:
       - packages/misskey-js/**
+      - packages/features/**
+      - pnpm-lock.yaml
       - .github/workflows/api-misskey-js.yml
 jobs:
   report:
@@ -38,9 +42,17 @@ jobs:
       - name: Check files
         run: ls packages/misskey-js/built
 
+      - name: SDK tests
+        run: pnpm --filter misskey-js test
+        env:
+          CI: true
+
       - name: API report
         run: pnpm --filter misskey-js api-prod
 
       - name: Show report
         if: always()
-        run: cat packages/misskey-js/temp/misskey-js.api.md
+        run: |
+          if [ -f packages/misskey-js/temp/misskey-js.api.md ]; then
+            cat packages/misskey-js/temp/misskey-js.api.md
+          fi
