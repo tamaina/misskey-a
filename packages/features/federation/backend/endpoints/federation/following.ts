@@ -7,8 +7,8 @@ import { Inject, Injectable } from '@nestjs/common';
 import { Endpoint } from '@/server/api/endpoint-base.js';
 import type { FollowingsRepository } from '@/models/_.js';
 import { QueryService } from '@/core/QueryService.js';
-import { FollowingEntityService } from '@/core/entities/FollowingEntityService.js';
-import { RoleService } from '@/core/RoleService.js';
+import { FollowingEntityService } from '../../../../relationships/backend/serializers/FollowingEntityService.js';
+import { RoleService } from '../../../../roles/backend/services/RoleService.js';
 import { DI } from '@/di-symbols.js';
 
 export const meta = {

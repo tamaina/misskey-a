@@ -5,9 +5,9 @@
 
 import { Injectable } from '@nestjs/common';
 import { Endpoint } from '@/server/api/endpoint-base.js';
-import { EmojiEntityService } from '@/core/entities/EmojiEntityService.js';
-import { CustomEmojiService, fetchEmojisHostTypes, fetchEmojisSortKeys } from '@/core/CustomEmojiService.js';
-import { IdService } from '@/core/IdService.js';
+import { EmojiEntityService } from '../../../../serializers/EmojiEntityService.js';
+import { CustomEmojiService, fetchEmojisHostTypes, fetchEmojisSortKeys } from '../../../../services/CustomEmojiService.js';
+import { IdService } from '../../../../../../runtime/backend/services/IdService.js';
 
 export const meta = {
 	tags: ['admin'],

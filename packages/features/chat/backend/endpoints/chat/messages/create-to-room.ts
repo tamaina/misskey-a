@@ -9,7 +9,7 @@ import { Endpoint } from '@/server/api/endpoint-base.js';
 import { GetterService } from '@/server/api/GetterService.js';
 import { DI } from '@/di-symbols.js';
 import { ApiError } from '@/server/api/error.js';
-import { ChatService } from '@/core/ChatService.js';
+import { ChatService } from '../../../services/ChatService.js';
 import type { DriveFilesRepository, MiUser } from '@/models/_.js';
 
 export const meta = {

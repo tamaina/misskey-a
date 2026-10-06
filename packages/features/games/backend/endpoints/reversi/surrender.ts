@@ -5,7 +5,7 @@
 
 import { Injectable } from '@nestjs/common';
 import { Endpoint } from '@/server/api/endpoint-base.js';
-import { ReversiService } from '@/core/ReversiService.js';
+import { ReversiService } from '../../services/ReversiService.js';
 import { ApiError } from '@/server/api/error.js';
 
 export const meta = {

@@ -5,7 +5,7 @@
 
 import { Injectable } from '@nestjs/common';
 import { Endpoint } from '@/server/api/endpoint-base.js';
-import { AnnouncementService } from '@/core/AnnouncementService.js';
+import { AnnouncementService } from '../../../services/AnnouncementService.js';
 
 export const meta = {
 	tags: ['admin'],

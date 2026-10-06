@@ -8,7 +8,7 @@ import ms from '@/runtime-dependencies/ms.js';
 import type { SwSubscriptionsRepository } from '@/models/_.js';
 import { Endpoint } from '@/server/api/endpoint-base.js';
 import { DI } from '@/di-symbols.js';
-import { PushNotificationService } from '@/core/PushNotificationService.js';
+import { PushNotificationService } from '../../services/PushNotificationService.js';
 
 export const meta = {
 	tags: ['account'],

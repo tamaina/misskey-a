@@ -9,9 +9,9 @@ import { DI } from '@/di-symbols.js';
 import type { ClipsRepository, MiNote, MiClip, ClipNotesRepository, NotesRepository } from '@/models/_.js';
 import { bindThis } from '@/decorators.js';
 import { isDuplicateKeyValueError } from '@/misc/is-duplicate-key-value-error.js';
-import { RoleService } from '@/core/RoleService.js';
-import { IdService } from '@/core/IdService.js';
-import type { MiLocalUser } from '@/models/User.js';
+import { RoleService } from '../../../roles/backend/services/RoleService.js';
+import { IdService } from '../../../runtime/backend/services/IdService.js';
+import type { MiLocalUser } from '../../../users/backend/models/User.js';
 
 @Injectable()
 export class ClipService {

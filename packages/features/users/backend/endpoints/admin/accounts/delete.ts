@@ -6,10 +6,10 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { Endpoint } from '@/server/api/endpoint-base.js';
 import type { UsersRepository } from '@/models/_.js';
-import { QueueService } from '@/core/QueueService.js';
+import { QueueService } from '../../../../../runtime/backend/services/QueueService.js';
 import { DI } from '@/di-symbols.js';
-import { UserEntityService } from '@/core/entities/UserEntityService.js';
-import { DeleteAccountService } from '@/core/DeleteAccountService.js';
+import { UserEntityService } from '../../../serializers/UserEntityService.js';
+import { DeleteAccountService } from '../../../services/DeleteAccountService.js';
 
 export const meta = {
 	tags: ['admin'],

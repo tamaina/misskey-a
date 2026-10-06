@@ -5,7 +5,7 @@
 
 import { PrimaryColumn, Entity, Index, JoinColumn, Column, ManyToOne } from 'typeorm';
 import { id } from '@/models/util/id.js';
-import { MiUser } from '@/models/User.js';
+import { MiUser } from '../../../users/backend/models/User.js';
 import { MiChatRoom } from './ChatRoom.js';
 
 @Entity('chat_room_membership')

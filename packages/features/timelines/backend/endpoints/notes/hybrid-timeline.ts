@@ -8,18 +8,18 @@ import { Inject, Injectable } from '@nestjs/common';
 import type { NotesRepository, ChannelFollowingsRepository, MiMeta } from '@/models/_.js';
 import { Endpoint } from '@/server/api/endpoint-base.js';
 import ActiveUsersChart from '@/core/chart/charts/active-users.js';
-import { NoteEntityService } from '@/core/entities/NoteEntityService.js';
+import { NoteEntityService } from '../../../../notes/backend/serializers/NoteEntityService.js';
 import { DI } from '@/di-symbols.js';
-import { RoleService } from '@/core/RoleService.js';
-import { IdService } from '@/core/IdService.js';
+import { RoleService } from '../../../../roles/backend/services/RoleService.js';
+import { IdService } from '../../../../runtime/backend/services/IdService.js';
 import { CacheService } from '@/core/CacheService.js';
-import { FanoutTimelineName } from '@/core/FanoutTimelineService.js';
+import { FanoutTimelineName } from '../../services/FanoutTimelineService.js';
 import { QueryService } from '@/core/QueryService.js';
-import { UserFollowingService } from '@/core/UserFollowingService.js';
-import { MiLocalUser } from '@/models/User.js';
-import { FanoutTimelineEndpointService } from '@/core/FanoutTimelineEndpointService.js';
-import { ChannelMutingService } from '@/core/ChannelMutingService.js';
-import { ChannelFollowingService } from '@/core/ChannelFollowingService.js';
+import { UserFollowingService } from '../../../../relationships/backend/services/UserFollowingService.js';
+import { MiLocalUser } from '../../../../users/backend/models/User.js';
+import { FanoutTimelineEndpointService } from '../../services/FanoutTimelineEndpointService.js';
+import { ChannelMutingService } from '../../../../channels/backend/services/ChannelMutingService.js';
+import { ChannelFollowingService } from '../../../../channels/backend/services/ChannelFollowingService.js';
 import { ApiError } from '@/server/api/error.js';
 
 export const meta = {

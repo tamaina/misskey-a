@@ -72,7 +72,7 @@ describe('[シナリオ] ユーザ通報', () => {
 		return res.body;
 	}
 
-	async function resolveAbuseReport(args?: Partial<entities.AdminResolveAbuseUserReportRequest>, credential?: UserToken): Promise<entities.EmptyResponse> {
+	async function resolveAbuseReport(args?: Partial<entities.AdminResolveAbuseUserReportRequest>, credential?: UserToken): Promise<void> {
 		const res = await api(
 			'admin/resolve-abuse-user-report',
 			{

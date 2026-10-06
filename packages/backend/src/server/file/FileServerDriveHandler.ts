@@ -6,11 +6,11 @@
 import * as fs from 'node:fs';
 import rename from 'rename';
 import type { Config } from '@/config.js';
-import type { IImageStreamable } from '@/core/ImageProcessingService.js';
+import type { IImageStreamable } from '../../../../features/media/backend/services/ImageProcessingService.js';
 import { contentDisposition } from '@/misc/content-disposition.js';
 import { correctFilename } from '@/misc/correct-filename.js';
 import { isMimeImage } from '@/misc/is-mime-image.js';
-import { VideoProcessingService } from '@/core/VideoProcessingService.js';
+import { VideoProcessingService } from '../../../../features/media/backend/services/VideoProcessingService.js';
 import { attachStreamCleanup, handleRangeRequest, setFileResponseHeaders, getSafeContentType, needsCleanup } from './FileServerUtils.js';
 import type { FileServerFileResolver } from './FileServerFileResolver.js';
 import type { FastifyReply, FastifyRequest } from 'fastify';

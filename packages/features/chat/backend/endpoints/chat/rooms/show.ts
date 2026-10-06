@@ -6,9 +6,9 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { Endpoint } from '@/server/api/endpoint-base.js';
 import { DI } from '@/di-symbols.js';
-import { ChatService } from '@/core/ChatService.js';
+import { ChatService } from '../../../services/ChatService.js';
 import { ApiError } from '@/server/api/error.js';
-import { ChatEntityService } from '@/core/entities/ChatEntityService.js';
+import { ChatEntityService } from '../../../serializers/ChatEntityService.js';
 
 export const meta = {
 	tags: ['chat'],

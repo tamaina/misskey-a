@@ -9,7 +9,7 @@ import { afterAll, beforeAll, describe, test, expect, vi } from 'vitest';
 import { Test } from '@nestjs/testing';
 import { GlobalModule } from '@/GlobalModule.js';
 import { DI } from '@/di-symbols.js';
-import { MetaService } from '@/core/MetaService.js';
+import { MetaService } from '../../../features/instance/backend/services/MetaService.js';
 import { CoreModule } from '@/core/CoreModule.js';
 import type { TestingModule } from '@nestjs/testing';
 import type { DataSource } from 'typeorm';

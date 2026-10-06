@@ -5,8 +5,8 @@
 
 import { Injectable } from '@nestjs/common';
 import { Endpoint } from '@/server/api/endpoint-base.js';
-import { AchievementService } from '@/core/AchievementService.js';
-import { ACHIEVEMENT_TYPES } from '@/models/UserProfile.js';
+import { AchievementService } from '../../services/AchievementService.js';
+import { ACHIEVEMENT_TYPES } from '../../models/UserProfile.js';
 
 export const meta = {
 	requireCredential: true,

@@ -8,13 +8,13 @@ import { In } from 'typeorm';
 import { DI } from '@/di-symbols.js';
 import type { MiNoteDraft, NoteDraftsRepository, MiNote, MiDriveFile, MiChannel, UsersRepository, DriveFilesRepository, NotesRepository, BlockingsRepository, ChannelsRepository } from '@/models/_.js';
 import { bindThis } from '@/decorators.js';
-import { RoleService } from '@/core/RoleService.js';
-import { IdService } from '@/core/IdService.js';
-import type { MiLocalUser, MiUser } from '@/models/User.js';
+import { RoleService } from '../../../roles/backend/services/RoleService.js';
+import { IdService } from '../../../runtime/backend/services/IdService.js';
+import type { MiLocalUser, MiUser } from '../../../users/backend/models/User.js';
 import { IdentifiableError } from '@/misc/identifiable-error.js';
 import { isRenote, isQuote } from '@/misc/is-renote.js';
-import { NoteEntityService } from '@/core/entities/NoteEntityService.js';
-import { QueueService } from '@/core/QueueService.js';
+import { NoteEntityService } from '../serializers/NoteEntityService.js';
+import { QueueService } from '../../../runtime/backend/services/QueueService.js';
 
 export type NoteDraftOptions = Omit<MiNoteDraft, 'id' | 'userId' | 'user' | 'reply' | 'renote' | 'channel'>;
 

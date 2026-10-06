@@ -5,9 +5,9 @@
 
 import { Inject, Injectable } from '@nestjs/common';
 import { Endpoint } from '@/server/api/endpoint-base.js';
-import { UserEntityService } from '@/core/entities/UserEntityService.js';
+import { UserEntityService } from '../../../../users/backend/serializers/UserEntityService.js';
 import { DI } from '@/di-symbols.js';
-import { UserSearchService } from '@/core/UserSearchService.js';
+import { UserSearchService } from '../../services/UserSearchService.js';
 
 export const meta = {
 	tags: ['users'],

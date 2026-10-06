@@ -6,18 +6,18 @@
 import { Inject, Injectable } from '@nestjs/common';
 import * as Redis from 'ioredis';
 import { In } from 'typeorm';
-import { FanoutTimelineService } from '@/core/FanoutTimelineService.js';
-import type { GlobalEvents } from '@/core/GlobalEventService.js';
-import { GlobalEventService } from '@/core/GlobalEventService.js';
+import { FanoutTimelineService } from './FanoutTimelineService.js';
+import type { GlobalEvents } from '../../../runtime/backend/services/GlobalEventService.js';
+import { GlobalEventService } from '../../../runtime/backend/services/GlobalEventService.js';
 import { UtilityService } from '@/core/UtilityService.js';
 import { bindThis } from '@/decorators.js';
 import { DI } from '@/di-symbols.js';
 import * as Acct from '@/misc/acct.js';
 import type { Packed } from '@/misc/json-schema.js';
 import type { AntennasRepository, UserListMembershipsRepository } from '@/models/_.js';
-import type { MiAntenna } from '@/models/Antenna.js';
-import type { MiNote } from '@/models/Note.js';
-import type { MiUser } from '@/models/User.js';
+import type { MiAntenna } from '../models/Antenna.js';
+import type { MiNote } from '../../../notes/backend/models/Note.js';
+import type { MiUser } from '../../../users/backend/models/User.js';
 import { CacheService } from '@/core/CacheService.js';
 import type { OnApplicationShutdown } from '@nestjs/common';
 

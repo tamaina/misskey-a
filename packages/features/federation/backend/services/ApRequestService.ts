@@ -11,16 +11,16 @@ import * as htmlParser from 'node-html-parser';
 import { RsaKeyPair } from 'slacc';
 import { DI } from '@/di-symbols.js';
 import type { Config } from '@/config.js';
-import type { MiUser } from '@/models/User.js';
-import { UserKeypairService } from '@/core/UserKeypairService.js';
+import type { MiUser } from '../../../users/backend/models/User.js';
+import { UserKeypairService } from './UserKeypairService.js';
 import { UtilityService } from '@/core/UtilityService.js';
-import { HttpRequestService } from '@/core/HttpRequestService.js';
-import { LoggerService } from '@/core/LoggerService.js';
+import { HttpRequestService } from '../../../runtime/backend/services/HttpRequestService.js';
+import { LoggerService } from '../../../runtime/backend/services/LoggerService.js';
 import { bindThis } from '@/decorators.js';
 import type Logger from '@/logger.js';
-import { validateContentTypeSetAsActivityPub } from '@/core/activitypub/misc/validator.js';
-import { assertActivityMatchesUrl, FetchAllowSoftFailMask as FetchAllowSoftFailMask } from '@/core/activitypub/misc/check-against-url.js';
-import type { IObject } from '@/core/activitypub/type.js';
+import { validateContentTypeSetAsActivityPub } from '../protocol/misc/validator.js';
+import { assertActivityMatchesUrl, FetchAllowSoftFailMask as FetchAllowSoftFailMask } from '../protocol/misc/check-against-url.js';
+import type { IObject } from '../protocol/type.js';
 
 type Request = {
 	url: string;

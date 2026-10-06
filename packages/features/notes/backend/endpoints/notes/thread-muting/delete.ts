@@ -3,55 +3,20 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Inject, Injectable } from '@nestjs/common';
-import type { NoteThreadMutingsRepository } from '@/models/_.js';
+import { legacyNotesCommandSchemas } from '../../../commands.js';
+import { notesCommandErrors } from '../../../../contract/index.js';
+import type { Schema } from '@/misc/json-schema.js';
 import { Endpoint } from '@/server/api/endpoint-base.js';
-import { GetterService } from '@/server/api/GetterService.js';
-import { DI } from '@/di-symbols.js';
-import { ApiError } from '@/server/api/error.js';
+import { defineFeatureEndpoint } from '@/server/api/feature-endpoint.js';
 
 export const meta = {
 	tags: ['notes'],
-
 	requireCredential: true,
-
 	kind: 'write:account',
-
-	errors: {
-		noSuchNote: {
-			message: 'No such note.',
-			code: 'NO_SUCH_NOTE',
-			id: 'bddd57ac-ceb3-b29d-4334-86ea5fae481a',
-		},
-	},
+	errors: notesCommandErrors['notes/thread-muting/delete'],
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {
-		noteId: { type: 'string', format: 'misskey:id' },
-	},
-	required: ['noteId'],
-} as const;
+export const paramDef = legacyNotesCommandSchemas['notes/thread-muting/delete'].input as Schema;
 
-@Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
-	constructor(
-		@Inject(DI.noteThreadMutingsRepository)
-		private noteThreadMutingsRepository: NoteThreadMutingsRepository,
-
-		private getterService: GetterService,
-	) {
-		super(meta, paramDef, async (ps, me) => {
-			const note = await this.getterService.getNote(ps.noteId).catch(err => {
-				if (err.id === '9725d0ce-ba28-4dde-95a7-2cbb2c15de24') throw new ApiError(meta.errors.noSuchNote);
-				throw err;
-			});
-
-			await this.noteThreadMutingsRepository.delete({
-				threadId: note.threadId ?? note.id,
-				userId: me.id,
-			});
-		});
-	}
-}
+export const { feature, createEndpoint } = defineFeatureEndpoint('notesCommands', commands =>
+	new Endpoint(meta, paramDef, async (params, user) => commands['notes/thread-muting/delete'](params, { context: { actor: user } })));

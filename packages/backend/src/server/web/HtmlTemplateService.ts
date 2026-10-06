@@ -10,12 +10,12 @@ import { Injectable, Inject } from '@nestjs/common';
 import { DI } from '@/di-symbols.js';
 import { bindThis } from '@/decorators.js';
 import { htmlSafeJsonStringify } from '@/misc/json-stringify-html-safe.js';
-import { MetaEntityService } from '@/core/entities/MetaEntityService.js';
+import { MetaEntityService } from '../../../../features/instance/backend/serializers/MetaEntityService.js';
 import type { FastifyReply } from 'fastify';
 import type { Manifest } from 'vite';
 import type { Config } from '@/config.js';
-import type { MiMeta } from '@/models/Meta.js';
-import type { CommonData, ViteFiles } from './views/_.js';
+import type { MiMeta } from '../../../../features/instance/backend/models/Meta.js';
+import type { CommonData, ViteFiles } from '../../../../features/web/backend/templates/_.js';
 
 @Injectable()
 export class HtmlTemplateService {

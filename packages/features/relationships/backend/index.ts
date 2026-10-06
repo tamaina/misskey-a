@@ -5,3 +5,5 @@
 
 export { createListCommands, legacyListSchemas } from './commands.js';
 export type { ListCommandsContext, ListCommandsDependencies, ListCommandsFeature } from './commands.js';
+export { createRelationshipCommands, legacyRelationshipSchemas } from './relationship-commands.js';
+export type { RelationshipCommandsContext, RelationshipCommandsDependencies, RelationshipCommandsFeature } from './relationship-commands.js';

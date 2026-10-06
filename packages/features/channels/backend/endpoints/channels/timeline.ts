@@ -7,13 +7,13 @@ import { Inject, Injectable } from '@nestjs/common';
 import { Endpoint } from '@/server/api/endpoint-base.js';
 import type { ChannelsRepository, MiMeta, NotesRepository } from '@/models/_.js';
 import { QueryService } from '@/core/QueryService.js';
-import { NoteEntityService } from '@/core/entities/NoteEntityService.js';
+import { NoteEntityService } from '../../../../notes/backend/serializers/NoteEntityService.js';
 import ActiveUsersChart from '@/core/chart/charts/active-users.js';
 import { DI } from '@/di-symbols.js';
-import { IdService } from '@/core/IdService.js';
-import { FanoutTimelineEndpointService } from '@/core/FanoutTimelineEndpointService.js';
-import { MiLocalUser } from '@/models/User.js';
-import { ChannelMutingService } from '@/core/ChannelMutingService.js';
+import { IdService } from '../../../../runtime/backend/services/IdService.js';
+import { FanoutTimelineEndpointService } from '../../../../timelines/backend/services/FanoutTimelineEndpointService.js';
+import { MiLocalUser } from '../../../../users/backend/models/User.js';
+import { ChannelMutingService } from '../../services/ChannelMutingService.js';
 import { ApiError } from '@/server/api/error.js';
 import { Brackets } from 'typeorm';
 

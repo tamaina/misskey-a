@@ -8,8 +8,8 @@ import { Endpoint } from '@/server/api/endpoint-base.js';
 import type { InstancesRepository } from '@/models/_.js';
 import { UtilityService } from '@/core/UtilityService.js';
 import { DI } from '@/di-symbols.js';
-import { FederatedInstanceService } from '@/core/FederatedInstanceService.js';
-import { ModerationLogService } from '@/core/ModerationLogService.js';
+import { FederatedInstanceService } from '../../../services/FederatedInstanceService.js';
+import { ModerationLogService } from '../../../../../moderation/backend/services/ModerationLogService.js';
 
 export const meta = {
 	tags: ['admin'],

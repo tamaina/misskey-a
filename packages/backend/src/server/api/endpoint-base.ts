@@ -7,8 +7,8 @@ import * as fs from 'node:fs';
 import _Ajv from 'ajv';
 import { misskeyIdPattern } from '@features/api/contract';
 import type { Schema, SchemaType } from '@/misc/json-schema.js';
-import type { MiLocalUser } from '@/models/User.js';
-import type { MiAccessToken } from '@/models/AccessToken.js';
+import type { MiLocalUser } from '../../../../features/users/backend/models/User.js';
+import type { MiAccessToken } from '../../../../features/auth/backend/models/AccessToken.js';
 import { ApiError } from './error.js';
 import type { IEndpointMeta } from './endpoints.js';
 

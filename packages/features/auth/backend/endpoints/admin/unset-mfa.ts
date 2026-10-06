@@ -7,12 +7,12 @@ import { Inject, Injectable } from '@nestjs/common';
 import { DataSource } from 'typeorm';
 import { Endpoint } from '@/server/api/endpoint-base.js';
 import { ApiError } from '@/server/api/error.js';
-import { MiUserProfile } from '@/models/UserProfile.js';
-import { MiUserSecurityKey } from '@/models/UserSecurityKey.js';
+import { MiUserProfile } from '../../../../users/backend/models/UserProfile.js';
+import { MiUserSecurityKey } from '../../models/UserSecurityKey.js';
 import type { UsersRepository } from '@/models/_.js';
 import { DI } from '@/di-symbols.js';
-import { RoleService } from '@/core/RoleService.js';
-import { ModerationLogService } from '@/core/ModerationLogService.js';
+import { RoleService } from '../../../../roles/backend/services/RoleService.js';
+import { ModerationLogService } from '../../../../moderation/backend/services/ModerationLogService.js';
 
 export const meta = {
 	tags: ['admin'],

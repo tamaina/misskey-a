@@ -6,8 +6,8 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { Endpoint } from '@/server/api/endpoint-base.js';
 import type { GalleryLikesRepository, GalleryPostsRepository } from '@/models/_.js';
-import { FeaturedService, GALLERY_POSTS_RANKING_WINDOW } from '@/core/FeaturedService.js';
-import { IdService } from '@/core/IdService.js';
+import { FeaturedService, GALLERY_POSTS_RANKING_WINDOW } from '../../../../../discovery/backend/services/FeaturedService.js';
+import { IdService } from '../../../../../runtime/backend/services/IdService.js';
 import { DI } from '@/di-symbols.js';
 import { ApiError } from '@/server/api/error.js';
 

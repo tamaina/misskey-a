@@ -8,7 +8,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { Endpoint } from '@/server/api/endpoint-base.js';
 import type { UserProfilesRepository } from '@/models/_.js';
 import { DI } from '@/di-symbols.js';
-import { UserAuthService } from '@/core/UserAuthService.js';
+import { UserAuthService } from '../../services/UserAuthService.js';
 
 export const meta = {
 	requireCredential: true,

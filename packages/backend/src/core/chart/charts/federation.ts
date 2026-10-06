@@ -11,7 +11,7 @@ import { DI } from '@/di-symbols.js';
 import { bindThis } from '@/decorators.js';
 import { acquireChartInsertLock } from '@/misc/distributed-lock.js';
 import Chart from '../core.js';
-import { ChartLoggerService } from '../ChartLoggerService.js';
+import { ChartLoggerService } from '../../../../../features/statistics/backend/services/ChartLoggerService.js';
 import { name, schema } from './entities/federation.js';
 import type { KVs } from '../core.js';
 

@@ -5,8 +5,8 @@
 
 import { Injectable } from '@nestjs/common';
 import { Endpoint } from '@/server/api/endpoint-base.js';
-import { ClipEntityService } from '@/core/entities/ClipEntityService.js';
-import { ClipService } from '@/core/ClipService.js';
+import { ClipEntityService } from '../../serializers/ClipEntityService.js';
+import { ClipService } from '../../services/ClipService.js';
 import { ApiError } from '@/server/api/error.js';
 
 export const meta = {

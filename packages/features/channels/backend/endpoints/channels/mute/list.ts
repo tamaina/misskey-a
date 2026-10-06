@@ -5,8 +5,8 @@
 
 import { Injectable } from '@nestjs/common';
 import { Endpoint } from '@/server/api/endpoint-base.js';
-import { ChannelMutingService } from '@/core/ChannelMutingService.js';
-import { ChannelEntityService } from '@/core/entities/ChannelEntityService.js';
+import { ChannelMutingService } from '../../../services/ChannelMutingService.js';
+import { ChannelEntityService } from '../../../serializers/ChannelEntityService.js';
 
 export const meta = {
 	tags: ['channels', 'mute'],

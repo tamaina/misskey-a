@@ -34,3 +34,5 @@ export function toLegacyJsonSchema(
 	});
 	return legacySchema;
 }
+
+export { featureProcedure } from './procedure.js';

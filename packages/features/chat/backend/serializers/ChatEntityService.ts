@@ -8,11 +8,11 @@ import { DI } from '@/di-symbols.js';
 import type { MiUser, ChatMessagesRepository, MiChatMessage, ChatRoomsRepository, MiChatRoom, MiChatRoomInvitation, ChatRoomInvitationsRepository, MiChatRoomMembership, ChatRoomMembershipsRepository } from '@/models/_.js';
 import { awaitAll } from '@/misc/prelude/await-all.js';
 import type { Packed } from '@/misc/json-schema.js';
-import type { } from '@/models/Blocking.js';
+import type { } from '../../../relationships/backend/models/Blocking.js';
 import { bindThis } from '@/decorators.js';
-import { IdService } from '@/core/IdService.js';
-import { UserEntityService } from '@/core/entities/UserEntityService.js';
-import { DriveFileEntityService } from '@/core/entities/DriveFileEntityService.js';
+import { IdService } from '../../../runtime/backend/services/IdService.js';
+import { UserEntityService } from '../../../users/backend/serializers/UserEntityService.js';
+import { DriveFileEntityService } from '../../../drive/backend/serializers/DriveFileEntityService.js';
 import { In } from 'typeorm';
 
 @Injectable()

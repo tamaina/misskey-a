@@ -7,15 +7,15 @@ import { afterEach, beforeEach, describe, expect, test, beforeAll, afterAll, vi 
 import type { Mocked } from 'vitest';
 import { Test, TestingModule } from '@nestjs/testing';
 import { randomString } from '../utils.js';
-import { MiUser } from '@/models/User.js';
+import { MiUser } from '../../../features/users/backend/models/User.js';
 import { MiWebhook, UsersRepository, WebhooksRepository } from '@/models/_.js';
-import { IdService } from '@/core/IdService.js';
+import { IdService } from '../../../features/runtime/backend/services/IdService.js';
 import { GlobalModule } from '@/GlobalModule.js';
-import { GlobalEventService } from '@/core/GlobalEventService.js';
+import { GlobalEventService } from '../../../features/runtime/backend/services/GlobalEventService.js';
 import { DI } from '@/di-symbols.js';
-import { QueueService } from '@/core/QueueService.js';
-import { LoggerService } from '@/core/LoggerService.js';
-import { UserWebhookService } from '@/core/UserWebhookService.js';
+import { QueueService } from '../../../features/runtime/backend/services/QueueService.js';
+import { LoggerService } from '../../../features/runtime/backend/services/LoggerService.js';
+import { UserWebhookService } from '../../../features/integrations/backend/services/UserWebhookService.js';
 
 describe('UserWebhookService', () => {
 	let app: TestingModule;

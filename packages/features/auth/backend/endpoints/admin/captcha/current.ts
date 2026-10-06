@@ -5,7 +5,7 @@
 
 import { Injectable } from '@nestjs/common';
 import { Endpoint } from '@/server/api/endpoint-base.js';
-import { CaptchaService, supportedCaptchaProviders } from '@/core/CaptchaService.js';
+import { CaptchaService, supportedCaptchaProviders } from '../../../services/CaptchaService.js';
 
 export const meta = {
 	tags: ['admin', 'captcha'],

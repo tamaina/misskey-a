@@ -8,12 +8,12 @@ import { In } from 'typeorm';
 import { DI } from '@/di-symbols.js';
 import { bindThis } from '@/decorators.js';
 import type { AbuseUserReportsRepository, MiAbuseUserReport, MiUser, UsersRepository } from '@/models/_.js';
-import { AbuseReportNotificationService } from '@/core/AbuseReportNotificationService.js';
-import { QueueService } from '@/core/QueueService.js';
-import { ApRendererService } from '@/core/activitypub/ApRendererService.js';
-import { ModerationLogService } from '@/core/ModerationLogService.js';
-import { SystemAccountService } from '@/core/SystemAccountService.js';
-import { IdService } from '@/core/IdService.js';
+import { AbuseReportNotificationService } from './AbuseReportNotificationService.js';
+import { QueueService } from '../../../runtime/backend/services/QueueService.js';
+import { ApRendererService } from '../../../federation/backend/services/ApRendererService.js';
+import { ModerationLogService } from './ModerationLogService.js';
+import { SystemAccountService } from '../../../users/backend/services/SystemAccountService.js';
+import { IdService } from '../../../runtime/backend/services/IdService.js';
 
 @Injectable()
 export class AbuseReportService {

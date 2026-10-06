@@ -5,10 +5,10 @@
 
 import { Inject, Injectable } from '@nestjs/common';
 import { Endpoint } from '@/server/api/endpoint-base.js';
-import { NoteEntityService } from '@/core/entities/NoteEntityService.js';
+import { NoteEntityService } from '../../serializers/NoteEntityService.js';
 import { GetterService } from '@/server/api/GetterService.js';
 import { DI } from '@/di-symbols.js';
-import { MiMeta } from '@/models/Meta.js';
+import { MiMeta } from '../../../../instance/backend/models/Meta.js';
 import { ApiError } from '@/server/api/error.js';
 
 export const meta = {

@@ -9,7 +9,7 @@ import { Endpoint } from '@/server/api/endpoint-base.js';
 import type { MutingsRepository } from '@/models/_.js';
 import { DI } from '@/di-symbols.js';
 import { GetterService } from '@/server/api/GetterService.js';
-import { UserMutingService } from '@/core/UserMutingService.js';
+import { UserMutingService } from '../../services/UserMutingService.js';
 import { ApiError } from '@/server/api/error.js';
 
 export const meta = {

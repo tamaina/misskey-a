@@ -6,8 +6,8 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { Endpoint } from '@/server/api/endpoint-base.js';
 import { DI } from '@/di-symbols.js';
-import { IdService } from '@/core/IdService.js';
-import { AvatarDecorationService } from '@/core/AvatarDecorationService.js';
+import { IdService } from '../../../../../runtime/backend/services/IdService.js';
+import { AvatarDecorationService } from '../../../services/AvatarDecorationService.js';
 
 export const meta = {
 	tags: ['admin'],

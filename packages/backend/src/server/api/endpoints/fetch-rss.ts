@@ -6,7 +6,7 @@
 import Parser from 'rss-parser';
 import { Injectable } from '@nestjs/common';
 import { Endpoint } from '@/server/api/endpoint-base.js';
-import { HttpRequestService } from '@/core/HttpRequestService.js';
+import { HttpRequestService } from '../../../../../features/runtime/backend/services/HttpRequestService.js';
 import { ApiError } from '../error.js';
 
 const MAX_URL_LENGTH = 8192;

@@ -6,7 +6,7 @@
 import { describe, expect, test, vi } from 'vitest';
 import { createOperations } from '@features/operations/backend';
 import { createPortability } from '@features/portability/backend';
-import type { MiLocalUser } from '@/models/User.js';
+import type { MiLocalUser } from '../../../../features/users/backend/models/User.js';
 import * as pause from './endpoints/admin/queue/pause.js';
 import * as clear from './endpoints/admin/queue/clear.js';
 import * as following from './endpoints/i/export-following.js';

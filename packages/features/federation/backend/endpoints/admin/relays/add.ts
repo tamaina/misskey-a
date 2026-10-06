@@ -6,7 +6,7 @@
 import { URL } from 'node:url';
 import { Injectable } from '@nestjs/common';
 import { Endpoint } from '@/server/api/endpoint-base.js';
-import { RelayService } from '@/core/RelayService.js';
+import { RelayService } from '../../../services/RelayService.js';
 import { ApiError } from '@/server/api/error.js';
 
 export const meta = {

@@ -119,6 +119,9 @@ export function createPortability(deps: PortabilityDependencies) {
 
 export type PortabilityFeature = ReturnType<typeof createPortability>;
 
+export { createPortabilityImportCommands, legacyPortabilityImportSchemas } from './import-commands.js';
+export type { Antenna, PortabilityImportActor, PortabilityImportDependencies, PortabilityImportFeature } from './import-commands.js';
+
 export const legacyPortabilitySchemas: Record<keyof typeof portabilityInputs, { input: JsonSchema }> = {
 	'i/export-antennas': { input: toLegacyJsonSchema(portabilityInputs['i/export-antennas']) },
 	'i/export-blocking': { input: toLegacyJsonSchema(portabilityInputs['i/export-blocking']) },

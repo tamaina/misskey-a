@@ -57,3 +57,6 @@ type Outputs = InferContractRouterOutputs<typeof portabilityContract>;
 export type PortabilityEndpoints = {
 	[K in keyof typeof portabilityContract]: { req: Inputs[K]; res: Outputs[K] };
 };
+
+export { portabilityImportContract, portabilityImportErrors, portabilityImportInputs } from './imports.js';
+export type { PortabilityImportEndpoints } from './imports.js';

@@ -19,7 +19,7 @@ import { initTelemetry, shutdownTelemetry } from '@/core/telemetry/telemetry-reg
 import { initExtraThreadPool, acquireLegacyRole } from './common.js';
 import { createProcessRoles, planRoles, stopClusterWorkers } from '@features/boot/backend';
 import { readyRef } from './ready.js';
-import { installShutdownSignalHandlers, isShutdownInProgress } from './shutdown-handler.js';
+import { installShutdownSignalHandlers, isShutdownInProgress } from '../../../features/boot/backend/signals.js';
 
 const logger = new Logger('core', 'cyan');
 const bootLogger = logger.createSubLogger('boot', 'magenta');

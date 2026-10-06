@@ -5,7 +5,7 @@
 
 import { Inject, Injectable } from '@nestjs/common';
 import type { FlashsRepository, FlashLikesRepository } from '@/models/_.js';
-import { IdService } from '@/core/IdService.js';
+import { IdService } from '../../../../runtime/backend/services/IdService.js';
 import { Endpoint } from '@/server/api/endpoint-base.js';
 import { DI } from '@/di-symbols.js';
 import { ApiError } from '@/server/api/error.js';

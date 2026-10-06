@@ -6,9 +6,9 @@
 import ms from '@/runtime-dependencies/ms.js';
 import { Injectable } from '@nestjs/common';
 import { Endpoint } from '@/server/api/endpoint-base.js';
-import { GlobalEventService } from '@/core/GlobalEventService.js';
-import { DriveFileEntityService } from '@/core/entities/DriveFileEntityService.js';
-import { DriveService } from '@/core/DriveService.js';
+import { GlobalEventService } from '../../../../../runtime/backend/services/GlobalEventService.js';
+import { DriveFileEntityService } from '../../../serializers/DriveFileEntityService.js';
+import { DriveService } from '../../../services/DriveService.js';
 
 export const meta = {
 	tags: ['drive'],

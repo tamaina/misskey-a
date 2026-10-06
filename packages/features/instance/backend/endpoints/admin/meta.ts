@@ -5,11 +5,11 @@
 
 import { Inject, Injectable } from '@nestjs/common';
 import { Endpoint } from '@/server/api/endpoint-base.js';
-import { MetaService } from '@/core/MetaService.js';
+import { MetaService } from '../../services/MetaService.js';
 import type { Config } from '@/config.js';
 import { DI } from '@/di-symbols.js';
-import { DEFAULT_POLICIES } from '@/core/RoleService.js';
-import { SystemAccountService } from '@/core/SystemAccountService.js';
+import { DEFAULT_POLICIES } from '../../../../roles/backend/services/RoleService.js';
+import { SystemAccountService } from '../../../../users/backend/services/SystemAccountService.js';
 
 export const meta = {
 	tags: ['meta'],

@@ -7,10 +7,10 @@ import { Inject, Injectable } from '@nestjs/common';
 import type { UsersRepository, SigninsRepository, UserProfilesRepository } from '@/models/_.js';
 import { Endpoint } from '@/server/api/endpoint-base.js';
 import { DI } from '@/di-symbols.js';
-import { RoleService } from '@/core/RoleService.js';
-import { RoleEntityService } from '@/core/entities/RoleEntityService.js';
-import { IdService } from '@/core/IdService.js';
-import { notificationRecieveConfig } from '@/models/json-schema/user.js';
+import { RoleService } from '../../../../roles/backend/services/RoleService.js';
+import { RoleEntityService } from '../../../../roles/backend/serializers/RoleEntityService.js';
+import { IdService } from '../../../../runtime/backend/services/IdService.js';
+import { notificationRecieveConfig } from '../../../../users/backend/models/json-schema/user.js';
 
 export const meta = {
 	tags: ['admin'],

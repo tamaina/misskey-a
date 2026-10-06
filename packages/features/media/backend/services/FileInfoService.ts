@@ -16,12 +16,12 @@ import probeImageSize from 'probe-image-size';
 import { sharpBmp } from '@misskey-dev/sharp-read-bmp';
 import * as blurhash from 'blurhash';
 import { createTempDir } from '@/misc/create-temp.js';
-import { SensitiveMediaDetectionService } from '@/core/SensitiveMediaDetectionService.js';
-import { LoggerService } from '@/core/LoggerService.js';
+import { SensitiveMediaDetectionService } from './SensitiveMediaDetectionService.js';
+import { LoggerService } from '../../../runtime/backend/services/LoggerService.js';
 import type Logger from '@/logger.js';
 import { bindThis } from '@/decorators.js';
 import { isMimeImage } from '@/misc/is-mime-image.js';
-import type { Prediction } from '@/core/SensitiveMediaDetectionService.js';
+import type { Prediction } from './SensitiveMediaDetectionService.js';
 
 export type FileInfo = {
 	size: number;

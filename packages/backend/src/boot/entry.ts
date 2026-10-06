@@ -14,7 +14,7 @@ import Xev from 'xev';
 import Logger from '@/logger.js';
 import { envOption } from '../env.js';
 import { installProcessErrorHandlers } from './process-error-handler.js';
-import { isShutdownInProgress } from './shutdown-handler.js';
+import { isShutdownInProgress } from '../../../features/boot/backend/signals.js';
 import { readyRef } from './ready.js';
 
 import 'reflect-metadata';

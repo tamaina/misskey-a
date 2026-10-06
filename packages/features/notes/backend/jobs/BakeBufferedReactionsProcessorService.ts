@@ -6,7 +6,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import type Logger from '@/logger.js';
 import { bindThis } from '@/decorators.js';
-import { ReactionsBufferingService } from '@/core/ReactionsBufferingService.js';
+import { ReactionsBufferingService } from '../services/ReactionsBufferingService.js';
 import { QueueLoggerService } from '@/queue/QueueLoggerService.js';
 import type * as Bull from 'bullmq';
 import { MiMeta } from '@/models/_.js';

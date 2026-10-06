@@ -5,23 +5,23 @@
 
 import { Brackets, In, IsNull, Not } from 'typeorm';
 import { Injectable, Inject } from '@nestjs/common';
-import type { MiUser, MiLocalUser, MiRemoteUser } from '@/models/User.js';
-import type { MiNote, IMentionedRemoteUsers } from '@/models/Note.js';
+import type { MiUser, MiLocalUser, MiRemoteUser } from '../../../users/backend/models/User.js';
+import type { MiNote, IMentionedRemoteUsers } from '../models/Note.js';
 import type { InstancesRepository, MiMeta, NotesRepository, UsersRepository } from '@/models/_.js';
-import { RelayService } from '@/core/RelayService.js';
-import { FederatedInstanceService } from '@/core/FederatedInstanceService.js';
+import { RelayService } from '../../../federation/backend/services/RelayService.js';
+import { FederatedInstanceService } from '../../../federation/backend/services/FederatedInstanceService.js';
 import { DI } from '@/di-symbols.js';
 import type { Config } from '@/config.js';
 import NotesChart from '@/core/chart/charts/notes.js';
 import PerUserNotesChart from '@/core/chart/charts/per-user-notes.js';
 import InstanceChart from '@/core/chart/charts/instance.js';
-import { GlobalEventService } from '@/core/GlobalEventService.js';
-import { ApRendererService } from '@/core/activitypub/ApRendererService.js';
-import { ApDeliverManagerService } from '@/core/activitypub/ApDeliverManagerService.js';
-import { UserEntityService } from '@/core/entities/UserEntityService.js';
+import { GlobalEventService } from '../../../runtime/backend/services/GlobalEventService.js';
+import { ApRendererService } from '../../../federation/backend/services/ApRendererService.js';
+import { ApDeliverManagerService } from '../../../federation/backend/services/ApDeliverManagerService.js';
+import { UserEntityService } from '../../../users/backend/serializers/UserEntityService.js';
 import { bindThis } from '@/decorators.js';
-import { SearchService } from '@/core/SearchService.js';
-import { ModerationLogService } from '@/core/ModerationLogService.js';
+import { SearchService } from '../../../discovery/backend/services/SearchService.js';
+import { ModerationLogService } from '../../../moderation/backend/services/ModerationLogService.js';
 import { isQuote, isRenote } from '@/misc/is-renote.js';
 
 @Injectable()

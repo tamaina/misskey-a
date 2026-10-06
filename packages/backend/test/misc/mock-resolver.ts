@@ -4,12 +4,12 @@
  */
 
 import type { Config } from '@/config.js';
-import type { ApDbResolverService } from '@/core/activitypub/ApDbResolverService.js';
-import type { ApRendererService } from '@/core/activitypub/ApRendererService.js';
-import type { ApRequestService } from '@/core/activitypub/ApRequestService.js';
-import type { IObject } from '@/core/activitypub/type.js';
-import type { HttpRequestService } from '@/core/HttpRequestService.js';
-import type { LoggerService } from '@/core/LoggerService.js';
+import type { ApDbResolverService } from '../../../features/federation/backend/services/ApDbResolverService.js';
+import type { ApRendererService } from '../../../features/federation/backend/services/ApRendererService.js';
+import type { ApRequestService } from '../../../features/federation/backend/services/ApRequestService.js';
+import type { IObject } from '../../../features/federation/backend/protocol/type.js';
+import type { HttpRequestService } from '../../../features/runtime/backend/services/HttpRequestService.js';
+import type { LoggerService } from '../../../features/runtime/backend/services/LoggerService.js';
 import type { UtilityService } from '@/core/UtilityService.js';
 import type {
 	FollowRequestsRepository,
@@ -19,9 +19,9 @@ import type {
 	PollsRepository,
 	UsersRepository,
 } from '@/models/_.js';
-import { SystemAccountService } from '@/core/SystemAccountService.js';
+import { SystemAccountService } from '../../../features/users/backend/services/SystemAccountService.js';
 import { bindThis } from '@/decorators.js';
-import { Resolver } from '@/core/activitypub/ApResolverService.js';
+import { Resolver } from '../../../features/federation/backend/services/ApResolverService.js';
 
 type MockResponse = {
 	type: string;

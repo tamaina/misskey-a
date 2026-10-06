@@ -5,13 +5,13 @@
 
 import { Inject, Injectable } from '@nestjs/common';
 import type { UserListsRepository } from '@/models/_.js';
-import { IdService } from '@/core/IdService.js';
-import type { MiUserList } from '@/models/UserList.js';
+import { IdService } from '../../../../../runtime/backend/services/IdService.js';
+import type { MiUserList } from '../../../models/UserList.js';
 import { Endpoint } from '@/server/api/endpoint-base.js';
-import { UserListEntityService } from '@/core/entities/UserListEntityService.js';
+import { UserListEntityService } from '../../../serializers/UserListEntityService.js';
 import { DI } from '@/di-symbols.js';
 import { ApiError } from '@/server/api/error.js';
-import { RoleService } from '@/core/RoleService.js';
+import { RoleService } from '../../../../../roles/backend/services/RoleService.js';
 
 export const meta = {
 	tags: ['lists'],

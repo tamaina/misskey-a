@@ -7,16 +7,16 @@ import { Inject, Injectable, OnApplicationShutdown } from '@nestjs/common';
 import type { SummalyResult } from '@misskey-dev/summaly';
 import { DI } from '@/di-symbols.js';
 import type { Config } from '@/config.js';
-import { HttpRequestService } from '@/core/HttpRequestService.js';
+import { HttpRequestService } from '../../../../features/runtime/backend/services/HttpRequestService.js';
 import type Logger from '@/logger.js';
 import { deepClone } from '@/misc/clone.js';
 import { query } from '@/misc/prelude/url.js';
 import { MemoryKVCache } from '@/misc/cache.js';
-import { LoggerService } from '@/core/LoggerService.js';
+import { LoggerService } from '../../../../features/runtime/backend/services/LoggerService.js';
 import { UtilityService } from '@/core/UtilityService.js';
 import { bindThis } from '@/decorators.js';
 import { ApiError } from '@/server/api/error.js';
-import { MiMeta } from '@/models/Meta.js';
+import { MiMeta } from '../../../../features/instance/backend/models/Meta.js';
 import type { FastifyRequest, FastifyReply } from 'fastify';
 
 @Injectable()

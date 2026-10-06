@@ -7,17 +7,17 @@ import { Inject, Injectable } from '@nestjs/common';
 import { DI } from '@/di-symbols.js';
 import type { NotesRepository, UserNotePiningsRepository, UsersRepository } from '@/models/_.js';
 import { IdentifiableError } from '@/misc/identifiable-error.js';
-import type { MiUser } from '@/models/User.js';
-import type { MiNote } from '@/models/Note.js';
-import { IdService } from '@/core/IdService.js';
-import type { MiUserNotePining } from '@/models/UserNotePining.js';
-import { RelayService } from '@/core/RelayService.js';
+import type { MiUser } from '../../../users/backend/models/User.js';
+import type { MiNote } from '../models/Note.js';
+import { IdService } from '../../../runtime/backend/services/IdService.js';
+import type { MiUserNotePining } from '../models/UserNotePining.js';
+import { RelayService } from '../../../federation/backend/services/RelayService.js';
 import type { Config } from '@/config.js';
-import { UserEntityService } from '@/core/entities/UserEntityService.js';
-import { ApDeliverManagerService } from '@/core/activitypub/ApDeliverManagerService.js';
-import { ApRendererService } from '@/core/activitypub/ApRendererService.js';
+import { UserEntityService } from '../../../users/backend/serializers/UserEntityService.js';
+import { ApDeliverManagerService } from '../../../federation/backend/services/ApDeliverManagerService.js';
+import { ApRendererService } from '../../../federation/backend/services/ApRendererService.js';
 import { bindThis } from '@/decorators.js';
-import { RoleService } from '@/core/RoleService.js';
+import { RoleService } from '../../../roles/backend/services/RoleService.js';
 
 @Injectable()
 export class NotePiningService {

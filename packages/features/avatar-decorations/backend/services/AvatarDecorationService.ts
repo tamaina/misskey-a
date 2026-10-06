@@ -6,13 +6,13 @@
 import { Inject, Injectable, OnApplicationShutdown } from '@nestjs/common';
 import * as Redis from 'ioredis';
 import type { AvatarDecorationsRepository, MiAvatarDecoration, MiUser } from '@/models/_.js';
-import { IdService } from '@/core/IdService.js';
-import { GlobalEventService } from '@/core/GlobalEventService.js';
+import { IdService } from '../../../runtime/backend/services/IdService.js';
+import { GlobalEventService } from '../../../runtime/backend/services/GlobalEventService.js';
 import { DI } from '@/di-symbols.js';
 import { bindThis } from '@/decorators.js';
 import { MemorySingleCache } from '@/misc/cache.js';
-import type { GlobalEvents } from '@/core/GlobalEventService.js';
-import { ModerationLogService } from '@/core/ModerationLogService.js';
+import type { GlobalEvents } from '../../../runtime/backend/services/GlobalEventService.js';
+import { ModerationLogService } from '../../../moderation/backend/services/ModerationLogService.js';
 
 @Injectable()
 export class AvatarDecorationService implements OnApplicationShutdown {

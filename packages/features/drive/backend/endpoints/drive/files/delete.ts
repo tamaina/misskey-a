@@ -6,10 +6,10 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { Endpoint } from '@/server/api/endpoint-base.js';
 import type { DriveFilesRepository } from '@/models/_.js';
-import { DriveService } from '@/core/DriveService.js';
-import { GlobalEventService } from '@/core/GlobalEventService.js';
+import { DriveService } from '../../../services/DriveService.js';
+import { GlobalEventService } from '../../../../../runtime/backend/services/GlobalEventService.js';
 import { DI } from '@/di-symbols.js';
-import { RoleService } from '@/core/RoleService.js';
+import { RoleService } from '../../../../../roles/backend/services/RoleService.js';
 import { ApiError } from '@/server/api/error.js';
 
 export const meta = {

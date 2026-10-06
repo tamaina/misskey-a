@@ -6,17 +6,17 @@
 import { Inject, Injectable, OnApplicationShutdown } from '@nestjs/common';
 import * as Redis from 'ioredis';
 import { In, IsNull } from 'typeorm';
-import { EmojiEntityService } from '@/core/entities/EmojiEntityService.js';
-import { GlobalEventService } from '@/core/GlobalEventService.js';
-import { IdService } from '@/core/IdService.js';
-import { ModerationLogService } from '@/core/ModerationLogService.js';
+import { EmojiEntityService } from '../serializers/EmojiEntityService.js';
+import { GlobalEventService } from '../../../runtime/backend/services/GlobalEventService.js';
+import { IdService } from '../../../runtime/backend/services/IdService.js';
+import { ModerationLogService } from '../../../moderation/backend/services/ModerationLogService.js';
 import { UtilityService } from '@/core/UtilityService.js';
 import { bindThis } from '@/decorators.js';
 import { DI } from '@/di-symbols.js';
 import { MemoryKVCache, RedisSingleCache } from '@/misc/cache.js';
 import { sqlLikeEscape } from '@/misc/sql-like-escape.js';
 import type { EmojisRepository, MiRole, MiUser } from '@/models/_.js';
-import type { MiEmoji } from '@/models/Emoji.js';
+import type { MiEmoji } from '../models/Emoji.js';
 import type { Serialized } from '@/types.js';
 
 const parseEmojiStrRegexp = /^([-\w]+)(?:@([\w.-]+))?$/;

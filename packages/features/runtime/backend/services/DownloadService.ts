@@ -11,10 +11,10 @@ import got, * as Got from '@/runtime-dependencies/got.js';
 import { parse } from 'content-disposition';
 import { DI } from '@/di-symbols.js';
 import type { Config } from '@/config.js';
-import { HttpRequestService } from '@/core/HttpRequestService.js';
+import { HttpRequestService } from './HttpRequestService.js';
 import { createTemp } from '@/misc/create-temp.js';
 import { StatusError } from '@/misc/status-error.js';
-import { LoggerService } from '@/core/LoggerService.js';
+import { LoggerService } from './LoggerService.js';
 import type Logger from '@/logger.js';
 
 import { bindThis } from '@/decorators.js';

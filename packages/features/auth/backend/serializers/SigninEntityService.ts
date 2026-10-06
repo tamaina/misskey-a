@@ -4,10 +4,10 @@
  */
 
 import { Injectable } from '@nestjs/common';
-import type { } from '@/models/Blocking.js';
-import type { MiSignin } from '@/models/Signin.js';
+import type { } from '../../../relationships/backend/models/Blocking.js';
+import type { MiSignin } from '../models/Signin.js';
 import { bindThis } from '@/decorators.js';
-import { IdService } from '@/core/IdService.js';
+import { IdService } from '../../../runtime/backend/services/IdService.js';
 
 @Injectable()
 export class SigninEntityService {

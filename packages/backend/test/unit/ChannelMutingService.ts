@@ -9,9 +9,9 @@ import { afterEach, beforeEach, describe, expect, beforeAll, afterAll, test } fr
 import { Test, TestingModule } from '@nestjs/testing';
 import { GlobalModule } from '@/GlobalModule.js';
 import { CoreModule } from '@/core/CoreModule.js';
-import { GlobalEventService } from '@/core/GlobalEventService.js';
-import { IdService } from '@/core/IdService.js';
-import { ChannelMutingService } from '@/core/ChannelMutingService.js';
+import { GlobalEventService } from '../../../features/runtime/backend/services/GlobalEventService.js';
+import { IdService } from '../../../features/runtime/backend/services/IdService.js';
+import { ChannelMutingService } from '../../../features/channels/backend/services/ChannelMutingService.js';
 import {
 	ChannelMutingRepository,
 	ChannelsRepository,

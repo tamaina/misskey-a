@@ -4,7 +4,7 @@
  */
 
 import { beforeEach, describe, expect, test, vi } from 'vitest';
-import { HttpRequestService } from '@/core/HttpRequestService.js';
+import { HttpRequestService } from '../../../../../../features/runtime/backend/services/HttpRequestService.js';
 import FetchRssEndpoint, { meta } from '@/server/api/endpoints/fetch-rss.js';
 import { ApiError } from '@/server/api/error.js';
 import type { Mocked } from 'vitest';

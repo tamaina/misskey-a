@@ -5,7 +5,7 @@
 
 import { Entity, Column, PrimaryColumn, ManyToOne } from 'typeorm';
 import { id } from '@/models/util/id.js';
-import { MiUser } from '@/models/User.js';
+import { MiUser } from '../../../users/backend/models/User.js';
 
 @Entity('meta')
 export class MiMeta {

@@ -10,12 +10,12 @@ import { Endpoint } from '@/server/api/endpoint-base.js';
 import type { NotesRepository, AntennasRepository } from '@/models/_.js';
 import { QueryService } from '@/core/QueryService.js';
 import { DI } from '@/di-symbols.js';
-import { NoteEntityService } from '@/core/entities/NoteEntityService.js';
-import { IdService } from '@/core/IdService.js';
-import { FanoutTimelineService } from '@/core/FanoutTimelineService.js';
-import { GlobalEventService } from '@/core/GlobalEventService.js';
+import { NoteEntityService } from '../../../../notes/backend/serializers/NoteEntityService.js';
+import { IdService } from '../../../../runtime/backend/services/IdService.js';
+import { FanoutTimelineService } from '../../services/FanoutTimelineService.js';
+import { GlobalEventService } from '../../../../runtime/backend/services/GlobalEventService.js';
 import { trackPromise } from '@/misc/promise-tracker.js';
-import { ChannelMutingService } from '@/core/ChannelMutingService.js';
+import { ChannelMutingService } from '../../../../channels/backend/services/ChannelMutingService.js';
 import { ApiError } from '@/server/api/error.js';
 
 export const meta = {

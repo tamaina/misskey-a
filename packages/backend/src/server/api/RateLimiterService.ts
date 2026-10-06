@@ -8,7 +8,7 @@ import Limiter from 'ratelimiter';
 import * as Redis from 'ioredis';
 import { DI } from '@/di-symbols.js';
 import type Logger from '@/logger.js';
-import { LoggerService } from '@/core/LoggerService.js';
+import { LoggerService } from '../../../../features/runtime/backend/services/LoggerService.js';
 import { bindThis } from '@/decorators.js';
 import type { IEndpointMeta } from './endpoints.js';
 

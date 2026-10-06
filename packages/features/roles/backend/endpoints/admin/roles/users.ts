@@ -9,8 +9,8 @@ import type { RoleAssignmentsRepository, RolesRepository } from '@/models/_.js';
 import { Endpoint } from '@/server/api/endpoint-base.js';
 import { QueryService } from '@/core/QueryService.js';
 import { DI } from '@/di-symbols.js';
-import { UserEntityService } from '@/core/entities/UserEntityService.js';
-import { IdService } from '@/core/IdService.js';
+import { UserEntityService } from '../../../../../users/backend/serializers/UserEntityService.js';
+import { IdService } from '../../../../../runtime/backend/services/IdService.js';
 import { ApiError } from '@/server/api/error.js';
 
 export const meta = {

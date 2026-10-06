@@ -5,7 +5,7 @@
 
 import { JoinColumn, ManyToOne, Entity, PrimaryColumn, Index, Column } from 'typeorm';
 import { id } from '@/models/util/id.js';
-import { MiUser } from '@/models/User.js';
+import { MiUser } from '../../../users/backend/models/User.js';
 
 @Entity('drive_folder')
 export class MiDriveFolder {

@@ -5,9 +5,9 @@
 
 import { Inject, Injectable } from '@nestjs/common';
 import { Endpoint } from '@/server/api/endpoint-base.js';
-import { FlashLikeEntityService } from '@/core/entities/FlashLikeEntityService.js';
+import { FlashLikeEntityService } from '../../serializers/FlashLikeEntityService.js';
 import { DI } from '@/di-symbols.js';
-import { FlashService } from '@/core/FlashService.js';
+import { FlashService } from '../../services/FlashService.js';
 
 export const meta = {
 	tags: ['account', 'flash'],

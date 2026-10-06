@@ -8,10 +8,10 @@ import promiseLimit from 'promise-limit';
 import type { MiUser } from '@/models/_.js';
 import { toArray, unique } from '@/misc/prelude/array.js';
 import { bindThis } from '@/decorators.js';
-import { isMention } from '@/core/activitypub/type.js';
+import { isMention } from '../protocol/type.js';
 import { Resolver } from './ApResolverService.js';
 import { ApPersonService } from './ApPersonService.js';
-import type { IObject, IApMention } from '@/core/activitypub/type.js';
+import type { IObject, IApMention } from '../protocol/type.js';
 
 @Injectable()
 export class ApMentionService {

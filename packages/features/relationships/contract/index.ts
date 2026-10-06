@@ -5,3 +5,5 @@
 
 export { listContract, listErrors, listInputs } from './lists.js';
 export type { ListEndpoints } from './lists.js';
+export { relationshipContract, relationshipErrors, relationshipInputs } from './commands.js';
+export type { RelationshipEndpoints } from './commands.js';

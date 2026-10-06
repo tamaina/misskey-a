@@ -7,19 +7,19 @@ import { Inject, Injectable, OnApplicationShutdown, OnModuleInit } from '@nestjs
 import * as Redis from 'ioredis';
 import { ModuleRef } from '@nestjs/core';
 import type { UserListMembershipsRepository } from '@/models/_.js';
-import type { MiUser } from '@/models/User.js';
-import type { MiUserList } from '@/models/UserList.js';
-import type { MiUserListMembership } from '@/models/UserListMembership.js';
-import { IdService } from '@/core/IdService.js';
-import type { GlobalEvents } from '@/core/GlobalEventService.js';
-import { GlobalEventService } from '@/core/GlobalEventService.js';
+import type { MiUser } from '../../../users/backend/models/User.js';
+import type { MiUserList } from '../models/UserList.js';
+import type { MiUserListMembership } from '../models/UserListMembership.js';
+import { IdService } from '../../../runtime/backend/services/IdService.js';
+import type { GlobalEvents } from '../../../runtime/backend/services/GlobalEventService.js';
+import { GlobalEventService } from '../../../runtime/backend/services/GlobalEventService.js';
 import { DI } from '@/di-symbols.js';
-import { UserEntityService } from '@/core/entities/UserEntityService.js';
+import { UserEntityService } from '../../../users/backend/serializers/UserEntityService.js';
 import { bindThis } from '@/decorators.js';
-import { QueueService } from '@/core/QueueService.js';
+import { QueueService } from '../../../runtime/backend/services/QueueService.js';
 import { RedisKVCache } from '@/misc/cache.js';
-import { RoleService } from '@/core/RoleService.js';
-import { SystemAccountService } from '@/core/SystemAccountService.js';
+import { RoleService } from '../../../roles/backend/services/RoleService.js';
+import { SystemAccountService } from '../../../users/backend/services/SystemAccountService.js';
 
 @Injectable()
 export class UserListService implements OnApplicationShutdown, OnModuleInit {

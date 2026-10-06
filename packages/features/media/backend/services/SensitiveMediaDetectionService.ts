@@ -6,8 +6,8 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { DI } from '@/di-symbols.js';
 import { bindThis } from '@/decorators.js';
-import { HttpRequestService } from '@/core/HttpRequestService.js';
-import { LoggerService } from '@/core/LoggerService.js';
+import { HttpRequestService } from '../../../runtime/backend/services/HttpRequestService.js';
+import { LoggerService } from '../../../runtime/backend/services/LoggerService.js';
 import type { MiMeta } from '@/models/_.js';
 import type Logger from '@/logger.js';
 

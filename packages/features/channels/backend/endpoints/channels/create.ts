@@ -7,9 +7,9 @@ import { Inject, Injectable } from '@nestjs/common';
 import ms from '@/runtime-dependencies/ms.js';
 import { Endpoint } from '@/server/api/endpoint-base.js';
 import type { ChannelsRepository, DriveFilesRepository } from '@/models/_.js';
-import type { MiChannel } from '@/models/Channel.js';
-import { IdService } from '@/core/IdService.js';
-import { ChannelEntityService } from '@/core/entities/ChannelEntityService.js';
+import type { MiChannel } from '../../models/Channel.js';
+import { IdService } from '../../../../runtime/backend/services/IdService.js';
+import { ChannelEntityService } from '../../serializers/ChannelEntityService.js';
 import { DI } from '@/di-symbols.js';
 import { ApiError } from '@/server/api/error.js';
 

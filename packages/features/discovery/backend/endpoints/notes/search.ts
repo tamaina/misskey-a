@@ -5,10 +5,10 @@
 
 import { Injectable } from '@nestjs/common';
 import { Endpoint } from '@/server/api/endpoint-base.js';
-import { SearchService } from '@/core/SearchService.js';
-import { NoteEntityService } from '@/core/entities/NoteEntityService.js';
-import { RoleService } from '@/core/RoleService.js';
-import { IdService } from '@/core/IdService.js';
+import { SearchService } from '../../services/SearchService.js';
+import { NoteEntityService } from '../../../../notes/backend/serializers/NoteEntityService.js';
+import { RoleService } from '../../../../roles/backend/services/RoleService.js';
+import { IdService } from '../../../../runtime/backend/services/IdService.js';
 import { ApiError } from '@/server/api/error.js';
 
 export const meta = {

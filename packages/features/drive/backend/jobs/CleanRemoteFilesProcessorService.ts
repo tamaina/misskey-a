@@ -8,7 +8,7 @@ import { IsNull, MoreThan, Not } from 'typeorm';
 import { DI } from '@/di-symbols.js';
 import type { MiDriveFile, DriveFilesRepository } from '@/models/_.js';
 import type Logger from '@/logger.js';
-import { DriveService } from '@/core/DriveService.js';
+import { DriveService } from '../services/DriveService.js';
 import { bindThis } from '@/decorators.js';
 import { QueueLoggerService } from '@/queue/QueueLoggerService.js';
 import type * as Bull from 'bullmq';

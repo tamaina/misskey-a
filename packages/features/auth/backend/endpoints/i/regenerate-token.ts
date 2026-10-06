@@ -8,7 +8,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { Endpoint } from '@/server/api/endpoint-base.js';
 import type { UsersRepository, UserProfilesRepository } from '@/models/_.js';
 import { generateNativeUserToken } from '@/misc/token.js';
-import { GlobalEventService } from '@/core/GlobalEventService.js';
+import { GlobalEventService } from '../../../../runtime/backend/services/GlobalEventService.js';
 import { DI } from '@/di-symbols.js';
 
 export const meta = {

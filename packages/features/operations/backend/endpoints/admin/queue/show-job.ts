@@ -5,7 +5,7 @@
 
 import { Injectable } from '@nestjs/common';
 import { Endpoint } from '@/server/api/endpoint-base.js';
-import { QUEUE_TYPES, QueueService } from '@/core/QueueService.js';
+import { QUEUE_TYPES, QueueService } from '../../../../../runtime/backend/services/QueueService.js';
 
 export const meta = {
 	tags: ['admin'],

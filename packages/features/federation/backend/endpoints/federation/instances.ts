@@ -6,8 +6,8 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { Endpoint } from '@/server/api/endpoint-base.js';
 import type { InstancesRepository } from '@/models/_.js';
-import { InstanceEntityService } from '@/core/entities/InstanceEntityService.js';
-import { MetaService } from '@/core/MetaService.js';
+import { InstanceEntityService } from '../../../../instance/backend/serializers/InstanceEntityService.js';
+import { MetaService } from '../../../../instance/backend/services/MetaService.js';
 import { DI } from '@/di-symbols.js';
 import { sqlLikeEscape } from '@/misc/sql-like-escape.js';
 

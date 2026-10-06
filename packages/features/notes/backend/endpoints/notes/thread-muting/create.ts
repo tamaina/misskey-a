@@ -3,85 +3,22 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Inject, Injectable } from '@nestjs/common';
+import { legacyNotesCommandSchemas } from '../../../commands.js';
+import { notesCommandErrors } from '../../../../contract/index.js';
+import type { Schema } from '@/misc/json-schema.js';
 import ms from '@/runtime-dependencies/ms.js';
-import type { NotesRepository, NoteThreadMutingsRepository } from '@/models/_.js';
-import { IdService } from '@/core/IdService.js';
 import { Endpoint } from '@/server/api/endpoint-base.js';
-import { GetterService } from '@/server/api/GetterService.js';
-import { DI } from '@/di-symbols.js';
-import { ApiError } from '@/server/api/error.js';
+import { defineFeatureEndpoint } from '@/server/api/feature-endpoint.js';
 
 export const meta = {
 	tags: ['notes'],
-
 	requireCredential: true,
-
 	kind: 'write:account',
-
-	limit: {
-		duration: ms('1hour'),
-		max: 10,
-	},
-
-	errors: {
-		noSuchNote: {
-			message: 'No such note.',
-			code: 'NO_SUCH_NOTE',
-			id: '5ff67ada-ed3b-2e71-8e87-a1a421e177d2',
-		},
-
-		alreadyMuting: {
-			message: 'You are already muting that thread.',
-			code: 'ALREADY_MUTING',
-			id: 'c146e22d-1141-4b31-b28d-176371014d18',
-		},
-	},
+	limit: { duration: ms('1hour'), max: 10 },
+	errors: notesCommandErrors['notes/thread-muting/create'],
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {
-		noteId: { type: 'string', format: 'misskey:id' },
-	},
-	required: ['noteId'],
-} as const;
+export const paramDef = legacyNotesCommandSchemas['notes/thread-muting/create'].input as Schema;
 
-@Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
-	constructor(
-		@Inject(DI.notesRepository)
-		private notesRepository: NotesRepository,
-
-		@Inject(DI.noteThreadMutingsRepository)
-		private noteThreadMutingsRepository: NoteThreadMutingsRepository,
-
-		private getterService: GetterService,
-		private idService: IdService,
-	) {
-		super(meta, paramDef, async (ps, me) => {
-			const note = await this.getterService.getNote(ps.noteId).catch(err => {
-				if (err.id === '9725d0ce-ba28-4dde-95a7-2cbb2c15de24') throw new ApiError(meta.errors.noSuchNote);
-				throw err;
-			});
-
-			// Check if already muting
-			const exist = await this.noteThreadMutingsRepository.exists({
-				where: {
-					threadId: note.threadId ?? note.id,
-					userId: me.id,
-				},
-			});
-
-			if (exist) {
-				throw new ApiError(meta.errors.alreadyMuting);
-			}
-
-			await this.noteThreadMutingsRepository.insert({
-				id: this.idService.gen(),
-				threadId: note.threadId ?? note.id,
-				userId: me.id,
-			});
-		});
-	}
-}
+export const { feature, createEndpoint } = defineFeatureEndpoint('notesCommands', commands =>
+	new Endpoint(meta, paramDef, async (params, user) => commands['notes/thread-muting/create'](params, { context: { actor: user } })));

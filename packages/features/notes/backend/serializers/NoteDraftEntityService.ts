@@ -13,10 +13,10 @@ import type { MiUser, MiNote, MiNoteDraft } from '@/models/_.js';
 import type { NoteDraftsRepository, ChannelsRepository } from '@/models/_.js';
 import { bindThis } from '@/decorators.js';
 import { DebounceLoader } from '@/misc/loader.js';
-import { IdService } from '@/core/IdService.js';
+import { IdService } from '../../../runtime/backend/services/IdService.js';
 import type { OnModuleInit } from '@nestjs/common';
-import type { UserEntityService } from '@/core/entities/UserEntityService.js';
-import type { DriveFileEntityService } from '@/core/entities/DriveFileEntityService.js';
+import type { UserEntityService } from '../../../users/backend/serializers/UserEntityService.js';
+import type { DriveFileEntityService } from '../../../drive/backend/serializers/DriveFileEntityService.js';
 import type { NoteEntityService } from './NoteEntityService.js';
 
 @Injectable()

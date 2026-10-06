@@ -6,12 +6,12 @@
 import { Inject, Injectable } from '@nestjs/common';
 import ms from '@/runtime-dependencies/ms.js';
 import type { NoteFavoritesRepository } from '@/models/_.js';
-import { IdService } from '@/core/IdService.js';
+import { IdService } from '../../../../../runtime/backend/services/IdService.js';
 import { Endpoint } from '@/server/api/endpoint-base.js';
 import { GetterService } from '@/server/api/GetterService.js';
 import { DI } from '@/di-symbols.js';
-import { AchievementService } from '@/core/AchievementService.js';
-import { NoteEntityService } from '@/core/entities/NoteEntityService.js';
+import { AchievementService } from '../../../../../users/backend/services/AchievementService.js';
+import { NoteEntityService } from '../../../../../notes/backend/serializers/NoteEntityService.js';
 import { ApiError } from '@/server/api/error.js';
 
 export const meta = {

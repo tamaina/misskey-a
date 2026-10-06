@@ -15,11 +15,11 @@ import {
 	MiNote,
 } from '@/models/_.js';
 import { bindThis } from '@/decorators.js';
-import { RoleService } from '@/core/RoleService.js';
-import { IdService } from '@/core/IdService.js';
-import type { MiUser } from '@/models/User.js';
+import { RoleService } from '../../../roles/backend/services/RoleService.js';
+import { IdService } from '../../../runtime/backend/services/IdService.js';
+import type { MiUser } from '../../../users/backend/models/User.js';
 import { IdentifiableError } from '@/misc/identifiable-error.js';
-import { ModerationLogService } from '@/core/ModerationLogService.js';
+import { ModerationLogService } from '../../../moderation/backend/services/ModerationLogService.js';
 
 export interface PageBody {
 	title: string;

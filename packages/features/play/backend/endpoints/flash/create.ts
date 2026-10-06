@@ -6,10 +6,10 @@
 import ms from '@/runtime-dependencies/ms.js';
 import { Inject, Injectable } from '@nestjs/common';
 import type { FlashsRepository } from '@/models/_.js';
-import { IdService } from '@/core/IdService.js';
+import { IdService } from '../../../../runtime/backend/services/IdService.js';
 import { Endpoint } from '@/server/api/endpoint-base.js';
 import { DI } from '@/di-symbols.js';
-import { FlashEntityService } from '@/core/entities/FlashEntityService.js';
+import { FlashEntityService } from '../../serializers/FlashEntityService.js';
 
 export const meta = {
 	tags: ['flash'],

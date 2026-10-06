@@ -20,7 +20,16 @@ import type { ListEndpoints } from '../../relationships/contract/index.js';
 
 import type { ChannelEndpoints } from '../../channels/contract/index.js';
 
-export type FeatureEndpoints = InstanceEndpoints
+import type { ModerationCommandEndpoints } from '../../moderation/contract/index.js';
+import type { NotesCommandEndpoints } from '../../notes/contract/index.js';
+import type { RelationshipEndpoints } from '../../relationships/contract/commands.js';
+import type { PortabilityImportEndpoints } from '../../portability/contract/imports.js';
+
+export type FeatureEndpoints = ModerationCommandEndpoints
+	& NotesCommandEndpoints
+	& RelationshipEndpoints
+	& PortabilityImportEndpoints
+	& InstanceEndpoints
 	& StatisticsEndpoints
 	& AvatarDecorationEndpoints
 	& EmojiEndpoints

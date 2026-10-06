@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { webhookEventTypes } from '@/models/Webhook.js';
+import { webhookEventTypes } from '../Webhook.js';
 
 export const packedUserWebhookSchema = {
 	type: 'object',

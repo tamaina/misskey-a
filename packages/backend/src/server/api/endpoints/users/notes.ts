@@ -7,16 +7,16 @@ import { Brackets } from 'typeorm';
 import { Inject, Injectable } from '@nestjs/common';
 import type { MiMeta, NotesRepository } from '@/models/_.js';
 import { Endpoint } from '@/server/api/endpoint-base.js';
-import { NoteEntityService } from '@/core/entities/NoteEntityService.js';
+import { NoteEntityService } from '../../../../../../features/notes/backend/serializers/NoteEntityService.js';
 import { DI } from '@/di-symbols.js';
 import { CacheService } from '@/core/CacheService.js';
-import { IdService } from '@/core/IdService.js';
+import { IdService } from '../../../../../../features/runtime/backend/services/IdService.js';
 import { QueryService } from '@/core/QueryService.js';
-import { MiLocalUser } from '@/models/User.js';
-import { FanoutTimelineEndpointService } from '@/core/FanoutTimelineEndpointService.js';
-import { FanoutTimelineName } from '@/core/FanoutTimelineService.js';
+import { MiLocalUser } from '../../../../../../features/users/backend/models/User.js';
+import { FanoutTimelineEndpointService } from '../../../../../../features/timelines/backend/services/FanoutTimelineEndpointService.js';
+import { FanoutTimelineName } from '../../../../../../features/timelines/backend/services/FanoutTimelineService.js';
 import { ApiError } from '@/server/api/error.js';
-import { ChannelMutingService } from '@/core/ChannelMutingService.js';
+import { ChannelMutingService } from '../../../../../../features/channels/backend/services/ChannelMutingService.js';
 
 export const meta = {
 	tags: ['users', 'notes'],

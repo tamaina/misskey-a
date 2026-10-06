@@ -5,7 +5,7 @@
 
 import { Entity, Column, Index, OneToOne, JoinColumn, PrimaryColumn } from 'typeorm';
 import { id } from '@/models/util/id.js';
-import { MiDriveFile } from '@/models/DriveFile.js';
+import { MiDriveFile } from '../../../drive/backend/models/DriveFile.js';
 
 @Entity('user')
 @Index(['usernameLower', 'host'], { unique: true })

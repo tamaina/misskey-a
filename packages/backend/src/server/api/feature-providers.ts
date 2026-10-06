@@ -5,6 +5,10 @@
 
 import * as os from 'node:os';
 import {
+	createModerationCommands,
+	createNotesCommands,
+	createRelationshipCommands,
+	createPortabilityImportCommands,
 	createAvatarDecorationCommands,
 	createAnnouncementCommands,
 	createWebhookCommands,
@@ -23,47 +27,72 @@ import {
 	createEmojis,
 } from '@features/index/backend';
 import type { FeatureApis } from '@features/index/backend';
-import { ChatService, ChatMessageAccessError } from '@/core/ChatService.js';
-import { ClipService } from '@/core/ClipService.js';
-import { CustomEmojiService } from '@/core/CustomEmojiService.js';
-import { NotificationService } from '@/core/NotificationService.js';
-import type { MiChatRoom } from '@/models/ChatRoom.js';
-import type { MiChatMessage } from '@/models/ChatMessage.js';
-import type { MiAnnouncement } from '@/models/Announcement.js';
-import type { MiWebhook } from '@/models/Webhook.js';
-import type { MiUserList } from '@/models/UserList.js';
-import type { MiUserListFavorite } from '@/models/UserListFavorite.js';
-import type { MiUser } from '@/models/User.js';
-import type { MiLocalUser } from '@/models/User.js';
-import { AnnouncementService } from '@/core/AnnouncementService.js';
-import { UserListService } from '@/core/UserListService.js';
+import { ChatService, ChatMessageAccessError } from '../../../../features/chat/backend/services/ChatService.js';
+import { ClipService } from '../../../../features/collections/backend/services/ClipService.js';
+import { CustomEmojiService } from '../../../../features/emojis/backend/services/CustomEmojiService.js';
+import { NotificationService } from '../../../../features/notifications/backend/services/NotificationService.js';
+import type { MiChatRoom } from '../../../../features/chat/backend/models/ChatRoom.js';
+import type { MiChatMessage } from '../../../../features/chat/backend/models/ChatMessage.js';
+import type { MiAnnouncement } from '../../../../features/announcements/backend/models/Announcement.js';
+import type { MiWebhook } from '../../../../features/integrations/backend/models/Webhook.js';
+import type { MiUserList } from '../../../../features/relationships/backend/models/UserList.js';
+import type { MiUserListFavorite } from '../../../../features/relationships/backend/models/UserListFavorite.js';
+import type { MiUser } from '../../../../features/users/backend/models/User.js';
+import type { MiLocalUser } from '../../../../features/users/backend/models/User.js';
+import { AnnouncementService } from '../../../../features/announcements/backend/services/AnnouncementService.js';
+import { UserListService } from '../../../../features/relationships/backend/services/UserListService.js';
 import { GetterService } from '@/server/api/GetterService.js';
-import { ChannelFollowingService } from '@/core/ChannelFollowingService.js';
-import { ChannelMutingService } from '@/core/ChannelMutingService.js';
+import { ChannelFollowingService } from '../../../../features/channels/backend/services/ChannelFollowingService.js';
+import { ChannelMutingService } from '../../../../features/channels/backend/services/ChannelMutingService.js';
 import { IdentifiableError } from '@/misc/identifiable-error.js';
-import type { MiChannel } from '@/models/Channel.js';
-import type { MiClip } from '@/models/Clip.js';
-import type { MiClipFavorite } from '@/models/ClipFavorite.js';
-import { IdService } from '@/core/IdService.js';
-import { GlobalEventService } from '@/core/GlobalEventService.js';
+import type { MiChannel } from '../../../../features/channels/backend/models/Channel.js';
+import type { MiClip } from '../../../../features/collections/backend/models/Clip.js';
+import type { MiClipFavorite } from '../../../../features/collections/backend/models/ClipFavorite.js';
+import { IdService } from '../../../../features/runtime/backend/services/IdService.js';
+import { GlobalEventService } from '../../../../features/runtime/backend/services/GlobalEventService.js';
 import { ApiError } from './error.js';
-import { QueueService } from '@/core/QueueService.js';
-import { ModerationLogService } from '@/core/ModerationLogService.js';
+import { QueueService } from '../../../../features/runtime/backend/services/QueueService.js';
+import { ModerationLogService } from '../../../../features/moderation/backend/services/ModerationLogService.js';
 import { MoreThan, IsNull } from 'typeorm';
 import { USER_ONLINE_THRESHOLD } from '@/const.js';
-import { EmojiEntityService } from '@/core/entities/EmojiEntityService.js';
-import { AvatarDecorationService } from '@/core/AvatarDecorationService.js';
-import { RoleService } from '@/core/RoleService.js';
+import { EmojiEntityService } from '../../../../features/emojis/backend/serializers/EmojiEntityService.js';
+import { AvatarDecorationService } from '../../../../features/avatar-decorations/backend/services/AvatarDecorationService.js';
+import { RoleService } from '../../../../features/roles/backend/services/RoleService.js';
 import NotesChart from '@/core/chart/charts/notes.js';
 import UsersChart from '@/core/chart/charts/users.js';
 import { DI } from '@/di-symbols.js';
-import type { MiMeta } from '@/models/Meta.js';
+import type { MiMeta } from '../../../../features/instance/backend/models/Meta.js';
 import type { UsersRepository, NoteReactionsRepository, InstancesRepository, EmojisRepository, AnnouncementsRepository, WebhooksRepository, UserListsRepository, UserListFavoritesRepository, UserListMembershipsRepository, BlockingsRepository, ChannelsRepository, ChannelFavoritesRepository, ClipsRepository, ClipFavoritesRepository } from '@/models/_.js';
 import type { Provider } from '@nestjs/common';
 
+import { UserSuspendService } from '../../../../features/moderation/backend/services/UserSuspendService.js';
+import { AbuseReportService } from '../../../../features/moderation/backend/services/AbuseReportService.js';
+import { AbuseReportNotificationService } from '../../../../features/moderation/backend/services/AbuseReportNotificationService.js';
+import { NoteDeleteService } from '../../../../features/notes/backend/services/NoteDeleteService.js';
+import { NoteDraftService } from '../../../../features/notes/backend/services/NoteDraftService.js';
+import { ReactionService } from '../../../../features/notes/backend/services/ReactionService.js';
+import { UserFollowingService } from '../../../../features/relationships/backend/services/UserFollowingService.js';
+import { UserMutingService } from '../../../../features/relationships/backend/services/UserMutingService.js';
+import { UserRenoteMutingService } from '../../../../features/relationships/backend/services/UserRenoteMutingService.js';
+import { DownloadService } from '../../../../features/runtime/backend/services/DownloadService.js';
+import { AccountMoveService } from '../../../../features/users/backend/services/AccountMoveService.js';
+import type { MiUserProfile, MiAbuseUserReport, MiNote, MiNoteDraft, MiMuting, MiRenoteMuting, MiDriveFile, UserProfilesRepository, AbuseUserReportsRepository, NoteThreadMutingsRepository, NotesRepository, PromoReadsRepository, MutingsRepository, RenoteMutingsRepository, DriveFilesRepository, AntennasRepository } from '@/models/_.js';
+
 // Transitional composition boundary: Nest resolves a feature, not each handler.
 // The feature itself receives narrow dependencies and has no container access.
+type ResolvedUser = Awaited<ReturnType<GetterService['getUser']>>;
+
 export type ApiFeatures = FeatureApis<{
+	relationshipUser: ResolvedUser;
+	moderationUser: MiUser;
+	moderationProfile: MiUserProfile;
+	moderationReport: MiAbuseUserReport;
+	note: MiNote;
+	noteDraft: MiNoteDraft;
+	noteAuthor: MiUser;
+	muting: MiMuting;
+	renoteMuting: MiRenoteMuting;
+	driveFile: MiDriveFile;
 	channel: MiChannel;
 	clip: MiClip;
 	clipFavorite: MiClipFavorite;
@@ -77,6 +106,10 @@ export type ApiFeatures = FeatureApis<{
 	favorite: MiUserListFavorite;
 }>;
 export const featureTokens = {
+	moderationCommands: Symbol('moderation command API feature'),
+	notesCommands: Symbol('note command API feature'),
+	relationshipCommands: Symbol('relationship command API feature'),
+	portabilityImportCommands: Symbol('portability import command API feature'),
 	channelCommands: Symbol('channel command API feature'),
 	clipFavoriteCommands: Symbol('clip favorite command API feature'),
 	listCommands: Symbol('list command API feature'),
@@ -94,7 +127,89 @@ export const featureTokens = {
 	avatarDecorations: Symbol('avatar decorations API feature'),
 	emojis: Symbol('emojis API feature'),
 } satisfies Record<keyof ApiFeatures, symbol>;
+
+function hasErrorId(error: unknown, id: string): boolean {
+	return typeof error === 'object' && error !== null && 'id' in error && error.id === id;
+}
+
 export const featureProviders: Provider[] = [{
+	provide: featureTokens.moderationCommands,
+	inject: [DI.usersRepository, DI.userProfilesRepository, DI.abuseUserReportsRepository, UserSuspendService, RoleService, ModerationLogService, AbuseReportService, AbuseReportNotificationService],
+	useFactory: (users: UsersRepository, profiles: UserProfilesRepository, reports: AbuseUserReportsRepository, suspension: UserSuspendService, roles: RoleService, logs: ModerationLogService, abuse: AbuseReportService, recipients: AbuseReportNotificationService) => createModerationCommands<MiUser, MiUserProfile, MiAbuseUserReport, MiLocalUser>({
+		findUserById: id => users.findOneBy({ id }),
+		isModerator: user => roles.isModerator(user),
+		suspend: (user, actor) => suspension.suspend(user, actor),
+		unsuspend: (user, actor) => suspension.unsuspend(user, actor),
+		updateUser: (id, values) => users.update(id, values),
+		findUserProfileByUserIdOrFail: userId => profiles.findOneByOrFail({ userId }),
+		updateUserProfile: (userId, values) => profiles.update({ userId }, values),
+		logUserAvatarUnset: (actor, values) => logs.log(actor, 'unsetUserAvatar', values),
+		logUserBannerUnset: (actor, values) => logs.log(actor, 'unsetUserBanner', values),
+		logUserNoteUpdate: (actor, values) => logs.log(actor, 'updateUserNote', values),
+		findAbuseReportById: id => reports.findOneBy({ id }),
+		forwardAbuseReport: (id, actor) => abuse.forward(id, actor),
+		resolveAbuseReports: (values, actor) => abuse.resolve(values, actor),
+		updateAbuseReport: (id, values, actor) => abuse.update(id, values, actor),
+		deleteAbuseReportNotificationRecipient: (id, actor) => recipients.deleteRecipient(id, actor),
+		createError: definition => new ApiError(definition),
+	}),
+}, {
+	provide: featureTokens.notesCommands,
+	inject: [GetterService, RoleService, DI.usersRepository, NoteDeleteService, NoteDraftService, ReactionService, DI.noteThreadMutingsRepository, DI.notesRepository, DI.promoReadsRepository, IdService],
+	useFactory: (getter: GetterService, roles: RoleService, users: UsersRepository, deletion: NoteDeleteService, drafts: NoteDraftService, reactions: ReactionService, threadMutings: NoteThreadMutingsRepository, notes: NotesRepository, promoReads: PromoReadsRepository, ids: IdService) => createNotesCommands<MiLocalUser, MiNote, MiNoteDraft, MiUser>({
+		getNote: id => getter.getNote(id),
+		isModerator: actor => roles.isModerator(actor),
+		findUserByIdOrFail: id => users.findOneByOrFail({ id }),
+		deleteNote: (author, note, quiet, deleter) => deletion.delete(author, note, quiet, deleter),
+		getDraft: (actor, id) => drafts.get(actor, id),
+		deleteDraft: (actor, id) => drafts.delete(actor, id),
+		createReaction: (actor, note, reaction) => reactions.create(actor, note, reaction),
+		deleteReaction: (actor, note) => reactions.delete(actor, note),
+		threadMuteExists: (threadId, userId) => threadMutings.exists({ where: { threadId, userId } }),
+		insertThreadMute: (id, threadId, userId) => threadMutings.insert({ id, threadId, userId }),
+		deleteThreadMute: (threadId, userId) => threadMutings.delete({ threadId, userId }),
+		findRenotesByUserAndRenote: (userId, renoteId) => notes.findBy({ userId, renoteId }),
+		promoReadExists: (noteId, userId) => promoReads.exists({ where: { noteId, userId } }),
+		insertPromoRead: (id, noteId, userId) => promoReads.insert({ id, noteId, userId }),
+		newId: () => ids.gen(),
+		createError: definition => new ApiError(definition),
+	}),
+}, {
+	provide: featureTokens.relationshipCommands,
+	inject: [GetterService, UserFollowingService, DI.mutingsRepository, UserMutingService, DI.renoteMutingsRepository, UserRenoteMutingService],
+	useFactory: (getter: GetterService, following: UserFollowingService, mutings: MutingsRepository, muting: UserMutingService, renoteMutings: RenoteMutingsRepository, renoteMuting: UserRenoteMutingService) => createRelationshipCommands<ResolvedUser, MiLocalUser, MiMuting, MiRenoteMuting>({
+		getUser: id => getter.getUser(id),
+		isMissingUserError: error => hasErrorId(error, '15348ddd-432d-49c2-8a5a-8069753becff'),
+		acceptFollowRequest: (actor, follower) => following.acceptFollowRequest(actor, follower),
+		rejectFollowRequest: (actor, follower) => following.rejectFollowRequest(actor, follower),
+		isMissingFollowRequestError: error => hasErrorId(error, '8884c2dd-5795-4ac9-b27e-6a01d38190f9'),
+		findMuting: (muterId, muteeId) => mutings.findOneBy({ muterId, muteeId }),
+		unmute: rows => muting.unmute(rows),
+		isRenoteMuting: (muterId, muteeId) => renoteMutings.exists({ where: { muterId, muteeId } }),
+		muteRenotes: (actor, target) => renoteMuting.mute(actor, target),
+		findRenoteMuting: (muterId, muteeId) => renoteMutings.findOneBy({ muterId, muteeId }),
+		unmuteRenotes: rows => renoteMuting.unmute(rows),
+		createError: definition => new ApiError(definition),
+	}),
+}, {
+	provide: featureTokens.portabilityImportCommands,
+	inject: [DI.usersRepository, DI.driveFilesRepository, DI.antennasRepository, RoleService, DownloadService, AccountMoveService, QueueService],
+	useFactory: (users: UsersRepository, files: DriveFilesRepository, antennas: AntennasRepository, roles: RoleService, downloads: DownloadService, moves: AccountMoveService, queue: QueueService) => createPortabilityImportCommands<MiLocalUser, MiDriveFile>({
+		userExists: id => users.exists({ where: { id } }),
+		findOwnedFile: (id, userId) => files.findOneBy({ id, userId }),
+		countAntennas: userId => antennas.countBy({ userId }),
+		getAntennaLimit: async userId => (await roles.getUserPolicies(userId)).antennaLimit,
+		downloadTextFile: url => downloads.downloadTextFile(url),
+		isMovingDuringGracePeriod: async actor => (await moves.validateAlsoKnownAs(actor, (_old, src) => !!src.movedAt && src.movedAt.getTime() + 1000 * 60 * 60 * 2 > Date.now(), true)) !== null,
+		createImportAntennasJob: (actor, data) => queue.createImportAntennasJob(actor, data),
+		createImportBlockingJob: (actor, id) => queue.createImportBlockingJob(actor, id),
+		createImportFollowingJob: (actor, id, withReplies) => queue.createImportFollowingJob(actor, id, withReplies),
+		createImportMutingJob: (actor, id) => queue.createImportMutingJob(actor, id),
+		createImportUserListsJob: (actor, id) => queue.createImportUserListsJob(actor, id),
+		createError: definition => new ApiError(definition),
+	}),
+},
+{
 	provide: featureTokens.channelCommands,
 	inject: [DI.channelsRepository, DI.channelFavoritesRepository, ChannelFollowingService, ChannelMutingService, IdService],
 	useFactory: (channels: ChannelsRepository, favorites: ChannelFavoritesRepository, following: ChannelFollowingService, muting: ChannelMutingService, ids: IdService) => createChannelCommands<MiChannel, MiLocalUser>({

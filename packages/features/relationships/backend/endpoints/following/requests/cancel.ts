@@ -6,9 +6,9 @@
 import { Injectable } from '@nestjs/common';
 import { Endpoint } from '@/server/api/endpoint-base.js';
 import { IdentifiableError } from '@/misc/identifiable-error.js';
-import { UserEntityService } from '@/core/entities/UserEntityService.js';
+import { UserEntityService } from '../../../../../users/backend/serializers/UserEntityService.js';
 import { GetterService } from '@/server/api/GetterService.js';
-import { UserFollowingService } from '@/core/UserFollowingService.js';
+import { UserFollowingService } from '../../../services/UserFollowingService.js';
 import { ApiError } from '@/server/api/error.js';
 
 export const meta = {

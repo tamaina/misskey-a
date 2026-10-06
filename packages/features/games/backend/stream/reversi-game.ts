@@ -6,8 +6,8 @@
 import { Inject, Injectable, Scope } from '@nestjs/common';
 import type { MiReversiGame } from '@/models/_.js';
 import { bindThis } from '@/decorators.js';
-import { ReversiService } from '@/core/ReversiService.js';
-import { ReversiGameEntityService } from '@/core/entities/ReversiGameEntityService.js';
+import { ReversiService } from '../services/ReversiService.js';
+import { ReversiGameEntityService } from '../serializers/ReversiGameEntityService.js';
 import { isJsonObject } from '@/misc/json-value.js';
 import type { JsonObject, JsonValue } from '@/misc/json-value.js';
 import Channel, { type ChannelRequest } from '@/server/api/stream/channel.js';

@@ -13,9 +13,16 @@ import { ApiLoggerService } from './ApiLoggerService.js';
 import type { Provider } from '@nestjs/common';
 
 const endpoints = Object.entries(endpointsObject);
-const endpointProviders = endpoints.map(([path, endpoint]): Provider => 'createEndpoint' in endpoint
-	? { provide: `ep:${path}`, inject: [featureTokens[endpoint.feature]], useFactory: endpoint.createEndpoint }
-	: { provide: `ep:${path}`, useClass: endpoint.default });
+const endpointProviders = endpoints.map(([path, endpoint]): Provider => {
+	if ('createEndpoint' in endpoint) {
+		return { provide: `ep:${path}`, inject: [featureTokens[endpoint.feature]], useFactory: endpoint.createEndpoint };
+	}
+
+	// Feature-owned endpoint classes expose their real constructor by its canonical
+	// name. The remaining eight host-owned class endpoints keep their default export.
+	const implementation = 'EndpointImplementation' in endpoint ? endpoint.EndpointImplementation : endpoint.default;
+	return { provide: `ep:${path}`, useClass: implementation };
+});
 
 @Module({
 	imports: [

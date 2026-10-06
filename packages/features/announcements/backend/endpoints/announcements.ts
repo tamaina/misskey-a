@@ -7,7 +7,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { Brackets } from 'typeorm';
 import { Endpoint } from '@/server/api/endpoint-base.js';
 import { QueryService } from '@/core/QueryService.js';
-import { AnnouncementEntityService } from '@/core/entities/AnnouncementEntityService.js';
+import { AnnouncementEntityService } from '../serializers/AnnouncementEntityService.js';
 import { DI } from '@/di-symbols.js';
 import type { AnnouncementsRepository } from '@/models/_.js';
 

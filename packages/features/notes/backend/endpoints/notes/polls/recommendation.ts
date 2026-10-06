@@ -7,7 +7,7 @@ import { Brackets, In } from 'typeorm';
 import { Inject, Injectable } from '@nestjs/common';
 import type { NotesRepository, MutingsRepository, PollsRepository, PollVotesRepository } from '@/models/_.js';
 import { Endpoint } from '@/server/api/endpoint-base.js';
-import { NoteEntityService } from '@/core/entities/NoteEntityService.js';
+import { NoteEntityService } from '../../../serializers/NoteEntityService.js';
 import { DI } from '@/di-symbols.js';
 
 export const meta = {

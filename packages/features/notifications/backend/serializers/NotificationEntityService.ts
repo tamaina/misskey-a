@@ -9,17 +9,17 @@ import { In } from 'typeorm';
 import { DI } from '@/di-symbols.js';
 import type { FollowRequestsRepository, NotesRepository, MiUser, UsersRepository } from '@/models/_.js';
 import { awaitAll } from '@/misc/prelude/await-all.js';
-import type { MiGroupedNotification, MiNotification } from '@/models/Notification.js';
-import type { MiNote } from '@/models/Note.js';
+import type { MiGroupedNotification, MiNotification } from '../models/Notification.js';
+import type { MiNote } from '../../../notes/backend/models/Note.js';
 import type { Packed } from '@/misc/json-schema.js';
 import { bindThis } from '@/decorators.js';
 import { FilterUnionByProperty, groupedNotificationTypes } from '@/types.js';
 import { CacheService } from '@/core/CacheService.js';
-import { RoleEntityService } from '@/core/entities/RoleEntityService.js';
-import { ChatEntityService } from '@/core/entities/ChatEntityService.js';
+import { RoleEntityService } from '../../../roles/backend/serializers/RoleEntityService.js';
+import { ChatEntityService } from '../../../chat/backend/serializers/ChatEntityService.js';
 import type { OnModuleInit } from '@nestjs/common';
-import type { UserEntityService } from '@/core/entities/UserEntityService.js';
-import type { NoteEntityService } from '@/core/entities/NoteEntityService.js';
+import type { UserEntityService } from '../../../users/backend/serializers/UserEntityService.js';
+import type { NoteEntityService } from '../../../notes/backend/serializers/NoteEntityService.js';
 
 const NOTE_REQUIRED_NOTIFICATION_TYPES = new Set([
 	'note',

@@ -7,9 +7,9 @@ import { Inject, Injectable } from '@nestjs/common';
 import ms from '@/runtime-dependencies/ms.js';
 import { Endpoint } from '@/server/api/endpoint-base.js';
 import type { DriveFoldersRepository } from '@/models/_.js';
-import { IdService } from '@/core/IdService.js';
-import { DriveFolderEntityService } from '@/core/entities/DriveFolderEntityService.js';
-import { GlobalEventService } from '@/core/GlobalEventService.js';
+import { IdService } from '../../../../../runtime/backend/services/IdService.js';
+import { DriveFolderEntityService } from '../../../serializers/DriveFolderEntityService.js';
+import { GlobalEventService } from '../../../../../runtime/backend/services/GlobalEventService.js';
 import { DI } from '@/di-symbols.js';
 import { ApiError } from '@/server/api/error.js';
 

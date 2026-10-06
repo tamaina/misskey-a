@@ -5,7 +5,7 @@
 
 import { Inject, Injectable } from '@nestjs/common';
 import { Endpoint } from '@/server/api/endpoint-base.js';
-import { webhookEventTypes } from '@/models/Webhook.js';
+import { webhookEventTypes } from '../../../models/Webhook.js';
 import type { WebhooksRepository } from '@/models/_.js';
 import { DI } from '@/di-symbols.js';
 

@@ -8,9 +8,9 @@ import { Endpoint } from '@/server/api/endpoint-base.js';
 import type { DriveFilesRepository, ChatMessagesRepository } from '@/models/_.js';
 import { QueryService } from '@/core/QueryService.js';
 import { DI } from '@/di-symbols.js';
-import { RoleService } from '@/core/RoleService.js';
-import { ChatEntityService } from '@/core/entities/ChatEntityService.js';
-import { ChatService } from '@/core/ChatService.js';
+import { RoleService } from '../../../../../roles/backend/services/RoleService.js';
+import { ChatEntityService } from '../../../../../chat/backend/serializers/ChatEntityService.js';
+import { ChatService } from '../../../../../chat/backend/services/ChatService.js';
 import { ApiError } from '@/server/api/error.js';
 
 export const meta = {

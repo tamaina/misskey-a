@@ -8,7 +8,7 @@ import { describe, expect, test, vi } from 'vitest';
 describe('shutdown-handler', () => {
 	test('runs shutdown tasks once and exits on SIGTERM or SIGINT', async () => {
 		vi.resetModules();
-		const { installShutdownSignalHandlers, isShutdownInProgress } = await import('@/boot/shutdown-handler.js');
+		const { installShutdownSignalHandlers, isShutdownInProgress } = await import('../../../../features/boot/backend/signals.js');
 		const handlers = new Map<string, () => Promise<void>>();
 		const processLike = {
 			once: vi.fn((event: string, handler: () => Promise<void>) => {
@@ -46,7 +46,7 @@ describe('shutdown-handler', () => {
 
 	test('continues with later shutdown tasks when an earlier task rejects', async () => {
 		vi.resetModules();
-		const { installShutdownSignalHandlers } = await import('@/boot/shutdown-handler.js');
+		const { installShutdownSignalHandlers } = await import('../../../../features/boot/backend/signals.js');
 		const handlers = new Map<string, () => Promise<void>>();
 		const processLike = {
 			once: vi.fn((event: string, handler: () => Promise<void>) => {
@@ -79,7 +79,7 @@ describe('shutdown-handler', () => {
 	test('exits after the shutdown deadline when a task remains pending', async () => {
 		vi.resetModules();
 		vi.useFakeTimers();
-		const { installShutdownSignalHandlers } = await import('@/boot/shutdown-handler.js');
+		const { installShutdownSignalHandlers } = await import('../../../../features/boot/backend/signals.js');
 		const handlers = new Map<string, () => Promise<void>>();
 		const processLike = {
 			once: vi.fn((event: string, handler: () => Promise<void>) => {
@@ -112,7 +112,7 @@ describe('shutdown-handler', () => {
 	});
 	test('startup failure uses the same shutdown path with a failing exit code', async () => {
 		vi.resetModules();
-		const { installShutdownSignalHandlers, isShutdownInProgress } = await import('@/boot/shutdown-handler.js');
+		const { installShutdownSignalHandlers, isShutdownInProgress } = await import('../../../../features/boot/backend/signals.js');
 		const exit = vi.fn();
 		const task = vi.fn(async () => { expect(isShutdownInProgress()).toBe(true); });
 		const shutdown = installShutdownSignalHandlers({ process: { once: vi.fn() }, shutdownTasks: [task], exit });

@@ -16,12 +16,12 @@ import type {
 	NotesRepository,
 } from '@/models/_.js';
 import type { Packed } from '@/misc/json-schema.js';
-import type { MiUser } from '@/models/User.js';
-import type { MiChannel } from '@/models/Channel.js';
+import type { MiUser } from '../../../users/backend/models/User.js';
+import type { MiChannel } from '../models/Channel.js';
 import { bindThis } from '@/decorators.js';
-import { IdService } from '@/core/IdService.js';
-import { DriveFileEntityService } from '@/core/entities/DriveFileEntityService.js';
-import { NoteEntityService } from '@/core/entities/NoteEntityService.js';
+import { IdService } from '../../../runtime/backend/services/IdService.js';
+import { DriveFileEntityService } from '../../../drive/backend/serializers/DriveFileEntityService.js';
+import { NoteEntityService } from '../../../notes/backend/serializers/NoteEntityService.js';
 
 @Injectable()
 export class ChannelEntityService {

@@ -14,7 +14,7 @@ import type { Packed } from '@/misc/json-schema.js';
 import type { Promiseable } from '@/misc/prelude/await-all.js';
 import { awaitAll } from '@/misc/prelude/await-all.js';
 import { USER_ACTIVE_THRESHOLD, USER_ONLINE_THRESHOLD } from '@/const.js';
-import type { MiLocalUser, MiPartialLocalUser, MiPartialRemoteUser, MiRemoteUser, MiUser } from '@/models/User.js';
+import type { MiLocalUser, MiPartialLocalUser, MiPartialRemoteUser, MiRemoteUser, MiUser } from '../models/User.js';
 import {
 	birthdaySchema,
 	descriptionSchema,
@@ -22,7 +22,7 @@ import {
 	locationSchema,
 	nameSchema,
 	passwordSchema,
-} from '@/models/User.js';
+} from '../models/User.js';
 import type {
 	BlockingsRepository,
 	FollowingsRepository,
@@ -40,17 +40,17 @@ import type {
 	UsersRepository,
 } from '@/models/_.js';
 import { bindThis } from '@/decorators.js';
-import { RoleService } from '@/core/RoleService.js';
-import { ApPersonService } from '@/core/activitypub/models/ApPersonService.js';
-import { FederatedInstanceService } from '@/core/FederatedInstanceService.js';
-import { IdService } from '@/core/IdService.js';
-import type { AnnouncementService } from '@/core/AnnouncementService.js';
-import type { CustomEmojiService } from '@/core/CustomEmojiService.js';
-import { AvatarDecorationService } from '@/core/AvatarDecorationService.js';
-import { ChatService } from '@/core/ChatService.js';
+import { RoleService } from '../../../roles/backend/services/RoleService.js';
+import { ApPersonService } from '../../../federation/backend/services/ApPersonService.js';
+import { FederatedInstanceService } from '../../../federation/backend/services/FederatedInstanceService.js';
+import { IdService } from '../../../runtime/backend/services/IdService.js';
+import type { AnnouncementService } from '../../../announcements/backend/services/AnnouncementService.js';
+import type { CustomEmojiService } from '../../../emojis/backend/services/CustomEmojiService.js';
+import { AvatarDecorationService } from '../../../avatar-decorations/backend/services/AvatarDecorationService.js';
+import { ChatService } from '../../../chat/backend/services/ChatService.js';
 import type { OnModuleInit } from '@nestjs/common';
-import type { NoteEntityService } from '@/core/entities/NoteEntityService.js';
-import type { PageEntityService } from '@/core/entities/PageEntityService.js';
+import type { NoteEntityService } from '../../../notes/backend/serializers/NoteEntityService.js';
+import type { PageEntityService } from '../../../pages/backend/serializers/PageEntityService.js';
 import { toArray } from '@/misc/prelude/array.js';
 
 const ajv = new Ajv();

@@ -6,12 +6,12 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { DataSource } from 'typeorm';
 import * as Redis from 'ioredis';
-import type { MiDriveFile } from '@/models/DriveFile.js';
+import type { MiDriveFile } from '../../../../../features/drive/backend/models/DriveFile.js';
 import { DI } from '@/di-symbols.js';
 import { bindThis } from '@/decorators.js';
 import { acquireChartInsertLock } from '@/misc/distributed-lock.js';
 import Chart from '../core.js';
-import { ChartLoggerService } from '../ChartLoggerService.js';
+import { ChartLoggerService } from '../../../../../features/statistics/backend/services/ChartLoggerService.js';
 import { name, schema } from './entities/drive.js';
 import type { KVs } from '../core.js';
 

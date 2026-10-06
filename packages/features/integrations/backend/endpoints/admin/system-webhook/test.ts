@@ -6,9 +6,9 @@
 import { Injectable } from '@nestjs/common';
 import ms from '@/runtime-dependencies/ms.js';
 import { Endpoint } from '@/server/api/endpoint-base.js';
-import { WebhookTestService } from '@/core/WebhookTestService.js';
+import { WebhookTestService } from '../../../services/WebhookTestService.js';
 import { ApiError } from '@/server/api/error.js';
-import { systemWebhookEventTypes } from '@/models/SystemWebhook.js';
+import { systemWebhookEventTypes } from '../../../models/SystemWebhook.js';
 
 export const meta = {
 	tags: ['webhooks'],

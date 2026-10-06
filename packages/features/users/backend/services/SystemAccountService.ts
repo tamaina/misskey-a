@@ -9,15 +9,15 @@ import type { OnApplicationShutdown } from '@nestjs/common';
 import { DataSource, IsNull } from 'typeorm';
 import * as Redis from 'ioredis';
 import bcrypt from 'bcryptjs';
-import { MiLocalUser, MiUser } from '@/models/User.js';
+import { MiLocalUser, MiUser } from '../models/User.js';
 import { MiSystemAccount, MiUsedUsername, MiUserKeypair, MiUserProfile, type UsersRepository, type SystemAccountsRepository } from '@/models/_.js';
 import type { MiMeta, UserProfilesRepository } from '@/models/_.js';
-import type { GlobalEvents } from '@/core/GlobalEventService.js';
+import type { GlobalEvents } from '../../../runtime/backend/services/GlobalEventService.js';
 import { MemoryKVCache } from '@/misc/cache.js';
 import { DI } from '@/di-symbols.js';
 import { bindThis } from '@/decorators.js';
 import { generateNativeUserToken } from '@/misc/token.js';
-import { IdService } from '@/core/IdService.js';
+import { IdService } from '../../../runtime/backend/services/IdService.js';
 import { genRsaKeyPair } from '@/misc/gen-key-pair.js';
 
 export const SYSTEM_ACCOUNT_TYPES = ['actor', 'relay', 'proxy'] as const;

@@ -3,4 +3,14 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-export { EndpointImplementation as default, meta, paramDef } from '../../../../../../features/portability/backend/endpoints/i/import-following.js';
+import { meta as featureMeta, paramDef as featureParamDef } from '../../../../../../features/portability/backend/endpoints/i/import-following.js';
+import type { Schema } from '@/misc/json-schema.js';
+import { Endpoint } from '@/server/api/endpoint-base.js';
+import { defineFeatureEndpoint } from '@/server/api/feature-endpoint.js';
+
+export const meta = featureMeta;
+export const paramDef = featureParamDef as Schema;
+
+export const { feature, createEndpoint } = defineFeatureEndpoint('portabilityImportCommands', commands => new Endpoint(meta, paramDef, async (params, user) => commands['i/import-following'](params, {
+	context: { actor: user },
+})));

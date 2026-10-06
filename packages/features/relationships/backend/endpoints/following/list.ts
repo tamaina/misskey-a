@@ -4,7 +4,7 @@
  */
 
 import { Inject, Injectable } from '@nestjs/common';
-import { FollowingEntityService } from '@/core/entities/FollowingEntityService.js';
+import { FollowingEntityService } from '../../serializers/FollowingEntityService.js';
 import type { FollowingsRepository } from '@/models/_.js';
 import { Endpoint } from '@/server/api/endpoint-base.js';
 import { QueryService } from '@/core/QueryService.js';

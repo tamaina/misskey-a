@@ -6,14 +6,14 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { DataSource } from 'typeorm';
 import * as Redis from 'ioredis';
-import type { MiUser } from '@/models/User.js';
-import type { MiNote } from '@/models/Note.js';
+import type { MiUser } from '../../../../../features/users/backend/models/User.js';
+import type { MiNote } from '../../../../../features/notes/backend/models/Note.js';
 import { DI } from '@/di-symbols.js';
-import { UserEntityService } from '@/core/entities/UserEntityService.js';
+import { UserEntityService } from '../../../../../features/users/backend/serializers/UserEntityService.js';
 import { bindThis } from '@/decorators.js';
 import { acquireChartInsertLock } from '@/misc/distributed-lock.js';
 import Chart from '../core.js';
-import { ChartLoggerService } from '../ChartLoggerService.js';
+import { ChartLoggerService } from '../../../../../features/statistics/backend/services/ChartLoggerService.js';
 import { name, schema } from './entities/per-user-reactions.js';
 import type { KVs } from '../core.js';
 

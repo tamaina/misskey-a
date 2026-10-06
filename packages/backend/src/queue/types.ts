@@ -4,14 +4,14 @@
  */
 
 import type { Antenna } from '@/server/api/endpoints/i/import-antennas.js';
-import type { MiDriveFile } from '@/models/DriveFile.js';
-import type { MiNote } from '@/models/Note.js';
-import type { SystemWebhookEventType } from '@/models/SystemWebhook.js';
-import type { MiUser } from '@/models/User.js';
-import type { MiWebhook, WebhookEventTypes } from '@/models/Webhook.js';
-import type { IActivity } from '@/core/activitypub/type.js';
-import type { SystemWebhookPayload } from '@/core/SystemWebhookService.js';
-import type { UserWebhookPayload } from '@/core/UserWebhookService.js';
+import type { MiDriveFile } from '../../../features/drive/backend/models/DriveFile.js';
+import type { MiNote } from '../../../features/notes/backend/models/Note.js';
+import type { SystemWebhookEventType } from '../../../features/integrations/backend/models/SystemWebhook.js';
+import type { MiUser } from '../../../features/users/backend/models/User.js';
+import type { MiWebhook, WebhookEventTypes } from '../../../features/integrations/backend/models/Webhook.js';
+import type { IActivity } from '../../../features/federation/backend/protocol/type.js';
+import type { SystemWebhookPayload } from '../../../features/integrations/backend/services/SystemWebhookService.js';
+import type { UserWebhookPayload } from '../../../features/integrations/backend/services/UserWebhookService.js';
 import type httpSignature from '@peertube/http-signature';
 
 export type DeliverJobData = {

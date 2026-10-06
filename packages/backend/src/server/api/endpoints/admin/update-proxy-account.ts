@@ -7,10 +7,10 @@ import { Injectable } from '@nestjs/common';
 import { Endpoint } from '@/server/api/endpoint-base.js';
 import {
 	descriptionSchema,
-} from '@/models/User.js';
-import { UserEntityService } from '@/core/entities/UserEntityService.js';
-import { ModerationLogService } from '@/core/ModerationLogService.js';
-import { SystemAccountService } from '@/core/SystemAccountService.js';
+} from '../../../../../../features/users/backend/models/User.js';
+import { UserEntityService } from '../../../../../../features/users/backend/serializers/UserEntityService.js';
+import { ModerationLogService } from '../../../../../../features/moderation/backend/services/ModerationLogService.js';
+import { SystemAccountService } from '../../../../../../features/users/backend/services/SystemAccountService.js';
 
 export const meta = {
 	tags: ['admin'],

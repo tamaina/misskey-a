@@ -6,7 +6,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { Endpoint } from '@/server/api/endpoint-base.js';
 import type { GalleryPostsRepository } from '@/models/_.js';
-import { GalleryPostEntityService } from '@/core/entities/GalleryPostEntityService.js';
+import { GalleryPostEntityService } from '../../serializers/GalleryPostEntityService.js';
 import { DI } from '@/di-symbols.js';
 
 export const meta = {

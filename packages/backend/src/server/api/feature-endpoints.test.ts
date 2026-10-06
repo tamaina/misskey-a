@@ -8,7 +8,7 @@ import { createEmojis } from '@features/emojis/backend';
 import { createEndpoint as createEmojiEndpoint, meta as emojiMeta } from './endpoints/emoji.js';
 import { createEndpoint as createEmojisEndpoint, meta as emojisMeta } from './endpoints/emojis.js';
 import { createAvatarDecorations } from '@features/avatar-decorations/backend';
-import type { MiLocalUser } from '@/models/User.js';
+import type { MiLocalUser } from '../../../../features/users/backend/models/User.js';
 import { createEndpoint as createDecorationsEndpoint, meta as decorationsMeta } from './endpoints/get-avatar-decorations.js';
 import { createStatistics } from '@features/statistics/backend';
 import { createEndpoint as createStatsEndpoint, meta as statsMeta } from './endpoints/stats.js';

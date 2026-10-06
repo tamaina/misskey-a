@@ -5,16 +5,16 @@
 
 import { afterEach, beforeAll, describe, test, expect } from 'vitest';
 import { Test, TestingModule } from '@nestjs/testing';
-import { CustomEmojiService } from '@/core/CustomEmojiService.js';
-import { EmojiEntityService } from '@/core/entities/EmojiEntityService.js';
-import { GlobalEventService } from '@/core/GlobalEventService.js';
-import { IdService } from '@/core/IdService.js';
-import { ModerationLogService } from '@/core/ModerationLogService.js';
+import { CustomEmojiService } from '../../../features/emojis/backend/services/CustomEmojiService.js';
+import { EmojiEntityService } from '../../../features/emojis/backend/serializers/EmojiEntityService.js';
+import { GlobalEventService } from '../../../features/runtime/backend/services/GlobalEventService.js';
+import { IdService } from '../../../features/runtime/backend/services/IdService.js';
+import { ModerationLogService } from '../../../features/moderation/backend/services/ModerationLogService.js';
 import { UtilityService } from '@/core/UtilityService.js';
 import { DI } from '@/di-symbols.js';
 import { GlobalModule } from '@/GlobalModule.js';
 import { EmojisRepository } from '@/models/_.js';
-import { MiEmoji } from '@/models/Emoji.js';
+import { MiEmoji } from '../../../features/emojis/backend/models/Emoji.js';
 
 describe('CustomEmojiService', () => {
 	let app: TestingModule;

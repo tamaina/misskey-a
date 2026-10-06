@@ -5,8 +5,8 @@
 
 import { Injectable } from '@nestjs/common';
 import { Endpoint } from '@/server/api/endpoint-base.js';
-import { UserEntityService } from '@/core/entities/UserEntityService.js';
-import { NotePiningService } from '@/core/NotePiningService.js';
+import { UserEntityService } from '../../../../users/backend/serializers/UserEntityService.js';
+import { NotePiningService } from '../../services/NotePiningService.js';
 import { ApiError } from '@/server/api/error.js';
 
 export const meta = {

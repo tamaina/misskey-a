@@ -6,15 +6,15 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { DI } from '@/di-symbols.js';
 import type { NotesRepository, UsersRepository, PollsRepository, PollVotesRepository, MiUser } from '@/models/_.js';
-import type { MiNote } from '@/models/Note.js';
-import { RelayService } from '@/core/RelayService.js';
-import { IdService } from '@/core/IdService.js';
-import { GlobalEventService } from '@/core/GlobalEventService.js';
-import { ApRendererService } from '@/core/activitypub/ApRendererService.js';
-import { UserEntityService } from '@/core/entities/UserEntityService.js';
-import { ApDeliverManagerService } from '@/core/activitypub/ApDeliverManagerService.js';
+import type { MiNote } from '../models/Note.js';
+import { RelayService } from '../../../federation/backend/services/RelayService.js';
+import { IdService } from '../../../runtime/backend/services/IdService.js';
+import { GlobalEventService } from '../../../runtime/backend/services/GlobalEventService.js';
+import { ApRendererService } from '../../../federation/backend/services/ApRendererService.js';
+import { UserEntityService } from '../../../users/backend/serializers/UserEntityService.js';
+import { ApDeliverManagerService } from '../../../federation/backend/services/ApDeliverManagerService.js';
 import { bindThis } from '@/decorators.js';
-import { UserBlockingService } from '@/core/UserBlockingService.js';
+import { UserBlockingService } from '../../../relationships/backend/services/UserBlockingService.js';
 
 @Injectable()
 export class PollService {

@@ -7,7 +7,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { Endpoint } from '@/server/api/endpoint-base.js';
 import type { AdsRepository } from '@/models/_.js';
 import { DI } from '@/di-symbols.js';
-import { ModerationLogService } from '@/core/ModerationLogService.js';
+import { ModerationLogService } from '../../../../../moderation/backend/services/ModerationLogService.js';
 import { ApiError } from '@/server/api/error.js';
 
 export const meta = {

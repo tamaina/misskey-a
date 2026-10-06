@@ -6,9 +6,9 @@
 import { Entity, Index, JoinColumn, Column, PrimaryColumn, ManyToOne } from 'typeorm';
 import { noteVisibilities, noteReactionAcceptances } from '@/types.js';
 import { id } from '@/models/util/id.js';
-import { MiUser } from '@/models/User.js';
-import { MiChannel } from '@/models/Channel.js';
-import type { MiDriveFile } from '@/models/DriveFile.js';
+import { MiUser } from '../../../users/backend/models/User.js';
+import { MiChannel } from '../../../channels/backend/models/Channel.js';
+import type { MiDriveFile } from '../../../drive/backend/models/DriveFile.js';
 
 // Note: When you create a new index for existing column of this table,
 // it might be better to index concurrently under isConcurrentIndexMigrationEnabled flag

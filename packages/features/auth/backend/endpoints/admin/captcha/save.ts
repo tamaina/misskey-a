@@ -5,7 +5,7 @@
 
 import { Injectable } from '@nestjs/common';
 import { Endpoint } from '@/server/api/endpoint-base.js';
-import { captchaErrorCodes, CaptchaService, supportedCaptchaProviders } from '@/core/CaptchaService.js';
+import { captchaErrorCodes, CaptchaService, supportedCaptchaProviders } from '../../../services/CaptchaService.js';
 import { ApiError } from '@/server/api/error.js';
 
 export const meta = {

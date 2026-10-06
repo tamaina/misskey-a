@@ -6,7 +6,7 @@
 import { Injectable } from '@nestjs/common';
 import ms from '@/runtime-dependencies/ms.js';
 import { Endpoint } from '@/server/api/endpoint-base.js';
-import { ApResolverService } from '@/core/activitypub/ApResolverService.js';
+import { ApResolverService } from '../../services/ApResolverService.js';
 
 export const meta = {
 	tags: ['federation'],

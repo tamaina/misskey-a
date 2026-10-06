@@ -6,7 +6,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import type { UsersRepository } from '@/models/_.js';
 import { Endpoint } from '@/server/api/endpoint-base.js';
-import { DeleteAccountService } from '@/core/DeleteAccountService.js';
+import { DeleteAccountService } from '../../services/DeleteAccountService.js';
 import { DI } from '@/di-symbols.js';
 
 export const meta = {

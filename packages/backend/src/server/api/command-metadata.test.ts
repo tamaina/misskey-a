@@ -4,8 +4,8 @@
  */
 
 import { expect, test } from 'vitest';
-import type { MiLocalUser } from '@/models/User.js';
-import type { MiAccessToken } from '@/models/AccessToken.js';
+import type { MiLocalUser } from '../../../../features/users/backend/models/User.js';
+import type { MiAccessToken } from '../../../../features/auth/backend/models/AccessToken.js';
 import baseline from './command-metadata.fixture.json' with { type: 'json' };
 
 // Snapshotted from the original handlers before contract migration.

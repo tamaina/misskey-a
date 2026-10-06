@@ -7,7 +7,7 @@ process.env.NODE_ENV = 'test';
 
 import * as assert from 'assert';
 import { describe, beforeAll, beforeEach, afterEach, test, vi } from 'vitest';
-import { DEFAULT_POLICIES } from '@/core/RoleService.js';
+import { DEFAULT_POLICIES } from '../../../features/roles/backend/services/RoleService.js';
 import { api, ApiRequest, failedApiCall, hiddenNote, post, signup, successfulApiCall } from '../utils.js';
 import type * as Misskey from 'misskey-js';
 

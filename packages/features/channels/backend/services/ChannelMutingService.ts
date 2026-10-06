@@ -8,8 +8,8 @@ import * as Redis from 'ioredis';
 import { Brackets, In } from 'typeorm';
 import { DI } from '@/di-symbols.js';
 import type { ChannelMutingRepository, ChannelsRepository, MiChannel, MiChannelMuting, MiUser } from '@/models/_.js';
-import { IdService } from '@/core/IdService.js';
-import { GlobalEvents, GlobalEventService } from '@/core/GlobalEventService.js';
+import { IdService } from '../../../runtime/backend/services/IdService.js';
+import { GlobalEvents, GlobalEventService } from '../../../runtime/backend/services/GlobalEventService.js';
 import { bindThis } from '@/decorators.js';
 import { RedisKVCache } from '@/misc/cache.js';
 

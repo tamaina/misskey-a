@@ -13,7 +13,7 @@ import { getNoteSummary } from '@/misc/get-note-summary.js';
 import type { MiMeta, MiSwSubscription, SwSubscriptionsRepository } from '@/models/_.js';
 import { bindThis } from '@/decorators.js';
 import { RedisKVCache } from '@/misc/cache.js';
-import { HttpRequestService } from '@/core/HttpRequestService.js';
+import { HttpRequestService } from '../../../runtime/backend/services/HttpRequestService.js';
 
 // Defined also packages/sw/types.ts#L13
 type PushNotificationsTypes = {

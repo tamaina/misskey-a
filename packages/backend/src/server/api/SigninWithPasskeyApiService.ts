@@ -14,12 +14,12 @@ import type {
 } from '@/models/_.js';
 import type { Config } from '@/config.js';
 import { getIpHash } from '@/misc/get-ip-hash.js';
-import type { MiLocalUser, MiUser } from '@/models/User.js';
-import { IdService } from '@/core/IdService.js';
+import type { MiLocalUser, MiUser } from '../../../../features/users/backend/models/User.js';
+import { IdService } from '../../../../features/runtime/backend/services/IdService.js';
 import { bindThis } from '@/decorators.js';
-import { WebAuthnService } from '@/core/WebAuthnService.js';
+import { WebAuthnService } from '../../../../features/auth/backend/services/WebAuthnService.js';
 import Logger from '@/logger.js';
-import { LoggerService } from '@/core/LoggerService.js';
+import { LoggerService } from '../../../../features/runtime/backend/services/LoggerService.js';
 import type { IdentifiableError } from '@/misc/identifiable-error.js';
 import { RateLimiterService } from './RateLimiterService.js';
 import { SigninService } from './SigninService.js';

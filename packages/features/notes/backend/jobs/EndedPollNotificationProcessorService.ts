@@ -8,7 +8,7 @@ import { DI } from '@/di-symbols.js';
 import type { PollVotesRepository, NotesRepository } from '@/models/_.js';
 import type Logger from '@/logger.js';
 import { CacheService } from '@/core/CacheService.js';
-import { NotificationService } from '@/core/NotificationService.js';
+import { NotificationService } from '../../../notifications/backend/services/NotificationService.js';
 import { bindThis } from '@/decorators.js';
 import { QueueLoggerService } from '@/queue/QueueLoggerService.js';
 import type * as Bull from 'bullmq';

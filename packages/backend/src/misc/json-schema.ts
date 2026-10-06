@@ -13,40 +13,40 @@ import {
 	packedUserDetailedSchema,
 	packedUserLiteSchema,
 	packedUserSchema,
-} from '@/models/json-schema/user.js';
-import { packedNoteSchema } from '@/models/json-schema/note.js';
-import { packedUserListSchema } from '@/models/json-schema/user-list.js';
-import { packedAppSchema } from '@/models/json-schema/app.js';
-import { packedNotificationSchema } from '@/models/json-schema/notification.js';
-import { packedDriveFileSchema } from '@/models/json-schema/drive-file.js';
-import { packedDriveFolderSchema } from '@/models/json-schema/drive-folder.js';
-import { packedFollowingSchema } from '@/models/json-schema/following.js';
-import { packedMutingSchema } from '@/models/json-schema/muting.js';
-import { packedRenoteMutingSchema } from '@/models/json-schema/renote-muting.js';
-import { packedBlockingSchema } from '@/models/json-schema/blocking.js';
-import { packedNoteReactionSchema, packedNoteReactionWithNoteSchema } from '@/models/json-schema/note-reaction.js';
-import { packedHashtagSchema } from '@/models/json-schema/hashtag.js';
-import { packedInviteCodeSchema } from '@/models/json-schema/invite-code.js';
-import { packedPageBlockSchema, packedPageSchema } from '@/models/json-schema/page.js';
-import { packedNoteFavoriteSchema } from '@/models/json-schema/note-favorite.js';
-import { packedChannelSchema } from '@/models/json-schema/channel.js';
-import { packedAntennaSchema } from '@/models/json-schema/antenna.js';
-import { packedClipSchema } from '@/models/json-schema/clip.js';
-import { packedFederationInstanceSchema } from '@/models/json-schema/federation-instance.js';
+} from '../../../features/users/backend/models/json-schema/user.js';
+import { packedNoteSchema } from '../../../features/notes/backend/models/json-schema/note.js';
+import { packedUserListSchema } from '../../../features/relationships/backend/models/json-schema/user-list.js';
+import { packedAppSchema } from '../../../features/auth/backend/models/json-schema/app.js';
+import { packedNotificationSchema } from '../../../features/notifications/backend/models/json-schema/notification.js';
+import { packedDriveFileSchema } from '../../../features/drive/backend/models/json-schema/drive-file.js';
+import { packedDriveFolderSchema } from '../../../features/drive/backend/models/json-schema/drive-folder.js';
+import { packedFollowingSchema } from '../../../features/relationships/backend/models/json-schema/following.js';
+import { packedMutingSchema } from '../../../features/relationships/backend/models/json-schema/muting.js';
+import { packedRenoteMutingSchema } from '../../../features/relationships/backend/models/json-schema/renote-muting.js';
+import { packedBlockingSchema } from '../../../features/relationships/backend/models/json-schema/blocking.js';
+import { packedNoteReactionSchema, packedNoteReactionWithNoteSchema } from '../../../features/notes/backend/models/json-schema/note-reaction.js';
+import { packedHashtagSchema } from '../../../features/discovery/backend/models/json-schema/hashtag.js';
+import { packedInviteCodeSchema } from '../../../features/auth/backend/models/json-schema/invite-code.js';
+import { packedPageBlockSchema, packedPageSchema } from '../../../features/pages/backend/models/json-schema/page.js';
+import { packedNoteFavoriteSchema } from '../../../features/collections/backend/models/json-schema/note-favorite.js';
+import { packedChannelSchema } from '../../../features/channels/backend/models/json-schema/channel.js';
+import { packedAntennaSchema } from '../../../features/timelines/backend/models/json-schema/antenna.js';
+import { packedClipSchema } from '../../../features/collections/backend/models/json-schema/clip.js';
+import { packedFederationInstanceSchema } from '../../../features/federation/backend/models/json-schema/federation-instance.js';
 import {
 	packedQueueCountSchema,
 	packedQueueMetricsSchema,
 	packedQueueJobSchema,
-} from '@/models/json-schema/queue.js';
-import { packedGalleryPostSchema } from '@/models/json-schema/gallery-post.js';
+} from '../../../features/operations/backend/models/json-schema/queue.js';
+import { packedGalleryPostSchema } from '../../../features/gallery/backend/models/json-schema/gallery-post.js';
 import {
 	packedEmojiDetailedAdminSchema,
 	packedEmojiDetailedSchema,
 	packedEmojiSimpleSchema,
-} from '@/models/json-schema/emoji.js';
-import { packedFlashSchema } from '@/models/json-schema/flash.js';
-import { packedAnnouncementSchema } from '@/models/json-schema/announcement.js';
-import { packedSigninSchema } from '@/models/json-schema/signin.js';
+} from '../../../features/emojis/backend/models/json-schema/emoji.js';
+import { packedFlashSchema } from '../../../features/play/backend/models/json-schema/flash.js';
+import { packedAnnouncementSchema } from '../../../features/announcements/backend/models/json-schema/announcement.js';
+import { packedSigninSchema } from '../../../features/auth/backend/models/json-schema/signin.js';
 import {
 	packedRoleCondFormulaFollowersOrFollowingOrNotesSchema,
 	packedRoleCondFormulaLogicsSchema,
@@ -59,24 +59,24 @@ import {
 	packedRoleLiteSchema,
 	packedRolePoliciesSchema,
 	packedRoleSchema,
-} from '@/models/json-schema/role.js';
-import { packedAdSchema } from '@/models/json-schema/ad.js';
-import { packedReversiGameDetailedSchema, packedReversiGameLiteSchema } from '@/models/json-schema/reversi-game.js';
+} from '../../../features/roles/backend/models/json-schema/role.js';
+import { packedAdSchema } from '../../../features/instance/backend/models/json-schema/ad.js';
+import { packedReversiGameDetailedSchema, packedReversiGameLiteSchema } from '../../../features/games/backend/models/json-schema/reversi-game.js';
 import {
 	packedMetaDetailedOnlySchema,
 	packedMetaDetailedSchema,
 	packedMetaLiteSchema,
 	packedMetaClientOptionsSchema,
-} from '@/models/json-schema/meta.js';
-import { packedUserWebhookSchema } from '@/models/json-schema/user-webhook.js';
-import { packedSystemWebhookSchema } from '@/models/json-schema/system-webhook.js';
-import { packedAbuseReportNotificationRecipientSchema } from '@/models/json-schema/abuse-report-notification-recipient.js';
-import { packedChatMessageSchema, packedChatMessageLiteSchema, packedChatMessageLiteForRoomSchema, packedChatMessageLiteFor1on1Schema } from '@/models/json-schema/chat-message.js';
-import { packedChatRoomSchema } from '@/models/json-schema/chat-room.js';
-import { packedChatRoomInvitationSchema } from '@/models/json-schema/chat-room-invitation.js';
-import { packedChatRoomMembershipSchema } from '@/models/json-schema/chat-room-membership.js';
-import { packedAchievementNameSchema, packedAchievementSchema } from '@/models/json-schema/achievement.js';
-import { packedNoteDraftSchema } from '@/models/json-schema/note-draft.js';
+} from '../../../features/instance/backend/models/json-schema/meta.js';
+import { packedUserWebhookSchema } from '../../../features/integrations/backend/models/json-schema/user-webhook.js';
+import { packedSystemWebhookSchema } from '../../../features/integrations/backend/models/json-schema/system-webhook.js';
+import { packedAbuseReportNotificationRecipientSchema } from '../../../features/moderation/backend/models/json-schema/abuse-report-notification-recipient.js';
+import { packedChatMessageSchema, packedChatMessageLiteSchema, packedChatMessageLiteForRoomSchema, packedChatMessageLiteFor1on1Schema } from '../../../features/chat/backend/models/json-schema/chat-message.js';
+import { packedChatRoomSchema } from '../../../features/chat/backend/models/json-schema/chat-room.js';
+import { packedChatRoomInvitationSchema } from '../../../features/chat/backend/models/json-schema/chat-room-invitation.js';
+import { packedChatRoomMembershipSchema } from '../../../features/chat/backend/models/json-schema/chat-room-membership.js';
+import { packedAchievementNameSchema, packedAchievementSchema } from '../../../features/users/backend/models/json-schema/achievement.js';
+import { packedNoteDraftSchema } from '../../../features/notes/backend/models/json-schema/note-draft.js';
 
 export const refs = {
 	UserLite: packedUserLiteSchema,

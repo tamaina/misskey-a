@@ -10,8 +10,8 @@ import { ApiError } from '@/server/api/error.js';
 import type { UsersRepository, UserProfilesRepository, MiMeta } from '@/models/_.js';
 import { DI } from '@/di-symbols.js';
 import { secureRndstr } from '@/misc/secure-rndstr.js';
-import { RoleService } from '@/core/RoleService.js';
-import { ModerationLogService } from '@/core/ModerationLogService.js';
+import { RoleService } from '../../../../roles/backend/services/RoleService.js';
+import { ModerationLogService } from '../../../../moderation/backend/services/ModerationLogService.js';
 
 export const meta = {
 	tags: ['admin'],

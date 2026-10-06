@@ -5,7 +5,7 @@
 
 import { PrimaryColumn, Entity, Index, Column, ManyToOne, JoinColumn, OneToOne } from 'typeorm';
 import { id } from '@/models/util/id.js';
-import { MiUser } from '@/models/User.js';
+import { MiUser } from '../../../users/backend/models/User.js';
 
 @Entity('registration_ticket')
 export class MiRegistrationTicket {

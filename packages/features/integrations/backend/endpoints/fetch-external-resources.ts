@@ -7,7 +7,7 @@ import { createHash } from 'crypto';
 import ms from '@/runtime-dependencies/ms.js';
 import { Injectable } from '@nestjs/common';
 import { Endpoint } from '@/server/api/endpoint-base.js';
-import { HttpRequestService } from '@/core/HttpRequestService.js';
+import { HttpRequestService } from '../../../runtime/backend/services/HttpRequestService.js';
 import { ApiError } from '@/server/api/error.js';
 
 export const meta = {

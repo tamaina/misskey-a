@@ -5,9 +5,9 @@
 
 import { Injectable } from '@nestjs/common';
 import { Endpoint } from '@/server/api/endpoint-base.js';
-import { GlobalEventService } from '@/core/GlobalEventService.js';
-import { MetaService } from '@/core/MetaService.js';
-import { ModerationLogService } from '@/core/ModerationLogService.js';
+import { GlobalEventService } from '../../../../../runtime/backend/services/GlobalEventService.js';
+import { MetaService } from '../../../../../instance/backend/services/MetaService.js';
+import { ModerationLogService } from '../../../../../moderation/backend/services/ModerationLogService.js';
 
 export const meta = {
 	tags: ['admin', 'role'],

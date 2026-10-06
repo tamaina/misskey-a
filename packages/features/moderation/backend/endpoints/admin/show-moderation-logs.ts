@@ -8,7 +8,7 @@ import { Endpoint } from '@/server/api/endpoint-base.js';
 import type { ModerationLogsRepository } from '@/models/_.js';
 import { QueryService } from '@/core/QueryService.js';
 import { DI } from '@/di-symbols.js';
-import { ModerationLogEntityService } from '@/core/entities/ModerationLogEntityService.js';
+import { ModerationLogEntityService } from '../../serializers/ModerationLogEntityService.js';
 import { sqlLikeEscape } from '@/misc/sql-like-escape.js';
 
 export const meta = {

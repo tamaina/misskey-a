@@ -6,11 +6,11 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { Endpoint } from '@/server/api/endpoint-base.js';
 import type { RegistrationTicketsRepository } from '@/models/_.js';
-import { InviteCodeEntityService } from '@/core/entities/InviteCodeEntityService.js';
-import { IdService } from '@/core/IdService.js';
+import { InviteCodeEntityService } from '../../../serializers/InviteCodeEntityService.js';
+import { IdService } from '../../../../../runtime/backend/services/IdService.js';
 import { DI } from '@/di-symbols.js';
 import { generateInviteCode } from '@/misc/generate-invite-code.js';
-import { ModerationLogService } from '@/core/ModerationLogService.js';
+import { ModerationLogService } from '../../../../../moderation/backend/services/ModerationLogService.js';
 import { ApiError } from '@/server/api/error.js';
 
 export const meta = {

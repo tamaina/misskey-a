@@ -6,7 +6,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { Endpoint } from '@/server/api/endpoint-base.js';
 import type { AntennasRepository } from '@/models/_.js';
-import { FanoutTimelineService } from '@/core/FanoutTimelineService.js';
+import { FanoutTimelineService } from '../../services/FanoutTimelineService.js';
 import { DI } from '@/di-symbols.js';
 import { ApiError } from '@/server/api/error.js';
 

@@ -11,7 +11,7 @@ import { DI } from '@/di-symbols.js';
 import type { MiMeta, MiNote, NotesRepository } from '@/models/_.js';
 import type Logger from '@/logger.js';
 import { bindThis } from '@/decorators.js';
-import { IdService } from '@/core/IdService.js';
+import { IdService } from '../../../../features/runtime/backend/services/IdService.js';
 import { QueueLoggerService } from '../QueueLoggerService.js';
 import type * as Bull from 'bullmq';
 

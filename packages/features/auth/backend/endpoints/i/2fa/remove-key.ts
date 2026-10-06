@@ -7,11 +7,11 @@ import bcrypt from 'bcryptjs';
 import { Inject, Injectable } from '@nestjs/common';
 import { Endpoint } from '@/server/api/endpoint-base.js';
 import type { UserProfilesRepository, UserSecurityKeysRepository } from '@/models/_.js';
-import { UserEntityService } from '@/core/entities/UserEntityService.js';
-import { GlobalEventService } from '@/core/GlobalEventService.js';
+import { UserEntityService } from '../../../../../users/backend/serializers/UserEntityService.js';
+import { GlobalEventService } from '../../../../../runtime/backend/services/GlobalEventService.js';
 import { DI } from '@/di-symbols.js';
 import { ApiError } from '@/server/api/error.js';
-import { UserAuthService } from '@/core/UserAuthService.js';
+import { UserAuthService } from '../../../services/UserAuthService.js';
 
 export const meta = {
 	requireCredential: true,

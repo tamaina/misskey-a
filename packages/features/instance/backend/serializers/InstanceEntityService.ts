@@ -5,11 +5,11 @@
 
 import { Inject, Injectable } from '@nestjs/common';
 import type { Packed } from '@/misc/json-schema.js';
-import type { MiInstance } from '@/models/Instance.js';
+import type { MiInstance } from '../../../federation/backend/models/Instance.js';
 import { bindThis } from '@/decorators.js';
 import { UtilityService } from '@/core/UtilityService.js';
-import { RoleService } from '@/core/RoleService.js';
-import { MiUser } from '@/models/User.js';
+import { RoleService } from '../../../roles/backend/services/RoleService.js';
+import { MiUser } from '../../../users/backend/models/User.js';
 import { DI } from '@/di-symbols.js';
 import { MiMeta } from '@/models/_.js';
 

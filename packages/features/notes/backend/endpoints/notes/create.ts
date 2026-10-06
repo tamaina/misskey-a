@@ -8,8 +8,8 @@ import { In } from 'typeorm';
 import { Inject, Injectable } from '@nestjs/common';
 import { MAX_NOTE_TEXT_LENGTH } from '@/const.js';
 import { Endpoint } from '@/server/api/endpoint-base.js';
-import { NoteEntityService } from '@/core/entities/NoteEntityService.js';
-import { NoteCreateService } from '@/core/NoteCreateService.js';
+import { NoteEntityService } from '../../serializers/NoteEntityService.js';
+import { NoteCreateService } from '../../services/NoteCreateService.js';
 import { IdentifiableError } from '@/misc/identifiable-error.js';
 import { ApiError } from '@/server/api/error.js';
 

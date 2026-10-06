@@ -11,7 +11,7 @@ import type {
 	UserProfilesRepository,
 } from '@/models/_.js';
 import { Endpoint } from '@/server/api/endpoint-base.js';
-import { UserEntityService } from '@/core/entities/UserEntityService.js';
+import { UserEntityService } from '../../../../users/backend/serializers/UserEntityService.js';
 import type { Packed } from '@/misc/json-schema.js';
 
 export const meta = {

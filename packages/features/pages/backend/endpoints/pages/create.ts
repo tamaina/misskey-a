@@ -6,11 +6,11 @@
 import ms from '@/runtime-dependencies/ms.js';
 import { Inject, Injectable } from '@nestjs/common';
 import type { DriveFilesRepository, MiDriveFile, PagesRepository } from '@/models/_.js';
-import { pageNameSchema } from '@/models/Page.js';
+import { pageNameSchema } from '../../models/Page.js';
 import { Endpoint } from '@/server/api/endpoint-base.js';
-import { PageEntityService } from '@/core/entities/PageEntityService.js';
+import { PageEntityService } from '../../serializers/PageEntityService.js';
 import { DI } from '@/di-symbols.js';
-import { PageService } from '@/core/PageService.js';
+import { PageService } from '../../services/PageService.js';
 import { IdentifiableError } from '@/misc/identifiable-error.js';
 import { ApiError } from '@/server/api/error.js';
 

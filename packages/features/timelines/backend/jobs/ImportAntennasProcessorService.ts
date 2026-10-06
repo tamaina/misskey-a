@@ -5,8 +5,8 @@
 
 import { Injectable, Inject } from '@nestjs/common';
 import { Ajv } from 'ajv';
-import { IdService } from '@/core/IdService.js';
-import { GlobalEventService } from '@/core/GlobalEventService.js';
+import { IdService } from '../../../runtime/backend/services/IdService.js';
+import { GlobalEventService } from '../../../runtime/backend/services/GlobalEventService.js';
 import Logger from '@/logger.js';
 import type { AntennasRepository } from '@/models/_.js';
 import { DI } from '@/di-symbols.js';

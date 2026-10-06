@@ -15,12 +15,12 @@ import vary from 'vary';
 import type { Config } from '@/config.js';
 import { DI } from '@/di-symbols.js';
 import * as Acct from '@/misc/acct.js';
-import { UserEntityService } from '@/core/entities/UserEntityService.js';
-import { NoteEntityService } from '@/core/entities/NoteEntityService.js';
-import { PageEntityService } from '@/core/entities/PageEntityService.js';
-import { GalleryPostEntityService } from '@/core/entities/GalleryPostEntityService.js';
-import { ClipEntityService } from '@/core/entities/ClipEntityService.js';
-import { ChannelEntityService } from '@/core/entities/ChannelEntityService.js';
+import { UserEntityService } from '../../../../features/users/backend/serializers/UserEntityService.js';
+import { NoteEntityService } from '../../../../features/notes/backend/serializers/NoteEntityService.js';
+import { PageEntityService } from '../../../../features/pages/backend/serializers/PageEntityService.js';
+import { GalleryPostEntityService } from '../../../../features/gallery/backend/serializers/GalleryPostEntityService.js';
+import { ClipEntityService } from '../../../../features/collections/backend/serializers/ClipEntityService.js';
+import { ChannelEntityService } from '../../../../features/channels/backend/serializers/ChannelEntityService.js';
 import type {
 	AnnouncementsRepository,
 	ChannelsRepository,
@@ -38,30 +38,30 @@ import type Logger from '@/logger.js';
 import { handleRequestRedirectToOmitSearch } from '@/misc/fastify-hook-handlers.js';
 import { htmlSafeJsonStringify } from '@/misc/json-stringify-html-safe.js';
 import { bindThis } from '@/decorators.js';
-import { FlashEntityService } from '@/core/entities/FlashEntityService.js';
-import { ReversiGameEntityService } from '@/core/entities/ReversiGameEntityService.js';
-import { AnnouncementEntityService } from '@/core/entities/AnnouncementEntityService.js';
+import { FlashEntityService } from '../../../../features/play/backend/serializers/FlashEntityService.js';
+import { ReversiGameEntityService } from '../../../../features/games/backend/serializers/ReversiGameEntityService.js';
+import { AnnouncementEntityService } from '../../../../features/announcements/backend/serializers/AnnouncementEntityService.js';
 import { FeedService } from './FeedService.js';
 import { UrlPreviewService } from './UrlPreviewService.js';
 import { ClientLoggerService } from './ClientLoggerService.js';
 import { HtmlTemplateService } from './HtmlTemplateService.js';
 
-import { BasePage } from './views/base.js';
-import { UserPage } from './views/user.js';
-import { NotePage } from './views/note.js';
-import { PagePage } from './views/page.js';
-import { ClipPage } from './views/clip.js';
-import { FlashPage } from './views/flash.js';
-import { GalleryPostPage } from './views/gallery-post.js';
-import { ChannelPage } from './views/channel.js';
-import { ReversiGamePage } from './views/reversi-game.js';
-import { AnnouncementPage } from './views/announcement.js';
-import { BaseEmbed } from './views/base-embed.js';
-import { InfoCardPage } from './views/info-card.js';
-import { BiosPage } from './views/bios.js';
-import { CliPage } from './views/cli.js';
-import { FlushPage } from './views/flush.js';
-import { ErrorPage } from './views/error.js';
+import { BasePage } from '../../../../features/web/backend/templates/base.js';
+import { UserPage } from '../../../../features/users/backend/templates/user.js';
+import { NotePage } from '../../../../features/notes/backend/templates/note.js';
+import { PagePage } from '../../../../features/pages/backend/templates/page.js';
+import { ClipPage } from '../../../../features/collections/backend/templates/clip.js';
+import { FlashPage } from '../../../../features/play/backend/templates/flash.js';
+import { GalleryPostPage } from '../../../../features/gallery/backend/templates/gallery-post.js';
+import { ChannelPage } from '../../../../features/channels/backend/templates/channel.js';
+import { ReversiGamePage } from '../../../../features/games/backend/templates/reversi-game.js';
+import { AnnouncementPage } from '../../../../features/announcements/backend/templates/announcement.js';
+import { BaseEmbed } from '../../../../features/web/backend/templates/base-embed.js';
+import { InfoCardPage } from '../../../../features/web/backend/templates/info-card.js';
+import { BiosPage } from '../../../../features/boot/backend/templates/bios.js';
+import { CliPage } from '../../../../features/boot/backend/templates/cli.js';
+import { FlushPage } from '../../../../features/boot/backend/templates/flush.js';
+import { ErrorPage } from '../../../../features/web/backend/templates/error.js';
 
 import type { FastifyError, FastifyInstance, FastifyPluginOptions, FastifyReply } from 'fastify';
 

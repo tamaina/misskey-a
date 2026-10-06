@@ -8,8 +8,8 @@ import { Endpoint } from '@/server/api/endpoint-base.js';
 import { ApiError } from '@/server/api/error.js';
 import {
 	AbuseReportNotificationRecipientEntityService,
-} from '@/core/entities/AbuseReportNotificationRecipientEntityService.js';
-import { AbuseReportNotificationService } from '@/core/AbuseReportNotificationService.js';
+} from '../../../../serializers/AbuseReportNotificationRecipientEntityService.js';
+import { AbuseReportNotificationService } from '../../../../services/AbuseReportNotificationService.js';
 import { DI } from '@/di-symbols.js';
 import type { UserProfilesRepository } from '@/models/_.js';
 

@@ -8,7 +8,7 @@ import { Endpoint } from '@/server/api/endpoint-base.js';
 import type { MiNoteDraft, NoteDraftsRepository } from '@/models/_.js';
 import { DI } from '@/di-symbols.js';
 import { QueryService } from '@/core/QueryService.js';
-import { NoteDraftEntityService } from '@/core/entities/NoteDraftEntityService.js';
+import { NoteDraftEntityService } from '../../../serializers/NoteDraftEntityService.js';
 
 export const meta = {
 	tags: ['notes', 'drafts'],

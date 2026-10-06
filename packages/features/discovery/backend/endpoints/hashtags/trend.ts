@@ -6,8 +6,8 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { Endpoint } from '@/server/api/endpoint-base.js';
 import { DI } from '@/di-symbols.js';
-import { FeaturedService } from '@/core/FeaturedService.js';
-import { HashtagService } from '@/core/HashtagService.js';
+import { FeaturedService } from '../../services/FeaturedService.js';
+import { HashtagService } from '../../services/HashtagService.js';
 
 export const meta = {
 	tags: ['hashtags'],

@@ -9,9 +9,9 @@ import type { DriveFilesRepository, MiDriveFile } from '@/models/_.js';
 import { Endpoint } from '@/server/api/endpoint-base.js';
 import { DI } from '@/di-symbols.js';
 import { ApiError } from '@/server/api/error.js';
-import { pageNameSchema } from '@/models/Page.js';
+import { pageNameSchema } from '../../models/Page.js';
 import { IdentifiableError } from '@/misc/identifiable-error.js';
-import { PageService } from '@/core/PageService.js';
+import { PageService } from '../../services/PageService.js';
 
 export const meta = {
 	tags: ['pages'],

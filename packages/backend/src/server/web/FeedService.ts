@@ -9,12 +9,12 @@ import { Feed } from 'feed';
 import { DI } from '@/di-symbols.js';
 import type { DriveFilesRepository, NotesRepository, UserProfilesRepository } from '@/models/_.js';
 import type { Config } from '@/config.js';
-import type { MiUser } from '@/models/User.js';
-import { UserEntityService } from '@/core/entities/UserEntityService.js';
-import { DriveFileEntityService } from '@/core/entities/DriveFileEntityService.js';
+import type { MiUser } from '../../../../features/users/backend/models/User.js';
+import { UserEntityService } from '../../../../features/users/backend/serializers/UserEntityService.js';
+import { DriveFileEntityService } from '../../../../features/drive/backend/serializers/DriveFileEntityService.js';
 import { bindThis } from '@/decorators.js';
-import { IdService } from '@/core/IdService.js';
-import { MfmService } from "@/core/MfmService.js";
+import { IdService } from '../../../../features/runtime/backend/services/IdService.js';
+import { MfmService } from "../../../../features/markup/backend/services/MfmService.js";
 import { parse as mfmParse } from 'mfm-js';
 import { shouldHideNoteByTime } from '@/misc/should-hide-note-by-time.js';
 

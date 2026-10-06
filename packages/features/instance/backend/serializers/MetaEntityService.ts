@@ -7,14 +7,14 @@ import { Brackets } from 'typeorm';
 import { Inject, Injectable } from '@nestjs/common';
 import JSON5 from 'json5';
 import type { Packed } from '@/misc/json-schema.js';
-import type { MiMeta } from '@/models/Meta.js';
+import type { MiMeta } from '../models/Meta.js';
 import type { AdsRepository } from '@/models/_.js';
 import { MAX_NOTE_TEXT_LENGTH } from '@/const.js';
 import { bindThis } from '@/decorators.js';
-import { SystemAccountService } from '@/core/SystemAccountService.js';
+import { SystemAccountService } from '../../../users/backend/services/SystemAccountService.js';
 import type { Config } from '@/config.js';
 import { DI } from '@/di-symbols.js';
-import { DEFAULT_POLICIES } from '@/core/RoleService.js';
+import { DEFAULT_POLICIES } from '../../../roles/backend/services/RoleService.js';
 
 @Injectable()
 export class MetaEntityService {

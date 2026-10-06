@@ -8,11 +8,11 @@ import { DI } from '@/di-symbols.js';
 import type { ReversiGamesRepository } from '@/models/_.js';
 import { awaitAll } from '@/misc/prelude/await-all.js';
 import type { Packed } from '@/misc/json-schema.js';
-import type { } from '@/models/Blocking.js';
-import type { MiReversiGame } from '@/models/ReversiGame.js';
+import type { } from '../../../relationships/backend/models/Blocking.js';
+import type { MiReversiGame } from '../models/ReversiGame.js';
 import { bindThis } from '@/decorators.js';
-import { IdService } from '@/core/IdService.js';
-import { UserEntityService } from '@/core/entities/UserEntityService.js';
+import { IdService } from '../../../runtime/backend/services/IdService.js';
+import { UserEntityService } from '../../../users/backend/serializers/UserEntityService.js';
 
 function assertBw(bw: string): bw is Packed<'ReversiGameDetailed'>['bw'] {
 	return ['random', '1', '2'].includes(bw);

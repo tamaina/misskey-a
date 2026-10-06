@@ -7,7 +7,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import type { RolesRepository } from '@/models/_.js';
 import { Endpoint } from '@/server/api/endpoint-base.js';
 import { DI } from '@/di-symbols.js';
-import { RoleEntityService } from '@/core/entities/RoleEntityService.js';
+import { RoleEntityService } from '../../serializers/RoleEntityService.js';
 import { ApiError } from '@/server/api/error.js';
 
 export const meta = {

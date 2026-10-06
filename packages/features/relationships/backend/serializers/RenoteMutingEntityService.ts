@@ -8,12 +8,12 @@ import { DI } from '@/di-symbols.js';
 import type { RenoteMutingsRepository } from '@/models/_.js';
 import { awaitAll } from '@/misc/prelude/await-all.js';
 import type { Packed } from '@/misc/json-schema.js';
-import type { } from '@/models/Blocking.js';
-import type { MiUser } from '@/models/User.js';
-import type { MiRenoteMuting } from '@/models/RenoteMuting.js';
+import type { } from '../models/Blocking.js';
+import type { MiUser } from '../../../users/backend/models/User.js';
+import type { MiRenoteMuting } from '../models/RenoteMuting.js';
 import { bindThis } from '@/decorators.js';
-import { IdService } from '@/core/IdService.js';
-import { UserEntityService } from '@/core/entities/UserEntityService.js';
+import { IdService } from '../../../runtime/backend/services/IdService.js';
+import { UserEntityService } from '../../../users/backend/serializers/UserEntityService.js';
 
 @Injectable()
 export class RenoteMutingEntityService {

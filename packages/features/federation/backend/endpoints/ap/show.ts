@@ -6,20 +6,20 @@
 import { Inject, Injectable } from '@nestjs/common';
 import ms from '@/runtime-dependencies/ms.js';
 import { Endpoint } from '@/server/api/endpoint-base.js';
-import type { MiNote } from '@/models/Note.js';
-import type { MiLocalUser, MiUser } from '@/models/User.js';
-import { isActor, isPost, getApId } from '@/core/activitypub/type.js';
+import type { MiNote } from '../../../../notes/backend/models/Note.js';
+import type { MiLocalUser, MiUser } from '../../../../users/backend/models/User.js';
+import { isActor, isPost, getApId } from '../../protocol/type.js';
 import type { SchemaType } from '@/misc/json-schema.js';
-import { ApResolverService } from '@/core/activitypub/ApResolverService.js';
-import { ApDbResolverService } from '@/core/activitypub/ApDbResolverService.js';
-import { ApPersonService } from '@/core/activitypub/models/ApPersonService.js';
-import { ApNoteService } from '@/core/activitypub/models/ApNoteService.js';
-import { UserEntityService } from '@/core/entities/UserEntityService.js';
-import { NoteEntityService } from '@/core/entities/NoteEntityService.js';
+import { ApResolverService } from '../../services/ApResolverService.js';
+import { ApDbResolverService } from '../../services/ApDbResolverService.js';
+import { ApPersonService } from '../../services/ApPersonService.js';
+import { ApNoteService } from '../../services/ApNoteService.js';
+import { UserEntityService } from '../../../../users/backend/serializers/UserEntityService.js';
+import { NoteEntityService } from '../../../../notes/backend/serializers/NoteEntityService.js';
 import { UtilityService } from '@/core/UtilityService.js';
 import { bindThis } from '@/decorators.js';
 import { IdentifiableError } from '@/misc/identifiable-error.js';
-import { FetchAllowSoftFailMask } from '@/core/activitypub/misc/check-against-url.js';
+import { FetchAllowSoftFailMask } from '../../protocol/misc/check-against-url.js';
 import { ApiError } from '@/server/api/error.js';
 
 export const meta = {

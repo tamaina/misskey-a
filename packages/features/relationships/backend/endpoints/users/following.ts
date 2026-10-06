@@ -6,13 +6,13 @@
 import { IsNull } from 'typeorm';
 import { Inject, Injectable } from '@nestjs/common';
 import type { UsersRepository, FollowingsRepository, UserProfilesRepository } from '@/models/_.js';
-import { birthdaySchema } from '@/models/User.js';
+import { birthdaySchema } from '../../../../users/backend/models/User.js';
 import { Endpoint } from '@/server/api/endpoint-base.js';
 import { QueryService } from '@/core/QueryService.js';
-import { FollowingEntityService } from '@/core/entities/FollowingEntityService.js';
+import { FollowingEntityService } from '../../serializers/FollowingEntityService.js';
 import { UtilityService } from '@/core/UtilityService.js';
 import { DI } from '@/di-symbols.js';
-import { RoleService } from '@/core/RoleService.js';
+import { RoleService } from '../../../../roles/backend/services/RoleService.js';
 import { ApiError } from '@/server/api/error.js';
 
 export const meta = {

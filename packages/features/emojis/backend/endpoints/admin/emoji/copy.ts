@@ -6,11 +6,11 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { Endpoint } from '@/server/api/endpoint-base.js';
 import type { EmojisRepository } from '@/models/_.js';
-import type { MiDriveFile } from '@/models/DriveFile.js';
+import type { MiDriveFile } from '../../../../../drive/backend/models/DriveFile.js';
 import { DI } from '@/di-symbols.js';
-import { DriveService } from '@/core/DriveService.js';
-import { CustomEmojiService } from '@/core/CustomEmojiService.js';
-import { EmojiEntityService } from '@/core/entities/EmojiEntityService.js';
+import { DriveService } from '../../../../../drive/backend/services/DriveService.js';
+import { CustomEmojiService } from '../../../services/CustomEmojiService.js';
+import { EmojiEntityService } from '../../../serializers/EmojiEntityService.js';
 import { ApiError } from '@/server/api/error.js';
 
 export const meta = {

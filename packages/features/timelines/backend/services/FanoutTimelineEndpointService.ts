@@ -6,20 +6,20 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { DI } from '@/di-symbols.js';
 import { bindThis } from '@/decorators.js';
-import type { MiUser } from '@/models/User.js';
-import type { MiNote } from '@/models/Note.js';
-import type { MiMeta } from '@/models/Meta.js';
+import type { MiUser } from '../../../users/backend/models/User.js';
+import type { MiNote } from '../../../notes/backend/models/Note.js';
+import type { MiMeta } from '../../../instance/backend/models/Meta.js';
 import { Packed } from '@/misc/json-schema.js';
 import type { NotesRepository } from '@/models/_.js';
-import { NoteEntityService } from '@/core/entities/NoteEntityService.js';
-import { FanoutTimelineName, FanoutTimelineService } from '@/core/FanoutTimelineService.js';
+import { NoteEntityService } from '../../../notes/backend/serializers/NoteEntityService.js';
+import { FanoutTimelineName, FanoutTimelineService } from './FanoutTimelineService.js';
 import { UtilityService } from '@/core/UtilityService.js';
 import { isUserRelated } from '@/misc/is-user-related.js';
 import { isQuote, isRenote } from '@/misc/is-renote.js';
 import { CacheService } from '@/core/CacheService.js';
 import { isReply } from '@/misc/is-reply.js';
 import { isInstanceMuted } from '@/misc/is-instance-muted.js';
-import { ChannelMutingService } from '@/core/ChannelMutingService.js';
+import { ChannelMutingService } from '../../../channels/backend/services/ChannelMutingService.js';
 import { isChannelRelated } from '@/misc/is-channel-related.js';
 
 type NoteFilter = (note: MiNote) => boolean;

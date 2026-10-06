@@ -5,9 +5,9 @@
 
 import { Injectable } from '@nestjs/common';
 import { Endpoint } from '@/server/api/endpoint-base.js';
-import { SystemWebhookEntityService } from '@/core/entities/SystemWebhookEntityService.js';
+import { SystemWebhookEntityService } from '../../../serializers/SystemWebhookEntityService.js';
 import { ApiError } from '@/server/api/error.js';
-import { SystemWebhookService } from '@/core/SystemWebhookService.js';
+import { SystemWebhookService } from '../../../services/SystemWebhookService.js';
 
 export const meta = {
 	tags: ['admin', 'system-webhook'],

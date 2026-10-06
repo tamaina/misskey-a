@@ -6,13 +6,13 @@
 import { In, IsNull } from 'typeorm';
 import { Inject, Injectable } from '@nestjs/common';
 import type { MiMeta, UsersRepository } from '@/models/_.js';
-import type { MiUser } from '@/models/User.js';
+import type { MiUser } from '../../models/User.js';
 import { Endpoint } from '@/server/api/endpoint-base.js';
-import { UserEntityService } from '@/core/entities/UserEntityService.js';
-import { RemoteUserResolveService } from '@/core/RemoteUserResolveService.js';
+import { UserEntityService } from '../../serializers/UserEntityService.js';
+import { RemoteUserResolveService } from '../../../../federation/backend/services/RemoteUserResolveService.js';
 import { DI } from '@/di-symbols.js';
 import PerUserPvChart from '@/core/chart/charts/per-user-pv.js';
-import { RoleService } from '@/core/RoleService.js';
+import { RoleService } from '../../../../roles/backend/services/RoleService.js';
 import { ApiError } from '@/server/api/error.js';
 import { ApiLoggerService } from '@/server/api/ApiLoggerService.js';
 import type { FindOptionsWhere } from 'typeorm';

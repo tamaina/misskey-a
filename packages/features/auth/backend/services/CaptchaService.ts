@@ -4,12 +4,12 @@
  */
 
 import { Injectable } from '@nestjs/common';
-import { HttpRequestService } from '@/core/HttpRequestService.js';
+import { HttpRequestService } from '../../../runtime/backend/services/HttpRequestService.js';
 import { bindThis } from '@/decorators.js';
-import { MetaService } from '@/core/MetaService.js';
-import { MiMeta } from '@/models/Meta.js';
+import { MetaService } from '../../../instance/backend/services/MetaService.js';
+import { MiMeta } from '../../../instance/backend/models/Meta.js';
 import Logger from '@/logger.js';
-import { LoggerService } from '@/core/LoggerService.js';
+import { LoggerService } from '../../../runtime/backend/services/LoggerService.js';
 
 export const supportedCaptchaProviders = ['none', 'hcaptcha', 'mcaptcha', 'recaptcha', 'turnstile', 'testcaptcha'] as const;
 export type CaptchaProvider = typeof supportedCaptchaProviders[number];

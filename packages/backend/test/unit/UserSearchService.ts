@@ -6,12 +6,12 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { describe, beforeEach, beforeAll, afterEach, afterAll, vi, test, expect } from 'vitest';
 import { In } from 'typeorm';
-import { UserSearchService } from '@/core/UserSearchService.js';
+import { UserSearchService } from '../../../features/discovery/backend/services/UserSearchService.js';
 import { FollowingsRepository, MiUser, UserProfilesRepository, UsersRepository } from '@/models/_.js';
-import { IdService } from '@/core/IdService.js';
+import { IdService } from '../../../features/runtime/backend/services/IdService.js';
 import { GlobalModule } from '@/GlobalModule.js';
 import { DI } from '@/di-symbols.js';
-import { UserEntityService } from '@/core/entities/UserEntityService.js';
+import { UserEntityService } from '../../../features/users/backend/serializers/UserEntityService.js';
 
 describe('UserSearchService', () => {
 	let app: TestingModule;

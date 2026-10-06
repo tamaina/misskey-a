@@ -12,10 +12,10 @@ import { Test } from '@nestjs/testing';
 import { afterAll, beforeAll, describe, test } from 'vitest';
 import { mockDeep } from 'vitest-mock-extended';
 import { GlobalModule } from '@/GlobalModule.js';
-import { FileInfo, FileInfoService } from '@/core/FileInfoService.js';
+import { FileInfo, FileInfoService } from '../../../features/media/backend/services/FileInfoService.js';
 //import { DI } from '@/di-symbols.js';
-import { SensitiveMediaDetectionService } from '@/core/SensitiveMediaDetectionService.js';
-import { LoggerService } from '@/core/LoggerService.js';
+import { SensitiveMediaDetectionService } from '../../../features/media/backend/services/SensitiveMediaDetectionService.js';
+import { LoggerService } from '../../../features/runtime/backend/services/LoggerService.js';
 import type { TestingModule } from '@nestjs/testing';
 
 const _filename = fileURLToPath(import.meta.url);

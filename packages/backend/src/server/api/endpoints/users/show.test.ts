@@ -7,7 +7,7 @@ process.env.NODE_ENV = 'test';
 
 import { describe, test, expect } from 'vitest';
 import { getValidator } from '../../../../../test/prelude/get-api-validator.js';
-import { paramDef } from './show.js';
+import { paramDef } from '../../../../../../features/users/backend/endpoints/users/show.js';
 
 const VALID = true;
 const INVALID = false;

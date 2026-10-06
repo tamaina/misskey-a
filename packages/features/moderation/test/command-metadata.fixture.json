@@ -1,0 +1,47 @@
+{
+	"admin/suspend-user": {
+		"meta": { "tags": ["admin"], "requireCredential": true, "requireModerator": true, "kind": "write:admin:suspend-user" },
+		"paramDef": { "type": "object", "properties": { "userId": { "type": "string", "format": "misskey:id" } }, "required": ["userId"] }
+	},
+	"admin/unsuspend-user": {
+		"meta": { "tags": ["admin"], "requireCredential": true, "requireModerator": true, "kind": "write:admin:unsuspend-user" },
+		"paramDef": { "type": "object", "properties": { "userId": { "type": "string", "format": "misskey:id" } }, "required": ["userId"] }
+	},
+	"admin/unset-user-avatar": {
+		"meta": { "tags": ["admin"], "requireCredential": true, "requireModerator": true, "kind": "write:admin:unset-user-avatar" },
+		"paramDef": { "type": "object", "properties": { "userId": { "type": "string", "format": "misskey:id" } }, "required": ["userId"] }
+	},
+	"admin/unset-user-banner": {
+		"meta": { "tags": ["admin"], "requireCredential": true, "requireModerator": true, "kind": "write:admin:unset-user-banner" },
+		"paramDef": { "type": "object", "properties": { "userId": { "type": "string", "format": "misskey:id" } }, "required": ["userId"] }
+	},
+	"admin/update-user-note": {
+		"meta": { "tags": ["admin"], "requireCredential": true, "requireModerator": true, "kind": "write:admin:user-note" },
+		"paramDef": { "type": "object", "properties": { "userId": { "type": "string", "format": "misskey:id" }, "text": { "type": "string" } }, "required": ["userId", "text"] }
+	},
+	"admin/forward-abuse-user-report": {
+		"meta": {
+			"tags": ["admin"], "requireCredential": true, "requireModerator": true, "kind": "write:admin:resolve-abuse-user-report",
+			"errors": { "noSuchAbuseReport": { "message": "No such abuse report.", "code": "NO_SUCH_ABUSE_REPORT", "id": "8763e21b-d9bc-40be-acf6-54c1a6986493", "kind": "server", "httpStatusCode": 404 } }
+		},
+		"paramDef": { "type": "object", "properties": { "reportId": { "type": "string", "format": "misskey:id" } }, "required": ["reportId"] }
+	},
+	"admin/resolve-abuse-user-report": {
+		"meta": {
+			"tags": ["admin"], "requireCredential": true, "requireModerator": true, "kind": "write:admin:resolve-abuse-user-report",
+			"errors": { "noSuchAbuseReport": { "message": "No such abuse report.", "code": "NO_SUCH_ABUSE_REPORT", "id": "ac3794dd-2ce4-d878-e546-73c60c06b398", "kind": "server", "httpStatusCode": 404 } }
+		},
+		"paramDef": { "type": "object", "properties": { "reportId": { "type": "string", "format": "misskey:id" }, "resolvedAs": { "type": "string", "enum": ["accept", "reject", null], "nullable": true } }, "required": ["reportId"] }
+	},
+	"admin/update-abuse-user-report": {
+		"meta": {
+			"tags": ["admin"], "requireCredential": true, "requireModerator": true, "kind": "write:admin:resolve-abuse-user-report",
+			"errors": { "noSuchAbuseReport": { "message": "No such abuse report.", "code": "NO_SUCH_ABUSE_REPORT", "id": "15f51cf5-46d1-4b1d-a618-b35bcbed0662", "kind": "server", "httpStatusCode": 404 } }
+		},
+		"paramDef": { "type": "object", "properties": { "reportId": { "type": "string", "format": "misskey:id" }, "moderationNote": { "type": "string" } }, "required": ["reportId"] }
+	},
+	"admin/abuse-report/notification-recipient/delete": {
+		"meta": { "tags": ["admin", "abuse-report", "notification-recipient"], "requireCredential": true, "requireModerator": true, "secure": true, "kind": "write:admin:abuse-report:notification-recipient" },
+		"paramDef": { "type": "object", "properties": { "id": { "type": "string", "format": "misskey:id" } }, "required": ["id"] }
+	}
+}

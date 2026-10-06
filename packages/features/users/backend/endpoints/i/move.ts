@@ -9,14 +9,14 @@ import ms from '@/runtime-dependencies/ms.js';
 import { Endpoint } from '@/server/api/endpoint-base.js';
 import { ApiError } from '@/server/api/error.js';
 
-import { MiLocalUser, MiRemoteUser } from '@/models/User.js';
+import { MiLocalUser, MiRemoteUser } from '../../models/User.js';
 
-import { AccountMoveService } from '@/core/AccountMoveService.js';
-import { RemoteUserResolveService } from '@/core/RemoteUserResolveService.js';
+import { AccountMoveService } from '../../services/AccountMoveService.js';
+import { RemoteUserResolveService } from '../../../../federation/backend/services/RemoteUserResolveService.js';
 import { ApiLoggerService } from '@/server/api/ApiLoggerService.js';
 import { GetterService } from '@/server/api/GetterService.js';
-import { ApPersonService } from '@/core/activitypub/models/ApPersonService.js';
-import { UserEntityService } from '@/core/entities/UserEntityService.js';
+import { ApPersonService } from '../../../../federation/backend/services/ApPersonService.js';
+import { UserEntityService } from '../../serializers/UserEntityService.js';
 
 import * as Acct from '@/misc/acct.js';
 import { DI } from '@/di-symbols.js';

@@ -6,12 +6,12 @@
 import { Inject, Injectable } from '@nestjs/common';
 import * as Redis from 'ioredis';
 import { MiUser, type WebhooksRepository } from '@/models/_.js';
-import { MiWebhook, WebhookEventTypes } from '@/models/Webhook.js';
+import { MiWebhook, WebhookEventTypes } from '../models/Webhook.js';
 import { DI } from '@/di-symbols.js';
 import { bindThis } from '@/decorators.js';
-import { GlobalEvents } from '@/core/GlobalEventService.js';
+import { GlobalEvents } from '../../../runtime/backend/services/GlobalEventService.js';
 import type { Packed } from '@/misc/json-schema.js';
-import { QueueService } from '@/core/QueueService.js';
+import { QueueService } from '../../../runtime/backend/services/QueueService.js';
 import type { OnApplicationShutdown } from '@nestjs/common';
 
 export type UserWebhookPayload<T extends WebhookEventTypes> =

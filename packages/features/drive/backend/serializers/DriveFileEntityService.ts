@@ -10,17 +10,17 @@ import type { DriveFilesRepository, MiMeta } from '@/models/_.js';
 import type { Config } from '@/config.js';
 import type { Packed } from '@/misc/json-schema.js';
 import { awaitAll } from '@/misc/prelude/await-all.js';
-import type { MiUser } from '@/models/User.js';
-import type { MiDriveFile } from '@/models/DriveFile.js';
+import type { MiUser } from '../../../users/backend/models/User.js';
+import type { MiDriveFile } from '../models/DriveFile.js';
 import { appendQuery, query } from '@/misc/prelude/url.js';
 import { deepClone } from '@/misc/clone.js';
 import { bindThis } from '@/decorators.js';
 import { isMimeImage } from '@/misc/is-mime-image.js';
-import { IdService } from '@/core/IdService.js';
+import { IdService } from '../../../runtime/backend/services/IdService.js';
 import { uniqueByKey } from '@/misc/unique-by-key.js';
 import { UtilityService } from '@/core/UtilityService.js';
-import { VideoProcessingService } from '@/core/VideoProcessingService.js';
-import { UserEntityService } from '@/core/entities/UserEntityService.js';
+import { VideoProcessingService } from '../../../media/backend/services/VideoProcessingService.js';
+import { UserEntityService } from '../../../users/backend/serializers/UserEntityService.js';
 import { DriveFolderEntityService } from './DriveFolderEntityService.js';
 
 type PackOptions = {

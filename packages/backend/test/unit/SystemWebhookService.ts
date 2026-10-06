@@ -9,17 +9,17 @@ import { afterEach, beforeEach, afterAll, beforeAll, describe, test, expect, vi 
 import type { Mocked } from 'vitest';
 import { Test, TestingModule } from '@nestjs/testing';
 import { randomString } from '../utils.js';
-import { MiUser } from '@/models/User.js';
-import { MiSystemWebhook, SystemWebhookEventType } from '@/models/SystemWebhook.js';
+import { MiUser } from '../../../features/users/backend/models/User.js';
+import { MiSystemWebhook, SystemWebhookEventType } from '../../../features/integrations/backend/models/SystemWebhook.js';
 import { SystemWebhooksRepository, UsersRepository } from '@/models/_.js';
-import { IdService } from '@/core/IdService.js';
+import { IdService } from '../../../features/runtime/backend/services/IdService.js';
 import { GlobalModule } from '@/GlobalModule.js';
-import { ModerationLogService } from '@/core/ModerationLogService.js';
-import { GlobalEventService } from '@/core/GlobalEventService.js';
+import { ModerationLogService } from '../../../features/moderation/backend/services/ModerationLogService.js';
+import { GlobalEventService } from '../../../features/runtime/backend/services/GlobalEventService.js';
 import { DI } from '@/di-symbols.js';
-import { QueueService } from '@/core/QueueService.js';
-import { LoggerService } from '@/core/LoggerService.js';
-import { SystemWebhookService } from '@/core/SystemWebhookService.js';
+import { QueueService } from '../../../features/runtime/backend/services/QueueService.js';
+import { LoggerService } from '../../../features/runtime/backend/services/LoggerService.js';
+import { SystemWebhookService } from '../../../features/integrations/backend/services/SystemWebhookService.js';
 
 describe('SystemWebhookService', () => {
 	let app: TestingModule;

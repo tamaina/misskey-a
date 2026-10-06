@@ -5,17 +5,17 @@
 
 import { Inject, Injectable } from '@nestjs/common';
 import type { UsersRepository, PollsRepository, PollVotesRepository } from '@/models/_.js';
-import type { MiRemoteUser } from '@/models/User.js';
-import { IdService } from '@/core/IdService.js';
+import type { MiRemoteUser } from '../../../../../users/backend/models/User.js';
+import { IdService } from '../../../../../runtime/backend/services/IdService.js';
 import { Endpoint } from '@/server/api/endpoint-base.js';
 import { GetterService } from '@/server/api/GetterService.js';
-import { QueueService } from '@/core/QueueService.js';
-import { PollService } from '@/core/PollService.js';
-import { ApRendererService } from '@/core/activitypub/ApRendererService.js';
-import { GlobalEventService } from '@/core/GlobalEventService.js';
+import { QueueService } from '../../../../../runtime/backend/services/QueueService.js';
+import { PollService } from '../../../services/PollService.js';
+import { ApRendererService } from '../../../../../federation/backend/services/ApRendererService.js';
+import { GlobalEventService } from '../../../../../runtime/backend/services/GlobalEventService.js';
 import { DI } from '@/di-symbols.js';
-import { UserBlockingService } from '@/core/UserBlockingService.js';
-import { NoteEntityService } from '@/core/entities/NoteEntityService.js';
+import { UserBlockingService } from '../../../../../relationships/backend/services/UserBlockingService.js';
+import { NoteEntityService } from '../../../serializers/NoteEntityService.js';
 import { ApiError } from '@/server/api/error.js';
 
 export const meta = {

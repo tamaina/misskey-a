@@ -5,7 +5,7 @@
 
 import { Column, Entity, Index, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
 import { id } from '@/models/util/id.js';
-import { MiUser } from '@/models/User.js';
+import { MiUser } from '../../../users/backend/models/User.js';
 import { MiChannel } from './Channel.js';
 
 @Entity('channel_muting')

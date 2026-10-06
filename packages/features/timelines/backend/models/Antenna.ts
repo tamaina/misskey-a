@@ -5,8 +5,8 @@
 
 import { PrimaryColumn, Entity, Index, JoinColumn, Column, ManyToOne } from 'typeorm';
 import { id } from '@/models/util/id.js';
-import { MiUser } from '@/models/User.js';
-import { MiUserList } from '@/models/UserList.js';
+import { MiUser } from '../../../users/backend/models/User.js';
+import { MiUserList } from '../../../relationships/backend/models/UserList.js';
 
 @Entity('antenna')
 export class MiAntenna {

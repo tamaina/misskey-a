@@ -10,7 +10,7 @@ import { describe, beforeAll, test } from 'vitest';
 import { WebSocket } from 'ws';
 import { api, connectStream, createAppToken, initTestDb, port, post, signup, waitFire } from '../utils.js';
 import type * as misskey from 'misskey-js';
-import { MiFollowing } from '@/models/Following.js';
+import { MiFollowing } from '../../../features/relationships/backend/models/Following.js';
 
 describe('Streaming', () => {
 	let Followings: any;

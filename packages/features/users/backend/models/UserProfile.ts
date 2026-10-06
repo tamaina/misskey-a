@@ -7,8 +7,8 @@ import { Entity, Column, Index, OneToOne, JoinColumn, PrimaryColumn } from 'type
 import { obsoleteNotificationTypes, followingVisibilities, followersVisibilities, notificationTypes } from '@/types.js';
 import { id } from '@/models/util/id.js';
 import { MiUser } from './User.js';
-import { MiPage } from '@/models/Page.js';
-import { MiUserList } from '@/models/UserList.js';
+import { MiPage } from '../../../pages/backend/models/Page.js';
+import { MiUserList } from '../../../relationships/backend/models/UserList.js';
 
 // TODO: このテーブルで管理している情報すべてレジストリで管理するようにしても良いかも
 //       ただ、「emailVerified が true なユーザーを find する」のようなクエリは書けなくなるからウーン

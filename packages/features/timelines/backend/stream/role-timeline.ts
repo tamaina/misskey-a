@@ -4,13 +4,13 @@
  */
 
 import { Inject, Injectable, Scope } from '@nestjs/common';
-import { NoteEntityService } from '@/core/entities/NoteEntityService.js';
+import { NoteEntityService } from '../../../notes/backend/serializers/NoteEntityService.js';
 import { bindThis } from '@/decorators.js';
 import { NoteStreamingHidingService } from '@/server/api/stream/NoteStreamingHidingService.js';
 import { isRenotePacked, isQuotePacked } from '@/misc/is-renote.js';
 import { DI } from '@/di-symbols.js';
 import type { RolesRepository } from '@/models/_.js';
-import type { GlobalEvents } from '@/core/GlobalEventService.js';
+import type { GlobalEvents } from '../../../runtime/backend/services/GlobalEventService.js';
 import type { JsonObject } from '@/misc/json-value.js';
 import Channel, { type ChannelRequest } from '@/server/api/stream/channel.js';
 import { REQUEST } from '@nestjs/core';

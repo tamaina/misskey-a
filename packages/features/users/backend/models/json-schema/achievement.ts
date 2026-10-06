@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ACHIEVEMENT_TYPES } from '@/models/UserProfile.js';
+import { ACHIEVEMENT_TYPES } from '../UserProfile.js';
 
 export const packedAchievementNameSchema = {
 	type: 'string',

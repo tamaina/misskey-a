@@ -10,7 +10,7 @@ import type Logger from '@/logger.js';
 import { bindThis } from '@/decorators.js';
 import type { RetentionAggregationsRepository, UsersRepository } from '@/models/_.js';
 import { deepClone } from '@/misc/clone.js';
-import { IdService } from '@/core/IdService.js';
+import { IdService } from '../../../runtime/backend/services/IdService.js';
 import { isDuplicateKeyValueError } from '@/misc/is-duplicate-key-value-error.js';
 import { QueueLoggerService } from '@/queue/QueueLoggerService.js';
 import type * as Bull from 'bullmq';

@@ -8,24 +8,24 @@ import { IsNull, In, MoreThan, Not } from 'typeorm';
 
 import { bindThis } from '@/decorators.js';
 import { DI } from '@/di-symbols.js';
-import type { MiLocalUser, MiRemoteUser, MiUser } from '@/models/User.js';
+import type { MiLocalUser, MiRemoteUser, MiUser } from '../models/User.js';
 import type { BlockingsRepository, FollowingsRepository, InstancesRepository, MiMeta, MutingsRepository, UserListMembershipsRepository, UsersRepository } from '@/models/_.js';
 import type { RelationshipJobData, ThinUser } from '@/queue/types.js';
 
-import { IdService } from '@/core/IdService.js';
-import { GlobalEventService } from '@/core/GlobalEventService.js';
-import { QueueService } from '@/core/QueueService.js';
-import { RelayService } from '@/core/RelayService.js';
-import { ApPersonService } from '@/core/activitypub/models/ApPersonService.js';
-import { ApDeliverManagerService } from '@/core/activitypub/ApDeliverManagerService.js';
-import { ApRendererService } from '@/core/activitypub/ApRendererService.js';
-import { UserEntityService } from '@/core/entities/UserEntityService.js';
-import { FederatedInstanceService } from '@/core/FederatedInstanceService.js';
+import { IdService } from '../../../runtime/backend/services/IdService.js';
+import { GlobalEventService } from '../../../runtime/backend/services/GlobalEventService.js';
+import { QueueService } from '../../../runtime/backend/services/QueueService.js';
+import { RelayService } from '../../../federation/backend/services/RelayService.js';
+import { ApPersonService } from '../../../federation/backend/services/ApPersonService.js';
+import { ApDeliverManagerService } from '../../../federation/backend/services/ApDeliverManagerService.js';
+import { ApRendererService } from '../../../federation/backend/services/ApRendererService.js';
+import { UserEntityService } from '../serializers/UserEntityService.js';
+import { FederatedInstanceService } from '../../../federation/backend/services/FederatedInstanceService.js';
 import InstanceChart from '@/core/chart/charts/instance.js';
 import PerUserFollowingChart from '@/core/chart/charts/per-user-following.js';
-import { SystemAccountService } from '@/core/SystemAccountService.js';
-import { RoleService } from '@/core/RoleService.js';
-import { AntennaService } from '@/core/AntennaService.js';
+import { SystemAccountService } from './SystemAccountService.js';
+import { RoleService } from '../../../roles/backend/services/RoleService.js';
+import { AntennaService } from '../../../timelines/backend/services/AntennaService.js';
 
 @Injectable()
 export class AccountMoveService {

@@ -5,7 +5,7 @@
 
 import { Injectable } from '@nestjs/common';
 import { Endpoint } from '@/server/api/endpoint-base.js';
-import { RelayService } from '@/core/RelayService.js';
+import { RelayService } from '../../../services/RelayService.js';
 
 export const meta = {
 	tags: ['admin'],

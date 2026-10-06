@@ -9,20 +9,20 @@ import { ModuleRef } from '@nestjs/core';
 import { DI } from '@/di-symbols.js';
 import type { Packed } from '@/misc/json-schema.js';
 import { awaitAll } from '@/misc/prelude/await-all.js';
-import type { MiUser } from '@/models/User.js';
-import type { MiNote } from '@/models/Note.js';
+import type { MiUser } from '../../../users/backend/models/User.js';
+import type { MiNote } from '../models/Note.js';
 import type { UsersRepository, NotesRepository, FollowingsRepository, PollsRepository, PollVotesRepository, NoteReactionsRepository, ChannelsRepository, MiMeta } from '@/models/_.js';
 import { bindThis } from '@/decorators.js';
 import { DebounceLoader } from '@/misc/loader.js';
-import { IdService } from '@/core/IdService.js';
+import { IdService } from '../../../runtime/backend/services/IdService.js';
 import { shouldHideNoteByTime } from '@/misc/should-hide-note-by-time.js';
-import { ReactionsBufferingService } from '@/core/ReactionsBufferingService.js';
+import { ReactionsBufferingService } from '../services/ReactionsBufferingService.js';
 import { CacheService } from '@/core/CacheService.js';
 import type { OnModuleInit } from '@nestjs/common';
-import type { CustomEmojiService } from '@/core/CustomEmojiService.js';
-import type { ReactionService } from '@/core/ReactionService.js';
-import type { UserEntityService } from '@/core/entities/UserEntityService.js';
-import type { DriveFileEntityService } from '@/core/entities/DriveFileEntityService.js';
+import type { CustomEmojiService } from '../../../emojis/backend/services/CustomEmojiService.js';
+import type { ReactionService } from '../services/ReactionService.js';
+import type { UserEntityService } from '../../../users/backend/serializers/UserEntityService.js';
+import type { DriveFileEntityService } from '../../../drive/backend/serializers/DriveFileEntityService.js';
 
 // is-renote.tsとよしなにリンク
 function isPureRenote(note: MiNote): note is MiNote & { renoteId: MiNote['id']; renote: MiNote } {

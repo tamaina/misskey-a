@@ -5,8 +5,8 @@
 
 import { Inject, Injectable } from '@nestjs/common';
 import { Endpoint } from '@/server/api/endpoint-base.js';
-import { RoleEntityService } from '@/core/entities/RoleEntityService.js';
-import { RoleService } from '@/core/RoleService.js';
+import { RoleEntityService } from '../../../serializers/RoleEntityService.js';
+import { RoleService } from '../../../services/RoleService.js';
 
 export const meta = {
 	tags: ['admin', 'role'],

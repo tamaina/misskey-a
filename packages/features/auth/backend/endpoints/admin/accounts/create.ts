@@ -6,10 +6,10 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { Endpoint } from '@/server/api/endpoint-base.js';
 import type { MiMeta, UsersRepository } from '@/models/_.js';
-import { SignupService } from '@/core/SignupService.js';
-import { RoleService } from '@/core/RoleService.js';
-import { UserEntityService } from '@/core/entities/UserEntityService.js';
-import { localUsernameSchema, passwordSchema } from '@/models/User.js';
+import { SignupService } from '../../../services/SignupService.js';
+import { RoleService } from '../../../../../roles/backend/services/RoleService.js';
+import { UserEntityService } from '../../../../../users/backend/serializers/UserEntityService.js';
+import { localUsernameSchema, passwordSchema } from '../../../../../users/backend/models/User.js';
 import { DI } from '@/di-symbols.js';
 import type { Config } from '@/config.js';
 import { ApiError } from '@/server/api/error.js';
