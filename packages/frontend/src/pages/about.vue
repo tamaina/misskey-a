@@ -26,9 +26,10 @@ import { instance } from '@/instance.js';
 import { i18n } from '@/i18n.js';
 import { claimAchievement } from '@/utility/achievements.js';
 import { definePage } from '@/page.js';
+import { loadEmojiCatalog } from '@features/emojis/frontend';
 
 const XOverview = defineAsyncComponent(() => import('@/pages/about.overview.vue'));
-const XEmojis = defineAsyncComponent(() => import('@/pages/about.emojis.vue'));
+const XEmojis = defineAsyncComponent(loadEmojiCatalog);
 const XFederation = defineAsyncComponent(() => import('@/pages/about.federation.vue'));
 const MkInstanceStats = defineAsyncComponent(() => import('@/components/MkInstanceStats.vue'));
 

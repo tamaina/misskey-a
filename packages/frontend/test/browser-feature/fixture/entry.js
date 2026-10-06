@@ -4,6 +4,7 @@
  */
 import { createApp, defineComponent, h } from 'vue';
 import { createInternationalization } from 'virtual:vite-vue-internationalization';
+import { loadEmojiCatalog } from '@features/emojis/frontend';
 import { loadNotFoundPage } from '@features/navigation/frontend';
 import { startComponentLocales } from '@features/boot/frontend';
 import MkResult from '@/components/global/MkResult.vue';
@@ -12,10 +13,12 @@ import MkError from '@/components/global/MkError.vue';
 try {
 	const locale = new URL(window.location.href).searchParams.get('locale') ?? 'en-US';
 	const { default: NotFoundPage } = await loadNotFoundPage();
+	const { default: EmojiCatalog } = await loadEmojiCatalog();
 	let retries = 0;
 	const app = createApp(defineComponent({
 		setup: () => () => h('div', [
 			h('section', { id: 'not-found' }, [h(NotFoundPage, { showLoginPopup: true })]),
+			h('section', { id: 'emoji-catalog' }, [h(EmojiCatalog)]),
 			h('section', { id: 'empty' }, [h(MkResult, { type: 'empty' })]),
 			h('section', { id: 'error' }, [h(MkError, { onRetry() { window.document.querySelector('#retry-count').textContent = String(++retries); } })]),
 		]),

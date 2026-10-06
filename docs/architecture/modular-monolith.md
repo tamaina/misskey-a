@@ -290,3 +290,19 @@ and omits those optional values just as JSON serialization would. It does not
 mutate the packer's object. Decoration category uses the same absent-property
 semantics. The schema bridge preserves existing references, descriptions and
 nullability; the complete generated OpenAPI document remains unchanged.
+
+## Emoji catalog frontend
+
+The catalog and its row menu now live beside the emoji backend/contract under
+`features/emojis/frontend`. The instance-information page loads the feature
+through its named lazy entry. Search behavior, menu permissions and detail/edit
+flows retain their existing semantics; storage and global emoji state remain
+owned by the existing application adapter for now. The two SFCs own seven labels
+through VVI locale blocks, preserving all 28 resolved translations.
+
+Unit coverage checks search and menu predicates, including the existing nullish
+moderator/admin predicate without silently changing it. The production browser
+fixture adds catalog search/clear, translated menus, permission differences and
+dialog cleanup using synthetic state and service adapters. It is not a complete
+application E2E test. Local Chromium process sockets remain restricted even with
+approved execution elevation; CI supplies the actual browser execution.
