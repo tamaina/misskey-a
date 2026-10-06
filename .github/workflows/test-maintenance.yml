@@ -48,6 +48,7 @@ jobs:
           node-version-file: .node-version
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      - run: pnpm build-pre
       - run: cp .github/misskey/test.yml .config/test.yml
       - run: pnpm --filter 'backend^...' -r build
       - run: pnpm --filter '@misskey-a/*' -r test
