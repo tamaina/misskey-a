@@ -1,7 +1,7 @@
 import { defineConfig } from 'rolldown';
 import { globSync } from 'node:fs';
 import { version as summalyVersion } from '@misskey-dev/summaly';
-import type { Plugin, ExternalOption } from 'rolldown';
+import type { Plugin, ExternalOption, InputOptions } from 'rolldown';
 import { execa, execaNode } from 'execa';
 import type { ResultPromise } from 'execa';
 import fkill from 'fkill';
@@ -81,6 +81,11 @@ export default defineConfig((args) => {
 	const isWatchMode = args.watch != null && args.watch !== 'false';
 	const isE2E = args.e2e != null && args.e2e !== 'false';
 
+	// A successful bundle must not leave unresolved source aliases or JSX runtimes.
+	const onLog: NonNullable<InputOptions['onLog']> = (level, log, defaultHandler) => {
+		defaultHandler(log.code === 'UNRESOLVED_IMPORT' ? 'error' : level, log);
+	};
+
 	// 外部モジュールの判定に使う正規表現。`@/` で始まるものは内部モジュールとみなす
 	const allExternalModulesRegex = /^(?!@\/|@features\/|\0)[^.\/](?!:[\/\\])/;
 
@@ -114,6 +119,7 @@ export default defineConfig((args) => {
 
 	if (isE2E) {
 		return {
+			onLog,
 			input: './test-server/entry.ts',
 			platform: 'node',
 			tsconfig: './test-server/tsconfig.json',
@@ -135,6 +141,7 @@ export default defineConfig((args) => {
 		};
 	} else {
 		return {
+			onLog,
 			input: {
 				entry: './src/boot/entry.ts',
 				cli: './src/boot/cli.ts',
@@ -146,7 +153,8 @@ export default defineConfig((args) => {
 				])),
 			},
 			platform: 'node',
-			tsconfig: true,
+			// Feature sources are outside this package; use the backend-owned transform and path settings.
+			tsconfig: './tsconfig.json',
 			plugins: [
 				esmShim(),
 				(isWatchMode ? backendDevServerPlugin() : undefined),
