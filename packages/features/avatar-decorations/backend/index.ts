@@ -9,6 +9,70 @@ import { avatarDecorationResult, avatarDecorationsContract } from '../contract/i
 import type { AvatarDecorationEndpoints } from '../contract/index.js';
 import { objectParams } from '../../api/contract/index.js';
 import { toLegacyJsonSchema } from '../../api/backend/index.js';
+import { avatarDecorationCommandInputs, avatarDecorationCommandsContract } from '../contract/index.js';
+
+export interface AvatarDecorationCommandsContext<Actor extends { id: string }> {
+	actor: Actor;
+}
+
+export interface AvatarDecorationUpdateValues {
+	name: string | undefined;
+	description: string | undefined;
+	url: string | undefined;
+	roleIdsThatCanBeUsedThisDecoration: string[] | undefined;
+	category: string | null | undefined;
+}
+
+/** Only the service operations required by these command endpoints. */
+export interface AvatarDecorationCommandsDependencies<Actor extends { id: string }> {
+	update(id: string, values: AvatarDecorationUpdateValues, actor: Actor): Promise<unknown>;
+	delete(id: string, actor: Actor): Promise<unknown>;
+}
+
+function requireAvatarDecorationActor<Actor extends { id: string }>(context: AvatarDecorationCommandsContext<Actor> | null | undefined): Actor {
+	if (context == null || context.actor == null || typeof context.actor.id !== 'string' || context.actor.id.length === 0) {
+		throw new Error('A trusted avatar-decoration actor is required');
+	}
+
+	return context.actor;
+}
+
+/** Build the admin commands separately from the public decoration-read factory. */
+export function createAvatarDecorationCommands<Actor extends { id: string }>(deps: AvatarDecorationCommandsDependencies<Actor>) {
+	const clientContext = (context: AvatarDecorationCommandsContext<Actor>) => context;
+
+	const update = createProcedureClient(implement(avatarDecorationCommandsContract['admin/avatar-decorations/update'])
+		.$context<AvatarDecorationCommandsContext<Actor>>()
+		.handler(async ({ input, context }) => {
+			const actor = requireAvatarDecorationActor(context);
+			await deps.update(input.id, {
+				name: input.name,
+				description: input.description,
+				url: input.url,
+				roleIdsThatCanBeUsedThisDecoration: input.roleIdsThatCanBeUsedThisDecoration,
+				category: input.category,
+			}, actor);
+		}), { context: clientContext });
+
+	const deleteDecoration = createProcedureClient(implement(avatarDecorationCommandsContract['admin/avatar-decorations/delete'])
+		.$context<AvatarDecorationCommandsContext<Actor>>()
+		.handler(async ({ input, context }) => {
+			const actor = requireAvatarDecorationActor(context);
+			await deps.delete(input.id, actor);
+		}), { context: clientContext });
+
+	return {
+		'admin/avatar-decorations/update': update,
+		'admin/avatar-decorations/delete': deleteDecoration,
+	};
+}
+
+export type AvatarDecorationCommandsFeature<Actor extends { id: string }> = ReturnType<typeof createAvatarDecorationCommands<Actor>>;
+
+export const legacyAvatarDecorationCommandSchemas = {
+	'admin/avatar-decorations/update': { input: toLegacyJsonSchema(avatarDecorationCommandInputs['admin/avatar-decorations/update'], { target: 'openapi-3.0' }) },
+	'admin/avatar-decorations/delete': { input: toLegacyJsonSchema(avatarDecorationCommandInputs['admin/avatar-decorations/delete'], { target: 'openapi-3.0' }) },
+};
 
 export interface AvatarDecorationsDependencies {
 	readDecorations(): Promise<readonly {

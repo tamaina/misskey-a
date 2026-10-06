@@ -3,11 +3,11 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Inject, Injectable } from '@nestjs/common';
-import type { UserListsRepository } from '@/models/_.js';
+import { listErrors } from '@features/relationships/contract';
+import { legacyListSchemas } from '@features/relationships/backend';
+import type { Schema } from '@/misc/json-schema.js';
 import { Endpoint } from '@/server/api/endpoint-base.js';
-import { DI } from '@/di-symbols.js';
-import { ApiError } from '../../../error.js';
+import { defineFeatureEndpoint } from '@/server/api/feature-endpoint.js';
 
 export const meta = {
 	tags: ['lists'],
@@ -18,40 +18,11 @@ export const meta = {
 
 	description: 'Delete an existing list of users.',
 
-	errors: {
-		noSuchList: {
-			message: 'No such list.',
-			code: 'NO_SUCH_LIST',
-			id: '78436795-db79-42f5-b1e2-55ea2cf19166',
-		},
-	},
+	errors: listErrors['users/lists/delete'],
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {
-		listId: { type: 'string', format: 'misskey:id' },
-	},
-	required: ['listId'],
-} as const;
+export const paramDef = legacyListSchemas['users/lists/delete'].input as Schema;
 
-@Injectable()
-export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-disable-line import/no-default-export
-	constructor(
-		@Inject(DI.userListsRepository)
-		private userListsRepository: UserListsRepository,
-	) {
-		super(meta, paramDef, async (ps, me) => {
-			const userList = await this.userListsRepository.findOneBy({
-				id: ps.listId,
-				userId: me.id,
-			});
-
-			if (userList == null) {
-				throw new ApiError(meta.errors.noSuchList);
-			}
-
-			await this.userListsRepository.delete(userList.id);
-		});
-	}
-}
+export const { feature, createEndpoint } = defineFeatureEndpoint('listCommands', commands => new Endpoint(meta, paramDef, async (params, user) => commands['users/lists/delete'](params, {
+	context: { actor: user },
+})));

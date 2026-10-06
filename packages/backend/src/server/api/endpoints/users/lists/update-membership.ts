@@ -3,13 +3,11 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Inject, Injectable } from '@nestjs/common';
-import type { UserListsRepository } from '@/models/_.js';
+import { listErrors } from '@features/relationships/contract';
+import { legacyListSchemas } from '@features/relationships/backend';
+import type { Schema } from '@/misc/json-schema.js';
 import { Endpoint } from '@/server/api/endpoint-base.js';
-import { GetterService } from '@/server/api/GetterService.js';
-import { DI } from '@/di-symbols.js';
-import { UserListService } from '@/core/UserListService.js';
-import { ApiError } from '../../../error.js';
+import { defineFeatureEndpoint } from '@/server/api/feature-endpoint.js';
 
 export const meta = {
 	tags: ['lists', 'users'],
@@ -20,60 +18,11 @@ export const meta = {
 
 	kind: 'write:account',
 
-	errors: {
-		noSuchList: {
-			message: 'No such list.',
-			code: 'NO_SUCH_LIST',
-			id: '7f44670e-ab16-43b8-b4c1-ccd2ee89cc02',
-		},
-
-		noSuchUser: {
-			message: 'No such user.',
-			code: 'NO_SUCH_USER',
-			id: '588e7f72-c744-4a61-b180-d354e912bda2',
-		},
-	},
+	errors: listErrors['users/lists/update-membership'],
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {
-		listId: { type: 'string', format: 'misskey:id' },
-		userId: { type: 'string', format: 'misskey:id' },
-		withReplies: { type: 'boolean' },
-	},
-	required: ['listId', 'userId'],
-} as const;
+export const paramDef = legacyListSchemas['users/lists/update-membership'].input as Schema;
 
-@Injectable()
-export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-disable-line import/no-default-export
-	constructor(
-		@Inject(DI.userListsRepository)
-		private userListsRepository: UserListsRepository,
-
-		private userListService: UserListService,
-		private getterService: GetterService,
-	) {
-		super(meta, paramDef, async (ps, me) => {
-			// Fetch the list
-			const userList = await this.userListsRepository.findOneBy({
-				id: ps.listId,
-				userId: me.id,
-			});
-
-			if (userList == null) {
-				throw new ApiError(meta.errors.noSuchList);
-			}
-
-			// Fetch the user
-			const user = await this.getterService.getUser(ps.userId).catch(err => {
-				if (err.id === '15348ddd-432d-49c2-8a5a-8069753becff') throw new ApiError(meta.errors.noSuchUser);
-				throw err;
-			});
-
-			await this.userListService.updateMembership(user, userList, {
-				withReplies: ps.withReplies,
-			});
-		});
-	}
-}
+export const { feature, createEndpoint } = defineFeatureEndpoint('listCommands', commands => new Endpoint(meta, paramDef, async (params, user) => commands['users/lists/update-membership'](params, {
+	context: { actor: user },
+})));

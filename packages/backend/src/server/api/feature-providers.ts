@@ -5,6 +5,10 @@
 
 import * as os from 'node:os';
 import {
+	createAvatarDecorationCommands,
+	createAnnouncementCommands,
+	createWebhookCommands,
+	createListCommands,
 	createChatCommands,
 	createCollectionCommands,
 	createEmojiAdministration,
@@ -23,7 +27,17 @@ import { CustomEmojiService } from '@/core/CustomEmojiService.js';
 import { NotificationService } from '@/core/NotificationService.js';
 import type { MiChatRoom } from '@/models/ChatRoom.js';
 import type { MiChatMessage } from '@/models/ChatMessage.js';
+import type { MiAnnouncement } from '@/models/Announcement.js';
+import type { MiWebhook } from '@/models/Webhook.js';
+import type { MiUserList } from '@/models/UserList.js';
+import type { MiUserListFavorite } from '@/models/UserListFavorite.js';
+import type { MiUser } from '@/models/User.js';
 import type { MiLocalUser } from '@/models/User.js';
+import { AnnouncementService } from '@/core/AnnouncementService.js';
+import { UserListService } from '@/core/UserListService.js';
+import { GetterService } from '@/server/api/GetterService.js';
+import { IdService } from '@/core/IdService.js';
+import { GlobalEventService } from '@/core/GlobalEventService.js';
 import { ApiError } from './error.js';
 import { QueueService } from '@/core/QueueService.js';
 import { ModerationLogService } from '@/core/ModerationLogService.js';
@@ -36,13 +50,26 @@ import NotesChart from '@/core/chart/charts/notes.js';
 import UsersChart from '@/core/chart/charts/users.js';
 import { DI } from '@/di-symbols.js';
 import type { MiMeta } from '@/models/Meta.js';
-import type { UsersRepository, NoteReactionsRepository, InstancesRepository, EmojisRepository } from '@/models/_.js';
+import type { UsersRepository, NoteReactionsRepository, InstancesRepository, EmojisRepository, AnnouncementsRepository, WebhooksRepository, UserListsRepository, UserListFavoritesRepository, UserListMembershipsRepository, BlockingsRepository } from '@/models/_.js';
 import type { Provider } from '@nestjs/common';
 
 // Transitional composition boundary: Nest resolves a feature, not each handler.
 // The feature itself receives narrow dependencies and has no container access.
-export type ApiFeatures = FeatureApis<MiChatRoom, MiChatMessage, MiLocalUser>;
+export type ApiFeatures = FeatureApis<{
+	room: MiChatRoom;
+	message: MiChatMessage;
+	actor: MiLocalUser;
+	announcement: MiAnnouncement;
+	webhook: MiWebhook;
+	list: MiUserList;
+	user: MiUser;
+	favorite: MiUserListFavorite;
+}>;
 export const featureTokens = {
+	listCommands: Symbol('list command API feature'),
+	avatarDecorationCommands: Symbol('avatar decoration command API feature'),
+	announcementCommands: Symbol('announcement command API feature'),
+	webhookCommands: Symbol('webhook command API feature'),
 	chatCommands: Symbol('chat command API feature'),
 	collectionCommands: Symbol('collection command API feature'),
 	emojiAdministration: Symbol('emoji administration API feature'),
@@ -55,6 +82,58 @@ export const featureTokens = {
 	emojis: Symbol('emojis API feature'),
 } satisfies Record<keyof ApiFeatures, symbol>;
 export const featureProviders: Provider[] = [{
+	provide: featureTokens.listCommands,
+	inject: [DI.userListsRepository, DI.userListFavoritesRepository, DI.userListMembershipsRepository, DI.blockingsRepository, GetterService, UserListService, IdService],
+	useFactory: (lists: UserListsRepository, favorites: UserListFavoritesRepository, memberships: UserListMembershipsRepository, blockings: BlockingsRepository, getter: GetterService, service: UserListService, ids: IdService) => createListCommands<MiUserList, MiUser, MiLocalUser, MiUserListFavorite>({
+		findOwnedList: (id, userId) => lists.findOneBy({ id, userId }),
+		deleteList: id => lists.delete(id),
+		findPublicList: id => lists.exists({ where: { id, isPublic: true } }),
+		hasFavorite: (userId, userListId) => favorites.exists({ where: { userId, userListId } }),
+		generateFavoriteId: () => ids.gen(),
+		insertFavorite: values => favorites.insert(values),
+		findFavorite: (userListId, userId) => favorites.findOneBy({ userListId, userId }),
+		deleteFavorite: id => favorites.delete({ id }),
+		getUser: id => getter.getUser(id),
+		isMissingUserError: error => (error as { id?: unknown }).id === '15348ddd-432d-49c2-8a5a-8069753becff',
+		removeMember: (user, list) => service.removeMember(user, list),
+		hasReverseBlock: (blockerId, blockeeId) => blockings.exists({ where: { blockerId, blockeeId } }),
+		hasMembership: (userListId, userId) => memberships.exists({ where: { userListId, userId } }),
+		addMember: (user, list, actor) => service.addMember(user, list, actor),
+		isTooManyUsersError: error => error instanceof UserListService.TooManyUsersError,
+		updateMembership: (user, list, values) => service.updateMembership(user, list, values),
+		createError: definition => new ApiError(definition),
+	}),
+}, {
+	provide: featureTokens.avatarDecorationCommands,
+	inject: [AvatarDecorationService],
+	useFactory: (decorations: AvatarDecorationService) => createAvatarDecorationCommands<MiLocalUser>({
+		update: (id, values, actor) => decorations.update(id, values, actor),
+		delete: (id, actor) => decorations.delete(id, actor),
+	}),
+}, {
+	provide: featureTokens.announcementCommands,
+	inject: [DI.announcementsRepository, AnnouncementService],
+	useFactory: (repository: AnnouncementsRepository, announcements: AnnouncementService) => createAnnouncementCommands<MiAnnouncement, MiLocalUser>({
+		findById: id => repository.findOneBy({ id }),
+		update: (announcement, values, actor) => announcements.update(announcement, values, actor),
+		delete: (announcement, actor) => announcements.delete(announcement, actor),
+		read: (actor, id) => announcements.read(actor, id),
+		now: () => new Date(),
+		createError: definition => new ApiError(definition),
+	}),
+}, {
+	provide: featureTokens.webhookCommands,
+	inject: [DI.webhooksRepository, GlobalEventService],
+	useFactory: (repository: WebhooksRepository, events: GlobalEventService) => createWebhookCommands<MiWebhook>({
+		findOwnedById: (id, userId) => repository.findOneBy({ id, userId }),
+		update: (id, values) => repository.update(id, values),
+		findByIdOrFail: id => repository.findOneByOrFail({ id }),
+		delete: id => repository.delete(id),
+		publishUpdated: webhook => events.publishInternalEvent('webhookUpdated', webhook),
+		publishDeleted: webhook => events.publishInternalEvent('webhookDeleted', webhook),
+		createError: definition => new ApiError(definition),
+	}),
+}, {
 	provide: featureTokens.chatCommands,
 	inject: [ChatService],
 	useFactory: (chat: ChatService) => createChatCommands<MiChatRoom, MiChatMessage, MiLocalUser>({

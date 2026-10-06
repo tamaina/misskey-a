@@ -13,6 +13,11 @@ import type { ChatEndpoints } from '../../chat/contract/index.js';
 import type { CollectionEndpoints } from '../../collections/contract/index.js';
 import type { NotificationsEndpoints } from '../../notifications/contract/index.js';
 
+import type { AnnouncementEndpoints } from '../../announcements/contract/index.js';
+import type { WebhookEndpoints } from '../../integrations/contract/index.js';
+
+import type { ListEndpoints } from '../../relationships/contract/index.js';
+
 export type FeatureEndpoints = InstanceEndpoints
 	& StatisticsEndpoints
 	& AvatarDecorationEndpoints
@@ -21,4 +26,7 @@ export type FeatureEndpoints = InstanceEndpoints
 	& PortabilityEndpoints
 	& ChatEndpoints
 	& CollectionEndpoints
-	& NotificationsEndpoints;
+	& NotificationsEndpoints
+	& AnnouncementEndpoints
+	& WebhookEndpoints
+	& ListEndpoints;

@@ -6,9 +6,11 @@
 import { PrimaryColumn, Entity, Index, JoinColumn, Column, ManyToOne } from 'typeorm';
 import { id } from './util/id.js';
 import { MiUser } from './User.js';
+import { webhookEventTypes } from '@features/integrations/contract';
+import type { WebhookEventTypes } from '@features/integrations/contract';
 
-export const webhookEventTypes = ['mention', 'unfollow', 'follow', 'followed', 'note', 'reply', 'renote', 'reaction'] as const;
-export type WebhookEventTypes = typeof webhookEventTypes[number];
+export { webhookEventTypes } from '@features/integrations/contract';
+export type { WebhookEventTypes } from '@features/integrations/contract';
 
 @Entity('webhook')
 export class MiWebhook {

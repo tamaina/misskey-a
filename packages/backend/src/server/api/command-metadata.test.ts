@@ -10,6 +10,19 @@ import baseline from './command-metadata.fixture.json' with { type: 'json' };
 
 // Snapshotted from the original handlers before contract migration.
 const loaders = {
+	'admin/avatar-decorations/update': () => import('./endpoints/admin/avatar-decorations/update.js'),
+	'admin/avatar-decorations/delete': () => import('./endpoints/admin/avatar-decorations/delete.js'),
+	'admin/announcements/update': () => import('./endpoints/admin/announcements/update.js'),
+	'admin/announcements/delete': () => import('./endpoints/admin/announcements/delete.js'),
+	'i/read-announcement': () => import('./endpoints/i/read-announcement.js'),
+	'i/webhooks/update': () => import('./endpoints/i/webhooks/update.js'),
+	'i/webhooks/delete': () => import('./endpoints/i/webhooks/delete.js'),
+	'users/lists/delete': () => import('./endpoints/users/lists/delete.js'),
+	'users/lists/favorite': () => import('./endpoints/users/lists/favorite.js'),
+	'users/lists/pull': () => import('./endpoints/users/lists/pull.js'),
+	'users/lists/push': () => import('./endpoints/users/lists/push.js'),
+	'users/lists/unfavorite': () => import('./endpoints/users/lists/unfavorite.js'),
+	'users/lists/update-membership': () => import('./endpoints/users/lists/update-membership.js'),
 	'chat/read-all': () => import('./endpoints/chat/read-all.js'),
 	'chat/rooms/join': () => import('./endpoints/chat/rooms/join.js'),
 	'chat/rooms/leave': () => import('./endpoints/chat/rooms/leave.js'),
@@ -48,9 +61,10 @@ for (const [route, load] of Object.entries(loaders)) {
 		const actor = { id: 'trustedUser' } as MiLocalUser;
 		const token = { id: 'trustedToken', name: 'App', iconUrl: null } as MiAccessToken;
 		await endpoint.exec({
+			id: 'id1', listId: 'list1', userId: 'user1', announcementId: 'announcement1', webhookId: 'webhook1',
 			clipId: 'clip1', noteId: 'note1', roomId: 'room1', messageId: 'message1',
 			mute: false, reaction: '👍', ids: ['emoji1'], aliases: ['alias'],
-			category: null, license: null, body: 'hello', header: null, icon: null,
+			category: null, license: null, body: 'hello', header: null, ...(route.startsWith('admin/announcements/') ? {} : { icon: null }),
 			actor: { id: 'forged' }, token: { id: 'forged' },
 		}, actor, token);
 		expect(calls).toHaveLength(1);

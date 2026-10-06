@@ -3,11 +3,10 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Inject, Injectable } from '@nestjs/common';
+import { legacyAvatarDecorationCommandSchemas } from '@features/avatar-decorations/backend';
+import type { Schema } from '@/misc/json-schema.js';
 import { Endpoint } from '@/server/api/endpoint-base.js';
-import { DI } from '@/di-symbols.js';
-import { AvatarDecorationService } from '@/core/AvatarDecorationService.js';
-import { ApiError } from '../../../error.js';
+import { defineFeatureEndpoint } from '@/server/api/feature-endpoint.js';
 
 export const meta = {
 	tags: ['admin'],
@@ -16,38 +15,11 @@ export const meta = {
 	requiredRolePolicy: 'canManageAvatarDecorations',
 	kind: 'write:admin:avatar-decorations',
 
-	errors: {
-	},
+	errors: {},
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {
-		id: { type: 'string', format: 'misskey:id' },
-		name: { type: 'string', minLength: 1 },
-		description: { type: 'string' },
-		url: { type: 'string', minLength: 1 },
-		roleIdsThatCanBeUsedThisDecoration: { type: 'array', items: {
-			type: 'string',
-		} },
-		category: { type: 'string', nullable: true },
-	},
-	required: ['id'],
-} as const;
+export const paramDef = legacyAvatarDecorationCommandSchemas['admin/avatar-decorations/update'].input as Schema;
 
-@Injectable()
-export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-disable-line import/no-default-export
-	constructor(
-		private avatarDecorationService: AvatarDecorationService,
-	) {
-		super(meta, paramDef, async (ps, me) => {
-			await this.avatarDecorationService.update(ps.id, {
-				name: ps.name,
-				description: ps.description,
-				url: ps.url,
-				roleIdsThatCanBeUsedThisDecoration: ps.roleIdsThatCanBeUsedThisDecoration,
-				category: ps.category,
-			}, me);
-		});
-	}
-}
+export const { feature, createEndpoint } = defineFeatureEndpoint('avatarDecorationCommands', commands => new Endpoint(meta, paramDef, async (params, user) => commands['admin/avatar-decorations/update'](params, {
+	context: { actor: user },
+})));

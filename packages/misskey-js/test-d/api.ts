@@ -149,3 +149,21 @@ test('chat, collection, emoji administration and notification commands derive fr
 	// @ts-expect-error notification body is required
 	cli.request('notifications/create', { header: 'hello' });
 });
+
+test('list, announcement, decoration and webhook commands derive from contracts', async () => {
+	const cli = new Misskey.api.APIClient({ origin: 'https://misskey.test' });
+	expectType<void>(await cli.request('users/lists/update-membership', { listId: 'list1', userId: 'user1', withReplies: false }));
+	expectType<void>(await cli.request('users/lists/favorite', { listId: 'list1' }));
+	expectType<void>(await cli.request('admin/avatar-decorations/update', { id: 'decoration1', category: null }));
+	expectType<void>(await cli.request('admin/announcements/update', { id: 'announcement1', imageUrl: null, icon: 'info' }));
+	expectType<void>(await cli.request('i/read-announcement', { announcementId: 'announcement1' }));
+	expectType<void>(await cli.request('i/webhooks/update', { webhookId: 'hook1', secret: null, on: ['note'] }));
+	// @ts-expect-error membership user is required
+	cli.request('users/lists/update-membership', { listId: 'list1' });
+	// @ts-expect-error decoration roles must be strings
+	cli.request('admin/avatar-decorations/update', { id: 'decoration1', roleIdsThatCanBeUsedThisDecoration: [1] });
+	// @ts-expect-error announcement icons remain constrained
+	cli.request('admin/announcements/update', { id: 'announcement1', icon: 'unknown' });
+	// @ts-expect-error webhook events remain constrained
+	cli.request('i/webhooks/update', { webhookId: 'hook1', on: ['unknown'] });
+});

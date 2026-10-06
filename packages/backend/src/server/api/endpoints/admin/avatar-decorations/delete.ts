@@ -3,11 +3,10 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Inject, Injectable } from '@nestjs/common';
+import { legacyAvatarDecorationCommandSchemas } from '@features/avatar-decorations/backend';
+import type { Schema } from '@/misc/json-schema.js';
 import { Endpoint } from '@/server/api/endpoint-base.js';
-import { DI } from '@/di-symbols.js';
-import { AvatarDecorationService } from '@/core/AvatarDecorationService.js';
-import { ApiError } from '../../../error.js';
+import { defineFeatureEndpoint } from '@/server/api/feature-endpoint.js';
 
 export const meta = {
 	tags: ['admin'],
@@ -15,25 +14,11 @@ export const meta = {
 	requireCredential: true,
 	requiredRolePolicy: 'canManageAvatarDecorations',
 	kind: 'write:admin:avatar-decorations',
-	errors: {
-	},
+	errors: {},
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {
-		id: { type: 'string', format: 'misskey:id' },
-	},
-	required: ['id'],
-} as const;
+export const paramDef = legacyAvatarDecorationCommandSchemas['admin/avatar-decorations/delete'].input as Schema;
 
-@Injectable()
-export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-disable-line import/no-default-export
-	constructor(
-		private avatarDecorationService: AvatarDecorationService,
-	) {
-		super(meta, paramDef, async (ps, me) => {
-			await this.avatarDecorationService.delete(ps.id, me);
-		});
-	}
-}
+export const { feature, createEndpoint } = defineFeatureEndpoint('avatarDecorationCommands', commands => new Endpoint(meta, paramDef, async (params, user) => commands['admin/avatar-decorations/delete'](params, {
+	context: { actor: user },
+})));
