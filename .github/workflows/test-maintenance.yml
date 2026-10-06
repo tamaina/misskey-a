@@ -54,7 +54,7 @@ jobs:
       - run: pnpm --filter backend typecheck
       - run: pnpm --filter backend lint:features
       - run: pnpm --filter backend test:features
-      - run: pnpm --filter backend test --run test/unit/boot/shutdown-handler.ts src/misc/collapsed-queue.test.ts src/daemons/role-cleanup.test.ts src/server/api/streaming-shutdown.test.ts src/server/api/feature-endpoints.test.ts src/server/api/feature-endpoint.test.ts
+      - run: pnpm --filter backend test --run test/unit/boot/shutdown-handler.ts src/misc/collapsed-queue.test.ts src/daemons/role-cleanup.test.ts src/server/api/streaming-shutdown.test.ts src/server/api/feature-endpoints.test.ts src/server/api/feature-endpoint.test.ts src/server/api/batch-feature-endpoints.test.ts src/core/entities/feature-identity.test.ts test/unit/entities
       - run: pnpm --filter backend test:maintenance
       - run: pnpm --filter frontend... -r build
       - run: pnpm --filter backend test:boot

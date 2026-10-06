@@ -1,4 +1,5 @@
 {
+	"extends": "../tsconfig.paths.json",
 	"compilerOptions": {
 		"allowJs": true,
 		"noEmitOnError": true,
@@ -25,12 +26,6 @@
 		"isolatedModules": true,
 		"jsx": "react-jsx",
 		"jsxImportSource": "@kitajs/html",
-		"paths": {
-			"@/*": ["../src/*"],
-			"@features/*": ["../../features/*/index.ts"],
-			"@kitajs/html": ["../node_modules/@kitajs/html"],
-			"@kitajs/html/*": ["../node_modules/@kitajs/html/*"]
-		},
 		"rootDir": "../../",
 		"outDir": "../built-test",
 		"types": [

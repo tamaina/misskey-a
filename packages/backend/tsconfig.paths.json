@@ -1,0 +1,16 @@
+{
+	"compilerOptions": {
+		"paths": {
+			"@/*": ["./src/*"],
+			"@features/*": ["../features/*/index.ts"],
+			"@kitajs/html": ["./node_modules/@kitajs/html"],
+			"@kitajs/html/*": ["./node_modules/@kitajs/html/*"],
+			"@nestjs/common": ["./node_modules/@nestjs/common"],
+			"@nestjs/core": ["./node_modules/@nestjs/core"],
+			"typeorm": ["./node_modules/typeorm"],
+			"json5": ["./node_modules/json5"],
+			"ioredis": ["./node_modules/ioredis"],
+			"ajv": ["./node_modules/ajv"]
+		}
+	}
+}

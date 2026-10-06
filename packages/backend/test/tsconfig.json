@@ -1,4 +1,5 @@
 {
+	"extends": "../tsconfig.paths.json",
 	"compilerOptions": {
 		"allowJs": true,
 		"noEmitOnError": false,
@@ -25,12 +26,6 @@
 		"isolatedModules": true,
 		"jsx": "react-jsx",
 		"jsxImportSource": "@kitajs/html",
-		"paths": {
-			"@/*": ["../src/*"],
-			"@features/*": ["../../features/*/index.ts"],
-			"@kitajs/html": ["../node_modules/@kitajs/html"],
-			"@kitajs/html/*": ["../node_modules/@kitajs/html/*"]
-		},
 		"typeRoots": [
 			"../node_modules/@types",
 			"../src/@types"
@@ -38,7 +33,9 @@
 		"lib": [
 			"esnext"
 		],
-		"types": ["node"]
+		"types": [
+			"node"
+		]
 	},
 	"compileOnSave": false,
 	"include": [

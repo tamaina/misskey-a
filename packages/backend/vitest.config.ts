@@ -1,11 +1,25 @@
 import { EventEmitter } from 'node:events';
 import { resolve } from 'node:path';
 import { defineConfig } from 'vitest/config';
+import backendTsconfig from './tsconfig.json' with { type: 'json' };
+import sourcePaths from './tsconfig.paths.json' with { type: 'json' };
+
+const dependencyAliases = Object.fromEntries(Object.entries(sourcePaths.compilerOptions.paths)
+	.filter(([name]) => !name.includes('*'))
+	.map(([name, [target]]) => [name, resolve(import.meta.dirname, target)]));
 
 // Raise the global EventEmitter listener limit before Vitest wires CLI listeners.
 EventEmitter.defaultMaxListeners = 20;
 
 export const baseConfig = defineConfig({
+	// Feature-owned backend sources use the same transforms as package-local sources.
+	oxc: {
+		decorator: {
+			legacy: backendTsconfig.compilerOptions.experimentalDecorators,
+			emitDecoratorMetadata: backendTsconfig.compilerOptions.emitDecoratorMetadata,
+		},
+		jsx: { runtime: 'automatic', importSource: backendTsconfig.compilerOptions.jsxImportSource },
+	},
 	test: {
 		dir: import.meta.dirname,
 		exclude: ['node_modules', 'dist'],
@@ -25,8 +39,9 @@ export const baseConfig = defineConfig({
 	},
 	resolve: {
 		alias: {
-			'@': resolve(__dirname, './src'),
-			'@features': resolve(__dirname, '../features'),
+			...dependencyAliases,
+			'@': resolve(import.meta.dirname, './src'),
+			'@features': resolve(import.meta.dirname, '../features'),
 		},
 	},
 });

@@ -77,7 +77,8 @@ The [file allocation table](feature-file-allocation.tsv) records 419 service, se
 
 ## Exact server-template allocation
 
-All paths below are currently under `packages/backend/src/server/web/views/`.
+The compatibility paths below remain under `packages/backend/src/server/web/views/`;
+the implementations are now in the assigned feature directories.
 
 - `web/backend/templates`: `_.ts`, `base.tsx`, `base-embed.tsx`, `_splash.tsx`,
   `error.tsx`, `info-card.tsx`.
@@ -146,3 +147,10 @@ compatibility decision before output validation is introduced.
 The first checkpoint relocates all 19 SSR implementations and converts six queue
 commands plus eight user-export endpoints. The old SSR paths remain temporary
 reexports. Feature TSX is included in backend type checking, lint and watch builds.
+
+The next placement checkpoint moves all 39 entity serializers to their domain's
+`backend/serializers`. Old paths directly reexport the same constructor and types;
+this does not claim the existing Nest services have been converted to ports.
+Backend source, test and test-server configurations share a backend-owned path map.
+Vitest uses the same dependency paths and legacy-decorator/JSX settings for feature
+sources. Constructor metadata and old/new class identity are checked explicitly.

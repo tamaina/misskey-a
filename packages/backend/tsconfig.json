@@ -1,4 +1,5 @@
 {
+	"extends": "./tsconfig.paths.json",
 	"compilerOptions": {
 		"allowJs": true,
 		"noEmitOnError": true,
@@ -26,15 +27,11 @@
 		"jsx": "react-jsx",
 		"jsxImportSource": "@kitajs/html",
 		"rootDir": "..",
-		"paths": {
-			"@/*": ["./src/*"],
-			"@features/*": ["../features/*/index.ts"],
-			"@kitajs/html": ["./node_modules/@kitajs/html"],
-			"@kitajs/html/*": ["./node_modules/@kitajs/html/*"]
-		},
 		"outDir": "./built",
 		"plugins": [
-			{"name": "@kitajs/ts-html-plugin"}
+			{
+				"name": "@kitajs/ts-html-plugin"
+			}
 		],
 		"types": [
 			"node"
