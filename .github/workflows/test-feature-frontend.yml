@@ -36,4 +36,4 @@ jobs:
       - run: cp .github/misskey/test.yml .config/test.yml
       - run: pnpm --filter frontend... -r build
       - run: pnpm --filter frontend exec vue-tsc --noEmit
-      - run: pnpm --filter frontend exec vitest run --config vitest.config.unit.ts test/unit/not-found-locale.test.ts test/unit/result-locale.test.ts test/unit/lib/vvi-subrequests.test.ts test/unit/i18n.test.ts
+      - run: pnpm --filter frontend exec vitest run --config vitest.config.unit.ts ../features/navigation/frontend/NotFoundPage.test.ts test/unit/result-locale.test.ts test/unit/lib/vvi-subrequests.test.ts test/unit/i18n.test.ts

@@ -127,13 +127,14 @@ rendering. Only then extend the migration to additional feature-owned views.
 - The SDK builds portable contract declarations from feature-owned source.
   Distribution and license review remains a migration task; do not publish this
   experimental SDK layout as-is.
-- The first VVI slice is the not-found view. Its locale blocks preserve the
+- The first VVI slice is the navigation feature's not-found view. Its locale
+  blocks preserve the
   resolved text of all 28 existing languages. The existing boot language choice
   is passed to VVI; mounting waits for a successful locale load. Unit tests cover
   every translated body/title and the optional login prompt. Frontend typecheck
   and production build, including the legacy locale inliner, pass. This remains
-  an initial adapter in the frontend package; feature ownership migration is
-  not complete. Browser end-to-end validation is still pending because this
+  an initial feature-owned view; the wider frontend migration is not complete.
+  Browser end-to-end validation is still pending because this
   cloud environment blocks the browser's local test-server connection.
 - Existing server/queue Nest runtime and other endpoint definitions remain
   active. Remaining contracts, DI replacement and VVI migration are unfinished.
@@ -213,3 +214,14 @@ previously scanned dictionaries and renders literal locale key paths. Only the
 complete SFC is now passed through that transform; Vue handles its subrequests.
 A direct hook regression and mounted component tests cover this guard. Review
 and remove the guard when adopting a VVI release that handles subrequests itself.
+
+## Feature-owned frontend sources
+
+The not-found view and its locale regression tests live under
+`features/navigation/frontend`, exposed by a named lazy loader. Existing router
+fallbacks and permission conditions call that public entry without eagerly loading
+the view. The frontend package owns test discovery, typed lint, dependency
+resolution and compilation for these sources; no feature configuration is added.
+VVI scans the common packages directory with explicit frontend/feature patterns,
+because its scanner does not traverse `../` include globs outside its own root.
+This changes only localization's scan root, not Vite's application root.

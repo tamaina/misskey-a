@@ -8,17 +8,17 @@ import sharedConfig from '../shared/eslint.config.js';
 export default [
 	...sharedConfig,
 	{
-		files: ['src/**/*.vue'],
+		files: ['src/**/*.vue', '**/frontend/**/*.vue'],
 		...pluginMisskey.configs.typescript,
 	},
 	{
-		files: ['src/**/*.vue'],
+		files: ['src/**/*.vue', '**/frontend/**/*.vue'],
 		// Injected by VVI's SFC transform; Volar checks dictionary members.
 		languageOptions: { globals: { $locale: 'readonly', $l: 'readonly' } },
 	},
 	...pluginVue.configs['flat/recommended'],
 	{
-		files: ['src/**/*.{ts,vue}'],
+		files: ['src/**/*.{ts,vue}', '**/frontend/**/*.{ts,vue}'],
 		ignores: ['**/*.stories.ts'],
 		languageOptions: {
 			globals: {

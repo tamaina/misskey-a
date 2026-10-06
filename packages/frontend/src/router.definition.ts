@@ -5,6 +5,7 @@
 
 import { defineAsyncComponent } from 'vue';
 import type { AsyncComponentLoader } from 'vue';
+import { loadNotFoundPage } from '@features/navigation/frontend';
 import type { RouteDef } from '@/lib/nirax.js';
 import { $i, iAmModerator } from '@/i.js';
 import MkLoading from '@/pages/_loading_.vue';
@@ -18,7 +19,7 @@ export const page = (loader: AsyncComponentLoader) => defineAsyncComponent({
 });
 
 function chatPage(...args: Parameters<typeof page>) {
-	return $i?.policies.chatAvailability !== 'unavailable' ? page(...args) : page(() => import('@/pages/not-found.vue'));
+	return $i?.policies.chatAvailability !== 'unavailable' ? page(...args) : page(loadNotFoundPage);
 }
 
 export const ROUTE_DEF = [{
@@ -379,13 +380,13 @@ export const ROUTE_DEF = [{
 	loginRequired: true,
 }, {
 	path: '/admin/user/:userId',
-	component: iAmModerator ? page(() => import('@/pages/admin-user.vue')) : page(() => import('@/pages/not-found.vue')),
+	component: iAmModerator ? page(() => import('@/pages/admin-user.vue')) : page(loadNotFoundPage),
 }, {
 	path: '/admin/file/:fileId',
-	component: iAmModerator ? page(() => import('@/pages/admin-file.vue')) : page(() => import('@/pages/not-found.vue')),
+	component: iAmModerator ? page(() => import('@/pages/admin-file.vue')) : page(loadNotFoundPage),
 }, {
 	path: '/admin',
-	component: iAmModerator ? page(() => import('@/pages/admin/index.vue')) : page(() => import('@/pages/not-found.vue')),
+	component: iAmModerator ? page(() => import('@/pages/admin/index.vue')) : page(loadNotFoundPage),
 	children: [{
 		path: '/overview',
 		name: 'overview',
@@ -605,5 +606,5 @@ export const ROUTE_DEF = [{
 	loginRequired: true,
 }, {
 	path: '/:(*)',
-	component: page(() => import('@/pages/not-found.vue')),
+	component: page(loadNotFoundPage),
 }] as const satisfies RouteDef[];

@@ -4,6 +4,7 @@
  */
 
 import { inject } from 'vue';
+import { loadNotFoundPage } from '@features/navigation/frontend';
 import { page } from '@/router.definition.js';
 import { $i } from '@/i.js';
 import { Nirax } from '@/lib/nirax.js';
@@ -14,7 +15,7 @@ import { DI } from '@/di.js';
 export type Router = Nirax<typeof ROUTE_DEF>;
 
 export function createRouter(fullPath: string): Router {
-	return new Nirax(ROUTE_DEF, fullPath, !!$i, page(() => import('@/pages/not-found.vue')));
+	return new Nirax(ROUTE_DEF, fullPath, !!$i, page(loadNotFoundPage));
 }
 
 export const mainRouter = createRouter(window.location.pathname + window.location.search + window.location.hash);

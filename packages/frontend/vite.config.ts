@@ -165,6 +165,8 @@ export function getConfig(): UserConfig {
 
 		resolve: {
 			extensions,
+			// Feature sources have no package manifests; use this consumer's runtime.
+			dedupe: ['vue', 'i18n', 'vitest', 'vite-vue-internationalization'],
 			alias: {
 				'@/': __dirname + '/src/',
 				'@@/': __dirname + '/../frontend-shared/',
