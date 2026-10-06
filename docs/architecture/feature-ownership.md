@@ -159,3 +159,11 @@ this does not claim the existing Nest services have been converted to ports.
 Backend source, test and test-server configurations share a backend-owned path map.
 Vitest uses the same dependency paths and legacy-decorator/JSX settings for feature
 sources. Constructor metadata and old/new class identity are checked explicitly.
+
+The queue placement checkpoint moves 32 domain-owned processors to `backend/jobs`,
+with direct old-path bridges preserving provider identity. The three review-required
+cleanup processors stay in place until their mixed responsibilities are resolved.
+Queue names, scheduling, retries and processor behavior are unchanged. All 37
+registered processor providers retain their constructor/injection metadata. Archive
+runtime dependencies resolve through the backend package's small queue adapter;
+feature directories do not acquire package manifests or build configuration.
