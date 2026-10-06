@@ -49,7 +49,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts">
-import type { SortOrder } from '@/components/MkSortOrderEditor.define.js';
+import type { SortOrder } from '@features/preferences/frontend/components/MkSortOrderEditor.define.js';
 import type { GridSortOrderKey } from '@features/emojis/frontend/pages/admin/custom-emojis-manager.impl.js';
 import type { PageHeaderItem } from '@/types/page-header.js';
 
@@ -73,8 +73,8 @@ export type EmojiSearchQuery = {
 import { computed, defineAsyncComponent, onMounted, ref, nextTick, useCssModule } from 'vue';
 import * as Misskey from 'misskey-js';
 import type { RequestLogItem } from '@features/emojis/frontend/pages/admin/custom-emojis-manager.impl.js';
-import type { GridCellValidationEvent, GridCellValueChangeEvent, GridEvent } from '@/components/grid/grid-event.js';
-import type { GridSetting } from '@/components/grid/grid.js';
+import type { GridCellValidationEvent, GridCellValueChangeEvent, GridEvent } from '@features/ui/frontend/components/grid/grid-event.js';
+import type { GridSetting } from '@features/ui/frontend/components/grid/grid.js';
 import * as os from '@/os.js';
 import {
 	emptyStrToEmptyArray,
@@ -82,15 +82,15 @@ import {
 	emptyStrToUndefined,
 	roleIdsParser,
 } from '@features/emojis/frontend/pages/admin/custom-emojis-manager.impl.js';
-import MkGrid from '@/components/grid/MkGrid.vue';
+import MkGrid from '@features/ui/frontend/components/grid/MkGrid.vue';
 import { i18n } from '@/i18n.js';
-import MkButton from '@/components/MkButton.vue';
-import { validators } from '@/components/grid/cell-validators.js';
+import MkButton from '@features/ui/frontend/components/MkButton.vue';
+import { validators } from '@features/ui/frontend/components/grid/cell-validators.js';
 import { misskeyApi } from '@/utility/misskey-api.js';
-import MkPagingButtons from '@/components/MkPagingButtons.vue';
-import { selectFile } from '@/utility/drive.js';
-import { copyGridDataToClipboard, removeDataFromGrid } from '@/components/grid/grid-utils.js';
-import { useLoading } from '@/composables/use-loading.js';
+import MkPagingButtons from '@features/ui/frontend/components/MkPagingButtons.vue';
+import { selectFile } from '@features/drive/frontend/utility/drive.js';
+import { copyGridDataToClipboard, removeDataFromGrid } from '@features/ui/frontend/components/grid/grid-utils.js';
+import { useLoading } from '@features/ui/frontend/composables/use-loading.js';
 
 type GridItem = {
 	checked: boolean;

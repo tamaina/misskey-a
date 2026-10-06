@@ -6,8 +6,8 @@ import { createApp, defineComponent, h } from 'vue';
 import { describe, expect, test, vi } from 'vitest';
 import { createInternationalization } from 'virtual:vite-vue-internationalization';
 import locales from 'i18n';
-import MkError from '@/components/global/MkError.vue';
-import MkResult from '@/components/global/MkResult.vue';
+import MkError from '@features/ui/frontend/components/global/MkError.vue';
+import MkResult from '@features/ui/frontend/components/global/MkResult.vue';
 
 vi.mock('@/instance.js', () => ({ instance: {} }));
 

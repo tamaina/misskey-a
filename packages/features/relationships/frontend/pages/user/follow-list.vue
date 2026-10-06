@@ -16,9 +16,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script lang="ts" setup>
 import { computed, markRaw } from 'vue';
 import * as Misskey from 'misskey-js';
-import MkUserInfo from '@/components/MkUserInfo.vue';
-import MkPagination from '@/components/MkPagination.vue';
-import { Paginator } from '@/utility/paginator.js';
+import MkUserInfo from '@features/users/frontend/components/MkUserInfo.vue';
+import MkPagination from '@features/ui/frontend/components/MkPagination.vue';
+import { Paginator } from '@features/ui/frontend/utility/paginator.js';
 
 const props = defineProps<{
 	user: Misskey.entities.User;

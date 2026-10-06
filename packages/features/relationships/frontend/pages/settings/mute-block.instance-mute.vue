@@ -16,9 +16,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import { ref, watch } from 'vue';
-import MkTextarea from '@/components/MkTextarea.vue';
-import MkInfo from '@/components/MkInfo.vue';
-import MkButton from '@/components/MkButton.vue';
+import MkTextarea from '@features/ui/frontend/components/MkTextarea.vue';
+import MkInfo from '@features/ui/frontend/components/MkInfo.vue';
+import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import { ensureSignin } from '@/i.js';
 import { misskeyApi } from '@/utility/misskey-api.js';
 import { i18n } from '@/i18n.js';

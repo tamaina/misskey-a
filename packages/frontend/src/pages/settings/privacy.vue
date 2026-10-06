@@ -213,22 +213,22 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import { ref, computed, watch } from 'vue';
-import type { MkSelectItem } from '@/components/MkSelect.vue';
-import MkSwitch from '@/components/MkSwitch.vue';
-import MkSelect from '@/components/MkSelect.vue';
-import FormSection from '@/components/form/section.vue';
+import type { MkSelectItem } from '@features/ui/frontend/components/MkSelect.vue';
+import MkSwitch from '@features/ui/frontend/components/MkSwitch.vue';
+import MkSelect from '@features/ui/frontend/components/MkSelect.vue';
+import FormSection from '@features/ui/frontend/components/form/section.vue';
 import { misskeyApi } from '@/utility/misskey-api.js';
 import { i18n } from '@/i18n.js';
 import { instance } from '@/instance.js';
 import { ensureSignin } from '@/i.js';
 import { definePage } from '@/page.js';
-import FormSlot from '@/components/form/slot.vue';
-import { formatDateTimeString } from '@/utility/format-time-string.js';
-import { useMkSelect } from '@/composables/use-mkselect.js';
-import MkInput from '@/components/MkInput.vue';
+import FormSlot from '@features/ui/frontend/components/form/slot.vue';
+import { formatDateTimeString } from '@features/ui/frontend/utility/format-time-string.js';
+import { useMkSelect } from '@features/ui/frontend/composables/use-mkselect.js';
+import MkInput from '@features/ui/frontend/components/MkInput.vue';
 import * as os from '@/os.js';
-import MkDisableSection from '@/components/MkDisableSection.vue';
-import MkInfo from '@/components/MkInfo.vue';
+import MkDisableSection from '@features/ui/frontend/components/MkDisableSection.vue';
+import MkInfo from '@features/ui/frontend/components/MkInfo.vue';
 import MkFeatureBanner from '@/components/MkFeatureBanner.vue';
 
 const $i = ensureSignin();

@@ -40,7 +40,8 @@
 			"sharp": ["./node_modules/sharp"],
 			"slacc": ["./node_modules/slacc"],
 			"strict-event-emitter-types": ["./node_modules/strict-event-emitter-types"],
-			"ulid": ["./node_modules/ulid"]
+			"ulid": ["./node_modules/ulid"],
+			"xev": ["./node_modules/xev"]
 		}
 	}
 }

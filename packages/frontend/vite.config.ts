@@ -16,7 +16,8 @@ import meta from '../../package.json';
 import packageInfo from './package.json' with { type: 'json' };
 import pluginUnwindCssModuleClassName from './lib/rollup-plugin-unwind-css-module-class-name.js';
 import pluginJson5 from './lib/vite-plugin-json5.js';
-import type { Options as SearchIndexOptions } from './lib/vite-plugin-create-search-index.js';
+import { searchIndexes } from './lib/search-index-options.js';
+export { searchIndexes } from './lib/search-index-options.js';
 import pluginCreateSearchIndex from './lib/vite-plugin-create-search-index.js';
 import pluginWatchLocales from './lib/vite-plugin-watch-locales.js';
 import { pluginRemoveUnrefI18n } from '../frontend-builder/rollup-plugin-remove-unref-i18n.js';
@@ -56,21 +57,6 @@ function getBundleVisualizerPlugin(): PluginOption[] {
 
 	return plugins;
 }
-
-/**
- * 検索インデックスの生成設定
- */
-export const searchIndexes = [{
-	targetFilePaths: ['src/pages/settings/*.vue'],
-	mainVirtualModule: 'search-index:settings',
-	modulesToHmrOnUpdate: ['src/pages/settings/index.vue'],
-	verbose: process.env.FRONTEND_SEARCH_INDEX_VERBOSE === 'true',
-}, {
-	targetFilePaths: ['src/pages/admin/*.vue'],
-	mainVirtualModule: 'search-index:admin',
-	modulesToHmrOnUpdate: ['src/pages/admin/index.vue'],
-	verbose: process.env.FRONTEND_SEARCH_INDEX_VERBOSE === 'true',
-}] satisfies SearchIndexOptions[];
 
 /**
  * Misskeyのフロントエンドにバンドルせず、CDNなどから別途読み込むリソースを記述する。

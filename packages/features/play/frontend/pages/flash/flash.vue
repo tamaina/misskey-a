@@ -67,24 +67,24 @@ import { utils } from '@syuilo/aiscript';
 import { compareVersions } from 'compare-versions';
 import { url } from '@@/js/config.js';
 import type { Ref } from 'vue';
-import type { AsUiComponent, AsUiRoot } from '@/aiscript/ui.js';
+import type { AsUiComponent, AsUiRoot } from '@features/play/frontend/services/aiscript/ui.js';
 import type { MenuItem } from '@/types/menu.js';
 import type { Interpreter } from '@syuilo/aiscript';
-import MkButton from '@/components/MkButton.vue';
+import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import * as os from '@/os.js';
 import { misskeyApi } from '@/utility/misskey-api.js';
 import { i18n } from '@/i18n.js';
 import { definePage } from '@/page.js';
 import MkAsUi from '@/components/MkAsUi.vue';
-import { registerAsUiLib } from '@/aiscript/ui.js';
-import { aiScriptReadline, createAiScriptEnv } from '@/aiscript/api.js';
+import { registerAsUiLib } from '@features/play/frontend/services/aiscript/ui.js';
+import { aiScriptReadline, createAiScriptEnv } from '@features/play/frontend/services/aiscript/api.js';
 import MkFolder from '@/components/MkFolder.vue';
-import MkCode from '@/components/MkCode.vue';
+import MkCode from '@features/markup/frontend/components/MkCode.vue';
 import { prefer } from '@/preferences.js';
 import { $i } from '@/i.js';
-import { isSupportShare } from '@/utility/navigator.js';
-import { copyToClipboard } from '@/utility/copy-to-clipboard.js';
-import { pleaseLogin } from '@/utility/please-login.js';
+import { isSupportShare } from '@features/navigation/frontend/utility/navigator.js';
+import { copyToClipboard } from '@features/ui/frontend/utility/copy-to-clipboard.js';
+import { pleaseLogin } from '@features/auth/frontend/utility/please-login.js';
 
 const props = defineProps<{
 	id: string;
@@ -273,7 +273,7 @@ async function reportAbuse() {
 
 	const pageUrl = `${url}/play/${flash.value.id}`;
 
-	const { dispose } = await os.popupAsyncWithDialog(import('@/components/MkAbuseReportWindow.vue').then(x => x.default), {
+	const { dispose } = await os.popupAsyncWithDialog(import('@features/moderation/frontend/components/MkAbuseReportWindow.vue').then(x => x.default), {
 		user: flash.value.user,
 		initialComment: `Play: ${pageUrl}\n-----\n`,
 	}, {

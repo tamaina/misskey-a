@@ -126,12 +126,12 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
-import MkWindow from '@/components/MkWindow.vue';
-import MkInput from '@/components/MkInput.vue';
-import MkSelect from '@/components/MkSelect.vue';
-import MkButton from '@/components/MkButton.vue';
+import MkWindow from '@features/ui/frontend/components/MkWindow.vue';
+import MkInput from '@features/ui/frontend/components/MkInput.vue';
+import MkSelect from '@features/ui/frontend/components/MkSelect.vue';
+import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import MkFolder from '@/components/MkFolder.vue';
-import MkSortOrderEditor from '@/components/MkSortOrderEditor.vue';
+import MkSortOrderEditor from '@features/preferences/frontend/components/MkSortOrderEditor.vue';
 
 import {
 	gridSortOrderKeys,
@@ -141,7 +141,7 @@ import { i18n } from '@/i18n.js';
 import * as os from '@/os.js';
 
 import type { EmojiSearchQuery } from '@features/emojis/frontend/pages/admin/custom-emojis-manager.local.list.vue';
-import type { SortOrder } from '@/components/MkSortOrderEditor.define.js';
+import type { SortOrder } from '@features/preferences/frontend/components/MkSortOrderEditor.define.js';
 import type { GridSortOrderKey } from '@features/emojis/frontend/pages/admin/custom-emojis-manager.impl.js';
 
 const props = defineProps<{

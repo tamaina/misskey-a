@@ -149,25 +149,25 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script lang="ts" setup>
 import { computed, watch } from 'vue';
 import XMigration from '@features/users/frontend/pages/settings/migration.vue';
-import MkSwitch from '@/components/MkSwitch.vue';
-import FormLink from '@/components/form/link.vue';
+import MkSwitch from '@features/ui/frontend/components/MkSwitch.vue';
+import FormLink from '@features/ui/frontend/components/form/link.vue';
 import MkFolder from '@/components/MkFolder.vue';
-import FormInfo from '@/components/MkInfo.vue';
-import MkKeyValue from '@/components/MkKeyValue.vue';
-import MkButton from '@/components/MkButton.vue';
-import FormSlot from '@/components/form/slot.vue';
+import FormInfo from '@features/ui/frontend/components/MkInfo.vue';
+import MkKeyValue from '@features/ui/frontend/components/MkKeyValue.vue';
+import MkButton from '@features/ui/frontend/components/MkButton.vue';
+import FormSlot from '@features/ui/frontend/components/form/slot.vue';
 import * as os from '@/os.js';
 import { enableStoragePersistence, getStoragePersistenceStatusRef, storagePersistenceSupported } from '@/utility/storage.js';
 import { ensureSignin } from '@/i.js';
 import { i18n } from '@/i18n.js';
 import { definePage } from '@/page.js';
-import FormSection from '@/components/form/section.vue';
+import FormSection from '@features/ui/frontend/components/form/section.vue';
 import { prefer } from '@/preferences.js';
-import MkRolePreview from '@/components/MkRolePreview.vue';
+import MkRolePreview from '@features/roles/frontend/components/MkRolePreview.vue';
 import { signout } from '@/signout.js';
 import { hideAllTips as _hideAllTips, resetAllTips as _resetAllTips } from '@/tips.js';
 import { suggestReload } from '@/utility/reload-suggest.js';
-import { cloudBackup } from '@/preferences/utility.js';
+import { cloudBackup } from '@features/preferences/frontend/state/utility.js';
 
 const $i = ensureSignin();
 

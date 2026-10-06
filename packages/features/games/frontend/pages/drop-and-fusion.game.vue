@@ -199,19 +199,19 @@ import { useInterval } from '@@/js/use-interval.js';
 import { apiUrl } from '@@/js/config.js';
 import type { Mono } from 'misskey-bubble-game';
 import { definePage } from '@/page.js';
-import MkRippleEffect from '@/components/MkRippleEffect.vue';
+import MkRippleEffect from '@features/ui/frontend/components/MkRippleEffect.vue';
 import * as os from '@/os.js';
-import MkNumber from '@/components/MkNumber.vue';
-import MkPlusOneEffect from '@/components/MkPlusOneEffect.vue';
-import MkButton from '@/components/MkButton.vue';
-import { claimAchievement } from '@/utility/achievements.js';
+import MkNumber from '@features/ui/frontend/components/MkNumber.vue';
+import MkPlusOneEffect from '@features/ui/frontend/components/MkPlusOneEffect.vue';
+import MkButton from '@features/ui/frontend/components/MkButton.vue';
+import { claimAchievement } from '@features/users/frontend/utility/achievements.js';
 import { store } from '@/store.js';
 import { misskeyApi } from '@/utility/misskey-api.js';
 import { i18n } from '@/i18n.js';
 import { $i } from '@/i.js';
 import * as sound from '@/utility/sound.js';
-import MkRange from '@/components/MkRange.vue';
-import { copyToClipboard } from '@/utility/copy-to-clipboard.js';
+import MkRange from '@features/ui/frontend/components/MkRange.vue';
+import { copyToClipboard } from '@features/ui/frontend/utility/copy-to-clipboard.js';
 import { prefer } from '@/preferences.js';
 
 type FrontendMonoDefinition = {

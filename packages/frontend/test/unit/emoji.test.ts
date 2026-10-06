@@ -9,7 +9,7 @@ import { preferState } from '../setup.unit.js';
 import { getEmojiName } from '@@/js/emojilist.js';
 import { components } from '@/components/index.js';
 import { directives } from '@/directives/index.js';
-import MkEmoji from '@/components/global/MkEmoji.vue';
+import MkEmoji from '@features/emojis/frontend/components/global/MkEmoji.vue';
 
 describe('Emoji', () => {
 	const renderEmoji = (emoji: string): RenderResult => {

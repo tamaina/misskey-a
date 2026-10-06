@@ -5,10 +5,10 @@
 
 import { BroadcastChannel } from 'broadcast-channel';
 import { createVisibilityAwareInterval } from '@@/js/interval.js';
-import type { StorageProvider } from '@/preferences/manager.js';
-import { cloudBackup } from '@/preferences/utility.js';
+import type { StorageProvider } from '@features/preferences/frontend/state/manager.js';
+import { cloudBackup } from '@features/preferences/frontend/state/utility.js';
 import { miLocalStorage } from '@/local-storage.js';
-import { isSameScope, PreferencesManager } from '@/preferences/manager.js';
+import { isSameScope, PreferencesManager } from '@features/preferences/frontend/state/manager.js';
 import { store } from '@/store.js';
 import { $i } from '@/i.js';
 import { misskeyApi } from '@/utility/misskey-api.js';

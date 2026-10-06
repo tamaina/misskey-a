@@ -28,19 +28,19 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import { computed, watch, provide, useTemplateRef, ref, onMounted, onActivated } from 'vue';
-import type { Tab } from '@/components/global/MkPageHeader.tabs.vue';
+import type { Tab } from '@features/navigation/frontend/components/global/MkPageHeader.tabs.vue';
 import type { MenuItem } from '@/types/menu.js';
 import type { BasicTimelineType } from '@/timelines.js';
 import type { PageHeaderItem } from '@/types/page-header.js';
-import MkStreamingNotesTimeline from '@/components/MkStreamingNotesTimeline.vue';
-import MkPostForm from '@/components/MkPostForm.vue';
+import MkStreamingNotesTimeline from '@features/timelines/frontend/components/MkStreamingNotesTimeline.vue';
+import MkPostForm from '@features/notes/frontend/components/MkPostForm.vue';
 import * as os from '@/os.js';
 import { store } from '@/store.js';
 import { i18n } from '@/i18n.js';
 import { $i } from '@/i.js';
 import { definePage } from '@/page.js';
 import { antennasCache, userListsCache, favoritedChannelsCache } from '@/cache.js';
-import { deviceKind } from '@/utility/device-kind.js';
+import { deviceKind } from '@features/ui/frontend/utility/device-kind.js';
 import { deepMerge } from '@/utility/merge.js';
 import { miLocalStorage } from '@/local-storage.js';
 import { availableBasicTimelines, hasWithReplies, isAvailableBasicTimeline, isBasicTimeline, basicTimelineIconClass } from '@/timelines.js';

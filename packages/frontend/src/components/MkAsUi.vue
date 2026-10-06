@@ -64,16 +64,16 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script lang="ts" setup>
 import { ref, computed } from 'vue';
 import type { Ref } from 'vue';
-import type { AsUiComponent, AsUiRoot, AsUiPostFormButton } from '@/aiscript/ui.js';
+import type { AsUiComponent, AsUiRoot, AsUiPostFormButton } from '@features/play/frontend/services/aiscript/ui.js';
 import * as os from '@/os.js';
-import MkButton from '@/components/MkButton.vue';
-import MkInput from '@/components/MkInput.vue';
-import MkSwitch from '@/components/MkSwitch.vue';
-import MkTextarea from '@/components/MkTextarea.vue';
-import MkSelect from '@/components/MkSelect.vue';
+import MkButton from '@features/ui/frontend/components/MkButton.vue';
+import MkInput from '@features/ui/frontend/components/MkInput.vue';
+import MkSwitch from '@features/ui/frontend/components/MkSwitch.vue';
+import MkTextarea from '@features/ui/frontend/components/MkTextarea.vue';
+import MkSelect from '@features/ui/frontend/components/MkSelect.vue';
 import MkFolder from '@/components/MkFolder.vue';
-import MkPostForm from '@/components/MkPostForm.vue';
-import { useMkSelect } from '@/composables/use-mkselect.js';
+import MkPostForm from '@features/notes/frontend/components/MkPostForm.vue';
+import { useMkSelect } from '@features/ui/frontend/composables/use-mkselect.js';
 
 const props = withDefaults(defineProps<{
 	component: AsUiComponent;

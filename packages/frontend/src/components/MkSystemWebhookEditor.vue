@@ -98,13 +98,13 @@ import type {
 	MkSystemWebhookEditorProps,
 	MkSystemWebhookResult,
 	SystemWebhookEventType,
-} from '@/components/MkSystemWebhookEditor.impl.js';
-import MkInput from '@/components/MkInput.vue';
-import MkSwitch from '@/components/MkSwitch.vue';
+} from '@features/integrations/frontend/components/MkSystemWebhookEditor.impl.js';
+import MkInput from '@features/ui/frontend/components/MkInput.vue';
+import MkSwitch from '@features/ui/frontend/components/MkSwitch.vue';
 import { i18n } from '@/i18n.js';
-import MkButton from '@/components/MkButton.vue';
+import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import { misskeyApi } from '@/utility/misskey-api.js';
-import MkModalWindow from '@/components/MkModalWindow.vue';
+import MkModalWindow from '@features/ui/frontend/components/MkModalWindow.vue';
 import MkFolder from '@/components/MkFolder.vue';
 import * as os from '@/os.js';
 

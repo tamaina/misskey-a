@@ -65,8 +65,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 import { onMounted, ref } from 'vue';
 import * as Misskey from 'misskey-js';
 import { misskeyApi, misskeyApiGet } from '@/utility/misskey-api.js';
-import MkNumberDiff from '@/components/MkNumberDiff.vue';
-import MkNumber from '@/components/MkNumber.vue';
+import MkNumberDiff from '@features/ui/frontend/components/MkNumberDiff.vue';
+import MkNumber from '@features/ui/frontend/components/MkNumber.vue';
 import { i18n } from '@/i18n.js';
 import { customEmojis } from '@/custom-emojis.js';
 import { prefer } from '@/preferences.js';

@@ -31,8 +31,8 @@ import * as Misskey from 'misskey-js';
 import XPv from '@/pages/user/activity.pv.vue';
 import XNotes from '@features/notes/frontend/pages/user/activity.notes.vue';
 import XFollowing from '@features/relationships/frontend/pages/user/activity.following.vue';
-import MkFoldableSection from '@/components/MkFoldableSection.vue';
-import MkHeatmap from '@/components/MkHeatmap.vue';
+import MkFoldableSection from '@features/ui/frontend/components/MkFoldableSection.vue';
+import MkHeatmap from '@features/statistics/frontend/components/MkHeatmap.vue';
 
 const props = defineProps<{
 	user: Misskey.entities.User;

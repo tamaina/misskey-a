@@ -28,18 +28,18 @@ SPDX-License-Identifier: AGPL-3.0-only
 import { computed, ref } from 'vue';
 import JSON5 from 'json5';
 import type { Theme } from '@@/js/theme.js';
-import MkTextarea from '@/components/MkTextarea.vue';
-import MkSelect from '@/components/MkSelect.vue';
-import MkInput from '@/components/MkInput.vue';
-import MkButton from '@/components/MkButton.vue';
+import MkTextarea from '@features/ui/frontend/components/MkTextarea.vue';
+import MkSelect from '@features/ui/frontend/components/MkSelect.vue';
+import MkInput from '@features/ui/frontend/components/MkInput.vue';
+import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import { removeTheme } from '@/theme.js';
 import { getBuiltinThemes } from '@@/js/theme.js';
-import { copyToClipboard } from '@/utility/copy-to-clipboard.js';
+import { copyToClipboard } from '@features/ui/frontend/utility/copy-to-clipboard.js';
 import * as os from '@/os.js';
 import { i18n } from '@/i18n.js';
 import { definePage } from '@/page.js';
-import { useMkSelect } from '@/composables/use-mkselect.js';
-import type { MkSelectItem } from '@/components/MkSelect.vue';
+import { useMkSelect } from '@features/ui/frontend/composables/use-mkselect.js';
+import type { MkSelectItem } from '@features/ui/frontend/components/MkSelect.vue';
 import { prefer } from '@/preferences';
 
 const installedThemes = prefer.r.themes;

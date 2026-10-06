@@ -11,8 +11,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 import { onMounted, onUnmounted, useTemplateRef } from 'vue';
 import { Chart } from 'chart.js';
 import { themeManager } from '@/theme.js';
-import { useChartTooltip } from '@/composables/use-chart-tooltip.js';
-import { initChart } from '@/utility/init-chart.js';
+import { useChartTooltip } from '@features/statistics/frontend/composables/use-chart-tooltip.js';
+import { initChart } from '@features/statistics/frontend/utility/init-chart.js';
 
 export type InstanceForPie = {
 	name: string,

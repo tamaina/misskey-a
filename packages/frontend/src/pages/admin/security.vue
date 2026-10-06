@@ -196,19 +196,19 @@ SPDX-License-Identifier: AGPL-3.0-only
 import { ref, computed } from 'vue';
 import XBotProtection from '@features/auth/frontend/pages/admin/bot-protection.vue';
 import MkFolder from '@/components/MkFolder.vue';
-import MkRadios from '@/components/MkRadios.vue';
-import MkSwitch from '@/components/MkSwitch.vue';
-import MkRange from '@/components/MkRange.vue';
-import MkInput from '@/components/MkInput.vue';
-import MkTextarea from '@/components/MkTextarea.vue';
-import MkInfo from '@/components/MkInfo.vue';
+import MkRadios from '@features/ui/frontend/components/MkRadios.vue';
+import MkSwitch from '@features/ui/frontend/components/MkSwitch.vue';
+import MkRange from '@features/ui/frontend/components/MkRange.vue';
+import MkInput from '@features/ui/frontend/components/MkInput.vue';
+import MkTextarea from '@features/ui/frontend/components/MkTextarea.vue';
+import MkInfo from '@features/ui/frontend/components/MkInfo.vue';
 import * as os from '@/os.js';
 import { misskeyApi } from '@/utility/misskey-api.js';
 import { fetchInstance } from '@/instance.js';
 import { i18n } from '@/i18n.js';
 import { definePage } from '@/page.js';
-import { useForm } from '@/composables/use-form.js';
-import MkFormFooter from '@/components/MkFormFooter.vue';
+import { useForm } from '@features/ui/frontend/composables/use-form.js';
+import MkFormFooter from '@features/ui/frontend/components/MkFormFooter.vue';
 
 const meta = await misskeyApi('admin/meta');
 

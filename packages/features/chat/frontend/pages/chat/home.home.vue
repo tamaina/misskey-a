@@ -44,17 +44,17 @@ import { onActivated, onDeactivated, onMounted, ref } from 'vue';
 import * as Misskey from 'misskey-js';
 import { useInterval } from '@@/js/use-interval.js';
 import XMessage from '@features/chat/frontend/pages/chat/XMessage.vue';
-import MkButton from '@/components/MkButton.vue';
+import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import { i18n } from '@/i18n.js';
 import { misskeyApi } from '@/utility/misskey-api.js';
 import { ensureSignin } from '@/i.js';
 import { useRouter } from '@/router.js';
 import * as os from '@/os.js';
 import { updateCurrentAccountPartial } from '@/accounts.js';
-import MkInput from '@/components/MkInput.vue';
-import MkFoldableSection from '@/components/MkFoldableSection.vue';
-import MkInfo from '@/components/MkInfo.vue';
-import MkChatHistories from '@/components/MkChatHistories.vue';
+import MkInput from '@features/ui/frontend/components/MkInput.vue';
+import MkFoldableSection from '@features/ui/frontend/components/MkFoldableSection.vue';
+import MkInfo from '@features/ui/frontend/components/MkInfo.vue';
+import MkChatHistories from '@features/chat/frontend/components/MkChatHistories.vue';
 
 const $i = ensureSignin();
 

@@ -58,21 +58,21 @@ import { url } from '@@/js/config.js';
 import { isLink } from '@@/js/is-link.js';
 import type { MenuItem } from '@/types/menu.js';
 import type { NormalizedChatMessage } from '@features/chat/frontend/pages/chat/room.vue';
-import { extractUrlFromMfm } from '@/utility/extract-url-from-mfm.js';
-import MkUrlPreview from '@/components/MkUrlPreview.vue';
+import { extractUrlFromMfm } from '@features/markup/frontend/utility/extract-url-from-mfm.js';
+import MkUrlPreview from '@features/markup/frontend/components/MkUrlPreview.vue';
 import { ensureSignin } from '@/i.js';
 import { misskeyApi } from '@/utility/misskey-api.js';
 import { i18n } from '@/i18n.js';
-import MkFukidashi from '@/components/MkFukidashi.vue';
+import MkFukidashi from '@features/ui/frontend/components/MkFukidashi.vue';
 import * as os from '@/os.js';
-import { copyToClipboard } from '@/utility/copy-to-clipboard.js';
-import MkMediaList from '@/components/MkMediaList.vue';
-import { reactionPicker } from '@/utility/reaction-picker.js';
+import { copyToClipboard } from '@features/ui/frontend/utility/copy-to-clipboard.js';
+import MkMediaList from '@features/media/frontend/components/MkMediaList.vue';
+import { reactionPicker } from '@features/notes/frontend/utility/reaction-picker.js';
 import * as sound from '@/utility/sound.js';
-import MkReactionIcon from '@/components/MkReactionIcon.vue';
+import MkReactionIcon from '@features/notes/frontend/components/MkReactionIcon.vue';
 import { prefer } from '@/preferences.js';
 import { DI } from '@/di.js';
-import { getHTMLElementOrNull } from '@/utility/get-dom-node-or-null.js';
+import { getHTMLElementOrNull } from '@features/ui/frontend/utility/get-dom-node-or-null.js';
 
 const $i = ensureSignin();
 
@@ -183,7 +183,7 @@ function showMenu(ev: PointerEvent, contextmenu = false) {
 			icon: 'ti ti-exclamation-circle',
 			action: async () => {
 				const localUrl = `${url}/chat/messages/${props.message.id}`;
-				const { dispose } = await os.popupAsyncWithDialog(import('@/components/MkAbuseReportWindow.vue').then(x => x.default), {
+				const { dispose } = await os.popupAsyncWithDialog(import('@features/moderation/frontend/components/MkAbuseReportWindow.vue').then(x => x.default), {
 					user: props.message.fromUser!,
 					initialComment: `${localUrl}\n-----\n`,
 				}, {

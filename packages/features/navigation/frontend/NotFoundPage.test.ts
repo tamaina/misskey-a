@@ -8,10 +8,10 @@ import { createInternationalization } from 'virtual:vite-vue-internationalizatio
 import locales from 'i18n';
 import { loadNotFoundPage } from './index.js';
 import { definePage } from '@/page.js';
-import { pleaseLogin } from '@/utility/please-login.js';
+import { pleaseLogin } from '@features/auth/frontend/utility/please-login.js';
 
 vi.mock('@/page.js', () => ({ definePage: vi.fn() }));
-vi.mock('@/utility/please-login.js', () => ({ pleaseLogin: vi.fn() }));
+vi.mock('@features/auth/frontend/utility/please-login.js', () => ({ pleaseLogin: vi.fn() }));
 
 let NotFound: Awaited<ReturnType<typeof loadNotFoundPage>>['default'];
 

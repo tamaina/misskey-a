@@ -118,12 +118,12 @@ import type { MenuItem } from '@/types/menu.js';
 import { i18n } from '@/i18n.js';
 import { $i } from '@/i.js';
 import { deepClone } from '@/utility/clone.js';
-import MkButton from '@/components/MkButton.vue';
-import MkRadios from '@/components/MkRadios.vue';
-import MkSwitch from '@/components/MkSwitch.vue';
+import MkButton from '@features/ui/frontend/components/MkButton.vue';
+import MkRadios from '@features/ui/frontend/components/MkRadios.vue';
+import MkSwitch from '@features/ui/frontend/components/MkSwitch.vue';
 import MkFolder from '@/components/MkFolder.vue';
 import * as os from '@/os.js';
-import type { MkRadiosOption } from '@/components/MkRadios.vue';
+import type { MkRadiosOption } from '@features/ui/frontend/components/MkRadios.vue';
 import { useRouter } from '@/router.js';
 
 const router = useRouter();

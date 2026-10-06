@@ -126,12 +126,12 @@ export type Extension = {
 </script>
 <script lang="ts" setup>
 import { computed } from 'vue';
-import MkButton from '@/components/MkButton.vue';
-import FormSplit from '@/components/form/split.vue';
-import MkCode from '@/components/MkCode.vue';
-import MkInfo from '@/components/MkInfo.vue';
+import MkButton from '@features/ui/frontend/components/MkButton.vue';
+import FormSplit from '@features/ui/frontend/components/form/split.vue';
+import MkCode from '@features/markup/frontend/components/MkCode.vue';
+import MkInfo from '@features/ui/frontend/components/MkInfo.vue';
 import MkFolder from '@/components/MkFolder.vue';
-import MkKeyValue from '@/components/MkKeyValue.vue';
+import MkKeyValue from '@features/ui/frontend/components/MkKeyValue.vue';
 import { i18n } from '@/i18n.js';
 
 const isPlugin = computed(() => props.extension.type === 'plugin');

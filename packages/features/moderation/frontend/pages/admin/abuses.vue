@@ -50,15 +50,15 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import { computed, ref, markRaw } from 'vue';
-import MkSelect from '@/components/MkSelect.vue';
-import MkPagination from '@/components/MkPagination.vue';
-import XAbuseReport from '@/components/MkAbuseReport.vue';
+import MkSelect from '@features/ui/frontend/components/MkSelect.vue';
+import MkPagination from '@features/ui/frontend/components/MkPagination.vue';
+import XAbuseReport from '@features/moderation/frontend/components/MkAbuseReport.vue';
 import { i18n } from '@/i18n.js';
 import { definePage } from '@/page.js';
-import { useMkSelect } from '@/composables/use-mkselect.js';
-import MkButton from '@/components/MkButton.vue';
+import { useMkSelect } from '@features/ui/frontend/composables/use-mkselect.js';
+import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import { store } from '@/store.js';
-import { Paginator } from '@/utility/paginator.js';
+import { Paginator } from '@features/ui/frontend/utility/paginator.js';
 
 const {
 	model: state,

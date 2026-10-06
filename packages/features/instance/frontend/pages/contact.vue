@@ -47,10 +47,10 @@ import { instance } from '@/instance.js';
 import { definePage } from '@/page.js';
 import { getUserEnvironment } from '@/utility/get-user-environment.js';
 import type { UserEnvironment } from '@/utility/get-user-environment.js';
-import MkKeyValue from '@/components/MkKeyValue.vue';
+import MkKeyValue from '@features/ui/frontend/components/MkKeyValue.vue';
 import MkFolder from '@/components/MkFolder.vue';
 import MkLink from '@/components/MkLink.vue';
-import MkCode from '@/components/MkCode.vue';
+import MkCode from '@features/markup/frontend/components/MkCode.vue';
 
 const userEnv = ref<UserEnvironment | null>(null);
 

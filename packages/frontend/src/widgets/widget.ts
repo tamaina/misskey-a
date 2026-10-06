@@ -6,8 +6,8 @@
 import { defineAsyncComponent, reactive, watch } from 'vue';
 import { throttle } from 'throttle-debounce';
 import type { Reactive } from 'vue';
-import type { FormWithDefault, GetFormResultType } from '@/utility/form.js';
-import { getDefaultFormValues } from '@/utility/form.js';
+import type { FormWithDefault, GetFormResultType } from '@features/ui/frontend/utility/form.js';
+import { getDefaultFormValues } from '@features/ui/frontend/utility/form.js';
 import * as os from '@/os.js';
 import { deepClone } from '@/utility/clone.js';
 import type { WidgetName } from './index.js';
@@ -75,7 +75,7 @@ export const useWidgetPropsManager = <F extends FormWithDefault>(
 		} | {
 			canceled: true;
 		}>((resolve) => {
-			const { dispose } = os.popup(defineAsyncComponent(() => import('@/components/MkWidgetSettingsDialog.vue')), {
+			const { dispose } = os.popup(defineAsyncComponent(() => import('@features/ui/frontend/components/MkWidgetSettingsDialog.vue')), {
 				widgetName: name,
 				form: form,
 				currentSettings: widgetProps,

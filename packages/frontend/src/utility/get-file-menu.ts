@@ -7,7 +7,7 @@ import * as Misskey from 'misskey-js';
 import { $i, iAmModerator } from '@/i.js';
 import { i18n } from '@/i18n.js';
 import { prefer } from '@/preferences.js';
-import { copyToClipboard } from '@/utility/copy-to-clipboard.js';
+import { copyToClipboard } from '@features/ui/frontend/utility/copy-to-clipboard.js';
 import * as os from '@/os.js';
 import type { MenuItem } from '@/types/menu.js';
 

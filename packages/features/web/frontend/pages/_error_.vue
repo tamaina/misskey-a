@@ -28,7 +28,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 import { ref, computed } from 'vue';
 import * as Misskey from 'misskey-js';
 import { version } from '@@/js/config.js';
-import MkButton from '@/components/MkButton.vue';
+import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import MkLink from '@/components/MkLink.vue';
 import { misskeyApi } from '@/utility/misskey-api.js';
 import { unisonReload } from '@/utility/unison-reload.js';

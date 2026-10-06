@@ -42,13 +42,13 @@ import { entities } from 'misskey-js';
 import { computed, defineAsyncComponent, onMounted, ref } from 'vue';
 import XRecipient from '@features/moderation/frontend/pages/admin/abuse-report/notification-recipient.item.vue';
 import { misskeyApi } from '@/utility/misskey-api.js';
-import MkInput from '@/components/MkInput.vue';
-import MkSelect from '@/components/MkSelect.vue';
-import MkButton from '@/components/MkButton.vue';
+import MkInput from '@features/ui/frontend/components/MkInput.vue';
+import MkSelect from '@features/ui/frontend/components/MkSelect.vue';
+import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import * as os from '@/os.js';
-import MkDivider from '@/components/MkDivider.vue';
+import MkDivider from '@features/ui/frontend/components/MkDivider.vue';
 import { i18n } from '@/i18n.js';
-import { useMkSelect } from '@/composables/use-mkselect.js';
+import { useMkSelect } from '@features/ui/frontend/composables/use-mkselect.js';
 
 const recipients = ref<entities.AbuseReportNotificationRecipient[]>([]);
 

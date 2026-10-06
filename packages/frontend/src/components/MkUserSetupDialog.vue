@@ -130,15 +130,15 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script lang="ts" setup>
 import { ref, useTemplateRef, watch, nextTick, defineAsyncComponent } from 'vue';
 import { host } from '@@/js/config.js';
-import MkModalWindow from '@/components/MkModalWindow.vue';
-import MkButton from '@/components/MkButton.vue';
-import XProfile from '@/components/MkUserSetupDialog.Profile.vue';
-import XFollow from '@/components/MkUserSetupDialog.Follow.vue';
-import XPrivacy from '@/components/MkUserSetupDialog.Privacy.vue';
+import MkModalWindow from '@features/ui/frontend/components/MkModalWindow.vue';
+import MkButton from '@features/ui/frontend/components/MkButton.vue';
+import XProfile from '@features/users/frontend/components/MkUserSetupDialog.Profile.vue';
+import XFollow from '@features/users/frontend/components/MkUserSetupDialog.Follow.vue';
+import XPrivacy from '@features/users/frontend/components/MkUserSetupDialog.Privacy.vue';
 import MkAnimBg from '@/components/MkAnimBg.vue';
 import { i18n } from '@/i18n.js';
 import { instance } from '@/instance.js';
-import MkPushNotificationAllowButton from '@/components/MkPushNotificationAllowButton.vue';
+import MkPushNotificationAllowButton from '@features/notifications/frontend/components/MkPushNotificationAllowButton.vue';
 import { store } from '@/store.js';
 import * as os from '@/os.js';
 

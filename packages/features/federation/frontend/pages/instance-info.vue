@@ -123,29 +123,29 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script lang="ts" setup>
 import { ref, computed, watch, markRaw } from 'vue';
 import * as Misskey from 'misskey-js';
-import type { ChartSrc } from '@/components/MkChart.vue';
-import MkChart from '@/components/MkChart.vue';
-import MkObjectView from '@/components/MkObjectView.vue';
-import FormLink from '@/components/form/link.vue';
+import type { ChartSrc } from '@features/statistics/frontend/components/MkChart.vue';
+import MkChart from '@features/statistics/frontend/components/MkChart.vue';
+import MkObjectView from '@features/ui/frontend/components/MkObjectView.vue';
+import FormLink from '@features/ui/frontend/components/form/link.vue';
 import MkLink from '@/components/MkLink.vue';
-import MkButton from '@/components/MkButton.vue';
-import FormSection from '@/components/form/section.vue';
-import MkKeyValue from '@/components/MkKeyValue.vue';
-import MkSelect from '@/components/MkSelect.vue';
-import MkSwitch from '@/components/MkSwitch.vue';
+import MkButton from '@features/ui/frontend/components/MkButton.vue';
+import FormSection from '@features/ui/frontend/components/form/section.vue';
+import MkKeyValue from '@features/ui/frontend/components/MkKeyValue.vue';
+import MkSelect from '@features/ui/frontend/components/MkSelect.vue';
+import MkSwitch from '@features/ui/frontend/components/MkSwitch.vue';
 import * as os from '@/os.js';
 import { misskeyApi } from '@/utility/misskey-api.js';
-import number from '@/filters/number.js';
+import number from '@features/ui/frontend/filters/number.js';
 import { iAmModerator, iAmAdmin } from '@/i.js';
 import { definePage } from '@/page.js';
 import { i18n } from '@/i18n.js';
-import MkUserCardMini from '@/components/MkUserCardMini.vue';
-import MkPagination from '@/components/MkPagination.vue';
+import MkUserCardMini from '@features/users/frontend/components/MkUserCardMini.vue';
+import MkPagination from '@features/ui/frontend/components/MkPagination.vue';
 import { getProxiedImageUrlNullable } from '@/utility/media-proxy.js';
-import { dateString } from '@/filters/date.js';
-import { useMkSelect } from '@/composables/use-mkselect.js';
-import MkTextarea from '@/components/MkTextarea.vue';
-import { Paginator } from '@/utility/paginator.js';
+import { dateString } from '@features/ui/frontend/filters/date.js';
+import { useMkSelect } from '@features/ui/frontend/composables/use-mkselect.js';
+import MkTextarea from '@features/ui/frontend/components/MkTextarea.vue';
+import { Paginator } from '@features/ui/frontend/utility/paginator.js';
 
 const props = defineProps<{
 	host: string;

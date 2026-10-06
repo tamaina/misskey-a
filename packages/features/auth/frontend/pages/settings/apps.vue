@@ -51,14 +51,14 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script lang="ts" setup>
 import { ref, computed, markRaw } from 'vue';
 import * as Misskey from 'misskey-js';
-import MkPagination from '@/components/MkPagination.vue';
+import MkPagination from '@features/ui/frontend/components/MkPagination.vue';
 import { misskeyApi } from '@/utility/misskey-api.js';
 import { i18n } from '@/i18n.js';
 import { definePage } from '@/page.js';
-import MkKeyValue from '@/components/MkKeyValue.vue';
-import MkButton from '@/components/MkButton.vue';
+import MkKeyValue from '@features/ui/frontend/components/MkKeyValue.vue';
+import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import MkFolder from '@/components/MkFolder.vue';
-import { Paginator } from '@/utility/paginator.js';
+import { Paginator } from '@features/ui/frontend/utility/paginator.js';
 
 const paginator = markRaw(new Paginator('i/apps', {
 	limit: 100,

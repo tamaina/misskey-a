@@ -4,7 +4,7 @@
  */
 
 import { i18n } from '@/i18n.js';
-import type { MkSelectItem } from '@/components/MkSelect.vue';
+import type { MkSelectItem } from '@features/ui/frontend/components/MkSelect.vue';
 
 export function getPageBlockList() {
 	return [

@@ -53,16 +53,16 @@ import tinycolor from 'tinycolor2';
 import type { StyleValue } from 'vue';
 import * as os from '@/os.js';
 import { misskeyApi } from '@/utility/misskey-api.js';
-import MkPagination from '@/components/MkPagination.vue';
-import MkDriveFileThumbnail from '@/components/MkDriveFileThumbnail.vue';
+import MkPagination from '@features/ui/frontend/components/MkPagination.vue';
+import MkDriveFileThumbnail from '@features/drive/frontend/components/MkDriveFileThumbnail.vue';
 import { i18n } from '@/i18n.js';
-import bytes from '@/filters/bytes.js';
+import bytes from '@features/ui/frontend/filters/bytes.js';
 import { definePage } from '@/page.js';
-import MkSelect from '@/components/MkSelect.vue';
-import { useMkSelect } from '@/composables/use-mkselect.js';
+import MkSelect from '@features/ui/frontend/components/MkSelect.vue';
+import { useMkSelect } from '@features/ui/frontend/composables/use-mkselect.js';
 import { useGlobalEvent } from '@/events.js';
-import { getDriveFileMenu } from '@/utility/get-drive-file-menu.js';
-import { Paginator } from '@/utility/paginator.js';
+import { getDriveFileMenu } from '@features/drive/frontend/utility/get-drive-file-menu.js';
+import { Paginator } from '@features/ui/frontend/utility/paginator.js';
 
 const sortMode = ref<Misskey.entities.DriveFilesRequest['sort']>('+size');
 const paginator = markRaw(new Paginator('drive/files', {

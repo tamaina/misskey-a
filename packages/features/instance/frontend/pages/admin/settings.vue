@@ -386,21 +386,21 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import { computed } from 'vue';
-import MkSwitch from '@/components/MkSwitch.vue';
-import MkInput from '@/components/MkInput.vue';
-import MkTextarea from '@/components/MkTextarea.vue';
-import MkInfo from '@/components/MkInfo.vue';
-import FormSplit from '@/components/form/split.vue';
+import MkSwitch from '@features/ui/frontend/components/MkSwitch.vue';
+import MkInput from '@features/ui/frontend/components/MkInput.vue';
+import MkTextarea from '@features/ui/frontend/components/MkTextarea.vue';
+import MkInfo from '@features/ui/frontend/components/MkInfo.vue';
+import FormSplit from '@features/ui/frontend/components/form/split.vue';
 import * as os from '@/os.js';
 import { misskeyApi } from '@/utility/misskey-api.js';
 import { fetchInstance, instance } from '@/instance.js';
 import { i18n } from '@/i18n.js';
 import { definePage } from '@/page.js';
-import MkButton from '@/components/MkButton.vue';
+import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import MkFolder from '@/components/MkFolder.vue';
-import { useForm } from '@/composables/use-form.js';
-import MkFormFooter from '@/components/MkFormFooter.vue';
-import MkRadios from '@/components/MkRadios.vue';
+import { useForm } from '@features/ui/frontend/composables/use-form.js';
+import MkFormFooter from '@features/ui/frontend/components/MkFormFooter.vue';
+import MkRadios from '@features/ui/frontend/components/MkRadios.vue';
 
 const meta = await misskeyApi('admin/meta');
 
@@ -527,7 +527,7 @@ async function openSetupWizard() {
 	});
 	if (canceled) return;
 
-	const { dispose } = await os.popupAsyncWithDialog(import('@/components/MkServerSetupWizardDialog.vue').then(x => x.default), {
+	const { dispose } = await os.popupAsyncWithDialog(import('@features/boot/frontend/components/MkServerSetupWizardDialog.vue').then(x => x.default), {
 	}, {
 		closed: () => dispose(),
 	});

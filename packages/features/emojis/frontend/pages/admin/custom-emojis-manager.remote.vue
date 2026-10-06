@@ -143,23 +143,23 @@ SPDX-License-Identifier: AGPL-3.0-only
 import { computed, onMounted, ref, useCssModule } from 'vue';
 import * as Misskey from 'misskey-js';
 import type { GridSortOrderKey, RequestLogItem } from '@features/emojis/frontend/pages/admin/custom-emojis-manager.impl.js';
-import type { GridCellValueChangeEvent, GridEvent } from '@/components/grid/grid-event.js';
-import type { GridSetting } from '@/components/grid/grid.js';
-import type { SortOrder } from '@/components/MkSortOrderEditor.define.js';
-import MkRemoteEmojiEditDialog from '@/components/MkRemoteEmojiEditDialog.vue';
+import type { GridCellValueChangeEvent, GridEvent } from '@features/ui/frontend/components/grid/grid-event.js';
+import type { GridSetting } from '@features/ui/frontend/components/grid/grid.js';
+import type { SortOrder } from '@features/preferences/frontend/components/MkSortOrderEditor.define.js';
+import MkRemoteEmojiEditDialog from '@features/emojis/frontend/components/MkRemoteEmojiEditDialog.vue';
 import { misskeyApi } from '@/utility/misskey-api.js';
 import { i18n } from '@/i18n.js';
-import MkButton from '@/components/MkButton.vue';
-import MkInput from '@/components/MkInput.vue';
-import MkGrid from '@/components/grid/MkGrid.vue';
+import MkButton from '@features/ui/frontend/components/MkButton.vue';
+import MkInput from '@features/ui/frontend/components/MkInput.vue';
+import MkGrid from '@features/ui/frontend/components/grid/MkGrid.vue';
 import { emptyStrToUndefined, gridSortOrderKeys } from '@features/emojis/frontend/pages/admin/custom-emojis-manager.impl.js';
 import MkFolder from '@/components/MkFolder.vue';
 import XRegisterLogs from '@features/emojis/frontend/pages/admin/custom-emojis-manager.logs.vue';
 import * as os from '@/os.js';
-import { deviceKind } from '@/utility/device-kind.js';
-import MkPagingButtons from '@/components/MkPagingButtons.vue';
-import MkSortOrderEditor from '@/components/MkSortOrderEditor.vue';
-import { useLoading } from '@/composables/use-loading.js';
+import { deviceKind } from '@features/ui/frontend/utility/device-kind.js';
+import MkPagingButtons from '@features/ui/frontend/components/MkPagingButtons.vue';
+import MkSortOrderEditor from '@features/preferences/frontend/components/MkSortOrderEditor.vue';
+import { useLoading } from '@features/ui/frontend/composables/use-loading.js';
 
 type GridItem = {
 	checked: boolean;

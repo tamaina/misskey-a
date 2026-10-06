@@ -18,8 +18,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import { ref, computed } from 'vue';
-import MkCodeEditor from '@/components/MkCodeEditor.vue';
-import MkButton from '@/components/MkButton.vue';
+import MkCodeEditor from '@features/markup/frontend/components/MkCodeEditor.vue';
+import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import { themeManager, installTheme, handleThemeInstallError } from '@/theme.js';
 import { parseThemeCode } from '@@/js/theme.js';
 import * as os from '@/os.js';

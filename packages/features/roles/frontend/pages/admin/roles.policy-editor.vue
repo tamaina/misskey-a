@@ -419,11 +419,11 @@ import { computed, ref, watch } from 'vue';
 import { i18n } from '@/i18n.js';
 import XFolder from '@features/roles/frontend/pages/admin/roles.policy-editor.folder.vue';
 
-import MkInput from '@/components/MkInput.vue';
-import MkTextarea from '@/components/MkTextarea.vue';
-import MkRange from '@/components/MkRange.vue';
-import MkSwitch from '@/components/MkSwitch.vue';
-import MkSelect from '@/components/MkSelect.vue';
+import MkInput from '@features/ui/frontend/components/MkInput.vue';
+import MkTextarea from '@features/ui/frontend/components/MkTextarea.vue';
+import MkRange from '@features/ui/frontend/components/MkRange.vue';
+import MkSwitch from '@features/ui/frontend/components/MkSwitch.vue';
+import MkSelect from '@features/ui/frontend/components/MkSelect.vue';
 
 const props = defineProps<{
 	isBaseRole: boolean;

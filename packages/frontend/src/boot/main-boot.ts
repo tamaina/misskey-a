@@ -9,7 +9,7 @@ import * as Misskey from 'misskey-js';
 import { compareVersions } from 'compare-versions';
 import { common } from './common.js';
 import type { Component } from 'vue';
-import type { Keymap } from '@/utility/hotkey.js';
+import type { Keymap } from '@features/ui/frontend/utility/hotkey.js';
 import { i18n } from '@/i18n.js';
 import { alert, confirm, popup, post } from '@/os.js';
 import { useStream } from '@/stream.js';
@@ -17,18 +17,18 @@ import * as sound from '@/utility/sound.js';
 import { $i } from '@/i.js';
 import { instance } from '@/instance.js';
 import { store } from '@/store.js';
-import { reactionPicker } from '@/utility/reaction-picker.js';
+import { reactionPicker } from '@features/notes/frontend/utility/reaction-picker.js';
 import { miLocalStorage } from '@/local-storage.js';
-import { claimAchievement, claimedAchievements } from '@/utility/achievements.js';
+import { claimAchievement, claimedAchievements } from '@features/users/frontend/utility/achievements.js';
 import { initializeSw } from '@/utility/initialize-sw.js';
-import { emojiPicker } from '@/utility/emoji-picker.js';
+import { emojiPicker } from '@features/emojis/frontend/utility/emoji-picker.js';
 import { mainRouter } from '@/router.js';
-import { makeHotkey } from '@/utility/hotkey.js';
+import { makeHotkey } from '@features/ui/frontend/utility/hotkey.js';
 import { addCustomEmoji, removeCustomEmojis, updateCustomEmojis } from '@/custom-emojis.js';
 import { prefer } from '@/preferences.js';
 import { updateCurrentAccountPartial } from '@/accounts.js';
 import { unisonReload } from '@/utility/unison-reload.js';
-import { isBirthday } from '@/utility/is-birthday.js';
+import { isBirthday } from '@features/users/frontend/utility/is-birthday.js';
 
 export async function mainBoot() {
 	const { isClientUpdated, lastVersion } = await common(async () => {
@@ -65,7 +65,7 @@ export async function mainBoot() {
 	emojiPicker.init();
 
 	if (isClientUpdated && $i) {
-		const { dispose } = popup(defineAsyncComponent(() => import('@/components/MkUpdated.vue')), {}, {
+		const { dispose } = popup(defineAsyncComponent(() => import('@features/boot/frontend/components/MkUpdated.vue')), {}, {
 			closed: () => dispose(),
 		});
 	}
@@ -107,7 +107,7 @@ export async function mainBoot() {
 		});
 
 		for (const announcement of ($i.unreadAnnouncements ?? []).filter(x => x.display === 'dialog')) {
-			const { dispose } = popup(defineAsyncComponent(() => import('@/components/MkAnnouncementDialog.vue')), {
+			const { dispose } = popup(defineAsyncComponent(() => import('@features/announcements/frontend/components/MkAnnouncementDialog.vue')), {
 				announcement,
 			}, {
 				closed: () => dispose(),
@@ -117,7 +117,7 @@ export async function mainBoot() {
 		function onAnnouncementCreated(ev: { announcement: Misskey.entities.Announcement }) {
 			const announcement = ev.announcement;
 			if (announcement.display === 'dialog') {
-				const { dispose } = popup(defineAsyncComponent(() => import('@/components/MkAnnouncementDialog.vue')), {
+				const { dispose } = popup(defineAsyncComponent(() => import('@features/announcements/frontend/components/MkAnnouncementDialog.vue')), {
 					announcement,
 				}, {
 					closed: () => dispose(),
@@ -286,7 +286,7 @@ export async function mainBoot() {
 
 		const modifiedVersionMustProminentlyOfferInAgplV3Section13Read = miLocalStorage.getItem('modifiedVersionMustProminentlyOfferInAgplV3Section13Read');
 		if (modifiedVersionMustProminentlyOfferInAgplV3Section13Read !== 'true' && instance.repositoryUrl !== 'https://github.com/misskey-dev/misskey') {
-			const { dispose } = popup(defineAsyncComponent(() => import('@/components/MkSourceCodeAvailablePopup.vue')), {}, {
+			const { dispose } = popup(defineAsyncComponent(() => import('@features/instance/frontend/components/MkSourceCodeAvailablePopup.vue')), {}, {
 				closed: () => dispose(),
 			});
 		}

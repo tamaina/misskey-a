@@ -35,8 +35,8 @@ import * as os from '@/os.js';
 import { misskeyApi } from '@/utility/misskey-api.js';
 import { i18n } from '@/i18n.js';
 import { definePage } from '@/page.js';
-import MkFoldableSection from '@/components/MkFoldableSection.vue';
-import { groupAvatarDecorations } from '@/utility/group-avatar-decorations.js';
+import MkFoldableSection from '@features/ui/frontend/components/MkFoldableSection.vue';
+import { groupAvatarDecorations } from '@features/avatar-decorations/frontend/utility/group-avatar-decorations.js';
 
 const $i = ensureSignin();
 

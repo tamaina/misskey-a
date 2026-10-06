@@ -20,7 +20,7 @@ import * as Misskey from 'misskey-js';
 import XStatusbar from '@features/preferences/frontend/pages/settings/statusbar.statusbar.vue';
 import { genId } from '@/utility/id.js';
 import MkFolder from '@/components/MkFolder.vue';
-import MkButton from '@/components/MkButton.vue';
+import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import { misskeyApi } from '@/utility/misskey-api.js';
 import { i18n } from '@/i18n.js';
 import { definePage } from '@/page.js';

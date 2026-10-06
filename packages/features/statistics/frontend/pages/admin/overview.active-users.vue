@@ -18,9 +18,9 @@ import { Chart } from 'chart.js';
 import gradient from 'chartjs-plugin-gradient';
 import { misskeyApi } from '@/utility/misskey-api.js';
 import { store } from '@/store.js';
-import { useChartTooltip } from '@/composables/use-chart-tooltip.js';
-import { chartVLine } from '@/utility/chart-vline.js';
-import { initChart } from '@/utility/init-chart.js';
+import { useChartTooltip } from '@features/statistics/frontend/composables/use-chart-tooltip.js';
+import { chartVLine } from '@features/statistics/frontend/utility/chart-vline.js';
+import { initChart } from '@features/statistics/frontend/utility/init-chart.js';
 
 initChart();
 

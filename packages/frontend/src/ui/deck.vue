@@ -89,17 +89,17 @@ SPDX-License-Identifier: AGPL-3.0-only
 import { defineAsyncComponent, ref, useTemplateRef } from 'vue';
 import XCommon from './_common_/common.vue';
 import { genId } from '@/utility/id.js';
-import XSidebar from '@/ui/_common_/navbar.vue';
-import XNavbarH from '@/ui/_common_/navbar-h.vue';
-import XMobileFooterMenu from '@/ui/_common_/mobile-footer-menu.vue';
-import XTitlebar from '@/ui/_common_/titlebar.vue';
-import XPreferenceRestore from '@/ui/_common_/PreferenceRestore.vue';
-import XReloadSuggestion from '@/ui/_common_/ReloadSuggestion.vue';
-import XThemePreviewing from '@/ui/_common_/ThemePreviewing.vue';
+import XSidebar from '@features/navigation/frontend/ui/_common_/navbar.vue';
+import XNavbarH from '@features/navigation/frontend/ui/_common_/navbar-h.vue';
+import XMobileFooterMenu from '@features/navigation/frontend/ui/_common_/mobile-footer-menu.vue';
+import XTitlebar from '@features/navigation/frontend/ui/_common_/titlebar.vue';
+import XPreferenceRestore from '@features/preferences/frontend/ui/_common_/PreferenceRestore.vue';
+import XReloadSuggestion from '@features/boot/frontend/ui/_common_/ReloadSuggestion.vue';
+import XThemePreviewing from '@features/preferences/frontend/ui/_common_/ThemePreviewing.vue';
 import * as os from '@/os.js';
 import { $i } from '@/i.js';
 import { i18n } from '@/i18n.js';
-import { deviceKind } from '@/utility/device-kind.js';
+import { deviceKind } from '@features/ui/frontend/utility/device-kind.js';
 import { prefer } from '@/preferences.js';
 import { store } from '@/store.js';
 import { isPreviewMode as isThemePreviewMode } from '@/theme.js';
@@ -114,16 +114,16 @@ import XMentionsColumn from '@/ui/deck/mentions-column.vue';
 import XDirectColumn from '@/ui/deck/direct-column.vue';
 import XRoleTimelineColumn from '@/ui/deck/role-timeline-column.vue';
 import XChatColumn from '@/ui/deck/chat-column.vue';
-import MkInfo from '@/components/MkInfo.vue';
+import MkInfo from '@features/ui/frontend/components/MkInfo.vue';
 import { mainRouter } from '@/router.js';
 import { columns, layout, columnTypes, switchProfileMenu, addColumn as addColumnToStore, deleteProfile as deleteProfile_ } from '@/deck.js';
-import { shouldSuggestRestoreBackup } from '@/preferences/utility.js';
+import { shouldSuggestRestoreBackup } from '@features/preferences/frontend/state/utility.js';
 import { shouldSuggestReload } from '@/utility/reload-suggest.js';
 import { startTour } from '@/utility/tour.js';
 import { closeTip } from '@/tips.js';
 
 const XStatusBars = defineAsyncComponent(() => import('@/ui/_common_/statusbars.vue'));
-const XAnnouncements = defineAsyncComponent(() => import('@/ui/_common_/announcements.vue'));
+const XAnnouncements = defineAsyncComponent(() => import('@features/announcements/frontend/ui/_common_/announcements.vue'));
 
 const columnComponents = {
 	main: XMainColumn,

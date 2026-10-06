@@ -8,7 +8,7 @@ import { render, cleanup, type RenderResult } from '@testing-library/vue';
 import type { SummalyResult } from '@misskey-dev/summaly';
 import { components } from '@/components/index.js';
 import { directives } from '@/directives/index.js';
-import MkUrlPreview from '@/components/MkUrlPreview.vue';
+import MkUrlPreview from '@features/markup/frontend/components/MkUrlPreview.vue';
 
 describe('MkUrlPreview', () => {
 	const renderPreviewBy = async (summary: Partial<SummalyResult>): Promise<RenderResult> => {

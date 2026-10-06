@@ -56,20 +56,20 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import { computed, ref } from 'vue';
-import MkRadios from '@/components/MkRadios.vue';
-import MkButton from '@/components/MkButton.vue';
-import FormSlot from '@/components/form/slot.vue';
-import MkContainer from '@/components/MkContainer.vue';
-import MkSwitch from '@/components/MkSwitch.vue';
-import MkPreferenceContainer from '@/components/MkPreferenceContainer.vue';
-import MkDraggable from '@/components/MkDraggable.vue';
+import MkRadios from '@features/ui/frontend/components/MkRadios.vue';
+import MkButton from '@features/ui/frontend/components/MkButton.vue';
+import FormSlot from '@features/ui/frontend/components/form/slot.vue';
+import MkContainer from '@features/ui/frontend/components/MkContainer.vue';
+import MkSwitch from '@features/ui/frontend/components/MkSwitch.vue';
+import MkPreferenceContainer from '@features/preferences/frontend/components/MkPreferenceContainer.vue';
+import MkDraggable from '@features/ui/frontend/components/MkDraggable.vue';
 import * as os from '@/os.js';
 import { navbarItemDef } from '@/navbar.js';
 import { store } from '@/store.js';
 import { i18n } from '@/i18n.js';
 import { definePage } from '@/page.js';
 import { prefer } from '@/preferences.js';
-import { getInitialPrefValue } from '@/preferences/manager.js';
+import { getInitialPrefValue } from '@features/preferences/frontend/state/manager.js';
 import { genId } from '@/utility/id.js';
 
 const items = ref(prefer.s.menu.map(x => ({

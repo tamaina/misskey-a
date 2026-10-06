@@ -37,15 +37,15 @@ SPDX-License-Identifier: AGPL-3.0-only
 import { onMounted, watch, ref, shallowRef, computed, nextTick, readonly, onBeforeUnmount } from 'vue';
 import * as Misskey from 'misskey-js';
 //import insertTextAtCursor from 'insert-text-at-cursor';
-import { formatTimeString } from '@/utility/format-time-string.js';
-import { selectFile } from '@/utility/drive.js';
+import { formatTimeString } from '@features/ui/frontend/utility/format-time-string.js';
+import { selectFile } from '@features/drive/frontend/utility/drive.js';
 import * as os from '@/os.js';
 import { i18n } from '@/i18n.js';
 import { miLocalStorage } from '@/local-storage.js';
 import { misskeyApi } from '@/utility/misskey-api.js';
 import { prefer } from '@/preferences.js';
-import { Autocomplete } from '@/utility/autocomplete.js';
-import { emojiPicker } from '@/utility/emoji-picker.js';
+import { Autocomplete } from '@features/discovery/frontend/utility/autocomplete.js';
+import { emojiPicker } from '@features/emojis/frontend/utility/emoji-picker.js';
 import { checkDragDataType, getDragData } from '@/drag-and-drop.js';
 
 const props = defineProps<{

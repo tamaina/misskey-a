@@ -23,7 +23,7 @@ import XJoiningRooms from '@features/chat/frontend/pages/chat/home.joiningRooms.
 import XOwnedRooms from '@features/chat/frontend/pages/chat/home.ownedRooms.vue';
 import { i18n } from '@/i18n.js';
 import { definePage } from '@/page.js';
-import MkPolkadots from '@/components/MkPolkadots.vue';
+import MkPolkadots from '@features/ui/frontend/components/MkPolkadots.vue';
 
 const tab = ref('home');
 

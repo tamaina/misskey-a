@@ -61,29 +61,29 @@ SPDX-License-Identifier: AGPL-3.0-only
 import * as Misskey from 'misskey-js';
 import { computed, onMounted, ref, useCssModule } from 'vue';
 import type { RequestLogItem } from '@features/emojis/frontend/pages/admin/custom-emojis-manager.impl.js';
-import type { GridCellValidationEvent, GridCellValueChangeEvent, GridEvent } from '@/components/grid/grid-event.js';
+import type { GridCellValidationEvent, GridCellValueChangeEvent, GridEvent } from '@features/ui/frontend/components/grid/grid-event.js';
 import type { DroppedFile } from '@/utility/file-drop.js';
-import type { GridSetting } from '@/components/grid/grid.js';
-import type { GridRow } from '@/components/grid/row.js';
+import type { GridSetting } from '@features/ui/frontend/components/grid/grid.js';
+import type { GridRow } from '@features/ui/frontend/components/grid/row.js';
 import { misskeyApi } from '@/utility/misskey-api.js';
 import {
 	emptyStrToEmptyArray,
 	emptyStrToNull,
 	roleIdsParser,
 } from '@features/emojis/frontend/pages/admin/custom-emojis-manager.impl.js';
-import MkGrid from '@/components/grid/MkGrid.vue';
+import MkGrid from '@features/ui/frontend/components/grid/MkGrid.vue';
 import { i18n } from '@/i18n.js';
-import MkSelect from '@/components/MkSelect.vue';
-import MkSwitch from '@/components/MkSwitch.vue';
+import MkSelect from '@features/ui/frontend/components/MkSelect.vue';
+import MkSwitch from '@features/ui/frontend/components/MkSwitch.vue';
 import MkFolder from '@/components/MkFolder.vue';
-import MkButton from '@/components/MkButton.vue';
+import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import * as os from '@/os.js';
-import { validators } from '@/components/grid/cell-validators.js';
-import { chooseDriveFile, chooseFileFromPcAndUpload } from '@/utility/drive.js';
+import { validators } from '@features/ui/frontend/components/grid/cell-validators.js';
+import { chooseDriveFile, chooseFileFromPcAndUpload } from '@features/drive/frontend/utility/drive.js';
 import { extractDroppedItems, flattenDroppedFiles } from '@/utility/file-drop.js';
 import XRegisterLogs from '@features/emojis/frontend/pages/admin/custom-emojis-manager.logs.vue';
-import { copyGridDataToClipboard } from '@/components/grid/grid-utils.js';
-import { useMkSelect } from '@/composables/use-mkselect.js';
+import { copyGridDataToClipboard } from '@features/ui/frontend/components/grid/grid-utils.js';
+import { useMkSelect } from '@features/ui/frontend/composables/use-mkselect.js';
 
 import { prefer } from '@/preferences.js';
 

@@ -104,8 +104,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script lang="ts" setup>
 import { defineAsyncComponent, ref, TransitionGroup } from 'vue';
 import * as Misskey from 'misskey-js';
-import { swInject } from './sw-inject.js';
-import XNotification from './notification.vue';
+import { swInject } from '@features/boot/frontend/ui/_common_/sw-inject.js';
+import XNotification from '@features/notifications/frontend/ui/_common_/notification.vue';
 import { isSafeMode } from '@@/js/config.js';
 import { popups } from '@/os.js';
 import { unisonReload } from '@/utility/unison-reload.js';
@@ -118,7 +118,7 @@ import { i18n } from '@/i18n.js';
 import { prefer } from '@/preferences.js';
 import { globalEvents } from '@/events.js';
 import { store } from '@/store.js';
-import XNavbar from '@/ui/_common_/navbar.vue';
+import XNavbar from '@features/navigation/frontend/ui/_common_/navbar.vue';
 
 const XStreamIndicator = defineAsyncComponent(() => import('./stream-indicator.vue'));
 const XWidgets = defineAsyncComponent(() => import('./widgets.vue'));

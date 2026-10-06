@@ -88,18 +88,18 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script lang="ts" setup>
 import { reactive, computed, watch } from 'vue';
 import * as Misskey from 'misskey-js';
-import MkSelect from '@/components/MkSelect.vue';
-import MkInput from '@/components/MkInput.vue';
-import MkSwitch from '@/components/MkSwitch.vue';
-import MkRadios from '@/components/MkRadios.vue';
-import MkButton from '@/components/MkButton.vue';
-import MkRange from '@/components/MkRange.vue';
+import MkSelect from '@features/ui/frontend/components/MkSelect.vue';
+import MkInput from '@features/ui/frontend/components/MkInput.vue';
+import MkSwitch from '@features/ui/frontend/components/MkSwitch.vue';
+import MkRadios from '@features/ui/frontend/components/MkRadios.vue';
+import MkButton from '@features/ui/frontend/components/MkButton.vue';
+import MkRange from '@features/ui/frontend/components/MkRange.vue';
 import { i18n } from '@/i18n.js';
 import { instance } from '@/instance.js';
 import { deepClone } from '@/utility/clone.js';
 import { prefer } from '@/preferences.js';
-import type { MkSelectItem } from '@/components/MkSelect.vue';
-import type { StatusbarStore } from '@/preferences/def.js';
+import type { MkSelectItem } from '@features/ui/frontend/components/MkSelect.vue';
+import type { StatusbarStore } from '@features/preferences/frontend/state/def.js';
 
 const props = defineProps<{
 	_id: string;

@@ -54,10 +54,10 @@ import { ref, useTemplateRef, watch, onMounted, onUnmounted, reactive, nextTick 
 import type { ImageEffectorLayer } from '@/utility/image-effector/ImageEffector.js';
 import { i18n } from '@/i18n.js';
 import { ImageEffector } from '@/utility/image-effector/ImageEffector.js';
-import MkModalWindow from '@/components/MkModalWindow.vue';
-import MkPreviewWithControls from '@/components/MkPreviewWithControls.vue';
-import MkButton from '@/components/MkButton.vue';
-import XLayer from '@/components/MkImageEffectorDialog.Layer.vue';
+import MkModalWindow from '@features/ui/frontend/components/MkModalWindow.vue';
+import MkPreviewWithControls from '@features/markup/frontend/components/MkPreviewWithControls.vue';
+import MkButton from '@features/ui/frontend/components/MkButton.vue';
+import XLayer from '@features/media/frontend/components/MkImageEffectorDialog.Layer.vue';
 import * as os from '@/os.js';
 import { FXS } from '@/utility/image-effector/fxs.js';
 import { genId } from '@/utility/id.js';

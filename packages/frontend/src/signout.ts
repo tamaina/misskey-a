@@ -4,13 +4,13 @@
  */
 
 import { apiUrl } from '@@/js/config.js';
-import { cloudBackup } from '@/preferences/utility.js';
+import { cloudBackup } from '@features/preferences/frontend/state/utility.js';
 import { store } from '@/store.js';
 import { waiting } from '@/os.js';
 import { unisonReload } from '@/utility/unison-reload.js';
 import { clear } from '@/utility/idb-proxy.js';
 import { $i } from '@/i.js';
-import { encodePushSubscriptionKey } from '@/utility/encode-push-subscription-key.js';
+import { encodePushSubscriptionKey } from '@features/notifications/frontend/utility/encode-push-subscription-key.js';
 
 export async function signout() {
 	if (!$i) return;

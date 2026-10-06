@@ -26,10 +26,10 @@ SPDX-License-Identifier: AGPL-3.0-only
 import { watch, ref } from 'vue';
 import * as Misskey from 'misskey-js';
 import XContainer from '@features/pages/frontend/pages/page-editor/page-editor.container.vue';
-import MkInput from '@/components/MkInput.vue';
-import MkSwitch from '@/components/MkSwitch.vue';
-import MkNote from '@/components/MkNote.vue';
-import MkNoteDetailed from '@/components/MkNoteDetailed.vue';
+import MkInput from '@features/ui/frontend/components/MkInput.vue';
+import MkSwitch from '@features/ui/frontend/components/MkSwitch.vue';
+import MkNote from '@features/notes/frontend/components/MkNote.vue';
+import MkNoteDetailed from '@features/notes/frontend/components/MkNoteDetailed.vue';
 import { misskeyApi } from '@/utility/misskey-api.js';
 import { i18n } from '@/i18n.js';
 

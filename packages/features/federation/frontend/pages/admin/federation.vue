@@ -37,15 +37,15 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script lang="ts" setup>
 import * as Misskey from 'misskey-js';
 import { computed, markRaw, ref } from 'vue';
-import MkInput from '@/components/MkInput.vue';
-import MkSelect from '@/components/MkSelect.vue';
-import MkPagination from '@/components/MkPagination.vue';
-import MkInstanceCardMini from '@/components/MkInstanceCardMini.vue';
-import FormSplit from '@/components/form/split.vue';
+import MkInput from '@features/ui/frontend/components/MkInput.vue';
+import MkSelect from '@features/ui/frontend/components/MkSelect.vue';
+import MkPagination from '@features/ui/frontend/components/MkPagination.vue';
+import MkInstanceCardMini from '@features/federation/frontend/components/MkInstanceCardMini.vue';
+import FormSplit from '@features/ui/frontend/components/form/split.vue';
 import { i18n } from '@/i18n.js';
 import { definePage } from '@/page.js';
-import { useMkSelect } from '@/composables/use-mkselect.js';
-import { Paginator } from '@/utility/paginator.js';
+import { useMkSelect } from '@features/ui/frontend/composables/use-mkselect.js';
+import { Paginator } from '@features/ui/frontend/utility/paginator.js';
 
 const host = ref('');
 const {

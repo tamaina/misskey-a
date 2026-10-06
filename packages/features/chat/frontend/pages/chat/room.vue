@@ -106,11 +106,11 @@ import { ensureSignin } from '@/i.js';
 import { misskeyApi } from '@/utility/misskey-api.js';
 import { definePage } from '@/page.js';
 import { prefer } from '@/preferences.js';
-import MkButton from '@/components/MkButton.vue';
+import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import { useRouter } from '@/router.js';
-import { useMutationObserver } from '@/composables/use-mutation-observer.js';
-import MkInfo from '@/components/MkInfo.vue';
-import { makeDateSeparatedTimelineComputedRef } from '@/utility/timeline-date-separate.js';
+import { useMutationObserver } from '@features/ui/frontend/composables/use-mutation-observer.js';
+import MkInfo from '@features/ui/frontend/components/MkInfo.vue';
+import { makeDateSeparatedTimelineComputedRef } from '@features/timelines/frontend/utility/timeline-date-separate.js';
 
 const $i = ensureSignin();
 const router = useRouter();

@@ -36,14 +36,14 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script lang="ts" setup>
 import * as Misskey from 'misskey-js';
 import { computed, markRaw, ref, watch } from 'vue';
-import MkPagination from '@/components/MkPagination.vue';
-import MkButton from '@/components/MkButton.vue';
-import { userPage, acct } from '@/filters/user.js';
+import MkPagination from '@features/ui/frontend/components/MkPagination.vue';
+import MkButton from '@features/ui/frontend/components/MkButton.vue';
+import { userPage, acct } from '@features/users/frontend/filters/user.js';
 import * as os from '@/os.js';
 import { i18n } from '@/i18n.js';
 import { definePage } from '@/page.js';
 import { $i } from '@/i.js';
-import { Paginator } from '@/utility/paginator.js';
+import { Paginator } from '@features/ui/frontend/utility/paginator.js';
 
 const tab = ref($i?.isLocked ? 'list' : 'sent');
 

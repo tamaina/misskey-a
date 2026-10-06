@@ -196,3 +196,21 @@ JavaScript UTF-16 code units. Feature dependency resolution is scoped to the
 consuming host package; it does not globally replace transitive package versions.
 Icon subset scanning includes feature frontend sources so relocated pages retain
 the same bundled glyph coverage.
+
+The component/protocol placement checkpoint moves 475 further frontend sources
+and story companions, preserving the curated Storybook selection and lazy imports.
+Generated story outputs remain package-owned and ignored. Imported prop types in
+feature SFCs use explicit relative paths where Vue's SFC compiler cannot discover
+the frontend package tsconfig; no feature-local configuration is introduced.
+
+It also places 39 legacy packed schemas, 17 domain streaming channel classes and
+seven ActivityPub protocol support files with direct compatibility reexports.
+Streaming scopes and request injection are unchanged; the main aggregate stream
+and generic transport remain host composition. The relocated schemas are still
+legacy JSON Schema, not completed contract-first conversions. Remaining endpoint
+implementations, DI boundaries and locale migration are tracked separately.
+
+Settings/admin search-index generation scans retained host pages and feature pages,
+including the feature-owned navigation indexes for HMR. Its regression test checks
+coverage against the page allocation, so source placement cannot silently remove
+settings or administration search entries.

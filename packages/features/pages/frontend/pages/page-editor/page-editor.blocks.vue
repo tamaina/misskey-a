@@ -35,7 +35,7 @@ import XSection from '@features/pages/frontend/pages/page-editor/els/page-editor
 import XText from '@features/pages/frontend/pages/page-editor/els/page-editor.el.text.vue';
 import XImage from '@features/pages/frontend/pages/page-editor/els/page-editor.el.image.vue';
 import XNote from '@features/pages/frontend/pages/page-editor/els/page-editor.el.note.vue';
-import MkDraggable from '@/components/MkDraggable.vue';
+import MkDraggable from '@features/ui/frontend/components/MkDraggable.vue';
 
 function getComponent(type: Misskey.entities.Page['content'][number]['type']): Component {
 	switch (type) {

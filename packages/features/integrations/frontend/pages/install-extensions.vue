@@ -44,12 +44,12 @@ SPDX-License-Identifier: AGPL-3.0-only
 import { ref, computed, nextTick } from 'vue';
 import type { Extension } from '@/components/MkExtensionInstaller.vue';
 import type { AiScriptPluginMeta } from '@/plugin.js';
-import MkLoading from '@/components/global/MkLoading.vue';
+import MkLoading from '@features/ui/frontend/components/global/MkLoading.vue';
 import MkExtensionInstaller from '@/components/MkExtensionInstaller.vue';
-import MkButton from '@/components/MkButton.vue';
-import MkKeyValue from '@/components/MkKeyValue.vue';
-import MkUrl from '@/components/global/MkUrl.vue';
-import FormSection from '@/components/form/section.vue';
+import MkButton from '@features/ui/frontend/components/MkButton.vue';
+import MkKeyValue from '@features/ui/frontend/components/MkKeyValue.vue';
+import MkUrl from '@features/markup/frontend/components/global/MkUrl.vue';
+import FormSection from '@features/ui/frontend/components/form/section.vue';
 import * as os from '@/os.js';
 import { misskeyApi } from '@/utility/misskey-api.js';
 import { parsePluginMeta, installPlugin } from '@/plugin.js';

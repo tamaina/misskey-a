@@ -36,11 +36,11 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script lang="ts" setup>
 import { computed, onMounted, ref } from 'vue';
 import * as Misskey from 'misskey-js';
-import MkButton from '@/components/MkButton.vue';
+import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import { i18n } from '@/i18n.js';
 import { misskeyApi } from '@/utility/misskey-api.js';
-import MkUserCardMini from '@/components/MkUserCardMini.vue';
-import { userPage } from '@/filters/user.js';
+import MkUserCardMini from '@features/users/frontend/components/MkUserCardMini.vue';
+import { userPage } from '@features/users/frontend/filters/user.js';
 import { ensureSignin } from '@/i.js';
 
 const $i = ensureSignin();

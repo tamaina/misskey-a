@@ -29,7 +29,7 @@ import { genId } from '@/utility/id.js';
 import * as os from '@/os.js';
 import { i18n } from '@/i18n.js';
 import { deepClone } from '@/utility/clone.js';
-import MkButton from '@/components/MkButton.vue';
+import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import { getPageBlockList } from '@features/pages/frontend/pages/page-editor/common.js';
 
 const XBlocks = defineAsyncComponent(() => import('@features/pages/frontend/pages/page-editor/page-editor.blocks.vue'));

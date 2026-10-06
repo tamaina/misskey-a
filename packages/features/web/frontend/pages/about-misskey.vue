@@ -139,16 +139,16 @@ SPDX-License-Identifier: AGPL-3.0-only
 import { nextTick, onBeforeUnmount, ref, useTemplateRef, computed } from 'vue';
 import { host, version } from '@@/js/config.js';
 import { DEFAULT_EMOJIS } from '@@/js/const.js';
-import FormLink from '@/components/form/link.vue';
-import FormSection from '@/components/form/section.vue';
-import MkButton from '@/components/MkButton.vue';
-import MkInfo from '@/components/MkInfo.vue';
+import FormLink from '@features/ui/frontend/components/form/link.vue';
+import FormSection from '@features/ui/frontend/components/form/section.vue';
+import MkButton from '@features/ui/frontend/components/MkButton.vue';
+import MkInfo from '@features/ui/frontend/components/MkInfo.vue';
 import { physics } from '@/utility/physics.js';
 import { i18n } from '@/i18n.js';
 import { instance } from '@/instance.js';
 import * as os from '@/os.js';
 import { definePage } from '@/page.js';
-import { claimAchievement, claimedAchievements } from '@/utility/achievements.js';
+import { claimAchievement, claimedAchievements } from '@features/users/frontend/utility/achievements.js';
 import { $i } from '@/i.js';
 import { prefer } from '@/preferences.js';
 

@@ -157,17 +157,17 @@ import { ref, computed } from 'vue';
 import JSON5 from 'json5';
 import * as Misskey from 'misskey-js';
 import { host } from '@@/js/config.js';
-import MkInput from '@/components/MkInput.vue';
-import MkTextarea from '@/components/MkTextarea.vue';
+import MkInput from '@features/ui/frontend/components/MkInput.vue';
+import MkTextarea from '@features/ui/frontend/components/MkTextarea.vue';
 import * as os from '@/os.js';
 import { misskeyApi } from '@/utility/misskey-api.js';
 import { instance, fetchInstance } from '@/instance.js';
 import { i18n } from '@/i18n.js';
 import { definePage } from '@/page.js';
-import MkButton from '@/components/MkButton.vue';
-import MkColorInput from '@/components/MkColorInput.vue';
-import MkRadios from '@/components/MkRadios.vue';
-import MkSwitch from '@/components/MkSwitch.vue';
+import MkButton from '@features/ui/frontend/components/MkButton.vue';
+import MkColorInput from '@features/ui/frontend/components/MkColorInput.vue';
+import MkRadios from '@features/ui/frontend/components/MkRadios.vue';
+import MkSwitch from '@features/ui/frontend/components/MkSwitch.vue';
 
 const meta = await misskeyApi('admin/meta');
 

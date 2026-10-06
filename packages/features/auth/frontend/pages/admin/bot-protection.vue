@@ -163,19 +163,19 @@ SPDX-License-Identifier: AGPL-3.0-only
 import { computed, defineAsyncComponent, ref, watch } from 'vue';
 import * as Misskey from 'misskey-js';
 import type { ApiWithDialogCustomErrors } from '@/os.js';
-import MkRadios from '@/components/MkRadios.vue';
-import MkInput from '@/components/MkInput.vue';
-import FormSlot from '@/components/form/slot.vue';
+import MkRadios from '@features/ui/frontend/components/MkRadios.vue';
+import MkInput from '@features/ui/frontend/components/MkInput.vue';
+import FormSlot from '@features/ui/frontend/components/form/slot.vue';
 import * as os from '@/os.js';
 import { misskeyApi } from '@/utility/misskey-api.js';
 import { fetchInstance } from '@/instance.js';
 import { i18n } from '@/i18n.js';
-import { useForm } from '@/composables/use-form.js';
-import MkFormFooter from '@/components/MkFormFooter.vue';
+import { useForm } from '@features/ui/frontend/composables/use-form.js';
+import MkFormFooter from '@features/ui/frontend/components/MkFormFooter.vue';
 import MkFolder from '@/components/MkFolder.vue';
-import MkInfo from '@/components/MkInfo.vue';
+import MkInfo from '@features/ui/frontend/components/MkInfo.vue';
 
-const MkCaptcha = defineAsyncComponent(() => import('@/components/MkCaptcha.vue'));
+const MkCaptcha = defineAsyncComponent(() => import('@features/auth/frontend/components/MkCaptcha.vue'));
 
 const errorHandler: ApiWithDialogCustomErrors = {
 	// 検証リクエストそのものに失敗

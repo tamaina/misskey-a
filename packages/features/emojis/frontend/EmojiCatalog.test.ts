@@ -38,7 +38,7 @@ vi.mock('@/custom-emojis.js', async () => {
 	};
 });
 
-vi.mock('@/components/MkButton.vue', async () => {
+vi.mock('@features/ui/frontend/components/MkButton.vue', async () => {
 	const { defineComponent, h } = await import('vue');
 	return {
 		default: defineComponent({
@@ -48,7 +48,7 @@ vi.mock('@/components/MkButton.vue', async () => {
 	};
 });
 
-vi.mock('@/components/MkInput.vue', async () => {
+vi.mock('@features/ui/frontend/components/MkInput.vue', async () => {
 	const { defineComponent, h } = await import('vue');
 	return {
 		default: defineComponent({
@@ -66,7 +66,7 @@ vi.mock('@/components/MkInput.vue', async () => {
 	};
 });
 
-vi.mock('@/components/MkFoldableSection.vue', async () => {
+vi.mock('@features/ui/frontend/components/MkFoldableSection.vue', async () => {
 	const { defineComponent, h } = await import('vue');
 	return {
 		default: defineComponent({
@@ -78,7 +78,7 @@ vi.mock('@/components/MkFoldableSection.vue', async () => {
 	};
 });
 
-vi.mock('@/components/MkCustomEmojiDetailedDialog.vue', async () => {
+vi.mock('@features/emojis/frontend/components/MkCustomEmojiDetailedDialog.vue', async () => {
 	const { defineComponent } = await import('vue');
 	return { default: defineComponent({ render: () => null }) };
 });
@@ -90,7 +90,7 @@ vi.mock('@/os.js', () => ({
 }));
 
 vi.mock('@/utility/misskey-api.js', () => ({ misskeyApiGet: mocks.misskeyApiGet }));
-vi.mock('@/utility/copy-to-clipboard.js', () => ({ copyToClipboard: mocks.copyToClipboard }));
+vi.mock('@features/ui/frontend/utility/copy-to-clipboard.js', () => ({ copyToClipboard: mocks.copyToClipboard }));
 
 let EmojiCatalog: Component;
 

@@ -48,21 +48,21 @@ SPDX-License-Identifier: AGPL-3.0-only
 import { computed, watch, ref, markRaw } from 'vue';
 import * as Misskey from 'misskey-js';
 import { host } from '@@/js/config.js';
-import MkNoteDetailed from '@/components/MkNoteDetailed.vue';
-import MkNotesTimeline from '@/components/MkNotesTimeline.vue';
-import MkRemoteCaution from '@/components/MkRemoteCaution.vue';
-import MkButton from '@/components/MkButton.vue';
+import MkNoteDetailed from '@features/notes/frontend/components/MkNoteDetailed.vue';
+import MkNotesTimeline from '@features/timelines/frontend/components/MkNotesTimeline.vue';
+import MkRemoteCaution from '@features/federation/frontend/components/MkRemoteCaution.vue';
+import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import { misskeyApi } from '@/utility/misskey-api.js';
 import { definePage } from '@/page.js';
 import { i18n } from '@/i18n.js';
-import { dateString } from '@/filters/date.js';
-import MkClipPreview from '@/components/MkClipPreview.vue';
+import { dateString } from '@features/ui/frontend/filters/date.js';
+import MkClipPreview from '@features/collections/frontend/components/MkClipPreview.vue';
 import { prefer } from '@/preferences.js';
-import { pleaseLogin } from '@/utility/please-login.js';
-import { getAppearNote } from '@/utility/get-appear-note.js';
+import { pleaseLogin } from '@features/auth/frontend/utility/please-login.js';
+import { getAppearNote } from '@features/notes/frontend/utility/get-appear-note.js';
 import { serverContext, assertServerContext } from '@/server-context.js';
 import { $i } from '@/i.js';
-import { Paginator } from '@/utility/paginator.js';
+import { Paginator } from '@features/ui/frontend/utility/paginator.js';
 
 // contextは非ログイン状態の情報しかないためログイン時は利用できない
 const CTX_NOTE = !$i && assertServerContext(serverContext, 'note') ? serverContext.note : null;

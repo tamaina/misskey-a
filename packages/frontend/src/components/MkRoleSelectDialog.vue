@@ -46,13 +46,13 @@ SPDX-License-Identifier: AGPL-3.0-only
 import { computed, ref, toRefs, useTemplateRef } from 'vue';
 import * as Misskey from 'misskey-js';
 import { i18n } from '@/i18n.js';
-import MkButton from '@/components/MkButton.vue';
-import MkInfo from '@/components/MkInfo.vue';
-import MkRolePreview from '@/components/MkRolePreview.vue';
+import MkButton from '@features/ui/frontend/components/MkButton.vue';
+import MkInfo from '@features/ui/frontend/components/MkInfo.vue';
+import MkRolePreview from '@features/roles/frontend/components/MkRolePreview.vue';
 import { misskeyApi } from '@/utility/misskey-api.js';
 import * as os from '@/os.js';
-import MkModalWindow from '@/components/MkModalWindow.vue';
-import MkLoading from '@/components/global/MkLoading.vue';
+import MkModalWindow from '@features/ui/frontend/components/MkModalWindow.vue';
+import MkLoading from '@features/ui/frontend/components/global/MkLoading.vue';
 
 const emit = defineEmits<{
 	(ev: 'done', value: Misskey.entities.Role[]): void;

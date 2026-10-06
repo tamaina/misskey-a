@@ -39,7 +39,7 @@ import { markRaw, onMounted, onUnmounted, ref, useTemplateRef } from 'vue';
 import * as Misskey from 'misskey-js';
 import XChart from '@features/statistics/frontend/pages/admin/overview.queue.chart.vue';
 import type { ApQueueDomain } from '@features/operations/frontend/pages/admin/federation-job-queue.vue';
-import number from '@/filters/number.js';
+import number from '@features/ui/frontend/filters/number.js';
 import { useStream } from '@/stream.js';
 import { genId } from '@/utility/id.js';
 

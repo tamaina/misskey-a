@@ -19,11 +19,11 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import { markRaw } from 'vue';
-import MkPagination from '@/components/MkPagination.vue';
-import MkNote from '@/components/MkNote.vue';
+import MkPagination from '@features/ui/frontend/components/MkPagination.vue';
+import MkNote from '@features/notes/frontend/components/MkNote.vue';
 import { i18n } from '@/i18n.js';
 import { definePage } from '@/page.js';
-import { Paginator } from '@/utility/paginator.js';
+import { Paginator } from '@features/ui/frontend/utility/paginator.js';
 
 const paginator = markRaw(new Paginator('i/favorites', {
 	limit: 10,

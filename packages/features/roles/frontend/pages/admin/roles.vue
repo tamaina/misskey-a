@@ -46,17 +46,17 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import { computed, reactive, ref } from 'vue';
-import MkInput from '@/components/MkInput.vue';
+import MkInput from '@features/ui/frontend/components/MkInput.vue';
 import MkFolder from '@/components/MkFolder.vue';
-import MkButton from '@/components/MkButton.vue';
-import MkRolePreview from '@/components/MkRolePreview.vue';
+import MkButton from '@features/ui/frontend/components/MkButton.vue';
+import MkRolePreview from '@features/roles/frontend/components/MkRolePreview.vue';
 import XPolicyEditor from '@features/roles/frontend/pages/admin/roles.policy-editor.vue';
 import * as os from '@/os.js';
 import { misskeyApi } from '@/utility/misskey-api.js';
 import { i18n } from '@/i18n.js';
 import { definePage } from '@/page.js';
 import { instance, fetchInstance } from '@/instance.js';
-import MkFoldableSection from '@/components/MkFoldableSection.vue';
+import MkFoldableSection from '@features/ui/frontend/components/MkFoldableSection.vue';
 import { useRouter } from '@/router.js';
 import { deepClone } from '@/utility/clone.js';
 

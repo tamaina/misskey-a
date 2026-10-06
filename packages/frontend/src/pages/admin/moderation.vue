@@ -157,19 +157,19 @@ SPDX-License-Identifier: AGPL-3.0-only
 import { ref, computed } from 'vue';
 import * as Misskey from 'misskey-js';
 import XServerRules from '@features/instance/frontend/pages/admin/server-rules.vue';
-import MkSwitch from '@/components/MkSwitch.vue';
-import MkInput from '@/components/MkInput.vue';
-import MkTextarea from '@/components/MkTextarea.vue';
+import MkSwitch from '@features/ui/frontend/components/MkSwitch.vue';
+import MkInput from '@features/ui/frontend/components/MkInput.vue';
+import MkTextarea from '@features/ui/frontend/components/MkTextarea.vue';
 import * as os from '@/os.js';
 import { misskeyApi } from '@/utility/misskey-api.js';
 import { fetchInstance } from '@/instance.js';
 import { i18n } from '@/i18n.js';
 import { definePage } from '@/page.js';
-import { useMkSelect } from '@/composables/use-mkselect.js';
-import MkButton from '@/components/MkButton.vue';
-import FormLink from '@/components/form/link.vue';
+import { useMkSelect } from '@features/ui/frontend/composables/use-mkselect.js';
+import MkButton from '@features/ui/frontend/components/MkButton.vue';
+import FormLink from '@features/ui/frontend/components/form/link.vue';
 import MkFolder from '@/components/MkFolder.vue';
-import MkSelect from '@/components/MkSelect.vue';
+import MkSelect from '@features/ui/frontend/components/MkSelect.vue';
 
 const meta = await misskeyApi('admin/meta');
 

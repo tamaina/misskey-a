@@ -51,10 +51,10 @@ import XPie from '@features/statistics/frontend/pages/admin/overview.pie.vue';
 import type { InstanceForPie } from '@features/statistics/frontend/pages/admin/overview.pie.vue';
 import * as os from '@/os.js';
 import { misskeyApiGet } from '@/utility/misskey-api.js';
-import number from '@/filters/number.js';
-import MkNumberDiff from '@/components/MkNumberDiff.vue';
+import number from '@features/ui/frontend/filters/number.js';
+import MkNumberDiff from '@features/ui/frontend/components/MkNumberDiff.vue';
 import { i18n } from '@/i18n.js';
-import { useChartTooltip } from '@/composables/use-chart-tooltip.js';
+import { useChartTooltip } from '@features/statistics/frontend/composables/use-chart-tooltip.js';
 
 const topSubInstancesForPie = ref<InstanceForPie[] | null>(null);
 const topPubInstancesForPie = ref<InstanceForPie[] | null>(null);

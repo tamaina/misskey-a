@@ -30,12 +30,12 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script setup lang="ts">
 import { computed, ref, toRefs } from 'vue';
 import { i18n } from '@/i18n.js';
-import MkGrid from '@/components/grid/MkGrid.vue';
-import MkSwitch from '@/components/MkSwitch.vue';
-import { copyGridDataToClipboard } from '@/components/grid/grid-utils.js';
+import MkGrid from '@features/ui/frontend/components/grid/MkGrid.vue';
+import MkSwitch from '@features/ui/frontend/components/MkSwitch.vue';
+import { copyGridDataToClipboard } from '@features/ui/frontend/components/grid/grid-utils.js';
 
 import type { RequestLogItem } from '@features/emojis/frontend/pages/admin/custom-emojis-manager.impl.js';
-import type { GridSetting } from '@/components/grid/grid.js';
+import type { GridSetting } from '@features/ui/frontend/components/grid/grid.js';
 
 function setupGrid(): GridSetting {
 	return {

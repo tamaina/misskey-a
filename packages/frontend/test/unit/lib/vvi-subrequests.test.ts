@@ -39,12 +39,12 @@ describe('VVI SFC subrequest guard', () => {
 		const root = resolve(process.cwd());
 		hook(plugin.configResolved, { root, command, base: '/' });
 		hook(plugin.buildStart);
-		const id = `${root}/src/components/global/MkResult.vue`;
+		const id = resolve(root, '../features/ui/frontend/components/global/MkResult.vue');
 		hook(plugin.transform, readFileSync(id, 'utf8'), id);
 		const localeId = '\0virtual:vite-vue-internationalization/locale/ja-JP';
 		const before = hook(plugin.load, localeId);
-		expect(before).toContain('/frontend/src/components/global/MkResult.vue');
-		expect(before).toContain('/frontend/src/components/global/MkError.vue');
+		expect(before).toContain('/features/ui/frontend/components/global/MkResult.vue');
+		expect(before).toContain('/features/ui/frontend/components/global/MkError.vue');
 		for (const query of ['?vue&type=style&index=0&lang.scss', '?vue&type=template', '?vue&type=script&setup=true&lang.ts']) {
 			expect(hook(plugin.transform, '/* compiled fragment without locale blocks */', id + query)).toBeNull();
 			expect(hook(plugin.load, localeId)).toBe(before);

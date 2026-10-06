@@ -52,13 +52,13 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script lang="ts" setup>
 import { ref, watch, nextTick, onBeforeUnmount, onMounted, useTemplateRef } from 'vue';
 import * as Misskey from 'misskey-js';
-import XItem from './MkLightbox.item.vue';
-import type { Content } from './MkLightbox.item.vue';
-import type { Keymap } from '@/utility/hotkey.js';
+import XItem from '@features/media/frontend/components/MkLightbox.item.vue';
+import type { Content } from '@features/media/frontend/components/MkLightbox.item.vue';
+import type { Keymap } from '@features/ui/frontend/utility/hotkey.js';
 import * as os from '@/os.js';
 import { prefer } from '@/preferences.js';
-import { isTouchUsing } from '@/utility/touch.js';
-import { focusTrap } from '@/utility/focus-trap.js';
+import { isTouchUsing } from '@features/ui/frontend/utility/touch.js';
+import { focusTrap } from '@features/ui/frontend/utility/focus-trap.js';
 
 const props = withDefaults(defineProps<{
 	defaultIndex?: number;

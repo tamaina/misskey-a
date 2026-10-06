@@ -54,11 +54,11 @@ import { isLink } from '@@/js/is-link.js';
 import type { UploaderItem } from '@/composables/use-uploader.js';
 import { getUploadName } from '@/composables/use-uploader.js';
 import { i18n } from '@/i18n.js';
-import MkButton from '@/components/MkButton.vue';
-import { isPreviewable, getType } from '@/utility/lightbox.js';
-import bytes from '@/filters/bytes.js';
+import MkButton from '@features/ui/frontend/components/MkButton.vue';
+import { isPreviewable, getType } from '@features/media/frontend/utility/lightbox.js';
+import bytes from '@features/ui/frontend/filters/bytes.js';
 import * as os from '@/os.js';
-import type { Content } from '@/components/MkLightbox.item.vue';
+import type { Content } from '@features/media/frontend/components/MkLightbox.item.vue';
 
 const props = defineProps<{
 	items: UploaderItem[];

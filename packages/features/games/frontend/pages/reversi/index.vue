@@ -111,16 +111,16 @@ import { useInterval } from '@@/js/use-interval.js';
 import { misskeyApi } from '@/utility/misskey-api.js';
 import { definePage } from '@/page.js';
 import { useStream } from '@/stream.js';
-import MkButton from '@/components/MkButton.vue';
+import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import MkFolder from '@/components/MkFolder.vue';
 import { i18n } from '@/i18n.js';
 import { $i } from '@/i.js';
-import MkPagination from '@/components/MkPagination.vue';
+import MkPagination from '@features/ui/frontend/components/MkPagination.vue';
 import { useRouter } from '@/router.js';
 import * as os from '@/os.js';
-import { pleaseLogin } from '@/utility/please-login.js';
+import { pleaseLogin } from '@features/auth/frontend/utility/please-login.js';
 import * as sound from '@/utility/sound.js';
-import { Paginator } from '@/utility/paginator.js';
+import { Paginator } from '@features/ui/frontend/utility/paginator.js';
 
 const myGamesPaginator = markRaw(new Paginator('reversi/games', {
 	limit: 10,

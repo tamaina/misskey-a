@@ -7,8 +7,8 @@ import { createInternationalization } from 'virtual:vite-vue-internationalizatio
 import { loadEmojiCatalog } from '@features/emojis/frontend';
 import { loadNotFoundPage } from '@features/navigation/frontend';
 import { startComponentLocales } from '@features/boot/frontend';
-import MkResult from '@/components/global/MkResult.vue';
-import MkError from '@/components/global/MkError.vue';
+import MkResult from '@features/ui/frontend/components/global/MkResult.vue';
+import MkError from '@features/ui/frontend/components/global/MkError.vue';
 
 try {
 	const locale = new URL(window.location.href).searchParams.get('locale') ?? 'en-US';

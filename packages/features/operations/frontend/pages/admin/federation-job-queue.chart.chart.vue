@@ -11,10 +11,10 @@ SPDX-License-Identifier: AGPL-3.0-only
 import { onMounted, onUnmounted, useTemplateRef } from 'vue';
 import { Chart } from 'chart.js';
 import { store } from '@/store.js';
-import { useChartTooltip } from '@/composables/use-chart-tooltip.js';
-import { chartVLine } from '@/utility/chart-vline.js';
-import { alpha } from '@/utility/color.js';
-import { initChart } from '@/utility/init-chart.js';
+import { useChartTooltip } from '@features/statistics/frontend/composables/use-chart-tooltip.js';
+import { chartVLine } from '@features/statistics/frontend/utility/chart-vline.js';
+import { alpha } from '@features/ui/frontend/utility/color.js';
+import { initChart } from '@features/statistics/frontend/utility/init-chart.js';
 
 initChart();
 

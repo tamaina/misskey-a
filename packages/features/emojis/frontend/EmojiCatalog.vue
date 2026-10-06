@@ -33,9 +33,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 import { watch, ref } from 'vue';
 import type { EmojiSimple } from '../contract/index.js';
 import EmojiCatalogItem from './EmojiCatalogItem.vue';
-import MkButton from '@/components/MkButton.vue';
-import MkInput from '@/components/MkInput.vue';
-import MkFoldableSection from '@/components/MkFoldableSection.vue';
+import MkButton from '@features/ui/frontend/components/MkButton.vue';
+import MkInput from '@features/ui/frontend/components/MkInput.vue';
+import MkFoldableSection from '@features/ui/frontend/components/MkFoldableSection.vue';
 import { customEmojis, customEmojiCategories } from '@/custom-emojis.js';
 import { $i } from '@/i.js';
 import { searchEmojiCatalog } from './search.js';

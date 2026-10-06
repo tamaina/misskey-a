@@ -14,11 +14,11 @@ import type { ImageFrameParams, ImageFramePreset } from '@/utility/image-frame-r
 import { genId } from '@/utility/id.js';
 import { i18n } from '@/i18n.js';
 import { prefer } from '@/preferences.js';
-import { isWebpSupported } from '@/utility/isWebpSupported.js';
-import { uploadFile, UploadAbortedError } from '@/utility/drive.js';
-import type { Content } from '@/components/MkLightbox.item.vue';
+import { isWebpSupported } from '@features/media/frontend/utility/isWebpSupported.js';
+import { uploadFile, UploadAbortedError } from '@features/drive/frontend/utility/drive.js';
+import type { Content } from '@features/media/frontend/components/MkLightbox.item.vue';
 import * as os from '@/os.js';
-import { isPreviewable, getType } from '@/utility/lightbox.js';
+import { isPreviewable, getType } from '@features/media/frontend/utility/lightbox.js';
 import { ensureSignin } from '@/i.js';
 
 export type UploaderFeatures = {
@@ -224,7 +224,7 @@ export function useUploader(options: {
 				text: i18n.ts.describeFile,
 				icon: 'ti ti-text-caption',
 				action: async () => {
-					const { dispose } = await os.popupAsyncWithDialog(import('@/components/MkFileCaptionEditWindow.vue').then(x => x.default), {
+					const { dispose } = await os.popupAsyncWithDialog(import('@features/drive/frontend/components/MkFileCaptionEditWindow.vue').then(x => x.default), {
 						default: item.caption ?? null,
 					}, {
 						done: caption => {
@@ -355,7 +355,7 @@ export function useUploader(options: {
 					icon: 'ti ti-pencil',
 					text: i18n.ts.edit,
 					action: async () => {
-						const { dispose } = await os.popupAsyncWithDialog(import('@/components/MkWatermarkEditorDialog.vue').then(x => x.default), {
+						const { dispose } = await os.popupAsyncWithDialog(import('@features/media/frontend/components/MkWatermarkEditorDialog.vue').then(x => x.default), {
 							layers: item.watermarkLayers,
 							image: item.file,
 						}, {
@@ -407,7 +407,7 @@ export function useUploader(options: {
 					icon: 'ti ti-pencil',
 					text: i18n.ts.edit,
 					action: async () => {
-						const { dispose } = await os.popupAsyncWithDialog(import('@/components/MkImageFrameEditorDialog.vue').then(x => x.default), {
+						const { dispose } = await os.popupAsyncWithDialog(import('@features/media/frontend/components/MkImageFrameEditorDialog.vue').then(x => x.default), {
 							params: item.imageFrameParams,
 							image: item.file,
 							imageCaption: item.caption ?? null,
@@ -433,7 +433,7 @@ export function useUploader(options: {
 					type: 'button' as const,
 					text: preset.name,
 					action: async () => {
-						const { dispose } = await os.popupAsyncWithDialog(import('@/components/MkImageFrameEditorDialog.vue').then(x => x.default), {
+						const { dispose } = await os.popupAsyncWithDialog(import('@features/media/frontend/components/MkImageFrameEditorDialog.vue').then(x => x.default), {
 							params: preset.params,
 							image: item.file,
 							imageCaption: item.caption ?? null,

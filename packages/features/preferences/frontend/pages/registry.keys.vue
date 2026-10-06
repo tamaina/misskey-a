@@ -38,11 +38,11 @@ import * as os from '@/os.js';
 import { misskeyApi } from '@/utility/misskey-api.js';
 import { i18n } from '@/i18n.js';
 import { definePage } from '@/page.js';
-import FormLink from '@/components/form/link.vue';
-import FormSection from '@/components/form/section.vue';
-import MkButton from '@/components/MkButton.vue';
-import MkKeyValue from '@/components/MkKeyValue.vue';
-import FormSplit from '@/components/form/split.vue';
+import FormLink from '@features/ui/frontend/components/form/link.vue';
+import FormSection from '@features/ui/frontend/components/form/section.vue';
+import MkButton from '@features/ui/frontend/components/MkButton.vue';
+import MkKeyValue from '@features/ui/frontend/components/MkKeyValue.vue';
+import FormSplit from '@features/ui/frontend/components/form/split.vue';
 
 const props = defineProps<{
 	path: string;

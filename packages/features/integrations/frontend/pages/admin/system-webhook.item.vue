@@ -46,8 +46,8 @@ import { entities } from 'misskey-js';
 import { toRefs } from 'vue';
 import MkFolder from '@/components/MkFolder.vue';
 import { i18n } from '@/i18n.js';
-import MkButton from '@/components/MkButton.vue';
-import MkKeyValue from '@/components/MkKeyValue.vue';
+import MkButton from '@features/ui/frontend/components/MkButton.vue';
+import MkKeyValue from '@features/ui/frontend/components/MkKeyValue.vue';
 
 const emit = defineEmits<{
 	(ev: 'edit', value: entities.SystemWebhook): void;

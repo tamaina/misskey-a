@@ -5,17 +5,17 @@
 
 import type { App, Directive } from 'vue';
 
-import { userPreviewDirective } from './user-preview.js';
-import { getSizeDirective } from './get-size.js';
-import { rippleDirective } from './ripple.js';
-import { tooltipDirective } from './tooltip.js';
-import { hotkeyDirective } from './hotkey.js';
-import { appearDirective } from './appear.js';
-import { animDirective } from './anim.js';
-import { clickAnimeDirective } from './click-anime.js';
-import { panelDirective } from './panel.js';
-import { adaptiveBorderDirective } from './adaptive-border.js';
-import { adaptiveBgDirective } from './adaptive-bg.js';
+import { userPreviewDirective } from '@features/users/frontend/directives/user-preview.js';
+import { getSizeDirective } from '@features/ui/frontend/directives/get-size.js';
+import { rippleDirective } from '@features/ui/frontend/directives/ripple.js';
+import { tooltipDirective } from '@features/ui/frontend/directives/tooltip.js';
+import { hotkeyDirective } from '@features/ui/frontend/directives/hotkey.js';
+import { appearDirective } from '@features/ui/frontend/directives/appear.js';
+import { animDirective } from '@features/ui/frontend/directives/anim.js';
+import { clickAnimeDirective } from '@features/ui/frontend/directives/click-anime.js';
+import { panelDirective } from '@features/ui/frontend/directives/panel.js';
+import { adaptiveBorderDirective } from '@features/ui/frontend/directives/adaptive-border.js';
+import { adaptiveBgDirective } from '@features/ui/frontend/directives/adaptive-bg.js';
 
 export default function(app: App) {
 	for (const [key, value] of Object.entries(directives)) {

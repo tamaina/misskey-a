@@ -63,18 +63,18 @@ import * as Misskey from 'misskey-js';
 import { url } from '@@/js/config.js';
 import XBlocks from '@features/pages/frontend/pages/page-editor/page-editor.blocks.vue';
 import { genId } from '@/utility/id.js';
-import MkButton from '@/components/MkButton.vue';
-import MkSelect from '@/components/MkSelect.vue';
-import MkSwitch from '@/components/MkSwitch.vue';
-import MkInput from '@/components/MkInput.vue';
+import MkButton from '@features/ui/frontend/components/MkButton.vue';
+import MkSelect from '@features/ui/frontend/components/MkSelect.vue';
+import MkSwitch from '@features/ui/frontend/components/MkSwitch.vue';
+import MkInput from '@features/ui/frontend/components/MkInput.vue';
 import * as os from '@/os.js';
 import { misskeyApi } from '@/utility/misskey-api.js';
-import { selectFile } from '@/utility/drive.js';
+import { selectFile } from '@features/drive/frontend/utility/drive.js';
 import { i18n } from '@/i18n.js';
 import { definePage } from '@/page.js';
 import { $i } from '@/i.js';
 import { mainRouter } from '@/router.js';
-import { useMkSelect } from '@/composables/use-mkselect.js';
+import { useMkSelect } from '@features/ui/frontend/composables/use-mkselect.js';
 import { getPageBlockList } from '@features/pages/frontend/pages/page-editor/common.js';
 
 const props = defineProps<{

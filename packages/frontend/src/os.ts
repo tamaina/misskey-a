@@ -9,31 +9,31 @@ import { markRaw, ref, defineAsyncComponent, nextTick } from 'vue';
 import * as Misskey from 'misskey-js';
 import type { Component, MaybeRef } from 'vue';
 import type { ComponentEmit, ComponentProps as CP } from 'vue-component-type-helpers';
-import type { Form, GetFormResultType } from '@/utility/form.js';
+import type { Form, GetFormResultType } from '@features/ui/frontend/utility/form.js';
 import type { MenuItem } from '@/types/menu.js';
-import type { PostFormProps } from '@/types/post-form.js';
+import type { PostFormProps } from '@features/notes/frontend/types/post-form.js';
 import type { UploaderFeatures } from '@/composables/use-uploader.js';
-import type { MkSelectItem } from '@/components/MkSelect.vue';
-import type { OptionValue } from '@/types/option-value.js';
-import type { MkDialogReturnType } from '@/components/MkDialog.vue';
+import type { MkSelectItem } from '@features/ui/frontend/components/MkSelect.vue';
+import type { OptionValue } from '@features/ui/frontend/types/option-value.js';
+import type { MkDialogReturnType } from '@features/ui/frontend/components/MkDialog.vue';
 import type { OverloadToUnion } from '@/types/overload-to-union.js';
 import type MkRoleSelectDialog_TypeReferenceOnly from '@/components/MkRoleSelectDialog.vue';
-import type MkEmojiPickerDialog_TypeReferenceOnly from '@/components/MkEmojiPickerDialog.vue';
+import type MkEmojiPickerDialog_TypeReferenceOnly from '@features/emojis/frontend/components/MkEmojiPickerDialog.vue';
 import { misskeyApi } from '@/utility/misskey-api.js';
 import { prefer } from '@/preferences.js';
 import { i18n } from '@/i18n.js';
-import MkPostFormDialog from '@/components/MkPostFormDialog.vue';
-import MkWaitingDialog from '@/components/MkWaitingDialog.vue';
-import MkPageWindow from '@/components/MkPageWindow.vue';
-import MkToast from '@/components/MkToast.vue';
-import MkDialog from '@/components/MkDialog.vue';
-import MkPopupMenu from '@/components/MkPopupMenu.vue';
-import MkContextMenu from '@/components/MkContextMenu.vue';
-import { copyToClipboard } from '@/utility/copy-to-clipboard.js';
-import { pleaseLogin } from '@/utility/please-login.js';
-import { showMovedDialog } from '@/utility/show-moved-dialog.js';
-import { getHTMLElementOrNull } from '@/utility/get-dom-node-or-null.js';
-import { focusParent } from '@/utility/focus.js';
+import MkPostFormDialog from '@features/notes/frontend/components/MkPostFormDialog.vue';
+import MkWaitingDialog from '@features/ui/frontend/components/MkWaitingDialog.vue';
+import MkPageWindow from '@features/pages/frontend/components/MkPageWindow.vue';
+import MkToast from '@features/ui/frontend/components/MkToast.vue';
+import MkDialog from '@features/ui/frontend/components/MkDialog.vue';
+import MkPopupMenu from '@features/ui/frontend/components/MkPopupMenu.vue';
+import MkContextMenu from '@features/ui/frontend/components/MkContextMenu.vue';
+import { copyToClipboard } from '@features/ui/frontend/utility/copy-to-clipboard.js';
+import { pleaseLogin } from '@features/auth/frontend/utility/please-login.js';
+import { showMovedDialog } from '@features/users/frontend/utility/show-moved-dialog.js';
+import { getHTMLElementOrNull } from '@features/ui/frontend/utility/get-dom-node-or-null.js';
+import { focusParent } from '@features/ui/frontend/utility/focus.js';
 
 export const openingWindowsCount = ref(0);
 
@@ -461,7 +461,7 @@ export function authenticateDialog(): Promise<{
 	canceled: false; result: { password: string; token: string | null; };
 }> {
 	return new Promise(resolve => {
-		const { dispose } = popup(defineAsyncComponent(() => import('@/components/MkPasswordDialog.vue')), {}, {
+		const { dispose } = popup(defineAsyncComponent(() => import('@features/auth/frontend/components/MkPasswordDialog.vue')), {}, {
 			done: result => {
 				resolve(result ? { canceled: false, result } : { canceled: true, result: undefined });
 			},
@@ -543,7 +543,7 @@ export function waiting(options: { text?: string } = {}) {
 
 export function form<F extends Form>(title: string, f: F): Promise<{ canceled: true, result?: undefined } | { canceled?: false, result: GetFormResultType<F> }> {
 	return new Promise(resolve => {
-		const { dispose } = popup(defineAsyncComponent(() => import('@/components/MkFormDialog.vue')), { title, form: f }, {
+		const { dispose } = popup(defineAsyncComponent(() => import('@features/ui/frontend/components/MkFormDialog.vue')), { title, form: f }, {
 			done: result => {
 				resolve(result as { canceled?: false, result: GetFormResultType<F> });
 			},
@@ -554,7 +554,7 @@ export function form<F extends Form>(title: string, f: F): Promise<{ canceled: t
 
 export async function selectUser(opts: { includeSelf?: boolean; localOnly?: boolean; } = {}): Promise<Misskey.entities.UserDetailed> {
 	return new Promise(resolve => {
-		const { dispose } = popup(defineAsyncComponent(() => import('@/components/MkUserSelectDialog.vue')), {
+		const { dispose } = popup(defineAsyncComponent(() => import('@features/users/frontend/components/MkUserSelectDialog.vue')), {
 			includeSelf: opts.includeSelf,
 			localOnly: opts.localOnly,
 		}, {
@@ -585,7 +585,7 @@ export async function selectRole(params: ComponentProps<typeof MkRoleSelectDialo
 
 export async function pickEmoji(anchorElement: HTMLElement, opts: ComponentProps<typeof MkEmojiPickerDialog_TypeReferenceOnly>): Promise<string> {
 	return new Promise(resolve => {
-		const { dispose } = popup(defineAsyncComponent(() => import('@/components/MkEmojiPickerDialog.vue')), {
+		const { dispose } = popup(defineAsyncComponent(() => import('@features/emojis/frontend/components/MkEmojiPickerDialog.vue')), {
 			anchorElement,
 			...opts,
 		}, {

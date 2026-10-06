@@ -28,14 +28,14 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script lang="ts" setup>
 import { watch, ref, computed, markRaw } from 'vue';
 import * as Misskey from 'misskey-js';
-import MkPagination from '@/components/MkPagination.vue';
-import MkButton from '@/components/MkButton.vue';
-import MkClipPreview from '@/components/MkClipPreview.vue';
+import MkPagination from '@features/ui/frontend/components/MkPagination.vue';
+import MkButton from '@features/ui/frontend/components/MkButton.vue';
+import MkClipPreview from '@features/collections/frontend/components/MkClipPreview.vue';
 import * as os from '@/os.js';
 import { i18n } from '@/i18n.js';
 import { definePage } from '@/page.js';
 import { clipsCache } from '@/cache.js';
-import { Paginator } from '@/utility/paginator.js';
+import { Paginator } from '@features/ui/frontend/utility/paginator.js';
 
 const tab = ref('my');
 

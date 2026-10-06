@@ -18,8 +18,8 @@ import type { EmojiSimple } from '../contract/index.js';
 import type { MenuItem } from '@/types/menu.js';
 import * as os from '@/os.js';
 import { misskeyApiGet } from '@/utility/misskey-api.js';
-import { copyToClipboard } from '@/utility/copy-to-clipboard.js';
-import MkCustomEmojiDetailedDialog from '@/components/MkCustomEmojiDetailedDialog.vue';
+import { copyToClipboard } from '@features/ui/frontend/utility/copy-to-clipboard.js';
+import MkCustomEmojiDetailedDialog from '@features/emojis/frontend/components/MkCustomEmojiDetailedDialog.vue';
 import { $i } from '@/i.js';
 
 const props = defineProps<{

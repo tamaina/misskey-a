@@ -147,17 +147,17 @@ import * as Misskey from 'misskey-js';
 import * as Reversi from 'misskey-reversi';
 import { useInterval } from '@@/js/use-interval.js';
 import { url } from '@@/js/config.js';
-import MkButton from '@/components/MkButton.vue';
+import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import MkFolder from '@/components/MkFolder.vue';
-import MkSwitch from '@/components/MkSwitch.vue';
+import MkSwitch from '@features/ui/frontend/components/MkSwitch.vue';
 import { deepClone } from '@/utility/clone.js';
 import { $i } from '@/i.js';
 import { i18n } from '@/i18n.js';
 import { misskeyApi } from '@/utility/misskey-api.js';
-import { userPage } from '@/filters/user.js';
+import { userPage } from '@features/users/frontend/filters/user.js';
 import * as sound from '@/utility/sound.js';
 import * as os from '@/os.js';
-import { confetti } from '@/utility/confetti.js';
+import { confetti } from '@features/ui/frontend/utility/confetti.js';
 import { genId } from '@/utility/id.js';
 
 const props = defineProps<{

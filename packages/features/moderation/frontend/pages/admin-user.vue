@@ -210,29 +210,29 @@ SPDX-License-Identifier: AGPL-3.0-only
 import { computed, defineAsyncComponent, watch, ref, markRaw } from 'vue';
 import * as Misskey from 'misskey-js';
 import { url } from '@@/js/config.js';
-import type { ChartSrc } from '@/components/MkChart.vue';
-import MkChart from '@/components/MkChart.vue';
-import MkObjectView from '@/components/MkObjectView.vue';
-import MkTextarea from '@/components/MkTextarea.vue';
-import MkSwitch from '@/components/MkSwitch.vue';
-import FormLink from '@/components/form/link.vue';
-import FormSection from '@/components/form/section.vue';
-import MkButton from '@/components/MkButton.vue';
+import type { ChartSrc } from '@features/statistics/frontend/components/MkChart.vue';
+import MkChart from '@features/statistics/frontend/components/MkChart.vue';
+import MkObjectView from '@features/ui/frontend/components/MkObjectView.vue';
+import MkTextarea from '@features/ui/frontend/components/MkTextarea.vue';
+import MkSwitch from '@features/ui/frontend/components/MkSwitch.vue';
+import FormLink from '@features/ui/frontend/components/form/link.vue';
+import FormSection from '@features/ui/frontend/components/form/section.vue';
+import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import MkFolder from '@/components/MkFolder.vue';
-import MkKeyValue from '@/components/MkKeyValue.vue';
-import MkSelect from '@/components/MkSelect.vue';
-import MkFileListForAdmin from '@/components/MkFileListForAdmin.vue';
-import MkInfo from '@/components/MkInfo.vue';
+import MkKeyValue from '@features/ui/frontend/components/MkKeyValue.vue';
+import MkSelect from '@features/ui/frontend/components/MkSelect.vue';
+import MkFileListForAdmin from '@features/drive/frontend/components/MkFileListForAdmin.vue';
+import MkInfo from '@features/ui/frontend/components/MkInfo.vue';
 import * as os from '@/os.js';
 import { misskeyApi } from '@/utility/misskey-api.js';
-import { acct } from '@/filters/user.js';
+import { acct } from '@features/users/frontend/filters/user.js';
 import { definePage } from '@/page.js';
 import { i18n } from '@/i18n.js';
-import { useMkSelect } from '@/composables/use-mkselect.js';
+import { useMkSelect } from '@features/ui/frontend/composables/use-mkselect.js';
 import { ensureSignin, iAmAdmin, iAmModerator } from '@/i.js';
-import MkRolePreview from '@/components/MkRolePreview.vue';
-import MkPagination from '@/components/MkPagination.vue';
-import { Paginator } from '@/utility/paginator.js';
+import MkRolePreview from '@features/roles/frontend/components/MkRolePreview.vue';
+import MkPagination from '@features/ui/frontend/components/MkPagination.vue';
+import { Paginator } from '@features/ui/frontend/utility/paginator.js';
 
 const $i = ensureSignin();
 
@@ -511,7 +511,7 @@ function toggleRoleItem(role: typeof info.value.roles[number]) {
 }
 
 async function createAnnouncement() {
-	const { dispose } = await os.popupAsyncWithDialog(import('@/components/MkUserAnnouncementEditDialog.vue').then(x => x.default), {
+	const { dispose } = await os.popupAsyncWithDialog(import('@features/users/frontend/components/MkUserAnnouncementEditDialog.vue').then(x => x.default), {
 		user: user.value,
 	}, {
 		closed: () => dispose(),
@@ -519,7 +519,7 @@ async function createAnnouncement() {
 }
 
 async function editAnnouncement(announcement: Misskey.entities.AdminAnnouncementsListResponse[number]) {
-	const { dispose } = await os.popupAsyncWithDialog(import('@/components/MkUserAnnouncementEditDialog.vue').then(x => x.default), {
+	const { dispose } = await os.popupAsyncWithDialog(import('@features/users/frontend/components/MkUserAnnouncementEditDialog.vue').then(x => x.default), {
 		user: user.value,
 		announcement,
 	}, {

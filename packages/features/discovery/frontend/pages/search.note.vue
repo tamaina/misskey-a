@@ -128,14 +128,14 @@ import * as os from '@/os.js';
 import { misskeyApi } from '@/utility/misskey-api.js';
 import { apLookup } from '@/utility/lookup.js';
 import { useRouter } from '@/router.js';
-import MkButton from '@/components/MkButton.vue';
-import MkFoldableSection from '@/components/MkFoldableSection.vue';
-import MkInput from '@/components/MkInput.vue';
-import MkNotesTimeline from '@/components/MkNotesTimeline.vue';
-import MkRadios from '@/components/MkRadios.vue';
-import MkUserCardMini from '@/components/MkUserCardMini.vue';
-import { Paginator } from '@/utility/paginator.js';
-import type { MkRadiosOption } from '@/components/MkRadios.vue';
+import MkButton from '@features/ui/frontend/components/MkButton.vue';
+import MkFoldableSection from '@features/ui/frontend/components/MkFoldableSection.vue';
+import MkInput from '@features/ui/frontend/components/MkInput.vue';
+import MkNotesTimeline from '@features/timelines/frontend/components/MkNotesTimeline.vue';
+import MkRadios from '@features/ui/frontend/components/MkRadios.vue';
+import MkUserCardMini from '@features/users/frontend/components/MkUserCardMini.vue';
+import { Paginator } from '@features/ui/frontend/utility/paginator.js';
+import type { MkRadiosOption } from '@features/ui/frontend/components/MkRadios.vue';
 
 const props = withDefaults(defineProps<{
 	query?: string;

@@ -206,25 +206,25 @@ import XWatermarkItem from '@features/drive/frontend/pages/settings/drive.Waterm
 import XImageFrameItem from '@features/drive/frontend/pages/settings/drive.ImageFrameItem.vue';
 import type { WatermarkPreset } from '@/utility/watermark/WatermarkRenderer.js';
 import type { ImageFramePreset } from '@/utility/image-frame-renderer/ImageFrameRenderer.js';
-import FormLink from '@/components/form/link.vue';
-import MkSwitch from '@/components/MkSwitch.vue';
-import MkSelect from '@/components/MkSelect.vue';
-import FormSection from '@/components/form/section.vue';
-import MkKeyValue from '@/components/MkKeyValue.vue';
-import FormSplit from '@/components/form/split.vue';
+import FormLink from '@features/ui/frontend/components/form/link.vue';
+import MkSwitch from '@features/ui/frontend/components/MkSwitch.vue';
+import MkSelect from '@features/ui/frontend/components/MkSelect.vue';
+import FormSection from '@features/ui/frontend/components/form/section.vue';
+import MkKeyValue from '@features/ui/frontend/components/MkKeyValue.vue';
+import FormSplit from '@features/ui/frontend/components/form/split.vue';
 import * as os from '@/os.js';
 import { misskeyApi } from '@/utility/misskey-api.js';
-import bytes from '@/filters/bytes.js';
-import MkChart from '@/components/MkChart.vue';
+import bytes from '@features/ui/frontend/filters/bytes.js';
+import MkChart from '@features/statistics/frontend/components/MkChart.vue';
 import { i18n } from '@/i18n.js';
 import { definePage } from '@/page.js';
 import { ensureSignin } from '@/i.js';
 import { prefer } from '@/preferences.js';
-import MkPreferenceContainer from '@/components/MkPreferenceContainer.vue';
+import MkPreferenceContainer from '@features/preferences/frontend/components/MkPreferenceContainer.vue';
 import MkFeatureBanner from '@/components/MkFeatureBanner.vue';
-import { selectDriveFolder } from '@/utility/drive.js';
+import { selectDriveFolder } from '@features/drive/frontend/utility/drive.js';
 import MkFolder from '@/components/MkFolder.vue';
-import MkButton from '@/components/MkButton.vue';
+import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import { genId } from '@/utility/id.js';
 
 const $i = ensureSignin();
@@ -311,7 +311,7 @@ function chooseUploadFolder() {
 }
 
 async function addWatermarkPreset() {
-	const { dispose } = await os.popupAsyncWithDialog(import('@/components/MkWatermarkEditorDialog.vue').then(x => x.default), {
+	const { dispose } = await os.popupAsyncWithDialog(import('@features/media/frontend/components/MkWatermarkEditorDialog.vue').then(x => x.default), {
 		presetEditMode: true,
 		preset: null,
 		layers: [],
@@ -370,7 +370,7 @@ function onDeleteImageFramePreset(id: string) {
 }
 
 async function addImageFramePreset() {
-	const { dispose } = await os.popupAsyncWithDialog(import('@/components/MkImageFrameEditorDialog.vue').then(x => x.default), {
+	const { dispose } = await os.popupAsyncWithDialog(import('@features/media/frontend/components/MkImageFrameEditorDialog.vue').then(x => x.default), {
 		presetEditMode: true,
 		preset: null,
 		params: null,

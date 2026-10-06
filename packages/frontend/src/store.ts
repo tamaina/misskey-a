@@ -7,10 +7,10 @@ import { markRaw } from 'vue';
 import * as Misskey from 'misskey-js';
 import { prefersReducedMotion } from '@@/js/config.js';
 import { hemisphere } from '@@/js/intl-const.js';
-import type { DeviceKind } from '@/utility/device-kind.js';
+import type { DeviceKind } from '@features/ui/frontend/utility/device-kind.js';
 import type { TIPS } from '@/tips.js';
 import { Pizzax } from '@/lib/pizzax.js';
-import { DEFAULT_DEVICE_KIND } from '@/utility/device-kind.js';
+import { DEFAULT_DEVICE_KIND } from '@features/ui/frontend/utility/device-kind.js';
 
 /**
  * 「状態」を管理するストア(not「設定」)

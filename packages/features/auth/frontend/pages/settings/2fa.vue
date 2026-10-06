@@ -86,10 +86,10 @@ SPDX-License-Identifier: AGPL-3.0-only
 import { computed } from 'vue';
 import { browserSupportsWebAuthn, startRegistration } from '@simplewebauthn/browser';
 import * as Misskey from 'misskey-js';
-import MkButton from '@/components/MkButton.vue';
-import MkInfo from '@/components/MkInfo.vue';
-import MkSwitch from '@/components/MkSwitch.vue';
-import FormSection from '@/components/form/section.vue';
+import MkButton from '@features/ui/frontend/components/MkButton.vue';
+import MkInfo from '@features/ui/frontend/components/MkInfo.vue';
+import MkSwitch from '@features/ui/frontend/components/MkSwitch.vue';
+import FormSection from '@features/ui/frontend/components/form/section.vue';
 import MkFolder from '@/components/MkFolder.vue';
 import MkLink from '@/components/MkLink.vue';
 import * as os from '@/os.js';

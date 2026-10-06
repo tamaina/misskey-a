@@ -16,8 +16,8 @@ import { markRaw, ref } from 'vue';
 import XColumn from './column.vue';
 import type { Column } from '@/deck.js';
 import { i18n } from '@/i18n.js';
-import MkNotesTimeline from '@/components/MkNotesTimeline.vue';
-import { Paginator } from '@/utility/paginator.js';
+import MkNotesTimeline from '@features/timelines/frontend/components/MkNotesTimeline.vue';
+import { Paginator } from '@features/ui/frontend/utility/paginator.js';
 
 defineProps<{
 	column: Column;

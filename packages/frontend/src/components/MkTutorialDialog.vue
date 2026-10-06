@@ -150,16 +150,16 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script lang="ts" setup>
 import { ref, useTemplateRef, watch } from 'vue';
 import { host } from '@@/js/config.js';
-import MkModalWindow from '@/components/MkModalWindow.vue';
-import MkButton from '@/components/MkButton.vue';
-import XNote from '@/components/MkTutorialDialog.Note.vue';
-import XTimeline from '@/components/MkTutorialDialog.Timeline.vue';
-import XPostNote from '@/components/MkTutorialDialog.PostNote.vue';
-import XSensitive from '@/components/MkTutorialDialog.Sensitive.vue';
+import MkModalWindow from '@features/ui/frontend/components/MkModalWindow.vue';
+import MkButton from '@features/ui/frontend/components/MkButton.vue';
+import XNote from '@features/notes/frontend/components/MkTutorialDialog.Note.vue';
+import XTimeline from '@features/timelines/frontend/components/MkTutorialDialog.Timeline.vue';
+import XPostNote from '@features/notes/frontend/components/MkTutorialDialog.PostNote.vue';
+import XSensitive from '@features/media/frontend/components/MkTutorialDialog.Sensitive.vue';
 import MkAnimBg from '@/components/MkAnimBg.vue';
 import { i18n } from '@/i18n.js';
 import { instance } from '@/instance.js';
-import { claimAchievement } from '@/utility/achievements.js';
+import { claimAchievement } from '@features/users/frontend/utility/achievements.js';
 import * as os from '@/os.js';
 
 const props = defineProps<{

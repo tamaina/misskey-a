@@ -85,11 +85,11 @@ import { computed, ref, watch } from 'vue';
 import * as Misskey from 'misskey-js';
 import XGame from '@features/games/frontend/pages/drop-and-fusion.game.vue';
 import { definePage } from '@/page.js';
-import MkButton from '@/components/MkButton.vue';
+import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import { i18n } from '@/i18n.js';
-import { useMkSelect } from '@/composables/use-mkselect.js';
-import MkSelect from '@/components/MkSelect.vue';
-import MkSwitch from '@/components/MkSwitch.vue';
+import { useMkSelect } from '@features/ui/frontend/composables/use-mkselect.js';
+import MkSelect from '@features/ui/frontend/components/MkSelect.vue';
+import MkSwitch from '@features/ui/frontend/components/MkSwitch.vue';
 import { misskeyApiGet } from '@/utility/misskey-api.js';
 
 const {

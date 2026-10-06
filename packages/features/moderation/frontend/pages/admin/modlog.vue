@@ -46,17 +46,17 @@ SPDX-License-Identifier: AGPL-3.0-only
 import { computed, ref, markRaw, onMounted } from 'vue';
 import * as Misskey from 'misskey-js';
 import XModLog from '@features/moderation/frontend/pages/admin/modlog.ModLog.vue';
-import MkSelect from '@/components/MkSelect.vue';
-import MkInput from '@/components/MkInput.vue';
-import MkTl from '@/components/MkTl.vue';
+import MkSelect from '@features/ui/frontend/components/MkSelect.vue';
+import MkInput from '@features/ui/frontend/components/MkInput.vue';
+import MkTl from '@features/ui/frontend/components/MkTl.vue';
 import { i18n } from '@/i18n.js';
 import { definePage } from '@/page.js';
 import { prefer } from '@/preferences.js';
-import { useMkSelect } from '@/composables/use-mkselect.js';
-import MkPullToRefresh from '@/components/MkPullToRefresh.vue';
-import MkButton from '@/components/MkButton.vue';
-import MkPaginationControl from '@/components/MkPaginationControl.vue';
-import { Paginator } from '@/utility/paginator.js';
+import { useMkSelect } from '@features/ui/frontend/composables/use-mkselect.js';
+import MkPullToRefresh from '@features/ui/frontend/components/MkPullToRefresh.vue';
+import MkButton from '@features/ui/frontend/components/MkButton.vue';
+import MkPaginationControl from '@features/ui/frontend/components/MkPaginationControl.vue';
+import { Paginator } from '@features/ui/frontend/utility/paginator.js';
 
 const {
 	model: type,

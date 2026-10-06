@@ -17,9 +17,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup generic="P extends IPaginator">
 import * as Misskey from 'misskey-js';
-import type { IPaginator, ExtractorFunction } from '@/utility/paginator.js';
-import MkUserInfo from '@/components/MkUserInfo.vue';
-import MkPagination from '@/components/MkPagination.vue';
+import type { IPaginator, ExtractorFunction } from '@features/ui/frontend/utility/paginator.js';
+import MkUserInfo from '@features/users/frontend/components/MkUserInfo.vue';
+import MkPagination from '@features/ui/frontend/components/MkPagination.vue';
 import { i18n } from '@/i18n.js';
 
 const props = withDefaults(defineProps<{

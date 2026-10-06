@@ -73,20 +73,20 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script lang="ts" setup>
 import * as Misskey from 'misskey-js';
 import { computed, markRaw, ref } from 'vue';
-import MkButton from '@/components/MkButton.vue';
-import MkInput from '@/components/MkInput.vue';
-import MkPagination from '@/components/MkPagination.vue';
-import MkRemoteEmojiEditDialog from '@/components/MkRemoteEmojiEditDialog.vue';
-import MkSwitch from '@/components/MkSwitch.vue';
-import FormSplit from '@/components/form/split.vue';
-import { selectFile } from '@/utility/drive.js';
+import MkButton from '@features/ui/frontend/components/MkButton.vue';
+import MkInput from '@features/ui/frontend/components/MkInput.vue';
+import MkPagination from '@features/ui/frontend/components/MkPagination.vue';
+import MkRemoteEmojiEditDialog from '@features/emojis/frontend/components/MkRemoteEmojiEditDialog.vue';
+import MkSwitch from '@features/ui/frontend/components/MkSwitch.vue';
+import FormSplit from '@features/ui/frontend/components/form/split.vue';
+import { selectFile } from '@features/drive/frontend/utility/drive.js';
 import * as os from '@/os.js';
 import { misskeyApi } from '@/utility/misskey-api.js';
 import { getProxiedImageUrl } from '@/utility/media-proxy.js';
 import { i18n } from '@/i18n.js';
 import { iAmAdmin } from '@/i.js';
 import { definePage } from '@/page.js';
-import { Paginator } from '@/utility/paginator.js';
+import { Paginator } from '@features/ui/frontend/utility/paginator.js';
 
 const tab = ref('local');
 const query = ref<string | null>(null);

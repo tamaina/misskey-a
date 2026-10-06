@@ -60,11 +60,11 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import { onMounted, ref, watch, computed } from 'vue';
-import FormSection from '@/components/form/section.vue';
-import MkInfo from '@/components/MkInfo.vue';
-import MkInput from '@/components/MkInput.vue';
-import MkSwitch from '@/components/MkSwitch.vue';
-import MkDisableSection from '@/components/MkDisableSection.vue';
+import FormSection from '@features/ui/frontend/components/form/section.vue';
+import MkInfo from '@features/ui/frontend/components/MkInfo.vue';
+import MkInput from '@features/ui/frontend/components/MkInput.vue';
+import MkSwitch from '@features/ui/frontend/components/MkSwitch.vue';
+import MkDisableSection from '@features/ui/frontend/components/MkDisableSection.vue';
 import * as os from '@/os.js';
 import { misskeyApi } from '@/utility/misskey-api.js';
 import { ensureSignin } from '@/i.js';

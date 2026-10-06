@@ -120,22 +120,22 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script lang="ts" setup>
 import { computed, ref, watch } from 'vue';
 import XPalette from '@features/preferences/frontend/pages/settings/emoji-palette.palette.vue';
-import type { MkSelectItem } from '@/components/MkSelect.vue';
-import type { MkRadiosOption } from '@/components/MkRadios.vue';
+import type { MkSelectItem } from '@features/ui/frontend/components/MkSelect.vue';
+import type { MkRadiosOption } from '@features/ui/frontend/components/MkRadios.vue';
 import { genId } from '@/utility/id.js';
 import MkFeatureBanner from '@/components/MkFeatureBanner.vue';
-import MkRadios from '@/components/MkRadios.vue';
-import MkButton from '@/components/MkButton.vue';
-import FormSection from '@/components/form/section.vue';
-import MkSelect from '@/components/MkSelect.vue';
+import MkRadios from '@features/ui/frontend/components/MkRadios.vue';
+import MkButton from '@features/ui/frontend/components/MkButton.vue';
+import FormSection from '@features/ui/frontend/components/form/section.vue';
+import MkSelect from '@features/ui/frontend/components/MkSelect.vue';
 import * as os from '@/os.js';
 import { i18n } from '@/i18n.js';
 import { definePage } from '@/page.js';
 import MkFolder from '@/components/MkFolder.vue';
 import { prefer } from '@/preferences.js';
-import MkPreferenceContainer from '@/components/MkPreferenceContainer.vue';
-import MkSwitch from '@/components/MkSwitch.vue';
-import { emojiPicker } from '@/utility/emoji-picker.js';
+import MkPreferenceContainer from '@features/preferences/frontend/components/MkPreferenceContainer.vue';
+import MkSwitch from '@features/ui/frontend/components/MkSwitch.vue';
+import { emojiPicker } from '@features/emojis/frontend/utility/emoji-picker.js';
 
 const emojiPaletteForReaction = prefer.model('emojiPaletteForReaction');
 const emojiPaletteForReactionDef = computed<MkSelectItem[]>(() => [

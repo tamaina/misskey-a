@@ -164,25 +164,25 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script lang="ts" setup>
 import { computed, reactive, ref, watch } from 'vue';
 import * as Misskey from 'misskey-js';
-import MkButton from '@/components/MkButton.vue';
-import MkInput from '@/components/MkInput.vue';
-import MkSwitch from '@/components/MkSwitch.vue';
-import MkSelect from '@/components/MkSelect.vue';
-import FormSplit from '@/components/form/split.vue';
+import MkButton from '@features/ui/frontend/components/MkButton.vue';
+import MkInput from '@features/ui/frontend/components/MkInput.vue';
+import MkSwitch from '@features/ui/frontend/components/MkSwitch.vue';
+import MkSelect from '@features/ui/frontend/components/MkSelect.vue';
+import FormSplit from '@features/ui/frontend/components/form/split.vue';
 import MkFolder from '@/components/MkFolder.vue';
-import FormSlot from '@/components/form/slot.vue';
-import FormLink from '@/components/form/link.vue';
-import MkDraggable from '@/components/MkDraggable.vue';
-import { chooseDriveFile } from '@/utility/drive.js';
+import FormSlot from '@features/ui/frontend/components/form/slot.vue';
+import FormLink from '@features/ui/frontend/components/form/link.vue';
+import MkDraggable from '@features/ui/frontend/components/MkDraggable.vue';
+import { chooseDriveFile } from '@features/drive/frontend/utility/drive.js';
 import * as os from '@/os.js';
 import { i18n } from '@/i18n.js';
 import { ensureSignin } from '@/i.js';
 import { langmap } from '@/utility/langmap.js';
 import { definePage } from '@/page.js';
-import { claimAchievement } from '@/utility/achievements.js';
+import { claimAchievement } from '@features/users/frontend/utility/achievements.js';
 import { store } from '@/store.js';
-import MkInfo from '@/components/MkInfo.vue';
-import MkTextarea from '@/components/MkTextarea.vue';
+import MkInfo from '@features/ui/frontend/components/MkInfo.vue';
+import MkTextarea from '@features/ui/frontend/components/MkTextarea.vue';
 import { genId } from '@/utility/id.js';
 
 const $i = ensureSignin();

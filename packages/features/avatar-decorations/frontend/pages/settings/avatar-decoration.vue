@@ -53,15 +53,15 @@ import { ref, defineAsyncComponent, computed } from 'vue';
 import * as Misskey from 'misskey-js';
 import XDecoration from '@features/avatar-decorations/frontend/pages/settings/avatar-decoration.decoration.vue';
 import XDialog from '@features/avatar-decorations/frontend/pages/settings/avatar-decoration.dialog.vue';
-import MkButton from '@/components/MkButton.vue';
-import MkFoldableSection from '@/components/MkFoldableSection.vue';
+import MkButton from '@features/ui/frontend/components/MkButton.vue';
+import MkFoldableSection from '@features/ui/frontend/components/MkFoldableSection.vue';
 import * as os from '@/os.js';
 import { misskeyApi } from '@/utility/misskey-api.js';
 import { i18n } from '@/i18n.js';
 import { ensureSignin } from '@/i.js';
-import MkInfo from '@/components/MkInfo.vue';
+import MkInfo from '@features/ui/frontend/components/MkInfo.vue';
 import { definePage } from '@/page.js';
-import { groupAvatarDecorations } from '@/utility/group-avatar-decorations.js';
+import { groupAvatarDecorations } from '@features/avatar-decorations/frontend/utility/group-avatar-decorations.js';
 
 const $i = ensureSignin();
 

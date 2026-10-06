@@ -62,12 +62,12 @@ import * as os from '@/os.js';
 import { misskeyApi } from '@/utility/misskey-api.js';
 import { i18n } from '@/i18n.js';
 import { definePage } from '@/page.js';
-import MkButton from '@/components/MkButton.vue';
-import MkUserCardMini from '@/components/MkUserCardMini.vue';
-import MkInfo from '@/components/MkInfo.vue';
-import MkPagination from '@/components/MkPagination.vue';
+import MkButton from '@features/ui/frontend/components/MkButton.vue';
+import MkUserCardMini from '@features/users/frontend/components/MkUserCardMini.vue';
+import MkInfo from '@features/ui/frontend/components/MkInfo.vue';
+import MkPagination from '@features/ui/frontend/components/MkPagination.vue';
 import { useRouter } from '@/router.js';
-import { Paginator } from '@/utility/paginator.js';
+import { Paginator } from '@features/ui/frontend/utility/paginator.js';
 
 const router = useRouter();
 

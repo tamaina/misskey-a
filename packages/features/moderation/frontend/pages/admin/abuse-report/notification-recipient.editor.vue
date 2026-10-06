@@ -65,17 +65,17 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script lang="ts" setup>
 import { computed, onMounted, ref, useTemplateRef, toRefs } from 'vue';
 import { entities } from 'misskey-js';
-import type { MkSystemWebhookResult } from '@/components/MkSystemWebhookEditor.impl.js';
-import MkButton from '@/components/MkButton.vue';
-import MkModalWindow from '@/components/MkModalWindow.vue';
+import type { MkSystemWebhookResult } from '@features/integrations/frontend/components/MkSystemWebhookEditor.impl.js';
+import MkButton from '@features/ui/frontend/components/MkButton.vue';
+import MkModalWindow from '@features/ui/frontend/components/MkModalWindow.vue';
 import { i18n } from '@/i18n.js';
-import MkInput from '@/components/MkInput.vue';
+import MkInput from '@features/ui/frontend/components/MkInput.vue';
 import { misskeyApi } from '@/utility/misskey-api.js';
-import { useMkSelect } from '@/composables/use-mkselect.js';
-import MkSelect from '@/components/MkSelect.vue';
-import { showSystemWebhookEditorDialog } from '@/components/MkSystemWebhookEditor.impl.js';
-import MkSwitch from '@/components/MkSwitch.vue';
-import MkDivider from '@/components/MkDivider.vue';
+import { useMkSelect } from '@features/ui/frontend/composables/use-mkselect.js';
+import MkSelect from '@features/ui/frontend/components/MkSelect.vue';
+import { showSystemWebhookEditorDialog } from '@features/integrations/frontend/components/MkSystemWebhookEditor.impl.js';
+import MkSwitch from '@features/ui/frontend/components/MkSwitch.vue';
+import MkDivider from '@features/ui/frontend/components/MkDivider.vue';
 import * as os from '@/os.js';
 
 const emit = defineEmits<{

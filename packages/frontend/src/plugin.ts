@@ -8,7 +8,7 @@ import { compareVersions } from 'compare-versions';
 import { isSafeMode } from '@@/js/config.js';
 import * as Misskey from 'misskey-js';
 import type { Parser, Interpreter, values, utils as utils_TypeReferenceOnly } from '@syuilo/aiscript';
-import type { FormWithDefault } from '@/utility/form.js';
+import type { FormWithDefault } from '@features/ui/frontend/utility/form.js';
 import { genId } from '@/utility/id.js';
 import { store } from '@/store.js';
 import * as os from '@/os.js';
@@ -108,7 +108,7 @@ export async function authorizePlugin(plugin: Plugin) {
 
 	const token = await new Promise<string>((res, rej) => {
 		let dispose: () => void;
-		os.popupAsyncWithDialog(import('@/components/MkTokenGenerateWindow.vue').then(x => x.default), {
+		os.popupAsyncWithDialog(import('@features/auth/frontend/components/MkTokenGenerateWindow.vue').then(x => x.default), {
 			title: i18n.ts.tokenRequested,
 			information: i18n.ts.pluginTokenRequestedDescription,
 			initialName: plugin.name,
@@ -269,7 +269,7 @@ async function launchPlugin(id: Plugin['installId']): Promise<void> {
 	await authorizePlugin(plugin);
 
 	const { Interpreter, utils } = await import('@syuilo/aiscript');
-	const { aiScriptReadline } = await import('@/aiscript/api.js');
+	const { aiScriptReadline } = await import('@features/play/frontend/services/aiscript/api.js');
 
 	const aiscript = new Interpreter(await createPluginEnv({
 		plugin: plugin,
@@ -359,7 +359,7 @@ async function createPluginEnv(opts: { plugin: Plugin; storageKey: string }): Pr
 	const ais = await import('@syuilo/aiscript');
 	const values = ais.values;
 	const utils: typeof utils_TypeReferenceOnly = ais.utils;
-	const { createAiScriptEnv } = await import('@/aiscript/api.js');
+	const { createAiScriptEnv } = await import('@features/play/frontend/services/aiscript/api.js');
 
 	const config = new Map<string, values.Value>();
 	for (const [k, v] of Object.entries(opts.plugin.config ?? {})) {

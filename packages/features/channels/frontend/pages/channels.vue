@@ -63,17 +63,17 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import { computed, markRaw, onMounted, ref, shallowRef } from 'vue';
-import MkChannelPreview from '@/components/MkChannelPreview.vue';
-import MkChannelList from '@/components/MkChannelList.vue';
-import MkPagination from '@/components/MkPagination.vue';
-import MkInput from '@/components/MkInput.vue';
-import MkRadios from '@/components/MkRadios.vue';
-import MkButton from '@/components/MkButton.vue';
-import MkFoldableSection from '@/components/MkFoldableSection.vue';
+import MkChannelPreview from '@features/channels/frontend/components/MkChannelPreview.vue';
+import MkChannelList from '@features/channels/frontend/components/MkChannelList.vue';
+import MkPagination from '@features/ui/frontend/components/MkPagination.vue';
+import MkInput from '@features/ui/frontend/components/MkInput.vue';
+import MkRadios from '@features/ui/frontend/components/MkRadios.vue';
+import MkButton from '@features/ui/frontend/components/MkButton.vue';
+import MkFoldableSection from '@features/ui/frontend/components/MkFoldableSection.vue';
 import { definePage } from '@/page.js';
 import { i18n } from '@/i18n.js';
 import { useRouter } from '@/router.js';
-import { Paginator } from '@/utility/paginator.js';
+import { Paginator } from '@features/ui/frontend/utility/paginator.js';
 import { $i } from '@/i.js';
 
 const router = useRouter();

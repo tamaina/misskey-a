@@ -22,8 +22,8 @@ import MkQrShow from './qr.show.vue';
 import { definePage } from '@/page.js';
 import { i18n } from '@/i18n.js';
 import { ensureSignin } from '@/i';
-import MkButton from '@/components/MkButton.vue';
-import MkPolkadots from '@/components/MkPolkadots.vue';
+import MkButton from '@features/ui/frontend/components/MkButton.vue';
+import MkPolkadots from '@features/ui/frontend/components/MkPolkadots.vue';
 
 // router definitionでloginRequiredが設定されているためエラーハンドリングしない
 const $i = ensureSignin();

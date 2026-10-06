@@ -29,8 +29,8 @@ import { misskeyApi } from '@/utility/misskey-api.js';
 import MkUserList from '@/components/MkUserList.vue';
 import { definePage } from '@/page.js';
 import { i18n } from '@/i18n.js';
-import MkStreamingNotesTimeline from '@/components/MkStreamingNotesTimeline.vue';
-import { Paginator } from '@/utility/paginator.js';
+import MkStreamingNotesTimeline from '@features/timelines/frontend/components/MkStreamingNotesTimeline.vue';
+import { Paginator } from '@features/ui/frontend/utility/paginator.js';
 
 const props = withDefaults(defineProps<{
 	roleId: string;

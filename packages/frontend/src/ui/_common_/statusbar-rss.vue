@@ -32,7 +32,7 @@ import * as Misskey from 'misskey-js';
 import { useInterval } from '@@/js/use-interval.js';
 import { url as baseUrl } from '@@/js/config.js';
 import { tryParseUrl } from '@@/js/url.js';
-import MkMarqueeText from '@/components/MkMarqueeText.vue';
+import MkMarqueeText from '@features/ui/frontend/components/MkMarqueeText.vue';
 import { shuffle } from '@/utility/shuffle.js';
 
 const props = defineProps<{

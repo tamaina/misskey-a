@@ -32,15 +32,15 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script lang="ts" setup>
 import { computed, markRaw, ref, watch } from 'vue';
 import { useLowresTime } from '@@/js/use-lowres-time.js';
-import { isSeparatorNeeded, getSeparatorInfo } from '@/utility/timeline-date-separate.js';
+import { isSeparatorNeeded, getSeparatorInfo } from '@features/timelines/frontend/utility/timeline-date-separate.js';
 import { useWidgetPropsManager } from './widget.js';
 import type { WidgetComponentEmits, WidgetComponentExpose, WidgetComponentProps } from './widget.js';
-import type { FormWithDefault, GetFormResultType } from '@/utility/form.js';
-import MkContainer from '@/components/MkContainer.vue';
-import MkPagination from '@/components/MkPagination.vue';
+import type { FormWithDefault, GetFormResultType } from '@features/ui/frontend/utility/form.js';
+import MkContainer from '@features/ui/frontend/components/MkContainer.vue';
+import MkPagination from '@features/ui/frontend/components/MkPagination.vue';
 import XUser from './WidgetBirthdayFollowings.user.vue';
 import { i18n } from '@/i18n.js';
-import { Paginator } from '@/utility/paginator.js';
+import { Paginator } from '@features/ui/frontend/utility/paginator.js';
 
 const name = 'birthdayFollowings';
 

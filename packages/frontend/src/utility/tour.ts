@@ -26,7 +26,7 @@ export function startTour(steps: TourStep[]) {
 			anchorElementRef.value = step.element;
 		});
 
-		const { dispose } = os.popup(defineAsyncComponent(() => import('@/components/MkSpot.vue')), {
+		const { dispose } = os.popup(defineAsyncComponent(() => import('@features/ui/frontend/components/MkSpot.vue')), {
 			title: titleRef,
 			description: descriptionRef,
 			anchorElement: anchorElementRef,

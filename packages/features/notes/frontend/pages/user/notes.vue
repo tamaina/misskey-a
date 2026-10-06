@@ -30,10 +30,10 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script lang="ts" setup>
 import { ref, computed, markRaw } from 'vue';
 import * as Misskey from 'misskey-js';
-import MkNotesTimeline from '@/components/MkNotesTimeline.vue';
-import MkTab from '@/components/MkTab.vue';
+import MkNotesTimeline from '@features/timelines/frontend/components/MkNotesTimeline.vue';
+import MkTab from '@features/ui/frontend/components/MkTab.vue';
 import { i18n } from '@/i18n.js';
-import { Paginator } from '@/utility/paginator.js';
+import { Paginator } from '@features/ui/frontend/utility/paginator.js';
 
 const props = defineProps<{
 	user: Misskey.entities.UserDetailed;

@@ -55,9 +55,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import { ref, computed } from 'vue';
-import MkInput from '@/components/MkInput.vue';
-import MkButton from '@/components/MkButton.vue';
-import MkSwitch from '@/components/MkSwitch.vue';
+import MkInput from '@features/ui/frontend/components/MkInput.vue';
+import MkButton from '@features/ui/frontend/components/MkButton.vue';
+import MkSwitch from '@features/ui/frontend/components/MkSwitch.vue';
 import * as os from '@/os.js';
 import { misskeyApi } from '@/utility/misskey-api.js';
 import { fetchInstance } from '@/instance.js';

@@ -32,13 +32,13 @@ import * as Misskey from 'misskey-js';
 import { i18n } from '@/i18n.js';
 import * as os from '@/os.js';
 import { misskeyApi } from '@/utility/misskey-api.js';
-import MkButton from '@/components/MkButton.vue';
-import MkPagination from '@/components/MkPagination.vue';
-import MkInviteCode from '@/components/MkInviteCode.vue';
+import MkButton from '@features/ui/frontend/components/MkButton.vue';
+import MkPagination from '@features/ui/frontend/components/MkPagination.vue';
+import MkInviteCode from '@features/auth/frontend/components/MkInviteCode.vue';
 import { definePage } from '@/page.js';
 import { instance } from '@/instance.js';
 import { $i } from '@/i.js';
-import { Paginator } from '@/utility/paginator.js';
+import { Paginator } from '@features/ui/frontend/utility/paginator.js';
 
 const currentInviteLimit = ref<null | number>(null);
 const inviteLimit = (($i != null && $i.policies.inviteLimit) || (($i == null && instance.policies.inviteLimit))) as number;

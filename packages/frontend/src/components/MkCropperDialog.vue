@@ -33,7 +33,7 @@ import { onMounted, useTemplateRef, ref, onUnmounted } from 'vue';
 import * as Misskey from 'misskey-js';
 import Cropper from 'cropperjs';
 import tinycolor from 'tinycolor2';
-import MkModalWindow from '@/components/MkModalWindow.vue';
+import MkModalWindow from '@features/ui/frontend/components/MkModalWindow.vue';
 import { themeManager } from '@/theme.js';
 import { i18n } from '@/i18n.js';
 

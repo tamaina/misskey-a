@@ -8,7 +8,7 @@ import { defaultEmbedParams, embedRouteWithScrollbar } from '@@/js/embed-page.js
 import type { EmbedParams, EmbeddableEntity } from '@@/js/embed-page.js';
 import { genId } from '@/utility/id.js';
 import * as os from '@/os.js';
-import { copyToClipboard } from '@/utility/copy-to-clipboard.js';
+import { copyToClipboard } from '@features/ui/frontend/utility/copy-to-clipboard.js';
 
 const MOBILE_THRESHOLD = 500;
 
@@ -76,7 +76,7 @@ export async function genEmbedCode(entity: EmbeddableEntity, id: string, params?
 	if (window.innerWidth < MOBILE_THRESHOLD) {
 		copyToClipboard(getEmbedCode(`/embed/${entity}/${id}`, _params));
 	} else {
-		const { dispose } = await os.popupAsyncWithDialog(import('@/components/MkEmbedCodeGenDialog.vue').then(x => x.default), {
+		const { dispose } = await os.popupAsyncWithDialog(import('@features/web/frontend/components/MkEmbedCodeGenDialog.vue').then(x => x.default), {
 			entity,
 			id,
 			params: _params,

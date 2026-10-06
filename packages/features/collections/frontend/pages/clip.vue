@@ -35,19 +35,19 @@ import * as Misskey from 'misskey-js';
 import { url } from '@@/js/config.js';
 import type { MenuItem } from '@/types/menu.js';
 import type { PageHeaderItem } from '@/types/page-header.js';
-import MkNotesTimeline from '@/components/MkNotesTimeline.vue';
+import MkNotesTimeline from '@features/timelines/frontend/components/MkNotesTimeline.vue';
 import { $i } from '@/i.js';
 import { i18n } from '@/i18n.js';
 import * as os from '@/os.js';
 import { misskeyApi } from '@/utility/misskey-api.js';
 import { definePage } from '@/page.js';
-import MkButton from '@/components/MkButton.vue';
+import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import { clipsCache } from '@/cache.js';
-import { isSupportShare } from '@/utility/navigator.js';
-import { copyToClipboard } from '@/utility/copy-to-clipboard.js';
+import { isSupportShare } from '@features/navigation/frontend/utility/navigator.js';
+import { copyToClipboard } from '@features/ui/frontend/utility/copy-to-clipboard.js';
 import { genEmbedCode } from '@/utility/get-embed-code.js';
 import { assertServerContext, serverContext } from '@/server-context.js';
-import { Paginator } from '@/utility/paginator.js';
+import { Paginator } from '@features/ui/frontend/utility/paginator.js';
 
 // contextは非ログイン状態の情報しかないためログイン時は利用できない
 const CTX_CLIP = !$i && assertServerContext(serverContext, 'clip') ? serverContext.clip : null;
