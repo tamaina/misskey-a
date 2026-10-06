@@ -130,8 +130,8 @@ three-service QueueService/webhook cycle. Moving files does not remove these.
 
 ## Batch process
 
-1. Freeze an ownership list for each batch. Assign disjoint files to Luna workers;
-   dot owns shared integration, schema exceptions and dependency directions.
+1. Freeze an ownership list for each batch. Assign disjoint files for parallel work;
+   review shared integration, schema exceptions and dependency directions centrally.
 2. Move source and rewrite imports mechanically, preserving body/metadata hashes
    where possible. Keep short old-path bridges when required for incremental boot.
 3. Convert repeated endpoint families together to feature contracts/factories;
@@ -167,3 +167,13 @@ Queue names, scheduling, retries and processor behavior are unchanged. All 37
 registered processor providers retain their constructor/injection metadata. Archive
 runtime dependencies resolve through the backend package's small queue adapter;
 feature directories do not acquire package manifests or build configuration.
+
+The model placement checkpoint moves all 76 TypeORM entities plus the notification
+model types and instance-meta persistence helper to their owning `backend/models`.
+The [model allocation table](model-file-allocation.tsv) also records the 39 legacy
+JSON schemas awaiting their own contract migration. Host `models/_.ts`, repository
+provider composition and the shared ORM ID-column helper remain backend-owned.
+Direct legacy reexports preserve entity constructor identity; table names, columns,
+indexes, relations and migrations do not change. The User/DriveFile/DriveFolder
+cycle moves together. User/Role auxiliary exports stay with their existing files
+until a separate contract extraction, rather than changing public shape here.
