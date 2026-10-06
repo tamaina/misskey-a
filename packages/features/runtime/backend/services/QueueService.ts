@@ -180,6 +180,11 @@ export class QueueService {
 	@bindThis
 	public async deliverMany(user: ThinUser, content: IActivity | null, inboxes: Map<string, boolean>) {
 		if (content == null) return null;
+		// Defend against nullable inboxes at runtime without mutating the caller's map.
+		const destinations = new Map(inboxes);
+		destinations.delete(null as unknown as string);
+		if (destinations.size === 0) return null;
+
 		const contentBody = JSON.stringify(content);
 		const digest = ApRequestCreator.createDigest(contentBody);
 
@@ -198,7 +203,7 @@ export class QueueService {
 			},
 		};
 
-		await this.deliverQueue.addBulk(Array.from(inboxes.entries(), d => ({
+		await this.deliverQueue.addBulk(Array.from(destinations.entries(), d => ({
 			name: d[0].replace('https://', '').replace('/inbox', ''),
 			data: {
 				user,
