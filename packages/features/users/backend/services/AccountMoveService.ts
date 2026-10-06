@@ -135,6 +135,7 @@ export class AccountMoveService {
 		const proxy = await this.systemAccountService.fetch('proxy');
 		const followings = await this.followingsRepository.findBy({
 			followeeId: src.id,
+			isFollowerSuspended: false,
 			followerHost: IsNull(), // follower is local
 			followerId: Not(proxy.id),
 		});

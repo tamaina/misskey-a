@@ -179,11 +179,13 @@ export class UserEntityService implements OnModuleInit {
 			this.followingsRepository.findOneBy({
 				followerId: me,
 				followeeId: target,
+				isFollowerSuspended: false,
 			}),
 			this.followingsRepository.exists({
 				where: {
 					followerId: target,
 					followeeId: me,
+					isFollowerSuspended: false,
 				},
 			}),
 			this.followRequestsRepository.exists({
@@ -250,11 +252,12 @@ export class UserEntityService implements OnModuleInit {
 			muters,
 			renoteMuters,
 		] = await Promise.all([
-			this.followingsRepository.findBy({ followerId: me })
+			this.followingsRepository.findBy({ followerId: me, isFollowerSuspended: false })
 				.then(f => new Map(f.map(it => [it.followeeId, it]))),
 			this.followingsRepository.createQueryBuilder('f')
 				.select('f.followerId')
 				.where('f.followeeId = :me', { me })
+				.andWhere('f.isFollowerSuspended = false')
 				.getRawMany<{ f_followerId: string }>()
 				.then(it => it.map(it => it.f_followerId)),
 			this.followRequestsRepository.createQueryBuilder('f')
