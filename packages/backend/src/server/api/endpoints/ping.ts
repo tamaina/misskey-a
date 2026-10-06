@@ -3,40 +3,21 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Injectable } from '@nestjs/common';
+import { createPing, legacyPingSchemas } from '@misskey-a/instance/backend';
+import type { Schema } from '@/misc/json-schema.js';
 import { Endpoint } from '@/server/api/endpoint-base.js';
 
+// Retain the existing transport/auth/error pipeline while migrating the implementation.
 export const meta = {
 	requireCredential: false,
-
 	tags: ['meta'],
-
-	res: {
-		type: 'object',
-		optional: false, nullable: false,
-		properties: {
-			pong: {
-				type: 'number',
-				optional: false, nullable: false,
-			},
-		},
-	},
+	res: legacyPingSchemas.output as Schema,
 } as const;
+export const paramDef = legacyPingSchemas.input as Schema;
 
-export const paramDef = {
-	type: 'object',
-	properties: {},
-	required: [],
-} as const;
-
-@Injectable()
 export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-disable-line import/no-default-export
-	constructor(
-	) {
-		super(meta, paramDef, async () => {
-			return {
-				pong: Date.now(),
-			};
-		});
+	constructor() {
+		const ping = createPing();
+		super(meta, paramDef, async params => ping(params));
 	}
 }

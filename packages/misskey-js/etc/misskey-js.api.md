@@ -6,6 +6,7 @@
 
 import type { AuthenticationResponseJSON } from '@simplewebauthn/browser';
 import { EventEmitter } from 'eventemitter3';
+import type { InstanceEndpoints } from '@misskey-a/instance/contract';
 import { Options } from 'reconnecting-websocket';
 import type { PublicKeyCredentialCreationOptionsJSON as PublicKeyCredentialCreationOptionsJSON_2 } from '@simplewebauthn/browser';
 import type { PublicKeyCredentialRequestOptionsJSON as PublicKeyCredentialRequestOptionsJSON_2 } from '@simplewebauthn/browser';
@@ -1441,6 +1442,7 @@ type EndpointResponse = operations['endpoint']['responses']['200']['content']['a
 //
 // @public (undocumented)
 export type Endpoints = Overwrite<Endpoints_2, {
+    'ping': InstanceEndpoints['ping'];
     'users/show': {
         req: UsersShowRequest;
         res: {

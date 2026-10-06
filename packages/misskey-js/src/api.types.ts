@@ -1,3 +1,4 @@
+import type { InstanceEndpoints } from '@misskey-a/instance/contract';
 import { Endpoints as Gen } from './autogen/endpoint.js';
 import { UserDetailed } from './autogen/models.js';
 import {
@@ -69,6 +70,7 @@ export type SwitchCaseResponseType<E extends keyof Endpoints, P extends Endpoint
 export type Endpoints = Overwrite<
 	Gen,
 	{
+		'ping': InstanceEndpoints['ping'];
 		'users/show': {
 			req: UsersShowRequest;
 			res: {

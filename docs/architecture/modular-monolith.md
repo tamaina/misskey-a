@@ -72,6 +72,27 @@ notes explicitly do not establish a performance winner. Compare build time,
 locale update/switch behavior, CPU, memory and output size with identical tagged
 input and cache conditions; do not claim an unmeasured improvement.
 
+The selected implementation is `tamaina/vite-vue-internationalization` (VVI).
+The currently published 1.1.3 package comes from commit
+`07803e81e02f5af723821fae9d0e9266d196f53f`; its API must be checked against that
+artifact, not the newer develop documentation. In particular, that artifact
+does not export the newer SSR asset resolver, and its `ready` promise logs an
+initial load failure instead of rejecting. Mounting must not treat that promise
+alone as proof that translations loaded successfully.
+
+For the first UI slice, use the virtual strategy while the legacy locale inliner
+still owns entry URLs. Do not stack two locale-specific chunk rewriters without
+verifying the backend manifest and dynamic-import paths. Preserve the existing
+selected language and reload-based language switch. Move component-owned text
+to locale tags, retaining every existing translation and the current fallback
+chain (Japanese, English, language-family primary, selected locale). A VVI-only
+Japanese fallback would silently change many existing translations.
+
+Validate a small component in Japanese, English and a partially translated
+locale, including direct navigation, reload, missing-key fallback and failed
+locale loading. Check Volar types and production assets as well as development
+rendering. Only then extend the migration to additional feature-owned views.
+
 ## Initial progress
 
 - Upstream snapshot imported; SDK baseline: 14 tests pass.
@@ -80,5 +101,14 @@ input and cache conditions; do not claim an unmeasured improvement.
 - CLI dispatch now uses the boot feature: help, ping and unknown commands do not
   construct the legacy container. The reset-captcha adapter still uses Nest and
   closes its context in a finally block; database execution is not yet verified.
-- Existing server/queue Nest runtime is still active. Wiring and replacing it, endpoint
-  contracts, SDK integration and VVI migration remain work to do.
+- The first migrated endpoint is instance/ping. Its Valibot input/output and
+  oRPC contract live under the instance feature. The server implements that
+  contract; misskey-js derives ping request/response types from the contract.
+  A temporary adapter retains the existing API policy/error pipeline and
+  derives legacy JSON Schema documentation from Valibot. Generated SDK models
+  are unchanged for this endpoint.
+- SDK contract dependencies currently resolve through the workspace. Packaging
+  independently publishable SDK/contract artifacts remains a migration task;
+  do not publish these private feature packages as-is.
+- Existing server/queue Nest runtime and other endpoint definitions remain
+  active. Remaining contracts, DI replacement and VVI migration are unfinished.

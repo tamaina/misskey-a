@@ -1,0 +1,23 @@
+{
+  "name": "@misskey-a/instance",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "license": "AGPL-3.0-only",
+  "exports": {
+    "./contract": { "types": "./built/contract/index.d.ts", "import": "./built/contract/index.js" },
+    "./backend": { "types": "./built/backend/index.d.ts", "import": "./built/backend/index.js" }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "pnpm build && node --test test/*.test.mjs",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "pnpm typecheck && eslint contract backend test"
+  },
+  "dependencies": {
+    "@orpc/contract": "1.15.4",
+    "@orpc/server": "1.15.4",
+    "@valibot/to-json-schema": "1.8.0",
+    "valibot": "1.5.0"
+  }
+}

@@ -190,6 +190,9 @@ importers:
       '@misskey-a/boot':
         specifier: workspace:*
         version: link:../features/boot
+      '@misskey-a/instance':
+        specifier: workspace:*
+        version: link:../features/instance
       '@misskey-dev/emoji-assets':
         specifier: 17.0.3
         version: 17.0.3
@@ -629,6 +632,21 @@ importers:
         version: 6.0.6
 
   packages/features/boot: {}
+
+  packages/features/instance:
+    dependencies:
+      '@orpc/contract':
+        specifier: 1.15.4
+        version: 1.15.4(@opentelemetry/api@1.9.1)
+      '@orpc/server':
+        specifier: 1.15.4
+        version: 1.15.4(@opentelemetry/api@1.9.1)(fastify@5.12.5)(ws@8.21.3(bufferutil@4.1.0)(utf-8-validate@6.0.6))
+      '@valibot/to-json-schema':
+        specifier: 1.8.0
+        version: 1.8.0(valibot@1.5.0(typescript@6.0.2))
+      valibot:
+        specifier: 1.5.0
+        version: 1.5.0(typescript@6.0.2)
 
   packages/frontend:
     dependencies:
@@ -1296,6 +1314,9 @@ importers:
 
   packages/misskey-js:
     dependencies:
+      '@misskey-a/instance':
+        specifier: workspace:*
+        version: link:../features/instance
       '@simplewebauthn/browser':
         specifier: 13.3.0
         version: 13.3.0
@@ -2540,6 +2561,57 @@ packages:
   '@opentelemetry/semantic-conventions@1.43.0':
     resolution: {integrity: sha512-eSYWTm620tTk45EKSedaUL8MFYI8hW164hIXsgIHyxu3VobUB3fFCu5t0hQby6OoWRPsG1KkKUG2M5UadiLiVg==}
     engines: {node: '>=14'}
+
+  '@orpc/client@1.15.4':
+    resolution: {integrity: sha512-8Iv2K8Rj8hf6xHCTxmQ+gxgiY6EATDossQk4gdt3oSbGVV0x2RSeLtRK9Zry+KVsmOqPJfnLahfRp7H2rQ/Vgg==}
+
+  '@orpc/contract@1.15.4':
+    resolution: {integrity: sha512-mxH+kuIsKz7BGsoqDHShnMjKG7GvCMGpvxTtJnkpbowIp2iBz8XiWosiWBybZcUl1Dy9W77TyOk6pNqG5I4D6w==}
+
+  '@orpc/interop@1.15.4':
+    resolution: {integrity: sha512-ZCTNPenr1clZ2RBCJxsCsvS3eS8MJIDSx/LH1AIAKj9RjvfOXI/BnjHmgD4jUEIa6FcG+c2LV/1IXVJpC6NoTw==}
+
+  '@orpc/server@1.15.4':
+    resolution: {integrity: sha512-Ccs2Pdwql2XRtk7bzkiZohoYuUVNcffydbswhz75rdepCQt0HmKosfVhsqjAqCKDDB7c84ct7Q7c5Z/xQak7pQ==}
+    peerDependencies:
+      crossws: '>=0.3.4'
+      ws: '>=8.18.1'
+    peerDependenciesMeta:
+      crossws:
+        optional: true
+      ws:
+        optional: true
+
+  '@orpc/shared@1.15.4':
+    resolution: {integrity: sha512-syNylxXmv1WnroSDUvtYjuvu0YMAYzkLTjFPa0CggnaF3DH2YmAnRS5GGGzSPRAbhMtRAXArIoM7GVrRNKHxng==}
+    peerDependencies:
+      '@opentelemetry/api': '>=1.9.0'
+    peerDependenciesMeta:
+      '@opentelemetry/api':
+        optional: true
+
+  '@orpc/standard-server-aws-lambda@1.15.4':
+    resolution: {integrity: sha512-Vq5nNhq/XSM3DPsI1MLEbMraP+++hb0btsS8IfdAj5eXTYvDzpTA5rZ+gMhhgnVuZvZcQbmBojTgtu41X8t4sA==}
+
+  '@orpc/standard-server-fastify@1.15.4':
+    resolution: {integrity: sha512-OkBWAUQhtssTrfaV3FF8X/gdJL7otS1MvfTBuxKoRKpf6u7CQB9QpdY76OSg407N/hvN8wzSW2lSbhlKljOxkQ==}
+    peerDependencies:
+      fastify: '>=5.6.1'
+    peerDependenciesMeta:
+      fastify:
+        optional: true
+
+  '@orpc/standard-server-fetch@1.15.4':
+    resolution: {integrity: sha512-u6zQDx/tUgNUWDQstJMbWkCKsecp9j+4WHWoPmNNuk2PyRdD6FEmvJJs23CAKa5njKu2V8aMzuuL9AW3jechuw==}
+
+  '@orpc/standard-server-node@1.15.4':
+    resolution: {integrity: sha512-is6T03n1y6nx+g9ve0ip+F1BXbnR104r3NEGVUcGmkuLCqtxqbXCCjyzJTXWwGArTdEcxDOT4cW/zx/EORGN0g==}
+
+  '@orpc/standard-server-peer@1.15.4':
+    resolution: {integrity: sha512-qWH7gf+8Iv2oXVIQZIQIvAyk2LYUHcj0CXF+AKF5WzHU22vJInD4FKbl8+UesVU+nT8O+BrVmOXzrQ40TqngpQ==}
+
+  '@orpc/standard-server@1.15.4':
+    resolution: {integrity: sha512-woaFpUJavYPiqRQ0Eh716jOHRZ7o84mPpmEPS79bBUJNDilGEj2OBSjbHV2ez4FYdVnEnlbg+rYy7sX3PwwENA==}
 
   '@oxc-parser/binding-android-arm-eabi@0.127.0':
     resolution: {integrity: sha512-0LC7ye4hvqbIKxAzThzvswgHLFu2AURKzYLeSVvLdu2TBOYWQDmHnTqPLeA597BcUCxiLqLsS4CJ5uoI5WYWCQ==}
@@ -4090,6 +4162,11 @@ packages:
 
   '@ungap/structured-clone@1.3.1':
     resolution: {integrity: sha512-mUFwbeTqrVgDQxFveS+df2yfap6iuP20NAKAsBt5jDEoOTDew+zwLAOilHCeQJOVSvmgCX4ogqIrA0mnyr08yQ==}
+
+  '@valibot/to-json-schema@1.8.0':
+    resolution: {integrity: sha512-a0M+uwCuQZEPAo65NYkFSJ14O5c213KoSZmPdoCfuFvUhfULi4T2Z6Tpjv6lTVMW9RoLm74RpRAjNEa43KcN+g==}
+    peerDependencies:
+      valibot: ^1.5.0
 
   '@vitejs/plugin-vue@6.0.8':
     resolution: {integrity: sha512-0ZjgOg7oO6farnNGup7yvoM/YXZV84OZxHAwtflItNa/6zzQyVb5LNxyea3FEKEX2XlagIKzrlH7wwxkKgtiew==}
@@ -7577,6 +7654,10 @@ packages:
     resolution: {integrity: sha512-WuyALRjWPDGtt/wzJiadO5AXY+8hZ80hVpe6MyivgraREW751X3SbhRvG3eLKOYN+8VEvqLcf3wdnt44Z4S4SA==}
     engines: {node: '>=10'}
 
+  radash@12.1.1:
+    resolution: {integrity: sha512-h36JMxKRqrAxVD8201FrCpyeNuUY9Y5zZwujr20fFO77tpUtGa6EZzfKw/3WaiBX95fq7+MpsuMLNdSnORAwSA==}
+    engines: {node: '>=14.18.0'}
+
   random-seed@0.3.0:
     resolution: {integrity: sha512-y13xtn3kcTlLub3HKWXxJNeC2qK4mB59evwZ5EkeRlolx+Bp2ztF7LbcZmyCnOqlHQrLnfuNbi1sVmm9lPDlDA==}
     engines: {node: '>= 0.6.0'}
@@ -8851,6 +8932,14 @@ packages:
       vue: ^2.6.0 || >=3.0.0
     peerDependenciesMeta:
       '@vue/composition-api':
+        optional: true
+
+  valibot@1.5.0:
+    resolution: {integrity: sha512-nil6AkP2TChWL43Z5uJ6GTxX01CUA+g8LWUM+N/rB9NBbkUMaUsi9PUNzlUPgoKASgmx9f7eGOYpJ04/fSa6FQ==}
+    peerDependencies:
+      typescript: '>=5'
+    peerDependenciesMeta:
+      typescript:
         optional: true
 
   valid-data-url@3.0.1:
@@ -10447,6 +10536,99 @@ snapshots:
       '@opentelemetry/semantic-conventions': 1.43.0
 
   '@opentelemetry/semantic-conventions@1.43.0': {}
+
+  '@orpc/client@1.15.4(@opentelemetry/api@1.9.1)':
+    dependencies:
+      '@orpc/shared': 1.15.4(@opentelemetry/api@1.9.1)
+      '@orpc/standard-server': 1.15.4(@opentelemetry/api@1.9.1)
+      '@orpc/standard-server-fetch': 1.15.4(@opentelemetry/api@1.9.1)
+      '@orpc/standard-server-peer': 1.15.4(@opentelemetry/api@1.9.1)
+    transitivePeerDependencies:
+      - '@opentelemetry/api'
+
+  '@orpc/contract@1.15.4(@opentelemetry/api@1.9.1)':
+    dependencies:
+      '@orpc/client': 1.15.4(@opentelemetry/api@1.9.1)
+      '@orpc/shared': 1.15.4(@opentelemetry/api@1.9.1)
+      '@standard-schema/spec': 1.1.0
+      openapi-types: 12.1.3
+    transitivePeerDependencies:
+      - '@opentelemetry/api'
+
+  '@orpc/interop@1.15.4': {}
+
+  '@orpc/server@1.15.4(@opentelemetry/api@1.9.1)(fastify@5.12.5)(ws@8.21.3(bufferutil@4.1.0)(utf-8-validate@6.0.6))':
+    dependencies:
+      '@orpc/client': 1.15.4(@opentelemetry/api@1.9.1)
+      '@orpc/contract': 1.15.4(@opentelemetry/api@1.9.1)
+      '@orpc/interop': 1.15.4
+      '@orpc/shared': 1.15.4(@opentelemetry/api@1.9.1)
+      '@orpc/standard-server': 1.15.4(@opentelemetry/api@1.9.1)
+      '@orpc/standard-server-aws-lambda': 1.15.4(@opentelemetry/api@1.9.1)
+      '@orpc/standard-server-fastify': 1.15.4(@opentelemetry/api@1.9.1)(fastify@5.12.5)
+      '@orpc/standard-server-fetch': 1.15.4(@opentelemetry/api@1.9.1)
+      '@orpc/standard-server-node': 1.15.4(@opentelemetry/api@1.9.1)
+      '@orpc/standard-server-peer': 1.15.4(@opentelemetry/api@1.9.1)
+      cookie: 1.1.1
+    optionalDependencies:
+      ws: 8.21.3(bufferutil@4.1.0)(utf-8-validate@6.0.6)
+    transitivePeerDependencies:
+      - '@opentelemetry/api'
+      - fastify
+
+  '@orpc/shared@1.15.4(@opentelemetry/api@1.9.1)':
+    dependencies:
+      radash: 12.1.1
+      type-fest: 5.6.0
+    optionalDependencies:
+      '@opentelemetry/api': 1.9.1
+
+  '@orpc/standard-server-aws-lambda@1.15.4(@opentelemetry/api@1.9.1)':
+    dependencies:
+      '@orpc/shared': 1.15.4(@opentelemetry/api@1.9.1)
+      '@orpc/standard-server': 1.15.4(@opentelemetry/api@1.9.1)
+      '@orpc/standard-server-fetch': 1.15.4(@opentelemetry/api@1.9.1)
+      '@orpc/standard-server-node': 1.15.4(@opentelemetry/api@1.9.1)
+    transitivePeerDependencies:
+      - '@opentelemetry/api'
+
+  '@orpc/standard-server-fastify@1.15.4(@opentelemetry/api@1.9.1)(fastify@5.12.5)':
+    dependencies:
+      '@orpc/shared': 1.15.4(@opentelemetry/api@1.9.1)
+      '@orpc/standard-server': 1.15.4(@opentelemetry/api@1.9.1)
+      '@orpc/standard-server-node': 1.15.4(@opentelemetry/api@1.9.1)
+    optionalDependencies:
+      fastify: 5.12.5
+    transitivePeerDependencies:
+      - '@opentelemetry/api'
+
+  '@orpc/standard-server-fetch@1.15.4(@opentelemetry/api@1.9.1)':
+    dependencies:
+      '@orpc/shared': 1.15.4(@opentelemetry/api@1.9.1)
+      '@orpc/standard-server': 1.15.4(@opentelemetry/api@1.9.1)
+    transitivePeerDependencies:
+      - '@opentelemetry/api'
+
+  '@orpc/standard-server-node@1.15.4(@opentelemetry/api@1.9.1)':
+    dependencies:
+      '@orpc/shared': 1.15.4(@opentelemetry/api@1.9.1)
+      '@orpc/standard-server': 1.15.4(@opentelemetry/api@1.9.1)
+      '@orpc/standard-server-fetch': 1.15.4(@opentelemetry/api@1.9.1)
+    transitivePeerDependencies:
+      - '@opentelemetry/api'
+
+  '@orpc/standard-server-peer@1.15.4(@opentelemetry/api@1.9.1)':
+    dependencies:
+      '@orpc/shared': 1.15.4(@opentelemetry/api@1.9.1)
+      '@orpc/standard-server': 1.15.4(@opentelemetry/api@1.9.1)
+    transitivePeerDependencies:
+      - '@opentelemetry/api'
+
+  '@orpc/standard-server@1.15.4(@opentelemetry/api@1.9.1)':
+    dependencies:
+      '@orpc/shared': 1.15.4(@opentelemetry/api@1.9.1)
+    transitivePeerDependencies:
+      - '@opentelemetry/api'
 
   '@oxc-parser/binding-android-arm-eabi@0.127.0':
     optional: true
@@ -12065,6 +12247,10 @@ snapshots:
       '@typescript/old': typescript@6.0.3
 
   '@ungap/structured-clone@1.3.1': {}
+
+  '@valibot/to-json-schema@1.8.0(valibot@1.5.0(typescript@6.0.2))':
+    dependencies:
+      valibot: 1.5.0(typescript@6.0.2)
 
   '@vitejs/plugin-vue@6.0.8(vite@8.2.2(@types/node@26.4.0)(esbuild@0.28.2)(sass-embedded@1.103.1)(sass@1.103.1)(terser@5.48.0)(tsx@4.23.13))(vue@3.5.42(typescript@6.0.3))':
     dependencies:
@@ -16403,6 +16589,8 @@ snapshots:
 
   quick-lru@5.1.1: {}
 
+  radash@12.1.1: {}
+
   random-seed@0.3.0:
     dependencies:
       json-stringify-safe: 5.0.1
@@ -17774,6 +17962,10 @@ snapshots:
       highlight.js: 11.12.0
       vue: 3.5.42(typescript@6.0.3)
       vue-demi: 0.14.10(vue@3.5.42(typescript@6.0.3))
+
+  valibot@1.5.0(typescript@6.0.2):
+    optionalDependencies:
+      typescript: 6.0.2
 
   valid-data-url@3.0.1: {}
 

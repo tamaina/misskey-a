@@ -44,3 +44,11 @@ describe('API', () => {
 		expectType<Misskey.entities.UserDetailed[]>(res2);
 	});
 });
+
+describe('feature contracts', () => {
+	test('ping is inferred from its oRPC contract', async () => {
+		const cli = new Misskey.api.APIClient({ origin: 'https://misskey.test' });
+		expectType<{ pong: number }>(await cli.request('ping'));
+		expectType<{ pong: number }>(await cli.request('ping', {}));
+	});
+});
