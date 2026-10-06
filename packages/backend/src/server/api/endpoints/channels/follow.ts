@@ -3,13 +3,11 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Inject, Injectable } from '@nestjs/common';
+import { channelErrors } from '@features/channels/contract';
+import { legacyChannelSchemas } from '@features/channels/backend';
+import type { Schema } from '@/misc/json-schema.js';
 import { Endpoint } from '@/server/api/endpoint-base.js';
-import type { ChannelsRepository } from '@/models/_.js';
-import { DI } from '@/di-symbols.js';
-import { ChannelFollowingService } from '@/core/ChannelFollowingService.js';
-import { IdentifiableError } from '@/misc/identifiable-error.js';
-import { ApiError } from '../../error.js';
+import { defineFeatureEndpoint } from '@/server/api/feature-endpoint.js';
 
 export const meta = {
 	tags: ['channels'],
@@ -20,52 +18,11 @@ export const meta = {
 
 	kind: 'write:channels',
 
-	errors: {
-		noSuchChannel: {
-			message: 'No such channel.',
-			code: 'NO_SUCH_CHANNEL',
-			id: 'c0031718-d573-4e85-928e-10039f1fbb68',
-		},
-		alreadyFollowing: {
-			message: 'You are already following that channel.',
-			code: 'ALREADY_FOLLOWING',
-			id: '7db31665-651e-40c1-8e6e-28e9ad829a2d',
-		},
-	},
+	errors: channelErrors['channels/follow'],
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {
-		channelId: { type: 'string', format: 'misskey:id' },
-	},
-	required: ['channelId'],
-} as const;
+export const paramDef = legacyChannelSchemas['channels/follow'].input as Schema;
 
-@Injectable()
-export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-disable-line import/no-default-export
-	constructor(
-		@Inject(DI.channelsRepository)
-		private channelsRepository: ChannelsRepository,
-		private channelFollowingService: ChannelFollowingService,
-	) {
-		super(meta, paramDef, async (ps, me) => {
-			const channel = await this.channelsRepository.findOneBy({
-				id: ps.channelId,
-			});
-
-			if (channel == null) {
-				throw new ApiError(meta.errors.noSuchChannel);
-			}
-
-			try {
-				await this.channelFollowingService.follow(me, channel);
-			} catch (e) {
-				if (e instanceof IdentifiableError) {
-					if (e.id === '6e335e39-0203-4418-a936-b3f2dc987845') throw new ApiError(meta.errors.alreadyFollowing);
-				}
-				throw e;
-			}
-		});
-	}
-}
+export const { feature, createEndpoint } = defineFeatureEndpoint('channelCommands', commands => new Endpoint(meta, paramDef, async (params, user) => commands['channels/follow'](params, {
+	context: { actor: user },
+})));

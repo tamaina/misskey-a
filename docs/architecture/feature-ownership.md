@@ -3,7 +3,7 @@
 This is the placement plan for the modular-monolith migration, not a claim that
 all listed code has already moved. Public routes, authentication, database
 schema and wire responses stay compatible. The inventory currently contains
-438 registered API modules (381 legacy classes, 57 feature-backed endpoints), 94 core
+438 registered API modules (373 legacy classes, 65 feature-backed endpoints), 94 core
 services, 39 entity serializers, 35 job processors and 19 server-rendered view
 files. The frontend has 245 Vue files under `pages`; these are not 245 distinct
 routes (the router has 151 direct path bindings to 136 distinct page files).

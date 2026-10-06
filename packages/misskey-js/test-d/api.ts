@@ -167,3 +167,19 @@ test('list, announcement, decoration and webhook commands derive from contracts'
 	// @ts-expect-error webhook events remain constrained
 	cli.request('i/webhooks/update', { webhookId: 'hook1', on: ['unknown'] });
 });
+
+test('channel interactions and clip favorites derive from contracts', async () => {
+	const cli = new Misskey.api.APIClient({ origin: 'https://misskey.test' });
+	expectType<void>(await cli.request('channels/follow', { channelId: 'channel1' }));
+	expectType<void>(await cli.request('channels/unfavorite', { channelId: 'channel1' }));
+	expectType<void>(await cli.request('channels/mute/create', { channelId: 'channel1', expiresAt: null }));
+	expectType<void>(await cli.request('channels/mute/create', { channelId: 'channel1', expiresAt: 1234 }));
+	expectType<void>(await cli.request('clips/favorite', { clipId: 'clip1' }));
+	expectType<void>(await cli.request('clips/unfavorite', { clipId: 'clip1' }));
+	// @ts-expect-error channel id is required
+	cli.request('channels/follow', {});
+	// @ts-expect-error expiry remains a number or null
+	cli.request('channels/mute/create', { channelId: 'channel1', expiresAt: 'tomorrow' });
+	// @ts-expect-error clip id remains a string
+	cli.request('clips/favorite', { clipId: 1 });
+});

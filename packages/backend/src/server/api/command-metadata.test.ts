@@ -10,6 +10,14 @@ import baseline from './command-metadata.fixture.json' with { type: 'json' };
 
 // Snapshotted from the original handlers before contract migration.
 const loaders = {
+	'channels/follow': () => import('./endpoints/channels/follow.js'),
+	'channels/unfollow': () => import('./endpoints/channels/unfollow.js'),
+	'channels/favorite': () => import('./endpoints/channels/favorite.js'),
+	'channels/unfavorite': () => import('./endpoints/channels/unfavorite.js'),
+	'channels/mute/create': () => import('./endpoints/channels/mute/create.js'),
+	'channels/mute/delete': () => import('./endpoints/channels/mute/delete.js'),
+	'clips/favorite': () => import('./endpoints/clips/favorite.js'),
+	'clips/unfavorite': () => import('./endpoints/clips/unfavorite.js'),
 	'admin/avatar-decorations/update': () => import('./endpoints/admin/avatar-decorations/update.js'),
 	'admin/avatar-decorations/delete': () => import('./endpoints/admin/avatar-decorations/delete.js'),
 	'admin/announcements/update': () => import('./endpoints/admin/announcements/update.js'),
@@ -62,7 +70,7 @@ for (const [route, load] of Object.entries(loaders)) {
 		const token = { id: 'trustedToken', name: 'App', iconUrl: null } as MiAccessToken;
 		await endpoint.exec({
 			id: 'id1', listId: 'list1', userId: 'user1', announcementId: 'announcement1', webhookId: 'webhook1',
-			clipId: 'clip1', noteId: 'note1', roomId: 'room1', messageId: 'message1',
+			channelId: 'channel1', clipId: 'clip1', noteId: 'note1', roomId: 'room1', messageId: 'message1',
 			mute: false, reaction: '👍', ids: ['emoji1'], aliases: ['alias'],
 			category: null, license: null, body: 'hello', header: null, ...(route.startsWith('admin/announcements/') ? {} : { icon: null }),
 			actor: { id: 'forged' }, token: { id: 'forged' },

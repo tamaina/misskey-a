@@ -31,8 +31,16 @@ export { createWebhookCommands } from '../../integrations/backend/index.js';
 import type { ListCommandsFeature } from '../../relationships/backend/index.js';
 export { createListCommands } from '../../relationships/backend/index.js';
 
+import type { ChannelCommandsFeature } from '../../channels/backend/index.js';
+import type { ClipFavoriteCommandsFeature } from '../../collections/backend/index.js';
+export { createChannelCommands } from '../../channels/backend/index.js';
+export { createClipFavoriteCommands } from '../../collections/backend/index.js';
+
 /** Domain models supplied by the backend composition root, never imported here. */
 export interface FeatureApiModels {
+	channel: { id: string };
+	clip: { id: string; userId: string; isPublic: boolean };
+	clipFavorite: { id: string };
 	room: unknown;
 	message: unknown;
 	actor: { id: string };
@@ -44,6 +52,8 @@ export interface FeatureApiModels {
 }
 
 export interface FeatureApis<Models extends FeatureApiModels> {
+	channelCommands: ChannelCommandsFeature<Models['channel'], Models['actor']>;
+	clipFavoriteCommands: ClipFavoriteCommandsFeature<Models['clip'], Models['clipFavorite']>;
 	listCommands: ListCommandsFeature<Models['list'], Models['user'], Models['actor'], Models['favorite']>;
 	avatarDecorationCommands: AvatarDecorationCommandsFeature<Models['actor']>;
 	announcementCommands: AnnouncementCommandsFeature<Models['announcement'], Models['actor']>;

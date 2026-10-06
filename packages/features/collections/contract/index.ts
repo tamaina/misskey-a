@@ -59,6 +59,48 @@ export const collectionsErrors = {
 	},
 } as const;
 
+export const clipFavoriteInputs = {
+	'clips/favorite': v.looseObject({ clipId: misskeyId }),
+	'clips/unfavorite': v.looseObject({ clipId: misskeyId }),
+};
+
+/** Keep the exact legacy metadata, including distinct UUIDs for the two routes. */
+export const clipFavoriteErrors = {
+	'clips/favorite': {
+		noSuchClip: {
+			message: 'No such clip.',
+			code: 'NO_SUCH_CLIP',
+			id: '4c2aaeae-80d8-4250-9606-26cb1fdb77a5',
+		},
+		alreadyFavorited: {
+			message: 'The clip has already been favorited.',
+			code: 'ALREADY_FAVORITED',
+			id: '92658936-c625-4273-8326-2d790129256e',
+		},
+	},
+	'clips/unfavorite': {
+		noSuchClip: {
+			message: 'No such clip.',
+			code: 'NO_SUCH_CLIP',
+			id: '2603966e-b865-426c-94a7-af4a01241dc1',
+		},
+		notFavorited: {
+			message: 'You have not favorited the clip.',
+			code: 'NOT_FAVORITED',
+			id: '90c3a9e8-b321-4dae-bf57-2bf79bbcc187',
+		},
+	},
+} as const;
+
+export const clipFavoriteContract = {
+	'clips/favorite': oc.route({ method: 'POST', path: '/clips/favorite', tags: ['clip'] })
+		.input(clipFavoriteInputs['clips/favorite'])
+		.output(v.void()),
+	'clips/unfavorite': oc.route({ method: 'POST', path: '/clips/unfavorite', tags: ['clip'] })
+		.input(clipFavoriteInputs['clips/unfavorite'])
+		.output(v.void()),
+};
+
 export const collectionsContract = {
 	'clips/delete': oc.route({ method: 'POST', path: '/clips/delete', tags: ['clips'] })
 		.input(collectionsInputs['clips/delete'])
@@ -69,6 +111,7 @@ export const collectionsContract = {
 	'clips/remove-note': oc.route({ method: 'POST', path: '/clips/remove-note', tags: ['account', 'notes', 'clips'] })
 		.input(collectionsInputs['clips/remove-note'])
 		.output(v.void()),
+	...clipFavoriteContract,
 };
 
 type Inputs = InferContractRouterInputs<typeof collectionsContract>;

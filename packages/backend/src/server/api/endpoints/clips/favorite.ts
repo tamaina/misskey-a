@@ -3,12 +3,11 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Inject, Injectable } from '@nestjs/common';
-import type { ClipsRepository, ClipFavoritesRepository } from '@/models/_.js';
-import { IdService } from '@/core/IdService.js';
+import { clipFavoriteErrors } from '@features/collections/contract';
+import { legacyClipFavoriteSchemas } from '@features/collections/backend';
+import type { Schema } from '@/misc/json-schema.js';
 import { Endpoint } from '@/server/api/endpoint-base.js';
-import { DI } from '@/di-symbols.js';
-import { ApiError } from '../../error.js';
+import { defineFeatureEndpoint } from '@/server/api/feature-endpoint.js';
 
 export const meta = {
 	tags: ['clip'],
@@ -19,65 +18,11 @@ export const meta = {
 
 	kind: 'write:clip-favorite',
 
-	errors: {
-		noSuchClip: {
-			message: 'No such clip.',
-			code: 'NO_SUCH_CLIP',
-			id: '4c2aaeae-80d8-4250-9606-26cb1fdb77a5',
-		},
-
-		alreadyFavorited: {
-			message: 'The clip has already been favorited.',
-			code: 'ALREADY_FAVORITED',
-			id: '92658936-c625-4273-8326-2d790129256e',
-		},
-	},
+	errors: clipFavoriteErrors['clips/favorite'],
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {
-		clipId: { type: 'string', format: 'misskey:id' },
-	},
-	required: ['clipId'],
-} as const;
+export const paramDef = legacyClipFavoriteSchemas['clips/favorite'].input as Schema;
 
-@Injectable()
-export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-disable-line import/no-default-export
-	constructor(
-		@Inject(DI.clipsRepository)
-		private clipsRepository: ClipsRepository,
-
-		@Inject(DI.clipFavoritesRepository)
-		private clipFavoritesRepository: ClipFavoritesRepository,
-
-		private idService: IdService,
-	) {
-		super(meta, paramDef, async (ps, me) => {
-			const clip = await this.clipsRepository.findOneBy({ id: ps.clipId });
-			if (clip == null) {
-				throw new ApiError(meta.errors.noSuchClip);
-			}
-			if ((clip.userId !== me.id) && !clip.isPublic) {
-				throw new ApiError(meta.errors.noSuchClip);
-			}
-
-			const exist = await this.clipFavoritesRepository.exists({
-				where: {
-					clipId: clip.id,
-					userId: me.id,
-				},
-			});
-
-			if (exist) {
-				throw new ApiError(meta.errors.alreadyFavorited);
-			}
-
-			await this.clipFavoritesRepository.insert({
-				id: this.idService.gen(),
-				clipId: clip.id,
-				userId: me.id,
-			});
-		});
-	}
-}
+export const { feature, createEndpoint } = defineFeatureEndpoint('clipFavoriteCommands', commands => new Endpoint(meta, paramDef, async (params, user) => commands['clips/favorite'](params, {
+	context: { actor: { id: user.id } },
+})));

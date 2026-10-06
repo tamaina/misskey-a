@@ -18,6 +18,8 @@ import type { WebhookEndpoints } from '../../integrations/contract/index.js';
 
 import type { ListEndpoints } from '../../relationships/contract/index.js';
 
+import type { ChannelEndpoints } from '../../channels/contract/index.js';
+
 export type FeatureEndpoints = InstanceEndpoints
 	& StatisticsEndpoints
 	& AvatarDecorationEndpoints
@@ -29,4 +31,5 @@ export type FeatureEndpoints = InstanceEndpoints
 	& NotificationsEndpoints
 	& AnnouncementEndpoints
 	& WebhookEndpoints
-	& ListEndpoints;
+	& ListEndpoints
+	& ChannelEndpoints;

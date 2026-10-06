@@ -9,6 +9,8 @@ import {
 	createAnnouncementCommands,
 	createWebhookCommands,
 	createListCommands,
+	createChannelCommands,
+	createClipFavoriteCommands,
 	createChatCommands,
 	createCollectionCommands,
 	createEmojiAdministration,
@@ -36,6 +38,12 @@ import type { MiLocalUser } from '@/models/User.js';
 import { AnnouncementService } from '@/core/AnnouncementService.js';
 import { UserListService } from '@/core/UserListService.js';
 import { GetterService } from '@/server/api/GetterService.js';
+import { ChannelFollowingService } from '@/core/ChannelFollowingService.js';
+import { ChannelMutingService } from '@/core/ChannelMutingService.js';
+import { IdentifiableError } from '@/misc/identifiable-error.js';
+import type { MiChannel } from '@/models/Channel.js';
+import type { MiClip } from '@/models/Clip.js';
+import type { MiClipFavorite } from '@/models/ClipFavorite.js';
 import { IdService } from '@/core/IdService.js';
 import { GlobalEventService } from '@/core/GlobalEventService.js';
 import { ApiError } from './error.js';
@@ -50,12 +58,15 @@ import NotesChart from '@/core/chart/charts/notes.js';
 import UsersChart from '@/core/chart/charts/users.js';
 import { DI } from '@/di-symbols.js';
 import type { MiMeta } from '@/models/Meta.js';
-import type { UsersRepository, NoteReactionsRepository, InstancesRepository, EmojisRepository, AnnouncementsRepository, WebhooksRepository, UserListsRepository, UserListFavoritesRepository, UserListMembershipsRepository, BlockingsRepository } from '@/models/_.js';
+import type { UsersRepository, NoteReactionsRepository, InstancesRepository, EmojisRepository, AnnouncementsRepository, WebhooksRepository, UserListsRepository, UserListFavoritesRepository, UserListMembershipsRepository, BlockingsRepository, ChannelsRepository, ChannelFavoritesRepository, ClipsRepository, ClipFavoritesRepository } from '@/models/_.js';
 import type { Provider } from '@nestjs/common';
 
 // Transitional composition boundary: Nest resolves a feature, not each handler.
 // The feature itself receives narrow dependencies and has no container access.
 export type ApiFeatures = FeatureApis<{
+	channel: MiChannel;
+	clip: MiClip;
+	clipFavorite: MiClipFavorite;
 	room: MiChatRoom;
 	message: MiChatMessage;
 	actor: MiLocalUser;
@@ -66,6 +77,8 @@ export type ApiFeatures = FeatureApis<{
 	favorite: MiUserListFavorite;
 }>;
 export const featureTokens = {
+	channelCommands: Symbol('channel command API feature'),
+	clipFavoriteCommands: Symbol('clip favorite command API feature'),
 	listCommands: Symbol('list command API feature'),
 	avatarDecorationCommands: Symbol('avatar decoration command API feature'),
 	announcementCommands: Symbol('announcement command API feature'),
@@ -82,6 +95,35 @@ export const featureTokens = {
 	emojis: Symbol('emojis API feature'),
 } satisfies Record<keyof ApiFeatures, symbol>;
 export const featureProviders: Provider[] = [{
+	provide: featureTokens.channelCommands,
+	inject: [DI.channelsRepository, DI.channelFavoritesRepository, ChannelFollowingService, ChannelMutingService, IdService],
+	useFactory: (channels: ChannelsRepository, favorites: ChannelFavoritesRepository, following: ChannelFollowingService, muting: ChannelMutingService, ids: IdService) => createChannelCommands<MiChannel, MiLocalUser>({
+		findById: id => channels.findOneBy({ id }),
+		follow: (actor, channel) => following.follow(actor, channel),
+		unfollow: (actor, channel) => following.unfollow(actor, channel),
+		isAlreadyFollowingError: error => error instanceof IdentifiableError && error.id === '6e335e39-0203-4418-a936-b3f2dc987845',
+		generateFavoriteId: () => ids.gen(),
+		insertFavorite: values => favorites.insert(values),
+		deleteFavorite: (userId, channelId) => favorites.delete({ userId, channelId }),
+		isMuted: values => muting.isMuted(values),
+		mute: values => muting.mute(values),
+		unmute: values => muting.unmute(values),
+		now: () => Date.now(),
+		createError: definition => new ApiError(definition),
+	}),
+}, {
+	provide: featureTokens.clipFavoriteCommands,
+	inject: [DI.clipsRepository, DI.clipFavoritesRepository, IdService],
+	useFactory: (clips: ClipsRepository, favorites: ClipFavoritesRepository, ids: IdService) => createClipFavoriteCommands<MiClip, MiClipFavorite>({
+		findClipById: id => clips.findOneBy({ id }),
+		hasFavorite: (clipId, userId) => favorites.exists({ where: { clipId, userId } }),
+		generateFavoriteId: () => ids.gen(),
+		insertFavorite: values => favorites.insert(values),
+		findFavorite: (clipId, userId) => favorites.findOneBy({ clipId, userId }),
+		deleteFavorite: id => favorites.delete(id),
+		createError: definition => new ApiError(definition),
+	}),
+}, {
 	provide: featureTokens.listCommands,
 	inject: [DI.userListsRepository, DI.userListFavoritesRepository, DI.userListMembershipsRepository, DI.blockingsRepository, GetterService, UserListService, IdService],
 	useFactory: (lists: UserListsRepository, favorites: UserListFavoritesRepository, memberships: UserListMembershipsRepository, blockings: BlockingsRepository, getter: GetterService, service: UserListService, ids: IdService) => createListCommands<MiUserList, MiUser, MiLocalUser, MiUserListFavorite>({

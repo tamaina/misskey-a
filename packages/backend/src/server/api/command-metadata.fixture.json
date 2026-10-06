@@ -484,5 +484,157 @@
 				"id": "588e7f72-c744-4a61-b180-d354e912bda2"
 			}
 		}
+	},
+	"channels/follow": {
+		"tags": [
+			"channels"
+		],
+		"requireCredential": true,
+		"prohibitMoved": true,
+		"kind": "write:channels",
+		"errors": {
+			"noSuchChannel": {
+				"message": "No such channel.",
+				"code": "NO_SUCH_CHANNEL",
+				"id": "c0031718-d573-4e85-928e-10039f1fbb68"
+			},
+			"alreadyFollowing": {
+				"message": "You are already following that channel.",
+				"code": "ALREADY_FOLLOWING",
+				"id": "7db31665-651e-40c1-8e6e-28e9ad829a2d"
+			}
+		}
+	},
+	"channels/unfollow": {
+		"tags": [
+			"channels"
+		],
+		"requireCredential": true,
+		"prohibitMoved": true,
+		"kind": "write:channels",
+		"errors": {
+			"noSuchChannel": {
+				"message": "No such channel.",
+				"code": "NO_SUCH_CHANNEL",
+				"id": "19959ee9-0153-4c51-bbd9-a98c49dc59d6"
+			}
+		}
+	},
+	"channels/favorite": {
+		"tags": [
+			"channels"
+		],
+		"requireCredential": true,
+		"prohibitMoved": true,
+		"kind": "write:channels",
+		"errors": {
+			"noSuchChannel": {
+				"message": "No such channel.",
+				"code": "NO_SUCH_CHANNEL",
+				"id": "4938f5f3-6167-4c04-9149-6607b7542861"
+			}
+		}
+	},
+	"channels/unfavorite": {
+		"tags": [
+			"channels"
+		],
+		"requireCredential": true,
+		"prohibitMoved": true,
+		"kind": "write:channels",
+		"errors": {
+			"noSuchChannel": {
+				"message": "No such channel.",
+				"code": "NO_SUCH_CHANNEL",
+				"id": "353c68dd-131a-476c-aa99-88a345e83668"
+			}
+		}
+	},
+	"channels/mute/create": {
+		"tags": [
+			"channels",
+			"mute"
+		],
+		"requireCredential": true,
+		"prohibitMoved": true,
+		"kind": "write:channels",
+		"errors": {
+			"noSuchChannel": {
+				"message": "No such Channel.",
+				"code": "NO_SUCH_CHANNEL",
+				"id": "7174361e-d58f-31d6-2e7c-6fb830786a3f"
+			},
+			"alreadyMuting": {
+				"message": "You are already muting that user.",
+				"code": "ALREADY_MUTING_CHANNEL",
+				"id": "5a251978-769a-da44-3e89-3931e43bb592"
+			},
+			"expiresAtIsPast": {
+				"message": "Cannot set past date to \"expiresAt\".",
+				"code": "EXPIRES_AT_IS_PAST",
+				"id": "42b32236-df2c-a45f-fdbf-def67268f749"
+			}
+		}
+	},
+	"channels/mute/delete": {
+		"tags": [
+			"channels",
+			"mute"
+		],
+		"requireCredential": true,
+		"prohibitMoved": true,
+		"kind": "write:channels",
+		"errors": {
+			"noSuchChannel": {
+				"message": "No such Channel.",
+				"code": "NO_SUCH_CHANNEL",
+				"id": "e7998769-6e94-d9c2-6b8f-94a527314aba"
+			},
+			"notMuting": {
+				"message": "You are not muting that channel.",
+				"code": "NOT_MUTING_CHANNEL",
+				"id": "14d55962-6ea8-d990-1333-d6bef78dc2ab"
+			}
+		}
+	},
+	"clips/favorite": {
+		"tags": [
+			"clip"
+		],
+		"requireCredential": true,
+		"prohibitMoved": true,
+		"kind": "write:clip-favorite",
+		"errors": {
+			"noSuchClip": {
+				"message": "No such clip.",
+				"code": "NO_SUCH_CLIP",
+				"id": "4c2aaeae-80d8-4250-9606-26cb1fdb77a5"
+			},
+			"alreadyFavorited": {
+				"message": "The clip has already been favorited.",
+				"code": "ALREADY_FAVORITED",
+				"id": "92658936-c625-4273-8326-2d790129256e"
+			}
+		}
+	},
+	"clips/unfavorite": {
+		"tags": [
+			"clip"
+		],
+		"requireCredential": true,
+		"prohibitMoved": true,
+		"kind": "write:clip-favorite",
+		"errors": {
+			"noSuchClip": {
+				"message": "No such clip.",
+				"code": "NO_SUCH_CLIP",
+				"id": "2603966e-b865-426c-94a7-af4a01241dc1"
+			},
+			"notFavorited": {
+				"message": "You have not favorited the clip.",
+				"code": "NOT_FAVORITED",
+				"id": "90c3a9e8-b321-4dae-bf57-2bf79bbcc187"
+			}
+		}
 	}
 }

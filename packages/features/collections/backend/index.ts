@@ -8,6 +8,7 @@ import type { JsonSchema } from '@valibot/to-json-schema';
 import type { ApiErrorDefinition } from '../../api/contract/index.js';
 import { collectionsContract, collectionsErrors, collectionsInputs } from '../contract/index.js';
 export { collectionsErrors } from '../contract/index.js';
+export { clipFavoriteErrors } from '../contract/index.js';
 import type { CollectionEndpoints } from '../contract/index.js';
 import { toLegacyJsonSchema } from '../../api/backend/index.js';
 
@@ -97,7 +98,7 @@ export function createCollectionCommands(deps: CollectionsDependencies) {
 		'clips/delete': deleteClip,
 		'clips/add-note': addNote,
 		'clips/remove-note': removeNote,
-	} satisfies { [K in keyof CollectionEndpoints]: unknown };
+	} satisfies Pick<{ [K in keyof CollectionEndpoints]: unknown }, 'clips/delete' | 'clips/add-note' | 'clips/remove-note'>;
 }
 
 export type CollectionCommandsFeature = ReturnType<typeof createCollectionCommands>;
@@ -107,3 +108,6 @@ export const legacyCollectionsSchemas: Record<keyof typeof collectionsInputs, { 
 	'clips/add-note': { input: toLegacyJsonSchema(collectionsInputs['clips/add-note']) },
 	'clips/remove-note': { input: toLegacyJsonSchema(collectionsInputs['clips/remove-note']) },
 };
+
+export { createClipFavoriteCommands, legacyClipFavoriteSchemas } from './clip-favorite-commands.js';
+export type { ClipFavoriteCommandsFeature } from './clip-favorite-commands.js';
