@@ -14,7 +14,7 @@ export const avatarDecorationResult = v.array(v.object({
 	description: v.string(),
 	url: v.string(),
 	roleIdsThatCanBeUsedThisDecoration: v.array(v.pipe(v.string(), v.metadata({ format: 'id' }))),
-	category: v.pipe(v.optional(v.nullable(v.string())), v.metadata({ optional: true })),
+	category: v.pipe(v.exactOptional(v.nullable(v.string())), v.metadata({ optional: true })),
 }));
 
 export const avatarDecorationsContract = {

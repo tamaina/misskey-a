@@ -1,3 +1,4 @@
+import type { EmojiEndpoints } from '#feature-contracts/emojis';
 import type { AvatarDecorationEndpoints } from '#feature-contracts/avatar-decorations';
 import type { StatisticsEndpoints } from '#feature-contracts/statistics';
 import type { InstanceEndpoints } from '#feature-contracts/instance';
@@ -70,7 +71,7 @@ export type SwitchCaseResponseType<E extends keyof Endpoints, P extends Endpoint
 /* eslint-enable @stylistic/indent */
 
 export type Endpoints = Overwrite<
-	Overwrite<Gen, InstanceEndpoints & StatisticsEndpoints & AvatarDecorationEndpoints>,
+	Overwrite<Gen, InstanceEndpoints & StatisticsEndpoints & AvatarDecorationEndpoints & EmojiEndpoints>,
 	{
 		'users/show': {
 			req: UsersShowRequest;

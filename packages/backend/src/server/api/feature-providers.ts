@@ -4,8 +4,11 @@
  */
 
 import * as os from 'node:os';
-import { MoreThan } from 'typeorm';
+import { MoreThan, IsNull } from 'typeorm';
 import { USER_ONLINE_THRESHOLD } from '@/const.js';
+import { createEmojis } from '@features/emojis/backend';
+import type { EmojisFeature } from '@features/emojis/backend';
+import { EmojiEntityService } from '@/core/entities/EmojiEntityService.js';
 import { createInstance } from '@features/instance/backend';
 import type { InstanceFeature } from '@features/instance/backend';
 import { createAvatarDecorations } from '@features/avatar-decorations/backend';
@@ -18,13 +21,23 @@ import NotesChart from '@/core/chart/charts/notes.js';
 import UsersChart from '@/core/chart/charts/users.js';
 import { DI } from '@/di-symbols.js';
 import type { MiMeta } from '@/models/Meta.js';
-import type { UsersRepository, NoteReactionsRepository, InstancesRepository } from '@/models/_.js';
+import type { UsersRepository, NoteReactionsRepository, InstancesRepository, EmojisRepository } from '@/models/_.js';
 import type { Provider } from '@nestjs/common';
 
 // Transitional composition boundary: Nest resolves a feature, not each handler.
 // The feature itself receives narrow dependencies and has no container access.
-export interface ApiFeatures { instance: InstanceFeature; statistics: StatisticsFeature; avatarDecorations: AvatarDecorationsFeature }
-export const featureTokens = { instance: Symbol('instance API feature'), statistics: Symbol('statistics API feature'), avatarDecorations: Symbol('avatar decorations API feature') } satisfies Record<keyof ApiFeatures, symbol>;
+export interface ApiFeatures {
+	instance: InstanceFeature;
+	statistics: StatisticsFeature;
+	avatarDecorations: AvatarDecorationsFeature;
+	emojis: EmojisFeature;
+}
+export const featureTokens = {
+	instance: Symbol('instance API feature'),
+	statistics: Symbol('statistics API feature'),
+	avatarDecorations: Symbol('avatar decorations API feature'),
+	emojis: Symbol('emojis API feature'),
+} satisfies Record<keyof ApiFeatures, symbol>;
 export const featureProviders: Provider[] = [{
 	provide: featureTokens.instance,
 	inject: [DI.meta, DI.usersRepository],
@@ -80,5 +93,17 @@ export const featureProviders: Provider[] = [{
 	useFactory: (decorations: AvatarDecorationService, roles: RoleService) => createAvatarDecorations({
 		readDecorations: () => decorations.getAll(true),
 		readRoles: () => roles.getRoles(),
+	}),
+}, {
+	provide: featureTokens.emojis,
+	inject: [DI.emojisRepository, EmojiEntityService],
+	useFactory: (repository: EmojisRepository, entities: EmojiEntityService) => createEmojis({
+		listLocal: async () => entities.packSimpleMany(await repository.find({
+			where: { host: IsNull() },
+			order: { category: 'ASC', name: 'ASC' },
+		})),
+		findLocal: async name => entities.packDetailed(await repository.findOneOrFail({
+			where: { name, host: IsNull() },
+		})),
 	}),
 }];

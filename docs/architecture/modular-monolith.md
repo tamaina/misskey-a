@@ -274,3 +274,19 @@ Anonymous callers retain only public role IDs; authenticated callers retain all
 existing role IDs, matching the previous endpoint. Missing runtime context is
 anonymous. Roles and decorations are read anew through the existing services,
 whose cache and lifecycle ownership remain unchanged.
+
+## Contract-owned public entity schemas
+
+The public simple/detailed emoji models now live in the emoji feature contract.
+Legacy model references are generated from those schemas, and backend `Packed`
+and `KeyOf` resolve these migrated models from their inferred contract types.
+Unmigrated models, including the administrative emoji model, keep their existing
+schema/type path. This avoids maintaining a second public emoji field list.
+
+Optional wire properties use exact optional types, preserving compatibility for
+SDK consumers with `exactOptionalPropertyTypes`. Legacy packers can return own
+undefined properties, so the public emoji response boundary copies the object
+and omits those optional values just as JSON serialization would. It does not
+mutate the packer's object. Decoration category uses the same absent-property
+semantics. The schema bridge preserves existing references, descriptions and
+nullability; the complete generated OpenAPI document remains unchanged.

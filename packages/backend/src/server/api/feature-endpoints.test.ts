@@ -4,6 +4,9 @@
  */
 
 import { describe, expect, test } from 'vitest';
+import { createEmojis } from '@features/emojis/backend';
+import { createEndpoint as createEmojiEndpoint, meta as emojiMeta } from './endpoints/emoji.js';
+import { createEndpoint as createEmojisEndpoint, meta as emojisMeta } from './endpoints/emojis.js';
 import { createAvatarDecorations } from '@features/avatar-decorations/backend';
 import type { MiLocalUser } from '@/models/User.js';
 import { createEndpoint as createDecorationsEndpoint, meta as decorationsMeta } from './endpoints/get-avatar-decorations.js';
@@ -149,4 +152,23 @@ test('decoration visibility uses authenticated transport context, not request fi
 	expect(decorationsMeta).toMatchObject({ tags: ['users'], requireCredential: false });
 	expect(decorationsMeta).not.toHaveProperty('allowGet');
 	expect(decorationsMeta).not.toHaveProperty('cacheSec');
+});
+
+test('emoji adapters retain lookup validation, local results and cache policy', async () => {
+	const names: string[] = [];
+	const simple = { aliases: ['alias'], name: 'sample', category: null, url: '/sample.webp' };
+	const detailed = { ...simple, id: 'e', host: null, license: null, isSensitive: false, localOnly: false, roleIdsThatCanBeUsedThisEmojiAsReaction: [] };
+	const feature = createEmojis({
+		listLocal: async () => [simple],
+		findLocal: async name => { names.push(name); return detailed; },
+	});
+	const single = createEmojiEndpoint(feature);
+	for (const invalid of [null, {}, { name: 1 }, { name: null }]) {
+		await expect(single.exec(invalid, null, null)).rejects.toMatchObject({ code: 'INVALID_PARAM' });
+	}
+	expect(names).toEqual([]);
+	await expect(single.exec({ name: 'sample' }, null, null)).resolves.toEqual(detailed);
+	expect(names).toEqual(['sample']);
+	await expect(createEmojisEndpoint(feature).exec({}, null, null)).resolves.toEqual({ emojis: [simple] });
+	for (const meta of [emojiMeta, emojisMeta]) expect(meta).toMatchObject({ requireCredential: false, allowGet: true, cacheSec: 3600, tags: ['meta'] });
 });

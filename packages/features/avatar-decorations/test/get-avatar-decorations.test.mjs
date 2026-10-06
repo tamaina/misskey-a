@@ -135,3 +135,11 @@ test('malformed runtime contexts never count as authenticated', async () => {
 		assert.deepEqual(result[0].roleIdsThatCanBeUsedThisDecoration, ['public-b', 'public-a']);
 	}
 });
+
+test('an absent category stays absent in the portable response contract', async () => {
+	const withoutCategory = { ...decorationsFixture[0] };
+	delete withoutCategory.category;
+	const feature = createAvatarDecorations({ readDecorations: async () => [withoutCategory], readRoles: async () => rolesFixture });
+	const result = await call(feature);
+	assert.equal(Object.hasOwn(result[0], 'category'), false);
+});

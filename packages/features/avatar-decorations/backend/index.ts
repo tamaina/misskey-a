@@ -46,7 +46,7 @@ export function createAvatarDecorations(deps: AvatarDecorationsDependencies) {
 				description: decoration.description,
 				url: decoration.url,
 				roleIdsThatCanBeUsedThisDecoration: decoration.roleIdsThatCanBeUsedThisDecoration.filter(roleId => visibleRoleIds.has(roleId)),
-				category: decoration.category,
+				...(decoration.category === undefined ? {} : { category: decoration.category }),
 			})) satisfies AvatarDecorationEndpoints['get-avatar-decorations']['res'];
 		});
 

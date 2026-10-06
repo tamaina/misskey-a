@@ -1,3 +1,4 @@
+import type { Endpoints as LegacyEndpoints } from '../src/autogen/endpoint.js';
 import { describe, test } from 'vitest';
 import { expectType } from 'tsd';
 import * as Misskey from '../src/index.js';
@@ -95,7 +96,18 @@ describe('feature contracts', () => {
 test('avatar decoration responses derive from the feature contract', async () => {
 	const cli = new Misskey.api.APIClient({ origin: 'https://misskey.test' });
 	const result = await cli.request('get-avatar-decorations', {});
+	expectType<LegacyEndpoints['get-avatar-decorations']['res']>(result);
 	expectType<string>(result[0].id);
 	expectType<string[]>(result[0].roleIdsThatCanBeUsedThisDecoration);
 	expectType<string | null | undefined>(result[0].category);
+});
+
+test('public emoji response types remain compatible with generated entities', async () => {
+	const cli = new Misskey.api.APIClient({ origin: 'https://misskey.test' });
+	const detailed = await cli.request('emoji', { name: 'sample' });
+	const list = await cli.request('emojis', {});
+	expectType<Misskey.entities.EmojiDetailed>(detailed);
+	expectType<Misskey.entities.EmojiSimple>(list.emojis[0]);
+	expectType<string | null>(detailed.host);
+	expectType<boolean | undefined>(list.emojis[0].localOnly);
 });

@@ -16,11 +16,24 @@ assert.equal(config.db.host, '127.0.0.1'); assert.equal(config.db.port, 54312);
 assert.equal(config.db.db, 'test-misskey'); assert.equal(config.clusterLimit, 1);
 assert.equal(config.redis.host, '127.0.0.1'); assert.equal(config.redis.port, 56312);
 const db = createPostgresDataSource(config);
+const emojiFixtures = [
+	{ id: 'featureemoji000000000001', name: 'feature_b', host: null, category: 'a', originalUrl: 'https://example.invalid/b.png', publicUrl: '' },
+	{ id: 'featureemoji000000000002', name: 'feature_a', host: null, category: 'a', originalUrl: 'https://example.invalid/a.png', publicUrl: '' },
+	{ id: 'featureemoji000000000003', name: 'feature_c', host: null, category: 'b', originalUrl: 'https://example.invalid/c.png', publicUrl: '' },
+	{ id: 'featureemoji000000000004', name: 'feature_a', host: 'remote.invalid', category: 'a', originalUrl: 'https://remote.invalid/a.png', publicUrl: '' },
+	{ id: 'featureemoji000000000005', name: 'feature_remote_only', host: 'remote.invalid', category: 'a', originalUrl: 'https://remote.invalid/only.png', publicUrl: '' },
+];
 before(async () => {
 	await db.initialize();
 	await db.getRepository('MiMeta').save({ id: 'x', enableServerMachineStats: false });
+	await db.getRepository('MiEmoji').save(emojiFixtures);
 });
-after(async () => { if (db.isInitialized) await db.destroy(); });
+after(async () => {
+	if (db.isInitialized) {
+		try { await db.getRepository('MiEmoji').delete(emojiFixtures.map(emoji => emoji.id)); }
+		finally { await db.destroy(); }
+	}
+});
 
 for (const mode of ['server', 'queue', 'combined', 'cluster', 'cluster-server', 'cluster-queue']) {
 	test(`${mode} reaches readiness and drains on SIGTERM without the process deadline`, { timeout: 90000 }, async () => {
@@ -62,6 +75,20 @@ for (const mode of ['server', 'queue', 'combined', 'cluster', 'cluster-server', 
 				assert.deepEqual(await selfDescriptor.json(), { params: [{ name: 'endpoint', type: 'String' }] });
 				const unknownDescriptor = await post('/api/endpoint', { endpoint: 'not-a-real-endpoint' });
 				assert.equal(unknownDescriptor.status, 204);
+				const emojis = await fetch(`http://127.0.0.1:${config.port}/api/emojis`, { signal: AbortSignal.timeout(10000) });
+				assert.equal(emojis.status, 200);
+				const listed = (await emojis.json()).emojis.filter(emoji => emojiFixtures.some(fixture => fixture.name === emoji.name));
+				assert.deepEqual(listed.map(emoji => emoji.name), ['feature_a', 'feature_b', 'feature_c']);
+				assert.equal(listed[0].url, 'https://example.invalid/a.png');
+				assert.ok(!('localOnly' in listed[0]));
+				const emoji = await post('/api/emoji', { name: 'feature_a' });
+				assert.equal(emoji.status, 200);
+				const detail = await emoji.json();
+				assert.equal(detail.id, 'featureemoji000000000002');
+				assert.equal(detail.host, null); assert.equal(detail.localOnly, false);
+				assert.ok(!('originalUrl' in detail));
+				const remoteOnly = await post('/api/emoji', { name: 'feature_remote_only' });
+				assert.notEqual(remoteOnly.status, 200);
 				const decorations = await post('/api/get-avatar-decorations', { authenticated: true });
 				assert.equal(decorations.status, 200);
 				assert.ok(Array.isArray(await decorations.json()));

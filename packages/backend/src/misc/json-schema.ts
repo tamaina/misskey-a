@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import type { EmojiPacked } from '@features/emojis/contract';
+
 import {
 	packedMeDetailedOnlySchema,
 	packedMeDetailedSchema,
@@ -149,9 +151,9 @@ export const refs = {
 	ChatRoomMembership: packedChatRoomMembershipSchema,
 };
 
-export type Packed<x extends keyof typeof refs> = SchemaType<typeof refs[x]>;
+export type Packed<x extends keyof typeof refs> = x extends keyof EmojiPacked ? EmojiPacked[x] : SchemaType<typeof refs[x]>;
 
-export type KeyOf<x extends keyof typeof refs> = PropertiesToUnion<typeof refs[x]>;
+export type KeyOf<x extends keyof typeof refs> = x extends keyof EmojiPacked ? keyof EmojiPacked[x] : PropertiesToUnion<typeof refs[x]>;
 type PropertiesToUnion<p extends Schema> = p['properties'] extends NonNullable<Obj> ? keyof p['properties'] : never;
 
 type TypeStringef = 'null' | 'boolean' | 'integer' | 'number' | 'string' | 'array' | 'object' | 'any';
