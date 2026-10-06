@@ -110,5 +110,13 @@ rendering. Only then extend the migration to additional feature-owned views.
 - SDK contract dependencies currently resolve through the workspace. Packaging
   independently publishable SDK/contract artifacts remains a migration task;
   do not publish these private feature packages as-is.
+- The first VVI slice is the not-found view. Its locale blocks preserve the
+  resolved text of all 28 existing languages. The existing boot language choice
+  is passed to VVI; mounting waits for a successful locale load. Unit tests cover
+  every translated body/title and the optional login prompt. Frontend typecheck
+  and production build, including the legacy locale inliner, pass. This remains
+  an initial adapter in the frontend package; feature ownership migration is
+  not complete. Browser end-to-end validation is still pending because this
+  cloud environment blocks the browser's local test-server connection.
 - Existing server/queue Nest runtime and other endpoint definitions remain
   active. Remaining contracts, DI replacement and VVI migration are unfinished.

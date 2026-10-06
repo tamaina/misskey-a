@@ -45,6 +45,9 @@
 		],
 		"jsx": "preserve"
 	},
+	"vueCompilerOptions": {
+		"plugins": [{ "name": "vite-vue-internationalization/volar", "primaryLocale": "ja-JP" }]
+	},
 	"compileOnSave": false,
 	"include": [
 		"./src/**/*.ts",

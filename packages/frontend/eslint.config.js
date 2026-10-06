@@ -11,6 +11,11 @@ export default [
 		files: ['src/**/*.vue'],
 		...pluginMisskey.configs.typescript,
 	},
+	{
+		files: ['src/**/*.vue'],
+		// Injected by VVI's SFC transform; Volar checks dictionary members.
+		languageOptions: { globals: { $locale: 'readonly', $l: 'readonly' } },
+	},
 	...pluginVue.configs['flat/recommended'],
 	{
 		files: ['src/**/*.{ts,vue}'],
