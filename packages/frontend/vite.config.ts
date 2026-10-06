@@ -1,6 +1,8 @@
 import path from 'path';
+import { createRequire } from 'node:module';
 import pluginVue from '@vitejs/plugin-vue';
 import { pluginVvi } from './lib/vite-plugin-vvi.js';
+import { pluginFeatureDependencies } from './lib/vite-plugin-feature-dependencies.js';
 import pluginGlsl from 'vite-plugin-glsl';
 import { replacePlugin } from 'rolldown/plugins';
 import { visualizer } from 'rollup-plugin-visualizer';
@@ -19,6 +21,8 @@ import pluginCreateSearchIndex from './lib/vite-plugin-create-search-index.js';
 import pluginWatchLocales from './lib/vite-plugin-watch-locales.js';
 import { pluginRemoveUnrefI18n } from '../frontend-builder/rollup-plugin-remove-unref-i18n.js';
 import { Features } from 'lightningcss';
+
+const fluentEmojiDirectory = path.dirname(createRequire(import.meta.url).resolve('@misskey-dev/emoji-assets/fluent-emoji/1f3c6.png'));
 
 const url = process.env.NODE_ENV === 'development' ? (loadYaml(await fsp.readFile('../../.config/default.yml', 'utf-8')) as any).url : null;
 const host = url ? (new URL(url)).hostname : undefined;
@@ -143,6 +147,7 @@ export function getConfig(): UserConfig {
 		},
 
 		plugins: [
+			pluginFeatureDependencies(__dirname, path.resolve(__dirname, '../features')),
 			pluginVvi(),
 			pluginWatchLocales(),
 			...searchIndexes.map(options => pluginCreateSearchIndex(options)),
@@ -173,7 +178,7 @@ export function getConfig(): UserConfig {
 				'@features/': __dirname + '/../features/',
 				'/client-assets/': __dirname + '/assets/',
 				'/static-assets/': __dirname + '/../backend/assets/',
-				'/fluent-emoji/': '@misskey-dev/emoji-assets/fluent-emoji/',
+				'/fluent-emoji/': fluentEmojiDirectory + '/',
 			},
 		},
 

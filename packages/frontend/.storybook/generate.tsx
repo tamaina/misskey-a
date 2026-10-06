@@ -71,8 +71,8 @@ const generator = {
 				break;
 			}
 			default: {
-				// @ts-ignore
-				this[node.expression.type](node.expression, state);
+				const generateExpression = this[node.expression.type] as (expression: estree.Expression, state: State) => void;
+				generateExpression.call(this, node.expression, state);
 				break;
 			}
 		}
@@ -93,11 +93,6 @@ type SplitCamel<
 		: SplitCamel<XR, `${YC}${XH}`, YN>
 	: YN;
 
-// @ts-ignore
-type SplitKebab<T extends string> = T extends `${infer XH}-${infer XR}`
-	? [XH, ...SplitKebab<XR>]
-	: [T];
-
 type ToKebab<T extends readonly string[]> = T extends readonly [
 	infer XO extends string
 ]
@@ -109,14 +104,6 @@ type ToKebab<T extends readonly string[]> = T extends readonly [
 	? `${XH}${XR extends readonly string[] ? `-${ToKebab<XR>}` : ''}`
 	: '';
 
-// @ts-ignore
-type ToPascal<T extends readonly string[]> = T extends readonly [
-	infer XH extends string,
-	...infer XR extends readonly string[]
-]
-	? `${Capitalize<XH>}${ToPascal<XR>}`
-	: '';
-
 function h<T extends estree.Node>(
 	component: T['type'],
 	props: Omit<T, 'type'>
@@ -125,6 +112,17 @@ function h<T extends estree.Node>(
 	return Object.assign(props || {}, { type }) as T;
 }
 
+function toStoryTitle(component: string): string {
+	const withoutExtension = component.slice(0, -'.vue'.length);
+	const sourceRelative = withoutExtension.startsWith('src/')
+		? withoutExtension.slice('src/'.length)
+		: withoutExtension.startsWith('../features/')
+			? 'features/' + withoutExtension.slice('../features/'.length)
+			: withoutExtension;
+	return sourceRelative.replace(/\./g, '/');
+}
+
+// eslint-disable-next-line @typescript-eslint/no-namespace -- Classic JSX factory typing requires this namespace.
 declare namespace h.JSX {
 	type Element = estree.Node;
 	type IntrinsicElements = {
@@ -146,11 +144,12 @@ function toStories(component: string): Promise<string> {
 	const hasMetaStories = existsSync(`${metaStories}.ts`);
 	const base = basename(component);
 	const dir = dirname(component);
+	const pagePath = dir + '/';
+	const isPage = pagePath.startsWith('src/pages/')
+		|| /^\.\.\/features\/[^/]+\/frontend\/pages\//.test(pagePath);
 	const literal =
 		<literal
-			value={component
-				.slice('src/'.length, -'.vue'.length)
-				.replace(/\./g, '/')}
+			value={toStoryTitle(component)}
 		/> as estree.Literal;
 	const identifier =
 		<identifier
@@ -164,7 +163,7 @@ function toStories(component: string): Promise<string> {
 			properties={[
 				<property
 					key={<identifier name='layout' /> as estree.Identifier}
-					value={<literal value={`${dir}/`.startsWith('src/pages/') ? 'fullscreen' : 'centered'}/> as estree.Literal}
+					value={<literal value={isPage ? 'fullscreen' : 'centered'}/> as estree.Literal}
 					kind={'init' as const}
 				/> as estree.Property,
 				...(hasMsw
@@ -463,13 +462,13 @@ function toStories(component: string): Promise<string> {
 		globSync('src/components/MkTagItem.vue'),
 		globSync('src/components/MkRoleSelectDialog.vue'),
 		globSync('src/components/grid/MkGrid.vue'),
-		globSync('src/pages/admin/custom-emojis-manager2.vue'),
-		globSync('src/pages/admin/overview.ap-requests.vue'),
-		globSync('src/pages/user/home.vue'),
-		globSync('src/pages/search.vue'),
+		globSync('../features/emojis/frontend/pages/admin/custom-emojis-manager2.vue'),
+		globSync('../features/statistics/frontend/pages/admin/overview.ap-requests.vue'),
+		globSync('../features/users/frontend/pages/user/home.vue'),
+		globSync('../features/discovery/frontend/pages/search.vue'),
 	].flat();
 	await Promise.all(components.map(async (component) => {
 		const stories = component.replace(/\.vue$/, '.stories.ts');
 		await writeFile(stories, await toStories(component));
-	}))
+	}));
 })();

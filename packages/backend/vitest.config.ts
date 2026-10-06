@@ -4,9 +4,13 @@ import { defineConfig } from 'vitest/config';
 import backendTsconfig from './tsconfig.json' with { type: 'json' };
 import sourcePaths from './tsconfig.paths.json' with { type: 'json' };
 
-const dependencyAliases = Object.fromEntries(Object.entries(sourcePaths.compilerOptions.paths)
+const dependencyAliases = Object.entries(sourcePaths.compilerOptions.paths)
 	.filter(([name]) => !name.includes('*'))
-	.map(([name, [target]]) => [name, resolve(import.meta.dirname, target)]));
+	.map(([name, [target]]) => ({
+		// Do not turn package subpaths into filesystem paths that bypass exports.
+		find: new RegExp('^' + name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '$'),
+		replacement: resolve(import.meta.dirname, target),
+	}));
 
 // Raise the global EventEmitter listener limit before Vitest wires CLI listeners.
 EventEmitter.defaultMaxListeners = 20;
@@ -38,11 +42,11 @@ export const baseConfig = defineConfig({
 		maxConcurrency: 32,
 	},
 	resolve: {
-		alias: {
+		alias: [
 			...dependencyAliases,
-			'@': resolve(import.meta.dirname, './src'),
-			'@features': resolve(import.meta.dirname, '../features'),
-		},
+			{ find: '@', replacement: resolve(import.meta.dirname, './src') },
+			{ find: '@features', replacement: resolve(import.meta.dirname, '../features') },
+		],
 	},
 });
 

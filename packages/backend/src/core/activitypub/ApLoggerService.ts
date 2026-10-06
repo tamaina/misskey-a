@@ -3,17 +3,5 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Injectable } from '@nestjs/common';
-import type Logger from '@/logger.js';
-import { RemoteLoggerService } from '@/core/RemoteLoggerService.js';
-
-@Injectable()
-export class ApLoggerService {
-	public logger: Logger;
-
-	constructor(
-		private remoteLoggerService: RemoteLoggerService,
-	) {
-		this.logger = this.remoteLoggerService.logger.createSubLogger('ap', 'magenta');
-	}
-}
+// Compatibility bridge for existing core imports; implementation lives in the owning feature backend.
+export * from '../../../../features/federation/backend/services/ApLoggerService.js';

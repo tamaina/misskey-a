@@ -6,7 +6,7 @@
 import { oc } from '@orpc/contract';
 import type { InferContractRouterInputs, InferContractRouterOutputs } from '@orpc/contract';
 import * as v from 'valibot';
-import { misskeyId } from '../../api/contract/index.js';
+import { jsonString, misskeyId } from '../../api/contract/index.js';
 
 export const webhookEventTypes = ['mention', 'unfollow', 'follow', 'followed', 'note', 'reply', 'renote', 'reaction'] as const;
 export type WebhookEventTypes = typeof webhookEventTypes[number];
@@ -17,9 +17,9 @@ const voidOutput = v.void();
 export const webhookInputs = {
 	'i/webhooks/update': v.looseObject({
 		webhookId: misskeyId,
-		name: v.exactOptional(v.pipe(v.string(), v.minLength(1), v.maxLength(100))),
-		url: v.exactOptional(v.pipe(v.string(), v.minLength(1), v.maxLength(1024))),
-		secret: v.exactOptional(v.nullable(v.pipe(v.string(), v.maxLength(1024)))),
+		name: v.exactOptional(jsonString({ minLength: 1, maxLength: 100 })),
+		url: v.exactOptional(jsonString({ minLength: 1, maxLength: 1024 })),
+		secret: v.exactOptional(v.nullable(jsonString({ maxLength: 1024 }))),
 		on: v.exactOptional(v.array(webhookEventTypeInput)),
 		active: v.exactOptional(v.boolean()),
 	}),

@@ -7,14 +7,26 @@ import { createRequire } from 'node:module';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { StorybookConfig } from '@storybook/vue3-vite';
-import { type Plugin, mergeConfig } from 'vite';
+import { type PluginOption, mergeConfig } from 'vite';
 import turbosnap from 'vite-plugin-turbosnap';
 
 const require = createRequire(import.meta.url);
 const _dirname = fileURLToPath(new URL('.', import.meta.url));
 
+// Retain the project's legacy autodocs option alongside the current config type.
+type CompatibleStorybookConfig = StorybookConfig & { docs: NonNullable<StorybookConfig['docs']> & { autodocs: 'tag' } };
+
+function hasPluginName(plugin: PluginOption, name: string): boolean {
+	return !!plugin && typeof plugin === 'object' && !Array.isArray(plugin) && 'name' in plugin && plugin.name === name;
+}
+
 const config = {
-	stories: ['../src/**/*.mdx', '../src/**/*.stories.@(js|jsx|ts|tsx)'],
+	stories: [
+		'../src/**/*.mdx',
+		'../src/**/*.stories.@(js|jsx|ts|tsx)',
+		'../../features/*/frontend/**/*.mdx',
+		'../../features/*/frontend/**/*.stories.@(js|jsx|ts|tsx)',
+	],
 	staticDirs: [{ from: '../assets', to: '/client-assets' }],
 	addons: [
 		getAbsolutePath('@storybook/addon-essentials'),
@@ -35,13 +47,13 @@ const config = {
 		disableTelemetry: true,
 	},
 	async viteFinal(config) {
-		const replacePluginForIsChromatic = config.plugins?.findIndex((plugin: Plugin) => plugin && plugin.name === 'replace') ?? -1;
+		const replacePluginForIsChromatic = config.plugins?.findIndex(plugin => hasPluginName(plugin, 'replace')) ?? -1;
 		if (~replacePluginForIsChromatic) {
 			config.plugins?.splice(replacePluginForIsChromatic, 1);
 		}
 
 		//pluginsからcreateSearchIndexを削除、複数あるかもしれないので全て削除
-		config.plugins = config.plugins?.filter((plugin: Plugin) => plugin && plugin.name !== 'createSearchIndex') ?? [];
+		config.plugins = config.plugins?.filter(plugin => plugin && !hasPluginName(plugin, 'createSearchIndex')) ?? [];
 
 		return mergeConfig(config, {
 			plugins: [
@@ -62,7 +74,7 @@ const config = {
 			},
 		});
 	},
-} satisfies StorybookConfig;
+} satisfies CompatibleStorybookConfig;
 export default config;
 
 function getAbsolutePath(value: string): string {

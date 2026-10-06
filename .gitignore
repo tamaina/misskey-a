@@ -62,6 +62,7 @@ api-docs.json
 ormconfig.json
 temp
 /packages/frontend/src/**/*.stories.ts
+/packages/features/*/frontend/**/*.stories.ts
 tsdoc-metadata.json
 misskey-assets
 

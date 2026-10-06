@@ -3,19 +3,5 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Injectable } from '@nestjs/common';
-import Logger from '@/logger.js';
-import { bindThis } from '@/decorators.js';
-import type { Keyword } from 'color-convert';
-
-@Injectable()
-export class LoggerService {
-	constructor(
-	) {
-	}
-
-	@bindThis
-	public getLogger(domain: string, color?: Keyword | undefined) {
-		return new Logger(domain, color);
-	}
-}
+// Compatibility bridge for existing core imports; implementation lives in the owning feature backend.
+export * from '../../../features/runtime/backend/services/LoggerService.js';

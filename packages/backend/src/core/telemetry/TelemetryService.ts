@@ -3,20 +3,5 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Injectable } from '@nestjs/common';
-import { bindThis } from '@/decorators.js';
-import { captureMessage, startSpan } from './telemetry-registry.js';
-import type { TelemetryCaptureMessageOptions } from './adapters/TelemetryAdapter.js';
-
-@Injectable()
-export class TelemetryService {
-	@bindThis
-	public captureMessage(message: string, opts: TelemetryCaptureMessageOptions): void {
-		captureMessage(message, opts);
-	}
-
-	@bindThis
-	public startSpan<T>(name: string, fn: () => T): T {
-		return startSpan(name, fn);
-	}
-}
+// Compatibility bridge for existing core imports; implementation lives in the owning feature backend.
+export * from '../../../../features/statistics/backend/services/TelemetryService.js';

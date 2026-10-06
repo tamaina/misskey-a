@@ -6,7 +6,7 @@
 import { oc } from '@orpc/contract';
 import type { InferContractRouterInputs, InferContractRouterOutputs } from '@orpc/contract';
 import * as v from 'valibot';
-import { misskeyId, objectParams } from '../../api/contract/index.js';
+import { jsonString, misskeyId, objectParams } from '../../api/contract/index.js';
 
 export const avatarDecorationResult = v.array(v.object({
 	id: v.pipe(v.string(), v.metadata({ format: 'id', example: 'xxxxxxxxxx' })),
@@ -21,9 +21,9 @@ export const avatarDecorationResult = v.array(v.object({
 export const avatarDecorationCommandInputs = {
 	'admin/avatar-decorations/update': v.looseObject({
 		id: misskeyId,
-		name: v.exactOptional(v.pipe(v.string(), v.minLength(1))),
+		name: v.exactOptional(jsonString({ minLength: 1 })),
 		description: v.exactOptional(v.string()),
-		url: v.exactOptional(v.pipe(v.string(), v.minLength(1))),
+		url: v.exactOptional(jsonString({ minLength: 1 })),
 		roleIdsThatCanBeUsedThisDecoration: v.exactOptional(v.array(v.string())),
 		category: v.exactOptional(v.nullable(v.string())),
 	}),

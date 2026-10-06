@@ -177,3 +177,22 @@ Direct legacy reexports preserve entity constructor identity; table names, colum
 indexes, relations and migrations do not change. The User/DriveFile/DriveFolder
 cycle moves together. User/Role auxiliary exports stay with their existing files
 until a separate contract extraction, rather than changing public shape here.
+
+The service/page placement checkpoint moves 90 approved core services while the
+four split-required services remain host-owned. Package-export/type-resolution
+adapters stay in the backend package; feature sources retain the same providers
+and business logic. This is placement, not conversion of every Nest service.
+
+The same checkpoint moves 237 approved page/companion files (231 Vue SFCs) into
+feature frontend directories. Dynamic routes remain lazy, and the 14 review/split
+page rows remain in the host until their ownership is resolved. Frontend build,
+dependency resolution and Storybook generation remain package-owned; generated
+feature stories are ignored just like host stories. No feature package manifests,
+tsconfigs or lint configurations are introduced.
+
+Compatibility details are verified at the transport boundary. JSON string length
+limits count Unicode code points, matching legacy AJV validation rather than
+JavaScript UTF-16 code units. Feature dependency resolution is scoped to the
+consuming host package; it does not globally replace transitive package versions.
+Icon subset scanning includes feature frontend sources so relocated pages retain
+the same bundled glyph coverage.

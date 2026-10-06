@@ -8,7 +8,7 @@ import { cleanup, render, type RenderResult } from '@testing-library/vue';
 import * as Misskey from 'misskey-js';
 import { directives } from '@/directives/index.js';
 import { components } from '@/components/index.js';
-import XHome from '@/pages/user/home.vue';
+import XHome from '@features/users/frontend/pages/user/home.vue';
 import 'intersection-observer';
 
 describe('XHome', () => {

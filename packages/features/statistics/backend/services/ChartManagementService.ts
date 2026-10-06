@@ -1,0 +1,102 @@
+/*
+ * SPDX-FileCopyrightText: syuilo and misskey-project
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
+
+import { Injectable } from '@nestjs/common';
+
+import { bindThis } from '@/decorators.js';
+import FederationChart from '@/core/chart/charts/federation.js';
+import NotesChart from '@/core/chart/charts/notes.js';
+import UsersChart from '@/core/chart/charts/users.js';
+import ActiveUsersChart from '@/core/chart/charts/active-users.js';
+import InstanceChart from '@/core/chart/charts/instance.js';
+import PerUserNotesChart from '@/core/chart/charts/per-user-notes.js';
+import PerUserPvChart from '@/core/chart/charts/per-user-pv.js';
+import DriveChart from '@/core/chart/charts/drive.js';
+import PerUserReactionsChart from '@/core/chart/charts/per-user-reactions.js';
+import PerUserFollowingChart from '@/core/chart/charts/per-user-following.js';
+import PerUserDriveChart from '@/core/chart/charts/per-user-drive.js';
+import ApRequestChart from '@/core/chart/charts/ap-request.js';
+import { ChartLoggerService } from './ChartLoggerService.js';
+import type { OnApplicationShutdown } from '@nestjs/common';
+
+@Injectable()
+export class ChartManagementService implements OnApplicationShutdown {
+	private charts;
+	private saveIntervalId: NodeJS.Timeout | undefined;
+	private saving: Promise<void> | undefined;
+	private disposing: Promise<void> | undefined;
+
+	constructor(
+		private federationChart: FederationChart,
+		private notesChart: NotesChart,
+		private usersChart: UsersChart,
+		private activeUsersChart: ActiveUsersChart,
+		private instanceChart: InstanceChart,
+		private perUserNotesChart: PerUserNotesChart,
+		private perUserPvChart: PerUserPvChart,
+		private driveChart: DriveChart,
+		private perUserReactionsChart: PerUserReactionsChart,
+		private perUserFollowingChart: PerUserFollowingChart,
+		private perUserDriveChart: PerUserDriveChart,
+		private apRequestChart: ApRequestChart,
+
+		private chartLoggerService: ChartLoggerService,
+	) {
+		this.charts = [
+			this.federationChart,
+			this.notesChart,
+			this.usersChart,
+			this.activeUsersChart,
+			this.instanceChart,
+			this.perUserNotesChart,
+			this.perUserPvChart,
+			this.driveChart,
+			this.perUserReactionsChart,
+			this.perUserFollowingChart,
+			this.perUserDriveChart,
+			this.apRequestChart,
+		];
+	}
+
+	@bindThis
+	private async saveAll(): Promise<void> {
+		for (const chart of this.charts) {
+			try {
+				await chart.save();
+			} catch (err) {
+				this.chartLoggerService.logger.error('Failed to save chart:', { err });
+			}
+		}
+	}
+
+	@bindThis
+	public async start() {
+		if (this.saveIntervalId || this.disposing) return;
+		// 20分おきにメモリ情報をDBに書き込み
+		this.saveIntervalId = setInterval(() => {
+			if (!this.saving) this.saving = this.saveAll().finally(() => { this.saving = undefined; });
+		}, 1000 * 60 * 20);
+	}
+
+	@bindThis
+	public stop(): void {
+		clearInterval(this.saveIntervalId);
+		this.saveIntervalId = undefined;
+	}
+
+	@bindThis
+	public async dispose(): Promise<void> {
+		return this.disposing ??= (async () => {
+			this.stop();
+			await this.saving;
+			if (process.env.NODE_ENV !== 'test') await this.saveAll();
+		})();
+	}
+
+	@bindThis
+	async onApplicationShutdown(signal: string): Promise<void> {
+		await this.dispose();
+	}
+}

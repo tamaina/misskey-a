@@ -7,14 +7,14 @@ import { oc } from '@orpc/contract';
 import type { InferContractRouterInputs, InferContractRouterOutputs } from '@orpc/contract';
 import * as v from 'valibot';
 import type { ApiErrorDefinition } from '../../api/contract/index.js';
-import { misskeyId } from '../../api/contract/index.js';
+import { jsonString, misskeyId } from '../../api/contract/index.js';
 
 export const announcementCommandInputs = {
 	'admin/announcements/update': v.looseObject({
 		id: misskeyId,
-		title: v.exactOptional(v.pipe(v.string(), v.minLength(1))),
-		text: v.exactOptional(v.pipe(v.string(), v.minLength(1))),
-		imageUrl: v.exactOptional(v.nullable(v.pipe(v.string(), v.minLength(0)))),
+		title: v.exactOptional(jsonString({ minLength: 1 })),
+		text: v.exactOptional(jsonString({ minLength: 1 })),
+		imageUrl: v.exactOptional(v.nullable(jsonString({ minLength: 0 }))),
 		icon: v.exactOptional(v.picklist(['info', 'warning', 'error', 'success'])),
 		display: v.exactOptional(v.picklist(['normal', 'banner', 'dialog'])),
 		forExistingUsers: v.exactOptional(v.boolean()),

@@ -199,7 +199,7 @@ async function edit(name: string) {
 	const emoji = await misskeyApi('emoji', {
 		name: name,
 	});
-	const { dispose } = await os.popupAsyncWithDialog(import('@/pages/emoji-edit-dialog.vue').then(x => x.default), {
+	const { dispose } = await os.popupAsyncWithDialog(import('@features/emojis/frontend/pages/emoji-edit-dialog.vue').then(x => x.default), {
 		emoji: emoji,
 	}, {
 		closed: () => dispose(),

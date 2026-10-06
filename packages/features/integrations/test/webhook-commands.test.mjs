@@ -5,7 +5,10 @@
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import { createRequire } from 'node:module';
 import { createWebhookCommands, legacyWebhookSchemas } from '../../../backend/built/features/integrations/backend.js';
+
+const Ajv = createRequire(new URL('../../../backend/package.json', import.meta.url))('ajv');
 
 const eventTypes = ['mention', 'unfollow', 'follow', 'followed', 'note', 'reply', 'renote', 'reaction'];
 const inputUpdate = { webhookId: 'webhook1' };
@@ -33,6 +36,17 @@ function invoke(feature, route, input, actor = { id: 'owner' }) {
 	return feature[route](input, { context: { actor } });
 }
 
+async function acceptsWebhookUpdate(values) {
+	const { deps } = createDeps();
+	const feature = createWebhookCommands(deps);
+	try {
+		await invoke(feature, 'i/webhooks/update', { ...inputUpdate, ...values });
+		return true;
+	} catch {
+		return false;
+	}
+}
+
 test('legacy schemas preserve both webhook endpoint parameter definitions', () => {
 	const update = legacyWebhookSchemas['i/webhooks/update'].input;
 	const object = (properties, required) => ({ type: 'object', properties, required });
@@ -48,6 +62,29 @@ test('legacy schemas preserve both webhook endpoint parameter definitions', () =
 	}, ['webhookId']));
 	assert.deepEqual(legacyWebhookSchemas['i/webhooks/delete'].input, object({ webhookId: id }, ['webhookId']));
 	assert.equal(JSON.stringify(update).includes('"optional":true'), false);
+});
+
+test('webhook update validation matches AJV at Unicode and secret length boundaries', async () => {
+	const update = legacyWebhookSchemas['i/webhooks/update'].input;
+	const ajv = new Ajv();
+	const validateName = ajv.compile(update.properties.name);
+	const validateSecret = ajv.compile(update.properties.secret);
+
+	for (const [label, name, expected] of [
+		['100 emoji in name', '😀'.repeat(100), true],
+		['101 emoji in name', '😀'.repeat(101), false],
+	]) {
+		assert.equal(validateName(name), expected, `${label}: AJV`);
+		assert.equal(await acceptsWebhookUpdate({ name }), expected, `${label}: endpoint`);
+	}
+
+	for (const [label, secret, expected] of [
+		['1024 emoji in secret', '😀'.repeat(1024), true],
+		['1025 emoji in secret', '😀'.repeat(1025), false],
+	]) {
+		assert.equal(validateSecret(secret), expected, `${label}: AJV`);
+		assert.equal(await acceptsWebhookUpdate({ secret }), expected, `${label}: endpoint`);
+	}
 });
 
 test('update scopes lookup to the trusted actor, forwards exact values, and awaits write before reload', async () => {
