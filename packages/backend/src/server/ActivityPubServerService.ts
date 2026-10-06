@@ -233,13 +233,14 @@ export class ActivityPubServerService {
 		}
 		//#endregion
 
+		const activeRelation: FindOptionsWhere<MiFollowing> = { followeeId: user.id, isFollowerSuspended: false };
+		const totalItems = await this.followingsRepository.countBy(activeRelation);
+
 		const limit = 10;
 		const partOf = `${this.config.url}/users/${userId}/followers`;
 
 		if (page) {
-			const query = {
-				followeeId: user.id,
-			} as FindOptionsWhere<MiFollowing>;
+			const query: FindOptionsWhere<MiFollowing> = { ...activeRelation };
 
 			// カーソルが指定されている場合
 			if (cursor) {
@@ -263,7 +264,7 @@ export class ActivityPubServerService {
 					page: 'true',
 					cursor,
 				})}`,
-				user.followersCount, renderedFollowers, partOf,
+				totalItems, renderedFollowers, partOf,
 				undefined,
 				inStock ? `${partOf}?${url.query({
 					page: 'true',
@@ -277,7 +278,7 @@ export class ActivityPubServerService {
 			// index page
 			const rendered = this.apRendererService.renderOrderedCollection(
 				partOf,
-				user.followersCount,
+				totalItems,
 				`${partOf}?page=true`,
 			);
 			reply.header('Cache-Control', 'public, max-age=180');
@@ -330,13 +331,14 @@ export class ActivityPubServerService {
 		}
 		//#endregion
 
+		const activeRelation: FindOptionsWhere<MiFollowing> = { followerId: user.id, isFollowerSuspended: false };
+		const totalItems = await this.followingsRepository.countBy(activeRelation);
+
 		const limit = 10;
 		const partOf = `${this.config.url}/users/${userId}/following`;
 
 		if (page) {
-			const query = {
-				followerId: user.id,
-			} as FindOptionsWhere<MiFollowing>;
+			const query: FindOptionsWhere<MiFollowing> = { ...activeRelation };
 
 			// カーソルが指定されている場合
 			if (cursor) {
@@ -360,7 +362,7 @@ export class ActivityPubServerService {
 					page: 'true',
 					cursor,
 				})}`,
-				user.followingCount, renderedFollowees, partOf,
+				totalItems, renderedFollowees, partOf,
 				undefined,
 				inStock ? `${partOf}?${url.query({
 					page: 'true',
@@ -374,7 +376,7 @@ export class ActivityPubServerService {
 			// index page
 			const rendered = this.apRendererService.renderOrderedCollection(
 				partOf,
-				user.followingCount,
+				totalItems,
 				`${partOf}?page=true`,
 			);
 			reply.header('Cache-Control', 'public, max-age=180');

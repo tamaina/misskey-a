@@ -133,6 +133,7 @@ export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDe
 							where: {
 								followeeId: user.id,
 								followerId: me.id,
+								isFollowerSuspended: false,
 							},
 						});
 						if (!isFollowing) {
@@ -144,6 +145,7 @@ export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDe
 
 			const query = this.queryService.makePaginationQuery(this.followingsRepository.createQueryBuilder('following'), ps.sinceId, ps.untilId, ps.sinceDate, ps.untilDate)
 				.andWhere('following.followerId = :userId', { userId: user.id })
+				.andWhere('following.isFollowerSuspended = false')
 				.innerJoinAndSelect('following.followee', 'followee');
 
 			// @deprecated use get-following-users-by-birthday instead.

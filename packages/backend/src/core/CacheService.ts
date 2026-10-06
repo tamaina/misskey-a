@@ -113,11 +113,11 @@ export class CacheService implements OnApplicationShutdown {
 			fromRedisConverter: (value) => new Set(JSON.parse(value)),
 		});
 
-		this.userFollowingsCache = new RedisKVCache<Record<string, Pick<MiFollowing, 'withReplies'> | undefined>>(this.redisClient, 'userFollowings', {
+		this.userFollowingsCache = new RedisKVCache<Record<string, Pick<MiFollowing, 'withReplies'> | undefined>>(this.redisClient, 'activeUserFollowings', {
 			lifetime: 1000 * 60 * 30, // 30m
 			memoryCacheLifetime: 1000 * 60, // 1m
 			fetcher: (key) => this.followingsRepository.find({
-				where: { followerId: key },
+				where: { followerId: key, isFollowerSuspended: false },
 				select: { followeeId: true, withReplies: true },
 			}).then(xs => {
 				const obj: Record<string, Pick<MiFollowing, 'withReplies'> | undefined> = {};
@@ -167,6 +167,8 @@ export class CacheService implements OnApplicationShutdown {
 							this.localUserByIdCache.set(user.id, user);
 						}
 					}
+					// A Redis invalidation failure must not prevent updating the account's suspension state above.
+					if (type === 'userChangeSuspendedState') await this.userFollowingsCache.delete(body.id);
 					break;
 				}
 				case 'userTokenRegenerated': {

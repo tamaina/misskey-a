@@ -281,7 +281,8 @@ export class QueryService {
 		} else {
 			const followingQuery = this.followingsRepository.createQueryBuilder('following')
 				.select('following.followeeId')
-				.where('following.followerId = :meId');
+				.where('following.followerId = :meId')
+				.andWhere('following.isFollowerSuspended = false');
 
 			q.andWhere(new Brackets(qb => {
 				qb
@@ -410,7 +411,8 @@ export class QueryService {
 
 		const meFollowingQuery = this.followingsRepository.createQueryBuilder('meFollowing')
 			.select('meFollowing.followeeId')
-			.where('meFollowing.followerId = :meId');
+			.where('meFollowing.followerId = :meId')
+			.andWhere('meFollowing.isFollowerSuspended = false');
 
 		q.andWhere(new Brackets(qb => {
 			qb
