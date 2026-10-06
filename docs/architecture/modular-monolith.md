@@ -306,3 +306,18 @@ fixture adds catalog search/clear, translated menus, permission differences and
 dialog cleanup using synthetic state and service adapters. It is not a complete
 application E2E test. Local Chromium process sockets remain restricted even with
 approved execution elevation; CI supplies the actual browser execution.
+
+## Injectable emoji frontend state
+
+Emoji state is constructed by a feature factory with explicit clock, cache and
+fetch dependencies. The existing application module still performs its initial
+IndexedDB/localStorage cache read and supplies the concrete GET/POST and storage
+adapters. It reexports the same application-lifetime singleton API. The feature
+owns refs, category/map updates and cache policy without importing application
+I/O or credentials. Test instances can stop their own watcher through `dispose`.
+
+This extraction preserves watcher scheduling, stable map identity, mutation and
+persistence order, one-hour TTL, force-refresh behavior, concurrent completion
+order and the existing first-snapshot tag cache. It does not introduce fetch
+coalescing or silently change persistence error handling. Isolated feature tests
+and host-adapter tests cover both the state rules and concrete API/storage keys.

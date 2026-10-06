@@ -6,3 +6,5 @@
 export function loadEmojiCatalog() {
 	return import('./EmojiCatalog.vue');
 }
+
+export { createCustomEmojiStore } from './store.js';

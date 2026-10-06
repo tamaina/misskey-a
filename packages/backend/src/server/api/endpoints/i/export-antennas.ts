@@ -3,10 +3,11 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Injectable } from '@nestjs/common';
 import ms from 'ms';
+import { legacyPortabilitySchemas } from '@features/portability/backend';
+import type { Schema } from '@/misc/json-schema.js';
 import { Endpoint } from '@/server/api/endpoint-base.js';
-import { QueueService } from '@/core/QueueService.js';
+import { defineFeatureEndpoint } from '@/server/api/feature-endpoint.js';
 
 export const meta = {
 	secure: true,
@@ -17,19 +18,8 @@ export const meta = {
 	},
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {},
-	required: [],
-} as const;
+export const paramDef = legacyPortabilitySchemas['i/export-antennas'].input as Schema;
 
-@Injectable()
-export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-disable-line import/no-default-export
-	constructor (
-		private queueService: QueueService,
-	) {
-		super(meta, paramDef, async (ps, me) => {
-			this.queueService.createExportAntennasJob(me);
-		});
-	}
-}
+export const { feature, createEndpoint } = defineFeatureEndpoint('portability', portability => new Endpoint(meta, paramDef, async (params, user) => portability['i/export-antennas'](params, {
+	context: { actor: { id: user.id } },
+})));

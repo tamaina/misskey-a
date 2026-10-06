@@ -41,18 +41,9 @@ import type {
 import type httpSignature from '@peertube/http-signature';
 import type * as Bull from 'bullmq';
 
-export const QUEUE_TYPES = [
-	'system',
-	'endedPollNotification',
-	'postScheduledNote',
-	'deliver',
-	'inbox',
-	'db',
-	'relationship',
-	'objectStorage',
-	'userWebhookDeliver',
-	'systemWebhookDeliver',
-] as const;
+import { QUEUE_TYPES } from '../../../features/runtime/shared/queue-types.js';
+
+export { QUEUE_TYPES } from '../../../features/runtime/shared/queue-types.js';
 
 const REPEATABLE_SYSTEM_JOB_DEF = [{
 	name: 'tickCharts',

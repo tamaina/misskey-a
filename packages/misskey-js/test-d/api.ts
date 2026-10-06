@@ -111,3 +111,20 @@ test('public emoji response types remain compatible with generated entities', as
 	expectType<string | null>(detailed.host);
 	expectType<boolean | undefined>(list.emojis[0].localOnly);
 });
+
+test('queue operations and exports use the feature contract types', async () => {
+	const cli = new Misskey.api.APIClient({ origin: 'https://misskey.test' });
+	expectType<void>(await cli.request('admin/queue/pause', { queue: 'db' }));
+	expectType<void>(await cli.request('admin/queue/clear', { queue: 'inbox', state: 'failed' }));
+	expectType<void>(await cli.request('admin/queue/retry-job', { queue: 'deliver', jobId: 'job' }));
+	expectType<void>(await cli.request('i/export-notes'));
+	expectType<void>(await cli.request('i/export-following', { excludeMuting: true }));
+	// @ts-expect-error queue names are constrained by the contract
+	cli.request('admin/queue/pause', { queue: 'unknown' });
+	// @ts-expect-error clear requires a state
+	cli.request('admin/queue/clear', { queue: 'db' });
+	// @ts-expect-error retry requires a job id
+	cli.request('admin/queue/retry-job', { queue: 'db' });
+	// @ts-expect-error following export filter must be boolean
+	cli.request('i/export-following', { excludeMuting: 'yes' });
+});

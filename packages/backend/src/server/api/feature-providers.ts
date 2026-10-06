@@ -4,6 +4,12 @@
  */
 
 import * as os from 'node:os';
+import { createOperations } from '@features/operations/backend';
+import type { OperationsFeature } from '@features/operations/backend';
+import { createPortability } from '@features/portability/backend';
+import type { PortabilityFeature } from '@features/portability/backend';
+import { QueueService } from '@/core/QueueService.js';
+import { ModerationLogService } from '@/core/ModerationLogService.js';
 import { MoreThan, IsNull } from 'typeorm';
 import { USER_ONLINE_THRESHOLD } from '@/const.js';
 import { createEmojis } from '@features/emojis/backend';
@@ -27,18 +33,47 @@ import type { Provider } from '@nestjs/common';
 // Transitional composition boundary: Nest resolves a feature, not each handler.
 // The feature itself receives narrow dependencies and has no container access.
 export interface ApiFeatures {
+	operations: OperationsFeature;
+	portability: PortabilityFeature;
 	instance: InstanceFeature;
 	statistics: StatisticsFeature;
 	avatarDecorations: AvatarDecorationsFeature;
 	emojis: EmojisFeature;
 }
 export const featureTokens = {
+	operations: Symbol('operations API feature'),
+	portability: Symbol('portability API feature'),
 	instance: Symbol('instance API feature'),
 	statistics: Symbol('statistics API feature'),
 	avatarDecorations: Symbol('avatar decorations API feature'),
 	emojis: Symbol('emojis API feature'),
 } satisfies Record<keyof ApiFeatures, symbol>;
 export const featureProviders: Provider[] = [{
+	provide: featureTokens.operations,
+	inject: [QueueService, ModerationLogService],
+	useFactory: (queue: QueueService, audit: ModerationLogService) => createOperations({
+		queuePause: name => queue.queuePause(name),
+		queueResume: name => queue.queueResume(name),
+		queueClear: (name, state) => queue.queueClear(name, state),
+		queuePromoteJobs: name => queue.queuePromoteJobs(name),
+		queueRetryJob: (name, jobId) => queue.queueRetryJob(name, jobId),
+		queueRemoveJob: (name, jobId) => queue.queueRemoveJob(name, jobId),
+		log: (actor, action) => audit.log(actor, action),
+	}),
+}, {
+	provide: featureTokens.portability,
+	inject: [QueueService],
+	useFactory: (queue: QueueService) => createPortability({
+		createExportAntennasJob: actor => queue.createExportAntennasJob(actor),
+		createExportBlockingJob: actor => queue.createExportBlockingJob(actor),
+		createExportClipsJob: actor => queue.createExportClipsJob(actor),
+		createExportFavoritesJob: actor => queue.createExportFavoritesJob(actor),
+		createExportFollowingJob: (actor, excludeMuting, excludeInactive) => queue.createExportFollowingJob(actor, excludeMuting, excludeInactive),
+		createExportMuteJob: actor => queue.createExportMuteJob(actor),
+		createExportNotesJob: actor => queue.createExportNotesJob(actor),
+		createExportUserListsJob: actor => queue.createExportUserListsJob(actor),
+	}),
+}, {
 	provide: featureTokens.instance,
 	inject: [DI.meta, DI.usersRepository],
 	useFactory: (settings: MiMeta, usersRepository: UsersRepository) => createInstance({

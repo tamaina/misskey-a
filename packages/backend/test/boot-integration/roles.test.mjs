@@ -62,6 +62,13 @@ for (const mode of ['server', 'queue', 'combined', 'cluster', 'cluster-server', 
 					body: JSON.stringify(body),
 					signal: AbortSignal.timeout(10000),
 				});
+				// Feature-owned SSR templates still render through the existing web routes.
+				for (const path of ['/bios', '/cli', '/_info_card_']) {
+					const page = await fetch(`http://127.0.0.1:${config.port}${path}`, { signal: AbortSignal.timeout(10000) });
+					assert.equal(page.status, 200, path);
+					assert.match(page.headers.get('content-type'), /text\/html/);
+					assert.match(await page.text(), /<!DOCTYPE html>/i);
+				}
 				const response = await post('/api/ping', {});
 				assert.equal(response.status, 200); assert.equal(typeof (await response.json()).pong, 'number');
 				const endpointNames = await post('/api/endpoints', { endpoint: 'ping' });

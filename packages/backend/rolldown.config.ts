@@ -163,7 +163,7 @@ export default defineConfig((args) => {
 				format: 'esm',
 			},
 			watch: {
-				include: ['src/**/*.{ts,js,mjs,cjs,tsx,json}'],
+				include: ['src/**/*.{ts,js,mjs,cjs,tsx,json}', '../features/*/{backend,contract,shared}/**/*.{ts,js,mjs,cjs,tsx,json}'],
 				clearScreen: false,
 			},
 			// ビルドの高速化のために、watchモードのときは外部モジュールは全てバンドルしないようにする

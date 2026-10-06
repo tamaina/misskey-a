@@ -28,7 +28,9 @@
 		"rootDir": "..",
 		"paths": {
 			"@/*": ["./src/*"],
-			"@features/*": ["../features/*/index.ts"]
+			"@features/*": ["../features/*/index.ts"],
+			"@kitajs/html": ["./node_modules/@kitajs/html"],
+			"@kitajs/html/*": ["./node_modules/@kitajs/html/*"]
 		},
 		"outDir": "./built",
 		"plugins": [
@@ -51,6 +53,7 @@
 		"./src/**/*.ts",
 		"./src/**/*.tsx",
 		"../features/*/backend/**/*.ts",
+		"../features/*/backend/**/*.tsx",
 		"../features/*/contract/**/*.ts",
 		"../features/*/shared/**/*.ts"
 	],
