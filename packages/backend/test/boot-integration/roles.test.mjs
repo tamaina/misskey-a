@@ -48,6 +48,11 @@ for (const mode of ['server', 'queue', 'combined', 'cluster', 'cluster-server', 
 				const info = await fetch(`http://127.0.0.1:${config.port}/api/server-info`, { signal: AbortSignal.timeout(10000) });
 				assert.equal(info.status, 200);
 				assert.deepEqual(await info.json(), { machine: '?', cpu: { model: '?', cores: 0 }, mem: { total: 0 }, fs: { total: 0, used: 0 } });
+				const onlineUsersCount = await fetch(`http://127.0.0.1:${config.port}/api/get-online-users-count`, { signal: AbortSignal.timeout(10000) });
+				assert.equal(onlineUsersCount.status, 200);
+				const onlineUsersCountBody = await onlineUsersCount.json();
+				assert.equal(typeof onlineUsersCountBody.count, 'number');
+				assert.ok(onlineUsersCountBody.count >= 0);
 				socket = new WebSocket(`ws://127.0.0.1:${config.port}/streaming`);
 				await once(socket, 'open', { signal: AbortSignal.timeout(10000) });
 			}

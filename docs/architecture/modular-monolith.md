@@ -120,6 +120,10 @@ rendering. Only then extend the migration to additional feature-owned views.
   OpenAPI remains identical; machine statistics are never read by the feature
   while the setting is disabled. The SDK overlays the complete instance contract
   type map, so adding a contract does not require a per-endpoint SDK type copy.
+- Instance/get-online-users-count now follows the same path. The feature computes
+  the per-request cutoff from its clock and threshold; its adapter retains the
+  existing strict `lastActiveDate > cutoff` TypeORM query. Anonymous GET/POST,
+  caching, required numeric response and generated OpenAPI are unchanged.
 - The SDK builds portable contract declarations from feature-owned source.
   Distribution and license review remains a migration task; do not publish this
   experimental SDK layout as-is.

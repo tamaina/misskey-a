@@ -3,12 +3,10 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { MoreThan } from 'typeorm';
-import { Inject, Injectable } from '@nestjs/common';
-import { USER_ONLINE_THRESHOLD } from '@/const.js';
-import type { UsersRepository } from '@/models/_.js';
+import { legacyOnlineUsersCountSchemas } from '@features/instance/backend';
+import type { InstanceFeature } from '@features/instance/backend';
+import type { Schema } from '@/misc/json-schema.js';
 import { Endpoint } from '@/server/api/endpoint-base.js';
-import { DI } from '@/di-symbols.js';
 
 export const meta = {
 	tags: ['meta'],
@@ -16,38 +14,12 @@ export const meta = {
 	requireCredential: false,
 	allowGet: true,
 	cacheSec: 60 * 1,
-	res: {
-		type: 'object',
-		optional: false, nullable: false,
-		properties: {
-			count: {
-				type: 'number',
-				nullable: false,
-			},
-		},
-	},
+	res: legacyOnlineUsersCountSchemas.output as Schema,
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {},
-	required: [],
-} as const;
+export const paramDef = legacyOnlineUsersCountSchemas.input as Schema;
 
-@Injectable()
-export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-disable-line import/no-default-export
-	constructor(
-		@Inject(DI.usersRepository)
-		private usersRepository: UsersRepository,
-	) {
-		super(meta, paramDef, async () => {
-			const count = await this.usersRepository.countBy({
-				lastActiveDate: MoreThan(new Date(Date.now() - USER_ONLINE_THRESHOLD)),
-			});
-
-			return {
-				count,
-			};
-		});
-	}
+export const feature = 'instance' as const;
+export function createEndpoint(instance: InstanceFeature) {
+	return new Endpoint(meta, paramDef, async params => instance['get-online-users-count'](params));
 }

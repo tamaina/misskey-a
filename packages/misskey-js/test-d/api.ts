@@ -59,4 +59,9 @@ describe('feature contracts', () => {
 		expectType<number>(result.mem.total);
 		expectType<number>(result.fs.used);
 	});
+	test('online user count is inferred from its oRPC contract', async () => {
+		const cli = new Misskey.api.APIClient({ origin: 'https://misskey.test' });
+		expectType<{ count: number }>(await cli.request('get-online-users-count'));
+		expectType<{ count: number }>(await cli.request('get-online-users-count', {}));
+	});
 });

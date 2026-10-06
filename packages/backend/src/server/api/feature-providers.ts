@@ -4,9 +4,12 @@
  */
 
 import * as os from 'node:os';
+import { MoreThan } from 'typeorm';
+import { USER_ONLINE_THRESHOLD } from '@/const.js';
 import { createInstance } from '@features/instance/backend';
 import { DI } from '@/di-symbols.js';
 import type { MiMeta } from '@/models/Meta.js';
+import type { UsersRepository } from '@/models/_.js';
 import type { Provider } from '@nestjs/common';
 
 // Transitional composition boundary: Nest resolves a feature, not each handler.
@@ -14,8 +17,8 @@ import type { Provider } from '@nestjs/common';
 export const featureTokens = { instance: Symbol('instance API feature') };
 export const featureProviders: Provider[] = [{
 	provide: featureTokens.instance,
-	inject: [DI.meta],
-	useFactory: (settings: MiMeta) => createInstance({
+	inject: [DI.meta, DI.usersRepository],
+	useFactory: (settings: MiMeta, usersRepository: UsersRepository) => createInstance({
 		serverInfo: {
 			enabled: () => settings.enableServerMachineStats,
 			read: async () => {
@@ -29,6 +32,10 @@ export const featureProviders: Provider[] = [{
 					fs: { total: fsStats[0].size, used: fsStats[0].used },
 				};
 			},
+		},
+		getOnlineUsersCount: {
+			thresholdMs: USER_ONLINE_THRESHOLD,
+			countSince: cutoff => usersRepository.countBy({ lastActiveDate: MoreThan(cutoff) }),
 		},
 	}),
 }];

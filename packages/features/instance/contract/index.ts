@@ -12,6 +12,7 @@ export const objectParams = v.custom<Record<string, unknown>>(
 	'Expected a JSON object',
 );
 export const pingResult = v.object({ pong: v.number() });
+export const onlineUsersCountResult = v.object({ count: v.number() });
 export const serverInfoResult = v.object({
 	machine: v.string(),
 	cpu: v.object({ model: v.string(), cores: v.number() }),
@@ -23,6 +24,9 @@ export const instanceContract = {
 	ping: oc.route({ method: 'POST', path: '/ping', tags: ['meta'] })
 		.input(v.optional(objectParams, {}))
 		.output(pingResult),
+	'get-online-users-count': oc.route({ method: 'POST', path: '/get-online-users-count', tags: ['meta'] })
+		.input(v.optional(objectParams, {}))
+		.output(onlineUsersCountResult),
 	'server-info': oc.route({ method: 'POST', path: '/server-info', tags: ['meta'] })
 		.input(v.optional(objectParams, {}))
 		.output(serverInfoResult),

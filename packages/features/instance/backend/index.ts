@@ -5,8 +5,10 @@
 import { createProcedureClient, implement } from '@orpc/server';
 import { toJsonSchema } from '@valibot/to-json-schema';
 import type { JsonSchema } from '@valibot/to-json-schema';
-import { instanceContract, objectParams, pingResult, serverInfoResult } from '../contract/index.js';
+import { instanceContract, objectParams, onlineUsersCountResult, pingResult, serverInfoResult } from '../contract/index.js';
 import type { InstanceEndpoints } from '../contract/index.js';
+import { createGetOnlineUsersCount } from './get-online-users-count.js';
+import type { OnlineUsersCountDependencies } from './get-online-users-count.js';
 
 /** The clock is a narrow dependency and can be replaced without a container. */
 export function createPing(now: () => number = Date.now) {
@@ -40,15 +42,20 @@ const { $schema: _outputDialect, ...output } = toJsonSchema(pingResult);
 export const legacyPingSchemas: { input: JsonSchema; output: JsonSchema } = { input, output };
 const { $schema: _serverInfoDialect, ...serverInfoOutput } = toJsonSchema(serverInfoResult);
 export const legacyServerInfoSchemas: { input: JsonSchema; output: JsonSchema } = { input, output: serverInfoOutput };
+const { $schema: _onlineUsersCountDialect, ...onlineUsersCountOutput } = toJsonSchema(onlineUsersCountResult);
+export const legacyOnlineUsersCountSchemas: { input: JsonSchema; output: JsonSchema } = { input, output: onlineUsersCountOutput };
 
 export { createResetCaptcha } from './reset-captcha.js';
 export type { CaptchaReset } from './reset-captcha.js';
+export { createGetOnlineUsersCount } from './get-online-users-count.js';
+export type { OnlineUsersCountDependencies } from './get-online-users-count.js';
 
 /** One feature instance per role, with explicit dependencies and no container access. */
-export function createInstance(deps: { serverInfo: ServerInfoDependencies; now?: () => number }) {
+export function createInstance(deps: { serverInfo: ServerInfoDependencies; getOnlineUsersCount: OnlineUsersCountDependencies; now?: () => number }) {
 	return {
 		ping: createPing(deps.now),
 		'server-info': createServerInfo(deps.serverInfo),
+		'get-online-users-count': createGetOnlineUsersCount(deps.getOnlineUsersCount, deps.now),
 	};
 }
 export type InstanceFeature = ReturnType<typeof createInstance>;
