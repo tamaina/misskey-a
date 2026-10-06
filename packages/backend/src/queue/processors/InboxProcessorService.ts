@@ -39,6 +39,7 @@ type UpdateInstanceJob = {
 
 @Injectable()
 export class InboxProcessorService implements OnApplicationShutdown {
+	private disposing: Promise<void> | undefined;
 	private logger: Logger;
 	private updateInstanceQueue: CollapsedQueue<MiNote['id'], UpdateInstanceJob>;
 
@@ -299,7 +300,7 @@ export class InboxProcessorService implements OnApplicationShutdown {
 
 	@bindThis
 	public async dispose(): Promise<void> {
-		await this.updateInstanceQueue.performAllNow();
+		return this.disposing ??= this.updateInstanceQueue.performAllNow();
 	}
 
 	@bindThis

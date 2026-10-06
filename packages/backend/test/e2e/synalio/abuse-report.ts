@@ -22,10 +22,9 @@ import {
 	UserToken,
 	WEBHOOK_HOST,
 } from '../../utils.js';
-import type { INestApplicationContext } from '@nestjs/common';
 
 describe('[シナリオ] ユーザ通報', () => {
-	let queue: INestApplicationContext;
+	let queue: { close(): Promise<void> };
 	let admin: entities.SignupResponse;
 	let alice: entities.SignupResponse;
 	let bob: entities.SignupResponse;

@@ -110,4 +110,14 @@ describe('shutdown-handler', () => {
 			vi.useRealTimers();
 		}
 	});
+	test('startup failure uses the same shutdown path with a failing exit code', async () => {
+		vi.resetModules();
+		const { installShutdownSignalHandlers, isShutdownInProgress } = await import('@/boot/shutdown-handler.js');
+		const exit = vi.fn();
+		const task = vi.fn(async () => { expect(isShutdownInProgress()).toBe(true); });
+		const shutdown = installShutdownSignalHandlers({ process: { once: vi.fn() }, shutdownTasks: [task], exit });
+		await shutdown(1); await shutdown(1);
+		expect(task).toHaveBeenCalledOnce(); expect(exit).toHaveBeenCalledExactlyOnceWith(1);
+	});
+
 });

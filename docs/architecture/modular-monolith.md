@@ -161,3 +161,26 @@ public dependencies referenced by its generated contract declarations.
 
 The generated contract directory carries the source license. SDK distribution and
 licensing review remains required before publishing this experimental fork.
+
+## Server and queue lifecycle migration
+
+Boot owns role selection, phased role shutdown and process signal handling.
+All contexts are acquired before admission starts. Shutdown requests admission
+stop/drain across every role, waits at a barrier, flushes domain buffers, then
+closes contexts/infrastructure. Primary processes signal and await cluster workers;
+workers use the same role lifecycle. Startup failure rolls back acquired contexts
+and exits through the shutdown path with a failing code, without declaring ready.
+The existing process deadline is a hard bound, not cancellation of pending work.
+
+The transitional backend adapter still constructs the legacy Nest graph. A Nest
+constructor failure before the context is returned remains process-fatal; this is
+not a claim that arbitrary partially constructed legacy graphs can be recovered.
+Untracked legacy fire-and-forget work also remains migration work. The new barriers
+cover registered HTTP/queue drains, WebSocket upgrades/close, statistics readers,
+chart saves and collapsed-queue writes already running when a flush starts.
+
+Known flush/dispose methods coalesce repeated calls, because temporary Nest
+shutdown hooks may run after explicit boot cleanup. Shared process telemetry is
+closed by boot after roles/workers, rather than by the first Nest context to close.
+The real-process CI covers server-only, queue-only, combined and cluster modes,
+including WebSocket closure and the absence of orphaned worker processes.

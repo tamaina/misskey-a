@@ -11,6 +11,7 @@ type Job<V> = {
 // TODO: redis使えるようにする
 export class CollapsedQueue<K, V> {
 	private jobs: Map<K, Job<V>> = new Map();
+	private running = new Set<Promise<void>>();
 
 	constructor(
 		private timeout: number,
@@ -27,10 +28,17 @@ export class CollapsedQueue<K, V> {
 			const timer = setTimeout(() => {
 				const job = this.jobs.get(key)!;
 				this.jobs.delete(key);
-				this.perform(key, job.value);
+				void this.run(key, job.value).catch(error => console.error('Collapsed queue job failed:', error));
 			}, this.timeout);
 			this.jobs.set(key, { value, timer });
 		}
+	}
+
+	private run(key: K, value: V): Promise<void> {
+		const task = Promise.resolve().then(() => this.perform(key, value));
+		this.running.add(task);
+		void task.then(() => this.running.delete(task), () => this.running.delete(task));
+		return task;
 	}
 
 	async performAllNow() {
@@ -39,6 +47,6 @@ export class CollapsedQueue<K, V> {
 		for (const [_key, job] of entries) {
 			clearTimeout(job.timer);
 		}
-		await Promise.allSettled(entries.map(([key, job]) => this.perform(key, job.value)));
+		await Promise.allSettled([...this.running, ...entries.map(([key, job]) => this.run(key, job.value))]);
 	}
 }

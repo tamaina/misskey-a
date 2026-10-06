@@ -44,8 +44,8 @@ cluster.on('online', worker => {
 
 // Listen for dying workers
 cluster.on('exit', worker => {
-	if (isShutdownInProgress()) {
-		clusterLogger.info(`Process exited during shutdown: [${worker.id}]`);
+	if (isShutdownInProgress() || !readyRef.value) {
+		clusterLogger.info(`Process exited outside the running phase: [${worker.id}]`);
 		return;
 	}
 
@@ -66,7 +66,7 @@ if (!envOption.disableClustering) {
 	if (cluster.isPrimary) {
 		const { masterMain } = await import('./master.js');
 		await masterMain();
-		ev.mount();
+		if (!isShutdownInProgress()) ev.mount();
 	} else if (cluster.isWorker) {
 		const { workerMain } = await import('./worker.js');
 		await workerMain();
@@ -77,7 +77,7 @@ if (!envOption.disableClustering) {
 	// 非clusterの場合はMasterのみが起動するため、Workerの処理は行わない(cluster.isWorker === trueの状態でこのブロックに来ることはない)
 	const { masterMain } = await import('./master.js');
 	await masterMain();
-	ev.mount();
+	if (!isShutdownInProgress()) ev.mount();
 }
 
 process.on('message', msg => {
@@ -117,10 +117,10 @@ process.on('message', msg => {
 	}
 });
 
-readyRef.value = true;
+readyRef.value = !isShutdownInProgress();
 
 // ユニットテスト時にMisskeyが子プロセスで起動された時のため
 // それ以外のときは process.send は使えないので弾く
-if (process.send) {
+if (process.send && readyRef.value) {
 	process.send('ok');
 }

@@ -193,6 +193,7 @@ type Option = {
 
 @Injectable()
 export class NoteCreateService implements OnApplicationShutdown {
+	private disposing: Promise<void> | undefined;
 	#shutdownController = new AbortController();
 	private updateNotesCountQueue: CollapsedQueue<MiNote['id'], number>;
 
@@ -1250,8 +1251,10 @@ export class NoteCreateService implements OnApplicationShutdown {
 
 	@bindThis
 	public async dispose(): Promise<void> {
-		this.#shutdownController.abort();
-		await this.updateNotesCountQueue.performAllNow();
+		return this.disposing ??= (async () => {
+			this.#shutdownController.abort();
+			await this.updateNotesCountQueue.performAllNow();
+		})();
 	}
 
 	@bindThis

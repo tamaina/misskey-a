@@ -24,7 +24,9 @@ import type { OnApplicationShutdown } from '@nestjs/common';
 @Injectable()
 export class ChartManagementService implements OnApplicationShutdown {
 	private charts;
-	private saveIntervalId: NodeJS.Timeout;
+	private saveIntervalId: NodeJS.Timeout | undefined;
+	private saving: Promise<void> | undefined;
+	private disposing: Promise<void> | undefined;
 
 	constructor(
 		private federationChart: FederationChart,
@@ -71,18 +73,26 @@ export class ChartManagementService implements OnApplicationShutdown {
 
 	@bindThis
 	public async start() {
+		if (this.saveIntervalId || this.disposing) return;
 		// 20分おきにメモリ情報をDBに書き込み
 		this.saveIntervalId = setInterval(() => {
-			this.saveAll();
+			if (!this.saving) this.saving = this.saveAll().finally(() => { this.saving = undefined; });
 		}, 1000 * 60 * 20);
 	}
 
 	@bindThis
-	public async dispose(): Promise<void> {
+	public stop(): void {
 		clearInterval(this.saveIntervalId);
-		if (process.env.NODE_ENV !== 'test') {
-			await this.saveAll();
-		}
+		this.saveIntervalId = undefined;
+	}
+
+	@bindThis
+	public async dispose(): Promise<void> {
+		return this.disposing ??= (async () => {
+			this.stop();
+			await this.saving;
+			if (process.env.NODE_ENV !== 'test') await this.saveAll();
+		})();
 	}
 
 	@bindThis

@@ -543,6 +543,16 @@ export class QueueProcessorService implements OnApplicationShutdown {
 	}
 
 	@bindThis
+	public async waitUntilReady(): Promise<void> {
+		await Promise.all([
+			this.systemQueueWorker, this.dbQueueWorker, this.deliverQueueWorker,
+			this.inboxQueueWorker, this.userWebhookDeliverQueueWorker, this.systemWebhookDeliverQueueWorker,
+			this.relationshipQueueWorker, this.objectStorageQueueWorker,
+			this.endedPollNotificationQueueWorker, this.postScheduledNoteQueueWorker,
+		].map(worker => worker.waitUntilReady()));
+	}
+
+	@bindThis
 	public async start(): Promise<void> {
 		await Promise.all([
 			this.systemQueueWorker.run(),

@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { INestApplicationContext } from '@nestjs/common';
 
 process.env.NODE_ENV = 'test';
 
@@ -22,7 +21,7 @@ const waitForMoveJobOptions = { timeout: 5000, interval: 50 };
 const waitForDelayedUnfollowJobOptions = { timeout: 15000, interval: 100 };
 
 describe('Account Move', () => {
-	let jq: INestApplicationContext;
+	let jq: { close(): Promise<void> };
 	let url: URL;
 
 	let root: misskey.entities.SignupResponse;

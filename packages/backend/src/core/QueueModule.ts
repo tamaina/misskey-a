@@ -124,6 +124,7 @@ const $systemWebhookDeliver: Provider = {
 	],
 })
 export class QueueModule implements OnApplicationShutdown {
+	private disposing: Promise<void> | undefined;
 	constructor(
 		@Inject('queue:system') public systemQueue: SystemQueue,
 		@Inject('queue:endedPollNotification') public endedPollNotificationQueue: EndedPollNotificationQueue,
@@ -138,21 +139,23 @@ export class QueueModule implements OnApplicationShutdown {
 	) {}
 
 	public async dispose(): Promise<void> {
-		// Wait for all potential queue jobs
-		await allSettled();
-		// And then close all queues
-		await Promise.all([
-			this.systemQueue.close(),
-			this.endedPollNotificationQueue.close(),
-			this.postScheduledNoteQueue.close(),
-			this.deliverQueue.close(),
-			this.inboxQueue.close(),
-			this.dbQueue.close(),
-			this.relationshipQueue.close(),
-			this.objectStorageQueue.close(),
-			this.userWebhookDeliverQueue.close(),
-			this.systemWebhookDeliverQueue.close(),
-		]);
+		return this.disposing ??= (async () => {
+			// Wait for all potential queue jobs
+			await allSettled();
+			// And then close all queues
+			await Promise.all([
+				this.systemQueue.close(),
+				this.endedPollNotificationQueue.close(),
+				this.postScheduledNoteQueue.close(),
+				this.deliverQueue.close(),
+				this.inboxQueue.close(),
+				this.dbQueue.close(),
+				this.relationshipQueue.close(),
+				this.objectStorageQueue.close(),
+				this.userWebhookDeliverQueue.close(),
+				this.systemWebhookDeliverQueue.close(),
+			]);
+		})();
 	}
 
 	async onApplicationShutdown(signal: string): Promise<void> {

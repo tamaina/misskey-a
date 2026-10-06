@@ -16,8 +16,10 @@ import type { LogFormat } from '@/logging/types.js';
 import { showMachineInfo } from '@/misc/show-machine-info.js';
 import { envOption } from '@/env.js';
 import { initTelemetry, shutdownTelemetry } from '@/core/telemetry/telemetry-registry.js';
-import { initExtraThreadPool, jobQueue, server } from './common.js';
-import { installShutdownSignalHandlers } from './shutdown-handler.js';
+import { initExtraThreadPool, acquireLegacyRole } from './common.js';
+import { createProcessRoles, planRoles, stopClusterWorkers } from '@features/boot/backend';
+import { readyRef } from './ready.js';
+import { installShutdownSignalHandlers, isShutdownInProgress } from './shutdown-handler.js';
 
 const logger = new Logger('core', 'cyan');
 const bootLogger = logger.createSubLogger('boot', 'magenta');
@@ -88,8 +90,14 @@ export async function masterMain() {
 		bootLogger.error(e instanceof Error ? e : new Error(String(e)), null, true);
 		process.exit(1);
 	}
-	installShutdownSignalHandlers({
-		shutdownTasks: [shutdownTelemetry, shutdownLogging],
+	const roles = createProcessRoles(planRoles({ worker: false, ...envOption }), acquireLegacyRole);
+	const shutdown = installShutdownSignalHandlers({
+		shutdownTasks: [async () => {
+			readyRef.value = false;
+			const results = await Promise.allSettled([roles.stop(), stopClusterWorkers()]);
+			const errors = results.filter(result => result.status === 'rejected').map(result => result.reason);
+			if (errors.length) throw new AggregateError(errors, 'Process shutdown failed');
+		}, shutdownTelemetry, shutdownLogging],
 		onRegistered: message => bootLogger.info(message),
 	});
 
@@ -97,33 +105,15 @@ export async function masterMain() {
 		`mode: [disableClustering: ${envOption.disableClustering}, onlyServer: ${envOption.onlyServer}, onlyQueue: ${envOption.onlyQueue}]`,
 	);
 
-	if (!envOption.disableClustering) {
-		// clusterモジュール有効時
-
-		if (envOption.onlyServer) {
-			// onlyServer かつ enableCluster な場合、メインプロセスはforkのみに制限する(listenしない)。
-			// ワーカープロセス側でlistenすると、メインプロセスでポートへの着信を受け入れてワーカープロセスへの分配を行う動作をする。
-			// そのため、メインプロセスでも直接listenするとポートの競合が発生して起動に失敗してしまう。
-			// see: https://nodejs.org/api/cluster.html#cluster
-		} else if (envOption.onlyQueue) {
-			await jobQueue();
-		} else {
-			await server();
-		}
-
-		await spawnWorkers(config.clusterLimit);
-	} else {
-		// clusterモジュール無効時
-
-		if (envOption.onlyServer) {
-			await server();
-		} else if (envOption.onlyQueue) {
-			await jobQueue();
-		} else {
-			await server();
-			await jobQueue();
-		}
+	try {
+		await roles.start();
+		if (!envOption.disableClustering && !isShutdownInProgress()) await spawnWorkers(config.clusterLimit);
+	} catch (error) {
+		bootLogger.error(error instanceof Error ? error : new Error(String(error)), null, true);
+		await shutdown(1);
+		return;
 	}
+	if (isShutdownInProgress()) return;
 
 	if (envOption.onlyQueue) {
 		bootLogger.succ('Queue started', null, true);
@@ -197,15 +187,18 @@ async function spawnWorkers(limit = 1) {
 }
 
 function spawnWorker(): Promise<void> {
-	return new Promise(res => {
+	return new Promise((resolve, reject) => {
 		const worker = cluster.fork();
-		worker.on('message', message => {
-			if (message === 'listenFailed') {
-				bootLogger.error('The server Listen failed due to the previous error.');
-				process.exit(1);
-			}
-			if (message !== 'ready') return;
-			res();
-		});
+		const cleanup = () => {
+			worker.off('message', onMessage);
+			worker.off('exit', onExit);
+		};
+		const onExit = () => { cleanup(); reject(new Error('Worker exited before readiness')); };
+		const onMessage = (message: unknown) => {
+			if (message === 'listenFailed') { cleanup(); reject(new Error('Worker could not listen')); }
+			if (message === 'ready') { cleanup(); resolve(); }
+		};
+		worker.on('message', onMessage);
+		worker.once('exit', onExit);
 	});
 }

@@ -39,7 +39,8 @@ const _dirname = fileURLToPath(new URL('.', import.meta.url));
 @Injectable()
 export class ServerService implements OnApplicationShutdown {
 	private logger: Logger;
-	#fastify: FastifyInstance;
+	#fastify: FastifyInstance | undefined;
+	private draining: Promise<void> | undefined;
 
 	constructor(
 		@Inject(DI.config)
@@ -269,9 +270,6 @@ export class ServerService implements OnApplicationShutdown {
 
 			if (cluster.isWorker) {
 				process.send!('listenFailed');
-			} else {
-				// disableClustering
-				process.exit(1);
 			}
 		};
 
@@ -290,28 +288,39 @@ export class ServerService implements OnApplicationShutdown {
 			await fastify.ready();
 		} catch (err) {
 			handleListenError(err);
-			return;
+			throw err;
 		}
 	}
 
 	@bindThis
+	public drain(): Promise<void> {
+		return this.draining ??= (async () => {
+			if (!this.#fastify) return;
+			// Close HTTP admission immediately, then drain upgraded connections.
+			const closed = this.#fastify.close();
+			await Promise.all([closed, this.streamingApiServerService.detach()]);
+		})();
+	}
+
+	@bindThis
 	public async dispose(): Promise<void> {
-		await this.streamingApiServerService.detach();
-		// fastify@5 close() waits for upgraded WebSocket connections to drain.
-		// streamingApiServerService.attach() adds raw ws.Server upgrades that
-		// fastify does not track in its connection registry, so close() can hang
-		// forever during OnApplicationShutdown. Cap at 5s so PM2/systemd/k8s
-		// shutdown timeouts aren't held hostage.
-		await Promise.race([
-			this.#fastify.close(),
-			new Promise<void>(resolve => setTimeout(resolve, 5_000)),
-		]).catch(err => this.logger.error('fastify.close() failed', err as Error));
+		// Legacy direct Nest callers retain their bounded cleanup. Process boot
+		// awaits drain() itself and owns the overall shutdown deadline instead.
+		let timer: NodeJS.Timeout | undefined;
+		try {
+			await Promise.race([this.drain(), new Promise<void>(resolve => { timer = setTimeout(resolve, 5_000); })]);
+		} catch (error) {
+			this.logger.error('fastify.close() failed', error as Error);
+		} finally {
+			clearTimeout(timer);
+		}
 	}
 
 	/**
 	 * Get the Fastify instance for testing.
 	 */
 	public get fastify(): FastifyInstance {
+		if (!this.#fastify) throw new Error('Server has not been started');
 		return this.#fastify;
 	}
 

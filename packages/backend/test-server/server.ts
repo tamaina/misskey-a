@@ -1,12 +1,8 @@
 import { portToPid } from 'pid-port';
 import fkill from 'fkill';
 import Fastify from 'fastify';
-import { NestFactory } from '@nestjs/core';
-import { MainModule } from '@/MainModule.js';
-import { ServerService } from '@/server/ServerService.js';
 import { loadConfig } from '@/config.js';
-import { NestLogger } from '@/NestLogger.js';
-import { INestApplicationContext } from '@nestjs/common';
+import { server } from '@/boot/common.js';
 import type { FastifyInstance } from 'fastify';
 
 const config = loadConfig();
@@ -14,8 +10,7 @@ const originEnv = JSON.stringify(process.env);
 
 process.env.NODE_ENV = 'test';
 
-let app: INestApplicationContext;
-let serverService: ServerService;
+let app: Awaited<ReturnType<typeof server>>;
 let controller: FastifyInstance | undefined;
 
 /**
@@ -26,11 +21,7 @@ export async function setup() {
 
 	console.log('starting application...');
 
-	app = await NestFactory.createApplicationContext(MainModule, {
-		logger: new NestLogger(),
-	});
-	serverService = app.get(ServerService);
-	await serverService.launch();
+	app = await server();
 
 	await startControllerEndpoints();
 
@@ -48,7 +39,6 @@ export async function teardown() {
 	await controller?.close();
 	controller = undefined;
 
-	await serverService.dispose();
 	await app.close();
 	await killTestServer();
 }
@@ -92,18 +82,13 @@ async function startControllerEndpoints(port = config.port + 1000) {
 	fastify.post<{ Body: { key?: string, value?: string } }>('/env-reset', async (req, res) => {
 		process.env = JSON.parse(originEnv);
 
-		await serverService.dispose();
 		await app.close();
 
 		await killTestServer();
 
 		console.log('starting application...');
 
-		app = await NestFactory.createApplicationContext(MainModule, {
-			logger: new NestLogger(),
-		});
-		serverService = app.get(ServerService);
-		await serverService.launch();
+		app = await server();
 
 		res.code(200).send({ success: true });
 	});

@@ -16,10 +16,9 @@ import {
 	UserToken,
 	WEBHOOK_HOST,
 } from '../../utils.js';
-import type { INestApplicationContext } from '@nestjs/common';
 
 describe('[シナリオ] ユーザ作成', () => {
-	let queue: INestApplicationContext;
+	let queue: { close(): Promise<void> };
 	let admin: entities.SignupResponse;
 
 	async function createSystemWebhook(args?: Partial<entities.AdminSystemWebhookCreateRequest>, credential?: UserToken): Promise<entities.AdminSystemWebhookCreateResponse> {

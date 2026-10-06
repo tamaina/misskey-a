@@ -4,6 +4,7 @@
  */
 
 import { EventEmitter } from 'events';
+import type { Duplex } from 'node:stream';
 import { Inject, Injectable } from '@nestjs/common';
 import * as Redis from 'ioredis';
 import * as WebSocket from 'ws';
@@ -19,7 +20,12 @@ import { ContextIdFactory, ModuleRef } from '@nestjs/core';
 
 @Injectable()
 export class StreamingApiServerService {
-	#wss: WebSocket.WebSocketServer;
+	#wss: WebSocket.WebSocketServer | undefined;
+	#stopping = false;
+	#detaching: Promise<void> | undefined;
+	#upgrades = new Set<Promise<void>>();
+	#stopUpgrades: (() => void) | undefined;
+	#stopRedis: (() => void) | undefined;
 	#connections = new Map<WebSocket.WebSocket, number>();
 	#cleanConnectionsIntervalId: NodeJS.Timeout | null = null;
 
@@ -35,11 +41,12 @@ export class StreamingApiServerService {
 
 	@bindThis
 	public attach(server: http.Server): void {
-		this.#wss = new WebSocket.WebSocketServer({
+		const wss = this.#wss = new WebSocket.WebSocketServer({
 			noServer: true,
 		});
 
-		server.on('upgrade', async (request, socket, head) => {
+		const upgrade = async (request: http.IncomingMessage, socket: Duplex, head: Buffer) => {
+			if (this.#stopping) { socket.destroy(); return; }
 			if (request.url == null) {
 				socket.write('HTTP/1.1 400 Bad Request\r\n\r\n');
 				socket.destroy();
@@ -77,6 +84,8 @@ export class StreamingApiServerService {
 				return;
 			}
 
+			if (this.#stopping) { socket.destroy(); return; }
+
 			if (user?.isSuspended) {
 				socket.write('HTTP/1.1 403 Forbidden\r\n\r\n');
 				socket.destroy();
@@ -91,22 +100,36 @@ export class StreamingApiServerService {
 			const stream = await this.moduleRef.create(MainStreamConnection, contextId);
 
 			await stream.init();
+			if (this.#stopping) { stream.dispose(); socket.destroy(); return; }
 
-			this.#wss.handleUpgrade(request, socket, head, (ws) => {
-				this.#wss.emit('connection', ws, request, {
+			wss.handleUpgrade(request, socket, head, (ws) => {
+				wss.emit('connection', ws, request, {
 					stream, user, app,
 				});
 			});
-		});
+		};
+		const onUpgrade = (request: http.IncomingMessage, socket: Duplex, head: Buffer) => {
+			const task = upgrade(request, socket, head);
+			this.#upgrades.add(task);
+			void task.then(() => this.#upgrades.delete(task), error => {
+				this.#upgrades.delete(task);
+				socket.destroy();
+				console.error('WebSocket upgrade failed:', error);
+			});
+		};
+		server.on('upgrade', onUpgrade);
+		this.#stopUpgrades = () => server.off('upgrade', onUpgrade);
 
 		const globalEv = new EventEmitter();
 
-		this.redisForSub.on('message', (_: string, data: string) => {
+		const onGlobalMessage = (_: string, data: string) => {
 			const parsed = JSON.parse(data);
 			globalEv.emit('message', parsed);
-		});
+		};
+		this.redisForSub.on('message', onGlobalMessage);
+		this.#stopRedis = () => this.redisForSub.off('message', onGlobalMessage);
 
-		this.#wss.on('connection', async (connection: WebSocket.WebSocket, request: http.IncomingMessage, ctx: {
+		wss.on('connection', async (connection: WebSocket.WebSocket, request: http.IncomingMessage, ctx: {
 			stream: MainStreamConnection,
 			user: MiLocalUser | null;
 			app: MiAccessToken | null
@@ -161,12 +184,24 @@ export class StreamingApiServerService {
 
 	@bindThis
 	public detach(): Promise<void> {
-		if (this.#cleanConnectionsIntervalId) {
-			clearInterval(this.#cleanConnectionsIntervalId);
+		return this.#detaching ??= (async () => {
+			this.#stopping = true;
+			this.#stopUpgrades?.();
+			if (this.#cleanConnectionsIntervalId) clearInterval(this.#cleanConnectionsIntervalId);
 			this.#cleanConnectionsIntervalId = null;
-		}
-		return new Promise((resolve) => {
-			this.#wss.close(() => resolve());
-		});
+			// Authentication/context initialization must finish before infrastructure closes.
+			await Promise.allSettled([...this.#upgrades]);
+			const wss = this.#wss;
+			if (!wss) return;
+			const closed = new Promise<void>(resolve => wss.close(() => resolve()));
+			for (const connection of wss.clients) connection.close(1001, 'Server shutting down');
+			const timer = setTimeout(() => {
+				for (const connection of wss.clients) connection.terminate();
+			}, 1000);
+			try { await closed; } finally {
+				clearTimeout(timer);
+				this.#stopRedis?.();
+			}
+		})();
 	}
 }

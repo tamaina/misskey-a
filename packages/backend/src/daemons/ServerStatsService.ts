@@ -20,6 +20,9 @@ const round = (num: number) => Math.round(num * 10) / 10;
 
 @Injectable()
 export class ServerStatsService implements OnApplicationShutdown {
+	private disposing: Promise<void> | undefined;
+	private pending = new Set<Promise<void>>();
+	private logListener: ((request: { id: string; length?: number }) => void) | undefined;
 	private intervalId: NodeJS.Timeout | null = null;
 
 	constructor(
@@ -33,13 +36,15 @@ export class ServerStatsService implements OnApplicationShutdown {
 	 */
 	@bindThis
 	public async start(): Promise<void> {
+		if (this.intervalId || this.disposing) return;
 		if (!this.meta.enableServerMachineStats) return;
 
 		const log = [] as any[];
 
-		ev.on('requestServerStatsLog', x => {
+		this.logListener = x => {
 			ev.emit(`serverStatsLog:${x.id}`, log.slice(0, x.length));
-		});
+		};
+		ev.on('requestServerStatsLog', this.logListener);
 
 		const tick = async () => {
 			const cpu = await cpuUsage();
@@ -62,26 +67,39 @@ export class ServerStatsService implements OnApplicationShutdown {
 					w: round(Math.max(0, fsStats.wIO_sec ?? 0)),
 				},
 			};
+			if (this.disposing) return;
 			ev.emit('serverStats', stats);
 			log.unshift(stats);
 			if (log.length > 200) log.pop();
 		};
 
-		tick();
-
-		this.intervalId = setInterval(tick, interval);
+		const runTick = () => {
+			if (this.disposing) return;
+			const task = tick();
+			this.pending.add(task);
+			void task.then(() => this.pending.delete(task), error => {
+				this.pending.delete(task);
+				console.error('Statistics collection failed:', error);
+			});
+		};
+		runTick();
+		this.intervalId = setInterval(runTick, interval);
 	}
 
 	@bindThis
-	public dispose(): void {
-		if (this.intervalId) {
-			clearInterval(this.intervalId);
-		}
+	public dispose(): Promise<void> {
+		return this.disposing ??= (async () => {
+			clearInterval(this.intervalId ?? undefined);
+			if (this.logListener) ev.off('requestServerStatsLog', this.logListener);
+			const results = await Promise.allSettled([...this.pending]);
+			const errors = results.filter(result => result.status === 'rejected').map(result => result.reason);
+			if (errors.length) throw new AggregateError(errors, 'Statistics cleanup failed');
+		})();
 	}
 
 	@bindThis
-	public onApplicationShutdown(signal?: string | undefined): void {
-		this.dispose();
+	public async onApplicationShutdown(): Promise<void> {
+		await this.dispose();
 	}
 }
 

@@ -161,6 +161,7 @@ const $meta: Provider = {
 	exports: [$config, $db, $meta, $meilisearch, $redis, $redisForPub, $redisForSub, $redisForTimelines, $redisForReactions, RepositoryModule],
 })
 export class GlobalModule implements OnApplicationShutdown {
+	private disposing: Promise<void> | undefined;
 	constructor(
 		@Inject(DI.db) private db: DataSource,
 		@Inject(DI.redis) private redisClient: Redis.Redis,
@@ -171,17 +172,19 @@ export class GlobalModule implements OnApplicationShutdown {
 	) { }
 
 	public async dispose(): Promise<void> {
-		// Wait for all potential DB queries
-		await allSettled();
-		// And then disconnect from DB
-		await Promise.all([
-			this.db.destroy(),
-			this.redisClient.disconnect(),
-			this.redisForPub.disconnect(),
-			this.redisForSub.disconnect(),
-			this.redisForTimelines.disconnect(),
-			this.redisForReactions.disconnect(),
-		]);
+		return this.disposing ??= (async () => {
+			// Wait for all potential DB queries
+			await allSettled();
+			// And then disconnect from DB
+			await Promise.all([
+				this.db.destroy(),
+				this.redisClient.disconnect(),
+				this.redisForPub.disconnect(),
+				this.redisForSub.disconnect(),
+				this.redisForTimelines.disconnect(),
+				this.redisForReactions.disconnect(),
+			]);
+		})();
 	}
 
 	async onApplicationShutdown(signal: string): Promise<void> {
