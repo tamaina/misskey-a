@@ -1,6 +1,6 @@
 import path from 'path';
 import pluginVue from '@vitejs/plugin-vue';
-import { vueInternationalization } from 'vite-vue-internationalization';
+import { pluginVvi } from './lib/vite-plugin-vvi.js';
 import pluginGlsl from 'vite-plugin-glsl';
 import { replacePlugin } from 'rolldown/plugins';
 import { visualizer } from 'rollup-plugin-visualizer';
@@ -143,7 +143,7 @@ export function getConfig(): UserConfig {
 		},
 
 		plugins: [
-			vueInternationalization({ primaryLocale: 'ja-JP', scan: { include: ['src/**/*.vue', '../features/*/frontend/**/*.vue'] } }),
+			pluginVvi(),
 			pluginWatchLocales(),
 			...searchIndexes.map(options => pluginCreateSearchIndex(options)),
 			pluginVue(),

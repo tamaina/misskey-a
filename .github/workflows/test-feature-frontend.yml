@@ -1,0 +1,39 @@
+name: Test feature frontend
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - packages/frontend/**
+      - packages/features/**
+      - packages/misskey-js/**
+      - pnpm-lock.yaml
+      - .github/workflows/test-feature-frontend.yml
+  pull_request:
+    paths:
+      - packages/frontend/**
+      - packages/features/**
+      - packages/misskey-js/**
+      - pnpm-lock.yaml
+      - .github/workflows/test-feature-frontend.yml
+
+permissions:
+  contents: read
+
+jobs:
+  locale-migration:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: pnpm/action-setup@v6.0.10
+      - uses: actions/setup-node@v7.0.0
+        with:
+          node-version-file: .node-version
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build-pre
+      - run: cp .github/misskey/test.yml .config/test.yml
+      - run: pnpm --filter frontend... -r build
+      - run: pnpm --filter frontend exec vue-tsc --noEmit
+      - run: pnpm --filter frontend exec vitest run --config vitest.config.unit.ts test/unit/not-found-locale.test.ts test/unit/result-locale.test.ts test/unit/lib/vvi-subrequests.test.ts test/unit/i18n.test.ts

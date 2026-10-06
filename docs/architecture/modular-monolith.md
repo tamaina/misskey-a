@@ -198,3 +198,14 @@ API pipeline; unmigrated handlers retain their class providers.
 This removes per-handler container construction from the migrated slice without
 introducing a global service locator into feature code. It does not select or
 complete the replacement container for the remaining service graph.
+
+## VVI component locale expansion
+
+The shared result/error components now own their translated labels, preserving
+all 28 resolved legacy locales, custom text (including an empty string), and the
+retry event. VVI 1.1.3 needs a narrow integration guard: its transform collects
+Vue style/template subrequests as if they were complete SFCs, which erases their
+previously scanned dictionaries and renders literal locale key paths. Only the
+complete SFC is now passed through that transform; Vue handles its subrequests.
+A direct hook regression and mounted component tests cover this guard. Review
+and remove the guard when adopting a VVI release that handles subrequests itself.
