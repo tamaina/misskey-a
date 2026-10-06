@@ -321,3 +321,19 @@ persistence order, one-hour TTL, force-refresh behavior, concurrent completion
 order and the existing first-snapshot tag cache. It does not introduce fetch
 coalescing or silently change persistence error handling. Isolated feature tests
 and host-adapter tests cover both the state rules and concrete API/storage keys.
+
+## Static component locale migration checkpoint
+
+A further 47 feature-owned SFCs now use component locale tags for 176 static
+labels. All 28 loader-resolved translations are preserved per label (4,928
+value comparisons). The regression manifest covers these and the preceding
+37-component batch, with 84 SFCs and 5,964 exact translation comparisons.
+The URL-preview test application now installs the real VVI runtime and explicitly
+loads its selected locale before mounting. Full frontend unit tests (404),
+changed-file lint, production build and frontend type checking pass locally.
+This removes global dictionary references from those templates; embedded locale
+strings increase source bytes, and this is not a completed frontend conversion.
+
+The current priority is completing contract-first API definitions, dependency
+construction and VVI migration before resuming the separately prepared owner-PR
+ports. File placement alone is not counted as completion of those changes.

@@ -15,15 +15,15 @@ SPDX-License-Identifier: AGPL-3.0-only
 	<div style="pointer-events: none;">
 		<div v-if="$i?.avatarId == file.id" :class="[$style.label]">
 			<img :class="$style.labelImg" src="/client-assets/label.svg"/>
-			<p :class="$style.labelText">{{ i18n.ts.avatar }}</p>
+			<p :class="$style.labelText">{{ $locale.sfc.avatar }}</p>
 		</div>
 		<div v-if="$i?.bannerId == file.id" :class="[$style.label]">
 			<img :class="$style.labelImg" src="/client-assets/label.svg"/>
-			<p :class="$style.labelText">{{ i18n.ts.banner }}</p>
+			<p :class="$style.labelText">{{ $locale.sfc.banner }}</p>
 		</div>
 		<div v-if="file.isSensitive" :class="[$style.label, $style.red]">
 			<img :class="$style.labelImg" src="/client-assets/label-red.svg"/>
-			<p :class="$style.labelText">{{ i18n.ts.sensitive }}</p>
+			<p :class="$style.labelText">{{ $locale.sfc.sensitive }}</p>
 		</div>
 
 		<MkDriveFileThumbnail :class="$style.thumbnail" :file="file" fit="contain"/>
@@ -42,7 +42,6 @@ import * as Misskey from 'misskey-js';
 import MkDriveFileThumbnail from '@features/drive/frontend/components/MkDriveFileThumbnail.vue';
 import bytes from '@features/ui/frontend/filters/bytes.js';
 import * as os from '@/os.js';
-import { i18n } from '@/i18n.js';
 import { $i } from '@/i.js';
 import { getDriveFileMenu } from '@features/drive/frontend/utility/get-drive-file-menu.js';
 import { setDragData } from '@/drag-and-drop.js';
@@ -230,3 +229,227 @@ function onDragend() {
 	overflow: hidden;
 }
 </style>
+
+<locale locale="ar-SA" lang="json">
+{
+  "avatar": "الصورة الرمزية",
+  "banner": "الصورة الرأسية",
+  "sensitive": "محتوى حساس"
+}
+</locale>
+
+<locale locale="ca-ES" lang="json">
+{
+  "avatar": "Icona",
+  "banner": "Bàner",
+  "sensitive": "Sensible"
+}
+</locale>
+
+<locale locale="cs-CZ" lang="json">
+{
+  "avatar": "Avatar",
+  "banner": "Baner",
+  "sensitive": "NSFW"
+}
+</locale>
+
+<locale locale="da-DK" lang="json">
+{
+  "avatar": "Avatar",
+  "banner": "Banner",
+  "sensitive": "Sensitive"
+}
+</locale>
+
+<locale locale="de-DE" lang="json">
+{
+  "avatar": "Profilbild",
+  "banner": "Banner",
+  "sensitive": "Sensibel"
+}
+</locale>
+
+<locale locale="en-US" lang="json">
+{
+  "avatar": "Avatar",
+  "banner": "Banner",
+  "sensitive": "Sensitive"
+}
+</locale>
+
+<locale locale="es-ES" lang="json">
+{
+  "avatar": "Avatar",
+  "banner": "Banner",
+  "sensitive": "Marcado como sensible (NSFW)"
+}
+</locale>
+
+<locale locale="fr-FR" lang="json">
+{
+  "avatar": "Avatar",
+  "banner": "Bannière",
+  "sensitive": "Contenu sensible"
+}
+</locale>
+
+<locale locale="id-ID" lang="json">
+{
+  "avatar": "Avatar",
+  "banner": "Banner",
+  "sensitive": "Konten sensitif"
+}
+</locale>
+
+<locale locale="it-IT" lang="json">
+{
+  "avatar": "Foto del profilo",
+  "banner": "Intestazione",
+  "sensitive": "Esplicito"
+}
+</locale>
+
+<locale locale="ja-JP" lang="json">
+{
+  "avatar": "アイコン",
+  "banner": "バナー",
+  "sensitive": "センシティブ"
+}
+</locale>
+
+<locale locale="ja-KS" lang="json">
+{
+  "avatar": "アイコン",
+  "banner": "バナー",
+  "sensitive": "気いつけて見いや"
+}
+</locale>
+
+<locale locale="kab-KAB" lang="json">
+{
+  "avatar": "Avatar",
+  "banner": "Banner",
+  "sensitive": "Sensitive"
+}
+</locale>
+
+<locale locale="kn-IN" lang="json">
+{
+  "avatar": "Avatar",
+  "banner": "Banner",
+  "sensitive": "Sensitive"
+}
+</locale>
+
+<locale locale="ko-KR" lang="json">
+{
+  "avatar": "아바타",
+  "banner": "배너",
+  "sensitive": "열람 주의"
+}
+</locale>
+
+<locale locale="nl-NL" lang="json">
+{
+  "avatar": "Avatar",
+  "banner": "Banner",
+  "sensitive": "NSFW"
+}
+</locale>
+
+<locale locale="no-NO" lang="json">
+{
+  "avatar": "Avatar",
+  "banner": "Banner",
+  "sensitive": "Sensitive"
+}
+</locale>
+
+<locale locale="pl-PL" lang="json">
+{
+  "avatar": "Awatar",
+  "banner": "Baner",
+  "sensitive": "NSFW"
+}
+</locale>
+
+<locale locale="pt-PT" lang="json">
+{
+  "avatar": "Avatar",
+  "banner": "Capa",
+  "sensitive": "Conteúdo sensível"
+}
+</locale>
+
+<locale locale="ru-RU" lang="json">
+{
+  "avatar": "Аватар",
+  "banner": "Шапка",
+  "sensitive": "Содержимое не для всех"
+}
+</locale>
+
+<locale locale="sk-SK" lang="json">
+{
+  "avatar": "Avatar",
+  "banner": "BAnner",
+  "sensitive": "NSFW"
+}
+</locale>
+
+<locale locale="th-TH" lang="json">
+{
+  "avatar": "ไอคอน",
+  "banner": "แบนเนอร์",
+  "sensitive": "เนื้อหาที่ละเอียดอ่อน"
+}
+</locale>
+
+<locale locale="tr-TR" lang="json">
+{
+  "avatar": "Avatar",
+  "banner": "Banner",
+  "sensitive": "Hassas"
+}
+</locale>
+
+<locale locale="ug-CN" lang="json">
+{
+  "avatar": "Avatar",
+  "banner": "Banner",
+  "sensitive": "Sensitive"
+}
+</locale>
+
+<locale locale="uk-UA" lang="json">
+{
+  "avatar": "Аватар",
+  "banner": "Банер",
+  "sensitive": "NSFW"
+}
+</locale>
+
+<locale locale="vi-VN" lang="json">
+{
+  "avatar": "Ảnh đại diện",
+  "banner": "Ảnh bìa",
+  "sensitive": "Nhạy cảm"
+}
+</locale>
+
+<locale locale="zh-CN" lang="json">
+{
+  "avatar": "头像",
+  "banner": "横幅",
+  "sensitive": "敏感内容"
+}
+</locale>
+
+<locale locale="zh-TW" lang="json">
+{
+  "avatar": "大頭貼",
+  "banner": "橫幅",
+  "sensitive": "敏感內容"
+}
+</locale>

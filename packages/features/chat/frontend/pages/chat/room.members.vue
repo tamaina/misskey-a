@@ -5,7 +5,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <template>
 <div class="_gaps">
-	<MkButton v-if="isOwner" primary rounded style="margin: 0 auto;" @click="emit('inviteUser')"><i class="ti ti-plus"></i> {{ i18n.ts._chat.inviteUser }}</MkButton>
+	<MkButton v-if="isOwner" primary rounded style="margin: 0 auto;" @click="emit('inviteUser')"><i class="ti ti-plus"></i> {{ $locale.sfc.inviteUser }}</MkButton>
 
 	<MkA :class="$style.membershipBody" :to="`${userPage(room.owner)}`">
 		<MkUserCardMini :user="room.owner"/>
@@ -22,7 +22,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 	<template v-if="isOwner">
 		<hr>
 
-		<div>{{ i18n.ts._chat.sentInvitations }}</div>
+		<div>{{ $locale.sfc.sentInvitations }}</div>
 
 		<div v-for="invitation in invitations" :key="invitation.id" :class="$style.invitation">
 			<MkA :class="$style.invitationBody" :to="`${userPage(invitation.user)}`">
@@ -37,7 +37,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 import { computed, onMounted, ref } from 'vue';
 import * as Misskey from 'misskey-js';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
-import { i18n } from '@/i18n.js';
 import { misskeyApi } from '@/utility/misskey-api.js';
 import MkUserCardMini from '@features/users/frontend/components/MkUserCardMini.vue';
 import { userPage } from '@features/users/frontend/filters/user.js';
@@ -96,3 +95,199 @@ onMounted(async () => {
 	margin-right: 8px;
 }
 </style>
+
+<locale locale="ar-SA" lang="json">
+{
+  "inviteUser": "Invite Users",
+  "sentInvitations": "Sent Invites"
+}
+</locale>
+
+<locale locale="ca-ES" lang="json">
+{
+  "inviteUser": "Invitar usuaris",
+  "sentInvitations": "Enviar invitacions"
+}
+</locale>
+
+<locale locale="cs-CZ" lang="json">
+{
+  "inviteUser": "Invite Users",
+  "sentInvitations": "Sent Invites"
+}
+</locale>
+
+<locale locale="da-DK" lang="json">
+{
+  "inviteUser": "Invite Users",
+  "sentInvitations": "Sent Invites"
+}
+</locale>
+
+<locale locale="de-DE" lang="json">
+{
+  "inviteUser": "Benutzer einladen",
+  "sentInvitations": "Verschickte Einladungen"
+}
+</locale>
+
+<locale locale="en-US" lang="json">
+{
+  "inviteUser": "Invite Users",
+  "sentInvitations": "Sent Invites"
+}
+</locale>
+
+<locale locale="es-ES" lang="json">
+{
+  "inviteUser": "Invitar  usuarios",
+  "sentInvitations": "Invitaciones enviadas"
+}
+</locale>
+
+<locale locale="fr-FR" lang="json">
+{
+  "inviteUser": "Invite Users",
+  "sentInvitations": "Sent Invites"
+}
+</locale>
+
+<locale locale="id-ID" lang="json">
+{
+  "inviteUser": "Invite Users",
+  "sentInvitations": "Sent Invites"
+}
+</locale>
+
+<locale locale="it-IT" lang="json">
+{
+  "inviteUser": "Invita persona",
+  "sentInvitations": "Inviti spediti"
+}
+</locale>
+
+<locale locale="ja-JP" lang="json">
+{
+  "inviteUser": "ユーザーを招待",
+  "sentInvitations": "送信した招待"
+}
+</locale>
+
+<locale locale="ja-KS" lang="json">
+{
+  "inviteUser": "ユーザーを招待",
+  "sentInvitations": "送信した招待"
+}
+</locale>
+
+<locale locale="kab-KAB" lang="json">
+{
+  "inviteUser": "Invite Users",
+  "sentInvitations": "Sent Invites"
+}
+</locale>
+
+<locale locale="kn-IN" lang="json">
+{
+  "inviteUser": "Invite Users",
+  "sentInvitations": "Sent Invites"
+}
+</locale>
+
+<locale locale="ko-KR" lang="json">
+{
+  "inviteUser": "유저를 초대",
+  "sentInvitations": "초대를 보내기"
+}
+</locale>
+
+<locale locale="nl-NL" lang="json">
+{
+  "inviteUser": "Invite Users",
+  "sentInvitations": "Sent Invites"
+}
+</locale>
+
+<locale locale="no-NO" lang="json">
+{
+  "inviteUser": "Invite Users",
+  "sentInvitations": "Sent Invites"
+}
+</locale>
+
+<locale locale="pl-PL" lang="json">
+{
+  "inviteUser": "Invite Users",
+  "sentInvitations": "Sent Invites"
+}
+</locale>
+
+<locale locale="pt-PT" lang="json">
+{
+  "inviteUser": "Convidar Usuários",
+  "sentInvitations": "Convites Enviados"
+}
+</locale>
+
+<locale locale="ru-RU" lang="json">
+{
+  "inviteUser": "Пригласить пользователей",
+  "sentInvitations": "Отправленные приглашения"
+}
+</locale>
+
+<locale locale="sk-SK" lang="json">
+{
+  "inviteUser": "Invite Users",
+  "sentInvitations": "Sent Invites"
+}
+</locale>
+
+<locale locale="th-TH" lang="json">
+{
+  "inviteUser": "เชิญผู้ใช้",
+  "sentInvitations": "คำเชิญที่ส่งไปแล้ว"
+}
+</locale>
+
+<locale locale="tr-TR" lang="json">
+{
+  "inviteUser": "Kullanıcıları Davet Et",
+  "sentInvitations": "Gönderilen Davetler"
+}
+</locale>
+
+<locale locale="ug-CN" lang="json">
+{
+  "inviteUser": "Invite Users",
+  "sentInvitations": "Sent Invites"
+}
+</locale>
+
+<locale locale="uk-UA" lang="json">
+{
+  "inviteUser": "Запросити користувачів",
+  "sentInvitations": "Відправленні запрошення"
+}
+</locale>
+
+<locale locale="vi-VN" lang="json">
+{
+  "inviteUser": "Invite Users",
+  "sentInvitations": "Sent Invites"
+}
+</locale>
+
+<locale locale="zh-CN" lang="json">
+{
+  "inviteUser": "邀请用户",
+  "sentInvitations": "已发送的邀请"
+}
+</locale>
+
+<locale locale="zh-TW" lang="json">
+{
+  "inviteUser": "邀請使用者",
+  "sentInvitations": "已傳送的邀請"
+}
+</locale>

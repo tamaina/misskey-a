@@ -11,9 +11,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<MkLoading v-if="isRefreshing" :class="$style.loader" :em="true"/>
 			<i v-else class="ti ti-arrow-bar-to-down" :class="[$style.icon, { [$style.refresh]: isPulledEnough }]"></i>
 			<div :class="$style.text">
-				<template v-if="isPulledEnough">{{ i18n.ts.releaseToRefresh }}</template>
-				<template v-else-if="isRefreshing">{{ i18n.ts.refreshing }}</template>
-				<template v-else>{{ i18n.ts.pullDownToRefresh }}</template>
+				<template v-if="isPulledEnough">{{ $locale.sfc.releaseToRefresh }}</template>
+				<template v-else-if="isRefreshing">{{ $locale.sfc.refreshing }}</template>
+				<template v-else>{{ $locale.sfc.pullDownToRefresh }}</template>
 			</div>
 		</div>
 	</div>
@@ -25,7 +25,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script lang="ts" setup>
 import { onMounted, onUnmounted, ref, useTemplateRef } from 'vue';
 import { getScrollContainer } from '@@/js/scroll.js';
-import { i18n } from '@/i18n.js';
 import { isHorizontalSwipeSwiping } from '@features/ui/frontend/utility/touch.js';
 import { haptic } from '@features/ui/frontend/utility/haptic.js';
 
@@ -282,3 +281,227 @@ onUnmounted(() => {
 	}
 }
 </style>
+
+<locale locale="ar-SA" lang="json">
+{
+  "releaseToRefresh": "Release to refresh",
+  "refreshing": "Refreshing...",
+  "pullDownToRefresh": "Pull down to refresh"
+}
+</locale>
+
+<locale locale="ca-ES" lang="json">
+{
+  "releaseToRefresh": "Deixar anar per actualitzar",
+  "refreshing": "Recarregant...",
+  "pullDownToRefresh": "Llisca cap a baix per recarregar"
+}
+</locale>
+
+<locale locale="cs-CZ" lang="json">
+{
+  "releaseToRefresh": "Release to refresh",
+  "refreshing": "Refreshing...",
+  "pullDownToRefresh": "Pull down to refresh"
+}
+</locale>
+
+<locale locale="da-DK" lang="json">
+{
+  "releaseToRefresh": "Release to refresh",
+  "refreshing": "Refreshing...",
+  "pullDownToRefresh": "Pull down to refresh"
+}
+</locale>
+
+<locale locale="de-DE" lang="json">
+{
+  "releaseToRefresh": "Zum Aktualisieren loslassen",
+  "refreshing": "Wird aktualisiert...",
+  "pullDownToRefresh": "Zum Aktualisieren ziehen"
+}
+</locale>
+
+<locale locale="en-US" lang="json">
+{
+  "releaseToRefresh": "Release to refresh",
+  "refreshing": "Refreshing...",
+  "pullDownToRefresh": "Pull down to refresh"
+}
+</locale>
+
+<locale locale="es-ES" lang="json">
+{
+  "releaseToRefresh": "Suelta para recargar",
+  "refreshing": "Recargando...",
+  "pullDownToRefresh": "Tira hacia abajo para recargar"
+}
+</locale>
+
+<locale locale="fr-FR" lang="json">
+{
+  "releaseToRefresh": "Relâcher pour rafraîchir",
+  "refreshing": "Rafraîchissement...",
+  "pullDownToRefresh": "Tirer vers le bas pour rafraîchir"
+}
+</locale>
+
+<locale locale="id-ID" lang="json">
+{
+  "releaseToRefresh": "Lepaskan untuk memuat ulang",
+  "refreshing": "Sedang memuat ulang...",
+  "pullDownToRefresh": "Tarik ke bawah untuk memuat ulang"
+}
+</locale>
+
+<locale locale="it-IT" lang="json">
+{
+  "releaseToRefresh": "Rilascia per aggiornare",
+  "refreshing": "Aggiornamento...",
+  "pullDownToRefresh": "Trascinare per aggiornare"
+}
+</locale>
+
+<locale locale="ja-JP" lang="json">
+{
+  "releaseToRefresh": "離してリロード",
+  "refreshing": "リロード中",
+  "pullDownToRefresh": "引っ張ってリロード"
+}
+</locale>
+
+<locale locale="ja-KS" lang="json">
+{
+  "releaseToRefresh": "離したらリロード",
+  "refreshing": "リロードしとる",
+  "pullDownToRefresh": "引っ張ってリロードするで"
+}
+</locale>
+
+<locale locale="kab-KAB" lang="json">
+{
+  "releaseToRefresh": "Release to refresh",
+  "refreshing": "Refreshing...",
+  "pullDownToRefresh": "Pull down to refresh"
+}
+</locale>
+
+<locale locale="kn-IN" lang="json">
+{
+  "releaseToRefresh": "Release to refresh",
+  "refreshing": "Refreshing...",
+  "pullDownToRefresh": "Pull down to refresh"
+}
+</locale>
+
+<locale locale="ko-KR" lang="json">
+{
+  "releaseToRefresh": "놓아서 새로고침",
+  "refreshing": "새로고침 중",
+  "pullDownToRefresh": "아래로 내려서 새로고침"
+}
+</locale>
+
+<locale locale="nl-NL" lang="json">
+{
+  "releaseToRefresh": "Release to refresh",
+  "refreshing": "Refreshing...",
+  "pullDownToRefresh": "Pull down to refresh"
+}
+</locale>
+
+<locale locale="no-NO" lang="json">
+{
+  "releaseToRefresh": "Release to refresh",
+  "refreshing": "Refreshing...",
+  "pullDownToRefresh": "Pull down to refresh"
+}
+</locale>
+
+<locale locale="pl-PL" lang="json">
+{
+  "releaseToRefresh": "Release to refresh",
+  "refreshing": "Refreshing...",
+  "pullDownToRefresh": "Pull down to refresh"
+}
+</locale>
+
+<locale locale="pt-PT" lang="json">
+{
+  "releaseToRefresh": "Solte para atualizar",
+  "refreshing": "Atualizando...",
+  "pullDownToRefresh": "Puxe para baixo para atualizar"
+}
+</locale>
+
+<locale locale="ru-RU" lang="json">
+{
+  "releaseToRefresh": "Отпустите, чтобы обновить",
+  "refreshing": "Обновление...",
+  "pullDownToRefresh": "Опустите что бы обновить"
+}
+</locale>
+
+<locale locale="sk-SK" lang="json">
+{
+  "releaseToRefresh": "Release to refresh",
+  "refreshing": "Refreshing...",
+  "pullDownToRefresh": "Pull down to refresh"
+}
+</locale>
+
+<locale locale="th-TH" lang="json">
+{
+  "releaseToRefresh": "ปล่อยเพื่อรีเฟรช",
+  "refreshing": "กำลังรีเฟรช...",
+  "pullDownToRefresh": "ดึงลงเพื่อรีเฟรช"
+}
+</locale>
+
+<locale locale="tr-TR" lang="json">
+{
+  "releaseToRefresh": "Yenilemek için serbest bırak",
+  "refreshing": "Yenileniyor...",
+  "pullDownToRefresh": "Yenilemek için aşağı çekin"
+}
+</locale>
+
+<locale locale="ug-CN" lang="json">
+{
+  "releaseToRefresh": "Release to refresh",
+  "refreshing": "Refreshing...",
+  "pullDownToRefresh": "Pull down to refresh"
+}
+</locale>
+
+<locale locale="uk-UA" lang="json">
+{
+  "releaseToRefresh": "Відпустіть, щоб оновити",
+  "refreshing": "Оновлення...",
+  "pullDownToRefresh": "Потягніть вниз, щоб оновити"
+}
+</locale>
+
+<locale locale="vi-VN" lang="json">
+{
+  "releaseToRefresh": "Thả để làm mới",
+  "refreshing": "Đang làm mới",
+  "pullDownToRefresh": "Kéo xuống để làm mới"
+}
+</locale>
+
+<locale locale="zh-CN" lang="json">
+{
+  "releaseToRefresh": "松开以刷新",
+  "refreshing": "刷新中",
+  "pullDownToRefresh": "下拉以刷新"
+}
+</locale>
+
+<locale locale="zh-TW" lang="json">
+{
+  "releaseToRefresh": "放開以更新內容",
+  "refreshing": "載入更新中",
+  "pullDownToRefresh": "往下拉來更新內容"
+}
+</locale>

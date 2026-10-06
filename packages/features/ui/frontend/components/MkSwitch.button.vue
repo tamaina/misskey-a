@@ -5,7 +5,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <template>
 <span
-	v-tooltip="checked ? i18n.ts.itsOn : i18n.ts.itsOff"
+	v-tooltip="checked ? $locale.sfc.itsOn : $locale.sfc.itsOff"
 	:class="{
 		[$style.button]: true,
 		[$style.buttonChecked]: checked,
@@ -21,7 +21,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script lang="ts" setup>
 import { toRefs } from 'vue';
 import type { Ref } from 'vue';
-import { i18n } from '@/i18n.js';
 
 const props = withDefaults(defineProps<{
 	checked: boolean | Ref<boolean>;
@@ -90,3 +89,199 @@ const toggle = () => {
 	background: var(--MI_THEME-switchOnFg);
 }
 </style>
+
+<locale locale="ar-SA" lang="json">
+{
+  "itsOn": "مفعّل",
+  "itsOff": "معطّل"
+}
+</locale>
+
+<locale locale="ca-ES" lang="json">
+{
+  "itsOn": "Activat",
+  "itsOff": "Desactivat"
+}
+</locale>
+
+<locale locale="cs-CZ" lang="json">
+{
+  "itsOn": "Zapnuto",
+  "itsOff": "Vypnuto"
+}
+</locale>
+
+<locale locale="da-DK" lang="json">
+{
+  "itsOn": "Enabled",
+  "itsOff": "Disabled"
+}
+</locale>
+
+<locale locale="de-DE" lang="json">
+{
+  "itsOn": "Eingeschaltet",
+  "itsOff": "Ausgeschaltet"
+}
+</locale>
+
+<locale locale="en-US" lang="json">
+{
+  "itsOn": "Enabled",
+  "itsOff": "Disabled"
+}
+</locale>
+
+<locale locale="es-ES" lang="json">
+{
+  "itsOn": "¡Está encendido!",
+  "itsOff": "¡Está apagado!"
+}
+</locale>
+
+<locale locale="fr-FR" lang="json">
+{
+  "itsOn": "Activé",
+  "itsOff": "Désactivé"
+}
+</locale>
+
+<locale locale="id-ID" lang="json">
+{
+  "itsOn": "Aktif",
+  "itsOff": "Nonaktif"
+}
+</locale>
+
+<locale locale="it-IT" lang="json">
+{
+  "itsOn": "Abilitato",
+  "itsOff": "Disabilitato"
+}
+</locale>
+
+<locale locale="ja-JP" lang="json">
+{
+  "itsOn": "オンになっています",
+  "itsOff": "オフになっています"
+}
+</locale>
+
+<locale locale="ja-KS" lang="json">
+{
+  "itsOn": "オンになっとるよ",
+  "itsOff": "オフになってるで"
+}
+</locale>
+
+<locale locale="kab-KAB" lang="json">
+{
+  "itsOn": "Enabled",
+  "itsOff": "Disabled"
+}
+</locale>
+
+<locale locale="kn-IN" lang="json">
+{
+  "itsOn": "Enabled",
+  "itsOff": "Disabled"
+}
+</locale>
+
+<locale locale="ko-KR" lang="json">
+{
+  "itsOn": "켜져 있습니다",
+  "itsOff": "꺼져 있습니다"
+}
+</locale>
+
+<locale locale="nl-NL" lang="json">
+{
+  "itsOn": "Ingeschakeld",
+  "itsOff": "Uitgeschakeld"
+}
+</locale>
+
+<locale locale="no-NO" lang="json">
+{
+  "itsOn": "Enabled",
+  "itsOff": "Disabled"
+}
+</locale>
+
+<locale locale="pl-PL" lang="json">
+{
+  "itsOn": "Włączone",
+  "itsOff": "Wyłączone"
+}
+</locale>
+
+<locale locale="pt-PT" lang="json">
+{
+  "itsOn": "Ativado",
+  "itsOff": "Desativado"
+}
+</locale>
+
+<locale locale="ru-RU" lang="json">
+{
+  "itsOn": "Включено",
+  "itsOff": "Выключено"
+}
+</locale>
+
+<locale locale="sk-SK" lang="json">
+{
+  "itsOn": "Zapnuté",
+  "itsOff": "Vypnuté"
+}
+</locale>
+
+<locale locale="th-TH" lang="json">
+{
+  "itsOn": "เปิดใช้งาน",
+  "itsOff": "ปิดใช้งาน"
+}
+</locale>
+
+<locale locale="tr-TR" lang="json">
+{
+  "itsOn": "Etkin",
+  "itsOff": "Devre Dışı"
+}
+</locale>
+
+<locale locale="ug-CN" lang="json">
+{
+  "itsOn": "Enabled",
+  "itsOff": "Disabled"
+}
+</locale>
+
+<locale locale="uk-UA" lang="json">
+{
+  "itsOn": "Увімкнено",
+  "itsOff": "Вимкнено"
+}
+</locale>
+
+<locale locale="vi-VN" lang="json">
+{
+  "itsOn": "Đã bật",
+  "itsOff": "Đã tắt"
+}
+</locale>
+
+<locale locale="zh-CN" lang="json">
+{
+  "itsOn": "已开启",
+  "itsOff": "已关闭"
+}
+</locale>
+
+<locale locale="zh-TW" lang="json">
+{
+  "itsOn": "已開啟",
+  "itsOff": "已關閉"
+}
+</locale>

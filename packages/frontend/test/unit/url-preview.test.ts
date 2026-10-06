@@ -6,6 +6,7 @@
 import { describe, test, assert, afterEach } from 'vitest';
 import { render, cleanup, type RenderResult } from '@testing-library/vue';
 import type { SummalyResult } from '@misskey-dev/summaly';
+import { createInternationalization } from 'virtual:vite-vue-internationalization';
 import { components } from '@/components/index.js';
 import { directives } from '@/directives/index.js';
 import MkUrlPreview from '@features/markup/frontend/components/MkUrlPreview.vue';
@@ -31,9 +32,13 @@ describe('MkUrlPreview', () => {
 			};
 		});
 
+		const internationalization = createInternationalization({ initialLocale: 'en-US' });
+		await internationalization.ready;
+		await internationalization.loadLocale('en-US');
+
 		const result = render(MkUrlPreview, {
 			props: { url: summary.url! },
-			global: { directives, components },
+			global: { plugins: [internationalization], directives, components },
 		});
 
 		await new Promise<void>(resolve => {

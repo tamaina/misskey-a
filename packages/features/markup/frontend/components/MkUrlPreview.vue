@@ -22,7 +22,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 	</div>
 	<div :class="$style.action">
 		<MkButton :small="true" inline @click="playerEnabled = false">
-			<i class="ti ti-x"></i> {{ i18n.ts.disablePlayer }}
+			<i class="ti ti-x"></i> {{ $locale.sfc.disablePlayer }}
 		</MkButton>
 	</div>
 </template>
@@ -39,7 +39,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 	</div>
 	<div :class="$style.action">
 		<MkButton :small="true" inline @click="tweetExpanded = false">
-			<i class="ti ti-x"></i> {{ i18n.ts.close }}
+			<i class="ti ti-x"></i> {{ $locale.sfc.close }}
 		</MkButton>
 	</div>
 </template>
@@ -53,7 +53,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<h1 v-else-if="fetching" :class="$style.title"><MkEllipsis/></h1>
 				<h1 v-else :class="$style.title" :title="title ?? undefined">{{ title }}</h1>
 			</header>
-			<p v-if="unknownUrl" :class="$style.text">{{ i18n.ts.failedToPreviewUrl }}</p>
+			<p v-if="unknownUrl" :class="$style.text">{{ $locale.sfc.failedToPreviewUrl }}</p>
 			<p v-else-if="fetching" :class="$style.text"><MkEllipsis/></p>
 			<p v-else-if="description" :class="$style.text" :title="description">{{ description.length > 85 ? description.slice(0, 85) + '…' : description }}</p>
 			<footer :class="$style.footer">
@@ -67,15 +67,15 @@ SPDX-License-Identifier: AGPL-3.0-only
 	<template v-if="showActions">
 		<div v-if="tweetId" :class="$style.action">
 			<MkButton :small="true" inline @click="tweetExpanded = true">
-				<i class="ti ti-brand-x"></i> {{ i18n.ts.expandTweet }}
+				<i class="ti ti-brand-x"></i> {{ $locale.sfc.expandTweet }}
 			</MkButton>
 		</div>
 		<div v-if="!playerEnabled && player.url" :class="$style.action">
 			<MkButton :small="true" inline @click="playerEnabled = true">
-				<i class="ti ti-player-play"></i> {{ i18n.ts.enablePlayer }}
+				<i class="ti ti-player-play"></i> {{ $locale.sfc.enablePlayer }}
 			</MkButton>
 			<MkButton v-if="!isMobile" :small="true" inline @click="openPlayer()">
-				<i class="ti ti-picture-in-picture"></i> {{ i18n.ts.openInWindow }}
+				<i class="ti ti-picture-in-picture"></i> {{ $locale.sfc.openInWindow }}
 			</MkButton>
 		</div>
 	</template>
@@ -87,7 +87,6 @@ import { computed, defineAsyncComponent, onDeactivated, onUnmounted, ref } from 
 import { url as local } from '@@/js/config.js';
 import { versatileLang } from '@@/js/intl-const.js';
 import type { SummalyResult } from '@misskey-dev/summaly';
-import { i18n } from '@/i18n.js';
 import * as os from '@/os.js';
 import { deviceKind } from '@features/ui/frontend/utility/device-kind.js';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
@@ -389,3 +388,311 @@ onUnmounted(() => {
 	}
 }
 </style>
+
+<locale locale="ar-SA" lang="json">
+{
+  "disablePlayer": "أغلق مشغل الفيديو",
+  "close": "اغلق",
+  "failedToPreviewUrl": "تتعذر المعاينة",
+  "expandTweet": "وسّع التغريدة",
+  "enablePlayer": "افتح مشغل الفيديو",
+  "openInWindow": "افتح في نافذة جديدة"
+}
+</locale>
+
+<locale locale="ca-ES" lang="json">
+{
+  "disablePlayer": "Tanca el reproductor de vídeo",
+  "close": "Tanca",
+  "failedToPreviewUrl": "Vista prèvia no disponible",
+  "expandTweet": "Expandir post",
+  "enablePlayer": "Obre el reproductor de vídeo",
+  "openInWindow": "Obrir en una finestra nova"
+}
+</locale>
+
+<locale locale="cs-CZ" lang="json">
+{
+  "disablePlayer": "Zavřít video přehrávač",
+  "close": "Zavřít",
+  "failedToPreviewUrl": "Náhled se nezdařil",
+  "expandTweet": "Rozbalit tweet",
+  "enablePlayer": "Otevřít video přehrávač",
+  "openInWindow": "Otevřít v novém okně"
+}
+</locale>
+
+<locale locale="da-DK" lang="json">
+{
+  "disablePlayer": "Close video player",
+  "close": "Close",
+  "failedToPreviewUrl": "Could not preview",
+  "expandTweet": "Expand post",
+  "enablePlayer": "Open video player",
+  "openInWindow": "Open in window"
+}
+</locale>
+
+<locale locale="de-DE" lang="json">
+{
+  "disablePlayer": "Video-Player schließen",
+  "close": "Schließen",
+  "failedToPreviewUrl": "Vorschau nicht anzeigbar",
+  "expandTweet": "Tweet ausklappen",
+  "enablePlayer": "Video-Player öffnen",
+  "openInWindow": "In einem Fenster öffnen"
+}
+</locale>
+
+<locale locale="en-US" lang="json">
+{
+  "disablePlayer": "Close video player",
+  "close": "Close",
+  "failedToPreviewUrl": "Could not preview",
+  "expandTweet": "Expand post",
+  "enablePlayer": "Open video player",
+  "openInWindow": "Open in window"
+}
+</locale>
+
+<locale locale="es-ES" lang="json">
+{
+  "disablePlayer": "Cerrar reproductor",
+  "close": "Cerrar",
+  "failedToPreviewUrl": "No se pudo generar la vista previa",
+  "expandTweet": "Expandir tweet",
+  "enablePlayer": "Abrir reproductor",
+  "openInWindow": "Abrir en una ventana"
+}
+</locale>
+
+<locale locale="fr-FR" lang="json">
+{
+  "disablePlayer": "Fermer le lecteur vidéo",
+  "close": "Fermer",
+  "failedToPreviewUrl": "Aperçu d'URL échoué",
+  "expandTweet": "Étendre le tweet",
+  "enablePlayer": "Ouvrir dans le lecteur vidéo",
+  "openInWindow": "Ouvrir dans une nouvelle fenêtre"
+}
+</locale>
+
+<locale locale="id-ID" lang="json">
+{
+  "disablePlayer": "Tutup pemutar video",
+  "close": "Tutup",
+  "failedToPreviewUrl": "Tidak dapat dipratinjau",
+  "expandTweet": "Perluas utas",
+  "enablePlayer": "Buka pemutar video",
+  "openInWindow": "Buka di jendela"
+}
+</locale>
+
+<locale locale="it-IT" lang="json">
+{
+  "disablePlayer": "Chiudi",
+  "close": "Chiudi",
+  "failedToPreviewUrl": "Anteprima non disponibile",
+  "expandTweet": "Espandi tweet",
+  "enablePlayer": "Visualizza",
+  "openInWindow": "Apri in una finestra"
+}
+</locale>
+
+<locale locale="ja-JP" lang="json">
+{
+  "disablePlayer": "プレイヤーを閉じる",
+  "close": "閉じる",
+  "failedToPreviewUrl": "プレビューできません",
+  "expandTweet": "ポストを展開する",
+  "enablePlayer": "プレイヤーを開く",
+  "openInWindow": "ウィンドウで開く"
+}
+</locale>
+
+<locale locale="ja-KS" lang="json">
+{
+  "disablePlayer": "プレイヤー閉じる",
+  "close": "さいなら",
+  "failedToPreviewUrl": "プレビューできへん",
+  "expandTweet": "ポスト展開しとく",
+  "enablePlayer": "プレイヤー開く",
+  "openInWindow": "ウィンドウで開く"
+}
+</locale>
+
+<locale locale="kab-KAB" lang="json">
+{
+  "disablePlayer": "Close video player",
+  "close": "Close",
+  "failedToPreviewUrl": "Could not preview",
+  "expandTweet": "Expand post",
+  "enablePlayer": "Open video player",
+  "openInWindow": "Open in window"
+}
+</locale>
+
+<locale locale="kn-IN" lang="json">
+{
+  "disablePlayer": "Close video player",
+  "close": "Close",
+  "failedToPreviewUrl": "Could not preview",
+  "expandTweet": "Expand post",
+  "enablePlayer": "Open video player",
+  "openInWindow": "Open in window"
+}
+</locale>
+
+<locale locale="ko-KR" lang="json">
+{
+  "disablePlayer": "플레이어 닫기",
+  "close": "닫기",
+  "failedToPreviewUrl": "미리 볼 수 없음",
+  "expandTweet": "게시물 확장하기",
+  "enablePlayer": "플레이어 열기",
+  "openInWindow": "창으로 열기"
+}
+</locale>
+
+<locale locale="nl-NL" lang="json">
+{
+  "disablePlayer": "Videospeler sluiten",
+  "close": "Sluiten",
+  "failedToPreviewUrl": "Could not preview",
+  "expandTweet": "Notitie uitklappen",
+  "enablePlayer": "Videospeler openen",
+  "openInWindow": "In een venster openen"
+}
+</locale>
+
+<locale locale="no-NO" lang="json">
+{
+  "disablePlayer": "Close video player",
+  "close": "Lukk",
+  "failedToPreviewUrl": "Could not preview",
+  "expandTweet": "Expand post",
+  "enablePlayer": "Open video player",
+  "openInWindow": "Åpne i vindu"
+}
+</locale>
+
+<locale locale="pl-PL" lang="json">
+{
+  "disablePlayer": "Zamknij odtwarzacz wideo",
+  "close": "Zamknij",
+  "failedToPreviewUrl": "Could not preview",
+  "expandTweet": "Rozwiń tweet",
+  "enablePlayer": "Otwórz odtwarzacz wideo",
+  "openInWindow": "Otwórz w oknie"
+}
+</locale>
+
+<locale locale="pt-PT" lang="json">
+{
+  "disablePlayer": "Fechar o reprodutor de mídia",
+  "close": "Fechar",
+  "failedToPreviewUrl": "Não foi possível carregar prévia",
+  "expandTweet": "Expandir tweet",
+  "enablePlayer": "Abrir o reprodutor de mídia",
+  "openInWindow": "Abrir em um janela"
+}
+</locale>
+
+<locale locale="ru-RU" lang="json">
+{
+  "disablePlayer": "Выключить проигрыватель",
+  "close": "Закрыть",
+  "failedToPreviewUrl": "Предварительный просмотр недоступен",
+  "expandTweet": "Развернуть заметку",
+  "enablePlayer": "Включить проигрыватель",
+  "openInWindow": "Открыть в плавающем окне"
+}
+</locale>
+
+<locale locale="sk-SK" lang="json">
+{
+  "disablePlayer": "Zavrieť video prehrávač",
+  "close": "Zavrieť",
+  "failedToPreviewUrl": "Could not preview",
+  "expandTweet": "Rozšíriť tweet",
+  "enablePlayer": "Otvoriť video prehrávač",
+  "openInWindow": "Otvoriť v novom okne"
+}
+</locale>
+
+<locale locale="th-TH" lang="json">
+{
+  "disablePlayer": "ปิดเครื่องเล่นวิดีโอ",
+  "close": "ปิด",
+  "failedToPreviewUrl": "ไม่สามารถดูตัวอย่างได้",
+  "expandTweet": "ขยายทวีต",
+  "enablePlayer": "เปิดเครื่องเล่นวิดีโอ",
+  "openInWindow": "เปิดในหน้าต่าง"
+}
+</locale>
+
+<locale locale="tr-TR" lang="json">
+{
+  "disablePlayer": "Video oynatıcıyı kapat",
+  "close": "Kapat",
+  "failedToPreviewUrl": "Önizleme yapılamadı",
+  "expandTweet": "Notu genişlet",
+  "enablePlayer": "Video oynatıcıyı aç",
+  "openInWindow": "Pencerede aç"
+}
+</locale>
+
+<locale locale="ug-CN" lang="json">
+{
+  "disablePlayer": "Close video player",
+  "close": "Close",
+  "failedToPreviewUrl": "Could not preview",
+  "expandTweet": "Expand post",
+  "enablePlayer": "Open video player",
+  "openInWindow": "Open in window"
+}
+</locale>
+
+<locale locale="uk-UA" lang="json">
+{
+  "disablePlayer": "Закрити відеоплеєр",
+  "close": "Закрити",
+  "failedToPreviewUrl": "Не вдалося переглянути",
+  "expandTweet": "Розгорнути твіт",
+  "enablePlayer": "Відкрити відеоплеєр",
+  "openInWindow": "Відкрити у вікні"
+}
+</locale>
+
+<locale locale="vi-VN" lang="json">
+{
+  "disablePlayer": "Đóng trình phát video",
+  "close": "Đóng",
+  "failedToPreviewUrl": "Không thể xem trước",
+  "expandTweet": "Mở rộng tweet",
+  "enablePlayer": "Mở trình phát video",
+  "openInWindow": "Mở trong cửa sổ mới"
+}
+</locale>
+
+<locale locale="zh-CN" lang="json">
+{
+  "disablePlayer": "关闭播放器",
+  "close": "关闭",
+  "failedToPreviewUrl": "无法预览",
+  "expandTweet": "展开帖子",
+  "enablePlayer": "打开播放器",
+  "openInWindow": "在新窗口中打开"
+}
+</locale>
+
+<locale locale="zh-TW" lang="json">
+{
+  "disablePlayer": "關閉播放器",
+  "close": "關閉",
+  "failedToPreviewUrl": "無法預覽",
+  "expandTweet": "展開推文",
+  "enablePlayer": "開啟播放器",
+  "openInWindow": "在新視窗開啟"
+}
+</locale>

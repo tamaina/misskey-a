@@ -51,6 +51,420 @@ const migrations = [
 	{ file: 'packages/frontend/src/ui/zen.vue', keyPath: 'goToDeck' },
 ] as const;
 
+const featureMigrations = [
+	{
+		file: 'packages/features/auth/frontend/components/MkInviteCode.vue',
+		keyPaths: [
+			'used',
+			'expired',
+			'unused',
+			'copy',
+			'delete',
+			'invitationCode',
+			'inviteCodeCreator',
+			'registeredUserUsingInviteCode',
+			'unknown',
+			'waitingForMailAuth',
+			'expirationDate',
+			'inviteCodeUsedAt',
+			'createdAt',
+		],
+	},
+	{
+		file: 'packages/features/auth/frontend/components/MkSignin.passkey.vue',
+		keyPaths: [
+			'useSecurityKey',
+			'retry',
+			'useTotp',
+		],
+	},
+	{
+		file: 'packages/features/boot/frontend/ui/_common_/ReloadSuggestion.vue',
+		keyPaths: [
+			'reloadRequiredToApplySettings',
+			'reload',
+			'skip',
+		],
+	},
+	{
+		file: 'packages/features/channels/frontend/components/MkChannelFollowButton.vue',
+		keyPaths: [
+			'unfollow',
+			'follow',
+			'processing',
+		],
+	},
+	{
+		file: 'packages/features/chat/frontend/components/MkChatHistories.vue',
+		keyPaths: [
+			'you',
+			'_chat.noHistory',
+		],
+	},
+	{
+		file: 'packages/features/chat/frontend/pages/chat/home.invitations.vue',
+		keyPaths: [
+			'_chat.join',
+			'_chat.ignore',
+			'noDescription',
+			'_chat.noInvitations',
+		],
+	},
+	{
+		file: 'packages/features/chat/frontend/pages/chat/room.members.vue',
+		keyPaths: [
+			'_chat.inviteUser',
+			'_chat.sentInvitations',
+		],
+	},
+	{
+		file: 'packages/features/chat/frontend/pages/chat/room.search.vue',
+		keyPaths: [
+			'_chat.searchMessages',
+			'search',
+			'searchResult',
+		],
+	},
+	{
+		file: 'packages/features/discovery/frontend/pages/explore.featured.vue',
+		keyPaths: [
+			'notes',
+			'poll',
+		],
+	},
+	{
+		file: 'packages/features/drive/frontend/components/MkDrive.file.vue',
+		keyPaths: [
+			'avatar',
+			'banner',
+			'sensitive',
+		],
+	},
+	{
+		file: 'packages/features/drive/frontend/components/MkDriveFileSelectDialog.vue',
+		keyPaths: [
+			'selectFiles',
+			'selectFile',
+		],
+	},
+	{
+		file: 'packages/features/drive/frontend/components/MkDriveFolderSelectDialog.vue',
+		keyPaths: [
+			'selectFolders',
+			'selectFolder',
+		],
+	},
+	{
+		file: 'packages/features/drive/frontend/components/MkFileCaptionEditWindow.vue',
+		keyPaths: [
+			'describeFile',
+			'inputNewDescription',
+			'caption',
+		],
+	},
+	{
+		file: 'packages/features/drive/frontend/components/MkFileListForAdmin.vue',
+		keyPaths: [
+			'sensitive',
+			'system',
+			'registeredDate',
+		],
+	},
+	{
+		file: 'packages/features/emojis/frontend/components/MkEmojiPicker.vue',
+		keyPaths: [
+			'search',
+			'settings',
+			'recentUsed',
+			'customEmojis',
+			'other',
+			'emoji',
+		],
+	},
+	{
+		file: 'packages/features/emojis/frontend/components/MkRemoteEmojiEditDialog.vue',
+		keyPaths: [
+			'name',
+			'host',
+			'license',
+			'import',
+		],
+	},
+	{
+		file: 'packages/features/federation/frontend/components/MkRemoteCaution.vue',
+		keyPaths: [
+			'remoteUserCaution',
+			'showOnRemote',
+		],
+	},
+	{
+		file: 'packages/features/instance/frontend/pages/admin/server-rules.vue',
+		keyPaths: [
+			'serverRules',
+			'_serverRules.description',
+			'add',
+			'save',
+		],
+	},
+	{
+		file: 'packages/features/integrations/frontend/pages/admin/system-webhook.item.vue',
+		keyPaths: [
+			'edit',
+			'delete',
+		],
+	},
+	{
+		file: 'packages/features/integrations/frontend/pages/settings/webhook.new.vue',
+		keyPaths: [
+			'_webhookSettings.name',
+			'_webhookSettings.secret',
+			'_webhookSettings.trigger',
+			'_webhookSettings._events.follow',
+			'_webhookSettings._events.followed',
+			'_webhookSettings._events.note',
+			'_webhookSettings._events.reply',
+			'_webhookSettings._events.renote',
+			'_webhookSettings._events.reaction',
+			'_webhookSettings._events.mention',
+			'create',
+		],
+	},
+	{
+		file: 'packages/features/markup/frontend/components/MkCode.vue',
+		keyPaths: [
+			'code',
+			'clickToShow',
+		],
+	},
+	{
+		file: 'packages/features/markup/frontend/components/MkUrlPreview.vue',
+		keyPaths: [
+			'disablePlayer',
+			'close',
+			'failedToPreviewUrl',
+			'expandTweet',
+			'enablePlayer',
+			'openInWindow',
+		],
+	},
+	{
+		file: 'packages/features/media/frontend/components/MkLightbox.item.fileinfo.vue',
+		keyPaths: [
+			'fileName',
+			'description',
+			'none',
+		],
+	},
+	{
+		file: 'packages/features/media/frontend/components/MkMediaBanner.vue',
+		keyPaths: [
+			'sensitive',
+			'clickToShow',
+		],
+	},
+	{
+		file: 'packages/features/navigation/frontend/ui/_common_/navbar-h.vue',
+		keyPaths: [
+			'timeline',
+			'controlPanel',
+			'settings',
+		],
+	},
+	{
+		file: 'packages/features/notes/frontend/components/MkNoteMediaGrid.vue',
+		keyPaths: [
+			'sensitive',
+			'image',
+			'clickToShow',
+		],
+	},
+	{
+		file: 'packages/features/notes/frontend/components/MkVisibilityPicker.vue',
+		keyPaths: [
+			'visibility',
+			'_visibility.public',
+			'_visibility.publicDescription',
+			'_visibility.home',
+			'_visibility.homeDescription',
+			'_visibility.followers',
+			'_visibility.followersDescription',
+			'_visibility.specified',
+			'_visibility.specifiedDescription',
+		],
+	},
+	{
+		file: 'packages/features/notes/frontend/pages/user/index.files.vue',
+		keyPaths: [
+			'files',
+			'showMore',
+			'nothing',
+		],
+	},
+	{
+		file: 'packages/features/notes/frontend/pages/user/notes.vue',
+		keyPaths: [
+			'featured',
+			'notes',
+			'all',
+			'withFiles',
+		],
+	},
+	{
+		file: 'packages/features/notifications/frontend/components/MkStreamingNotificationsTimeline.vue',
+		keyPaths: [
+			'noNotifications',
+			'loadMore',
+		],
+	},
+	{
+		file: 'packages/features/pages/frontend/pages/page-editor/els/page-editor.el.note.vue',
+		keyPaths: [
+			'_pages.blocks.note',
+			'_pages.blocks._note.id',
+			'_pages.blocks._note.idDescription',
+			'_pages.blocks._note.detailed',
+		],
+	},
+	{
+		file: 'packages/features/preferences/frontend/ui/_common_/PreferenceRestore.vue',
+		keyPaths: [
+			'_preferencesBackup.backupFound',
+			'restore',
+			'skip',
+		],
+	},
+	{
+		file: 'packages/features/preferences/frontend/ui/_common_/ThemePreviewing.vue',
+		keyPaths: [
+			'previewingTheme',
+			'previewingThemeRestore',
+			'settings',
+		],
+	},
+	{
+		file: 'packages/features/relationships/frontend/pages/settings/mute-block.instance-mute.vue',
+		keyPaths: [
+			'_instanceMute.title',
+			'_instanceMute.heading',
+			'_instanceMute.instanceMuteDescription',
+			'_instanceMute.instanceMuteDescription2',
+			'save',
+		],
+	},
+	{
+		file: 'packages/features/statistics/frontend/components/MkVisitorDashboard.vue',
+		keyPaths: [
+			'headlineMisskey',
+			'invitationRequiredToRegister',
+			'federationSpecified',
+			'federationDisabled',
+			'joinThisServer',
+			'exploreOtherServers',
+			'login',
+			'users',
+			'notes',
+			'letsLookAtTimeline',
+		],
+	},
+	{
+		file: 'packages/features/timelines/frontend/components/MkAntennaEditorDialog.vue',
+		keyPaths: [
+			'createAntenna',
+			'editAntenna',
+		],
+	},
+	{
+		file: 'packages/features/timelines/frontend/components/MkStreamingNotesTimeline.vue',
+		keyPaths: [
+			'noNotes',
+			'newNote',
+			'loadMore',
+		],
+	},
+	{
+		file: 'packages/features/timelines/frontend/pages/user/index.timeline.vue',
+		keyPaths: [
+			'featured',
+			'notes',
+			'all',
+			'withFiles',
+		],
+	},
+	{
+		file: 'packages/features/ui/frontend/components/MkPullToRefresh.vue',
+		keyPaths: [
+			'releaseToRefresh',
+			'refreshing',
+			'pullDownToRefresh',
+		],
+	},
+	{
+		file: 'packages/features/ui/frontend/components/MkSpot.vue',
+		keyPaths: [
+			'goBack',
+			'next',
+			'done',
+		],
+	},
+	{
+		file: 'packages/features/ui/frontend/components/MkSwitch.button.vue',
+		keyPaths: [
+			'itsOn',
+			'itsOff',
+		],
+	},
+	{
+		file: 'packages/features/ui/frontend/components/MkTextarea.vue',
+		keyPaths: [
+			'preview',
+			'save',
+		],
+	},
+	{
+		file: 'packages/features/ui/frontend/components/global/MkSuspense.vue',
+		keyPaths: [
+			'somethingHappened',
+			'retry',
+		],
+	},
+	{
+		file: 'packages/features/users/frontend/components/MkUserInfo.vue',
+		keyPaths: [
+			'followsYou',
+			'noAccountDescription',
+			'notes',
+			'following',
+			'followers',
+		],
+	},
+	{
+		file: 'packages/features/users/frontend/components/MkUserPopup.vue',
+		keyPaths: [
+			'followsYou',
+			'noAccountDescription',
+			'notes',
+			'following',
+			'followers',
+		],
+	},
+	{
+		file: 'packages/features/users/frontend/components/MkUserSetupDialog.Follow.vue',
+		keyPaths: [
+			'_initialAccountSetting.followUsers',
+			'recommended',
+			'popularUsers',
+		],
+	},
+	{
+		file: 'packages/features/users/frontend/components/MkUserSetupDialog.User.vue',
+		keyPaths: [
+			'noAccountDescription',
+			'follow',
+			'youFollowing',
+		],
+	},
+] as const;
+
 function getLocaleValue(locale: string, keyPath: string): unknown {
 	return keyPath.split('.').reduce<unknown>((value, key) => {
 		if (value === null || typeof value !== 'object') return undefined;
@@ -80,6 +494,52 @@ describe('SFC-local locale migration', () => {
 			const expected = getLocaleValue(language, keyPath);
 			expect(typeof actual).toBe('string');
 			expect(actual).toBe(expected);
+		}
+	});
+});
+
+function countExactPropertyReference(source: string, reference: string): number {
+	let count = 0;
+	let offset = 0;
+	while (true) {
+		const index = source.indexOf(reference, offset);
+		if (index === -1) return count;
+		const next = source[index + reference.length];
+		if (next === undefined || !/[A-Za-z0-9_$]/.test(next)) count++;
+		offset = index + reference.length;
+	}
+}
+
+describe('Feature SFC-local locale migration', () => {
+	test.each(featureMigrations)('$file preserves all simple labels in all active locales', ({ file, keyPaths }) => {
+		const source = readFileSync(resolve(repoRoot, file), 'utf8');
+		const localKeys = keyPaths.map(keyPath => keyPath.split('.').at(-1)!);
+		const localeBlocks = new Map<string, Record<string, unknown>>();
+
+		for (const match of source.matchAll(/<locale\s+locale="([^"]+)"\s+lang="json">([\s\S]*?)<\/locale>/g)) {
+			expect(localeBlocks.has(match[1])).toBe(false);
+			localeBlocks.set(match[1], JSON.parse(match[2]) as Record<string, unknown>);
+		}
+
+		expect([...localeBlocks.keys()]).toEqual(languages);
+		expect(source).not.toMatch(/\bi18n\s*\./);
+		expect(source).not.toMatch(/import\s+\{\s*i18n\s*\}\s+from\s+['"]@\/i18n(?:\.js)?['"]/);
+		for (const keyPath of keyPaths) {
+			const localKey = keyPath.split('.').at(-1)!;
+			const oldReference = 'i18n.ts.' + keyPath;
+			const localReference = '$locale.sfc.' + localKey;
+			expect(countExactPropertyReference(source, oldReference)).toBe(0);
+			expect(countExactPropertyReference(source, localReference)).toBe(1);
+		}
+
+		for (const language of languages) {
+			const dictionary = localeBlocks.get(language)!;
+			expect(Object.keys(dictionary).sort()).toEqual([...localKeys].sort());
+			for (const keyPath of keyPaths) {
+				const localKey = keyPath.split('.').at(-1)!;
+				expect(typeof dictionary[localKey]).toBe('string');
+				expect(dictionary[localKey]).toBe(getLocaleValue(language, keyPath));
+			}
 		}
 	});
 });
