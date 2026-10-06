@@ -3,13 +3,10 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import * as os from 'node:os';
-import { createServerInfo, legacyServerInfoSchemas } from '@features/instance/backend';
+import { legacyServerInfoSchemas } from '@features/instance/backend';
+import type { InstanceFeature } from '@features/instance/backend';
 import type { Schema } from '@/misc/json-schema.js';
-import { Inject, Injectable } from '@nestjs/common';
 import { Endpoint } from '@/server/api/endpoint-base.js';
-import { MiMeta } from '@/models/_.js';
-import { DI } from '@/di-symbols.js';
 
 export const meta = {
 	requireCredential: false,
@@ -22,36 +19,7 @@ export const meta = {
 
 export const paramDef = legacyServerInfoSchemas.input as Schema;
 
-@Injectable()
-export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-disable-line import/no-default-export
-	constructor(
-		@Inject(DI.meta)
-		serverSettings: MiMeta,
-	) {
-		const serverInfo = createServerInfo({
-			enabled: () => serverSettings.enableServerMachineStats,
-			read: async () => {
-				const si = await import('systeminformation');
-
-				const memStats = await si.mem();
-				const fsStats = await si.fsSize();
-
-				return {
-					machine: os.hostname(),
-					cpu: {
-						model: os.cpus()[0].model,
-						cores: os.cpus().length,
-					},
-					mem: {
-						total: memStats.total,
-					},
-					fs: {
-						total: fsStats[0].size,
-						used: fsStats[0].used,
-					},
-				};
-			},
-		});
-		super(meta, paramDef, async params => serverInfo(params));
-	}
+export const feature = 'instance' as const;
+export function createEndpoint(instance: InstanceFeature) {
+	return new Endpoint(meta, paramDef, async params => instance['server-info'](params));
 }

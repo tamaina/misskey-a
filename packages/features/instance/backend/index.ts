@@ -43,3 +43,12 @@ export const legacyServerInfoSchemas: { input: JsonSchema; output: JsonSchema } 
 
 export { createResetCaptcha } from './reset-captcha.js';
 export type { CaptchaReset } from './reset-captcha.js';
+
+/** One feature instance per role, with explicit dependencies and no container access. */
+export function createInstance(deps: { serverInfo: ServerInfoDependencies; now?: () => number }) {
+	return {
+		ping: createPing(deps.now),
+		'server-info': createServerInfo(deps.serverInfo),
+	};
+}
+export type InstanceFeature = ReturnType<typeof createInstance>;

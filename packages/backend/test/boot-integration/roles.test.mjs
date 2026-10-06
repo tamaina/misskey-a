@@ -45,6 +45,9 @@ for (const mode of ['server', 'queue', 'combined', 'cluster', 'cluster-server', 
 			if (!mode.endsWith('queue')) {
 				const response = await fetch(`http://127.0.0.1:${config.port}/api/ping`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}', signal: AbortSignal.timeout(10000) });
 				assert.equal(response.status, 200); assert.equal(typeof (await response.json()).pong, 'number');
+				const info = await fetch(`http://127.0.0.1:${config.port}/api/server-info`, { signal: AbortSignal.timeout(10000) });
+				assert.equal(info.status, 200);
+				assert.deepEqual(await info.json(), { machine: '?', cpu: { model: '?', cores: 0 }, mem: { total: 0 }, fs: { total: 0, used: 0 } });
 				socket = new WebSocket(`ws://127.0.0.1:${config.port}/streaming`);
 				await once(socket, 'open', { signal: AbortSignal.timeout(10000) });
 			}

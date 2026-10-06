@@ -6,13 +6,16 @@
 import { Module } from '@nestjs/common';
 
 import { CoreModule } from '@/core/CoreModule.js';
+import { featureProviders, featureTokens } from './feature-providers.js';
 import * as endpointsObject from './endpoint-list.js';
 import { GetterService } from './GetterService.js';
 import { ApiLoggerService } from './ApiLoggerService.js';
 import type { Provider } from '@nestjs/common';
 
 const endpoints = Object.entries(endpointsObject);
-const endpointProviders = endpoints.map(([path, endpoint]): Provider => ({ provide: `ep:${path}`, useClass: endpoint.default }));
+const endpointProviders = endpoints.map(([path, endpoint]): Provider => 'createEndpoint' in endpoint
+	? { provide: `ep:${path}`, inject: [featureTokens[endpoint.feature]], useFactory: endpoint.createEndpoint }
+	: { provide: `ep:${path}`, useClass: endpoint.default });
 
 @Module({
 	imports: [
@@ -21,6 +24,7 @@ const endpointProviders = endpoints.map(([path, endpoint]): Provider => ({ provi
 	providers: [
 		GetterService,
 		ApiLoggerService,
+		...featureProviders,
 		...endpointProviders,
 	],
 	exports: [

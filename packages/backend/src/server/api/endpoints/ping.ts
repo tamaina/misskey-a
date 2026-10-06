@@ -3,7 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { createPing, legacyPingSchemas } from '@features/instance/backend';
+import { legacyPingSchemas } from '@features/instance/backend';
+import type { InstanceFeature } from '@features/instance/backend';
 import type { Schema } from '@/misc/json-schema.js';
 import { Endpoint } from '@/server/api/endpoint-base.js';
 
@@ -15,9 +16,7 @@ export const meta = {
 } as const;
 export const paramDef = legacyPingSchemas.input as Schema;
 
-export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-disable-line import/no-default-export
-	constructor() {
-		const ping = createPing();
-		super(meta, paramDef, async params => ping(params));
-	}
+export const feature = 'instance' as const;
+export function createEndpoint(instance: InstanceFeature) {
+	return new Endpoint(meta, paramDef, async params => instance.ping(params));
 }

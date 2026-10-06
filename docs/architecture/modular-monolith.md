@@ -184,3 +184,17 @@ shutdown hooks may run after explicit boot cleanup. Shared process telemetry is
 closed by boot after roles/workers, rather than by the first Nest context to close.
 The real-process CI covers server-only, queue-only, combined and cluster modes,
 including WebSocket closure and the absence of orphaned worker processes.
+
+## Feature-level dependency construction
+
+The instance API is constructed once per role through a typed factory. Its
+clock, current-settings predicate and metrics reader are explicit dependencies;
+constructing the feature performs no I/O. The transitional Nest composition
+boundary registers one feature provider. Migrated endpoint files export small
+transport factories instead of injectable classes. Existing endpoint policy
+metadata, validation, error handling and routes still pass through the same
+API pipeline; unmigrated handlers retain their class providers.
+
+This removes per-handler container construction from the migrated slice without
+introducing a global service locator into feature code. It does not select or
+complete the replacement container for the remaining service graph.
