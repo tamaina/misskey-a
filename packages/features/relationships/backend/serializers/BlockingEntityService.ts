@@ -7,7 +7,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { DI } from '@/di-symbols.js';
 import type { BlockingsRepository } from '@/models/_.js';
 import { awaitAll } from '@/misc/prelude/await-all.js';
-import type { Packed } from '@/misc/json-schema.js';
+import type { Packed } from '../../../index/contract/packed.js';
 import type { MiBlocking } from '../models/Blocking.js';
 import type { MiUser } from '../../../users/backend/models/User.js';
 import { bindThis } from '@/decorators.js';

@@ -8,7 +8,7 @@ import push from '@/runtime-dependencies/web-push.js';
 import * as Redis from 'ioredis';
 import { DI } from '@/di-symbols.js';
 import type { Config } from '@/config.js';
-import type { Packed } from '@/misc/json-schema.js';
+import type { Packed } from '../../../index/contract/packed.js';
 import { getNoteSummary } from '@/misc/get-note-summary.js';
 import type { MiMeta, MiSwSubscription, SwSubscriptionsRepository } from '@/models/_.js';
 import { bindThis } from '@/decorators.js';

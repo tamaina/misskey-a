@@ -11,7 +11,7 @@ import type { } from '../../../relationships/backend/models/Blocking.js';
 import { MiModerationLog } from '../models/ModerationLog.js';
 import { bindThis } from '@/decorators.js';
 import { IdService } from '../../../runtime/backend/services/IdService.js';
-import type { Packed } from '@/misc/json-schema.js';
+import type { Packed } from '../../../index/contract/packed.js';
 import { UserEntityService } from '../../../users/backend/serializers/UserEntityService.js';
 
 @Injectable()

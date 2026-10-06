@@ -10,7 +10,7 @@ import { MiWebhook, WebhookEventTypes } from '../models/Webhook.js';
 import { DI } from '@/di-symbols.js';
 import { bindThis } from '@/decorators.js';
 import { GlobalEvents } from '../../../runtime/backend/services/GlobalEventService.js';
-import type { Packed } from '@/misc/json-schema.js';
+import type { Packed } from '../../../index/contract/packed.js';
 import { QueueService } from '../../../runtime/backend/services/QueueService.js';
 import type { OnApplicationShutdown } from '@nestjs/common';
 

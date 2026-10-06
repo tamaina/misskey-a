@@ -13,7 +13,7 @@ import type { MiRole } from '../models/Role.js';
 import { bindThis } from '@/decorators.js';
 import { DEFAULT_POLICIES } from '../services/RoleService.js';
 import { IdService } from '../../../runtime/backend/services/IdService.js';
-import { Packed } from '@/misc/json-schema.js';
+import { Packed } from '../../../index/contract/packed.js';
 
 @Injectable()
 export class RoleEntityService {

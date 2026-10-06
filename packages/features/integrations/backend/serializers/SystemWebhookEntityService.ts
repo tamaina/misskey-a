@@ -8,7 +8,7 @@ import { In } from 'typeorm';
 import { DI } from '@/di-symbols.js';
 import type { MiSystemWebhook, SystemWebhooksRepository } from '@/models/_.js';
 import { bindThis } from '@/decorators.js';
-import { Packed } from '@/misc/json-schema.js';
+import { Packed } from '../../../index/contract/packed.js';
 
 @Injectable()
 export class SystemWebhookEntityService {

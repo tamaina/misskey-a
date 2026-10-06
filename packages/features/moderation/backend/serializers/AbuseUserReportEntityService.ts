@@ -10,7 +10,7 @@ import { awaitAll } from '@/misc/prelude/await-all.js';
 import type { MiAbuseUserReport } from '../models/AbuseUserReport.js';
 import { bindThis } from '@/decorators.js';
 import { IdService } from '../../../runtime/backend/services/IdService.js';
-import type { Packed } from '@/misc/json-schema.js';
+import type { Packed } from '../../../index/contract/packed.js';
 import { UserEntityService } from '../../../users/backend/serializers/UserEntityService.js';
 
 @Injectable()

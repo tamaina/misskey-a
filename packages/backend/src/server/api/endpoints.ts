@@ -4,7 +4,8 @@
  */
 
 import { permissions } from 'misskey-js';
-import type { KeyOf, Schema } from '@/misc/json-schema.js';
+import type { Schema } from '@/misc/json-schema.js';
+import type { packedRolePoliciesSchema } from '../../../../features/roles/contract/packed.js';
 
 import * as endpointsObject from './endpoint-list.js';
 
@@ -39,7 +40,7 @@ interface IEndpointMetaBase {
 	 */
 	readonly requireAdmin?: boolean;
 
-	readonly requiredRolePolicy?: KeyOf<'RolePolicies'>;
+	readonly requiredRolePolicy?: keyof typeof packedRolePoliciesSchema.entries;
 
 	/**
 	 * 引っ越し済みのユーザーによるリクエストを禁止するか

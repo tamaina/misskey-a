@@ -10,7 +10,7 @@ import { DI } from '@/di-symbols.js';
 import { RoleService } from '../../../../roles/backend/services/RoleService.js';
 import { RoleEntityService } from '../../../../roles/backend/serializers/RoleEntityService.js';
 import { IdService } from '../../../../runtime/backend/services/IdService.js';
-import { notificationRecieveConfig } from '../../../../users/backend/models/json-schema/user.js';
+import { notificationRecieveConfig } from '../../../../users/contract/notification-receive-config.js';
 
 export const meta = {
 	tags: ['admin'],

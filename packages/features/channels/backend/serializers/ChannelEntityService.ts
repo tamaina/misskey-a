@@ -15,7 +15,7 @@ import type {
 	MiNote,
 	NotesRepository,
 } from '@/models/_.js';
-import type { Packed } from '@/misc/json-schema.js';
+import type { Packed } from '../../../index/contract/packed.js';
 import type { MiUser } from '../../../users/backend/models/User.js';
 import type { MiChannel } from '../models/Channel.js';
 import { bindThis } from '@/decorators.js';

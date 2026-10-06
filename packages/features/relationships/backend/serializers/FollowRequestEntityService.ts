@@ -10,7 +10,7 @@ import type { } from '../models/Blocking.js';
 import type { MiUser } from '../../../users/backend/models/User.js';
 import type { MiFollowRequest } from '../models/FollowRequest.js';
 import { bindThis } from '@/decorators.js';
-import type { Packed } from '@/misc/json-schema.js';
+import type { Packed } from '../../../index/contract/packed.js';
 import { UserEntityService } from '../../../users/backend/serializers/UserEntityService.js';
 
 @Injectable()

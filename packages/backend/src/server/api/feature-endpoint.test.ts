@@ -3,8 +3,10 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import type { Packed, KeyOf, SchemaType } from '@/misc/json-schema.js';
+import type { Packed } from '../../../../features/index/contract/packed.js';
+import type { SchemaType } from '@/misc/json-schema.js';
 import type { EmojiSimple, EmojiDetailed } from '@features/emojis/contract';
+import type { packedEmojiSimpleSchema } from '../../../../features/emojis/contract/packed.js';
 import { expect, expectTypeOf, test, vi } from 'vitest';
 import type { InstanceFeature } from '@features/instance/backend';
 import type { StatisticsFeature } from '@features/statistics/backend';
@@ -34,7 +36,7 @@ test('feature mismatches and non-handler factories are compile-time errors', () 
 test('legacy packed emoji types resolve from the feature contract', () => {
 	expectTypeOf<Packed<'EmojiSimple'>>().toEqualTypeOf<EmojiSimple>();
 	expectTypeOf<Packed<'EmojiDetailed'>>().toEqualTypeOf<EmojiDetailed>();
-	expectTypeOf<KeyOf<'EmojiSimple'>>().toEqualTypeOf<keyof EmojiSimple>();
+	expectTypeOf<keyof typeof packedEmojiSimpleSchema.entries>().toEqualTypeOf<keyof EmojiSimple>();
 	expectTypeOf<SchemaType<{ type: 'object'; ref: 'EmojiDetailed' }>>().toEqualTypeOf<EmojiDetailed>();
 	expectTypeOf<Packed<'EmojiSimple'>['localOnly']>().toEqualTypeOf<boolean | undefined>();
 	expectTypeOf<Packed<'EmojiDetailed'>['host']>().toEqualTypeOf<string | null>();

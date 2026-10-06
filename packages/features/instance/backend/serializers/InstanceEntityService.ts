@@ -4,7 +4,7 @@
  */
 
 import { Inject, Injectable } from '@nestjs/common';
-import type { Packed } from '@/misc/json-schema.js';
+import type { Packed } from '../../../index/contract/packed.js';
 import type { MiInstance } from '../../../federation/backend/models/Instance.js';
 import { bindThis } from '@/decorators.js';
 import { UtilityService } from '@/core/UtilityService.js';

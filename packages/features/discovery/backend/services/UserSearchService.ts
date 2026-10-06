@@ -11,7 +11,7 @@ import { bindThis } from '@/decorators.js';
 import { sqlLikeEscape } from '@/misc/sql-like-escape.js';
 import type { Config } from '@/config.js';
 import { UserEntityService } from '../../../users/backend/serializers/UserEntityService.js';
-import { Packed } from '@/misc/json-schema.js';
+import { Packed } from '../../../index/contract/packed.js';
 
 function defaultActiveThreshold() {
 	return new Date(Date.now() - 1000 * 60 * 60 * 24 * 30);

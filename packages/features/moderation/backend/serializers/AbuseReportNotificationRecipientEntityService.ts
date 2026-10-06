@@ -9,7 +9,7 @@ import { DI } from '@/di-symbols.js';
 import type { AbuseReportNotificationRecipientRepository, MiAbuseReportNotificationRecipient } from '@/models/_.js';
 import { bindThis } from '@/decorators.js';
 import { UserEntityService } from '../../../users/backend/serializers/UserEntityService.js';
-import { Packed } from '@/misc/json-schema.js';
+import { Packed } from '../../../index/contract/packed.js';
 import { SystemWebhookEntityService } from '../../../integrations/backend/serializers/SystemWebhookEntityService.js';
 
 @Injectable()

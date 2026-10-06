@@ -15,7 +15,7 @@ import { QueueService } from '../../../runtime/backend/services/QueueService.js'
 import { ModerationLogService } from '../../../moderation/backend/services/ModerationLogService.js';
 import { LoggerService } from '../../../runtime/backend/services/LoggerService.js';
 import Logger from '@/logger.js';
-import { Packed } from '@/misc/json-schema.js';
+import { Packed } from '../../../index/contract/packed.js';
 import { AbuseReportResolveType } from '../../../moderation/backend/models/AbuseUserReport.js';
 import { ModeratorInactivityRemainingTime } from '../../../moderation/backend/jobs/CheckModeratorsActivityProcessorService.js';
 import type { OnApplicationShutdown } from '@nestjs/common';

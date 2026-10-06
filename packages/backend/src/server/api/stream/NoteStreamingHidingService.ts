@@ -9,7 +9,7 @@ import { bindThis } from '@/decorators.js';
 import { NoteEntityService } from '../../../../../features/notes/backend/serializers/NoteEntityService.js';
 import { deepClone } from '@/misc/clone.js';
 import { isRenotePacked, isQuotePacked } from '@/misc/is-renote.js';
-import type { Packed } from '@/misc/json-schema.js';
+import type { Packed } from '../../../../../features/index/contract/packed.js';
 import type { MiUser } from '../../../../../features/users/backend/models/User.js';
 import type { MiMeta } from '@/models/_.js';
 

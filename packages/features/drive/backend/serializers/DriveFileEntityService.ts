@@ -8,7 +8,7 @@ import { In } from 'typeorm';
 import { DI } from '@/di-symbols.js';
 import type { DriveFilesRepository, MiMeta } from '@/models/_.js';
 import type { Config } from '@/config.js';
-import type { Packed } from '@/misc/json-schema.js';
+import type { Packed } from '../../../index/contract/packed.js';
 import { awaitAll } from '@/misc/prelude/await-all.js';
 import type { MiUser } from '../../../users/backend/models/User.js';
 import type { MiDriveFile } from '../models/DriveFile.js';

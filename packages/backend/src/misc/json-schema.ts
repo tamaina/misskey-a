@@ -3,158 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import type { EmojiPacked } from '@features/emojis/contract';
-
-import {
-	packedMeDetailedOnlySchema,
-	packedMeDetailedSchema,
-	packedUserDetailedNotMeOnlySchema,
-	packedUserDetailedNotMeSchema,
-	packedUserDetailedSchema,
-	packedUserLiteSchema,
-	packedUserSchema,
-} from '../../../features/users/backend/models/json-schema/user.js';
-import { packedNoteSchema } from '../../../features/notes/backend/models/json-schema/note.js';
-import { packedUserListSchema } from '../../../features/relationships/backend/models/json-schema/user-list.js';
-import { packedAppSchema } from '../../../features/auth/backend/models/json-schema/app.js';
-import { packedNotificationSchema } from '../../../features/notifications/backend/models/json-schema/notification.js';
-import { packedDriveFileSchema } from '../../../features/drive/backend/models/json-schema/drive-file.js';
-import { packedDriveFolderSchema } from '../../../features/drive/backend/models/json-schema/drive-folder.js';
-import { packedFollowingSchema } from '../../../features/relationships/backend/models/json-schema/following.js';
-import { packedMutingSchema } from '../../../features/relationships/backend/models/json-schema/muting.js';
-import { packedRenoteMutingSchema } from '../../../features/relationships/backend/models/json-schema/renote-muting.js';
-import { packedBlockingSchema } from '../../../features/relationships/backend/models/json-schema/blocking.js';
-import { packedNoteReactionSchema, packedNoteReactionWithNoteSchema } from '../../../features/notes/backend/models/json-schema/note-reaction.js';
-import { packedHashtagSchema } from '../../../features/discovery/backend/models/json-schema/hashtag.js';
-import { packedInviteCodeSchema } from '../../../features/auth/backend/models/json-schema/invite-code.js';
-import { packedPageBlockSchema, packedPageSchema } from '../../../features/pages/backend/models/json-schema/page.js';
-import { packedNoteFavoriteSchema } from '../../../features/collections/backend/models/json-schema/note-favorite.js';
-import { packedChannelSchema } from '../../../features/channels/backend/models/json-schema/channel.js';
-import { packedAntennaSchema } from '../../../features/timelines/backend/models/json-schema/antenna.js';
-import { packedClipSchema } from '../../../features/collections/backend/models/json-schema/clip.js';
-import { packedFederationInstanceSchema } from '../../../features/federation/backend/models/json-schema/federation-instance.js';
-import {
-	packedQueueCountSchema,
-	packedQueueMetricsSchema,
-	packedQueueJobSchema,
-} from '../../../features/operations/backend/models/json-schema/queue.js';
-import { packedGalleryPostSchema } from '../../../features/gallery/backend/models/json-schema/gallery-post.js';
-import {
-	packedEmojiDetailedAdminSchema,
-	packedEmojiDetailedSchema,
-	packedEmojiSimpleSchema,
-} from '../../../features/emojis/backend/models/json-schema/emoji.js';
-import { packedFlashSchema } from '../../../features/play/backend/models/json-schema/flash.js';
-import { packedAnnouncementSchema } from '../../../features/announcements/backend/models/json-schema/announcement.js';
-import { packedSigninSchema } from '../../../features/auth/backend/models/json-schema/signin.js';
-import {
-	packedRoleCondFormulaFollowersOrFollowingOrNotesSchema,
-	packedRoleCondFormulaLogicsSchema,
-	packedRoleCondFormulaValueAssignedRoleSchema,
-	packedRoleCondFormulaValueCreatedSchema,
-	packedRoleCondFormulaValueIsLocalOrRemoteSchema,
-	packedRoleCondFormulaValueNot,
-	packedRoleCondFormulaValueSchema,
-	packedRoleCondFormulaValueUserSettingBooleanSchema,
-	packedRoleLiteSchema,
-	packedRolePoliciesSchema,
-	packedRoleSchema,
-} from '../../../features/roles/backend/models/json-schema/role.js';
-import { packedAdSchema } from '../../../features/instance/backend/models/json-schema/ad.js';
-import { packedReversiGameDetailedSchema, packedReversiGameLiteSchema } from '../../../features/games/backend/models/json-schema/reversi-game.js';
-import {
-	packedMetaDetailedOnlySchema,
-	packedMetaDetailedSchema,
-	packedMetaLiteSchema,
-	packedMetaClientOptionsSchema,
-} from '../../../features/instance/backend/models/json-schema/meta.js';
-import { packedUserWebhookSchema } from '../../../features/integrations/backend/models/json-schema/user-webhook.js';
-import { packedSystemWebhookSchema } from '../../../features/integrations/backend/models/json-schema/system-webhook.js';
-import { packedAbuseReportNotificationRecipientSchema } from '../../../features/moderation/backend/models/json-schema/abuse-report-notification-recipient.js';
-import { packedChatMessageSchema, packedChatMessageLiteSchema, packedChatMessageLiteForRoomSchema, packedChatMessageLiteFor1on1Schema } from '../../../features/chat/backend/models/json-schema/chat-message.js';
-import { packedChatRoomSchema } from '../../../features/chat/backend/models/json-schema/chat-room.js';
-import { packedChatRoomInvitationSchema } from '../../../features/chat/backend/models/json-schema/chat-room-invitation.js';
-import { packedChatRoomMembershipSchema } from '../../../features/chat/backend/models/json-schema/chat-room-membership.js';
-import { packedAchievementNameSchema, packedAchievementSchema } from '../../../features/users/backend/models/json-schema/achievement.js';
-import { packedNoteDraftSchema } from '../../../features/notes/backend/models/json-schema/note-draft.js';
-
-export const refs = {
-	UserLite: packedUserLiteSchema,
-	UserDetailedNotMeOnly: packedUserDetailedNotMeOnlySchema,
-	MeDetailedOnly: packedMeDetailedOnlySchema,
-	UserDetailedNotMe: packedUserDetailedNotMeSchema,
-	MeDetailed: packedMeDetailedSchema,
-	UserDetailed: packedUserDetailedSchema,
-	User: packedUserSchema,
-
-	UserList: packedUserListSchema,
-	Achievement: packedAchievementSchema,
-	AchievementName: packedAchievementNameSchema,
-	Ad: packedAdSchema,
-	Announcement: packedAnnouncementSchema,
-	App: packedAppSchema,
-	Note: packedNoteSchema,
-	NoteDraft: packedNoteDraftSchema,
-	NoteReaction: packedNoteReactionSchema,
-	NoteReactionWithNote: packedNoteReactionWithNoteSchema,
-	NoteFavorite: packedNoteFavoriteSchema,
-	Notification: packedNotificationSchema,
-	DriveFile: packedDriveFileSchema,
-	DriveFolder: packedDriveFolderSchema,
-	Following: packedFollowingSchema,
-	Muting: packedMutingSchema,
-	RenoteMuting: packedRenoteMutingSchema,
-	Blocking: packedBlockingSchema,
-	Hashtag: packedHashtagSchema,
-	InviteCode: packedInviteCodeSchema,
-	Page: packedPageSchema,
-	PageBlock: packedPageBlockSchema,
-	Channel: packedChannelSchema,
-	QueueCount: packedQueueCountSchema,
-	QueueMetrics: packedQueueMetricsSchema,
-	QueueJob: packedQueueJobSchema,
-	Antenna: packedAntennaSchema,
-	Clip: packedClipSchema,
-	FederationInstance: packedFederationInstanceSchema,
-	GalleryPost: packedGalleryPostSchema,
-	EmojiSimple: packedEmojiSimpleSchema,
-	EmojiDetailed: packedEmojiDetailedSchema,
-	EmojiDetailedAdmin: packedEmojiDetailedAdminSchema,
-	Flash: packedFlashSchema,
-	Signin: packedSigninSchema,
-	RoleCondFormulaLogics: packedRoleCondFormulaLogicsSchema,
-	RoleCondFormulaValueNot: packedRoleCondFormulaValueNot,
-	RoleCondFormulaValueIsLocalOrRemote: packedRoleCondFormulaValueIsLocalOrRemoteSchema,
-	RoleCondFormulaValueUserSettingBooleanSchema: packedRoleCondFormulaValueUserSettingBooleanSchema,
-	RoleCondFormulaValueAssignedRole: packedRoleCondFormulaValueAssignedRoleSchema,
-	RoleCondFormulaValueCreated: packedRoleCondFormulaValueCreatedSchema,
-	RoleCondFormulaFollowersOrFollowingOrNotes: packedRoleCondFormulaFollowersOrFollowingOrNotesSchema,
-	RoleCondFormulaValue: packedRoleCondFormulaValueSchema,
-	RoleLite: packedRoleLiteSchema,
-	Role: packedRoleSchema,
-	RolePolicies: packedRolePoliciesSchema,
-	ReversiGameLite: packedReversiGameLiteSchema,
-	ReversiGameDetailed: packedReversiGameDetailedSchema,
-	MetaLite: packedMetaLiteSchema,
-	MetaDetailedOnly: packedMetaDetailedOnlySchema,
-	MetaDetailed: packedMetaDetailedSchema,
-	MetaClientOptions: packedMetaClientOptionsSchema,
-	UserWebhook: packedUserWebhookSchema,
-	SystemWebhook: packedSystemWebhookSchema,
-	AbuseReportNotificationRecipient: packedAbuseReportNotificationRecipientSchema,
-	ChatMessage: packedChatMessageSchema,
-	ChatMessageLite: packedChatMessageLiteSchema,
-	ChatMessageLiteFor1on1: packedChatMessageLiteFor1on1Schema,
-	ChatMessageLiteForRoom: packedChatMessageLiteForRoomSchema,
-	ChatRoom: packedChatRoomSchema,
-	ChatRoomInvitation: packedChatRoomInvitationSchema,
-	ChatRoomMembership: packedChatRoomMembershipSchema,
-};
-
-export type Packed<x extends keyof typeof refs> = x extends keyof EmojiPacked ? EmojiPacked[x] : SchemaType<typeof refs[x]>;
-
-export type KeyOf<x extends keyof typeof refs> = x extends keyof EmojiPacked ? keyof EmojiPacked[x] : PropertiesToUnion<typeof refs[x]>;
-type PropertiesToUnion<p extends Schema> = p['properties'] extends NonNullable<Obj> ? keyof p['properties'] : never;
+import type { Packed } from '../../../features/index/contract/packed.js';
+import { packedSchemas } from '../../../features/index/contract/packed.js';
 
 type TypeStringef = 'null' | 'boolean' | 'integer' | 'number' | 'string' | 'array' | 'object' | 'any';
 type StringDefToType<T extends TypeStringef> =
@@ -186,7 +36,7 @@ export interface Schema extends OfSchema {
 	readonly description?: string;
 	readonly example?: any;
 	readonly format?: string;
-	readonly ref?: keyof typeof refs;
+	readonly ref?: keyof typeof packedSchemas;
 	readonly selfRef?: boolean;
 	readonly enum?: ReadonlyArray<string | null>;
 	readonly default?: (this['type'] extends TypeStringef ? StringDefToType<this['type']> : any) | null;
@@ -248,7 +98,7 @@ type ArrayUnion<T> = T extends any ? Array<T> : never;
 type ArrayToTuple<X extends ReadonlyArray<Schema>> = { [K in keyof X]: SchemaType<X[K]> };
 
 type ObjectSchemaTypeDef<p extends Schema> =
-	p['ref'] extends keyof typeof refs ? Packed<p['ref']> :
+	p['ref'] extends keyof typeof packedSchemas ? Packed<p['ref']> :
 	p['properties'] extends NonNullable<Obj> ?
 		p['anyOf'] extends ReadonlyArray<Schema> ? p['anyOf'][number]['required'] extends ReadonlyArray<keyof p['properties']> ?
 			UnionObjType<p['properties'], NonNullable<p['anyOf'][number]['required']>> & ObjType<p['properties'], NonNullable<p['required']>>

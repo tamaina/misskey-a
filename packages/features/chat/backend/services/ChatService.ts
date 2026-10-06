@@ -22,7 +22,7 @@ import { QueryService } from '@/core/QueryService.js';
 import { RoleService } from '../../../roles/backend/services/RoleService.js';
 import { UserFollowingService } from '../../../relationships/backend/services/UserFollowingService.js';
 import { MiChatRoomInvitation } from '../models/ChatRoomInvitation.js';
-import { Packed } from '@/misc/json-schema.js';
+import { Packed } from '../../../index/contract/packed.js';
 import { sqlLikeEscape } from '@/misc/sql-like-escape.js';
 import { CustomEmojiService } from '../../../emojis/backend/services/CustomEmojiService.js';
 import { emojiRegex } from '@/misc/emoji-regex.js';

@@ -4467,8 +4467,6 @@ export type components = {
              * @example xxxxxxxxxx
              */
             renoteId?: string | null;
-            reply?: components['schemas']['Note'] | null;
-            renote?: components['schemas']['Note'] | null;
             isHidden?: boolean;
             /** @enum {string} */
             visibility: 'public' | 'home' | 'followers' | 'specified';
@@ -4504,8 +4502,7 @@ export type components = {
                 userId: string | null;
             } | null;
             localOnly?: boolean;
-            /** @enum {string|null} */
-            reactionAcceptance: 'likeOnly' | 'likeOnlyForRemote' | 'nonSensitiveOnly' | 'nonSensitiveOnlyForLocalLikeOnlyForRemote' | null;
+            reactionAcceptance: ('likeOnly' | 'likeOnlyForRemote' | 'nonSensitiveOnly' | 'nonSensitiveOnlyForLocalLikeOnlyForRemote') | null;
             reactionEmojis: {
                 [key: string]: string;
             };
@@ -4521,6 +4518,8 @@ export type components = {
             clippedCount?: number;
             hasPoll?: boolean;
             myReaction?: string | null;
+            reply?: components['schemas']['Note'] | null;
+            renote?: components['schemas']['Note'] | null;
         };
         NoteDraft: {
             /**
@@ -4565,8 +4564,7 @@ export type components = {
                 userId: string | null;
             } | null;
             localOnly: boolean;
-            /** @enum {string|null} */
-            reactionAcceptance: 'likeOnly' | 'likeOnlyForRemote' | 'nonSensitiveOnly' | 'nonSensitiveOnlyForLocalLikeOnlyForRemote' | null;
+            reactionAcceptance: ('likeOnly' | 'likeOnlyForRemote' | 'nonSensitiveOnly' | 'nonSensitiveOnlyForLocalLikeOnlyForRemote') | null;
             scheduledAt: number | null;
             isActuallyScheduled: boolean;
         };
@@ -4692,7 +4690,7 @@ export type components = {
             createdAt: string;
             /** @enum {string} */
             type: 'scheduledNotePostFailed';
-            noteDraft: components['schemas']['NoteDraft'];
+            noteDraft?: components['schemas']['NoteDraft'];
         } | {
             /** Format: id */
             id: string;
@@ -4973,7 +4971,7 @@ export type components = {
             /** Format: id */
             userId: string;
             user: components['schemas']['UserLite'];
-            content: components['schemas']['PageBlock'][];
+            content: (components['schemas']['PageBlock'] | Record<string, never>)[];
             variables: Record<string, never>[];
             title: string;
             name: string;
@@ -4999,7 +4997,7 @@ export type components = {
             /** @enum {string} */
             type: 'section';
             title: string;
-            children: components['schemas']['PageBlock'][];
+            children: (components['schemas']['PageBlock'] | Record<string, never>)[];
         } | {
             id: string;
             /** @enum {string} */
@@ -5011,6 +5009,11 @@ export type components = {
             type: 'note';
             detailed: boolean;
             note: string | null;
+        } | {
+            id: string;
+            /** @enum {string} */
+            type: 'button' | 'if' | 'textarea' | 'post' | 'canvas' | 'numberInput' | 'textInput' | 'switch' | 'radioButton' | 'counter' | 'input';
+            children?: (components['schemas']['PageBlock'] | Record<string, never>)[];
         };
         Channel: {
             /**
@@ -5067,12 +5070,12 @@ export type components = {
             processedOn?: number;
             processedBy?: string;
             finishedOn?: number;
-            progress: Record<string, never>;
+            progress: number | string | boolean | unknown[] | Record<string, never>;
             attempts: number;
             delay: number;
             failedReason: string;
             stacktrace: string[];
-            returnValue: Record<string, never>;
+            returnValue: unknown;
             isFailed: boolean;
         };
         Antenna: {

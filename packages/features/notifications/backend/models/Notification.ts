@@ -10,6 +10,7 @@ import { MiAccessToken } from '../../../auth/backend/models/AccessToken.js';
 import { MiRole } from '../../../roles/backend/models/Role.js';
 import { MiDriveFile } from '../../../drive/backend/models/DriveFile.js';
 import { MiNoteDraft } from '../../../notes/backend/models/NoteDraft.js';
+import type { Packed } from '../../../index/contract/packed.js';
 
 // misskey-js の notificationTypes と同期すべし
 export type MiNotification = {
@@ -97,7 +98,7 @@ export type MiNotification = {
 	type: 'achievementEarned';
 	id: string;
 	createdAt: string;
-	achievement: string;
+	achievement: Packed<'AchievementName'>;
 } | {
 	type: 'exportCompleted';
 	id: string;

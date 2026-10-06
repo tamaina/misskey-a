@@ -7,7 +7,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { DI } from '@/di-symbols.js';
 import type { DriveFilesRepository, DriveFoldersRepository } from '@/models/_.js';
 import { awaitAll } from '@/misc/prelude/await-all.js';
-import type { Packed } from '@/misc/json-schema.js';
+import type { Packed } from '../../../index/contract/packed.js';
 import type { } from '../../../relationships/backend/models/Blocking.js';
 import type { MiDriveFolder } from '../models/DriveFolder.js';
 import { bindThis } from '@/decorators.js';

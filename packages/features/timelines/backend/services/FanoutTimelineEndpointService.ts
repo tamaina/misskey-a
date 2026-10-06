@@ -9,7 +9,7 @@ import { bindThis } from '@/decorators.js';
 import type { MiUser } from '../../../users/backend/models/User.js';
 import type { MiNote } from '../../../notes/backend/models/Note.js';
 import type { MiMeta } from '../../../instance/backend/models/Meta.js';
-import { Packed } from '@/misc/json-schema.js';
+import { Packed } from '../../../index/contract/packed.js';
 import type { NotesRepository } from '@/models/_.js';
 import { NoteEntityService } from '../../../notes/backend/serializers/NoteEntityService.js';
 import { FanoutTimelineName, FanoutTimelineService } from './FanoutTimelineService.js';

@@ -16,7 +16,7 @@ import { bindThis } from '@/decorators.js';
 import type { Antenna } from '@/server/api/endpoints/i/import-antennas.js';
 import { ApRequestCreator } from '../../../federation/backend/services/ApRequestService.js';
 import { type SystemWebhookPayload } from '../../../integrations/backend/services/SystemWebhookService.js';
-import type { Packed } from '@/misc/json-schema.js';
+import type { Packed } from '../../../index/contract/packed.js';
 import { type UserWebhookPayload } from '../../../integrations/backend/services/UserWebhookService.js';
 import type {
 	DbJobData,

@@ -4,7 +4,7 @@
  */
 
 import type { MiNote } from '../../../features/notes/backend/models/Note.js';
-import type { Packed } from '@/misc/json-schema.js';
+import type { Packed } from '../../../features/index/contract/packed.js';
 
 // NoteEntityService.isPureRenote とよしなにリンク
 

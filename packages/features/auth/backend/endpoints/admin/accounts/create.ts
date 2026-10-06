@@ -13,7 +13,7 @@ import { localUsernameSchema, passwordSchema } from '../../../../../users/backen
 import { DI } from '@/di-symbols.js';
 import type { Config } from '@/config.js';
 import { ApiError } from '@/server/api/error.js';
-import { Packed } from '@/misc/json-schema.js';
+import { Packed } from '../../../../../index/contract/packed.js';
 
 export const meta = {
 	tags: ['admin'],

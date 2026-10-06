@@ -4,7 +4,7 @@
  */
 
 import { MiNote } from '../../../features/notes/backend/models/Note.js';
-import type { Packed } from './json-schema.js';
+import type { Packed } from '../../../features/index/contract/packed.js';
 
 export function isInstanceMuted(note: Packed<'Note'> | MiNote, mutedInstances: Set<string>): boolean {
 	if (mutedInstances.has(note.user?.host ?? '')) return true;
@@ -15,7 +15,7 @@ export function isInstanceMuted(note: Packed<'Note'> | MiNote, mutedInstances: S
 }
 
 export function isUserFromMutedInstance(notif: Packed<'Notification'>, mutedInstances: Set<string>): boolean {
-	if (mutedInstances.has(notif.user?.host ?? '')) return true;
+	if ('user' in notif && mutedInstances.has(notif.user?.host ?? '')) return true;
 
 	return false;
 }

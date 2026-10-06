@@ -275,21 +275,35 @@ existing role IDs, matching the previous endpoint. Missing runtime context is
 anonymous. Roles and decorations are read anew through the existing services,
 whose cache and lifecycle ownership remain unchanged.
 
-## Contract-owned public entity schemas
+## Packed model contracts
 
-The public simple/detailed emoji models now live in the emoji feature contract.
-Legacy model references are generated from those schemas, and backend `Packed`
-and `KeyOf` resolve these migrated models from their inferred contract types.
-Unmigrated models, including the administrative emoji model, keep their existing
-schema/type path. This avoids maintaining a second public emoji field list.
+All 69 packed response model schemas now have authoritative static Valibot
+contracts in 23 feature-owned `contract/packed.ts` modules, with PageBlock split into a dependency-light contract for frontend consumers. The host composition
+registry `features/index/contract/packed.ts` maps the published model names to
+those feature definitions; backend `Packed<K>` is inferred with
+`v.InferOutput`, and OpenAPI named components are generated from the same registry.
+Definitions remain beside their owning features rather than in the registry.
 
-Optional wire properties use exact optional types, preserving compatibility for
-SDK consumers with `exactOptionalPropertyTypes`. Legacy packers can return own
-undefined properties, so the public emoji response boundary copies the object
-and omits those optional values just as JSON serialization would. It does not
-mutate the packer's object. Decoration category uses the same absent-property
-semantics. The schema bridge preserves existing references, descriptions and
-nullability; the complete generated OpenAPI document remains unchanged.
+`resultObject` preserves the runtime behavior of `v.looseObject`: extra response
+keys continue to pass through. Its schema type exposes only declared entries to
+TypeScript, so inferred `Packed<K>` types describe the declared contract fields
+without inventing an index signature for every extra runtime key. This change does
+not install global output validation on legacy endpoints, strip unknown response
+fields, or normalize stored data. Opaque-schema compatibility fixes and
+serializer/guard work remain separate API-host and feature responsibilities.
+
+This is not full endpoint-schema retirement. Legacy endpoint input `Schema` and
+`SchemaType` remain in the backend compatibility layer for the next input-contract
+phase, and inline endpoint `meta.res` schemas still use the legacy converter.
+The 69-model registry is a bounded schema migration, not a claim that every
+endpoint contract or runtime response path is fully migrated.
+
+EmojiSimple and EmojiDetailed continue to reuse their existing emoji feature
+contract schemas rather than duplicating the field lists. Optional wire properties
+use exact optional types for `exactOptionalPropertyTypes` consumers. The emoji
+response boundary still copies packed objects and omits own `undefined` properties
+as JSON serialization would; it does not mutate the packer's object. Decoration
+category retains the same absent-property semantics.
 
 ## Emoji catalog frontend
 

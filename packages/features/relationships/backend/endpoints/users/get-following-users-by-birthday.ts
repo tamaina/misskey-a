@@ -12,7 +12,7 @@ import type {
 } from '@/models/_.js';
 import { Endpoint } from '@/server/api/endpoint-base.js';
 import { UserEntityService } from '../../../../users/backend/serializers/UserEntityService.js';
-import type { Packed } from '@/misc/json-schema.js';
+import type { Packed } from '../../../../index/contract/packed.js';
 
 export const meta = {
 	tags: ['users'],

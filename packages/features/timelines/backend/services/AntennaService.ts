@@ -13,7 +13,7 @@ import { UtilityService } from '@/core/UtilityService.js';
 import { bindThis } from '@/decorators.js';
 import { DI } from '@/di-symbols.js';
 import * as Acct from '@/misc/acct.js';
-import type { Packed } from '@/misc/json-schema.js';
+import type { Packed } from '../../../index/contract/packed.js';
 import type { AntennasRepository, UserListMembershipsRepository } from '@/models/_.js';
 import type { MiAntenna } from '../models/Antenna.js';
 import type { MiNote } from '../../../notes/backend/models/Note.js';

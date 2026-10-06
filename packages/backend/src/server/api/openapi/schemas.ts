@@ -4,8 +4,9 @@
  */
 
 import { deepClone } from '@/misc/clone.js';
+import { toJsonSchemaDefs } from '@valibot/to-json-schema';
 import type { Schema } from '@/misc/json-schema.js';
-import { refs } from '@/misc/json-schema.js';
+import { packedSchemas } from '../../../../../features/index/contract/packed.js';
 
 export function convertSchemaToOpenApiSchema(schema: Schema, type: 'param' | 'res', includeSelfRef: boolean): any {
 	// optional, nullable, refはスキーマ定義に含まれないので分離しておく
@@ -54,7 +55,7 @@ export function convertSchemaToOpenApiSchema(schema: Schema, type: 'param' | 're
 	return res;
 }
 
-export function getSchemas(includeSelfRef: boolean) {
+export function getSchemas(_includeSelfRef: boolean) {
 	return {
 		Error: {
 			type: 'object',
@@ -83,8 +84,10 @@ export function getSchemas(includeSelfRef: boolean) {
 			required: ['error'],
 		},
 
-		...Object.fromEntries(
-			Object.entries(refs).map(([key, schema]) => [key, convertSchemaToOpenApiSchema(schema, 'res', includeSelfRef)]),
-		),
+		...toJsonSchemaDefs(packedSchemas, {
+			target: 'draft-2020-12',
+			typeMode: 'output',
+			overrideRef: ctx => `#/components/schemas/${ctx.referenceId}`,
+		}),
 	};
 }

@@ -21,7 +21,7 @@ import type { MiWebhook } from '../../../integrations/backend/models/Webhook.js'
 import type { MiSystemWebhook } from '../../../integrations/backend/models/SystemWebhook.js';
 import type { MiMeta } from '../../../instance/backend/models/Meta.js';
 import { MiAvatarDecoration, MiChatMessage, MiChatRoom, MiReversiGame, MiRole, MiRoleAssignment } from '@/models/_.js';
-import type { Packed } from '@/misc/json-schema.js';
+import type { Packed } from '../../../index/contract/packed.js';
 import { DI } from '@/di-symbols.js';
 import type { Config } from '@/config.js';
 import { bindThis } from '@/decorators.js';

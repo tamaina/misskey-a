@@ -27,7 +27,7 @@ import type { GlobalEvents } from '../../../runtime/backend/services/GlobalEvent
 import { GlobalEventService } from '../../../runtime/backend/services/GlobalEventService.js';
 import { IdService } from '../../../runtime/backend/services/IdService.js';
 import { ModerationLogService } from '../../../moderation/backend/services/ModerationLogService.js';
-import type { Packed } from '@/misc/json-schema.js';
+import type { Packed } from '../../../index/contract/packed.js';
 import { FanoutTimelineService } from '../../../timelines/backend/services/FanoutTimelineService.js';
 import { NotificationService } from '../../../notifications/backend/services/NotificationService.js';
 import type { OnApplicationShutdown, OnModuleInit } from '@nestjs/common';

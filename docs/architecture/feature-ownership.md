@@ -30,10 +30,12 @@ The [file allocation table](feature-file-allocation.tsv) records 419 service, se
   `boot` assembles implementations and starts/stops them. Do not import another
   feature's private repository, service implementation or Vue internals.
 - `features/index/{contract,backend,frontend}` are separate composition entries for
-  the host packages. The contract entry exports types only; the backend entry
-  gathers factories and their API types; the frontend entry keeps page loaders
-  lazy. Domain implementations must not import these aggregation entries. There
-  is no mixed root barrel and no additional package or build configuration.
+  the host packages. `contract/index.ts` exports endpoint types; `contract/packed.ts`
+  is a deliberate host registry for the 69 packed Valibot schemas and transitional
+  `Packed<K>` / JSON Schema lookup. The registry composes definitions but does not
+  own them: the 23 `features/<feature>/contract/packed.ts` modules own the 69
+  model schemas. Backend gathers factories and API types; frontend keeps page
+  loaders lazy. There is no mixed root barrel or feature-local build configuration.
 - Temporary old-path reexports are allowed for mechanical placement migration,
   explicitly marked as compatibility bridges. A move alone is not DI conversion
   or contract-first completion.
@@ -171,13 +173,15 @@ feature directories do not acquire package manifests or build configuration.
 
 The model placement checkpoint moves all 76 TypeORM entities plus the notification
 model types and instance-meta persistence helper to their owning `backend/models`.
-The [model allocation table](model-file-allocation.tsv) also records the 39 legacy
-JSON schemas awaiting their own contract migration. Host `models/_.ts`, repository
-provider composition and the shared ORM ID-column helper remain backend-owned.
-Direct legacy reexports preserve entity constructor identity; table names, columns,
-indexes, relations and migrations do not change. The User/DriveFile/DriveFolder
-cycle moves together. User/Role auxiliary exports stay with their existing files
-until a separate contract extraction, rather than changing public shape here.
+The [model allocation table](model-file-allocation.tsv) now maps the 39 removed
+packed JSON-schema source files to 23 feature `contract/packed.ts` modules (with a standalone PageBlock contract for frontend use) and all
+69 named packed models. Host `models/_.ts`, repository provider composition and the
+shared ORM ID-column helper remain backend-owned. Direct legacy entity reexports
+preserve constructor identity; table names, columns, indexes, relations and
+migrations do not change. The User/DriveFile/DriveFolder cycle moves together.
+The user notification-receive input schema was split to
+`features/users/contract/notification-receive-config.ts` and remains part of the
+legacy endpoint-input migration rather than the packed-output registry.
 
 The service/page placement checkpoint moves 90 approved core services while the
 four split-required services remain host-owned. Package-export/type-resolution
@@ -205,12 +209,21 @@ Generated story outputs remain package-owned and ignored. Imported prop types in
 feature SFCs use explicit relative paths where Vue's SFC compiler cannot discover
 the frontend package tsconfig; no feature-local configuration is introduced.
 
-It also places 39 legacy packed schemas, 17 domain streaming channel classes and
-seven ActivityPub protocol support files with direct compatibility reexports.
-Streaming scopes and request injection are unchanged; the main aggregate stream
-and generic transport remain host composition. The relocated schemas are still
-legacy JSON Schema, not completed contract-first conversions. Remaining endpoint
-implementations, DI boundaries and locale migration are tracked separately.
+It also placed the 39 packed schema files, 17 domain streaming channel classes
+and seven ActivityPub protocol support files beside their features. In the packed
+model contract checkpoint, those 39 JSON-schema files were removed and their 69
+named models moved into 23 authoritative feature `contract/packed.ts` modules and a standalone PageBlock contract.
+`features/index/contract/packed.ts` composes them for OpenAPI and `Packed<K>`
+inference. `resultObject` keeps runtime loose-object passthrough of unknown keys,
+while inferred types expose declared fields only. This adds neither global legacy
+endpoint output validation nor database normalization. Legacy endpoint input
+`Schema`/`SchemaType` and inline `meta.res` conversion remain transitional work for
+a later contract phase; opaque-schema compatibility and serializer/guard work stay
+with their respective API and feature owners; notification serialization and
+guards remain notifications-owned. Streaming scopes and request injection are
+unchanged; the main aggregate stream and generic transport remain host composition.
+Remaining endpoint implementations, DI boundaries and locale migration are
+tracked separately.
 
 Settings/admin search-index generation scans retained host pages and feature pages,
 including the feature-owned navigation indexes for HMR. Its regression test checks

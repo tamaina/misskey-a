@@ -32,7 +32,7 @@ import { DriveFileEntityService } from '../../../../drive/backend/serializers/Dr
 import { HttpRequestService } from '../../../../runtime/backend/services/HttpRequestService.js';
 import type { Config } from '@/config.js';
 import { AvatarDecorationService } from '../../../../avatar-decorations/backend/services/AvatarDecorationService.js';
-import { notificationRecieveConfig } from '../../models/json-schema/user.js';
+import { notificationRecieveConfig } from '../../../contract/notification-receive-config.js';
 import { ApiLoggerService } from '@/server/api/ApiLoggerService.js';
 import { ApiError } from '@/server/api/error.js';
 
