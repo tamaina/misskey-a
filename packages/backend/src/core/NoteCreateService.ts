@@ -57,6 +57,7 @@ import { IdentifiableError } from '@/misc/identifiable-error.js';
 import { CollapsedQueue } from '@/misc/collapsed-queue.js';
 import { CacheService } from '@/core/CacheService.js';
 import { isQuote, isRenote } from '@/misc/is-renote.js';
+import { isCreationQuote, isCreationRenote } from '@misskey-a/notes/shared';
 
 type NotificationType = 'reply' | 'renote' | 'quote' | 'mention';
 
@@ -528,7 +529,7 @@ export class NoteCreateService implements OnApplicationShutdown {
 		}
 
 		// Check blocking
-		if (this.isRenote(data) && !this.isQuote(data)) {
+		if (isCreationRenote(data) && !isCreationQuote(data)) {
 			if (data.renote.userHost === null) {
 				if (data.renote.userId !== user.id) {
 					const blocked = await this.userBlockingService.checkBlocked(data.renote.userId, user.id);
@@ -794,7 +795,7 @@ export class NoteCreateService implements OnApplicationShutdown {
 				notify: 'normal',
 			}).then(async followings => {
 				if (note.visibility !== 'specified') {
-					const isPureRenote = this.isRenote(data) && !this.isQuote(data) ? true : false;
+					const isPureRenote = isCreationRenote(data) && !isCreationQuote(data) ? true : false;
 					for (const following of followings) {
 						// TODO: ワードミュート考慮
 						let isRenoteMuted = false;
@@ -869,8 +870,8 @@ export class NoteCreateService implements OnApplicationShutdown {
 			}
 
 			// If it is renote
-			if (this.isRenote(data)) {
-				const type = this.isQuote(data) ? 'quote' : 'renote';
+			if (isCreationRenote(data)) {
+				const type = isCreationQuote(data) ? 'quote' : 'renote';
 
 				// Notify
 				if (data.renote.userHost === null) {
@@ -947,23 +948,6 @@ export class NoteCreateService implements OnApplicationShutdown {
 	}
 
 	@bindThis
-	private isRenote(note: Option): note is Option & { renote: MiNote } {
-		return note.renote != null;
-	}
-
-	@bindThis
-	private isQuote(note: Option & { renote: MiNote }): note is Option & { renote: MiNote } & (
-		{ text: string } | { cw: string } | { reply: MiNote } | { poll: IPoll } | { files: MiDriveFile[] }
-	) {
-		// NOTE: SYNC WITH misc/is-quote.ts
-		return note.text != null ||
-			note.reply != null ||
-			note.cw != null ||
-			note.poll != null ||
-			(note.files != null && note.files.length > 0);
-	}
-
-	@bindThis
 	private incRenoteCount(renote: MiNote) {
 		this.notesRepository.createQueryBuilder().update()
 			.set({
@@ -1022,7 +1006,7 @@ export class NoteCreateService implements OnApplicationShutdown {
 	private async renderNoteOrRenoteActivity(data: Option, note: MiNote) {
 		if (data.localOnly) return null;
 
-		const content = this.isRenote(data) && !this.isQuote(data)
+		const content = isCreationRenote(data) && !isCreationQuote(data)
 			? this.apRendererService.renderAnnounce(data.renote.uri ? data.renote.uri : `${this.config.url}/notes/${data.renote.id}`, note)
 			: this.apRendererService.renderCreate(await this.apRendererService.renderNote(note, false), note);
 

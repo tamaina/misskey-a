@@ -120,3 +120,9 @@ rendering. Only then extend the migration to additional feature-owned views.
   cloud environment blocks the browser's local test-server connection.
 - Existing server/queue Nest runtime and other endpoint definitions remain
   active. Remaining contracts, DI replacement and VVI migration are unfinished.
+- Note-creation renote/quote predicates now live in the notes feature's shared
+  public entry. They require only the fields they inspect, without ORM entities
+  or a DI container. The existing seven predicate cases run in isolation without
+  database setup; feature tests add null/undefined, empty text/CW and empty-file
+  cases. This does not replace NoteCreateService's remaining dependencies or
+  claim database/federation integration coverage.
