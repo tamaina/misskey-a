@@ -46,6 +46,19 @@ describe('API', () => {
 });
 
 describe('feature contracts', () => {
+	test('statistics types come from their feature contract', async () => {
+		const cli = new Misskey.api.APIClient({ origin: 'https://misskey.test' });
+		const stats = await cli.request('stats');
+		expectType<number>(stats.notesCount);
+		expectType<number>(stats.originalNotesCount);
+		expectType<number>(stats.usersCount);
+		expectType<number>(stats.originalUsersCount);
+		expectType<number>(stats.reactionsCount);
+		expectType<number>(stats.instances);
+		expectType<number>(stats.driveUsageLocal);
+		expectType<number>(stats.driveUsageRemote);
+	});
+
 	test('ping is inferred from its oRPC contract', async () => {
 		const cli = new Misskey.api.APIClient({ origin: 'https://misskey.test' });
 		expectType<{ pong: number }>(await cli.request('ping'));

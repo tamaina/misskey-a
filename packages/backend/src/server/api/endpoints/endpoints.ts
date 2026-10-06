@@ -4,9 +4,9 @@
  */
 
 import { legacyEndpointsSchemas } from '@features/instance/backend';
-import type { InstanceFeature } from '@features/instance/backend';
 import type { Schema } from '@/misc/json-schema.js';
 import { Endpoint } from '@/server/api/endpoint-base.js';
+import { defineFeatureEndpoint } from '@/server/api/feature-endpoint.js';
 
 export const meta = {
 	tags: ['meta'],
@@ -16,7 +16,4 @@ export const meta = {
 
 export const paramDef = legacyEndpointsSchemas.input as Schema;
 
-export const feature = 'instance' as const;
-export function createEndpoint(instance: InstanceFeature) {
-	return new Endpoint(meta, paramDef, async params => instance.endpoints(params));
-}
+export const { feature, createEndpoint } = defineFeatureEndpoint('instance', instance => new Endpoint(meta, paramDef, async params => instance.endpoints(params)));

@@ -4,6 +4,8 @@
  */
 
 import { describe, expect, test } from 'vitest';
+import { createStatistics } from '@features/statistics/backend';
+import { createEndpoint as createStatsEndpoint, meta as statsMeta } from './endpoints/stats.js';
 import { createInstance } from '@features/instance/backend';
 import type { EndpointDescriptor, ReadEndpoints } from '@features/instance/backend';
 import { createEndpoint as createPingEndpoint, meta as pingMeta } from './endpoints/ping.js';
@@ -102,4 +104,20 @@ describe('feature endpoint transport adapters', () => {
 		await expect(endpoint.exec({ endpoint: 'ping' }, null, null)).rejects.toBe(error);
 		await expect(endpoints.exec({}, null, null)).rejects.toBe(error);
 	});
+});
+
+test('statistics has its own feature binding and retains anonymous POST-only policy', async () => {
+	const feature = createStatistics({
+		readNotes: async () => ({ local: 2, remote: 3 }),
+		readUsers: async () => ({ local: 5, remote: 7 }),
+		countReactions: async () => 11,
+		countInstances: async () => 13,
+	});
+	await expect(createStatsEndpoint(feature).exec({}, null, null)).resolves.toEqual({
+		notesCount: 5, originalNotesCount: 2, usersCount: 12, originalUsersCount: 5,
+		reactionsCount: 11, instances: 13, driveUsageLocal: 0, driveUsageRemote: 0,
+	});
+	expect(statsMeta.requireCredential).toBe(false);
+	expect(statsMeta).not.toHaveProperty('allowGet');
+	expect(statsMeta).not.toHaveProperty('cacheSec');
 });

@@ -6,11 +6,9 @@ import { oc } from '@orpc/contract';
 import * as v from 'valibot';
 import type { InferContractRouterInputs, InferContractRouterOutputs } from '@orpc/contract';
 
-// Match the existing JSON-object input semantics, including rejection of arrays.
-export const objectParams = v.custom<Record<string, unknown>>(
-	value => value !== null && typeof value === 'object' && !Array.isArray(value),
-	'Expected a JSON object',
-);
+import { objectParams } from '../../api/contract/index.js';
+export { objectParams };
+
 export const pingResult = v.object({ pong: v.number() });
 export const onlineUsersCountResult = v.object({ count: v.number() });
 export const serverInfoResult = v.object({

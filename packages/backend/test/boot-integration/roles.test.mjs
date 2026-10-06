@@ -62,6 +62,11 @@ for (const mode of ['server', 'queue', 'combined', 'cluster', 'cluster-server', 
 				assert.deepEqual(await selfDescriptor.json(), { params: [{ name: 'endpoint', type: 'String' }] });
 				const unknownDescriptor = await post('/api/endpoint', { endpoint: 'not-a-real-endpoint' });
 				assert.equal(unknownDescriptor.status, 204);
+				const stats = await post('/api/stats', {});
+				assert.equal(stats.status, 200);
+				const totals = await stats.json();
+				for (const key of ['notesCount', 'originalNotesCount', 'usersCount', 'originalUsersCount', 'reactionsCount', 'instances']) assert.equal(typeof totals[key], 'number');
+				assert.equal(totals.driveUsageLocal, 0); assert.equal(totals.driveUsageRemote, 0);
 				const info = await fetch(`http://127.0.0.1:${config.port}/api/server-info`, { signal: AbortSignal.timeout(10000) });
 				assert.equal(info.status, 200);
 				assert.deepEqual(await info.json(), { machine: '?', cpu: { model: '?', cores: 0 }, mem: { total: 0 }, fs: { total: 0, used: 0 } });

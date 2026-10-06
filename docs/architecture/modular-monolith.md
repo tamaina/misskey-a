@@ -248,3 +248,18 @@ adapters. It checks multiple locales, reload, retry events, the login callback
 and failure to load a locale chunk. This is component/runtime coverage, not a
 claim that the complete application browser E2E suite has passed. The dot cloud's
 Chromium process socket setup is restricted; the browser execution runs in CI.
+
+
+## Multiple backend feature bindings
+
+Statistics has its own contract and backend factory. Its chart reads retain their
+sequential order, count queries retain their one-hour database cache, and the two
+counts still run concurrently. Existing zero-valued drive-usage fields are not
+reinterpreted. SDK types combine the instance and statistics contract maps.
+A typed endpoint binding ties each transport factory to the correct feature;
+backend typecheck rejects mismatched features and non-handler factories.
+
+The packed SDK consumer check uses explicit `{}` parameters for empty-input
+routes. Its legacy generated public overloads require that argument, even though
+the source implementation has a default; this convention predates the migration.
+Source-only SDK tests do not by themselves establish packed-consumer compatibility.

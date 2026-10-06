@@ -1,3 +1,4 @@
+import type { StatisticsEndpoints } from '#feature-contracts/statistics';
 import type { InstanceEndpoints } from '#feature-contracts/instance';
 import { Endpoints as Gen } from './autogen/endpoint.js';
 import { UserDetailed } from './autogen/models.js';
@@ -68,7 +69,7 @@ export type SwitchCaseResponseType<E extends keyof Endpoints, P extends Endpoint
 /* eslint-enable @stylistic/indent */
 
 export type Endpoints = Overwrite<
-	Overwrite<Gen, InstanceEndpoints>,
+	Overwrite<Gen, InstanceEndpoints & StatisticsEndpoints>,
 	{
 		'users/show': {
 			req: UsersShowRequest;
