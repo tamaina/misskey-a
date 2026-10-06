@@ -12,6 +12,7 @@ test('feature construction does not read settings, metrics, or the clock', async
 		now: () => { calls.push('clock'); return 123; },
 		serverInfo: { enabled: () => { calls.push('settings'); return false; }, read: () => { assert.fail('disabled'); } },
 		getOnlineUsersCount: { thresholdMs: 1000, countSince: async () => { calls.push('count'); return 0; } },
+		readEndpoints: async () => { calls.push('endpoints'); return []; },
 	});
 	assert.deepEqual(calls, []);
 	assert.deepEqual(await feature.ping({}), { pong: 123 });
@@ -21,7 +22,7 @@ test('feature construction does not read settings, metrics, or the clock', async
 });
 
 test('separate role instances keep their injected dependencies independent', async () => {
-	const make = now => createInstance({ now: () => now, serverInfo: { enabled: () => false, read: () => { assert.fail('disabled'); } }, getOnlineUsersCount: { thresholdMs: 1000, countSince: async () => 0 } });
+	const make = now => createInstance({ now: () => now, serverInfo: { enabled: () => false, read: () => { assert.fail('disabled'); } }, getOnlineUsersCount: { thresholdMs: 1000, countSince: async () => 0 }, readEndpoints: async () => [] });
 	const first = make(1); const second = make(2);
 	assert.deepEqual(await first.ping({}), { pong: 1 });
 	assert.deepEqual(await second.ping({}), { pong: 2 });

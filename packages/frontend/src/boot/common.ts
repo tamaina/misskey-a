@@ -5,6 +5,7 @@
 
 import { watch, version as vueVersion } from 'vue';
 import { createInternationalization } from 'virtual:vite-vue-internationalization';
+import { startComponentLocales } from '@features/boot/frontend';
 import { compareVersions } from 'compare-versions';
 import { version, lang, isSafeMode } from '@@/js/config.js';
 import defaultLightTheme from '@@/themes/l-light.json5';
@@ -261,12 +262,7 @@ export async function common(createVue: () => Promise<App<Element>>) {
 	});
 
 	const app = await createVue();
-	const componentLocales = createInternationalization({ initialLocale: lang });
-	await componentLocales.ready;
-	// VVI 1.1.3 logs initial load errors. Explicitly await a successful load
-	// before mounting, so a failed locale request cannot silently render keys.
-	await componentLocales.loadLocale(lang);
-	app.use(componentLocales);
+	await startComponentLocales(lang, createInternationalization, runtime => app.use(runtime));
 
 	if (_DEV_) {
 		app.config.performance = true;

@@ -7,18 +7,20 @@ import sharedConfig from '../shared/eslint.config.js';
 
 export default [
 	...sharedConfig,
+	{ files: ['test/browser-feature/*.mjs'], languageOptions: { globals: globals.node } },
+	{ files: ['test/browser-feature/fixture/*.js'], languageOptions: { globals: globals.browser } },
 	{
-		files: ['src/**/*.vue', '**/frontend/**/*.vue'],
+		files: ['src/**/*.vue', '**/frontend/**/*.vue', 'test/browser-feature/**/*.vue'],
 		...pluginMisskey.configs.typescript,
 	},
 	{
-		files: ['src/**/*.vue', '**/frontend/**/*.vue'],
+		files: ['src/**/*.vue', '**/frontend/**/*.vue', 'test/browser-feature/**/*.vue'],
 		// Injected by VVI's SFC transform; Volar checks dictionary members.
 		languageOptions: { globals: { $locale: 'readonly', $l: 'readonly' } },
 	},
 	...pluginVue.configs['flat/recommended'],
 	{
-		files: ['src/**/*.{ts,vue}', '**/frontend/**/*.{ts,vue}'],
+		files: ['src/**/*.{ts,vue}', '**/frontend/**/*.{ts,vue}', 'test/browser-feature/**/*.vue'],
 		ignores: ['**/*.stories.ts'],
 		languageOptions: {
 			globals: {

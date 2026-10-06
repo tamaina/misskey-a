@@ -64,4 +64,17 @@ describe('feature contracts', () => {
 		expectType<{ count: number }>(await cli.request('get-online-users-count'));
 		expectType<{ count: number }>(await cli.request('get-online-users-count', {}));
 	});
+	test('endpoint introspection is inferred from its oRPC contract', async () => {
+		const cli = new Misskey.api.APIClient({ origin: 'https://misskey.test' });
+		expectType<string[]>(await cli.request('endpoints'));
+		expectType<string[]>(await cli.request('endpoints', {}));
+
+		const result = await cli.request('endpoint', { endpoint: 'ping' });
+		expectType<{ params: { name: string; type: string }[] } | null>(result);
+
+		// @ts-expect-error endpoint is required
+		cli.request('endpoint', {});
+		// @ts-expect-error endpoint must be a string
+		cli.request('endpoint', { endpoint: 1 });
+	});
 });

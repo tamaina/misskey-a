@@ -43,8 +43,25 @@ for (const mode of ['server', 'queue', 'combined', 'cluster', 'cluster-server', 
 				child.on('message', message => { if (message === 'ok') { clearTimeout(timer); resolve(); } });
 			});
 			if (!mode.endsWith('queue')) {
-				const response = await fetch(`http://127.0.0.1:${config.port}/api/ping`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}', signal: AbortSignal.timeout(10000) });
+				const post = (path, body) => fetch(`http://127.0.0.1:${config.port}${path}`, {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify(body),
+					signal: AbortSignal.timeout(10000),
+				});
+				const response = await post('/api/ping', {});
 				assert.equal(response.status, 200); assert.equal(typeof (await response.json()).pong, 'number');
+				const endpointNames = await post('/api/endpoints', { endpoint: 'ping' });
+				assert.equal(endpointNames.status, 200);
+				assert.ok((await endpointNames.json()).includes('ping'));
+				const pingDescriptor = await post('/api/endpoint', { endpoint: 'ping' });
+				assert.equal(pingDescriptor.status, 200);
+				assert.deepEqual(await pingDescriptor.json(), { params: [] });
+				const selfDescriptor = await post('/api/endpoint', { endpoint: 'endpoint' });
+				assert.equal(selfDescriptor.status, 200);
+				assert.deepEqual(await selfDescriptor.json(), { params: [{ name: 'endpoint', type: 'String' }] });
+				const unknownDescriptor = await post('/api/endpoint', { endpoint: 'not-a-real-endpoint' });
+				assert.equal(unknownDescriptor.status, 204);
 				const info = await fetch(`http://127.0.0.1:${config.port}/api/server-info`, { signal: AbortSignal.timeout(10000) });
 				assert.equal(info.status, 200);
 				assert.deepEqual(await info.json(), { machine: '?', cpu: { model: '?', cores: 0 }, mem: { total: 0 }, fs: { total: 0, used: 0 } });

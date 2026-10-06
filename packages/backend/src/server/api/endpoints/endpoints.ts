@@ -3,50 +3,20 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Injectable } from '@nestjs/common';
+import { legacyEndpointsSchemas } from '@features/instance/backend';
+import type { InstanceFeature } from '@features/instance/backend';
+import type { Schema } from '@/misc/json-schema.js';
 import { Endpoint } from '@/server/api/endpoint-base.js';
 
-// 循環参照を回避
-let endpointsPromise: Promise<typeof import('../endpoints.js').default> | undefined;
-
-function getEndpoints() {
-	return endpointsPromise ??= import('../endpoints.js').then(module => module.default);
-}
-
 export const meta = {
-	requireCredential: false,
-
 	tags: ['meta'],
-
-	res: {
-		type: 'array',
-		optional: false, nullable: false,
-		items: {
-			type: 'string',
-			optional: false, nullable: false,
-		},
-		example: [
-			'admin/abuse-user-reports',
-			'admin/accounts/create',
-			'admin/announcements/create',
-			'...',
-		],
-	},
+	requireCredential: false,
+	res: legacyEndpointsSchemas.output as Schema,
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {},
-	required: [],
-} as const;
+export const paramDef = legacyEndpointsSchemas.input as Schema;
 
-@Injectable()
-export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-disable-line import/no-default-export
-	constructor(
-	) {
-		super(meta, paramDef, async () => {
-			const endpoints = await getEndpoints();
-			return endpoints.map(x => x.name);
-		});
-	}
+export const feature = 'instance' as const;
+export function createEndpoint(instance: InstanceFeature) {
+	return new Endpoint(meta, paramDef, async params => instance.endpoints(params));
 }

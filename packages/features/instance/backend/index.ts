@@ -5,7 +5,17 @@
 import { createProcedureClient, implement } from '@orpc/server';
 import { toJsonSchema } from '@valibot/to-json-schema';
 import type { JsonSchema } from '@valibot/to-json-schema';
-import { instanceContract, objectParams, onlineUsersCountResult, pingResult, serverInfoResult } from '../contract/index.js';
+import * as v from 'valibot';
+import {
+	endpointInput,
+	endpointResult,
+	endpointsResult,
+	instanceContract,
+	objectParams,
+	onlineUsersCountResult,
+	pingResult,
+	serverInfoResult,
+} from '../contract/index.js';
 import type { InstanceEndpoints } from '../contract/index.js';
 import { createGetOnlineUsersCount } from './get-online-users-count.js';
 import type { OnlineUsersCountDependencies } from './get-online-users-count.js';
@@ -20,6 +30,13 @@ export interface ServerInfoDependencies {
 	read(): Promise<InstanceEndpoints['server-info']['res']>;
 }
 
+export interface EndpointDescriptor {
+	name: string;
+	properties: Readonly<Record<string, { type?: string }>>;
+}
+
+export type ReadEndpoints = () => Promise<readonly EndpointDescriptor[]>;
+
 /** Check current settings on every request before reading machine information. */
 export function createServerInfo(deps: ServerInfoDependencies) {
 	return createProcedureClient(implement(instanceContract['server-info']).handler(async () => {
@@ -28,6 +45,27 @@ export function createServerInfo(deps: ServerInfoDependencies) {
 			mem: { total: 0 }, fs: { total: 0, used: 0 },
 		};
 		return deps.read();
+	}));
+}
+
+export function createEndpoints(readEndpoints: ReadEndpoints) {
+	return createProcedureClient(implement(instanceContract.endpoints).handler(async () => {
+		const endpoints = await readEndpoints();
+		return endpoints.map(endpoint => endpoint.name);
+	}));
+}
+
+export function createEndpoint(readEndpoints: ReadEndpoints) {
+	return createProcedureClient(implement(instanceContract.endpoint).handler(async ({ input: params }) => {
+		const endpoints = await readEndpoints();
+		const endpoint = endpoints.find(candidate => candidate.name === params.endpoint);
+		if (endpoint == null) return null;
+		return {
+			params: Object.entries(endpoint.properties).map(([name, property]) => ({
+				name,
+				type: property.type ? property.type.charAt(0).toUpperCase() + property.type.slice(1) : 'string',
+			})),
+		};
 	}));
 }
 
@@ -44,6 +82,30 @@ const { $schema: _serverInfoDialect, ...serverInfoOutput } = toJsonSchema(server
 export const legacyServerInfoSchemas: { input: JsonSchema; output: JsonSchema } = { input, output: serverInfoOutput };
 const { $schema: _onlineUsersCountDialect, ...onlineUsersCountOutput } = toJsonSchema(onlineUsersCountResult);
 export const legacyOnlineUsersCountSchemas: { input: JsonSchema; output: JsonSchema } = { input, output: onlineUsersCountOutput };
+const { $schema: _endpointsInputDialect, ...endpointsInput } = toJsonSchema(objectParams, {
+	overrideSchema: ({ valibotSchema }) => valibotSchema === objectParams
+		? { type: 'object', properties: {} }
+		: undefined,
+});
+const { $schema: _endpointsOutputDialect, ...endpointsOutput } = toJsonSchema(endpointsResult);
+export const legacyEndpointsSchemas: { input: JsonSchema; output: JsonSchema & { example: string[] } } = {
+	input: endpointsInput,
+	output: {
+		...endpointsOutput,
+		example: [
+			'admin/abuse-user-reports',
+			'admin/accounts/create',
+			'admin/announcements/create',
+			'...',
+		],
+	},
+};
+const { $schema: _endpointInputDialect, ...endpointInputSchema } = toJsonSchema(endpointInput);
+const { $schema: _endpointOutputDialect, ...endpointOutputSchema } = toJsonSchema(v.unwrap(endpointResult));
+export const legacyEndpointSchemas: { input: JsonSchema; output: JsonSchema & { nullable: true } } = {
+	input: endpointInputSchema,
+	output: { ...endpointOutputSchema, nullable: true },
+};
 
 export { createResetCaptcha } from './reset-captcha.js';
 export type { CaptchaReset } from './reset-captcha.js';
@@ -51,11 +113,18 @@ export { createGetOnlineUsersCount } from './get-online-users-count.js';
 export type { OnlineUsersCountDependencies } from './get-online-users-count.js';
 
 /** One feature instance per role, with explicit dependencies and no container access. */
-export function createInstance(deps: { serverInfo: ServerInfoDependencies; getOnlineUsersCount: OnlineUsersCountDependencies; now?: () => number }) {
+export function createInstance(deps: {
+	serverInfo: ServerInfoDependencies;
+	getOnlineUsersCount: OnlineUsersCountDependencies;
+	readEndpoints: ReadEndpoints;
+	now?: () => number;
+}) {
 	return {
 		ping: createPing(deps.now),
 		'server-info': createServerInfo(deps.serverInfo),
 		'get-online-users-count': createGetOnlineUsersCount(deps.getOnlineUsersCount, deps.now),
+		endpoints: createEndpoints(deps.readEndpoints),
+		endpoint: createEndpoint(deps.readEndpoints),
 	};
 }
 export type InstanceFeature = ReturnType<typeof createInstance>;

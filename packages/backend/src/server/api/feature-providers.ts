@@ -37,5 +37,16 @@ export const featureProviders: Provider[] = [{
 			thresholdMs: USER_ONLINE_THRESHOLD,
 			countSince: cutoff => usersRepository.countBy({ lastActiveDate: MoreThan(cutoff) }),
 		},
+		readEndpoints: async () => {
+			const { default: endpoints } = await import('./endpoints.js');
+			return endpoints.map(endpoint => {
+				const properties = Object.fromEntries(Object.entries(endpoint.params.properties ?? {}).map(([name, property]) => {
+					const projected: { type?: string } = {};
+					if (property.type !== undefined) projected.type = property.type;
+					return [name, projected];
+				}));
+				return { name: endpoint.name, properties };
+			});
+		},
 	}),
 }];

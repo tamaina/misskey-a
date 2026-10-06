@@ -124,6 +124,10 @@ rendering. Only then extend the migration to additional feature-owned views.
   the per-request cutoff from its clock and threshold; its adapter retains the
   existing strict `lastActiveDate > cutoff` TypeORM query. Anonymous GET/POST,
   caching, required numeric response and generated OpenAPI are unchanged.
+- Instance/endpoint and instance/endpoints use a lazy registry projection to avoid
+  an import cycle during feature construction. Their contract-derived SDK types
+  preserve required inputs, descriptor order and nullable unknown results; the
+  legacy bridge retains the HTTP 204 response for unknown names.
 - The SDK builds portable contract declarations from feature-owned source.
   Distribution and license review remains a migration task; do not publish this
   experimental SDK layout as-is.
@@ -135,7 +139,7 @@ rendering. Only then extend the migration to additional feature-owned views.
   and production build, including the legacy locale inliner, pass. This remains
   an initial feature-owned view; the wider frontend migration is not complete.
   Browser end-to-end validation is still pending because this
-  cloud environment blocks the browser's local test-server connection.
+  cloud environment restricts Chromium process socket setup.
 - Existing server/queue Nest runtime and other endpoint definitions remain
   active. Remaining contracts, DI replacement and VVI migration are unfinished.
 - Note-creation renote/quote predicates now live in the notes feature's shared
@@ -215,6 +219,15 @@ complete SFC is now passed through that transform; Vue handles its subrequests.
 A direct hook regression and mounted component tests cover this guard. Review
 and remove the guard when adopting a VVI release that handles subrequests itself.
 
+## Frontend boot phase
+
+Boot also owns the component-locale startup phase through an explicit factory
+and installer dependency. Readiness alone is insufficient with VVI 1.1.3;
+the selected locale must load successfully before installation and mounting.
+Failure is propagated without installing an incomplete runtime. Separate app
+starts remain independent. The frontend consumer supplies the concrete VVI
+factory and Vue installation callback.
+
 ## Feature-owned frontend sources
 
 The not-found view and its locale regression tests live under
@@ -225,3 +238,13 @@ resolution and compilation for these sources; no feature configuration is added.
 VVI scans the common packages directory with explicit frontend/feature patterns,
 because its scanner does not traverse `../` include globs outside its own root.
 This changes only localization's scan root, not Vite's application root.
+
+
+## Browser fixture verification
+
+A production-built Chromium fixture exercises the real navigation/result/error
+components and frontend locale boot phase with isolated application-service
+adapters. It checks multiple locales, reload, retry events, the login callback
+and failure to load a locale chunk. This is component/runtime coverage, not a
+claim that the complete application browser E2E suite has passed. The dot cloud's
+Chromium process socket setup is restricted; the browser execution runs in CI.
