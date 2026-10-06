@@ -307,6 +307,7 @@ export class NoteEntityService implements OnModuleInit {
 						where: {
 							followeeId: note.userId,
 							followerId: meId,
+							isFollowerSuspended: false,
 						},
 						take: 1,
 					}),
