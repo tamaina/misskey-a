@@ -4,11 +4,11 @@
  */
 
 import { createProcedureClient, implement } from '@orpc/server';
-import { toJsonSchema } from '@valibot/to-json-schema';
 import type { JsonSchema } from '@valibot/to-json-schema';
 import { avatarDecorationResult, avatarDecorationsContract } from '../contract/index.js';
 import type { AvatarDecorationEndpoints } from '../contract/index.js';
 import { objectParams } from '../../api/contract/index.js';
+import { toLegacyJsonSchema } from '../../api/backend/index.js';
 
 export interface AvatarDecorationsDependencies {
 	readDecorations(): Promise<readonly {
@@ -61,10 +61,6 @@ export function createAvatarDecorations(deps: AvatarDecorationsDependencies) {
 
 export type AvatarDecorationsFeature = ReturnType<typeof createAvatarDecorations>;
 
-const { $schema: _inputDialect, ...input } = toJsonSchema(objectParams, {
-	overrideSchema: ({ valibotSchema }) => valibotSchema === objectParams
-		? { type: 'object', properties: {}, additionalProperties: true }
-		: undefined,
-});
-const { $schema: _outputDialect, ...output } = toJsonSchema(avatarDecorationResult, { target: 'openapi-3.0' });
+const input = toLegacyJsonSchema(objectParams);
+const output = toLegacyJsonSchema(avatarDecorationResult, { target: 'openapi-3.0' });
 export const legacyAvatarDecorationSchemas: { input: JsonSchema; output: JsonSchema } = { input, output };

@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 import { createProcedureClient, implement } from '@orpc/server';
-import { toJsonSchema } from '@valibot/to-json-schema';
 import type { JsonSchema } from '@valibot/to-json-schema';
 import * as v from 'valibot';
 import {
@@ -19,6 +18,7 @@ import {
 import type { InstanceEndpoints } from '../contract/index.js';
 import { createGetOnlineUsersCount } from './get-online-users-count.js';
 import type { OnlineUsersCountDependencies } from './get-online-users-count.js';
+import { toLegacyJsonSchema } from '../../api/backend/index.js';
 
 /** The clock is a narrow dependency and can be replaced without a container. */
 export function createPing(now: () => number = Date.now) {
@@ -71,23 +71,19 @@ export function createEndpoint(readEndpoints: ReadEndpoints) {
 
 // Transitional documentation/AJV bridge. The Valibot schema remains authoritative.
 // These endpoints use object/string/number schemas, with response fields required.
-const { $schema: _inputDialect, ...input } = toJsonSchema(objectParams, {
-	overrideSchema: ({ valibotSchema }) => valibotSchema === objectParams
-		? { type: 'object', properties: {}, additionalProperties: true }
-		: undefined,
-});
-const { $schema: _outputDialect, ...output } = toJsonSchema(pingResult);
+const input = toLegacyJsonSchema(objectParams);
+const output = toLegacyJsonSchema(pingResult);
 export const legacyPingSchemas: { input: JsonSchema; output: JsonSchema } = { input, output };
-const { $schema: _serverInfoDialect, ...serverInfoOutput } = toJsonSchema(serverInfoResult);
+const serverInfoOutput = toLegacyJsonSchema(serverInfoResult);
 export const legacyServerInfoSchemas: { input: JsonSchema; output: JsonSchema } = { input, output: serverInfoOutput };
-const { $schema: _onlineUsersCountDialect, ...onlineUsersCountOutput } = toJsonSchema(onlineUsersCountResult);
+const onlineUsersCountOutput = toLegacyJsonSchema(onlineUsersCountResult);
 export const legacyOnlineUsersCountSchemas: { input: JsonSchema; output: JsonSchema } = { input, output: onlineUsersCountOutput };
-const { $schema: _endpointsInputDialect, ...endpointsInput } = toJsonSchema(objectParams, {
+const endpointsInput = toLegacyJsonSchema(objectParams, {
 	overrideSchema: ({ valibotSchema }) => valibotSchema === objectParams
 		? { type: 'object', properties: {} }
 		: undefined,
 });
-const { $schema: _endpointsOutputDialect, ...endpointsOutput } = toJsonSchema(endpointsResult);
+const endpointsOutput = toLegacyJsonSchema(endpointsResult);
 export const legacyEndpointsSchemas: { input: JsonSchema; output: JsonSchema & { example: string[] } } = {
 	input: endpointsInput,
 	output: {
@@ -100,8 +96,8 @@ export const legacyEndpointsSchemas: { input: JsonSchema; output: JsonSchema & {
 		],
 	},
 };
-const { $schema: _endpointInputDialect, ...endpointInputSchema } = toJsonSchema(endpointInput);
-const { $schema: _endpointOutputDialect, ...endpointOutputSchema } = toJsonSchema(v.unwrap(endpointResult));
+const endpointInputSchema = toLegacyJsonSchema(endpointInput);
+const endpointOutputSchema = toLegacyJsonSchema(v.unwrap(endpointResult));
 export const legacyEndpointSchemas: { input: JsonSchema; output: JsonSchema & { nullable: true } } = {
 	input: endpointInputSchema,
 	output: { ...endpointOutputSchema, nullable: true },

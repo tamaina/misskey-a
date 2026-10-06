@@ -4,10 +4,10 @@
  */
 
 import { createProcedureClient, implement } from '@orpc/server';
-import { toJsonSchema } from '@valibot/to-json-schema';
 import type { JsonSchema } from '@valibot/to-json-schema';
 import { statisticsContract, statsResult } from '../contract/index.js';
 import { objectParams } from '../../api/contract/index.js';
+import { toLegacyJsonSchema } from '../../api/backend/index.js';
 import type { StatisticsEndpoints } from '../contract/index.js';
 
 export interface StatisticsDependencies {
@@ -51,10 +51,6 @@ export function createStatistics(deps: StatisticsDependencies) {
 
 export type StatisticsFeature = ReturnType<typeof createStatistics>;
 
-const { $schema: _inputDialect, ...input } = toJsonSchema(objectParams, {
-	overrideSchema: ({ valibotSchema }) => valibotSchema === objectParams
-		? { type: 'object', properties: {}, additionalProperties: true }
-		: undefined,
-});
-const { $schema: _outputDialect, ...output } = toJsonSchema(statsResult);
+const input = toLegacyJsonSchema(objectParams);
+const output = toLegacyJsonSchema(statsResult);
 export const legacyStatsSchemas: { input: JsonSchema; output: JsonSchema } = { input, output };
