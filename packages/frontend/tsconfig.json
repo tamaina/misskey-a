@@ -25,7 +25,8 @@
 		"skipLibCheck": true,
 		"paths": {
 			"@/*": ["./src/*"],
-			"@@/*": ["../frontend-shared/*"]
+			"@@/*": ["../frontend-shared/*"],
+			"@features/*": ["../features/*/index.ts"]
 		},
 		"typeRoots": [
 			"./@types",
@@ -54,7 +55,10 @@
 		"./src/**/*.vue",
 		"./test/**/*.ts",
 		"./test/**/*.vue",
-		"./@types/**/*.ts"
+		"./@types/**/*.ts",
+		"../features/*/frontend/**/*.ts",
+		"../features/*/frontend/**/*.vue",
+		"../features/*/shared/**/*.ts"
 	],
 	"exclude": [
 		"./src/**/*.stories.ts"

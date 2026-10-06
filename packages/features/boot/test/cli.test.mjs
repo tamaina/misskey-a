@@ -4,7 +4,7 @@
  */
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { runCli } from '../built/backend/index.js';
+import { runCli } from '../../../backend/built/features/boot/backend.js';
 
 function harness() {
 	const messages = [];

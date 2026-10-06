@@ -9,14 +9,6 @@ const _filename = fileURLToPath(import.meta.url);
 const _dirname = dirname(_filename);
 const _package = JSON.parse(fs.readFileSync(_dirname + '/package.json', 'utf-8'));
 
-// Workspace contracts expose generated declarations. A standalone SDK build
-// must build its workspace dependencies first, including on a clean CI runner.
-await execa('pnpm', ['--filter', `${_package.name}^...`, '-r', 'build'], {
-	cwd: _dirname,
-	stdout: process.stdout,
-	stderr: process.stderr,
-});
-
 const entryPoints = fs.globSync('./src/**/**.{ts,tsx}');
 
 /** @type {import('esbuild').BuildOptions} */
@@ -37,6 +29,13 @@ const args = process.argv.slice(2).map(arg => arg.toLowerCase());
 if (!args.includes('--no-clean')) {
 	fs.rmSync('./built', { recursive: true, force: true });
 }
+
+// Contracts remain feature-owned source; the SDK owns their portable build.
+await execa('tsc', ['-p', 'tsconfig.contracts.json'], {
+	cwd: _dirname, stdout: process.stdout, stderr: process.stderr,
+});
+// Feature contracts retain the repository's license inside generated SDK artifacts.
+fs.copyFileSync(_dirname + '/../../LICENSE', _dirname + '/built/contracts/LICENSE');
 
 if (args.includes('--watch')) {
 	await watchSrc();

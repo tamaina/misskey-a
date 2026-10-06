@@ -26,9 +26,10 @@
 		"jsx": "react-jsx",
 		"jsxImportSource": "@kitajs/html",
 		"paths": {
-			"@/*": ["../src/*"]
+			"@/*": ["../src/*"],
+			"@features/*": ["../../features/*/index.ts"]
 		},
-		"rootDir": "../",
+		"rootDir": "../../",
 		"outDir": "../built-test",
 		"types": [
 			"node"

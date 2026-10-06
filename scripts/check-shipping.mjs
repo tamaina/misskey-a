@@ -27,6 +27,8 @@ import { execaSync } from 'execa';
 import { DEFAULT_INTEGRATION_REFS, findClosestMergeBase, gitLines, gitMergeBase, gitPaths } from './lib/git.mjs';
 
 const LINT_TARGETS = [
+	{ root: 'packages/features', config: '../frontend/eslint.config.js', pattern: /^packages\/features\/[^/]+\/frontend\/.*\.(ts|vue)$/ },
+	{ root: 'packages/features', config: '../backend/eslint.config.js', pattern: /^packages\/features\/[^/]+\/(backend|contract|shared|test)\/.*\.(ts|mjs)$/ },
 	{ root: 'packages/backend', pattern: /^packages\/backend\/(src|test-federation)\/.*\.ts$/ },
 	{ root: 'packages/frontend', pattern: /^packages\/frontend\/src\/.*\.(ts|vue)$/ },
 	{ root: 'packages/frontend-embed', pattern: /^packages\/frontend-embed\/src\/.*\.(ts|vue)$/ },
@@ -143,7 +145,7 @@ function runChangedFileLint(changedFiles, repoRoot) {
 
 			ran = true;
 			console.log(`Lint: ${target.root} (${files.length} files)`);
-			const current = normalizeStatus(runCommand('pnpm', ['exec', 'eslint', '--quiet', '--', ...files], join(repoRoot, target.root)));
+			const current = normalizeStatus(runCommand('pnpm', ['exec', 'eslint', '--quiet', ...('config' in target ? ['--config', target.config] : []), '--', ...files], join(repoRoot, target.root)));
 			if (current > status) status = current;
 		} catch (error) {
 			const message = error instanceof Error ? error.message : String(error);

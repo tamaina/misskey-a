@@ -26,6 +26,7 @@ export const baseConfig = defineConfig({
 	resolve: {
 		alias: {
 			'@': resolve(__dirname, './src'),
+			'@features': resolve(__dirname, '../features'),
 		},
 	},
 });

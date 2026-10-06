@@ -4,7 +4,7 @@
  */
 
 import { EventEmitter } from 'node:events';
-import { runCli } from '@misskey-a/boot/backend';
+import { runCli } from '@features/boot/backend';
 
 process.title = 'Misskey Cli';
 Error.stackTraceLimit = Infinity;

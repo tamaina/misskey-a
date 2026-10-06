@@ -4,7 +4,7 @@
  */
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { createServerInfo, legacyServerInfoSchemas } from '../built/backend/index.js';
+import { createServerInfo, legacyServerInfoSchemas } from '../../../backend/built/features/instance/backend.js';
 
 const metrics = { machine: 'fixture', cpu: { model: 'fixture-cpu', cores: 4 }, mem: { total: 1024 }, fs: { total: 512, used: 64 } };
 const hidden = { machine: '?', cpu: { model: '?', cores: 0 }, mem: { total: 0 }, fs: { total: 0, used: 0 } };

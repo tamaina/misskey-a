@@ -5,7 +5,7 @@
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { createResetCaptcha } from '../built/backend/index.js';
+import { createResetCaptcha } from '../../../backend/built/features/instance/backend.js';
 
 test('captcha reset changes only the existing captcha fields', async () => {
 	let patch;

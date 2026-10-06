@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { createPing, legacyPingSchemas } from '@misskey-a/instance/backend';
+import { createPing, legacyPingSchemas } from '@features/instance/backend';
 import type { Schema } from '@/misc/json-schema.js';
 import { Endpoint } from '@/server/api/endpoint-base.js';
 

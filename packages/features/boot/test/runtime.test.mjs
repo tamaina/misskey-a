@@ -4,7 +4,7 @@
  */
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { createRuntime } from '../built/backend/index.js';
+import { createRuntime } from '../../../backend/built/features/boot/backend.js';
 
 const step = (name, events) => ({ name, start() { events.push(`start:${name}`); return () => { events.push(`stop:${name}`); }; } });
 

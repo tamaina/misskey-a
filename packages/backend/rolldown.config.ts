@@ -1,4 +1,5 @@
 import { defineConfig } from 'rolldown';
+import { globSync } from 'node:fs';
 import { version as summalyVersion } from '@misskey-dev/summaly';
 import type { Plugin, ExternalOption } from 'rolldown';
 import { execa, execaNode } from 'execa';
@@ -81,7 +82,7 @@ export default defineConfig((args) => {
 	const isE2E = args.e2e != null && args.e2e !== 'false';
 
 	// 外部モジュールの判定に使う正規表現。`@/` で始まるものは内部モジュールとみなす
-	const allExternalModulesRegex = /^(?!@\/|\0)[^.\/](?!:[\/\\])/;
+	const allExternalModulesRegex = /^(?!@\/|@features\/|\0)[^.\/](?!:[\/\\])/;
 
 	// 通常のビルド時にexternalとするモジュール
 	const externalModules: ExternalOption = [
@@ -134,13 +135,16 @@ export default defineConfig((args) => {
 		};
 	} else {
 		return {
-			input: [
-				'./src/boot/entry.ts',
-				'./src/boot/cli.ts',
-				'./src/config.ts',
-				'./src/postgres.ts',
-				'./src/server/api/openapi/gen-spec.ts',
-			],
+			input: {
+				entry: './src/boot/entry.ts',
+				cli: './src/boot/cli.ts',
+				config: './src/config.ts',
+				postgres: './src/postgres.ts',
+				'gen-spec': './src/server/api/openapi/gen-spec.ts',
+				...Object.fromEntries([...globSync('../features/*/{backend,shared}/index.ts')].map(file => [
+					file.replace('../', '').replace('/index.ts', ''), file,
+				])),
+			},
 			platform: 'node',
 			tsconfig: true,
 			plugins: [

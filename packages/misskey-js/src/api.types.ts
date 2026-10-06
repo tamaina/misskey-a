@@ -1,4 +1,4 @@
-import type { InstanceEndpoints } from '@misskey-a/instance/contract';
+import type { InstanceEndpoints } from '#feature-contracts/instance';
 import { Endpoints as Gen } from './autogen/endpoint.js';
 import { UserDetailed } from './autogen/models.js';
 import {

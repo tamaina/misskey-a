@@ -4,7 +4,7 @@
  */
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { isCreationRenote, isCreationQuote } from '../built/shared/index.js';
+import { isCreationRenote, isCreationQuote } from '../../../backend/built/features/notes/shared.js';
 
 test('renote checks the related object, without infrastructure or entities', () => {
 	for (const note of [{}, { renote: null }, { renote: undefined }]) assert.equal(isCreationRenote(note), false);

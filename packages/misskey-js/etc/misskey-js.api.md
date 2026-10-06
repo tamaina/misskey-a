@@ -5,13 +5,16 @@
 ```ts
 
 import type { AuthenticationResponseJSON } from '@simplewebauthn/browser';
+import { ContractProcedureBuilderWithInputOutput } from '@orpc/contract';
 import { EventEmitter } from 'eventemitter3';
-import type { InstanceEndpoints } from '@misskey-a/instance/contract';
+import type { InferContractRouterInputs } from '@orpc/contract';
+import type { InferContractRouterOutputs } from '@orpc/contract';
 import { Options } from 'reconnecting-websocket';
 import type { PublicKeyCredentialCreationOptionsJSON as PublicKeyCredentialCreationOptionsJSON_2 } from '@simplewebauthn/browser';
 import type { PublicKeyCredentialRequestOptionsJSON as PublicKeyCredentialRequestOptionsJSON_2 } from '@simplewebauthn/browser';
 import _ReconnectingWebSocket from 'reconnecting-websocket';
 import type { RegistrationResponseJSON } from '@simplewebauthn/browser';
+import * as v from 'valibot';
 
 // Warning: (ae-forgotten-export) The symbol "components" needs to be exported by the entry point index.d.ts
 //
@@ -1439,6 +1442,7 @@ type EndpointResponse = operations['endpoint']['responses']['200']['content']['a
 
 // Warning: (ae-forgotten-export) The symbol "Overwrite" needs to be exported by the entry point index.d.ts
 // Warning: (ae-forgotten-export) The symbol "Endpoints_2" needs to be exported by the entry point index.d.ts
+// Warning: (ae-forgotten-export) The symbol "InstanceEndpoints" needs to be exported by the entry point index.d.ts
 //
 // @public (undocumented)
 export type Endpoints = Overwrite<Overwrite<Endpoints_2, InstanceEndpoints>, {

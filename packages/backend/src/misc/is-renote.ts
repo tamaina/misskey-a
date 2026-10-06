@@ -30,7 +30,7 @@ export function isRenote(note: MiNote): note is Renote {
 }
 
 export function isQuote(note: Renote): note is Quote {
-	// NOTE: Keep parity with @misskey-a/notes/shared isCreationQuote.
+	// NOTE: Keep parity with @features/notes/shared isCreationQuote.
 	return note.text != null ||
 		note.cw != null ||
 		note.replyId != null ||

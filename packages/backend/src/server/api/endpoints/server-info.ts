@@ -4,7 +4,7 @@
  */
 
 import * as os from 'node:os';
-import { createServerInfo, legacyServerInfoSchemas } from '@misskey-a/instance/backend';
+import { createServerInfo, legacyServerInfoSchemas } from '@features/instance/backend';
 import type { Schema } from '@/misc/json-schema.js';
 import { Inject, Injectable } from '@nestjs/common';
 import { Endpoint } from '@/server/api/endpoint-base.js';

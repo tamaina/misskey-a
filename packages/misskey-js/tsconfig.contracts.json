@@ -1,0 +1,15 @@
+{
+	"extends": "./tsconfig.json",
+	"compilerOptions": {
+		"module": "ESNext",
+		"moduleResolution": "Bundler",
+		"rootDir": "../features",
+		"outDir": "./built/contracts",
+		"types": [],
+		"removeComments": false
+	},
+	"include": [
+		"../features/*/contract/**/*.ts"
+	],
+	"exclude": []
+}

@@ -5,8 +5,8 @@
 
 import 'reflect-metadata';
 import { Redis } from 'ioredis';
-import { runTask } from '@misskey-a/boot/backend';
-import { createResetCaptcha } from '@misskey-a/instance/backend';
+import { runTask } from '@features/boot/backend';
+import { createResetCaptcha } from '@features/instance/backend';
 import { loadConfig } from '@/config.js';
 import { createPostgresDataSource } from '@/postgres.js';
 import { updateInstanceMeta } from '@/models/update-instance-meta.js';

@@ -4,8 +4,8 @@
  */
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { createPing, legacyPingSchemas } from '../built/backend/index.js';
-import { instanceContract } from '../built/contract/index.js';
+import { createPing, legacyPingSchemas } from '../../../backend/built/features/instance/backend.js';
+import { instanceContract } from '../../../misskey-js/built/contracts/instance/contract/index.js';
 
 test('implementation uses the contract and an injectable clock', async () => {
 	const ping = createPing(() => 123);

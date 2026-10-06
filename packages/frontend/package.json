@@ -15,7 +15,8 @@
 		"test:browser": "vitest --run --globals --config vitest.config.browser.ts",
 		"typecheck": "vue-tsc --noEmit",
 		"eslint": "eslint --quiet \"src/**/*.{ts,vue}\"",
-		"lint": "pnpm typecheck && pnpm eslint"
+		"lint:features": "cd ../.. && eslint --quiet --config packages/frontend/eslint.config.js \"packages/features/*/frontend/**/*.{ts,vue}\" --no-error-on-unmatched-pattern",
+		"lint": "pnpm typecheck && pnpm eslint && pnpm lint:features"
 	},
 	"dependencies": {
 		"@analytics/google-analytics": "1.1.0",

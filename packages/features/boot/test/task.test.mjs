@@ -5,7 +5,7 @@
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { runTask } from '../built/backend/index.js';
+import { runTask } from '../../../backend/built/features/boot/backend.js';
 
 test('one-shot role returns its result after closing in reverse order', async () => {
 	const events = [];

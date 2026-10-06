@@ -57,7 +57,7 @@ import { IdentifiableError } from '@/misc/identifiable-error.js';
 import { CollapsedQueue } from '@/misc/collapsed-queue.js';
 import { CacheService } from '@/core/CacheService.js';
 import { isQuote, isRenote } from '@/misc/is-renote.js';
-import { isCreationQuote, isCreationRenote } from '@misskey-a/notes/shared';
+import { isCreationQuote, isCreationRenote } from '@features/notes/shared';
 
 type NotificationType = 'reply' | 'renote' | 'quote' | 'mention';
 

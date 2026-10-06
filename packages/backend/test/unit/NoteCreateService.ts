@@ -4,7 +4,7 @@
  */
 
 import { describe, test, expect } from 'vitest';
-import { isCreationRenote, isCreationQuote } from '@misskey-a/notes/shared';
+import { isCreationRenote, isCreationQuote } from '@features/notes/shared';
 
 describe('Note creation predicates', () => {
 	describe('is-renote', () => {

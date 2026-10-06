@@ -51,4 +51,13 @@ export default [
 			}],
 		},
 	},
+	{
+		files: ['**/contract/**/*.ts', '**/shared/**/*.ts'],
+		rules: {
+			'no-restricted-imports': ['error', {
+				paths: [{ name: 'punycode' }],
+				patterns: [{ group: ['node:*', '**/backend/**'], message: 'Contracts/shared code cannot import server implementation.' }],
+			}],
+		},
+	},
 ];

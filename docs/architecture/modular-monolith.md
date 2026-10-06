@@ -120,9 +120,9 @@ rendering. Only then extend the migration to additional feature-owned views.
   OpenAPI remains identical; machine statistics are never read by the feature
   while the setting is disabled. The SDK overlays the complete instance contract
   type map, so adding a contract does not require a per-endpoint SDK type copy.
-- SDK contract dependencies currently resolve through the workspace. Packaging
-  independently publishable SDK/contract artifacts remains a migration task;
-  do not publish these private feature packages as-is.
+- The SDK builds portable contract declarations from feature-owned source.
+  Distribution and license review remains a migration task; do not publish this
+  experimental SDK layout as-is.
 - The first VVI slice is the not-found view. Its locale blocks preserve the
   resolved text of all 28 existing languages. The existing boot language choice
   is passed to VVI; mounting waits for a successful locale load. Unit tests cover
@@ -148,3 +148,16 @@ network interfaces (uv_interface_addresses is denied by the environment).
 Do not report the full server suite as passed or mock that call to disguise this
 limit. The maintenance command's narrower dependencies are tested with real
 PostgreSQL/Redis without constructing that unrelated HTTP client.
+
+## Build ownership
+
+Features are source directories, not independent workspace packages. They have
+no package manifests, tsconfig, ESLint config or generated output directories.
+The existing backend package owns backend/shared compilation and feature tests;
+frontend owns frontend/shared checks and VVI scanning; misskey-js owns portable
+contract declarations. Each consumer selects its source layers with globs.
+The root supplies feature-source build dependencies; the SDK also declares the
+public dependencies referenced by its generated contract declarations.
+
+The generated contract directory carries the source license. SDK distribution and
+licensing review remains required before publishing this experimental fork.

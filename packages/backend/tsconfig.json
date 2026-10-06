@@ -25,9 +25,10 @@
 		"isolatedModules": true,
 		"jsx": "react-jsx",
 		"jsxImportSource": "@kitajs/html",
-		"rootDir": "./src",
+		"rootDir": "..",
 		"paths": {
-			"@/*": ["./src/*"]
+			"@/*": ["./src/*"],
+			"@features/*": ["../features/*/index.ts"]
 		},
 		"outDir": "./built",
 		"plugins": [
@@ -48,7 +49,10 @@
 	"compileOnSave": false,
 	"include": [
 		"./src/**/*.ts",
-		"./src/**/*.tsx"
+		"./src/**/*.tsx",
+		"../features/*/backend/**/*.ts",
+		"../features/*/contract/**/*.ts",
+		"../features/*/shared/**/*.ts"
 	],
 	"exclude": [
 		"./src/**/*.test.ts"

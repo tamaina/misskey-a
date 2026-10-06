@@ -143,7 +143,7 @@ export function getConfig(): UserConfig {
 		},
 
 		plugins: [
-			vueInternationalization({ primaryLocale: 'ja-JP', scan: { include: ['src/**/*.vue'] } }),
+			vueInternationalization({ primaryLocale: 'ja-JP', scan: { include: ['src/**/*.vue', '../features/*/frontend/**/*.vue'] } }),
 			pluginWatchLocales(),
 			...searchIndexes.map(options => pluginCreateSearchIndex(options)),
 			pluginVue(),
@@ -168,6 +168,7 @@ export function getConfig(): UserConfig {
 			alias: {
 				'@/': __dirname + '/src/',
 				'@@/': __dirname + '/../frontend-shared/',
+				'@features/': __dirname + '/../features/',
 				'/client-assets/': __dirname + '/assets/',
 				'/static-assets/': __dirname + '/../backend/assets/',
 				'/fluent-emoji/': '@misskey-dev/emoji-assets/fluent-emoji/',
