@@ -9,13 +9,6 @@ import { createPortabilityImportCommands, legacyPortabilityImportSchemas } from 
 
 const actor = { id: 'trusted123', data: 'kept' };
 const file = { id: 'file123', size: 12, url: 'https://example.test/file' };
-const routes = [
-	'i/import-antennas',
-	'i/import-blocking',
-	'i/import-following',
-	'i/import-muting',
-	'i/import-user-lists',
-];
 
 function makeError(definition) {
 	const error = new Error(definition.message);
