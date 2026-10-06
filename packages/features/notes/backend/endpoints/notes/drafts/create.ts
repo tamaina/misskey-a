@@ -4,7 +4,7 @@
  */
 
 import { Injectable } from '@nestjs/common';
-import ms from 'ms';
+import ms from '@/runtime-dependencies/ms.js';
 import { Endpoint } from '@/server/api/endpoint-base.js';
 import { NoteDraftService } from '@/core/NoteDraftService.js';
 import { MAX_NOTE_TEXT_LENGTH } from '@/const.js';

@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import ms from 'ms';
+import ms from '@/runtime-dependencies/ms.js';
 import { Inject, Injectable } from '@nestjs/common';
 import type { DriveFilesRepository, MiDriveFile, PagesRepository } from '@/models/_.js';
 import { pageNameSchema } from '@/models/Page.js';

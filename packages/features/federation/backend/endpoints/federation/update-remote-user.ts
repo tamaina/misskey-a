@@ -4,7 +4,7 @@
  */
 
 import { Injectable } from '@nestjs/common';
-import ms from 'ms';
+import ms from '@/runtime-dependencies/ms.js';
 import { Endpoint } from '@/server/api/endpoint-base.js';
 import { ApPersonService } from '@/core/activitypub/models/ApPersonService.js';
 import { GetterService } from '@/server/api/GetterService.js';

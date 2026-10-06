@@ -4,7 +4,7 @@
  */
 
 import { Injectable } from '@nestjs/common';
-import ms from 'ms';
+import ms from '@/runtime-dependencies/ms.js';
 import { Endpoint } from '@/server/api/endpoint-base.js';
 import { WebhookTestService } from '@/core/WebhookTestService.js';
 import { ApiError } from '@/server/api/error.js';

@@ -4,7 +4,7 @@
  */
 
 import { createHash } from 'crypto';
-import ms from 'ms';
+import ms from '@/runtime-dependencies/ms.js';
 import { Injectable } from '@nestjs/common';
 import { Endpoint } from '@/server/api/endpoint-base.js';
 import { HttpRequestService } from '@/core/HttpRequestService.js';

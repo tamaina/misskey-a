@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import ms from 'ms';
+import ms from '@/runtime-dependencies/ms.js';
 import { In } from 'typeorm';
 import { Inject, Injectable } from '@nestjs/common';
 import { MAX_NOTE_TEXT_LENGTH } from '@/const.js';
