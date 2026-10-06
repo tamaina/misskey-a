@@ -91,3 +91,11 @@ describe('feature contracts', () => {
 		cli.request('endpoint', { endpoint: 1 });
 	});
 });
+
+test('avatar decoration responses derive from the feature contract', async () => {
+	const cli = new Misskey.api.APIClient({ origin: 'https://misskey.test' });
+	const result = await cli.request('get-avatar-decorations', {});
+	expectType<string>(result[0].id);
+	expectType<string[]>(result[0].roleIdsThatCanBeUsedThisDecoration);
+	expectType<string | null | undefined>(result[0].category);
+});

@@ -8,6 +8,10 @@ import { MoreThan } from 'typeorm';
 import { USER_ONLINE_THRESHOLD } from '@/const.js';
 import { createInstance } from '@features/instance/backend';
 import type { InstanceFeature } from '@features/instance/backend';
+import { createAvatarDecorations } from '@features/avatar-decorations/backend';
+import type { AvatarDecorationsFeature } from '@features/avatar-decorations/backend';
+import { AvatarDecorationService } from '@/core/AvatarDecorationService.js';
+import { RoleService } from '@/core/RoleService.js';
 import { createStatistics } from '@features/statistics/backend';
 import type { StatisticsFeature } from '@features/statistics/backend';
 import NotesChart from '@/core/chart/charts/notes.js';
@@ -19,8 +23,8 @@ import type { Provider } from '@nestjs/common';
 
 // Transitional composition boundary: Nest resolves a feature, not each handler.
 // The feature itself receives narrow dependencies and has no container access.
-export interface ApiFeatures { instance: InstanceFeature; statistics: StatisticsFeature }
-export const featureTokens = { instance: Symbol('instance API feature'), statistics: Symbol('statistics API feature') } satisfies Record<keyof ApiFeatures, symbol>;
+export interface ApiFeatures { instance: InstanceFeature; statistics: StatisticsFeature; avatarDecorations: AvatarDecorationsFeature }
+export const featureTokens = { instance: Symbol('instance API feature'), statistics: Symbol('statistics API feature'), avatarDecorations: Symbol('avatar decorations API feature') } satisfies Record<keyof ApiFeatures, symbol>;
 export const featureProviders: Provider[] = [{
 	provide: featureTokens.instance,
 	inject: [DI.meta, DI.usersRepository],
@@ -69,5 +73,12 @@ export const featureProviders: Provider[] = [{
 		},
 		countReactions: () => reactions.count({ cache: 3600000 }),
 		countInstances: () => instances.count({ cache: 3600000 }),
+	}),
+}, {
+	provide: featureTokens.avatarDecorations,
+	inject: [AvatarDecorationService, RoleService],
+	useFactory: (decorations: AvatarDecorationService, roles: RoleService) => createAvatarDecorations({
+		readDecorations: () => decorations.getAll(true),
+		readRoles: () => roles.getRoles(),
 	}),
 }];

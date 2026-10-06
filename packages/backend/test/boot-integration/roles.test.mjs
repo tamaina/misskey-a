@@ -62,6 +62,9 @@ for (const mode of ['server', 'queue', 'combined', 'cluster', 'cluster-server', 
 				assert.deepEqual(await selfDescriptor.json(), { params: [{ name: 'endpoint', type: 'String' }] });
 				const unknownDescriptor = await post('/api/endpoint', { endpoint: 'not-a-real-endpoint' });
 				assert.equal(unknownDescriptor.status, 204);
+				const decorations = await post('/api/get-avatar-decorations', { authenticated: true });
+				assert.equal(decorations.status, 200);
+				assert.ok(Array.isArray(await decorations.json()));
 				const stats = await post('/api/stats', {});
 				assert.equal(stats.status, 200);
 				const totals = await stats.json();

@@ -1,0 +1,137 @@
+/*
+ * SPDX-FileCopyrightText: syuilo and misskey-project
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
+import { test } from 'node:test';
+import assert from 'node:assert/strict';
+import { createAvatarDecorations } from '../../../backend/built/features/avatar-decorations/backend.js';
+
+const decorationsFixture = [
+	{
+		id: 'first', name: 'First', description: 'First decoration', url: 'https://example.test/first.png',
+		roleIdsThatCanBeUsedThisDecoration: ['public-b', 'private', 'missing', 'public-a'], category: 'seasonal',
+	},
+	{
+		id: 'second', name: 'Second', description: 'Second decoration', url: 'https://example.test/second.png',
+		roleIdsThatCanBeUsedThisDecoration: ['private'], category: null,
+	},
+];
+const rolesFixture = [
+	{ id: 'private', isPublic: false },
+	{ id: 'public-a', isPublic: true },
+	{ id: 'public-b', isPublic: true },
+];
+
+function call(feature, input = {}, authenticated = false) {
+	return feature['get-avatar-decorations'](input, { context: { authenticated } });
+}
+
+test('construction has no I/O; each call reads decorations then roles and preserves decoration order', async () => {
+	const calls = [];
+	let decorationRead = 0;
+	let rolesRead = 0;
+	const feature = createAvatarDecorations({
+		readDecorations: async () => {
+			calls.push('decorations');
+			decorationRead++;
+			return decorationsFixture;
+		},
+		readRoles: async () => {
+			calls.push('roles');
+			rolesRead++;
+			return rolesFixture;
+		},
+	});
+
+	assert.deepEqual(calls, []);
+	assert.deepEqual(await call(feature), [
+		{
+			id: 'first', name: 'First', description: 'First decoration', url: 'https://example.test/first.png',
+			roleIdsThatCanBeUsedThisDecoration: ['public-b', 'public-a'], category: 'seasonal',
+		},
+		{
+			id: 'second', name: 'Second', description: 'Second decoration', url: 'https://example.test/second.png',
+			roleIdsThatCanBeUsedThisDecoration: [], category: null,
+		},
+	]);
+	assert.deepEqual(calls, ['decorations', 'roles']);
+	assert.deepEqual(await call(feature, {}, true), [
+		{ ...decorationsFixture[0], roleIdsThatCanBeUsedThisDecoration: ['public-b', 'private', 'public-a'] },
+		decorationsFixture[1],
+	]);
+	assert.deepEqual(calls, ['decorations', 'roles', 'decorations', 'roles']);
+	assert.equal(decorationRead, 2);
+	assert.equal(rolesRead, 2);
+});
+
+test('opposite authentication contexts on concurrent calls remain isolated', async () => {
+	let releaseDecorations;
+	let decorationReads = 0;
+	const decorationsReady = new Promise(resolve => { releaseDecorations = resolve; });
+	const feature = createAvatarDecorations({
+		readDecorations: async () => {
+			decorationReads++;
+			if (decorationReads === 2) releaseDecorations();
+			await decorationsReady;
+			return decorationsFixture;
+		},
+		readRoles: async () => rolesFixture,
+	});
+
+	const [anonymous, authenticated] = await Promise.all([
+		call(feature, {}, false),
+		call(feature, {}, true),
+	]);
+	assert.deepEqual(anonymous[0].roleIdsThatCanBeUsedThisDecoration, ['public-b', 'public-a']);
+	assert.deepEqual(authenticated[0].roleIdsThatCanBeUsedThisDecoration, ['public-b', 'private', 'public-a']);
+});
+
+test('authentication-shaped input cannot reveal private role IDs', async () => {
+	const feature = createAvatarDecorations({
+		readDecorations: async () => decorationsFixture,
+		readRoles: async () => rolesFixture,
+	});
+
+	const result = await feature['get-avatar-decorations']({ authenticated: true });
+	assert.deepEqual(result[0].roleIdsThatCanBeUsedThisDecoration, ['public-b', 'public-a']);
+});
+
+test('missing runtime context fails closed to public roles only', async () => {
+	const feature = createAvatarDecorations({
+		readDecorations: async () => decorationsFixture,
+		readRoles: async () => rolesFixture,
+	});
+
+	const result = await feature['get-avatar-decorations']({});
+	assert.deepEqual(result[0].roleIdsThatCanBeUsedThisDecoration, ['public-b', 'public-a']);
+});
+
+test('dependency failures propagate in read order without starting the next read', async () => {
+	const decorationFailure = new Error('decoration read failed');
+	const calls = [];
+	const firstFeature = createAvatarDecorations({
+		readDecorations: async () => { calls.push('decorations'); throw decorationFailure; },
+		readRoles: async () => { calls.push('roles'); return rolesFixture; },
+	});
+	await assert.rejects(call(firstFeature), error => error === decorationFailure);
+	assert.deepEqual(calls, ['decorations']);
+
+	const roleFailure = new Error('role read failed');
+	const secondFeature = createAvatarDecorations({
+		readDecorations: async () => { calls.push('decorations-2'); return decorationsFixture; },
+		readRoles: async () => { calls.push('roles-2'); throw roleFailure; },
+	});
+	await assert.rejects(call(secondFeature), error => error === roleFailure);
+	assert.deepEqual(calls, ['decorations', 'decorations-2', 'roles-2']);
+});
+
+test('malformed runtime contexts never count as authenticated', async () => {
+	const feature = createAvatarDecorations({
+		readDecorations: async () => decorationsFixture,
+		readRoles: async () => rolesFixture,
+	});
+	for (const context of [null, {}, { authenticated: 'true' }, { authenticated: 1 }, { authenticated: false }]) {
+		const result = await feature['get-avatar-decorations']({}, { context });
+		assert.deepEqual(result[0].roleIdsThatCanBeUsedThisDecoration, ['public-b', 'public-a']);
+	}
+});

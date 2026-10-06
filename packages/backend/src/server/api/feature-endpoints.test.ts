@@ -4,6 +4,9 @@
  */
 
 import { describe, expect, test } from 'vitest';
+import { createAvatarDecorations } from '@features/avatar-decorations/backend';
+import type { MiLocalUser } from '@/models/User.js';
+import { createEndpoint as createDecorationsEndpoint, meta as decorationsMeta } from './endpoints/get-avatar-decorations.js';
 import { createStatistics } from '@features/statistics/backend';
 import { createEndpoint as createStatsEndpoint, meta as statsMeta } from './endpoints/stats.js';
 import { createInstance } from '@features/instance/backend';
@@ -120,4 +123,30 @@ test('statistics has its own feature binding and retains anonymous POST-only pol
 	expect(statsMeta.requireCredential).toBe(false);
 	expect(statsMeta).not.toHaveProperty('allowGet');
 	expect(statsMeta).not.toHaveProperty('cacheSec');
+});
+
+test('decoration visibility uses authenticated transport context, not request fields', async () => {
+	let reads = 0;
+	const decorations = createAvatarDecorations({
+		readDecorations: async () => {
+			reads++;
+			return [{ id: 'a', name: 'A', description: '', url: '/a.png', roleIdsThatCanBeUsedThisDecoration: ['public', 'private', 'missing'], category: null }];
+		},
+		readRoles: async () => [{ id: 'public', isPublic: true }, { id: 'private', isPublic: false }],
+	});
+	const endpoint = createDecorationsEndpoint(decorations);
+	await expect(endpoint.exec(null, null, null)).rejects.toMatchObject({ code: 'INVALID_PARAM' });
+	expect(reads).toBe(0);
+	const [anonymous, authenticated, again] = await Promise.all([
+		endpoint.exec({ authenticated: true, context: { authenticated: true } }, null, null),
+		endpoint.exec({ authenticated: false }, { id: 'local-user' } as MiLocalUser, null),
+		endpoint.exec({}, null, null),
+	]);
+	expect(anonymous[0].roleIdsThatCanBeUsedThisDecoration).toEqual(['public']);
+	expect(authenticated[0].roleIdsThatCanBeUsedThisDecoration).toEqual(['public', 'private']);
+	expect(again[0].roleIdsThatCanBeUsedThisDecoration).toEqual(['public']);
+	expect(reads).toBe(3);
+	expect(decorationsMeta).toMatchObject({ tags: ['users'], requireCredential: false });
+	expect(decorationsMeta).not.toHaveProperty('allowGet');
+	expect(decorationsMeta).not.toHaveProperty('cacheSec');
 });

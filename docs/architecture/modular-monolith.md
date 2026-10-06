@@ -263,3 +263,14 @@ The packed SDK consumer check uses explicit `{}` parameters for empty-input
 routes. Its legacy generated public overloads require that argument, even though
 the source implementation has a default; this convention predates the migration.
 Source-only SDK tests do not by themselves establish packed-consumer compatibility.
+
+## Request-local feature context
+
+Avatar-decoration reads receive only the transport's authenticated/anonymous
+state through per-call oRPC context. It is derived from the API pipeline's
+resolved user, never from request parameters. Feature construction has no user
+state, and concurrent callers cannot overwrite one another's visibility.
+Anonymous callers retain only public role IDs; authenticated callers retain all
+existing role IDs, matching the previous endpoint. Missing runtime context is
+anonymous. Roles and decorations are read anew through the existing services,
+whose cache and lifecycle ownership remain unchanged.
