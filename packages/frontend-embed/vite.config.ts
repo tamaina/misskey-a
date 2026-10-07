@@ -1,4 +1,5 @@
 import path from 'path';
+import { createRequire } from 'node:module';
 import pluginVue from '@vitejs/plugin-vue';
 import { pluginFeatureDependencies } from '../frontend/lib/vite-plugin-feature-dependencies.js';
 import { defineConfig, type UserConfig } from 'vite';
@@ -8,6 +9,7 @@ import { promises as fsp } from 'fs';
 import locales from 'i18n';
 import meta from '../../package.json';
 import packageInfo from './package.json' with { type: 'json' };
+import embedSourcePaths from './lib/embed-source-paths.json' with { type: 'json' };
 import pluginJson5 from './lib/vite-plugin-json5.js';
 import { pluginRemoveUnrefI18n } from '../frontend-builder/rollup-plugin-remove-unref-i18n';
 import { Features } from 'lightningcss';
@@ -98,6 +100,7 @@ export function getConfig(): UserConfig {
 		resolve: {
 			extensions,
 			alias: {
+				buraha: createRequire(import.meta.url).resolve('buraha'),
 				'@/': __dirname + '/src/',
 				'@@/': __dirname + '/../frontend-shared/',
 				'@features/': __dirname + '/../features/',
@@ -113,7 +116,9 @@ export function getConfig(): UserConfig {
 			},
 			modules: {
 				generateScopedName(name, filename, _css): string {
-					const id = (path.relative(__dirname, filename.split('?')[0]) + '-' + name).replace(/[\\\/\.\?&=]/g, '-').replace(/(src-|vue-)/g, '');
+					const relativePath = path.relative(__dirname, filename.split('?')[0]).replaceAll('\\', '/');
+					const originalPath = (embedSourcePaths as Record<string, string>)[relativePath] ?? relativePath;
+					const id = (originalPath + '-' + name).replace(/[\\\/\.\?&=]/g, '-').replace(/(src-|vue-)/g, '');
 					if (process.env.NODE_ENV === 'production') {
 						return 'x' + toBase62(hash(id)).substring(0, 4);
 					} else {
@@ -145,7 +150,7 @@ export function getConfig(): UserConfig {
 					nativeMagicString: true,
 				},
 				input: {
-					i18n: './src/i18n.ts',
+					i18n: '../features/runtime/frontend/embed/i18n.ts',
 					entry: './src/boot.ts',
 				},
 				external: externalPackages.map(p => p.match),

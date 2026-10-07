@@ -18,15 +18,15 @@ import defaultLightTheme from '@features/preferences/frontend/themes/l-light.jso
 import defaultDarkTheme from '@features/preferences/frontend/themes/d-dark.json5';
 import { MediaProxy } from '@features/media/frontend/shared/media-proxy.js';
 import { storeBootloaderErrors } from '@features/boot/frontend/shared/store-boot-errors.js';
-import { applyTheme, assertIsTheme } from '@/theme.js';
-import { fetchCustomEmojis } from '@/custom-emojis.js';
-import { DI } from '@/di.js';
-import { serverMetadata } from '@/server-metadata.js';
+import { applyTheme, assertIsTheme } from '@features/preferences/frontend/embed/theme.js';
+import { fetchCustomEmojis } from '@features/emojis/frontend/embed/custom-emojis.js';
+import { DI } from '@features/boot/frontend/embed/di.js';
+import { serverMetadata } from '@features/instance/frontend/embed/server-metadata.js';
 import { url, version, lang } from '@features/boot/frontend/shared/config.js';
 import { parseEmbedParams } from '@features/web/frontend/shared/embed-page.js';
-import { postMessageToParentWindow, setIframeId } from '@/post-message.js';
-import { serverContext } from '@/server-context.js';
-import { i18n } from '@/i18n.js';
+import { postMessageToParentWindow, setIframeId } from '@features/web/frontend/embed/post-message.js';
+import { serverContext } from '@features/boot/frontend/embed/server-context.js';
+import { i18n } from '@features/runtime/frontend/embed/i18n.js';
 
 import type { Theme } from '@features/preferences/frontend/shared/theme.js';
 
@@ -98,7 +98,7 @@ try {
 } catch (err) { /* empty */ }
 
 const app = createApp(
-	defineAsyncComponent(() => import('@/ui.vue')),
+	defineAsyncComponent(() => import('@features/boot/frontend/embed/ui.vue')),
 );
 
 app.provide(DI.mediaProxy, new MediaProxy(serverMetadata, url));

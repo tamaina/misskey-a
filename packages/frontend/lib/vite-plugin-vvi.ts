@@ -8,7 +8,7 @@ import { vueInternationalization } from 'vite-vue-internationalization';
 
 /** Keep VVI 1.1.3 from replacing an SFC dictionary with a style/template fragment. */
 export function pluginVvi() {
-	const plugin = vueInternationalization({ primaryLocale: 'ja-JP', scan: { include: ['features/*/frontend/**/*.vue'] } });
+	const plugin = vueInternationalization({ primaryLocale: 'ja-JP', scan: { include: ['features/*/frontend/**/*.vue'], exclude: ['features/*/frontend/embed/**'] } });
 	const configure = plugin.configResolved;
 	if (typeof configure !== 'function') throw new Error('Unexpected VVI config hook; review the feature scan root on upgrade.');
 	plugin.configResolved = function (config) {

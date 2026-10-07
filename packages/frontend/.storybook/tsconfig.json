@@ -35,5 +35,8 @@
 		"../features/*/frontend/**/*.stories.impl.ts",
 		"../features/*/frontend/**/*.msw.ts"
 	],
-	"exclude": ["../features/media/frontend/workers/**/*.ts"]
+	"exclude": [
+		"../features/media/frontend/workers/**/*.ts",
+		"../../features/*/frontend/embed/**"
+	]
 }

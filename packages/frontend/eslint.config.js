@@ -7,6 +7,7 @@ import sharedConfig from '../shared/eslint.config.js';
 
 export default [
 	...sharedConfig,
+	{ ignores: ['**/frontend/embed/**'] },
 	{ files: ['test/browser-feature/*.mjs'], languageOptions: { globals: globals.node } },
 	{ files: ['test/browser-feature/fixture/*.js'], languageOptions: { globals: globals.browser } },
 	{

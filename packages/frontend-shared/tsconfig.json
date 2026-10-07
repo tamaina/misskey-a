@@ -67,6 +67,7 @@
 	],
 	"exclude": [
 		"node_modules",
-		"test/**/*"
+		"test/**/*",
+		"../features/*/frontend/embed/**"
 	]
 }
