@@ -3,8 +3,10 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { packedDriveFilesAttachedChatMessagesDefinition, packedDriveFilesAttachedChatMessagesInput, packedDriveFilesAttachedChatMessagesOutput } from '../../../../contract/packed-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
+
 import type { DriveFilesRepository, ChatMessagesRepository } from '@/models/_.js';
 import { QueryService } from '@/core/QueryService.js';
 import { DI } from '@/di-symbols.js';
@@ -13,6 +15,8 @@ import { ChatEntityService } from '../../../../../chat/backend/serializers/ChatE
 import { ChatService } from '../../../../../chat/backend/services/ChatService.js';
 import { ApiError } from '@/server/api/error.js';
 
+const contractProjection = projectEndpointContract(packedDriveFilesAttachedChatMessagesDefinition);
+
 export const meta = {
 	tags: ['drive', 'chat'],
 
@@ -20,15 +24,7 @@ export const meta = {
 
 	kind: 'read:drive',
 
-	res: {
-		type: 'array',
-		optional: false, nullable: false,
-		items: {
-			type: 'object',
-			optional: false, nullable: false,
-			ref: 'ChatMessage',
-		},
-	},
+	res: contractProjection.response,
 
 	errors: {
 		noSuchFile: {
@@ -39,21 +35,10 @@ export const meta = {
 	},
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {
-		sinceId: { type: 'string', format: 'misskey:id' },
-		untilId: { type: 'string', format: 'misskey:id' },
-		sinceDate: { type: 'integer' },
-		untilDate: { type: 'integer' },
-		limit: { type: 'integer', minimum: 1, maximum: 100, default: 10 },
-		fileId: { type: 'string', format: 'misskey:id' },
-	},
-	required: ['fileId'],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedDriveFilesAttachedChatMessagesInput, typeof packedDriveFilesAttachedChatMessagesOutput> {
 	constructor(
 		@Inject(DI.driveFilesRepository)
 		private driveFilesRepository: DriveFilesRepository,
@@ -66,7 +51,7 @@ export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDe
 		private queryService: QueryService,
 		private roleService: RoleService,
 	) {
-		super(meta, paramDef, async (ps, me) => {
+		super(meta, contractProjection, async (ps, me) => {
 			const isModerator = await this.roleService.isModerator(me);
 
 			if (!isModerator) {

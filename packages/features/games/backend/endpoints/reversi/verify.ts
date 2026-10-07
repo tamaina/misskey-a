@@ -3,11 +3,15 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { packedReversiVerifyDefinition, packedReversiVerifyInput, packedReversiVerifyOutput } from '../../../contract/packed-endpoint-definitions.js';
 import { Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
+
 import { ReversiService } from '../../services/ReversiService.js';
 import { ReversiGameEntityService } from '../../serializers/ReversiGameEntityService.js';
 import { ApiError } from '@/server/api/error.js';
+
+const contractProjection = projectEndpointContract(packedReversiVerifyDefinition);
 
 export const meta = {
 	errors: {
@@ -18,36 +22,18 @@ export const meta = {
 		},
 	},
 
-	res: {
-		type: 'object',
-		optional: false, nullable: false,
-		properties: {
-			desynced: { type: 'boolean' },
-			game: {
-				type: 'object',
-				optional: true, nullable: true,
-				ref: 'ReversiGameDetailed',
-			},
-		},
-	},
+	res: contractProjection.response,
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {
-		gameId: { type: 'string', format: 'misskey:id' },
-		crc32: { type: 'string' },
-	},
-	required: ['gameId', 'crc32'],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedReversiVerifyInput, typeof packedReversiVerifyOutput> {
 	constructor(
 		private reversiService: ReversiService,
 		private reversiGameEntityService: ReversiGameEntityService,
 	) {
-		super(meta, paramDef, async (ps, me) => {
+		super(meta, contractProjection, async (ps, me) => {
 			const game = await this.reversiService.checkCrc(ps.gameId, ps.crc32);
 			if (game) {
 				return {

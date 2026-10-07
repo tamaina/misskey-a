@@ -3,13 +3,17 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { packedFollowingRequestsCancelDefinition, packedFollowingRequestsCancelInput, packedFollowingRequestsCancelOutput } from '../../../../contract/packed-endpoint-definitions.js';
 import { Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
+
 import { IdentifiableError } from '@/misc/identifiable-error.js';
 import { UserEntityService } from '../../../../../users/backend/serializers/UserEntityService.js';
 import { GetterService } from '@/server/api/GetterService.js';
 import { UserFollowingService } from '../../../services/UserFollowingService.js';
 import { ApiError } from '@/server/api/error.js';
+
+const contractProjection = projectEndpointContract(packedFollowingRequestsCancelDefinition);
 
 export const meta = {
 	tags: ['following', 'account'],
@@ -32,29 +36,19 @@ export const meta = {
 		},
 	},
 
-	res: {
-		type: 'object',
-		optional: false, nullable: false,
-		ref: 'UserLite',
-	},
+	res: contractProjection.response,
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {
-		userId: { type: 'string', format: 'misskey:id' },
-	},
-	required: ['userId'],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedFollowingRequestsCancelInput, typeof packedFollowingRequestsCancelOutput> {
 	constructor(
 		private userEntityService: UserEntityService,
 		private getterService: GetterService,
 		private userFollowingService: UserFollowingService,
 	) {
-		super(meta, paramDef, async (ps, me) => {
+		super(meta, contractProjection, async (ps, me) => {
 			// Fetch followee
 			const followee = await this.getterService.getUser(ps.userId).catch(err => {
 				if (err.id === '15348ddd-432d-49c2-8a5a-8069753becff') throw new ApiError(meta.errors.noSuchUser);

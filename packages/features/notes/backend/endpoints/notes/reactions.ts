@@ -3,11 +3,13 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { packedNotesReactionsDefinition, packedNotesReactionsInput, packedNotesReactionsOutput } from '../../../contract/packed-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
 import { Brackets, type FindOptionsWhere } from 'typeorm';
 import type { NoteReactionsRepository } from '@/models/_.js';
 import type { MiNoteReaction } from '../../models/NoteReaction.js';
-import { Endpoint } from '@/server/api/endpoint-base.js';
+
 import { NoteReactionEntityService } from '../../serializers/NoteReactionEntityService.js';
 import { NoteEntityService } from '../../serializers/NoteEntityService.js';
 import { DI } from '@/di-symbols.js';
@@ -15,20 +17,14 @@ import { QueryService } from '@/core/QueryService.js';
 import { GetterService } from '@/server/api/GetterService.js';
 import { ApiError } from '@/server/api/error.js';
 
+const contractProjection = projectEndpointContract(packedNotesReactionsDefinition);
+
 export const meta = {
 	tags: ['notes', 'reactions'],
 
 	requireCredential: false,
 
-	res: {
-		type: 'array',
-		optional: false, nullable: false,
-		items: {
-			type: 'object',
-			optional: false, nullable: false,
-			ref: 'NoteReaction',
-		},
-	},
+	res: contractProjection.response,
 
 	errors: {
 		noSuchNote: {
@@ -39,22 +35,10 @@ export const meta = {
 	},
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {
-		noteId: { type: 'string', format: 'misskey:id' },
-		type: { type: 'string', nullable: true },
-		limit: { type: 'integer', minimum: 1, maximum: 100, default: 10 },
-		sinceId: { type: 'string', format: 'misskey:id' },
-		untilId: { type: 'string', format: 'misskey:id' },
-		sinceDate: { type: 'integer' },
-		untilDate: { type: 'integer' },
-	},
-	required: ['noteId'],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedNotesReactionsInput, typeof packedNotesReactionsOutput> {
 	constructor(
 		@Inject(DI.noteReactionsRepository)
 		private noteReactionsRepository: NoteReactionsRepository,
@@ -64,7 +48,7 @@ export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDe
 		private queryService: QueryService,
 		private getterService: GetterService,
 	) {
-		super(meta, paramDef, async (ps, me) => {
+		super(meta, contractProjection, async (ps, me) => {
 			const note = await this.getterService.getNote(ps.noteId).catch(err => {
 				if (err.id === '9725d0ce-ba28-4dde-95a7-2cbb2c15de24') throw new ApiError(meta.errors.noSuchNote);
 				throw err;

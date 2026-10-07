@@ -3,11 +3,15 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { packedClipsUpdateDefinition, packedClipsUpdateInput, packedClipsUpdateOutput } from '../../../contract/packed-endpoint-definitions.js';
 import { Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
+
 import { ClipEntityService } from '../../serializers/ClipEntityService.js';
 import { ClipService } from '../../services/ClipService.js';
 import { ApiError } from '@/server/api/error.js';
+
+const contractProjection = projectEndpointContract(packedClipsUpdateDefinition);
 
 export const meta = {
 	tags: ['clips'],
@@ -26,32 +30,19 @@ export const meta = {
 		},
 	},
 
-	res: {
-		type: 'object',
-		optional: false, nullable: false,
-		ref: 'Clip',
-	},
+	res: contractProjection.response,
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {
-		clipId: { type: 'string', format: 'misskey:id' },
-		name: { type: 'string', minLength: 1, maxLength: 100 },
-		isPublic: { type: 'boolean' },
-		description: { type: 'string', nullable: true, maxLength: 2048 },
-	},
-	required: ['clipId'],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedClipsUpdateInput, typeof packedClipsUpdateOutput> {
 	constructor(
 		private clipService: ClipService,
 
 		private clipEntityService: ClipEntityService,
 	) {
-		super(meta, paramDef, async (ps, me) => {
+		super(meta, contractProjection, async (ps, me) => {
 			try {
 				// 空文字列をnullにしたいので??は使わない
 				// eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing

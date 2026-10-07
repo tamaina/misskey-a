@@ -46,3 +46,5 @@ export type FeatureEndpoints = ModerationCommandEndpoints
 	& ChannelEndpoints
 	& InlineNativeEndpoints
 	& PackedNativeEndpoints;
+
+export type { PackedModels } from './packed.js';

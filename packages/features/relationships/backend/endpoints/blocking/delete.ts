@@ -3,15 +3,19 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { packedBlockingDeleteDefinition, packedBlockingDeleteInput, packedBlockingDeleteOutput } from '../../../contract/packed-endpoint-definitions.js';
 import ms from '@/runtime-dependencies/ms.js';
 import { Inject, Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
+
 import type { UsersRepository, BlockingsRepository } from '@/models/_.js';
 import { UserEntityService } from '../../../../users/backend/serializers/UserEntityService.js';
 import { UserBlockingService } from '../../services/UserBlockingService.js';
 import { DI } from '@/di-symbols.js';
 import { GetterService } from '@/server/api/GetterService.js';
 import { ApiError } from '@/server/api/error.js';
+
+const contractProjection = projectEndpointContract(packedBlockingDeleteDefinition);
 
 export const meta = {
 	tags: ['account'],
@@ -45,23 +49,13 @@ export const meta = {
 		},
 	},
 
-	res: {
-		type: 'object',
-		optional: false, nullable: false,
-		ref: 'UserDetailedNotMe',
-	},
+	res: contractProjection.response,
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {
-		userId: { type: 'string', format: 'misskey:id' },
-	},
-	required: ['userId'],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedBlockingDeleteInput, typeof packedBlockingDeleteOutput> {
 	constructor(
 		@Inject(DI.usersRepository)
 		private usersRepository: UsersRepository,
@@ -73,7 +67,7 @@ export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDe
 		private getterService: GetterService,
 		private userBlockingService: UserBlockingService,
 	) {
-		super(meta, paramDef, async (ps, me) => {
+		super(meta, contractProjection, async (ps, me) => {
 			const blocker = await this.usersRepository.findOneByOrFail({ id: me.id });
 
 			// Check if the blockee is yourself

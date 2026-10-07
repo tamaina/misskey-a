@@ -3,29 +3,25 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { packedNotesClipsDefinition, packedNotesClipsInput, packedNotesClipsOutput } from '../../../contract/packed-endpoint-definitions.js';
 import { In } from 'typeorm';
 import { Inject, Injectable } from '@nestjs/common';
 import type { ClipNotesRepository, ClipsRepository } from '@/models/_.js';
-import { Endpoint } from '@/server/api/endpoint-base.js';
+
 import { ClipEntityService } from '../../serializers/ClipEntityService.js';
 import { DI } from '@/di-symbols.js';
 import { GetterService } from '@/server/api/GetterService.js';
 import { ApiError } from '@/server/api/error.js';
+
+const contractProjection = projectEndpointContract(packedNotesClipsDefinition);
 
 export const meta = {
 	tags: ['clips', 'notes'],
 
 	requireCredential: false,
 
-	res: {
-		type: 'array',
-		optional: false, nullable: false,
-		items: {
-			type: 'object',
-			optional: false, nullable: false,
-			ref: 'Clip',
-		},
-	},
+	res: contractProjection.response,
 
 	errors: {
 		noSuchNote: {
@@ -36,16 +32,10 @@ export const meta = {
 	},
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {
-		noteId: { type: 'string', format: 'misskey:id' },
-	},
-	required: ['noteId'],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedNotesClipsInput, typeof packedNotesClipsOutput> {
 	constructor(
 		@Inject(DI.clipsRepository)
 		private clipsRepository: ClipsRepository,
@@ -56,7 +46,7 @@ export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDe
 		private clipEntityService: ClipEntityService,
 		private getterService: GetterService,
 	) {
-		super(meta, paramDef, async (ps, me) => {
+		super(meta, contractProjection, async (ps, me) => {
 			const note = await this.getterService.getNote(ps.noteId).catch(err => {
 				if (err.id === '9725d0ce-ba28-4dde-95a7-2cbb2c15de24') throw new ApiError(meta.errors.noSuchNote);
 				throw err;

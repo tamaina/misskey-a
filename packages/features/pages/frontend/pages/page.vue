@@ -152,7 +152,7 @@ function fetchPage() {
 		// plugin
 		const pageViewInterruptors = getPluginHandlers('page_view_interruptor');
 		if (pageViewInterruptors.length > 0) {
-			let result = deepClone(_page);
+			let result: Misskey.entities.Page = deepClone(_page);
 			for (const interruptor of pageViewInterruptors) {
 				result = await interruptor.handler(result);
 			}

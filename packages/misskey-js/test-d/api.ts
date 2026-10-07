@@ -1,6 +1,6 @@
 import type { Endpoints as LegacyEndpoints } from '../src/autogen/endpoint.js';
 import { describe, test } from 'vitest';
-import { expectType } from 'tsd';
+import { expectType, expectNotAssignable } from 'tsd';
 import * as Misskey from '../src/index.js';
 
 describe('API', () => {
@@ -182,4 +182,20 @@ test('channel interactions and clip favorites derive from contracts', async () =
 	cli.request('channels/mute/create', { channelId: 'channel1', expiresAt: 'tomorrow' });
 	// @ts-expect-error clip id remains a string
 	cli.request('clips/favorite', { clipId: 1 });
+});
+
+
+describe('canonical contract aliases', () => {
+	test('named models and operation aliases use the same native response type', async () => {
+		const cli = new Misskey.api.APIClient({ origin: 'https://misskey.test' });
+		const me = await cli.request('i');
+		expectType<Misskey.entities.MeDetailed>(me);
+		expectType<Misskey.entities.IResponse>(me);
+		expectType<Misskey.entities.ReversiMatchResponse>(await cli.request('reversi/match', { userId: 'user1' }));
+	});
+	test('declared request keys survive mapped-type operations', () => {
+		const update: Omit<Misskey.entities.ClipsUpdateRequest, 'name'> = { clipId: 'clip1' };
+		expectType<string>(update.clipId);
+		expectNotAssignable<Omit<Misskey.entities.ClipsUpdateRequest, 'name'>>({});
+	});
 });

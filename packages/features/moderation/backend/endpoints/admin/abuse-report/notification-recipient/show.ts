@@ -3,13 +3,17 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { packedAdminAbuseReportNotificationRecipientShowDefinition, packedAdminAbuseReportNotificationRecipientShowInput, packedAdminAbuseReportNotificationRecipientShowOutput } from '../../../../../contract/packed-endpoint-definitions.js';
 import { Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
+
 import {
 	AbuseReportNotificationRecipientEntityService,
 } from '../../../../serializers/AbuseReportNotificationRecipientEntityService.js';
 import { AbuseReportNotificationService } from '../../../../services/AbuseReportNotificationService.js';
 import { ApiError } from '@/server/api/error.js';
+
+const contractProjection = projectEndpointContract(packedAdminAbuseReportNotificationRecipientShowDefinition);
 
 export const meta = {
 	tags: ['admin', 'abuse-report', 'notification-recipient'],
@@ -19,10 +23,7 @@ export const meta = {
 	secure: true,
 	kind: 'read:admin:abuse-report:notification-recipient',
 
-	res: {
-		type: 'object',
-		ref: 'AbuseReportNotificationRecipient',
-	},
+	res: contractProjection.response,
 
 	errors: {
 		noSuchRecipient: {
@@ -35,24 +36,15 @@ export const meta = {
 	},
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {
-		id: {
-			type: 'string',
-			format: 'misskey:id',
-		},
-	},
-	required: ['id'],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedAdminAbuseReportNotificationRecipientShowInput, typeof packedAdminAbuseReportNotificationRecipientShowOutput> {
 	constructor(
 		private abuseReportNotificationService: AbuseReportNotificationService,
 		private abuseReportNotificationRecipientEntityService: AbuseReportNotificationRecipientEntityService,
 	) {
-		super(meta, paramDef, async (ps) => {
+		super(meta, contractProjection, async (ps) => {
 			const recipients = await this.abuseReportNotificationService.fetchRecipients({ ids: [ps.id] });
 			if (recipients.length === 0) {
 				throw new ApiError(meta.errors.noSuchRecipient);

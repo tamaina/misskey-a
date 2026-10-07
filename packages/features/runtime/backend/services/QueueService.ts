@@ -815,7 +815,7 @@ export class QueueService {
 			id: job.id!,
 			name: job.name,
 			data: this.redactJobData(queueType, job.data),
-			opts: job.opts,
+			opts: { ...job.opts },
 			timestamp: job.timestamp,
 			processedOn: job.processedOn,
 			processedBy: job.processedBy,

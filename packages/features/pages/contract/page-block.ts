@@ -32,12 +32,12 @@ const legacyPageBlockBaseSchema = resultObject({
 });
 export type PackedPageBlock =
 	| v.InferOutput<typeof pageTextBlockSchema | typeof pageImageBlockSchema | typeof pageNoteBlockSchema>
-	| (v.InferOutput<typeof pageSectionBaseSchema> & { children: (PackedPageBlock | object)[] })
-	| (v.InferOutput<typeof legacyPageBlockBaseSchema> & { children?: (PackedPageBlock | object)[] | undefined });
+	| (v.InferOutput<typeof pageSectionBaseSchema> & { children: (PackedPageBlock | Record<string, unknown>)[] })
+	| (v.InferOutput<typeof legacyPageBlockBaseSchema> & { children?: (PackedPageBlock | Record<string, unknown>)[] | undefined });
 export const packedPageBlockSchema: v.GenericSchema<PackedPageBlock, PackedPageBlock> = v.variant('type', [
 	pageTextBlockSchema,
-	resultObject({ ...pageSectionBaseSchema.entries, children: v.array(v.union([v.lazy(() => packedPageBlockSchema), resultObject({})])) }),
+	resultObject({ ...pageSectionBaseSchema.entries, children: v.array(v.union([v.lazy(() => packedPageBlockSchema), v.looseObject({})])) }),
 	pageImageBlockSchema,
 	pageNoteBlockSchema,
-	resultObject({ ...legacyPageBlockBaseSchema.entries, children: v.optional(v.array(v.union([v.lazy(() => packedPageBlockSchema), resultObject({})]))) }),
+	resultObject({ ...legacyPageBlockBaseSchema.entries, children: v.optional(v.array(v.union([v.lazy(() => packedPageBlockSchema), v.looseObject({})]))) }),
 ]);

@@ -3,12 +3,16 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { packedBubbleGameRankingDefinition, packedBubbleGameRankingInput, packedBubbleGameRankingOutput } from '../../../contract/packed-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
 import { MoreThan } from 'typeorm';
-import { Endpoint } from '@/server/api/endpoint-base.js';
+
 import type { BubbleGameRecordsRepository } from '@/models/_.js';
 import { DI } from '@/di-symbols.js';
 import { UserEntityService } from '../../../../users/backend/serializers/UserEntityService.js';
+
+const contractProjection = projectEndpointContract(packedBubbleGameRankingDefinition);
 
 export const meta = {
 	allowGet: true,
@@ -17,48 +21,20 @@ export const meta = {
 	errors: {
 	},
 
-	res: {
-		type: 'array',
-		optional: false, nullable: false,
-		items: {
-			type: 'object',
-			optional: false, nullable: false,
-			properties: {
-				id: {
-					type: 'string', format: 'misskey:id',
-					optional: false, nullable: false,
-				},
-				score: {
-					type: 'integer',
-					optional: false, nullable: false,
-				},
-				user: {
-					type: 'object',
-					optional: true, nullable: false,
-					ref: 'UserLite',
-				},
-			},
-		},
-	},
+	res: contractProjection.response,
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {
-		gameMode: { type: 'string' },
-	},
-	required: ['gameMode'],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedBubbleGameRankingInput, typeof packedBubbleGameRankingOutput> {
 	constructor(
 		@Inject(DI.bubbleGameRecordsRepository)
 		private bubbleGameRecordsRepository: BubbleGameRecordsRepository,
 
 		private userEntityService: UserEntityService,
 	) {
-		super(meta, paramDef, async (ps) => {
+		super(meta, contractProjection, async (ps) => {
 			const records = await this.bubbleGameRecordsRepository.find({
 				where: {
 					gameMode: ps.gameMode,

@@ -77,9 +77,11 @@ async function generateSchemaEntities(
 	const schemaNames = Object.keys(schemas);
 	const typeAliasLines: string[] = [];
 
-	typeAliasLines.push(`import { components } from '${toImportPath(typeFileName)}';`);
+	typeAliasLines.push(`import type { components } from '${toImportPath(typeFileName)}';`);
+	typeAliasLines.push("import type { PackedModels } from '#feature-contracts/index';");
+	typeAliasLines.push("type ContractModel<Name extends keyof components['schemas']> = Name extends keyof PackedModels ? PackedModels[Name] : components['schemas'][Name];");
 	typeAliasLines.push(
-		...schemaNames.map(it => `export type ${it} = components['schemas']['${it}'];`),
+		...schemaNames.map(it => `export type ${it} = ContractModel<'${it}'>;`),
 	);
 	typeAliasLines.push('');
 
@@ -152,7 +154,10 @@ async function generateEndpoints(
 
 	entitiesOutputLine.push('/* eslint @typescript-eslint/naming-convention: 0 */');
 
-	entitiesOutputLine.push(`import { operations } from '${toImportPath(typeFileName)}';`);
+	entitiesOutputLine.push(`import type { operations } from '${toImportPath(typeFileName)}';`);
+	entitiesOutputLine.push("import type { ContractEndpoints } from '../contract.types.js';");
+	entitiesOutputLine.push("type ContractRequest<Route extends string, Legacy> = Route extends keyof ContractEndpoints ? ContractEndpoints[Route]['req'] : Legacy;");
+	entitiesOutputLine.push("type ContractResponse<Route extends string, Legacy> = Route extends keyof ContractEndpoints ? ContractEndpoints[Route]['res'] : Legacy;");
 	entitiesOutputLine.push('');
 
 	entitiesOutputLine.push(new EmptyTypeAlias(OperationsAliasType.REQUEST).toLine());
@@ -334,8 +339,8 @@ class OperationTypeAlias implements IOperationTypeAlias {
 	toLine(): string {
 		const name = this.generateName();
 		return (this.type === OperationsAliasType.REQUEST)
-			? `export type ${name} = operations['${this.operationId}']['requestBody']['content']['${this.mediaType}'];`
-			: `export type ${name} = operations['${this.operationId}']['responses']['200']['content']['${this.mediaType}'];`;
+			? `export type ${name} = ContractRequest<'${this.path.replace(/^\//, '')}', operations['${this.operationId}']['requestBody']['content']['${this.mediaType}']>;`
+			: `export type ${name} = ContractResponse<'${this.path.replace(/^\//, '')}', operations['${this.operationId}']['responses']['200']['content']['${this.mediaType}']>;`;
 	}
 }
 

@@ -3,14 +3,18 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { packedIWebhooksShowDefinition, packedIWebhooksShowInput, packedIWebhooksShowOutput } from '../../../../contract/packed-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
+
 import { webhookEventTypes } from '../../../models/Webhook.js';
 import type { WebhooksRepository } from '@/models/_.js';
 import { DI } from '@/di-symbols.js';
 import { ApiError } from '@/server/api/error.js';
 
 // TODO: UserWebhook schemaの適用
+const contractProjection = projectEndpointContract(packedIWebhooksShowDefinition);
+
 export const meta = {
 	tags: ['webhooks'],
 
@@ -26,27 +30,18 @@ export const meta = {
 		},
 	},
 
-	res: {
-		type: 'object',
-		ref: 'UserWebhook',
-	},
+	res: contractProjection.response,
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {
-		webhookId: { type: 'string', format: 'misskey:id' },
-	},
-	required: ['webhookId'],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedIWebhooksShowInput, typeof packedIWebhooksShowOutput> {
 	constructor(
 		@Inject(DI.webhooksRepository)
 		private webhooksRepository: WebhooksRepository,
 	) {
-		super(meta, paramDef, async (ps, me) => {
+		super(meta, contractProjection, async (ps, me) => {
 			const webhook = await this.webhooksRepository.findOneBy({
 				id: ps.webhookId,
 				userId: me.id,

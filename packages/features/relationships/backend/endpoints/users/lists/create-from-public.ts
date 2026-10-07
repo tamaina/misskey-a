@@ -3,11 +3,13 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { packedUsersListsCreateFromPublicDefinition, packedUsersListsCreateFromPublicInput, packedUsersListsCreateFromPublicOutput } from '../../../../contract/packed-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
 import type { UserListsRepository, UserListMembershipsRepository, BlockingsRepository } from '@/models/_.js';
 import { IdService } from '../../../../../runtime/backend/services/IdService.js';
 import type { MiUserList } from '../../../models/UserList.js';
-import { Endpoint } from '@/server/api/endpoint-base.js';
+
 import { GetterService } from '@/server/api/GetterService.js';
 import { UserListEntityService } from '../../../serializers/UserListEntityService.js';
 import { DI } from '@/di-symbols.js';
@@ -15,15 +17,13 @@ import { ApiError } from '@/server/api/error.js';
 import { RoleService } from '../../../../../roles/backend/services/RoleService.js';
 import { UserListService } from '../../../services/UserListService.js';
 
+const contractProjection = projectEndpointContract(packedUsersListsCreateFromPublicDefinition);
+
 export const meta = {
 	requireCredential: true,
 	prohibitMoved: true,
 	kind: 'write:account',
-	res: {
-		type: 'object',
-		optional: false, nullable: false,
-		ref: 'UserList',
-	},
+	res: contractProjection.response,
 
 	errors: {
 		tooManyUserLists: {
@@ -62,17 +62,10 @@ export const meta = {
 	},
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {
-		name: { type: 'string', minLength: 1, maxLength: 100 },
-		listId: { type: 'string', format: 'misskey:id' },
-	},
-	required: ['name', 'listId'],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedUsersListsCreateFromPublicInput, typeof packedUsersListsCreateFromPublicOutput> {
 	constructor(
 		@Inject(DI.userListsRepository)
 		private userListsRepository: UserListsRepository,
@@ -89,7 +82,7 @@ export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDe
 		private getterService: GetterService,
 		private roleService: RoleService,
 	) {
-		super(meta, paramDef, async (ps, me) => {
+		super(meta, contractProjection, async (ps, me) => {
 			const listExist = await this.userListsRepository.exists({
 				where: {
 					id: ps.listId,

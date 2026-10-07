@@ -3,14 +3,18 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { packedAdminEmojiAddDefinition, packedAdminEmojiAddInput, packedAdminEmojiAddOutput } from '../../../../contract/packed-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
+
 import type { DriveFilesRepository } from '@/models/_.js';
 import { DI } from '@/di-symbols.js';
 import { CustomEmojiService } from '../../../services/CustomEmojiService.js';
 import { EmojiEntityService } from '../../../serializers/EmojiEntityService.js';
 import { FILE_TYPE_IMAGE } from '@/const.js';
 import { ApiError } from '@/server/api/error.js';
+
+const contractProjection = projectEndpointContract(packedAdminEmojiAddDefinition);
 
 export const meta = {
 	tags: ['admin'],
@@ -37,52 +41,22 @@ export const meta = {
 		},
 	},
 
-	res: {
-		type: 'object',
-		ref: 'EmojiDetailed',
-	},
+	res: contractProjection.response,
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {
-		name: { type: 'string', pattern: '^[a-zA-Z0-9_]+$' },
-		fileId: { type: 'string', format: 'misskey:id' },
-		category: {
-			type: 'string',
-			nullable: true,
-			description: 'Use `null` to reset the category.',
-		},
-		aliases: {
-			type: 'array',
-			items: {
-				type: 'string',
-			},
-		},
-		license: { type: 'string', nullable: true },
-		isSensitive: { type: 'boolean' },
-		localOnly: { type: 'boolean' },
-		roleIdsThatCanBeUsedThisEmojiAsReaction: {
-			type: 'array',
-			items: {
-				type: 'string',
-			},
-		},
-	},
-	required: ['name', 'fileId'],
-} as const;
+export const paramDef = contractProjection.input;
 
 // TODO: ロジックをサービスに切り出す
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedAdminEmojiAddInput, typeof packedAdminEmojiAddOutput> {
 	constructor(
 		@Inject(DI.driveFilesRepository)
 		private driveFilesRepository: DriveFilesRepository,
 		private customEmojiService: CustomEmojiService,
 		private emojiEntityService: EmojiEntityService,
 	) {
-		super(meta, paramDef, async (ps, me) => {
+		super(meta, contractProjection, async (ps, me) => {
 			const driveFile = await this.driveFilesRepository.findOneBy({ id: ps.fileId });
 			if (driveFile == null) throw new ApiError(meta.errors.noSuchFile);
 			const isDuplicate = await this.customEmojiService.checkDuplicate(ps.name);

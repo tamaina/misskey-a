@@ -401,3 +401,20 @@ schema converter does not automatically accept these output-only references,
 and the legacy input adapter rejects them. Existing handler response objects are
 not parsed, cloned or stripped. Missing-type legacy references remain outside
 this mechanical batch until their intended public schema is reviewed.
+
+
+## Expanded Packed contracts and SDK aliases
+
+A further 121 endpoints use native feature contracts, bringing coverage to 290
+routes (92 feature factories and 198 class adapters); 148 routes still use legacy
+schema inference. The role-creation endpoint stays on its legacy path until its
+opaque condition-formula input and typed service boundary can be reconciled
+without a cast or an unintended validation change.
+
+Named SDK model aliases now derive from the canonical Packed schema map. Named
+operation aliases prefer migrated contracts and fall back to the generated
+OpenAPI types for unmigrated routes. Declared request keys remain usable with
+Pick/Omit without a broad top-level index signature erasing required fields;
+transport validation and preservation of extra input keys are unchanged. Opaque
+Page data and queue options are represented as records, retaining arbitrary data.
+These changes do not introduce response parsing or alter the HTTP client runtime.

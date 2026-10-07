@@ -288,3 +288,6 @@ export const packedSchemas: PackedSchemaRegistry = {
 };
 
 export type Packed<K extends keyof typeof packedSchemas> = v.InferOutput<(typeof packedSchemas)[K]>;
+
+/** Canonical SDK model types, inferred directly from the feature schemas. */
+export type PackedModels = { [Name in keyof typeof packedSchemas]: Packed<Name> };

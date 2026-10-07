@@ -3,11 +3,15 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { packedFlashMyLikesDefinition, packedFlashMyLikesInput, packedFlashMyLikesOutput } from '../../../contract/packed-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
+
 import { FlashLikeEntityService } from '../../serializers/FlashLikeEntityService.js';
 import { DI } from '@/di-symbols.js';
 import { FlashService } from '../../services/FlashService.js';
+
+const contractProjection = projectEndpointContract(packedFlashMyLikesDefinition);
 
 export const meta = {
 	tags: ['account', 'flash'],
@@ -16,47 +20,18 @@ export const meta = {
 
 	kind: 'read:flash-likes',
 
-	res: {
-		type: 'array',
-		optional: false, nullable: false,
-		items: {
-			type: 'object',
-			properties: {
-				id: {
-					type: 'string',
-					optional: false, nullable: false,
-					format: 'id',
-				},
-				flash: {
-					type: 'object',
-					optional: false, nullable: false,
-					ref: 'Flash',
-				},
-			},
-		},
-	},
+	res: contractProjection.response,
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {
-		limit: { type: 'integer', minimum: 1, maximum: 100, default: 10 },
-		sinceId: { type: 'string', format: 'misskey:id' },
-		untilId: { type: 'string', format: 'misskey:id' },
-		sinceDate: { type: 'integer' },
-		untilDate: { type: 'integer' },
-		search: { type: 'string', minLength: 1, maxLength: 100, nullable: true },
-	},
-	required: [],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedFlashMyLikesInput, typeof packedFlashMyLikesOutput> {
 	constructor(
 		private flashLikeEntityService: FlashLikeEntityService,
 		private flashService: FlashService,
 	) {
-		super(meta, paramDef, async (ps, me) => {
+		super(meta, contractProjection, async (ps, me) => {
 			const likes = await this.flashService.myLikes(me.id, {
 				sinceId: ps.sinceId,
 				untilId: ps.untilId,

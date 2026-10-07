@@ -3,15 +3,19 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { packedDriveFoldersCreateDefinition, packedDriveFoldersCreateInput, packedDriveFoldersCreateOutput } from '../../../../contract/packed-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
 import ms from '@/runtime-dependencies/ms.js';
-import { Endpoint } from '@/server/api/endpoint-base.js';
+
 import type { DriveFoldersRepository } from '@/models/_.js';
 import { IdService } from '../../../../../runtime/backend/services/IdService.js';
 import { DriveFolderEntityService } from '../../../serializers/DriveFolderEntityService.js';
 import { GlobalEventService } from '../../../../../runtime/backend/services/GlobalEventService.js';
 import { DI } from '@/di-symbols.js';
 import { ApiError } from '@/server/api/error.js';
+
+const contractProjection = projectEndpointContract(packedDriveFoldersCreateDefinition);
 
 export const meta = {
 	tags: ['drive'],
@@ -33,24 +37,13 @@ export const meta = {
 		},
 	},
 
-	res: {
-		type: 'object' as const,
-		optional: false as const, nullable: false as const,
-		ref: 'DriveFolder',
-	},
+	res: contractProjection.response,
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {
-		name: { type: 'string', default: 'Untitled', maxLength: 200 },
-		parentId: { type: 'string', format: 'misskey:id', nullable: true },
-	},
-	required: [],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedDriveFoldersCreateInput, typeof packedDriveFoldersCreateOutput> {
 	constructor(
 		@Inject(DI.driveFoldersRepository)
 		private driveFoldersRepository: DriveFoldersRepository,
@@ -59,7 +52,7 @@ export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDe
 		private idService: IdService,
 		private globalEventService: GlobalEventService,
 	) {
-		super(meta, paramDef, async (ps, me) => {
+		super(meta, contractProjection, async (ps, me) => {
 			// If the parent folder is specified
 			let parent = null;
 			if (ps.parentId) {

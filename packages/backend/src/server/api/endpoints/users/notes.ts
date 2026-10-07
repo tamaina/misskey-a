@@ -3,10 +3,12 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { packedUsersNotesDefinition, packedUsersNotesInput, packedUsersNotesOutput } from '../../../../../../features/timelines/contract/packed-endpoint-definitions.js';
 import { Brackets } from 'typeorm';
 import { Inject, Injectable } from '@nestjs/common';
 import type { MiMeta, NotesRepository } from '@/models/_.js';
-import { Endpoint } from '@/server/api/endpoint-base.js';
+
 import { NoteEntityService } from '../../../../../../features/notes/backend/serializers/NoteEntityService.js';
 import { DI } from '@/di-symbols.js';
 import { CacheService } from '@/core/CacheService.js';
@@ -18,18 +20,12 @@ import { FanoutTimelineName } from '../../../../../../features/timelines/backend
 import { ApiError } from '@/server/api/error.js';
 import { ChannelMutingService } from '../../../../../../features/channels/backend/services/ChannelMutingService.js';
 
+const contractProjection = projectEndpointContract(packedUsersNotesDefinition);
+
 export const meta = {
 	tags: ['users', 'notes'],
 
-	res: {
-		type: 'array',
-		optional: false, nullable: false,
-		items: {
-			type: 'object',
-			optional: false, nullable: false,
-			ref: 'Note',
-		},
-	},
+	res: contractProjection.response,
 
 	errors: {
 		noSuchUser: {
@@ -52,26 +48,10 @@ export const meta = {
 	},
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {
-		userId: { type: 'string', format: 'misskey:id' },
-		withReplies: { type: 'boolean', default: false },
-		withRenotes: { type: 'boolean', default: true },
-		withChannelNotes: { type: 'boolean', default: false },
-		limit: { type: 'integer', minimum: 1, maximum: 100, default: 10 },
-		sinceId: { type: 'string', format: 'misskey:id' },
-		untilId: { type: 'string', format: 'misskey:id' },
-		sinceDate: { type: 'integer' },
-		untilDate: { type: 'integer' },
-		allowPartial: { type: 'boolean', default: false }, // true is recommended but for compatibility false by default
-		withFiles: { type: 'boolean', default: false },
-	},
-	required: ['userId'],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-disable-line import/no-default-export
+export default class extends ContractEndpoint<typeof meta, typeof packedUsersNotesInput, typeof packedUsersNotesOutput> { // eslint-disable-line import/no-default-export
 	constructor(
 		@Inject(DI.meta)
 		private serverSettings: MiMeta,
@@ -85,7 +65,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 		private fanoutTimelineEndpointService: FanoutTimelineEndpointService,
 		private channelMutingService: ChannelMutingService,
 	) {
-		super(meta, paramDef, async (ps, me) => {
+		super(meta, contractProjection, async (ps, me) => {
 			const untilId = ps.untilId ?? (ps.untilDate ? this.idService.gen(ps.untilDate!) : null);
 			const sinceId = ps.sinceId ?? (ps.sinceDate ? this.idService.gen(ps.sinceDate!) : null);
 			const isSelf = me && (me.id === ps.userId);

@@ -3,11 +3,15 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { packedAdminSystemWebhookShowDefinition, packedAdminSystemWebhookShowInput, packedAdminSystemWebhookShowOutput } from '../../../../contract/packed-endpoint-definitions.js';
 import { Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
+
 import { SystemWebhookEntityService } from '../../../serializers/SystemWebhookEntityService.js';
 import { ApiError } from '@/server/api/error.js';
 import { SystemWebhookService } from '../../../services/SystemWebhookService.js';
+
+const contractProjection = projectEndpointContract(packedAdminSystemWebhookShowDefinition);
 
 export const meta = {
 	tags: ['admin', 'system-webhook'],
@@ -17,10 +21,7 @@ export const meta = {
 	secure: true,
 	kind: 'write:admin:system-webhook',
 
-	res: {
-		type: 'object',
-		ref: 'SystemWebhook',
-	},
+	res: contractProjection.response,
 
 	errors: {
 		noSuchSystemWebhook: {
@@ -33,24 +34,15 @@ export const meta = {
 	},
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {
-		id: {
-			type: 'string',
-			format: 'misskey:id',
-		},
-	},
-	required: ['id'],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedAdminSystemWebhookShowInput, typeof packedAdminSystemWebhookShowOutput> {
 	constructor(
 		private systemWebhookService: SystemWebhookService,
 		private systemWebhookEntityService: SystemWebhookEntityService,
 	) {
-		super(meta, paramDef, async (ps) => {
+		super(meta, contractProjection, async (ps) => {
 			const webhooks = await this.systemWebhookService.fetchSystemWebhooks({ ids: [ps.id] });
 			if (webhooks.length === 0) {
 				throw new ApiError(meta.errors.noSuchSystemWebhook);

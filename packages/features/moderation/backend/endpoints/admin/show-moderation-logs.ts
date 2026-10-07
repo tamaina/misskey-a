@@ -3,13 +3,17 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { packedAdminShowModerationLogsDefinition, packedAdminShowModerationLogsInput, packedAdminShowModerationLogsOutput } from '../../../contract/packed-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
+
 import type { ModerationLogsRepository } from '@/models/_.js';
 import { QueryService } from '@/core/QueryService.js';
 import { DI } from '@/di-symbols.js';
 import { ModerationLogEntityService } from '../../serializers/ModerationLogEntityService.js';
 import { sqlLikeEscape } from '@/misc/sql-like-escape.js';
+
+const contractProjection = projectEndpointContract(packedAdminShowModerationLogsDefinition);
 
 export const meta = {
 	tags: ['admin'],
@@ -18,63 +22,13 @@ export const meta = {
 	requireAdmin: true,
 	kind: 'read:admin:show-moderation-log',
 
-	res: {
-		type: 'array',
-		optional: false, nullable: false,
-		items: {
-			type: 'object',
-			optional: false, nullable: false,
-			properties: {
-				id: {
-					type: 'string',
-					optional: false, nullable: false,
-					format: 'id',
-				},
-				createdAt: {
-					type: 'string',
-					optional: false, nullable: false,
-					format: 'date-time',
-				},
-				type: {
-					type: 'string',
-					optional: false, nullable: false,
-				},
-				info: {
-					type: 'object',
-					optional: false, nullable: false,
-				},
-				userId: {
-					type: 'string',
-					optional: false, nullable: false,
-					format: 'id',
-				},
-				user: {
-					type: 'object',
-					optional: false, nullable: false,
-					ref: 'UserDetailedNotMe',
-				},
-			},
-		},
-	},
+	res: contractProjection.response,
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {
-		limit: { type: 'integer', minimum: 1, maximum: 100, default: 10 },
-		sinceId: { type: 'string', format: 'misskey:id' },
-		untilId: { type: 'string', format: 'misskey:id' },
-		sinceDate: { type: 'integer' },
-		untilDate: { type: 'integer' },
-		type: { type: 'string', nullable: true },
-		userId: { type: 'string', format: 'misskey:id', nullable: true },
-		search: { type: 'string', nullable: true },
-	},
-	required: [],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedAdminShowModerationLogsInput, typeof packedAdminShowModerationLogsOutput> {
 	constructor(
 		@Inject(DI.moderationLogsRepository)
 		private moderationLogsRepository: ModerationLogsRepository,
@@ -82,7 +36,7 @@ export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDe
 		private moderationLogEntityService: ModerationLogEntityService,
 		private queryService: QueryService,
 	) {
-		super(meta, paramDef, async (ps, me) => {
+		super(meta, contractProjection, async (ps, me) => {
 			const query = this.queryService.makePaginationQuery(this.moderationLogsRepository.createQueryBuilder('log'), ps.sinceId, ps.untilId, ps.sinceDate, ps.untilDate);
 
 			if (ps.type != null) {

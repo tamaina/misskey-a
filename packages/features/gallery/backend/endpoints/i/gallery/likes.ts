@@ -3,12 +3,16 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { packedIGalleryLikesDefinition, packedIGalleryLikesInput, packedIGalleryLikesOutput } from '../../../../contract/packed-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
+
 import type { GalleryLikesRepository } from '@/models/_.js';
 import { QueryService } from '@/core/QueryService.js';
 import { GalleryLikeEntityService } from '../../../serializers/GalleryLikeEntityService.js';
 import { DI } from '@/di-symbols.js';
+
+const contractProjection = projectEndpointContract(packedIGalleryLikesDefinition);
 
 export const meta = {
 	tags: ['account', 'gallery'],
@@ -17,42 +21,13 @@ export const meta = {
 
 	kind: 'read:gallery-likes',
 
-	res: {
-		type: 'array',
-		optional: false, nullable: false,
-		items: {
-			type: 'object',
-			optional: false, nullable: false,
-			properties: {
-				id: {
-					type: 'string',
-					optional: false, nullable: false,
-					format: 'id',
-				},
-				post: {
-					type: 'object',
-					optional: false, nullable: false,
-					ref: 'GalleryPost',
-				},
-			},
-		},
-	},
+	res: contractProjection.response,
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {
-		limit: { type: 'integer', minimum: 1, maximum: 100, default: 10 },
-		sinceId: { type: 'string', format: 'misskey:id' },
-		untilId: { type: 'string', format: 'misskey:id' },
-		sinceDate: { type: 'integer' },
-		untilDate: { type: 'integer' },
-	},
-	required: [],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedIGalleryLikesInput, typeof packedIGalleryLikesOutput> {
 	constructor(
 		@Inject(DI.galleryLikesRepository)
 		private galleryLikesRepository: GalleryLikesRepository,
@@ -60,7 +35,7 @@ export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDe
 		private galleryLikeEntityService: GalleryLikeEntityService,
 		private queryService: QueryService,
 	) {
-		super(meta, paramDef, async (ps, me) => {
+		super(meta, contractProjection, async (ps, me) => {
 			const query = this.queryService.makePaginationQuery(this.galleryLikesRepository.createQueryBuilder('like'), ps.sinceId, ps.untilId, ps.sinceDate, ps.untilDate)
 				.andWhere('like.userId = :meId', { meId: me.id })
 				.leftJoinAndSelect('like.post', 'post');

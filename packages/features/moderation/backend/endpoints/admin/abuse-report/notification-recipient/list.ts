@@ -3,12 +3,16 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { packedAdminAbuseReportNotificationRecipientListDefinition, packedAdminAbuseReportNotificationRecipientListInput, packedAdminAbuseReportNotificationRecipientListOutput } from '../../../../../contract/packed-endpoint-definitions.js';
 import { Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
+
 import {
 	AbuseReportNotificationRecipientEntityService,
 } from '../../../../serializers/AbuseReportNotificationRecipientEntityService.js';
 import { AbuseReportNotificationService } from '../../../../services/AbuseReportNotificationService.js';
+
+const contractProjection = projectEndpointContract(packedAdminAbuseReportNotificationRecipientListDefinition);
 
 export const meta = {
 	tags: ['admin', 'abuse-report', 'notification-recipient'],
@@ -18,36 +22,18 @@ export const meta = {
 	secure: true,
 	kind: 'read:admin:abuse-report:notification-recipient',
 
-	res: {
-		type: 'array',
-		items: {
-			type: 'object',
-			ref: 'AbuseReportNotificationRecipient',
-		},
-	},
+	res: contractProjection.response,
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {
-		method: {
-			type: 'array',
-			items: {
-				type: 'string',
-				enum: ['email', 'webhook'],
-			},
-		},
-	},
-	required: [],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedAdminAbuseReportNotificationRecipientListInput, typeof packedAdminAbuseReportNotificationRecipientListOutput> {
 	constructor(
 		private abuseReportNotificationService: AbuseReportNotificationService,
 		private abuseReportNotificationRecipientEntityService: AbuseReportNotificationRecipientEntityService,
 	) {
-		super(meta, paramDef, async (ps) => {
+		super(meta, contractProjection, async (ps) => {
 			const recipients = await this.abuseReportNotificationService.fetchRecipients({ method: ps.method });
 			return this.abuseReportNotificationRecipientEntityService.packMany(recipients);
 		});

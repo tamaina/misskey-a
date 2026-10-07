@@ -22,8 +22,8 @@ export const packedPageSchema = resultObject({
 	"userId": v.pipe(v.string(), v.metadata({ "format": "id" })),
 	"user": v.lazy(() => __ref_UserLite),
 	// Stored pages may also contain historical or extension-defined opaque blocks.
-	"content": v.array(v.union([v.lazy(() => packedPageBlockSchema), resultObject({})])),
-	"variables": v.array(resultObject({})),
+	"content": v.array(v.union([v.lazy(() => packedPageBlockSchema), v.looseObject({})])),
+	"variables": v.array(v.looseObject({})),
 	"title": v.string(),
 	"name": v.string(),
 	"summary": v.nullable(v.string()),

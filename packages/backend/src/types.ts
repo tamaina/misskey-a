@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import type { JsonValue } from './misc/json-value.js';
+
 /**
  * note - 通知オンにしているユーザーが投稿した
  * follow - フォローされた
@@ -406,7 +408,12 @@ export type ModerationLogPayloads = {
 
 export type Serialized<T> = {
 	[K in keyof T]:
-	T[K] extends Date
+	// Preserve legacy any fields; unknown values have crossed the JSON boundary.
+	0 extends (1 & T[K])
+		? T[K]
+		: unknown extends T[K]
+			? JsonValue
+			: T[K] extends Date
 		? string
 		: T[K] extends (Date | null)
 			? (string | null)

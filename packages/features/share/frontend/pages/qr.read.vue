@@ -104,9 +104,9 @@ const timer = ref<number | null>(null);
 
 function updateLists() {
 	const responses = uris.value.map(uri => sources.get(uri)).filter((r): r is ApShowResponse => !!r);
-	users.value = responses.filter(r => r.type === 'User').map(r => r.object).filter((u): u is misskey.entities.UserDetailed => !!u);
+	users.value = responses.filter(r => r.type === 'User').map(r => r.object).filter((u) => !!u);
 	usersCount.value = users.value.length;
-	notes.value = responses.filter(r => r.type === 'Note').map(r => r.object).filter((n): n is misskey.entities.Note => !!n);
+	notes.value = responses.filter(r => r.type === 'Note').map(r => r.object).filter((n) => !!n);
 	notesCount.value = notes.value.length;
 	updateRequired.value = false;
 }

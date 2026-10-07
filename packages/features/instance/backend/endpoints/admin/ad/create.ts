@@ -3,12 +3,16 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { packedAdminAdCreateDefinition, packedAdminAdCreateInput, packedAdminAdCreateOutput } from '../../../../contract/packed-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
+
 import type { AdsRepository } from '@/models/_.js';
 import { IdService } from '../../../../../runtime/backend/services/IdService.js';
 import { DI } from '@/di-symbols.js';
 import { ModerationLogService } from '../../../../../moderation/backend/services/ModerationLogService.js';
+
+const contractProjection = projectEndpointContract(packedAdminAdCreateDefinition);
 
 export const meta = {
 	tags: ['admin'],
@@ -16,33 +20,13 @@ export const meta = {
 	requireCredential: true,
 	requireModerator: true,
 	kind: 'write:admin:ad',
-	res: {
-		type: 'object',
-		optional: false,
-		nullable: false,
-		ref: 'Ad',
-	},
+	res: contractProjection.response,
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {
-		url: { type: 'string', minLength: 1 },
-		memo: { type: 'string' },
-		place: { type: 'string' },
-		priority: { type: 'string' },
-		ratio: { type: 'integer' },
-		expiresAt: { type: 'integer' },
-		startsAt: { type: 'integer' },
-		imageUrl: { type: 'string', minLength: 1 },
-		dayOfWeek: { type: 'integer' },
-		isSensitive: { type: 'boolean' },
-	},
-	required: ['url', 'memo', 'place', 'priority', 'ratio', 'expiresAt', 'startsAt', 'imageUrl', 'dayOfWeek'],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedAdminAdCreateInput, typeof packedAdminAdCreateOutput> {
 	constructor(
 		@Inject(DI.adsRepository)
 		private adsRepository: AdsRepository,
@@ -50,7 +34,7 @@ export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDe
 		private idService: IdService,
 		private moderationLogService: ModerationLogService,
 	) {
-		super(meta, paramDef, async (ps, me) => {
+		super(meta, contractProjection, async (ps, me) => {
 			const ad = await this.adsRepository.insertOne({
 				id: this.idService.gen(),
 				expiresAt: new Date(ps.expiresAt),

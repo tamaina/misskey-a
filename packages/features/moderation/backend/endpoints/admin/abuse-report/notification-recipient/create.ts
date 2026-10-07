@@ -3,8 +3,10 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { packedAdminAbuseReportNotificationRecipientCreateDefinition, packedAdminAbuseReportNotificationRecipientCreateInput, packedAdminAbuseReportNotificationRecipientCreateOutput } from '../../../../../contract/packed-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
+
 import { ApiError } from '@/server/api/error.js';
 import {
 	AbuseReportNotificationRecipientEntityService,
@@ -12,6 +14,8 @@ import {
 import { AbuseReportNotificationService } from '../../../../services/AbuseReportNotificationService.js';
 import { DI } from '@/di-symbols.js';
 import type { UserProfilesRepository } from '@/models/_.js';
+
+const contractProjection = projectEndpointContract(packedAdminAbuseReportNotificationRecipientCreateDefinition);
 
 export const meta = {
 	tags: ['admin', 'abuse-report', 'notification-recipient'],
@@ -21,10 +25,7 @@ export const meta = {
 	secure: true,
 	kind: 'write:admin:abuse-report:notification-recipient',
 
-	res: {
-		type: 'object',
-		ref: 'AbuseReportNotificationRecipient',
-	},
+	res: contractProjection.response,
 
 	errors: {
 		correlationCheckEmail: {
@@ -48,46 +49,17 @@ export const meta = {
 	},
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {
-		isActive: {
-			type: 'boolean',
-		},
-		name: {
-			type: 'string',
-			minLength: 1,
-			maxLength: 255,
-		},
-		method: {
-			type: 'string',
-			enum: ['email', 'webhook'],
-		},
-		userId: {
-			type: 'string',
-			format: 'misskey:id',
-		},
-		systemWebhookId: {
-			type: 'string',
-			format: 'misskey:id',
-		},
-	},
-	required: [
-		'isActive',
-		'name',
-		'method',
-	],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedAdminAbuseReportNotificationRecipientCreateInput, typeof packedAdminAbuseReportNotificationRecipientCreateOutput> {
 	constructor(
 		@Inject(DI.userProfilesRepository)
 		private userProfilesRepository: UserProfilesRepository,
 		private abuseReportNotificationService: AbuseReportNotificationService,
 		private abuseReportNotificationRecipientEntityService: AbuseReportNotificationRecipientEntityService,
 	) {
-		super(meta, paramDef, async (ps, me) => {
+		super(meta, contractProjection, async (ps, me) => {
 			if (ps.method === 'email') {
 				const userProfile = await this.userProfilesRepository.findOneBy({ userId: ps.userId });
 				if (!ps.userId || !userProfile) {

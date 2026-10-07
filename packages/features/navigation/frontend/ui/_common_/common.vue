@@ -93,11 +93,11 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <div v-if="dev" id="devTicker"><span style="animation: dev-ticker-blink 2s infinite;">DEV BUILD</span></div>
 
-<div v-if="$i && $i.isBot" id="botWarn"><span style="animation: dev-ticker-blink 2s infinite;">{{ i18n.ts.loggedInAsBot }}</span></div>
+<div v-if="$i && $i.isBot" id="botWarn"><span style="animation: dev-ticker-blink 2s infinite;">{{ $locale.sfc.loggedInAsBot }}</span></div>
 
 <div v-if="isSafeMode" id="safemodeWarn">
-	<span style="animation: dev-ticker-blink 2s infinite;">{{ i18n.ts.safeModeEnabled }}</span>&nbsp;
-	<button class="_textButton" style="pointer-events: all;" @click="exitSafeMode">{{ i18n.ts.turnItOff }}</button>
+	<span style="animation: dev-ticker-blink 2s infinite;">{{ $locale.sfc.safeModeEnabled }}</span>&nbsp;
+	<button class="_textButton" style="pointer-events: all;" @click="exitSafeMode">{{ $locale.sfc.turnItOff }}</button>
 </div>
 </template>
 
@@ -114,7 +114,6 @@ import { pendingApiRequestsCount } from '@features/api/frontend/utility/misskey-
 import * as sound from '@features/preferences/frontend/utility/sound.js';
 import { $i } from '@features/auth/frontend/i.js';
 import { useStream } from '@features/api/frontend/stream.js';
-import { i18n } from '@features/runtime/frontend/i18n.js';
 import { prefer } from '@features/preferences/frontend/preferences.js';
 import { globalEvents } from '@features/runtime/frontend/events.js';
 import { store } from '@features/preferences/frontend/store.js';
@@ -448,3 +447,227 @@ if ($i) {
 	user-select: none;
 }
 </style>
+
+<locale locale="ar-SA" lang="json">
+{
+  "loggedInAsBot": "والج كآلي",
+  "safeModeEnabled": "Safe mode is enabled",
+  "turnItOff": "Turn off"
+}
+</locale>
+
+<locale locale="ca-ES" lang="json">
+{
+  "loggedInAsBot": "Identificat com a bot",
+  "safeModeEnabled": "Mode segur activat",
+  "turnItOff": "Desactivar"
+}
+</locale>
+
+<locale locale="cs-CZ" lang="json">
+{
+  "loggedInAsBot": "Právě jste přihlášen jako bot",
+  "safeModeEnabled": "Safe mode is enabled",
+  "turnItOff": "Turn off"
+}
+</locale>
+
+<locale locale="da-DK" lang="json">
+{
+  "loggedInAsBot": "Currently logged in as bot",
+  "safeModeEnabled": "Safe mode is enabled",
+  "turnItOff": "Turn off"
+}
+</locale>
+
+<locale locale="de-DE" lang="json">
+{
+  "loggedInAsBot": "Momentan als Bot angemeldet",
+  "safeModeEnabled": "Der abgesicherte Modus ist aktiviert.",
+  "turnItOff": "Ausschalten"
+}
+</locale>
+
+<locale locale="en-US" lang="json">
+{
+  "loggedInAsBot": "Currently logged in as bot",
+  "safeModeEnabled": "Safe mode is enabled",
+  "turnItOff": "Turn off"
+}
+</locale>
+
+<locale locale="es-ES" lang="json">
+{
+  "loggedInAsBot": "Inicio sesión como cuenta bot.",
+  "safeModeEnabled": "El modo seguro está activado",
+  "turnItOff": "Desactivar"
+}
+</locale>
+
+<locale locale="fr-FR" lang="json">
+{
+  "loggedInAsBot": "Connecté actuellement en tant que bot",
+  "safeModeEnabled": "Safe mode is enabled",
+  "turnItOff": "Turn off"
+}
+</locale>
+
+<locale locale="id-ID" lang="json">
+{
+  "loggedInAsBot": "Sedang login sebagai bot",
+  "safeModeEnabled": "Safe mode is enabled",
+  "turnItOff": "Turn off"
+}
+</locale>
+
+<locale locale="it-IT" lang="json">
+{
+  "loggedInAsBot": "Connessione come Bot",
+  "safeModeEnabled": "La modalità sicura è attiva",
+  "turnItOff": "Disattivare"
+}
+</locale>
+
+<locale locale="ja-JP" lang="json">
+{
+  "loggedInAsBot": "Botアカウントでログイン中",
+  "safeModeEnabled": "セーフモードが有効です",
+  "turnItOff": "オフにする"
+}
+</locale>
+
+<locale locale="ja-KS" lang="json">
+{
+  "loggedInAsBot": "Botアカウントでログイン中やで",
+  "safeModeEnabled": "セーフモードがオンになってるで",
+  "turnItOff": "オフでええわ"
+}
+</locale>
+
+<locale locale="kab-KAB" lang="json">
+{
+  "loggedInAsBot": "Currently logged in as bot",
+  "safeModeEnabled": "Safe mode is enabled",
+  "turnItOff": "Turn off"
+}
+</locale>
+
+<locale locale="kn-IN" lang="json">
+{
+  "loggedInAsBot": "Currently logged in as bot",
+  "safeModeEnabled": "Safe mode is enabled",
+  "turnItOff": "Turn off"
+}
+</locale>
+
+<locale locale="ko-KR" lang="json">
+{
+  "loggedInAsBot": "봇 계정으로 로그인중",
+  "safeModeEnabled": "세이프 모드가 활성화돼있습니다",
+  "turnItOff": "끄기"
+}
+</locale>
+
+<locale locale="nl-NL" lang="json">
+{
+  "loggedInAsBot": "Momenteel als bot ingelogd",
+  "safeModeEnabled": "Safe mode is enabled",
+  "turnItOff": "Turn off"
+}
+</locale>
+
+<locale locale="no-NO" lang="json">
+{
+  "loggedInAsBot": "Currently logged in as bot",
+  "safeModeEnabled": "Safe mode is enabled",
+  "turnItOff": "Turn off"
+}
+</locale>
+
+<locale locale="pl-PL" lang="json">
+{
+  "loggedInAsBot": "Jesteś obecnie zalogowany/a jako bot",
+  "safeModeEnabled": "Safe mode is enabled",
+  "turnItOff": "Turn off"
+}
+</locale>
+
+<locale locale="pt-PT" lang="json">
+{
+  "loggedInAsBot": "Atualmente conectado como bot",
+  "safeModeEnabled": "Modo seguro está habilitado",
+  "turnItOff": "Desativar"
+}
+</locale>
+
+<locale locale="ru-RU" lang="json">
+{
+  "loggedInAsBot": "Вы под аккаунтом бота!",
+  "safeModeEnabled": "Безопасный режим включен",
+  "turnItOff": "Выключить"
+}
+</locale>
+
+<locale locale="sk-SK" lang="json">
+{
+  "loggedInAsBot": "Currently logged in as bot",
+  "safeModeEnabled": "Safe mode is enabled",
+  "turnItOff": "Turn off"
+}
+</locale>
+
+<locale locale="th-TH" lang="json">
+{
+  "loggedInAsBot": "เข้าสู่ระบบเป็นบอตอยู่ในขณะนี้",
+  "safeModeEnabled": "โหมดปลอดภัยถูกเปิดใช้งาน",
+  "turnItOff": "ปิดใช้งาน"
+}
+</locale>
+
+<locale locale="tr-TR" lang="json">
+{
+  "loggedInAsBot": "Şu anda bot olarak oturum açmış durumdasınız.",
+  "safeModeEnabled": "Güvenli mod etkinleştirildi",
+  "turnItOff": "Kapat"
+}
+</locale>
+
+<locale locale="ug-CN" lang="json">
+{
+  "loggedInAsBot": "Currently logged in as bot",
+  "safeModeEnabled": "Safe mode is enabled",
+  "turnItOff": "Turn off"
+}
+</locale>
+
+<locale locale="uk-UA" lang="json">
+{
+  "loggedInAsBot": "Зараз виконано вхід як бот",
+  "safeModeEnabled": "Безпечний режим увімкнено",
+  "turnItOff": "Вимкнути"
+}
+</locale>
+
+<locale locale="vi-VN" lang="json">
+{
+  "loggedInAsBot": "Đang đăng nhập bằng tài khoản Bot",
+  "safeModeEnabled": "Safe mode is enabled",
+  "turnItOff": "Turn off"
+}
+</locale>
+
+<locale locale="zh-CN" lang="json">
+{
+  "loggedInAsBot": "以机器人账户登录中",
+  "safeModeEnabled": "已启用安全模式",
+  "turnItOff": "关闭"
+}
+</locale>
+
+<locale locale="zh-TW" lang="json">
+{
+  "loggedInAsBot": "以機器人帳戶登入中",
+  "safeModeEnabled": "啟用安全模式",
+  "turnItOff": "關閉"
+}
+</locale>

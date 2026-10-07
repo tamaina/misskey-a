@@ -3,12 +3,16 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { packedIDefinition, packedIInput, packedIOutput } from '../../contract/packed-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
 import type { UserProfilesRepository } from '@/models/_.js';
-import { Endpoint } from '@/server/api/endpoint-base.js';
+
 import { UserEntityService } from '../serializers/UserEntityService.js';
 import { DI } from '@/di-symbols.js';
 import { ApiError } from '@/server/api/error.js';
+
+const contractProjection = projectEndpointContract(packedIDefinition);
 
 export const meta = {
 	tags: ['account'],
@@ -16,11 +20,7 @@ export const meta = {
 	requireCredential: true,
 	kind: "read:account",
 
-	res: {
-		type: 'object',
-		optional: false, nullable: false,
-		ref: 'MeDetailed',
-	},
+	res: contractProjection.response,
 
 	errors: {
 		userIsDeleted: {
@@ -32,21 +32,17 @@ export const meta = {
 	},
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {},
-	required: [],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedIInput, typeof packedIOutput> {
 	constructor(
 		@Inject(DI.userProfilesRepository)
 		private userProfilesRepository: UserProfilesRepository,
 
 		private userEntityService: UserEntityService,
 	) {
-		super(meta, paramDef, async (ps, user, token) => {
+		super(meta, contractProjection, async (ps, user, token) => {
 			const isSecure = token == null;
 
 			const now = new Date();

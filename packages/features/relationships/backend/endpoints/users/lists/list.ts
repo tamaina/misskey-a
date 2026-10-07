@@ -3,12 +3,16 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { packedUsersListsListDefinition, packedUsersListsListInput, packedUsersListsListOutput } from '../../../../contract/packed-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
 import type { UserListsRepository, UsersRepository } from '@/models/_.js';
-import { Endpoint } from '@/server/api/endpoint-base.js';
+
 import { UserListEntityService } from '../../../serializers/UserListEntityService.js';
 import { ApiError } from '@/server/api/error.js';
 import { DI } from '@/di-symbols.js';
+
+const contractProjection = projectEndpointContract(packedUsersListsListDefinition);
 
 export const meta = {
 	tags: ['lists', 'account'],
@@ -19,15 +23,7 @@ export const meta = {
 
 	description: 'Show all lists that the authenticated user has created.',
 
-	res: {
-		type: 'array',
-		optional: false, nullable: false,
-		items: {
-			type: 'object',
-			optional: false, nullable: false,
-			ref: 'UserList',
-		},
-	},
+	res: contractProjection.response,
 	errors: {
 		noSuchUser: {
 			message: 'No such user.',
@@ -47,16 +43,10 @@ export const meta = {
 	},
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {
-		userId: { type: 'string', format: 'misskey:id' },
-	},
-	required: [],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable() // eslint-disable-next-line import/no-default-export
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedUsersListsListInput, typeof packedUsersListsListOutput> {
 	constructor(
 		@Inject(DI.usersRepository)
 		private usersRepository: UsersRepository,
@@ -66,7 +56,7 @@ export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDe
 
 		private userListEntityService: UserListEntityService,
 	) {
-		super(meta, paramDef, async (ps, me) => {
+		super(meta, contractProjection, async (ps, me) => {
 			if (typeof ps.userId !== 'undefined') {
 				const user = await this.usersRepository.findOneBy({ id: ps.userId });
 				if (user === null) throw new ApiError(meta.errors.noSuchUser);

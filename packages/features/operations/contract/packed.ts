@@ -17,7 +17,7 @@ export const packedQueueJobSchema = resultObject({
 	"id": v.string(),
 	"name": v.string(),
 	"data": resultObject({}),
-	"opts": resultObject({}),
+	"opts": v.looseObject({}),
 	"timestamp": v.number(),
 	"processedOn": v.optional(v.number()),
 	"processedBy": v.optional(v.string()),

@@ -3,13 +3,17 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { packedFederationInstancesDefinition, packedFederationInstancesInput, packedFederationInstancesOutput } from '../../../contract/packed-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
+
 import type { InstancesRepository } from '@/models/_.js';
 import { InstanceEntityService } from '../../../../instance/backend/serializers/InstanceEntityService.js';
 import { MetaService } from '../../../../instance/backend/services/MetaService.js';
 import { DI } from '@/di-symbols.js';
 import { sqlLikeEscape } from '@/misc/sql-like-escape.js';
+
+const contractProjection = projectEndpointContract(packedFederationInstancesDefinition);
 
 export const meta = {
 	tags: ['federation'],
@@ -18,57 +22,13 @@ export const meta = {
 	allowGet: true,
 	cacheSec: 3600,
 
-	res: {
-		type: 'array',
-		optional: false, nullable: false,
-		items: {
-			type: 'object',
-			optional: false, nullable: false,
-			ref: 'FederationInstance',
-		},
-	},
+	res: contractProjection.response,
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {
-		host: { type: 'string', nullable: true, description: 'Omit or use `null` to not filter by host.' },
-		blocked: { type: 'boolean', nullable: true },
-		notResponding: { type: 'boolean', nullable: true },
-		suspended: { type: 'boolean', nullable: true },
-		silenced: { type: 'boolean', nullable: true },
-		federating: { type: 'boolean', nullable: true },
-		subscribing: { type: 'boolean', nullable: true },
-		publishing: { type: 'boolean', nullable: true },
-		limit: { type: 'integer', minimum: 1, maximum: 100, default: 30 },
-		offset: { type: 'integer', default: 0 },
-		sort: {
-			type: 'string',
-			nullable: true,
-			enum: [
-				'+pubSub',
-				'-pubSub',
-				'+notes',
-				'-notes',
-				'+users',
-				'-users',
-				'+following',
-				'-following',
-				'+followers',
-				'-followers',
-				'+firstRetrievedAt',
-				'-firstRetrievedAt',
-				'+latestRequestReceivedAt',
-				'-latestRequestReceivedAt',
-				null,
-			],
-		},
-	},
-	required: [],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedFederationInstancesInput, typeof packedFederationInstancesOutput> {
 	constructor(
 		@Inject(DI.instancesRepository)
 		private instancesRepository: InstancesRepository,
@@ -76,7 +36,7 @@ export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDe
 		private instanceEntityService: InstanceEntityService,
 		private metaService: MetaService,
 	) {
-		super(meta, paramDef, async (ps, me) => {
+		super(meta, contractProjection, async (ps, me) => {
 			const query = this.instancesRepository.createQueryBuilder('instance');
 
 			switch (ps.sort) {

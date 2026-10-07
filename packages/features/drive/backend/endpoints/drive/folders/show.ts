@@ -3,12 +3,16 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { packedDriveFoldersShowDefinition, packedDriveFoldersShowInput, packedDriveFoldersShowOutput } from '../../../../contract/packed-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
+
 import type { DriveFoldersRepository } from '@/models/_.js';
 import { DriveFolderEntityService } from '../../../serializers/DriveFolderEntityService.js';
 import { DI } from '@/di-symbols.js';
 import { ApiError } from '@/server/api/error.js';
+
+const contractProjection = projectEndpointContract(packedDriveFoldersShowDefinition);
 
 export const meta = {
 	tags: ['drive'],
@@ -17,11 +21,7 @@ export const meta = {
 
 	kind: 'read:drive',
 
-	res: {
-		type: 'object',
-		optional: false, nullable: false,
-		ref: 'DriveFolder',
-	},
+	res: contractProjection.response,
 
 	errors: {
 		noSuchFolder: {
@@ -32,23 +32,17 @@ export const meta = {
 	},
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {
-		folderId: { type: 'string', format: 'misskey:id' },
-	},
-	required: ['folderId'],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedDriveFoldersShowInput, typeof packedDriveFoldersShowOutput> {
 	constructor(
 		@Inject(DI.driveFoldersRepository)
 		private driveFoldersRepository: DriveFoldersRepository,
 
 		private driveFolderEntityService: DriveFolderEntityService,
 	) {
-		super(meta, paramDef, async (ps, me) => {
+		super(meta, contractProjection, async (ps, me) => {
 			// Get folder
 			const folder = await this.driveFoldersRepository.findOneBy({
 				id: ps.folderId,

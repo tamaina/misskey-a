@@ -1,4 +1,4 @@
-import type { FeatureEndpoints } from '#feature-contracts/index';
+import type { ContractEndpoints } from './contract.types.js';
 import { Endpoints as Gen } from './autogen/endpoint.js';
 import { UserDetailed } from './autogen/models.js';
 import {
@@ -68,7 +68,7 @@ export type SwitchCaseResponseType<E extends keyof Endpoints, P extends Endpoint
 /* eslint-enable @stylistic/indent */
 
 export type Endpoints = Overwrite<
-	Overwrite<Gen, FeatureEndpoints>,
+	Overwrite<Gen, ContractEndpoints>,
 	{
 		'users/show': {
 			req: UsersShowRequest;
