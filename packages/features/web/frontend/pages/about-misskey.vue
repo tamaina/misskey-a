@@ -21,7 +21,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 					<button v-if="thereIsTreasure" class="_button treasure" @click="getTreasure"><img src="/fluent-emoji/1f3c6.png" class="treasureImg"></button>
 				</div>
 				<div style="text-align: center;">
-					{{ i18n.ts._aboutMisskey.about }}<br><a href="https://misskey-hub.net/docs/about-misskey/" target="_blank" class="_link">{{ i18n.ts.learnMore }}</a>
+					{{ $locale.sfc.aboutMisskeyAbout }}<br><a href="https://misskey-hub.net/docs/about-misskey/" target="_blank" class="_link">{{ $locale.sfc.learnMore }}</a>
 				</div>
 				<div v-if="$i != null" style="text-align: center;">
 					<MkButton primary rounded inline @click="iLoveMisskey">I <Mfm text="$[jelly ❤]"/> #Misskey</MkButton>
@@ -30,17 +30,17 @@ SPDX-License-Identifier: AGPL-3.0-only
 					<div class="_gaps_s">
 						<FormLink to="https://github.com/misskey-dev/misskey" external>
 							<template #icon><i class="ti ti-code"></i></template>
-							{{ i18n.ts._aboutMisskey.source }} ({{ i18n.ts._aboutMisskey.original }})
+							{{ $locale.sfc.aboutMisskeySource }} ({{ $locale.sfc.aboutMisskeyOriginal }})
 							<template #suffix>GitHub</template>
 						</FormLink>
 						<FormLink to="https://crowdin.com/project/misskey" external>
 							<template #icon><i class="ti ti-language-hiragana"></i></template>
-							{{ i18n.ts._aboutMisskey.translation }}
+							{{ $locale.sfc.aboutMisskeyTranslation }}
 							<template #suffix>Crowdin</template>
 						</FormLink>
 						<FormLink to="https://www.patreon.com/syuilo" external>
 							<template #icon><i class="ti ti-pig-money"></i></template>
-							{{ i18n.ts._aboutMisskey.donate }}
+							{{ $locale.sfc.aboutMisskeyDonate }}
 							<template #suffix>Patreon</template>
 						</FormLink>
 					</div>
@@ -48,24 +48,24 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<FormSection v-if="instance.repositoryUrl !== 'https://github.com/misskey-dev/misskey'">
 					<div class="_gaps_s">
 						<MkInfo>
-							{{ i18n.tsx._aboutMisskey.thisIsModifiedVersion({ name: instance.name ?? host }) }}
+							{{ interpolateLocaleParameters($locale.sfc.aboutMisskeyThisIsModifiedVersion, { name: instance.name ?? host }) }}
 						</MkInfo>
 						<FormLink v-if="instance.repositoryUrl" :to="instance.repositoryUrl" external>
 							<template #icon><i class="ti ti-code"></i></template>
-							{{ i18n.ts._aboutMisskey.source }}
+							{{ $locale.sfc.aboutMisskeySource }}
 						</FormLink>
 						<FormLink v-if="instance.providesTarball" :to="`/tarball/misskey-${version}.tar.gz`" external>
 							<template #icon><i class="ti ti-download"></i></template>
-							{{ i18n.ts._aboutMisskey.source }}
+							{{ $locale.sfc.aboutMisskeySource }}
 							<template #suffix>Tarball</template>
 						</FormLink>
 						<MkInfo v-if="!instance.repositoryUrl && !instance.providesTarball" warn>
-							{{ i18n.ts.sourceCodeIsNotYetProvided }}
+							{{ $locale.sfc.sourceCodeIsNotYetProvided }}
 						</MkInfo>
 					</div>
 				</FormSection>
 				<FormSection>
-					<template #label>{{ i18n.ts._aboutMisskey.projectMembers }}</template>
+					<template #label>{{ $locale.sfc.aboutMisskeyProjectMembers }}</template>
 					<div :class="$style.contributors">
 						<a href="https://github.com/syuilo" target="_blank" :class="$style.contributor">
 							<img src="https://avatars.githubusercontent.com/u/4439005?v=4" :class="$style.contributorAvatar">
@@ -117,7 +117,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 					</div>
 				</FormSection>
 				<FormSection>
-					<template #label><Mfm text="$[jelly ❤]"/> {{ i18n.ts._aboutMisskey.patrons }}</template>
+					<template #label><Mfm text="$[jelly ❤]"/> {{ $locale.sfc.aboutMisskeyPatrons }}</template>
 					<div :class="$style.patronsWithIcon">
 						<div v-for="patron in patronsWithIcon" :class="$style.patronWithIcon">
 							<img :src="patron.icon" :class="$style.patronIcon">
@@ -127,7 +127,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 					<div style="margin-top: 16px; display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); grid-gap: 12px;">
 						<div v-for="patron in patrons" :key="patron">{{ patron }}</div>
 					</div>
-					<p>{{ i18n.ts._aboutMisskey.morePatrons }}</p>
+					<p>{{ $locale.sfc.aboutMisskeyMorePatrons }}</p>
 				</FormSection>
 			</div>
 		</div>
@@ -144,7 +144,7 @@ import FormSection from '@features/ui/frontend/components/form/section.vue';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import MkInfo from '@features/ui/frontend/components/MkInfo.vue';
 import { physics } from '@features/media/frontend/utility/physics.js';
-import { i18n } from '@features/runtime/frontend/i18n.js';
+import { interpolateLocaleParameters } from '@features/runtime/frontend/interpolate-locale-parameters.js';
 import { instance } from '@features/instance/frontend/instance.js';
 import * as os from '@features/ui/frontend/os.js';
 import { definePage } from '@features/navigation/frontend/page.js';
@@ -485,7 +485,7 @@ const headerActions = computed(() => []);
 const headerTabs = computed(() => []);
 
 definePage(() => ({
-	title: i18n.ts.aboutMisskey,
+	title: $locale.value.sfc.aboutMisskey,
 	icon: null,
 }));
 </script>
@@ -632,3 +632,479 @@ definePage(() => ({
 	margin-left: 12px;
 }
 </style>
+
+<locale lang="json" locale="ar-SA">
+{
+	"aboutMisskeyAbout": "ميسكي هو برمجية مفتوحة المصدر يطورها syuilo منذ 2014.",
+	"learnMore": "راجع المزيد",
+	"aboutMisskeySource": "الشفرة المصدرية",
+	"aboutMisskeyOriginal": "Original",
+	"aboutMisskeyTranslation": "ترجم ميسكي",
+	"aboutMisskeyDonate": "تبرع لميسكي",
+	"aboutMisskeyThisIsModifiedVersion": "{name} uses a modified version of the original Misskey.",
+	"sourceCodeIsNotYetProvided": "Source code is not yet available. Contact the administrator to fix this problem.",
+	"aboutMisskeyProjectMembers": "Project members",
+	"aboutMisskeyPatrons": "الداعمون",
+	"aboutMisskeyMorePatrons": "نحن نقدر الدعم الذي قدمه العديد من الأشخاص الذين لم نذكرهم. شكرًا لكم 🥰",
+	"aboutMisskey": "عن Misskey"
+}
+</locale>
+
+<locale lang="json" locale="ca-ES">
+{
+	"aboutMisskeyAbout": "Misskey és un programa de codi obert desenvolupat des del 2014 per syuilo",
+	"learnMore": "Saber-ne més ",
+	"aboutMisskeySource": "Codi font",
+	"aboutMisskeyOriginal": "Original",
+	"aboutMisskeyTranslation": "Tradueix Misskey",
+	"aboutMisskeyDonate": "Fes un donatiu a Misskey",
+	"aboutMisskeyThisIsModifiedVersion": "En {name} fa servir una versió modificada de Misskey.",
+	"sourceCodeIsNotYetProvided": "El codi font encara no es troba disponible. Contacta amb l'administrador per solucionar aquest problema.",
+	"aboutMisskeyProjectMembers": "Membres del projecte",
+	"aboutMisskeyPatrons": "Patrocinadors",
+	"aboutMisskeyMorePatrons": "També agraïm el suport d'altres col·laboradors que no surten en aquesta llista. Gràcies! 🥰",
+	"aboutMisskey": "Quant a Misskey"
+}
+</locale>
+
+<locale lang="json" locale="cs-CZ">
+{
+	"aboutMisskeyAbout": "Misskey je open-source software vyvíjený syuilo od roku 2014.",
+	"learnMore": "Zjistit více",
+	"aboutMisskeySource": "Zdrojový kód",
+	"aboutMisskeyOriginal": "Original",
+	"aboutMisskeyTranslation": "Přeložit Misskey",
+	"aboutMisskeyDonate": "Přispějte na Misskey",
+	"aboutMisskeyThisIsModifiedVersion": "{name} uses a modified version of the original Misskey.",
+	"sourceCodeIsNotYetProvided": "Source code is not yet available. Contact the administrator to fix this problem.",
+	"aboutMisskeyProjectMembers": "Project members",
+	"aboutMisskeyPatrons": "Patroni",
+	"aboutMisskeyMorePatrons": "Vážíme si také podpory mnoha dalších pomocníků, kteří zde nejsou uvedeni. Děkujeme! 🥰",
+	"aboutMisskey": "O Misskey"
+}
+</locale>
+
+<locale lang="json" locale="da-DK">
+{
+	"aboutMisskeyAbout": "Misskey is open-source software being developed by syuilo since 2014.",
+	"learnMore": "Learn more",
+	"aboutMisskeySource": "Source code",
+	"aboutMisskeyOriginal": "Original",
+	"aboutMisskeyTranslation": "Translate Misskey",
+	"aboutMisskeyDonate": "Donate to Misskey",
+	"aboutMisskeyThisIsModifiedVersion": "{name} uses a modified version of the original Misskey.",
+	"sourceCodeIsNotYetProvided": "Source code is not yet available. Contact the administrator to fix this problem.",
+	"aboutMisskeyProjectMembers": "Project members",
+	"aboutMisskeyPatrons": "Patrons",
+	"aboutMisskeyMorePatrons": "We also appreciate the support of many other helpers not listed here. Thank you! 🥰",
+	"aboutMisskey": "About Misskey"
+}
+</locale>
+
+<locale lang="json" locale="de-DE">
+{
+	"aboutMisskeyAbout": "Misskey ist Open-Source-Software, welche von syuilo seit 2014 entwickelt wird.",
+	"learnMore": "Mehr erfahren",
+	"aboutMisskeySource": "Quellcode",
+	"aboutMisskeyOriginal": "Original",
+	"aboutMisskeyTranslation": "Misskey übersetzen",
+	"aboutMisskeyDonate": "An Misskey spenden",
+	"aboutMisskeyThisIsModifiedVersion": "{name} verwendet eine modifizierte Version des ursprünglichen Misskey.",
+	"sourceCodeIsNotYetProvided": "Der Quellcode ist noch nicht verfügbar. Kontaktiere den Administrator, um das Problem zu lösen.",
+	"aboutMisskeyProjectMembers": "Projektmitglieder",
+	"aboutMisskeyPatrons": "UnterstützerInnen",
+	"aboutMisskeyMorePatrons": "Wir schätzen ebenso die Unterstützung vieler anderer hier nicht gelisteter Personen sehr. Danke! 🥰",
+	"aboutMisskey": "Über Misskey"
+}
+</locale>
+
+<locale lang="json" locale="en-US">
+{
+	"aboutMisskeyAbout": "Misskey is open-source software being developed by syuilo since 2014.",
+	"learnMore": "Learn more",
+	"aboutMisskeySource": "Source code",
+	"aboutMisskeyOriginal": "Original",
+	"aboutMisskeyTranslation": "Translate Misskey",
+	"aboutMisskeyDonate": "Donate to Misskey",
+	"aboutMisskeyThisIsModifiedVersion": "{name} uses a modified version of the original Misskey.",
+	"sourceCodeIsNotYetProvided": "Source code is not yet available. Contact the administrator to fix this problem.",
+	"aboutMisskeyProjectMembers": "Project members",
+	"aboutMisskeyPatrons": "Patrons",
+	"aboutMisskeyMorePatrons": "We also appreciate the support of many other helpers not listed here. Thank you! 🥰",
+	"aboutMisskey": "About Misskey"
+}
+</locale>
+
+<locale lang="json" locale="es-ES">
+{
+	"aboutMisskeyAbout": "Misskey es un software de código abierto, desarrollado por syuilo desde 2014",
+	"learnMore": "Ver más",
+	"aboutMisskeySource": "Código fuente",
+	"aboutMisskeyOriginal": "Original",
+	"aboutMisskeyTranslation": "Traducir Misskey",
+	"aboutMisskeyDonate": "Donar a Misskey",
+	"aboutMisskeyThisIsModifiedVersion": "{name} usa una versión modificada de Misskey.",
+	"sourceCodeIsNotYetProvided": "El código fuente aún no está disponible. Contacta con el administrador para solucionarlo.",
+	"aboutMisskeyProjectMembers": "Miembros del proyecto",
+	"aboutMisskeyPatrons": "Patrocinadores",
+	"aboutMisskeyMorePatrons": "Muchas más personas nos apoyan. Muchas gracias🥰",
+	"aboutMisskey": "Sobre Misskey"
+}
+</locale>
+
+<locale lang="json" locale="fr-FR">
+{
+	"aboutMisskeyAbout": "Misskey est un logiciel libre et ouvert, développé par syuilo depuis 2014.",
+	"learnMore": "Plus d'informations",
+	"aboutMisskeySource": "Code source",
+	"aboutMisskeyOriginal": "Original",
+	"aboutMisskeyTranslation": "Traduire Misskey",
+	"aboutMisskeyDonate": "Soutenir Misskey",
+	"aboutMisskeyThisIsModifiedVersion": "{name} uses a modified version of the original Misskey.",
+	"sourceCodeIsNotYetProvided": "Le code source n'est pas encore disponible. Veuillez signaler ce problème aux administrateurs.",
+	"aboutMisskeyProjectMembers": "Membres du projet",
+	"aboutMisskeyPatrons": "Contributeurs",
+	"aboutMisskeyMorePatrons": "Nous apprécions vraiment le soutien de nombreuses autres personnes non mentionnées ici. Merci à toutes et à tous ! 🥰",
+	"aboutMisskey": "À propos de Misskey"
+}
+</locale>
+
+<locale lang="json" locale="id-ID">
+{
+	"aboutMisskeyAbout": "Misskey adalah perangkat lunak sumber terbuka yang sedang dikembangkan oleh syuilo sejak 2014.",
+	"learnMore": "Pelajari lebih lanjut",
+	"aboutMisskeySource": "Sumber kode",
+	"aboutMisskeyOriginal": "Asli",
+	"aboutMisskeyTranslation": "Terjemahkan Misskey",
+	"aboutMisskeyDonate": "Donasi ke Misskey",
+	"aboutMisskeyThisIsModifiedVersion": "{name} menggunakan versi modifikasi dari Misskey yang asli.",
+	"sourceCodeIsNotYetProvided": "Sumber kode belum tersedia. Hubungi admin untuk memperbaiki masalah ini.",
+	"aboutMisskeyProjectMembers": "Anggota proyek",
+	"aboutMisskeyPatrons": "Pendukung",
+	"aboutMisskeyMorePatrons": "Kami sangat mengapresiasi dukungan dari banyak penolong lain yang tidak tercantum disini. Terima kasih! 🥰",
+	"aboutMisskey": "Tentang Misskey"
+}
+</locale>
+
+<locale lang="json" locale="it-IT">
+{
+	"aboutMisskeyAbout": "Misskey è software libero, open source, sviluppato da Syuilo fin dal lontano 2014.",
+	"learnMore": "Per saperne di più",
+	"aboutMisskeySource": "Codice sorgente",
+	"aboutMisskeyOriginal": "Originale",
+	"aboutMisskeyTranslation": "Tradurre Misskey",
+	"aboutMisskeyDonate": "Sostieni Misskey",
+	"aboutMisskeyThisIsModifiedVersion": "{name} sta usando una versione modificata diversa da Misskey originale.",
+	"sourceCodeIsNotYetProvided": "Source code is not yet available. Contact the administrator to fix this problem.",
+	"aboutMisskeyProjectMembers": "Partecipanti al progetto",
+	"aboutMisskeyPatrons": "Sostenitori",
+	"aboutMisskeyMorePatrons": "Apprezziamo sinceramente il supporto di tante altre persone. Grazie mille! 🥰",
+	"aboutMisskey": "A proposito di Misskey"
+}
+</locale>
+
+<locale lang="json" locale="ja-JP">
+{
+	"aboutMisskeyAbout": "Misskeyはsyuiloによって2014年から開発されている、オープンソースのソフトウェアです。",
+	"learnMore": "詳しく",
+	"aboutMisskeySource": "ソースコード",
+	"aboutMisskeyOriginal": "オリジナル",
+	"aboutMisskeyTranslation": "Misskeyを翻訳",
+	"aboutMisskeyDonate": "Misskeyに寄付",
+	"aboutMisskeyThisIsModifiedVersion": "{name}はオリジナルのMisskeyを改変したバージョンを使用しています。",
+	"sourceCodeIsNotYetProvided": "ソースコードはまだ提供されていません。この問題の修正について管理者に問い合わせてください。",
+	"aboutMisskeyProjectMembers": "プロジェクトメンバー",
+	"aboutMisskeyPatrons": "支援者",
+	"aboutMisskeyMorePatrons": "他にも多くの方が支援してくれています。ありがとうございます🥰",
+	"aboutMisskey": "Misskeyについて"
+}
+</locale>
+
+<locale lang="json" locale="ja-KS">
+{
+	"aboutMisskeyAbout": "Misskeyはsyuiloが2014年からずっと作ってはる、オープンソースなソフトウェアや。",
+	"learnMore": "詳しく",
+	"aboutMisskeySource": "ソースコード",
+	"aboutMisskeyOriginal": "オリジナル",
+	"aboutMisskeyTranslation": "Misskeyを翻訳",
+	"aboutMisskeyDonate": "Misskeyに寄付",
+	"aboutMisskeyThisIsModifiedVersion": "{name}はオリジナルのMisskeyをいじったバージョンをつこうてるで。",
+	"sourceCodeIsNotYetProvided": "ソースコードはまだ提供されてへんで。問題の修正について管理者に問い合わせてみ。",
+	"aboutMisskeyProjectMembers": "プロジェクトメンバー",
+	"aboutMisskeyPatrons": "支援者",
+	"aboutMisskeyMorePatrons": "他にもぎょうさんの人からサポートしてもろてんねん。ほんまおおきに🥰",
+	"aboutMisskey": "Misskeyってなんや？"
+}
+</locale>
+
+<locale lang="json" locale="kab-KAB">
+{
+	"aboutMisskeyAbout": "Misskey is open-source software being developed by syuilo since 2014.",
+	"learnMore": "Learn more",
+	"aboutMisskeySource": "Source code",
+	"aboutMisskeyOriginal": "Original",
+	"aboutMisskeyTranslation": "Translate Misskey",
+	"aboutMisskeyDonate": "Donate to Misskey",
+	"aboutMisskeyThisIsModifiedVersion": "{name} uses a modified version of the original Misskey.",
+	"sourceCodeIsNotYetProvided": "Source code is not yet available. Contact the administrator to fix this problem.",
+	"aboutMisskeyProjectMembers": "Project members",
+	"aboutMisskeyPatrons": "Patrons",
+	"aboutMisskeyMorePatrons": "We also appreciate the support of many other helpers not listed here. Thank you! 🥰",
+	"aboutMisskey": "About Misskey"
+}
+</locale>
+
+<locale lang="json" locale="kn-IN">
+{
+	"aboutMisskeyAbout": "Misskey is open-source software being developed by syuilo since 2014.",
+	"learnMore": "Learn more",
+	"aboutMisskeySource": "Source code",
+	"aboutMisskeyOriginal": "Original",
+	"aboutMisskeyTranslation": "Translate Misskey",
+	"aboutMisskeyDonate": "Donate to Misskey",
+	"aboutMisskeyThisIsModifiedVersion": "{name} uses a modified version of the original Misskey.",
+	"sourceCodeIsNotYetProvided": "Source code is not yet available. Contact the administrator to fix this problem.",
+	"aboutMisskeyProjectMembers": "Project members",
+	"aboutMisskeyPatrons": "Patrons",
+	"aboutMisskeyMorePatrons": "We also appreciate the support of many other helpers not listed here. Thank you! 🥰",
+	"aboutMisskey": "About Misskey"
+}
+</locale>
+
+<locale lang="json" locale="ko-KR">
+{
+	"aboutMisskeyAbout": "Misskey는 syuilo가 2014년부터 개발한 오픈소스 소프트웨어입니다.",
+	"learnMore": "자세히",
+	"aboutMisskeySource": "소스 코드",
+	"aboutMisskeyOriginal": "원본",
+	"aboutMisskeyTranslation": "Misskey를 번역하기",
+	"aboutMisskeyDonate": "Misskey에 기부하기",
+	"aboutMisskeyThisIsModifiedVersion": "{name}에서는 원본 미스키를 수정한 버전을 사용하고 있습니다.",
+	"sourceCodeIsNotYetProvided": "소스 코드를 아직 제공하지 않습니다. 이 문제를 해결하려면 관리자에게 문의해 주세요.",
+	"aboutMisskeyProjectMembers": "프로젝트 구성원",
+	"aboutMisskeyPatrons": "후원자",
+	"aboutMisskeyMorePatrons": "이 외에도 다른 많은 분들이 도움을 주시고 계십니다. 감사합니다🥰",
+	"aboutMisskey": "Misskey에 대하여"
+}
+</locale>
+
+<locale lang="json" locale="nl-NL">
+{
+	"aboutMisskeyAbout": "Misskey is open-source software being developed by syuilo since 2014.",
+	"learnMore": "Meer leren",
+	"aboutMisskeySource": "Source code",
+	"aboutMisskeyOriginal": "Original",
+	"aboutMisskeyTranslation": "Translate Misskey",
+	"aboutMisskeyDonate": "Donate to Misskey",
+	"aboutMisskeyThisIsModifiedVersion": "{name} uses a modified version of the original Misskey.",
+	"sourceCodeIsNotYetProvided": "Source code is not yet available. Contact the administrator to fix this problem.",
+	"aboutMisskeyProjectMembers": "Project members",
+	"aboutMisskeyPatrons": "Patrons",
+	"aboutMisskeyMorePatrons": "We also appreciate the support of many other helpers not listed here. Thank you! 🥰",
+	"aboutMisskey": "Over Misskey"
+}
+</locale>
+
+<locale lang="json" locale="no-NO">
+{
+	"aboutMisskeyAbout": "Misskey er programvare med åpen kildekode som har blitt utviklet av syuilo siden 2014.",
+	"learnMore": "Les mer",
+	"aboutMisskeySource": "Source code",
+	"aboutMisskeyOriginal": "Original",
+	"aboutMisskeyTranslation": "Oversett Misskey",
+	"aboutMisskeyDonate": "Donate to Misskey",
+	"aboutMisskeyThisIsModifiedVersion": "{name} uses a modified version of the original Misskey.",
+	"sourceCodeIsNotYetProvided": "Source code is not yet available. Contact the administrator to fix this problem.",
+	"aboutMisskeyProjectMembers": "Project members",
+	"aboutMisskeyPatrons": "Patrons",
+	"aboutMisskeyMorePatrons": "We also appreciate the support of many other helpers not listed here. Thank you! 🥰",
+	"aboutMisskey": "Om Misskey"
+}
+</locale>
+
+<locale lang="json" locale="pl-PL">
+{
+	"aboutMisskeyAbout": "Misskey jest oprogramowanie open source rozwijanym przez syuilo od 2014.",
+	"learnMore": "Dowiedz się więcej",
+	"aboutMisskeySource": "Kod źródłowy",
+	"aboutMisskeyOriginal": "Original",
+	"aboutMisskeyTranslation": "Tłumacz Misskey",
+	"aboutMisskeyDonate": "Przekaż darowiznę na Misskey",
+	"aboutMisskeyThisIsModifiedVersion": "{name} uses a modified version of the original Misskey.",
+	"sourceCodeIsNotYetProvided": "Source code is not yet available. Contact the administrator to fix this problem.",
+	"aboutMisskeyProjectMembers": "Project members",
+	"aboutMisskeyPatrons": "Wspierający",
+	"aboutMisskeyMorePatrons": "Naprawdę doceniam wsparcie ze strony wielu niewymienionych tu osób. Dziękuję! 🥰",
+	"aboutMisskey": "O Misskey"
+}
+</locale>
+
+<locale lang="json" locale="pt-PT">
+{
+	"aboutMisskeyAbout": "Misskey é um software de código aberto desenvolvido por syulio desde 2014.",
+	"learnMore": "Saiba mais",
+	"aboutMisskeySource": "Código-fonte",
+	"aboutMisskeyOriginal": "Original",
+	"aboutMisskeyTranslation": "Traduza o Misskey",
+	"aboutMisskeyDonate": "Doe para o Misskey",
+	"aboutMisskeyThisIsModifiedVersion": "{name} utiliza uma versão modificada do Misskey original.",
+	"sourceCodeIsNotYetProvided": "Código-fonte está indisponível. Contate o administrador para resolver esse problema.",
+	"aboutMisskeyProjectMembers": "Membros do projeto",
+	"aboutMisskeyPatrons": "Apoiadores",
+	"aboutMisskeyMorePatrons": "Nós apreciamos o apoio de vários outros apoiadores não listados aqui. Obrigado! 🥰",
+	"aboutMisskey": "Sobre Misskey"
+}
+</locale>
+
+<locale lang="json" locale="ru-RU">
+{
+	"aboutMisskeyAbout": "Misskey — программа с открытым исходным кодом, которую разрабатывает syuilo с 2014 года.",
+	"learnMore": "Подробнее",
+	"aboutMisskeySource": "Исходный код",
+	"aboutMisskeyOriginal": "Original",
+	"aboutMisskeyTranslation": "Перевод Misskey",
+	"aboutMisskeyDonate": "Пожертвование на Misskey",
+	"aboutMisskeyThisIsModifiedVersion": "{name} uses a modified version of the original Misskey.",
+	"sourceCodeIsNotYetProvided": "Исходный код пока не доступен. Свяжитесь с администратором, чтобы исправить эту проблему.",
+	"aboutMisskeyProjectMembers": "Участники проекта",
+	"aboutMisskeyPatrons": "Материальная поддержка",
+	"aboutMisskeyMorePatrons": "Большое спасибо и многим другим, кто принял участие в этом проекте! 🥰",
+	"aboutMisskey": "О Misskey"
+}
+</locale>
+
+<locale lang="json" locale="sk-SK">
+{
+	"aboutMisskeyAbout": "Misskey je open-source softvér, ktorý vyvíja syuilo od 2014.",
+	"learnMore": "Zistiť viac",
+	"aboutMisskeySource": "Zdrojový kód",
+	"aboutMisskeyOriginal": "Original",
+	"aboutMisskeyTranslation": "Preložiť Misskey",
+	"aboutMisskeyDonate": "Podporiť Misskey",
+	"aboutMisskeyThisIsModifiedVersion": "{name} uses a modified version of the original Misskey.",
+	"sourceCodeIsNotYetProvided": "Source code is not yet available. Contact the administrator to fix this problem.",
+	"aboutMisskeyProjectMembers": "Project members",
+	"aboutMisskeyPatrons": "Prispievatelia",
+	"aboutMisskeyMorePatrons": "Takisto oceňujeme podporu mnoých ďalších, ktorí tu nie sú uvedení. Ďakujeme! 🥰",
+	"aboutMisskey": "O Misskey"
+}
+</locale>
+
+<locale lang="json" locale="th-TH">
+{
+	"aboutMisskeyAbout": "Misskey เป็นซอฟต์แวร์โอเพ่นซอร์สที่ถูกพัฒนาโดย Syuilo ตั้งแต่ปี 2014",
+	"learnMore": "แสดงให้ดูหน่อย",
+	"aboutMisskeySource": "ซอร์สโค้ด",
+	"aboutMisskeyOriginal": "ต้นฉบับ",
+	"aboutMisskeyTranslation": "แปลภาษา Misskey",
+	"aboutMisskeyDonate": "บริจาคให้กับ Misskey",
+	"aboutMisskeyThisIsModifiedVersion": "{name} ใช้ Misskey เวอร์ชันดัดแปลง",
+	"sourceCodeIsNotYetProvided": "ซอร์สโค้ดยังไม่พร้อมใช้งาน โปรดติดต่อผู้ดูแลระบบเพื่อแก้ไขปัญหานี้",
+	"aboutMisskeyProjectMembers": "สมาชิกในโครงการ",
+	"aboutMisskeyPatrons": "ผู้อุปถัมภ์",
+	"aboutMisskeyMorePatrons": "และอีกหลายท่านที่ไม่ได้เอ่ยนาม ขอบคุณที่ร่วมช่วยเหลือตลอดมานะคะ 🥰",
+	"aboutMisskey": "เกี่ยวกับ Misskey"
+}
+</locale>
+
+<locale lang="json" locale="tr-TR">
+{
+	"aboutMisskeyAbout": "Misskey, 2014 yılından beri syuilo tarafından geliştirilen açık kaynaklı bir yazılımdır.",
+	"learnMore": "Daha fazla bilgi edinin",
+	"aboutMisskeySource": "Kaynak kodu",
+	"aboutMisskeyOriginal": "Orijinal",
+	"aboutMisskeyTranslation": "Misskey'i çevir",
+	"aboutMisskeyDonate": "Misskey'e bağış yapın",
+	"aboutMisskeyThisIsModifiedVersion": "{name} orijinal Misskey'in değiştirilmiş bir sürümünü kullanır.",
+	"sourceCodeIsNotYetProvided": "Kaynak kodu henüz mevcut değildir. Bu sorunu gidermek için yöneticiyle iletişime geçin.",
+	"aboutMisskeyProjectMembers": "Proje üyeleri",
+	"aboutMisskeyPatrons": "Müşteriler",
+	"aboutMisskeyMorePatrons": "Burada adı geçmeyen diğer birçok yardımseverin desteğine de teşekkür ederiz. Teşekkürler! 🥰",
+	"aboutMisskey": "Misskey Hakkında"
+}
+</locale>
+
+<locale lang="json" locale="ug-CN">
+{
+	"aboutMisskeyAbout": "Misskey is open-source software being developed by syuilo since 2014.",
+	"learnMore": "Learn more",
+	"aboutMisskeySource": "Source code",
+	"aboutMisskeyOriginal": "Original",
+	"aboutMisskeyTranslation": "Translate Misskey",
+	"aboutMisskeyDonate": "Donate to Misskey",
+	"aboutMisskeyThisIsModifiedVersion": "{name} uses a modified version of the original Misskey.",
+	"sourceCodeIsNotYetProvided": "Source code is not yet available. Contact the administrator to fix this problem.",
+	"aboutMisskeyProjectMembers": "Project members",
+	"aboutMisskeyPatrons": "Patrons",
+	"aboutMisskeyMorePatrons": "We also appreciate the support of many other helpers not listed here. Thank you! 🥰",
+	"aboutMisskey": "About Misskey"
+}
+</locale>
+
+<locale lang="json" locale="uk-UA">
+{
+	"aboutMisskeyAbout": "Misskey - це програмне забезпечення з відкритим кодом, яке розробляє syuilo з 2014 року.",
+	"learnMore": "Докладніше",
+	"aboutMisskeySource": "Вихідний код",
+	"aboutMisskeyOriginal": "Original",
+	"aboutMisskeyTranslation": "Перекладати Misskey",
+	"aboutMisskeyDonate": "Пожертвувати Misskey",
+	"aboutMisskeyThisIsModifiedVersion": "{name} uses a modified version of the original Misskey.",
+	"sourceCodeIsNotYetProvided": "Вихідний код ще недоступний. Зверніться до адміністратора, щоб виправити цю проблему.",
+	"aboutMisskeyProjectMembers": "Project members",
+	"aboutMisskeyPatrons": "Підтримали",
+	"aboutMisskeyMorePatrons": "Ми дуже цінуємо підтримку багатьох інших помічників, не перелічених тут. Дякуємо! 🥰",
+	"aboutMisskey": "Про Misskey"
+}
+</locale>
+
+<locale lang="json" locale="vi-VN">
+{
+	"aboutMisskeyAbout": "Misskey là phần mềm mã nguồn mở được phát triển bởi syuilo từ năm 2014.",
+	"learnMore": "Tìm hiểu thêm",
+	"aboutMisskeySource": "Mã nguồn",
+	"aboutMisskeyOriginal": "Original",
+	"aboutMisskeyTranslation": "Dịch Misskey",
+	"aboutMisskeyDonate": "Ủng hộ Misskey",
+	"aboutMisskeyThisIsModifiedVersion": "{name} uses a modified version of the original Misskey.",
+	"sourceCodeIsNotYetProvided": "Mã nguồn hiện chưa có sẵn, vui lòng liên hệ với quản trị viên để khắc phục sự cố này.",
+	"aboutMisskeyProjectMembers": "Project members",
+	"aboutMisskeyPatrons": "Người ủng hộ",
+	"aboutMisskeyMorePatrons": "Chúng tôi cũng trân trọng sự hỗ trợ của nhiều người đóng góp khác không được liệt kê ở đây. Cảm ơn! 🥰",
+	"aboutMisskey": "Về Misskey"
+}
+</locale>
+
+<locale lang="json" locale="zh-CN">
+{
+	"aboutMisskeyAbout": "Misskey 是由 syuilo 于 2014 年开发的开源软件。",
+	"learnMore": "更多信息",
+	"aboutMisskeySource": "源代码",
+	"aboutMisskeyOriginal": "原版",
+	"aboutMisskeyTranslation": "翻译 Misskey",
+	"aboutMisskeyDonate": "赞助 Misskey",
+	"aboutMisskeyThisIsModifiedVersion": "{name}正在使用修改后的 Misskey。",
+	"sourceCodeIsNotYetProvided": "还未提供源代码。要解决此问题请联系管理员。",
+	"aboutMisskeyProjectMembers": "项目成员",
+	"aboutMisskeyPatrons": "支持者",
+	"aboutMisskeyMorePatrons": "还有很多其它的人也在支持我们，非常感谢🥰",
+	"aboutMisskey": "关于 Misskey"
+}
+</locale>
+
+<locale lang="json" locale="zh-TW">
+{
+	"aboutMisskeyAbout": "Misskey 是由 syuilo 自 2014 年起開發的開放原始碼軟體。",
+	"learnMore": "更多資訊",
+	"aboutMisskeySource": "原始碼",
+	"aboutMisskeyOriginal": "原始",
+	"aboutMisskeyTranslation": "翻譯 Misskey",
+	"aboutMisskeyDonate": "贊助 Misskey",
+	"aboutMisskeyThisIsModifiedVersion": "{name} 使用原始 Misskey 的修改版本。",
+	"sourceCodeIsNotYetProvided": "尚未提供原始碼，請洽詢管理員解決這個問題。",
+	"aboutMisskeyProjectMembers": "專案成員",
+	"aboutMisskeyPatrons": "贊助者",
+	"aboutMisskeyMorePatrons": "還有許許多多幫助我們的其他人，非常感謝你們。 🥰",
+	"aboutMisskey": "關於 Misskey"
+}
+</locale>

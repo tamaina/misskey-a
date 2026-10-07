@@ -250,7 +250,7 @@ describe('uploader locale-tag migration', () => {
 		expect(view.container.textContent).toContain('50% d\'estalvi ');
 	});
 
-	test('keeps the unchanged parent dialog cancel-decline/accept and retry/progress behavior', async () => {
+	test('keeps parent dialog cancel-decline/accept and retry/progress behavior in the active locale', async () => {
 		uploaderState.items.value = [item({ preprocessing: false })];
 		const view = render(MkUploaderDialog, {
 			props: { files: [uploaderState.items.value[0].file] },
@@ -264,9 +264,9 @@ describe('uploader locale-tag migration', () => {
 		expect(actions.abortAll).not.toHaveBeenCalled();
 		expect(actions.close).not.toHaveBeenCalled();
 		expect(view.emitted().canceled).toBeUndefined();
-		await fireEvent.click(view.getByRole('button', { name: locales['en-US'].upload }));
+		await fireEvent.click(view.getByRole('button', { name: locales['ca-ES'].upload }));
 		expect(actions.upload).toHaveBeenCalledTimes(1);
-		await fireEvent.click(view.getByRole('button', { name: locales['en-US'].retry }));
+		await fireEvent.click(view.getByRole('button', { name: locales['ca-ES'].retry }));
 		expect(actions.upload).toHaveBeenCalledTimes(2);
 		uploaderState.items.value[0].progress = { max: 100, value: 60 };
 		await nextTick();
