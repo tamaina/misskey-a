@@ -3,10 +3,14 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { inlineSwShowRegistrationDefinition, inlineSwShowRegistrationInput, inlineSwShowRegistrationOutput } from '../../../contract/endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
 import type { SwSubscriptionsRepository } from '@/models/_.js';
-import { Endpoint } from '@/server/api/endpoint-base.js';
+
 import { DI } from '@/di-symbols.js';
+
+const contractProjection = projectEndpointContract(inlineSwShowRegistrationDefinition);
 
 export const meta = {
 	tags: ['account'],
@@ -16,41 +20,18 @@ export const meta = {
 
 	description: 'Check push notification registration exists.',
 
-	res: {
-		type: 'object',
-		optional: false, nullable: true,
-		properties: {
-			userId: {
-				type: 'string',
-				optional: false, nullable: false,
-			},
-			endpoint: {
-				type: 'string',
-				optional: false, nullable: false,
-			},
-			sendReadMessage: {
-				type: 'boolean',
-				optional: false, nullable: false,
-			},
-		},
-	},
+	res: contractProjection.response,
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {
-		endpoint: { type: 'string' },
-	},
-	required: ['endpoint'],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof inlineSwShowRegistrationInput, typeof inlineSwShowRegistrationOutput> {
 	constructor(
 		@Inject(DI.swSubscriptionsRepository)
 		private swSubscriptionsRepository: SwSubscriptionsRepository,
 	) {
-		super(meta, paramDef, async (ps, me) => {
+		super(meta, contractProjection, async (ps, me) => {
 			// if already subscribed
 			const exist = await this.swSubscriptionsRepository.findOneBy({
 				userId: me.id,

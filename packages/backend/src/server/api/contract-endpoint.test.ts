@@ -92,3 +92,22 @@ test('all-optional response objects retain legacy required-list behavior', () =>
 		type: 'object', properties: { value: { type: 'string' } },
 	});
 });
+
+test('optional root results preserve the no-content branch in types and metadata', async () => {
+	const optional = defineEndpointContract({ path: '/optional-output' }, v.looseObject({}),
+		v.optional(resultObject({ text: v.string() })));
+	const projected = projectEndpointContract(optional);
+	expect(projected.response?.optional).toBe(true);
+	const endpoint = new ContractEndpoint({}, projected, async () => undefined);
+	expectTypeOf(await endpoint.exec({}, null, null)).toMatchTypeOf<{ text: string } | undefined>();
+	await expect(endpoint.exec({}, null, null)).resolves.toBeUndefined();
+});
+
+test('opaque object results preserve the existing schema shape and payload', async () => {
+	const projected = projectEndpointContract(defineEndpointContract({ path: '/opaque' },
+		v.looseObject({}), resultObject({})));
+	expect(convertSchemaToOpenApiSchema(projected.response!, 'res', true)).toEqual({ type: 'object' });
+	const value = { extension: { retained: true } };
+	const endpoint = new ContractEndpoint({}, projected, async () => value);
+	expect(await endpoint.exec({}, null, null)).toBe(value);
+});

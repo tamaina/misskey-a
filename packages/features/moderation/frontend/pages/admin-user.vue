@@ -258,7 +258,7 @@ const {
 const user = ref(result.user);
 const info = ref(result.info);
 const ips = ref(result.ips);
-const ap = ref<Misskey.entities.ApGetResponse | null>(null);
+const ap = ref<Misskey.Endpoints['ap/get']['res'] | null>(null);
 const moderator = ref(info.value.isModerator);
 const silenced = ref(info.value.isSilenced);
 const suspended = ref(info.value.isSuspended);

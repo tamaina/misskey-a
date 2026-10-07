@@ -3,44 +3,31 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { inlineI2faDoneDefinition, inlineI2faDoneInput, inlineI2faDoneOutput } from '../../../../contract/endpoint-definitions.js';
 import * as OTPAuth from 'otpauth';
 import { Inject, Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
+
 import { UserEntityService } from '../../../../../users/backend/serializers/UserEntityService.js';
 import type { UserProfilesRepository } from '@/models/_.js';
 import { GlobalEventService } from '../../../../../runtime/backend/services/GlobalEventService.js';
 import { DI } from '@/di-symbols.js';
 import { UserAuthService } from "../../../services/UserAuthService.js";
 
+const contractProjection = projectEndpointContract(inlineI2faDoneDefinition);
+
 export const meta = {
 	requireCredential: true,
 
 	secure: true,
 
-	res: {
-		type: 'object',
-		properties: {
-			backupCodes: {
-				type: 'array',
-				optional: false,
-				items: {
-					type: 'string',
-				},
-			},
-		},
-	},
+	res: contractProjection.response,
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {
-		token: { type: 'string' },
-	},
-	required: ['token'],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof inlineI2faDoneInput, typeof inlineI2faDoneOutput> {
 	constructor(
 		@Inject(DI.userProfilesRepository)
 		private userProfilesRepository: UserProfilesRepository,
@@ -49,7 +36,7 @@ export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDe
 		private userAuthService: UserAuthService,
 		private globalEventService: GlobalEventService,
 	) {
-		super(meta, paramDef, async (ps, me) => {
+		super(meta, contractProjection, async (ps, me) => {
 			const token = ps.token.replace(/\s/g, '');
 
 			const profile = await this.userProfilesRepository.findOneByOrFail({ userId: me.id });

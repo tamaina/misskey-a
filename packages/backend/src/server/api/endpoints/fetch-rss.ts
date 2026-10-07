@@ -3,15 +3,19 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { inlineFetchRssDefinition, inlineFetchRssInput, inlineFetchRssOutput } from '../../../../../features/integrations/contract/endpoint-definitions.js';
 import Parser from 'rss-parser';
 import { Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
+
 import { HttpRequestService } from '../../../../../features/runtime/backend/services/HttpRequestService.js';
 import { ApiError } from '../error.js';
 
 const MAX_URL_LENGTH = 8192;
 const MAX_RESPONSE_SIZE = 1024 * 1024;
 const MAX_CONCURRENT_REQUESTS = 32;
+
+const contractProjection = projectEndpointContract(inlineFetchRssDefinition);
 
 export const meta = {
 	tags: ['meta'],
@@ -48,211 +52,20 @@ export const meta = {
 		},
 	},
 
-	res: {
-		type: 'object',
-		properties: {
-			image: {
-				type: 'object',
-				optional: true,
-				properties: {
-					link: {
-						type: 'string',
-						optional: true,
-					},
-					url: {
-						type: 'string',
-						optional: false,
-					},
-					title: {
-						type: 'string',
-						optional: true,
-					},
-				},
-			},
-			paginationLinks: {
-				type: 'object',
-				optional: true,
-				properties: {
-					self: {
-						type: 'string',
-						optional: true,
-					},
-					first: {
-						type: 'string',
-						optional: true,
-					},
-					next: {
-						type: 'string',
-						optional: true,
-					},
-					last: {
-						type: 'string',
-						optional: true,
-					},
-					prev: {
-						type: 'string',
-						optional: true,
-					},
-				},
-			},
-			link: {
-				type: 'string',
-				optional: true,
-			},
-			title: {
-				type: 'string',
-				optional: true,
-			},
-			items: {
-				type: 'array',
-				optional: false,
-				items: {
-					type: 'object',
-					properties: {
-						link: {
-							type: 'string',
-							optional: true,
-						},
-						guid: {
-							type: 'string',
-							optional: true,
-						},
-						title: {
-							type: 'string',
-							optional: true,
-						},
-						pubDate: {
-							type: 'string',
-							optional: true,
-						},
-						creator: {
-							type: 'string',
-							optional: true,
-						},
-						summary: {
-							type: 'string',
-							optional: true,
-						},
-						content: {
-							type: 'string',
-							optional: true,
-						},
-						isoDate: {
-							type: 'string',
-							optional: true,
-						},
-						categories: {
-							type: 'array',
-							optional: true,
-							items: {
-								type: 'string',
-							},
-						},
-						contentSnippet: {
-							type: 'string',
-							optional: true,
-						},
-						enclosure: {
-							type: 'object',
-							optional: true,
-							properties: {
-								url: {
-									type: 'string',
-									optional: false,
-								},
-								length: {
-									type: 'number',
-									optional: true,
-								},
-								type: {
-									type: 'string',
-									optional: true,
-								},
-							},
-						},
-					},
-				},
-			},
-			feedUrl: {
-				type: 'string',
-				optional: true,
-			},
-			description: {
-				type: 'string',
-				optional: true,
-			},
-			itunes: {
-				type: 'object',
-				optional: true,
-				additionalProperties: true,
-				properties: {
-					image: {
-						type: 'string',
-						optional: true,
-					},
-					owner: {
-						type: 'object',
-						optional: true,
-						properties: {
-							name: {
-								type: 'string',
-								optional: true,
-							},
-							email: {
-								type: 'string',
-								optional: true,
-							},
-						},
-					},
-					author: {
-						type: 'string',
-						optional: true,
-					},
-					summary: {
-						type: 'string',
-						optional: true,
-					},
-					explicit: {
-						type: 'string',
-						optional: true,
-					},
-					categories: {
-						type: 'array',
-						optional: true,
-						items: {
-							type: 'string',
-						},
-					},
-					keywords: {
-						type: 'array',
-						optional: true,
-						items: {
-							type: 'string',
-						},
-					},
-				},
-			},
-		},
-	},
+	res: contractProjection.response,
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {
-		url: { type: 'string' },
-	},
-	required: ['url'],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-disable-line import/no-default-export
+export default class extends ContractEndpoint<typeof meta, typeof inlineFetchRssInput, typeof inlineFetchRssOutput> { // eslint-disable-line import/no-default-export
 	private readonly inFlightRequests = new Map<string, Promise<Awaited<ReturnType<Parser['parseString']>>>>();
 	private activeRequestCount = 0;
 
 	constructor(
 		private httpRequestService: HttpRequestService,
 	) {
-		super(meta, paramDef, async (ps) => {
+		super(meta, contractProjection, async (ps) => {
 			const url = this.normalizeUrl(ps.url);
 			const inFlightRequest = this.inFlightRequests.get(url);
 			if (inFlightRequest != null) {

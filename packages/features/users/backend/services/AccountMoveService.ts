@@ -11,6 +11,7 @@ import { DI } from '@/di-symbols.js';
 import type { MiLocalUser, MiRemoteUser, MiUser } from '../models/User.js';
 import type { BlockingsRepository, FollowingsRepository, InstancesRepository, MiMeta, MutingsRepository, UserListMembershipsRepository, UsersRepository } from '@/models/_.js';
 import type { RelationshipJobData, ThinUser } from '@/queue/types.js';
+import type { Packed } from '../../../index/contract/packed.js';
 
 import { IdService } from '../../../runtime/backend/services/IdService.js';
 import { GlobalEventService } from '../../../runtime/backend/services/GlobalEventService.js';
@@ -74,7 +75,7 @@ export class AccountMoveService {
 	 * After delivering Move activity, its local followers unfollow the old account and then follow the new one.
 	 */
 	@bindThis
-	public async moveFromLocal(src: MiLocalUser, dst: MiLocalUser | MiRemoteUser): Promise<unknown> {
+	public async moveFromLocal(src: MiLocalUser, dst: MiLocalUser | MiRemoteUser): Promise<Packed<'MeDetailed'>> {
 		const _srcUri = this.userEntityService.getUserUri(src);
 		const dstUri = this.userEntityService.getUserUri(dst);
 

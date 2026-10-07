@@ -3,35 +3,25 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { inlineAuthSessionGenerateDefinition, inlineAuthSessionGenerateInput, inlineAuthSessionGenerateOutput } from '../../../../contract/endpoint-definitions.js';
 import { randomUUID } from 'node:crypto';
 import { Inject, Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
+
 import type { AppsRepository, AuthSessionsRepository } from '@/models/_.js';
 import { IdService } from '../../../../../runtime/backend/services/IdService.js';
 import type { Config } from '@/config.js';
 import { DI } from '@/di-symbols.js';
 import { ApiError } from '@/server/api/error.js';
 
+const contractProjection = projectEndpointContract(inlineAuthSessionGenerateDefinition);
+
 export const meta = {
 	tags: ['auth'],
 
 	requireCredential: false,
 
-	res: {
-		type: 'object',
-		optional: false, nullable: false,
-		properties: {
-			token: {
-				type: 'string',
-				optional: false, nullable: false,
-			},
-			url: {
-				type: 'string',
-				optional: false, nullable: false,
-				format: 'url',
-			},
-		},
-	},
+	res: contractProjection.response,
 
 	errors: {
 		noSuchApp: {
@@ -42,16 +32,10 @@ export const meta = {
 	},
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {
-		appSecret: { type: 'string' },
-	},
-	required: ['appSecret'],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof inlineAuthSessionGenerateInput, typeof inlineAuthSessionGenerateOutput> {
 	constructor(
 		@Inject(DI.config)
 		private config: Config,
@@ -64,7 +48,7 @@ export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDe
 
 		private idService: IdService,
 	) {
-		super(meta, paramDef, async (ps, me) => {
+		super(meta, contractProjection, async (ps, me) => {
 			// Lookup app
 			const app = await this.appsRepository.findOneBy({
 				secret: ps.appSecret,

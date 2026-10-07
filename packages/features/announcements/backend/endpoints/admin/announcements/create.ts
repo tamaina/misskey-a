@@ -3,9 +3,13 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { inlineAdminAnnouncementsCreateDefinition, inlineAdminAnnouncementsCreateInput, inlineAdminAnnouncementsCreateOutput } from '../../../../contract/endpoint-definitions.js';
 import { Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
+
 import { AnnouncementService } from '../../../services/AnnouncementService.js';
+
+const contractProjection = projectEndpointContract(inlineAdminAnnouncementsCreateDefinition);
 
 export const meta = {
 	tags: ['admin'],
@@ -14,64 +18,17 @@ export const meta = {
 	requireModerator: true,
 	kind: 'write:admin:announcements',
 
-	res: {
-		type: 'object',
-		optional: false, nullable: false,
-		properties: {
-			id: {
-				type: 'string',
-				optional: false, nullable: false,
-				format: 'id',
-				example: 'xxxxxxxxxx',
-			},
-			createdAt: {
-				type: 'string',
-				optional: false, nullable: false,
-				format: 'date-time',
-			},
-			updatedAt: {
-				type: 'string',
-				optional: false, nullable: true,
-				format: 'date-time',
-			},
-			title: {
-				type: 'string',
-				optional: false, nullable: false,
-			},
-			text: {
-				type: 'string',
-				optional: false, nullable: false,
-			},
-			imageUrl: {
-				type: 'string',
-				optional: false, nullable: true,
-			},
-		},
-	},
+	res: contractProjection.response,
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {
-		title: { type: 'string', minLength: 1 },
-		text: { type: 'string', minLength: 1 },
-		imageUrl: { type: 'string', nullable: true, minLength: 0 },
-		icon: { type: 'string', enum: ['info', 'warning', 'error', 'success'], default: 'info' },
-		display: { type: 'string', enum: ['normal', 'banner', 'dialog'], default: 'normal' },
-		forExistingUsers: { type: 'boolean', default: false },
-		silence: { type: 'boolean', default: false },
-		needConfirmationToRead: { type: 'boolean', default: false },
-		userId: { type: 'string', format: 'misskey:id', nullable: true, default: null },
-	},
-	required: ['title', 'text', 'imageUrl'],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof inlineAdminAnnouncementsCreateInput, typeof inlineAdminAnnouncementsCreateOutput> {
 	constructor(
 		private announcementService: AnnouncementService,
 	) {
-		super(meta, paramDef, async (ps, me) => {
+		super(meta, contractProjection, async (ps, me) => {
 			const { packed } = await this.announcementService.create({
 				updatedAt: null,
 				title: ps.title,

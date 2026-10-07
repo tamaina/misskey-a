@@ -24,6 +24,7 @@ import type { ModerationCommandEndpoints } from '../../moderation/contract/index
 import type { NotesCommandEndpoints } from '../../notes/contract/index.js';
 import type { RelationshipEndpoints } from '../../relationships/contract/commands.js';
 import type { PortabilityImportEndpoints } from '../../portability/contract/imports.js';
+import type { InlineNativeEndpoints } from './inline-native-endpoints.js';
 
 export type FeatureEndpoints = ModerationCommandEndpoints
 	& NotesCommandEndpoints
@@ -41,4 +42,5 @@ export type FeatureEndpoints = ModerationCommandEndpoints
 	& AnnouncementEndpoints
 	& WebhookEndpoints
 	& ListEndpoints
-	& ChannelEndpoints;
+	& ChannelEndpoints
+	& InlineNativeEndpoints;

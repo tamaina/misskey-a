@@ -3,13 +3,17 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { inlineAdminServerInfoDefinition, inlineAdminServerInfoInput, inlineAdminServerInfoOutput } from '../../../contract/endpoint-definitions.js';
 import { loadSystemInformation } from '@/runtime-dependencies/systeminformation.js';
 import * as os from 'node:os';
 import { Inject, Injectable } from '@nestjs/common';
 import { DataSource } from 'typeorm';
 import * as Redis from 'ioredis';
-import { Endpoint } from '@/server/api/endpoint-base.js';
+
 import { DI } from '@/di-symbols.js';
+
+const contractProjection = projectEndpointContract(inlineAdminServerInfoDefinition);
 
 export const meta = {
 	requireCredential: true,
@@ -18,91 +22,13 @@ export const meta = {
 
 	tags: ['admin', 'meta'],
 
-	res: {
-		type: 'object',
-		optional: false, nullable: false,
-		properties: {
-			machine: {
-				type: 'string',
-				optional: false, nullable: false,
-			},
-			os: {
-				type: 'string',
-				optional: false, nullable: false,
-				example: 'linux',
-			},
-			node: {
-				type: 'string',
-				optional: false, nullable: false,
-			},
-			psql: {
-				type: 'string',
-				optional: false, nullable: false,
-			},
-			cpu: {
-				type: 'object',
-				optional: false, nullable: false,
-				properties: {
-					model: {
-						type: 'string',
-						optional: false, nullable: false,
-					},
-					cores: {
-						type: 'number',
-						optional: false, nullable: false,
-					},
-				},
-			},
-			mem: {
-				type: 'object',
-				optional: false, nullable: false,
-				properties: {
-					total: {
-						type: 'number',
-						optional: false, nullable: false,
-						format: 'bytes',
-					},
-				},
-			},
-			fs: {
-				type: 'object',
-				optional: false, nullable: false,
-				properties: {
-					total: {
-						type: 'number',
-						optional: false, nullable: false,
-						format: 'bytes',
-					},
-					used: {
-						type: 'number',
-						optional: false, nullable: false,
-						format: 'bytes',
-					},
-				},
-			},
-			net: {
-				type: 'object',
-				optional: false, nullable: false,
-				properties: {
-					interface: {
-						type: 'string',
-						optional: false, nullable: false,
-						example: 'eth0',
-					},
-				},
-			},
-		},
-	},
+	res: contractProjection.response,
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {},
-	required: [],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof inlineAdminServerInfoInput, typeof inlineAdminServerInfoOutput> {
 	constructor(
 		@Inject(DI.db)
 		private db: DataSource,
@@ -111,7 +37,7 @@ export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDe
 		private redisClient: Redis.Redis,
 
 	) {
-		super(meta, paramDef, async () => {
+		super(meta, contractProjection, async () => {
 			const si = await loadSystemInformation();
 
 			const memStats = await si.mem();

@@ -3,11 +3,15 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { inlineHashtagsTrendDefinition, inlineHashtagsTrendInput, inlineHashtagsTrendOutput } from '../../../contract/endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
+
 import { DI } from '@/di-symbols.js';
 import { FeaturedService } from '../../services/FeaturedService.js';
 import { HashtagService } from '../../services/HashtagService.js';
+
+const contractProjection = projectEndpointContract(inlineHashtagsTrendDefinition);
 
 export const meta = {
 	tags: ['hashtags'],
@@ -16,47 +20,18 @@ export const meta = {
 	allowGet: true,
 	cacheSec: 60 * 1,
 
-	res: {
-		type: 'array',
-		optional: false, nullable: false,
-		items: {
-			type: 'object',
-			optional: false, nullable: false,
-			properties: {
-				tag: {
-					type: 'string',
-					optional: false, nullable: false,
-				},
-				chart: {
-					type: 'array',
-					optional: false, nullable: false,
-					items: {
-						type: 'number',
-						optional: false, nullable: false,
-					},
-				},
-				usersCount: {
-					type: 'number',
-					optional: false, nullable: false,
-				},
-			},
-		},
-	},
+	res: contractProjection.response,
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {},
-	required: [],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof inlineHashtagsTrendInput, typeof inlineHashtagsTrendOutput> {
 	constructor(
 		private featuredService: FeaturedService,
 		private hashtagService: HashtagService,
 	) {
-		super(meta, paramDef, async () => {
+		super(meta, contractProjection, async () => {
 			const ranking = await this.featuredService.getHashtagsRanking(10);
 
 			const charts = ranking.length === 0 ? {} : await this.hashtagService.getCharts(ranking, 20);

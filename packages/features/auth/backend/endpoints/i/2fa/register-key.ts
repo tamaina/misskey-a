@@ -3,14 +3,18 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { inlineI2faRegisterKeyDefinition, inlineI2faRegisterKeyInput, inlineI2faRegisterKeyOutput } from '../../../../contract/endpoint-definitions.js';
 import bcrypt from 'bcryptjs';
 import { Inject, Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
+
 import type { UserProfilesRepository } from '@/models/_.js';
 import { DI } from '@/di-symbols.js';
 import { WebAuthnService } from '../../../services/WebAuthnService.js';
 import { ApiError } from '@/server/api/error.js';
 import { UserAuthService } from '../../../services/UserAuthService.js';
+
+const contractProjection = projectEndpointContract(inlineI2faRegisterKeyDefinition);
 
 export const meta = {
 	requireCredential: true,
@@ -37,23 +41,14 @@ export const meta = {
 		},
 	},
 
-	res: {
-		type: 'object',
-	},
+	res: contractProjection.response,
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {
-		password: { type: 'string' },
-		token: { type: 'string', nullable: true },
-	},
-	required: ['password'],
-} as const;
+export const paramDef = contractProjection.input;
 
 // eslint-disable-next-line import/no-default-export
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof inlineI2faRegisterKeyInput, typeof inlineI2faRegisterKeyOutput> {
 	constructor(
 		@Inject(DI.userProfilesRepository)
 		private userProfilesRepository: UserProfilesRepository,
@@ -61,7 +56,7 @@ export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDe
 		private webAuthnService: WebAuthnService,
 		private userAuthService: UserAuthService,
 	) {
-		super(meta, paramDef, async (ps, me) => {
+		super(meta, contractProjection, async (ps, me) => {
 			const token = ps.token;
 			const profile = await this.userProfilesRepository.findOne({
 				where: {

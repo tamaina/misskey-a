@@ -3,13 +3,17 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { inlineAdminAnnouncementsListDefinition, inlineAdminAnnouncementsListInput, inlineAdminAnnouncementsListOutput } from '../../../../contract/endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
 import type { AnnouncementsRepository, AnnouncementReadsRepository } from '@/models/_.js';
 import type { MiAnnouncement } from '../../../models/Announcement.js';
-import { Endpoint } from '@/server/api/endpoint-base.js';
+
 import { QueryService } from '@/core/QueryService.js';
 import { DI } from '@/di-symbols.js';
 import { IdService } from '../../../../../runtime/backend/services/IdService.js';
+
+const contractProjection = projectEndpointContract(inlineAdminAnnouncementsListDefinition);
 
 export const meta = {
 	tags: ['admin'],
@@ -18,96 +22,13 @@ export const meta = {
 	requireModerator: true,
 	kind: 'read:admin:announcements',
 
-	res: {
-		type: 'array',
-		optional: false, nullable: false,
-		items: {
-			type: 'object',
-			optional: false, nullable: false,
-			properties: {
-				id: {
-					type: 'string',
-					optional: false, nullable: false,
-					format: 'id',
-					example: 'xxxxxxxxxx',
-				},
-				createdAt: {
-					type: 'string',
-					optional: false, nullable: false,
-					format: 'date-time',
-				},
-				updatedAt: {
-					type: 'string',
-					optional: false, nullable: true,
-					format: 'date-time',
-				},
-				text: {
-					type: 'string',
-					optional: false, nullable: false,
-				},
-				title: {
-					type: 'string',
-					optional: false, nullable: false,
-				},
-				icon: {
-					type: 'string',
-					optional: false, nullable: false,
-					enum: ['info', 'warning', 'error', 'success'],
-				},
-				display: {
-					type: 'string',
-					optional: false, nullable: false,
-					enum: ['normal', 'banner', 'dialog'],
-				},
-				isActive: {
-					type: 'boolean',
-					optional: false, nullable: false,
-				},
-				forExistingUsers: {
-					type: 'boolean',
-					optional: false, nullable: false,
-				},
-				silence: {
-					type: 'boolean',
-					optional: false, nullable: false,
-				},
-				needConfirmationToRead: {
-					type: 'boolean',
-					optional: false, nullable: false,
-				},
-				userId: {
-					type: 'string',
-					optional: false, nullable: true,
-				},
-				imageUrl: {
-					type: 'string',
-					optional: false, nullable: true,
-				},
-				reads: {
-					type: 'number',
-					optional: false, nullable: false,
-				},
-			},
-		},
-	},
+	res: contractProjection.response,
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {
-		limit: { type: 'integer', minimum: 1, maximum: 100, default: 10 },
-		sinceId: { type: 'string', format: 'misskey:id' },
-		untilId: { type: 'string', format: 'misskey:id' },
-		sinceDate: { type: 'integer' },
-		untilDate: { type: 'integer' },
-		userId: { type: 'string', format: 'misskey:id', nullable: true },
-		status: { type: 'string', enum: ['all', 'active', 'archived'], default: 'active' },
-	},
-	required: [],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof inlineAdminAnnouncementsListInput, typeof inlineAdminAnnouncementsListOutput> {
 	constructor(
 		@Inject(DI.announcementsRepository)
 		private announcementsRepository: AnnouncementsRepository,
@@ -118,7 +39,7 @@ export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDe
 		private queryService: QueryService,
 		private idService: IdService,
 	) {
-		super(meta, paramDef, async (ps, me) => {
+		super(meta, contractProjection, async (ps, me) => {
 			const query = this.queryService.makePaginationQuery(this.announcementsRepository.createQueryBuilder('announcement'), ps.sinceId, ps.untilId, ps.sinceDate, ps.untilDate);
 
 			if (ps.status === 'archived') {

@@ -3,44 +3,33 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { inlineHashtagsSearchDefinition, inlineHashtagsSearchInput, inlineHashtagsSearchOutput } from '../../../contract/endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
+
 import type { HashtagsRepository } from '@/models/_.js';
 import { DI } from '@/di-symbols.js';
 import { sqlLikeEscape } from '@/misc/sql-like-escape.js';
+
+const contractProjection = projectEndpointContract(inlineHashtagsSearchDefinition);
 
 export const meta = {
 	tags: ['hashtags'],
 
 	requireCredential: false,
 
-	res: {
-		type: 'array',
-		optional: false, nullable: false,
-		items: {
-			type: 'string',
-			optional: false, nullable: false,
-		},
-	},
+	res: contractProjection.response,
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {
-		limit: { type: 'integer', minimum: 1, maximum: 100, default: 10 },
-		query: { type: 'string' },
-		offset: { type: 'integer', default: 0 },
-	},
-	required: ['query'],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof inlineHashtagsSearchInput, typeof inlineHashtagsSearchOutput> {
 	constructor(
 		@Inject(DI.hashtagsRepository)
 		private hashtagsRepository: HashtagsRepository,
 	) {
-		super(meta, paramDef, async (ps, me) => {
+		super(meta, contractProjection, async (ps, me) => {
 			const hashtags = await this.hashtagsRepository.createQueryBuilder('tag')
 				.where('tag.name like :q', { q: sqlLikeEscape(ps.query.toLowerCase()) + '%' })
 				.orderBy('tag.mentionedLocalUsersCount', 'DESC')

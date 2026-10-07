@@ -369,3 +369,19 @@ strings increase source bytes, and this is not a completed frontend conversion.
 The current priority is completing contract-first API definitions, dependency
 construction and VVI migration before resuming the separately prepared owner-PR
 ports. File placement alone is not counted as completion of those changes.
+
+
+## Inline native-contract batch
+
+A further 35 endpoints now own native Valibot input/output definitions under
+their features, with oRPC-derived SDK types collected by the feature index.
+Together with the earlier routes this brings native contracts to 129; 309
+class-based endpoints still use legacy schema inference. Of the native routes,
+92 use feature procedure factories and 37 retain their existing class adapters.
+This does not count those class adapters as completed dependency-injection migration.
+
+The HTTP input validator, handler bodies, authorization metadata and full OpenAPI
+document remain unchanged. Optional root responses retain their no-content branch,
+and opaque object output declarations retain extra payload fields. The WebAuthn
+key-completion route remains outside this batch because its opaque credential
+input needs a separate boundary review.

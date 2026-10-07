@@ -3,10 +3,11 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { inlineIMoveDefinition, inlineIMoveInput, inlineIMoveOutput } from '../../../contract/endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
 import ms from '@/runtime-dependencies/ms.js';
 
-import { Endpoint } from '@/server/api/endpoint-base.js';
 import { ApiError } from '@/server/api/error.js';
 
 import { MiLocalUser, MiRemoteUser } from '../../models/User.js';
@@ -21,6 +22,8 @@ import { UserEntityService } from '../../serializers/UserEntityService.js';
 import * as Acct from '@/misc/acct.js';
 import { DI } from '@/di-symbols.js';
 import { MiMeta } from '@/models/_.js';
+
+const contractProjection = projectEndpointContract(inlineIMoveDefinition);
 
 export const meta = {
 	tags: ['users'],
@@ -67,21 +70,13 @@ export const meta = {
 		},
 	},
 
-	res: {
-		type: 'object',
-	},
+	res: contractProjection.response,
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {
-		moveToAccount: { type: 'string' },
-	},
-	required: ['moveToAccount'],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof inlineIMoveInput, typeof inlineIMoveOutput> {
 	constructor(
 		@Inject(DI.meta)
 		private serverSettings: MiMeta,
@@ -93,7 +88,7 @@ export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDe
 		private apPersonService: ApPersonService,
 		private userEntityService: UserEntityService,
 	) {
-		super(meta, paramDef, async (ps, me) => {
+		super(meta, contractProjection, async (ps, me) => {
 			// check parameter
 			if (!ps.moveToAccount) throw new ApiError(meta.errors.noSuchUser);
 			// abort if user is the root

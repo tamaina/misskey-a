@@ -3,8 +3,11 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { inlineTestDefinition, inlineTestInput, inlineTestOutput } from '../../contract/endpoint-definitions.js';
 import { Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
+
+const contractProjection = projectEndpointContract(inlineTestDefinition);
 
 export const meta = {
 	tags: ['non-productive'],
@@ -13,52 +16,16 @@ export const meta = {
 
 	requireCredential: false,
 
-	res: {
-		type: 'object',
-		properties: {
-			id: {
-				type: 'string',
-				format: 'misskey:id',
-				optional: true, nullable: false,
-			},
-			required: {
-				type: 'boolean',
-				optional: false, nullable: false,
-			},
-			string: {
-				type: 'string',
-				optional: true, nullable: false,
-			},
-			default: {
-				type: 'string',
-				optional: true, nullable: false,
-			},
-			nullableDefault: {
-				type: 'string',
-				default: 'hello',
-				optional: true, nullable: true,
-			},
-		},
-	},
+	res: contractProjection.response,
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {
-		required: { type: 'boolean' },
-		string: { type: 'string' },
-		default: { type: 'string', default: 'hello' },
-		nullableDefault: { type: 'string', nullable: true, default: 'hello' },
-		id: { type: 'string', format: 'misskey:id' },
-	},
-	required: ['required'],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof inlineTestInput, typeof inlineTestOutput> {
 	constructor(
 	) {
-		super(meta, paramDef, async (ps, me) => {
+		super(meta, contractProjection, async (ps, me) => {
 			return ps;
 		});
 	}

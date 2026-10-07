@@ -3,16 +3,20 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { inlineI2faRegisterDefinition, inlineI2faRegisterInput, inlineI2faRegisterOutput } from '../../../../contract/endpoint-definitions.js';
 import bcrypt from 'bcryptjs';
 import * as OTPAuth from 'otpauth';
 import * as QRCode from '@/runtime-dependencies/qrcode.js';
 import { Inject, Injectable } from '@nestjs/common';
 import type { UserProfilesRepository } from '@/models/_.js';
-import { Endpoint } from '@/server/api/endpoint-base.js';
+
 import { DI } from '@/di-symbols.js';
 import type { Config } from '@/config.js';
 import { ApiError } from '@/server/api/error.js';
 import { UserAuthService } from '../../../services/UserAuthService.js';
+
+const contractProjection = projectEndpointContract(inlineI2faRegisterDefinition);
 
 export const meta = {
 	requireCredential: true,
@@ -27,31 +31,13 @@ export const meta = {
 		},
 	},
 
-	res: {
-		type: 'object',
-		nullable: false,
-		optional: false,
-		properties: {
-			qr: { type: 'string' },
-			url: { type: 'string' },
-			secret: { type: 'string' },
-			label: { type: 'string' },
-			issuer: { type: 'string' },
-		},
-	},
+	res: contractProjection.response,
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {
-		password: { type: 'string' },
-		token: { type: 'string', nullable: true },
-	},
-	required: ['password'],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof inlineI2faRegisterInput, typeof inlineI2faRegisterOutput> {
 	constructor(
 		@Inject(DI.config)
 		private config: Config,
@@ -61,7 +47,7 @@ export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDe
 
 		private userAuthService: UserAuthService,
 	) {
-		super(meta, paramDef, async (ps, me) => {
+		super(meta, contractProjection, async (ps, me) => {
 			const token = ps.token;
 			const profile = await this.userProfilesRepository.findOneByOrFail({ userId: me.id });
 

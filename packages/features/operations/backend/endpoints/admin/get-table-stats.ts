@@ -3,10 +3,14 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { inlineAdminGetTableStatsDefinition, inlineAdminGetTableStatsInput, inlineAdminGetTableStatsOutput } from '../../../contract/endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
 import { DataSource } from 'typeorm';
-import { Endpoint } from '@/server/api/endpoint-base.js';
+
 import { DI } from '@/di-symbols.js';
+
+const contractProjection = projectEndpointContract(inlineAdminGetTableStatsDefinition);
 
 export const meta = {
 	requireCredential: true,
@@ -15,43 +19,18 @@ export const meta = {
 
 	tags: ['admin'],
 
-	res: {
-		type: 'object',
-		optional: false, nullable: false,
-		additionalProperties: {
-			type: 'object',
-			properties: {
-				count: {
-					type: 'number',
-				},
-				size: {
-					type: 'number',
-				},
-			},
-			required: ['count', 'size'],
-		},
-		example: {
-			migrations: {
-				count: 66,
-				size: 32768,
-			},
-		},
-	},
+	res: contractProjection.response,
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {},
-	required: [],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof inlineAdminGetTableStatsInput, typeof inlineAdminGetTableStatsOutput> {
 	constructor(
 		@Inject(DI.db)
 		private db: DataSource,
 	) {
-		super(meta, paramDef, async () => {
+		super(meta, contractProjection, async () => {
 			const sizes = await this.db.query(`
 			SELECT relname AS "table", reltuples as "count", pg_total_relation_size(C.oid) AS "size"
 			FROM pg_class C LEFT JOIN pg_namespace N ON (N.oid = C.relnamespace)

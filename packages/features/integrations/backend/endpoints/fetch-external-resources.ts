@@ -3,12 +3,16 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { inlineFetchExternalResourcesDefinition, inlineFetchExternalResourcesInput, inlineFetchExternalResourcesOutput } from '../../contract/endpoint-definitions.js';
 import { createHash } from 'crypto';
 import ms from '@/runtime-dependencies/ms.js';
 import { Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
+
 import { HttpRequestService } from '../../../runtime/backend/services/HttpRequestService.js';
 import { ApiError } from '@/server/api/error.js';
+
+const contractProjection = projectEndpointContract(inlineFetchExternalResourcesDefinition);
 
 export const meta = {
 	tags: ['meta'],
@@ -34,34 +38,17 @@ export const meta = {
 		},
 	},
 
-	res: {
-		type: 'object',
-		properties: {
-			type: {
-				type: 'string',
-			},
-			data: {
-				type: 'string',
-			},
-		},
-	},
+	res: contractProjection.response,
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {
-		url: { type: 'string' },
-		hash: { type: 'string' },
-	},
-	required: ['url', 'hash'],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof inlineFetchExternalResourcesInput, typeof inlineFetchExternalResourcesOutput> {
 	constructor(
 		private httpRequestService: HttpRequestService,
 	) {
-		super(meta, paramDef, async (ps) => {
+		super(meta, contractProjection, async (ps) => {
 			const res = await this.httpRequestService.getJson<{
 				type: string;
 				data: string;

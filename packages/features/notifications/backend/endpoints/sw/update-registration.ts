@@ -3,12 +3,16 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { inlineSwUpdateRegistrationDefinition, inlineSwUpdateRegistrationInput, inlineSwUpdateRegistrationOutput } from '../../../contract/endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
 import type { SwSubscriptionsRepository } from '@/models/_.js';
-import { Endpoint } from '@/server/api/endpoint-base.js';
+
 import { DI } from '@/di-symbols.js';
 import { PushNotificationService } from '../../services/PushNotificationService.js';
 import { ApiError } from '@/server/api/error.js';
+
+const contractProjection = projectEndpointContract(inlineSwUpdateRegistrationDefinition);
 
 export const meta = {
 	tags: ['account'],
@@ -18,24 +22,7 @@ export const meta = {
 
 	description: 'Update push notification registration.',
 
-	res: {
-		type: 'object',
-		optional: false, nullable: false,
-		properties: {
-			userId: {
-				type: 'string',
-				optional: false, nullable: false,
-			},
-			endpoint: {
-				type: 'string',
-				optional: false, nullable: false,
-			},
-			sendReadMessage: {
-				type: 'boolean',
-				optional: false, nullable: false,
-			},
-		},
-	},
+	res: contractProjection.response,
 	errors: {
 		noSuchRegistration: {
 			message: 'No such registration.',
@@ -45,24 +32,17 @@ export const meta = {
 	},
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {
-		endpoint: { type: 'string' },
-		sendReadMessage: { type: 'boolean' },
-	},
-	required: ['endpoint'],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof inlineSwUpdateRegistrationInput, typeof inlineSwUpdateRegistrationOutput> {
 	constructor(
 		@Inject(DI.swSubscriptionsRepository)
 		private swSubscriptionsRepository: SwSubscriptionsRepository,
 
 		private pushNotificationService: PushNotificationService,
 	) {
-		super(meta, paramDef, async (ps, me) => {
+		super(meta, contractProjection, async (ps, me) => {
 			const swSubscription = await this.swSubscriptionsRepository.findOneBy({
 				userId: me.id,
 				endpoint: ps.endpoint,

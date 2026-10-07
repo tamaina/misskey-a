@@ -3,45 +3,30 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { inlineEmailAddressAvailableDefinition, inlineEmailAddressAvailableInput, inlineEmailAddressAvailableOutput } from '../../../contract/endpoint-definitions.js';
 import { Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
+
 import { EmailService } from '@/core/EmailService.js';
+
+const contractProjection = projectEndpointContract(inlineEmailAddressAvailableDefinition);
 
 export const meta = {
 	tags: ['users'],
 
 	requireCredential: false,
 
-	res: {
-		type: 'object',
-		optional: false, nullable: false,
-		properties: {
-			available: {
-				type: 'boolean',
-				optional: false, nullable: false,
-			},
-			reason: {
-				type: 'string',
-				optional: false, nullable: true,
-			},
-		},
-	},
+	res: contractProjection.response,
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {
-		emailAddress: { type: 'string' },
-	},
-	required: ['emailAddress'],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof inlineEmailAddressAvailableInput, typeof inlineEmailAddressAvailableOutput> {
 	constructor(
 		private emailService: EmailService,
 	) {
-		super(meta, paramDef, async (ps, me) => {
+		super(meta, contractProjection, async (ps, me) => {
 			return await this.emailService.validateEmailForAccount(ps.emailAddress);
 		});
 	}

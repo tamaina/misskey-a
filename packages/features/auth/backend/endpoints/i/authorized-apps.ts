@@ -3,72 +3,36 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { inlineIAuthorizedAppsDefinition, inlineIAuthorizedAppsInput, inlineIAuthorizedAppsOutput } from '../../../contract/endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
 import { IsNull, Not } from 'typeorm';
-import { Endpoint } from '@/server/api/endpoint-base.js';
+
 import type { AccessTokensRepository } from '@/models/_.js';
 import { AppEntityService } from '../../serializers/AppEntityService.js';
 import { DI } from '@/di-symbols.js';
+
+const contractProjection = projectEndpointContract(inlineIAuthorizedAppsDefinition);
 
 export const meta = {
 	requireCredential: true,
 
 	secure: true,
 
-	res: {
-		type: 'array',
-		items: {
-			type: 'object',
-			properties: {
-				id: {
-					type: 'string',
-					format: 'misskey:id',
-					optional: false,
-				},
-				name: {
-					type: 'string',
-					optional: false,
-				},
-				callbackUrl: {
-					type: 'string',
-					optional: false, nullable: true,
-				},
-				permission: {
-					type: 'array',
-					optional: false,
-					uniqueItems: true,
-					items: {
-						type: 'string',
-					},
-				},
-				isAuthorized: {
-					type: 'boolean',
-					optional: true,
-				},
-			},
-		},
-	},
+	res: contractProjection.response,
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {
-		limit: { type: 'integer', minimum: 1, maximum: 100, default: 10 },
-		offset: { type: 'integer', default: 0 },
-		sort: { type: 'string', enum: ['desc', 'asc'], default: 'desc' },
-	},
-	required: [],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof inlineIAuthorizedAppsInput, typeof inlineIAuthorizedAppsOutput> {
 	constructor(
 		@Inject(DI.accessTokensRepository)
 		private accessTokensRepository: AccessTokensRepository,
 
 		private appEntityService: AppEntityService,
 	) {
-		super(meta, paramDef, async (ps, me) => {
+		super(meta, contractProjection, async (ps, me) => {
 			// Get tokens
 			const tokens = await this.accessTokensRepository.find({
 				where: {

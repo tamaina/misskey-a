@@ -3,13 +3,17 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { inlineInviteLimitDefinition, inlineInviteLimitInput, inlineInviteLimitOutput } from '../../../contract/endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
 import { MoreThan } from 'typeorm';
-import { Endpoint } from '@/server/api/endpoint-base.js';
+
 import type { RegistrationTicketsRepository } from '@/models/_.js';
 import { RoleService } from '../../../../roles/backend/services/RoleService.js';
 import { DI } from '@/di-symbols.js';
 import { IdService } from '../../../../runtime/backend/services/IdService.js';
+
+const contractProjection = projectEndpointContract(inlineInviteLimitDefinition);
 
 export const meta = {
 	tags: ['meta'],
@@ -18,26 +22,13 @@ export const meta = {
 	requiredRolePolicy: 'canInvite',
 	kind: 'read:invite-codes',
 
-	res: {
-		type: 'object',
-		optional: false, nullable: false,
-		properties: {
-			remaining: {
-				type: 'integer',
-				optional: false, nullable: true,
-			},
-		},
-	},
+	res: contractProjection.response,
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {},
-	required: [],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof inlineInviteLimitInput, typeof inlineInviteLimitOutput> {
 	constructor(
 		@Inject(DI.registrationTicketsRepository)
 		private registrationTicketsRepository: RegistrationTicketsRepository,
@@ -45,7 +36,7 @@ export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDe
 		private roleService: RoleService,
 		private idService: IdService,
 	) {
-		super(meta, paramDef, async (ps, me) => {
+		super(meta, contractProjection, async (ps, me) => {
 			const policies = await this.roleService.getUserPolicies(me.id);
 
 			const count = policies.inviteLimit ? await this.registrationTicketsRepository.countBy({

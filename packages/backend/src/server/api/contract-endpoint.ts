@@ -68,6 +68,7 @@ function markResponseProperties(schema: JsonSchema | boolean): JsonSchema {
 	for (const key of ['anyOf', 'oneOf', 'allOf'] as const) {
 		if (schema[key]) result[key] = schema[key].map(markResponseProperties);
 	}
+	if (result.properties && Object.keys(result.properties).length === 0) delete result.properties;
 	return result;
 }
 
@@ -88,9 +89,13 @@ export function projectEndpointContract<Input extends v.GenericSchema, Output ex
 		target: 'openapi-3.0',
 		typeMode: 'ignore',
 	}) as Schema;
-	const response = definition.output.type === 'void' ? undefined : markResponseProperties(
+	const responseSchema = definition.output.type === 'void' ? undefined : markResponseProperties(
 		toLegacyJsonSchema(definition.output, { target: 'openapi-3.0', typeMode: 'output' }),
 	) as Schema;
+	// A root optional response also documents the existing no-content branch.
+	const response = responseSchema && (definition.output.type === 'optional' || definition.output.type === 'exact_optional')
+		? { ...responseSchema, optional: true }
+		: responseSchema;
 	return { definition, input, response } as const;
 }
 

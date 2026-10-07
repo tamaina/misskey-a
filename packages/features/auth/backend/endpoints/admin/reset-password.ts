@@ -3,15 +3,19 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { inlineAdminResetPasswordDefinition, inlineAdminResetPasswordInput, inlineAdminResetPasswordOutput } from '../../../contract/endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
 import bcrypt from 'bcryptjs';
-import { Endpoint } from '@/server/api/endpoint-base.js';
+
 import { ApiError } from '@/server/api/error.js';
 import type { UsersRepository, UserProfilesRepository, MiMeta } from '@/models/_.js';
 import { DI } from '@/di-symbols.js';
 import { secureRndstr } from '@/misc/secure-rndstr.js';
 import { RoleService } from '../../../../roles/backend/services/RoleService.js';
 import { ModerationLogService } from '../../../../moderation/backend/services/ModerationLogService.js';
+
+const contractProjection = projectEndpointContract(inlineAdminResetPasswordDefinition);
 
 export const meta = {
 	tags: ['admin'],
@@ -33,30 +37,13 @@ export const meta = {
 		},
 	},
 
-	res: {
-		type: 'object',
-		optional: false, nullable: false,
-		properties: {
-			password: {
-				type: 'string',
-				optional: false, nullable: false,
-				minLength: 8,
-				maxLength: 8,
-			},
-		},
-	},
+	res: contractProjection.response,
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {
-		userId: { type: 'string', format: 'misskey:id' },
-	},
-	required: ['userId'],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof inlineAdminResetPasswordInput, typeof inlineAdminResetPasswordOutput> {
 	constructor(
 		@Inject(DI.meta)
 		private serverSettings: MiMeta,
@@ -70,7 +57,7 @@ export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDe
 		private roleService: RoleService,
 		private moderationLogService: ModerationLogService,
 	) {
-		super(meta, paramDef, async (ps, me) => {
+		super(meta, contractProjection, async (ps, me) => {
 			const user = await this.usersRepository.findOneBy({ id: ps.userId });
 
 			if (user == null) {

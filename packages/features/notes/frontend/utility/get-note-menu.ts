@@ -349,7 +349,7 @@ export function getNoteMenu(props: {
 				targetLang: miLocalStorage.getItem('lang') ?? navigator.language,
 			});
 			props.translating.value = false;
-			props.translation.value = res;
+			props.translation.value = res ?? null;
 		}
 	}
 

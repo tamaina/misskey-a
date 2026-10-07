@@ -3,79 +3,35 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { inlineIAppsDefinition, inlineIAppsInput, inlineIAppsOutput } from '../../../contract/endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
+
 import type { AccessTokensRepository } from '@/models/_.js';
 import { DI } from '@/di-symbols.js';
 import { IdService } from '../../../../runtime/backend/services/IdService.js';
+
+const contractProjection = projectEndpointContract(inlineIAppsDefinition);
 
 export const meta = {
 	requireCredential: true,
 
 	secure: true,
 
-	res: {
-		type: 'array',
-		items: {
-			type: 'object',
-			properties: {
-				id: {
-					type: 'string',
-					optional: false,
-					format: 'misskey:id',
-				},
-				name: {
-					type: 'string',
-					optional: true,
-				},
-				createdAt: {
-					type: 'string',
-					optional: false,
-					format: 'date-time',
-				},
-				lastUsedAt: {
-					type: 'string',
-					optional: true,
-					format: 'date-time',
-				},
-				permission: {
-					type: 'array',
-					optional: false,
-					uniqueItems: true,
-					items: {
-						type: 'string',
-					},
-				},
-				iconUrl: {
-					type: 'string',
-					optional: true, nullable: true,
-				},
-				description: {
-					type: 'string',
-					optional: true, nullable: true,
-				},
-			},
-		},
-	},
+	res: contractProjection.response,
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {
-		sort: { type: 'string', enum: ['+createdAt', '-createdAt', '+lastUsedAt', '-lastUsedAt'] },
-	},
-	required: [],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof inlineIAppsInput, typeof inlineIAppsOutput> {
 	constructor(
 		@Inject(DI.accessTokensRepository)
 		private accessTokensRepository: AccessTokensRepository,
 
 		private idService: IdService,
 	) {
-		super(meta, paramDef, async (ps, me) => {
+		super(meta, contractProjection, async (ps, me) => {
 			const query = this.accessTokensRepository.createQueryBuilder('token')
 				.where('token.userId = :userId', { userId: me.id })
 				.leftJoinAndSelect('token.app', 'app');

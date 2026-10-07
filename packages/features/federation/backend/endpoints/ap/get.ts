@@ -3,10 +3,14 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { inlineApGetDefinition, inlineApGetInput, inlineApGetOutput } from '../../../contract/endpoint-definitions.js';
 import { Injectable } from '@nestjs/common';
 import ms from '@/runtime-dependencies/ms.js';
-import { Endpoint } from '@/server/api/endpoint-base.js';
+
 import { ApResolverService } from '../../services/ApResolverService.js';
+
+const contractProjection = projectEndpointContract(inlineApGetDefinition);
 
 export const meta = {
 	tags: ['federation'],
@@ -23,26 +27,17 @@ export const meta = {
 	errors: {
 	},
 
-	res: {
-		type: 'object',
-		optional: false, nullable: false,
-	},
+	res: contractProjection.response,
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {
-		uri: { type: 'string' },
-	},
-	required: ['uri'],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof inlineApGetInput, typeof inlineApGetOutput> {
 	constructor(
 		private apResolverService: ApResolverService,
 	) {
-		super(meta, paramDef, async (ps, me) => {
+		super(meta, contractProjection, async (ps, me) => {
 			const resolver = await this.apResolverService.createResolver();
 			const object = await resolver.resolve(ps.uri);
 			return object;

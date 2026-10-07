@@ -3,10 +3,14 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { inlineDriveFilesCheckExistenceDefinition, inlineDriveFilesCheckExistenceInput, inlineDriveFilesCheckExistenceOutput } from '../../../../contract/endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
+
 import type { DriveFilesRepository } from '@/models/_.js';
 import { DI } from '@/di-symbols.js';
+
+const contractProjection = projectEndpointContract(inlineDriveFilesCheckExistenceDefinition);
 
 export const meta = {
 	tags: ['drive'],
@@ -17,27 +21,18 @@ export const meta = {
 
 	description: 'Check if a given file exists.',
 
-	res: {
-		type: 'boolean',
-		optional: false, nullable: false,
-	},
+	res: contractProjection.response,
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {
-		md5: { type: 'string' },
-	},
-	required: ['md5'],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof inlineDriveFilesCheckExistenceInput, typeof inlineDriveFilesCheckExistenceOutput> {
 	constructor(
 		@Inject(DI.driveFilesRepository)
 		private driveFilesRepository: DriveFilesRepository,
 	) {
-		super(meta, paramDef, async (ps, me) => {
+		super(meta, contractProjection, async (ps, me) => {
 			const exist = await this.driveFilesRepository.exists({
 				where: {
 					md5: ps.md5,

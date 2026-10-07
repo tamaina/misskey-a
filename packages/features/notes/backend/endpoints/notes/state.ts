@@ -3,10 +3,14 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { inlineNotesStateDefinition, inlineNotesStateInput, inlineNotesStateOutput } from '../../../contract/endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
 import type { NotesRepository, NoteThreadMutingsRepository, NoteFavoritesRepository } from '@/models/_.js';
-import { Endpoint } from '@/server/api/endpoint-base.js';
+
 import { DI } from '@/di-symbols.js';
+
+const contractProjection = projectEndpointContract(inlineNotesStateDefinition);
 
 export const meta = {
 	tags: ['notes'],
@@ -14,32 +18,13 @@ export const meta = {
 	requireCredential: true,
 	kind: 'read:account',
 
-	res: {
-		type: 'object',
-		optional: false, nullable: false,
-		properties: {
-			isFavorited: {
-				type: 'boolean',
-				optional: false, nullable: false,
-			},
-			isMutedThread: {
-				type: 'boolean',
-				optional: false, nullable: false,
-			},
-		},
-	},
+	res: contractProjection.response,
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {
-		noteId: { type: 'string', format: 'misskey:id' },
-	},
-	required: ['noteId'],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof inlineNotesStateInput, typeof inlineNotesStateOutput> {
 	constructor(
 		@Inject(DI.notesRepository)
 		private notesRepository: NotesRepository,
@@ -50,7 +35,7 @@ export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDe
 		@Inject(DI.noteFavoritesRepository)
 		private noteFavoritesRepository: NoteFavoritesRepository,
 	) {
-		super(meta, paramDef, async (ps, me) => {
+		super(meta, contractProjection, async (ps, me) => {
 			const note = await this.notesRepository.findOneByOrFail({ id: ps.noteId });
 
 			const [favorite, threadMuting] = await Promise.all([

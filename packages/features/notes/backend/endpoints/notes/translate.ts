@@ -3,9 +3,11 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { inlineNotesTranslateDefinition, inlineNotesTranslateInput, inlineNotesTranslateOutput } from '../../../contract/endpoint-definitions.js';
 import { URLSearchParams } from 'node:url';
 import { Inject, Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
+
 import { NoteEntityService } from '../../serializers/NoteEntityService.js';
 import { HttpRequestService } from '../../../../runtime/backend/services/HttpRequestService.js';
 import { GetterService } from '@/server/api/GetterService.js';
@@ -14,20 +16,15 @@ import { MiMeta } from '@/models/_.js';
 import { DI } from '@/di-symbols.js';
 import { ApiError } from '@/server/api/error.js';
 
+const contractProjection = projectEndpointContract(inlineNotesTranslateDefinition);
+
 export const meta = {
 	tags: ['notes'],
 
 	requireCredential: true,
 	kind: 'read:account',
 
-	res: {
-		type: 'object',
-		optional: true, nullable: false,
-		properties: {
-			sourceLang: { type: 'string' },
-			text: { type: 'string' },
-		},
-	},
+	res: contractProjection.response,
 
 	errors: {
 		unavailable: {
@@ -48,17 +45,10 @@ export const meta = {
 	},
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {
-		noteId: { type: 'string', format: 'misskey:id' },
-		targetLang: { type: 'string' },
-	},
-	required: ['noteId', 'targetLang'],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof inlineNotesTranslateInput, typeof inlineNotesTranslateOutput> {
 	constructor(
 		@Inject(DI.meta)
 		private serverSettings: MiMeta,
@@ -68,7 +58,7 @@ export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDe
 		private httpRequestService: HttpRequestService,
 		private roleService: RoleService,
 	) {
-		super(meta, paramDef, async (ps, me) => {
+		super(meta, contractProjection, async (ps, me) => {
 			const policies = await this.roleService.getUserPolicies(me.id);
 			if (!policies.canUseTranslator) {
 				throw new ApiError(meta.errors.unavailable);

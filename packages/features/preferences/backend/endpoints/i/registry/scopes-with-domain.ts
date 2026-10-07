@@ -3,49 +3,29 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { inlineIRegistryScopesWithDomainDefinition, inlineIRegistryScopesWithDomainInput, inlineIRegistryScopesWithDomainOutput } from '../../../../contract/endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
+
 import { RegistryApiService } from '../../../services/RegistryApiService.js';
+
+const contractProjection = projectEndpointContract(inlineIRegistryScopesWithDomainDefinition);
 
 export const meta = {
 	requireCredential: true,
 	secure: true,
 
-	res: {
-		type: 'array',
-		items: {
-			type: 'object',
-			properties: {
-				scopes: {
-					type: 'array',
-					items: {
-						type: 'array',
-						items: {
-							type: 'string',
-						}
-					}
-				},
-				domain: {
-					type: 'string',
-					nullable: true,
-				},
-			},
-		},
-	}
+	res: contractProjection.response
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {},
-	required: [],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof inlineIRegistryScopesWithDomainInput, typeof inlineIRegistryScopesWithDomainOutput> {
 	constructor(
 		private registryApiService: RegistryApiService,
 	) {
-		super(meta, paramDef, async (ps, me) => {
+		super(meta, contractProjection, async (ps, me) => {
 			return await this.registryApiService.getAllScopeAndDomains(me.id);
 		});
 	}
