@@ -4,7 +4,7 @@
  */
 
 import { describe, expect, test, vi } from 'vitest';
-import type { AccessLogRecord, LogRecord } from '@/logging/types.js';
+import type { AccessLogRecord, LogRecord } from '@features/runtime/backend/logging/types.js';
 
 type Formatter = ((value: unknown) => string) & { white?: Formatter };
 
@@ -33,7 +33,7 @@ vi.mock('chalk', () => ({
 	default: chalkMock,
 }));
 
-import { PrettyConsoleBackend } from '@/logging/PrettyConsoleBackend.js';
+import { PrettyConsoleBackend } from '@features/runtime/backend/logging/PrettyConsoleBackend.js';
 
 /** 見やすい形式のテストで使う共通のログを作成します。 */
 function createRecord(overrides: Partial<LogRecord> = {}): LogRecord {

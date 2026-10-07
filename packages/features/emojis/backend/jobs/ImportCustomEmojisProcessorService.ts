@@ -8,7 +8,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { IsNull } from 'typeorm';
 import { DI } from '@/di-symbols.js';
 import type { EmojisRepository, DriveFilesRepository } from '@/models/_.js';
-import type Logger from '@/logger.js';
+import type { Logger } from '@features/runtime/backend/logging/logger.js';
 import { CustomEmojiService } from '../services/CustomEmojiService.js';
 import { createTempDir } from '@/misc/create-temp.js';
 import { ZipFile } from '@/misc/zip.js';

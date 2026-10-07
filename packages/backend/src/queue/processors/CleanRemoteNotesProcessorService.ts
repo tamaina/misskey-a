@@ -9,7 +9,7 @@ import * as Redis from 'ioredis';
 import { DataSource, IsNull, LessThan, QueryFailedError, Not } from 'typeorm';
 import { DI } from '@/di-symbols.js';
 import type { MiMeta, MiNote, NotesRepository } from '@/models/_.js';
-import type Logger from '@/logger.js';
+import type { Logger } from '@features/runtime/backend/logging/logger.js';
 import { bindThis } from '@/decorators.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { QueueLoggerService } from '../QueueLoggerService.js';

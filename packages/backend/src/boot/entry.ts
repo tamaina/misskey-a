@@ -11,7 +11,7 @@ import cluster from 'node:cluster';
 import { EventEmitter } from 'node:events';
 import { writeHeapSnapshot } from 'node:v8';
 import Xev from 'xev';
-import Logger from '@/logger.js';
+import { Logger } from '@features/runtime/backend/logging/logger.js';
 import { envOption } from '../env.js';
 import { installProcessErrorHandlers } from './process-error-handler.js';
 import { isShutdownInProgress } from '@features/boot/backend/signals.js';

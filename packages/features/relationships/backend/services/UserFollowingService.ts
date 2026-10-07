@@ -28,7 +28,7 @@ import type { Config } from '@/config.js';
 import { AccountMoveService } from '@features/users/backend/services/AccountMoveService.js';
 import { UtilityService } from '@/core/UtilityService.js';
 import type { ThinUser } from '@/queue/types.js';
-import Logger from '@/logger.js';
+import { Logger } from '@features/runtime/backend/logging/logger.js';
 
 const logger = new Logger('following/create');
 

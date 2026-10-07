@@ -7,7 +7,7 @@ import { NestFactory } from '@nestjs/core';
 import { init } from 'slacc';
 import { createProcessRoles } from '@features/boot/backend';
 import type { ProcessRole, RoleName } from '@features/boot/backend';
-import { NestLogger } from '@/NestLogger.js';
+import { NestLogger } from '@features/runtime/backend/logging/NestLogger.js';
 import { envOption } from '@/env.js';
 import type { Config } from '@/config.js';
 

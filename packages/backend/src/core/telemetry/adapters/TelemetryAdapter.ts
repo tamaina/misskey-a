@@ -4,7 +4,7 @@
  */
 
 import type { Config } from '@/config.js';
-import type { LogTraceContext } from '@/logging/types.js';
+import type { LogTraceContext } from '@features/runtime/backend/logging/types.js';
 
 export type SentryBackendConfig = NonNullable<Config['sentryForBackend']>;
 

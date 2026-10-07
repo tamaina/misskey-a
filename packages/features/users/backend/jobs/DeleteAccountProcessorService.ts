@@ -7,7 +7,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { MoreThan } from 'typeorm';
 import { DI } from '@/di-symbols.js';
 import type { DriveFilesRepository, NotesRepository, PagesRepository, UserProfilesRepository, UsersRepository } from '@/models/_.js';
-import type Logger from '@/logger.js';
+import type { Logger } from '@features/runtime/backend/logging/logger.js';
 import { DriveService } from '@features/drive/backend/services/DriveService.js';
 import type { MiDriveFile } from '@features/drive/backend/models/DriveFile.js';
 import type { MiNote } from '@features/notes/backend/models/Note.js';

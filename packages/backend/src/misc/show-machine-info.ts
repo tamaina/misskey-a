@@ -4,7 +4,7 @@
  */
 
 import * as os from 'node:os';
-import type Logger from '@/logger.js';
+import type { Logger } from '@features/runtime/backend/logging/logger.js';
 
 export async function showMachineInfo(parentLogger: Logger) {
 	const logger = parentLogger.createSubLogger('machine');

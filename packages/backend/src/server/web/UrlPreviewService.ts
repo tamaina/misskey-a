@@ -8,7 +8,7 @@ import type { SummalyResult } from '@misskey-dev/summaly';
 import { DI } from '@/di-symbols.js';
 import type { Config } from '@/config.js';
 import { HttpRequestService } from '@features/runtime/backend/services/HttpRequestService.js';
-import type Logger from '@/logger.js';
+import type { Logger } from '@features/runtime/backend/logging/logger.js';
 import { deepClone } from '@/misc/clone.js';
 import { query } from '@/misc/prelude/url.js';
 import { MemoryKVCache } from '@/misc/cache.js';

@@ -5,12 +5,12 @@
 
 import { describe, expect, test, vi } from 'vitest';
 import { ApiCallService } from '@/server/api/ApiCallService.js';
-import Logger from '@/logger.js';
+import { Logger } from '@features/runtime/backend/logging/logger.js';
 import { envOption } from '@/env.js';
-import { logManager } from '@/logging/logging-runtime.js';
-import { PrettyConsoleBackend } from '@/logging/PrettyConsoleBackend.js';
-import type { LogBackend } from '@/logging/LogBackend.js';
-import type { LogRecord } from '@/logging/types.js';
+import { logManager } from '@features/runtime/backend/logging/logging-runtime.js';
+import { PrettyConsoleBackend } from '@features/runtime/backend/logging/PrettyConsoleBackend.js';
+import type { LogBackend } from '@features/runtime/backend/logging/LogBackend.js';
+import type { LogRecord } from '@features/runtime/backend/logging/types.js';
 
 /** API失敗ログを確認するための最小Fastify応答を作成します。 */
 function createReply() {

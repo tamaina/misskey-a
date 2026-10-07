@@ -4,8 +4,8 @@
  */
 
 import { bindThis } from '@/decorators.js';
-import { logManager } from './logging/logging-runtime.js';
-import type { LogEntryInput, LogLevel, LoggerContext, LogWriteInput } from './logging/types.js';
+import { logManager } from './logging-runtime.js';
+import type { LogEntryInput, LogLevel, LoggerContext, LogWriteInput } from './types.js';
 import type { Keyword } from 'color-convert';
 
 // 旧APIのdataは表示用の任意値を受け取り、Errorや配列も既存呼び出しで使用されています。
@@ -149,3 +149,5 @@ export default class Logger {
 		}
 	}
 }
+
+export { Logger };

@@ -6,7 +6,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { DI } from '@/di-symbols.js';
 import type { MutingsRepository } from '@/models/_.js';
-import type Logger from '@/logger.js';
+import type { Logger } from '@features/runtime/backend/logging/logger.js';
 import { bindThis } from '@/decorators.js';
 import { UserMutingService } from '@features/relationships/backend/services/UserMutingService.js';
 import { ChannelMutingService } from '@features/channels/backend/services/ChannelMutingService.js';

@@ -7,7 +7,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import Limiter from 'ratelimiter';
 import * as Redis from 'ioredis';
 import { DI } from '@/di-symbols.js';
-import type Logger from '@/logger.js';
+import type { Logger } from '@features/runtime/backend/logging/logger.js';
 import { LoggerService } from '@features/runtime/backend/services/LoggerService.js';
 import { bindThis } from '@/decorators.js';
 import type { IEndpointMeta } from './endpoints.js';

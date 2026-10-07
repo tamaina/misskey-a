@@ -15,7 +15,7 @@ import * as blurhash from 'blurhash';
 import FFmpeg from '@/runtime-dependencies/ffmpeg.js';
 import * as fileType from '@/runtime-dependencies/file-type.js';
 import { createTempDir } from '@/misc/create-temp.js';
-import type Logger from '@/logger.js';
+import type { Logger } from '@features/runtime/backend/logging/logger.js';
 import { bindThis } from '@/decorators.js';
 import { isMimeImage } from '@/misc/is-mime-image.js';
 import type { LoggerService } from '@features/runtime/backend/services/LoggerService.js';

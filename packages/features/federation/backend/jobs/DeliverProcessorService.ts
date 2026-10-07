@@ -8,7 +8,7 @@ import * as Bull from 'bullmq';
 import { Not } from 'typeorm';
 import { DI } from '@/di-symbols.js';
 import type { InstancesRepository, MiMeta } from '@/models/_.js';
-import type Logger from '@/logger.js';
+import type { Logger } from '@features/runtime/backend/logging/logger.js';
 import { ApRequestService } from '../services/ApRequestService.js';
 import { FederatedInstanceService } from '../services/FederatedInstanceService.js';
 import { FetchInstanceMetadataService } from '../services/FetchInstanceMetadataService.js';

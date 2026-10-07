@@ -6,7 +6,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { DI } from '@/di-symbols.js';
 import type { PollVotesRepository, NotesRepository } from '@/models/_.js';
-import type Logger from '@/logger.js';
+import type { Logger } from '@features/runtime/backend/logging/logger.js';
 import { CacheService } from '@/core/CacheService.js';
 import { NotificationService } from '@features/notifications/backend/services/NotificationService.js';
 import { bindThis } from '@/decorators.js';

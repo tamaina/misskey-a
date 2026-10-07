@@ -11,7 +11,7 @@ import { mime, ZipArchive } from '@/queue/archive-dependencies.js';
 import { DI } from '@/di-symbols.js';
 import type { EmojisRepository, UsersRepository } from '@/models/_.js';
 import type { Config } from '@/config.js';
-import type Logger from '@/logger.js';
+import type { Logger } from '@features/runtime/backend/logging/logger.js';
 import { DriveService } from '@features/drive/backend/services/DriveService.js';
 import { createTemp, createTempDir } from '@/misc/create-temp.js';
 import { DownloadService } from '@features/runtime/backend/services/DownloadService.js';

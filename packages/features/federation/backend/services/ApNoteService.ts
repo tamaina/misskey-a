@@ -16,7 +16,7 @@ import { toArray, toSingle, unique } from '@/misc/prelude/array.js';
 import type { MiEmoji } from '@features/emojis/backend/models/Emoji.js';
 import type { MiDriveFile } from '@features/drive/backend/models/DriveFile.js';
 import { NoteCreateService } from '@features/notes/backend/services/NoteCreateService.js';
-import type Logger from '@/logger.js';
+import type { Logger } from '@features/runtime/backend/logging/logger.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { PollService } from '@features/notes/backend/services/PollService.js';
 import { StatusError } from '@/misc/status-error.js';

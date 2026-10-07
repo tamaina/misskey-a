@@ -4,7 +4,7 @@
  */
 
 import type { Config } from '@/config.js';
-import { setLogTraceContextProvider } from '@/logging/logging-runtime.js';
+import { setLogTraceContextProvider } from '@features/runtime/backend/logging/logging-runtime.js';
 import { SentryTelemetryAdapter } from './adapters/SentryTelemetryAdapter.js';
 import type { TelemetryAdapter, TelemetryCaptureMessageOptions } from './adapters/TelemetryAdapter.js';
 

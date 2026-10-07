@@ -4,9 +4,9 @@
  */
 
 import { describe, expect, test, vi } from 'vitest';
-import type { LogBackend } from '@/logging/LogBackend.js';
-import type { AccessLogRecord, AccessLogRecordInput, LogRecordInput, LogTraceContext } from '@/logging/types.js';
-import { LogManager } from '@/logging/LogManager.js';
+import type { LogBackend } from '@features/runtime/backend/logging/LogBackend.js';
+import type { AccessLogRecord, AccessLogRecordInput, LogRecordInput, LogTraceContext } from '@features/runtime/backend/logging/types.js';
+import { LogManager } from '@features/runtime/backend/logging/LogManager.js';
 
 /** テストで使う最小構成のログ入力を作成します。 */
 function createInput(level: LogRecordInput['level'] = 'info'): LogRecordInput {

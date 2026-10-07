@@ -11,7 +11,7 @@ import type { MiDriveFile } from '@features/drive/backend/models/DriveFile.js';
 import { truncate } from '@/misc/truncate.js';
 import { DB_MAX_IMAGE_COMMENT_LENGTH } from '@/const.js';
 import { DriveService } from '@features/drive/backend/services/DriveService.js';
-import type Logger from '@/logger.js';
+import type { Logger } from '@features/runtime/backend/logging/logger.js';
 import { bindThis } from '@/decorators.js';
 import { checkHttps } from '@/misc/check-https.js';
 import { ApResolverService } from './ApResolverService.js';

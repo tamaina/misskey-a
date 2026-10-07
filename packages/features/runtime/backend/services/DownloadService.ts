@@ -15,7 +15,7 @@ import { HttpRequestService } from './HttpRequestService.js';
 import { createTemp } from '@/misc/create-temp.js';
 import { StatusError } from '@/misc/status-error.js';
 import { LoggerService } from './LoggerService.js';
-import type Logger from '@/logger.js';
+import type { Logger } from '../logging/logger.js';
 
 import { bindThis } from '@/decorators.js';
 

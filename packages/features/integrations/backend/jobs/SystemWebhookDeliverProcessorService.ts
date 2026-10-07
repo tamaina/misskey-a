@@ -8,7 +8,7 @@ import * as Bull from 'bullmq';
 import { DI } from '@/di-symbols.js';
 import type { SystemWebhooksRepository } from '@/models/_.js';
 import type { Config } from '@/config.js';
-import type Logger from '@/logger.js';
+import type { Logger } from '@features/runtime/backend/logging/logger.js';
 import { HttpRequestService } from '@features/runtime/backend/services/HttpRequestService.js';
 import { StatusError } from '@/misc/status-error.js';
 import { bindThis } from '@/decorators.js';

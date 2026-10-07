@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import type { LogWriteInput } from '@/logging/types.js';
+import type { LogWriteInput } from '@features/runtime/backend/logging/types.js';
 
 /** プロセス例外をロガーへ渡すために必要な最小の処理対象です。 */
 export type ProcessErrorHandlerProcess = {

@@ -20,7 +20,7 @@ import { DI } from '@/di-symbols.js';
 import { UtilityService } from '@/core/UtilityService.js';
 import { bindThis } from '@/decorators.js';
 import { LoggerService } from '@features/runtime/backend/services/LoggerService.js';
-import type Logger from '@/logger.js';
+import type { Logger } from '@features/runtime/backend/logging/logger.js';
 import { SystemAccountService } from '@features/users/backend/services/SystemAccountService.js';
 import { IdentifiableError } from '@/misc/identifiable-error.js';
 import type { ICollection, IObject, IOrderedCollection } from '../protocol/type.js';

@@ -8,7 +8,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { UserFollowingService } from '../services/UserFollowingService.js';
 import { UserBlockingService } from '../services/UserBlockingService.js';
 import { bindThis } from '@/decorators.js';
-import type Logger from '@/logger.js';
+import type { Logger } from '@features/runtime/backend/logging/logger.js';
 
 import type { UsersRepository } from '@/models/_.js';
 import { DI } from '@/di-symbols.js';

@@ -5,7 +5,7 @@
 
 import { Inject, Injectable } from '@nestjs/common';
 import { In } from 'typeorm';
-import type Logger from '@/logger.js';
+import type { Logger } from '@features/runtime/backend/logging/logger.js';
 import { bindThis } from '@/decorators.js';
 import { MetaService } from '@features/instance/backend/services/MetaService.js';
 import { RoleService } from '@features/roles/backend/services/RoleService.js';

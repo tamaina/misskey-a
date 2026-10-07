@@ -4,7 +4,7 @@
  */
 
 import { Inject, Injectable } from '@nestjs/common';
-import type Logger from '@/logger.js';
+import type { Logger } from '@features/runtime/backend/logging/logger.js';
 import { bindThis } from '@/decorators.js';
 import { ReactionsBufferingService } from '../services/ReactionsBufferingService.js';
 import { QueueLoggerService } from '@/queue/QueueLoggerService.js';

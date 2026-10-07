@@ -14,7 +14,7 @@ import type { ChartMetricDescriptor, ChartValueRange } from '@features/statistic
 import { EntitySchema, LessThan, Between } from 'typeorm';
 import { dateUTC, isTimeSame, isTimeBefore, subtractTime, addTime } from '@/misc/prelude/time.js';
 import { sqlStringEscape } from '@/misc/sql-string-escape.js';
-import type Logger from '@/logger.js';
+import type { Logger } from '@features/runtime/backend/logging/logger.js';
 import { bindThis } from '@/decorators.js';
 import { MiRepository, miRepository } from '@/models/_.js';
 import type { DataSource, Repository } from 'typeorm';

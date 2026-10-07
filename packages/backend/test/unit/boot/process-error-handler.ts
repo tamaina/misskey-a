@@ -4,7 +4,7 @@
  */
 
 import { describe, expect, test, vi } from 'vitest';
-import type { LogWriteInput } from '@/logging/types.js';
+import type { LogWriteInput } from '@features/runtime/backend/logging/types.js';
 import { installProcessErrorHandlers } from '@/boot/process-error-handler.js';
 
 type ProcessListener = (...args: unknown[]) => void;

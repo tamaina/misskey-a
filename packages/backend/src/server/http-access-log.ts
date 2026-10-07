@@ -5,9 +5,9 @@
 
 import { Buffer } from 'node:buffer';
 import type { FastifyInstance } from 'fastify';
-import { logManager } from '@/logging/logging-runtime.js';
-import type { LogManager } from '@/logging/LogManager.js';
-import type { LogTraceContext } from '@/logging/types.js';
+import { logManager } from '@features/runtime/backend/logging/logging-runtime.js';
+import type { LogManager } from '@features/runtime/backend/logging/LogManager.js';
+import type { LogTraceContext } from '@features/runtime/backend/logging/types.js';
 
 type AccessRequestState = {
 	traceContext?: LogTraceContext;

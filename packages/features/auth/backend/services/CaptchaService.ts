@@ -10,7 +10,7 @@ import { HttpRequestService } from '@features/runtime/backend/services/HttpReque
 import { bindThis } from '@/decorators.js';
 import { MetaService } from '@features/instance/backend/services/MetaService.js';
 import { MiMeta } from '@features/instance/backend/models/Meta.js';
-import Logger from '@/logger.js';
+import { Logger } from '@features/runtime/backend/logging/logger.js';
 import { LoggerService } from '@features/runtime/backend/services/LoggerService.js';
 
 export { supportedCaptchaProviders } from '../../contract/captcha-providers.js';

@@ -31,7 +31,7 @@ import { CacheService } from '@/core/CacheService.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 import { MemoryKVCache } from '@/misc/cache.js';
 import { LoggerService } from '@features/runtime/backend/services/LoggerService.js';
-import Logger from '@/logger.js';
+import { Logger } from '@features/runtime/backend/logging/logger.js';
 import { StatusError } from '@/misc/status-error.js';
 import { HtmlTemplateService } from '@/server/web/HtmlTemplateService.js';
 import { OAuthPage } from '@features/auth/backend/templates/oauth.js';

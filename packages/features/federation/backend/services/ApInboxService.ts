@@ -17,7 +17,7 @@ import { NoteDeleteService } from '@features/notes/backend/services/NoteDeleteSe
 import { NoteCreateService } from '@features/notes/backend/services/NoteCreateService.js';
 import { acquireApObjectLock } from '@/misc/distributed-lock.js';
 import { concat, toArray, toSingle, unique } from '@/misc/prelude/array.js';
-import type Logger from '@/logger.js';
+import type { Logger } from '@features/runtime/backend/logging/logger.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { StatusError } from '@/misc/status-error.js';
 import { UtilityService } from '@/core/UtilityService.js';

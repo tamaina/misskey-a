@@ -13,7 +13,7 @@ const mocks = vi.hoisted(() => {
 	};
 });
 
-vi.mock('@/logging/logging-runtime.js', () => ({
+vi.mock('@features/runtime/backend/logging/logging-runtime.js', () => ({
 	setLogTraceContextProvider: mocks.setLogTraceContextProvider,
 }));
 

@@ -10,7 +10,7 @@ import type { Config } from '@/config.js';
 import type { DriveFilesRepository } from '@/models/_.js';
 import { DI } from '@/di-symbols.js';
 import { StatusError } from '@/misc/status-error.js';
-import type Logger from '@/logger.js';
+import type { Logger } from '@features/runtime/backend/logging/logger.js';
 import { DownloadService } from '@features/runtime/backend/services/DownloadService.js';
 import { InternalStorageService } from '@features/runtime/backend/services/InternalStorageService.js';
 import { FileInfoService } from '@features/media/backend/services/FileInfoService.js';

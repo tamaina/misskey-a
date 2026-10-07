@@ -9,7 +9,7 @@ import tinycolor from '@/runtime-dependencies/tinycolor.js';
 import * as Redis from 'ioredis';
 import * as htmlParser from 'node-html-parser';
 import type { MiInstance } from '../models/Instance.js';
-import type Logger from '@/logger.js';
+import type { Logger } from '@features/runtime/backend/logging/logger.js';
 import { DI } from '@/di-symbols.js';
 import { LoggerService } from '@features/runtime/backend/services/LoggerService.js';
 import { HttpRequestService } from '@features/runtime/backend/services/HttpRequestService.js';

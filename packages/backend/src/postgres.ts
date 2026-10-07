@@ -8,7 +8,7 @@ import pg from 'pg';
 import { DataSource, Logger, type QueryRunner } from 'typeorm';
 import { entities as charts } from '@features/statistics/backend/charts/registry.js';
 import { Config } from '@/config.js';
-import MisskeyLogger from '@/logger.js';
+import { Logger as MisskeyLogger } from '@features/runtime/backend/logging/logger.js';
 import { bindThis } from '@/decorators.js';
 
 import { MiAbuseUserReport } from '@features/moderation/backend/models/AbuseUserReport.js';

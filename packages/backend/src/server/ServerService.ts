@@ -15,7 +15,7 @@ import { GlobalEventService } from '@features/runtime/backend/services/GlobalEve
 import type { Config } from '@/config.js';
 import type { EmojisRepository, MiMeta, UserProfilesRepository, UsersRepository } from '@/models/_.js';
 import { DI } from '@/di-symbols.js';
-import type Logger from '@/logger.js';
+import type { Logger } from '@features/runtime/backend/logging/logger.js';
 import * as Acct from '@/misc/acct.js';
 import { genIdenticon } from '@/misc/gen-identicon.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';

@@ -7,7 +7,7 @@ import { URL } from 'node:url';
 import { Inject, Injectable, OnApplicationShutdown } from '@nestjs/common';
 import httpSignature from '@peertube/http-signature';
 import * as Bull from 'bullmq';
-import type Logger from '@/logger.js';
+import type { Logger } from '@features/runtime/backend/logging/logger.js';
 import { FederatedInstanceService } from '../services/FederatedInstanceService.js';
 import { FetchInstanceMetadataService } from '../services/FetchInstanceMetadataService.js';
 import { InstanceChart } from '@features/statistics/backend/charts/instance.js';

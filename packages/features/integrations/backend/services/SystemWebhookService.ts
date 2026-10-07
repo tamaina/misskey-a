@@ -14,7 +14,7 @@ import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { QueueService } from '@features/runtime/backend/services/QueueService.js';
 import { ModerationLogService } from '@features/moderation/backend/services/ModerationLogService.js';
 import { LoggerService } from '@features/runtime/backend/services/LoggerService.js';
-import Logger from '@/logger.js';
+import { Logger } from '@features/runtime/backend/logging/logger.js';
 import { Packed } from '@features/index/contract/packed.js';
 import { AbuseReportResolveType } from '@features/moderation/backend/models/AbuseUserReport.js';
 import { ModeratorInactivityRemainingTime } from '@features/moderation/backend/jobs/CheckModeratorsActivityProcessorService.js';

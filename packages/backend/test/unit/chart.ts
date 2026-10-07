@@ -20,7 +20,7 @@ import { entity as TestGroupedChartEntity } from '@features/statistics/backend/c
 import { entity as TestUniqueChartEntity } from '@features/statistics/backend/charts/definitions/test-unique.js';
 import { entity as TestIntersectionChartEntity } from '@features/statistics/backend/charts/definitions/test-intersection.js';
 import { loadConfig } from '@/config.js';
-import Logger from '@/logger.js';
+import { Logger } from '@features/runtime/backend/logging/logger.js';
 
 describe('Chart', () => {
 	const config = loadConfig();

@@ -16,7 +16,7 @@ import { truncate } from '@/misc/truncate.js';
 import type { CacheService } from '@/core/CacheService.js';
 import { normalizeForSearch } from '@/misc/normalize-for-search.js';
 import { isDuplicateKeyValueError } from '@/misc/is-duplicate-key-value-error.js';
-import type Logger from '@/logger.js';
+import type { Logger } from '@features/runtime/backend/logging/logger.js';
 import type { MiNote } from '@features/notes/backend/models/Note.js';
 import type { IdService } from '@features/runtime/backend/services/IdService.js';
 import type { MfmService } from '@features/markup/backend/services/MfmService.js';
