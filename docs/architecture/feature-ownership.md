@@ -294,10 +294,12 @@ This completes the approved backend implementation placement, not the whole
 architecture migration. Remaining VVI work and legacy i18n/frontend-builder
 retirement are still separate work, as is the fallback asset defect above.
 
-### Proposed test placement after backend source ownership
+### Proposed test placement by behavior owner
 
-This is a proposal; tests have not moved. Single-owner unit/validator tests can
-use `features/<owner>/test/backend/` with the existing backend-owned Vitest,
+This is a proposal; tests have not moved. Classify tests by the behavior they
+verify, including both backend `src` and `test` trees and frontend package/colocated
+tests. A DB, Redis, Nest, HTTP or storage fixture does not itself make a test
+cross-feature. Single-owner tests can use `features/<owner>/test/backend/` with the existing backend-owned Vitest,
 TypeScript and lint configuration. Update those central include patterns and
 explicit CI file selections together; keep shared test helpers/fixtures
 package-owned unless their ownership is separately established. No per-feature
@@ -307,20 +309,40 @@ package or tsconfig is needed.
 | --- | --- |
 | api | `src/server/api/{feature-id,json-object-contract,json-selector-and-common,result-object,unique-string-array}.test.ts` |
 | runtime | `src/misc/collapsed-queue.test.ts`, `src/types.test.ts`, `src/core/queue-service.pack-job-data.test.ts`; pure helper tests under `test/unit/misc/{zip,loader,id,ulid,cache}.ts` |
-| notes | `src/server/api/endpoints/notes/create.test.ts`, `test/unit/misc/{should-hide-note-by-time,is-renote}.ts` |
+| notes | `src/server/api/endpoints/notes/create.test.ts`, `test/unit/misc/{should-hide-note-by-time,is-renote}.ts`, `test/unit/queue/processors/CleanRemoteNotesProcessorService.ts` |
 | users | `src/server/api/endpoints/users/show.test.ts` |
 | notifications | `src/core/entities/notification-entity-service.test.ts` (its collaborating services are mocked) |
 | relationships | `test/unit/misc/check-word-mute.ts` |
-| drive | `test/unit/misc/correct-filename.ts`, `test/unit/misc/others.ts` (currently only content-disposition cases) |
+| drive | `test/unit/misc/correct-filename.ts`, `test/unit/misc/others.ts` (currently only content-disposition cases), `test/unit/server/FileServerService.ts` |
 | markup | `test/unit/extract-mentions.ts` |
 | statistics | `test/unit/telemetry-registry.ts`, `test/unit/core/telemetry/adapters/SentryTelemetryAdapter.ts` (mocked adapter/logging boundaries) |
 
 Keep actual cross-feature integrations in backend: Nest provider/alias resolution,
 entity/repository constructor identity, complete endpoint and packed registries,
 HTTP/OpenAPI/SDK parity across feature contracts, active-following reader policy,
-role/stream shutdown, real file-server/storage/DB integration and the Nest/Redis/DB
-CleanRemoteNotesProcessorService integration. This includes
+role/stream shutdown, and boot/build/host coordination. File-server behavior
+belongs to drive and remote-note cleanup belongs to notes even when their tests
+use real infrastructure. This includes
 the five cross-feature compile-time test files. The BullMQ package-version and
 declaration contract test also remains backend-owned. Existing E2E/federation,
 boot/maintenance integration tests and shared runner/config/fixtures remain
 package-owned. Test relocation must preserve every assertion and fixture.
+
+Frontend single-owner candidates use `features/<owner>/test/frontend/` under the
+existing frontend-owned runner, compiler and lint configuration:
+
+| Owner | Candidates relative to `packages/frontend/` |
+| --- | --- |
+| users | `test/unit/home.test.ts` (user profile home) |
+| drive | `test/unit/note.test.ts` (actually `MkMediaImage`), `test/unit/uploader-locale-migration.test.ts` |
+| emojis | `test/unit/emoji.test.ts` |
+| markup | `test/unit/url-preview.test.ts` |
+| ui | `test/unit/result-locale.test.ts` |
+
+Global Storybook provisioning, multi-owner localization parity/reversal, main/embed
+entrypoint and compiler/build isolation tests remain host-owned. Keep existing
+feature-colocated tests with their owner. The first bounded import/path-only
+cohort is the five API tests listed above plus frontend home, media image, emoji
+and URL preview tests. Update central discovery, coverage, TypeScript inclusion,
+dependency resolution and CI selectors together; preserve setup state, fixtures
+and all assertions. No feature-specific package or tsconfig is introduced.
