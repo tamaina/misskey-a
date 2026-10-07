@@ -5,6 +5,7 @@
 
 import { describe, test, assert, afterEach } from 'vitest';
 import { render, cleanup, type RenderResult } from '@testing-library/vue';
+import { createInternationalization } from 'virtual:vite-vue-internationalization';
 import { preferState } from '../setup.unit.js';
 import { getEmojiName } from '@@/js/emojilist.js';
 import { components } from '@features/index/frontend/components.js';
@@ -12,10 +13,14 @@ import { directives } from '@features/index/frontend/directives.js';
 import MkEmoji from '@features/emojis/frontend/components/global/MkEmoji.vue';
 
 describe('Emoji', () => {
-	const renderEmoji = (emoji: string): RenderResult => {
+	const renderEmoji = async (emoji: string): Promise<RenderResult> => {
+		const internationalization = createInternationalization({ initialLocale: 'en-US' });
+		await internationalization.ready;
+		await internationalization.loadLocale('en-US');
+
 		return render(MkEmoji, {
 			props: { emoji },
-			global: { directives, components },
+			global: { plugins: [internationalization], directives, components },
 		});
 	};
 

@@ -3,11 +3,13 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { portableAdminSystemWebhookListDefinition, portableAdminSystemWebhookListInput, portableAdminSystemWebhookListOutput } from '../../../../contract/portable-constant-endpoint-definitions.js';
 import { Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
 import { SystemWebhookEntityService } from '../../../serializers/SystemWebhookEntityService.js';
-import { systemWebhookEventTypes } from '../../../models/SystemWebhook.js';
 import { SystemWebhookService } from '../../../services/SystemWebhookService.js';
+
+const contractProjection = projectEndpointContract(portableAdminSystemWebhookListDefinition);
 
 export const meta = {
 	tags: ['admin', 'system-webhook'],
@@ -17,39 +19,18 @@ export const meta = {
 	secure: true,
 	kind: 'write:admin:system-webhook',
 
-	res: {
-		type: 'array',
-		items: {
-			type: 'object',
-			ref: 'SystemWebhook',
-		},
-	},
+	res: contractProjection.response,
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {
-		isActive: {
-			type: 'boolean',
-		},
-		on: {
-			type: 'array',
-			items: {
-				type: 'string',
-				enum: systemWebhookEventTypes,
-			},
-		},
-	},
-	required: [],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof portableAdminSystemWebhookListInput, typeof portableAdminSystemWebhookListOutput> {
 	constructor(
 		private systemWebhookService: SystemWebhookService,
 		private systemWebhookEntityService: SystemWebhookEntityService,
 	) {
-		super(meta, paramDef, async (ps) => {
+		super(meta, contractProjection, async (ps) => {
 			const webhooks = await this.systemWebhookService.fetchSystemWebhooks({
 				isActive: ps.isActive,
 				on: ps.on,

@@ -4,14 +4,14 @@
  */
 
 import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
-import { packedAdminShowUsersDefinition, packedAdminShowUsersInput, packedAdminShowUsersOutput } from '../../../../../../features/moderation/contract/packed-endpoint-definitions.js';
+import { packedAdminShowUsersDefinition, packedAdminShowUsersInput, packedAdminShowUsersOutput } from '../../../contract/packed-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
 import type { UsersRepository } from '@/models/_.js';
 
 import { DI } from '@/di-symbols.js';
-import { UserEntityService } from '../../../../../../features/users/backend/serializers/UserEntityService.js';
+import { UserEntityService } from '../../../../users/backend/serializers/UserEntityService.js';
 import { sqlLikeEscape } from '@/misc/sql-like-escape.js';
-import { RoleService } from '../../../../../../features/roles/backend/services/RoleService.js';
+import { RoleService } from '../../../../roles/backend/services/RoleService.js';
 
 const contractProjection = projectEndpointContract(packedAdminShowUsersDefinition);
 

@@ -22,12 +22,14 @@ export const misskeyId = v.custom<string>(
 export interface JsonStringOptions {
 	minLength?: number;
 	maxLength?: number;
+	pattern?: string;
 }
 
 export interface JsonStringLegacySchema {
 	readonly type: 'string';
 	readonly minLength?: number;
 	readonly maxLength?: number;
+	readonly pattern?: string;
 }
 
 const jsonStringLegacySchemas = new WeakMap<object, JsonStringLegacySchema>();
@@ -35,10 +37,13 @@ const jsonStringLegacySchemas = new WeakMap<object, JsonStringLegacySchema>();
 /** String schema with JSON Schema's Unicode-code-point length semantics. */
 export function jsonString(options: JsonStringOptions = {}) {
 	// Capture primitive values now so later caller mutations can't change validation or projection.
-	const { minLength, maxLength } = options;
+	const { minLength, maxLength, pattern } = options;
+	// JSON Schema/AJV patterns use Unicode mode; no stateful flags are exposed.
+	const expression = pattern === undefined ? undefined : new RegExp(pattern, 'u');
 	const schema = v.custom<string>(
 		value => {
 			if (typeof value !== 'string') return false;
+			if (expression !== undefined && !expression.test(value)) return false;
 
 			let length = 0;
 			for (const _codePoint of value) {
@@ -56,8 +61,9 @@ export function jsonString(options: JsonStringOptions = {}) {
 		type: 'string',
 		...(minLength === undefined ? {} : { minLength }),
 		...(maxLength === undefined ? {} : { maxLength }),
+		...(pattern === undefined ? {} : { pattern }),
 	}));
-	return schema;
+	return Object.freeze(schema);
 }
 
 /** Return the legacy JSON Schema shape for a jsonString schema, if registered. */

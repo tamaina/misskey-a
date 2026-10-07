@@ -3,22 +3,14 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { defineServices, service } from '../../index/backend/service-definitions.js';
+import { ports } from '../../index/backend/service-ports.js';
 import { AntennaEntityService } from './serializers/AntennaEntityService.js';
-import type { AntennasRepository } from '@/models/_.js';
-import type { IdService } from '../../runtime/backend/services/IdService.js';
+import type { Inputs, Outputs } from '../../index/backend/service-definitions.js';
 
-export interface TimelineServicesDependencies {
-	antennasRepository: AntennasRepository;
-	idService: Pick<IdService, 'parse'>;
-}
-
-/** Compose this feature without starting resources or resolving a container. */
-export function createTimelineServices(deps: TimelineServicesDependencies) {
-	const antennaEntityService = new AntennaEntityService(deps.antennasRepository, deps.idService);
-
-	return {
-		AntennaEntityService: antennaEntityService,
-	};
-}
-
-export type TimelineServices = ReturnType<typeof createTimelineServices>;
+export const timelineServices = defineServices({
+	AntennaEntityService: service(AntennaEntityService, [ports.antennasRepository, ports.idService]),
+});
+export const createTimelineServices = timelineServices.create;
+export type TimelineServicesDependencies = Inputs<typeof timelineServices>;
+export type TimelineServices = Outputs<typeof timelineServices>;

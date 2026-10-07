@@ -3,14 +3,17 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { selectorDriveFilesShowDefinition, selectorDriveFilesShowInput, selectorDriveFilesShowOutput } from '../../../../contract/selector-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
 import type { MiDriveFile } from '../../../models/DriveFile.js';
 import type { DriveFilesRepository } from '@/models/_.js';
-import { Endpoint } from '@/server/api/endpoint-base.js';
 import { DriveFileEntityService } from '../../../serializers/DriveFileEntityService.js';
 import { DI } from '@/di-symbols.js';
 import { RoleService } from '../../../../../roles/backend/services/RoleService.js';
 import { ApiError } from '@/server/api/error.js';
+
+const contractProjection = projectEndpointContract(selectorDriveFilesShowDefinition);
 
 export const meta = {
 	tags: ['drive'],
@@ -21,11 +24,7 @@ export const meta = {
 
 	description: 'Show the properties of a drive file.',
 
-	res: {
-		type: 'object',
-		optional: false, nullable: false,
-		ref: 'DriveFile',
-	},
+	res: contractProjection.response,
 
 	errors: {
 		noSuchFile: {
@@ -42,27 +41,10 @@ export const meta = {
 	},
 } as const;
 
-export const paramDef = {
-	anyOf: [
-		{
-			type: 'object',
-			properties: {
-				fileId: { type: 'string', format: 'misskey:id' },
-			},
-			required: ['fileId'],
-		},
-		{
-			type: 'object',
-			properties: {
-				url: { type: 'string' },
-			},
-			required: ['url'],
-		},
-	],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof selectorDriveFilesShowInput, typeof selectorDriveFilesShowOutput, 'legacy-declared'> {
 	constructor(
 		@Inject(DI.driveFilesRepository)
 		private driveFilesRepository: DriveFilesRepository,
@@ -70,7 +52,7 @@ export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDe
 		private driveFileEntityService: DriveFileEntityService,
 		private roleService: RoleService,
 	) {
-		super(meta, paramDef, async (ps, me) => {
+		super(meta, contractProjection, async (ps, me) => {
 			const file = await this.driveFilesRepository.findOneBy(
 				'fileId' in ps
 					? { id: ps.fileId }

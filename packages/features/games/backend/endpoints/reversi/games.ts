@@ -3,39 +3,27 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { referenceReversiGamesDefinition, referenceReversiGamesInput, referenceReversiGamesOutput } from '../../../contract/reference-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
 import { Brackets } from 'typeorm';
-import { Endpoint } from '@/server/api/endpoint-base.js';
 import { ReversiGameEntityService } from '../../serializers/ReversiGameEntityService.js';
 import { DI } from '@/di-symbols.js';
 import type { ReversiGamesRepository } from '@/models/_.js';
 import { QueryService } from '@/core/QueryService.js';
 
+const contractProjection = projectEndpointContract(referenceReversiGamesDefinition);
+
 export const meta = {
 	requireCredential: false,
 
-	res: {
-		type: 'array',
-		optional: false, nullable: false,
-		items: { ref: 'ReversiGameLite' },
-	},
+	res: contractProjection.response,
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {
-		limit: { type: 'integer', minimum: 1, maximum: 100, default: 10 },
-		sinceId: { type: 'string', format: 'misskey:id' },
-		untilId: { type: 'string', format: 'misskey:id' },
-		sinceDate: { type: 'integer' },
-		untilDate: { type: 'integer' },
-		my: { type: 'boolean', default: false },
-	},
-	required: [],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof referenceReversiGamesInput, typeof referenceReversiGamesOutput> {
 	constructor(
 		@Inject(DI.reversiGamesRepository)
 		private reversiGamesRepository: ReversiGamesRepository,
@@ -43,7 +31,7 @@ export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDe
 		private reversiGameEntityService: ReversiGameEntityService,
 		private queryService: QueryService,
 	) {
-		super(meta, paramDef, async (ps, me) => {
+		super(meta, contractProjection, async (ps, me) => {
 			const query = this.queryService.makePaginationQuery(this.reversiGamesRepository.createQueryBuilder('game'), ps.sinceId, ps.untilId, ps.sinceDate, ps.untilDate)
 				.innerJoinAndSelect('game.user1', 'user1')
 				.innerJoinAndSelect('game.user2', 'user2');

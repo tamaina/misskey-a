@@ -3,15 +3,12 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { defineServices, service } from '../../index/backend/service-definitions.js';
 import { HashtagEntityService } from './serializers/HashtagEntityService.js';
+import type { Outputs } from '../../index/backend/service-definitions.js';
 
-/** Compose this feature without starting resources or resolving a container. */
-export function createDiscoveryServices() {
-	const hashtagEntityService = new HashtagEntityService();
-
-	return {
-		HashtagEntityService: hashtagEntityService,
-	};
-}
-
-export type DiscoveryServices = ReturnType<typeof createDiscoveryServices>;
+export const discoveryServices = defineServices({
+	HashtagEntityService: service(HashtagEntityService, []),
+});
+export const createDiscoveryServices = discoveryServices.create;
+export type DiscoveryServices = Outputs<typeof discoveryServices>;

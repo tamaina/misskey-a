@@ -19,7 +19,7 @@ const endpointProviders = endpoints.map(([path, endpoint]): Provider => {
 	}
 
 	// Feature-owned endpoint classes expose their real constructor by its canonical
-	// name. The remaining eight host-owned class endpoints keep their default export.
+	// name or preserve their existing default export after a placement-only move.
 	const implementation = 'EndpointImplementation' in endpoint ? endpoint.EndpointImplementation : endpoint.default;
 	return { provide: `ep:${path}`, useClass: implementation };
 });

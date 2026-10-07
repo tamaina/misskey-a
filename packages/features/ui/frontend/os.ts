@@ -40,7 +40,7 @@ export const openingWindowsCount = ref(0);
 export type ApiWithDialogCustomErrors = Record<string, { title?: string; text: string; }>;
 export const apiWithDialog = (<E extends keyof Misskey.Endpoints>(
 	endpoint: E,
-	data: Misskey.Endpoints[E]['req'],
+	data: Misskey.Endpoints[E]['req'] & { i?: string | null; },
 	token?: string | null | undefined,
 	customErrors?: ApiWithDialogCustomErrors,
 ) => {

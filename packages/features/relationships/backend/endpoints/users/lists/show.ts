@@ -3,12 +3,15 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { compositionUsersListsShowDefinition, compositionUsersListsShowInput, compositionUsersListsShowOutput } from '../../../../contract/output-composition-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
 import type { UserListsRepository, UserListFavoritesRepository } from '@/models/_.js';
-import { Endpoint } from '@/server/api/endpoint-base.js';
 import { UserListEntityService } from '../../../serializers/UserListEntityService.js';
 import { DI } from '@/di-symbols.js';
 import { ApiError } from '@/server/api/error.js';
+
+const contractProjection = projectEndpointContract(compositionUsersListsShowDefinition);
 
 export const meta = {
 	tags: ['lists', 'account'],
@@ -19,30 +22,7 @@ export const meta = {
 
 	description: 'Show the properties of a list.',
 
-	res: {
-		type: 'object',
-		optional: false, nullable: false,
-		allOf: [
-			{
-				type: 'object',
-				ref: 'UserList',
-			},
-			{
-				type: 'object',
-				optional: false, nullable: false,
-				properties: {
-					likedCount: {
-						type: 'number',
-						optional: true, nullable: false,
-					},
-					isLiked: {
-						type: 'boolean',
-						optional: true, nullable: false,
-					},
-				},
-			},
-		],
-	},
+	res: contractProjection.response,
 
 	errors: {
 		noSuchList: {
@@ -53,17 +33,10 @@ export const meta = {
 	},
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {
-		listId: { type: 'string', format: 'misskey:id' },
-		forPublic: { type: 'boolean', default: false },
-	},
-	required: ['listId'],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable() // eslint-disable-next-line import/no-default-export
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof compositionUsersListsShowInput, typeof compositionUsersListsShowOutput> {
 	constructor(
 		@Inject(DI.userListsRepository)
 		private userListsRepository: UserListsRepository,
@@ -73,7 +46,7 @@ export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDe
 
 		private userListEntityService: UserListEntityService,
 	) {
-		super(meta, paramDef, async (ps, me) => {
+		super(meta, contractProjection, async (ps, me) => {
 			const additionalProperties: Partial<{ likedCount: number, isLiked: boolean }> = {};
 			// Fetch the list
 			const userList = await this.userListsRepository.findOneBy(!ps.forPublic && me !== null ? {

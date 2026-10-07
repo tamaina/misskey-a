@@ -3,15 +3,17 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { portablePagesUpdateDefinition, portablePagesUpdateInput, portablePagesUpdateOutput } from '../../../contract/portable-constant-endpoint-definitions.js';
 import ms from '@/runtime-dependencies/ms.js';
 import { Inject, Injectable } from '@nestjs/common';
 import type { DriveFilesRepository, MiDriveFile } from '@/models/_.js';
-import { Endpoint } from '@/server/api/endpoint-base.js';
 import { DI } from '@/di-symbols.js';
 import { ApiError } from '@/server/api/error.js';
-import { pageNameSchema } from '../../models/Page.js';
 import { IdentifiableError } from '@/misc/identifiable-error.js';
 import { PageService } from '../../services/PageService.js';
+
+const contractProjection = projectEndpointContract(portablePagesUpdateDefinition);
 
 export const meta = {
 	tags: ['pages'],
@@ -51,37 +53,17 @@ export const meta = {
 	},
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {
-		pageId: { type: 'string', format: 'misskey:id' },
-		title: { type: 'string' },
-		name: { ...pageNameSchema, minLength: 1 },
-		summary: { type: 'string', nullable: true },
-		content: { type: 'array', items: {
-			type: 'object', additionalProperties: true,
-		} },
-		variables: { type: 'array', items: {
-			type: 'object', additionalProperties: true,
-		} },
-		script: { type: 'string' },
-		eyeCatchingImageId: { type: 'string', format: 'misskey:id', nullable: true },
-		font: { type: 'string', enum: ['serif', 'sans-serif'] },
-		alignCenter: { type: 'boolean' },
-		hideTitleWhenPinned: { type: 'boolean' },
-	},
-	required: ['pageId'],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof portablePagesUpdateInput, typeof portablePagesUpdateOutput> {
 	constructor(
 		@Inject(DI.driveFilesRepository)
 		private driveFilesRepository: DriveFilesRepository,
 
 		private pageService: PageService,
 	) {
-		super(meta, paramDef, async (ps, me) => {
+		super(meta, contractProjection, async (ps, me) => {
 			try {
 				let eyeCatchingImage: MiDriveFile | null | undefined | string = ps.eyeCatchingImageId;
 				if (eyeCatchingImage != null) {

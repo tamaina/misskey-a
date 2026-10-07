@@ -3,10 +3,13 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { delayedTupleAdminQueueDeliverDelayedDefinition, delayedTupleAdminQueueDeliverDelayedInput, delayedTupleAdminQueueDeliverDelayedOutput } from '../../../../contract/delayed-tuple-endpoint-definitions.js';
 import { URL } from 'node:url';
 import { Inject, Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
 import type { DeliverQueue } from '@/core/QueueModule.js';
+
+const contractProjection = projectEndpointContract(delayedTupleAdminQueueDeliverDelayedDefinition);
 
 export const meta = {
 	tags: ['admin'],
@@ -15,41 +18,17 @@ export const meta = {
 	requireModerator: true,
 	kind: 'read:admin:queue',
 
-	res: {
-		type: 'array',
-		optional: false, nullable: false,
-		items: {
-			type: 'array',
-			optional: false, nullable: false,
-			prefixItems: [
-				{
-					type: 'string',
-				},
-				{
-					type: 'number',
-				},
-			],
-			unevaluatedItems: false,
-		},
-		example: [[
-			'example.com',
-			12,
-		]],
-	},
+	res: contractProjection.response,
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {},
-	required: [],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof delayedTupleAdminQueueDeliverDelayedInput, typeof delayedTupleAdminQueueDeliverDelayedOutput> {
 	constructor(
 		@Inject('queue:deliver') public deliverQueue: DeliverQueue,
 	) {
-		super(meta, paramDef, async (ps, me) => {
+		super(meta, contractProjection, async (ps, me) => {
 			const jobs = await this.deliverQueue.getJobs(['delayed']);
 
 			const counts = new Map<string, number>();

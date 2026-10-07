@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import type { FetchEmojisHostTypes, FetchEmojisSortKeys } from '../../contract/fetch-options.js';
 import { Inject, Injectable, OnApplicationShutdown } from '@nestjs/common';
 import * as Redis from 'ioredis';
 import { In, IsNull } from 'typeorm';
@@ -19,43 +20,10 @@ import type { EmojisRepository, MiRole, MiUser } from '@/models/_.js';
 import type { MiEmoji } from '../models/Emoji.js';
 import type { Serialized } from '@/types.js';
 
-const parseEmojiStrRegexp = /^([-\w]+)(?:@([\w.-]+))?$/;
+export { fetchEmojisHostTypes, fetchEmojisSortKeys } from '../../contract/fetch-options.js';
+export type { FetchEmojisHostTypes, FetchEmojisSortKeys } from '../../contract/fetch-options.js';
 
-export const fetchEmojisHostTypes = [
-	'local',
-	'remote',
-	'all',
-] as const;
-export type FetchEmojisHostTypes = typeof fetchEmojisHostTypes[number];
-export const fetchEmojisSortKeys = [
-	'+id',
-	'-id',
-	'+updatedAt',
-	'-updatedAt',
-	'+name',
-	'-name',
-	'+host',
-	'-host',
-	'+uri',
-	'-uri',
-	'+publicUrl',
-	'-publicUrl',
-	'+type',
-	'-type',
-	'+aliases',
-	'-aliases',
-	'+category',
-	'-category',
-	'+license',
-	'-license',
-	'+isSensitive',
-	'-isSensitive',
-	'+localOnly',
-	'-localOnly',
-	'+roleIdsThatCanBeUsedThisEmojiAsReaction',
-	'-roleIdsThatCanBeUsedThisEmojiAsReaction',
-] as const;
-export type FetchEmojisSortKeys = typeof fetchEmojisSortKeys[number];
+const parseEmojiStrRegexp = /^([-\w]+)(?:@([\w.-]+))?$/;
 
 @Injectable()
 export class CustomEmojiService implements OnApplicationShutdown {

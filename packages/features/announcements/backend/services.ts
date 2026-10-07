@@ -3,31 +3,17 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { defineServices, service } from '../../index/backend/service-definitions.js';
+import { ports } from '../../index/backend/service-ports.js';
 import { AnnouncementEntityService } from './serializers/AnnouncementEntityService.js';
 import { AnnouncementService } from './services/AnnouncementService.js';
-import type { AnnouncementReadsRepository, AnnouncementsRepository, UsersRepository } from '@/models/_.js';
-import type { IdService } from '../../runtime/backend/services/IdService.js';
-import type { GlobalEventService } from '../../runtime/backend/services/GlobalEventService.js';
-import type { ModerationLogService } from '../../moderation/backend/services/ModerationLogService.js';
+import type { Inputs, Outputs } from '../../index/backend/service-definitions.js';
 
-export interface AnnouncementServicesDependencies {
-	announcementsRepository: AnnouncementsRepository;
-	announcementReadsRepository: AnnouncementReadsRepository;
-	idService: Pick<IdService, 'gen' | 'parse'>;
-	usersRepository: UsersRepository;
-	globalEventService: Pick<GlobalEventService, 'publishBroadcastStream' | 'publishMainStream'>;
-	moderationLogService: Pick<ModerationLogService, 'log'>;
-}
-
-/** Compose this feature without starting resources or resolving a container. */
-export function createAnnouncementServices(deps: AnnouncementServicesDependencies) {
-	const announcementEntityService = new AnnouncementEntityService(deps.announcementsRepository, deps.announcementReadsRepository, deps.idService);
-	const announcementService = new AnnouncementService(deps.announcementsRepository, deps.announcementReadsRepository, deps.usersRepository, deps.idService, deps.globalEventService, deps.moderationLogService, announcementEntityService);
-
-	return {
-		AnnouncementEntityService: announcementEntityService,
-		AnnouncementService: announcementService,
-	};
-}
-
-export type AnnouncementServices = ReturnType<typeof createAnnouncementServices>;
+const announcementEntityService = service(AnnouncementEntityService, [ports.announcementsRepository, ports.announcementReadsRepository, ports.idService]);
+export const announcementServices = defineServices({
+	AnnouncementEntityService: announcementEntityService,
+	AnnouncementService: service(AnnouncementService, [ports.announcementsRepository, ports.announcementReadsRepository, ports.usersRepository, ports.idService, ports.globalEventService, ports.moderationLogService, announcementEntityService]),
+});
+export const createAnnouncementServices = announcementServices.create;
+export type AnnouncementServicesDependencies = Inputs<typeof announcementServices>;
+export type AnnouncementServices = Outputs<typeof announcementServices>;

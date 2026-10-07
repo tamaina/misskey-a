@@ -8,6 +8,8 @@ import { id } from '@/models/util/id.js';
 import { MiUser } from '../../../users/backend/models/User.js';
 import { MiDriveFile } from '../../../drive/backend/models/DriveFile.js';
 
+export { pageNameSchema } from '../../contract/page-name.js';
+
 @Entity('page')
 @Index(['userId', 'name'], { unique: true })
 export class MiPage {
@@ -118,5 +120,3 @@ export class MiPage {
 		}
 	}
 }
-
-export const pageNameSchema = { type: 'string', pattern: /^[^\s:\/?#\[\]@!$&'()*+,;=\\%\x00-\x20]{1,256}$/.source } as const;

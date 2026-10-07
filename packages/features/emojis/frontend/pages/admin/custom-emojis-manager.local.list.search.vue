@@ -12,7 +12,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 	@closed="emit('closed')"
 >
 	<template #header>
-		<i class="ti ti-search" style="margin-right: 0.5em;"></i> {{ i18n.ts.search }}
+		<i class="ti ti-search" style="margin-right: 0.5em;"></i> {{ $locale.sfc.search }}
 	</template>
 	<div :class="$style.root">
 		<div class="_spacer">
@@ -103,7 +103,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 				</div>
 				<MkFolder :spacerMax="8" :spacerMin="8">
 					<template #icon><i class="ti ti-arrows-sort"></i></template>
-					<template #label>{{ i18n.ts._customEmojisManager._gridCommon.sortOrder }}</template>
+					<template #label>{{ $locale.sfc.sortOrder }}</template>
 					<MkSortOrderEditor
 						:baseOrderKeyNames="gridSortOrderKeys"
 						:currentOrders="sortOrders"
@@ -114,10 +114,10 @@ SPDX-License-Identifier: AGPL-3.0-only
 		</div>
 		<div :class="$style.footerActions">
 			<MkButton primary @click="onSearchRequest">
-				{{ i18n.ts.search }}
+				{{ $locale.sfc.search }}
 			</MkButton>
 			<MkButton @click="onQueryResetButtonClicked">
-				{{ i18n.ts.reset }}
+				{{ $locale.sfc.reset }}
 			</MkButton>
 		</div>
 	</div>
@@ -137,7 +137,6 @@ import {
 	gridSortOrderKeys,
 } from '@features/emojis/frontend/pages/admin/custom-emojis-manager.impl.js';
 
-import { i18n } from '@features/runtime/frontend/i18n.js';
 import * as os from '@features/ui/frontend/os.js';
 
 import type { EmojiSearchQuery } from '@features/emojis/frontend/pages/admin/custom-emojis-manager.local.list.vue';
@@ -189,7 +188,7 @@ function onQueryResetButtonClicked() {
 async function onQueryRolesEditClicked() {
 	const result = await os.selectRole({
 		initialRoleIds: model.value.roles.map(it => it.id),
-		title: i18n.ts._customEmojisManager._local._list.dialogSelectRoleTitle,
+		title: $locale.value.sfc.dialogSelectRoleTitle,
 		publicOnly: true,
 	});
 	if (result.canceled) {
@@ -215,3 +214,255 @@ async function onQueryRolesEditClicked() {
 	z-index: 1;
 }
 </style>
+
+<locale locale="ar-SA" lang="json">
+{
+	"search": "البحث",
+	"sortOrder": "Sort order",
+	"reset": "Reset",
+	"dialogSelectRoleTitle": "Search by role set in Emojis"
+}
+</locale>
+
+<locale locale="ca-ES" lang="json">
+{
+	"search": "Cercar",
+	"sortOrder": "Ordenar",
+	"reset": "Reiniciar",
+	"dialogSelectRoleTitle": "Buscar Emojis per rol"
+}
+</locale>
+
+<locale locale="cs-CZ" lang="json">
+{
+	"search": "Vyhledávání",
+	"sortOrder": "Sort order",
+	"reset": "Obnovit",
+	"dialogSelectRoleTitle": "Search by role set in Emojis"
+}
+</locale>
+
+<locale locale="da-DK" lang="json">
+{
+	"search": "Search",
+	"sortOrder": "Sort order",
+	"reset": "Reset",
+	"dialogSelectRoleTitle": "Search by role set in Emojis"
+}
+</locale>
+
+<locale locale="de-DE" lang="json">
+{
+	"search": "Suchen",
+	"sortOrder": "Sortierung",
+	"reset": "Zurücksetzen",
+	"dialogSelectRoleTitle": "Suche nach dem Rollensatz in Emojis"
+}
+</locale>
+
+<locale locale="en-US" lang="json">
+{
+	"search": "Search",
+	"sortOrder": "Sort order",
+	"reset": "Reset",
+	"dialogSelectRoleTitle": "Search by role set in Emojis"
+}
+</locale>
+
+<locale locale="es-ES" lang="json">
+{
+	"search": "Buscar",
+	"sortOrder": "Ordenar",
+	"reset": "Restablecer",
+	"dialogSelectRoleTitle": "Buscar Emojis por rol"
+}
+</locale>
+
+<locale locale="fr-FR" lang="json">
+{
+	"search": "Rechercher",
+	"sortOrder": "Sort order",
+	"reset": "Réinitialiser",
+	"dialogSelectRoleTitle": "Search by role set in Emojis"
+}
+</locale>
+
+<locale locale="id-ID" lang="json">
+{
+	"search": "Cari",
+	"sortOrder": "Sort order",
+	"reset": "Reset",
+	"dialogSelectRoleTitle": "Search by role set in Emojis"
+}
+</locale>
+
+<locale locale="it-IT" lang="json">
+{
+	"search": "Cerca",
+	"sortOrder": "Ordine",
+	"reset": "Ripristina",
+	"dialogSelectRoleTitle": "Cerca emoji per ruolo"
+}
+</locale>
+
+<locale locale="ja-JP" lang="json">
+{
+	"search": "検索",
+	"sortOrder": "並び順",
+	"reset": "リセット",
+	"dialogSelectRoleTitle": "絵文字に設定されたロールで検索"
+}
+</locale>
+
+<locale locale="ja-KS" lang="json">
+{
+	"search": "探す",
+	"sortOrder": "並び順",
+	"reset": "リセット",
+	"dialogSelectRoleTitle": "絵文字に設定されたロールで検索"
+}
+</locale>
+
+<locale locale="kab-KAB" lang="json">
+{
+	"search": "Nadi",
+	"sortOrder": "Sort order",
+	"reset": "Reset",
+	"dialogSelectRoleTitle": "Search by role set in Emojis"
+}
+</locale>
+
+<locale locale="kn-IN" lang="json">
+{
+	"search": "ಹುಡುಕು",
+	"sortOrder": "Sort order",
+	"reset": "Reset",
+	"dialogSelectRoleTitle": "Search by role set in Emojis"
+}
+</locale>
+
+<locale locale="ko-KR" lang="json">
+{
+	"search": "검색",
+	"sortOrder": "정렬 순서",
+	"reset": "초기화",
+	"dialogSelectRoleTitle": "이모지에 설정된 역할을 검색"
+}
+</locale>
+
+<locale locale="nl-NL" lang="json">
+{
+	"search": "Zoeken",
+	"sortOrder": "Sort order",
+	"reset": "Herstellen",
+	"dialogSelectRoleTitle": "Search by role set in Emojis"
+}
+</locale>
+
+<locale locale="no-NO" lang="json">
+{
+	"search": "Søk",
+	"sortOrder": "Sort order",
+	"reset": "Reset",
+	"dialogSelectRoleTitle": "Search by role set in Emojis"
+}
+</locale>
+
+<locale locale="pl-PL" lang="json">
+{
+	"search": "Szukaj",
+	"sortOrder": "Sort order",
+	"reset": "Reset",
+	"dialogSelectRoleTitle": "Search by role set in Emojis"
+}
+</locale>
+
+<locale locale="pt-PT" lang="json">
+{
+	"search": "Pesquisar",
+	"sortOrder": "Ordem de classificação",
+	"reset": "Redefinir",
+	"dialogSelectRoleTitle": "Buscar por cargo que pode usar esse Emoji"
+}
+</locale>
+
+<locale locale="ru-RU" lang="json">
+{
+	"search": "Поиск",
+	"sortOrder": "Порядок сортировки",
+	"reset": "Сброс",
+	"dialogSelectRoleTitle": "Search by role set in Emojis"
+}
+</locale>
+
+<locale locale="sk-SK" lang="json">
+{
+	"search": "Hľadať",
+	"sortOrder": "Sort order",
+	"reset": "Reset",
+	"dialogSelectRoleTitle": "Search by role set in Emojis"
+}
+</locale>
+
+<locale locale="th-TH" lang="json">
+{
+	"search": "ค้นหา",
+	"sortOrder": "ลำดับการเรียง",
+	"reset": "รีเซ็ต",
+	"dialogSelectRoleTitle": "ค้นหาบทบาทที่ตั้งค่าไว้ด้วยเอโมจิ"
+}
+</locale>
+
+<locale locale="tr-TR" lang="json">
+{
+	"search": "Ara",
+	"sortOrder": "Sıralama düzeni",
+	"reset": "Sıfırla",
+	"dialogSelectRoleTitle": "Emojilerde rol setine göre arama yapın"
+}
+</locale>
+
+<locale locale="ug-CN" lang="json">
+{
+	"search": "ئىزدەش",
+	"sortOrder": "Sort order",
+	"reset": "Reset",
+	"dialogSelectRoleTitle": "Search by role set in Emojis"
+}
+</locale>
+
+<locale locale="uk-UA" lang="json">
+{
+	"search": "Пошук",
+	"sortOrder": "Sort order",
+	"reset": "Скинути",
+	"dialogSelectRoleTitle": "Search by role set in Emojis"
+}
+</locale>
+
+<locale locale="vi-VN" lang="json">
+{
+	"search": "Tìm kiếm",
+	"sortOrder": "Sort order",
+	"reset": "cài lại",
+	"dialogSelectRoleTitle": "Search by role set in Emojis"
+}
+</locale>
+
+<locale locale="zh-CN" lang="json">
+{
+	"search": "搜索",
+	"sortOrder": "排序方式",
+	"reset": "重置",
+	"dialogSelectRoleTitle": "按角色搜索表情符号"
+}
+</locale>
+
+<locale locale="zh-TW" lang="json">
+{
+	"search": "搜尋",
+	"sortOrder": "排序",
+	"reset": "重設",
+	"dialogSelectRoleTitle": "根據表情符號設定的角色進行搜尋"
+}
+</locale>

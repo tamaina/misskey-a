@@ -4,12 +4,12 @@
  */
 
 import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
-import { inlineFetchRssDefinition, inlineFetchRssInput, inlineFetchRssOutput } from '../../../../../features/integrations/contract/endpoint-definitions.js';
+import { inlineFetchRssDefinition, inlineFetchRssInput, inlineFetchRssOutput } from '../../contract/endpoint-definitions.js';
 import Parser from 'rss-parser';
 import { Injectable } from '@nestjs/common';
 
-import { HttpRequestService } from '../../../../../features/runtime/backend/services/HttpRequestService.js';
-import { ApiError } from '../error.js';
+import { HttpRequestService } from '../../../runtime/backend/services/HttpRequestService.js';
+import { ApiError } from '../../../../backend/src/server/api/error.js';
 
 const MAX_URL_LENGTH = 8192;
 const MAX_RESPONSE_SIZE = 1024 * 1024;
@@ -58,7 +58,7 @@ export const meta = {
 export const paramDef = contractProjection.input;
 
 @Injectable()
-export default class extends ContractEndpoint<typeof meta, typeof inlineFetchRssInput, typeof inlineFetchRssOutput> { // eslint-disable-line import/no-default-export
+export default class FetchRssEndpoint extends ContractEndpoint<typeof meta, typeof inlineFetchRssInput, typeof inlineFetchRssOutput> { // eslint-disable-line import/no-default-export
 	private readonly inFlightRequests = new Map<string, Promise<Awaited<ReturnType<Parser['parseString']>>>>();
 	private activeRequestCount = 0;
 
@@ -140,3 +140,5 @@ export default class extends ContractEndpoint<typeof meta, typeof inlineFetchRss
 		return await rssParser.parseString(text);
 	}
 }
+
+export { FetchRssEndpoint };

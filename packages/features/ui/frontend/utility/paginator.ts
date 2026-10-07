@@ -24,10 +24,12 @@ type AbsEndpointType = {
 	res: unknown;
 };
 
-type FilterByEpRes<E extends Record<string, AbsEndpointType>> = {
-	[K in keyof E]: E[K]['res'] extends Array<{ id: string }> ? K : never
+type FilterPaginatorCompatibleEndpoints<E extends Record<string, AbsEndpointType>> = {
+	[K in keyof E]: E[K]['res'] extends Array<{ id: string }>
+		? E[K]['req'] extends object ? K : never
+		: never
 }[keyof E];
-export type PaginatorCompatibleEndpointPaths = FilterByEpRes<Misskey.Endpoints>;
+export type PaginatorCompatibleEndpointPaths = FilterPaginatorCompatibleEndpoints<Misskey.Endpoints>;
 export type PaginatorCompatibleEndpoints = {
 	[K in PaginatorCompatibleEndpointPaths]: Misskey.Endpoints[K];
 };
@@ -273,7 +275,7 @@ export class Paginator<
 			}),
 		};
 
-		const apiRes = (await misskeyApi<T[]>(this.endpoint, data).catch(_ => {
+		const apiRes = (await misskeyApi<T[], Endpoint>(this.endpoint, data).catch(_ => {
 			return null;
 		})) as T[] | null;
 
@@ -326,7 +328,7 @@ export class Paginator<
 			}),
 		};
 
-		const apiRes = (await misskeyApi<T[]>(this.endpoint, data).catch(_ => {
+		const apiRes = (await misskeyApi<T[], Endpoint>(this.endpoint, data).catch(_ => {
 			return null;
 		})) as T[] | null;
 

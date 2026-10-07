@@ -28,7 +28,6 @@ import { tryParseUrl } from '@@/js/url.js';
 import { useWidgetPropsManager } from '../../../ui/frontend/widgets/widget.js';
 import type { WidgetComponentEmits, WidgetComponentExpose, WidgetComponentProps } from '../../../ui/frontend/widgets/widget.js';
 import type { FormWithDefault, GetFormResultType } from '@features/ui/frontend/utility/form.js';
-import { i18n } from '@features/runtime/frontend/i18n.js';
 import MkContainer from '@features/ui/frontend/components/MkContainer.vue';
 
 const name = 'rss';
@@ -36,23 +35,23 @@ const name = 'rss';
 const widgetPropsDef = {
 	url: {
 		type: 'string',
-		label: i18n.ts._widgetOptions._rss.url,
+		label: $locale.value.sfc.url,
 		default: 'http://feeds.afpbb.com/rss/afpbb/afpbbnews',
 		manualSave: true,
 	},
 	refreshIntervalSec: {
 		type: 'number',
-		label: i18n.ts._widgetOptions._rss.refreshIntervalSec,
+		label: $locale.value.sfc.refreshIntervalSec,
 		default: 60,
 	},
 	maxEntries: {
 		type: 'number',
-		label: i18n.ts._widgetOptions._rss.maxEntries,
+		label: $locale.value.sfc.maxEntries,
 		default: 15,
 	},
 	showHeader: {
 		type: 'boolean',
-		label: i18n.ts._widgetOptions.showHeader,
+		label: $locale.value.sfc.showHeader,
 		default: true,
 	},
 } satisfies FormWithDefault;
@@ -128,3 +127,255 @@ defineExpose<WidgetComponentExpose>({
 	}
 }
 </style>
+
+<locale locale="ar-SA" lang="json">
+{
+	"url": "RSS Feed Url",
+	"refreshIntervalSec": "Update interval (in seconds)",
+	"maxEntries": "Maximum number of items to display",
+	"showHeader": "Show header"
+}
+</locale>
+
+<locale locale="ca-ES" lang="json">
+{
+	"url": "URL del canal RSS",
+	"refreshIntervalSec": "Interval d'actualitzacions (segons)",
+	"maxEntries": "Nombre màxim d'entrades a mostrar",
+	"showHeader": "Mostrar la capçalera"
+}
+</locale>
+
+<locale locale="cs-CZ" lang="json">
+{
+	"url": "RSS Feed Url",
+	"refreshIntervalSec": "Update interval (in seconds)",
+	"maxEntries": "Maximum number of items to display",
+	"showHeader": "Show header"
+}
+</locale>
+
+<locale locale="da-DK" lang="json">
+{
+	"url": "RSS Feed Url",
+	"refreshIntervalSec": "Update interval (in seconds)",
+	"maxEntries": "Maximum number of items to display",
+	"showHeader": "Show header"
+}
+</locale>
+
+<locale locale="de-DE" lang="json">
+{
+	"url": "RSS-Feed-URL",
+	"refreshIntervalSec": "Aktualisierungsintervall (Sekunden)",
+	"maxEntries": "Maximale Anzahl der angezeigten Einträge",
+	"showHeader": "Kopfzeile anzeigen"
+}
+</locale>
+
+<locale locale="en-US" lang="json">
+{
+	"url": "RSS Feed Url",
+	"refreshIntervalSec": "Update interval (in seconds)",
+	"maxEntries": "Maximum number of items to display",
+	"showHeader": "Show header"
+}
+</locale>
+
+<locale locale="es-ES" lang="json">
+{
+	"url": "URL del canal RSS",
+	"refreshIntervalSec": "Intervalo de actualización (En segundos)",
+	"maxEntries": "Número máximo de elementos a mostrar",
+	"showHeader": "Mostrar encabezados"
+}
+</locale>
+
+<locale locale="fr-FR" lang="json">
+{
+	"url": "RSS Feed Url",
+	"refreshIntervalSec": "Update interval (in seconds)",
+	"maxEntries": "Maximum number of items to display",
+	"showHeader": "Show header"
+}
+</locale>
+
+<locale locale="id-ID" lang="json">
+{
+	"url": "RSS Feed Url",
+	"refreshIntervalSec": "Update interval (in seconds)",
+	"maxEntries": "Maximum number of items to display",
+	"showHeader": "Show header"
+}
+</locale>
+
+<locale locale="it-IT" lang="json">
+{
+	"url": "URL del Feed RSS",
+	"refreshIntervalSec": "Intervallo di aggiornamento (in secondi)",
+	"maxEntries": "Quantità massima visualizzabile",
+	"showHeader": "Mostra la testata"
+}
+</locale>
+
+<locale locale="ja-JP" lang="json">
+{
+	"url": "RSSフィードのURL",
+	"refreshIntervalSec": "更新間隔(秒)",
+	"maxEntries": "最大表示件数",
+	"showHeader": "ヘッダーを表示"
+}
+</locale>
+
+<locale locale="ja-KS" lang="json">
+{
+	"url": "RSSフィードのURL",
+	"refreshIntervalSec": "更新間隔(秒)",
+	"maxEntries": "最大表示件数",
+	"showHeader": "ヘッダー出す"
+}
+</locale>
+
+<locale locale="kab-KAB" lang="json">
+{
+	"url": "RSS Feed Url",
+	"refreshIntervalSec": "Update interval (in seconds)",
+	"maxEntries": "Maximum number of items to display",
+	"showHeader": "Show header"
+}
+</locale>
+
+<locale locale="kn-IN" lang="json">
+{
+	"url": "RSS Feed Url",
+	"refreshIntervalSec": "Update interval (in seconds)",
+	"maxEntries": "Maximum number of items to display",
+	"showHeader": "Show header"
+}
+</locale>
+
+<locale locale="ko-KR" lang="json">
+{
+	"url": "RSS 필드의 URL",
+	"refreshIntervalSec": "갱신 간격(초)",
+	"maxEntries": "최대 표시 건수",
+	"showHeader": "해더를 표시"
+}
+</locale>
+
+<locale locale="nl-NL" lang="json">
+{
+	"url": "RSS Feed Url",
+	"refreshIntervalSec": "Update interval (in seconds)",
+	"maxEntries": "Maximum number of items to display",
+	"showHeader": "Show header"
+}
+</locale>
+
+<locale locale="no-NO" lang="json">
+{
+	"url": "RSS Feed Url",
+	"refreshIntervalSec": "Update interval (in seconds)",
+	"maxEntries": "Maximum number of items to display",
+	"showHeader": "Show header"
+}
+</locale>
+
+<locale locale="pl-PL" lang="json">
+{
+	"url": "RSS Feed Url",
+	"refreshIntervalSec": "Update interval (in seconds)",
+	"maxEntries": "Maximum number of items to display",
+	"showHeader": "Show header"
+}
+</locale>
+
+<locale locale="pt-PT" lang="json">
+{
+	"url": "RSS Feed Url",
+	"refreshIntervalSec": "Update interval (in seconds)",
+	"maxEntries": "Maximum number of items to display",
+	"showHeader": "Exibir cabeçalho"
+}
+</locale>
+
+<locale locale="ru-RU" lang="json">
+{
+	"url": "RSS Feed Url",
+	"refreshIntervalSec": "Update interval (in seconds)",
+	"maxEntries": "Maximum number of items to display",
+	"showHeader": "Show header"
+}
+</locale>
+
+<locale locale="sk-SK" lang="json">
+{
+	"url": "RSS Feed Url",
+	"refreshIntervalSec": "Update interval (in seconds)",
+	"maxEntries": "Maximum number of items to display",
+	"showHeader": "Show header"
+}
+</locale>
+
+<locale locale="th-TH" lang="json">
+{
+	"url": "URL ของฟีด RSS",
+	"refreshIntervalSec": "ห้วงอัปเดต (วินาที)",
+	"maxEntries": "จำนวนที่แสดงได้สูงสุด",
+	"showHeader": "แสดงส่วนหัว"
+}
+</locale>
+
+<locale locale="tr-TR" lang="json">
+{
+	"url": "RSS beslemesi URL'si",
+	"refreshIntervalSec": "Güncelleme aralığı (saniye)",
+	"maxEntries": "Görüntülenecek maksimum öğe sayısı",
+	"showHeader": "Başlığı göster"
+}
+</locale>
+
+<locale locale="ug-CN" lang="json">
+{
+	"url": "RSS Feed Url",
+	"refreshIntervalSec": "Update interval (in seconds)",
+	"maxEntries": "Maximum number of items to display",
+	"showHeader": "Show header"
+}
+</locale>
+
+<locale locale="uk-UA" lang="json">
+{
+	"url": "RSS Feed Url",
+	"refreshIntervalSec": "Update interval (in seconds)",
+	"maxEntries": "Maximum number of items to display",
+	"showHeader": "Show header"
+}
+</locale>
+
+<locale locale="vi-VN" lang="json">
+{
+	"url": "RSS Feed Url",
+	"refreshIntervalSec": "Update interval (in seconds)",
+	"maxEntries": "Maximum number of items to display",
+	"showHeader": "Show header"
+}
+</locale>
+
+<locale locale="zh-CN" lang="json">
+{
+	"url": "RSS 订阅源网址",
+	"refreshIntervalSec": "更新间隔（秒）",
+	"maxEntries": "最大显示个数",
+	"showHeader": "显示标题"
+}
+</locale>
+
+<locale locale="zh-TW" lang="json">
+{
+	"url": "RSS 訂閱網址",
+	"refreshIntervalSec": "更新間隔（秒）",
+	"maxEntries": "最大顯示數量",
+	"showHeader": "檢視標頭 "
+}
+</locale>

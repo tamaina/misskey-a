@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { supportedCaptchaProviders } from '../../contract/captcha-providers.js';
+import type { CaptchaProvider } from '../../contract/captcha-providers.js';
 import { Injectable } from '@nestjs/common';
 import { HttpRequestService } from '../../../runtime/backend/services/HttpRequestService.js';
 import { bindThis } from '@/decorators.js';
@@ -11,8 +13,8 @@ import { MiMeta } from '../../../instance/backend/models/Meta.js';
 import Logger from '@/logger.js';
 import { LoggerService } from '../../../runtime/backend/services/LoggerService.js';
 
-export const supportedCaptchaProviders = ['none', 'hcaptcha', 'mcaptcha', 'recaptcha', 'turnstile', 'testcaptcha'] as const;
-export type CaptchaProvider = typeof supportedCaptchaProviders[number];
+export { supportedCaptchaProviders } from '../../contract/captcha-providers.js';
+export type { CaptchaProvider } from '../../contract/captcha-providers.js';
 
 export const captchaErrorCodes = {
 	invalidProvider: Symbol('invalidProvider'),

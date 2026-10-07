@@ -1,0 +1,4620 @@
+{
+  "captureMethod": "Current original source AST before stage edits; exact previous published full OpenAPI paths",
+  "routes": [
+    {
+      "route": "admin/meta",
+      "source": "packages/features/instance/backend/endpoints/admin/meta.ts",
+      "originalSourceSha256": "634f7ecd9102b61a40fb591657e57139919a9c1e13ded3727af90823bdc220b3",
+      "input": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      },
+      "meta": {
+        "tags": [
+          "meta"
+        ],
+        "requireCredential": true,
+        "requireAdmin": true,
+        "kind": "read:admin:meta",
+        "res": {
+          "type": "object",
+          "optional": false,
+          "nullable": false,
+          "properties": {
+            "cacheRemoteFiles": {
+              "type": "boolean",
+              "optional": false,
+              "nullable": false
+            },
+            "cacheRemoteSensitiveFiles": {
+              "type": "boolean",
+              "optional": false,
+              "nullable": false
+            },
+            "emailRequiredForSignup": {
+              "type": "boolean",
+              "optional": false,
+              "nullable": false
+            },
+            "enableHcaptcha": {
+              "type": "boolean",
+              "optional": false,
+              "nullable": false
+            },
+            "hcaptchaSiteKey": {
+              "type": "string",
+              "optional": false,
+              "nullable": true
+            },
+            "enableMcaptcha": {
+              "type": "boolean",
+              "optional": false,
+              "nullable": false
+            },
+            "mcaptchaSiteKey": {
+              "type": "string",
+              "optional": false,
+              "nullable": true
+            },
+            "mcaptchaInstanceUrl": {
+              "type": "string",
+              "optional": false,
+              "nullable": true
+            },
+            "enableRecaptcha": {
+              "type": "boolean",
+              "optional": false,
+              "nullable": false
+            },
+            "recaptchaSiteKey": {
+              "type": "string",
+              "optional": false,
+              "nullable": true
+            },
+            "enableTurnstile": {
+              "type": "boolean",
+              "optional": false,
+              "nullable": false
+            },
+            "turnstileSiteKey": {
+              "type": "string",
+              "optional": false,
+              "nullable": true
+            },
+            "enableTestcaptcha": {
+              "type": "boolean",
+              "optional": false,
+              "nullable": false
+            },
+            "googleAnalyticsMeasurementId": {
+              "type": "string",
+              "optional": false,
+              "nullable": true
+            },
+            "swPublickey": {
+              "type": "string",
+              "optional": false,
+              "nullable": true
+            },
+            "mascotImageUrl": {
+              "type": "string",
+              "optional": false,
+              "nullable": true,
+              "default": "/assets/ai.png"
+            },
+            "bannerUrl": {
+              "type": "string",
+              "optional": false,
+              "nullable": true
+            },
+            "serverErrorImageUrl": {
+              "type": "string",
+              "optional": false,
+              "nullable": true
+            },
+            "infoImageUrl": {
+              "type": "string",
+              "optional": false,
+              "nullable": true
+            },
+            "notFoundImageUrl": {
+              "type": "string",
+              "optional": false,
+              "nullable": true
+            },
+            "iconUrl": {
+              "type": "string",
+              "optional": false,
+              "nullable": true
+            },
+            "app192IconUrl": {
+              "type": "string",
+              "optional": false,
+              "nullable": true
+            },
+            "app512IconUrl": {
+              "type": "string",
+              "optional": false,
+              "nullable": true
+            },
+            "enableEmail": {
+              "type": "boolean",
+              "optional": false,
+              "nullable": false
+            },
+            "enableServiceWorker": {
+              "type": "boolean",
+              "optional": false,
+              "nullable": false
+            },
+            "translatorAvailable": {
+              "type": "boolean",
+              "optional": false,
+              "nullable": false
+            },
+            "silencedHosts": {
+              "type": "array",
+              "optional": true,
+              "nullable": false,
+              "items": {
+                "type": "string",
+                "optional": false,
+                "nullable": false
+              }
+            },
+            "mediaSilencedHosts": {
+              "type": "array",
+              "optional": false,
+              "nullable": false,
+              "items": {
+                "type": "string",
+                "optional": false,
+                "nullable": false
+              }
+            },
+            "pinnedUsers": {
+              "type": "array",
+              "optional": false,
+              "nullable": false,
+              "items": {
+                "type": "string"
+              }
+            },
+            "hiddenTags": {
+              "type": "array",
+              "optional": false,
+              "nullable": false,
+              "items": {
+                "type": "string"
+              }
+            },
+            "blockedHosts": {
+              "type": "array",
+              "optional": false,
+              "nullable": false,
+              "items": {
+                "type": "string"
+              }
+            },
+            "sensitiveWords": {
+              "type": "array",
+              "optional": false,
+              "nullable": false,
+              "items": {
+                "type": "string"
+              }
+            },
+            "prohibitedWords": {
+              "type": "array",
+              "optional": false,
+              "nullable": false,
+              "items": {
+                "type": "string"
+              }
+            },
+            "prohibitedWordsForNameOfUser": {
+              "type": "array",
+              "optional": false,
+              "nullable": false,
+              "items": {
+                "type": "string"
+              }
+            },
+            "bannedEmailDomains": {
+              "type": "array",
+              "optional": true,
+              "nullable": false,
+              "items": {
+                "type": "string",
+                "optional": false,
+                "nullable": false
+              }
+            },
+            "preservedUsernames": {
+              "type": "array",
+              "optional": false,
+              "nullable": false,
+              "items": {
+                "type": "string"
+              }
+            },
+            "hcaptchaSecretKey": {
+              "type": "string",
+              "optional": false,
+              "nullable": true
+            },
+            "mcaptchaSecretKey": {
+              "type": "string",
+              "optional": false,
+              "nullable": true
+            },
+            "recaptchaSecretKey": {
+              "type": "string",
+              "optional": false,
+              "nullable": true
+            },
+            "turnstileSecretKey": {
+              "type": "string",
+              "optional": false,
+              "nullable": true
+            },
+            "sensitiveMediaDetection": {
+              "type": "string",
+              "optional": false,
+              "nullable": false,
+              "enum": [
+                "none",
+                "all",
+                "local",
+                "remote"
+              ]
+            },
+            "sensitiveMediaDetectionSensitivity": {
+              "type": "string",
+              "optional": false,
+              "nullable": false,
+              "enum": [
+                "medium",
+                "low",
+                "high",
+                "veryLow",
+                "veryHigh"
+              ]
+            },
+            "setSensitiveFlagAutomatically": {
+              "type": "boolean",
+              "optional": false,
+              "nullable": false
+            },
+            "enableSensitiveMediaDetectionForVideos": {
+              "type": "boolean",
+              "optional": false,
+              "nullable": false
+            },
+            "sensitiveMediaDetectionApiUrl": {
+              "type": "string",
+              "optional": false,
+              "nullable": true
+            },
+            "sensitiveMediaDetectionApiKey": {
+              "type": "string",
+              "optional": false,
+              "nullable": true
+            },
+            "sensitiveMediaDetectionTimeout": {
+              "type": "number",
+              "optional": false,
+              "nullable": false
+            },
+            "sensitiveMediaDetectionMaxImagesPerRequest": {
+              "type": "number",
+              "optional": false,
+              "nullable": false
+            },
+            "proxyAccountId": {
+              "type": "string",
+              "optional": false,
+              "nullable": false,
+              "format": "id"
+            },
+            "email": {
+              "type": "string",
+              "optional": false,
+              "nullable": true
+            },
+            "smtpSecure": {
+              "type": "boolean",
+              "optional": false,
+              "nullable": false
+            },
+            "smtpHost": {
+              "type": "string",
+              "optional": false,
+              "nullable": true
+            },
+            "smtpPort": {
+              "type": "number",
+              "optional": false,
+              "nullable": true
+            },
+            "smtpUser": {
+              "type": "string",
+              "optional": false,
+              "nullable": true
+            },
+            "smtpPass": {
+              "type": "string",
+              "optional": false,
+              "nullable": true
+            },
+            "swPrivateKey": {
+              "type": "string",
+              "optional": false,
+              "nullable": true
+            },
+            "useObjectStorage": {
+              "type": "boolean",
+              "optional": false,
+              "nullable": false
+            },
+            "objectStorageBaseUrl": {
+              "type": "string",
+              "optional": false,
+              "nullable": true
+            },
+            "objectStorageBucket": {
+              "type": "string",
+              "optional": false,
+              "nullable": true
+            },
+            "objectStoragePrefix": {
+              "type": "string",
+              "optional": false,
+              "nullable": true
+            },
+            "objectStorageEndpoint": {
+              "type": "string",
+              "optional": false,
+              "nullable": true
+            },
+            "objectStorageRegion": {
+              "type": "string",
+              "optional": false,
+              "nullable": true
+            },
+            "objectStoragePort": {
+              "type": "number",
+              "optional": false,
+              "nullable": true
+            },
+            "objectStorageAccessKey": {
+              "type": "string",
+              "optional": false,
+              "nullable": true
+            },
+            "objectStorageSecretKey": {
+              "type": "string",
+              "optional": false,
+              "nullable": true
+            },
+            "objectStorageUseSSL": {
+              "type": "boolean",
+              "optional": false,
+              "nullable": false
+            },
+            "objectStorageUseProxy": {
+              "type": "boolean",
+              "optional": false,
+              "nullable": false
+            },
+            "objectStorageSetPublicRead": {
+              "type": "boolean",
+              "optional": false,
+              "nullable": false
+            },
+            "enableIpLogging": {
+              "type": "boolean",
+              "optional": false,
+              "nullable": false
+            },
+            "enableActiveEmailValidation": {
+              "type": "boolean",
+              "optional": false,
+              "nullable": false
+            },
+            "enableVerifymailApi": {
+              "type": "boolean",
+              "optional": false,
+              "nullable": false
+            },
+            "verifymailAuthKey": {
+              "type": "string",
+              "optional": false,
+              "nullable": true
+            },
+            "enableTruemailApi": {
+              "type": "boolean",
+              "optional": false,
+              "nullable": false
+            },
+            "truemailInstance": {
+              "type": "string",
+              "optional": false,
+              "nullable": true
+            },
+            "truemailAuthKey": {
+              "type": "string",
+              "optional": false,
+              "nullable": true
+            },
+            "enableChartsForRemoteUser": {
+              "type": "boolean",
+              "optional": false,
+              "nullable": false
+            },
+            "enableChartsForFederatedInstances": {
+              "type": "boolean",
+              "optional": false,
+              "nullable": false
+            },
+            "enableStatsForFederatedInstances": {
+              "type": "boolean",
+              "optional": false,
+              "nullable": false
+            },
+            "enableServerMachineStats": {
+              "type": "boolean",
+              "optional": false,
+              "nullable": false
+            },
+            "enableIdenticonGeneration": {
+              "type": "boolean",
+              "optional": false,
+              "nullable": false
+            },
+            "manifestJsonOverride": {
+              "type": "string",
+              "optional": false,
+              "nullable": false
+            },
+            "policies": {
+              "type": "object",
+              "optional": false,
+              "nullable": false
+            },
+            "enableFanoutTimeline": {
+              "type": "boolean",
+              "optional": false,
+              "nullable": false
+            },
+            "enableFanoutTimelineDbFallback": {
+              "type": "boolean",
+              "optional": false,
+              "nullable": false
+            },
+            "perLocalUserUserTimelineCacheMax": {
+              "type": "number",
+              "optional": false,
+              "nullable": false
+            },
+            "perRemoteUserUserTimelineCacheMax": {
+              "type": "number",
+              "optional": false,
+              "nullable": false
+            },
+            "perUserHomeTimelineCacheMax": {
+              "type": "number",
+              "optional": false,
+              "nullable": false
+            },
+            "perUserListTimelineCacheMax": {
+              "type": "number",
+              "optional": false,
+              "nullable": false
+            },
+            "enableReactionsBuffering": {
+              "type": "boolean",
+              "optional": false,
+              "nullable": false
+            },
+            "notesPerOneAd": {
+              "type": "number",
+              "optional": false,
+              "nullable": false
+            },
+            "backgroundImageUrl": {
+              "type": "string",
+              "optional": false,
+              "nullable": true
+            },
+            "deeplAuthKey": {
+              "type": "string",
+              "optional": false,
+              "nullable": true
+            },
+            "deeplIsPro": {
+              "type": "boolean",
+              "optional": false,
+              "nullable": false
+            },
+            "defaultDarkTheme": {
+              "type": "string",
+              "optional": false,
+              "nullable": true
+            },
+            "defaultLightTheme": {
+              "type": "string",
+              "optional": false,
+              "nullable": true
+            },
+            "clientOptions": {
+              "ref": "MetaClientOptions"
+            },
+            "description": {
+              "type": "string",
+              "optional": false,
+              "nullable": true
+            },
+            "disableRegistration": {
+              "type": "boolean",
+              "optional": false,
+              "nullable": false
+            },
+            "impressumUrl": {
+              "type": "string",
+              "optional": false,
+              "nullable": true
+            },
+            "maintainerEmail": {
+              "type": "string",
+              "optional": false,
+              "nullable": true
+            },
+            "maintainerName": {
+              "type": "string",
+              "optional": false,
+              "nullable": true
+            },
+            "name": {
+              "type": "string",
+              "optional": false,
+              "nullable": true
+            },
+            "shortName": {
+              "type": "string",
+              "optional": false,
+              "nullable": true
+            },
+            "objectStorageS3ForcePathStyle": {
+              "type": "boolean",
+              "optional": false,
+              "nullable": false
+            },
+            "privacyPolicyUrl": {
+              "type": "string",
+              "optional": false,
+              "nullable": true
+            },
+            "inquiryUrl": {
+              "type": "string",
+              "optional": false,
+              "nullable": true
+            },
+            "repositoryUrl": {
+              "type": "string",
+              "optional": false,
+              "nullable": true
+            },
+            "feedbackUrl": {
+              "type": "string",
+              "optional": false,
+              "nullable": true
+            },
+            "summalyProxy": {
+              "type": "string",
+              "optional": false,
+              "nullable": true,
+              "deprecated": true,
+              "description": "[Deprecated] Use \"urlPreviewSummaryProxyUrl\" instead."
+            },
+            "themeColor": {
+              "type": "string",
+              "optional": false,
+              "nullable": true
+            },
+            "tosUrl": {
+              "type": "string",
+              "optional": false,
+              "nullable": true
+            },
+            "uri": {
+              "type": "string",
+              "optional": false,
+              "nullable": false
+            },
+            "version": {
+              "type": "string",
+              "optional": false,
+              "nullable": false
+            },
+            "urlPreviewEnabled": {
+              "type": "boolean",
+              "optional": false,
+              "nullable": false
+            },
+            "urlPreviewAllowRedirect": {
+              "type": "boolean",
+              "optional": false,
+              "nullable": false
+            },
+            "urlPreviewTimeout": {
+              "type": "number",
+              "optional": false,
+              "nullable": false
+            },
+            "urlPreviewMaximumContentLength": {
+              "type": "number",
+              "optional": false,
+              "nullable": false
+            },
+            "urlPreviewRequireContentLength": {
+              "type": "boolean",
+              "optional": false,
+              "nullable": false
+            },
+            "urlPreviewUserAgent": {
+              "type": "string",
+              "optional": false,
+              "nullable": true
+            },
+            "urlPreviewSummaryProxyUrl": {
+              "type": "string",
+              "optional": false,
+              "nullable": true
+            },
+            "urlPreviewSensitiveList": {
+              "type": "array",
+              "optional": false,
+              "nullable": false,
+              "items": {
+                "type": "string",
+                "optional": false,
+                "nullable": false
+              }
+            },
+            "federation": {
+              "type": "string",
+              "enum": [
+                "all",
+                "specified",
+                "none"
+              ],
+              "optional": false,
+              "nullable": false
+            },
+            "federationHosts": {
+              "type": "array",
+              "optional": false,
+              "nullable": false,
+              "items": {
+                "type": "string",
+                "optional": false,
+                "nullable": false
+              }
+            },
+            "deliverSuspendedSoftware": {
+              "type": "array",
+              "optional": false,
+              "nullable": false,
+              "items": {
+                "type": "object",
+                "optional": false,
+                "nullable": false,
+                "properties": {
+                  "software": {
+                    "type": "string",
+                    "optional": false,
+                    "nullable": false
+                  },
+                  "versionRange": {
+                    "type": "string",
+                    "optional": false,
+                    "nullable": false
+                  }
+                }
+              }
+            },
+            "singleUserMode": {
+              "type": "boolean",
+              "optional": false,
+              "nullable": false
+            },
+            "ugcVisibilityForVisitor": {
+              "type": "string",
+              "enum": [
+                "all",
+                "local",
+                "none"
+              ],
+              "optional": false,
+              "nullable": false
+            },
+            "proxyRemoteFiles": {
+              "type": "boolean",
+              "optional": false,
+              "nullable": false
+            },
+            "signToActivityPubGet": {
+              "type": "boolean",
+              "optional": false,
+              "nullable": false
+            },
+            "allowExternalApRedirect": {
+              "type": "boolean",
+              "optional": false,
+              "nullable": false
+            },
+            "enableRemoteNotesCleaning": {
+              "type": "boolean",
+              "optional": false,
+              "nullable": false
+            },
+            "remoteNotesCleaningExpiryDaysForEachNotes": {
+              "type": "number",
+              "optional": false,
+              "nullable": false
+            },
+            "remoteNotesCleaningMaxProcessingDurationInMinutes": {
+              "type": "number",
+              "optional": false,
+              "nullable": false
+            },
+            "showRoleBadgesOfRemoteUsers": {
+              "type": "boolean",
+              "optional": false,
+              "nullable": false
+            }
+          }
+        }
+      },
+      "output": {
+        "type": "object",
+        "optional": false,
+        "nullable": false,
+        "properties": {
+          "cacheRemoteFiles": {
+            "type": "boolean",
+            "optional": false,
+            "nullable": false
+          },
+          "cacheRemoteSensitiveFiles": {
+            "type": "boolean",
+            "optional": false,
+            "nullable": false
+          },
+          "emailRequiredForSignup": {
+            "type": "boolean",
+            "optional": false,
+            "nullable": false
+          },
+          "enableHcaptcha": {
+            "type": "boolean",
+            "optional": false,
+            "nullable": false
+          },
+          "hcaptchaSiteKey": {
+            "type": "string",
+            "optional": false,
+            "nullable": true
+          },
+          "enableMcaptcha": {
+            "type": "boolean",
+            "optional": false,
+            "nullable": false
+          },
+          "mcaptchaSiteKey": {
+            "type": "string",
+            "optional": false,
+            "nullable": true
+          },
+          "mcaptchaInstanceUrl": {
+            "type": "string",
+            "optional": false,
+            "nullable": true
+          },
+          "enableRecaptcha": {
+            "type": "boolean",
+            "optional": false,
+            "nullable": false
+          },
+          "recaptchaSiteKey": {
+            "type": "string",
+            "optional": false,
+            "nullable": true
+          },
+          "enableTurnstile": {
+            "type": "boolean",
+            "optional": false,
+            "nullable": false
+          },
+          "turnstileSiteKey": {
+            "type": "string",
+            "optional": false,
+            "nullable": true
+          },
+          "enableTestcaptcha": {
+            "type": "boolean",
+            "optional": false,
+            "nullable": false
+          },
+          "googleAnalyticsMeasurementId": {
+            "type": "string",
+            "optional": false,
+            "nullable": true
+          },
+          "swPublickey": {
+            "type": "string",
+            "optional": false,
+            "nullable": true
+          },
+          "mascotImageUrl": {
+            "type": "string",
+            "optional": false,
+            "nullable": true,
+            "default": "/assets/ai.png"
+          },
+          "bannerUrl": {
+            "type": "string",
+            "optional": false,
+            "nullable": true
+          },
+          "serverErrorImageUrl": {
+            "type": "string",
+            "optional": false,
+            "nullable": true
+          },
+          "infoImageUrl": {
+            "type": "string",
+            "optional": false,
+            "nullable": true
+          },
+          "notFoundImageUrl": {
+            "type": "string",
+            "optional": false,
+            "nullable": true
+          },
+          "iconUrl": {
+            "type": "string",
+            "optional": false,
+            "nullable": true
+          },
+          "app192IconUrl": {
+            "type": "string",
+            "optional": false,
+            "nullable": true
+          },
+          "app512IconUrl": {
+            "type": "string",
+            "optional": false,
+            "nullable": true
+          },
+          "enableEmail": {
+            "type": "boolean",
+            "optional": false,
+            "nullable": false
+          },
+          "enableServiceWorker": {
+            "type": "boolean",
+            "optional": false,
+            "nullable": false
+          },
+          "translatorAvailable": {
+            "type": "boolean",
+            "optional": false,
+            "nullable": false
+          },
+          "silencedHosts": {
+            "type": "array",
+            "optional": true,
+            "nullable": false,
+            "items": {
+              "type": "string",
+              "optional": false,
+              "nullable": false
+            }
+          },
+          "mediaSilencedHosts": {
+            "type": "array",
+            "optional": false,
+            "nullable": false,
+            "items": {
+              "type": "string",
+              "optional": false,
+              "nullable": false
+            }
+          },
+          "pinnedUsers": {
+            "type": "array",
+            "optional": false,
+            "nullable": false,
+            "items": {
+              "type": "string"
+            }
+          },
+          "hiddenTags": {
+            "type": "array",
+            "optional": false,
+            "nullable": false,
+            "items": {
+              "type": "string"
+            }
+          },
+          "blockedHosts": {
+            "type": "array",
+            "optional": false,
+            "nullable": false,
+            "items": {
+              "type": "string"
+            }
+          },
+          "sensitiveWords": {
+            "type": "array",
+            "optional": false,
+            "nullable": false,
+            "items": {
+              "type": "string"
+            }
+          },
+          "prohibitedWords": {
+            "type": "array",
+            "optional": false,
+            "nullable": false,
+            "items": {
+              "type": "string"
+            }
+          },
+          "prohibitedWordsForNameOfUser": {
+            "type": "array",
+            "optional": false,
+            "nullable": false,
+            "items": {
+              "type": "string"
+            }
+          },
+          "bannedEmailDomains": {
+            "type": "array",
+            "optional": true,
+            "nullable": false,
+            "items": {
+              "type": "string",
+              "optional": false,
+              "nullable": false
+            }
+          },
+          "preservedUsernames": {
+            "type": "array",
+            "optional": false,
+            "nullable": false,
+            "items": {
+              "type": "string"
+            }
+          },
+          "hcaptchaSecretKey": {
+            "type": "string",
+            "optional": false,
+            "nullable": true
+          },
+          "mcaptchaSecretKey": {
+            "type": "string",
+            "optional": false,
+            "nullable": true
+          },
+          "recaptchaSecretKey": {
+            "type": "string",
+            "optional": false,
+            "nullable": true
+          },
+          "turnstileSecretKey": {
+            "type": "string",
+            "optional": false,
+            "nullable": true
+          },
+          "sensitiveMediaDetection": {
+            "type": "string",
+            "optional": false,
+            "nullable": false,
+            "enum": [
+              "none",
+              "all",
+              "local",
+              "remote"
+            ]
+          },
+          "sensitiveMediaDetectionSensitivity": {
+            "type": "string",
+            "optional": false,
+            "nullable": false,
+            "enum": [
+              "medium",
+              "low",
+              "high",
+              "veryLow",
+              "veryHigh"
+            ]
+          },
+          "setSensitiveFlagAutomatically": {
+            "type": "boolean",
+            "optional": false,
+            "nullable": false
+          },
+          "enableSensitiveMediaDetectionForVideos": {
+            "type": "boolean",
+            "optional": false,
+            "nullable": false
+          },
+          "sensitiveMediaDetectionApiUrl": {
+            "type": "string",
+            "optional": false,
+            "nullable": true
+          },
+          "sensitiveMediaDetectionApiKey": {
+            "type": "string",
+            "optional": false,
+            "nullable": true
+          },
+          "sensitiveMediaDetectionTimeout": {
+            "type": "number",
+            "optional": false,
+            "nullable": false
+          },
+          "sensitiveMediaDetectionMaxImagesPerRequest": {
+            "type": "number",
+            "optional": false,
+            "nullable": false
+          },
+          "proxyAccountId": {
+            "type": "string",
+            "optional": false,
+            "nullable": false,
+            "format": "id"
+          },
+          "email": {
+            "type": "string",
+            "optional": false,
+            "nullable": true
+          },
+          "smtpSecure": {
+            "type": "boolean",
+            "optional": false,
+            "nullable": false
+          },
+          "smtpHost": {
+            "type": "string",
+            "optional": false,
+            "nullable": true
+          },
+          "smtpPort": {
+            "type": "number",
+            "optional": false,
+            "nullable": true
+          },
+          "smtpUser": {
+            "type": "string",
+            "optional": false,
+            "nullable": true
+          },
+          "smtpPass": {
+            "type": "string",
+            "optional": false,
+            "nullable": true
+          },
+          "swPrivateKey": {
+            "type": "string",
+            "optional": false,
+            "nullable": true
+          },
+          "useObjectStorage": {
+            "type": "boolean",
+            "optional": false,
+            "nullable": false
+          },
+          "objectStorageBaseUrl": {
+            "type": "string",
+            "optional": false,
+            "nullable": true
+          },
+          "objectStorageBucket": {
+            "type": "string",
+            "optional": false,
+            "nullable": true
+          },
+          "objectStoragePrefix": {
+            "type": "string",
+            "optional": false,
+            "nullable": true
+          },
+          "objectStorageEndpoint": {
+            "type": "string",
+            "optional": false,
+            "nullable": true
+          },
+          "objectStorageRegion": {
+            "type": "string",
+            "optional": false,
+            "nullable": true
+          },
+          "objectStoragePort": {
+            "type": "number",
+            "optional": false,
+            "nullable": true
+          },
+          "objectStorageAccessKey": {
+            "type": "string",
+            "optional": false,
+            "nullable": true
+          },
+          "objectStorageSecretKey": {
+            "type": "string",
+            "optional": false,
+            "nullable": true
+          },
+          "objectStorageUseSSL": {
+            "type": "boolean",
+            "optional": false,
+            "nullable": false
+          },
+          "objectStorageUseProxy": {
+            "type": "boolean",
+            "optional": false,
+            "nullable": false
+          },
+          "objectStorageSetPublicRead": {
+            "type": "boolean",
+            "optional": false,
+            "nullable": false
+          },
+          "enableIpLogging": {
+            "type": "boolean",
+            "optional": false,
+            "nullable": false
+          },
+          "enableActiveEmailValidation": {
+            "type": "boolean",
+            "optional": false,
+            "nullable": false
+          },
+          "enableVerifymailApi": {
+            "type": "boolean",
+            "optional": false,
+            "nullable": false
+          },
+          "verifymailAuthKey": {
+            "type": "string",
+            "optional": false,
+            "nullable": true
+          },
+          "enableTruemailApi": {
+            "type": "boolean",
+            "optional": false,
+            "nullable": false
+          },
+          "truemailInstance": {
+            "type": "string",
+            "optional": false,
+            "nullable": true
+          },
+          "truemailAuthKey": {
+            "type": "string",
+            "optional": false,
+            "nullable": true
+          },
+          "enableChartsForRemoteUser": {
+            "type": "boolean",
+            "optional": false,
+            "nullable": false
+          },
+          "enableChartsForFederatedInstances": {
+            "type": "boolean",
+            "optional": false,
+            "nullable": false
+          },
+          "enableStatsForFederatedInstances": {
+            "type": "boolean",
+            "optional": false,
+            "nullable": false
+          },
+          "enableServerMachineStats": {
+            "type": "boolean",
+            "optional": false,
+            "nullable": false
+          },
+          "enableIdenticonGeneration": {
+            "type": "boolean",
+            "optional": false,
+            "nullable": false
+          },
+          "manifestJsonOverride": {
+            "type": "string",
+            "optional": false,
+            "nullable": false
+          },
+          "policies": {
+            "type": "object",
+            "optional": false,
+            "nullable": false
+          },
+          "enableFanoutTimeline": {
+            "type": "boolean",
+            "optional": false,
+            "nullable": false
+          },
+          "enableFanoutTimelineDbFallback": {
+            "type": "boolean",
+            "optional": false,
+            "nullable": false
+          },
+          "perLocalUserUserTimelineCacheMax": {
+            "type": "number",
+            "optional": false,
+            "nullable": false
+          },
+          "perRemoteUserUserTimelineCacheMax": {
+            "type": "number",
+            "optional": false,
+            "nullable": false
+          },
+          "perUserHomeTimelineCacheMax": {
+            "type": "number",
+            "optional": false,
+            "nullable": false
+          },
+          "perUserListTimelineCacheMax": {
+            "type": "number",
+            "optional": false,
+            "nullable": false
+          },
+          "enableReactionsBuffering": {
+            "type": "boolean",
+            "optional": false,
+            "nullable": false
+          },
+          "notesPerOneAd": {
+            "type": "number",
+            "optional": false,
+            "nullable": false
+          },
+          "backgroundImageUrl": {
+            "type": "string",
+            "optional": false,
+            "nullable": true
+          },
+          "deeplAuthKey": {
+            "type": "string",
+            "optional": false,
+            "nullable": true
+          },
+          "deeplIsPro": {
+            "type": "boolean",
+            "optional": false,
+            "nullable": false
+          },
+          "defaultDarkTheme": {
+            "type": "string",
+            "optional": false,
+            "nullable": true
+          },
+          "defaultLightTheme": {
+            "type": "string",
+            "optional": false,
+            "nullable": true
+          },
+          "clientOptions": {
+            "ref": "MetaClientOptions"
+          },
+          "description": {
+            "type": "string",
+            "optional": false,
+            "nullable": true
+          },
+          "disableRegistration": {
+            "type": "boolean",
+            "optional": false,
+            "nullable": false
+          },
+          "impressumUrl": {
+            "type": "string",
+            "optional": false,
+            "nullable": true
+          },
+          "maintainerEmail": {
+            "type": "string",
+            "optional": false,
+            "nullable": true
+          },
+          "maintainerName": {
+            "type": "string",
+            "optional": false,
+            "nullable": true
+          },
+          "name": {
+            "type": "string",
+            "optional": false,
+            "nullable": true
+          },
+          "shortName": {
+            "type": "string",
+            "optional": false,
+            "nullable": true
+          },
+          "objectStorageS3ForcePathStyle": {
+            "type": "boolean",
+            "optional": false,
+            "nullable": false
+          },
+          "privacyPolicyUrl": {
+            "type": "string",
+            "optional": false,
+            "nullable": true
+          },
+          "inquiryUrl": {
+            "type": "string",
+            "optional": false,
+            "nullable": true
+          },
+          "repositoryUrl": {
+            "type": "string",
+            "optional": false,
+            "nullable": true
+          },
+          "feedbackUrl": {
+            "type": "string",
+            "optional": false,
+            "nullable": true
+          },
+          "summalyProxy": {
+            "type": "string",
+            "optional": false,
+            "nullable": true,
+            "deprecated": true,
+            "description": "[Deprecated] Use \"urlPreviewSummaryProxyUrl\" instead."
+          },
+          "themeColor": {
+            "type": "string",
+            "optional": false,
+            "nullable": true
+          },
+          "tosUrl": {
+            "type": "string",
+            "optional": false,
+            "nullable": true
+          },
+          "uri": {
+            "type": "string",
+            "optional": false,
+            "nullable": false
+          },
+          "version": {
+            "type": "string",
+            "optional": false,
+            "nullable": false
+          },
+          "urlPreviewEnabled": {
+            "type": "boolean",
+            "optional": false,
+            "nullable": false
+          },
+          "urlPreviewAllowRedirect": {
+            "type": "boolean",
+            "optional": false,
+            "nullable": false
+          },
+          "urlPreviewTimeout": {
+            "type": "number",
+            "optional": false,
+            "nullable": false
+          },
+          "urlPreviewMaximumContentLength": {
+            "type": "number",
+            "optional": false,
+            "nullable": false
+          },
+          "urlPreviewRequireContentLength": {
+            "type": "boolean",
+            "optional": false,
+            "nullable": false
+          },
+          "urlPreviewUserAgent": {
+            "type": "string",
+            "optional": false,
+            "nullable": true
+          },
+          "urlPreviewSummaryProxyUrl": {
+            "type": "string",
+            "optional": false,
+            "nullable": true
+          },
+          "urlPreviewSensitiveList": {
+            "type": "array",
+            "optional": false,
+            "nullable": false,
+            "items": {
+              "type": "string",
+              "optional": false,
+              "nullable": false
+            }
+          },
+          "federation": {
+            "type": "string",
+            "enum": [
+              "all",
+              "specified",
+              "none"
+            ],
+            "optional": false,
+            "nullable": false
+          },
+          "federationHosts": {
+            "type": "array",
+            "optional": false,
+            "nullable": false,
+            "items": {
+              "type": "string",
+              "optional": false,
+              "nullable": false
+            }
+          },
+          "deliverSuspendedSoftware": {
+            "type": "array",
+            "optional": false,
+            "nullable": false,
+            "items": {
+              "type": "object",
+              "optional": false,
+              "nullable": false,
+              "properties": {
+                "software": {
+                  "type": "string",
+                  "optional": false,
+                  "nullable": false
+                },
+                "versionRange": {
+                  "type": "string",
+                  "optional": false,
+                  "nullable": false
+                }
+              }
+            }
+          },
+          "singleUserMode": {
+            "type": "boolean",
+            "optional": false,
+            "nullable": false
+          },
+          "ugcVisibilityForVisitor": {
+            "type": "string",
+            "enum": [
+              "all",
+              "local",
+              "none"
+            ],
+            "optional": false,
+            "nullable": false
+          },
+          "proxyRemoteFiles": {
+            "type": "boolean",
+            "optional": false,
+            "nullable": false
+          },
+          "signToActivityPubGet": {
+            "type": "boolean",
+            "optional": false,
+            "nullable": false
+          },
+          "allowExternalApRedirect": {
+            "type": "boolean",
+            "optional": false,
+            "nullable": false
+          },
+          "enableRemoteNotesCleaning": {
+            "type": "boolean",
+            "optional": false,
+            "nullable": false
+          },
+          "remoteNotesCleaningExpiryDaysForEachNotes": {
+            "type": "number",
+            "optional": false,
+            "nullable": false
+          },
+          "remoteNotesCleaningMaxProcessingDurationInMinutes": {
+            "type": "number",
+            "optional": false,
+            "nullable": false
+          },
+          "showRoleBadgesOfRemoteUsers": {
+            "type": "boolean",
+            "optional": false,
+            "nullable": false
+          }
+        }
+      },
+      "openapi": {
+        "post": {
+          "operationId": "post___admin___meta",
+          "summary": "admin/meta",
+          "description": "No description provided.\n\n**Credential required**: *Yes* / **Permission**: *read:admin:meta*",
+          "externalDocs": {
+            "description": "Source code",
+            "url": "https://github.com/misskey-dev/misskey/blob/develop/packages/backend/src/server/api/endpoints/admin/meta.ts"
+          },
+          "tags": [
+            "meta"
+          ],
+          "security": [
+            {
+              "bearerAuth": []
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "OK (with results)",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "cacheRemoteFiles": {
+                        "type": "boolean"
+                      },
+                      "cacheRemoteSensitiveFiles": {
+                        "type": "boolean"
+                      },
+                      "emailRequiredForSignup": {
+                        "type": "boolean"
+                      },
+                      "enableHcaptcha": {
+                        "type": "boolean"
+                      },
+                      "hcaptchaSiteKey": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      },
+                      "enableMcaptcha": {
+                        "type": "boolean"
+                      },
+                      "mcaptchaSiteKey": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      },
+                      "mcaptchaInstanceUrl": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      },
+                      "enableRecaptcha": {
+                        "type": "boolean"
+                      },
+                      "recaptchaSiteKey": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      },
+                      "enableTurnstile": {
+                        "type": "boolean"
+                      },
+                      "turnstileSiteKey": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      },
+                      "enableTestcaptcha": {
+                        "type": "boolean"
+                      },
+                      "googleAnalyticsMeasurementId": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      },
+                      "swPublickey": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      },
+                      "mascotImageUrl": {
+                        "type": [
+                          "string",
+                          "null"
+                        ],
+                        "default": "/assets/ai.png"
+                      },
+                      "bannerUrl": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      },
+                      "serverErrorImageUrl": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      },
+                      "infoImageUrl": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      },
+                      "notFoundImageUrl": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      },
+                      "iconUrl": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      },
+                      "app192IconUrl": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      },
+                      "app512IconUrl": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      },
+                      "enableEmail": {
+                        "type": "boolean"
+                      },
+                      "enableServiceWorker": {
+                        "type": "boolean"
+                      },
+                      "translatorAvailable": {
+                        "type": "boolean"
+                      },
+                      "silencedHosts": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "mediaSilencedHosts": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "pinnedUsers": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "hiddenTags": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "blockedHosts": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "sensitiveWords": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "prohibitedWords": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "prohibitedWordsForNameOfUser": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "bannedEmailDomains": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "preservedUsernames": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "hcaptchaSecretKey": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      },
+                      "mcaptchaSecretKey": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      },
+                      "recaptchaSecretKey": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      },
+                      "turnstileSecretKey": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      },
+                      "sensitiveMediaDetection": {
+                        "type": "string",
+                        "enum": [
+                          "none",
+                          "all",
+                          "local",
+                          "remote"
+                        ]
+                      },
+                      "sensitiveMediaDetectionSensitivity": {
+                        "type": "string",
+                        "enum": [
+                          "medium",
+                          "low",
+                          "high",
+                          "veryLow",
+                          "veryHigh"
+                        ]
+                      },
+                      "setSensitiveFlagAutomatically": {
+                        "type": "boolean"
+                      },
+                      "enableSensitiveMediaDetectionForVideos": {
+                        "type": "boolean"
+                      },
+                      "sensitiveMediaDetectionApiUrl": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      },
+                      "sensitiveMediaDetectionApiKey": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      },
+                      "sensitiveMediaDetectionTimeout": {
+                        "type": "number"
+                      },
+                      "sensitiveMediaDetectionMaxImagesPerRequest": {
+                        "type": "number"
+                      },
+                      "proxyAccountId": {
+                        "type": "string",
+                        "format": "id"
+                      },
+                      "email": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      },
+                      "smtpSecure": {
+                        "type": "boolean"
+                      },
+                      "smtpHost": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      },
+                      "smtpPort": {
+                        "type": [
+                          "number",
+                          "null"
+                        ]
+                      },
+                      "smtpUser": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      },
+                      "smtpPass": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      },
+                      "swPrivateKey": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      },
+                      "useObjectStorage": {
+                        "type": "boolean"
+                      },
+                      "objectStorageBaseUrl": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      },
+                      "objectStorageBucket": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      },
+                      "objectStoragePrefix": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      },
+                      "objectStorageEndpoint": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      },
+                      "objectStorageRegion": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      },
+                      "objectStoragePort": {
+                        "type": [
+                          "number",
+                          "null"
+                        ]
+                      },
+                      "objectStorageAccessKey": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      },
+                      "objectStorageSecretKey": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      },
+                      "objectStorageUseSSL": {
+                        "type": "boolean"
+                      },
+                      "objectStorageUseProxy": {
+                        "type": "boolean"
+                      },
+                      "objectStorageSetPublicRead": {
+                        "type": "boolean"
+                      },
+                      "enableIpLogging": {
+                        "type": "boolean"
+                      },
+                      "enableActiveEmailValidation": {
+                        "type": "boolean"
+                      },
+                      "enableVerifymailApi": {
+                        "type": "boolean"
+                      },
+                      "verifymailAuthKey": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      },
+                      "enableTruemailApi": {
+                        "type": "boolean"
+                      },
+                      "truemailInstance": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      },
+                      "truemailAuthKey": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      },
+                      "enableChartsForRemoteUser": {
+                        "type": "boolean"
+                      },
+                      "enableChartsForFederatedInstances": {
+                        "type": "boolean"
+                      },
+                      "enableStatsForFederatedInstances": {
+                        "type": "boolean"
+                      },
+                      "enableServerMachineStats": {
+                        "type": "boolean"
+                      },
+                      "enableIdenticonGeneration": {
+                        "type": "boolean"
+                      },
+                      "manifestJsonOverride": {
+                        "type": "string"
+                      },
+                      "policies": {
+                        "type": "object"
+                      },
+                      "enableFanoutTimeline": {
+                        "type": "boolean"
+                      },
+                      "enableFanoutTimelineDbFallback": {
+                        "type": "boolean"
+                      },
+                      "perLocalUserUserTimelineCacheMax": {
+                        "type": "number"
+                      },
+                      "perRemoteUserUserTimelineCacheMax": {
+                        "type": "number"
+                      },
+                      "perUserHomeTimelineCacheMax": {
+                        "type": "number"
+                      },
+                      "perUserListTimelineCacheMax": {
+                        "type": "number"
+                      },
+                      "enableReactionsBuffering": {
+                        "type": "boolean"
+                      },
+                      "notesPerOneAd": {
+                        "type": "number"
+                      },
+                      "backgroundImageUrl": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      },
+                      "deeplAuthKey": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      },
+                      "deeplIsPro": {
+                        "type": "boolean"
+                      },
+                      "defaultDarkTheme": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      },
+                      "defaultLightTheme": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      },
+                      "clientOptions": {
+                        "$ref": "#/components/schemas/MetaClientOptions"
+                      },
+                      "description": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      },
+                      "disableRegistration": {
+                        "type": "boolean"
+                      },
+                      "impressumUrl": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      },
+                      "maintainerEmail": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      },
+                      "maintainerName": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      },
+                      "name": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      },
+                      "shortName": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      },
+                      "objectStorageS3ForcePathStyle": {
+                        "type": "boolean"
+                      },
+                      "privacyPolicyUrl": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      },
+                      "inquiryUrl": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      },
+                      "repositoryUrl": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      },
+                      "feedbackUrl": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      },
+                      "summalyProxy": {
+                        "type": [
+                          "string",
+                          "null"
+                        ],
+                        "deprecated": true,
+                        "description": "[Deprecated] Use \"urlPreviewSummaryProxyUrl\" instead."
+                      },
+                      "themeColor": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      },
+                      "tosUrl": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      },
+                      "uri": {
+                        "type": "string"
+                      },
+                      "version": {
+                        "type": "string"
+                      },
+                      "urlPreviewEnabled": {
+                        "type": "boolean"
+                      },
+                      "urlPreviewAllowRedirect": {
+                        "type": "boolean"
+                      },
+                      "urlPreviewTimeout": {
+                        "type": "number"
+                      },
+                      "urlPreviewMaximumContentLength": {
+                        "type": "number"
+                      },
+                      "urlPreviewRequireContentLength": {
+                        "type": "boolean"
+                      },
+                      "urlPreviewUserAgent": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      },
+                      "urlPreviewSummaryProxyUrl": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      },
+                      "urlPreviewSensitiveList": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "federation": {
+                        "type": "string",
+                        "enum": [
+                          "all",
+                          "specified",
+                          "none"
+                        ]
+                      },
+                      "federationHosts": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "deliverSuspendedSoftware": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "software": {
+                              "type": "string"
+                            },
+                            "versionRange": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "software",
+                            "versionRange"
+                          ]
+                        }
+                      },
+                      "singleUserMode": {
+                        "type": "boolean"
+                      },
+                      "ugcVisibilityForVisitor": {
+                        "type": "string",
+                        "enum": [
+                          "all",
+                          "local",
+                          "none"
+                        ]
+                      },
+                      "proxyRemoteFiles": {
+                        "type": "boolean"
+                      },
+                      "signToActivityPubGet": {
+                        "type": "boolean"
+                      },
+                      "allowExternalApRedirect": {
+                        "type": "boolean"
+                      },
+                      "enableRemoteNotesCleaning": {
+                        "type": "boolean"
+                      },
+                      "remoteNotesCleaningExpiryDaysForEachNotes": {
+                        "type": "number"
+                      },
+                      "remoteNotesCleaningMaxProcessingDurationInMinutes": {
+                        "type": "number"
+                      },
+                      "showRoleBadgesOfRemoteUsers": {
+                        "type": "boolean"
+                      }
+                    },
+                    "required": [
+                      "cacheRemoteFiles",
+                      "cacheRemoteSensitiveFiles",
+                      "emailRequiredForSignup",
+                      "enableHcaptcha",
+                      "hcaptchaSiteKey",
+                      "enableMcaptcha",
+                      "mcaptchaSiteKey",
+                      "mcaptchaInstanceUrl",
+                      "enableRecaptcha",
+                      "recaptchaSiteKey",
+                      "enableTurnstile",
+                      "turnstileSiteKey",
+                      "enableTestcaptcha",
+                      "googleAnalyticsMeasurementId",
+                      "swPublickey",
+                      "mascotImageUrl",
+                      "bannerUrl",
+                      "serverErrorImageUrl",
+                      "infoImageUrl",
+                      "notFoundImageUrl",
+                      "iconUrl",
+                      "app192IconUrl",
+                      "app512IconUrl",
+                      "enableEmail",
+                      "enableServiceWorker",
+                      "translatorAvailable",
+                      "mediaSilencedHosts",
+                      "pinnedUsers",
+                      "hiddenTags",
+                      "blockedHosts",
+                      "sensitiveWords",
+                      "prohibitedWords",
+                      "prohibitedWordsForNameOfUser",
+                      "preservedUsernames",
+                      "hcaptchaSecretKey",
+                      "mcaptchaSecretKey",
+                      "recaptchaSecretKey",
+                      "turnstileSecretKey",
+                      "sensitiveMediaDetection",
+                      "sensitiveMediaDetectionSensitivity",
+                      "setSensitiveFlagAutomatically",
+                      "enableSensitiveMediaDetectionForVideos",
+                      "sensitiveMediaDetectionApiUrl",
+                      "sensitiveMediaDetectionApiKey",
+                      "sensitiveMediaDetectionTimeout",
+                      "sensitiveMediaDetectionMaxImagesPerRequest",
+                      "proxyAccountId",
+                      "email",
+                      "smtpSecure",
+                      "smtpHost",
+                      "smtpPort",
+                      "smtpUser",
+                      "smtpPass",
+                      "swPrivateKey",
+                      "useObjectStorage",
+                      "objectStorageBaseUrl",
+                      "objectStorageBucket",
+                      "objectStoragePrefix",
+                      "objectStorageEndpoint",
+                      "objectStorageRegion",
+                      "objectStoragePort",
+                      "objectStorageAccessKey",
+                      "objectStorageSecretKey",
+                      "objectStorageUseSSL",
+                      "objectStorageUseProxy",
+                      "objectStorageSetPublicRead",
+                      "enableIpLogging",
+                      "enableActiveEmailValidation",
+                      "enableVerifymailApi",
+                      "verifymailAuthKey",
+                      "enableTruemailApi",
+                      "truemailInstance",
+                      "truemailAuthKey",
+                      "enableChartsForRemoteUser",
+                      "enableChartsForFederatedInstances",
+                      "enableStatsForFederatedInstances",
+                      "enableServerMachineStats",
+                      "enableIdenticonGeneration",
+                      "manifestJsonOverride",
+                      "policies",
+                      "enableFanoutTimeline",
+                      "enableFanoutTimelineDbFallback",
+                      "perLocalUserUserTimelineCacheMax",
+                      "perRemoteUserUserTimelineCacheMax",
+                      "perUserHomeTimelineCacheMax",
+                      "perUserListTimelineCacheMax",
+                      "enableReactionsBuffering",
+                      "notesPerOneAd",
+                      "backgroundImageUrl",
+                      "deeplAuthKey",
+                      "deeplIsPro",
+                      "defaultDarkTheme",
+                      "defaultLightTheme",
+                      "clientOptions",
+                      "description",
+                      "disableRegistration",
+                      "impressumUrl",
+                      "maintainerEmail",
+                      "maintainerName",
+                      "name",
+                      "shortName",
+                      "objectStorageS3ForcePathStyle",
+                      "privacyPolicyUrl",
+                      "inquiryUrl",
+                      "repositoryUrl",
+                      "feedbackUrl",
+                      "summalyProxy",
+                      "themeColor",
+                      "tosUrl",
+                      "uri",
+                      "version",
+                      "urlPreviewEnabled",
+                      "urlPreviewAllowRedirect",
+                      "urlPreviewTimeout",
+                      "urlPreviewMaximumContentLength",
+                      "urlPreviewRequireContentLength",
+                      "urlPreviewUserAgent",
+                      "urlPreviewSummaryProxyUrl",
+                      "urlPreviewSensitiveList",
+                      "federation",
+                      "federationHosts",
+                      "deliverSuspendedSoftware",
+                      "singleUserMode",
+                      "ugcVisibilityForVisitor",
+                      "proxyRemoteFiles",
+                      "signToActivityPubGet",
+                      "allowExternalApRedirect",
+                      "enableRemoteNotesCleaning",
+                      "remoteNotesCleaningExpiryDaysForEachNotes",
+                      "remoteNotesCleaningMaxProcessingDurationInMinutes",
+                      "showRoleBadgesOfRemoteUsers"
+                    ]
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Client error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "INVALID_PARAM": {
+                      "value": {
+                        "error": {
+                          "message": "Invalid param.",
+                          "code": "INVALID_PARAM",
+                          "id": "3d81ceae-475f-4600-b2a8-2bc116157532"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "401": {
+              "description": "Authentication error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "CREDENTIAL_REQUIRED": {
+                      "value": {
+                        "error": {
+                          "message": "Credential required.",
+                          "code": "CREDENTIAL_REQUIRED",
+                          "id": "1384574d-a912-4b81-8601-c7b1c4085df1"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "403": {
+              "description": "Forbidden error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "AUTHENTICATION_FAILED": {
+                      "value": {
+                        "error": {
+                          "message": "Authentication failed. Please ensure your token is correct.",
+                          "code": "AUTHENTICATION_FAILED",
+                          "id": "b0a7f5f8-dc2f-4171-b91f-de88ad238e14"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "418": {
+              "description": "I'm Ai",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "I_AM_AI": {
+                      "value": {
+                        "error": {
+                          "message": "You sent a request to Ai-chan, Misskey's showgirl, instead of the server.",
+                          "code": "I_AM_AI",
+                          "id": "60c46cd1-f23a-46b1-bebe-5d2b73951a84"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "500": {
+              "description": "Internal server error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "INTERNAL_ERROR": {
+                      "value": {
+                        "error": {
+                          "message": "Internal error occurred. Please contact us if the error persists.",
+                          "code": "INTERNAL_ERROR",
+                          "id": "5d37dbcb-891e-41ca-a3d6-e690c97775ac"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "route": "admin/queue/show-job",
+      "source": "packages/features/operations/backend/endpoints/admin/queue/show-job.ts",
+      "originalSourceSha256": "292ad20e33c39e5a3116a66d7b67f8105b25d03584d38dba1b0a331d29a5ee93",
+      "input": {
+        "type": "object",
+        "properties": {
+          "queue": {
+            "type": "string",
+            "enum": [
+              "system",
+              "endedPollNotification",
+              "postScheduledNote",
+              "deliver",
+              "inbox",
+              "db",
+              "relationship",
+              "objectStorage",
+              "userWebhookDeliver",
+              "systemWebhookDeliver"
+            ]
+          },
+          "jobId": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "queue",
+          "jobId"
+        ]
+      },
+      "meta": {
+        "tags": [
+          "admin"
+        ],
+        "requireCredential": true,
+        "requireModerator": true,
+        "kind": "read:admin:queue",
+        "res": {
+          "optional": false,
+          "nullable": false,
+          "ref": "QueueJob"
+        }
+      },
+      "output": {
+        "optional": false,
+        "nullable": false,
+        "ref": "QueueJob"
+      },
+      "openapi": {
+        "post": {
+          "operationId": "post___admin___queue___show-job",
+          "summary": "admin/queue/show-job",
+          "description": "No description provided.\n\n**Credential required**: *Yes* / **Permission**: *read:admin:queue*",
+          "externalDocs": {
+            "description": "Source code",
+            "url": "https://github.com/misskey-dev/misskey/blob/develop/packages/backend/src/server/api/endpoints/admin/queue/show-job.ts"
+          },
+          "tags": [
+            "admin"
+          ],
+          "security": [
+            {
+              "bearerAuth": []
+            }
+          ],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "queue": {
+                      "type": "string",
+                      "enum": [
+                        "system",
+                        "endedPollNotification",
+                        "postScheduledNote",
+                        "deliver",
+                        "inbox",
+                        "db",
+                        "relationship",
+                        "objectStorage",
+                        "userWebhookDeliver",
+                        "systemWebhookDeliver"
+                      ]
+                    },
+                    "jobId": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "queue",
+                    "jobId"
+                  ]
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "OK (with results)",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/QueueJob"
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Client error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "INVALID_PARAM": {
+                      "value": {
+                        "error": {
+                          "message": "Invalid param.",
+                          "code": "INVALID_PARAM",
+                          "id": "3d81ceae-475f-4600-b2a8-2bc116157532"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "401": {
+              "description": "Authentication error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "CREDENTIAL_REQUIRED": {
+                      "value": {
+                        "error": {
+                          "message": "Credential required.",
+                          "code": "CREDENTIAL_REQUIRED",
+                          "id": "1384574d-a912-4b81-8601-c7b1c4085df1"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "403": {
+              "description": "Forbidden error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "AUTHENTICATION_FAILED": {
+                      "value": {
+                        "error": {
+                          "message": "Authentication failed. Please ensure your token is correct.",
+                          "code": "AUTHENTICATION_FAILED",
+                          "id": "b0a7f5f8-dc2f-4171-b91f-de88ad238e14"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "418": {
+              "description": "I'm Ai",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "I_AM_AI": {
+                      "value": {
+                        "error": {
+                          "message": "You sent a request to Ai-chan, Misskey's showgirl, instead of the server.",
+                          "code": "I_AM_AI",
+                          "id": "60c46cd1-f23a-46b1-bebe-5d2b73951a84"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "500": {
+              "description": "Internal server error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "INTERNAL_ERROR": {
+                      "value": {
+                        "error": {
+                          "message": "Internal error occurred. Please contact us if the error persists.",
+                          "code": "INTERNAL_ERROR",
+                          "id": "5d37dbcb-891e-41ca-a3d6-e690c97775ac"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "route": "admin/queue/jobs",
+      "source": "packages/features/operations/backend/endpoints/admin/queue/jobs.ts",
+      "originalSourceSha256": "9a2b1adb3f600304daf850900385f62d3392f72d3ef77a7d243b146f6e28adfd",
+      "input": {
+        "type": "object",
+        "properties": {
+          "queue": {
+            "type": "string",
+            "enum": [
+              "system",
+              "endedPollNotification",
+              "postScheduledNote",
+              "deliver",
+              "inbox",
+              "db",
+              "relationship",
+              "objectStorage",
+              "userWebhookDeliver",
+              "systemWebhookDeliver"
+            ]
+          },
+          "state": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "active",
+                "wait",
+                "delayed",
+                "completed",
+                "failed"
+              ]
+            }
+          },
+          "search": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "queue",
+          "state"
+        ]
+      },
+      "meta": {
+        "tags": [
+          "admin"
+        ],
+        "requireCredential": true,
+        "requireModerator": true,
+        "kind": "read:admin:queue",
+        "res": {
+          "type": "array",
+          "optional": false,
+          "nullable": false,
+          "items": {
+            "optional": false,
+            "nullable": false,
+            "ref": "QueueJob"
+          }
+        }
+      },
+      "output": {
+        "type": "array",
+        "optional": false,
+        "nullable": false,
+        "items": {
+          "optional": false,
+          "nullable": false,
+          "ref": "QueueJob"
+        }
+      },
+      "openapi": {
+        "post": {
+          "operationId": "post___admin___queue___jobs",
+          "summary": "admin/queue/jobs",
+          "description": "No description provided.\n\n**Credential required**: *Yes* / **Permission**: *read:admin:queue*",
+          "externalDocs": {
+            "description": "Source code",
+            "url": "https://github.com/misskey-dev/misskey/blob/develop/packages/backend/src/server/api/endpoints/admin/queue/jobs.ts"
+          },
+          "tags": [
+            "admin"
+          ],
+          "security": [
+            {
+              "bearerAuth": []
+            }
+          ],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "queue": {
+                      "type": "string",
+                      "enum": [
+                        "system",
+                        "endedPollNotification",
+                        "postScheduledNote",
+                        "deliver",
+                        "inbox",
+                        "db",
+                        "relationship",
+                        "objectStorage",
+                        "userWebhookDeliver",
+                        "systemWebhookDeliver"
+                      ]
+                    },
+                    "state": {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "enum": [
+                          "active",
+                          "wait",
+                          "delayed",
+                          "completed",
+                          "failed"
+                        ]
+                      }
+                    },
+                    "search": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "queue",
+                    "state"
+                  ]
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "OK (with results)",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/QueueJob"
+                    }
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Client error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "INVALID_PARAM": {
+                      "value": {
+                        "error": {
+                          "message": "Invalid param.",
+                          "code": "INVALID_PARAM",
+                          "id": "3d81ceae-475f-4600-b2a8-2bc116157532"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "401": {
+              "description": "Authentication error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "CREDENTIAL_REQUIRED": {
+                      "value": {
+                        "error": {
+                          "message": "Credential required.",
+                          "code": "CREDENTIAL_REQUIRED",
+                          "id": "1384574d-a912-4b81-8601-c7b1c4085df1"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "403": {
+              "description": "Forbidden error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "AUTHENTICATION_FAILED": {
+                      "value": {
+                        "error": {
+                          "message": "Authentication failed. Please ensure your token is correct.",
+                          "code": "AUTHENTICATION_FAILED",
+                          "id": "b0a7f5f8-dc2f-4171-b91f-de88ad238e14"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "418": {
+              "description": "I'm Ai",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "I_AM_AI": {
+                      "value": {
+                        "error": {
+                          "message": "You sent a request to Ai-chan, Misskey's showgirl, instead of the server.",
+                          "code": "I_AM_AI",
+                          "id": "60c46cd1-f23a-46b1-bebe-5d2b73951a84"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "500": {
+              "description": "Internal server error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "INTERNAL_ERROR": {
+                      "value": {
+                        "error": {
+                          "message": "Internal error occurred. Please contact us if the error persists.",
+                          "code": "INTERNAL_ERROR",
+                          "id": "5d37dbcb-891e-41ca-a3d6-e690c97775ac"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "route": "admin/queue/queues",
+      "source": "packages/features/operations/backend/endpoints/admin/queue/queues.ts",
+      "originalSourceSha256": "4f9685863511470cc5f5e54d7f797415fab2bad0ceeb13407c6aecb3fa5b4b3c",
+      "input": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      },
+      "meta": {
+        "tags": [
+          "admin"
+        ],
+        "requireCredential": true,
+        "requireModerator": true,
+        "kind": "read:admin:queue",
+        "res": {
+          "type": "array",
+          "optional": false,
+          "nullable": false,
+          "items": {
+            "type": "object",
+            "optional": false,
+            "nullable": false,
+            "properties": {
+              "name": {
+                "type": "string",
+                "optional": false,
+                "nullable": false,
+                "enum": [
+                  "system",
+                  "endedPollNotification",
+                  "postScheduledNote",
+                  "deliver",
+                  "inbox",
+                  "db",
+                  "relationship",
+                  "objectStorage",
+                  "userWebhookDeliver",
+                  "systemWebhookDeliver"
+                ]
+              },
+              "counts": {
+                "type": "object",
+                "optional": false,
+                "nullable": false,
+                "additionalProperties": {
+                  "type": "number"
+                }
+              },
+              "isPaused": {
+                "type": "boolean",
+                "optional": false,
+                "nullable": false
+              },
+              "metrics": {
+                "type": "object",
+                "optional": false,
+                "nullable": false,
+                "properties": {
+                  "completed": {
+                    "optional": false,
+                    "nullable": false,
+                    "ref": "QueueMetrics"
+                  },
+                  "failed": {
+                    "optional": false,
+                    "nullable": false,
+                    "ref": "QueueMetrics"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "output": {
+        "type": "array",
+        "optional": false,
+        "nullable": false,
+        "items": {
+          "type": "object",
+          "optional": false,
+          "nullable": false,
+          "properties": {
+            "name": {
+              "type": "string",
+              "optional": false,
+              "nullable": false,
+              "enum": [
+                "system",
+                "endedPollNotification",
+                "postScheduledNote",
+                "deliver",
+                "inbox",
+                "db",
+                "relationship",
+                "objectStorage",
+                "userWebhookDeliver",
+                "systemWebhookDeliver"
+              ]
+            },
+            "counts": {
+              "type": "object",
+              "optional": false,
+              "nullable": false,
+              "additionalProperties": {
+                "type": "number"
+              }
+            },
+            "isPaused": {
+              "type": "boolean",
+              "optional": false,
+              "nullable": false
+            },
+            "metrics": {
+              "type": "object",
+              "optional": false,
+              "nullable": false,
+              "properties": {
+                "completed": {
+                  "optional": false,
+                  "nullable": false,
+                  "ref": "QueueMetrics"
+                },
+                "failed": {
+                  "optional": false,
+                  "nullable": false,
+                  "ref": "QueueMetrics"
+                }
+              }
+            }
+          }
+        }
+      },
+      "openapi": {
+        "post": {
+          "operationId": "post___admin___queue___queues",
+          "summary": "admin/queue/queues",
+          "description": "No description provided.\n\n**Credential required**: *Yes* / **Permission**: *read:admin:queue*",
+          "externalDocs": {
+            "description": "Source code",
+            "url": "https://github.com/misskey-dev/misskey/blob/develop/packages/backend/src/server/api/endpoints/admin/queue/queues.ts"
+          },
+          "tags": [
+            "admin"
+          ],
+          "security": [
+            {
+              "bearerAuth": []
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "OK (with results)",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "name": {
+                          "type": "string",
+                          "enum": [
+                            "system",
+                            "endedPollNotification",
+                            "postScheduledNote",
+                            "deliver",
+                            "inbox",
+                            "db",
+                            "relationship",
+                            "objectStorage",
+                            "userWebhookDeliver",
+                            "systemWebhookDeliver"
+                          ]
+                        },
+                        "counts": {
+                          "type": "object",
+                          "additionalProperties": {
+                            "type": "number"
+                          }
+                        },
+                        "isPaused": {
+                          "type": "boolean"
+                        },
+                        "metrics": {
+                          "type": "object",
+                          "properties": {
+                            "completed": {
+                              "$ref": "#/components/schemas/QueueMetrics"
+                            },
+                            "failed": {
+                              "$ref": "#/components/schemas/QueueMetrics"
+                            }
+                          },
+                          "required": [
+                            "completed",
+                            "failed"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "name",
+                        "counts",
+                        "isPaused",
+                        "metrics"
+                      ]
+                    }
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Client error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "INVALID_PARAM": {
+                      "value": {
+                        "error": {
+                          "message": "Invalid param.",
+                          "code": "INVALID_PARAM",
+                          "id": "3d81ceae-475f-4600-b2a8-2bc116157532"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "401": {
+              "description": "Authentication error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "CREDENTIAL_REQUIRED": {
+                      "value": {
+                        "error": {
+                          "message": "Credential required.",
+                          "code": "CREDENTIAL_REQUIRED",
+                          "id": "1384574d-a912-4b81-8601-c7b1c4085df1"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "403": {
+              "description": "Forbidden error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "AUTHENTICATION_FAILED": {
+                      "value": {
+                        "error": {
+                          "message": "Authentication failed. Please ensure your token is correct.",
+                          "code": "AUTHENTICATION_FAILED",
+                          "id": "b0a7f5f8-dc2f-4171-b91f-de88ad238e14"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "418": {
+              "description": "I'm Ai",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "I_AM_AI": {
+                      "value": {
+                        "error": {
+                          "message": "You sent a request to Ai-chan, Misskey's showgirl, instead of the server.",
+                          "code": "I_AM_AI",
+                          "id": "60c46cd1-f23a-46b1-bebe-5d2b73951a84"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "500": {
+              "description": "Internal server error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "INTERNAL_ERROR": {
+                      "value": {
+                        "error": {
+                          "message": "Internal error occurred. Please contact us if the error persists.",
+                          "code": "INTERNAL_ERROR",
+                          "id": "5d37dbcb-891e-41ca-a3d6-e690c97775ac"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "route": "admin/queue/queue-stats",
+      "source": "packages/features/operations/backend/endpoints/admin/queue/queue-stats.ts",
+      "originalSourceSha256": "77cb4feb432b9972899bc89bd5ba008f94b77adcabca4bcc6ee239f9c5691f9f",
+      "input": {
+        "type": "object",
+        "properties": {
+          "queue": {
+            "type": "string",
+            "enum": [
+              "system",
+              "endedPollNotification",
+              "postScheduledNote",
+              "deliver",
+              "inbox",
+              "db",
+              "relationship",
+              "objectStorage",
+              "userWebhookDeliver",
+              "systemWebhookDeliver"
+            ]
+          }
+        },
+        "required": [
+          "queue"
+        ]
+      },
+      "meta": {
+        "tags": [
+          "admin"
+        ],
+        "requireCredential": true,
+        "requireModerator": true,
+        "kind": "read:admin:queue",
+        "res": {
+          "type": "object",
+          "optional": false,
+          "nullable": false,
+          "properties": {
+            "name": {
+              "type": "string",
+              "optional": false,
+              "nullable": false,
+              "enum": [
+                "system",
+                "endedPollNotification",
+                "postScheduledNote",
+                "deliver",
+                "inbox",
+                "db",
+                "relationship",
+                "objectStorage",
+                "userWebhookDeliver",
+                "systemWebhookDeliver"
+              ]
+            },
+            "qualifiedName": {
+              "type": "string",
+              "optional": false,
+              "nullable": false
+            },
+            "counts": {
+              "type": "object",
+              "optional": false,
+              "nullable": false,
+              "additionalProperties": {
+                "type": "number"
+              }
+            },
+            "isPaused": {
+              "type": "boolean",
+              "optional": false,
+              "nullable": false
+            },
+            "metrics": {
+              "type": "object",
+              "optional": false,
+              "nullable": false,
+              "properties": {
+                "completed": {
+                  "optional": false,
+                  "nullable": false,
+                  "ref": "QueueMetrics"
+                },
+                "failed": {
+                  "optional": false,
+                  "nullable": false,
+                  "ref": "QueueMetrics"
+                }
+              }
+            },
+            "db": {
+              "type": "object",
+              "optional": false,
+              "nullable": false,
+              "properties": {
+                "version": {
+                  "type": "string",
+                  "optional": false,
+                  "nullable": false
+                },
+                "mode": {
+                  "type": "string",
+                  "optional": false,
+                  "nullable": false,
+                  "enum": [
+                    "cluster",
+                    "standalone",
+                    "sentinel"
+                  ]
+                },
+                "runId": {
+                  "type": "string",
+                  "optional": false,
+                  "nullable": false
+                },
+                "processId": {
+                  "type": "string",
+                  "optional": false,
+                  "nullable": false
+                },
+                "port": {
+                  "type": "number",
+                  "optional": false,
+                  "nullable": false
+                },
+                "os": {
+                  "type": "string",
+                  "optional": false,
+                  "nullable": false
+                },
+                "uptime": {
+                  "type": "number",
+                  "optional": false,
+                  "nullable": false
+                },
+                "memory": {
+                  "type": "object",
+                  "optional": false,
+                  "nullable": false,
+                  "properties": {
+                    "total": {
+                      "type": "number",
+                      "optional": false,
+                      "nullable": false
+                    },
+                    "used": {
+                      "type": "number",
+                      "optional": false,
+                      "nullable": false
+                    },
+                    "fragmentationRatio": {
+                      "type": "number",
+                      "optional": false,
+                      "nullable": false
+                    },
+                    "peak": {
+                      "type": "number",
+                      "optional": false,
+                      "nullable": false
+                    }
+                  }
+                },
+                "clients": {
+                  "type": "object",
+                  "optional": false,
+                  "nullable": false,
+                  "properties": {
+                    "blocked": {
+                      "type": "number",
+                      "optional": false,
+                      "nullable": false
+                    },
+                    "connected": {
+                      "type": "number",
+                      "optional": false,
+                      "nullable": false
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "output": {
+        "type": "object",
+        "optional": false,
+        "nullable": false,
+        "properties": {
+          "name": {
+            "type": "string",
+            "optional": false,
+            "nullable": false,
+            "enum": [
+              "system",
+              "endedPollNotification",
+              "postScheduledNote",
+              "deliver",
+              "inbox",
+              "db",
+              "relationship",
+              "objectStorage",
+              "userWebhookDeliver",
+              "systemWebhookDeliver"
+            ]
+          },
+          "qualifiedName": {
+            "type": "string",
+            "optional": false,
+            "nullable": false
+          },
+          "counts": {
+            "type": "object",
+            "optional": false,
+            "nullable": false,
+            "additionalProperties": {
+              "type": "number"
+            }
+          },
+          "isPaused": {
+            "type": "boolean",
+            "optional": false,
+            "nullable": false
+          },
+          "metrics": {
+            "type": "object",
+            "optional": false,
+            "nullable": false,
+            "properties": {
+              "completed": {
+                "optional": false,
+                "nullable": false,
+                "ref": "QueueMetrics"
+              },
+              "failed": {
+                "optional": false,
+                "nullable": false,
+                "ref": "QueueMetrics"
+              }
+            }
+          },
+          "db": {
+            "type": "object",
+            "optional": false,
+            "nullable": false,
+            "properties": {
+              "version": {
+                "type": "string",
+                "optional": false,
+                "nullable": false
+              },
+              "mode": {
+                "type": "string",
+                "optional": false,
+                "nullable": false,
+                "enum": [
+                  "cluster",
+                  "standalone",
+                  "sentinel"
+                ]
+              },
+              "runId": {
+                "type": "string",
+                "optional": false,
+                "nullable": false
+              },
+              "processId": {
+                "type": "string",
+                "optional": false,
+                "nullable": false
+              },
+              "port": {
+                "type": "number",
+                "optional": false,
+                "nullable": false
+              },
+              "os": {
+                "type": "string",
+                "optional": false,
+                "nullable": false
+              },
+              "uptime": {
+                "type": "number",
+                "optional": false,
+                "nullable": false
+              },
+              "memory": {
+                "type": "object",
+                "optional": false,
+                "nullable": false,
+                "properties": {
+                  "total": {
+                    "type": "number",
+                    "optional": false,
+                    "nullable": false
+                  },
+                  "used": {
+                    "type": "number",
+                    "optional": false,
+                    "nullable": false
+                  },
+                  "fragmentationRatio": {
+                    "type": "number",
+                    "optional": false,
+                    "nullable": false
+                  },
+                  "peak": {
+                    "type": "number",
+                    "optional": false,
+                    "nullable": false
+                  }
+                }
+              },
+              "clients": {
+                "type": "object",
+                "optional": false,
+                "nullable": false,
+                "properties": {
+                  "blocked": {
+                    "type": "number",
+                    "optional": false,
+                    "nullable": false
+                  },
+                  "connected": {
+                    "type": "number",
+                    "optional": false,
+                    "nullable": false
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "openapi": {
+        "post": {
+          "operationId": "post___admin___queue___queue-stats",
+          "summary": "admin/queue/queue-stats",
+          "description": "No description provided.\n\n**Credential required**: *Yes* / **Permission**: *read:admin:queue*",
+          "externalDocs": {
+            "description": "Source code",
+            "url": "https://github.com/misskey-dev/misskey/blob/develop/packages/backend/src/server/api/endpoints/admin/queue/queue-stats.ts"
+          },
+          "tags": [
+            "admin"
+          ],
+          "security": [
+            {
+              "bearerAuth": []
+            }
+          ],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "queue": {
+                      "type": "string",
+                      "enum": [
+                        "system",
+                        "endedPollNotification",
+                        "postScheduledNote",
+                        "deliver",
+                        "inbox",
+                        "db",
+                        "relationship",
+                        "objectStorage",
+                        "userWebhookDeliver",
+                        "systemWebhookDeliver"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "queue"
+                  ]
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "OK (with results)",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "enum": [
+                          "system",
+                          "endedPollNotification",
+                          "postScheduledNote",
+                          "deliver",
+                          "inbox",
+                          "db",
+                          "relationship",
+                          "objectStorage",
+                          "userWebhookDeliver",
+                          "systemWebhookDeliver"
+                        ]
+                      },
+                      "qualifiedName": {
+                        "type": "string"
+                      },
+                      "counts": {
+                        "type": "object",
+                        "additionalProperties": {
+                          "type": "number"
+                        }
+                      },
+                      "isPaused": {
+                        "type": "boolean"
+                      },
+                      "metrics": {
+                        "type": "object",
+                        "properties": {
+                          "completed": {
+                            "$ref": "#/components/schemas/QueueMetrics"
+                          },
+                          "failed": {
+                            "$ref": "#/components/schemas/QueueMetrics"
+                          }
+                        },
+                        "required": [
+                          "completed",
+                          "failed"
+                        ]
+                      },
+                      "db": {
+                        "type": "object",
+                        "properties": {
+                          "version": {
+                            "type": "string"
+                          },
+                          "mode": {
+                            "type": "string",
+                            "enum": [
+                              "cluster",
+                              "standalone",
+                              "sentinel"
+                            ]
+                          },
+                          "runId": {
+                            "type": "string"
+                          },
+                          "processId": {
+                            "type": "string"
+                          },
+                          "port": {
+                            "type": "number"
+                          },
+                          "os": {
+                            "type": "string"
+                          },
+                          "uptime": {
+                            "type": "number"
+                          },
+                          "memory": {
+                            "type": "object",
+                            "properties": {
+                              "total": {
+                                "type": "number"
+                              },
+                              "used": {
+                                "type": "number"
+                              },
+                              "fragmentationRatio": {
+                                "type": "number"
+                              },
+                              "peak": {
+                                "type": "number"
+                              }
+                            },
+                            "required": [
+                              "total",
+                              "used",
+                              "fragmentationRatio",
+                              "peak"
+                            ]
+                          },
+                          "clients": {
+                            "type": "object",
+                            "properties": {
+                              "blocked": {
+                                "type": "number"
+                              },
+                              "connected": {
+                                "type": "number"
+                              }
+                            },
+                            "required": [
+                              "blocked",
+                              "connected"
+                            ]
+                          }
+                        },
+                        "required": [
+                          "version",
+                          "mode",
+                          "runId",
+                          "processId",
+                          "port",
+                          "os",
+                          "uptime",
+                          "memory",
+                          "clients"
+                        ]
+                      }
+                    },
+                    "required": [
+                      "name",
+                      "qualifiedName",
+                      "counts",
+                      "isPaused",
+                      "metrics",
+                      "db"
+                    ]
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Client error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "INVALID_PARAM": {
+                      "value": {
+                        "error": {
+                          "message": "Invalid param.",
+                          "code": "INVALID_PARAM",
+                          "id": "3d81ceae-475f-4600-b2a8-2bc116157532"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "401": {
+              "description": "Authentication error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "CREDENTIAL_REQUIRED": {
+                      "value": {
+                        "error": {
+                          "message": "Credential required.",
+                          "code": "CREDENTIAL_REQUIRED",
+                          "id": "1384574d-a912-4b81-8601-c7b1c4085df1"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "403": {
+              "description": "Forbidden error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "AUTHENTICATION_FAILED": {
+                      "value": {
+                        "error": {
+                          "message": "Authentication failed. Please ensure your token is correct.",
+                          "code": "AUTHENTICATION_FAILED",
+                          "id": "b0a7f5f8-dc2f-4171-b91f-de88ad238e14"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "418": {
+              "description": "I'm Ai",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "I_AM_AI": {
+                      "value": {
+                        "error": {
+                          "message": "You sent a request to Ai-chan, Misskey's showgirl, instead of the server.",
+                          "code": "I_AM_AI",
+                          "id": "60c46cd1-f23a-46b1-bebe-5d2b73951a84"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "500": {
+              "description": "Internal server error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "INTERNAL_ERROR": {
+                      "value": {
+                        "error": {
+                          "message": "Internal error occurred. Please contact us if the error persists.",
+                          "code": "INTERNAL_ERROR",
+                          "id": "5d37dbcb-891e-41ca-a3d6-e690c97775ac"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "route": "admin/roles/users",
+      "source": "packages/features/roles/backend/endpoints/admin/roles/users.ts",
+      "originalSourceSha256": "b8695e7b313a641f84d427358d7e1292be46afbcb92421fb442fb4051b1e6a22",
+      "input": {
+        "type": "object",
+        "properties": {
+          "roleId": {
+            "type": "string",
+            "format": "misskey:id"
+          },
+          "sinceId": {
+            "type": "string",
+            "format": "misskey:id"
+          },
+          "untilId": {
+            "type": "string",
+            "format": "misskey:id"
+          },
+          "sinceDate": {
+            "type": "integer"
+          },
+          "untilDate": {
+            "type": "integer"
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100,
+            "default": 10
+          }
+        },
+        "required": [
+          "roleId"
+        ]
+      },
+      "meta": {
+        "tags": [
+          "admin",
+          "role",
+          "users"
+        ],
+        "requireCredential": false,
+        "requireModerator": true,
+        "kind": "read:admin:roles",
+        "errors": {
+          "noSuchRole": {
+            "message": "No such role.",
+            "code": "NO_SUCH_ROLE",
+            "id": "224eff5e-2488-4b18-b3e7-f50d94421648"
+          }
+        },
+        "res": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "misskey:id"
+              },
+              "createdAt": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "user": {
+                "ref": "UserDetailed"
+              },
+              "expiresAt": {
+                "type": "string",
+                "format": "date-time",
+                "nullable": true
+              }
+            },
+            "required": [
+              "id",
+              "createdAt",
+              "user"
+            ]
+          }
+        }
+      },
+      "output": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "format": "misskey:id"
+            },
+            "createdAt": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "user": {
+              "ref": "UserDetailed"
+            },
+            "expiresAt": {
+              "type": "string",
+              "format": "date-time",
+              "nullable": true
+            }
+          },
+          "required": [
+            "id",
+            "createdAt",
+            "user"
+          ]
+        }
+      },
+      "openapi": {
+        "post": {
+          "operationId": "post___admin___roles___users",
+          "summary": "admin/roles/users",
+          "description": "No description provided.\n\n**Credential required**: *No* / **Permission**: *read:admin:roles*",
+          "externalDocs": {
+            "description": "Source code",
+            "url": "https://github.com/misskey-dev/misskey/blob/develop/packages/backend/src/server/api/endpoints/admin/roles/users.ts"
+          },
+          "tags": [
+            "admin"
+          ],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "roleId": {
+                      "type": "string",
+                      "format": "misskey:id"
+                    },
+                    "sinceId": {
+                      "type": "string",
+                      "format": "misskey:id"
+                    },
+                    "untilId": {
+                      "type": "string",
+                      "format": "misskey:id"
+                    },
+                    "sinceDate": {
+                      "type": "integer"
+                    },
+                    "untilDate": {
+                      "type": "integer"
+                    },
+                    "limit": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 100,
+                      "default": 10
+                    }
+                  },
+                  "required": [
+                    "roleId"
+                  ]
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "OK (with results)",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "format": "misskey:id"
+                        },
+                        "createdAt": {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        "user": {
+                          "$ref": "#/components/schemas/UserDetailed"
+                        },
+                        "expiresAt": {
+                          "type": [
+                            "string",
+                            "null"
+                          ],
+                          "format": "date-time"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "createdAt",
+                        "user",
+                        "expiresAt"
+                      ]
+                    }
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Client error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "NO_SUCH_ROLE": {
+                      "value": {
+                        "error": {
+                          "message": "No such role.",
+                          "code": "NO_SUCH_ROLE",
+                          "id": "224eff5e-2488-4b18-b3e7-f50d94421648"
+                        }
+                      }
+                    },
+                    "INVALID_PARAM": {
+                      "value": {
+                        "error": {
+                          "message": "Invalid param.",
+                          "code": "INVALID_PARAM",
+                          "id": "3d81ceae-475f-4600-b2a8-2bc116157532"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "401": {
+              "description": "Authentication error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "CREDENTIAL_REQUIRED": {
+                      "value": {
+                        "error": {
+                          "message": "Credential required.",
+                          "code": "CREDENTIAL_REQUIRED",
+                          "id": "1384574d-a912-4b81-8601-c7b1c4085df1"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "403": {
+              "description": "Forbidden error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "AUTHENTICATION_FAILED": {
+                      "value": {
+                        "error": {
+                          "message": "Authentication failed. Please ensure your token is correct.",
+                          "code": "AUTHENTICATION_FAILED",
+                          "id": "b0a7f5f8-dc2f-4171-b91f-de88ad238e14"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "418": {
+              "description": "I'm Ai",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "I_AM_AI": {
+                      "value": {
+                        "error": {
+                          "message": "You sent a request to Ai-chan, Misskey's showgirl, instead of the server.",
+                          "code": "I_AM_AI",
+                          "id": "60c46cd1-f23a-46b1-bebe-5d2b73951a84"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "500": {
+              "description": "Internal server error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "INTERNAL_ERROR": {
+                      "value": {
+                        "error": {
+                          "message": "Internal error occurred. Please contact us if the error persists.",
+                          "code": "INTERNAL_ERROR",
+                          "id": "5d37dbcb-891e-41ca-a3d6-e690c97775ac"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "route": "reversi/games",
+      "source": "packages/features/games/backend/endpoints/reversi/games.ts",
+      "originalSourceSha256": "8677fa1b7d9f71ee71386502f703eb3ff922380881753b7b69d5fb30ecb09f02",
+      "input": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100,
+            "default": 10
+          },
+          "sinceId": {
+            "type": "string",
+            "format": "misskey:id"
+          },
+          "untilId": {
+            "type": "string",
+            "format": "misskey:id"
+          },
+          "sinceDate": {
+            "type": "integer"
+          },
+          "untilDate": {
+            "type": "integer"
+          },
+          "my": {
+            "type": "boolean",
+            "default": false
+          }
+        },
+        "required": []
+      },
+      "meta": {
+        "requireCredential": false,
+        "res": {
+          "type": "array",
+          "optional": false,
+          "nullable": false,
+          "items": {
+            "ref": "ReversiGameLite"
+          }
+        }
+      },
+      "output": {
+        "type": "array",
+        "optional": false,
+        "nullable": false,
+        "items": {
+          "ref": "ReversiGameLite"
+        }
+      },
+      "openapi": {
+        "post": {
+          "operationId": "post___reversi___games",
+          "summary": "reversi/games",
+          "description": "No description provided.\n\n**Credential required**: *No*",
+          "externalDocs": {
+            "description": "Source code",
+            "url": "https://github.com/misskey-dev/misskey/blob/develop/packages/backend/src/server/api/endpoints/reversi/games.ts"
+          },
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "limit": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 100,
+                      "default": 10
+                    },
+                    "sinceId": {
+                      "type": "string",
+                      "format": "misskey:id"
+                    },
+                    "untilId": {
+                      "type": "string",
+                      "format": "misskey:id"
+                    },
+                    "sinceDate": {
+                      "type": "integer"
+                    },
+                    "untilDate": {
+                      "type": "integer"
+                    },
+                    "my": {
+                      "type": "boolean",
+                      "default": false
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "OK (with results)",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/ReversiGameLite"
+                    }
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Client error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "INVALID_PARAM": {
+                      "value": {
+                        "error": {
+                          "message": "Invalid param.",
+                          "code": "INVALID_PARAM",
+                          "id": "3d81ceae-475f-4600-b2a8-2bc116157532"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "401": {
+              "description": "Authentication error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "CREDENTIAL_REQUIRED": {
+                      "value": {
+                        "error": {
+                          "message": "Credential required.",
+                          "code": "CREDENTIAL_REQUIRED",
+                          "id": "1384574d-a912-4b81-8601-c7b1c4085df1"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "403": {
+              "description": "Forbidden error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "AUTHENTICATION_FAILED": {
+                      "value": {
+                        "error": {
+                          "message": "Authentication failed. Please ensure your token is correct.",
+                          "code": "AUTHENTICATION_FAILED",
+                          "id": "b0a7f5f8-dc2f-4171-b91f-de88ad238e14"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "418": {
+              "description": "I'm Ai",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "I_AM_AI": {
+                      "value": {
+                        "error": {
+                          "message": "You sent a request to Ai-chan, Misskey's showgirl, instead of the server.",
+                          "code": "I_AM_AI",
+                          "id": "60c46cd1-f23a-46b1-bebe-5d2b73951a84"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "500": {
+              "description": "Internal server error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "INTERNAL_ERROR": {
+                      "value": {
+                        "error": {
+                          "message": "Internal error occurred. Please contact us if the error persists.",
+                          "code": "INTERNAL_ERROR",
+                          "id": "5d37dbcb-891e-41ca-a3d6-e690c97775ac"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "route": "users/achievements",
+      "source": "packages/features/users/backend/endpoints/users/achievements.ts",
+      "originalSourceSha256": "f2baed083427ea73d1402c6b3d322909edca21941f679da6b30e60cd23e13bda",
+      "input": {
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "string",
+            "format": "misskey:id"
+          }
+        },
+        "required": [
+          "userId"
+        ]
+      },
+      "meta": {
+        "requireCredential": false,
+        "res": {
+          "type": "array",
+          "items": {
+            "ref": "Achievement"
+          }
+        }
+      },
+      "output": {
+        "type": "array",
+        "items": {
+          "ref": "Achievement"
+        }
+      },
+      "openapi": {
+        "post": {
+          "operationId": "post___users___achievements",
+          "summary": "users/achievements",
+          "description": "No description provided.\n\n**Credential required**: *No*",
+          "externalDocs": {
+            "description": "Source code",
+            "url": "https://github.com/misskey-dev/misskey/blob/develop/packages/backend/src/server/api/endpoints/users/achievements.ts"
+          },
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "userId": {
+                      "type": "string",
+                      "format": "misskey:id"
+                    }
+                  },
+                  "required": [
+                    "userId"
+                  ]
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "OK (with results)",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/Achievement"
+                    }
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Client error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "INVALID_PARAM": {
+                      "value": {
+                        "error": {
+                          "message": "Invalid param.",
+                          "code": "INVALID_PARAM",
+                          "id": "3d81ceae-475f-4600-b2a8-2bc116157532"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "401": {
+              "description": "Authentication error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "CREDENTIAL_REQUIRED": {
+                      "value": {
+                        "error": {
+                          "message": "Credential required.",
+                          "code": "CREDENTIAL_REQUIRED",
+                          "id": "1384574d-a912-4b81-8601-c7b1c4085df1"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "403": {
+              "description": "Forbidden error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "AUTHENTICATION_FAILED": {
+                      "value": {
+                        "error": {
+                          "message": "Authentication failed. Please ensure your token is correct.",
+                          "code": "AUTHENTICATION_FAILED",
+                          "id": "b0a7f5f8-dc2f-4171-b91f-de88ad238e14"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "418": {
+              "description": "I'm Ai",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "I_AM_AI": {
+                      "value": {
+                        "error": {
+                          "message": "You sent a request to Ai-chan, Misskey's showgirl, instead of the server.",
+                          "code": "I_AM_AI",
+                          "id": "60c46cd1-f23a-46b1-bebe-5d2b73951a84"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "500": {
+              "description": "Internal server error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "INTERNAL_ERROR": {
+                      "value": {
+                        "error": {
+                          "message": "Internal error occurred. Please contact us if the error persists.",
+                          "code": "INTERNAL_ERROR",
+                          "id": "5d37dbcb-891e-41ca-a3d6-e690c97775ac"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

@@ -3,10 +3,13 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { portableAdminCaptchaSaveDefinition, portableAdminCaptchaSaveInput, portableAdminCaptchaSaveOutput } from '../../../../contract/portable-constant-endpoint-definitions.js';
 import { Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
-import { captchaErrorCodes, CaptchaService, supportedCaptchaProviders } from '../../../services/CaptchaService.js';
+import { captchaErrorCodes, CaptchaService } from '../../../services/CaptchaService.js';
 import { ApiError } from '@/server/api/error.js';
+
+const contractProjection = projectEndpointContract(portableAdminCaptchaSaveDefinition);
 
 export const meta = {
 	tags: ['admin', 'captcha'],
@@ -57,35 +60,14 @@ export const meta = {
 	},
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {
-		provider: {
-			type: 'string',
-			enum: supportedCaptchaProviders,
-		},
-		captchaResult: {
-			type: 'string', nullable: true,
-		},
-		sitekey: {
-			type: 'string', nullable: true,
-		},
-		secret: {
-			type: 'string', nullable: true,
-		},
-		instanceUrl: {
-			type: 'string', nullable: true,
-		},
-	},
-	required: ['provider'],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof portableAdminCaptchaSaveInput, typeof portableAdminCaptchaSaveOutput> {
 	constructor(
 		private captchaService: CaptchaService,
 	) {
-		super(meta, paramDef, async (ps) => {
+		super(meta, contractProjection, async (ps) => {
 			const result = await this.captchaService.save(ps.provider, {
 				sitekey: ps.sitekey,
 				secret: ps.secret,

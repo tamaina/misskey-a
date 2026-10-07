@@ -3,17 +3,19 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { compositionAdminAccountsCreateDefinition, compositionAdminAccountsCreateInput, compositionAdminAccountsCreateOutput } from '../../../../contract/output-composition-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
 import type { MiMeta, UsersRepository } from '@/models/_.js';
 import { SignupService } from '../../../services/SignupService.js';
 import { RoleService } from '../../../../../roles/backend/services/RoleService.js';
 import { UserEntityService } from '../../../../../users/backend/serializers/UserEntityService.js';
-import { localUsernameSchema, passwordSchema } from '../../../../../users/backend/models/User.js';
 import { DI } from '@/di-symbols.js';
 import type { Config } from '@/config.js';
 import { ApiError } from '@/server/api/error.js';
 import { Packed } from '../../../../../index/contract/packed.js';
+
+const contractProjection = projectEndpointContract(compositionAdminAccountsCreateDefinition);
 
 export const meta = {
 	tags: ['admin'],
@@ -32,40 +34,13 @@ export const meta = {
 		},
 	},
 
-	res: {
-		type: 'object',
-		optional: false, nullable: false,
-		allOf: [
-			{
-				type: 'object',
-				ref: 'MeDetailed',
-			},
-			{
-				type: 'object',
-				optional: false, nullable: false,
-				properties: {
-					token: {
-						type: 'string',
-						optional: false, nullable: false,
-					},
-				},
-			}
-		],
-	},
+	res: contractProjection.response,
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {
-		username: localUsernameSchema,
-		password: passwordSchema,
-		setupPassword: { type: 'string', nullable: true },
-	},
-	required: ['username', 'password'],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof compositionAdminAccountsCreateInput, typeof compositionAdminAccountsCreateOutput> {
 	constructor(
 		@Inject(DI.config)
 		private config: Config,
@@ -80,7 +55,7 @@ export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDe
 		private signupService: SignupService,
 		private roleService: RoleService,
 	) {
-		super(meta, paramDef, async (ps, _me, token) => {
+		super(meta, contractProjection, async (ps, _me, token) => {
 			const me = _me ? await this.usersRepository.findOneByOrFail({ id: _me.id }) : null;
 
 			if (this.serverSettings.rootUserId == null && me == null && token == null) {

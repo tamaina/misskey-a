@@ -3,45 +3,24 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { defineServices, service } from '../../index/backend/service-definitions.js';
+import { ports } from '../../index/backend/service-ports.js';
 import { BlockingEntityService } from './serializers/BlockingEntityService.js';
 import { FollowRequestEntityService } from './serializers/FollowRequestEntityService.js';
 import { FollowingEntityService } from './serializers/FollowingEntityService.js';
 import { MutingEntityService } from './serializers/MutingEntityService.js';
 import { RenoteMutingEntityService } from './serializers/RenoteMutingEntityService.js';
 import { UserListEntityService } from './serializers/UserListEntityService.js';
-import type { BlockingsRepository, FollowRequestsRepository, FollowingsRepository, MutingsRepository, RenoteMutingsRepository, UserListMembershipsRepository, UserListsRepository } from '@/models/_.js';
-import type { UserEntityService } from '../../users/backend/serializers/UserEntityService.js';
-import type { IdService } from '../../runtime/backend/services/IdService.js';
+import type { Inputs, Outputs } from '../../index/backend/service-definitions.js';
 
-export interface RelationshipServicesDependencies {
-	blockingsRepository: BlockingsRepository;
-	userEntityService: Pick<UserEntityService, 'pack' | 'packMany'>;
-	idService: Pick<IdService, 'parse'>;
-	followRequestsRepository: FollowRequestsRepository;
-	followingsRepository: FollowingsRepository;
-	mutingsRepository: MutingsRepository;
-	renoteMutingsRepository: RenoteMutingsRepository;
-	userListsRepository: UserListsRepository;
-	userListMembershipsRepository: UserListMembershipsRepository;
-}
-
-/** Compose this feature without starting resources or resolving a container. */
-export function createRelationshipServices(deps: RelationshipServicesDependencies) {
-	const blockingEntityService = new BlockingEntityService(deps.blockingsRepository, deps.userEntityService, deps.idService);
-	const followRequestEntityService = new FollowRequestEntityService(deps.followRequestsRepository, deps.userEntityService);
-	const followingEntityService = new FollowingEntityService(deps.followingsRepository, deps.userEntityService, deps.idService);
-	const mutingEntityService = new MutingEntityService(deps.mutingsRepository, deps.userEntityService, deps.idService);
-	const renoteMutingEntityService = new RenoteMutingEntityService(deps.renoteMutingsRepository, deps.userEntityService, deps.idService);
-	const userListEntityService = new UserListEntityService(deps.userListsRepository, deps.userListMembershipsRepository, deps.userEntityService, deps.idService);
-
-	return {
-		BlockingEntityService: blockingEntityService,
-		FollowRequestEntityService: followRequestEntityService,
-		FollowingEntityService: followingEntityService,
-		MutingEntityService: mutingEntityService,
-		RenoteMutingEntityService: renoteMutingEntityService,
-		UserListEntityService: userListEntityService,
-	};
-}
-
-export type RelationshipServices = ReturnType<typeof createRelationshipServices>;
+export const relationshipServices = defineServices({
+	BlockingEntityService: service(BlockingEntityService, [ports.blockingsRepository, ports.userEntityService, ports.idService]),
+	FollowRequestEntityService: service(FollowRequestEntityService, [ports.followRequestsRepository, ports.userEntityService]),
+	FollowingEntityService: service(FollowingEntityService, [ports.followingsRepository, ports.userEntityService, ports.idService]),
+	MutingEntityService: service(MutingEntityService, [ports.mutingsRepository, ports.userEntityService, ports.idService]),
+	RenoteMutingEntityService: service(RenoteMutingEntityService, [ports.renoteMutingsRepository, ports.userEntityService, ports.idService]),
+	UserListEntityService: service(UserListEntityService, [ports.userListsRepository, ports.userListMembershipsRepository, ports.userEntityService, ports.idService]),
+});
+export const createRelationshipServices = relationshipServices.create;
+export type RelationshipServicesDependencies = Inputs<typeof relationshipServices>;
+export type RelationshipServices = Outputs<typeof relationshipServices>;

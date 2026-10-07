@@ -1,0 +1,5412 @@
+{
+  "captureMethod": "Current original source AST before stage edits; exact previous published full OpenAPI paths",
+  "routes": [
+    {
+      "route": "admin/captcha/save",
+      "source": "packages/features/auth/backend/endpoints/admin/captcha/save.ts",
+      "originalSourceSha256": "c56a7633a9cc5b44e37ccf3e707eea219f8791a4c4477072d279db5d44e3a352",
+      "input": {
+        "type": "object",
+        "properties": {
+          "provider": {
+            "type": "string",
+            "enum": [
+              "none",
+              "hcaptcha",
+              "mcaptcha",
+              "recaptcha",
+              "turnstile",
+              "testcaptcha"
+            ]
+          },
+          "captchaResult": {
+            "type": "string",
+            "nullable": true
+          },
+          "sitekey": {
+            "type": "string",
+            "nullable": true
+          },
+          "secret": {
+            "type": "string",
+            "nullable": true
+          },
+          "instanceUrl": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "provider"
+        ]
+      },
+      "meta": {
+        "tags": [
+          "admin",
+          "captcha"
+        ],
+        "requireCredential": true,
+        "requireAdmin": true,
+        "kind": "write:admin:meta",
+        "errors": {
+          "invalidProvider": {
+            "message": "Invalid provider.",
+            "code": "INVALID_PROVIDER",
+            "id": "14bf7ae1-80cc-4363-acb2-4fd61d086af0",
+            "httpStatusCode": 400
+          },
+          "invalidParameters": {
+            "message": "Invalid parameters.",
+            "code": "INVALID_PARAMETERS",
+            "id": "26654194-410e-44e2-b42e-460ff6f92476",
+            "httpStatusCode": 400
+          },
+          "noResponseProvided": {
+            "message": "No response provided.",
+            "code": "NO_RESPONSE_PROVIDED",
+            "id": "40acbba8-0937-41fb-bb3f-474514d40afe",
+            "httpStatusCode": 400
+          },
+          "requestFailed": {
+            "message": "Request failed.",
+            "code": "REQUEST_FAILED",
+            "id": "0f4fe2f1-2c15-4d6e-b714-efbfcde231cd",
+            "httpStatusCode": 500
+          },
+          "verificationFailed": {
+            "message": "Verification failed.",
+            "code": "VERIFICATION_FAILED",
+            "id": "c41c067f-24f3-4150-84b2-b5a3ae8c2214",
+            "httpStatusCode": 400
+          },
+          "unknown": {
+            "message": "unknown",
+            "code": "UNKNOWN",
+            "id": "f868d509-e257-42a9-99c1-42614b031a97",
+            "httpStatusCode": 500
+          }
+        }
+      },
+      "output": null,
+      "openapi": {
+        "post": {
+          "operationId": "post___admin___captcha___save",
+          "summary": "admin/captcha/save",
+          "description": "No description provided.\n\n**Credential required**: *Yes* / **Permission**: *write:admin:meta*",
+          "externalDocs": {
+            "description": "Source code",
+            "url": "https://github.com/misskey-dev/misskey/blob/develop/packages/backend/src/server/api/endpoints/admin/captcha/save.ts"
+          },
+          "tags": [
+            "admin"
+          ],
+          "security": [
+            {
+              "bearerAuth": []
+            }
+          ],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "provider": {
+                      "type": "string",
+                      "enum": [
+                        "none",
+                        "hcaptcha",
+                        "mcaptcha",
+                        "recaptcha",
+                        "turnstile",
+                        "testcaptcha"
+                      ]
+                    },
+                    "captchaResult": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "sitekey": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "secret": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "instanceUrl": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "provider"
+                  ]
+                }
+              }
+            }
+          },
+          "responses": {
+            "204": {
+              "description": "OK (without any results)"
+            },
+            "400": {
+              "description": "Client error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "INVALID_PROVIDER": {
+                      "value": {
+                        "error": {
+                          "message": "Invalid provider.",
+                          "code": "INVALID_PROVIDER",
+                          "id": "14bf7ae1-80cc-4363-acb2-4fd61d086af0",
+                          "httpStatusCode": 400
+                        }
+                      }
+                    },
+                    "INVALID_PARAMETERS": {
+                      "value": {
+                        "error": {
+                          "message": "Invalid parameters.",
+                          "code": "INVALID_PARAMETERS",
+                          "id": "26654194-410e-44e2-b42e-460ff6f92476",
+                          "httpStatusCode": 400
+                        }
+                      }
+                    },
+                    "NO_RESPONSE_PROVIDED": {
+                      "value": {
+                        "error": {
+                          "message": "No response provided.",
+                          "code": "NO_RESPONSE_PROVIDED",
+                          "id": "40acbba8-0937-41fb-bb3f-474514d40afe",
+                          "httpStatusCode": 400
+                        }
+                      }
+                    },
+                    "REQUEST_FAILED": {
+                      "value": {
+                        "error": {
+                          "message": "Request failed.",
+                          "code": "REQUEST_FAILED",
+                          "id": "0f4fe2f1-2c15-4d6e-b714-efbfcde231cd",
+                          "httpStatusCode": 500
+                        }
+                      }
+                    },
+                    "VERIFICATION_FAILED": {
+                      "value": {
+                        "error": {
+                          "message": "Verification failed.",
+                          "code": "VERIFICATION_FAILED",
+                          "id": "c41c067f-24f3-4150-84b2-b5a3ae8c2214",
+                          "httpStatusCode": 400
+                        }
+                      }
+                    },
+                    "UNKNOWN": {
+                      "value": {
+                        "error": {
+                          "message": "unknown",
+                          "code": "UNKNOWN",
+                          "id": "f868d509-e257-42a9-99c1-42614b031a97",
+                          "httpStatusCode": 500
+                        }
+                      }
+                    },
+                    "INVALID_PARAM": {
+                      "value": {
+                        "error": {
+                          "message": "Invalid param.",
+                          "code": "INVALID_PARAM",
+                          "id": "3d81ceae-475f-4600-b2a8-2bc116157532"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "401": {
+              "description": "Authentication error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "CREDENTIAL_REQUIRED": {
+                      "value": {
+                        "error": {
+                          "message": "Credential required.",
+                          "code": "CREDENTIAL_REQUIRED",
+                          "id": "1384574d-a912-4b81-8601-c7b1c4085df1"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "403": {
+              "description": "Forbidden error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "AUTHENTICATION_FAILED": {
+                      "value": {
+                        "error": {
+                          "message": "Authentication failed. Please ensure your token is correct.",
+                          "code": "AUTHENTICATION_FAILED",
+                          "id": "b0a7f5f8-dc2f-4171-b91f-de88ad238e14"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "418": {
+              "description": "I'm Ai",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "I_AM_AI": {
+                      "value": {
+                        "error": {
+                          "message": "You sent a request to Ai-chan, Misskey's showgirl, instead of the server.",
+                          "code": "I_AM_AI",
+                          "id": "60c46cd1-f23a-46b1-bebe-5d2b73951a84"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "500": {
+              "description": "Internal server error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "INTERNAL_ERROR": {
+                      "value": {
+                        "error": {
+                          "message": "Internal error occurred. Please contact us if the error persists.",
+                          "code": "INTERNAL_ERROR",
+                          "id": "5d37dbcb-891e-41ca-a3d6-e690c97775ac"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "route": "admin/system-webhook/create",
+      "source": "packages/features/integrations/backend/endpoints/admin/system-webhook/create.ts",
+      "originalSourceSha256": "f937fe6fcbaf97dd895cbde4247854a8022bb733c053ece987dfd48a147f8789",
+      "input": {
+        "type": "object",
+        "properties": {
+          "isActive": {
+            "type": "boolean"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255
+          },
+          "on": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "abuseReport",
+                "abuseReportResolved",
+                "userCreated",
+                "inactiveModeratorsWarning",
+                "inactiveModeratorsInvitationOnlyChanged"
+              ]
+            }
+          },
+          "url": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1024
+          },
+          "secret": {
+            "type": "string",
+            "maxLength": 1024,
+            "default": ""
+          }
+        },
+        "required": [
+          "isActive",
+          "name",
+          "on",
+          "url"
+        ]
+      },
+      "meta": {
+        "tags": [
+          "admin",
+          "system-webhook"
+        ],
+        "requireCredential": true,
+        "requireModerator": true,
+        "secure": true,
+        "kind": "write:admin:system-webhook",
+        "res": {
+          "type": "object",
+          "ref": "SystemWebhook"
+        }
+      },
+      "output": {
+        "type": "object",
+        "ref": "SystemWebhook"
+      },
+      "openapi": {
+        "post": {
+          "operationId": "post___admin___system-webhook___create",
+          "summary": "admin/system-webhook/create",
+          "description": "No description provided.\n\n**Internal Endpoint**: This endpoint is an API for the misskey mainframe and is not intended for use by third parties.\n**Credential required**: *Yes* / **Permission**: *write:admin:system-webhook*",
+          "externalDocs": {
+            "description": "Source code",
+            "url": "https://github.com/misskey-dev/misskey/blob/develop/packages/backend/src/server/api/endpoints/admin/system-webhook/create.ts"
+          },
+          "tags": [
+            "admin"
+          ],
+          "security": [
+            {
+              "bearerAuth": []
+            }
+          ],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "isActive": {
+                      "type": "boolean"
+                    },
+                    "name": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 255
+                    },
+                    "on": {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "enum": [
+                          "abuseReport",
+                          "abuseReportResolved",
+                          "userCreated",
+                          "inactiveModeratorsWarning",
+                          "inactiveModeratorsInvitationOnlyChanged"
+                        ]
+                      }
+                    },
+                    "url": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 1024
+                    },
+                    "secret": {
+                      "type": "string",
+                      "maxLength": 1024,
+                      "default": ""
+                    }
+                  },
+                  "required": [
+                    "isActive",
+                    "name",
+                    "on",
+                    "url"
+                  ]
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "OK (with results)",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/SystemWebhook"
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Client error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "INVALID_PARAM": {
+                      "value": {
+                        "error": {
+                          "message": "Invalid param.",
+                          "code": "INVALID_PARAM",
+                          "id": "3d81ceae-475f-4600-b2a8-2bc116157532"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "401": {
+              "description": "Authentication error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "CREDENTIAL_REQUIRED": {
+                      "value": {
+                        "error": {
+                          "message": "Credential required.",
+                          "code": "CREDENTIAL_REQUIRED",
+                          "id": "1384574d-a912-4b81-8601-c7b1c4085df1"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "403": {
+              "description": "Forbidden error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "AUTHENTICATION_FAILED": {
+                      "value": {
+                        "error": {
+                          "message": "Authentication failed. Please ensure your token is correct.",
+                          "code": "AUTHENTICATION_FAILED",
+                          "id": "b0a7f5f8-dc2f-4171-b91f-de88ad238e14"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "418": {
+              "description": "I'm Ai",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "I_AM_AI": {
+                      "value": {
+                        "error": {
+                          "message": "You sent a request to Ai-chan, Misskey's showgirl, instead of the server.",
+                          "code": "I_AM_AI",
+                          "id": "60c46cd1-f23a-46b1-bebe-5d2b73951a84"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "500": {
+              "description": "Internal server error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "INTERNAL_ERROR": {
+                      "value": {
+                        "error": {
+                          "message": "Internal error occurred. Please contact us if the error persists.",
+                          "code": "INTERNAL_ERROR",
+                          "id": "5d37dbcb-891e-41ca-a3d6-e690c97775ac"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "route": "admin/system-webhook/list",
+      "source": "packages/features/integrations/backend/endpoints/admin/system-webhook/list.ts",
+      "originalSourceSha256": "9893c897690d4fa5d29d1bba3f0eb3ff7853fe28c68deba495c2b264491e8742",
+      "input": {
+        "type": "object",
+        "properties": {
+          "isActive": {
+            "type": "boolean"
+          },
+          "on": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "abuseReport",
+                "abuseReportResolved",
+                "userCreated",
+                "inactiveModeratorsWarning",
+                "inactiveModeratorsInvitationOnlyChanged"
+              ]
+            }
+          }
+        },
+        "required": []
+      },
+      "meta": {
+        "tags": [
+          "admin",
+          "system-webhook"
+        ],
+        "requireCredential": true,
+        "requireModerator": true,
+        "secure": true,
+        "kind": "write:admin:system-webhook",
+        "res": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "ref": "SystemWebhook"
+          }
+        }
+      },
+      "output": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "ref": "SystemWebhook"
+        }
+      },
+      "openapi": {
+        "post": {
+          "operationId": "post___admin___system-webhook___list",
+          "summary": "admin/system-webhook/list",
+          "description": "No description provided.\n\n**Internal Endpoint**: This endpoint is an API for the misskey mainframe and is not intended for use by third parties.\n**Credential required**: *Yes* / **Permission**: *write:admin:system-webhook*",
+          "externalDocs": {
+            "description": "Source code",
+            "url": "https://github.com/misskey-dev/misskey/blob/develop/packages/backend/src/server/api/endpoints/admin/system-webhook/list.ts"
+          },
+          "tags": [
+            "admin"
+          ],
+          "security": [
+            {
+              "bearerAuth": []
+            }
+          ],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "isActive": {
+                      "type": "boolean"
+                    },
+                    "on": {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "enum": [
+                          "abuseReport",
+                          "abuseReportResolved",
+                          "userCreated",
+                          "inactiveModeratorsWarning",
+                          "inactiveModeratorsInvitationOnlyChanged"
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "OK (with results)",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/SystemWebhook"
+                    }
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Client error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "INVALID_PARAM": {
+                      "value": {
+                        "error": {
+                          "message": "Invalid param.",
+                          "code": "INVALID_PARAM",
+                          "id": "3d81ceae-475f-4600-b2a8-2bc116157532"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "401": {
+              "description": "Authentication error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "CREDENTIAL_REQUIRED": {
+                      "value": {
+                        "error": {
+                          "message": "Credential required.",
+                          "code": "CREDENTIAL_REQUIRED",
+                          "id": "1384574d-a912-4b81-8601-c7b1c4085df1"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "403": {
+              "description": "Forbidden error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "AUTHENTICATION_FAILED": {
+                      "value": {
+                        "error": {
+                          "message": "Authentication failed. Please ensure your token is correct.",
+                          "code": "AUTHENTICATION_FAILED",
+                          "id": "b0a7f5f8-dc2f-4171-b91f-de88ad238e14"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "418": {
+              "description": "I'm Ai",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "I_AM_AI": {
+                      "value": {
+                        "error": {
+                          "message": "You sent a request to Ai-chan, Misskey's showgirl, instead of the server.",
+                          "code": "I_AM_AI",
+                          "id": "60c46cd1-f23a-46b1-bebe-5d2b73951a84"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "500": {
+              "description": "Internal server error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "INTERNAL_ERROR": {
+                      "value": {
+                        "error": {
+                          "message": "Internal error occurred. Please contact us if the error persists.",
+                          "code": "INTERNAL_ERROR",
+                          "id": "5d37dbcb-891e-41ca-a3d6-e690c97775ac"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "route": "admin/system-webhook/test",
+      "source": "packages/features/integrations/backend/endpoints/admin/system-webhook/test.ts",
+      "originalSourceSha256": "a139fc4bb5e622c3314d17b4d8eebf6b1d71c05582846bbb7e90c125d44c0ca3",
+      "input": {
+        "type": "object",
+        "properties": {
+          "webhookId": {
+            "type": "string",
+            "format": "misskey:id"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "abuseReport",
+              "abuseReportResolved",
+              "userCreated",
+              "inactiveModeratorsWarning",
+              "inactiveModeratorsInvitationOnlyChanged"
+            ]
+          },
+          "override": {
+            "type": "object",
+            "properties": {
+              "url": {
+                "type": "string",
+                "nullable": false
+              },
+              "secret": {
+                "type": "string",
+                "nullable": false
+              }
+            }
+          }
+        },
+        "required": [
+          "webhookId",
+          "type"
+        ]
+      },
+      "meta": {
+        "tags": [
+          "webhooks"
+        ],
+        "requireCredential": true,
+        "requireModerator": true,
+        "secure": true,
+        "kind": "read:admin:system-webhook",
+        "limit": {
+          "duration": 900000,
+          "max": 60
+        },
+        "errors": {
+          "noSuchWebhook": {
+            "message": "No such webhook.",
+            "code": "NO_SUCH_WEBHOOK",
+            "id": "0c52149c-e913-18f8-5dc7-74870bfe0cf9"
+          }
+        }
+      },
+      "output": null,
+      "openapi": {
+        "post": {
+          "operationId": "post___admin___system-webhook___test",
+          "summary": "admin/system-webhook/test",
+          "description": "No description provided.\n\n**Internal Endpoint**: This endpoint is an API for the misskey mainframe and is not intended for use by third parties.\n**Credential required**: *Yes* / **Permission**: *read:admin:system-webhook*",
+          "externalDocs": {
+            "description": "Source code",
+            "url": "https://github.com/misskey-dev/misskey/blob/develop/packages/backend/src/server/api/endpoints/admin/system-webhook/test.ts"
+          },
+          "tags": [
+            "webhooks"
+          ],
+          "security": [
+            {
+              "bearerAuth": []
+            }
+          ],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "webhookId": {
+                      "type": "string",
+                      "format": "misskey:id"
+                    },
+                    "type": {
+                      "type": "string",
+                      "enum": [
+                        "abuseReport",
+                        "abuseReportResolved",
+                        "userCreated",
+                        "inactiveModeratorsWarning",
+                        "inactiveModeratorsInvitationOnlyChanged"
+                      ]
+                    },
+                    "override": {
+                      "type": "object",
+                      "properties": {
+                        "url": {
+                          "type": "string"
+                        },
+                        "secret": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  },
+                  "required": [
+                    "webhookId",
+                    "type"
+                  ]
+                }
+              }
+            }
+          },
+          "responses": {
+            "204": {
+              "description": "OK (without any results)"
+            },
+            "400": {
+              "description": "Client error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "NO_SUCH_WEBHOOK": {
+                      "value": {
+                        "error": {
+                          "message": "No such webhook.",
+                          "code": "NO_SUCH_WEBHOOK",
+                          "id": "0c52149c-e913-18f8-5dc7-74870bfe0cf9"
+                        }
+                      }
+                    },
+                    "INVALID_PARAM": {
+                      "value": {
+                        "error": {
+                          "message": "Invalid param.",
+                          "code": "INVALID_PARAM",
+                          "id": "3d81ceae-475f-4600-b2a8-2bc116157532"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "401": {
+              "description": "Authentication error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "CREDENTIAL_REQUIRED": {
+                      "value": {
+                        "error": {
+                          "message": "Credential required.",
+                          "code": "CREDENTIAL_REQUIRED",
+                          "id": "1384574d-a912-4b81-8601-c7b1c4085df1"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "403": {
+              "description": "Forbidden error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "AUTHENTICATION_FAILED": {
+                      "value": {
+                        "error": {
+                          "message": "Authentication failed. Please ensure your token is correct.",
+                          "code": "AUTHENTICATION_FAILED",
+                          "id": "b0a7f5f8-dc2f-4171-b91f-de88ad238e14"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "418": {
+              "description": "I'm Ai",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "I_AM_AI": {
+                      "value": {
+                        "error": {
+                          "message": "You sent a request to Ai-chan, Misskey's showgirl, instead of the server.",
+                          "code": "I_AM_AI",
+                          "id": "60c46cd1-f23a-46b1-bebe-5d2b73951a84"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "429": {
+              "description": "Too many requests",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "RATE_LIMIT_EXCEEDED": {
+                      "value": {
+                        "error": {
+                          "message": "Rate limit exceeded. Please try again later.",
+                          "code": "RATE_LIMIT_EXCEEDED",
+                          "id": "d5826d14-3982-4d2e-8011-b9e9f02499ef"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "500": {
+              "description": "Internal server error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "INTERNAL_ERROR": {
+                      "value": {
+                        "error": {
+                          "message": "Internal error occurred. Please contact us if the error persists.",
+                          "code": "INTERNAL_ERROR",
+                          "id": "5d37dbcb-891e-41ca-a3d6-e690c97775ac"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "route": "admin/system-webhook/update",
+      "source": "packages/features/integrations/backend/endpoints/admin/system-webhook/update.ts",
+      "originalSourceSha256": "665095d8ebe8a8c242a195524a0436acedae9b61556e46d8d7bb1ca41aac72fe",
+      "input": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "misskey:id"
+          },
+          "isActive": {
+            "type": "boolean"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255
+          },
+          "on": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "abuseReport",
+                "abuseReportResolved",
+                "userCreated",
+                "inactiveModeratorsWarning",
+                "inactiveModeratorsInvitationOnlyChanged"
+              ]
+            }
+          },
+          "url": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1024
+          },
+          "secret": {
+            "type": "string",
+            "maxLength": 1024,
+            "default": ""
+          }
+        },
+        "required": [
+          "id",
+          "isActive",
+          "name",
+          "on",
+          "url"
+        ]
+      },
+      "meta": {
+        "tags": [
+          "admin",
+          "system-webhook"
+        ],
+        "requireCredential": true,
+        "requireModerator": true,
+        "secure": true,
+        "kind": "write:admin:system-webhook",
+        "res": {
+          "type": "object",
+          "ref": "SystemWebhook"
+        }
+      },
+      "output": {
+        "type": "object",
+        "ref": "SystemWebhook"
+      },
+      "openapi": {
+        "post": {
+          "operationId": "post___admin___system-webhook___update",
+          "summary": "admin/system-webhook/update",
+          "description": "No description provided.\n\n**Internal Endpoint**: This endpoint is an API for the misskey mainframe and is not intended for use by third parties.\n**Credential required**: *Yes* / **Permission**: *write:admin:system-webhook*",
+          "externalDocs": {
+            "description": "Source code",
+            "url": "https://github.com/misskey-dev/misskey/blob/develop/packages/backend/src/server/api/endpoints/admin/system-webhook/update.ts"
+          },
+          "tags": [
+            "admin"
+          ],
+          "security": [
+            {
+              "bearerAuth": []
+            }
+          ],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "misskey:id"
+                    },
+                    "isActive": {
+                      "type": "boolean"
+                    },
+                    "name": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 255
+                    },
+                    "on": {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "enum": [
+                          "abuseReport",
+                          "abuseReportResolved",
+                          "userCreated",
+                          "inactiveModeratorsWarning",
+                          "inactiveModeratorsInvitationOnlyChanged"
+                        ]
+                      }
+                    },
+                    "url": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 1024
+                    },
+                    "secret": {
+                      "type": "string",
+                      "maxLength": 1024,
+                      "default": ""
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "isActive",
+                    "name",
+                    "on",
+                    "url"
+                  ]
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "OK (with results)",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/SystemWebhook"
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Client error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "INVALID_PARAM": {
+                      "value": {
+                        "error": {
+                          "message": "Invalid param.",
+                          "code": "INVALID_PARAM",
+                          "id": "3d81ceae-475f-4600-b2a8-2bc116157532"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "401": {
+              "description": "Authentication error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "CREDENTIAL_REQUIRED": {
+                      "value": {
+                        "error": {
+                          "message": "Credential required.",
+                          "code": "CREDENTIAL_REQUIRED",
+                          "id": "1384574d-a912-4b81-8601-c7b1c4085df1"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "403": {
+              "description": "Forbidden error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "AUTHENTICATION_FAILED": {
+                      "value": {
+                        "error": {
+                          "message": "Authentication failed. Please ensure your token is correct.",
+                          "code": "AUTHENTICATION_FAILED",
+                          "id": "b0a7f5f8-dc2f-4171-b91f-de88ad238e14"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "418": {
+              "description": "I'm Ai",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "I_AM_AI": {
+                      "value": {
+                        "error": {
+                          "message": "You sent a request to Ai-chan, Misskey's showgirl, instead of the server.",
+                          "code": "I_AM_AI",
+                          "id": "60c46cd1-f23a-46b1-bebe-5d2b73951a84"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "500": {
+              "description": "Internal server error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "INTERNAL_ERROR": {
+                      "value": {
+                        "error": {
+                          "message": "Internal error occurred. Please contact us if the error persists.",
+                          "code": "INTERNAL_ERROR",
+                          "id": "5d37dbcb-891e-41ca-a3d6-e690c97775ac"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "route": "admin/update-proxy-account",
+      "source": "packages/backend/src/server/api/endpoints/admin/update-proxy-account.ts",
+      "originalSourceSha256": "58f790b13fe61db2d21fb98bae784e162f572a47286164cddb31bfe3f2b0bbeb",
+      "input": {
+        "type": "object",
+        "properties": {
+          "description": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1500,
+            "nullable": true
+          }
+        }
+      },
+      "meta": {
+        "tags": [
+          "admin"
+        ],
+        "requireCredential": true,
+        "requireModerator": true,
+        "kind": "write:admin:account",
+        "res": {
+          "type": "object",
+          "nullable": false,
+          "optional": false,
+          "ref": "UserDetailed"
+        }
+      },
+      "output": {
+        "type": "object",
+        "nullable": false,
+        "optional": false,
+        "ref": "UserDetailed"
+      },
+      "openapi": {
+        "post": {
+          "operationId": "post___admin___update-proxy-account",
+          "summary": "admin/update-proxy-account",
+          "description": "No description provided.\n\n**Credential required**: *Yes* / **Permission**: *write:admin:account*",
+          "externalDocs": {
+            "description": "Source code",
+            "url": "https://github.com/misskey-dev/misskey/blob/develop/packages/backend/src/server/api/endpoints/admin/update-proxy-account.ts"
+          },
+          "tags": [
+            "admin"
+          ],
+          "security": [
+            {
+              "bearerAuth": []
+            }
+          ],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "description": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "minLength": 1,
+                      "maxLength": 1500
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "OK (with results)",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/UserDetailed"
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Client error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "INVALID_PARAM": {
+                      "value": {
+                        "error": {
+                          "message": "Invalid param.",
+                          "code": "INVALID_PARAM",
+                          "id": "3d81ceae-475f-4600-b2a8-2bc116157532"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "401": {
+              "description": "Authentication error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "CREDENTIAL_REQUIRED": {
+                      "value": {
+                        "error": {
+                          "message": "Credential required.",
+                          "code": "CREDENTIAL_REQUIRED",
+                          "id": "1384574d-a912-4b81-8601-c7b1c4085df1"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "403": {
+              "description": "Forbidden error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "AUTHENTICATION_FAILED": {
+                      "value": {
+                        "error": {
+                          "message": "Authentication failed. Please ensure your token is correct.",
+                          "code": "AUTHENTICATION_FAILED",
+                          "id": "b0a7f5f8-dc2f-4171-b91f-de88ad238e14"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "418": {
+              "description": "I'm Ai",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "I_AM_AI": {
+                      "value": {
+                        "error": {
+                          "message": "You sent a request to Ai-chan, Misskey's showgirl, instead of the server.",
+                          "code": "I_AM_AI",
+                          "id": "60c46cd1-f23a-46b1-bebe-5d2b73951a84"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "500": {
+              "description": "Internal server error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "INTERNAL_ERROR": {
+                      "value": {
+                        "error": {
+                          "message": "Internal error occurred. Please contact us if the error persists.",
+                          "code": "INTERNAL_ERROR",
+                          "id": "5d37dbcb-891e-41ca-a3d6-e690c97775ac"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "route": "i/notifications",
+      "source": "packages/features/notifications/backend/endpoints/i/notifications.ts",
+      "originalSourceSha256": "3a52175c292334504541278c8883a5244abd17192bb5060a8631d6fbba87e501",
+      "input": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100,
+            "default": 10
+          },
+          "sinceId": {
+            "type": "string",
+            "format": "misskey:id"
+          },
+          "untilId": {
+            "type": "string",
+            "format": "misskey:id"
+          },
+          "sinceDate": {
+            "type": "integer"
+          },
+          "untilDate": {
+            "type": "integer"
+          },
+          "markAsRead": {
+            "type": "boolean",
+            "default": true
+          },
+          "includeTypes": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "note",
+                "follow",
+                "mention",
+                "reply",
+                "renote",
+                "quote",
+                "reaction",
+                "pollEnded",
+                "scheduledNotePosted",
+                "scheduledNotePostFailed",
+                "receiveFollowRequest",
+                "followRequestAccepted",
+                "roleAssigned",
+                "chatRoomInvitationReceived",
+                "achievementEarned",
+                "exportCompleted",
+                "login",
+                "createToken",
+                "app",
+                "test",
+                "pollVote",
+                "groupInvited"
+              ]
+            }
+          },
+          "excludeTypes": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "note",
+                "follow",
+                "mention",
+                "reply",
+                "renote",
+                "quote",
+                "reaction",
+                "pollEnded",
+                "scheduledNotePosted",
+                "scheduledNotePostFailed",
+                "receiveFollowRequest",
+                "followRequestAccepted",
+                "roleAssigned",
+                "chatRoomInvitationReceived",
+                "achievementEarned",
+                "exportCompleted",
+                "login",
+                "createToken",
+                "app",
+                "test",
+                "pollVote",
+                "groupInvited"
+              ]
+            }
+          }
+        },
+        "required": []
+      },
+      "meta": {
+        "tags": [
+          "account",
+          "notifications"
+        ],
+        "requireCredential": true,
+        "limit": {
+          "duration": 30000,
+          "max": 30
+        },
+        "kind": "read:notifications",
+        "res": {
+          "type": "array",
+          "optional": false,
+          "nullable": false,
+          "items": {
+            "type": "object",
+            "optional": false,
+            "nullable": false,
+            "ref": "Notification"
+          }
+        }
+      },
+      "output": {
+        "type": "array",
+        "optional": false,
+        "nullable": false,
+        "items": {
+          "type": "object",
+          "optional": false,
+          "nullable": false,
+          "ref": "Notification"
+        }
+      },
+      "openapi": {
+        "post": {
+          "operationId": "post___i___notifications",
+          "summary": "i/notifications",
+          "description": "No description provided.\n\n**Credential required**: *Yes* / **Permission**: *read:notifications*",
+          "externalDocs": {
+            "description": "Source code",
+            "url": "https://github.com/misskey-dev/misskey/blob/develop/packages/backend/src/server/api/endpoints/i/notifications.ts"
+          },
+          "tags": [
+            "account"
+          ],
+          "security": [
+            {
+              "bearerAuth": []
+            }
+          ],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "limit": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 100,
+                      "default": 10
+                    },
+                    "sinceId": {
+                      "type": "string",
+                      "format": "misskey:id"
+                    },
+                    "untilId": {
+                      "type": "string",
+                      "format": "misskey:id"
+                    },
+                    "sinceDate": {
+                      "type": "integer"
+                    },
+                    "untilDate": {
+                      "type": "integer"
+                    },
+                    "markAsRead": {
+                      "type": "boolean",
+                      "default": true
+                    },
+                    "includeTypes": {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "enum": [
+                          "note",
+                          "follow",
+                          "mention",
+                          "reply",
+                          "renote",
+                          "quote",
+                          "reaction",
+                          "pollEnded",
+                          "scheduledNotePosted",
+                          "scheduledNotePostFailed",
+                          "receiveFollowRequest",
+                          "followRequestAccepted",
+                          "roleAssigned",
+                          "chatRoomInvitationReceived",
+                          "achievementEarned",
+                          "exportCompleted",
+                          "login",
+                          "createToken",
+                          "app",
+                          "test",
+                          "pollVote",
+                          "groupInvited"
+                        ]
+                      }
+                    },
+                    "excludeTypes": {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "enum": [
+                          "note",
+                          "follow",
+                          "mention",
+                          "reply",
+                          "renote",
+                          "quote",
+                          "reaction",
+                          "pollEnded",
+                          "scheduledNotePosted",
+                          "scheduledNotePostFailed",
+                          "receiveFollowRequest",
+                          "followRequestAccepted",
+                          "roleAssigned",
+                          "chatRoomInvitationReceived",
+                          "achievementEarned",
+                          "exportCompleted",
+                          "login",
+                          "createToken",
+                          "app",
+                          "test",
+                          "pollVote",
+                          "groupInvited"
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "OK (with results)",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/Notification"
+                    }
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Client error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "INVALID_PARAM": {
+                      "value": {
+                        "error": {
+                          "message": "Invalid param.",
+                          "code": "INVALID_PARAM",
+                          "id": "3d81ceae-475f-4600-b2a8-2bc116157532"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "401": {
+              "description": "Authentication error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "CREDENTIAL_REQUIRED": {
+                      "value": {
+                        "error": {
+                          "message": "Credential required.",
+                          "code": "CREDENTIAL_REQUIRED",
+                          "id": "1384574d-a912-4b81-8601-c7b1c4085df1"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "403": {
+              "description": "Forbidden error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "AUTHENTICATION_FAILED": {
+                      "value": {
+                        "error": {
+                          "message": "Authentication failed. Please ensure your token is correct.",
+                          "code": "AUTHENTICATION_FAILED",
+                          "id": "b0a7f5f8-dc2f-4171-b91f-de88ad238e14"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "418": {
+              "description": "I'm Ai",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "I_AM_AI": {
+                      "value": {
+                        "error": {
+                          "message": "You sent a request to Ai-chan, Misskey's showgirl, instead of the server.",
+                          "code": "I_AM_AI",
+                          "id": "60c46cd1-f23a-46b1-bebe-5d2b73951a84"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "429": {
+              "description": "Too many requests",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "RATE_LIMIT_EXCEEDED": {
+                      "value": {
+                        "error": {
+                          "message": "Rate limit exceeded. Please try again later.",
+                          "code": "RATE_LIMIT_EXCEEDED",
+                          "id": "d5826d14-3982-4d2e-8011-b9e9f02499ef"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "500": {
+              "description": "Internal server error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "INTERNAL_ERROR": {
+                      "value": {
+                        "error": {
+                          "message": "Internal error occurred. Please contact us if the error persists.",
+                          "code": "INTERNAL_ERROR",
+                          "id": "5d37dbcb-891e-41ca-a3d6-e690c97775ac"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "route": "i/notifications-grouped",
+      "source": "packages/features/notifications/backend/endpoints/i/notifications-grouped.ts",
+      "originalSourceSha256": "e219fc71e57c098a6ec4fa37c50bc28db22f4730da4d904f8a8ca96558832a6b",
+      "input": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100,
+            "default": 10
+          },
+          "sinceId": {
+            "type": "string",
+            "format": "misskey:id"
+          },
+          "untilId": {
+            "type": "string",
+            "format": "misskey:id"
+          },
+          "sinceDate": {
+            "type": "integer"
+          },
+          "untilDate": {
+            "type": "integer"
+          },
+          "markAsRead": {
+            "type": "boolean",
+            "default": true
+          },
+          "includeTypes": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "note",
+                "follow",
+                "mention",
+                "reply",
+                "renote",
+                "quote",
+                "reaction",
+                "pollEnded",
+                "scheduledNotePosted",
+                "scheduledNotePostFailed",
+                "receiveFollowRequest",
+                "followRequestAccepted",
+                "roleAssigned",
+                "chatRoomInvitationReceived",
+                "achievementEarned",
+                "exportCompleted",
+                "login",
+                "createToken",
+                "app",
+                "test",
+                "pollVote",
+                "groupInvited"
+              ]
+            }
+          },
+          "excludeTypes": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "note",
+                "follow",
+                "mention",
+                "reply",
+                "renote",
+                "quote",
+                "reaction",
+                "pollEnded",
+                "scheduledNotePosted",
+                "scheduledNotePostFailed",
+                "receiveFollowRequest",
+                "followRequestAccepted",
+                "roleAssigned",
+                "chatRoomInvitationReceived",
+                "achievementEarned",
+                "exportCompleted",
+                "login",
+                "createToken",
+                "app",
+                "test",
+                "pollVote",
+                "groupInvited"
+              ]
+            }
+          }
+        },
+        "required": []
+      },
+      "meta": {
+        "tags": [
+          "account",
+          "notifications"
+        ],
+        "requireCredential": true,
+        "limit": {
+          "duration": 30000,
+          "max": 30
+        },
+        "kind": "read:notifications",
+        "res": {
+          "type": "array",
+          "optional": false,
+          "nullable": false,
+          "items": {
+            "type": "object",
+            "optional": false,
+            "nullable": false,
+            "ref": "Notification"
+          }
+        }
+      },
+      "output": {
+        "type": "array",
+        "optional": false,
+        "nullable": false,
+        "items": {
+          "type": "object",
+          "optional": false,
+          "nullable": false,
+          "ref": "Notification"
+        }
+      },
+      "openapi": {
+        "post": {
+          "operationId": "post___i___notifications-grouped",
+          "summary": "i/notifications-grouped",
+          "description": "No description provided.\n\n**Credential required**: *Yes* / **Permission**: *read:notifications*",
+          "externalDocs": {
+            "description": "Source code",
+            "url": "https://github.com/misskey-dev/misskey/blob/develop/packages/backend/src/server/api/endpoints/i/notifications-grouped.ts"
+          },
+          "tags": [
+            "account"
+          ],
+          "security": [
+            {
+              "bearerAuth": []
+            }
+          ],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "limit": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 100,
+                      "default": 10
+                    },
+                    "sinceId": {
+                      "type": "string",
+                      "format": "misskey:id"
+                    },
+                    "untilId": {
+                      "type": "string",
+                      "format": "misskey:id"
+                    },
+                    "sinceDate": {
+                      "type": "integer"
+                    },
+                    "untilDate": {
+                      "type": "integer"
+                    },
+                    "markAsRead": {
+                      "type": "boolean",
+                      "default": true
+                    },
+                    "includeTypes": {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "enum": [
+                          "note",
+                          "follow",
+                          "mention",
+                          "reply",
+                          "renote",
+                          "quote",
+                          "reaction",
+                          "pollEnded",
+                          "scheduledNotePosted",
+                          "scheduledNotePostFailed",
+                          "receiveFollowRequest",
+                          "followRequestAccepted",
+                          "roleAssigned",
+                          "chatRoomInvitationReceived",
+                          "achievementEarned",
+                          "exportCompleted",
+                          "login",
+                          "createToken",
+                          "app",
+                          "test",
+                          "pollVote",
+                          "groupInvited"
+                        ]
+                      }
+                    },
+                    "excludeTypes": {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "enum": [
+                          "note",
+                          "follow",
+                          "mention",
+                          "reply",
+                          "renote",
+                          "quote",
+                          "reaction",
+                          "pollEnded",
+                          "scheduledNotePosted",
+                          "scheduledNotePostFailed",
+                          "receiveFollowRequest",
+                          "followRequestAccepted",
+                          "roleAssigned",
+                          "chatRoomInvitationReceived",
+                          "achievementEarned",
+                          "exportCompleted",
+                          "login",
+                          "createToken",
+                          "app",
+                          "test",
+                          "pollVote",
+                          "groupInvited"
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "OK (with results)",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/Notification"
+                    }
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Client error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "INVALID_PARAM": {
+                      "value": {
+                        "error": {
+                          "message": "Invalid param.",
+                          "code": "INVALID_PARAM",
+                          "id": "3d81ceae-475f-4600-b2a8-2bc116157532"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "401": {
+              "description": "Authentication error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "CREDENTIAL_REQUIRED": {
+                      "value": {
+                        "error": {
+                          "message": "Credential required.",
+                          "code": "CREDENTIAL_REQUIRED",
+                          "id": "1384574d-a912-4b81-8601-c7b1c4085df1"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "403": {
+              "description": "Forbidden error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "AUTHENTICATION_FAILED": {
+                      "value": {
+                        "error": {
+                          "message": "Authentication failed. Please ensure your token is correct.",
+                          "code": "AUTHENTICATION_FAILED",
+                          "id": "b0a7f5f8-dc2f-4171-b91f-de88ad238e14"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "418": {
+              "description": "I'm Ai",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "I_AM_AI": {
+                      "value": {
+                        "error": {
+                          "message": "You sent a request to Ai-chan, Misskey's showgirl, instead of the server.",
+                          "code": "I_AM_AI",
+                          "id": "60c46cd1-f23a-46b1-bebe-5d2b73951a84"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "429": {
+              "description": "Too many requests",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "RATE_LIMIT_EXCEEDED": {
+                      "value": {
+                        "error": {
+                          "message": "Rate limit exceeded. Please try again later.",
+                          "code": "RATE_LIMIT_EXCEEDED",
+                          "id": "d5826d14-3982-4d2e-8011-b9e9f02499ef"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "500": {
+              "description": "Internal server error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "INTERNAL_ERROR": {
+                      "value": {
+                        "error": {
+                          "message": "Internal error occurred. Please contact us if the error persists.",
+                          "code": "INTERNAL_ERROR",
+                          "id": "5d37dbcb-891e-41ca-a3d6-e690c97775ac"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "route": "pages/create",
+      "source": "packages/features/pages/backend/endpoints/pages/create.ts",
+      "originalSourceSha256": "b8576ec56e9b1790ecedfd8936948cd0a6fceeaf4a495aadd5d093e89cf9b1f2",
+      "input": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string",
+            "pattern": "^[^\\s:\\/?#\\[\\]@!$&'()*+,;=\\\\%\\x00-\\x20]{1,256}$",
+            "minLength": 1
+          },
+          "summary": {
+            "type": "string",
+            "nullable": true
+          },
+          "content": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": true
+            }
+          },
+          "variables": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": true
+            }
+          },
+          "script": {
+            "type": "string"
+          },
+          "eyeCatchingImageId": {
+            "type": "string",
+            "format": "misskey:id",
+            "nullable": true
+          },
+          "font": {
+            "type": "string",
+            "enum": [
+              "serif",
+              "sans-serif"
+            ],
+            "default": "sans-serif"
+          },
+          "alignCenter": {
+            "type": "boolean",
+            "default": false
+          },
+          "hideTitleWhenPinned": {
+            "type": "boolean",
+            "default": false
+          }
+        },
+        "required": [
+          "title",
+          "name",
+          "content",
+          "variables",
+          "script"
+        ]
+      },
+      "meta": {
+        "tags": [
+          "pages"
+        ],
+        "requireCredential": true,
+        "prohibitMoved": true,
+        "kind": "write:pages",
+        "limit": {
+          "duration": 3600000,
+          "max": 10
+        },
+        "res": {
+          "type": "object",
+          "optional": false,
+          "nullable": false,
+          "ref": "Page"
+        },
+        "errors": {
+          "noSuchFile": {
+            "message": "No such file.",
+            "code": "NO_SUCH_FILE",
+            "id": "b7b97489-0f66-4b12-a5ff-b21bd63f6e1c"
+          },
+          "nameAlreadyExists": {
+            "message": "Specified name already exists.",
+            "code": "NAME_ALREADY_EXISTS",
+            "id": "4650348e-301c-499a-83c9-6aa988c66bc1"
+          }
+        }
+      },
+      "output": {
+        "type": "object",
+        "optional": false,
+        "nullable": false,
+        "ref": "Page"
+      },
+      "openapi": {
+        "post": {
+          "operationId": "post___pages___create",
+          "summary": "pages/create",
+          "description": "No description provided.\n\n**Credential required**: *Yes* / **Permission**: *write:pages*",
+          "externalDocs": {
+            "description": "Source code",
+            "url": "https://github.com/misskey-dev/misskey/blob/develop/packages/backend/src/server/api/endpoints/pages/create.ts"
+          },
+          "tags": [
+            "pages"
+          ],
+          "security": [
+            {
+              "bearerAuth": []
+            }
+          ],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string",
+                      "pattern": "^[^\\s:\\/?#\\[\\]@!$&'()*+,;=\\\\%\\x00-\\x20]{1,256}$",
+                      "minLength": 1
+                    },
+                    "summary": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "content": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "additionalProperties": true
+                      }
+                    },
+                    "variables": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "additionalProperties": true
+                      }
+                    },
+                    "script": {
+                      "type": "string"
+                    },
+                    "eyeCatchingImageId": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "format": "misskey:id"
+                    },
+                    "font": {
+                      "type": "string",
+                      "enum": [
+                        "serif",
+                        "sans-serif"
+                      ],
+                      "default": "sans-serif"
+                    },
+                    "alignCenter": {
+                      "type": "boolean",
+                      "default": false
+                    },
+                    "hideTitleWhenPinned": {
+                      "type": "boolean",
+                      "default": false
+                    }
+                  },
+                  "required": [
+                    "title",
+                    "name",
+                    "content",
+                    "variables",
+                    "script"
+                  ]
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "OK (with results)",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Page"
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Client error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "NO_SUCH_FILE": {
+                      "value": {
+                        "error": {
+                          "message": "No such file.",
+                          "code": "NO_SUCH_FILE",
+                          "id": "b7b97489-0f66-4b12-a5ff-b21bd63f6e1c"
+                        }
+                      }
+                    },
+                    "NAME_ALREADY_EXISTS": {
+                      "value": {
+                        "error": {
+                          "message": "Specified name already exists.",
+                          "code": "NAME_ALREADY_EXISTS",
+                          "id": "4650348e-301c-499a-83c9-6aa988c66bc1"
+                        }
+                      }
+                    },
+                    "INVALID_PARAM": {
+                      "value": {
+                        "error": {
+                          "message": "Invalid param.",
+                          "code": "INVALID_PARAM",
+                          "id": "3d81ceae-475f-4600-b2a8-2bc116157532"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "401": {
+              "description": "Authentication error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "CREDENTIAL_REQUIRED": {
+                      "value": {
+                        "error": {
+                          "message": "Credential required.",
+                          "code": "CREDENTIAL_REQUIRED",
+                          "id": "1384574d-a912-4b81-8601-c7b1c4085df1"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "403": {
+              "description": "Forbidden error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "AUTHENTICATION_FAILED": {
+                      "value": {
+                        "error": {
+                          "message": "Authentication failed. Please ensure your token is correct.",
+                          "code": "AUTHENTICATION_FAILED",
+                          "id": "b0a7f5f8-dc2f-4171-b91f-de88ad238e14"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "418": {
+              "description": "I'm Ai",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "I_AM_AI": {
+                      "value": {
+                        "error": {
+                          "message": "You sent a request to Ai-chan, Misskey's showgirl, instead of the server.",
+                          "code": "I_AM_AI",
+                          "id": "60c46cd1-f23a-46b1-bebe-5d2b73951a84"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "429": {
+              "description": "Too many requests",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "RATE_LIMIT_EXCEEDED": {
+                      "value": {
+                        "error": {
+                          "message": "Rate limit exceeded. Please try again later.",
+                          "code": "RATE_LIMIT_EXCEEDED",
+                          "id": "d5826d14-3982-4d2e-8011-b9e9f02499ef"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "500": {
+              "description": "Internal server error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "INTERNAL_ERROR": {
+                      "value": {
+                        "error": {
+                          "message": "Internal error occurred. Please contact us if the error persists.",
+                          "code": "INTERNAL_ERROR",
+                          "id": "5d37dbcb-891e-41ca-a3d6-e690c97775ac"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "route": "pages/update",
+      "source": "packages/features/pages/backend/endpoints/pages/update.ts",
+      "originalSourceSha256": "0f7df87a7efa5e861bf823360b12290bd7e1cc527ff0f3297f258d834c26a7dd",
+      "input": {
+        "type": "object",
+        "properties": {
+          "pageId": {
+            "type": "string",
+            "format": "misskey:id"
+          },
+          "title": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string",
+            "pattern": "^[^\\s:\\/?#\\[\\]@!$&'()*+,;=\\\\%\\x00-\\x20]{1,256}$",
+            "minLength": 1
+          },
+          "summary": {
+            "type": "string",
+            "nullable": true
+          },
+          "content": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": true
+            }
+          },
+          "variables": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": true
+            }
+          },
+          "script": {
+            "type": "string"
+          },
+          "eyeCatchingImageId": {
+            "type": "string",
+            "format": "misskey:id",
+            "nullable": true
+          },
+          "font": {
+            "type": "string",
+            "enum": [
+              "serif",
+              "sans-serif"
+            ]
+          },
+          "alignCenter": {
+            "type": "boolean"
+          },
+          "hideTitleWhenPinned": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "pageId"
+        ]
+      },
+      "meta": {
+        "tags": [
+          "pages"
+        ],
+        "requireCredential": true,
+        "prohibitMoved": true,
+        "kind": "write:pages",
+        "limit": {
+          "duration": 3600000,
+          "max": 300
+        },
+        "errors": {
+          "noSuchPage": {
+            "message": "No such page.",
+            "code": "NO_SUCH_PAGE",
+            "id": "21149b9e-3616-4778-9592-c4ce89f5a864"
+          },
+          "accessDenied": {
+            "message": "Access denied.",
+            "code": "ACCESS_DENIED",
+            "id": "3c15cd52-3b4b-4274-967d-6456fc4f792b"
+          },
+          "noSuchFile": {
+            "message": "No such file.",
+            "code": "NO_SUCH_FILE",
+            "id": "cfc23c7c-3887-490e-af30-0ed576703c82"
+          },
+          "nameAlreadyExists": {
+            "message": "Specified name already exists.",
+            "code": "NAME_ALREADY_EXISTS",
+            "id": "2298a392-d4a1-44c5-9ebb-ac1aeaa5a9ab"
+          }
+        }
+      },
+      "output": null,
+      "openapi": {
+        "post": {
+          "operationId": "post___pages___update",
+          "summary": "pages/update",
+          "description": "No description provided.\n\n**Credential required**: *Yes* / **Permission**: *write:pages*",
+          "externalDocs": {
+            "description": "Source code",
+            "url": "https://github.com/misskey-dev/misskey/blob/develop/packages/backend/src/server/api/endpoints/pages/update.ts"
+          },
+          "tags": [
+            "pages"
+          ],
+          "security": [
+            {
+              "bearerAuth": []
+            }
+          ],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "pageId": {
+                      "type": "string",
+                      "format": "misskey:id"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string",
+                      "pattern": "^[^\\s:\\/?#\\[\\]@!$&'()*+,;=\\\\%\\x00-\\x20]{1,256}$",
+                      "minLength": 1
+                    },
+                    "summary": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "content": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "additionalProperties": true
+                      }
+                    },
+                    "variables": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "additionalProperties": true
+                      }
+                    },
+                    "script": {
+                      "type": "string"
+                    },
+                    "eyeCatchingImageId": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "format": "misskey:id"
+                    },
+                    "font": {
+                      "type": "string",
+                      "enum": [
+                        "serif",
+                        "sans-serif"
+                      ]
+                    },
+                    "alignCenter": {
+                      "type": "boolean"
+                    },
+                    "hideTitleWhenPinned": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "pageId"
+                  ]
+                }
+              }
+            }
+          },
+          "responses": {
+            "204": {
+              "description": "OK (without any results)"
+            },
+            "400": {
+              "description": "Client error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "NO_SUCH_PAGE": {
+                      "value": {
+                        "error": {
+                          "message": "No such page.",
+                          "code": "NO_SUCH_PAGE",
+                          "id": "21149b9e-3616-4778-9592-c4ce89f5a864"
+                        }
+                      }
+                    },
+                    "ACCESS_DENIED": {
+                      "value": {
+                        "error": {
+                          "message": "Access denied.",
+                          "code": "ACCESS_DENIED",
+                          "id": "3c15cd52-3b4b-4274-967d-6456fc4f792b"
+                        }
+                      }
+                    },
+                    "NO_SUCH_FILE": {
+                      "value": {
+                        "error": {
+                          "message": "No such file.",
+                          "code": "NO_SUCH_FILE",
+                          "id": "cfc23c7c-3887-490e-af30-0ed576703c82"
+                        }
+                      }
+                    },
+                    "NAME_ALREADY_EXISTS": {
+                      "value": {
+                        "error": {
+                          "message": "Specified name already exists.",
+                          "code": "NAME_ALREADY_EXISTS",
+                          "id": "2298a392-d4a1-44c5-9ebb-ac1aeaa5a9ab"
+                        }
+                      }
+                    },
+                    "INVALID_PARAM": {
+                      "value": {
+                        "error": {
+                          "message": "Invalid param.",
+                          "code": "INVALID_PARAM",
+                          "id": "3d81ceae-475f-4600-b2a8-2bc116157532"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "401": {
+              "description": "Authentication error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "CREDENTIAL_REQUIRED": {
+                      "value": {
+                        "error": {
+                          "message": "Credential required.",
+                          "code": "CREDENTIAL_REQUIRED",
+                          "id": "1384574d-a912-4b81-8601-c7b1c4085df1"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "403": {
+              "description": "Forbidden error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "AUTHENTICATION_FAILED": {
+                      "value": {
+                        "error": {
+                          "message": "Authentication failed. Please ensure your token is correct.",
+                          "code": "AUTHENTICATION_FAILED",
+                          "id": "b0a7f5f8-dc2f-4171-b91f-de88ad238e14"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "418": {
+              "description": "I'm Ai",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "I_AM_AI": {
+                      "value": {
+                        "error": {
+                          "message": "You sent a request to Ai-chan, Misskey's showgirl, instead of the server.",
+                          "code": "I_AM_AI",
+                          "id": "60c46cd1-f23a-46b1-bebe-5d2b73951a84"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "429": {
+              "description": "Too many requests",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "RATE_LIMIT_EXCEEDED": {
+                      "value": {
+                        "error": {
+                          "message": "Rate limit exceeded. Please try again later.",
+                          "code": "RATE_LIMIT_EXCEEDED",
+                          "id": "d5826d14-3982-4d2e-8011-b9e9f02499ef"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "500": {
+              "description": "Internal server error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "INTERNAL_ERROR": {
+                      "value": {
+                        "error": {
+                          "message": "Internal error occurred. Please contact us if the error persists.",
+                          "code": "INTERNAL_ERROR",
+                          "id": "5d37dbcb-891e-41ca-a3d6-e690c97775ac"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "route": "v2/admin/emoji/list",
+      "source": "packages/features/emojis/backend/endpoints/v2/admin/emoji/list.ts",
+      "originalSourceSha256": "e2f72413966f0000fe867a11ba583fddb6185149dbc8701936d5b826870ba6a9",
+      "input": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "object",
+            "nullable": true,
+            "properties": {
+              "updatedAtFrom": {
+                "type": "string"
+              },
+              "updatedAtTo": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "host": {
+                "type": "string"
+              },
+              "uri": {
+                "type": "string"
+              },
+              "publicUrl": {
+                "type": "string"
+              },
+              "originalUrl": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string"
+              },
+              "aliases": {
+                "type": "string"
+              },
+              "category": {
+                "type": "string"
+              },
+              "license": {
+                "type": "string"
+              },
+              "isSensitive": {
+                "type": "boolean"
+              },
+              "localOnly": {
+                "type": "boolean"
+              },
+              "hostType": {
+                "type": "string",
+                "enum": [
+                  "local",
+                  "remote",
+                  "all"
+                ],
+                "default": "all"
+              },
+              "roleIds": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "format": "misskey:id"
+                }
+              }
+            }
+          },
+          "sinceId": {
+            "type": "string",
+            "format": "misskey:id"
+          },
+          "untilId": {
+            "type": "string",
+            "format": "misskey:id"
+          },
+          "sinceDate": {
+            "type": "integer"
+          },
+          "untilDate": {
+            "type": "integer"
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100,
+            "default": 10
+          },
+          "page": {
+            "type": "integer"
+          },
+          "sortKeys": {
+            "type": "array",
+            "default": [
+              "-id"
+            ],
+            "items": {
+              "type": "string",
+              "enum": [
+                "+id",
+                "-id",
+                "+updatedAt",
+                "-updatedAt",
+                "+name",
+                "-name",
+                "+host",
+                "-host",
+                "+uri",
+                "-uri",
+                "+publicUrl",
+                "-publicUrl",
+                "+type",
+                "-type",
+                "+aliases",
+                "-aliases",
+                "+category",
+                "-category",
+                "+license",
+                "-license",
+                "+isSensitive",
+                "-isSensitive",
+                "+localOnly",
+                "-localOnly",
+                "+roleIdsThatCanBeUsedThisEmojiAsReaction",
+                "-roleIdsThatCanBeUsedThisEmojiAsReaction"
+              ]
+            }
+          }
+        },
+        "required": []
+      },
+      "meta": {
+        "tags": [
+          "admin"
+        ],
+        "requireCredential": true,
+        "requiredRolePolicy": "canManageCustomEmojis",
+        "kind": "read:admin:emoji",
+        "res": {
+          "type": "object",
+          "properties": {
+            "emojis": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "ref": "EmojiDetailedAdmin"
+              }
+            },
+            "count": {
+              "type": "integer"
+            },
+            "allCount": {
+              "type": "integer"
+            },
+            "allPages": {
+              "type": "integer"
+            }
+          }
+        }
+      },
+      "output": {
+        "type": "object",
+        "properties": {
+          "emojis": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "ref": "EmojiDetailedAdmin"
+            }
+          },
+          "count": {
+            "type": "integer"
+          },
+          "allCount": {
+            "type": "integer"
+          },
+          "allPages": {
+            "type": "integer"
+          }
+        }
+      },
+      "openapi": {
+        "post": {
+          "operationId": "post___v2___admin___emoji___list",
+          "summary": "v2/admin/emoji/list",
+          "description": "No description provided.\n\n**Credential required**: *Yes* / **Permission**: *read:admin:emoji*",
+          "externalDocs": {
+            "description": "Source code",
+            "url": "https://github.com/misskey-dev/misskey/blob/develop/packages/backend/src/server/api/endpoints/v2/admin/emoji/list.ts"
+          },
+          "tags": [
+            "admin"
+          ],
+          "security": [
+            {
+              "bearerAuth": []
+            }
+          ],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "query": {
+                      "type": [
+                        "object",
+                        "null"
+                      ],
+                      "properties": {
+                        "updatedAtFrom": {
+                          "type": "string"
+                        },
+                        "updatedAtTo": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "host": {
+                          "type": "string"
+                        },
+                        "uri": {
+                          "type": "string"
+                        },
+                        "publicUrl": {
+                          "type": "string"
+                        },
+                        "originalUrl": {
+                          "type": "string"
+                        },
+                        "type": {
+                          "type": "string"
+                        },
+                        "aliases": {
+                          "type": "string"
+                        },
+                        "category": {
+                          "type": "string"
+                        },
+                        "license": {
+                          "type": "string"
+                        },
+                        "isSensitive": {
+                          "type": "boolean"
+                        },
+                        "localOnly": {
+                          "type": "boolean"
+                        },
+                        "hostType": {
+                          "type": "string",
+                          "enum": [
+                            "local",
+                            "remote",
+                            "all"
+                          ],
+                          "default": "all"
+                        },
+                        "roleIds": {
+                          "type": "array",
+                          "items": {
+                            "type": "string",
+                            "format": "misskey:id"
+                          }
+                        }
+                      }
+                    },
+                    "sinceId": {
+                      "type": "string",
+                      "format": "misskey:id"
+                    },
+                    "untilId": {
+                      "type": "string",
+                      "format": "misskey:id"
+                    },
+                    "sinceDate": {
+                      "type": "integer"
+                    },
+                    "untilDate": {
+                      "type": "integer"
+                    },
+                    "limit": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 100,
+                      "default": 10
+                    },
+                    "page": {
+                      "type": "integer"
+                    },
+                    "sortKeys": {
+                      "type": "array",
+                      "default": [
+                        "-id"
+                      ],
+                      "items": {
+                        "type": "string",
+                        "enum": [
+                          "+id",
+                          "-id",
+                          "+updatedAt",
+                          "-updatedAt",
+                          "+name",
+                          "-name",
+                          "+host",
+                          "-host",
+                          "+uri",
+                          "-uri",
+                          "+publicUrl",
+                          "-publicUrl",
+                          "+type",
+                          "-type",
+                          "+aliases",
+                          "-aliases",
+                          "+category",
+                          "-category",
+                          "+license",
+                          "-license",
+                          "+isSensitive",
+                          "-isSensitive",
+                          "+localOnly",
+                          "-localOnly",
+                          "+roleIdsThatCanBeUsedThisEmojiAsReaction",
+                          "-roleIdsThatCanBeUsedThisEmojiAsReaction"
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "OK (with results)",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "emojis": {
+                        "type": "array",
+                        "items": {
+                          "$ref": "#/components/schemas/EmojiDetailedAdmin"
+                        }
+                      },
+                      "count": {
+                        "type": "integer"
+                      },
+                      "allCount": {
+                        "type": "integer"
+                      },
+                      "allPages": {
+                        "type": "integer"
+                      }
+                    },
+                    "required": [
+                      "emojis",
+                      "count",
+                      "allCount",
+                      "allPages"
+                    ]
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Client error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "INVALID_PARAM": {
+                      "value": {
+                        "error": {
+                          "message": "Invalid param.",
+                          "code": "INVALID_PARAM",
+                          "id": "3d81ceae-475f-4600-b2a8-2bc116157532"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "401": {
+              "description": "Authentication error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "CREDENTIAL_REQUIRED": {
+                      "value": {
+                        "error": {
+                          "message": "Credential required.",
+                          "code": "CREDENTIAL_REQUIRED",
+                          "id": "1384574d-a912-4b81-8601-c7b1c4085df1"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "403": {
+              "description": "Forbidden error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "AUTHENTICATION_FAILED": {
+                      "value": {
+                        "error": {
+                          "message": "Authentication failed. Please ensure your token is correct.",
+                          "code": "AUTHENTICATION_FAILED",
+                          "id": "b0a7f5f8-dc2f-4171-b91f-de88ad238e14"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "418": {
+              "description": "I'm Ai",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "I_AM_AI": {
+                      "value": {
+                        "error": {
+                          "message": "You sent a request to Ai-chan, Misskey's showgirl, instead of the server.",
+                          "code": "I_AM_AI",
+                          "id": "60c46cd1-f23a-46b1-bebe-5d2b73951a84"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "500": {
+              "description": "Internal server error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "INTERNAL_ERROR": {
+                      "value": {
+                        "error": {
+                          "message": "Internal error occurred. Please contact us if the error persists.",
+                          "code": "INTERNAL_ERROR",
+                          "id": "5d37dbcb-891e-41ca-a3d6-e690c97775ac"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ],
+  "samples": {
+    "admin/captcha/save": [
+      {
+        "provider": "none"
+      },
+      {
+        "provider": "hcaptcha"
+      },
+      {
+        "provider": "mcaptcha"
+      },
+      {
+        "provider": "recaptcha"
+      },
+      {
+        "provider": "turnstile"
+      },
+      {
+        "provider": "testcaptcha"
+      },
+      {
+        "provider": "none",
+        "future": {
+          "preserved": true
+        },
+        "constructor": {
+          "keep": "constructor"
+        },
+        "__proto__": {
+          "keep": "proto"
+        },
+        "prototype": {
+          "keep": "prototype"
+        }
+      },
+      {
+        "provider": "none",
+        "captchaResult": null,
+        "sitekey": null,
+        "secret": null,
+        "instanceUrl": null
+      },
+      {
+        "provider": "none",
+        "captchaResult": "",
+        "sitekey": "",
+        "secret": "",
+        "instanceUrl": ""
+      },
+      {
+        "provider": "none",
+        "secret": 42
+      },
+      {
+        "provider": "none",
+        "instanceUrl": false
+      },
+      {
+        "provider": "unknown"
+      },
+      {
+        "provider": null
+      },
+      {},
+      [],
+      null,
+      "text",
+      42,
+      true
+    ],
+    "admin/system-webhook/create": [
+      {
+        "isActive": true,
+        "name": "n",
+        "on": [
+          "abuseReport"
+        ],
+        "url": "u"
+      },
+      {
+        "isActive": true,
+        "name": "n",
+        "on": [
+          "abuseReport"
+        ],
+        "url": "u",
+        "future": {
+          "preserved": true
+        },
+        "constructor": {
+          "keep": "constructor"
+        },
+        "__proto__": {
+          "keep": "proto"
+        },
+        "prototype": {
+          "keep": "prototype"
+        }
+      },
+      {
+        "isActive": true,
+        "name": "n",
+        "on": [
+          "abuseReport",
+          "abuseReport"
+        ],
+        "url": "u"
+      },
+      {
+        "isActive": true,
+        "name": "😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀",
+        "on": [
+          "abuseReport"
+        ],
+        "url": "uuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu",
+        "secret": "😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀"
+      },
+      {
+        "isActive": true,
+        "name": "",
+        "on": [
+          "abuseReport"
+        ],
+        "url": "u"
+      },
+      {
+        "isActive": true,
+        "name": "😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀",
+        "on": [
+          "abuseReport"
+        ],
+        "url": "u"
+      },
+      {
+        "isActive": true,
+        "name": "n",
+        "on": [
+          "abuseReport"
+        ],
+        "url": ""
+      },
+      {
+        "isActive": true,
+        "name": "n",
+        "on": [
+          "abuseReport"
+        ],
+        "url": "uuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu"
+      },
+      {
+        "isActive": true,
+        "name": "n",
+        "on": [
+          "abuseReport"
+        ],
+        "url": "u",
+        "secret": null
+      },
+      {
+        "isActive": true,
+        "name": "n",
+        "on": [
+          "abuseReport"
+        ],
+        "url": "u",
+        "secret": "😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀"
+      },
+      {
+        "isActive": true,
+        "name": "n",
+        "on": null,
+        "url": "u"
+      },
+      {
+        "isActive": true,
+        "name": "n",
+        "on": [
+          "unknown"
+        ],
+        "url": "u"
+      },
+      {
+        "isActive": null,
+        "name": "n",
+        "on": [
+          "abuseReport"
+        ],
+        "url": "u"
+      },
+      {
+        "name": "n",
+        "on": [
+          "abuseReport"
+        ],
+        "url": "u"
+      },
+      {
+        "isActive": true,
+        "on": [
+          "abuseReport"
+        ],
+        "url": "u"
+      },
+      {
+        "isActive": true,
+        "name": "n",
+        "url": "u"
+      },
+      {
+        "isActive": true,
+        "name": "n",
+        "on": [
+          "abuseReport"
+        ]
+      },
+      {},
+      [],
+      null,
+      "text",
+      42,
+      true
+    ],
+    "admin/system-webhook/list": [
+      {
+        "future": {
+          "preserved": true
+        },
+        "constructor": {
+          "keep": "constructor"
+        },
+        "__proto__": {
+          "keep": "proto"
+        },
+        "prototype": {
+          "keep": "prototype"
+        }
+      },
+      {
+        "isActive": false
+      },
+      {
+        "on": []
+      },
+      {
+        "on": [
+          "abuseReport",
+          "abuseReport"
+        ]
+      },
+      {
+        "on": [
+          "unknown"
+        ]
+      },
+      {
+        "on": null
+      },
+      {
+        "isActive": null
+      },
+      {},
+      [],
+      null,
+      "text",
+      42,
+      true
+    ],
+    "admin/system-webhook/test": [
+      {
+        "webhookId": "abc123",
+        "type": "abuseReport"
+      },
+      {
+        "webhookId": "abc123",
+        "type": "abuseReportResolved"
+      },
+      {
+        "webhookId": "abc123",
+        "type": "userCreated"
+      },
+      {
+        "webhookId": "abc123",
+        "type": "inactiveModeratorsWarning"
+      },
+      {
+        "webhookId": "abc123",
+        "type": "inactiveModeratorsInvitationOnlyChanged"
+      },
+      {
+        "webhookId": "abc123",
+        "type": "abuseReport"
+      },
+      {
+        "webhookId": "abc123",
+        "type": "abuseReport",
+        "future": {
+          "preserved": true
+        },
+        "constructor": {
+          "keep": "constructor"
+        },
+        "__proto__": {
+          "keep": "proto"
+        },
+        "prototype": {
+          "keep": "prototype"
+        }
+      },
+      {
+        "webhookId": "abc123",
+        "type": "abuseReport",
+        "override": {
+          "future": {
+            "preserved": true
+          },
+          "constructor": {
+            "keep": "constructor"
+          },
+          "__proto__": {
+            "keep": "proto"
+          },
+          "prototype": {
+            "keep": "prototype"
+          }
+        }
+      },
+      {
+        "webhookId": "abc123",
+        "type": "abuseReport",
+        "override": {
+          "url": "",
+          "secret": "",
+          "future": {
+            "preserved": true
+          },
+          "constructor": {
+            "keep": "constructor"
+          },
+          "__proto__": {
+            "keep": "proto"
+          },
+          "prototype": {
+            "keep": "prototype"
+          }
+        }
+      },
+      {
+        "webhookId": "abc123",
+        "type": "abuseReport",
+        "override": []
+      },
+      {
+        "webhookId": "abc123",
+        "type": "abuseReport",
+        "override": null
+      },
+      {
+        "webhookId": "abc123",
+        "type": "abuseReport",
+        "override": {
+          "url": null
+        }
+      },
+      {
+        "webhookId": "abc123",
+        "type": "abuseReport",
+        "override": {
+          "secret": 42
+        }
+      },
+      {
+        "webhookId": "bad-id",
+        "type": "abuseReport"
+      },
+      {
+        "webhookId": "abc123",
+        "type": "unknown"
+      },
+      {
+        "webhookId": "abc123"
+      },
+      {},
+      [],
+      null,
+      "text",
+      42,
+      true
+    ],
+    "admin/system-webhook/update": [
+      {
+        "isActive": true,
+        "name": "n",
+        "on": [
+          "abuseReport"
+        ],
+        "url": "u",
+        "id": "abc123"
+      },
+      {
+        "isActive": true,
+        "name": "n",
+        "on": [
+          "abuseReport"
+        ],
+        "url": "u",
+        "id": "abc123",
+        "future": {
+          "preserved": true
+        },
+        "constructor": {
+          "keep": "constructor"
+        },
+        "__proto__": {
+          "keep": "proto"
+        },
+        "prototype": {
+          "keep": "prototype"
+        }
+      },
+      {
+        "isActive": true,
+        "name": "n",
+        "on": [
+          "abuseReport",
+          "abuseReport"
+        ],
+        "url": "u",
+        "id": "abc123"
+      },
+      {
+        "isActive": true,
+        "name": "😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀",
+        "on": [
+          "abuseReport"
+        ],
+        "url": "uuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu",
+        "id": "abc123",
+        "secret": "😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀"
+      },
+      {
+        "isActive": true,
+        "name": "",
+        "on": [
+          "abuseReport"
+        ],
+        "url": "u",
+        "id": "abc123"
+      },
+      {
+        "isActive": true,
+        "name": "😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀",
+        "on": [
+          "abuseReport"
+        ],
+        "url": "u",
+        "id": "abc123"
+      },
+      {
+        "isActive": true,
+        "name": "n",
+        "on": [
+          "abuseReport"
+        ],
+        "url": "",
+        "id": "abc123"
+      },
+      {
+        "isActive": true,
+        "name": "n",
+        "on": [
+          "abuseReport"
+        ],
+        "url": "uuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu",
+        "id": "abc123"
+      },
+      {
+        "isActive": true,
+        "name": "n",
+        "on": [
+          "abuseReport"
+        ],
+        "url": "u",
+        "id": "abc123",
+        "secret": null
+      },
+      {
+        "isActive": true,
+        "name": "n",
+        "on": [
+          "abuseReport"
+        ],
+        "url": "u",
+        "id": "abc123",
+        "secret": "😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀"
+      },
+      {
+        "isActive": true,
+        "name": "n",
+        "on": null,
+        "url": "u",
+        "id": "abc123"
+      },
+      {
+        "isActive": true,
+        "name": "n",
+        "on": [
+          "unknown"
+        ],
+        "url": "u",
+        "id": "abc123"
+      },
+      {
+        "isActive": null,
+        "name": "n",
+        "on": [
+          "abuseReport"
+        ],
+        "url": "u",
+        "id": "abc123"
+      },
+      {
+        "isActive": true,
+        "name": "n",
+        "on": [
+          "abuseReport"
+        ],
+        "url": "u"
+      },
+      {
+        "name": "n",
+        "on": [
+          "abuseReport"
+        ],
+        "url": "u",
+        "id": "abc123"
+      },
+      {
+        "isActive": true,
+        "on": [
+          "abuseReport"
+        ],
+        "url": "u",
+        "id": "abc123"
+      },
+      {
+        "isActive": true,
+        "name": "n",
+        "url": "u",
+        "id": "abc123"
+      },
+      {
+        "isActive": true,
+        "name": "n",
+        "on": [
+          "abuseReport"
+        ],
+        "id": "abc123"
+      },
+      {
+        "isActive": true,
+        "name": "n",
+        "on": [
+          "abuseReport"
+        ],
+        "url": "u",
+        "id": "bad-id"
+      },
+      {},
+      [],
+      null,
+      "text",
+      42,
+      true
+    ],
+    "admin/update-proxy-account": [
+      {
+        "future": {
+          "preserved": true
+        },
+        "constructor": {
+          "keep": "constructor"
+        },
+        "__proto__": {
+          "keep": "proto"
+        },
+        "prototype": {
+          "keep": "prototype"
+        }
+      },
+      {
+        "description": null
+      },
+      {
+        "description": "x"
+      },
+      {
+        "description": "😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀"
+      },
+      {
+        "description": "😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀"
+      },
+      {
+        "description": ""
+      },
+      {
+        "description": 42
+      },
+      {},
+      [],
+      null,
+      "text",
+      42,
+      true
+    ],
+    "i/notifications": [
+      {
+        "future": {
+          "preserved": true
+        },
+        "constructor": {
+          "keep": "constructor"
+        },
+        "__proto__": {
+          "keep": "proto"
+        },
+        "prototype": {
+          "keep": "prototype"
+        }
+      },
+      {
+        "includeTypes": [
+          "note"
+        ]
+      },
+      {
+        "includeTypes": [
+          "follow"
+        ]
+      },
+      {
+        "includeTypes": [
+          "mention"
+        ]
+      },
+      {
+        "includeTypes": [
+          "reply"
+        ]
+      },
+      {
+        "includeTypes": [
+          "renote"
+        ]
+      },
+      {
+        "includeTypes": [
+          "quote"
+        ]
+      },
+      {
+        "includeTypes": [
+          "reaction"
+        ]
+      },
+      {
+        "includeTypes": [
+          "pollEnded"
+        ]
+      },
+      {
+        "includeTypes": [
+          "scheduledNotePosted"
+        ]
+      },
+      {
+        "includeTypes": [
+          "scheduledNotePostFailed"
+        ]
+      },
+      {
+        "includeTypes": [
+          "receiveFollowRequest"
+        ]
+      },
+      {
+        "includeTypes": [
+          "followRequestAccepted"
+        ]
+      },
+      {
+        "includeTypes": [
+          "roleAssigned"
+        ]
+      },
+      {
+        "includeTypes": [
+          "chatRoomInvitationReceived"
+        ]
+      },
+      {
+        "includeTypes": [
+          "achievementEarned"
+        ]
+      },
+      {
+        "includeTypes": [
+          "exportCompleted"
+        ]
+      },
+      {
+        "includeTypes": [
+          "login"
+        ]
+      },
+      {
+        "includeTypes": [
+          "createToken"
+        ]
+      },
+      {
+        "includeTypes": [
+          "app"
+        ]
+      },
+      {
+        "includeTypes": [
+          "test"
+        ]
+      },
+      {
+        "includeTypes": [
+          "pollVote"
+        ]
+      },
+      {
+        "includeTypes": [
+          "groupInvited"
+        ]
+      },
+      {
+        "includeTypes": [
+          "note",
+          "follow",
+          "mention",
+          "reply",
+          "renote",
+          "quote",
+          "reaction",
+          "pollEnded",
+          "scheduledNotePosted",
+          "scheduledNotePostFailed",
+          "receiveFollowRequest",
+          "followRequestAccepted",
+          "roleAssigned",
+          "chatRoomInvitationReceived",
+          "achievementEarned",
+          "exportCompleted",
+          "login",
+          "createToken",
+          "app",
+          "test",
+          "pollVote",
+          "groupInvited",
+          "note",
+          "follow",
+          "mention",
+          "reply",
+          "renote",
+          "quote",
+          "reaction",
+          "pollEnded",
+          "scheduledNotePosted",
+          "scheduledNotePostFailed",
+          "receiveFollowRequest",
+          "followRequestAccepted",
+          "roleAssigned",
+          "chatRoomInvitationReceived",
+          "achievementEarned",
+          "exportCompleted",
+          "login",
+          "createToken",
+          "app",
+          "test",
+          "pollVote",
+          "groupInvited"
+        ],
+        "excludeTypes": [
+          "note",
+          "follow",
+          "mention",
+          "reply",
+          "renote",
+          "quote",
+          "reaction",
+          "pollEnded",
+          "scheduledNotePosted",
+          "scheduledNotePostFailed",
+          "receiveFollowRequest",
+          "followRequestAccepted",
+          "roleAssigned",
+          "chatRoomInvitationReceived",
+          "achievementEarned",
+          "exportCompleted",
+          "login",
+          "createToken",
+          "app",
+          "test",
+          "pollVote",
+          "groupInvited"
+        ]
+      },
+      {
+        "includeTypes": [],
+        "excludeTypes": []
+      },
+      {
+        "includeTypes": [
+          "reaction:grouped"
+        ]
+      },
+      {
+        "excludeTypes": [
+          "renote:grouped"
+        ]
+      },
+      {
+        "includeTypes": [
+          "unknown"
+        ]
+      },
+      {
+        "excludeTypes": null
+      },
+      {
+        "markAsRead": false
+      },
+      {
+        "markAsRead": null
+      },
+      {
+        "sinceId": "abc123",
+        "untilId": "def456",
+        "sinceDate": 0,
+        "untilDate": 1
+      },
+      {
+        "sinceId": "bad-id"
+      },
+      {
+        "limit": 1
+      },
+      {
+        "limit": 100
+      },
+      {
+        "limit": 0
+      },
+      {
+        "limit": 101
+      },
+      {
+        "limit": 1.5
+      },
+      {},
+      [],
+      null,
+      "text",
+      42,
+      true
+    ],
+    "i/notifications-grouped": [
+      {
+        "future": {
+          "preserved": true
+        },
+        "constructor": {
+          "keep": "constructor"
+        },
+        "__proto__": {
+          "keep": "proto"
+        },
+        "prototype": {
+          "keep": "prototype"
+        }
+      },
+      {
+        "includeTypes": [
+          "note"
+        ]
+      },
+      {
+        "includeTypes": [
+          "follow"
+        ]
+      },
+      {
+        "includeTypes": [
+          "mention"
+        ]
+      },
+      {
+        "includeTypes": [
+          "reply"
+        ]
+      },
+      {
+        "includeTypes": [
+          "renote"
+        ]
+      },
+      {
+        "includeTypes": [
+          "quote"
+        ]
+      },
+      {
+        "includeTypes": [
+          "reaction"
+        ]
+      },
+      {
+        "includeTypes": [
+          "pollEnded"
+        ]
+      },
+      {
+        "includeTypes": [
+          "scheduledNotePosted"
+        ]
+      },
+      {
+        "includeTypes": [
+          "scheduledNotePostFailed"
+        ]
+      },
+      {
+        "includeTypes": [
+          "receiveFollowRequest"
+        ]
+      },
+      {
+        "includeTypes": [
+          "followRequestAccepted"
+        ]
+      },
+      {
+        "includeTypes": [
+          "roleAssigned"
+        ]
+      },
+      {
+        "includeTypes": [
+          "chatRoomInvitationReceived"
+        ]
+      },
+      {
+        "includeTypes": [
+          "achievementEarned"
+        ]
+      },
+      {
+        "includeTypes": [
+          "exportCompleted"
+        ]
+      },
+      {
+        "includeTypes": [
+          "login"
+        ]
+      },
+      {
+        "includeTypes": [
+          "createToken"
+        ]
+      },
+      {
+        "includeTypes": [
+          "app"
+        ]
+      },
+      {
+        "includeTypes": [
+          "test"
+        ]
+      },
+      {
+        "includeTypes": [
+          "pollVote"
+        ]
+      },
+      {
+        "includeTypes": [
+          "groupInvited"
+        ]
+      },
+      {
+        "includeTypes": [
+          "note",
+          "follow",
+          "mention",
+          "reply",
+          "renote",
+          "quote",
+          "reaction",
+          "pollEnded",
+          "scheduledNotePosted",
+          "scheduledNotePostFailed",
+          "receiveFollowRequest",
+          "followRequestAccepted",
+          "roleAssigned",
+          "chatRoomInvitationReceived",
+          "achievementEarned",
+          "exportCompleted",
+          "login",
+          "createToken",
+          "app",
+          "test",
+          "pollVote",
+          "groupInvited",
+          "note",
+          "follow",
+          "mention",
+          "reply",
+          "renote",
+          "quote",
+          "reaction",
+          "pollEnded",
+          "scheduledNotePosted",
+          "scheduledNotePostFailed",
+          "receiveFollowRequest",
+          "followRequestAccepted",
+          "roleAssigned",
+          "chatRoomInvitationReceived",
+          "achievementEarned",
+          "exportCompleted",
+          "login",
+          "createToken",
+          "app",
+          "test",
+          "pollVote",
+          "groupInvited"
+        ],
+        "excludeTypes": [
+          "note",
+          "follow",
+          "mention",
+          "reply",
+          "renote",
+          "quote",
+          "reaction",
+          "pollEnded",
+          "scheduledNotePosted",
+          "scheduledNotePostFailed",
+          "receiveFollowRequest",
+          "followRequestAccepted",
+          "roleAssigned",
+          "chatRoomInvitationReceived",
+          "achievementEarned",
+          "exportCompleted",
+          "login",
+          "createToken",
+          "app",
+          "test",
+          "pollVote",
+          "groupInvited"
+        ]
+      },
+      {
+        "includeTypes": [],
+        "excludeTypes": []
+      },
+      {
+        "includeTypes": [
+          "reaction:grouped"
+        ]
+      },
+      {
+        "excludeTypes": [
+          "renote:grouped"
+        ]
+      },
+      {
+        "includeTypes": [
+          "unknown"
+        ]
+      },
+      {
+        "excludeTypes": null
+      },
+      {
+        "markAsRead": false
+      },
+      {
+        "markAsRead": null
+      },
+      {
+        "sinceId": "abc123",
+        "untilId": "def456",
+        "sinceDate": 0,
+        "untilDate": 1
+      },
+      {
+        "sinceId": "bad-id"
+      },
+      {
+        "limit": 1
+      },
+      {
+        "limit": 100
+      },
+      {
+        "limit": 0
+      },
+      {
+        "limit": 101
+      },
+      {
+        "limit": 1.5
+      },
+      {},
+      [],
+      null,
+      "text",
+      42,
+      true
+    ],
+    "pages/create": [
+      {
+        "title": "t",
+        "name": "good-name",
+        "content": [
+          {}
+        ],
+        "variables": [
+          {}
+        ],
+        "script": ""
+      },
+      {
+        "title": "t",
+        "name": "good-name",
+        "content": [
+          {}
+        ],
+        "variables": [
+          {}
+        ],
+        "script": "",
+        "future": {
+          "preserved": true
+        },
+        "constructor": {
+          "keep": "constructor"
+        },
+        "__proto__": {
+          "keep": "proto"
+        },
+        "prototype": {
+          "keep": "prototype"
+        }
+      },
+      {
+        "title": "t",
+        "name": "good-name",
+        "content": [
+          {
+            "future": {
+              "preserved": true
+            },
+            "constructor": {
+              "keep": "constructor"
+            },
+            "__proto__": {
+              "keep": "proto"
+            },
+            "prototype": {
+              "keep": "prototype"
+            }
+          }
+        ],
+        "variables": [
+          {
+            "future": {
+              "preserved": true
+            },
+            "constructor": {
+              "keep": "constructor"
+            },
+            "__proto__": {
+              "keep": "proto"
+            },
+            "prototype": {
+              "keep": "prototype"
+            }
+          }
+        ],
+        "script": ""
+      },
+      {
+        "title": "t",
+        "name": "ああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああ",
+        "content": [
+          {}
+        ],
+        "variables": [
+          {}
+        ],
+        "script": ""
+      },
+      {
+        "title": "t",
+        "name": "あああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああ",
+        "content": [
+          {}
+        ],
+        "variables": [
+          {}
+        ],
+        "script": ""
+      },
+      {
+        "title": "t",
+        "name": "😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀",
+        "content": [
+          {}
+        ],
+        "variables": [
+          {}
+        ],
+        "script": ""
+      },
+      {
+        "title": "t",
+        "name": "😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀",
+        "content": [
+          {}
+        ],
+        "variables": [
+          {}
+        ],
+        "script": ""
+      },
+      {
+        "title": "t",
+        "name": "😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀",
+        "content": [
+          {}
+        ],
+        "variables": [
+          {}
+        ],
+        "script": ""
+      },
+      {
+        "title": "t",
+        "name": "😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀",
+        "content": [
+          {}
+        ],
+        "variables": [
+          {}
+        ],
+        "script": ""
+      },
+      {
+        "title": "t",
+        "name": "good-name",
+        "content": [
+          {}
+        ],
+        "variables": [
+          {}
+        ],
+        "script": "",
+        "summary": null,
+        "eyeCatchingImageId": null
+      },
+      {
+        "title": "t",
+        "name": "good-name",
+        "content": [
+          {}
+        ],
+        "variables": [
+          {}
+        ],
+        "script": "",
+        "font": "serif",
+        "alignCenter": true,
+        "hideTitleWhenPinned": true
+      },
+      {
+        "title": "t",
+        "name": "good-name",
+        "content": [],
+        "variables": [],
+        "script": ""
+      },
+      {
+        "title": "t",
+        "name": "",
+        "content": [
+          {}
+        ],
+        "variables": [
+          {}
+        ],
+        "script": ""
+      },
+      {
+        "title": "t",
+        "name": "bad name",
+        "content": [
+          {}
+        ],
+        "variables": [
+          {}
+        ],
+        "script": ""
+      },
+      {
+        "title": "t",
+        "name": "bad/name",
+        "content": [
+          {}
+        ],
+        "variables": [
+          {}
+        ],
+        "script": ""
+      },
+      {
+        "title": "t",
+        "name": "bad:name",
+        "content": [
+          {}
+        ],
+        "variables": [
+          {}
+        ],
+        "script": ""
+      },
+      {
+        "title": "t",
+        "name": "bad?name",
+        "content": [
+          {}
+        ],
+        "variables": [
+          {}
+        ],
+        "script": ""
+      },
+      {
+        "title": "t",
+        "name": "bad%name",
+        "content": [
+          {}
+        ],
+        "variables": [
+          {}
+        ],
+        "script": ""
+      },
+      {
+        "title": "t",
+        "name": "bad\\name",
+        "content": [
+          {}
+        ],
+        "variables": [
+          {}
+        ],
+        "script": ""
+      },
+      {
+        "title": "t",
+        "name": "bad\nname",
+        "content": [
+          {}
+        ],
+        "variables": [
+          {}
+        ],
+        "script": ""
+      },
+      {
+        "title": "t",
+        "name": "bad\u0000name",
+        "content": [
+          {}
+        ],
+        "variables": [
+          {}
+        ],
+        "script": ""
+      },
+      {
+        "title": "t",
+        "name": "good-name",
+        "content": [
+          []
+        ],
+        "variables": [
+          {}
+        ],
+        "script": ""
+      },
+      {
+        "title": "t",
+        "name": "good-name",
+        "content": [
+          {}
+        ],
+        "variables": [
+          null
+        ],
+        "script": ""
+      },
+      {
+        "title": "t",
+        "name": "good-name",
+        "content": [
+          42
+        ],
+        "variables": [
+          {}
+        ],
+        "script": ""
+      },
+      {
+        "title": "t",
+        "name": "good-name",
+        "content": null,
+        "variables": [
+          {}
+        ],
+        "script": ""
+      },
+      {
+        "title": "t",
+        "name": "good-name",
+        "content": [
+          {}
+        ],
+        "variables": [
+          {}
+        ],
+        "script": "",
+        "font": "unknown"
+      },
+      {
+        "title": "t",
+        "name": "good-name",
+        "content": [
+          {}
+        ],
+        "variables": [
+          {}
+        ],
+        "script": "",
+        "eyeCatchingImageId": "bad-id"
+      },
+      {
+        "name": "good-name",
+        "content": [
+          {}
+        ],
+        "variables": [
+          {}
+        ],
+        "script": ""
+      },
+      {
+        "title": "t",
+        "content": [
+          {}
+        ],
+        "variables": [
+          {}
+        ],
+        "script": ""
+      },
+      {
+        "title": "t",
+        "name": "good-name",
+        "variables": [
+          {}
+        ],
+        "script": ""
+      },
+      {
+        "title": "t",
+        "name": "good-name",
+        "content": [
+          {}
+        ],
+        "script": ""
+      },
+      {
+        "title": "t",
+        "name": "good-name",
+        "content": [
+          {}
+        ],
+        "variables": [
+          {}
+        ]
+      },
+      {},
+      [],
+      null,
+      "text",
+      42,
+      true
+    ],
+    "pages/update": [
+      {
+        "pageId": "abc123"
+      },
+      {
+        "pageId": "abc123",
+        "future": {
+          "preserved": true
+        },
+        "constructor": {
+          "keep": "constructor"
+        },
+        "__proto__": {
+          "keep": "proto"
+        },
+        "prototype": {
+          "keep": "prototype"
+        }
+      },
+      {
+        "pageId": "abc123",
+        "content": [
+          {
+            "future": {
+              "preserved": true
+            },
+            "constructor": {
+              "keep": "constructor"
+            },
+            "__proto__": {
+              "keep": "proto"
+            },
+            "prototype": {
+              "keep": "prototype"
+            }
+          }
+        ],
+        "variables": [
+          {
+            "future": {
+              "preserved": true
+            },
+            "constructor": {
+              "keep": "constructor"
+            },
+            "__proto__": {
+              "keep": "proto"
+            },
+            "prototype": {
+              "keep": "prototype"
+            }
+          }
+        ]
+      },
+      {
+        "pageId": "abc123",
+        "name": "ああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああ"
+      },
+      {
+        "pageId": "abc123",
+        "name": "あああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああ"
+      },
+      {
+        "pageId": "abc123",
+        "name": "😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀"
+      },
+      {
+        "pageId": "abc123",
+        "name": "😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀"
+      },
+      {
+        "pageId": "abc123",
+        "name": "😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀"
+      },
+      {
+        "pageId": "abc123",
+        "name": "😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀"
+      },
+      {
+        "pageId": "abc123",
+        "summary": null,
+        "eyeCatchingImageId": null
+      },
+      {
+        "pageId": "abc123",
+        "font": "serif",
+        "alignCenter": true,
+        "hideTitleWhenPinned": true
+      },
+      {
+        "pageId": "abc123",
+        "content": [],
+        "variables": []
+      },
+      {
+        "pageId": "abc123",
+        "name": ""
+      },
+      {
+        "pageId": "abc123",
+        "name": "bad name"
+      },
+      {
+        "pageId": "abc123",
+        "name": "bad/name"
+      },
+      {
+        "pageId": "abc123",
+        "name": "bad:name"
+      },
+      {
+        "pageId": "abc123",
+        "name": "bad?name"
+      },
+      {
+        "pageId": "abc123",
+        "name": "bad%name"
+      },
+      {
+        "pageId": "abc123",
+        "name": "bad\\name"
+      },
+      {
+        "pageId": "abc123",
+        "name": "bad\nname"
+      },
+      {
+        "pageId": "abc123",
+        "name": "bad\u0000name"
+      },
+      {
+        "pageId": "abc123",
+        "content": [
+          []
+        ]
+      },
+      {
+        "pageId": "abc123",
+        "variables": [
+          null
+        ]
+      },
+      {
+        "pageId": "abc123",
+        "content": [
+          42
+        ]
+      },
+      {
+        "pageId": "abc123",
+        "content": null
+      },
+      {
+        "pageId": "abc123",
+        "font": "unknown"
+      },
+      {
+        "pageId": "abc123",
+        "eyeCatchingImageId": "bad-id"
+      },
+      {},
+      [],
+      null,
+      "text",
+      42,
+      true
+    ],
+    "v2/admin/emoji/list": [
+      {
+        "future": {
+          "preserved": true
+        },
+        "constructor": {
+          "keep": "constructor"
+        },
+        "__proto__": {
+          "keep": "proto"
+        },
+        "prototype": {
+          "keep": "prototype"
+        }
+      },
+      {
+        "query": null
+      },
+      {
+        "query": {}
+      },
+      {
+        "query": {
+          "future": {
+            "preserved": true
+          },
+          "constructor": {
+            "keep": "constructor"
+          },
+          "__proto__": {
+            "keep": "proto"
+          },
+          "prototype": {
+            "keep": "prototype"
+          }
+        }
+      },
+      {
+        "query": {
+          "hostType": "local"
+        }
+      },
+      {
+        "query": {
+          "hostType": "remote"
+        }
+      },
+      {
+        "query": {
+          "hostType": "all"
+        }
+      },
+      {
+        "sortKeys": [
+          "+id"
+        ]
+      },
+      {
+        "sortKeys": [
+          "-id"
+        ]
+      },
+      {
+        "sortKeys": [
+          "+updatedAt"
+        ]
+      },
+      {
+        "sortKeys": [
+          "-updatedAt"
+        ]
+      },
+      {
+        "sortKeys": [
+          "+name"
+        ]
+      },
+      {
+        "sortKeys": [
+          "-name"
+        ]
+      },
+      {
+        "sortKeys": [
+          "+host"
+        ]
+      },
+      {
+        "sortKeys": [
+          "-host"
+        ]
+      },
+      {
+        "sortKeys": [
+          "+uri"
+        ]
+      },
+      {
+        "sortKeys": [
+          "-uri"
+        ]
+      },
+      {
+        "sortKeys": [
+          "+publicUrl"
+        ]
+      },
+      {
+        "sortKeys": [
+          "-publicUrl"
+        ]
+      },
+      {
+        "sortKeys": [
+          "+type"
+        ]
+      },
+      {
+        "sortKeys": [
+          "-type"
+        ]
+      },
+      {
+        "sortKeys": [
+          "+aliases"
+        ]
+      },
+      {
+        "sortKeys": [
+          "-aliases"
+        ]
+      },
+      {
+        "sortKeys": [
+          "+category"
+        ]
+      },
+      {
+        "sortKeys": [
+          "-category"
+        ]
+      },
+      {
+        "sortKeys": [
+          "+license"
+        ]
+      },
+      {
+        "sortKeys": [
+          "-license"
+        ]
+      },
+      {
+        "sortKeys": [
+          "+isSensitive"
+        ]
+      },
+      {
+        "sortKeys": [
+          "-isSensitive"
+        ]
+      },
+      {
+        "sortKeys": [
+          "+localOnly"
+        ]
+      },
+      {
+        "sortKeys": [
+          "-localOnly"
+        ]
+      },
+      {
+        "sortKeys": [
+          "+roleIdsThatCanBeUsedThisEmojiAsReaction"
+        ]
+      },
+      {
+        "sortKeys": [
+          "-roleIdsThatCanBeUsedThisEmojiAsReaction"
+        ]
+      },
+      {
+        "sortKeys": [
+          "-id",
+          "-id"
+        ]
+      },
+      {
+        "sortKeys": []
+      },
+      {
+        "sortKeys": [
+          "unknown"
+        ]
+      },
+      {
+        "query": []
+      },
+      {
+        "query": {
+          "hostType": null
+        }
+      },
+      {
+        "query": {
+          "hostType": "unknown"
+        }
+      },
+      {
+        "query": {
+          "roleIds": [
+            "abc123",
+            "abc123"
+          ]
+        }
+      },
+      {
+        "query": {
+          "roleIds": [
+            "bad-id"
+          ]
+        }
+      },
+      {
+        "query": {
+          "name": null
+        }
+      },
+      {
+        "query": {
+          "isSensitive": "true"
+        }
+      },
+      {
+        "sinceId": "bad-id"
+      },
+      {
+        "limit": 1
+      },
+      {
+        "limit": 100
+      },
+      {
+        "limit": 0
+      },
+      {
+        "limit": 101
+      },
+      {
+        "limit": 1.5
+      },
+      {
+        "page": 1.5
+      },
+      {},
+      [],
+      null,
+      "text",
+      42,
+      true
+    ]
+  }
+}

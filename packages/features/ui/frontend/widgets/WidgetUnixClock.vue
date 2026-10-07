@@ -19,7 +19,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 import { onUnmounted, ref, watch } from 'vue';
 import { createVisibilityAwareInterval } from '@@/js/interval.js';
 import { useWidgetPropsManager } from './widget.js';
-import { i18n } from '@features/runtime/frontend/i18n.js';
 import type { WidgetComponentEmits, WidgetComponentExpose, WidgetComponentProps } from './widget.js';
 import type { FormWithDefault, GetFormResultType } from '@features/ui/frontend/utility/form.js';
 
@@ -28,23 +27,23 @@ const name = 'unixClock';
 const widgetPropsDef = {
 	transparent: {
 		type: 'boolean',
-		label: i18n.ts._widgetOptions.transparent,
+		label: $locale.value.sfc.transparent,
 		default: false,
 	},
 	fontSize: {
 		type: 'number',
-		label: i18n.ts.fontSize,
+		label: $locale.value.sfc.fontSize,
 		default: 1.5,
 		step: 0.1,
 	},
 	showMs: {
 		type: 'boolean',
-		label: i18n.ts._widgetOptions._clock.showMs,
+		label: $locale.value.sfc.showMs,
 		default: true,
 	},
 	showLabel: {
 		type: 'boolean',
-		label: i18n.ts._widgetOptions._clock.showLabel,
+		label: $locale.value.sfc.showLabel,
 		default: true,
 	},
 } satisfies FormWithDefault;
@@ -144,3 +143,255 @@ defineExpose<WidgetComponentExpose>({
 	}
 }
 </style>
+
+<locale locale="ar-SA" lang="json">
+{
+	"transparent": "Make background transparent",
+	"fontSize": "حجم الخط",
+	"showMs": "Show Miliseconds",
+	"showLabel": "Show Label"
+}
+</locale>
+
+<locale locale="ca-ES" lang="json">
+{
+	"transparent": "Fons transparent",
+	"fontSize": "Mida del text",
+	"showMs": "Mostrar mil·lisegons",
+	"showLabel": "Mostrar etiqueta"
+}
+</locale>
+
+<locale locale="cs-CZ" lang="json">
+{
+	"transparent": "Make background transparent",
+	"fontSize": "Velikost písma",
+	"showMs": "Show Miliseconds",
+	"showLabel": "Show Label"
+}
+</locale>
+
+<locale locale="da-DK" lang="json">
+{
+	"transparent": "Make background transparent",
+	"fontSize": "Font size",
+	"showMs": "Show Miliseconds",
+	"showLabel": "Show Label"
+}
+</locale>
+
+<locale locale="de-DE" lang="json">
+{
+	"transparent": "Hintergrund transparent machen",
+	"fontSize": "Schriftgröße",
+	"showMs": "Millisekunden anzeigen",
+	"showLabel": "Beschriftung anzeigen"
+}
+</locale>
+
+<locale locale="en-US" lang="json">
+{
+	"transparent": "Make background transparent",
+	"fontSize": "Font size",
+	"showMs": "Show Miliseconds",
+	"showLabel": "Show Label"
+}
+</locale>
+
+<locale locale="es-ES" lang="json">
+{
+	"transparent": "Hacer fondo transparente",
+	"fontSize": "Tamaño de la letra",
+	"showMs": "Mostrar milisegundos",
+	"showLabel": "Mostrar etiqueta"
+}
+</locale>
+
+<locale locale="fr-FR" lang="json">
+{
+	"transparent": "Make background transparent",
+	"fontSize": "Taille de la police",
+	"showMs": "Show Miliseconds",
+	"showLabel": "Show Label"
+}
+</locale>
+
+<locale locale="id-ID" lang="json">
+{
+	"transparent": "Make background transparent",
+	"fontSize": "Ukuran huruf",
+	"showMs": "Show Miliseconds",
+	"showLabel": "Show Label"
+}
+</locale>
+
+<locale locale="it-IT" lang="json">
+{
+	"transparent": "Sfondo trasparente",
+	"fontSize": "Dimensione carattere",
+	"showMs": "Millisecondi visibili",
+	"showLabel": "Etichetta visibile"
+}
+</locale>
+
+<locale locale="ja-JP" lang="json">
+{
+	"transparent": "背景を透明にする",
+	"fontSize": "フォントサイズ",
+	"showMs": "ミリ秒を表示",
+	"showLabel": "ラベルを表示"
+}
+</locale>
+
+<locale locale="ja-KS" lang="json">
+{
+	"transparent": "背景を透明にする",
+	"fontSize": "字の大きさ",
+	"showMs": "ミリ秒を表示",
+	"showLabel": "ラベルを表示"
+}
+</locale>
+
+<locale locale="kab-KAB" lang="json">
+{
+	"transparent": "Make background transparent",
+	"fontSize": "Font size",
+	"showMs": "Show Miliseconds",
+	"showLabel": "Show Label"
+}
+</locale>
+
+<locale locale="kn-IN" lang="json">
+{
+	"transparent": "Make background transparent",
+	"fontSize": "Font size",
+	"showMs": "Show Miliseconds",
+	"showLabel": "Show Label"
+}
+</locale>
+
+<locale locale="ko-KR" lang="json">
+{
+	"transparent": "배경을 투명하게 설정",
+	"fontSize": "글자 크기",
+	"showMs": "밀리초 표시",
+	"showLabel": "레이블 표시"
+}
+</locale>
+
+<locale locale="nl-NL" lang="json">
+{
+	"transparent": "Make background transparent",
+	"fontSize": "Lettergrootte",
+	"showMs": "Show Miliseconds",
+	"showLabel": "Show Label"
+}
+</locale>
+
+<locale locale="no-NO" lang="json">
+{
+	"transparent": "Make background transparent",
+	"fontSize": "Font size",
+	"showMs": "Show Miliseconds",
+	"showLabel": "Show Label"
+}
+</locale>
+
+<locale locale="pl-PL" lang="json">
+{
+	"transparent": "Make background transparent",
+	"fontSize": "Rozmiar czcionki",
+	"showMs": "Show Miliseconds",
+	"showLabel": "Show Label"
+}
+</locale>
+
+<locale locale="pt-PT" lang="json">
+{
+	"transparent": "Make background transparent",
+	"fontSize": "Tamanho do texto",
+	"showMs": "Show Miliseconds",
+	"showLabel": "Show Label"
+}
+</locale>
+
+<locale locale="ru-RU" lang="json">
+{
+	"transparent": "Make background transparent",
+	"fontSize": "Размер шрифта",
+	"showMs": "Show Miliseconds",
+	"showLabel": "Show Label"
+}
+</locale>
+
+<locale locale="sk-SK" lang="json">
+{
+	"transparent": "Make background transparent",
+	"fontSize": "Veľkosť písma",
+	"showMs": "Show Miliseconds",
+	"showLabel": "Show Label"
+}
+</locale>
+
+<locale locale="th-TH" lang="json">
+{
+	"transparent": "ทำพื้นหลังโปรงใส",
+	"fontSize": "ขนาดตัวอักษร",
+	"showMs": "แสดงมิลลิวินาที",
+	"showLabel": "แสดงป้าย"
+}
+</locale>
+
+<locale locale="tr-TR" lang="json">
+{
+	"transparent": "Arka planı şeffaf yapın",
+	"fontSize": "Yazı tipi boyutu",
+	"showMs": "Milisaniye cinsinden göster",
+	"showLabel": "Etiketi Göster"
+}
+</locale>
+
+<locale locale="ug-CN" lang="json">
+{
+	"transparent": "Make background transparent",
+	"fontSize": "Font size",
+	"showMs": "Show Miliseconds",
+	"showLabel": "Show Label"
+}
+</locale>
+
+<locale locale="uk-UA" lang="json">
+{
+	"transparent": "Make background transparent",
+	"fontSize": "Розмір шрифту",
+	"showMs": "Show Miliseconds",
+	"showLabel": "Show Label"
+}
+</locale>
+
+<locale locale="vi-VN" lang="json">
+{
+	"transparent": "Make background transparent",
+	"fontSize": "Cỡ chữ",
+	"showMs": "Show Miliseconds",
+	"showLabel": "Show Label"
+}
+</locale>
+
+<locale locale="zh-CN" lang="json">
+{
+	"transparent": "使背景透明",
+	"fontSize": "字体大小",
+	"showMs": "显示毫秒",
+	"showLabel": "显示标签"
+}
+</locale>
+
+<locale locale="zh-TW" lang="json">
+{
+	"transparent": "使背景透明",
+	"fontSize": "字體大小",
+	"showMs": "顯示毫秒",
+	"showLabel": "顯示標記"
+}
+</locale>

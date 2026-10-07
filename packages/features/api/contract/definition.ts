@@ -16,5 +16,16 @@ export function defineEndpointContract<Input extends v.GenericSchema, Output ext
 	return { input, output, contract: oc.route(route).input(input).output(output) } as const;
 }
 
-export type EndpointContractDefinition<Input extends v.GenericSchema, Output extends v.GenericSchema> =
-	ReturnType<typeof defineEndpointContract<Input, Output>>;
+/** Wire defaults to logical input for every existing JSON definition. */
+export type EndpointContractDefinition<
+	Input extends v.GenericSchema,
+	Output extends v.GenericSchema,
+	WireInput extends v.GenericSchema = Input,
+> = {
+	readonly input: Input;
+	readonly output: Output;
+	readonly contract: ReturnType<typeof defineEndpointContract<WireInput, Output>>['contract'];
+} & (
+	| { readonly transport?: undefined; readonly wireInput?: never }
+	| { readonly transport: 'multipart/form-data'; readonly wireInput: WireInput }
+);

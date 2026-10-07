@@ -4,8 +4,11 @@
  */
 
 import { Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
-import { CaptchaService, supportedCaptchaProviders } from '../../../services/CaptchaService.js';
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { emptyAdminCaptchaCurrentDefinition, emptyAdminCaptchaCurrentInput, emptyAdminCaptchaCurrentOutput } from '../../../../contract/empty-input-endpoint-definitions.js';
+import { CaptchaService } from '../../../services/CaptchaService.js';
+
+const contractProjection = projectEndpointContract(emptyAdminCaptchaCurrentDefinition);
 
 export const meta = {
 	tags: ['admin', 'captcha'],
@@ -16,54 +19,17 @@ export const meta = {
 	// 実態はmetaの取得であるため
 	kind: 'read:admin:meta',
 
-	res: {
-		type: 'object',
-		properties: {
-			provider: {
-				type: 'string',
-				enum: supportedCaptchaProviders,
-			},
-			hcaptcha: {
-				type: 'object',
-				properties: {
-					siteKey: { type: 'string', nullable: true },
-					secretKey: { type: 'string', nullable: true },
-				},
-			},
-			mcaptcha: {
-				type: 'object',
-				properties: {
-					siteKey: { type: 'string', nullable: true },
-					secretKey: { type: 'string', nullable: true },
-					instanceUrl: { type: 'string', nullable: true },
-				},
-			},
-			recaptcha: {
-				type: 'object',
-				properties: {
-					siteKey: { type: 'string', nullable: true },
-					secretKey: { type: 'string', nullable: true },
-				},
-			},
-			turnstile: {
-				type: 'object',
-				properties: {
-					siteKey: { type: 'string', nullable: true },
-					secretKey: { type: 'string', nullable: true },
-				},
-			},
-		},
-	},
+	res: contractProjection.response,
 } as const;
 
-export const paramDef = {} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof emptyAdminCaptchaCurrentInput, typeof emptyAdminCaptchaCurrentOutput> {
 	constructor(
 		private captchaService: CaptchaService,
 	) {
-		super(meta, paramDef, async () => {
+		super(meta, contractProjection, async () => {
 			return this.captchaService.get();
 		});
 	}

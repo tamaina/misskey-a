@@ -3,33 +3,19 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { defineServices, service } from '../../index/backend/service-definitions.js';
+import { ports } from '../../index/backend/service-ports.js';
 import { FlashEntityService } from './serializers/FlashEntityService.js';
 import { FlashLikeEntityService } from './serializers/FlashLikeEntityService.js';
 import { FlashService } from './services/FlashService.js';
-import type { FlashLikesRepository, FlashsRepository } from '@/models/_.js';
-import type { UserEntityService } from '../../users/backend/serializers/UserEntityService.js';
-import type { IdService } from '../../runtime/backend/services/IdService.js';
-import type { QueryService } from '@/core/QueryService.js';
+import type { Inputs, Outputs } from '../../index/backend/service-definitions.js';
 
-export interface PlayServicesDependencies {
-	flashsRepository: FlashsRepository;
-	flashLikesRepository: FlashLikesRepository;
-	userEntityService: Pick<UserEntityService, 'pack' | 'packMany'>;
-	idService: Pick<IdService, 'parse'>;
-	queryService: Pick<QueryService, 'makePaginationQuery'>;
-}
-
-/** Compose this feature without starting resources or resolving a container. */
-export function createPlayServices(deps: PlayServicesDependencies) {
-	const flashEntityService = new FlashEntityService(deps.flashsRepository, deps.flashLikesRepository, deps.userEntityService, deps.idService);
-	const flashLikeEntityService = new FlashLikeEntityService(deps.flashLikesRepository, flashEntityService);
-	const flashService = new FlashService(deps.flashsRepository, deps.flashLikesRepository, deps.queryService);
-
-	return {
-		FlashEntityService: flashEntityService,
-		FlashLikeEntityService: flashLikeEntityService,
-		FlashService: flashService,
-	};
-}
-
-export type PlayServices = ReturnType<typeof createPlayServices>;
+const flashEntityService = service(FlashEntityService, [ports.flashsRepository, ports.flashLikesRepository, ports.userEntityService, ports.idService]);
+export const playServices = defineServices({
+	FlashEntityService: flashEntityService,
+	FlashLikeEntityService: service(FlashLikeEntityService, [ports.flashLikesRepository, flashEntityService]),
+	FlashService: service(FlashService, [ports.flashsRepository, ports.flashLikesRepository, ports.queryService]),
+});
+export const createPlayServices = playServices.create;
+export type PlayServicesDependencies = Inputs<typeof playServices>;
+export type PlayServices = Outputs<typeof playServices>;

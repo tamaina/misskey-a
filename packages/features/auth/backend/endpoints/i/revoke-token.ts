@@ -3,12 +3,15 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { selectorIRevokeTokenDefinition, selectorIRevokeTokenInput, selectorIRevokeTokenOutput } from '../../../contract/selector-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
 import type { AccessTokensRepository } from '@/models/_.js';
 import type { MiAccessToken } from '../../models/AccessToken.js';
 import { DI } from '@/di-symbols.js';
 import { ApiError } from '@/server/api/error.js';
+
+const contractProjection = projectEndpointContract(selectorIRevokeTokenDefinition);
 
 export const meta = {
 	description: 'Revoke an access token of the authenticated user. Requires credential. When called with an access token (third-party app), only the token currently in use can be revoked.',
@@ -33,32 +36,15 @@ export const meta = {
 	},
 } as const;
 
-export const paramDef = {
-	anyOf: [
-		{
-			type: 'object',
-			properties: {
-				tokenId: { type: 'string', format: 'misskey:id' },
-			},
-			required: ['tokenId'],
-		},
-		{
-			type: 'object',
-			properties: {
-				token: { type: 'string', nullable: true },
-			},
-			required: ['token'],
-		},
-	],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof selectorIRevokeTokenInput, typeof selectorIRevokeTokenOutput, 'legacy-declared'> {
 	constructor(
 		@Inject(DI.accessTokensRepository)
 		private accessTokensRepository: AccessTokensRepository,
 	) {
-		super(meta, paramDef, async (ps, me, token) => {
+		super(meta, contractProjection, async (ps, me, token) => {
 			if (me == null) {
 				throw new ApiError(meta.errors.credentialRequired);
 			}

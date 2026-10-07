@@ -4,11 +4,11 @@
  */
 
 import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
-import { voidAdminFederationDeleteAllFilesDefinition, voidAdminFederationDeleteAllFilesInput, voidAdminFederationDeleteAllFilesOutput } from '../../../../../../../features/federation/contract/void-endpoint-definitions.js';
+import { voidAdminFederationDeleteAllFilesDefinition, voidAdminFederationDeleteAllFilesInput, voidAdminFederationDeleteAllFilesOutput } from '../../../../contract/void-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
 
 import type { DriveFilesRepository } from '@/models/_.js';
-import { DriveService } from '../../../../../../../features/drive/backend/services/DriveService.js';
+import { DriveService } from '../../../../../drive/backend/services/DriveService.js';
 import { DI } from '@/di-symbols.js';
 
 const contractProjection = projectEndpointContract(voidAdminFederationDeleteAllFilesDefinition);

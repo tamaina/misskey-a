@@ -3,21 +3,14 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { defineServices, service } from '../../index/backend/service-definitions.js';
+import { ports } from '../../index/backend/service-ports.js';
 import { EmojiEntityService } from './serializers/EmojiEntityService.js';
-import type { EmojisRepository, RolesRepository } from '@/models/_.js';
+import type { Inputs, Outputs } from '../../index/backend/service-definitions.js';
 
-export interface EmojiServicesDependencies {
-	emojisRepository: EmojisRepository;
-	rolesRepository: RolesRepository;
-}
-
-/** Compose this feature without starting resources or resolving a container. */
-export function createEmojiServices(deps: EmojiServicesDependencies) {
-	const emojiEntityService = new EmojiEntityService(deps.emojisRepository, deps.rolesRepository);
-
-	return {
-		EmojiEntityService: emojiEntityService,
-	};
-}
-
-export type EmojiServices = ReturnType<typeof createEmojiServices>;
+export const emojiServices = defineServices({
+	EmojiEntityService: service(EmojiEntityService, [ports.emojisRepository, ports.rolesRepository]),
+});
+export const createEmojiServices = emojiServices.create;
+export type EmojiServicesDependencies = Inputs<typeof emojiServices>;
+export type EmojiServices = Outputs<typeof emojiServices>;

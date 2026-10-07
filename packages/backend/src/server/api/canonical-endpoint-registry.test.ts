@@ -4,7 +4,7 @@
  */
 
 import 'reflect-metadata';
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { MODULE_METADATA } from '@nestjs/common/constants.js';
 import { expect, test } from 'vitest';
@@ -12,6 +12,14 @@ import * as ts from 'typescript';
 import * as endpointRegistry from './endpoint-list.js';
 import { EndpointsModule } from './EndpointsModule.js';
 import { featureTokens } from './feature-providers.js';
+import * as featureDefaultEndpoint0 from '../../../../features/federation/backend/endpoints/admin/federation/delete-all-files.js';
+import * as featureDefaultEndpoint1 from '../../../../features/federation/backend/endpoints/admin/federation/remove-all-following.js';
+import * as featureDefaultEndpoint2 from '../../../../features/integrations/backend/endpoints/admin/send-email.js';
+import * as featureDefaultEndpoint3 from '../../../../features/moderation/backend/endpoints/admin/show-users.js';
+import * as featureDefaultEndpoint4 from '../../../../features/users/backend/endpoints/admin/update-proxy-account.js';
+import * as featureDefaultEndpoint5 from '../../../../features/integrations/backend/endpoints/fetch-rss.js';
+import * as featureDefaultEndpoint6 from '../../../../features/timelines/backend/endpoints/notes/mentions.js';
+import * as featureDefaultEndpoint7 from '../../../../features/timelines/backend/endpoints/users/notes.js';
 
 type EndpointModule = {
 	EndpointImplementation?: unknown;
@@ -29,15 +37,15 @@ type ProviderDefinition = {
 	useFactory?: unknown;
 };
 
-const hostDefaultRoutes = new Set([
-	'admin/federation/delete-all-files',
-	'admin/federation/remove-all-following',
-	'admin/send-email',
-	'admin/show-users',
-	'admin/update-proxy-account',
-	'fetch-rss',
-	'notes/mentions',
-	'users/notes',
+const featureDefaultEndpoints = new Map<string, { owner: string; endpoint: EndpointModule }>([
+	['admin/federation/delete-all-files', { owner: 'federation', endpoint: featureDefaultEndpoint0 }],
+	['admin/federation/remove-all-following', { owner: 'federation', endpoint: featureDefaultEndpoint1 }],
+	['admin/send-email', { owner: 'integrations', endpoint: featureDefaultEndpoint2 }],
+	['admin/show-users', { owner: 'moderation', endpoint: featureDefaultEndpoint3 }],
+	['admin/update-proxy-account', { owner: 'users', endpoint: featureDefaultEndpoint4 }],
+	['fetch-rss', { owner: 'integrations', endpoint: featureDefaultEndpoint5 }],
+	['notes/mentions', { owner: 'timelines', endpoint: featureDefaultEndpoint6 }],
+	['users/notes', { owner: 'timelines', endpoint: featureDefaultEndpoint7 }],
 ]);
 const endpointModules = endpointRegistry as unknown as Record<string, EndpointModule>;
 const sourceFile = fileURLToPath(new URL('./endpoint-list.ts', import.meta.url));
@@ -88,11 +96,28 @@ test('API endpoint registry binds canonical classes and feature factories exactl
 		}
 
 		defaultRoutes.add(route);
-		expect(hostDefaultRoutes.has(route)).toBe(true);
+		const canonicalEndpoint = featureDefaultEndpoints.get(route);
+		expect(canonicalEndpoint).toBeDefined();
 		expect(typeof endpoint.default).toBe('function');
-		expect(routeSources.get(route)).toMatch(/^\.\/endpoints\/.+\.js$/);
+		expect(routeSources.get(route)).toBe(`../../../../features/${canonicalEndpoint!.owner}/backend/endpoints/${route}.js`);
+		expect(endpoint.default).toBe(canonicalEndpoint!.endpoint.default);
+		expect(endpoint.meta).toBe(canonicalEndpoint!.endpoint.meta);
+		expect(endpoint.paramDef).toBe(canonicalEndpoint!.endpoint.paramDef);
 		expect(provider.useClass).toBe(endpoint.default);
 	}
 
-	expect(defaultRoutes).toEqual(hostDefaultRoutes);
+	expect(defaultRoutes).toEqual(new Set(featureDefaultEndpoints.keys()));
+});
+
+test('feature-owned default endpoints have real implementations and no old-path bridges', () => {
+	for (const [route, { owner }] of featureDefaultEndpoints) {
+		const implementationPath = fileURLToPath(new URL(`../../../../features/${owner}/backend/endpoints/${route}.ts`, import.meta.url));
+		const implementation = ts.createSourceFile(implementationPath, readFileSync(implementationPath, 'utf8'), ts.ScriptTarget.Latest, true);
+		expect(implementation.statements.some(statement => ts.isClassDeclaration(statement) && statement.modifiers?.some(modifier => modifier.kind === ts.SyntaxKind.DefaultKeyword))).toBe(true);
+		expect(existsSync(fileURLToPath(new URL(`./endpoints/${route}.ts`, import.meta.url)))).toBe(false);
+	}
+});
+
+test('RSS named export preserves the default endpoint constructor identity', () => {
+	expect(featureDefaultEndpoint5.FetchRssEndpoint).toBe(featureDefaultEndpoint5.default);
 });

@@ -5,10 +5,7 @@
 
 import { describe, expect, test, vi } from 'vitest';
 import { mockDeep } from 'vitest-mock-extended';
-import type { SelectQueryBuilder } from 'typeorm';
 import type { MiAbuseReportNotificationRecipient, MiAbuseUserReport, MiAntenna, MiApp, MiAuthSession, MiBlocking, MiChannel, MiChatMessage, MiDriveFile, MiDriveFolder, MiEmoji, MiFollowing, MiFollowRequest, MiHashtag, MiInstance, MiMeta, MiModerationLog, MiMuting, MiRegistrationTicket, MiRenoteMuting, MiReversiGame, MiRole, MiSignin, MiSystemWebhook, MiUser, MiUserList, MiUserListMembership } from '@/models/_.js';
-import type { Packed } from '../../../features/index/contract/packed.js';
-import type { MiLocalUser } from '../../../features/users/backend/models/User.js';
 import { createAuthServices, type AuthServicesDependencies } from '../../../features/auth/backend/services.js';
 import { createChannelServices, type ChannelServicesDependencies } from '../../../features/channels/backend/services.js';
 import { createChatServices, type ChatServicesDependencies } from '../../../features/chat/backend/services.js';
@@ -22,6 +19,9 @@ import { createModerationServices, type ModerationServicesDependencies } from '.
 import { createRelationshipServices, type RelationshipServicesDependencies } from '../../../features/relationships/backend/services.js';
 import { createRoleServices, type RoleServicesDependencies } from '../../../features/roles/backend/services.js';
 import { createTimelineServices, type TimelineServicesDependencies } from '../../../features/timelines/backend/services.js';
+import type { MiLocalUser } from '../../../features/users/backend/models/User.js';
+import type { Packed } from '../../../features/index/contract/packed.js';
+import type { SelectQueryBuilder } from 'typeorm';
 
 function fixture<Model>(fields: Partial<Model>): Model {
 	return fields as Model;
@@ -141,7 +141,11 @@ describe('annotation-free feature serializers', () => {
 		deps.utilityService.isDeliverSuspendedSoftware.mockReturnValue({ software: 'example', versionRange: '*' });
 		deps.roleService.isModerator.mockResolvedValue(false);
 		const instance = fixture<MiInstance>({ id: 'instance', host: 'example.com', firstRetrievedAt: date, infoUpdatedAt: null, latestRequestReceivedAt: null, suspensionState: 'none', moderationNote: 'private' });
-		const pack = createInstanceServices({ ...deps, meta: fixture<MiMeta>({ blockedHosts: [], silencedHosts: [], mediaSilencedHosts: [] }) }).InstanceEntityService.pack;
+		const pack = createInstanceServices({
+			meta: fixture<MiMeta>({ blockedHosts: [], silencedHosts: [], mediaSilencedHosts: [] }),
+			roleService: deps.roleService, utilityService: deps.utilityService,
+			config: deps.config, adsRepository: deps.adsRepository, systemAccountService: deps.systemAccountService,
+		}).InstanceEntityService.pack;
 		expect(await pack(instance, viewer)).toMatchObject({ isSuspended: true, suspensionState: 'softwareSuspended', moderationNote: null });
 		deps.roleService.isModerator.mockResolvedValue(true);
 		expect(await pack(instance, viewer)).toHaveProperty('moderationNote', 'private');
@@ -155,7 +159,8 @@ describe('annotation-free feature serializers', () => {
 		builder.getMany.mockResolvedValue([]);
 		deps.adsRepository.createQueryBuilder.mockReturnValue(builder);
 		const pack = createInstanceServices({
-			...deps,
+			roleService: deps.roleService, utilityService: deps.utilityService,
+			adsRepository: deps.adsRepository, systemAccountService: deps.systemAccountService,
 			config: fixture<InstanceServicesDependencies['config']>({ version: 'version', url: 'https://example.com' }),
 			meta: fixture<MiMeta>({ defaultLightTheme: '{name: "light"}', defaultDarkTheme: 'invalid', policies: {} }),
 		}).MetaEntityService.pack;
@@ -167,7 +172,10 @@ describe('annotation-free feature serializers', () => {
 		const deps = mockDeep<InstanceServicesDependencies>();
 		const meta = fixture<MiMeta>({ rootUserId: null, policies: { ltlAvailable: true, gtlAvailable: false } });
 		deps.systemAccountService.fetch.mockResolvedValue(fixture<MiLocalUser>({ username: 'system.proxy' }));
-		const service = createInstanceServices({ ...deps, meta }).MetaEntityService;
+		const service = createInstanceServices({
+			meta, roleService: deps.roleService, utilityService: deps.utilityService,
+			config: deps.config, adsRepository: deps.adsRepository, systemAccountService: deps.systemAccountService,
+		}).MetaEntityService;
 		expect(deps.systemAccountService.fetch).not.toHaveBeenCalled();
 		const pack = vi.spyOn(service, 'pack').mockResolvedValue(fixture<Packed<'MetaLite'>>({ name: 'Instance' }));
 		const packDetailed = service.packDetailed;
@@ -193,7 +201,12 @@ describe('annotation-free feature serializers', () => {
 		const integrationServices = createIntegrationServices(integrations);
 		const deps = mockDeep<ModerationServicesDependencies>();
 		deps.userEntityService.packMany.mockResolvedValue([user]);
-		const packMany = createModerationServices({ ...deps, systemWebhookEntityService: integrationServices.SystemWebhookEntityService }).AbuseReportNotificationRecipientEntityService.packMany;
+		const packMany = createModerationServices({
+			abuseReportNotificationRecipientRepository: deps.abuseReportNotificationRecipientRepository,
+			abuseUserReportsRepository: deps.abuseUserReportsRepository, moderationLogsRepository: deps.moderationLogsRepository,
+			userEntityService: deps.userEntityService, idService: deps.idService,
+			systemWebhookEntityService: integrationServices.SystemWebhookEntityService,
+		}).AbuseReportNotificationRecipientEntityService.packMany;
 		const recipient = fixture<MiAbuseReportNotificationRecipient>({ id: 'recipient', updatedAt: date, userId: 'user', systemWebhookId: 'webhook' });
 		const packWebhook = vi.spyOn(integrationServices.SystemWebhookEntityService, 'pack');
 		expect(await packMany([recipient])).toEqual([expect.objectContaining({ user, systemWebhook: expect.objectContaining({ id: 'webhook' }) })]);

@@ -3,16 +3,18 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { portablePagesCreateDefinition, portablePagesCreateInput, portablePagesCreateOutput } from '../../../contract/portable-constant-endpoint-definitions.js';
 import ms from '@/runtime-dependencies/ms.js';
 import { Inject, Injectable } from '@nestjs/common';
 import type { DriveFilesRepository, MiDriveFile, PagesRepository } from '@/models/_.js';
-import { pageNameSchema } from '../../models/Page.js';
-import { Endpoint } from '@/server/api/endpoint-base.js';
 import { PageEntityService } from '../../serializers/PageEntityService.js';
 import { DI } from '@/di-symbols.js';
 import { PageService } from '../../services/PageService.js';
 import { IdentifiableError } from '@/misc/identifiable-error.js';
 import { ApiError } from '@/server/api/error.js';
+
+const contractProjection = projectEndpointContract(portablePagesCreateDefinition);
 
 export const meta = {
 	tags: ['pages'],
@@ -28,11 +30,7 @@ export const meta = {
 		max: 10,
 	},
 
-	res: {
-		type: 'object',
-		optional: false, nullable: false,
-		ref: 'Page',
-	},
+	res: contractProjection.response,
 
 	errors: {
 		noSuchFile: {
@@ -48,29 +46,10 @@ export const meta = {
 	},
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {
-		title: { type: 'string' },
-		name: { ...pageNameSchema, minLength: 1 },
-		summary: { type: 'string', nullable: true },
-		content: { type: 'array', items: {
-			type: 'object', additionalProperties: true,
-		} },
-		variables: { type: 'array', items: {
-			type: 'object', additionalProperties: true,
-		} },
-		script: { type: 'string' },
-		eyeCatchingImageId: { type: 'string', format: 'misskey:id', nullable: true },
-		font: { type: 'string', enum: ['serif', 'sans-serif'], default: 'sans-serif' },
-		alignCenter: { type: 'boolean', default: false },
-		hideTitleWhenPinned: { type: 'boolean', default: false },
-	},
-	required: ['title', 'name', 'content', 'variables', 'script'],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof portablePagesCreateInput, typeof portablePagesCreateOutput> {
 	constructor(
 		@Inject(DI.pagesRepository)
 		private pagesRepository: PagesRepository,
@@ -81,7 +60,7 @@ export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDe
 		private pageService: PageService,
 		private pageEntityService: PageEntityService,
 	) {
-		super(meta, paramDef, async (ps, me) => {
+		super(meta, contractProjection, async (ps, me) => {
 			let eyeCatchingImage: MiDriveFile | null = null;
 			if (ps.eyeCatchingImageId != null) {
 				eyeCatchingImage = await this.driveFilesRepository.findOneBy({

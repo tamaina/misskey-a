@@ -3,12 +3,14 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { portableAdminSystemWebhookTestDefinition, portableAdminSystemWebhookTestInput, portableAdminSystemWebhookTestOutput } from '../../../../contract/portable-constant-endpoint-definitions.js';
 import { Injectable } from '@nestjs/common';
 import ms from '@/runtime-dependencies/ms.js';
-import { Endpoint } from '@/server/api/endpoint-base.js';
 import { WebhookTestService } from '../../../services/WebhookTestService.js';
 import { ApiError } from '@/server/api/error.js';
-import { systemWebhookEventTypes } from '../../../models/SystemWebhook.js';
+
+const contractProjection = projectEndpointContract(portableAdminSystemWebhookTestDefinition);
 
 export const meta = {
 	tags: ['webhooks'],
@@ -32,34 +34,14 @@ export const meta = {
 	},
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {
-		webhookId: {
-			type: 'string',
-			format: 'misskey:id',
-		},
-		type: {
-			type: 'string',
-			enum: systemWebhookEventTypes,
-		},
-		override: {
-			type: 'object',
-			properties: {
-				url: { type: 'string', nullable: false },
-				secret: { type: 'string', nullable: false },
-			},
-		},
-	},
-	required: ['webhookId', 'type'],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof portableAdminSystemWebhookTestInput, typeof portableAdminSystemWebhookTestOutput> {
 	constructor(
 		private webhookTestService: WebhookTestService,
 	) {
-		super(meta, paramDef, async (ps) => {
+		super(meta, contractProjection, async (ps) => {
 			try {
 				await this.webhookTestService.testSystemWebhook({
 					webhookId: ps.webhookId,

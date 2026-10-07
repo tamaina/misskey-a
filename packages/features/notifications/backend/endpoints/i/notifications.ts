@@ -3,17 +3,20 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { portableINotificationsDefinition, portableINotificationsInput, portableINotificationsOutput } from '../../../contract/portable-constant-endpoint-definitions.js';
 import { In } from 'typeorm';
 import * as Redis from 'ioredis';
 import { Inject, Injectable } from '@nestjs/common';
 import type { NotesRepository } from '@/models/_.js';
 import { FilterUnionByProperty, notificationTypes, obsoleteNotificationTypes } from '@/types.js';
-import { Endpoint } from '@/server/api/endpoint-base.js';
 import { NotificationEntityService } from '../../serializers/NotificationEntityService.js';
 import { NotificationService } from '../../services/NotificationService.js';
 import { DI } from '@/di-symbols.js';
 import { IdService } from '../../../../runtime/backend/services/IdService.js';
 import { MiNotification } from '../../models/Notification.js';
+
+const contractProjection = projectEndpointContract(portableINotificationsDefinition);
 
 export const meta = {
 	tags: ['account', 'notifications'],
@@ -27,45 +30,19 @@ export const meta = {
 
 	kind: 'read:notifications',
 
-	res: {
-		type: 'array',
-		optional: false, nullable: false,
-		items: {
-			type: 'object',
-			optional: false, nullable: false,
-			ref: 'Notification',
-		},
-	},
+	res: contractProjection.response,
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {
-		limit: { type: 'integer', minimum: 1, maximum: 100, default: 10 },
-		sinceId: { type: 'string', format: 'misskey:id' },
-		untilId: { type: 'string', format: 'misskey:id' },
-		sinceDate: { type: 'integer' },
-		untilDate: { type: 'integer' },
-		markAsRead: { type: 'boolean', default: true },
-		// 後方互換のため、廃止された通知タイプも受け付ける
-		includeTypes: { type: 'array', items: {
-			type: 'string', enum: [...notificationTypes, ...obsoleteNotificationTypes],
-		} },
-		excludeTypes: { type: 'array', items: {
-			type: 'string', enum: [...notificationTypes, ...obsoleteNotificationTypes],
-		} },
-	},
-	required: [],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof portableINotificationsInput, typeof portableINotificationsOutput> {
 	constructor(
 		private idService: IdService,
 		private notificationEntityService: NotificationEntityService,
 		private notificationService: NotificationService,
 	) {
-		super(meta, paramDef, async (ps, me) => {
+		super(meta, contractProjection, async (ps, me) => {
 			const untilId = ps.untilId ?? (ps.untilDate ? this.idService.gen(ps.untilDate!) : undefined);
 			const sinceId = ps.sinceId ?? (ps.sinceDate ? this.idService.gen(ps.sinceDate!) : undefined);
 

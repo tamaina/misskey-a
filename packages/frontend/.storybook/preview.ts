@@ -6,6 +6,8 @@
 import { FORCE_RE_RENDER, FORCE_REMOUNT } from '@storybook/core-events';
 import { addons } from '@storybook/preview-api';
 import { type Preview, setup } from '@storybook/vue3';
+import { createInternationalization } from 'virtual:vite-vue-internationalization';
+import { startComponentLocales } from '@features/boot/frontend/index.js';
 import isChromatic from 'chromatic/isChromatic';
 import { initialize, mswLoader } from 'msw-storybook-addon';
 import { userDetailed } from './fakes.js';
@@ -68,21 +70,25 @@ queueMicrotask(() => {
 		import('../../features/preferences/frontend/theme.js'),
 		import('../../features/preferences/frontend/preferences.js'),
 		import('../../features/ui/frontend/os.js'),
-	]).then(([{ default: components }, { default: directives }, { default: widgets }, { applyTheme }, { prefer }, os]) => {
-		setup((app) => {
-			moduleInitialized = true;
-			if (app[appInitialized]) {
-				return;
-			}
-			app[appInitialized] = true;
-			loadTheme(applyTheme);
-			components(app);
-			directives(app);
-			widgets(app);
-			misskeyOS = os;
-			if (isChromatic()) {
-				prefer.commit('animation', false);
-			}
+	]).then(async ([{ default: components }, { default: directives }, { default: widgets }, { themeManager }, { prefer }, os]) => {
+		const { lang } = await import('../../frontend-shared/js/config.js');
+		await startComponentLocales(lang, createInternationalization, (internationalization) => {
+			setup((app) => {
+				moduleInitialized = true;
+				if (app[appInitialized]) {
+					return;
+				}
+				app[appInitialized] = true;
+				app.use(internationalization);
+				loadTheme(themeManager);
+				components(app);
+				directives(app);
+				widgets(app);
+				misskeyOS = os;
+				if (isChromatic()) {
+					prefer.commit('animation', false);
+				}
+			});
 		});
 	});
 });
@@ -97,13 +103,13 @@ const preview = {
 				const channel = addons.getChannel();
 				const resetIndexedDBPromise = globalThis.indexedDB?.databases
 					? indexedDB.databases().then((r) => {
-							for (var i = 0; i < r.length; i++) {
+							for (let i = 0; i < r.length; i++) {
 								indexedDB.deleteDatabase(r[i].name!);
 							}
 						}).catch(() => {})
 					: Promise.resolve();
 				const resetDefaultStorePromise = import('../../features/preferences/frontend/store').then(({ store }) => {
-					// @ts-expect-error
+					// @ts-expect-error -- Storybook deliberately invokes the private initializer to reset story state.
 					store.init();
 				}).catch(() => {});
 				Promise.all([resetIndexedDBPromise, resetDefaultStorePromise]).then(() => {

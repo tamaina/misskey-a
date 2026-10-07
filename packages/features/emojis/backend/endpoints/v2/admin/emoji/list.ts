@@ -3,11 +3,14 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { portableV2AdminEmojiListDefinition, portableV2AdminEmojiListInput, portableV2AdminEmojiListOutput } from '../../../../../contract/portable-constant-endpoint-definitions.js';
 import { Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
 import { EmojiEntityService } from '../../../../serializers/EmojiEntityService.js';
-import { CustomEmojiService, fetchEmojisHostTypes, fetchEmojisSortKeys } from '../../../../services/CustomEmojiService.js';
+import { CustomEmojiService } from '../../../../services/CustomEmojiService.js';
 import { IdService } from '../../../../../../runtime/backend/services/IdService.js';
+
+const contractProjection = projectEndpointContract(portableV2AdminEmojiListDefinition);
 
 export const meta = {
 	tags: ['admin'],
@@ -16,80 +19,19 @@ export const meta = {
 	requiredRolePolicy: 'canManageCustomEmojis',
 	kind: 'read:admin:emoji',
 
-	res: {
-		type: 'object',
-		properties: {
-			emojis: {
-				type: 'array',
-				items: {
-					type: 'object',
-					ref: 'EmojiDetailedAdmin',
-				},
-			},
-			count: { type: 'integer' },
-			allCount: { type: 'integer' },
-			allPages: { type: 'integer' },
-		},
-	},
+	res: contractProjection.response,
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {
-		query: {
-			type: 'object',
-			nullable: true,
-			properties: {
-				updatedAtFrom: { type: 'string' },
-				updatedAtTo: { type: 'string' },
-				name: { type: 'string' },
-				host: { type: 'string' },
-				uri: { type: 'string' },
-				publicUrl: { type: 'string' },
-				originalUrl: { type: 'string' },
-				type: { type: 'string' },
-				aliases: { type: 'string' },
-				category: { type: 'string' },
-				license: { type: 'string' },
-				isSensitive: { type: 'boolean' },
-				localOnly: { type: 'boolean' },
-				hostType: {
-					type: 'string',
-					enum: fetchEmojisHostTypes,
-					default: 'all',
-				},
-				roleIds: {
-					type: 'array',
-					items: { type: 'string', format: 'misskey:id' },
-				},
-			},
-		},
-		sinceId: { type: 'string', format: 'misskey:id' },
-		untilId: { type: 'string', format: 'misskey:id' },
-		sinceDate: { type: 'integer' },
-		untilDate: { type: 'integer' },
-		limit: { type: 'integer', minimum: 1, maximum: 100, default: 10 },
-		page: { type: 'integer' },
-		sortKeys: {
-			type: 'array',
-			default: ['-id'],
-			items: {
-				type: 'string',
-				enum: fetchEmojisSortKeys,
-			},
-		},
-	},
-	required: [],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof portableV2AdminEmojiListInput, typeof portableV2AdminEmojiListOutput> {
 	constructor(
 		private customEmojiService: CustomEmojiService,
 		private emojiEntityService: EmojiEntityService,
 		private idService: IdService,
 	) {
-		super(meta, paramDef, async (ps, me) => {
+		super(meta, contractProjection, async (ps, me) => {
 			const untilId = ps.untilId ?? (ps.untilDate ? this.idService.gen(ps.untilDate!) : undefined);
 			const sinceId = ps.sinceId ?? (ps.sinceDate ? this.idService.gen(ps.sinceDate!) : undefined);
 

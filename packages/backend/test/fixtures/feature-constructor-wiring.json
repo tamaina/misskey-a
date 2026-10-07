@@ -1,0 +1,491 @@
+{
+  "features": {
+    "announcements": {
+      "AnnouncementEntityService": [
+        {
+          "port": "announcementsRepository"
+        },
+        {
+          "port": "announcementReadsRepository"
+        },
+        {
+          "port": "idService"
+        }
+      ],
+      "AnnouncementService": [
+        {
+          "port": "announcementsRepository"
+        },
+        {
+          "port": "announcementReadsRepository"
+        },
+        {
+          "port": "usersRepository"
+        },
+        {
+          "port": "idService"
+        },
+        {
+          "port": "globalEventService"
+        },
+        {
+          "port": "moderationLogService"
+        },
+        {
+          "service": "AnnouncementEntityService"
+        }
+      ]
+    },
+    "auth": {
+      "AppEntityService": [
+        {
+          "port": "appsRepository"
+        },
+        {
+          "port": "accessTokensRepository"
+        }
+      ],
+      "AuthSessionEntityService": [
+        {
+          "port": "authSessionsRepository"
+        },
+        {
+          "service": "AppEntityService"
+        }
+      ],
+      "InviteCodeEntityService": [
+        {
+          "port": "registrationTicketsRepository"
+        },
+        {
+          "port": "userEntityService"
+        },
+        {
+          "port": "idService"
+        }
+      ],
+      "SigninEntityService": [
+        {
+          "port": "idService"
+        }
+      ]
+    },
+    "channels": {
+      "ChannelEntityService": [
+        {
+          "port": "channelsRepository"
+        },
+        {
+          "port": "channelFollowingsRepository"
+        },
+        {
+          "port": "channelFavoritesRepository"
+        },
+        {
+          "port": "channelMutingRepository"
+        },
+        {
+          "port": "notesRepository"
+        },
+        {
+          "port": "driveFilesRepository"
+        },
+        {
+          "port": "noteEntityService"
+        },
+        {
+          "port": "driveFileEntityService"
+        },
+        {
+          "port": "idService"
+        }
+      ]
+    },
+    "chat": {
+      "ChatEntityService": [
+        {
+          "port": "chatMessagesRepository"
+        },
+        {
+          "port": "chatRoomsRepository"
+        },
+        {
+          "port": "chatRoomInvitationsRepository"
+        },
+        {
+          "port": "chatRoomMembershipsRepository"
+        },
+        {
+          "port": "userEntityService"
+        },
+        {
+          "port": "driveFileEntityService"
+        },
+        {
+          "port": "idService"
+        }
+      ]
+    },
+    "collections": {
+      "ClipEntityService": [
+        {
+          "port": "clipsRepository"
+        },
+        {
+          "port": "clipNotesRepository"
+        },
+        {
+          "port": "clipFavoritesRepository"
+        },
+        {
+          "port": "userEntityService"
+        },
+        {
+          "port": "idService"
+        }
+      ],
+      "NoteFavoriteEntityService": [
+        {
+          "port": "noteFavoritesRepository"
+        },
+        {
+          "port": "noteEntityService"
+        },
+        {
+          "port": "idService"
+        }
+      ],
+      "ClipService": [
+        {
+          "port": "clipsRepository"
+        },
+        {
+          "port": "clipNotesRepository"
+        },
+        {
+          "port": "notesRepository"
+        },
+        {
+          "port": "roleService"
+        },
+        {
+          "port": "idService"
+        }
+      ]
+    },
+    "discovery": {
+      "HashtagEntityService": []
+    },
+    "drive": {
+      "DriveFolderEntityService": [
+        {
+          "port": "driveFoldersRepository"
+        },
+        {
+          "port": "driveFilesRepository"
+        },
+        {
+          "port": "idService"
+        }
+      ]
+    },
+    "emojis": {
+      "EmojiEntityService": [
+        {
+          "port": "emojisRepository"
+        },
+        {
+          "port": "rolesRepository"
+        }
+      ]
+    },
+    "gallery": {
+      "GalleryPostEntityService": [
+        {
+          "port": "galleryPostsRepository"
+        },
+        {
+          "port": "galleryLikesRepository"
+        },
+        {
+          "port": "userEntityService"
+        },
+        {
+          "port": "driveFileEntityService"
+        },
+        {
+          "port": "idService"
+        }
+      ],
+      "GalleryLikeEntityService": [
+        {
+          "port": "galleryLikesRepository"
+        },
+        {
+          "service": "GalleryPostEntityService"
+        }
+      ]
+    },
+    "games": {
+      "ReversiGameEntityService": [
+        {
+          "port": "reversiGamesRepository"
+        },
+        {
+          "port": "userEntityService"
+        },
+        {
+          "port": "idService"
+        }
+      ]
+    },
+    "instance": {
+      "InstanceEntityService": [
+        {
+          "port": "meta"
+        },
+        {
+          "port": "roleService"
+        },
+        {
+          "port": "utilityService"
+        }
+      ],
+      "MetaEntityService": [
+        {
+          "port": "config"
+        },
+        {
+          "port": "meta"
+        },
+        {
+          "port": "adsRepository"
+        },
+        {
+          "port": "systemAccountService"
+        }
+      ]
+    },
+    "integrations": {
+      "SystemWebhookEntityService": [
+        {
+          "port": "systemWebhooksRepository"
+        }
+      ]
+    },
+    "moderation": {
+      "AbuseReportNotificationRecipientEntityService": [
+        {
+          "port": "abuseReportNotificationRecipientRepository"
+        },
+        {
+          "port": "userEntityService"
+        },
+        {
+          "port": "systemWebhookEntityService"
+        }
+      ],
+      "AbuseUserReportEntityService": [
+        {
+          "port": "abuseUserReportsRepository"
+        },
+        {
+          "port": "userEntityService"
+        },
+        {
+          "port": "idService"
+        }
+      ],
+      "ModerationLogEntityService": [
+        {
+          "port": "moderationLogsRepository"
+        },
+        {
+          "port": "userEntityService"
+        },
+        {
+          "port": "idService"
+        }
+      ]
+    },
+    "pages": {
+      "PageEntityService": [
+        {
+          "port": "pagesRepository"
+        },
+        {
+          "port": "pageLikesRepository"
+        },
+        {
+          "port": "driveFilesRepository"
+        },
+        {
+          "port": "userEntityService"
+        },
+        {
+          "port": "driveFileEntityService"
+        },
+        {
+          "port": "idService"
+        }
+      ],
+      "PageLikeEntityService": [
+        {
+          "port": "pageLikesRepository"
+        },
+        {
+          "service": "PageEntityService"
+        }
+      ],
+      "PageService": [
+        {
+          "port": "db"
+        },
+        {
+          "port": "pagesRepository"
+        },
+        {
+          "port": "notesRepository"
+        },
+        {
+          "port": "usersRepository"
+        },
+        {
+          "port": "roleService"
+        },
+        {
+          "port": "moderationLogService"
+        },
+        {
+          "port": "idService"
+        }
+      ]
+    },
+    "play": {
+      "FlashEntityService": [
+        {
+          "port": "flashsRepository"
+        },
+        {
+          "port": "flashLikesRepository"
+        },
+        {
+          "port": "userEntityService"
+        },
+        {
+          "port": "idService"
+        }
+      ],
+      "FlashLikeEntityService": [
+        {
+          "port": "flashLikesRepository"
+        },
+        {
+          "service": "FlashEntityService"
+        }
+      ],
+      "FlashService": [
+        {
+          "port": "flashsRepository"
+        },
+        {
+          "port": "flashLikesRepository"
+        },
+        {
+          "port": "queryService"
+        }
+      ]
+    },
+    "relationships": {
+      "BlockingEntityService": [
+        {
+          "port": "blockingsRepository"
+        },
+        {
+          "port": "userEntityService"
+        },
+        {
+          "port": "idService"
+        }
+      ],
+      "FollowRequestEntityService": [
+        {
+          "port": "followRequestsRepository"
+        },
+        {
+          "port": "userEntityService"
+        }
+      ],
+      "FollowingEntityService": [
+        {
+          "port": "followingsRepository"
+        },
+        {
+          "port": "userEntityService"
+        },
+        {
+          "port": "idService"
+        }
+      ],
+      "MutingEntityService": [
+        {
+          "port": "mutingsRepository"
+        },
+        {
+          "port": "userEntityService"
+        },
+        {
+          "port": "idService"
+        }
+      ],
+      "RenoteMutingEntityService": [
+        {
+          "port": "renoteMutingsRepository"
+        },
+        {
+          "port": "userEntityService"
+        },
+        {
+          "port": "idService"
+        }
+      ],
+      "UserListEntityService": [
+        {
+          "port": "userListsRepository"
+        },
+        {
+          "port": "userListMembershipsRepository"
+        },
+        {
+          "port": "userEntityService"
+        },
+        {
+          "port": "idService"
+        }
+      ]
+    },
+    "roles": {
+      "RoleEntityService": [
+        {
+          "port": "rolesRepository"
+        },
+        {
+          "port": "roleAssignmentsRepository"
+        },
+        {
+          "port": "idService"
+        }
+      ]
+    },
+    "timelines": {
+      "AntennaEntityService": [
+        {
+          "port": "antennasRepository"
+        },
+        {
+          "port": "idService"
+        }
+      ]
+    }
+  }
+}

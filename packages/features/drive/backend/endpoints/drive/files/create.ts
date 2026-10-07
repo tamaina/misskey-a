@@ -5,14 +5,16 @@
 
 import ms from '@/runtime-dependencies/ms.js';
 import { Inject, Injectable } from '@nestjs/common';
-import { DB_MAX_IMAGE_COMMENT_LENGTH } from '@/const.js';
 import { IdentifiableError } from '@/misc/identifiable-error.js';
-import { Endpoint } from '@/server/api/endpoint-base.js';
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { driveFilesCreateDefinition, driveFilesCreateInput, driveFilesCreateWireInput, driveFilesCreateOutput } from '../../../../contract/create-endpoint-definition.js';
 import { DriveFileEntityService } from '../../../serializers/DriveFileEntityService.js';
 import { DriveService } from '../../../services/DriveService.js';
 import { MiMeta } from '@/models/_.js';
 import { DI } from '@/di-symbols.js';
 import { ApiError } from '@/server/api/error.js';
+
+const contractProjection = projectEndpointContract(driveFilesCreateDefinition);
 
 export const meta = {
 	tags: ['drive'],
@@ -32,11 +34,7 @@ export const meta = {
 
 	description: 'Upload a new drive file.',
 
-	res: {
-		type: 'object',
-		optional: false, nullable: false,
-		ref: 'DriveFile',
-	},
+	res: contractProjection.response,
 
 	errors: {
 		invalidFileName: {
@@ -72,20 +70,10 @@ export const meta = {
 	},
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {
-		folderId: { type: 'string', format: 'misskey:id', nullable: true, default: null },
-		name: { type: 'string', nullable: true, default: null },
-		comment: { type: 'string', nullable: true, maxLength: DB_MAX_IMAGE_COMMENT_LENGTH, default: null },
-		isSensitive: { type: 'boolean', default: false },
-		force: { type: 'boolean', default: false },
-	},
-	required: [],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof driveFilesCreateInput, typeof driveFilesCreateOutput, 'native', typeof driveFilesCreateWireInput> {
 	constructor(
 		@Inject(DI.meta)
 		private serverSettings: MiMeta,
@@ -93,7 +81,7 @@ export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDe
 		private driveFileEntityService: DriveFileEntityService,
 		private driveService: DriveService,
 	) {
-		super(meta, paramDef, async (ps, me, _, file, cleanup, ip, headers) => {
+		super(meta, contractProjection, async (ps, me, _, file, cleanup, ip, headers) => {
 			// Get 'name' parameter
 			let name = ps.name ?? file!.name ?? null;
 			if (name != null) {

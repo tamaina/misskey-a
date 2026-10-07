@@ -6,12 +6,14 @@
 import ms from '@/runtime-dependencies/ms.js';
 import { In } from 'typeorm';
 import { Inject, Injectable } from '@nestjs/common';
-import { MAX_NOTE_TEXT_LENGTH } from '@/const.js';
-import { Endpoint } from '@/server/api/endpoint-base.js';
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { notesCreateDefinition } from '../../../contract/create-endpoint-definition.js';
 import { NoteEntityService } from '../../serializers/NoteEntityService.js';
 import { NoteCreateService } from '../../services/NoteCreateService.js';
 import { IdentifiableError } from '@/misc/identifiable-error.js';
 import { ApiError } from '@/server/api/error.js';
+
+const contractProjection = projectEndpointContract(notesCreateDefinition);
 
 export const meta = {
 	tags: ['notes'],
@@ -27,17 +29,7 @@ export const meta = {
 
 	kind: 'write:notes',
 
-	res: {
-		type: 'object',
-		optional: false, nullable: false,
-		properties: {
-			createdNote: {
-				type: 'object',
-				optional: false, nullable: false,
-				ref: 'Note',
-			},
-		},
-	},
+	res: contractProjection.response,
 
 	errors: {
 		noSuchRenoteTarget: {
@@ -126,100 +118,15 @@ export const meta = {
 	},
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {
-		visibility: { type: 'string', enum: ['public', 'home', 'followers', 'specified'], default: 'public' },
-		visibleUserIds: { type: 'array', uniqueItems: true, items: {
-			type: 'string', format: 'misskey:id',
-		} },
-		cw: { type: 'string', nullable: true, minLength: 1, maxLength: 100 },
-		localOnly: { type: 'boolean', default: false },
-		reactionAcceptance: { type: 'string', nullable: true, enum: [null, 'likeOnly', 'likeOnlyForRemote', 'nonSensitiveOnly', 'nonSensitiveOnlyForLocalLikeOnlyForRemote'], default: null },
-		noExtractMentions: { type: 'boolean', default: false },
-		noExtractHashtags: { type: 'boolean', default: false },
-		noExtractEmojis: { type: 'boolean', default: false },
-		replyId: { type: 'string', format: 'misskey:id', nullable: true },
-		renoteId: { type: 'string', format: 'misskey:id', nullable: true },
-		channelId: { type: 'string', format: 'misskey:id', nullable: true },
-
-		// anyOf内にバリデーションを書いても最初の一つしかチェックされない
-		// See https://github.com/misskey-dev/misskey/pull/10082
-		text: {
-			type: 'string',
-			minLength: 1,
-			maxLength: MAX_NOTE_TEXT_LENGTH,
-			nullable: true,
-		},
-		fileIds: {
-			type: 'array',
-			uniqueItems: true,
-			minItems: 1,
-			maxItems: 16,
-			items: { type: 'string', format: 'misskey:id' },
-		},
-		mediaIds: {
-			type: 'array',
-			uniqueItems: true,
-			minItems: 1,
-			maxItems: 16,
-			items: { type: 'string', format: 'misskey:id' },
-		},
-		poll: {
-			type: 'object',
-			nullable: true,
-			properties: {
-				choices: {
-					type: 'array',
-					uniqueItems: true,
-					minItems: 2,
-					maxItems: 10,
-					items: { type: 'string', minLength: 1, maxLength: 50 },
-				},
-				multiple: { type: 'boolean' },
-				expiresAt: { type: 'integer', nullable: true },
-				expiredAfter: { type: 'integer', nullable: true, minimum: 1 },
-			},
-			required: ['choices'],
-		},
-	},
-	// (re)note with text, files and poll are optional
-	if: {
-		properties: {
-			renoteId: {
-				type: 'null',
-			},
-			fileIds: {
-				type: 'null',
-			},
-			mediaIds: {
-				type: 'null',
-			},
-			poll: {
-				type: 'null',
-			},
-		},
-	},
-	then: {
-		properties: {
-			text: {
-				type: 'string',
-				minLength: 1,
-				maxLength: MAX_NOTE_TEXT_LENGTH,
-				pattern: '[^\\s]+',
-			},
-		},
-		required: ['text'],
-	},
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof notesCreateDefinition.input, typeof notesCreateDefinition.output> {
 	constructor(
 		private noteEntityService: NoteEntityService,
 		private noteCreateService: NoteCreateService,
 	) {
-		super(meta, paramDef, async (ps, me) => {
+		super(meta, contractProjection, async (ps, me) => {
 			try {
 				const note = await this.noteCreateService.fetchAndCreate(me, {
 					createdAt: new Date(),

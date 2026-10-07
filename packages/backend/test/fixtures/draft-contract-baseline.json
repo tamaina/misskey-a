@@ -1,0 +1,2814 @@
+{
+  "capturedFrom": "Pre-migration worktree AST + published baseline-api.json",
+  "routes": [
+    {
+      "route": "notes/drafts/create",
+      "source": "packages/features/notes/backend/endpoints/notes/drafts/create.ts",
+      "definitionFile": "packages/features/notes/contract/draft-endpoint-definitions.ts",
+      "definitionName": "notesDraftsCreateDefinition",
+      "originalSourceSha256": "abfd819ab1cd925a1f1e3a3de19c1e9dfa0e341970d0ff0e5725d702f6ba8c64",
+      "input": {
+        "type": "object",
+        "properties": {
+          "visibility": {
+            "type": "string",
+            "enum": [
+              "public",
+              "home",
+              "followers",
+              "specified"
+            ],
+            "default": "public"
+          },
+          "visibleUserIds": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "format": "misskey:id"
+            }
+          },
+          "cw": {
+            "type": "string",
+            "nullable": true,
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "hashtag": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 200
+          },
+          "localOnly": {
+            "type": "boolean",
+            "default": false
+          },
+          "reactionAcceptance": {
+            "type": "string",
+            "nullable": true,
+            "enum": [
+              null,
+              "likeOnly",
+              "likeOnlyForRemote",
+              "nonSensitiveOnly",
+              "nonSensitiveOnlyForLocalLikeOnlyForRemote"
+            ],
+            "default": null
+          },
+          "replyId": {
+            "type": "string",
+            "format": "misskey:id",
+            "nullable": true
+          },
+          "renoteId": {
+            "type": "string",
+            "format": "misskey:id",
+            "nullable": true
+          },
+          "channelId": {
+            "type": "string",
+            "format": "misskey:id",
+            "nullable": true
+          },
+          "text": {
+            "type": "string",
+            "minLength": 0,
+            "maxLength": 3000,
+            "nullable": true
+          },
+          "fileIds": {
+            "type": "array",
+            "uniqueItems": true,
+            "minItems": 0,
+            "maxItems": 16,
+            "items": {
+              "type": "string",
+              "format": "misskey:id"
+            }
+          },
+          "poll": {
+            "type": "object",
+            "nullable": true,
+            "properties": {
+              "choices": {
+                "type": "array",
+                "uniqueItems": true,
+                "minItems": 0,
+                "maxItems": 10,
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 50
+                }
+              },
+              "multiple": {
+                "type": "boolean"
+              },
+              "expiresAt": {
+                "type": "integer",
+                "nullable": true
+              },
+              "expiredAfter": {
+                "type": "integer",
+                "nullable": true,
+                "minimum": 1
+              }
+            },
+            "required": [
+              "choices"
+            ]
+          },
+          "scheduledAt": {
+            "type": "integer",
+            "nullable": true
+          },
+          "isActuallyScheduled": {
+            "type": "boolean",
+            "default": false
+          }
+        },
+        "required": []
+      },
+      "meta": {
+        "tags": [
+          "notes",
+          "drafts"
+        ],
+        "requireCredential": true,
+        "prohibitMoved": true,
+        "kind": "write:account",
+        "res": {
+          "type": "object",
+          "optional": false,
+          "nullable": false,
+          "properties": {
+            "createdDraft": {
+              "type": "object",
+              "optional": false,
+              "nullable": false,
+              "ref": "NoteDraft"
+            }
+          }
+        },
+        "errors": {
+          "noSuchRenoteTarget": {
+            "message": "No such renote target.",
+            "code": "NO_SUCH_RENOTE_TARGET",
+            "id": "b5c90186-4ab0-49c8-9bba-a1f76c282ba4"
+          },
+          "cannotReRenote": {
+            "message": "You can not Renote a pure Renote.",
+            "code": "CANNOT_RENOTE_TO_A_PURE_RENOTE",
+            "id": "fd4cc33e-2a37-48dd-99cc-9b806eb2031a"
+          },
+          "cannotRenoteDueToVisibility": {
+            "message": "You can not Renote due to target visibility.",
+            "code": "CANNOT_RENOTE_DUE_TO_VISIBILITY",
+            "id": "be9529e9-fe72-4de0-ae43-0b363c4938af"
+          },
+          "noSuchReplyTarget": {
+            "message": "No such reply target.",
+            "code": "NO_SUCH_REPLY_TARGET",
+            "id": "749ee0f6-d3da-459a-bf02-282e2da4292c"
+          },
+          "cannotReplyToInvisibleNote": {
+            "message": "You cannot reply to an invisible Note.",
+            "code": "CANNOT_REPLY_TO_AN_INVISIBLE_NOTE",
+            "id": "b98980fa-3780-406c-a935-b6d0eeee10d1"
+          },
+          "cannotReplyToPureRenote": {
+            "message": "You can not reply to a pure Renote.",
+            "code": "CANNOT_REPLY_TO_A_PURE_RENOTE",
+            "id": "3ac74a84-8fd5-4bb0-870f-01804f82ce15"
+          },
+          "cannotReplyToSpecifiedVisibilityNoteWithExtendedVisibility": {
+            "message": "You cannot reply to a specified visibility note with extended visibility.",
+            "code": "CANNOT_REPLY_TO_SPECIFIED_VISIBILITY_NOTE_WITH_EXTENDED_VISIBILITY",
+            "id": "ed940410-535c-4d5e-bfa3-af798671e93c"
+          },
+          "cannotCreateAlreadyExpiredPoll": {
+            "message": "Poll is already expired.",
+            "code": "CANNOT_CREATE_ALREADY_EXPIRED_POLL",
+            "id": "04da457d-b083-4055-9082-955525eda5a5"
+          },
+          "noSuchChannel": {
+            "message": "No such channel.",
+            "code": "NO_SUCH_CHANNEL",
+            "id": "b1653923-5453-4edc-b786-7c4f39bb0bbb"
+          },
+          "youHaveBeenBlocked": {
+            "message": "You have been blocked by this user.",
+            "code": "YOU_HAVE_BEEN_BLOCKED",
+            "id": "b390d7e1-8a5e-46ed-b625-06271cafd3d3"
+          },
+          "noSuchFile": {
+            "message": "Some files are not found.",
+            "code": "NO_SUCH_FILE",
+            "id": "b6992544-63e7-67f0-fa7f-32444b1b5306"
+          },
+          "cannotRenoteOutsideOfChannel": {
+            "message": "Cannot renote outside of channel.",
+            "code": "CANNOT_RENOTE_OUTSIDE_OF_CHANNEL",
+            "id": "33510210-8452-094c-6227-4a6c05d99f00"
+          },
+          "containsProhibitedWords": {
+            "message": "Cannot post because it contains prohibited words.",
+            "code": "CONTAINS_PROHIBITED_WORDS",
+            "id": "aa6e01d3-a85c-669d-758a-76aab43af334"
+          },
+          "containsTooManyMentions": {
+            "message": "Cannot post because it exceeds the allowed number of mentions.",
+            "code": "CONTAINS_TOO_MANY_MENTIONS",
+            "id": "4de0363a-3046-481b-9b0f-feff3e211025"
+          },
+          "tooManyDrafts": {
+            "message": "You cannot create drafts any more.",
+            "code": "TOO_MANY_DRAFTS",
+            "id": "9ee33bbe-fde3-4c71-9b51-e50492c6b9c8"
+          },
+          "tooManyScheduledNotes": {
+            "message": "You cannot create scheduled notes any more.",
+            "code": "TOO_MANY_SCHEDULED_NOTES",
+            "id": "22ae69eb-09e3-4541-a850-773cfa45e693"
+          },
+          "cannotRenoteToExternal": {
+            "message": "Cannot Renote to External.",
+            "code": "CANNOT_RENOTE_TO_EXTERNAL",
+            "id": "ed1952ac-2d26-4957-8b30-2deda76bedf7"
+          },
+          "scheduledAtRequired": {
+            "message": "scheduledAt is required when isActuallyScheduled is true.",
+            "code": "SCHEDULED_AT_REQUIRED",
+            "id": "15e28a55-e74c-4d65-89b7-8880cdaaa87d"
+          },
+          "scheduledAtMustBeInFuture": {
+            "message": "scheduledAt must be in the future.",
+            "code": "SCHEDULED_AT_MUST_BE_IN_FUTURE",
+            "id": "e4bed6c9-017e-4934-aed0-01c22cc60ec1"
+          }
+        },
+        "limit": {
+          "duration": 3600000,
+          "max": 300
+        }
+      },
+      "output": {
+        "type": "object",
+        "optional": false,
+        "nullable": false,
+        "properties": {
+          "createdDraft": {
+            "type": "object",
+            "optional": false,
+            "nullable": false,
+            "ref": "NoteDraft"
+          }
+        }
+      },
+      "openapi": {
+        "post": {
+          "operationId": "post___notes___drafts___create",
+          "summary": "notes/drafts/create",
+          "description": "No description provided.\n\n**Credential required**: *Yes* / **Permission**: *write:account*",
+          "externalDocs": {
+            "description": "Source code",
+            "url": "https://github.com/misskey-dev/misskey/blob/develop/packages/backend/src/server/api/endpoints/notes/drafts/create.ts"
+          },
+          "tags": [
+            "notes"
+          ],
+          "security": [
+            {
+              "bearerAuth": []
+            }
+          ],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "visibility": {
+                      "type": "string",
+                      "enum": [
+                        "public",
+                        "home",
+                        "followers",
+                        "specified"
+                      ],
+                      "default": "public"
+                    },
+                    "visibleUserIds": {
+                      "type": "array",
+                      "uniqueItems": true,
+                      "items": {
+                        "type": "string",
+                        "format": "misskey:id"
+                      }
+                    },
+                    "cw": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "minLength": 1,
+                      "maxLength": 100
+                    },
+                    "hashtag": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "maxLength": 200
+                    },
+                    "localOnly": {
+                      "type": "boolean",
+                      "default": false
+                    },
+                    "reactionAcceptance": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "enum": [
+                        null,
+                        "likeOnly",
+                        "likeOnlyForRemote",
+                        "nonSensitiveOnly",
+                        "nonSensitiveOnlyForLocalLikeOnlyForRemote"
+                      ],
+                      "default": null
+                    },
+                    "replyId": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "format": "misskey:id"
+                    },
+                    "renoteId": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "format": "misskey:id"
+                    },
+                    "channelId": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "format": "misskey:id"
+                    },
+                    "text": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "minLength": 0,
+                      "maxLength": 3000
+                    },
+                    "fileIds": {
+                      "type": "array",
+                      "uniqueItems": true,
+                      "minItems": 0,
+                      "maxItems": 16,
+                      "items": {
+                        "type": "string",
+                        "format": "misskey:id"
+                      }
+                    },
+                    "poll": {
+                      "type": [
+                        "object",
+                        "null"
+                      ],
+                      "properties": {
+                        "choices": {
+                          "type": "array",
+                          "uniqueItems": true,
+                          "minItems": 0,
+                          "maxItems": 10,
+                          "items": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 50
+                          }
+                        },
+                        "multiple": {
+                          "type": "boolean"
+                        },
+                        "expiresAt": {
+                          "type": [
+                            "integer",
+                            "null"
+                          ]
+                        },
+                        "expiredAfter": {
+                          "type": [
+                            "integer",
+                            "null"
+                          ],
+                          "minimum": 1
+                        }
+                      },
+                      "required": [
+                        "choices"
+                      ]
+                    },
+                    "scheduledAt": {
+                      "type": [
+                        "integer",
+                        "null"
+                      ]
+                    },
+                    "isActuallyScheduled": {
+                      "type": "boolean",
+                      "default": false
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "OK (with results)",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "createdDraft": {
+                        "$ref": "#/components/schemas/NoteDraft"
+                      }
+                    },
+                    "required": [
+                      "createdDraft"
+                    ]
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Client error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "NO_SUCH_RENOTE_TARGET": {
+                      "value": {
+                        "error": {
+                          "message": "No such renote target.",
+                          "code": "NO_SUCH_RENOTE_TARGET",
+                          "id": "b5c90186-4ab0-49c8-9bba-a1f76c282ba4"
+                        }
+                      }
+                    },
+                    "CANNOT_RENOTE_TO_A_PURE_RENOTE": {
+                      "value": {
+                        "error": {
+                          "message": "You can not Renote a pure Renote.",
+                          "code": "CANNOT_RENOTE_TO_A_PURE_RENOTE",
+                          "id": "fd4cc33e-2a37-48dd-99cc-9b806eb2031a"
+                        }
+                      }
+                    },
+                    "CANNOT_RENOTE_DUE_TO_VISIBILITY": {
+                      "value": {
+                        "error": {
+                          "message": "You can not Renote due to target visibility.",
+                          "code": "CANNOT_RENOTE_DUE_TO_VISIBILITY",
+                          "id": "be9529e9-fe72-4de0-ae43-0b363c4938af"
+                        }
+                      }
+                    },
+                    "NO_SUCH_REPLY_TARGET": {
+                      "value": {
+                        "error": {
+                          "message": "No such reply target.",
+                          "code": "NO_SUCH_REPLY_TARGET",
+                          "id": "749ee0f6-d3da-459a-bf02-282e2da4292c"
+                        }
+                      }
+                    },
+                    "CANNOT_REPLY_TO_AN_INVISIBLE_NOTE": {
+                      "value": {
+                        "error": {
+                          "message": "You cannot reply to an invisible Note.",
+                          "code": "CANNOT_REPLY_TO_AN_INVISIBLE_NOTE",
+                          "id": "b98980fa-3780-406c-a935-b6d0eeee10d1"
+                        }
+                      }
+                    },
+                    "CANNOT_REPLY_TO_A_PURE_RENOTE": {
+                      "value": {
+                        "error": {
+                          "message": "You can not reply to a pure Renote.",
+                          "code": "CANNOT_REPLY_TO_A_PURE_RENOTE",
+                          "id": "3ac74a84-8fd5-4bb0-870f-01804f82ce15"
+                        }
+                      }
+                    },
+                    "CANNOT_REPLY_TO_SPECIFIED_VISIBILITY_NOTE_WITH_EXTENDED_VISIBILITY": {
+                      "value": {
+                        "error": {
+                          "message": "You cannot reply to a specified visibility note with extended visibility.",
+                          "code": "CANNOT_REPLY_TO_SPECIFIED_VISIBILITY_NOTE_WITH_EXTENDED_VISIBILITY",
+                          "id": "ed940410-535c-4d5e-bfa3-af798671e93c"
+                        }
+                      }
+                    },
+                    "CANNOT_CREATE_ALREADY_EXPIRED_POLL": {
+                      "value": {
+                        "error": {
+                          "message": "Poll is already expired.",
+                          "code": "CANNOT_CREATE_ALREADY_EXPIRED_POLL",
+                          "id": "04da457d-b083-4055-9082-955525eda5a5"
+                        }
+                      }
+                    },
+                    "NO_SUCH_CHANNEL": {
+                      "value": {
+                        "error": {
+                          "message": "No such channel.",
+                          "code": "NO_SUCH_CHANNEL",
+                          "id": "b1653923-5453-4edc-b786-7c4f39bb0bbb"
+                        }
+                      }
+                    },
+                    "YOU_HAVE_BEEN_BLOCKED": {
+                      "value": {
+                        "error": {
+                          "message": "You have been blocked by this user.",
+                          "code": "YOU_HAVE_BEEN_BLOCKED",
+                          "id": "b390d7e1-8a5e-46ed-b625-06271cafd3d3"
+                        }
+                      }
+                    },
+                    "NO_SUCH_FILE": {
+                      "value": {
+                        "error": {
+                          "message": "Some files are not found.",
+                          "code": "NO_SUCH_FILE",
+                          "id": "b6992544-63e7-67f0-fa7f-32444b1b5306"
+                        }
+                      }
+                    },
+                    "CANNOT_RENOTE_OUTSIDE_OF_CHANNEL": {
+                      "value": {
+                        "error": {
+                          "message": "Cannot renote outside of channel.",
+                          "code": "CANNOT_RENOTE_OUTSIDE_OF_CHANNEL",
+                          "id": "33510210-8452-094c-6227-4a6c05d99f00"
+                        }
+                      }
+                    },
+                    "CONTAINS_PROHIBITED_WORDS": {
+                      "value": {
+                        "error": {
+                          "message": "Cannot post because it contains prohibited words.",
+                          "code": "CONTAINS_PROHIBITED_WORDS",
+                          "id": "aa6e01d3-a85c-669d-758a-76aab43af334"
+                        }
+                      }
+                    },
+                    "CONTAINS_TOO_MANY_MENTIONS": {
+                      "value": {
+                        "error": {
+                          "message": "Cannot post because it exceeds the allowed number of mentions.",
+                          "code": "CONTAINS_TOO_MANY_MENTIONS",
+                          "id": "4de0363a-3046-481b-9b0f-feff3e211025"
+                        }
+                      }
+                    },
+                    "TOO_MANY_DRAFTS": {
+                      "value": {
+                        "error": {
+                          "message": "You cannot create drafts any more.",
+                          "code": "TOO_MANY_DRAFTS",
+                          "id": "9ee33bbe-fde3-4c71-9b51-e50492c6b9c8"
+                        }
+                      }
+                    },
+                    "TOO_MANY_SCHEDULED_NOTES": {
+                      "value": {
+                        "error": {
+                          "message": "You cannot create scheduled notes any more.",
+                          "code": "TOO_MANY_SCHEDULED_NOTES",
+                          "id": "22ae69eb-09e3-4541-a850-773cfa45e693"
+                        }
+                      }
+                    },
+                    "CANNOT_RENOTE_TO_EXTERNAL": {
+                      "value": {
+                        "error": {
+                          "message": "Cannot Renote to External.",
+                          "code": "CANNOT_RENOTE_TO_EXTERNAL",
+                          "id": "ed1952ac-2d26-4957-8b30-2deda76bedf7"
+                        }
+                      }
+                    },
+                    "SCHEDULED_AT_REQUIRED": {
+                      "value": {
+                        "error": {
+                          "message": "scheduledAt is required when isActuallyScheduled is true.",
+                          "code": "SCHEDULED_AT_REQUIRED",
+                          "id": "15e28a55-e74c-4d65-89b7-8880cdaaa87d"
+                        }
+                      }
+                    },
+                    "SCHEDULED_AT_MUST_BE_IN_FUTURE": {
+                      "value": {
+                        "error": {
+                          "message": "scheduledAt must be in the future.",
+                          "code": "SCHEDULED_AT_MUST_BE_IN_FUTURE",
+                          "id": "e4bed6c9-017e-4934-aed0-01c22cc60ec1"
+                        }
+                      }
+                    },
+                    "INVALID_PARAM": {
+                      "value": {
+                        "error": {
+                          "message": "Invalid param.",
+                          "code": "INVALID_PARAM",
+                          "id": "3d81ceae-475f-4600-b2a8-2bc116157532"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "401": {
+              "description": "Authentication error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "CREDENTIAL_REQUIRED": {
+                      "value": {
+                        "error": {
+                          "message": "Credential required.",
+                          "code": "CREDENTIAL_REQUIRED",
+                          "id": "1384574d-a912-4b81-8601-c7b1c4085df1"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "403": {
+              "description": "Forbidden error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "AUTHENTICATION_FAILED": {
+                      "value": {
+                        "error": {
+                          "message": "Authentication failed. Please ensure your token is correct.",
+                          "code": "AUTHENTICATION_FAILED",
+                          "id": "b0a7f5f8-dc2f-4171-b91f-de88ad238e14"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "418": {
+              "description": "I'm Ai",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "I_AM_AI": {
+                      "value": {
+                        "error": {
+                          "message": "You sent a request to Ai-chan, Misskey's showgirl, instead of the server.",
+                          "code": "I_AM_AI",
+                          "id": "60c46cd1-f23a-46b1-bebe-5d2b73951a84"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "429": {
+              "description": "Too many requests",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "RATE_LIMIT_EXCEEDED": {
+                      "value": {
+                        "error": {
+                          "message": "Rate limit exceeded. Please try again later.",
+                          "code": "RATE_LIMIT_EXCEEDED",
+                          "id": "d5826d14-3982-4d2e-8011-b9e9f02499ef"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "500": {
+              "description": "Internal server error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "INTERNAL_ERROR": {
+                      "value": {
+                        "error": {
+                          "message": "Internal error occurred. Please contact us if the error persists.",
+                          "code": "INTERNAL_ERROR",
+                          "id": "5d37dbcb-891e-41ca-a3d6-e690c97775ac"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "route": "notes/drafts/update",
+      "source": "packages/features/notes/backend/endpoints/notes/drafts/update.ts",
+      "definitionFile": "packages/features/notes/contract/draft-endpoint-definitions.ts",
+      "definitionName": "notesDraftsUpdateDefinition",
+      "originalSourceSha256": "f8277e485d9371314b840312c42d2ab773bd6a052db52d3437b19d406dd638a1",
+      "input": {
+        "type": "object",
+        "properties": {
+          "draftId": {
+            "type": "string",
+            "nullable": false,
+            "format": "misskey:id"
+          },
+          "visibility": {
+            "type": "string",
+            "enum": [
+              "public",
+              "home",
+              "followers",
+              "specified"
+            ]
+          },
+          "visibleUserIds": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "format": "misskey:id"
+            }
+          },
+          "cw": {
+            "type": "string",
+            "nullable": true,
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "hashtag": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 200
+          },
+          "localOnly": {
+            "type": "boolean"
+          },
+          "reactionAcceptance": {
+            "type": "string",
+            "nullable": true,
+            "enum": [
+              null,
+              "likeOnly",
+              "likeOnlyForRemote",
+              "nonSensitiveOnly",
+              "nonSensitiveOnlyForLocalLikeOnlyForRemote"
+            ]
+          },
+          "replyId": {
+            "type": "string",
+            "format": "misskey:id",
+            "nullable": true
+          },
+          "renoteId": {
+            "type": "string",
+            "format": "misskey:id",
+            "nullable": true
+          },
+          "channelId": {
+            "type": "string",
+            "format": "misskey:id",
+            "nullable": true
+          },
+          "text": {
+            "type": "string",
+            "minLength": 0,
+            "maxLength": 3000,
+            "nullable": true
+          },
+          "fileIds": {
+            "type": "array",
+            "uniqueItems": true,
+            "minItems": 0,
+            "maxItems": 16,
+            "items": {
+              "type": "string",
+              "format": "misskey:id"
+            }
+          },
+          "poll": {
+            "type": "object",
+            "nullable": true,
+            "properties": {
+              "choices": {
+                "type": "array",
+                "uniqueItems": true,
+                "minItems": 0,
+                "maxItems": 10,
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 50
+                }
+              },
+              "multiple": {
+                "type": "boolean"
+              },
+              "expiresAt": {
+                "type": "integer",
+                "nullable": true
+              },
+              "expiredAfter": {
+                "type": "integer",
+                "nullable": true,
+                "minimum": 1
+              }
+            },
+            "required": [
+              "choices"
+            ]
+          },
+          "scheduledAt": {
+            "type": "integer",
+            "nullable": true
+          },
+          "isActuallyScheduled": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "draftId"
+        ]
+      },
+      "meta": {
+        "tags": [
+          "notes",
+          "drafts"
+        ],
+        "requireCredential": true,
+        "prohibitMoved": true,
+        "kind": "write:account",
+        "res": {
+          "type": "object",
+          "optional": false,
+          "nullable": false,
+          "properties": {
+            "updatedDraft": {
+              "type": "object",
+              "optional": false,
+              "nullable": false,
+              "ref": "NoteDraft"
+            }
+          }
+        },
+        "errors": {
+          "noSuchRenoteTarget": {
+            "message": "No such renote target.",
+            "code": "NO_SUCH_RENOTE_TARGET",
+            "id": "b5c90186-4ab0-49c8-9bba-a1f76c282ba4"
+          },
+          "cannotReRenote": {
+            "message": "You can not Renote a pure Renote.",
+            "code": "CANNOT_RENOTE_TO_A_PURE_RENOTE",
+            "id": "fd4cc33e-2a37-48dd-99cc-9b806eb2031a"
+          },
+          "cannotRenoteDueToVisibility": {
+            "message": "You can not Renote due to target visibility.",
+            "code": "CANNOT_RENOTE_DUE_TO_VISIBILITY",
+            "id": "be9529e9-fe72-4de0-ae43-0b363c4938af"
+          },
+          "noSuchReplyTarget": {
+            "message": "No such reply target.",
+            "code": "NO_SUCH_REPLY_TARGET",
+            "id": "749ee0f6-d3da-459a-bf02-282e2da4292c"
+          },
+          "cannotReplyToInvisibleNote": {
+            "message": "You cannot reply to an invisible Note.",
+            "code": "CANNOT_REPLY_TO_AN_INVISIBLE_NOTE",
+            "id": "b98980fa-3780-406c-a935-b6d0eeee10d1"
+          },
+          "cannotReplyToPureRenote": {
+            "message": "You can not reply to a pure Renote.",
+            "code": "CANNOT_REPLY_TO_A_PURE_RENOTE",
+            "id": "3ac74a84-8fd5-4bb0-870f-01804f82ce15"
+          },
+          "cannotReplyToSpecifiedNoteWithExtendedVisibility": {
+            "message": "You cannot reply to a specified visibility note with extended visibility.",
+            "code": "CANNOT_REPLY_TO_SPECIFIED_NOTE_WITH_EXTENDED_VISIBILITY",
+            "id": "ed940410-535c-4d5e-bfa3-af798671e93c"
+          },
+          "cannotCreateAlreadyExpiredPoll": {
+            "message": "Poll is already expired.",
+            "code": "CANNOT_CREATE_ALREADY_EXPIRED_POLL",
+            "id": "04da457d-b083-4055-9082-955525eda5a5"
+          },
+          "noSuchChannel": {
+            "message": "No such channel.",
+            "code": "NO_SUCH_CHANNEL",
+            "id": "b1653923-5453-4edc-b786-7c4f39bb0bbb"
+          },
+          "youHaveBeenBlocked": {
+            "message": "You have been blocked by this user.",
+            "code": "YOU_HAVE_BEEN_BLOCKED",
+            "id": "b390d7e1-8a5e-46ed-b625-06271cafd3d3"
+          },
+          "noSuchFile": {
+            "message": "Some files are not found.",
+            "code": "NO_SUCH_FILE",
+            "id": "b6992544-63e7-67f0-fa7f-32444b1b5306"
+          },
+          "cannotRenoteOutsideOfChannel": {
+            "message": "Cannot renote outside of channel.",
+            "code": "CANNOT_RENOTE_OUTSIDE_OF_CHANNEL",
+            "id": "33510210-8452-094c-6227-4a6c05d99f00"
+          },
+          "containsProhibitedWords": {
+            "message": "Cannot post because it contains prohibited words.",
+            "code": "CONTAINS_PROHIBITED_WORDS",
+            "id": "aa6e01d3-a85c-669d-758a-76aab43af334"
+          },
+          "containsTooManyMentions": {
+            "message": "Cannot post because it exceeds the allowed number of mentions.",
+            "code": "CONTAINS_TOO_MANY_MENTIONS",
+            "id": "4de0363a-3046-481b-9b0f-feff3e211025"
+          },
+          "noSuchNoteDraft": {
+            "message": "No such note draft.",
+            "code": "NO_SUCH_NOTE_DRAFT",
+            "id": "49cd6b9d-848e-41ee-b0b9-adaca711a6b1"
+          },
+          "accessDenied": {
+            "message": "Access denied.",
+            "code": "ACCESS_DENIED",
+            "id": "56f35758-7dd5-468b-8439-5d6fb8ec9b8e"
+          },
+          "noSuchRenote": {
+            "message": "No such renote.",
+            "code": "NO_SUCH_RENOTE",
+            "id": "64929870-2540-4d11-af41-3b484d78c956"
+          },
+          "cannotRenote": {
+            "message": "Cannot renote.",
+            "code": "CANNOT_RENOTE",
+            "id": "76cc5583-5a14-4ad3-8717-0298507e32db"
+          },
+          "cannotRenoteToExternal": {
+            "message": "Cannot Renote to External.",
+            "code": "CANNOT_RENOTE_TO_EXTERNAL",
+            "id": "ed1952ac-2d26-4957-8b30-2deda76bedf7"
+          },
+          "noSuchReply": {
+            "message": "No such reply.",
+            "code": "NO_SUCH_REPLY",
+            "id": "c4721841-22fc-4bb7-ad3d-897ef1d375b5"
+          },
+          "cannotReplyToSpecifiedVisibilityNoteWithExtendedVisibility": {
+            "message": "You cannot reply to a specified visibility note with extended visibility.",
+            "code": "CANNOT_REPLY_TO_SPECIFIED_VISIBILITY_NOTE_WITH_EXTENDED_VISIBILITY",
+            "id": "215dbc76-336c-4d2a-9605-95766ba7dab0"
+          },
+          "tooManyScheduledNotes": {
+            "message": "You cannot create scheduled notes any more.",
+            "code": "TOO_MANY_SCHEDULED_NOTES",
+            "id": "02f5df79-08ae-4a33-8524-f1503c8f6212"
+          },
+          "scheduledAtRequired": {
+            "message": "scheduledAt is required when isActuallyScheduled is true.",
+            "code": "SCHEDULED_AT_REQUIRED",
+            "id": "fe9737d5-cc41-498c-af9d-149207307530"
+          },
+          "scheduledAtMustBeInFuture": {
+            "message": "scheduledAt must be in the future.",
+            "code": "SCHEDULED_AT_MUST_BE_IN_FUTURE",
+            "id": "ed1a6673-d0d1-4364-aaae-9bf3f139cbc5"
+          }
+        },
+        "limit": {
+          "duration": 3600000,
+          "max": 300
+        }
+      },
+      "output": {
+        "type": "object",
+        "optional": false,
+        "nullable": false,
+        "properties": {
+          "updatedDraft": {
+            "type": "object",
+            "optional": false,
+            "nullable": false,
+            "ref": "NoteDraft"
+          }
+        }
+      },
+      "openapi": {
+        "post": {
+          "operationId": "post___notes___drafts___update",
+          "summary": "notes/drafts/update",
+          "description": "No description provided.\n\n**Credential required**: *Yes* / **Permission**: *write:account*",
+          "externalDocs": {
+            "description": "Source code",
+            "url": "https://github.com/misskey-dev/misskey/blob/develop/packages/backend/src/server/api/endpoints/notes/drafts/update.ts"
+          },
+          "tags": [
+            "notes"
+          ],
+          "security": [
+            {
+              "bearerAuth": []
+            }
+          ],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "draftId": {
+                      "type": "string",
+                      "format": "misskey:id"
+                    },
+                    "visibility": {
+                      "type": "string",
+                      "enum": [
+                        "public",
+                        "home",
+                        "followers",
+                        "specified"
+                      ]
+                    },
+                    "visibleUserIds": {
+                      "type": "array",
+                      "uniqueItems": true,
+                      "items": {
+                        "type": "string",
+                        "format": "misskey:id"
+                      }
+                    },
+                    "cw": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "minLength": 1,
+                      "maxLength": 100
+                    },
+                    "hashtag": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "maxLength": 200
+                    },
+                    "localOnly": {
+                      "type": "boolean"
+                    },
+                    "reactionAcceptance": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "enum": [
+                        null,
+                        "likeOnly",
+                        "likeOnlyForRemote",
+                        "nonSensitiveOnly",
+                        "nonSensitiveOnlyForLocalLikeOnlyForRemote"
+                      ]
+                    },
+                    "replyId": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "format": "misskey:id"
+                    },
+                    "renoteId": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "format": "misskey:id"
+                    },
+                    "channelId": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "format": "misskey:id"
+                    },
+                    "text": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "minLength": 0,
+                      "maxLength": 3000
+                    },
+                    "fileIds": {
+                      "type": "array",
+                      "uniqueItems": true,
+                      "minItems": 0,
+                      "maxItems": 16,
+                      "items": {
+                        "type": "string",
+                        "format": "misskey:id"
+                      }
+                    },
+                    "poll": {
+                      "type": [
+                        "object",
+                        "null"
+                      ],
+                      "properties": {
+                        "choices": {
+                          "type": "array",
+                          "uniqueItems": true,
+                          "minItems": 0,
+                          "maxItems": 10,
+                          "items": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 50
+                          }
+                        },
+                        "multiple": {
+                          "type": "boolean"
+                        },
+                        "expiresAt": {
+                          "type": [
+                            "integer",
+                            "null"
+                          ]
+                        },
+                        "expiredAfter": {
+                          "type": [
+                            "integer",
+                            "null"
+                          ],
+                          "minimum": 1
+                        }
+                      },
+                      "required": [
+                        "choices"
+                      ]
+                    },
+                    "scheduledAt": {
+                      "type": [
+                        "integer",
+                        "null"
+                      ]
+                    },
+                    "isActuallyScheduled": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "draftId"
+                  ]
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "OK (with results)",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "updatedDraft": {
+                        "$ref": "#/components/schemas/NoteDraft"
+                      }
+                    },
+                    "required": [
+                      "updatedDraft"
+                    ]
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Client error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "NO_SUCH_RENOTE_TARGET": {
+                      "value": {
+                        "error": {
+                          "message": "No such renote target.",
+                          "code": "NO_SUCH_RENOTE_TARGET",
+                          "id": "b5c90186-4ab0-49c8-9bba-a1f76c282ba4"
+                        }
+                      }
+                    },
+                    "CANNOT_RENOTE_TO_A_PURE_RENOTE": {
+                      "value": {
+                        "error": {
+                          "message": "You can not Renote a pure Renote.",
+                          "code": "CANNOT_RENOTE_TO_A_PURE_RENOTE",
+                          "id": "fd4cc33e-2a37-48dd-99cc-9b806eb2031a"
+                        }
+                      }
+                    },
+                    "CANNOT_RENOTE_DUE_TO_VISIBILITY": {
+                      "value": {
+                        "error": {
+                          "message": "You can not Renote due to target visibility.",
+                          "code": "CANNOT_RENOTE_DUE_TO_VISIBILITY",
+                          "id": "be9529e9-fe72-4de0-ae43-0b363c4938af"
+                        }
+                      }
+                    },
+                    "NO_SUCH_REPLY_TARGET": {
+                      "value": {
+                        "error": {
+                          "message": "No such reply target.",
+                          "code": "NO_SUCH_REPLY_TARGET",
+                          "id": "749ee0f6-d3da-459a-bf02-282e2da4292c"
+                        }
+                      }
+                    },
+                    "CANNOT_REPLY_TO_AN_INVISIBLE_NOTE": {
+                      "value": {
+                        "error": {
+                          "message": "You cannot reply to an invisible Note.",
+                          "code": "CANNOT_REPLY_TO_AN_INVISIBLE_NOTE",
+                          "id": "b98980fa-3780-406c-a935-b6d0eeee10d1"
+                        }
+                      }
+                    },
+                    "CANNOT_REPLY_TO_A_PURE_RENOTE": {
+                      "value": {
+                        "error": {
+                          "message": "You can not reply to a pure Renote.",
+                          "code": "CANNOT_REPLY_TO_A_PURE_RENOTE",
+                          "id": "3ac74a84-8fd5-4bb0-870f-01804f82ce15"
+                        }
+                      }
+                    },
+                    "CANNOT_REPLY_TO_SPECIFIED_NOTE_WITH_EXTENDED_VISIBILITY": {
+                      "value": {
+                        "error": {
+                          "message": "You cannot reply to a specified visibility note with extended visibility.",
+                          "code": "CANNOT_REPLY_TO_SPECIFIED_NOTE_WITH_EXTENDED_VISIBILITY",
+                          "id": "ed940410-535c-4d5e-bfa3-af798671e93c"
+                        }
+                      }
+                    },
+                    "CANNOT_CREATE_ALREADY_EXPIRED_POLL": {
+                      "value": {
+                        "error": {
+                          "message": "Poll is already expired.",
+                          "code": "CANNOT_CREATE_ALREADY_EXPIRED_POLL",
+                          "id": "04da457d-b083-4055-9082-955525eda5a5"
+                        }
+                      }
+                    },
+                    "NO_SUCH_CHANNEL": {
+                      "value": {
+                        "error": {
+                          "message": "No such channel.",
+                          "code": "NO_SUCH_CHANNEL",
+                          "id": "b1653923-5453-4edc-b786-7c4f39bb0bbb"
+                        }
+                      }
+                    },
+                    "YOU_HAVE_BEEN_BLOCKED": {
+                      "value": {
+                        "error": {
+                          "message": "You have been blocked by this user.",
+                          "code": "YOU_HAVE_BEEN_BLOCKED",
+                          "id": "b390d7e1-8a5e-46ed-b625-06271cafd3d3"
+                        }
+                      }
+                    },
+                    "NO_SUCH_FILE": {
+                      "value": {
+                        "error": {
+                          "message": "Some files are not found.",
+                          "code": "NO_SUCH_FILE",
+                          "id": "b6992544-63e7-67f0-fa7f-32444b1b5306"
+                        }
+                      }
+                    },
+                    "CANNOT_RENOTE_OUTSIDE_OF_CHANNEL": {
+                      "value": {
+                        "error": {
+                          "message": "Cannot renote outside of channel.",
+                          "code": "CANNOT_RENOTE_OUTSIDE_OF_CHANNEL",
+                          "id": "33510210-8452-094c-6227-4a6c05d99f00"
+                        }
+                      }
+                    },
+                    "CONTAINS_PROHIBITED_WORDS": {
+                      "value": {
+                        "error": {
+                          "message": "Cannot post because it contains prohibited words.",
+                          "code": "CONTAINS_PROHIBITED_WORDS",
+                          "id": "aa6e01d3-a85c-669d-758a-76aab43af334"
+                        }
+                      }
+                    },
+                    "CONTAINS_TOO_MANY_MENTIONS": {
+                      "value": {
+                        "error": {
+                          "message": "Cannot post because it exceeds the allowed number of mentions.",
+                          "code": "CONTAINS_TOO_MANY_MENTIONS",
+                          "id": "4de0363a-3046-481b-9b0f-feff3e211025"
+                        }
+                      }
+                    },
+                    "NO_SUCH_NOTE_DRAFT": {
+                      "value": {
+                        "error": {
+                          "message": "No such note draft.",
+                          "code": "NO_SUCH_NOTE_DRAFT",
+                          "id": "49cd6b9d-848e-41ee-b0b9-adaca711a6b1"
+                        }
+                      }
+                    },
+                    "ACCESS_DENIED": {
+                      "value": {
+                        "error": {
+                          "message": "Access denied.",
+                          "code": "ACCESS_DENIED",
+                          "id": "56f35758-7dd5-468b-8439-5d6fb8ec9b8e"
+                        }
+                      }
+                    },
+                    "NO_SUCH_RENOTE": {
+                      "value": {
+                        "error": {
+                          "message": "No such renote.",
+                          "code": "NO_SUCH_RENOTE",
+                          "id": "64929870-2540-4d11-af41-3b484d78c956"
+                        }
+                      }
+                    },
+                    "CANNOT_RENOTE": {
+                      "value": {
+                        "error": {
+                          "message": "Cannot renote.",
+                          "code": "CANNOT_RENOTE",
+                          "id": "76cc5583-5a14-4ad3-8717-0298507e32db"
+                        }
+                      }
+                    },
+                    "CANNOT_RENOTE_TO_EXTERNAL": {
+                      "value": {
+                        "error": {
+                          "message": "Cannot Renote to External.",
+                          "code": "CANNOT_RENOTE_TO_EXTERNAL",
+                          "id": "ed1952ac-2d26-4957-8b30-2deda76bedf7"
+                        }
+                      }
+                    },
+                    "NO_SUCH_REPLY": {
+                      "value": {
+                        "error": {
+                          "message": "No such reply.",
+                          "code": "NO_SUCH_REPLY",
+                          "id": "c4721841-22fc-4bb7-ad3d-897ef1d375b5"
+                        }
+                      }
+                    },
+                    "CANNOT_REPLY_TO_SPECIFIED_VISIBILITY_NOTE_WITH_EXTENDED_VISIBILITY": {
+                      "value": {
+                        "error": {
+                          "message": "You cannot reply to a specified visibility note with extended visibility.",
+                          "code": "CANNOT_REPLY_TO_SPECIFIED_VISIBILITY_NOTE_WITH_EXTENDED_VISIBILITY",
+                          "id": "215dbc76-336c-4d2a-9605-95766ba7dab0"
+                        }
+                      }
+                    },
+                    "TOO_MANY_SCHEDULED_NOTES": {
+                      "value": {
+                        "error": {
+                          "message": "You cannot create scheduled notes any more.",
+                          "code": "TOO_MANY_SCHEDULED_NOTES",
+                          "id": "02f5df79-08ae-4a33-8524-f1503c8f6212"
+                        }
+                      }
+                    },
+                    "SCHEDULED_AT_REQUIRED": {
+                      "value": {
+                        "error": {
+                          "message": "scheduledAt is required when isActuallyScheduled is true.",
+                          "code": "SCHEDULED_AT_REQUIRED",
+                          "id": "fe9737d5-cc41-498c-af9d-149207307530"
+                        }
+                      }
+                    },
+                    "SCHEDULED_AT_MUST_BE_IN_FUTURE": {
+                      "value": {
+                        "error": {
+                          "message": "scheduledAt must be in the future.",
+                          "code": "SCHEDULED_AT_MUST_BE_IN_FUTURE",
+                          "id": "ed1a6673-d0d1-4364-aaae-9bf3f139cbc5"
+                        }
+                      }
+                    },
+                    "INVALID_PARAM": {
+                      "value": {
+                        "error": {
+                          "message": "Invalid param.",
+                          "code": "INVALID_PARAM",
+                          "id": "3d81ceae-475f-4600-b2a8-2bc116157532"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "401": {
+              "description": "Authentication error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "CREDENTIAL_REQUIRED": {
+                      "value": {
+                        "error": {
+                          "message": "Credential required.",
+                          "code": "CREDENTIAL_REQUIRED",
+                          "id": "1384574d-a912-4b81-8601-c7b1c4085df1"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "403": {
+              "description": "Forbidden error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "AUTHENTICATION_FAILED": {
+                      "value": {
+                        "error": {
+                          "message": "Authentication failed. Please ensure your token is correct.",
+                          "code": "AUTHENTICATION_FAILED",
+                          "id": "b0a7f5f8-dc2f-4171-b91f-de88ad238e14"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "418": {
+              "description": "I'm Ai",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "I_AM_AI": {
+                      "value": {
+                        "error": {
+                          "message": "You sent a request to Ai-chan, Misskey's showgirl, instead of the server.",
+                          "code": "I_AM_AI",
+                          "id": "60c46cd1-f23a-46b1-bebe-5d2b73951a84"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "429": {
+              "description": "Too many requests",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "RATE_LIMIT_EXCEEDED": {
+                      "value": {
+                        "error": {
+                          "message": "Rate limit exceeded. Please try again later.",
+                          "code": "RATE_LIMIT_EXCEEDED",
+                          "id": "d5826d14-3982-4d2e-8011-b9e9f02499ef"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "500": {
+              "description": "Internal server error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "INTERNAL_ERROR": {
+                      "value": {
+                        "error": {
+                          "message": "Internal error occurred. Please contact us if the error persists.",
+                          "code": "INTERNAL_ERROR",
+                          "id": "5d37dbcb-891e-41ca-a3d6-e690c97775ac"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ],
+  "samples": {
+    "notes/drafts/create": [
+      {},
+      {
+        "future": {
+          "keep": true
+        }
+      },
+      {
+        "visibility": "public"
+      },
+      {
+        "visibility": "specified",
+        "visibleUserIds": []
+      },
+      {
+        "visibility": "home"
+      },
+      {
+        "visibility": "followers"
+      },
+      {
+        "visibility": "private"
+      },
+      {
+        "visibility": null
+      },
+      {
+        "visibility": 1
+      },
+      {
+        "visibleUserIds": [
+          "a",
+          "B2"
+        ]
+      },
+      {
+        "visibleUserIds": [
+          "a",
+          "a"
+        ]
+      },
+      {
+        "visibleUserIds": [
+          "a",
+          "A"
+        ]
+      },
+      {
+        "visibleUserIds": [
+          "bad-id"
+        ]
+      },
+      {
+        "visibleUserIds": [
+          ""
+        ]
+      },
+      {
+        "visibleUserIds": [
+          1
+        ]
+      },
+      {
+        "visibleUserIds": null
+      },
+      {
+        "cw": null
+      },
+      {
+        "cw": ""
+      },
+      {
+        "cw": "a"
+      },
+      {
+        "cw": "😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀"
+      },
+      {
+        "cw": "😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀"
+      },
+      {
+        "cw": 1
+      },
+      {
+        "hashtag": null
+      },
+      {
+        "hashtag": ""
+      },
+      {
+        "hashtag": "😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀"
+      },
+      {
+        "hashtag": "😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀"
+      },
+      {
+        "hashtag": false
+      },
+      {
+        "localOnly": true
+      },
+      {
+        "localOnly": false
+      },
+      {
+        "localOnly": null
+      },
+      {
+        "localOnly": "false"
+      },
+      {
+        "reactionAcceptance": null
+      },
+      {
+        "reactionAcceptance": "likeOnly"
+      },
+      {
+        "reactionAcceptance": "likeOnlyForRemote"
+      },
+      {
+        "reactionAcceptance": "nonSensitiveOnly"
+      },
+      {
+        "reactionAcceptance": "nonSensitiveOnlyForLocalLikeOnlyForRemote"
+      },
+      {
+        "reactionAcceptance": "unknown"
+      },
+      {
+        "reactionAcceptance": false
+      },
+      {
+        "replyId": null
+      },
+      {
+        "replyId": "abc123"
+      },
+      {
+        "replyId": ""
+      },
+      {
+        "replyId": "bad-id"
+      },
+      {
+        "replyId": 1
+      },
+      {
+        "renoteId": null
+      },
+      {
+        "renoteId": "abc123"
+      },
+      {
+        "renoteId": ""
+      },
+      {
+        "renoteId": "bad-id"
+      },
+      {
+        "renoteId": 1
+      },
+      {
+        "channelId": null
+      },
+      {
+        "channelId": "abc123"
+      },
+      {
+        "channelId": ""
+      },
+      {
+        "channelId": "bad-id"
+      },
+      {
+        "channelId": 1
+      },
+      {
+        "text": null
+      },
+      {
+        "text": ""
+      },
+      {
+        "text": "😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀"
+      },
+      {
+        "text": "😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀"
+      },
+      {
+        "text": "éééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééé"
+      },
+      {
+        "text": "ééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééé"
+      },
+      {
+        "text": 1
+      },
+      {
+        "fileIds": []
+      },
+      {
+        "fileIds": [
+          "a"
+        ]
+      },
+      {
+        "fileIds": [
+          "a",
+          "a"
+        ]
+      },
+      {
+        "fileIds": [
+          "id0",
+          "id1",
+          "id2",
+          "id3",
+          "id4",
+          "id5",
+          "id6",
+          "id7",
+          "id8",
+          "id9",
+          "id10",
+          "id11",
+          "id12",
+          "id13",
+          "id14",
+          "id15"
+        ]
+      },
+      {
+        "fileIds": [
+          "id0",
+          "id1",
+          "id2",
+          "id3",
+          "id4",
+          "id5",
+          "id6",
+          "id7",
+          "id8",
+          "id9",
+          "id10",
+          "id11",
+          "id12",
+          "id13",
+          "id14",
+          "id15",
+          "id16"
+        ]
+      },
+      {
+        "fileIds": [
+          "bad-id"
+        ]
+      },
+      {
+        "fileIds": [
+          null
+        ]
+      },
+      {
+        "fileIds": null
+      },
+      {
+        "poll": null
+      },
+      {
+        "poll": {}
+      },
+      {
+        "poll": []
+      },
+      {
+        "poll": {
+          "choices": []
+        }
+      },
+      {
+        "poll": {
+          "choices": [
+            "x"
+          ]
+        }
+      },
+      {
+        "poll": {
+          "choices": [
+            "x",
+            "x"
+          ]
+        }
+      },
+      {
+        "poll": {
+          "choices": [
+            "x",
+            "X"
+          ]
+        }
+      },
+      {
+        "poll": {
+          "choices": [
+            "é",
+            "é"
+          ]
+        }
+      },
+      {
+        "poll": {
+          "choices": [
+            "😀",
+            "😀"
+          ]
+        }
+      },
+      {
+        "poll": {
+          "choices": [
+            "😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀"
+          ]
+        }
+      },
+      {
+        "poll": {
+          "choices": [
+            "😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀"
+          ]
+        }
+      },
+      {
+        "poll": {
+          "choices": [
+            ""
+          ]
+        }
+      },
+      {
+        "poll": {
+          "choices": [
+            null
+          ]
+        }
+      },
+      {
+        "poll": {
+          "choices": null
+        }
+      },
+      {
+        "poll": {
+          "choices": [
+            "choice0",
+            "choice1",
+            "choice2",
+            "choice3",
+            "choice4",
+            "choice5",
+            "choice6",
+            "choice7",
+            "choice8",
+            "choice9"
+          ]
+        }
+      },
+      {
+        "poll": {
+          "choices": [
+            "choice0",
+            "choice1",
+            "choice2",
+            "choice3",
+            "choice4",
+            "choice5",
+            "choice6",
+            "choice7",
+            "choice8",
+            "choice9",
+            "choice10"
+          ]
+        }
+      },
+      {
+        "poll": {
+          "choices": [],
+          "multiple": true
+        }
+      },
+      {
+        "poll": {
+          "choices": [],
+          "multiple": null
+        }
+      },
+      {
+        "poll": {
+          "choices": [],
+          "expiresAt": null
+        }
+      },
+      {
+        "poll": {
+          "choices": [],
+          "expiresAt": -1
+        }
+      },
+      {
+        "poll": {
+          "choices": [],
+          "expiresAt": 0
+        }
+      },
+      {
+        "poll": {
+          "choices": [],
+          "expiresAt": 1
+        }
+      },
+      {
+        "poll": {
+          "choices": [],
+          "expiresAt": 1.5
+        }
+      },
+      {
+        "poll": {
+          "choices": [],
+          "expiresAt": "1"
+        }
+      },
+      {
+        "poll": {
+          "choices": [],
+          "expiredAfter": null
+        }
+      },
+      {
+        "poll": {
+          "choices": [],
+          "expiredAfter": -1
+        }
+      },
+      {
+        "poll": {
+          "choices": [],
+          "expiredAfter": 0
+        }
+      },
+      {
+        "poll": {
+          "choices": [],
+          "expiredAfter": 1
+        }
+      },
+      {
+        "poll": {
+          "choices": [],
+          "expiredAfter": 1.5
+        }
+      },
+      {
+        "poll": {
+          "choices": [],
+          "expiredAfter": "1"
+        }
+      },
+      {
+        "poll": {
+          "choices": [],
+          "future": {
+            "keep": true
+          }
+        }
+      },
+      {
+        "scheduledAt": null
+      },
+      {
+        "scheduledAt": -1
+      },
+      {
+        "scheduledAt": 0
+      },
+      {
+        "scheduledAt": 1
+      },
+      {
+        "scheduledAt": 1.5
+      },
+      {
+        "scheduledAt": "1"
+      },
+      {
+        "isActuallyScheduled": false
+      },
+      {
+        "isActuallyScheduled": true
+      },
+      {
+        "isActuallyScheduled": null
+      },
+      {
+        "isActuallyScheduled": "false"
+      },
+      {
+        "isActuallyScheduled": true,
+        "scheduledAt": null
+      },
+      {
+        "isActuallyScheduled": true
+      },
+      {
+        "visibility": "specified"
+      },
+      {
+        "__proto__": {
+          "keep": true
+        },
+        "constructor": {
+          "keep": true
+        },
+        "prototype": {
+          "keep": true
+        },
+        "toString": {
+          "keep": true
+        },
+        "poll": {
+          "choices": [],
+          "__proto__": {
+            "keep": true
+          },
+          "constructor": {
+            "keep": true
+          },
+          "prototype": {
+            "keep": true
+          },
+          "toString": {
+            "keep": true
+          }
+        }
+      },
+      [],
+      null,
+      false,
+      1,
+      "body"
+    ],
+    "notes/drafts/update": [
+      {
+        "draftId": "draft1"
+      },
+      {
+        "draftId": "draft1",
+        "future": {
+          "keep": true
+        }
+      },
+      {
+        "draftId": "draft1",
+        "visibility": "public"
+      },
+      {
+        "draftId": "draft1",
+        "visibility": "specified",
+        "visibleUserIds": []
+      },
+      {
+        "draftId": "draft1",
+        "visibility": "home"
+      },
+      {
+        "draftId": "draft1",
+        "visibility": "followers"
+      },
+      {
+        "draftId": "draft1",
+        "visibility": "private"
+      },
+      {
+        "draftId": "draft1",
+        "visibility": null
+      },
+      {
+        "draftId": "draft1",
+        "visibility": 1
+      },
+      {
+        "draftId": "draft1",
+        "visibleUserIds": [
+          "a",
+          "B2"
+        ]
+      },
+      {
+        "draftId": "draft1",
+        "visibleUserIds": [
+          "a",
+          "a"
+        ]
+      },
+      {
+        "draftId": "draft1",
+        "visibleUserIds": [
+          "a",
+          "A"
+        ]
+      },
+      {
+        "draftId": "draft1",
+        "visibleUserIds": [
+          "bad-id"
+        ]
+      },
+      {
+        "draftId": "draft1",
+        "visibleUserIds": [
+          ""
+        ]
+      },
+      {
+        "draftId": "draft1",
+        "visibleUserIds": [
+          1
+        ]
+      },
+      {
+        "draftId": "draft1",
+        "visibleUserIds": null
+      },
+      {
+        "draftId": "draft1",
+        "cw": null
+      },
+      {
+        "draftId": "draft1",
+        "cw": ""
+      },
+      {
+        "draftId": "draft1",
+        "cw": "a"
+      },
+      {
+        "draftId": "draft1",
+        "cw": "😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀"
+      },
+      {
+        "draftId": "draft1",
+        "cw": "😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀"
+      },
+      {
+        "draftId": "draft1",
+        "cw": 1
+      },
+      {
+        "draftId": "draft1",
+        "hashtag": null
+      },
+      {
+        "draftId": "draft1",
+        "hashtag": ""
+      },
+      {
+        "draftId": "draft1",
+        "hashtag": "😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀"
+      },
+      {
+        "draftId": "draft1",
+        "hashtag": "😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀"
+      },
+      {
+        "draftId": "draft1",
+        "hashtag": false
+      },
+      {
+        "draftId": "draft1",
+        "localOnly": true
+      },
+      {
+        "draftId": "draft1",
+        "localOnly": false
+      },
+      {
+        "draftId": "draft1",
+        "localOnly": null
+      },
+      {
+        "draftId": "draft1",
+        "localOnly": "false"
+      },
+      {
+        "draftId": "draft1",
+        "reactionAcceptance": null
+      },
+      {
+        "draftId": "draft1",
+        "reactionAcceptance": "likeOnly"
+      },
+      {
+        "draftId": "draft1",
+        "reactionAcceptance": "likeOnlyForRemote"
+      },
+      {
+        "draftId": "draft1",
+        "reactionAcceptance": "nonSensitiveOnly"
+      },
+      {
+        "draftId": "draft1",
+        "reactionAcceptance": "nonSensitiveOnlyForLocalLikeOnlyForRemote"
+      },
+      {
+        "draftId": "draft1",
+        "reactionAcceptance": "unknown"
+      },
+      {
+        "draftId": "draft1",
+        "reactionAcceptance": false
+      },
+      {
+        "draftId": "draft1",
+        "replyId": null
+      },
+      {
+        "draftId": "draft1",
+        "replyId": "abc123"
+      },
+      {
+        "draftId": "draft1",
+        "replyId": ""
+      },
+      {
+        "draftId": "draft1",
+        "replyId": "bad-id"
+      },
+      {
+        "draftId": "draft1",
+        "replyId": 1
+      },
+      {
+        "draftId": "draft1",
+        "renoteId": null
+      },
+      {
+        "draftId": "draft1",
+        "renoteId": "abc123"
+      },
+      {
+        "draftId": "draft1",
+        "renoteId": ""
+      },
+      {
+        "draftId": "draft1",
+        "renoteId": "bad-id"
+      },
+      {
+        "draftId": "draft1",
+        "renoteId": 1
+      },
+      {
+        "draftId": "draft1",
+        "channelId": null
+      },
+      {
+        "draftId": "draft1",
+        "channelId": "abc123"
+      },
+      {
+        "draftId": "draft1",
+        "channelId": ""
+      },
+      {
+        "draftId": "draft1",
+        "channelId": "bad-id"
+      },
+      {
+        "draftId": "draft1",
+        "channelId": 1
+      },
+      {
+        "draftId": "draft1",
+        "text": null
+      },
+      {
+        "draftId": "draft1",
+        "text": ""
+      },
+      {
+        "draftId": "draft1",
+        "text": "😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀"
+      },
+      {
+        "draftId": "draft1",
+        "text": "😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀"
+      },
+      {
+        "draftId": "draft1",
+        "text": "éééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééé"
+      },
+      {
+        "draftId": "draft1",
+        "text": "ééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééé"
+      },
+      {
+        "draftId": "draft1",
+        "text": 1
+      },
+      {
+        "draftId": "draft1",
+        "fileIds": []
+      },
+      {
+        "draftId": "draft1",
+        "fileIds": [
+          "a"
+        ]
+      },
+      {
+        "draftId": "draft1",
+        "fileIds": [
+          "a",
+          "a"
+        ]
+      },
+      {
+        "draftId": "draft1",
+        "fileIds": [
+          "id0",
+          "id1",
+          "id2",
+          "id3",
+          "id4",
+          "id5",
+          "id6",
+          "id7",
+          "id8",
+          "id9",
+          "id10",
+          "id11",
+          "id12",
+          "id13",
+          "id14",
+          "id15"
+        ]
+      },
+      {
+        "draftId": "draft1",
+        "fileIds": [
+          "id0",
+          "id1",
+          "id2",
+          "id3",
+          "id4",
+          "id5",
+          "id6",
+          "id7",
+          "id8",
+          "id9",
+          "id10",
+          "id11",
+          "id12",
+          "id13",
+          "id14",
+          "id15",
+          "id16"
+        ]
+      },
+      {
+        "draftId": "draft1",
+        "fileIds": [
+          "bad-id"
+        ]
+      },
+      {
+        "draftId": "draft1",
+        "fileIds": [
+          null
+        ]
+      },
+      {
+        "draftId": "draft1",
+        "fileIds": null
+      },
+      {
+        "draftId": "draft1",
+        "poll": null
+      },
+      {
+        "draftId": "draft1",
+        "poll": {}
+      },
+      {
+        "draftId": "draft1",
+        "poll": []
+      },
+      {
+        "draftId": "draft1",
+        "poll": {
+          "choices": []
+        }
+      },
+      {
+        "draftId": "draft1",
+        "poll": {
+          "choices": [
+            "x"
+          ]
+        }
+      },
+      {
+        "draftId": "draft1",
+        "poll": {
+          "choices": [
+            "x",
+            "x"
+          ]
+        }
+      },
+      {
+        "draftId": "draft1",
+        "poll": {
+          "choices": [
+            "x",
+            "X"
+          ]
+        }
+      },
+      {
+        "draftId": "draft1",
+        "poll": {
+          "choices": [
+            "é",
+            "é"
+          ]
+        }
+      },
+      {
+        "draftId": "draft1",
+        "poll": {
+          "choices": [
+            "😀",
+            "😀"
+          ]
+        }
+      },
+      {
+        "draftId": "draft1",
+        "poll": {
+          "choices": [
+            "😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀"
+          ]
+        }
+      },
+      {
+        "draftId": "draft1",
+        "poll": {
+          "choices": [
+            "😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀"
+          ]
+        }
+      },
+      {
+        "draftId": "draft1",
+        "poll": {
+          "choices": [
+            ""
+          ]
+        }
+      },
+      {
+        "draftId": "draft1",
+        "poll": {
+          "choices": [
+            null
+          ]
+        }
+      },
+      {
+        "draftId": "draft1",
+        "poll": {
+          "choices": null
+        }
+      },
+      {
+        "draftId": "draft1",
+        "poll": {
+          "choices": [
+            "choice0",
+            "choice1",
+            "choice2",
+            "choice3",
+            "choice4",
+            "choice5",
+            "choice6",
+            "choice7",
+            "choice8",
+            "choice9"
+          ]
+        }
+      },
+      {
+        "draftId": "draft1",
+        "poll": {
+          "choices": [
+            "choice0",
+            "choice1",
+            "choice2",
+            "choice3",
+            "choice4",
+            "choice5",
+            "choice6",
+            "choice7",
+            "choice8",
+            "choice9",
+            "choice10"
+          ]
+        }
+      },
+      {
+        "draftId": "draft1",
+        "poll": {
+          "choices": [],
+          "multiple": true
+        }
+      },
+      {
+        "draftId": "draft1",
+        "poll": {
+          "choices": [],
+          "multiple": null
+        }
+      },
+      {
+        "draftId": "draft1",
+        "poll": {
+          "choices": [],
+          "expiresAt": null
+        }
+      },
+      {
+        "draftId": "draft1",
+        "poll": {
+          "choices": [],
+          "expiresAt": -1
+        }
+      },
+      {
+        "draftId": "draft1",
+        "poll": {
+          "choices": [],
+          "expiresAt": 0
+        }
+      },
+      {
+        "draftId": "draft1",
+        "poll": {
+          "choices": [],
+          "expiresAt": 1
+        }
+      },
+      {
+        "draftId": "draft1",
+        "poll": {
+          "choices": [],
+          "expiresAt": 1.5
+        }
+      },
+      {
+        "draftId": "draft1",
+        "poll": {
+          "choices": [],
+          "expiresAt": "1"
+        }
+      },
+      {
+        "draftId": "draft1",
+        "poll": {
+          "choices": [],
+          "expiredAfter": null
+        }
+      },
+      {
+        "draftId": "draft1",
+        "poll": {
+          "choices": [],
+          "expiredAfter": -1
+        }
+      },
+      {
+        "draftId": "draft1",
+        "poll": {
+          "choices": [],
+          "expiredAfter": 0
+        }
+      },
+      {
+        "draftId": "draft1",
+        "poll": {
+          "choices": [],
+          "expiredAfter": 1
+        }
+      },
+      {
+        "draftId": "draft1",
+        "poll": {
+          "choices": [],
+          "expiredAfter": 1.5
+        }
+      },
+      {
+        "draftId": "draft1",
+        "poll": {
+          "choices": [],
+          "expiredAfter": "1"
+        }
+      },
+      {
+        "draftId": "draft1",
+        "poll": {
+          "choices": [],
+          "future": {
+            "keep": true
+          }
+        }
+      },
+      {
+        "draftId": "draft1",
+        "scheduledAt": null
+      },
+      {
+        "draftId": "draft1",
+        "scheduledAt": -1
+      },
+      {
+        "draftId": "draft1",
+        "scheduledAt": 0
+      },
+      {
+        "draftId": "draft1",
+        "scheduledAt": 1
+      },
+      {
+        "draftId": "draft1",
+        "scheduledAt": 1.5
+      },
+      {
+        "draftId": "draft1",
+        "scheduledAt": "1"
+      },
+      {
+        "draftId": "draft1",
+        "isActuallyScheduled": false
+      },
+      {
+        "draftId": "draft1",
+        "isActuallyScheduled": true
+      },
+      {
+        "draftId": "draft1",
+        "isActuallyScheduled": null
+      },
+      {
+        "draftId": "draft1",
+        "isActuallyScheduled": "false"
+      },
+      {
+        "draftId": "draft1",
+        "isActuallyScheduled": true,
+        "scheduledAt": null
+      },
+      {
+        "draftId": "draft1",
+        "isActuallyScheduled": true
+      },
+      {
+        "draftId": "draft1",
+        "visibility": "specified"
+      },
+      {
+        "draftId": "draft1",
+        "__proto__": {
+          "keep": true
+        },
+        "constructor": {
+          "keep": true
+        },
+        "prototype": {
+          "keep": true
+        },
+        "toString": {
+          "keep": true
+        },
+        "poll": {
+          "choices": [],
+          "__proto__": {
+            "keep": true
+          },
+          "constructor": {
+            "keep": true
+          },
+          "prototype": {
+            "keep": true
+          },
+          "toString": {
+            "keep": true
+          }
+        }
+      },
+      [],
+      null,
+      false,
+      1,
+      "body",
+      {},
+      {
+        "draftId": null
+      },
+      {
+        "draftId": ""
+      },
+      {
+        "draftId": "bad-id"
+      },
+      {
+        "draftId": 1
+      }
+    ]
+  }
+}

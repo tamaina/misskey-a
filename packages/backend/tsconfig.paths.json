@@ -11,6 +11,7 @@
 			"json5": ["./node_modules/json5"],
 			"ioredis": ["./node_modules/ioredis"],
 			"ajv": ["./node_modules/ajv"],
+			"rss-parser": ["./node_modules/rss-parser"],
 			"@peertube/http-signature": ["./node_modules/@peertube/http-signature"],
 			"bullmq": ["./node_modules/bullmq"],
 			"date-fns": ["./node_modules/date-fns"],

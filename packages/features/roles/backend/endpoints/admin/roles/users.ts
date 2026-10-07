@@ -3,15 +3,18 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { referenceAdminRolesUsersDefinition, referenceAdminRolesUsersInput, referenceAdminRolesUsersOutput } from '../../../../contract/reference-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
 import { Brackets } from 'typeorm';
 import type { RoleAssignmentsRepository, RolesRepository } from '@/models/_.js';
-import { Endpoint } from '@/server/api/endpoint-base.js';
 import { QueryService } from '@/core/QueryService.js';
 import { DI } from '@/di-symbols.js';
 import { UserEntityService } from '../../../../../users/backend/serializers/UserEntityService.js';
 import { IdService } from '../../../../../runtime/backend/services/IdService.js';
 import { ApiError } from '@/server/api/error.js';
+
+const contractProjection = projectEndpointContract(referenceAdminRolesUsersDefinition);
 
 export const meta = {
 	tags: ['admin', 'role', 'users'],
@@ -28,36 +31,13 @@ export const meta = {
 		},
 	},
 
-	res: {
-		type: 'array',
-		items: {
-			type: 'object',
-			properties: {
-				id: { type: 'string', format: 'misskey:id' },
-				createdAt: { type: 'string', format: 'date-time' },
-				user: { ref: 'UserDetailed' },
-				expiresAt: { type: 'string', format: 'date-time', nullable: true },
-			},
-			required: ['id', 'createdAt', 'user'],
-		},
-	},
+	res: contractProjection.response,
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {
-		roleId: { type: 'string', format: 'misskey:id' },
-		sinceId: { type: 'string', format: 'misskey:id' },
-		untilId: { type: 'string', format: 'misskey:id' },
-		sinceDate: { type: 'integer' },
-		untilDate: { type: 'integer' },
-		limit: { type: 'integer', minimum: 1, maximum: 100, default: 10 },
-	},
-	required: ['roleId'],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof referenceAdminRolesUsersInput, typeof referenceAdminRolesUsersOutput> {
 	constructor(
 		@Inject(DI.rolesRepository)
 		private rolesRepository: RolesRepository,
@@ -69,7 +49,7 @@ export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDe
 		private userEntityService: UserEntityService,
 		private idService: IdService,
 	) {
-		super(meta, paramDef, async (ps, me) => {
+		super(meta, contractProjection, async (ps, me) => {
 			const role = await this.rolesRepository.findOneBy({
 				id: ps.roleId,
 			});

@@ -3,25 +3,24 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { selectorPagesShowDefinition, selectorPagesShowInput, selectorPagesShowOutput } from '../../../contract/selector-endpoint-definitions.js';
 import { IsNull } from 'typeorm';
 import { Inject, Injectable } from '@nestjs/common';
 import type { UsersRepository, PagesRepository } from '@/models/_.js';
 import type { MiPage } from '../../models/Page.js';
-import { Endpoint } from '@/server/api/endpoint-base.js';
 import { PageEntityService } from '../../serializers/PageEntityService.js';
 import { DI } from '@/di-symbols.js';
 import { ApiError } from '@/server/api/error.js';
+
+const contractProjection = projectEndpointContract(selectorPagesShowDefinition);
 
 export const meta = {
 	tags: ['pages'],
 
 	requireCredential: false,
 
-	res: {
-		type: 'object',
-		optional: false, nullable: false,
-		ref: 'Page',
-	},
+	res: contractProjection.response,
 
 	errors: {
 		noSuchPage: {
@@ -32,28 +31,10 @@ export const meta = {
 	},
 } as const;
 
-export const paramDef = {
-	anyOf: [
-		{
-			type: 'object',
-			properties: {
-				pageId: { type: 'string', format: 'misskey:id' },
-			},
-			required: ['pageId'],
-		},
-		{
-			type: 'object',
-			properties: {
-				name: { type: 'string' },
-				username: { type: 'string' },
-			},
-			required: ['name', 'username'],
-		},
-	],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof selectorPagesShowInput, typeof selectorPagesShowOutput, 'legacy-declared'> {
 	constructor(
 		@Inject(DI.usersRepository)
 		private usersRepository: UsersRepository,
@@ -63,7 +44,7 @@ export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDe
 
 		private pageEntityService: PageEntityService,
 	) {
-		super(meta, paramDef, async (ps, me) => {
+		super(meta, contractProjection, async (ps, me) => {
 			let page: MiPage | null = null;
 
 			if ('pageId' in ps) {

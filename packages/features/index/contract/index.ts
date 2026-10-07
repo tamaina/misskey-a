@@ -3,6 +3,16 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import type { NativeDriveFileCreateEndpoints } from '../../drive/contract/create-endpoint-definition.js';
+import type { PortableConstantNativeEndpoints } from './portable-constant-native-endpoints.js';
+import type { DelayedTupleNativeEndpoints } from './delayed-tuple-native-endpoints.js';
+import type { NativeNoteCreateEndpoints } from '../../notes/contract/create-endpoint-definition.js';
+import type { SelectorNativeEndpoints } from './selector-native-endpoints.js';
+import type { EmptyInputNativeEndpoints } from './empty-input-native-endpoints.js';
+import type { NativeNoteDraftEndpoints } from '../../notes/contract/draft-endpoint-definitions.js';
+import type { OutputCompositionNativeEndpoints } from './output-composition-native-endpoints.js';
+import type { ReferenceNativeEndpoints } from './reference-native-endpoints.js';
+import type { SourceConstantNativeEndpoints } from './source-constant-native-endpoints.js';
 import type { RemainingInlineNativeEndpoints } from './remaining-inline-native-endpoints.js';
 import type { DriveListingNativeEndpoints } from './drive-listing-native-endpoints.js';
 import type { UniqueStringNativeEndpoints } from './unique-string-native-endpoints.js';
@@ -55,6 +65,16 @@ export type FeatureEndpoints = ModerationCommandEndpoints
 	& VoidNativeEndpoints
 	& RemainingInlineNativeEndpoints
 	& DriveListingNativeEndpoints
-	& UniqueStringNativeEndpoints;
+	& UniqueStringNativeEndpoints
+	& SourceConstantNativeEndpoints
+	& PortableConstantNativeEndpoints
+	& ReferenceNativeEndpoints
+	& OutputCompositionNativeEndpoints
+	& NativeNoteDraftEndpoints
+	& EmptyInputNativeEndpoints
+	& SelectorNativeEndpoints
+	& DelayedTupleNativeEndpoints
+	& NativeNoteCreateEndpoints
+	& NativeDriveFileCreateEndpoints;
 
 export type { PackedModels } from './packed.js';

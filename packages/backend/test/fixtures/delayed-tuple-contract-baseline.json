@@ -1,0 +1,449 @@
+{
+  "captureMethod": "Current original source AST before stage edits; previously published full OpenAPI paths",
+  "routes": [
+    {
+      "route": "admin/queue/deliver-delayed",
+      "source": "packages/features/operations/backend/endpoints/admin/queue/deliver-delayed.ts",
+      "originalSourceSha256": "f7924f39216dee07f697c3d591fcecc585d1f2ea976661a2bb2d4ec38a46b7f0",
+      "input": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      },
+      "meta": {
+        "tags": [
+          "admin"
+        ],
+        "requireCredential": true,
+        "requireModerator": true,
+        "kind": "read:admin:queue",
+        "res": {
+          "type": "array",
+          "optional": false,
+          "nullable": false,
+          "items": {
+            "type": "array",
+            "optional": false,
+            "nullable": false,
+            "prefixItems": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "unevaluatedItems": false
+          },
+          "example": [
+            [
+              "example.com",
+              12
+            ]
+          ]
+        }
+      },
+      "output": {
+        "type": "array",
+        "optional": false,
+        "nullable": false,
+        "items": {
+          "type": "array",
+          "optional": false,
+          "nullable": false,
+          "prefixItems": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "unevaluatedItems": false
+        },
+        "example": [
+          [
+            "example.com",
+            12
+          ]
+        ]
+      },
+      "openapi": {
+        "post": {
+          "operationId": "post___admin___queue___deliver-delayed",
+          "summary": "admin/queue/deliver-delayed",
+          "description": "No description provided.\n\n**Credential required**: *Yes* / **Permission**: *read:admin:queue*",
+          "externalDocs": {
+            "description": "Source code",
+            "url": "https://github.com/misskey-dev/misskey/blob/develop/packages/backend/src/server/api/endpoints/admin/queue/deliver-delayed.ts"
+          },
+          "tags": [
+            "admin"
+          ],
+          "security": [
+            {
+              "bearerAuth": []
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "OK (with results)",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "array",
+                    "items": {
+                      "type": "array",
+                      "prefixItems": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "number"
+                        }
+                      ],
+                      "unevaluatedItems": false
+                    },
+                    "example": [
+                      [
+                        "example.com",
+                        12
+                      ]
+                    ]
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Client error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "INVALID_PARAM": {
+                      "value": {
+                        "error": {
+                          "message": "Invalid param.",
+                          "code": "INVALID_PARAM",
+                          "id": "3d81ceae-475f-4600-b2a8-2bc116157532"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "401": {
+              "description": "Authentication error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "CREDENTIAL_REQUIRED": {
+                      "value": {
+                        "error": {
+                          "message": "Credential required.",
+                          "code": "CREDENTIAL_REQUIRED",
+                          "id": "1384574d-a912-4b81-8601-c7b1c4085df1"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "403": {
+              "description": "Forbidden error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "AUTHENTICATION_FAILED": {
+                      "value": {
+                        "error": {
+                          "message": "Authentication failed. Please ensure your token is correct.",
+                          "code": "AUTHENTICATION_FAILED",
+                          "id": "b0a7f5f8-dc2f-4171-b91f-de88ad238e14"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "418": {
+              "description": "I'm Ai",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "I_AM_AI": {
+                      "value": {
+                        "error": {
+                          "message": "You sent a request to Ai-chan, Misskey's showgirl, instead of the server.",
+                          "code": "I_AM_AI",
+                          "id": "60c46cd1-f23a-46b1-bebe-5d2b73951a84"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "500": {
+              "description": "Internal server error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "INTERNAL_ERROR": {
+                      "value": {
+                        "error": {
+                          "message": "Internal error occurred. Please contact us if the error persists.",
+                          "code": "INTERNAL_ERROR",
+                          "id": "5d37dbcb-891e-41ca-a3d6-e690c97775ac"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "route": "admin/queue/inbox-delayed",
+      "source": "packages/features/operations/backend/endpoints/admin/queue/inbox-delayed.ts",
+      "originalSourceSha256": "9c6d6aec0d7dbd88474d14b3c23ea44666595efa3a43f7dd1326542c2444ecbb",
+      "input": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      },
+      "meta": {
+        "tags": [
+          "admin"
+        ],
+        "requireCredential": true,
+        "requireModerator": true,
+        "kind": "read:admin:queue",
+        "res": {
+          "type": "array",
+          "optional": false,
+          "nullable": false,
+          "items": {
+            "type": "array",
+            "optional": false,
+            "nullable": false,
+            "prefixItems": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "unevaluatedItems": false
+          },
+          "example": [
+            [
+              "example.com",
+              12
+            ]
+          ]
+        }
+      },
+      "output": {
+        "type": "array",
+        "optional": false,
+        "nullable": false,
+        "items": {
+          "type": "array",
+          "optional": false,
+          "nullable": false,
+          "prefixItems": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "unevaluatedItems": false
+        },
+        "example": [
+          [
+            "example.com",
+            12
+          ]
+        ]
+      },
+      "openapi": {
+        "post": {
+          "operationId": "post___admin___queue___inbox-delayed",
+          "summary": "admin/queue/inbox-delayed",
+          "description": "No description provided.\n\n**Credential required**: *Yes* / **Permission**: *read:admin:queue*",
+          "externalDocs": {
+            "description": "Source code",
+            "url": "https://github.com/misskey-dev/misskey/blob/develop/packages/backend/src/server/api/endpoints/admin/queue/inbox-delayed.ts"
+          },
+          "tags": [
+            "admin"
+          ],
+          "security": [
+            {
+              "bearerAuth": []
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "OK (with results)",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "array",
+                    "items": {
+                      "type": "array",
+                      "prefixItems": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "number"
+                        }
+                      ],
+                      "unevaluatedItems": false
+                    },
+                    "example": [
+                      [
+                        "example.com",
+                        12
+                      ]
+                    ]
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Client error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "INVALID_PARAM": {
+                      "value": {
+                        "error": {
+                          "message": "Invalid param.",
+                          "code": "INVALID_PARAM",
+                          "id": "3d81ceae-475f-4600-b2a8-2bc116157532"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "401": {
+              "description": "Authentication error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "CREDENTIAL_REQUIRED": {
+                      "value": {
+                        "error": {
+                          "message": "Credential required.",
+                          "code": "CREDENTIAL_REQUIRED",
+                          "id": "1384574d-a912-4b81-8601-c7b1c4085df1"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "403": {
+              "description": "Forbidden error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "AUTHENTICATION_FAILED": {
+                      "value": {
+                        "error": {
+                          "message": "Authentication failed. Please ensure your token is correct.",
+                          "code": "AUTHENTICATION_FAILED",
+                          "id": "b0a7f5f8-dc2f-4171-b91f-de88ad238e14"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "418": {
+              "description": "I'm Ai",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "I_AM_AI": {
+                      "value": {
+                        "error": {
+                          "message": "You sent a request to Ai-chan, Misskey's showgirl, instead of the server.",
+                          "code": "I_AM_AI",
+                          "id": "60c46cd1-f23a-46b1-bebe-5d2b73951a84"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "500": {
+              "description": "Internal server error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  },
+                  "examples": {
+                    "INTERNAL_ERROR": {
+                      "value": {
+                        "error": {
+                          "message": "Internal error occurred. Please contact us if the error persists.",
+                          "code": "INTERNAL_ERROR",
+                          "id": "5d37dbcb-891e-41ca-a3d6-e690c97775ac"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

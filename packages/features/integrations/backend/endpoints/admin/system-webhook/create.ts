@@ -3,11 +3,13 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { portableAdminSystemWebhookCreateDefinition, portableAdminSystemWebhookCreateInput, portableAdminSystemWebhookCreateOutput } from '../../../../contract/portable-constant-endpoint-definitions.js';
 import { Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
 import { SystemWebhookEntityService } from '../../../serializers/SystemWebhookEntityService.js';
-import { systemWebhookEventTypes } from '../../../models/SystemWebhook.js';
 import { SystemWebhookService } from '../../../services/SystemWebhookService.js';
+
+const contractProjection = projectEndpointContract(portableAdminSystemWebhookCreateDefinition);
 
 export const meta = {
 	tags: ['admin', 'system-webhook'],
@@ -17,56 +19,18 @@ export const meta = {
 	secure: true,
 	kind: 'write:admin:system-webhook',
 
-	res: {
-		type: 'object',
-		ref: 'SystemWebhook',
-	},
+	res: contractProjection.response,
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {
-		isActive: {
-			type: 'boolean',
-		},
-		name: {
-			type: 'string',
-			minLength: 1,
-			maxLength: 255,
-		},
-		on: {
-			type: 'array',
-			items: {
-				type: 'string',
-				enum: systemWebhookEventTypes,
-			},
-		},
-		url: {
-			type: 'string',
-			minLength: 1,
-			maxLength: 1024,
-		},
-		secret: {
-			type: 'string',
-			maxLength: 1024,
-			default: '',
-		},
-	},
-	required: [
-		'isActive',
-		'name',
-		'on',
-		'url',
-	],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof portableAdminSystemWebhookCreateInput, typeof portableAdminSystemWebhookCreateOutput> {
 	constructor(
 		private systemWebhookService: SystemWebhookService,
 		private systemWebhookEntityService: SystemWebhookEntityService,
 	) {
-		super(meta, paramDef, async (ps, me) => {
+		super(meta, contractProjection, async (ps, me) => {
 			const result = await this.systemWebhookService.createSystemWebhook(
 				{
 					isActive: ps.isActive,

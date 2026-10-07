@@ -3,24 +3,14 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { defineServices, service } from '../../index/backend/service-definitions.js';
+import { ports } from '../../index/backend/service-ports.js';
 import { ReversiGameEntityService } from './serializers/ReversiGameEntityService.js';
-import type { ReversiGamesRepository } from '@/models/_.js';
-import type { UserEntityService } from '../../users/backend/serializers/UserEntityService.js';
-import type { IdService } from '../../runtime/backend/services/IdService.js';
+import type { Inputs, Outputs } from '../../index/backend/service-definitions.js';
 
-export interface GameServicesDependencies {
-	reversiGamesRepository: ReversiGamesRepository;
-	userEntityService: Pick<UserEntityService, 'pack' | 'packMany'>;
-	idService: Pick<IdService, 'parse'>;
-}
-
-/** Compose this feature without starting resources or resolving a container. */
-export function createGameServices(deps: GameServicesDependencies) {
-	const reversiGameEntityService = new ReversiGameEntityService(deps.reversiGamesRepository, deps.userEntityService, deps.idService);
-
-	return {
-		ReversiGameEntityService: reversiGameEntityService,
-	};
-}
-
-export type GameServices = ReturnType<typeof createGameServices>;
+export const gameServices = defineServices({
+	ReversiGameEntityService: service(ReversiGameEntityService, [ports.reversiGamesRepository, ports.userEntityService, ports.idService]),
+});
+export const createGameServices = gameServices.create;
+export type GameServicesDependencies = Inputs<typeof gameServices>;
+export type GameServices = Outputs<typeof gameServices>;

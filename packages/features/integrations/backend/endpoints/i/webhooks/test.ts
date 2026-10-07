@@ -3,12 +3,14 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { constantIWebhooksTestDefinition, constantIWebhooksTestInput, constantIWebhooksTestOutput } from '../../../../contract/source-constant-endpoint-definitions.js';
 import { Injectable } from '@nestjs/common';
 import ms from '@/runtime-dependencies/ms.js';
-import { Endpoint } from '@/server/api/endpoint-base.js';
-import { webhookEventTypes } from '../../../models/Webhook.js';
 import { WebhookTestService } from '../../../services/WebhookTestService.js';
 import { ApiError } from '@/server/api/error.js';
+
+const contractProjection = projectEndpointContract(constantIWebhooksTestDefinition);
 
 export const meta = {
 	tags: ['webhooks'],
@@ -31,34 +33,14 @@ export const meta = {
 	},
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {
-		webhookId: {
-			type: 'string',
-			format: 'misskey:id',
-		},
-		type: {
-			type: 'string',
-			enum: webhookEventTypes,
-		},
-		override: {
-			type: 'object',
-			properties: {
-				url: { type: 'string' },
-				secret: { type: 'string' },
-			},
-		},
-	},
-	required: ['webhookId', 'type'],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof constantIWebhooksTestInput, typeof constantIWebhooksTestOutput> {
 	constructor(
 		private webhookTestService: WebhookTestService,
 	) {
-		super(meta, paramDef, async (ps, me) => {
+		super(meta, contractProjection, async (ps, me) => {
 			try {
 				await this.webhookTestService.testUserWebhook({
 					webhookId: ps.webhookId,

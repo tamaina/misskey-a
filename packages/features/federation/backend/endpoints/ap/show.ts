@@ -3,13 +3,14 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { compositionApShowDefinition, compositionApShowInput, compositionApShowOutput } from '../../../contract/output-composition-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
 import ms from '@/runtime-dependencies/ms.js';
-import { Endpoint } from '@/server/api/endpoint-base.js';
 import type { MiNote } from '../../../../notes/backend/models/Note.js';
 import type { MiLocalUser, MiUser } from '../../../../users/backend/models/User.js';
 import { isActor, isPost, getApId } from '../../protocol/type.js';
-import type { SchemaType } from '@/misc/json-schema.js';
+import type { InferOutput } from 'valibot';
 import { ApResolverService } from '../../services/ApResolverService.js';
 import { ApDbResolverService } from '../../services/ApDbResolverService.js';
 import { ApPersonService } from '../../services/ApPersonService.js';
@@ -21,6 +22,8 @@ import { bindThis } from '@/decorators.js';
 import { IdentifiableError } from '@/misc/identifiable-error.js';
 import { FetchAllowSoftFailMask } from '../../protocol/misc/check-against-url.js';
 import { ApiError } from '@/server/api/error.js';
+
+const contractProjection = projectEndpointContract(compositionApShowDefinition);
 
 export const meta = {
 	tags: ['federation'],
@@ -61,53 +64,13 @@ export const meta = {
 		},
 	},
 
-	res: {
-		optional: false, nullable: false,
-		oneOf: [
-			{
-				type: 'object',
-				properties: {
-					type: {
-						type: 'string',
-						optional: false, nullable: false,
-						enum: ['User'],
-					},
-					object: {
-						type: 'object',
-						optional: false, nullable: false,
-						ref: 'UserDetailedNotMe',
-					},
-				},
-			},
-			{
-				type: 'object',
-				properties: {
-					type: {
-						type: 'string',
-						optional: false, nullable: false,
-						enum: ['Note'],
-					},
-					object: {
-						type: 'object',
-						optional: false, nullable: false,
-						ref: 'Note',
-					},
-				},
-			},
-		],
-	},
+	res: contractProjection.response,
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {
-		uri: { type: 'string' },
-	},
-	required: ['uri'],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof compositionApShowInput, typeof compositionApShowOutput> {
 	constructor(
 		private utilityService: UtilityService,
 		private userEntityService: UserEntityService,
@@ -117,7 +80,7 @@ export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDe
 		private apPersonService: ApPersonService,
 		private apNoteService: ApNoteService,
 	) {
-		super(meta, paramDef, async (ps, me) => {
+		super(meta, contractProjection, async (ps, me) => {
 			const object = await this.fetchAny(ps.uri, me);
 			if (object) {
 				return object;
@@ -131,7 +94,7 @@ export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDe
 	 * URIからUserかNoteを解決する
 	 */
 	@bindThis
-	private async fetchAny(uri: string, me: MiLocalUser | null | undefined): Promise<SchemaType<typeof meta['res']> | null> {
+	private async fetchAny(uri: string, me: MiLocalUser | null | undefined): Promise<InferOutput<typeof compositionApShowOutput> | null> {
 		if (!this.utilityService.isFederationAllowedUri(uri)) {
 			throw new ApiError(meta.errors.federationNotAllowed);
 		}
@@ -201,7 +164,7 @@ export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDe
 	}
 
 	@bindThis
-	private async mergePack(me: MiLocalUser | null | undefined, user: MiUser | null | undefined, note: MiNote | null | undefined): Promise<SchemaType<typeof meta.res> | null> {
+	private async mergePack(me: MiLocalUser | null | undefined, user: MiUser | null | undefined, note: MiNote | null | undefined): Promise<InferOutput<typeof compositionApShowOutput> | null> {
 		if (user != null) {
 			return {
 				type: 'User',

@@ -52,9 +52,9 @@ export * as 'admin/emoji/set-aliases-bulk' from './endpoints/admin/emoji/set-ali
 export * as 'admin/emoji/set-category-bulk' from './endpoints/admin/emoji/set-category-bulk.js';
 export * as 'admin/emoji/set-license-bulk' from './endpoints/admin/emoji/set-license-bulk.js';
 export * as 'admin/emoji/update' from '../../../../features/emojis/backend/endpoints/admin/emoji/update.js';
-export * as 'admin/federation/delete-all-files' from './endpoints/admin/federation/delete-all-files.js';
+export * as 'admin/federation/delete-all-files' from '../../../../features/federation/backend/endpoints/admin/federation/delete-all-files.js';
 export * as 'admin/federation/refresh-remote-instance-metadata' from '../../../../features/federation/backend/endpoints/admin/federation/refresh-remote-instance-metadata.js';
-export * as 'admin/federation/remove-all-following' from './endpoints/admin/federation/remove-all-following.js';
+export * as 'admin/federation/remove-all-following' from '../../../../features/federation/backend/endpoints/admin/federation/remove-all-following.js';
 export * as 'admin/federation/update-instance' from '../../../../features/federation/backend/endpoints/admin/federation/update-instance.js';
 export * as 'admin/forward-abuse-user-report' from './endpoints/admin/forward-abuse-user-report.js';
 export * as 'admin/get-index-stats' from '../../../../features/operations/backend/endpoints/admin/get-index-stats.js';
@@ -92,11 +92,11 @@ export * as 'admin/roles/unassign' from '../../../../features/roles/backend/endp
 export * as 'admin/roles/update' from '../../../../features/roles/backend/endpoints/admin/roles/update.js';
 export * as 'admin/roles/update-default-policies' from '../../../../features/roles/backend/endpoints/admin/roles/update-default-policies.js';
 export * as 'admin/roles/users' from '../../../../features/roles/backend/endpoints/admin/roles/users.js';
-export * as 'admin/send-email' from './endpoints/admin/send-email.js';
+export * as 'admin/send-email' from '../../../../features/integrations/backend/endpoints/admin/send-email.js';
 export * as 'admin/server-info' from '../../../../features/instance/backend/endpoints/admin/server-info.js';
 export * as 'admin/show-moderation-logs' from '../../../../features/moderation/backend/endpoints/admin/show-moderation-logs.js';
 export * as 'admin/show-user' from '../../../../features/moderation/backend/endpoints/admin/show-user.js';
-export * as 'admin/show-users' from './endpoints/admin/show-users.js';
+export * as 'admin/show-users' from '../../../../features/moderation/backend/endpoints/admin/show-users.js';
 export * as 'admin/suspend-user' from './endpoints/admin/suspend-user.js';
 export * as 'admin/system-webhook/create' from '../../../../features/integrations/backend/endpoints/admin/system-webhook/create.js';
 export * as 'admin/system-webhook/delete' from '../../../../features/integrations/backend/endpoints/admin/system-webhook/delete.js';
@@ -110,7 +110,7 @@ export * as 'admin/unset-user-banner' from './endpoints/admin/unset-user-banner.
 export * as 'admin/unsuspend-user' from './endpoints/admin/unsuspend-user.js';
 export * as 'admin/update-abuse-user-report' from './endpoints/admin/update-abuse-user-report.js';
 export * as 'admin/update-meta' from '../../../../features/instance/backend/endpoints/admin/update-meta.js';
-export * as 'admin/update-proxy-account' from './endpoints/admin/update-proxy-account.js';
+export * as 'admin/update-proxy-account' from '../../../../features/users/backend/endpoints/admin/update-proxy-account.js';
 export * as 'admin/update-user-note' from './endpoints/admin/update-user-note.js';
 export * as 'announcements' from '../../../../features/announcements/backend/endpoints/announcements.js';
 export * as 'announcements/show' from '../../../../features/announcements/backend/endpoints/announcements/show.js';
@@ -207,7 +207,7 @@ export * as 'federation/stats' from '../../../../features/federation/backend/end
 export * as 'federation/update-remote-user' from '../../../../features/federation/backend/endpoints/federation/update-remote-user.js';
 export * as 'federation/users' from '../../../../features/federation/backend/endpoints/federation/users.js';
 export * as 'fetch-external-resources' from '../../../../features/integrations/backend/endpoints/fetch-external-resources.js';
-export * as 'fetch-rss' from './endpoints/fetch-rss.js';
+export * as 'fetch-rss' from '../../../../features/integrations/backend/endpoints/fetch-rss.js';
 export * as 'flash/create' from '../../../../features/play/backend/endpoints/flash/create.js';
 export * as 'flash/delete' from '../../../../features/play/backend/endpoints/flash/delete.js';
 export * as 'flash/featured' from '../../../../features/play/backend/endpoints/flash/featured.js';
@@ -329,7 +329,7 @@ export * as 'notes/featured' from '../../../../features/discovery/backend/endpoi
 export * as 'notes/global-timeline' from '../../../../features/timelines/backend/endpoints/notes/global-timeline.js';
 export * as 'notes/hybrid-timeline' from '../../../../features/timelines/backend/endpoints/notes/hybrid-timeline.js';
 export * as 'notes/local-timeline' from '../../../../features/timelines/backend/endpoints/notes/local-timeline.js';
-export * as 'notes/mentions' from './endpoints/notes/mentions.js';
+export * as 'notes/mentions' from '../../../../features/timelines/backend/endpoints/notes/mentions.js';
 export * as 'notes/polls/recommendation' from '../../../../features/notes/backend/endpoints/notes/polls/recommendation.js';
 export * as 'notes/polls/vote' from '../../../../features/notes/backend/endpoints/notes/polls/vote.js';
 export * as 'notes/reactions' from '../../../../features/notes/backend/endpoints/notes/reactions.js';
@@ -411,7 +411,7 @@ export * as 'users/lists/show' from '../../../../features/relationships/backend/
 export * as 'users/lists/unfavorite' from './endpoints/users/lists/unfavorite.js';
 export * as 'users/lists/update' from '../../../../features/relationships/backend/endpoints/users/lists/update.js';
 export * as 'users/lists/update-membership' from './endpoints/users/lists/update-membership.js';
-export * as 'users/notes' from './endpoints/users/notes.js';
+export * as 'users/notes' from '../../../../features/timelines/backend/endpoints/users/notes.js';
 export * as 'users/pages' from '../../../../features/pages/backend/endpoints/users/pages.js';
 export * as 'users/reactions' from '../../../../features/notes/backend/endpoints/users/reactions.js';
 export * as 'users/recommendation' from '../../../../features/discovery/backend/endpoints/users/recommendation.js';

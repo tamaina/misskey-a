@@ -4,33 +4,31 @@
  */
 
 import { Inject, Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { emptyReversiInvitationsDefinition, emptyReversiInvitationsInput, emptyReversiInvitationsOutput } from '../../../contract/empty-input-endpoint-definitions.js';
 import { DI } from '@/di-symbols.js';
 import { UserEntityService } from '../../../../users/backend/serializers/UserEntityService.js';
 import { ReversiService } from '../../services/ReversiService.js';
+
+const contractProjection = projectEndpointContract(emptyReversiInvitationsDefinition);
 
 export const meta = {
 	requireCredential: true,
 
 	kind: 'read:account',
 
-	res: {
-		type: 'array',
-		optional: false, nullable: false,
-		items: { ref: 'UserLite' },
-	},
+	res: contractProjection.response,
 } as const;
 
-export const paramDef = {
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof emptyReversiInvitationsInput, typeof emptyReversiInvitationsOutput> {
 	constructor(
 		private userEntityService: UserEntityService,
 		private reversiService: ReversiService,
 	) {
-		super(meta, paramDef, async (ps, me) => {
+		super(meta, contractProjection, async (ps, me) => {
 			const invitations = await this.reversiService.getInvitations(me);
 
 			return await this.userEntityService.packMany(invitations, me);

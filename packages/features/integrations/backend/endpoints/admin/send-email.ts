@@ -4,7 +4,7 @@
  */
 
 import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
-import { voidAdminSendEmailDefinition, voidAdminSendEmailInput, voidAdminSendEmailOutput } from '../../../../../../features/integrations/contract/void-endpoint-definitions.js';
+import { voidAdminSendEmailDefinition, voidAdminSendEmailInput, voidAdminSendEmailOutput } from '../../../contract/void-endpoint-definitions.js';
 import { Injectable } from '@nestjs/common';
 
 import { EmailService } from '@/core/EmailService.js';

@@ -23,7 +23,7 @@ import { MiBubbleGameRecord } from '../../../features/games/backend/models/Bubbl
 import { MiChannel } from '../../../features/channels/backend/models/Channel.js';
 import { MiChannelFavorite } from '../../../features/channels/backend/models/ChannelFavorite.js';
 import { MiChannelFollowing } from '../../../features/channels/backend/models/ChannelFollowing.js';
-import { MiChannelMuting } from "../../../features/channels/backend/models/ChannelMuting.js";
+import { MiChannelMuting } from '../../../features/channels/backend/models/ChannelMuting.js';
 import { MiChatApproval } from '../../../features/chat/backend/models/ChatApproval.js';
 import { MiChatMessage } from '../../../features/chat/backend/models/ChatMessage.js';
 import { MiChatRoom } from '../../../features/chat/backend/models/ChatRoom.js';
@@ -238,7 +238,7 @@ export type UserProfilesRepository = Repository<MiUserProfile> & MiRepository<Mi
 export type UserPublickeysRepository = Repository<MiUserPublickey> & MiRepository<MiUserPublickey>;
 export type UserSecurityKeysRepository = Repository<MiUserSecurityKey> & MiRepository<MiUserSecurityKey>;
 export type WebhooksRepository = Repository<MiWebhook> & MiRepository<MiWebhook>;
-export type SystemWebhooksRepository = Repository<MiSystemWebhook> & MiRepository<MiWebhook>;
+export type SystemWebhooksRepository = Repository<MiSystemWebhook> & MiRepository<MiSystemWebhook>;
 export type ChannelsRepository = Repository<MiChannel> & MiRepository<MiChannel>;
 export type RetentionAggregationsRepository = Repository<MiRetentionAggregation> & MiRepository<MiRetentionAggregation>;
 export type RolesRepository = Repository<MiRole> & MiRepository<MiRole>;

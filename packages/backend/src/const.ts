@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-export const MAX_NOTE_TEXT_LENGTH = 3000;
+export { MAX_NOTE_TEXT_LENGTH } from '../../features/notes/contract/note-text-limit.js';
 
 export const USER_ONLINE_THRESHOLD = 1000 * 60 * 10; // 10min
 export const USER_ACTIVE_THRESHOLD = 1000 * 60 * 60 * 24 * 3; // 3days
@@ -23,7 +23,7 @@ export const DB_MAX_NOTE_TEXT_LENGTH = 8192;
  * Maximum image description length that can be stored in DB.
  * Surrogate pairs count as one
  */
-export const DB_MAX_IMAGE_COMMENT_LENGTH = 512;
+export { DB_MAX_IMAGE_COMMENT_LENGTH } from '../../features/drive/contract/image-comment-limit.js';
 //#endregion
 
 export const FILE_TYPE_IMAGE = [

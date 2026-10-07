@@ -3,12 +3,15 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { constantAdminUpdateMetaDefinition, constantAdminUpdateMetaInput, constantAdminUpdateMetaOutput } from '../../../contract/source-constant-endpoint-definitions.js';
 import { Injectable, Inject } from '@nestjs/common';
 import { DI } from '@/di-symbols.js';
 import type { MiMeta } from '../../models/Meta.js';
 import { ModerationLogService } from '../../../../moderation/backend/services/ModerationLogService.js';
-import { Endpoint } from '@/server/api/endpoint-base.js';
 import { MetaService } from '../../services/MetaService.js';
+
+const contractProjection = projectEndpointContract(constantAdminUpdateMetaDefinition);
 
 export const meta = {
 	tags: ['admin'],
@@ -18,222 +21,10 @@ export const meta = {
 	kind: 'write:admin:meta',
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {
-		disableRegistration: { type: 'boolean', nullable: true },
-		pinnedUsers: {
-			type: 'array', nullable: true, items: {
-				type: 'string',
-			},
-		},
-		hiddenTags: {
-			type: 'array', nullable: true, items: {
-				type: 'string',
-			},
-		},
-		blockedHosts: {
-			type: 'array', nullable: true, items: {
-				type: 'string',
-			},
-		},
-		sensitiveWords: {
-			type: 'array', nullable: true, items: {
-				type: 'string',
-			},
-		},
-		prohibitedWords: {
-			type: 'array', nullable: true, items: {
-				type: 'string',
-			},
-		},
-		prohibitedWordsForNameOfUser: {
-			type: 'array', nullable: true, items: {
-				type: 'string',
-			},
-		},
-		themeColor: { type: 'string', nullable: true, pattern: '^#[0-9a-fA-F]{6}$' },
-		mascotImageUrl: { type: 'string', nullable: true },
-		bannerUrl: { type: 'string', nullable: true },
-		serverErrorImageUrl: { type: 'string', nullable: true },
-		infoImageUrl: { type: 'string', nullable: true },
-		notFoundImageUrl: { type: 'string', nullable: true },
-		iconUrl: { type: 'string', nullable: true },
-		app192IconUrl: { type: 'string', nullable: true },
-		app512IconUrl: { type: 'string', nullable: true },
-		backgroundImageUrl: { type: 'string', nullable: true },
-		logoImageUrl: { type: 'string', nullable: true },
-		name: { type: 'string', nullable: true },
-		shortName: { type: 'string', nullable: true },
-		description: { type: 'string', nullable: true },
-		defaultLightTheme: { type: 'string', nullable: true },
-		defaultDarkTheme: { type: 'string', nullable: true },
-		clientOptions: {
-			type: 'object', nullable: false,
-			properties: {
-				entrancePageStyle: { type: 'string', nullable: false, enum: ['classic', 'simple'] },
-				showTimelineForVisitor: { type: 'boolean', nullable: false },
-				showActivitiesForVisitor: { type: 'boolean', nullable: false },
-			},
-		},
-		cacheRemoteFiles: { type: 'boolean' },
-		cacheRemoteSensitiveFiles: { type: 'boolean' },
-		emailRequiredForSignup: { type: 'boolean' },
-		enableHcaptcha: { type: 'boolean' },
-		hcaptchaSiteKey: { type: 'string', nullable: true },
-		hcaptchaSecretKey: { type: 'string', nullable: true },
-		enableMcaptcha: { type: 'boolean' },
-		mcaptchaSiteKey: { type: 'string', nullable: true },
-		mcaptchaInstanceUrl: { type: 'string', nullable: true },
-		mcaptchaSecretKey: { type: 'string', nullable: true },
-		enableRecaptcha: { type: 'boolean' },
-		recaptchaSiteKey: { type: 'string', nullable: true },
-		recaptchaSecretKey: { type: 'string', nullable: true },
-		enableTurnstile: { type: 'boolean' },
-		turnstileSiteKey: { type: 'string', nullable: true },
-		turnstileSecretKey: { type: 'string', nullable: true },
-		enableTestcaptcha: { type: 'boolean' },
-		googleAnalyticsMeasurementId: { type: 'string', nullable: true },
-		sensitiveMediaDetection: { type: 'string', enum: ['none', 'all', 'local', 'remote'] },
-		sensitiveMediaDetectionSensitivity: { type: 'string', enum: ['medium', 'low', 'high', 'veryLow', 'veryHigh'] },
-		setSensitiveFlagAutomatically: { type: 'boolean' },
-		enableSensitiveMediaDetectionForVideos: { type: 'boolean' },
-		sensitiveMediaDetectionApiUrl: { type: 'string', nullable: true },
-		sensitiveMediaDetectionApiKey: { type: 'string', nullable: true },
-		sensitiveMediaDetectionTimeout: { type: 'integer', minimum: 1 },
-		sensitiveMediaDetectionMaxImagesPerRequest: { type: 'integer', minimum: 1 },
-		maintainerName: { type: 'string', nullable: true },
-		maintainerEmail: { type: 'string', nullable: true },
-		langs: {
-			type: 'array', items: {
-				type: 'string',
-			},
-		},
-		deeplAuthKey: { type: 'string', nullable: true },
-		deeplIsPro: { type: 'boolean' },
-		enableEmail: { type: 'boolean' },
-		email: { type: 'string', nullable: true },
-		smtpSecure: { type: 'boolean' },
-		smtpHost: { type: 'string', nullable: true },
-		smtpPort: { type: 'integer', nullable: true },
-		smtpUser: { type: 'string', nullable: true },
-		smtpPass: { type: 'string', nullable: true },
-		enableServiceWorker: { type: 'boolean' },
-		swPublicKey: { type: 'string', nullable: true },
-		swPrivateKey: { type: 'string', nullable: true },
-		tosUrl: { type: 'string', nullable: true },
-		repositoryUrl: { type: 'string', nullable: true },
-		feedbackUrl: { type: 'string', nullable: true },
-		impressumUrl: { type: 'string', nullable: true },
-		privacyPolicyUrl: { type: 'string', nullable: true },
-		inquiryUrl: { type: 'string', nullable: true },
-		useObjectStorage: { type: 'boolean' },
-		objectStorageBaseUrl: { type: 'string', nullable: true },
-		objectStorageBucket: { type: 'string', nullable: true },
-		objectStoragePrefix: { type: 'string', pattern: /^[a-zA-Z0-9-._]*$/.source, nullable: true },
-		objectStorageEndpoint: { type: 'string', nullable: true },
-		objectStorageRegion: { type: 'string', nullable: true },
-		objectStoragePort: { type: 'integer', nullable: true },
-		objectStorageAccessKey: { type: 'string', nullable: true },
-		objectStorageSecretKey: { type: 'string', nullable: true },
-		objectStorageUseSSL: { type: 'boolean' },
-		objectStorageUseProxy: { type: 'boolean' },
-		objectStorageSetPublicRead: { type: 'boolean' },
-		objectStorageS3ForcePathStyle: { type: 'boolean' },
-		enableIpLogging: { type: 'boolean' },
-		enableActiveEmailValidation: { type: 'boolean' },
-		enableVerifymailApi: { type: 'boolean' },
-		verifymailAuthKey: { type: 'string', nullable: true },
-		enableTruemailApi: { type: 'boolean' },
-		truemailInstance: { type: 'string', nullable: true },
-		truemailAuthKey: { type: 'string', nullable: true },
-		enableChartsForRemoteUser: { type: 'boolean' },
-		enableChartsForFederatedInstances: { type: 'boolean' },
-		enableStatsForFederatedInstances: { type: 'boolean' },
-		enableServerMachineStats: { type: 'boolean' },
-		enableIdenticonGeneration: { type: 'boolean' },
-		serverRules: { type: 'array', items: { type: 'string' } },
-		bannedEmailDomains: { type: 'array', items: { type: 'string' } },
-		preservedUsernames: { type: 'array', items: { type: 'string' } },
-		manifestJsonOverride: { type: 'string' },
-		enableFanoutTimeline: { type: 'boolean' },
-		enableFanoutTimelineDbFallback: { type: 'boolean' },
-		perLocalUserUserTimelineCacheMax: { type: 'integer' },
-		perRemoteUserUserTimelineCacheMax: { type: 'integer' },
-		perUserHomeTimelineCacheMax: { type: 'integer' },
-		perUserListTimelineCacheMax: { type: 'integer' },
-		enableReactionsBuffering: { type: 'boolean' },
-		notesPerOneAd: { type: 'integer' },
-		silencedHosts: {
-			type: 'array',
-			nullable: true,
-			items: {
-				type: 'string',
-			},
-		},
-		mediaSilencedHosts: {
-			type: 'array',
-			nullable: true,
-			items: {
-				type: 'string',
-			},
-		},
-		summalyProxy: {
-			type: 'string', nullable: true,
-			description: '[Deprecated] Use "urlPreviewSummaryProxyUrl" instead.',
-		},
-		urlPreviewEnabled: { type: 'boolean' },
-		urlPreviewAllowRedirect: { type: 'boolean' },
-		urlPreviewTimeout: { type: 'integer' },
-		urlPreviewMaximumContentLength: { type: 'integer' },
-		urlPreviewRequireContentLength: { type: 'boolean' },
-		urlPreviewUserAgent: { type: 'string', nullable: true },
-		urlPreviewSummaryProxyUrl: { type: 'string', nullable: true },
-		urlPreviewSensitiveList: {
-			type: 'array', nullable: true,
-			items: {
-				type: 'string',
-			}
-		},
-		federation: {
-			type: 'string',
-			enum: ['all', 'none', 'specified'],
-		},
-		federationHosts: {
-			type: 'array',
-			items: {
-				type: 'string',
-			},
-		},
-		deliverSuspendedSoftware: {
-			type: 'array',
-			items: {
-				type: 'object',
-				properties: {
-					software: { type: 'string' },
-					versionRange: { type: 'string' },
-				},
-				required: ['software', 'versionRange'],
-			},
-		},
-		singleUserMode: { type: 'boolean' },
-		ugcVisibilityForVisitor: {
-			type: 'string',
-			enum: ['all', 'local', 'none'],
-		},
-		proxyRemoteFiles: { type: 'boolean' },
-		signToActivityPubGet: { type: 'boolean' },
-		allowExternalApRedirect: { type: 'boolean' },
-		enableRemoteNotesCleaning: { type: 'boolean' },
-		remoteNotesCleaningExpiryDaysForEachNotes: { type: 'number' },
-		remoteNotesCleaningMaxProcessingDurationInMinutes: { type: 'number' },
-		showRoleBadgesOfRemoteUsers: { type: 'boolean' },
-	},
-	required: [],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof constantAdminUpdateMetaInput, typeof constantAdminUpdateMetaOutput> {
 	constructor(
 		@Inject(DI.meta)
 		private serverSettings: MiMeta,
@@ -241,7 +32,7 @@ export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDe
 		private metaService: MetaService,
 		private moderationLogService: ModerationLogService,
 	) {
-		super(meta, paramDef, async (ps, me) => {
+		super(meta, contractProjection, async (ps, me) => {
 			const set = {} as Partial<MiMeta>;
 
 			if (typeof ps.disableRegistration === 'boolean') {

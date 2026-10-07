@@ -479,3 +479,114 @@ fixtures preserve descriptor order, all 24 entity metadata objects, complete
 GET/POST documentation and existing offset/default/error behavior, including
 out-of-range dates and integers beyond the safe-integer range. The old chart
 JSON-schema response generator is no longer a production source of truth.
+
+## Portable object and source-constant contracts
+
+Twenty-four more APIs use native feature contracts, bringing coverage to 407 of
+438 routes. Feature-owned leaves now hold shared captcha, webhook, notification,
+page-name and emoji-query constants without importing backend services into the
+portable contract graph. Existing consumers retain their compatibility exports.
+
+`jsonObject` validates known fields and static defaults while retaining unknown
+own keys, including prototype-named data keys, without changing the object's
+prototype. It rejects arrays at optional-only object boundaries. Its registered
+public parser is projected through a converter-only schema view; arbitrary
+transforms and semantic metadata overrides are still rejected. Native validation
+keeps issue paths and messages, but nested union-branch issue details are not
+retained by the public parser action. HTTP validation continues to use the
+existing AJV adapter, so its error shape and input mutation remain unchanged.
+
+`jsonNumber` preserves finite-number validation, including JSON exponent
+overflow, while opaque unknown values remain opaque. `jsonString` can carry a
+JSON Schema pattern interpreted in Unicode mode, preserving astral-character
+length and pattern behavior. Packed output references can explicitly retain an
+omitted legacy object type without changing canonical model inference or adding
+runtime response parsing. Whole-document OpenAPI parity and generated SDK types
+remain integration gates.
+
+## Compact service declarations
+
+The 37 migrated services now declare their constructor dependencies once. A small
+feature composition helper derives narrow factory inputs and checks constructor
+argument compatibility. Descriptors are immutable and identity-registered;
+foreign definitions, missing ports and duplicate constructors fail before
+construction. Each factory call creates a fresh graph, sharing internal services
+within that graph. Existing named factory exports remain available.
+
+The Nest adapter translates external service ports to the original class tokens
+and leaves repository DI symbols unchanged. Selective test modules therefore
+retain their class-token behavior without extra runtime aliases. Public/private
+exports and resource ownership are unchanged. TypeScript's structural repository
+types do not prove semantic token identity; a stable fixture verifies the actual
+37 constructor argument lists and 18 feature bindings.
+
+Production wiring, including the helper, catalogue and adapter, decreases from
+825 to 589 physical lines. A repository type alias now names the same
+SystemWebhook entity that its existing factory already constructs; database
+schema and runtime entity behavior are unchanged.
+
+A further 40 frontend components use local VVI dictionaries with exact
+28-language reconstruction and compiled behavior regressions. Direct component
+tests install the real internationalization plugin just as the application does.
+
+Three output-composition APIs also use native contracts: ap/show retains its
+User/Note discriminator, while account creation and list lookup retain their
+existing intersections and optional fields. Native coverage is now 410 of 438
+routes. Username/password validation lives in a pure users contract leaf;
+request validation, error metadata and actual response handling stay unchanged.
+
+## Legacy selector compatibility and unconstrained inputs
+
+Four ordered anyOf selectors retain their existing backend presence-based branch
+selection through an explicit `legacy-declared` handler input mode. The default
+adapter mode and canonical Valibot inference remain unchanged: inactive extra
+keys are still unknown. The compatibility view preserves the old structural
+`in` assumption; it is not evidence that the selected key passed that branch's
+validation. Mixed-selector payloads retain their old callback values, validation
+errors and precedence. A stricter selector policy would be a separate API change.
+
+The administrative drive-file header dictionary now has the honest opaque type
+`Record<string, unknown> | null`, replacing the old generator's empty-record
+inference without filtering or rewriting values. Two endpoints with literal
+empty input schemas use `v.unknown()`; their SDK request types intentionally
+widen from EmptyRequest to unknown, while no-argument calls and the existing
+APIClient record normalization remain unchanged.
+
+Draft-note contracts share the public 3000-character limit through a pure notes
+leaf and retain the old backend export. The separate 8192-character database
+limit is unchanged. Their native unique-string constraints and Unicode string
+rules reproduce the existing transport behavior.
+
+Native coverage is now 421 of 438 routes. Two delayed-queue responses retain
+ordered string/number tuple types from their unchanged Map-entry producers.
+Their output-only compatibility projection preserves the old prefixItems and
+unevaluatedItems document, including its missing minItems under-specification.
+Only captured bare scalar items are supported; unsupported item kinds and all
+input tuple projections fail explicitly. Responses are never parsed or truncated.
+
+Note creation's conditional text requirement is derived from registered native
+fields: when renote, files, media and poll are nullish, text must satisfy the
+existing non-whitespace string constraint. Its action is bound to the exact
+immutable object base and registered string rule. Unsupported outer defaults,
+lazy conditional fields, cloned bases and semantic metadata overwrites reject;
+normal defaults, validation errors and handler statements remain unchanged.
+
+The last eight host-default endpoint implementations now live beside their
+feature contracts in federation, integrations, moderation, users and timelines.
+The host registry keeps the same 438 keys, order and constructor identities;
+there are no old-path re-export bridges for these moves. The RSS implementation
+also exposes its existing default constructor by name so NodeNext test consumers
+can import it without synthetic-default ambiguity. Its parser uses the backend's
+existing dependency and build configuration.
+
+Drive upload now has a native multipart contract with a required Blob field. A
+single factory derives its wire schema from the logical attribute entries; the
+backend continues validating attributes separately from the existing temporary
+file descriptor. The direct FormData transport, authentication, cleanup and
+OpenAPI binary injection are unchanged. Factory provenance and metadata/transport
+agreement are checked before adapter construction. Native coverage is 422 of 438.
+
+Generic frontend dialog requests retain the API helper's optional credential
+shape, and pagination accepts only object-shaped request contracts. Unconstrained
+API requests remain unconstrained in the SDK; their existing direct callers are
+unchanged. These frontend corrections change types only.

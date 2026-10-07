@@ -1,0 +1,602 @@
+{
+  "captureMethod": "Original current-worktree source AST, prior to stage changes",
+  "rows": [
+    {
+      "route": "admin/drive/show-file",
+      "feature": "drive",
+      "name": "selectorAdminDriveShowFile",
+      "source": "packages/features/drive/backend/endpoints/admin/drive/show-file.ts",
+      "definitionFile": "packages/features/drive/contract/selector-endpoint-definitions.ts",
+      "meta": {
+        "tags": [
+          "admin"
+        ],
+        "requireCredential": true,
+        "requireModerator": true,
+        "kind": "read:admin:drive",
+        "errors": {
+          "noSuchFile": {
+            "message": "No such file.",
+            "code": "NO_SUCH_FILE",
+            "id": "caf3ca38-c6e5-472e-a30c-b05377dcc240"
+          }
+        },
+        "res": {
+          "type": "object",
+          "optional": false,
+          "nullable": false,
+          "properties": {
+            "id": {
+              "type": "string",
+              "optional": false,
+              "nullable": false,
+              "format": "id",
+              "example": "xxxxxxxxxx"
+            },
+            "createdAt": {
+              "type": "string",
+              "optional": false,
+              "nullable": false,
+              "format": "date-time"
+            },
+            "userId": {
+              "type": "string",
+              "optional": false,
+              "nullable": true,
+              "format": "id",
+              "example": "xxxxxxxxxx"
+            },
+            "userHost": {
+              "type": "string",
+              "optional": false,
+              "nullable": true,
+              "description": "The local host is represented with `null`."
+            },
+            "md5": {
+              "type": "string",
+              "optional": false,
+              "nullable": false,
+              "format": "md5",
+              "example": "15eca7fba0480996e2245f5185bf39f2"
+            },
+            "name": {
+              "type": "string",
+              "optional": false,
+              "nullable": false,
+              "example": "192.jpg"
+            },
+            "type": {
+              "type": "string",
+              "optional": false,
+              "nullable": false,
+              "example": "image/jpeg"
+            },
+            "size": {
+              "type": "number",
+              "optional": false,
+              "nullable": false,
+              "example": 51469
+            },
+            "comment": {
+              "type": "string",
+              "optional": false,
+              "nullable": true
+            },
+            "blurhash": {
+              "type": "string",
+              "optional": false,
+              "nullable": true
+            },
+            "properties": {
+              "type": "object",
+              "optional": false,
+              "nullable": false,
+              "properties": {
+                "width": {
+                  "type": "number",
+                  "optional": true,
+                  "nullable": false
+                },
+                "height": {
+                  "type": "number",
+                  "optional": true,
+                  "nullable": false
+                },
+                "orientation": {
+                  "type": "number",
+                  "optional": true,
+                  "nullable": false
+                },
+                "avgColor": {
+                  "type": "string",
+                  "optional": true,
+                  "nullable": false
+                }
+              }
+            },
+            "storedInternal": {
+              "type": "boolean",
+              "optional": false,
+              "nullable": true,
+              "example": true
+            },
+            "url": {
+              "type": "string",
+              "optional": false,
+              "nullable": true,
+              "format": "url"
+            },
+            "thumbnailUrl": {
+              "type": "string",
+              "optional": false,
+              "nullable": true,
+              "format": "url"
+            },
+            "webpublicUrl": {
+              "type": "string",
+              "optional": false,
+              "nullable": true,
+              "format": "url"
+            },
+            "accessKey": {
+              "type": "string",
+              "optional": false,
+              "nullable": true
+            },
+            "thumbnailAccessKey": {
+              "type": "string",
+              "optional": false,
+              "nullable": true
+            },
+            "webpublicAccessKey": {
+              "type": "string",
+              "optional": false,
+              "nullable": true
+            },
+            "uri": {
+              "type": "string",
+              "optional": false,
+              "nullable": true
+            },
+            "src": {
+              "type": "string",
+              "optional": false,
+              "nullable": true
+            },
+            "folderId": {
+              "type": "string",
+              "optional": false,
+              "nullable": true,
+              "format": "id",
+              "example": "xxxxxxxxxx"
+            },
+            "isSensitive": {
+              "type": "boolean",
+              "optional": false,
+              "nullable": false
+            },
+            "isLink": {
+              "type": "boolean",
+              "optional": false,
+              "nullable": false
+            },
+            "maybeSensitive": {
+              "type": "boolean",
+              "optional": false,
+              "nullable": false
+            },
+            "maybePorn": {
+              "type": "boolean",
+              "optional": false,
+              "nullable": false
+            },
+            "requestIp": {
+              "type": "string",
+              "optional": false,
+              "nullable": true
+            },
+            "requestHeaders": {
+              "type": "object",
+              "optional": false,
+              "nullable": true
+            }
+          }
+        }
+      },
+      "input": {
+        "anyOf": [
+          {
+            "type": "object",
+            "properties": {
+              "fileId": {
+                "type": "string",
+                "format": "misskey:id"
+              }
+            },
+            "required": [
+              "fileId"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "url": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "url"
+            ]
+          }
+        ]
+      },
+      "output": {
+        "type": "object",
+        "optional": false,
+        "nullable": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "optional": false,
+            "nullable": false,
+            "format": "id",
+            "example": "xxxxxxxxxx"
+          },
+          "createdAt": {
+            "type": "string",
+            "optional": false,
+            "nullable": false,
+            "format": "date-time"
+          },
+          "userId": {
+            "type": "string",
+            "optional": false,
+            "nullable": true,
+            "format": "id",
+            "example": "xxxxxxxxxx"
+          },
+          "userHost": {
+            "type": "string",
+            "optional": false,
+            "nullable": true,
+            "description": "The local host is represented with `null`."
+          },
+          "md5": {
+            "type": "string",
+            "optional": false,
+            "nullable": false,
+            "format": "md5",
+            "example": "15eca7fba0480996e2245f5185bf39f2"
+          },
+          "name": {
+            "type": "string",
+            "optional": false,
+            "nullable": false,
+            "example": "192.jpg"
+          },
+          "type": {
+            "type": "string",
+            "optional": false,
+            "nullable": false,
+            "example": "image/jpeg"
+          },
+          "size": {
+            "type": "number",
+            "optional": false,
+            "nullable": false,
+            "example": 51469
+          },
+          "comment": {
+            "type": "string",
+            "optional": false,
+            "nullable": true
+          },
+          "blurhash": {
+            "type": "string",
+            "optional": false,
+            "nullable": true
+          },
+          "properties": {
+            "type": "object",
+            "optional": false,
+            "nullable": false,
+            "properties": {
+              "width": {
+                "type": "number",
+                "optional": true,
+                "nullable": false
+              },
+              "height": {
+                "type": "number",
+                "optional": true,
+                "nullable": false
+              },
+              "orientation": {
+                "type": "number",
+                "optional": true,
+                "nullable": false
+              },
+              "avgColor": {
+                "type": "string",
+                "optional": true,
+                "nullable": false
+              }
+            }
+          },
+          "storedInternal": {
+            "type": "boolean",
+            "optional": false,
+            "nullable": true,
+            "example": true
+          },
+          "url": {
+            "type": "string",
+            "optional": false,
+            "nullable": true,
+            "format": "url"
+          },
+          "thumbnailUrl": {
+            "type": "string",
+            "optional": false,
+            "nullable": true,
+            "format": "url"
+          },
+          "webpublicUrl": {
+            "type": "string",
+            "optional": false,
+            "nullable": true,
+            "format": "url"
+          },
+          "accessKey": {
+            "type": "string",
+            "optional": false,
+            "nullable": true
+          },
+          "thumbnailAccessKey": {
+            "type": "string",
+            "optional": false,
+            "nullable": true
+          },
+          "webpublicAccessKey": {
+            "type": "string",
+            "optional": false,
+            "nullable": true
+          },
+          "uri": {
+            "type": "string",
+            "optional": false,
+            "nullable": true
+          },
+          "src": {
+            "type": "string",
+            "optional": false,
+            "nullable": true
+          },
+          "folderId": {
+            "type": "string",
+            "optional": false,
+            "nullable": true,
+            "format": "id",
+            "example": "xxxxxxxxxx"
+          },
+          "isSensitive": {
+            "type": "boolean",
+            "optional": false,
+            "nullable": false
+          },
+          "isLink": {
+            "type": "boolean",
+            "optional": false,
+            "nullable": false
+          },
+          "maybeSensitive": {
+            "type": "boolean",
+            "optional": false,
+            "nullable": false
+          },
+          "maybePorn": {
+            "type": "boolean",
+            "optional": false,
+            "nullable": false
+          },
+          "requestIp": {
+            "type": "string",
+            "optional": false,
+            "nullable": true
+          },
+          "requestHeaders": {
+            "type": "object",
+            "optional": false,
+            "nullable": true
+          }
+        }
+      },
+      "sourceSha256": "b9ffff53a2d4cc7d188a4a0ce06615e4805f0e5c742311a0f4f01dd4be596453"
+    },
+    {
+      "route": "drive/files/show",
+      "feature": "drive",
+      "name": "selectorDriveFilesShow",
+      "source": "packages/features/drive/backend/endpoints/drive/files/show.ts",
+      "definitionFile": "packages/features/drive/contract/selector-endpoint-definitions.ts",
+      "meta": {
+        "tags": [
+          "drive"
+        ],
+        "requireCredential": true,
+        "kind": "read:drive",
+        "description": "Show the properties of a drive file.",
+        "res": {
+          "type": "object",
+          "optional": false,
+          "nullable": false,
+          "ref": "DriveFile"
+        },
+        "errors": {
+          "noSuchFile": {
+            "message": "No such file.",
+            "code": "NO_SUCH_FILE",
+            "id": "067bc436-2718-4795-b0fb-ecbe43949e31"
+          },
+          "accessDenied": {
+            "message": "Access denied.",
+            "code": "ACCESS_DENIED",
+            "id": "25b73c73-68b1-41d0-bad1-381cfdf6579f"
+          }
+        }
+      },
+      "input": {
+        "anyOf": [
+          {
+            "type": "object",
+            "properties": {
+              "fileId": {
+                "type": "string",
+                "format": "misskey:id"
+              }
+            },
+            "required": [
+              "fileId"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "url": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "url"
+            ]
+          }
+        ]
+      },
+      "output": {
+        "type": "object",
+        "optional": false,
+        "nullable": false,
+        "ref": "DriveFile"
+      },
+      "sourceSha256": "939f8a9a37c97846cd48ae4ef724407dd878cb983022c26becd6251d60d28bfd"
+    },
+    {
+      "route": "i/revoke-token",
+      "feature": "auth",
+      "name": "selectorIRevokeToken",
+      "source": "packages/features/auth/backend/endpoints/i/revoke-token.ts",
+      "definitionFile": "packages/features/auth/contract/selector-endpoint-definitions.ts",
+      "meta": {
+        "description": "Revoke an access token of the authenticated user. Requires credential. When called with an access token (third-party app), only the token currently in use can be revoked.",
+        "errors": {
+          "credentialRequired": {
+            "message": "Credential required.",
+            "code": "CREDENTIAL_REQUIRED",
+            "id": "6f1f0d3a-3d5b-4b1f-9c3e-2a6d1e5b8c47",
+            "httpStatusCode": 401
+          },
+          "permissionDenied": {
+            "message": "Permission denied.",
+            "code": "PERMISSION_DENIED",
+            "id": "fc20d118-5705-4462-b6c5-2b5b43092cf3",
+            "httpStatusCode": 403
+          }
+        }
+      },
+      "input": {
+        "anyOf": [
+          {
+            "type": "object",
+            "properties": {
+              "tokenId": {
+                "type": "string",
+                "format": "misskey:id"
+              }
+            },
+            "required": [
+              "tokenId"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "token": {
+                "type": "string",
+                "nullable": true
+              }
+            },
+            "required": [
+              "token"
+            ]
+          }
+        ]
+      },
+      "output": null,
+      "sourceSha256": "f2d5d23e4b6ca2220bca14c2bda25ec1ffb94f7c2711699383f6196a47d9f673"
+    },
+    {
+      "route": "pages/show",
+      "feature": "pages",
+      "name": "selectorPagesShow",
+      "source": "packages/features/pages/backend/endpoints/pages/show.ts",
+      "definitionFile": "packages/features/pages/contract/selector-endpoint-definitions.ts",
+      "meta": {
+        "tags": [
+          "pages"
+        ],
+        "requireCredential": false,
+        "res": {
+          "type": "object",
+          "optional": false,
+          "nullable": false,
+          "ref": "Page"
+        },
+        "errors": {
+          "noSuchPage": {
+            "message": "No such page.",
+            "code": "NO_SUCH_PAGE",
+            "id": "222120c0-3ead-4528-811b-b96f233388d7"
+          }
+        }
+      },
+      "input": {
+        "anyOf": [
+          {
+            "type": "object",
+            "properties": {
+              "pageId": {
+                "type": "string",
+                "format": "misskey:id"
+              }
+            },
+            "required": [
+              "pageId"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "username": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "name",
+              "username"
+            ]
+          }
+        ]
+      },
+      "output": {
+        "type": "object",
+        "optional": false,
+        "nullable": false,
+        "ref": "Page"
+      },
+      "sourceSha256": "64013148ee5df061b0c1ea9d7f69d102cad37afd86477f5e4a3b901e656638fa"
+    }
+  ]
+}
