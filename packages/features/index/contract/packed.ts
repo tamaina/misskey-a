@@ -55,7 +55,7 @@ import {
 
 import {
 	packedGalleryPostSchema,
-} from '../../gallery/contract/packed.js';
+} from '../../collections/contract/gallery/packed.js';
 
 import {
 	packedReversiGameLiteSchema,

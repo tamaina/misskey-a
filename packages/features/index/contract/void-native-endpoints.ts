@@ -8,7 +8,7 @@ import type { NativeVoidEndpoints as CollectionsVoidEndpoints } from '../../coll
 import type { NativeVoidEndpoints as DriveVoidEndpoints } from '../../drive/contract/void-endpoint-definitions.js';
 import type { NativeVoidEndpoints as EmojisVoidEndpoints } from '../../emojis/contract/void-endpoint-definitions.js';
 import type { NativeVoidEndpoints as FederationVoidEndpoints } from '../../federation/contract/void-endpoint-definitions.js';
-import type { NativeVoidEndpoints as GalleryVoidEndpoints } from '../../gallery/contract/void-endpoint-definitions.js';
+import type { NativeVoidEndpoints as GalleryVoidEndpoints } from '../../collections/contract/gallery/void-endpoint-definitions.js';
 import type { NativeVoidEndpoints as GamesVoidEndpoints } from '../../games/contract/void-endpoint-definitions.js';
 import type { NativeVoidEndpoints as InstanceVoidEndpoints } from '../../instance/contract/void-endpoint-definitions.js';
 import type { NativeVoidEndpoints as IntegrationsVoidEndpoints } from '../../integrations/contract/void-endpoint-definitions.js';

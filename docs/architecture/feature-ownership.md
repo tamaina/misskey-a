@@ -71,9 +71,8 @@ The [file allocation table](feature-file-allocation.tsv) records 419 service, se
 | `chat` | ChatService and ChatEntityService | rooms/messages/read state and chat Vue templates |
 | `notifications` | Notification, PushNotification, notification serializer | notifications and web-push subscriptions/settings |
 | `channels` | ChannelFollowing, ChannelMuting, ChannelEntityService | channel membership/content surfaces; `channel.tsx` |
-| `collections` | ClipService, clip/note-favorite serializers | clips/favorites/bookmarks; `clip.tsx` |
+| `collections` | ClipService, clip/note-favorite and gallery-post/like serializers | clips/favorites/bookmarks and gallery CRUD/likes/exploration; `clip.tsx`, `gallery-post.tsx` |
 | `pages` | PageService, Page/PageLike serializers | authored pages/editor/likes; `page.tsx` |
-| `gallery` | gallery-post/like serializers | gallery CRUD/likes/exploration; `gallery-post.tsx` |
 | `play` | FlashService, Flash/FlashLike serializers | Play/AiScript authoring and execution UI; `flash.tsx` |
 | `games` | ReversiService and game serializers | Reversi/bubble-game APIs/UI; `reversi-game.tsx` |
 | `announcements` | AnnouncementService and serializer | public/admin announcements/read state; `announcement.tsx` |
@@ -93,11 +92,10 @@ the implementations are now in the assigned feature directories.
 - `auth/backend/templates`: `oauth.tsx`.
 - `users/backend/templates`: `user.tsx`.
 - `notes/backend/templates`: `note.tsx`.
-- `collections/backend/templates`: `clip.tsx`.
+- `collections/backend/templates`: `clip.tsx`, `gallery-post.tsx`.
 - `channels/backend/templates`: `channel.tsx`.
 - `announcements/backend/templates`: `announcement.tsx`.
 - `pages/backend/templates`: `page.tsx`.
-- `gallery/backend/templates`: `gallery-post.tsx`.
 - `play/backend/templates`: `flash.tsx`.
 - `games/backend/templates`: `reversi-game.tsx`.
 

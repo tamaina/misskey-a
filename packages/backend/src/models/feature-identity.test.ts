@@ -69,9 +69,9 @@ import { MiFollowRequest } from '@features/relationships/backend/models/FollowRe
 
 import { MiFollowing } from '@features/relationships/backend/models/Following.js';
 
-import { MiGalleryLike } from '@features/gallery/backend/models/GalleryLike.js';
+import { MiGalleryLike } from '@features/collections/backend/models/GalleryLike.js';
 
-import { MiGalleryPost } from '@features/gallery/backend/models/GalleryPost.js';
+import { MiGalleryPost } from '@features/collections/backend/models/GalleryPost.js';
 
 import { MiHashtag } from '@features/discovery/backend/models/Hashtag.js';
 

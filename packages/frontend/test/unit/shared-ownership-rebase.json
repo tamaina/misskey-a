@@ -809,7 +809,7 @@
 		]
 	},
 	{
-		"file": "packages/features/gallery/frontend/pages/gallery/post.vue",
+		"file": "packages/features/collections/frontend/pages/gallery/post.vue",
 		"fixture": "packages/frontend/test/unit/sfc-next74-locale-migration.test.ts",
 		"oldOriginalSha256": "84f41e56ef94124156948624bcb3466c64795932cb7ec553052b6e912b28b863",
 		"oldMigratedSha256": "71b41865072eb8bdcedc7fc5b5b237a43b67fd53188a5fb4a804f4b9b808774d",
@@ -820,6 +820,14 @@
 			{
 				"source": "'@@/js/config.js'",
 				"replacement": "'@features/boot/frontend/shared/config.js'"
+			},
+			{
+				"source": "@features/gallery/frontend/components/MkGalleryPostPreview.vue",
+				"replacement": "@features/collections/frontend/components/MkGalleryPostPreview.vue"
+			},
+			{
+				"source": "features/gallery/frontend/components/MkGalleryPostPreview.vue",
+				"replacement": "features/collections/frontend/components/MkGalleryPostPreview.vue"
 			}
 		]
 	},

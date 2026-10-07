@@ -12,7 +12,7 @@ import type { PackedNativeEndpoints as DiscoveryPackedNativeEndpoints } from '..
 import type { PackedNativeEndpoints as DrivePackedNativeEndpoints } from '../../drive/contract/packed-endpoint-definitions.js';
 import type { PackedNativeEndpoints as EmojisPackedNativeEndpoints } from '../../emojis/contract/packed-endpoint-definitions.js';
 import type { PackedNativeEndpoints as FederationPackedNativeEndpoints } from '../../federation/contract/packed-endpoint-definitions.js';
-import type { PackedNativeEndpoints as GalleryPackedNativeEndpoints } from '../../gallery/contract/packed-endpoint-definitions.js';
+import type { PackedNativeEndpoints as GalleryPackedNativeEndpoints } from '../../collections/contract/gallery/packed-endpoint-definitions.js';
 import type { PackedNativeEndpoints as GamesPackedNativeEndpoints } from '../../games/contract/packed-endpoint-definitions.js';
 import type { PackedNativeEndpoints as InstancePackedNativeEndpoints } from '../../instance/contract/packed-endpoint-definitions.js';
 import type { PackedNativeEndpoints as IntegrationsPackedNativeEndpoints } from '../../integrations/contract/packed-endpoint-definitions.js';

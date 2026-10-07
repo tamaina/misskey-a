@@ -328,18 +328,18 @@ export const ROUTE_DEF = [{
 	component: page(() => import('@features/play/frontend/pages/flash/flash-index.vue')),
 }, {
 	path: '/gallery/:postId/edit',
-	component: page(() => import('@features/gallery/frontend/pages/gallery/edit.vue')),
+	component: page(() => import('@features/collections/frontend/pages/gallery/edit.vue')),
 	loginRequired: true,
 }, {
 	path: '/gallery/new',
-	component: page(() => import('@features/gallery/frontend/pages/gallery/edit.vue')),
+	component: page(() => import('@features/collections/frontend/pages/gallery/edit.vue')),
 	loginRequired: true,
 }, {
 	path: '/gallery/:postId',
-	component: page(() => import('@features/gallery/frontend/pages/gallery/post.vue')),
+	component: page(() => import('@features/collections/frontend/pages/gallery/post.vue')),
 }, {
 	path: '/gallery',
-	component: page(() => import('@features/gallery/frontend/pages/gallery/index.vue')),
+	component: page(() => import('@features/collections/frontend/pages/gallery/index.vue')),
 }, {
 	path: '/channels/:channelId/edit',
 	component: page(() => import('@features/channels/frontend/pages/channel-editor.vue')),

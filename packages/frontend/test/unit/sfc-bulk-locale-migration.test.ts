@@ -296,9 +296,9 @@ const migrations = [
 		]
 	},
 	{
-		"file": "packages/features/gallery/frontend/pages/gallery/edit.vue",
-		"sha256": "e668c0e969d97e6c3de60c6ede29506a912b9eb0f579bbad3090b32cd2a10275",
-		"importOffset": 452,
+		"file": "packages/features/collections/frontend/pages/gallery/edit.vue",
+		"sha256": "560df77f2639f195f5ad45b2f45ee3c30273194fb4f9bdff8c60507ba45cdcf2",
+		"importOffset": 456,
 		"keyPaths": [
 			"edit",
 			"postToGallery"
@@ -1638,11 +1638,11 @@ describe('expanded literal SFC-local locale migration', () => {
 	// Locale settings request a reload. Exercise fresh localized mounts in each
 	// language while retaining the actual component's reactive/event boundaries.
 	test.each(['ja-JP', 'en-US'])('compiled gallery metadata reacts to post ID changes after a %s boot', async language => {
-		const file = 'packages/features/gallery/frontend/pages/gallery/edit.vue';
+		const file = 'packages/features/collections/frontend/pages/gallery/edit.vue';
 		let metadata: ComputedRef<{ title: string }> | undefined;
 		const api = vi.fn();
 		const component = compileComponent(file, {
-			'@features/gallery/frontend/pages/gallery/edit.root.vue': { default: slotContainer },
+			'@features/collections/frontend/pages/gallery/edit.root.vue': { default: slotContainer },
 			'@features/api/frontend/utility/misskey-api.js': { misskeyApi: api },
 			'@features/navigation/frontend/page.js': { definePage: (getter: () => { title: string }) => { metadata = Vue.computed(getter); } },
 		});

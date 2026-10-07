@@ -14,7 +14,7 @@ import type { MiAnnouncement, MiClip, MiFlash, MiFlashLike, MiGalleryLike, MiGal
 import { announcementServices } from '@features/announcements/backend/services.js';
 import { ClipService } from '@features/collections/backend/services/ClipService.js';
 import { collectionServices } from '@features/collections/backend/services.js';
-import { galleryServices } from '@features/gallery/backend/services.js';
+import { galleryServices } from '@features/collections/backend/services/gallery.js';
 import { pageServices } from '@features/pages/backend/services.js';
 import { playServices } from '@features/play/backend/services.js';
 import { LoggerService } from '@features/runtime/backend/services/LoggerService.js';
@@ -133,8 +133,7 @@ describe('feature service composition adapter', () => {
 	test('feature factories and implementations have no Nest injection or lifecycle ownership', () => {
 		const groups = {
 			announcements: ['serializers/AnnouncementEntityService', 'services/AnnouncementService'],
-			collections: ['serializers/ClipEntityService', 'serializers/NoteFavoriteEntityService', 'services/ClipService'],
-			gallery: ['serializers/GalleryPostEntityService', 'serializers/GalleryLikeEntityService'],
+			collections: ['serializers/ClipEntityService', 'serializers/NoteFavoriteEntityService', 'services/ClipService', 'services/gallery', 'serializers/GalleryPostEntityService', 'serializers/GalleryLikeEntityService'],
 			pages: ['serializers/PageEntityService', 'serializers/PageLikeEntityService', 'services/PageService'],
 			play: ['serializers/FlashEntityService', 'serializers/FlashLikeEntityService', 'services/FlashService'],
 			auth: ['services/UserAuthService', 'services/WebAuthnService', 'serializers/AppEntityService', 'serializers/AuthSessionEntityService', 'serializers/InviteCodeEntityService', 'serializers/SigninEntityService'],

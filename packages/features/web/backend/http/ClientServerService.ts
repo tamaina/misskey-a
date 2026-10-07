@@ -18,7 +18,7 @@ import * as Acct from '@features/federation/backend/utility/acct.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import { NoteEntityService } from '@features/notes/backend/serializers/NoteEntityService.js';
 import { PageEntityService } from '@features/pages/backend/serializers/PageEntityService.js';
-import { GalleryPostEntityService } from '@features/gallery/backend/serializers/GalleryPostEntityService.js';
+import { GalleryPostEntityService } from '@features/collections/backend/serializers/GalleryPostEntityService.js';
 import { ClipEntityService } from '@features/collections/backend/serializers/ClipEntityService.js';
 import { ChannelEntityService } from '@features/channels/backend/serializers/ChannelEntityService.js';
 import type {
@@ -52,7 +52,7 @@ import { NotePage } from '@features/notes/backend/templates/note.js';
 import { PagePage } from '@features/pages/backend/templates/page.js';
 import { ClipPage } from '@features/collections/backend/templates/clip.js';
 import { FlashPage } from '@features/play/backend/templates/flash.js';
-import { GalleryPostPage } from '@features/gallery/backend/templates/gallery-post.js';
+import { GalleryPostPage } from '@features/collections/backend/templates/gallery-post.js';
 import { ChannelPage } from '@features/channels/backend/templates/channel.js';
 import { ReversiGamePage } from '@features/games/backend/templates/reversi-game.js';
 import { AnnouncementPage } from '@features/announcements/backend/templates/announcement.js';

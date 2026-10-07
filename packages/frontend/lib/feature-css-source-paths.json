@@ -23,5 +23,11 @@
 	"../features/drive/frontend/components/MkWatermarkEditorDialog.vue": "../features/media/frontend/components/MkWatermarkEditorDialog.vue",
 	"../features/drive/frontend/components/MkYouTubePlayer.vue": "../features/media/frontend/components/MkYouTubePlayer.vue",
 	"../features/drive/frontend/widgets/WidgetPhotos.vue": "../features/media/frontend/widgets/WidgetPhotos.vue",
-	"../features/drive/frontend/widgets/WidgetSlideshow.vue": "../features/media/frontend/widgets/WidgetSlideshow.vue"
+	"../features/drive/frontend/widgets/WidgetSlideshow.vue": "../features/media/frontend/widgets/WidgetSlideshow.vue",
+	"../features/collections/frontend/components/MkGalleryPostPreview.vue": "../features/gallery/frontend/components/MkGalleryPostPreview.vue",
+	"../features/collections/frontend/pages/gallery/edit.root.vue": "../features/gallery/frontend/pages/gallery/edit.root.vue",
+	"../features/collections/frontend/pages/gallery/edit.vue": "../features/gallery/frontend/pages/gallery/edit.vue",
+	"../features/collections/frontend/pages/gallery/index.vue": "../features/gallery/frontend/pages/gallery/index.vue",
+	"../features/collections/frontend/pages/gallery/post.vue": "../features/gallery/frontend/pages/gallery/post.vue",
+	"../features/collections/frontend/pages/user/gallery.vue": "../features/gallery/frontend/pages/user/gallery.vue"
 }

@@ -43,7 +43,7 @@ const XClips = defineAsyncComponent(() => import('@features/collections/frontend
 const XLists = defineAsyncComponent(() => import('@features/relationships/frontend/pages/user/lists.vue'));
 const XPages = defineAsyncComponent(() => import('@features/pages/frontend/pages/user/pages.vue'));
 const XFlashs = defineAsyncComponent(() => import('@features/play/frontend/pages/user/flashs.vue'));
-const XGallery = defineAsyncComponent(() => import('@features/gallery/frontend/pages/user/gallery.vue'));
+const XGallery = defineAsyncComponent(() => import('@features/collections/frontend/pages/user/gallery.vue'));
 const XRaw = defineAsyncComponent(() => import('@features/users/frontend/pages/user/raw.vue'));
 
 // contextは非ログイン状態の情報しかないためログイン時は利用できない

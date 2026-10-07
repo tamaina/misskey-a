@@ -22,7 +22,7 @@ import * as schema12 from '@features/drive/contract/packed.js';
 import * as schema13 from '@features/drive/contract/packed.js';
 import * as schema14 from '@features/emojis/contract/packed.js';
 import * as schema15 from '@features/federation/contract/packed.js';
-import * as schema16 from '@features/gallery/contract/packed.js';
+import * as schema16 from '@features/collections/contract/gallery/packed.js';
 import * as schema17 from '@features/games/contract/packed.js';
 import * as schema18 from '@features/instance/contract/packed.js';
 import * as schema19 from '@features/instance/contract/packed.js';

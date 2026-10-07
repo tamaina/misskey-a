@@ -199,7 +199,7 @@
         }
       ]
     },
-    "gallery": {
+    "collectionGallery": {
       "GalleryPostEntityService": [
         {
           "port": "galleryPostsRepository"

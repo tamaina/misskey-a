@@ -459,7 +459,7 @@ function toStories(component: string): Promise<string> {
 		globSync('../features/drive/frontend/components/MkCropperDialog.vue'),
 
 		globSync('../features/play/frontend/components/MkFlashPreview.vue'),
-		globSync('../features/gallery/frontend/components/MkGalleryPostPreview.vue'),
+		globSync('../features/collections/frontend/components/MkGalleryPostPreview.vue'),
 
 		globSync('../features/users/frontend/components/MkUserSetupDialog.vue'),
 

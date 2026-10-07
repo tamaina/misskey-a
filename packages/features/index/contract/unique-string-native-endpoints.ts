@@ -5,7 +5,7 @@
 
 import type { UniqueStringEndpoints as AuthUniqueStringEndpoints } from '../../auth/contract/unique-string-endpoint-definitions.js';
 import type { UniqueStringEndpoints as DriveUniqueStringEndpoints } from '../../drive/contract/unique-string-endpoint-definitions.js';
-import type { UniqueStringEndpoints as GalleryUniqueStringEndpoints } from '../../gallery/contract/unique-string-endpoint-definitions.js';
+import type { UniqueStringEndpoints as GalleryUniqueStringEndpoints } from '../../collections/contract/unique-string-endpoint-definitions.js';
 
 export type UniqueStringNativeEndpoints = AuthUniqueStringEndpoints
 	& DriveUniqueStringEndpoints

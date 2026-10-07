@@ -42,9 +42,9 @@ import { FollowingEntityService } from '@features/relationships/backend/serializ
 
 import { FollowRequestEntityService } from '@features/relationships/backend/serializers/FollowRequestEntityService.js';
 
-import { GalleryLikeEntityService } from '@features/gallery/backend/serializers/GalleryLikeEntityService.js';
+import { GalleryLikeEntityService } from '@features/collections/backend/serializers/GalleryLikeEntityService.js';
 
-import { GalleryPostEntityService } from '@features/gallery/backend/serializers/GalleryPostEntityService.js';
+import { GalleryPostEntityService } from '@features/collections/backend/serializers/GalleryPostEntityService.js';
 
 import { HashtagEntityService } from '@features/discovery/backend/serializers/HashtagEntityService.js';
 
