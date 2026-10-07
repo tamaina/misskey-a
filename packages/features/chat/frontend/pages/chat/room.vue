@@ -90,7 +90,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script lang="ts" setup>
 import { ref, useTemplateRef, computed, onMounted, onBeforeUnmount, onDeactivated, onActivated } from 'vue';
 import * as Misskey from 'misskey-js';
-import { getScrollContainer } from '@@/js/scroll.js';
+import { getScrollContainer } from '@features/ui/frontend/shared/scroll.js';
 import XMessage from '@features/chat/frontend/pages/chat/XMessage.vue';
 import XForm from '@features/chat/frontend/pages/chat/room.form.vue';
 import XSearch from '@features/chat/frontend/pages/chat/room.search.vue';

@@ -145,8 +145,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 import { computed, onActivated, onDeactivated, onMounted, onUnmounted, ref, shallowRef, triggerRef, watch } from 'vue';
 import * as Misskey from 'misskey-js';
 import * as Reversi from 'misskey-reversi';
-import { useInterval } from '@@/js/use-interval.js';
-import { url } from '@@/js/config.js';
+import { useInterval } from '@features/ui/frontend/shared/use-interval.js';
+import { url } from '@features/boot/frontend/shared/config.js';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import MkFolder from '@features/ui/frontend/components/MkFolder.vue';
 import MkSwitch from '@features/ui/frontend/components/MkSwitch.vue';

@@ -20,7 +20,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import { computed, onMounted, onUnmounted, ref } from 'vue';
-import { useInterval } from '@@/js/use-interval.js';
+import { useInterval } from '@features/ui/frontend/shared/use-interval.js';
 import MkPlusOneEffect from '@features/ui/frontend/components/MkPlusOneEffect.vue';
 import * as os from '@features/ui/frontend/os.js';
 import * as game from '@features/games/frontend/utility/clicker-game.js';

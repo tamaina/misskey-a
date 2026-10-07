@@ -97,7 +97,7 @@ export type SuperMenuDef = {
 <script lang="ts" setup>
 import { useTemplateRef, ref, watch, nextTick, computed, onUnmounted } from 'vue';
 import { throttle } from 'throttle-debounce';
-import { getScrollContainer } from '@@/js/scroll.js';
+import { getScrollContainer } from '@features/ui/frontend/shared/scroll.js';
 import type { SearchIndexItem } from '@features/discovery/frontend/utility/inapp-search.js';
 import MkInput from '@features/ui/frontend/components/MkInput.vue';
 import { useRouter } from '@features/navigation/frontend/router.js';

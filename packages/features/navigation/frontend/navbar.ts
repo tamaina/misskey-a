@@ -4,7 +4,7 @@
  */
 
 import { computed, reactive } from 'vue';
-import { ui } from '@@/js/config.js';
+import { ui } from '@features/boot/frontend/shared/config.js';
 import { clearCache } from '../../runtime/frontend/utility/clear-cache.js';
 import type { ComputedRef } from 'vue';
 import { $i } from '@features/auth/frontend/i.js';

@@ -5,7 +5,7 @@
 
 import { defineAsyncComponent } from 'vue';
 import * as Misskey from 'misskey-js';
-import { apiUrl } from '@@/js/config.js';
+import { apiUrl } from '@features/boot/frontend/shared/config.js';
 import type { UploaderFeatures } from '@features/drive/frontend/composables/use-uploader.js';
 import * as os from '@features/ui/frontend/os.js';
 import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';

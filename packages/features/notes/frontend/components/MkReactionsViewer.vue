@@ -32,8 +32,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 import * as Misskey from 'misskey-js';
 import { inject, watch, ref } from 'vue';
 import { TransitionGroup } from 'vue';
-import { isSupportedEmoji } from '@@/js/emojilist.js';
-import { getEmojiNameFromReaction, isLocalCustomEmojiReaction } from '@@/js/emoji-name.js';
+import { isSupportedEmoji } from '@features/emojis/frontend/shared/emojilist.js';
+import { getEmojiNameFromReaction, isLocalCustomEmojiReaction } from '@features/emojis/frontend/shared/emoji-name.js';
 import XReaction from '@features/notes/frontend/components/MkReactionsViewer.reaction.vue';
 import { $i } from '@features/auth/frontend/i.js';
 import { prefer } from '@features/preferences/frontend/preferences.js';

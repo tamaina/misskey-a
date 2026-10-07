@@ -27,13 +27,13 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script lang="ts" setup>
 import { computed, ref } from 'vue';
 import JSON5 from 'json5';
-import type { Theme } from '@@/js/theme.js';
+import type { Theme } from '@features/preferences/frontend/shared/theme.js';
 import MkTextarea from '@features/ui/frontend/components/MkTextarea.vue';
 import MkSelect from '@features/ui/frontend/components/MkSelect.vue';
 import MkInput from '@features/ui/frontend/components/MkInput.vue';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import { removeTheme } from '@features/preferences/frontend/theme.js';
-import { getBuiltinThemes } from '@@/js/theme.js';
+import { getBuiltinThemes } from '@features/preferences/frontend/shared/theme.js';
 import { copyToClipboard } from '@features/ui/frontend/utility/copy-to-clipboard.js';
 import * as os from '@features/ui/frontend/os.js';
 import { definePage } from '@features/navigation/frontend/page.js';

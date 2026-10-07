@@ -5,8 +5,8 @@
 
 import { genId } from '@features/runtime/frontend/utility/id.js';
 
-import type { Theme } from '@@/js/theme.js';
-import { themeProps } from '@@/js/theme.js';
+import type { Theme } from '@features/preferences/frontend/shared/theme.js';
+import { themeProps } from '@features/preferences/frontend/shared/theme.js';
 
 export type Default = null;
 export type Color = string;

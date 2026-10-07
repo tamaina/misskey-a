@@ -171,7 +171,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 import { ref, computed, watch } from 'vue';
 import * as Misskey from 'misskey-js';
 import { debounce } from 'throttle-debounce';
-import { useInterval } from '@@/js/use-interval.js';
+import { useInterval } from '@features/ui/frontend/shared/use-interval.js';
 import XChart from '@features/operations/frontend/pages/admin/job-queue.chart.vue';
 import XJob from '@features/operations/frontend/pages/admin/job-queue.job.vue';
 import * as os from '@features/ui/frontend/os.js';

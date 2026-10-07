@@ -5,7 +5,7 @@
 
 import { errors, utils, values } from '@syuilo/aiscript';
 import * as Misskey from 'misskey-js';
-import { url, lang } from '@@/js/config.js';
+import { url, lang } from '@features/boot/frontend/shared/config.js';
 import { assertStringAndIsIn } from '@features/play/frontend/services/aiscript/common.js';
 import * as os from '@features/ui/frontend/os.js';
 import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';

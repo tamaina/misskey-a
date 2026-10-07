@@ -26,7 +26,7 @@ vi.mock('@features/navigation/frontend/composables/use-leave-guard.js', () => ({
 vi.mock('@features/auth/frontend/i.js', () => ({ ensureSignin: () => ({ username: 'fixture' }) }));
 vi.mock('@features/preferences/frontend/store.js', () => ({ store: { s: { darkMode: false } } }));
 vi.mock('@features/preferences/frontend/preferences.js', () => ({ prefer: { commit: effects.commit } }));
-vi.mock('@@/js/config.js', () => ({ host: 'fixture.invalid' }));
+vi.mock('@features/boot/frontend/shared/config.js', () => ({ host: 'fixture.invalid' }));
 vi.mock('@features/runtime/frontend/utility/id.js', () => ({ genId: () => 'fixture-id' }));
 vi.mock('@features/markup/frontend/components/MkCodeEditor.vue', async () => {
 	const { defineComponent, h } = await import('vue');

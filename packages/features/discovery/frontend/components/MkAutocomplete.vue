@@ -47,9 +47,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 import { markRaw, ref, useTemplateRef, computed, onUpdated, onMounted, onBeforeUnmount, nextTick, watch } from 'vue';
 import * as Misskey from 'misskey-js';
 import sanitizeHtml from 'sanitize-html';
-import { emojilist, getEmojiName } from '@@/js/emojilist.js';
-import { char2twemojiFilePath, char2fluentEmojiFilePath } from '@@/js/emoji-base.js';
-import { MFM_TAGS, MFM_PARAMS } from '@@/js/const.js';
+import { emojilist, getEmojiName } from '@features/emojis/frontend/shared/emojilist.js';
+import { char2twemojiFilePath, char2fluentEmojiFilePath } from '@features/emojis/frontend/shared/emoji-base.js';
+import { MFM_TAGS, MFM_PARAMS } from '@features/markup/frontend/shared/mfm-constants.js';
 import type { EmojiDef } from '@features/emojis/frontend/utility/search-emoji.js';
 import { elementContains } from '@features/ui/frontend/utility/element-contains.js';
 import { acct } from '@features/users/frontend/filters/user.js';

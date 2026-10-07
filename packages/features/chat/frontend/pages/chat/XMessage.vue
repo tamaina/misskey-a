@@ -54,8 +54,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 import { computed, defineAsyncComponent, provide } from 'vue';
 import * as mfm from 'mfm-js';
 import * as Misskey from 'misskey-js';
-import { url } from '@@/js/config.js';
-import { isLink } from '@@/js/is-link.js';
+import { url } from '@features/boot/frontend/shared/config.js';
+import { isLink } from '@features/ui/frontend/shared/is-link.js';
 import type { MenuItem } from '@features/navigation/frontend/types/menu.js';
 import type { NormalizedChatMessage } from '@features/chat/frontend/pages/chat/room.vue';
 import { extractUrlFromMfm } from '@features/markup/frontend/utility/extract-url-from-mfm.js';

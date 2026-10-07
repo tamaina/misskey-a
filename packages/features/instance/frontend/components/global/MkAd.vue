@@ -40,7 +40,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import { ref, computed } from 'vue';
-import { url as local, host } from '@@/js/config.js';
+import { url as local, host } from '@features/boot/frontend/shared/config.js';
 import { instance } from '@features/instance/frontend/instance.js';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import { store } from '@features/preferences/frontend/store.js';

@@ -29,7 +29,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 import tinycolor from 'tinycolor2';
 import QRCodeStyling from 'qr-code-styling';
 import { computed, ref, shallowRef, watch, onMounted, onUnmounted, useTemplateRef } from 'vue';
-import { url, host } from '@@/js/config.js';
+import { url, host } from '@features/boot/frontend/shared/config.js';
 import type { Directive } from 'vue';
 import { instance } from '@features/instance/frontend/instance.js';
 import { ensureSignin } from '@features/auth/frontend/i.js';

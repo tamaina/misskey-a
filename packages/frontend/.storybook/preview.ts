@@ -71,7 +71,7 @@ queueMicrotask(() => {
 		import('../../features/preferences/frontend/preferences.js'),
 		import('../../features/ui/frontend/os.js'),
 	]).then(async ([{ default: components }, { default: directives }, { default: widgets }, { themeManager }, { prefer }, os]) => {
-		const { lang } = await import('../../frontend-shared/js/config.js');
+		const { lang } = await import('@features/boot/frontend/shared/config.js');
 		await startComponentLocales(lang, createInternationalization, (internationalization) => {
 			setup((app) => {
 				moduleInitialized = true;

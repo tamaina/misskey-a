@@ -1,5 +1,6 @@
 import path from 'path';
 import pluginVue from '@vitejs/plugin-vue';
+import { pluginFeatureDependencies } from '../frontend/lib/vite-plugin-feature-dependencies.js';
 import { defineConfig, type UserConfig } from 'vite';
 import { load as loadYaml } from 'js-yaml';
 import { promises as fsp } from 'fs';
@@ -88,6 +89,7 @@ export function getConfig(): UserConfig {
 		},
 
 		plugins: [
+			pluginFeatureDependencies(__dirname, path.resolve(__dirname, '../features')),
 			pluginVue(),
 			pluginRemoveUnrefI18n(),
 			pluginJson5(),
@@ -98,6 +100,7 @@ export function getConfig(): UserConfig {
 			alias: {
 				'@/': __dirname + '/src/',
 				'@@/': __dirname + '/../frontend-shared/',
+				'@features/': __dirname + '/../features/',
 				'/client-assets/': __dirname + '/assets/',
 				'/static-assets/': __dirname + '/../backend/assets/',
 				'/fluent-emoji/': '@misskey-dev/emoji-assets/fluent-emoji/',

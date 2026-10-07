@@ -6,7 +6,7 @@
 import { h } from 'vue';
 import * as mfm from 'mfm-js';
 import * as Misskey from 'misskey-js';
-import { host } from '@@/js/config.js';
+import { host } from '@features/boot/frontend/shared/config.js';
 import type { VNode, SetupContext } from 'vue';
 import type { MkABehavior } from '@features/navigation/frontend/components/global/MkA.vue';
 import MkUrl from '@features/markup/frontend/components/global/MkUrl.vue';

@@ -4,7 +4,7 @@
  */
 
 import { ref, readonly, computed } from 'vue';
-import { createVisibilityAwareInterval } from './interval.js';
+import { createVisibilityAwareInterval } from '@features/ui/frontend/shared/interval.js';
 
 const time = ref(Date.now());
 

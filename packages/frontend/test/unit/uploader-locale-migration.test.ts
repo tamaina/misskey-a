@@ -20,7 +20,7 @@ import { parse } from 'vue/compiler-sfc';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import { cleanup, fireEvent, render } from '@testing-library/vue';
 import { languages, locales } from 'i18n';
-import { I18n } from '../../../frontend-shared/js/i18n.js';
+import { I18n } from '@features/runtime/frontend/shared/i18n.js';
 import { applyWithLocale } from '../../../frontend-builder/locale-inliner/apply-with-locale.js';
 import { blankLogger } from '../../../frontend-builder/logger.js';
 import type { UploaderItem } from '@features/drive/frontend/composables/use-uploader.js';
@@ -138,7 +138,7 @@ describe('uploader locale-tag migration', () => {
 			.replace('interpolateLocaleParameters($locale.sfc.compressedToX, ', 'i18n.tsx._uploader.compressedToX(')
 			.replace('interpolateLocaleParameters($locale.sfc.savedXPercent, ', 'i18n.tsx._uploader.savedXPercent(')
 			.replace('$locale.sfc.preprocessing', 'i18n.ts.preprocessing');
-		expect(createHash('sha256').update(original).digest('hex')).toBe('d0af9aae9171d12151d091601c6931ad9d15951c77f1a3365e402f1ee6d7e250');
+		expect(createHash('sha256').update(original).digest('hex')).toBe('c834058442b9d9fabc4647317e7e615ea3725c9501dde4a0408b7cf550728587');
 	});
 
 	test('loads all actual VVI dictionaries and agrees with both oracles on 392 formatter cases', async () => {

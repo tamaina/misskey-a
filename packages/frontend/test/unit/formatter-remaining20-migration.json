@@ -1,8 +1,8 @@
 [
 	{
 		"file": "packages/features/web/frontend/pages/about-misskey.vue",
-		"originalSha256": "c7f303018b54dd4d93b832ab26b9be950b0e5bc7f536ee9a430a377280d9f3c5",
-		"migratedSha256": "87be8c18d3024f946c58f979c7cce45c6cd379b1238bd659526663077425be81",
+		"originalSha256": "56960d7aa7f23531cb9c0f6f5989e2bd9f10ef2d3acdfa2f78d8d024779ce4b7",
+		"migratedSha256": "d83a55da3dda7e01a0b0ac8985fd3f5ff982f46840772db698624e31b51a8037",
 		"edits": [
 			{
 				"start": 1316,
@@ -135,21 +135,21 @@
 				"afterStart": 7609
 			},
 			{
-				"start": 8229,
-				"end": 8287,
+				"start": 8290,
+				"end": 8348,
 				"source": "import { i18n } from '@features/runtime/frontend/i18n.js';",
 				"replacement": "import { interpolateLocaleParameters } from '@features/runtime/frontend/interpolate-locale-parameters.js';",
-				"afterStart": 8287
+				"afterStart": 8348
 			},
 			{
-				"start": 17068,
-				"end": 17088,
+				"start": 17129,
+				"end": 17149,
 				"source": "i18n.ts.aboutMisskey",
 				"replacement": "$locale.value.sfc.aboutMisskey",
 				"key": "aboutMisskey",
 				"kind": "ts",
 				"region": "script",
-				"afterStart": 17174
+				"afterStart": 17235
 			}
 		],
 		"keys": [
@@ -217,8 +217,8 @@
 	},
 	{
 		"file": "packages/features/moderation/frontend/pages/admin-user.vue",
-		"originalSha256": "866ec46e8014d8f5e0b66ac5e12d3a72550cbe2de85f8b9757596a04cb487e7b",
-		"migratedSha256": "3d80426bcaaa7232c0e05681f6727abded50c45769c554b018462538d84a9e6f",
+		"originalSha256": "3a19ef988a51ba11dc66d66b24a89f87c43d52514c760dbe62838b0f1b66a35f",
+		"migratedSha256": "42b747f6c3b29f0f890233fc444669072161c4812141022092b64632e986c1e3",
 		"edits": [
 			{
 				"start": 891,
@@ -481,291 +481,291 @@
 				"afterStart": 9013
 			},
 			{
-				"start": 10739,
-				"end": 10797,
+				"start": 10764,
+				"end": 10822,
 				"source": "import { i18n } from '@features/runtime/frontend/i18n.js';",
 				"replacement": "import { interpolateLocaleParameters } from '@features/runtime/frontend/interpolate-locale-parameters.js';",
-				"afterStart": 10897
+				"afterStart": 10922
 			},
 			{
-				"start": 11496,
-				"end": 11509,
+				"start": 11521,
+				"end": 11534,
 				"source": "i18n.ts.notes",
 				"replacement": "$locale.value.sfc.notes",
 				"key": "notes",
 				"kind": "ts",
 				"region": "script",
-				"afterStart": 11702
+				"afterStart": 11727
 			},
 			{
-				"start": 12270,
-				"end": 12284,
+				"start": 12295,
+				"end": 12309,
 				"source": "i18n.ts.active",
 				"replacement": "$locale.value.sfc.active",
 				"key": "active",
 				"kind": "ts",
 				"region": "script",
-				"afterStart": 12486
+				"afterStart": 12511
 			},
 			{
-				"start": 12316,
-				"end": 12332,
+				"start": 12341,
+				"end": 12357,
 				"source": "i18n.ts.archived",
 				"replacement": "$locale.value.sfc.archived",
 				"key": "archived",
 				"kind": "ts",
 				"region": "script",
-				"afterStart": 12542
+				"afterStart": 12567
 			},
 			{
-				"start": 13816,
-				"end": 13844,
+				"start": 13841,
+				"end": 13869,
 				"source": "i18n.ts.resetPasswordConfirm",
 				"replacement": "$locale.value.sfc.resetPasswordConfirm",
 				"key": "resetPasswordConfirm",
 				"kind": "ts",
 				"region": "script",
-				"afterStart": 14052
+				"afterStart": 14077
 			},
 			{
-				"start": 14042,
-				"end": 14065,
+				"start": 14067,
+				"end": 14090,
 				"source": "i18n.tsx.newPasswordIs(",
 				"replacement": "interpolateLocaleParameters($locale.value.sfc.newPasswordIs, ",
 				"key": "newPasswordIs",
 				"kind": "tsx",
 				"region": "script",
-				"afterStart": 14288
+				"afterStart": 14313
 			},
 			{
-				"start": 14183,
-				"end": 14206,
+				"start": 14208,
+				"end": 14231,
 				"source": "i18n.ts.unsetMfaConfirm",
 				"replacement": "$locale.value.sfc.unsetMfaConfirm",
 				"key": "unsetMfaConfirm",
 				"kind": "ts",
 				"region": "script",
-				"afterStart": 14467
+				"afterStart": 14492
 			},
 			{
-				"start": 14452,
-				"end": 14474,
+				"start": 14477,
+				"end": 14499,
 				"source": "i18n.ts.suspendConfirm",
 				"replacement": "$locale.value.sfc.suspendConfirm",
 				"key": "suspendConfirm",
 				"kind": "ts",
 				"region": "script",
-				"afterStart": 14746
+				"afterStart": 14771
 			},
 			{
-				"start": 14477,
-				"end": 14501,
+				"start": 14502,
+				"end": 14526,
 				"source": "i18n.ts.unsuspendConfirm",
 				"replacement": "$locale.value.sfc.unsuspendConfirm",
 				"key": "unsuspendConfirm",
 				"kind": "ts",
 				"region": "script",
-				"afterStart": 14781
+				"afterStart": 14806
 			},
 			{
-				"start": 14792,
-				"end": 14822,
+				"start": 14817,
+				"end": 14847,
 				"source": "i18n.ts.unsetUserAvatarConfirm",
 				"replacement": "$locale.value.sfc.unsetUserAvatarConfirm",
 				"key": "unsetUserAvatarConfirm",
 				"kind": "ts",
 				"region": "script",
-				"afterStart": 15106
+				"afterStart": 15131
 			},
 			{
-				"start": 15201,
-				"end": 15231,
+				"start": 15226,
+				"end": 15256,
 				"source": "i18n.ts.unsetUserBannerConfirm",
 				"replacement": "$locale.value.sfc.unsetUserBannerConfirm",
 				"key": "unsetUserBannerConfirm",
 				"kind": "ts",
 				"region": "script",
-				"afterStart": 15525
+				"afterStart": 15550
 			},
 			{
-				"start": 15609,
-				"end": 15638,
+				"start": 15634,
+				"end": 15663,
 				"source": "i18n.ts.deleteAllFilesConfirm",
 				"replacement": "$locale.value.sfc.deleteAllFilesConfirm",
 				"key": "deleteAllFilesConfirm",
 				"kind": "ts",
 				"region": "script",
-				"afterStart": 15943
+				"afterStart": 15968
 			},
 			{
-				"start": 16030,
-				"end": 16058,
+				"start": 16055,
+				"end": 16083,
 				"source": "i18n.ts.deleteAccountConfirm",
 				"replacement": "$locale.value.sfc.deleteAccountConfirm",
 				"key": "deleteAccountConfirm",
 				"kind": "ts",
 				"region": "script",
-				"afterStart": 16374
+				"afterStart": 16399
 			},
 			{
-				"start": 16141,
-				"end": 16164,
+				"start": 16166,
+				"end": 16189,
 				"source": "i18n.tsx.typeToConfirm(",
 				"replacement": "interpolateLocaleParameters($locale.value.sfc.typeToConfirm, ",
 				"key": "typeToConfirm",
 				"kind": "tsx",
 				"region": "script",
-				"afterStart": 16495
+				"afterStart": 16520
 			},
 			{
-				"start": 16638,
-				"end": 16670,
+				"start": 16663,
+				"end": 16695,
 				"source": "i18n.ts._role.chooseRoleToAssign",
 				"replacement": "$locale.value.sfc.roleChooseRoleToAssign",
 				"key": "_role.chooseRoleToAssign",
 				"kind": "ts",
 				"region": "script",
-				"afterStart": 17030
+				"afterStart": 17055
 			},
 			{
-				"start": 16854,
-				"end": 16868,
+				"start": 16879,
+				"end": 16893,
 				"source": "i18n.ts.period",
 				"replacement": "$locale.value.sfc.period",
 				"key": "period",
 				"kind": "ts",
 				"region": "script",
-				"afterStart": 17254
+				"afterStart": 17279
 			},
 			{
-				"start": 16963,
-				"end": 16983,
+				"start": 16988,
+				"end": 17008,
 				"source": "i18n.ts.indefinitely",
 				"replacement": "$locale.value.sfc.indefinitely",
 				"key": "indefinitely",
 				"kind": "ts",
 				"region": "script",
-				"afterStart": 17373
+				"afterStart": 17398
 			},
 			{
-				"start": 17020,
-				"end": 17035,
+				"start": 17045,
+				"end": 17060,
 				"source": "i18n.ts.oneHour",
 				"replacement": "$locale.value.sfc.oneHour",
 				"key": "oneHour",
 				"kind": "ts",
 				"region": "script",
-				"afterStart": 17440
+				"afterStart": 17465
 			},
 			{
-				"start": 17071,
-				"end": 17085,
+				"start": 17096,
+				"end": 17110,
 				"source": "i18n.ts.oneDay",
 				"replacement": "$locale.value.sfc.oneDay",
 				"key": "oneDay",
 				"kind": "ts",
 				"region": "script",
-				"afterStart": 17501
+				"afterStart": 17526
 			},
 			{
-				"start": 17122,
-				"end": 17137,
+				"start": 17147,
+				"end": 17162,
 				"source": "i18n.ts.oneWeek",
 				"replacement": "$locale.value.sfc.oneWeek",
 				"key": "oneWeek",
 				"kind": "ts",
 				"region": "script",
-				"afterStart": 17562
+				"afterStart": 17587
 			},
 			{
-				"start": 17175,
-				"end": 17191,
+				"start": 17200,
+				"end": 17216,
 				"source": "i18n.ts.oneMonth",
 				"replacement": "$locale.value.sfc.oneMonth",
 				"key": "oneMonth",
 				"kind": "ts",
 				"region": "script",
-				"afterStart": 17625
+				"afterStart": 17650
 			},
 			{
-				"start": 17795,
-				"end": 17811,
+				"start": 17820,
+				"end": 17836,
 				"source": "i18n.ts.unassign",
 				"replacement": "$locale.value.sfc.unassign",
 				"key": "unassign",
 				"kind": "ts",
 				"region": "script",
-				"afterStart": 18255
+				"afterStart": 18280
 			},
 			{
-				"start": 19134,
-				"end": 19150,
+				"start": 19159,
+				"end": 19175,
 				"source": "i18n.ts.overview",
 				"replacement": "$locale.value.sfc.overview",
 				"key": "overview",
 				"kind": "ts",
 				"region": "script",
-				"afterStart": 19604
+				"afterStart": 19629
 			},
 			{
-				"start": 19268,
-				"end": 19284,
+				"start": 19293,
+				"end": 19309,
 				"source": "i18n.ts.overview",
 				"replacement": "$locale.value.sfc.overview",
 				"key": "overview",
 				"kind": "ts",
 				"region": "script",
-				"afterStart": 19748
+				"afterStart": 19773
 			},
 			{
-				"start": 19342,
-				"end": 19355,
+				"start": 19367,
+				"end": 19380,
 				"source": "i18n.ts.roles",
 				"replacement": "$locale.value.sfc.roles",
 				"key": "roles",
 				"kind": "ts",
 				"region": "script",
-				"afterStart": 19832
+				"afterStart": 19857
 			},
 			{
-				"start": 19416,
-				"end": 19437,
+				"start": 19441,
+				"end": 19462,
 				"source": "i18n.ts.announcements",
 				"replacement": "$locale.value.sfc.announcements",
 				"key": "announcements",
 				"kind": "ts",
 				"region": "script",
-				"afterStart": 19916
+				"afterStart": 19941
 			},
 			{
-				"start": 19496,
-				"end": 19509,
+				"start": 19521,
+				"end": 19534,
 				"source": "i18n.ts.drive",
 				"replacement": "$locale.value.sfc.drive",
 				"key": "drive",
 				"kind": "ts",
 				"region": "script",
-				"afterStart": 20006
+				"afterStart": 20031
 			},
 			{
-				"start": 19561,
-				"end": 19575,
+				"start": 19586,
+				"end": 19600,
 				"source": "i18n.ts.charts",
 				"replacement": "$locale.value.sfc.charts",
 				"key": "charts",
 				"kind": "ts",
 				"region": "script",
-				"afterStart": 20081
+				"afterStart": 20106
 			},
 			{
-				"start": 19724,
-				"end": 19740,
+				"start": 19749,
+				"end": 19765,
 				"source": "i18n.ts.userInfo",
 				"replacement": "$locale.value.sfc.userInfo",
 				"key": "userInfo",
 				"kind": "ts",
 				"region": "script",
-				"afterStart": 20254
+				"afterStart": 20279
 			}
 		],
 		"keys": [
@@ -1389,8 +1389,8 @@
 	},
 	{
 		"file": "packages/features/auth/frontend/components/MkSignupDialog.form.vue",
-		"originalSha256": "fd8e36ee7f35cb4a6ccea6acdb2f835c255783b35e0ffdca0532ffb588424598",
-		"migratedSha256": "21b63de9598a404e2c10b519238e4cb27e2cb6c6c630e1296c3f75026d293721",
+		"originalSha256": "cb91bbbc3720f80a2d28f55efab209b8932f0a7f1b55caeb43c77eddc1da065c",
+		"migratedSha256": "66697782b1d396279dfc7174c47befe85c85301ffd2e20514a39308cfae8b92b",
 		"edits": [
 			{
 				"start": 522,
@@ -1713,41 +1713,41 @@
 				"afterStart": 7217
 			},
 			{
-				"start": 7861,
-				"end": 7919,
+				"start": 7886,
+				"end": 7944,
 				"source": "import { i18n } from '@features/runtime/frontend/i18n.js';",
 				"replacement": "import { interpolateLocaleParameters } from '@features/runtime/frontend/interpolate-locale-parameters.js';",
-				"afterStart": 7975
+				"afterStart": 8000
 			},
 			{
-				"start": 13689,
-				"end": 13716,
+				"start": 13714,
+				"end": 13741,
 				"source": "i18n.ts._signup.almostThere",
 				"replacement": "$locale.value.sfc.signupAlmostThere",
 				"key": "_signup.almostThere",
 				"kind": "ts",
 				"region": "script",
-				"afterStart": 13851
+				"afterStart": 13876
 			},
 			{
-				"start": 13728,
-				"end": 13755,
+				"start": 13753,
+				"end": 13780,
 				"source": "i18n.tsx._signup.emailSent(",
 				"replacement": "interpolateLocaleParameters($locale.value.sfc.signupEmailSent, ",
 				"key": "_signup.emailSent",
 				"kind": "tsx",
 				"region": "script",
-				"afterStart": 13898
+				"afterStart": 13923
 			},
 			{
-				"start": 14340,
-				"end": 14365,
+				"start": 14365,
+				"end": 14390,
 				"source": "i18n.ts.somethingHappened",
 				"replacement": "$locale.value.sfc.somethingHappened",
 				"key": "somethingHappened",
 				"kind": "ts",
 				"region": "script",
-				"afterStart": 14546
+				"afterStart": 14571
 			}
 		],
 		"keys": [
@@ -4960,8 +4960,8 @@
 	},
 	{
 		"file": "packages/features/pages/frontend/pages/page-editor/page-editor.vue",
-		"originalSha256": "1f7488d5cb4fbf034a18278220a40ea727396f35685e877469f4bc2e272751f4",
-		"migratedSha256": "4cc211d06db0d3b9bfa8bb1f39a3437062519d433d152dd3c9ae976c3037b134",
+		"originalSha256": "2de9958190be87d51386e5530aaa776d73d3fc97ea3450c192db14cdededb680",
+		"migratedSha256": "c84f3458697255cbc9dc3e57b83ba6a8f890a9bff8f09c72d794b6023ccff6b2",
 		"edits": [
 			{
 				"start": 446,
@@ -5084,161 +5084,161 @@
 				"afterStart": 2127
 			},
 			{
-				"start": 3267,
-				"end": 3325,
+				"start": 3292,
+				"end": 3350,
 				"source": "import { i18n } from '@features/runtime/frontend/i18n.js';",
 				"replacement": "import { interpolateLocaleParameters } from '@features/runtime/frontend/interpolate-locale-parameters.js';",
-				"afterStart": 3297
+				"afterStart": 3322
 			},
 			{
-				"start": 4346,
-				"end": 4374,
+				"start": 4371,
+				"end": 4399,
 				"source": "i18n.ts._pages.fontSansSerif",
 				"replacement": "$locale.value.sfc.pagesFontSansSerif",
 				"key": "_pages.fontSansSerif",
 				"kind": "ts",
 				"region": "script",
-				"afterStart": 4424
+				"afterStart": 4449
 			},
 			{
-				"start": 4410,
-				"end": 4434,
+				"start": 4435,
+				"end": 4459,
 				"source": "i18n.ts._pages.fontSerif",
 				"replacement": "$locale.value.sfc.pagesFontSerif",
 				"key": "_pages.fontSerif",
 				"kind": "ts",
 				"region": "script",
-				"afterStart": 4496
+				"afterStart": 4521
 			},
 			{
-				"start": 5590,
-				"end": 5615,
+				"start": 5615,
+				"end": 5640,
 				"source": "i18n.ts.somethingHappened",
 				"replacement": "$locale.value.sfc.somethingHappened",
 				"key": "somethingHappened",
 				"kind": "ts",
 				"region": "script",
-				"afterStart": 5684
+				"afterStart": 5709
 			},
 			{
-				"start": 5627,
-				"end": 5659,
+				"start": 5652,
+				"end": 5684,
 				"source": "i18n.ts._pages.nameAlreadyExists",
 				"replacement": "$locale.value.sfc.pagesNameAlreadyExists",
 				"key": "_pages.nameAlreadyExists",
 				"kind": "ts",
 				"region": "script",
-				"afterStart": 5731
+				"afterStart": 5756
 			},
 			{
-				"start": 5860,
-				"end": 5885,
+				"start": 5885,
+				"end": 5910,
 				"source": "i18n.ts.somethingHappened",
 				"replacement": "$locale.value.sfc.somethingHappened",
 				"key": "somethingHappened",
 				"kind": "ts",
 				"region": "script",
-				"afterStart": 5972
+				"afterStart": 5997
 			},
 			{
-				"start": 5897,
-				"end": 5929,
+				"start": 5922,
+				"end": 5954,
 				"source": "i18n.ts._pages.nameAlreadyExists",
 				"replacement": "$locale.value.sfc.pagesNameAlreadyExists",
 				"key": "_pages.nameAlreadyExists",
 				"kind": "ts",
 				"region": "script",
-				"afterStart": 6019
+				"afterStart": 6044
 			},
 			{
-				"start": 6245,
-				"end": 6271,
+				"start": 6270,
+				"end": 6296,
 				"source": "i18n.tsx.removeAreYouSure(",
 				"replacement": "interpolateLocaleParameters($locale.value.sfc.removeAreYouSure, ",
 				"key": "removeAreYouSure",
 				"kind": "tsx",
 				"region": "script",
-				"afterStart": 6375
+				"afterStart": 6400
 			},
 			{
-				"start": 6682,
-				"end": 6707,
+				"start": 6707,
+				"end": 6732,
 				"source": "i18n.ts.somethingHappened",
 				"replacement": "$locale.value.sfc.somethingHappened",
 				"key": "somethingHappened",
 				"kind": "ts",
 				"region": "script",
-				"afterStart": 6850
+				"afterStart": 6875
 			},
 			{
-				"start": 6718,
-				"end": 6750,
+				"start": 6743,
+				"end": 6775,
 				"source": "i18n.ts._pages.nameAlreadyExists",
 				"replacement": "$locale.value.sfc.pagesNameAlreadyExists",
 				"key": "_pages.nameAlreadyExists",
 				"kind": "ts",
 				"region": "script",
-				"afterStart": 6896
+				"afterStart": 6921
 			},
 			{
-				"start": 7018,
-				"end": 7044,
+				"start": 7043,
+				"end": 7069,
 				"source": "i18n.ts._pages.chooseBlock",
 				"replacement": "$locale.value.sfc.pagesChooseBlock",
 				"key": "_pages.chooseBlock",
 				"kind": "ts",
 				"region": "script",
-				"afterStart": 7204
+				"afterStart": 7229
 			},
 			{
-				"start": 8875,
-				"end": 8901,
+				"start": 8900,
+				"end": 8926,
 				"source": "i18n.ts._pages.pageSetting",
 				"replacement": "$locale.value.sfc.pagesPageSetting",
 				"key": "_pages.pageSetting",
 				"kind": "ts",
 				"region": "script",
-				"afterStart": 9069
+				"afterStart": 9094
 			},
 			{
-				"start": 8959,
-				"end": 8982,
+				"start": 8984,
+				"end": 9007,
 				"source": "i18n.ts._pages.contents",
 				"replacement": "$locale.value.sfc.pagesContents",
 				"key": "_pages.contents",
 				"kind": "ts",
 				"region": "script",
-				"afterStart": 9161
+				"afterStart": 9186
 			},
 			{
-				"start": 9058,
-				"end": 9081,
+				"start": 9083,
+				"end": 9106,
 				"source": "i18n.ts._pages.editPage",
 				"replacement": "$locale.value.sfc.pagesEditPage",
 				"key": "_pages.editPage",
 				"kind": "ts",
 				"region": "script",
-				"afterStart": 9268
+				"afterStart": 9293
 			},
 			{
-				"start": 9124,
-				"end": 9147,
+				"start": 9149,
+				"end": 9172,
 				"source": "i18n.ts._pages.readPage",
 				"replacement": "$locale.value.sfc.pagesReadPage",
 				"key": "_pages.readPage",
 				"kind": "ts",
 				"region": "script",
-				"afterStart": 9342
+				"afterStart": 9367
 			},
 			{
-				"start": 9151,
-				"end": 9173,
+				"start": 9176,
+				"end": 9198,
 				"source": "i18n.ts._pages.newPage",
 				"replacement": "$locale.value.sfc.pagesNewPage",
 				"key": "_pages.newPage",
 				"kind": "ts",
 				"region": "script",
-				"afterStart": 9377
+				"afterStart": 9402
 			}
 		],
 		"keys": [
@@ -5361,8 +5361,8 @@
 	},
 	{
 		"file": "packages/features/instance/frontend/pages/about.overview.vue",
-		"originalSha256": "b6d604965d6b56896187c421a9c4adefe93f69fdadf404dd3cbdd7faa6a62cb7",
-		"migratedSha256": "77aca8453c5fa3cf9446280e29b01734e00b29616587fc638f18ce5b94536bb3",
+		"originalSha256": "931035c193f0508240d3b21fb3e09751faff6d5d1a650759e6eff43224f2f70a",
+		"migratedSha256": "73b15795650bdca2b452a157749ba3259757c916a2936919fa3797a9e89e59d5",
 		"edits": [
 			{
 				"start": 512,
@@ -5555,11 +5555,11 @@
 				"afterStart": 4228
 			},
 			{
-				"start": 4853,
-				"end": 4911,
+				"start": 4878,
+				"end": 4936,
 				"source": "import { i18n } from '@features/runtime/frontend/i18n.js';",
 				"replacement": "import { interpolateLocaleParameters } from '@features/runtime/frontend/interpolate-locale-parameters.js';",
-				"afterStart": 4957
+				"afterStart": 4982
 			}
 		],
 		"keys": [
@@ -5652,8 +5652,8 @@
 	},
 	{
 		"file": "packages/features/instance/frontend/pages/admin/branding.vue",
-		"originalSha256": "5bb2f6026bcdd43dad8d13b9a3c610d0efc9d7f34faf079cfcc09706247db231",
-		"migratedSha256": "9037af782426c94cdad6d94b663a9450f7ced3e0c329071fc26462f23be91133",
+		"originalSha256": "78f3bcfc85d925fed6517df04943a6c26e9f9c8e22365d33468e1a2b8072ab30",
+		"migratedSha256": "ac03fdeea5779d9bc9f393c65886ff724cf7e85f6c565fd70e53b76f8e5f1138",
 		"edits": [
 			{
 				"start": 293,
@@ -5946,21 +5946,21 @@
 				"afterStart": 6498
 			},
 			{
-				"start": 6914,
-				"end": 6972,
+				"start": 6939,
+				"end": 6997,
 				"source": "import { i18n } from '@features/runtime/frontend/i18n.js';",
 				"replacement": "import { interpolateLocaleParameters } from '@features/runtime/frontend/interpolate-locale-parameters.js';",
-				"afterStart": 7112
+				"afterStart": 7137
 			},
 			{
-				"start": 10091,
-				"end": 10107,
+				"start": 10116,
+				"end": 10132,
 				"source": "i18n.ts.branding",
 				"replacement": "$locale.value.sfc.branding",
 				"key": "branding",
 				"kind": "ts",
 				"region": "script",
-				"afterStart": 10337
+				"afterStart": 10362
 			}
 		],
 		"keys": [
@@ -6078,8 +6078,8 @@
 	},
 	{
 		"file": "packages/features/ui/frontend/components/global/MkTime.vue",
-		"originalSha256": "8f315124acdba71375b466f19d0e9c93e78fa06b7cede5ceba326df5070cf064",
-		"migratedSha256": "6fb0c2f98a1817c5ac455fd64c7094134f3152f8eda215aae874a29662edcf66",
+		"originalSha256": "ab07df46d7661d1c90e464cf556bd02394e4a1fbe8476eb7c38de2e2336824bd",
+		"migratedSha256": "ab3add67c61ea0044276527a9e922f77a9c28566f9a2d5832b62af3e38d549a5",
 		"edits": [
 			{
 				"start": 284,
@@ -6099,174 +6099,174 @@
 				"afterStart": 670
 			},
 			{
-				"start": 1530,
-				"end": 1550,
+				"start": 1576,
+				"end": 1596,
 				"source": "i18n.ts._ago.invalid",
 				"replacement": "$locale.value.sfc.agoInvalid",
 				"key": "_ago.invalid",
 				"kind": "ts",
 				"region": "script",
-				"afterStart": 1580
+				"afterStart": 1626
 			},
 			{
-				"start": 1942,
-				"end": 1962,
+				"start": 1988,
+				"end": 2008,
 				"source": "i18n.ts._ago.invalid",
 				"replacement": "$locale.value.sfc.agoInvalid",
 				"key": "_ago.invalid",
 				"kind": "ts",
 				"region": "script",
-				"afterStart": 2000
+				"afterStart": 2046
 			},
 			{
-				"start": 2001,
-				"end": 2024,
+				"start": 2047,
+				"end": 2070,
 				"source": "i18n.tsx._ago.yearsAgo(",
 				"replacement": "interpolateLocaleParameters($locale.value.sfc.agoYearsAgo, ",
 				"key": "_ago.yearsAgo",
 				"kind": "tsx",
 				"region": "script",
-				"afterStart": 2067
+				"afterStart": 2113
 			},
 			{
-				"start": 2103,
-				"end": 2127,
+				"start": 2149,
+				"end": 2173,
 				"source": "i18n.tsx._ago.monthsAgo(",
 				"replacement": "interpolateLocaleParameters($locale.value.sfc.agoMonthsAgo, ",
 				"key": "_ago.monthsAgo",
 				"kind": "tsx",
 				"region": "script",
-				"afterStart": 2205
+				"afterStart": 2251
 			},
 			{
-				"start": 2204,
-				"end": 2227,
+				"start": 2250,
+				"end": 2273,
 				"source": "i18n.tsx._ago.weeksAgo(",
 				"replacement": "interpolateLocaleParameters($locale.value.sfc.agoWeeksAgo, ",
 				"key": "_ago.weeksAgo",
 				"kind": "tsx",
 				"region": "script",
-				"afterStart": 2342
+				"afterStart": 2388
 			},
 			{
-				"start": 2302,
-				"end": 2324,
+				"start": 2348,
+				"end": 2370,
 				"source": "i18n.tsx._ago.daysAgo(",
 				"replacement": "interpolateLocaleParameters($locale.value.sfc.agoDaysAgo, ",
 				"key": "_ago.daysAgo",
 				"kind": "tsx",
 				"region": "script",
-				"afterStart": 2476
+				"afterStart": 2522
 			},
 			{
-				"start": 2397,
-				"end": 2420,
+				"start": 2443,
+				"end": 2466,
 				"source": "i18n.tsx._ago.hoursAgo(",
 				"replacement": "interpolateLocaleParameters($locale.value.sfc.agoHoursAgo, ",
 				"key": "_ago.hoursAgo",
 				"kind": "tsx",
 				"region": "script",
-				"afterStart": 2607
+				"afterStart": 2653
 			},
 			{
-				"start": 2490,
-				"end": 2515,
+				"start": 2536,
+				"end": 2561,
 				"source": "i18n.tsx._ago.minutesAgo(",
 				"replacement": "interpolateLocaleParameters($locale.value.sfc.agoMinutesAgo, ",
 				"key": "_ago.minutesAgo",
 				"kind": "tsx",
 				"region": "script",
-				"afterStart": 2736
+				"afterStart": 2782
 			},
 			{
-				"start": 2577,
-				"end": 2602,
+				"start": 2623,
+				"end": 2648,
 				"source": "i18n.tsx._ago.secondsAgo(",
 				"replacement": "interpolateLocaleParameters($locale.value.sfc.agoSecondsAgo, ",
 				"key": "_ago.secondsAgo",
 				"kind": "tsx",
 				"region": "script",
-				"afterStart": 2859
+				"afterStart": 2905
 			},
 			{
-				"start": 2664,
-				"end": 2684,
+				"start": 2710,
+				"end": 2730,
 				"source": "i18n.ts._ago.justNow",
 				"replacement": "$locale.value.sfc.agoJustNow",
 				"key": "_ago.justNow",
 				"kind": "ts",
 				"region": "script",
-				"afterStart": 2982
+				"afterStart": 3028
 			},
 			{
-				"start": 2713,
-				"end": 2736,
+				"start": 2759,
+				"end": 2782,
 				"source": "i18n.tsx._timeIn.years(",
 				"replacement": "interpolateLocaleParameters($locale.value.sfc.timeInYears, ",
 				"key": "_timeIn.years",
 				"kind": "tsx",
 				"region": "script",
-				"afterStart": 3039
+				"afterStart": 3085
 			},
 			{
-				"start": 2816,
-				"end": 2840,
+				"start": 2862,
+				"end": 2886,
 				"source": "i18n.tsx._timeIn.months(",
 				"replacement": "interpolateLocaleParameters($locale.value.sfc.timeInMonths, ",
 				"key": "_timeIn.months",
 				"kind": "tsx",
 				"region": "script",
-				"afterStart": 3178
+				"afterStart": 3224
 			},
 			{
-				"start": 2918,
-				"end": 2941,
+				"start": 2964,
+				"end": 2987,
 				"source": "i18n.tsx._timeIn.weeks(",
 				"replacement": "interpolateLocaleParameters($locale.value.sfc.timeInWeeks, ",
 				"key": "_timeIn.weeks",
 				"kind": "tsx",
 				"region": "script",
-				"afterStart": 3316
+				"afterStart": 3362
 			},
 			{
-				"start": 3017,
-				"end": 3039,
+				"start": 3063,
+				"end": 3085,
 				"source": "i18n.tsx._timeIn.days(",
 				"replacement": "interpolateLocaleParameters($locale.value.sfc.timeInDays, ",
 				"key": "_timeIn.days",
 				"kind": "tsx",
 				"region": "script",
-				"afterStart": 3451
+				"afterStart": 3497
 			},
 			{
-				"start": 3113,
-				"end": 3136,
+				"start": 3159,
+				"end": 3182,
 				"source": "i18n.tsx._timeIn.hours(",
 				"replacement": "interpolateLocaleParameters($locale.value.sfc.timeInHours, ",
 				"key": "_timeIn.hours",
 				"kind": "tsx",
 				"region": "script",
-				"afterStart": 3583
+				"afterStart": 3629
 			},
 			{
-				"start": 3207,
-				"end": 3232,
+				"start": 3253,
+				"end": 3278,
 				"source": "i18n.tsx._timeIn.minutes(",
 				"replacement": "interpolateLocaleParameters($locale.value.sfc.timeInMinutes, ",
 				"key": "_timeIn.minutes",
 				"kind": "tsx",
 				"region": "script",
-				"afterStart": 3713
+				"afterStart": 3759
 			},
 			{
-				"start": 3277,
-				"end": 3302,
+				"start": 3323,
+				"end": 3348,
 				"source": "i18n.tsx._timeIn.seconds(",
 				"replacement": "interpolateLocaleParameters($locale.value.sfc.timeInSeconds, ",
 				"key": "_timeIn.seconds",
 				"kind": "tsx",
 				"region": "script",
-				"afterStart": 3819
+				"afterStart": 3865
 			}
 		],
 		"keys": [
@@ -6820,8 +6820,8 @@
 	},
 	{
 		"file": "packages/features/users/frontend/components/MkUserSetupDialog.vue",
-		"originalSha256": "90632ca09cd6b5e304a46cc50989917b30126407cce892512320ddaa335ced12",
-		"migratedSha256": "af96e59d55034301b24d1fac987fa402dcc178a0d87a624551f86ae9dbf15014",
+		"originalSha256": "8cada9ca73730be7984662492fbce910eb84c8a3d883b1592cd4c1a399333989",
+		"migratedSha256": "19b08988bfb02a27b71eb80f20b34d5a1d8d33b2e1cfdd43ab8edb1987909888",
 		"edits": [
 			{
 				"start": 324,
@@ -7074,31 +7074,31 @@
 				"afterStart": 6634
 			},
 			{
-				"start": 7283,
-				"end": 7341,
+				"start": 7308,
+				"end": 7366,
 				"source": "import { i18n } from '@features/runtime/frontend/i18n.js';",
 				"replacement": "import { interpolateLocaleParameters } from '@features/runtime/frontend/interpolate-locale-parameters.js';",
-				"afterStart": 7421
+				"afterStart": 7446
 			},
 			{
-				"start": 7989,
-				"end": 8034,
+				"start": 8014,
+				"end": 8059,
 				"source": "i18n.ts._initialAccountSetting.skipAreYouSure",
 				"replacement": "$locale.value.sfc.initialAccountSettingSkipAreYouSure",
 				"key": "_initialAccountSetting.skipAreYouSure",
 				"kind": "ts",
 				"region": "script",
-				"afterStart": 8175
+				"afterStart": 8200
 			},
 			{
-				"start": 8637,
-				"end": 8683,
+				"start": 8662,
+				"end": 8708,
 				"source": "i18n.ts._initialAccountSetting.laterAreYouSure",
 				"replacement": "$locale.value.sfc.initialAccountSettingLaterAreYouSure",
 				"key": "_initialAccountSetting.laterAreYouSure",
 				"kind": "ts",
 				"region": "script",
-				"afterStart": 8831
+				"afterStart": 8856
 			}
 		],
 		"keys": [
@@ -7452,8 +7452,8 @@
 	},
 	{
 		"file": "packages/features/users/frontend/pages/user/home.vue",
-		"originalSha256": "49bc0c2b1b76756062f26a448ba0811c57c58039c7f2015d62c8798707ae2c8d",
-		"migratedSha256": "05829abe59fec28782e80d842de3f80819c8188550211c7a26d0548c9f797a31",
+		"originalSha256": "c7e1222c6d7ae9d565a653b1d6882d3e846a311ee45a61fe6cf2bc3415a145a5",
+		"migratedSha256": "d1b9e50ecb4f27c90a7e5f12fc649d26ed4165b70741d233011bf09405479125",
 		"edits": [
 			{
 				"start": 563,
@@ -7656,11 +7656,11 @@
 				"afterStart": 6896
 			},
 			{
-				"start": 8678,
-				"end": 8736,
+				"start": 8701,
+				"end": 8759,
 				"source": "import { i18n } from '@features/runtime/frontend/i18n.js';",
 				"replacement": "import { interpolateLocaleParameters } from '@features/runtime/frontend/interpolate-locale-parameters.js';",
-				"afterStart": 8786
+				"afterStart": 8809
 			}
 		],
 		"keys": [
@@ -8024,8 +8024,8 @@
 	},
 	{
 		"file": "packages/features/games/frontend/pages/reversi/game.board.vue",
-		"originalSha256": "44f2a6d8bfb1c99ab8f3b1b595489baf01a41e6cf5702b5950cdaa53b6818c07",
-		"migratedSha256": "00a63b67bc9853ac04630a477dc12bb712f692c9b9f6cc59337d788f16683426",
+		"originalSha256": "2337a0026f354451b351a40eba0bdc26a09261e558b705dce82368b43569ae1d",
+		"migratedSha256": "42145994b83a5bd4bd20be92e9f4f329536367447591bf96d06e9bcfcade49ce",
 		"edits": [
 			{
 				"start": 306,
@@ -8288,21 +8288,21 @@
 				"afterStart": 7355
 			},
 			{
-				"start": 8022,
-				"end": 8080,
+				"start": 8070,
+				"end": 8128,
 				"source": "import { i18n } from '@features/runtime/frontend/i18n.js';",
 				"replacement": "import { interpolateLocaleParameters } from '@features/runtime/frontend/interpolate-locale-parameters.js';",
-				"afterStart": 8250
+				"afterStart": 8298
 			},
 			{
-				"start": 15156,
-				"end": 15174,
+				"start": 15204,
+				"end": 15222,
 				"source": "i18n.ts.areYouSure",
 				"replacement": "$locale.value.sfc.areYouSure",
 				"key": "areYouSure",
 				"kind": "ts",
 				"region": "script",
-				"afterStart": 15432
+				"afterStart": 15480
 			}
 		],
 		"keys": [

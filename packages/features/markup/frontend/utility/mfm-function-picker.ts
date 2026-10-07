@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { MFM_TAGS } from '@@/js/const.js';
+import { MFM_TAGS } from '@features/markup/frontend/shared/mfm-constants.js';
 import * as os from '@features/ui/frontend/os.js';
 import { i18n } from '@features/runtime/frontend/i18n.js';
 

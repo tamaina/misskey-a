@@ -45,7 +45,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script lang="ts" setup>
 import { watch, ref, computed } from 'vue';
 import * as Misskey from 'misskey-js';
-import { extractAvgColorFromBlurhash } from '@@/js/extract-avg-color-from-blurhash.js';
+import { extractAvgColorFromBlurhash } from '@features/media/frontend/shared/extract-avg-color-from-blurhash.js';
 import MkImgWithBlurhash from '@features/media/frontend/components/MkImgWithBlurhash.vue';
 import MkA from '@features/navigation/frontend/components/global/MkA.vue';
 import { getStaticImageUrl } from '@features/media/frontend/utility/media-proxy.js';

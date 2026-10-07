@@ -30,7 +30,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import { onMounted, provide, ref, computed } from 'vue';
-import { instanceName } from '@@/js/config.js';
+import { instanceName } from '@features/boot/frontend/shared/config.js';
 import XCommon from './_common_/common.vue';
 import type { PageMetadata } from '@features/navigation/frontend/page.js';
 import * as os from '@features/ui/frontend/os.js';

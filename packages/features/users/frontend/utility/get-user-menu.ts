@@ -6,7 +6,7 @@
 import { toUnicode } from 'punycode.js';
 import { defineAsyncComponent, ref, watch } from 'vue';
 import * as Misskey from 'misskey-js';
-import { host, url } from '@@/js/config.js';
+import { host, url } from '@features/boot/frontend/shared/config.js';
 import type { Router } from '@features/navigation/frontend/router.js';
 import type { MenuItem } from '@features/navigation/frontend/types/menu.js';
 import { i18n } from '@features/runtime/frontend/i18n.js';

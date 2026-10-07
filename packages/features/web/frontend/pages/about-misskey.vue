@@ -137,8 +137,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import { nextTick, onBeforeUnmount, ref, useTemplateRef, computed } from 'vue';
-import { host, version } from '@@/js/config.js';
-import { DEFAULT_EMOJIS } from '@@/js/const.js';
+import { host, version } from '@features/boot/frontend/shared/config.js';
+import { DEFAULT_EMOJIS } from '@features/emojis/frontend/shared/default-emojis.js';
 import FormLink from '@features/ui/frontend/components/form/link.vue';
 import FormSection from '@features/ui/frontend/components/form/section.vue';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';

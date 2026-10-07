@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { apiUrl } from '@@/js/config.js';
+import { apiUrl } from '@features/boot/frontend/shared/config.js';
 import { cloudBackup } from '@features/preferences/frontend/state/utility.js';
 import { store } from '@features/preferences/frontend/store.js';
 import { waiting } from '@features/ui/frontend/os.js';

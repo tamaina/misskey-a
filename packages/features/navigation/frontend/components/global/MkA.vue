@@ -15,7 +15,7 @@ export type MkABehavior = 'window' | 'browser' | null;
 
 <script lang="ts" setup>
 import { computed, inject, useTemplateRef } from 'vue';
-import { url } from '@@/js/config.js';
+import { url } from '@features/boot/frontend/shared/config.js';
 import * as os from '@features/ui/frontend/os.js';
 import { copyToClipboard } from '@features/ui/frontend/utility/copy-to-clipboard.js';
 import { useRouter } from '@features/navigation/frontend/router.js';

@@ -29,9 +29,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script lang="ts" setup>
 import { ref } from 'vue';
 import * as Misskey from 'misskey-js';
-import { useInterval } from '@@/js/use-interval.js';
-import { url as baseUrl } from '@@/js/config.js';
-import { tryParseUrl } from '@@/js/url.js';
+import { useInterval } from '@features/ui/frontend/shared/use-interval.js';
+import { url as baseUrl } from '@features/boot/frontend/shared/config.js';
+import { tryParseUrl } from '@features/web/frontend/shared/url.js';
 import MkMarqueeText from '@features/ui/frontend/components/MkMarqueeText.vue';
 import { shuffle } from '@features/runtime/frontend/utility/shuffle.js';
 

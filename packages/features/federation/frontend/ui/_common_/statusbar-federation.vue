@@ -33,7 +33,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script lang="ts" setup>
 import { ref } from 'vue';
 import * as Misskey from 'misskey-js';
-import { useInterval } from '@@/js/use-interval.js';
+import { useInterval } from '@features/ui/frontend/shared/use-interval.js';
 import MkMarqueeText from '@features/ui/frontend/components/MkMarqueeText.vue';
 import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 import { getProxiedImageUrlNullable } from '@features/media/frontend/utility/media-proxy.js';

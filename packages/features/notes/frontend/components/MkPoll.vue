@@ -29,14 +29,14 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script lang="ts" setup>
 import { computed, ref, watch } from 'vue';
 import * as Misskey from 'misskey-js';
-import { host } from '@@/js/config.js';
+import { host } from '@features/boot/frontend/shared/config.js';
 import type { OpenOnRemoteOptions } from '@features/auth/frontend/utility/please-login.js';
 import { sum } from '@features/runtime/frontend/utility/array.js';
 import { pleaseLogin } from '@features/auth/frontend/utility/please-login.js';
 import * as os from '@features/ui/frontend/os.js';
 import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 import { i18n } from '@features/runtime/frontend/i18n.js';
-import { useLowresTime } from '@@/js/use-lowres-time.js';
+import { useLowresTime } from '@features/ui/frontend/shared/use-lowres-time.js';
 
 const props = defineProps<{
 	noteId: string;

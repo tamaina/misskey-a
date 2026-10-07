@@ -15,7 +15,7 @@ import { describe, expect, test, vi } from 'vitest';
 import { getLocaleMessageNamedKeys } from 'vite-vue-internationalization';
 import * as VviRuntime from 'vite-vue-internationalization/runtime';
 import { languages, locales } from 'i18n';
-import { I18n } from '@@/js/i18n.js';
+import { I18n } from '@features/runtime/frontend/shared/i18n.js';
 import { pluginVvi } from '../../lib/vite-plugin-vvi.js';
 import type { Component, ComputedRef } from 'vue';
 
@@ -77,8 +77,8 @@ const migrations = [
 	},
 	{
 		"file": "packages/features/instance/frontend/widgets/WidgetInstanceCloud.vue",
-		"sha256": "648fb79446f40cf8d6084af093793a528a1ad348a6a85b2c26e7fd4696b78e8c",
-		"importOffset": 1371,
+		"sha256": "2e070f65cc7c6d10b5f3b377597fec1959caa12a5627f0d10cc33bb31d4df0f8",
+		"importOffset": 1394,
 		"keyPaths": [
 			"_widgetOptions.transparent"
 		],
@@ -111,8 +111,8 @@ const migrations = [
 	},
 	{
 		"file": "packages/features/navigation/frontend/ui/deck/main-column.vue",
-		"sha256": "ad49bc63aa1d34df4766bc6d36823ea6a93aaa132e52aad892fe2a4912c82323",
-		"importOffset": 1057,
+		"sha256": "9b0257c910be4e132e97c5ac179ea47d7ebafd0a22daf818e1634d64ad4993b8",
+		"importOffset": 1080,
 		"keyPaths": [
 			"openInWindow"
 		],
@@ -128,8 +128,8 @@ const migrations = [
 	},
 	{
 		"file": "packages/features/navigation/frontend/ui/universal.vue",
-		"sha256": "c503697a956327847b829ea71207385bb74f46c7671c5434dcbec9672bc09498",
-		"importOffset": 2390,
+		"sha256": "f4d760fcfc49b1cbec4a4ee176158d5550c1a0fc5fbc7b6972c402e7addcf545",
+		"importOffset": 2438,
 		"keyPaths": [
 			"openInWindow"
 		],
@@ -272,8 +272,8 @@ const migrations = [
 	},
 	{
 		"file": "packages/features/federation/frontend/widgets/WidgetFederation.vue",
-		"sha256": "9c97d5c66c0fb1c1a7614db70f78a0eadc4487840a19847cab7c13ecc2abe745",
-		"importOffset": 1693,
+		"sha256": "035546dca49d7819ae12ef2b51b3b7d5658d7a30f9810a8a8e87f88fcfc66556",
+		"importOffset": 1716,
 		"keyPaths": [
 			"_widgets.federation",
 			"_widgetOptions.showHeader"
@@ -627,8 +627,8 @@ const migrations = [
 	},
 	{
 		"file": "packages/features/discovery/frontend/widgets/WidgetTrends.vue",
-		"sha256": "c7274b495c108f13c5c1694243b40d93064451d65bf307bec460ccd1292a9199",
-		"importOffset": 1531,
+		"sha256": "ad1fdc96ee680a4dc4a3df7a7c475a5df08ce8575ced3b72b5e1d29c4804a211",
+		"importOffset": 1554,
 		"keyPaths": [
 			"_widgets.trends",
 			"nUsersMentioned",
@@ -726,8 +726,8 @@ const migrations = [
 	},
 	{
 		"file": "packages/features/media/frontend/widgets/WidgetSlideshow.vue",
-		"sha256": "e875abfd65807ce6164e26a57569de3e0fc2f1a54c867989b4c3496d42cd6b0e",
-		"importOffset": 1147,
+		"sha256": "79ec3a6a63a50be196d5a671aafc7f7f278069ed79fe056fd46075092dc5675b",
+		"importOffset": 1170,
 		"keyPaths": [
 			"folder",
 			"nothing",
@@ -1202,8 +1202,8 @@ const migrations = [
 	},
 	{
 		"file": "packages/features/operations/frontend/pages/admin/job-queue.vue",
-		"sha256": "ae5e366a4daf960aa5eec47bae94c3607ab209adaac03ee60b27397662e3cc1e",
-		"importOffset": 6659,
+		"sha256": "4846839c7db8dfb369ccbfb237af0dc2aa234bcb9957ab36307e7b5247930daa",
+		"importOffset": 6682,
 		"keyPaths": [
 			"search",
 			"areYouSure",
@@ -1427,8 +1427,8 @@ const migrations = [
 	},
 	{
 		"file": "packages/features/preferences/frontend/pages/settings/custom-css.vue",
-		"sha256": "4caa7a32f01a0a03cc1a908957ac6a265f335a01c7e23fb8b22121e54b16c537",
-		"importOffset": 818,
+		"sha256": "3568b5f2d3844dfd5f128132077f086f3fa4d62ad792f192064941d60d84fcbb",
+		"importOffset": 843,
 		"keyPaths": [
 			"customCssWarn",
 			"customCssIsDisabledBecauseSafeMode",
@@ -1754,7 +1754,7 @@ describe('expanded literal SFC-local locale migration', () => {
 		const component = compileComponent(file, {
 			'@features/markup/frontend/components/MkCodeEditor.vue': { default: editor },
 			'@features/ui/frontend/components/MkInfo.vue': { default: slotContainer },
-			'@@/js/config.js': { isSafeMode: true },
+			'@features/boot/frontend/shared/config.js': { isSafeMode: true },
 			'@features/ui/frontend/os.js': { confirm: confirmation },
 			'@features/runtime/frontend/utility/unison-reload.js': { unisonReload: reload },
 			'@features/preferences/frontend/local-storage.js': { miLocalStorage: { getItem: () => 'initial', setItem } },

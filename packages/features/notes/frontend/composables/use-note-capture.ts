@@ -6,7 +6,7 @@
 import { onUnmounted, reactive } from 'vue';
 import * as Misskey from 'misskey-js';
 import { EventEmitter } from 'eventemitter3';
-import { createVisibilityAwareInterval } from '@@/js/interval.js';
+import { createVisibilityAwareInterval } from '@features/ui/frontend/shared/interval.js';
 import type { Reactive } from 'vue';
 import type { NoteUpdatedEvent } from 'misskey-js/streaming.types.js';
 import { useStream } from '@features/api/frontend/stream.js';

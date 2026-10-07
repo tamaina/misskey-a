@@ -209,7 +209,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script lang="ts" setup>
 import { computed, defineAsyncComponent, watch, ref, markRaw } from 'vue';
 import * as Misskey from 'misskey-js';
-import { url } from '@@/js/config.js';
+import { url } from '@features/boot/frontend/shared/config.js';
 import type { ChartSrc } from '@features/statistics/frontend/components/MkChart.vue';
 import MkChart from '@features/statistics/frontend/components/MkChart.vue';
 import MkObjectView from '@features/ui/frontend/components/MkObjectView.vue';

@@ -50,7 +50,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import { computed } from 'vue';
-import { isLink } from '@@/js/is-link.js';
+import { isLink } from '@features/ui/frontend/shared/is-link.js';
 import type { UploaderItem } from '@features/drive/frontend/composables/use-uploader.js';
 import { getUploadName } from '@features/drive/frontend/composables/use-uploader.js';
 import { interpolateLocaleParameters } from '@features/runtime/frontend/interpolate-locale-parameters.js';

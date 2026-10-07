@@ -106,7 +106,7 @@ import { defineAsyncComponent, ref, TransitionGroup } from 'vue';
 import * as Misskey from 'misskey-js';
 import { swInject } from '@features/boot/frontend/ui/_common_/sw-inject.js';
 import XNotification from '@features/notifications/frontend/ui/_common_/notification.vue';
-import { isSafeMode } from '@@/js/config.js';
+import { isSafeMode } from '@features/boot/frontend/shared/config.js';
 import { popups } from '@features/ui/frontend/os.js';
 import { unisonReload } from '@features/runtime/frontend/utility/unison-reload.js';
 import { miLocalStorage } from '@features/preferences/frontend/local-storage.js';

@@ -207,10 +207,10 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script lang="ts" setup>
 import { computed, ref, watch } from 'vue';
 import JSON5 from 'json5';
-import defaultLightTheme from '@@/themes/l-light.json5';
-import defaultDarkTheme from '@@/themes/d-green-lime.json5';
-import { isSafeMode } from '@@/js/config.js';
-import type { Theme } from '@@/js/theme.js';
+import defaultLightTheme from '@features/preferences/frontend/themes/l-light.json5';
+import defaultDarkTheme from '@features/preferences/frontend/themes/d-green-lime.json5';
+import { isSafeMode } from '@features/boot/frontend/shared/config.js';
+import type { Theme } from '@features/preferences/frontend/shared/theme.js';
 import * as os from '@features/ui/frontend/os.js';
 import MkSwitch from '@features/ui/frontend/components/MkSwitch.vue';
 import FormSection from '@features/ui/frontend/components/form/section.vue';
@@ -219,7 +219,7 @@ import MkFolder from '@features/ui/frontend/components/MkFolder.vue';
 import MkThemePreview from '@features/preferences/frontend/components/MkThemePreview.vue';
 import MkInfo from '@features/ui/frontend/components/MkInfo.vue';
 import { handleThemeInstallError, installTheme, removeTheme } from '@features/preferences/frontend/theme.js';
-import { getBuiltinThemes } from '@@/js/theme.js';
+import { getBuiltinThemes } from '@features/preferences/frontend/shared/theme.js';
 import { isDeviceDarkmode } from '@features/ui/frontend/utility/is-device-darkmode.js';
 import { store } from '@features/preferences/frontend/store.js';
 import { interpolateLocaleParameters } from '@features/runtime/frontend/interpolate-locale-parameters.js';

@@ -41,10 +41,10 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script setup lang="ts">
 import { ref, watch } from 'vue';
-import lightTheme from '@@/themes/_light.json5';
-import darkTheme from '@@/themes/_dark.json5';
-import type { Theme } from '@@/js/theme.js';
-import { compile } from '@@/js/theme.js';
+import lightTheme from '@features/preferences/frontend/themes/_light.json5';
+import darkTheme from '@features/preferences/frontend/themes/_dark.json5';
+import type { Theme } from '@features/preferences/frontend/shared/theme.js';
+import { compile } from '@features/preferences/frontend/shared/theme.js';
 import { deepClone } from '@features/runtime/frontend/utility/clone.js';
 
 const props = defineProps<{

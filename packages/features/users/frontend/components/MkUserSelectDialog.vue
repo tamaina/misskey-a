@@ -63,7 +63,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script lang="ts" setup>
 import { onMounted, ref, computed, useTemplateRef } from 'vue';
 import * as Misskey from 'misskey-js';
-import { host as currentHost, hostname } from '@@/js/config.js';
+import { host as currentHost, hostname } from '@features/boot/frontend/shared/config.js';
 import MkInput from '@features/ui/frontend/components/MkInput.vue';
 import FormSplit from '@features/ui/frontend/components/form/split.vue';
 import MkModalWindow from '@features/ui/frontend/components/MkModalWindow.vue';

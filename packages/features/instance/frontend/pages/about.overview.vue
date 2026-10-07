@@ -126,7 +126,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { host, version } from '@@/js/config.js';
+import { host, version } from '@features/boot/frontend/shared/config.js';
 import { interpolateLocaleParameters } from '@features/runtime/frontend/interpolate-locale-parameters.js';
 import { instance } from '@features/instance/frontend/instance.js';
 import number from '@features/ui/frontend/filters/number.js';

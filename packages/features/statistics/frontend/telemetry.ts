@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { apiUrl } from '@@/js/config.js';
+import { apiUrl } from '@features/boot/frontend/shared/config.js';
 import type { App } from 'vue';
 import type * as Misskey from 'misskey-js';
 

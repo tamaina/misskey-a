@@ -96,7 +96,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import { nextTick, ref, computed } from 'vue';
-import { isSafeMode } from '@@/js/config.js';
+import { isSafeMode } from '@features/boot/frontend/shared/config.js';
 import type { Plugin } from '@features/integrations/frontend/plugin.js';
 import FormLink from '@features/ui/frontend/components/form/link.vue';
 import MkSwitch from '@features/ui/frontend/components/MkSwitch.vue';

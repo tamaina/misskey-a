@@ -65,7 +65,7 @@ import { computed, onDeactivated, onUnmounted, ref, watch, shallowRef, defineAsy
 import * as Misskey from 'misskey-js';
 import { utils } from '@syuilo/aiscript';
 import { compareVersions } from 'compare-versions';
-import { url } from '@@/js/config.js';
+import { url } from '@features/boot/frontend/shared/config.js';
 import type { Ref } from 'vue';
 import type { AsUiComponent, AsUiRoot } from '@features/play/frontend/services/aiscript/ui.js';
 import type { MenuItem } from '@features/navigation/frontend/types/menu.js';

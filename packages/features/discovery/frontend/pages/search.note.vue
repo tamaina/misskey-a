@@ -119,7 +119,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import { computed, markRaw, ref, shallowRef, toRef } from 'vue';
-import { host as localHost } from '@@/js/config.js';
+import { host as localHost } from '@features/boot/frontend/shared/config.js';
 import type * as Misskey from 'misskey-js';
 import { $i } from '@features/auth/frontend/i.js';
 import { instance } from '@features/instance/frontend/instance.js';

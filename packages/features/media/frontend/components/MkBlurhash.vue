@@ -18,7 +18,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script lang="ts">
 import DrawBlurhash from '@features/media/frontend/workers/draw-blurhash?worker';
 import TestWebGL2 from '@features/media/frontend/workers/test-webgl2?worker';
-import { WorkerMultiDispatch } from '@@/js/worker-multi-dispatch.js';
+import { WorkerMultiDispatch } from '@features/media/frontend/shared/worker-multi-dispatch.js';
 
 // テスト環境で Web Worker インスタンスは作成できない
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -57,7 +57,7 @@ const canvasPromise = new Promise<WorkerMultiDispatch | HTMLCanvasElement>(resol
 <script lang="ts" setup>
 import { watch, ref, shallowRef, useTemplateRef, onMounted, onUnmounted } from 'vue';
 import { genId } from '@features/runtime/frontend/utility/id.js';
-import { extractAvgColorFromBlurhash } from '@@/js/extract-avg-color-from-blurhash.js';
+import { extractAvgColorFromBlurhash } from '@features/media/frontend/shared/extract-avg-color-from-blurhash.js';
 
 const props = withDefaults(defineProps<{
 	blurhash: string | null;

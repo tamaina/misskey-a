@@ -4,7 +4,7 @@
  */
 
 import { onActivated, onDeactivated, onMounted, onUnmounted } from 'vue';
-import { createVisibilityAwareInterval } from './interval.js';
+import { createVisibilityAwareInterval } from '@features/ui/frontend/shared/interval.js';
 
 export function useInterval(fn: () => void, interval: number, options: {
 	immediate: boolean;

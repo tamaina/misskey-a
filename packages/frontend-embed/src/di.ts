@@ -5,8 +5,8 @@
 
 import type { InjectionKey } from 'vue';
 import * as Misskey from 'misskey-js';
-import { MediaProxy } from '@@/js/media-proxy.js';
-import type { ParsedEmbedParams } from '@@/js/embed-page.js';
+import { MediaProxy } from '@features/media/frontend/shared/media-proxy.js';
+import type { ParsedEmbedParams } from '@features/web/frontend/shared/embed-page.js';
 import type { ServerContext } from '@/server-context.js';
 
 export const DI = {

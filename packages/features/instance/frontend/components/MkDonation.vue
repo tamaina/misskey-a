@@ -38,7 +38,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script lang="ts" setup>
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import MkLink from '@features/navigation/frontend/components/MkLink.vue';
-import { host } from '@@/js/config.js';
+import { host } from '@features/boot/frontend/shared/config.js';
 import { i18n } from '@features/runtime/frontend/i18n.js';
 import * as os from '@features/ui/frontend/os.js';
 import { miLocalStorage } from '@features/preferences/frontend/local-storage.js';

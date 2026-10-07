@@ -5,8 +5,8 @@
 
 import { markRaw } from 'vue';
 import * as Misskey from 'misskey-js';
-import { prefersReducedMotion } from '@@/js/config.js';
-import { hemisphere } from '@@/js/intl-const.js';
+import { prefersReducedMotion } from '@features/boot/frontend/shared/config.js';
+import { hemisphere } from '@features/ui/frontend/shared/intl-const.js';
 import type { DeviceKind } from '@features/ui/frontend/utility/device-kind.js';
 import type { TIPS } from '@features/web/frontend/tips.js';
 import { Pizzax } from '@features/preferences/frontend/utility/pizzax.js';

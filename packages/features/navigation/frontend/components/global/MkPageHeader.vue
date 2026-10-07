@@ -59,7 +59,7 @@ export type PageHeaderProps = {
 
 <script lang="ts" setup>
 import { onMounted, onUnmounted, ref, inject, useTemplateRef, computed } from 'vue';
-import { scrollToTop } from '@@/js/scroll.js';
+import { scrollToTop } from '@features/ui/frontend/shared/scroll.js';
 import XTabs from '@features/navigation/frontend/components/global/MkPageHeader.tabs.vue';
 import { getAccountMenu } from '@features/auth/frontend/accounts.js';
 import { deviceKind } from '@features/ui/frontend/utility/device-kind.js';

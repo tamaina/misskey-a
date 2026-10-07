@@ -84,8 +84,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import { computed, defineAsyncComponent, onDeactivated, onUnmounted, ref } from 'vue';
-import { url as local } from '@@/js/config.js';
-import { versatileLang } from '@@/js/intl-const.js';
+import { url as local } from '@features/boot/frontend/shared/config.js';
+import { versatileLang } from '@features/ui/frontend/shared/intl-const.js';
 import type { SummalyResult } from '@misskey-dev/summaly';
 import * as os from '@features/ui/frontend/os.js';
 import { deviceKind } from '@features/ui/frontend/utility/device-kind.js';
@@ -93,7 +93,7 @@ import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import { transformPlayerUrl } from '@features/markup/frontend/utility/url-preview.js';
 import { store } from '@features/preferences/frontend/store.js';
 import { prefer } from '@features/preferences/frontend/preferences.js';
-import { maybeMakeRelative } from '@@/js/url.js';
+import { maybeMakeRelative } from '@features/web/frontend/shared/url.js';
 
 const props = withDefaults(defineProps<{
 	url: string;

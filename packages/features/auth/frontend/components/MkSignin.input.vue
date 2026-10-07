@@ -56,8 +56,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 import { ref } from 'vue';
 import { toUnicode } from 'punycode.js';
 
-import { query, extractDomain } from '@@/js/url.js';
-import { host as configHost } from '@@/js/config.js';
+import { query, extractDomain } from '@features/web/frontend/shared/url.js';
+import { host as configHost } from '@features/boot/frontend/shared/config.js';
 import type { OpenOnRemoteOptions } from '@features/auth/frontend/utility/please-login.js';
 import * as os from '@features/ui/frontend/os.js';
 

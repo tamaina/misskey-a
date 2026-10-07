@@ -4,7 +4,7 @@
  */
 
 import { BroadcastChannel } from 'broadcast-channel';
-import { createVisibilityAwareInterval } from '@@/js/interval.js';
+import { createVisibilityAwareInterval } from '@features/ui/frontend/shared/interval.js';
 import type { StorageProvider } from '@features/preferences/frontend/state/manager.js';
 import { cloudBackup } from '@features/preferences/frontend/state/utility.js';
 import { miLocalStorage } from '@features/preferences/frontend/local-storage.js';

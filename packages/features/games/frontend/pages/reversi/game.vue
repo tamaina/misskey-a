@@ -20,8 +20,8 @@ import { useStream } from '@features/api/frontend/stream.js';
 import { $i } from '@features/auth/frontend/i.js';
 import { useRouter } from '@features/navigation/frontend/router.js';
 import * as os from '@features/ui/frontend/os.js';
-import { url } from '@@/js/config.js';
-import { useInterval } from '@@/js/use-interval.js';
+import { url } from '@features/boot/frontend/shared/config.js';
+import { useInterval } from '@features/ui/frontend/shared/use-interval.js';
 
 const router = useRouter();
 

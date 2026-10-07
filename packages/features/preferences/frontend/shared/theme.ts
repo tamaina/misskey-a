@@ -5,7 +5,7 @@
 
 import tinycolor from 'tinycolor2';
 import JSON5 from 'json5';
-import lightTheme from '@@/themes/_light.json5';
+import lightTheme from '@features/preferences/frontend/themes/_light.json5';
 import type { BundledTheme } from 'shiki/themes';
 
 export type Theme = {
@@ -55,7 +55,7 @@ export const getBuiltinThemes = () => Promise.all(
 		'd-cherry',
 		'd-ice',
 		'd-u0',
-	].map(name => import(`@@/themes/${name}.json5`).then(({ default: _default }): Theme => _default)),
+	].map(name => import(`@features/preferences/frontend/themes/${name}.json5`).then(({ default: _default }): Theme => _default)),
 );
 
 function getThemeReferenceColor(theme: Theme, key: string, stack: string[], depth: number): tinycolor.Instance {

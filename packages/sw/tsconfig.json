@@ -10,8 +10,8 @@
 		"declaration": false,
 		"sourceMap": false,
 		"target": "ES2022",
-		"module": "nodenext",
-		"moduleResolution": "nodenext",
+		"module": "esnext",
+		"moduleResolution": "bundler",
 		"removeComments": false,
 		"skipLibCheck": true,
 		"noLib": false,
@@ -21,8 +21,19 @@
 		"resolveJsonModule": true,
 		"isolatedModules": true,
 		"paths": {
-			"@/*": ["./src/*"],
-			"@@/*": ["../frontend-shared/*"]
+			"@/*": [
+				"./src/*"
+			],
+			"@@/*": [
+				"../frontend-shared/*"
+			],
+			"@features/*": [
+				"../features/*/index.ts",
+				"../features/*"
+			],
+			"i18n": [
+				"./node_modules/i18n"
+			]
 		},
 		"typeRoots": [
 			"./node_modules/@types",

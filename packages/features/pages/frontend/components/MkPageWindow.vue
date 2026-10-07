@@ -29,7 +29,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import { computed, onMounted, onUnmounted, provide, ref, useTemplateRef, nextTick } from 'vue';
-import { url } from '@@/js/config.js';
+import { url } from '@features/boot/frontend/shared/config.js';
 import type { PageMetadata } from '@features/navigation/frontend/page.js';
 import RouterView from '@features/navigation/frontend/components/global/RouterView.vue';
 import MkWindow from '@features/ui/frontend/components/MkWindow.vue';

@@ -17,7 +17,7 @@ import { createInternationalization } from 'virtual:vite-vue-internationalizatio
 import { createComponentLocale } from 'vite-vue-internationalization/runtime';
 import { languages, locales } from 'i18n';
 import { interpolateLocaleParameters } from '@features/runtime/frontend/interpolate-locale-parameters.js';
-import { I18n } from '../../../frontend-shared/js/i18n.js';
+import { I18n } from '@features/runtime/frontend/shared/i18n.js';
 import { applyWithLocale } from '../../../frontend-builder/locale-inliner/apply-with-locale.js';
 import { blankLogger } from '../../../frontend-builder/logger.js';
 import { pluginVvi } from '../../lib/vite-plugin-vvi.js';

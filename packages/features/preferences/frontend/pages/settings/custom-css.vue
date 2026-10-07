@@ -19,7 +19,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 import { ref, watch, computed } from 'vue';
 import MkCodeEditor from '@features/markup/frontend/components/MkCodeEditor.vue';
 import FormInfo from '@features/ui/frontend/components/MkInfo.vue';
-import { isSafeMode } from '@@/js/config.js';
+import { isSafeMode } from '@features/boot/frontend/shared/config.js';
 import * as os from '@features/ui/frontend/os.js';
 import { unisonReload } from '@features/runtime/frontend/utility/unison-reload.js';
 import { definePage } from '@features/navigation/frontend/page.js';

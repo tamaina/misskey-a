@@ -69,7 +69,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 import QrScanner from 'qr-scanner';
 import { onActivated, onDeactivated, onMounted, onUnmounted, ref, shallowRef, useTemplateRef, watch } from 'vue';
 import * as misskey from 'misskey-js';
-import { getScrollContainer } from '@@/js/scroll.js';
+import { getScrollContainer } from '@features/ui/frontend/shared/scroll.js';
 import type { ApShowResponse } from 'misskey-js/entities.js';
 import * as os from '@features/ui/frontend/os.js';
 import MkUserInfo from '@features/users/frontend/components/MkUserInfo.vue';

@@ -195,8 +195,8 @@ import { computed, onDeactivated, onMounted, onUnmounted, ref, shallowRef, watch
 import * as Matter from 'matter-js';
 import * as Misskey from 'misskey-js';
 import { DropAndFusionGame } from 'misskey-bubble-game';
-import { useInterval } from '@@/js/use-interval.js';
-import { apiUrl } from '@@/js/config.js';
+import { useInterval } from '@features/ui/frontend/shared/use-interval.js';
+import { apiUrl } from '@features/boot/frontend/shared/config.js';
 import type { Mono } from 'misskey-bubble-game';
 import { definePage } from '@features/navigation/frontend/page.js';
 import MkRippleEffect from '@features/ui/frontend/components/MkRippleEffect.vue';

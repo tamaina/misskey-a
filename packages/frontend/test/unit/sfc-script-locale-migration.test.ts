@@ -14,7 +14,7 @@ import { describe, expect, test, vi } from 'vitest';
 import { getLocaleMessageNamedKeys } from 'vite-vue-internationalization';
 import * as VviRuntime from 'vite-vue-internationalization/runtime';
 import { languages, locales } from 'i18n';
-import { I18n } from '@@/js/i18n.js';
+import { I18n } from '@features/runtime/frontend/shared/i18n.js';
 import { pluginVvi } from '../../lib/vite-plugin-vvi.js';
 import type { Component, ComputedRef } from 'vue';
 
@@ -283,7 +283,7 @@ describe('script and parameterized SFC-local locales', () => {
 			const copy = vi.fn();
 			const destination = Vue.ref('/before');
 			const link = compileComponent(linkFile, {
-				'@@/js/config.js': { url: 'https://example.test' },
+				'@features/boot/frontend/shared/config.js': { url: 'https://example.test' },
 				'@features/ui/frontend/os.js': { contextMenu, pageWindow: vi.fn() },
 				'@features/ui/frontend/utility/copy-to-clipboard.js': { copyToClipboard: copy },
 				'@features/navigation/frontend/router.js': { useRouter: () => ({ pushByPath: vi.fn() }) },

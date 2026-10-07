@@ -5,7 +5,7 @@
 
 import { ref } from 'vue';
 import { compareVersions } from 'compare-versions';
-import { isSafeMode } from '@@/js/config.js';
+import { isSafeMode } from '@features/boot/frontend/shared/config.js';
 import * as Misskey from 'misskey-js';
 import type { Parser, Interpreter, values, utils as utils_TypeReferenceOnly } from '@syuilo/aiscript';
 import type { FormWithDefault } from '@features/ui/frontend/utility/form.js';

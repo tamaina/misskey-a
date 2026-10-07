@@ -4,11 +4,11 @@
  */
 
 import * as Misskey from 'misskey-js';
-import { hemisphere } from '@@/js/intl-const.js';
-import { DEFAULT_EMOJIS } from '@@/js/const.js';
-import { prefersReducedMotion } from '@@/js/config.js';
+import { hemisphere } from '@features/ui/frontend/shared/intl-const.js';
+import { DEFAULT_EMOJIS } from '@features/emojis/frontend/shared/default-emojis.js';
+import { prefersReducedMotion } from '@features/boot/frontend/shared/config.js';
 import { definePreferences } from '@features/preferences/frontend/state/manager.js';
-import type { Theme } from '@@/js/theme.js';
+import type { Theme } from '@features/preferences/frontend/shared/theme.js';
 import type { SoundType } from '@features/preferences/frontend/utility/sound.js';
 import type { Plugin } from '@features/integrations/frontend/plugin.js';
 import type { DeviceKind } from '@features/ui/frontend/utility/device-kind.js';

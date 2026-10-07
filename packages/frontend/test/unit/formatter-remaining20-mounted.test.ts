@@ -11,17 +11,17 @@ import { createInternationalization } from 'virtual:vite-vue-internationalizatio
 import { locales } from 'i18n';
 import MkPollEditor from '@features/notes/frontend/components/MkPollEditor.vue';
 import MkTime from '@features/ui/frontend/components/global/MkTime.vue';
-import { lowresTime } from '@@/js/use-lowres-time.js';
+import { lowresTime } from '@features/ui/frontend/shared/use-lowres-time.js';
 import { interpolateLocaleParameters } from '@features/runtime/frontend/interpolate-locale-parameters.js';
 import type { PollEditorModelValue } from '@features/notes/frontend/components/MkPollEditor.vue';
 
 vi.mock('chromatic/isChromatic', () => ({ default: () => false }));
-vi.mock('@@/js/use-lowres-time.js', async () => {
+vi.mock('@features/ui/frontend/shared/use-lowres-time.js', async () => {
 	const { ref } = await import('vue');
 	const now = ref(Date.UTC(2026, 0, 1));
 	return { lowresTime: now, useLowresTime: () => now };
 });
-vi.mock('@@/js/intl-const.js', () => ({ dateTimeFormat: new Intl.DateTimeFormat('en-US', { dateStyle: 'short', timeStyle: 'short', timeZone: 'UTC' }) }));
+vi.mock('@features/ui/frontend/shared/intl-const.js', () => ({ dateTimeFormat: new Intl.DateTimeFormat('en-US', { dateStyle: 'short', timeStyle: 'short', timeZone: 'UTC' }) }));
 vi.mock('@features/ui/frontend/components/MkInput.vue', async () => {
 	const { defineComponent, h } = await import('vue');
 	return { default: defineComponent({ props: ['modelValue', 'placeholder', 'type'], emits: ['update:modelValue'], setup: (props, { emit, slots }) => () => h('label', [slots.label?.(), h('input', { value: props.modelValue, placeholder: props.placeholder, type: props.type ?? 'text', onInput: (event: Event) => emit('update:modelValue', (event.target as HTMLInputElement).value) })]) }) };

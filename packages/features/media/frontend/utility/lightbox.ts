@@ -2,7 +2,7 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-import { FILE_TYPE_BROWSERSAFE } from '@@/js/const.js';
+import { FILE_TYPE_BROWSERSAFE } from '@features/media/frontend/shared/browser-safe-file-types.js';
 
 export function isPreviewable(mime: string): boolean {
 	if (mime === 'image/svg+xml') return true; // svgのwebpublic/thumbnailはpngなのでtrue

@@ -17,7 +17,7 @@ import registerComponents from '@features/index/frontend/components.js';
 import registerDirectives from '@features/index/frontend/directives.js';
 import MkEmoji from '@features/emojis/frontend/components/global/MkEmoji.vue';
 import MkResult from '@features/ui/frontend/components/global/MkResult.vue';
-import { lang } from '@@/js/config.js';
+import { lang } from '@features/boot/frontend/shared/config.js';
 
 test('actual Storybook preview setup readies real component locales and installs once per app', async () => {
 	const setup = vi.fn<(callback: (app: App) => void) => void>();
@@ -40,7 +40,7 @@ test('actual Storybook preview setup readies real component locales and installs
 		'../../features/preferences/frontend/theme.js': { themeManager: { updateTheme: vi.fn() } },
 		'../../features/preferences/frontend/preferences.js': { prefer: { commit: vi.fn() } },
 		'../../features/ui/frontend/os.js': { popups: [] },
-		'../../frontend-shared/js/config.js': { lang },
+		'@features/boot/frontend/shared/config.js': { lang },
 	};
 	// Execute the actual preview's setup and guard. Only external Storybook,
 	// theme/widget and network collaborators are substituted; localization and

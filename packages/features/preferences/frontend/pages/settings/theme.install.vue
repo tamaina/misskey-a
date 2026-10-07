@@ -21,7 +21,7 @@ import { ref, computed } from 'vue';
 import MkCodeEditor from '@features/markup/frontend/components/MkCodeEditor.vue';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import { themeManager, installTheme, handleThemeInstallError } from '@features/preferences/frontend/theme.js';
-import { parseThemeCode } from '@@/js/theme.js';
+import { parseThemeCode } from '@features/preferences/frontend/shared/theme.js';
 import * as os from '@features/ui/frontend/os.js';
 import { interpolateLocaleParameters } from '@features/runtime/frontend/interpolate-locale-parameters.js';
 import { definePage } from '@features/navigation/frontend/page.js';

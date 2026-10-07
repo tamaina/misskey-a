@@ -19,7 +19,7 @@ import { useWidgetPropsManager } from '../../../ui/frontend/widgets/widget.js';
 import type { WidgetComponentEmits, WidgetComponentExpose, WidgetComponentProps } from '../../../ui/frontend/widgets/widget.js';
 import type { FormWithDefault, GetFormResultType } from '@features/ui/frontend/utility/form.js';
 import { misskeyApiGet } from '@features/api/frontend/utility/misskey-api.js';
-import { useInterval } from '@@/js/use-interval.js';
+import { useInterval } from '@features/ui/frontend/shared/use-interval.js';
 import { i18n } from '@features/runtime/frontend/i18n.js';
 import number from '@features/ui/frontend/filters/number.js';
 

@@ -2,8 +2,8 @@
 	"$schema": "https://json.schemastore.org/tsconfig",
 	"compilerOptions": {
 		"target": "ES2022",
-		"module": "nodenext",
-		"moduleResolution": "nodenext",
+		"module": "esnext",
+		"moduleResolution": "bundler",
 		"declaration": true,
 		"declarationMap": true,
 		"sourceMap": false,
@@ -18,10 +18,39 @@
 		"noImplicitReturns": true,
 		"esModuleInterop": true,
 		"verbatimModuleSyntax": true,
-		"rootDir": "./js",
+		"rootDir": "..",
 		"paths": {
-			"@/*": ["./*"],
-			"@@/*": ["./*"]
+			"@/*": [
+				"./*"
+			],
+			"@@/*": [
+				"./*"
+			],
+			"@features/*": [
+				"../features/*/index.ts",
+				"../features/*"
+			],
+			"i18n": [
+				"./node_modules/i18n"
+			],
+			"vue": [
+				"./node_modules/vue"
+			],
+			"misskey-js": [
+				"./node_modules/misskey-js"
+			],
+			"json5": [
+				"./node_modules/json5"
+			],
+			"tinycolor2": [
+				"./node_modules/@types/tinycolor2"
+			],
+			"shiki/themes": [
+				"./node_modules/shiki/dist/themes.d.mts"
+			],
+			"@misskey-dev/emoji-data/emojilist.json": [
+				"./node_modules/@misskey-dev/emoji-data/built/emojilist.json"
+			]
 		},
 		"typeRoots": [
 			"./@types",
@@ -34,7 +63,7 @@
 	},
 	"include": [
 		"@types/**/*.ts",
-		"js/**/*"
+		"../features/*/frontend/shared/**/*.ts"
 	],
 	"exclude": [
 		"node_modules",

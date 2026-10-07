@@ -7,11 +7,11 @@
 
 import { ref, nextTick } from 'vue';
 import { EventEmitter } from 'eventemitter3';
-import lightTheme from '@@/themes/_light.json5';
-import darkTheme from '@@/themes/_dark.json5';
-import { version } from '@@/js/config.js';
-import { getBuiltinThemes, parseThemeCode, themeProps, compile } from '@@/js/theme.js';
-import type { Theme, CompiledTheme } from '@@/js/theme.js';
+import lightTheme from '@features/preferences/frontend/themes/_light.json5';
+import darkTheme from '@features/preferences/frontend/themes/_dark.json5';
+import { version } from '@features/boot/frontend/shared/config.js';
+import { getBuiltinThemes, parseThemeCode, themeProps, compile } from '@features/preferences/frontend/shared/theme.js';
+import type { Theme, CompiledTheme } from '@features/preferences/frontend/shared/theme.js';
 import { deepClone } from '@features/runtime/frontend/utility/clone.js';
 import { miLocalStorage } from '@features/preferences/frontend/local-storage.js';
 import { $i } from '@features/auth/frontend/i.js';

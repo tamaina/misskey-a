@@ -1,7 +1,7 @@
 [
 	{
 		"file": "packages/features/notes/frontend/pages/note.vue",
-		"originalSha256": "15efb6e8c3bd7e53478f1493b1df3cd03ca9b2447c5cdba6743cf7e886745be7",
+		"originalSha256": "2c56ce064958c21910a567577623a5d293a3164775d8298d1eab5c50f56ec386",
 		"edits": [
 			{
 				"start": 1379,
@@ -14,51 +14,51 @@
 				"afterStart": 1379
 			},
 			{
-				"start": 2955,
-				"end": 3013,
+				"start": 2980,
+				"end": 3038,
 				"source": "import { i18n } from '@features/runtime/frontend/i18n.js';",
 				"replacement": "import { interpolateLocaleParameters } from '@features/runtime/frontend/interpolate-locale-parameters.js';",
-				"afterStart": 2959
+				"afterStart": 2984
 			},
 			{
-				"start": 6152,
-				"end": 6205,
+				"start": 6177,
+				"end": 6230,
 				"source": "i18n.ts.thisContentsAreMarkedAsSigninRequiredByAuthor",
 				"replacement": "$locale.value.sfc.thisContentsAreMarkedAsSigninRequiredByAuthor",
 				"key": "thisContentsAreMarkedAsSigninRequiredByAuthor",
 				"kind": "ts",
 				"region": "script",
-				"afterStart": 6204
+				"afterStart": 6229
 			},
 			{
-				"start": 6208,
-				"end": 6240,
+				"start": 6233,
+				"end": 6265,
 				"source": "i18n.ts.signinOrContinueOnRemote",
 				"replacement": "$locale.value.sfc.signinOrContinueOnRemote",
 				"key": "signinOrContinueOnRemote",
 				"kind": "ts",
 				"region": "script",
-				"afterStart": 6270
+				"afterStart": 6295
 			},
 			{
-				"start": 6554,
-				"end": 6566,
+				"start": 6579,
+				"end": 6591,
 				"source": "i18n.ts.note",
 				"replacement": "$locale.value.sfc.note",
 				"key": "note",
 				"kind": "ts",
 				"region": "script",
-				"afterStart": 6626
+				"afterStart": 6651
 			},
 			{
-				"start": 6716,
-				"end": 6732,
+				"start": 6741,
+				"end": 6757,
 				"source": "i18n.tsx.noteOf(",
 				"replacement": "interpolateLocaleParameters($locale.value.sfc.noteOf, ",
 				"key": "noteOf",
 				"kind": "tsx",
 				"region": "script",
-				"afterStart": 6798
+				"afterStart": 6823
 			}
 		],
 		"keys": [
@@ -491,7 +491,7 @@
 	},
 	{
 		"file": "packages/features/notes/frontend/components/MkSubNoteContent.vue",
-		"originalSha256": "bb05ae2d2e31dbd4bcd62a766bbd00fea285dc5bf85267503ee9b62219d9e1b9",
+		"originalSha256": "b07af3969c09443c7342ba9beac2bd550f178d7ad770f1ea61e8482af49f56a3",
 		"edits": [
 			{
 				"start": 236,
@@ -564,11 +564,11 @@
 				"afterStart": 1629
 			},
 			{
-				"start": 1928,
-				"end": 1986,
+				"start": 1954,
+				"end": 2012,
 				"source": "import { i18n } from '@features/runtime/frontend/i18n.js';",
 				"replacement": "import { interpolateLocaleParameters } from '@features/runtime/frontend/interpolate-locale-parameters.js';",
-				"afterStart": 1984
+				"afterStart": 2010
 			}
 		],
 		"keys": [
@@ -871,104 +871,104 @@
 	},
 	{
 		"file": "packages/features/emojis/frontend/components/global/MkCustomEmoji.vue",
-		"originalSha256": "2f7954c8eef9be384981df1508657fd1a68b555a4cbf260cf6944070de7bd5a8",
+		"originalSha256": "e213068d2f0572e32c707219e3af7147c9726c435859de7d54cdddb694641bc0",
 		"edits": [
 			{
-				"start": 1566,
-				"end": 1624,
+				"start": 1593,
+				"end": 1651,
 				"source": "import { i18n } from '@features/runtime/frontend/i18n.js';",
 				"replacement": "import { interpolateLocaleParameters } from '@features/runtime/frontend/interpolate-locale-parameters.js';",
-				"afterStart": 1566
+				"afterStart": 1593
 			},
 			{
-				"start": 3762,
-				"end": 3774,
+				"start": 3789,
+				"end": 3801,
 				"source": "i18n.ts.copy",
 				"replacement": "$locale.value.sfc.copy",
 				"key": "copy",
 				"kind": "ts",
 				"region": "script",
-				"afterStart": 3810
+				"afterStart": 3837
 			},
 			{
-				"start": 3947,
-				"end": 3965,
+				"start": 3974,
+				"end": 3992,
 				"source": "i18n.ts.doReaction",
 				"replacement": "$locale.value.sfc.doReaction",
 				"key": "doReaction",
 				"kind": "ts",
 				"region": "script",
-				"afterStart": 4005
+				"afterStart": 4032
 			},
 			{
-				"start": 4143,
-				"end": 4155,
+				"start": 4170,
+				"end": 4182,
 				"source": "i18n.ts.info",
 				"replacement": "$locale.value.sfc.info",
 				"key": "info",
 				"kind": "ts",
 				"region": "script",
-				"afterStart": 4211
+				"afterStart": 4238
 			},
 			{
-				"start": 4491,
-				"end": 4510,
+				"start": 4518,
+				"end": 4537,
 				"source": "i18n.ts.emojiUnmute",
 				"replacement": "$locale.value.sfc.emojiUnmute",
 				"key": "emojiUnmute",
 				"kind": "ts",
 				"region": "script",
-				"afterStart": 4569
+				"afterStart": 4596
 			},
 			{
-				"start": 4644,
-				"end": 4661,
+				"start": 4671,
+				"end": 4688,
 				"source": "i18n.ts.emojiMute",
 				"replacement": "$locale.value.sfc.emojiMute",
 				"key": "emojiMute",
 				"kind": "ts",
 				"region": "script",
-				"afterStart": 4732
+				"afterStart": 4759
 			},
 			{
-				"start": 4808,
-				"end": 4833,
+				"start": 4835,
+				"end": 4860,
 				"source": "i18n.ts.addToEmojiPalette",
 				"replacement": "$locale.value.sfc.addToEmojiPalette",
 				"key": "addToEmojiPalette",
 				"kind": "ts",
 				"region": "script",
-				"afterStart": 4906
+				"afterStart": 4933
 			},
 			{
-				"start": 5062,
-				"end": 5074,
+				"start": 5089,
+				"end": 5101,
 				"source": "i18n.ts.edit",
 				"replacement": "$locale.value.sfc.edit",
 				"key": "edit",
 				"kind": "ts",
 				"region": "script",
-				"afterStart": 5170
+				"afterStart": 5197
 			},
 			{
-				"start": 5687,
-				"end": 5702,
+				"start": 5714,
+				"end": 5729,
 				"source": "i18n.tsx.muteX(",
 				"replacement": "interpolateLocaleParameters($locale.value.sfc.muteX, ",
 				"key": "muteX",
 				"kind": "tsx",
 				"region": "script",
-				"afterStart": 5805
+				"afterStart": 5832
 			},
 			{
-				"start": 5981,
-				"end": 5998,
+				"start": 6008,
+				"end": 6025,
 				"source": "i18n.tsx.unmuteX(",
 				"replacement": "interpolateLocaleParameters($locale.value.sfc.unmuteX, ",
 				"key": "unmuteX",
 				"kind": "tsx",
 				"region": "script",
-				"afterStart": 6137
+				"afterStart": 6164
 			}
 		],
 		"keys": [
@@ -1021,104 +1021,104 @@
 	},
 	{
 		"file": "packages/features/notes/frontend/components/MkReactionsViewer.reaction.vue",
-		"originalSha256": "c01cf24dc2afabc6da7d25cc61713b788983b2d9a89b6151d786c64d8805e894",
+		"originalSha256": "498438ef553da8ccf3e0450e596f1504602c2512895752f7954d5f14d7136fe9",
 		"edits": [
 			{
-				"start": 1711,
-				"end": 1769,
+				"start": 1765,
+				"end": 1823,
 				"source": "import { i18n } from '@features/runtime/frontend/i18n.js';",
 				"replacement": "import { interpolateLocaleParameters } from '@features/runtime/frontend/interpolate-locale-parameters.js';",
-				"afterStart": 1711
+				"afterStart": 1765
 			},
 			{
-				"start": 3657,
-				"end": 3686,
+				"start": 3711,
+				"end": 3740,
 				"source": "i18n.ts.changeReactionConfirm",
 				"replacement": "$locale.value.sfc.changeReactionConfirm",
 				"key": "changeReactionConfirm",
 				"kind": "ts",
 				"region": "script",
-				"afterStart": 3705
+				"afterStart": 3759
 			},
 			{
-				"start": 3689,
-				"end": 3718,
+				"start": 3743,
+				"end": 3772,
 				"source": "i18n.ts.cancelReactionConfirm",
 				"replacement": "$locale.value.sfc.cancelReactionConfirm",
 				"key": "cancelReactionConfirm",
 				"kind": "ts",
 				"region": "script",
-				"afterStart": 3747
+				"afterStart": 3801
 			},
 			{
-				"start": 4713,
-				"end": 4738,
+				"start": 4767,
+				"end": 4792,
 				"source": "i18n.tsx.reactAreYouSure(",
 				"replacement": "interpolateLocaleParameters($locale.value.sfc.reactAreYouSure, ",
 				"key": "reactAreYouSure",
 				"kind": "tsx",
 				"region": "script",
-				"afterStart": 4781
+				"afterStart": 4835
 			},
 			{
-				"start": 5702,
-				"end": 5714,
+				"start": 5756,
+				"end": 5768,
 				"source": "i18n.ts.info",
 				"replacement": "$locale.value.sfc.info",
 				"key": "info",
 				"kind": "ts",
 				"region": "script",
-				"afterStart": 5808
+				"afterStart": 5862
 			},
 			{
-				"start": 6050,
-				"end": 6069,
+				"start": 6104,
+				"end": 6123,
 				"source": "i18n.ts.emojiUnmute",
 				"replacement": "$locale.value.sfc.emojiUnmute",
 				"key": "emojiUnmute",
 				"kind": "ts",
 				"region": "script",
-				"afterStart": 6166
+				"afterStart": 6220
 			},
 			{
-				"start": 6171,
-				"end": 6188,
+				"start": 6225,
+				"end": 6242,
 				"source": "i18n.tsx.unmuteX(",
 				"replacement": "interpolateLocaleParameters($locale.value.sfc.unmuteX, ",
 				"key": "unmuteX",
 				"kind": "tsx",
 				"region": "script",
-				"afterStart": 6297
+				"afterStart": 6351
 			},
 			{
-				"start": 6415,
-				"end": 6432,
+				"start": 6469,
+				"end": 6486,
 				"source": "i18n.ts.emojiMute",
 				"replacement": "$locale.value.sfc.emojiMute",
 				"key": "emojiMute",
 				"kind": "ts",
 				"region": "script",
-				"afterStart": 6579
+				"afterStart": 6633
 			},
 			{
-				"start": 6532,
-				"end": 6547,
+				"start": 6586,
+				"end": 6601,
 				"source": "i18n.tsx.muteX(",
 				"replacement": "interpolateLocaleParameters($locale.value.sfc.muteX, ",
 				"key": "muteX",
 				"kind": "tsx",
 				"region": "script",
-				"afterStart": 6706
+				"afterStart": 6760
 			},
 			{
-				"start": 6790,
-				"end": 6815,
+				"start": 6844,
+				"end": 6869,
 				"source": "i18n.ts.addToEmojiPalette",
 				"replacement": "$locale.value.sfc.addToEmojiPalette",
 				"key": "addToEmojiPalette",
 				"kind": "ts",
 				"region": "script",
-				"afterStart": 7002
+				"afterStart": 7056
 			}
 		],
 		"keys": [
@@ -1171,7 +1171,7 @@
 	},
 	{
 		"file": "packages/features/relationships/frontend/components/MkFollowButton.vue",
-		"originalSha256": "a1fc908ad51b945f0ab3c646b90687e81e53470ee186a4361f038041656caad1",
+		"originalSha256": "bd859c1166cce1eee6137b13442cad339db2bf53322d592d13c13ffad80f8713",
 		"edits": [
 			{
 				"start": 469,
@@ -1234,41 +1234,41 @@
 				"afterStart": 1377
 			},
 			{
-				"start": 1810,
-				"end": 1868,
+				"start": 1835,
+				"end": 1893,
 				"source": "import { i18n } from '@features/runtime/frontend/i18n.js';",
 				"replacement": "import { interpolateLocaleParameters } from '@features/runtime/frontend/interpolate-locale-parameters.js';",
-				"afterStart": 1834
+				"afterStart": 1859
 			},
 			{
-				"start": 3383,
-				"end": 3408,
+				"start": 3408,
+				"end": 3433,
 				"source": "i18n.tsx.unfollowConfirm(",
 				"replacement": "interpolateLocaleParameters($locale.value.sfc.unfollowConfirm, ",
 				"key": "unfollowConfirm",
 				"kind": "tsx",
 				"region": "script",
-				"afterStart": 3455
+				"afterStart": 3480
 			},
 			{
-				"start": 3732,
-				"end": 3768,
+				"start": 3757,
+				"end": 3793,
 				"source": "i18n.tsx.cancelFollowRequestConfirm(",
 				"replacement": "interpolateLocaleParameters($locale.value.sfc.cancelFollowRequestConfirm, ",
 				"key": "cancelFollowRequestConfirm",
 				"kind": "tsx",
 				"region": "script",
-				"afterStart": 3842
+				"afterStart": 3867
 			},
 			{
-				"start": 4150,
-				"end": 4173,
+				"start": 4175,
+				"end": 4198,
 				"source": "i18n.tsx.followConfirm(",
 				"replacement": "interpolateLocaleParameters($locale.value.sfc.followConfirm, ",
 				"key": "followConfirm",
 				"kind": "tsx",
 				"region": "script",
-				"afterStart": 4298
+				"afterStart": 4323
 			}
 		],
 		"keys": [

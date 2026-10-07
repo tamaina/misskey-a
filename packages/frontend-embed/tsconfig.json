@@ -25,7 +25,9 @@
 		"verbatimModuleSyntax": true,
 		"paths": {
 			"@/*": ["./src/*"],
-			"@@/*": ["../frontend-shared/*"]
+			"shiki/themes": ["./node_modules/shiki/dist/themes.d.mts"],
+			"@@/*": ["../frontend-shared/*"],
+			"@features/*": ["../features/*/index.ts", "../features/*"]
 		},
 		"typeRoots": [
 			"./@types",

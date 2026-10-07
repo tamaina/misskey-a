@@ -12,7 +12,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import { computed } from 'vue';
-import { instanceName as localInstanceName } from '@@/js/config.js';
+import { instanceName as localInstanceName } from '@features/boot/frontend/shared/config.js';
 import type { CSSProperties } from 'vue';
 import { instance as localInstance } from '@features/instance/frontend/instance.js';
 import { getProxiedImageUrlNullable } from '@features/media/frontend/utility/media-proxy.js';

@@ -4,9 +4,9 @@
  */
 
 import { afterEach, assert, beforeEach, describe, test, vi } from 'vitest';
-import type { Theme } from '@@/js/theme.js';
-import lightTheme from '@@/themes/_light.json5';
-import darkTheme from '@@/themes/_dark.json5';
+import type { Theme } from '@features/preferences/frontend/shared/theme.js';
+import lightTheme from '@features/preferences/frontend/themes/_light.json5';
+import darkTheme from '@features/preferences/frontend/themes/_dark.json5';
 
 vi.mock('@features/runtime/frontend/i18n.js', () => ({
 	i18n: {

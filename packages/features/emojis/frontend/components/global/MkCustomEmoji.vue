@@ -38,7 +38,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import { computed, defineAsyncComponent, inject, ref } from 'vue';
-import { normalizeCustomEmojiName, isLocalCustomEmojiName, getCustomEmojiImagePath } from '@@/js/emoji-name.js';
+import { normalizeCustomEmojiName, isLocalCustomEmojiName, getCustomEmojiImagePath } from '@features/emojis/frontend/shared/emoji-name.js';
 import type { MenuItem } from '@features/navigation/frontend/types/menu.js';
 import { getProxiedImageUrl, getStaticImageUrl } from '@features/media/frontend/utility/media-proxy.js';
 import { customEmojisMap } from '@features/emojis/frontend/custom-emojis.js';

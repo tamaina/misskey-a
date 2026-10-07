@@ -7,7 +7,7 @@ import { get } from 'idb-keyval';
 import * as Misskey from 'misskey-js';
 import { FETCH_TIMEOUT_MS } from '@/const.js';
 import type { PushNotificationDataMap } from '@/types.js';
-import type { I18n } from '@@/js/i18n.js';
+import type { I18n } from '@features/runtime/frontend/shared/i18n.js';
 import type { Locale } from 'i18n';
 import { createEmptyNotification, createNotification } from '@/scripts/create-notification.js';
 import { swLang } from '@/scripts/lang.js';

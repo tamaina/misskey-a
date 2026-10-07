@@ -5,10 +5,10 @@
 
 // TODO: (可能な部分を)sharedに抽出して frontend と共通化
 
-import lightTheme from '@@/themes/_light.json5';
-import darkTheme from '@@/themes/_dark.json5';
-import { compile } from '@@/js/theme.js';
-import type { Theme } from '@@/js/theme.js';
+import lightTheme from '@features/preferences/frontend/themes/_light.json5';
+import darkTheme from '@features/preferences/frontend/themes/_dark.json5';
+import { compile } from '@features/preferences/frontend/shared/theme.js';
+import type { Theme } from '@features/preferences/frontend/shared/theme.js';
 
 let timeout: number | null = null;
 

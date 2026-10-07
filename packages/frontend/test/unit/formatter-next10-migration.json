@@ -528,8 +528,8 @@
 	},
 	{
 		"file": "packages/features/preferences/frontend/pages/theme-editor.vue",
-		"originalSha256": "d4b00d9c94dd3dcf57ea5d39731ed3804cb397f259803459e02cd7dfe5fd0bc0",
-		"migratedSha256": "f0cf0d64e14823dec5c85c1504afad1ff69c36f25c506f6d838b7c365c720319",
+		"originalSha256": "0ebc67befd316cbdb20a04d5b092744e761e1885489f7f7e21cd5960702ca7c1",
+		"migratedSha256": "af6423eb16604002a6b366363256bb6b0ad886e213162cec3a9f3f5ac15ec6de",
 		"edits": [
 			{
 				"start": 362,
@@ -612,71 +612,71 @@
 				"afterStart": 2652
 			},
 			{
-				"start": 3808,
-				"end": 3866,
+				"start": 3921,
+				"end": 3979,
 				"source": "import { i18n } from '@features/runtime/frontend/i18n.js';",
 				"replacement": "import { interpolateLocaleParameters } from '@features/runtime/frontend/interpolate-locale-parameters.js';",
-				"afterStart": 3836
+				"afterStart": 3949
 			},
 			{
-				"start": 7378,
-				"end": 7400,
+				"start": 7491,
+				"end": 7513,
 				"source": "i18n.ts._theme.invalid",
 				"replacement": "$locale.value.sfc.themeInvalid",
 				"key": "_theme.invalid",
 				"kind": "ts",
 				"region": "script",
-				"afterStart": 7454
+				"afterStart": 7567
 			},
 			{
-				"start": 7540,
-				"end": 7552,
+				"start": 7653,
+				"end": 7665,
 				"source": "i18n.ts.name",
 				"replacement": "$locale.value.sfc.name",
 				"key": "name",
 				"kind": "ts",
 				"region": "script",
-				"afterStart": 7624
+				"afterStart": 7737
 			},
 			{
-				"start": 7972,
-				"end": 7998,
+				"start": 8085,
+				"end": 8111,
 				"source": "i18n.tsx._theme.installed(",
 				"replacement": "interpolateLocaleParameters($locale.value.sfc.themeInstalled, ",
 				"key": "_theme.installed",
 				"kind": "tsx",
 				"region": "script",
-				"afterStart": 8066
+				"afterStart": 8179
 			},
 			{
-				"start": 8161,
-				"end": 8176,
+				"start": 8274,
+				"end": 8289,
 				"source": "i18n.ts.preview",
 				"replacement": "$locale.value.sfc.preview",
 				"key": "preview",
 				"kind": "ts",
 				"region": "script",
-				"afterStart": 8291
+				"afterStart": 8404
 			},
 			{
-				"start": 8256,
-				"end": 8270,
+				"start": 8369,
+				"end": 8383,
 				"source": "i18n.ts.saveAs",
 				"replacement": "$locale.value.sfc.saveAs",
 				"key": "saveAs",
 				"kind": "ts",
 				"region": "script",
-				"afterStart": 8396
+				"afterStart": 8509
 			},
 			{
-				"start": 8364,
-				"end": 8383,
+				"start": 8477,
+				"end": 8496,
 				"source": "i18n.ts.themeEditor",
 				"replacement": "$locale.value.sfc.themeEditor",
 				"key": "themeEditor",
 				"kind": "ts",
 				"region": "script",
-				"afterStart": 8514
+				"afterStart": 8627
 			}
 		],
 		"keys": [
@@ -754,8 +754,8 @@
 	},
 	{
 		"file": "packages/features/preferences/frontend/pages/settings/theme.vue",
-		"originalSha256": "1bf7a07ee306db3b309dee576131a3059b1afcbe4e3a755777cc61a8e7fc0c1b",
-		"migratedSha256": "a2dc81cdb42f8d1d45b54103adf296ec0e4a61ff9a282189d62f5445135e6546",
+		"originalSha256": "759a7950cf5075a3dd0b76bc7b7cbaff868c199ea90f09a81762df61af5e2bfd",
+		"migratedSha256": "34802db1b032af2adcf10276cababe15a6345eb137f0c3e69a127f1a2666e2a5",
 		"edits": [
 			{
 				"start": 156,
@@ -938,61 +938,61 @@
 				"afterStart": 9161
 			},
 			{
-				"start": 10326,
-				"end": 10384,
+				"start": 10471,
+				"end": 10529,
 				"source": "import { i18n } from '@features/runtime/frontend/i18n.js';",
 				"replacement": "import { interpolateLocaleParameters } from '@features/runtime/frontend/interpolate-locale-parameters.js';",
-				"afterStart": 10376
+				"afterStart": 10521
 			},
 			{
-				"start": 13211,
-				"end": 13265,
+				"start": 13356,
+				"end": 13410,
 				"source": "i18n.tsx.switchDarkModeManuallyWhenSyncEnabledConfirm(",
 				"replacement": "interpolateLocaleParameters($locale.value.sfc.switchDarkModeManuallyWhenSyncEnabledConfirm, ",
 				"key": "switchDarkModeManuallyWhenSyncEnabledConfirm",
 				"kind": "tsx",
 				"region": "script",
-				"afterStart": 13309
+				"afterStart": 13454
 			},
 			{
-				"start": 13270,
-				"end": 13296,
+				"start": 13415,
+				"end": 13441,
 				"source": "i18n.ts.syncDeviceDarkMode",
 				"replacement": "$locale.value.sfc.syncDeviceDarkMode",
 				"key": "syncDeviceDarkMode",
 				"kind": "ts",
 				"region": "script",
-				"afterStart": 13406
+				"afterStart": 13551
 			},
 			{
-				"start": 13951,
-				"end": 13979,
+				"start": 14096,
+				"end": 14124,
 				"source": "i18n.ts._theme.copyThemeCode",
 				"replacement": "$locale.value.sfc.themeCopyThemeCode",
 				"key": "_theme.copyThemeCode",
 				"kind": "ts",
 				"region": "script",
-				"afterStart": 14097
+				"afterStart": 14242
 			},
 			{
-				"start": 14097,
-				"end": 14111,
+				"start": 14242,
+				"end": 14256,
 				"source": "i18n.ts.delete",
 				"replacement": "$locale.value.sfc.delete",
 				"key": "delete",
 				"kind": "ts",
 				"region": "script",
-				"afterStart": 14251
+				"afterStart": 14396
 			},
 			{
-				"start": 14946,
-				"end": 14959,
+				"start": 15091,
+				"end": 15104,
 				"source": "i18n.ts.theme",
 				"replacement": "$locale.value.sfc.theme",
 				"key": "theme",
 				"kind": "ts",
 				"region": "script",
-				"afterStart": 15110
+				"afterStart": 15255
 			}
 		],
 		"keys": [
@@ -1090,8 +1090,8 @@
 	},
 	{
 		"file": "packages/features/preferences/frontend/pages/settings/theme.install.vue",
-		"originalSha256": "7ddde2eed763d496dfd78e6e194c9401895dba55e0455e2d8aa5be2f8e49c5e7",
-		"migratedSha256": "04a9676b4f96395a5663c54e166a0a97fb278ff7cfb2f10a6799c27c86c55d27",
+		"originalSha256": "4557ea5faa32718d4f93589178201145912985356cc9684ac823c7e476f6afb1",
+		"migratedSha256": "16f7ee0e32dc1e00d5ad17fbf6f0f5afa99a8773773bc70f233ab3aa5897f15b",
 		"edits": [
 			{
 				"start": 211,
@@ -1124,41 +1124,41 @@
 				"afterStart": 660
 			},
 			{
-				"start": 1137,
-				"end": 1195,
+				"start": 1169,
+				"end": 1227,
 				"source": "import { i18n } from '@features/runtime/frontend/i18n.js';",
 				"replacement": "import { interpolateLocaleParameters } from '@features/runtime/frontend/interpolate-locale-parameters.js';",
-				"afterStart": 1147
+				"afterStart": 1179
 			},
 			{
-				"start": 1596,
-				"end": 1618,
+				"start": 1628,
+				"end": 1650,
 				"source": "i18n.ts._theme.invalid",
 				"replacement": "$locale.value.sfc.themeInvalid",
 				"key": "_theme.invalid",
 				"kind": "ts",
 				"region": "script",
-				"afterStart": 1654
+				"afterStart": 1686
 			},
 			{
-				"start": 1823,
-				"end": 1849,
+				"start": 1855,
+				"end": 1881,
 				"source": "i18n.tsx._theme.installed(",
 				"replacement": "interpolateLocaleParameters($locale.value.sfc.themeInstalled, ",
 				"key": "_theme.installed",
 				"kind": "tsx",
 				"region": "script",
-				"afterStart": 1889
+				"afterStart": 1921
 			},
 			{
-				"start": 2116,
-				"end": 2138,
+				"start": 2148,
+				"end": 2170,
 				"source": "i18n.ts._theme.install",
 				"replacement": "$locale.value.sfc.themeInstall",
 				"key": "_theme.install",
 				"kind": "ts",
 				"region": "script",
-				"afterStart": 2218
+				"afterStart": 2250
 			}
 		],
 		"keys": [
@@ -2249,8 +2249,8 @@
 	},
 	{
 		"file": "packages/features/collections/frontend/pages/clip.vue",
-		"originalSha256": "9fa3cb048c8b3bad961884701f95592577df6992f3482ecb70635c9110393d53",
-		"migratedSha256": "45f7ef459040e6b06096d7b6edc416775d4f562a47a886136757ad7bfcf479fe",
+		"originalSha256": "9ed9a823e820bebc9364b17d500ba4610a5a3ebb822f7ab69ef2830a34aaa8fa",
+		"migratedSha256": "0b55e9b6cddb4dca1bc1091919a2d5739d64768c4136fc4688a9814b172b1e4c",
 		"edits": [
 			{
 				"start": 440,
@@ -2283,131 +2283,131 @@
 				"afterStart": 768
 			},
 			{
-				"start": 1734,
-				"end": 1792,
+				"start": 1759,
+				"end": 1817,
 				"source": "import { i18n } from '@features/runtime/frontend/i18n.js';",
 				"replacement": "import { interpolateLocaleParameters } from '@features/runtime/frontend/interpolate-locale-parameters.js';",
-				"afterStart": 1746
+				"afterStart": 1771
 			},
 			{
-				"start": 3628,
-				"end": 3653,
+				"start": 3653,
+				"end": 3678,
 				"source": "i18n.ts.unfavoriteConfirm",
 				"replacement": "$locale.value.sfc.unfavoriteConfirm",
 				"key": "unfavoriteConfirm",
 				"kind": "ts",
 				"region": "script",
-				"afterStart": 3688
+				"afterStart": 3713
 			},
 			{
-				"start": 3932,
-				"end": 3944,
+				"start": 3957,
+				"end": 3969,
 				"source": "i18n.ts.edit",
 				"replacement": "$locale.value.sfc.edit",
 				"key": "edit",
 				"kind": "ts",
 				"region": "script",
-				"afterStart": 4002
+				"afterStart": 4027
 			},
 			{
-				"start": 4126,
-				"end": 4138,
+				"start": 4151,
+				"end": 4163,
 				"source": "i18n.ts.name",
 				"replacement": "$locale.value.sfc.name",
 				"key": "name",
 				"kind": "ts",
 				"region": "script",
-				"afterStart": 4206
+				"afterStart": 4231
 			},
 			{
-				"start": 4289,
-				"end": 4308,
+				"start": 4314,
+				"end": 4333,
 				"source": "i18n.ts.description",
 				"replacement": "$locale.value.sfc.description",
 				"key": "description",
 				"kind": "ts",
 				"region": "script",
-				"afterStart": 4379
+				"afterStart": 4404
 			},
 			{
-				"start": 4400,
-				"end": 4414,
+				"start": 4425,
+				"end": 4439,
 				"source": "i18n.ts.public",
 				"replacement": "$locale.value.sfc.public",
 				"key": "public",
 				"kind": "ts",
 				"region": "script",
-				"afterStart": 4500
+				"afterStart": 4525
 			},
 			{
-				"start": 4660,
-				"end": 4673,
+				"start": 4685,
+				"end": 4698,
 				"source": "i18n.ts.share",
 				"replacement": "$locale.value.sfc.share",
 				"key": "share",
 				"kind": "ts",
 				"region": "script",
-				"afterStart": 4770
+				"afterStart": 4795
 			},
 			{
-				"start": 4789,
-				"end": 4804,
+				"start": 4814,
+				"end": 4829,
 				"source": "i18n.ts.copyUrl",
 				"replacement": "$locale.value.sfc.copyUrl",
 				"key": "copyUrl",
 				"kind": "ts",
 				"region": "script",
-				"afterStart": 4909
+				"afterStart": 4934
 			},
 			{
-				"start": 4925,
-				"end": 4938,
+				"start": 4950,
+				"end": 4963,
 				"source": "i18n.ts.embed",
 				"replacement": "$locale.value.sfc.embed",
 				"key": "embed",
 				"kind": "ts",
 				"region": "script",
-				"afterStart": 5055
+				"afterStart": 5080
 			},
 			{
-				"start": 5096,
-				"end": 5109,
+				"start": 5121,
+				"end": 5134,
 				"source": "i18n.ts.share",
 				"replacement": "$locale.value.sfc.share",
 				"key": "share",
 				"kind": "ts",
 				"region": "script",
-				"afterStart": 5236
+				"afterStart": 5261
 			},
 			{
-				"start": 5437,
-				"end": 5451,
+				"start": 5462,
+				"end": 5476,
 				"source": "i18n.ts.delete",
 				"replacement": "$locale.value.sfc.delete",
 				"key": "delete",
 				"kind": "ts",
 				"region": "script",
-				"afterStart": 5587
+				"afterStart": 5612
 			},
 			{
-				"start": 5613,
-				"end": 5639,
+				"start": 5638,
+				"end": 5664,
 				"source": "i18n.tsx.deleteAreYouSure(",
 				"replacement": "interpolateLocaleParameters($locale.value.sfc.deleteAreYouSure, ",
 				"key": "deleteAreYouSure",
 				"kind": "tsx",
 				"region": "script",
-				"afterStart": 5773
+				"afterStart": 5798
 			},
 			{
-				"start": 5897,
-				"end": 5909,
+				"start": 5922,
+				"end": 5934,
 				"source": "i18n.ts.clip",
 				"replacement": "$locale.value.sfc.clip",
 				"key": "clip",
 				"kind": "ts",
 				"region": "script",
-				"afterStart": 6095
+				"afterStart": 6120
 			}
 		],
 		"keys": [

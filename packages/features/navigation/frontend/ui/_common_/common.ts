@@ -4,7 +4,7 @@
  */
 
 import { defineAsyncComponent } from 'vue';
-import { host } from '@@/js/config.js';
+import { host } from '@features/boot/frontend/shared/config.js';
 import type { MenuItem } from '@features/navigation/frontend/types/menu.js';
 import * as os from '@features/ui/frontend/os.js';
 import { instance } from '@features/instance/frontend/instance.js';

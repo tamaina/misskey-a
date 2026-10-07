@@ -3,9 +3,9 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 import { defineAsyncComponent } from 'vue';
-import { url } from '@@/js/config.js';
-import { defaultEmbedParams, embedRouteWithScrollbar } from '@@/js/embed-page.js';
-import type { EmbedParams, EmbeddableEntity } from '@@/js/embed-page.js';
+import { url } from '@features/boot/frontend/shared/config.js';
+import { defaultEmbedParams, embedRouteWithScrollbar } from '@features/web/frontend/shared/embed-page.js';
+import type { EmbedParams, EmbeddableEntity } from '@features/web/frontend/shared/embed-page.js';
 import { genId } from '@features/runtime/frontend/utility/id.js';
 import * as os from '@features/ui/frontend/os.js';
 import { copyToClipboard } from '@features/ui/frontend/utility/copy-to-clipboard.js';

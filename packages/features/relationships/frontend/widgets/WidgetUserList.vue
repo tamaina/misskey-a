@@ -32,7 +32,7 @@ import type { FormWithDefault, GetFormResultType } from '@features/ui/frontend/u
 import MkContainer from '@features/ui/frontend/components/MkContainer.vue';
 import * as os from '@features/ui/frontend/os.js';
 import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
-import { useInterval } from '@@/js/use-interval.js';
+import { useInterval } from '@features/ui/frontend/shared/use-interval.js';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 
 const name = 'userList';
