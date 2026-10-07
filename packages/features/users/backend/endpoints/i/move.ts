@@ -19,7 +19,7 @@ import { GetterService } from '@features/api/backend/transport/GetterService.js'
 import { ApPersonService } from '@features/federation/backend/services/ApPersonService.js';
 import { UserEntityService } from '../../serializers/UserEntityService.js';
 
-import * as Acct from '@/misc/acct.js';
+import * as Acct from '@features/federation/backend/utility/acct.js';
 import { DI } from '@/di-symbols.js';
 import { MiMeta } from '@features/persistence/backend/repositories/models.js';
 

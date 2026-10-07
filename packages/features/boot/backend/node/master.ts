@@ -13,7 +13,7 @@ import { loadConfig } from '@/config.js';
 import type { Config } from '@/config.js';
 import { configureLogging, shutdownLogging } from '@features/runtime/backend/logging/logging-runtime.js';
 import type { LogFormat } from '@features/runtime/backend/logging/types.js';
-import { showMachineInfo } from '@/misc/show-machine-info.js';
+import { showMachineInfo } from '@features/operations/backend/utility/show-machine-info.js';
 import { envOption } from '@/env.js';
 import { initTelemetry, shutdownTelemetry } from '@/core/telemetry/telemetry-registry.js';
 import { initExtraThreadPool, acquireLegacyRole } from './common.js';

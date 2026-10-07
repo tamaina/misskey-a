@@ -9,7 +9,7 @@ import type { AntennasRepository } from '@features/persistence/backend/repositor
 import { NoteEntityService } from '@features/notes/backend/serializers/NoteEntityService.js';
 import { NoteStreamingHidingService } from '@features/api/backend/transport/stream/NoteStreamingHidingService.js';
 import { bindThis } from '@features/runtime/backend/decorators.js';
-import { isRenotePacked, isQuotePacked } from '@/misc/is-renote.js';
+import { isRenotePacked, isQuotePacked } from '@features/notes/backend/utility/is-renote.js';
 import type { GlobalEvents } from '@features/runtime/backend/services/GlobalEventService.js';
 import type { JsonObject } from '@features/runtime/backend/formatting/json-value.js';
 import Channel, { type ChannelRequest } from '@features/api/backend/transport/stream/channel.js';

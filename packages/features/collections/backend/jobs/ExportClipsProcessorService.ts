@@ -18,7 +18,7 @@ import { bindThis } from '@features/runtime/backend/decorators.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { NotificationService } from '@features/notifications/backend/services/NotificationService.js';
 import { QueryService } from '@features/notes/backend/services/QueryService.js';
-import { shouldHideNoteByTime } from '@/misc/should-hide-note-by-time.js';
+import { shouldHideNoteByTime } from '@features/notes/backend/utility/should-hide-note-by-time.js';
 import { QueueLoggerService } from '@features/runtime/backend/queue/QueueLoggerService.js';
 import type * as Bull from 'bullmq';
 import type { DbJobDataWithUser } from '@features/runtime/backend/queue/types.js';

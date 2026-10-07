@@ -4,7 +4,7 @@
  */
 
 import { Inject, Injectable, Scope } from '@nestjs/common';
-import { isInstanceMuted, isUserFromMutedInstance } from '@/misc/is-instance-muted.js';
+import { isInstanceMuted, isUserFromMutedInstance } from '@features/relationships/backend/utility/is-instance-muted.js';
 import { NoteEntityService } from '@features/notes/backend/serializers/NoteEntityService.js';
 import { bindThis } from '@features/runtime/backend/decorators.js';
 import type { JsonObject } from '@features/runtime/backend/formatting/json-value.js';

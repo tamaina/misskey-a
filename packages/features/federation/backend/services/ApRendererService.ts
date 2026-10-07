@@ -28,7 +28,7 @@ import { bindThis } from '@features/runtime/backend/decorators.js';
 import { CustomEmojiService } from '@features/emojis/backend/services/CustomEmojiService.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { UtilityService } from './UtilityService.js';
-import { escapeHtml } from '@/misc/escape-html.js';
+import { escapeHtml } from '@features/markup/backend/utility/escape-html.js';
 import { JsonLdService } from './JsonLdService.js';
 import { ApMfmService } from './ApMfmService.js';
 import { CONTEXT } from '../protocol/misc/contexts.js';

@@ -12,7 +12,7 @@ import { GlobalEventService } from '@features/runtime/backend/services/GlobalEve
 import { UtilityService } from '@features/federation/backend/services/UtilityService.js';
 import { bindThis } from '@features/runtime/backend/decorators.js';
 import { DI } from '@/di-symbols.js';
-import * as Acct from '@/misc/acct.js';
+import * as Acct from '@features/federation/backend/utility/acct.js';
 import type { Packed } from '@features/index/contract/packed.js';
 import type { AntennasRepository, UserListMembershipsRepository } from '@features/persistence/backend/repositories/models.js';
 import type { MiAntenna } from '../models/Antenna.js';

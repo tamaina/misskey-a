@@ -12,7 +12,7 @@ import { MiNote } from '@features/notes/backend/models/Note.js';
 import type { MiMeta, NotesRepository } from '@features/persistence/backend/repositories/models.js';
 import { MiUser } from '@features/persistence/backend/repositories/models.js';
 import { sqlLikeEscape } from '@features/persistence/backend/utility/sql-like-escape.js';
-import { isUserRelated } from '@/misc/is-user-related.js';
+import { isUserRelated } from '@features/relationships/backend/utility/is-user-related.js';
 import { CacheService } from '@features/users/backend/services/CacheService.js';
 import { QueryService } from '@features/notes/backend/services/QueryService.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';

@@ -13,7 +13,7 @@ import { DB_MAX_IMAGE_COMMENT_LENGTH } from '@features/drive/contract/image-comm
 import { DriveService } from '@features/drive/backend/services/DriveService.js';
 import type { Logger } from '@features/runtime/backend/logging/logger.js';
 import { bindThis } from '@features/runtime/backend/decorators.js';
-import { checkHttps } from '@/misc/check-https.js';
+import { checkHttps } from '../utility/check-https.js';
 import { ApResolverService } from './ApResolverService.js';
 import { ApLoggerService } from './ApLoggerService.js';
 import { isDocument, type IObject } from '../protocol/type.js';

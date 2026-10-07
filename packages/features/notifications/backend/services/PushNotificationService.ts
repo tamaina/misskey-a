@@ -9,7 +9,7 @@ import * as Redis from 'ioredis';
 import { DI } from '@/di-symbols.js';
 import type { Config } from '@/config.js';
 import type { Packed } from '@features/index/contract/packed.js';
-import { getNoteSummary } from '@/misc/get-note-summary.js';
+import { getNoteSummary } from '@features/notes/backend/utility/get-note-summary.js';
 import type { MiMeta, MiSwSubscription, SwSubscriptionsRepository } from '@features/persistence/backend/repositories/models.js';
 import { bindThis } from '@features/runtime/backend/decorators.js';
 import { RedisKVCache } from '@features/runtime/backend/cache/cache.js';

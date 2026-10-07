@@ -8,7 +8,7 @@ import { packedPinnedUsersDefinition, packedPinnedUsersInput, packedPinnedUsersO
 import { IsNull } from 'typeorm';
 import { Inject, Injectable } from '@nestjs/common';
 import type { MiMeta, UsersRepository } from '@features/persistence/backend/repositories/models.js';
-import * as Acct from '@/misc/acct.js';
+import * as Acct from '@features/federation/backend/utility/acct.js';
 import type { MiUser } from '@features/users/backend/models/User.js';
 
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';

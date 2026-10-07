@@ -8,7 +8,7 @@ import { IsNull } from 'typeorm';
 import { DI } from '@/di-symbols.js';
 import type { UsersRepository, DriveFilesRepository } from '@features/persistence/backend/repositories/models.js';
 import type { Logger } from '@features/runtime/backend/logging/logger.js';
-import * as Acct from '@/misc/acct.js';
+import * as Acct from '@features/federation/backend/utility/acct.js';
 import { RemoteUserResolveService } from '@features/federation/backend/services/RemoteUserResolveService.js';
 import { DownloadService } from '@features/runtime/backend/services/DownloadService.js';
 import { UserMutingService } from '../services/UserMutingService.js';

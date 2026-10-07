@@ -8,7 +8,7 @@ import { packedHashtagsShowDefinition, packedHashtagsShowInput, packedHashtagsSh
 import { Inject, Injectable } from '@nestjs/common';
 
 import type { HashtagsRepository } from '@features/persistence/backend/repositories/models.js';
-import { normalizeForSearch } from '@/misc/normalize-for-search.js';
+import { normalizeForSearch } from '../../utility/normalize-for-search.js';
 import { HashtagEntityService } from '../../serializers/HashtagEntityService.js';
 import { DI } from '@/di-symbols.js';
 import { ApiError } from '@features/api/backend/transport/error.js';

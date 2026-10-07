@@ -7,8 +7,8 @@ import type { Packed } from '@features/index/contract/packed.js';
 import type { MiUserProfile } from '@features/users/backend/models/UserProfile.js';
 import type { CommonProps } from '@features/web/backend/templates/_.js';
 import { Layout } from '@features/web/backend/templates/base.js';
-import { isRenotePacked } from '@/misc/is-renote.js';
-import { getNoteSummary } from '@/misc/get-note-summary.js';
+import { isRenotePacked } from '../utility/is-renote.js';
+import { getNoteSummary } from '../utility/get-note-summary.js';
 
 export function NotePage(props: CommonProps<{
 	note: Packed<'Note'>;

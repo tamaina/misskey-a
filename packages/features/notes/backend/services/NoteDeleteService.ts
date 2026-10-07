@@ -22,7 +22,7 @@ import { UserEntityService } from '@features/users/backend/serializers/UserEntit
 import { bindThis } from '@features/runtime/backend/decorators.js';
 import { SearchService } from '@features/discovery/backend/services/SearchService.js';
 import { ModerationLogService } from '@features/moderation/backend/services/ModerationLogService.js';
-import { isQuote, isRenote } from '@/misc/is-renote.js';
+import { isQuote, isRenote } from '../utility/is-renote.js';
 
 @Injectable()
 export class NoteDeleteService {

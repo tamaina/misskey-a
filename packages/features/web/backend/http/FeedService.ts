@@ -16,7 +16,7 @@ import { bindThis } from '@features/runtime/backend/decorators.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { MfmService } from "@features/markup/backend/services/MfmService.js";
 import { parse as mfmParse } from 'mfm-js';
-import { shouldHideNoteByTime } from '@/misc/should-hide-note-by-time.js';
+import { shouldHideNoteByTime } from '@features/notes/backend/utility/should-hide-note-by-time.js';
 
 @Injectable()
 export class FeedService {

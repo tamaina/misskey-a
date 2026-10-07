@@ -14,13 +14,13 @@ import type { NotesRepository } from '@features/persistence/backend/repositories
 import { NoteEntityService } from '@features/notes/backend/serializers/NoteEntityService.js';
 import { FanoutTimelineName, FanoutTimelineService } from './FanoutTimelineService.js';
 import { UtilityService } from '@features/federation/backend/services/UtilityService.js';
-import { isUserRelated } from '@/misc/is-user-related.js';
-import { isQuote, isRenote } from '@/misc/is-renote.js';
+import { isUserRelated } from '@features/relationships/backend/utility/is-user-related.js';
+import { isQuote, isRenote } from '@features/notes/backend/utility/is-renote.js';
 import { CacheService } from '@features/users/backend/services/CacheService.js';
-import { isReply } from '@/misc/is-reply.js';
-import { isInstanceMuted } from '@/misc/is-instance-muted.js';
+import { isReply } from '@features/notes/backend/utility/is-reply.js';
+import { isInstanceMuted } from '@features/relationships/backend/utility/is-instance-muted.js';
 import { ChannelMutingService } from '@features/channels/backend/services/ChannelMutingService.js';
-import { isChannelRelated } from '@/misc/is-channel-related.js';
+import { isChannelRelated } from '@features/channels/backend/utility/is-channel-related.js';
 
 type NoteFilter = (note: MiNote) => boolean;
 

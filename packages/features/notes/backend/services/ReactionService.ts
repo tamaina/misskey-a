@@ -15,7 +15,7 @@ import { isDuplicateKeyValueError } from '@features/persistence/backend/utility/
 import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
 import { NotificationService } from '@features/notifications/backend/services/NotificationService.js';
 import { PerUserReactionsChart } from '@features/statistics/backend/charts/per-user-reactions.js';
-import { emojiRegex } from '@/misc/emoji-regex.js';
+import { emojiRegex } from '@features/emojis/backend/utility/emoji-regex.js';
 import { ApDeliverManagerService } from '@features/federation/backend/services/ApDeliverManagerService.js';
 import { NoteEntityService } from '../serializers/NoteEntityService.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
@@ -27,7 +27,7 @@ import { CustomEmojiService } from '@features/emojis/backend/services/CustomEmoj
 import { RoleService } from '@features/roles/backend/services/RoleService.js';
 import { FeaturedService } from '@features/discovery/backend/services/FeaturedService.js';
 import { trackPromise } from '@features/runtime/backend/async/promise-tracker.js';
-import { isQuote, isRenote } from '@/misc/is-renote.js';
+import { isQuote, isRenote } from '../utility/is-renote.js';
 import { ReactionsBufferingService } from './ReactionsBufferingService.js';
 import { PER_NOTE_REACTION_USER_PAIR_CACHE_MAX } from '../constants.js';
 

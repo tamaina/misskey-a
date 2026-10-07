@@ -25,7 +25,7 @@ import { MiChatRoomInvitation } from '../models/ChatRoomInvitation.js';
 import { Packed } from '@features/index/contract/packed.js';
 import { sqlLikeEscape } from '@features/persistence/backend/utility/sql-like-escape.js';
 import { CustomEmojiService } from '@features/emojis/backend/services/CustomEmojiService.js';
-import { emojiRegex } from '@/misc/emoji-regex.js';
+import { emojiRegex } from '@features/emojis/backend/utility/emoji-regex.js';
 import { NotificationService } from '@features/notifications/backend/services/NotificationService.js';
 import { ModerationLogService } from '@features/moderation/backend/services/ModerationLogService.js';
 

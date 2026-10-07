@@ -5,7 +5,7 @@
 
 import * as fs from 'node:fs';
 import { FILE_TYPE_BROWSERSAFE } from '@features/media/backend/file-types.js';
-import { contentDisposition } from '@/misc/content-disposition.js';
+import { contentDisposition } from '@features/media/backend/utility/content-disposition.js';
 import type { IImageStreamable } from '@features/media/backend/services/ImageProcessingService.js';
 import type { FastifyReply } from 'fastify';
 

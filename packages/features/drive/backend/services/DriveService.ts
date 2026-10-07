@@ -21,7 +21,7 @@ import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { isDuplicateKeyValueError } from '@features/persistence/backend/utility/is-duplicate-key-value-error.js';
 import { FILE_TYPE_BROWSERSAFE } from '@features/media/backend/file-types.js';
 import { IdentifiableError } from '@features/runtime/backend/errors/identifiable-error.js';
-import { contentDisposition } from '@/misc/content-disposition.js';
+import { contentDisposition } from '@features/media/backend/utility/content-disposition.js';
 import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
 import { VideoProcessingService } from '@features/media/backend/services/VideoProcessingService.js';
 import { ImageProcessingService } from '@features/media/backend/services/ImageProcessingService.js';
@@ -40,8 +40,8 @@ import { UserEntityService } from '@features/users/backend/serializers/UserEntit
 import { FileInfoService } from '@features/media/backend/services/FileInfoService.js';
 import { bindThis } from '@features/runtime/backend/decorators.js';
 import { RoleService } from '@features/roles/backend/services/RoleService.js';
-import { correctFilename } from '@/misc/correct-filename.js';
-import { isMimeImage } from '@/misc/is-mime-image.js';
+import { correctFilename } from '@features/media/backend/utility/correct-filename.js';
+import { isMimeImage } from '@features/media/backend/utility/is-mime-image.js';
 import { ModerationLogService } from '@features/moderation/backend/services/ModerationLogService.js';
 import { UtilityService } from '@features/federation/backend/services/UtilityService.js';
 

@@ -18,7 +18,7 @@ import { DI } from '@/di-symbols.js';
 import { bindThis } from '@features/runtime/backend/decorators.js';
 import { generateNativeUserToken } from '@features/auth/backend/utility/token.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
-import { genRsaKeyPair } from '@/misc/gen-key-pair.js';
+import { genRsaKeyPair } from '@features/federation/backend/utility/gen-key-pair.js';
 
 export const SYSTEM_ACCOUNT_TYPES = ['actor', 'relay', 'proxy'] as const;
 

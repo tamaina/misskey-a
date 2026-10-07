@@ -9,7 +9,7 @@ import { Inject, Injectable } from '@nestjs/common';
 
 import type { UsersRepository } from '@features/persistence/backend/repositories/models.js';
 import { safeForSql } from "@features/persistence/backend/utility/safe-for-sql.js";
-import { normalizeForSearch } from '@/misc/normalize-for-search.js';
+import { normalizeForSearch } from '../../utility/normalize-for-search.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import { DI } from '@/di-symbols.js';
 

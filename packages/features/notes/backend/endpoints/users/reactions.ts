@@ -14,7 +14,7 @@ import { DI } from '@/di-symbols.js';
 import { CacheService } from '@features/users/backend/services/CacheService.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import { RoleService } from '@features/roles/backend/services/RoleService.js';
-import { isUserRelated } from '@/misc/is-user-related.js';
+import { isUserRelated } from '@features/relationships/backend/utility/is-user-related.js';
 import { ApiError } from '@features/api/backend/transport/error.js';
 
 const contractProjection = projectEndpointContract(packedUsersReactionsDefinition);

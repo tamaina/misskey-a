@@ -12,7 +12,7 @@ import { NoteEntityService } from '@features/notes/backend/serializers/NoteEntit
 import { DI } from '@/di-symbols.js';
 import { FeaturedService } from '../../services/FeaturedService.js';
 import { CacheService } from '@features/users/backend/services/CacheService.js';
-import { isUserRelated } from '@/misc/is-user-related.js';
+import { isUserRelated } from '@features/relationships/backend/utility/is-user-related.js';
 import { QueryService } from '@features/notes/backend/services/QueryService.js';
 
 const contractProjection = projectEndpointContract(packedUsersFeaturedNotesDefinition);

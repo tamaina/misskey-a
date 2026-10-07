@@ -15,7 +15,7 @@ import type { MiMeta, UserProfilesRepository } from '@features/persistence/backe
 import { LoggerService } from '@features/runtime/backend/services/LoggerService.js';
 import { bindThis } from '@features/runtime/backend/decorators.js';
 import { HttpRequestService } from '@features/runtime/backend/services/HttpRequestService.js';
-import { escapeHtml } from '@/misc/escape-html.js';
+import { escapeHtml } from '@features/markup/backend/utility/escape-html.js';
 
 @Injectable()
 export class EmailService {

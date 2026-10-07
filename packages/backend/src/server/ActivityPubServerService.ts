@@ -28,8 +28,8 @@ import { UtilityService } from '@features/federation/backend/services/UtilitySer
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import { bindThis } from '@features/runtime/backend/decorators.js';
 import { IActivity } from '@features/federation/backend/protocol/type.js';
-import { isQuote, isRenote } from '@/misc/is-renote.js';
-import * as Acct from '@/misc/acct.js';
+import { isQuote, isRenote } from '@features/notes/backend/utility/is-renote.js';
+import * as Acct from '@features/federation/backend/utility/acct.js';
 import { FanoutTimelineEndpointService } from '@features/timelines/backend/services/FanoutTimelineEndpointService.js';
 import type { FastifyInstance, FastifyRequest, FastifyReply, FastifyPluginOptions, FastifyBodyParser } from 'fastify';
 import type { FindOptionsWhere } from 'typeorm';

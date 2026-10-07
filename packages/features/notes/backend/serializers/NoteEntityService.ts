@@ -15,7 +15,7 @@ import type { UsersRepository, NotesRepository, FollowingsRepository, PollsRepos
 import { bindThis } from '@features/runtime/backend/decorators.js';
 import { DebounceLoader } from '@features/runtime/backend/async/loader.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
-import { shouldHideNoteByTime } from '@/misc/should-hide-note-by-time.js';
+import { shouldHideNoteByTime } from '../utility/should-hide-note-by-time.js';
 import { ReactionsBufferingService } from '../services/ReactionsBufferingService.js';
 import { CacheService } from '@features/users/backend/services/CacheService.js';
 import type { OnModuleInit } from '@nestjs/common';

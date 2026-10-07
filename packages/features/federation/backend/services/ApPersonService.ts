@@ -14,7 +14,7 @@ import type { MiLocalUser, MiRemoteUser } from '@features/users/backend/models/U
 import { MiUser } from '@features/users/backend/models/User.js';
 import { truncate } from '@features/runtime/backend/formatting/truncate.js';
 import type { CacheService } from '@features/users/backend/services/CacheService.js';
-import { normalizeForSearch } from '@/misc/normalize-for-search.js';
+import { normalizeForSearch } from '@features/discovery/backend/utility/normalize-for-search.js';
 import { isDuplicateKeyValueError } from '@features/persistence/backend/utility/is-duplicate-key-value-error.js';
 import type { Logger } from '@features/runtime/backend/logging/logger.js';
 import type { MiNote } from '@features/notes/backend/models/Note.js';
@@ -37,7 +37,7 @@ import { bindThis } from '@features/runtime/backend/decorators.js';
 import { RoleService } from '@features/roles/backend/services/RoleService.js';
 import { DriveFileEntityService } from '@features/drive/backend/serializers/DriveFileEntityService.js';
 import type { AccountMoveService } from '@features/users/backend/services/AccountMoveService.js';
-import { checkHttps } from '@/misc/check-https.js';
+import { checkHttps } from '../utility/check-https.js';
 import { getApId, getApType, getOneApHrefNullable, isActor, isCollection, isCollectionOrOrderedCollection, isPropertyValue } from '../protocol/type.js';
 import { extractApHashtags } from '../protocol/models/tag.js';
 import type { OnModuleInit } from '@nestjs/common';

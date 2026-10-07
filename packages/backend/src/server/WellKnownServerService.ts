@@ -12,7 +12,7 @@ import type { MiMeta, UsersRepository } from '@features/persistence/backend/repo
 import type { Config } from '@/config.js';
 import { escapeAttribute, escapeValue } from '@features/runtime/backend/formatting/xml.js';
 import type { MiUser } from '@features/users/backend/models/User.js';
-import * as Acct from '@/misc/acct.js';
+import * as Acct from '@features/federation/backend/utility/acct.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import { bindThis } from '@features/runtime/backend/decorators.js';
 import { NodeinfoServerService } from './NodeinfoServerService.js';

@@ -9,7 +9,7 @@ import { languages } from 'i18n/const';
 import { Injectable, Inject } from '@nestjs/common';
 import { DI } from '@/di-symbols.js';
 import { bindThis } from '@features/runtime/backend/decorators.js';
-import { htmlSafeJsonStringify } from '@/misc/json-stringify-html-safe.js';
+import { htmlSafeJsonStringify } from '@features/markup/backend/utility/json-stringify-html-safe.js';
 import { MetaEntityService } from '@features/instance/backend/serializers/MetaEntityService.js';
 import type { FastifyReply } from 'fastify';
 import type { Manifest } from 'vite';

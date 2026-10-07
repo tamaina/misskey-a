@@ -11,7 +11,7 @@ import * as Redis from 'ioredis';
 import { LoggerService } from '@features/runtime/backend/services/LoggerService.js';
 
 import { DI } from '@/di-symbols.js';
-import { resetDb } from '@/misc/reset-db.js';
+import { resetDb } from '../utility/reset-db.js';
 import { MetaService } from '@features/instance/backend/services/MetaService.js';
 import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
 

@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { normalizeForSearch } from '@/misc/normalize-for-search.js';
+import { normalizeForSearch } from '../utility/normalize-for-search.js';
 import type { HashtagsRepository, MiMeta } from '@features/persistence/backend/repositories/models.js';
 import { bindThis } from '@features/runtime/backend/decorators.js';
 import type { UtilityService } from '@features/federation/backend/services/UtilityService.js';
