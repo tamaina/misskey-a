@@ -1,0 +1,3019 @@
+[
+	{
+		"file": "packages/features/preferences/frontend/pages/settings/preferences.vue",
+		"originalSha256": "2ec537c72bb602ba8ecb7fc5e65e775a2f6c7e5a2e096c10622d7ce7f6ece86f",
+		"migratedSha256": "3dfec1e11bf9d8e8134791893337446d55c4a2d6a353ddf4eb8e7411d18c5a2b",
+		"edits": [
+			{
+				"start": 162,
+				"end": 181,
+				"source": "i18n.ts.preferences",
+				"replacement": "$locale.sfc.preferences",
+				"key": "preferences",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 162
+			},
+			{
+				"start": 355,
+				"end": 390,
+				"source": "i18n.ts._settings.preferencesBanner",
+				"replacement": "$locale.sfc.settingsPreferencesBanner",
+				"key": "_settings.preferencesBanner",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 359
+			},
+			{
+				"start": 609,
+				"end": 624,
+				"source": "i18n.ts.general",
+				"replacement": "$locale.sfc.general",
+				"key": "general",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 615
+			},
+			{
+				"start": 945,
+				"end": 963,
+				"source": "i18n.ts.uiLanguage",
+				"replacement": "$locale.sfc.uiLanguage",
+				"key": "uiLanguage",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 955
+			},
+			{
+				"start": 1041,
+				"end": 1057,
+				"source": "i18n.ts.i18nInfo",
+				"replacement": "$locale.sfc.i18nInfo",
+				"key": "i18nInfo",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 1055
+			},
+			{
+				"start": 1478,
+				"end": 1490,
+				"source": "i18n.ts.auto",
+				"replacement": "$locale.sfc.auto",
+				"key": "auto",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 1496
+			},
+			{
+				"start": 1533,
+				"end": 1551,
+				"source": "i18n.ts.smartphone",
+				"replacement": "$locale.sfc.smartphone",
+				"key": "smartphone",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 1555
+			},
+			{
+				"start": 1619,
+				"end": 1633,
+				"source": "i18n.ts.tablet",
+				"replacement": "$locale.sfc.tablet",
+				"key": "tablet",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 1645
+			},
+			{
+				"start": 1702,
+				"end": 1717,
+				"source": "i18n.ts.desktop",
+				"replacement": "$locale.sfc.desktop",
+				"key": "desktop",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 1732
+			},
+			{
+				"start": 1812,
+				"end": 1839,
+				"source": "i18n.ts.overridedDeviceKind",
+				"replacement": "$locale.sfc.overridedDeviceKind",
+				"key": "overridedDeviceKind",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 1846
+			},
+			{
+				"start": 2069,
+				"end": 2089,
+				"source": "i18n.ts.realtimeMode",
+				"replacement": "$locale.sfc.realtimeMode",
+				"key": "realtimeMode",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 2107
+			},
+			{
+				"start": 2160,
+				"end": 2202,
+				"source": "i18n.ts._settings.realtimeMode_description",
+				"replacement": "$locale.sfc.settingsRealtimeMode_description",
+				"key": "_settings.realtimeMode_description",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 2202
+			},
+			{
+				"start": 2562,
+				"end": 2573,
+				"source": "i18n.ts.low",
+				"replacement": "$locale.sfc.low",
+				"key": "low",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 2606
+			},
+			{
+				"start": 2586,
+				"end": 2600,
+				"source": "i18n.ts.middle",
+				"replacement": "$locale.sfc.middle",
+				"key": "middle",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 2634
+			},
+			{
+				"start": 2613,
+				"end": 2625,
+				"source": "i18n.ts.high",
+				"replacement": "$locale.sfc.high",
+				"key": "high",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 2665
+			},
+			{
+				"start": 2676,
+				"end": 2717,
+				"source": "i18n.ts._settings.contentsUpdateFrequency",
+				"replacement": "$locale.sfc.settingsContentsUpdateFrequency",
+				"key": "_settings.contentsUpdateFrequency",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 2732
+			},
+			{
+				"start": 2790,
+				"end": 2843,
+				"source": "i18n.ts._settings.contentsUpdateFrequency_description",
+				"replacement": "$locale.sfc.settingsContentsUpdateFrequency_description",
+				"key": "_settings.contentsUpdateFrequency_description",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 2848
+			},
+			{
+				"start": 2878,
+				"end": 2932,
+				"source": "i18n.ts._settings.contentsUpdateFrequency_description2",
+				"replacement": "$locale.sfc.settingsContentsUpdateFrequency_description2",
+				"key": "_settings.contentsUpdateFrequency_description2",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 2938
+			},
+			{
+				"start": 3433,
+				"end": 3453,
+				"source": "i18n.ts.showTitlebar",
+				"replacement": "$locale.sfc.showTitlebar",
+				"key": "showTitlebar",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 3495
+			},
+			{
+				"start": 3788,
+				"end": 3817,
+				"source": "i18n.ts.showAvatarDecorations",
+				"replacement": "$locale.sfc.showAvatarDecorations",
+				"key": "showAvatarDecorations",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 3854
+			},
+			{
+				"start": 4139,
+				"end": 4166,
+				"source": "i18n.ts.alwaysConfirmFollow",
+				"replacement": "$locale.sfc.alwaysConfirmFollow",
+				"key": "alwaysConfirmFollow",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 4209
+			},
+			{
+				"start": 4550,
+				"end": 4581,
+				"source": "i18n.ts.highlightSensitiveMedia",
+				"replacement": "$locale.sfc.highlightSensitiveMedia",
+				"key": "highlightSensitiveMedia",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 4624
+			},
+			{
+				"start": 4986,
+				"end": 5028,
+				"source": "i18n.ts.confirmWhenRevealingSensitiveMedia",
+				"replacement": "$locale.sfc.confirmWhenRevealingSensitiveMedia",
+				"key": "confirmWhenRevealingSensitiveMedia",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 5064
+			},
+			{
+				"start": 5340,
+				"end": 5365,
+				"source": "i18n.ts.enableAdvancedMfm",
+				"replacement": "$locale.sfc.enableAdvancedMfm",
+				"key": "enableAdvancedMfm",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 5422
+			},
+			{
+				"start": 5700,
+				"end": 5728,
+				"source": "i18n.ts.enableInfiniteScroll",
+				"replacement": "$locale.sfc.enableInfiniteScroll",
+				"key": "enableInfiniteScroll",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 5786
+			},
+			{
+				"start": 6110,
+				"end": 6124,
+				"source": "i18n.ts.native",
+				"replacement": "$locale.sfc.native",
+				"key": "native",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 6200
+			},
+			{
+				"start": 6306,
+				"end": 6324,
+				"source": "i18n.ts.emojiStyle",
+				"replacement": "$locale.sfc.emojiStyle",
+				"key": "emojiStyle",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 6400
+			},
+			{
+				"start": 6772,
+				"end": 6805,
+				"source": "i18n.ts._settings.timelineAndNote",
+				"replacement": "$locale.sfc.settingsTimelineAndNote",
+				"key": "_settings.timelineAndNote",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 6870
+			},
+			{
+				"start": 7183,
+				"end": 7208,
+				"source": "i18n.ts.showFixedPostForm",
+				"replacement": "$locale.sfc.showFixedPostForm",
+				"key": "showFixedPostForm",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 7283
+			},
+			{
+				"start": 7552,
+				"end": 7586,
+				"source": "i18n.ts.showFixedPostFormInChannel",
+				"replacement": "$locale.sfc.showFixedPostFormInChannel",
+				"key": "showFixedPostFormInChannel",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 7656
+			},
+			{
+				"start": 7879,
+				"end": 7902,
+				"source": "i18n.ts.collapseRenotes",
+				"replacement": "$locale.sfc.collapseRenotes",
+				"key": "collapseRenotes",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 7987
+			},
+			{
+				"start": 7975,
+				"end": 8009,
+				"source": "i18n.ts.collapseRenotesDescription",
+				"replacement": "$locale.sfc.collapseRenotesDescription",
+				"key": "collapseRenotesDescription",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 8087
+			},
+			{
+				"start": 8229,
+				"end": 8247,
+				"source": "i18n.ts.pinnedList",
+				"replacement": "$locale.sfc.pinnedList",
+				"key": "pinnedList",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 8345
+			},
+			{
+				"start": 8425,
+				"end": 8436,
+				"source": "i18n.ts.add",
+				"replacement": "$locale.sfc.add",
+				"key": "add",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 8545
+			},
+			{
+				"start": 8543,
+				"end": 8557,
+				"source": "i18n.ts.remove",
+				"replacement": "$locale.sfc.remove",
+				"key": "remove",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 8667
+			},
+			{
+				"start": 8933,
+				"end": 8965,
+				"source": "i18n.ts.showNoteActionsOnlyHover",
+				"replacement": "$locale.sfc.showNoteActionsOnlyHover",
+				"key": "showNoteActionsOnlyHover",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 9061
+			},
+			{
+				"start": 9313,
+				"end": 9347,
+				"source": "i18n.ts.showClipButtonInNoteFooter",
+				"replacement": "$locale.sfc.showClipButtonInNoteFooter",
+				"key": "showClipButtonInNoteFooter",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 9445
+			},
+			{
+				"start": 9672,
+				"end": 9698,
+				"source": "i18n.ts.showReactionsCount",
+				"replacement": "$locale.sfc.showReactionsCount",
+				"key": "showReactionsCount",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 9808
+			},
+			{
+				"start": 10009,
+				"end": 10031,
+				"source": "i18n.ts.confirmOnReact",
+				"replacement": "$locale.sfc.confirmOnReact",
+				"key": "confirmOnReact",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 10149
+			},
+			{
+				"start": 10400,
+				"end": 10421,
+				"source": "i18n.ts.loadRawImages",
+				"replacement": "$locale.sfc.loadRawImages",
+				"key": "loadRawImages",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 10544
+			},
+			{
+				"start": 10788,
+				"end": 10827,
+				"source": "i18n.ts.useReactionPickerForContextMenu",
+				"replacement": "$locale.sfc.useReactionPickerForContextMenu",
+				"key": "useReactionPickerForContextMenu",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 10936
+			},
+			{
+				"start": 11174,
+				"end": 11225,
+				"source": "i18n.ts._settings.showAvailableReactionsFirstInNote",
+				"replacement": "$locale.sfc.settingsShowAvailableReactionsFirstInNote",
+				"key": "_settings.showAvailableReactionsFirstInNote",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 11326
+			},
+			{
+				"start": 11599,
+				"end": 11612,
+				"source": "i18n.ts.small",
+				"replacement": "$locale.sfc.small",
+				"key": "small",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 11753
+			},
+			{
+				"start": 11653,
+				"end": 11667,
+				"source": "i18n.ts.medium",
+				"replacement": "$locale.sfc.medium",
+				"key": "medium",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 11811
+			},
+			{
+				"start": 11707,
+				"end": 11720,
+				"source": "i18n.ts.large",
+				"replacement": "$locale.sfc.large",
+				"key": "large",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 11869
+			},
+			{
+				"start": 11791,
+				"end": 11819,
+				"source": "i18n.ts.reactionsDisplaySize",
+				"replacement": "$locale.sfc.reactionsDisplaySize",
+				"key": "reactionsDisplaySize",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 11957
+			},
+			{
+				"start": 12170,
+				"end": 12198,
+				"source": "i18n.ts.limitWidthOfReaction",
+				"replacement": "$locale.sfc.limitWidthOfReaction",
+				"key": "limitWidthOfReaction",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 12340
+			},
+			{
+				"start": 12629,
+				"end": 12644,
+				"source": "i18n.ts.default",
+				"replacement": "$locale.sfc.default",
+				"key": "default",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 12803
+			},
+			{
+				"start": 12683,
+				"end": 12700,
+				"source": "i18n.tsx.limitTo(",
+				"replacement": "interpolateLocaleParameters($locale.sfc.limitTo, ",
+				"key": "limitTo",
+				"kind": "tsx",
+				"region": "template",
+				"afterStart": 12861
+			},
+			{
+				"start": 12752,
+				"end": 12769,
+				"source": "i18n.tsx.limitTo(",
+				"replacement": "interpolateLocaleParameters($locale.sfc.limitTo, ",
+				"key": "limitTo",
+				"kind": "tsx",
+				"region": "template",
+				"afterStart": 12962
+			},
+			{
+				"start": 12820,
+				"end": 12837,
+				"source": "i18n.tsx.limitTo(",
+				"replacement": "interpolateLocaleParameters($locale.sfc.limitTo, ",
+				"key": "limitTo",
+				"kind": "tsx",
+				"region": "template",
+				"afterStart": 13062
+			},
+			{
+				"start": 12921,
+				"end": 12960,
+				"source": "i18n.ts.mediaListWithOneImageAppearance",
+				"replacement": "$locale.sfc.mediaListWithOneImageAppearance",
+				"key": "mediaListWithOneImageAppearance",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 13195
+			},
+			{
+				"start": 13360,
+				"end": 13397,
+				"source": "i18n.ts.showMediaListByGridInWideArea",
+				"replacement": "$locale.sfc.showMediaListByGridInWideArea",
+				"key": "showMediaListByGridInWideArea",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 13638
+			},
+			{
+				"start": 13824,
+				"end": 13852,
+				"source": "i18n.ts._instanceTicker.none",
+				"replacement": "$locale.sfc.instanceTickerNone",
+				"key": "_instanceTicker.none",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 14106
+			},
+			{
+				"start": 13892,
+				"end": 13922,
+				"source": "i18n.ts._instanceTicker.remote",
+				"replacement": "$locale.sfc.instanceTickerRemote",
+				"key": "_instanceTicker.remote",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 14176
+			},
+			{
+				"start": 13964,
+				"end": 13994,
+				"source": "i18n.ts._instanceTicker.always",
+				"replacement": "$locale.sfc.instanceTickerAlways",
+				"key": "_instanceTicker.always",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 14250
+			},
+			{
+				"start": 14085,
+				"end": 14107,
+				"source": "i18n.ts.instanceTicker",
+				"replacement": "$locale.sfc.instanceTicker",
+				"key": "instanceTicker",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 14373
+			},
+			{
+				"start": 14523,
+				"end": 14563,
+				"source": "i18n.ts._displayOfSensitiveMedia.respect",
+				"replacement": "$locale.sfc.displayOfSensitiveMediaRespect",
+				"key": "_displayOfSensitiveMedia.respect",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 14815
+			},
+			{
+				"start": 14605,
+				"end": 14644,
+				"source": "i18n.ts._displayOfSensitiveMedia.ignore",
+				"replacement": "$locale.sfc.displayOfSensitiveMediaIgnore",
+				"key": "_displayOfSensitiveMedia.ignore",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 14899
+			},
+			{
+				"start": 14685,
+				"end": 14723,
+				"source": "i18n.ts._displayOfSensitiveMedia.force",
+				"replacement": "$locale.sfc.displayOfSensitiveMediaForce",
+				"key": "_displayOfSensitiveMedia.force",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 14981
+			},
+			{
+				"start": 14810,
+				"end": 14841,
+				"source": "i18n.ts.displayOfSensitiveMedia",
+				"replacement": "$locale.sfc.displayOfSensitiveMedia",
+				"key": "displayOfSensitiveMedia",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 15108
+			},
+			{
+				"start": 15169,
+				"end": 15185,
+				"source": "i18n.ts.postForm",
+				"replacement": "$locale.sfc.postForm",
+				"key": "postForm",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 15471
+			},
+			{
+				"start": 15546,
+				"end": 15560,
+				"source": "i18n.ts.keepCw",
+				"replacement": "$locale.sfc.keepCw",
+				"key": "keepCw",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 15852
+			},
+			{
+				"start": 15899,
+				"end": 15929,
+				"source": "i18n.ts.rememberNoteVisibility",
+				"replacement": "$locale.sfc.rememberNoteVisibility",
+				"key": "rememberNoteVisibility",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 16209
+			},
+			{
+				"start": 16305,
+				"end": 16338,
+				"source": "i18n.ts.enableQuickAddMfmFunction",
+				"replacement": "$locale.sfc.enableQuickAddMfmFunction",
+				"key": "enableQuickAddMfmFunction",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 16619
+			},
+			{
+				"start": 16647,
+				"end": 16676,
+				"source": "i18n.ts.defaultNoteVisibility",
+				"replacement": "$locale.sfc.defaultNoteVisibility",
+				"key": "defaultNoteVisibility",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 16965
+			},
+			{
+				"start": 16777,
+				"end": 16803,
+				"source": "i18n.ts._visibility.public",
+				"replacement": "$locale.sfc.visibilityPublic",
+				"key": "_visibility.public",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 17099
+			},
+			{
+				"start": 16893,
+				"end": 16917,
+				"source": "i18n.ts._visibility.home",
+				"replacement": "$locale.sfc.visibilityHome",
+				"key": "_visibility.home",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 17217
+			},
+			{
+				"start": 17012,
+				"end": 17041,
+				"source": "i18n.ts._visibility.followers",
+				"replacement": "$locale.sfc.visibilityFollowers",
+				"key": "_visibility.followers",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 17338
+			},
+			{
+				"start": 17136,
+				"end": 17165,
+				"source": "i18n.ts._visibility.specified",
+				"replacement": "$locale.sfc.visibilitySpecified",
+				"key": "_visibility.specified",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 17464
+			},
+			{
+				"start": 17381,
+				"end": 17407,
+				"source": "i18n.ts._visibility.public",
+				"replacement": "$locale.sfc.visibilityPublic",
+				"key": "_visibility.public",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 17711
+			},
+			{
+				"start": 17450,
+				"end": 17474,
+				"source": "i18n.ts._visibility.home",
+				"replacement": "$locale.sfc.visibilityHome",
+				"key": "_visibility.home",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 17782
+			},
+			{
+				"start": 17515,
+				"end": 17544,
+				"source": "i18n.ts._visibility.followers",
+				"replacement": "$locale.sfc.visibilityFollowers",
+				"key": "_visibility.followers",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 17849
+			},
+			{
+				"start": 17590,
+				"end": 17619,
+				"source": "i18n.ts._visibility.specified",
+				"replacement": "$locale.sfc.visibilitySpecified",
+				"key": "_visibility.specified",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 17926
+			},
+			{
+				"start": 17844,
+				"end": 17881,
+				"source": "i18n.ts._visibility.disableFederation",
+				"replacement": "$locale.sfc.visibilityDisableFederation",
+				"key": "_visibility.disableFederation",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 18182
+			},
+			{
+				"start": 18225,
+				"end": 18246,
+				"source": "i18n.ts.notifications",
+				"replacement": "$locale.sfc.notifications",
+				"key": "notifications",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 18565
+			},
+			{
+				"start": 18584,
+				"end": 18615,
+				"source": "i18n.ts.useGroupedNotifications",
+				"replacement": "$locale.sfc.useGroupedNotifications",
+				"key": "useGroupedNotifications",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 18928
+			},
+			{
+				"start": 18937,
+				"end": 18952,
+				"source": "i18n.ts.leftTop",
+				"replacement": "$locale.sfc.leftTop",
+				"key": "leftTop",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 19285
+			},
+			{
+				"start": 19028,
+				"end": 19044,
+				"source": "i18n.ts.rightTop",
+				"replacement": "$locale.sfc.rightTop",
+				"key": "rightTop",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 19380
+			},
+			{
+				"start": 19123,
+				"end": 19141,
+				"source": "i18n.ts.leftBottom",
+				"replacement": "$locale.sfc.leftBottom",
+				"key": "leftBottom",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 19479
+			},
+			{
+				"start": 19223,
+				"end": 19242,
+				"source": "i18n.ts.rightBottom",
+				"replacement": "$locale.sfc.rightBottom",
+				"key": "rightBottom",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 19583
+			},
+			{
+				"start": 19348,
+				"end": 19364,
+				"source": "i18n.ts.position",
+				"replacement": "$locale.sfc.position",
+				"key": "position",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 19712
+			},
+			{
+				"start": 19707,
+				"end": 19723,
+				"source": "i18n.ts.vertical",
+				"replacement": "$locale.sfc.vertical",
+				"key": "vertical",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 20075
+			},
+			{
+				"start": 19800,
+				"end": 19818,
+				"source": "i18n.ts.horizontal",
+				"replacement": "$locale.sfc.horizontal",
+				"key": "horizontal",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 20172
+			},
+			{
+				"start": 19921,
+				"end": 19938,
+				"source": "i18n.ts.stackAxis",
+				"replacement": "$locale.sfc.stackAxis",
+				"key": "stackAxis",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 20297
+			},
+			{
+				"start": 20087,
+				"end": 20134,
+				"source": "i18n.ts._notification.checkNotificationBehavior",
+				"replacement": "$locale.sfc.notificationCheckNotificationBehavior",
+				"key": "_notification.checkNotificationBehavior",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 20467
+			},
+			{
+				"start": 20434,
+				"end": 20455,
+				"source": "i18n.ts.directMessage",
+				"replacement": "$locale.sfc.directMessage",
+				"key": "directMessage",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 20816
+			},
+			{
+				"start": 20811,
+				"end": 20849,
+				"source": "i18n.ts._settings._chat.showSenderName",
+				"replacement": "$locale.sfc.settingsChatShowSenderName",
+				"key": "_settings._chat.showSenderName",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 21197
+			},
+			{
+				"start": 21161,
+				"end": 21196,
+				"source": "i18n.ts._settings._chat.sendOnEnter",
+				"replacement": "$locale.sfc.settingsChatSendOnEnter",
+				"key": "_settings._chat.sendOnEnter",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 21547
+			},
+			{
+				"start": 21325,
+				"end": 21347,
+				"source": "i18n.ts._settings.ifOn",
+				"replacement": "$locale.sfc.settingsIfOn",
+				"key": "_settings.ifOn",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 21711
+			},
+			{
+				"start": 21377,
+				"end": 21395,
+				"source": "i18n.ts._chat.send",
+				"replacement": "$locale.sfc.chatSend",
+				"key": "_chat.send",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 21765
+			},
+			{
+				"start": 21433,
+				"end": 21454,
+				"source": "i18n.ts._chat.newline",
+				"replacement": "$locale.sfc.chatNewline",
+				"key": "_chat.newline",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 21823
+			},
+			{
+				"start": 21535,
+				"end": 21558,
+				"source": "i18n.ts._settings.ifOff",
+				"replacement": "$locale.sfc.settingsIfOff",
+				"key": "_settings.ifOff",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 21927
+			},
+			{
+				"start": 21588,
+				"end": 21606,
+				"source": "i18n.ts._chat.send",
+				"replacement": "$locale.sfc.chatSend",
+				"key": "_chat.send",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 21982
+			},
+			{
+				"start": 21651,
+				"end": 21672,
+				"source": "i18n.ts._chat.newline",
+				"replacement": "$locale.sfc.chatNewline",
+				"key": "_chat.newline",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 22047
+			},
+			{
+				"start": 22053,
+				"end": 22074,
+				"source": "i18n.ts.accessibility",
+				"replacement": "$locale.sfc.accessibility",
+				"key": "accessibility",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 22451
+			},
+			{
+				"start": 22314,
+				"end": 22351,
+				"source": "i18n.ts._settings.accessibilityBanner",
+				"replacement": "$locale.sfc.settingsAccessibilityBanner",
+				"key": "_settings.accessibilityBanner",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 22716
+			},
+			{
+				"start": 22625,
+				"end": 22650,
+				"source": "i18n.ts.reduceUiAnimation",
+				"replacement": "$locale.sfc.reduceUiAnimation",
+				"key": "reduceUiAnimation",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 23029
+			},
+			{
+				"start": 23041,
+				"end": 23077,
+				"source": "i18n.ts.disableShowingAnimatedImages",
+				"replacement": "$locale.sfc.disableShowingAnimatedImages",
+				"key": "disableShowingAnimatedImages",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 23449
+			},
+			{
+				"start": 23138,
+				"end": 23182,
+				"source": "i18n.ts.disableShowingAnimatedImages_caption",
+				"replacement": "$locale.sfc.disableShowingAnimatedImages_caption",
+				"key": "disableShowingAnimatedImages_caption",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 23550
+			},
+			{
+				"start": 23480,
+				"end": 23505,
+				"source": "i18n.ts.enableAnimatedMfm",
+				"replacement": "$locale.sfc.enableAnimatedMfm",
+				"key": "enableAnimatedMfm",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 23896
+			},
+			{
+				"start": 23835,
+				"end": 23873,
+				"source": "i18n.ts._settings.showPageTabBarBottom",
+				"replacement": "$locale.sfc.settingsShowPageTabBarBottom",
+				"key": "_settings.showPageTabBarBottom",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 24255
+			},
+			{
+				"start": 24198,
+				"end": 24227,
+				"source": "i18n.ts.enableHorizontalSwipe",
+				"replacement": "$locale.sfc.enableHorizontalSwipe",
+				"key": "enableHorizontalSwipe",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 24620
+			},
+			{
+				"start": 24546,
+				"end": 24583,
+				"source": "i18n.ts._settings.enablePullToRefresh",
+				"replacement": "$locale.sfc.settingsEnablePullToRefresh",
+				"key": "_settings.enablePullToRefresh",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 24972
+			},
+			{
+				"start": 24656,
+				"end": 24705,
+				"source": "i18n.ts._settings.enablePullToRefresh_description",
+				"replacement": "$locale.sfc.settingsEnablePullToRefresh_description",
+				"key": "_settings.enablePullToRefresh_description",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 25084
+			},
+			{
+				"start": 25016,
+				"end": 25036,
+				"source": "i18n.ts.keepScreenOn",
+				"replacement": "$locale.sfc.keepScreenOn",
+				"key": "keepScreenOn",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 25446
+			},
+			{
+				"start": 25406,
+				"end": 25444,
+				"source": "i18n.ts.useNativeUIForVideoAudioPlayer",
+				"replacement": "$locale.sfc.useNativeUIForVideoAudioPlayer",
+				"key": "useNativeUIForVideoAudioPlayer",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 25840
+			},
+			{
+				"start": 25781,
+				"end": 25830,
+				"source": "i18n.ts._settings.makeEveryTextElementsSelectable",
+				"replacement": "$locale.sfc.settingsMakeEveryTextElementsSelectable",
+				"key": "_settings.makeEveryTextElementsSelectable",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 26219
+			},
+			{
+				"start": 25891,
+				"end": 25952,
+				"source": "i18n.ts._settings.makeEveryTextElementsSelectable_description",
+				"replacement": "$locale.sfc.settingsMakeEveryTextElementsSelectable_description",
+				"key": "_settings.makeEveryTextElementsSelectable_description",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 26331
+			},
+			{
+				"start": 26258,
+				"end": 26270,
+				"source": "i18n.ts.auto",
+				"replacement": "$locale.sfc.auto",
+				"key": "auto",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 26700
+			},
+			{
+				"start": 26308,
+				"end": 26321,
+				"source": "i18n.ts.popup",
+				"replacement": "$locale.sfc.popup",
+				"key": "popup",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 26754
+			},
+			{
+				"start": 26360,
+				"end": 26374,
+				"source": "i18n.ts.drawer",
+				"replacement": "$locale.sfc.drawer",
+				"key": "drawer",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 26810
+			},
+			{
+				"start": 26459,
+				"end": 26476,
+				"source": "i18n.ts.menuStyle",
+				"replacement": "$locale.sfc.menuStyle",
+				"key": "menuStyle",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 26913
+			},
+			{
+				"start": 26783,
+				"end": 26807,
+				"source": "i18n.ts._contextMenu.app",
+				"replacement": "$locale.sfc.contextMenuApp",
+				"key": "_contextMenu.app",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 27241
+			},
+			{
+				"start": 26844,
+				"end": 26877,
+				"source": "i18n.ts._contextMenu.appWithShift",
+				"replacement": "$locale.sfc.contextMenuAppWithShift",
+				"key": "_contextMenu.appWithShift",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 27304
+			},
+			{
+				"start": 26923,
+				"end": 26950,
+				"source": "i18n.ts._contextMenu.native",
+				"replacement": "$locale.sfc.contextMenuNative",
+				"key": "_contextMenu.native",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 27385
+			},
+			{
+				"start": 27035,
+				"end": 27061,
+				"source": "i18n.ts._contextMenu.title",
+				"replacement": "$locale.sfc.contextMenuTitle",
+				"key": "_contextMenu.title",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 27499
+			},
+			{
+				"start": 27621,
+				"end": 27637,
+				"source": "i18n.ts.fontSize",
+				"replacement": "$locale.sfc.fontSize",
+				"key": "fontSize",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 28087
+			},
+			{
+				"start": 27853,
+				"end": 27874,
+				"source": "i18n.ts.useSystemFont",
+				"replacement": "$locale.sfc.useSystemFont",
+				"key": "useSystemFont",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 28323
+			},
+			{
+				"start": 28152,
+				"end": 28171,
+				"source": "i18n.ts.performance",
+				"replacement": "$locale.sfc.performance",
+				"key": "performance",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 28626
+			},
+			{
+				"start": 28579,
+				"end": 28609,
+				"source": "i18n.ts._settings.uiAnimations",
+				"replacement": "$locale.sfc.settingsUiAnimations",
+				"key": "_settings.uiAnimations",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 29057
+			},
+			{
+				"start": 28681,
+				"end": 28716,
+				"source": "i18n.ts.turnOffToImprovePerformance",
+				"replacement": "$locale.sfc.turnOffToImprovePerformance",
+				"key": "turnOffToImprovePerformance",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 29161
+			},
+			{
+				"start": 29153,
+				"end": 29191,
+				"source": "i18n.ts._settings.enableAnimatedImages",
+				"replacement": "$locale.sfc.settingsEnableAnimatedImages",
+				"key": "_settings.enableAnimatedImages",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 29637
+			},
+			{
+				"start": 29274,
+				"end": 29309,
+				"source": "i18n.ts.turnOffToImprovePerformance",
+				"replacement": "$locale.sfc.turnOffToImprovePerformance",
+				"key": "turnOffToImprovePerformance",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 29760
+			},
+			{
+				"start": 29344,
+				"end": 29388,
+				"source": "i18n.ts.disableShowingAnimatedImages_caption",
+				"replacement": "$locale.sfc.disableShowingAnimatedImages_caption",
+				"key": "disableShowingAnimatedImages_caption",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 29834
+			},
+			{
+				"start": 29670,
+				"end": 29691,
+				"source": "i18n.ts.useBlurEffect",
+				"replacement": "$locale.sfc.useBlurEffect",
+				"key": "useBlurEffect",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 30164
+			},
+			{
+				"start": 29763,
+				"end": 29798,
+				"source": "i18n.ts.turnOffToImprovePerformance",
+				"replacement": "$locale.sfc.turnOffToImprovePerformance",
+				"key": "turnOffToImprovePerformance",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 30261
+			},
+			{
+				"start": 30102,
+				"end": 30131,
+				"source": "i18n.ts.useBlurEffectForModal",
+				"replacement": "$locale.sfc.useBlurEffectForModal",
+				"key": "useBlurEffectForModal",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 30604
+			},
+			{
+				"start": 30203,
+				"end": 30238,
+				"source": "i18n.ts.turnOffToImprovePerformance",
+				"replacement": "$locale.sfc.turnOffToImprovePerformance",
+				"key": "turnOffToImprovePerformance",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 30709
+			},
+			{
+				"start": 30620,
+				"end": 30672,
+				"source": "i18n.ts._settings.enableHighQualityImagePlaceholders",
+				"replacement": "$locale.sfc.settingsEnableHighQualityImagePlaceholders",
+				"key": "_settings.enableHighQualityImagePlaceholders",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 31130
+			},
+			{
+				"start": 30744,
+				"end": 30779,
+				"source": "i18n.ts.turnOffToImprovePerformance",
+				"replacement": "$locale.sfc.turnOffToImprovePerformance",
+				"key": "turnOffToImprovePerformance",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 31256
+			},
+			{
+				"start": 31062,
+				"end": 31094,
+				"source": "i18n.ts._settings.useStickyIcons",
+				"replacement": "$locale.sfc.settingsUseStickyIcons",
+				"key": "_settings.useStickyIcons",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 31578
+			},
+			{
+				"start": 31166,
+				"end": 31201,
+				"source": "i18n.ts.turnOffToImprovePerformance",
+				"replacement": "$locale.sfc.turnOffToImprovePerformance",
+				"key": "turnOffToImprovePerformance",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 31684
+			},
+			{
+				"start": 31364,
+				"end": 31404,
+				"source": "i18n.ts._clientPerformanceIssueTip.title",
+				"replacement": "$locale.sfc.clientPerformanceIssueTipTitle",
+				"key": "_clientPerformanceIssueTip.title",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 31886
+			},
+			{
+				"start": 31449,
+				"end": 31509,
+				"source": "i18n.ts._clientPerformanceIssueTip.makeSureDisabledAdBlocker",
+				"replacement": "$locale.sfc.clientPerformanceIssueTipMakeSureDisabledAdBlocker",
+				"key": "_clientPerformanceIssueTip.makeSureDisabledAdBlocker",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 31973
+			},
+			{
+				"start": 31540,
+				"end": 31612,
+				"source": "i18n.ts._clientPerformanceIssueTip.makeSureDisabledAdBlocker_description",
+				"replacement": "$locale.sfc.clientPerformanceIssueTipMakeSureDisabledAdBlocker_description",
+				"key": "_clientPerformanceIssueTip.makeSureDisabledAdBlocker_description",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 32066
+			},
+			{
+				"start": 31671,
+				"end": 31731,
+				"source": "i18n.ts._clientPerformanceIssueTip.makeSureDisabledCustomCss",
+				"replacement": "$locale.sfc.clientPerformanceIssueTipMakeSureDisabledCustomCss",
+				"key": "_clientPerformanceIssueTip.makeSureDisabledCustomCss",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 32199
+			},
+			{
+				"start": 31762,
+				"end": 31834,
+				"source": "i18n.ts._clientPerformanceIssueTip.makeSureDisabledCustomCss_description",
+				"replacement": "$locale.sfc.clientPerformanceIssueTipMakeSureDisabledCustomCss_description",
+				"key": "_clientPerformanceIssueTip.makeSureDisabledCustomCss_description",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 32292
+			},
+			{
+				"start": 31893,
+				"end": 31950,
+				"source": "i18n.ts._clientPerformanceIssueTip.makeSureDisabledAddons",
+				"replacement": "$locale.sfc.clientPerformanceIssueTipMakeSureDisabledAddons",
+				"key": "_clientPerformanceIssueTip.makeSureDisabledAddons",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 32425
+			},
+			{
+				"start": 31981,
+				"end": 32050,
+				"source": "i18n.ts._clientPerformanceIssueTip.makeSureDisabledAddons_description",
+				"replacement": "$locale.sfc.clientPerformanceIssueTipMakeSureDisabledAddons_description",
+				"key": "_clientPerformanceIssueTip.makeSureDisabledAddons_description",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 32515
+			},
+			{
+				"start": 32311,
+				"end": 32328,
+				"source": "i18n.ts.dataSaver",
+				"replacement": "$locale.sfc.dataSaver",
+				"key": "dataSaver",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 32847
+			},
+			{
+				"start": 32496,
+				"end": 32533,
+				"source": "i18n.ts.reloadRequiredToApplySettings",
+				"replacement": "$locale.sfc.reloadRequiredToApplySettings",
+				"key": "reloadRequiredToApplySettings",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 33036
+			},
+			{
+				"start": 32631,
+				"end": 32648,
+				"source": "i18n.ts.enableAll",
+				"replacement": "$locale.sfc.enableAll",
+				"key": "enableAll",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 33175
+			},
+			{
+				"start": 32719,
+				"end": 32737,
+				"source": "i18n.ts.disableAll",
+				"replacement": "$locale.sfc.disableAll",
+				"key": "disableAll",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 33267
+			},
+			{
+				"start": 32848,
+				"end": 32879,
+				"source": "i18n.ts._dataSaver._media.title",
+				"replacement": "$locale.sfc.dataSaverMediaTitle",
+				"key": "_dataSaver._media.title",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 33400
+			},
+			{
+				"start": 32913,
+				"end": 32950,
+				"source": "i18n.ts._dataSaver._media.description",
+				"replacement": "$locale.sfc.dataSaverMediaDescription",
+				"key": "_dataSaver._media.description",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 33465
+			},
+			{
+				"start": 33040,
+				"end": 33072,
+				"source": "i18n.ts._dataSaver._avatar.title",
+				"replacement": "$locale.sfc.dataSaverAvatarTitle",
+				"key": "_dataSaver._avatar.title",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 33592
+			},
+			{
+				"start": 33106,
+				"end": 33144,
+				"source": "i18n.ts._dataSaver._avatar.description",
+				"replacement": "$locale.sfc.dataSaverAvatarDescription",
+				"key": "_dataSaver._avatar.description",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 33658
+			},
+			{
+				"start": 33284,
+				"end": 33327,
+				"source": "i18n.ts._dataSaver._disableUrlPreview.title",
+				"replacement": "$locale.sfc.dataSaverDisableUrlPreviewTitle",
+				"key": "_dataSaver._disableUrlPreview.title",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 33836
+			},
+			{
+				"start": 33361,
+				"end": 33410,
+				"source": "i18n.ts._dataSaver._disableUrlPreview.description",
+				"replacement": "$locale.sfc.dataSaverDisableUrlPreviewDescription",
+				"key": "_dataSaver._disableUrlPreview.description",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 33913
+			},
+			{
+				"start": 33583,
+				"end": 33628,
+				"source": "i18n.ts._dataSaver._urlPreviewThumbnail.title",
+				"replacement": "$locale.sfc.dataSaverUrlPreviewThumbnailTitle",
+				"key": "_dataSaver._urlPreviewThumbnail.title",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 34135
+			},
+			{
+				"start": 33662,
+				"end": 33713,
+				"source": "i18n.ts._dataSaver._urlPreviewThumbnail.description",
+				"replacement": "$locale.sfc.dataSaverUrlPreviewThumbnailDescription",
+				"key": "_dataSaver._urlPreviewThumbnail.description",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 34214
+			},
+			{
+				"start": 33801,
+				"end": 33831,
+				"source": "i18n.ts._dataSaver._code.title",
+				"replacement": "$locale.sfc.dataSaverCodeTitle",
+				"key": "_dataSaver._code.title",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 34353
+			},
+			{
+				"start": 33865,
+				"end": 33901,
+				"source": "i18n.ts._dataSaver._code.description",
+				"replacement": "$locale.sfc.dataSaverCodeDescription",
+				"key": "_dataSaver._code.description",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 34417
+			},
+			{
+				"start": 34150,
+				"end": 34163,
+				"source": "i18n.ts.other",
+				"replacement": "$locale.sfc.other",
+				"key": "other",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 34702
+			},
+			{
+				"start": 34540,
+				"end": 34561,
+				"source": "i18n.ts.squareAvatars",
+				"replacement": "$locale.sfc.squareAvatars",
+				"key": "squareAvatars",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 35096
+			},
+			{
+				"start": 34884,
+				"end": 34912,
+				"source": "i18n.ts.seasonalScreenEffect",
+				"replacement": "$locale.sfc.seasonalScreenEffect",
+				"key": "seasonalScreenEffect",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 35444
+			},
+			{
+				"start": 35252,
+				"end": 35277,
+				"source": "i18n.ts.openImageInNewTab",
+				"replacement": "$locale.sfc.openImageInNewTab",
+				"key": "openImageInNewTab",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 35816
+			},
+			{
+				"start": 35599,
+				"end": 35643,
+				"source": "i18n.ts.withRepliesByDefaultForNewlyFollowed",
+				"replacement": "$locale.sfc.withRepliesByDefaultForNewlyFollowed",
+				"key": "withRepliesByDefaultForNewlyFollowed",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 36167
+			},
+			{
+				"start": 36021,
+				"end": 36063,
+				"source": "i18n.ts._serverDisconnectedBehavior.reload",
+				"replacement": "$locale.sfc.serverDisconnectedBehaviorReload",
+				"key": "_serverDisconnectedBehavior.reload",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 36593
+			},
+			{
+				"start": 36103,
+				"end": 36145,
+				"source": "i18n.ts._serverDisconnectedBehavior.dialog",
+				"replacement": "$locale.sfc.serverDisconnectedBehaviorDialog",
+				"key": "_serverDisconnectedBehavior.dialog",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 36677
+			},
+			{
+				"start": 36185,
+				"end": 36226,
+				"source": "i18n.ts._serverDisconnectedBehavior.quiet",
+				"replacement": "$locale.sfc.serverDisconnectedBehaviorQuiet",
+				"key": "_serverDisconnectedBehavior.quiet",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 36761
+			},
+			{
+				"start": 36310,
+				"end": 36340,
+				"source": "i18n.ts.whenServerDisconnected",
+				"replacement": "$locale.sfc.whenServerDisconnected",
+				"key": "whenServerDisconnected",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 36888
+			},
+			{
+				"start": 36672,
+				"end": 36697,
+				"source": "i18n.ts.numberOfPageCache",
+				"replacement": "$locale.sfc.numberOfPageCache",
+				"key": "numberOfPageCache",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 37254
+			},
+			{
+				"start": 36757,
+				"end": 36793,
+				"source": "i18n.ts.numberOfPageCacheDescription",
+				"replacement": "$locale.sfc.numberOfPageCacheDescription",
+				"key": "numberOfPageCacheDescription",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 37343
+			},
+			{
+				"start": 37062,
+				"end": 37082,
+				"source": "i18n.ts.forceShowAds",
+				"replacement": "$locale.sfc.forceShowAds",
+				"key": "forceShowAds",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 37652
+			},
+			{
+				"start": 37353,
+				"end": 37374,
+				"source": "i18n.ts._hemisphere.N",
+				"replacement": "$locale.sfc.hemisphereN",
+				"key": "_hemisphere.N",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 37947
+			},
+			{
+				"start": 37409,
+				"end": 37430,
+				"source": "i18n.ts._hemisphere.S",
+				"replacement": "$locale.sfc.hemisphereS",
+				"key": "_hemisphere.S",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 38005
+			},
+			{
+				"start": 37498,
+				"end": 37516,
+				"source": "i18n.ts.hemisphere",
+				"replacement": "$locale.sfc.hemisphere",
+				"key": "hemisphere",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 38096
+			},
+			{
+				"start": 37576,
+				"end": 37603,
+				"source": "i18n.ts._hemisphere.caption",
+				"replacement": "$locale.sfc.hemisphereCaption",
+				"key": "_hemisphere.caption",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 38178
+			},
+			{
+				"start": 37832,
+				"end": 37865,
+				"source": "i18n.ts.additionalEmojiDictionary",
+				"replacement": "$locale.sfc.additionalEmojiDictionary",
+				"key": "additionalEmojiDictionary",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 38436
+			},
+			{
+				"start": 38136,
+				"end": 38150,
+				"source": "i18n.ts.remove",
+				"replacement": "$locale.sfc.remove",
+				"key": "remove",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 38744
+			},
+			{
+				"start": 38387,
+				"end": 38404,
+				"source": "i18n.ts.installed",
+				"replacement": "$locale.sfc.installed",
+				"key": "installed",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 38999
+			},
+			{
+				"start": 38685,
+				"end": 38699,
+				"source": "i18n.ts.navbar",
+				"replacement": "$locale.sfc.navbar",
+				"key": "navbar",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 39301
+			},
+			{
+				"start": 38808,
+				"end": 38825,
+				"source": "i18n.ts.statusbar",
+				"replacement": "$locale.sfc.statusbar",
+				"key": "statusbar",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 39428
+			},
+			{
+				"start": 38932,
+				"end": 38944,
+				"source": "i18n.ts.deck",
+				"replacement": "$locale.sfc.deck",
+				"key": "deck",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 39556
+			},
+			{
+				"start": 39054,
+				"end": 39071,
+				"source": "i18n.ts.customCss",
+				"replacement": "$locale.sfc.customCss",
+				"key": "customCss",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 39682
+			},
+			{
+				"start": 40213,
+				"end": 40271,
+				"source": "import { i18n } from '@features/runtime/frontend/i18n.js';",
+				"replacement": "import { interpolateLocaleParameters } from '@features/runtime/frontend/interpolate-locale-parameters.js';",
+				"afterStart": 40845
+			},
+			{
+				"start": 48061,
+				"end": 48079,
+				"source": "i18n.ts.selectList",
+				"replacement": "$locale.value.sfc.selectList",
+				"key": "selectList",
+				"kind": "ts",
+				"region": "script",
+				"afterStart": 48741
+			},
+			{
+				"start": 49427,
+				"end": 49442,
+				"source": "i18n.ts.general",
+				"replacement": "$locale.value.sfc.general",
+				"key": "general",
+				"kind": "ts",
+				"region": "script",
+				"afterStart": 50117
+			}
+		],
+		"keys": [
+			{
+				"global": "preferences",
+				"local": "preferences",
+				"formatter": false
+			},
+			{
+				"global": "_settings.preferencesBanner",
+				"local": "settingsPreferencesBanner",
+				"formatter": false
+			},
+			{
+				"global": "general",
+				"local": "general",
+				"formatter": false
+			},
+			{
+				"global": "uiLanguage",
+				"local": "uiLanguage",
+				"formatter": false
+			},
+			{
+				"global": "i18nInfo",
+				"local": "i18nInfo",
+				"formatter": false
+			},
+			{
+				"global": "auto",
+				"local": "auto",
+				"formatter": false
+			},
+			{
+				"global": "smartphone",
+				"local": "smartphone",
+				"formatter": false
+			},
+			{
+				"global": "tablet",
+				"local": "tablet",
+				"formatter": false
+			},
+			{
+				"global": "desktop",
+				"local": "desktop",
+				"formatter": false
+			},
+			{
+				"global": "overridedDeviceKind",
+				"local": "overridedDeviceKind",
+				"formatter": false
+			},
+			{
+				"global": "realtimeMode",
+				"local": "realtimeMode",
+				"formatter": false
+			},
+			{
+				"global": "_settings.realtimeMode_description",
+				"local": "settingsRealtimeMode_description",
+				"formatter": false
+			},
+			{
+				"global": "low",
+				"local": "low",
+				"formatter": false
+			},
+			{
+				"global": "middle",
+				"local": "middle",
+				"formatter": false
+			},
+			{
+				"global": "high",
+				"local": "high",
+				"formatter": false
+			},
+			{
+				"global": "_settings.contentsUpdateFrequency",
+				"local": "settingsContentsUpdateFrequency",
+				"formatter": false
+			},
+			{
+				"global": "_settings.contentsUpdateFrequency_description",
+				"local": "settingsContentsUpdateFrequency_description",
+				"formatter": false
+			},
+			{
+				"global": "_settings.contentsUpdateFrequency_description2",
+				"local": "settingsContentsUpdateFrequency_description2",
+				"formatter": false
+			},
+			{
+				"global": "showTitlebar",
+				"local": "showTitlebar",
+				"formatter": false
+			},
+			{
+				"global": "showAvatarDecorations",
+				"local": "showAvatarDecorations",
+				"formatter": false
+			},
+			{
+				"global": "alwaysConfirmFollow",
+				"local": "alwaysConfirmFollow",
+				"formatter": false
+			},
+			{
+				"global": "highlightSensitiveMedia",
+				"local": "highlightSensitiveMedia",
+				"formatter": false
+			},
+			{
+				"global": "confirmWhenRevealingSensitiveMedia",
+				"local": "confirmWhenRevealingSensitiveMedia",
+				"formatter": false
+			},
+			{
+				"global": "enableAdvancedMfm",
+				"local": "enableAdvancedMfm",
+				"formatter": false
+			},
+			{
+				"global": "enableInfiniteScroll",
+				"local": "enableInfiniteScroll",
+				"formatter": false
+			},
+			{
+				"global": "native",
+				"local": "native",
+				"formatter": false
+			},
+			{
+				"global": "emojiStyle",
+				"local": "emojiStyle",
+				"formatter": false
+			},
+			{
+				"global": "_settings.timelineAndNote",
+				"local": "settingsTimelineAndNote",
+				"formatter": false
+			},
+			{
+				"global": "showFixedPostForm",
+				"local": "showFixedPostForm",
+				"formatter": false
+			},
+			{
+				"global": "showFixedPostFormInChannel",
+				"local": "showFixedPostFormInChannel",
+				"formatter": false
+			},
+			{
+				"global": "collapseRenotes",
+				"local": "collapseRenotes",
+				"formatter": false
+			},
+			{
+				"global": "collapseRenotesDescription",
+				"local": "collapseRenotesDescription",
+				"formatter": false
+			},
+			{
+				"global": "pinnedList",
+				"local": "pinnedList",
+				"formatter": false
+			},
+			{
+				"global": "add",
+				"local": "add",
+				"formatter": false
+			},
+			{
+				"global": "remove",
+				"local": "remove",
+				"formatter": false
+			},
+			{
+				"global": "showNoteActionsOnlyHover",
+				"local": "showNoteActionsOnlyHover",
+				"formatter": false
+			},
+			{
+				"global": "showClipButtonInNoteFooter",
+				"local": "showClipButtonInNoteFooter",
+				"formatter": false
+			},
+			{
+				"global": "showReactionsCount",
+				"local": "showReactionsCount",
+				"formatter": false
+			},
+			{
+				"global": "confirmOnReact",
+				"local": "confirmOnReact",
+				"formatter": false
+			},
+			{
+				"global": "loadRawImages",
+				"local": "loadRawImages",
+				"formatter": false
+			},
+			{
+				"global": "useReactionPickerForContextMenu",
+				"local": "useReactionPickerForContextMenu",
+				"formatter": false
+			},
+			{
+				"global": "_settings.showAvailableReactionsFirstInNote",
+				"local": "settingsShowAvailableReactionsFirstInNote",
+				"formatter": false
+			},
+			{
+				"global": "small",
+				"local": "small",
+				"formatter": false
+			},
+			{
+				"global": "medium",
+				"local": "medium",
+				"formatter": false
+			},
+			{
+				"global": "large",
+				"local": "large",
+				"formatter": false
+			},
+			{
+				"global": "reactionsDisplaySize",
+				"local": "reactionsDisplaySize",
+				"formatter": false
+			},
+			{
+				"global": "limitWidthOfReaction",
+				"local": "limitWidthOfReaction",
+				"formatter": false
+			},
+			{
+				"global": "default",
+				"local": "default",
+				"formatter": false
+			},
+			{
+				"global": "limitTo",
+				"local": "limitTo",
+				"formatter": true
+			},
+			{
+				"global": "mediaListWithOneImageAppearance",
+				"local": "mediaListWithOneImageAppearance",
+				"formatter": false
+			},
+			{
+				"global": "showMediaListByGridInWideArea",
+				"local": "showMediaListByGridInWideArea",
+				"formatter": false
+			},
+			{
+				"global": "_instanceTicker.none",
+				"local": "instanceTickerNone",
+				"formatter": false
+			},
+			{
+				"global": "_instanceTicker.remote",
+				"local": "instanceTickerRemote",
+				"formatter": false
+			},
+			{
+				"global": "_instanceTicker.always",
+				"local": "instanceTickerAlways",
+				"formatter": false
+			},
+			{
+				"global": "instanceTicker",
+				"local": "instanceTicker",
+				"formatter": false
+			},
+			{
+				"global": "_displayOfSensitiveMedia.respect",
+				"local": "displayOfSensitiveMediaRespect",
+				"formatter": false
+			},
+			{
+				"global": "_displayOfSensitiveMedia.ignore",
+				"local": "displayOfSensitiveMediaIgnore",
+				"formatter": false
+			},
+			{
+				"global": "_displayOfSensitiveMedia.force",
+				"local": "displayOfSensitiveMediaForce",
+				"formatter": false
+			},
+			{
+				"global": "displayOfSensitiveMedia",
+				"local": "displayOfSensitiveMedia",
+				"formatter": false
+			},
+			{
+				"global": "postForm",
+				"local": "postForm",
+				"formatter": false
+			},
+			{
+				"global": "keepCw",
+				"local": "keepCw",
+				"formatter": false
+			},
+			{
+				"global": "rememberNoteVisibility",
+				"local": "rememberNoteVisibility",
+				"formatter": false
+			},
+			{
+				"global": "enableQuickAddMfmFunction",
+				"local": "enableQuickAddMfmFunction",
+				"formatter": false
+			},
+			{
+				"global": "defaultNoteVisibility",
+				"local": "defaultNoteVisibility",
+				"formatter": false
+			},
+			{
+				"global": "_visibility.public",
+				"local": "visibilityPublic",
+				"formatter": false
+			},
+			{
+				"global": "_visibility.home",
+				"local": "visibilityHome",
+				"formatter": false
+			},
+			{
+				"global": "_visibility.followers",
+				"local": "visibilityFollowers",
+				"formatter": false
+			},
+			{
+				"global": "_visibility.specified",
+				"local": "visibilitySpecified",
+				"formatter": false
+			},
+			{
+				"global": "_visibility.disableFederation",
+				"local": "visibilityDisableFederation",
+				"formatter": false
+			},
+			{
+				"global": "notifications",
+				"local": "notifications",
+				"formatter": false
+			},
+			{
+				"global": "useGroupedNotifications",
+				"local": "useGroupedNotifications",
+				"formatter": false
+			},
+			{
+				"global": "leftTop",
+				"local": "leftTop",
+				"formatter": false
+			},
+			{
+				"global": "rightTop",
+				"local": "rightTop",
+				"formatter": false
+			},
+			{
+				"global": "leftBottom",
+				"local": "leftBottom",
+				"formatter": false
+			},
+			{
+				"global": "rightBottom",
+				"local": "rightBottom",
+				"formatter": false
+			},
+			{
+				"global": "position",
+				"local": "position",
+				"formatter": false
+			},
+			{
+				"global": "vertical",
+				"local": "vertical",
+				"formatter": false
+			},
+			{
+				"global": "horizontal",
+				"local": "horizontal",
+				"formatter": false
+			},
+			{
+				"global": "stackAxis",
+				"local": "stackAxis",
+				"formatter": false
+			},
+			{
+				"global": "_notification.checkNotificationBehavior",
+				"local": "notificationCheckNotificationBehavior",
+				"formatter": false
+			},
+			{
+				"global": "directMessage",
+				"local": "directMessage",
+				"formatter": false
+			},
+			{
+				"global": "_settings._chat.showSenderName",
+				"local": "settingsChatShowSenderName",
+				"formatter": false
+			},
+			{
+				"global": "_settings._chat.sendOnEnter",
+				"local": "settingsChatSendOnEnter",
+				"formatter": false
+			},
+			{
+				"global": "_settings.ifOn",
+				"local": "settingsIfOn",
+				"formatter": false
+			},
+			{
+				"global": "_chat.send",
+				"local": "chatSend",
+				"formatter": false
+			},
+			{
+				"global": "_chat.newline",
+				"local": "chatNewline",
+				"formatter": false
+			},
+			{
+				"global": "_settings.ifOff",
+				"local": "settingsIfOff",
+				"formatter": false
+			},
+			{
+				"global": "accessibility",
+				"local": "accessibility",
+				"formatter": false
+			},
+			{
+				"global": "_settings.accessibilityBanner",
+				"local": "settingsAccessibilityBanner",
+				"formatter": false
+			},
+			{
+				"global": "reduceUiAnimation",
+				"local": "reduceUiAnimation",
+				"formatter": false
+			},
+			{
+				"global": "disableShowingAnimatedImages",
+				"local": "disableShowingAnimatedImages",
+				"formatter": false
+			},
+			{
+				"global": "disableShowingAnimatedImages_caption",
+				"local": "disableShowingAnimatedImages_caption",
+				"formatter": false
+			},
+			{
+				"global": "enableAnimatedMfm",
+				"local": "enableAnimatedMfm",
+				"formatter": false
+			},
+			{
+				"global": "_settings.showPageTabBarBottom",
+				"local": "settingsShowPageTabBarBottom",
+				"formatter": false
+			},
+			{
+				"global": "enableHorizontalSwipe",
+				"local": "enableHorizontalSwipe",
+				"formatter": false
+			},
+			{
+				"global": "_settings.enablePullToRefresh",
+				"local": "settingsEnablePullToRefresh",
+				"formatter": false
+			},
+			{
+				"global": "_settings.enablePullToRefresh_description",
+				"local": "settingsEnablePullToRefresh_description",
+				"formatter": false
+			},
+			{
+				"global": "keepScreenOn",
+				"local": "keepScreenOn",
+				"formatter": false
+			},
+			{
+				"global": "useNativeUIForVideoAudioPlayer",
+				"local": "useNativeUIForVideoAudioPlayer",
+				"formatter": false
+			},
+			{
+				"global": "_settings.makeEveryTextElementsSelectable",
+				"local": "settingsMakeEveryTextElementsSelectable",
+				"formatter": false
+			},
+			{
+				"global": "_settings.makeEveryTextElementsSelectable_description",
+				"local": "settingsMakeEveryTextElementsSelectable_description",
+				"formatter": false
+			},
+			{
+				"global": "popup",
+				"local": "popup",
+				"formatter": false
+			},
+			{
+				"global": "drawer",
+				"local": "drawer",
+				"formatter": false
+			},
+			{
+				"global": "menuStyle",
+				"local": "menuStyle",
+				"formatter": false
+			},
+			{
+				"global": "_contextMenu.app",
+				"local": "contextMenuApp",
+				"formatter": false
+			},
+			{
+				"global": "_contextMenu.appWithShift",
+				"local": "contextMenuAppWithShift",
+				"formatter": false
+			},
+			{
+				"global": "_contextMenu.native",
+				"local": "contextMenuNative",
+				"formatter": false
+			},
+			{
+				"global": "_contextMenu.title",
+				"local": "contextMenuTitle",
+				"formatter": false
+			},
+			{
+				"global": "fontSize",
+				"local": "fontSize",
+				"formatter": false
+			},
+			{
+				"global": "useSystemFont",
+				"local": "useSystemFont",
+				"formatter": false
+			},
+			{
+				"global": "performance",
+				"local": "performance",
+				"formatter": false
+			},
+			{
+				"global": "_settings.uiAnimations",
+				"local": "settingsUiAnimations",
+				"formatter": false
+			},
+			{
+				"global": "turnOffToImprovePerformance",
+				"local": "turnOffToImprovePerformance",
+				"formatter": false
+			},
+			{
+				"global": "_settings.enableAnimatedImages",
+				"local": "settingsEnableAnimatedImages",
+				"formatter": false
+			},
+			{
+				"global": "useBlurEffect",
+				"local": "useBlurEffect",
+				"formatter": false
+			},
+			{
+				"global": "useBlurEffectForModal",
+				"local": "useBlurEffectForModal",
+				"formatter": false
+			},
+			{
+				"global": "_settings.enableHighQualityImagePlaceholders",
+				"local": "settingsEnableHighQualityImagePlaceholders",
+				"formatter": false
+			},
+			{
+				"global": "_settings.useStickyIcons",
+				"local": "settingsUseStickyIcons",
+				"formatter": false
+			},
+			{
+				"global": "_clientPerformanceIssueTip.title",
+				"local": "clientPerformanceIssueTipTitle",
+				"formatter": false
+			},
+			{
+				"global": "_clientPerformanceIssueTip.makeSureDisabledAdBlocker",
+				"local": "clientPerformanceIssueTipMakeSureDisabledAdBlocker",
+				"formatter": false
+			},
+			{
+				"global": "_clientPerformanceIssueTip.makeSureDisabledAdBlocker_description",
+				"local": "clientPerformanceIssueTipMakeSureDisabledAdBlocker_description",
+				"formatter": false
+			},
+			{
+				"global": "_clientPerformanceIssueTip.makeSureDisabledCustomCss",
+				"local": "clientPerformanceIssueTipMakeSureDisabledCustomCss",
+				"formatter": false
+			},
+			{
+				"global": "_clientPerformanceIssueTip.makeSureDisabledCustomCss_description",
+				"local": "clientPerformanceIssueTipMakeSureDisabledCustomCss_description",
+				"formatter": false
+			},
+			{
+				"global": "_clientPerformanceIssueTip.makeSureDisabledAddons",
+				"local": "clientPerformanceIssueTipMakeSureDisabledAddons",
+				"formatter": false
+			},
+			{
+				"global": "_clientPerformanceIssueTip.makeSureDisabledAddons_description",
+				"local": "clientPerformanceIssueTipMakeSureDisabledAddons_description",
+				"formatter": false
+			},
+			{
+				"global": "dataSaver",
+				"local": "dataSaver",
+				"formatter": false
+			},
+			{
+				"global": "reloadRequiredToApplySettings",
+				"local": "reloadRequiredToApplySettings",
+				"formatter": false
+			},
+			{
+				"global": "enableAll",
+				"local": "enableAll",
+				"formatter": false
+			},
+			{
+				"global": "disableAll",
+				"local": "disableAll",
+				"formatter": false
+			},
+			{
+				"global": "_dataSaver._media.title",
+				"local": "dataSaverMediaTitle",
+				"formatter": false
+			},
+			{
+				"global": "_dataSaver._media.description",
+				"local": "dataSaverMediaDescription",
+				"formatter": false
+			},
+			{
+				"global": "_dataSaver._avatar.title",
+				"local": "dataSaverAvatarTitle",
+				"formatter": false
+			},
+			{
+				"global": "_dataSaver._avatar.description",
+				"local": "dataSaverAvatarDescription",
+				"formatter": false
+			},
+			{
+				"global": "_dataSaver._disableUrlPreview.title",
+				"local": "dataSaverDisableUrlPreviewTitle",
+				"formatter": false
+			},
+			{
+				"global": "_dataSaver._disableUrlPreview.description",
+				"local": "dataSaverDisableUrlPreviewDescription",
+				"formatter": false
+			},
+			{
+				"global": "_dataSaver._urlPreviewThumbnail.title",
+				"local": "dataSaverUrlPreviewThumbnailTitle",
+				"formatter": false
+			},
+			{
+				"global": "_dataSaver._urlPreviewThumbnail.description",
+				"local": "dataSaverUrlPreviewThumbnailDescription",
+				"formatter": false
+			},
+			{
+				"global": "_dataSaver._code.title",
+				"local": "dataSaverCodeTitle",
+				"formatter": false
+			},
+			{
+				"global": "_dataSaver._code.description",
+				"local": "dataSaverCodeDescription",
+				"formatter": false
+			},
+			{
+				"global": "other",
+				"local": "other",
+				"formatter": false
+			},
+			{
+				"global": "squareAvatars",
+				"local": "squareAvatars",
+				"formatter": false
+			},
+			{
+				"global": "seasonalScreenEffect",
+				"local": "seasonalScreenEffect",
+				"formatter": false
+			},
+			{
+				"global": "openImageInNewTab",
+				"local": "openImageInNewTab",
+				"formatter": false
+			},
+			{
+				"global": "withRepliesByDefaultForNewlyFollowed",
+				"local": "withRepliesByDefaultForNewlyFollowed",
+				"formatter": false
+			},
+			{
+				"global": "_serverDisconnectedBehavior.reload",
+				"local": "serverDisconnectedBehaviorReload",
+				"formatter": false
+			},
+			{
+				"global": "_serverDisconnectedBehavior.dialog",
+				"local": "serverDisconnectedBehaviorDialog",
+				"formatter": false
+			},
+			{
+				"global": "_serverDisconnectedBehavior.quiet",
+				"local": "serverDisconnectedBehaviorQuiet",
+				"formatter": false
+			},
+			{
+				"global": "whenServerDisconnected",
+				"local": "whenServerDisconnected",
+				"formatter": false
+			},
+			{
+				"global": "numberOfPageCache",
+				"local": "numberOfPageCache",
+				"formatter": false
+			},
+			{
+				"global": "numberOfPageCacheDescription",
+				"local": "numberOfPageCacheDescription",
+				"formatter": false
+			},
+			{
+				"global": "forceShowAds",
+				"local": "forceShowAds",
+				"formatter": false
+			},
+			{
+				"global": "_hemisphere.N",
+				"local": "hemisphereN",
+				"formatter": false
+			},
+			{
+				"global": "_hemisphere.S",
+				"local": "hemisphereS",
+				"formatter": false
+			},
+			{
+				"global": "hemisphere",
+				"local": "hemisphere",
+				"formatter": false
+			},
+			{
+				"global": "_hemisphere.caption",
+				"local": "hemisphereCaption",
+				"formatter": false
+			},
+			{
+				"global": "additionalEmojiDictionary",
+				"local": "additionalEmojiDictionary",
+				"formatter": false
+			},
+			{
+				"global": "installed",
+				"local": "installed",
+				"formatter": false
+			},
+			{
+				"global": "navbar",
+				"local": "navbar",
+				"formatter": false
+			},
+			{
+				"global": "statusbar",
+				"local": "statusbar",
+				"formatter": false
+			},
+			{
+				"global": "deck",
+				"local": "deck",
+				"formatter": false
+			},
+			{
+				"global": "customCss",
+				"local": "customCss",
+				"formatter": false
+			},
+			{
+				"global": "selectList",
+				"local": "selectList",
+				"formatter": false
+			}
+		]
+	},
+	{
+		"file": "packages/features/navigation/frontend/components/MkTutorialDialog.vue",
+		"originalSha256": "1e4cdd54a429b307c5f4b470276bea78d61d9bf1ccb4e2bf41eaf15f618a2d03",
+		"migratedSha256": "534d66ee427bb903b6e210f256e430e8dd6a954f68917ba0f8b2c4569aac8677",
+		"edits": [
+			{
+				"start": 288,
+				"end": 324,
+				"source": "i18n.ts._initialTutorial._note.title",
+				"replacement": "$locale.sfc.initialTutorialNoteTitle",
+				"key": "_initialTutorial._note.title",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 288
+			},
+			{
+				"start": 417,
+				"end": 457,
+				"source": "i18n.ts._initialTutorial._reaction.title",
+				"replacement": "$locale.sfc.initialTutorialReactionTitle",
+				"key": "_initialTutorial._reaction.title",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 417
+			},
+			{
+				"start": 544,
+				"end": 584,
+				"source": "i18n.ts._initialTutorial._timeline.title",
+				"replacement": "$locale.sfc.initialTutorialTimelineTitle",
+				"key": "_initialTutorial._timeline.title",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 544
+			},
+			{
+				"start": 678,
+				"end": 718,
+				"source": "i18n.ts._initialTutorial._postNote.title",
+				"replacement": "$locale.sfc.initialTutorialPostNoteTitle",
+				"key": "_initialTutorial._postNote.title",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 678
+			},
+			{
+				"start": 816,
+				"end": 877,
+				"source": "i18n.ts._initialTutorial._howToMakeAttachmentsSensitive.title",
+				"replacement": "$locale.sfc.initialTutorialHowToMakeAttachmentsSensitiveTitle",
+				"key": "_initialTutorial._howToMakeAttachmentsSensitive.title",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 816
+			},
+			{
+				"start": 921,
+				"end": 951,
+				"source": "i18n.ts._initialTutorial.title",
+				"replacement": "$locale.sfc.initialTutorialTitle",
+				"key": "_initialTutorial.title",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 921
+			},
+			{
+				"start": 1676,
+				"end": 1715,
+				"source": "i18n.ts._initialTutorial._landing.title",
+				"replacement": "$locale.sfc.initialTutorialLandingTitle",
+				"key": "_initialTutorial._landing.title",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 1678
+			},
+			{
+				"start": 1740,
+				"end": 1785,
+				"source": "i18n.ts._initialTutorial._landing.description",
+				"replacement": "$locale.sfc.initialTutorialLandingDescription",
+				"key": "_initialTutorial._landing.description",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 1742
+			},
+			{
+				"start": 1889,
+				"end": 1928,
+				"source": "i18n.ts._initialTutorial.launchTutorial",
+				"replacement": "$locale.sfc.initialTutorialLaunchTutorial",
+				"key": "_initialTutorial.launchTutorial",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 1891
+			},
+			{
+				"start": 2062,
+				"end": 2075,
+				"source": "i18n.ts.close",
+				"replacement": "$locale.sfc.close",
+				"key": "close",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 2066
+			},
+			{
+				"start": 2596,
+				"end": 2610,
+				"source": "i18n.ts.goBack",
+				"replacement": "$locale.sfc.goBack",
+				"key": "goBack",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 2604
+			},
+			{
+				"start": 2686,
+				"end": 2702,
+				"source": "i18n.ts.continue",
+				"replacement": "$locale.sfc.continue",
+				"key": "continue",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 2698
+			},
+			{
+				"start": 3201,
+				"end": 3251,
+				"source": "i18n.ts._initialTutorial._reaction.reactToContinue",
+				"replacement": "$locale.sfc.initialTutorialReactionReactToContinue",
+				"key": "_initialTutorial._reaction.reactToContinue",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 3217
+			},
+			{
+				"start": 3466,
+				"end": 3480,
+				"source": "i18n.ts.goBack",
+				"replacement": "$locale.sfc.goBack",
+				"key": "goBack",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 3482
+			},
+			{
+				"start": 3594,
+				"end": 3610,
+				"source": "i18n.ts.continue",
+				"replacement": "$locale.sfc.continue",
+				"key": "continue",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 3614
+			},
+			{
+				"start": 4165,
+				"end": 4179,
+				"source": "i18n.ts.goBack",
+				"replacement": "$locale.sfc.goBack",
+				"key": "goBack",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 4189
+			},
+			{
+				"start": 4255,
+				"end": 4271,
+				"source": "i18n.ts.continue",
+				"replacement": "$locale.sfc.continue",
+				"key": "continue",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 4283
+			},
+			{
+				"start": 4826,
+				"end": 4840,
+				"source": "i18n.ts.goBack",
+				"replacement": "$locale.sfc.goBack",
+				"key": "goBack",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 4858
+			},
+			{
+				"start": 4916,
+				"end": 4932,
+				"source": "i18n.ts.continue",
+				"replacement": "$locale.sfc.continue",
+				"key": "continue",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 4952
+			},
+			{
+				"start": 5427,
+				"end": 5497,
+				"source": "i18n.ts._initialTutorial._howToMakeAttachmentsSensitive.doItToContinue",
+				"replacement": "$locale.sfc.initialTutorialHowToMakeAttachmentsSensitiveDoItToContinue",
+				"key": "_initialTutorial._howToMakeAttachmentsSensitive.doItToContinue",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 5467
+			},
+			{
+				"start": 5712,
+				"end": 5726,
+				"source": "i18n.ts.goBack",
+				"replacement": "$locale.sfc.goBack",
+				"key": "goBack",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 5752
+			},
+			{
+				"start": 5844,
+				"end": 5860,
+				"source": "i18n.ts.continue",
+				"replacement": "$locale.sfc.continue",
+				"key": "continue",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 5888
+			},
+			{
+				"start": 6409,
+				"end": 6445,
+				"source": "i18n.ts._initialTutorial._done.title",
+				"replacement": "$locale.sfc.initialTutorialDoneTitle",
+				"key": "_initialTutorial._done.title",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 6457
+			},
+			{
+				"start": 6474,
+				"end": 6516,
+				"source": "i18n.ts._initialTutorial._done.description",
+				"replacement": "$locale.sfc.initialTutorialDoneDescription",
+				"key": "_initialTutorial._done.description",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 6522
+			},
+			{
+				"start": 6671,
+				"end": 6683,
+				"source": "i18n.ts.help",
+				"replacement": "$locale.sfc.help",
+				"key": "help",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 6719
+			},
+			{
+				"start": 6741,
+				"end": 6781,
+				"source": "i18n.tsx._initialAccountSetting.haveFun(",
+				"replacement": "interpolateLocaleParameters($locale.sfc.initialAccountSettingHaveFun, ",
+				"key": "_initialAccountSetting.haveFun",
+				"kind": "tsx",
+				"region": "template",
+				"afterStart": 6793
+			},
+			{
+				"start": 6988,
+				"end": 7002,
+				"source": "i18n.ts.goBack",
+				"replacement": "$locale.sfc.goBack",
+				"key": "goBack",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 7070
+			},
+			{
+				"start": 7084,
+				"end": 7097,
+				"source": "i18n.ts.close",
+				"replacement": "$locale.sfc.close",
+				"key": "close",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 7170
+			},
+			{
+				"start": 7954,
+				"end": 8012,
+				"source": "import { i18n } from '@features/runtime/frontend/i18n.js';",
+				"replacement": "import { interpolateLocaleParameters } from '@features/runtime/frontend/interpolate-locale-parameters.js';",
+				"afterStart": 8044
+			},
+			{
+				"start": 8835,
+				"end": 8874,
+				"source": "i18n.ts._initialTutorial.skipAreYouSure",
+				"replacement": "$locale.value.sfc.initialTutorialSkipAreYouSure",
+				"key": "_initialTutorial.skipAreYouSure",
+				"kind": "ts",
+				"region": "script",
+				"afterStart": 8973
+			}
+		],
+		"keys": [
+			{
+				"global": "_initialTutorial._note.title",
+				"local": "initialTutorialNoteTitle",
+				"formatter": false
+			},
+			{
+				"global": "_initialTutorial._reaction.title",
+				"local": "initialTutorialReactionTitle",
+				"formatter": false
+			},
+			{
+				"global": "_initialTutorial._timeline.title",
+				"local": "initialTutorialTimelineTitle",
+				"formatter": false
+			},
+			{
+				"global": "_initialTutorial._postNote.title",
+				"local": "initialTutorialPostNoteTitle",
+				"formatter": false
+			},
+			{
+				"global": "_initialTutorial._howToMakeAttachmentsSensitive.title",
+				"local": "initialTutorialHowToMakeAttachmentsSensitiveTitle",
+				"formatter": false
+			},
+			{
+				"global": "_initialTutorial.title",
+				"local": "initialTutorialTitle",
+				"formatter": false
+			},
+			{
+				"global": "_initialTutorial._landing.title",
+				"local": "initialTutorialLandingTitle",
+				"formatter": false
+			},
+			{
+				"global": "_initialTutorial._landing.description",
+				"local": "initialTutorialLandingDescription",
+				"formatter": false
+			},
+			{
+				"global": "_initialTutorial.launchTutorial",
+				"local": "initialTutorialLaunchTutorial",
+				"formatter": false
+			},
+			{
+				"global": "close",
+				"local": "close",
+				"formatter": false
+			},
+			{
+				"global": "goBack",
+				"local": "goBack",
+				"formatter": false
+			},
+			{
+				"global": "continue",
+				"local": "continue",
+				"formatter": false
+			},
+			{
+				"global": "_initialTutorial._reaction.reactToContinue",
+				"local": "initialTutorialReactionReactToContinue",
+				"formatter": false
+			},
+			{
+				"global": "_initialTutorial._howToMakeAttachmentsSensitive.doItToContinue",
+				"local": "initialTutorialHowToMakeAttachmentsSensitiveDoItToContinue",
+				"formatter": false
+			},
+			{
+				"global": "_initialTutorial._done.title",
+				"local": "initialTutorialDoneTitle",
+				"formatter": false
+			},
+			{
+				"global": "_initialTutorial._done.description",
+				"local": "initialTutorialDoneDescription",
+				"formatter": false
+			},
+			{
+				"global": "help",
+				"local": "help",
+				"formatter": false
+			},
+			{
+				"global": "_initialAccountSetting.haveFun",
+				"local": "initialAccountSettingHaveFun",
+				"formatter": true
+			},
+			{
+				"global": "_initialTutorial.skipAreYouSure",
+				"local": "initialTutorialSkipAreYouSure",
+				"formatter": false
+			}
+		]
+	}
+]
