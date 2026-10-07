@@ -5,7 +5,7 @@
 
 import { URL } from 'node:url';
 import { Inject, Injectable } from '@nestjs/common';
-import tinycolor from '@/runtime-dependencies/tinycolor.js';
+import tinycolor from 'tinycolor2';
 import * as Redis from 'ioredis';
 import * as htmlParser from 'node-html-parser';
 import type { MiInstance } from '../models/Instance.js';

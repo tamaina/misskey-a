@@ -6,7 +6,7 @@
 import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
 import { voidMuteCreateDefinition, voidMuteCreateInput, voidMuteCreateOutput } from '../../../contract/void-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
-import ms from '@/runtime-dependencies/ms.js';
+import ms from 'ms';
 
 import type { MutingsRepository } from '@/models/_.js';
 import { DI } from '@/di-symbols.js';

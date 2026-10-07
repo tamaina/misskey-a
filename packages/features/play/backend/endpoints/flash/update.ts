@@ -5,7 +5,7 @@
 
 import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
 import { voidFlashUpdateDefinition, voidFlashUpdateInput, voidFlashUpdateOutput } from '../../../contract/void-endpoint-definitions.js';
-import ms from '@/runtime-dependencies/ms.js';
+import ms from 'ms';
 import { Inject, Injectable } from '@nestjs/common';
 import type { FlashsRepository } from '@/models/_.js';
 

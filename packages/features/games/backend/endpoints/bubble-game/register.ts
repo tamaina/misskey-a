@@ -6,7 +6,7 @@
 import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
 import { voidBubbleGameRegisterDefinition, voidBubbleGameRegisterInput, voidBubbleGameRegisterOutput } from '../../../contract/void-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
-import ms from '@/runtime-dependencies/ms.js';
+import ms from 'ms';
 
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 import type { BubbleGameRecordsRepository } from '@/models/_.js';

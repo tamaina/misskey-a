@@ -5,7 +5,7 @@
 
 import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
 import { portablePagesUpdateDefinition, portablePagesUpdateInput, portablePagesUpdateOutput } from '../../../contract/portable-constant-endpoint-definitions.js';
-import ms from '@/runtime-dependencies/ms.js';
+import ms from 'ms';
 import { Inject, Injectable } from '@nestjs/common';
 import type { DriveFilesRepository, MiDriveFile } from '@/models/_.js';
 import { DI } from '@/di-symbols.js';

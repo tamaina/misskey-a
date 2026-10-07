@@ -4,7 +4,7 @@
  */
 
 import type { Packed } from '@features/index/contract/packed.js';
-import ms from '@/runtime-dependencies/ms.js';
+import ms from 'ms';
 import { Inject, Injectable } from '@nestjs/common';
 import { DB_MAX_IMAGE_COMMENT_LENGTH } from '@features/drive/contract/image-comment-limit.js';
 import { IdentifiableError } from '@features/runtime/backend/errors/identifiable-error.js';

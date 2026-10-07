@@ -6,7 +6,7 @@
 import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
 import { voidFederationUpdateRemoteUserDefinition, voidFederationUpdateRemoteUserInput, voidFederationUpdateRemoteUserOutput } from '../../../contract/void-endpoint-definitions.js';
 import { Injectable } from '@nestjs/common';
-import ms from '@/runtime-dependencies/ms.js';
+import ms from 'ms';
 
 import { ApPersonService } from '../../services/ApPersonService.js';
 import { GetterService } from '@features/api/backend/transport/GetterService.js';

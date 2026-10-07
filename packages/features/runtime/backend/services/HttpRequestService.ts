@@ -8,7 +8,7 @@ import * as https from 'node:https';
 import * as net from 'node:net';
 import * as stream from 'node:stream';
 import ipaddr from 'ipaddr.js';
-import CacheableLookup from '@/runtime-dependencies/cacheable-lookup.js';
+import CacheableLookup from 'cacheable-lookup';
 import fetch from 'node-fetch';
 import { HttpProxyAgent, HttpsProxyAgent } from 'hpagent';
 import { Inject, Injectable } from '@nestjs/common';

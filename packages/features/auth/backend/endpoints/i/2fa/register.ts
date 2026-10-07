@@ -7,7 +7,7 @@ import { ContractEndpoint, projectEndpointContract } from '@features/api/backend
 import { inlineI2faRegisterDefinition, inlineI2faRegisterInput, inlineI2faRegisterOutput } from '../../../../contract/endpoint-definitions.js';
 import bcrypt from 'bcryptjs';
 import * as OTPAuth from 'otpauth';
-import * as QRCode from '@/runtime-dependencies/qrcode.js';
+import * as QRCode from 'qrcode';
 import { Inject, Injectable } from '@nestjs/common';
 import type { UserProfilesRepository } from '@/models/_.js';
 

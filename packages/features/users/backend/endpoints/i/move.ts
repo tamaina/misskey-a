@@ -6,7 +6,7 @@
 import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
 import { inlineIMoveDefinition, inlineIMoveInput, inlineIMoveOutput } from '../../../contract/endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
-import ms from '@/runtime-dependencies/ms.js';
+import ms from 'ms';
 
 import { ApiError } from '@features/api/backend/transport/error.js';
 

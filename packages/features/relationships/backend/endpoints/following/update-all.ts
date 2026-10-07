@@ -5,7 +5,7 @@
 
 import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
 import { voidFollowingUpdateAllDefinition, voidFollowingUpdateAllInput, voidFollowingUpdateAllOutput } from '../../../contract/void-endpoint-definitions.js';
-import ms from '@/runtime-dependencies/ms.js';
+import ms from 'ms';
 import { Inject, Injectable } from '@nestjs/common';
 
 import type { FollowingsRepository } from '@/models/_.js';

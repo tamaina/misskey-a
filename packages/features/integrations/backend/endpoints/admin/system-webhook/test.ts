@@ -6,7 +6,7 @@
 import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
 import { portableAdminSystemWebhookTestDefinition, portableAdminSystemWebhookTestInput, portableAdminSystemWebhookTestOutput } from '../../../../contract/portable-constant-endpoint-definitions.js';
 import { Injectable } from '@nestjs/common';
-import ms from '@/runtime-dependencies/ms.js';
+import ms from 'ms';
 import { WebhookTestService } from '../../../services/WebhookTestService.js';
 import { ApiError } from '@features/api/backend/transport/error.js';
 

@@ -6,7 +6,7 @@
 import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
 import { compositionApShowDefinition, compositionApShowInput, compositionApShowOutput } from '../../../contract/output-composition-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
-import ms from '@/runtime-dependencies/ms.js';
+import ms from 'ms';
 import type { MiNote } from '@features/notes/backend/models/Note.js';
 import type { MiLocalUser, MiUser } from '@features/users/backend/models/User.js';
 import { isActor, isPost, getApId } from '../../protocol/type.js';

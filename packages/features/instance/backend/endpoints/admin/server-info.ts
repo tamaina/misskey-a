@@ -5,7 +5,7 @@
 
 import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
 import { inlineAdminServerInfoDefinition, inlineAdminServerInfoInput, inlineAdminServerInfoOutput } from '../../../contract/endpoint-definitions.js';
-import { loadSystemInformation } from '@/runtime-dependencies/systeminformation.js';
+import { loadSystemInformation } from '@features/statistics/backend/runtime-dependencies/systeminformation.js';
 import * as os from 'node:os';
 import { Inject, Injectable } from '@nestjs/common';
 import { DataSource } from 'typeorm';

@@ -6,7 +6,7 @@
 import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
 import { packedChatMessagesCreateToRoomDefinition, packedChatMessagesCreateToRoomInput, packedChatMessagesCreateToRoomOutput } from '../../../../contract/packed-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
-import ms from '@/runtime-dependencies/ms.js';
+import ms from 'ms';
 
 import { GetterService } from '@features/api/backend/transport/GetterService.js';
 import { DI } from '@/di-symbols.js';

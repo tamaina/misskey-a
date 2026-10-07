@@ -9,7 +9,7 @@ import { legacyListSchemas } from '@features/relationships/backend';
 import type { Schema } from '@features/api/backend/utility/json-schema.js';
 import { createContractTransportEndpoint } from '@features/api/backend/transport/contract-transport-endpoint.js';
 import { defineFeatureEndpoint } from '@features/api/backend/transport/feature-endpoint.js';
-import ms from '@/runtime-dependencies/ms.js';
+import ms from 'ms';
 
 export const meta = {
 	tags: ['lists', 'users'],

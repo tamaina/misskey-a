@@ -6,7 +6,7 @@
 import { legacyNotesCommandSchemas } from '../../commands.js';
 import { notesCommandErrors, notesCommandsContract } from '../../../contract/index.js';
 import type { Schema } from '@features/api/backend/utility/json-schema.js';
-import ms from '@/runtime-dependencies/ms.js';
+import ms from 'ms';
 import { createContractTransportEndpoint } from '@features/api/backend/transport/contract-transport-endpoint.js';
 import { defineFeatureEndpoint } from '@features/api/backend/transport/feature-endpoint.js';
 

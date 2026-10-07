@@ -4,7 +4,7 @@
  */
 
 import { portabilityImportContract } from '../../../contract/imports.js';
-import ms from '@/runtime-dependencies/ms.js';
+import ms from 'ms';
 import { portabilityImportErrors } from '@features/portability/contract';
 import { legacyPortabilityImportSchemas } from '@features/portability/backend';
 import type { Schema } from '@features/api/backend/utility/json-schema.js';

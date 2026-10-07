@@ -12,8 +12,8 @@ import { bindThis } from '@/decorators.js';
 import { IdentifiableError } from '@features/runtime/backend/errors/identifiable-error.js';
 import { CONTEXT, PRELOADED_CONTEXTS } from '../protocol/misc/contexts.js';
 import { validateContentTypeSetAsJsonLD } from '../protocol/misc/validator.js';
-import { loadJsonLd } from '@/runtime-dependencies/jsonld.js';
-import type { JsonLdDocument } from '@/runtime-dependencies/jsonld.js';
+import { loadJsonLd } from '../runtime-dependencies/jsonld.js';
+import type { JsonLdDocument } from '../runtime-dependencies/jsonld.js';
 import type { JsonLd as JsonLdObject, RemoteDocument } from 'jsonld/jsonld-spec.js';
 
 // RsaSignature2017 implementation is based on https://github.com/transmute-industries/RsaSignature2017

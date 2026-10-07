@@ -6,7 +6,7 @@
 import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
 import { packedDriveFoldersCreateDefinition, packedDriveFoldersCreateInput, packedDriveFoldersCreateOutput } from '../../../../contract/packed-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
-import ms from '@/runtime-dependencies/ms.js';
+import ms from 'ms';
 
 import type { DriveFoldersRepository } from '@/models/_.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';

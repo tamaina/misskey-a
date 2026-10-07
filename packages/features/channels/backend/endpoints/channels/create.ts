@@ -6,7 +6,7 @@
 import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
 import { packedChannelsCreateDefinition, packedChannelsCreateInput, packedChannelsCreateOutput } from '../../../contract/packed-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
-import ms from '@/runtime-dependencies/ms.js';
+import ms from 'ms';
 
 import type { ChannelsRepository, DriveFilesRepository } from '@/models/_.js';
 import type { MiChannel } from '../../models/Channel.js';

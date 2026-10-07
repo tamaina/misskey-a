@@ -6,7 +6,7 @@
 import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
 import { inlineFetchExternalResourcesDefinition, inlineFetchExternalResourcesInput, inlineFetchExternalResourcesOutput } from '../../contract/endpoint-definitions.js';
 import { createHash } from 'crypto';
-import ms from '@/runtime-dependencies/ms.js';
+import ms from 'ms';
 import { Injectable } from '@nestjs/common';
 
 import { HttpRequestService } from '@features/runtime/backend/services/HttpRequestService.js';

@@ -4,7 +4,7 @@
  */
 
 import { relationshipContract } from '../../../contract/commands.js';
-import ms from '@/runtime-dependencies/ms.js';
+import ms from 'ms';
 import { relationshipErrors } from '@features/relationships/contract';
 import { legacyRelationshipSchemas } from '@features/relationships/backend';
 import type { Schema } from '@features/api/backend/utility/json-schema.js';

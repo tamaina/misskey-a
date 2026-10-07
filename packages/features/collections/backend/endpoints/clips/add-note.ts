@@ -4,7 +4,7 @@
  */
 
 import { collectionsContract } from '../../../contract/index.js';
-import ms from '@/runtime-dependencies/ms.js';
+import ms from 'ms';
 import { collectionsErrors } from '@features/collections/contract';
 import { legacyCollectionsSchemas } from '@features/collections/backend';
 import type { Schema } from '@features/api/backend/utility/json-schema.js';

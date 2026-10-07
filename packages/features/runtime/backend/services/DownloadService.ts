@@ -6,8 +6,8 @@
 import * as fs from 'node:fs';
 import * as stream from 'node:stream/promises';
 import { Inject, Injectable } from '@nestjs/common';
-import chalk from '@/runtime-dependencies/chalk.js';
-import got, * as Got from '@/runtime-dependencies/got.js';
+import chalk from 'chalk';
+import got, * as Got from 'got';
 import { parse } from 'content-disposition';
 import { DI } from '@/di-symbols.js';
 import type { Config } from '@/config.js';

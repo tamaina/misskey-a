@@ -6,7 +6,7 @@
 import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
 import { packedIUpdateEmailDefinition, packedIUpdateEmailInput, packedIUpdateEmailOutput } from '../../../contract/packed-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
-import ms from '@/runtime-dependencies/ms.js';
+import ms from 'ms';
 import bcrypt from 'bcryptjs';
 
 import type { MiMeta, UserProfilesRepository } from '@/models/_.js';

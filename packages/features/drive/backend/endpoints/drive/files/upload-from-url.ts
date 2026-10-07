@@ -5,7 +5,7 @@
 
 import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
 import { voidDriveFilesUploadFromUrlDefinition, voidDriveFilesUploadFromUrlInput, voidDriveFilesUploadFromUrlOutput } from '../../../../contract/void-endpoint-definitions.js';
-import ms from '@/runtime-dependencies/ms.js';
+import ms from 'ms';
 import { Injectable } from '@nestjs/common';
 
 import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';

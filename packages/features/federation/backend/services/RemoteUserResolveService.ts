@@ -5,7 +5,7 @@
 
 import { URL } from 'node:url';
 import { Inject, Injectable } from '@nestjs/common';
-import chalk from '@/runtime-dependencies/chalk.js';
+import chalk from 'chalk';
 import { IsNull } from 'typeorm';
 import { DI } from '@/di-symbols.js';
 import type { UsersRepository } from '@/models/_.js';

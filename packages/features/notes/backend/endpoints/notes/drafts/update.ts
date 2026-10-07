@@ -4,7 +4,7 @@
  */
 
 import { Injectable } from '@nestjs/common';
-import ms from '@/runtime-dependencies/ms.js';
+import ms from 'ms';
 import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
 import { notesDraftsUpdateDefinition } from '../../../../contract/draft-endpoint-definitions.js';
 import { NoteDraftService } from '../../../services/NoteDraftService.js';

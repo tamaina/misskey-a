@@ -8,7 +8,7 @@ import {
 	generateRegistrationOptions, verifyAuthenticationResponse,
 	verifyRegistrationResponse,
 } from '@simplewebauthn/server';
-import { AttestationFormat, isoCBOR, isoUint8Array } from '@/runtime-dependencies/webauthn-helpers.js';
+import { AttestationFormat, isoCBOR, isoUint8Array } from '@simplewebauthn/server/helpers';
 import type { MiMeta, UserSecurityKeysRepository } from '@/models/_.js';
 import type { Config } from '@/config.js';
 import { bindThis } from '@/decorators.js';

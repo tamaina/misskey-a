@@ -5,7 +5,7 @@
 
 import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
 import { voidExportCustomEmojisDefinition, voidExportCustomEmojisInput, voidExportCustomEmojisOutput } from '../../contract/void-endpoint-definitions.js';
-import ms from '@/runtime-dependencies/ms.js';
+import ms from 'ms';
 import { Injectable } from '@nestjs/common';
 
 import { QueueService } from '@features/runtime/backend/services/QueueService.js';

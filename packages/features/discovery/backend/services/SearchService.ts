@@ -17,7 +17,7 @@ import { CacheService } from '@features/users/backend/services/CacheService.js';
 import { QueryService } from '@features/notes/backend/services/QueryService.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { LoggerService } from '@features/runtime/backend/services/LoggerService.js';
-import type { Index, Meilisearch } from '@/runtime-dependencies/meilisearch.js';
+import type { Index, Meilisearch } from 'meilisearch';
 
 type K = string;
 type V = string | number | boolean;

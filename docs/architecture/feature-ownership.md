@@ -171,8 +171,11 @@ with direct old-path bridges preserving provider identity. The three review-requ
 cleanup processors stay in place until their mixed responsibilities are resolved.
 Queue names, scheduling, retries and processor behavior are unchanged. All 37
 registered processor providers retain their constructor/injection metadata. Archive
-runtime dependencies resolve through the backend package's small queue adapter;
-feature directories do not acquire package manifests or build configuration.
+runtime dependencies resolve through the backend-owned TypeScript paths and the
+public-export resolvers used by both build modes and Vitest. Export-only dependency
+shims have been removed; the real jsonld and systeminformation lazy loaders remain
+feature implementations. Feature directories do not acquire package manifests or
+build configuration.
 
 The model placement checkpoint moves all 76 TypeORM entities plus the notification
 model types and instance-meta persistence helper to their owning `backend/models`.

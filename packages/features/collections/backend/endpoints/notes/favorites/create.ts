@@ -6,7 +6,7 @@
 import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
 import { voidNotesFavoritesCreateDefinition, voidNotesFavoritesCreateInput, voidNotesFavoritesCreateOutput } from '../../../../contract/void-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
-import ms from '@/runtime-dependencies/ms.js';
+import ms from 'ms';
 import type { NoteFavoritesRepository } from '@/models/_.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 

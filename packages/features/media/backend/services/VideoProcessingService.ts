@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import FFmpeg from '@/runtime-dependencies/ffmpeg.js';
+import FFmpeg from 'fluent-ffmpeg';
 import type { Config } from '@/config.js';
 import { createTempDir } from '@features/runtime/backend/io/create-temp.js';
 import { bindThis } from '@/decorators.js';

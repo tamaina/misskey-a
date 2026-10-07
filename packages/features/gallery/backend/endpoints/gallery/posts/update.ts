@@ -5,7 +5,7 @@
 
 import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
 import { uniqueGalleryPostsUpdateDefinition, uniqueGalleryPostsUpdateInput, uniqueGalleryPostsUpdateOutput } from '../../../../contract/unique-string-endpoint-definitions.js';
-import ms from '@/runtime-dependencies/ms.js';
+import ms from 'ms';
 import { Inject, Injectable } from '@nestjs/common';
 import type { DriveFilesRepository, GalleryPostsRepository } from '@/models/_.js';
 import type { MiDriveFile } from '@features/drive/backend/models/DriveFile.js';
