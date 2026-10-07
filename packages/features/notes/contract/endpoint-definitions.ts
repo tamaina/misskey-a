@@ -31,10 +31,10 @@ export const inlineNotesShowPartialBulkDefinition = defineEndpointContract(
 	inlineNotesShowPartialBulkOutput,
 );
 
-export const inlineNotesStateInput = v.looseObject({
+export const inlineNotesStateInput = v.object({
 	"noteId": misskeyId,
 });
-export const inlineNotesStateOutput = resultObject({
+export const inlineNotesStateOutput = v.strictObject({
 	"isFavorited": v.boolean(),
 	"isMutedThread": v.boolean(),
 });

@@ -8,6 +8,7 @@
 			"@nestjs/common": ["./node_modules/@nestjs/common/index.d.ts"],
 			"@nestjs/testing": ["./node_modules/@nestjs/testing/index.d.ts"],
 			"vitest": ["./node_modules/vitest/dist/index.d.ts"],
+			"vitest-mock-extended": ["./node_modules/vitest-mock-extended/lib/esm/index.d.ts"],
 			"@nestjs/core": ["./node_modules/@nestjs/core"],
 			"pg": ["./node_modules/@types/pg/index.d.ts"],
 			"chalk-template": ["./node_modules/chalk-template/index.d.ts"],
