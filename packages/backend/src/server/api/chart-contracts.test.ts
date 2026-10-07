@@ -15,7 +15,7 @@ import * as descriptors from '@features/statistics/shared/chart-descriptors.js';
 import { Endpoint } from '@features/api/backend/transport/endpoint-base.js';
 import { projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
 import { ApiError } from '@features/api/backend/transport/error.js';
-import documentedEndpoints from './endpoints.js';
+import { endpoints as documentedEndpoints } from '@features/index/backend/endpoints.js';
 import { genOpenapiSpec } from '@features/api/backend/transport/openapi/gen-spec.js';
 import { convertSchemaToOpenApiSchema } from '@features/api/backend/transport/openapi/schemas.js';
 import * as endpoint0 from '@features/statistics/backend/endpoints/charts/active-users.js';
@@ -46,7 +46,7 @@ import * as chartEntity11 from '@features/statistics/backend/charts/definitions/
 // Collection instances are never created. Only the real schemaToEntity metadata generator runs.
 vi.mock('@features/persistence/backend/repositories/models.js', () => ({ miRepository: {} }));
 // Restrict documentation input to these real chart endpoint modules, avoiding unrelated endpoints.
-vi.mock('./endpoints.js', () => ({ default: [] }));
+vi.mock('@features/index/backend/endpoints.js', () => ({ endpoints: [] }));
 vi.mock('@features/statistics/backend/charts/active-users.js', () => ({ ActiveUsersChart: class {} }));
 vi.mock('@features/statistics/backend/charts/ap-request.js', () => ({ ApRequestChart: class {} }));
 vi.mock('@features/statistics/backend/charts/drive.js', () => ({ DriveChart: class {} }));

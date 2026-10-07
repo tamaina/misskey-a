@@ -19,7 +19,7 @@ import { pageServices } from '@features/pages/backend/services.js';
 import { playServices } from '@features/play/backend/services.js';
 import { LoggerService } from '@features/runtime/backend/services/LoggerService.js';
 import { CoreModule } from '@features/boot/backend/assembly/CoreModule.js';
-import { featureServiceExports, featureServiceGroups, featureServiceProviders } from './feature-service-providers.js';
+import { featureServiceExports, featureServiceGroups, featureServiceProviders } from '@features/index/backend/feature-service-providers.js';
 import type { Packed } from '@features/index/contract/packed.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 import type { SelectQueryBuilder } from 'typeorm';

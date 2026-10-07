@@ -22,12 +22,12 @@ import { ContractEndpoint, projectEndpointContract } from '@features/api/backend
 import { convertSchemaToOpenApiSchema } from '@features/api/backend/transport/openapi/schemas.js';
 import baseline from '../../../test/fixtures/reference-contract-baseline.json' with { type: 'json' };
 import type { Config } from '@/config.js';
-import type { IEndpointMeta } from './endpoints.js';
-import documentedEndpoints from './endpoints.js';
+import type { IEndpointMeta } from '@features/index/backend/endpoints.js';
+import { endpoints as documentedEndpoints } from '@features/index/backend/endpoints.js';
 import { genOpenapiSpec } from '@features/api/backend/transport/openapi/gen-spec.js';
 
 // Run the real writer without importing endpoint handlers or Nest services.
-vi.mock('./endpoints.js', () => ({ default: [] }));
+vi.mock('@features/index/backend/endpoints.js', () => ({ endpoints: [] }));
 
 const transportMeta = { requireCredential: false } as const;
 const definitions = { ...instanceDefinitions, ...operationDefinitions, ...roleDefinitions, ...gameDefinitions, ...userDefinitions };

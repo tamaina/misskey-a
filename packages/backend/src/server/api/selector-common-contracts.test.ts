@@ -13,13 +13,13 @@ import { misskeyIdPattern } from '@features/api/contract/index.js';
 import { defineEndpointContract } from '@features/api/contract/definition.js';
 import type { Schema } from '@features/api/backend/utility/json-schema.js';
 import type { Config } from '@/config.js';
-import type { IEndpointMeta } from './endpoints.js';
-import documentedEndpoints from './endpoints.js';
+import type { IEndpointMeta } from '@features/index/backend/endpoints.js';
+import { endpoints as documentedEndpoints } from '@features/index/backend/endpoints.js';
 import { Endpoint } from '@features/api/backend/transport/endpoint-base.js';
 import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
 import { genOpenapiSpec } from '@features/api/backend/transport/openapi/gen-spec.js';
 import baseline from '../../../test/fixtures/selector-common-contract-baseline.json' with { type: 'json' };
-vi.mock('./endpoints.js', () => ({ default: [] }));
+vi.mock('@features/index/backend/endpoints.js', () => ({ endpoints: [] }));
 const Ajv = _Ajv.default;
 const definitions = {
 	'admin/emoji/update': allOfAdminEmojiUpdateDefinition,

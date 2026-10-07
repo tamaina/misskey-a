@@ -17,7 +17,7 @@ import { projectEndpointContract } from '@features/api/backend/transport/contrac
 import { convertSchemaToOpenApiSchema } from '@features/api/backend/transport/openapi/schemas.js';
 import type { Schema } from '@features/api/backend/utility/json-schema.js';
 import legacy from '../../../test/fixtures/user-update-contract-baseline.json' with { type: 'json' };
-vi.mock('./endpoints.js', () => ({ default: [] }));
+vi.mock('@features/index/backend/endpoints.js', () => ({ endpoints: [] }));
 const projection = () => projectEndpointContract(iUpdateDefinition).input;
 const canonical = (x: unknown) => JSON.parse(JSON.stringify(x));
 test('exact legacy projection, all 37 optional fields and 221 language keys', () => {

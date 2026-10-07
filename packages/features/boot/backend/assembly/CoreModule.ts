@@ -104,7 +104,7 @@ import { UtilityService } from '@features/federation/backend/services/UtilitySer
 import { CacheService } from '@features/users/backend/services/CacheService.js';
 import { QueryService } from '@features/notes/backend/services/QueryService.js';
 import { EmailService } from '@features/email/backend/services/EmailService.js';
-import { featureServiceProviders, featureServiceExports } from '@/core/feature-service-providers.js';
+import { featureServiceProviders, featureServiceExports } from '@features/index/backend/feature-service-providers.js';
 import type { ExistingProvider } from '@nestjs/common';
 
 // Preserve the canonical provider order. Factory-owned features are composed

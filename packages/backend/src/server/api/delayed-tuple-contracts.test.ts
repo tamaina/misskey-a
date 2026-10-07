@@ -23,11 +23,11 @@ import { convertSchemaToOpenApiSchema } from '@features/api/backend/transport/op
 import { genOpenapiSpec } from '@features/api/backend/transport/openapi/gen-spec.js';
 import type { Config } from '@/config.js';
 import type { Schema } from '@features/api/backend/utility/json-schema.js';
-import type { IEndpointMeta } from './endpoints.js';
-import documentedEndpoints from './endpoints.js';
+import type { IEndpointMeta } from '@features/index/backend/endpoints.js';
+import { endpoints as documentedEndpoints } from '@features/index/backend/endpoints.js';
 import baseline from '../../../test/fixtures/delayed-tuple-contract-baseline.json' with { type: 'json' };
 
-vi.mock('./endpoints.js', () => ({ default: [] }));
+vi.mock('@features/index/backend/endpoints.js', () => ({ endpoints: [] }));
 const transportMeta = { requireCredential: false } as const;
 const frozenInput = { type: 'object', properties: {}, required: [] } as const;
 

@@ -15,7 +15,7 @@ import { HashtagService } from '@features/discovery/backend/services/HashtagServ
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { UtilityService } from '@features/federation/backend/services/UtilityService.js';
-import { featureServiceGroups } from './feature-service-providers.js';
+import { featureServiceGroups } from '@features/index/backend/feature-service-providers.js';
 import type { FactoryProvider } from '@nestjs/common';
 import type { ChainableCommander } from 'ioredis';
 import type { Inputs } from '@features/index/backend/service-definitions.js';

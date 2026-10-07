@@ -11,7 +11,7 @@ import { mockDeep } from 'vitest-mock-extended';
 import { Test } from '@nestjs/testing';
 import { GlobalModule } from '@features/boot/backend/assembly/GlobalModule.js';
 import { AnnouncementService } from '@features/announcements/backend/services/AnnouncementService.js';
-import { featureServiceGroups } from '@/core/feature-service-providers.js';
+import { featureServiceGroups } from '@features/index/backend/feature-service-providers.js';
 import type {
 	AnnouncementReadsRepository,
 	AnnouncementsRepository,

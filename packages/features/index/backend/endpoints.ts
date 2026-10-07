@@ -131,7 +131,7 @@ export interface IEndpoint {
 	params: Schema;
 }
 
-const endpoints: IEndpoint[] = Object.entries(endpointsObject).map(([name, ep]) => {
+export const endpoints: IEndpoint[] = Object.entries(endpointsObject).map(([name, ep]) => {
 	return {
 		name: name,
 		get meta() {

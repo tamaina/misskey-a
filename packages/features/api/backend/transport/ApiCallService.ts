@@ -25,7 +25,7 @@ import { AuthenticateService, AuthenticationError } from '@features/auth/backend
 import type { Readable } from 'node:stream';
 import type { FastifyRequest, FastifyReply } from 'fastify';
 import type { OnApplicationShutdown } from '@nestjs/common';
-import type { IEndpointMeta, IEndpoint } from '@/server/api/endpoints.js';
+import type { IEndpointMeta, IEndpoint } from '@features/index/backend/endpoints.js';
 
 const accessDenied = {
 	message: 'Access denied.',

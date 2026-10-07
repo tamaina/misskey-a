@@ -14,7 +14,7 @@ import { jsonObject } from '@features/api/contract/json-object.js';
 import { requireWhenAllNullish } from '@features/api/contract/require-when-all-nullish.js';
 import { toLegacyJsonSchema } from '@features/api/backend/index.js';
 import { defineEndpointContract } from '@features/api/contract/definition.js';
-import documentedEndpoints from './endpoints.js';
+import { endpoints as documentedEndpoints } from '@features/index/backend/endpoints.js';
 import { genOpenapiSpec } from '@features/api/backend/transport/openapi/gen-spec.js';
 import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
 import { Endpoint } from '@features/api/backend/transport/endpoint-base.js';
@@ -277,7 +277,7 @@ const frozenMeta = {
     }
   }
 } as const;
-vi.mock('./endpoints.js', () => ({ default: [] }));
+vi.mock('@features/index/backend/endpoints.js', () => ({ endpoints: [] }));
 const transportMeta = { requireCredential: false } as const;
 const projection = projectEndpointContract(notesCreateDefinition);
 type Flatten<T> = { [K in keyof T]: T[K] };

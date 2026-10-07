@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import type { ApiFeatures } from '@/server/api/feature-providers.js';
+import type { ApiFeatures } from '@features/index/backend/feature-providers.js';
 
 type Handler = { exec: (...args: never[]) => unknown };
 

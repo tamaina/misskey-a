@@ -14,12 +14,12 @@ import { emptyReversiInvitationsInput, emptyReversiInvitationsOutput, emptyInput
 import { getPackedReference, getPackedReferenceLegacyOutputSchema } from '@features/api/contract/packed-reference.js';
 import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
 import { Endpoint } from '@features/api/backend/transport/endpoint-base.js';
-import documentedEndpoints from './endpoints.js';
+import { endpoints as documentedEndpoints } from '@features/index/backend/endpoints.js';
 import { genOpenapiSpec } from '@features/api/backend/transport/openapi/gen-spec.js';
 import { convertSchemaToOpenApiSchema } from '@features/api/backend/transport/openapi/schemas.js';
 
 // Exercise the production writer without importing Nest handlers or unrelated services.
-vi.mock('./endpoints.js', () => ({ default: [] }));
+vi.mock('@features/index/backend/endpoints.js', () => ({ endpoints: [] }));
 
 const definitions = { ...authDefinitions, ...gamesDefinitions };
 const frozenMetas = {

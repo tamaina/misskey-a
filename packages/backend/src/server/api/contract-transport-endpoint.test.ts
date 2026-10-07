@@ -11,7 +11,7 @@ import { channelContract, channelInputs } from '@features/channels/contract';
 import { clipFavoriteInputs } from '@features/collections/contract';
 import { portabilityContract } from '@features/portability/contract';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
-import type { ApiFeatures } from './feature-providers.js';
+import type { ApiFeatures } from '@features/index/backend/feature-providers.js';
 import { createContractTransportEndpoint } from '@features/api/backend/transport/contract-transport-endpoint.js';
 import { Endpoint } from '@features/api/backend/transport/endpoint-base.js';
 import { ApiError } from '@features/api/backend/transport/error.js';

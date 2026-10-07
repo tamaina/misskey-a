@@ -20,15 +20,15 @@ import { Endpoint } from '@features/api/backend/transport/endpoint-base.js';
 import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
 import { convertSchemaToOpenApiSchema } from '@features/api/backend/transport/openapi/schemas.js';
 import { genOpenapiSpec } from '@features/api/backend/transport/openapi/gen-spec.js';
-import documentedEndpoints from './endpoints.js';
+import { endpoints as documentedEndpoints } from '@features/index/backend/endpoints.js';
 import type { Config } from '@/config.js';
 import type { Schema } from '@features/api/backend/utility/json-schema.js';
-import type { IEndpointMeta } from './endpoints.js';
+import type { IEndpointMeta } from '@features/index/backend/endpoints.js';
 import baseline from '../../../test/fixtures/union-contract-baseline.json' with { type: 'json' };
 import { EndpointImplementation as MetaEndpoint, meta as metaMetadata } from '@features/instance/backend/endpoints/meta.js';
 import { EndpointImplementation as RelationEndpoint, meta as relationMetadata } from '@features/relationships/backend/endpoints/users/relation.js';
 
-vi.mock('./endpoints.js', () => ({ default: [] }));
+vi.mock('@features/index/backend/endpoints.js', () => ({ endpoints: [] }));
 vi.mock('../../../../features/instance/backend/serializers/MetaEntityService.js', () => ({ MetaEntityService: class {} }));
 vi.mock('../../../../features/users/backend/serializers/UserEntityService.js', () => ({ UserEntityService: class {} }));
 

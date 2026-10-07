@@ -25,7 +25,7 @@ import { assertLegacyOutputOneOfMetadata } from '@features/api/backend/legacy-ou
 import { convertSchemaToOpenApiSchema } from './openapi/schemas.js';
 import { Endpoint } from './endpoint-base.js';
 import type { EndpointExecutor } from './endpoint-base.js';
-import type { IEndpointMeta } from '@/server/api/endpoints.js';
+import type { IEndpointMeta } from '@features/index/backend/endpoints.js';
 
 /** Flatten public Valibot pipelines in the same order as the JSON Schema converter. */
 function* flattenInputPipe(pipe: unknown[], parents = new Set<object>()): Generator<unknown> {

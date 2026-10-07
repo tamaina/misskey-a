@@ -9,9 +9,10 @@ import { fileURLToPath } from 'node:url';
 import { MODULE_METADATA } from '@nestjs/common/constants.js';
 import { expect, test } from 'vitest';
 import * as ts from 'typescript';
-import * as endpointRegistry from './endpoint-list.js';
+import documentedEndpoints, { endpoints as namedEndpoints } from '@features/index/backend/endpoints.js';
+import * as endpointRegistry from '@features/index/backend/endpoint-list.js';
 import { EndpointsModule } from '@features/boot/backend/assembly/EndpointsModule.js';
-import { featureTokens } from './feature-providers.js';
+import { featureTokens } from '@features/index/backend/feature-providers.js';
 import * as featureDefaultEndpoint0 from '@features/federation/backend/endpoints/admin/federation/delete-all-files.js';
 import * as featureDefaultEndpoint1 from '@features/federation/backend/endpoints/admin/federation/remove-all-following.js';
 import * as featureDefaultEndpoint2 from '@features/integrations/backend/endpoints/admin/send-email.js';
@@ -48,7 +49,7 @@ const featureDefaultEndpoints = new Map<string, { owner: string; endpoint: Endpo
 	['users/notes', { owner: 'timelines', endpoint: featureDefaultEndpoint7 }],
 ]);
 const endpointModules = endpointRegistry as unknown as Record<string, EndpointModule>;
-const sourceFile = fileURLToPath(new URL('./endpoint-list.ts', import.meta.url));
+const sourceFile = fileURLToPath(new URL('../../../../features/index/backend/endpoint-list.ts', import.meta.url));
 const source = readFileSync(sourceFile, 'utf8');
 const ast = ts.createSourceFile(sourceFile, source, ts.ScriptTarget.Latest, true);
 const routeSources = new Map<string, string>();
@@ -65,6 +66,8 @@ const expectedFeatureFactories = JSON.parse(readFileSync(fileURLToPath(new URL('
 const moduleProviders = Reflect.getMetadata(MODULE_METADATA.PROVIDERS, EndpointsModule) as ProviderDefinition[];
 
 test('API endpoint route keys retain the published contract', () => {
+	expect(namedEndpoints).toBe(documentedEndpoints);
+	expect(namedEndpoints.map(endpoint => endpoint.name)).toEqual(Object.keys(endpointModules));
 	const routeKeys = Object.keys(endpointModules).sort();
 	expect([...routeSources.keys()].sort()).toEqual(expectedRouteKeys);
 	expect([...routeSources.keys()]).toEqual(expectedRouteOrder);

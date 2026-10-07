@@ -24,7 +24,7 @@ import { FileInfoService } from '@features/media/backend/services/FileInfoServic
 import { MfmService } from '@features/markup/backend/services/MfmService.js';
 import { RegistryApiService } from '@features/preferences/backend/services/RegistryApiService.js';
 import { ModerationLogService } from '@features/moderation/backend/services/ModerationLogService.js';
-import { featureServiceGroups } from './feature-service-providers.js';
+import { featureServiceGroups } from '@features/index/backend/feature-service-providers.js';
 import type { FactoryProvider, InjectionToken, Provider } from '@nestjs/common';
 import type { SelectQueryBuilder } from 'typeorm';
 import type { Inputs } from '@features/index/backend/service-definitions.js';

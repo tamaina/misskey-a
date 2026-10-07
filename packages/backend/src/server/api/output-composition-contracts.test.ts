@@ -16,15 +16,15 @@ import { packedSchemas } from '@features/index/contract/packed.js';
 import type { Packed } from '@features/index/contract/packed.js';
 import type { Schema } from '@features/api/backend/utility/json-schema.js';
 import type { Config } from '@/config.js';
-import type { IEndpointMeta } from './endpoints.js';
-import documentedEndpoints from './endpoints.js';
+import type { IEndpointMeta } from '@features/index/backend/endpoints.js';
+import { endpoints as documentedEndpoints } from '@features/index/backend/endpoints.js';
 import { Endpoint } from '@features/api/backend/transport/endpoint-base.js';
 import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
 import { convertSchemaToOpenApiSchema } from '@features/api/backend/transport/openapi/schemas.js';
 import { genOpenapiSpec } from '@features/api/backend/transport/openapi/gen-spec.js';
 import baseline from '../../../test/fixtures/output-composition-contract-baseline.json' with { type: 'json' };
 
-vi.mock('./endpoints.js', () => ({ default: [] }));
+vi.mock('@features/index/backend/endpoints.js', () => ({ endpoints: [] }));
 const definitions = {
 	'ap/show': compositionApShowDefinition,
 	'admin/accounts/create': compositionAdminAccountsCreateDefinition,

@@ -19,9 +19,9 @@ import type { Config } from '@/config.js';
 import { Endpoint } from '@features/api/backend/transport/endpoint-base.js';
 import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
 import { genOpenapiSpec } from '@features/api/backend/transport/openapi/gen-spec.js';
-import documentedEndpoints from './endpoints.js';
+import { endpoints as documentedEndpoints } from '@features/index/backend/endpoints.js';
 
-vi.mock('./endpoints.js', () => ({ default: [] }));
+vi.mock('@features/index/backend/endpoints.js', () => ({ endpoints: [] }));
 vi.mock('node:fs', async () => ({
 	...await vi.importActual<typeof import('node:fs')>('node:fs'),
 	unlink: vi.fn((_path: string, callback: (error: Error | null) => void) => callback(null)),

@@ -21,7 +21,7 @@ import { UserSearchService } from '@features/discovery/backend/services/UserSear
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import { MiUserSecurityKey } from '@features/auth/backend/models/UserSecurityKey.js';
 import { ports } from '@features/index/backend/service-ports.js';
-import { featureServiceGroups } from './feature-service-providers.js';
+import { featureServiceGroups } from '@features/index/backend/feature-service-providers.js';
 import type { FactoryProvider, InjectionToken, Provider } from '@nestjs/common';
 import type { AuthenticationResponseJSON, PublicKeyCredentialRequestOptionsJSON, PublicKeyCredentialCreationOptionsJSON, RegistrationResponseJSON } from '@simplewebauthn/server';
 import type { SelectQueryBuilder } from 'typeorm';

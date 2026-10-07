@@ -46,8 +46,8 @@ import { HttpRequestService } from '@features/runtime/backend/services/HttpReque
 import { LoggerService } from '@features/runtime/backend/services/LoggerService.js';
 import { QueryService } from '@features/notes/backend/services/QueryService.js';
 import { UtilityService } from '@features/federation/backend/services/UtilityService.js';
-import { toNestProviders } from './feature-service-provider-types.js';
-import { featureServiceGroups } from './feature-service-providers.js';
+import { toNestProviders } from '@features/index/backend/feature-service-provider-types.js';
+import { featureServiceGroups } from '@features/index/backend/feature-service-providers.js';
 import type { FactoryProvider, Provider } from '@nestjs/common';
 import type { Inputs, ServiceDefinition } from '@features/index/backend/service-definitions.js';
 

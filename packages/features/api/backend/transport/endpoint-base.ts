@@ -10,7 +10,7 @@ import type { Schema } from '../utility/json-schema.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 import type { MiAccessToken } from '@features/auth/backend/models/AccessToken.js';
 import { ApiError } from './error.js';
-import type { IEndpointMeta } from '@/server/api/endpoints.js';
+import type { IEndpointMeta } from '@features/index/backend/endpoints.js';
 
 const Ajv = _Ajv.default;
 

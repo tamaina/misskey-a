@@ -22,13 +22,13 @@ import { packedAchievementNameSchema } from '@features/users/contract/packed.js'
 import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
 import { Endpoint } from '@features/api/backend/transport/endpoint-base.js';
 import { ApiError } from '@features/api/backend/transport/error.js';
-import documentedEndpoints from './endpoints.js';
-import type { IEndpointMeta } from './endpoints.js';
+import { endpoints as documentedEndpoints } from '@features/index/backend/endpoints.js';
+import type { IEndpointMeta } from '@features/index/backend/endpoints.js';
 import { genOpenapiSpec } from '@features/api/backend/transport/openapi/gen-spec.js';
 import { convertSchemaToOpenApiSchema } from '@features/api/backend/transport/openapi/schemas.js';
 
 // Exercise the real writer without importing Nest handlers or unrelated runtime services.
-vi.mock('./endpoints.js', () => ({ default: [] }));
+vi.mock('@features/index/backend/endpoints.js', () => ({ endpoints: [] }));
 
 const definitions = {
 	...operationsDefinitions,

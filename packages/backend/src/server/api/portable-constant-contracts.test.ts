@@ -6,8 +6,8 @@
 import { expect, expectTypeOf, test, vi } from 'vitest';
 import type { Config } from '@/config.js';
 import type { Schema } from '@features/api/backend/utility/json-schema.js';
-import type { IEndpointMeta } from './endpoints.js';
-import documentedEndpoints from './endpoints.js';
+import type { IEndpointMeta } from '@features/index/backend/endpoints.js';
+import { endpoints as documentedEndpoints } from '@features/index/backend/endpoints.js';
 import { genOpenapiSpec } from '@features/api/backend/transport/openapi/gen-spec.js';
 import * as v from 'valibot';
 import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
@@ -916,7 +916,7 @@ const frozenMetas = {
   }
 } as const;
 
-vi.mock('./endpoints.js', () => ({ default: [] }));
+vi.mock('@features/index/backend/endpoints.js', () => ({ endpoints: [] }));
 const transportMeta = { requireCredential: false } as const;
 
 function normalized(value: unknown): unknown {

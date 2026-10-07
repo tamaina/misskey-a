@@ -4,7 +4,7 @@
  */
 
 import { defineServices, service } from '@features/index/backend/service-definitions.js';
-import { bindLegacyService } from './feature-service-provider-types.js';
+import { bindLegacyService } from '@features/index/backend/feature-service-provider-types.js';
 import type { Inputs, Port } from '@features/index/backend/service-definitions.js';
 
 interface Apps { apps(): void }

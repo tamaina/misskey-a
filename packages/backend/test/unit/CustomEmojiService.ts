@@ -5,7 +5,7 @@
 
 import { afterEach, beforeAll, describe, test, expect } from 'vitest';
 import { Test, TestingModule } from '@nestjs/testing';
-import { featureServiceGroups } from '@/core/feature-service-providers.js';
+import { featureServiceGroups } from '@features/index/backend/feature-service-providers.js';
 import { UtilityService } from '@features/federation/backend/services/UtilityService.js';
 import { DI } from '@/di-symbols.js';
 import { GlobalModule } from '@features/boot/backend/assembly/GlobalModule.js';

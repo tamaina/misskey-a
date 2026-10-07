@@ -393,7 +393,7 @@ export const featureProviders: Provider[] = [{
 			countSince: cutoff => usersRepository.countBy({ lastActiveDate: MoreThan(cutoff) }),
 		},
 		readEndpoints: async () => {
-			const { default: endpoints } = await import('./endpoints.js');
+			const { endpoints } = await import('./endpoints.js');
 			return endpoints.map(endpoint => {
 				const properties = Object.fromEntries(Object.entries(endpoint.params.properties ?? {}).map(([name, property]) => {
 					const projected: { type?: string } = {};
