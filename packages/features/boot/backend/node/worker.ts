@@ -9,7 +9,7 @@ import { envOption } from '@/env.js';
 import { loadConfig } from '@/config.js';
 import type { Config } from '@/config.js';
 import { configureLogging, shutdownLogging } from '@features/runtime/backend/logging/logging-runtime.js';
-import { initTelemetry, shutdownTelemetry } from '@/core/telemetry/telemetry-registry.js';
+import { initTelemetry, shutdownTelemetry } from '@features/statistics/backend/telemetry/telemetry-registry.js';
 import { initExtraThreadPool, acquireLegacyRole } from './common.js';
 import { createProcessRoles, planRoles } from '@features/boot/backend';
 import { readyRef } from './ready.js';

@@ -15,7 +15,7 @@ import { configureLogging, shutdownLogging } from '@features/runtime/backend/log
 import type { LogFormat } from '@features/runtime/backend/logging/types.js';
 import { showMachineInfo } from '@features/operations/backend/utility/show-machine-info.js';
 import { envOption } from '@/env.js';
-import { initTelemetry, shutdownTelemetry } from '@/core/telemetry/telemetry-registry.js';
+import { initTelemetry, shutdownTelemetry } from '@features/statistics/backend/telemetry/telemetry-registry.js';
 import { initExtraThreadPool, acquireLegacyRole } from './common.js';
 import { createProcessRoles, planRoles, stopClusterWorkers } from '@features/boot/backend';
 import { readyRef } from './ready.js';

@@ -30,7 +30,7 @@ export async function acquireLegacyRole(name: RoleName): Promise<ProcessRole> {
 		import('../assembly/MainModule.js'), import('../assembly/QueueProcessorModule.js'),
 		import('../assembly/ServerService.mjs'), import('@features/runtime/backend/queue/QueueProcessorService.js'),
 		import('@features/statistics/backend/services/ChartManagementService.js'), import('@features/runtime/backend/queue/QueueStatsService.js'),
-		import('@/daemons/ServerStatsService.js'), import('@features/notes/backend/services/NoteCreateService.js'),
+		import('@features/statistics/backend/daemons/ServerStatsService.js'), import('@features/notes/backend/services/NoteCreateService.js'),
 		import('@features/federation/backend/jobs/InboxProcessorService.js'), import('../assembly/GlobalModule.js'), import('../assembly/QueueModule.js'),
 	]);
 	const app = await NestFactory.createApplicationContext(name === 'server' ? MainModule : QueueProcessorModule, {

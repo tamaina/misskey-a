@@ -7,7 +7,7 @@ import { Module } from '@nestjs/common';
 import { CoreModule } from './CoreModule.js';
 import { GlobalModule } from './GlobalModule.js';
 import { QueueStatsService } from '@features/runtime/backend/queue/QueueStatsService.js';
-import { ServerStatsService } from '@/daemons/ServerStatsService.js';
+import { ServerStatsService } from '@features/statistics/backend/daemons/ServerStatsService.js';
 
 @Module({
 	imports: [

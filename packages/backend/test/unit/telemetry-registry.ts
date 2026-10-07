@@ -17,7 +17,7 @@ vi.mock('@features/runtime/backend/logging/logging-runtime.js', () => ({
 	setLogTraceContextProvider: mocks.setLogTraceContextProvider,
 }));
 
-vi.mock('@/core/telemetry/adapters/SentryTelemetryAdapter.js', () => ({
+vi.mock('@features/statistics/backend/telemetry/adapters/SentryTelemetryAdapter.js', () => ({
 	SentryTelemetryAdapter: {
 		create: mocks.sentryCreate,
 	},
@@ -39,7 +39,7 @@ describe('telemetry-registry', () => {
 	});
 
 	test('does not initialize an adapter when Sentry is not configured', async () => {
-		const { initTelemetry } = await import('@/core/telemetry/telemetry-registry.js');
+		const { initTelemetry } = await import('@features/statistics/backend/telemetry/telemetry-registry.js');
 
 		await initTelemetry(config({}));
 
@@ -48,7 +48,7 @@ describe('telemetry-registry', () => {
 	});
 
 	test('initializes Sentry and registers its trace context provider', async () => {
-		const { initTelemetry } = await import('@/core/telemetry/telemetry-registry.js');
+		const { initTelemetry } = await import('@features/statistics/backend/telemetry/telemetry-registry.js');
 		const sentryForBackend = { options: {}, enableNodeProfiling: false };
 		const getActiveTraceContext = vi.fn(() => ({
 			traceId: '0123456789abcdef0123456789abcdef',
@@ -76,7 +76,7 @@ describe('telemetry-registry', () => {
 	});
 
 	test('startSpan runs fn directly when no adapter is registered', async () => {
-		const { startSpan } = await import('@/core/telemetry/telemetry-registry.js');
+		const { startSpan } = await import('@features/statistics/backend/telemetry/telemetry-registry.js');
 
 		const fn = vi.fn().mockReturnValue('result');
 		expect(startSpan('test', fn)).toBe('result');
@@ -84,7 +84,7 @@ describe('telemetry-registry', () => {
 	});
 
 	test('startSpan delegates to the Sentry adapter', async () => {
-		const { initTelemetry, startSpan } = await import('@/core/telemetry/telemetry-registry.js');
+		const { initTelemetry, startSpan } = await import('@features/statistics/backend/telemetry/telemetry-registry.js');
 		const adapterStartSpan = vi.fn((_name: string, fn: () => string) => fn());
 		mocks.sentryCreate.mockResolvedValue({ shutdown: vi.fn(), captureMessage: vi.fn(), startSpan: adapterStartSpan });
 
@@ -96,7 +96,7 @@ describe('telemetry-registry', () => {
 	});
 
 	test('shutdownTelemetry waits for all registered adapters even when one rejects', async () => {
-		const { initTelemetry, shutdownTelemetry } = await import('@/core/telemetry/telemetry-registry.js');
+		const { initTelemetry, shutdownTelemetry } = await import('@features/statistics/backend/telemetry/telemetry-registry.js');
 		const firstShutdown = vi.fn().mockRejectedValue(new Error('first failed'));
 		const secondShutdown = vi.fn().mockResolvedValue(undefined);
 		mocks.sentryCreate

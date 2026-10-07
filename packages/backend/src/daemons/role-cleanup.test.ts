@@ -4,7 +4,7 @@
  */
 import { afterEach, expect, test, vi } from 'vitest';
 import { QueueStatsService } from '@features/runtime/backend/queue/QueueStatsService.js';
-import { ServerStatsService } from './ServerStatsService.js';
+import { ServerStatsService } from '@features/statistics/backend/daemons/ServerStatsService.js';
 import { ChartManagementService } from '@features/statistics/backend/services/ChartManagementService.js';
 const state = vi.hoisted(() => ({ events: [] as { close: ReturnType<typeof vi.fn> }[], emitters: [] as any[], cpu: [] as ((value: number) => void)[] }));
 vi.mock('bullmq', () => ({ QueueEvents: class {
