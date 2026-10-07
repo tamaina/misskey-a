@@ -6,7 +6,7 @@
 import { Injectable } from '@nestjs/common';
 import promiseLimit from 'promise-limit';
 import type { MiRemoteUser, MiUser } from '@features/users/backend/models/User.js';
-import { concat, unique } from '@/misc/prelude/array.js';
+import { concat, unique } from '@features/runtime/backend/data/array.js';
 import { bindThis } from '@/decorators.js';
 import { getApIds } from '../protocol/type.js';
 import { ApPersonService } from './ApPersonService.js';

@@ -19,7 +19,7 @@ import { UserEntityService } from '@features/users/backend/serializers/UserEntit
 import { NoteEntityService } from '@features/notes/backend/serializers/NoteEntityService.js';
 import { UtilityService } from '@/core/UtilityService.js';
 import { bindThis } from '@/decorators.js';
-import { IdentifiableError } from '@/misc/identifiable-error.js';
+import { IdentifiableError } from '@features/runtime/backend/errors/identifiable-error.js';
 import { FetchAllowSoftFailMask } from '../../protocol/misc/check-against-url.js';
 import { ApiError } from '@features/api/backend/transport/error.js';
 

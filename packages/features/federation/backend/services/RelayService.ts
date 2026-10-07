@@ -7,12 +7,12 @@ import { Inject, Injectable } from '@nestjs/common';
 import type { MiUser } from '@features/users/backend/models/User.js';
 import type { RelaysRepository } from '@/models/_.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
-import { MemorySingleCache } from '@/misc/cache.js';
+import { MemorySingleCache } from '@features/runtime/backend/cache/cache.js';
 import type { MiRelay } from '../models/Relay.js';
 import { QueueService } from '@features/runtime/backend/services/QueueService.js';
 import { ApRendererService } from './ApRendererService.js';
 import { DI } from '@/di-symbols.js';
-import { deepClone } from '@/misc/clone.js';
+import { deepClone } from '@features/runtime/backend/data/clone.js';
 import { bindThis } from '@/decorators.js';
 import { SystemAccountService } from '@features/users/backend/services/SystemAccountService.js';
 

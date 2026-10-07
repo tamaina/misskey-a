@@ -9,7 +9,7 @@ import ms from '@/runtime-dependencies/ms.js';
 import { Inject, Injectable } from '@nestjs/common';
 
 import type { FollowingsRepository } from '@/models/_.js';
-import { IdentifiableError } from '@/misc/identifiable-error.js';
+import { IdentifiableError } from '@features/runtime/backend/errors/identifiable-error.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import { UserFollowingService } from '../../services/UserFollowingService.js';
 import { DI } from '@/di-symbols.js';

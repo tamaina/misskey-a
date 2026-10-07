@@ -63,7 +63,11 @@
 			"feed": ["./node_modules/feed/lib/feed.d.ts"],
 			"@fastify/static": ["./node_modules/@fastify/static"],
 			"@fastify/http-proxy": ["./node_modules/@fastify/http-proxy"],
-			"vary": ["./node_modules/@types/vary/index.d.ts"]
+			"vary": ["./node_modules/@types/vary/index.d.ts"],
+			"nanoid": ["./node_modules/nanoid/index.d.ts"],
+			"@zip.js/zip.js": ["./node_modules/@zip.js/zip.js/index.d.ts"],
+			"stringz": ["./node_modules/stringz/dist/index.d.ts"],
+			"tmp": ["./node_modules/@types/tmp/index.d.ts"]
 		}
 	}
 }

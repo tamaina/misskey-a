@@ -14,7 +14,7 @@ import { HttpProxyAgent, HttpsProxyAgent } from 'hpagent';
 import { Inject, Injectable } from '@nestjs/common';
 import { DI } from '@/di-symbols.js';
 import type { Config } from '@/config.js';
-import { StatusError } from '@/misc/status-error.js';
+import { StatusError } from '../http/status-error.js';
 import { bindThis } from '@/decorators.js';
 import { validateContentTypeSetAsActivityPub } from '@features/federation/backend/protocol/misc/validator.js';
 import { assertActivityMatchesUrl, FetchAllowSoftFailMask } from '@features/federation/backend/protocol/misc/check-against-url.js';

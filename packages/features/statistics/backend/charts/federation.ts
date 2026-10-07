@@ -9,7 +9,7 @@ import * as Redis from 'ioredis';
 import type { FollowingsRepository, InstancesRepository, MiMeta } from '@/models/_.js';
 import { DI } from '@/di-symbols.js';
 import { bindThis } from '@/decorators.js';
-import { acquireChartInsertLock } from '@/misc/distributed-lock.js';
+import { acquireChartInsertLock } from '@features/runtime/backend/cache/distributed-lock.js';
 import Chart from './core.js';
 import { ChartLoggerService } from '@features/statistics/backend/services/ChartLoggerService.js';
 import { name, schema } from './definitions/federation.js';

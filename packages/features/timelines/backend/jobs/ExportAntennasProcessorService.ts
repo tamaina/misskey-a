@@ -12,7 +12,7 @@ import type { AntennasRepository, UsersRepository, UserListMembershipsRepository
 import { Logger } from '@features/runtime/backend/logging/logger.js';
 import { DriveService } from '@features/drive/backend/services/DriveService.js';
 import { bindThis } from '@/decorators.js';
-import { createTemp } from '@/misc/create-temp.js';
+import { createTemp } from '@features/runtime/backend/io/create-temp.js';
 import { UtilityService } from '@/core/UtilityService.js';
 import { NotificationService } from '@features/notifications/backend/services/NotificationService.js';
 import type { ExportedAntenna } from '../../contract/antenna-export.js';

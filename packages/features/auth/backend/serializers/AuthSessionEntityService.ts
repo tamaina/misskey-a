@@ -4,7 +4,7 @@
  */
 
 import type { AuthSessionsRepository } from '@/models/_.js';
-import { awaitAll } from '@/misc/prelude/await-all.js';
+import { awaitAll } from '@features/runtime/backend/async/await-all.js';
 import type { MiAuthSession } from '../models/AuthSession.js';
 import type { MiUser } from '@features/users/backend/models/User.js';
 import { bindThis } from '@/decorators.js';

@@ -16,7 +16,7 @@ import { NoteEntityService } from '@features/notes/backend/serializers/NoteEntit
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { FanoutTimelineService } from '../../services/FanoutTimelineService.js';
 import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
-import { trackPromise } from '@/misc/promise-tracker.js';
+import { trackPromise } from '@features/runtime/backend/async/promise-tracker.js';
 import { ChannelMutingService } from '@features/channels/backend/services/ChannelMutingService.js';
 import { ApiError } from '@features/api/backend/transport/error.js';
 

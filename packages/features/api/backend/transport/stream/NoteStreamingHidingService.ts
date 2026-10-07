@@ -7,7 +7,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { DI } from '@/di-symbols.js';
 import { bindThis } from '@/decorators.js';
 import { NoteEntityService } from '@features/notes/backend/serializers/NoteEntityService.js';
-import { deepClone } from '@/misc/clone.js';
+import { deepClone } from '@features/runtime/backend/data/clone.js';
 import { isRenotePacked, isQuotePacked } from '@/misc/is-renote.js';
 import type { Packed } from '@features/index/contract/packed.js';
 import type { MiUser } from '@features/users/backend/models/User.js';

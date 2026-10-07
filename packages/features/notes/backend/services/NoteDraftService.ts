@@ -11,7 +11,7 @@ import { bindThis } from '@/decorators.js';
 import { RoleService } from '@features/roles/backend/services/RoleService.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 import type { MiLocalUser, MiUser } from '@features/users/backend/models/User.js';
-import { IdentifiableError } from '@/misc/identifiable-error.js';
+import { IdentifiableError } from '@features/runtime/backend/errors/identifiable-error.js';
 import { isRenote, isQuote } from '@/misc/is-renote.js';
 import { NoteEntityService } from '../serializers/NoteEntityService.js';
 import { QueueService } from '@features/runtime/backend/services/QueueService.js';

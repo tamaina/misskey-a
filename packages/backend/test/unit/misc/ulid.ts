@@ -4,7 +4,7 @@
  */
 
 import { describe, expect, test } from 'vitest';
-import { parseUlidFull } from '@/misc/id/ulid.js';
+import { parseUlidFull } from '@features/runtime/backend/id/ulid.js';
 
 // Timestamp part "01KPS7S300" encodes 1776816000000ms (2026-04-22T00:00:00.000Z)
 // Verified: 1*32^8 + 19*32^7 + 22*32^6 + 25*32^5 + 7*32^4 + 25*32^3 + 3*32^2 = 1776816000000

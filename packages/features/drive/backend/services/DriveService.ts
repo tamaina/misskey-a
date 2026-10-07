@@ -20,7 +20,7 @@ import { MiDriveFile } from '../models/DriveFile.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { isDuplicateKeyValueError } from '@features/persistence/backend/utility/is-duplicate-key-value-error.js';
 import { FILE_TYPE_BROWSERSAFE } from '@features/media/backend/file-types.js';
-import { IdentifiableError } from '@/misc/identifiable-error.js';
+import { IdentifiableError } from '@features/runtime/backend/errors/identifiable-error.js';
 import { contentDisposition } from '@/misc/content-disposition.js';
 import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
 import { VideoProcessingService } from '@features/media/backend/services/VideoProcessingService.js';
@@ -28,7 +28,7 @@ import { ImageProcessingService } from '@features/media/backend/services/ImagePr
 import type { IImage } from '@features/media/backend/services/ImageProcessingService.js';
 import { QueueService } from '@features/runtime/backend/services/QueueService.js';
 import type { MiDriveFolder } from '../models/DriveFolder.js';
-import { createTemp } from '@/misc/create-temp.js';
+import { createTemp } from '@features/runtime/backend/io/create-temp.js';
 import { DriveChart } from '@features/statistics/backend/charts/drive.js';
 import { PerUserDriveChart } from '@features/statistics/backend/charts/per-user-drive.js';
 import { InstanceChart } from '@features/statistics/backend/charts/instance.js';

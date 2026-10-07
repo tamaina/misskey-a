@@ -11,7 +11,7 @@ import type { ChannelMutingRepository, ChannelsRepository, MiChannel, MiChannelM
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { GlobalEvents, GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
 import { bindThis } from '@/decorators.js';
-import { RedisKVCache } from '@/misc/cache.js';
+import { RedisKVCache } from '@features/runtime/backend/cache/cache.js';
 
 @Injectable()
 export class ChannelMutingService {

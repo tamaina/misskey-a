@@ -6,7 +6,7 @@
 import { URL } from 'node:url';
 import * as htmlParser from 'node-html-parser';
 import type { Config } from '@/config.js';
-import { intersperse } from '@/misc/prelude/array.js';
+import { intersperse } from '@features/runtime/backend/data/array.js';
 import { normalizeForSearch } from '@/misc/normalize-for-search.js';
 import { bindThis } from '@/decorators.js';
 import { escapeHtml } from '@/misc/escape-html.js';

@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { parseBigInt16 } from '@/misc/bigint.js';
+import { parseBigInt16 } from '../formatting/bigint.js';
 
 const CHARS = '0123456789abcdef';
 

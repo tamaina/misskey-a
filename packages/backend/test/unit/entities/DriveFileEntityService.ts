@@ -15,7 +15,7 @@ import { DriveFileEntityService } from '@features/drive/backend/serializers/Driv
 import { DriveFolderEntityService } from '@features/drive/backend/serializers/DriveFolderEntityService.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import { DI } from '@/di-symbols.js';
-import { genAidx } from '@/misc/id/aidx.js';
+import { genAidx } from '@features/runtime/backend/id/aidx.js';
 import { secureRndstr } from '@features/auth/backend/utility/secure-rndstr.js';
 
 const describeBenchmark = process.env.RUN_BENCHMARKS === '1' ? describe : describe.skip;

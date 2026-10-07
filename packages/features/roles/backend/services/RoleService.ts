@@ -15,7 +15,7 @@ import type {
 	RolesRepository,
 	UsersRepository,
 } from '@/models/_.js';
-import { MemoryKVCache, MemorySingleCache } from '@/misc/cache.js';
+import { MemoryKVCache, MemorySingleCache } from '@features/runtime/backend/cache/cache.js';
 import type { MiUser } from '@features/users/backend/models/User.js';
 import type { Config } from '@/config.js';
 import { DI } from '@/di-symbols.js';

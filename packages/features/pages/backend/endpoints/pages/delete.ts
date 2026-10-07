@@ -12,7 +12,7 @@ import { DI } from '@/di-symbols.js';
 import { ModerationLogService } from '@features/moderation/backend/services/ModerationLogService.js';
 import { RoleService } from '@features/roles/backend/services/RoleService.js';
 import { ApiError } from '@features/api/backend/transport/error.js';
-import { IdentifiableError } from '@/misc/identifiable-error.js';
+import { IdentifiableError } from '@features/runtime/backend/errors/identifiable-error.js';
 import { PageService } from '../../services/PageService.js';
 
 const contractProjection = projectEndpointContract(voidPagesDeleteDefinition);

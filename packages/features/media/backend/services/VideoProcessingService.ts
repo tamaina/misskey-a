@@ -5,9 +5,9 @@
 
 import FFmpeg from '@/runtime-dependencies/ffmpeg.js';
 import type { Config } from '@/config.js';
-import { createTempDir } from '@/misc/create-temp.js';
+import { createTempDir } from '@features/runtime/backend/io/create-temp.js';
 import { bindThis } from '@/decorators.js';
-import { appendQuery, query } from '@/misc/prelude/url.js';
+import { appendQuery, query } from '@features/runtime/backend/formatting/url.js';
 import type { IImage } from './ImageProcessingService.js';
 import type { ImageProcessingService } from './ImageProcessingService.js';
 

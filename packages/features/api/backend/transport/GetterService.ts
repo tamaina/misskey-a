@@ -6,7 +6,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { DI } from '@/di-symbols.js';
 import type { NotesRepository, UsersRepository } from '@/models/_.js';
-import { IdentifiableError } from '@/misc/identifiable-error.js';
+import { IdentifiableError } from '@features/runtime/backend/errors/identifiable-error.js';
 import type { MiLocalUser, MiRemoteUser, MiUser } from '@features/users/backend/models/User.js';
 import type { MiNote } from '@features/notes/backend/models/Note.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';

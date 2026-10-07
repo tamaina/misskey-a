@@ -8,7 +8,7 @@ import { ModuleRef } from '@nestjs/core';
 import { In } from 'typeorm';
 import { DI } from '@/di-symbols.js';
 import type { FollowRequestsRepository, NotesRepository, MiUser, UsersRepository } from '@/models/_.js';
-import { awaitAll } from '@/misc/prelude/await-all.js';
+import { awaitAll } from '@features/runtime/backend/async/await-all.js';
 import type { MiGroupedNotification, MiNotification } from '../models/Notification.js';
 import type { MiNote } from '@features/notes/backend/models/Note.js';
 import type { Packed } from '@features/index/contract/packed.js';

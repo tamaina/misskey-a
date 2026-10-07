@@ -10,7 +10,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import type { DriveFilesRepository, MiDriveFile } from '@/models/_.js';
 import { DI } from '@/di-symbols.js';
 import { ApiError } from '@features/api/backend/transport/error.js';
-import { IdentifiableError } from '@/misc/identifiable-error.js';
+import { IdentifiableError } from '@features/runtime/backend/errors/identifiable-error.js';
 import { PageService } from '../../services/PageService.js';
 
 const contractProjection = projectEndpointContract(portablePagesUpdateDefinition);

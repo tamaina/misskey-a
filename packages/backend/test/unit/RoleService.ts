@@ -25,7 +25,7 @@ import {
 } from '@/models/_.js';
 import { DI } from '@/di-symbols.js';
 import { MetaService } from '@features/instance/backend/services/MetaService.js';
-import { genAidx } from '@/misc/id/aidx.js';
+import { genAidx } from '@features/runtime/backend/id/aidx.js';
 import { CacheService } from '@/core/CacheService.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';

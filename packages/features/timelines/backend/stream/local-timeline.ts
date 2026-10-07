@@ -11,7 +11,7 @@ import { NoteStreamingHidingService } from '@features/api/backend/transport/stre
 import { bindThis } from '@/decorators.js';
 import { RoleService } from '@features/roles/backend/services/RoleService.js';
 import { isQuotePacked, isRenotePacked } from '@/misc/is-renote.js';
-import type { JsonObject } from '@/misc/json-value.js';
+import type { JsonObject } from '@features/runtime/backend/formatting/json-value.js';
 import Channel, { type ChannelRequest } from '@features/api/backend/transport/stream/channel.js';
 import { REQUEST } from '@nestjs/core';
 

@@ -5,7 +5,7 @@
 
 import { Brackets } from 'typeorm';
 import type { RoleAssignmentsRepository, RolesRepository } from '@/models/_.js';
-import { awaitAll } from '@/misc/prelude/await-all.js';
+import { awaitAll } from '@features/runtime/backend/async/await-all.js';
 import type { MiUser } from '@features/users/backend/models/User.js';
 import type { MiRole } from '../models/Role.js';
 import { bindThis } from '@/decorators.js';

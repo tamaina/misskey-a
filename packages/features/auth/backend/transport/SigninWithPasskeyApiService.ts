@@ -20,7 +20,7 @@ import { bindThis } from '@/decorators.js';
 import { WebAuthnService } from '@features/auth/backend/services/WebAuthnService.js';
 import { Logger } from '@features/runtime/backend/logging/logger.js';
 import { LoggerService } from '@features/runtime/backend/services/LoggerService.js';
-import type { IdentifiableError } from '@/misc/identifiable-error.js';
+import type { IdentifiableError } from '@features/runtime/backend/errors/identifiable-error.js';
 import { RateLimiterService } from '@features/api/backend/transport/RateLimiterService.js';
 import { SigninService } from './SigninService.js';
 import type { AuthenticationResponseJSON } from '@simplewebauthn/server';

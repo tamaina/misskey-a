@@ -14,7 +14,7 @@ import { driveFilesCreateDefinition, driveFilesCreateInput, driveFilesCreateWire
 import { DB_MAX_IMAGE_COMMENT_LENGTH } from '@features/drive/contract/image-comment-limit.js';
 import { EndpointImplementation as Upload, meta as uploadMeta, paramDef } from '@features/drive/backend/endpoints/drive/files/create.js';
 import { EndpointImplementation as LegacyUpload, meta as legacyMeta, paramDef as legacyParams } from '../../../test/fixtures/multipart-drive-create-original.js';
-import { IdentifiableError } from '@/misc/identifiable-error.js';
+import { IdentifiableError } from '@features/runtime/backend/errors/identifiable-error.js';
 import type { Config } from '@/config.js';
 import { Endpoint } from '@features/api/backend/transport/endpoint-base.js';
 import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';

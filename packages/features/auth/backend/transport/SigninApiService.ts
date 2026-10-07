@@ -25,7 +25,7 @@ import { WebAuthnService } from '@features/auth/backend/services/WebAuthnService
 import { UserAuthService } from '@features/auth/backend/services/UserAuthService.js';
 import { CaptchaService } from '@features/auth/backend/services/CaptchaService.js';
 import { LoggerService } from '@features/runtime/backend/services/LoggerService.js';
-import { FastifyReplyError } from '@/misc/fastify-reply-error.js';
+import { FastifyReplyError } from '@features/runtime/backend/http/fastify-reply-error.js';
 import { RateLimiterService } from '@features/api/backend/transport/RateLimiterService.js';
 import { SigninService } from './SigninService.js';
 import type { AuthenticationResponseJSON } from '@simplewebauthn/server';

@@ -10,7 +10,7 @@ import { ContractEndpoint, projectEndpointContract } from '@features/api/backend
 import { notesCreateDefinition } from '../../../contract/create-endpoint-definition.js';
 import { NoteEntityService } from '../../serializers/NoteEntityService.js';
 import { NoteCreateService } from '../../services/NoteCreateService.js';
-import { IdentifiableError } from '@/misc/identifiable-error.js';
+import { IdentifiableError } from '@features/runtime/backend/errors/identifiable-error.js';
 import { ApiError } from '@features/api/backend/transport/error.js';
 
 const contractProjection = projectEndpointContract(notesCreateDefinition);

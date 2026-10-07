@@ -12,8 +12,8 @@ import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { GlobalEvents, GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
 import { bindThis } from '@/decorators.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
-import { RedisKVCache } from '@/misc/cache.js';
-import { IdentifiableError } from '@/misc/identifiable-error.js';
+import { RedisKVCache } from '@features/runtime/backend/cache/cache.js';
+import { IdentifiableError } from '@features/runtime/backend/errors/identifiable-error.js';
 import { isDuplicateKeyValueError } from '@features/persistence/backend/utility/is-duplicate-key-value-error.js';
 
 @Injectable()

@@ -9,7 +9,7 @@ import { ContractEndpoint, projectEndpointContract } from '@features/api/backend
 import { notesDraftsUpdateDefinition } from '../../../../contract/draft-endpoint-definitions.js';
 import { NoteDraftService } from '../../../services/NoteDraftService.js';
 import { NoteDraftEntityService } from '../../../serializers/NoteDraftEntityService.js';
-import { IdentifiableError } from '@/misc/identifiable-error.js';
+import { IdentifiableError } from '@features/runtime/backend/errors/identifiable-error.js';
 import { ApiError } from '@features/api/backend/transport/error.js';
 
 const contractProjection = projectEndpointContract(notesDraftsUpdateDefinition);

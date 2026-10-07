@@ -11,7 +11,7 @@ import { bindThis } from '@/decorators.js';
 import { isRenotePacked, isQuotePacked } from '@/misc/is-renote.js';
 import { isInstanceMuted } from '@/misc/is-instance-muted.js';
 import { isUserRelated } from '@/misc/is-user-related.js';
-import type { JsonObject } from '@/misc/json-value.js';
+import type { JsonObject } from '@features/runtime/backend/formatting/json-value.js';
 import Channel, { type ChannelRequest } from '@features/api/backend/transport/stream/channel.js';
 import { REQUEST } from '@nestjs/core';
 

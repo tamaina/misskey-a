@@ -8,7 +8,7 @@ import { DI } from '@/di-symbols.js';
 import type { DriveFilesRepository, MiMeta } from '@/models/_.js';
 import type { MiRemoteUser } from '@features/users/backend/models/User.js';
 import type { MiDriveFile } from '@features/drive/backend/models/DriveFile.js';
-import { truncate } from '@/misc/truncate.js';
+import { truncate } from '@features/runtime/backend/formatting/truncate.js';
 import { DB_MAX_IMAGE_COMMENT_LENGTH } from '@features/drive/contract/image-comment-limit.js';
 import { DriveService } from '@features/drive/backend/services/DriveService.js';
 import type { Logger } from '@features/runtime/backend/logging/logger.js';

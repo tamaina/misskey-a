@@ -7,7 +7,7 @@ import type { Packed } from '@features/index/contract/packed.js';
 import ms from '@/runtime-dependencies/ms.js';
 import { Inject, Injectable } from '@nestjs/common';
 import { DB_MAX_IMAGE_COMMENT_LENGTH } from '@features/drive/contract/image-comment-limit.js';
-import { IdentifiableError } from '@/misc/identifiable-error.js';
+import { IdentifiableError } from '@features/runtime/backend/errors/identifiable-error.js';
 import { Endpoint } from '@features/api/backend/transport/endpoint-base.js';
 import { DriveFileEntityService } from '@features/drive/backend/serializers/DriveFileEntityService.js';
 import { DriveService } from '@features/drive/backend/services/DriveService.js';

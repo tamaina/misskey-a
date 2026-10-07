@@ -4,7 +4,7 @@
  */
 
 import type { RegistrationTicketsRepository } from '@/models/_.js';
-import { awaitAll } from '@/misc/prelude/await-all.js';
+import { awaitAll } from '@features/runtime/backend/async/await-all.js';
 import type { Packed } from '@features/index/contract/packed.js';
 import type { MiUser } from '@features/users/backend/models/User.js';
 import type { MiRegistrationTicket } from '../models/RegistrationTicket.js';

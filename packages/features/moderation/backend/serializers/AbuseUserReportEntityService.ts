@@ -4,7 +4,7 @@
  */
 
 import type { AbuseUserReportsRepository } from '@/models/_.js';
-import { awaitAll } from '@/misc/prelude/await-all.js';
+import { awaitAll } from '@features/runtime/backend/async/await-all.js';
 import type { MiAbuseUserReport } from '../models/AbuseUserReport.js';
 import { bindThis } from '@/decorators.js';
 import type { IdService } from '@features/runtime/backend/services/IdService.js';

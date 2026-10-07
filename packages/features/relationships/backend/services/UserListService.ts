@@ -17,7 +17,7 @@ import { DI } from '@/di-symbols.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import { bindThis } from '@/decorators.js';
 import { QueueService } from '@features/runtime/backend/services/QueueService.js';
-import { RedisKVCache } from '@/misc/cache.js';
+import { RedisKVCache } from '@features/runtime/backend/cache/cache.js';
 import { RoleService } from '@features/roles/backend/services/RoleService.js';
 import { SystemAccountService } from '@features/users/backend/services/SystemAccountService.js';
 

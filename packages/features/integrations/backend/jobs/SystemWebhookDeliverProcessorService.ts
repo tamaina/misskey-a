@@ -10,7 +10,7 @@ import type { SystemWebhooksRepository } from '@/models/_.js';
 import type { Config } from '@/config.js';
 import type { Logger } from '@features/runtime/backend/logging/logger.js';
 import { HttpRequestService } from '@features/runtime/backend/services/HttpRequestService.js';
-import { StatusError } from '@/misc/status-error.js';
+import { StatusError } from '@features/runtime/backend/http/status-error.js';
 import { bindThis } from '@/decorators.js';
 import { QueueLoggerService } from '@/queue/QueueLoggerService.js';
 import { SystemWebhookDeliverJobData } from '@/queue/types.js';

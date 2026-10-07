@@ -9,7 +9,7 @@
 // https://misskey.m544.net/notes/71899acdcc9859ec5708ac24
 
 import { customAlphabet } from 'nanoid';
-import { parseBigInt36 } from '@/misc/bigint.js';
+import { parseBigInt36 } from '../formatting/bigint.js';
 
 export const aidxRegExp = /^[0-9a-z]{16}$/;
 

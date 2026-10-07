@@ -5,7 +5,7 @@
 
 import { URL } from 'node:url';
 import { Injectable } from '@nestjs/common';
-import { query as urlQuery } from '@/misc/prelude/url.js';
+import { query as urlQuery } from '@features/runtime/backend/formatting/url.js';
 import { HttpRequestService } from '@features/runtime/backend/services/HttpRequestService.js';
 import { bindThis } from '@/decorators.js';
 

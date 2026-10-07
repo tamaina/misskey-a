@@ -20,7 +20,7 @@ import { SigninWithPasskeyApiService } from '@features/auth/backend/transport/Si
 import { RateLimiterService } from '@features/api/backend/transport/RateLimiterService.js';
 import { WebAuthnService } from '@features/auth/backend/services/WebAuthnService.js';
 import { SigninService } from '@features/auth/backend/transport/SigninService.js';
-import { IdentifiableError } from '@/misc/identifiable-error.js';
+import { IdentifiableError } from '@features/runtime/backend/errors/identifiable-error.js';
 
 class FakeLimiter {
 	public async limit() {

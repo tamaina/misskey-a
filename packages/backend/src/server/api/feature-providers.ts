@@ -44,7 +44,7 @@ import { UserListService } from '@features/relationships/backend/services/UserLi
 import { GetterService } from '@features/api/backend/transport/GetterService.js';
 import { ChannelFollowingService } from '@features/channels/backend/services/ChannelFollowingService.js';
 import { ChannelMutingService } from '@features/channels/backend/services/ChannelMutingService.js';
-import { IdentifiableError } from '@/misc/identifiable-error.js';
+import { IdentifiableError } from '@features/runtime/backend/errors/identifiable-error.js';
 import type { MiChannel } from '@features/channels/backend/models/Channel.js';
 import type { MiClip } from '@features/collections/backend/models/Clip.js';
 import type { MiClipFavorite } from '@features/collections/backend/models/ClipFavorite.js';

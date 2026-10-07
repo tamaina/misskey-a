@@ -5,7 +5,7 @@
 
 import { expectTypeOf, test } from 'vitest';
 import type { Serialized } from './types.js';
-import type { JsonObject, JsonValue } from './misc/json-value.js';
+import type { JsonObject, JsonValue } from '@features/runtime/backend/formatting/json-value.js';
 import type { Packed } from '@features/index/contract/packed.js';
 
 test('serialized opaque metadata is represented as JSON after the event boundary', () => {

@@ -8,7 +8,7 @@ import * as Bull from 'bullmq';
 import { DI } from '@/di-symbols.js';
 import type { Config } from '@/config.js';
 import { baseQueueOptions, QUEUE } from '@/queue/const.js';
-import { allSettled } from '@/misc/promise-tracker.js';
+import { allSettled } from '@features/runtime/backend/async/promise-tracker.js';
 import {
 	DeliverJobData,
 	EndedPollNotificationJobData,

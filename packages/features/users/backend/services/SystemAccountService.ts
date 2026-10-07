@@ -13,7 +13,7 @@ import { MiLocalUser, MiUser } from '../models/User.js';
 import { MiSystemAccount, MiUsedUsername, MiUserKeypair, MiUserProfile, type UsersRepository, type SystemAccountsRepository } from '@/models/_.js';
 import type { MiMeta, UserProfilesRepository } from '@/models/_.js';
 import type { GlobalEvents } from '@features/runtime/backend/services/GlobalEventService.js';
-import { MemoryKVCache } from '@/misc/cache.js';
+import { MemoryKVCache } from '@features/runtime/backend/cache/cache.js';
 import { DI } from '@/di-symbols.js';
 import { bindThis } from '@/decorators.js';
 import { generateNativeUserToken } from '@features/auth/backend/utility/token.js';

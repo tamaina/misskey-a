@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { deepClone } from '@/misc/clone.js';
+import { deepClone } from '@features/runtime/backend/data/clone.js';
 import { toJsonSchemaDefs } from '@valibot/to-json-schema';
 import type { Schema } from '../../utility/json-schema.js';
 import { packedSchemas } from '@features/index/contract/packed.js';

@@ -11,8 +11,8 @@ import { In } from 'typeorm';
 import { DI } from '@/di-symbols.js';
 import type { Config } from '@/config.js';
 import type { Packed } from '@features/index/contract/packed.js';
-import type { Promiseable } from '@/misc/prelude/await-all.js';
-import { awaitAll } from '@/misc/prelude/await-all.js';
+import type { Promiseable } from '@features/runtime/backend/async/await-all.js';
+import { awaitAll } from '@features/runtime/backend/async/await-all.js';
 import { USER_ACTIVE_THRESHOLD, USER_ONLINE_THRESHOLD } from '../presence-constants.js';
 import type { MiLocalUser, MiPartialLocalUser, MiPartialRemoteUser, MiRemoteUser, MiUser } from '../models/User.js';
 import {
@@ -51,7 +51,7 @@ import { ChatService } from '@features/chat/backend/services/ChatService.js';
 import type { OnModuleInit } from '@nestjs/common';
 import type { NoteEntityService } from '@features/notes/backend/serializers/NoteEntityService.js';
 import type { PageEntityService } from '@features/pages/backend/serializers/PageEntityService.js';
-import { toArray } from '@/misc/prelude/array.js';
+import { toArray } from '@features/runtime/backend/data/array.js';
 
 const ajv = new Ajv();
 

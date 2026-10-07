@@ -6,7 +6,7 @@
 import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
 import { packedUsersGetFrequentlyRepliedUsersDefinition, packedUsersGetFrequentlyRepliedUsersInput, packedUsersGetFrequentlyRepliedUsersOutput } from '../../../contract/packed-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
-import { maximum } from '@/misc/prelude/array.js';
+import { maximum } from '@features/runtime/backend/data/array.js';
 import type { NotesRepository } from '@/models/_.js';
 
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';

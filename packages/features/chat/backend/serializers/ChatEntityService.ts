@@ -4,7 +4,7 @@
  */
 
 import type { MiUser, ChatMessagesRepository, MiChatMessage, ChatRoomsRepository, MiChatRoom, MiChatRoomInvitation, ChatRoomInvitationsRepository, MiChatRoomMembership, ChatRoomMembershipsRepository } from '@/models/_.js';
-import { awaitAll } from '@/misc/prelude/await-all.js';
+import { awaitAll } from '@features/runtime/backend/async/await-all.js';
 import type { Packed } from '@features/index/contract/packed.js';
 import type { } from '@features/relationships/backend/models/Blocking.js';
 import { bindThis } from '@/decorators.js';

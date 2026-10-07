@@ -13,7 +13,7 @@ import type { EmojisRepository, UsersRepository } from '@/models/_.js';
 import type { Config } from '@/config.js';
 import type { Logger } from '@features/runtime/backend/logging/logger.js';
 import { DriveService } from '@features/drive/backend/services/DriveService.js';
-import { createTemp, createTempDir } from '@/misc/create-temp.js';
+import { createTemp, createTempDir } from '@features/runtime/backend/io/create-temp.js';
 import { DownloadService } from '@features/runtime/backend/services/DownloadService.js';
 import { NotificationService } from '@features/notifications/backend/services/NotificationService.js';
 import { bindThis } from '@/decorators.js';

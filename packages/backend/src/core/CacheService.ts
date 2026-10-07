@@ -6,7 +6,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import * as Redis from 'ioredis';
 import type { BlockingsRepository, FollowingsRepository, MutingsRepository, RenoteMutingsRepository, MiUserProfile, UserProfilesRepository, UsersRepository, MiFollowing } from '@/models/_.js';
-import { MemoryKVCache, RedisKVCache } from '@/misc/cache.js';
+import { MemoryKVCache, RedisKVCache } from '@features/runtime/backend/cache/cache.js';
 import type { MiLocalUser, MiUser } from '@features/users/backend/models/User.js';
 import { DI } from '@/di-symbols.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';

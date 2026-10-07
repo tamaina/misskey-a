@@ -9,7 +9,7 @@ import * as Redis from 'ioredis';
 import { DI } from '@/di-symbols.js';
 import { Logger } from '@features/runtime/backend/logging/logger.js';
 import { bindThis } from '@/decorators.js';
-import { acquireChartInsertLock } from '@/misc/distributed-lock.js';
+import { acquireChartInsertLock } from '@features/runtime/backend/cache/distributed-lock.js';
 import Chart from './core.js';
 import { name, schema } from './definitions/test-intersection.js';
 import type { KVs } from './core.js';

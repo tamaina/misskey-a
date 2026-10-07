@@ -11,7 +11,7 @@ import type { DriveFilesRepository, MiDriveFile, PagesRepository } from '@/model
 import { PageEntityService } from '../../serializers/PageEntityService.js';
 import { DI } from '@/di-symbols.js';
 import { PageService } from '../../services/PageService.js';
-import { IdentifiableError } from '@/misc/identifiable-error.js';
+import { IdentifiableError } from '@features/runtime/backend/errors/identifiable-error.js';
 import { ApiError } from '@features/api/backend/transport/error.js';
 
 const contractProjection = projectEndpointContract(portablePagesCreateDefinition);

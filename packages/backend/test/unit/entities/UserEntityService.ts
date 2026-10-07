@@ -9,7 +9,7 @@ import { GlobalModule } from '@/GlobalModule.js';
 import { CoreModule } from '@/core/CoreModule.js';
 import { featureServiceGroups } from '@/core/feature-service-providers.js';
 import { secureRndstr } from '@features/auth/backend/utility/secure-rndstr.js';
-import { genAidx } from '@/misc/id/aidx.js';
+import { genAidx } from '@features/runtime/backend/id/aidx.js';
 import {
 	BlockingsRepository,
 	FollowingsRepository, FollowRequestsRepository,

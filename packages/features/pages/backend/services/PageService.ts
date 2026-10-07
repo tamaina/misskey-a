@@ -16,7 +16,7 @@ import { bindThis } from '@/decorators.js';
 import type { RoleService } from '@features/roles/backend/services/RoleService.js';
 import type { IdService } from '@features/runtime/backend/services/IdService.js';
 import type { MiUser } from '@features/users/backend/models/User.js';
-import { IdentifiableError } from '@/misc/identifiable-error.js';
+import { IdentifiableError } from '@features/runtime/backend/errors/identifiable-error.js';
 import type { ModerationLogService } from '@features/moderation/backend/services/ModerationLogService.js';
 
 export interface PageBody {

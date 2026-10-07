@@ -22,7 +22,7 @@ import { bindThis } from '@/decorators.js';
 import { LoggerService } from '@features/runtime/backend/services/LoggerService.js';
 import type { Logger } from '@features/runtime/backend/logging/logger.js';
 import { SystemAccountService } from '@features/users/backend/services/SystemAccountService.js';
-import { IdentifiableError } from '@/misc/identifiable-error.js';
+import { IdentifiableError } from '@features/runtime/backend/errors/identifiable-error.js';
 import type { ICollection, IObject, IOrderedCollection } from '../protocol/type.js';
 import { isCollectionOrOrderedCollection } from '../protocol/type.js';
 import { ApDbResolverService } from './ApDbResolverService.js';

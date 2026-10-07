@@ -11,7 +11,7 @@ import { DI } from '@/di-symbols.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import type { UsersRepository } from '@/models/_.js';
 import { bindThis } from '@/decorators.js';
-import { acquireChartInsertLock } from '@/misc/distributed-lock.js';
+import { acquireChartInsertLock } from '@features/runtime/backend/cache/distributed-lock.js';
 import Chart from './core.js';
 import { ChartLoggerService } from '@features/statistics/backend/services/ChartLoggerService.js';
 import { name, schema } from './definitions/users.js';

@@ -7,7 +7,7 @@ import { ContractEndpoint, projectEndpointContract } from '@features/api/backend
 import { packedFollowingRequestsCancelDefinition, packedFollowingRequestsCancelInput, packedFollowingRequestsCancelOutput } from '../../../../contract/packed-endpoint-definitions.js';
 import { Injectable } from '@nestjs/common';
 
-import { IdentifiableError } from '@/misc/identifiable-error.js';
+import { IdentifiableError } from '@features/runtime/backend/errors/identifiable-error.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import { GetterService } from '@features/api/backend/transport/GetterService.js';
 import { UserFollowingService } from '../../../services/UserFollowingService.js';

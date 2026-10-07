@@ -4,7 +4,7 @@
  */
 
 import type { MiRegistryItem, RegistryItemsRepository } from '@/models/_.js';
-import { IdentifiableError } from '@/misc/identifiable-error.js';
+import { IdentifiableError } from '@features/runtime/backend/errors/identifiable-error.js';
 import { bindThis } from '@/decorators.js';
 import type { MiUser } from '@features/users/backend/models/User.js';
 import type { IdService } from '@features/runtime/backend/services/IdService.js';

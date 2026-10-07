@@ -8,7 +8,7 @@ import { DI } from '@/di-symbols.js';
 import type { Config } from '@/config.js';
 import { MetaService } from '@features/instance/backend/services/MetaService.js';
 import { MAX_NOTE_TEXT_LENGTH } from '@features/notes/contract/note-text-limit.js';
-import { MemorySingleCache } from '@/misc/cache.js';
+import { MemorySingleCache } from '@features/runtime/backend/cache/cache.js';
 import { bindThis } from '@/decorators.js';
 import { NotesChart } from '@features/statistics/backend/charts/notes.js';
 import { UsersChart } from '@features/statistics/backend/charts/users.js';

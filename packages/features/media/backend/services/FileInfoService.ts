@@ -14,7 +14,7 @@ import { sharpBmp } from '@misskey-dev/sharp-read-bmp';
 import * as blurhash from 'blurhash';
 import FFmpeg from '@/runtime-dependencies/ffmpeg.js';
 import * as fileType from '@/runtime-dependencies/file-type.js';
-import { createTempDir } from '@/misc/create-temp.js';
+import { createTempDir } from '@features/runtime/backend/io/create-temp.js';
 import type { Logger } from '@features/runtime/backend/logging/logger.js';
 import { bindThis } from '@/decorators.js';
 import { isMimeImage } from '@/misc/is-mime-image.js';

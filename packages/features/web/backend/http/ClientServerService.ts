@@ -35,7 +35,7 @@ import type {
 	UsersRepository,
 } from '@/models/_.js';
 import type { Logger } from '@features/runtime/backend/logging/logger.js';
-import { handleRequestRedirectToOmitSearch } from '@/misc/fastify-hook-handlers.js';
+import { handleRequestRedirectToOmitSearch } from '@features/runtime/backend/http/fastify-hook-handlers.js';
 import { htmlSafeJsonStringify } from '@/misc/json-stringify-html-safe.js';
 import { bindThis } from '@/decorators.js';
 import { FlashEntityService } from '@features/play/backend/serializers/FlashEntityService.js';

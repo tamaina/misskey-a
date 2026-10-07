@@ -13,7 +13,7 @@ import type { MiMeta, UserSecurityKeysRepository } from '@/models/_.js';
 import type { Config } from '@/config.js';
 import { bindThis } from '@/decorators.js';
 import { MiUser } from '@/models/_.js';
-import { IdentifiableError } from '@/misc/identifiable-error.js';
+import { IdentifiableError } from '@features/runtime/backend/errors/identifiable-error.js';
 import type * as Redis from 'ioredis';
 import type {
 	AuthenticationResponseJSON,

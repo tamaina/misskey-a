@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import type { JsonValue } from './misc/json-value.js';
+import type { JsonValue } from '@features/runtime/backend/formatting/json-value.js';
 
 export { notificationTypes, groupedNotificationTypes, obsoleteNotificationTypes } from '@features/notifications/contract/notification-types.js';
 

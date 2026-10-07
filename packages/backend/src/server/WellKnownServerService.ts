@@ -10,7 +10,7 @@ import fastifyAccepts from '@fastify/accepts';
 import { DI } from '@/di-symbols.js';
 import type { MiMeta, UsersRepository } from '@/models/_.js';
 import type { Config } from '@/config.js';
-import { escapeAttribute, escapeValue } from '@/misc/prelude/xml.js';
+import { escapeAttribute, escapeValue } from '@features/runtime/backend/formatting/xml.js';
 import type { MiUser } from '@features/users/backend/models/User.js';
 import * as Acct from '@/misc/acct.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';

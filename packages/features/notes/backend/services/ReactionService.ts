@@ -6,7 +6,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { DI } from '@/di-symbols.js';
 import type { EmojisRepository, NoteReactionsRepository, UsersRepository, NotesRepository, MiMeta } from '@/models/_.js';
-import { IdentifiableError } from '@/misc/identifiable-error.js';
+import { IdentifiableError } from '@features/runtime/backend/errors/identifiable-error.js';
 import type { MiRemoteUser, MiUser } from '@features/users/backend/models/User.js';
 import type { MiNote } from '../models/Note.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
@@ -26,7 +26,7 @@ import { UserBlockingService } from '@features/relationships/backend/services/Us
 import { CustomEmojiService } from '@features/emojis/backend/services/CustomEmojiService.js';
 import { RoleService } from '@features/roles/backend/services/RoleService.js';
 import { FeaturedService } from '@features/discovery/backend/services/FeaturedService.js';
-import { trackPromise } from '@/misc/promise-tracker.js';
+import { trackPromise } from '@features/runtime/backend/async/promise-tracker.js';
 import { isQuote, isRenote } from '@/misc/is-renote.js';
 import { ReactionsBufferingService } from './ReactionsBufferingService.js';
 import { PER_NOTE_REACTION_USER_PAIR_CACHE_MAX } from '../constants.js';

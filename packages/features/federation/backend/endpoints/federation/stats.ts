@@ -8,7 +8,7 @@ import { packedFederationStatsDefinition, packedFederationStatsInput, packedFede
 import { In, IsNull, Not } from 'typeorm';
 import { Inject, Injectable } from '@nestjs/common';
 import type { FollowingsRepository, InstancesRepository } from '@/models/_.js';
-import { awaitAll } from '@/misc/prelude/await-all.js';
+import { awaitAll } from '@features/runtime/backend/async/await-all.js';
 
 import { InstanceEntityService } from '@features/instance/backend/serializers/InstanceEntityService.js';
 import { DI } from '@/di-symbols.js';

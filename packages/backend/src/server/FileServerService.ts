@@ -9,7 +9,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import type { Config } from '@/config.js';
 import type { DriveFilesRepository } from '@/models/_.js';
 import { DI } from '@/di-symbols.js';
-import { StatusError } from '@/misc/status-error.js';
+import { StatusError } from '@features/runtime/backend/http/status-error.js';
 import type { Logger } from '@features/runtime/backend/logging/logger.js';
 import { DownloadService } from '@features/runtime/backend/services/DownloadService.js';
 import { InternalStorageService } from '@features/runtime/backend/services/InternalStorageService.js';
@@ -18,7 +18,7 @@ import { ImageProcessingService } from '@features/media/backend/services/ImagePr
 import { VideoProcessingService } from '@features/media/backend/services/VideoProcessingService.js';
 import { LoggerService } from '@features/runtime/backend/services/LoggerService.js';
 import { bindThis } from '@/decorators.js';
-import { handleRequestRedirectToOmitSearch } from '@/misc/fastify-hook-handlers.js';
+import { handleRequestRedirectToOmitSearch } from '@features/runtime/backend/http/fastify-hook-handlers.js';
 import { FileServerDriveHandler } from './file/FileServerDriveHandler.js';
 import { FileServerFileResolver } from './file/FileServerFileResolver.js';
 import { FileServerProxyHandler } from './file/FileServerProxyHandler.js';

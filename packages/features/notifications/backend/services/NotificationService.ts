@@ -21,7 +21,7 @@ import { CacheService } from '@/core/CacheService.js';
 import type { Config } from '@/config.js';
 import { UserListService } from '@features/relationships/backend/services/UserListService.js';
 import { FilterUnionByProperty, groupedNotificationTypes, obsoleteNotificationTypes } from '@/types.js';
-import { trackPromise } from '@/misc/promise-tracker.js';
+import { trackPromise } from '@features/runtime/backend/async/promise-tracker.js';
 // import { escapeHtml } from '@/misc/escape-html.js';
 
 @Injectable()

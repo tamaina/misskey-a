@@ -4,15 +4,15 @@
  */
 
 import type { DriveFilesRepository, DriveFoldersRepository } from '@/models/_.js';
-import { awaitAll } from '@/misc/prelude/await-all.js';
+import { awaitAll } from '@features/runtime/backend/async/await-all.js';
 import type { Packed } from '@features/index/contract/packed.js';
 import type { } from '@features/relationships/backend/models/Blocking.js';
 import type { MiDriveFolder } from '../models/DriveFolder.js';
 import { bindThis } from '@/decorators.js';
 import type { IdService } from '@features/runtime/backend/services/IdService.js';
 import { In } from 'typeorm';
-import { uniqueByKey } from '@/misc/unique-by-key.js';
-import { splitIdAndObjects } from '@/misc/split-id-and-objects.js';
+import { uniqueByKey } from '@features/runtime/backend/data/unique-by-key.js';
+import { splitIdAndObjects } from '@features/runtime/backend/data/split-id-and-objects.js';
 
 export class DriveFolderEntityService {
 	constructor(
