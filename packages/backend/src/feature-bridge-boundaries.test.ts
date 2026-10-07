@@ -13,7 +13,7 @@ const testDirectory = path.dirname(fileURLToPath(import.meta.url));
 const repositoryRoot = path.resolve(testDirectory, '../../..');
 const backendSourceRoot = testDirectory;
 const featureRoot = path.resolve(repositoryRoot, 'packages/features');
-const endpointRegistryPath = path.resolve(backendSourceRoot, 'server/api/endpoint-list.ts');
+const endpointRegistryPath = path.resolve(featureRoot, 'index/backend/endpoint-list.ts');
 const expectedRouteOrder = JSON.parse(readFileSync(path.resolve(testDirectory, '../test/fixtures/backend-api-registry-order.json'), 'utf8')) as string[];
 const removedBridgePaths = JSON.parse(readFileSync(path.resolve(testDirectory, '../test/fixtures/backend-feature-bridge-removal.json'), 'utf8')) as string[];
 const removedBridgeStems = new Set(removedBridgePaths.map(bridgePath => path.resolve(repositoryRoot, bridgePath).replace(/\.tsx?$/, '')));
@@ -71,11 +71,11 @@ function resolvedModuleStem(importer: string, specifier: string): string | null 
 function resolveExistingModule(importer: string, specifier: string): string | null {
 	const stem = resolvedModuleStem(importer, specifier);
 	if (stem == null) return null;
-	const candidates = [stem, `${stem}.ts`, `${stem}.tsx`, `${stem}.js`, `${stem}.mjs`, `${stem}.cjs`, path.join(stem, 'index.ts')];
+	const candidates = [stem, `${stem}.ts`, `${stem}.tsx`, `${stem}.mts`, `${stem}.js`, `${stem}.mjs`, `${stem}.cjs`, path.join(stem, 'index.ts')];
 	return candidates.find(candidate => existsSync(candidate)) ?? null;
 }
 
-// The host composition registry is not a one-to-one compatibility forwarder.
+// The canonical composition registry is not a one-to-one compatibility forwarder.
 // Recognize its exact namespace contract, never a general barrel/path exemption.
 function isCanonicalEndpointRegistry(file: string, ast: ts.SourceFile): boolean {
 	return path.resolve(file) === endpointRegistryPath
@@ -123,7 +123,7 @@ test('backend source has no export-only forwarders into feature modules', () => 
 	expect(bridges).toEqual([]);
 });
 
-test('only the complete ordered host namespace registry is a composition exception', () => {
+test('only the complete ordered index namespace registry is a composition exception', () => {
 	const source = readFileSync(endpointRegistryPath, 'utf8');
 	const parse = (text: string) => ts.createSourceFile(endpointRegistryPath, text, ts.ScriptTarget.Latest, true);
 	const ast = parse(source);
@@ -149,6 +149,7 @@ test('feature leaf aliases cannot hide export-only bridges', () => {
 	const specifier = '@features/users/backend/models/User.js';
 	expect(resolveExistingModule(importer, specifier)).toBe(path.join(featureRoot, 'users/backend/models/User.ts'));
 	expect(resolveExistingModule(importer, '@features/users/backend/missing.js')).toBeNull();
+	expect(resolveExistingModule(importer, '@features/boot/backend/assembly/ServerService.mjs')).toBe(path.join(featureRoot, 'boot/backend/assembly/ServerService.mts'));
 	expect(isFeatureReexportBridge(importer, `export { MiUser } from '${specifier}';`)).toBe(true);
 	expect(isFeatureReexportBridge(importer, `export type { MiUser } from '${specifier}';`)).toBe(true);
 	expect(isFeatureReexportBridge(importer, `export * as users from '${specifier}';`)).toBe(true);
