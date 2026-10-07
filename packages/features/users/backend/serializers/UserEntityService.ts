@@ -13,7 +13,7 @@ import type { Config } from '@/config.js';
 import type { Packed } from '@features/index/contract/packed.js';
 import type { Promiseable } from '@/misc/prelude/await-all.js';
 import { awaitAll } from '@/misc/prelude/await-all.js';
-import { USER_ACTIVE_THRESHOLD, USER_ONLINE_THRESHOLD } from '@/const.js';
+import { USER_ACTIVE_THRESHOLD, USER_ONLINE_THRESHOLD } from '../presence-constants.js';
 import type { MiLocalUser, MiPartialLocalUser, MiPartialRemoteUser, MiRemoteUser, MiUser } from '../models/User.js';
 import {
 	birthdaySchema,

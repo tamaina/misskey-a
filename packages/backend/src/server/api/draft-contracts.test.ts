@@ -15,7 +15,8 @@ import { convertSchemaToOpenApiSchema } from './openapi/schemas.js';
 import type { Packed } from '@features/index/contract/packed.js';
 import { noteDraftEndpointDefinitions as definitions } from '@features/notes/contract/draft-endpoint-definitions.js';
 import { MAX_NOTE_TEXT_LENGTH } from '@features/notes/contract/note-text-limit.js';
-import { MAX_NOTE_TEXT_LENGTH as backendPublicLimit, DB_MAX_NOTE_TEXT_LENGTH } from '@/const.js';
+import { MAX_NOTE_TEXT_LENGTH as backendPublicLimit } from '@features/notes/contract/note-text-limit.js';
+import { DB_MAX_NOTE_TEXT_LENGTH } from '@features/notes/backend/constants.js';
 import baseline from '../../../test/fixtures/draft-contract-baseline.json' with { type: 'json' };
 
 const frozenInputs = {

@@ -29,7 +29,7 @@ import { FeaturedService } from '@features/discovery/backend/services/FeaturedSe
 import { trackPromise } from '@/misc/promise-tracker.js';
 import { isQuote, isRenote } from '@/misc/is-renote.js';
 import { ReactionsBufferingService } from './ReactionsBufferingService.js';
-import { PER_NOTE_REACTION_USER_PAIR_CACHE_MAX } from '@/const.js';
+import { PER_NOTE_REACTION_USER_PAIR_CACHE_MAX } from '../constants.js';
 
 const FALLBACK = '\u2764';
 

@@ -54,7 +54,7 @@ import { ApiError } from './error.js';
 import { QueueService } from '@features/runtime/backend/services/QueueService.js';
 import { ModerationLogService } from '@features/moderation/backend/services/ModerationLogService.js';
 import { MoreThan, IsNull } from 'typeorm';
-import { USER_ONLINE_THRESHOLD } from '@/const.js';
+import { USER_ONLINE_THRESHOLD } from '@features/users/backend/presence-constants.js';
 import { EmojiEntityService } from '@features/emojis/backend/serializers/EmojiEntityService.js';
 import { AvatarDecorationService } from '@features/avatar-decorations/backend/services/AvatarDecorationService.js';
 import { RoleService } from '@features/roles/backend/services/RoleService.js';

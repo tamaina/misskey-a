@@ -19,7 +19,7 @@ import type { MiRemoteUser, MiUser } from '@features/users/backend/models/User.j
 import { MiDriveFile } from '../models/DriveFile.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { isDuplicateKeyValueError } from '@features/persistence/backend/utility/is-duplicate-key-value-error.js';
-import { FILE_TYPE_BROWSERSAFE } from '@/const.js';
+import { FILE_TYPE_BROWSERSAFE } from '@features/media/backend/file-types.js';
 import { IdentifiableError } from '@/misc/identifiable-error.js';
 import { contentDisposition } from '@/misc/content-disposition.js';
 import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
