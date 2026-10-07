@@ -23,11 +23,11 @@ import { SigninService } from '@features/auth/backend/transport/SigninService.js
 import { SignupApiService } from '@features/auth/backend/transport/SignupApiService.js';
 import { StreamingApiServerService } from '@features/api/backend/transport/StreamingApiServerService.js';
 import { OpenApiServerService } from '@features/api/backend/transport/openapi/OpenApiServerService.js';
-import { ClientServerService } from './web/ClientServerService.js';
-import { HtmlTemplateService } from './web/HtmlTemplateService.js';
-import { FeedService } from './web/FeedService.js';
+import { ClientServerService } from '@features/web/backend/http/ClientServerService.js';
+import { HtmlTemplateService } from '@features/web/backend/http/HtmlTemplateService.js';
+import { FeedService } from '@features/web/backend/http/FeedService.js';
 import { UrlPreviewService } from './web/UrlPreviewService.js';
-import { ClientLoggerService } from './web/ClientLoggerService.js';
+import { ClientLoggerService } from '@features/web/backend/http/ClientLoggerService.js';
 import { OAuth2ProviderService } from '@features/auth/backend/oauth/OAuth2ProviderService.js';
 
 import { Connection as MainStreamConnection } from '@features/api/backend/transport/stream/Connection.js';

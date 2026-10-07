@@ -33,7 +33,7 @@ import { MemoryKVCache } from '@/misc/cache.js';
 import { LoggerService } from '@features/runtime/backend/services/LoggerService.js';
 import { Logger } from '@features/runtime/backend/logging/logger.js';
 import { StatusError } from '@/misc/status-error.js';
-import { HtmlTemplateService } from '@/server/web/HtmlTemplateService.js';
+import { HtmlTemplateService } from '@features/web/backend/http/HtmlTemplateService.js';
 import { OAuthPage } from '@features/auth/backend/templates/oauth.js';
 import type { FastifyInstance, FastifyReply } from 'fastify';
 

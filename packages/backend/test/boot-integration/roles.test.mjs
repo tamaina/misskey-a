@@ -5,6 +5,8 @@
 import assert from 'node:assert/strict';
 import { before, after, test } from 'node:test';
 import { spawn } from 'node:child_process';
+import { readFile } from 'node:fs/promises';
+import { join } from 'node:path';
 import { once } from 'node:events';
 import { WebSocket } from 'ws';
 import { loadConfig } from '../../built/config.js';
@@ -30,8 +32,7 @@ before(async () => {
 });
 after(async () => {
 	if (db.isInitialized) {
-		try { await db.getRepository('MiEmoji').delete(emojiFixtures.map(emoji => emoji.id)); }
-		finally { await db.destroy(); }
+		try { await db.getRepository('MiEmoji').delete(emojiFixtures.map(emoji => emoji.id)); } finally { await db.destroy(); }
 	}
 });
 
@@ -62,6 +63,18 @@ for (const mode of ['server', 'queue', 'combined', 'cluster', 'cluster-server', 
 					body: JSON.stringify(body),
 					signal: AbortSignal.timeout(10000),
 				});
+				// Relocating web services must preserve the public manifest and actual static bytes.
+				const manifest = await fetch(`http://127.0.0.1:${config.port}/manifest.json`, { signal: AbortSignal.timeout(10000) });
+				assert.equal(manifest.status, 200);
+				assert.match(manifest.headers.get('content-type'), /application\/json/);
+				const manifestBody = await manifest.json();
+				assert.equal(manifestBody.start_url, '/');
+				for (const asset of ['icons/192.png', 'icons/512.png', 'splash.png']) {
+					const response = await fetch(`http://127.0.0.1:${config.port}/static-assets/${asset}`, { signal: AbortSignal.timeout(10000) });
+					assert.equal(response.status, 200, asset);
+					assert.match(response.headers.get('content-type'), /image\/png/);
+					assert.deepEqual(Buffer.from(await response.arrayBuffer()), await readFile(join(config.rootDir, 'packages/backend/assets', asset)));
+				}
 				// Feature-owned SSR templates still render through the existing web routes.
 				for (const path of ['/bios', '/cli', '/_info_card_']) {
 					const page = await fetch(`http://127.0.0.1:${config.port}${path}`, { signal: AbortSignal.timeout(10000) });

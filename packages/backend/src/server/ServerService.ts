@@ -29,7 +29,7 @@ import { StreamingApiServerService } from '@features/api/backend/transport/Strea
 import { WellKnownServerService } from './WellKnownServerService.js';
 import { FileServerService } from './FileServerService.js';
 import { HealthServerService } from './HealthServerService.js';
-import { ClientServerService } from './web/ClientServerService.js';
+import { ClientServerService } from '@features/web/backend/http/ClientServerService.js';
 import { OpenApiServerService } from '@features/api/backend/transport/openapi/OpenApiServerService.js';
 import { OAuth2ProviderService } from '@features/auth/backend/oauth/OAuth2ProviderService.js';
 import { registerHttpAccessLog } from './http-access-log.js';

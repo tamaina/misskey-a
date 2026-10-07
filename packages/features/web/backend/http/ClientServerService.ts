@@ -6,7 +6,7 @@
 import { randomUUID } from 'node:crypto';
 import { resolve } from 'node:path';
 import { Inject, Injectable } from '@nestjs/common';
-import ms from 'ms';
+import ms from '@/runtime-dependencies/ms.js';
 import sharp from 'sharp';
 import { In, IsNull } from 'typeorm';
 import fastifyStatic from '@fastify/static';
@@ -42,7 +42,7 @@ import { FlashEntityService } from '@features/play/backend/serializers/FlashEnti
 import { ReversiGameEntityService } from '@features/games/backend/serializers/ReversiGameEntityService.js';
 import { AnnouncementEntityService } from '@features/announcements/backend/serializers/AnnouncementEntityService.js';
 import { FeedService } from './FeedService.js';
-import { UrlPreviewService } from './UrlPreviewService.js';
+import { UrlPreviewService } from '@/server/web/UrlPreviewService.js';
 import { ClientLoggerService } from './ClientLoggerService.js';
 import { HtmlTemplateService } from './HtmlTemplateService.js';
 

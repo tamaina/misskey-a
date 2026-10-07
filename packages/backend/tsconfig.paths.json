@@ -57,7 +57,13 @@
 			"ratelimiter": ["./node_modules/@types/ratelimiter/index.d.ts"],
 			"@orpc/contract": ["./node_modules/@orpc/contract/dist/index.d.mts"],
 			"@valibot/to-json-schema": ["./node_modules/@valibot/to-json-schema"],
-			"valibot": ["./node_modules/valibot"]
+			"valibot": ["./node_modules/valibot"],
+			"i18n/const": ["./node_modules/i18n/built/const.d.ts"],
+			"vite": ["./node_modules/vite/dist/node/index.d.ts"],
+			"feed": ["./node_modules/feed/lib/feed.d.ts"],
+			"@fastify/static": ["./node_modules/@fastify/static"],
+			"@fastify/http-proxy": ["./node_modules/@fastify/http-proxy"],
+			"vary": ["./node_modules/@types/vary/index.d.ts"]
 		}
 	}
 }
