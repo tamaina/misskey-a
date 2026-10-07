@@ -11,7 +11,7 @@ import type { Logger } from '@features/runtime/backend/logging/logger.js';
 import { DriveService } from '@features/drive/backend/services/DriveService.js';
 import type { MiDriveFile } from '@features/drive/backend/models/DriveFile.js';
 import type { MiNote } from '@features/notes/backend/models/Note.js';
-import { EmailService } from '@/core/EmailService.js';
+import { EmailService } from '@features/email/backend/services/EmailService.js';
 import { bindThis } from '@/decorators.js';
 import { SearchService } from '@features/discovery/backend/services/SearchService.js';
 import { PageService } from '@features/pages/backend/services/PageService.js';

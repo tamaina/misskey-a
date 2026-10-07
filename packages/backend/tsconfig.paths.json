@@ -43,7 +43,10 @@
 			"strict-event-emitter-types": ["./node_modules/strict-event-emitter-types"],
 			"ulid": ["./node_modules/ulid"],
 			"xev": ["./node_modules/xev"],
-			"nested-property": ["./node_modules/nested-property"]
+			"nested-property": ["./node_modules/nested-property"],
+			"nodemailer": ["./node_modules/nodemailer"],
+			"juice": ["./node_modules/juice"],
+			"deep-email-validator": ["./node_modules/deep-email-validator/dist/index.d.ts"]
 		}
 	}
 }

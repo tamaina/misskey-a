@@ -7,7 +7,7 @@ import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract
 import { inlineEmailAddressAvailableDefinition, inlineEmailAddressAvailableInput, inlineEmailAddressAvailableOutput } from '../../../contract/endpoint-definitions.js';
 import { Injectable } from '@nestjs/common';
 
-import { EmailService } from '@/core/EmailService.js';
+import { EmailService } from '@features/email/backend/services/EmailService.js';
 
 const contractProjection = projectEndpointContract(inlineEmailAddressAvailableDefinition);
 

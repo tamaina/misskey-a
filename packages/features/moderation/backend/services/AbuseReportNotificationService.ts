@@ -17,7 +17,7 @@ import type {
 	MiMeta,
 	MiUser,
 } from '@/models/_.js';
-import { EmailService } from '@/core/EmailService.js';
+import { EmailService } from '@features/email/backend/services/EmailService.js';
 import { RoleService } from '@features/roles/backend/services/RoleService.js';
 import { RecipientMethod } from '../models/AbuseReportNotificationRecipient.js';
 import { ModerationLogService } from './ModerationLogService.js';

@@ -1,5 +1,6 @@
 import { EventEmitter } from 'node:events';
 import { resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'vitest/config';
 import backendTsconfig from './tsconfig.json' with { type: 'json' };
 import sourcePaths from './tsconfig.paths.json' with { type: 'json' };
@@ -9,7 +10,9 @@ const dependencyAliases = Object.entries(sourcePaths.compilerOptions.paths)
 	.map(([name, [target]]) => ({
 		// Do not turn package subpaths into filesystem paths that bypass exports.
 		find: new RegExp('^' + name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '$'),
-		replacement: resolve(import.meta.dirname, target),
+		replacement: target.endsWith('.d.ts')
+			? fileURLToPath(import.meta.resolve(name))
+			: resolve(import.meta.dirname, target),
 	}));
 
 // Raise the global EventEmitter listener limit before Vitest wires CLI listeners.

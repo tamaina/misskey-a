@@ -1,5 +1,6 @@
 import { defineConfig } from 'rolldown';
 import { globSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import { version as summalyVersion } from '@misskey-dev/summaly';
 import type { Plugin, ExternalOption, InputOptions } from 'rolldown';
 import { execa, execaNode } from 'execa';
@@ -112,6 +113,9 @@ export default defineConfig((args) => {
 		'pg',
 	];
 
+	// Resolve the runtime import condition while TypeScript uses the shipped declaration.
+	const resolve = { alias: { 'deep-email-validator': fileURLToPath(import.meta.resolve('deep-email-validator')) } };
+
 	const define: Record<string, string> = {
 		// Summalyのバージョンを埋め込む
 		'_SUMMALY_VERSION_': JSON.stringify(summalyVersion),
@@ -120,6 +124,7 @@ export default defineConfig((args) => {
 	if (isE2E) {
 		return {
 			onLog,
+			resolve,
 			input: './test-server/entry.ts',
 			platform: 'node',
 			tsconfig: './test-server/tsconfig.json',
@@ -142,6 +147,7 @@ export default defineConfig((args) => {
 	} else {
 		return {
 			onLog,
+			resolve,
 			input: {
 				entry: './src/boot/entry.ts',
 				cli: './src/boot/cli.ts',

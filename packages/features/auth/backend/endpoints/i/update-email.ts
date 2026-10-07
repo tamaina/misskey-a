@@ -11,7 +11,7 @@ import bcrypt from 'bcryptjs';
 
 import type { MiMeta, UserProfilesRepository } from '@/models/_.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
-import { EmailService } from '@/core/EmailService.js';
+import { EmailService } from '@features/email/backend/services/EmailService.js';
 import type { Config } from '@/config.js';
 import { DI } from '@/di-symbols.js';
 import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';

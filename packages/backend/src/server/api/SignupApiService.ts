@@ -13,7 +13,7 @@ import { CaptchaService } from '@features/auth/backend/services/CaptchaService.j
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { SignupService } from '@features/auth/backend/services/SignupService.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
-import { EmailService } from '@/core/EmailService.js';
+import { EmailService } from '@features/email/backend/services/EmailService.js';
 import { MiLocalUser } from '@features/users/backend/models/User.js';
 import { FastifyReplyError } from '@/misc/fastify-reply-error.js';
 import { bindThis } from '@/decorators.js';

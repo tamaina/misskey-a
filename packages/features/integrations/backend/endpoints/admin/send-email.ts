@@ -7,7 +7,7 @@ import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract
 import { voidAdminSendEmailDefinition, voidAdminSendEmailInput, voidAdminSendEmailOutput } from '../../../contract/void-endpoint-definitions.js';
 import { Injectable } from '@nestjs/common';
 
-import { EmailService } from '@/core/EmailService.js';
+import { EmailService } from '@features/email/backend/services/EmailService.js';
 
 const contractProjection = projectEndpointContract(voidAdminSendEmailDefinition);
 

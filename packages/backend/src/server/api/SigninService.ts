@@ -12,7 +12,7 @@ import type { MiLocalUser } from '@features/users/backend/models/User.js';
 import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
 import { SigninEntityService } from '@features/auth/backend/serializers/SigninEntityService.js';
 import { bindThis } from '@/decorators.js';
-import { EmailService } from '@/core/EmailService.js';
+import { EmailService } from '@features/email/backend/services/EmailService.js';
 import { NotificationService } from '@features/notifications/backend/services/NotificationService.js';
 import type { FastifyRequest, FastifyReply } from 'fastify';
 

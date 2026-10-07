@@ -103,7 +103,7 @@ import { FederationChart } from '@features/statistics/backend/charts/federation.
 import { UtilityService } from './UtilityService.js';
 import { CacheService } from './CacheService.js';
 import { QueryService } from './QueryService.js';
-import { EmailService } from './EmailService.js';
+import { EmailService } from '@features/email/backend/services/EmailService.js';
 import { featureServiceProviders, featureServiceExports } from './feature-service-providers.js';
 import type { ExistingProvider } from '@nestjs/common';
 
