@@ -8,7 +8,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 	<div class="_spacer" style="--MI_SPACER-w: 800px; --MI_SPACER-min: 16px; --MI_SPACER-max: 32px;">
 		<div class="cwepdizn _gaps_m">
 			<MkFolder :defaultOpen="true">
-				<template #label>{{ i18n.ts.backgroundColor }}</template>
+				<template #label>{{ $locale.sfc.backgroundColor }}</template>
 				<div class="cwepdizn-colors">
 					<div class="row">
 						<button v-for="color in bgColors.filter(x => x.kind === 'light')" class="color _button" :class="{ active: theme.props.bg === color.color }" @click="setBgColor(color)">
@@ -24,7 +24,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			</MkFolder>
 
 			<MkFolder :defaultOpen="true">
-				<template #label>{{ i18n.ts.accentColor }}</template>
+				<template #label>{{ $locale.sfc.accentColor }}</template>
 				<div class="cwepdizn-colors">
 					<div class="row">
 						<button v-for="color in accentColors" class="color rounded _button" :class="{ active: theme.props.accent === color }" @click="setAccentColor(color)">
@@ -35,7 +35,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			</MkFolder>
 
 			<MkFolder :defaultOpen="true">
-				<template #label>{{ i18n.ts.textColor }}</template>
+				<template #label>{{ $locale.sfc.textColor }}</template>
 				<div class="cwepdizn-colors">
 					<div class="row">
 						<button v-for="color in fgColors" class="color char _button" :class="{ active: (theme.props.fg === color.forLight) || (theme.props.fg === color.forDark) }" @click="setFgColor(color)">
@@ -47,22 +47,22 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 			<MkFolder :defaultOpen="false">
 				<template #icon><i class="ti ti-code"></i></template>
-				<template #label>{{ i18n.ts.editCode }}</template>
+				<template #label>{{ $locale.sfc.editCode }}</template>
 
 				<div class="_gaps_m">
 					<MkCodeEditor v-model="themeCode" lang="json5">
-						<template #label>{{ i18n.ts._theme.code }}</template>
+						<template #label>{{ $locale.sfc.themeCode }}</template>
 					</MkCodeEditor>
-					<MkButton primary @click="applyThemeCode">{{ i18n.ts.apply }}</MkButton>
+					<MkButton primary @click="applyThemeCode">{{ $locale.sfc.apply }}</MkButton>
 				</div>
 			</MkFolder>
 
 			<MkFolder :defaultOpen="false">
-				<template #label>{{ i18n.ts.addDescription }}</template>
+				<template #label>{{ $locale.sfc.addDescription }}</template>
 
 				<div class="_gaps_m">
 					<MkTextarea v-model="description">
-						<template #label>{{ i18n.ts._theme.description }}</template>
+						<template #label>{{ $locale.sfc.themeDescription }}</template>
 					</MkTextarea>
 				</div>
 			</MkFolder>
@@ -90,7 +90,7 @@ import { addTheme, themeManager } from '@features/preferences/frontend/theme.js'
 import { deepClone } from '@features/runtime/frontend/utility/clone.js';
 import * as os from '@features/ui/frontend/os.js';
 import { store } from '@features/preferences/frontend/store.js';
-import { i18n } from '@features/runtime/frontend/i18n.js';
+import { interpolateLocaleParameters } from '@features/runtime/frontend/interpolate-locale-parameters.js';
 import { useLeaveGuard } from '@features/navigation/frontend/composables/use-leave-guard.js';
 import { definePage } from '@features/navigation/frontend/page.js';
 import { prefer } from '@features/preferences/frontend/preferences.js';
@@ -183,7 +183,7 @@ function applyThemeCode() {
 	} catch (err) {
 		os.alert({
 			type: 'error',
-			text: i18n.ts._theme.invalid,
+			text: $locale.value.sfc.themeInvalid,
 		});
 		return;
 	}
@@ -193,7 +193,7 @@ function applyThemeCode() {
 
 async function saveAs() {
 	const { canceled, result: name } = await os.inputText({
-		title: i18n.ts.name,
+		title: $locale.value.sfc.name,
 		minLength: 1,
 	});
 	if (canceled) return;
@@ -211,7 +211,7 @@ async function saveAs() {
 	changed.value = false;
 	os.alert({
 		type: 'success',
-		text: i18n.tsx._theme.installed({ name: theme.value.name }),
+		text: interpolateLocaleParameters($locale.value.sfc.themeInstalled, { name: theme.value.name }),
 	});
 }
 
@@ -220,19 +220,19 @@ watch(theme, apply, { deep: true });
 const headerActions = computed(() => [{
 	asFullButton: true,
 	icon: 'ti ti-eye',
-	text: i18n.ts.preview,
+	text: $locale.value.sfc.preview,
 	handler: showPreview,
 }, {
 	asFullButton: true,
 	icon: 'ti ti-check',
-	text: i18n.ts.saveAs,
+	text: $locale.value.sfc.saveAs,
 	handler: saveAs,
 }]);
 
 const headerTabs = computed(() => []);
 
 definePage(() => ({
-	title: i18n.ts.themeEditor,
+	title: $locale.value.sfc.themeEditor,
 	icon: 'ti ti-palette',
 }));
 </script>
@@ -290,3 +290,535 @@ definePage(() => ({
 	}
 }
 </style>
+
+<locale lang="json" locale="ar-SA">
+{
+	"backgroundColor": "لون الخلفية",
+	"accentColor": "طابع لوني",
+	"textColor": "لون النص",
+	"editCode": "حرر الشفرة",
+	"themeCode": "شيفرة القالب",
+	"apply": "تطبيق",
+	"addDescription": "أضف وصفًا",
+	"themeDescription": "الوصف",
+	"themeInvalid": "تنسيق السمة غير صالح",
+	"name": "الإسم",
+	"themeInstalled": "تم تنصيب {name}",
+	"preview": "معاينة",
+	"saveAs": "احفظ كـ...",
+	"themeEditor": "مصمم القوالب"
+}
+</locale>
+
+<locale lang="json" locale="ca-ES">
+{
+	"backgroundColor": "Color de fons",
+	"accentColor": "Color principal",
+	"textColor": "Color del text",
+	"editCode": "Editar el codi",
+	"themeCode": "Codi del tema",
+	"apply": "Aplicar",
+	"addDescription": "Afegeix una descripció ",
+	"themeDescription": "Descripció",
+	"themeInvalid": "El format d'aquest tema no és correcte",
+	"name": "Nom",
+	"themeInstalled": "{name} Instal·lat ",
+	"preview": "Vista prèvia",
+	"saveAs": "Desar com...",
+	"themeEditor": "Editor de temes"
+}
+</locale>
+
+<locale lang="json" locale="cs-CZ">
+{
+	"backgroundColor": "Pozadí",
+	"accentColor": "Akcent",
+	"textColor": "Barva textu",
+	"editCode": "Upravit kód",
+	"themeCode": "Kód vzhledu",
+	"apply": "Potvrdit",
+	"addDescription": "Přidat popis",
+	"themeDescription": "Popis",
+	"themeInvalid": "Formát tohoto tématu je neplatný",
+	"name": "Jméno",
+	"themeInstalled": "{name} byl nainstalován",
+	"preview": "Náhled",
+	"saveAs": "Uložit jako…",
+	"themeEditor": "Editor témat"
+}
+</locale>
+
+<locale lang="json" locale="da-DK">
+{
+	"backgroundColor": "Background color",
+	"accentColor": "Accent color",
+	"textColor": "Text color",
+	"editCode": "Edit code",
+	"themeCode": "Theme code",
+	"apply": "Apply",
+	"addDescription": "Add description",
+	"themeDescription": "Description",
+	"themeInvalid": "The format of this theme is invalid",
+	"name": "Name",
+	"themeInstalled": "{name} has been installed",
+	"preview": "Preview",
+	"saveAs": "Save as...",
+	"themeEditor": "Theme editor"
+}
+</locale>
+
+<locale lang="json" locale="de-DE">
+{
+	"backgroundColor": "Hintergrundfarbe",
+	"accentColor": "Akzentfarbe",
+	"textColor": "Textfarbe",
+	"editCode": "Code bearbeiten",
+	"themeCode": "Farbschemencode",
+	"apply": "Anwenden",
+	"addDescription": "Beschreibung hinzufügen",
+	"themeDescription": "Beschreibung",
+	"themeInvalid": "Der Code dieses Farbschemas ist ungültig",
+	"name": "Name",
+	"themeInstalled": "{name} wurde installiert",
+	"preview": "Vorschau",
+	"saveAs": "Speichern als …",
+	"themeEditor": "Farbschema-Editor"
+}
+</locale>
+
+<locale lang="json" locale="en-US">
+{
+	"backgroundColor": "Background color",
+	"accentColor": "Accent color",
+	"textColor": "Text color",
+	"editCode": "Edit code",
+	"themeCode": "Theme code",
+	"apply": "Apply",
+	"addDescription": "Add description",
+	"themeDescription": "Description",
+	"themeInvalid": "The format of this theme is invalid",
+	"name": "Name",
+	"themeInstalled": "{name} has been installed",
+	"preview": "Preview",
+	"saveAs": "Save as...",
+	"themeEditor": "Theme editor"
+}
+</locale>
+
+<locale lang="json" locale="es-ES">
+{
+	"backgroundColor": "Fondo",
+	"accentColor": "Acento",
+	"textColor": "Texto",
+	"editCode": "Editar código",
+	"themeCode": "Código del tema",
+	"apply": "Aplicar",
+	"addDescription": "Agregar descripción",
+	"themeDescription": "Descripción",
+	"themeInvalid": "El formato del tema no es válido",
+	"name": "Nombre",
+	"themeInstalled": "{name} ha sido instalado",
+	"preview": "Vista previa",
+	"saveAs": "Guardar como…",
+	"themeEditor": "Editor de temas"
+}
+</locale>
+
+<locale lang="json" locale="fr-FR">
+{
+	"backgroundColor": "Arrière-plan",
+	"accentColor": "Accentuation",
+	"textColor": "Texte",
+	"editCode": "Modifier le code",
+	"themeCode": "Code du thème",
+	"apply": "Appliquer",
+	"addDescription": "Ajouter une description",
+	"themeDescription": "Description",
+	"themeInvalid": "Le format du thème n'est pas valide",
+	"name": "Nom",
+	"themeInstalled": "{name} a été installé",
+	"preview": "Aperçu",
+	"saveAs": "Enregistrer sous ...",
+	"themeEditor": "Éditeur de thèmes"
+}
+</locale>
+
+<locale lang="json" locale="id-ID">
+{
+	"backgroundColor": "Latar Belakang",
+	"accentColor": "Aksen",
+	"textColor": "Teks",
+	"editCode": "Sunting kode",
+	"themeCode": "Kode tema",
+	"apply": "Terapkan",
+	"addDescription": "Tambahkan deskripsi",
+	"themeDescription": "Deskripsi",
+	"themeInvalid": "Format tema tidak valid",
+	"name": "Nama",
+	"themeInstalled": "{name} telah dipasang",
+	"preview": "Pratinjau",
+	"saveAs": "Simpan sebagai…",
+	"themeEditor": "Penyunting tema"
+}
+</locale>
+
+<locale lang="json" locale="it-IT">
+{
+	"backgroundColor": "Sfondo",
+	"accentColor": "Colore principale",
+	"textColor": "Testo",
+	"editCode": "Modifica codice",
+	"themeCode": "Codice tema",
+	"apply": "Applica",
+	"addDescription": "Aggiungi descrizione",
+	"themeDescription": "Descrizione",
+	"themeInvalid": "Il formato tema non è valido",
+	"name": "Nome",
+	"themeInstalled": "{name} è installato",
+	"preview": "Anteprima",
+	"saveAs": "Salva con nome",
+	"themeEditor": "Editor di temi"
+}
+</locale>
+
+<locale lang="json" locale="ja-JP">
+{
+	"backgroundColor": "背景",
+	"accentColor": "アクセント",
+	"textColor": "文字",
+	"editCode": "コードを編集",
+	"themeCode": "テーマコード",
+	"apply": "適用",
+	"addDescription": "説明を追加",
+	"themeDescription": "説明",
+	"themeInvalid": "テーマの形式が間違っています",
+	"name": "名前",
+	"themeInstalled": "{name}をインストールしました",
+	"preview": "プレビュー",
+	"saveAs": "名前を付けて保存",
+	"themeEditor": "テーマエディター"
+}
+</locale>
+
+<locale lang="json" locale="ja-KS">
+{
+	"backgroundColor": "背景",
+	"accentColor": "アクセント",
+	"textColor": "文字",
+	"editCode": "コードを編集",
+	"themeCode": "テーマコード",
+	"apply": "適用",
+	"addDescription": "説明を入れるで",
+	"themeDescription": "説明",
+	"themeInvalid": "テーマの形式が間違ってるみたいや",
+	"name": "名前",
+	"themeInstalled": "{name}をインストールしたで。",
+	"preview": "プレビュー",
+	"saveAs": "名前を付けて保存",
+	"themeEditor": "テーマエディター"
+}
+</locale>
+
+<locale lang="json" locale="kab-KAB">
+{
+	"backgroundColor": "Background color",
+	"accentColor": "Accent color",
+	"textColor": "Text color",
+	"editCode": "Edit code",
+	"themeCode": "Theme code",
+	"apply": "Apply",
+	"addDescription": "Add description",
+	"themeDescription": "Description",
+	"themeInvalid": "The format of this theme is invalid",
+	"name": "Name",
+	"themeInstalled": "{name} has been installed",
+	"preview": "Preview",
+	"saveAs": "Save as...",
+	"themeEditor": "Theme editor"
+}
+</locale>
+
+<locale lang="json" locale="kn-IN">
+{
+	"backgroundColor": "Background color",
+	"accentColor": "Accent color",
+	"textColor": "Text color",
+	"editCode": "Edit code",
+	"themeCode": "Theme code",
+	"apply": "Apply",
+	"addDescription": "Add description",
+	"themeDescription": "Description",
+	"themeInvalid": "The format of this theme is invalid",
+	"name": "Name",
+	"themeInstalled": "{name} has been installed",
+	"preview": "Preview",
+	"saveAs": "Save as...",
+	"themeEditor": "Theme editor"
+}
+</locale>
+
+<locale lang="json" locale="ko-KR">
+{
+	"backgroundColor": "배경 색",
+	"accentColor": "강조 색상",
+	"textColor": "문자 색",
+	"editCode": "코드 수정",
+	"themeCode": "테마 코드",
+	"apply": "적용",
+	"addDescription": "설명 추가",
+	"themeDescription": "설명",
+	"themeInvalid": "테마 형식이 올바르지 않습니다",
+	"name": "이름",
+	"themeInstalled": "{name} 테마가 설치되었습니다",
+	"preview": "미리보기",
+	"saveAs": "다른 이름으로 저장",
+	"themeEditor": "테마 에디터"
+}
+</locale>
+
+<locale lang="json" locale="nl-NL">
+{
+	"backgroundColor": "Achtergrondkleur",
+	"accentColor": "Accentkleur",
+	"textColor": "Tekstkleur",
+	"editCode": "Code bewerken",
+	"themeCode": "Theme code",
+	"apply": "Toepassen",
+	"addDescription": "Beschrijving toevoegen",
+	"themeDescription": "Beschrijving",
+	"themeInvalid": "The format of this theme is invalid",
+	"name": "Naam",
+	"themeInstalled": "{name} has been installed",
+	"preview": "Voorbeeld",
+	"saveAs": "Opslaan als…",
+	"themeEditor": "Thema-editor"
+}
+</locale>
+
+<locale lang="json" locale="no-NO">
+{
+	"backgroundColor": "Background color",
+	"accentColor": "Accent color",
+	"textColor": "Text color",
+	"editCode": "Edit code",
+	"themeCode": "Theme code",
+	"apply": "Apply",
+	"addDescription": "Legg til beskrivelse",
+	"themeDescription": "Beskrivelse",
+	"themeInvalid": "The format of this theme is invalid",
+	"name": "Navn",
+	"themeInstalled": "{name} has been installed",
+	"preview": "Preview",
+	"saveAs": "Lagre som",
+	"themeEditor": "Theme editor"
+}
+</locale>
+
+<locale lang="json" locale="pl-PL">
+{
+	"backgroundColor": "Tło",
+	"accentColor": "Akcent",
+	"textColor": "Tekst",
+	"editCode": "Edytuj kod",
+	"themeCode": "Kod motywu",
+	"apply": "Zastosuj",
+	"addDescription": "Dodaj opis",
+	"themeDescription": "Opis",
+	"themeInvalid": "Format motywu jest nieprawidłowy.",
+	"name": "Nazwa",
+	"themeInstalled": "Zainstalowano {name}",
+	"preview": "Podgląd",
+	"saveAs": "Zapisz jako…",
+	"themeEditor": "Edytor motywu"
+}
+</locale>
+
+<locale lang="json" locale="pt-PT">
+{
+	"backgroundColor": "Cor de fundo",
+	"accentColor": "Cor de destaque",
+	"textColor": "Cor do texto",
+	"editCode": "Editar código",
+	"themeCode": "Código do tema",
+	"apply": "Aplicar",
+	"addDescription": "Adicionar descrição",
+	"themeDescription": "Descrição",
+	"themeInvalid": "O formato desse tema é invalido",
+	"name": "Nome",
+	"themeInstalled": "{name} foi instalado",
+	"preview": "Pré-visualizar",
+	"saveAs": "Salvar como",
+	"themeEditor": "Editor de temas"
+}
+</locale>
+
+<locale lang="json" locale="ru-RU">
+{
+	"backgroundColor": "Фон",
+	"accentColor": "Акцент",
+	"textColor": "Текст",
+	"editCode": "Редактировать исходный текст",
+	"themeCode": "Код темы",
+	"apply": "Применить",
+	"addDescription": "Добавить описание",
+	"themeDescription": "Описание",
+	"themeInvalid": "Формат темы некорректный.",
+	"name": "Название",
+	"themeInstalled": "Тема «{name}» установлена.",
+	"preview": "Предпросмотр",
+	"saveAs": "Сохранить под названием…",
+	"themeEditor": "Редактор темы оформления"
+}
+</locale>
+
+<locale lang="json" locale="sk-SK">
+{
+	"backgroundColor": "Pozadie",
+	"accentColor": "Akcent",
+	"textColor": "Text",
+	"editCode": "Upraviť kód",
+	"themeCode": "Kód témy",
+	"apply": "Použiť",
+	"addDescription": "Pridať popis",
+	"themeDescription": "Popis",
+	"themeInvalid": "Formát tejto témy je nesprávny",
+	"name": "Názov",
+	"themeInstalled": "{name} je nainštalovaná",
+	"preview": "Náhľad",
+	"saveAs": "Uložiť ako...",
+	"themeEditor": "Editor tém"
+}
+</locale>
+
+<locale lang="json" locale="th-TH">
+{
+	"backgroundColor": "สีพื้นหลัง",
+	"accentColor": "สีหลัก",
+	"textColor": "สีข้อความ",
+	"editCode": "แก้ไขโค้ด",
+	"themeCode": "โค้ดธีม",
+	"apply": "นำไปใช้",
+	"addDescription": "เพิ่มคำอธิบาย",
+	"themeDescription": "คำอธิบาย",
+	"themeInvalid": "รูปแบบของธีมนี้ไม่ถูกต้องนะ",
+	"name": "ชื่อ",
+	"themeInstalled": "{name} ได้รับการติดตั้ง",
+	"preview": "แสดงตัวอย่าง",
+	"saveAs": "บันทึกเป็น...",
+	"themeEditor": "ตัวแก้ไขธีม"
+}
+</locale>
+
+<locale lang="json" locale="tr-TR">
+{
+	"backgroundColor": "Arka plan rengi",
+	"accentColor": "Vurgu rengi",
+	"textColor": "Metin rengi",
+	"editCode": "Kodu düzenle",
+	"themeCode": "Tema kodu",
+	"apply": "Uygula",
+	"addDescription": "Açıklama ekle",
+	"themeDescription": "Açıklama",
+	"themeInvalid": "Bu temanın biçimi geçersizdir.",
+	"name": "İsim",
+	"themeInstalled": "{name} kuruldu",
+	"preview": "Önizleme",
+	"saveAs": "Farklı kaydet",
+	"themeEditor": "Tema düzenleyici"
+}
+</locale>
+
+<locale lang="json" locale="ug-CN">
+{
+	"backgroundColor": "Background color",
+	"accentColor": "Accent color",
+	"textColor": "Text color",
+	"editCode": "Edit code",
+	"themeCode": "Theme code",
+	"apply": "Apply",
+	"addDescription": "Add description",
+	"themeDescription": "Description",
+	"themeInvalid": "The format of this theme is invalid",
+	"name": "Name",
+	"themeInstalled": "{name} has been installed",
+	"preview": "Preview",
+	"saveAs": "Save as...",
+	"themeEditor": "Theme editor"
+}
+</locale>
+
+<locale lang="json" locale="uk-UA">
+{
+	"backgroundColor": "Фон",
+	"accentColor": "Акцент",
+	"textColor": "Текст",
+	"editCode": "Редагувати вихідний текст",
+	"themeCode": "Код теми",
+	"apply": "Застосувати",
+	"addDescription": "Додатковий опис.",
+	"themeDescription": "Опис",
+	"themeInvalid": "Неправильний формат теми",
+	"name": "Ім'я",
+	"themeInstalled": "Тему {name} встановлено",
+	"preview": "Попередній перегляд",
+	"saveAs": "Зберегти як…",
+	"themeEditor": "Редактор тем"
+}
+</locale>
+
+<locale lang="json" locale="vi-VN">
+{
+	"backgroundColor": "Màu nền",
+	"accentColor": "Màu phụ",
+	"textColor": "Màu chữ",
+	"editCode": "Chỉnh sửa mã",
+	"themeCode": "Mã theme",
+	"apply": "Áp dụng",
+	"addDescription": "Thêm mô tả",
+	"themeDescription": "Mô tả",
+	"themeInvalid": "Định dạng của theme này không hợp lệ",
+	"name": "Tên",
+	"themeInstalled": "{name} đã được cài đặt",
+	"preview": "Xem trước",
+	"saveAs": "Lưu thành",
+	"themeEditor": "Công cụ thiết kế theme"
+}
+</locale>
+
+<locale lang="json" locale="zh-CN">
+{
+	"backgroundColor": "背景",
+	"accentColor": "强调色",
+	"textColor": "文本",
+	"editCode": "编辑代码",
+	"themeCode": "主题代码",
+	"apply": "应用",
+	"addDescription": "添加描述",
+	"themeDescription": "描述",
+	"themeInvalid": "主题格式错误",
+	"name": "名称",
+	"themeInstalled": "{name} 已安装",
+	"preview": "预览",
+	"saveAs": "另存为",
+	"themeEditor": "主题编辑器"
+}
+</locale>
+
+<locale lang="json" locale="zh-TW">
+{
+	"backgroundColor": "背景",
+	"accentColor": "重點色彩",
+	"textColor": "文字",
+	"editCode": "編輯程式碼",
+	"themeCode": "佈景主題代碼",
+	"apply": "套用",
+	"addDescription": "新增描述",
+	"themeDescription": "描述",
+	"themeInvalid": "佈景主題格式錯誤",
+	"name": "名稱",
+	"themeInstalled": "{name}已安裝",
+	"preview": "預覽",
+	"saveAs": "另存新檔",
+	"themeEditor": "佈景主題編輯器"
+}
+</locale>
