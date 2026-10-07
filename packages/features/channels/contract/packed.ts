@@ -4,12 +4,11 @@
  */
 
 import * as v from 'valibot';
-import { resultObject } from '../../api/contract/result-object.js';
 import {
 	packedNoteSchema as __ref_Note
 } from '../../notes/contract/packed.js';
 
-export const packedChannelSchema = resultObject({
+export const packedChannelSchema = v.strictObject({
 	"id": v.pipe(v.string(), v.metadata({ "format": "id", "example": "xxxxxxxxxx" })),
 	"createdAt": v.pipe(v.string(), v.metadata({ "format": "date-time" })),
 	"lastNotedAt": v.pipe(v.nullable(v.string()), v.metadata({ "format": "date-time" })),
@@ -28,5 +27,7 @@ export const packedChannelSchema = resultObject({
 	"isFollowing": v.optional(v.boolean()),
 	"isFavorited": v.optional(v.boolean()),
 	"isMuting": v.optional(v.boolean()),
+	// Authenticated packing emits this compatibility field.
+	"hasUnreadNote": v.optional(v.boolean()),
 	"pinnedNotes": v.optional(v.array(v.lazy(() => __ref_Note)))
 });

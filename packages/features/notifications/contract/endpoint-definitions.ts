@@ -6,16 +6,15 @@
 import type { InferContractRouterInputs, InferContractRouterOutputs } from '@orpc/contract';
 import * as v from 'valibot';
 import { defineEndpointContract } from '../../api/contract/definition.js';
-import { resultObject } from '../../api/contract/result-object.js';
 
-export const inlineSwRegisterInput = v.looseObject({
+export const inlineSwRegisterInput = v.object({
 	"endpoint": v.string(),
 	"auth": v.string(),
 	"publickey": v.string(),
 	"sendReadMessage": v.optional(v.boolean(), false),
 });
-export const inlineSwRegisterOutput = resultObject({
-	"state": v.exactOptional(v.picklist(["already-subscribed", "subscribed"])),
+export const inlineSwRegisterOutput = v.strictObject({
+	"state": v.picklist(["already-subscribed", "subscribed"]),
 	"key": v.nullable(v.string()),
 	"userId": v.string(),
 	"endpoint": v.string(),
@@ -27,10 +26,10 @@ export const inlineSwRegisterDefinition = defineEndpointContract(
 	inlineSwRegisterOutput,
 );
 
-export const inlineSwShowRegistrationInput = v.looseObject({
+export const inlineSwShowRegistrationInput = v.object({
 	"endpoint": v.string(),
 });
-export const inlineSwShowRegistrationOutput = v.nullable(resultObject({
+export const inlineSwShowRegistrationOutput = v.nullable(v.strictObject({
 	"userId": v.string(),
 	"endpoint": v.string(),
 	"sendReadMessage": v.boolean(),
@@ -41,11 +40,11 @@ export const inlineSwShowRegistrationDefinition = defineEndpointContract(
 	inlineSwShowRegistrationOutput,
 );
 
-export const inlineSwUpdateRegistrationInput = v.looseObject({
+export const inlineSwUpdateRegistrationInput = v.object({
 	"endpoint": v.string(),
 	"sendReadMessage": v.exactOptional(v.boolean()),
 });
-export const inlineSwUpdateRegistrationOutput = resultObject({
+export const inlineSwUpdateRegistrationOutput = v.strictObject({
 	"userId": v.string(),
 	"endpoint": v.string(),
 	"sendReadMessage": v.boolean(),

@@ -9,7 +9,7 @@ import * as v from 'valibot';
 import { objectParams } from '../../api/contract/index.js';
 
 export const notificationsInputs = {
-	'notifications/create': v.looseObject({
+	'notifications/create': v.object({
 		body: v.string(),
 		header: v.exactOptional(v.nullable(v.string())),
 		icon: v.exactOptional(v.nullable(v.string())),

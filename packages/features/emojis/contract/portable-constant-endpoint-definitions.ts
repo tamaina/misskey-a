@@ -7,7 +7,6 @@ import type { InferContractRouterInputs, InferContractRouterOutputs } from '@orp
 import * as v from 'valibot';
 import { defineEndpointContract } from '../../api/contract/definition.js';
 import { misskeyId } from '../../api/contract/index.js';
-import { resultObject } from '../../api/contract/result-object.js';
 import { jsonObject } from '../../api/contract/json-object.js';
 import { packedReference } from '../../api/contract/packed-reference.js';
 import { fetchEmojisHostTypes, fetchEmojisSortKeys } from './fetch-options.js';
@@ -38,7 +37,7 @@ export const portableV2AdminEmojiListInput = jsonObject({
 	"page": v.exactOptional(v.pipe(v.number(), v.integer())),
 	"sortKeys": v.optional(v.array(v.picklist(fetchEmojisSortKeys)), ["-id"]),
 });
-export const portableV2AdminEmojiListOutput = resultObject({
+export const portableV2AdminEmojiListOutput = v.strictObject({
 	"emojis": v.array(packedReference("EmojiDetailedAdmin")),
 	"count": v.pipe(v.number(), v.integer()),
 	"allCount": v.pipe(v.number(), v.integer()),

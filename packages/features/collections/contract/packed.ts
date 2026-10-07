@@ -4,7 +4,6 @@
  */
 
 import * as v from 'valibot';
-import { resultObject } from '../../api/contract/result-object.js';
 import {
 	packedNoteSchema as __ref_Note
 } from '../../notes/contract/packed.js';
@@ -12,7 +11,7 @@ import {
 	packedUserLiteSchema as __ref_UserLite
 } from '../../users/contract/packed.js';
 
-export const packedClipSchema = resultObject({
+export const packedClipSchema = v.strictObject({
 	"id": v.pipe(v.string(), v.metadata({ "format": "id", "example": "xxxxxxxxxx" })),
 	"createdAt": v.pipe(v.string(), v.metadata({ "format": "date-time" })),
 	"lastClippedAt": v.pipe(v.nullable(v.string()), v.metadata({ "format": "date-time" })),
@@ -25,7 +24,7 @@ export const packedClipSchema = resultObject({
 	"isFavorited": v.optional(v.boolean()),
 	"notesCount": v.optional(v.pipe(v.number(), v.integer()))
 });
-export const packedNoteFavoriteSchema = resultObject({
+export const packedNoteFavoriteSchema = v.strictObject({
 	"id": v.pipe(v.string(), v.metadata({ "format": "id", "example": "xxxxxxxxxx" })),
 	"createdAt": v.pipe(v.string(), v.metadata({ "format": "date-time" })),
 	"note": v.lazy(() => __ref_Note),

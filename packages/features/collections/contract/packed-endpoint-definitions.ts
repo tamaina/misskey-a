@@ -9,7 +9,7 @@ import { defineEndpointContract } from '../../api/contract/definition.js';
 import { jsonString, misskeyId } from '../../api/contract/index.js';
 import { packedReference } from '../../api/contract/packed-reference.js';
 
-export const packedClipsCreateInput = v.looseObject({
+export const packedClipsCreateInput = v.object({
 	"name": jsonString({ "minLength": 1, "maxLength": 100 }),
 	"isPublic": v.optional(v.boolean(), false),
 	"description": v.exactOptional(v.nullable(jsonString({ "maxLength": 2048 }))),
@@ -21,7 +21,7 @@ export const packedClipsCreateDefinition = defineEndpointContract(
 	packedClipsCreateOutput,
 );
 
-export const packedClipsListInput = v.looseObject({
+export const packedClipsListInput = v.object({
 	"limit": v.optional(v.pipe(v.pipe(v.number(), v.integer()), v.minValue(1), v.maxValue(100)), 10),
 	"sinceId": v.exactOptional(misskeyId),
 	"untilId": v.exactOptional(misskeyId),
@@ -35,7 +35,7 @@ export const packedClipsListDefinition = defineEndpointContract(
 	packedClipsListOutput,
 );
 
-export const packedClipsMyFavoritesInput = v.looseObject({});
+export const packedClipsMyFavoritesInput = v.object({});
 export const packedClipsMyFavoritesOutput = v.array(packedReference("Clip"));
 export const packedClipsMyFavoritesDefinition = defineEndpointContract(
 	{ method: 'POST', path: "/clips/my-favorites", tags: ["account", "clip"] },
@@ -43,7 +43,7 @@ export const packedClipsMyFavoritesDefinition = defineEndpointContract(
 	packedClipsMyFavoritesOutput,
 );
 
-export const packedClipsNotesInput = v.looseObject({
+export const packedClipsNotesInput = v.object({
 	"clipId": misskeyId,
 	"limit": v.optional(v.pipe(v.pipe(v.number(), v.integer()), v.minValue(1), v.maxValue(100)), 10),
 	"sinceId": v.exactOptional(misskeyId),
@@ -59,7 +59,7 @@ export const packedClipsNotesDefinition = defineEndpointContract(
 	packedClipsNotesOutput,
 );
 
-export const packedClipsShowInput = v.looseObject({
+export const packedClipsShowInput = v.object({
 	"clipId": misskeyId,
 });
 export const packedClipsShowOutput = packedReference("Clip");
@@ -69,7 +69,7 @@ export const packedClipsShowDefinition = defineEndpointContract(
 	packedClipsShowOutput,
 );
 
-export const packedClipsUpdateInput = v.looseObject({
+export const packedClipsUpdateInput = v.object({
 	"clipId": misskeyId,
 	"name": v.exactOptional(jsonString({ "minLength": 1, "maxLength": 100 })),
 	"isPublic": v.exactOptional(v.boolean()),
@@ -82,7 +82,7 @@ export const packedClipsUpdateDefinition = defineEndpointContract(
 	packedClipsUpdateOutput,
 );
 
-export const packedIFavoritesInput = v.looseObject({
+export const packedIFavoritesInput = v.object({
 	"limit": v.optional(v.pipe(v.pipe(v.number(), v.integer()), v.minValue(1), v.maxValue(100)), 10),
 	"sinceId": v.exactOptional(misskeyId),
 	"untilId": v.exactOptional(misskeyId),
@@ -96,7 +96,7 @@ export const packedIFavoritesDefinition = defineEndpointContract(
 	packedIFavoritesOutput,
 );
 
-export const packedNotesClipsInput = v.looseObject({
+export const packedNotesClipsInput = v.object({
 	"noteId": misskeyId,
 });
 export const packedNotesClipsOutput = v.array(packedReference("Clip"));
@@ -106,7 +106,7 @@ export const packedNotesClipsDefinition = defineEndpointContract(
 	packedNotesClipsOutput,
 );
 
-export const packedUsersClipsInput = v.looseObject({
+export const packedUsersClipsInput = v.object({
 	"userId": misskeyId,
 	"limit": v.optional(v.pipe(v.pipe(v.number(), v.integer()), v.minValue(1), v.maxValue(100)), 10),
 	"sinceId": v.exactOptional(misskeyId),

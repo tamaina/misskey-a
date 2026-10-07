@@ -8,9 +8,8 @@ import type { InferContractRouterInputs, InferContractRouterOutputs } from '@orp
 import * as v from 'valibot';
 import { defineEndpointContract } from '../../api/contract/definition.js';
 import { jsonString, misskeyId, objectParams } from '../../api/contract/index.js';
-import { resultObject } from '../../api/contract/result-object.js';
 
-export const avatarDecorationResult = v.array(v.object({
+export const avatarDecorationResult = v.array(v.strictObject({
 	id: v.pipe(v.string(), v.metadata({ format: 'id', example: 'xxxxxxxxxx' })),
 	name: v.string(),
 	description: v.string(),
@@ -21,7 +20,7 @@ export const avatarDecorationResult = v.array(v.object({
 
 /** Inputs for the legacy avatar-decoration administration endpoints. */
 export const avatarDecorationCommandInputs = {
-	'admin/avatar-decorations/update': v.looseObject({
+	'admin/avatar-decorations/update': v.object({
 		id: misskeyId,
 		name: v.exactOptional(jsonString({ minLength: 1 })),
 		description: v.exactOptional(v.string()),
@@ -29,7 +28,7 @@ export const avatarDecorationCommandInputs = {
 		roleIdsThatCanBeUsedThisDecoration: v.exactOptional(v.array(v.string())),
 		category: v.exactOptional(v.nullable(v.string())),
 	}),
-	'admin/avatar-decorations/delete': v.looseObject({
+	'admin/avatar-decorations/delete': v.object({
 		id: misskeyId,
 	}),
 };
@@ -43,7 +42,7 @@ const avatarDecorationAdminResultFields = {
 	roleIdsThatCanBeUsedThisDecoration: v.array(v.pipe(v.string(), v.metadata({ format: 'id' }))),
 };
 
-export const createAvatarDecorationInput = v.looseObject({
+export const createAvatarDecorationInput = v.object({
 	name: jsonString({ minLength: 1 }),
 	description: v.string(),
 	url: jsonString({ minLength: 1 }),
@@ -51,7 +50,7 @@ export const createAvatarDecorationInput = v.looseObject({
 	category: v.exactOptional(v.nullable(v.string())),
 });
 
-export const createAvatarDecorationOutput = resultObject({
+export const createAvatarDecorationOutput = v.strictObject({
 	id: v.pipe(v.string(), v.metadata({ format: 'id' })),
 	...avatarDecorationAdminResultFields,
 	category: v.nullable(v.string()),
@@ -65,7 +64,7 @@ export const createAvatarDecorationDefinition = defineEndpointContract(
 
 export const createAvatarDecorationContract = createAvatarDecorationDefinition.contract;
 
-export const listAvatarDecorationsInput = v.looseObject({
+export const listAvatarDecorationsInput = v.object({
 	limit: v.optional(v.pipe(v.number(), v.integer(), v.minValue(1), v.maxValue(100)), 10),
 	sinceId: v.exactOptional(misskeyId),
 	untilId: v.exactOptional(misskeyId),
@@ -74,7 +73,7 @@ export const listAvatarDecorationsInput = v.looseObject({
 	userId: v.exactOptional(v.nullable(misskeyId)),
 });
 
-export const listAvatarDecorationsOutput = v.array(resultObject({
+export const listAvatarDecorationsOutput = v.array(v.strictObject({
 	id: v.pipe(v.string(), v.metadata({ format: 'id', example: 'xxxxxxxxxx' })),
 	...avatarDecorationAdminResultFields,
 	category: v.exactOptional(v.nullable(v.string())),

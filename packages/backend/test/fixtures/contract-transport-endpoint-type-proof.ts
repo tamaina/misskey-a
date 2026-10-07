@@ -38,16 +38,15 @@ if (false) {
 		const id: string = params.channelId;
 		const actor: MiLocalUser = user;
 		const accessToken: MiAccessToken | null = token;
-		const opaque: unknown = params.extra;
 		const name: string | null | undefined = file?.name;
 		const path: string | undefined = file?.path;
 		const remoteAddress: string | null | undefined = ip;
 		const requestHeaders: Record<string, string> | null | undefined = headers;
 		cleanup?.();
-		void [id, actor, accessToken, opaque, name, path, remoteAddress, requestHeaders];
+		void [id, actor, accessToken, name, path, remoteAddress, requestHeaders];
 		// @ts-expect-error A declared channel identifier cannot widen to number.
 		const wrongId: number = params.channelId; void wrongId;
-		// @ts-expect-error Unknown extra fields are not declared typed payload properties.
+		// @ts-expect-error Native finite input does not declare extra payload properties.
 		const wrongExtra: string = params.extra; void wrongExtra;
 	});
 	createContractTransportEndpoint(anonymousMeta, {}, channelContract['channels/follow'], async (_params, user) => {

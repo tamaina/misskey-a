@@ -244,7 +244,7 @@ function canonical(value: unknown): unknown {
 }
 
 for (const fixture of fixtures) {
-	test(fixture.route + ' retains unique-string input, native validation and response documentation', () => {
+	test(fixture.route + ' retains HTTP unique-string input and native validation with finite gallery key selection', () => {
 		const definition = definitions[fixture.route];
 		const projection = projectEndpointContract<v.GenericSchema, v.GenericSchema>(definition);
 		expect(canonical(projection.input)).toEqual(canonical(fixture.input));
@@ -264,7 +264,15 @@ for (const fixture of fixtures) {
 			expect(after).toEqual(before);
 			const native = v.safeParse<v.GenericSchema>(definition.input, structuredClone(sample));
 			expect(native.success).toBe(oldValid);
-			if (native.success) expect(native.output).toEqual(before);
+			if (native.success) {
+				if (fixture.route.startsWith('gallery/posts/')) {
+					if (before === null || typeof before !== 'object') throw new Error('Expected valid gallery object');
+					const declared = new Set(Object.keys(fixture.input.properties));
+					expect(native.output).toEqual(Object.fromEntries(Object.entries(before).filter(([key]) => declared.has(key))));
+				} else {
+					expect(native.output).toEqual(before);
+				}
+			}
 		}
 	});
 }

@@ -4,9 +4,8 @@
  */
 
 import * as v from 'valibot';
-import { resultObject } from '../../api/contract/result-object.js';
 
-export const packedAnnouncementSchema = resultObject({
+export const packedAnnouncementSchema = v.strictObject({
 	"id": v.pipe(v.string(), v.metadata({ "format": "id", "example": "xxxxxxxxxx" })),
 	"createdAt": v.pipe(v.string(), v.metadata({ "format": "date-time" })),
 	"updatedAt": v.pipe(v.nullable(v.string()), v.metadata({ "format": "date-time" })),

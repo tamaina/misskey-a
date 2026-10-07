@@ -108,7 +108,8 @@ export class NotificationEntityService implements OnModuleInit {
 		};
 		const packedCommon = {
 			...packedBase,
-			userId: 'notifierId' in notification ? notification.notifierId : undefined,
+			// Every notifier-bearing branch supplies its narrowed notifierId below.
+			userId: undefined,
 			...(userIfNeed != null ? { user: userIfNeed } : {}),
 			...(noteIfNeed != null ? { note: noteIfNeed } : {}),
 		};

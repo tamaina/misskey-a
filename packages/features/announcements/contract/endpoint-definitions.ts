@@ -7,9 +7,9 @@ import type { InferContractRouterInputs, InferContractRouterOutputs } from '@orp
 import * as v from 'valibot';
 import { defineEndpointContract } from '../../api/contract/definition.js';
 import { jsonString, misskeyId } from '../../api/contract/index.js';
-import { resultObject } from '../../api/contract/result-object.js';
+import { packedAnnouncementSchema } from './packed.js';
 
-export const inlineAdminAnnouncementsCreateInput = v.looseObject({
+export const inlineAdminAnnouncementsCreateInput = v.object({
 	"title": jsonString({ "minLength": 1 }),
 	"text": jsonString({ "minLength": 1 }),
 	"imageUrl": v.nullable(jsonString({ "minLength": 0 })),
@@ -20,21 +20,15 @@ export const inlineAdminAnnouncementsCreateInput = v.looseObject({
 	"needConfirmationToRead": v.optional(v.boolean(), false),
 	"userId": v.optional(v.nullable(misskeyId), null),
 });
-export const inlineAdminAnnouncementsCreateOutput = resultObject({
-	"id": v.pipe(v.string(), v.metadata({ "format": "id", "example": "xxxxxxxxxx" })),
-	"createdAt": v.pipe(v.string(), v.metadata({ "format": "date-time" })),
-	"updatedAt": v.pipe(v.nullable(v.string()), v.metadata({ "format": "date-time" })),
-	"title": v.string(),
-	"text": v.string(),
-	"imageUrl": v.nullable(v.string()),
-});
+// Creation returns the full public serializer result, including its optional read state.
+export const inlineAdminAnnouncementsCreateOutput = v.strictObject(packedAnnouncementSchema.entries);
 export const inlineAdminAnnouncementsCreateDefinition = defineEndpointContract(
 	{ method: 'POST', path: '/admin/announcements/create', tags: ["admin"] },
 	inlineAdminAnnouncementsCreateInput,
 	inlineAdminAnnouncementsCreateOutput,
 );
 
-export const inlineAdminAnnouncementsListInput = v.looseObject({
+export const inlineAdminAnnouncementsListInput = v.object({
 	"limit": v.optional(v.pipe(v.pipe(v.number(), v.integer()), v.minValue(1), v.maxValue(100)), 10),
 	"sinceId": v.exactOptional(misskeyId),
 	"untilId": v.exactOptional(misskeyId),
@@ -43,7 +37,7 @@ export const inlineAdminAnnouncementsListInput = v.looseObject({
 	"userId": v.exactOptional(v.nullable(misskeyId)),
 	"status": v.optional(v.picklist(["all", "active", "archived"]), "active"),
 });
-export const inlineAdminAnnouncementsListOutput = v.array(resultObject({
+export const inlineAdminAnnouncementsListOutput = v.array(v.strictObject({
 		"id": v.pipe(v.string(), v.metadata({ "format": "id", "example": "xxxxxxxxxx" })),
 		"createdAt": v.pipe(v.string(), v.metadata({ "format": "date-time" })),
 		"updatedAt": v.pipe(v.nullable(v.string()), v.metadata({ "format": "date-time" })),

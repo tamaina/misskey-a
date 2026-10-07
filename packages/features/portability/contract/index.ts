@@ -8,7 +8,7 @@ import type { InferContractRouterInputs, InferContractRouterOutputs } from '@orp
 import * as v from 'valibot';
 import { objectParams } from '../../api/contract/index.js';
 
-const exportFollowingInput = v.looseObject({
+const exportFollowingInput = v.object({
 	excludeMuting: v.optional(v.boolean(), false),
 	excludeInactive: v.optional(v.boolean(), false),
 });

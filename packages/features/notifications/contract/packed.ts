@@ -4,7 +4,6 @@
  */
 
 import * as v from 'valibot';
-import { resultObject } from '../../api/contract/result-object.js';
 import {
 	packedChatRoomInvitationSchema as __ref_ChatRoomInvitation
 } from '../../chat/contract/packed.js';
@@ -20,42 +19,42 @@ import {
 	packedUserLiteSchema as __ref_UserLite
 } from '../../users/contract/packed.js';
 
-export const packedNotificationSchema = v.variant("type", [resultObject({
+export const packedNotificationSchema = v.variant("type", [v.strictObject({
 	"id": v.pipe(v.string(), v.metadata({ "format": "id" })),
 	"createdAt": v.pipe(v.string(), v.metadata({ "format": "date-time" })),
 	"type": v.picklist(["note"]),
 	"user": v.lazy(() => __ref_UserLite),
 	"userId": v.pipe(v.string(), v.metadata({ "format": "id" })),
 	"note": v.lazy(() => __ref_Note)
-}), resultObject({
+}), v.strictObject({
 	"id": v.pipe(v.string(), v.metadata({ "format": "id" })),
 	"createdAt": v.pipe(v.string(), v.metadata({ "format": "date-time" })),
 	"type": v.picklist(["mention"]),
 	"user": v.lazy(() => __ref_UserLite),
 	"userId": v.pipe(v.string(), v.metadata({ "format": "id" })),
 	"note": v.lazy(() => __ref_Note)
-}), resultObject({
+}), v.strictObject({
 	"id": v.pipe(v.string(), v.metadata({ "format": "id" })),
 	"createdAt": v.pipe(v.string(), v.metadata({ "format": "date-time" })),
 	"type": v.picklist(["reply"]),
 	"user": v.lazy(() => __ref_UserLite),
 	"userId": v.pipe(v.string(), v.metadata({ "format": "id" })),
 	"note": v.lazy(() => __ref_Note)
-}), resultObject({
+}), v.strictObject({
 	"id": v.pipe(v.string(), v.metadata({ "format": "id" })),
 	"createdAt": v.pipe(v.string(), v.metadata({ "format": "date-time" })),
 	"type": v.picklist(["renote"]),
 	"user": v.lazy(() => __ref_UserLite),
 	"userId": v.pipe(v.string(), v.metadata({ "format": "id" })),
 	"note": v.lazy(() => __ref_Note)
-}), resultObject({
+}), v.strictObject({
 	"id": v.pipe(v.string(), v.metadata({ "format": "id" })),
 	"createdAt": v.pipe(v.string(), v.metadata({ "format": "date-time" })),
 	"type": v.picklist(["quote"]),
 	"user": v.lazy(() => __ref_UserLite),
 	"userId": v.pipe(v.string(), v.metadata({ "format": "id" })),
 	"note": v.lazy(() => __ref_Note)
-}), resultObject({
+}), v.strictObject({
 	"id": v.pipe(v.string(), v.metadata({ "format": "id" })),
 	"createdAt": v.pipe(v.string(), v.metadata({ "format": "date-time" })),
 	"type": v.picklist(["reaction"]),
@@ -63,96 +62,116 @@ export const packedNotificationSchema = v.variant("type", [resultObject({
 	"userId": v.pipe(v.string(), v.metadata({ "format": "id" })),
 	"note": v.lazy(() => __ref_Note),
 	"reaction": v.string()
-}), resultObject({
+}), v.strictObject({
 	"id": v.pipe(v.string(), v.metadata({ "format": "id" })),
 	"createdAt": v.pipe(v.string(), v.metadata({ "format": "date-time" })),
 	"type": v.picklist(["pollEnded"]),
 	"user": v.lazy(() => __ref_UserLite),
 	"userId": v.pipe(v.string(), v.metadata({ "format": "id" })),
 	"note": v.lazy(() => __ref_Note)
-}), resultObject({
+}), v.strictObject({
 	"id": v.pipe(v.string(), v.metadata({ "format": "id" })),
 	"createdAt": v.pipe(v.string(), v.metadata({ "format": "date-time" })),
 	"type": v.picklist(["scheduledNotePosted"]),
+	// packedCommon emits this enumerable key as undefined; JSON must omit it.
+	"userId": v.optional(v.never()),
 	"note": v.lazy(() => __ref_Note)
-}), resultObject({
+}), v.strictObject({
 	"id": v.pipe(v.string(), v.metadata({ "format": "id" })),
 	"createdAt": v.pipe(v.string(), v.metadata({ "format": "date-time" })),
 	"type": v.picklist(["scheduledNotePostFailed"]),
+	// packedCommon emits this enumerable key as undefined; JSON must omit it.
+	"userId": v.optional(v.never()),
 	// Existing notifications may omit the draft; packing must not fetch new private data.
 	"noteDraft": v.optional(v.lazy(() => __ref_NoteDraft))
-}), resultObject({
+}), v.strictObject({
 	"id": v.pipe(v.string(), v.metadata({ "format": "id" })),
 	"createdAt": v.pipe(v.string(), v.metadata({ "format": "date-time" })),
 	"type": v.picklist(["follow"]),
 	"user": v.lazy(() => __ref_UserLite),
 	"userId": v.pipe(v.string(), v.metadata({ "format": "id" }))
-}), resultObject({
+}), v.strictObject({
 	"id": v.pipe(v.string(), v.metadata({ "format": "id" })),
 	"createdAt": v.pipe(v.string(), v.metadata({ "format": "date-time" })),
 	"type": v.picklist(["receiveFollowRequest"]),
 	"user": v.lazy(() => __ref_UserLite),
 	"userId": v.pipe(v.string(), v.metadata({ "format": "id" }))
-}), resultObject({
+}), v.strictObject({
 	"id": v.pipe(v.string(), v.metadata({ "format": "id" })),
 	"createdAt": v.pipe(v.string(), v.metadata({ "format": "date-time" })),
 	"type": v.picklist(["followRequestAccepted"]),
 	"user": v.lazy(() => __ref_UserLite),
 	"userId": v.pipe(v.string(), v.metadata({ "format": "id" })),
 	"message": v.nullable(v.string())
-}), resultObject({
+}), v.strictObject({
 	"id": v.pipe(v.string(), v.metadata({ "format": "id" })),
 	"createdAt": v.pipe(v.string(), v.metadata({ "format": "date-time" })),
 	"type": v.picklist(["roleAssigned"]),
+	// packedCommon emits this enumerable key as undefined; JSON must omit it.
+	"userId": v.optional(v.never()),
 	"role": v.lazy(() => __ref_Role)
-}), resultObject({
+}), v.strictObject({
 	"id": v.pipe(v.string(), v.metadata({ "format": "id" })),
 	"createdAt": v.pipe(v.string(), v.metadata({ "format": "date-time" })),
 	"type": v.picklist(["chatRoomInvitationReceived"]),
+	"user": v.lazy(() => __ref_UserLite),
+	"userId": v.pipe(v.string(), v.metadata({ "format": "id" })),
 	"invitation": v.lazy(() => __ref_ChatRoomInvitation)
-}), resultObject({
+}), v.strictObject({
 	"id": v.pipe(v.string(), v.metadata({ "format": "id" })),
 	"createdAt": v.pipe(v.string(), v.metadata({ "format": "date-time" })),
 	"type": v.picklist(["achievementEarned"]),
+	// packedCommon emits this enumerable key as undefined; JSON must omit it.
+	"userId": v.optional(v.never()),
 	"achievement": v.lazy(() => __ref_AchievementName)
-}), resultObject({
+}), v.strictObject({
 	"id": v.pipe(v.string(), v.metadata({ "format": "id" })),
 	"createdAt": v.pipe(v.string(), v.metadata({ "format": "date-time" })),
 	"type": v.picklist(["exportCompleted"]),
+	// packedCommon emits this enumerable key as undefined; JSON must omit it.
+	"userId": v.optional(v.never()),
 	"exportedEntity": v.picklist(["antenna", "blocking", "clip", "customEmoji", "favorite", "following", "muting", "note", "userList"]),
 	"fileId": v.pipe(v.string(), v.metadata({ "format": "id" }))
-}), resultObject({
+}), v.strictObject({
 	"id": v.pipe(v.string(), v.metadata({ "format": "id" })),
 	"createdAt": v.pipe(v.string(), v.metadata({ "format": "date-time" })),
-	"type": v.picklist(["login"])
-}), resultObject({
+	"type": v.picklist(["login"]),
+	// packedCommon emits this enumerable key as undefined; JSON must omit it.
+	"userId": v.optional(v.never())
+}), v.strictObject({
 	"id": v.pipe(v.string(), v.metadata({ "format": "id" })),
 	"createdAt": v.pipe(v.string(), v.metadata({ "format": "date-time" })),
-	"type": v.picklist(["createToken"])
-}), resultObject({
+	"type": v.picklist(["createToken"]),
+	// packedCommon emits this enumerable key as undefined; JSON must omit it.
+	"userId": v.optional(v.never())
+}), v.strictObject({
 	"id": v.pipe(v.string(), v.metadata({ "format": "id" })),
 	"createdAt": v.pipe(v.string(), v.metadata({ "format": "date-time" })),
 	"type": v.picklist(["app"]),
+	// packedCommon emits this enumerable key as undefined; JSON must omit it.
+	"userId": v.optional(v.never()),
 	"body": v.string(),
 	"header": v.nullable(v.string()),
 	"icon": v.nullable(v.string())
-}), resultObject({
+}), v.strictObject({
 	"id": v.pipe(v.string(), v.metadata({ "format": "id" })),
 	"createdAt": v.pipe(v.string(), v.metadata({ "format": "date-time" })),
 	"type": v.picklist(["reaction:grouped"]),
 	"note": v.lazy(() => __ref_Note),
-	"reactions": v.array(resultObject({
+	"reactions": v.array(v.strictObject({
 	"user": v.lazy(() => __ref_UserLite),
 	"reaction": v.string()
 }))
-}), resultObject({
+}), v.strictObject({
 	"id": v.pipe(v.string(), v.metadata({ "format": "id" })),
 	"createdAt": v.pipe(v.string(), v.metadata({ "format": "date-time" })),
 	"type": v.picklist(["renote:grouped"]),
 	"note": v.lazy(() => __ref_Note),
 	"users": v.array(v.lazy(() => __ref_UserLite))
-}), resultObject({
+}), v.strictObject({
 	"id": v.pipe(v.string(), v.metadata({ "format": "id" })),
 	"createdAt": v.pipe(v.string(), v.metadata({ "format": "date-time" })),
-	"type": v.picklist(["test"])
+	"type": v.picklist(["test"]),
+	// packedCommon emits this enumerable key as undefined; JSON must omit it.
+	"userId": v.optional(v.never())
 })]);

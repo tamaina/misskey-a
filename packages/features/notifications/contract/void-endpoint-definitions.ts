@@ -7,7 +7,7 @@ import type { InferContractRouterInputs, InferContractRouterOutputs } from '@orp
 import * as v from 'valibot';
 import { defineEndpointContract } from '../../api/contract/definition.js';
 
-export const voidSwUnregisterInput = v.looseObject({
+export const voidSwUnregisterInput = v.object({
 	"endpoint": v.string(),
 	"auth": v.string(),
 	"publickey": v.string(),

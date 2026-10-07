@@ -8,7 +8,7 @@ import * as v from 'valibot';
 import { defineEndpointContract } from '../../api/contract/definition.js';
 import { misskeyId } from '../../api/contract/index.js';
 
-export const voidNotesFavoritesCreateInput = v.looseObject({
+export const voidNotesFavoritesCreateInput = v.object({
 	"noteId": misskeyId,
 });
 export const voidNotesFavoritesCreateOutput = v.void();
@@ -18,7 +18,7 @@ export const voidNotesFavoritesCreateDefinition = defineEndpointContract(
 	voidNotesFavoritesCreateOutput,
 );
 
-export const voidNotesFavoritesDeleteInput = v.looseObject({
+export const voidNotesFavoritesDeleteInput = v.object({
 	"noteId": misskeyId,
 });
 export const voidNotesFavoritesDeleteOutput = v.void();

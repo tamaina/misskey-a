@@ -9,8 +9,8 @@ import * as v from 'valibot';
 import type { ApiErrorDefinition } from '../../api/contract/index.js';
 import { misskeyId } from '../../api/contract/index.js';
 
-const channelIdInput = v.looseObject({ channelId: misskeyId });
-const muteCreateInput = v.looseObject({
+const channelIdInput = v.object({ channelId: misskeyId });
+const muteCreateInput = v.object({
 	channelId: misskeyId,
 	expiresAt: v.pipe(
 		v.exactOptional(v.nullable(v.pipe(v.number(), v.integer()))),

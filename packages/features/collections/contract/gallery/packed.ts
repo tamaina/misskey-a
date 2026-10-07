@@ -4,7 +4,6 @@
  */
 
 import * as v from 'valibot';
-import { resultObject } from '../../../api/contract/result-object.js';
 import {
 	packedDriveFileSchema as __ref_DriveFile
 } from '../../../drive/contract/packed.js';
@@ -12,7 +11,7 @@ import {
 	packedUserLiteSchema as __ref_UserLite
 } from '../../../users/contract/packed.js';
 
-export const packedGalleryPostSchema = resultObject({
+export const packedGalleryPostSchema = v.strictObject({
 	"id": v.pipe(v.string(), v.metadata({ "format": "id", "example": "xxxxxxxxxx" })),
 	"createdAt": v.pipe(v.string(), v.metadata({ "format": "date-time" })),
 	"updatedAt": v.pipe(v.string(), v.metadata({ "format": "date-time" })),

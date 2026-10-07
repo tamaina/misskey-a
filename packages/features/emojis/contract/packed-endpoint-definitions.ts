@@ -9,7 +9,7 @@ import { defineEndpointContract } from '../../api/contract/definition.js';
 import { misskeyId } from '../../api/contract/index.js';
 import { packedReference } from '../../api/contract/packed-reference.js';
 
-export const packedAdminEmojiAddInput = v.looseObject({
+export const packedAdminEmojiAddInput = v.object({
 	"name": v.pipe(v.string(), v.regex(new RegExp("^[a-zA-Z0-9_]+$"))),
 	"fileId": misskeyId,
 	"category": v.exactOptional(v.pipe(v.nullable(v.string()), v.metadata({ "description": "Use `null` to reset the category." }))),
@@ -26,7 +26,7 @@ export const packedAdminEmojiAddDefinition = defineEndpointContract(
 	packedAdminEmojiAddOutput,
 );
 
-export const packedAdminEmojiListInput = v.looseObject({
+export const packedAdminEmojiListInput = v.object({
 	"query": v.optional(v.nullable(v.string()), null),
 	"limit": v.optional(v.pipe(v.pipe(v.number(), v.integer()), v.minValue(1), v.maxValue(100)), 10),
 	"sinceId": v.exactOptional(misskeyId),
@@ -41,7 +41,7 @@ export const packedAdminEmojiListDefinition = defineEndpointContract(
 	packedAdminEmojiListOutput,
 );
 
-export const packedAdminEmojiListRemoteInput = v.looseObject({
+export const packedAdminEmojiListRemoteInput = v.object({
 	"query": v.optional(v.nullable(v.string()), null),
 	"host": v.optional(v.pipe(v.nullable(v.string()), v.metadata({ "description": "Use `null` to represent the local host." })), null),
 	"limit": v.optional(v.pipe(v.pipe(v.number(), v.integer()), v.minValue(1), v.maxValue(100)), 10),

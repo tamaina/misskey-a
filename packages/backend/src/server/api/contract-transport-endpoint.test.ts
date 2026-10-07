@@ -115,8 +115,8 @@ for (const row of rows) {
 			expect(parsed.success).toBe('result' in result);
 			if (parsed.success) {
 				if (params === null || typeof params !== 'object') throw new Error('Expected validated object input');
-				expect(typeof parsed.output[row.id]).toBe('string');
-				expect(parsed.output[row.id]).toBe(Reflect.get(params, row.id));
+				expect(typeof Reflect.get(parsed.output, row.id)).toBe('string');
+				expect(parsed.output).toMatchObject({ [row.id]: Reflect.get(params, row.id) });
 			}
 		}
 		// Frozen HTTP inputs have no defaults; neither the IDs nor expiration are normalized.

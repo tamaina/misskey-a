@@ -8,7 +8,7 @@ import * as v from 'valibot';
 import { defineEndpointContract } from '../../api/contract/definition.js';
 import { misskeyId } from '../../api/contract/index.js';
 
-export const voidAdminEmojiDeleteInput = v.looseObject({
+export const voidAdminEmojiDeleteInput = v.object({
 	"id": misskeyId,
 });
 export const voidAdminEmojiDeleteOutput = v.void();
@@ -18,7 +18,7 @@ export const voidAdminEmojiDeleteDefinition = defineEndpointContract(
 	voidAdminEmojiDeleteOutput,
 );
 
-export const voidAdminEmojiDeleteBulkInput = v.looseObject({
+export const voidAdminEmojiDeleteBulkInput = v.object({
 	"ids": v.array(misskeyId),
 });
 export const voidAdminEmojiDeleteBulkOutput = v.void();
@@ -28,7 +28,7 @@ export const voidAdminEmojiDeleteBulkDefinition = defineEndpointContract(
 	voidAdminEmojiDeleteBulkOutput,
 );
 
-export const voidAdminEmojiImportZipInput = v.looseObject({
+export const voidAdminEmojiImportZipInput = v.object({
 	"fileId": misskeyId,
 });
 export const voidAdminEmojiImportZipOutput = v.void();
@@ -38,7 +38,7 @@ export const voidAdminEmojiImportZipDefinition = defineEndpointContract(
 	voidAdminEmojiImportZipOutput,
 );
 
-export const voidExportCustomEmojisInput = v.looseObject({});
+export const voidExportCustomEmojisInput = v.object({});
 export const voidExportCustomEmojisOutput = v.void();
 export const voidExportCustomEmojisDefinition = defineEndpointContract(
 	{ method: 'POST', path: "/export-custom-emojis" },

@@ -6,9 +6,8 @@
 import type { InferContractRouterInputs, InferContractRouterOutputs } from '@orpc/contract';
 import * as v from 'valibot';
 import { defineEndpointContract } from '../../api/contract/definition.js';
-import { resultObject } from '../../api/contract/result-object.js';
 
-export const inlineHashtagsSearchInput = v.looseObject({
+export const inlineHashtagsSearchInput = v.object({
 	"limit": v.optional(v.pipe(v.pipe(v.number(), v.integer()), v.minValue(1), v.maxValue(100)), 10),
 	"query": v.string(),
 	"offset": v.optional(v.pipe(v.number(), v.integer()), 0),
@@ -20,8 +19,8 @@ export const inlineHashtagsSearchDefinition = defineEndpointContract(
 	inlineHashtagsSearchOutput,
 );
 
-export const inlineHashtagsTrendInput = v.looseObject({});
-export const inlineHashtagsTrendOutput = v.array(resultObject({
+export const inlineHashtagsTrendInput = v.object({});
+export const inlineHashtagsTrendOutput = v.array(v.strictObject({
 		"tag": v.string(),
 		"chart": v.array(v.number()),
 		"usersCount": v.number(),

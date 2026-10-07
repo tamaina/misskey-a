@@ -10,7 +10,7 @@ import type { ApiErrorDefinition } from '../../api/contract/index.js';
 import { jsonString, misskeyId } from '../../api/contract/index.js';
 
 export const announcementCommandInputs = {
-	'admin/announcements/update': v.looseObject({
+	'admin/announcements/update': v.object({
 		id: misskeyId,
 		title: v.exactOptional(jsonString({ minLength: 1 })),
 		text: v.exactOptional(jsonString({ minLength: 1 })),
@@ -22,10 +22,10 @@ export const announcementCommandInputs = {
 		needConfirmationToRead: v.exactOptional(v.boolean()),
 		isActive: v.exactOptional(v.boolean()),
 	}),
-	'admin/announcements/delete': v.looseObject({
+	'admin/announcements/delete': v.object({
 		id: misskeyId,
 	}),
-	'i/read-announcement': v.looseObject({
+	'i/read-announcement': v.object({
 		announcementId: misskeyId,
 	}),
 };

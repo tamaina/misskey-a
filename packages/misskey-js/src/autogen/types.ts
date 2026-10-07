@@ -4682,6 +4682,7 @@ export type components = {
             createdAt: string;
             /** @enum {string} */
             type: 'scheduledNotePosted';
+            userId?: unknown;
             note: components['schemas']['Note'];
         } | {
             /** Format: id */
@@ -4690,6 +4691,7 @@ export type components = {
             createdAt: string;
             /** @enum {string} */
             type: 'scheduledNotePostFailed';
+            userId?: unknown;
             noteDraft?: components['schemas']['NoteDraft'];
         } | {
             /** Format: id */
@@ -4729,6 +4731,7 @@ export type components = {
             createdAt: string;
             /** @enum {string} */
             type: 'roleAssigned';
+            userId?: unknown;
             role: components['schemas']['Role'];
         } | {
             /** Format: id */
@@ -4737,6 +4740,9 @@ export type components = {
             createdAt: string;
             /** @enum {string} */
             type: 'chatRoomInvitationReceived';
+            user: components['schemas']['UserLite'];
+            /** Format: id */
+            userId: string;
             invitation: components['schemas']['ChatRoomInvitation'];
         } | {
             /** Format: id */
@@ -4745,6 +4751,7 @@ export type components = {
             createdAt: string;
             /** @enum {string} */
             type: 'achievementEarned';
+            userId?: unknown;
             achievement: components['schemas']['AchievementName'];
         } | {
             /** Format: id */
@@ -4753,6 +4760,7 @@ export type components = {
             createdAt: string;
             /** @enum {string} */
             type: 'exportCompleted';
+            userId?: unknown;
             /** @enum {string} */
             exportedEntity: 'antenna' | 'blocking' | 'clip' | 'customEmoji' | 'favorite' | 'following' | 'muting' | 'note' | 'userList';
             /** Format: id */
@@ -4764,6 +4772,7 @@ export type components = {
             createdAt: string;
             /** @enum {string} */
             type: 'login';
+            userId?: unknown;
         } | {
             /** Format: id */
             id: string;
@@ -4771,6 +4780,7 @@ export type components = {
             createdAt: string;
             /** @enum {string} */
             type: 'createToken';
+            userId?: unknown;
         } | {
             /** Format: id */
             id: string;
@@ -4778,6 +4788,7 @@ export type components = {
             createdAt: string;
             /** @enum {string} */
             type: 'app';
+            userId?: unknown;
             body: string;
             header: string | null;
             icon: string | null;
@@ -4809,6 +4820,7 @@ export type components = {
             createdAt: string;
             /** @enum {string} */
             type: 'test';
+            userId?: unknown;
         };
         DriveFile: {
             /**
@@ -5043,6 +5055,7 @@ export type components = {
             isFollowing?: boolean;
             isFavorited?: boolean;
             isMuting?: boolean;
+            hasUnreadNote?: boolean;
             pinnedNotes?: components['schemas']['Note'][];
         };
         QueueCount: {
@@ -6712,9 +6725,17 @@ export interface operations {
                         createdAt: string;
                         /** Format: date-time */
                         updatedAt: string | null;
-                        title: string;
                         text: string;
+                        title: string;
                         imageUrl: string | null;
+                        /** @enum {string} */
+                        icon: 'info' | 'warning' | 'error' | 'success';
+                        /** @enum {string} */
+                        display: 'dialog' | 'normal' | 'banner';
+                        needConfirmationToRead: boolean;
+                        silence: boolean;
+                        forYou: boolean;
+                        isRead?: boolean;
                     };
                 };
             };
@@ -8053,6 +8074,16 @@ export interface operations {
                     'application/json': {
                         /** Format: id */
                         id: string;
+                        aliases: string[];
+                        name: string;
+                        category: string | null;
+                        /** @description The local host is represented with `null`. */
+                        host: string | null;
+                        url: string;
+                        license: string | null;
+                        isSensitive: boolean;
+                        localOnly: boolean;
+                        roleIdsThatCanBeUsedThisEmojiAsReaction: string[];
                     };
                 };
             };
@@ -34384,7 +34415,7 @@ export interface operations {
                 content: {
                     'application/json': {
                         /** @enum {string} */
-                        state?: 'already-subscribed' | 'subscribed';
+                        state: 'already-subscribed' | 'subscribed';
                         key: string | null;
                         userId: string;
                         endpoint: string;

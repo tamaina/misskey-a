@@ -4,9 +4,8 @@
  */
 
 import * as v from 'valibot';
-import { resultObject } from '../../api/contract/result-object.js';
 
-export const packedHashtagSchema = resultObject({
+export const packedHashtagSchema = v.strictObject({
 	"tag": v.pipe(v.string(), v.metadata({ "example": "misskey" })),
 	"mentionedUsersCount": v.number(),
 	"mentionedLocalUsersCount": v.number(),

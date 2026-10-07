@@ -9,7 +9,7 @@ import { defineEndpointContract } from '../../api/contract/definition.js';
 import { misskeyId } from '../../api/contract/index.js';
 import { packedReference } from '../../api/contract/packed-reference.js';
 
-export const packedAnnouncementsInput = v.looseObject({
+export const packedAnnouncementsInput = v.object({
 	"limit": v.optional(v.pipe(v.pipe(v.number(), v.integer()), v.minValue(1), v.maxValue(100)), 10),
 	"sinceId": v.exactOptional(misskeyId),
 	"untilId": v.exactOptional(misskeyId),
@@ -24,7 +24,7 @@ export const packedAnnouncementsDefinition = defineEndpointContract(
 	packedAnnouncementsOutput,
 );
 
-export const packedAnnouncementsShowInput = v.looseObject({
+export const packedAnnouncementsShowInput = v.object({
 	"announcementId": misskeyId,
 });
 export const packedAnnouncementsShowOutput = packedReference("Announcement");

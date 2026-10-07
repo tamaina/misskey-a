@@ -8,7 +8,7 @@ import type { InferContractRouterInputs, InferContractRouterOutputs } from '@orp
 import * as v from 'valibot';
 import { objectParams } from '../../api/contract/index.js';
 
-export const statsResult = v.object({
+export const statsResult = v.strictObject({
 	notesCount: v.number(),
 	originalNotesCount: v.number(),
 	usersCount: v.number(),

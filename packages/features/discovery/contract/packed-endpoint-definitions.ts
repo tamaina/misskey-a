@@ -7,10 +7,9 @@ import type { InferContractRouterInputs, InferContractRouterOutputs } from '@orp
 import * as v from 'valibot';
 import { defineEndpointContract } from '../../api/contract/definition.js';
 import { misskeyId } from '../../api/contract/index.js';
-import { resultObject } from '../../api/contract/result-object.js';
 import { packedReference } from '../../api/contract/packed-reference.js';
 
-export const packedHashtagsListInput = v.looseObject({
+export const packedHashtagsListInput = v.object({
 	"limit": v.optional(v.pipe(v.pipe(v.number(), v.integer()), v.minValue(1), v.maxValue(100)), 10),
 	"attachedToUserOnly": v.optional(v.boolean(), false),
 	"attachedToLocalUserOnly": v.optional(v.boolean(), false),
@@ -24,7 +23,7 @@ export const packedHashtagsListDefinition = defineEndpointContract(
 	packedHashtagsListOutput,
 );
 
-export const packedHashtagsShowInput = v.looseObject({
+export const packedHashtagsShowInput = v.object({
 	"tag": v.string(),
 });
 export const packedHashtagsShowOutput = packedReference("Hashtag");
@@ -34,7 +33,7 @@ export const packedHashtagsShowDefinition = defineEndpointContract(
 	packedHashtagsShowOutput,
 );
 
-export const packedHashtagsUsersInput = v.looseObject({
+export const packedHashtagsUsersInput = v.object({
 	"tag": v.string(),
 	"limit": v.optional(v.pipe(v.pipe(v.number(), v.integer()), v.minValue(1), v.maxValue(100)), 10),
 	"offset": v.optional(v.pipe(v.number(), v.integer()), 0),
@@ -49,7 +48,7 @@ export const packedHashtagsUsersDefinition = defineEndpointContract(
 	packedHashtagsUsersOutput,
 );
 
-export const packedNotesFeaturedInput = v.looseObject({
+export const packedNotesFeaturedInput = v.object({
 	"limit": v.optional(v.pipe(v.pipe(v.number(), v.integer()), v.minValue(1), v.maxValue(100)), 10),
 	"untilId": v.exactOptional(misskeyId),
 	"channelId": v.exactOptional(v.nullable(misskeyId)),
@@ -61,7 +60,7 @@ export const packedNotesFeaturedDefinition = defineEndpointContract(
 	packedNotesFeaturedOutput,
 );
 
-export const packedUsersFeaturedNotesInput = v.looseObject({
+export const packedUsersFeaturedNotesInput = v.object({
 	"limit": v.optional(v.pipe(v.pipe(v.number(), v.integer()), v.minValue(1), v.maxValue(100)), 10),
 	"untilId": v.exactOptional(misskeyId),
 	"userId": misskeyId,
@@ -73,11 +72,11 @@ export const packedUsersFeaturedNotesDefinition = defineEndpointContract(
 	packedUsersFeaturedNotesOutput,
 );
 
-export const packedUsersGetFrequentlyRepliedUsersInput = v.looseObject({
+export const packedUsersGetFrequentlyRepliedUsersInput = v.object({
 	"userId": misskeyId,
 	"limit": v.optional(v.pipe(v.pipe(v.number(), v.integer()), v.minValue(1), v.maxValue(100)), 10),
 });
-export const packedUsersGetFrequentlyRepliedUsersOutput = v.array(resultObject({
+export const packedUsersGetFrequentlyRepliedUsersOutput = v.array(v.strictObject({
 		"user": packedReference("UserDetailed"),
 		"weight": v.number(),
 	}));
@@ -87,7 +86,7 @@ export const packedUsersGetFrequentlyRepliedUsersDefinition = defineEndpointCont
 	packedUsersGetFrequentlyRepliedUsersOutput,
 );
 
-export const packedUsersRecommendationInput = v.looseObject({
+export const packedUsersRecommendationInput = v.object({
 	"limit": v.optional(v.pipe(v.pipe(v.number(), v.integer()), v.minValue(1), v.maxValue(100)), 10),
 	"offset": v.optional(v.pipe(v.number(), v.integer()), 0),
 });
@@ -98,7 +97,7 @@ export const packedUsersRecommendationDefinition = defineEndpointContract(
 	packedUsersRecommendationOutput,
 );
 
-export const packedUsersSearchInput = v.looseObject({
+export const packedUsersSearchInput = v.object({
 	"query": v.string(),
 	"offset": v.optional(v.pipe(v.number(), v.integer()), 0),
 	"limit": v.optional(v.pipe(v.pipe(v.number(), v.integer()), v.minValue(1), v.maxValue(100)), 10),

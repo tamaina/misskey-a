@@ -129,25 +129,39 @@ test('all 24 real hour/day EntitySchema options remain deterministically equival
 	}
 });
 
-test('chart input schemas and every required numeric-series output retain final OpenAPI shape', () => {
+// Only chart response objects are now closed; the frozen HTTP request oracle stays unchanged.
+function closeChartResponseObjects(value: unknown): unknown {
+	if (Array.isArray(value)) return value.map(closeChartResponseObjects);
+	if (value === null || typeof value !== 'object') return value;
+	const result = Object.fromEntries(Object.entries(value).map(([key, child]) => [key, closeChartResponseObjects(child)]));
+	if ('type' in value && value.type === 'object') result.additionalProperties = false;
+	return result;
+}
+
+test('chart HTTP input schemas stay frozen and all finite response objects become closed', () => {
 	for (const row of rows) {
 		const old = frozen.routes.find(entry => entry.route === row.route)!;
 		expect(row.endpoint.paramDef).toEqual(old.input);
 		const { res: _response, ...meta } = row.endpoint.meta;
 		expect(meta).toEqual(old.meta);
 		const schema = convertSchemaToOpenApiSchema(row.endpoint.meta.res!, 'res', true);
-		expect(schema).toEqual(old.openapi.post.responses['200'].content['application/json'].schema);
+		expect(schema).toEqual(closeChartResponseObjects(old.openapi.post.responses['200'].content['application/json'].schema));
 	}
 });
 
-test('complete published chart GET/POST operations match the frozen OpenAPI oracle', () => {
+test('complete chart GET/POST operations match the frozen oracle with response closure only', () => {
 	documentedEndpoints.splice(0, documentedEndpoints.length, ...rows.map(row => ({
 		name: row.route, meta: row.endpoint.meta, params: row.endpoint.paramDef,
 	})));
 	const spec = genOpenapiSpec({ version: 'chart-test', apiUrl: 'https://chart.test/api' } as never);
-	for (const row of rows) expect(JSON.parse(JSON.stringify(spec.paths['/' + row.route]))).toEqual(
-		frozen.routes.find(entry => entry.route === row.route)!.openapi,
-	);
+	for (const row of rows) {
+		const expected = structuredClone(frozen.routes.find(entry => entry.route === row.route)!.openapi);
+		for (const operation of Object.values(expected)) {
+			const content = operation.responses['200'].content['application/json'];
+			Reflect.set(content, 'schema', closeChartResponseObjects(content.schema));
+		}
+		expect(JSON.parse(JSON.stringify(spec.paths['/' + row.route]))).toEqual(expected);
+	}
 });
 
 test('real chart endpoint handlers retain AJV defaults, mutations, errors and original response identity', async () => {
@@ -215,8 +229,8 @@ test('chart date and group arguments preserve null, zero, negative and beyond-sa
 	}
 });
 
-test('portable Valibot requests preserve defaults and unrestricted host/date semantics', () => {
-	expect(v.parse(chartInput, { span: 'day', future: true })).toEqual({ span: 'day', future: true, limit: 30, offset: null });
+test('native chart requests strip extras while preserving defaults and host/date semantics', () => {
+	expect(v.parse(chartInput, { span: 'day', future: true })).toEqual({ span: 'day', limit: 30, offset: null });
 	expect(v.parse(instanceChartInput, { span: 'day', host: '' }).host).toBe('');
 	for (const offset of [8640000000000001, Number.MAX_SAFE_INTEGER + 1, -Number.MAX_SAFE_INTEGER - 1]) {
 		expect(v.parse(chartInput, { span: 'hour', offset }).offset).toBe(offset);

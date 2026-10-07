@@ -9,9 +9,9 @@ import * as v from 'valibot';
 import { misskeyId } from '../../api/contract/index.js';
 
 export const collectionsInputs = {
-	'clips/delete': v.looseObject({ clipId: misskeyId }),
-	'clips/add-note': v.looseObject({ clipId: misskeyId, noteId: misskeyId }),
-	'clips/remove-note': v.looseObject({ clipId: misskeyId, noteId: misskeyId }),
+	'clips/delete': v.object({ clipId: misskeyId }),
+	'clips/add-note': v.object({ clipId: misskeyId, noteId: misskeyId }),
+	'clips/remove-note': v.object({ clipId: misskeyId, noteId: misskeyId }),
 };
 
 /** These definitions intentionally retain each legacy route's distinct error UUID. */
@@ -60,8 +60,8 @@ export const collectionsErrors = {
 } as const;
 
 export const clipFavoriteInputs = {
-	'clips/favorite': v.looseObject({ clipId: misskeyId }),
-	'clips/unfavorite': v.looseObject({ clipId: misskeyId }),
+	'clips/favorite': v.object({ clipId: misskeyId }),
+	'clips/unfavorite': v.object({ clipId: misskeyId }),
 };
 
 /** Keep the exact legacy metadata, including distinct UUIDs for the two routes. */

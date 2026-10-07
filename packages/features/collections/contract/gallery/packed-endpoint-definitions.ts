@@ -7,10 +7,9 @@ import type { InferContractRouterInputs, InferContractRouterOutputs } from '@orp
 import * as v from 'valibot';
 import { defineEndpointContract } from '../../../api/contract/definition.js';
 import { misskeyId } from '../../../api/contract/index.js';
-import { resultObject } from '../../../api/contract/result-object.js';
 import { packedReference } from '../../../api/contract/packed-reference.js';
 
-export const packedGalleryFeaturedInput = v.looseObject({
+export const packedGalleryFeaturedInput = v.object({
 	"limit": v.optional(v.pipe(v.pipe(v.number(), v.integer()), v.minValue(1), v.maxValue(100)), 10),
 	"untilId": v.exactOptional(misskeyId),
 });
@@ -21,7 +20,7 @@ export const packedGalleryFeaturedDefinition = defineEndpointContract(
 	packedGalleryFeaturedOutput,
 );
 
-export const packedGalleryPopularInput = v.looseObject({});
+export const packedGalleryPopularInput = v.object({});
 export const packedGalleryPopularOutput = v.array(packedReference("GalleryPost"));
 export const packedGalleryPopularDefinition = defineEndpointContract(
 	{ method: 'POST', path: "/gallery/popular", tags: ["gallery"] },
@@ -29,7 +28,7 @@ export const packedGalleryPopularDefinition = defineEndpointContract(
 	packedGalleryPopularOutput,
 );
 
-export const packedGalleryPostsInput = v.looseObject({
+export const packedGalleryPostsInput = v.object({
 	"limit": v.optional(v.pipe(v.pipe(v.number(), v.integer()), v.minValue(1), v.maxValue(100)), 10),
 	"sinceId": v.exactOptional(misskeyId),
 	"untilId": v.exactOptional(misskeyId),
@@ -43,7 +42,7 @@ export const packedGalleryPostsDefinition = defineEndpointContract(
 	packedGalleryPostsOutput,
 );
 
-export const packedGalleryPostsShowInput = v.looseObject({
+export const packedGalleryPostsShowInput = v.object({
 	"postId": misskeyId,
 });
 export const packedGalleryPostsShowOutput = packedReference("GalleryPost");
@@ -53,14 +52,14 @@ export const packedGalleryPostsShowDefinition = defineEndpointContract(
 	packedGalleryPostsShowOutput,
 );
 
-export const packedIGalleryLikesInput = v.looseObject({
+export const packedIGalleryLikesInput = v.object({
 	"limit": v.optional(v.pipe(v.pipe(v.number(), v.integer()), v.minValue(1), v.maxValue(100)), 10),
 	"sinceId": v.exactOptional(misskeyId),
 	"untilId": v.exactOptional(misskeyId),
 	"sinceDate": v.exactOptional(v.pipe(v.number(), v.integer())),
 	"untilDate": v.exactOptional(v.pipe(v.number(), v.integer())),
 });
-export const packedIGalleryLikesOutput = v.array(resultObject({
+export const packedIGalleryLikesOutput = v.array(v.strictObject({
 		"id": v.pipe(v.string(), v.metadata({ "format": "id" })),
 		"post": packedReference("GalleryPost"),
 	}));
@@ -70,7 +69,7 @@ export const packedIGalleryLikesDefinition = defineEndpointContract(
 	packedIGalleryLikesOutput,
 );
 
-export const packedIGalleryPostsInput = v.looseObject({
+export const packedIGalleryPostsInput = v.object({
 	"limit": v.optional(v.pipe(v.pipe(v.number(), v.integer()), v.minValue(1), v.maxValue(100)), 10),
 	"sinceId": v.exactOptional(misskeyId),
 	"untilId": v.exactOptional(misskeyId),
@@ -84,7 +83,7 @@ export const packedIGalleryPostsDefinition = defineEndpointContract(
 	packedIGalleryPostsOutput,
 );
 
-export const packedUsersGalleryPostsInput = v.looseObject({
+export const packedUsersGalleryPostsInput = v.object({
 	"userId": misskeyId,
 	"limit": v.optional(v.pipe(v.pipe(v.number(), v.integer()), v.minValue(1), v.maxValue(100)), 10),
 	"sinceId": v.exactOptional(misskeyId),

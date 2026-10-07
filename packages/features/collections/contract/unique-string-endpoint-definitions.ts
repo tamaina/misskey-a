@@ -9,7 +9,7 @@ import { defineEndpointContract } from '../../api/contract/definition.js';
 import { packedReference } from '../../api/contract/packed-reference.js';
 import { jsonString, misskeyId, uniqueStringArray } from '../../api/contract/index.js';
 
-export const uniqueGalleryPostsCreateInput = v.looseObject({
+export const uniqueGalleryPostsCreateInput = v.object({
 	"title": jsonString({ "minLength": 1 }),
 	"description": v.exactOptional(v.nullable(v.string())),
 	"fileIds": v.pipe(uniqueStringArray(misskeyId), v.minLength(1), v.maxLength(32)),
@@ -22,7 +22,7 @@ export const uniqueGalleryPostsCreateDefinition = defineEndpointContract(
 	uniqueGalleryPostsCreateOutput,
 );
 
-export const uniqueGalleryPostsUpdateInput = v.looseObject({
+export const uniqueGalleryPostsUpdateInput = v.object({
 	"postId": misskeyId,
 	"title": v.exactOptional(jsonString({ "minLength": 1 })),
 	"description": v.exactOptional(v.nullable(v.string())),

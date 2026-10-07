@@ -6,15 +6,13 @@
 import type { InferContractRouterInputs, InferContractRouterOutputs } from '@orpc/contract';
 import * as v from 'valibot';
 import { defineEndpointContract } from '../../api/contract/definition.js';
+import { emojiDetailedResult } from './index.js';
 import { misskeyId } from '../../api/contract/index.js';
-import { resultObject } from '../../api/contract/result-object.js';
 
-export const inlineAdminEmojiCopyInput = v.looseObject({
+export const inlineAdminEmojiCopyInput = v.object({
 	"emojiId": misskeyId,
 });
-export const inlineAdminEmojiCopyOutput = resultObject({
-	"id": v.pipe(v.string(), v.metadata({ "format": "id" })),
-});
+export const inlineAdminEmojiCopyOutput = emojiDetailedResult;
 export const inlineAdminEmojiCopyDefinition = defineEndpointContract(
 	{ method: 'POST', path: '/admin/emoji/copy', tags: ["admin"] },
 	inlineAdminEmojiCopyInput,

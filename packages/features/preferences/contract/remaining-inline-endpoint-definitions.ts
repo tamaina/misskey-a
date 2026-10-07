@@ -6,13 +6,12 @@
 import type { InferContractRouterInputs, InferContractRouterOutputs } from '@orpc/contract';
 import * as v from 'valibot';
 import { defineEndpointContract } from '../../api/contract/definition.js';
-import { resultObject } from '../../api/contract/result-object.js';
 import { jsonString } from '../../api/contract/index.js';
 
 // AJV keeps the legacy required scope list while both validators supply its static default.
 // Opaque registry result payloads retain the legacy unconstrained response type.
 
-export const remainingIRegistryGetInput = v.pipe(v.looseObject({
+export const remainingIRegistryGetInput = v.pipe(v.object({
 	"key": v.string(),
 	"scope": v.optional(v.array(v.pipe(v.string(), v.regex(new RegExp("^[a-zA-Z0-9_]+$")))), []),
 	"domain": v.exactOptional(v.nullable(v.string())),
@@ -24,7 +23,7 @@ export const remainingIRegistryGetDefinition = defineEndpointContract(
 	remainingIRegistryGetOutput,
 );
 
-export const remainingIRegistryGetAllInput = v.pipe(v.looseObject({
+export const remainingIRegistryGetAllInput = v.pipe(v.object({
 	"scope": v.optional(v.array(v.pipe(v.string(), v.regex(new RegExp("^[a-zA-Z0-9_]+$")))), []),
 	"domain": v.exactOptional(v.nullable(v.string())),
 }), v.metadata({ required: ["scope"] }));
@@ -35,12 +34,12 @@ export const remainingIRegistryGetAllDefinition = defineEndpointContract(
 	remainingIRegistryGetAllOutput,
 );
 
-export const remainingIRegistryGetDetailInput = v.pipe(v.looseObject({
+export const remainingIRegistryGetDetailInput = v.pipe(v.object({
 	"key": v.string(),
 	"scope": v.optional(v.array(v.pipe(v.string(), v.regex(new RegExp("^[a-zA-Z0-9_]+$")))), []),
 	"domain": v.exactOptional(v.nullable(v.string())),
 }), v.metadata({ required: ["key", "scope"] }));
-export const remainingIRegistryGetDetailOutput = resultObject({
+export const remainingIRegistryGetDetailOutput = v.strictObject({
 	"updatedAt": v.string(),
 	"value": v.unknown(),
 });
@@ -50,7 +49,7 @@ export const remainingIRegistryGetDetailDefinition = defineEndpointContract(
 	remainingIRegistryGetDetailOutput,
 );
 
-export const remainingIRegistryKeysInput = v.pipe(v.looseObject({
+export const remainingIRegistryKeysInput = v.pipe(v.object({
 	"scope": v.optional(v.array(v.pipe(v.string(), v.regex(new RegExp("^[a-zA-Z0-9_]+$")))), []),
 	"domain": v.exactOptional(v.nullable(v.string())),
 }), v.metadata({ required: ["scope"] }));
@@ -61,7 +60,7 @@ export const remainingIRegistryKeysDefinition = defineEndpointContract(
 	remainingIRegistryKeysOutput,
 );
 
-export const remainingIRegistryKeysWithTypeInput = v.pipe(v.looseObject({
+export const remainingIRegistryKeysWithTypeInput = v.pipe(v.object({
 	"scope": v.optional(v.array(v.pipe(v.string(), v.regex(new RegExp("^[a-zA-Z0-9_]+$")))), []),
 	"domain": v.exactOptional(v.nullable(v.string())),
 }), v.metadata({ required: ["scope"] }));
@@ -72,7 +71,7 @@ export const remainingIRegistryKeysWithTypeDefinition = defineEndpointContract(
 	remainingIRegistryKeysWithTypeOutput,
 );
 
-export const remainingIRegistryRemoveInput = v.pipe(v.looseObject({
+export const remainingIRegistryRemoveInput = v.pipe(v.object({
 	"key": v.string(),
 	"scope": v.optional(v.array(v.pipe(v.string(), v.regex(new RegExp("^[a-zA-Z0-9_]+$")))), []),
 	"domain": v.exactOptional(v.nullable(v.string())),
@@ -84,7 +83,7 @@ export const remainingIRegistryRemoveDefinition = defineEndpointContract(
 	remainingIRegistryRemoveOutput,
 );
 
-export const remainingIRegistrySetInput = v.pipe(v.looseObject({
+export const remainingIRegistrySetInput = v.pipe(v.object({
 	"key": jsonString({ "minLength": 1 }),
 	"value": v.unknown(),
 	"scope": v.optional(v.array(v.pipe(v.string(), v.regex(new RegExp("^[a-zA-Z0-9_]+$")))), []),

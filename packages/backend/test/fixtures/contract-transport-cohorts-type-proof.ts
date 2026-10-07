@@ -462,8 +462,9 @@ if (false) {
 		const muting: boolean = params.excludeMuting;
 		const inactive: boolean = params.excludeInactive;
 		const actor: MiLocalUser = user;
-		const opaque: unknown = params.untrusted;
-		void [muting, inactive, actor, opaque];
+		void [muting, inactive, actor];
+		// @ts-expect-error Native finite input has no unknown-key index signature.
+		const untrusted = params.untrusted; void untrusted;
 		// @ts-expect-error AJV/defaulted native output consumes required booleans.
 		const absentDefault: undefined = params.excludeMuting; void absentDefault;
 		// @ts-expect-error Optional-root native input becomes an object after defaults.

@@ -9,8 +9,8 @@ import * as v from 'valibot';
 import type { ApiErrorDefinition } from '../../api/contract/index.js';
 import { misskeyId } from '../../api/contract/index.js';
 
-const fileIdInput = v.looseObject({ fileId: misskeyId });
-const followingInput = v.looseObject({ fileId: misskeyId, withReplies: v.optional(v.boolean()) });
+const fileIdInput = v.object({ fileId: misskeyId });
+const followingInput = v.object({ fileId: misskeyId, withReplies: v.optional(v.boolean()) });
 const voidOutput = v.void();
 
 export const portabilityImportErrors = {

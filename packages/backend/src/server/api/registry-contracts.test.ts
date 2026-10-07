@@ -111,12 +111,13 @@ test('username availability keeps the source constant regex boundaries', async (
 	expect(calls).toBe(3);
 });
 
-test('retention keeps its one-branch map documentation and response identity', async () => {
+test('retention closes its finite envelope while retaining dynamic map documentation and HTTP response identity', async () => {
 	const projection = projectEndpointContract(remainingRetentionDefinition);
 	expect(convertSchemaToOpenApiSchema(projection.response!, 'res', true)).toEqual({
 		type: 'array',
 		items: {
 			type: 'object',
+			additionalProperties: false,
 			properties: {
 				createdAt: { type: 'string', format: 'date-time' },
 				users: { type: 'number' },

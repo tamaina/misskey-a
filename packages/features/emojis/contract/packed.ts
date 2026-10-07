@@ -4,11 +4,10 @@
  */
 
 import * as v from 'valibot';
-import { resultObject } from '../../api/contract/result-object.js';
 import { emojiSimpleResult, emojiDetailedResult } from './index.js';
 
 export const packedEmojiDetailedSchema = emojiDetailedResult;
-export const packedEmojiDetailedAdminSchema = resultObject({
+export const packedEmojiDetailedAdminSchema = v.strictObject({
 	"id": v.pipe(v.string(), v.metadata({ "format": "id" })),
 	"updatedAt": v.pipe(v.nullable(v.string()), v.metadata({ "format": "date-time" })),
 	"name": v.string(),
@@ -22,7 +21,7 @@ export const packedEmojiDetailedAdminSchema = resultObject({
 	"license": v.nullable(v.string()),
 	"localOnly": v.boolean(),
 	"isSensitive": v.boolean(),
-	"roleIdsThatCanBeUsedThisEmojiAsReaction": v.array(resultObject({
+	"roleIdsThatCanBeUsedThisEmojiAsReaction": v.array(v.strictObject({
 	"id": v.pipe(v.string(), v.metadata({ "format": "misskey:id" })),
 	"name": v.string()
 }))

@@ -7,8 +7,6 @@ import type { InferContractRouterInputs, InferContractRouterOutputs } from '@orp
 import * as v from 'valibot';
 import { defineEndpointContract } from '../../api/contract/definition.js';
 import { misskeyId } from '../../api/contract/index.js';
-import { activeUsersChartDescriptor, apRequestChartDescriptor, driveChartDescriptor, federationChartDescriptor, instanceChartDescriptor, notesChartDescriptor, perUserDriveChartDescriptor, perUserFollowingChartDescriptor, perUserNotesChartDescriptor, perUserPvChartDescriptor, perUserReactionsChartDescriptor, usersChartDescriptor } from '../shared/chart-descriptors.js';
-import { chartOutputSchema } from './chart-output-schema.js';
 
 const chartInputEntries = {
 	span: v.picklist(['day', 'hour']),
@@ -16,88 +14,255 @@ const chartInputEntries = {
 	offset: v.optional(v.nullable(v.pipe(v.number(), v.integer())), null),
 } as const;
 
-export const chartInput = v.looseObject(chartInputEntries);
-export const instanceChartInput = v.looseObject({ ...chartInputEntries, host: v.string() });
-export const userChartInput = v.looseObject({ ...chartInputEntries, userId: misskeyId });
+export const chartInput = v.object(chartInputEntries);
+export const instanceChartInput = v.object({ ...chartInputEntries, host: v.string() });
+export const userChartInput = v.object({ ...chartInputEntries, userId: misskeyId });
 
-export const chartActiveUsersOutput = chartOutputSchema(activeUsersChartDescriptor);
+export const chartActiveUsersOutput = v.strictObject({
+	readWrite: v.array(v.number()),
+	read: v.array(v.number()),
+	write: v.array(v.number()),
+	registeredWithinWeek: v.array(v.number()),
+	registeredWithinMonth: v.array(v.number()),
+	registeredWithinYear: v.array(v.number()),
+	registeredOutsideWeek: v.array(v.number()),
+	registeredOutsideMonth: v.array(v.number()),
+	registeredOutsideYear: v.array(v.number()),
+});
 export const chartActiveUsersDefinition = defineEndpointContract(
 	{ method: 'POST', path: '/charts/active-users', tags: ["charts", "users"] },
 	chartInput,
 	chartActiveUsersOutput,
 );
 
-export const chartApRequestOutput = chartOutputSchema(apRequestChartDescriptor);
+export const chartApRequestOutput = v.strictObject({
+	deliverFailed: v.array(v.number()),
+	deliverSucceeded: v.array(v.number()),
+	inboxReceived: v.array(v.number()),
+});
 export const chartApRequestDefinition = defineEndpointContract(
 	{ method: 'POST', path: '/charts/ap-request', tags: ["charts"] },
 	chartInput,
 	chartApRequestOutput,
 );
 
-export const chartDriveOutput = chartOutputSchema(driveChartDescriptor);
+export const chartDriveOutput = v.strictObject({
+	local: v.strictObject({
+		incCount: v.array(v.number()),
+		incSize: v.array(v.number()),
+		decCount: v.array(v.number()),
+		decSize: v.array(v.number()),
+	}),
+	remote: v.strictObject({
+		incCount: v.array(v.number()),
+		incSize: v.array(v.number()),
+		decCount: v.array(v.number()),
+		decSize: v.array(v.number()),
+	}),
+});
 export const chartDriveDefinition = defineEndpointContract(
 	{ method: 'POST', path: '/charts/drive', tags: ["charts", "drive"] },
 	chartInput,
 	chartDriveOutput,
 );
 
-export const chartFederationOutput = chartOutputSchema(federationChartDescriptor);
+export const chartFederationOutput = v.strictObject({
+	deliveredInstances: v.array(v.number()),
+	inboxInstances: v.array(v.number()),
+	stalled: v.array(v.number()),
+	sub: v.array(v.number()),
+	pub: v.array(v.number()),
+	pubsub: v.array(v.number()),
+	subActive: v.array(v.number()),
+	pubActive: v.array(v.number()),
+});
 export const chartFederationDefinition = defineEndpointContract(
 	{ method: 'POST', path: '/charts/federation', tags: ["charts"] },
 	chartInput,
 	chartFederationOutput,
 );
 
-export const chartInstanceOutput = chartOutputSchema(instanceChartDescriptor);
+export const chartInstanceOutput = v.strictObject({
+	requests: v.strictObject({
+		failed: v.array(v.number()),
+		succeeded: v.array(v.number()),
+		received: v.array(v.number()),
+	}),
+	notes: v.strictObject({
+		total: v.array(v.number()),
+		inc: v.array(v.number()),
+		dec: v.array(v.number()),
+		diffs: v.strictObject({
+			normal: v.array(v.number()),
+			reply: v.array(v.number()),
+			renote: v.array(v.number()),
+			withFile: v.array(v.number()),
+		}),
+	}),
+	users: v.strictObject({
+		total: v.array(v.number()),
+		inc: v.array(v.number()),
+		dec: v.array(v.number()),
+	}),
+	following: v.strictObject({
+		total: v.array(v.number()),
+		inc: v.array(v.number()),
+		dec: v.array(v.number()),
+	}),
+	followers: v.strictObject({
+		total: v.array(v.number()),
+		inc: v.array(v.number()),
+		dec: v.array(v.number()),
+	}),
+	drive: v.strictObject({
+		totalFiles: v.array(v.number()),
+		incFiles: v.array(v.number()),
+		decFiles: v.array(v.number()),
+		incUsage: v.array(v.number()),
+		decUsage: v.array(v.number()),
+	}),
+});
 export const chartInstanceDefinition = defineEndpointContract(
 	{ method: 'POST', path: '/charts/instance', tags: ["charts"] },
 	instanceChartInput,
 	chartInstanceOutput,
 );
 
-export const chartNotesOutput = chartOutputSchema(notesChartDescriptor);
+export const chartNotesOutput = v.strictObject({
+	local: v.strictObject({
+		total: v.array(v.number()),
+		inc: v.array(v.number()),
+		dec: v.array(v.number()),
+		diffs: v.strictObject({
+			normal: v.array(v.number()),
+			reply: v.array(v.number()),
+			renote: v.array(v.number()),
+			withFile: v.array(v.number()),
+		}),
+	}),
+	remote: v.strictObject({
+		total: v.array(v.number()),
+		inc: v.array(v.number()),
+		dec: v.array(v.number()),
+		diffs: v.strictObject({
+			normal: v.array(v.number()),
+			reply: v.array(v.number()),
+			renote: v.array(v.number()),
+			withFile: v.array(v.number()),
+		}),
+	}),
+});
 export const chartNotesDefinition = defineEndpointContract(
 	{ method: 'POST', path: '/charts/notes', tags: ["charts", "notes"] },
 	chartInput,
 	chartNotesOutput,
 );
 
-export const chartPerUserDriveOutput = chartOutputSchema(perUserDriveChartDescriptor);
+export const chartPerUserDriveOutput = v.strictObject({
+	totalCount: v.array(v.number()),
+	totalSize: v.array(v.number()),
+	incCount: v.array(v.number()),
+	incSize: v.array(v.number()),
+	decCount: v.array(v.number()),
+	decSize: v.array(v.number()),
+});
 export const chartPerUserDriveDefinition = defineEndpointContract(
 	{ method: 'POST', path: '/charts/user/drive', tags: ["charts", "drive", "users"] },
 	userChartInput,
 	chartPerUserDriveOutput,
 );
 
-export const chartPerUserFollowingOutput = chartOutputSchema(perUserFollowingChartDescriptor);
+export const chartPerUserFollowingOutput = v.strictObject({
+	local: v.strictObject({
+		followings: v.strictObject({
+			total: v.array(v.number()),
+			inc: v.array(v.number()),
+			dec: v.array(v.number()),
+		}),
+		followers: v.strictObject({
+			total: v.array(v.number()),
+			inc: v.array(v.number()),
+			dec: v.array(v.number()),
+		}),
+	}),
+	remote: v.strictObject({
+		followings: v.strictObject({
+			total: v.array(v.number()),
+			inc: v.array(v.number()),
+			dec: v.array(v.number()),
+		}),
+		followers: v.strictObject({
+			total: v.array(v.number()),
+			inc: v.array(v.number()),
+			dec: v.array(v.number()),
+		}),
+	}),
+});
 export const chartPerUserFollowingDefinition = defineEndpointContract(
 	{ method: 'POST', path: '/charts/user/following', tags: ["charts", "users", "following"] },
 	userChartInput,
 	chartPerUserFollowingOutput,
 );
 
-export const chartPerUserNotesOutput = chartOutputSchema(perUserNotesChartDescriptor);
+export const chartPerUserNotesOutput = v.strictObject({
+	total: v.array(v.number()),
+	inc: v.array(v.number()),
+	dec: v.array(v.number()),
+	diffs: v.strictObject({
+		normal: v.array(v.number()),
+		reply: v.array(v.number()),
+		renote: v.array(v.number()),
+		withFile: v.array(v.number()),
+	}),
+});
 export const chartPerUserNotesDefinition = defineEndpointContract(
 	{ method: 'POST', path: '/charts/user/notes', tags: ["charts", "users", "notes"] },
 	userChartInput,
 	chartPerUserNotesOutput,
 );
 
-export const chartPerUserPvOutput = chartOutputSchema(perUserPvChartDescriptor);
+export const chartPerUserPvOutput = v.strictObject({
+	upv: v.strictObject({
+		user: v.array(v.number()),
+		visitor: v.array(v.number()),
+	}),
+	pv: v.strictObject({
+		user: v.array(v.number()),
+		visitor: v.array(v.number()),
+	}),
+});
 export const chartPerUserPvDefinition = defineEndpointContract(
 	{ method: 'POST', path: '/charts/user/pv', tags: ["charts", "users"] },
 	userChartInput,
 	chartPerUserPvOutput,
 );
 
-export const chartPerUserReactionsOutput = chartOutputSchema(perUserReactionsChartDescriptor);
+export const chartPerUserReactionsOutput = v.strictObject({
+	local: v.strictObject({
+		count: v.array(v.number()),
+	}),
+	remote: v.strictObject({
+		count: v.array(v.number()),
+	}),
+});
 export const chartPerUserReactionsDefinition = defineEndpointContract(
 	{ method: 'POST', path: '/charts/user/reactions', tags: ["charts", "users", "reactions"] },
 	userChartInput,
 	chartPerUserReactionsOutput,
 );
 
-export const chartUsersOutput = chartOutputSchema(usersChartDescriptor);
+export const chartUsersOutput = v.strictObject({
+	local: v.strictObject({
+		total: v.array(v.number()),
+		inc: v.array(v.number()),
+		dec: v.array(v.number()),
+	}),
+	remote: v.strictObject({
+		total: v.array(v.number()),
+		inc: v.array(v.number()),
+		dec: v.array(v.number()),
+	}),
+});
 export const chartUsersDefinition = defineEndpointContract(
 	{ method: 'POST', path: '/charts/users', tags: ["charts", "users"] },
 	chartInput,

@@ -932,13 +932,14 @@ for (const route of Object.keys(definitions) as Route[]) {
 	const row = baseline.routes.find(item => item.route === route)!;
 	const definition = definitions[route as keyof typeof definitions];
 	const projection = projectEndpointContract<v.GenericSchema, v.GenericSchema>(definition);
-	test(`${route} retains captured input and complete response documentation`, () => {
+	test(`${route} retains captured input and response documentation with finite emoji-list closure`, () => {
 		expect(normalized(projection.input)).toEqual(normalized(row.input));
 		expect(JSON.parse(JSON.stringify(projection.input))).toEqual(row.input);
 		expect(frozenInputs[route]).toEqual(row.input);
 		const response = projection.response === undefined ? null : convertSchemaToOpenApiSchema(projection.response, 'res', true);
 		const expected = row.output === null ? null : row.openapi.post.responses['200'].content['application/json'].schema;
-		expect(normalized(response)).toEqual(normalized(expected));
+		const finiteExpected = route === 'v2/admin/emoji/list' && expected !== null ? { ...expected, additionalProperties: false } : expected;
+		expect(normalized(response)).toEqual(normalized(finiteExpected));
 	});
 	test(`${route} matches real legacy AJV, defaults and portable object parsing`, async () => {
 		for (const sample of baseline.samples[route as keyof typeof baseline.samples]) {
@@ -1004,7 +1005,7 @@ test('native outputs remain canonical packed identities and explicit void routes
 	expectTypeOf<v.InferOutput<typeof definitions['pages/update']['output']>>().toEqualTypeOf<void>();
 });
 
-test('the real OpenAPI writer retains all 11 complete paths, auth, errors and statuses', () => {
+test('the real OpenAPI writer retains all 11 paths, auth, errors and statuses with emoji-list response closure', () => {
  const saved = documentedEndpoints.slice();
  try {
   documentedEndpoints.splice(0, documentedEndpoints.length, ...(Object.keys(definitions) as Route[]).map(route => {
@@ -1017,7 +1018,13 @@ test('the real OpenAPI writer retains all 11 complete paths, auth, errors and st
   const spec = genOpenapiSpec(config);
   expect(Object.keys(spec.paths).sort()).toEqual(baseline.routes.map(row => '/' + row.route).sort());
   for (const row of baseline.routes) {
-   expect(JSON.parse(JSON.stringify(spec.paths['/' + row.route]))).toEqual(row.openapi);
+   const expected = structuredClone(row.openapi);
+   if (row.route === 'v2/admin/emoji/list') {
+    const content = expected.post.responses['200']?.content['application/json'];
+    if (content === undefined) throw new Error('Expected finite emoji list response');
+    Reflect.set(content.schema, 'additionalProperties', false);
+   }
+   expect(JSON.parse(JSON.stringify(spec.paths['/' + row.route]))).toEqual(expected);
    if (row.output === null) {
     expect(spec.paths['/' + row.route].post.responses).not.toHaveProperty('200');
     expect(spec.paths['/' + row.route].post.responses['204']).toEqual({ description: 'OK (without any results)' });

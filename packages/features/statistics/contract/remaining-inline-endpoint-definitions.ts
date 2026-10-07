@@ -6,12 +6,11 @@
 import type { InferContractRouterInputs, InferContractRouterOutputs } from '@orpc/contract';
 import * as v from 'valibot';
 import { defineEndpointContract } from '../../api/contract/definition.js';
-import { resultObject } from '../../api/contract/result-object.js';
 
 // The one-branch union preserves the legacy anyOf on each retention map value.
 
-export const remainingRetentionInput = v.looseObject({});
-export const remainingRetentionOutput = v.array(resultObject({
+export const remainingRetentionInput = v.object({});
+export const remainingRetentionOutput = v.array(v.strictObject({
 		"createdAt": v.pipe(v.string(), v.metadata({ "format": "date-time" })),
 		"users": v.number(),
 		"data": v.record(v.string(), v.union([v.number()])),

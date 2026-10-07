@@ -9,7 +9,7 @@ import { defineEndpointContract } from '../../api/contract/definition.js';
 import { jsonString, misskeyId } from '../../api/contract/index.js';
 import { packedReference } from '../../api/contract/packed-reference.js';
 
-export const packedChannelsCreateInput = v.looseObject({
+export const packedChannelsCreateInput = v.object({
 	"name": jsonString({ "minLength": 1, "maxLength": 128 }),
 	"description": v.exactOptional(v.nullable(jsonString({ "maxLength": 2048 }))),
 	"bannerId": v.exactOptional(v.nullable(misskeyId)),
@@ -24,7 +24,7 @@ export const packedChannelsCreateDefinition = defineEndpointContract(
 	packedChannelsCreateOutput,
 );
 
-export const packedChannelsFeaturedInput = v.looseObject({});
+export const packedChannelsFeaturedInput = v.object({});
 export const packedChannelsFeaturedOutput = v.array(packedReference("Channel"));
 export const packedChannelsFeaturedDefinition = defineEndpointContract(
 	{ method: 'POST', path: "/channels/featured", tags: ["channels"] },
@@ -32,7 +32,7 @@ export const packedChannelsFeaturedDefinition = defineEndpointContract(
 	packedChannelsFeaturedOutput,
 );
 
-export const packedChannelsFollowedInput = v.looseObject({
+export const packedChannelsFollowedInput = v.object({
 	"sinceId": v.exactOptional(misskeyId),
 	"untilId": v.exactOptional(misskeyId),
 	"sinceDate": v.exactOptional(v.pipe(v.number(), v.integer())),
@@ -46,7 +46,7 @@ export const packedChannelsFollowedDefinition = defineEndpointContract(
 	packedChannelsFollowedOutput,
 );
 
-export const packedChannelsMuteListInput = v.looseObject({});
+export const packedChannelsMuteListInput = v.object({});
 export const packedChannelsMuteListOutput = v.array(packedReference("Channel"));
 export const packedChannelsMuteListDefinition = defineEndpointContract(
 	{ method: 'POST', path: "/channels/mute/list", tags: ["channels", "mute"] },
@@ -54,7 +54,7 @@ export const packedChannelsMuteListDefinition = defineEndpointContract(
 	packedChannelsMuteListOutput,
 );
 
-export const packedChannelsMyFavoritesInput = v.looseObject({});
+export const packedChannelsMyFavoritesInput = v.object({});
 export const packedChannelsMyFavoritesOutput = v.array(packedReference("Channel"));
 export const packedChannelsMyFavoritesDefinition = defineEndpointContract(
 	{ method: 'POST', path: "/channels/my-favorites", tags: ["channels", "account"] },
@@ -62,7 +62,7 @@ export const packedChannelsMyFavoritesDefinition = defineEndpointContract(
 	packedChannelsMyFavoritesOutput,
 );
 
-export const packedChannelsOwnedInput = v.looseObject({
+export const packedChannelsOwnedInput = v.object({
 	"sinceId": v.exactOptional(misskeyId),
 	"untilId": v.exactOptional(misskeyId),
 	"sinceDate": v.exactOptional(v.pipe(v.number(), v.integer())),
@@ -76,7 +76,7 @@ export const packedChannelsOwnedDefinition = defineEndpointContract(
 	packedChannelsOwnedOutput,
 );
 
-export const packedChannelsSearchInput = v.looseObject({
+export const packedChannelsSearchInput = v.object({
 	"query": v.string(),
 	"type": v.optional(v.picklist(["nameAndDescription", "nameOnly"]), "nameAndDescription"),
 	"sinceId": v.exactOptional(misskeyId),
@@ -92,7 +92,7 @@ export const packedChannelsSearchDefinition = defineEndpointContract(
 	packedChannelsSearchOutput,
 );
 
-export const packedChannelsShowInput = v.looseObject({
+export const packedChannelsShowInput = v.object({
 	"channelId": misskeyId,
 });
 export const packedChannelsShowOutput = packedReference("Channel");
@@ -102,7 +102,7 @@ export const packedChannelsShowDefinition = defineEndpointContract(
 	packedChannelsShowOutput,
 );
 
-export const packedChannelsTimelineInput = v.looseObject({
+export const packedChannelsTimelineInput = v.object({
 	"channelId": misskeyId,
 	"limit": v.optional(v.pipe(v.pipe(v.number(), v.integer()), v.minValue(1), v.maxValue(100)), 10),
 	"sinceId": v.exactOptional(misskeyId),
@@ -118,7 +118,7 @@ export const packedChannelsTimelineDefinition = defineEndpointContract(
 	packedChannelsTimelineOutput,
 );
 
-export const packedChannelsUpdateInput = v.looseObject({
+export const packedChannelsUpdateInput = v.object({
 	"channelId": misskeyId,
 	"name": v.exactOptional(jsonString({ "minLength": 1, "maxLength": 128 })),
 	"description": v.exactOptional(v.nullable(jsonString({ "maxLength": 2048 }))),

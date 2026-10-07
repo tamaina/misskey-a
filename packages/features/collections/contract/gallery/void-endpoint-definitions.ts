@@ -8,7 +8,7 @@ import * as v from 'valibot';
 import { defineEndpointContract } from '../../../api/contract/definition.js';
 import { misskeyId } from '../../../api/contract/index.js';
 
-export const voidGalleryPostsDeleteInput = v.looseObject({
+export const voidGalleryPostsDeleteInput = v.object({
 	"postId": misskeyId,
 });
 export const voidGalleryPostsDeleteOutput = v.void();
@@ -18,7 +18,7 @@ export const voidGalleryPostsDeleteDefinition = defineEndpointContract(
 	voidGalleryPostsDeleteOutput,
 );
 
-export const voidGalleryPostsLikeInput = v.looseObject({
+export const voidGalleryPostsLikeInput = v.object({
 	"postId": misskeyId,
 });
 export const voidGalleryPostsLikeOutput = v.void();
@@ -28,7 +28,7 @@ export const voidGalleryPostsLikeDefinition = defineEndpointContract(
 	voidGalleryPostsLikeOutput,
 );
 
-export const voidGalleryPostsUnlikeInput = v.looseObject({
+export const voidGalleryPostsUnlikeInput = v.object({
 	"postId": misskeyId,
 });
 export const voidGalleryPostsUnlikeOutput = v.void();

@@ -10,17 +10,17 @@ import { misskeyId, objectParams } from '../../api/contract/index.js';
 
 const emojiId = v.pipe(v.string(), v.metadata({ format: 'id' }));
 
-export const emojiSimpleResult = v.object({
+export const emojiSimpleResult = v.strictObject({
 	aliases: v.array(emojiId),
 	name: v.string(),
 	category: v.nullable(v.string()),
 	url: v.string(),
-	localOnly: v.pipe(v.exactOptional(v.boolean()), v.metadata({ optional: true })),
-	isSensitive: v.pipe(v.exactOptional(v.boolean()), v.metadata({ optional: true })),
-	roleIdsThatCanBeUsedThisEmojiAsReaction: v.pipe(v.exactOptional(v.array(emojiId)), v.metadata({ optional: true })),
+	localOnly: v.pipe(v.optional(v.boolean()), v.metadata({ optional: true })),
+	isSensitive: v.pipe(v.optional(v.boolean()), v.metadata({ optional: true })),
+	roleIdsThatCanBeUsedThisEmojiAsReaction: v.pipe(v.optional(v.array(emojiId)), v.metadata({ optional: true })),
 });
 
-export const emojiDetailedResult = v.object({
+export const emojiDetailedResult = v.strictObject({
 	id: emojiId,
 	aliases: v.array(emojiId),
 	name: v.string(),
@@ -40,24 +40,24 @@ export type EmojiPacked = {
 	EmojiDetailed: EmojiDetailed;
 };
 
-export const emojisResult = v.object({ emojis: v.array(emojiSimpleResult) });
+export const emojisResult = v.strictObject({ emojis: v.array(emojiSimpleResult) });
 export const emojiInput = v.object({ name: v.string() });
 
 const emojiIdsInput = v.array(misskeyId);
 const emojiAliasesInput = v.array(v.string());
 
 export const emojiAdministrationInputs = {
-	'admin/emoji/set-category-bulk': v.looseObject({
+	'admin/emoji/set-category-bulk': v.object({
 		ids: emojiIdsInput,
 		category: v.pipe(v.exactOptional(v.nullable(v.string())), v.metadata({ description: 'Use `null` to reset the category.' })),
 	}),
-	'admin/emoji/set-license-bulk': v.looseObject({
+	'admin/emoji/set-license-bulk': v.object({
 		ids: emojiIdsInput,
 		license: v.pipe(v.exactOptional(v.nullable(v.string())), v.metadata({ description: 'Use `null` to reset the license.' })),
 	}),
-	'admin/emoji/set-aliases-bulk': v.looseObject({ ids: emojiIdsInput, aliases: emojiAliasesInput }),
-	'admin/emoji/add-aliases-bulk': v.looseObject({ ids: emojiIdsInput, aliases: emojiAliasesInput }),
-	'admin/emoji/remove-aliases-bulk': v.looseObject({ ids: emojiIdsInput, aliases: emojiAliasesInput }),
+	'admin/emoji/set-aliases-bulk': v.object({ ids: emojiIdsInput, aliases: emojiAliasesInput }),
+	'admin/emoji/add-aliases-bulk': v.object({ ids: emojiIdsInput, aliases: emojiAliasesInput }),
+	'admin/emoji/remove-aliases-bulk': v.object({ ids: emojiIdsInput, aliases: emojiAliasesInput }),
 };
 
 const voidOutput = v.void();
