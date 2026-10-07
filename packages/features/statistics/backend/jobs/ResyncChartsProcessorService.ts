@@ -5,9 +5,9 @@
 
 import { Injectable } from '@nestjs/common';
 import type Logger from '@/logger.js';
-import NotesChart from '@/core/chart/charts/notes.js';
-import UsersChart from '@/core/chart/charts/users.js';
-import DriveChart from '@/core/chart/charts/drive.js';
+import { NotesChart } from '../charts/notes.js';
+import { UsersChart } from '../charts/users.js';
+import { DriveChart } from '../charts/drive.js';
 import { bindThis } from '@/decorators.js';
 import { QueueLoggerService } from '@/queue/QueueLoggerService.js';
 import type * as Bull from 'bullmq';

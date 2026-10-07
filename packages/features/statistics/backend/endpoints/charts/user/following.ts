@@ -6,7 +6,7 @@
 import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
 import { chartPerUserFollowingDefinition, userChartInput, chartPerUserFollowingOutput } from '../../../../contract/chart-endpoint-definitions.js';
 import { Injectable } from '@nestjs/common';
-import PerUserFollowingChart from '@/core/chart/charts/per-user-following.js';
+import { PerUserFollowingChart } from '../../../charts/per-user-following.js';
 
 const contractProjection = projectEndpointContract(chartPerUserFollowingDefinition);
 

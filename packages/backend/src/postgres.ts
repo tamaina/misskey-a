@@ -6,7 +6,7 @@
 // https://github.com/typeorm/typeorm/issues/2400
 import pg from 'pg';
 import { DataSource, Logger, type QueryRunner } from 'typeorm';
-import { entities as charts } from '@/core/chart/entities.js';
+import { entities as charts } from '@features/statistics/backend/charts/registry.js';
 import { Config } from '@/config.js';
 import MisskeyLogger from '@/logger.js';
 import { bindThis } from '@/decorators.js';

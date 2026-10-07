@@ -14,7 +14,7 @@ import type { MiNoteReaction } from '../models/NoteReaction.js';
 import { isDuplicateKeyValueError } from '@/misc/is-duplicate-key-value-error.js';
 import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
 import { NotificationService } from '@features/notifications/backend/services/NotificationService.js';
-import PerUserReactionsChart from '@/core/chart/charts/per-user-reactions.js';
+import { PerUserReactionsChart } from '@features/statistics/backend/charts/per-user-reactions.js';
 import { emojiRegex } from '@/misc/emoji-regex.js';
 import { ApDeliverManagerService } from '@features/federation/backend/services/ApDeliverManagerService.js';
 import { NoteEntityService } from '../serializers/NoteEntityService.js';

@@ -11,7 +11,7 @@ import type { NotesRepository } from '@/models/_.js';
 
 import { QueryService } from '@/core/QueryService.js';
 import { NoteEntityService } from '@features/notes/backend/serializers/NoteEntityService.js';
-import ActiveUsersChart from '@/core/chart/charts/active-users.js';
+import { ActiveUsersChart } from '@features/statistics/backend/charts/active-users.js';
 import { DI } from '@/di-symbols.js';
 import { RoleService } from '@features/roles/backend/services/RoleService.js';
 import { ApiError } from '@/server/api/error.js';

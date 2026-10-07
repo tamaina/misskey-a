@@ -10,8 +10,8 @@ import { MetaService } from '@features/instance/backend/services/MetaService.js'
 import { MAX_NOTE_TEXT_LENGTH } from '@/const.js';
 import { MemorySingleCache } from '@/misc/cache.js';
 import { bindThis } from '@/decorators.js';
-import NotesChart from '@/core/chart/charts/notes.js';
-import UsersChart from '@/core/chart/charts/users.js';
+import { NotesChart } from '@features/statistics/backend/charts/notes.js';
+import { UsersChart } from '@features/statistics/backend/charts/users.js';
 import { DEFAULT_POLICIES } from '@features/roles/backend/services/RoleService.js';
 import { SystemAccountService } from '@features/users/backend/services/SystemAccountService.js';
 import type { FastifyInstance, FastifyPluginOptions } from 'fastify';

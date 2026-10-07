@@ -22,8 +22,8 @@ import { ApDeliverManagerService } from '@features/federation/backend/services/A
 import { ApRendererService } from '@features/federation/backend/services/ApRendererService.js';
 import { UserEntityService } from '../serializers/UserEntityService.js';
 import { FederatedInstanceService } from '@features/federation/backend/services/FederatedInstanceService.js';
-import InstanceChart from '@/core/chart/charts/instance.js';
-import PerUserFollowingChart from '@/core/chart/charts/per-user-following.js';
+import { InstanceChart } from '@features/statistics/backend/charts/instance.js';
+import { PerUserFollowingChart } from '@features/statistics/backend/charts/per-user-following.js';
 import { SystemAccountService } from './SystemAccountService.js';
 import { RoleService } from '@features/roles/backend/services/RoleService.js';
 import { AntennaService } from '@features/timelines/backend/services/AntennaService.js';

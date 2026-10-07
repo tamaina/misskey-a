@@ -42,7 +42,8 @@
 			"slacc": ["./node_modules/slacc"],
 			"strict-event-emitter-types": ["./node_modules/strict-event-emitter-types"],
 			"ulid": ["./node_modules/ulid"],
-			"xev": ["./node_modules/xev"]
+			"xev": ["./node_modules/xev"],
+			"nested-property": ["./node_modules/nested-property"]
 		}
 	}
 }

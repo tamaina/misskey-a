@@ -6,7 +6,7 @@
 import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
 import { chartDriveDefinition, chartInput, chartDriveOutput } from '../../../contract/chart-endpoint-definitions.js';
 import { Injectable } from '@nestjs/common';
-import DriveChart from '@/core/chart/charts/drive.js';
+import { DriveChart } from '../../charts/drive.js';
 
 const contractProjection = projectEndpointContract(chartDriveDefinition);
 

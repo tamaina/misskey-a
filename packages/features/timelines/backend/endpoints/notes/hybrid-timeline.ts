@@ -9,7 +9,7 @@ import { Brackets } from 'typeorm';
 import { Inject, Injectable } from '@nestjs/common';
 import type { NotesRepository, ChannelFollowingsRepository, MiMeta } from '@/models/_.js';
 
-import ActiveUsersChart from '@/core/chart/charts/active-users.js';
+import { ActiveUsersChart } from '@features/statistics/backend/charts/active-users.js';
 import { NoteEntityService } from '@features/notes/backend/serializers/NoteEntityService.js';
 import { DI } from '@/di-symbols.js';
 import { RoleService } from '@features/roles/backend/services/RoleService.js';

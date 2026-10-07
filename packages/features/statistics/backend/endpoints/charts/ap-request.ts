@@ -6,7 +6,7 @@
 import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
 import { chartApRequestDefinition, chartInput, chartApRequestOutput } from '../../../contract/chart-endpoint-definitions.js';
 import { Injectable } from '@nestjs/common';
-import ApRequestChart from '@/core/chart/charts/ap-request.js';
+import { ApRequestChart } from '../../charts/ap-request.js';
 
 const contractProjection = projectEndpointContract(chartApRequestDefinition);
 

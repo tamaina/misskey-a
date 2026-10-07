@@ -12,7 +12,7 @@ import { usersShowDefinition } from '../../../contract/show-endpoint-definition.
 import { UserEntityService } from '../../serializers/UserEntityService.js';
 import { RemoteUserResolveService } from '@features/federation/backend/services/RemoteUserResolveService.js';
 import { DI } from '@/di-symbols.js';
-import PerUserPvChart from '@/core/chart/charts/per-user-pv.js';
+import { PerUserPvChart } from '@features/statistics/backend/charts/per-user-pv.js';
 import { RoleService } from '@features/roles/backend/services/RoleService.js';
 import { ApiError } from '@/server/api/error.js';
 import { ApiLoggerService } from '@/server/api/ApiLoggerService.js';

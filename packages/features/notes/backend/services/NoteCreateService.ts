@@ -28,10 +28,10 @@ import { RelayService } from '@features/federation/backend/services/RelayService
 import { FederatedInstanceService } from '@features/federation/backend/services/FederatedInstanceService.js';
 import { DI } from '@/di-symbols.js';
 import type { Config } from '@/config.js';
-import NotesChart from '@/core/chart/charts/notes.js';
-import PerUserNotesChart from '@/core/chart/charts/per-user-notes.js';
-import InstanceChart from '@/core/chart/charts/instance.js';
-import ActiveUsersChart from '@/core/chart/charts/active-users.js';
+import { NotesChart } from '@features/statistics/backend/charts/notes.js';
+import { PerUserNotesChart } from '@features/statistics/backend/charts/per-user-notes.js';
+import { InstanceChart } from '@features/statistics/backend/charts/instance.js';
+import { ActiveUsersChart } from '@features/statistics/backend/charts/active-users.js';
 import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
 import { NotificationService } from '@features/notifications/backend/services/NotificationService.js';
 import { UserWebhookService } from '@features/integrations/backend/services/UserWebhookService.js';

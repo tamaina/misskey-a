@@ -14,9 +14,9 @@ import { FederatedInstanceService } from '../services/FederatedInstanceService.j
 import { FetchInstanceMetadataService } from '../services/FetchInstanceMetadataService.js';
 import { MemorySingleCache } from '@/misc/cache.js';
 import type { MiInstance } from '../models/Instance.js';
-import InstanceChart from '@/core/chart/charts/instance.js';
-import ApRequestChart from '@/core/chart/charts/ap-request.js';
-import FederationChart from '@/core/chart/charts/federation.js';
+import { InstanceChart } from '@features/statistics/backend/charts/instance.js';
+import { ApRequestChart } from '@features/statistics/backend/charts/ap-request.js';
+import { FederationChart } from '@features/statistics/backend/charts/federation.js';
 import { StatusError } from '@/misc/status-error.js';
 import { UtilityService } from '@/core/UtilityService.js';
 import { bindThis } from '@/decorators.js';

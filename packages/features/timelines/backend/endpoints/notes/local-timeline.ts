@@ -10,7 +10,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import type { MiMeta, NotesRepository } from '@/models/_.js';
 
 import { NoteEntityService } from '@features/notes/backend/serializers/NoteEntityService.js';
-import ActiveUsersChart from '@/core/chart/charts/active-users.js';
+import { ActiveUsersChart } from '@features/statistics/backend/charts/active-users.js';
 import { DI } from '@/di-symbols.js';
 import { RoleService } from '@features/roles/backend/services/RoleService.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';

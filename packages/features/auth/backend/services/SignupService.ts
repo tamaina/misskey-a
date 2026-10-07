@@ -17,7 +17,7 @@ import { MiUsedUsername } from '@features/users/backend/models/UsedUsername.js';
 import { generateNativeUserToken } from '@/misc/token.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import { bindThis } from '@/decorators.js';
-import UsersChart from '@/core/chart/charts/users.js';
+import { UsersChart } from '@features/statistics/backend/charts/users.js';
 import { UtilityService } from '@/core/UtilityService.js';
 import { UserService } from '@features/users/backend/services/UserService.js';
 import { SystemAccountService } from '@features/users/backend/services/SystemAccountService.js';

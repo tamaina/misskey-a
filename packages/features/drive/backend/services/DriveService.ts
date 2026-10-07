@@ -29,9 +29,9 @@ import type { IImage } from '@features/media/backend/services/ImageProcessingSer
 import { QueueService } from '@features/runtime/backend/services/QueueService.js';
 import type { MiDriveFolder } from '../models/DriveFolder.js';
 import { createTemp } from '@/misc/create-temp.js';
-import DriveChart from '@/core/chart/charts/drive.js';
-import PerUserDriveChart from '@/core/chart/charts/per-user-drive.js';
-import InstanceChart from '@/core/chart/charts/instance.js';
+import { DriveChart } from '@features/statistics/backend/charts/drive.js';
+import { PerUserDriveChart } from '@features/statistics/backend/charts/per-user-drive.js';
+import { InstanceChart } from '@features/statistics/backend/charts/instance.js';
 import { DownloadService } from '@features/runtime/backend/services/DownloadService.js';
 import { S3Service } from '@features/runtime/backend/services/S3Service.js';
 import { InternalStorageService } from '@features/runtime/backend/services/InternalStorageService.js';
