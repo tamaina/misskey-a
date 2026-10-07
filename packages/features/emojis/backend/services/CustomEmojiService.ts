@@ -15,7 +15,7 @@ import { UtilityService } from '@/core/UtilityService.js';
 import { bindThis } from '@/decorators.js';
 import { DI } from '@/di-symbols.js';
 import { MemoryKVCache, RedisSingleCache } from '@/misc/cache.js';
-import { sqlLikeEscape } from '@/misc/sql-like-escape.js';
+import { sqlLikeEscape } from '@features/persistence/backend/utility/sql-like-escape.js';
 import type { EmojisRepository, MiRole, MiUser } from '@/models/_.js';
 import type { MiEmoji } from '../models/Emoji.js';
 import type { Serialized } from '@/types.js';

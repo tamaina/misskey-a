@@ -21,7 +21,7 @@ import { IdService } from '@features/runtime/backend/services/IdService.js';
 import type { MiUser, MiLocalUser, MiRemoteUser } from '@features/users/backend/models/User.js';
 import type { IPoll } from '../models/Poll.js';
 import { MiPoll } from '../models/Poll.js';
-import { isDuplicateKeyValueError } from '@/misc/is-duplicate-key-value-error.js';
+import { isDuplicateKeyValueError } from '@features/persistence/backend/utility/is-duplicate-key-value-error.js';
 import type { MiChannel } from '@features/channels/backend/models/Channel.js';
 import { normalizeForSearch } from '@/misc/normalize-for-search.js';
 import { RelayService } from '@features/federation/backend/services/RelayService.js';

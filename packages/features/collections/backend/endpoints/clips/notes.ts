@@ -12,7 +12,7 @@ import type { NotesRepository, ClipsRepository, ClipNotesRepository } from '@/mo
 import { QueryService } from '@/core/QueryService.js';
 import { NoteEntityService } from '@features/notes/backend/serializers/NoteEntityService.js';
 import { DI } from '@/di-symbols.js';
-import { sqlLikeEscape } from '@/misc/sql-like-escape.js';
+import { sqlLikeEscape } from '@features/persistence/backend/utility/sql-like-escape.js';
 import { ApiError } from '@/server/api/error.js';
 
 const contractProjection = projectEndpointContract(packedClipsNotesDefinition);

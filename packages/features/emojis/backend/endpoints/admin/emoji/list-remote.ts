@@ -12,7 +12,7 @@ import { QueryService } from '@/core/QueryService.js';
 import { UtilityService } from '@/core/UtilityService.js';
 import { EmojiEntityService } from '../../../serializers/EmojiEntityService.js';
 import { DI } from '@/di-symbols.js';
-import { sqlLikeEscape } from '@/misc/sql-like-escape.js';
+import { sqlLikeEscape } from '@features/persistence/backend/utility/sql-like-escape.js';
 
 const contractProjection = projectEndpointContract(packedAdminEmojiListRemoteDefinition);
 

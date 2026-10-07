@@ -5,7 +5,7 @@
 
 import { PrimaryColumn, Entity, Index, JoinColumn, Column, OneToOne } from 'typeorm';
 import { noteVisibilities } from '@/types.js';
-import { id } from '@/models/util/id.js';
+import { id } from '@features/persistence/backend/models/util/id.js';
 import { MiNote } from './Note.js';
 import type { MiUser } from '@features/users/backend/models/User.js';
 import type { MiChannel } from "@features/channels/backend/models/Channel.js";

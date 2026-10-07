@@ -10,7 +10,7 @@ import type { UsersRepository } from '@/models/_.js';
 
 import { DI } from '@/di-symbols.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
-import { sqlLikeEscape } from '@/misc/sql-like-escape.js';
+import { sqlLikeEscape } from '@features/persistence/backend/utility/sql-like-escape.js';
 import { RoleService } from '@features/roles/backend/services/RoleService.js';
 
 const contractProjection = projectEndpointContract(packedAdminShowUsersDefinition);

@@ -12,7 +12,7 @@ import { QueueService } from '@features/runtime/backend/services/QueueService.js
 import { PerUserFollowingChart } from '@features/statistics/backend/charts/per-user-following.js';
 import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
-import { isDuplicateKeyValueError } from '@/misc/is-duplicate-key-value-error.js';
+import { isDuplicateKeyValueError } from '@features/persistence/backend/utility/is-duplicate-key-value-error.js';
 import { InstanceChart } from '@features/statistics/backend/charts/instance.js';
 import { FederatedInstanceService } from '@features/federation/backend/services/FederatedInstanceService.js';
 import { UserWebhookService } from '@features/integrations/backend/services/UserWebhookService.js';

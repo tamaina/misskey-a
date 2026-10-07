@@ -8,7 +8,7 @@ import { packedHashtagsUsersDefinition, packedHashtagsUsersInput, packedHashtags
 import { Inject, Injectable } from '@nestjs/common';
 
 import type { UsersRepository } from '@/models/_.js';
-import { safeForSql } from "@/misc/safe-for-sql.js";
+import { safeForSql } from "@features/persistence/backend/utility/safe-for-sql.js";
 import { normalizeForSearch } from '@/misc/normalize-for-search.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import { DI } from '@/di-symbols.js';

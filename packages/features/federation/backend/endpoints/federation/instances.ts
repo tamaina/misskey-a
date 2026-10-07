@@ -11,7 +11,7 @@ import type { InstancesRepository } from '@/models/_.js';
 import { InstanceEntityService } from '@features/instance/backend/serializers/InstanceEntityService.js';
 import { MetaService } from '@features/instance/backend/services/MetaService.js';
 import { DI } from '@/di-symbols.js';
-import { sqlLikeEscape } from '@/misc/sql-like-escape.js';
+import { sqlLikeEscape } from '@features/persistence/backend/utility/sql-like-escape.js';
 
 const contractProjection = projectEndpointContract(packedFederationInstancesDefinition);
 

@@ -8,7 +8,7 @@ import { allOfNotesSearchByTagDefinition, allOfNotesSearchByTagInput, allOfNotes
 import { Brackets } from 'typeorm';
 import { Inject, Injectable } from '@nestjs/common';
 import type { NotesRepository } from '@/models/_.js';
-import { safeForSql } from '@/misc/safe-for-sql.js';
+import { safeForSql } from '@features/persistence/backend/utility/safe-for-sql.js';
 import { normalizeForSearch } from '@/misc/normalize-for-search.js';
 import { QueryService } from '@/core/QueryService.js';
 import { NoteEntityService } from '@features/notes/backend/serializers/NoteEntityService.js';

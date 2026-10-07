@@ -13,7 +13,7 @@ import * as nestedProperty from 'nested-property';
 import type { ChartMetricDescriptor, ChartValueRange } from '@features/statistics/shared/chart-descriptors.js';
 import { EntitySchema, LessThan, Between } from 'typeorm';
 import { dateUTC, isTimeSame, isTimeBefore, subtractTime, addTime } from '@/misc/prelude/time.js';
-import { sqlStringEscape } from '@/misc/sql-string-escape.js';
+import { sqlStringEscape } from '@features/persistence/backend/utility/sql-string-escape.js';
 import type { Logger } from '@features/runtime/backend/logging/logger.js';
 import { bindThis } from '@/decorators.js';
 import { MiRepository, miRepository } from '@/models/_.js';

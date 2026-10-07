@@ -5,7 +5,7 @@
 
 import { Entity, Index, JoinColumn, Column, PrimaryColumn, ManyToOne } from 'typeorm';
 import { noteVisibilities, noteReactionAcceptances } from '@/types.js';
-import { id } from '@/models/util/id.js';
+import { id } from '@features/persistence/backend/models/util/id.js';
 import { MiUser } from '@features/users/backend/models/User.js';
 import { MiChannel } from '@features/channels/backend/models/Channel.js';
 import type { MiDriveFile } from '@features/drive/backend/models/DriveFile.js';

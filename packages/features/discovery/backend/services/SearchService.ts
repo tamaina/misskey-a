@@ -11,7 +11,7 @@ import { bindThis } from '@/decorators.js';
 import { MiNote } from '@features/notes/backend/models/Note.js';
 import type { MiMeta, NotesRepository } from '@/models/_.js';
 import { MiUser } from '@/models/_.js';
-import { sqlLikeEscape } from '@/misc/sql-like-escape.js';
+import { sqlLikeEscape } from '@features/persistence/backend/utility/sql-like-escape.js';
 import { isUserRelated } from '@/misc/is-user-related.js';
 import { CacheService } from '@/core/CacheService.js';
 import { QueryService } from '@/core/QueryService.js';

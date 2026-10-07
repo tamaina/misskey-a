@@ -4,7 +4,7 @@
  */
 
 import { Entity, Index, Column, PrimaryGeneratedColumn } from 'typeorm';
-import { id } from '@/models/util/id.js';
+import { id } from '@features/persistence/backend/models/util/id.js';
 import type { MiUser } from '@features/users/backend/models/User.js';
 
 @Entity('user_ip')

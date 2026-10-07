@@ -11,7 +11,7 @@ import type { MiRemoteUser, MiUser } from '@features/users/backend/models/User.j
 import type { MiNote } from '../models/Note.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 import type { MiNoteReaction } from '../models/NoteReaction.js';
-import { isDuplicateKeyValueError } from '@/misc/is-duplicate-key-value-error.js';
+import { isDuplicateKeyValueError } from '@features/persistence/backend/utility/is-duplicate-key-value-error.js';
 import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
 import { NotificationService } from '@features/notifications/backend/services/NotificationService.js';
 import { PerUserReactionsChart } from '@features/statistics/backend/charts/per-user-reactions.js';

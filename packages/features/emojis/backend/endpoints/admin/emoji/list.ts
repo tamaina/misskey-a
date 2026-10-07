@@ -12,7 +12,7 @@ import type { MiEmoji } from '../../../models/Emoji.js';
 import { QueryService } from '@/core/QueryService.js';
 import { DI } from '@/di-symbols.js';
 import { EmojiEntityService } from '../../../serializers/EmojiEntityService.js';
-//import { sqlLikeEscape } from '@/misc/sql-like-escape.js';
+//import { sqlLikeEscape } from '@features/persistence/backend/utility/sql-like-escape.js';
 
 const contractProjection = projectEndpointContract(packedAdminEmojiListDefinition);
 

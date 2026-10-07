@@ -4,7 +4,7 @@
  */
 
 import { PrimaryColumn, Entity, JoinColumn, Column, OneToOne } from 'typeorm';
-import { id } from '@/models/util/id.js';
+import { id } from '@features/persistence/backend/models/util/id.js';
 import { MiUser } from '@features/users/backend/models/User.js';
 
 @Entity('user_keypair')

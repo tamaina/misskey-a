@@ -18,7 +18,7 @@ import { Logger } from '@features/runtime/backend/logging/logger.js';
 import type { MiRemoteUser, MiUser } from '@features/users/backend/models/User.js';
 import { MiDriveFile } from '../models/DriveFile.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
-import { isDuplicateKeyValueError } from '@/misc/is-duplicate-key-value-error.js';
+import { isDuplicateKeyValueError } from '@features/persistence/backend/utility/is-duplicate-key-value-error.js';
 import { FILE_TYPE_BROWSERSAFE } from '@/const.js';
 import { IdentifiableError } from '@/misc/identifiable-error.js';
 import { contentDisposition } from '@/misc/content-disposition.js';

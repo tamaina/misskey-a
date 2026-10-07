@@ -4,7 +4,7 @@
  */
 
 import { Entity, Index, JoinColumn, Column, ManyToOne, PrimaryColumn } from 'typeorm';
-import { id } from '@/models/util/id.js';
+import { id } from '@features/persistence/backend/models/util/id.js';
 import { MiNote } from '@features/notes/backend/models/Note.js';
 import { MiClip } from './Clip.js';
 

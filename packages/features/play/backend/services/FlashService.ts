@@ -6,7 +6,7 @@
 import { Brackets } from 'typeorm';
 import { type FlashLikesRepository, MiUser, type FlashsRepository } from '@/models/_.js';
 import type { QueryService } from '@/core/QueryService.js';
-import { sqlLikeEscape } from '@/misc/sql-like-escape.js';
+import { sqlLikeEscape } from '@features/persistence/backend/utility/sql-like-escape.js';
 
 /**
  * MisskeyPlay関係のService

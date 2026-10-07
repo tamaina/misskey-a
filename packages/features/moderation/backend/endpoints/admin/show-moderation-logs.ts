@@ -11,7 +11,7 @@ import type { ModerationLogsRepository } from '@/models/_.js';
 import { QueryService } from '@/core/QueryService.js';
 import { DI } from '@/di-symbols.js';
 import { ModerationLogEntityService } from '../../serializers/ModerationLogEntityService.js';
-import { sqlLikeEscape } from '@/misc/sql-like-escape.js';
+import { sqlLikeEscape } from '@features/persistence/backend/utility/sql-like-escape.js';
 
 const contractProjection = projectEndpointContract(packedAdminShowModerationLogsDefinition);
 
