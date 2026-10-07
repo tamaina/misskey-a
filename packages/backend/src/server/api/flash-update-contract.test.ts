@@ -5,7 +5,7 @@
 
 import { expect, test } from 'vitest';
 import { mockDeep } from 'vitest-mock-extended';
-import type { FlashsRepository } from '@/models/_.js';
+import type { FlashsRepository } from '@features/persistence/backend/repositories/models.js';
 import type { MiFlash } from '@features/play/backend/models/Flash.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 import { EndpointImplementation, meta } from '@features/play/backend/endpoints/flash/update.js';

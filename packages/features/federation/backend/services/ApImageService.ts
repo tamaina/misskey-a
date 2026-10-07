@@ -5,7 +5,7 @@
 
 import { Inject, Injectable } from '@nestjs/common';
 import { DI } from '@/di-symbols.js';
-import type { DriveFilesRepository, MiMeta } from '@/models/_.js';
+import type { DriveFilesRepository, MiMeta } from '@features/persistence/backend/repositories/models.js';
 import type { MiRemoteUser } from '@features/users/backend/models/User.js';
 import type { MiDriveFile } from '@features/drive/backend/models/DriveFile.js';
 import { truncate } from '@features/runtime/backend/formatting/truncate.js';

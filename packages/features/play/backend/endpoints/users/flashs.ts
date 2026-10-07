@@ -9,7 +9,7 @@ import { Inject, Injectable } from '@nestjs/common';
 
 import { QueryService } from '@features/notes/backend/services/QueryService.js';
 import { FlashEntityService } from '../../serializers/FlashEntityService.js';
-import type { FlashsRepository } from '@/models/_.js';
+import type { FlashsRepository } from '@features/persistence/backend/repositories/models.js';
 import { DI } from '@/di-symbols.js';
 
 const contractProjection = projectEndpointContract(packedUsersFlashsDefinition);

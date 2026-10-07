@@ -7,7 +7,7 @@ import { ContractEndpoint, projectEndpointContract } from '@features/api/backend
 import { packedAdminRolesShowDefinition, packedAdminRolesShowInput, packedAdminRolesShowOutput } from '../../../../contract/packed-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
 
-import type { RolesRepository } from '@/models/_.js';
+import type { RolesRepository } from '@features/persistence/backend/repositories/models.js';
 import { DI } from '@/di-symbols.js';
 import { ApiError } from '@features/api/backend/transport/error.js';
 import { RoleEntityService } from '../../../serializers/RoleEntityService.js';

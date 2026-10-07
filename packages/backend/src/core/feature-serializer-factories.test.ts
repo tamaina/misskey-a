@@ -5,7 +5,7 @@
 
 import { describe, expect, test, vi } from 'vitest';
 import { mockDeep } from 'vitest-mock-extended';
-import type { MiAbuseReportNotificationRecipient, MiAbuseUserReport, MiAntenna, MiApp, MiAuthSession, MiBlocking, MiChannel, MiChatMessage, MiDriveFile, MiDriveFolder, MiEmoji, MiFollowing, MiFollowRequest, MiHashtag, MiInstance, MiMeta, MiModerationLog, MiMuting, MiRegistrationTicket, MiRenoteMuting, MiReversiGame, MiRole, MiSignin, MiSystemWebhook, MiUser, MiUserList, MiUserListMembership } from '@/models/_.js';
+import type { MiAbuseReportNotificationRecipient, MiAbuseUserReport, MiAntenna, MiApp, MiAuthSession, MiBlocking, MiChannel, MiChatMessage, MiDriveFile, MiDriveFolder, MiEmoji, MiFollowing, MiFollowRequest, MiHashtag, MiInstance, MiMeta, MiModerationLog, MiMuting, MiRegistrationTicket, MiRenoteMuting, MiReversiGame, MiRole, MiSignin, MiSystemWebhook, MiUser, MiUserList, MiUserListMembership } from '@features/persistence/backend/repositories/models.js';
 import { authServices } from '@features/auth/backend/services.js';
 import { channelServices } from '@features/channels/backend/services.js';
 import { chatServices } from '@features/chat/backend/services.js';
@@ -154,7 +154,7 @@ describe('annotation-free feature serializers', () => {
 
 	test('meta composition preserves theme conversion and reads ads through its port', async () => {
 		const deps = mockDeep<Inputs<typeof instanceServices>>();
-		const builder = mockDeep<SelectQueryBuilder<import('@/models/_.js').MiAd>>();
+		const builder = mockDeep<SelectQueryBuilder<import('@features/persistence/backend/repositories/models.js').MiAd>>();
 		builder.where.mockReturnValue(builder);
 		builder.andWhere.mockReturnValue(builder);
 		builder.getMany.mockResolvedValue([]);
@@ -292,7 +292,7 @@ describe('annotation-free feature serializers', () => {
 	test('roles retain default policies and unexpired-assignment counting', async () => {
 		const deps = mockDeep<Inputs<typeof roleServices>>();
 		deps.idService.parse.mockReturnValue({ date });
-		const builder = mockDeep<SelectQueryBuilder<import('@/models/_.js').MiRoleAssignment>>();
+		const builder = mockDeep<SelectQueryBuilder<import('@features/persistence/backend/repositories/models.js').MiRoleAssignment>>();
 		builder.where.mockReturnValue(builder);
 		builder.andWhere.mockReturnValue(builder);
 		builder.getCount.mockResolvedValue(2);

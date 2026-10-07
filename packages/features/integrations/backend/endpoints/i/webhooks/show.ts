@@ -8,7 +8,7 @@ import { packedIWebhooksShowDefinition, packedIWebhooksShowInput, packedIWebhook
 import { Inject, Injectable } from '@nestjs/common';
 
 import { webhookEventTypes } from '../../../models/Webhook.js';
-import type { WebhooksRepository } from '@/models/_.js';
+import type { WebhooksRepository } from '@features/persistence/backend/repositories/models.js';
 import { DI } from '@/di-symbols.js';
 import { ApiError } from '@features/api/backend/transport/error.js';
 

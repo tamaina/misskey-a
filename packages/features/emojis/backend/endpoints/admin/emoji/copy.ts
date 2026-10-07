@@ -7,7 +7,7 @@ import { ContractEndpoint, projectEndpointContract } from '@features/api/backend
 import { inlineAdminEmojiCopyDefinition, inlineAdminEmojiCopyInput, inlineAdminEmojiCopyOutput } from '../../../../contract/endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
 
-import type { EmojisRepository } from '@/models/_.js';
+import type { EmojisRepository } from '@features/persistence/backend/repositories/models.js';
 import type { MiDriveFile } from '@features/drive/backend/models/DriveFile.js';
 import { DI } from '@/di-symbols.js';
 import { DriveService } from '@features/drive/backend/services/DriveService.js';

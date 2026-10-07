@@ -8,7 +8,7 @@ import { packedDriveFoldersCreateDefinition, packedDriveFoldersCreateInput, pack
 import { Inject, Injectable } from '@nestjs/common';
 import ms from 'ms';
 
-import type { DriveFoldersRepository } from '@/models/_.js';
+import type { DriveFoldersRepository } from '@features/persistence/backend/repositories/models.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { DriveFolderEntityService } from '../../../serializers/DriveFolderEntityService.js';
 import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';

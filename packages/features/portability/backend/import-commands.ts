@@ -4,7 +4,7 @@
  */
 
 import type { JsonSchema } from '@valibot/to-json-schema';
-import type { MiAntenna as _Antenna } from '@/models/_.js';
+import type { MiAntenna as _Antenna } from '@features/persistence/backend/repositories/models.js';
 import type { ApiErrorDefinition } from '@features/api/contract/index.js';
 import { toLegacyJsonSchema, featureProcedure } from '@features/api/backend/index.js';
 import { portabilityImportContract, portabilityImportErrors, portabilityImportInputs } from '../contract/imports.js';

@@ -7,7 +7,7 @@ import * as fs from 'node:fs';
 import { Inject, Injectable } from '@nestjs/common';
 import { format as dateFormat } from 'date-fns';
 import { DI } from '@/di-symbols.js';
-import type { MiNoteFavorite, NoteFavoritesRepository, PollsRepository, MiUser, UsersRepository } from '@/models/_.js';
+import type { MiNoteFavorite, NoteFavoritesRepository, PollsRepository, MiUser, UsersRepository } from '@features/persistence/backend/repositories/models.js';
 import type { Logger } from '@features/runtime/backend/logging/logger.js';
 import { DriveService } from '@features/drive/backend/services/DriveService.js';
 import { createTemp } from '@features/runtime/backend/io/create-temp.js';

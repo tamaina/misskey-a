@@ -4,7 +4,7 @@
  */
 
 import { Inject, Injectable, Scope } from '@nestjs/common';
-import type { MiUserListMembership, UserListMembershipsRepository, UserListsRepository } from '@/models/_.js';
+import type { MiUserListMembership, UserListMembershipsRepository, UserListsRepository } from '@features/persistence/backend/repositories/models.js';
 import type { Packed } from '@features/index/contract/packed.js';
 import { NoteEntityService } from '@features/notes/backend/serializers/NoteEntityService.js';
 import { NoteStreamingHidingService } from '@features/api/backend/transport/stream/NoteStreamingHidingService.js';

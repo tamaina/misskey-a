@@ -7,7 +7,7 @@ import { ContractEndpoint, projectEndpointContract } from '@features/api/backend
 import { inlineSwRegisterDefinition, inlineSwRegisterInput, inlineSwRegisterOutput } from '../../../contract/endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
-import type { MiMeta, SwSubscriptionsRepository } from '@/models/_.js';
+import type { MiMeta, SwSubscriptionsRepository } from '@features/persistence/backend/repositories/models.js';
 
 import { DI } from '@/di-symbols.js';
 import { PushNotificationService } from '../../services/PushNotificationService.js';

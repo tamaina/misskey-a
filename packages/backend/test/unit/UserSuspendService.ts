@@ -19,7 +19,7 @@ import {
 	FollowingsRepository,
 	FollowRequestsRepository,
 	UsersRepository,
-} from '@/models/_.js';
+} from '@features/persistence/backend/repositories/models.js';
 import { DI } from '@/di-symbols.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import { QueueService } from '@features/runtime/backend/services/QueueService.js';

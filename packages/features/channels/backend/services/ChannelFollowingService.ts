@@ -6,8 +6,8 @@
 import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
 import * as Redis from 'ioredis';
 import { DI } from '@/di-symbols.js';
-import type { ChannelFollowingsRepository, ChannelsRepository, MiUser } from '@/models/_.js';
-import { MiChannel } from '@/models/_.js';
+import type { ChannelFollowingsRepository, ChannelsRepository, MiUser } from '@features/persistence/backend/repositories/models.js';
+import { MiChannel } from '@features/persistence/backend/repositories/models.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { GlobalEvents, GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
 import { bindThis } from '@/decorators.js';

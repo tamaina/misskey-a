@@ -181,9 +181,9 @@ The model placement checkpoint moves all 76 TypeORM entities plus the notificati
 model types and instance-meta persistence helper to their owning `backend/models`.
 The [model allocation table](model-file-allocation.tsv) now maps the 39 removed
 packed JSON-schema source files to 23 feature `contract/packed.ts` modules (with a standalone PageBlock contract for frontend use) and all
-69 named packed models. Host `models/_.ts`, repository provider composition and the
-shared ORM ID-column helper remain backend-owned. Direct legacy entity reexports
-preserve constructor identity; table names, columns, indexes, relations and
+69 named packed models. The persistence feature owns the shared ORM ID-column
+helper, intact connection configuration and repository composition. Its repository
+registry preserves constructor identity; table names, columns, indexes, relations and
 migrations do not change. The User/DriveFile/DriveFolder cycle moves together.
 The user notification-receive input schema was split to
 `features/users/contract/notification-receive-config.ts` and remains part of the

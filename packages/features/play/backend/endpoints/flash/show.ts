@@ -6,7 +6,7 @@
 import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
 import { packedFlashShowDefinition, packedFlashShowInput, packedFlashShowOutput } from '../../../contract/packed-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
-import type { FlashsRepository } from '@/models/_.js';
+import type { FlashsRepository } from '@features/persistence/backend/repositories/models.js';
 
 import { FlashEntityService } from '../../serializers/FlashEntityService.js';
 import { DI } from '@/di-symbols.js';

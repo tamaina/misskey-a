@@ -13,7 +13,7 @@ import { DI } from '@/di-symbols.js';
 import { UserSuspendService } from '@features/moderation/backend/services/UserSuspendService.js';
 import { UserFollowingService } from '@features/relationships/backend/services/UserFollowingService.js';
 import type { InstanceEntityService } from '@features/instance/backend/serializers/InstanceEntityService.js';
-import type { FollowingsRepository, InstancesRepository, MiUser, UsersRepository } from '@/models/_.js';
+import type { FollowingsRepository, InstancesRepository, MiUser, UsersRepository } from '@features/persistence/backend/repositories/models.js';
 import { EndpointImplementation as FederationStats } from '@features/federation/backend/endpoints/federation/stats.js';
 import { secureRndstr } from '@features/auth/backend/utility/secure-rndstr.js';
 import { FollowingIsFollowerSuspended1791310067731 as SuspensionSchemaMigration } from '../../migration/1791310067731-FollowingIsFollowerSuspended.js';

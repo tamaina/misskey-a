@@ -7,7 +7,7 @@ import { ContractEndpoint, projectEndpointContract } from '@features/api/backend
 import { packedAdminAccountsFindByEmailDefinition, packedAdminAccountsFindByEmailInput, packedAdminAccountsFindByEmailOutput } from '../../../../contract/packed-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
 
-import type { UserProfilesRepository } from '@/models/_.js';
+import type { UserProfilesRepository } from '@features/persistence/backend/repositories/models.js';
 import { DI } from '@/di-symbols.js';
 import { UserEntityService } from '../../../serializers/UserEntityService.js';
 import { ApiError } from '@features/api/backend/transport/error.js';

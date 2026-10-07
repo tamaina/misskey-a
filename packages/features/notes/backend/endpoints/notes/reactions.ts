@@ -7,7 +7,7 @@ import { ContractEndpoint, projectEndpointContract } from '@features/api/backend
 import { packedNotesReactionsDefinition, packedNotesReactionsInput, packedNotesReactionsOutput } from '../../../contract/packed-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
 import { Brackets, type FindOptionsWhere } from 'typeorm';
-import type { NoteReactionsRepository } from '@/models/_.js';
+import type { NoteReactionsRepository } from '@features/persistence/backend/repositories/models.js';
 import type { MiNoteReaction } from '../../models/NoteReaction.js';
 
 import { NoteReactionEntityService } from '../../serializers/NoteReactionEntityService.js';

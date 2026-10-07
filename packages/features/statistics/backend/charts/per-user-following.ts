@@ -9,7 +9,7 @@ import * as Redis from 'ioredis';
 import type { MiUser } from '@features/users/backend/models/User.js';
 import { DI } from '@/di-symbols.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
-import type { FollowingsRepository } from '@/models/_.js';
+import type { FollowingsRepository } from '@features/persistence/backend/repositories/models.js';
 import { bindThis } from '@/decorators.js';
 import { acquireChartInsertLock } from '@features/runtime/backend/cache/distributed-lock.js';
 import Chart from './core.js';

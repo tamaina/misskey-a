@@ -9,10 +9,10 @@ import {
 	verifyRegistrationResponse,
 } from '@simplewebauthn/server';
 import { AttestationFormat, isoCBOR, isoUint8Array } from '@simplewebauthn/server/helpers';
-import type { MiMeta, UserSecurityKeysRepository } from '@/models/_.js';
+import type { MiMeta, UserSecurityKeysRepository } from '@features/persistence/backend/repositories/models.js';
 import type { Config } from '@/config.js';
 import { bindThis } from '@/decorators.js';
-import { MiUser } from '@/models/_.js';
+import { MiUser } from '@features/persistence/backend/repositories/models.js';
 import { IdentifiableError } from '@features/runtime/backend/errors/identifiable-error.js';
 import type * as Redis from 'ioredis';
 import type {

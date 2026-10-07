@@ -7,7 +7,7 @@ import * as fs from 'node:fs';
 import { resolve } from 'node:path';
 import { Inject, Injectable } from '@nestjs/common';
 import type { Config } from '@/config.js';
-import type { DriveFilesRepository } from '@/models/_.js';
+import type { DriveFilesRepository } from '@features/persistence/backend/repositories/models.js';
 import { DI } from '@/di-symbols.js';
 import { StatusError } from '@features/runtime/backend/http/status-error.js';
 import type { Logger } from '@features/runtime/backend/logging/logger.js';

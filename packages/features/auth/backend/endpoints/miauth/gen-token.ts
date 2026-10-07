@@ -6,7 +6,7 @@
 import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
 import { uniqueMiauthGenTokenDefinition, uniqueMiauthGenTokenInput, uniqueMiauthGenTokenOutput } from '../../../contract/unique-string-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
-import type { AccessTokensRepository } from '@/models/_.js';
+import type { AccessTokensRepository } from '@features/persistence/backend/repositories/models.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { NotificationService } from '@features/notifications/backend/services/NotificationService.js';
 import { secureRndstr } from '../../utility/secure-rndstr.js';

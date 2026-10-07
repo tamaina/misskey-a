@@ -38,7 +38,7 @@ import type {
 	UserProfilesRepository,
 	UserSecurityKeysRepository,
 	UsersRepository,
-} from '@/models/_.js';
+} from '@features/persistence/backend/repositories/models.js';
 import { bindThis } from '@/decorators.js';
 import { RoleService } from '@features/roles/backend/services/RoleService.js';
 import { ApPersonService } from '@features/federation/backend/services/ApPersonService.js';

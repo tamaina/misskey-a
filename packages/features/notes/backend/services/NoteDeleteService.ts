@@ -7,7 +7,7 @@ import { Brackets, In, IsNull, Not } from 'typeorm';
 import { Injectable, Inject } from '@nestjs/common';
 import type { MiUser, MiLocalUser, MiRemoteUser } from '@features/users/backend/models/User.js';
 import type { MiNote, IMentionedRemoteUsers } from '../models/Note.js';
-import type { InstancesRepository, MiMeta, NotesRepository, UsersRepository } from '@/models/_.js';
+import type { InstancesRepository, MiMeta, NotesRepository, UsersRepository } from '@features/persistence/backend/repositories/models.js';
 import { RelayService } from '@features/federation/backend/services/RelayService.js';
 import { FederatedInstanceService } from '@features/federation/backend/services/FederatedInstanceService.js';
 import { DI } from '@/di-symbols.js';

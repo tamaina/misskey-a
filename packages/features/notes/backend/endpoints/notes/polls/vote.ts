@@ -6,7 +6,7 @@
 import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
 import { voidNotesPollsVoteDefinition, voidNotesPollsVoteInput, voidNotesPollsVoteOutput } from '../../../../contract/void-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
-import type { UsersRepository, PollsRepository, PollVotesRepository } from '@/models/_.js';
+import type { UsersRepository, PollsRepository, PollVotesRepository } from '@features/persistence/backend/repositories/models.js';
 import type { MiRemoteUser } from '@features/users/backend/models/User.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 

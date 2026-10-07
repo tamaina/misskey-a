@@ -8,7 +8,7 @@ import { voidAdminDriveCleanupDefinition, voidAdminDriveCleanupInput, voidAdminD
 import { IsNull } from 'typeorm';
 import { Inject, Injectable } from '@nestjs/common';
 
-import type { DriveFilesRepository } from '@/models/_.js';
+import type { DriveFilesRepository } from '@features/persistence/backend/repositories/models.js';
 import { DriveService } from '../../../services/DriveService.js';
 import { DI } from '@/di-symbols.js';
 

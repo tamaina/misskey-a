@@ -8,7 +8,7 @@ import { inlineIAuthorizedAppsDefinition, inlineIAuthorizedAppsInput, inlineIAut
 import { Inject, Injectable } from '@nestjs/common';
 import { IsNull, Not } from 'typeorm';
 
-import type { AccessTokensRepository } from '@/models/_.js';
+import type { AccessTokensRepository } from '@features/persistence/backend/repositories/models.js';
 import { AppEntityService } from '../../serializers/AppEntityService.js';
 import { DI } from '@/di-symbols.js';
 

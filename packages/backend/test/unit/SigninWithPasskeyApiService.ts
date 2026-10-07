@@ -11,7 +11,7 @@ import { FastifyReply, FastifyRequest } from 'fastify';
 import type { AuthenticationResponseJSON } from '@simplewebauthn/server';
 import { HttpHeader } from 'fastify/types/utils.js';
 import { MiUser } from '@features/users/backend/models/User.js';
-import { MiUserProfile, UserProfilesRepository, UsersRepository } from '@/models/_.js';
+import { MiUserProfile, UserProfilesRepository, UsersRepository } from '@features/persistence/backend/repositories/models.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { GlobalModule } from '@/GlobalModule.js';
 import { DI } from '@/di-symbols.js';

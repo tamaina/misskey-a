@@ -6,7 +6,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import * as Misskey from 'misskey-js';
 import { DI } from '@/di-symbols.js';
-import type { SigninsRepository, UserProfilesRepository } from '@/models/_.js';
+import type { SigninsRepository, UserProfilesRepository } from '@features/persistence/backend/repositories/models.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';

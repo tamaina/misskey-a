@@ -8,7 +8,7 @@ import { packedFollowingRequestsListDefinition, packedFollowingRequestsListInput
 import { Inject, Injectable } from '@nestjs/common';
 
 import { QueryService } from '@features/notes/backend/services/QueryService.js';
-import type { FollowRequestsRepository } from '@/models/_.js';
+import type { FollowRequestsRepository } from '@features/persistence/backend/repositories/models.js';
 import { FollowRequestEntityService } from '../../../serializers/FollowRequestEntityService.js';
 import { DI } from '@/di-symbols.js';
 

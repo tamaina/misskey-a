@@ -11,7 +11,7 @@ import type { MiBlocking } from '../models/Blocking.js';
 import { QueueService } from '@features/runtime/backend/services/QueueService.js';
 import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
 import { DI } from '@/di-symbols.js';
-import type { FollowRequestsRepository, BlockingsRepository, UserListsRepository, UserListMembershipsRepository } from '@/models/_.js';
+import type { FollowRequestsRepository, BlockingsRepository, UserListsRepository, UserListMembershipsRepository } from '@features/persistence/backend/repositories/models.js';
 import { Logger } from '@features/runtime/backend/logging/logger.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import { ApRendererService } from '@features/federation/backend/services/ApRendererService.js';

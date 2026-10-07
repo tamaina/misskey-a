@@ -8,7 +8,7 @@ import { packedChannelsCreateDefinition, packedChannelsCreateInput, packedChanne
 import { Inject, Injectable } from '@nestjs/common';
 import ms from 'ms';
 
-import type { ChannelsRepository, DriveFilesRepository } from '@/models/_.js';
+import type { ChannelsRepository, DriveFilesRepository } from '@features/persistence/backend/repositories/models.js';
 import type { MiChannel } from '../../models/Channel.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { ChannelEntityService } from '../../serializers/ChannelEntityService.js';

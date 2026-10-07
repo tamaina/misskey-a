@@ -7,7 +7,7 @@ import { Brackets } from 'typeorm';
 import JSON5 from 'json5';
 import type { Packed } from '@features/index/contract/packed.js';
 import type { MiMeta } from '../models/Meta.js';
-import type { AdsRepository } from '@/models/_.js';
+import type { AdsRepository } from '@features/persistence/backend/repositories/models.js';
 import { MAX_NOTE_TEXT_LENGTH } from '@features/notes/contract/note-text-limit.js';
 import { bindThis } from '@/decorators.js';
 import type { SystemAccountService } from '@features/users/backend/services/SystemAccountService.js';

@@ -8,7 +8,7 @@ import promiseLimit from 'promise-limit';
 import { DataSource } from 'typeorm';
 import { ModuleRef } from '@nestjs/core';
 import { DI } from '@/di-symbols.js';
-import type { FollowingsRepository, InstancesRepository, MiMeta, UserProfilesRepository, UserPublickeysRepository, UsersRepository } from '@/models/_.js';
+import type { FollowingsRepository, InstancesRepository, MiMeta, UserProfilesRepository, UserPublickeysRepository, UsersRepository } from '@features/persistence/backend/repositories/models.js';
 import type { Config } from '@/config.js';
 import type { MiLocalUser, MiRemoteUser } from '@features/users/backend/models/User.js';
 import { MiUser } from '@features/users/backend/models/User.js';

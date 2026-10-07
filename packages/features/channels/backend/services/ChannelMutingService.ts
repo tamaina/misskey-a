@@ -7,7 +7,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import * as Redis from 'ioredis';
 import { Brackets, In } from 'typeorm';
 import { DI } from '@/di-symbols.js';
-import type { ChannelMutingRepository, ChannelsRepository, MiChannel, MiChannelMuting, MiUser } from '@/models/_.js';
+import type { ChannelMutingRepository, ChannelsRepository, MiChannel, MiChannelMuting, MiUser } from '@features/persistence/backend/repositories/models.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { GlobalEvents, GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
 import { bindThis } from '@/decorators.js';

@@ -7,7 +7,7 @@ import { ContractEndpoint, projectEndpointContract } from '@features/api/backend
 import { voidDriveFoldersDeleteDefinition, voidDriveFoldersDeleteInput, voidDriveFoldersDeleteOutput } from '../../../../contract/void-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
 
-import type { DriveFoldersRepository, DriveFilesRepository } from '@/models/_.js';
+import type { DriveFoldersRepository, DriveFilesRepository } from '@features/persistence/backend/repositories/models.js';
 import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
 import { DI } from '@/di-symbols.js';
 import { ApiError } from '@features/api/backend/transport/error.js';

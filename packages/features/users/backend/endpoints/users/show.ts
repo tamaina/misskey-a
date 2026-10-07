@@ -5,7 +5,7 @@
 
 import { In, IsNull } from 'typeorm';
 import { Inject, Injectable } from '@nestjs/common';
-import type { MiMeta, UsersRepository } from '@/models/_.js';
+import type { MiMeta, UsersRepository } from '@features/persistence/backend/repositories/models.js';
 import type { MiUser } from '../../models/User.js';
 import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
 import { usersShowDefinition } from '../../../contract/show-endpoint-definition.js';

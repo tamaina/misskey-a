@@ -7,7 +7,7 @@ import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { In } from 'typeorm';
 import * as Redis from 'ioredis';
 import { DI } from '@/di-symbols.js';
-import type { PollsRepository, EmojisRepository, MiMeta } from '@/models/_.js';
+import type { PollsRepository, EmojisRepository, MiMeta } from '@features/persistence/backend/repositories/models.js';
 import type { Config } from '@/config.js';
 import type { MiRemoteUser } from '@features/users/backend/models/User.js';
 import type { MiNote } from '@features/notes/backend/models/Note.js';

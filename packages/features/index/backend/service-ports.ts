@@ -4,7 +4,7 @@
  */
 
 import { DI } from '@/di-symbols.js';
-import type { RepositorySet } from '@/models/repository-factory.js';
+import type { RepositorySet } from '@features/persistence/backend/repositories/factory.js';
 import type { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import type { NoteEntityService } from '@features/notes/backend/serializers/NoteEntityService.js';
 import type { DriveFileEntityService } from '@features/drive/backend/serializers/DriveFileEntityService.js';
@@ -21,7 +21,7 @@ import type { LoggerService } from '@features/runtime/backend/services/LoggerSer
 import type { Config } from '@/config.js';
 import type * as Redis from 'ioredis';
 import type { DataSource } from 'typeorm';
-import type { MiMeta } from '@/models/_.js';
+import type { MiMeta } from '@features/persistence/backend/repositories/models.js';
 import type { Port, PortToken } from './service-definitions.js';
 
 /** Audited legacy bridge: property names agree with RepositorySet providers. */

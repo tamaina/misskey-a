@@ -7,7 +7,7 @@ import { ContractEndpoint, projectEndpointContract } from '@features/api/backend
 import { voidResetPasswordDefinition, voidResetPasswordInput, voidResetPasswordOutput } from '../../contract/void-endpoint-definitions.js';
 import bcrypt from 'bcryptjs';
 import { Inject, Injectable } from '@nestjs/common';
-import type { UserProfilesRepository, PasswordResetRequestsRepository } from '@/models/_.js';
+import type { UserProfilesRepository, PasswordResetRequestsRepository } from '@features/persistence/backend/repositories/models.js';
 
 import { DI } from '@/di-symbols.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';

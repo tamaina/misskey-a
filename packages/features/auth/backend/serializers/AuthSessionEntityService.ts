@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import type { AuthSessionsRepository } from '@/models/_.js';
+import type { AuthSessionsRepository } from '@features/persistence/backend/repositories/models.js';
 import { awaitAll } from '@features/runtime/backend/async/await-all.js';
 import type { MiAuthSession } from '../models/AuthSession.js';
 import type { MiUser } from '@features/users/backend/models/User.js';

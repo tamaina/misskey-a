@@ -8,7 +8,7 @@ import { packedAntennasCreateDefinition, packedAntennasCreateInput, packedAntenn
 import { Inject, Injectable } from '@nestjs/common';
 
 import { IdService } from '@features/runtime/backend/services/IdService.js';
-import type { UserListsRepository, AntennasRepository } from '@/models/_.js';
+import type { UserListsRepository, AntennasRepository } from '@features/persistence/backend/repositories/models.js';
 import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
 import { AntennaEntityService } from '../../serializers/AntennaEntityService.js';
 import { DI } from '@/di-symbols.js';

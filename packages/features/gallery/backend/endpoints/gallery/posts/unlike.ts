@@ -7,7 +7,7 @@ import { ContractEndpoint, projectEndpointContract } from '@features/api/backend
 import { voidGalleryPostsUnlikeDefinition, voidGalleryPostsUnlikeInput, voidGalleryPostsUnlikeOutput } from '../../../../contract/void-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
 
-import type { GalleryPostsRepository, GalleryLikesRepository } from '@/models/_.js';
+import type { GalleryPostsRepository, GalleryLikesRepository } from '@features/persistence/backend/repositories/models.js';
 import { FeaturedService, GALLERY_POSTS_RANKING_WINDOW } from '@features/discovery/backend/services/FeaturedService.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { DI } from '@/di-symbols.js';

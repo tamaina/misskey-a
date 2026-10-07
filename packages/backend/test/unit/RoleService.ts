@@ -22,7 +22,7 @@ import {
 	RoleAssignmentsRepository,
 	RolesRepository,
 	UsersRepository,
-} from '@/models/_.js';
+} from '@features/persistence/backend/repositories/models.js';
 import { DI } from '@/di-symbols.js';
 import { MetaService } from '@features/instance/backend/services/MetaService.js';
 import { genAidx } from '@features/runtime/backend/id/aidx.js';

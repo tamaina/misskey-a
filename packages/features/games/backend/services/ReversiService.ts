@@ -12,7 +12,7 @@ import { IsNull, LessThan, MoreThan } from 'typeorm';
 import type {
 	MiReversiGame,
 	ReversiGamesRepository,
-} from '@/models/_.js';
+} from '@features/persistence/backend/repositories/models.js';
 import type { MiUser } from '@features/users/backend/models/User.js';
 import { DI } from '@/di-symbols.js';
 import { bindThis } from '@/decorators.js';

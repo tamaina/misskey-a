@@ -6,7 +6,7 @@
 import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
 import { selectorIRevokeTokenDefinition, selectorIRevokeTokenInput, selectorIRevokeTokenOutput } from '../../../contract/selector-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
-import type { AccessTokensRepository } from '@/models/_.js';
+import type { AccessTokensRepository } from '@features/persistence/backend/repositories/models.js';
 import type { MiAccessToken } from '../../models/AccessToken.js';
 import { DI } from '@/di-symbols.js';
 import { ApiError } from '@features/api/backend/transport/error.js';

@@ -7,7 +7,7 @@ import { ContractEndpoint, projectEndpointContract } from '@features/api/backend
 import { constantIWebhooksCreateDefinition, constantIWebhooksCreateInput, constantIWebhooksCreateOutput } from '../../../../contract/source-constant-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
-import type { WebhooksRepository } from '@/models/_.js';
+import type { WebhooksRepository } from '@features/persistence/backend/repositories/models.js';
 import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
 import { DI } from '@/di-symbols.js';
 import { RoleService } from '@features/roles/backend/services/RoleService.js';

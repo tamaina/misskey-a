@@ -6,10 +6,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { describe, beforeEach, beforeAll, afterEach, afterAll, vi, test, expect } from 'vitest';
 import { In } from 'typeorm';
-import { FollowingsRepository, MiUser, UserProfilesRepository, UsersRepository } from '@/models/_.js';
+import { FollowingsRepository, MiUser, UserProfilesRepository, UsersRepository } from '@features/persistence/backend/repositories/models.js';
 import { GlobalModule } from '@/GlobalModule.js';
 import type { Config } from '@/config.js';
-import type { MutingsRepository } from '@/models/_.js';
+import type { MutingsRepository } from '@features/persistence/backend/repositories/models.js';
 import { DI } from '@/di-symbols.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { UserSearchService } from '@features/discovery/backend/services/UserSearchService.js';

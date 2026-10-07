@@ -7,7 +7,7 @@ import { ContractEndpoint, projectEndpointContract } from '@features/api/backend
 import { packedBlockingListDefinition, packedBlockingListInput, packedBlockingListOutput } from '../../../contract/packed-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
 
-import type { BlockingsRepository } from '@/models/_.js';
+import type { BlockingsRepository } from '@features/persistence/backend/repositories/models.js';
 import { QueryService } from '@features/notes/backend/services/QueryService.js';
 import { BlockingEntityService } from '../../serializers/BlockingEntityService.js';
 import { DI } from '@/di-symbols.js';

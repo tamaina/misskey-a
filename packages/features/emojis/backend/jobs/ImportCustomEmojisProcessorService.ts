@@ -7,7 +7,7 @@ import * as fs from 'node:fs';
 import { Inject, Injectable } from '@nestjs/common';
 import { IsNull } from 'typeorm';
 import { DI } from '@/di-symbols.js';
-import type { EmojisRepository, DriveFilesRepository } from '@/models/_.js';
+import type { EmojisRepository, DriveFilesRepository } from '@features/persistence/backend/repositories/models.js';
 import type { Logger } from '@features/runtime/backend/logging/logger.js';
 import { CustomEmojiService } from '../services/CustomEmojiService.js';
 import { createTempDir } from '@features/runtime/backend/io/create-temp.js';

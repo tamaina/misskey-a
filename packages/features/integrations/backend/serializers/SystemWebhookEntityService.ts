@@ -4,7 +4,7 @@
  */
 
 import { In } from 'typeorm';
-import type { MiSystemWebhook, SystemWebhooksRepository } from '@/models/_.js';
+import type { MiSystemWebhook, SystemWebhooksRepository } from '@features/persistence/backend/repositories/models.js';
 import { bindThis } from '@/decorators.js';
 import { Packed } from '@features/index/contract/packed.js';
 

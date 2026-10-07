@@ -6,7 +6,7 @@
 import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
 import { voidPagesLikeDefinition, voidPagesLikeInput, voidPagesLikeOutput } from '../../../contract/void-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
-import type { PagesRepository, PageLikesRepository } from '@/models/_.js';
+import type { PagesRepository, PageLikesRepository } from '@features/persistence/backend/repositories/models.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 
 import { DI } from '@/di-symbols.js';

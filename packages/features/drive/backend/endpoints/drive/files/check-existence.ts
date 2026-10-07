@@ -7,7 +7,7 @@ import { ContractEndpoint, projectEndpointContract } from '@features/api/backend
 import { inlineDriveFilesCheckExistenceDefinition, inlineDriveFilesCheckExistenceInput, inlineDriveFilesCheckExistenceOutput } from '../../../../contract/endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
 
-import type { DriveFilesRepository } from '@/models/_.js';
+import type { DriveFilesRepository } from '@features/persistence/backend/repositories/models.js';
 import { DI } from '@/di-symbols.js';
 
 const contractProjection = projectEndpointContract(inlineDriveFilesCheckExistenceDefinition);

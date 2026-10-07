@@ -9,7 +9,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { Brackets } from 'typeorm';
 import { ReversiGameEntityService } from '../../serializers/ReversiGameEntityService.js';
 import { DI } from '@/di-symbols.js';
-import type { ReversiGamesRepository } from '@/models/_.js';
+import type { ReversiGamesRepository } from '@features/persistence/backend/repositories/models.js';
 import { QueryService } from '@features/notes/backend/services/QueryService.js';
 
 const contractProjection = projectEndpointContract(referenceReversiGamesDefinition);

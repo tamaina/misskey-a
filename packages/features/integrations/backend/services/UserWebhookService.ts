@@ -5,7 +5,7 @@
 
 import { Inject, Injectable } from '@nestjs/common';
 import * as Redis from 'ioredis';
-import { MiUser, type WebhooksRepository } from '@/models/_.js';
+import { MiUser, type WebhooksRepository } from '@features/persistence/backend/repositories/models.js';
 import { MiWebhook, WebhookEventTypes } from '../models/Webhook.js';
 import { DI } from '@/di-symbols.js';
 import { bindThis } from '@/decorators.js';

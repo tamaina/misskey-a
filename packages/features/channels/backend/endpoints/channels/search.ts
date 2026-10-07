@@ -9,7 +9,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { Brackets } from 'typeorm';
 
 import { QueryService } from '@features/notes/backend/services/QueryService.js';
-import type { ChannelsRepository } from '@/models/_.js';
+import type { ChannelsRepository } from '@features/persistence/backend/repositories/models.js';
 import { ChannelEntityService } from '../../serializers/ChannelEntityService.js';
 import { DI } from '@/di-symbols.js';
 import { sqlLikeEscape } from '@features/persistence/backend/utility/sql-like-escape.js';

@@ -8,7 +8,7 @@ import { packedDriveFilesFindDefinition, packedDriveFilesFindInput, packedDriveF
 import { Inject, Injectable } from '@nestjs/common';
 import { IsNull } from 'typeorm';
 
-import type { DriveFilesRepository } from '@/models/_.js';
+import type { DriveFilesRepository } from '@features/persistence/backend/repositories/models.js';
 import { DriveFileEntityService } from '../../../serializers/DriveFileEntityService.js';
 import { DI } from '@/di-symbols.js';
 

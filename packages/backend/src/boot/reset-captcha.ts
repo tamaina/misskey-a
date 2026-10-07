@@ -8,7 +8,7 @@ import { Redis } from 'ioredis';
 import { runTask } from '@features/boot/backend';
 import { createResetCaptcha } from '@features/instance/backend';
 import { loadConfig } from '@/config.js';
-import { createPostgresDataSource } from '@/postgres.js';
+import { createPostgresDataSource } from '@features/persistence/backend/postgres.js';
 import { updateInstanceMeta } from '@features/instance/backend/models/update-instance-meta.js';
 
 /** Composition root: this command needs only persistence and event publication. */

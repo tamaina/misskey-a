@@ -5,7 +5,7 @@
 
 import { Inject, Injectable } from '@nestjs/common';
 import { In } from 'typeorm';
-import type { RenoteMutingsRepository } from '@/models/_.js';
+import type { RenoteMutingsRepository } from '@features/persistence/backend/repositories/models.js';
 import type { MiRenoteMuting } from '../models/RenoteMuting.js';
 
 import { IdService } from '@features/runtime/backend/services/IdService.js';

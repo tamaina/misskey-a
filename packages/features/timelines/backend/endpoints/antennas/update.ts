@@ -7,7 +7,7 @@ import { ContractEndpoint, projectEndpointContract } from '@features/api/backend
 import { packedAntennasUpdateDefinition, packedAntennasUpdateInput, packedAntennasUpdateOutput } from '../../../contract/packed-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
 
-import type { AntennasRepository, UserListsRepository } from '@/models/_.js';
+import type { AntennasRepository, UserListsRepository } from '@features/persistence/backend/repositories/models.js';
 import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
 import { AntennaEntityService } from '../../serializers/AntennaEntityService.js';
 import { DI } from '@/di-symbols.js';

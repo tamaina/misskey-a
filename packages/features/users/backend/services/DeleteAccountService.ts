@@ -5,7 +5,7 @@
 
 import { Inject, Injectable } from '@nestjs/common';
 import { Not, IsNull } from 'typeorm';
-import type { FollowingsRepository, MiMeta, MiUser, UsersRepository } from '@/models/_.js';
+import type { FollowingsRepository, MiMeta, MiUser, UsersRepository } from '@features/persistence/backend/repositories/models.js';
 import { QueueService } from '@features/runtime/backend/services/QueueService.js';
 import { DI } from '@/di-symbols.js';
 import { bindThis } from '@/decorators.js';

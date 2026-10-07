@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import type { FollowRequestsRepository } from '@/models/_.js';
+import type { FollowRequestsRepository } from '@features/persistence/backend/repositories/models.js';
 import type { } from '../models/Blocking.js';
 import type { MiUser } from '@features/users/backend/models/User.js';
 import type { MiFollowRequest } from '../models/FollowRequest.js';

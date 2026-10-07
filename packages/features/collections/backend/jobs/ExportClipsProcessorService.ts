@@ -8,7 +8,7 @@ import { Writable } from 'node:stream';
 import { Inject, Injectable } from '@nestjs/common';
 import { format as dateFormat } from 'date-fns';
 import { DI } from '@/di-symbols.js';
-import type { ClipNotesRepository, ClipsRepository, MiClip, MiClipNote, MiUser, PollsRepository, UsersRepository } from '@/models/_.js';
+import type { ClipNotesRepository, ClipsRepository, MiClip, MiClipNote, MiUser, PollsRepository, UsersRepository } from '@features/persistence/backend/repositories/models.js';
 import type { Logger } from '@features/runtime/backend/logging/logger.js';
 import { DriveService } from '@features/drive/backend/services/DriveService.js';
 import { createTemp } from '@features/runtime/backend/io/create-temp.js';

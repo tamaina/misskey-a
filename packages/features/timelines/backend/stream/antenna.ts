@@ -5,7 +5,7 @@
 
 import { Inject, Injectable, Scope } from '@nestjs/common';
 import { DI } from '@/di-symbols.js';
-import type { AntennasRepository } from '@/models/_.js';
+import type { AntennasRepository } from '@features/persistence/backend/repositories/models.js';
 import { NoteEntityService } from '@features/notes/backend/serializers/NoteEntityService.js';
 import { NoteStreamingHidingService } from '@features/api/backend/transport/stream/NoteStreamingHidingService.js';
 import { bindThis } from '@/decorators.js';

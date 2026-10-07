@@ -7,7 +7,7 @@ import { ContractEndpoint, projectEndpointContract } from '@features/api/backend
 import { packedClipsCreateDefinition, packedClipsCreateInput, packedClipsCreateOutput } from '../../../contract/packed-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
 
-import type { MiClip } from '@/models/_.js';
+import type { MiClip } from '@features/persistence/backend/repositories/models.js';
 import { ClipEntityService } from '../../serializers/ClipEntityService.js';
 import { ApiError } from '@features/api/backend/transport/error.js';
 import { ClipService } from '../../services/ClipService.js';

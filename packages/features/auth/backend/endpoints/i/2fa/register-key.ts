@@ -8,7 +8,7 @@ import { inlineI2faRegisterKeyDefinition, inlineI2faRegisterKeyInput, inlineI2fa
 import bcrypt from 'bcryptjs';
 import { Inject, Injectable } from '@nestjs/common';
 
-import type { UserProfilesRepository } from '@/models/_.js';
+import type { UserProfilesRepository } from '@features/persistence/backend/repositories/models.js';
 import { DI } from '@/di-symbols.js';
 import { WebAuthnService } from '../../../services/WebAuthnService.js';
 import { ApiError } from '@features/api/backend/transport/error.js';

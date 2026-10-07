@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import type { AbuseUserReportsRepository } from '@/models/_.js';
+import type { AbuseUserReportsRepository } from '@features/persistence/backend/repositories/models.js';
 import { awaitAll } from '@features/runtime/backend/async/await-all.js';
 import type { MiAbuseUserReport } from '../models/AbuseUserReport.js';
 import { bindThis } from '@/decorators.js';

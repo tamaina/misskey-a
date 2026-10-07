@@ -6,7 +6,7 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { DataSource } from 'typeorm';
 import * as Redis from 'ioredis';
-import type { FollowingsRepository, InstancesRepository, MiMeta } from '@/models/_.js';
+import type { FollowingsRepository, InstancesRepository, MiMeta } from '@features/persistence/backend/repositories/models.js';
 import { DI } from '@/di-symbols.js';
 import { bindThis } from '@/decorators.js';
 import { acquireChartInsertLock } from '@features/runtime/backend/cache/distributed-lock.js';

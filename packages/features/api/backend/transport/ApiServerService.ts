@@ -9,7 +9,7 @@ import multipart from '@fastify/multipart';
 import { ModuleRef } from '@nestjs/core';
 import type { AuthenticationResponseJSON } from '@simplewebauthn/server';
 import type { Config } from '@/config.js';
-import type { InstancesRepository, AccessTokensRepository } from '@/models/_.js';
+import type { InstancesRepository, AccessTokensRepository } from '@features/persistence/backend/repositories/models.js';
 import { DI } from '@/di-symbols.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import { bindThis } from '@/decorators.js';

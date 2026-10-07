@@ -14,7 +14,7 @@ import type {
 	UserProfilesRepository,
 	UserSecurityKeysRepository,
 	UsersRepository,
-} from '@/models/_.js';
+} from '@features/persistence/backend/repositories/models.js';
 import type { Logger } from '@features/runtime/backend/logging/logger.js';
 import type { Config } from '@/config.js';
 import { getIpHash } from '../utility/get-ip-hash.js';

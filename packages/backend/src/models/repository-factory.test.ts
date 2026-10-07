@@ -86,10 +86,10 @@ import {
 	MiUserPublickey,
 	MiUserSecurityKey,
 	MiWebhook,
-} from './_.js';
+} from '@features/persistence/backend/repositories/models.js';
 import type { FactoryProvider } from '@nestjs/common';
-import { RepositoryModule, repositoryProviders } from './RepositoryModule.js';
-import { createRepositorySet, repositoryFactories } from './repository-factory.js';
+import { RepositoryModule, repositoryProviders } from '@features/persistence/backend/repositories/RepositoryModule.js';
+import { createRepositorySet, repositoryFactories } from '@features/persistence/backend/repositories/factory.js';
 
 // Captured from the original RepositoryModule providers/exports before the refactor.
 const originalMappings = [

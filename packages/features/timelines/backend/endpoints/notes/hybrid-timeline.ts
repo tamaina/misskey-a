@@ -7,7 +7,7 @@ import { ContractEndpoint, projectEndpointContract } from '@features/api/backend
 import { packedNotesHybridTimelineDefinition, packedNotesHybridTimelineInput, packedNotesHybridTimelineOutput } from '../../../contract/packed-endpoint-definitions.js';
 import { Brackets } from 'typeorm';
 import { Inject, Injectable } from '@nestjs/common';
-import type { NotesRepository, ChannelFollowingsRepository, MiMeta } from '@/models/_.js';
+import type { NotesRepository, ChannelFollowingsRepository, MiMeta } from '@features/persistence/backend/repositories/models.js';
 
 import { ActiveUsersChart } from '@features/statistics/backend/charts/active-users.js';
 import { NoteEntityService } from '@features/notes/backend/serializers/NoteEntityService.js';

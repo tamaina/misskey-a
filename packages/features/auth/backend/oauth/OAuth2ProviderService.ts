@@ -25,7 +25,7 @@ import { HttpRequestService } from '@features/runtime/backend/services/HttpReque
 import type { Config } from '@/config.js';
 import { DI } from '@/di-symbols.js';
 import { bindThis } from '@/decorators.js';
-import type { AccessTokensRepository, UsersRepository } from '@/models/_.js';
+import type { AccessTokensRepository, UsersRepository } from '@features/persistence/backend/repositories/models.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { CacheService } from '@features/users/backend/services/CacheService.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';

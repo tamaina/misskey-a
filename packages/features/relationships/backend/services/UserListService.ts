@@ -6,7 +6,7 @@
 import { Inject, Injectable, OnApplicationShutdown, OnModuleInit } from '@nestjs/common';
 import * as Redis from 'ioredis';
 import { ModuleRef } from '@nestjs/core';
-import type { UserListMembershipsRepository } from '@/models/_.js';
+import type { UserListMembershipsRepository } from '@features/persistence/backend/repositories/models.js';
 import type { MiUser } from '@features/users/backend/models/User.js';
 import type { MiUserList } from '../models/UserList.js';
 import type { MiUserListMembership } from '../models/UserListMembership.js';

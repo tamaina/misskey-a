@@ -13,7 +13,7 @@ import {
 } from '../../../../serializers/AbuseReportNotificationRecipientEntityService.js';
 import { AbuseReportNotificationService } from '../../../../services/AbuseReportNotificationService.js';
 import { DI } from '@/di-symbols.js';
-import type { UserProfilesRepository } from '@/models/_.js';
+import type { UserProfilesRepository } from '@features/persistence/backend/repositories/models.js';
 
 const contractProjection = projectEndpointContract(packedAdminAbuseReportNotificationRecipientCreateDefinition);
 

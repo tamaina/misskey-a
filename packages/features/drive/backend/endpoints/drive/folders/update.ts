@@ -7,7 +7,7 @@ import { ContractEndpoint, projectEndpointContract } from '@features/api/backend
 import { packedDriveFoldersUpdateDefinition, packedDriveFoldersUpdateInput, packedDriveFoldersUpdateOutput } from '../../../../contract/packed-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
 
-import type { DriveFoldersRepository } from '@/models/_.js';
+import type { DriveFoldersRepository } from '@features/persistence/backend/repositories/models.js';
 import { DriveFolderEntityService } from '../../../serializers/DriveFolderEntityService.js';
 import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
 import { DI } from '@/di-symbols.js';

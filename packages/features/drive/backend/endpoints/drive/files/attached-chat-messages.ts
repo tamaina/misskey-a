@@ -7,7 +7,7 @@ import { ContractEndpoint, projectEndpointContract } from '@features/api/backend
 import { packedDriveFilesAttachedChatMessagesDefinition, packedDriveFilesAttachedChatMessagesInput, packedDriveFilesAttachedChatMessagesOutput } from '../../../../contract/packed-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
 
-import type { DriveFilesRepository, ChatMessagesRepository } from '@/models/_.js';
+import type { DriveFilesRepository, ChatMessagesRepository } from '@features/persistence/backend/repositories/models.js';
 import { QueryService } from '@features/notes/backend/services/QueryService.js';
 import { DI } from '@/di-symbols.js';
 import { RoleService } from '@features/roles/backend/services/RoleService.js';

@@ -7,7 +7,7 @@ import { ContractEndpoint, projectEndpointContract } from '@features/api/backend
 import { voidVerifyEmailDefinition, voidVerifyEmailInput, voidVerifyEmailOutput } from '../../contract/void-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
 
-import type { UserProfilesRepository } from '@/models/_.js';
+import type { UserProfilesRepository } from '@features/persistence/backend/repositories/models.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import { DI } from '@/di-symbols.js';
 import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';

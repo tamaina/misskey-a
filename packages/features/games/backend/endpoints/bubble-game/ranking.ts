@@ -8,7 +8,7 @@ import { packedBubbleGameRankingDefinition, packedBubbleGameRankingInput, packed
 import { Inject, Injectable } from '@nestjs/common';
 import { MoreThan } from 'typeorm';
 
-import type { BubbleGameRecordsRepository } from '@/models/_.js';
+import type { BubbleGameRecordsRepository } from '@features/persistence/backend/repositories/models.js';
 import { DI } from '@/di-symbols.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 

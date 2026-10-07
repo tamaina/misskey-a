@@ -7,7 +7,7 @@ import { ContractEndpoint, projectEndpointContract } from '@features/api/backend
 import { packedPinnedUsersDefinition, packedPinnedUsersInput, packedPinnedUsersOutput } from '../../contract/packed-endpoint-definitions.js';
 import { IsNull } from 'typeorm';
 import { Inject, Injectable } from '@nestjs/common';
-import type { MiMeta, UsersRepository } from '@/models/_.js';
+import type { MiMeta, UsersRepository } from '@features/persistence/backend/repositories/models.js';
 import * as Acct from '@/misc/acct.js';
 import type { MiUser } from '@features/users/backend/models/User.js';
 

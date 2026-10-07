@@ -14,7 +14,7 @@ import { bindThis } from '@/decorators.js';
 import { DI } from '@/di-symbols.js';
 import * as Acct from '@/misc/acct.js';
 import type { Packed } from '@features/index/contract/packed.js';
-import type { AntennasRepository, UserListMembershipsRepository } from '@/models/_.js';
+import type { AntennasRepository, UserListMembershipsRepository } from '@features/persistence/backend/repositories/models.js';
 import type { MiAntenna } from '../models/Antenna.js';
 import type { MiNote } from '@features/notes/backend/models/Note.js';
 import type { MiUser } from '@features/users/backend/models/User.js';

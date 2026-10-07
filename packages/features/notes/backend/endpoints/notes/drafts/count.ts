@@ -7,7 +7,7 @@ import { ContractEndpoint, projectEndpointContract } from '@features/api/backend
 import { inlineNotesDraftsCountDefinition, inlineNotesDraftsCountInput, inlineNotesDraftsCountOutput } from '../../../../contract/endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
 
-import type { NoteDraftsRepository } from '@/models/_.js';
+import type { NoteDraftsRepository } from '@features/persistence/backend/repositories/models.js';
 import { DI } from '@/di-symbols.js';
 
 const contractProjection = projectEndpointContract(inlineNotesDraftsCountDefinition);

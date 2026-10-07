@@ -11,7 +11,7 @@ import * as htmlParser from 'node-html-parser';
 import { extractCustomEmojisFromMfm } from '@/misc/extract-custom-emojis-from-mfm.js';
 import { extractHashtags } from '@/misc/extract-hashtags.js';
 import * as Acct from '@/misc/acct.js';
-import type { UsersRepository, DriveFilesRepository, MiMeta, UserProfilesRepository, PagesRepository } from '@/models/_.js';
+import type { UsersRepository, DriveFilesRepository, MiMeta, UserProfilesRepository, PagesRepository } from '@features/persistence/backend/repositories/models.js';
 import type { MiLocalUser, MiUser } from '../../models/User.js';
 import type { MiUserProfile } from '../../models/UserProfile.js';
 import { normalizeForSearch } from '@/misc/normalize-for-search.js';

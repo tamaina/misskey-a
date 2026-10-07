@@ -5,7 +5,7 @@
 
 import { expect, test, vi } from 'vitest';
 import { DataSource } from 'typeorm';
-import { entities } from '@/postgres.js';
+import { entities } from '@features/persistence/backend/postgres.js';
 import { QueryService } from '@features/notes/backend/services/QueryService.js';
 import { MiFollowing } from '@features/relationships/backend/models/Following.js';
 import { MiUserProfile } from '@features/users/backend/models/UserProfile.js';

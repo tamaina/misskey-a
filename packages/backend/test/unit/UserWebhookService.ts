@@ -8,7 +8,7 @@ import type { Mocked } from 'vitest';
 import { Test, TestingModule } from '@nestjs/testing';
 import { randomString } from '../utils.js';
 import { MiUser } from '@features/users/backend/models/User.js';
-import { MiWebhook, UsersRepository, WebhooksRepository } from '@/models/_.js';
+import { MiWebhook, UsersRepository, WebhooksRepository } from '@features/persistence/backend/repositories/models.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { GlobalModule } from '@/GlobalModule.js';
 import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';

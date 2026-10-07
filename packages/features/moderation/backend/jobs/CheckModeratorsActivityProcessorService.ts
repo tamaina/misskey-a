@@ -10,7 +10,7 @@ import { bindThis } from '@/decorators.js';
 import { MetaService } from '@features/instance/backend/services/MetaService.js';
 import { RoleService } from '@features/roles/backend/services/RoleService.js';
 import { EmailService } from '@features/email/backend/services/EmailService.js';
-import { MiUser, type UserProfilesRepository } from '@/models/_.js';
+import { MiUser, type UserProfilesRepository } from '@features/persistence/backend/repositories/models.js';
 import { DI } from '@/di-symbols.js';
 import { SystemWebhookService } from '@features/integrations/backend/services/SystemWebhookService.js';
 import { AnnouncementService } from '@features/announcements/backend/services/AnnouncementService.js';

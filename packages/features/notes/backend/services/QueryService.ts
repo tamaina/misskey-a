@@ -7,7 +7,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { Brackets, ObjectLiteral } from 'typeorm';
 import { DI } from '@/di-symbols.js';
 import type { MiUser } from '@features/users/backend/models/User.js';
-import type { UserProfilesRepository, FollowingsRepository, ChannelFollowingsRepository, BlockingsRepository, NoteThreadMutingsRepository, MutingsRepository, RenoteMutingsRepository, MiMeta } from '@/models/_.js';
+import type { UserProfilesRepository, FollowingsRepository, ChannelFollowingsRepository, BlockingsRepository, NoteThreadMutingsRepository, MutingsRepository, RenoteMutingsRepository, MiMeta } from '@features/persistence/backend/repositories/models.js';
 import { bindThis } from '@/decorators.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 import type { SelectQueryBuilder } from 'typeorm';

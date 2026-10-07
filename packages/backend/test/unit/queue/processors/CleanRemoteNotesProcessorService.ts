@@ -17,7 +17,7 @@ import {
 	type UsersRepository,
 	type UserProfilesRepository,
 	MiMeta,
-} from '@/models/_.js';
+} from '@features/persistence/backend/repositories/models.js';
 import { CleanRemoteNotesProcessorService } from '@/queue/processors/CleanRemoteNotesProcessorService.js';
 import { DI } from '@/di-symbols.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';

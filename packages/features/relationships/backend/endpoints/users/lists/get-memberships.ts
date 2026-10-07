@@ -6,7 +6,7 @@
 import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
 import { packedUsersListsGetMembershipsDefinition, packedUsersListsGetMembershipsInput, packedUsersListsGetMembershipsOutput } from '../../../../contract/packed-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
-import type { UserListsRepository, UserListFavoritesRepository, UserListMembershipsRepository } from '@/models/_.js';
+import type { UserListsRepository, UserListFavoritesRepository, UserListMembershipsRepository } from '@features/persistence/backend/repositories/models.js';
 
 import { UserListEntityService } from '../../../serializers/UserListEntityService.js';
 import { DI } from '@/di-symbols.js';

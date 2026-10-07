@@ -12,7 +12,7 @@ import { sharpBmp } from '@misskey-dev/sharp-read-bmp';
 import { In, IsNull } from 'typeorm';
 import { DeleteObjectCommandInput, PutObjectCommandInput, NoSuchKey } from '@aws-sdk/client-s3';
 import { DI } from '@/di-symbols.js';
-import type { DriveFilesRepository, UsersRepository, DriveFoldersRepository, UserProfilesRepository, MiMeta } from '@/models/_.js';
+import type { DriveFilesRepository, UsersRepository, DriveFoldersRepository, UserProfilesRepository, MiMeta } from '@features/persistence/backend/repositories/models.js';
 import type { Config } from '@/config.js';
 import { Logger } from '@features/runtime/backend/logging/logger.js';
 import type { MiRemoteUser, MiUser } from '@features/users/backend/models/User.js';

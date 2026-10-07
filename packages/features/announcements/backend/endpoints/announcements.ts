@@ -11,7 +11,7 @@ import { Brackets } from 'typeorm';
 import { QueryService } from '@features/notes/backend/services/QueryService.js';
 import { AnnouncementEntityService } from '../serializers/AnnouncementEntityService.js';
 import { DI } from '@/di-symbols.js';
-import type { AnnouncementsRepository } from '@/models/_.js';
+import type { AnnouncementsRepository } from '@features/persistence/backend/repositories/models.js';
 
 const contractProjection = projectEndpointContract(packedAnnouncementsDefinition);
 

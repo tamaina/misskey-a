@@ -24,7 +24,7 @@ import {
 	type MiChannel,
 	type MiNote,
 	type MiUser,
-} from '@/models/_.js';
+} from '@features/persistence/backend/repositories/models.js';
 
 describe('SearchService', () => {
 	type TestContext = {

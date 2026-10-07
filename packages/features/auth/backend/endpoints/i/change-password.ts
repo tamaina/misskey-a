@@ -8,7 +8,7 @@ import { voidIChangePasswordDefinition, voidIChangePasswordInput, voidIChangePas
 import bcrypt from 'bcryptjs';
 import { Inject, Injectable } from '@nestjs/common';
 
-import type { UserProfilesRepository } from '@/models/_.js';
+import type { UserProfilesRepository } from '@features/persistence/backend/repositories/models.js';
 import { DI } from '@/di-symbols.js';
 import { UserAuthService } from '../../services/UserAuthService.js';
 

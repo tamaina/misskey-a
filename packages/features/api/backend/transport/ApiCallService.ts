@@ -12,7 +12,7 @@ import { getIpHash } from '@features/auth/backend/utility/get-ip-hash.js';
 import type { MiLocalUser, MiUser } from '@features/users/backend/models/User.js';
 import type { MiAccessToken } from '@features/auth/backend/models/AccessToken.js';
 import type { Logger } from '@features/runtime/backend/logging/logger.js';
-import type { MiMeta, UserIpsRepository } from '@/models/_.js';
+import type { MiMeta, UserIpsRepository } from '@features/persistence/backend/repositories/models.js';
 import { createTemp } from '@features/runtime/backend/io/create-temp.js';
 import { bindThis } from '@/decorators.js';
 import { RoleService } from '@features/roles/backend/services/RoleService.js';

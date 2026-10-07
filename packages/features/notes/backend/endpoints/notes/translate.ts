@@ -12,7 +12,7 @@ import { NoteEntityService } from '../../serializers/NoteEntityService.js';
 import { HttpRequestService } from '@features/runtime/backend/services/HttpRequestService.js';
 import { GetterService } from '@features/api/backend/transport/GetterService.js';
 import { RoleService } from '@features/roles/backend/services/RoleService.js';
-import { MiMeta } from '@/models/_.js';
+import { MiMeta } from '@features/persistence/backend/repositories/models.js';
 import { DI } from '@/di-symbols.js';
 import { ApiError } from '@features/api/backend/transport/error.js';
 

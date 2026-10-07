@@ -4,7 +4,7 @@
  */
 
 import { Brackets } from 'typeorm';
-import { type FlashLikesRepository, MiUser, type FlashsRepository } from '@/models/_.js';
+import { type FlashLikesRepository, MiUser, type FlashsRepository } from '@features/persistence/backend/repositories/models.js';
 import type { QueryService } from '@features/notes/backend/services/QueryService.js';
 import { sqlLikeEscape } from '@features/persistence/backend/utility/sql-like-escape.js';
 

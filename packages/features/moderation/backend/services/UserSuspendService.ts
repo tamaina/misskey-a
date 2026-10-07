@@ -5,7 +5,7 @@
 
 import { Inject, Injectable } from '@nestjs/common';
 import { Not, IsNull } from 'typeorm';
-import type { FollowingsRepository, FollowRequestsRepository, UsersRepository } from '@/models/_.js';
+import type { FollowingsRepository, FollowRequestsRepository, UsersRepository } from '@features/persistence/backend/repositories/models.js';
 import type { MiUser } from '@features/users/backend/models/User.js';
 import { QueueService } from '@features/runtime/backend/services/QueueService.js';
 import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';

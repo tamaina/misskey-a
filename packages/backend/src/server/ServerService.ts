@@ -13,7 +13,7 @@ import fastifyRawBody from 'fastify-raw-body';
 import { IsNull } from 'typeorm';
 import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
 import type { Config } from '@/config.js';
-import type { EmojisRepository, MiMeta, UserProfilesRepository, UsersRepository } from '@/models/_.js';
+import type { EmojisRepository, MiMeta, UserProfilesRepository, UsersRepository } from '@features/persistence/backend/repositories/models.js';
 import { DI } from '@/di-symbols.js';
 import type { Logger } from '@features/runtime/backend/logging/logger.js';
 import * as Acct from '@/misc/acct.js';

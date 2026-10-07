@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import type { ClipNotesRepository, ClipFavoritesRepository, ClipsRepository, MiUser } from '@/models/_.js';
+import type { ClipNotesRepository, ClipFavoritesRepository, ClipsRepository, MiUser } from '@features/persistence/backend/repositories/models.js';
 import { awaitAll } from '@features/runtime/backend/async/await-all.js';
 import type { Packed } from '@features/index/contract/packed.js';
 import type { } from '@features/relationships/backend/models/Blocking.js';

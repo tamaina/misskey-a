@@ -9,7 +9,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import * as Redis from 'ioredis';
 import * as WebSocket from 'ws';
 import { DI } from '@/di-symbols.js';
-import type { MiAccessToken } from '@/models/_.js';
+import type { MiAccessToken } from '@features/persistence/backend/repositories/models.js';
 import { bindThis } from '@/decorators.js';
 import { MiLocalUser } from '@features/users/backend/models/User.js';
 import { UserService } from '@features/users/backend/services/UserService.js';

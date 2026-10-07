@@ -13,8 +13,8 @@ import type { JsonObject, JsonValue } from '@features/runtime/backend/formatting
 import { ChannelMutingService } from '@features/channels/backend/services/ChannelMutingService.js';
 import { ChannelFollowingService } from '@features/channels/backend/services/ChannelFollowingService.js';
 import type { GlobalEvents, StreamEventEmitter } from '@features/runtime/backend/services/GlobalEventService.js';
-import { MiFollowing, MiUserProfile } from '@/models/_.js';
-import type { MiMeta } from '@/models/_.js';
+import { MiFollowing, MiUserProfile } from '@features/persistence/backend/repositories/models.js';
+import type { MiMeta } from '@features/persistence/backend/repositories/models.js';
 import { CacheService } from '@features/users/backend/services/CacheService.js';
 import { bindThis } from '@/decorators.js';
 import { NotificationService } from '@features/notifications/backend/services/NotificationService.js';

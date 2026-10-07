@@ -6,7 +6,7 @@
 import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
 import { inlineNotesStateDefinition, inlineNotesStateInput, inlineNotesStateOutput } from '../../../contract/endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
-import type { NotesRepository, NoteThreadMutingsRepository, NoteFavoritesRepository } from '@/models/_.js';
+import type { NotesRepository, NoteThreadMutingsRepository, NoteFavoritesRepository } from '@features/persistence/backend/repositories/models.js';
 
 import { DI } from '@/di-symbols.js';
 

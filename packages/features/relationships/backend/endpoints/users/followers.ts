@@ -7,7 +7,7 @@ import { ContractEndpoint, projectEndpointContract } from '@features/api/backend
 import { allOfUsersFollowersDefinition, allOfUsersFollowersInput, allOfUsersFollowersOutput } from '../../../contract/selector-common-endpoint-definitions.js';
 import { IsNull } from 'typeorm';
 import { Inject, Injectable } from '@nestjs/common';
-import type { UsersRepository, FollowingsRepository, UserProfilesRepository } from '@/models/_.js';
+import type { UsersRepository, FollowingsRepository, UserProfilesRepository } from '@features/persistence/backend/repositories/models.js';
 import { QueryService } from '@features/notes/backend/services/QueryService.js';
 import { FollowingEntityService } from '../../serializers/FollowingEntityService.js';
 import { UtilityService } from '@features/federation/backend/services/UtilityService.js';

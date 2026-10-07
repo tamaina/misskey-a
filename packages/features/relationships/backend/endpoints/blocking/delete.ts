@@ -8,7 +8,7 @@ import { packedBlockingDeleteDefinition, packedBlockingDeleteInput, packedBlocki
 import ms from 'ms';
 import { Inject, Injectable } from '@nestjs/common';
 
-import type { UsersRepository, BlockingsRepository } from '@/models/_.js';
+import type { UsersRepository, BlockingsRepository } from '@features/persistence/backend/repositories/models.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import { UserBlockingService } from '../../services/UserBlockingService.js';
 import { DI } from '@/di-symbols.js';

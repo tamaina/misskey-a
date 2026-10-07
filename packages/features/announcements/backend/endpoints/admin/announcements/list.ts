@@ -6,7 +6,7 @@
 import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
 import { inlineAdminAnnouncementsListDefinition, inlineAdminAnnouncementsListInput, inlineAdminAnnouncementsListOutput } from '../../../../contract/endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
-import type { AnnouncementsRepository, AnnouncementReadsRepository } from '@/models/_.js';
+import type { AnnouncementsRepository, AnnouncementReadsRepository } from '@features/persistence/backend/repositories/models.js';
 import type { MiAnnouncement } from '../../../models/Announcement.js';
 
 import { QueryService } from '@features/notes/backend/services/QueryService.js';

@@ -44,7 +44,7 @@ import * as endpoint11 from '@features/statistics/backend/endpoints/charts/users
 import * as chartEntity11 from '@features/statistics/backend/charts/definitions/users.js';
 
 // Collection instances are never created. Only the real schemaToEntity metadata generator runs.
-vi.mock('@/models/_.js', () => ({ miRepository: {} }));
+vi.mock('@features/persistence/backend/repositories/models.js', () => ({ miRepository: {} }));
 // Restrict documentation input to these real chart endpoint modules, avoiding unrelated endpoints.
 vi.mock('./endpoints.js', () => ({ default: [] }));
 vi.mock('@features/statistics/backend/charts/active-users.js', () => ({ ActiveUsersChart: class {} }));

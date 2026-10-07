@@ -7,7 +7,7 @@ import { ContractEndpoint, projectEndpointContract } from '@features/api/backend
 import { packedNotesDraftsListDefinition, packedNotesDraftsListInput, packedNotesDraftsListOutput } from '../../../../contract/packed-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
 
-import type { MiNoteDraft, NoteDraftsRepository } from '@/models/_.js';
+import type { MiNoteDraft, NoteDraftsRepository } from '@features/persistence/backend/repositories/models.js';
 import { DI } from '@/di-symbols.js';
 import { QueryService } from '../../../services/QueryService.js';
 import { NoteDraftEntityService } from '../../../serializers/NoteDraftEntityService.js';

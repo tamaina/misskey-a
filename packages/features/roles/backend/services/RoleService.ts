@@ -14,7 +14,7 @@ import type {
 	RoleAssignmentsRepository,
 	RolesRepository,
 	UsersRepository,
-} from '@/models/_.js';
+} from '@features/persistence/backend/repositories/models.js';
 import { MemoryKVCache, MemorySingleCache } from '@features/runtime/backend/cache/cache.js';
 import type { MiUser } from '@features/users/backend/models/User.js';
 import type { Config } from '@/config.js';

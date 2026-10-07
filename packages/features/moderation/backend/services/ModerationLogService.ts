@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import type { ModerationLogsRepository } from '@/models/_.js';
+import type { ModerationLogsRepository } from '@features/persistence/backend/repositories/models.js';
 import { bindThis } from '@/decorators.js';
 import type { ModerationLogPayloads } from '@/types.js';
 import { moderationLogTypes } from '@/types.js';

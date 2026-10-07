@@ -5,7 +5,7 @@
 
 import { Brackets, EntityNotFoundError } from 'typeorm';
 import type { MiUser } from '@features/users/backend/models/User.js';
-import type { AnnouncementReadsRepository, AnnouncementsRepository, MiAnnouncement, MiAnnouncementRead, UsersRepository } from '@/models/_.js';
+import type { AnnouncementReadsRepository, AnnouncementsRepository, MiAnnouncement, MiAnnouncementRead, UsersRepository } from '@features/persistence/backend/repositories/models.js';
 import { bindThis } from '@/decorators.js';
 import { Packed } from '@features/index/contract/packed.js';
 import type { IdService } from '@features/runtime/backend/services/IdService.js';

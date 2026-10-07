@@ -5,8 +5,8 @@
 
 // Checked by the backend typecheck against actual constructors and
 // RepositorySet tokens, including narrow factory inputs and invalid bindings.
-import type { MiSystemWebhook, SystemWebhooksRepository } from '@/models/_.js';
-import type { RepositorySet } from '@/models/repository-factory.js';
+import type { MiSystemWebhook, SystemWebhooksRepository } from '@features/persistence/backend/repositories/models.js';
+import type { RepositorySet } from '@features/persistence/backend/repositories/factory.js';
 import { authSecurityServices, authServices } from '@features/auth/backend/services.js';
 import { channelServices } from '@features/channels/backend/services.js';
 import { discoveryServices, rankingServices, userSearchServices } from '@features/discovery/backend/services.js';

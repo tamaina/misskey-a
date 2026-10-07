@@ -5,7 +5,7 @@
 
 import { Inject, Injectable } from '@nestjs/common';
 import { DI } from '@/di-symbols.js';
-import type { NoteReactionsRepository } from '@/models/_.js';
+import type { NoteReactionsRepository } from '@features/persistence/backend/repositories/models.js';
 import type { Packed } from '@features/index/contract/packed.js';
 import { bindThis } from '@/decorators.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';

@@ -7,7 +7,7 @@ import { ContractEndpoint, projectEndpointContract } from '@features/api/backend
 import { referenceAdminRolesUsersDefinition, referenceAdminRolesUsersInput, referenceAdminRolesUsersOutput } from '../../../../contract/reference-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
 import { Brackets } from 'typeorm';
-import type { RoleAssignmentsRepository, RolesRepository } from '@/models/_.js';
+import type { RoleAssignmentsRepository, RolesRepository } from '@features/persistence/backend/repositories/models.js';
 import { QueryService } from '@features/notes/backend/services/QueryService.js';
 import { DI } from '@/di-symbols.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';

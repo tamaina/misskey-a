@@ -18,7 +18,7 @@ import type {
 	MiAnnouncement,
 	MiUser,
 	UsersRepository,
-} from '@/models/_.js';
+} from '@features/persistence/backend/repositories/models.js';
 import { DI } from '@/di-symbols.js';
 import { genAidx } from '@features/runtime/backend/id/aidx.js';
 import { CacheService } from '@features/users/backend/services/CacheService.js';

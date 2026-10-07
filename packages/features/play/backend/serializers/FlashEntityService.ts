@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import type { FlashLikesRepository, FlashsRepository } from '@/models/_.js';
+import type { FlashLikesRepository, FlashsRepository } from '@features/persistence/backend/repositories/models.js';
 import type { Packed } from '@features/index/contract/packed.js';
 import type { MiUser } from '@features/users/backend/models/User.js';
 import type { MiFlash } from '../models/Flash.js';

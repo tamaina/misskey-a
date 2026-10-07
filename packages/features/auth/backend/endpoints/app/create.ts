@@ -6,7 +6,7 @@
 import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
 import { uniqueAppCreateDefinition, uniqueAppCreateInput, uniqueAppCreateOutput } from '../../../contract/unique-string-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
-import type { AppsRepository } from '@/models/_.js';
+import type { AppsRepository } from '@features/persistence/backend/repositories/models.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { unique } from '@features/runtime/backend/data/array.js';
 import { secureRndstr } from '../../utility/secure-rndstr.js';

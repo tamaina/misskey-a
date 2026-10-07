@@ -4,7 +4,7 @@
  */
 
 import { In } from 'typeorm';
-import type { AbuseReportNotificationRecipientRepository, MiAbuseReportNotificationRecipient } from '@/models/_.js';
+import type { AbuseReportNotificationRecipientRepository, MiAbuseReportNotificationRecipient } from '@features/persistence/backend/repositories/models.js';
 import { bindThis } from '@/decorators.js';
 import type { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import { Packed } from '@features/index/contract/packed.js';

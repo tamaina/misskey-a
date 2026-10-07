@@ -5,7 +5,7 @@
 
 import { Inject, Injectable } from '@nestjs/common';
 import type { MiUser } from '@features/users/backend/models/User.js';
-import type { RelaysRepository } from '@/models/_.js';
+import type { RelaysRepository } from '@features/persistence/backend/repositories/models.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { MemorySingleCache } from '@features/runtime/backend/cache/cache.js';
 import type { MiRelay } from '../models/Relay.js';

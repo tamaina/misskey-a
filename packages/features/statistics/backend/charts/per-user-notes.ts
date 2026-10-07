@@ -9,7 +9,7 @@ import * as Redis from 'ioredis';
 import type { MiUser } from '@features/users/backend/models/User.js';
 import type { MiNote } from '@features/notes/backend/models/Note.js';
 import { DI } from '@/di-symbols.js';
-import type { NotesRepository } from '@/models/_.js';
+import type { NotesRepository } from '@features/persistence/backend/repositories/models.js';
 import { bindThis } from '@/decorators.js';
 import { acquireChartInsertLock } from '@features/runtime/backend/cache/distributed-lock.js';
 import Chart from './core.js';

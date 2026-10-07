@@ -4,7 +4,7 @@
  */
 
 import * as fs from 'node:fs';
-import type { DriveFilesRepository, MiDriveFile } from '@/models/_.js';
+import type { DriveFilesRepository, MiDriveFile } from '@features/persistence/backend/repositories/models.js';
 import { createTemp } from '@features/runtime/backend/io/create-temp.js';
 import type { DownloadService } from '@features/runtime/backend/services/DownloadService.js';
 import type { FileInfoService } from '@features/media/backend/services/FileInfoService.js';

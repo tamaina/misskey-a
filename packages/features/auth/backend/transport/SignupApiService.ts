@@ -7,7 +7,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import bcrypt from 'bcryptjs';
 import { IsNull, LessThanOrEqual } from 'typeorm';
 import { DI } from '@/di-symbols.js';
-import type { RegistrationTicketsRepository, UsedUsernamesRepository, UserPendingsRepository, UserProfilesRepository, UsersRepository, MiRegistrationTicket, MiMeta } from '@/models/_.js';
+import type { RegistrationTicketsRepository, UsedUsernamesRepository, UserPendingsRepository, UserProfilesRepository, UsersRepository, MiRegistrationTicket, MiMeta } from '@features/persistence/backend/repositories/models.js';
 import type { Config } from '@/config.js';
 import { CaptchaService } from '@features/auth/backend/services/CaptchaService.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';

@@ -9,7 +9,7 @@ import { Inject, Injectable } from '@nestjs/common';
 
 import { QueryService } from '@features/notes/backend/services/QueryService.js';
 import { PageEntityService } from '../../serializers/PageEntityService.js';
-import type { PagesRepository } from '@/models/_.js';
+import type { PagesRepository } from '@features/persistence/backend/repositories/models.js';
 import { DI } from '@/di-symbols.js';
 
 const contractProjection = projectEndpointContract(packedUsersPagesDefinition);

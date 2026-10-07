@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import type { MiGalleryPost, MiNote, MiUser } from '@/models/_.js';
+import type { MiGalleryPost, MiNote, MiUser } from '@features/persistence/backend/repositories/models.js';
 import { bindThis } from '@/decorators.js';
 import type * as Redis from 'ioredis';
 

@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import type { AntennasRepository } from '@/models/_.js';
+import type { AntennasRepository } from '@features/persistence/backend/repositories/models.js';
 import type { Packed } from '@features/index/contract/packed.js';
 import type { MiAntenna } from '../models/Antenna.js';
 import { bindThis } from '@/decorators.js';

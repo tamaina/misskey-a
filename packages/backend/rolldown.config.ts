@@ -160,7 +160,7 @@ export default defineConfig((args) => {
 				entry: './src/boot/entry.ts',
 				cli: './src/boot/cli.ts',
 				config: './src/config.ts',
-				postgres: './src/postgres.ts',
+				postgres: '../features/persistence/backend/postgres.ts',
 				'gen-spec': '../features/api/backend/transport/openapi/gen-spec.ts',
 				...Object.fromEntries([...globSync('../features/*/{backend,shared}/index.ts')].map(file => [
 					file.replace('../', '').replace('/index.ts', ''), file,

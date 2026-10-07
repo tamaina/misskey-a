@@ -8,7 +8,7 @@ import { inlineAuthSessionGenerateDefinition, inlineAuthSessionGenerateInput, in
 import { randomUUID } from 'node:crypto';
 import { Inject, Injectable } from '@nestjs/common';
 
-import type { AppsRepository, AuthSessionsRepository } from '@/models/_.js';
+import type { AppsRepository, AuthSessionsRepository } from '@features/persistence/backend/repositories/models.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 import type { Config } from '@/config.js';
 import { DI } from '@/di-symbols.js';

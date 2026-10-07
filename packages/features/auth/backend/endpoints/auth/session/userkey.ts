@@ -7,7 +7,7 @@ import { ContractEndpoint, projectEndpointContract } from '@features/api/backend
 import { packedAuthSessionUserkeyDefinition, packedAuthSessionUserkeyInput, packedAuthSessionUserkeyOutput } from '../../../../contract/packed-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
 
-import type { AppsRepository, AccessTokensRepository, AuthSessionsRepository } from '@/models/_.js';
+import type { AppsRepository, AccessTokensRepository, AuthSessionsRepository } from '@features/persistence/backend/repositories/models.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import { DI } from '@/di-symbols.js';
 import { ApiError } from '@features/api/backend/transport/error.js';

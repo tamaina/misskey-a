@@ -8,7 +8,7 @@ import { voidRequestResetPasswordDefinition, voidRequestResetPasswordInput, void
 import ms from 'ms';
 import { IsNull } from 'typeorm';
 import { Inject, Injectable } from '@nestjs/common';
-import type { PasswordResetRequestsRepository, UserProfilesRepository, UsersRepository } from '@/models/_.js';
+import type { PasswordResetRequestsRepository, UserProfilesRepository, UsersRepository } from '@features/persistence/backend/repositories/models.js';
 
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 import type { Config } from '@/config.js';

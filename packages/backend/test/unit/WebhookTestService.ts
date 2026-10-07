@@ -11,7 +11,7 @@ import { WebhookTestService } from '@features/integrations/backend/services/Webh
 import { UserWebhookPayload, UserWebhookService } from '@features/integrations/backend/services/UserWebhookService.js';
 import { SystemWebhookService } from '@features/integrations/backend/services/SystemWebhookService.js';
 import { GlobalModule } from '@/GlobalModule.js';
-import { MiSystemWebhook, MiUser, MiWebhook, UserProfilesRepository, UsersRepository } from '@/models/_.js';
+import { MiSystemWebhook, MiUser, MiWebhook, UserProfilesRepository, UsersRepository } from '@features/persistence/backend/repositories/models.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { DI } from '@/di-symbols.js';
 import { QueueService } from '@features/runtime/backend/services/QueueService.js';

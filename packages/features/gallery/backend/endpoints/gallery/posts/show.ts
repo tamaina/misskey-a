@@ -7,7 +7,7 @@ import { ContractEndpoint, projectEndpointContract } from '@features/api/backend
 import { packedGalleryPostsShowDefinition, packedGalleryPostsShowInput, packedGalleryPostsShowOutput } from '../../../../contract/packed-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
 
-import type { GalleryPostsRepository } from '@/models/_.js';
+import type { GalleryPostsRepository } from '@features/persistence/backend/repositories/models.js';
 import { GalleryPostEntityService } from '../../../serializers/GalleryPostEntityService.js';
 import { DI } from '@/di-symbols.js';
 import { ApiError } from '@features/api/backend/transport/error.js';

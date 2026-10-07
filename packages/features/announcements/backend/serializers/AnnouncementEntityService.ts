@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import type { AnnouncementsRepository, AnnouncementReadsRepository, MiAnnouncement, MiUser } from '@/models/_.js';
+import type { AnnouncementsRepository, AnnouncementReadsRepository, MiAnnouncement, MiUser } from '@features/persistence/backend/repositories/models.js';
 import type { Packed } from '@features/index/contract/packed.js';
 import { bindThis } from '@/decorators.js';
 import type { IdService } from '@features/runtime/backend/services/IdService.js';

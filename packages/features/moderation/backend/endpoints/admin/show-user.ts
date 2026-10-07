@@ -4,7 +4,7 @@
  */
 
 import { Inject, Injectable } from '@nestjs/common';
-import type { UsersRepository, SigninsRepository, UserProfilesRepository } from '@/models/_.js';
+import type { UsersRepository, SigninsRepository, UserProfilesRepository } from '@features/persistence/backend/repositories/models.js';
 import { LegacyAdminUserProducerEndpoint, legacyAdminShowUserMeta, legacyAdminShowUserParamDef } from '../../legacy-admin-user-producer-endpoint.js';
 import { DI } from '@/di-symbols.js';
 import { RoleService } from '@features/roles/backend/services/RoleService.js';

@@ -8,7 +8,7 @@ import { voidUsersUpdateMemoDefinition, voidUsersUpdateMemoInput, voidUsersUpdat
 import { Inject, Injectable } from '@nestjs/common';
 
 import { IdService } from '@features/runtime/backend/services/IdService.js';
-import type { UserMemoRepository } from '@/models/_.js';
+import type { UserMemoRepository } from '@features/persistence/backend/repositories/models.js';
 import { DI } from '@/di-symbols.js';
 import { GetterService } from '@features/api/backend/transport/GetterService.js';
 import { ApiError } from '@features/api/backend/transport/error.js';

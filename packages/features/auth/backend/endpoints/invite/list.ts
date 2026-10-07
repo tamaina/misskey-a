@@ -7,7 +7,7 @@ import { ContractEndpoint, projectEndpointContract } from '@features/api/backend
 import { packedInviteListDefinition, packedInviteListInput, packedInviteListOutput } from '../../../contract/packed-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
 
-import type { RegistrationTicketsRepository } from '@/models/_.js';
+import type { RegistrationTicketsRepository } from '@features/persistence/backend/repositories/models.js';
 import { InviteCodeEntityService } from '../../serializers/InviteCodeEntityService.js';
 import { QueryService } from '@features/notes/backend/services/QueryService.js';
 import { DI } from '@/di-symbols.js';

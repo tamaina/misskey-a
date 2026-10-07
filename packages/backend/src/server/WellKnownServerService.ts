@@ -8,7 +8,7 @@ import { IsNull } from 'typeorm';
 import vary from 'vary';
 import fastifyAccepts from '@fastify/accepts';
 import { DI } from '@/di-symbols.js';
-import type { MiMeta, UsersRepository } from '@/models/_.js';
+import type { MiMeta, UsersRepository } from '@features/persistence/backend/repositories/models.js';
 import type { Config } from '@/config.js';
 import { escapeAttribute, escapeValue } from '@features/runtime/backend/formatting/xml.js';
 import type { MiUser } from '@features/users/backend/models/User.js';

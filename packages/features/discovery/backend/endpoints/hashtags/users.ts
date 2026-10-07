@@ -7,7 +7,7 @@ import { ContractEndpoint, projectEndpointContract } from '@features/api/backend
 import { packedHashtagsUsersDefinition, packedHashtagsUsersInput, packedHashtagsUsersOutput } from '../../../contract/packed-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
 
-import type { UsersRepository } from '@/models/_.js';
+import type { UsersRepository } from '@features/persistence/backend/repositories/models.js';
 import { safeForSql } from "@features/persistence/backend/utility/safe-for-sql.js";
 import { normalizeForSearch } from '@/misc/normalize-for-search.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';

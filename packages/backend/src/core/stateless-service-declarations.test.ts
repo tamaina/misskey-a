@@ -10,7 +10,7 @@ import { describe, expect, test, vi } from 'vitest';
 import { mockDeep } from 'vitest-mock-extended';
 import sharp from 'sharp';
 import { DI } from '@/di-symbols.js';
-import type { MiRegistryItem } from '@/models/_.js';
+import type { MiRegistryItem } from '@features/persistence/backend/repositories/models.js';
 import { mediaServices } from '@features/media/backend/services.js';
 import { markupServices } from '@features/markup/backend/services.js';
 import { preferencesServices } from '@features/preferences/backend/services.js';

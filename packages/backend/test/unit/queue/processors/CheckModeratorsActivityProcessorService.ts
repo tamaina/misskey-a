@@ -9,7 +9,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import * as lolex from '@sinonjs/fake-timers';
 import { addHours, addSeconds, subDays, subHours, subSeconds } from 'date-fns';
 import { CheckModeratorsActivityProcessorService } from '@features/moderation/backend/jobs/CheckModeratorsActivityProcessorService.js';
-import { MiSystemWebhook, MiUser, MiUserProfile, UserProfilesRepository, UsersRepository } from '@/models/_.js';
+import { MiSystemWebhook, MiUser, MiUserProfile, UserProfilesRepository, UsersRepository } from '@features/persistence/backend/repositories/models.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { RoleService } from '@features/roles/backend/services/RoleService.js';
 import { GlobalModule } from '@/GlobalModule.js';

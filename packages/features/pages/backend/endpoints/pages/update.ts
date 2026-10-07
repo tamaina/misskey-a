@@ -7,7 +7,7 @@ import { ContractEndpoint, projectEndpointContract } from '@features/api/backend
 import { portablePagesUpdateDefinition, portablePagesUpdateInput, portablePagesUpdateOutput } from '../../../contract/portable-constant-endpoint-definitions.js';
 import ms from 'ms';
 import { Inject, Injectable } from '@nestjs/common';
-import type { DriveFilesRepository, MiDriveFile } from '@/models/_.js';
+import type { DriveFilesRepository, MiDriveFile } from '@features/persistence/backend/repositories/models.js';
 import { DI } from '@/di-symbols.js';
 import { ApiError } from '@features/api/backend/transport/error.js';
 import { IdentifiableError } from '@features/runtime/backend/errors/identifiable-error.js';

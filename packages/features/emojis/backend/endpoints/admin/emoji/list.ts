@@ -7,7 +7,7 @@ import { ContractEndpoint, projectEndpointContract } from '@features/api/backend
 import { packedAdminEmojiListDefinition, packedAdminEmojiListInput, packedAdminEmojiListOutput } from '../../../../contract/packed-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
 
-import type { EmojisRepository } from '@/models/_.js';
+import type { EmojisRepository } from '@features/persistence/backend/repositories/models.js';
 import type { MiEmoji } from '../../../models/Emoji.js';
 import { QueryService } from '@features/notes/backend/services/QueryService.js';
 import { DI } from '@/di-symbols.js';

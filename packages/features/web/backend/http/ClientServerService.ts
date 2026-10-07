@@ -33,7 +33,7 @@ import type {
 	ReversiGamesRepository,
 	UserProfilesRepository,
 	UsersRepository,
-} from '@/models/_.js';
+} from '@features/persistence/backend/repositories/models.js';
 import type { Logger } from '@features/runtime/backend/logging/logger.js';
 import { handleRequestRedirectToOmitSearch } from '@features/runtime/backend/http/fastify-hook-handlers.js';
 import { htmlSafeJsonStringify } from '@/misc/json-stringify-html-safe.js';

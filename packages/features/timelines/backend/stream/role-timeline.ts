@@ -9,7 +9,7 @@ import { bindThis } from '@/decorators.js';
 import { NoteStreamingHidingService } from '@features/api/backend/transport/stream/NoteStreamingHidingService.js';
 import { isRenotePacked, isQuotePacked } from '@/misc/is-renote.js';
 import { DI } from '@/di-symbols.js';
-import type { RolesRepository } from '@/models/_.js';
+import type { RolesRepository } from '@features/persistence/backend/repositories/models.js';
 import type { GlobalEvents } from '@features/runtime/backend/services/GlobalEventService.js';
 import type { JsonObject } from '@features/runtime/backend/formatting/json-value.js';
 import Channel, { type ChannelRequest } from '@features/api/backend/transport/stream/channel.js';

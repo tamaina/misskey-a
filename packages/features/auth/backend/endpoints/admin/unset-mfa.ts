@@ -11,7 +11,7 @@ import { DataSource } from 'typeorm';
 import { ApiError } from '@features/api/backend/transport/error.js';
 import { MiUserProfile } from '@features/users/backend/models/UserProfile.js';
 import { MiUserSecurityKey } from '../../models/UserSecurityKey.js';
-import type { UsersRepository } from '@/models/_.js';
+import type { UsersRepository } from '@features/persistence/backend/repositories/models.js';
 import { DI } from '@/di-symbols.js';
 import { RoleService } from '@features/roles/backend/services/RoleService.js';
 import { ModerationLogService } from '@features/moderation/backend/services/ModerationLogService.js';

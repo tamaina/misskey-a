@@ -8,7 +8,7 @@ import { voidAuthAcceptDefinition, voidAuthAcceptInput, voidAuthAcceptOutput } f
 import * as crypto from 'node:crypto';
 import { Inject, Injectable } from '@nestjs/common';
 
-import type { AuthSessionsRepository, AppsRepository, AccessTokensRepository } from '@/models/_.js';
+import type { AuthSessionsRepository, AppsRepository, AccessTokensRepository } from '@features/persistence/backend/repositories/models.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { secureRndstr } from '../../utility/secure-rndstr.js';
 import { DI } from '@/di-symbols.js';

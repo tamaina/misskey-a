@@ -7,7 +7,7 @@ import { ContractEndpoint, projectEndpointContract } from '@features/api/backend
 import { packedChannelsMyFavoritesDefinition, packedChannelsMyFavoritesInput, packedChannelsMyFavoritesOutput } from '../../../contract/packed-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
 
-import type { ChannelFavoritesRepository } from '@/models/_.js';
+import type { ChannelFavoritesRepository } from '@features/persistence/backend/repositories/models.js';
 import { ChannelEntityService } from '../../serializers/ChannelEntityService.js';
 import { DI } from '@/di-symbols.js';
 

@@ -23,7 +23,7 @@ import { MfmService } from '@features/markup/backend/services/MfmService.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import { DriveFileEntityService } from '@features/drive/backend/serializers/DriveFileEntityService.js';
 import type { MiUserKeypair } from '../models/UserKeypair.js';
-import type { UsersRepository, UserProfilesRepository, NotesRepository, DriveFilesRepository, PollsRepository, MiMeta } from '@/models/_.js';
+import type { UsersRepository, UserProfilesRepository, NotesRepository, DriveFilesRepository, PollsRepository, MiMeta } from '@features/persistence/backend/repositories/models.js';
 import { bindThis } from '@/decorators.js';
 import { CustomEmojiService } from '@features/emojis/backend/services/CustomEmojiService.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';

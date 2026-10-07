@@ -6,7 +6,7 @@
 import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
 import { selectorAdminDriveShowFileDefinition, selectorAdminDriveShowFileInput, selectorAdminDriveShowFileOutput } from '../../../../contract/selector-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
-import type { DriveFilesRepository, UsersRepository } from '@/models/_.js';
+import type { DriveFilesRepository, UsersRepository } from '@features/persistence/backend/repositories/models.js';
 import { DI } from '@/di-symbols.js';
 import { RoleService } from '@features/roles/backend/services/RoleService.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';

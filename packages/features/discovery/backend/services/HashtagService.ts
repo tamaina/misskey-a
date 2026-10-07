@@ -4,7 +4,7 @@
  */
 
 import { normalizeForSearch } from '@/misc/normalize-for-search.js';
-import type { HashtagsRepository, MiMeta } from '@/models/_.js';
+import type { HashtagsRepository, MiMeta } from '@features/persistence/backend/repositories/models.js';
 import { bindThis } from '@/decorators.js';
 import type { UtilityService } from '@features/federation/backend/services/UtilityService.js';
 import { Logger } from '@features/runtime/backend/logging/logger.js';

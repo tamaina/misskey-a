@@ -9,7 +9,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import ms from 'ms';
 import bcrypt from 'bcryptjs';
 
-import type { MiMeta, UserProfilesRepository } from '@/models/_.js';
+import type { MiMeta, UserProfilesRepository } from '@features/persistence/backend/repositories/models.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import { EmailService } from '@features/email/backend/services/EmailService.js';
 import type { Config } from '@/config.js';

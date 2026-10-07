@@ -8,7 +8,7 @@ import { Ajv } from 'ajv';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
 import { Logger } from '@features/runtime/backend/logging/logger.js';
-import type { AntennasRepository } from '@/models/_.js';
+import type { AntennasRepository } from '@features/persistence/backend/repositories/models.js';
 import { DI } from '@/di-symbols.js';
 import { bindThis } from '@/decorators.js';
 import { toLegacyJsonSchema } from '@features/api/backend/index.js';

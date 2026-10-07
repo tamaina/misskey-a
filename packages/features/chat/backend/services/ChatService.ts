@@ -16,7 +16,7 @@ import { ChatEntityService } from '../serializers/ChatEntityService.js';
 import { ApRendererService } from '@features/federation/backend/services/ApRendererService.js';
 import { PushNotificationService } from '@features/notifications/backend/services/PushNotificationService.js';
 import { bindThis } from '@/decorators.js';
-import type { ChatApprovalsRepository, ChatMessagesRepository, ChatRoomInvitationsRepository, ChatRoomMembershipsRepository, ChatRoomsRepository, MiChatMessage, MiChatRoom, MiChatRoomMembership, MiDriveFile, MiUser, MutingsRepository, UsersRepository } from '@/models/_.js';
+import type { ChatApprovalsRepository, ChatMessagesRepository, ChatRoomInvitationsRepository, ChatRoomMembershipsRepository, ChatRoomsRepository, MiChatMessage, MiChatRoom, MiChatRoomMembership, MiDriveFile, MiUser, MutingsRepository, UsersRepository } from '@features/persistence/backend/repositories/models.js';
 import { UserBlockingService } from '@features/relationships/backend/services/UserBlockingService.js';
 import { QueryService } from '@features/notes/backend/services/QueryService.js';
 import { RoleService } from '@features/roles/backend/services/RoleService.js';

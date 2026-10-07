@@ -11,7 +11,7 @@ import { LegacyWebAuthnRegistrationConsumerEndpoint } from '../../../legacy-weba
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import { DI } from '@/di-symbols.js';
 import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
-import type { UserProfilesRepository, UserSecurityKeysRepository } from '@/models/_.js';
+import type { UserProfilesRepository, UserSecurityKeysRepository } from '@features/persistence/backend/repositories/models.js';
 import { WebAuthnService } from '../../../services/WebAuthnService.js';
 import { ApiError } from '@features/api/backend/transport/error.js';
 import { UserAuthService } from '../../../services/UserAuthService.js';

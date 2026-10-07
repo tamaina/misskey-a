@@ -11,7 +11,7 @@ import { UtilityService } from '@features/federation/backend/services/UtilitySer
 import { DI } from '@/di-symbols.js';
 import type { Config } from '@/config.js';
 import type { Logger } from '@features/runtime/backend/logging/logger.js';
-import type { MiMeta, UserProfilesRepository } from '@/models/_.js';
+import type { MiMeta, UserProfilesRepository } from '@features/persistence/backend/repositories/models.js';
 import { LoggerService } from '@features/runtime/backend/services/LoggerService.js';
 import { bindThis } from '@/decorators.js';
 import { HttpRequestService } from '@features/runtime/backend/services/HttpRequestService.js';

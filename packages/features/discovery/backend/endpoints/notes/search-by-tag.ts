@@ -7,7 +7,7 @@ import { ContractEndpoint, projectEndpointContract } from '@features/api/backend
 import { allOfNotesSearchByTagDefinition, allOfNotesSearchByTagInput, allOfNotesSearchByTagOutput } from '../../../contract/selector-common-endpoint-definitions.js';
 import { Brackets } from 'typeorm';
 import { Inject, Injectable } from '@nestjs/common';
-import type { NotesRepository } from '@/models/_.js';
+import type { NotesRepository } from '@features/persistence/backend/repositories/models.js';
 import { safeForSql } from '@features/persistence/backend/utility/safe-for-sql.js';
 import { normalizeForSearch } from '@/misc/normalize-for-search.js';
 import { QueryService } from '@features/notes/backend/services/QueryService.js';

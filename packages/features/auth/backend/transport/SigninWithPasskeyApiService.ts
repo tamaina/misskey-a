@@ -11,7 +11,7 @@ import type {
 	SigninsRepository,
 	UserProfilesRepository,
 	UsersRepository,
-} from '@/models/_.js';
+} from '@features/persistence/backend/repositories/models.js';
 import type { Config } from '@/config.js';
 import { getIpHash } from '../utility/get-ip-hash.js';
 import type { MiLocalUser, MiUser } from '@features/users/backend/models/User.js';

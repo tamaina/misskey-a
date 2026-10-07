@@ -7,7 +7,7 @@ import { ContractEndpoint, projectEndpointContract } from '@features/api/backend
 import { packedFederationInstancesDefinition, packedFederationInstancesInput, packedFederationInstancesOutput } from '../../../contract/packed-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
 
-import type { InstancesRepository } from '@/models/_.js';
+import type { InstancesRepository } from '@features/persistence/backend/repositories/models.js';
 import { InstanceEntityService } from '@features/instance/backend/serializers/InstanceEntityService.js';
 import { MetaService } from '@features/instance/backend/services/MetaService.js';
 import { DI } from '@/di-symbols.js';

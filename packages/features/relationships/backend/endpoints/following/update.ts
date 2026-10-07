@@ -8,7 +8,7 @@ import { packedFollowingUpdateDefinition, packedFollowingUpdateInput, packedFoll
 import ms from 'ms';
 import { Inject, Injectable } from '@nestjs/common';
 
-import type { FollowingsRepository } from '@/models/_.js';
+import type { FollowingsRepository } from '@features/persistence/backend/repositories/models.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import { UserFollowingService } from '../../services/UserFollowingService.js';
 import { DI } from '@/di-symbols.js';

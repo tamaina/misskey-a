@@ -5,7 +5,7 @@
 
 import { Inject, Injectable } from '@nestjs/common';
 import { DI } from '@/di-symbols.js';
-import type { NoteDraftsRepository } from '@/models/_.js';
+import type { NoteDraftsRepository } from '@features/persistence/backend/repositories/models.js';
 import type { Logger } from '@features/runtime/backend/logging/logger.js';
 import { NotificationService } from '@features/notifications/backend/services/NotificationService.js';
 import { bindThis } from '@/decorators.js';

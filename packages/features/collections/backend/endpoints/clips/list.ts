@@ -8,7 +8,7 @@ import { packedClipsListDefinition, packedClipsListInput, packedClipsListOutput 
 import { Inject, Injectable } from '@nestjs/common';
 
 import { QueryService } from '@features/notes/backend/services/QueryService.js';
-import type { ClipsRepository } from '@/models/_.js';
+import type { ClipsRepository } from '@features/persistence/backend/repositories/models.js';
 import { ClipEntityService } from '../../serializers/ClipEntityService.js';
 import { DI } from '@/di-symbols.js';
 

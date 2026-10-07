@@ -11,7 +11,7 @@ import type { JsonObject } from '@features/runtime/backend/formatting/json-value
 import { ChatService } from '../services/ChatService.js';
 import Channel, { type ChannelRequest } from '@features/api/backend/transport/stream/channel.js';
 import { REQUEST } from '@nestjs/core';
-import type { ChatRoomsRepository } from '@/models/_.js';
+import type { ChatRoomsRepository } from '@features/persistence/backend/repositories/models.js';
 
 @Injectable({ scope: Scope.TRANSIENT })
 export class ChatRoomChannel extends Channel {

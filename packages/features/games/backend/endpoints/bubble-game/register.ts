@@ -9,7 +9,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import ms from 'ms';
 
 import { IdService } from '@features/runtime/backend/services/IdService.js';
-import type { BubbleGameRecordsRepository } from '@/models/_.js';
+import type { BubbleGameRecordsRepository } from '@features/persistence/backend/repositories/models.js';
 import { DI } from '@/di-symbols.js';
 import { ApiError } from '@features/api/backend/transport/error.js';
 

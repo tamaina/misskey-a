@@ -5,7 +5,7 @@
 
 import { Inject, Injectable } from '@nestjs/common';
 import { DI } from '@/di-symbols.js';
-import type { UsersRepository } from '@/models/_.js';
+import type { UsersRepository } from '@features/persistence/backend/repositories/models.js';
 import type { MiUser } from '../models/User.js';
 import { ApRendererService } from '@features/federation/backend/services/ApRendererService.js';
 import { RelayService } from '@features/federation/backend/services/RelayService.js';

@@ -5,7 +5,7 @@
 
 import { Inject, Injectable, OnApplicationShutdown } from '@nestjs/common';
 import * as Redis from 'ioredis';
-import type { InstancesRepository } from '@/models/_.js';
+import type { InstancesRepository } from '@features/persistence/backend/repositories/models.js';
 import type { MiInstance } from '../models/Instance.js';
 import { MemoryKVCache, RedisKVCache } from '@features/runtime/backend/cache/cache.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';

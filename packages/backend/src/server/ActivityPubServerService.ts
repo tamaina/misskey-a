@@ -13,7 +13,7 @@ import accepts from 'accepts';
 import vary from 'vary';
 import secureJson from 'secure-json-parse';
 import { DI } from '@/di-symbols.js';
-import type { FollowingsRepository, NotesRepository, EmojisRepository, NoteReactionsRepository, UserProfilesRepository, UserNotePiningsRepository, UsersRepository, FollowRequestsRepository, MiMeta } from '@/models/_.js';
+import type { FollowingsRepository, NotesRepository, EmojisRepository, NoteReactionsRepository, UserProfilesRepository, UserNotePiningsRepository, UsersRepository, FollowRequestsRepository, MiMeta } from '@features/persistence/backend/repositories/models.js';
 import * as url from '@features/runtime/backend/formatting/url.js';
 import type { Config } from '@/config.js';
 import { ApRendererService } from '@features/federation/backend/services/ApRendererService.js';

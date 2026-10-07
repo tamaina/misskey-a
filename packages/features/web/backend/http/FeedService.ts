@@ -7,7 +7,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { In, IsNull } from 'typeorm';
 import { Feed } from 'feed';
 import { DI } from '@/di-symbols.js';
-import type { DriveFilesRepository, NotesRepository, UserProfilesRepository } from '@/models/_.js';
+import type { DriveFilesRepository, NotesRepository, UserProfilesRepository } from '@features/persistence/backend/repositories/models.js';
 import type { Config } from '@/config.js';
 import type { MiUser } from '@features/users/backend/models/User.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';

@@ -16,7 +16,7 @@ import type {
 	MiAbuseUserReport,
 	MiMeta,
 	MiUser,
-} from '@/models/_.js';
+} from '@features/persistence/backend/repositories/models.js';
 import { EmailService } from '@features/email/backend/services/EmailService.js';
 import { RoleService } from '@features/roles/backend/services/RoleService.js';
 import { RecipientMethod } from '../models/AbuseReportNotificationRecipient.js';

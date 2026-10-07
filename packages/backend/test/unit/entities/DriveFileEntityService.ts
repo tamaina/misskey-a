@@ -8,7 +8,7 @@ process.env.NODE_ENV = 'test';
 import { afterAll, beforeAll, beforeEach, describe, expect, vi, test } from 'vitest';
 import { Test } from '@nestjs/testing';
 import type { TestingModule } from '@nestjs/testing';
-import type { DriveFilesRepository, DriveFoldersRepository, UsersRepository } from '@/models/_.js';
+import type { DriveFilesRepository, DriveFoldersRepository, UsersRepository } from '@features/persistence/backend/repositories/models.js';
 import { GlobalModule } from '@/GlobalModule.js';
 import { CoreModule } from '@/core/CoreModule.js';
 import { DriveFileEntityService } from '@features/drive/backend/serializers/DriveFileEntityService.js';

@@ -8,7 +8,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import chalk from 'chalk';
 import { IsNull } from 'typeorm';
 import { DI } from '@/di-symbols.js';
-import type { UsersRepository } from '@/models/_.js';
+import type { UsersRepository } from '@features/persistence/backend/repositories/models.js';
 import type { MiLocalUser, MiRemoteUser } from '@features/users/backend/models/User.js';
 import type { Config } from '@/config.js';
 import type { Logger } from '@features/runtime/backend/logging/logger.js';

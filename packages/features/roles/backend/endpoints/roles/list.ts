@@ -7,7 +7,7 @@ import { ContractEndpoint, projectEndpointContract } from '@features/api/backend
 import { packedRolesListDefinition, packedRolesListInput, packedRolesListOutput } from '../../../contract/packed-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
 
-import type { RolesRepository } from '@/models/_.js';
+import type { RolesRepository } from '@features/persistence/backend/repositories/models.js';
 import { DI } from '@/di-symbols.js';
 import { RoleEntityService } from '../../serializers/RoleEntityService.js';
 

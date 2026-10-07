@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import type { NoteFavoritesRepository } from '@/models/_.js';
+import type { NoteFavoritesRepository } from '@features/persistence/backend/repositories/models.js';
 import type { } from '@features/relationships/backend/models/Blocking.js';
 import type { MiUser } from '@features/users/backend/models/User.js';
 import type { MiNoteFavorite } from '../models/NoteFavorite.js';

@@ -7,7 +7,7 @@ import { ContractEndpoint, projectEndpointContract } from '@features/api/backend
 import { uniqueGalleryPostsCreateDefinition, uniqueGalleryPostsCreateInput, uniqueGalleryPostsCreateOutput } from '../../../../contract/unique-string-endpoint-definitions.js';
 import ms from 'ms';
 import { Inject, Injectable } from '@nestjs/common';
-import type { DriveFilesRepository, GalleryPostsRepository } from '@/models/_.js';
+import type { DriveFilesRepository, GalleryPostsRepository } from '@features/persistence/backend/repositories/models.js';
 import { MiGalleryPost } from '../../../models/GalleryPost.js';
 import type { MiDriveFile } from '@features/drive/backend/models/DriveFile.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';

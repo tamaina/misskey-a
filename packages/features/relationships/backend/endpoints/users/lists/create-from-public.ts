@@ -6,7 +6,7 @@
 import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
 import { packedUsersListsCreateFromPublicDefinition, packedUsersListsCreateFromPublicInput, packedUsersListsCreateFromPublicOutput } from '../../../../contract/packed-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
-import type { UserListsRepository, UserListMembershipsRepository, BlockingsRepository } from '@/models/_.js';
+import type { UserListsRepository, UserListMembershipsRepository, BlockingsRepository } from '@features/persistence/backend/repositories/models.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 import type { MiUserList } from '../../../models/UserList.js';
 

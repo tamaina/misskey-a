@@ -13,7 +13,7 @@ import type {
 	NotesRepository,
 	PollsRepository,
 	UsersRepository
-} from '@/models/_.js';
+} from '@features/persistence/backend/repositories/models.js';
 import type { Config } from '@/config.js';
 import { HttpRequestService } from '@features/runtime/backend/services/HttpRequestService.js';
 import { DI } from '@/di-symbols.js';

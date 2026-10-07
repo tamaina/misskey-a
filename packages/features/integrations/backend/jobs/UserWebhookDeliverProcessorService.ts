@@ -6,7 +6,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import * as Bull from 'bullmq';
 import { DI } from '@/di-symbols.js';
-import type { WebhooksRepository } from '@/models/_.js';
+import type { WebhooksRepository } from '@features/persistence/backend/repositories/models.js';
 import type { Config } from '@/config.js';
 import type { Logger } from '@features/runtime/backend/logging/logger.js';
 import { HttpRequestService } from '@features/runtime/backend/services/HttpRequestService.js';

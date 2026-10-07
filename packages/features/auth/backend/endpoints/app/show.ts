@@ -7,7 +7,7 @@ import { ContractEndpoint, projectEndpointContract } from '@features/api/backend
 import { packedAppShowDefinition, packedAppShowInput, packedAppShowOutput } from '../../../contract/packed-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
 
-import type { AppsRepository } from '@/models/_.js';
+import type { AppsRepository } from '@features/persistence/backend/repositories/models.js';
 import { AppEntityService } from '../../serializers/AppEntityService.js';
 import { DI } from '@/di-symbols.js';
 import { ApiError } from '@features/api/backend/transport/error.js';

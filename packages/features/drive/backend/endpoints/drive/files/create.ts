@@ -10,7 +10,7 @@ import { ContractEndpoint, projectEndpointContract } from '@features/api/backend
 import { driveFilesCreateDefinition, driveFilesCreateInput, driveFilesCreateWireInput, driveFilesCreateOutput } from '../../../../contract/create-endpoint-definition.js';
 import { DriveFileEntityService } from '../../../serializers/DriveFileEntityService.js';
 import { DriveService } from '../../../services/DriveService.js';
-import { MiMeta } from '@/models/_.js';
+import { MiMeta } from '@features/persistence/backend/repositories/models.js';
 import { DI } from '@/di-symbols.js';
 import { ApiError } from '@features/api/backend/transport/error.js';
 

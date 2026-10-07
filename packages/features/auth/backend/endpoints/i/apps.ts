@@ -7,7 +7,7 @@ import { ContractEndpoint, projectEndpointContract } from '@features/api/backend
 import { inlineIAppsDefinition, inlineIAppsInput, inlineIAppsOutput } from '../../../contract/endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
 
-import type { AccessTokensRepository } from '@/models/_.js';
+import type { AccessTokensRepository } from '@features/persistence/backend/repositories/models.js';
 import { DI } from '@/di-symbols.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 

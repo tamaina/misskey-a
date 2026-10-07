@@ -6,7 +6,7 @@
 import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
 import { voidAdminDeleteAccountDefinition, voidAdminDeleteAccountInput, voidAdminDeleteAccountOutput } from '../../../contract/void-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
-import type { UsersRepository } from '@/models/_.js';
+import type { UsersRepository } from '@features/persistence/backend/repositories/models.js';
 
 import { DeleteAccountService } from '../../services/DeleteAccountService.js';
 import { DI } from '@/di-symbols.js';

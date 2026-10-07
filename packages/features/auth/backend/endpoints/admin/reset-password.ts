@@ -9,7 +9,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import bcrypt from 'bcryptjs';
 
 import { ApiError } from '@features/api/backend/transport/error.js';
-import type { UsersRepository, UserProfilesRepository, MiMeta } from '@/models/_.js';
+import type { UsersRepository, UserProfilesRepository, MiMeta } from '@features/persistence/backend/repositories/models.js';
 import { DI } from '@/di-symbols.js';
 import { secureRndstr } from '../../utility/secure-rndstr.js';
 import { RoleService } from '@features/roles/backend/services/RoleService.js';

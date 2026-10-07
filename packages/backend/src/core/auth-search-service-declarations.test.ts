@@ -12,7 +12,7 @@ import { generateAuthenticationOptions, generateRegistrationOptions, verifyAuthe
 import { afterEach, describe, expect, test, vi } from 'vitest';
 import { mockDeep } from 'vitest-mock-extended';
 import { DI } from '@/di-symbols.js';
-import type { MiUser, MiUserProfile } from '@/models/_.js';
+import type { MiUser, MiUserProfile } from '@features/persistence/backend/repositories/models.js';
 import { authSecurityServices, authServices } from '@features/auth/backend/services.js';
 import { discoveryServices, userSearchServices } from '@features/discovery/backend/services.js';
 import { UserAuthService } from '@features/auth/backend/services/UserAuthService.js';

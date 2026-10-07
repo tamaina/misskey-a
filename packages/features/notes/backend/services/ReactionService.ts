@@ -5,7 +5,7 @@
 
 import { Inject, Injectable } from '@nestjs/common';
 import { DI } from '@/di-symbols.js';
-import type { EmojisRepository, NoteReactionsRepository, UsersRepository, NotesRepository, MiMeta } from '@/models/_.js';
+import type { EmojisRepository, NoteReactionsRepository, UsersRepository, NotesRepository, MiMeta } from '@features/persistence/backend/repositories/models.js';
 import { IdentifiableError } from '@features/runtime/backend/errors/identifiable-error.js';
 import type { MiRemoteUser, MiUser } from '@features/users/backend/models/User.js';
 import type { MiNote } from '../models/Note.js';

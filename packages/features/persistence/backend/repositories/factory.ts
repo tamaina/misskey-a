@@ -83,8 +83,8 @@ import {
 	MiUserPublickey,
 	MiUserSecurityKey,
 	MiWebhook,
-} from './_.js';
-import type { MiRepository } from './_.js';
+} from './models.js';
+import type { MiRepository } from './models.js';
 
 type RepositoryName = Extract<keyof typeof DI, `${string}Repository`>;
 

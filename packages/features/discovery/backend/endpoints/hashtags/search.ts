@@ -7,7 +7,7 @@ import { ContractEndpoint, projectEndpointContract } from '@features/api/backend
 import { inlineHashtagsSearchDefinition, inlineHashtagsSearchInput, inlineHashtagsSearchOutput } from '../../../contract/endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
 
-import type { HashtagsRepository } from '@/models/_.js';
+import type { HashtagsRepository } from '@features/persistence/backend/repositories/models.js';
 import { DI } from '@/di-symbols.js';
 import { sqlLikeEscape } from '@features/persistence/backend/utility/sql-like-escape.js';
 

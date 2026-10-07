@@ -7,7 +7,7 @@ import { ContractEndpoint, projectEndpointContract } from '@features/api/backend
 import { packedClipsMyFavoritesDefinition, packedClipsMyFavoritesInput, packedClipsMyFavoritesOutput } from '../../../contract/packed-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
 
-import type { ClipFavoritesRepository } from '@/models/_.js';
+import type { ClipFavoritesRepository } from '@features/persistence/backend/repositories/models.js';
 import { DI } from '@/di-symbols.js';
 import { ClipEntityService } from '../../serializers/ClipEntityService.js';
 

@@ -6,7 +6,7 @@
 import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
 import { compositionAdminAccountsCreateDefinition, compositionAdminAccountsCreateInput, compositionAdminAccountsCreateOutput } from '../../../../contract/output-composition-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
-import type { MiMeta, UsersRepository } from '@/models/_.js';
+import type { MiMeta, UsersRepository } from '@features/persistence/backend/repositories/models.js';
 import { SignupService } from '../../../services/SignupService.js';
 import { RoleService } from '@features/roles/backend/services/RoleService.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';

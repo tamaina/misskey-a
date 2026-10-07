@@ -7,7 +7,7 @@ import { ContractEndpoint, projectEndpointContract } from '@features/api/backend
 import { voidAdminFederationRemoveAllFollowingDefinition, voidAdminFederationRemoveAllFollowingInput, voidAdminFederationRemoveAllFollowingOutput } from '../../../../contract/void-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
 
-import type { FollowingsRepository, UsersRepository } from '@/models/_.js';
+import type { FollowingsRepository, UsersRepository } from '@features/persistence/backend/repositories/models.js';
 import { DI } from '@/di-symbols.js';
 import { QueueService } from '@features/runtime/backend/services/QueueService.js';
 

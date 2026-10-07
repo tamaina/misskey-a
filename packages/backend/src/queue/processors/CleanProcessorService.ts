@@ -6,7 +6,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { In, LessThan } from 'typeorm';
 import { DI } from '@/di-symbols.js';
-import type { AntennasRepository, RoleAssignmentsRepository, UserIpsRepository } from '@/models/_.js';
+import type { AntennasRepository, RoleAssignmentsRepository, UserIpsRepository } from '@features/persistence/backend/repositories/models.js';
 import type { Logger } from '@features/runtime/backend/logging/logger.js';
 import { bindThis } from '@/decorators.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';

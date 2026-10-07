@@ -9,7 +9,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import * as Redis from 'ioredis';
 import { Brackets } from 'typeorm';
 
-import type { NotesRepository, RolesRepository } from '@/models/_.js';
+import type { NotesRepository, RolesRepository } from '@features/persistence/backend/repositories/models.js';
 import { QueryService } from '@features/notes/backend/services/QueryService.js';
 import { DI } from '@/di-symbols.js';
 import { NoteEntityService } from '@features/notes/backend/serializers/NoteEntityService.js';

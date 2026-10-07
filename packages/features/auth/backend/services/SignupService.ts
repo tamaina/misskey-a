@@ -8,7 +8,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import bcrypt from 'bcryptjs';
 import { DataSource, IsNull } from 'typeorm';
 import { DI } from '@/di-symbols.js';
-import type { MiMeta, UsedUsernamesRepository, UsersRepository } from '@/models/_.js';
+import type { MiMeta, UsedUsernamesRepository, UsersRepository } from '@features/persistence/backend/repositories/models.js';
 import { MiUser } from '@features/users/backend/models/User.js';
 import { MiUserProfile } from '@features/users/backend/models/UserProfile.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';

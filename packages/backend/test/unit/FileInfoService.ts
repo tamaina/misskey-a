@@ -13,7 +13,7 @@ import { afterAll, beforeAll, describe, test } from 'vitest';
 import { mockDeep } from 'vitest-mock-extended';
 import { GlobalModule } from '@/GlobalModule.js';
 import { DI } from '@/di-symbols.js';
-import type { MiMeta } from '@/models/_.js';
+import type { MiMeta } from '@features/persistence/backend/repositories/models.js';
 import { FileInfo, FileInfoService } from '@features/media/backend/services/FileInfoService.js';
 import { SensitiveMediaDetectionService } from '@features/media/backend/services/SensitiveMediaDetectionService.js';
 import { LoggerService } from '@features/runtime/backend/services/LoggerService.js';

@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import type { MiUserListMembership, UserListMembershipsRepository, UserListsRepository } from '@/models/_.js';
+import type { MiUserListMembership, UserListMembershipsRepository, UserListsRepository } from '@features/persistence/backend/repositories/models.js';
 import type { Packed } from '@features/index/contract/packed.js';
 import type { } from '../models/Blocking.js';
 import type { MiUserList } from '../models/UserList.js';

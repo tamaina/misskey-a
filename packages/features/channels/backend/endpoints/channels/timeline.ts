@@ -7,7 +7,7 @@ import { ContractEndpoint, projectEndpointContract } from '@features/api/backend
 import { packedChannelsTimelineDefinition, packedChannelsTimelineInput, packedChannelsTimelineOutput } from '../../../contract/packed-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
 
-import type { ChannelsRepository, MiMeta, NotesRepository } from '@/models/_.js';
+import type { ChannelsRepository, MiMeta, NotesRepository } from '@features/persistence/backend/repositories/models.js';
 import { QueryService } from '@features/notes/backend/services/QueryService.js';
 import { NoteEntityService } from '@features/notes/backend/serializers/NoteEntityService.js';
 import { ActiveUsersChart } from '@features/statistics/backend/charts/active-users.js';

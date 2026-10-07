@@ -8,7 +8,7 @@ import * as Redis from 'ioredis';
 import { DI } from '@/di-symbols.js';
 import type { MiNote } from '../models/Note.js';
 import { bindThis } from '@/decorators.js';
-import type { MiUser, NotesRepository } from '@/models/_.js';
+import type { MiUser, NotesRepository } from '@features/persistence/backend/repositories/models.js';
 import type { Config } from '@/config.js';
 import { PER_NOTE_REACTION_USER_PAIR_CACHE_MAX } from '../constants.js';
 import type { GlobalEvents } from '@features/runtime/backend/services/GlobalEventService.js';

@@ -8,7 +8,7 @@ import { inlineInviteLimitDefinition, inlineInviteLimitInput, inlineInviteLimitO
 import { Inject, Injectable } from '@nestjs/common';
 import { MoreThan } from 'typeorm';
 
-import type { RegistrationTicketsRepository } from '@/models/_.js';
+import type { RegistrationTicketsRepository } from '@features/persistence/backend/repositories/models.js';
 import { RoleService } from '@features/roles/backend/services/RoleService.js';
 import { DI } from '@/di-symbols.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';

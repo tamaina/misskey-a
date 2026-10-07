@@ -18,7 +18,7 @@ import type {
 	NotesRepository,
 	PollsRepository,
 	UsersRepository,
-} from '@/models/_.js';
+} from '@features/persistence/backend/repositories/models.js';
 import { SystemAccountService } from '@features/users/backend/services/SystemAccountService.js';
 import { bindThis } from '@/decorators.js';
 import { Resolver } from '@features/federation/backend/services/ApResolverService.js';

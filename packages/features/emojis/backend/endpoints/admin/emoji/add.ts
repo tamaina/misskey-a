@@ -7,7 +7,7 @@ import { ContractEndpoint, projectEndpointContract } from '@features/api/backend
 import { packedAdminEmojiAddDefinition, packedAdminEmojiAddInput, packedAdminEmojiAddOutput } from '../../../../contract/packed-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
 
-import type { DriveFilesRepository } from '@/models/_.js';
+import type { DriveFilesRepository } from '@features/persistence/backend/repositories/models.js';
 import { DI } from '@/di-symbols.js';
 import { CustomEmojiService } from '../../../services/CustomEmojiService.js';
 import { EmojiEntityService } from '../../../serializers/EmojiEntityService.js';

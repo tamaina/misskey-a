@@ -6,7 +6,7 @@
 import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
 import { inlineSwShowRegistrationDefinition, inlineSwShowRegistrationInput, inlineSwShowRegistrationOutput } from '../../../contract/endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
-import type { SwSubscriptionsRepository } from '@/models/_.js';
+import type { SwSubscriptionsRepository } from '@features/persistence/backend/repositories/models.js';
 
 import { DI } from '@/di-symbols.js';
 

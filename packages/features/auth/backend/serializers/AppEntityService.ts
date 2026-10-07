@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import type { AccessTokensRepository, AppsRepository } from '@/models/_.js';
+import type { AccessTokensRepository, AppsRepository } from '@features/persistence/backend/repositories/models.js';
 import type { Packed } from '@features/index/contract/packed.js';
 import type { MiApp } from '../models/App.js';
 import type { MiUser } from '@features/users/backend/models/User.js';

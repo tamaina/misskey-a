@@ -4,7 +4,7 @@
  */
 
 import { QueryFailedError } from 'typeorm';
-import type { ClipsRepository, MiNote, MiClip, ClipNotesRepository, NotesRepository } from '@/models/_.js';
+import type { ClipsRepository, MiNote, MiClip, ClipNotesRepository, NotesRepository } from '@features/persistence/backend/repositories/models.js';
 import { bindThis } from '@/decorators.js';
 import { isDuplicateKeyValueError } from '@features/persistence/backend/utility/is-duplicate-key-value-error.js';
 import type { RoleService } from '@features/roles/backend/services/RoleService.js';

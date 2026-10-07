@@ -16,7 +16,7 @@ import { dateUTC, isTimeSame, isTimeBefore, subtractTime, addTime } from '@featu
 import { sqlStringEscape } from '@features/persistence/backend/utility/sql-string-escape.js';
 import type { Logger } from '@features/runtime/backend/logging/logger.js';
 import { bindThis } from '@/decorators.js';
-import { MiRepository, miRepository } from '@/models/_.js';
+import { MiRepository, miRepository } from '@features/persistence/backend/repositories/models.js';
 import type { DataSource, Repository } from 'typeorm';
 
 const COLUMN_PREFIX = '___' as const;

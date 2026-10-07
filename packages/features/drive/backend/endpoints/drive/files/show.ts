@@ -7,7 +7,7 @@ import { ContractEndpoint, projectEndpointContract } from '@features/api/backend
 import { selectorDriveFilesShowDefinition, selectorDriveFilesShowInput, selectorDriveFilesShowOutput } from '../../../../contract/selector-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
 import type { MiDriveFile } from '../../../models/DriveFile.js';
-import type { DriveFilesRepository } from '@/models/_.js';
+import type { DriveFilesRepository } from '@features/persistence/backend/repositories/models.js';
 import { DriveFileEntityService } from '../../../serializers/DriveFileEntityService.js';
 import { DI } from '@/di-symbols.js';
 import { RoleService } from '@features/roles/backend/services/RoleService.js';

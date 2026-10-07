@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import type { MiRegistryItem, RegistryItemsRepository } from '@/models/_.js';
+import type { MiRegistryItem, RegistryItemsRepository } from '@features/persistence/backend/repositories/models.js';
 import { IdentifiableError } from '@features/runtime/backend/errors/identifiable-error.js';
 import { bindThis } from '@/decorators.js';
 import type { MiUser } from '@features/users/backend/models/User.js';

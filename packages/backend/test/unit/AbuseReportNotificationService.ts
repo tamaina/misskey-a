@@ -17,7 +17,7 @@ import {
 	SystemWebhooksRepository,
 	UserProfilesRepository,
 	UsersRepository,
-} from '@/models/_.js';
+} from '@features/persistence/backend/repositories/models.js';
 import { DI } from '@/di-symbols.js';
 import { GlobalModule } from '@/GlobalModule.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';

@@ -9,7 +9,7 @@ import { Inject, Injectable } from '@nestjs/common';
 
 import { GetterService } from '@features/api/backend/transport/GetterService.js';
 import { DI } from '@/di-symbols.js';
-import type { NoteFavoritesRepository } from '@/models/_.js';
+import type { NoteFavoritesRepository } from '@features/persistence/backend/repositories/models.js';
 import { ApiError } from '@features/api/backend/transport/error.js';
 
 const contractProjection = projectEndpointContract(voidNotesFavoritesDeleteDefinition);

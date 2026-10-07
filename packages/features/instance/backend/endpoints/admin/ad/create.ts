@@ -7,7 +7,7 @@ import { ContractEndpoint, projectEndpointContract } from '@features/api/backend
 import { packedAdminAdCreateDefinition, packedAdminAdCreateInput, packedAdminAdCreateOutput } from '../../../../contract/packed-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
 
-import type { AdsRepository } from '@/models/_.js';
+import type { AdsRepository } from '@features/persistence/backend/repositories/models.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { DI } from '@/di-symbols.js';
 import { ModerationLogService } from '@features/moderation/backend/services/ModerationLogService.js';

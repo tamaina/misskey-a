@@ -8,7 +8,7 @@ import { voidMuteCreateDefinition, voidMuteCreateInput, voidMuteCreateOutput } f
 import { Inject, Injectable } from '@nestjs/common';
 import ms from 'ms';
 
-import type { MutingsRepository } from '@/models/_.js';
+import type { MutingsRepository } from '@features/persistence/backend/repositories/models.js';
 import { DI } from '@/di-symbols.js';
 import { GetterService } from '@features/api/backend/transport/GetterService.js';
 import { UserMutingService } from '../../services/UserMutingService.js';

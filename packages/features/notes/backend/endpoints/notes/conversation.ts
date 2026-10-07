@@ -7,7 +7,7 @@ import { ContractEndpoint, projectEndpointContract } from '@features/api/backend
 import { packedNotesConversationDefinition, packedNotesConversationInput, packedNotesConversationOutput } from '../../../contract/packed-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
 import type { MiNote } from '../../models/Note.js';
-import type { MiMeta, NotesRepository } from '@/models/_.js';
+import type { MiMeta, NotesRepository } from '@features/persistence/backend/repositories/models.js';
 
 import { NoteEntityService } from '../../serializers/NoteEntityService.js';
 import { DI } from '@/di-symbols.js';

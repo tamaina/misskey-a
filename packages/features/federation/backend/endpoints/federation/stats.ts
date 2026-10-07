@@ -7,7 +7,7 @@ import { ContractEndpoint, projectEndpointContract } from '@features/api/backend
 import { packedFederationStatsDefinition, packedFederationStatsInput, packedFederationStatsOutput } from '../../../contract/packed-endpoint-definitions.js';
 import { In, IsNull, Not } from 'typeorm';
 import { Inject, Injectable } from '@nestjs/common';
-import type { FollowingsRepository, InstancesRepository } from '@/models/_.js';
+import type { FollowingsRepository, InstancesRepository } from '@features/persistence/backend/repositories/models.js';
 import { awaitAll } from '@features/runtime/backend/async/await-all.js';
 
 import { InstanceEntityService } from '@features/instance/backend/serializers/InstanceEntityService.js';

@@ -7,7 +7,7 @@ import { ContractEndpoint, projectEndpointContract } from '@features/api/backend
 import { packedUsersRecommendationDefinition, packedUsersRecommendationInput, packedUsersRecommendationOutput } from '../../../contract/packed-endpoint-definitions.js';
 import ms from 'ms';
 import { Inject, Injectable } from '@nestjs/common';
-import type { UsersRepository, FollowingsRepository } from '@/models/_.js';
+import type { UsersRepository, FollowingsRepository } from '@features/persistence/backend/repositories/models.js';
 
 import { QueryService } from '@features/notes/backend/services/QueryService.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';

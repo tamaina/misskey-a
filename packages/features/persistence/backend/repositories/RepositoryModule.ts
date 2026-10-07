@@ -6,8 +6,8 @@
 import { Module } from '@nestjs/common';
 import type { FactoryProvider } from '@nestjs/common';
 import { DI } from '@/di-symbols.js';
-import { createRepositorySet, repositoryNames } from './repository-factory.js';
-import type { RepositorySet } from './repository-factory.js';
+import { createRepositorySet, repositoryNames } from './factory.js';
+import type { RepositorySet } from './factory.js';
 
 const repositorySet = Symbol('repositorySet');
 

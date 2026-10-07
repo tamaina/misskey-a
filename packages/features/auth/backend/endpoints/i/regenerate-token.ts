@@ -8,7 +8,7 @@ import { voidIRegenerateTokenDefinition, voidIRegenerateTokenInput, voidIRegener
 import bcrypt from 'bcryptjs';
 import { Inject, Injectable } from '@nestjs/common';
 
-import type { UsersRepository, UserProfilesRepository } from '@/models/_.js';
+import type { UsersRepository, UserProfilesRepository } from '@features/persistence/backend/repositories/models.js';
 import { generateNativeUserToken } from '../../utility/token.js';
 import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
 import { DI } from '@/di-symbols.js';

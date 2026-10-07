@@ -6,7 +6,7 @@
 import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
 import { voidFlashDeleteDefinition, voidFlashDeleteInput, voidFlashDeleteOutput } from '../../../contract/void-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
-import type { FlashsRepository, UsersRepository } from '@/models/_.js';
+import type { FlashsRepository, UsersRepository } from '@features/persistence/backend/repositories/models.js';
 
 import { DI } from '@/di-symbols.js';
 import { ModerationLogService } from '@features/moderation/backend/services/ModerationLogService.js';

@@ -9,7 +9,7 @@ import { bindThis } from '@/decorators.js';
 import type { UtilityService } from '@features/federation/backend/services/UtilityService.js';
 import type { RoleService } from '@features/roles/backend/services/RoleService.js';
 import { MiUser } from '@features/users/backend/models/User.js';
-import { MiMeta } from '@/models/_.js';
+import { MiMeta } from '@features/persistence/backend/repositories/models.js';
 
 export class InstanceEntityService {
 	constructor(

@@ -9,7 +9,7 @@ import { Inject, Injectable, OnApplicationShutdown } from '@nestjs/common';
 import { In } from 'typeorm';
 import { ReplyError } from 'ioredis';
 import { DI } from '@/di-symbols.js';
-import type { UsersRepository } from '@/models/_.js';
+import type { UsersRepository } from '@features/persistence/backend/repositories/models.js';
 import type { MiUser } from '@features/users/backend/models/User.js';
 import type { MiNotification } from '../models/Notification.js';
 import { bindThis } from '@/decorators.js';

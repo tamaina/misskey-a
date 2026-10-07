@@ -6,7 +6,7 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { DataSource } from 'typeorm';
 import * as Redis from 'ioredis';
-import type { DriveFilesRepository } from '@/models/_.js';
+import type { DriveFilesRepository } from '@features/persistence/backend/repositories/models.js';
 import type { MiDriveFile } from '@features/drive/backend/models/DriveFile.js';
 import { DI } from '@/di-symbols.js';
 import { DriveFileEntityService } from '@features/drive/backend/serializers/DriveFileEntityService.js';

@@ -7,7 +7,7 @@ import { ContractEndpoint, projectEndpointContract } from '@features/api/backend
 import { packedISigninHistoryDefinition, packedISigninHistoryInput, packedISigninHistoryOutput } from '../../../contract/packed-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
 
-import type { SigninsRepository } from '@/models/_.js';
+import type { SigninsRepository } from '@features/persistence/backend/repositories/models.js';
 import { QueryService } from '@features/notes/backend/services/QueryService.js';
 import { SigninEntityService } from '../../serializers/SigninEntityService.js';
 import { DI } from '@/di-symbols.js';

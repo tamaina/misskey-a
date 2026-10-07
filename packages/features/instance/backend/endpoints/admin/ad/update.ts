@@ -7,7 +7,7 @@ import { ContractEndpoint, projectEndpointContract } from '@features/api/backend
 import { voidAdminAdUpdateDefinition, voidAdminAdUpdateInput, voidAdminAdUpdateOutput } from '../../../../contract/void-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
 
-import type { AdsRepository } from '@/models/_.js';
+import type { AdsRepository } from '@features/persistence/backend/repositories/models.js';
 import { DI } from '@/di-symbols.js';
 import { ModerationLogService } from '@features/moderation/backend/services/ModerationLogService.js';
 import { ApiError } from '@features/api/backend/transport/error.js';

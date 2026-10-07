@@ -6,7 +6,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { IsNull, Not } from 'typeorm';
 import { DI } from '@/di-symbols.js';
-import type { FollowingsRepository } from '@/models/_.js';
+import type { FollowingsRepository } from '@features/persistence/backend/repositories/models.js';
 import type { MiLocalUser, MiRemoteUser, MiUser } from '@features/users/backend/models/User.js';
 import { QueueService } from '@features/runtime/backend/services/QueueService.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';

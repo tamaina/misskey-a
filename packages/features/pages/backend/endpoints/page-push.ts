@@ -6,7 +6,7 @@
 import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
 import { voidPagePushDefinition, voidPagePushInput, voidPagePushOutput } from '../../contract/void-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
-import type { PagesRepository } from '@/models/_.js';
+import type { PagesRepository } from '@features/persistence/backend/repositories/models.js';
 
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';

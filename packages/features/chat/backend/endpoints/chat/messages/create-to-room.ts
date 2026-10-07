@@ -12,7 +12,7 @@ import { GetterService } from '@features/api/backend/transport/GetterService.js'
 import { DI } from '@/di-symbols.js';
 import { ApiError } from '@features/api/backend/transport/error.js';
 import { ChatService } from '../../../services/ChatService.js';
-import type { DriveFilesRepository, MiUser } from '@/models/_.js';
+import type { DriveFilesRepository, MiUser } from '@features/persistence/backend/repositories/models.js';
 
 const contractProjection = projectEndpointContract(packedChatMessagesCreateToRoomDefinition);
 

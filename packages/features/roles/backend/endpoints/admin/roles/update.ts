@@ -8,7 +8,7 @@ import { voidAdminRolesUpdateDefinition } from '../../../../contract/void-endpoi
 import { LegacyRoleUpdateConsumerEndpoint } from '../../../legacy-role-consumer-endpoint.js';
 import { Inject, Injectable } from '@nestjs/common';
 
-import type { RolesRepository } from '@/models/_.js';
+import type { RolesRepository } from '@features/persistence/backend/repositories/models.js';
 import { DI } from '@/di-symbols.js';
 import { ApiError } from '@features/api/backend/transport/error.js';
 import { RoleService } from '../../../services/RoleService.js';

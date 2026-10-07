@@ -21,7 +21,7 @@ import {
 	MiUser,
 	UserProfilesRepository,
 	UsersRepository,
-} from '@/models/_.js';
+} from '@features/persistence/backend/repositories/models.js';
 import { DI } from '@/di-symbols.js';
 import { ChannelFollowingService } from "@features/channels/backend/services/ChannelFollowingService.js";
 import { MiLocalUser } from "@features/users/backend/models/User.js";

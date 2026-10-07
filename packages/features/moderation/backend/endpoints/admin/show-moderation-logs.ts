@@ -7,7 +7,7 @@ import { ContractEndpoint, projectEndpointContract } from '@features/api/backend
 import { packedAdminShowModerationLogsDefinition, packedAdminShowModerationLogsInput, packedAdminShowModerationLogsOutput } from '../../../contract/packed-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
 
-import type { ModerationLogsRepository } from '@/models/_.js';
+import type { ModerationLogsRepository } from '@features/persistence/backend/repositories/models.js';
 import { QueryService } from '@features/notes/backend/services/QueryService.js';
 import { DI } from '@/di-symbols.js';
 import { ModerationLogEntityService } from '../../serializers/ModerationLogEntityService.js';

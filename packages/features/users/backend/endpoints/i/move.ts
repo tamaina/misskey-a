@@ -21,7 +21,7 @@ import { UserEntityService } from '../../serializers/UserEntityService.js';
 
 import * as Acct from '@/misc/acct.js';
 import { DI } from '@/di-symbols.js';
-import { MiMeta } from '@/models/_.js';
+import { MiMeta } from '@features/persistence/backend/repositories/models.js';
 
 const contractProjection = projectEndpointContract(inlineIMoveDefinition);
 

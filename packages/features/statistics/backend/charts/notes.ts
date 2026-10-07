@@ -6,7 +6,7 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { Not, IsNull, DataSource } from 'typeorm';
 import * as Redis from 'ioredis';
-import type { NotesRepository } from '@/models/_.js';
+import type { NotesRepository } from '@features/persistence/backend/repositories/models.js';
 import type { MiNote } from '@features/notes/backend/models/Note.js';
 import { DI } from '@/di-symbols.js';
 import { bindThis } from '@/decorators.js';

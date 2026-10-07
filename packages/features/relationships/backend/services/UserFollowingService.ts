@@ -18,7 +18,7 @@ import { FederatedInstanceService } from '@features/federation/backend/services/
 import { UserWebhookService } from '@features/integrations/backend/services/UserWebhookService.js';
 import { NotificationService } from '@features/notifications/backend/services/NotificationService.js';
 import { DI } from '@/di-symbols.js';
-import type { FollowingsRepository, FollowRequestsRepository, InstancesRepository, MiMeta, UserProfilesRepository, UsersRepository } from '@/models/_.js';
+import type { FollowingsRepository, FollowRequestsRepository, InstancesRepository, MiMeta, UserProfilesRepository, UsersRepository } from '@features/persistence/backend/repositories/models.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import { ApRendererService } from '@features/federation/backend/services/ApRendererService.js';
 import { bindThis } from '@/decorators.js';

@@ -7,7 +7,7 @@ import { ContractEndpoint, projectEndpointContract } from '@features/api/backend
 import { packedNotesPollsRecommendationDefinition, packedNotesPollsRecommendationInput, packedNotesPollsRecommendationOutput } from '../../../../contract/packed-endpoint-definitions.js';
 import { Brackets, In } from 'typeorm';
 import { Inject, Injectable } from '@nestjs/common';
-import type { NotesRepository, MutingsRepository, PollsRepository, PollVotesRepository } from '@/models/_.js';
+import type { NotesRepository, MutingsRepository, PollsRepository, PollVotesRepository } from '@features/persistence/backend/repositories/models.js';
 
 import { NoteEntityService } from '../../../serializers/NoteEntityService.js';
 import { DI } from '@/di-symbols.js';

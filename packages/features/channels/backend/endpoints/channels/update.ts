@@ -7,7 +7,7 @@ import { ContractEndpoint, projectEndpointContract } from '@features/api/backend
 import { packedChannelsUpdateDefinition, packedChannelsUpdateInput, packedChannelsUpdateOutput } from '../../../contract/packed-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
 
-import type { DriveFilesRepository, ChannelsRepository } from '@/models/_.js';
+import type { DriveFilesRepository, ChannelsRepository } from '@features/persistence/backend/repositories/models.js';
 import { ChannelEntityService } from '../../serializers/ChannelEntityService.js';
 import { DI } from '@/di-symbols.js';
 import { RoleService } from '@features/roles/backend/services/RoleService.js';

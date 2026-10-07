@@ -20,7 +20,7 @@ import type { MiPage } from '@features/pages/backend/models/Page.js';
 import type { MiWebhook } from '@features/integrations/backend/models/Webhook.js';
 import type { MiSystemWebhook } from '@features/integrations/backend/models/SystemWebhook.js';
 import type { MiMeta } from '@features/instance/backend/models/Meta.js';
-import { MiAvatarDecoration, MiChatMessage, MiChatRoom, MiReversiGame, MiRole, MiRoleAssignment } from '@/models/_.js';
+import { MiAvatarDecoration, MiChatMessage, MiChatRoom, MiReversiGame, MiRole, MiRoleAssignment } from '@features/persistence/backend/repositories/models.js';
 import type { Packed } from '@features/index/contract/packed.js';
 import { DI } from '@/di-symbols.js';
 import type { Config } from '@/config.js';

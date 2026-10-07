@@ -14,7 +14,7 @@ import type { RequestInit, Headers, Response } from 'node-fetch';
 import * as htmlParser from 'node-html-parser';
 import { DataSource } from 'typeorm';
 import Fastify from 'fastify';
-import { entities } from '@/postgres.js';
+import { entities } from '@features/persistence/backend/postgres.js';
 import { loadConfig } from '@/config.js';
 import type * as misskey from 'misskey-js';
 import { DEFAULT_POLICIES } from '@features/roles/backend/services/RoleService.js';

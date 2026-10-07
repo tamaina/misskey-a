@@ -6,7 +6,7 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { In } from 'typeorm';
 import { DI } from '@/di-symbols.js';
-import type { DriveFilesRepository, MiMeta } from '@/models/_.js';
+import type { DriveFilesRepository, MiMeta } from '@features/persistence/backend/repositories/models.js';
 import type { Config } from '@/config.js';
 import type { Packed } from '@features/index/contract/packed.js';
 import { awaitAll } from '@features/runtime/backend/async/await-all.js';

@@ -12,7 +12,7 @@ import type {
 	MiDriveFile,
 	MiNote,
 	NotesRepository,
-} from '@/models/_.js';
+} from '@features/persistence/backend/repositories/models.js';
 import type { Packed } from '@features/index/contract/packed.js';
 import type { MiUser } from '@features/users/backend/models/User.js';
 import type { MiChannel } from '../models/Channel.js';

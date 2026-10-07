@@ -4,7 +4,7 @@
  */
 
 import { Injectable } from '@nestjs/common';
-import { MiAbuseUserReport, MiNote, MiUser, MiWebhook } from '@/models/_.js';
+import { MiAbuseUserReport, MiNote, MiUser, MiWebhook } from '@features/persistence/backend/repositories/models.js';
 import { bindThis } from '@/decorators.js';
 import { MiSystemWebhook, type SystemWebhookEventType } from '../models/SystemWebhook.js';
 import { type AbuseReportPayload, SystemWebhookPayload, SystemWebhookService } from './SystemWebhookService.js';

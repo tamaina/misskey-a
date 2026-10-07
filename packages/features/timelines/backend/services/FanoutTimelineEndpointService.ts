@@ -10,7 +10,7 @@ import type { MiUser } from '@features/users/backend/models/User.js';
 import type { MiNote } from '@features/notes/backend/models/Note.js';
 import type { MiMeta } from '@features/instance/backend/models/Meta.js';
 import { Packed } from '@features/index/contract/packed.js';
-import type { NotesRepository } from '@/models/_.js';
+import type { NotesRepository } from '@features/persistence/backend/repositories/models.js';
 import { NoteEntityService } from '@features/notes/backend/serializers/NoteEntityService.js';
 import { FanoutTimelineName, FanoutTimelineService } from './FanoutTimelineService.js';
 import { UtilityService } from '@features/federation/backend/services/UtilityService.js';

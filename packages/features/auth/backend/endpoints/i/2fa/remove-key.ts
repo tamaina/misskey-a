@@ -7,7 +7,7 @@ import bcrypt from 'bcryptjs';
 import { Inject, Injectable } from '@nestjs/common';
 import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
 import { emptyObjectI2faRemoveKeyDefinition, emptyObjectI2faRemoveKeyInput, emptyObjectI2faRemoveKeyOutput } from '../../../../contract/empty-object-key-endpoint-definitions.js';
-import type { UserProfilesRepository, UserSecurityKeysRepository } from '@/models/_.js';
+import type { UserProfilesRepository, UserSecurityKeysRepository } from '@features/persistence/backend/repositories/models.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
 import { DI } from '@/di-symbols.js';

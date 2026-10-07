@@ -10,7 +10,7 @@ import { DI } from '@/di-symbols.js';
 import type { Config } from '@/config.js';
 import type { Packed } from '@features/index/contract/packed.js';
 import { getNoteSummary } from '@/misc/get-note-summary.js';
-import type { MiMeta, MiSwSubscription, SwSubscriptionsRepository } from '@/models/_.js';
+import type { MiMeta, MiSwSubscription, SwSubscriptionsRepository } from '@features/persistence/backend/repositories/models.js';
 import { bindThis } from '@/decorators.js';
 import { RedisKVCache } from '@features/runtime/backend/cache/cache.js';
 import { HttpRequestService } from '@features/runtime/backend/services/HttpRequestService.js';

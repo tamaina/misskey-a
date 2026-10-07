@@ -62,7 +62,7 @@ import { NotesChart } from '@features/statistics/backend/charts/notes.js';
 import { UsersChart } from '@features/statistics/backend/charts/users.js';
 import { DI } from '@/di-symbols.js';
 import type { MiMeta } from '@features/instance/backend/models/Meta.js';
-import type { UsersRepository, NoteReactionsRepository, InstancesRepository, EmojisRepository, AnnouncementsRepository, WebhooksRepository, UserListsRepository, UserListFavoritesRepository, UserListMembershipsRepository, BlockingsRepository, ChannelsRepository, ChannelFavoritesRepository, ClipsRepository, ClipFavoritesRepository } from '@/models/_.js';
+import type { UsersRepository, NoteReactionsRepository, InstancesRepository, EmojisRepository, AnnouncementsRepository, WebhooksRepository, UserListsRepository, UserListFavoritesRepository, UserListMembershipsRepository, BlockingsRepository, ChannelsRepository, ChannelFavoritesRepository, ClipsRepository, ClipFavoritesRepository } from '@features/persistence/backend/repositories/models.js';
 import type { Provider } from '@nestjs/common';
 
 import { UserSuspendService } from '@features/moderation/backend/services/UserSuspendService.js';
@@ -76,7 +76,7 @@ import { UserMutingService } from '@features/relationships/backend/services/User
 import { UserRenoteMutingService } from '@features/relationships/backend/services/UserRenoteMutingService.js';
 import { DownloadService } from '@features/runtime/backend/services/DownloadService.js';
 import { AccountMoveService } from '@features/users/backend/services/AccountMoveService.js';
-import type { MiUserProfile, MiAbuseUserReport, MiNote, MiNoteDraft, MiMuting, MiRenoteMuting, MiDriveFile, UserProfilesRepository, AbuseUserReportsRepository, NoteThreadMutingsRepository, NotesRepository, PromoReadsRepository, MutingsRepository, RenoteMutingsRepository, DriveFilesRepository, AntennasRepository } from '@/models/_.js';
+import type { MiUserProfile, MiAbuseUserReport, MiNote, MiNoteDraft, MiMuting, MiRenoteMuting, MiDriveFile, UserProfilesRepository, AbuseUserReportsRepository, NoteThreadMutingsRepository, NotesRepository, PromoReadsRepository, MutingsRepository, RenoteMutingsRepository, DriveFilesRepository, AntennasRepository } from '@features/persistence/backend/repositories/models.js';
 
 // Transitional composition boundary: Nest resolves a feature, not each handler.
 // The feature itself receives narrow dependencies and has no container access.

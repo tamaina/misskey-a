@@ -11,7 +11,7 @@ import { IdentifiableError } from '@features/runtime/backend/errors/identifiable
 import { Endpoint } from '@features/api/backend/transport/endpoint-base.js';
 import { DriveFileEntityService } from '@features/drive/backend/serializers/DriveFileEntityService.js';
 import { DriveService } from '@features/drive/backend/services/DriveService.js';
-import { MiMeta } from '@/models/_.js';
+import { MiMeta } from '@features/persistence/backend/repositories/models.js';
 import { DI } from '@/di-symbols.js';
 import { ApiError } from '@features/api/backend/transport/error.js';
 

@@ -11,7 +11,7 @@ import { deepClone } from '@features/runtime/backend/data/clone.js';
 import { isRenotePacked, isQuotePacked } from '@/misc/is-renote.js';
 import type { Packed } from '@features/index/contract/packed.js';
 import type { MiUser } from '@features/users/backend/models/User.js';
-import type { MiMeta } from '@/models/_.js';
+import type { MiMeta } from '@features/persistence/backend/repositories/models.js';
 
 /** Streamにおいて、ノートを隠す（hideNote）を適用するためのService */
 @Injectable()

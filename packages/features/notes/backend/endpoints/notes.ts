@@ -6,7 +6,7 @@
 import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
 import { packedNotesDefinition, packedNotesInput, packedNotesOutput } from '../../contract/packed-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
-import type { NotesRepository } from '@/models/_.js';
+import type { NotesRepository } from '@features/persistence/backend/repositories/models.js';
 
 import { QueryService } from '../services/QueryService.js';
 import { NoteEntityService } from '../serializers/NoteEntityService.js';

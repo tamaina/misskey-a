@@ -17,7 +17,7 @@ import {
 	UserMemoRepository,
 	UserProfilesRepository,
 	UsersRepository,
-} from '@/models/_.js';
+} from '@features/persistence/backend/repositories/models.js';
 import type { Config } from '@/config.js';
 import { DI } from '@/di-symbols.js';
 import { UtilityService } from '@features/federation/backend/services/UtilityService.js';

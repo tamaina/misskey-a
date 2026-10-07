@@ -7,7 +7,7 @@ import { ContractEndpoint, projectEndpointContract } from '@features/api/backend
 import { packedNotesClipsDefinition, packedNotesClipsInput, packedNotesClipsOutput } from '../../../contract/packed-endpoint-definitions.js';
 import { In } from 'typeorm';
 import { Inject, Injectable } from '@nestjs/common';
-import type { ClipNotesRepository, ClipsRepository } from '@/models/_.js';
+import type { ClipNotesRepository, ClipsRepository } from '@features/persistence/backend/repositories/models.js';
 
 import { ClipEntityService } from '../../serializers/ClipEntityService.js';
 import { DI } from '@/di-symbols.js';

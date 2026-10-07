@@ -5,7 +5,7 @@
 
 import { Inject, Injectable } from '@nestjs/common';
 import { DI } from '@/di-symbols.js';
-import type { UsersRepository, NotesRepository, PollsRepository } from '@/models/_.js';
+import type { UsersRepository, NotesRepository, PollsRepository } from '@features/persistence/backend/repositories/models.js';
 import type { Config } from '@/config.js';
 import type { IPoll } from '@features/notes/backend/models/Poll.js';
 import type { MiRemoteUser } from '@features/users/backend/models/User.js';

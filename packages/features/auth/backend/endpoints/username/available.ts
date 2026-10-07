@@ -7,7 +7,7 @@ import { ContractEndpoint, projectEndpointContract } from '@features/api/backend
 import { remainingUsernameAvailableDefinition, remainingUsernameAvailableInput, remainingUsernameAvailableOutput } from '../../../contract/remaining-inline-endpoint-definitions.js';
 import { IsNull } from 'typeorm';
 import { Inject, Injectable } from '@nestjs/common';
-import type { MiMeta, UsedUsernamesRepository, UsersRepository } from '@/models/_.js';
+import type { MiMeta, UsedUsernamesRepository, UsersRepository } from '@features/persistence/backend/repositories/models.js';
 import { DI } from '@/di-symbols.js';
 
 const contractProjection = projectEndpointContract(remainingUsernameAvailableDefinition);

@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import type { GalleryLikesRepository } from '@/models/_.js';
+import type { GalleryLikesRepository } from '@features/persistence/backend/repositories/models.js';
 import type { } from '@features/relationships/backend/models/Blocking.js';
 import type { MiGalleryLike } from '../models/GalleryLike.js';
 import { bindThis } from '@/decorators.js';

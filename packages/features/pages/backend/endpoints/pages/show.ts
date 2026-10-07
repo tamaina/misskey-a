@@ -7,7 +7,7 @@ import { ContractEndpoint, projectEndpointContract } from '@features/api/backend
 import { selectorPagesShowDefinition, selectorPagesShowInput, selectorPagesShowOutput } from '../../../contract/selector-endpoint-definitions.js';
 import { IsNull } from 'typeorm';
 import { Inject, Injectable } from '@nestjs/common';
-import type { UsersRepository, PagesRepository } from '@/models/_.js';
+import type { UsersRepository, PagesRepository } from '@features/persistence/backend/repositories/models.js';
 import type { MiPage } from '../../models/Page.js';
 import { PageEntityService } from '../../serializers/PageEntityService.js';
 import { DI } from '@/di-symbols.js';

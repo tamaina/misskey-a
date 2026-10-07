@@ -10,7 +10,7 @@ import { Test } from '@nestjs/testing';
 import { ModuleRef } from '@nestjs/core';
 import { describe, expect, test, vi } from 'vitest';
 import { mockDeep } from 'vitest-mock-extended';
-import type { MiAnnouncement, MiClip, MiFlash, MiFlashLike, MiGalleryLike, MiGalleryPost, MiNoteFavorite, MiPage, MiPageLike } from '@/models/_.js';
+import type { MiAnnouncement, MiClip, MiFlash, MiFlashLike, MiGalleryLike, MiGalleryPost, MiNoteFavorite, MiPage, MiPageLike } from '@features/persistence/backend/repositories/models.js';
 import { announcementServices } from '@features/announcements/backend/services.js';
 import { ClipService } from '@features/collections/backend/services/ClipService.js';
 import { collectionServices } from '@features/collections/backend/services.js';

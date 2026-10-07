@@ -6,7 +6,7 @@
 import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
 import { referenceUsersAchievementsDefinition, referenceUsersAchievementsInput, referenceUsersAchievementsOutput } from '../../../contract/reference-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
-import type { UserProfilesRepository } from '@/models/_.js';
+import type { UserProfilesRepository } from '@features/persistence/backend/repositories/models.js';
 import { DI } from '@/di-symbols.js';
 
 const contractProjection = projectEndpointContract(referenceUsersAchievementsDefinition);

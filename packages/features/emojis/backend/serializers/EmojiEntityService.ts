@@ -4,7 +4,7 @@
  */
 
 import { In } from 'typeorm';
-import type { EmojisRepository, MiRole, RolesRepository } from '@/models/_.js';
+import type { EmojisRepository, MiRole, RolesRepository } from '@features/persistence/backend/repositories/models.js';
 import type { Packed } from '@features/index/contract/packed.js';
 import type { MiEmoji } from '../models/Emoji.js';
 import { bindThis } from '@/decorators.js';

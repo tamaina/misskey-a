@@ -9,7 +9,7 @@ import { DI } from '@/di-symbols.js';
 import type {
 	FollowingsRepository,
 	UserProfilesRepository,
-} from '@/models/_.js';
+} from '@features/persistence/backend/repositories/models.js';
 import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
 import { birthdayUsersDefinition, birthdayUsersInput, birthdayUsersOutput } from '../../../contract/birthday-endpoint-definitions.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';

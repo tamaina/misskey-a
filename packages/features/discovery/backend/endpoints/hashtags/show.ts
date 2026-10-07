@@ -7,7 +7,7 @@ import { ContractEndpoint, projectEndpointContract } from '@features/api/backend
 import { packedHashtagsShowDefinition, packedHashtagsShowInput, packedHashtagsShowOutput } from '../../../contract/packed-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
 
-import type { HashtagsRepository } from '@/models/_.js';
+import type { HashtagsRepository } from '@features/persistence/backend/repositories/models.js';
 import { normalizeForSearch } from '@/misc/normalize-for-search.js';
 import { HashtagEntityService } from '../../serializers/HashtagEntityService.js';
 import { DI } from '@/di-symbols.js';

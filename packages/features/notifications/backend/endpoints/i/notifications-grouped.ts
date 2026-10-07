@@ -8,7 +8,7 @@ import { portableINotificationsGroupedDefinition, portableINotificationsGroupedI
 import { In } from 'typeorm';
 import * as Redis from 'ioredis';
 import { Inject, Injectable } from '@nestjs/common';
-import type { NotesRepository } from '@/models/_.js';
+import type { NotesRepository } from '@features/persistence/backend/repositories/models.js';
 import {
 	obsoleteNotificationTypes,
 	groupedNotificationTypes,
