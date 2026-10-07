@@ -7,7 +7,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 <div class="_spacer" style="--MI_SPACER-w: 800px;">
 	<div :class="$style.root">
 		<div v-if="!gameLoaded" :class="$style.loadingScreen">
-			<div>{{ i18n.ts.loading }}<MkEllipsis/></div>
+			<div>{{ $locale.sfc.loading }}<MkEllipsis/></div>
 		</div>
 		<!-- ↓に対してTransitionコンポーネントを使うと何故かkeyを指定していてもキャッシュが効かず様々なコンポーネントが都度再評価されてパフォーマンスが低下する -->
 		<div v-show="gameLoaded" class="_gaps_s">
@@ -32,13 +32,13 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<div :class="$style.header">
 				<div class="_woodenFrame" :class="[$style.headerTitle]">
 					<div class="_woodenFrameInner">
-						<b>{{ i18n.ts.bubbleGame }}</b>
+						<b>{{ $locale.sfc.bubbleGame }}</b>
 						<div>- {{ gameMode.toUpperCase() }} -</div>
 					</div>
 				</div>
 				<div class="_woodenFrame _woodenFrameH">
 					<div class="_woodenFrameInner">
-						<MkButton inline small @click="hold">{{ i18n.ts._bubbleGame.hold }}</MkButton>
+						<MkButton inline small @click="hold">{{ $locale.sfc.bubbleGameHold }}</MkButton>
 						<img v-if="holdingStock" :src="getTextureImageUrl(holdingStock.mono)" style="width: 32px; margin-left: 8px; vertical-align: bottom;"/>
 					</div>
 					<div class="_woodenFrameInner" :class="$style.stock" style="text-align: center;">
@@ -88,24 +88,24 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<div v-if="isGameOver && !replaying" :class="$style.gameOverLabel">
 					<div class="_gaps_s">
 						<img src="/client-assets/drop-and-fusion/gameover.png" style="width: 200px; max-width: 100%; display: block; margin: auto; margin-bottom: -5px;"/>
-						<div>{{ i18n.ts._bubbleGame._score.score }}: <MkNumber :value="score"/>{{ getScoreUnit(gameMode) }}</div>
-						<div>{{ i18n.ts._bubbleGame._score.maxChain }}: <MkNumber :value="maxCombo"/></div>
+						<div>{{ $locale.sfc.bubbleGameScoreScore }}: <MkNumber :value="score"/>{{ getScoreUnit(gameMode) }}</div>
+						<div>{{ $locale.sfc.bubbleGameScoreMaxChain }}: <MkNumber :value="maxCombo"/></div>
 						<div v-if="gameMode === 'yen'">
-							{{ i18n.ts._bubbleGame._score.scoreYen }}:
-							<I18n :src="i18n.ts._bubbleGame._score.yen" tag="b">
+							{{ $locale.sfc.bubbleGameScoreScoreYen }}:
+							<I18n :src="$locale.sfc.bubbleGameScoreYen" tag="b">
 								<template #yen><MkNumber :value="yenTotal ?? score"/></template>
 							</I18n>
 						</div>
-						<I18n v-if="gameMode === 'sweets'" :src="i18n.ts._bubbleGame._score.scoreSweets" tag="div">
+						<I18n v-if="gameMode === 'sweets'" :src="$locale.sfc.bubbleGameScoreScoreSweets" tag="div">
 							<template #onigiriQtyWithUnit>
-								<I18n :src="i18n.ts._bubbleGame._score.estimatedQty" tag="b">
+								<I18n :src="$locale.sfc.bubbleGameScoreEstimatedQty" tag="b">
 									<template #qty><MkNumber :value="score / 130"/></template>
 								</I18n>
 							</template>
 						</I18n>
 					</div>
 				</div>
-				<div v-if="replaying" :class="$style.replayIndicator"><span :class="$style.replayIndicatorText"><i class="ti ti-player-play"></i> {{ i18n.ts.replaying }}</span></div>
+				<div v-if="replaying" :class="$style.replayIndicator"><span :class="$style.replayIndicatorText"><i class="ti ti-player-play"></i> {{ $locale.sfc.replaying }}</span></div>
 			</div>
 
 			<div v-if="replaying" class="_woodenFrame">
@@ -116,7 +116,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 				</div>
 				<div class="_woodenFrameInner">
 					<div class="_buttonsCenter">
-						<MkButton @click="endReplay"><i class="ti ti-player-stop"></i> {{ i18n.ts.endReplay }}</MkButton>
+						<MkButton @click="endReplay"><i class="ti ti-player-stop"></i> {{ $locale.sfc.endReplay }}</MkButton>
 						<MkButton :primary="replayPlaybackRate === 4" @click="replayPlaybackRate = replayPlaybackRate === 4 ? 1 : 4"><i class="ti ti-player-track-next"></i> x4</MkButton>
 						<MkButton :primary="replayPlaybackRate === 16" @click="replayPlaybackRate = replayPlaybackRate === 16 ? 1 : 16"><i class="ti ti-player-track-next"></i> x16</MkButton>
 					</div>
@@ -126,10 +126,10 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<div v-if="isGameOver" class="_woodenFrame">
 				<div class="_woodenFrameInner">
 					<div class="_buttonsCenter">
-						<MkButton primary rounded @click="backToTitle">{{ i18n.ts.backToTitle }}</MkButton>
-						<MkButton primary rounded @click="replay">{{ i18n.ts.showReplay }}</MkButton>
-						<MkButton primary rounded @click="share">{{ i18n.ts.share }}</MkButton>
-						<MkButton rounded @click="exportLog">{{ i18n.ts.copyReplayData }}</MkButton>
+						<MkButton primary rounded @click="backToTitle">{{ $locale.sfc.backToTitle }}</MkButton>
+						<MkButton primary rounded @click="replay">{{ $locale.sfc.showReplay }}</MkButton>
+						<MkButton primary rounded @click="share">{{ $locale.sfc.share }}</MkButton>
+						<MkButton rounded @click="exportLog">{{ $locale.sfc.copyReplayData }}</MkButton>
 					</div>
 				</div>
 			</div>
@@ -137,11 +137,11 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<div style="display: flex;">
 				<div class="_woodenFrame" style="flex: 1; margin-right: 10px;">
 					<div class="_woodenFrameInner">
-						<div>{{ i18n.ts._bubbleGame._score.score }}: <MkNumber :value="score"/>{{ getScoreUnit(gameMode) }}</div>
-						<div>{{ i18n.ts._bubbleGame._score.highScore }}: <b v-if="highScore"><MkNumber :value="highScore"/>{{ getScoreUnit(gameMode) }}</b><b v-else>-</b></div>
+						<div>{{ $locale.sfc.bubbleGameScoreScore }}: <MkNumber :value="score"/>{{ getScoreUnit(gameMode) }}</div>
+						<div>{{ $locale.sfc.bubbleGameScoreHighScore }}: <b v-if="highScore"><MkNumber :value="highScore"/>{{ getScoreUnit(gameMode) }}</b><b v-else>-</b></div>
 						<div v-if="gameMode === 'yen'">
-							{{ i18n.ts._bubbleGame._score.scoreYen }}:
-							<I18n :src="i18n.ts._bubbleGame._score.yen" tag="b">
+							{{ $locale.sfc.bubbleGameScoreScoreYen }}:
+							<I18n :src="$locale.sfc.bubbleGameScoreYen" tag="b">
 								<template #yen><MkNumber :value="yenTotal ?? score"/></template>
 							</I18n>
 						</div>
@@ -158,10 +158,10 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<div class="_woodenFrameInner">
 					<div class="_gaps">
 						<MkRange v-model="bgmVolume" :min="0" :max="1" :step="0.01" :textConverter="(v) => `${Math.floor(v * 100)}%`" :continuousUpdate="true" @dragEnded="(v) => updateSettings('bgmVolume', v)">
-							<template #label>BGM {{ i18n.ts.volume }}</template>
+							<template #label>BGM {{ $locale.sfc.volume }}</template>
 						</MkRange>
 						<MkRange v-model="sfxVolume" :min="0" :max="1" :step="0.01" :textConverter="(v) => `${Math.floor(v * 100)}%`" :continuousUpdate="true" @dragEnded="(v) => updateSettings('sfxVolume', v)">
-							<template #label>{{ i18n.ts.sfx }} {{ i18n.ts.volume }}</template>
+							<template #label>{{ $locale.sfc.sfx }} {{ $locale.sfc.volume }}</template>
 						</MkRange>
 					</div>
 				</div>
@@ -181,8 +181,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 			<div class="_woodenFrame">
 				<div class="_woodenFrameInner">
-					<MkButton v-if="!isGameOver && !replaying" full danger @click="surrender">{{ i18n.ts.surrender }}</MkButton>
-					<MkButton v-else full @click="restart">{{ i18n.ts.gameRetry }}</MkButton>
+					<MkButton v-if="!isGameOver && !replaying" full danger @click="surrender">{{ $locale.sfc.surrender }}</MkButton>
+					<MkButton v-else full @click="restart">{{ $locale.sfc.gameRetry }}</MkButton>
 				</div>
 			</div>
 		</div>
@@ -207,7 +207,6 @@ import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import { claimAchievement } from '@features/users/frontend/utility/achievements.js';
 import { store } from '@features/preferences/frontend/store.js';
 import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
-import { i18n } from '@features/runtime/frontend/i18n.js';
 import { $i } from '@features/auth/frontend/i.js';
 import * as sound from '@features/preferences/frontend/utility/sound.js';
 import MkRange from '@features/ui/frontend/components/MkRange.vue';
@@ -766,7 +765,7 @@ function hold() {
 async function surrender() {
 	const { canceled } = await os.confirm({
 		type: 'warning',
-		text: i18n.ts.areYouSure,
+		text: $locale.value.sfc.areYouSure,
 	});
 	if (canceled) return;
 	game.surrender();
@@ -1178,7 +1177,7 @@ onMounted(async () => {
 			} else {
 				os.alert({
 					type: 'error',
-					text: i18n.ts.cannotLoad,
+					text: $locale.value.sfc.cannotLoad,
 				});
 				return;
 			}
@@ -1229,7 +1228,7 @@ onDeactivated(() => {
 });
 
 definePage(() => ({
-	title: i18n.ts.bubbleGame,
+	title: $locale.value.sfc.bubbleGame,
 	icon: 'ti ti-apple',
 }));
 </script>
@@ -1507,3 +1506,759 @@ definePage(() => ({
 	100% { transform: translateY(0); }
 }
 </style>
+
+<locale lang="json" locale="ar-SA">
+{
+	"loading": "Loading",
+	"bubbleGame": "Bubble Game",
+	"bubbleGameHold": "Hold",
+	"bubbleGameScoreScore": "Score",
+	"bubbleGameScoreMaxChain": "Maximum number of chains",
+	"bubbleGameScoreScoreYen": "Amount of money earned",
+	"bubbleGameScoreYen": "{yen} Yen",
+	"bubbleGameScoreScoreSweets": "{onigiriQtyWithUnit} Onigiri",
+	"bubbleGameScoreEstimatedQty": "{qty} Pieces",
+	"replaying": "Showing replay",
+	"endReplay": "Exit Replay",
+	"backToTitle": "Go back to title",
+	"showReplay": "View Replay",
+	"share": "شارِك",
+	"copyReplayData": "Copy replay data",
+	"bubbleGameScoreHighScore": "High score",
+	"volume": "مستوى الصوت",
+	"sfx": "Sound Effects",
+	"surrender": "ألغِ",
+	"gameRetry": "Retry",
+	"areYouSure": "Are you sure?",
+	"cannotLoad": "تعذر التحميل"
+}
+</locale>
+
+<locale lang="json" locale="ca-ES">
+{
+	"loading": "S’està carregant",
+	"bubbleGame": "Bubble Game",
+	"bubbleGameHold": "Mantenir",
+	"bubbleGameScoreScore": "Puntuació ",
+	"bubbleGameScoreMaxChain": "Nombre màxim de combos",
+	"bubbleGameScoreScoreYen": "Diners guanyats",
+	"bubbleGameScoreYen": "{yen}Ien",
+	"bubbleGameScoreScoreSweets": "{onigiriQtyWithUnit} Boles d'arròs ",
+	"bubbleGameScoreEstimatedQty": "{qty} Peces",
+	"replaying": "Reproduint",
+	"endReplay": "Tanca la redifusió",
+	"backToTitle": "Torna al títol",
+	"showReplay": "Veure reproducció",
+	"share": "Comparteix",
+	"copyReplayData": "Copia les dades de la resposta",
+	"bubbleGameScoreHighScore": "Millor puntuació ",
+	"volume": "Volum",
+	"sfx": "Efectes de so",
+	"surrender": "Cancel·lar ",
+	"gameRetry": "Torna a provar",
+	"areYouSure": "Estàs segur?",
+	"cannotLoad": "No es pot carregar"
+}
+</locale>
+
+<locale lang="json" locale="cs-CZ">
+{
+	"loading": "Loading",
+	"bubbleGame": "Bubble Game",
+	"bubbleGameHold": "Hold",
+	"bubbleGameScoreScore": "Score",
+	"bubbleGameScoreMaxChain": "Maximum number of chains",
+	"bubbleGameScoreScoreYen": "Amount of money earned",
+	"bubbleGameScoreYen": "{yen} Yen",
+	"bubbleGameScoreScoreSweets": "{onigiriQtyWithUnit} Onigiri",
+	"bubbleGameScoreEstimatedQty": "{qty} Pieces",
+	"replaying": "Showing replay",
+	"endReplay": "Exit Replay",
+	"backToTitle": "Go back to title",
+	"showReplay": "View Replay",
+	"share": "Sdílet",
+	"copyReplayData": "Copy replay data",
+	"bubbleGameScoreHighScore": "High score",
+	"volume": "Hlasitost",
+	"sfx": "Sound Effects",
+	"surrender": "Zrušit",
+	"gameRetry": "Retry",
+	"areYouSure": "Jste si jistí?",
+	"cannotLoad": "Načtení se nezdařilo"
+}
+</locale>
+
+<locale lang="json" locale="da-DK">
+{
+	"loading": "Loading",
+	"bubbleGame": "Bubble Game",
+	"bubbleGameHold": "Hold",
+	"bubbleGameScoreScore": "Score",
+	"bubbleGameScoreMaxChain": "Maximum number of chains",
+	"bubbleGameScoreScoreYen": "Amount of money earned",
+	"bubbleGameScoreYen": "{yen} Yen",
+	"bubbleGameScoreScoreSweets": "{onigiriQtyWithUnit} Onigiri",
+	"bubbleGameScoreEstimatedQty": "{qty} Pieces",
+	"replaying": "Showing replay",
+	"endReplay": "Exit Replay",
+	"backToTitle": "Go back to title",
+	"showReplay": "View Replay",
+	"share": "Share",
+	"copyReplayData": "Copy replay data",
+	"bubbleGameScoreHighScore": "High score",
+	"volume": "Volume",
+	"sfx": "Sound Effects",
+	"surrender": "Cancel",
+	"gameRetry": "Retry",
+	"areYouSure": "Are you sure?",
+	"cannotLoad": "Unable to load"
+}
+</locale>
+
+<locale lang="json" locale="de-DE">
+{
+	"loading": "Laden",
+	"bubbleGame": "Bubble Game",
+	"bubbleGameHold": "Halten",
+	"bubbleGameScoreScore": "Spielstand",
+	"bubbleGameScoreMaxChain": "Maximale Anzahl an Verkettungen",
+	"bubbleGameScoreScoreYen": "Verdienter Geldbetrag",
+	"bubbleGameScoreYen": "{yen} Yen",
+	"bubbleGameScoreScoreSweets": "{onigiriQtyWithUnit} Onigiri",
+	"bubbleGameScoreEstimatedQty": "{qty} Stück",
+	"replaying": "Aufzeichnung",
+	"endReplay": "Aufzeichnung verlassen",
+	"backToTitle": "Zurück zum Startbildschirm",
+	"showReplay": "Wiederholung anzeigen",
+	"share": "Teilen",
+	"copyReplayData": "Aufzeichnung kopieren",
+	"bubbleGameScoreHighScore": "Höchstpunktzahl",
+	"volume": "Lautstärke",
+	"sfx": "Soundeffekte",
+	"surrender": "Abbrechen",
+	"gameRetry": "Erneut versuchen",
+	"areYouSure": "Bist du sicher?",
+	"cannotLoad": "Kann nicht geladen werden"
+}
+</locale>
+
+<locale lang="json" locale="en-US">
+{
+	"loading": "Loading",
+	"bubbleGame": "Bubble Game",
+	"bubbleGameHold": "Hold",
+	"bubbleGameScoreScore": "Score",
+	"bubbleGameScoreMaxChain": "Maximum number of chains",
+	"bubbleGameScoreScoreYen": "Amount of money earned",
+	"bubbleGameScoreYen": "{yen} Yen",
+	"bubbleGameScoreScoreSweets": "{onigiriQtyWithUnit} Onigiri",
+	"bubbleGameScoreEstimatedQty": "{qty} Pieces",
+	"replaying": "Showing replay",
+	"endReplay": "Exit Replay",
+	"backToTitle": "Go back to title",
+	"showReplay": "View Replay",
+	"share": "Share",
+	"copyReplayData": "Copy replay data",
+	"bubbleGameScoreHighScore": "High score",
+	"volume": "Volume",
+	"sfx": "Sound Effects",
+	"surrender": "Cancel",
+	"gameRetry": "Retry",
+	"areYouSure": "Are you sure?",
+	"cannotLoad": "Unable to load"
+}
+</locale>
+
+<locale lang="json" locale="es-ES">
+{
+	"loading": "Cargando",
+	"bubbleGame": "Bubble Game",
+	"bubbleGameHold": "Mantener",
+	"bubbleGameScoreScore": "Puntos",
+	"bubbleGameScoreMaxChain": "Número máximo de combos",
+	"bubbleGameScoreScoreYen": "Cantidad de dinero ganada",
+	"bubbleGameScoreYen": "{yen} Yenes",
+	"bubbleGameScoreScoreSweets": "{onigiriQtyWithUnit} Onigiris",
+	"bubbleGameScoreEstimatedQty": "{qty} Piezas",
+	"replaying": "Reproduciendo",
+	"endReplay": "Terminar reproducción",
+	"backToTitle": "Regresar al inicio",
+	"showReplay": "Ver reproducción",
+	"share": "Compartir",
+	"copyReplayData": "Copiar datos de reproducción",
+	"bubbleGameScoreHighScore": "Puntuación más alta",
+	"volume": "Volumen",
+	"sfx": "Efectos de sonido",
+	"surrender": "detener",
+	"gameRetry": "Reintentar",
+	"areYouSure": "¿Estás conforme?",
+	"cannotLoad": "No se puede cargar."
+}
+</locale>
+
+<locale lang="json" locale="fr-FR">
+{
+	"loading": "Chargement en cours",
+	"bubbleGame": "Jeu de bulles",
+	"bubbleGameHold": "Réserver",
+	"bubbleGameScoreScore": "Score",
+	"bubbleGameScoreMaxChain": "Nombre maximum de chaînes",
+	"bubbleGameScoreScoreYen": "Montant gagné",
+	"bubbleGameScoreYen": "{yen} yens",
+	"bubbleGameScoreScoreSweets": "{onigiriQtyWithUnit} Onigiri(s)",
+	"bubbleGameScoreEstimatedQty": "{qty} pièces",
+	"replaying": "En cours de rediffusion",
+	"endReplay": "Arrêter la rediffusion",
+	"backToTitle": "Retourner au titre",
+	"showReplay": "Voir le replay",
+	"share": "Partager",
+	"copyReplayData": "Copier les données de la rediffusion",
+	"bubbleGameScoreHighScore": "Meilleur score",
+	"volume": "Volume",
+	"sfx": "Effets sonores",
+	"surrender": "Annuler",
+	"gameRetry": "Réessayer",
+	"areYouSure": "Êtes-vous sûr·e ?",
+	"cannotLoad": "Chargement impossible"
+}
+</locale>
+
+<locale lang="json" locale="id-ID">
+{
+	"loading": "Memuat...",
+	"bubbleGame": "Bubble Game",
+	"bubbleGameHold": "Tahan",
+	"bubbleGameScoreScore": "Skor",
+	"bubbleGameScoreMaxChain": "Jumlah skor berantai",
+	"bubbleGameScoreScoreYen": "Jumlah uang didapat",
+	"bubbleGameScoreYen": "{yen} Yen",
+	"bubbleGameScoreScoreSweets": "{onigiriQtyWithUnit} onigiri",
+	"bubbleGameScoreEstimatedQty": "{qty} buah",
+	"replaying": "Menayangkan Ulang",
+	"endReplay": "Keluat dari tayangan ulang",
+	"backToTitle": "Ke Judul",
+	"showReplay": "Lihat tayangan ulang",
+	"share": "Bagikan",
+	"copyReplayData": "Salin data tayangan ulang",
+	"bubbleGameScoreHighScore": "Skor tertinggi",
+	"volume": "Volume",
+	"sfx": "Efek Suara",
+	"surrender": "Batalkan",
+	"gameRetry": "Coba lagi",
+	"areYouSure": "Apakah kamu yakin?",
+	"cannotLoad": "Tidak dapat memuat"
+}
+</locale>
+
+<locale lang="json" locale="it-IT">
+{
+	"loading": "Caricamento",
+	"bubbleGame": "Bubble Game",
+	"bubbleGameHold": "Tieni",
+	"bubbleGameScoreScore": "Punteggio",
+	"bubbleGameScoreMaxChain": "Miglior combo",
+	"bubbleGameScoreScoreYen": "Capitale",
+	"bubbleGameScoreYen": "{yen}￥",
+	"bubbleGameScoreScoreSweets": "Onigiri {onigiriQtyWithUnit}",
+	"bubbleGameScoreEstimatedQty": "{qty} punti",
+	"replaying": "Replay in corso",
+	"endReplay": "Termina replay",
+	"backToTitle": "Torna al titolo",
+	"showReplay": "Vedi i replay",
+	"share": "Condividi",
+	"copyReplayData": "Copia replay",
+	"bubbleGameScoreHighScore": "Punteggio migliore",
+	"volume": "Volume",
+	"sfx": "Effetti sonori",
+	"surrender": "Annulla",
+	"gameRetry": "Riprova",
+	"areYouSure": "Confermi?",
+	"cannotLoad": "Caricamento impossibile"
+}
+</locale>
+
+<locale lang="json" locale="ja-JP">
+{
+	"loading": "読み込み中",
+	"bubbleGame": "バブルゲーム",
+	"bubbleGameHold": "ホールド",
+	"bubbleGameScoreScore": "スコア",
+	"bubbleGameScoreMaxChain": "最大チェーン数",
+	"bubbleGameScoreScoreYen": "稼いだ金額",
+	"bubbleGameScoreYen": "{yen}円",
+	"bubbleGameScoreScoreSweets": "おにぎり {onigiriQtyWithUnit}",
+	"bubbleGameScoreEstimatedQty": "{qty}個分",
+	"replaying": "リプレイ中",
+	"endReplay": "リプレイを終了",
+	"backToTitle": "タイトルへ",
+	"showReplay": "リプレイを見る",
+	"share": "共有",
+	"copyReplayData": "リプレイデータをコピー",
+	"bubbleGameScoreHighScore": "ハイスコア",
+	"volume": "音量",
+	"sfx": "効果音",
+	"surrender": "やめる",
+	"gameRetry": "リトライ",
+	"areYouSure": "よろしいですか？",
+	"cannotLoad": "読み込めません"
+}
+</locale>
+
+<locale lang="json" locale="ja-KS">
+{
+	"loading": "読み込み中",
+	"bubbleGame": "バブルゲーム",
+	"bubbleGameHold": "ホールド",
+	"bubbleGameScoreScore": "スコア",
+	"bubbleGameScoreMaxChain": "最大チェーン数",
+	"bubbleGameScoreScoreYen": "稼いだ金額",
+	"bubbleGameScoreYen": "{yen}円",
+	"bubbleGameScoreScoreSweets": "おにぎり {onigiriQtyWithUnit}",
+	"bubbleGameScoreEstimatedQty": "{qty}個分",
+	"replaying": "リプレイ中",
+	"endReplay": "リプレイを終了",
+	"backToTitle": "タイトルへ",
+	"showReplay": "リプレイ見る",
+	"share": "わけわけ",
+	"copyReplayData": "リプレイデータをコピー",
+	"bubbleGameScoreHighScore": "ハイスコア",
+	"volume": "音のでかさ",
+	"sfx": "効果音",
+	"surrender": "やめとく",
+	"gameRetry": "もういっちょ",
+	"areYouSure": "いいん？",
+	"cannotLoad": "読み込めへんで"
+}
+</locale>
+
+<locale lang="json" locale="kab-KAB">
+{
+	"loading": "Loading",
+	"bubbleGame": "Bubble Game",
+	"bubbleGameHold": "Hold",
+	"bubbleGameScoreScore": "Score",
+	"bubbleGameScoreMaxChain": "Maximum number of chains",
+	"bubbleGameScoreScoreYen": "Amount of money earned",
+	"bubbleGameScoreYen": "{yen} Yen",
+	"bubbleGameScoreScoreSweets": "{onigiriQtyWithUnit} Onigiri",
+	"bubbleGameScoreEstimatedQty": "{qty} Pieces",
+	"replaying": "Showing replay",
+	"endReplay": "Exit Replay",
+	"backToTitle": "Go back to title",
+	"showReplay": "View Replay",
+	"share": "Share",
+	"copyReplayData": "Copy replay data",
+	"bubbleGameScoreHighScore": "High score",
+	"volume": "Volume",
+	"sfx": "Sound Effects",
+	"surrender": "Cancel",
+	"gameRetry": "Retry",
+	"areYouSure": "Are you sure?",
+	"cannotLoad": "Unable to load"
+}
+</locale>
+
+<locale lang="json" locale="kn-IN">
+{
+	"loading": "Loading",
+	"bubbleGame": "Bubble Game",
+	"bubbleGameHold": "Hold",
+	"bubbleGameScoreScore": "Score",
+	"bubbleGameScoreMaxChain": "Maximum number of chains",
+	"bubbleGameScoreScoreYen": "Amount of money earned",
+	"bubbleGameScoreYen": "{yen} Yen",
+	"bubbleGameScoreScoreSweets": "{onigiriQtyWithUnit} Onigiri",
+	"bubbleGameScoreEstimatedQty": "{qty} Pieces",
+	"replaying": "Showing replay",
+	"endReplay": "Exit Replay",
+	"backToTitle": "Go back to title",
+	"showReplay": "View Replay",
+	"share": "Share",
+	"copyReplayData": "Copy replay data",
+	"bubbleGameScoreHighScore": "High score",
+	"volume": "Volume",
+	"sfx": "Sound Effects",
+	"surrender": "Cancel",
+	"gameRetry": "Retry",
+	"areYouSure": "Are you sure?",
+	"cannotLoad": "Unable to load"
+}
+</locale>
+
+<locale lang="json" locale="ko-KR">
+{
+	"loading": "불러오는 중",
+	"bubbleGame": "버블 게임",
+	"bubbleGameHold": "홀드",
+	"bubbleGameScoreScore": "점수",
+	"bubbleGameScoreMaxChain": "최대 콤보 수",
+	"bubbleGameScoreScoreYen": "번 돈",
+	"bubbleGameScoreYen": "{yen}엔",
+	"bubbleGameScoreScoreSweets": "오니기리 {onigiriQtyWithUnit}",
+	"bubbleGameScoreEstimatedQty": "{qty}개",
+	"replaying": "리플레이 중",
+	"endReplay": "리플레이 종료",
+	"backToTitle": "타이틀로 가기",
+	"showReplay": "리플레이 보기",
+	"share": "공유",
+	"copyReplayData": "리플레이 데이터를 복사",
+	"bubbleGameScoreHighScore": "최고 점수",
+	"volume": "음량",
+	"sfx": "효과음",
+	"surrender": "그만두기",
+	"gameRetry": "다시 시도",
+	"areYouSure": "계속 진행하시겠습니까?",
+	"cannotLoad": "불러오지 못했습니다"
+}
+</locale>
+
+<locale lang="json" locale="nl-NL">
+{
+	"loading": "Loading",
+	"bubbleGame": "Bubble Game",
+	"bubbleGameHold": "Hold",
+	"bubbleGameScoreScore": "Score",
+	"bubbleGameScoreMaxChain": "Maximum number of chains",
+	"bubbleGameScoreScoreYen": "Amount of money earned",
+	"bubbleGameScoreYen": "{yen} Yen",
+	"bubbleGameScoreScoreSweets": "{onigiriQtyWithUnit} Onigiri",
+	"bubbleGameScoreEstimatedQty": "{qty} Pieces",
+	"replaying": "Showing replay",
+	"endReplay": "Exit Replay",
+	"backToTitle": "Go back to title",
+	"showReplay": "View Replay",
+	"share": "Delen",
+	"copyReplayData": "Copy replay data",
+	"bubbleGameScoreHighScore": "High score",
+	"volume": "Volume",
+	"sfx": "Sound Effects",
+	"surrender": "Cancel",
+	"gameRetry": "Retry",
+	"areYouSure": "Weet je het zeker?",
+	"cannotLoad": "Unable to load"
+}
+</locale>
+
+<locale lang="json" locale="no-NO">
+{
+	"loading": "Loading",
+	"bubbleGame": "Bubble Game",
+	"bubbleGameHold": "Hold",
+	"bubbleGameScoreScore": "Score",
+	"bubbleGameScoreMaxChain": "Maximum number of chains",
+	"bubbleGameScoreScoreYen": "Amount of money earned",
+	"bubbleGameScoreYen": "{yen} Yen",
+	"bubbleGameScoreScoreSweets": "{onigiriQtyWithUnit} Onigiri",
+	"bubbleGameScoreEstimatedQty": "{qty} Pieces",
+	"replaying": "Showing replay",
+	"endReplay": "Exit Replay",
+	"backToTitle": "Go back to title",
+	"showReplay": "View Replay",
+	"share": "Del",
+	"copyReplayData": "Copy replay data",
+	"bubbleGameScoreHighScore": "High score",
+	"volume": "Volum",
+	"sfx": "Sound Effects",
+	"surrender": "Avbryt",
+	"gameRetry": "Retry",
+	"areYouSure": "Are you sure?",
+	"cannotLoad": "Unable to load"
+}
+</locale>
+
+<locale lang="json" locale="pl-PL">
+{
+	"loading": "Loading",
+	"bubbleGame": "Bubble Game",
+	"bubbleGameHold": "Hold",
+	"bubbleGameScoreScore": "Wynik",
+	"bubbleGameScoreMaxChain": "Maximum number of chains",
+	"bubbleGameScoreScoreYen": "Amount of money earned",
+	"bubbleGameScoreYen": "{yen} Yen",
+	"bubbleGameScoreScoreSweets": "{onigiriQtyWithUnit} Onigiri",
+	"bubbleGameScoreEstimatedQty": "{qty} Pieces",
+	"replaying": "Showing replay",
+	"endReplay": "Exit Replay",
+	"backToTitle": "Go back to title",
+	"showReplay": "View Replay",
+	"share": "Udostępnij",
+	"copyReplayData": "Copy replay data",
+	"bubbleGameScoreHighScore": "High score",
+	"volume": "Głośność",
+	"sfx": "Sound Effects",
+	"surrender": "Odrzuć",
+	"gameRetry": "Spróbuj ponownie",
+	"areYouSure": "Na pewno?",
+	"cannotLoad": "Nie można wczytać"
+}
+</locale>
+
+<locale lang="json" locale="pt-PT">
+{
+	"loading": "Carregando",
+	"bubbleGame": "Bubble Game",
+	"bubbleGameHold": "Próximos",
+	"bubbleGameScoreScore": "Pontuação",
+	"bubbleGameScoreMaxChain": "Número máximo de encadeamentos",
+	"bubbleGameScoreScoreYen": "Dinheiro recebido",
+	"bubbleGameScoreYen": "{yen} Yen",
+	"bubbleGameScoreScoreSweets": "{onigiriQtyWithUnit} Onigiri",
+	"bubbleGameScoreEstimatedQty": "{qty} Peças",
+	"replaying": "Mostrando Replay",
+	"endReplay": "Sair do Replay",
+	"backToTitle": "Voltar à página inicial",
+	"showReplay": "Ver Replay",
+	"share": "Compartilhar",
+	"copyReplayData": "Copiar dados de Replay",
+	"bubbleGameScoreHighScore": "Melhor pontuação",
+	"volume": "Volume",
+	"sfx": "Efeitos Sonoros",
+	"surrender": "Cancelar",
+	"gameRetry": "Tentar Novamente",
+	"areYouSure": "Tem certeza?",
+	"cannotLoad": "Não foi possível carregar"
+}
+</locale>
+
+<locale lang="json" locale="ru-RU">
+{
+	"loading": "Загрузка",
+	"bubbleGame": "BubbleGame",
+	"bubbleGameHold": "Hold",
+	"bubbleGameScoreScore": "Счёт",
+	"bubbleGameScoreMaxChain": "Максимальное комбо",
+	"bubbleGameScoreScoreYen": "Иен заработано",
+	"bubbleGameScoreYen": "{yen} иен",
+	"bubbleGameScoreScoreSweets": "{onigiriQtyWithUnit} онигири",
+	"bubbleGameScoreEstimatedQty": "{qty} объектов",
+	"replaying": "Показывается повтор",
+	"endReplay": "Конец повтора",
+	"backToTitle": "Вернуться к заголовку",
+	"showReplay": "Показать повтор",
+	"share": "Поделиться",
+	"copyReplayData": "Копировать данные повтора",
+	"bubbleGameScoreHighScore": "Рекорд",
+	"volume": "Громкость",
+	"sfx": "Звуковые эффекты",
+	"surrender": "Отменить",
+	"gameRetry": "Повторить попытку",
+	"areYouSure": "Вы уверены?",
+	"cannotLoad": "Не удалось загрузить"
+}
+</locale>
+
+<locale lang="json" locale="sk-SK">
+{
+	"loading": "Loading",
+	"bubbleGame": "Bubble Game",
+	"bubbleGameHold": "Hold",
+	"bubbleGameScoreScore": "Score",
+	"bubbleGameScoreMaxChain": "Maximum number of chains",
+	"bubbleGameScoreScoreYen": "Amount of money earned",
+	"bubbleGameScoreYen": "{yen} Yen",
+	"bubbleGameScoreScoreSweets": "{onigiriQtyWithUnit} Onigiri",
+	"bubbleGameScoreEstimatedQty": "{qty} Pieces",
+	"replaying": "Showing replay",
+	"endReplay": "Exit Replay",
+	"backToTitle": "Go back to title",
+	"showReplay": "View Replay",
+	"share": "Zdieľať",
+	"copyReplayData": "Copy replay data",
+	"bubbleGameScoreHighScore": "High score",
+	"volume": "Hlasitosť",
+	"sfx": "Sound Effects",
+	"surrender": "Cancel",
+	"gameRetry": "Retry",
+	"areYouSure": "Are you sure?",
+	"cannotLoad": "Nedá sa načítať."
+}
+</locale>
+
+<locale lang="json" locale="th-TH">
+{
+	"loading": "กำลังโหลด",
+	"bubbleGame": "เกมบับเบิ้ล",
+	"bubbleGameHold": "ถือไว้",
+	"bubbleGameScoreScore": "คะแนน",
+	"bubbleGameScoreMaxChain": "จำนวน chain สูงสุด",
+	"bubbleGameScoreScoreYen": "จำนวนเงินที่ได้รับ",
+	"bubbleGameScoreYen": "{yen} เยน",
+	"bubbleGameScoreScoreSweets": "โอนิงิริ {onigiriQtyWithUnit}",
+	"bubbleGameScoreEstimatedQty": "{qty} อัน",
+	"replaying": "กำลังรีเพลย์",
+	"endReplay": "ออกจากรีเพลย์",
+	"backToTitle": "กลับไปหน้าไตเติ้ล",
+	"showReplay": "ดูรีเพลย์",
+	"share": "แบ่งปัน",
+	"copyReplayData": "คัดลอกข้อมูลรีเพลย์",
+	"bubbleGameScoreHighScore": "คะแนนสูงสุด",
+	"volume": "ระดับเสียง",
+	"sfx": "เสียงเอฟเฟ็กต์",
+	"surrender": "ยอมแพ้",
+	"gameRetry": "เริ่มเกมใหม่",
+	"areYouSure": "แน่ใจแล้วใช่ไหมคะ?",
+	"cannotLoad": "ไม่สามารถโหลดได้"
+}
+</locale>
+
+<locale lang="json" locale="tr-TR">
+{
+	"loading": "Yükleniyor",
+	"bubbleGame": "Kabarcık Oyunu",
+	"bubbleGameHold": "Tut",
+	"bubbleGameScoreScore": "Skor",
+	"bubbleGameScoreMaxChain": "Maksimum zincir sayısı",
+	"bubbleGameScoreScoreYen": "Kazanılan para miktarı",
+	"bubbleGameScoreYen": "{yen} Yen",
+	"bubbleGameScoreScoreSweets": "{onigiriQtyWithUnit} Onigiri",
+	"bubbleGameScoreEstimatedQty": "{qty} Adet",
+	"replaying": "Tekrar gösteriliyor",
+	"endReplay": "Tekrardan çık",
+	"backToTitle": "Başlığa geri dön",
+	"showReplay": "Tekrarı izle",
+	"share": "Paylaş",
+	"copyReplayData": "Tekrar oynatma verilerini kopyala",
+	"bubbleGameScoreHighScore": "Yüksek puan",
+	"volume": "Ses hacmi",
+	"sfx": "Ses Efektleri",
+	"surrender": "İptal",
+	"gameRetry": "Tekrar dene",
+	"areYouSure": "Emin misin?",
+	"cannotLoad": "Yüklenemiyor"
+}
+</locale>
+
+<locale lang="json" locale="ug-CN">
+{
+	"loading": "Loading",
+	"bubbleGame": "Bubble Game",
+	"bubbleGameHold": "Hold",
+	"bubbleGameScoreScore": "Score",
+	"bubbleGameScoreMaxChain": "Maximum number of chains",
+	"bubbleGameScoreScoreYen": "Amount of money earned",
+	"bubbleGameScoreYen": "{yen} Yen",
+	"bubbleGameScoreScoreSweets": "{onigiriQtyWithUnit} Onigiri",
+	"bubbleGameScoreEstimatedQty": "{qty} Pieces",
+	"replaying": "Showing replay",
+	"endReplay": "Exit Replay",
+	"backToTitle": "Go back to title",
+	"showReplay": "View Replay",
+	"share": "Share",
+	"copyReplayData": "Copy replay data",
+	"bubbleGameScoreHighScore": "High score",
+	"volume": "Volume",
+	"sfx": "Sound Effects",
+	"surrender": "Cancel",
+	"gameRetry": "Retry",
+	"areYouSure": "Are you sure?",
+	"cannotLoad": "Unable to load"
+}
+</locale>
+
+<locale lang="json" locale="uk-UA">
+{
+	"loading": "Завантаження",
+	"bubbleGame": "Bubble Game",
+	"bubbleGameHold": "Затримати",
+	"bubbleGameScoreScore": "Рахунок",
+	"bubbleGameScoreMaxChain": "Максимальна кількість ",
+	"bubbleGameScoreScoreYen": "Кількість зроблених грошей",
+	"bubbleGameScoreYen": "{yen} Єн",
+	"bubbleGameScoreScoreSweets": "{onigiriQtyWithUnit} Оніґірі",
+	"bubbleGameScoreEstimatedQty": "{qty} Шматків",
+	"replaying": "Показ повтору",
+	"endReplay": "Вийти з повтору",
+	"backToTitle": "Повернутися до заголовного екрана",
+	"showReplay": "Переглянути повтор",
+	"share": "Поділитись",
+	"copyReplayData": "Копіювати дані повтору",
+	"bubbleGameScoreHighScore": "Найвищий рахунок",
+	"volume": "Гучність",
+	"sfx": "Звукові ефекти",
+	"surrender": "Скасувати",
+	"gameRetry": "Спробувати знову",
+	"areYouSure": "Ви впевнені?",
+	"cannotLoad": "Не вдалося завантажити"
+}
+</locale>
+
+<locale lang="json" locale="vi-VN">
+{
+	"loading": "Loading",
+	"bubbleGame": "Bubble Game",
+	"bubbleGameHold": "Hold",
+	"bubbleGameScoreScore": "Score",
+	"bubbleGameScoreMaxChain": "Maximum number of chains",
+	"bubbleGameScoreScoreYen": "Amount of money earned",
+	"bubbleGameScoreYen": "{yen} Yen",
+	"bubbleGameScoreScoreSweets": "{onigiriQtyWithUnit} Onigiri",
+	"bubbleGameScoreEstimatedQty": "{qty} Pieces",
+	"replaying": "Showing replay",
+	"endReplay": "Exit Replay",
+	"backToTitle": "Go back to title",
+	"showReplay": "View Replay",
+	"share": "Chia sẻ",
+	"copyReplayData": "Copy replay data",
+	"bubbleGameScoreHighScore": "High score",
+	"volume": "Âm lượng",
+	"sfx": "Sound Effects",
+	"surrender": "Từ chối",
+	"gameRetry": "Retry",
+	"areYouSure": "Bạn chắc chứ?",
+	"cannotLoad": "Không tải được"
+}
+</locale>
+
+<locale lang="json" locale="zh-CN">
+{
+	"loading": "读取中",
+	"bubbleGame": "泡泡游戏",
+	"bubbleGameHold": "抓住",
+	"bubbleGameScoreScore": "得分",
+	"bubbleGameScoreMaxChain": "最高连击数",
+	"bubbleGameScoreScoreYen": "赚到的钱",
+	"bubbleGameScoreYen": "{yen} 日元",
+	"bubbleGameScoreScoreSweets": "相当于 {onigiriQtyWithUnit} 饭团",
+	"bubbleGameScoreEstimatedQty": "约 {qty} 个",
+	"replaying": "重播中",
+	"endReplay": "结束回放",
+	"backToTitle": "返回标题",
+	"showReplay": "观看回放",
+	"share": "分享",
+	"copyReplayData": "复制回放数据",
+	"bubbleGameScoreHighScore": "最高分",
+	"volume": "音量",
+	"sfx": "音效",
+	"surrender": "取消",
+	"gameRetry": "重试",
+	"areYouSure": "你确定吗？",
+	"cannotLoad": "无法加载"
+}
+</locale>
+
+<locale lang="json" locale="zh-TW">
+{
+	"loading": "載入中",
+	"bubbleGame": "氣泡遊戲",
+	"bubbleGameHold": "保留",
+	"bubbleGameScoreScore": "分數",
+	"bubbleGameScoreMaxChain": "最大結合數",
+	"bubbleGameScoreScoreYen": "賺取的金額",
+	"bubbleGameScoreYen": "{yen}円",
+	"bubbleGameScoreScoreSweets": "飯糰 {onigiriQtyWithUnit}",
+	"bubbleGameScoreEstimatedQty": "{qty}個",
+	"replaying": "重播中",
+	"endReplay": "退出重播",
+	"backToTitle": "回到遊戲標題頁",
+	"showReplay": "觀看重播",
+	"share": "分享",
+	"copyReplayData": "複製重播資料",
+	"bubbleGameScoreHighScore": "最高分",
+	"volume": "音量",
+	"sfx": "音效",
+	"surrender": "退出",
+	"gameRetry": "再試一次",
+	"areYouSure": "是否確定？",
+	"cannotLoad": "無法載入"
+}
+</locale>
