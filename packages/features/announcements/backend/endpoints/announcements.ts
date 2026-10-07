@@ -3,45 +3,30 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { packedAnnouncementsDefinition, packedAnnouncementsInput, packedAnnouncementsOutput } from '../../contract/packed-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
 import { Brackets } from 'typeorm';
-import { Endpoint } from '@/server/api/endpoint-base.js';
+
 import { QueryService } from '@/core/QueryService.js';
 import { AnnouncementEntityService } from '../serializers/AnnouncementEntityService.js';
 import { DI } from '@/di-symbols.js';
 import type { AnnouncementsRepository } from '@/models/_.js';
+
+const contractProjection = projectEndpointContract(packedAnnouncementsDefinition);
 
 export const meta = {
 	tags: ['meta'],
 
 	requireCredential: false,
 
-	res: {
-		type: 'array',
-		optional: false, nullable: false,
-		items: {
-			type: 'object',
-			optional: false, nullable: false,
-			ref: 'Announcement',
-		},
-	},
+	res: contractProjection.response,
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {
-		limit: { type: 'integer', minimum: 1, maximum: 100, default: 10 },
-		sinceId: { type: 'string', format: 'misskey:id' },
-		untilId: { type: 'string', format: 'misskey:id' },
-		sinceDate: { type: 'integer' },
-		untilDate: { type: 'integer' },
-		isActive: { type: 'boolean', default: true },
-	},
-	required: [],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedAnnouncementsInput, typeof packedAnnouncementsOutput> {
 	constructor(
 		@Inject(DI.announcementsRepository)
 		private announcementsRepository: AnnouncementsRepository,
@@ -49,7 +34,7 @@ export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDe
 		private queryService: QueryService,
 		private announcementEntityService: AnnouncementEntityService,
 	) {
-		super(meta, paramDef, async (ps, me) => {
+		super(meta, contractProjection, async (ps, me) => {
 			const query = this.queryService.makePaginationQuery(this.announcementsRepository.createQueryBuilder('announcement'), ps.sinceId, ps.untilId, ps.sinceDate, ps.untilDate)
 				.andWhere('announcement.isActive = :isActive', { isActive: ps.isActive })
 				.andWhere(new Brackets(qb => {

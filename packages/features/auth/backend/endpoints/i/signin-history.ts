@@ -3,42 +3,28 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { packedISigninHistoryDefinition, packedISigninHistoryInput, packedISigninHistoryOutput } from '../../../contract/packed-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
+
 import type { SigninsRepository } from '@/models/_.js';
 import { QueryService } from '@/core/QueryService.js';
 import { SigninEntityService } from '../../serializers/SigninEntityService.js';
 import { DI } from '@/di-symbols.js';
 
+const contractProjection = projectEndpointContract(packedISigninHistoryDefinition);
+
 export const meta = {
 	requireCredential: true,
 	secure: true,
 
-	res: {
-		type: 'array',
-		optional: false, nullable: false,
-		items: {
-			type: 'object',
-			optional: false, nullable: false,
-			ref: 'Signin',
-		},
-	},
+	res: contractProjection.response,
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {
-		limit: { type: 'integer', minimum: 1, maximum: 100, default: 10 },
-		sinceId: { type: 'string', format: 'misskey:id' },
-		untilId: { type: 'string', format: 'misskey:id' },
-		sinceDate: { type: 'integer' },
-		untilDate: { type: 'integer' },
-	},
-	required: [],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedISigninHistoryInput, typeof packedISigninHistoryOutput> {
 	constructor(
 		@Inject(DI.signinsRepository)
 		private signinsRepository: SigninsRepository,
@@ -46,7 +32,7 @@ export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDe
 		private signinEntityService: SigninEntityService,
 		private queryService: QueryService,
 	) {
-		super(meta, paramDef, async (ps, me) => {
+		super(meta, contractProjection, async (ps, me) => {
 			const query = this.queryService.makePaginationQuery(this.signinsRepository.createQueryBuilder('signin'), ps.sinceId, ps.untilId, ps.sinceDate, ps.untilDate)
 				.andWhere('signin.userId = :meId', { meId: me.id });
 

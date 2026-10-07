@@ -3,10 +3,12 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { packedIUpdateEmailDefinition, packedIUpdateEmailInput, packedIUpdateEmailOutput } from '../../../contract/packed-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
 import ms from '@/runtime-dependencies/ms.js';
 import bcrypt from 'bcryptjs';
-import { Endpoint } from '@/server/api/endpoint-base.js';
+
 import type { MiMeta, UserProfilesRepository } from '@/models/_.js';
 import { UserEntityService } from '../../../../users/backend/serializers/UserEntityService.js';
 import { EmailService } from '@/core/EmailService.js';
@@ -16,6 +18,8 @@ import { GlobalEventService } from '../../../../runtime/backend/services/GlobalE
 import { L_CHARS, secureRndstr } from '@/misc/secure-rndstr.js';
 import { UserAuthService } from '../../services/UserAuthService.js';
 import { ApiError } from '@/server/api/error.js';
+
+const contractProjection = projectEndpointContract(packedIUpdateEmailDefinition);
 
 export const meta = {
 	requireCredential: true,
@@ -47,24 +51,13 @@ export const meta = {
 		},
 	},
 
-	res: {
-		type: 'object',
-		ref: 'MeDetailed',
-	},
+	res: contractProjection.response,
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {
-		password: { type: 'string' },
-		email: { type: 'string', nullable: true },
-		token: { type: 'string', nullable: true },
-	},
-	required: ['password'],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedIUpdateEmailInput, typeof packedIUpdateEmailOutput> {
 	constructor(
 		@Inject(DI.config)
 		private config: Config,
@@ -80,7 +73,7 @@ export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDe
 		private userAuthService: UserAuthService,
 		private globalEventService: GlobalEventService,
 	) {
-		super(meta, paramDef, async (ps, me) => {
+		super(meta, contractProjection, async (ps, me) => {
 			const token = ps.token;
 			const profile = await this.userProfilesRepository.findOneByOrFail({ userId: me.id });
 

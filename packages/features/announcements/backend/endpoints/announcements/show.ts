@@ -3,22 +3,22 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { packedAnnouncementsShowDefinition, packedAnnouncementsShowInput, packedAnnouncementsShowOutput } from '../../../contract/packed-endpoint-definitions.js';
 import { Injectable } from '@nestjs/common';
 import { EntityNotFoundError } from 'typeorm';
-import { Endpoint } from '@/server/api/endpoint-base.js';
+
 import { AnnouncementService } from '../../services/AnnouncementService.js';
 import { ApiError } from '@/server/api/error.js';
+
+const contractProjection = projectEndpointContract(packedAnnouncementsShowDefinition);
 
 export const meta = {
 	tags: ['meta'],
 
 	requireCredential: false,
 
-	res: {
-		type: 'object',
-		optional: false, nullable: false,
-		ref: 'Announcement',
-	},
+	res: contractProjection.response,
 
 	errors: {
 		noSuchAnnouncement: {
@@ -29,20 +29,14 @@ export const meta = {
 	},
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {
-		announcementId: { type: 'string', format: 'misskey:id' },
-	},
-	required: ['announcementId'],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedAnnouncementsShowInput, typeof packedAnnouncementsShowOutput> {
 	constructor(
 		private announcementService: AnnouncementService,
 	) {
-		super(meta, paramDef, async (ps, me) => {
+		super(meta, contractProjection, async (ps, me) => {
 			try {
 				return await this.announcementService.getAnnouncement(ps.announcementId, me);
 			} catch (err) {

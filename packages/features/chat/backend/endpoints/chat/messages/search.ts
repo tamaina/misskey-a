@@ -3,12 +3,16 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { packedChatMessagesSearchDefinition, packedChatMessagesSearchInput, packedChatMessagesSearchOutput } from '../../../../contract/packed-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
+
 import { DI } from '@/di-symbols.js';
 import { ChatService } from '../../../services/ChatService.js';
 import { ChatEntityService } from '../../../serializers/ChatEntityService.js';
 import { ApiError } from '@/server/api/error.js';
+
+const contractProjection = projectEndpointContract(packedChatMessagesSearchDefinition);
 
 export const meta = {
 	tags: ['chat'],
@@ -17,15 +21,7 @@ export const meta = {
 
 	kind: 'read:chat',
 
-	res: {
-		type: 'array',
-		optional: false, nullable: false,
-		items: {
-			type: 'object',
-			optional: false, nullable: false,
-			ref: 'ChatMessage',
-		},
-	},
+	res: contractProjection.response,
 
 	errors: {
 		noSuchRoom: {
@@ -36,24 +32,15 @@ export const meta = {
 	},
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {
-		query: { type: 'string', minLength: 1, maxLength: 256 },
-		limit: { type: 'integer', minimum: 1, maximum: 100, default: 10 },
-		userId: { type: 'string', format: 'misskey:id', nullable: true },
-		roomId: { type: 'string', format: 'misskey:id', nullable: true },
-	},
-	required: ['query'],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedChatMessagesSearchInput, typeof packedChatMessagesSearchOutput> {
 	constructor(
 		private chatEntityService: ChatEntityService,
 		private chatService: ChatService,
 	) {
-		super(meta, paramDef, async (ps, me) => {
+		super(meta, contractProjection, async (ps, me) => {
 			await this.chatService.checkChatAvailability(me.id, 'read');
 
 			if (ps.roomId != null) {

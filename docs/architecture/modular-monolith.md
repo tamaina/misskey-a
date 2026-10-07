@@ -385,3 +385,19 @@ document remain unchanged. Optional root responses retain their no-content branc
 and opaque object output declarations retain extra payload fields. The WebAuthn
 key-completion route remains outside this batch because its opaque credential
 input needs a separate boundary review.
+
+## Packed-reference contract batch
+
+Forty further endpoints now use feature-owned native contracts across
+announcements, authentication, channels, chat and collections. The SDK derives
+these request/response types from their oRPC definitions. There are now 169
+native-contract routes (92 feature factories and 77 class adapters), with 269
+legacy schema-inference routes remaining.
+
+`packedReference(name)` preserves the canonical Valibot model type without
+expanding recursive response schemas at every endpoint. Only the legacy output
+projection maps registered references to named OpenAPI components. The generic
+schema converter does not automatically accept these output-only references,
+and the legacy input adapter rejects them. Existing handler response objects are
+not parsed, cloned or stripped. Missing-type legacy references remain outside
+this mechanical batch until their intended public schema is reviewed.

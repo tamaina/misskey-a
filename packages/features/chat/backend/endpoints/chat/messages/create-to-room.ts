@@ -3,14 +3,18 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { packedChatMessagesCreateToRoomDefinition, packedChatMessagesCreateToRoomInput, packedChatMessagesCreateToRoomOutput } from '../../../../contract/packed-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
 import ms from '@/runtime-dependencies/ms.js';
-import { Endpoint } from '@/server/api/endpoint-base.js';
+
 import { GetterService } from '@/server/api/GetterService.js';
 import { DI } from '@/di-symbols.js';
 import { ApiError } from '@/server/api/error.js';
 import { ChatService } from '../../../services/ChatService.js';
 import type { DriveFilesRepository, MiUser } from '@/models/_.js';
+
+const contractProjection = projectEndpointContract(packedChatMessagesCreateToRoomDefinition);
 
 export const meta = {
 	tags: ['chat'],
@@ -26,11 +30,7 @@ export const meta = {
 		max: 500,
 	},
 
-	res: {
-		type: 'object',
-		optional: false, nullable: false,
-		ref: 'ChatMessageLiteForRoom',
-	},
+	res: contractProjection.response,
 
 	errors: {
 		noSuchRoom: {
@@ -53,18 +53,10 @@ export const meta = {
 	},
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {
-		text: { type: 'string', nullable: true, maxLength: 2000 },
-		fileId: { type: 'string', format: 'misskey:id' },
-		toRoomId: { type: 'string', format: 'misskey:id' },
-	},
-	required: ['toRoomId'],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedChatMessagesCreateToRoomInput, typeof packedChatMessagesCreateToRoomOutput> {
 	constructor(
 		@Inject(DI.driveFilesRepository)
 		private driveFilesRepository: DriveFilesRepository,
@@ -72,7 +64,7 @@ export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDe
 		private getterService: GetterService,
 		private chatService: ChatService,
 	) {
-		super(meta, paramDef, async (ps, me) => {
+		super(meta, contractProjection, async (ps, me) => {
 			await this.chatService.checkChatAvailability(me.id, 'write');
 
 			const room = await this.chatService.findRoomById(ps.toRoomId);

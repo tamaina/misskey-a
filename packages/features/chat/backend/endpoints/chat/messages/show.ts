@@ -3,14 +3,18 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { packedChatMessagesShowDefinition, packedChatMessagesShowInput, packedChatMessagesShowOutput } from '../../../../contract/packed-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
+
 import { DI } from '@/di-symbols.js';
 import { GetterService } from '@/server/api/GetterService.js';
 import { ChatService } from '../../../services/ChatService.js';
 import { ChatEntityService } from '../../../serializers/ChatEntityService.js';
 import { ApiError } from '@/server/api/error.js';
 import { RoleService } from '../../../../../roles/backend/services/RoleService.js';
+
+const contractProjection = projectEndpointContract(packedChatMessagesShowDefinition);
 
 export const meta = {
 	tags: ['chat'],
@@ -19,11 +23,7 @@ export const meta = {
 
 	kind: 'read:chat',
 
-	res: {
-		type: 'object',
-		optional: false, nullable: false,
-		ref: 'ChatMessage',
-	},
+	res: contractProjection.response,
 
 	errors: {
 		noSuchMessage: {
@@ -34,22 +34,16 @@ export const meta = {
 	},
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {
-		messageId: { type: 'string', format: 'misskey:id' },
-	},
-	required: ['messageId'],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedChatMessagesShowInput, typeof packedChatMessagesShowOutput> {
 	constructor(
 		private chatService: ChatService,
 		private roleService: RoleService,
 		private chatEntityService: ChatEntityService,
 	) {
-		super(meta, paramDef, async (ps, me) => {
+		super(meta, contractProjection, async (ps, me) => {
 			await this.chatService.checkChatAvailability(me.id, 'read');
 
 			const message = await this.chatService.findMessageById(ps.messageId);

@@ -3,12 +3,16 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { packedClipsCreateDefinition, packedClipsCreateInput, packedClipsCreateOutput } from '../../../contract/packed-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
+
 import type { MiClip } from '@/models/_.js';
 import { ClipEntityService } from '../../serializers/ClipEntityService.js';
 import { ApiError } from '@/server/api/error.js';
 import { ClipService } from '../../services/ClipService.js';
+
+const contractProjection = projectEndpointContract(packedClipsCreateDefinition);
 
 export const meta = {
 	tags: ['clips'],
@@ -19,11 +23,7 @@ export const meta = {
 
 	kind: 'write:account',
 
-	res: {
-		type: 'object',
-		optional: false, nullable: false,
-		ref: 'Clip',
-	},
+	res: contractProjection.response,
 
 	errors: {
 		tooManyClips: {
@@ -34,23 +34,15 @@ export const meta = {
 	},
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {
-		name: { type: 'string', minLength: 1, maxLength: 100 },
-		isPublic: { type: 'boolean', default: false },
-		description: { type: 'string', nullable: true, maxLength: 2048 },
-	},
-	required: ['name'],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedClipsCreateInput, typeof packedClipsCreateOutput> {
 	constructor(
 		private clipEntityService: ClipEntityService,
 		private clipService: ClipService,
 	) {
-		super(meta, paramDef, async (ps, me) => {
+		super(meta, contractProjection, async (ps, me) => {
 			let clip: MiClip;
 			try {
 				// 空文字列をnullにしたいので??は使わない

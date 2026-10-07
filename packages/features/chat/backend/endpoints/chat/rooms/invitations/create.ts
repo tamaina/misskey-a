@@ -3,13 +3,17 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { packedChatRoomsInvitationsCreateDefinition, packedChatRoomsInvitationsCreateInput, packedChatRoomsInvitationsCreateOutput } from '../../../../../contract/packed-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
 import ms from '@/runtime-dependencies/ms.js';
-import { Endpoint } from '@/server/api/endpoint-base.js';
+
 import { DI } from '@/di-symbols.js';
 import { ApiError } from '@/server/api/error.js';
 import { ChatService } from '../../../../services/ChatService.js';
 import { ChatEntityService } from '../../../../serializers/ChatEntityService.js';
+
+const contractProjection = projectEndpointContract(packedChatRoomsInvitationsCreateDefinition);
 
 export const meta = {
 	tags: ['chat'],
@@ -25,11 +29,7 @@ export const meta = {
 		max: 50,
 	},
 
-	res: {
-		type: 'object',
-		optional: false, nullable: false,
-		ref: 'ChatRoomInvitation',
-	},
+	res: contractProjection.response,
 
 	errors: {
 		noSuchRoom: {
@@ -40,22 +40,15 @@ export const meta = {
 	},
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {
-		roomId: { type: 'string', format: 'misskey:id' },
-		userId: { type: 'string', format: 'misskey:id' },
-	},
-	required: ['roomId', 'userId'],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedChatRoomsInvitationsCreateInput, typeof packedChatRoomsInvitationsCreateOutput> {
 	constructor(
 		private chatService: ChatService,
 		private chatEntityService: ChatEntityService,
 	) {
-		super(meta, paramDef, async (ps, me) => {
+		super(meta, contractProjection, async (ps, me) => {
 			await this.chatService.checkChatAvailability(me.id, 'write');
 
 			const room = await this.chatService.findMyRoomById(me.id, ps.roomId);

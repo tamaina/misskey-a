@@ -3,13 +3,17 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { packedChatRoomsMembersDefinition, packedChatRoomsMembersInput, packedChatRoomsMembersOutput } from '../../../../contract/packed-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
+
 import { DI } from '@/di-symbols.js';
 import { ChatService } from '../../../services/ChatService.js';
 import { ApiError } from '@/server/api/error.js';
 import { ChatEntityService } from '../../../serializers/ChatEntityService.js';
 import { IdService } from '../../../../../runtime/backend/services/IdService.js';
+
+const contractProjection = projectEndpointContract(packedChatRoomsMembersDefinition);
 
 export const meta = {
 	tags: ['chat'],
@@ -18,15 +22,7 @@ export const meta = {
 
 	kind: 'write:chat',
 
-	res: {
-		type: 'array',
-		optional: false, nullable: false,
-		items: {
-			type: 'object',
-			optional: false, nullable: false,
-			ref: 'ChatRoomMembership',
-		},
-	},
+	res: contractProjection.response,
 
 	errors: {
 		noSuchRoom: {
@@ -37,27 +33,16 @@ export const meta = {
 	},
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {
-		roomId: { type: 'string', format: 'misskey:id' },
-		limit: { type: 'integer', minimum: 1, maximum: 100, default: 30 },
-		sinceId: { type: 'string', format: 'misskey:id' },
-		untilId: { type: 'string', format: 'misskey:id' },
-		sinceDate: { type: 'integer' },
-		untilDate: { type: 'integer' },
-	},
-	required: ['roomId'],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedChatRoomsMembersInput, typeof packedChatRoomsMembersOutput> {
 	constructor(
 		private chatService: ChatService,
 		private chatEntityService: ChatEntityService,
 		private idService: IdService,
 	) {
-		super(meta, paramDef, async (ps, me) => {
+		super(meta, contractProjection, async (ps, me) => {
 			const untilId = ps.untilId ?? (ps.untilDate ? this.idService.gen(ps.untilDate!) : null);
 			const sinceId = ps.sinceId ?? (ps.sinceDate ? this.idService.gen(ps.sinceDate!) : null);
 

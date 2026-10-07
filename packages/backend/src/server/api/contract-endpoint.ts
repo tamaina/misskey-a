@@ -9,6 +9,8 @@ import type * as v from 'valibot';
 import type { EndpointContractDefinition } from '../../../../features/api/contract/definition.js';
 import { toLegacyJsonSchema } from '../../../../features/api/backend/index.js';
 import type { Schema } from '@/misc/json-schema.js';
+import { getPackedReference } from '../../../../features/api/contract/packed-reference.js';
+import { convertSchemaToOpenApiSchema } from './openapi/schemas.js';
 import { Endpoint } from './endpoint-base.js';
 import type { EndpointExecutor } from './endpoint-base.js';
 import type { IEndpointMeta } from './endpoints.js';
@@ -17,6 +19,9 @@ import type { IEndpointMeta } from './endpoints.js';
 function assertStaticInputProjection(value: unknown, seen = new Set<object>()): void {
 	if (value === null || typeof value !== 'object' || seen.has(value)) return;
 	seen.add(value);
+	if (getPackedReference(value) !== undefined) {
+		throw new Error('Legacy input contracts cannot use packed references');
+	}
 	if (Array.isArray(value)) {
 		for (const item of value) assertStaticInputProjection(item, seen);
 		return;
@@ -50,11 +55,13 @@ function markResponseProperties(schema: JsonSchema | boolean): JsonSchema {
 	if ('$ref' in schema || '$defs' in schema || 'definitions' in schema || 'prefixItems' in schema) {
 		throw new Error('Referenced or tuple response schemas require an explicit legacy projection');
 	}
-	// The old writer leaves map-value schemas intact, but references inside them must still be checked.
-	if (schema.additionalProperties && typeof schema.additionalProperties === 'object') {
-		markResponseProperties(schema.additionalProperties);
-	}
 	const result = { ...schema };
+	// The old writer doesn't descend into maps, so convert typed map values here after recursive marking.
+	if (schema.additionalProperties && typeof schema.additionalProperties === 'object') {
+		result.additionalProperties = convertSchemaToOpenApiSchema(
+			markResponseProperties(schema.additionalProperties) as Schema, 'res', true,
+		);
+	}
 	if (result.required?.length === 0) delete result.required;
 	if (schema.properties) {
 		const required = new Set(schema.required ?? []);
@@ -89,8 +96,16 @@ export function projectEndpointContract<Input extends v.GenericSchema, Output ex
 		target: 'openapi-3.0',
 		typeMode: 'ignore',
 	}) as Schema;
+	const packedReferenceOutputOverride = ({ valibotSchema }: { valibotSchema: object }) => {
+		const reference = getPackedReference(valibotSchema);
+		return reference === undefined ? undefined : { type: 'object' as const, ref: reference };
+	};
 	const responseSchema = definition.output.type === 'void' ? undefined : markResponseProperties(
-		toLegacyJsonSchema(definition.output, { target: 'openapi-3.0', typeMode: 'output' }),
+		toLegacyJsonSchema(definition.output, {
+			target: 'openapi-3.0',
+			typeMode: 'output',
+			overrideSchema: packedReferenceOutputOverride,
+		}),
 	) as Schema;
 	// A root optional response also documents the existing no-content branch.
 	const response = responseSchema && (definition.output.type === 'optional' || definition.output.type === 'exact_optional')

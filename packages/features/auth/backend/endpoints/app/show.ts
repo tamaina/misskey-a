@@ -3,12 +3,16 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { packedAppShowDefinition, packedAppShowInput, packedAppShowOutput } from '../../../contract/packed-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
+
 import type { AppsRepository } from '@/models/_.js';
 import { AppEntityService } from '../../serializers/AppEntityService.js';
 import { DI } from '@/di-symbols.js';
 import { ApiError } from '@/server/api/error.js';
+
+const contractProjection = projectEndpointContract(packedAppShowDefinition);
 
 export const meta = {
 	tags: ['app'],
@@ -21,30 +25,20 @@ export const meta = {
 		},
 	},
 
-	res: {
-		type: 'object',
-		optional: false, nullable: false,
-		ref: 'App',
-	},
+	res: contractProjection.response,
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {
-		appId: { type: 'string', format: 'misskey:id' },
-	},
-	required: ['appId'],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedAppShowInput, typeof packedAppShowOutput> {
 	constructor(
 		@Inject(DI.appsRepository)
 		private appsRepository: AppsRepository,
 
 		private appEntityService: AppEntityService,
 	) {
-		super(meta, paramDef, async (ps, user, token) => {
+		super(meta, contractProjection, async (ps, user, token) => {
 			const isSecure = user != null && token == null;
 
 			// Lookup app

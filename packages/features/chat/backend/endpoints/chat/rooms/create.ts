@@ -3,13 +3,17 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { packedChatRoomsCreateDefinition, packedChatRoomsCreateInput, packedChatRoomsCreateOutput } from '../../../../contract/packed-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
 import ms from '@/runtime-dependencies/ms.js';
-import { Endpoint } from '@/server/api/endpoint-base.js';
+
 import { DI } from '@/di-symbols.js';
 import { ApiError } from '@/server/api/error.js';
 import { ChatService } from '../../../services/ChatService.js';
 import { ChatEntityService } from '../../../serializers/ChatEntityService.js';
+
+const contractProjection = projectEndpointContract(packedChatRoomsCreateDefinition);
 
 export const meta = {
 	tags: ['chat'],
@@ -25,32 +29,21 @@ export const meta = {
 		max: 10,
 	},
 
-	res: {
-		type: 'object',
-		optional: false, nullable: false,
-		ref: 'ChatRoom',
-	},
+	res: contractProjection.response,
 
 	errors: {
 	},
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {
-		name: { type: 'string', maxLength: 256 },
-		description: { type: 'string', maxLength: 1024 },
-	},
-	required: ['name'],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedChatRoomsCreateInput, typeof packedChatRoomsCreateOutput> {
 	constructor(
 		private chatService: ChatService,
 		private chatEntityService: ChatEntityService,
 	) {
-		super(meta, paramDef, async (ps, me) => {
+		super(meta, contractProjection, async (ps, me) => {
 			await this.chatService.checkChatAvailability(me.id, 'write');
 
 			const room = await this.chatService.createRoom(me, {

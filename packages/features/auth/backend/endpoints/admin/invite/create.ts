@@ -3,8 +3,10 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { packedAdminInviteCreateDefinition, packedAdminInviteCreateInput, packedAdminInviteCreateOutput } from '../../../../contract/packed-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
+
 import type { RegistrationTicketsRepository } from '@/models/_.js';
 import { InviteCodeEntityService } from '../../../serializers/InviteCodeEntityService.js';
 import { IdService } from '../../../../../runtime/backend/services/IdService.js';
@@ -12,6 +14,8 @@ import { DI } from '@/di-symbols.js';
 import { generateInviteCode } from '@/misc/generate-invite-code.js';
 import { ModerationLogService } from '../../../../../moderation/backend/services/ModerationLogService.js';
 import { ApiError } from '@/server/api/error.js';
+
+const contractProjection = projectEndpointContract(packedAdminInviteCreateDefinition);
 
 export const meta = {
 	tags: ['admin'],
@@ -28,28 +32,13 @@ export const meta = {
 		},
 	},
 
-	res: {
-		type: 'array',
-		optional: false, nullable: false,
-		items: {
-			type: 'object',
-			optional: false, nullable: false,
-			ref: 'InviteCode',
-		},
-	},
+	res: contractProjection.response,
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {
-		count: { type: 'integer', minimum: 1, maximum: 100, default: 1 },
-		expiresAt: { type: 'string', nullable: true },
-	},
-	required: [],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedAdminInviteCreateInput, typeof packedAdminInviteCreateOutput> {
 	constructor(
 		@Inject(DI.registrationTicketsRepository)
 		private registrationTicketsRepository: RegistrationTicketsRepository,
@@ -58,7 +47,7 @@ export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDe
 		private idService: IdService,
 		private moderationLogService: ModerationLogService,
 	) {
-		super(meta, paramDef, async (ps, me) => {
+		super(meta, contractProjection, async (ps, me) => {
 			if (ps.expiresAt && isNaN(Date.parse(ps.expiresAt))) {
 				throw new ApiError(meta.errors.invalidDateTime);
 			}

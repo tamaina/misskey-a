@@ -3,9 +3,11 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { packedInviteCreateDefinition, packedInviteCreateInput, packedInviteCreateOutput } from '../../../contract/packed-endpoint-definitions.js';
 import { MoreThan } from 'typeorm';
 import { Inject, Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
+
 import type { RegistrationTicketsRepository } from '@/models/_.js';
 import { InviteCodeEntityService } from '../../serializers/InviteCodeEntityService.js';
 import { IdService } from '../../../../runtime/backend/services/IdService.js';
@@ -13,6 +15,8 @@ import { RoleService } from '../../../../roles/backend/services/RoleService.js';
 import { DI } from '@/di-symbols.js';
 import { generateInviteCode } from '@/misc/generate-invite-code.js';
 import { ApiError } from '@/server/api/error.js';
+
+const contractProjection = projectEndpointContract(packedInviteCreateDefinition);
 
 export const meta = {
 	tags: ['meta'],
@@ -29,21 +33,13 @@ export const meta = {
 		},
 	},
 
-	res: {
-		type: 'object',
-		optional: false, nullable: false,
-		ref: 'InviteCode',
-	},
+	res: contractProjection.response,
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {},
-	required: [],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedInviteCreateInput, typeof packedInviteCreateOutput> {
 	constructor(
 		@Inject(DI.registrationTicketsRepository)
 		private registrationTicketsRepository: RegistrationTicketsRepository,
@@ -52,7 +48,7 @@ export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDe
 		private idService: IdService,
 		private roleService: RoleService,
 	) {
-		super(meta, paramDef, async (ps, me) => {
+		super(meta, contractProjection, async (ps, me) => {
 			const policies = await this.roleService.getUserPolicies(me.id);
 
 			if (policies.inviteLimit) {

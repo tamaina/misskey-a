@@ -3,11 +3,15 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { packedAdminInviteListDefinition, packedAdminInviteListInput, packedAdminInviteListOutput } from '../../../../contract/packed-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
+
 import type { RegistrationTicketsRepository } from '@/models/_.js';
 import { InviteCodeEntityService } from '../../../serializers/InviteCodeEntityService.js';
 import { DI } from '@/di-symbols.js';
+
+const contractProjection = projectEndpointContract(packedAdminInviteListDefinition);
 
 export const meta = {
 	tags: ['admin'],
@@ -16,37 +20,20 @@ export const meta = {
 	requireModerator: true,
 	kind: 'read:admin:invite-codes',
 
-	res: {
-		type: 'array',
-		optional: false, nullable: false,
-		items: {
-			type: 'object',
-			optional: false, nullable: false,
-			ref: 'InviteCode',
-		},
-	},
+	res: contractProjection.response,
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {
-		limit: { type: 'integer', minimum: 1, maximum: 100, default: 30 },
-		offset: { type: 'integer', default: 0 },
-		type: { type: 'string', enum: ['unused', 'used', 'expired', 'all'], default: 'all' },
-		sort: { type: 'string', enum: ['+createdAt', '-createdAt', '+usedAt', '-usedAt'] },
-	},
-	required: [],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedAdminInviteListInput, typeof packedAdminInviteListOutput> {
 	constructor(
 		@Inject(DI.registrationTicketsRepository)
 		private registrationTicketsRepository: RegistrationTicketsRepository,
 
 		private inviteCodeEntityService: InviteCodeEntityService,
 	) {
-		super(meta, paramDef, async (ps, me) => {
+		super(meta, contractProjection, async (ps, me) => {
 			const query = this.registrationTicketsRepository.createQueryBuilder('ticket')
 				.leftJoinAndSelect('ticket.createdBy', 'createdBy')
 				.leftJoinAndSelect('ticket.usedBy', 'usedBy');

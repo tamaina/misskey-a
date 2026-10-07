@@ -26,7 +26,7 @@ export function toLegacyJsonSchema(
 			const overridden = config.overrideSchema!(context);
 			return overridden !== undefined
 				? overridden
-				: getJsonStringLegacySchema(context.valibotSchema);
+				: defaultOverrideSchema(context);
 		};
 	const { $schema: _dialect, ...legacySchema } = toJsonSchema(schema, {
 		...config,
