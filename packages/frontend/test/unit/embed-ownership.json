@@ -588,6 +588,18 @@
 			{
 				"source": "'@/components/EmLoading.vue'",
 				"replacement": "'@features/ui/frontend/embed/components/EmLoading.vue'"
+			},
+			{
+				"source": "computed, isRef, nextTick",
+				"replacement": "computed, nextTick"
+			},
+			{
+				"source": "shallowRef, watch }",
+				"replacement": "shallowRef, unref, watch }"
+			},
+			{
+				"source": "props.pagination.params ? isRef(props.pagination.params) ? props.pagination.params.value : props.pagination.params : {}",
+				"replacement": "unref(props.pagination.params) ?? {}"
 			}
 		]
 	},

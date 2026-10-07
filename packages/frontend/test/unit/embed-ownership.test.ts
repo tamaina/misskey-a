@@ -13,7 +13,7 @@ import ownership from './embed-ownership.json';
 const root = resolve(import.meta.dirname, '../../../..');
 
 describe('embed feature ownership', () => {
-	test.each(ownership)('$destination preserves the complete source apart from reviewed module paths', entry => {
+	test.each(ownership)('$destination preserves the complete source apart from reviewed module paths and typed parameter unwrapping', entry => {
 		const expected = entry.rewrites.reduce((source, edit) => source.split(edit.source).join(edit.replacement), entry.originalSource);
 		const source = readFileSync(resolve(root, entry.destination), 'utf8');
 		expect(source).toBe(expected);
