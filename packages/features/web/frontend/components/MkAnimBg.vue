@@ -12,7 +12,7 @@ import { onMounted, onUnmounted, useTemplateRef } from 'vue';
 import isChromatic from 'chromatic/isChromatic';
 import vertexShaderSource from './MkAnimBg.vertex.glsl';
 import fragmentShaderSource from './MkAnimBg.fragment.glsl';
-import { initShaderProgram } from '@features/media/frontend/utility/webgl.js';
+import { initShaderProgram } from '@features/drive/frontend/utility/webgl.js';
 
 const canvasEl = useTemplateRef('canvasEl');
 

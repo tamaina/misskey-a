@@ -141,7 +141,7 @@ import { definePage } from '@features/navigation/frontend/page.js';
 import { i18n } from '@features/runtime/frontend/i18n.js';
 import MkUserCardMini from '@features/users/frontend/components/MkUserCardMini.vue';
 import MkPagination from '@features/ui/frontend/components/MkPagination.vue';
-import { getProxiedImageUrlNullable } from '@features/media/frontend/utility/media-proxy.js';
+import { getProxiedImageUrlNullable } from '@features/drive/frontend/utility/media-proxy.js';
 import { dateString } from '@features/ui/frontend/filters/date.js';
 import { useMkSelect } from '@features/ui/frontend/composables/use-mkselect.js';
 import MkTextarea from '@features/ui/frontend/components/MkTextarea.vue';

@@ -41,7 +41,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 import { ref } from 'vue';
 import * as Misskey from 'misskey-js';
 import { shouldCollapsed } from '@features/notes/frontend/shared/collapsed.js';
-import MkMediaList from '@features/media/frontend/components/MkMediaList.vue';
+import MkMediaList from '@features/drive/frontend/components/MkMediaList.vue';
 import MkPoll from '@features/notes/frontend/components/MkPoll.vue';
 import { interpolateLocaleParameters } from '@features/runtime/frontend/interpolate-locale-parameters.js';
 

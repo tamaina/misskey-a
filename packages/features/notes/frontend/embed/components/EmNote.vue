@@ -116,7 +116,7 @@ import EmNoteHeader from '@features/notes/frontend/embed/components/EmNoteHeader
 import EmNoteSimple from '@features/notes/frontend/embed/components/EmNoteSimple.vue';
 import EmInstanceTicker from '@features/federation/frontend/embed/components/EmInstanceTicker.vue';
 import EmReactionsViewer from '@features/notes/frontend/embed/components/EmReactionsViewer.vue';
-import EmMediaList from '@features/media/frontend/embed/components/EmMediaList.vue';
+import EmMediaList from '@features/drive/frontend/embed/components/EmMediaList.vue';
 import EmPoll from '@features/notes/frontend/embed/components/EmPoll.vue';
 import EmMfm from '@features/markup/frontend/embed/components/EmMfm.js';
 import EmA from '@features/navigation/frontend/embed/components/EmA.vue';

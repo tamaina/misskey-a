@@ -2617,8 +2617,8 @@
 	},
 	{
 		"file": "packages/features/navigation/frontend/components/MkTutorialDialog.vue",
-		"originalSha256": "1e4cdd54a429b307c5f4b470276bea78d61d9bf1ccb4e2bf41eaf15f618a2d03",
-		"migratedSha256": "534d66ee427bb903b6e210f256e430e8dd6a954f68917ba0f8b2c4569aac8677",
+		"originalSha256": "b87e35e0210a79c4f94168d29e2166d05bd6aa0b5b50df481ec37ea3792cc607",
+		"migratedSha256": "7f65a32fd00dacd1aad8c4510350c05468072b6573946e66cff985ede1ccef3a",
 		"edits": [
 			{
 				"start": 288,

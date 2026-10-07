@@ -73,7 +73,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 import { ref, computed, defineAsyncComponent, onMounted } from 'vue';
 import * as Misskey from 'misskey-js';
 import MkInfo from '@features/ui/frontend/components/MkInfo.vue';
-import MkMediaList from '@features/media/frontend/components/MkMediaList.vue';
+import MkMediaList from '@features/drive/frontend/components/MkMediaList.vue';
 import MkKeyValue from '@features/ui/frontend/components/MkKeyValue.vue';
 import bytes from '@features/ui/frontend/filters/bytes.js';
 import { interpolateLocaleParameters } from '@features/runtime/frontend/interpolate-locale-parameters.js';

@@ -82,6 +82,6 @@
 		"../features/*/frontend/embed/**",
 		"./src/**/*.stories.ts",
 		"../features/*/frontend/**/*.stories.ts",
-		"../features/media/frontend/workers/**/*.ts"
+		"../features/drive/frontend/workers/**/*.ts"
 	]
 }

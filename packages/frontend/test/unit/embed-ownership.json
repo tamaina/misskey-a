@@ -33,7 +33,7 @@
 			},
 			{
 				"source": "'@/components/EmMediaList.vue'",
-				"replacement": "'@features/media/frontend/embed/components/EmMediaList.vue'"
+				"replacement": "'@features/drive/frontend/embed/components/EmMediaList.vue'"
 			},
 			{
 				"source": "'@/components/EmNoteSub.vue'",
@@ -104,7 +104,7 @@
 		"rewrites": [
 			{
 				"source": "'@/components/EmMediaList.vue'",
-				"replacement": "'@features/media/frontend/embed/components/EmMediaList.vue'"
+				"replacement": "'@features/drive/frontend/embed/components/EmMediaList.vue'"
 			},
 			{
 				"source": "'@/components/EmPoll.vue'",
@@ -155,7 +155,7 @@
 			},
 			{
 				"source": "'@/components/EmMediaList.vue'",
-				"replacement": "'@features/media/frontend/embed/components/EmMediaList.vue'"
+				"replacement": "'@features/drive/frontend/embed/components/EmMediaList.vue'"
 			},
 			{
 				"source": "'@/components/EmPoll.vue'",
@@ -385,7 +385,7 @@
 		"rewrites": [
 			{
 				"source": "'./EmImgWithBlurhash.vue'",
-				"replacement": "'@features/media/frontend/embed/components/EmImgWithBlurhash.vue'"
+				"replacement": "'@features/drive/frontend/embed/components/EmImgWithBlurhash.vue'"
 			},
 			{
 				"source": "'./EmA.vue'",
@@ -405,7 +405,7 @@
 	},
 	{
 		"source": "packages/frontend-embed/src/components/EmMediaBanner.vue",
-		"destination": "packages/features/media/frontend/embed/components/EmMediaBanner.vue",
+		"destination": "packages/features/drive/frontend/embed/components/EmMediaBanner.vue",
 		"originalSource": "<!--\nSPDX-FileCopyrightText: syuilo and misskey-project\nSPDX-License-Identifier: AGPL-3.0-only\n-->\n\n<template>\n<a :href=\"href\" target=\"_blank\" :class=\"$style.root\">\n\t<div :class=\"$style.label\">\n\t\t<template v-if=\"media.type.startsWith('audio')\"><i class=\"ti ti-music\"></i> {{ i18n.ts.audio }}</template>\n\t\t<template v-else><i class=\"ti ti-file\"></i> {{ i18n.ts.file }}</template>\n\t</div>\n\t<div :class=\"$style.go\">\n\t\t<i class=\"ti ti-chevron-right\"></i>\n\t</div>\n</a>\n</template>\n\n<script setup lang=\"ts\">\nimport * as Misskey from 'misskey-js';\nimport { i18n } from '@/i18n.js';\n\ndefineProps<{\n\tmedia: Misskey.entities.DriveFile;\n\thref: string;\n}>();\n</script>\n\n<style lang=\"scss\" module>\n.root {\n\tbox-sizing: border-box;\n\tdisplay: flex;\n\talign-items: center;\n\twidth: 100%;\n\tpadding: var(--MI-margin);\n\tmargin-top: 4px;\n\tborder: 1px solid var(--MI_THEME-inputBorder);\n\tborder-radius: var(--MI-radius);\n\tbackground-color: var(--MI_THEME-panel);\n\ttransition: background-color .1s, border-color .1s;\n\n\t&:hover {\n\t\ttext-decoration: none;\n\t\tborder-color: var(--MI_THEME-inputBorderHover);\n\t\tbackground-color: var(--MI_THEME-buttonHoverBg);\n\t}\n}\n\n.label {\n\tfont-size: .9em;\n}\n\n.go {\n\tmargin-left: auto;\n}\n</style>\n",
 		"rewrites": [
 			{
@@ -416,27 +416,31 @@
 	},
 	{
 		"source": "packages/frontend-embed/src/components/EmImgWithBlurhash.vue",
-		"destination": "packages/features/media/frontend/embed/components/EmImgWithBlurhash.vue",
+		"destination": "packages/features/drive/frontend/embed/components/EmImgWithBlurhash.vue",
 		"originalSource": "<!--\nSPDX-FileCopyrightText: syuilo and misskey-project\nSPDX-License-Identifier: AGPL-3.0-only\n-->\n\n<template>\n<div ref=\"root\" :class=\"['chromatic-ignore', $style.root, { [$style.cover]: cover }]\" :title=\"title ?? ''\">\n\t<canvas v-show=\"hide\" key=\"canvas\" ref=\"canvas\" :class=\"$style.canvas\" :width=\"canvasWidth\" :height=\"canvasHeight\" :title=\"title ?? undefined\" tabindex=\"-1\"></canvas>\n\t<img v-show=\"!hide\" key=\"img\" ref=\"img\" :height=\"imgHeight ?? undefined\" :width=\"imgWidth ?? undefined\" :class=\"$style.img\" :src=\"src ?? undefined\" :title=\"title ?? undefined\" :alt=\"alt ?? undefined\" loading=\"eager\" decoding=\"async\" tabindex=\"-1\"/>\n</div>\n</template>\n\n<script lang=\"ts\">\nimport DrawBlurhash from '@/workers/draw-blurhash?worker';\nimport TestWebGL2 from '@/workers/test-webgl2?worker';\nimport { WorkerMultiDispatch } from '@features/media/frontend/shared/worker-multi-dispatch.js';\nimport { extractAvgColorFromBlurhash } from '@features/media/frontend/shared/extract-avg-color-from-blurhash.js';\n\nconst canvasPromise = new Promise<WorkerMultiDispatch | HTMLCanvasElement>(resolve => {\n\t// テスト環境で Web Worker インスタンスは作成できない\n\tif (import.meta.env.MODE === 'test') {\n\t\tconst canvas = window.document.createElement('canvas');\n\t\tcanvas.width = 64;\n\t\tcanvas.height = 64;\n\t\tresolve(canvas);\n\t\treturn;\n\t}\n\tconst testWorker = new TestWebGL2();\n\ttestWorker.addEventListener('message', event => {\n\t\tif (event.data.result) {\n\t\t\tconst workers = new WorkerMultiDispatch(\n\t\t\t\t() => new DrawBlurhash(),\n\t\t\t\tMath.min(navigator.hardwareConcurrency - 1, 4),\n\t\t\t);\n\t\t\tresolve(workers);\n\t\t} else {\n\t\t\tconst canvas = window.document.createElement('canvas');\n\t\t\tcanvas.width = 64;\n\t\t\tcanvas.height = 64;\n\t\t\tresolve(canvas);\n\t\t}\n\t\ttestWorker.terminate();\n\t});\n});\n</script>\n\n<script lang=\"ts\" setup>\nimport { computed, nextTick, onMounted, onUnmounted, shallowRef, watch, ref } from 'vue';\nimport { v4 as uuid } from 'uuid';\nimport { render } from 'buraha';\n\nconst props = withDefaults(defineProps<{\n\tsrc?: string | null;\n\thash?: string | null;\n\talt?: string | null;\n\ttitle?: string | null;\n\theight?: number;\n\twidth?: number;\n\tcover?: boolean;\n\tforceBlurhash?: boolean;\n\tonlyAvgColor?: boolean; // 軽量化のためにBlurhashを使わずに平均色だけを描画\n}>(), {\n\tsrc: null,\n\talt: '',\n\ttitle: null,\n\theight: 64,\n\twidth: 64,\n\tcover: true,\n\tforceBlurhash: false,\n\tonlyAvgColor: false,\n});\n\nconst viewId = uuid();\nconst canvas = shallowRef<HTMLCanvasElement>();\nconst root = shallowRef<HTMLDivElement>();\nconst img = shallowRef<HTMLImageElement>();\nconst loaded = ref(false);\nconst canvasWidth = ref(64);\nconst canvasHeight = ref(64);\nconst imgWidth = ref(props.width);\nconst imgHeight = ref(props.height);\nconst bitmapTmp = ref<CanvasImageSource | undefined>();\nconst hide = computed(() => !loaded.value || props.forceBlurhash);\n\nfunction waitForDecode() {\n\tif (props.src != null && props.src !== '') {\n\t\tnextTick()\n\t\t\t.then(() => img.value?.decode())\n\t\t\t.then(() => {\n\t\t\t\tloaded.value = true;\n\t\t\t}, error => {\n\t\t\t\tconsole.log('Error occurred during decoding image', img.value, error);\n\t\t\t});\n\t} else {\n\t\tloaded.value = false;\n\t}\n}\n\nwatch([() => props.width, () => props.height, root], () => {\n\tconst ratio = props.width / props.height;\n\tif (ratio > 1) {\n\t\tcanvasWidth.value = Math.round(64 * ratio);\n\t\tcanvasHeight.value = 64;\n\t} else {\n\t\tcanvasWidth.value = 64;\n\t\tcanvasHeight.value = Math.round(64 / ratio);\n\t}\n\n\tconst clientWidth = root.value?.clientWidth ?? 300;\n\timgWidth.value = clientWidth;\n\timgHeight.value = Math.round(clientWidth / ratio);\n}, {\n\timmediate: true,\n});\n\nfunction drawImage(bitmap: CanvasImageSource) {\n\t// canvasがない（mountedされていない）場合はTmpに保存しておく\n\tif (!canvas.value) {\n\t\tbitmapTmp.value = bitmap;\n\t\treturn;\n\t}\n\n\t// canvasがあれば描画する\n\tbitmapTmp.value = undefined;\n\tconst ctx = canvas.value.getContext('2d');\n\tif (!ctx) return;\n\tctx.drawImage(bitmap, 0, 0, canvasWidth.value, canvasHeight.value);\n}\n\nfunction drawAvg() {\n\tif (!canvas.value) return;\n\n\tconst color = (props.hash != null && extractAvgColorFromBlurhash(props.hash)) || '#888';\n\n\tconst ctx = canvas.value.getContext('2d');\n\tif (!ctx) return;\n\n\t// avgColorでお茶をにごす\n\tctx.beginPath();\n\tctx.fillStyle = color;\n\tctx.fillRect(0, 0, canvasWidth.value, canvasHeight.value);\n}\n\nasync function draw() {\n\tif (import.meta.env.MODE === 'test' && props.hash == null) return;\n\n\tdrawAvg();\n\n\tif (props.hash == null) return;\n\n\tif (props.onlyAvgColor) return;\n\n\tconst work = await canvasPromise;\n\tif (work instanceof WorkerMultiDispatch) {\n\t\twork.postMessage(\n\t\t\t{\n\t\t\t\tid: viewId,\n\t\t\t\thash: props.hash,\n\t\t\t},\n\t\t\tundefined,\n\t\t);\n\t} else {\n\t\ttry {\n\t\t\trender(props.hash, work);\n\t\t\tdrawImage(work);\n\t\t} catch (error) {\n\t\t\tconsole.error('Error occurred during drawing blurhash', error);\n\t\t}\n\t}\n}\n\nfunction workerOnMessage(event: MessageEvent) {\n\tif (event.data.id !== viewId) return;\n\tdrawImage(event.data.bitmap as ImageBitmap);\n}\n\ncanvasPromise.then(work => {\n\tif (work instanceof WorkerMultiDispatch) {\n\t\twork.addListener(workerOnMessage);\n\t}\n\n\tdraw();\n});\n\nwatch(() => props.src, () => {\n\twaitForDecode();\n});\n\nwatch(() => props.hash, () => {\n\tdraw();\n});\n\nonMounted(() => {\n\t// drawImageがmountedより先に呼ばれている場合はここで描画する\n\tif (bitmapTmp.value) {\n\t\tdrawImage(bitmapTmp.value);\n\t}\n\twaitForDecode();\n});\n\nonUnmounted(() => {\n\tcanvasPromise.then(work => {\n\t\tif (work instanceof WorkerMultiDispatch) {\n\t\t\twork.removeListener(workerOnMessage);\n\t\t}\n\t});\n});\n</script>\n\n<style lang=\"scss\" module>\n.root {\n\tposition: relative;\n\twidth: 100%;\n\theight: 100%;\n\n\t&.cover {\n\t\t> .canvas,\n\t\t> .img {\n\t\t\tobject-fit: cover;\n\t\t}\n\t}\n}\n\n.canvas,\n.img {\n\tdisplay: block;\n\twidth: 100%;\n\theight: 100%;\n}\n\n.canvas {\n\tobject-fit: contain;\n}\n\n.img {\n\tobject-fit: contain;\n}\n</style>\n",
 		"rewrites": [
 			{
 				"source": "'@/workers/draw-blurhash?worker'",
-				"replacement": "'@features/media/frontend/embed/workers/draw-blurhash?worker'"
+				"replacement": "'@features/drive/frontend/embed/workers/draw-blurhash?worker'"
 			},
 			{
 				"source": "'@/workers/test-webgl2?worker'",
-				"replacement": "'@features/media/frontend/embed/workers/test-webgl2?worker'"
+				"replacement": "'@features/drive/frontend/embed/workers/test-webgl2?worker'"
+			},
+			{
+				"source": "features/media/",
+				"replacement": "features/drive/"
 			}
 		]
 	},
 	{
 		"source": "packages/frontend-embed/src/components/EmMediaImage.vue",
-		"destination": "packages/features/media/frontend/embed/components/EmMediaImage.vue",
+		"destination": "packages/features/drive/frontend/embed/components/EmMediaImage.vue",
 		"originalSource": "<!--\nSPDX-FileCopyrightText: syuilo and misskey-project\nSPDX-License-Identifier: AGPL-3.0-only\n-->\n\n<template>\n<div :class=\"[hide ? $style.hidden : $style.visible]\" @click=\"onclick\">\n\t<a\n\t\t:title=\"image.name\"\n\t\t:class=\"$style.imageContainer\"\n\t\t:href=\"href ?? image.url\"\n\t\ttarget=\"_blank\"\n\t\trel=\"noopener\"\n\t>\n\t\t<EmImgWithBlurhash\n\t\t\t:hash=\"image.blurhash\"\n\t\t\t:src=\"hide ? null : url\"\n\t\t\t:forceBlurhash=\"hide\"\n\t\t\t:cover=\"hide || cover\"\n\t\t\t:alt=\"image.comment || image.name\"\n\t\t\t:title=\"image.comment || image.name\"\n\t\t\t:width=\"image.properties.width\"\n\t\t\t:height=\"image.properties.height\"\n\t\t\t:style=\"hide ? 'filter: brightness(0.7);' : null\"\n\t\t/>\n\t</a>\n\t<template v-if=\"hide\">\n\t\t<div :class=\"$style.hiddenText\">\n\t\t\t<div :class=\"$style.hiddenTextWrapper\">\n\t\t\t\t<b v-if=\"image.isSensitive\" style=\"display: block;\"><i class=\"ti ti-eye-exclamation\"></i> {{ i18n.ts.sensitive }}</b>\n\t\t\t\t<b v-else style=\"display: block;\"><i class=\"ti ti-photo\"></i> {{ i18n.ts.image }}</b>\n\t\t\t\t<span style=\"display: block;\">{{ i18n.ts.clickToShow }}</span>\n\t\t\t</div>\n\t\t</div>\n\t</template>\n\t<div :class=\"$style.indicators\">\n\t\t<div v-if=\"['image/gif', 'image/apng'].includes(image.type)\" :class=\"$style.indicator\">GIF</div>\n\t\t<div v-if=\"image.comment\" :class=\"$style.indicator\">ALT</div>\n\t\t<div v-if=\"image.isSensitive\" :class=\"$style.indicator\" style=\"color: var(--MI_THEME-warn);\" :title=\"i18n.ts.sensitive\"><i class=\"ti ti-eye-exclamation\"></i></div>\n\t</div>\n\t<i v-if=\"!hide\" class=\"ti ti-eye-off\" :class=\"$style.hide\" @click.stop=\"hide = true\"></i>\n</div>\n</template>\n\n<script lang=\"ts\" setup>\nimport { ref, computed } from 'vue';\nimport * as Misskey from 'misskey-js';\nimport EmImgWithBlurhash from '@/components/EmImgWithBlurhash.vue';\nimport { i18n } from '@/i18n.js';\n\nconst props = withDefaults(defineProps<{\n\timage: Misskey.entities.DriveFile;\n\thref?: string;\n\traw?: boolean;\n\tcover?: boolean;\n}>(), {\n\tcover: false,\n});\n\nconst hide = ref(props.image.isSensitive);\n\nconst url = computed(() => (props.raw)\n\t? props.image.url\n\t: props.image.thumbnailUrl,\n);\n\nasync function onclick(ev: PointerEvent) {\n\tif (hide.value) {\n\t\tev.stopPropagation();\n\t\thide.value = false;\n\t}\n}\n</script>\n\n<style lang=\"scss\" module>\n.hidden {\n\tposition: relative;\n}\n\n.hiddenText {\n\tposition: absolute;\n\tleft: 0;\n\ttop: 0;\n\twidth: 100%;\n\theight: 100%;\n\tz-index: 1;\n\tdisplay: flex;\n\tjustify-content: center;\n\talign-items: center;\n\tcursor: pointer;\n}\n\n.hide {\n\tdisplay: block;\n\tposition: absolute;\n\tborder-radius: 6px;\n\tbackground-color: var(--MI_THEME-fg);\n\tcolor: hsl(from var(--MI_THEME-accent) h s calc(l + 10));\n\tfont-size: 12px;\n\topacity: .5;\n\tpadding: 5px 8px;\n\ttext-align: center;\n\tcursor: pointer;\n\ttop: 12px;\n\tright: 12px;\n}\n\n.hiddenTextWrapper {\n\tdisplay: table-cell;\n\ttext-align: center;\n\tfont-size: 0.8em;\n\tcolor: #fff;\n}\n\n.visible {\n\tposition: relative;\n\t//box-shadow: 0 0 0 1px var(--MI_THEME-divider) inset;\n\tbackground: var(--MI_THEME-bg);\n\tbackground-size: 16px 16px;\n}\n\nhtml[data-color-scheme=dark] .visible {\n\t--c: rgb(255 255 255 / 2%);\n\tbackground-image: linear-gradient(45deg, var(--c) 16.67%, var(--MI_THEME-bg) 16.67%, var(--MI_THEME-bg) 50%, var(--c) 50%, var(--c) 66.67%, var(--MI_THEME-bg) 66.67%, var(--MI_THEME-bg) 100%);\n}\n\nhtml[data-color-scheme=light] .visible {\n\t--c: rgb(0 0 0 / 2%);\n\tbackground-image: linear-gradient(45deg, var(--c) 16.67%, var(--MI_THEME-bg) 16.67%, var(--MI_THEME-bg) 50%, var(--c) 50%, var(--c) 66.67%, var(--MI_THEME-bg) 66.67%, var(--MI_THEME-bg) 100%);\n}\n\n.imageContainer {\n\tdisplay: block;\n\toverflow: hidden;\n\twidth: 100%;\n\theight: 100%;\n\tbackground-position: center;\n\tbackground-size: contain;\n\tbackground-repeat: no-repeat;\n}\n\n.indicators {\n\tdisplay: inline-flex;\n\tposition: absolute;\n\ttop: 10px;\n\tleft: 10px;\n\tpointer-events: none;\n\topacity: .5;\n\tgap: 6px;\n}\n\n.indicator {\n\t/* Hardcode to black because either --MI_THEME-bg or --MI_THEME-fg makes it hard to read in dark/light mode */\n\tbackground-color: black;\n\tborder-radius: 6px;\n\tcolor: hsl(from var(--MI_THEME-accent) h s calc(l + 10));\n\tdisplay: inline-block;\n\tfont-weight: bold;\n\tfont-size: 0.8em;\n\tpadding: 2px 5px;\n}\n</style>\n",
 		"rewrites": [
 			{
 				"source": "'@/components/EmImgWithBlurhash.vue'",
-				"replacement": "'@features/media/frontend/embed/components/EmImgWithBlurhash.vue'"
+				"replacement": "'@features/drive/frontend/embed/components/EmImgWithBlurhash.vue'"
 			},
 			{
 				"source": "'@/i18n.js'",
@@ -446,26 +450,30 @@
 	},
 	{
 		"source": "packages/frontend-embed/src/components/EmMediaVideo.vue",
-		"destination": "packages/features/media/frontend/embed/components/EmMediaVideo.vue",
+		"destination": "packages/features/drive/frontend/embed/components/EmMediaVideo.vue",
 		"originalSource": "<!--\nSPDX-FileCopyrightText: syuilo and misskey-project\nSPDX-License-Identifier: AGPL-3.0-only\n-->\n\n<template>\n<a :href=\"href\" target=\"_blank\" :class=\"$style.root\">\n\t<img v-if=\"!video.isSensitive && video.thumbnailUrl\" :class=\"$style.thumbnail\" :src=\"video.thumbnailUrl\">\n\t<div :class=\"$style.videoOverlayPlayButton\"><i class=\"ti ti-player-play-filled\"></i></div>\n</a>\n</template>\n\n<script setup lang=\"ts\">\nimport * as Misskey from 'misskey-js';\n\ndefineProps<{\n\tvideo: Misskey.entities.DriveFile;\n\thref: string;\n}>();\n</script>\n\n<style lang=\"scss\" module>\n.root {\n\tposition: relative;\n\tbox-sizing: border-box;\n\tdisplay: flex;\n\talign-items: center;\n\tjustify-content: center;\n\twidth: 100%;\n\theight: auto;\n\taspect-ratio: 16 / 9;\n\tpadding: var(--MI-margin);\n\tborder: 1px solid var(--MI_THEME-divider);\n\tborder-radius: var(--MI-radius);\n\tbackground-color: #000;\n\n\t&:hover {\n\t\ttext-decoration: none;\n\t}\n}\n\n.thumbnail {\n\tposition: absolute;\n\ttop: 0;\n\tleft: 0;\n\twidth: 100%;\n\theight: 100%;\n\tobject-fit: cover;\n}\n\n.videoOverlayPlayButton {\n\tbackground: var(--MI_THEME-accent);\n\tcolor: #fff;\n\tpadding: 1rem;\n\tborder-radius: 99rem;\n\n\tfont-size: 1rem;\n\tline-height: 1rem;\n\n\t&:focus-visible {\n\t\toutline: none;\n\t}\n}\n</style>\n",
 		"rewrites": []
 	},
 	{
 		"source": "packages/frontend-embed/src/components/EmMediaList.vue",
-		"destination": "packages/features/media/frontend/embed/components/EmMediaList.vue",
+		"destination": "packages/features/drive/frontend/embed/components/EmMediaList.vue",
 		"originalSource": "<!--\nSPDX-FileCopyrightText: syuilo and misskey-project\nSPDX-License-Identifier: AGPL-3.0-only\n-->\n\n<template>\n<div>\n\t<div v-for=\"media in mediaList.filter(media => !previewable(media))\" :key=\"media.id\" :class=\"$style.banner\">\n\t\t<XBanner :media=\"media\" :href=\"originalEntityUrl\"/>\n\t</div>\n\t<div v-if=\"mediaList.filter(media => previewable(media)).length > 0\" :class=\"$style.container\">\n\t\t<div\n\t\t\t:class=\"[\n\t\t\t\t$style.medias,\n\t\t\t\tcount === 1 ? [$style.n1] : count === 2 ? $style.n2 : count === 3 ? $style.n3 : count === 4 ? $style.n4 : $style.nMany,\n\t\t\t]\"\n\t\t>\n\t\t\t<div v-for=\"media in mediaList.filter(media => previewable(media))\" :class=\"$style.media\">\n\t\t\t\t<XVideo v-if=\"media.type.startsWith('video')\" :key=\"`video:${media.id}`\" :class=\"$style.mediaInner\" :video=\"media\" :href=\"originalEntityUrl\"/>\n\t\t\t\t<XImage v-else-if=\"media.type.startsWith('image')\" :key=\"`image:${media.id}`\" :class=\"$style.mediaInner\" class=\"image\" :image=\"media\" :raw=\"raw\" :href=\"originalEntityUrl\"/>\n\t\t\t</div>\n\t\t</div>\n\t</div>\n</div>\n</template>\n\n<script lang=\"ts\" setup>\nimport { computed } from 'vue';\nimport * as Misskey from 'misskey-js';\nimport XBanner from './EmMediaBanner.vue';\nimport XImage from './EmMediaImage.vue';\nimport XVideo from './EmMediaVideo.vue';\nimport { FILE_TYPE_BROWSERSAFE } from '@features/media/frontend/shared/browser-safe-file-types.js';\n\nconst props = defineProps<{\n\tmediaList: Misskey.entities.DriveFile[];\n\traw?: boolean;\n\n\t/** 埋め込みページ用 親要素の正規URL */\n\toriginalEntityUrl: string;\n}>();\n\nconst count = computed(() => props.mediaList.filter(media => previewable(media)).length);\n\nconst previewable = (file: Misskey.entities.DriveFile): boolean => {\n\tif (file.type === 'image/svg+xml') return true; // svgのwebpublic/thumbnailはpngなのでtrue\n\t// FILE_TYPE_BROWSERSAFEに適合しないものはブラウザで表示するのに不適切\n\treturn (file.type.startsWith('video') || file.type.startsWith('image')) && FILE_TYPE_BROWSERSAFE.includes(file.type);\n};\n</script>\n\n<style lang=\"scss\" module>\n.container {\n\tposition: relative;\n\twidth: 100%;\n\tmargin-top: 4px;\n}\n\n.medias {\n\tdisplay: grid;\n\tgrid-gap: 8px;\n\n\theight: 100%;\n\twidth: 100%;\n\n\t&.n1 {\n\t\tgrid-template-rows: 1fr;\n\n\t\t// default but fallback (expand)\n\t\tmin-height: 64px;\n\t\tmax-height: clamp(\n\t\t\t64px,\n\t\t\t50cqh,\n\t\t\tmin(360px, 50vh)\n\t\t);\n\n\t\t&.n116_9 {\n\t\t\tmin-height: initial;\n\t\t\tmax-height: initial;\n\t\t\taspect-ratio: 16 / 9; // fallback\n\t\t}\n\n\t\t&.n11_1{\n\t\t\tmin-height: initial;\n\t\t\tmax-height: initial;\n\t\t\taspect-ratio: 1 / 1; // fallback\n\t\t}\n\n\t\t&.n12_3 {\n\t\t\tmin-height: initial;\n\t\t\tmax-height: initial;\n\t\t\taspect-ratio: 2 / 3; // fallback\n\t\t}\n\t}\n\n\t&.n2 {\n\t\taspect-ratio: 16/9;\n\t\tgrid-template-columns: 1fr 1fr;\n\t\tgrid-template-rows: 1fr;\n\t}\n\n\t&.n3 {\n\t\taspect-ratio: 16/9;\n\t\tgrid-template-columns: 1fr 0.5fr;\n\t\tgrid-template-rows: 1fr 1fr;\n\n\t\t> .media:nth-child(1) {\n\t\t\tgrid-row: 1 / 3;\n\t\t}\n\n\t\t> .media:nth-child(3) {\n\t\t\tgrid-column: 2 / 3;\n\t\t\tgrid-row: 2 / 3;\n\t\t}\n\t}\n\n\t&.n4 {\n\t\taspect-ratio: 16/9;\n\t\tgrid-template-columns: 1fr 1fr;\n\t\tgrid-template-rows: 1fr 1fr;\n\t}\n\n\t&.nMany {\n\t\tgrid-template-columns: 1fr 1fr;\n\n\t\t> .media {\n\t\t\taspect-ratio: 16/9;\n\t\t}\n\t}\n}\n\n.media {\n\toverflow: hidden; // clipにするとバグる\n\tborder-radius: 8px;\n\tposition: relative;\n\n\t>.mediaInner {\n\t\twidth: 100%;\n\t\theight: 100%;\n\t}\n}\n\n.banner {\n\tposition: relative;\n}\n</style>\n",
 		"rewrites": [
 			{
 				"source": "'./EmMediaBanner.vue'",
-				"replacement": "'@features/media/frontend/embed/components/EmMediaBanner.vue'"
+				"replacement": "'@features/drive/frontend/embed/components/EmMediaBanner.vue'"
 			},
 			{
 				"source": "'./EmMediaImage.vue'",
-				"replacement": "'@features/media/frontend/embed/components/EmMediaImage.vue'"
+				"replacement": "'@features/drive/frontend/embed/components/EmMediaImage.vue'"
 			},
 			{
 				"source": "'./EmMediaVideo.vue'",
-				"replacement": "'@features/media/frontend/embed/components/EmMediaVideo.vue'"
+				"replacement": "'@features/drive/frontend/embed/components/EmMediaVideo.vue'"
+			},
+			{
+				"source": "features/media/",
+				"replacement": "features/drive/"
 			}
 		]
 	},
@@ -851,6 +859,10 @@
 			{
 				"source": "'@/server-context.js'",
 				"replacement": "'@features/boot/frontend/embed/server-context.js'"
+			},
+			{
+				"source": "features/media/",
+				"replacement": "features/drive/"
 			}
 		]
 	},
@@ -879,13 +891,13 @@
 	},
 	{
 		"source": "packages/frontend-embed/src/workers/test-webgl2.ts",
-		"destination": "packages/features/media/frontend/embed/workers/test-webgl2.ts",
+		"destination": "packages/features/drive/frontend/embed/workers/test-webgl2.ts",
 		"originalSource": "/*\n * SPDX-FileCopyrightText: syuilo and misskey-project\n * SPDX-License-Identifier: AGPL-3.0-only\n */\n\n/// <reference lib=\"esnext\" />\n/// <reference lib=\"webworker\" />\n\nconst canvas = globalThis.OffscreenCanvas && new OffscreenCanvas(1, 1);\n// 環境によってはOffscreenCanvasが存在しないため\n// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition\nconst gl = canvas?.getContext('webgl2');\nif (gl) {\n\tself.postMessage({ result: true });\n} else {\n\tself.postMessage({ result: false });\n}\n",
 		"rewrites": []
 	},
 	{
 		"source": "packages/frontend-embed/src/workers/draw-blurhash.ts",
-		"destination": "packages/features/media/frontend/embed/workers/draw-blurhash.ts",
+		"destination": "packages/features/drive/frontend/embed/workers/draw-blurhash.ts",
 		"originalSource": "/*\n * SPDX-FileCopyrightText: syuilo and misskey-project\n * SPDX-License-Identifier: AGPL-3.0-only\n */\n\n/// <reference lib=\"esnext\" />\n/// <reference lib=\"webworker\" />\n\nimport { render } from 'buraha';\n\nconst canvas = new OffscreenCanvas(64, 64);\n\nonmessage = (event) => {\n\t// console.log(event.data);\n\tif (!('id' in event.data && typeof event.data.id === 'string')) {\n\t\treturn;\n\t}\n\tif (!('hash' in event.data && typeof event.data.hash === 'string')) {\n\t\treturn;\n\t}\n\n\trender(event.data.hash, canvas);\n\tconst bitmap = canvas.transferToImageBitmap();\n\tself.postMessage({ id: event.data.id, bitmap }, [bitmap]);\n};\n",
 		"rewrites": []
 	}

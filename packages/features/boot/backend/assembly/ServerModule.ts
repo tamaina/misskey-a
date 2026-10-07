@@ -7,7 +7,7 @@ import { Module } from '@nestjs/common';
 import { EndpointsModule } from './EndpointsModule.js';
 import { CoreModule } from './CoreModule.js';
 import { ApiCallService } from '@features/api/backend/transport/ApiCallService.js';
-import { FileServerService } from '@features/media/backend/http/FileServerService.js';
+import { FileServerService } from '@features/drive/backend/http/FileServerService.js';
 import { HealthServerService } from '@features/operations/backend/http/HealthServerService.js';
 import { NodeinfoServerService } from '@features/instance/backend/http/NodeinfoServerService.js';
 import { ServerService } from './ServerService.mjs';

@@ -33,11 +33,11 @@ import { ref } from 'vue';
 import * as Misskey from 'misskey-js';
 import XTimeline from '@features/timelines/frontend/pages/welcome.timeline.vue';
 import MkMarqueeText from '@features/ui/frontend/components/MkMarqueeText.vue';
-import MkFeaturedPhotos from '@features/media/frontend/components/MkFeaturedPhotos.vue';
+import MkFeaturedPhotos from '@features/drive/frontend/components/MkFeaturedPhotos.vue';
 import misskeysvg from '/client-assets/misskey.svg';
 import { misskeyApiGet } from '@features/api/frontend/utility/misskey-api.js';
 import MkVisitorDashboard from '@features/statistics/frontend/components/MkVisitorDashboard.vue';
-import { getProxiedImageUrl } from '@features/media/frontend/utility/media-proxy.js';
+import { getProxiedImageUrl } from '@features/drive/frontend/utility/media-proxy.js';
 import { instance as meta } from '@features/instance/frontend/instance.js';
 
 const instances = ref<Misskey.entities.FederationInstance[]>();

@@ -601,7 +601,7 @@ export async function cropImageFile<F extends File | Blob>(imageFile: F, options
 	aspectRatio: number | null;
 }): Promise<F> {
 	return new Promise(resolve => {
-		const { dispose } = popup(defineAsyncComponent(() => import('@features/media/frontend/components/MkCropperDialog.vue')), {
+		const { dispose } = popup(defineAsyncComponent(() => import('@features/drive/frontend/components/MkCropperDialog.vue')), {
 			imageFile: imageFile,
 			aspectRatio: options.aspectRatio,
 		}, {

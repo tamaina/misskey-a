@@ -11,7 +11,7 @@ import type { DriveFilesRepository } from '@features/persistence/backend/reposit
 import { DI } from '@/di-symbols.js';
 import { CustomEmojiService } from '../../../services/CustomEmojiService.js';
 import { EmojiEntityService } from '../../../serializers/EmojiEntityService.js';
-import { FILE_TYPE_IMAGE } from '@features/media/backend/file-types.js';
+import { FILE_TYPE_IMAGE } from '@features/drive/backend/file-types.js';
 import { ApiError } from '@features/api/backend/transport/error.js';
 
 const contractProjection = projectEndpointContract(packedAdminEmojiAddDefinition);

@@ -5,7 +5,7 @@
 
 import type { InjectionKey } from 'vue';
 import * as Misskey from 'misskey-js';
-import { MediaProxy } from '@features/media/frontend/shared/media-proxy.js';
+import { MediaProxy } from '@features/drive/frontend/shared/media-proxy.js';
 import type { ParsedEmbedParams } from '@features/web/frontend/shared/embed-page.js';
 import type { ServerContext } from '@features/boot/frontend/embed/server-context.js';
 

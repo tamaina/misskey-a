@@ -17,11 +17,11 @@ import { SigninEntityService } from '@features/auth/backend/serializers/SigninEn
 import { ChannelEntityService } from '@features/channels/backend/serializers/ChannelEntityService.js';
 import { HashtagEntityService } from '@features/discovery/backend/serializers/HashtagEntityService.js';
 import { SystemWebhookEntityService } from '@features/integrations/backend/serializers/SystemWebhookEntityService.js';
-import { mediaServices } from '@features/media/backend/services.js';
+import { mediaServices } from '@features/drive/backend/services/media.js';
 import { markupServices } from '@features/markup/backend/services.js';
 import { preferencesServices } from '@features/preferences/backend/services.js';
 import { moderationLoggingServices, moderationServices } from '@features/moderation/backend/services.js';
-import { SensitiveMediaDetectionService } from '@features/media/backend/services/SensitiveMediaDetectionService.js';
+import { SensitiveMediaDetectionService } from '@features/drive/backend/services/SensitiveMediaDetectionService.js';
 import { AbuseReportNotificationRecipientEntityService } from '@features/moderation/backend/serializers/AbuseReportNotificationRecipientEntityService.js';
 import { AbuseUserReportEntityService } from '@features/moderation/backend/serializers/AbuseUserReportEntityService.js';
 import { ModerationLogEntityService } from '@features/moderation/backend/serializers/ModerationLogEntityService.js';

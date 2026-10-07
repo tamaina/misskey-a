@@ -143,7 +143,7 @@ import FormLink from '@features/ui/frontend/components/form/link.vue';
 import FormSection from '@features/ui/frontend/components/form/section.vue';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import MkInfo from '@features/ui/frontend/components/MkInfo.vue';
-import { physics } from '@features/media/frontend/utility/physics.js';
+import { physics } from '@features/drive/frontend/utility/physics.js';
 import { interpolateLocaleParameters } from '@features/runtime/frontend/interpolate-locale-parameters.js';
 import { instance } from '@features/instance/frontend/instance.js';
 import * as os from '@features/ui/frontend/os.js';

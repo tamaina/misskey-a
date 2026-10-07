@@ -11,16 +11,16 @@ import { mockDeep } from 'vitest-mock-extended';
 import sharp from 'sharp';
 import { DI } from '@/di-symbols.js';
 import type { MiRegistryItem } from '@features/persistence/backend/repositories/models.js';
-import { mediaServices } from '@features/media/backend/services.js';
+import { mediaServices } from '@features/drive/backend/services/media.js';
 import { markupServices } from '@features/markup/backend/services.js';
 import { preferencesServices } from '@features/preferences/backend/services.js';
 import { moderationLoggingServices, moderationServices } from '@features/moderation/backend/services.js';
 import { HttpRequestService } from '@features/runtime/backend/services/HttpRequestService.js';
 import { LoggerService } from '@features/runtime/backend/services/LoggerService.js';
-import { ImageProcessingService } from '@features/media/backend/services/ImageProcessingService.js';
-import { VideoProcessingService } from '@features/media/backend/services/VideoProcessingService.js';
-import { SensitiveMediaDetectionService } from '@features/media/backend/services/SensitiveMediaDetectionService.js';
-import { FileInfoService } from '@features/media/backend/services/FileInfoService.js';
+import { ImageProcessingService } from '@features/drive/backend/services/ImageProcessingService.js';
+import { VideoProcessingService } from '@features/drive/backend/services/VideoProcessingService.js';
+import { SensitiveMediaDetectionService } from '@features/drive/backend/services/SensitiveMediaDetectionService.js';
+import { FileInfoService } from '@features/drive/backend/services/FileInfoService.js';
 import { MfmService } from '@features/markup/backend/services/MfmService.js';
 import { RegistryApiService } from '@features/preferences/backend/services/RegistryApiService.js';
 import { ModerationLogService } from '@features/moderation/backend/services/ModerationLogService.js';
@@ -29,7 +29,7 @@ import type { FactoryProvider, InjectionToken, Provider } from '@nestjs/common';
 import type { SelectQueryBuilder } from 'typeorm';
 import type { Inputs } from '@features/index/backend/service-definitions.js';
 
-const selectedGroups = [featureServiceGroups.media, featureServiceGroups.markup, featureServiceGroups.preferences, featureServiceGroups.moderationLogging];
+const selectedGroups = [featureServiceGroups.driveMedia, featureServiceGroups.markup, featureServiceGroups.preferences, featureServiceGroups.moderationLogging];
 const tokenOf = (provider: Provider): InjectionToken => typeof provider === 'function' ? provider : provider.provide;
 const selectedClasses = [ImageProcessingService, VideoProcessingService, SensitiveMediaDetectionService, FileInfoService, MfmService, RegistryApiService, ModerationLogService];
 
@@ -93,7 +93,7 @@ describe('seven stateless feature declarations', () => {
 		const mocks: unknown[] = [];
 		const module = await Test.createTestingModule({ providers: [
 			{ provide: DI.config, useValue: inputs.config }, { provide: DI.meta, useValue: inputs.meta },
-			...featureServiceGroups.media.providers,
+			...featureServiceGroups.driveMedia.providers,
 		] }).useMocker(token => {
 			mocks.push(token);
 			if (token === LoggerService) return inputs.loggerService;

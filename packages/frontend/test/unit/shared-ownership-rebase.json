@@ -114,6 +114,14 @@
 			{
 				"source": "@@/js/collapsed.js",
 				"replacement": "@features/notes/frontend/shared/collapsed.js"
+			},
+			{
+				"source": "@features/media/frontend/components/MkMediaList.vue",
+				"replacement": "@features/drive/frontend/components/MkMediaList.vue"
+			},
+			{
+				"source": "features/media/frontend/components/MkMediaList.vue",
+				"replacement": "features/drive/frontend/components/MkMediaList.vue"
 			}
 		]
 	},
@@ -129,6 +137,14 @@
 			{
 				"source": "@@/js/emoji-name.js",
 				"replacement": "@features/emojis/frontend/shared/emoji-name.js"
+			},
+			{
+				"source": "@features/media/frontend/utility/media-proxy.js",
+				"replacement": "@features/drive/frontend/utility/media-proxy.js"
+			},
+			{
+				"source": "features/media/frontend/utility/media-proxy.js",
+				"replacement": "features/drive/frontend/utility/media-proxy.js"
 			}
 		]
 	},
@@ -182,6 +198,14 @@
 			{
 				"source": "import { DEFAULT_EMOJIS } from '@@/js/const.js';",
 				"replacement": "import { DEFAULT_EMOJIS } from '@features/emojis/frontend/shared/default-emojis.js';"
+			},
+			{
+				"source": "@features/media/frontend/utility/physics.js",
+				"replacement": "@features/drive/frontend/utility/physics.js"
+			},
+			{
+				"source": "features/media/frontend/utility/physics.js",
+				"replacement": "features/drive/frontend/utility/physics.js"
 			}
 		]
 	},
@@ -306,6 +330,14 @@
 			{
 				"source": "@@/js/scroll.js",
 				"replacement": "@features/ui/frontend/shared/scroll.js"
+			},
+			{
+				"source": "@features/media/frontend/utility/media-proxy.js",
+				"replacement": "@features/drive/frontend/utility/media-proxy.js"
+			},
+			{
+				"source": "features/media/frontend/utility/media-proxy.js",
+				"replacement": "features/drive/frontend/utility/media-proxy.js"
 			}
 		]
 	},
@@ -340,6 +372,14 @@
 			{
 				"source": "'@@/js/use-interval.js'",
 				"replacement": "'@features/ui/frontend/shared/use-interval.js'"
+			},
+			{
+				"source": "@features/media/frontend/utility/media-proxy.js",
+				"replacement": "@features/drive/frontend/utility/media-proxy.js"
+			},
+			{
+				"source": "features/media/frontend/utility/media-proxy.js",
+				"replacement": "features/drive/frontend/utility/media-proxy.js"
 			}
 		]
 	},
@@ -389,6 +429,14 @@
 			{
 				"source": "'@@/js/use-interval.js'",
 				"replacement": "'@features/ui/frontend/shared/use-interval.js'"
+			},
+			{
+				"source": "@features/media/frontend/utility/media-proxy.js",
+				"replacement": "@features/drive/frontend/utility/media-proxy.js"
+			},
+			{
+				"source": "features/media/frontend/utility/media-proxy.js",
+				"replacement": "features/drive/frontend/utility/media-proxy.js"
 			}
 		]
 	},
@@ -408,7 +456,7 @@
 		]
 	},
 	{
-		"file": "packages/features/media/frontend/widgets/WidgetSlideshow.vue",
+		"file": "packages/features/drive/frontend/widgets/WidgetSlideshow.vue",
 		"fixture": "packages/frontend/test/unit/sfc-bulk-locale-migration.test.ts",
 		"oldOriginalSha256": "e875abfd65807ce6164e26a57569de3e0fc2f1a54c867989b4c3496d42cd6b0e",
 		"oldMigratedSha256": "78c3c3b9d2345d869d545db241f438e3d62d2cd5693b89af1d83a872dc8bb9a1",
@@ -581,6 +629,30 @@
 			{
 				"source": "'@@/js/is-link.js'",
 				"replacement": "'@features/ui/frontend/shared/is-link.js'"
+			},
+			{
+				"source": "@features/media/frontend/components/MkLightbox.item.vue",
+				"replacement": "@features/drive/frontend/components/MkLightbox.item.vue"
+			},
+			{
+				"source": "features/media/frontend/components/MkLightbox.item.vue",
+				"replacement": "features/drive/frontend/components/MkLightbox.item.vue"
+			},
+			{
+				"source": "@features/media/frontend/components/MkLightbox.vue",
+				"replacement": "@features/drive/frontend/components/MkLightbox.vue"
+			},
+			{
+				"source": "features/media/frontend/components/MkLightbox.vue",
+				"replacement": "features/drive/frontend/components/MkLightbox.vue"
+			},
+			{
+				"source": "@features/media/frontend/utility/lightbox.js",
+				"replacement": "@features/drive/frontend/utility/lightbox.js"
+			},
+			{
+				"source": "features/media/frontend/utility/lightbox.js",
+				"replacement": "features/drive/frontend/utility/lightbox.js"
 			}
 		]
 	},
@@ -626,6 +698,30 @@
 			{
 				"source": "'@@/js/config.js'",
 				"replacement": "'@features/boot/frontend/shared/config.js'"
+			},
+			{
+				"source": "@features/media/frontend/components/MkImgWithBlurhash.vue",
+				"replacement": "@features/drive/frontend/components/MkImgWithBlurhash.vue"
+			},
+			{
+				"source": "features/media/frontend/components/MkImgWithBlurhash.vue",
+				"replacement": "features/drive/frontend/components/MkImgWithBlurhash.vue"
+			},
+			{
+				"source": "@features/media/frontend/components/MkMediaImage.vue",
+				"replacement": "@features/drive/frontend/components/MkMediaImage.vue"
+			},
+			{
+				"source": "features/media/frontend/components/MkMediaImage.vue",
+				"replacement": "features/drive/frontend/components/MkMediaImage.vue"
+			},
+			{
+				"source": "@features/media/frontend/utility/media-proxy.js",
+				"replacement": "@features/drive/frontend/utility/media-proxy.js"
+			},
+			{
+				"source": "features/media/frontend/utility/media-proxy.js",
+				"replacement": "features/drive/frontend/utility/media-proxy.js"
 			}
 		]
 	},
@@ -819,6 +915,14 @@
 			{
 				"source": "'@@/js/is-link.js'",
 				"replacement": "'@features/ui/frontend/shared/is-link.js'"
+			},
+			{
+				"source": "@features/media/frontend/components/MkMediaList.vue",
+				"replacement": "@features/drive/frontend/components/MkMediaList.vue"
+			},
+			{
+				"source": "features/media/frontend/components/MkMediaList.vue",
+				"replacement": "features/drive/frontend/components/MkMediaList.vue"
 			}
 		]
 	},

@@ -47,7 +47,7 @@ const migrations = [
 		references: [{ "keyPath": "user", "replacement": "$locale.value.sfc.user" }, { "keyPath": "following", "replacement": "$locale.value.sfc.following" }],
 	},
 	{
-		file: "packages/features/media/frontend/components/MkLightbox.item.controls.vue",
+		file: "packages/features/drive/frontend/components/MkLightbox.item.controls.vue",
 		keyPaths: ["_mediaControls.loop", "_mediaControls.playbackRate", "_mediaControls.pip"],
 		references: [{ "keyPath": "_mediaControls.loop", "replacement": "$locale.value.sfc.loop" }, { "keyPath": "_mediaControls.playbackRate", "replacement": "$locale.value.sfc.playbackRate" }, { "keyPath": "_mediaControls.pip", "replacement": "$locale.value.sfc.pip" }],
 	},

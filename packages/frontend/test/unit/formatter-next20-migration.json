@@ -491,7 +491,7 @@
 	},
 	{
 		"file": "packages/features/notes/frontend/components/MkSubNoteContent.vue",
-		"originalSha256": "b07af3969c09443c7342ba9beac2bd550f178d7ad770f1ea61e8482af49f56a3",
+		"originalSha256": "deda7f9016fa53e311753f73343fa7e063f502eff939050f5b42d874bf43f245",
 		"edits": [
 			{
 				"start": 236,
@@ -871,7 +871,7 @@
 	},
 	{
 		"file": "packages/features/emojis/frontend/components/global/MkCustomEmoji.vue",
-		"originalSha256": "e213068d2f0572e32c707219e3af7147c9726c435859de7d54cdddb694641bc0",
+		"originalSha256": "df9e6ddd300782fef7bf73897bcc4aa884fcd49a2f3aeac2e22f06e2b3670f27",
 		"edits": [
 			{
 				"start": 1593,
@@ -1796,7 +1796,7 @@
 	},
 	{
 		"file": "packages/features/notes/frontend/components/MkPostFormAttaches.vue",
-		"originalSha256": "9d6065ceb76db0f8b0168bf44c988420376e36af588dd742efc84f9d4ec5a590",
+		"originalSha256": "3da1cc61f2f0b70b61160444ad26da5f908eedc67bd1b1a33a8fd65757551220",
 		"edits": [
 			{
 				"start": 1714,

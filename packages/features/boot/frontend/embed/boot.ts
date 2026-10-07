@@ -6,7 +6,7 @@
 import { createApp, defineAsyncComponent } from 'vue';
 import defaultLightTheme from '@features/preferences/frontend/themes/l-light.json5';
 import defaultDarkTheme from '@features/preferences/frontend/themes/d-dark.json5';
-import { MediaProxy } from '@features/media/frontend/shared/media-proxy.js';
+import { MediaProxy } from '@features/drive/frontend/shared/media-proxy.js';
 import { storeBootloaderErrors } from '@features/boot/frontend/shared/store-boot-errors.js';
 import { applyTheme, assertIsTheme } from '@features/preferences/frontend/embed/theme.js';
 import { fetchCustomEmojis } from '@features/emojis/frontend/embed/custom-emojis.js';

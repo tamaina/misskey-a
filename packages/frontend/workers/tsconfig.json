@@ -4,7 +4,7 @@
 		"lib": ["esnext", "webworker"]
 	},
 	"include": [
-		"../../features/media/frontend/workers/**/*.ts",
+		"../../features/drive/frontend/workers/**/*.ts",
 		"../@types/**/*.d.ts"
 	],
 	"exclude": []

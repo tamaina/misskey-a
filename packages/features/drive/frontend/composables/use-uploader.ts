@@ -9,16 +9,16 @@ import isAnimated from 'is-file-animated';
 import { EventEmitter } from 'eventemitter3';
 import { computed, markRaw, onMounted, onUnmounted, ref, triggerRef } from 'vue';
 import type { MenuItem } from '@features/navigation/frontend/types/menu.js';
-import type { WatermarkLayers, WatermarkPreset } from '@features/media/frontend/utility/watermark/WatermarkRenderer.js';
-import type { ImageFrameParams, ImageFramePreset } from '@features/media/frontend/utility/image-frame-renderer/ImageFrameRenderer.js';
+import type { WatermarkLayers, WatermarkPreset } from '@features/drive/frontend/utility/watermark/WatermarkRenderer.js';
+import type { ImageFrameParams, ImageFramePreset } from '@features/drive/frontend/utility/image-frame-renderer/ImageFrameRenderer.js';
 import { genId } from '@features/runtime/frontend/utility/id.js';
 import { i18n } from '@features/runtime/frontend/i18n.js';
 import { prefer } from '@features/preferences/frontend/preferences.js';
-import { isWebpSupported } from '@features/media/frontend/utility/isWebpSupported.js';
+import { isWebpSupported } from '@features/drive/frontend/utility/isWebpSupported.js';
 import { uploadFile, UploadAbortedError } from '@features/drive/frontend/utility/drive.js';
-import type { Content } from '@features/media/frontend/components/MkLightbox.item.vue';
+import type { Content } from '@features/drive/frontend/components/MkLightbox.item.vue';
 import * as os from '@features/ui/frontend/os.js';
-import { isPreviewable, getType } from '@features/media/frontend/utility/lightbox.js';
+import { isPreviewable, getType } from '@features/drive/frontend/utility/lightbox.js';
 import { ensureSignin } from '@features/auth/frontend/i.js';
 
 export type UploaderFeatures = {
@@ -253,7 +253,7 @@ export function useUploader(options: {
 								caption: item.caption ?? null,
 							}));
 
-						const { dispose } = await os.popupAsyncWithDialog(import('@features/media/frontend/components/MkLightbox.vue').then(x => x.default), {
+						const { dispose } = await os.popupAsyncWithDialog(import('@features/drive/frontend/components/MkLightbox.vue').then(x => x.default), {
 							defaultIndex: contents.findIndex(x => x.id === item.id),
 							contents,
 						}, {
@@ -306,7 +306,7 @@ export function useUploader(options: {
 					icon: 'ti ti-sparkles',
 					text: i18n.ts._imageEffector.title,
 					action: async () => {
-						const { dispose } = await os.popupAsyncWithDialog(import('@features/media/frontend/components/MkImageEffectorDialog.vue').then(x => x.default), {
+						const { dispose } = await os.popupAsyncWithDialog(import('@features/drive/frontend/components/MkImageEffectorDialog.vue').then(x => x.default), {
 							image: item.file,
 						}, {
 							ok: (file) => {
@@ -355,7 +355,7 @@ export function useUploader(options: {
 					icon: 'ti ti-pencil',
 					text: i18n.ts.edit,
 					action: async () => {
-						const { dispose } = await os.popupAsyncWithDialog(import('@features/media/frontend/components/MkWatermarkEditorDialog.vue').then(x => x.default), {
+						const { dispose } = await os.popupAsyncWithDialog(import('@features/drive/frontend/components/MkWatermarkEditorDialog.vue').then(x => x.default), {
 							layers: item.watermarkLayers,
 							image: item.file,
 						}, {
@@ -407,7 +407,7 @@ export function useUploader(options: {
 					icon: 'ti ti-pencil',
 					text: i18n.ts.edit,
 					action: async () => {
-						const { dispose } = await os.popupAsyncWithDialog(import('@features/media/frontend/components/MkImageFrameEditorDialog.vue').then(x => x.default), {
+						const { dispose } = await os.popupAsyncWithDialog(import('@features/drive/frontend/components/MkImageFrameEditorDialog.vue').then(x => x.default), {
 							params: item.imageFrameParams,
 							image: item.file,
 							imageCaption: item.caption ?? null,
@@ -433,7 +433,7 @@ export function useUploader(options: {
 					type: 'button' as const,
 					text: preset.name,
 					action: async () => {
-						const { dispose } = await os.popupAsyncWithDialog(import('@features/media/frontend/components/MkImageFrameEditorDialog.vue').then(x => x.default), {
+						const { dispose } = await os.popupAsyncWithDialog(import('@features/drive/frontend/components/MkImageFrameEditorDialog.vue').then(x => x.default), {
 							params: preset.params,
 							image: item.file,
 							imageCaption: item.caption ?? null,
@@ -667,7 +667,7 @@ export function useUploader(options: {
 		const needsWatermark = item.watermarkLayers != null && IMAGE_EDITING_SUPPORTED_TYPES.includes(preprocessedFile.type) && $i.policies.watermarkAvailable;
 		if (needsWatermark && item.watermarkLayers != null) {
 			const canvas = window.document.createElement('canvas');
-			const WatermarkRenderer = await import('@features/media/frontend/utility/watermark/WatermarkRenderer.js').then(x => x.WatermarkRenderer);
+			const WatermarkRenderer = await import('@features/drive/frontend/utility/watermark/WatermarkRenderer.js').then(x => x.WatermarkRenderer);
 			const renderer = new WatermarkRenderer({
 				canvas: canvas,
 				renderWidth: imageBitmap.width,
@@ -693,7 +693,7 @@ export function useUploader(options: {
 			const canvas = window.document.createElement('canvas');
 			const ExifReader = await import('exifreader');
 			const exif = await ExifReader.load(await item.file.arrayBuffer());
-			const ImageFrameRenderer = await import('@features/media/frontend/utility/image-frame-renderer/ImageFrameRenderer.js').then(x => x.ImageFrameRenderer);
+			const ImageFrameRenderer = await import('@features/drive/frontend/utility/image-frame-renderer/ImageFrameRenderer.js').then(x => x.ImageFrameRenderer);
 			const frameRenderer = new ImageFrameRenderer({
 				canvas: canvas,
 				image: await window.createImageBitmap(preprocessedFile),

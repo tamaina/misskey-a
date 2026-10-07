@@ -36,7 +36,7 @@ import * as Misskey from 'misskey-js';
 import { useInterval } from '@features/ui/frontend/shared/use-interval.js';
 import MkMarqueeText from '@features/ui/frontend/components/MkMarqueeText.vue';
 import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
-import { getProxiedImageUrlNullable } from '@features/media/frontend/utility/media-proxy.js';
+import { getProxiedImageUrlNullable } from '@features/drive/frontend/utility/media-proxy.js';
 
 const props = defineProps<{
 	display?: 'marquee' | 'oneByOne';

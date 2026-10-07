@@ -64,8 +64,7 @@ The [file allocation table](feature-file-allocation.tsv) records 419 service, se
 | `notes` | NoteCreate/Delete/Draft/Pining, Poll, Reaction, ReactionsBuffering; note serializers/jobs | notes/replies/renotes/reactions/polls, note UI; `note.tsx` |
 | `timelines` | FanoutTimeline, FanoutTimelineEndpoint, Antenna; antenna serializer | timeline/antenna queries, timeline UI; consumes note read/event ports |
 | `discovery` | Search, UserSearch, Hashtag, Featured; hashtag serializer | search/explore/trends/hashtags/featured views |
-| `drive` | DriveService, drive-file/folder serializers, file deletion/cleanup jobs | files/folders/uploads, drive browser and admin drive surfaces |
-| `media` | FileInfo, ImageProcessing, VideoProcessing, SensitiveMediaDetection | media transformation/detection ports and domain-independent media presentation |
+| `drive` | DriveService, drive-file/folder serializers, file deletion/cleanup jobs; FileInfo, ImageProcessing, VideoProcessing, SensitiveMediaDetection | files/folders/uploads, drive browser/admin surfaces, media display, transformation/detection and browser workers |
 | `emojis` | CustomEmoji, EmojiEntityService, emoji import/export jobs and frontend state | public/admin emoji API, catalog/picker/manager/editor |
 | `avatar-decorations` | AvatarDecorationService | decoration catalog/manager/editor and admin routes |
 | `federation` | all ActivityPub services, FederatedInstance, FetchInstanceMetadata, Relay, RemoteUserResolve, Webfinger, UserKeypair; inbox/delivery jobs | AP/WebFinger/remote instances/relays; protocol renderers stay here |
@@ -314,7 +313,7 @@ package or tsconfig is needed.
 | users | `src/server/api/endpoints/users/show.test.ts` |
 | notifications | `src/core/entities/notification-entity-service.test.ts` (its collaborating services are mocked) |
 | relationships | `test/unit/misc/check-word-mute.ts` |
-| media | `test/unit/misc/correct-filename.ts`, `test/unit/misc/others.ts` (currently only content-disposition cases) |
+| drive | `test/unit/misc/correct-filename.ts`, `test/unit/misc/others.ts` (currently only content-disposition cases) |
 | markup | `test/unit/extract-mentions.ts` |
 | statistics | `test/unit/telemetry-registry.ts`, `test/unit/core/telemetry/adapters/SentryTelemetryAdapter.ts` (mocked adapter/logging boundaries) |
 

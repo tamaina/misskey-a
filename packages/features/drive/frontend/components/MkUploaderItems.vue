@@ -55,10 +55,10 @@ import type { UploaderItem } from '@features/drive/frontend/composables/use-uplo
 import { getUploadName } from '@features/drive/frontend/composables/use-uploader.js';
 import { interpolateLocaleParameters } from '@features/runtime/frontend/interpolate-locale-parameters.js';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
-import { isPreviewable, getType } from '@features/media/frontend/utility/lightbox.js';
+import { isPreviewable, getType } from '@features/drive/frontend/utility/lightbox.js';
 import bytes from '@features/ui/frontend/filters/bytes.js';
 import * as os from '@features/ui/frontend/os.js';
-import type { Content } from '@features/media/frontend/components/MkLightbox.item.vue';
+import type { Content } from '@features/drive/frontend/components/MkLightbox.item.vue';
 
 const props = defineProps<{
 	items: UploaderItem[];
@@ -113,7 +113,7 @@ async function onThumbnailClick(item: UploaderItem, ev: PointerEvent) {
 				filename: getUploadName(item),
 			}));
 
-		const { dispose } = await os.popupAsyncWithDialog(import('@features/media/frontend/components/MkLightbox.vue').then(x => x.default), {
+		const { dispose } = await os.popupAsyncWithDialog(import('@features/drive/frontend/components/MkLightbox.vue').then(x => x.default), {
 			defaultIndex: contents.findIndex(content => content.id === item.id),
 			contents: contents,
 		}, {

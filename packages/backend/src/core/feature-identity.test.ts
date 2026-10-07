@@ -86,7 +86,7 @@ import { FederatedInstanceService } from '@features/federation/backend/services/
 
 import { FetchInstanceMetadataService } from '@features/federation/backend/services/FetchInstanceMetadataService.js';
 
-import { FileInfoService } from '@features/media/backend/services/FileInfoService.js';
+import { FileInfoService } from '@features/drive/backend/services/FileInfoService.js';
 
 import { FlashService } from '@features/play/backend/services/FlashService.js';
 
@@ -98,7 +98,7 @@ import { HttpRequestService } from '@features/runtime/backend/services/HttpReque
 
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 
-import { ImageProcessingService } from '@features/media/backend/services/ImageProcessingService.js';
+import { ImageProcessingService } from '@features/drive/backend/services/ImageProcessingService.js';
 
 import { InternalStorageService } from '@features/runtime/backend/services/InternalStorageService.js';
 
@@ -148,7 +148,7 @@ import { S3Service } from '@features/runtime/backend/services/S3Service.js';
 
 import { SearchService } from '@features/discovery/backend/services/SearchService.js';
 
-import { SensitiveMediaDetectionService } from '@features/media/backend/services/SensitiveMediaDetectionService.js';
+import { SensitiveMediaDetectionService } from '@features/drive/backend/services/SensitiveMediaDetectionService.js';
 
 import { SignupService } from '@features/auth/backend/services/SignupService.js';
 
@@ -180,7 +180,7 @@ import { UserSuspendService } from '@features/moderation/backend/services/UserSu
 
 import { UserWebhookService } from '@features/integrations/backend/services/UserWebhookService.js';
 
-import { VideoProcessingService } from '@features/media/backend/services/VideoProcessingService.js';
+import { VideoProcessingService } from '@features/drive/backend/services/VideoProcessingService.js';
 
 import { WebAuthnService } from '@features/auth/backend/services/WebAuthnService.js';
 

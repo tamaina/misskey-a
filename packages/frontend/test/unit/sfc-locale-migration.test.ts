@@ -25,7 +25,7 @@ const migrations = [
 	{ file: 'packages/features/emojis/frontend/components/MkEmojiPicker.section.vue', keyPath: 'other' },
 	{ file: 'packages/features/emojis/frontend/pages/admin/custom-emojis-manager.local.list.logs.vue', keyPath: '_customEmojisManager._gridCommon.registrationLogs' },
 	{ file: 'packages/features/markup/frontend/components/MkCodeEditor.vue', keyPath: 'save' },
-	{ file: 'packages/features/media/frontend/components/MkImageEffectorFxForm.vue', keyPath: 'nothingToConfigure' },
+	{ file: 'packages/features/drive/frontend/components/MkImageEffectorFxForm.vue', keyPath: 'nothingToConfigure' },
 	{ file: 'packages/features/navigation/frontend/components/MkSuperMenu.vue', keyPath: 'search' },
 	{ file: 'packages/features/notes/frontend/components/MkNoteSimple.vue', keyPath: 'deletedNote' },
 	{ file: 'packages/features/notes/frontend/components/MkPostForm.TextCounter.vue', keyPath: 'textCount' },
@@ -42,7 +42,7 @@ const migrations = [
 	{ file: 'packages/features/ui/frontend/components/MkOmit.vue', keyPath: 'showMore' },
 	{ file: 'packages/features/users/frontend/components/MkAccountMoved.vue', keyPath: 'accountMoved' },
 	{ file: 'packages/features/users/frontend/pages/user/raw.vue', keyPath: 'createdAt' },
-	{ file: 'packages/features/media/frontend/components/MkCropperDialog.vue', keyPath: 'cropImage' },
+	{ file: 'packages/features/drive/frontend/components/MkCropperDialog.vue', keyPath: 'cropImage' },
 	{ file: 'packages/features/integrations/frontend/components/MkGoogle.vue', keyPath: 'searchByGoogle' },
 	{ file: 'packages/features/relationships/frontend/components/MkUserList.vue', keyPath: 'noUsers' },
 	{ file: 'packages/features/relationships/frontend/ui/deck/direct-column.vue', keyPath: '_deck._columns.direct' },
@@ -248,7 +248,7 @@ const featureMigrations = [
 		],
 	},
 	{
-		file: 'packages/features/media/frontend/components/MkLightbox.item.fileinfo.vue',
+		file: 'packages/features/drive/frontend/components/MkLightbox.item.fileinfo.vue',
 		keyPaths: [
 			'fileName',
 			'description',
@@ -256,7 +256,7 @@ const featureMigrations = [
 		],
 	},
 	{
-		file: 'packages/features/media/frontend/components/MkMediaBanner.vue',
+		file: 'packages/features/drive/frontend/components/MkMediaBanner.vue',
 		keyPaths: [
 			'sensitive',
 			'clickToShow',
@@ -543,7 +543,6 @@ describe('Feature SFC-local locale migration', () => {
 		}
 	});
 });
-
 
 const additionalStaticMigrations = [
 	{

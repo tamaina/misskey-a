@@ -1,8 +1,8 @@
 [
 	{
 		"file": "packages/features/web/frontend/pages/about-misskey.vue",
-		"originalSha256": "56960d7aa7f23531cb9c0f6f5989e2bd9f10ef2d3acdfa2f78d8d024779ce4b7",
-		"migratedSha256": "d83a55da3dda7e01a0b0ac8985fd3f5ff982f46840772db698624e31b51a8037",
+		"originalSha256": "4f45d89f727354c8de0ab4ba6b3006ae1d5849db449901b32a29a70a9f652a13",
+		"migratedSha256": "7e9a3358fdd8e36a68cc903c86679f6bc62d4df089919e94e1aca413e71fb0f6",
 		"edits": [
 			{
 				"start": 1316,
@@ -7452,8 +7452,8 @@
 	},
 	{
 		"file": "packages/features/users/frontend/pages/user/home.vue",
-		"originalSha256": "c7e1222c6d7ae9d565a653b1d6882d3e846a311ee45a61fe6cf2bc3415a145a5",
-		"migratedSha256": "d1b9e50ecb4f27c90a7e5f12fc649d26ed4165b70741d233011bf09405479125",
+		"originalSha256": "b8792bddc524f9321cd2e9148b34562779ed27b8cb8660372a071f8e985405fd",
+		"migratedSha256": "18d22ae7db7086fea4ce7824aa716286ff93dda1f7f3b1d04837a7eb5874ad06",
 		"edits": [
 			{
 				"start": 563,

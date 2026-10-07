@@ -52,8 +52,8 @@ import { interpolateLocaleParameters } from '@features/runtime/frontend/interpol
 import { prefer } from '@features/preferences/frontend/preferences.js';
 import { DI } from '@features/ui/frontend/di.js';
 import { globalEvents } from '@features/runtime/frontend/events.js';
-import type { Content } from '@features/media/frontend/components/MkLightbox.item.vue';
-import { isPreviewable, getType } from '@features/media/frontend/utility/lightbox.js';
+import type { Content } from '@features/drive/frontend/components/MkLightbox.item.vue';
+import { isPreviewable, getType } from '@features/drive/frontend/utility/lightbox.js';
 
 const props = defineProps<{
 	modelValue: Misskey.entities.DriveFile[];
@@ -186,7 +186,7 @@ function showFileMenu(file: Misskey.entities.DriveFile, ev: PointerEvent | Keybo
 					file: item,
 					//sourceElement: TODO
 				}));
-				const { dispose } = await os.popupAsyncWithDialog(import('@features/media/frontend/components/MkLightbox.vue').then(x => x.default), {
+				const { dispose } = await os.popupAsyncWithDialog(import('@features/drive/frontend/components/MkLightbox.vue').then(x => x.default), {
 					defaultIndex: constents.findIndex(content => content.id === file.id),
 					contents: constents,
 					initiallyRevealedContentIds: [file.id],

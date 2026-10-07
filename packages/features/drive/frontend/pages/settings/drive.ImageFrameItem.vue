@@ -22,8 +22,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import { defineAsyncComponent, onMounted, onUnmounted, ref, useTemplateRef, watch } from 'vue';
-import type { ImageFramePreset } from '@features/media/frontend/utility/image-frame-renderer/ImageFrameRenderer.js';
-import { ImageFrameRenderer } from '@features/media/frontend/utility/image-frame-renderer/ImageFrameRenderer.js';
+import type { ImageFramePreset } from '@features/drive/frontend/utility/image-frame-renderer/ImageFrameRenderer.js';
+import { ImageFrameRenderer } from '@features/drive/frontend/utility/image-frame-renderer/ImageFrameRenderer.js';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import * as os from '@features/ui/frontend/os.js';
 import { deepClone } from '@features/runtime/frontend/utility/clone.js';
@@ -39,7 +39,7 @@ const emit = defineEmits<{
 }>();
 
 async function edit() {
-	const { dispose } = os.popup(defineAsyncComponent(() => import('@features/media/frontend/components/MkImageFrameEditorDialog.vue')), {
+	const { dispose } = os.popup(defineAsyncComponent(() => import('@features/drive/frontend/components/MkImageFrameEditorDialog.vue')), {
 		presetEditMode: true,
 		preset: deepClone(props.preset),
 		params: deepClone(props.preset.params),

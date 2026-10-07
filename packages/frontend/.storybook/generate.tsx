@@ -455,8 +455,8 @@ function toStories(component: string): Promise<string> {
 		globSync('../features/users/frontend/components/MkAvatars.vue'),
 		globSync('../features/instance/frontend/components/MkDonation.vue'),
 		globSync('../features/integrations/frontend/components/MkExtensionInstaller.vue'),
-		globSync('../features/media/frontend/components/MkBlurhash.vue'),
-		globSync('../features/media/frontend/components/MkCropperDialog.vue'),
+		globSync('../features/drive/frontend/components/MkBlurhash.vue'),
+		globSync('../features/drive/frontend/components/MkCropperDialog.vue'),
 
 		globSync('../features/play/frontend/components/MkFlashPreview.vue'),
 		globSync('../features/gallery/frontend/components/MkGalleryPostPreview.vue'),

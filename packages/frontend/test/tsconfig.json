@@ -16,7 +16,7 @@
 		"../../features/*/frontend/**/*.vue"
 	],
 	"exclude": [
-		"../../features/media/frontend/workers/**/*.ts",
+		"../../features/drive/frontend/workers/**/*.ts",
 		"../../features/*/frontend/**/*.stories.ts",
 		"../../features/*/frontend/**/*.stories.impl.ts",
 		"../../features/*/frontend/**/*.msw.ts"

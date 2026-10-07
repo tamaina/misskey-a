@@ -14,6 +14,7 @@ import { promises as fsp } from 'fs';
 import locales from 'i18n';
 import meta from '../../package.json';
 import packageInfo from './package.json' with { type: 'json' };
+import featureCssSourcePaths from './lib/feature-css-source-paths.json' with { type: 'json' };
 import pluginUnwindCssModuleClassName from './lib/rollup-plugin-unwind-css-module-class-name.js';
 import pluginJson5 from './lib/vite-plugin-json5.js';
 import { searchIndexes } from './lib/search-index-options.js';
@@ -182,7 +183,9 @@ export function getConfig(): UserConfig {
 			},
 			modules: {
 				generateScopedName(name, filename, _css): string {
-					const id = (path.relative(__dirname, filename.split('?')[0]) + '-' + name).replace(/[\\\/\.\?&=]/g, '-').replace(/(src-|vue-)/g, '');
+					const relativePath = path.relative(__dirname, filename.split('?')[0]).replaceAll('\\', '/');
+					const originalPath = (featureCssSourcePaths as Record<string, string>)[relativePath] ?? relativePath;
+					const id = (originalPath + '-' + name).replace(/[\\\/\.\?&=]/g, '-').replace(/(src-|vue-)/g, '');
 					if (process.env.NODE_ENV === 'production') {
 						return 'x' + toBase62(hash(id)).substring(0, 4);
 					} else {

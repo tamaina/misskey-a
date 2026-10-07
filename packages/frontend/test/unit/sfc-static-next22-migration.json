@@ -1,8 +1,8 @@
 [
 	{
 		"file": "packages/features/drive/frontend/pages/settings/drive.vue",
-		"originalSha256": "3b005ac18cad139272207536a4da4bb6404d3a924d401111576dd7085e298a69",
-		"migratedSha256": "a2d0a1140c14be2c68372d04327e7290d937f09136ba6cfc3dad258797d4b859",
+		"originalSha256": "f3e761eeb4a5cd7e9b7109153b3768398d8a6b6dcc17b22753a6ad7afd296f07",
+		"migratedSha256": "47d8ea90036533baf3110ed304fecebe2d681a8eaf099ac56d47ba9f14b36f85",
 		"edits": [
 			{
 				"start": 156,

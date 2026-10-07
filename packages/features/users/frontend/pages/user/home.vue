@@ -182,7 +182,7 @@ import { confetti } from '@features/ui/frontend/utility/confetti.js';
 import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 import { isFollowingVisibleForMe, isFollowersVisibleForMe } from '@features/relationships/frontend/utility/isFfVisibleForMe.js';
 import { useRouter } from '@features/navigation/frontend/router.js';
-import { getStaticImageUrl } from '@features/media/frontend/utility/media-proxy.js';
+import { getStaticImageUrl } from '@features/drive/frontend/utility/media-proxy.js';
 import MkSparkle from '@features/ui/frontend/components/MkSparkle.vue';
 import { prefer } from '@features/preferences/frontend/preferences.js';
 import MkPullToRefresh from '@features/ui/frontend/components/MkPullToRefresh.vue';

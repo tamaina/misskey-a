@@ -34,7 +34,7 @@ import type { FormWithDefault, GetFormResultType } from '@features/ui/frontend/u
 import MkContainer from '@features/ui/frontend/components/MkContainer.vue';
 import MkMiniChart from '@features/statistics/frontend/components/MkMiniChart.vue';
 import { misskeyApi, misskeyApiGet } from '@features/api/frontend/utility/misskey-api.js';
-import { getProxiedImageUrlNullable } from '@features/media/frontend/utility/media-proxy.js';
+import { getProxiedImageUrlNullable } from '@features/drive/frontend/utility/media-proxy.js';
 import { prefer } from '@features/preferences/frontend/preferences.js';
 
 const name = 'federation';

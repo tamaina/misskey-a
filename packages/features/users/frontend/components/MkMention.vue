@@ -19,7 +19,7 @@ import { computed } from 'vue';
 import { host as localHost } from '@features/boot/frontend/shared/config.js';
 import type { MkABehavior } from '@features/navigation/frontend/components/global/MkA.vue';
 import { $i } from '@features/auth/frontend/i.js';
-import { getStaticImageUrl } from '@features/media/frontend/utility/media-proxy.js';
+import { getStaticImageUrl } from '@features/drive/frontend/utility/media-proxy.js';
 import { prefer } from '@features/preferences/frontend/preferences.js';
 
 const props = defineProps<{

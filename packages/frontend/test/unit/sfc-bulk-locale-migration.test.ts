@@ -77,7 +77,7 @@ const migrations = [
 	},
 	{
 		"file": "packages/features/instance/frontend/widgets/WidgetInstanceCloud.vue",
-		"sha256": "2e070f65cc7c6d10b5f3b377597fec1959caa12a5627f0d10cc33bb31d4df0f8",
+		"sha256": "4c1d3ec40e32b13efa8d9d7573eff904a25b8b5d1cd7105244235e2fc4b6f1fa",
 		"importOffset": 1394,
 		"keyPaths": [
 			"_widgetOptions.transparent"
@@ -93,8 +93,8 @@ const migrations = [
 		]
 	},
 	{
-		"file": "packages/features/media/frontend/components/MkLightbox.item.audio-visualizer.vue",
-		"sha256": "dec33b5e2bf4b760663172b8f96ba0eb9e442df5e403897c26d03164f7b32f5b",
+		"file": "packages/features/drive/frontend/components/MkLightbox.item.audio-visualizer.vue",
+		"sha256": "91ecbcb9fc91002baf99821d0830fac033c603fca721cd057368d6b7bd8ada9b",
 		"importOffset": 1035,
 		"keyPaths": [
 			"cannotPreview"
@@ -272,7 +272,7 @@ const migrations = [
 	},
 	{
 		"file": "packages/features/federation/frontend/widgets/WidgetFederation.vue",
-		"sha256": "035546dca49d7819ae12ef2b51b3b7d5658d7a30f9810a8a8e87f88fcfc66556",
+		"sha256": "77380206b098f05395a3b9293092469dbe458d834ca79cf3a79c394e70beebc5",
 		"importOffset": 1716,
 		"keyPaths": [
 			"_widgets.federation",
@@ -692,8 +692,8 @@ const migrations = [
 		]
 	},
 	{
-		"file": "packages/features/media/frontend/widgets/WidgetPhotos.vue",
-		"sha256": "4ff73ce2b9af9ff47e3dcf06893b0d3ca7e2a833ccd38b59ddbf1cbda92fa6f1",
+		"file": "packages/features/drive/frontend/widgets/WidgetPhotos.vue",
+		"sha256": "d3d9aee86cdafc7cd8be6468d92d3501e26dbaa6884b7cce4ab0604cd56960b7",
 		"importOffset": 1493,
 		"keyPaths": [
 			"_widgets.photos",
@@ -725,7 +725,7 @@ const migrations = [
 		]
 	},
 	{
-		"file": "packages/features/media/frontend/widgets/WidgetSlideshow.vue",
+		"file": "packages/features/drive/frontend/widgets/WidgetSlideshow.vue",
 		"sha256": "79ec3a6a63a50be196d5a671aafc7f7f278069ed79fe056fd46075092dc5675b",
 		"importOffset": 1170,
 		"keyPaths": [
@@ -1263,7 +1263,7 @@ const migrations = [
 	},
 	{
 		"file": "packages/features/drive/frontend/pages/settings/drive.ImageFrameItem.vue",
-		"sha256": "d9f4ae457c155f5bdfa5ac1388ea0cd86bc3f86d830f42435017d992730c7180",
+		"sha256": "3d756d212743ed10b57b2eb219fe05b399f91adbd953f90dfbca8050687f793a",
 		"importOffset": 1176,
 		"keyPaths": [
 			"preset",
@@ -1304,7 +1304,7 @@ const migrations = [
 	},
 	{
 		"file": "packages/features/drive/frontend/pages/settings/drive.WatermarkItem.vue",
-		"sha256": "3abc519a420a9b6970ff9bc2ad568c0bd4772c5b0ddeb2d5749a12e206841d6e",
+		"sha256": "235084c2be4a01c73b00ebcb14cd455949d892507a9ffc9d418d5ae8741223a8",
 		"importOffset": 1150,
 		"keyPaths": [
 			"preset",

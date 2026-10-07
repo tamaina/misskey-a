@@ -65,7 +65,7 @@ import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 import MkFukidashi from '@features/ui/frontend/components/MkFukidashi.vue';
 import * as os from '@features/ui/frontend/os.js';
 import { copyToClipboard } from '@features/ui/frontend/utility/copy-to-clipboard.js';
-import MkMediaList from '@features/media/frontend/components/MkMediaList.vue';
+import MkMediaList from '@features/drive/frontend/components/MkMediaList.vue';
 import { reactionPicker } from '@features/notes/frontend/utility/reaction-picker.js';
 import * as sound from '@features/preferences/frontend/utility/sound.js';
 import MkReactionIcon from '@features/notes/frontend/components/MkReactionIcon.vue';

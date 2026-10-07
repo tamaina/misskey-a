@@ -11,18 +11,18 @@ import { describe, expect, test, beforeAll, afterAll, afterEach, vi } from 'vite
 import sharp from 'sharp';
 import { DataSource, type Repository } from 'typeorm';
 import { initTestDb, randomString } from '../../utils.js';
-import type { SensitiveMediaDetectionService } from '@features/media/backend/services/SensitiveMediaDetectionService.js';
+import type { SensitiveMediaDetectionService } from '@features/drive/backend/services/SensitiveMediaDetectionService.js';
 import { DownloadService } from '@features/runtime/backend/services/DownloadService.js';
-import { FileInfoService } from '@features/media/backend/services/FileInfoService.js';
+import { FileInfoService } from '@features/drive/backend/services/FileInfoService.js';
 import { HttpRequestService } from '@features/runtime/backend/services/HttpRequestService.js';
-import { ImageProcessingService } from '@features/media/backend/services/ImageProcessingService.js';
+import { ImageProcessingService } from '@features/drive/backend/services/ImageProcessingService.js';
 import { InternalStorageService } from '@features/runtime/backend/services/InternalStorageService.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { LoggerService } from '@features/runtime/backend/services/LoggerService.js';
-import { VideoProcessingService } from '@features/media/backend/services/VideoProcessingService.js';
+import { VideoProcessingService } from '@features/drive/backend/services/VideoProcessingService.js';
 import { loadConfig, type Config } from '@/config.js';
 import { MiDriveFile } from '@features/drive/backend/models/DriveFile.js';
-import { FileServerService } from '@features/media/backend/http/FileServerService.js';
+import { FileServerService } from '@features/drive/backend/http/FileServerService.js';
 import { FileServerFileResolver } from '@features/drive/backend/http/FileServerFileResolver.js';
 
 const dummyPath = path.resolve('test/resources/dummy-for-file-server-service.png');

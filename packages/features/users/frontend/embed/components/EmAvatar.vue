@@ -39,7 +39,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script lang="ts" setup>
 import { computed } from 'vue';
 import * as Misskey from 'misskey-js';
-import EmImgWithBlurhash from '@features/media/frontend/embed/components/EmImgWithBlurhash.vue';
+import EmImgWithBlurhash from '@features/drive/frontend/embed/components/EmImgWithBlurhash.vue';
 import EmA from '@features/navigation/frontend/embed/components/EmA.vue';
 import { userPage } from '@features/web/frontend/embed/utils.js';
 

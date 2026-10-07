@@ -21,7 +21,7 @@ import { roleServices } from '@features/roles/backend/services.js';
 import { emojiServices } from '@features/emojis/backend/services.js';
 import { galleryServices } from '@features/gallery/backend/services.js';
 import { pageServices } from '@features/pages/backend/services.js';
-import { mediaServices } from '@features/media/backend/services.js';
+import { mediaServices } from '@features/drive/backend/services/media.js';
 import { markupServices } from '@features/markup/backend/services.js';
 import { preferencesServices } from '@features/preferences/backend/services.js';
 import { ports } from '@features/index/backend/service-ports.js';
@@ -57,7 +57,7 @@ const legacyServiceBindings = [
 ];
 
 export const featureServiceGroups = {
-	media: toNestProviders('media', mediaServices, legacyServiceBindings),
+	driveMedia: toNestProviders('driveMedia', mediaServices, legacyServiceBindings),
 	markup: toNestProviders('markup', markupServices, legacyServiceBindings),
 	preferences: toNestProviders('preferences', preferencesServices, legacyServiceBindings),
 	auth: toNestProviders('auth', authServices, legacyServiceBindings),

@@ -15,7 +15,7 @@ import { prefer } from '@features/preferences/frontend/preferences.js';
 import { $i } from '@features/auth/frontend/i.js';
 import { instance } from '@features/instance/frontend/instance.js';
 import { globalEvents } from '@features/runtime/frontend/events.js';
-import { getProxiedImageUrl } from '@features/media/frontend/utility/media-proxy.js';
+import { getProxiedImageUrl } from '@features/drive/frontend/utility/media-proxy.js';
 import { genId } from '@features/runtime/frontend/utility/id.js';
 
 type UploadReturnType = {

@@ -130,7 +130,7 @@ import { computed, inject, ref } from 'vue';
 import * as mfm from 'mfm-js';
 import * as Misskey from 'misskey-js';
 import I18n from '@features/runtime/frontend/embed/components/I18n.vue';
-import EmMediaList from '@features/media/frontend/embed/components/EmMediaList.vue';
+import EmMediaList from '@features/drive/frontend/embed/components/EmMediaList.vue';
 import EmNoteSub from '@features/notes/frontend/embed/components/EmNoteSub.vue';
 import EmNoteSimple from '@features/notes/frontend/embed/components/EmNoteSimple.vue';
 import EmInstanceTicker from '@features/federation/frontend/embed/components/EmInstanceTicker.vue';

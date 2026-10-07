@@ -6,12 +6,12 @@
 import * as fs from 'node:fs';
 import rename from 'rename';
 import type { Config } from '@/config.js';
-import type { IImageStreamable } from '@features/media/backend/services/ImageProcessingService.js';
-import { contentDisposition } from '@features/media/backend/utility/content-disposition.js';
-import { correctFilename } from '@features/media/backend/utility/correct-filename.js';
-import { isMimeImage } from '@features/media/backend/utility/is-mime-image.js';
-import { VideoProcessingService } from '@features/media/backend/services/VideoProcessingService.js';
-import { attachStreamCleanup, handleRangeRequest, setFileResponseHeaders, getSafeContentType, needsCleanup } from '@features/media/backend/http/FileServerUtils.js';
+import type { IImageStreamable } from '@features/drive/backend/services/ImageProcessingService.js';
+import { contentDisposition } from '@features/drive/backend/utility/content-disposition.js';
+import { correctFilename } from '@features/drive/backend/utility/correct-filename.js';
+import { isMimeImage } from '@features/drive/backend/utility/is-mime-image.js';
+import { VideoProcessingService } from '@features/drive/backend/services/VideoProcessingService.js';
+import { attachStreamCleanup, handleRangeRequest, setFileResponseHeaders, getSafeContentType, needsCleanup } from '@features/drive/backend/http/FileServerUtils.js';
 import type { FileServerFileResolver } from './FileServerFileResolver.js';
 import type { FastifyReply, FastifyRequest } from 'fastify';
 

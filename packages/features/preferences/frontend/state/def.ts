@@ -13,8 +13,8 @@ import type { SoundType } from '@features/preferences/frontend/utility/sound.js'
 import type { Plugin } from '@features/integrations/frontend/plugin.js';
 import type { DeviceKind } from '@features/ui/frontend/utility/device-kind.js';
 import type { DeckProfile } from '@features/preferences/frontend/deck.js';
-import type { WatermarkPreset } from '@features/media/frontend/utility/watermark/WatermarkRenderer.js';
-import type { ImageFramePreset } from '@features/media/frontend/utility/image-frame-renderer/ImageFrameRenderer.js';
+import type { WatermarkPreset } from '@features/drive/frontend/utility/watermark/WatermarkRenderer.js';
+import type { ImageFramePreset } from '@features/drive/frontend/utility/image-frame-renderer/ImageFrameRenderer.js';
 import { genId } from '@features/runtime/frontend/utility/id.js';
 import { DEFAULT_DEVICE_KIND } from '@features/ui/frontend/utility/device-kind.js';
 import { deepEqual } from '@features/runtime/frontend/utility/deep-equal.js';

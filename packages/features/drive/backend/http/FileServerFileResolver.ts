@@ -7,7 +7,7 @@ import * as fs from 'node:fs';
 import type { DriveFilesRepository, MiDriveFile } from '@features/persistence/backend/repositories/models.js';
 import { createTemp } from '@features/runtime/backend/io/create-temp.js';
 import type { DownloadService } from '@features/runtime/backend/services/DownloadService.js';
-import type { FileInfoService } from '@features/media/backend/services/FileInfoService.js';
+import type { FileInfoService } from '@features/drive/backend/services/FileInfoService.js';
 import type { InternalStorageService } from '@features/runtime/backend/services/InternalStorageService.js';
 
 export type DownloadedFileResult = {

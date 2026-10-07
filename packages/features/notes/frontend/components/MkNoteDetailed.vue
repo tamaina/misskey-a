@@ -257,7 +257,7 @@ import type { Keymap } from '@features/ui/frontend/utility/hotkey.js';
 import MkNoteSub from '@features/notes/frontend/components/MkNoteSub.vue';
 import MkNoteSimple from '@features/notes/frontend/components/MkNoteSimple.vue';
 import MkReactionsViewer from '@features/notes/frontend/components/MkReactionsViewer.vue';
-import MkMediaList from '@features/media/frontend/components/MkMediaList.vue';
+import MkMediaList from '@features/drive/frontend/components/MkMediaList.vue';
 import MkCwButton from '@features/notes/frontend/components/MkCwButton.vue';
 import MkPoll from '@features/notes/frontend/components/MkPoll.vue';
 import MkUrlPreview from '@features/markup/frontend/components/MkUrlPreview.vue';

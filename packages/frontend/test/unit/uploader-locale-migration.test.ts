@@ -43,10 +43,10 @@ vi.mock('@features/drive/frontend/composables/use-uploader.js', () => ({
 }));
 vi.mock('@features/auth/frontend/i.js', () => ({ ensureSignin: () => ({ policies: { maxFileSizeMb: 10 } }) }));
 vi.mock('@features/ui/frontend/os.js', () => actions);
-vi.mock('@features/media/frontend/utility/lightbox.js', () => ({
+vi.mock('@features/drive/frontend/utility/lightbox.js', () => ({
 	isPreviewable: (type: string) => type.startsWith('image/'), getType: () => 'image',
 }));
-vi.mock('@features/media/frontend/components/MkLightbox.vue', () => ({ default: {} }));
+vi.mock('@features/drive/frontend/components/MkLightbox.vue', () => ({ default: {} }));
 vi.mock('@features/ui/frontend/components/MkButton.vue', async () => {
 	const { defineComponent, h } = await import('vue');
 	return { default: defineComponent({ setup: (_, { slots }) => () => h('button', slots.default?.()) }) };
@@ -138,7 +138,7 @@ describe('uploader locale-tag migration', () => {
 			.replace('interpolateLocaleParameters($locale.sfc.compressedToX, ', 'i18n.tsx._uploader.compressedToX(')
 			.replace('interpolateLocaleParameters($locale.sfc.savedXPercent, ', 'i18n.tsx._uploader.savedXPercent(')
 			.replace('$locale.sfc.preprocessing', 'i18n.ts.preprocessing');
-		expect(createHash('sha256').update(original).digest('hex')).toBe('c834058442b9d9fabc4647317e7e615ea3725c9501dde4a0408b7cf550728587');
+		expect(createHash('sha256').update(original).digest('hex')).toBe('768a03e99f01dbf94c7c1567a4e75faa699a9d4379558d65e02b7ff96d50c3ae');
 	});
 
 	test('loads all actual VVI dictionaries and agrees with both oracles on 392 formatter cases', async () => {

@@ -183,7 +183,7 @@ function adjustTweetHeight(message: MessageEvent) {
 function openPlayer(): void {
 	if (!summalyResult.value) return;
 
-	const { dispose } = os.popup(defineAsyncComponent(() => import('@features/media/frontend/components/MkYouTubePlayer.vue')), {
+	const { dispose } = os.popup(defineAsyncComponent(() => import('@features/drive/frontend/components/MkYouTubePlayer.vue')), {
 		urlOrSummalyResult: summalyResult.value,
 	}, {
 		closed: () => {

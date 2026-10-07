@@ -27,7 +27,7 @@ import { NodeinfoServerService } from '@features/instance/backend/http/NodeinfoS
 import { ApiServerService } from '@features/api/backend/transport/ApiServerService.js';
 import { StreamingApiServerService } from '@features/api/backend/transport/StreamingApiServerService.js';
 import { WellKnownServerService } from '@features/federation/backend/http/WellKnownServerService.js';
-import { FileServerService } from '@features/media/backend/http/FileServerService.js';
+import { FileServerService } from '@features/drive/backend/http/FileServerService.js';
 import { HealthServerService } from '@features/operations/backend/http/HealthServerService.js';
 import { ClientServerService } from '@features/web/backend/http/ClientServerService.js';
 import { OpenApiServerService } from '@features/api/backend/transport/openapi/OpenApiServerService.js';

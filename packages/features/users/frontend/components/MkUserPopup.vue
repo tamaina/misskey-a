@@ -69,7 +69,7 @@ import number from '@features/ui/frontend/filters/number.js';
 import { prefer } from '@features/preferences/frontend/preferences.js';
 import { $i } from '@features/auth/frontend/i.js';
 import { isFollowingVisibleForMe, isFollowersVisibleForMe } from '@features/relationships/frontend/utility/isFfVisibleForMe.js';
-import { getStaticImageUrl } from '@features/media/frontend/utility/media-proxy.js';
+import { getStaticImageUrl } from '@features/drive/frontend/utility/media-proxy.js';
 
 const props = defineProps<{
 	showing: boolean;

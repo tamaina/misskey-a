@@ -155,7 +155,7 @@ import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import XNote from '@features/notes/frontend/components/MkTutorialDialog.Note.vue';
 import XTimeline from '@features/timelines/frontend/components/MkTutorialDialog.Timeline.vue';
 import XPostNote from '@features/notes/frontend/components/MkTutorialDialog.PostNote.vue';
-import XSensitive from '@features/media/frontend/components/MkTutorialDialog.Sensitive.vue';
+import XSensitive from '@features/drive/frontend/components/MkTutorialDialog.Sensitive.vue';
 import MkAnimBg from '@features/web/frontend/components/MkAnimBg.vue';
 import { interpolateLocaleParameters } from '@features/runtime/frontend/interpolate-locale-parameters.js';
 import { instance } from '@features/instance/frontend/instance.js';

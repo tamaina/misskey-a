@@ -28,7 +28,7 @@ import MkContainer from '@features/ui/frontend/components/MkContainer.vue';
 import MkTagCloud from '@features/discovery/frontend/components/MkTagCloud.vue';
 import * as os from '@features/ui/frontend/os.js';
 import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
-import { getProxiedImageUrlNullable } from '@features/media/frontend/utility/media-proxy.js';
+import { getProxiedImageUrlNullable } from '@features/drive/frontend/utility/media-proxy.js';
 
 const name = 'instanceCloud';
 

@@ -18,12 +18,12 @@ export default function(app: App) {
 	app.component('WidgetTrends', defineAsyncComponent(() => import('@features/discovery/frontend/widgets/WidgetTrends.vue')));
 	app.component('WidgetClock', defineAsyncComponent(() => import('@features/ui/frontend/widgets/WidgetClock.vue')));
 	app.component('WidgetActivity', defineAsyncComponent(() => import('@features/statistics/frontend/widgets/WidgetActivity.vue')));
-	app.component('WidgetPhotos', defineAsyncComponent(() => import('@features/media/frontend/widgets/WidgetPhotos.vue')));
+	app.component('WidgetPhotos', defineAsyncComponent(() => import('@features/drive/frontend/widgets/WidgetPhotos.vue')));
 	app.component('WidgetDigitalClock', defineAsyncComponent(() => import('@features/ui/frontend/widgets/WidgetDigitalClock.vue')));
 	app.component('WidgetUnixClock', defineAsyncComponent(() => import('@features/ui/frontend/widgets/WidgetUnixClock.vue')));
 	app.component('WidgetFederation', defineAsyncComponent(() => import('@features/federation/frontend/widgets/WidgetFederation.vue')));
 	app.component('WidgetPostForm', defineAsyncComponent(() => import('@features/notes/frontend/widgets/WidgetPostForm.vue')));
-	app.component('WidgetSlideshow', defineAsyncComponent(() => import('@features/media/frontend/widgets/WidgetSlideshow.vue')));
+	app.component('WidgetSlideshow', defineAsyncComponent(() => import('@features/drive/frontend/widgets/WidgetSlideshow.vue')));
 	app.component('WidgetServerMetric', defineAsyncComponent(() => import('@features/statistics/frontend/widgets/server-metric/index.vue')));
 	app.component('WidgetOnlineUsers', defineAsyncComponent(() => import('@features/statistics/frontend/widgets/WidgetOnlineUsers.vue')));
 	app.component('WidgetJobQueue', defineAsyncComponent(() => import('@features/operations/frontend/widgets/WidgetJobQueue.vue')));

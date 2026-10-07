@@ -15,11 +15,11 @@ import type { MiDriveFile } from '../models/DriveFile.js';
 import { appendQuery, query } from '@features/runtime/backend/formatting/url.js';
 import { deepClone } from '@features/runtime/backend/data/clone.js';
 import { bindThis } from '@features/runtime/backend/decorators.js';
-import { isMimeImage } from '@features/media/backend/utility/is-mime-image.js';
+import { isMimeImage } from '@features/drive/backend/utility/is-mime-image.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { uniqueByKey } from '@features/runtime/backend/data/unique-by-key.js';
 import { UtilityService } from '@features/federation/backend/services/UtilityService.js';
-import { VideoProcessingService } from '@features/media/backend/services/VideoProcessingService.js';
+import { VideoProcessingService } from '@features/drive/backend/services/VideoProcessingService.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import { DriveFolderEntityService } from './DriveFolderEntityService.js';
 

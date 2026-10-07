@@ -9,7 +9,7 @@ import * as Misskey from 'misskey-js';
 import { createInternationalization } from 'virtual:vite-vue-internationalization';
 import { components } from '@features/index/frontend/components.js';
 import { directives } from '@features/index/frontend/directives.js';
-import MkMediaImage from '@features/media/frontend/components/MkMediaImage.vue';
+import MkMediaImage from '@features/drive/frontend/components/MkMediaImage.vue';
 
 describe('MkMediaImage', () => {
 	const renderMediaImage = async (image: Partial<Misskey.entities.DriveFile>): Promise<RenderResult> => {

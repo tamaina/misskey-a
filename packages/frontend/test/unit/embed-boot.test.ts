@@ -20,7 +20,7 @@ test('real embed boot installs the supplied runtime before mounting and preserve
 	const mounted = vi.fn();
 	const marker = Symbol('installed-runtime');
 	const dictionary = locales['fr-FR'];
-	vi.doMock('@features/media/frontend/shared/media-proxy.js', () => ({ MediaProxy: class MediaProxy {} }));
+	vi.doMock('@features/drive/frontend/shared/media-proxy.js', () => ({ MediaProxy: class MediaProxy {} }));
 	vi.doMock('@features/preferences/frontend/embed/theme.js', () => ({ applyTheme: theme, assertIsTheme: () => true }));
 	vi.doMock('@features/emojis/frontend/embed/custom-emojis.js', () => ({ fetchCustomEmojis: async () => {} }));
 	vi.doMock('@features/instance/frontend/embed/server-metadata.js', () => ({ serverMetadata: metadata }));

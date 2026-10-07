@@ -122,7 +122,7 @@ import { $i } from '@features/auth/frontend/i.js';
 import { getAccounts, getAccountWithSigninDialog, getAccountWithSignupDialog } from '@features/auth/frontend/accounts.js';
 import { i18n } from '@features/runtime/frontend/i18n.js';
 import * as os from '@features/ui/frontend/os.js';
-import { getProxiedImageUrl } from '@features/media/frontend/utility/media-proxy.js';
+import { getProxiedImageUrl } from '@features/drive/frontend/utility/media-proxy.js';
 import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 
 const props = defineProps<{

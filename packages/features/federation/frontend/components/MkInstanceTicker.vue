@@ -15,7 +15,7 @@ import { computed } from 'vue';
 import { instanceName as localInstanceName } from '@features/boot/frontend/shared/config.js';
 import type { CSSProperties } from 'vue';
 import { instance as localInstance } from '@features/instance/frontend/instance.js';
-import { getProxiedImageUrlNullable } from '@features/media/frontend/utility/media-proxy.js';
+import { getProxiedImageUrlNullable } from '@features/drive/frontend/utility/media-proxy.js';
 
 const props = defineProps<{
 	host: string | null;

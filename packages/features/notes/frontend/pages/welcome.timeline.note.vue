@@ -34,7 +34,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 import { ref, useTemplateRef, onUpdated, onMounted } from 'vue';
 import * as Misskey from 'misskey-js';
 import MkReactionsViewer from '@features/notes/frontend/components/MkReactionsViewer.vue';
-import MkMediaList from '@features/media/frontend/components/MkMediaList.vue';
+import MkMediaList from '@features/drive/frontend/components/MkMediaList.vue';
 import MkPoll from '@features/notes/frontend/components/MkPoll.vue';
 import MkCwButton from '@features/notes/frontend/components/MkCwButton.vue';
 

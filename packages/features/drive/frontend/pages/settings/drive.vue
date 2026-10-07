@@ -204,8 +204,8 @@ import * as Misskey from 'misskey-js';
 import tinycolor from 'tinycolor2';
 import XWatermarkItem from '@features/drive/frontend/pages/settings/drive.WatermarkItem.vue';
 import XImageFrameItem from '@features/drive/frontend/pages/settings/drive.ImageFrameItem.vue';
-import type { WatermarkPreset } from '@features/media/frontend/utility/watermark/WatermarkRenderer.js';
-import type { ImageFramePreset } from '@features/media/frontend/utility/image-frame-renderer/ImageFrameRenderer.js';
+import type { WatermarkPreset } from '@features/drive/frontend/utility/watermark/WatermarkRenderer.js';
+import type { ImageFramePreset } from '@features/drive/frontend/utility/image-frame-renderer/ImageFrameRenderer.js';
 import FormLink from '@features/ui/frontend/components/form/link.vue';
 import MkSwitch from '@features/ui/frontend/components/MkSwitch.vue';
 import MkSelect from '@features/ui/frontend/components/MkSelect.vue';
@@ -310,7 +310,7 @@ function chooseUploadFolder() {
 }
 
 async function addWatermarkPreset() {
-	const { dispose } = await os.popupAsyncWithDialog(import('@features/media/frontend/components/MkWatermarkEditorDialog.vue').then(x => x.default), {
+	const { dispose } = await os.popupAsyncWithDialog(import('@features/drive/frontend/components/MkWatermarkEditorDialog.vue').then(x => x.default), {
 		presetEditMode: true,
 		preset: null,
 		layers: [],
@@ -369,7 +369,7 @@ function onDeleteImageFramePreset(id: string) {
 }
 
 async function addImageFramePreset() {
-	const { dispose } = await os.popupAsyncWithDialog(import('@features/media/frontend/components/MkImageFrameEditorDialog.vue').then(x => x.default), {
+	const { dispose } = await os.popupAsyncWithDialog(import('@features/drive/frontend/components/MkImageFrameEditorDialog.vue').then(x => x.default), {
 		presetEditMode: true,
 		preset: null,
 		params: null,

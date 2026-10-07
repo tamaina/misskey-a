@@ -2485,8 +2485,8 @@
 	},
 	{
 		"file": "packages/features/drive/frontend/pages/drive.file.info.vue",
-		"originalSha256": "e06e14cae804a3632d8652eae8e1c04ed4d4e0d479019af47e5ff793b627a74f",
-		"migratedSha256": "15412873d9720b41050ed1ce1498c770728839962b3eceaa13f71a48baa457b4",
+		"originalSha256": "62487d2fb138d66f5f226bd64e7ce0ab2318667181e312db345bcaa0d621df90",
+		"migratedSha256": "db9985b735a088f46889e26f6ecf3fd338776ca3d7802efee9c6de67435aed3f",
 		"edits": [
 			{
 				"start": 143,
