@@ -9,26 +9,26 @@ import { ModuleRef } from '@nestjs/core';
 import { afterEach, describe, expect, test, vi } from 'vitest';
 import { mockDeep } from 'vitest-mock-extended';
 import { DI } from '@/di-symbols.js';
-import { createDiscoveryServices, createRankingServices, discoveryServices, rankingServices, userSearchServices } from '../../../features/discovery/backend/services.js';
+import { discoveryServices, rankingServices, userSearchServices } from '../../../features/discovery/backend/services.js';
 import { FeaturedService } from '../../../features/discovery/backend/services/FeaturedService.js';
 import { HashtagService } from '../../../features/discovery/backend/services/HashtagService.js';
 import { UserEntityService } from '../../../features/users/backend/serializers/UserEntityService.js';
 import { IdService } from '../../../features/runtime/backend/services/IdService.js';
 import { UtilityService } from './UtilityService.js';
 import { featureServiceGroups } from './feature-service-providers.js';
-import type { RankingServicesDependencies } from '../../../features/discovery/backend/services.js';
 import type { FactoryProvider } from '@nestjs/common';
 import type { ChainableCommander } from 'ioredis';
+import type { Inputs } from '../../../features/index/backend/service-definitions.js';
 
 function setup() {
-	const inputs = mockDeep<RankingServicesDependencies>({ meta: { hiddenTags: [], sensitiveWords: [] } });
+	const inputs = mockDeep<Inputs<typeof rankingServices>>({ meta: { hiddenTags: [], sensitiveWords: [] } });
 	const pipeline = mockDeep<ChainableCommander>();
 	inputs.redisClient.pipeline.mockReturnValue(pipeline);
 	inputs.redisClient.multi.mockReturnValue(pipeline);
 	pipeline.exec.mockResolvedValue([]);
 	inputs.redisClient.sismember.mockResolvedValue(0);
 	inputs.utilityService.isKeyWordIncluded.mockReturnValue(false);
-	return { inputs, pipeline, services: createRankingServices(inputs) };
+	return { inputs, pipeline, services: rankingServices.create(inputs) };
 }
 
 afterEach(() => {
@@ -39,7 +39,7 @@ afterEach(() => {
 describe('ranking declarations', () => {
 	test('existing discovery and search factory contracts keep their exact output shape', () => {
 		expect(Object.keys(discoveryServices.definitions)).toEqual(['HashtagEntityService']);
-		expect(Object.keys(createDiscoveryServices())).toEqual(['HashtagEntityService']);
+		expect(Object.keys(discoveryServices.create())).toEqual(['HashtagEntityService']);
 		expect(Object.keys(userSearchServices.definitions)).toEqual(['UserSearchService']);
 		expect(Object.keys(rankingServices.definitions)).toEqual(['FeaturedService', 'HashtagService']);
 		expect(rankingServices.definitions.HashtagService.dependencies[5]).toBe(rankingServices.definitions.FeaturedService);
@@ -47,7 +47,7 @@ describe('ranking declarations', () => {
 
 	test('local edge uses the exact exposed Featured singleton and borrows every constructor input', () => {
 		const { inputs, services } = setup();
-		const second = createRankingServices(inputs);
+		const second = rankingServices.create(inputs);
 		const direct = new HashtagService(inputs.db, inputs.meta, inputs.redisClient, inputs.hashtagsRepository, inputs.userEntityService, services.FeaturedService, inputs.idService, inputs.utilityService);
 		for (const instance of [services.HashtagService, direct]) {
 			for (const key of ['db', 'meta', 'redisClient', 'hashtagsRepository', 'userEntityService', 'idService', 'utilityService'] as const) expect(Reflect.get(instance, key)).toBe(inputs[key]);

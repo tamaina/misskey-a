@@ -13,8 +13,8 @@ import { afterEach, describe, expect, test, vi } from 'vitest';
 import { mockDeep } from 'vitest-mock-extended';
 import { DI } from '@/di-symbols.js';
 import type { MiUser, MiUserProfile } from '@/models/_.js';
-import { authSecurityServices, authServices, createAuthSecurityServices } from '../../../features/auth/backend/services.js';
-import { createDiscoveryServices, createUserSearchServices, discoveryServices } from '../../../features/discovery/backend/services.js';
+import { authSecurityServices, authServices } from '../../../features/auth/backend/services.js';
+import { discoveryServices, userSearchServices } from '../../../features/discovery/backend/services.js';
 import { UserAuthService } from '../../../features/auth/backend/services/UserAuthService.js';
 import { WebAuthnService } from '../../../features/auth/backend/services/WebAuthnService.js';
 import { UserSearchService } from '../../../features/discovery/backend/services/UserSearchService.js';
@@ -24,9 +24,8 @@ import { ports } from '../../../features/index/backend/service-ports.js';
 import { featureServiceGroups } from './feature-service-providers.js';
 import type { FactoryProvider, InjectionToken, Provider } from '@nestjs/common';
 import type { AuthenticationResponseJSON, PublicKeyCredentialRequestOptionsJSON, PublicKeyCredentialCreationOptionsJSON, RegistrationResponseJSON } from '@simplewebauthn/server';
-import type { AuthSecurityServicesDependencies } from '../../../features/auth/backend/services.js';
-import type { UserSearchServicesDependencies } from '../../../features/discovery/backend/services.js';
 import type { SelectQueryBuilder } from 'typeorm';
+import type { Inputs } from '../../../features/index/backend/service-definitions.js';
 
 vi.mock('@simplewebauthn/server', () => ({
 	generateAuthenticationOptions: vi.fn(), generateRegistrationOptions: vi.fn(),
@@ -38,7 +37,7 @@ const timestamp = Date.UTC(2026, 0, 2, 3, 4, 5);
 const secret = 'JBSWY3DPEHPK3PXP';
 
 function securityInputs() {
-	const inputs = mockDeep<AuthSecurityServicesDependencies>({
+	const inputs = mockDeep<Inputs<typeof authSecurityServices>>({
 		config: { url: 'https://example.test', hostname: 'example.test', host: 'example.test' },
 		meta: { name: 'Example', iconUrl: null },
 	});
@@ -67,15 +66,15 @@ describe('auth and search declaration boundaries', () => {
 	test('old auth and zero-input discovery definition/output shapes remain unchanged', () => {
 		expect(Object.keys(authServices.definitions).sort()).toEqual(['AppEntityService', 'AuthSessionEntityService', 'InviteCodeEntityService', 'SigninEntityService']);
 		expect(Object.keys(discoveryServices.definitions)).toEqual(['HashtagEntityService']);
-		expect(Object.keys(createDiscoveryServices())).toEqual(['HashtagEntityService']);
+		expect(Object.keys(discoveryServices.create())).toEqual(['HashtagEntityService']);
 		expect(ports.redisClient.token).toBe(DI.redis);
 		expect(authSecurityServices.ports.map(port => port.name).sort()).toEqual(['config', 'meta', 'redisClient', 'userProfilesRepository', 'userSecurityKeysRepository', 'usersRepository']);
 	});
 
 	test('plain security factories borrow one Redis object and direct constructors remain equivalent', () => {
 		const inputs = securityInputs();
-		const first = createAuthSecurityServices(inputs);
-		const second = createAuthSecurityServices(inputs);
+		const first = authSecurityServices.create(inputs);
+		const second = authSecurityServices.create(inputs);
 		const directAuth = new UserAuthService(inputs.redisClient, inputs.usersRepository, inputs.userProfilesRepository);
 		const directWebAuthn = new WebAuthnService(inputs.config, inputs.meta, inputs.redisClient, inputs.userSecurityKeysRepository);
 		for (const service of [first.UserAuthService, first.WebAuthnService, second.UserAuthService, second.WebAuthnService, directAuth, directWebAuthn]) expect(Reflect.get(service, 'redisClient')).toBe(inputs.redisClient);
@@ -125,7 +124,7 @@ describe('auth and search declaration boundaries', () => {
 		vi.stubEnv('MISSKEY_TEST_CHECK_DUPLICATED_TOTP', '1');
 		const inputs = securityInputs();
 		inputs.redisClient.set.mockResolvedValueOnce('OK').mockResolvedValueOnce(null);
-		const service = createAuthSecurityServices(inputs).UserAuthService;
+		const service = authSecurityServices.create(inputs).UserAuthService;
 		const totp = new OTPAuth.TOTP({ secret: OTPAuth.Secret.fromBase32(secret), digits: 6, period: 30 });
 		const token = totp.generate({ timestamp });
 		const key = `2fa:used:user:${createHash('sha256').update(secret).digest('base64url')}:${totp.counter({ timestamp })}`;
@@ -141,7 +140,7 @@ describe('auth and search declaration boundaries', () => {
 		vi.stubEnv('NODE_ENV', 'test');
 		vi.stubEnv('MISSKEY_TEST_CHECK_DUPLICATED_TOTP', '1');
 		const inputs = securityInputs();
-		const service = createAuthSecurityServices(inputs).UserAuthService;
+		const service = authSecurityServices.create(inputs).UserAuthService;
 		const authenticate = service.twoFactorAuthenticate;
 		await authenticate(mockDeep<MiUserProfile>({ userId: 'user', twoFactorBackupSecret: ['used', 'keep'] }), 'used');
 		expect(inputs.userProfilesRepository.update).toHaveBeenCalledWith({ userId: 'user' }, { twoFactorBackupSecret: ['keep'] });
@@ -156,7 +155,7 @@ describe('auth and search declaration boundaries', () => {
 		inputs.userSecurityKeysRepository.findBy.mockResolvedValue([storedKey()]);
 		const options = mockDeep<PublicKeyCredentialCreationOptionsJSON>({ challenge: 'registration-challenge' });
 		vi.mocked(generateRegistrationOptions).mockResolvedValue(options);
-		const service = createAuthSecurityServices(inputs).WebAuthnService;
+		const service = authSecurityServices.create(inputs).WebAuthnService;
 		expect(await service.initiateRegistration('user', 'name', 'Display')).toBe(options);
 		expect(generateRegistrationOptions).toHaveBeenCalledWith(expect.objectContaining({ rpName: 'Example', rpID: 'example.test', userName: 'name', userDisplayName: 'Display', excludeCredentials: [{ id: 'credential-id', transports: ['internal'] }], authenticatorSelection: { residentKey: 'required', userVerification: 'preferred' } }));
 		expect(inputs.redisClient.setex).toHaveBeenCalledWith('webauthn:registrationChallenge:user', 90, 'registration-challenge');
@@ -166,7 +165,7 @@ describe('auth and search declaration boundaries', () => {
 		const inputs = securityInputs();
 		inputs.redisClient.get.mockResolvedValue('registration-challenge');
 		vi.mocked(verifyRegistrationResponse).mockResolvedValue(mockDeep<Awaited<ReturnType<typeof verifyRegistrationResponse>>>({ verified: true, registrationInfo: { credential: { id: 'credential-id', publicKey: Uint8Array.from([1, 2]), counter: 1 }, userVerified: true, credentialDeviceType: 'singleDevice', credentialBackedUp: false, fmt: 'none', attestationObject: Uint8Array.from([3]) } }));
-		const service = createAuthSecurityServices(inputs).WebAuthnService;
+		const service = authSecurityServices.create(inputs).WebAuthnService;
 		const response: RegistrationResponseJSON = { id: 'credential-id', rawId: 'credential-id', type: 'public-key', response: { clientDataJSON: '', attestationObject: '', transports: ['internal'] }, clientExtensionResults: {} };
 		expect(await service.verifyRegistration('user', response)).toMatchObject({ credentialID: 'credential-id', counter: 1, userVerified: true, transports: ['internal'] });
 		expect(inputs.redisClient.del).toHaveBeenCalledWith('webauthn:registrationChallenge:user');
@@ -179,7 +178,7 @@ describe('auth and search declaration boundaries', () => {
 		inputs.userSecurityKeysRepository.findBy.mockResolvedValue([storedKey()]);
 		const options = mockDeep<PublicKeyCredentialRequestOptionsJSON>({ challenge: 'authentication-challenge' });
 		vi.mocked(generateAuthenticationOptions).mockResolvedValue(options);
-		const service = createAuthSecurityServices(inputs).WebAuthnService;
+		const service = authSecurityServices.create(inputs).WebAuthnService;
 		await service.initiateAuthentication('user');
 		expect(generateAuthenticationOptions).toHaveBeenNthCalledWith(1, { rpID: 'example.test', allowCredentials: [{ id: 'credential-id', transports: ['internal'] }], userVerification: 'preferred' });
 		expect(inputs.redisClient.setex).toHaveBeenCalledWith('webauthn:authenticationChallenge:user', 90, 'authentication-challenge');
@@ -195,7 +194,7 @@ describe('auth and search declaration boundaries', () => {
 		inputs.redisClient.getdel.mockResolvedValueOnce('authentication-challenge').mockResolvedValueOnce(null);
 		inputs.userSecurityKeysRepository.findOneBy.mockResolvedValue(storedKey());
 		vi.mocked(verifyAuthenticationResponse).mockResolvedValue(verifiedAuthentication());
-		const service = createAuthSecurityServices(inputs).WebAuthnService;
+		const service = authSecurityServices.create(inputs).WebAuthnService;
 		const response = authenticationResponse();
 		expect(await service.verifyAuthentication('user', response)).toBe(true);
 		expect(inputs.redisClient.getdel).toHaveBeenCalledWith('webauthn:authenticationChallenge:user');
@@ -211,7 +210,7 @@ describe('auth and search declaration boundaries', () => {
 		inputs.redisClient.getdel.mockResolvedValue('passkey-challenge');
 		inputs.userSecurityKeysRepository.findOneBy.mockResolvedValue(storedKey());
 		vi.mocked(verifyAuthenticationResponse).mockResolvedValueOnce(verifiedAuthentication()).mockResolvedValueOnce(verifiedAuthentication(false));
-		const service = createAuthSecurityServices(inputs).WebAuthnService;
+		const service = authSecurityServices.create(inputs).WebAuthnService;
 		expect(await service.verifySignInWithPasskeyAuthentication('context', authenticationResponse())).toBe('user');
 		expect(inputs.redisClient.getdel).toHaveBeenCalledWith('webauthn:passkeyChallenge:context');
 		expect(inputs.userSecurityKeysRepository.findOneBy).toHaveBeenCalledWith({ id: 'credential-id' });
@@ -220,7 +219,7 @@ describe('auth and search declaration boundaries', () => {
 	});
 
 	test('search factory and direct constructor preserve ordered ID packing and borrowed serializer', async () => {
-		const inputs = mockDeep<UserSearchServicesDependencies>();
+		const inputs = mockDeep<Inputs<typeof userSearchServices>>();
 		const query = mockDeep<SelectQueryBuilder<MiUser>>();
 		query.andWhere.mockReturnValue(query);
 		query.select.mockReturnValue(query);
@@ -229,7 +228,7 @@ describe('auth and search declaration boundaries', () => {
 		query.getRawMany.mockResolvedValue([{ user_id: 'first' }, { user_id: 'second' }]);
 		inputs.usersRepository.createQueryBuilder.mockReturnValue(query);
 		inputs.userEntityService.packMany.mockResolvedValue([]);
-		const factory = createUserSearchServices(inputs).UserSearchService;
+		const factory = userSearchServices.create(inputs).UserSearchService;
 		const direct = new UserSearchService(inputs.config, inputs.usersRepository, inputs.userProfilesRepository, inputs.followingsRepository, inputs.mutingsRepository, inputs.userEntityService);
 		for (const service of [factory, direct]) {
 			const search = service.searchByUsernameAndHost;

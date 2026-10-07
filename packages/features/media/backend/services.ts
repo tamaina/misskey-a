@@ -9,7 +9,6 @@ import { ImageProcessingService } from './services/ImageProcessingService.js';
 import { VideoProcessingService } from './services/VideoProcessingService.js';
 import { SensitiveMediaDetectionService } from './services/SensitiveMediaDetectionService.js';
 import { FileInfoService } from './services/FileInfoService.js';
-import type { Inputs, Outputs } from '../../index/backend/service-definitions.js';
 
 const image = service(ImageProcessingService, []);
 const sensitive = service(SensitiveMediaDetectionService, [ports.meta, ports.httpRequestService, ports.loggerService]);
@@ -19,6 +18,3 @@ export const mediaServices = defineServices({
 	SensitiveMediaDetectionService: sensitive,
 	FileInfoService: service(FileInfoService, [sensitive, ports.loggerService]),
 });
-export const createMediaServices = mediaServices.create;
-export type MediaServicesDependencies = Inputs<typeof mediaServices>;
-export type MediaServices = Outputs<typeof mediaServices>;

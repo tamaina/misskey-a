@@ -8,7 +8,6 @@ import { ports } from '../../index/backend/service-ports.js';
 import { FlashEntityService } from './serializers/FlashEntityService.js';
 import { FlashLikeEntityService } from './serializers/FlashLikeEntityService.js';
 import { FlashService } from './services/FlashService.js';
-import type { Inputs, Outputs } from '../../index/backend/service-definitions.js';
 
 const flashEntityService = service(FlashEntityService, [ports.flashsRepository, ports.flashLikesRepository, ports.userEntityService, ports.idService]);
 export const playServices = defineServices({
@@ -16,6 +15,3 @@ export const playServices = defineServices({
 	FlashLikeEntityService: service(FlashLikeEntityService, [ports.flashLikesRepository, flashEntityService]),
 	FlashService: service(FlashService, [ports.flashsRepository, ports.flashLikesRepository, ports.queryService]),
 });
-export const createPlayServices = playServices.create;
-export type PlayServicesDependencies = Inputs<typeof playServices>;
-export type PlayServices = Outputs<typeof playServices>;

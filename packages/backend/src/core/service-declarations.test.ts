@@ -10,9 +10,9 @@ import { ModuleRef } from '@nestjs/core';
 import { describe, expect, test, vi } from 'vitest';
 import { mockDeep } from 'vitest-mock-extended';
 import { DI } from '@/di-symbols.js';
-import { authSecurityServices, authServices, createAuthServices } from '../../../features/auth/backend/services.js';
-import { channelServices, createChannelServices } from '../../../features/channels/backend/services.js';
-import { discoveryServices, createDiscoveryServices, rankingServices, userSearchServices } from '../../../features/discovery/backend/services.js';
+import { authSecurityServices, authServices } from '../../../features/auth/backend/services.js';
+import { channelServices } from '../../../features/channels/backend/services.js';
+import { discoveryServices, rankingServices, userSearchServices } from '../../../features/discovery/backend/services.js';
 import { integrationServices } from '../../../features/integrations/backend/services.js';
 import { timelineServices } from '../../../features/timelines/backend/services.js';
 import { gameServices } from '../../../features/games/backend/services.js';
@@ -49,9 +49,7 @@ import { UtilityService } from './UtilityService.js';
 import { toNestProviders } from './feature-service-provider-types.js';
 import { featureServiceGroups } from './feature-service-providers.js';
 import type { FactoryProvider, Provider } from '@nestjs/common';
-import type { AuthServicesDependencies } from '../../../features/auth/backend/services.js';
-import type { ChannelServicesDependencies } from '../../../features/channels/backend/services.js';
-import type { ServiceDefinition } from '../../../features/index/backend/service-definitions.js';
+import type { Inputs, ServiceDefinition } from '../../../features/index/backend/service-definitions.js';
 
 const date = new Date('2026-01-02T03:04:05.000Z');
 const tokenOf = (provider: Provider) => typeof provider === 'function' ? provider : provider.provide;
@@ -101,10 +99,10 @@ describe('typed feature declaration proof', () => {
 	});
 
 	test('auth shares its local App instance and preserves fresh plain-factory graphs', async () => {
-		const deps = mockDeep<AuthServicesDependencies>();
+		const deps = mockDeep<Inputs<typeof authServices>>();
 		deps.idService.parse.mockReturnValue({ date });
-		const first = createAuthServices(deps);
-		const second = createAuthServices(deps);
+		const first = authServices.create(deps);
+		const second = authServices.create(deps);
 		expect(Reflect.get(first.AuthSessionEntityService, 'appEntityService')).toBe(first.AppEntityService);
 		expect(second.AppEntityService).not.toBe(first.AppEntityService);
 		expect(second.AuthSessionEntityService).not.toBe(first.AuthSessionEntityService);
@@ -113,11 +111,11 @@ describe('typed feature declaration proof', () => {
 	});
 
 	test('channels declares all nine constructor ports and zero-port create remains callable without inputs', () => {
-		const deps = mockDeep<ChannelServicesDependencies>();
-		const result = createChannelServices(deps).ChannelEntityService;
+		const deps = mockDeep<Inputs<typeof channelServices>>();
+		const result = channelServices.create(deps).ChannelEntityService;
 		expect(channelServices.ports).toHaveLength(9);
-		for (const port of channelServices.ports) expect(Reflect.get(result, port.name)).toBe(deps[port.name as keyof ChannelServicesDependencies]);
-		expect(createDiscoveryServices().HashtagEntityService).not.toBe(createDiscoveryServices().HashtagEntityService);
+		for (const port of channelServices.ports) expect(Reflect.get(result, port.name)).toBe(deps[port.name as keyof Inputs<typeof channelServices>]);
+		expect(discoveryServices.create().HashtagEntityService).not.toBe(discoveryServices.create().HashtagEntityService);
 	});
 
 	test('Nest singleton, stable aliases, consumers and strict ModuleRef match legacy contracts', async () => {
@@ -147,7 +145,7 @@ describe('typed feature declaration proof', () => {
 			for (const spy of spies) expect(spy).toHaveBeenCalledTimes(1);
 			const app = module.get('AppEntityService');
 			expect(Reflect.get(module.get('AuthSessionEntityService'), 'appEntityService')).toBe(app);
-			expect(module.get('HashtagEntityService')).toBeInstanceOf(createDiscoveryServices().HashtagEntityService.constructor);
+			expect(module.get('HashtagEntityService')).toBeInstanceOf(discoveryServices.create().HashtagEntityService.constructor);
 		} finally { await module.close(); }
 		const baseline = JSON.parse(readFileSync(new URL('../../test/fixtures/core-provider-contract.json', import.meta.url), 'utf8')) as { providers: string[]; exports: string[]; aliases: { name: string; target: string }[] };
 		const keys = new Set(featureServiceExports.filter((token): token is string => typeof token === 'string'));
@@ -246,6 +244,6 @@ describe('typed feature declaration proof', () => {
 	});
 
 	test('missing plain-object ports fail before constructing a feature', () => {
-		expect(() => Reflect.apply(createAuthServices, undefined, [{}])).toThrow('Missing port');
+		expect(() => Reflect.apply(authServices.create, undefined, [{}])).toThrow('Missing port');
 	});
 });

@@ -11,24 +11,20 @@ import { ModuleRef } from '@nestjs/core';
 import { describe, expect, test, vi } from 'vitest';
 import { mockDeep } from 'vitest-mock-extended';
 import type { MiAnnouncement, MiClip, MiFlash, MiFlashLike, MiGalleryLike, MiGalleryPost, MiNoteFavorite, MiPage, MiPageLike } from '@/models/_.js';
-import { createAnnouncementServices } from '../../../features/announcements/backend/services.js';
+import { announcementServices } from '../../../features/announcements/backend/services.js';
 import { ClipService } from '../../../features/collections/backend/services/ClipService.js';
-import { createCollectionServices } from '../../../features/collections/backend/services.js';
-import { createGalleryServices } from '../../../features/gallery/backend/services.js';
-import { createPageServices } from '../../../features/pages/backend/services.js';
-import { createPlayServices } from '../../../features/play/backend/services.js';
+import { collectionServices } from '../../../features/collections/backend/services.js';
+import { galleryServices } from '../../../features/gallery/backend/services.js';
+import { pageServices } from '../../../features/pages/backend/services.js';
+import { playServices } from '../../../features/play/backend/services.js';
 import { LoggerService } from '../../../features/runtime/backend/services/LoggerService.js';
 import { CoreModule } from './CoreModule.js';
 import { featureServiceExports, featureServiceGroups, featureServiceProviders } from './feature-service-providers.js';
-import type { PlayServicesDependencies } from '../../../features/play/backend/services.js';
-import type { PageServicesDependencies } from '../../../features/pages/backend/services.js';
-import type { GalleryServicesDependencies } from '../../../features/gallery/backend/services.js';
-import type { CollectionServicesDependencies } from '../../../features/collections/backend/services.js';
-import type { AnnouncementServicesDependencies } from '../../../features/announcements/backend/services.js';
 import type { Packed } from '../../../features/index/contract/packed.js';
 import type { MiLocalUser } from '../../../features/users/backend/models/User.js';
 import type { SelectQueryBuilder } from 'typeorm';
 import type { FactoryProvider, InjectionToken, Provider } from '@nestjs/common';
+import type { Inputs } from '../../../features/index/backend/service-definitions.js';
 
 const date = new Date('2026-01-02T03:04:05.000Z');
 const factoryProviders = featureServiceProviders.filter((provider): provider is FactoryProvider => typeof provider === 'object' && 'useFactory' in provider && typeof provider.provide === 'symbol');
@@ -169,7 +165,7 @@ describe('feature service composition adapter', () => {
 
 describe('annotation-free feature services preserve behavior', () => {
 	test('announcement writes use the composed serializer and preserve broadcast payloads and logs', async () => {
-		const deps = mockDeep<AnnouncementServicesDependencies>();
+		const deps = mockDeep<Inputs<typeof announcementServices>>();
 		deps.idService.gen.mockReturnValue('announcement');
 		deps.idService.parse.mockReturnValue({ date });
 		const announcement = mockDeep<MiAnnouncement>({
@@ -177,7 +173,7 @@ describe('annotation-free feature services preserve behavior', () => {
 			icon: 'info', display: 'normal', userId: null, needConfirmationToRead: false, silence: false,
 		});
 		deps.announcementsRepository.insertOne.mockResolvedValue(announcement);
-		const services = createAnnouncementServices(deps);
+		const services = announcementServices.create(deps);
 		const pack = vi.spyOn(services.AnnouncementEntityService, 'pack');
 		const moderator = mockDeep<MiLocalUser>({ id: 'moderator' });
 		const create = services.AnnouncementService.create;
@@ -190,12 +186,12 @@ describe('annotation-free feature services preserve behavior', () => {
 	});
 
 	test('announcement privacy checks happen before packing and per-user read checks remain bound', async () => {
-		const deps = mockDeep<AnnouncementServicesDependencies>();
+		const deps = mockDeep<Inputs<typeof announcementServices>>();
 		deps.idService.parse.mockReturnValue({ date });
 		const announcement = mockDeep<MiAnnouncement>({ id: 'private', updatedAt: null, userId: 'owner' });
 		deps.announcementsRepository.findOneByOrFail.mockResolvedValue(announcement);
 		deps.announcementReadsRepository.countBy.mockResolvedValue(1);
-		const services = createAnnouncementServices(deps);
+		const services = announcementServices.create(deps);
 		const get = services.AnnouncementService.getAnnouncement;
 		await expect(get('private', mockDeep<MiLocalUser>({ id: 'other' }))).rejects.toMatchObject({ name: 'EntityNotFoundError' });
 		expect(deps.announcementReadsRepository.findOneBy).not.toHaveBeenCalled();
@@ -206,12 +202,12 @@ describe('annotation-free feature services preserve behavior', () => {
 	});
 
 	test('collection services keep policy limits, owned deletion, and note serialization', async () => {
-		const deps = mockDeep<CollectionServicesDependencies>();
+		const deps = mockDeep<Inputs<typeof collectionServices>>();
 		deps.idService.gen.mockReturnValue('clip');
 		deps.idService.parse.mockReturnValue({ date });
 		deps.clipsRepository.countBy.mockResolvedValue(1);
-		deps.roleService.getUserPolicies.mockResolvedValue(mockDeep<Awaited<ReturnType<CollectionServicesDependencies['roleService']['getUserPolicies']>>>({ clipLimit: 1 }));
-		const services = createCollectionServices(deps);
+		deps.roleService.getUserPolicies.mockResolvedValue(mockDeep<Awaited<ReturnType<Inputs<typeof collectionServices>['roleService']['getUserPolicies']>>>({ clipLimit: 1 }));
+		const services = collectionServices.create(deps);
 		const actor = mockDeep<MiLocalUser>({ id: 'owner' });
 		await expect(services.ClipService.create(actor, 'name', false, null)).rejects.toBeInstanceOf(ClipService.TooManyClipsError);
 		expect(deps.clipsRepository.insertOne).not.toHaveBeenCalled();
@@ -229,7 +225,7 @@ describe('annotation-free feature services preserve behavior', () => {
 	});
 
 	test('gallery likes reuse the composed post serializer, viewer hints, and file packing', async () => {
-		const deps = mockDeep<GalleryServicesDependencies>();
+		const deps = mockDeep<Inputs<typeof galleryServices>>();
 		deps.idService.parse.mockReturnValue({ date });
 		deps.galleryLikesRepository.exists.mockResolvedValue(true);
 		deps.driveFileEntityService.packManyByIds.mockResolvedValue([]);
@@ -239,7 +235,7 @@ describe('annotation-free feature services preserve behavior', () => {
 			description: 'Description', fileIds: ['file'], tags: [], isSensitive: false, likedCount: 2,
 		};
 		deps.galleryPostsRepository.findOneByOrFail.mockResolvedValue(post);
-		const services = createGalleryServices(deps);
+		const services = galleryServices.create(deps);
 		const pack = vi.spyOn(services.GalleryPostEntityService, 'pack');
 		const actor = { id: 'viewer' };
 		const like = await services.GalleryLikeEntityService.pack({ id: 'like', post: null, postId: 'post' } as MiGalleryLike, actor);
@@ -250,7 +246,7 @@ describe('annotation-free feature services preserve behavior', () => {
 	});
 
 	test('pages retain legacy content migration and delegate likes to the same serializer', async () => {
-		const deps = mockDeep<PageServicesDependencies>();
+		const deps = mockDeep<Inputs<typeof pageServices>>();
 		deps.idService.parse.mockReturnValue({ date });
 		deps.userEntityService.pack.mockResolvedValue(mockDeep<Packed<'UserLite'>>({ id: 'author' }));
 		deps.driveFileEntityService.packMany.mockResolvedValue([]);
@@ -263,7 +259,7 @@ describe('annotation-free feature services preserve behavior', () => {
 			visibility: 'public', visibleUserIds: [], likedCount: 0,
 		};
 		deps.pagesRepository.findOneByOrFail.mockResolvedValue(page);
-		const services = createPageServices(deps);
+		const services = pageServices.create(deps);
 		const pack = vi.spyOn(services.PageEntityService, 'pack');
 		const like = await services.PageLikeEntityService.pack({ id: 'like', page: null, pageId: 'page' } as MiPageLike, { id: 'viewer' });
 		expect(pack).toHaveBeenCalledWith('page', { id: 'viewer' });
@@ -274,13 +270,13 @@ describe('annotation-free feature services preserve behavior', () => {
 	});
 
 	test('play composes liked-flash packing and keeps featured query defaults', async () => {
-		const deps = mockDeep<PlayServicesDependencies>();
+		const deps = mockDeep<Inputs<typeof playServices>>();
 		deps.idService.parse.mockReturnValue({ date });
 		deps.userEntityService.pack.mockResolvedValue(mockDeep<Packed<'UserLite'>>({ id: 'author' }));
 		deps.flashLikesRepository.exists.mockResolvedValue(true);
 		const flash = mockDeep<MiFlash>({ id: 'flash', updatedAt: date, userId: 'author', user: null, title: 'Title', summary: 'Summary', script: 'script', visibility: 'public', likedCount: 1 });
 		deps.flashsRepository.findOneByOrFail.mockResolvedValue(flash);
-		const services = createPlayServices(deps);
+		const services = playServices.create(deps);
 		const pack = vi.spyOn(services.FlashEntityService, 'pack');
 		const like = await services.FlashLikeEntityService.pack({ id: 'like', flash: null, flashId: 'flash' } as MiFlashLike, { id: 'viewer' });
 		expect(pack).toHaveBeenCalledWith('flash', { id: 'viewer' });

@@ -11,7 +11,6 @@ import { InviteCodeEntityService } from './serializers/InviteCodeEntityService.j
 import { SigninEntityService } from './serializers/SigninEntityService.js';
 import { UserAuthService } from './services/UserAuthService.js';
 import { WebAuthnService } from './services/WebAuthnService.js';
-import type { Inputs, Outputs } from '../../index/backend/service-definitions.js';
 
 const app = service(AppEntityService, [ports.appsRepository, ports.accessTokensRepository]);
 export const authServices = defineServices({
@@ -20,14 +19,8 @@ export const authServices = defineServices({
 	InviteCodeEntityService: service(InviteCodeEntityService, [ports.registrationTicketsRepository, ports.userEntityService, ports.idService]),
 	SigninEntityService: service(SigninEntityService, [ports.idService]),
 });
-export const createAuthServices = authServices.create;
-export type AuthServicesDependencies = Inputs<typeof authServices>;
-export type AuthServices = Outputs<typeof authServices>;
 
 export const authSecurityServices = defineServices({
 	UserAuthService: service(UserAuthService, [ports.redisClient, ports.usersRepository, ports.userProfilesRepository]),
 	WebAuthnService: service(WebAuthnService, [ports.config, ports.meta, ports.redisClient, ports.userSecurityKeysRepository]),
 });
-export const createAuthSecurityServices = authSecurityServices.create;
-export type AuthSecurityServicesDependencies = Inputs<typeof authSecurityServices>;
-export type AuthSecurityServices = Outputs<typeof authSecurityServices>;

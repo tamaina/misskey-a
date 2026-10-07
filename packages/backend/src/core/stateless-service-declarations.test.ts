@@ -11,10 +11,10 @@ import { mockDeep } from 'vitest-mock-extended';
 import sharp from 'sharp';
 import { DI } from '@/di-symbols.js';
 import type { MiRegistryItem } from '@/models/_.js';
-import { createMediaServices, mediaServices } from '../../../features/media/backend/services.js';
-import { createMarkupServices } from '../../../features/markup/backend/services.js';
-import { createPreferencesServices } from '../../../features/preferences/backend/services.js';
-import { createModerationLoggingServices, moderationServices } from '../../../features/moderation/backend/services.js';
+import { mediaServices } from '../../../features/media/backend/services.js';
+import { markupServices } from '../../../features/markup/backend/services.js';
+import { preferencesServices } from '../../../features/preferences/backend/services.js';
+import { moderationLoggingServices, moderationServices } from '../../../features/moderation/backend/services.js';
 import { HttpRequestService } from '../../../features/runtime/backend/services/HttpRequestService.js';
 import { LoggerService } from '../../../features/runtime/backend/services/LoggerService.js';
 import { ImageProcessingService } from '../../../features/media/backend/services/ImageProcessingService.js';
@@ -26,18 +26,15 @@ import { RegistryApiService } from '../../../features/preferences/backend/servic
 import { ModerationLogService } from '../../../features/moderation/backend/services/ModerationLogService.js';
 import { featureServiceGroups } from './feature-service-providers.js';
 import type { FactoryProvider, InjectionToken, Provider } from '@nestjs/common';
-import type { MediaServicesDependencies } from '../../../features/media/backend/services.js';
-import type { MarkupServicesDependencies } from '../../../features/markup/backend/services.js';
-import type { PreferencesServicesDependencies } from '../../../features/preferences/backend/services.js';
-import type { ModerationLoggingServicesDependencies } from '../../../features/moderation/backend/services.js';
 import type { SelectQueryBuilder } from 'typeorm';
+import type { Inputs } from '../../../features/index/backend/service-definitions.js';
 
 const selectedGroups = [featureServiceGroups.media, featureServiceGroups.markup, featureServiceGroups.preferences, featureServiceGroups.moderationLogging];
 const tokenOf = (provider: Provider): InjectionToken => typeof provider === 'function' ? provider : provider.provide;
 const selectedClasses = [ImageProcessingService, VideoProcessingService, SensitiveMediaDetectionService, FileInfoService, MfmService, RegistryApiService, ModerationLogService];
 
-function mediaInputs(): ReturnType<typeof mockDeep<MediaServicesDependencies>> {
-	const inputs = mockDeep<MediaServicesDependencies>();
+function mediaInputs(): ReturnType<typeof mockDeep<Inputs<typeof mediaServices>>> {
+	const inputs = mockDeep<Inputs<typeof mediaServices>>();
 	inputs.loggerService.getLogger.mockReturnValue(mockDeep<ReturnType<LoggerService['getLogger']>>());
 	return inputs;
 }
@@ -45,15 +42,15 @@ function mediaInputs(): ReturnType<typeof mockDeep<MediaServicesDependencies>> {
 describe('seven stateless feature declarations', () => {
 	test('plain media graphs share local services, borrow supplied objects, and remain fresh per create', () => {
 		const inputs = mediaInputs();
-		const first = createMediaServices(inputs);
-		const second = createMediaServices(inputs);
+		const first = mediaServices.create(inputs);
+		const second = mediaServices.create(inputs);
 		expect(Reflect.get(first.VideoProcessingService, 'imageProcessingService')).toBe(first.ImageProcessingService);
 		expect(Reflect.get(first.FileInfoService, 'sensitiveMediaDetectionService')).toBe(first.SensitiveMediaDetectionService);
 		expect(Reflect.get(first.SensitiveMediaDetectionService, 'httpRequestService')).toBe(inputs.httpRequestService);
 		expect(Reflect.get(first.FileInfoService, 'loggerService')).toBe(inputs.loggerService);
 		for (const key of Object.keys(first) as (keyof typeof first)[]) expect(second[key]).not.toBe(first[key]);
 		expect(mediaServices.ports.map(port => port.name).sort()).toEqual(['config', 'httpRequestService', 'loggerService', 'meta']);
-		expect(() => Reflect.apply(createMediaServices, undefined, [{}])).toThrow('Missing port');
+		expect(() => Reflect.apply(mediaServices.create, undefined, [{}])).toThrow('Missing port');
 	});
 
 	test('moderation keeps its original input and output group while logging is separate', () => {
@@ -114,14 +111,14 @@ describe('seven stateless feature declarations', () => {
 	test('video and markup factory behavior retains external URL encoding and HTML conversion', () => {
 		const inputs = mediaInputs();
 		inputs.config.videoThumbnailGenerator = 'https://thumb.example';
-		const video = createMediaServices(inputs).VideoProcessingService;
+		const video = mediaServices.create(inputs).VideoProcessingService;
 		expect(video.getExternalVideoThumbnailUrl('https://media.example/video?a=1')).toBe('https://thumb.example/thumbnail.webp?thumbnail=1&url=https%3A%2F%2Fmedia.example%2Fvideo%3Fa%3D1');
-		const markup = createMarkupServices(mockDeep<MarkupServicesDependencies>()).MfmService;
+		const markup = markupServices.create(mockDeep<Inputs<typeof markupServices>>()).MfmService;
 		expect(markup.fromHtml('<p>Hello<br>world</p>')).toBe('Hello\nworld');
 	});
 
 	test('media factories retain real image conversion and empty-file inspection', async () => {
-		const services = createMediaServices(mediaInputs());
+		const services = mediaServices.create(mediaInputs());
 		const image = await services.ImageProcessingService.convertSharpToWebp(sharp({ create: { width: 8, height: 8, channels: 3, background: '#ffffff' } }), 4, 4);
 		expect(image).toMatchObject({ ext: 'webp', type: 'image/webp' });
 		expect(await sharp(image.data).metadata()).toMatchObject({ width: 4, height: 4, format: 'webp' });
@@ -130,23 +127,23 @@ describe('seven stateless feature declarations', () => {
 	});
 
 	test('moderation logging uses the supplied repository and Id instance with unchanged payloads', async () => {
-		const inputs = mockDeep<ModerationLoggingServicesDependencies>();
+		const inputs = mockDeep<Inputs<typeof moderationLoggingServices>>();
 		inputs.idService.gen.mockReturnValue('log-id');
-		const service = createModerationLoggingServices(inputs).ModerationLogService;
+		const service = moderationLoggingServices.create(inputs).ModerationLogService;
 		const info = { userId: 'user', userUsername: 'name', userHost: null };
 		await service.log({ id: 'moderator' }, 'resetPassword', info);
 		expect(inputs.moderationLogsRepository.insert).toHaveBeenCalledWith({ id: 'log-id', userId: 'moderator', type: 'resetPassword', info });
 	});
 
 	test('registry writes retain insert/update decisions and main-stream event arguments', async () => {
-		const inputs = mockDeep<PreferencesServicesDependencies>();
+		const inputs = mockDeep<Inputs<typeof preferencesServices>>();
 		const query = mockDeep<SelectQueryBuilder<MiRegistryItem>>();
 		query.where.mockReturnValue(query);
 		query.andWhere.mockReturnValue(query);
 		inputs.registryItemsRepository.createQueryBuilder.mockReturnValue(query);
 		inputs.idService.gen.mockReturnValue('item-id');
 		query.getOne.mockResolvedValueOnce(null).mockResolvedValueOnce(mockDeep<MiRegistryItem>({ id: 'existing-id' }));
-		const registry = createPreferencesServices(inputs).RegistryApiService;
+		const registry = preferencesServices.create(inputs).RegistryApiService;
 		await registry.set('user', null, ['settings'], 'key', { enabled: true });
 		expect(inputs.registryItemsRepository.insert).toHaveBeenCalledWith(expect.objectContaining({ id: 'item-id', userId: 'user', domain: null, scope: ['settings'], key: 'key', value: { enabled: true } }));
 		expect(inputs.globalEventService.publishMainStream).toHaveBeenCalledWith('user', 'registryUpdated', { scope: ['settings'], key: 'key', value: { enabled: true } });

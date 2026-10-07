@@ -6,11 +6,7 @@
 import { defineServices, service } from '../../index/backend/service-definitions.js';
 import { ports } from '../../index/backend/service-ports.js';
 import { AntennaEntityService } from './serializers/AntennaEntityService.js';
-import type { Inputs, Outputs } from '../../index/backend/service-definitions.js';
 
 export const timelineServices = defineServices({
 	AntennaEntityService: service(AntennaEntityService, [ports.antennasRepository, ports.idService]),
 });
-export const createTimelineServices = timelineServices.create;
-export type TimelineServicesDependencies = Inputs<typeof timelineServices>;
-export type TimelineServices = Outputs<typeof timelineServices>;
