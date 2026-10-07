@@ -5,10 +5,18 @@
 
 import { resolve } from 'node:path';
 import { vueInternationalization } from 'vite-vue-internationalization';
+import { languages } from 'i18n';
 
 /** Keep VVI 1.1.3 from replacing an SFC dictionary with a style/template fragment. */
-export function pluginVvi() {
-	const plugin = vueInternationalization({ primaryLocale: 'ja-JP', scan: { include: ['features/*/frontend/**/*.vue'], exclude: ['features/*/frontend/embed/**'] } });
+export function pluginVvi(options: { embed?: boolean } = {}) {
+	const plugin = vueInternationalization({
+		primaryLocale: 'ja-JP',
+		// Embed has no migrated SFCs yet; retain all supported loader languages.
+		global: options.embed ? Object.fromEntries(languages.map(language => [language, {}])) : undefined,
+		scan: options.embed
+			? { include: ['features/*/frontend/embed/**/*.vue'] }
+			: { include: ['features/*/frontend/**/*.vue'], exclude: ['features/*/frontend/embed/**'] },
+	});
 	const configure = plugin.configResolved;
 	if (typeof configure !== 'function') throw new Error('Unexpected VVI config hook; review the feature scan root on upgrade.');
 	plugin.configResolved = function (config) {

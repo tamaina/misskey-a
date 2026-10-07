@@ -7,6 +7,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { describe, expect, test } from 'vitest';
 import { pluginVvi } from '../../../lib/vite-plugin-vvi.js';
+import { languages } from 'i18n';
 
 function hook(hook: unknown, ...args: unknown[]): unknown {
 	if (typeof hook === 'function') return Reflect.apply(hook, {}, args);
@@ -53,6 +54,33 @@ describe('VVI SFC subrequest guard', () => {
 			for (const query of ['?vue&type=style&index=0&lang.scss', '?vue&type=template', '?vue&type=script&setup=true&lang.ts']) {
 				expect(hook(plugin.transform, '/* compiled fragment without locale blocks */', id + query)).toBeNull();
 				expect(hook(plugin.load, localeId)).toBe(before);
+			}
+		} finally {
+			rmSync(root, { recursive: true, force: true });
+		}
+	});
+});
+
+describe('main/embed locale scan isolation', () => {
+	test.each([false, true])('isolates embed=%s and retains its supported locale loaders', embed => {
+		const root = mkdtempSync(join(tmpdir(), 'misskey-a-vvi-host-'));
+		try {
+			const host = embed ? 'frontend-embed' : 'frontend';
+			mkdirSync(join(root, host), { recursive: true });
+			mkdirSync(join(root, 'features/demo/frontend/embed'), { recursive: true });
+			writeFileSync(join(root, 'features/demo/frontend/Main.vue'), '<locale locale="ja-JP" lang="json">{"main":"Main only"}</locale>');
+			writeFileSync(join(root, 'features/demo/frontend/embed/Embed.vue'), '<locale locale="ja-JP" lang="json">{"embed":"Embed only"}</locale>');
+			const plugin = pluginVvi({ embed });
+			hook(plugin.configResolved, { root: join(root, host), command: 'build', base: '/' });
+			hook(plugin.buildStart);
+			const primary = hook(plugin.load, '\0virtual:vite-vue-internationalization/locale/ja-JP');
+			expect(primary).toContain(embed ? 'Embed only' : 'Main only');
+			expect(primary).not.toContain(embed ? 'Main only' : 'Embed only');
+			if (embed) {
+				expect(languages).toHaveLength(28);
+				for (const language of languages) {
+					expect(hook(plugin.load, `\0virtual:vite-vue-internationalization/locale/${language}`)).toEqual(expect.any(String));
+				}
 			}
 		} finally {
 			rmSync(root, { recursive: true, force: true });
