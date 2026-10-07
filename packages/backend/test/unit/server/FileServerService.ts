@@ -22,8 +22,8 @@ import { LoggerService } from '@features/runtime/backend/services/LoggerService.
 import { VideoProcessingService } from '@features/media/backend/services/VideoProcessingService.js';
 import { loadConfig, type Config } from '@/config.js';
 import { MiDriveFile } from '@features/drive/backend/models/DriveFile.js';
-import { FileServerService } from '@/server/FileServerService.js';
-import { FileServerFileResolver } from '@/server/file/FileServerFileResolver.js';
+import { FileServerService } from '@features/media/backend/http/FileServerService.js';
+import { FileServerFileResolver } from '@features/drive/backend/http/FileServerFileResolver.js';
 
 const dummyPath = path.resolve('test/resources/dummy-for-file-server-service.png');
 const dummySize = fs.statSync(dummyPath).size;

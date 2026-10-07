@@ -19,9 +19,9 @@ import { VideoProcessingService } from '@features/media/backend/services/VideoPr
 import { LoggerService } from '@features/runtime/backend/services/LoggerService.js';
 import { bindThis } from '@features/runtime/backend/decorators.js';
 import { handleRequestRedirectToOmitSearch } from '@features/runtime/backend/http/fastify-hook-handlers.js';
-import { FileServerDriveHandler } from './file/FileServerDriveHandler.js';
-import { FileServerFileResolver } from './file/FileServerFileResolver.js';
-import { FileServerProxyHandler } from './file/FileServerProxyHandler.js';
+import { FileServerDriveHandler } from '@features/drive/backend/http/FileServerDriveHandler.js';
+import { FileServerFileResolver } from '@features/drive/backend/http/FileServerFileResolver.js';
+import { FileServerProxyHandler } from './FileServerProxyHandler.js';
 import type { FastifyInstance, FastifyRequest, FastifyReply, FastifyPluginOptions } from 'fastify';
 
 @Injectable()

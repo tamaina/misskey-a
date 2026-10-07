@@ -7,13 +7,13 @@ import { Module } from '@nestjs/common';
 import { EndpointsModule } from './EndpointsModule.js';
 import { CoreModule } from './CoreModule.js';
 import { ApiCallService } from '@features/api/backend/transport/ApiCallService.js';
-import { FileServerService } from '@/server/FileServerService.js';
-import { HealthServerService } from '@/server/HealthServerService.js';
-import { NodeinfoServerService } from '@/server/NodeinfoServerService.js';
+import { FileServerService } from '@features/media/backend/http/FileServerService.js';
+import { HealthServerService } from '@features/operations/backend/http/HealthServerService.js';
+import { NodeinfoServerService } from '@features/instance/backend/http/NodeinfoServerService.js';
 import { ServerService } from './ServerService.mjs';
-import { WellKnownServerService } from '@/server/WellKnownServerService.js';
+import { WellKnownServerService } from '@features/federation/backend/http/WellKnownServerService.js';
 import { GetterService } from '@features/api/backend/transport/GetterService.js';
-import { ActivityPubServerService } from '@/server/ActivityPubServerService.js';
+import { ActivityPubServerService } from '@features/federation/backend/http/ActivityPubServerService.js';
 import { ApiLoggerService } from '@features/api/backend/transport/ApiLoggerService.js';
 import { ApiServerService } from '@features/api/backend/transport/ApiServerService.js';
 import { AuthenticateService } from '@features/auth/backend/transport/AuthenticateService.js';
@@ -26,7 +26,7 @@ import { OpenApiServerService } from '@features/api/backend/transport/openapi/Op
 import { ClientServerService } from '@features/web/backend/http/ClientServerService.js';
 import { HtmlTemplateService } from '@features/web/backend/http/HtmlTemplateService.js';
 import { FeedService } from '@features/web/backend/http/FeedService.js';
-import { UrlPreviewService } from '@/server/web/UrlPreviewService.js';
+import { UrlPreviewService } from '@features/markup/backend/http/UrlPreviewService.js';
 import { ClientLoggerService } from '@features/web/backend/http/ClientLoggerService.js';
 import { OAuth2ProviderService } from '@features/auth/backend/oauth/OAuth2ProviderService.js';
 

@@ -11,7 +11,7 @@ import { contentDisposition } from '@features/media/backend/utility/content-disp
 import { correctFilename } from '@features/media/backend/utility/correct-filename.js';
 import { isMimeImage } from '@features/media/backend/utility/is-mime-image.js';
 import { VideoProcessingService } from '@features/media/backend/services/VideoProcessingService.js';
-import { attachStreamCleanup, handleRangeRequest, setFileResponseHeaders, getSafeContentType, needsCleanup } from './FileServerUtils.js';
+import { attachStreamCleanup, handleRangeRequest, setFileResponseHeaders, getSafeContentType, needsCleanup } from '@features/media/backend/http/FileServerUtils.js';
 import type { FileServerFileResolver } from './FileServerFileResolver.js';
 import type { FastifyReply, FastifyRequest } from 'fastify';
 

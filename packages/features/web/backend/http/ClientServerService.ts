@@ -42,7 +42,7 @@ import { FlashEntityService } from '@features/play/backend/serializers/FlashEnti
 import { ReversiGameEntityService } from '@features/games/backend/serializers/ReversiGameEntityService.js';
 import { AnnouncementEntityService } from '@features/announcements/backend/serializers/AnnouncementEntityService.js';
 import { FeedService } from './FeedService.js';
-import { UrlPreviewService } from '@/server/web/UrlPreviewService.js';
+import { UrlPreviewService } from '@features/markup/backend/http/UrlPreviewService.js';
 import { ClientLoggerService } from './ClientLoggerService.js';
 import { HtmlTemplateService } from './HtmlTemplateService.js';
 

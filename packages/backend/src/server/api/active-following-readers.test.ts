@@ -13,7 +13,7 @@ import { CacheService } from '@features/users/backend/services/CacheService.js';
 import { AccountMoveService } from '@features/users/backend/services/AccountMoveService.js';
 import { UserFollowingService } from '@features/relationships/backend/services/UserFollowingService.js';
 import type { MiUser } from '@features/users/backend/models/User.js';
-import { ActivityPubServerService } from '@/server/ActivityPubServerService.js';
+import { ActivityPubServerService } from '@features/federation/backend/http/ActivityPubServerService.js';
 import { NoteEntityService } from '@features/notes/backend/serializers/NoteEntityService.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import { MiNote } from '@features/notes/backend/models/Note.js';

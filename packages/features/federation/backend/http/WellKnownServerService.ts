@@ -15,7 +15,7 @@ import type { MiUser } from '@features/users/backend/models/User.js';
 import * as Acct from '@features/federation/backend/utility/acct.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import { bindThis } from '@features/runtime/backend/decorators.js';
-import { NodeinfoServerService } from './NodeinfoServerService.js';
+import { NodeinfoServerService } from '@features/instance/backend/http/NodeinfoServerService.js';
 import { OAuth2ProviderService } from '@features/auth/backend/oauth/OAuth2ProviderService.js';
 import type { FindOptionsWhere } from 'typeorm';
 import type { FastifyInstance, FastifyPluginOptions } from 'fastify';

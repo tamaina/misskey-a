@@ -14,7 +14,7 @@ import { correctFilename } from '@features/media/backend/utility/correct-filenam
 import { isMimeImage } from '@features/media/backend/utility/is-mime-image.js';
 import { IImageStreamable, ImageProcessingService, webpDefault } from '@features/media/backend/services/ImageProcessingService.js';
 import { createRangeStream, attachStreamCleanup, needsCleanup } from './FileServerUtils.js';
-import type { DownloadedFileResult, FileResolveResult, FileServerFileResolver } from './FileServerFileResolver.js';
+import type { DownloadedFileResult, FileResolveResult, FileServerFileResolver } from '@features/drive/backend/http/FileServerFileResolver.js';
 import type { FastifyReply, FastifyRequest } from 'fastify';
 
 type ProxySource = DownloadedFileResult | FileResolveResult;
