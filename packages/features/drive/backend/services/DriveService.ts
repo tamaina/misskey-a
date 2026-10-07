@@ -38,7 +38,7 @@ import { InternalStorageService } from '@features/runtime/backend/services/Inter
 import { DriveFileEntityService } from '../serializers/DriveFileEntityService.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import { FileInfoService } from '@features/media/backend/services/FileInfoService.js';
-import { bindThis } from '@/decorators.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
 import { RoleService } from '@features/roles/backend/services/RoleService.js';
 import { correctFilename } from '@/misc/correct-filename.js';
 import { isMimeImage } from '@/misc/is-mime-image.js';

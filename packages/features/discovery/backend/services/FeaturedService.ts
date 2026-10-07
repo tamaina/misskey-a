@@ -4,7 +4,7 @@
  */
 
 import type { MiGalleryPost, MiNote, MiUser } from '@features/persistence/backend/repositories/models.js';
-import { bindThis } from '@/decorators.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
 import type * as Redis from 'ioredis';
 
 const GLOBAL_NOTES_RANKING_WINDOW = 1000 * 60 * 60 * 24 * 3; // 3日ごと

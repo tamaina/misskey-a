@@ -12,7 +12,7 @@ import { genAidx, isSafeAidxT, parseAidx, parseAidxFull } from '../id/aidx.js';
 import { genMeid, isSafeMeidT, parseMeid, parseMeidFull } from '../id/meid.js';
 import { genMeidg, isSafeMeidgT, parseMeidg, parseMeidgFull } from '../id/meidg.js';
 import { genObjectId, isSafeObjectIdT, parseObjectId, parseObjectIdFull } from '../id/object-id.js';
-import { bindThis } from '@/decorators.js';
+import { bindThis } from '../decorators.js';
 import { parseUlid, parseUlidFull } from '../id/ulid.js';
 
 @Injectable()

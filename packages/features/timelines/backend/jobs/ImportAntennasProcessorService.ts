@@ -10,12 +10,12 @@ import { GlobalEventService } from '@features/runtime/backend/services/GlobalEve
 import { Logger } from '@features/runtime/backend/logging/logger.js';
 import type { AntennasRepository } from '@features/persistence/backend/repositories/models.js';
 import { DI } from '@/di-symbols.js';
-import { bindThis } from '@/decorators.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
 import { toLegacyJsonSchema } from '@features/api/backend/index.js';
 import { exportedAntenna } from '../../contract/antenna-export.js';
 import type { ExportedAntenna } from '../../contract/antenna-export.js';
-import { QueueLoggerService } from '@/queue/QueueLoggerService.js';
-import { DBAntennaImportJobData } from '@/queue/types.js';
+import { QueueLoggerService } from '@features/runtime/backend/queue/QueueLoggerService.js';
+import { DBAntennaImportJobData } from '@features/runtime/backend/queue/types.js';
 import type * as Bull from 'bullmq';
 
 const exportedAntennaSchema = toLegacyJsonSchema(exportedAntenna, {

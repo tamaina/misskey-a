@@ -12,7 +12,7 @@ import { truncate } from '@features/runtime/backend/formatting/truncate.js';
 import { DB_MAX_IMAGE_COMMENT_LENGTH } from '@features/drive/contract/image-comment-limit.js';
 import { DriveService } from '@features/drive/backend/services/DriveService.js';
 import type { Logger } from '@features/runtime/backend/logging/logger.js';
-import { bindThis } from '@/decorators.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
 import { checkHttps } from '@/misc/check-https.js';
 import { ApResolverService } from './ApResolverService.js';
 import { ApLoggerService } from './ApLoggerService.js';

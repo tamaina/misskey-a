@@ -7,7 +7,7 @@ import { Injectable } from '@nestjs/common';
 import * as mfm from 'mfm-js';
 import { MfmService } from '@features/markup/backend/services/MfmService.js';
 import type { MiNote } from '@features/notes/backend/models/Note.js';
-import { bindThis } from '@/decorators.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
 import { extractApHashtagObjects } from '../protocol/models/tag.js';
 import type { IObject } from '../protocol/type.js';
 

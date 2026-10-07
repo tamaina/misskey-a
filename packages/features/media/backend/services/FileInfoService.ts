@@ -16,7 +16,7 @@ import FFmpeg from 'fluent-ffmpeg';
 import * as fileType from 'file-type';
 import { createTempDir } from '@features/runtime/backend/io/create-temp.js';
 import type { Logger } from '@features/runtime/backend/logging/logger.js';
-import { bindThis } from '@/decorators.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
 import { isMimeImage } from '@/misc/is-mime-image.js';
 import type { LoggerService } from '@features/runtime/backend/services/LoggerService.js';
 import type { SensitiveMediaDetectionService } from './SensitiveMediaDetectionService.js';

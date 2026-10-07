@@ -10,7 +10,7 @@ import { MemoryKVCache, RedisKVCache } from '@features/runtime/backend/cache/cac
 import type { MiLocalUser, MiUser } from '@features/users/backend/models/User.js';
 import { DI } from '@/di-symbols.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
-import { bindThis } from '@/decorators.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
 import type { GlobalEvents } from '@features/runtime/backend/services/GlobalEventService.js';
 import type { OnApplicationShutdown } from '@nestjs/common';
 

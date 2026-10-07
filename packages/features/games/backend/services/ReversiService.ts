@@ -15,13 +15,13 @@ import type {
 } from '@features/persistence/backend/repositories/models.js';
 import type { MiUser } from '@features/users/backend/models/User.js';
 import { DI } from '@/di-symbols.js';
-import { bindThis } from '@/decorators.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
 import { CacheService } from '@features/users/backend/services/CacheService.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { NotificationService } from '@features/notifications/backend/services/NotificationService.js';
-import { Serialized } from '@/types.js';
+import { Serialized } from '@features/runtime/backend/types.js';
 import { ReversiGameEntityService } from '../serializers/ReversiGameEntityService.js';
 import type { OnApplicationShutdown, OnModuleInit } from '@nestjs/common';
 

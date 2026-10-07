@@ -9,7 +9,7 @@ import type { MutingsRepository, MiMuting } from '@features/persistence/backend/
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 import type { MiUser } from '@features/users/backend/models/User.js';
 import { DI } from '@/di-symbols.js';
-import { bindThis } from '@/decorators.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
 import { CacheService } from '@features/users/backend/services/CacheService.js';
 
 @Injectable()

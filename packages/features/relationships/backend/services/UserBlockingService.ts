@@ -17,7 +17,7 @@ import { UserEntityService } from '@features/users/backend/serializers/UserEntit
 import { ApRendererService } from '@features/federation/backend/services/ApRendererService.js';
 import { LoggerService } from '@features/runtime/backend/services/LoggerService.js';
 import { UserWebhookService } from '@features/integrations/backend/services/UserWebhookService.js';
-import { bindThis } from '@/decorators.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
 import { CacheService } from '@features/users/backend/services/CacheService.js';
 import { UserFollowingService } from './UserFollowingService.js';
 

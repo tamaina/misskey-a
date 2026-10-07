@@ -7,7 +7,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { In } from 'typeorm';
 import { DI } from '@/di-symbols.js';
 import type { MiNoteDraft, NoteDraftsRepository, MiNote, MiDriveFile, MiChannel, UsersRepository, DriveFilesRepository, NotesRepository, BlockingsRepository, ChannelsRepository } from '@features/persistence/backend/repositories/models.js';
-import { bindThis } from '@/decorators.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
 import { RoleService } from '@features/roles/backend/services/RoleService.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 import type { MiLocalUser, MiUser } from '@features/users/backend/models/User.js';

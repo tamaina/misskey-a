@@ -14,10 +14,10 @@ import { DriveService } from '@features/drive/backend/services/DriveService.js';
 import { createTemp } from '@features/runtime/backend/io/create-temp.js';
 import { UtilityService } from '@features/federation/backend/services/UtilityService.js';
 import { NotificationService } from '@features/notifications/backend/services/NotificationService.js';
-import { bindThis } from '@/decorators.js';
-import { QueueLoggerService } from '@/queue/QueueLoggerService.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
+import { QueueLoggerService } from '@features/runtime/backend/queue/QueueLoggerService.js';
 import type * as Bull from 'bullmq';
-import type { DbJobDataWithUser } from '@/queue/types.js';
+import type { DbJobDataWithUser } from '@features/runtime/backend/queue/types.js';
 
 @Injectable()
 export class ExportBlockingProcessorService {

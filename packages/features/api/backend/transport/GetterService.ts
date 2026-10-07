@@ -10,7 +10,7 @@ import { IdentifiableError } from '@features/runtime/backend/errors/identifiable
 import type { MiLocalUser, MiRemoteUser, MiUser } from '@features/users/backend/models/User.js';
 import type { MiNote } from '@features/notes/backend/models/Note.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
-import { bindThis } from '@/decorators.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
 
 @Injectable()
 export class GetterService {

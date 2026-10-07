@@ -4,7 +4,7 @@
  */
 
 import { Inject, Injectable, Scope } from '@nestjs/common';
-import { bindThis } from '@/decorators.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
 import type { JsonObject } from '@features/runtime/backend/formatting/json-value.js';
 import type { EventTypesToEventPayload, AdminEventTypes } from '@features/runtime/backend/services/GlobalEventService.js';
 import Channel, { type ChannelRequest } from '@features/api/backend/transport/stream/channel.js';

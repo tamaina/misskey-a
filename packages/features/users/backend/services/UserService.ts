@@ -7,7 +7,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import type { FollowingsRepository, UsersRepository } from '@features/persistence/backend/repositories/models.js';
 import type { MiUser } from '../models/User.js';
 import { DI } from '@/di-symbols.js';
-import { bindThis } from '@/decorators.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
 import { SystemWebhookService } from '@features/integrations/backend/services/SystemWebhookService.js';
 import { UserEntityService } from '../serializers/UserEntityService.js';
 

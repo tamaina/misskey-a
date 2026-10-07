@@ -16,7 +16,7 @@ import { MiUserKeypair } from '@features/federation/backend/models/UserKeypair.j
 import { MiUsedUsername } from '@features/users/backend/models/UsedUsername.js';
 import { generateNativeUserToken } from '../utility/token.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
-import { bindThis } from '@/decorators.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
 import { UsersChart } from '@features/statistics/backend/charts/users.js';
 import { UtilityService } from '@features/federation/backend/services/UtilityService.js';
 import { UserService } from '@features/users/backend/services/UserService.js';

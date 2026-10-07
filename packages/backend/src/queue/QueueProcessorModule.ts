@@ -6,8 +6,8 @@
 import { Module } from '@nestjs/common';
 import { CoreModule } from '@/core/CoreModule.js';
 import { GlobalModule } from '@/GlobalModule.js';
-import { QueueLoggerService } from './QueueLoggerService.js';
-import { QueueProcessorService } from './QueueProcessorService.js';
+import { QueueLoggerService } from '@features/runtime/backend/queue/QueueLoggerService.js';
+import { QueueProcessorService } from '@features/runtime/backend/queue/QueueProcessorService.js';
 import { DeliverProcessorService } from '@features/federation/backend/jobs/DeliverProcessorService.js';
 import { EndedPollNotificationProcessorService } from '@features/notes/backend/jobs/EndedPollNotificationProcessorService.js';
 import { PostScheduledNoteProcessorService } from '@features/notes/backend/jobs/PostScheduledNoteProcessorService.js';

@@ -14,7 +14,7 @@ import {
 	groupedNotificationTypes,
 	FilterUnionByProperty,
 	notificationTypes,
-} from '@/types.js';
+} from '@features/runtime/backend/types.js';
 import { NotificationEntityService } from '../../serializers/NotificationEntityService.js';
 import { NotificationService } from '../../services/NotificationService.js';
 import { DI } from '@/di-symbols.js';

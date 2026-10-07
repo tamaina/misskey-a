@@ -6,7 +6,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import * as Redis from 'ioredis';
 import { DataSource } from 'typeorm';
-import { bindThis } from '@/decorators.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
 import { DI } from '@/di-symbols.js';
 import { readyRef } from '@/boot/ready.js';
 import type { FastifyInstance, FastifyPluginOptions } from 'fastify';

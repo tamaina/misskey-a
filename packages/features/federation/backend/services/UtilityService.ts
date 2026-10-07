@@ -9,7 +9,7 @@ import RE2 from 're2';
 import semver from 'semver';
 import { DI } from '@/di-symbols.js';
 import type { Config } from '@/config.js';
-import { bindThis } from '@/decorators.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
 import { MiMeta, SoftwareSuspension } from '@features/instance/backend/models/Meta.js';
 import { MiInstance } from '@features/federation/backend/models/Instance.js';
 

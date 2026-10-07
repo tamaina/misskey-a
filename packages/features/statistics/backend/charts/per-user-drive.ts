@@ -10,7 +10,7 @@ import type { DriveFilesRepository } from '@features/persistence/backend/reposit
 import type { MiDriveFile } from '@features/drive/backend/models/DriveFile.js';
 import { DI } from '@/di-symbols.js';
 import { DriveFileEntityService } from '@features/drive/backend/serializers/DriveFileEntityService.js';
-import { bindThis } from '@/decorators.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
 import { acquireChartInsertLock } from '@features/runtime/backend/cache/distributed-lock.js';
 import Chart from './core.js';
 import { ChartLoggerService } from '@features/statistics/backend/services/ChartLoggerService.js';

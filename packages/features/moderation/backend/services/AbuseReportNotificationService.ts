@@ -8,7 +8,7 @@ import { Brackets, In, IsNull, Not } from 'typeorm';
 import * as Redis from 'ioredis';
 import sanitizeHtml from 'sanitize-html';
 import { DI } from '@/di-symbols.js';
-import { bindThis } from '@/decorators.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
 import { GlobalEvents, GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
 import type {
 	AbuseReportNotificationRecipientRepository,

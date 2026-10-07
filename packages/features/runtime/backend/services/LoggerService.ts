@@ -5,7 +5,7 @@
 
 import { Injectable } from '@nestjs/common';
 import { Logger } from '../logging/logger.js';
-import { bindThis } from '@/decorators.js';
+import { bindThis } from '../decorators.js';
 import type { Keyword } from 'color-convert';
 
 @Injectable()

@@ -13,7 +13,7 @@ import { QueueService } from '@features/runtime/backend/services/QueueService.js
 import { ApRendererService } from './ApRendererService.js';
 import { DI } from '@/di-symbols.js';
 import { deepClone } from '@features/runtime/backend/data/clone.js';
-import { bindThis } from '@/decorators.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
 import { SystemAccountService } from '@features/users/backend/services/SystemAccountService.js';
 
 @Injectable()

@@ -20,7 +20,7 @@ import { ApDeliverManagerService } from '@features/federation/backend/services/A
 import { NoteEntityService } from '../serializers/NoteEntityService.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import { ApRendererService } from '@features/federation/backend/services/ApRendererService.js';
-import { bindThis } from '@/decorators.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
 import { UtilityService } from '@features/federation/backend/services/UtilityService.js';
 import { UserBlockingService } from '@features/relationships/backend/services/UserBlockingService.js';
 import { CustomEmojiService } from '@features/emojis/backend/services/CustomEmojiService.js';

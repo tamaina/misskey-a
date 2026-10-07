@@ -5,7 +5,7 @@
 
 import { Brackets, SelectQueryBuilder } from 'typeorm';
 import { type FollowingsRepository, MiUser, type MutingsRepository, type UserProfilesRepository, type UsersRepository } from '@features/persistence/backend/repositories/models.js';
-import { bindThis } from '@/decorators.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
 import { sqlLikeEscape } from '@features/persistence/backend/utility/sql-like-escape.js';
 import type { Config } from '@/config.js';
 import { Packed } from '@features/index/contract/packed.js';

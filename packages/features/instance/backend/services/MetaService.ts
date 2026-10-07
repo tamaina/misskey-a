@@ -10,7 +10,7 @@ import { DI } from '@/di-symbols.js';
 import { MiMeta } from '../models/Meta.js';
 import { updateInstanceMeta } from '../models/update-instance-meta.js';
 import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
-import { bindThis } from '@/decorators.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
 import type { GlobalEvents } from '@features/runtime/backend/services/GlobalEventService.js';
 import { FeaturedService } from '@features/discovery/backend/services/FeaturedService.js';
 import type { OnApplicationShutdown } from '@nestjs/common';

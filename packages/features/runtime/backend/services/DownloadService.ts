@@ -17,7 +17,7 @@ import { StatusError } from '../http/status-error.js';
 import { LoggerService } from './LoggerService.js';
 import type { Logger } from '../logging/logger.js';
 
-import { bindThis } from '@/decorators.js';
+import { bindThis } from '../decorators.js';
 
 @Injectable()
 export class DownloadService {

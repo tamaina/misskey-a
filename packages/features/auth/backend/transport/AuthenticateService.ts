@@ -12,7 +12,7 @@ import { MemoryKVCache } from '@features/runtime/backend/cache/cache.js';
 import type { MiApp } from '@features/auth/backend/models/App.js';
 import { CacheService } from '@features/users/backend/services/CacheService.js';
 import { isNativeUserToken } from '../utility/token.js';
-import { bindThis } from '@/decorators.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
 
 export class AuthenticationError extends Error {
 	constructor(message: string) {

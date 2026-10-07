@@ -8,7 +8,7 @@ import * as htmlParser from 'node-html-parser';
 import type { Config } from '@/config.js';
 import { intersperse } from '@features/runtime/backend/data/array.js';
 import { normalizeForSearch } from '@/misc/normalize-for-search.js';
-import { bindThis } from '@/decorators.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
 import { escapeHtml } from '@/misc/escape-html.js';
 import type { IMentionedRemoteUsers } from '@features/notes/backend/models/Note.js';
 import type * as mfm from 'mfm-js';

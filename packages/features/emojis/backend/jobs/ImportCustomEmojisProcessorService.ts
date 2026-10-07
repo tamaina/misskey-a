@@ -14,10 +14,10 @@ import { createTempDir } from '@features/runtime/backend/io/create-temp.js';
 import { ZipFile } from '@features/runtime/backend/io/zip.js';
 import { DriveService } from '@features/drive/backend/services/DriveService.js';
 import { DownloadService } from '@features/runtime/backend/services/DownloadService.js';
-import { bindThis } from '@/decorators.js';
-import { QueueLoggerService } from '@/queue/QueueLoggerService.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
+import { QueueLoggerService } from '@features/runtime/backend/queue/QueueLoggerService.js';
 import type * as Bull from 'bullmq';
-import type { DbUserImportJobData } from '@/queue/types.js';
+import type { DbUserImportJobData } from '@features/runtime/backend/queue/types.js';
 
 // 展開後のサイズ上限
 const MAX_META_JSON_SIZE = 64 * 1024 * 1024; // 64MB

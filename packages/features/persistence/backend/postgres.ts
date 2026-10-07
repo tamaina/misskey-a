@@ -9,7 +9,7 @@ import { DataSource, Logger, type QueryRunner } from 'typeorm';
 import { entities as charts } from '@features/statistics/backend/charts/registry.js';
 import { Config } from '@/config.js';
 import { Logger as MisskeyLogger } from '@features/runtime/backend/logging/logger.js';
-import { bindThis } from '@/decorators.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
 
 import { MiAbuseUserReport } from '@features/moderation/backend/models/AbuseUserReport.js';
 import { MiAbuseReportNotificationRecipient } from '@features/moderation/backend/models/AbuseReportNotificationRecipient.js';

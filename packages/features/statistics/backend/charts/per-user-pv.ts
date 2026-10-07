@@ -8,7 +8,7 @@ import { DataSource } from 'typeorm';
 import * as Redis from 'ioredis';
 import type { MiUser } from '@features/users/backend/models/User.js';
 import { DI } from '@/di-symbols.js';
-import { bindThis } from '@/decorators.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
 import { acquireChartInsertLock } from '@features/runtime/backend/cache/distributed-lock.js';
 import Chart from './core.js';
 import { ChartLoggerService } from '@features/statistics/backend/services/ChartLoggerService.js';

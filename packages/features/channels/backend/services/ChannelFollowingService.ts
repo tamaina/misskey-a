@@ -10,7 +10,7 @@ import type { ChannelFollowingsRepository, ChannelsRepository, MiUser } from '@f
 import { MiChannel } from '@features/persistence/backend/repositories/models.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { GlobalEvents, GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
-import { bindThis } from '@/decorators.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 import { RedisKVCache } from '@features/runtime/backend/cache/cache.js';
 import { IdentifiableError } from '@features/runtime/backend/errors/identifiable-error.js';

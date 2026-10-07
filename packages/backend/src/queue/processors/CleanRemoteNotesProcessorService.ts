@@ -10,9 +10,9 @@ import { DataSource, IsNull, LessThan, QueryFailedError, Not } from 'typeorm';
 import { DI } from '@/di-symbols.js';
 import type { MiMeta, MiNote, NotesRepository } from '@features/persistence/backend/repositories/models.js';
 import type { Logger } from '@features/runtime/backend/logging/logger.js';
-import { bindThis } from '@/decorators.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
-import { QueueLoggerService } from '../QueueLoggerService.js';
+import { QueueLoggerService } from '@features/runtime/backend/queue/QueueLoggerService.js';
 import type * as Bull from 'bullmq';
 
 // 走査位置はジョブを跨いで引き継ぐ

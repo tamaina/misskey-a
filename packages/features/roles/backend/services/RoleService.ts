@@ -19,7 +19,7 @@ import { MemoryKVCache, MemorySingleCache } from '@features/runtime/backend/cach
 import type { MiUser } from '@features/users/backend/models/User.js';
 import type { Config } from '@/config.js';
 import { DI } from '@/di-symbols.js';
-import { bindThis } from '@/decorators.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
 import { CacheService } from '@features/users/backend/services/CacheService.js';
 import type { RoleCondFormulaValue } from '../models/Role.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';

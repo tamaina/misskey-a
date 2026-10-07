@@ -10,7 +10,7 @@ import type { Config } from '@/config.js';
 import type { IPoll } from '@features/notes/backend/models/Poll.js';
 import type { MiRemoteUser } from '@features/users/backend/models/User.js';
 import type { Logger } from '@features/runtime/backend/logging/logger.js';
-import { bindThis } from '@/decorators.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
 import { getOneApId, isQuestion } from '../protocol/type.js';
 import { UtilityService } from './UtilityService.js';
 import { ApLoggerService } from './ApLoggerService.js';

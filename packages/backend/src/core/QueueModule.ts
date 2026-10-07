@@ -7,7 +7,7 @@ import { Inject, Module, OnApplicationShutdown } from '@nestjs/common';
 import * as Bull from 'bullmq';
 import { DI } from '@/di-symbols.js';
 import type { Config } from '@/config.js';
-import { baseQueueOptions, QUEUE } from '@/queue/const.js';
+import { baseQueueOptions, QUEUE } from '@features/runtime/backend/queue/const.js';
 import { allSettled } from '@features/runtime/backend/async/promise-tracker.js';
 import {
 	DeliverJobData,
@@ -17,7 +17,7 @@ import {
 	UserWebhookDeliverJobData,
 	SystemWebhookDeliverJobData,
 	PostScheduledNoteJobData,
-} from '../queue/types.js';
+} from '@features/runtime/backend/queue/types.js';
 import type { Provider } from '@nestjs/common';
 
 export type SystemQueue = Bull.Queue<Record<string, unknown>>;

@@ -12,7 +12,7 @@ import type { MiUserPublickey } from '../models/UserPublickey.js';
 import { CacheService } from '@features/users/backend/services/CacheService.js';
 import { UtilityService } from './UtilityService.js';
 import type { MiNote } from '@features/notes/backend/models/Note.js';
-import { bindThis } from '@/decorators.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
 import { MiLocalUser, MiRemoteUser } from '@features/users/backend/models/User.js';
 import { getApId } from '../protocol/type.js';
 import { ApPersonService } from './ApPersonService.js';

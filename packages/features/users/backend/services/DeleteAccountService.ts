@@ -8,7 +8,7 @@ import { Not, IsNull } from 'typeorm';
 import type { FollowingsRepository, MiMeta, MiUser, UsersRepository } from '@features/persistence/backend/repositories/models.js';
 import { QueueService } from '@features/runtime/backend/services/QueueService.js';
 import { DI } from '@/di-symbols.js';
-import { bindThis } from '@/decorators.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
 import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
 import { UserEntityService } from '../serializers/UserEntityService.js';
 import { ApRendererService } from '@features/federation/backend/services/ApRendererService.js';

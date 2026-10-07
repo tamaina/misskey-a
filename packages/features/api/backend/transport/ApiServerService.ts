@@ -12,7 +12,7 @@ import type { Config } from '@/config.js';
 import type { InstancesRepository, AccessTokensRepository } from '@features/persistence/backend/repositories/models.js';
 import { DI } from '@/di-symbols.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
-import { bindThis } from '@/decorators.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
 import endpoints from '@/server/api/endpoints.js';
 import { ApiCallService } from './ApiCallService.js';
 import { SignupApiService } from '@features/auth/backend/transport/SignupApiService.js';

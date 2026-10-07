@@ -39,7 +39,7 @@ import type {
 	UserSecurityKeysRepository,
 	UsersRepository,
 } from '@features/persistence/backend/repositories/models.js';
-import { bindThis } from '@/decorators.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
 import { RoleService } from '@features/roles/backend/services/RoleService.js';
 import { ApPersonService } from '@features/federation/backend/services/ApPersonService.js';
 import { FederatedInstanceService } from '@features/federation/backend/services/FederatedInstanceService.js';

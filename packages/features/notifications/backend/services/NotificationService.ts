@@ -12,7 +12,7 @@ import { DI } from '@/di-symbols.js';
 import type { UsersRepository } from '@features/persistence/backend/repositories/models.js';
 import type { MiUser } from '@features/users/backend/models/User.js';
 import type { MiNotification } from '../models/Notification.js';
-import { bindThis } from '@/decorators.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
 import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
 import { PushNotificationService } from './PushNotificationService.js';
 import { NotificationEntityService } from '../serializers/NotificationEntityService.js';
@@ -20,7 +20,7 @@ import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { CacheService } from '@features/users/backend/services/CacheService.js';
 import type { Config } from '@/config.js';
 import { UserListService } from '@features/relationships/backend/services/UserListService.js';
-import { FilterUnionByProperty, groupedNotificationTypes, obsoleteNotificationTypes } from '@/types.js';
+import { FilterUnionByProperty, groupedNotificationTypes, obsoleteNotificationTypes } from '@features/runtime/backend/types.js';
 import { trackPromise } from '@features/runtime/backend/async/promise-tracker.js';
 // import { escapeHtml } from '@/misc/escape-html.js';
 

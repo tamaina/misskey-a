@@ -9,7 +9,7 @@ import * as Redis from 'ioredis';
 import { DI } from '@/di-symbols.js';
 import type { Logger } from '@features/runtime/backend/logging/logger.js';
 import { LoggerService } from '@features/runtime/backend/services/LoggerService.js';
-import { bindThis } from '@/decorators.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
 import type { IEndpointMeta } from '@/server/api/endpoints.js';
 
 type RateLimitInfo = {

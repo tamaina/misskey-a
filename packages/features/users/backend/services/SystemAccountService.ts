@@ -15,7 +15,7 @@ import type { MiMeta, UserProfilesRepository } from '@features/persistence/backe
 import type { GlobalEvents } from '@features/runtime/backend/services/GlobalEventService.js';
 import { MemoryKVCache } from '@features/runtime/backend/cache/cache.js';
 import { DI } from '@/di-symbols.js';
-import { bindThis } from '@/decorators.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
 import { generateNativeUserToken } from '@features/auth/backend/utility/token.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { genRsaKeyPair } from '@/misc/gen-key-pair.js';

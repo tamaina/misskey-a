@@ -9,7 +9,7 @@ import type { AvatarDecorationsRepository, MiAvatarDecoration, MiUser } from '@f
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
 import { DI } from '@/di-symbols.js';
-import { bindThis } from '@/decorators.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
 import { MemorySingleCache } from '@features/runtime/backend/cache/cache.js';
 import type { GlobalEvents } from '@features/runtime/backend/services/GlobalEventService.js';
 import { ModerationLogService } from '@features/moderation/backend/services/ModerationLogService.js';

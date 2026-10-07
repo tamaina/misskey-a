@@ -6,11 +6,11 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { IsNull, In, MoreThan, Not } from 'typeorm';
 
-import { bindThis } from '@/decorators.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
 import { DI } from '@/di-symbols.js';
 import type { MiLocalUser, MiRemoteUser, MiUser } from '../models/User.js';
 import type { BlockingsRepository, FollowingsRepository, InstancesRepository, MiMeta, MutingsRepository, UserListMembershipsRepository, UsersRepository } from '@features/persistence/backend/repositories/models.js';
-import type { RelationshipJobData, ThinUser } from '@/queue/types.js';
+import type { RelationshipJobData, ThinUser } from '@features/runtime/backend/queue/types.js';
 import type { Packed } from '@features/index/contract/packed.js';
 
 import { IdService } from '@features/runtime/backend/services/IdService.js';

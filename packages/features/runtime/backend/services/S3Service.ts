@@ -12,7 +12,7 @@ import { Upload } from '@aws-sdk/lib-storage';
 import { NodeHttpHandler, NodeHttpHandlerOptions } from '@smithy/node-http-handler';
 import type { MiMeta } from '@features/instance/backend/models/Meta.js';
 import { HttpRequestService } from './HttpRequestService.js';
-import { bindThis } from '@/decorators.js';
+import { bindThis } from '../decorators.js';
 import type { DeleteObjectCommandInput, PutObjectCommandInput } from '@aws-sdk/client-s3';
 
 @Injectable()

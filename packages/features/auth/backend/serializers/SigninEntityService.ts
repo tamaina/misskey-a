@@ -5,7 +5,7 @@
 
 import type { } from '@features/relationships/backend/models/Blocking.js';
 import type { MiSignin } from '../models/Signin.js';
-import { bindThis } from '@/decorators.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
 import type { IdService } from '@features/runtime/backend/services/IdService.js';
 
 export class SigninEntityService {

@@ -3,12 +3,12 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { bindThis } from '@/decorators.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
 import { isInstanceMuted } from '@/misc/is-instance-muted.js';
 import { isUserRelated } from '@/misc/is-user-related.js';
 import { isQuotePacked, isRenotePacked } from '@/misc/is-renote.js';
 import { isChannelRelated } from '@/misc/is-channel-related.js';
-import type { Awaitable } from '@/types.js';
+import type { Awaitable } from '@features/runtime/backend/types.js';
 import type { Packed } from '@features/index/contract/packed.js';
 import type { JsonObject, JsonValue } from '@features/runtime/backend/formatting/json-value.js';
 import type { Connection } from './Connection.js';

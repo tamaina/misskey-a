@@ -7,7 +7,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import * as Redis from 'ioredis';
 import type { MiUser, SystemWebhooksRepository } from '@features/persistence/backend/repositories/models.js';
 import { DI } from '@/di-symbols.js';
-import { bindThis } from '@/decorators.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
 import { GlobalEvents, GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
 import { MiSystemWebhook, type SystemWebhookEventType } from '../models/SystemWebhook.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';

@@ -6,7 +6,7 @@
 import type { AntennasRepository } from '@features/persistence/backend/repositories/models.js';
 import type { Packed } from '@features/index/contract/packed.js';
 import type { MiAntenna } from '../models/Antenna.js';
-import { bindThis } from '@/decorators.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
 import type { IdService } from '@features/runtime/backend/services/IdService.js';
 
 export class AntennaEntityService {

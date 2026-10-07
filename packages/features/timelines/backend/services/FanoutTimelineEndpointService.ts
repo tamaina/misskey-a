@@ -5,7 +5,7 @@
 
 import { Inject, Injectable } from '@nestjs/common';
 import { DI } from '@/di-symbols.js';
-import { bindThis } from '@/decorators.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
 import type { MiUser } from '@features/users/backend/models/User.js';
 import type { MiNote } from '@features/notes/backend/models/Note.js';
 import type { MiMeta } from '@features/instance/backend/models/Meta.js';

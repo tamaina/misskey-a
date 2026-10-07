@@ -5,7 +5,7 @@
 
 import { Inject, Injectable, Scope } from '@nestjs/common';
 import { NoteEntityService } from '@features/notes/backend/serializers/NoteEntityService.js';
-import { bindThis } from '@/decorators.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
 import { NoteStreamingHidingService } from '@features/api/backend/transport/stream/NoteStreamingHidingService.js';
 import { isRenotePacked, isQuotePacked } from '@/misc/is-renote.js';
 import { DI } from '@/di-symbols.js';

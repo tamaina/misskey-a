@@ -5,7 +5,7 @@
 
 import { In } from 'typeorm';
 import type { MiSystemWebhook, SystemWebhooksRepository } from '@features/persistence/backend/repositories/models.js';
-import { bindThis } from '@/decorators.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
 import { Packed } from '@features/index/contract/packed.js';
 
 export class SystemWebhookEntityService {

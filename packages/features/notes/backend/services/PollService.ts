@@ -13,7 +13,7 @@ import { GlobalEventService } from '@features/runtime/backend/services/GlobalEve
 import { ApRendererService } from '@features/federation/backend/services/ApRendererService.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import { ApDeliverManagerService } from '@features/federation/backend/services/ApDeliverManagerService.js';
-import { bindThis } from '@/decorators.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
 import { UserBlockingService } from '@features/relationships/backend/services/UserBlockingService.js';
 
 @Injectable()

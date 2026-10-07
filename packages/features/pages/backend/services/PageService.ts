@@ -12,7 +12,7 @@ import {
 	type UsersRepository,
 	MiNote,
 } from '@features/persistence/backend/repositories/models.js';
-import { bindThis } from '@/decorators.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
 import type { RoleService } from '@features/roles/backend/services/RoleService.js';
 import type { IdService } from '@features/runtime/backend/services/IdService.js';
 import type { MiUser } from '@features/users/backend/models/User.js';

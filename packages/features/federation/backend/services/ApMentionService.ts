@@ -7,7 +7,7 @@ import { Injectable } from '@nestjs/common';
 import promiseLimit from 'promise-limit';
 import type { MiUser } from '@features/persistence/backend/repositories/models.js';
 import { toArray, unique } from '@features/runtime/backend/data/array.js';
-import { bindThis } from '@/decorators.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
 import { isMention } from '../protocol/type.js';
 import { Resolver } from './ApResolverService.js';
 import { ApPersonService } from './ApPersonService.js';

@@ -5,7 +5,7 @@
 
 import { Injectable } from '@nestjs/common';
 
-import { bindThis } from '@/decorators.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
 import { FederationChart } from '../charts/federation.js';
 import { NotesChart } from '../charts/notes.js';
 import { UsersChart } from '../charts/users.js';

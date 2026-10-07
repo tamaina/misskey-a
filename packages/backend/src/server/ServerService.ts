@@ -20,7 +20,7 @@ import * as Acct from '@/misc/acct.js';
 import { genIdenticon } from '@/misc/gen-identicon.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import { LoggerService } from '@features/runtime/backend/services/LoggerService.js';
-import { bindThis } from '@/decorators.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
 import { envOption } from '@/env.js';
 import { ActivityPubServerService } from './ActivityPubServerService.js';
 import { NodeinfoServerService } from './NodeinfoServerService.js';
@@ -32,7 +32,7 @@ import { HealthServerService } from './HealthServerService.js';
 import { ClientServerService } from '@features/web/backend/http/ClientServerService.js';
 import { OpenApiServerService } from '@features/api/backend/transport/openapi/OpenApiServerService.js';
 import { OAuth2ProviderService } from '@features/auth/backend/oauth/OAuth2ProviderService.js';
-import { registerHttpAccessLog } from './http-access-log.js';
+import { registerHttpAccessLog } from '@features/runtime/backend/http/http-access-log.js';
 
 const _dirname = fileURLToPath(new URL('.', import.meta.url));
 

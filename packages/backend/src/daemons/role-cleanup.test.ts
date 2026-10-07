@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 import { afterEach, expect, test, vi } from 'vitest';
-import { QueueStatsService } from './QueueStatsService.js';
+import { QueueStatsService } from '@features/runtime/backend/queue/QueueStatsService.js';
 import { ServerStatsService } from './ServerStatsService.js';
 import { ChartManagementService } from '@features/statistics/backend/services/ChartManagementService.js';
 const state = vi.hoisted(() => ({ events: [] as { close: ReturnType<typeof vi.fn> }[], emitters: [] as any[], cpu: [] as ((value: number) => void)[] }));
@@ -12,7 +12,7 @@ vi.mock('bullmq', () => ({ QueueEvents: class {
 	constructor() { state.events.push(this); }
 	on() {}
 } }));
-vi.mock('@/queue/const.js', () => ({ QUEUE: { DELIVER: 'deliver', INBOX: 'inbox' }, baseQueueOptions: () => ({}) }));
+vi.mock('@features/runtime/backend/queue/const.js', () => ({ QUEUE: { DELIVER: 'deliver', INBOX: 'inbox' }, baseQueueOptions: () => ({}) }));
 vi.mock('xev', async () => {
 	const { EventEmitter } = await import('node:events');
 	return { default: class extends EventEmitter { constructor() { super(); state.emitters.push(this); } } };

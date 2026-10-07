@@ -4,9 +4,9 @@
  */
 
 import type { ModerationLogsRepository } from '@features/persistence/backend/repositories/models.js';
-import { bindThis } from '@/decorators.js';
-import type { ModerationLogPayloads } from '@/types.js';
-import { moderationLogTypes } from '@/types.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
+import type { ModerationLogPayloads } from '@features/runtime/backend/types.js';
+import { moderationLogTypes } from '@features/runtime/backend/types.js';
 import type { IdService } from '@features/runtime/backend/services/IdService.js';
 import type { MiUser } from '@features/users/backend/models/User.js';
 

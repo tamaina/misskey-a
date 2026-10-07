@@ -6,7 +6,7 @@
 import type { AbuseUserReportsRepository } from '@features/persistence/backend/repositories/models.js';
 import { awaitAll } from '@features/runtime/backend/async/await-all.js';
 import type { MiAbuseUserReport } from '../models/AbuseUserReport.js';
-import { bindThis } from '@/decorators.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
 import type { IdService } from '@features/runtime/backend/services/IdService.js';
 import type { Packed } from '@features/index/contract/packed.js';
 import type { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';

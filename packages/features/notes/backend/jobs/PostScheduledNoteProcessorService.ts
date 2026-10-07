@@ -8,11 +8,11 @@ import { DI } from '@/di-symbols.js';
 import type { NoteDraftsRepository } from '@features/persistence/backend/repositories/models.js';
 import type { Logger } from '@features/runtime/backend/logging/logger.js';
 import { NotificationService } from '@features/notifications/backend/services/NotificationService.js';
-import { bindThis } from '@/decorators.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
 import { NoteCreateService } from '../services/NoteCreateService.js';
-import { QueueLoggerService } from '@/queue/QueueLoggerService.js';
+import { QueueLoggerService } from '@features/runtime/backend/queue/QueueLoggerService.js';
 import type * as Bull from 'bullmq';
-import type { PostScheduledNoteJobData } from '@/queue/types.js';
+import type { PostScheduledNoteJobData } from '@features/runtime/backend/queue/types.js';
 
 @Injectable()
 export class PostScheduledNoteProcessorService {

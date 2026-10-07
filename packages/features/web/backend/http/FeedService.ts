@@ -12,7 +12,7 @@ import type { Config } from '@/config.js';
 import type { MiUser } from '@features/users/backend/models/User.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import { DriveFileEntityService } from '@features/drive/backend/serializers/DriveFileEntityService.js';
-import { bindThis } from '@/decorators.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { MfmService } from "@features/markup/backend/services/MfmService.js";
 import { parse as mfmParse } from 'mfm-js';

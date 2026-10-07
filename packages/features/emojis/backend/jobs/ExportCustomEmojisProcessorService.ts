@@ -17,8 +17,8 @@ import { DriveService } from '@features/drive/backend/services/DriveService.js';
 import { createTemp, createTempDir } from '@features/runtime/backend/io/create-temp.js';
 import { DownloadService } from '@features/runtime/backend/services/DownloadService.js';
 import { NotificationService } from '@features/notifications/backend/services/NotificationService.js';
-import { bindThis } from '@/decorators.js';
-import { QueueLoggerService } from '@/queue/QueueLoggerService.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
+import { QueueLoggerService } from '@features/runtime/backend/queue/QueueLoggerService.js';
 import type * as Bull from 'bullmq';
 
 @Injectable()

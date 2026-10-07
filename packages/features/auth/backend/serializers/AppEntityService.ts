@@ -7,7 +7,7 @@ import type { AccessTokensRepository, AppsRepository } from '@features/persisten
 import type { Packed } from '@features/index/contract/packed.js';
 import type { MiApp } from '../models/App.js';
 import type { MiUser } from '@features/users/backend/models/User.js';
-import { bindThis } from '@/decorators.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
 
 export class AppEntityService {
 	constructor(

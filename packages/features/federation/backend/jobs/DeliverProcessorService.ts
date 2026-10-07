@@ -19,9 +19,9 @@ import { ApRequestChart } from '@features/statistics/backend/charts/ap-request.j
 import { FederationChart } from '@features/statistics/backend/charts/federation.js';
 import { StatusError } from '@features/runtime/backend/http/status-error.js';
 import { UtilityService } from '../services/UtilityService.js';
-import { bindThis } from '@/decorators.js';
-import { QueueLoggerService } from '@/queue/QueueLoggerService.js';
-import type { DeliverJobData } from '@/queue/types.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
+import { QueueLoggerService } from '@features/runtime/backend/queue/QueueLoggerService.js';
+import type { DeliverJobData } from '@features/runtime/backend/queue/types.js';
 
 @Injectable()
 export class DeliverProcessorService {

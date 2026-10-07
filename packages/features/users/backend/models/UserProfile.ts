@@ -4,7 +4,7 @@
  */
 
 import { Entity, Column, Index, OneToOne, JoinColumn, PrimaryColumn } from 'typeorm';
-import { obsoleteNotificationTypes, followingVisibilities, followersVisibilities, notificationTypes } from '@/types.js';
+import { obsoleteNotificationTypes, followingVisibilities, followersVisibilities, notificationTypes } from '@features/runtime/backend/types.js';
 import { id } from '@features/persistence/backend/models/util/id.js';
 import { MiUser } from './User.js';
 import { MiPage } from '@features/pages/backend/models/Page.js';

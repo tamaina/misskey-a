@@ -10,7 +10,7 @@ import { FanoutTimelineService } from './FanoutTimelineService.js';
 import type { GlobalEvents } from '@features/runtime/backend/services/GlobalEventService.js';
 import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
 import { UtilityService } from '@features/federation/backend/services/UtilityService.js';
-import { bindThis } from '@/decorators.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
 import { DI } from '@/di-symbols.js';
 import * as Acct from '@/misc/acct.js';
 import type { Packed } from '@features/index/contract/packed.js';

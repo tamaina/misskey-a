@@ -9,10 +9,10 @@ import type { PollVotesRepository, NotesRepository } from '@features/persistence
 import type { Logger } from '@features/runtime/backend/logging/logger.js';
 import { CacheService } from '@features/users/backend/services/CacheService.js';
 import { NotificationService } from '@features/notifications/backend/services/NotificationService.js';
-import { bindThis } from '@/decorators.js';
-import { QueueLoggerService } from '@/queue/QueueLoggerService.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
+import { QueueLoggerService } from '@features/runtime/backend/queue/QueueLoggerService.js';
 import type * as Bull from 'bullmq';
-import type { EndedPollNotificationJobData } from '@/queue/types.js';
+import type { EndedPollNotificationJobData } from '@features/runtime/backend/queue/types.js';
 
 @Injectable()
 export class EndedPollNotificationProcessorService {

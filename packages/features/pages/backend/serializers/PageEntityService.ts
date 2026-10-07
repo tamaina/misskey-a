@@ -10,7 +10,7 @@ import type { } from '@features/relationships/backend/models/Blocking.js';
 import type { MiUser } from '@features/users/backend/models/User.js';
 import type { MiPage } from '../models/Page.js';
 import type { MiDriveFile } from '@features/drive/backend/models/DriveFile.js';
-import { bindThis } from '@/decorators.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
 import type { IdService } from '@features/runtime/backend/services/IdService.js';
 import type { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import type { DriveFileEntityService } from '@features/drive/backend/serializers/DriveFileEntityService.js';

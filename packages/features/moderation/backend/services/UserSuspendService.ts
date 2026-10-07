@@ -12,7 +12,7 @@ import { GlobalEventService } from '@features/runtime/backend/services/GlobalEve
 import { DI } from '@/di-symbols.js';
 import { ApRendererService } from '@features/federation/backend/services/ApRendererService.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
-import { bindThis } from '@/decorators.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
 import { ModerationLogService } from './ModerationLogService.js';
 
 @Injectable()

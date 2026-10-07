@@ -20,7 +20,7 @@ import type {
 	UsersRepository,
 } from '@features/persistence/backend/repositories/models.js';
 import { SystemAccountService } from '@features/users/backend/services/SystemAccountService.js';
-import { bindThis } from '@/decorators.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
 import { Resolver } from '@features/federation/backend/services/ApResolverService.js';
 
 type MockResponse = {

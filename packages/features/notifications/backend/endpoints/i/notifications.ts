@@ -9,7 +9,7 @@ import { In } from 'typeorm';
 import * as Redis from 'ioredis';
 import { Inject, Injectable } from '@nestjs/common';
 import type { NotesRepository } from '@features/persistence/backend/repositories/models.js';
-import { FilterUnionByProperty, notificationTypes, obsoleteNotificationTypes } from '@/types.js';
+import { FilterUnionByProperty, notificationTypes, obsoleteNotificationTypes } from '@features/runtime/backend/types.js';
 import { NotificationEntityService } from '../../serializers/NotificationEntityService.js';
 import { NotificationService } from '../../services/NotificationService.js';
 import { DI } from '@/di-symbols.js';

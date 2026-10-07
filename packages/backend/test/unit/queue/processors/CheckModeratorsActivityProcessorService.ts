@@ -15,7 +15,7 @@ import { RoleService } from '@features/roles/backend/services/RoleService.js';
 import { GlobalModule } from '@/GlobalModule.js';
 import { MetaService } from '@features/instance/backend/services/MetaService.js';
 import { DI } from '@/di-symbols.js';
-import { QueueLoggerService } from '@/queue/QueueLoggerService.js';
+import { QueueLoggerService } from '@features/runtime/backend/queue/QueueLoggerService.js';
 import { EmailService } from '@features/email/backend/services/EmailService.js';
 import { SystemWebhookService } from '@features/integrations/backend/services/SystemWebhookService.js';
 import { AnnouncementService } from '@features/announcements/backend/services/AnnouncementService.js';

@@ -8,7 +8,7 @@ import * as Bull from 'bullmq';
 import type { Config } from '@/config.js';
 import { DI } from '@/di-symbols.js';
 import type { Logger } from '@features/runtime/backend/logging/logger.js';
-import { bindThis } from '@/decorators.js';
+import { bindThis } from '../decorators.js';
 import { TelemetryService } from '@features/statistics/backend/services/TelemetryService.js';
 import { CheckModeratorsActivityProcessorService } from '@features/moderation/backend/jobs/CheckModeratorsActivityProcessorService.js';
 import { runQueueJob } from './queue-job-runner.js';
@@ -41,11 +41,11 @@ import { RelationshipProcessorService } from '@features/relationships/backend/jo
 import { TickChartsProcessorService } from '@features/statistics/backend/jobs/TickChartsProcessorService.js';
 import { ResyncChartsProcessorService } from '@features/statistics/backend/jobs/ResyncChartsProcessorService.js';
 import { CleanChartsProcessorService } from '@features/statistics/backend/jobs/CleanChartsProcessorService.js';
-import { CheckExpiredMutingsProcessorService } from './processors/CheckExpiredMutingsProcessorService.js';
+import { CheckExpiredMutingsProcessorService } from '@/queue/processors/CheckExpiredMutingsProcessorService.js';
 import { BakeBufferedReactionsProcessorService } from '@features/notes/backend/jobs/BakeBufferedReactionsProcessorService.js';
-import { CleanProcessorService } from './processors/CleanProcessorService.js';
+import { CleanProcessorService } from '@/queue/processors/CleanProcessorService.js';
 import { AggregateRetentionProcessorService } from '@features/statistics/backend/jobs/AggregateRetentionProcessorService.js';
-import { CleanRemoteNotesProcessorService } from './processors/CleanRemoteNotesProcessorService.js';
+import { CleanRemoteNotesProcessorService } from '@/queue/processors/CleanRemoteNotesProcessorService.js';
 import { QueueLoggerService } from './QueueLoggerService.js';
 import { QUEUE, baseWorkerOptions } from './const.js';
 

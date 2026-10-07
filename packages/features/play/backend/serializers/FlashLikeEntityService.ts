@@ -7,7 +7,7 @@ import type { FlashLikesRepository } from '@features/persistence/backend/reposit
 import type { } from '@features/relationships/backend/models/Blocking.js';
 import type { MiUser } from '@features/users/backend/models/User.js';
 import type { MiFlashLike } from '../models/FlashLike.js';
-import { bindThis } from '@/decorators.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
 import type { FlashEntityService } from './FlashEntityService.js';
 
 export class FlashLikeEntityService {

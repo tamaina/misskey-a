@@ -21,13 +21,13 @@ import { DI } from '@/di-symbols.js';
 import type { FollowingsRepository, FollowRequestsRepository, InstancesRepository, MiMeta, UserProfilesRepository, UsersRepository } from '@features/persistence/backend/repositories/models.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import { ApRendererService } from '@features/federation/backend/services/ApRendererService.js';
-import { bindThis } from '@/decorators.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
 import { UserBlockingService } from './UserBlockingService.js';
 import { CacheService } from '@features/users/backend/services/CacheService.js';
 import type { Config } from '@/config.js';
 import { AccountMoveService } from '@features/users/backend/services/AccountMoveService.js';
 import { UtilityService } from '@features/federation/backend/services/UtilityService.js';
-import type { ThinUser } from '@/queue/types.js';
+import type { ThinUser } from '@features/runtime/backend/queue/types.js';
 import { Logger } from '@features/runtime/backend/logging/logger.js';
 
 const logger = new Logger('following/create');

@@ -7,7 +7,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { In } from 'typeorm';
 import { DI } from '@/di-symbols.js';
 import { type Config, FulltextSearchProvider } from '@/config.js';
-import { bindThis } from '@/decorators.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
 import { MiNote } from '@features/notes/backend/models/Note.js';
 import type { MiMeta, NotesRepository } from '@features/persistence/backend/repositories/models.js';
 import { MiUser } from '@features/persistence/backend/repositories/models.js';

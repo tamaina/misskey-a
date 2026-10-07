@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { bindThis } from '@/decorators.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
 import type { MiMeta } from '@features/persistence/backend/repositories/models.js';
 import type { Logger } from '@features/runtime/backend/logging/logger.js';
 import type { HttpRequestService } from '@features/runtime/backend/services/HttpRequestService.js';

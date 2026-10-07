@@ -13,7 +13,7 @@ import type { Config } from '@/config.js';
 import type { Logger } from '@features/runtime/backend/logging/logger.js';
 import type { MiMeta, UserProfilesRepository } from '@features/persistence/backend/repositories/models.js';
 import { LoggerService } from '@features/runtime/backend/services/LoggerService.js';
-import { bindThis } from '@/decorators.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
 import { HttpRequestService } from '@features/runtime/backend/services/HttpRequestService.js';
 import { escapeHtml } from '@/misc/escape-html.js';
 

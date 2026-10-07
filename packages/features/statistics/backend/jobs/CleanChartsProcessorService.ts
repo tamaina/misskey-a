@@ -17,8 +17,8 @@ import { PerUserReactionsChart } from '../charts/per-user-reactions.js';
 import { PerUserFollowingChart } from '../charts/per-user-following.js';
 import { PerUserDriveChart } from '../charts/per-user-drive.js';
 import { ApRequestChart } from '../charts/ap-request.js';
-import { bindThis } from '@/decorators.js';
-import { QueueLoggerService } from '@/queue/QueueLoggerService.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
+import { QueueLoggerService } from '@features/runtime/backend/queue/QueueLoggerService.js';
 import type * as Bull from 'bullmq';
 
 @Injectable()

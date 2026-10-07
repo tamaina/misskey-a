@@ -10,7 +10,7 @@ import { DI } from '@/di-symbols.js';
 import type { ChannelMutingRepository, ChannelsRepository, MiChannel, MiChannelMuting, MiUser } from '@features/persistence/backend/repositories/models.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { GlobalEvents, GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
-import { bindThis } from '@/decorators.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
 import { RedisKVCache } from '@features/runtime/backend/cache/cache.js';
 
 @Injectable()

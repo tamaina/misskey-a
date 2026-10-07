@@ -11,7 +11,7 @@ import { MemoryKVCache, RedisKVCache } from '@features/runtime/backend/cache/cac
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { DI } from '@/di-symbols.js';
 import { UtilityService } from './UtilityService.js';
-import { bindThis } from '@/decorators.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
 
 @Injectable()
 export class FederatedInstanceService implements OnApplicationShutdown {

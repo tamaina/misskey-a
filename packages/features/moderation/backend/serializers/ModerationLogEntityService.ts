@@ -7,7 +7,7 @@ import type { ModerationLogsRepository } from '@features/persistence/backend/rep
 import { awaitAll } from '@features/runtime/backend/async/await-all.js';
 import type { } from '@features/relationships/backend/models/Blocking.js';
 import { MiModerationLog } from '../models/ModerationLog.js';
-import { bindThis } from '@/decorators.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
 import type { IdService } from '@features/runtime/backend/services/IdService.js';
 import type { Packed } from '@features/index/contract/packed.js';
 import type { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';

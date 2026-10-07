@@ -5,7 +5,7 @@
 
 import Xev from 'xev';
 import { Inject, Injectable, Scope } from '@nestjs/common';
-import { bindThis } from '@/decorators.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
 import { isJsonObject } from '@features/runtime/backend/formatting/json-value.js';
 import type { JsonObject, JsonValue } from '@features/runtime/backend/formatting/json-value.js';
 import Channel, { type ChannelRequest } from '@features/api/backend/transport/stream/channel.js';

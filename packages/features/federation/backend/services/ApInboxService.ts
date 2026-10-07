@@ -25,7 +25,7 @@ import { NoteEntityService } from '@features/notes/backend/serializers/NoteEntit
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import { QueueService } from '@features/runtime/backend/services/QueueService.js';
 import type { UsersRepository, NotesRepository, FollowingsRepository, AbuseUserReportsRepository, FollowRequestsRepository, MiMeta } from '@features/persistence/backend/repositories/models.js';
-import { bindThis } from '@/decorators.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
 import type { MiRemoteUser } from '@features/users/backend/models/User.js';
 import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
 import { AbuseReportService } from '@features/moderation/backend/services/AbuseReportService.js';

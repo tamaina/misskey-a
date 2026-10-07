@@ -7,10 +7,10 @@ import { Inject, Injectable } from '@nestjs/common';
 import Xev from 'xev';
 import * as Bull from 'bullmq';
 import { QueueService } from '@features/runtime/backend/services/QueueService.js';
-import { bindThis } from '@/decorators.js';
+import { bindThis } from '../decorators.js';
 import { DI } from '@/di-symbols.js';
 import type { Config } from '@/config.js';
-import { QUEUE, baseQueueOptions } from '@/queue/const.js';
+import { QUEUE, baseQueueOptions } from './const.js';
 import type { OnApplicationShutdown } from '@nestjs/common';
 
 const ev = new Xev();

@@ -12,13 +12,13 @@ import { GlobalEventService } from '@features/runtime/backend/services/GlobalEve
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { ModerationLogService } from '@features/moderation/backend/services/ModerationLogService.js';
 import { UtilityService } from '@features/federation/backend/services/UtilityService.js';
-import { bindThis } from '@/decorators.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
 import { DI } from '@/di-symbols.js';
 import { MemoryKVCache, RedisSingleCache } from '@features/runtime/backend/cache/cache.js';
 import { sqlLikeEscape } from '@features/persistence/backend/utility/sql-like-escape.js';
 import type { EmojisRepository, MiRole, MiUser } from '@features/persistence/backend/repositories/models.js';
 import type { MiEmoji } from '../models/Emoji.js';
-import type { Serialized } from '@/types.js';
+import type { Serialized } from '@features/runtime/backend/types.js';
 
 export { fetchEmojisHostTypes, fetchEmojisSortKeys } from '../../contract/fetch-options.js';
 export type { FetchEmojisHostTypes, FetchEmojisSortKeys } from '../../contract/fetch-options.js';

@@ -14,7 +14,7 @@ import type { MiAccessToken } from '@features/auth/backend/models/AccessToken.js
 import type { Logger } from '@features/runtime/backend/logging/logger.js';
 import type { MiMeta, UserIpsRepository } from '@features/persistence/backend/repositories/models.js';
 import { createTemp } from '@features/runtime/backend/io/create-temp.js';
-import { bindThis } from '@/decorators.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
 import { RoleService } from '@features/roles/backend/services/RoleService.js';
 import { TelemetryService } from '@features/statistics/backend/services/TelemetryService.js';
 import type { Config } from '@/config.js';

@@ -43,7 +43,7 @@ import { UserEntityService } from '@features/users/backend/serializers/UserEntit
 import { ApRendererService } from '@features/federation/backend/services/ApRendererService.js';
 import { ApDeliverManagerService } from '@features/federation/backend/services/ApDeliverManagerService.js';
 import { RemoteUserResolveService } from '@features/federation/backend/services/RemoteUserResolveService.js';
-import { bindThis } from '@/decorators.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
 import { DB_MAX_NOTE_TEXT_LENGTH } from '../constants.js';
 import { RoleService } from '@features/roles/backend/services/RoleService.js';
 import { SearchService } from '@features/discovery/backend/services/SearchService.js';

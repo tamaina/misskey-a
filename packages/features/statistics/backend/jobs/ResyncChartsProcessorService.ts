@@ -8,8 +8,8 @@ import type { Logger } from '@features/runtime/backend/logging/logger.js';
 import { NotesChart } from '../charts/notes.js';
 import { UsersChart } from '../charts/users.js';
 import { DriveChart } from '../charts/drive.js';
-import { bindThis } from '@/decorators.js';
-import { QueueLoggerService } from '@/queue/QueueLoggerService.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
+import { QueueLoggerService } from '@features/runtime/backend/queue/QueueLoggerService.js';
 import type * as Bull from 'bullmq';
 
 @Injectable()

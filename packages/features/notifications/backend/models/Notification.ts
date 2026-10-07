@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { userExportableEntities } from '@/types.js';
+import { userExportableEntities } from '@features/runtime/backend/types.js';
 import { MiUser } from '@features/users/backend/models/User.js';
 import { MiNote } from '@features/notes/backend/models/Note.js';
 import { MiAccessToken } from '@features/auth/backend/models/AccessToken.js';

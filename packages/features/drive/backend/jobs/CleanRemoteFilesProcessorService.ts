@@ -9,8 +9,8 @@ import { DI } from '@/di-symbols.js';
 import type { MiDriveFile, DriveFilesRepository } from '@features/persistence/backend/repositories/models.js';
 import type { Logger } from '@features/runtime/backend/logging/logger.js';
 import { DriveService } from '../services/DriveService.js';
-import { bindThis } from '@/decorators.js';
-import { QueueLoggerService } from '@/queue/QueueLoggerService.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
+import { QueueLoggerService } from '@features/runtime/backend/queue/QueueLoggerService.js';
 import type * as Bull from 'bullmq';
 
 @Injectable()

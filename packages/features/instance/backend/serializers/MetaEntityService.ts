@@ -9,7 +9,7 @@ import type { Packed } from '@features/index/contract/packed.js';
 import type { MiMeta } from '../models/Meta.js';
 import type { AdsRepository } from '@features/persistence/backend/repositories/models.js';
 import { MAX_NOTE_TEXT_LENGTH } from '@features/notes/contract/note-text-limit.js';
-import { bindThis } from '@/decorators.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
 import type { SystemAccountService } from '@features/users/backend/services/SystemAccountService.js';
 import type { Config } from '@/config.js';
 import { DEFAULT_POLICIES } from '@features/roles/backend/services/RoleService.js';

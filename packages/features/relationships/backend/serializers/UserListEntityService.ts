@@ -7,7 +7,7 @@ import type { MiUserListMembership, UserListMembershipsRepository, UserListsRepo
 import type { Packed } from '@features/index/contract/packed.js';
 import type { } from '../models/Blocking.js';
 import type { MiUserList } from '../models/UserList.js';
-import { bindThis } from '@/decorators.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
 import type { IdService } from '@features/runtime/backend/services/IdService.js';
 import type { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 

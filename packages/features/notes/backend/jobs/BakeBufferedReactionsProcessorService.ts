@@ -5,9 +5,9 @@
 
 import { Inject, Injectable } from '@nestjs/common';
 import type { Logger } from '@features/runtime/backend/logging/logger.js';
-import { bindThis } from '@/decorators.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
 import { ReactionsBufferingService } from '../services/ReactionsBufferingService.js';
-import { QueueLoggerService } from '@/queue/QueueLoggerService.js';
+import { QueueLoggerService } from '@features/runtime/backend/queue/QueueLoggerService.js';
 import type * as Bull from 'bullmq';
 import { MiMeta } from '@features/persistence/backend/repositories/models.js';
 import { DI } from '@/di-symbols.js';

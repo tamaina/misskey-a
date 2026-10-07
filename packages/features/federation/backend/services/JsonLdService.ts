@@ -8,7 +8,7 @@ import { promisify } from 'node:util';
 import { Injectable } from '@nestjs/common';
 import { RsaKeyPair } from 'slacc';
 import { HttpRequestService } from '@features/runtime/backend/services/HttpRequestService.js';
-import { bindThis } from '@/decorators.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
 import { IdentifiableError } from '@features/runtime/backend/errors/identifiable-error.js';
 import { CONTEXT, PRELOADED_CONTEXTS } from '../protocol/misc/contexts.js';
 import { validateContentTypeSetAsJsonLD } from '../protocol/misc/validator.js';

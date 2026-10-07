@@ -21,7 +21,7 @@ import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { PollService } from '@features/notes/backend/services/PollService.js';
 import { StatusError } from '@features/runtime/backend/http/status-error.js';
 import { UtilityService } from './UtilityService.js';
-import { bindThis } from '@/decorators.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
 import { checkHttps } from '@/misc/check-https.js';
 import { IdentifiableError } from '@features/runtime/backend/errors/identifiable-error.js';
 import { getOneApId, getApId, getOneApHrefNullable, validPost, isEmoji, getApType } from '../protocol/type.js';

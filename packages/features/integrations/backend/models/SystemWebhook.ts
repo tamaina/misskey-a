@@ -5,7 +5,7 @@
 
 import type { SystemWebhookEventType } from '../../contract/system-webhook-events.js';
 import { Column, Entity, Index, PrimaryColumn } from 'typeorm';
-import { Serialized } from '@/types.js';
+import { Serialized } from '@features/runtime/backend/types.js';
 import { id } from '@features/persistence/backend/models/util/id.js';
 
 export { systemWebhookEventTypes } from '../../contract/system-webhook-events.js';

@@ -16,7 +16,7 @@ import type { GlobalEvents, StreamEventEmitter } from '@features/runtime/backend
 import { MiFollowing, MiUserProfile } from '@features/persistence/backend/repositories/models.js';
 import type { MiMeta } from '@features/persistence/backend/repositories/models.js';
 import { CacheService } from '@features/users/backend/services/CacheService.js';
-import { bindThis } from '@/decorators.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
 import { NotificationService } from '@features/notifications/backend/services/NotificationService.js';
 import type { MiAccessToken } from '@features/auth/backend/models/AccessToken.js';
 import type { MiUser } from '@features/users/backend/models/User.js';

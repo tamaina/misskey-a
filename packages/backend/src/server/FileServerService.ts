@@ -17,7 +17,7 @@ import { FileInfoService } from '@features/media/backend/services/FileInfoServic
 import { ImageProcessingService } from '@features/media/backend/services/ImageProcessingService.js';
 import { VideoProcessingService } from '@features/media/backend/services/VideoProcessingService.js';
 import { LoggerService } from '@features/runtime/backend/services/LoggerService.js';
-import { bindThis } from '@/decorators.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
 import { handleRequestRedirectToOmitSearch } from '@features/runtime/backend/http/fastify-hook-handlers.js';
 import { FileServerDriveHandler } from './file/FileServerDriveHandler.js';
 import { FileServerFileResolver } from './file/FileServerFileResolver.js';

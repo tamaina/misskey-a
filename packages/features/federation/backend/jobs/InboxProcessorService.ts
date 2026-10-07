@@ -23,14 +23,14 @@ import { UtilityService } from '../services/UtilityService.js';
 import { ApPersonService } from '../services/ApPersonService.js';
 import { JsonLdError, JsonLdService } from '../services/JsonLdService.js';
 import { ApInboxService } from '../services/ApInboxService.js';
-import { bindThis } from '@/decorators.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
 import { IdentifiableError } from '@features/runtime/backend/errors/identifiable-error.js';
 import { CollapsedQueue } from '@features/runtime/backend/async/collapsed-queue.js';
 import { MiNote } from '@features/notes/backend/models/Note.js';
 import { MiMeta } from '@features/instance/backend/models/Meta.js';
 import { DI } from '@/di-symbols.js';
-import { QueueLoggerService } from '@/queue/QueueLoggerService.js';
-import type { InboxJobData } from '@/queue/types.js';
+import { QueueLoggerService } from '@features/runtime/backend/queue/QueueLoggerService.js';
+import type { InboxJobData } from '@features/runtime/backend/queue/types.js';
 
 type UpdateInstanceJob = {
 	latestRequestReceivedAt: Date,

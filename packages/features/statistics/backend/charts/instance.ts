@@ -11,7 +11,7 @@ import type { MiDriveFile } from '@features/drive/backend/models/DriveFile.js';
 import type { MiNote } from '@features/notes/backend/models/Note.js';
 import { DI } from '@/di-symbols.js';
 import { UtilityService } from '@features/federation/backend/services/UtilityService.js';
-import { bindThis } from '@/decorators.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
 import { acquireChartInsertLock } from '@features/runtime/backend/cache/distributed-lock.js';
 import Chart from './core.js';
 import { ChartLoggerService } from '@features/statistics/backend/services/ChartLoggerService.js';

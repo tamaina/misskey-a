@@ -26,7 +26,7 @@ import type { MiNote } from '@features/notes/backend/models/Note.js';
 import { QueryService } from '@features/notes/backend/services/QueryService.js';
 import { UtilityService } from '@features/federation/backend/services/UtilityService.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
-import { bindThis } from '@/decorators.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
 import { IActivity } from '@features/federation/backend/protocol/type.js';
 import { isQuote, isRenote } from '@/misc/is-renote.js';
 import * as Acct from '@/misc/acct.js';

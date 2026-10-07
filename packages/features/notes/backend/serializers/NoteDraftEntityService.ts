@@ -11,7 +11,7 @@ import type { Packed } from '@features/index/contract/packed.js';
 import { awaitAll } from '@features/runtime/backend/async/await-all.js';
 import type { MiUser, MiNote, MiNoteDraft } from '@features/persistence/backend/repositories/models.js';
 import type { NoteDraftsRepository, ChannelsRepository } from '@features/persistence/backend/repositories/models.js';
-import { bindThis } from '@/decorators.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
 import { DebounceLoader } from '@features/runtime/backend/async/loader.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 import type { OnModuleInit } from '@nestjs/common';

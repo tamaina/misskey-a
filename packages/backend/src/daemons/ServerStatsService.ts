@@ -6,7 +6,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import Xev from 'xev';
 import * as osUtils from 'os-utils';
-import { bindThis } from '@/decorators.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
 import { MiMeta } from '@features/persistence/backend/repositories/models.js';
 import { DI } from '@/di-symbols.js';
 import type { OnApplicationShutdown } from '@nestjs/common';

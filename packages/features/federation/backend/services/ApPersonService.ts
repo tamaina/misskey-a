@@ -33,7 +33,7 @@ import { MiUserNotePining } from '@features/notes/backend/models/UserNotePining.
 import { StatusError } from '@features/runtime/backend/http/status-error.js';
 import type { UtilityService } from './UtilityService.js';
 import type { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
-import { bindThis } from '@/decorators.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
 import { RoleService } from '@features/roles/backend/services/RoleService.js';
 import { DriveFileEntityService } from '@features/drive/backend/serializers/DriveFileEntityService.js';
 import type { AccountMoveService } from '@features/users/backend/services/AccountMoveService.js';

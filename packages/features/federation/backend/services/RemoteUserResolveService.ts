@@ -17,7 +17,7 @@ import { ILink, WebfingerService } from './WebfingerService.js';
 import { RemoteLoggerService } from '@features/runtime/backend/services/RemoteLoggerService.js';
 import { ApDbResolverService } from './ApDbResolverService.js';
 import { ApPersonService } from './ApPersonService.js';
-import { bindThis } from '@/decorators.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
 
 @Injectable()
 export class RemoteUserResolveService {

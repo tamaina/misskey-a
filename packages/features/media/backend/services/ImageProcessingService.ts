@@ -43,7 +43,7 @@ export const avifDefault: AvifOptions = {
 	effort: 2,
 };
 
-import { bindThis } from '@/decorators.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
 import { Readable } from 'node:stream';
 
 export class ImageProcessingService {

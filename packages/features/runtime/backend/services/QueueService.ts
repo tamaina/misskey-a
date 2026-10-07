@@ -12,7 +12,7 @@ import type { MiWebhook, WebhookEventTypes } from '@features/integrations/backen
 import type { MiSystemWebhook, SystemWebhookEventType } from '@features/integrations/backend/models/SystemWebhook.js';
 import type { Config } from '@/config.js';
 import { DI } from '@/di-symbols.js';
-import { bindThis } from '@/decorators.js';
+import { bindThis } from '../decorators.js';
 import type { Antenna } from '@features/portability/backend/endpoints/i/import-antennas.js';
 import { ApRequestCreator } from '@features/federation/backend/services/ApRequestService.js';
 import { type SystemWebhookPayload } from '@features/integrations/backend/services/SystemWebhookService.js';
@@ -25,7 +25,7 @@ import type {
 	SystemWebhookDeliverJobData,
 	ThinUser,
 	UserWebhookDeliverJobData,
-} from '@/queue/types.js';
+} from '../queue/types.js';
 import type {
 	DbQueue,
 	DeliverQueue,

@@ -14,7 +14,7 @@ import { escapeAttribute, escapeValue } from '@features/runtime/backend/formatti
 import type { MiUser } from '@features/users/backend/models/User.js';
 import * as Acct from '@/misc/acct.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
-import { bindThis } from '@/decorators.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
 import { NodeinfoServerService } from './NodeinfoServerService.js';
 import { OAuth2ProviderService } from '@features/auth/backend/oauth/OAuth2ProviderService.js';
 import type { FindOptionsWhere } from 'typeorm';

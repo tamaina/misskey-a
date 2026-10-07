@@ -11,7 +11,7 @@ import { ApRendererService } from '@features/federation/backend/services/ApRende
 import { RelayService } from '@features/federation/backend/services/RelayService.js';
 import { ApDeliverManagerService } from '@features/federation/backend/services/ApDeliverManagerService.js';
 import { UserEntityService } from '../serializers/UserEntityService.js';
-import { bindThis } from '@/decorators.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
 
 @Injectable()
 export class AccountUpdateService {

@@ -24,8 +24,8 @@ import { MiAvatarDecoration, MiChatMessage, MiChatRoom, MiReversiGame, MiRole, M
 import type { Packed } from '@features/index/contract/packed.js';
 import { DI } from '@/di-symbols.js';
 import type { Config } from '@/config.js';
-import { bindThis } from '@/decorators.js';
-import { Serialized } from '@/types.js';
+import { bindThis } from '../decorators.js';
+import { Serialized } from '../types.js';
 import type { StrictEventEmitter } from 'strict-event-emitter-types';
 import type { EventEmitter } from 'events';
 

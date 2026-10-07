@@ -7,10 +7,10 @@ import { Inject, Injectable } from '@nestjs/common';
 import { DI } from '@/di-symbols.js';
 import type { MutingsRepository } from '@features/persistence/backend/repositories/models.js';
 import type { Logger } from '@features/runtime/backend/logging/logger.js';
-import { bindThis } from '@/decorators.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
 import { UserMutingService } from '@features/relationships/backend/services/UserMutingService.js';
 import { ChannelMutingService } from '@features/channels/backend/services/ChannelMutingService.js';
-import { QueueLoggerService } from '../QueueLoggerService.js';
+import { QueueLoggerService } from '@features/runtime/backend/queue/QueueLoggerService.js';
 
 @Injectable()
 export class CheckExpiredMutingsProcessorService {

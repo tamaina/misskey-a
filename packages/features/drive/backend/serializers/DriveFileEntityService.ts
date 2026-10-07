@@ -14,7 +14,7 @@ import type { MiUser } from '@features/users/backend/models/User.js';
 import type { MiDriveFile } from '../models/DriveFile.js';
 import { appendQuery, query } from '@features/runtime/backend/formatting/url.js';
 import { deepClone } from '@features/runtime/backend/data/clone.js';
-import { bindThis } from '@/decorators.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
 import { isMimeImage } from '@/misc/is-mime-image.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { uniqueByKey } from '@features/runtime/backend/data/unique-by-key.js';

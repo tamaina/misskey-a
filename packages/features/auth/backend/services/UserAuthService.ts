@@ -6,7 +6,7 @@
 import { createHash } from 'node:crypto';
 import * as OTPAuth from 'otpauth';
 import type { MiUserProfile, UserProfilesRepository, UsersRepository } from '@features/persistence/backend/repositories/models.js';
-import { bindThis } from '@/decorators.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
 import type * as Redis from 'ioredis';
 
 export class UserAuthService {

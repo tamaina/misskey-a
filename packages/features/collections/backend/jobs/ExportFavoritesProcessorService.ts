@@ -13,14 +13,14 @@ import { DriveService } from '@features/drive/backend/services/DriveService.js';
 import { createTemp } from '@features/runtime/backend/io/create-temp.js';
 import type { MiPoll } from '@features/notes/backend/models/Poll.js';
 import type { MiNote } from '@features/notes/backend/models/Note.js';
-import { bindThis } from '@/decorators.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { NotificationService } from '@features/notifications/backend/services/NotificationService.js';
 import { QueryService } from '@features/notes/backend/services/QueryService.js';
 import { shouldHideNoteByTime } from '@/misc/should-hide-note-by-time.js';
-import { QueueLoggerService } from '@/queue/QueueLoggerService.js';
+import { QueueLoggerService } from '@features/runtime/backend/queue/QueueLoggerService.js';
 import type * as Bull from 'bullmq';
-import type { DbJobDataWithUser } from '@/queue/types.js';
+import type { DbJobDataWithUser } from '@features/runtime/backend/queue/types.js';
 
 @Injectable()
 export class ExportFavoritesProcessorService {

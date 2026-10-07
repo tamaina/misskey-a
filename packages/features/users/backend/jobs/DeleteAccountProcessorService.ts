@@ -12,12 +12,12 @@ import { DriveService } from '@features/drive/backend/services/DriveService.js';
 import type { MiDriveFile } from '@features/drive/backend/models/DriveFile.js';
 import type { MiNote } from '@features/notes/backend/models/Note.js';
 import { EmailService } from '@features/email/backend/services/EmailService.js';
-import { bindThis } from '@/decorators.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
 import { SearchService } from '@features/discovery/backend/services/SearchService.js';
 import { PageService } from '@features/pages/backend/services/PageService.js';
-import { QueueLoggerService } from '@/queue/QueueLoggerService.js';
+import { QueueLoggerService } from '@features/runtime/backend/queue/QueueLoggerService.js';
 import type * as Bull from 'bullmq';
-import type { DbUserDeleteJobData } from '@/queue/types.js';
+import type { DbUserDeleteJobData } from '@features/runtime/backend/queue/types.js';
 
 @Injectable()
 export class DeleteAccountProcessorService {

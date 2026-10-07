@@ -16,7 +16,7 @@ import { UserKeypairService } from './UserKeypairService.js';
 import { UtilityService } from './UtilityService.js';
 import { HttpRequestService } from '@features/runtime/backend/services/HttpRequestService.js';
 import { LoggerService } from '@features/runtime/backend/services/LoggerService.js';
-import { bindThis } from '@/decorators.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
 import type { Logger } from '@features/runtime/backend/logging/logger.js';
 import { validateContentTypeSetAsActivityPub } from '../protocol/misc/validator.js';
 import { assertActivityMatchesUrl, FetchAllowSoftFailMask as FetchAllowSoftFailMask } from '../protocol/misc/check-against-url.js';

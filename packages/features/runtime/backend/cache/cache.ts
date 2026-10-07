@@ -4,7 +4,7 @@
  */
 
 import * as Redis from 'ioredis';
-import { bindThis } from '@/decorators.js';
+import { bindThis } from '../decorators.js';
 
 export class RedisKVCache<T> {
 	private readonly lifetime: number;

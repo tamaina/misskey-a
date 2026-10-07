@@ -7,7 +7,7 @@ import type { PageLikesRepository } from '@features/persistence/backend/reposito
 import type { } from '@features/relationships/backend/models/Blocking.js';
 import type { MiUser } from '@features/users/backend/models/User.js';
 import type { MiPageLike } from '../models/PageLike.js';
-import { bindThis } from '@/decorators.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
 import type { PageEntityService } from './PageEntityService.js';
 
 export class PageLikeEntityService {

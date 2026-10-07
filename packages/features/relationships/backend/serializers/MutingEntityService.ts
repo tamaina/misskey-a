@@ -9,7 +9,7 @@ import type { Packed } from '@features/index/contract/packed.js';
 import type { } from '../models/Blocking.js';
 import type { MiUser } from '@features/users/backend/models/User.js';
 import type { MiMuting } from '../models/Muting.js';
-import { bindThis } from '@/decorators.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
 import type { IdService } from '@features/runtime/backend/services/IdService.js';
 import type { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 

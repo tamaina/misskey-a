@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { bindThis } from '@/decorators.js';
+import { bindThis } from '../decorators.js';
 import { logManager } from './logging-runtime.js';
 import type { LogEntryInput, LogLevel, LoggerContext, LogWriteInput } from './types.js';
 import type { Keyword } from 'color-convert';

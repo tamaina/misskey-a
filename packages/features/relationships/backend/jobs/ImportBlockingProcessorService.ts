@@ -12,11 +12,11 @@ import * as Acct from '@/misc/acct.js';
 import { RemoteUserResolveService } from '@features/federation/backend/services/RemoteUserResolveService.js';
 import { DownloadService } from '@features/runtime/backend/services/DownloadService.js';
 import { UtilityService } from '@features/federation/backend/services/UtilityService.js';
-import { bindThis } from '@/decorators.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
 import { QueueService } from '@features/runtime/backend/services/QueueService.js';
-import { QueueLoggerService } from '@/queue/QueueLoggerService.js';
+import { QueueLoggerService } from '@features/runtime/backend/queue/QueueLoggerService.js';
 import type * as Bull from 'bullmq';
-import type { DbUserImportJobData, DbUserImportToDbJobData } from '@/queue/types.js';
+import type { DbUserImportJobData, DbUserImportToDbJobData } from '@features/runtime/backend/queue/types.js';
 
 @Injectable()
 export class ImportBlockingProcessorService {

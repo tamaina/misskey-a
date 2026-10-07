@@ -12,7 +12,7 @@ import { awaitAll } from '@features/runtime/backend/async/await-all.js';
 import type { MiUser } from '@features/users/backend/models/User.js';
 import type { MiNote } from '../models/Note.js';
 import type { UsersRepository, NotesRepository, FollowingsRepository, PollsRepository, PollVotesRepository, NoteReactionsRepository, ChannelsRepository, MiMeta } from '@features/persistence/backend/repositories/models.js';
-import { bindThis } from '@/decorators.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
 import { DebounceLoader } from '@features/runtime/backend/async/loader.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { shouldHideNoteByTime } from '@/misc/should-hide-note-by-time.js';

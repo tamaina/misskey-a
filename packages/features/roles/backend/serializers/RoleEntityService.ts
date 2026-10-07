@@ -8,7 +8,7 @@ import type { RoleAssignmentsRepository, RolesRepository } from '@features/persi
 import { awaitAll } from '@features/runtime/backend/async/await-all.js';
 import type { MiUser } from '@features/users/backend/models/User.js';
 import type { MiRole } from '../models/Role.js';
-import { bindThis } from '@/decorators.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
 import { DEFAULT_POLICIES } from '../services/RoleService.js';
 import type { IdService } from '@features/runtime/backend/services/IdService.js';
 import { Packed } from '@features/index/contract/packed.js';

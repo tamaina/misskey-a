@@ -7,12 +7,12 @@ import { Inject, Injectable } from '@nestjs/common';
 import { IsNull, MoreThan } from 'typeorm';
 import { DI } from '@/di-symbols.js';
 import type { Logger } from '@features/runtime/backend/logging/logger.js';
-import { bindThis } from '@/decorators.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
 import type { RetentionAggregationsRepository, UsersRepository } from '@features/persistence/backend/repositories/models.js';
 import { deepClone } from '@features/runtime/backend/data/clone.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { isDuplicateKeyValueError } from '@features/persistence/backend/utility/is-duplicate-key-value-error.js';
-import { QueueLoggerService } from '@/queue/QueueLoggerService.js';
+import { QueueLoggerService } from '@features/runtime/backend/queue/QueueLoggerService.js';
 import type * as Bull from 'bullmq';
 
 @Injectable()

@@ -10,7 +10,7 @@ import * as Redis from 'ioredis';
 import * as WebSocket from 'ws';
 import { DI } from '@/di-symbols.js';
 import type { MiAccessToken } from '@features/persistence/backend/repositories/models.js';
-import { bindThis } from '@/decorators.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
 import { MiLocalUser } from '@features/users/backend/models/User.js';
 import { UserService } from '@features/users/backend/services/UserService.js';
 import { AuthenticateService, AuthenticationError } from '@features/auth/backend/transport/AuthenticateService.js';

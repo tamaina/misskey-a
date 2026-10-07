@@ -15,7 +15,7 @@ import { EntitySchema, LessThan, Between } from 'typeorm';
 import { dateUTC, isTimeSame, isTimeBefore, subtractTime, addTime } from '@features/runtime/backend/formatting/time.js';
 import { sqlStringEscape } from '@features/persistence/backend/utility/sql-string-escape.js';
 import type { Logger } from '@features/runtime/backend/logging/logger.js';
-import { bindThis } from '@/decorators.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
 import { MiRepository, miRepository } from '@features/persistence/backend/repositories/models.js';
 import type { DataSource, Repository } from 'typeorm';
 

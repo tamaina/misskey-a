@@ -7,7 +7,7 @@ import { supportedCaptchaProviders } from '../../contract/captcha-providers.js';
 import type { CaptchaProvider } from '../../contract/captcha-providers.js';
 import { Injectable } from '@nestjs/common';
 import { HttpRequestService } from '@features/runtime/backend/services/HttpRequestService.js';
-import { bindThis } from '@/decorators.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
 import { MetaService } from '@features/instance/backend/services/MetaService.js';
 import { MiMeta } from '@features/instance/backend/models/Meta.js';
 import { Logger } from '@features/runtime/backend/logging/logger.js';
