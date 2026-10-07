@@ -46,7 +46,13 @@ const SECOND_FETCH_LIMIT = 30;
 const TOLERANCE = 16;
 const APPEAR_MINIMUM_INTERVAL = 600;
 
-export type Paging<E extends keyof Misskey.Endpoints = keyof Misskey.Endpoints> = {
+type PagingEndpointPaths = {
+	[E in keyof Misskey.Endpoints]: Misskey.Endpoints[E]['res'] extends Array<{ id: string }>
+		? Misskey.Endpoints[E]['req'] extends object ? E : never
+		: never
+}[keyof Misskey.Endpoints];
+
+export type Paging<E extends PagingEndpointPaths = PagingEndpointPaths> = {
 	endpoint: E;
 	limit: number;
 	params?: Misskey.Endpoints[E]['req'] | ComputedRef<Misskey.Endpoints[E]['req']>;
