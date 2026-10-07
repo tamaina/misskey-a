@@ -17,6 +17,7 @@ import type { PackedNativeEndpoints as GamesPackedNativeEndpoints } from '../../
 import type { PackedNativeEndpoints as InstancePackedNativeEndpoints } from '../../instance/contract/packed-endpoint-definitions.js';
 import type { PackedNativeEndpoints as IntegrationsPackedNativeEndpoints } from '../../integrations/contract/packed-endpoint-definitions.js';
 import type { PackedNativeEndpoints as ModerationPackedNativeEndpoints } from '../../moderation/contract/packed-endpoint-definitions.js';
+import type { PackedNativeEndpoints as NoteSearchPackedNativeEndpoints } from '../../note-search/contract/index.js';
 import type { PackedNativeEndpoints as NotesPackedNativeEndpoints } from '../../notes/contract/packed-endpoint-definitions.js';
 import type { PackedNativeEndpoints as PagesPackedNativeEndpoints } from '../../pages/contract/packed-endpoint-definitions.js';
 import type { PackedNativeEndpoints as PlayPackedNativeEndpoints } from '../../play/contract/packed-endpoint-definitions.js';
@@ -39,6 +40,7 @@ export type PackedNativeEndpoints = AnnouncementsPackedNativeEndpoints
 	& InstancePackedNativeEndpoints
 	& IntegrationsPackedNativeEndpoints
 	& ModerationPackedNativeEndpoints
+	& NoteSearchPackedNativeEndpoints
 	& NotesPackedNativeEndpoints
 	& PagesPackedNativeEndpoints
 	& PlayPackedNativeEndpoints

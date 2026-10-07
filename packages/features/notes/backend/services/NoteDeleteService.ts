@@ -20,7 +20,7 @@ import { ApRendererService } from '@features/federation/backend/services/ApRende
 import { ApDeliverManagerService } from '@features/federation/backend/services/ApDeliverManagerService.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import { bindThis } from '@features/runtime/backend/decorators.js';
-import { SearchService } from '@features/discovery/backend/services/SearchService.js';
+import { SearchService } from '@features/note-search/backend/services/SearchService.js';
 import { ModerationLogService } from '@features/moderation/backend/services/ModerationLogService.js';
 import { isQuote, isRenote } from '../utility/is-renote.js';
 

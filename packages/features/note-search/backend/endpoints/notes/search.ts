@@ -4,7 +4,7 @@
  */
 
 import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { packedNotesSearchDefinition, packedNotesSearchInput, packedNotesSearchOutput } from '../../../contract/packed-endpoint-definitions.js';
+import { packedNotesSearchDefinition, packedNotesSearchInput, packedNotesSearchOutput } from '../../../contract/index.js';
 import { Injectable } from '@nestjs/common';
 
 import { SearchService } from '../../services/SearchService.js';

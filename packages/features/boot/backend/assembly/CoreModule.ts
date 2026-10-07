@@ -50,7 +50,7 @@ import { UserMutingService } from '@features/relationships/backend/services/User
 import { UserRenoteMutingService } from '@features/relationships/backend/services/UserRenoteMutingService.js';
 import { UserSuspendService } from '@features/moderation/backend/services/UserSuspendService.js';
 import { UserWebhookService } from '@features/integrations/backend/services/UserWebhookService.js';
-import { SearchService } from '@features/discovery/backend/services/SearchService.js';
+import { SearchService } from '@features/note-search/backend/services/SearchService.js';
 import { FanoutTimelineService } from '@features/timelines/backend/services/FanoutTimelineService.js';
 import { ChannelFollowingService } from '@features/channels/backend/services/ChannelFollowingService.js';
 import { ChatService } from '@features/chat/backend/services/ChatService.js';

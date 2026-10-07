@@ -29,5 +29,6 @@
 	"../features/collections/frontend/pages/gallery/edit.vue": "../features/gallery/frontend/pages/gallery/edit.vue",
 	"../features/collections/frontend/pages/gallery/index.vue": "../features/gallery/frontend/pages/gallery/index.vue",
 	"../features/collections/frontend/pages/gallery/post.vue": "../features/gallery/frontend/pages/gallery/post.vue",
-	"../features/collections/frontend/pages/user/gallery.vue": "../features/gallery/frontend/pages/user/gallery.vue"
+	"../features/collections/frontend/pages/user/gallery.vue": "../features/gallery/frontend/pages/user/gallery.vue",
+	"../features/note-search/frontend/pages/search.note.vue": "../features/discovery/frontend/pages/search.note.vue"
 }

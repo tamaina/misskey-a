@@ -46,7 +46,7 @@ import { RemoteUserResolveService } from '@features/federation/backend/services/
 import { bindThis } from '@features/runtime/backend/decorators.js';
 import { DB_MAX_NOTE_TEXT_LENGTH } from '../constants.js';
 import { RoleService } from '@features/roles/backend/services/RoleService.js';
-import { SearchService } from '@features/discovery/backend/services/SearchService.js';
+import { SearchService } from '@features/note-search/backend/services/SearchService.js';
 import { FeaturedService } from '@features/discovery/backend/services/FeaturedService.js';
 import { FanoutTimelineService } from '@features/timelines/backend/services/FanoutTimelineService.js';
 import { UtilityService } from '@features/federation/backend/services/UtilityService.js';

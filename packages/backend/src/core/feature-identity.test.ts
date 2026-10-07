@@ -146,7 +146,7 @@ import { RoleService } from '@features/roles/backend/services/RoleService.js';
 
 import { S3Service } from '@features/runtime/backend/services/S3Service.js';
 
-import { SearchService } from '@features/discovery/backend/services/SearchService.js';
+import { SearchService } from '@features/note-search/backend/services/SearchService.js';
 
 import { SensitiveMediaDetectionService } from '@features/drive/backend/services/SensitiveMediaDetectionService.js';
 

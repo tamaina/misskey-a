@@ -749,7 +749,7 @@
 		]
 	},
 	{
-		"file": "packages/features/discovery/frontend/pages/search.note.vue",
+		"file": "packages/features/note-search/frontend/pages/search.note.vue",
 		"fixture": "packages/frontend/test/unit/sfc-next74-locale-migration.test.ts",
 		"oldOriginalSha256": "3f9938e99428e609f8553f79a332711e1f27eb93a00630f93a2d9ab3556b3688",
 		"oldMigratedSha256": "a2031129e2124e26f4d62a2fc50b082f7d2c69a23970e7ed7a45606117410316",

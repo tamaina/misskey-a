@@ -51,7 +51,7 @@ const props = withDefaults(defineProps<{
 	ignoreNotesSearchAvailable: false,
 });
 
-const XNote = defineAsyncComponent(() => import('@features/discovery/frontend/pages/search.note.vue'));
+const XNote = defineAsyncComponent(() => import('@features/note-search/frontend/pages/search.note.vue'));
 const XUser = defineAsyncComponent(() => import('@features/discovery/frontend/pages/search.user.vue'));
 
 const tab = ref(toRef(props, 'type').value);

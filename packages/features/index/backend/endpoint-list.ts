@@ -337,7 +337,7 @@ export * as 'notes/reactions/create' from '@features/notes/backend/endpoints/not
 export * as 'notes/reactions/delete' from '@features/notes/backend/endpoints/notes/reactions/delete.js';
 export * as 'notes/renotes' from '@features/notes/backend/endpoints/notes/renotes.js';
 export * as 'notes/replies' from '@features/notes/backend/endpoints/notes/replies.js';
-export * as 'notes/search' from '@features/discovery/backend/endpoints/notes/search.js';
+export * as 'notes/search' from '@features/note-search/backend/endpoints/notes/search.js';
 export * as 'notes/search-by-tag' from '@features/discovery/backend/endpoints/notes/search-by-tag.js';
 export * as 'notes/show' from '@features/notes/backend/endpoints/notes/show.js';
 export * as 'notes/show-partial-bulk' from '@features/notes/backend/endpoints/notes/show-partial-bulk.js';

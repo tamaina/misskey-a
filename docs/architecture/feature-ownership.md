@@ -63,7 +63,8 @@ The [file allocation table](feature-file-allocation.tsv) records 419 service, se
 | `statistics` | chart management/logger, telemetry, queue/server stats, retention/chart jobs | charts/statistics, dashboard widgets |
 | `notes` | NoteCreate/Delete/Draft/Pining, Poll, Reaction, ReactionsBuffering; note serializers/jobs | notes/replies/renotes/reactions/polls, note UI; `note.tsx` |
 | `timelines` | FanoutTimeline, FanoutTimelineEndpoint, Antenna; antenna serializer | timeline/antenna queries, timeline UI; consumes note read/event ports |
-| `discovery` | Search, UserSearch, Hashtag, Featured; hashtag serializer | search/explore/trends/hashtags/featured views |
+| `discovery` | UserSearch, Hashtag, Featured; hashtag serializer | shared search tabs, user/settings search, autocomplete, explore/trends/hashtags/featured views |
+| `note-search` | SearchService and notes/search contract/endpoint | note text search and SQL LIKE / Meilisearch indexing; note/user orchestration calls its index methods |
 | `drive` | DriveService, drive-file/folder serializers, file deletion/cleanup jobs; FileInfo, ImageProcessing, VideoProcessing, SensitiveMediaDetection | files/folders/uploads, drive browser/admin surfaces, media display, transformation/detection and browser workers |
 | `emojis` | CustomEmoji, EmojiEntityService, emoji import/export jobs and frontend state | public/admin emoji API, catalog/picker/manager/editor |
 | `avatar-decorations` | AvatarDecorationService | decoration catalog/manager/editor and admin routes |
