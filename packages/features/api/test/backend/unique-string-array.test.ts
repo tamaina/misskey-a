@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import _Ajv from 'ajv';
+import * as _Ajv from 'ajv';
 import { expect, expectTypeOf, test } from 'vitest';
 import * as v from 'valibot';
 import { defineEndpointContract } from '@features/api/contract/definition.js';

@@ -4,7 +4,8 @@
  */
 
 import { describe, test, assert, afterEach } from 'vitest';
-import { render, cleanup, type RenderResult } from '@testing-library/vue';
+import { render, cleanup } from '@testing-library/vue';
+import type { RenderResult } from '@testing-library/vue';
 import * as Misskey from 'misskey-js';
 import { createInternationalization } from 'virtual:vite-vue-internationalization';
 import { components } from '@features/index/frontend/components.js';

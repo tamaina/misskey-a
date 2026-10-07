@@ -13,7 +13,8 @@
 		"../vue-shims.d.ts",
 		"../@types/**/*.d.ts",
 		"../../features/*/frontend/**/*.ts",
-		"../../features/*/frontend/**/*.vue"
+		"../../features/*/frontend/**/*.vue",
+		"../../features/*/test/frontend/**/*.ts"
 	],
 	"exclude": [
 		"../../features/drive/frontend/workers/**/*.ts",

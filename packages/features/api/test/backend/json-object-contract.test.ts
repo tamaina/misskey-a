@@ -5,7 +5,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'vitest';
 import * as v from 'valibot';
-import _Ajv from 'ajv';
+import * as _Ajv from 'ajv';
 import { jsonNumber } from '@features/api/contract/json-number.js';
 import { jsonObject, getJsonObjectGuardRegistration } from '@features/api/contract/json-object.js';
 import { toLegacyJsonSchema as proposed } from '@features/api/backend/index.js';

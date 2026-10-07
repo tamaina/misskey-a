@@ -3,7 +3,7 @@ import { getConfig } from './vite.config.js';
 
 export default mergeConfig(getConfig(), defineConfig({
 	test: {
-		include: ['./test/unit/**/*.test.ts', '../features/*/frontend/**/*.test.ts'],
+		include: ['./test/unit/**/*.test.ts', '../features/*/frontend/**/*.test.ts', '../features/*/test/frontend/**/*.test.ts'],
 		exclude: ['../features/*/frontend/embed/**', '**/node_modules/**'],
 		environment: 'happy-dom',
 		setupFiles: ['./test/setup.unit.ts'],

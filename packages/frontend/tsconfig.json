@@ -41,6 +41,7 @@
 			"misskey-js/*": ["./node_modules/misskey-js/built/*"],
 			"chartjs-adapter-date-fns": ["./node_modules/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.esm.js"],
 			"vitest": ["./node_modules/vitest"],
+			"intersection-observer": ["./node_modules/intersection-observer"],
 			"i18n": ["./node_modules/i18n"],
 			"@/*": ["./src/*"],
 			"@@/*": ["../frontend-shared/*"],
@@ -76,7 +77,8 @@
 		"./@types/**/*.ts",
 		"../features/*/frontend/**/*.ts",
 		"../features/*/frontend/**/*.vue",
-		"../features/*/shared/**/*.ts"
+		"../features/*/shared/**/*.ts",
+		"../features/*/test/frontend/**/*.ts"
 	],
 	"exclude": [
 		"../features/*/frontend/embed/**",

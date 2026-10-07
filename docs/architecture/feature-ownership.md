@@ -283,8 +283,8 @@ Bodies, DI identities, route/stream behavior and the explicit fallback asset pat
 are preserved. The anonymous reaction helper uses `.mts` to retain its ESM default
 function without a package configuration or forwarding stub.
 
-`packages/backend/src` retains 91 files: `config.ts`, `env.ts`, `di-symbols.ts` and
-`global.d.ts`; ten package ambient/dependency declarations; 70 test sources (including
+`packages/backend/src` retains 86 files: `config.ts`, `env.ts`, `di-symbols.ts` and
+`global.d.ts`; ten package ambient/dependency declarations; 65 test sources (including
 five compile-time test files), one test fixture and the six held PNG assets.
 Package-owned launch, build, migration and central test configuration remain in
 backend. Cross-feature DI, entity identity, endpoint registry and HTTP/SDK parity
@@ -297,7 +297,11 @@ retirement are still separate work, as is the fallback asset defect above.
 
 ### Proposed test placement by behavior owner
 
-This is a proposal; tests have not moved. Classify tests by the behavior they
+The first bounded cohort has moved: five API contract/helper tests now live in
+`features/api/test/backend/`; frontend profile home, media image, emoji and URL
+preview tests live in their respective owners’ `test/frontend/` trees. Search
+service tests live in `features/note-search/test/backend/`. The remaining rows
+below are placement proposals. Classify tests by the behavior they
 verify, including both backend `src` and `test` trees and frontend package/colocated
 tests. A DB, Redis, Nest, HTTP or storage fixture does not itself make a test
 cross-feature. Single-owner tests can use `features/<owner>/test/backend/` with the existing backend-owned Vitest,
