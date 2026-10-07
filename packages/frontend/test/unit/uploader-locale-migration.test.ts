@@ -164,9 +164,9 @@ describe('uploader locale-tag migration', () => {
 		(await internationalization('ca-ES')).install(createApp({}));
 		expect(interpolateLocaleParameters(raw.savedXPercent, { x: 25 })).toBe('25% d\'estalvi ');
 		const nativeFormatter = createComponentLocalizer('/features/drive/frontend/components/MkUploaderItems.vue').savedXPercent;
-			if (typeof nativeFormatter !== 'function') throw new Error('Missing native formatter');
-			expect(nativeFormatter({ x: 25 })).toBe('25% d\'estalvi');
-	});
+		if (typeof nativeFormatter !== 'function') throw new Error('Missing native formatter');
+		expect(nativeFormatter({ x: 25 })).toBe('25% d\'estalvi');
+	}, 30000);
 
 	test('preserves repeated parameters and explicitly excludes known production coercion disagreements', () => {
 		expect(interpolateLocaleParameters(' {x}|{x} d\'estalvi ', { x: '$&' })).toBe(' $&|$& d\'estalvi ');

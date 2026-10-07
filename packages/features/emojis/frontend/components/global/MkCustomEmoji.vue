@@ -45,7 +45,7 @@ import { customEmojisMap } from '@features/emojis/frontend/custom-emojis.js';
 import * as os from '@features/ui/frontend/os.js';
 import { misskeyApi, misskeyApiGet } from '@features/api/frontend/utility/misskey-api.js';
 import { copyToClipboard } from '@features/ui/frontend/utility/copy-to-clipboard.js';
-import { i18n } from '@features/runtime/frontend/i18n.js';
+import { interpolateLocaleParameters } from '@features/runtime/frontend/interpolate-locale-parameters.js';
 import MkCustomEmojiDetailedDialog from '@features/emojis/frontend/components/MkCustomEmojiDetailedDialog.vue';
 import { $i } from '@features/auth/frontend/i.js';
 import { prefer } from '@features/preferences/frontend/preferences.js';
@@ -115,7 +115,7 @@ function onClick(ev: PointerEvent) {
 
 		if (isLocal.value) {
 			menuItems.push({
-				text: i18n.ts.copy,
+				text: $locale.value.sfc.copy,
 				icon: 'ti ti-copy',
 				action: () => {
 					copyToClipboard(`:${props.name}:`);
@@ -125,7 +125,7 @@ function onClick(ev: PointerEvent) {
 
 		if (props.menuReaction && react) {
 			menuItems.push({
-				text: i18n.ts.doReaction,
+				text: $locale.value.sfc.doReaction,
 				icon: 'ti ti-plus',
 				action: () => {
 					react(`:${props.name}:`);
@@ -137,7 +137,7 @@ function onClick(ev: PointerEvent) {
 			menuItems.push({
 				type: 'divider',
 			}, {
-				text: i18n.ts.info,
+				text: $locale.value.sfc.info,
 				icon: 'ti ti-info-circle',
 				action: async () => {
 					const { dispose } = os.popup(MkCustomEmojiDetailedDialog, {
@@ -153,7 +153,7 @@ function onClick(ev: PointerEvent) {
 
 		if (isMuted.value) {
 			menuItems.push({
-				text: i18n.ts.emojiUnmute,
+				text: $locale.value.sfc.emojiUnmute,
 				icon: 'ti ti-mood-smile',
 				action: async () => {
 					await unmute();
@@ -161,7 +161,7 @@ function onClick(ev: PointerEvent) {
 			});
 		} else {
 			menuItems.push({
-				text: i18n.ts.emojiMute,
+				text: $locale.value.sfc.emojiMute,
 				icon: 'ti ti-mood-off',
 				action: async () => {
 					await mute();
@@ -171,7 +171,7 @@ function onClick(ev: PointerEvent) {
 
 		if (isLocal.value) {
 			menuItems.push({
-				text: i18n.ts.addToEmojiPalette,
+				text: $locale.value.sfc.addToEmojiPalette,
 				icon: 'ti ti-palette',
 				action: () => {
 					addToEmojiPalette(`:${props.name}:`);
@@ -183,7 +183,7 @@ function onClick(ev: PointerEvent) {
 			menuItems.push({
 				type: 'divider',
 			}, {
-				text: i18n.ts.edit,
+				text: $locale.value.sfc.edit,
 				icon: 'ti ti-pencil',
 				action: async () => {
 					await edit(props.name);
@@ -212,7 +212,7 @@ function mute() {
 		: emojiCodeToMute;
 	os.confirm({
 		type: 'question',
-		title: i18n.tsx.muteX({ x: titleEmojiName }),
+		title: interpolateLocaleParameters($locale.value.sfc.muteX, { x: titleEmojiName }),
 	}).then(({ canceled }) => {
 		if (canceled) {
 			return;
@@ -227,7 +227,7 @@ function unmute() {
 		: emojiCodeToMute;
 	os.confirm({
 		type: 'question',
-		title: i18n.tsx.unmuteX({ x: titleEmojiName }),
+		title: interpolateLocaleParameters($locale.value.sfc.unmuteX, { x: titleEmojiName }),
 	}).then(({ canceled }) => {
 		if (canceled) {
 			return;
@@ -263,3 +263,395 @@ function unmute() {
 	height: auto !important;
 }
 </style>
+
+<locale lang="json" locale="ar-SA">
+{
+	"copy": "نسخ",
+	"doReaction": "Add reaction",
+	"info": "عن",
+	"emojiUnmute": "Unmute emoji",
+	"emojiMute": "Mute emoji",
+	"addToEmojiPalette": "Add to emoji palette",
+	"edit": "التعديل",
+	"muteX": "Mute {x}",
+	"unmuteX": "Unmute {x}"
+}
+</locale>
+
+<locale lang="json" locale="ca-ES">
+{
+	"copy": "Copiar",
+	"doReaction": "Afegeix una reacció ",
+	"info": "Informació",
+	"emojiUnmute": "Deixar de silenciar emojis",
+	"emojiMute": "Silenciar emojis",
+	"addToEmojiPalette": "Afegeix al calaix d'emojis",
+	"edit": "Editar",
+	"muteX": "Silenciar {x}",
+	"unmuteX": "Deixar de silenciar {x}"
+}
+</locale>
+
+<locale lang="json" locale="cs-CZ">
+{
+	"copy": "Kopírovat",
+	"doReaction": "Add reaction",
+	"info": "Informace",
+	"emojiUnmute": "Unmute emoji",
+	"emojiMute": "Mute emoji",
+	"addToEmojiPalette": "Add to emoji palette",
+	"edit": "Upravit",
+	"muteX": "Mute {x}",
+	"unmuteX": "Unmute {x}"
+}
+</locale>
+
+<locale lang="json" locale="da-DK">
+{
+	"copy": "Copy",
+	"doReaction": "Add reaction",
+	"info": "About",
+	"emojiUnmute": "Unmute emoji",
+	"emojiMute": "Mute emoji",
+	"addToEmojiPalette": "Add to emoji palette",
+	"edit": "Edit",
+	"muteX": "Mute {x}",
+	"unmuteX": "Unmute {x}"
+}
+</locale>
+
+<locale lang="json" locale="de-DE">
+{
+	"copy": "Kopieren",
+	"doReaction": "Reagieren",
+	"info": "Über",
+	"emojiUnmute": "Emoji-Stummschaltung aufheben",
+	"emojiMute": "Emoji stummschalten",
+	"addToEmojiPalette": "Add to emoji palette",
+	"edit": "Bearbeiten",
+	"muteX": "{x} stummschalten",
+	"unmuteX": "Stummschaltung von {x} aufheben"
+}
+</locale>
+
+<locale lang="json" locale="en-US">
+{
+	"copy": "Copy",
+	"doReaction": "Add reaction",
+	"info": "About",
+	"emojiUnmute": "Unmute emoji",
+	"emojiMute": "Mute emoji",
+	"addToEmojiPalette": "Add to emoji palette",
+	"edit": "Edit",
+	"muteX": "Mute {x}",
+	"unmuteX": "Unmute {x}"
+}
+</locale>
+
+<locale lang="json" locale="es-ES">
+{
+	"copy": "Copiar",
+	"doReaction": "Añadir reacción",
+	"info": "Información",
+	"emojiUnmute": "No silenciar emoji",
+	"emojiMute": "Silenciar emoji",
+	"addToEmojiPalette": "Añadir a la paleta de emojis",
+	"edit": "Editar",
+	"muteX": "Silenciar {x}",
+	"unmuteX": "Dejar de silenciar {x}"
+}
+</locale>
+
+<locale lang="json" locale="fr-FR">
+{
+	"copy": "Copier",
+	"doReaction": "Réagir",
+	"info": "Informations",
+	"emojiUnmute": "Unmute emoji",
+	"emojiMute": "Mute emoji",
+	"addToEmojiPalette": "Add to emoji palette",
+	"edit": "Editer",
+	"muteX": "Mute {x}",
+	"unmuteX": "Unmute {x}"
+}
+</locale>
+
+<locale lang="json" locale="id-ID">
+{
+	"copy": "Salin",
+	"doReaction": "Tambahkan reaksi",
+	"info": "Informasi",
+	"emojiUnmute": "Unmute emoji",
+	"emojiMute": "Mute emoji",
+	"addToEmojiPalette": "Add to emoji palette",
+	"edit": "Sunting",
+	"muteX": "Mute {x}",
+	"unmuteX": "Unmute {x}"
+}
+</locale>
+
+<locale lang="json" locale="it-IT">
+{
+	"copy": "Copia",
+	"doReaction": "Reagisci",
+	"info": "Informazioni",
+	"emojiUnmute": "De silenzia emoji",
+	"emojiMute": "Silenzia emoji",
+	"addToEmojiPalette": "Aggiungi alla tavolozza emoji",
+	"edit": "Modifica",
+	"muteX": "Silenzia {x}",
+	"unmuteX": "De silenzia {x}"
+}
+</locale>
+
+<locale lang="json" locale="ja-JP">
+{
+	"copy": "コピー",
+	"doReaction": "リアクションする",
+	"info": "情報",
+	"emojiUnmute": "絵文字ミュート解除",
+	"emojiMute": "絵文字ミュート",
+	"addToEmojiPalette": "絵文字パレットに追加",
+	"edit": "編集",
+	"muteX": "{x}をミュート",
+	"unmuteX": "{x}のミュートを解除"
+}
+</locale>
+
+<locale lang="json" locale="ja-KS">
+{
+	"copy": "コピー",
+	"doReaction": "ツッコむで",
+	"info": "情報",
+	"emojiUnmute": "絵文字ミュートやめたる",
+	"emojiMute": "絵文字ミュート",
+	"addToEmojiPalette": "絵文字パレットに追加",
+	"edit": "編集",
+	"muteX": "{x}をミュート",
+	"unmuteX": "{x}のミュートやめたる"
+}
+</locale>
+
+<locale lang="json" locale="kab-KAB">
+{
+	"copy": "Copy",
+	"doReaction": "Add reaction",
+	"info": "About",
+	"emojiUnmute": "Unmute emoji",
+	"emojiMute": "Mute emoji",
+	"addToEmojiPalette": "Add to emoji palette",
+	"edit": "Edit",
+	"muteX": "Mute {x}",
+	"unmuteX": "Unmute {x}"
+}
+</locale>
+
+<locale lang="json" locale="kn-IN">
+{
+	"copy": "Copy",
+	"doReaction": "Add reaction",
+	"info": "About",
+	"emojiUnmute": "Unmute emoji",
+	"emojiMute": "Mute emoji",
+	"addToEmojiPalette": "Add to emoji palette",
+	"edit": "Edit",
+	"muteX": "Mute {x}",
+	"unmuteX": "Unmute {x}"
+}
+</locale>
+
+<locale lang="json" locale="ko-KR">
+{
+	"copy": "복사",
+	"doReaction": "리액션 추가",
+	"info": "정보",
+	"emojiUnmute": "이모티콘 뮤트 해제",
+	"emojiMute": "이모티콘 뮤트",
+	"addToEmojiPalette": "이모지 팔레트에 추가",
+	"edit": "편집",
+	"muteX": "{x}를 뮤트",
+	"unmuteX": "{x}의 뮤트를 해제"
+}
+</locale>
+
+<locale lang="json" locale="nl-NL">
+{
+	"copy": "Kopiëren",
+	"doReaction": "Add reaction",
+	"info": "Over",
+	"emojiUnmute": "Unmute emoji",
+	"emojiMute": "Mute emoji",
+	"addToEmojiPalette": "Add to emoji palette",
+	"edit": "Bewerken",
+	"muteX": "Mute {x}",
+	"unmuteX": "Unmute {x}"
+}
+</locale>
+
+<locale lang="json" locale="no-NO">
+{
+	"copy": "Kopier",
+	"doReaction": "Add reaction",
+	"info": "Infomasjon",
+	"emojiUnmute": "Unmute emoji",
+	"emojiMute": "Mute emoji",
+	"addToEmojiPalette": "Add to emoji palette",
+	"edit": "Rediger",
+	"muteX": "Mute {x}",
+	"unmuteX": "Unmute {x}"
+}
+</locale>
+
+<locale lang="json" locale="pl-PL">
+{
+	"copy": "Kopiuj",
+	"doReaction": "Add reaction",
+	"info": "Informacje",
+	"emojiUnmute": "Unmute emoji",
+	"emojiMute": "Mute emoji",
+	"addToEmojiPalette": "Add to emoji palette",
+	"edit": "Edytuj",
+	"muteX": "Mute {x}",
+	"unmuteX": "Unmute {x}"
+}
+</locale>
+
+<locale lang="json" locale="pt-PT">
+{
+	"copy": "Copiar",
+	"doReaction": "Adicionar reação",
+	"info": "Informações",
+	"emojiUnmute": "Reativar emoji",
+	"emojiMute": "Silenciar emoji",
+	"addToEmojiPalette": "Add to emoji palette",
+	"edit": "Editar",
+	"muteX": "Silenciar {x}",
+	"unmuteX": "Reativar {x}"
+}
+</locale>
+
+<locale lang="json" locale="ru-RU">
+{
+	"copy": "Копировать",
+	"doReaction": "Добавить реакцию",
+	"info": "Описание",
+	"emojiUnmute": "Показать эмодзи",
+	"emojiMute": "Скрыть эмодзи",
+	"addToEmojiPalette": "Добавить к палитре эмодзи",
+	"edit": "Изменить",
+	"muteX": "Скрыть {x}",
+	"unmuteX": "Показать {x}"
+}
+</locale>
+
+<locale lang="json" locale="sk-SK">
+{
+	"copy": "Kopírovať",
+	"doReaction": "Add reaction",
+	"info": "Informácie",
+	"emojiUnmute": "Unmute emoji",
+	"emojiMute": "Mute emoji",
+	"addToEmojiPalette": "Add to emoji palette",
+	"edit": "Upraviť",
+	"muteX": "Mute {x}",
+	"unmuteX": "Unmute {x}"
+}
+</locale>
+
+<locale lang="json" locale="th-TH">
+{
+	"copy": "คัดลอก",
+	"doReaction": "เพิ่มรีแอคชั่น",
+	"info": "เกี่ยวกับ",
+	"emojiUnmute": "เลิกปิดเสียงเอโมจิ",
+	"emojiMute": "ปิดเสียงเอโมจิ",
+	"addToEmojiPalette": "Add to emoji palette",
+	"edit": "แก้ไข",
+	"muteX": "ปิดเสียง {x}",
+	"unmuteX": "เลิกปิดเสียง {x}"
+}
+</locale>
+
+<locale lang="json" locale="tr-TR">
+{
+	"copy": "Kopyala",
+	"doReaction": "Tepki ekle",
+	"info": "Hakkında",
+	"emojiUnmute": "Emoji ses aç",
+	"emojiMute": "Emoji ses kapat",
+	"addToEmojiPalette": "Add to emoji palette",
+	"edit": "Düzenle",
+	"muteX": "Sessiz {x}",
+	"unmuteX": "Sesi aç {x}"
+}
+</locale>
+
+<locale lang="json" locale="ug-CN">
+{
+	"copy": "Copy",
+	"doReaction": "Add reaction",
+	"info": "About",
+	"emojiUnmute": "Unmute emoji",
+	"emojiMute": "Mute emoji",
+	"addToEmojiPalette": "Add to emoji palette",
+	"edit": "Edit",
+	"muteX": "Mute {x}",
+	"unmuteX": "Unmute {x}"
+}
+</locale>
+
+<locale lang="json" locale="uk-UA">
+{
+	"copy": "Скопіювати",
+	"doReaction": "Додати реакцію",
+	"info": "Інформація",
+	"emojiUnmute": "Показувати емодзі",
+	"emojiMute": "Приховати емодзі",
+	"addToEmojiPalette": "Додати до палітри емодзі",
+	"edit": "Редагувати",
+	"muteX": "Приховати {x}",
+	"unmuteX": "Показувати {x}"
+}
+</locale>
+
+<locale lang="json" locale="vi-VN">
+{
+	"copy": "Sao chép",
+	"doReaction": "Add reaction",
+	"info": "Giới thiệu",
+	"emojiUnmute": "Unmute emoji",
+	"emojiMute": "Mute emoji",
+	"addToEmojiPalette": "Add to emoji palette",
+	"edit": "Sửa",
+	"muteX": "Mute {x}",
+	"unmuteX": "Unmute {x}"
+}
+</locale>
+
+<locale lang="json" locale="zh-CN">
+{
+	"copy": "复制",
+	"doReaction": "回应",
+	"info": "关于",
+	"emojiUnmute": "取消屏蔽表情符号",
+	"emojiMute": "屏蔽表情符号",
+	"addToEmojiPalette": "添加至表情符号选择器",
+	"edit": "编辑",
+	"muteX": "隐藏{x}",
+	"unmuteX": "取消对{x}的隐藏"
+}
+</locale>
+
+<locale lang="json" locale="zh-TW">
+{
+	"copy": "複製",
+	"doReaction": "做出反應",
+	"info": "資訊",
+	"emojiUnmute": "表情符號解除靜音",
+	"emojiMute": "表情符號靜音",
+	"addToEmojiPalette": "增加表情符號調色盤",
+	"edit": "編輯",
+	"muteX": "將 {x} 靜音",
+	"unmuteX": "將 {x} 解除靜音"
+}
+</locale>
