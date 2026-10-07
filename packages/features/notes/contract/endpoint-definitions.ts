@@ -7,9 +7,8 @@ import type { InferContractRouterInputs, InferContractRouterOutputs } from '@orp
 import * as v from 'valibot';
 import { defineEndpointContract } from '../../api/contract/definition.js';
 import { misskeyId } from '../../api/contract/index.js';
-import { resultObject } from '../../api/contract/result-object.js';
 
-export const inlineNotesDraftsCountInput = v.looseObject({});
+export const inlineNotesDraftsCountInput = v.object({});
 export const inlineNotesDraftsCountOutput = v.pipe(v.number(), v.metadata({ "description": "The number of drafts" }));
 export const inlineNotesDraftsCountDefinition = defineEndpointContract(
 	{ method: 'POST', path: '/notes/drafts/count', tags: ["notes", "drafts"] },
@@ -17,10 +16,10 @@ export const inlineNotesDraftsCountDefinition = defineEndpointContract(
 	inlineNotesDraftsCountOutput,
 );
 
-export const inlineNotesShowPartialBulkInput = v.looseObject({
+export const inlineNotesShowPartialBulkInput = v.object({
 	"noteIds": v.pipe(v.array(misskeyId), v.minLength(1), v.maxLength(100)),
 });
-export const inlineNotesShowPartialBulkOutput = v.array(resultObject({
+export const inlineNotesShowPartialBulkOutput = v.array(v.strictObject({
 		"id": v.string(),
 		"reactions": v.record(v.string(), v.number()),
 		"reactionEmojis": v.record(v.string(), v.string()),
@@ -44,11 +43,11 @@ export const inlineNotesStateDefinition = defineEndpointContract(
 	inlineNotesStateOutput,
 );
 
-export const inlineNotesTranslateInput = v.looseObject({
+export const inlineNotesTranslateInput = v.object({
 	"noteId": misskeyId,
 	"targetLang": v.string(),
 });
-export const inlineNotesTranslateOutput = v.optional(resultObject({
+export const inlineNotesTranslateOutput = v.optional(v.strictObject({
 	"sourceLang": v.string(),
 	"text": v.string(),
 }));
