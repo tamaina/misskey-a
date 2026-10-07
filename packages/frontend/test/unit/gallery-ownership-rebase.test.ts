@@ -21,5 +21,4 @@ describe('gallery ownership preserves frozen source identities', () => {
 		const localeStart = proof.migratedSource.indexOf('<locale ');
 		expect(rewrite(proof.migratedSource).slice(rewrite(proof.migratedSource).indexOf('<locale '))).toBe(proof.migratedSource.slice(localeStart));
 	});
-
 });
