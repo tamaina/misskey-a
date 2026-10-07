@@ -3,22 +3,18 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Inject, Injectable } from '@nestjs/common';
 import { In } from 'typeorm';
-import { DI } from '@/di-symbols.js';
 import type { AbuseReportNotificationRecipientRepository, MiAbuseReportNotificationRecipient } from '@/models/_.js';
 import { bindThis } from '@/decorators.js';
-import { UserEntityService } from '../../../users/backend/serializers/UserEntityService.js';
+import type { UserEntityService } from '../../../users/backend/serializers/UserEntityService.js';
 import { Packed } from '../../../index/contract/packed.js';
-import { SystemWebhookEntityService } from '../../../integrations/backend/serializers/SystemWebhookEntityService.js';
+import type { SystemWebhookEntityService } from '../../../integrations/backend/serializers/SystemWebhookEntityService.js';
 
-@Injectable()
 export class AbuseReportNotificationRecipientEntityService {
 	constructor(
-		@Inject(DI.abuseReportNotificationRecipientRepository)
 		private abuseReportNotificationRecipientRepository: AbuseReportNotificationRecipientRepository,
-		private userEntityService: UserEntityService,
-		private systemWebhookEntityService: SystemWebhookEntityService,
+		private userEntityService: Pick<UserEntityService, 'pack' | 'packMany'>,
+		private systemWebhookEntityService: Pick<SystemWebhookEntityService, 'pack' | 'packMany'>,
 	) {
 	}
 

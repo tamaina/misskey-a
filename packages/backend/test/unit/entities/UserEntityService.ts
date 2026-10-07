@@ -29,7 +29,6 @@ import { RoleService } from '../../../../features/roles/backend/services/RoleSer
 import { FederatedInstanceService } from '../../../../features/federation/backend/services/FederatedInstanceService.js';
 import { IdService } from '../../../../features/runtime/backend/services/IdService.js';
 import { UtilityService } from '@/core/UtilityService.js';
-import { EmojiEntityService } from '../../../../features/emojis/backend/serializers/EmojiEntityService.js';
 import { ModerationLogService } from '../../../../features/moderation/backend/services/ModerationLogService.js';
 import { GlobalEventService } from '../../../../features/runtime/backend/services/GlobalEventService.js';
 import { DriveFileEntityService } from '../../../../features/drive/backend/serializers/DriveFileEntityService.js';
@@ -150,7 +149,6 @@ describe('UserEntityService', () => {
 				IdService,
 				AvatarDecorationService,
 				UtilityService,
-				EmojiEntityService,
 				ModerationLogService,
 				GlobalEventService,
 				DriveFileEntityService,
@@ -180,6 +178,7 @@ describe('UserEntityService', () => {
 					...services,
 					...featureServiceGroups.announcements.providers,
 					...featureServiceGroups.pages.providers,
+					...featureServiceGroups.emojis.providers,
 					...services.map(x => ({ provide: x.name, useExisting: x })),
 				],
 			}).compile();

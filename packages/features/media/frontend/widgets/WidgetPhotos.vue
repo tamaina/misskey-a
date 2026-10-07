@@ -6,7 +6,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 <template>
 <MkContainer :showHeader="widgetProps.showHeader" :naked="widgetProps.transparent" :class="$style.root" :data-transparent="widgetProps.transparent ? true : null" data-testid="mkw-photos" class="mkw-photos">
 	<template #icon><i class="ti ti-camera"></i></template>
-	<template #header>{{ i18n.ts._widgets.photos }}</template>
+	<template #header>{{ $locale.sfc.photos }}</template>
 
 	<div class="">
 		<MkLoading v-if="fetching"/>
@@ -32,19 +32,18 @@ import { getStaticImageUrl } from '@features/media/frontend/utility/media-proxy.
 import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 import MkContainer from '@features/ui/frontend/components/MkContainer.vue';
 import { prefer } from '@features/preferences/frontend/preferences.js';
-import { i18n } from '@features/runtime/frontend/i18n.js';
 
 const name = 'photos';
 
 const widgetPropsDef = {
 	showHeader: {
 		type: 'boolean',
-		label: i18n.ts._widgetOptions.showHeader,
+		label: $locale.value.sfc.showHeader,
 		default: true,
 	},
 	transparent: {
 		type: 'boolean',
-		label: i18n.ts._widgetOptions.transparent,
+		label: $locale.value.sfc.transparent,
 		default: false,
 	},
 } satisfies FormWithDefault;
@@ -128,3 +127,227 @@ defineExpose<WidgetComponentExpose>({
 	}
 }
 </style>
+
+<locale locale="ar-SA" lang="json">
+{
+	"photos": "الصور",
+	"showHeader": "Show header",
+	"transparent": "Make background transparent"
+}
+</locale>
+
+<locale locale="ca-ES" lang="json">
+{
+	"photos": "Fotografies",
+	"showHeader": "Mostrar la capçalera",
+	"transparent": "Fons transparent"
+}
+</locale>
+
+<locale locale="cs-CZ" lang="json">
+{
+	"photos": "Fotky",
+	"showHeader": "Show header",
+	"transparent": "Make background transparent"
+}
+</locale>
+
+<locale locale="da-DK" lang="json">
+{
+	"photos": "Photos",
+	"showHeader": "Show header",
+	"transparent": "Make background transparent"
+}
+</locale>
+
+<locale locale="de-DE" lang="json">
+{
+	"photos": "Fotos",
+	"showHeader": "Kopfzeile anzeigen",
+	"transparent": "Hintergrund transparent machen"
+}
+</locale>
+
+<locale locale="en-US" lang="json">
+{
+	"photos": "Photos",
+	"showHeader": "Show header",
+	"transparent": "Make background transparent"
+}
+</locale>
+
+<locale locale="es-ES" lang="json">
+{
+	"photos": "Fotos",
+	"showHeader": "Mostrar encabezados",
+	"transparent": "Hacer fondo transparente"
+}
+</locale>
+
+<locale locale="fr-FR" lang="json">
+{
+	"photos": "Photos",
+	"showHeader": "Show header",
+	"transparent": "Make background transparent"
+}
+</locale>
+
+<locale locale="id-ID" lang="json">
+{
+	"photos": "Foto",
+	"showHeader": "Show header",
+	"transparent": "Make background transparent"
+}
+</locale>
+
+<locale locale="it-IT" lang="json">
+{
+	"photos": "Foto",
+	"showHeader": "Mostra la testata",
+	"transparent": "Sfondo trasparente"
+}
+</locale>
+
+<locale locale="ja-JP" lang="json">
+{
+	"photos": "フォト",
+	"showHeader": "ヘッダーを表示",
+	"transparent": "背景を透明にする"
+}
+</locale>
+
+<locale locale="ja-KS" lang="json">
+{
+	"photos": "フォト",
+	"showHeader": "ヘッダー出す",
+	"transparent": "背景を透明にする"
+}
+</locale>
+
+<locale locale="kab-KAB" lang="json">
+{
+	"photos": "Photos",
+	"showHeader": "Show header",
+	"transparent": "Make background transparent"
+}
+</locale>
+
+<locale locale="kn-IN" lang="json">
+{
+	"photos": "Photos",
+	"showHeader": "Show header",
+	"transparent": "Make background transparent"
+}
+</locale>
+
+<locale locale="ko-KR" lang="json">
+{
+	"photos": "사진",
+	"showHeader": "해더를 표시",
+	"transparent": "배경을 투명하게 설정"
+}
+</locale>
+
+<locale locale="nl-NL" lang="json">
+{
+	"photos": "Photos",
+	"showHeader": "Show header",
+	"transparent": "Make background transparent"
+}
+</locale>
+
+<locale locale="no-NO" lang="json">
+{
+	"photos": "Bilder",
+	"showHeader": "Show header",
+	"transparent": "Make background transparent"
+}
+</locale>
+
+<locale locale="pl-PL" lang="json">
+{
+	"photos": "Zdjęcia",
+	"showHeader": "Show header",
+	"transparent": "Make background transparent"
+}
+</locale>
+
+<locale locale="pt-PT" lang="json">
+{
+	"photos": "Fotos",
+	"showHeader": "Exibir cabeçalho",
+	"transparent": "Make background transparent"
+}
+</locale>
+
+<locale locale="ru-RU" lang="json">
+{
+	"photos": "Фото",
+	"showHeader": "Show header",
+	"transparent": "Make background transparent"
+}
+</locale>
+
+<locale locale="sk-SK" lang="json">
+{
+	"photos": "Fotky",
+	"showHeader": "Show header",
+	"transparent": "Make background transparent"
+}
+</locale>
+
+<locale locale="th-TH" lang="json">
+{
+	"photos": "รูปภาพ",
+	"showHeader": "แสดงส่วนหัว",
+	"transparent": "ทำพื้นหลังโปรงใส"
+}
+</locale>
+
+<locale locale="tr-TR" lang="json">
+{
+	"photos": "Fotoğraflar",
+	"showHeader": "Başlığı göster",
+	"transparent": "Arka planı şeffaf yapın"
+}
+</locale>
+
+<locale locale="ug-CN" lang="json">
+{
+	"photos": "Photos",
+	"showHeader": "Show header",
+	"transparent": "Make background transparent"
+}
+</locale>
+
+<locale locale="uk-UA" lang="json">
+{
+	"photos": "Фото",
+	"showHeader": "Show header",
+	"transparent": "Make background transparent"
+}
+</locale>
+
+<locale locale="vi-VN" lang="json">
+{
+	"photos": "Kho ảnh",
+	"showHeader": "Show header",
+	"transparent": "Make background transparent"
+}
+</locale>
+
+<locale locale="zh-CN" lang="json">
+{
+	"photos": "照片",
+	"showHeader": "显示标题",
+	"transparent": "使背景透明"
+}
+</locale>
+
+<locale locale="zh-TW" lang="json">
+{
+	"photos": "照片",
+	"showHeader": "檢視標頭 ",
+	"transparent": "使背景透明"
+}
+</locale>

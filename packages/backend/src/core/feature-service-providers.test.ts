@@ -62,9 +62,9 @@ describe('feature service composition adapter', () => {
 	test('CoreModule installs and exports every canonical service and compatibility alias once', () => {
 		const providers = Reflect.getMetadata(MODULE_METADATA.PROVIDERS, CoreModule) as Provider[];
 		const exports = Reflect.getMetadata(MODULE_METADATA.EXPORTS, CoreModule) as (Provider | InjectionToken)[];
-		expect(factoryProviders).toHaveLength(5);
-		expect(classProviders).toHaveLength(13);
-		expect(featureServiceExports).toHaveLength(25);
+		expect(factoryProviders).toHaveLength(18);
+		expect(classProviders).toHaveLength(37);
+		expect(featureServiceExports).toHaveLength(73);
 		for (const provider of featureServiceProviders) {
 			expect(providers.filter(candidate => providerToken(candidate) === providerToken(provider))).toEqual([provider]);
 		}
@@ -75,8 +75,7 @@ describe('feature service composition adapter', () => {
 
 	test('real Nest resolution shares one feature graph across class tokens, string aliases, and consumers', async () => {
 		const internalTokens = new Set(featureServiceProviders.map(providerToken));
-		const externalTokens = new Set(factoryProviders.flatMap(provider => provider.inject ?? []) as InjectionToken[]);
-		for (const token of externalTokens) expect(internalTokens.has(token)).toBe(false);
+		const externalTokens = new Set((factoryProviders.flatMap(provider => provider.inject ?? []) as InjectionToken[]).filter(token => !internalTokens.has(token)));
 		const createSpies = factoryProviders.map(provider => vi.spyOn(provider, 'useFactory'));
 		const module = await Test.createTestingModule({
 			providers: [
@@ -94,6 +93,7 @@ describe('feature service composition adapter', () => {
 				expect(service).toBeInstanceOf(provider.provide);
 				expect(module.get(name)).toBe(service);
 				expect(feature[name]).toBe(service);
+				expect(Object.values(service).every(dependency => dependency !== undefined)).toBe(true);
 				expect(Reflect.getMetadata('design:paramtypes', provider.provide)).toBeUndefined();
 			}
 			for (const [index, token] of featureServiceExports.entries()) {
@@ -106,7 +106,7 @@ describe('feature service composition adapter', () => {
 	});
 
 	test('selective local factory groups preserve strict ModuleRef aliases with complete dependencies', async () => {
-		const selectedProviders = [...featureServiceGroups.announcements.providers, ...featureServiceGroups.pages.providers];
+		const selectedProviders = [...featureServiceGroups.announcements.providers, ...featureServiceGroups.pages.providers, ...featureServiceGroups.emojis.providers];
 		const selectedFactories = selectedProviders.filter((provider): provider is FactoryProvider => typeof provider === 'object' && 'useFactory' in provider && typeof provider.provide === 'symbol');
 		const dependencies = new Set(selectedFactories.flatMap(provider => provider.inject ?? []) as InjectionToken[]);
 		const createSpies = selectedFactories.map(provider => vi.spyOn(provider, 'useFactory'));
@@ -120,7 +120,7 @@ describe('feature service composition adapter', () => {
 		try {
 			await module.init();
 			const resolver = module.get<ModuleRef>('strict local resolver');
-			for (const name of ['AnnouncementService', 'PageEntityService']) {
+			for (const name of ['AnnouncementService', 'PageEntityService', 'EmojiEntityService']) {
 				const provider = selectedProviders.find(candidate => typeof candidate === 'object' && typeof candidate.provide === 'function' && candidate.provide.name === name) as FactoryProvider;
 				expect(resolver.get(name)).toBe(module.get(provider.provide));
 			}
@@ -140,6 +140,19 @@ describe('feature service composition adapter', () => {
 			gallery: ['serializers/GalleryPostEntityService', 'serializers/GalleryLikeEntityService'],
 			pages: ['serializers/PageEntityService', 'serializers/PageLikeEntityService', 'services/PageService'],
 			play: ['serializers/FlashEntityService', 'serializers/FlashLikeEntityService', 'services/FlashService'],
+			auth: ['serializers/AppEntityService', 'serializers/AuthSessionEntityService', 'serializers/InviteCodeEntityService', 'serializers/SigninEntityService'],
+			channels: ['serializers/ChannelEntityService'],
+			chat: ['serializers/ChatEntityService'],
+			discovery: ['serializers/HashtagEntityService'],
+			drive: ['serializers/DriveFolderEntityService'],
+			emojis: ['serializers/EmojiEntityService'],
+			games: ['serializers/ReversiGameEntityService'],
+			instance: ['serializers/InstanceEntityService', 'serializers/MetaEntityService'],
+			integrations: ['serializers/SystemWebhookEntityService'],
+			moderation: ['serializers/AbuseReportNotificationRecipientEntityService', 'serializers/AbuseUserReportEntityService', 'serializers/ModerationLogEntityService'],
+			relationships: ['serializers/BlockingEntityService', 'serializers/FollowRequestEntityService', 'serializers/FollowingEntityService', 'serializers/MutingEntityService', 'serializers/RenoteMutingEntityService', 'serializers/UserListEntityService'],
+			roles: ['serializers/RoleEntityService'],
+			timelines: ['serializers/AntennaEntityService'],
 		};
 		for (const [feature, paths] of Object.entries(groups)) {
 			for (const path of ['services', ...paths]) {

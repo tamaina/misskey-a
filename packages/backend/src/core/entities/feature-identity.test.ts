@@ -139,6 +139,7 @@ for (const [moved, parameterCount] of cases) {
 			expect(Reflect.getMetadata('design:paramtypes', moved) ?? []).toHaveLength(parameterCount);
 		} else {
 			expect(registrations[0]).toHaveProperty('useFactory');
+			expect(Reflect.getMetadata('design:paramtypes', moved)).toBeUndefined();
 			expect(moved.length).toBe(parameterCount);
 		}
 	});

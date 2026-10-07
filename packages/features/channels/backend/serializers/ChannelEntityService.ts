@@ -3,9 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Inject, Injectable } from '@nestjs/common';
 import { In } from 'typeorm';
-import { DI } from '@/di-symbols.js';
 import type {
 	ChannelFavoritesRepository,
 	ChannelFollowingsRepository, ChannelMutingRepository,
@@ -19,28 +17,21 @@ import type { Packed } from '../../../index/contract/packed.js';
 import type { MiUser } from '../../../users/backend/models/User.js';
 import type { MiChannel } from '../models/Channel.js';
 import { bindThis } from '@/decorators.js';
-import { IdService } from '../../../runtime/backend/services/IdService.js';
-import { DriveFileEntityService } from '../../../drive/backend/serializers/DriveFileEntityService.js';
-import { NoteEntityService } from '../../../notes/backend/serializers/NoteEntityService.js';
+import type { IdService } from '../../../runtime/backend/services/IdService.js';
+import type { DriveFileEntityService } from '../../../drive/backend/serializers/DriveFileEntityService.js';
+import type { NoteEntityService } from '../../../notes/backend/serializers/NoteEntityService.js';
 
-@Injectable()
 export class ChannelEntityService {
 	constructor(
-		@Inject(DI.channelsRepository)
 		private channelsRepository: ChannelsRepository,
-		@Inject(DI.channelFollowingsRepository)
 		private channelFollowingsRepository: ChannelFollowingsRepository,
-		@Inject(DI.channelFavoritesRepository)
 		private channelFavoritesRepository: ChannelFavoritesRepository,
-		@Inject(DI.channelMutingRepository)
 		private channelMutingRepository: ChannelMutingRepository,
-		@Inject(DI.notesRepository)
 		private notesRepository: NotesRepository,
-		@Inject(DI.driveFilesRepository)
 		private driveFilesRepository: DriveFilesRepository,
-		private noteEntityService: NoteEntityService,
-		private driveFileEntityService: DriveFileEntityService,
-		private idService: IdService,
+		private noteEntityService: Pick<NoteEntityService, 'packMany'>,
+		private driveFileEntityService: Pick<DriveFileEntityService, 'getPublicUrl'>,
+		private idService: Pick<IdService, 'parse'>,
 	) {
 	}
 

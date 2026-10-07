@@ -7,10 +7,6 @@ import { Module } from '@nestjs/common';
 import { featureServiceProviders, featureServiceExports } from './feature-service-providers.js';
 import { FanoutTimelineEndpointService } from '../../../features/timelines/backend/services/FanoutTimelineEndpointService.js';
 import { AbuseReportService } from '../../../features/moderation/backend/services/AbuseReportService.js';
-import { SystemWebhookEntityService } from '../../../features/integrations/backend/serializers/SystemWebhookEntityService.js';
-import {
-	AbuseReportNotificationRecipientEntityService,
-} from '../../../features/moderation/backend/serializers/AbuseReportNotificationRecipientEntityService.js';
 import { AbuseReportNotificationService } from '../../../features/moderation/backend/services/AbuseReportNotificationService.js';
 import { SystemWebhookService } from '../../../features/integrations/backend/services/SystemWebhookService.js';
 import { UserSearchService } from '../../../features/discovery/backend/services/UserSearchService.js';
@@ -92,34 +88,12 @@ import PerUserDriveChart from './chart/charts/per-user-drive.js';
 import ApRequestChart from './chart/charts/ap-request.js';
 import { ChartManagementService } from '../../../features/statistics/backend/services/ChartManagementService.js';
 
-import { AbuseUserReportEntityService } from '../../../features/moderation/backend/serializers/AbuseUserReportEntityService.js';
-import { AntennaEntityService } from '../../../features/timelines/backend/serializers/AntennaEntityService.js';
-import { AppEntityService } from '../../../features/auth/backend/serializers/AppEntityService.js';
-import { AuthSessionEntityService } from '../../../features/auth/backend/serializers/AuthSessionEntityService.js';
-import { BlockingEntityService } from '../../../features/relationships/backend/serializers/BlockingEntityService.js';
-import { ChannelEntityService } from '../../../features/channels/backend/serializers/ChannelEntityService.js';
-import { ChatEntityService } from '../../../features/chat/backend/serializers/ChatEntityService.js';
 import { DriveFileEntityService } from '../../../features/drive/backend/serializers/DriveFileEntityService.js';
-import { DriveFolderEntityService } from '../../../features/drive/backend/serializers/DriveFolderEntityService.js';
-import { EmojiEntityService } from '../../../features/emojis/backend/serializers/EmojiEntityService.js';
-import { FollowingEntityService } from '../../../features/relationships/backend/serializers/FollowingEntityService.js';
-import { FollowRequestEntityService } from '../../../features/relationships/backend/serializers/FollowRequestEntityService.js';
-import { HashtagEntityService } from '../../../features/discovery/backend/serializers/HashtagEntityService.js';
-import { InstanceEntityService } from '../../../features/instance/backend/serializers/InstanceEntityService.js';
-import { InviteCodeEntityService } from '../../../features/auth/backend/serializers/InviteCodeEntityService.js';
-import { ModerationLogEntityService } from '../../../features/moderation/backend/serializers/ModerationLogEntityService.js';
-import { MutingEntityService } from '../../../features/relationships/backend/serializers/MutingEntityService.js';
-import { RenoteMutingEntityService } from '../../../features/relationships/backend/serializers/RenoteMutingEntityService.js';
 import { NoteEntityService } from '../../../features/notes/backend/serializers/NoteEntityService.js';
 import { NoteReactionEntityService } from '../../../features/notes/backend/serializers/NoteReactionEntityService.js';
 import { NoteDraftEntityService } from '../../../features/notes/backend/serializers/NoteDraftEntityService.js';
 import { NotificationEntityService } from '../../../features/notifications/backend/serializers/NotificationEntityService.js';
-import { SigninEntityService } from '../../../features/auth/backend/serializers/SigninEntityService.js';
 import { UserEntityService } from '../../../features/users/backend/serializers/UserEntityService.js';
-import { UserListEntityService } from '../../../features/relationships/backend/serializers/UserListEntityService.js';
-import { RoleEntityService } from '../../../features/roles/backend/serializers/RoleEntityService.js';
-import { ReversiGameEntityService } from '../../../features/games/backend/serializers/ReversiGameEntityService.js';
-import { MetaEntityService } from '../../../features/instance/backend/serializers/MetaEntityService.js';
 
 import { ApAudienceService } from '../../../features/federation/backend/services/ApAudienceService.js';
 import { ApDbResolverService } from '../../../features/federation/backend/services/ApDbResolverService.js';
@@ -230,36 +204,12 @@ const canonicalServices = {
 	PerUserDriveChart,
 	ApRequestChart,
 	ChartManagementService,
-	AbuseUserReportEntityService,
-	AbuseReportNotificationRecipientEntityService,
-	AntennaEntityService,
-	AppEntityService,
-	AuthSessionEntityService,
-	BlockingEntityService,
-	ChannelEntityService,
-	ChatEntityService,
 	DriveFileEntityService,
-	DriveFolderEntityService,
-	EmojiEntityService,
-	FollowingEntityService,
-	FollowRequestEntityService,
-	HashtagEntityService,
-	InstanceEntityService,
-	InviteCodeEntityService,
-	ModerationLogEntityService,
-	MutingEntityService,
-	RenoteMutingEntityService,
 	NoteEntityService,
 	NoteReactionEntityService,
 	NoteDraftEntityService,
 	NotificationEntityService,
-	SigninEntityService,
 	UserEntityService,
-	UserListEntityService,
-	RoleEntityService,
-	ReversiGameEntityService,
-	MetaEntityService,
-	SystemWebhookEntityService,
 	ApAudienceService,
 	ApDbResolverService,
 	ApDeliverManagerService,

@@ -6,11 +6,11 @@ SPDX-License-Identifier: AGPL-3.0-only
 <template>
 <PageWithHeader :actions="headerActions" :tabs="headerTabs">
 	<div class="_spacer" style="--MI_SPACER-w: 700px; --MI_SPACER-min: 16px; --MI_SPACER-max: 32px;">
-		<SearchMarker path="/admin/external-services" :label="i18n.ts.externalServices" :keywords="['external', 'services', 'thirdparty']" icon="ti ti-link">
+		<SearchMarker path="/admin/external-services" :label="$locale.sfc.externalServices" :keywords="['external', 'services', 'thirdparty']" icon="ti ti-link">
 			<div class="_gaps_m">
 				<SearchMarker v-slot="slotProps">
 					<MkFolder :defaultOpen="slotProps.isParentOfTarget">
-						<template #label><SearchLabel>Google Analytics</SearchLabel><span class="_beta">{{ i18n.ts.beta }}</span></template>
+						<template #label><SearchLabel>Google Analytics</SearchLabel><span class="_beta">{{ $locale.sfc.beta }}</span></template>
 
 						<div class="_gaps_m">
 							<SearchMarker>
@@ -61,7 +61,6 @@ import MkSwitch from '@features/ui/frontend/components/MkSwitch.vue';
 import * as os from '@features/ui/frontend/os.js';
 import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 import { fetchInstance } from '@features/instance/frontend/instance.js';
-import { i18n } from '@features/runtime/frontend/i18n.js';
 import { definePage } from '@features/navigation/frontend/page.js';
 import MkFolder from '@features/ui/frontend/components/MkFolder.vue';
 
@@ -93,7 +92,203 @@ const headerActions = computed(() => []);
 const headerTabs = computed(() => []);
 
 definePage(() => ({
-	title: i18n.ts.externalServices,
+	title: $locale.value.sfc.externalServices,
 	icon: 'ti ti-link',
 }));
 </script>
+
+<locale locale="ar-SA" lang="json">
+{
+	"externalServices": "External Services",
+	"beta": "بيتا"
+}
+</locale>
+
+<locale locale="ca-ES" lang="json">
+{
+	"externalServices": "Serveis externs",
+	"beta": "Proves"
+}
+</locale>
+
+<locale locale="cs-CZ" lang="json">
+{
+	"externalServices": "External Services",
+	"beta": "Beta verze"
+}
+</locale>
+
+<locale locale="da-DK" lang="json">
+{
+	"externalServices": "External Services",
+	"beta": "Beta"
+}
+</locale>
+
+<locale locale="de-DE" lang="json">
+{
+	"externalServices": "Externe Dienste",
+	"beta": "Beta"
+}
+</locale>
+
+<locale locale="en-US" lang="json">
+{
+	"externalServices": "External Services",
+	"beta": "Beta"
+}
+</locale>
+
+<locale locale="es-ES" lang="json">
+{
+	"externalServices": "Servicios Externos",
+	"beta": "Beta"
+}
+</locale>
+
+<locale locale="fr-FR" lang="json">
+{
+	"externalServices": "Services externes",
+	"beta": "Bêta"
+}
+</locale>
+
+<locale locale="id-ID" lang="json">
+{
+	"externalServices": "Layanan eksternal",
+	"beta": "Beta"
+}
+</locale>
+
+<locale locale="it-IT" lang="json">
+{
+	"externalServices": "Servizi esterni",
+	"beta": "Versione beta"
+}
+</locale>
+
+<locale locale="ja-JP" lang="json">
+{
+	"externalServices": "外部サービス",
+	"beta": "ベータ"
+}
+</locale>
+
+<locale locale="ja-KS" lang="json">
+{
+	"externalServices": "他のサイトのサービス",
+	"beta": "ベータ"
+}
+</locale>
+
+<locale locale="kab-KAB" lang="json">
+{
+	"externalServices": "External Services",
+	"beta": "Beta"
+}
+</locale>
+
+<locale locale="kn-IN" lang="json">
+{
+	"externalServices": "External Services",
+	"beta": "Beta"
+}
+</locale>
+
+<locale locale="ko-KR" lang="json">
+{
+	"externalServices": "외부 서비스",
+	"beta": "베타"
+}
+</locale>
+
+<locale locale="nl-NL" lang="json">
+{
+	"externalServices": "External Services",
+	"beta": "Beta"
+}
+</locale>
+
+<locale locale="no-NO" lang="json">
+{
+	"externalServices": "External Services",
+	"beta": "Beta"
+}
+</locale>
+
+<locale locale="pl-PL" lang="json">
+{
+	"externalServices": "External Services",
+	"beta": "Beta"
+}
+</locale>
+
+<locale locale="pt-PT" lang="json">
+{
+	"externalServices": "Serviços Externos",
+	"beta": "Beta"
+}
+</locale>
+
+<locale locale="ru-RU" lang="json">
+{
+	"externalServices": "Интеграции",
+	"beta": "Бета"
+}
+</locale>
+
+<locale locale="sk-SK" lang="json">
+{
+	"externalServices": "External Services",
+	"beta": "Beta"
+}
+</locale>
+
+<locale locale="th-TH" lang="json">
+{
+	"externalServices": "บริการภายนอก",
+	"beta": "เบต้า"
+}
+</locale>
+
+<locale locale="tr-TR" lang="json">
+{
+	"externalServices": "Dış Hizmetler",
+	"beta": "Beta"
+}
+</locale>
+
+<locale locale="ug-CN" lang="json">
+{
+	"externalServices": "External Services",
+	"beta": "Beta"
+}
+</locale>
+
+<locale locale="uk-UA" lang="json">
+{
+	"externalServices": "Зовнішні сервіси",
+	"beta": "Бета"
+}
+</locale>
+
+<locale locale="vi-VN" lang="json">
+{
+	"externalServices": "Các dịch vụ bên ngoài",
+	"beta": "Beta"
+}
+</locale>
+
+<locale locale="zh-CN" lang="json">
+{
+	"externalServices": "外部服务",
+	"beta": "测试"
+}
+</locale>
+
+<locale locale="zh-TW" lang="json">
+{
+	"externalServices": "外部服務",
+	"beta": "測試版"
+}
+</locale>

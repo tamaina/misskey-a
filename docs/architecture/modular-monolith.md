@@ -446,3 +446,25 @@ resource-owning constructors or lazy ModuleRef lifecycle resolution. Boot will
 ultimately own construction and disposal directly, at which point the Nest-only
 adapter can be removed. Regression tests preserve all existing provider/export
 and alias identities, singleton sharing, and strict local test-module resolution.
+
+## Unique arrays, serializer factories and further local locales
+
+Five more contracts use a registered unique-string-array validator, bringing
+native endpoint coverage to 371 of 438 routes. It rejects repeated exact strings
+without changing their contents and projects the existing uniqueItems rule.
+The bridge recognizes its frozen action/base pair and rejects semantic metadata
+overrides on affected pipelines, ancestors and item schemas. Ordinary annotation
+metadata and unrelated legacy projection metadata retain their prior behavior.
+This is a supported-schema equivalence check, not a sandbox for arbitrary code.
+
+A further 24 lifecycle-free serializers now use typed factories, for 37 migrated
+classes across 18 feature groups. This second DI slice adds 359 production lines;
+it prioritizes explicit construction over a claim of immediate net reduction.
+Some serializer imports still reach RoleService through DEFAULT_POLICIES, and
+existing method-level effects remain. Pure construction does not imply complete
+transitive framework independence or a change in resource ownership.
+
+Another 50 components use local VVI dictionaries while retaining their original
+setup/computed/event timing. Parameterized outputs are checked across all active
+languages. Components whose formatting differs, including a trailing-whitespace
+case in MkUploaderItems, stay on the legacy path until separately reconciled.

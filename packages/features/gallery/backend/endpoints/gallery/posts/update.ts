@@ -3,13 +3,16 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { uniqueGalleryPostsUpdateDefinition, uniqueGalleryPostsUpdateInput, uniqueGalleryPostsUpdateOutput } from '../../../../contract/unique-string-endpoint-definitions.js';
 import ms from '@/runtime-dependencies/ms.js';
 import { Inject, Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
 import type { DriveFilesRepository, GalleryPostsRepository } from '@/models/_.js';
 import type { MiDriveFile } from '../../../../../drive/backend/models/DriveFile.js';
 import { GalleryPostEntityService } from '../../../serializers/GalleryPostEntityService.js';
 import { DI } from '@/di-symbols.js';
+
+const contractProjection = projectEndpointContract(uniqueGalleryPostsUpdateDefinition);
 
 export const meta = {
 	tags: ['gallery'],
@@ -25,33 +28,17 @@ export const meta = {
 		max: 300,
 	},
 
-	res: {
-		type: 'object',
-		optional: false, nullable: false,
-		ref: 'GalleryPost',
-	},
+	res: contractProjection.response,
 
 	errors: {
 
 	},
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {
-		postId: { type: 'string', format: 'misskey:id' },
-		title: { type: 'string', minLength: 1 },
-		description: { type: 'string', nullable: true },
-		fileIds: { type: 'array', uniqueItems: true, minItems: 1, maxItems: 32, items: {
-			type: 'string', format: 'misskey:id',
-		} },
-		isSensitive: { type: 'boolean', default: false },
-	},
-	required: ['postId'],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof uniqueGalleryPostsUpdateInput, typeof uniqueGalleryPostsUpdateOutput> {
 	constructor(
 		@Inject(DI.galleryPostsRepository)
 		private galleryPostsRepository: GalleryPostsRepository,
@@ -61,7 +48,7 @@ export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDe
 
 		private galleryPostEntityService: GalleryPostEntityService,
 	) {
-		super(meta, paramDef, async (ps, me) => {
+		super(meta, contractProjection, async (ps, me) => {
 			let files: Array<MiDriveFile> | undefined;
 
 			if (ps.fileIds) {

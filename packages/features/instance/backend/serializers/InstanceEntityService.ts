@@ -3,25 +3,21 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Inject, Injectable } from '@nestjs/common';
 import type { Packed } from '../../../index/contract/packed.js';
 import type { MiInstance } from '../../../federation/backend/models/Instance.js';
 import { bindThis } from '@/decorators.js';
-import { UtilityService } from '@/core/UtilityService.js';
-import { RoleService } from '../../../roles/backend/services/RoleService.js';
+import type { UtilityService } from '@/core/UtilityService.js';
+import type { RoleService } from '../../../roles/backend/services/RoleService.js';
 import { MiUser } from '../../../users/backend/models/User.js';
-import { DI } from '@/di-symbols.js';
 import { MiMeta } from '@/models/_.js';
 
-@Injectable()
 export class InstanceEntityService {
 	constructor(
-		@Inject(DI.meta)
 		private meta: MiMeta,
 
-		private roleService: RoleService,
+		private roleService: Pick<RoleService, 'isModerator'>,
 
-		private utilityService: UtilityService,
+		private utilityService: Pick<UtilityService, 'isBlockedHost' | 'isDeliverSuspendedSoftware' | 'isMediaSilencedHost' | 'isSilencedHost'>,
 	) {
 	}
 

@@ -4,6 +4,8 @@
  */
 import * as v from 'valibot';
 
+export { uniqueStringArray } from './unique-string-array.js';
+
 /** Preserve the legacy JSON-object request semantics, including extra fields. */
 export const objectParams = v.custom<Record<string, unknown>>(
 	value => value !== null && typeof value === 'object' && !Array.isArray(value),

@@ -3,13 +3,11 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Injectable } from '@nestjs/common';
 import type { Packed } from '../../../index/contract/packed.js';
 import type { } from '../../../relationships/backend/models/Blocking.js';
 import type { MiHashtag } from '../models/Hashtag.js';
 import { bindThis } from '@/decorators.js';
 
-@Injectable()
 export class HashtagEntityService {
 	constructor(
 	) {

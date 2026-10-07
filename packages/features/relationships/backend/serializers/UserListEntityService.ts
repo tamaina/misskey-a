@@ -3,27 +3,22 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Inject, Injectable } from '@nestjs/common';
-import { DI } from '@/di-symbols.js';
 import type { MiUserListMembership, UserListMembershipsRepository, UserListsRepository } from '@/models/_.js';
 import type { Packed } from '../../../index/contract/packed.js';
 import type { } from '../models/Blocking.js';
 import type { MiUserList } from '../models/UserList.js';
 import { bindThis } from '@/decorators.js';
-import { IdService } from '../../../runtime/backend/services/IdService.js';
-import { UserEntityService } from '../../../users/backend/serializers/UserEntityService.js';
+import type { IdService } from '../../../runtime/backend/services/IdService.js';
+import type { UserEntityService } from '../../../users/backend/serializers/UserEntityService.js';
 
-@Injectable()
 export class UserListEntityService {
 	constructor(
-		@Inject(DI.userListsRepository)
 		private userListsRepository: UserListsRepository,
 
-		@Inject(DI.userListMembershipsRepository)
 		private userListMembershipsRepository: UserListMembershipsRepository,
 
-		private userEntityService: UserEntityService,
-		private idService: IdService,
+		private userEntityService: Pick<UserEntityService, 'pack' | 'packMany'>,
+		private idService: Pick<IdService, 'parse'>,
 	) {
 	}
 

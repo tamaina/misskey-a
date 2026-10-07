@@ -3,21 +3,16 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Inject, Injectable } from '@nestjs/common';
-import { DI } from '@/di-symbols.js';
 import type { AccessTokensRepository, AppsRepository } from '@/models/_.js';
 import type { Packed } from '../../../index/contract/packed.js';
 import type { MiApp } from '../models/App.js';
 import type { MiUser } from '../../../users/backend/models/User.js';
 import { bindThis } from '@/decorators.js';
 
-@Injectable()
 export class AppEntityService {
 	constructor(
-		@Inject(DI.appsRepository)
 		private appsRepository: AppsRepository,
 
-		@Inject(DI.accessTokensRepository)
 		private accessTokensRepository: AccessTokensRepository,
 	) {
 	}

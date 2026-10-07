@@ -32,6 +32,46 @@ import { RoleService } from '../../../features/roles/backend/services/RoleServic
 import { DriveFileEntityService } from '../../../features/drive/backend/serializers/DriveFileEntityService.js';
 import { QueryService } from './QueryService.js';
 
+import { createAuthServices } from '../../../features/auth/backend/services.js';
+import { AppEntityService } from '../../../features/auth/backend/serializers/AppEntityService.js';
+import { AuthSessionEntityService } from '../../../features/auth/backend/serializers/AuthSessionEntityService.js';
+import { InviteCodeEntityService } from '../../../features/auth/backend/serializers/InviteCodeEntityService.js';
+import { SigninEntityService } from '../../../features/auth/backend/serializers/SigninEntityService.js';
+import { createChannelServices } from '../../../features/channels/backend/services.js';
+import { ChannelEntityService } from '../../../features/channels/backend/serializers/ChannelEntityService.js';
+import { createChatServices } from '../../../features/chat/backend/services.js';
+import { ChatEntityService } from '../../../features/chat/backend/serializers/ChatEntityService.js';
+import { createDiscoveryServices } from '../../../features/discovery/backend/services.js';
+import { HashtagEntityService } from '../../../features/discovery/backend/serializers/HashtagEntityService.js';
+import { createDriveServices } from '../../../features/drive/backend/services.js';
+import { DriveFolderEntityService } from '../../../features/drive/backend/serializers/DriveFolderEntityService.js';
+import { createEmojiServices } from '../../../features/emojis/backend/services.js';
+import { EmojiEntityService } from '../../../features/emojis/backend/serializers/EmojiEntityService.js';
+import { createGameServices } from '../../../features/games/backend/services.js';
+import { ReversiGameEntityService } from '../../../features/games/backend/serializers/ReversiGameEntityService.js';
+import { createInstanceServices } from '../../../features/instance/backend/services.js';
+import { InstanceEntityService } from '../../../features/instance/backend/serializers/InstanceEntityService.js';
+import { MetaEntityService } from '../../../features/instance/backend/serializers/MetaEntityService.js';
+import { UtilityService } from './UtilityService.js';
+import { SystemAccountService } from '../../../features/users/backend/services/SystemAccountService.js';
+import { createIntegrationServices } from '../../../features/integrations/backend/services.js';
+import { SystemWebhookEntityService } from '../../../features/integrations/backend/serializers/SystemWebhookEntityService.js';
+import { createModerationServices } from '../../../features/moderation/backend/services.js';
+import { AbuseReportNotificationRecipientEntityService } from '../../../features/moderation/backend/serializers/AbuseReportNotificationRecipientEntityService.js';
+import { AbuseUserReportEntityService } from '../../../features/moderation/backend/serializers/AbuseUserReportEntityService.js';
+import { ModerationLogEntityService } from '../../../features/moderation/backend/serializers/ModerationLogEntityService.js';
+import { createRelationshipServices } from '../../../features/relationships/backend/services.js';
+import { BlockingEntityService } from '../../../features/relationships/backend/serializers/BlockingEntityService.js';
+import { FollowRequestEntityService } from '../../../features/relationships/backend/serializers/FollowRequestEntityService.js';
+import { FollowingEntityService } from '../../../features/relationships/backend/serializers/FollowingEntityService.js';
+import { MutingEntityService } from '../../../features/relationships/backend/serializers/MutingEntityService.js';
+import { RenoteMutingEntityService } from '../../../features/relationships/backend/serializers/RenoteMutingEntityService.js';
+import { UserListEntityService } from '../../../features/relationships/backend/serializers/UserListEntityService.js';
+import { createRoleServices } from '../../../features/roles/backend/services.js';
+import { RoleEntityService } from '../../../features/roles/backend/serializers/RoleEntityService.js';
+import { createTimelineServices } from '../../../features/timelines/backend/services.js';
+import { AntennaEntityService } from '../../../features/timelines/backend/serializers/AntennaEntityService.js';
+
 // Nest is a transitional host adapter. Features receive only their named ports;
 // one feature factory owns construction, and class/string providers are aliases.
 function provideFeatureServices<Dependencies extends object, Services extends Record<string, object>>(
@@ -116,8 +156,103 @@ const play = provideFeatureServices('play', createPlayServices, {
 	queryService: QueryService,
 }, { FlashEntityService, FlashLikeEntityService, FlashService });
 
+const auth = provideFeatureServices('auth', createAuthServices, {
+	appsRepository: DI.appsRepository,
+	accessTokensRepository: DI.accessTokensRepository,
+	authSessionsRepository: DI.authSessionsRepository,
+	registrationTicketsRepository: DI.registrationTicketsRepository,
+	userEntityService: UserEntityService,
+	idService: IdService,
+}, { AppEntityService, AuthSessionEntityService, InviteCodeEntityService, SigninEntityService });
+
+const channels = provideFeatureServices('channels', createChannelServices, {
+	channelsRepository: DI.channelsRepository,
+	channelFollowingsRepository: DI.channelFollowingsRepository,
+	channelFavoritesRepository: DI.channelFavoritesRepository,
+	channelMutingRepository: DI.channelMutingRepository,
+	notesRepository: DI.notesRepository,
+	driveFilesRepository: DI.driveFilesRepository,
+	noteEntityService: NoteEntityService,
+	driveFileEntityService: DriveFileEntityService,
+	idService: IdService,
+}, { ChannelEntityService });
+
+const chat = provideFeatureServices('chat', createChatServices, {
+	chatMessagesRepository: DI.chatMessagesRepository,
+	chatRoomsRepository: DI.chatRoomsRepository,
+	chatRoomInvitationsRepository: DI.chatRoomInvitationsRepository,
+	chatRoomMembershipsRepository: DI.chatRoomMembershipsRepository,
+	userEntityService: UserEntityService,
+	driveFileEntityService: DriveFileEntityService,
+	idService: IdService,
+}, { ChatEntityService });
+
+const discovery = provideFeatureServices('discovery', createDiscoveryServices, {}, { HashtagEntityService });
+
+const drive = provideFeatureServices('drive', createDriveServices, {
+	driveFoldersRepository: DI.driveFoldersRepository,
+	driveFilesRepository: DI.driveFilesRepository,
+	idService: IdService,
+}, { DriveFolderEntityService });
+
+const emojis = provideFeatureServices('emojis', createEmojiServices, {
+	emojisRepository: DI.emojisRepository,
+	rolesRepository: DI.rolesRepository,
+}, { EmojiEntityService });
+
+const games = provideFeatureServices('games', createGameServices, {
+	reversiGamesRepository: DI.reversiGamesRepository,
+	userEntityService: UserEntityService,
+	idService: IdService,
+}, { ReversiGameEntityService });
+
+const instance = provideFeatureServices('instance', createInstanceServices, {
+	meta: DI.meta,
+	roleService: RoleService,
+	utilityService: UtilityService,
+	config: DI.config,
+	adsRepository: DI.adsRepository,
+	systemAccountService: SystemAccountService,
+}, { InstanceEntityService, MetaEntityService });
+
+const integrations = provideFeatureServices('integrations', createIntegrationServices, {
+	systemWebhooksRepository: DI.systemWebhooksRepository,
+}, { SystemWebhookEntityService });
+
+const moderation = provideFeatureServices('moderation', createModerationServices, {
+	abuseReportNotificationRecipientRepository: DI.abuseReportNotificationRecipientRepository,
+	userEntityService: UserEntityService,
+	systemWebhookEntityService: SystemWebhookEntityService,
+	abuseUserReportsRepository: DI.abuseUserReportsRepository,
+	idService: IdService,
+	moderationLogsRepository: DI.moderationLogsRepository,
+}, { AbuseReportNotificationRecipientEntityService, AbuseUserReportEntityService, ModerationLogEntityService });
+
+const relationships = provideFeatureServices('relationships', createRelationshipServices, {
+	blockingsRepository: DI.blockingsRepository,
+	userEntityService: UserEntityService,
+	idService: IdService,
+	followRequestsRepository: DI.followRequestsRepository,
+	followingsRepository: DI.followingsRepository,
+	mutingsRepository: DI.mutingsRepository,
+	renoteMutingsRepository: DI.renoteMutingsRepository,
+	userListsRepository: DI.userListsRepository,
+	userListMembershipsRepository: DI.userListMembershipsRepository,
+}, { BlockingEntityService, FollowRequestEntityService, FollowingEntityService, MutingEntityService, RenoteMutingEntityService, UserListEntityService });
+
+const roles = provideFeatureServices('roles', createRoleServices, {
+	rolesRepository: DI.rolesRepository,
+	roleAssignmentsRepository: DI.roleAssignmentsRepository,
+	idService: IdService,
+}, { RoleEntityService });
+
+const timelines = provideFeatureServices('timelines', createTimelineServices, {
+	antennasRepository: DI.antennasRepository,
+	idService: IdService,
+}, { AntennaEntityService });
+
 // Selective composition roots (including tests) reuse the same typed wiring.
-export const featureServiceGroups = { announcements, collections, gallery, pages, play };
+export const featureServiceGroups = { announcements, collections, gallery, pages, play, auth, channels, chat, discovery, drive, emojis, games, instance, integrations, moderation, relationships, roles, timelines };
 const features = Object.values(featureServiceGroups);
 
 export const featureServiceProviders: Provider[] = features.flatMap(feature => feature.providers);

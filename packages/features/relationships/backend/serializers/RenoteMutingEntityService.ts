@@ -3,8 +3,6 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Inject, Injectable } from '@nestjs/common';
-import { DI } from '@/di-symbols.js';
 import type { RenoteMutingsRepository } from '@/models/_.js';
 import { awaitAll } from '@/misc/prelude/await-all.js';
 import type { Packed } from '../../../index/contract/packed.js';
@@ -12,17 +10,15 @@ import type { } from '../models/Blocking.js';
 import type { MiUser } from '../../../users/backend/models/User.js';
 import type { MiRenoteMuting } from '../models/RenoteMuting.js';
 import { bindThis } from '@/decorators.js';
-import { IdService } from '../../../runtime/backend/services/IdService.js';
-import { UserEntityService } from '../../../users/backend/serializers/UserEntityService.js';
+import type { IdService } from '../../../runtime/backend/services/IdService.js';
+import type { UserEntityService } from '../../../users/backend/serializers/UserEntityService.js';
 
-@Injectable()
 export class RenoteMutingEntityService {
 	constructor(
-		@Inject(DI.renoteMutingsRepository)
 		private renoteMutingsRepository: RenoteMutingsRepository,
 
-		private userEntityService: UserEntityService,
-		private idService: IdService,
+		private userEntityService: Pick<UserEntityService, 'pack' | 'packMany'>,
+		private idService: Pick<IdService, 'parse'>,
 	) {
 	}
 

@@ -3,17 +3,13 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Inject, Injectable } from '@nestjs/common';
 import { In } from 'typeorm';
-import { DI } from '@/di-symbols.js';
 import type { MiSystemWebhook, SystemWebhooksRepository } from '@/models/_.js';
 import { bindThis } from '@/decorators.js';
 import { Packed } from '../../../index/contract/packed.js';
 
-@Injectable()
 export class SystemWebhookEntityService {
 	constructor(
-		@Inject(DI.systemWebhooksRepository)
 		private systemWebhooksRepository: SystemWebhooksRepository,
 	) {
 	}

@@ -27,7 +27,6 @@ import * as Misskey from 'misskey-js';
 import XContainer from '@features/pages/frontend/pages/page-editor/page-editor.container.vue';
 import { genId } from '@features/runtime/frontend/utility/id.js';
 import * as os from '@features/ui/frontend/os.js';
-import { i18n } from '@features/runtime/frontend/i18n.js';
 import { deepClone } from '@features/runtime/frontend/utility/clone.js';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import { getPageBlockList } from '@features/pages/frontend/pages/page-editor/common.js';
@@ -57,7 +56,7 @@ watch(children, () => {
 
 async function rename() {
 	const { canceled, result: title } = await os.inputText({
-		title: i18n.ts._pages.enterSectionTitle,
+		title: $locale.value.sfc.enterSectionTitle,
 		default: props.modelValue.title,
 	});
 	if (canceled || title == null) return;
@@ -69,7 +68,7 @@ async function rename() {
 
 async function add() {
 	const { canceled, result: type } = await os.select({
-		title: i18n.ts._pages.chooseBlock,
+		title: $locale.value.sfc.chooseBlock,
 		items: getPageBlockList(),
 	});
 	if (canceled || type == null) return;
@@ -128,3 +127,199 @@ onMounted(() => {
 	}
 }
 </style>
+
+<locale locale="ar-SA" lang="json">
+{
+	"enterSectionTitle": "Enter a section title",
+	"chooseBlock": "إضافة كتلة"
+}
+</locale>
+
+<locale locale="ca-ES" lang="json">
+{
+	"enterSectionTitle": "Escriu el títol de la secció",
+	"chooseBlock": "Afegeix un bloc"
+}
+</locale>
+
+<locale locale="cs-CZ" lang="json">
+{
+	"enterSectionTitle": "Enter a section title",
+	"chooseBlock": "Přidat blok"
+}
+</locale>
+
+<locale locale="da-DK" lang="json">
+{
+	"enterSectionTitle": "Enter a section title",
+	"chooseBlock": "Add a block"
+}
+</locale>
+
+<locale locale="de-DE" lang="json">
+{
+	"enterSectionTitle": "Titel des Abschnitts eingeben",
+	"chooseBlock": "Block hinzufügen"
+}
+</locale>
+
+<locale locale="en-US" lang="json">
+{
+	"enterSectionTitle": "Enter a section title",
+	"chooseBlock": "Add a block"
+}
+</locale>
+
+<locale locale="es-ES" lang="json">
+{
+	"enterSectionTitle": "Escribe el título de la sección",
+	"chooseBlock": "Agregar bloque"
+}
+</locale>
+
+<locale locale="fr-FR" lang="json">
+{
+	"enterSectionTitle": "Enter a section title",
+	"chooseBlock": "Ajouter un bloc"
+}
+</locale>
+
+<locale locale="id-ID" lang="json">
+{
+	"enterSectionTitle": "Enter a section title",
+	"chooseBlock": "Tambahkan blokir"
+}
+</locale>
+
+<locale locale="it-IT" lang="json">
+{
+	"enterSectionTitle": "Inserisci il titolo della sezione",
+	"chooseBlock": "Aggiungi blocco"
+}
+</locale>
+
+<locale locale="ja-JP" lang="json">
+{
+	"enterSectionTitle": "セクションタイトルを入力",
+	"chooseBlock": "ブロックを追加"
+}
+</locale>
+
+<locale locale="ja-KS" lang="json">
+{
+	"enterSectionTitle": "セクションタイトルを入れる",
+	"chooseBlock": "ブロックを追加"
+}
+</locale>
+
+<locale locale="kab-KAB" lang="json">
+{
+	"enterSectionTitle": "Enter a section title",
+	"chooseBlock": "Add a block"
+}
+</locale>
+
+<locale locale="kn-IN" lang="json">
+{
+	"enterSectionTitle": "Enter a section title",
+	"chooseBlock": "Add a block"
+}
+</locale>
+
+<locale locale="ko-KR" lang="json">
+{
+	"enterSectionTitle": "섹션 타이틀을 입력하기",
+	"chooseBlock": "블록 추가"
+}
+</locale>
+
+<locale locale="nl-NL" lang="json">
+{
+	"enterSectionTitle": "Enter a section title",
+	"chooseBlock": "Add a block"
+}
+</locale>
+
+<locale locale="no-NO" lang="json">
+{
+	"enterSectionTitle": "Enter a section title",
+	"chooseBlock": "Add a block"
+}
+</locale>
+
+<locale locale="pl-PL" lang="json">
+{
+	"enterSectionTitle": "Enter a section title",
+	"chooseBlock": "Dodaj blok"
+}
+</locale>
+
+<locale locale="pt-PT" lang="json">
+{
+	"enterSectionTitle": "Insira um título à seção",
+	"chooseBlock": "Adicionar bloco"
+}
+</locale>
+
+<locale locale="ru-RU" lang="json">
+{
+	"enterSectionTitle": "Enter a section title",
+	"chooseBlock": "Добавить блок"
+}
+</locale>
+
+<locale locale="sk-SK" lang="json">
+{
+	"enterSectionTitle": "Enter a section title",
+	"chooseBlock": "Pridať blok"
+}
+</locale>
+
+<locale locale="th-TH" lang="json">
+{
+	"enterSectionTitle": "ป้อนชื่อหัวข้อ",
+	"chooseBlock": "เพิ่มบล็อก"
+}
+</locale>
+
+<locale locale="tr-TR" lang="json">
+{
+	"enterSectionTitle": "Bölüm başlığını girin",
+	"chooseBlock": "Blok ekle"
+}
+</locale>
+
+<locale locale="ug-CN" lang="json">
+{
+	"enterSectionTitle": "Enter a section title",
+	"chooseBlock": "Add a block"
+}
+</locale>
+
+<locale locale="uk-UA" lang="json">
+{
+	"enterSectionTitle": "Enter a section title",
+	"chooseBlock": "Додати блок"
+}
+</locale>
+
+<locale locale="vi-VN" lang="json">
+{
+	"enterSectionTitle": "Enter a section title",
+	"chooseBlock": "Thêm khối"
+}
+</locale>
+
+<locale locale="zh-CN" lang="json">
+{
+	"enterSectionTitle": "输入会话标题",
+	"chooseBlock": "添加内容块"
+}
+</locale>
+
+<locale locale="zh-TW" lang="json">
+{
+	"enterSectionTitle": "輸入區段的標題",
+	"chooseBlock": "新增方塊"
+}
+</locale>

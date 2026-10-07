@@ -62,19 +62,18 @@ import * as sound from '@features/preferences/frontend/utility/sound.js';
 import { deepClone } from '@features/runtime/frontend/utility/clone.js';
 import { prefer } from '@features/preferences/frontend/preferences.js';
 import { genId } from '@features/runtime/frontend/utility/id.js';
-import { i18n } from '@features/runtime/frontend/i18n.js';
 
 const name = 'jobQueue';
 
 const widgetPropsDef = {
 	transparent: {
 		type: 'boolean',
-		label: i18n.ts._widgetOptions.transparent,
+		label: $locale.value.sfc.transparent,
 		default: false,
 	},
 	sound: {
 		type: 'boolean',
-		label: i18n.ts._widgetOptions._jobQueue.sound,
+		label: $locale.value.sfc.sound,
 		default: false,
 	},
 } satisfies FormWithDefault;
@@ -218,3 +217,199 @@ defineExpose<WidgetComponentExpose>({
 	}
 }
 </style>
+
+<locale locale="ar-SA" lang="json">
+{
+	"transparent": "Make background transparent",
+	"sound": "Play Sounds"
+}
+</locale>
+
+<locale locale="ca-ES" lang="json">
+{
+	"transparent": "Fons transparent",
+	"sound": "Reprodueix so"
+}
+</locale>
+
+<locale locale="cs-CZ" lang="json">
+{
+	"transparent": "Make background transparent",
+	"sound": "Play Sounds"
+}
+</locale>
+
+<locale locale="da-DK" lang="json">
+{
+	"transparent": "Make background transparent",
+	"sound": "Play Sounds"
+}
+</locale>
+
+<locale locale="de-DE" lang="json">
+{
+	"transparent": "Hintergrund transparent machen",
+	"sound": "Ton abspielen"
+}
+</locale>
+
+<locale locale="en-US" lang="json">
+{
+	"transparent": "Make background transparent",
+	"sound": "Play Sounds"
+}
+</locale>
+
+<locale locale="es-ES" lang="json">
+{
+	"transparent": "Hacer fondo transparente",
+	"sound": "Reproducir sonido"
+}
+</locale>
+
+<locale locale="fr-FR" lang="json">
+{
+	"transparent": "Make background transparent",
+	"sound": "Play Sounds"
+}
+</locale>
+
+<locale locale="id-ID" lang="json">
+{
+	"transparent": "Make background transparent",
+	"sound": "Play Sounds"
+}
+</locale>
+
+<locale locale="it-IT" lang="json">
+{
+	"transparent": "Sfondo trasparente",
+	"sound": "Emetti un suono"
+}
+</locale>
+
+<locale locale="ja-JP" lang="json">
+{
+	"transparent": "背景を透明にする",
+	"sound": "音を鳴らす"
+}
+</locale>
+
+<locale locale="ja-KS" lang="json">
+{
+	"transparent": "背景を透明にする",
+	"sound": "音を鳴らす"
+}
+</locale>
+
+<locale locale="kab-KAB" lang="json">
+{
+	"transparent": "Make background transparent",
+	"sound": "Play Sounds"
+}
+</locale>
+
+<locale locale="kn-IN" lang="json">
+{
+	"transparent": "Make background transparent",
+	"sound": "Play Sounds"
+}
+</locale>
+
+<locale locale="ko-KR" lang="json">
+{
+	"transparent": "배경을 투명하게 설정",
+	"sound": "소리 재생"
+}
+</locale>
+
+<locale locale="nl-NL" lang="json">
+{
+	"transparent": "Make background transparent",
+	"sound": "Play Sounds"
+}
+</locale>
+
+<locale locale="no-NO" lang="json">
+{
+	"transparent": "Make background transparent",
+	"sound": "Play Sounds"
+}
+</locale>
+
+<locale locale="pl-PL" lang="json">
+{
+	"transparent": "Make background transparent",
+	"sound": "Play Sounds"
+}
+</locale>
+
+<locale locale="pt-PT" lang="json">
+{
+	"transparent": "Make background transparent",
+	"sound": "Play Sounds"
+}
+</locale>
+
+<locale locale="ru-RU" lang="json">
+{
+	"transparent": "Make background transparent",
+	"sound": "Play Sounds"
+}
+</locale>
+
+<locale locale="sk-SK" lang="json">
+{
+	"transparent": "Make background transparent",
+	"sound": "Play Sounds"
+}
+</locale>
+
+<locale locale="th-TH" lang="json">
+{
+	"transparent": "ทำพื้นหลังโปรงใส",
+	"sound": "เล่นเสียง"
+}
+</locale>
+
+<locale locale="tr-TR" lang="json">
+{
+	"transparent": "Arka planı şeffaf yapın",
+	"sound": "Sesleri Çal"
+}
+</locale>
+
+<locale locale="ug-CN" lang="json">
+{
+	"transparent": "Make background transparent",
+	"sound": "Play Sounds"
+}
+</locale>
+
+<locale locale="uk-UA" lang="json">
+{
+	"transparent": "Make background transparent",
+	"sound": "Play Sounds"
+}
+</locale>
+
+<locale locale="vi-VN" lang="json">
+{
+	"transparent": "Make background transparent",
+	"sound": "Play Sounds"
+}
+</locale>
+
+<locale locale="zh-CN" lang="json">
+{
+	"transparent": "使背景透明",
+	"sound": "播放音效"
+}
+</locale>
+
+<locale locale="zh-TW" lang="json">
+{
+	"transparent": "使背景透明",
+	"sound": "播放音效"
+}
+</locale>

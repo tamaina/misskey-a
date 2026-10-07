@@ -10,14 +10,38 @@ import type { EndpointContractDefinition } from '../../../../features/api/contra
 import { toLegacyJsonSchema } from '../../../../features/api/backend/index.js';
 import type { Schema } from '@/misc/json-schema.js';
 import { getPackedReference } from '../../../../features/api/contract/packed-reference.js';
+import { getUniqueStringArrayBaseSchema } from '../../../../features/api/contract/unique-string-array.js';
 import { convertSchemaToOpenApiSchema } from './openapi/schemas.js';
 import { Endpoint } from './endpoint-base.js';
 import type { EndpointExecutor } from './endpoint-base.js';
 import type { IEndpointMeta } from './endpoints.js';
 
+/** Flatten public Valibot pipelines in the same order as the JSON Schema converter. */
+function* flattenInputPipe(pipe: unknown[], parents = new Set<object>()): Generator<unknown> {
+	for (const item of pipe) {
+		if (item !== null && typeof item === 'object' && 'pipe' in item && Array.isArray(item.pipe)) {
+			if (parents.has(item)) throw new Error('Legacy input contracts cannot use cyclic pipelines');
+			parents.add(item);
+			yield* flattenInputPipe(item.pipe, parents);
+			parents.delete(item);
+		} else {
+			yield item;
+		}
+	}
+}
+
 /** Reject runtime-only input behavior that an AJV projection cannot execute. */
-function assertStaticInputProjection(value: unknown, seen = new Set<object>()): void {
-	if (value === null || typeof value !== 'object' || seen.has(value)) return;
+function assertStaticInputProjection(value: unknown, seen = new Set<object>(), pipelineSchema?: object): void {
+	if (value === null || typeof value !== 'object') return;
+	const uniqueArrayBase = getUniqueStringArrayBaseSchema(value);
+	if (uniqueArrayBase !== undefined && pipelineSchema !== uniqueArrayBase) {
+		throw new Error('Unique string array validation must follow its original array schema');
+	}
+	if ('kind' in value && value.kind === 'validation' && 'type' in value
+		&& (value.type === 'check' || value.type === 'check_items') && uniqueArrayBase === undefined) {
+		throw new Error('Legacy input contracts cannot use unregistered validation predicates');
+	}
+	if (seen.has(value)) return;
 	seen.add(value);
 	if (getPackedReference(value) !== undefined) {
 		throw new Error('Legacy input contracts cannot use packed references');
@@ -40,8 +64,17 @@ function assertStaticInputProjection(value: unknown, seen = new Set<object>()): 
 	}
 	const fields: [string, unknown][] = Object.entries(value);
 	for (const [key, child] of fields) {
-		if (['wrapped', 'item', 'items', 'key', 'value', 'rest', 'pipe', 'options'].includes(key)) {
+		if (['wrapped', 'item', 'items', 'key', 'value', 'rest', 'options'].includes(key)) {
 			assertStaticInputProjection(child, seen);
+		}
+	}
+	if ('pipe' in value && Array.isArray(value.pipe)) {
+		let currentSchema: object | undefined;
+		for (const item of flattenInputPipe(value.pipe)) {
+			if (item !== null && typeof item === 'object' && 'kind' in item && item.kind === 'schema') {
+				currentSchema = item;
+			}
+			assertStaticInputProjection(item, seen, currentSchema);
 		}
 	}
 	if ('entries' in value && value.entries !== null && typeof value.entries === 'object') {

@@ -3,24 +3,20 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Inject, Injectable } from '@nestjs/common';
-import { DI } from '@/di-symbols.js';
 import type { AbuseUserReportsRepository } from '@/models/_.js';
 import { awaitAll } from '@/misc/prelude/await-all.js';
 import type { MiAbuseUserReport } from '../models/AbuseUserReport.js';
 import { bindThis } from '@/decorators.js';
-import { IdService } from '../../../runtime/backend/services/IdService.js';
+import type { IdService } from '../../../runtime/backend/services/IdService.js';
 import type { Packed } from '../../../index/contract/packed.js';
-import { UserEntityService } from '../../../users/backend/serializers/UserEntityService.js';
+import type { UserEntityService } from '../../../users/backend/serializers/UserEntityService.js';
 
-@Injectable()
 export class AbuseUserReportEntityService {
 	constructor(
-		@Inject(DI.abuseUserReportsRepository)
 		private abuseUserReportsRepository: AbuseUserReportsRepository,
 
-		private userEntityService: UserEntityService,
-		private idService: IdService,
+		private userEntityService: Pick<UserEntityService, 'pack' | 'packMany'>,
+		private idService: Pick<IdService, 'parse'>,
 	) {
 	}
 

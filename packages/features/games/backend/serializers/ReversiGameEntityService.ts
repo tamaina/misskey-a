@@ -3,29 +3,25 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Inject, Injectable } from '@nestjs/common';
-import { DI } from '@/di-symbols.js';
 import type { ReversiGamesRepository } from '@/models/_.js';
 import { awaitAll } from '@/misc/prelude/await-all.js';
 import type { Packed } from '../../../index/contract/packed.js';
 import type { } from '../../../relationships/backend/models/Blocking.js';
 import type { MiReversiGame } from '../models/ReversiGame.js';
 import { bindThis } from '@/decorators.js';
-import { IdService } from '../../../runtime/backend/services/IdService.js';
-import { UserEntityService } from '../../../users/backend/serializers/UserEntityService.js';
+import type { IdService } from '../../../runtime/backend/services/IdService.js';
+import type { UserEntityService } from '../../../users/backend/serializers/UserEntityService.js';
 
 function assertBw(bw: string): bw is Packed<'ReversiGameDetailed'>['bw'] {
 	return ['random', '1', '2'].includes(bw);
 }
 
-@Injectable()
 export class ReversiGameEntityService {
 	constructor(
-		@Inject(DI.reversiGamesRepository)
 		private reversiGamesRepository: ReversiGamesRepository,
 
-		private userEntityService: UserEntityService,
-		private idService: IdService,
+		private userEntityService: Pick<UserEntityService, 'pack' | 'packMany'>,
+		private idService: Pick<IdService, 'parse'>,
 	) {
 	}
 

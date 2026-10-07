@@ -36,7 +36,6 @@ import { useTemplateRef, shallowRef, ref, computed, watch, onBeforeUnmount } fro
 import * as Misskey from 'misskey-js';
 import tinycolor from 'tinycolor2';
 import type { Content } from '@features/media/frontend/components/MkLightbox.item.vue';
-import { i18n } from '@features/runtime/frontend/i18n.js';
 import { themeManager } from '@features/preferences/frontend/theme.js';
 import { prefer } from '@features/preferences/frontend/preferences.js';
 
@@ -653,7 +652,7 @@ function draw(dt: number) {
 		ctx.textAlign = 'center';
 		ctx.textBaseline = 'middle';
 		ctx.font = `${Math.round(canvas.height * 0.055)}px ${window.getComputedStyle(canvas).fontFamily}`;
-		ctx.fillText(i18n.ts.cannotPreview, centerX, centerY + avatarSize / 2 + canvas.height * 0.09);
+		ctx.fillText($locale.value.sfc.cannotPreview, centerX, centerY + avatarSize / 2 + canvas.height * 0.09);
 	}
 }
 
@@ -740,3 +739,171 @@ defineExpose({
 	scale: 1.2;
 }
 </style>
+
+<locale locale="ar-SA" lang="json">
+{
+	"cannotPreview": "تتعذر المعاينة"
+}
+</locale>
+
+<locale locale="ca-ES" lang="json">
+{
+	"cannotPreview": "No es pot previsualitzar"
+}
+</locale>
+
+<locale locale="cs-CZ" lang="json">
+{
+	"cannotPreview": "Náhled se nezdařil"
+}
+</locale>
+
+<locale locale="da-DK" lang="json">
+{
+	"cannotPreview": "Could not preview"
+}
+</locale>
+
+<locale locale="de-DE" lang="json">
+{
+	"cannotPreview": "Vorschau nicht anzeigbar"
+}
+</locale>
+
+<locale locale="en-US" lang="json">
+{
+	"cannotPreview": "Could not preview"
+}
+</locale>
+
+<locale locale="es-ES" lang="json">
+{
+	"cannotPreview": "No se pudo generar la vista previa"
+}
+</locale>
+
+<locale locale="fr-FR" lang="json">
+{
+	"cannotPreview": "Aperçu d'URL échoué"
+}
+</locale>
+
+<locale locale="id-ID" lang="json">
+{
+	"cannotPreview": "Tidak dapat dipratinjau"
+}
+</locale>
+
+<locale locale="it-IT" lang="json">
+{
+	"cannotPreview": "Anteprima non disponibile"
+}
+</locale>
+
+<locale locale="ja-JP" lang="json">
+{
+	"cannotPreview": "プレビューできません"
+}
+</locale>
+
+<locale locale="ja-KS" lang="json">
+{
+	"cannotPreview": "プレビューできへん"
+}
+</locale>
+
+<locale locale="kab-KAB" lang="json">
+{
+	"cannotPreview": "Could not preview"
+}
+</locale>
+
+<locale locale="kn-IN" lang="json">
+{
+	"cannotPreview": "Could not preview"
+}
+</locale>
+
+<locale locale="ko-KR" lang="json">
+{
+	"cannotPreview": "미리 볼 수 없음"
+}
+</locale>
+
+<locale locale="nl-NL" lang="json">
+{
+	"cannotPreview": "Could not preview"
+}
+</locale>
+
+<locale locale="no-NO" lang="json">
+{
+	"cannotPreview": "Could not preview"
+}
+</locale>
+
+<locale locale="pl-PL" lang="json">
+{
+	"cannotPreview": "Could not preview"
+}
+</locale>
+
+<locale locale="pt-PT" lang="json">
+{
+	"cannotPreview": "Não foi possível carregar prévia"
+}
+</locale>
+
+<locale locale="ru-RU" lang="json">
+{
+	"cannotPreview": "Предварительный просмотр недоступен"
+}
+</locale>
+
+<locale locale="sk-SK" lang="json">
+{
+	"cannotPreview": "Could not preview"
+}
+</locale>
+
+<locale locale="th-TH" lang="json">
+{
+	"cannotPreview": "ไม่สามารถดูตัวอย่างได้"
+}
+</locale>
+
+<locale locale="tr-TR" lang="json">
+{
+	"cannotPreview": "Önizleme yapılamadı"
+}
+</locale>
+
+<locale locale="ug-CN" lang="json">
+{
+	"cannotPreview": "Could not preview"
+}
+</locale>
+
+<locale locale="uk-UA" lang="json">
+{
+	"cannotPreview": "Не вдалося переглянути"
+}
+</locale>
+
+<locale locale="vi-VN" lang="json">
+{
+	"cannotPreview": "Không thể xem trước"
+}
+</locale>
+
+<locale locale="zh-CN" lang="json">
+{
+	"cannotPreview": "无法预览"
+}
+</locale>
+
+<locale locale="zh-TW" lang="json">
+{
+	"cannotPreview": "無法預覽"
+}
+</locale>

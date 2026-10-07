@@ -5,6 +5,7 @@
 
 import type { RemainingInlineNativeEndpoints } from './remaining-inline-native-endpoints.js';
 import type { DriveListingNativeEndpoints } from './drive-listing-native-endpoints.js';
+import type { UniqueStringNativeEndpoints } from './unique-string-native-endpoints.js';
 import type { InstanceEndpoints } from '../../instance/contract/index.js';
 import type { StatisticsEndpoints } from '../../statistics/contract/index.js';
 import type { AvatarDecorationEndpoints } from '../../avatar-decorations/contract/index.js';
@@ -51,6 +52,7 @@ export type FeatureEndpoints = ModerationCommandEndpoints
 	& PackedNativeEndpoints
 	& VoidNativeEndpoints
 	& RemainingInlineNativeEndpoints
-	& DriveListingNativeEndpoints;
+	& DriveListingNativeEndpoints
+	& UniqueStringNativeEndpoints;
 
 export type { PackedModels } from './packed.js';

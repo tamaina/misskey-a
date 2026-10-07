@@ -3,36 +3,29 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Inject, Injectable } from '@nestjs/common';
-import { DI } from '@/di-symbols.js';
 import type { MiUser, ChatMessagesRepository, MiChatMessage, ChatRoomsRepository, MiChatRoom, MiChatRoomInvitation, ChatRoomInvitationsRepository, MiChatRoomMembership, ChatRoomMembershipsRepository } from '@/models/_.js';
 import { awaitAll } from '@/misc/prelude/await-all.js';
 import type { Packed } from '../../../index/contract/packed.js';
 import type { } from '../../../relationships/backend/models/Blocking.js';
 import { bindThis } from '@/decorators.js';
-import { IdService } from '../../../runtime/backend/services/IdService.js';
-import { UserEntityService } from '../../../users/backend/serializers/UserEntityService.js';
-import { DriveFileEntityService } from '../../../drive/backend/serializers/DriveFileEntityService.js';
+import type { IdService } from '../../../runtime/backend/services/IdService.js';
+import type { UserEntityService } from '../../../users/backend/serializers/UserEntityService.js';
+import type { DriveFileEntityService } from '../../../drive/backend/serializers/DriveFileEntityService.js';
 import { In } from 'typeorm';
 
-@Injectable()
 export class ChatEntityService {
 	constructor(
-		@Inject(DI.chatMessagesRepository)
 		private chatMessagesRepository: ChatMessagesRepository,
 
-		@Inject(DI.chatRoomsRepository)
 		private chatRoomsRepository: ChatRoomsRepository,
 
-		@Inject(DI.chatRoomInvitationsRepository)
 		private chatRoomInvitationsRepository: ChatRoomInvitationsRepository,
 
-		@Inject(DI.chatRoomMembershipsRepository)
 		private chatRoomMembershipsRepository: ChatRoomMembershipsRepository,
 
-		private userEntityService: UserEntityService,
-		private driveFileEntityService: DriveFileEntityService,
-		private idService: IdService,
+		private userEntityService: Pick<UserEntityService, 'pack' | 'packMany'>,
+		private driveFileEntityService: Pick<DriveFileEntityService, 'pack' | 'packMany'>,
+		private idService: Pick<IdService, 'parse'>,
 	) {
 	}
 

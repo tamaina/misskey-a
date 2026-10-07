@@ -4,31 +4,25 @@
  */
 
 import { Brackets } from 'typeorm';
-import { Inject, Injectable } from '@nestjs/common';
 import JSON5 from 'json5';
 import type { Packed } from '../../../index/contract/packed.js';
 import type { MiMeta } from '../models/Meta.js';
 import type { AdsRepository } from '@/models/_.js';
 import { MAX_NOTE_TEXT_LENGTH } from '@/const.js';
 import { bindThis } from '@/decorators.js';
-import { SystemAccountService } from '../../../users/backend/services/SystemAccountService.js';
+import type { SystemAccountService } from '../../../users/backend/services/SystemAccountService.js';
 import type { Config } from '@/config.js';
-import { DI } from '@/di-symbols.js';
 import { DEFAULT_POLICIES } from '../../../roles/backend/services/RoleService.js';
 
-@Injectable()
 export class MetaEntityService {
 	constructor(
-		@Inject(DI.config)
 		private config: Config,
 
-		@Inject(DI.meta)
 		private meta: MiMeta,
 
-		@Inject(DI.adsRepository)
 		private adsRepository: AdsRepository,
 
-		private systemAccountService: SystemAccountService,
+		private systemAccountService: Pick<SystemAccountService, 'fetch'>,
 	) { }
 
 	@bindThis

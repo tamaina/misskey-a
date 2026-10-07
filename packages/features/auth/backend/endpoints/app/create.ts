@@ -3,8 +3,9 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { uniqueAppCreateDefinition, uniqueAppCreateInput, uniqueAppCreateOutput } from '../../../contract/unique-string-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
 import type { AppsRepository } from '@/models/_.js';
 import { IdService } from '../../../../runtime/backend/services/IdService.js';
 import { unique } from '@/misc/prelude/array.js';
@@ -12,33 +13,20 @@ import { secureRndstr } from '@/misc/secure-rndstr.js';
 import { AppEntityService } from '../../serializers/AppEntityService.js';
 import { DI } from '@/di-symbols.js';
 
+const contractProjection = projectEndpointContract(uniqueAppCreateDefinition);
+
 export const meta = {
 	tags: ['app'],
 
 	requireCredential: false,
 
-	res: {
-		type: 'object',
-		optional: false, nullable: false,
-		ref: 'App',
-	},
+	res: contractProjection.response,
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {
-		name: { type: 'string' },
-		description: { type: 'string' },
-		permission: { type: 'array', uniqueItems: true, items: {
-			type: 'string',
-		} },
-		callbackUrl: { type: 'string', nullable: true },
-	},
-	required: ['name', 'description', 'permission'],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof uniqueAppCreateInput, typeof uniqueAppCreateOutput> {
 	constructor(
 		@Inject(DI.appsRepository)
 		private appsRepository: AppsRepository,
@@ -46,7 +34,7 @@ export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDe
 		private appEntityService: AppEntityService,
 		private idService: IdService,
 	) {
-		super(meta, paramDef, async (ps, me) => {
+		super(meta, contractProjection, async (ps, me) => {
 			// Generate secret
 			const secret = secureRndstr(32);
 

@@ -21,8 +21,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 			@posted="onPosted"
 		/>
 		<div v-else-if="state === 'posted'" class="_buttonsCenter">
-			<MkButton primary @click="close">{{ i18n.ts.close }}</MkButton>
-			<MkButton @click="goToMisskey">{{ i18n.ts.goToMisskey }}</MkButton>
+			<MkButton primary @click="close">{{ $locale.sfc.close }}</MkButton>
+			<MkButton @click="goToMisskey">{{ $locale.sfc.goToMisskey }}</MkButton>
 		</div>
 	</div>
 </PageWithHeader>
@@ -39,7 +39,6 @@ import * as os from '@features/ui/frontend/os.js';
 import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 import { definePage } from '@features/navigation/frontend/page.js';
 import { postMessageToParentWindow } from '@features/web/frontend/utility/post-message.js';
-import { i18n } from '@features/runtime/frontend/i18n.js';
 
 const urlParams = new URLSearchParams(window.location.search);
 const localOnlyQuery = urlParams.get('localOnly');
@@ -209,7 +208,231 @@ const headerActions = computed(() => []);
 const headerTabs = computed(() => []);
 
 definePage(() => ({
-	title: i18n.ts.share,
+	title: $locale.value.sfc.share,
 	icon: 'ti ti-share',
 }));
 </script>
+
+<locale locale="ar-SA" lang="json">
+{
+	"close": "اغلق",
+	"goToMisskey": "لميسكي",
+	"share": "شارِك"
+}
+</locale>
+
+<locale locale="ca-ES" lang="json">
+{
+	"close": "Tanca",
+	"goToMisskey": "Ves a Misskey",
+	"share": "Comparteix"
+}
+</locale>
+
+<locale locale="cs-CZ" lang="json">
+{
+	"close": "Zavřít",
+	"goToMisskey": "Jít na Misskey",
+	"share": "Sdílet"
+}
+</locale>
+
+<locale locale="da-DK" lang="json">
+{
+	"close": "Close",
+	"goToMisskey": "To Misskey",
+	"share": "Share"
+}
+</locale>
+
+<locale locale="de-DE" lang="json">
+{
+	"close": "Schließen",
+	"goToMisskey": "Zu Misskey",
+	"share": "Teilen"
+}
+</locale>
+
+<locale locale="en-US" lang="json">
+{
+	"close": "Close",
+	"goToMisskey": "To Misskey",
+	"share": "Share"
+}
+</locale>
+
+<locale locale="es-ES" lang="json">
+{
+	"close": "Cerrar",
+	"goToMisskey": "ir a Misskey",
+	"share": "Compartir"
+}
+</locale>
+
+<locale locale="fr-FR" lang="json">
+{
+	"close": "Fermer",
+	"goToMisskey": "Retour vers Misskey",
+	"share": "Partager"
+}
+</locale>
+
+<locale locale="id-ID" lang="json">
+{
+	"close": "Tutup",
+	"goToMisskey": "Ke Misskey",
+	"share": "Bagikan"
+}
+</locale>
+
+<locale locale="it-IT" lang="json">
+{
+	"close": "Chiudi",
+	"goToMisskey": "Vai a Misskey",
+	"share": "Condividi"
+}
+</locale>
+
+<locale locale="ja-JP" lang="json">
+{
+	"close": "閉じる",
+	"goToMisskey": "Misskeyへ",
+	"share": "共有"
+}
+</locale>
+
+<locale locale="ja-KS" lang="json">
+{
+	"close": "さいなら",
+	"goToMisskey": "Misskeyへ",
+	"share": "わけわけ"
+}
+</locale>
+
+<locale locale="kab-KAB" lang="json">
+{
+	"close": "Close",
+	"goToMisskey": "To Misskey",
+	"share": "Share"
+}
+</locale>
+
+<locale locale="kn-IN" lang="json">
+{
+	"close": "Close",
+	"goToMisskey": "To Misskey",
+	"share": "Share"
+}
+</locale>
+
+<locale locale="ko-KR" lang="json">
+{
+	"close": "닫기",
+	"goToMisskey": "Misskey로",
+	"share": "공유"
+}
+</locale>
+
+<locale locale="nl-NL" lang="json">
+{
+	"close": "Sluiten",
+	"goToMisskey": "To Misskey",
+	"share": "Delen"
+}
+</locale>
+
+<locale locale="no-NO" lang="json">
+{
+	"close": "Lukk",
+	"goToMisskey": "To Misskey",
+	"share": "Del"
+}
+</locale>
+
+<locale locale="pl-PL" lang="json">
+{
+	"close": "Zamknij",
+	"goToMisskey": "To Misskey",
+	"share": "Udostępnij"
+}
+</locale>
+
+<locale locale="pt-PT" lang="json">
+{
+	"close": "Fechar",
+	"goToMisskey": "Ao Misskey",
+	"share": "Compartilhar"
+}
+</locale>
+
+<locale locale="ru-RU" lang="json">
+{
+	"close": "Закрыть",
+	"goToMisskey": "К Misskey",
+	"share": "Поделиться"
+}
+</locale>
+
+<locale locale="sk-SK" lang="json">
+{
+	"close": "Zavrieť",
+	"goToMisskey": "To Misskey",
+	"share": "Zdieľať"
+}
+</locale>
+
+<locale locale="th-TH" lang="json">
+{
+	"close": "ปิด",
+	"goToMisskey": "ถึง Misskey",
+	"share": "แบ่งปัน"
+}
+</locale>
+
+<locale locale="tr-TR" lang="json">
+{
+	"close": "Kapat",
+	"goToMisskey": "Misskey'e",
+	"share": "Paylaş"
+}
+</locale>
+
+<locale locale="ug-CN" lang="json">
+{
+	"close": "Close",
+	"goToMisskey": "To Misskey",
+	"share": "Share"
+}
+</locale>
+
+<locale locale="uk-UA" lang="json">
+{
+	"close": "Закрити",
+	"goToMisskey": "До Misskey",
+	"share": "Поділитись"
+}
+</locale>
+
+<locale locale="vi-VN" lang="json">
+{
+	"close": "Đóng",
+	"goToMisskey": "Tới Misskey",
+	"share": "Chia sẻ"
+}
+</locale>
+
+<locale locale="zh-CN" lang="json">
+{
+	"close": "关闭",
+	"goToMisskey": "去往 Misskey",
+	"share": "分享"
+}
+</locale>
+
+<locale locale="zh-TW" lang="json">
+{
+	"close": "關閉",
+	"goToMisskey": "往 Misskey",
+	"share": "分享"
+}
+</locale>

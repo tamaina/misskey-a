@@ -3,13 +3,16 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { uniqueMiauthGenTokenDefinition, uniqueMiauthGenTokenInput, uniqueMiauthGenTokenOutput } from '../../../contract/unique-string-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
 import type { AccessTokensRepository } from '@/models/_.js';
 import { IdService } from '../../../../runtime/backend/services/IdService.js';
 import { NotificationService } from '../../../../notifications/backend/services/NotificationService.js';
 import { secureRndstr } from '@/misc/secure-rndstr.js';
 import { DI } from '@/di-symbols.js';
+
+const contractProjection = projectEndpointContract(uniqueMiauthGenTokenDefinition);
 
 export const meta = {
 	tags: ['auth'],
@@ -18,34 +21,13 @@ export const meta = {
 
 	secure: true,
 
-	res: {
-		type: 'object',
-		optional: false, nullable: false,
-		properties: {
-			token: {
-				type: 'string',
-				optional: false, nullable: false,
-			},
-		},
-	},
+	res: contractProjection.response,
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {
-		session: { type: 'string', nullable: true },
-		name: { type: 'string', nullable: true },
-		description: { type: 'string', nullable: true },
-		iconUrl: { type: 'string', nullable: true },
-		permission: { type: 'array', uniqueItems: true, items: {
-			type: 'string',
-		} },
-	},
-	required: ['session', 'permission'],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof uniqueMiauthGenTokenInput, typeof uniqueMiauthGenTokenOutput> {
 	constructor(
 		@Inject(DI.accessTokensRepository)
 		private accessTokensRepository: AccessTokensRepository,
@@ -53,7 +35,7 @@ export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDe
 		private idService: IdService,
 		private notificationService: NotificationService,
 	) {
-		super(meta, paramDef, async (ps, me) => {
+		super(meta, contractProjection, async (ps, me) => {
 			// Generate access token
 			const accessToken = secureRndstr(32);
 

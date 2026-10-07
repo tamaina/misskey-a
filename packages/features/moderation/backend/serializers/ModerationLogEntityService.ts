@@ -3,25 +3,21 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Inject, Injectable } from '@nestjs/common';
-import { DI } from '@/di-symbols.js';
 import type { ModerationLogsRepository } from '@/models/_.js';
 import { awaitAll } from '@/misc/prelude/await-all.js';
 import type { } from '../../../relationships/backend/models/Blocking.js';
 import { MiModerationLog } from '../models/ModerationLog.js';
 import { bindThis } from '@/decorators.js';
-import { IdService } from '../../../runtime/backend/services/IdService.js';
+import type { IdService } from '../../../runtime/backend/services/IdService.js';
 import type { Packed } from '../../../index/contract/packed.js';
-import { UserEntityService } from '../../../users/backend/serializers/UserEntityService.js';
+import type { UserEntityService } from '../../../users/backend/serializers/UserEntityService.js';
 
-@Injectable()
 export class ModerationLogEntityService {
 	constructor(
-		@Inject(DI.moderationLogsRepository)
 		private moderationLogsRepository: ModerationLogsRepository,
 
-		private userEntityService: UserEntityService,
-		private idService: IdService,
+		private userEntityService: Pick<UserEntityService, 'pack' | 'packMany'>,
+		private idService: Pick<IdService, 'parse'>,
 	) {
 	}
 
