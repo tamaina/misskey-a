@@ -15,9 +15,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 >
 	<button v-if="hide" :class="$style.hidden" @click="reveal">
 		<div :class="$style.hiddenTextWrapper">
-			<b v-if="video.isSensitive" style="display: block;"><i class="ti ti-eye-exclamation"></i> {{ i18n.ts.sensitive }}{{ prefer.s.dataSaver.media ? ` (${i18n.ts.video}${video.size ? ' ' + bytes(video.size) : ''})` : '' }}</b>
-			<b v-else style="display: block;"><i class="ti ti-movie"></i> {{ prefer.s.dataSaver.media && video.size ? bytes(video.size) : i18n.ts.video }}</b>
-			<span style="display: block;">{{ i18n.ts.clickToShow }}</span>
+			<b v-if="video.isSensitive" style="display: block;"><i class="ti ti-eye-exclamation"></i> {{ $locale.sfc.sensitive }}{{ prefer.s.dataSaver.media ? ` (${$locale.sfc.video}${video.size ? ' ' + bytes(video.size) : ''})` : '' }}</b>
+			<b v-else style="display: block;"><i class="ti ti-movie"></i> {{ prefer.s.dataSaver.media && video.size ? bytes(video.size) : $locale.sfc.video }}</b>
+			<span style="display: block;">{{ $locale.sfc.clickToShow }}</span>
 		</div>
 	</button>
 
@@ -52,7 +52,6 @@ import { ref } from 'vue';
 import * as Misskey from 'misskey-js';
 import type { MediaComponentExposes } from '@features/media/frontend/types/media-component.js';
 import bytes from '@features/ui/frontend/filters/bytes.js';
-import { i18n } from '@features/runtime/frontend/i18n.js';
 import { prefer } from '@features/preferences/frontend/preferences.js';
 import * as os from '@features/ui/frontend/os.js';
 import { getFileMenu } from '@features/drive/frontend/utility/get-file-menu.js';
@@ -207,3 +206,227 @@ defineExpose<MediaComponentExposes>({
 	right: 0;
 }
 </style>
+
+<locale locale="ar-SA" lang="json">
+{
+	"sensitive": "محتوى حساس",
+	"video": "فيديو",
+	"clickToShow": "اضغط للعرض"
+}
+</locale>
+
+<locale locale="ca-ES" lang="json">
+{
+	"sensitive": "Sensible",
+	"video": "Vídeo",
+	"clickToShow": "Fes clic per mostrar"
+}
+</locale>
+
+<locale locale="cs-CZ" lang="json">
+{
+	"sensitive": "NSFW",
+	"video": "Video",
+	"clickToShow": "Klikněte pro zobrazení"
+}
+</locale>
+
+<locale locale="da-DK" lang="json">
+{
+	"sensitive": "Sensitive",
+	"video": "Video",
+	"clickToShow": "Click to show"
+}
+</locale>
+
+<locale locale="de-DE" lang="json">
+{
+	"sensitive": "Sensibel",
+	"video": "Video",
+	"clickToShow": "Zum Anzeigen anklicken"
+}
+</locale>
+
+<locale locale="en-US" lang="json">
+{
+	"sensitive": "Sensitive",
+	"video": "Video",
+	"clickToShow": "Click to show"
+}
+</locale>
+
+<locale locale="es-ES" lang="json">
+{
+	"sensitive": "Marcado como sensible (NSFW)",
+	"video": "Video",
+	"clickToShow": "Haz clic para verlo"
+}
+</locale>
+
+<locale locale="fr-FR" lang="json">
+{
+	"sensitive": "Contenu sensible",
+	"video": "Vidéo",
+	"clickToShow": "Cliquer pour afficher"
+}
+</locale>
+
+<locale locale="id-ID" lang="json">
+{
+	"sensitive": "Konten sensitif",
+	"video": "Video",
+	"clickToShow": "Klik untuk melihat"
+}
+</locale>
+
+<locale locale="it-IT" lang="json">
+{
+	"sensitive": "Esplicito",
+	"video": "Video",
+	"clickToShow": "Media nascosto, cliccare solo se si intende vedere"
+}
+</locale>
+
+<locale locale="ja-JP" lang="json">
+{
+	"sensitive": "センシティブ",
+	"video": "動画",
+	"clickToShow": "クリックして表示"
+}
+</locale>
+
+<locale locale="ja-KS" lang="json">
+{
+	"sensitive": "気いつけて見いや",
+	"video": "動画",
+	"clickToShow": "押したら見えるで"
+}
+</locale>
+
+<locale locale="kab-KAB" lang="json">
+{
+	"sensitive": "Sensitive",
+	"video": "Video",
+	"clickToShow": "Click to show"
+}
+</locale>
+
+<locale locale="kn-IN" lang="json">
+{
+	"sensitive": "Sensitive",
+	"video": "Video",
+	"clickToShow": "Click to show"
+}
+</locale>
+
+<locale locale="ko-KR" lang="json">
+{
+	"sensitive": "열람 주의",
+	"video": "동영상",
+	"clickToShow": "클릭하여 보기"
+}
+</locale>
+
+<locale locale="nl-NL" lang="json">
+{
+	"sensitive": "NSFW",
+	"video": "Video",
+	"clickToShow": "Klik om te bekijken"
+}
+</locale>
+
+<locale locale="no-NO" lang="json">
+{
+	"sensitive": "Sensitive",
+	"video": "Video",
+	"clickToShow": "Klikk for å vise"
+}
+</locale>
+
+<locale locale="pl-PL" lang="json">
+{
+	"sensitive": "NSFW",
+	"video": "Video",
+	"clickToShow": "Kliknij, aby wyświetlić"
+}
+</locale>
+
+<locale locale="pt-PT" lang="json">
+{
+	"sensitive": "Conteúdo sensível",
+	"video": "Vídeo",
+	"clickToShow": "Clique para ver"
+}
+</locale>
+
+<locale locale="ru-RU" lang="json">
+{
+	"sensitive": "Содержимое не для всех",
+	"video": "Видео",
+	"clickToShow": "Нажмите для просмотра"
+}
+</locale>
+
+<locale locale="sk-SK" lang="json">
+{
+	"sensitive": "NSFW",
+	"video": "Video",
+	"clickToShow": "Kliknutím zobrazíte"
+}
+</locale>
+
+<locale locale="th-TH" lang="json">
+{
+	"sensitive": "เนื้อหาที่ละเอียดอ่อน",
+	"video": "วีดีโอ",
+	"clickToShow": "คลิกเพื่อแสดง"
+}
+</locale>
+
+<locale locale="tr-TR" lang="json">
+{
+	"sensitive": "Hassas",
+	"video": "Video",
+	"clickToShow": "Göstermek için tıklayın"
+}
+</locale>
+
+<locale locale="ug-CN" lang="json">
+{
+	"sensitive": "Sensitive",
+	"video": "Video",
+	"clickToShow": "Click to show"
+}
+</locale>
+
+<locale locale="uk-UA" lang="json">
+{
+	"sensitive": "NSFW",
+	"video": "Відео",
+	"clickToShow": "Натисніть для перегляду"
+}
+</locale>
+
+<locale locale="vi-VN" lang="json">
+{
+	"sensitive": "Nhạy cảm",
+	"video": "Video",
+	"clickToShow": "Nhấn để xem"
+}
+</locale>
+
+<locale locale="zh-CN" lang="json">
+{
+	"sensitive": "敏感内容",
+	"video": "视频",
+	"clickToShow": "点击以显示"
+}
+</locale>
+
+<locale locale="zh-TW" lang="json">
+{
+	"sensitive": "敏感內容",
+	"video": "影片",
+	"clickToShow": "點擊查看"
+}
+</locale>

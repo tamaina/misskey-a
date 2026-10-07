@@ -10,11 +10,11 @@ SPDX-License-Identifier: AGPL-3.0-only
 	<div :class="$style.rightDivider" style="flex: 1">
 		<div v-if="method === 'email' && user">
 			{{
-				`${i18n.ts._abuseReport._notificationRecipient.notifiedUser}: ` + ((user.name) ? `${user.name}(${user.username})` : user.username)
+				`${$locale.sfc.notifiedUser}: ` + ((user.name) ? `${user.name}(${user.username})` : user.username)
 			}}
 		</div>
 		<div v-if="method === 'webhook' && systemWebhook">
-			{{ `${i18n.ts._abuseReport._notificationRecipient.notifiedWebhook}: ` + systemWebhook.name }}
+			{{ `${$locale.sfc.notifiedWebhook}: ` + systemWebhook.name }}
 		</div>
 	</div>
 	<div :class="$style.recipientButtons" style="margin-left: auto">
@@ -31,7 +31,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script setup lang="ts">
 import { entities } from 'misskey-js';
 import { computed, toRefs } from 'vue';
-import { i18n } from '@features/runtime/frontend/i18n.js';
 
 const emit = defineEmits<{
 	(ev: 'edit', id: entities.AbuseReportNotificationRecipient['id']): void;
@@ -60,9 +59,9 @@ const methodIcon = computed(() => {
 const methodName = computed(() => {
 	switch (entity.value.method) {
 		case 'email':
-			return i18n.ts._abuseReport._notificationRecipient._recipientType.mail;
+			return $locale.value.sfc.mail;
 		case 'webhook':
-			return i18n.ts._abuseReport._notificationRecipient._recipientType.webhook;
+			return $locale.value.sfc.webhook;
 		default:
 			return '不明';
 	}
@@ -112,3 +111,255 @@ function onDeleteButtonClicked() {
 	}
 }
 </style>
+
+<locale locale="ar-SA" lang="json">
+{
+	"mail": "البريد الإلكتروني ",
+	"webhook": "Webhook",
+	"notifiedUser": "Users to notify",
+	"notifiedWebhook": "Webhook to use"
+}
+</locale>
+
+<locale locale="ca-ES" lang="json">
+{
+	"mail": "Correu electrònic",
+	"webhook": "Webhook",
+	"notifiedUser": "Usuaris que s'han de notificar ",
+	"notifiedWebhook": "Webhook que s'ha de fer servir"
+}
+</locale>
+
+<locale locale="cs-CZ" lang="json">
+{
+	"mail": "Email",
+	"webhook": "Webhook",
+	"notifiedUser": "Users to notify",
+	"notifiedWebhook": "Webhook to use"
+}
+</locale>
+
+<locale locale="da-DK" lang="json">
+{
+	"mail": "Email",
+	"webhook": "Webhook",
+	"notifiedUser": "Users to notify",
+	"notifiedWebhook": "Webhook to use"
+}
+</locale>
+
+<locale locale="de-DE" lang="json">
+{
+	"mail": "Email",
+	"webhook": "Webhook",
+	"notifiedUser": "Zu benachrichtigender Benutzer",
+	"notifiedWebhook": "Zu verwendender Webhook"
+}
+</locale>
+
+<locale locale="en-US" lang="json">
+{
+	"mail": "Email",
+	"webhook": "Webhook",
+	"notifiedUser": "Users to notify",
+	"notifiedWebhook": "Webhook to use"
+}
+</locale>
+
+<locale locale="es-ES" lang="json">
+{
+	"mail": "Correo",
+	"webhook": "Webhook",
+	"notifiedUser": "Usuarios a notificar",
+	"notifiedWebhook": "Webhook a utilizar"
+}
+</locale>
+
+<locale locale="fr-FR" lang="json">
+{
+	"mail": "E-mail ",
+	"webhook": "Webhook",
+	"notifiedUser": "Users to notify",
+	"notifiedWebhook": "Webhook to use"
+}
+</locale>
+
+<locale locale="id-ID" lang="json">
+{
+	"mail": "Surel",
+	"webhook": "Webhook",
+	"notifiedUser": "Users to notify",
+	"notifiedWebhook": "Webhook to use"
+}
+</locale>
+
+<locale locale="it-IT" lang="json">
+{
+	"mail": "Email",
+	"webhook": "Webhook",
+	"notifiedUser": "Profili da notificare",
+	"notifiedWebhook": "Webhook da usare"
+}
+</locale>
+
+<locale locale="ja-JP" lang="json">
+{
+	"mail": "メール",
+	"webhook": "Webhook",
+	"notifiedUser": "通知先ユーザー",
+	"notifiedWebhook": "使用するWebhook"
+}
+</locale>
+
+<locale locale="ja-KS" lang="json">
+{
+	"mail": "メール",
+	"webhook": "Webhook",
+	"notifiedUser": "通知先ユーザー",
+	"notifiedWebhook": "使用するWebhook"
+}
+</locale>
+
+<locale locale="kab-KAB" lang="json">
+{
+	"mail": "Imayl",
+	"webhook": "Webhook",
+	"notifiedUser": "Users to notify",
+	"notifiedWebhook": "Webhook to use"
+}
+</locale>
+
+<locale locale="kn-IN" lang="json">
+{
+	"mail": "Email",
+	"webhook": "Webhook",
+	"notifiedUser": "Users to notify",
+	"notifiedWebhook": "Webhook to use"
+}
+</locale>
+
+<locale locale="ko-KR" lang="json">
+{
+	"mail": "이메일",
+	"webhook": "Webhook",
+	"notifiedUser": "알릴 유저",
+	"notifiedWebhook": "사용할 Webhook"
+}
+</locale>
+
+<locale locale="nl-NL" lang="json">
+{
+	"mail": "Email",
+	"webhook": "Webhook",
+	"notifiedUser": "Users to notify",
+	"notifiedWebhook": "Webhook to use"
+}
+</locale>
+
+<locale locale="no-NO" lang="json">
+{
+	"mail": "E-post",
+	"webhook": "Webhook",
+	"notifiedUser": "Users to notify",
+	"notifiedWebhook": "Webhook to use"
+}
+</locale>
+
+<locale locale="pl-PL" lang="json">
+{
+	"mail": "Adres e-mail",
+	"webhook": "Webhook",
+	"notifiedUser": "Users to notify",
+	"notifiedWebhook": "Webhook to use"
+}
+</locale>
+
+<locale locale="pt-PT" lang="json">
+{
+	"mail": "E-mail",
+	"webhook": "Webhook",
+	"notifiedUser": "Usuários para notificar",
+	"notifiedWebhook": "Webhook usado"
+}
+</locale>
+
+<locale locale="ru-RU" lang="json">
+{
+	"mail": "Электронная почта",
+	"webhook": "Вебхук",
+	"notifiedUser": "Users to notify",
+	"notifiedWebhook": "Используемый Вебхук"
+}
+</locale>
+
+<locale locale="sk-SK" lang="json">
+{
+	"mail": "Email",
+	"webhook": "Webhook",
+	"notifiedUser": "Users to notify",
+	"notifiedWebhook": "Webhook to use"
+}
+</locale>
+
+<locale locale="th-TH" lang="json">
+{
+	"mail": "อีเมล",
+	"webhook": "Webhook",
+	"notifiedUser": "ผู้ใช้ที่ได้รับการแจ้งเตือน",
+	"notifiedWebhook": "Webhook ที่ใช้"
+}
+</locale>
+
+<locale locale="tr-TR" lang="json">
+{
+	"mail": "E-Posta",
+	"webhook": "Webhook",
+	"notifiedUser": "Bildirilecek kullanıcılar",
+	"notifiedWebhook": "Kullanılacak webhook"
+}
+</locale>
+
+<locale locale="ug-CN" lang="json">
+{
+	"mail": "Email",
+	"webhook": "Webhook",
+	"notifiedUser": "Users to notify",
+	"notifiedWebhook": "Webhook to use"
+}
+</locale>
+
+<locale locale="uk-UA" lang="json">
+{
+	"mail": "E-mail",
+	"webhook": "Webhook",
+	"notifiedUser": "Users to notify",
+	"notifiedWebhook": "Webhook to use"
+}
+</locale>
+
+<locale locale="vi-VN" lang="json">
+{
+	"mail": "Email",
+	"webhook": "Webhook",
+	"notifiedUser": "Users to notify",
+	"notifiedWebhook": "Webhook to use"
+}
+</locale>
+
+<locale locale="zh-CN" lang="json">
+{
+	"mail": "邮箱",
+	"webhook": "Webhook",
+	"notifiedUser": "通知的用户",
+	"notifiedWebhook": "使用的 webhook"
+}
+</locale>
+
+<locale locale="zh-TW" lang="json">
+{
+	"mail": "電子郵件",
+	"webhook": "Webhook",
+	"notifiedUser": "通知的使用者",
+	"notifiedWebhook": "使用的 Webhook"
+}
+</locale>

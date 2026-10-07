@@ -7,9 +7,9 @@
 // RepositorySet tokens, including narrow factory inputs and invalid bindings.
 import type { MiSystemWebhook, SystemWebhooksRepository } from '@/models/_.js';
 import type { RepositorySet } from '@/models/repository-factory.js';
-import { createAuthServices } from '../../../features/auth/backend/services.js';
+import { createAuthSecurityServices, createAuthServices } from '../../../features/auth/backend/services.js';
 import { createChannelServices } from '../../../features/channels/backend/services.js';
-import { createDiscoveryServices } from '../../../features/discovery/backend/services.js';
+import { createDiscoveryServices, createRankingServices, createUserSearchServices } from '../../../features/discovery/backend/services.js';
 import { AppEntityService } from '../../../features/auth/backend/serializers/AppEntityService.js';
 import { AuthSessionEntityService } from '../../../features/auth/backend/serializers/AuthSessionEntityService.js';
 import { InviteCodeEntityService } from '../../../features/auth/backend/serializers/InviteCodeEntityService.js';
@@ -17,8 +17,24 @@ import { SigninEntityService } from '../../../features/auth/backend/serializers/
 import { ChannelEntityService } from '../../../features/channels/backend/serializers/ChannelEntityService.js';
 import { HashtagEntityService } from '../../../features/discovery/backend/serializers/HashtagEntityService.js';
 import { SystemWebhookEntityService } from '../../../features/integrations/backend/serializers/SystemWebhookEntityService.js';
+import { createMediaServices } from '../../../features/media/backend/services.js';
+import { createMarkupServices } from '../../../features/markup/backend/services.js';
+import { createPreferencesServices } from '../../../features/preferences/backend/services.js';
+import { createModerationLoggingServices, createModerationServices } from '../../../features/moderation/backend/services.js';
+import { SensitiveMediaDetectionService } from '../../../features/media/backend/services/SensitiveMediaDetectionService.js';
+import { AbuseReportNotificationRecipientEntityService } from '../../../features/moderation/backend/serializers/AbuseReportNotificationRecipientEntityService.js';
+import { AbuseUserReportEntityService } from '../../../features/moderation/backend/serializers/AbuseUserReportEntityService.js';
+import { ModerationLogEntityService } from '../../../features/moderation/backend/serializers/ModerationLogEntityService.js';
 import { service } from '../../../features/index/backend/service-definitions.js';
 import { ports } from '../../../features/index/backend/service-ports.js';
+import { UserAuthService } from '../../../features/auth/backend/services/UserAuthService.js';
+import { WebAuthnService } from '../../../features/auth/backend/services/WebAuthnService.js';
+import type { AuthSecurityServicesDependencies, AuthServicesDependencies } from '../../../features/auth/backend/services.js';
+import type { RankingServicesDependencies, UserSearchServicesDependencies } from '../../../features/discovery/backend/services.js';
+import type { MediaServicesDependencies } from '../../../features/media/backend/services.js';
+import type { MarkupServicesDependencies } from '../../../features/markup/backend/services.js';
+import type { PreferencesServicesDependencies } from '../../../features/preferences/backend/services.js';
+import type { ModerationLoggingServicesDependencies, ModerationServicesDependencies } from '../../../features/moderation/backend/services.js';
 import type { ChannelServicesDependencies } from '../../../features/channels/backend/services.js';
 
 type NarrowAuth = {
@@ -62,3 +78,110 @@ const actualRepository: RepositorySet['systemWebhooksRepository'] = constructorR
 const insertedSystemWebhook: Promise<MiSystemWebhook> = actualRepository.insertOne({ name: 'system', isActive: true });
 void insertedSystemWebhook;
 service(SystemWebhookEntityService, [ports.systemWebhooksRepository]);
+
+// New factories use the real port/constructor graph; existing factories stay narrow.
+declare const media: MediaServicesDependencies;
+declare const markup: MarkupServicesDependencies;
+declare const preferences: PreferencesServicesDependencies;
+declare const moderation: ModerationServicesDependencies;
+createMediaServices(media);
+createMarkupServices(markup);
+createPreferencesServices(preferences);
+createModerationServices(moderation);
+type ModerationInputKey = 'abuseReportNotificationRecipientRepository' | 'abuseUserReportsRepository' | 'idService' | 'moderationLogsRepository' | 'systemWebhookEntityService' | 'userEntityService';
+declare const moderationInputKeys: Record<keyof ModerationServicesDependencies, true>;
+declare const originalInputKeys: Record<ModerationInputKey, true>;
+const preservedInputKeys: typeof originalInputKeys = moderationInputKeys;
+const currentInputKeys: typeof moderationInputKeys = originalInputKeys;
+void preservedInputKeys;
+void currentInputKeys;
+// @ts-expect-error The actual HTTP constructor input cannot accept a logger port.
+service(SensitiveMediaDetectionService, [ports.meta, ports.loggerService, ports.loggerService]);
+// @ts-expect-error Required real service port cannot be omitted from plain media inputs.
+createMediaServices({ config: media.config, meta: media.meta, loggerService: media.loggerService });
+
+// Preserve complete original input/output value types, including parse-only Id.
+type OriginalModerationInputs = {
+	abuseReportNotificationRecipientRepository: ConstructorParameters<typeof AbuseReportNotificationRecipientEntityService>[0];
+	abuseUserReportsRepository: ConstructorParameters<typeof AbuseUserReportEntityService>[0];
+	moderationLogsRepository: ConstructorParameters<typeof ModerationLogEntityService>[0];
+	userEntityService: ConstructorParameters<typeof AbuseReportNotificationRecipientEntityService>[1] & ConstructorParameters<typeof AbuseUserReportEntityService>[1] & ConstructorParameters<typeof ModerationLogEntityService>[1];
+	systemWebhookEntityService: ConstructorParameters<typeof AbuseReportNotificationRecipientEntityService>[2];
+	idService: ConstructorParameters<typeof AbuseUserReportEntityService>[2] & ConstructorParameters<typeof ModerationLogEntityService>[2];
+};
+declare const originalModerationInputs: OriginalModerationInputs;
+const oldInputsStillAccepted: ModerationServicesDependencies = originalModerationInputs;
+const currentInputsStillOriginal: OriginalModerationInputs = moderation;
+void oldInputsStillAccepted;
+void currentInputsStillOriginal;
+const actualModerationOutputs = createModerationServices(originalModerationInputs);
+declare const originalModerationOutputs: {
+	AbuseReportNotificationRecipientEntityService: AbuseReportNotificationRecipientEntityService;
+	AbuseUserReportEntityService: AbuseUserReportEntityService;
+	ModerationLogEntityService: ModerationLogEntityService;
+};
+const oldOutputsStillAccepted: typeof actualModerationOutputs = originalModerationOutputs;
+const currentOutputsStillOriginal: typeof originalModerationOutputs = actualModerationOutputs;
+void oldOutputsStillAccepted;
+void currentOutputsStillOriginal;
+declare const logging: ModerationLoggingServicesDependencies;
+createModerationLoggingServices(logging);
+
+// The old auth factory retains full value types and all four original outputs.
+declare const existingAuthInputs: AuthServicesDependencies;
+const oldAuthInputsStillAccepted: AuthServicesDependencies = narrow;
+const currentAuthInputsStillOriginal: NarrowAuth = existingAuthInputs;
+void oldAuthInputsStillAccepted;
+void currentAuthInputsStillOriginal;
+const currentAuthOutputs = createAuthServices(narrow);
+declare const originalAuthOutputs: {
+	AppEntityService: AppEntityService;
+	AuthSessionEntityService: AuthSessionEntityService;
+	InviteCodeEntityService: InviteCodeEntityService;
+	SigninEntityService: SigninEntityService;
+};
+const oldAuthOutputsStillAccepted: typeof currentAuthOutputs = originalAuthOutputs;
+const currentAuthOutputsStillOriginal: typeof originalAuthOutputs = currentAuthOutputs;
+void oldAuthOutputsStillAccepted;
+void currentAuthOutputsStillOriginal;
+const currentDiscoveryOutputs = createDiscoveryServices();
+declare const originalDiscoveryOutputs: { HashtagEntityService: HashtagEntityService };
+const oldDiscoveryOutputsStillAccepted: typeof currentDiscoveryOutputs = originalDiscoveryOutputs;
+const currentDiscoveryOutputsStillOriginal: typeof originalDiscoveryOutputs = currentDiscoveryOutputs;
+void oldDiscoveryOutputsStillAccepted;
+void currentDiscoveryOutputsStillOriginal;
+const originalDiscoveryCall: () => typeof originalDiscoveryOutputs = createDiscoveryServices;
+const currentDiscoveryCall: typeof createDiscoveryServices = originalDiscoveryCall;
+void currentDiscoveryCall;
+declare const security: AuthSecurityServicesDependencies;
+declare const userSearch: UserSearchServicesDependencies;
+createAuthSecurityServices(security);
+createUserSearchServices(userSearch);
+service(UserAuthService, [ports.redisClient, ports.usersRepository, ports.userProfilesRepository]);
+service(WebAuthnService, [ports.config, ports.meta, ports.redisClient, ports.userSecurityKeysRepository]);
+// @ts-expect-error Config cannot replace the Redis constructor input.
+service(UserAuthService, [ports.config, ports.usersRepository, ports.userProfilesRepository]);
+// @ts-expect-error Redis is a required borrowed input, never created by the feature factory.
+createAuthSecurityServices({ config: security.config, meta: security.meta, usersRepository: security.usersRepository, userProfilesRepository: security.userProfilesRepository, userSecurityKeysRepository: security.userSecurityKeysRepository });
+
+// Ranking keeps the former constructor types and excludes its local Featured edge from inputs.
+type RankingArgs = ConstructorParameters<typeof import('../../../features/discovery/backend/services/HashtagService.js').HashtagService>;
+type OriginalRankingInputs = {
+	db: RankingArgs[0];
+	meta: RankingArgs[1];
+	redisClient: RankingArgs[2];
+	hashtagsRepository: RankingArgs[3];
+	userEntityService: RankingArgs[4];
+	idService: RankingArgs[6];
+	utilityService: RankingArgs[7];
+};
+declare const rankingOriginal: OriginalRankingInputs;
+declare const rankingInferred: RankingServicesDependencies;
+const rankingForward: RankingServicesDependencies = rankingOriginal;
+const rankingBackward: OriginalRankingInputs = rankingInferred;
+const rankingOutput: {
+	FeaturedService: import('../../../features/discovery/backend/services/FeaturedService.js').FeaturedService;
+	HashtagService: import('../../../features/discovery/backend/services/HashtagService.js').HashtagService;
+} = createRankingServices(rankingOriginal);
+const rankingOutputReverse: ReturnType<typeof createRankingServices> = rankingOutput;
+void [rankingForward, rankingBackward, rankingOutputReverse];

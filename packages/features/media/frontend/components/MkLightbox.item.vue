@@ -54,9 +54,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 						<div v-else :class="$style.hiddenPlaceholder"></div>
 						<div :class="[$style.hiddenText, { [$style.withBlur]: content.type === 'video' && content.thumbnailUrl != null }]">
 							<div :class="$style.hiddenTextWrapper">
-								<b v-if="content.file?.isSensitive" style="display: block;"><i class="ti ti-eye-exclamation"></i> {{ i18n.ts.sensitive }}</b>
+								<b v-if="content.file?.isSensitive" style="display: block;"><i class="ti ti-eye-exclamation"></i> {{ $locale.sfc.sensitive }}</b>
 								<b v-else style="display: block;"><i class="ti" :class="contentHideFileIcon"></i> {{ contentHideFileText }}</b>
-								<span style="display: block;">{{ i18n.ts.clickToShow }}</span>
+								<span style="display: block;">{{ $locale.sfc.clickToShow }}</span>
 							</div>
 						</div>
 					</div>
@@ -206,7 +206,6 @@ import type { MenuItem } from '@features/navigation/frontend/types/menu.js';
 import { DI } from '@features/ui/frontend/di.js';
 import * as os from '@features/ui/frontend/os.js';
 import { prefer } from '@features/preferences/frontend/preferences.js';
-import { i18n } from '@features/runtime/frontend/i18n.js';
 import { shouldHideFileByDefault, canRevealFile } from '@features/drive/frontend/utility/sensitive-file.js';
 import { makeDoubleTapDetector } from '@features/ui/frontend/utility/double-tap.js';
 import { deviceKind } from '@features/ui/frontend/utility/device-kind.js';
@@ -288,11 +287,11 @@ const contentHideFileIcon = computed(() => {
 const contentHideFileText = computed(() => {
 	switch (props.content.type) {
 		case 'image':
-			return i18n.ts.image;
+			return $locale.value.sfc.image;
 		case 'video':
-			return i18n.ts.video;
+			return $locale.value.sfc.video;
 		case 'audio':
-			return i18n.ts.audio;
+			return $locale.value.sfc.audio;
 		default:
 			return '';
 	}
@@ -980,14 +979,14 @@ function openMenu(ev: PointerEvent) {
 	if (props.content.type === 'image') {
 		menu.push({
 			type: 'switch',
-			text: i18n.ts.pixelatedZoom,
+			text: $locale.value.sfc.pixelatedZoom,
 			icon: 'ti ti-grain',
 			ref: pixelatedZoom,
 		});
 	}
 
 	menu.push({
-		text: i18n.ts.hide,
+		text: $locale.value.sfc.hide,
 		icon: 'ti ti-eye-off',
 		action: () => {
 			hide.value = true;
@@ -1305,3 +1304,339 @@ defineExpose({
 	}
 }
 </style>
+
+<locale locale="ar-SA" lang="json">
+{
+	"image": "صور",
+	"video": "فيديو",
+	"audio": "Audio",
+	"pixelatedZoom": "Pixelated Zoom",
+	"hide": "إخفاء",
+	"sensitive": "محتوى حساس",
+	"clickToShow": "اضغط للعرض"
+}
+</locale>
+
+<locale locale="ca-ES" lang="json">
+{
+	"image": "Imatge",
+	"video": "Vídeo",
+	"audio": "So",
+	"pixelatedZoom": "Mode de zoom d'art pixelat",
+	"hide": "Amagar",
+	"sensitive": "Sensible",
+	"clickToShow": "Fes clic per mostrar"
+}
+</locale>
+
+<locale locale="cs-CZ" lang="json">
+{
+	"image": "Obrázky",
+	"video": "Video",
+	"audio": "Zvuk",
+	"pixelatedZoom": "Pixelated Zoom",
+	"hide": "Skrýt",
+	"sensitive": "NSFW",
+	"clickToShow": "Klikněte pro zobrazení"
+}
+</locale>
+
+<locale locale="da-DK" lang="json">
+{
+	"image": "Image",
+	"video": "Video",
+	"audio": "Audio",
+	"pixelatedZoom": "Pixelated Zoom",
+	"hide": "Hide",
+	"sensitive": "Sensitive",
+	"clickToShow": "Click to show"
+}
+</locale>
+
+<locale locale="de-DE" lang="json">
+{
+	"image": "Bild",
+	"video": "Video",
+	"audio": "Audio",
+	"pixelatedZoom": "Pixelated Zoom",
+	"hide": "Inhalt verbergen",
+	"sensitive": "Sensibel",
+	"clickToShow": "Zum Anzeigen anklicken"
+}
+</locale>
+
+<locale locale="en-US" lang="json">
+{
+	"image": "Image",
+	"video": "Video",
+	"audio": "Audio",
+	"pixelatedZoom": "Pixelated Zoom",
+	"hide": "Hide",
+	"sensitive": "Sensitive",
+	"clickToShow": "Click to show"
+}
+</locale>
+
+<locale locale="es-ES" lang="json">
+{
+	"image": "Imágenes",
+	"video": "Video",
+	"audio": "Sonido",
+	"pixelatedZoom": "Modo de ampliación para pixel art",
+	"hide": "Ocultar",
+	"sensitive": "Marcado como sensible (NSFW)",
+	"clickToShow": "Haz clic para verlo"
+}
+</locale>
+
+<locale locale="fr-FR" lang="json">
+{
+	"image": "Images",
+	"video": "Vidéo",
+	"audio": "Audio",
+	"pixelatedZoom": "Pixelated Zoom",
+	"hide": "Masquer",
+	"sensitive": "Contenu sensible",
+	"clickToShow": "Cliquer pour afficher"
+}
+</locale>
+
+<locale locale="id-ID" lang="json">
+{
+	"image": "Gambar",
+	"video": "Video",
+	"audio": "Suara",
+	"pixelatedZoom": "Pixelated Zoom",
+	"hide": "Sembunyikan",
+	"sensitive": "Konten sensitif",
+	"clickToShow": "Klik untuk melihat"
+}
+</locale>
+
+<locale locale="it-IT" lang="json">
+{
+	"image": "Immagini",
+	"video": "Video",
+	"audio": "Audio",
+	"pixelatedZoom": "Ingrandimento pixelato",
+	"hide": "Nascondere",
+	"sensitive": "Esplicito",
+	"clickToShow": "Media nascosto, cliccare solo se si intende vedere"
+}
+</locale>
+
+<locale locale="ja-JP" lang="json">
+{
+	"image": "画像",
+	"video": "動画",
+	"audio": "音声",
+	"pixelatedZoom": "ピクセルアート拡大モード",
+	"hide": "隠す",
+	"sensitive": "センシティブ",
+	"clickToShow": "クリックして表示"
+}
+</locale>
+
+<locale locale="ja-KS" lang="json">
+{
+	"image": "画像",
+	"video": "動画",
+	"audio": "音声",
+	"pixelatedZoom": "ピクセルアート拡大モード",
+	"hide": "隠す",
+	"sensitive": "気いつけて見いや",
+	"clickToShow": "押したら見えるで"
+}
+</locale>
+
+<locale locale="kab-KAB" lang="json">
+{
+	"image": "Image",
+	"video": "Video",
+	"audio": "Audio",
+	"pixelatedZoom": "Pixelated Zoom",
+	"hide": "Hide",
+	"sensitive": "Sensitive",
+	"clickToShow": "Click to show"
+}
+</locale>
+
+<locale locale="kn-IN" lang="json">
+{
+	"image": "Image",
+	"video": "Video",
+	"audio": "Audio",
+	"pixelatedZoom": "Pixelated Zoom",
+	"hide": "Hide",
+	"sensitive": "Sensitive",
+	"clickToShow": "Click to show"
+}
+</locale>
+
+<locale locale="ko-KR" lang="json">
+{
+	"image": "이미지",
+	"video": "동영상",
+	"audio": "소리",
+	"pixelatedZoom": "픽셀 아트 확대 모드",
+	"hide": "숨기기",
+	"sensitive": "열람 주의",
+	"clickToShow": "클릭하여 보기"
+}
+</locale>
+
+<locale locale="nl-NL" lang="json">
+{
+	"image": "Afbeeldingen",
+	"video": "Video",
+	"audio": "Audio",
+	"pixelatedZoom": "Pixelated Zoom",
+	"hide": "Verbergen",
+	"sensitive": "NSFW",
+	"clickToShow": "Klik om te bekijken"
+}
+</locale>
+
+<locale locale="no-NO" lang="json">
+{
+	"image": "Bilde",
+	"video": "Video",
+	"audio": "Audio",
+	"pixelatedZoom": "Pixelated Zoom",
+	"hide": "Skjul",
+	"sensitive": "Sensitive",
+	"clickToShow": "Klikk for å vise"
+}
+</locale>
+
+<locale locale="pl-PL" lang="json">
+{
+	"image": "Zdjęcia",
+	"video": "Video",
+	"audio": "Audio",
+	"pixelatedZoom": "Pixelated Zoom",
+	"hide": "Ukryj",
+	"sensitive": "NSFW",
+	"clickToShow": "Kliknij, aby wyświetlić"
+}
+</locale>
+
+<locale locale="pt-PT" lang="json">
+{
+	"image": "imagem",
+	"video": "Vídeo",
+	"audio": "Áudio",
+	"pixelatedZoom": "Pixelated Zoom",
+	"hide": "Ocultar",
+	"sensitive": "Conteúdo sensível",
+	"clickToShow": "Clique para ver"
+}
+</locale>
+
+<locale locale="ru-RU" lang="json">
+{
+	"image": "Изображения",
+	"video": "Видео",
+	"audio": "Звук",
+	"pixelatedZoom": "Пиксельное масштабирование",
+	"hide": "Спрятать",
+	"sensitive": "Содержимое не для всех",
+	"clickToShow": "Нажмите для просмотра"
+}
+</locale>
+
+<locale locale="sk-SK" lang="json">
+{
+	"image": "Obrázky",
+	"video": "Video",
+	"audio": "Audio",
+	"pixelatedZoom": "Pixelated Zoom",
+	"hide": "Skryť",
+	"sensitive": "NSFW",
+	"clickToShow": "Kliknutím zobrazíte"
+}
+</locale>
+
+<locale locale="th-TH" lang="json">
+{
+	"image": "รูปภาพ",
+	"video": "วีดีโอ",
+	"audio": "เสียง",
+	"pixelatedZoom": "Pixelated Zoom",
+	"hide": "ซ่อน",
+	"sensitive": "เนื้อหาที่ละเอียดอ่อน",
+	"clickToShow": "คลิกเพื่อแสดง"
+}
+</locale>
+
+<locale locale="tr-TR" lang="json">
+{
+	"image": "Görsel",
+	"video": "Video",
+	"audio": "Ses",
+	"pixelatedZoom": "Pixelated Zoom",
+	"hide": "Gizle",
+	"sensitive": "Hassas",
+	"clickToShow": "Göstermek için tıklayın"
+}
+</locale>
+
+<locale locale="ug-CN" lang="json">
+{
+	"image": "Image",
+	"video": "Video",
+	"audio": "Audio",
+	"pixelatedZoom": "Pixelated Zoom",
+	"hide": "Hide",
+	"sensitive": "Sensitive",
+	"clickToShow": "Click to show"
+}
+</locale>
+
+<locale locale="uk-UA" lang="json">
+{
+	"image": "Зображення",
+	"video": "Відео",
+	"audio": "Аудіо",
+	"pixelatedZoom": "Пікселізоване приближення",
+	"hide": "Сховати",
+	"sensitive": "NSFW",
+	"clickToShow": "Натисніть для перегляду"
+}
+</locale>
+
+<locale locale="vi-VN" lang="json">
+{
+	"image": "Hình ảnh",
+	"video": "Video",
+	"audio": "Âm thanh",
+	"pixelatedZoom": "Pixelated Zoom",
+	"hide": "Ẩn",
+	"sensitive": "Nhạy cảm",
+	"clickToShow": "Nhấn để xem"
+}
+</locale>
+
+<locale locale="zh-CN" lang="json">
+{
+	"image": "图片",
+	"video": "视频",
+	"audio": "音频",
+	"pixelatedZoom": "像素画放大模式",
+	"hide": "隐藏",
+	"sensitive": "敏感内容",
+	"clickToShow": "点击以显示"
+}
+</locale>
+
+<locale locale="zh-TW" lang="json">
+{
+	"image": "圖片",
+	"video": "影片",
+	"audio": "音效",
+	"pixelatedZoom": "像素藝術縮放模式",
+	"hide": "隱藏",
+	"sensitive": "敏感內容",
+	"clickToShow": "點擊查看"
+}
+</locale>

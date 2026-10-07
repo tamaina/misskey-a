@@ -8,26 +8,27 @@ import { readFileSync } from 'node:fs';
 import { MODULE_METADATA } from '@nestjs/common/constants.js';
 import { Test } from '@nestjs/testing';
 import { ModuleRef } from '@nestjs/core';
-import type { FactoryProvider, InjectionToken, Provider } from '@nestjs/common';
 import { describe, expect, test, vi } from 'vitest';
 import { mockDeep } from 'vitest-mock-extended';
-import type { SelectQueryBuilder } from 'typeorm';
 import type { MiAnnouncement, MiClip, MiFlash, MiFlashLike, MiGalleryLike, MiGalleryPost, MiNoteFavorite, MiPage, MiPageLike } from '@/models/_.js';
-import type { MiLocalUser } from '../../../features/users/backend/models/User.js';
-import type { Packed } from '../../../features/index/contract/packed.js';
 import { createAnnouncementServices } from '../../../features/announcements/backend/services.js';
-import type { AnnouncementServicesDependencies } from '../../../features/announcements/backend/services.js';
 import { ClipService } from '../../../features/collections/backend/services/ClipService.js';
 import { createCollectionServices } from '../../../features/collections/backend/services.js';
-import type { CollectionServicesDependencies } from '../../../features/collections/backend/services.js';
 import { createGalleryServices } from '../../../features/gallery/backend/services.js';
-import type { GalleryServicesDependencies } from '../../../features/gallery/backend/services.js';
 import { createPageServices } from '../../../features/pages/backend/services.js';
-import type { PageServicesDependencies } from '../../../features/pages/backend/services.js';
 import { createPlayServices } from '../../../features/play/backend/services.js';
-import type { PlayServicesDependencies } from '../../../features/play/backend/services.js';
+import { LoggerService } from '../../../features/runtime/backend/services/LoggerService.js';
 import { CoreModule } from './CoreModule.js';
 import { featureServiceExports, featureServiceGroups, featureServiceProviders } from './feature-service-providers.js';
+import type { PlayServicesDependencies } from '../../../features/play/backend/services.js';
+import type { PageServicesDependencies } from '../../../features/pages/backend/services.js';
+import type { GalleryServicesDependencies } from '../../../features/gallery/backend/services.js';
+import type { CollectionServicesDependencies } from '../../../features/collections/backend/services.js';
+import type { AnnouncementServicesDependencies } from '../../../features/announcements/backend/services.js';
+import type { Packed } from '../../../features/index/contract/packed.js';
+import type { MiLocalUser } from '../../../features/users/backend/models/User.js';
+import type { SelectQueryBuilder } from 'typeorm';
+import type { FactoryProvider, InjectionToken, Provider } from '@nestjs/common';
 
 const date = new Date('2026-01-02T03:04:05.000Z');
 const factoryProviders = featureServiceProviders.filter((provider): provider is FactoryProvider => typeof provider === 'object' && 'useFactory' in provider && typeof provider.provide === 'symbol');
@@ -62,9 +63,9 @@ describe('feature service composition adapter', () => {
 	test('CoreModule installs and exports every canonical service and compatibility alias once', () => {
 		const providers = Reflect.getMetadata(MODULE_METADATA.PROVIDERS, CoreModule) as Provider[];
 		const exports = Reflect.getMetadata(MODULE_METADATA.EXPORTS, CoreModule) as (Provider | InjectionToken)[];
-		expect(factoryProviders).toHaveLength(18);
-		expect(classProviders).toHaveLength(37);
-		expect(featureServiceExports).toHaveLength(73);
+		expect(factoryProviders).toHaveLength(25);
+		expect(classProviders).toHaveLength(49);
+		expect(featureServiceExports).toHaveLength(97);
 		for (const provider of featureServiceProviders) {
 			expect(providers.filter(candidate => providerToken(candidate) === providerToken(provider))).toEqual([provider]);
 		}
@@ -79,7 +80,7 @@ describe('feature service composition adapter', () => {
 		const createSpies = factoryProviders.map(provider => vi.spyOn(provider, 'useFactory'));
 		const module = await Test.createTestingModule({
 			providers: [
-				...[...externalTokens].map(provide => ({ provide, useValue: {} })),
+				...[...externalTokens].map(provide => ({ provide, useValue: provide === LoggerService ? { getLogger: vi.fn(() => ({ warn: vi.fn() })) } : {} })),
 				...featureServiceProviders,
 				{ provide: 'feature service consumer', inject: featureServiceExports, useFactory: (...services: object[]) => services },
 			],
@@ -112,7 +113,7 @@ describe('feature service composition adapter', () => {
 		const createSpies = selectedFactories.map(provider => vi.spyOn(provider, 'useFactory'));
 		const module = await Test.createTestingModule({
 			providers: [
-				...[...dependencies].map(provide => ({ provide, useValue: {} })),
+				...[...dependencies].map(provide => ({ provide, useValue: provide === LoggerService ? { getLogger: vi.fn(() => ({ warn: vi.fn() })) } : {} })),
 				...selectedProviders,
 				{ provide: 'strict local resolver', inject: [ModuleRef], useFactory: (moduleRef: ModuleRef) => moduleRef },
 			],
@@ -140,16 +141,19 @@ describe('feature service composition adapter', () => {
 			gallery: ['serializers/GalleryPostEntityService', 'serializers/GalleryLikeEntityService'],
 			pages: ['serializers/PageEntityService', 'serializers/PageLikeEntityService', 'services/PageService'],
 			play: ['serializers/FlashEntityService', 'serializers/FlashLikeEntityService', 'services/FlashService'],
-			auth: ['serializers/AppEntityService', 'serializers/AuthSessionEntityService', 'serializers/InviteCodeEntityService', 'serializers/SigninEntityService'],
+			auth: ['services/UserAuthService', 'services/WebAuthnService', 'serializers/AppEntityService', 'serializers/AuthSessionEntityService', 'serializers/InviteCodeEntityService', 'serializers/SigninEntityService'],
 			channels: ['serializers/ChannelEntityService'],
 			chat: ['serializers/ChatEntityService'],
-			discovery: ['serializers/HashtagEntityService'],
+			discovery: ['services/UserSearchService', 'serializers/HashtagEntityService'],
 			drive: ['serializers/DriveFolderEntityService'],
 			emojis: ['serializers/EmojiEntityService'],
 			games: ['serializers/ReversiGameEntityService'],
 			instance: ['serializers/InstanceEntityService', 'serializers/MetaEntityService'],
 			integrations: ['serializers/SystemWebhookEntityService'],
-			moderation: ['serializers/AbuseReportNotificationRecipientEntityService', 'serializers/AbuseUserReportEntityService', 'serializers/ModerationLogEntityService'],
+			media: ['services/ImageProcessingService', 'services/VideoProcessingService', 'services/SensitiveMediaDetectionService', 'services/FileInfoService'],
+			markup: ['services/MfmService'],
+			preferences: ['services/RegistryApiService'],
+			moderation: ['services/ModerationLogService', 'serializers/AbuseReportNotificationRecipientEntityService', 'serializers/AbuseUserReportEntityService', 'serializers/ModerationLogEntityService'],
 			relationships: ['serializers/BlockingEntityService', 'serializers/FollowRequestEntityService', 'serializers/FollowingEntityService', 'serializers/MutingEntityService', 'serializers/RenoteMutingEntityService', 'serializers/UserListEntityService'],
 			roles: ['serializers/RoleEntityService'],
 			timelines: ['serializers/AntennaEntityService'],

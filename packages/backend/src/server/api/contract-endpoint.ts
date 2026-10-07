@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { getJsonExclusiveObjectGuardRegistration, getJsonExclusiveObjectParserRegistration } from '../../../../features/api/contract/json-exclusive-object.js';
+import { assertJsonExclusiveObjectMetadata } from '../../../../features/api/backend/json-exclusive-object-projection.js';
 import type { InferSchemaOutput } from '@orpc/contract';
 import type { JsonSchema } from '@valibot/to-json-schema';
 import type * as v from 'valibot';
@@ -13,9 +15,13 @@ import type { Schema } from '@/misc/json-schema.js';
 import { assertLegacyOutputTupleMetadata } from '../../../../features/api/backend/legacy-output-tuple-projection.js';
 import { getPackedReference, getPackedReferenceLegacyOutputSchema } from '../../../../features/api/contract/packed-reference.js';
 import { getJsonObjectGuardRegistration, getJsonObjectParserRegistration } from '../../../../features/api/contract/json-object.js';
+import { getJsonSelectorAndCommonGuardRegistration, getJsonSelectorAndCommonParserRegistration } from '../../../../features/api/contract/json-selector-and-common.js';
+import { assertJsonSelectorAndCommonMetadata } from '../../../../features/api/backend/json-selector-and-common-projection.js';
 import { getLegacyOutputTupleItems, getLegacyOutputTupleLegacyItems } from '../../../../features/api/contract/legacy-output-tuple.js';
 import { getUniqueStringArrayBaseSchema } from '../../../../features/api/contract/unique-string-array.js';
 import { getRequireWhenAllNullishRegistration } from '../../../../features/api/contract/require-when-all-nullish.js';
+import { getLegacyOutputOneOfRegistration, hasLegacyOutputOneOfOptions } from '../../../../features/api/contract/legacy-output-one-of.js';
+import { assertLegacyOutputOneOfMetadata } from '../../../../features/api/backend/legacy-output-one-of-projection.js';
 import { convertSchemaToOpenApiSchema } from './openapi/schemas.js';
 import { Endpoint } from './endpoint-base.js';
 import type { EndpointExecutor } from './endpoint-base.js';
@@ -38,6 +44,26 @@ function* flattenInputPipe(pipe: unknown[], parents = new Set<object>()): Genera
 /** Reject runtime-only input behavior that an AJV projection cannot execute. */
 function assertStaticInputProjection(value: unknown, seen = new Set<object>(), pipelineSchema?: object): void {
 	if (value === null || typeof value !== 'object') return;
+	const exclusiveParser = getJsonExclusiveObjectParserRegistration(value);
+	const exclusiveGuard = getJsonExclusiveObjectGuardRegistration(value);
+	const exclusive = exclusiveGuard ?? exclusiveParser;
+	if (exclusive !== undefined) {
+		if (pipelineSchema !== exclusive.guard) throw new Error('Exclusive-object parsing requires its original guard/parser pipeline');
+		for (const option of exclusive.options) assertStaticInputProjection(option, seen);
+	}
+	const compositionParser = getJsonSelectorAndCommonParserRegistration(value);
+	const compositionGuard = getJsonSelectorAndCommonGuardRegistration(value);
+	if (compositionParser !== undefined && pipelineSchema !== compositionParser.guard) {
+		throw new Error('Selector/common parsing must follow its original guard');
+	}
+	if (compositionGuard !== undefined && pipelineSchema !== compositionGuard.guard) {
+		throw new Error('Selector/common guards require their registered parser pipeline');
+	}
+	const composition = compositionGuard ?? compositionParser;
+	if (composition !== undefined) {
+		assertStaticInputProjection(composition.selector, seen);
+		assertStaticInputProjection(composition.common, seen);
+	}
 	const objectParser = getJsonObjectParserRegistration(value);
 	if (objectParser !== undefined && pipelineSchema !== objectParser.guard) {
 		throw new Error('JSON-object parsing must follow its original object guard');
@@ -65,6 +91,9 @@ function assertStaticInputProjection(value: unknown, seen = new Set<object>(), p
 	if (getLegacyOutputTupleItems(value) !== undefined) {
 		throw new Error('Legacy input contracts cannot use output-only tuple projections');
 	}
+	if (getLegacyOutputOneOfRegistration(value) !== undefined || hasLegacyOutputOneOfOptions(value)) {
+		throw new Error('Legacy input contracts cannot use output-only oneOf projections');
+	}
 	if (getPackedReference(value) !== undefined) {
 		throw new Error('Legacy input contracts cannot use packed references');
 	}
@@ -72,7 +101,7 @@ function assertStaticInputProjection(value: unknown, seen = new Set<object>(), p
 		for (const item of value) assertStaticInputProjection(item, seen);
 		return;
 	}
-	if ('kind' in value && value.kind === 'transformation' && objectParser === undefined) {
+	if ('kind' in value && value.kind === 'transformation' && objectParser === undefined && compositionParser === undefined && exclusiveParser === undefined) {
 		throw new Error('Legacy input contracts cannot perform transformations');
 	}
 	if ('kind' in value && value.kind === 'schema') {
@@ -94,8 +123,8 @@ function assertStaticInputProjection(value: unknown, seen = new Set<object>(), p
 		const flattened = [...flattenInputPipe(value.pipe)];
 		for (const [index, item] of flattened.entries()) {
 			if (item === null || typeof item !== 'object') continue;
-			const guard = getJsonObjectGuardRegistration(item);
-			const parser = getJsonObjectParserRegistration(item);
+			const guard = getJsonObjectGuardRegistration(item) ?? getJsonSelectorAndCommonGuardRegistration(item) ?? getJsonExclusiveObjectGuardRegistration(item);
+			const parser = getJsonObjectParserRegistration(item) ?? getJsonSelectorAndCommonParserRegistration(item) ?? getJsonExclusiveObjectParserRegistration(item);
 			if ((guard !== undefined && flattened[index + 1] !== guard.parser)
 				|| (parser !== undefined && flattened[index - 1] !== parser.guard)) {
 				throw new Error('JSON-object parsing requires its exact guard and parser pair');
@@ -185,15 +214,27 @@ export function projectEndpointContract<
 	if (definition.input.type === 'optional' || definition.input.type === 'exact_optional') {
 		throw new Error('Legacy input contracts require an explicit object body');
 	}
+	assertJsonSelectorAndCommonMetadata(definition.input);
+	assertJsonExclusiveObjectMetadata(definition.input);
 	assertStaticInputProjection(definition.input);
 	assertLegacyOutputTupleMetadata(definition.output);
+	assertLegacyOutputOneOfMetadata(definition.output);
 	// These casts bridge schema AST dialects, never request or response payloads.
 	const input = toLegacyJsonSchema(definition.input, {
 		target: 'openapi-3.0',
 		typeMode: 'ignore',
 	}) as Schema;
 	const tuplePrefixes = new WeakSet<object>();
-	const legacyOutputOverride = ({ valibotSchema }: { valibotSchema: object }): JsonSchema | undefined => {
+	const legacyOutputOverride = ({ valibotSchema, jsonSchema }: { valibotSchema: object; jsonSchema: JsonSchema }): JsonSchema | undefined => {
+		const union = getLegacyOutputOneOfRegistration(valibotSchema);
+		if (union !== undefined) {
+			if (!Array.isArray(jsonSchema.anyOf) || jsonSchema.anyOf.length !== union.options.length
+				|| '$ref' in jsonSchema || '$defs' in jsonSchema || 'definitions' in jsonSchema) {
+				throw new Error('Referenced output oneOf schemas require an explicit legacy projection');
+			}
+			const { anyOf, ...rest } = jsonSchema;
+			return { ...rest, ...(union.legacyRootType === undefined ? {} : { type: union.legacyRootType }), oneOf: anyOf };
+		}
 		const tupleItems = getLegacyOutputTupleLegacyItems(valibotSchema);
 		if (tupleItems !== undefined) {
 			const prefixItems = tupleItems.map(item => ({ ...item }));
@@ -242,7 +283,7 @@ export class ContractEndpoint<
 	Output extends v.GenericSchema,
 	Mode extends ContractEndpointInputMode = 'native',
 	WireInput extends v.GenericSchema = Input,
-> extends Endpoint<Meta, Schema, ContractEndpointInput<Input, Mode>, InferSchemaOutput<Output>> {
+> extends Endpoint<Meta, ContractEndpointInput<Input, Mode>, InferSchemaOutput<Output>> {
 	constructor(
 		meta: Meta,
 		projection: ReturnType<typeof projectEndpointContract<Input, Output, WireInput>>,

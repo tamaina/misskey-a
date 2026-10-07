@@ -3,6 +3,14 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import type { BirthdayEndpoints } from '../../relationships/contract/birthday-endpoint-definitions.js';
+import type { AdminUserEndpoints } from '../../moderation/contract/admin-user-endpoint-definition.js';
+import type { QueueStatsEndpoints } from '../../operations/contract/queue-stats-endpoint-definition.js';
+import type { UserUpdateEndpoints } from '../../users/contract/user-update-endpoint-definitions.js';
+import type { UsersShowEndpoints } from '../../users/contract/show-endpoint-definition.js';
+import type { EmptyObjectKeyEndpoints } from '../../auth/contract/empty-object-key-endpoint-definitions.js';
+import type { UnionNativeEndpoints } from './union-native-endpoints.js';
+import type { SelectorCommonNativeEndpoints } from './selector-common-native-endpoints.js';
 import type { NativeDriveFileCreateEndpoints } from '../../drive/contract/create-endpoint-definition.js';
 import type { PortableConstantNativeEndpoints } from './portable-constant-native-endpoints.js';
 import type { DelayedTupleNativeEndpoints } from './delayed-tuple-native-endpoints.js';
@@ -75,6 +83,14 @@ export type FeatureEndpoints = ModerationCommandEndpoints
 	& SelectorNativeEndpoints
 	& DelayedTupleNativeEndpoints
 	& NativeNoteCreateEndpoints
-	& NativeDriveFileCreateEndpoints;
+	& NativeDriveFileCreateEndpoints
+	& SelectorCommonNativeEndpoints
+	& UnionNativeEndpoints
+	& EmptyObjectKeyEndpoints
+	& UsersShowEndpoints
+	& UserUpdateEndpoints
+	& QueueStatsEndpoints
+	& AdminUserEndpoints
+	& BirthdayEndpoints;
 
 export type { PackedModels } from './packed.js';

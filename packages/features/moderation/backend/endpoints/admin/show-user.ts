@@ -5,194 +5,17 @@
 
 import { Inject, Injectable } from '@nestjs/common';
 import type { UsersRepository, SigninsRepository, UserProfilesRepository } from '@/models/_.js';
-import { Endpoint } from '@/server/api/endpoint-base.js';
+import { LegacyAdminUserProducerEndpoint, legacyAdminShowUserMeta, legacyAdminShowUserParamDef } from '../../legacy-admin-user-producer-endpoint.js';
 import { DI } from '@/di-symbols.js';
 import { RoleService } from '../../../../roles/backend/services/RoleService.js';
 import { RoleEntityService } from '../../../../roles/backend/serializers/RoleEntityService.js';
 import { IdService } from '../../../../runtime/backend/services/IdService.js';
-import { notificationRecieveConfig } from '../../../../users/contract/notification-receive-config.js';
 
-export const meta = {
-	tags: ['admin'],
-
-	requireCredential: true,
-	requireModerator: true,
-	kind: 'read:admin:show-user',
-
-	res: {
-		type: 'object',
-		nullable: false, optional: false,
-		properties: {
-			email: {
-				type: 'string',
-				optional: false, nullable: true,
-			},
-			emailVerified: {
-				type: 'boolean',
-				optional: false, nullable: false,
-			},
-			followedMessage: {
-				type: 'string',
-				optional: false, nullable: true,
-			},
-			autoAcceptFollowed: {
-				type: 'boolean',
-				optional: false, nullable: false,
-			},
-			noCrawle: {
-				type: 'boolean',
-				optional: false, nullable: false,
-			},
-			preventAiLearning: {
-				type: 'boolean',
-				optional: false, nullable: false,
-			},
-			alwaysMarkNsfw: {
-				type: 'boolean',
-				optional: false, nullable: false,
-			},
-			autoSensitive: {
-				type: 'boolean',
-				optional: false, nullable: false,
-			},
-			carefulBot: {
-				type: 'boolean',
-				optional: false, nullable: false,
-			},
-			injectFeaturedNote: {
-				type: 'boolean',
-				optional: false, nullable: false,
-			},
-			receiveAnnouncementEmail: {
-				type: 'boolean',
-				optional: false, nullable: false,
-			},
-			mutedWords: {
-				type: 'array',
-				optional: false, nullable: false,
-				items: {
-					anyOf: [
-						{
-							type: 'string',
-						},
-						{
-							type: 'array',
-							items: {
-								type: 'string',
-							},
-						},
-					],
-				},
-			},
-			mutedInstances: {
-				type: 'array',
-				optional: false, nullable: false,
-				items: {
-					type: 'string',
-				},
-			},
-			notificationRecieveConfig: {
-				type: 'object',
-				optional: false, nullable: false,
-				properties: {
-					note: { optional: true, ...notificationRecieveConfig },
-					follow: { optional: true, ...notificationRecieveConfig },
-					mention: { optional: true, ...notificationRecieveConfig },
-					reply: { optional: true, ...notificationRecieveConfig },
-					renote: { optional: true, ...notificationRecieveConfig },
-					quote: { optional: true, ...notificationRecieveConfig },
-					reaction: { optional: true, ...notificationRecieveConfig },
-					pollEnded: { optional: true, ...notificationRecieveConfig },
-					scheduledNotePosted: { optional: true, ...notificationRecieveConfig },
-					scheduledNotePostFailed: { optional: true, ...notificationRecieveConfig },
-					receiveFollowRequest: { optional: true, ...notificationRecieveConfig },
-					followRequestAccepted: { optional: true, ...notificationRecieveConfig },
-					roleAssigned: { optional: true, ...notificationRecieveConfig },
-					chatRoomInvitationReceived: { optional: true, ...notificationRecieveConfig },
-					achievementEarned: { optional: true, ...notificationRecieveConfig },
-					app: { optional: true, ...notificationRecieveConfig },
-					test: { optional: true, ...notificationRecieveConfig },
-				},
-			},
-			isModerator: {
-				type: 'boolean',
-				optional: false, nullable: false,
-			},
-			isSilenced: {
-				type: 'boolean',
-				optional: false, nullable: false,
-			},
-			isSuspended: {
-				type: 'boolean',
-				optional: false, nullable: false,
-			},
-			isHibernated: {
-				type: 'boolean',
-				optional: false, nullable: false,
-			},
-			lastActiveDate: {
-				type: 'string',
-				optional: false, nullable: true,
-			},
-			moderationNote: {
-				type: 'string',
-				optional: false, nullable: false,
-			},
-			signins: {
-				type: 'array',
-				optional: false, nullable: false,
-				items: {
-					ref: 'Signin',
-				},
-			},
-			policies: {
-				type: 'object',
-				optional: false, nullable: false,
-				ref: 'RolePolicies',
-			},
-			roles: {
-				type: 'array',
-				optional: false, nullable: false,
-				items: {
-					type: 'object',
-					ref: 'Role',
-				},
-			},
-			roleAssigns: {
-				type: 'array',
-				optional: false, nullable: false,
-				items: {
-					type: 'object',
-					properties: {
-						createdAt: {
-							type: 'string',
-							optional: false, nullable: false,
-						},
-						expiresAt: {
-							type: 'string',
-							optional: false, nullable: true,
-						},
-						roleId: {
-							type: 'string',
-							optional: false, nullable: false,
-						},
-					},
-				},
-			},
-		},
-	},
-} as const;
-
-export const paramDef = {
-	type: 'object',
-	properties: {
-		userId: { type: 'string', format: 'misskey:id' },
-	},
-	required: ['userId'],
-} as const;
+export const meta = legacyAdminShowUserMeta;
+export const paramDef = legacyAdminShowUserParamDef;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends LegacyAdminUserProducerEndpoint {
 	constructor(
 		@Inject(DI.usersRepository)
 		private usersRepository: UsersRepository,
@@ -207,7 +30,7 @@ export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDe
 		private roleEntityService: RoleEntityService,
 		private idService: IdService,
 	) {
-		super(meta, paramDef, async (ps, me) => {
+		super(async (ps, me) => {
 			const [user, profile] = await Promise.all([
 				this.usersRepository.findOneBy({ id: ps.userId }),
 				this.userProfilesRepository.findOneBy({ userId: ps.userId }),

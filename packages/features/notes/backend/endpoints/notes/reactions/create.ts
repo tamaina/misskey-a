@@ -4,9 +4,9 @@
  */
 
 import { legacyNotesCommandSchemas } from '../../../commands.js';
-import { notesCommandErrors } from '../../../../contract/index.js';
+import { notesCommandErrors, notesCommandsContract } from '../../../../contract/index.js';
 import type { Schema } from '@/misc/json-schema.js';
-import { Endpoint } from '@/server/api/endpoint-base.js';
+import { createContractTransportEndpoint } from '@/server/api/contract-transport-endpoint.js';
 import { defineFeatureEndpoint } from '@/server/api/feature-endpoint.js';
 
 export const meta = {
@@ -20,4 +20,4 @@ export const meta = {
 export const paramDef = legacyNotesCommandSchemas['notes/reactions/create'].input as Schema;
 
 export const { feature, createEndpoint } = defineFeatureEndpoint('notesCommands', commands =>
-	new Endpoint(meta, paramDef, async (params, user) => commands['notes/reactions/create'](params, { context: { actor: user } })));
+	createContractTransportEndpoint(meta, paramDef, notesCommandsContract['notes/reactions/create'], async (params, user) => commands['notes/reactions/create'](params, { context: { actor: user } })));

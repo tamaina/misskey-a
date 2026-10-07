@@ -4,19 +4,19 @@ SPDX-License-Identifier: AGPL-3.0-only
 -->
 
 <template>
-<SearchMarker path="/settings/security" :label="i18n.ts.security" :keywords="['security']" icon="ti ti-lock" :inlining="['2fa']">
+<SearchMarker path="/settings/security" :label="$locale.sfc.security" :keywords="['security']" icon="ti ti-lock" :inlining="['2fa']">
 	<div class="_gaps_m">
 		<MkFeatureBanner icon="/fluent-emoji/1f510.png" color="#ffbf00">
-			<SearchText>{{ i18n.ts._settings.securityBanner }}</SearchText>
+			<SearchText>{{ $locale.sfc.securityBanner }}</SearchText>
 		</MkFeatureBanner>
 
 		<SearchMarker :keywords="['password']">
 			<FormSection first>
-				<template #label><SearchLabel>{{ i18n.ts.password }}</SearchLabel></template>
+				<template #label><SearchLabel>{{ $locale.sfc.password }}</SearchLabel></template>
 
 				<SearchMarker>
 					<MkButton primary @click="change()">
-						<SearchLabel>{{ i18n.ts.changePassword }}</SearchLabel>
+						<SearchLabel>{{ $locale.sfc.changePassword }}</SearchLabel>
 					</MkButton>
 				</SearchMarker>
 			</FormSection>
@@ -26,7 +26,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 		<SearchMarker :keywords="['signin', 'login', 'history', 'log']">
 			<FormSection>
-				<template #label><SearchLabel>{{ i18n.ts.signinHistory }}</SearchLabel></template>
+				<template #label><SearchLabel>{{ $locale.sfc.signinHistory }}</SearchLabel></template>
 				<MkPagination :paginator="paginator" withControl :forceDisableInfiniteScroll="true">
 					<template #default="{items}">
 						<div>
@@ -47,8 +47,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 		<SearchMarker :keywords="['regenerate', 'refresh', 'reset', 'token']">
 			<FormSection>
 				<FormSlot>
-					<MkButton danger @click="regenerateToken"><i class="ti ti-refresh"></i> <SearchLabel>{{ i18n.ts.regenerateLoginToken }}</SearchLabel></MkButton>
-					<template #caption>{{ i18n.ts.regenerateLoginTokenDescription }}</template>
+					<MkButton danger @click="regenerateToken"><i class="ti ti-refresh"></i> <SearchLabel>{{ $locale.sfc.regenerateLoginToken }}</SearchLabel></MkButton>
+					<template #caption>{{ $locale.sfc.regenerateLoginTokenDescription }}</template>
 				</FormSlot>
 			</FormSection>
 		</SearchMarker>
@@ -65,7 +65,6 @@ import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import MkPagination from '@features/ui/frontend/components/MkPagination.vue';
 import * as os from '@features/ui/frontend/os.js';
 import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
-import { i18n } from '@features/runtime/frontend/i18n.js';
 import { definePage } from '@features/navigation/frontend/page.js';
 import MkFeatureBanner from '@features/web/frontend/components/MkFeatureBanner.vue';
 import { Paginator } from '@features/ui/frontend/utility/paginator.js';
@@ -76,14 +75,14 @@ const paginator = markRaw(new Paginator('i/signin-history', {
 
 async function change() {
 	const { canceled: canceled2, result: newPassword } = await os.inputText({
-		title: i18n.ts.newPassword,
+		title: $locale.value.sfc.newPassword,
 		type: 'password',
 		autocomplete: 'new-password',
 	});
 	if (canceled2 || newPassword == null) return;
 
 	const { canceled: canceled3, result: newPassword2 } = await os.inputText({
-		title: i18n.ts.newPasswordRetype,
+		title: $locale.value.sfc.newPasswordRetype,
 		type: 'password',
 		autocomplete: 'new-password',
 	});
@@ -92,7 +91,7 @@ async function change() {
 	if (newPassword !== newPassword2) {
 		os.alert({
 			type: 'error',
-			text: i18n.ts.retypedNotMatch,
+			text: $locale.value.sfc.retypedNotMatch,
 		});
 		return;
 	}
@@ -122,7 +121,7 @@ const headerActions = computed(() => []);
 const headerTabs = computed(() => []);
 
 definePage(() => ({
-	title: i18n.ts.security,
+	title: $locale.value.sfc.security,
 	icon: 'ti ti-lock',
 }));
 </script>
@@ -178,3 +177,423 @@ definePage(() => ({
 	}
 }
 </style>
+
+<locale locale="ar-SA" lang="json">
+{
+	"newPassword": "كلمة المرور الجديدة",
+	"newPasswordRetype": "كرّر كلمة المرور الجديدة:",
+	"retypedNotMatch": "المدخلات لا تتطابق",
+	"security": "الأمان",
+	"securityBanner": "You can configure settings related to account security, such as password, login methods, authentication apps, and Passkeys.",
+	"password": "الكلمة السرية",
+	"changePassword": "تغيير الكلمة السرية",
+	"signinHistory": "تاريخ تسجيل الدخول",
+	"regenerateLoginToken": "أعد توليد الرمز",
+	"regenerateLoginTokenDescription": "ينشئ رمز استيثاق جديد في العادة هذا ليس ضروريًا ؛ عند إنشاء رمز جديد ستُخرج جميع الأجهزة."
+}
+</locale>
+
+<locale locale="ca-ES" lang="json">
+{
+	"newPassword": "Contrasenya nova",
+	"newPasswordRetype": "Contrasenya nova (repeteix-la)",
+	"retypedNotMatch": "Les entrades no coincideix",
+	"security": "Seguretat",
+	"securityBanner": "Configura les opcions relacionades amb la seguretat del teu compte com ara contrasenyes, mètodes per iniciar sessió, aplicacions d'autentificació i claus d'accés.",
+	"password": "Contrasenya",
+	"changePassword": "Canvia la contrasenya",
+	"signinHistory": "Historial d'autenticacions",
+	"regenerateLoginToken": "Regenerar clau de seguretat d'inici de sessió",
+	"regenerateLoginTokenDescription": "Regenera la clau de seguretat que es fa servir internament durant l'inici de sessió. Normalment aquesta acció no és necessària. Si es regenera es tancarà la sessió a tots els dispositius amb una sessió activa."
+}
+</locale>
+
+<locale locale="cs-CZ" lang="json">
+{
+	"newPassword": "Nové heslo",
+	"newPasswordRetype": "Nové heslo (znovu)",
+	"retypedNotMatch": "Zadané údaje se neshodují.",
+	"security": "Zabezpečení",
+	"securityBanner": "You can configure settings related to account security, such as password, login methods, authentication apps, and Passkeys.",
+	"password": "Heslo",
+	"changePassword": "Změnit heslo",
+	"signinHistory": "Historie přihlášení",
+	"regenerateLoginToken": "Přegenerovat přihlašovací token",
+	"regenerateLoginTokenDescription": "Přegeneruje token interně používaný během přihlášení. Běžně tahle akce není nutná. Pokud bude token přegenerovaný, tak se všechna přihlášená zařízení odhlásí."
+}
+</locale>
+
+<locale locale="da-DK" lang="json">
+{
+	"newPassword": "New password",
+	"newPasswordRetype": "Retype new password",
+	"retypedNotMatch": "The inputs do not match.",
+	"security": "Security",
+	"securityBanner": "You can configure settings related to account security, such as password, login methods, authentication apps, and Passkeys.",
+	"password": "Password",
+	"changePassword": "Change password",
+	"signinHistory": "Login history",
+	"regenerateLoginToken": "Regenerate login token",
+	"regenerateLoginTokenDescription": "Regenerates the token used internally during login. Normally this action is not necessary. If regenerated, all devices will be logged out."
+}
+</locale>
+
+<locale locale="de-DE" lang="json">
+{
+	"newPassword": "Neues Passwort",
+	"newPasswordRetype": "Neues Passwort bestätigen",
+	"retypedNotMatch": "Die Eingaben stimmen nicht überein.",
+	"security": "Sicherheit",
+	"securityBanner": "Du kannst Einstellungen für die Kontosicherheit konfigurieren, z. B. Passwörter, Anmeldemethoden, Authentifizierungs-Apps und Passkeys.",
+	"password": "Passwort",
+	"changePassword": "Passwort ändern",
+	"signinHistory": "Anmeldungsverlauf",
+	"regenerateLoginToken": "Anmeldetoken regenerieren",
+	"regenerateLoginTokenDescription": "Den zur Anmeldung intern verwendeten Token regenerieren. Normalerweise wird dies nicht benötigt. Bei Regeneration werden alle Geräte ausgeloggt."
+}
+</locale>
+
+<locale locale="en-US" lang="json">
+{
+	"newPassword": "New password",
+	"newPasswordRetype": "Retype new password",
+	"retypedNotMatch": "The inputs do not match.",
+	"security": "Security",
+	"securityBanner": "You can configure settings related to account security, such as password, login methods, authentication apps, and Passkeys.",
+	"password": "Password",
+	"changePassword": "Change password",
+	"signinHistory": "Login history",
+	"regenerateLoginToken": "Regenerate login token",
+	"regenerateLoginTokenDescription": "Regenerates the token used internally during login. Normally this action is not necessary. If regenerated, all devices will be logged out."
+}
+</locale>
+
+<locale locale="es-ES" lang="json">
+{
+	"newPassword": "Contraseña nueva",
+	"newPasswordRetype": "Reescribe contraseña nueva",
+	"retypedNotMatch": "La información no coincide.",
+	"security": "Seguridad",
+	"securityBanner": "Puedes configurar opciones relacionadas con la seguridad de la cuenta, como la contraseña, los métodos de inicio de sesión, las aplicaciones de autenticación y Passkeys.",
+	"password": "Contraseña",
+	"changePassword": "Cambiar contraseña",
+	"signinHistory": "Historial de ingresos",
+	"regenerateLoginToken": "Regenerar token de login",
+	"regenerateLoginTokenDescription": "Regenerar el token usado internamente durante el login. No siempre es necesario hacerlo. Al hacerlo de nuevo, se deslogueará en todos los dispositivos."
+}
+</locale>
+
+<locale locale="fr-FR" lang="json">
+{
+	"newPassword": "Nouveau mot de passe",
+	"newPasswordRetype": "Répéter le nouveau mot de passe",
+	"retypedNotMatch": "Les saisies ne correspondent pas.",
+	"security": "Sécurité",
+	"securityBanner": "You can configure settings related to account security, such as password, login methods, authentication apps, and Passkeys.",
+	"password": "Mot de passe",
+	"changePassword": "Modifier votre mot de passe",
+	"signinHistory": "Historique de connexion",
+	"regenerateLoginToken": "Régénérer le jeton de connexion",
+	"regenerateLoginTokenDescription": "Générer un nouveau jeton d'authentification. Cette opération ne devrait pas être nécessaire ; lors de la génération d'un nouveau jeton, tous les appareils seront déconnectés. "
+}
+</locale>
+
+<locale locale="id-ID" lang="json">
+{
+	"newPassword": "Kata sandi baru",
+	"newPasswordRetype": "Ulangi kata sandi baru",
+	"retypedNotMatch": "Input tidak sama",
+	"security": "Keamanan",
+	"securityBanner": "You can configure settings related to account security, such as password, login methods, authentication apps, and Passkeys.",
+	"password": "Kata sandi",
+	"changePassword": "Ubah kata sandi",
+	"signinHistory": "Riwayat masuk",
+	"regenerateLoginToken": "Perbarui token login",
+	"regenerateLoginTokenDescription": "Perbarui token yang digunakan secara internal saat login. Normalnya aksi ini tidak diperlukan. Jika diperbarui, semua perangkat akan dilogout."
+}
+</locale>
+
+<locale locale="it-IT" lang="json">
+{
+	"newPassword": "Nuova Password",
+	"newPasswordRetype": "Conferma password",
+	"retypedNotMatch": "Le password non corrispondono.",
+	"security": "Sicurezza",
+	"securityBanner": "Puoi gestire la sicurezza del tuo account, la password, i modi di accesso, la generazione di codici OTP per accesso multi fattore (MFA/2FA) e la passkey.",
+	"password": "Password",
+	"changePassword": "Aggiorna Password",
+	"signinHistory": "Storico degli accessi al profilo",
+	"regenerateLoginToken": "Genera di nuovo un token di connessione",
+	"regenerateLoginTokenDescription": "Genera un nuovo token di autenticazione. Solitamente questa operazione non è necessaria: quando si genera un nuovo token, tutti i dispositivi vanno disconnessi."
+}
+</locale>
+
+<locale locale="ja-JP" lang="json">
+{
+	"newPassword": "新しいパスワード",
+	"newPasswordRetype": "新しいパスワード(再入力)",
+	"retypedNotMatch": "入力が一致しません。",
+	"security": "セキュリティ",
+	"securityBanner": "パスワード、ログイン方法、認証アプリ、パスキーなどアカウントのセキュリティに関する設定を行えます。",
+	"password": "パスワード",
+	"changePassword": "パスワードを変更",
+	"signinHistory": "ログイン履歴",
+	"regenerateLoginToken": "ログイントークンを再生成",
+	"regenerateLoginTokenDescription": "ログインに使用される内部トークンを再生成します。通常この操作を行う必要はありません。再生成すると、全てのデバイスでログアウトされます。"
+}
+</locale>
+
+<locale locale="ja-KS" lang="json">
+{
+	"newPassword": "今度のパスワード",
+	"newPasswordRetype": "今度のパスワード(もっぺん入れて)",
+	"retypedNotMatch": "入れたやつ合うてへんわ。",
+	"security": "セキュリティ",
+	"securityBanner": "パスワード、ログイン方法、認証アプリ、パスキーとかアカウントのセキュリティに関わる設定ができるで。",
+	"password": "パスワード",
+	"changePassword": "パスワードをいじる",
+	"signinHistory": "ログイン履歴",
+	"regenerateLoginToken": "ログイントークンを再生成",
+	"regenerateLoginTokenDescription": "ログインに使われる内部トークンをもっかい作るで。いつもならこれをやる必要はないで。もっかい作ると、全部のデバイスでログアウトされるで気ぃつけてなー。"
+}
+</locale>
+
+<locale locale="kab-KAB" lang="json">
+{
+	"newPassword": "New password",
+	"newPasswordRetype": "Retype new password",
+	"retypedNotMatch": "The inputs do not match.",
+	"security": "Taɣellist",
+	"securityBanner": "You can configure settings related to account security, such as password, login methods, authentication apps, and Passkeys.",
+	"password": "Awal uffir",
+	"changePassword": "Change password",
+	"signinHistory": "Login history",
+	"regenerateLoginToken": "Regenerate login token",
+	"regenerateLoginTokenDescription": "Regenerates the token used internally during login. Normally this action is not necessary. If regenerated, all devices will be logged out."
+}
+</locale>
+
+<locale locale="kn-IN" lang="json">
+{
+	"newPassword": "New password",
+	"newPasswordRetype": "Retype new password",
+	"retypedNotMatch": "The inputs do not match.",
+	"security": "Security",
+	"securityBanner": "You can configure settings related to account security, such as password, login methods, authentication apps, and Passkeys.",
+	"password": "ಗುಪ್ತಪದ",
+	"changePassword": "Change password",
+	"signinHistory": "Login history",
+	"regenerateLoginToken": "Regenerate login token",
+	"regenerateLoginTokenDescription": "Regenerates the token used internally during login. Normally this action is not necessary. If regenerated, all devices will be logged out."
+}
+</locale>
+
+<locale locale="ko-KR" lang="json">
+{
+	"newPassword": "새 비밀번호",
+	"newPasswordRetype": "새 비밀번호(재입력)",
+	"retypedNotMatch": "입력이 일치하지 않습니다.",
+	"security": "보안",
+	"securityBanner": "비밀번호, 로그인 방법, OTP, 패스 키 등의 계정의 보안에 관련된 설정을 합니다.",
+	"password": "비밀번호",
+	"changePassword": "비밀번호 변경",
+	"signinHistory": "로그인 기록",
+	"regenerateLoginToken": "로그인 토큰을 재생성",
+	"regenerateLoginTokenDescription": "로그인할 때 사용되는 내부 토큰을 재생성합니다. 일반적으로 이 작업을 실행할 필요는 없습니다. 이 기능을 사용하면 이 계정으로 로그인한 모든 기기에서 로그아웃됩니다."
+}
+</locale>
+
+<locale locale="nl-NL" lang="json">
+{
+	"newPassword": "Nieuwe wachtwoord",
+	"newPasswordRetype": "Nieuw wachtwoord (herhalen)",
+	"retypedNotMatch": "Invoer komt niet overeen",
+	"security": "Beveiliging",
+	"securityBanner": "You can configure settings related to account security, such as password, login methods, authentication apps, and Passkeys.",
+	"password": "Wachtwoord",
+	"changePassword": "Wachtwoord wijzigen",
+	"signinHistory": "Inloggeschiedenis",
+	"regenerateLoginToken": "Login token opnieuw genereren",
+	"regenerateLoginTokenDescription": "Regenereren van het token dat intern wordt gebruikt om in te loggen. Dit is normaal gezien niet nodig. Alle apparaten worden afgemeld tijdens het regenereren."
+}
+</locale>
+
+<locale locale="no-NO" lang="json">
+{
+	"newPassword": "Nytt passord",
+	"newPasswordRetype": "Nytt passord (gjenta)",
+	"retypedNotMatch": "Inngangene stemmer ikke overens.",
+	"security": "Sikkerhet",
+	"securityBanner": "You can configure settings related to account security, such as password, login methods, authentication apps, and Passkeys.",
+	"password": "Passord",
+	"changePassword": "Endre passord",
+	"signinHistory": "Login history",
+	"regenerateLoginToken": "Regenerate login token",
+	"regenerateLoginTokenDescription": "Regenerates the token used internally during login. Normally this action is not necessary. If regenerated, all devices will be logged out."
+}
+</locale>
+
+<locale locale="pl-PL" lang="json">
+{
+	"newPassword": "Nowe hasło",
+	"newPasswordRetype": "Powtórz nowe hasło",
+	"retypedNotMatch": "Wejście nie zgadza się.",
+	"security": "Bezpieczeństwo",
+	"securityBanner": "You can configure settings related to account security, such as password, login methods, authentication apps, and Passkeys.",
+	"password": "Hasło",
+	"changePassword": "Zmień hasło",
+	"signinHistory": "Historia logowania",
+	"regenerateLoginToken": "Generuj token logowania ponownie",
+	"regenerateLoginTokenDescription": "Regeneruje token używany wewnętrznie podczas logowania. Zazwyczaj nie jest to konieczne. Po regeneracji wszystkie urządzenia zostaną wylogowane."
+}
+</locale>
+
+<locale locale="pt-PT" lang="json">
+{
+	"newPassword": "Nova senha",
+	"newPasswordRetype": "Nova senha (digite novamente)",
+	"retypedNotMatch": "As informações inseridas não coincidem.",
+	"security": "Segurança",
+	"securityBanner": "Você pode configurar a segurança da conta em ajustes como senha, meios de entrada, aplicativos de autenticação e chaves de acesso.",
+	"password": "Senha",
+	"changePassword": "Mudar senha",
+	"signinHistory": "Histórico de acesso",
+	"regenerateLoginToken": "Gerar novo token de login",
+	"regenerateLoginTokenDescription": "Gera novamente o token interno usado para o login. Normalmente, isso não é necessário. Ao regenerar, você será desconectado de todos os dispositivos."
+}
+</locale>
+
+<locale locale="ru-RU" lang="json">
+{
+	"newPassword": "Новый пароль",
+	"newPasswordRetype": "Новый пароль (ещё раз)",
+	"retypedNotMatch": "Не совпадают",
+	"security": "Безопасность",
+	"securityBanner": "You can configure settings related to account security, such as password, login methods, authentication apps, and Passkeys.",
+	"password": "Пароль",
+	"changePassword": "Изменить пароль",
+	"signinHistory": "Журнал посещений",
+	"regenerateLoginToken": "Создать новый токен для входа",
+	"regenerateLoginTokenDescription": "Создаёт новый токен, используемый внутри программы во время входа. Обычно в этом нет необходимости. При создании все устройства будут отключены."
+}
+</locale>
+
+<locale locale="sk-SK" lang="json">
+{
+	"newPassword": "Nové heslo",
+	"newPasswordRetype": "Nové heslo (znovu)",
+	"retypedNotMatch": "Zadané vstupy nesúhlasia",
+	"security": "Zabezpečenie",
+	"securityBanner": "You can configure settings related to account security, such as password, login methods, authentication apps, and Passkeys.",
+	"password": "Heslo",
+	"changePassword": "Zmeniť heslo",
+	"signinHistory": "História prihlásení",
+	"regenerateLoginToken": "Pregenerovať prihlasovací token",
+	"regenerateLoginTokenDescription": "Pregeneruje token interne používaný počas prihlásenia. Normálne toto netreba robiť. Ak sa pregeneruje, všetky zariadenia sa odhlásia."
+}
+</locale>
+
+<locale locale="th-TH" lang="json">
+{
+	"newPassword": "รหัสผ่านใหม่",
+	"newPasswordRetype": "ใส่รหัสผ่านใหม่อีกครั้ง",
+	"retypedNotMatch": "ทั้งสองป้อนข้อมูลไม่สอดคล้องกัน",
+	"security": "ความปลอดภัย",
+	"securityBanner": "สามารถตั้งค่าความปลอดภัยของบัญชี เช่น รหัสผ่าน วิธีการเข้าสู่ระบบ แอปยืนยันตัวตน Passkey เป็นต้น",
+	"password": "รหัสผ่าน",
+	"changePassword": "เปลี่ยนรหัสผ่าน",
+	"signinHistory": "ประวัติการเข้าสู่ระบบ",
+	"regenerateLoginToken": "สร้างโทเค็นการเข้าสู่ระบบอีกครั้ง",
+	"regenerateLoginTokenDescription": "สร้างโทเค็นใหม่ที่ใช้ภายในระหว่างการเข้าสู่ระบบ โดยตามหลักปกติแล้วการดำเนินการนี้ไม่จำเป็น หากสร้างใหม่ อุปกรณ์ทั้งหมดจะถูกออกจากระบบนะ"
+}
+</locale>
+
+<locale locale="tr-TR" lang="json">
+{
+	"newPassword": "Yeni şifre",
+	"newPasswordRetype": "Yeni şifreyi tekrar girin",
+	"retypedNotMatch": "Girişler eşleşmiyor.",
+	"security": "Güvenlik",
+	"securityBanner": "Şifre, oturum açma yöntemleri, kimlik doğrulama uygulamaları ve Passkeys gibi hesap güvenliği ile ilgili ayarları yapılandırabilirsin.",
+	"password": "Şifre",
+	"changePassword": "Şifreyi değiştir",
+	"signinHistory": "Giriş geçmişi",
+	"regenerateLoginToken": "Giriş jetonunu yeniden oluştur",
+	"regenerateLoginTokenDescription": "Giriş sırasında dahili olarak kullanılan jetonu yeniden oluşturur. Normalde bu işlem gerekli değildir. Yeniden oluşturulursa, tüm cihazlar oturumu kapatılır."
+}
+</locale>
+
+<locale locale="ug-CN" lang="json">
+{
+	"newPassword": "New password",
+	"newPasswordRetype": "Retype new password",
+	"retypedNotMatch": "The inputs do not match.",
+	"security": "Security",
+	"securityBanner": "You can configure settings related to account security, such as password, login methods, authentication apps, and Passkeys.",
+	"password": "Password",
+	"changePassword": "Change password",
+	"signinHistory": "Login history",
+	"regenerateLoginToken": "Regenerate login token",
+	"regenerateLoginTokenDescription": "Regenerates the token used internally during login. Normally this action is not necessary. If regenerated, all devices will be logged out."
+}
+</locale>
+
+<locale locale="uk-UA" lang="json">
+{
+	"newPassword": "Новий пароль",
+	"newPasswordRetype": "Новий пароль (повторно)",
+	"retypedNotMatch": "Введені дані не збігаються.",
+	"security": "Безпека",
+	"securityBanner": "Ви можете змінювати налаштування, пов'язані з безпекою облікового запису, такі як пароль, методи входження, засоби аутентифікації, й Passkeys.",
+	"password": "Пароль",
+	"changePassword": "Змінити пароль",
+	"signinHistory": "Історія входів",
+	"regenerateLoginToken": "Оновити Login Token",
+	"regenerateLoginTokenDescription": "Регенерувати внутрішній ключ використовуваний під час входу. Зазвичай цього не потрібно робити. При регенерації всі пристрої вийдуть з системи."
+}
+</locale>
+
+<locale locale="vi-VN" lang="json">
+{
+	"newPassword": "Mật khẩu mới",
+	"newPasswordRetype": "Nhập lại mật khẩu mới",
+	"retypedNotMatch": "Mật khẩu không trùng khớp.",
+	"security": "Bảo mật",
+	"securityBanner": "You can configure settings related to account security, such as password, login methods, authentication apps, and Passkeys.",
+	"password": "Mật khẩu",
+	"changePassword": "Đổi mật khẩu",
+	"signinHistory": "Lịch sử đăng nhập",
+	"regenerateLoginToken": "Tạo lại mã đăng nhập",
+	"regenerateLoginTokenDescription": "Tạo lại mã nội bộ có thể dùng để đăng nhập. Thông thường hành động này là không cần thiết. Nếu được tạo lại, tất cả các thiết bị sẽ bị đăng xuất."
+}
+</locale>
+
+<locale locale="zh-CN" lang="json">
+{
+	"newPassword": "新密码",
+	"newPasswordRetype": "重新输入密码：",
+	"retypedNotMatch": "两次输入不一致！",
+	"security": "安全",
+	"securityBanner": "可在此设置如密码、登入方式、验证器、Passkey 等账户安全性设置。",
+	"password": "密码",
+	"changePassword": "修改密码",
+	"signinHistory": "登录历史",
+	"regenerateLoginToken": "重新生成登录令牌",
+	"regenerateLoginTokenDescription": "重新生成用于登录的内部令牌。通常您不需要这样做。重新生成后，您将在所有设备上登出。"
+}
+</locale>
+
+<locale locale="zh-TW" lang="json">
+{
+	"newPassword": "新密碼",
+	"newPasswordRetype": "確認密碼",
+	"retypedNotMatch": "兩次輸入不一致。",
+	"security": "安全性",
+	"securityBanner": "您可以設定與帳戶安全性相關的設定，例如密碼、登入方式、驗證應用程式和通行金鑰。",
+	"password": "密碼",
+	"changePassword": "修改密碼",
+	"signinHistory": "登入歷史",
+	"regenerateLoginToken": "重新產生登入權杖",
+	"regenerateLoginTokenDescription": "重新產生用於登入的內部權杖。通常不需要使用此功能。重新產生後，所有裝置都將被登出。"
+}
+</locale>

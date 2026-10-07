@@ -3,19 +3,15 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Inject, Injectable } from '@nestjs/common';
-import { DI } from '@/di-symbols.js';
 import type { MiRegistryItem, RegistryItemsRepository } from '@/models/_.js';
 import { IdentifiableError } from '@/misc/identifiable-error.js';
-import type { MiUser } from '../../../users/backend/models/User.js';
-import { IdService } from '../../../runtime/backend/services/IdService.js';
-import { GlobalEventService } from '../../../runtime/backend/services/GlobalEventService.js';
 import { bindThis } from '@/decorators.js';
+import type { MiUser } from '../../../users/backend/models/User.js';
+import type { IdService } from '../../../runtime/backend/services/IdService.js';
+import type { GlobalEventService } from '../../../runtime/backend/services/GlobalEventService.js';
 
-@Injectable()
 export class RegistryApiService {
 	constructor(
-		@Inject(DI.registryItemsRepository)
 		private registryItemsRepository: RegistryItemsRepository,
 
 		private idService: IdService,

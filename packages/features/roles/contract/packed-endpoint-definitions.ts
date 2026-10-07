@@ -6,6 +6,9 @@
 import type { InferContractRouterInputs, InferContractRouterOutputs } from '@orpc/contract';
 import * as v from 'valibot';
 import { defineEndpointContract } from '../../api/contract/definition.js';
+import { opaqueObject } from '../../api/contract/opaque-object.js';
+import { jsonObject } from '../../api/contract/json-object.js';
+import { jsonNumber } from '../../api/contract/json-number.js';
 import { misskeyId } from '../../api/contract/index.js';
 import { resultObject } from '../../api/contract/result-object.js';
 import { packedReference } from '../../api/contract/packed-reference.js';
@@ -79,7 +82,32 @@ export const packedRolesUsersDefinition = defineEndpointContract(
 	packedRolesUsersOutput,
 );
 
+export const packedAdminRolesCreateInput = jsonObject({
+	name: v.string(),
+	description: v.string(),
+	color: v.nullable(v.string()),
+	iconUrl: v.nullable(v.string()),
+	target: v.picklist(['manual', 'conditional']),
+	condFormula: opaqueObject,
+	isPublic: v.boolean(),
+	isModerator: v.boolean(),
+	isAdministrator: v.boolean(),
+	isExplorable: v.optional(v.boolean(), false),
+	asBadge: v.boolean(),
+	preserveAssignmentOnMoveAccount: v.optional(v.boolean()),
+	canEditMembersByModerator: v.boolean(),
+	displayOrder: jsonNumber,
+	policies: opaqueObject,
+});
+export const packedAdminRolesCreateOutput = packedReference('Role');
+export const packedAdminRolesCreateDefinition = defineEndpointContract(
+	{ method: 'POST', path: '/admin/roles/create', tags: ['admin', 'role'] },
+	packedAdminRolesCreateInput,
+	packedAdminRolesCreateOutput,
+);
+
 export const packedEndpointDefinitions = {
+	"admin/roles/create": packedAdminRolesCreateDefinition,
 	"admin/roles/list": packedAdminRolesListDefinition,
 	"admin/roles/show": packedAdminRolesShowDefinition,
 	"roles/list": packedRolesListDefinition,
@@ -89,6 +117,7 @@ export const packedEndpointDefinitions = {
 } as const;
 
 export const packedEndpointContracts = {
+	"admin/roles/create": packedAdminRolesCreateDefinition.contract,
 	"admin/roles/list": packedAdminRolesListDefinition.contract,
 	"admin/roles/show": packedAdminRolesShowDefinition.contract,
 	"roles/list": packedRolesListDefinition.contract,

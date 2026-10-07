@@ -320,7 +320,7 @@ test('responses return the original packed payload and all extension fields', as
 test('new bridge retains actual legacy AJV defaults, unknown fields and errors', async () => {
 	const original = baseline.routes.find(row => row.route === 'reversi/games')!;
 	const projection = projectEndpointContract(gameDefinitions['reversi/games']);
-	const old = new Endpoint({}, frozenInputs['reversi/games'], async () => []);
+	const old = new Endpoint({}, frozenInputs['reversi/games'], async (_params: unknown) => []);
 	const current = new ContractEndpoint({}, projection, async () => []);
 	for (const sample of [{}, { my: true, future: 'keep' }, { limit: 0 }, { limit: null }, { sinceId: 'bad-id' }, [], null]) {
 		const before = structuredClone(sample);
@@ -368,7 +368,7 @@ test('every migrated request preserves native/AJV object, array and unknown-own-
 		const definition = definitions[route];
 		const projection = projectEndpointContract<v.GenericSchema, v.GenericSchema>(definition);
 		const payload = { unchanged: true };
-		const old = new Endpoint({}, frozenInputs[route], async () => payload);
+		const old = new Endpoint({}, frozenInputs[route], async (_params: unknown) => payload);
 		const current = new ContractEndpoint<typeof transportMeta, v.GenericSchema, v.GenericSchema>(transportMeta, projection, async () => payload);
 		const samples = [validInputs[route], { ...validInputs[route], ...ownKeys }, [], [1], null, 'string', 1, true];
 		for (const sample of samples) {

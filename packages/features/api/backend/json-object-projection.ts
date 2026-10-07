@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 import { metadata } from 'valibot';
-import { getJsonObjectGuardRegistration, getJsonObjectParserRegistration } from '../contract/json-object.js';
+import { getJsonObjectGuardRegistration, getJsonObjectParserRegistration, getJsonObjectSchemaRegistration } from '../contract/json-object.js';
 
 const annotations = new Set([
 	'title', 'description', 'example', 'examples', '$comment', 'deprecated',
@@ -56,7 +56,8 @@ function boundary(value: object, seen = new Set<object>()): Boundary | undefined
 }
 
 /** Protect only object-guard nodes and containing pipelines; leave sibling primitive metadata alone. */
-export function assertJsonObjectMetadata(schema: object): void {
+export function assertJsonObjectMetadata(schema: object): Set<object> {
+	const omissions = new Set<object>();
 	const seen = new Set<object>();
 	const parents = new Map<object, Set<object>>();
 	const protectedNodes = new Set<object>();
@@ -109,11 +110,29 @@ export function assertJsonObjectMetadata(schema: object): void {
 				if (annotations.has(key)) continue;
 				if (key === 'nullable' && value === false && shape?.nullable === false) continue;
 				if (key === 'required' && shape?.required !== undefined) {
-					if (value === undefined && shape.required.length === 0) continue;
+					if (value === undefined && shape.required.length === 0) {
+						if (isJsonObjectNoopMetadata(node, action)) omissions.add(action);
+						continue;
+					}
 					if (Array.isArray(value) && value.length === 0 && shape.required.length === 0) continue;
 				}
 				throw new Error('JSON-object pipelines allow only annotations or proven no-op object metadata');
 			}
 		}
 	}
+	return omissions;
+}
+
+/** Only exact original objects admit these already-proven layout-only annotations. */
+export function isJsonObjectNoopMetadata(node: object, action: object): boolean {
+	if (!('type' in action) || action.type !== 'metadata' || !('reference' in action) || action.reference !== metadata
+		|| !('metadata' in action) || action.metadata === null || typeof action.metadata !== 'object'
+		|| Object.keys(action.metadata).length !== 1) return false;
+	const original = 'pipe' in node && Array.isArray(node.pipe) ? node.pipe[0] : node;
+	if (original === null || typeof original !== 'object' || getJsonObjectSchemaRegistration(original) === undefined
+		|| !('entries' in original) || original.entries === null || typeof original.entries !== 'object') return false;
+	if (Object.hasOwn(action.metadata, 'nullable') && Reflect.get(action.metadata, 'nullable') === false) return true;
+	if (!Object.hasOwn(action.metadata, 'required') || Reflect.get(action.metadata, 'required') !== undefined) return false;
+	return Object.values(original.entries).every(entry => entry !== null && typeof entry === 'object'
+		&& 'type' in entry && entry.type === 'optional' && 'default' in entry && entry.default === undefined);
 }

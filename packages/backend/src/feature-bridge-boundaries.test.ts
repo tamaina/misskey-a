@@ -13,6 +13,8 @@ const testDirectory = path.dirname(fileURLToPath(import.meta.url));
 const repositoryRoot = path.resolve(testDirectory, '../../..');
 const backendSourceRoot = testDirectory;
 const featureRoot = path.resolve(repositoryRoot, 'packages/features');
+const endpointRegistryPath = path.resolve(backendSourceRoot, 'server/api/endpoint-list.ts');
+const expectedRouteOrder = JSON.parse(readFileSync(path.resolve(testDirectory, '../test/fixtures/backend-api-registry-order.json'), 'utf8')) as string[];
 const removedBridgePaths = JSON.parse(readFileSync(path.resolve(testDirectory, '../test/fixtures/backend-feature-bridge-removal.json'), 'utf8')) as string[];
 const removedBridgeStems = new Set(removedBridgePaths.map(bridgePath => path.resolve(repositoryRoot, bridgePath).replace(/\.tsx?$/, '')));
 
@@ -79,10 +81,25 @@ function resolveExistingModule(importer: string, specifier: string): string | nu
 	return candidates.find(candidate => existsSync(candidate)) ?? null;
 }
 
+// The host composition registry is not a one-to-one compatibility forwarder.
+// Recognize its exact namespace contract, never a general barrel/path exemption.
+function isCanonicalEndpointRegistry(file: string, ast: ts.SourceFile): boolean {
+	return path.resolve(file) === endpointRegistryPath
+		&& ast.statements.length === expectedRouteOrder.length
+		&& ast.statements.every((statement, index) => ts.isExportDeclaration(statement)
+			&& !statement.isTypeOnly
+			&& statement.moduleSpecifier != null
+			&& ts.isStringLiteralLike(statement.moduleSpecifier)
+			&& statement.exportClause != null
+			&& ts.isNamespaceExport(statement.exportClause)
+			&& statement.exportClause.name.text === expectedRouteOrder[index]);
+}
+
 function isFeatureReexportBridge(file: string): boolean {
 	const source = readFileSync(file, 'utf8');
 	const kind = file.endsWith('.tsx') ? ts.ScriptKind.TSX : ts.ScriptKind.TS;
 	const ast = ts.createSourceFile(file, source, ts.ScriptTarget.Latest, true, kind);
+	if (isCanonicalEndpointRegistry(file, ast)) return false;
 	if (ast.statements.length === 0 || !ast.statements.every(statement => ts.isExportDeclaration(statement) && statement.moduleSpecifier && ts.isStringLiteralLike(statement.moduleSpecifier))) return false;
 	return ast.statements.every(statement => {
 		if (!ts.isExportDeclaration(statement) || !statement.moduleSpecifier || !ts.isStringLiteralLike(statement.moduleSpecifier)) return false;
@@ -111,4 +128,25 @@ test('removed backend feature bridge paths stay absent and unreferenced', () => 
 test('backend source has no export-only forwarders into feature modules', () => {
 	const bridges = sourceFilesIn(backendSourceRoot).filter(isFeatureReexportBridge).map(file => path.relative(repositoryRoot, file));
 	expect(bridges).toEqual([]);
+});
+
+test('only the complete ordered host namespace registry is a composition exception', () => {
+	const source = readFileSync(endpointRegistryPath, 'utf8');
+	const parse = (text: string) => ts.createSourceFile(endpointRegistryPath, text, ts.ScriptTarget.Latest, true);
+	const ast = parse(source);
+	expect(isCanonicalEndpointRegistry(endpointRegistryPath, ast)).toBe(true);
+	expect(isCanonicalEndpointRegistry(path.join(backendSourceRoot, 'barrel.ts'), ast)).toBe(false);
+
+	const namespaceExports = expectedRouteOrder.map(route => `export * as '${route}' from './owner.js';`);
+	const invalidSources = [
+		namespaceExports.slice(1).join('\n'),
+		[...namespaceExports].reverse().join('\n'),
+		[namespaceExports[0], ...namespaceExports.slice(0, -1)].join('\n'),
+		source.replace('export * as', 'export type * as'),
+		`export { default } from './owner.js';\n${namespaceExports.slice(1).join('\n')}`,
+		`${source}\nconst extra = true;`,
+	];
+	for (const invalidSource of invalidSources) {
+		expect(isCanonicalEndpointRegistry(endpointRegistryPath, parse(invalidSource))).toBe(false);
+	}
 });

@@ -56,7 +56,7 @@ for (const item of cases) {
 		const projection = projectEndpointContract(definition);
 		const legacySchema = { type: 'object', properties: { value: { type: 'string', ...options } }, required: ['value'] } as const;
 		expect(JSON.parse(JSON.stringify(projection.input))).toEqual(legacySchema);
-		const original = new Endpoint(meta, legacySchema, async () => {});
+		const original = new Endpoint(meta, legacySchema, async (_params: unknown) => {});
 		const current = new ContractEndpoint(meta, projection, async () => {});
 		for (const value of [...values, null, 42]) {
 			const before = { value };

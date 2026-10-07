@@ -31,9 +31,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 				</div>
 				<div :class="$style.itemInfo">
 					<span>{{ displayItem.item.file.type }}</span>
-					<span v-if="displayItem.item.compressedSize">({{ i18n.tsx._uploader.compressedToX({ x: bytes(displayItem.item.compressedSize) }) }} = {{ i18n.tsx._uploader.savedXPercent({ x: Math.round((1 - displayItem.item.compressedSize / displayItem.item.file.size) * 100) }) }})</span>
+					<span v-if="displayItem.item.compressedSize">({{ interpolateLocaleParameters($locale.sfc.compressedToX, { x: bytes(displayItem.item.compressedSize) }) }} = {{ interpolateLocaleParameters($locale.sfc.savedXPercent, { x: Math.round((1 - displayItem.item.compressedSize / displayItem.item.file.size) * 100) }) }})</span>
 					<span v-else>{{ bytes(displayItem.item.file.size) }}</span>
-					<span v-if="displayItem.item.preprocessing">{{ i18n.ts.preprocessing }}<MkLoading inline em style="margin-left: 0.5em;"/></span>
+					<span v-if="displayItem.item.preprocessing">{{ $locale.sfc.preprocessing }}<MkLoading inline em style="margin-left: 0.5em;"/></span>
 				</div>
 				<div>
 				</div>
@@ -53,7 +53,7 @@ import { computed } from 'vue';
 import { isLink } from '@@/js/is-link.js';
 import type { UploaderItem } from '@features/drive/frontend/composables/use-uploader.js';
 import { getUploadName } from '@features/drive/frontend/composables/use-uploader.js';
-import { i18n } from '@features/runtime/frontend/i18n.js';
+import { interpolateLocaleParameters } from '@features/runtime/frontend/interpolate-locale-parameters.js';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import { isPreviewable, getType } from '@features/media/frontend/utility/lightbox.js';
 import bytes from '@features/ui/frontend/filters/bytes.js';
@@ -251,3 +251,227 @@ async function onThumbnailClick(item: UploaderItem, ev: PointerEvent) {
 	}
 }
 </style>
+
+<locale lang="json" locale="ar-SA">
+{
+	"compressedToX": "Compressed to {x}",
+	"savedXPercent": "Saving {x}%",
+	"preprocessing": "Preparing..."
+}
+</locale>
+
+<locale lang="json" locale="ca-ES">
+{
+	"compressedToX": "Comprimit a {x}",
+	"savedXPercent": "{x}% d'estalvi ",
+	"preprocessing": "Preparant"
+}
+</locale>
+
+<locale lang="json" locale="cs-CZ">
+{
+	"compressedToX": "Compressed to {x}",
+	"savedXPercent": "Saving {x}%",
+	"preprocessing": "Připravuji..."
+}
+</locale>
+
+<locale lang="json" locale="da-DK">
+{
+	"compressedToX": "Compressed to {x}",
+	"savedXPercent": "Saving {x}%",
+	"preprocessing": "Preparing..."
+}
+</locale>
+
+<locale lang="json" locale="de-DE">
+{
+	"compressedToX": "Komprimiert zu {x}",
+	"savedXPercent": "{x}% gespart",
+	"preprocessing": "In Vorbereitung"
+}
+</locale>
+
+<locale lang="json" locale="en-US">
+{
+	"compressedToX": "Compressed to {x}",
+	"savedXPercent": "Saving {x}%",
+	"preprocessing": "Preparing..."
+}
+</locale>
+
+<locale lang="json" locale="es-ES">
+{
+	"compressedToX": "Comprimir a {x}",
+	"savedXPercent": "Guardando {x}%",
+	"preprocessing": "Preparando"
+}
+</locale>
+
+<locale lang="json" locale="fr-FR">
+{
+	"compressedToX": "Compressed to {x}",
+	"savedXPercent": "Saving {x}%",
+	"preprocessing": "Preparing..."
+}
+</locale>
+
+<locale lang="json" locale="id-ID">
+{
+	"compressedToX": "Compressed to {x}",
+	"savedXPercent": "Saving {x}%",
+	"preprocessing": "Sedang mempersiapkan..."
+}
+</locale>
+
+<locale lang="json" locale="it-IT">
+{
+	"compressedToX": "Compresso in {x}",
+	"savedXPercent": "{x}% risparmiati",
+	"preprocessing": "In preparazione"
+}
+</locale>
+
+<locale lang="json" locale="ja-JP">
+{
+	"compressedToX": "{x}に圧縮",
+	"savedXPercent": "{x}%節約",
+	"preprocessing": "準備中"
+}
+</locale>
+
+<locale lang="json" locale="ja-KS">
+{
+	"compressedToX": "{x}に圧縮",
+	"savedXPercent": "{x}%節約",
+	"preprocessing": "準備中"
+}
+</locale>
+
+<locale lang="json" locale="kab-KAB">
+{
+	"compressedToX": "Compressed to {x}",
+	"savedXPercent": "Saving {x}%",
+	"preprocessing": "Preparing..."
+}
+</locale>
+
+<locale lang="json" locale="kn-IN">
+{
+	"compressedToX": "Compressed to {x}",
+	"savedXPercent": "Saving {x}%",
+	"preprocessing": "Preparing..."
+}
+</locale>
+
+<locale lang="json" locale="ko-KR">
+{
+	"compressedToX": "{x}로 압축",
+	"savedXPercent": "{x}% 절약",
+	"preprocessing": "준비중"
+}
+</locale>
+
+<locale lang="json" locale="nl-NL">
+{
+	"compressedToX": "Compressed to {x}",
+	"savedXPercent": "Saving {x}%",
+	"preprocessing": "Preparing..."
+}
+</locale>
+
+<locale lang="json" locale="no-NO">
+{
+	"compressedToX": "Compressed to {x}",
+	"savedXPercent": "Saving {x}%",
+	"preprocessing": "Preparing..."
+}
+</locale>
+
+<locale lang="json" locale="pl-PL">
+{
+	"compressedToX": "Compressed to {x}",
+	"savedXPercent": "Saving {x}%",
+	"preprocessing": "Preparing..."
+}
+</locale>
+
+<locale lang="json" locale="pt-PT">
+{
+	"compressedToX": "Comprimido para {x}",
+	"savedXPercent": "Salvando {x}%",
+	"preprocessing": "Preparando..."
+}
+</locale>
+
+<locale lang="json" locale="ru-RU">
+{
+	"compressedToX": "Compressed to {x}",
+	"savedXPercent": "Saving {x}%",
+	"preprocessing": "Подготовка..."
+}
+</locale>
+
+<locale lang="json" locale="sk-SK">
+{
+	"compressedToX": "Compressed to {x}",
+	"savedXPercent": "Saving {x}%",
+	"preprocessing": "Preparing..."
+}
+</locale>
+
+<locale lang="json" locale="th-TH">
+{
+	"compressedToX": "บีบอัดเป็น {x}",
+	"savedXPercent": "ประหยัดไป {x}%",
+	"preprocessing": "กำลังจัดเตรียม..."
+}
+</locale>
+
+<locale lang="json" locale="tr-TR">
+{
+	"compressedToX": "{x} boyutuna sıkıştırıldı",
+	"savedXPercent": "{x}% tasarruf",
+	"preprocessing": "Hazırlık aşamasında"
+}
+</locale>
+
+<locale lang="json" locale="ug-CN">
+{
+	"compressedToX": "Compressed to {x}",
+	"savedXPercent": "Saving {x}%",
+	"preprocessing": "Preparing..."
+}
+</locale>
+
+<locale lang="json" locale="uk-UA">
+{
+	"compressedToX": "Compressed to {x}",
+	"savedXPercent": "Saving {x}%",
+	"preprocessing": "Підготовка"
+}
+</locale>
+
+<locale lang="json" locale="vi-VN">
+{
+	"compressedToX": "Compressed to {x}",
+	"savedXPercent": "Saving {x}%",
+	"preprocessing": "Preparing..."
+}
+</locale>
+
+<locale lang="json" locale="zh-CN">
+{
+	"compressedToX": "压缩 {x}",
+	"savedXPercent": "节省了 {x}% 的空间",
+	"preprocessing": "准备中"
+}
+</locale>
+
+<locale lang="json" locale="zh-TW">
+{
+	"compressedToX": "壓縮為 {x}",
+	"savedXPercent": "節省了 {x}%",
+	"preprocessing": "準備中"
+}
+</locale>

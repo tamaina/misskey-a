@@ -4,8 +4,11 @@
  */
 
 import { Inject, Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { queueStatsDefinition, queueStatsInput, queueStatsOutput } from '../../../../contract/queue-stats-endpoint-definition.js';
 import type { DbQueue, DeliverQueue, EndedPollNotificationQueue, PostScheduledNoteQueue, InboxQueue, ObjectStorageQueue, SystemQueue, UserWebhookDeliverQueue, SystemWebhookDeliverQueue } from '@/core/QueueModule.js';
+
+const contractProjection = projectEndpointContract(queueStatsDefinition);
 
 export const meta = {
 	tags: ['admin'],
@@ -14,38 +17,13 @@ export const meta = {
 	requireModerator: true,
 	kind: 'read:admin:queue',
 
-	res: {
-		type: 'object',
-		optional: false, nullable: false,
-		properties: {
-			deliver: {
-				optional: false, nullable: false,
-				ref: 'QueueCount',
-			},
-			inbox: {
-				optional: false, nullable: false,
-				ref: 'QueueCount',
-			},
-			db: {
-				optional: false, nullable: false,
-				ref: 'QueueCount',
-			},
-			objectStorage: {
-				optional: false, nullable: false,
-				ref: 'QueueCount',
-			},
-		},
-	},
+	res: contractProjection.response,
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {},
-	required: [],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof queueStatsInput, typeof queueStatsOutput> {
 	constructor(
 		@Inject('queue:system') public systemQueue: SystemQueue,
 		@Inject('queue:endedPollNotification') public endedPollNotificationQueue: EndedPollNotificationQueue,
@@ -57,7 +35,7 @@ export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDe
 		@Inject('queue:userWebhookDeliver') public userWebhookDeliverQueue: UserWebhookDeliverQueue,
 		@Inject('queue:systemWebhookDeliver') public systemWebhookDeliverQueue: SystemWebhookDeliverQueue,
 	) {
-		super(meta, paramDef, async (ps, me) => {
+		super(meta, contractProjection, async (ps, me) => {
 			const deliverJobCounts = await this.deliverQueue.getJobCounts();
 			const inboxJobCounts = await this.inboxQueue.getJobCounts();
 			const dbJobCounts = await this.dbQueue.getJobCounts();

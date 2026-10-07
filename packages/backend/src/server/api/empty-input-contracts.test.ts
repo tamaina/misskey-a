@@ -151,7 +151,7 @@ for (const route of Object.keys(definitions) as (keyof typeof definitions)[]) {
 		const sentinel = { unvalidatedResponse: true, opaque: ['preserve'] };
 		let legacyCalls = 0;
 		let nativeCalls = 0;
-		const legacy = new Endpoint(transportMeta, {}, async params => {
+		const legacy = new Endpoint(transportMeta, {}, async (params: unknown) => {
 			legacyCalls++;
 			expect(params).toBe(input);
 			return sentinel;

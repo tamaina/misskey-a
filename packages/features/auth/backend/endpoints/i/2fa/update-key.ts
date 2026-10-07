@@ -5,12 +5,15 @@
 
 import bcrypt from 'bcryptjs';
 import { Inject, Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { emptyObjectI2faUpdateKeyDefinition, emptyObjectI2faUpdateKeyInput, emptyObjectI2faUpdateKeyOutput } from '../../../../contract/empty-object-key-endpoint-definitions.js';
 import type { UserSecurityKeysRepository } from '@/models/_.js';
 import { UserEntityService } from '../../../../../users/backend/serializers/UserEntityService.js';
 import { GlobalEventService } from '../../../../../runtime/backend/services/GlobalEventService.js';
 import { DI } from '@/di-symbols.js';
 import { ApiError } from '@/server/api/error.js';
+
+const contractProjection = projectEndpointContract(emptyObjectI2faUpdateKeyDefinition);
 
 export const meta = {
 	requireCredential: true,
@@ -32,17 +35,10 @@ export const meta = {
 	},
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {
-		name: { type: 'string', minLength: 1, maxLength: 30 },
-		credentialId: { type: 'string' },
-	},
-	required: ['name', 'credentialId'],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof emptyObjectI2faUpdateKeyInput, typeof emptyObjectI2faUpdateKeyOutput> {
 	constructor(
 		@Inject(DI.userSecurityKeysRepository)
 		private userSecurityKeysRepository: UserSecurityKeysRepository,
@@ -50,7 +46,7 @@ export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDe
 		private userEntityService: UserEntityService,
 		private globalEventService: GlobalEventService,
 	) {
-		super(meta, paramDef, async (ps, me) => {
+		super(meta, contractProjection, async (ps, me) => {
 			const key = await this.userSecurityKeysRepository.findOneBy({
 				id: ps.credentialId,
 			});

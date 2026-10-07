@@ -58,16 +58,20 @@ for (const statement of ast.statements) {
 }
 const routeFixturePath = fileURLToPath(new URL('../../../test/fixtures/backend-api-routes.json', import.meta.url));
 const expectedRouteKeys = JSON.parse(readFileSync(routeFixturePath, 'utf8')) as string[];
+const expectedRouteOrder = JSON.parse(readFileSync(fileURLToPath(new URL('../../../test/fixtures/backend-api-registry-order.json', import.meta.url)), 'utf8')) as string[];
+const expectedFeatureFactories = JSON.parse(readFileSync(fileURLToPath(new URL('../../../test/fixtures/backend-api-feature-factories.json', import.meta.url)), 'utf8')) as Record<string, { source: string; feature: string }>;
 const moduleProviders = Reflect.getMetadata(MODULE_METADATA.PROVIDERS, EndpointsModule) as ProviderDefinition[];
 
 test('API endpoint route keys retain the published contract', () => {
 	const routeKeys = Object.keys(endpointModules).sort();
 	expect([...routeSources.keys()].sort()).toEqual(expectedRouteKeys);
+	expect([...routeSources.keys()]).toEqual(expectedRouteOrder);
 	expect(routeKeys).toEqual(expectedRouteKeys);
 });
 
 test('API endpoint registry binds canonical classes and feature factories exactly once', () => {
 	const defaultRoutes = new Set<string>();
+	const factoryRoutes = new Set<string>();
 
 	for (const [route, endpoint] of Object.entries(endpointModules)) {
 		expect(endpoint.meta).toBeDefined();
@@ -81,6 +85,11 @@ test('API endpoint registry binds canonical classes and feature factories exactl
 		const [provider] = routeProviders;
 
 		if ('createEndpoint' in endpoint) {
+			factoryRoutes.add(route);
+			const expectedFactory = expectedFeatureFactories[route];
+			expect(expectedFactory).toBeDefined();
+			expect(routeSources.get(route)).toBe(expectedFactory.source);
+			expect(endpoint.feature).toBe(expectedFactory.feature);
 			expect(typeof endpoint.createEndpoint).toBe('function');
 			expect(typeof endpoint.feature).toBe('string');
 			expect(provider.useFactory).toBe(endpoint.createEndpoint);
@@ -107,6 +116,7 @@ test('API endpoint registry binds canonical classes and feature factories exactl
 	}
 
 	expect(defaultRoutes).toEqual(new Set(featureDefaultEndpoints.keys()));
+	expect(factoryRoutes).toEqual(new Set(Object.keys(expectedFeatureFactories)));
 });
 
 test('feature-owned default endpoints have real implementations and no old-path bridges', () => {
@@ -114,6 +124,22 @@ test('feature-owned default endpoints have real implementations and no old-path 
 		const implementationPath = fileURLToPath(new URL(`../../../../features/${owner}/backend/endpoints/${route}.ts`, import.meta.url));
 		const implementation = ts.createSourceFile(implementationPath, readFileSync(implementationPath, 'utf8'), ts.ScriptTarget.Latest, true);
 		expect(implementation.statements.some(statement => ts.isClassDeclaration(statement) && statement.modifiers?.some(modifier => modifier.kind === ts.SyntaxKind.DefaultKeyword))).toBe(true);
+		expect(existsSync(fileURLToPath(new URL(`./endpoints/${route}.ts`, import.meta.url)))).toBe(false);
+	}
+});
+
+test('feature-owned factories have real adapters and no old-path bridges', () => {
+	for (const [route, { source }] of Object.entries(expectedFeatureFactories)) {
+		expect(source).toMatch(/^\.{2}\/\.{2}\/\.{2}\/\.{2}\/features\/[^/]+\/backend\/endpoints\/.+\.js$/);
+		const implementationPath = fileURLToPath(new URL(source.replace(/\.js$/, '.ts'), import.meta.url));
+		const implementation = ts.createSourceFile(implementationPath, readFileSync(implementationPath, 'utf8'), ts.ScriptTarget.Latest, true);
+		let hasFeatureFactory = false;
+		const visit = (node: ts.Node) => {
+			if (ts.isCallExpression(node) && ts.isIdentifier(node.expression) && node.expression.text === 'defineFeatureEndpoint') hasFeatureFactory = true;
+			ts.forEachChild(node, visit);
+		};
+		visit(implementation);
+		expect(hasFeatureFactory).toBe(true);
 		expect(existsSync(fileURLToPath(new URL(`./endpoints/${route}.ts`, import.meta.url)))).toBe(false);
 	}
 });

@@ -3,12 +3,15 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { allOfAdminEmojiUpdateDefinition, allOfAdminEmojiUpdateInput, allOfAdminEmojiUpdateOutput } from '../../../../contract/selector-common-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
 import { CustomEmojiService } from '../../../services/CustomEmojiService.js';
 import type { DriveFilesRepository, MiEmoji } from '@/models/_.js';
 import { DI } from '@/di-symbols.js';
 import { ApiError } from '@/server/api/error.js';
+
+const contractProjection = projectEndpointContract(allOfAdminEmojiUpdateDefinition);
 
 export const meta = {
 	tags: ['admin'],
@@ -36,58 +39,17 @@ export const meta = {
 	},
 } as const;
 
-export const paramDef = {
-	allOf: [
-		{
-			anyOf: [
-				{
-					type: 'object',
-					properties: {
-						id: { type: 'string', format: 'misskey:id' },
-					},
-					required: ['id'],
-				},
-				{
-					type: 'object',
-					properties: {
-						name: { type: 'string', pattern: '^[a-zA-Z0-9_]+$' },
-					},
-					required: ['name'],
-				},
-			],
-		},
-		{
-			type: 'object',
-			properties: {
-				fileId: { type: 'string', format: 'misskey:id' },
-				category: {
-					type: 'string',
-					nullable: true,
-					description: 'Use `null` to reset the category.',
-				},
-				aliases: { type: 'array', items: {
-					type: 'string',
-				} },
-				license: { type: 'string', nullable: true },
-				isSensitive: { type: 'boolean' },
-				localOnly: { type: 'boolean' },
-				roleIdsThatCanBeUsedThisEmojiAsReaction: { type: 'array', items: {
-					type: 'string',
-				} },
-			},
-		},
-	],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof allOfAdminEmojiUpdateInput, typeof allOfAdminEmojiUpdateOutput, 'legacy-declared'> {
 	constructor(
 		@Inject(DI.driveFilesRepository)
 		private driveFilesRepository: DriveFilesRepository,
 
 		private customEmojiService: CustomEmojiService,
 	) {
-		super(meta, paramDef, async (ps, me) => {
+		super(meta, contractProjection, async (ps, me) => {
 			let driveFile;
 			if (ps.fileId) {
 				driveFile = await this.driveFilesRepository.findOneBy({ id: ps.fileId });

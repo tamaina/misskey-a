@@ -4,9 +4,9 @@
  */
 
 import type { Packed } from '../../../../features/index/contract/packed.js';
-import type { SchemaType } from '@/misc/json-schema.js';
+import type * as v from 'valibot';
 import type { EmojiSimple, EmojiDetailed } from '@features/emojis/contract';
-import type { packedEmojiSimpleSchema } from '../../../../features/emojis/contract/packed.js';
+import type { packedEmojiSimpleSchema, packedEmojiDetailedSchema } from '../../../../features/emojis/contract/packed.js';
 import { expect, expectTypeOf, test, vi } from 'vitest';
 import type { InstanceFeature } from '@features/instance/backend';
 import type { StatisticsFeature } from '@features/statistics/backend';
@@ -37,7 +37,7 @@ test('legacy packed emoji types resolve from the feature contract', () => {
 	expectTypeOf<Packed<'EmojiSimple'>>().toEqualTypeOf<EmojiSimple>();
 	expectTypeOf<Packed<'EmojiDetailed'>>().toEqualTypeOf<EmojiDetailed>();
 	expectTypeOf<keyof typeof packedEmojiSimpleSchema.entries>().toEqualTypeOf<keyof EmojiSimple>();
-	expectTypeOf<SchemaType<{ type: 'object'; ref: 'EmojiDetailed' }>>().toEqualTypeOf<EmojiDetailed>();
+	expectTypeOf<v.InferOutput<typeof packedEmojiDetailedSchema>>().toEqualTypeOf<EmojiDetailed>();
 	expectTypeOf<Packed<'EmojiSimple'>['localOnly']>().toEqualTypeOf<boolean | undefined>();
 	expectTypeOf<Packed<'EmojiDetailed'>['host']>().toEqualTypeOf<string | null>();
 });

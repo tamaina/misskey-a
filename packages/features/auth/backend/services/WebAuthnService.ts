@@ -3,20 +3,18 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Inject, Injectable } from '@nestjs/common';
-import * as Redis from 'ioredis';
 import {
 	generateAuthenticationOptions,
 	generateRegistrationOptions, verifyAuthenticationResponse,
 	verifyRegistrationResponse,
 } from '@simplewebauthn/server';
 import { AttestationFormat, isoCBOR, isoUint8Array } from '@/runtime-dependencies/webauthn-helpers.js';
-import { DI } from '@/di-symbols.js';
 import type { MiMeta, UserSecurityKeysRepository } from '@/models/_.js';
 import type { Config } from '@/config.js';
 import { bindThis } from '@/decorators.js';
 import { MiUser } from '@/models/_.js';
 import { IdentifiableError } from '@/misc/identifiable-error.js';
+import type * as Redis from 'ioredis';
 import type {
 	AuthenticationResponseJSON,
 	AuthenticatorTransportFuture,
@@ -26,19 +24,14 @@ import type {
 	RegistrationResponseJSON,
 } from '@simplewebauthn/server';
 
-@Injectable()
 export class WebAuthnService {
 	constructor(
-		@Inject(DI.config)
 		private config: Config,
 
-		@Inject(DI.meta)
 		private meta: MiMeta,
 
-		@Inject(DI.redis)
 		private redisClient: Redis.Redis,
 
-		@Inject(DI.userSecurityKeysRepository)
 		private userSecurityKeysRepository: UserSecurityKeysRepository,
 	) {
 	}

@@ -486,6 +486,148 @@
           "port": "idService"
         }
       ]
+    },
+    "media": {
+      "ImageProcessingService": [],
+      "VideoProcessingService": [
+        {
+          "port": "config"
+        },
+        {
+          "service": "ImageProcessingService"
+        }
+      ],
+      "SensitiveMediaDetectionService": [
+        {
+          "port": "meta"
+        },
+        {
+          "port": "httpRequestService"
+        },
+        {
+          "port": "loggerService"
+        }
+      ],
+      "FileInfoService": [
+        {
+          "service": "SensitiveMediaDetectionService"
+        },
+        {
+          "port": "loggerService"
+        }
+      ]
+    },
+    "markup": {
+      "MfmService": [
+        {
+          "port": "config"
+        }
+      ]
+    },
+    "preferences": {
+      "RegistryApiService": [
+        {
+          "port": "registryItemsRepository"
+        },
+        {
+          "port": "idService"
+        },
+        {
+          "port": "globalEventService"
+        }
+      ]
+    },
+    "moderationLogging": {
+      "ModerationLogService": [
+        {
+          "port": "moderationLogsRepository"
+        },
+        {
+          "port": "idService"
+        }
+      ]
+    },
+    "authSecurity": {
+      "UserAuthService": [
+        {
+          "port": "redisClient"
+        },
+        {
+          "port": "usersRepository"
+        },
+        {
+          "port": "userProfilesRepository"
+        }
+      ],
+      "WebAuthnService": [
+        {
+          "port": "config"
+        },
+        {
+          "port": "meta"
+        },
+        {
+          "port": "redisClient"
+        },
+        {
+          "port": "userSecurityKeysRepository"
+        }
+      ]
+    },
+    "userSearch": {
+      "UserSearchService": [
+        {
+          "port": "config"
+        },
+        {
+          "port": "usersRepository"
+        },
+        {
+          "port": "userProfilesRepository"
+        },
+        {
+          "port": "followingsRepository"
+        },
+        {
+          "port": "mutingsRepository"
+        },
+        {
+          "port": "userEntityService"
+        }
+      ]
+    },
+    "ranking": {
+      "FeaturedService": [
+        {
+          "port": "redisClient"
+        }
+      ],
+      "HashtagService": [
+        {
+          "port": "db"
+        },
+        {
+          "port": "meta"
+        },
+        {
+          "port": "redisClient"
+        },
+        {
+          "port": "hashtagsRepository"
+        },
+        {
+          "port": "userEntityService"
+        },
+        {
+          "service": "FeaturedService"
+        },
+        {
+          "port": "idService"
+        },
+        {
+          "port": "utilityService"
+        }
+      ]
     }
   }
 }

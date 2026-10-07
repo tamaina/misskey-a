@@ -292,11 +292,12 @@ not install global output validation on legacy endpoints, strip unknown response
 fields, or normalize stored data. Opaque-schema compatibility fixes and
 serializer/guard work remain separate API-host and feature responsibilities.
 
-This is not full endpoint-schema retirement. Legacy endpoint input `Schema` and
-`SchemaType` remain in the backend compatibility layer for the next input-contract
-phase, and inline endpoint `meta.res` schemas still use the legacy converter.
-The 69-model registry is a bounded schema migration, not a claim that every
-endpoint contract or runtime response path is fully migrated.
+The 69-model registry was a bounded packed-schema migration. The subsequent
+native endpoint phase removes the JSON-Schema-to-TypeScript payload interpreter
+and its endpoint generic defaults. `Schema` and inline `meta.res` projections
+remain compatibility metadata for AJV and the OpenAPI writer; retaining this
+metadata does not make it the source of handler payload types. Neither phase
+adds global runtime response validation.
 
 EmojiSimple and EmojiDetailed continue to reuse their existing emoji feature
 contract schemas rather than duplicating the field lists. Optional wire properties
@@ -590,3 +591,92 @@ Generic frontend dialog requests retain the API helper's optional credential
 shape, and pagination accepts only object-shaped request contracts. Unconstrained
 API requests remain unconstrained in the SDK; their existing direct callers are
 unchanged. These frontend corrections change types only.
+
+Seven additional media, markup, preferences and moderation services use plain
+constructors with feature-owned declarations. The total is 44 classes in 22 groups.
+Moderation logging has a separate declaration in the same owner module, preserving
+the existing serializer factory's complete narrow input/output types, including
+its parse-only Id dependency. HTTP/logger/repository resources remain host-owned.
+This cohort adds 41 production lines while removing framework decorators; it does
+not claim a further net line reduction.
+
+Five selector-plus-common APIs now compose an ordered native selector union with
+shared optional fields. Both schemas parse the same original object; the common
+result supplies defaults without the recursive merge behavior of stock
+intersection parsing. The legacy allOf/anyOf document and handler branch choices
+are preserved. The existing declared-field handler compatibility mode is explicit.
+The SDK's 29 optional common values now include explicit undefined; nine native
+parsed defaults are required. JSON serialization and HTTP behavior are unchanged.
+Native definition coverage is 427 of 438 routes.
+
+Eight existing forwarding factories now derive callback types from their native
+oRPC contract witnesses. This deliberately retains the audited legacy JSON
+metadata and the existing Endpoint/AJV execution path; native transforms are not
+executed by this adapter. Only audited schema/transport pairs belong here. In
+particular, an existing own-undefined JavaScript-only mismatch still reaches the
+feature procedure and retains its native rejection. Root-optional native contracts
+do not broaden the HTTP body's object requirement. This pilot preceded the
+remaining factory/class and antenna migrations; final interpreter retirement is
+described below.
+
+Meta and relationship lookup now use native unions, bringing definition coverage
+to 429 of 438 routes. Meta's overlapping output alternatives keep ordinary native
+union semantics while retaining the old oneOf documentation. Relationship lookup
+still returns arrays for scalar IDs and preserves undeclared runtime extras. Its
+identifier/string-array input alternatives are disjoint. The new bounded union
+projections explicitly exclude lazy descendants/returns; unrelated lazy schemas
+remain supported. No response validation or data rewriting is added.
+
+Authentication/security and user search add three plain constructors, bringing
+the declaration graph to 47 classes in 24 groups. Their separate groups preserve
+the old auth factory's complete value types and zero-input discovery factory.
+Redis is still the host-owned DI.redis instance; OTP replay/TTL, backup-code and
+WebAuthn challenge/counter logic are unchanged. This cohort removes four net
+production lines and does not change resource lifecycle ownership.
+
+A further 74 static-label SFCs own their VVI dictionaries, bringing the total to
+287 components. All 31,052 migrated values retain the exact 28-language content,
+including whitespace, NBSP and newline cases. Numeric static keys keep bracket
+access, and the mutable welcome error title has an explicit string annotation.
+The note-image test mounts the real asynchronous internationalization plugin.
+Dynamic keys, formatting paths, TS consumers, SW/embedded translations and the
+i18n package remain separate work; no global locale YAML is changed.
+
+Security-key removal/update have native declared-object outputs matching their
+actual 200 {} responses. The legacy adapter deliberately retains its res-less
+metadata and 204 documentation. SDK return types now describe the actual object
+rather than EmptyResponse's undefined alternative; existing callers only await
+the result. Handler/authentication/ownership checks and response identity are
+unchanged. Native definition coverage is 431 of 438 routes.
+
+All 84 remaining host forwarding adapters now live under their feature owners.
+Nineteen metadata-only owner files gained their real closures; the other 65 owner
+files are new. The host endpoint directory retains only its two tests, with no
+production forwarding or re-export bridges. The registry still owns composition
+and preserves all 438 route keys and their order. Shared transport/OpenAPI tooling
+stays in the backend package, alongside its build configuration.
+
+All 92 forwarding factories now consume native contract witness types, including
+the initial eight and the remaining 84. Root-optional bodies, existing legacy
+metadata and trusted actor/token closures retain their execution semantics.
+The audited non-JSON mismatches remain explicit: 15 optional native roots and
+25 present-undefined optional fields keep their old validation sequence. These
+witnesses do not authorize arbitrary native transforms at the AJV boundary.
+All 438 registered routes now have native contracts, and the antenna artifact
+type is inferred from its feature-owned native schema. `SchemaType`,
+`SchemaTypeDef`, `ObjType` and the recursive JSON Schema payload interpreter are
+removed. `Endpoint<Meta, Input, Output>` has no payload defaults; its constructor
+still accepts JSON `Schema` metadata and executes the same AJV validation body.
+`ContractEndpoint` and all 92 witness factories supply native-inferred types.
+`Packed<K>` remains a lookup over native Valibot schemas. Baseline tests use
+explicit frozen shapes where they read fields and explicit unknown inputs where
+they test identity or validation only; they do not clone the retired interpreter.
+
+Named feature-owned compatibility boundaries remain deliberately narrow. Role
+creation/update and WebAuthn registration preserve existing unchecked rich
+service-input assumptions after object validation; these are not domain
+validation guarantees. The admin user producer preserves raw `MiSignin` values
+without the documented `createdAt` field. These exceptions retain native types
+for the other fields and do not create a caller-selected payload escape. No
+new response parsing, normalization, file-cleanup change or AJV behavior is
+introduced by interpreter retirement.

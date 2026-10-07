@@ -3,8 +3,9 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
-import { voidAdminRolesUpdateDefinition, voidAdminRolesUpdateInput, voidAdminRolesUpdateOutput } from '../../../../contract/void-endpoint-definitions.js';
+import { projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { voidAdminRolesUpdateDefinition } from '../../../../contract/void-endpoint-definitions.js';
+import { LegacyRoleUpdateConsumerEndpoint } from '../../../legacy-role-consumer-endpoint.js';
 import { Inject, Injectable } from '@nestjs/common';
 
 import type { RolesRepository } from '@/models/_.js';
@@ -33,7 +34,7 @@ export const meta = {
 export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof voidAdminRolesUpdateInput, typeof voidAdminRolesUpdateOutput> {
+export class EndpointImplementation extends LegacyRoleUpdateConsumerEndpoint<typeof meta> {
 	constructor(
 		@Inject(DI.rolesRepository)
 		private rolesRepository: RolesRepository,

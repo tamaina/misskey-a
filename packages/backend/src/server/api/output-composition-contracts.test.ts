@@ -144,7 +144,7 @@ test('native validation matches legacy AJV defaults, errors and unknown own keys
 		const definition = definitions[route];
 		const projection = projectEndpointContract<v.GenericSchema, v.GenericSchema>(definition);
 		const response = { untouched: true };
-		const old = new Endpoint(transportMeta, oldInput(route), async () => response);
+		const old = new Endpoint(transportMeta, oldInput(route), async (_params: unknown) => response);
 		const current = new ContractEndpoint<typeof transportMeta, v.GenericSchema, v.GenericSchema>(transportMeta, projection, async () => response);
 		const valid = samples[route][0];
 		for (const sample of [...samples[route], { ...valid, ...ownKeys }, [], [valid], null, 'string', 1, true]) {

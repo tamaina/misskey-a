@@ -5,20 +5,20 @@
 
 import { describe, expect, test } from 'vitest';
 import { createEmojis } from '@features/emojis/backend';
-import { createEndpoint as createEmojiEndpoint, meta as emojiMeta } from './endpoints/emoji.js';
-import { createEndpoint as createEmojisEndpoint, meta as emojisMeta } from './endpoints/emojis.js';
+import { createEndpoint as createEmojiEndpoint, meta as emojiMeta } from '../../../../features/emojis/backend/endpoints/emoji.js';
+import { createEndpoint as createEmojisEndpoint, meta as emojisMeta } from '../../../../features/emojis/backend/endpoints/emojis.js';
 import { createAvatarDecorations } from '@features/avatar-decorations/backend';
 import type { MiLocalUser } from '../../../../features/users/backend/models/User.js';
-import { createEndpoint as createDecorationsEndpoint, meta as decorationsMeta } from './endpoints/get-avatar-decorations.js';
+import { createEndpoint as createDecorationsEndpoint, meta as decorationsMeta } from '../../../../features/avatar-decorations/backend/endpoints/get-avatar-decorations.js';
 import { createStatistics } from '@features/statistics/backend';
-import { createEndpoint as createStatsEndpoint, meta as statsMeta } from './endpoints/stats.js';
+import { createEndpoint as createStatsEndpoint, meta as statsMeta } from '../../../../features/statistics/backend/endpoints/stats.js';
 import { createInstance } from '@features/instance/backend';
 import type { EndpointDescriptor, ReadEndpoints } from '@features/instance/backend';
-import { createEndpoint as createPingEndpoint, meta as pingMeta } from './endpoints/ping.js';
-import { createEndpoint as createOnlineUsersCountEndpoint, meta as onlineUsersCountMeta } from './endpoints/get-online-users-count.js';
-import { createEndpoint as createServerInfoEndpoint, meta as serverInfoMeta } from './endpoints/server-info.js';
-import { createEndpoint as createEndpointIntrospectionEndpoint, meta as endpointMeta } from './endpoints/endpoint.js';
-import { createEndpoint as createEndpointsEndpoint, meta as endpointsMeta } from './endpoints/endpoints.js';
+import { createEndpoint as createPingEndpoint, meta as pingMeta } from '../../../../features/instance/backend/endpoints/ping.js';
+import { createEndpoint as createOnlineUsersCountEndpoint, meta as onlineUsersCountMeta } from '../../../../features/instance/backend/endpoints/get-online-users-count.js';
+import { createEndpoint as createServerInfoEndpoint, meta as serverInfoMeta } from '../../../../features/instance/backend/endpoints/server-info.js';
+import { createEndpoint as createEndpointIntrospectionEndpoint, meta as endpointMeta } from '../../../../features/instance/backend/endpoints/endpoint.js';
+import { createEndpoint as createEndpointsEndpoint, meta as endpointsMeta } from '../../../../features/instance/backend/endpoints/endpoints.js';
 
 function makeInstance(readEndpoints: ReadEndpoints) {
 	return createInstance({

@@ -6,12 +6,16 @@
 import { describe, test, assert, afterEach } from 'vitest';
 import { render, cleanup, type RenderResult } from '@testing-library/vue';
 import * as Misskey from 'misskey-js';
+import { createInternationalization } from 'virtual:vite-vue-internationalization';
 import { components } from '@features/index/frontend/components.js';
 import { directives } from '@features/index/frontend/directives.js';
 import MkMediaImage from '@features/media/frontend/components/MkMediaImage.vue';
 
 describe('MkMediaImage', () => {
-	const renderMediaImage = (image: Partial<Misskey.entities.DriveFile>): RenderResult => {
+	const renderMediaImage = async (image: Partial<Misskey.entities.DriveFile>): Promise<RenderResult> => {
+		const internationalization = createInternationalization({ initialLocale: 'en-US' });
+		await internationalization.ready;
+		await internationalization.loadLocale('en-US');
 		return render(MkMediaImage, {
 			props: {
 				image: {
@@ -30,7 +34,7 @@ describe('MkMediaImage', () => {
 					...image,
 				} as Misskey.entities.DriveFile,
 			},
-			global: { directives, components },
+			global: { directives, components, plugins: [internationalization] },
 		});
 	};
 
@@ -39,7 +43,7 @@ describe('MkMediaImage', () => {
 	});
 
 	test('Attaching JPG should show no indicator', async () => {
-		const mkMediaImage = renderMediaImage({
+		const mkMediaImage = await renderMediaImage({
 			type: 'image/jpeg',
 		});
 		const [gif, alt] = await Promise.all([
@@ -51,7 +55,7 @@ describe('MkMediaImage', () => {
 	});
 
 	test('Attaching GIF should show a GIF indicator', async () => {
-		const mkMediaImage = renderMediaImage({
+		const mkMediaImage = await renderMediaImage({
 			type: 'image/gif',
 		});
 		const [gif, alt] = await Promise.all([
@@ -63,7 +67,7 @@ describe('MkMediaImage', () => {
 	});
 
 	test('Attaching APNG should show a GIF indicator', async () => {
-		const mkMediaImage = renderMediaImage({
+		const mkMediaImage = await renderMediaImage({
 			type: 'image/apng',
 		});
 		const [gif, alt] = await Promise.all([
@@ -75,7 +79,7 @@ describe('MkMediaImage', () => {
 	});
 
 	test('Attaching image with an alt message should show an ALT indicator', async () => {
-		const mkMediaImage = renderMediaImage({
+		const mkMediaImage = await renderMediaImage({
 			type: 'image/png',
 			comment: 'Misskeyのロゴです',
 		});
@@ -88,7 +92,7 @@ describe('MkMediaImage', () => {
 	});
 
 	test('Attaching GIF image with an alt message should show a GIF and an ALT indicator', async () => {
-		const mkMediaImage = renderMediaImage({
+		const mkMediaImage = await renderMediaImage({
 			type: 'image/gif',
 			comment: 'Misskeyのロゴです',
 		});

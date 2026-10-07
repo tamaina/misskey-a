@@ -6,11 +6,13 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { describe, beforeEach, beforeAll, afterEach, afterAll, vi, test, expect } from 'vitest';
 import { In } from 'typeorm';
-import { UserSearchService } from '../../../features/discovery/backend/services/UserSearchService.js';
 import { FollowingsRepository, MiUser, UserProfilesRepository, UsersRepository } from '@/models/_.js';
-import { IdService } from '../../../features/runtime/backend/services/IdService.js';
 import { GlobalModule } from '@/GlobalModule.js';
+import type { Config } from '@/config.js';
+import type { MutingsRepository } from '@/models/_.js';
 import { DI } from '@/di-symbols.js';
+import { IdService } from '../../../features/runtime/backend/services/IdService.js';
+import { UserSearchService } from '../../../features/discovery/backend/services/UserSearchService.js';
 import { UserEntityService } from '../../../features/users/backend/serializers/UserEntityService.js';
 
 describe('UserSearchService', () => {
@@ -90,7 +92,11 @@ describe('UserSearchService', () => {
 					GlobalModule,
 				],
 				providers: [
-					UserSearchService,
+					{
+						provide: UserSearchService,
+						inject: [DI.config, DI.usersRepository, DI.userProfilesRepository, DI.followingsRepository, DI.mutingsRepository, UserEntityService],
+						useFactory: (config: Config, users: UsersRepository, profiles: UserProfilesRepository, followings: FollowingsRepository, mutings: MutingsRepository, userEntity: UserEntityService) => new UserSearchService(config, users, profiles, followings, mutings, userEntity),
+					},
 					{
 						provide: UserEntityService, useFactory: vi.fn(() => ({
 							// とりあえずIDが返れば確認が出来るので

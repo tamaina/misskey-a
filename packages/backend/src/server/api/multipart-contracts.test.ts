@@ -138,7 +138,7 @@ test('legacy and native bridge retain exact AJV outcomes, defaults, params ident
 	for (const sample of samples) {
 		const before = structuredClone(sample), after = structuredClone(sample);
 		let oldCalls = 0, newCalls = 0;
-		const old = new Endpoint(fileMeta, legacyParams, async params => { oldCalls++; expect(params).toBe(before); return params; });
+		const old = new Endpoint(fileMeta, legacyParams, async (params: unknown) => { oldCalls++; expect(params).toBe(before); return params; });
 		const current = new ContractEndpoint<typeof fileMeta, typeof driveFilesCreateInput, v.GenericSchema, 'native', typeof driveFilesCreateWireInput>(fileMeta, projection, async params => { newCalls++; expect(params).toBe(after); return params; });
 		const outcome = async (endpoint: { exec: (input: unknown, me: null, token: null, file: typeof descriptor) => Promise<unknown> }, input: unknown) => {
 			try { expect(await endpoint.exec(input, null, null, descriptor)).toBe(input); return { valid: true }; } catch (error) {

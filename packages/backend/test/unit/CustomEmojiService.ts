@@ -5,15 +5,15 @@
 
 import { afterEach, beforeAll, describe, test, expect } from 'vitest';
 import { Test, TestingModule } from '@nestjs/testing';
-import { CustomEmojiService } from '../../../features/emojis/backend/services/CustomEmojiService.js';
 import { featureServiceGroups } from '@/core/feature-service-providers.js';
-import { GlobalEventService } from '../../../features/runtime/backend/services/GlobalEventService.js';
-import { IdService } from '../../../features/runtime/backend/services/IdService.js';
-import { ModerationLogService } from '../../../features/moderation/backend/services/ModerationLogService.js';
 import { UtilityService } from '@/core/UtilityService.js';
 import { DI } from '@/di-symbols.js';
 import { GlobalModule } from '@/GlobalModule.js';
-import { EmojisRepository } from '@/models/_.js';
+import { type ModerationLogsRepository, EmojisRepository } from '@/models/_.js';
+import { ModerationLogService } from '../../../features/moderation/backend/services/ModerationLogService.js';
+import { IdService } from '../../../features/runtime/backend/services/IdService.js';
+import { GlobalEventService } from '../../../features/runtime/backend/services/GlobalEventService.js';
+import { CustomEmojiService } from '../../../features/emojis/backend/services/CustomEmojiService.js';
 import { MiEmoji } from '../../../features/emojis/backend/models/Emoji.js';
 
 describe('CustomEmojiService', () => {
@@ -34,7 +34,11 @@ describe('CustomEmojiService', () => {
 					UtilityService,
 					IdService,
 					...featureServiceGroups.emojis.providers,
-					ModerationLogService,
+					{
+						provide: ModerationLogService,
+						inject: [DI.moderationLogsRepository, IdService],
+						useFactory: (repository: ModerationLogsRepository, id: IdService) => new ModerationLogService(repository, id),
+					},
 					GlobalEventService,
 				],
 			})

@@ -62,7 +62,6 @@ import { extractUrlFromMfm } from '@features/markup/frontend/utility/extract-url
 import MkUrlPreview from '@features/markup/frontend/components/MkUrlPreview.vue';
 import { ensureSignin } from '@features/auth/frontend/i.js';
 import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
-import { i18n } from '@features/runtime/frontend/i18n.js';
 import MkFukidashi from '@features/ui/frontend/components/MkFukidashi.vue';
 import * as os from '@features/ui/frontend/os.js';
 import { copyToClipboard } from '@features/ui/frontend/utility/copy-to-clipboard.js';
@@ -140,7 +139,7 @@ function showMenu(ev: PointerEvent, contextmenu = false) {
 
 	if (!isMe.value && $i.policies.chatAvailability === 'available') {
 		menu.push({
-			text: i18n.ts.reaction,
+			text: $locale.value.sfc.reaction,
 			icon: 'ti ti-mood-plus',
 			action: (ev) => {
 				react(ev);
@@ -153,7 +152,7 @@ function showMenu(ev: PointerEvent, contextmenu = false) {
 	}
 
 	menu.push({
-		text: i18n.ts.copyContent,
+		text: $locale.value.sfc.copyContent,
 		icon: 'ti ti-copy',
 		action: () => {
 			copyToClipboard(props.message.text ?? '');
@@ -166,7 +165,7 @@ function showMenu(ev: PointerEvent, contextmenu = false) {
 
 	if (isMe.value && $i.policies.chatAvailability === 'available') {
 		menu.push({
-			text: i18n.ts.delete,
+			text: $locale.value.sfc.delete,
 			icon: 'ti ti-trash',
 			danger: true,
 			action: () => {
@@ -179,7 +178,7 @@ function showMenu(ev: PointerEvent, contextmenu = false) {
 
 	if (!isMe.value && props.message.fromUser != null) {
 		menu.push({
-			text: i18n.ts.reportAbuse,
+			text: $locale.value.sfc.reportAbuse,
 			icon: 'ti ti-exclamation-circle',
 			action: async () => {
 				const localUrl = `${url}/chat/messages/${props.message.id}`;
@@ -330,3 +329,255 @@ function showMenu(ev: PointerEvent, contextmenu = false) {
 	height: 24px;
 }
 </style>
+
+<locale locale="ar-SA" lang="json">
+{
+	"reaction": "التفاعلات",
+	"copyContent": "انسخ المحتوى",
+	"delete": "حذف",
+	"reportAbuse": "أبلغ"
+}
+</locale>
+
+<locale locale="ca-ES" lang="json">
+{
+	"reaction": "Reacció ",
+	"copyContent": "Copia el contingut",
+	"delete": "Elimina",
+	"reportAbuse": "Denuncia un abús "
+}
+</locale>
+
+<locale locale="cs-CZ" lang="json">
+{
+	"reaction": "Reakce",
+	"copyContent": "Zkopírovat obsah",
+	"delete": "Smazat",
+	"reportAbuse": "Nahlášení"
+}
+</locale>
+
+<locale locale="da-DK" lang="json">
+{
+	"reaction": "Reactions",
+	"copyContent": "Copy contents",
+	"delete": "Delete",
+	"reportAbuse": "Report"
+}
+</locale>
+
+<locale locale="de-DE" lang="json">
+{
+	"reaction": "Reaktionen",
+	"copyContent": "Inhalt kopieren",
+	"delete": "Löschen",
+	"reportAbuse": "Melden"
+}
+</locale>
+
+<locale locale="en-US" lang="json">
+{
+	"reaction": "Reactions",
+	"copyContent": "Copy contents",
+	"delete": "Delete",
+	"reportAbuse": "Report"
+}
+</locale>
+
+<locale locale="es-ES" lang="json">
+{
+	"reaction": "Reacción",
+	"copyContent": "Copiar contenido",
+	"delete": "Borrar",
+	"reportAbuse": "Reportar"
+}
+</locale>
+
+<locale locale="fr-FR" lang="json">
+{
+	"reaction": "Réactions",
+	"copyContent": "Copier le contenu",
+	"delete": "Supprimer",
+	"reportAbuse": "Signaler"
+}
+</locale>
+
+<locale locale="id-ID" lang="json">
+{
+	"reaction": "Reaksi",
+	"copyContent": "Salin isi",
+	"delete": "Hapus",
+	"reportAbuse": "Laporkan"
+}
+</locale>
+
+<locale locale="it-IT" lang="json">
+{
+	"reaction": "Reazioni",
+	"copyContent": "Copia il contenuto",
+	"delete": "Elimina",
+	"reportAbuse": "Segnalare"
+}
+</locale>
+
+<locale locale="ja-JP" lang="json">
+{
+	"reaction": "リアクション",
+	"copyContent": "内容をコピー",
+	"delete": "削除",
+	"reportAbuse": "通報"
+}
+</locale>
+
+<locale locale="ja-KS" lang="json">
+{
+	"reaction": "ツッコミ",
+	"copyContent": "内容をコピー",
+	"delete": "ほかす",
+	"reportAbuse": "通報"
+}
+</locale>
+
+<locale locale="kab-KAB" lang="json">
+{
+	"reaction": "Reactions",
+	"copyContent": "Copy contents",
+	"delete": "Kkes",
+	"reportAbuse": "Report"
+}
+</locale>
+
+<locale locale="kn-IN" lang="json">
+{
+	"reaction": "Reactions",
+	"copyContent": "ವಿಷಯವನ್ನು ನಕಲಿಸು",
+	"delete": "ಅಳಿಸು",
+	"reportAbuse": "Report"
+}
+</locale>
+
+<locale locale="ko-KR" lang="json">
+{
+	"reaction": "리액션",
+	"copyContent": "내용 복사",
+	"delete": "삭제",
+	"reportAbuse": "신고"
+}
+</locale>
+
+<locale locale="nl-NL" lang="json">
+{
+	"reaction": "Reacties",
+	"copyContent": "Kopiëren inhoud",
+	"delete": "Verwijderen",
+	"reportAbuse": "Meld"
+}
+</locale>
+
+<locale locale="no-NO" lang="json">
+{
+	"reaction": "Reaksjon",
+	"copyContent": "Kopier innhold",
+	"delete": "Slett",
+	"reportAbuse": "Rappoter"
+}
+</locale>
+
+<locale locale="pl-PL" lang="json">
+{
+	"reaction": "Reakcja",
+	"copyContent": "Skopiuj zawartość",
+	"delete": "Usuń",
+	"reportAbuse": "Zgłoś"
+}
+</locale>
+
+<locale locale="pt-PT" lang="json">
+{
+	"reaction": "Reações",
+	"copyContent": "Copiar conteúdos",
+	"delete": "Excluir",
+	"reportAbuse": "Denunciar"
+}
+</locale>
+
+<locale locale="ru-RU" lang="json">
+{
+	"reaction": "Реакции",
+	"copyContent": "Скопировать содержимое",
+	"delete": "Удалить",
+	"reportAbuse": "Жалоба"
+}
+</locale>
+
+<locale locale="sk-SK" lang="json">
+{
+	"reaction": "Reakcie",
+	"copyContent": "Kopírovať obsah",
+	"delete": "Odstrániť",
+	"reportAbuse": "Nahlásiť"
+}
+</locale>
+
+<locale locale="th-TH" lang="json">
+{
+	"reaction": "รีแอคชั่น",
+	"copyContent": "คัดลอกเนื้อหา",
+	"delete": "ลบ",
+	"reportAbuse": "รายงาน"
+}
+</locale>
+
+<locale locale="tr-TR" lang="json">
+{
+	"reaction": "Tepki",
+	"copyContent": "İçeriği kopyala",
+	"delete": "Sil",
+	"reportAbuse": "Rapor"
+}
+</locale>
+
+<locale locale="ug-CN" lang="json">
+{
+	"reaction": "Reactions",
+	"copyContent": "Copy contents",
+	"delete": "ئۆچۈرۈش",
+	"reportAbuse": "Report"
+}
+</locale>
+
+<locale locale="uk-UA" lang="json">
+{
+	"reaction": "Реакції",
+	"copyContent": "Скопіювати контент",
+	"delete": "Видалити",
+	"reportAbuse": "Поскаржитись"
+}
+</locale>
+
+<locale locale="vi-VN" lang="json">
+{
+	"reaction": "Biểu cảm",
+	"copyContent": "Chép nội dung",
+	"delete": "Xóa",
+	"reportAbuse": "Báo cáo"
+}
+</locale>
+
+<locale locale="zh-CN" lang="json">
+{
+	"reaction": "回应",
+	"copyContent": "复制内容",
+	"delete": "删除",
+	"reportAbuse": "举报"
+}
+</locale>
+
+<locale locale="zh-TW" lang="json">
+{
+	"reaction": "反應",
+	"copyContent": "複製內容",
+	"delete": "刪除",
+	"reportAbuse": "檢舉"
+}
+</locale>

@@ -3,20 +3,18 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Inject, Injectable } from '@nestjs/common';
-import * as Redis from 'ioredis';
-import { DataSource } from 'typeorm';
-import { DI } from '@/di-symbols.js';
-import type { MiUser } from '../../../users/backend/models/User.js';
 import { normalizeForSearch } from '@/misc/normalize-for-search.js';
-import { IdService } from '../../../runtime/backend/services/IdService.js';
-import { MiHashtag } from '../models/Hashtag.js';
 import type { HashtagsRepository, MiMeta } from '@/models/_.js';
-import { UserEntityService } from '../../../users/backend/serializers/UserEntityService.js';
 import { bindThis } from '@/decorators.js';
-import { FeaturedService } from './FeaturedService.js';
-import { UtilityService } from '@/core/UtilityService.js';
+import type { UtilityService } from '@/core/UtilityService.js';
 import Logger from '@/logger.js';
+import type * as Redis from 'ioredis';
+import type { DataSource } from 'typeorm';
+import type { MiUser } from '../../../users/backend/models/User.js';
+import type { IdService } from '../../../runtime/backend/services/IdService.js';
+import type { MiHashtag } from '../models/Hashtag.js';
+import type { UserEntityService } from '../../../users/backend/serializers/UserEntityService.js';
+import type { FeaturedService } from './FeaturedService.js';
 
 const logger = new Logger('hashtag/create');
 
@@ -30,19 +28,14 @@ type UpdatingHashtagColumn = {
 	remoteUsersCount: keyof MiHashtag & `${AttachedOrMentioned}RemoteUsersCount`,
 };
 
-@Injectable()
 export class HashtagService {
 	constructor(
-		@Inject(DI.db)
 		private db: DataSource,
 
-		@Inject(DI.meta)
 		private meta: MiMeta,
 
-		@Inject(DI.redis)
 		private redisClient: Redis.Redis, // TODO: 専用のRedisサーバーを設定できるようにする
 
-		@Inject(DI.hashtagsRepository)
 		private hashtagsRepository: HashtagsRepository,
 
 		private userEntityService: UserEntityService,

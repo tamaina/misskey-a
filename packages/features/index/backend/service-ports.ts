@@ -16,7 +16,10 @@ import type { QueryService } from '../../../backend/src/core/QueryService.js';
 import type { UtilityService } from '../../../backend/src/core/UtilityService.js';
 import type { SystemAccountService } from '../../users/backend/services/SystemAccountService.js';
 import type { SystemWebhookEntityService } from '../../integrations/backend/serializers/SystemWebhookEntityService.js';
+import type { HttpRequestService } from '../../runtime/backend/services/HttpRequestService.js';
+import type { LoggerService } from '../../runtime/backend/services/LoggerService.js';
 import type { Config } from '../../../backend/src/config.js';
+import type * as Redis from 'ioredis';
 import type { DataSource } from 'typeorm';
 import type { MiMeta } from '../../../backend/src/models/_.js';
 import type { Port, PortToken } from './service-definitions.js';
@@ -45,6 +48,9 @@ export const ports = {
 	utilityService: legacyPort<'utilityService', UtilityService>('utilityService'),
 	systemAccountService: legacyPort<'systemAccountService', SystemAccountService>('systemAccountService'),
 	systemWebhookEntityService: legacyPort<'systemWebhookEntityService', SystemWebhookEntityService>('systemWebhookEntityService'),
+	httpRequestService: legacyPort<'httpRequestService', HttpRequestService>('httpRequestService'),
+	loggerService: legacyPort<'loggerService', LoggerService>('loggerService'),
+	redisClient: legacyPort<'redisClient', Redis.Redis>('redisClient', DI.redis),
 	config: legacyPort<'config', Config>('config', DI.config),
 	db: legacyPort<'db', DataSource>('db', DI.db),
 	meta: legacyPort<'meta', MiMeta>('meta', DI.meta),

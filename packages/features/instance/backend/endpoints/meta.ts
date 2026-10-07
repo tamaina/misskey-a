@@ -3,38 +3,29 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { unionMetaDefinition, unionMetaInput, unionMetaOutput } from '../../contract/union-endpoint-definitions.js';
 import { Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
 import { MetaEntityService } from '../serializers/MetaEntityService.js';
+
+const contractProjection = projectEndpointContract(unionMetaDefinition);
 
 export const meta = {
 	tags: ['meta'],
 
 	requireCredential: false,
 
-	res: {
-		type: 'object',
-		oneOf: [
-			{ type: 'object', ref: 'MetaLite' },
-			{ type: 'object', ref: 'MetaDetailed' },
-		],
-	},
+	res: contractProjection.response,
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {
-		detail: { type: 'boolean', default: true },
-	},
-	required: [],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof unionMetaInput, typeof unionMetaOutput> {
 	constructor(
 		private metaEntityService: MetaEntityService,
 	) {
-		super(meta, paramDef, async (ps, me) => {
+		super(meta, contractProjection, async (ps, me) => {
 			return ps.detail ? await this.metaEntityService.packDetailed() : await this.metaEntityService.pack();
 		});
 	}

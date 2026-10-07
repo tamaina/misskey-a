@@ -6,6 +6,9 @@
 import type { InferContractRouterInputs, InferContractRouterOutputs } from '@orpc/contract';
 import * as v from 'valibot';
 import { defineEndpointContract } from '../../api/contract/definition.js';
+import { opaqueObject } from '../../api/contract/opaque-object.js';
+import { jsonObject } from '../../api/contract/json-object.js';
+import { jsonString } from '../../api/contract/index.js';
 import { misskeyId } from '../../api/contract/index.js';
 import { resultObject } from '../../api/contract/result-object.js';
 
@@ -133,7 +136,21 @@ export const inlineInviteLimitDefinition = defineEndpointContract(
 	inlineInviteLimitOutput,
 );
 
+export const inlineI2faKeyDoneInput = jsonObject({
+	password: v.string(),
+	token: v.optional(v.nullable(v.string())),
+	name: jsonString({ minLength: 1, maxLength: 30 }),
+	credential: opaqueObject,
+});
+export const inlineI2faKeyDoneOutput = resultObject({ id: v.string(), name: v.string() });
+export const inlineI2faKeyDoneDefinition = defineEndpointContract(
+	{ method: 'POST', path: '/i/2fa/key-done' },
+	inlineI2faKeyDoneInput,
+	inlineI2faKeyDoneOutput,
+);
+
 export const inlineEndpointDefinitions = {
+	'i/2fa/key-done': inlineI2faKeyDoneDefinition,
 	"admin/reset-password": inlineAdminResetPasswordDefinition,
 	"auth/session/generate": inlineAuthSessionGenerateDefinition,
 	"email-address/available": inlineEmailAddressAvailableDefinition,
@@ -146,6 +163,7 @@ export const inlineEndpointDefinitions = {
 } as const;
 
 export const inlineEndpointContracts = {
+	'i/2fa/key-done': inlineI2faKeyDoneDefinition.contract,
 	"admin/reset-password": inlineAdminResetPasswordDefinition.contract,
 	"auth/session/generate": inlineAuthSessionGenerateDefinition.contract,
 	"email-address/available": inlineEmailAddressAvailableDefinition.contract,

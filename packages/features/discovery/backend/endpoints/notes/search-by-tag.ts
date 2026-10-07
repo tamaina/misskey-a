@@ -3,85 +3,29 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { allOfNotesSearchByTagDefinition, allOfNotesSearchByTagInput, allOfNotesSearchByTagOutput } from '../../../contract/selector-common-endpoint-definitions.js';
 import { Brackets } from 'typeorm';
 import { Inject, Injectable } from '@nestjs/common';
 import type { NotesRepository } from '@/models/_.js';
 import { safeForSql } from '@/misc/safe-for-sql.js';
 import { normalizeForSearch } from '@/misc/normalize-for-search.js';
-import { Endpoint } from '@/server/api/endpoint-base.js';
 import { QueryService } from '@/core/QueryService.js';
 import { NoteEntityService } from '../../../../notes/backend/serializers/NoteEntityService.js';
 import { DI } from '@/di-symbols.js';
 
+const contractProjection = projectEndpointContract(allOfNotesSearchByTagDefinition);
+
 export const meta = {
 	tags: ['notes', 'hashtags'],
 
-	res: {
-		type: 'array',
-		optional: false, nullable: false,
-		items: {
-			type: 'object',
-			optional: false, nullable: false,
-			ref: 'Note',
-		},
-	},
+	res: contractProjection.response,
 } as const;
 
-export const paramDef = {
-	allOf: [
-		{
-			anyOf: [
-				{
-					type: 'object',
-					properties: {
-						tag: { type: 'string', minLength: 1 },
-					},
-					required: ['tag'],
-				},
-				{
-					type: 'object',
-					properties: {
-						query: {
-							type: 'array',
-							description: 'The outer arrays are chained with OR, the inner arrays are chained with AND.',
-							items: {
-								type: 'array',
-								items: {
-									type: 'string',
-									minLength: 1,
-								},
-								minItems: 1,
-							},
-							minItems: 1,
-						},
-					},
-					required: ['query'],
-				},
-			],
-		},
-		{
-			type: 'object',
-			properties: {
-				reply: { type: 'boolean', nullable: true, default: null },
-				renote: { type: 'boolean', nullable: true, default: null },
-				withFiles: {
-					type: 'boolean',
-					default: false,
-					description: 'Only show notes that have attached files.',
-				},
-				poll: { type: 'boolean', nullable: true, default: null },
-				sinceId: { type: 'string', format: 'misskey:id' },
-				untilId: { type: 'string', format: 'misskey:id' },
-				sinceDate: { type: 'integer' },
-				untilDate: { type: 'integer' },
-				limit: { type: 'integer', minimum: 1, maximum: 100, default: 10 },
-			},
-		},
-	],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof allOfNotesSearchByTagInput, typeof allOfNotesSearchByTagOutput, 'legacy-declared'> {
 	constructor(
 		@Inject(DI.notesRepository)
 		private notesRepository: NotesRepository,
@@ -89,7 +33,7 @@ export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDe
 		private noteEntityService: NoteEntityService,
 		private queryService: QueryService,
 	) {
-		super(meta, paramDef, async (ps, me) => {
+		super(meta, contractProjection, async (ps, me) => {
 			const query = this.queryService.makePaginationQuery(this.notesRepository.createQueryBuilder('note'), ps.sinceId, ps.untilId, ps.sinceDate, ps.untilDate)
 				.innerJoinAndSelect('note.user', 'user')
 				.leftJoinAndSelect('note.reply', 'reply')

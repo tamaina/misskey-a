@@ -3,36 +3,28 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Inject, Injectable } from '@nestjs/common';
 import { Brackets, SelectQueryBuilder } from 'typeorm';
-import { DI } from '@/di-symbols.js';
 import { type FollowingsRepository, MiUser, type MutingsRepository, type UserProfilesRepository, type UsersRepository } from '@/models/_.js';
 import { bindThis } from '@/decorators.js';
 import { sqlLikeEscape } from '@/misc/sql-like-escape.js';
 import type { Config } from '@/config.js';
-import { UserEntityService } from '../../../users/backend/serializers/UserEntityService.js';
 import { Packed } from '../../../index/contract/packed.js';
+import type { UserEntityService } from '../../../users/backend/serializers/UserEntityService.js';
 
 function defaultActiveThreshold() {
 	return new Date(Date.now() - 1000 * 60 * 60 * 24 * 30);
 }
 
-@Injectable()
 export class UserSearchService {
 	constructor(
-		@Inject(DI.config)
 		private config: Config,
 
-		@Inject(DI.usersRepository)
 		private usersRepository: UsersRepository,
 
-		@Inject(DI.userProfilesRepository)
 		private userProfilesRepository: UserProfilesRepository,
 
-		@Inject(DI.followingsRepository)
 		private followingsRepository: FollowingsRepository,
 
-		@Inject(DI.mutingsRepository)
 		private mutingsRepository: MutingsRepository,
 
 		private userEntityService: UserEntityService,

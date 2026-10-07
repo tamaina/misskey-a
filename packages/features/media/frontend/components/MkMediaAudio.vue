@@ -14,9 +14,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 >
 	<button v-if="hide" :class="$style.hidden" @click="reveal">
 		<div :class="$style.hiddenTextWrapper">
-			<b v-if="audio.isSensitive" style="display: block;"><i class="ti ti-eye-exclamation"></i> {{ i18n.ts.sensitive }}{{ prefer.s.dataSaver.media ? ` (${i18n.ts.audio}${audio.size ? ' ' + bytes(audio.size) : ''})` : '' }}</b>
-			<b v-else style="display: block;"><i class="ti ti-music"></i> {{ prefer.s.dataSaver.media && audio.size ? bytes(audio.size) : i18n.ts.audio }}</b>
-			<span style="display: block;">{{ i18n.ts.clickToShow }}</span>
+			<b v-if="audio.isSensitive" style="display: block;"><i class="ti ti-eye-exclamation"></i> {{ $locale.sfc.sensitive }}{{ prefer.s.dataSaver.media ? ` (${$locale.sfc.audio}${audio.size ? ' ' + bytes(audio.size) : ''})` : '' }}</b>
+			<b v-else style="display: block;"><i class="ti ti-music"></i> {{ prefer.s.dataSaver.media && audio.size ? bytes(audio.size) : $locale.sfc.audio }}</b>
+			<span style="display: block;">{{ $locale.sfc.clickToShow }}</span>
 		</div>
 	</button>
 	<div
@@ -65,7 +65,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<path d="m1867.6 415.21h-19.72v-89.53h19.72zm61.18-48.99h-19.72v8.45h19.72zm-30.59 0h-19.72v8.45h19.72z"/>
 		</svg>
 		<div :class="$style.audioText">
-			<i class="ti ti-music"></i> {{ i18n.ts.audio }}
+			<i class="ti ti-music"></i> {{ $locale.sfc.audio }}
 		</div>
 		<div :class="$style.playIconWrapper">
 			<div :class="$style.playIcon">
@@ -82,7 +82,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 import { ref } from 'vue';
 import * as Misskey from 'misskey-js';
 import bytes from '@features/ui/frontend/filters/bytes.js';
-import { i18n } from '@features/runtime/frontend/i18n.js';
 import { prefer } from '@features/preferences/frontend/preferences.js';
 import * as os from '@features/ui/frontend/os.js';
 import { getFileMenu } from '@features/drive/frontend/utility/get-file-menu.js';
@@ -252,3 +251,227 @@ function onContextmenu(ev: PointerEvent) {
 	right: 0;
 }
 </style>
+
+<locale locale="ar-SA" lang="json">
+{
+	"sensitive": "محتوى حساس",
+	"audio": "Audio",
+	"clickToShow": "اضغط للعرض"
+}
+</locale>
+
+<locale locale="ca-ES" lang="json">
+{
+	"sensitive": "Sensible",
+	"audio": "So",
+	"clickToShow": "Fes clic per mostrar"
+}
+</locale>
+
+<locale locale="cs-CZ" lang="json">
+{
+	"sensitive": "NSFW",
+	"audio": "Zvuk",
+	"clickToShow": "Klikněte pro zobrazení"
+}
+</locale>
+
+<locale locale="da-DK" lang="json">
+{
+	"sensitive": "Sensitive",
+	"audio": "Audio",
+	"clickToShow": "Click to show"
+}
+</locale>
+
+<locale locale="de-DE" lang="json">
+{
+	"sensitive": "Sensibel",
+	"audio": "Audio",
+	"clickToShow": "Zum Anzeigen anklicken"
+}
+</locale>
+
+<locale locale="en-US" lang="json">
+{
+	"sensitive": "Sensitive",
+	"audio": "Audio",
+	"clickToShow": "Click to show"
+}
+</locale>
+
+<locale locale="es-ES" lang="json">
+{
+	"sensitive": "Marcado como sensible (NSFW)",
+	"audio": "Sonido",
+	"clickToShow": "Haz clic para verlo"
+}
+</locale>
+
+<locale locale="fr-FR" lang="json">
+{
+	"sensitive": "Contenu sensible",
+	"audio": "Audio",
+	"clickToShow": "Cliquer pour afficher"
+}
+</locale>
+
+<locale locale="id-ID" lang="json">
+{
+	"sensitive": "Konten sensitif",
+	"audio": "Suara",
+	"clickToShow": "Klik untuk melihat"
+}
+</locale>
+
+<locale locale="it-IT" lang="json">
+{
+	"sensitive": "Esplicito",
+	"audio": "Audio",
+	"clickToShow": "Media nascosto, cliccare solo se si intende vedere"
+}
+</locale>
+
+<locale locale="ja-JP" lang="json">
+{
+	"sensitive": "センシティブ",
+	"audio": "音声",
+	"clickToShow": "クリックして表示"
+}
+</locale>
+
+<locale locale="ja-KS" lang="json">
+{
+	"sensitive": "気いつけて見いや",
+	"audio": "音声",
+	"clickToShow": "押したら見えるで"
+}
+</locale>
+
+<locale locale="kab-KAB" lang="json">
+{
+	"sensitive": "Sensitive",
+	"audio": "Audio",
+	"clickToShow": "Click to show"
+}
+</locale>
+
+<locale locale="kn-IN" lang="json">
+{
+	"sensitive": "Sensitive",
+	"audio": "Audio",
+	"clickToShow": "Click to show"
+}
+</locale>
+
+<locale locale="ko-KR" lang="json">
+{
+	"sensitive": "열람 주의",
+	"audio": "소리",
+	"clickToShow": "클릭하여 보기"
+}
+</locale>
+
+<locale locale="nl-NL" lang="json">
+{
+	"sensitive": "NSFW",
+	"audio": "Audio",
+	"clickToShow": "Klik om te bekijken"
+}
+</locale>
+
+<locale locale="no-NO" lang="json">
+{
+	"sensitive": "Sensitive",
+	"audio": "Audio",
+	"clickToShow": "Klikk for å vise"
+}
+</locale>
+
+<locale locale="pl-PL" lang="json">
+{
+	"sensitive": "NSFW",
+	"audio": "Audio",
+	"clickToShow": "Kliknij, aby wyświetlić"
+}
+</locale>
+
+<locale locale="pt-PT" lang="json">
+{
+	"sensitive": "Conteúdo sensível",
+	"audio": "Áudio",
+	"clickToShow": "Clique para ver"
+}
+</locale>
+
+<locale locale="ru-RU" lang="json">
+{
+	"sensitive": "Содержимое не для всех",
+	"audio": "Звук",
+	"clickToShow": "Нажмите для просмотра"
+}
+</locale>
+
+<locale locale="sk-SK" lang="json">
+{
+	"sensitive": "NSFW",
+	"audio": "Audio",
+	"clickToShow": "Kliknutím zobrazíte"
+}
+</locale>
+
+<locale locale="th-TH" lang="json">
+{
+	"sensitive": "เนื้อหาที่ละเอียดอ่อน",
+	"audio": "เสียง",
+	"clickToShow": "คลิกเพื่อแสดง"
+}
+</locale>
+
+<locale locale="tr-TR" lang="json">
+{
+	"sensitive": "Hassas",
+	"audio": "Ses",
+	"clickToShow": "Göstermek için tıklayın"
+}
+</locale>
+
+<locale locale="ug-CN" lang="json">
+{
+	"sensitive": "Sensitive",
+	"audio": "Audio",
+	"clickToShow": "Click to show"
+}
+</locale>
+
+<locale locale="uk-UA" lang="json">
+{
+	"sensitive": "NSFW",
+	"audio": "Аудіо",
+	"clickToShow": "Натисніть для перегляду"
+}
+</locale>
+
+<locale locale="vi-VN" lang="json">
+{
+	"sensitive": "Nhạy cảm",
+	"audio": "Âm thanh",
+	"clickToShow": "Nhấn để xem"
+}
+</locale>
+
+<locale locale="zh-CN" lang="json">
+{
+	"sensitive": "敏感内容",
+	"audio": "音频",
+	"clickToShow": "点击以显示"
+}
+</locale>
+
+<locale locale="zh-TW" lang="json">
+{
+	"sensitive": "敏感內容",
+	"audio": "音效",
+	"clickToShow": "點擊查看"
+}
+</locale>

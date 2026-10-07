@@ -6,7 +6,7 @@
 import * as fs from 'node:fs';
 import _Ajv from 'ajv';
 import { misskeyIdPattern } from '@features/api/contract';
-import type { Schema, SchemaType } from '@/misc/json-schema.js';
+import type { Schema } from '@/misc/json-schema.js';
 import type { MiLocalUser } from '../../../../features/users/backend/models/User.js';
 import type { MiAccessToken } from '../../../../features/auth/backend/models/AccessToken.js';
 import { ApiError } from './error.js';
@@ -20,8 +20,6 @@ const ajv = new Ajv({
 
 ajv.addFormat('misskey:id', misskeyIdPattern);
 
-export type Response = Record<string, any> | void;
-
 type File = {
 	name: string | null;
 	path: string;
@@ -34,13 +32,12 @@ export type EndpointExecutor<T extends IEndpointMeta, Input, Output> =
 
 export class Endpoint<
 	T extends IEndpointMeta,
-	Ps extends Schema,
-	Input = SchemaType<Ps>,
-	Output = T['res'] extends undefined ? Response : SchemaType<NonNullable<T['res']>>,
+	Input,
+	Output,
 > {
 	public exec: (params: unknown, user: T['requireCredential'] extends true ? MiLocalUser : MiLocalUser | null, token: MiAccessToken | null, file?: File, ip?: string | null, headers?: Record<string, string> | null) => Promise<Output>;
 
-	constructor(meta: T, paramDef: Ps, cb: EndpointExecutor<T, Input, Output>) {
+	constructor(meta: T, paramDef: Schema, cb: EndpointExecutor<T, Input, Output>) {
 		const validate = ajv.compile<Input>(paramDef);
 
 		this.exec = (params: unknown, user: T['requireCredential'] extends true ? MiLocalUser : MiLocalUser | null, token: MiAccessToken | null, file?: File, ip?: string | null, headers?: Record<string, string> | null) => {

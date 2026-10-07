@@ -15,7 +15,7 @@ import { bindThis } from '@/decorators.js';
 import { createTemp } from '@/misc/create-temp.js';
 import { UtilityService } from '@/core/UtilityService.js';
 import { NotificationService } from '../../../notifications/backend/services/NotificationService.js';
-import { ExportedAntenna } from './ImportAntennasProcessorService.js';
+import type { ExportedAntenna } from '../../contract/antenna-export.js';
 import { QueueLoggerService } from '@/queue/QueueLoggerService.js';
 import type { DBExportAntennasData } from '@/queue/types.js';
 import type * as Bull from 'bullmq';

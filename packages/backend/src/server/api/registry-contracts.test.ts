@@ -32,7 +32,7 @@ test('registry contracts retain the required scope declaration and both static d
 	const response = { future: { preserved: true } };
 	const oldParams = { key: 'setting', future: true };
 	const newParams = { key: 'setting', future: true };
-	const oldEndpoint = new Endpoint({}, legacyRegistryInput, async input => {
+	const oldEndpoint = new Endpoint({}, legacyRegistryInput, async (input: { key: string; scope: string[]; domain?: string | null }) => {
 		expect(input).toBe(oldParams);
 		expect(input.scope).toEqual([]);
 		return response;
@@ -51,7 +51,7 @@ test('registry contracts retain the required scope declaration and both static d
 test('registry scope boundaries retain real AJV errors and callback suppression', async () => {
 	let oldCalls = 0;
 	let newCalls = 0;
-	const oldEndpoint = new Endpoint({}, legacyRegistryInput, async () => { oldCalls++; return {}; });
+	const oldEndpoint = new Endpoint({}, legacyRegistryInput, async (_params: unknown) => { oldCalls++; return {}; });
 	const newEndpoint = new ContractEndpoint({}, registryProjection, async () => { newCalls++; return {}; });
 	for (const scope of [['letters_123'], []]) {
 		await expect(oldEndpoint.exec({ key: 'setting', scope }, null, null)).resolves.toEqual({});

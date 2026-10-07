@@ -182,7 +182,7 @@ test('real chart endpoint handlers retain AJV defaults, mutations, errors and or
 			const calls: unknown[][] = [];
 			const current = makeEndpoint(row, response, calls);
 			const legacyCalls: unknown[] = [];
-			const legacy = new Endpoint({}, legacyInput, async input => { legacyCalls.push(input); return response; });
+			const legacy = new Endpoint({}, legacyInput, async (input: unknown) => { legacyCalls.push(input); return response; });
 			const originalParams = structuredClone(sample);
 			const currentParams = structuredClone(sample);
 			const before = await outcome(legacy, originalParams, response);

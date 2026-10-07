@@ -10,9 +10,12 @@ import type {
 	FollowingsRepository,
 	UserProfilesRepository,
 } from '@/models/_.js';
-import { Endpoint } from '@/server/api/endpoint-base.js';
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { birthdayUsersDefinition, birthdayUsersInput, birthdayUsersOutput } from '../../../contract/birthday-endpoint-definitions.js';
 import { UserEntityService } from '../../../../users/backend/serializers/UserEntityService.js';
-import type { Packed } from '../../../../index/contract/packed.js';
+import type * as v from 'valibot';
+
+const contractProjection = projectEndpointContract(birthdayUsersDefinition);
 
 export const meta = {
 	tags: ['users'],
@@ -22,74 +25,13 @@ export const meta = {
 
 	description: 'Retrieve users who have a birthday on the specified range.',
 
-	res: {
-		type: 'array',
-		optional: false, nullable: false,
-		items: {
-			type: 'object',
-			optional: false, nullable: false,
-			properties: {
-				id: {
-					type: 'string',
-					optional: false, nullable: false,
-					format: 'misskey:id',
-				},
-				birthday: {
-					type: 'string',
-					optional: false, nullable: false,
-				},
-				user: {
-					type: 'object',
-					optional: false, nullable: false,
-					ref: 'UserLite',
-				},
-			},
-		},
-	},
+	res: contractProjection.response,
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {
-		limit: { type: 'integer', minimum: 1, maximum: 100, default: 10 },
-		offset: { type: 'integer', default: 0 },
-		birthday: {
-			oneOf: [{
-				type: 'object',
-				properties: {
-					month: { type: 'integer', minimum: 1, maximum: 12 },
-					day: { type: 'integer', minimum: 1, maximum: 31 },
-				},
-				required: ['month', 'day'],
-			}, {
-				type: 'object',
-				properties: {
-					begin: {
-						type: 'object',
-						properties: {
-							month: { type: 'integer', minimum: 1, maximum: 12 },
-							day: { type: 'integer', minimum: 1, maximum: 31 },
-						},
-						required: ['month', 'day'],
-					},
-					end: {
-						type: 'object',
-						properties: {
-							month: { type: 'integer', minimum: 1, maximum: 12 },
-							day: { type: 'integer', minimum: 1, maximum: 31 },
-						},
-						required: ['month', 'day'],
-					},
-				},
-				required: ['begin', 'end'],
-			}],
-		},
-	},
-	required: ['birthday'],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof birthdayUsersInput, typeof birthdayUsersOutput> {
 	constructor(
 		@Inject(DI.userProfilesRepository)
 		private userProfilesRepository: UserProfilesRepository,
@@ -98,12 +40,14 @@ export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDe
 
 		private userEntityService: UserEntityService,
 	) {
-		super(meta, paramDef, async (ps, me) => {
+		super(meta, contractProjection, async (ps, me) => {
 			const query = this.followingsRepository
 				.createQueryBuilder('following')
 				.andWhere('following.followerId = :userId', { userId: me.id })
 				.innerJoin(this.userProfilesRepository.metadata.targetName, 'followeeProfile', 'followeeProfile.userId = following.followeeId');
 
+			// Legacy birthday consumer boundary: presence selects the branch, not validated membership.
+			// Retain the two baseline assertions and malformed inactive-extra TypeError behavior.
 			if (Object.hasOwn(ps.birthday, 'begin') && Object.hasOwn(ps.birthday, 'end')) {
 				const range = ps.birthday as { begin: { month: number; day: number }; end: { month: number; day: number }; };
 
@@ -134,7 +78,7 @@ export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDe
 				.offset(ps.offset).limit(ps.limit)
 				.getRawMany<{ birthday_date: number; user_id: string }>();
 
-			const users = new Map<string, Packed<'UserLite'>>((
+			const users = new Map<string, v.InferOutput<typeof birthdayUsersOutput>[number]['user']>((
 				await this.userEntityService.packMany(
 					birthdayUsers.map(u => u.user_id),
 					me,
@@ -160,8 +104,7 @@ export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDe
 						user: users.get(item.user_id),
 					};
 				})
-				.filter(item => item.user != null)
-				.map(item => item as { id: string; birthday: string; user: Packed<'UserLite'> });
+				.filter((item): item is v.InferOutput<typeof birthdayUsersOutput>[number] => item.user != null);
 		});
 	}
 }

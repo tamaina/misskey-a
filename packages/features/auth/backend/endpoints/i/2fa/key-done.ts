@@ -5,7 +5,9 @@
 
 import bcrypt from 'bcryptjs';
 import { Inject, Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
+import { projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { inlineI2faKeyDoneDefinition } from '../../../../contract/endpoint-definitions.js';
+import { LegacyWebAuthnRegistrationConsumerEndpoint } from '../../../legacy-webauthn-registration-consumer-endpoint.js';
 import { UserEntityService } from '../../../../../users/backend/serializers/UserEntityService.js';
 import { DI } from '@/di-symbols.js';
 import { GlobalEventService } from '../../../../../runtime/backend/services/GlobalEventService.js';
@@ -13,6 +15,8 @@ import type { UserProfilesRepository, UserSecurityKeysRepository } from '@/model
 import { WebAuthnService } from '../../../services/WebAuthnService.js';
 import { ApiError } from '@/server/api/error.js';
 import { UserAuthService } from '../../../services/UserAuthService.js';
+
+const contractProjection = projectEndpointContract(inlineI2faKeyDoneDefinition);
 
 export const meta = {
 	requireCredential: true,
@@ -33,31 +37,14 @@ export const meta = {
 		},
 	},
 
-	res: {
-		type: 'object',
-		nullable: false,
-		optional: false,
-		properties: {
-			id: { type: 'string' },
-			name: { type: 'string' },
-		},
-	},
+	res: { ...contractProjection.response, nullable: false, optional: false },
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {
-		password: { type: 'string' },
-		token: { type: 'string', nullable: true },
-		name: { type: 'string', minLength: 1, maxLength: 30 },
-		credential: { type: 'object' },
-	},
-	required: ['password', 'name', 'credential'],
-} as const;
+export const paramDef = contractProjection.input;
 
 // eslint-disable-next-line import/no-default-export
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends LegacyWebAuthnRegistrationConsumerEndpoint<typeof meta> {
 	constructor(
 		@Inject(DI.userProfilesRepository)
 		private userProfilesRepository: UserProfilesRepository,
@@ -70,7 +57,7 @@ export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDe
 		private userEntityService: UserEntityService,
 		private globalEventService: GlobalEventService,
 	) {
-		super(meta, paramDef, async (ps, me) => {
+		super(meta, contractProjection, async (ps, me) => {
 			const token = ps.token;
 			const profile = await this.userProfilesRepository.findOneByOrFail({ userId: me.id });
 

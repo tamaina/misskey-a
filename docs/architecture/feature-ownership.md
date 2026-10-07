@@ -216,10 +216,12 @@ named models moved into 23 authoritative feature `contract/packed.ts` modules an
 `features/index/contract/packed.ts` composes them for OpenAPI and `Packed<K>`
 inference. `resultObject` keeps runtime loose-object passthrough of unknown keys,
 while inferred types expose declared fields only. This adds neither global legacy
-endpoint output validation nor database normalization. Legacy endpoint input
-`Schema`/`SchemaType` and inline `meta.res` conversion remain transitional work for
-a later contract phase; opaque-schema compatibility and serializer/guard work stay
-with their respective API and feature owners; notification serialization and
+endpoint output validation nor database normalization. The JSON-Schema-to-TypeScript payload interpreter and its endpoint generic
+defaults have been removed. `Schema` and inline `meta.res` projections remain
+metadata for the unchanged AJV transport and OpenAPI writer. Native contracts
+supply payload types; explicitly named legacy service/producer boundaries retain
+their documented unchecked assumptions. Opaque-schema compatibility and
+serializer/guard work stay with their respective API and feature owners; notification serialization and
 guards remain notifications-owned. Streaming scopes and request injection are
 unchanged; the main aggregate stream and generic transport remain host composition.
 Remaining endpoint implementations, DI boundaries and locale migration are

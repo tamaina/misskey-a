@@ -149,7 +149,7 @@ test('legacy declared mode preserves the existing presence-based query assumptio
 	for (const input of [selectorAdminDriveShowFileInput, selectorDriveFilesShowInput]) {
 		const oldQueries: unknown[] = [];
 		const queries: unknown[] = [];
-		const old = new Endpoint(transportMeta, originalInput, async ps => {
+		const old = new Endpoint(transportMeta, originalInput, async (ps: { fileId: string } | { url: string }) => {
 			oldQueries.push('fileId' in ps ? { id: ps.fileId } : [{ url: ps.url }, { webpublicUrl: ps.url }, { thumbnailUrl: ps.url }]);
 		});
 		const probe = defineEndpointContract({ path: '/selector-query-proof' }, input, v.void());
@@ -174,7 +174,7 @@ test('named-page and token probes retain mixed-selector callback values', async 
 			{ type: 'object', properties: { name: { type: 'string' }, username: { type: 'string' } }, required: ['name', 'username'] },
 		],
 	} as const;
-	const oldPage = new Endpoint(transportMeta, originalPageInput, async ps => {
+	const oldPage = new Endpoint(transportMeta, originalPageInput, async (ps: { pageId: string } | { name: string; username: string }) => {
 		oldPageQueries.push('pageId' in ps ? { id: ps.pageId } : { name: ps.name, username: ps.username });
 	});
 	const pageProbe = defineEndpointContract({ path: '/page-selector-proof' }, selectorPagesShowInput, v.void());
@@ -193,7 +193,7 @@ test('named-page and token probes retain mixed-selector callback values', async 
 			{ type: 'object', properties: { token: { type: 'string', nullable: true } }, required: ['token'] },
 		],
 	} as const;
-	const oldToken = new Endpoint(transportMeta, originalTokenInput, async ps => {
+	const oldToken = new Endpoint(transportMeta, originalTokenInput, async (ps: { tokenId: string } | { token: string | null }) => {
 		oldTokenQueries.push('tokenId' in ps ? { id: ps.tokenId } : { token: ps.token });
 	});
 	const tokenProbe = defineEndpointContract({ path: '/token-selector-proof' }, selectorIRevokeTokenInput, v.void());

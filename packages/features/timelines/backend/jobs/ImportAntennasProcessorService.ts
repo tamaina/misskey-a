@@ -11,47 +11,17 @@ import Logger from '@/logger.js';
 import type { AntennasRepository } from '@/models/_.js';
 import { DI } from '@/di-symbols.js';
 import { bindThis } from '@/decorators.js';
-import { Schema, SchemaType } from '@/misc/json-schema.js';
+import { toLegacyJsonSchema } from '../../../api/backend/index.js';
+import { exportedAntenna } from '../../contract/antenna-export.js';
+import type { ExportedAntenna } from '../../contract/antenna-export.js';
 import { QueueLoggerService } from '@/queue/QueueLoggerService.js';
 import { DBAntennaImportJobData } from '@/queue/types.js';
 import type * as Bull from 'bullmq';
 
-const exportedAntennaSchema = {
-	type: 'object',
-	properties: {
-		name: { type: 'string', minLength: 1, maxLength: 100 },
-		src: { type: 'string', enum: ['home', 'all', 'users', 'list', 'users_blacklist'] },
-		userListAccts: {
-			type: 'array',
-			items: {
-				type: 'string',
-			},
-			nullable: true,
-		},
-		keywords: { type: 'array', items: {
-			type: 'array', items: {
-				type: 'string',
-			},
-		} },
-		excludeKeywords: { type: 'array', items: {
-			type: 'array', items: {
-				type: 'string',
-			},
-		} },
-		users: { type: 'array', items: {
-			type: 'string',
-		} },
-		caseSensitive: { type: 'boolean' },
-		localOnly: { type: 'boolean' },
-		excludeBots: { type: 'boolean' },
-		withReplies: { type: 'boolean' },
-		withFile: { type: 'boolean' },
-		excludeNotesInSensitiveChannel: { type: 'boolean' },
-	},
-	required: ['name', 'src', 'keywords', 'excludeKeywords', 'users', 'caseSensitive', 'withReplies', 'withFile'],
-} as const satisfies Schema;
-
-export type ExportedAntenna = SchemaType<typeof exportedAntennaSchema>;
+const exportedAntennaSchema = toLegacyJsonSchema(exportedAntenna, {
+	target: 'openapi-3.0',
+	typeMode: 'ignore',
+});
 
 const validate = new Ajv().compile<ExportedAntenna>(exportedAntennaSchema);
 

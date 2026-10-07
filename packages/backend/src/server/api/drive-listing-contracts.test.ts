@@ -53,7 +53,7 @@ test('drive stream projection and real AJV regex errors remain exact', async () 
 	expect(projection.input).toEqual(legacyDriveStreamInput);
 	let oldCalls = 0;
 	let newCalls = 0;
-	const legacy = new Endpoint({}, legacyDriveStreamInput, async () => { oldCalls++; return []; });
+	const legacy = new Endpoint({}, legacyDriveStreamInput, async (_params: unknown) => { oldCalls++; return []; });
 	const current = new ContractEndpoint({}, projection, async () => { newCalls++; return []; });
 	for (const type of ['image/png', 'image/*', 'A-Z/*']) {
 		await expect(legacy.exec({ type }, null, null)).resolves.toEqual([]);

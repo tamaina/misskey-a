@@ -947,7 +947,7 @@ for (const route of Object.keys(definitions) as Route[]) {
 			const sentinel = { opaque: ['preserve'], unvalidatedResponse: true };
 			let oldCalls = 0;
 			let newCalls = 0;
-			const legacy = new Endpoint(transportMeta, frozenInputs[route], async input => {
+			const legacy = new Endpoint(transportMeta, frozenInputs[route], async (input: unknown) => {
 				oldCalls++;
 				expect(input).toBe(before);
 				return sentinel;

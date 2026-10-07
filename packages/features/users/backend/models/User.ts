@@ -319,7 +319,5 @@ export type MiPartialRemoteUser = Partial<MiUser> & {
 	uri: string;
 };
 
-export const nameSchema = { type: 'string', minLength: 1, maxLength: 50 } as const;
-export const followedMessageSchema = { type: 'string', minLength: 1, maxLength: 256 } as const;
-export const locationSchema = { type: 'string', minLength: 1, maxLength: 50 } as const;
-export const birthdaySchema = { type: 'string', pattern: /^([0-9]{4})-([0-9]{2})-([0-9]{2})$/.toString().slice(1, -1) } as const;
+export { nameSchema, followedMessageSchema, locationSchema } from '../../contract/user-profile-fields.js';
+export { birthdaySchema } from '../../contract/user-birthday.js';

@@ -2,10 +2,16 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
+import { getJsonExclusiveObjectGuardRegistration, getJsonExclusiveObjectSchemaRegistration, getJsonExclusiveObjectParserRegistration } from '../contract/json-exclusive-object.js';
+import { assertJsonExclusiveObjectMetadata } from './json-exclusive-object-projection.js';
 import { getGlobalDefs, toJsonSchema } from '@valibot/to-json-schema';
 import type { JsonSchema } from '@valibot/to-json-schema';
 import { getJsonStringLegacySchema, objectParams, misskeyId } from '../contract/index.js';
 import { getUniqueStringArrayBaseSchema } from '../contract/unique-string-array.js';
+import { getJsonSelectorAndCommonParserRegistration } from '../contract/json-selector-and-common.js';
+import { assertJsonSelectorAndCommonMetadata } from './json-selector-and-common-projection.js';
+import { isOpaqueObject } from '../contract/opaque-object.js';
+import { assertOpaqueObjectProjection } from './opaque-object-projection.js';
 import { jsonNumber } from '../contract/json-number.js';
 import { getJsonObjectParserRegistration } from '../contract/json-object.js';
 import { assertJsonObjectMetadata } from './json-object-projection.js';
@@ -14,6 +20,12 @@ import { assertUniqueStringArrayMetadata } from './unique-string-array-projectio
 import { getRequireWhenAllNullishRegistration } from '../contract/require-when-all-nullish.js';
 import { assertRequireWhenAllNullishPlacement } from './require-when-all-nullish-projection.js';
 
+import { isMuteWordInputItem } from '../contract/mute-word-input-item.js';
+import { isNotificationReceiveRule } from '../../users/contract/notification-receive-config.js';
+import { assertClosedUserInputUnionMetadata } from './legacy-output-one-of-projection.js';
+import { isMisskeyIdOrIds } from '../contract/misskey-id-or-ids.js';
+import { assertMisskeyIdOrIdsMetadata } from './legacy-output-one-of-projection.js';
+
 // Keep the portable schema builder available alongside the legacy schema bridge.
 export { jsonString } from '../contract/index.js';
 
@@ -21,13 +33,19 @@ export function toLegacyJsonSchema(
 	schema: Parameters<typeof toJsonSchema>[0],
 	config?: Parameters<typeof toJsonSchema>[1],
 ): JsonSchema {
+	assertOpaqueObjectProjection(schema, config?.definitions ?? getGlobalDefs());
 	assertRequireWhenAllNullishPlacement(schema);
-	assertJsonObjectMetadata(schema);
+	assertMisskeyIdOrIdsMetadata(schema, config?.definitions ?? getGlobalDefs());
+	assertClosedUserInputUnionMetadata(schema, config?.definitions ?? getGlobalDefs());
+	const objectMetadataOmissions = assertJsonObjectMetadata(schema);
+
 	const definitions = config?.definitions ?? getGlobalDefs();
 	for (const definition of Object.values(definitions ?? {})) {
 		assertRequireWhenAllNullishPlacement(definition);
-		assertJsonObjectMetadata(definition);
+		for (const action of assertJsonObjectMetadata(definition)) objectMetadataOmissions.add(action);
 	}
+	assertJsonSelectorAndCommonMetadata([schema, ...Object.values(definitions ?? {})]);
+	assertJsonExclusiveObjectMetadata([schema, ...Object.values(definitions ?? {})]);
 	assertUniqueStringArrayMetadata(schema);
 	const projection = jsonObjectProjectionView(schema, definitions);
 	const mapProxies = new WeakMap<object, object>();
@@ -67,9 +85,23 @@ export function toLegacyJsonSchema(
 		return { ...context, referenceMap: originalMap(context.referenceMap), getterMap: originalMap(context.getterMap) };
 	}
 
-	const defaultOverrideSchema = ({ valibotSchema }: { valibotSchema: object }): JsonSchema | undefined => {
+	const defaultOverrideSchema = ({ valibotSchema, jsonSchema }: { valibotSchema: object; jsonSchema: JsonSchema }): JsonSchema | undefined => {
+		if (getJsonExclusiveObjectSchemaRegistration(valibotSchema) !== undefined || getJsonExclusiveObjectGuardRegistration(valibotSchema) !== undefined) {
+			if (!Array.isArray(jsonSchema.anyOf) || jsonSchema.anyOf.length !== 2) throw new Error('Exclusive-object projection requires two derived alternatives');
+			const { anyOf, ...rest } = jsonSchema;
+			return { ...rest, oneOf: anyOf };
+		}
+		if (isMisskeyIdOrIds(valibotSchema) || isMuteWordInputItem(valibotSchema) || isNotificationReceiveRule(valibotSchema)) {
+			if (!Array.isArray(jsonSchema.anyOf) || jsonSchema.anyOf.length !== 2
+				|| '$ref' in jsonSchema || '$defs' in jsonSchema || 'definitions' in jsonSchema) {
+				throw new Error('Referenced identifier-or-identifiers schemas require an explicit legacy projection');
+			}
+			const { anyOf, ...rest } = jsonSchema;
+			return { ...rest, ...(isNotificationReceiveRule(valibotSchema) ? { type: 'object' as const } : {}), oneOf: anyOf };
+		}
 		const jsonStringSchema = getJsonStringLegacySchema(valibotSchema);
 		if (jsonStringSchema !== undefined) return jsonStringSchema;
+		if (isOpaqueObject(valibotSchema)) return { type: 'object' };
 		if (valibotSchema === objectParams) return { type: 'object', properties: {}, additionalProperties: true };
 		if (valibotSchema === jsonNumber) return { type: 'number' };
 		if (valibotSchema === misskeyId) return { type: 'string', format: 'misskey:id' };
@@ -99,7 +131,19 @@ export function toLegacyJsonSchema(
 		return undefined;
 	};
 	const defaultOverrideAction = ({ valibotAction, jsonSchema }: Parameters<NonNullable<NonNullable<typeof config>['overrideAction']>>[0]): JsonSchema | undefined => {
-		if (getJsonObjectParserRegistration(valibotAction) !== undefined) return jsonSchema;
+		if (objectMetadataOmissions.has(valibotAction)) {
+			const { required: _required, ...rest } = jsonSchema;
+			return rest;
+		}
+		if (getJsonObjectParserRegistration(valibotAction) !== undefined || getJsonExclusiveObjectParserRegistration(valibotAction) !== undefined) return jsonSchema;
+		if (getJsonSelectorAndCommonParserRegistration(valibotAction) !== undefined) {
+			const common = jsonSchema.allOf?.[1];
+			if (common !== null && typeof common === 'object' && Array.isArray(common.required) && common.required.length === 0) {
+				// Admission proves only this common block optional; preserve legacy omission physically.
+				delete common.required;
+			}
+			return jsonSchema;
+		}
 		const conditional = getRequireWhenAllNullishRegistration(valibotAction);
 		if (conditional !== undefined) {
 			const required = getJsonStringLegacySchema(conditional.schema);

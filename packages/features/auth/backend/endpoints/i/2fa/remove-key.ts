@@ -5,13 +5,16 @@
 
 import bcrypt from 'bcryptjs';
 import { Inject, Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { emptyObjectI2faRemoveKeyDefinition, emptyObjectI2faRemoveKeyInput, emptyObjectI2faRemoveKeyOutput } from '../../../../contract/empty-object-key-endpoint-definitions.js';
 import type { UserProfilesRepository, UserSecurityKeysRepository } from '@/models/_.js';
 import { UserEntityService } from '../../../../../users/backend/serializers/UserEntityService.js';
 import { GlobalEventService } from '../../../../../runtime/backend/services/GlobalEventService.js';
 import { DI } from '@/di-symbols.js';
 import { ApiError } from '@/server/api/error.js';
 import { UserAuthService } from '../../../services/UserAuthService.js';
+
+const contractProjection = projectEndpointContract(emptyObjectI2faRemoveKeyDefinition);
 
 export const meta = {
 	requireCredential: true,
@@ -27,18 +30,10 @@ export const meta = {
 	},
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {
-		password: { type: 'string' },
-		token: { type: 'string', nullable: true },
-		credentialId: { type: 'string' },
-	},
-	required: ['password', 'credentialId'],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof emptyObjectI2faRemoveKeyInput, typeof emptyObjectI2faRemoveKeyOutput> {
 	constructor(
 		@Inject(DI.userSecurityKeysRepository)
 		private userSecurityKeysRepository: UserSecurityKeysRepository,
@@ -50,7 +45,7 @@ export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDe
 		private userAuthService: UserAuthService,
 		private globalEventService: GlobalEventService,
 	) {
-		super(meta, paramDef, async (ps, me) => {
+		super(meta, contractProjection, async (ps, me) => {
 			const token = ps.token;
 			const profile = await this.userProfilesRepository.findOneByOrFail({ userId: me.id });
 

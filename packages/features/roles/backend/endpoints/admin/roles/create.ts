@@ -3,10 +3,14 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Inject, Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
+import { Injectable } from '@nestjs/common';
+import { projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { packedAdminRolesCreateDefinition } from '../../../../contract/packed-endpoint-definitions.js';
+import { LegacyRoleCreateConsumerEndpoint } from '../../../legacy-role-consumer-endpoint.js';
 import { RoleEntityService } from '../../../serializers/RoleEntityService.js';
 import { RoleService } from '../../../services/RoleService.js';
+
+const contractProjection = projectEndpointContract(packedAdminRolesCreateDefinition);
 
 export const meta = {
 	tags: ['admin', 'role'],
@@ -15,58 +19,18 @@ export const meta = {
 	requireAdmin: true,
 	kind: 'write:admin:roles',
 
-	res: {
-		type: 'object',
-		optional: false, nullable: false,
-		ref: 'Role',
-	},
+	res: { ...contractProjection.response, optional: false, nullable: false },
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {
-		name: { type: 'string' },
-		description: { type: 'string' },
-		color: { type: 'string', nullable: true },
-		iconUrl: { type: 'string', nullable: true },
-		target: { type: 'string', enum: ['manual', 'conditional'] },
-		condFormula: { type: 'object' },
-		isPublic: { type: 'boolean' },
-		isModerator: { type: 'boolean' },
-		isAdministrator: { type: 'boolean' },
-		isExplorable: { type: 'boolean', default: false }, // optional for backward compatibility
-		asBadge: { type: 'boolean' },
-		preserveAssignmentOnMoveAccount: { type: 'boolean' },
-		canEditMembersByModerator: { type: 'boolean' },
-		displayOrder: { type: 'number' },
-		policies: {
-			type: 'object',
-		},
-	},
-	required: [
-		'name',
-		'description',
-		'color',
-		'iconUrl',
-		'target',
-		'condFormula',
-		'isPublic',
-		'isModerator',
-		'isAdministrator',
-		'asBadge',
-		'canEditMembersByModerator',
-		'displayOrder',
-		'policies',
-	],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends LegacyRoleCreateConsumerEndpoint<typeof meta> {
 	constructor(
 		private roleEntityService: RoleEntityService,
 		private roleService: RoleService,
 	) {
-		super(meta, paramDef, async (ps, me) => {
+		super(meta, contractProjection, async (ps, me) => {
 			const created = await this.roleService.create(ps, me);
 
 			return await this.roleEntityService.pack(created, me);

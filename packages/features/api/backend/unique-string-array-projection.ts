@@ -6,6 +6,8 @@
 import { metadata } from 'valibot';
 import { getUniqueStringArrayBaseSchema } from '../contract/unique-string-array.js';
 
+import { isJsonObjectNoopMetadata } from './json-object-projection.js';
+
 const annotationKeys = new Set([
 	'title', 'description', 'example', 'examples', '$comment', 'deprecated',
 	'readOnly', 'writeOnly', 'externalDocs',
@@ -75,15 +77,16 @@ export function assertUniqueStringArrayMetadata(schema: object): void {
 
 	for (const base of bases) protectItems(base);
 
-	function checkPipe(pipe: unknown[], seen = new Set<object>()): void {
+	function checkPipe(pipe: unknown[], owner: object, seen = new Set<object>()): void {
 		for (const item of pipe) {
 			if (item === null || typeof item !== 'object' || seen.has(item)) continue;
 			seen.add(item);
-			if ('pipe' in item && Array.isArray(item.pipe)) checkPipe(item.pipe, seen);
+			if ('pipe' in item && Array.isArray(item.pipe)) checkPipe(item.pipe, item, seen);
 			if ('type' in item && item.type === 'metadata') {
 				if (!('kind' in item) || item.kind !== 'metadata' || !('reference' in item) || item.reference !== metadata) {
 					throw new Error('Unique string array pipelines cannot use disguised metadata predicates');
 				}
+				if (isJsonObjectNoopMetadata(owner, item)) continue;
 				if (!('metadata' in item) || item.metadata === null || typeof item.metadata !== 'object'
 					|| Object.keys(item.metadata).some(key => !annotationKeys.has(key))) {
 					throw new Error('Unique string array pipelines require annotation-only metadata');
@@ -93,6 +96,6 @@ export function assertUniqueStringArrayMetadata(schema: object): void {
 	}
 
 	for (const node of affected) {
-		if ('pipe' in node && Array.isArray(node.pipe)) checkPipe(node.pipe);
+		if ('pipe' in node && Array.isArray(node.pipe)) checkPipe(node.pipe, node);
 	}
 }

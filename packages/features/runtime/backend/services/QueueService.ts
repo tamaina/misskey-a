@@ -13,7 +13,7 @@ import type { MiSystemWebhook, SystemWebhookEventType } from '../../../integrati
 import type { Config } from '@/config.js';
 import { DI } from '@/di-symbols.js';
 import { bindThis } from '@/decorators.js';
-import type { Antenna } from '@/server/api/endpoints/i/import-antennas.js';
+import type { Antenna } from '../../../portability/backend/endpoints/i/import-antennas.js';
 import { ApRequestCreator } from '../../../federation/backend/services/ApRequestService.js';
 import { type SystemWebhookPayload } from '../../../integrations/backend/services/SystemWebhookService.js';
 import type { Packed } from '../../../index/contract/packed.js';

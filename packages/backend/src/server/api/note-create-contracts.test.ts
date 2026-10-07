@@ -301,7 +301,7 @@ test('notes/create matches 557 frozen native/AJV cases, exact errors, defaults a
 		const before = structuredClone(sample), after = structuredClone(sample);
 		const sentinel = { deliberatelyUnvalidatedOutput: true };
 		let oldCalls = 0, newCalls = 0;
-		const legacy = new Endpoint(transportMeta, frozenInput, async input => { oldCalls++; expect(input).toBe(before); return sentinel; });
+		const legacy = new Endpoint(transportMeta, frozenInput, async (input: unknown) => { oldCalls++; expect(input).toBe(before); return sentinel; });
 		const native = new ContractEndpoint<typeof transportMeta, v.GenericSchema, v.GenericSchema>(transportMeta, projection, async input => { newCalls++; expect(input).toBe(after); return sentinel; });
 		const outcome = async (endpoint: { exec: (input: unknown, me: null, token: null) => Promise<unknown> }, input: unknown) => {
 			try { expect(await endpoint.exec(input, null, null)).toBe(sentinel); return { valid: true }; } catch (error) {
@@ -352,7 +352,7 @@ test('root and poll unknown own keys remain safe and are never rewritten by tran
 		expect(Reflect.get(parsed.poll!, key)).toBe(Reflect.get(poll, key));
 	}
 	const before = structuredClone(input), after = structuredClone(input);
-	const legacy = new Endpoint(transportMeta, frozenInput, async params => params);
+	const legacy = new Endpoint(transportMeta, frozenInput, async (params: unknown) => params);
 	const native = new ContractEndpoint<typeof transportMeta, v.GenericSchema, v.GenericSchema>(transportMeta, projection, async params => params);
 	expect(await legacy.exec(before, null, null)).toBe(before);
 	expect(await native.exec(after, null, null)).toBe(after);

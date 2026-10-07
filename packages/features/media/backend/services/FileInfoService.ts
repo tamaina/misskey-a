@@ -7,20 +7,19 @@ import * as fs from 'node:fs';
 import * as crypto from 'node:crypto';
 import { join } from 'node:path';
 import * as stream from 'node:stream/promises';
-import { Injectable } from '@nestjs/common';
 import { FSWatcher } from 'chokidar';
-import * as fileType from '@/runtime-dependencies/file-type.js';
-import FFmpeg from '@/runtime-dependencies/ffmpeg.js';
 import isSvg from 'is-svg';
 import probeImageSize from 'probe-image-size';
 import { sharpBmp } from '@misskey-dev/sharp-read-bmp';
 import * as blurhash from 'blurhash';
+import FFmpeg from '@/runtime-dependencies/ffmpeg.js';
+import * as fileType from '@/runtime-dependencies/file-type.js';
 import { createTempDir } from '@/misc/create-temp.js';
-import { SensitiveMediaDetectionService } from './SensitiveMediaDetectionService.js';
-import { LoggerService } from '../../../runtime/backend/services/LoggerService.js';
 import type Logger from '@/logger.js';
 import { bindThis } from '@/decorators.js';
 import { isMimeImage } from '@/misc/is-mime-image.js';
+import type { LoggerService } from '../../../runtime/backend/services/LoggerService.js';
+import type { SensitiveMediaDetectionService } from './SensitiveMediaDetectionService.js';
 import type { Prediction } from './SensitiveMediaDetectionService.js';
 
 export type FileInfo = {
@@ -49,7 +48,6 @@ const TYPE_SVG = {
 	ext: 'svg',
 };
 
-@Injectable()
 export class FileInfoService {
 	private logger: Logger;
 

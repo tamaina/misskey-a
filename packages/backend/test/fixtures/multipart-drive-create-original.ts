@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import type { Packed } from '../../../features/index/contract/packed.js';
 import ms from '@/runtime-dependencies/ms.js';
 import { Inject, Injectable } from '@nestjs/common';
 import { DB_MAX_IMAGE_COMMENT_LENGTH } from '@/const.js';
@@ -84,8 +85,17 @@ export const paramDef = {
 	required: [],
 } as const;
 
+// Captured post-AJV request shape from the pre-migration multipart handler.
+type OriginalDriveCreateInput = {
+	folderId: string | null;
+	name: string | null;
+	comment: string | null;
+	isSensitive: boolean;
+	force: boolean;
+};
+
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends Endpoint<typeof meta, OriginalDriveCreateInput, Packed<'DriveFile'>> {
 	constructor(
 		@Inject(DI.meta)
 		private serverSettings: MiMeta,

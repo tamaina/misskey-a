@@ -14,13 +14,13 @@ SPDX-License-Identifier: AGPL-3.0-only
 	@ok="save()"
 	@closed="emit('closed')"
 >
-	<template #header><i class="ti ti-copyright"></i> {{ i18n.ts._watermarkEditor.title }}</template>
+	<template #header><i class="ti ti-copyright"></i> {{ $locale.sfc.title }}</template>
 
 	<MkPreviewWithControls>
 		<template #preview>
 			<canvas ref="canvasEl" :class="$style.previewCanvas"></canvas>
 			<div :class="$style.previewContainer">
-				<div class="_acrylic" :class="$style.previewTitle">{{ i18n.ts.preview }}</div>
+				<div class="_acrylic" :class="$style.previewTitle">{{ $locale.sfc.preview }}</div>
 				<div v-if="props.image == null" class="_acrylic" :class="$style.previewControls">
 					<button class="_button" :class="[$style.previewControlsButton, sampleImageType === '3_2' ? $style.active : null]" @click="sampleImageType = '3_2'"><i class="ti ti-crop-landscape"></i></button>
 					<button class="_button" :class="[$style.previewControlsButton, sampleImageType === '2_3' ? $style.active : null]" @click="sampleImageType = '2_3'"><i class="ti ti-crop-portrait"></i></button>
@@ -34,12 +34,12 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<div class="_gaps_s">
 					<MkFolder v-for="(layer, i) in layers" :key="layer.id" :defaultOpen="false" :canPage="false">
 						<template #label>
-							<div v-if="layer.type === 'text'">{{ i18n.ts._watermarkEditor.text }}</div>
-							<div v-if="layer.type === 'image'">{{ i18n.ts._watermarkEditor.image }}</div>
-							<div v-if="layer.type === 'qr'">{{ i18n.ts._watermarkEditor.qr }}</div>
-							<div v-if="layer.type === 'stripe'">{{ i18n.ts._watermarkEditor.stripe }}</div>
-							<div v-if="layer.type === 'polkadot'">{{ i18n.ts._watermarkEditor.polkadot }}</div>
-							<div v-if="layer.type === 'checker'">{{ i18n.ts._watermarkEditor.checker }}</div>
+							<div v-if="layer.type === 'text'">{{ $locale.sfc.text }}</div>
+							<div v-if="layer.type === 'image'">{{ $locale.sfc.image }}</div>
+							<div v-if="layer.type === 'qr'">{{ $locale.sfc.qr }}</div>
+							<div v-if="layer.type === 'stripe'">{{ $locale.sfc.stripe }}</div>
+							<div v-if="layer.type === 'polkadot'">{{ $locale.sfc.polkadot }}</div>
+							<div v-if="layer.type === 'checker'">{{ $locale.sfc.checker }}</div>
 						</template>
 						<template #footer>
 							<div class="_buttons">
@@ -66,7 +66,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 import { ref, useTemplateRef, watch, onMounted, onUnmounted, reactive, nextTick } from 'vue';
 import type { WatermarkLayers, WatermarkPreset } from '@features/media/frontend/utility/watermark/WatermarkRenderer.js';
 import { WatermarkRenderer } from '@features/media/frontend/utility/watermark/WatermarkRenderer.js';
-import { i18n } from '@features/runtime/frontend/i18n.js';
 import MkModalWindow from '@features/ui/frontend/components/MkModalWindow.vue';
 import MkPreviewWithControls from '@features/markup/frontend/components/MkPreviewWithControls.vue';
 import MkSelect from '@features/ui/frontend/components/MkSelect.vue';
@@ -189,7 +188,7 @@ async function cancel() {
 	if (props.presetEditMode) {
 		const { canceled } = await os.confirm({
 			type: 'question',
-			text: i18n.ts._watermarkEditor.quitWithoutSaveConfirm,
+			text: $locale.value.sfc.quitWithoutSaveConfirm,
 		});
 		if (canceled) return;
 	}
@@ -301,7 +300,7 @@ onMounted(async () => {
 		console.error(err);
 		os.alert({
 			type: 'error',
-			text: i18n.ts._watermarkEditor.failedToLoadImage,
+			text: $locale.value.sfc.failedToLoadImage,
 		});
 	}
 
@@ -322,7 +321,7 @@ onUnmounted(() => {
 async function save() {
 	if (props.presetEditMode) {
 		const { canceled, result: name } = await os.inputText({
-			title: i18n.ts.name,
+			title: $locale.value.sfc.name,
 			default: preset.name,
 		});
 		if (canceled) return;
@@ -352,32 +351,32 @@ async function save() {
 
 function addLayer(ev: PointerEvent) {
 	os.popupMenu([{
-		text: i18n.ts._watermarkEditor.text,
+		text: $locale.value.sfc.text,
 		action: () => {
 			layers.push(createTextLayer());
 		},
 	}, {
-		text: i18n.ts._watermarkEditor.image,
+		text: $locale.value.sfc.image,
 		action: () => {
 			layers.push(createImageLayer());
 		},
 	}, {
-		text: i18n.ts._watermarkEditor.qr,
+		text: $locale.value.sfc.qr,
 		action: () => {
 			layers.push(createQrLayer());
 		},
 	}, {
-		text: i18n.ts._watermarkEditor.stripe,
+		text: $locale.value.sfc.stripe,
 		action: () => {
 			layers.push(createStripeLayer());
 		},
 	}, {
-		text: i18n.ts._watermarkEditor.polkadot,
+		text: $locale.value.sfc.polkadot,
 		action: () => {
 			layers.push(createPolkadotLayer());
 		},
 	}, {
-		text: i18n.ts._watermarkEditor.checker,
+		text: $locale.value.sfc.checker,
 		action: () => {
 			layers.push(createCheckerLayer());
 		},
@@ -458,3 +457,451 @@ function removeLayer(layer: WatermarkPreset['layers'][number]) {
 	object-fit: contain;
 }
 </style>
+
+<locale locale="ar-SA" lang="json">
+{
+	"quitWithoutSaveConfirm": "Discard unsaved changes?",
+	"failedToLoadImage": "Failed to load image",
+	"name": "الإسم",
+	"text": "نص",
+	"image": "صور",
+	"qr": "QR Code",
+	"stripe": "Stripes",
+	"polkadot": "Polkadot",
+	"checker": "Checker",
+	"title": "Edit Watermark",
+	"preview": "معاينة"
+}
+</locale>
+
+<locale locale="ca-ES" lang="json">
+{
+	"quitWithoutSaveConfirm": "Sortir sense desar?",
+	"failedToLoadImage": "Error en carregar la imatge",
+	"name": "Nom",
+	"text": "Text",
+	"image": "Imatges",
+	"qr": "Codi QR",
+	"stripe": "Bandes",
+	"polkadot": "Lunars",
+	"checker": "Escacs",
+	"title": "Editar la marca d'aigua ",
+	"preview": "Vista prèvia"
+}
+</locale>
+
+<locale locale="cs-CZ" lang="json">
+{
+	"quitWithoutSaveConfirm": "Discard unsaved changes?",
+	"failedToLoadImage": "Failed to load image",
+	"name": "Jméno",
+	"text": "Text",
+	"image": "Obrázky",
+	"qr": "QR Code",
+	"stripe": "Stripes",
+	"polkadot": "Polkadot",
+	"checker": "Checker",
+	"title": "Edit Watermark",
+	"preview": "Náhled"
+}
+</locale>
+
+<locale locale="da-DK" lang="json">
+{
+	"quitWithoutSaveConfirm": "Discard unsaved changes?",
+	"failedToLoadImage": "Failed to load image",
+	"name": "Name",
+	"text": "Text",
+	"image": "Images",
+	"qr": "QR Code",
+	"stripe": "Stripes",
+	"polkadot": "Polkadot",
+	"checker": "Checker",
+	"title": "Edit Watermark",
+	"preview": "Preview"
+}
+</locale>
+
+<locale locale="de-DE" lang="json">
+{
+	"quitWithoutSaveConfirm": "Nicht gespeicherte Änderungen verwerfen?",
+	"failedToLoadImage": "Bild konnte nicht geladen werden",
+	"name": "Name",
+	"text": "Text",
+	"image": "Bilder",
+	"qr": "QR-Code",
+	"stripe": "Streifen",
+	"polkadot": "Punktmuster",
+	"checker": "Prüfer",
+	"title": "Wasserzeichen bearbeiten",
+	"preview": "Vorschau"
+}
+</locale>
+
+<locale locale="en-US" lang="json">
+{
+	"quitWithoutSaveConfirm": "Discard unsaved changes?",
+	"failedToLoadImage": "Failed to load image",
+	"name": "Name",
+	"text": "Text",
+	"image": "Images",
+	"qr": "QR Code",
+	"stripe": "Stripes",
+	"polkadot": "Polkadot",
+	"checker": "Checker",
+	"title": "Edit Watermark",
+	"preview": "Preview"
+}
+</locale>
+
+<locale locale="es-ES" lang="json">
+{
+	"quitWithoutSaveConfirm": "¿Descartar cambios no guardados?",
+	"failedToLoadImage": "Error al cargar la imagen",
+	"name": "Nombre",
+	"text": "Texto",
+	"image": "Imágenes",
+	"qr": "Código QR",
+	"stripe": "Rayas",
+	"polkadot": "Patrón de Lunares",
+	"checker": "Patrón de Damas / Tablero de Ajedrez",
+	"title": "Editar la marca de agua",
+	"preview": "Vista previa"
+}
+</locale>
+
+<locale locale="fr-FR" lang="json">
+{
+	"quitWithoutSaveConfirm": "Discard unsaved changes?",
+	"failedToLoadImage": "Failed to load image",
+	"name": "Nom",
+	"text": "Texte",
+	"image": "Images",
+	"qr": "QR Code",
+	"stripe": "Stripes",
+	"polkadot": "Polkadot",
+	"checker": "Checker",
+	"title": "Edit Watermark",
+	"preview": "Aperçu"
+}
+</locale>
+
+<locale locale="id-ID" lang="json">
+{
+	"quitWithoutSaveConfirm": "Discard unsaved changes?",
+	"failedToLoadImage": "Failed to load image",
+	"name": "Nama",
+	"text": "Teks",
+	"image": "Gambar",
+	"qr": "QR Code",
+	"stripe": "Stripes",
+	"polkadot": "Polkadot",
+	"checker": "Checker",
+	"title": "Edit Watermark",
+	"preview": "Pratinjau"
+}
+</locale>
+
+<locale locale="it-IT" lang="json">
+{
+	"quitWithoutSaveConfirm": "Uscire senza salvare?",
+	"failedToLoadImage": "Impossibile caricare l'immagine",
+	"name": "Nome",
+	"text": "Testo",
+	"image": "Immagini",
+	"qr": "QR Code",
+	"stripe": "Strisce",
+	"polkadot": "A pallini",
+	"checker": "Scacchiera",
+	"title": "Modifica la filigrana",
+	"preview": "Anteprima"
+}
+</locale>
+
+<locale locale="ja-JP" lang="json">
+{
+	"quitWithoutSaveConfirm": "保存せずに終了しますか？",
+	"failedToLoadImage": "画像の読み込みに失敗しました",
+	"name": "名前",
+	"text": "テキスト",
+	"image": "画像",
+	"qr": "二次元コード",
+	"stripe": "ストライプ",
+	"polkadot": "ポルカドット",
+	"checker": "チェッカー",
+	"title": "ウォーターマークの編集",
+	"preview": "プレビュー"
+}
+</locale>
+
+<locale locale="ja-KS" lang="json">
+{
+	"quitWithoutSaveConfirm": "保存せずに終わってもええんか？",
+	"failedToLoadImage": "あかん、画像読み込まれへんわ",
+	"name": "名前",
+	"text": "テキスト",
+	"image": "画像",
+	"qr": "二次元コード",
+	"stripe": "ストライプ",
+	"polkadot": "ポルカドット",
+	"checker": "チェッカー",
+	"title": "ウォーターマークの編集",
+	"preview": "プレビュー"
+}
+</locale>
+
+<locale locale="kab-KAB" lang="json">
+{
+	"quitWithoutSaveConfirm": "Discard unsaved changes?",
+	"failedToLoadImage": "Failed to load image",
+	"name": "Name",
+	"text": "Text",
+	"image": "Images",
+	"qr": "QR Code",
+	"stripe": "Stripes",
+	"polkadot": "Polkadot",
+	"checker": "Checker",
+	"title": "Edit Watermark",
+	"preview": "Preview"
+}
+</locale>
+
+<locale locale="kn-IN" lang="json">
+{
+	"quitWithoutSaveConfirm": "Discard unsaved changes?",
+	"failedToLoadImage": "Failed to load image",
+	"name": "Name",
+	"text": "Text",
+	"image": "Images",
+	"qr": "QR Code",
+	"stripe": "Stripes",
+	"polkadot": "Polkadot",
+	"checker": "Checker",
+	"title": "Edit Watermark",
+	"preview": "Preview"
+}
+</locale>
+
+<locale locale="ko-KR" lang="json">
+{
+	"quitWithoutSaveConfirm": "보존하지 않고 종료하시겠습니까?",
+	"failedToLoadImage": "이미지 로딩에 실패했습니다.",
+	"name": "이름",
+	"text": "텍스트",
+	"image": "이미지",
+	"qr": "QR 코드",
+	"stripe": "줄무늬",
+	"polkadot": "물방울 무늬",
+	"checker": "체크 무늬",
+	"title": "워터마크 편집",
+	"preview": "미리보기"
+}
+</locale>
+
+<locale locale="nl-NL" lang="json">
+{
+	"quitWithoutSaveConfirm": "Discard unsaved changes?",
+	"failedToLoadImage": "Failed to load image",
+	"name": "Naam",
+	"text": "Text",
+	"image": "Afbeeldingen",
+	"qr": "QR Code",
+	"stripe": "Stripes",
+	"polkadot": "Polkadot",
+	"checker": "Checker",
+	"title": "Edit Watermark",
+	"preview": "Voorbeeld"
+}
+</locale>
+
+<locale locale="no-NO" lang="json">
+{
+	"quitWithoutSaveConfirm": "Discard unsaved changes?",
+	"failedToLoadImage": "Failed to load image",
+	"name": "Navn",
+	"text": "Tekst",
+	"image": "Bilder",
+	"qr": "QR Code",
+	"stripe": "Stripes",
+	"polkadot": "Polkadot",
+	"checker": "Checker",
+	"title": "Edit Watermark",
+	"preview": "Preview"
+}
+</locale>
+
+<locale locale="pl-PL" lang="json">
+{
+	"quitWithoutSaveConfirm": "Discard unsaved changes?",
+	"failedToLoadImage": "Failed to load image",
+	"name": "Nazwa",
+	"text": "Tekst",
+	"image": "Zdjęcia",
+	"qr": "QR Code",
+	"stripe": "Stripes",
+	"polkadot": "Polkadot",
+	"checker": "Checker",
+	"title": "Edit Watermark",
+	"preview": "Podgląd"
+}
+</locale>
+
+<locale locale="pt-PT" lang="json">
+{
+	"quitWithoutSaveConfirm": "Descartar mudanças?",
+	"failedToLoadImage": "Failed to load image",
+	"name": "Nome",
+	"text": "Texto",
+	"image": "imagem",
+	"qr": "Código QR",
+	"stripe": "Listras",
+	"polkadot": "Bolinhas",
+	"checker": "Xadrez",
+	"title": "Editar marca d'água",
+	"preview": "Pré-visualizar"
+}
+</locale>
+
+<locale locale="ru-RU" lang="json">
+{
+	"quitWithoutSaveConfirm": "Discard unsaved changes?",
+	"failedToLoadImage": "Не удалось загрузить изображение",
+	"name": "Название",
+	"text": "Текст",
+	"image": "Изображения",
+	"qr": "QR Code",
+	"stripe": "Stripes",
+	"polkadot": "Polkadot",
+	"checker": "Checker",
+	"title": "Edit Watermark",
+	"preview": "Предпросмотр"
+}
+</locale>
+
+<locale locale="sk-SK" lang="json">
+{
+	"quitWithoutSaveConfirm": "Discard unsaved changes?",
+	"failedToLoadImage": "Failed to load image",
+	"name": "Názov",
+	"text": "Text",
+	"image": "Obrázky",
+	"qr": "QR Code",
+	"stripe": "Stripes",
+	"polkadot": "Polkadot",
+	"checker": "Checker",
+	"title": "Edit Watermark",
+	"preview": "Náhľad"
+}
+</locale>
+
+<locale locale="th-TH" lang="json">
+{
+	"quitWithoutSaveConfirm": "ต้องการออกโดยไม่บันทึกหรือไม่?",
+	"failedToLoadImage": "โหลดภาพล้มเหลว",
+	"name": "ชื่อ",
+	"text": "ข้อความ",
+	"image": "รูปภาพ",
+	"qr": "QR โค้ด",
+	"stripe": "ริ้ว",
+	"polkadot": "ลายจุด",
+	"checker": "ช่องตาราง",
+	"title": "แก้ไขลายน้ำ",
+	"preview": "แสดงตัวอย่าง"
+}
+</locale>
+
+<locale locale="tr-TR" lang="json">
+{
+	"quitWithoutSaveConfirm": "Kaydedilmemiş değişiklikleri silmek ister misin?",
+	"failedToLoadImage": "Görüntü yükleme başarısız oldu ",
+	"name": "İsim",
+	"text": "Metin",
+	"image": "Görseller",
+	"qr": "2 boyutlu kod",
+	"stripe": "Çizgiler",
+	"polkadot": "Nokta deseni",
+	"checker": "Kontrolcü",
+	"title": "Filigranı Düzenle",
+	"preview": "Önizleme"
+}
+</locale>
+
+<locale locale="ug-CN" lang="json">
+{
+	"quitWithoutSaveConfirm": "Discard unsaved changes?",
+	"failedToLoadImage": "Failed to load image",
+	"name": "Name",
+	"text": "Text",
+	"image": "Images",
+	"qr": "QR Code",
+	"stripe": "Stripes",
+	"polkadot": "Polkadot",
+	"checker": "Checker",
+	"title": "Edit Watermark",
+	"preview": "Preview"
+}
+</locale>
+
+<locale locale="uk-UA" lang="json">
+{
+	"quitWithoutSaveConfirm": "Discard unsaved changes?",
+	"failedToLoadImage": "Не вдалося завантажити зображення",
+	"name": "Ім'я",
+	"text": "Текст",
+	"image": "Зображення",
+	"qr": "QR-код",
+	"stripe": "Stripes",
+	"polkadot": "Polkadot",
+	"checker": "Checker",
+	"title": "Edit Watermark",
+	"preview": "Попередній перегляд"
+}
+</locale>
+
+<locale locale="vi-VN" lang="json">
+{
+	"quitWithoutSaveConfirm": "Discard unsaved changes?",
+	"failedToLoadImage": "Failed to load image",
+	"name": "Tên",
+	"text": "Văn bản",
+	"image": "Hình ảnh",
+	"qr": "QR Code",
+	"stripe": "Stripes",
+	"polkadot": "Polkadot",
+	"checker": "Checker",
+	"title": "Edit Watermark",
+	"preview": "Xem trước"
+}
+</locale>
+
+<locale locale="zh-CN" lang="json">
+{
+	"quitWithoutSaveConfirm": "放弃未保存的更改？",
+	"failedToLoadImage": "图片加载失败",
+	"name": "名称",
+	"text": "文本",
+	"image": "图片",
+	"qr": "二维码",
+	"stripe": "条纹",
+	"polkadot": "波点",
+	"checker": "检查",
+	"title": "编辑水印",
+	"preview": "预览"
+}
+</locale>
+
+<locale locale="zh-TW" lang="json">
+{
+	"quitWithoutSaveConfirm": "不儲存就退出嗎？",
+	"failedToLoadImage": "圖片載入失敗",
+	"name": "名稱",
+	"text": "文字",
+	"image": "圖片",
+	"qr": "二維條碼",
+	"stripe": "條紋",
+	"polkadot": "波卡圓點",
+	"checker": "棋盤格",
+	"title": "編輯浮水印",
+	"preview": "預覽"
+}
+</locale>

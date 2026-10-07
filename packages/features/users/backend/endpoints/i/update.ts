@@ -13,11 +13,10 @@ import { extractHashtags } from '@/misc/extract-hashtags.js';
 import * as Acct from '@/misc/acct.js';
 import type { UsersRepository, DriveFilesRepository, MiMeta, UserProfilesRepository, PagesRepository } from '@/models/_.js';
 import type { MiLocalUser, MiUser } from '../../models/User.js';
-import { birthdaySchema, descriptionSchema, followedMessageSchema, locationSchema, nameSchema } from '../../models/User.js';
 import type { MiUserProfile } from '../../models/UserProfile.js';
 import { normalizeForSearch } from '@/misc/normalize-for-search.js';
-import { langmap } from '@/misc/langmap.js';
-import { Endpoint } from '@/server/api/endpoint-base.js';
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { iUpdateDefinition, iUpdateInput, iUpdateOutput } from '../../../contract/user-update-endpoint-definitions.js';
 import { UserEntityService } from '../../serializers/UserEntityService.js';
 import { GlobalEventService } from '../../../../runtime/backend/services/GlobalEventService.js';
 import { UserFollowingService } from '../../../../relationships/backend/services/UserFollowingService.js';
@@ -32,9 +31,10 @@ import { DriveFileEntityService } from '../../../../drive/backend/serializers/Dr
 import { HttpRequestService } from '../../../../runtime/backend/services/HttpRequestService.js';
 import type { Config } from '@/config.js';
 import { AvatarDecorationService } from '../../../../avatar-decorations/backend/services/AvatarDecorationService.js';
-import { notificationRecieveConfig } from '../../../contract/notification-receive-config.js';
 import { ApiLoggerService } from '@/server/api/ApiLoggerService.js';
 import { ApiError } from '@/server/api/error.js';
+
+const contractProjection = projectEndpointContract(iUpdateDefinition);
 
 export const meta = {
 	tags: ['account'],
@@ -123,116 +123,13 @@ export const meta = {
 		},
 	},
 
-	res: {
-		type: 'object',
-		optional: false, nullable: false,
-		ref: 'MeDetailed',
-	},
+	res: contractProjection.response,
 } as const;
 
-const muteWords = { type: 'array', items: { oneOf: [
-	{ type: 'array', items: { type: 'string' } },
-	{ type: 'string' },
-] } } as const;
-
-export const paramDef = {
-	type: 'object',
-	properties: {
-		name: { ...nameSchema, nullable: true },
-		description: { ...descriptionSchema, nullable: true },
-		followedMessage: { ...followedMessageSchema, nullable: true },
-		location: { ...locationSchema, nullable: true },
-		birthday: { ...birthdaySchema, nullable: true },
-		lang: { type: 'string', enum: [null, ...Object.keys(langmap)] as string[], nullable: true },
-		avatarId: { type: 'string', format: 'misskey:id', nullable: true },
-		avatarDecorations: { type: 'array', maxItems: 16, items: {
-			type: 'object',
-			properties: {
-				id: { type: 'string', format: 'misskey:id' },
-				angle: { type: 'number', nullable: true, maximum: 0.5, minimum: -0.5 },
-				flipH: { type: 'boolean', nullable: true },
-				offsetX: { type: 'number', nullable: true, maximum: 0.25, minimum: -0.25 },
-				offsetY: { type: 'number', nullable: true, maximum: 0.25, minimum: -0.25 },
-			},
-			required: ['id'],
-		} },
-		bannerId: { type: 'string', format: 'misskey:id', nullable: true },
-		fields: {
-			type: 'array',
-			minItems: 0,
-			maxItems: 16,
-			items: {
-				type: 'object',
-				properties: {
-					name: { type: 'string' },
-					value: { type: 'string' },
-				},
-				required: ['name', 'value'],
-			},
-		},
-		isLocked: { type: 'boolean' },
-		isExplorable: { type: 'boolean' },
-		hideOnlineStatus: { type: 'boolean' },
-		publicReactions: { type: 'boolean' },
-		carefulBot: { type: 'boolean' },
-		autoAcceptFollowed: { type: 'boolean' },
-		noCrawle: { type: 'boolean' },
-		preventAiLearning: { type: 'boolean' },
-		requireSigninToViewContents: { type: 'boolean' },
-		makeNotesFollowersOnlyBefore: { type: 'integer', nullable: true },
-		makeNotesHiddenBefore: { type: 'integer', nullable: true },
-		isBot: { type: 'boolean' },
-		isCat: { type: 'boolean' },
-		injectFeaturedNote: { type: 'boolean' },
-		receiveAnnouncementEmail: { type: 'boolean' },
-		alwaysMarkNsfw: { type: 'boolean' },
-		autoSensitive: { type: 'boolean' },
-		followingVisibility: { type: 'string', enum: ['public', 'followers', 'private'] },
-		followersVisibility: { type: 'string', enum: ['public', 'followers', 'private'] },
-		chatScope: { type: 'string', enum: ['everyone', 'followers', 'following', 'mutual', 'none'] },
-		pinnedPageId: { type: 'string', format: 'misskey:id', nullable: true },
-		mutedWords: muteWords,
-		hardMutedWords: muteWords,
-		mutedInstances: { type: 'array', items: {
-			type: 'string',
-		} },
-		notificationRecieveConfig: {
-			type: 'object',
-			nullable: false,
-			properties: {
-				note: notificationRecieveConfig,
-				follow: notificationRecieveConfig,
-				mention: notificationRecieveConfig,
-				reply: notificationRecieveConfig,
-				renote: notificationRecieveConfig,
-				quote: notificationRecieveConfig,
-				reaction: notificationRecieveConfig,
-				pollEnded: notificationRecieveConfig,
-				scheduledNotePosted: notificationRecieveConfig,
-				scheduledNotePostFailed: notificationRecieveConfig,
-				receiveFollowRequest: notificationRecieveConfig,
-				followRequestAccepted: notificationRecieveConfig,
-				roleAssigned: notificationRecieveConfig,
-				chatRoomInvitationReceived: notificationRecieveConfig,
-				achievementEarned: notificationRecieveConfig,
-				app: notificationRecieveConfig,
-				test: notificationRecieveConfig,
-			},
-		},
-		emailNotificationTypes: { type: 'array', items: {
-			type: 'string',
-		} },
-		alsoKnownAs: {
-			type: 'array',
-			maxItems: 10,
-			uniqueItems: true,
-			items: { type: 'string' },
-		},
-	},
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof iUpdateInput, typeof iUpdateOutput> {
 	constructor(
 		@Inject(DI.config)
 		private config: Config,
@@ -266,7 +163,7 @@ export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDe
 		private avatarDecorationService: AvatarDecorationService,
 		private utilityService: UtilityService,
 	) {
-		super(meta, paramDef, async (ps, _user, token) => {
+		super(meta, contractProjection, async (ps, _user, token) => {
 			const user = await this.usersRepository.findOneByOrFail({ id: _user.id }) as MiLocalUser;
 			const isSecure = token == null;
 

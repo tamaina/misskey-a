@@ -3,13 +3,11 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Injectable, Inject } from '@nestjs/common';
-import { DI } from '@/di-symbols.js';
 import { bindThis } from '@/decorators.js';
-import { HttpRequestService } from '../../../runtime/backend/services/HttpRequestService.js';
-import { LoggerService } from '../../../runtime/backend/services/LoggerService.js';
 import type { MiMeta } from '@/models/_.js';
 import type Logger from '@/logger.js';
+import type { HttpRequestService } from '../../../runtime/backend/services/HttpRequestService.js';
+import type { LoggerService } from '../../../runtime/backend/services/LoggerService.js';
 
 /**
  * 正規化済み画像に対する nsfwjs 互換の予測値。
@@ -68,12 +66,10 @@ function isDetectImagesResponse(v: unknown): v is DetectImagesResponse {
 // サイドカーの判定エンドポイント。baseUrl にパスプレフィックスがあっても連結できるよう先頭スラッシュは付けない。
 const DETECT_IMAGES_PATH = 'v1/detect-images';
 
-@Injectable()
 export class SensitiveMediaDetectionService {
 	private logger: Logger;
 
 	constructor(
-		@Inject(DI.meta)
 		private meta: MiMeta,
 
 		private httpRequestService: HttpRequestService,

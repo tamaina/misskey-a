@@ -94,7 +94,7 @@ assert.throws(() => proposed(v.pipe(jsonObject({}), v.metadata({ type: 'array' }
 proof('actual Endpoint AJV rejects before callbacks and preserves payload identity/default mutation', async () => {
 // The actual Endpoint class validates the generated schema and passes the original payload to its callback.
 const seen: unknown[] = [];
-const endpoint = new Endpoint({}, projected, async params => { seen.push(params); });
+const endpoint = new Endpoint({}, projected, async (params: unknown) => { seen.push(params); });
 for (const value of primitives) await assert.rejects(endpoint.exec(structuredClone(value), null, null), { code: 'INVALID_PARAM' });
 assert.equal(seen.length, 0);
 const payload = { nested: { extra: 'nested' }, extra: 'root' };

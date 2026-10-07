@@ -6,6 +6,7 @@
 import type { InferContractRouterInputs, InferContractRouterOutputs } from '@orpc/contract';
 import * as v from 'valibot';
 import { defineEndpointContract } from '../../api/contract/definition.js';
+import { opaqueObject } from '../../api/contract/opaque-object.js';
 import { misskeyId } from '../../api/contract/index.js';
 
 export const voidAdminRolesAssignInput = v.looseObject({
@@ -48,7 +49,7 @@ export const voidAdminRolesUpdateInput = v.looseObject({
 	"color": v.exactOptional(v.nullable(v.string())),
 	"iconUrl": v.exactOptional(v.nullable(v.string())),
 	"target": v.exactOptional(v.picklist(["manual", "conditional"])),
-	"condFormula": v.exactOptional(v.pipe(v.any(), v.metadata({ type: 'object' }))),
+	"condFormula": v.optional(opaqueObject),
 	"isPublic": v.exactOptional(v.boolean()),
 	"isModerator": v.exactOptional(v.boolean()),
 	"isAdministrator": v.exactOptional(v.boolean()),
@@ -57,7 +58,7 @@ export const voidAdminRolesUpdateInput = v.looseObject({
 	"preserveAssignmentOnMoveAccount": v.exactOptional(v.boolean()),
 	"canEditMembersByModerator": v.exactOptional(v.boolean()),
 	"displayOrder": v.exactOptional(v.number()),
-	"policies": v.exactOptional(v.pipe(v.any(), v.metadata({ type: 'object' }))),
+	"policies": v.optional(opaqueObject),
 });
 export const voidAdminRolesUpdateOutput = v.void();
 export const voidAdminRolesUpdateDefinition = defineEndpointContract(
@@ -67,7 +68,7 @@ export const voidAdminRolesUpdateDefinition = defineEndpointContract(
 );
 
 export const voidAdminRolesUpdateDefaultPoliciesInput = v.looseObject({
-	"policies": v.pipe(v.any(), v.metadata({ type: 'object' })),
+	"policies": opaqueObject,
 });
 export const voidAdminRolesUpdateDefaultPoliciesOutput = v.void();
 export const voidAdminRolesUpdateDefaultPoliciesDefinition = defineEndpointContract(

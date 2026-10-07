@@ -14,13 +14,13 @@ SPDX-License-Identifier: AGPL-3.0-only
 	@ok="save()"
 	@closed="emit('closed')"
 >
-	<template #header><i class="ti ti-sparkles"></i> {{ i18n.ts._imageEffector.title }}</template>
+	<template #header><i class="ti ti-sparkles"></i> {{ $locale.sfc.title }}</template>
 
 	<MkPreviewWithControls>
 		<template #preview>
 			<canvas ref="canvasEl" :class="$style.previewCanvas" @pointerdown.prevent.stop="onImagePointerdown"></canvas>
 			<div :class="$style.previewContainer">
-				<div class="_acrylic" :class="$style.previewTitle">{{ i18n.ts.preview }}</div>
+				<div class="_acrylic" :class="$style.previewTitle">{{ $locale.sfc.preview }}</div>
 				<div class="_acrylic" :class="$style.editControls">
 					<button class="_button" :class="[$style.previewControlsButton, penMode != null ? $style.active : null]" @click="showPenMenu"><i class="ti ti-pencil"></i></button>
 				</div>
@@ -42,7 +42,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 					@swapDown="onLayerSwapDown(layer)"
 				></XLayer>
 
-				<MkButton rounded primary style="margin: 0 auto;" @click="addEffect"><i class="ti ti-plus"></i> {{ i18n.ts._imageEffector.addEffect }}</MkButton>
+				<MkButton rounded primary style="margin: 0 auto;" @click="addEffect"><i class="ti ti-plus"></i> {{ $locale.sfc.addEffect }}</MkButton>
 			</div>
 		</template>
 	</MkPreviewWithControls>
@@ -52,7 +52,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script setup lang="ts">
 import { ref, useTemplateRef, watch, onMounted, onUnmounted, reactive, nextTick } from 'vue';
 import type { ImageEffectorLayer } from '@features/media/frontend/utility/image-effector/ImageEffector.js';
-import { i18n } from '@features/runtime/frontend/i18n.js';
 import { ImageEffector } from '@features/media/frontend/utility/image-effector/ImageEffector.js';
 import MkModalWindow from '@features/ui/frontend/components/MkModalWindow.vue';
 import MkPreviewWithControls from '@features/markup/frontend/components/MkPreviewWithControls.vue';
@@ -78,7 +77,7 @@ async function cancel() {
 	if (layers.length > 0) {
 		const { canceled } = await os.confirm({
 			type: 'warning',
-			text: i18n.ts._imageEffector.discardChangesConfirm,
+			text: $locale.value.sfc.discardChangesConfirm,
 		});
 		if (canceled) return;
 	}
@@ -169,7 +168,7 @@ onMounted(async () => {
 		console.error(err);
 		os.alert({
 			type: 'error',
-			text: i18n.ts._imageEffector.failedToLoadImage,
+			text: $locale.value.sfc.failedToLoadImage,
 		});
 	}
 
@@ -221,17 +220,17 @@ const penMode = ref<'fill' | 'blur' | 'pixelate' | null>(null);
 
 function showPenMenu(ev: PointerEvent) {
 	os.popupMenu([{
-		text: i18n.ts._imageEffector._fxs.fill,
+		text: $locale.value.sfc.fill,
 		action: () => {
 			penMode.value = 'fill';
 		},
 	}, {
-		text: i18n.ts._imageEffector._fxs.blur,
+		text: $locale.value.sfc.blur,
 		action: () => {
 			penMode.value = 'blur';
 		},
 	}, {
-		text: i18n.ts._imageEffector._fxs.pixelate,
+		text: $locale.value.sfc.pixelate,
 		action: () => {
 			penMode.value = 'pixelate';
 		},
@@ -427,3 +426,367 @@ function onImagePointerdown(ev: PointerEvent) {
 	touch-action: none;
 }
 </style>
+
+<locale locale="ar-SA" lang="json">
+{
+	"discardChangesConfirm": "Are you sure you want to leave? You have unsaved changes.",
+	"failedToLoadImage": "Failed to load image",
+	"fill": "Fill",
+	"blur": "Blur",
+	"pixelate": "Pixelate",
+	"title": "Effects",
+	"preview": "معاينة",
+	"addEffect": "Add Effects"
+}
+</locale>
+
+<locale locale="ca-ES" lang="json">
+{
+	"discardChangesConfirm": "Vols descartar els canvis i sortir?",
+	"failedToLoadImage": "Error en carregar la imatge",
+	"fill": "Omplir",
+	"blur": "Desenfocament",
+	"pixelate": "Mosaic",
+	"title": "Efecte",
+	"preview": "Vista prèvia",
+	"addEffect": "Afegeix un efecte"
+}
+</locale>
+
+<locale locale="cs-CZ" lang="json">
+{
+	"discardChangesConfirm": "Are you sure you want to leave? You have unsaved changes.",
+	"failedToLoadImage": "Failed to load image",
+	"fill": "Fill",
+	"blur": "Blur",
+	"pixelate": "Pixelate",
+	"title": "Effects",
+	"preview": "Náhled",
+	"addEffect": "Add Effects"
+}
+</locale>
+
+<locale locale="da-DK" lang="json">
+{
+	"discardChangesConfirm": "Are you sure you want to leave? You have unsaved changes.",
+	"failedToLoadImage": "Failed to load image",
+	"fill": "Fill",
+	"blur": "Blur",
+	"pixelate": "Pixelate",
+	"title": "Effects",
+	"preview": "Preview",
+	"addEffect": "Add Effects"
+}
+</locale>
+
+<locale locale="de-DE" lang="json">
+{
+	"discardChangesConfirm": "Änderungen verwerfen und beenden?",
+	"failedToLoadImage": "Bild konnte nicht geladen werden",
+	"fill": "Ausfüllen",
+	"blur": "Verwischen",
+	"pixelate": "Verpixeln",
+	"title": "Effekte",
+	"preview": "Vorschau",
+	"addEffect": "Effekte hinzufügen"
+}
+</locale>
+
+<locale locale="en-US" lang="json">
+{
+	"discardChangesConfirm": "Are you sure you want to leave? You have unsaved changes.",
+	"failedToLoadImage": "Failed to load image",
+	"fill": "Fill",
+	"blur": "Blur",
+	"pixelate": "Pixelate",
+	"title": "Effects",
+	"preview": "Preview",
+	"addEffect": "Add Effects"
+}
+</locale>
+
+<locale locale="es-ES" lang="json">
+{
+	"discardChangesConfirm": "¿Ignorar cambios y salir?",
+	"failedToLoadImage": "Error al cargar la imagen",
+	"fill": "Relleno de color",
+	"blur": "Difuminar",
+	"pixelate": "Pixelar",
+	"title": "Efecto",
+	"preview": "Vista previa",
+	"addEffect": "Añadir Efecto"
+}
+</locale>
+
+<locale locale="fr-FR" lang="json">
+{
+	"discardChangesConfirm": "Are you sure you want to leave? You have unsaved changes.",
+	"failedToLoadImage": "Failed to load image",
+	"fill": "Fill",
+	"blur": "Blur",
+	"pixelate": "Pixelate",
+	"title": "Effects",
+	"preview": "Aperçu",
+	"addEffect": "Add Effects"
+}
+</locale>
+
+<locale locale="id-ID" lang="json">
+{
+	"discardChangesConfirm": "Are you sure you want to leave? You have unsaved changes.",
+	"failedToLoadImage": "Failed to load image",
+	"fill": "Fill",
+	"blur": "Blur",
+	"pixelate": "Pixelate",
+	"title": "Effects",
+	"preview": "Pratinjau",
+	"addEffect": "Add Effects"
+}
+</locale>
+
+<locale locale="it-IT" lang="json">
+{
+	"discardChangesConfirm": "Scarta le modifiche ed esci?",
+	"failedToLoadImage": "Impossibile caricare l'immagine",
+	"fill": "Riempimento",
+	"blur": "Sfocatura",
+	"pixelate": "Mosaico",
+	"title": "Effetto",
+	"preview": "Anteprima",
+	"addEffect": "Aggiungi effetto"
+}
+</locale>
+
+<locale locale="ja-JP" lang="json">
+{
+	"discardChangesConfirm": "変更を破棄して終了しますか？",
+	"failedToLoadImage": "画像の読み込みに失敗しました",
+	"fill": "塗りつぶし",
+	"blur": "ぼかし",
+	"pixelate": "モザイク",
+	"title": "エフェクト",
+	"preview": "プレビュー",
+	"addEffect": "エフェクトを追加"
+}
+</locale>
+
+<locale locale="ja-KS" lang="json">
+{
+	"discardChangesConfirm": "変更をせんで終わるか？",
+	"failedToLoadImage": "あかん、画像読み込まれへんわ",
+	"fill": "塗りつぶし",
+	"blur": "ぼかし",
+	"pixelate": "モザイク",
+	"title": "エフェクト",
+	"preview": "プレビュー",
+	"addEffect": "エフェクトを追加"
+}
+</locale>
+
+<locale locale="kab-KAB" lang="json">
+{
+	"discardChangesConfirm": "Are you sure you want to leave? You have unsaved changes.",
+	"failedToLoadImage": "Failed to load image",
+	"fill": "Fill",
+	"blur": "Blur",
+	"pixelate": "Pixelate",
+	"title": "Effects",
+	"preview": "Preview",
+	"addEffect": "Add Effects"
+}
+</locale>
+
+<locale locale="kn-IN" lang="json">
+{
+	"discardChangesConfirm": "Are you sure you want to leave? You have unsaved changes.",
+	"failedToLoadImage": "Failed to load image",
+	"fill": "Fill",
+	"blur": "Blur",
+	"pixelate": "Pixelate",
+	"title": "Effects",
+	"preview": "Preview",
+	"addEffect": "Add Effects"
+}
+</locale>
+
+<locale locale="ko-KR" lang="json">
+{
+	"discardChangesConfirm": "변경을 취소하고 종료하시겠습니까?",
+	"failedToLoadImage": "이미지 로딩에 실패했습니다.",
+	"fill": "채우기",
+	"blur": "흐림 효과",
+	"pixelate": "모자이크",
+	"title": "이펙트",
+	"preview": "미리보기",
+	"addEffect": "이펙트를 추가"
+}
+</locale>
+
+<locale locale="nl-NL" lang="json">
+{
+	"discardChangesConfirm": "Are you sure you want to leave? You have unsaved changes.",
+	"failedToLoadImage": "Failed to load image",
+	"fill": "Fill",
+	"blur": "Blur",
+	"pixelate": "Pixelate",
+	"title": "Effects",
+	"preview": "Voorbeeld",
+	"addEffect": "Add Effects"
+}
+</locale>
+
+<locale locale="no-NO" lang="json">
+{
+	"discardChangesConfirm": "Are you sure you want to leave? You have unsaved changes.",
+	"failedToLoadImage": "Failed to load image",
+	"fill": "Fill",
+	"blur": "Blur",
+	"pixelate": "Pixelate",
+	"title": "Effects",
+	"preview": "Preview",
+	"addEffect": "Add Effects"
+}
+</locale>
+
+<locale locale="pl-PL" lang="json">
+{
+	"discardChangesConfirm": "Are you sure you want to leave? You have unsaved changes.",
+	"failedToLoadImage": "Failed to load image",
+	"fill": "Fill",
+	"blur": "Blur",
+	"pixelate": "Pixelate",
+	"title": "Effects",
+	"preview": "Podgląd",
+	"addEffect": "Add Effects"
+}
+</locale>
+
+<locale locale="pt-PT" lang="json">
+{
+	"discardChangesConfirm": "Tem certeza que deseja sair? Há mudanças não salvas.",
+	"failedToLoadImage": "Failed to load image",
+	"fill": "Preencher",
+	"blur": "Desfoque",
+	"pixelate": "Pixelizar",
+	"title": "Efeitos",
+	"preview": "Pré-visualizar",
+	"addEffect": "Adicionar efeitos"
+}
+</locale>
+
+<locale locale="ru-RU" lang="json">
+{
+	"discardChangesConfirm": "Are you sure you want to leave? You have unsaved changes.",
+	"failedToLoadImage": "Не удалось загрузить изображение",
+	"fill": "Fill",
+	"blur": "Blur",
+	"pixelate": "Pixelate",
+	"title": "Effects",
+	"preview": "Предпросмотр",
+	"addEffect": "Add Effects"
+}
+</locale>
+
+<locale locale="sk-SK" lang="json">
+{
+	"discardChangesConfirm": "Are you sure you want to leave? You have unsaved changes.",
+	"failedToLoadImage": "Failed to load image",
+	"fill": "Fill",
+	"blur": "Blur",
+	"pixelate": "Pixelate",
+	"title": "Effects",
+	"preview": "Náhľad",
+	"addEffect": "Add Effects"
+}
+</locale>
+
+<locale locale="th-TH" lang="json">
+{
+	"discardChangesConfirm": "ต้องการทิ้งการเปลี่ยนแปลงแล้วออกหรือไม่?",
+	"failedToLoadImage": "โหลดภาพล้มเหลว",
+	"fill": "เติมเต็ม",
+	"blur": "มัว",
+	"pixelate": "โมเสก",
+	"title": "เอฟเฟกต์",
+	"preview": "แสดงตัวอย่าง",
+	"addEffect": "เพิ่มเอฟเฟกต์"
+}
+</locale>
+
+<locale locale="tr-TR" lang="json">
+{
+	"discardChangesConfirm": "Cidden çıkmak istiyor musun? Kaydedilmemiş değişikliklerin var.",
+	"failedToLoadImage": "Görüntü yükleme başarısız oldu ",
+	"fill": "Doldur",
+	"blur": "Bulanıklık",
+	"pixelate": "Mozaik",
+	"title": "Effektler",
+	"preview": "Önizleme",
+	"addEffect": "Efektler Ekle"
+}
+</locale>
+
+<locale locale="ug-CN" lang="json">
+{
+	"discardChangesConfirm": "Are you sure you want to leave? You have unsaved changes.",
+	"failedToLoadImage": "Failed to load image",
+	"fill": "Fill",
+	"blur": "Blur",
+	"pixelate": "Pixelate",
+	"title": "Effects",
+	"preview": "Preview",
+	"addEffect": "Add Effects"
+}
+</locale>
+
+<locale locale="uk-UA" lang="json">
+{
+	"discardChangesConfirm": "Are you sure you want to leave? You have unsaved changes.",
+	"failedToLoadImage": "Не вдалося завантажити зображення",
+	"fill": "Fill",
+	"blur": "Blur",
+	"pixelate": "Pixelate",
+	"title": "Effects",
+	"preview": "Попередній перегляд",
+	"addEffect": "Add Effects"
+}
+</locale>
+
+<locale locale="vi-VN" lang="json">
+{
+	"discardChangesConfirm": "Are you sure you want to leave? You have unsaved changes.",
+	"failedToLoadImage": "Failed to load image",
+	"fill": "Fill",
+	"blur": "Blur",
+	"pixelate": "Pixelate",
+	"title": "Effects",
+	"preview": "Xem trước",
+	"addEffect": "Add Effects"
+}
+</locale>
+
+<locale locale="zh-CN" lang="json">
+{
+	"discardChangesConfirm": "丢弃当前设置并退出？",
+	"failedToLoadImage": "图片加载失败",
+	"fill": "填充",
+	"blur": "模糊",
+	"pixelate": "马赛克",
+	"title": "效果",
+	"preview": "预览",
+	"addEffect": "添加效果"
+}
+</locale>
+
+<locale locale="zh-TW" lang="json">
+{
+	"discardChangesConfirm": "捨棄更改並退出嗎？",
+	"failedToLoadImage": "圖片載入失敗",
+	"fill": "填充",
+	"blur": "模糊",
+	"pixelate": "馬賽克",
+	"title": "特效",
+	"preview": "預覽",
+	"addEffect": "新增特效"
+}
+</locale>

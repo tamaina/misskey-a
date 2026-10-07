@@ -1,0 +1,661 @@
+{
+  "rows": [
+    {
+      "route": "admin/emoji/update",
+      "feature": "emojis",
+      "file": "packages/features/emojis/backend/endpoints/admin/emoji/update.ts",
+      "sourceSha256": "06ea23d789fd9a99b07199faf8483e57f789065c1ceb71411fe518012c28debd",
+      "line": 39,
+      "input": {
+        "allOf": [
+          {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "format": "misskey:id"
+                  }
+                },
+                "required": [
+                  "id"
+                ]
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "pattern": "^[a-zA-Z0-9_]+$"
+                  }
+                },
+                "required": [
+                  "name"
+                ]
+              }
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "fileId": {
+                "type": "string",
+                "format": "misskey:id"
+              },
+              "category": {
+                "type": "string",
+                "nullable": true,
+                "description": "Use `null` to reset the category."
+              },
+              "aliases": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "license": {
+                "type": "string",
+                "nullable": true
+              },
+              "isSensitive": {
+                "type": "boolean"
+              },
+              "localOnly": {
+                "type": "boolean"
+              },
+              "roleIdsThatCanBeUsedThisEmojiAsReaction": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "meta": {
+        "tags": [
+          "admin"
+        ],
+        "requireCredential": true,
+        "requiredRolePolicy": "canManageCustomEmojis",
+        "kind": "write:admin:emoji",
+        "errors": {
+          "noSuchEmoji": {
+            "message": "No such emoji.",
+            "code": "NO_SUCH_EMOJI",
+            "id": "684dec9d-a8c2-4364-9aa8-456c49cb1dc8"
+          },
+          "noSuchFile": {
+            "message": "No such file.",
+            "code": "NO_SUCH_FILE",
+            "id": "14fb9fd9-0731-4e2f-aeb9-f09e4740333d"
+          },
+          "sameNameEmojiExists": {
+            "message": "Emoji that have same name already exists.",
+            "code": "SAME_NAME_EMOJI_EXISTS",
+            "id": "7180fe9d-1ee3-bff9-647d-fe9896d2ffb8"
+          }
+        }
+      },
+      "selectorKeys": [
+        [
+          "id"
+        ],
+        [
+          "name"
+        ]
+      ],
+      "commonKeys": [
+        "fileId",
+        "category",
+        "aliases",
+        "license",
+        "isSensitive",
+        "localOnly",
+        "roleIdsThatCanBeUsedThisEmojiAsReaction"
+      ],
+      "selectorCommonDisjoint": true,
+      "commonDefaults": [],
+      "rootTypeOmitted": true,
+      "commonRequiredOmitted": true,
+      "selectorAllDeclaredRequired": true,
+      "status": "design-only",
+      "name": "allOfAdminEmojiUpdate",
+      "source": "packages/features/emojis/backend/endpoints/admin/emoji/update.ts",
+      "definitionFile": "packages/features/emojis/contract/selector-common-endpoint-definitions.ts"
+    },
+    {
+      "route": "notes/search-by-tag",
+      "feature": "discovery",
+      "file": "packages/features/discovery/backend/endpoints/notes/search-by-tag.ts",
+      "sourceSha256": "2adaae3e84bc2b6140b115cafe6019bcf63d96a9db7f1ae378dacaa6921bdaab",
+      "line": 30,
+      "input": {
+        "allOf": [
+          {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "tag": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "required": [
+                  "tag"
+                ]
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "query": {
+                    "type": "array",
+                    "description": "The outer arrays are chained with OR, the inner arrays are chained with AND.",
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "minItems": 1
+                    },
+                    "minItems": 1
+                  }
+                },
+                "required": [
+                  "query"
+                ]
+              }
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "reply": {
+                "type": "boolean",
+                "nullable": true,
+                "default": null
+              },
+              "renote": {
+                "type": "boolean",
+                "nullable": true,
+                "default": null
+              },
+              "withFiles": {
+                "type": "boolean",
+                "default": false,
+                "description": "Only show notes that have attached files."
+              },
+              "poll": {
+                "type": "boolean",
+                "nullable": true,
+                "default": null
+              },
+              "sinceId": {
+                "type": "string",
+                "format": "misskey:id"
+              },
+              "untilId": {
+                "type": "string",
+                "format": "misskey:id"
+              },
+              "sinceDate": {
+                "type": "integer"
+              },
+              "untilDate": {
+                "type": "integer"
+              },
+              "limit": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 100,
+                "default": 10
+              }
+            }
+          }
+        ]
+      },
+      "meta": {
+        "tags": [
+          "notes",
+          "hashtags"
+        ],
+        "res": {
+          "type": "array",
+          "optional": false,
+          "nullable": false,
+          "items": {
+            "type": "object",
+            "optional": false,
+            "nullable": false,
+            "ref": "Note"
+          }
+        }
+      },
+      "selectorKeys": [
+        [
+          "tag"
+        ],
+        [
+          "query"
+        ]
+      ],
+      "commonKeys": [
+        "reply",
+        "renote",
+        "withFiles",
+        "poll",
+        "sinceId",
+        "untilId",
+        "sinceDate",
+        "untilDate",
+        "limit"
+      ],
+      "selectorCommonDisjoint": true,
+      "commonDefaults": [
+        {
+          "key": "reply",
+          "value": null
+        },
+        {
+          "key": "renote",
+          "value": null
+        },
+        {
+          "key": "withFiles",
+          "value": false
+        },
+        {
+          "key": "poll",
+          "value": null
+        },
+        {
+          "key": "limit",
+          "value": 10
+        }
+      ],
+      "rootTypeOmitted": true,
+      "commonRequiredOmitted": true,
+      "selectorAllDeclaredRequired": true,
+      "status": "design-only",
+      "name": "allOfNotesSearchByTag",
+      "source": "packages/features/discovery/backend/endpoints/notes/search-by-tag.ts",
+      "definitionFile": "packages/features/discovery/contract/selector-common-endpoint-definitions.ts"
+    },
+    {
+      "route": "users/followers",
+      "feature": "relationships",
+      "file": "packages/features/relationships/backend/endpoints/users/followers.ts",
+      "sourceSha256": "11a71eb47e8955fcf399b0b81dce1df8996ae0057dc6fd9aa81fb05d0f1f8468",
+      "line": 49,
+      "input": {
+        "allOf": [
+          {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "userId": {
+                    "type": "string",
+                    "format": "misskey:id"
+                  }
+                },
+                "required": [
+                  "userId"
+                ]
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "username": {
+                    "type": "string"
+                  },
+                  "host": {
+                    "type": "string",
+                    "nullable": true,
+                    "description": "The local host is represented with `null`."
+                  }
+                },
+                "required": [
+                  "username",
+                  "host"
+                ]
+              }
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "sinceId": {
+                "type": "string",
+                "format": "misskey:id"
+              },
+              "untilId": {
+                "type": "string",
+                "format": "misskey:id"
+              },
+              "sinceDate": {
+                "type": "integer"
+              },
+              "untilDate": {
+                "type": "integer"
+              },
+              "limit": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 100,
+                "default": 10
+              }
+            }
+          }
+        ]
+      },
+      "meta": {
+        "tags": [
+          "users"
+        ],
+        "requireCredential": false,
+        "description": "Show everyone that follows this user.",
+        "res": {
+          "type": "array",
+          "optional": false,
+          "nullable": false,
+          "items": {
+            "type": "object",
+            "optional": false,
+            "nullable": false,
+            "ref": "Following"
+          }
+        },
+        "errors": {
+          "noSuchUser": {
+            "message": "No such user.",
+            "code": "NO_SUCH_USER",
+            "id": "27fa5435-88ab-43de-9360-387de88727cd"
+          },
+          "forbidden": {
+            "message": "Forbidden.",
+            "code": "FORBIDDEN",
+            "id": "3c6a84db-d619-26af-ca14-06232a21df8a"
+          }
+        }
+      },
+      "selectorKeys": [
+        [
+          "userId"
+        ],
+        [
+          "username",
+          "host"
+        ]
+      ],
+      "commonKeys": [
+        "sinceId",
+        "untilId",
+        "sinceDate",
+        "untilDate",
+        "limit"
+      ],
+      "selectorCommonDisjoint": true,
+      "commonDefaults": [
+        {
+          "key": "limit",
+          "value": 10
+        }
+      ],
+      "rootTypeOmitted": true,
+      "commonRequiredOmitted": true,
+      "selectorAllDeclaredRequired": true,
+      "status": "design-only",
+      "name": "allOfUsersFollowers",
+      "source": "packages/features/relationships/backend/endpoints/users/followers.ts",
+      "definitionFile": "packages/features/relationships/contract/selector-common-endpoint-definitions.ts"
+    },
+    {
+      "route": "users/following",
+      "feature": "relationships",
+      "file": "packages/features/relationships/backend/endpoints/users/following.ts",
+      "sourceSha256": "965603d40f82d18544931ca10d93d0e2042786688c51b8ddde8cdf2840788f02",
+      "line": 56,
+      "input": {
+        "allOf": [
+          {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "userId": {
+                    "type": "string",
+                    "format": "misskey:id"
+                  }
+                },
+                "required": [
+                  "userId"
+                ]
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "username": {
+                    "type": "string"
+                  },
+                  "host": {
+                    "type": "string",
+                    "nullable": true,
+                    "description": "The local host is represented with `null`."
+                  }
+                },
+                "required": [
+                  "username",
+                  "host"
+                ]
+              }
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "sinceId": {
+                "type": "string",
+                "format": "misskey:id"
+              },
+              "untilId": {
+                "type": "string",
+                "format": "misskey:id"
+              },
+              "sinceDate": {
+                "type": "integer"
+              },
+              "untilDate": {
+                "type": "integer"
+              },
+              "limit": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 100,
+                "default": 10
+              },
+              "birthday": {
+                "type": "string",
+                "pattern": "^([0-9]{4})-([0-9]{2})-([0-9]{2})$",
+                "nullable": true,
+                "description": "@deprecated use get-following-users-by-birthday instead."
+              }
+            }
+          }
+        ]
+      },
+      "meta": {
+        "tags": [
+          "users"
+        ],
+        "requireCredential": false,
+        "description": "Show everyone that this user is following.",
+        "res": {
+          "type": "array",
+          "optional": false,
+          "nullable": false,
+          "items": {
+            "type": "object",
+            "optional": false,
+            "nullable": false,
+            "ref": "Following"
+          }
+        },
+        "errors": {
+          "noSuchUser": {
+            "message": "No such user.",
+            "code": "NO_SUCH_USER",
+            "id": "63e4aba4-4156-4e53-be25-c9559e42d71b"
+          },
+          "forbidden": {
+            "message": "Forbidden.",
+            "code": "FORBIDDEN",
+            "id": "f6cdb0df-c19f-ec5c-7dbb-0ba84a1f92ba"
+          },
+          "birthdayInvalid": {
+            "message": "Birthday date format is invalid.",
+            "code": "BIRTHDAY_DATE_FORMAT_INVALID",
+            "id": "a2b007b9-4782-4eba-abd3-93b05ed4130d"
+          }
+        }
+      },
+      "selectorKeys": [
+        [
+          "userId"
+        ],
+        [
+          "username",
+          "host"
+        ]
+      ],
+      "commonKeys": [
+        "sinceId",
+        "untilId",
+        "sinceDate",
+        "untilDate",
+        "limit",
+        "birthday"
+      ],
+      "selectorCommonDisjoint": true,
+      "commonDefaults": [
+        {
+          "key": "limit",
+          "value": 10
+        }
+      ],
+      "rootTypeOmitted": true,
+      "commonRequiredOmitted": true,
+      "selectorAllDeclaredRequired": true,
+      "status": "design-only",
+      "name": "allOfUsersFollowing",
+      "source": "packages/features/relationships/backend/endpoints/users/following.ts",
+      "definitionFile": "packages/features/relationships/contract/selector-common-endpoint-definitions.ts"
+    },
+    {
+      "route": "users/search-by-username-and-host",
+      "feature": "discovery",
+      "file": "packages/features/discovery/backend/endpoints/users/search-by-username-and-host.ts",
+      "sourceSha256": "8086fc16b31818f8fb684695ab18a31fcc9c7c6822cc76927d2702024f021f23",
+      "line": 28,
+      "input": {
+        "allOf": [
+          {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "username": {
+                    "type": "string",
+                    "nullable": true
+                  }
+                },
+                "required": [
+                  "username"
+                ]
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "host": {
+                    "type": "string",
+                    "nullable": true
+                  }
+                },
+                "required": [
+                  "host"
+                ]
+              }
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "limit": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 100,
+                "default": 10
+              },
+              "detail": {
+                "type": "boolean",
+                "default": true
+              }
+            }
+          }
+        ]
+      },
+      "meta": {
+        "tags": [
+          "users"
+        ],
+        "requireCredential": false,
+        "description": "Search for a user by username and/or host.",
+        "res": {
+          "type": "array",
+          "optional": false,
+          "nullable": false,
+          "items": {
+            "type": "object",
+            "optional": false,
+            "nullable": false,
+            "ref": "User"
+          }
+        }
+      },
+      "selectorKeys": [
+        [
+          "username"
+        ],
+        [
+          "host"
+        ]
+      ],
+      "commonKeys": [
+        "limit",
+        "detail"
+      ],
+      "selectorCommonDisjoint": true,
+      "commonDefaults": [
+        {
+          "key": "limit",
+          "value": 10
+        },
+        {
+          "key": "detail",
+          "value": true
+        }
+      ],
+      "rootTypeOmitted": true,
+      "commonRequiredOmitted": true,
+      "selectorAllDeclaredRequired": true,
+      "status": "design-only",
+      "name": "allOfUsersSearchByUsernameAndHost",
+      "source": "packages/features/discovery/backend/endpoints/users/search-by-username-and-host.ts",
+      "definitionFile": "packages/features/discovery/contract/selector-common-endpoint-definitions.ts"
+    }
+  ]
+}

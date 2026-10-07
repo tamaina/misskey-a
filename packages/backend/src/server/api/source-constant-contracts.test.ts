@@ -952,7 +952,7 @@ for (const route of Object.keys(definitions) as Route[]) {
 		const response = { deliberatelyUnparsed: [null, 1], future: { retained: true } };
 		const oldCalls: unknown[] = [];
 		const newCalls: unknown[] = [];
-		const legacy = new Endpoint({}, legacyInput(route), async input => { oldCalls.push(input); return response; });
+		const legacy = new Endpoint({}, legacyInput(route), async (input: unknown) => { oldCalls.push(input); return response; });
 		const current = new ContractEndpoint({}, projection, async input => { newCalls.push(input); return response; });
 		for (const sample of requestSamples(route)) {
 			oldCalls.length = 0;
@@ -993,7 +993,7 @@ test('webhook Unicode boundaries, default insertion and invalid-request mutation
 	const response = { id: 'id1', userId: 'user1', name: 'n', url: 'u', secret: '', on: [], active: true, latestSentAt: null, latestStatus: null };
 	const before = { name: '😀'.repeat(100), url: '😀'.repeat(1024), on: ['mention', 'mention'], future: true };
 	const after = structuredClone(before);
-	const legacy = new Endpoint({}, legacyInput('i/webhooks/create'), async input => { expect(input).toBe(before); return response; });
+	const legacy = new Endpoint({}, legacyInput('i/webhooks/create'), async (input: unknown) => { expect(input).toBe(before); return response; });
 	const current = new ContractEndpoint({}, projection, async input => { expect(input).toBe(after); return response; });
 	expect(await legacy.exec(before, null, null)).toBe(response);
 	expect(await current.exec(after, null, null)).toBe(response);

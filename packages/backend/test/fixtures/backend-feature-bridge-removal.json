@@ -666,5 +666,6 @@
   "packages/backend/src/server/web/views/oauth.tsx",
   "packages/backend/src/server/web/views/page.tsx",
   "packages/backend/src/server/web/views/reversi-game.tsx",
-  "packages/backend/src/server/web/views/user.tsx"
+  "packages/backend/src/server/web/views/user.tsx",
+  "packages/backend/src/misc/langmap.ts"
 ]

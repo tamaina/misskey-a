@@ -7,7 +7,8 @@ import { In, IsNull } from 'typeorm';
 import { Inject, Injectable } from '@nestjs/common';
 import type { MiMeta, UsersRepository } from '@/models/_.js';
 import type { MiUser } from '../../models/User.js';
-import { Endpoint } from '@/server/api/endpoint-base.js';
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { usersShowDefinition } from '../../../contract/show-endpoint-definition.js';
 import { UserEntityService } from '../../serializers/UserEntityService.js';
 import { RemoteUserResolveService } from '../../../../federation/backend/services/RemoteUserResolveService.js';
 import { DI } from '@/di-symbols.js';
@@ -17,6 +18,8 @@ import { ApiError } from '@/server/api/error.js';
 import { ApiLoggerService } from '@/server/api/ApiLoggerService.js';
 import type { FindOptionsWhere } from 'typeorm';
 
+const projection = projectEndpointContract(usersShowDefinition);
+
 export const meta = {
 	tags: ['users'],
 
@@ -24,22 +27,7 @@ export const meta = {
 
 	description: 'Show the properties of a user.',
 
-	res: {
-		optional: false, nullable: false,
-		oneOf: [
-			{
-				type: 'object',
-				ref: 'UserDetailed',
-			},
-			{
-				type: 'array',
-				items: {
-					type: 'object',
-					ref: 'UserDetailed',
-				},
-			},
-		],
-	},
+	res: projection.response,
 
 	errors: {
 		failedToResolveRemoteUser: {
@@ -58,50 +46,10 @@ export const meta = {
 	},
 } as const;
 
-export const paramDef = {
-	allOf: [
-		{
-			anyOf: [
-				{
-					type: 'object',
-					properties: {
-						userId: { type: 'string', format: 'misskey:id' },
-					},
-					required: ['userId'],
-				},
-				{
-					type: 'object',
-					properties: {
-						userIds: { type: 'array', uniqueItems: true, items: {
-							type: 'string', format: 'misskey:id',
-						} },
-					},
-					required: ['userIds'],
-				},
-				{
-					type: 'object',
-					properties: {
-						username: { type: 'string' },
-					},
-					required: ['username'],
-				},
-			],
-		},
-		{
-			type: 'object',
-			properties: {
-				host: {
-					type: 'string',
-					nullable: true,
-					description: 'The local host is represented with `null`.',
-				},
-			},
-		},
-	],
-} as const;
+export const paramDef = projection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof usersShowDefinition.input, typeof usersShowDefinition.output, 'legacy-declared'> {
 	constructor(
 		@Inject(DI.meta)
 		private serverSettings: MiMeta,
@@ -115,7 +63,7 @@ export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDe
 		private perUserPvChart: PerUserPvChart,
 		private apiLoggerService: ApiLoggerService,
 	) {
-		super(meta, paramDef, async (ps, me, _1, _2, _3, ip) => {
+		super(meta, projection, async (ps, me, _1, _2, _3, ip) => {
 			// ログイン時にusers/showできなくなってしまう
 			//if (this.serverSettings.ugcVisibilityForVisitor === 'none' && me == null) {
 			//	throw new ApiError(meta.errors.noSuchUser);

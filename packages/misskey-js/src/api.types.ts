@@ -8,7 +8,6 @@ import {
 	EmptyResponse,
 	I2faRegisterKeyRequest,
 	I2faKeyDoneResponse,
-	UsersShowRequest,
 } from './autogen/entities.js';
 import {
 	PartialRolePolicyOverride,
@@ -71,7 +70,7 @@ export type Endpoints = Overwrite<
 	Overwrite<Gen, ContractEndpoints>,
 	{
 		'users/show': {
-			req: UsersShowRequest;
+			req: ContractEndpoints['users/show']['req'];
 			res: {
 				$switch: {
 					$cases: [[

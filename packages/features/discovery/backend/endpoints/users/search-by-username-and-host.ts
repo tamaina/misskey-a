@@ -3,9 +3,12 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { allOfUsersSearchByUsernameAndHostDefinition, allOfUsersSearchByUsernameAndHostInput, allOfUsersSearchByUsernameAndHostOutput } from '../../../contract/selector-common-endpoint-definitions.js';
 import { Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
 import { UserSearchService } from '../../services/UserSearchService.js';
+
+const contractProjection = projectEndpointContract(allOfUsersSearchByUsernameAndHostDefinition);
 
 export const meta = {
 	tags: ['users'],
@@ -14,53 +17,17 @@ export const meta = {
 
 	description: 'Search for a user by username and/or host.',
 
-	res: {
-		type: 'array',
-		optional: false, nullable: false,
-		items: {
-			type: 'object',
-			optional: false, nullable: false,
-			ref: 'User',
-		},
-	},
+	res: contractProjection.response,
 } as const;
 
-export const paramDef = {
-	allOf: [
-		{
-			anyOf: [
-				{
-					type: 'object',
-					properties: {
-						username: { type: 'string', nullable: true },
-					},
-					required: ['username'],
-				},
-				{
-					type: 'object',
-					properties: {
-						host: { type: 'string', nullable: true },
-					},
-					required: ['host'],
-				},
-			],
-		},
-		{
-			type: 'object',
-			properties: {
-				limit: { type: 'integer', minimum: 1, maximum: 100, default: 10 },
-				detail: { type: 'boolean', default: true },
-			},
-		},
-	],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof allOfUsersSearchByUsernameAndHostInput, typeof allOfUsersSearchByUsernameAndHostOutput, 'legacy-declared'> {
 	constructor(
 		private userSearchService: UserSearchService,
 	) {
-		super(meta, paramDef, (ps, me) => {
+		super(meta, contractProjection, (ps, me) => {
 			return this.userSearchService.searchByUsernameAndHost({
 				username: 'username' in ps ? ps.username : undefined,
 				host: 'host' in ps ? ps.host : undefined,

@@ -2,9 +2,16 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
+import { assertNoOpaqueObjectLazyReturn } from './opaque-object-projection.js';
+import { intersect, union } from 'valibot';
+import { assertJsonSelectorAndCommonMetadata, assertNoSelectorCommonLazyReturn } from './json-selector-and-common-projection.js';
+import { getJsonSelectorAndCommonGuardRegistration, getJsonSelectorAndCommonParserRegistration } from '../contract/json-selector-and-common.js';
+import { assertJsonExclusiveObjectMetadata, assertNoExclusiveObjectLazyReturn } from './json-exclusive-object-projection.js';
+import { getJsonExclusiveObjectGuardRegistration, getJsonExclusiveObjectParserRegistration } from '../contract/json-exclusive-object.js';
 import { assertJsonObjectMetadata } from './json-object-projection.js';
 import { assertRequireWhenAllNullishPlacement } from './require-when-all-nullish-projection.js';
-import { getJsonObjectGuardRegistration, getJsonObjectParserRegistration } from '../contract/json-object.js';
+import { assertOwnedUnionLazyReturn } from './legacy-output-one-of-projection.js';
+import { getJsonObjectGuardRegistration, getJsonObjectParserRegistration, getJsonObjectSchemaRegistration } from '../contract/json-object.js';
 
 /** Converter-only public AST view. It is never a runtime parser and contains no private Valibot members. */
 export function jsonObjectProjectionView(schema: object, definitions?: Record<string, object>) {
@@ -45,19 +52,40 @@ export function jsonObjectProjectionView(schema: object, definitions?: Record<st
 			const flat = flatten(value.pipe); const mapped:unknown[] = []; let hasPair = false;
 			for (let index = 0; index < flat.length; index++) {
 				const item = flat[index]; const registration = item !== null && typeof item === 'object' ? getJsonObjectGuardRegistration(item) : undefined;
-				if (registration !== undefined) {
+				const composition = item !== null && typeof item === 'object' ? getJsonSelectorAndCommonGuardRegistration(item) : undefined;
+				const exclusive = item !== null && typeof item === 'object' ? getJsonExclusiveObjectGuardRegistration(item) : undefined;
+				if (exclusive !== undefined) {
+					hasPair = true;
+					if (flat[index + 1] !== exclusive.parser) throw new Error('Exclusive-object projection requires its exact guard/parser pair');
+					// The union is a converter-only layout; the native parser is genuinely exclusive.
+					const layoutView = publicCopy(project(union(exclusive.options)) as object);
+					originals.set(layoutView, exclusive.schema); schemaAliases.set(layoutView, [exclusive.guard, exclusive.schema]);
+					views.set(exclusive.guard, layoutView); mapped.push(layoutView);
+					const marker = { kind: 'metadata', type: 'raw_transform', reference: exclusive.parser.reference };
+					originals.set(marker, exclusive.parser); mapped.push(marker); index++;
+				} else if (composition !== undefined) {
+					hasPair = true;
+					if (flat[index + 1] !== composition.parser) throw new Error('Selector/common projection requires its exact guard and parser pair');
+					// Converter-only layout: the native parser never executes this intersection.
+					const layout = intersect([composition.selector, composition.common]);
+					const layoutView = publicCopy(project(layout) as object);
+					originals.set(layoutView, composition.schema); schemaAliases.set(layoutView, [composition.guard, composition.schema]);
+					views.set(composition.guard, layoutView); mapped.push(layoutView);
+					const marker = { kind: 'metadata', type: 'raw_transform', reference: composition.parser.reference };
+					originals.set(marker, composition.parser); mapped.push(marker); index++;
+				} else if (registration !== undefined) {
 					hasPair = true;
 					if (flat[index + 1] !== registration.parser) throw new Error('JSON-object projection requires its exact guard and parser pair');
 					const base = project(registration.base);
 					// Separate this conversion occurrence from an independently shared base schema.
 					const baseView = publicCopy(base as object);
 					if (namedBases.has(registration.base)) {baseView.type = 'custom'; namedBaseViews.set(baseView, registration.base);}
-					originals.set(baseView, value); schemaAliases.set(baseView, [registration.guard, registration.base]);
+					originals.set(baseView, value); schemaAliases.set(baseView, [registration.guard, registration.base, ...(getJsonObjectSchemaRegistration(value) === registration ? [value] : [])]);
 					views.set(registration.guard, baseView); mapped.push(baseView);
 					const marker = { kind: 'metadata', type: 'raw_transform', reference: registration.parser.reference };
 					originals.set(marker, registration.parser); mapped.push(marker); index++;
 				} else {
-					if (item !== null && typeof item === 'object' && getJsonObjectParserRegistration(item) !== undefined) throw new Error('JSON-object projection requires its exact guard and parser pair');
+					if (item !== null && typeof item === 'object' && (getJsonObjectParserRegistration(item) !== undefined || getJsonSelectorAndCommonParserRegistration(item) !== undefined || getJsonExclusiveObjectParserRegistration(item) !== undefined)) throw new Error('JSON-object projection requires its exact guard and parser pair');
 					mapped.push(project(item));
 				}
 			}
@@ -76,7 +104,7 @@ export function jsonObjectProjectionView(schema: object, definitions?: Record<st
 		if ('type' in value && value.type === 'lazy' && 'getter' in value && typeof value.getter === 'function') {
 			changed = true;
 			const getter = value.getter;
-			const projectedGetter = (input:unknown) => {const returned = Reflect.apply(getter, undefined, [input]); if (returned !== null && typeof returned === 'object') {assertRequireWhenAllNullishPlacement(returned); assertJsonObjectMetadata(returned);} return project(returned);};
+			const projectedGetter = (input:unknown) => {const returned = Reflect.apply(getter, undefined, [input]); if (returned !== null && typeof returned === 'object') {assertNoOpaqueObjectLazyReturn(returned); assertNoSelectorCommonLazyReturn(returned); assertNoExclusiveObjectLazyReturn(returned); assertJsonExclusiveObjectMetadata(returned); assertRequireWhenAllNullishPlacement(returned); assertJsonObjectMetadata(returned); assertJsonSelectorAndCommonMetadata(returned); assertOwnedUnionLazyReturn(returned);} return project(returned);};
 			views.set(getter, projectedGetter); originals.set(projectedGetter, getter); copy.getter = projectedGetter;
 		}
 		if (!changed) {views.set(value, value); return value;}

@@ -6,7 +6,6 @@
 // Compile-only integration target: packages/backend/test/fixtures/backend-selector-type-proof.ts.
 // Use the actual configured backend compiler options; never execute this file.
 import type * as v from 'valibot';
-import type { SchemaType } from '../../src/misc/json-schema.js';
 import type { ContractEndpointInput, LegacyDeclaredInput } from '../../src/server/api/contract-endpoint.js';
 import type { selectorAdminDriveShowFileInput, selectorDriveFilesShowInput } from '../../../features/drive/contract/selector-endpoint-definitions.js';
 import type { selectorIRevokeTokenInput } from '../../../features/auth/contract/selector-endpoint-definitions.js';
@@ -22,24 +21,11 @@ type CapturedFile = { fileId: string } | { url: string };
 type CapturedToken = { tokenId: string } | { token: string | null };
 type CapturedPage = { pageId: string } | { name: string; username: string };
 
-// Captured old paramDefs. Avoid importing the legacy database-backed handlers.
-const legacyFileParamDef = { anyOf: [
-	{ type: 'object', properties: { fileId: { type: 'string', format: 'misskey:id' } }, required: ['fileId'] },
-	{ type: 'object', properties: { url: { type: 'string' } }, required: ['url'] },
-] } as const;
-const legacyTokenParamDef = { anyOf: [
-	{ type: 'object', properties: { tokenId: { type: 'string', format: 'misskey:id' } }, required: ['tokenId'] },
-	{ type: 'object', properties: { token: { type: 'string', nullable: true } }, required: ['token'] },
-] } as const;
-const legacyPageParamDef = { anyOf: [
-	{ type: 'object', properties: { pageId: { type: 'string', format: 'misskey:id' } }, required: ['pageId'] },
-	{ type: 'object', properties: { name: { type: 'string' }, username: { type: 'string' } }, required: ['name', 'username'] },
-] } as const;
-
-type BeforeAdminFile = SchemaType<typeof legacyFileParamDef>;
-type BeforeFile = SchemaType<typeof legacyFileParamDef>;
-type BeforeToken = SchemaType<typeof legacyTokenParamDef>;
-type BeforePage = SchemaType<typeof legacyPageParamDef>;
+// Frozen pre-migration payload types, independent of the current native schemas.
+type BeforeAdminFile = CapturedAdminFile;
+type BeforeFile = CapturedFile;
+type BeforeToken = CapturedToken;
+type BeforePage = CapturedPage;
 type NativeAdminFile = v.InferOutput<typeof selectorAdminDriveShowFileInput>;
 type NativeFile = v.InferOutput<typeof selectorDriveFilesShowInput>;
 type NativeToken = v.InferOutput<typeof selectorIRevokeTokenInput>;
@@ -49,7 +35,7 @@ type AfterFile = ContractEndpointInput<typeof selectorDriveFilesShowInput, 'lega
 type AfterToken = ContractEndpointInput<typeof selectorIRevokeTokenInput, 'legacy-declared'>;
 type AfterPage = ContractEndpointInput<typeof selectorPagesShowInput, 'legacy-declared'>;
 
-// Old backend intersections and opt-in handler types are structurally equivalent.
+// Frozen old payload shapes and opt-in handler types are structurally equivalent.
 export type SelectorTypeAssertions = [
 	Assert<Extends<BeforeAdminFile, AfterAdminFile>>, Assert<Extends<AfterAdminFile, BeforeAdminFile>>,
 	Assert<Extends<BeforeFile, AfterFile>>, Assert<Extends<AfterFile, BeforeFile>>,

@@ -213,7 +213,7 @@ test('both requests retain native and legacy AJV object/unknown-own-key acceptan
 	const ownKeys = JSON.parse('{"__proto__":{"retained":true},"constructor":{"retained":true},"prototype":true,"future":{"retained":true}}');
 	for (const definition of Object.values(definitions)) {
 		const projection = projectEndpointContract(definition);
-		const legacy = new Endpoint(transportMeta, frozenInput, async () => []);
+		const legacy = new Endpoint(transportMeta, frozenInput, async (_params: unknown) => []);
 		const current = new ContractEndpoint(transportMeta, projection, async () => []);
 		for (const sample of [{}, ownKeys, [], [1], null, 'string', 1, true]) {
 			const before = structuredClone(sample), after = structuredClone(sample);

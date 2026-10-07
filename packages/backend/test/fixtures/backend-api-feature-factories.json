@@ -1,0 +1,370 @@
+{
+  "admin/abuse-report/notification-recipient/delete": {
+    "source": "../../../../features/moderation/backend/endpoints/admin/abuse-report/notification-recipient/delete.js",
+    "feature": "moderationCommands"
+  },
+  "admin/announcements/delete": {
+    "source": "../../../../features/announcements/backend/endpoints/admin/announcements/delete.js",
+    "feature": "announcementCommands"
+  },
+  "admin/announcements/update": {
+    "source": "../../../../features/announcements/backend/endpoints/admin/announcements/update.js",
+    "feature": "announcementCommands"
+  },
+  "admin/avatar-decorations/delete": {
+    "source": "../../../../features/avatar-decorations/backend/endpoints/admin/avatar-decorations/delete.js",
+    "feature": "avatarDecorationCommands"
+  },
+  "admin/avatar-decorations/update": {
+    "source": "../../../../features/avatar-decorations/backend/endpoints/admin/avatar-decorations/update.js",
+    "feature": "avatarDecorationCommands"
+  },
+  "admin/emoji/add-aliases-bulk": {
+    "source": "../../../../features/emojis/backend/endpoints/admin/emoji/add-aliases-bulk.js",
+    "feature": "emojiAdministration"
+  },
+  "admin/emoji/remove-aliases-bulk": {
+    "source": "../../../../features/emojis/backend/endpoints/admin/emoji/remove-aliases-bulk.js",
+    "feature": "emojiAdministration"
+  },
+  "admin/emoji/set-aliases-bulk": {
+    "source": "../../../../features/emojis/backend/endpoints/admin/emoji/set-aliases-bulk.js",
+    "feature": "emojiAdministration"
+  },
+  "admin/emoji/set-category-bulk": {
+    "source": "../../../../features/emojis/backend/endpoints/admin/emoji/set-category-bulk.js",
+    "feature": "emojiAdministration"
+  },
+  "admin/emoji/set-license-bulk": {
+    "source": "../../../../features/emojis/backend/endpoints/admin/emoji/set-license-bulk.js",
+    "feature": "emojiAdministration"
+  },
+  "admin/forward-abuse-user-report": {
+    "source": "../../../../features/moderation/backend/endpoints/admin/forward-abuse-user-report.js",
+    "feature": "moderationCommands"
+  },
+  "admin/queue/clear": {
+    "source": "../../../../features/operations/backend/endpoints/admin/queue/clear.js",
+    "feature": "operations"
+  },
+  "admin/queue/retry-job": {
+    "source": "../../../../features/operations/backend/endpoints/admin/queue/retry-job.js",
+    "feature": "operations"
+  },
+  "admin/queue/remove-job": {
+    "source": "../../../../features/operations/backend/endpoints/admin/queue/remove-job.js",
+    "feature": "operations"
+  },
+  "admin/queue/promote-jobs": {
+    "source": "../../../../features/operations/backend/endpoints/admin/queue/promote-jobs.js",
+    "feature": "operations"
+  },
+  "admin/queue/pause": {
+    "source": "../../../../features/operations/backend/endpoints/admin/queue/pause.js",
+    "feature": "operations"
+  },
+  "admin/queue/resume": {
+    "source": "../../../../features/operations/backend/endpoints/admin/queue/resume.js",
+    "feature": "operations"
+  },
+  "admin/resolve-abuse-user-report": {
+    "source": "../../../../features/moderation/backend/endpoints/admin/resolve-abuse-user-report.js",
+    "feature": "moderationCommands"
+  },
+  "admin/suspend-user": {
+    "source": "../../../../features/moderation/backend/endpoints/admin/suspend-user.js",
+    "feature": "moderationCommands"
+  },
+  "admin/unset-user-avatar": {
+    "source": "../../../../features/moderation/backend/endpoints/admin/unset-user-avatar.js",
+    "feature": "moderationCommands"
+  },
+  "admin/unset-user-banner": {
+    "source": "../../../../features/moderation/backend/endpoints/admin/unset-user-banner.js",
+    "feature": "moderationCommands"
+  },
+  "admin/unsuspend-user": {
+    "source": "../../../../features/moderation/backend/endpoints/admin/unsuspend-user.js",
+    "feature": "moderationCommands"
+  },
+  "admin/update-abuse-user-report": {
+    "source": "../../../../features/moderation/backend/endpoints/admin/update-abuse-user-report.js",
+    "feature": "moderationCommands"
+  },
+  "admin/update-user-note": {
+    "source": "../../../../features/moderation/backend/endpoints/admin/update-user-note.js",
+    "feature": "moderationCommands"
+  },
+  "channels/favorite": {
+    "source": "../../../../features/channels/backend/endpoints/channels/favorite.js",
+    "feature": "channelCommands"
+  },
+  "channels/follow": {
+    "source": "../../../../features/channels/backend/endpoints/channels/follow.js",
+    "feature": "channelCommands"
+  },
+  "channels/unfavorite": {
+    "source": "../../../../features/channels/backend/endpoints/channels/unfavorite.js",
+    "feature": "channelCommands"
+  },
+  "channels/unfollow": {
+    "source": "../../../../features/channels/backend/endpoints/channels/unfollow.js",
+    "feature": "channelCommands"
+  },
+  "channels/mute/create": {
+    "source": "../../../../features/channels/backend/endpoints/channels/mute/create.js",
+    "feature": "channelCommands"
+  },
+  "channels/mute/delete": {
+    "source": "../../../../features/channels/backend/endpoints/channels/mute/delete.js",
+    "feature": "channelCommands"
+  },
+  "clips/add-note": {
+    "source": "../../../../features/collections/backend/endpoints/clips/add-note.js",
+    "feature": "collectionCommands"
+  },
+  "clips/delete": {
+    "source": "../../../../features/collections/backend/endpoints/clips/delete.js",
+    "feature": "collectionCommands"
+  },
+  "clips/favorite": {
+    "source": "../../../../features/collections/backend/endpoints/clips/favorite.js",
+    "feature": "clipFavoriteCommands"
+  },
+  "clips/remove-note": {
+    "source": "../../../../features/collections/backend/endpoints/clips/remove-note.js",
+    "feature": "collectionCommands"
+  },
+  "clips/unfavorite": {
+    "source": "../../../../features/collections/backend/endpoints/clips/unfavorite.js",
+    "feature": "clipFavoriteCommands"
+  },
+  "emoji": {
+    "source": "../../../../features/emojis/backend/endpoints/emoji.js",
+    "feature": "emojis"
+  },
+  "emojis": {
+    "source": "../../../../features/emojis/backend/endpoints/emojis.js",
+    "feature": "emojis"
+  },
+  "endpoint": {
+    "source": "../../../../features/instance/backend/endpoints/endpoint.js",
+    "feature": "instance"
+  },
+  "endpoints": {
+    "source": "../../../../features/instance/backend/endpoints/endpoints.js",
+    "feature": "instance"
+  },
+  "following/requests/accept": {
+    "source": "../../../../features/relationships/backend/endpoints/following/requests/accept.js",
+    "feature": "relationshipCommands"
+  },
+  "following/requests/reject": {
+    "source": "../../../../features/relationships/backend/endpoints/following/requests/reject.js",
+    "feature": "relationshipCommands"
+  },
+  "get-avatar-decorations": {
+    "source": "../../../../features/avatar-decorations/backend/endpoints/get-avatar-decorations.js",
+    "feature": "avatarDecorations"
+  },
+  "get-online-users-count": {
+    "source": "../../../../features/instance/backend/endpoints/get-online-users-count.js",
+    "feature": "instance"
+  },
+  "i/export-antennas": {
+    "source": "../../../../features/portability/backend/endpoints/i/export-antennas.js",
+    "feature": "portability"
+  },
+  "i/export-blocking": {
+    "source": "../../../../features/portability/backend/endpoints/i/export-blocking.js",
+    "feature": "portability"
+  },
+  "i/export-clips": {
+    "source": "../../../../features/portability/backend/endpoints/i/export-clips.js",
+    "feature": "portability"
+  },
+  "i/export-favorites": {
+    "source": "../../../../features/portability/backend/endpoints/i/export-favorites.js",
+    "feature": "portability"
+  },
+  "i/export-following": {
+    "source": "../../../../features/portability/backend/endpoints/i/export-following.js",
+    "feature": "portability"
+  },
+  "i/export-mute": {
+    "source": "../../../../features/portability/backend/endpoints/i/export-mute.js",
+    "feature": "portability"
+  },
+  "i/export-notes": {
+    "source": "../../../../features/portability/backend/endpoints/i/export-notes.js",
+    "feature": "portability"
+  },
+  "i/export-user-lists": {
+    "source": "../../../../features/portability/backend/endpoints/i/export-user-lists.js",
+    "feature": "portability"
+  },
+  "i/import-antennas": {
+    "source": "../../../../features/portability/backend/endpoints/i/import-antennas.js",
+    "feature": "portabilityImportCommands"
+  },
+  "i/import-blocking": {
+    "source": "../../../../features/portability/backend/endpoints/i/import-blocking.js",
+    "feature": "portabilityImportCommands"
+  },
+  "i/import-following": {
+    "source": "../../../../features/portability/backend/endpoints/i/import-following.js",
+    "feature": "portabilityImportCommands"
+  },
+  "i/import-muting": {
+    "source": "../../../../features/portability/backend/endpoints/i/import-muting.js",
+    "feature": "portabilityImportCommands"
+  },
+  "i/import-user-lists": {
+    "source": "../../../../features/portability/backend/endpoints/i/import-user-lists.js",
+    "feature": "portabilityImportCommands"
+  },
+  "i/read-announcement": {
+    "source": "../../../../features/announcements/backend/endpoints/i/read-announcement.js",
+    "feature": "announcementCommands"
+  },
+  "i/webhooks/delete": {
+    "source": "../../../../features/integrations/backend/endpoints/i/webhooks/delete.js",
+    "feature": "webhookCommands"
+  },
+  "i/webhooks/update": {
+    "source": "../../../../features/integrations/backend/endpoints/i/webhooks/update.js",
+    "feature": "webhookCommands"
+  },
+  "mute/delete": {
+    "source": "../../../../features/relationships/backend/endpoints/mute/delete.js",
+    "feature": "relationshipCommands"
+  },
+  "notes/delete": {
+    "source": "../../../../features/notes/backend/endpoints/notes/delete.js",
+    "feature": "notesCommands"
+  },
+  "notes/drafts/delete": {
+    "source": "../../../../features/notes/backend/endpoints/notes/drafts/delete.js",
+    "feature": "notesCommands"
+  },
+  "notes/reactions/create": {
+    "source": "../../../../features/notes/backend/endpoints/notes/reactions/create.js",
+    "feature": "notesCommands"
+  },
+  "notes/reactions/delete": {
+    "source": "../../../../features/notes/backend/endpoints/notes/reactions/delete.js",
+    "feature": "notesCommands"
+  },
+  "notes/thread-muting/create": {
+    "source": "../../../../features/notes/backend/endpoints/notes/thread-muting/create.js",
+    "feature": "notesCommands"
+  },
+  "notes/thread-muting/delete": {
+    "source": "../../../../features/notes/backend/endpoints/notes/thread-muting/delete.js",
+    "feature": "notesCommands"
+  },
+  "notes/unrenote": {
+    "source": "../../../../features/notes/backend/endpoints/notes/unrenote.js",
+    "feature": "notesCommands"
+  },
+  "notifications/create": {
+    "source": "../../../../features/notifications/backend/endpoints/notifications/create.js",
+    "feature": "notifications"
+  },
+  "notifications/flush": {
+    "source": "../../../../features/notifications/backend/endpoints/notifications/flush.js",
+    "feature": "notifications"
+  },
+  "notifications/mark-all-as-read": {
+    "source": "../../../../features/notifications/backend/endpoints/notifications/mark-all-as-read.js",
+    "feature": "notifications"
+  },
+  "notifications/test-notification": {
+    "source": "../../../../features/notifications/backend/endpoints/notifications/test-notification.js",
+    "feature": "notifications"
+  },
+  "ping": {
+    "source": "../../../../features/instance/backend/endpoints/ping.js",
+    "feature": "instance"
+  },
+  "promo/read": {
+    "source": "../../../../features/notes/backend/endpoints/promo/read.js",
+    "feature": "notesCommands"
+  },
+  "renote-mute/create": {
+    "source": "../../../../features/relationships/backend/endpoints/renote-mute/create.js",
+    "feature": "relationshipCommands"
+  },
+  "renote-mute/delete": {
+    "source": "../../../../features/relationships/backend/endpoints/renote-mute/delete.js",
+    "feature": "relationshipCommands"
+  },
+  "server-info": {
+    "source": "../../../../features/instance/backend/endpoints/server-info.js",
+    "feature": "instance"
+  },
+  "stats": {
+    "source": "../../../../features/statistics/backend/endpoints/stats.js",
+    "feature": "statistics"
+  },
+  "users/lists/delete": {
+    "source": "../../../../features/relationships/backend/endpoints/users/lists/delete.js",
+    "feature": "listCommands"
+  },
+  "users/lists/favorite": {
+    "source": "../../../../features/relationships/backend/endpoints/users/lists/favorite.js",
+    "feature": "listCommands"
+  },
+  "users/lists/pull": {
+    "source": "../../../../features/relationships/backend/endpoints/users/lists/pull.js",
+    "feature": "listCommands"
+  },
+  "users/lists/push": {
+    "source": "../../../../features/relationships/backend/endpoints/users/lists/push.js",
+    "feature": "listCommands"
+  },
+  "users/lists/unfavorite": {
+    "source": "../../../../features/relationships/backend/endpoints/users/lists/unfavorite.js",
+    "feature": "listCommands"
+  },
+  "users/lists/update-membership": {
+    "source": "../../../../features/relationships/backend/endpoints/users/lists/update-membership.js",
+    "feature": "listCommands"
+  },
+  "chat/messages/delete": {
+    "source": "../../../../features/chat/backend/endpoints/chat/messages/delete.js",
+    "feature": "chatCommands"
+  },
+  "chat/messages/react": {
+    "source": "../../../../features/chat/backend/endpoints/chat/messages/react.js",
+    "feature": "chatCommands"
+  },
+  "chat/messages/unreact": {
+    "source": "../../../../features/chat/backend/endpoints/chat/messages/unreact.js",
+    "feature": "chatCommands"
+  },
+  "chat/rooms/delete": {
+    "source": "../../../../features/chat/backend/endpoints/chat/rooms/delete.js",
+    "feature": "chatCommands"
+  },
+  "chat/rooms/join": {
+    "source": "../../../../features/chat/backend/endpoints/chat/rooms/join.js",
+    "feature": "chatCommands"
+  },
+  "chat/rooms/leave": {
+    "source": "../../../../features/chat/backend/endpoints/chat/rooms/leave.js",
+    "feature": "chatCommands"
+  },
+  "chat/rooms/mute": {
+    "source": "../../../../features/chat/backend/endpoints/chat/rooms/mute.js",
+    "feature": "chatCommands"
+  },
+  "chat/rooms/invitations/ignore": {
+    "source": "../../../../features/chat/backend/endpoints/chat/rooms/invitations/ignore.js",
+    "feature": "chatCommands"
+  },
+  "chat/read-all": {
+    "source": "../../../../features/chat/backend/endpoints/chat/read-all.js",
+    "feature": "chatCommands"
+  }
+}

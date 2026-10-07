@@ -4,17 +4,14 @@
  */
 
 import { Module } from '@nestjs/common';
-import { featureServiceProviders, featureServiceExports } from './feature-service-providers.js';
 import { FanoutTimelineEndpointService } from '../../../features/timelines/backend/services/FanoutTimelineEndpointService.js';
 import { AbuseReportService } from '../../../features/moderation/backend/services/AbuseReportService.js';
 import { AbuseReportNotificationService } from '../../../features/moderation/backend/services/AbuseReportNotificationService.js';
 import { SystemWebhookService } from '../../../features/integrations/backend/services/SystemWebhookService.js';
-import { UserSearchService } from '../../../features/discovery/backend/services/UserSearchService.js';
 import { WebhookTestService } from '../../../features/integrations/backend/services/WebhookTestService.js';
 import { ChannelMutingService } from '../../../features/channels/backend/services/ChannelMutingService.js';
 import { AccountMoveService } from '../../../features/users/backend/services/AccountMoveService.js';
 import { AccountUpdateService } from '../../../features/users/backend/services/AccountUpdateService.js';
-import { SensitiveMediaDetectionService } from '../../../features/media/backend/services/SensitiveMediaDetectionService.js';
 import { AntennaService } from '../../../features/timelines/backend/services/AntennaService.js';
 import { AchievementService } from '../../../features/users/backend/services/AchievementService.js';
 import { AvatarDecorationService } from '../../../features/avatar-decorations/backend/services/AvatarDecorationService.js';
@@ -23,19 +20,14 @@ import { CustomEmojiService } from '../../../features/emojis/backend/services/Cu
 import { DeleteAccountService } from '../../../features/users/backend/services/DeleteAccountService.js';
 import { DownloadService } from '../../../features/runtime/backend/services/DownloadService.js';
 import { DriveService } from '../../../features/drive/backend/services/DriveService.js';
-import { EmailService } from './EmailService.js';
 import { FederatedInstanceService } from '../../../features/federation/backend/services/FederatedInstanceService.js';
 import { FetchInstanceMetadataService } from '../../../features/federation/backend/services/FetchInstanceMetadataService.js';
 import { GlobalEventService } from '../../../features/runtime/backend/services/GlobalEventService.js';
-import { HashtagService } from '../../../features/discovery/backend/services/HashtagService.js';
 import { HttpRequestService } from '../../../features/runtime/backend/services/HttpRequestService.js';
 import { IdService } from '../../../features/runtime/backend/services/IdService.js';
-import { ImageProcessingService } from '../../../features/media/backend/services/ImageProcessingService.js';
 import { SystemAccountService } from '../../../features/users/backend/services/SystemAccountService.js';
 import { InternalStorageService } from '../../../features/runtime/backend/services/InternalStorageService.js';
 import { MetaService } from '../../../features/instance/backend/services/MetaService.js';
-import { MfmService } from '../../../features/markup/backend/services/MfmService.js';
-import { ModerationLogService } from '../../../features/moderation/backend/services/ModerationLogService.js';
 import { NoteCreateService } from '../../../features/notes/backend/services/NoteCreateService.js';
 import { NoteDeleteService } from '../../../features/notes/backend/services/NoteDeleteService.js';
 import { NotePiningService } from '../../../features/notes/backend/services/NotePiningService.js';
@@ -43,16 +35,13 @@ import { NoteDraftService } from '../../../features/notes/backend/services/NoteD
 import { NotificationService } from '../../../features/notifications/backend/services/NotificationService.js';
 import { PollService } from '../../../features/notes/backend/services/PollService.js';
 import { PushNotificationService } from '../../../features/notifications/backend/services/PushNotificationService.js';
-import { QueryService } from './QueryService.js';
 import { ReactionService } from '../../../features/notes/backend/services/ReactionService.js';
 import { ReactionsBufferingService } from '../../../features/notes/backend/services/ReactionsBufferingService.js';
 import { RelayService } from '../../../features/federation/backend/services/RelayService.js';
 import { RoleService } from '../../../features/roles/backend/services/RoleService.js';
 import { S3Service } from '../../../features/runtime/backend/services/S3Service.js';
 import { SignupService } from '../../../features/auth/backend/services/SignupService.js';
-import { WebAuthnService } from '../../../features/auth/backend/services/WebAuthnService.js';
 import { UserBlockingService } from '../../../features/relationships/backend/services/UserBlockingService.js';
-import { CacheService } from './CacheService.js';
 import { UserService } from '../../../features/users/backend/services/UserService.js';
 import { UserFollowingService } from '../../../features/relationships/backend/services/UserFollowingService.js';
 import { UserKeypairService } from '../../../features/federation/backend/services/UserKeypairService.js';
@@ -60,32 +49,14 @@ import { UserListService } from '../../../features/relationships/backend/service
 import { UserMutingService } from '../../../features/relationships/backend/services/UserMutingService.js';
 import { UserRenoteMutingService } from '../../../features/relationships/backend/services/UserRenoteMutingService.js';
 import { UserSuspendService } from '../../../features/moderation/backend/services/UserSuspendService.js';
-import { UserAuthService } from '../../../features/auth/backend/services/UserAuthService.js';
-import { VideoProcessingService } from '../../../features/media/backend/services/VideoProcessingService.js';
 import { UserWebhookService } from '../../../features/integrations/backend/services/UserWebhookService.js';
-import { UtilityService } from './UtilityService.js';
-import { FileInfoService } from '../../../features/media/backend/services/FileInfoService.js';
 import { SearchService } from '../../../features/discovery/backend/services/SearchService.js';
-import { FeaturedService } from '../../../features/discovery/backend/services/FeaturedService.js';
 import { FanoutTimelineService } from '../../../features/timelines/backend/services/FanoutTimelineService.js';
 import { ChannelFollowingService } from '../../../features/channels/backend/services/ChannelFollowingService.js';
 import { ChatService } from '../../../features/chat/backend/services/ChatService.js';
-import { RegistryApiService } from '../../../features/preferences/backend/services/RegistryApiService.js';
 import { ReversiService } from '../../../features/games/backend/services/ReversiService.js';
 
 import { ChartLoggerService } from '../../../features/statistics/backend/services/ChartLoggerService.js';
-import FederationChart from './chart/charts/federation.js';
-import NotesChart from './chart/charts/notes.js';
-import UsersChart from './chart/charts/users.js';
-import ActiveUsersChart from './chart/charts/active-users.js';
-import InstanceChart from './chart/charts/instance.js';
-import PerUserNotesChart from './chart/charts/per-user-notes.js';
-import PerUserPvChart from './chart/charts/per-user-pv.js';
-import DriveChart from './chart/charts/drive.js';
-import PerUserReactionsChart from './chart/charts/per-user-reactions.js';
-import PerUserFollowingChart from './chart/charts/per-user-following.js';
-import PerUserDriveChart from './chart/charts/per-user-drive.js';
-import ApRequestChart from './chart/charts/ap-request.js';
 import { ChartManagementService } from '../../../features/statistics/backend/services/ChartManagementService.js';
 
 import { DriveFileEntityService } from '../../../features/drive/backend/serializers/DriveFileEntityService.js';
@@ -113,10 +84,27 @@ import { ApMentionService } from '../../../features/federation/backend/services/
 import { ApNoteService } from '../../../features/federation/backend/services/ApNoteService.js';
 import { ApPersonService } from '../../../features/federation/backend/services/ApPersonService.js';
 import { ApQuestionService } from '../../../features/federation/backend/services/ApQuestionService.js';
-import { QueueModule } from './QueueModule.js';
 import { QueueService } from '../../../features/runtime/backend/services/QueueService.js';
 import { LoggerService } from '../../../features/runtime/backend/services/LoggerService.js';
 import { TelemetryService } from '../../../features/statistics/backend/services/TelemetryService.js';
+import { QueueModule } from './QueueModule.js';
+import ApRequestChart from './chart/charts/ap-request.js';
+import PerUserDriveChart from './chart/charts/per-user-drive.js';
+import PerUserFollowingChart from './chart/charts/per-user-following.js';
+import PerUserReactionsChart from './chart/charts/per-user-reactions.js';
+import DriveChart from './chart/charts/drive.js';
+import PerUserPvChart from './chart/charts/per-user-pv.js';
+import PerUserNotesChart from './chart/charts/per-user-notes.js';
+import InstanceChart from './chart/charts/instance.js';
+import ActiveUsersChart from './chart/charts/active-users.js';
+import UsersChart from './chart/charts/users.js';
+import NotesChart from './chart/charts/notes.js';
+import FederationChart from './chart/charts/federation.js';
+import { UtilityService } from './UtilityService.js';
+import { CacheService } from './CacheService.js';
+import { QueryService } from './QueryService.js';
+import { EmailService } from './EmailService.js';
+import { featureServiceProviders, featureServiceExports } from './feature-service-providers.js';
 import type { ExistingProvider } from '@nestjs/common';
 
 // Preserve the canonical provider order. Factory-owned features are composed
@@ -127,7 +115,6 @@ const canonicalServices = {
 	AbuseReportNotificationService,
 	AccountMoveService,
 	AccountUpdateService,
-	SensitiveMediaDetectionService,
 	AntennaService,
 	AchievementService,
 	AvatarDecorationService,
@@ -140,14 +127,10 @@ const canonicalServices = {
 	FederatedInstanceService,
 	FetchInstanceMetadataService,
 	GlobalEventService,
-	HashtagService,
 	HttpRequestService,
 	IdService,
-	ImageProcessingService,
 	InternalStorageService,
 	MetaService,
-	MfmService,
-	ModerationLogService,
 	NoteCreateService,
 	NoteDeleteService,
 	NotePiningService,
@@ -163,7 +146,6 @@ const canonicalServices = {
 	RoleService,
 	S3Service,
 	SignupService,
-	WebAuthnService,
 	UserBlockingService,
 	CacheService,
 	UserService,
@@ -172,23 +154,17 @@ const canonicalServices = {
 	UserListService,
 	UserMutingService,
 	UserRenoteMutingService,
-	UserSearchService,
 	UserSuspendService,
-	UserAuthService,
-	VideoProcessingService,
 	UserWebhookService,
 	SystemWebhookService,
 	WebhookTestService,
 	UtilityService,
-	FileInfoService,
 	SearchService,
-	FeaturedService,
 	FanoutTimelineService,
 	FanoutTimelineEndpointService,
 	ChannelFollowingService,
 	ChannelMutingService,
 	ChatService,
-	RegistryApiService,
 	ReversiService,
 	ChartLoggerService,
 	FederationChart,
