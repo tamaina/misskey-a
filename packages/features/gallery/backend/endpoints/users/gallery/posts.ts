@@ -8,7 +8,7 @@ import { packedUsersGalleryPostsDefinition, packedUsersGalleryPostsInput, packed
 import { Inject, Injectable } from '@nestjs/common';
 
 import type { GalleryPostsRepository } from '@/models/_.js';
-import { QueryService } from '@/core/QueryService.js';
+import { QueryService } from '@features/notes/backend/services/QueryService.js';
 import { GalleryPostEntityService } from '../../../serializers/GalleryPostEntityService.js';
 import { DI } from '@/di-symbols.js';
 

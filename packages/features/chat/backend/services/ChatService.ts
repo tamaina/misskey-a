@@ -18,7 +18,7 @@ import { PushNotificationService } from '@features/notifications/backend/service
 import { bindThis } from '@/decorators.js';
 import type { ChatApprovalsRepository, ChatMessagesRepository, ChatRoomInvitationsRepository, ChatRoomMembershipsRepository, ChatRoomsRepository, MiChatMessage, MiChatRoom, MiChatRoomMembership, MiDriveFile, MiUser, MutingsRepository, UsersRepository } from '@/models/_.js';
 import { UserBlockingService } from '@features/relationships/backend/services/UserBlockingService.js';
-import { QueryService } from '@/core/QueryService.js';
+import { QueryService } from '@features/notes/backend/services/QueryService.js';
 import { RoleService } from '@features/roles/backend/services/RoleService.js';
 import { UserFollowingService } from '@features/relationships/backend/services/UserFollowingService.js';
 import { MiChatRoomInvitation } from '../models/ChatRoomInvitation.js';

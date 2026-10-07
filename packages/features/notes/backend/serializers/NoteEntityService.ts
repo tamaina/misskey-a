@@ -17,7 +17,7 @@ import { DebounceLoader } from '@features/runtime/backend/async/loader.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { shouldHideNoteByTime } from '@/misc/should-hide-note-by-time.js';
 import { ReactionsBufferingService } from '../services/ReactionsBufferingService.js';
-import { CacheService } from '@/core/CacheService.js';
+import { CacheService } from '@features/users/backend/services/CacheService.js';
 import type { OnModuleInit } from '@nestjs/common';
 import type { CustomEmojiService } from '@features/emojis/backend/services/CustomEmojiService.js';
 import type { ReactionService } from '../services/ReactionService.js';

@@ -9,7 +9,7 @@ import { Inject, Injectable } from '@nestjs/common';
 
 import type { InstancesRepository } from '@/models/_.js';
 import { InstanceEntityService } from '@features/instance/backend/serializers/InstanceEntityService.js';
-import { UtilityService } from '@/core/UtilityService.js';
+import { UtilityService } from '../../services/UtilityService.js';
 import { DI } from '@/di-symbols.js';
 
 const contractProjection = projectEndpointContract(packedFederationShowInstanceDefinition);

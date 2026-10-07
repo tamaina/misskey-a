@@ -10,7 +10,7 @@ import { maximum } from '@features/runtime/backend/data/array.js';
 import type { NotesRepository } from '@/models/_.js';
 
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
-import { QueryService } from '@/core/QueryService.js';
+import { QueryService } from '@features/notes/backend/services/QueryService.js';
 import { DI } from '@/di-symbols.js';
 import { GetterService } from '@features/api/backend/transport/GetterService.js';
 import { ApiError } from '@features/api/backend/transport/error.js';

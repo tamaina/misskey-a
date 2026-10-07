@@ -8,7 +8,7 @@ import { packedNotesRepliesDefinition, packedNotesRepliesInput, packedNotesRepli
 import { Inject, Injectable } from '@nestjs/common';
 import type { NotesRepository } from '@/models/_.js';
 
-import { QueryService } from '@/core/QueryService.js';
+import { QueryService } from '../../services/QueryService.js';
 import { NoteEntityService } from '../../serializers/NoteEntityService.js';
 import { DI } from '@/di-symbols.js';
 

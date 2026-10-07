@@ -10,7 +10,7 @@ import type { MiInstance } from '../models/Instance.js';
 import { MemoryKVCache, RedisKVCache } from '@features/runtime/backend/cache/cache.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { DI } from '@/di-symbols.js';
-import { UtilityService } from '@/core/UtilityService.js';
+import { UtilityService } from './UtilityService.js';
 import { bindThis } from '@/decorators.js';
 
 @Injectable()

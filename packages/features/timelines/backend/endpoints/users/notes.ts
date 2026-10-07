@@ -11,9 +11,9 @@ import type { MiMeta, NotesRepository } from '@/models/_.js';
 
 import { NoteEntityService } from '@features/notes/backend/serializers/NoteEntityService.js';
 import { DI } from '@/di-symbols.js';
-import { CacheService } from '@/core/CacheService.js';
+import { CacheService } from '@features/users/backend/services/CacheService.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
-import { QueryService } from '@/core/QueryService.js';
+import { QueryService } from '@features/notes/backend/services/QueryService.js';
 import { MiLocalUser } from '@features/users/backend/models/User.js';
 import { FanoutTimelineEndpointService } from '../../services/FanoutTimelineEndpointService.js';
 import { FanoutTimelineName } from '../../services/FanoutTimelineService.js';

@@ -17,7 +17,7 @@ import { GlobalEventService } from '@features/runtime/backend/services/GlobalEve
 import { PushNotificationService } from './PushNotificationService.js';
 import { NotificationEntityService } from '../serializers/NotificationEntityService.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
-import { CacheService } from '@/core/CacheService.js';
+import { CacheService } from '@features/users/backend/services/CacheService.js';
 import type { Config } from '@/config.js';
 import { UserListService } from '@features/relationships/backend/services/UserListService.js';
 import { FilterUnionByProperty, groupedNotificationTypes, obsoleteNotificationTypes } from '@/types.js';

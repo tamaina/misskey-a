@@ -12,8 +12,8 @@ import type { IdService } from '@features/runtime/backend/services/IdService.js'
 import type { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
 import type { ModerationLogService } from '@features/moderation/backend/services/ModerationLogService.js';
 import type { RoleService } from '@features/roles/backend/services/RoleService.js';
-import type { QueryService } from '@/core/QueryService.js';
-import type { UtilityService } from '@/core/UtilityService.js';
+import type { QueryService } from '@features/notes/backend/services/QueryService.js';
+import type { UtilityService } from '@features/federation/backend/services/UtilityService.js';
 import type { SystemAccountService } from '@features/users/backend/services/SystemAccountService.js';
 import type { SystemWebhookEntityService } from '@features/integrations/backend/serializers/SystemWebhookEntityService.js';
 import type { HttpRequestService } from '@features/runtime/backend/services/HttpRequestService.js';

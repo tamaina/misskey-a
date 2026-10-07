@@ -6,7 +6,7 @@
 import type { Packed } from '@features/index/contract/packed.js';
 import type { MiInstance } from '@features/federation/backend/models/Instance.js';
 import { bindThis } from '@/decorators.js';
-import type { UtilityService } from '@/core/UtilityService.js';
+import type { UtilityService } from '@features/federation/backend/services/UtilityService.js';
 import type { RoleService } from '@features/roles/backend/services/RoleService.js';
 import { MiUser } from '@features/users/backend/models/User.js';
 import { MiMeta } from '@/models/_.js';

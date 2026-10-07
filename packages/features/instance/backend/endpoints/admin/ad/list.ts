@@ -8,7 +8,7 @@ import { packedAdminAdListDefinition, packedAdminAdListInput, packedAdminAdListO
 import { Inject, Injectable } from '@nestjs/common';
 
 import type { AdsRepository } from '@/models/_.js';
-import { QueryService } from '@/core/QueryService.js';
+import { QueryService } from '@features/notes/backend/services/QueryService.js';
 import { DI } from '@/di-symbols.js';
 
 const contractProjection = projectEndpointContract(packedAdminAdListDefinition);

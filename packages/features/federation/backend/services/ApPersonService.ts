@@ -13,7 +13,7 @@ import type { Config } from '@/config.js';
 import type { MiLocalUser, MiRemoteUser } from '@features/users/backend/models/User.js';
 import { MiUser } from '@features/users/backend/models/User.js';
 import { truncate } from '@features/runtime/backend/formatting/truncate.js';
-import type { CacheService } from '@/core/CacheService.js';
+import type { CacheService } from '@features/users/backend/services/CacheService.js';
 import { normalizeForSearch } from '@/misc/normalize-for-search.js';
 import { isDuplicateKeyValueError } from '@features/persistence/backend/utility/is-duplicate-key-value-error.js';
 import type { Logger } from '@features/runtime/backend/logging/logger.js';
@@ -31,7 +31,7 @@ import type { InstanceChart } from '@features/statistics/backend/charts/instance
 import type { HashtagService } from '@features/discovery/backend/services/HashtagService.js';
 import { MiUserNotePining } from '@features/notes/backend/models/UserNotePining.js';
 import { StatusError } from '@features/runtime/backend/http/status-error.js';
-import type { UtilityService } from '@/core/UtilityService.js';
+import type { UtilityService } from './UtilityService.js';
 import type { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import { bindThis } from '@/decorators.js';
 import { RoleService } from '@features/roles/backend/services/RoleService.js';

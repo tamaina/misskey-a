@@ -8,7 +8,7 @@ import { packedDriveFoldersDefinition, packedDriveFoldersInput, packedDriveFolde
 import { Inject, Injectable } from '@nestjs/common';
 
 import type { DriveFoldersRepository } from '@/models/_.js';
-import { QueryService } from '@/core/QueryService.js';
+import { QueryService } from '@features/notes/backend/services/QueryService.js';
 import { DriveFolderEntityService } from '../../serializers/DriveFolderEntityService.js';
 import { DI } from '@/di-symbols.js';
 

@@ -9,7 +9,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { FollowingEntityService } from '../../serializers/FollowingEntityService.js';
 import type { FollowingsRepository } from '@/models/_.js';
 
-import { QueryService } from '@/core/QueryService.js';
+import { QueryService } from '@features/notes/backend/services/QueryService.js';
 import { DI } from '@/di-symbols.js';
 
 const contractProjection = projectEndpointContract(packedFollowingListDefinition);

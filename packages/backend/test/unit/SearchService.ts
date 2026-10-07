@@ -10,7 +10,7 @@ import { type Config, loadConfig } from '@/config.js';
 import { GlobalModule } from '@/GlobalModule.js';
 import { CoreModule } from '@/core/CoreModule.js';
 import { SearchService } from '@features/discovery/backend/services/SearchService.js';
-import { CacheService } from '@/core/CacheService.js';
+import { CacheService } from '@features/users/backend/services/CacheService.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { DI } from '@/di-symbols.js';
 import {

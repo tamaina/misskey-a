@@ -18,7 +18,7 @@ import { ApRendererService } from '@features/federation/backend/services/ApRende
 import { LoggerService } from '@features/runtime/backend/services/LoggerService.js';
 import { UserWebhookService } from '@features/integrations/backend/services/UserWebhookService.js';
 import { bindThis } from '@/decorators.js';
-import { CacheService } from '@/core/CacheService.js';
+import { CacheService } from '@features/users/backend/services/CacheService.js';
 import { UserFollowingService } from './UserFollowingService.js';
 
 @Injectable()

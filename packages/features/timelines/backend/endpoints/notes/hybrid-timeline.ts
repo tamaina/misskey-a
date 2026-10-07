@@ -14,9 +14,9 @@ import { NoteEntityService } from '@features/notes/backend/serializers/NoteEntit
 import { DI } from '@/di-symbols.js';
 import { RoleService } from '@features/roles/backend/services/RoleService.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
-import { CacheService } from '@/core/CacheService.js';
+import { CacheService } from '@features/users/backend/services/CacheService.js';
 import { FanoutTimelineName } from '../../services/FanoutTimelineService.js';
-import { QueryService } from '@/core/QueryService.js';
+import { QueryService } from '@features/notes/backend/services/QueryService.js';
 import { UserFollowingService } from '@features/relationships/backend/services/UserFollowingService.js';
 import { MiLocalUser } from '@features/users/backend/models/User.js';
 import { FanoutTimelineEndpointService } from '../../services/FanoutTimelineEndpointService.js';

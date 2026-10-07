@@ -8,7 +8,7 @@ import { packedChannelsSearchDefinition, packedChannelsSearchInput, packedChanne
 import { Inject, Injectable } from '@nestjs/common';
 import { Brackets } from 'typeorm';
 
-import { QueryService } from '@/core/QueryService.js';
+import { QueryService } from '@features/notes/backend/services/QueryService.js';
 import type { ChannelsRepository } from '@/models/_.js';
 import { ChannelEntityService } from '../../serializers/ChannelEntityService.js';
 import { DI } from '@/di-symbols.js';

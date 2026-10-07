@@ -10,7 +10,7 @@ import type { MiLocalUser } from '@features/users/backend/models/User.js';
 import type { MiAccessToken } from '@features/auth/backend/models/AccessToken.js';
 import { MemoryKVCache } from '@features/runtime/backend/cache/cache.js';
 import type { MiApp } from '@features/auth/backend/models/App.js';
-import { CacheService } from '@/core/CacheService.js';
+import { CacheService } from '@features/users/backend/services/CacheService.js';
 import { isNativeUserToken } from '../utility/token.js';
 import { bindThis } from '@/decorators.js';
 

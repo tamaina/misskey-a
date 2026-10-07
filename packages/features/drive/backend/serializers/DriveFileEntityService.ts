@@ -18,7 +18,7 @@ import { bindThis } from '@/decorators.js';
 import { isMimeImage } from '@/misc/is-mime-image.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { uniqueByKey } from '@features/runtime/backend/data/unique-by-key.js';
-import { UtilityService } from '@/core/UtilityService.js';
+import { UtilityService } from '@features/federation/backend/services/UtilityService.js';
 import { VideoProcessingService } from '@features/media/backend/services/VideoProcessingService.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import { DriveFolderEntityService } from './DriveFolderEntityService.js';

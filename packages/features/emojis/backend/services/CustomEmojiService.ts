@@ -11,7 +11,7 @@ import { EmojiEntityService } from '../serializers/EmojiEntityService.js';
 import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { ModerationLogService } from '@features/moderation/backend/services/ModerationLogService.js';
-import { UtilityService } from '@/core/UtilityService.js';
+import { UtilityService } from '@features/federation/backend/services/UtilityService.js';
 import { bindThis } from '@/decorators.js';
 import { DI } from '@/di-symbols.js';
 import { MemoryKVCache, RedisSingleCache } from '@features/runtime/backend/cache/cache.js';

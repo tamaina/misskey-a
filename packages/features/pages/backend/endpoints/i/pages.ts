@@ -8,7 +8,7 @@ import { packedIPagesDefinition, packedIPagesInput, packedIPagesOutput } from '.
 import { Inject, Injectable } from '@nestjs/common';
 
 import type { PagesRepository } from '@/models/_.js';
-import { QueryService } from '@/core/QueryService.js';
+import { QueryService } from '@features/notes/backend/services/QueryService.js';
 import { PageEntityService } from '../../serializers/PageEntityService.js';
 import { DI } from '@/di-symbols.js';
 

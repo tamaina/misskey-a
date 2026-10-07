@@ -8,7 +8,7 @@ import { packedBlockingListDefinition, packedBlockingListInput, packedBlockingLi
 import { Inject, Injectable } from '@nestjs/common';
 
 import type { BlockingsRepository } from '@/models/_.js';
-import { QueryService } from '@/core/QueryService.js';
+import { QueryService } from '@features/notes/backend/services/QueryService.js';
 import { BlockingEntityService } from '../../serializers/BlockingEntityService.js';
 import { DI } from '@/di-symbols.js';
 

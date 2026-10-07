@@ -8,7 +8,7 @@ import { packedISigninHistoryDefinition, packedISigninHistoryInput, packedISigni
 import { Inject, Injectable } from '@nestjs/common';
 
 import type { SigninsRepository } from '@/models/_.js';
-import { QueryService } from '@/core/QueryService.js';
+import { QueryService } from '@features/notes/backend/services/QueryService.js';
 import { SigninEntityService } from '../../serializers/SigninEntityService.js';
 import { DI } from '@/di-symbols.js';
 

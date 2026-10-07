@@ -13,7 +13,7 @@ import { RemoteUserResolveService } from '@features/federation/backend/services/
 import { DownloadService } from '@features/runtime/backend/services/DownloadService.js';
 import { UserListService } from '../services/UserListService.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
-import { UtilityService } from '@/core/UtilityService.js';
+import { UtilityService } from '@features/federation/backend/services/UtilityService.js';
 import { bindThis } from '@/decorators.js';
 import { QueueLoggerService } from '@/queue/QueueLoggerService.js';
 import type * as Bull from 'bullmq';

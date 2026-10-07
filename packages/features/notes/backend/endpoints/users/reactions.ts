@@ -8,10 +8,10 @@ import { packedUsersReactionsDefinition, packedUsersReactionsInput, packedUsersR
 import { Inject, Injectable } from '@nestjs/common';
 import type { UserProfilesRepository, NoteReactionsRepository } from '@/models/_.js';
 
-import { QueryService } from '@/core/QueryService.js';
+import { QueryService } from '../../services/QueryService.js';
 import { NoteReactionEntityService } from '../../serializers/NoteReactionEntityService.js';
 import { DI } from '@/di-symbols.js';
-import { CacheService } from '@/core/CacheService.js';
+import { CacheService } from '@features/users/backend/services/CacheService.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import { RoleService } from '@features/roles/backend/services/RoleService.js';
 import { isUserRelated } from '@/misc/is-user-related.js';

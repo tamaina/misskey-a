@@ -115,11 +115,14 @@ three-service QueueService/webhook cycle. Moving files does not remove these.
   reader rather than importing the whole mutable settings service.
 - `RoleService`: roles owns capability evaluation; API/domain consumers receive
   capability readers, with trusted request context kept outside request input.
-- `CacheService`: temporarily runtime-hosted; domain caches must be split to
-  users/roles/relationships rather than becoming a global feature service locator.
-- `QueryService`: split reusable SQL mechanics from domain visibility/filtering;
-  note/user access rules cannot be moved into a generic utility by filename.
-- `UtilityService`: classify methods before moving; not a blanket shared bucket.
+- `CacheService`: users owns the intact user-state cache service, including existing
+  relationship caches. Preserve its single subscription/invalidation/disposal lifecycle;
+  cross-domain consumers remain explicit during mechanical placement.
+- `QueryService`: notes owns the intact note visibility/filtering service. Existing
+  generic pagination and user/follow-list consumers retain its public methods;
+  semantic decomposition is a separate change.
+- `UtilityService`: federation owns the intact host/account/delivery-policy service.
+  Existing email-format and keyword-check consumers retain the same public methods.
 - `EmailService`: runtime delivery adapter plus feature-owned message bodies.
 - `QueueService`: runtime transport and boot registration. Processor ownership
   follows the data/protocol domain. Operations owns administrative control APIs.
@@ -249,3 +252,23 @@ active languages, including legacy English/primary-language fallbacks; global
 Crowdin YAML is untouched. A regression test verifies all 1,036 copied values,
 and the browser fixture exercises a migrated component across locale/reload cases.
 Dynamic, interpolated, multi-message and non-SFC localization remains separate.
+
+## Held file-server fallback asset defect
+
+The six versioned PNGs remain in `packages/backend/src/server/assets`.
+FileServerService instead resolves `packages/backend/src/server/file/assets/dummy.png`
+from `config.rootDir`; that directory is absent in a clean checkout and Rolldown
+does not copy these PNGs. The ordinary `/static-assets/` route uses
+`packages/backend/assets`, a different asset set.
+
+Baseline reproduction with the compiled backend and the isolated test configuration:
+start the server role with `MK_DISABLE_CLUSTERING=1 MK_ONLY_SERVER=1 MK_NO_DAEMONS=1`,
+then GET `/files/app-default.jpg`. The response is HTTP 500 with JSON `code: ENOENT`
+for the missing `src/server/file/assets/dummy.png`. The route declares image/jpeg
+but cannot read its PNG fallback. FileServerService unit tests create that missing
+directory temporarily and copy `test/resources/dummy-for-file-server-service.png`;
+that 6285-byte fixture is SHA256-identical to the versioned `server/assets/dummy.png`
+(`fe0f4c44a5e63ac228fafc6fa3aba1fbe88188dea73ca39d2f8c950f17f74d47`).
+
+Asset relocation and the missing-path repair need a separate behavior change.
+The mechanical placement cohorts neither repair the path nor remove these PNGs.

@@ -10,7 +10,7 @@ import { Brackets } from 'typeorm';
 import { ReversiGameEntityService } from '../../serializers/ReversiGameEntityService.js';
 import { DI } from '@/di-symbols.js';
 import type { ReversiGamesRepository } from '@/models/_.js';
-import { QueryService } from '@/core/QueryService.js';
+import { QueryService } from '@features/notes/backend/services/QueryService.js';
 
 const contractProjection = projectEndpointContract(referenceReversiGamesDefinition);
 

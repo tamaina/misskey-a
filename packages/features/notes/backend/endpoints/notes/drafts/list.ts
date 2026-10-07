@@ -9,7 +9,7 @@ import { Inject, Injectable } from '@nestjs/common';
 
 import type { MiNoteDraft, NoteDraftsRepository } from '@/models/_.js';
 import { DI } from '@/di-symbols.js';
-import { QueryService } from '@/core/QueryService.js';
+import { QueryService } from '../../../services/QueryService.js';
 import { NoteDraftEntityService } from '../../../serializers/NoteDraftEntityService.js';
 
 const contractProjection = projectEndpointContract(packedNotesDraftsListDefinition);

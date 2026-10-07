@@ -6,10 +6,10 @@
 import { expect, test, vi } from 'vitest';
 import { DataSource } from 'typeorm';
 import { entities } from '@/postgres.js';
-import { QueryService } from '@/core/QueryService.js';
+import { QueryService } from '@features/notes/backend/services/QueryService.js';
 import { MiFollowing } from '@features/relationships/backend/models/Following.js';
 import { MiUserProfile } from '@features/users/backend/models/UserProfile.js';
-import { CacheService } from '@/core/CacheService.js';
+import { CacheService } from '@features/users/backend/services/CacheService.js';
 import { AccountMoveService } from '@features/users/backend/services/AccountMoveService.js';
 import { UserFollowingService } from '@features/relationships/backend/services/UserFollowingService.js';
 import type { MiUser } from '@features/users/backend/models/User.js';

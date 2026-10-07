@@ -7,7 +7,7 @@ import * as nodemailer from 'nodemailer';
 import juice from 'juice';
 import sanitizeHtml from '@/runtime-dependencies/sanitize-html.js';
 import { Inject, Injectable } from '@nestjs/common';
-import { UtilityService } from '@/core/UtilityService.js';
+import { UtilityService } from '@features/federation/backend/services/UtilityService.js';
 import { DI } from '@/di-symbols.js';
 import type { Config } from '@/config.js';
 import type { Logger } from '@features/runtime/backend/logging/logger.js';

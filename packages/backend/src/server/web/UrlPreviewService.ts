@@ -13,7 +13,7 @@ import { deepClone } from '@features/runtime/backend/data/clone.js';
 import { query } from '@features/runtime/backend/formatting/url.js';
 import { MemoryKVCache } from '@features/runtime/backend/cache/cache.js';
 import { LoggerService } from '@features/runtime/backend/services/LoggerService.js';
-import { UtilityService } from '@/core/UtilityService.js';
+import { UtilityService } from '@features/federation/backend/services/UtilityService.js';
 import { bindThis } from '@/decorators.js';
 import { ApiError } from '@features/api/backend/transport/error.js';
 import { MiMeta } from '@features/instance/backend/models/Meta.js';

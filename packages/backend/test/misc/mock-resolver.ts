@@ -10,7 +10,7 @@ import type { ApRequestService } from '@features/federation/backend/services/ApR
 import type { IObject } from '@features/federation/backend/protocol/type.js';
 import type { HttpRequestService } from '@features/runtime/backend/services/HttpRequestService.js';
 import type { LoggerService } from '@features/runtime/backend/services/LoggerService.js';
-import type { UtilityService } from '@/core/UtilityService.js';
+import type { UtilityService } from '@features/federation/backend/services/UtilityService.js';
 import type {
 	FollowRequestsRepository,
 	MiMeta,

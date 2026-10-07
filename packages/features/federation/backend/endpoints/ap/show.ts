@@ -17,7 +17,7 @@ import { ApPersonService } from '../../services/ApPersonService.js';
 import { ApNoteService } from '../../services/ApNoteService.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import { NoteEntityService } from '@features/notes/backend/serializers/NoteEntityService.js';
-import { UtilityService } from '@/core/UtilityService.js';
+import { UtilityService } from '../../services/UtilityService.js';
 import { bindThis } from '@/decorators.js';
 import { IdentifiableError } from '@features/runtime/backend/errors/identifiable-error.js';
 import { FetchAllowSoftFailMask } from '../../protocol/misc/check-against-url.js';

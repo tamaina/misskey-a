@@ -8,7 +8,7 @@ import { packedAdminShowModerationLogsDefinition, packedAdminShowModerationLogsI
 import { Inject, Injectable } from '@nestjs/common';
 
 import type { ModerationLogsRepository } from '@/models/_.js';
-import { QueryService } from '@/core/QueryService.js';
+import { QueryService } from '@features/notes/backend/services/QueryService.js';
 import { DI } from '@/di-symbols.js';
 import { ModerationLogEntityService } from '../../serializers/ModerationLogEntityService.js';
 import { sqlLikeEscape } from '@features/persistence/backend/utility/sql-like-escape.js';

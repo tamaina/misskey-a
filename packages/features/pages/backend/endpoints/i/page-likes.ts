@@ -8,7 +8,7 @@ import { packedIPageLikesDefinition, packedIPageLikesInput, packedIPageLikesOutp
 import { Inject, Injectable } from '@nestjs/common';
 
 import type { PageLikesRepository } from '@/models/_.js';
-import { QueryService } from '@/core/QueryService.js';
+import { QueryService } from '@features/notes/backend/services/QueryService.js';
 import { PageLikeEntityService } from '../../serializers/PageLikeEntityService.js';
 import { DI } from '@/di-symbols.js';
 

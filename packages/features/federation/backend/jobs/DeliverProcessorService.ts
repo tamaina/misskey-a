@@ -18,7 +18,7 @@ import { InstanceChart } from '@features/statistics/backend/charts/instance.js';
 import { ApRequestChart } from '@features/statistics/backend/charts/ap-request.js';
 import { FederationChart } from '@features/statistics/backend/charts/federation.js';
 import { StatusError } from '@features/runtime/backend/http/status-error.js';
-import { UtilityService } from '@/core/UtilityService.js';
+import { UtilityService } from '../services/UtilityService.js';
 import { bindThis } from '@/decorators.js';
 import { QueueLoggerService } from '@/queue/QueueLoggerService.js';
 import type { DeliverJobData } from '@/queue/types.js';

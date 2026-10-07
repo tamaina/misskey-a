@@ -11,9 +11,9 @@ import type { NotesRepository } from '@/models/_.js';
 import { NoteEntityService } from '@features/notes/backend/serializers/NoteEntityService.js';
 import { DI } from '@/di-symbols.js';
 import { FeaturedService } from '../../services/FeaturedService.js';
-import { CacheService } from '@/core/CacheService.js';
+import { CacheService } from '@features/users/backend/services/CacheService.js';
 import { isUserRelated } from '@/misc/is-user-related.js';
-import { QueryService } from '@/core/QueryService.js';
+import { QueryService } from '@features/notes/backend/services/QueryService.js';
 
 const contractProjection = projectEndpointContract(packedUsersFeaturedNotesDefinition);
 

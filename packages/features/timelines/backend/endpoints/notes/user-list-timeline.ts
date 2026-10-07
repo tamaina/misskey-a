@@ -13,7 +13,7 @@ import { NoteEntityService } from '@features/notes/backend/serializers/NoteEntit
 import { ActiveUsersChart } from '@features/statistics/backend/charts/active-users.js';
 import { DI } from '@/di-symbols.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
-import { QueryService } from '@/core/QueryService.js';
+import { QueryService } from '@features/notes/backend/services/QueryService.js';
 import { MiLocalUser } from '@features/users/backend/models/User.js';
 import { FanoutTimelineEndpointService } from '../../services/FanoutTimelineEndpointService.js';
 import { ChannelMutingService } from '@features/channels/backend/services/ChannelMutingService.js';

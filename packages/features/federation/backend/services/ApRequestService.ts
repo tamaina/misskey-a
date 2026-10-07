@@ -13,7 +13,7 @@ import { DI } from '@/di-symbols.js';
 import type { Config } from '@/config.js';
 import type { MiUser } from '@features/users/backend/models/User.js';
 import { UserKeypairService } from './UserKeypairService.js';
-import { UtilityService } from '@/core/UtilityService.js';
+import { UtilityService } from './UtilityService.js';
 import { HttpRequestService } from '@features/runtime/backend/services/HttpRequestService.js';
 import { LoggerService } from '@features/runtime/backend/services/LoggerService.js';
 import { bindThis } from '@/decorators.js';

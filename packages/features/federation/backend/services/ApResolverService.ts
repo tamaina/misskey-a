@@ -17,7 +17,7 @@ import type {
 import type { Config } from '@/config.js';
 import { HttpRequestService } from '@features/runtime/backend/services/HttpRequestService.js';
 import { DI } from '@/di-symbols.js';
-import { UtilityService } from '@/core/UtilityService.js';
+import { UtilityService } from './UtilityService.js';
 import { bindThis } from '@/decorators.js';
 import { LoggerService } from '@features/runtime/backend/services/LoggerService.js';
 import type { Logger } from '@features/runtime/backend/logging/logger.js';

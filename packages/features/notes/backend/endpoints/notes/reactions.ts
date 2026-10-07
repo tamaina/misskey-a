@@ -13,7 +13,7 @@ import type { MiNoteReaction } from '../../models/NoteReaction.js';
 import { NoteReactionEntityService } from '../../serializers/NoteReactionEntityService.js';
 import { NoteEntityService } from '../../serializers/NoteEntityService.js';
 import { DI } from '@/di-symbols.js';
-import { QueryService } from '@/core/QueryService.js';
+import { QueryService } from '../../services/QueryService.js';
 import { GetterService } from '@features/api/backend/transport/GetterService.js';
 import { ApiError } from '@features/api/backend/transport/error.js';
 

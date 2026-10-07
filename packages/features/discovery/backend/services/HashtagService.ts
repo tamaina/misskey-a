@@ -6,7 +6,7 @@
 import { normalizeForSearch } from '@/misc/normalize-for-search.js';
 import type { HashtagsRepository, MiMeta } from '@/models/_.js';
 import { bindThis } from '@/decorators.js';
-import type { UtilityService } from '@/core/UtilityService.js';
+import type { UtilityService } from '@features/federation/backend/services/UtilityService.js';
 import { Logger } from '@features/runtime/backend/logging/logger.js';
 import type * as Redis from 'ioredis';
 import type { DataSource } from 'typeorm';

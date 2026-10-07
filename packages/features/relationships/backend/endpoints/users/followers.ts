@@ -8,9 +8,9 @@ import { allOfUsersFollowersDefinition, allOfUsersFollowersInput, allOfUsersFoll
 import { IsNull } from 'typeorm';
 import { Inject, Injectable } from '@nestjs/common';
 import type { UsersRepository, FollowingsRepository, UserProfilesRepository } from '@/models/_.js';
-import { QueryService } from '@/core/QueryService.js';
+import { QueryService } from '@features/notes/backend/services/QueryService.js';
 import { FollowingEntityService } from '../../serializers/FollowingEntityService.js';
-import { UtilityService } from '@/core/UtilityService.js';
+import { UtilityService } from '@features/federation/backend/services/UtilityService.js';
 import { DI } from '@/di-symbols.js';
 import { RoleService } from '@features/roles/backend/services/RoleService.js';
 import { ApiError } from '@features/api/backend/transport/error.js';

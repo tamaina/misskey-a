@@ -12,7 +12,7 @@ import type { MiRemoteUser } from '@features/users/backend/models/User.js';
 import type { Logger } from '@features/runtime/backend/logging/logger.js';
 import { bindThis } from '@/decorators.js';
 import { getOneApId, isQuestion } from '../protocol/type.js';
-import { UtilityService } from '@/core/UtilityService.js';
+import { UtilityService } from './UtilityService.js';
 import { ApLoggerService } from './ApLoggerService.js';
 import { ApResolverService } from './ApResolverService.js';
 import type { Resolver } from './ApResolverService.js';

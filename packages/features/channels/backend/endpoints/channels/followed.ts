@@ -8,7 +8,7 @@ import { packedChannelsFollowedDefinition, packedChannelsFollowedInput, packedCh
 import { Inject, Injectable } from '@nestjs/common';
 
 import type { ChannelFollowingsRepository } from '@/models/_.js';
-import { QueryService } from '@/core/QueryService.js';
+import { QueryService } from '@features/notes/backend/services/QueryService.js';
 import { ChannelEntityService } from '../../serializers/ChannelEntityService.js';
 import { DI } from '@/di-symbols.js';
 

@@ -8,7 +8,7 @@ import { packedChannelsTimelineDefinition, packedChannelsTimelineInput, packedCh
 import { Inject, Injectable } from '@nestjs/common';
 
 import type { ChannelsRepository, MiMeta, NotesRepository } from '@/models/_.js';
-import { QueryService } from '@/core/QueryService.js';
+import { QueryService } from '@features/notes/backend/services/QueryService.js';
 import { NoteEntityService } from '@features/notes/backend/serializers/NoteEntityService.js';
 import { ActiveUsersChart } from '@features/statistics/backend/charts/active-users.js';
 import { DI } from '@/di-symbols.js';

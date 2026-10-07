@@ -10,7 +10,7 @@ import type { UserListsRepository, UserListFavoritesRepository, UserListMembersh
 
 import { UserListEntityService } from '../../../serializers/UserListEntityService.js';
 import { DI } from '@/di-symbols.js';
-import { QueryService } from '@/core/QueryService.js';
+import { QueryService } from '@features/notes/backend/services/QueryService.js';
 import { ApiError } from '@features/api/backend/transport/error.js';
 
 const contractProjection = projectEndpointContract(packedUsersListsGetMembershipsDefinition);

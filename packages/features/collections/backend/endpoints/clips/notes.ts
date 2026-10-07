@@ -9,7 +9,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { Brackets } from 'typeorm';
 
 import type { NotesRepository, ClipsRepository, ClipNotesRepository } from '@/models/_.js';
-import { QueryService } from '@/core/QueryService.js';
+import { QueryService } from '@features/notes/backend/services/QueryService.js';
 import { NoteEntityService } from '@features/notes/backend/serializers/NoteEntityService.js';
 import { DI } from '@/di-symbols.js';
 import { sqlLikeEscape } from '@features/persistence/backend/utility/sql-like-escape.js';

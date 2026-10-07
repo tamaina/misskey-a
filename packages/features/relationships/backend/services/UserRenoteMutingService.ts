@@ -12,7 +12,7 @@ import { IdService } from '@features/runtime/backend/services/IdService.js';
 import type { MiUser } from '@features/users/backend/models/User.js';
 import { DI } from '@/di-symbols.js';
 import { bindThis } from '@/decorators.js';
-import { CacheService } from '@/core/CacheService.js';
+import { CacheService } from '@features/users/backend/services/CacheService.js';
 
 @Injectable()
 export class UserRenoteMutingService {

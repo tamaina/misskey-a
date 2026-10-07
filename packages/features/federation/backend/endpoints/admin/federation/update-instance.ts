@@ -8,7 +8,7 @@ import { voidAdminFederationUpdateInstanceDefinition, voidAdminFederationUpdateI
 import { Inject, Injectable } from '@nestjs/common';
 
 import type { InstancesRepository } from '@/models/_.js';
-import { UtilityService } from '@/core/UtilityService.js';
+import { UtilityService } from '../../../services/UtilityService.js';
 import { DI } from '@/di-symbols.js';
 import { FederatedInstanceService } from '../../../services/FederatedInstanceService.js';
 import { ModerationLogService } from '@features/moderation/backend/services/ModerationLogService.js';

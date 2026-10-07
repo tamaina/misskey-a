@@ -9,12 +9,12 @@ import { Brackets } from 'typeorm';
 import { Inject, Injectable } from '@nestjs/common';
 import type { NotesRepository, MiMeta } from '@/models/_.js';
 
-import { QueryService } from '@/core/QueryService.js';
+import { QueryService } from '@features/notes/backend/services/QueryService.js';
 import { ActiveUsersChart } from '@features/statistics/backend/charts/active-users.js';
 import { NoteEntityService } from '@features/notes/backend/serializers/NoteEntityService.js';
 import { DI } from '@/di-symbols.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
-import { CacheService } from '@/core/CacheService.js';
+import { CacheService } from '@features/users/backend/services/CacheService.js';
 import { UserFollowingService } from '@features/relationships/backend/services/UserFollowingService.js';
 import { MiLocalUser } from '@features/users/backend/models/User.js';
 import { FanoutTimelineEndpointService } from '../../services/FanoutTimelineEndpointService.js';

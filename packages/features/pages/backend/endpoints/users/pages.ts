@@ -7,7 +7,7 @@ import { ContractEndpoint, projectEndpointContract } from '@features/api/backend
 import { packedUsersPagesDefinition, packedUsersPagesInput, packedUsersPagesOutput } from '../../../contract/packed-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
 
-import { QueryService } from '@/core/QueryService.js';
+import { QueryService } from '@features/notes/backend/services/QueryService.js';
 import { PageEntityService } from '../../serializers/PageEntityService.js';
 import type { PagesRepository } from '@/models/_.js';
 import { DI } from '@/di-symbols.js';

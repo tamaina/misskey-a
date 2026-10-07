@@ -67,7 +67,9 @@
 			"nanoid": ["./node_modules/nanoid/index.d.ts"],
 			"@zip.js/zip.js": ["./node_modules/@zip.js/zip.js/index.d.ts"],
 			"stringz": ["./node_modules/stringz/dist/index.d.ts"],
-			"tmp": ["./node_modules/@types/tmp/index.d.ts"]
+			"tmp": ["./node_modules/@types/tmp/index.d.ts"],
+			"semver": ["./node_modules/@types/semver/index.d.ts"],
+			"re2": ["./node_modules/re2/re2.d.ts"]
 		}
 	}
 }

@@ -8,8 +8,8 @@ import { packedAdminEmojiListRemoteDefinition, packedAdminEmojiListRemoteInput, 
 import { Inject, Injectable } from '@nestjs/common';
 
 import type { EmojisRepository } from '@/models/_.js';
-import { QueryService } from '@/core/QueryService.js';
-import { UtilityService } from '@/core/UtilityService.js';
+import { QueryService } from '@features/notes/backend/services/QueryService.js';
+import { UtilityService } from '@features/federation/backend/services/UtilityService.js';
 import { EmojiEntityService } from '../../../serializers/EmojiEntityService.js';
 import { DI } from '@/di-symbols.js';
 import { sqlLikeEscape } from '@features/persistence/backend/utility/sql-like-escape.js';

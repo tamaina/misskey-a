@@ -23,8 +23,8 @@ import { UserKeypairService } from '@features/federation/backend/services/UserKe
 import type { MiFollowing } from '@features/relationships/backend/models/Following.js';
 import { countIf } from '@features/runtime/backend/data/array.js';
 import type { MiNote } from '@features/notes/backend/models/Note.js';
-import { QueryService } from '@/core/QueryService.js';
-import { UtilityService } from '@/core/UtilityService.js';
+import { QueryService } from '@features/notes/backend/services/QueryService.js';
+import { UtilityService } from '@features/federation/backend/services/UtilityService.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import { bindThis } from '@/decorators.js';
 import { IActivity } from '@features/federation/backend/protocol/type.js';

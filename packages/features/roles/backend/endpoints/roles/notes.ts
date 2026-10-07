@@ -10,7 +10,7 @@ import * as Redis from 'ioredis';
 import { Brackets } from 'typeorm';
 
 import type { NotesRepository, RolesRepository } from '@/models/_.js';
-import { QueryService } from '@/core/QueryService.js';
+import { QueryService } from '@features/notes/backend/services/QueryService.js';
 import { DI } from '@/di-symbols.js';
 import { NoteEntityService } from '@features/notes/backend/serializers/NoteEntityService.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';

@@ -8,7 +8,7 @@ import { packedIGalleryLikesDefinition, packedIGalleryLikesInput, packedIGallery
 import { Inject, Injectable } from '@nestjs/common';
 
 import type { GalleryLikesRepository } from '@/models/_.js';
-import { QueryService } from '@/core/QueryService.js';
+import { QueryService } from '@features/notes/backend/services/QueryService.js';
 import { GalleryLikeEntityService } from '../../../serializers/GalleryLikeEntityService.js';
 import { DI } from '@/di-symbols.js';
 

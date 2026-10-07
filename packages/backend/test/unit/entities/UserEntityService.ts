@@ -20,8 +20,8 @@ import {
 } from '@/models/_.js';
 import type { Config } from '@/config.js';
 import { DI } from '@/di-symbols.js';
-import { UtilityService } from '@/core/UtilityService.js';
-import { CacheService } from '@/core/CacheService.js';
+import { UtilityService } from '@features/federation/backend/services/UtilityService.js';
+import { CacheService } from '@features/users/backend/services/CacheService.js';
 import { UsersChart } from '@features/statistics/backend/charts/users.js';
 import { InstanceChart } from '@features/statistics/backend/charts/instance.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';

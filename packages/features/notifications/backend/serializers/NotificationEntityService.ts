@@ -14,7 +14,7 @@ import type { MiNote } from '@features/notes/backend/models/Note.js';
 import type { Packed } from '@features/index/contract/packed.js';
 import { bindThis } from '@/decorators.js';
 import { FilterUnionByProperty, groupedNotificationTypes } from '@/types.js';
-import { CacheService } from '@/core/CacheService.js';
+import { CacheService } from '@features/users/backend/services/CacheService.js';
 import { RoleEntityService } from '@features/roles/backend/serializers/RoleEntityService.js';
 import { ChatEntityService } from '@features/chat/backend/serializers/ChatEntityService.js';
 import type { OnModuleInit } from '@nestjs/common';

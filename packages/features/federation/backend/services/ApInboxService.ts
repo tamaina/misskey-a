@@ -20,7 +20,7 @@ import { concat, toArray, toSingle, unique } from '@features/runtime/backend/dat
 import type { Logger } from '@features/runtime/backend/logging/logger.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { StatusError } from '@features/runtime/backend/http/status-error.js';
-import { UtilityService } from '@/core/UtilityService.js';
+import { UtilityService } from './UtilityService.js';
 import { NoteEntityService } from '@features/notes/backend/serializers/NoteEntityService.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import { QueueService } from '@features/runtime/backend/services/QueueService.js';

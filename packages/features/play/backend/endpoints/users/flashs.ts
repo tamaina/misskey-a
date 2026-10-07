@@ -7,7 +7,7 @@ import { ContractEndpoint, projectEndpointContract } from '@features/api/backend
 import { packedUsersFlashsDefinition, packedUsersFlashsInput, packedUsersFlashsOutput } from '../../../contract/packed-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
 
-import { QueryService } from '@/core/QueryService.js';
+import { QueryService } from '@features/notes/backend/services/QueryService.js';
 import { FlashEntityService } from '../../serializers/FlashEntityService.js';
 import type { FlashsRepository } from '@/models/_.js';
 import { DI } from '@/di-symbols.js';

@@ -7,7 +7,7 @@ import { ContractEndpoint, projectEndpointContract } from '@features/api/backend
 import { listingDriveFilesDefinition, listingDriveFilesInput, listingDriveFilesOutput } from '../../../contract/drive-listing-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
 import type { DriveFilesRepository } from '@/models/_.js';
-import { QueryService } from '@/core/QueryService.js';
+import { QueryService } from '@features/notes/backend/services/QueryService.js';
 import { DriveFileEntityService } from '../../serializers/DriveFileEntityService.js';
 import { DI } from '@/di-symbols.js';
 

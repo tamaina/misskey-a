@@ -15,7 +15,7 @@ import { ChannelFollowingService } from '@features/channels/backend/services/Cha
 import type { GlobalEvents, StreamEventEmitter } from '@features/runtime/backend/services/GlobalEventService.js';
 import { MiFollowing, MiUserProfile } from '@/models/_.js';
 import type { MiMeta } from '@/models/_.js';
-import { CacheService } from '@/core/CacheService.js';
+import { CacheService } from '@features/users/backend/services/CacheService.js';
 import { bindThis } from '@/decorators.js';
 import { NotificationService } from '@features/notifications/backend/services/NotificationService.js';
 import type { MiAccessToken } from '@features/auth/backend/models/AccessToken.js';

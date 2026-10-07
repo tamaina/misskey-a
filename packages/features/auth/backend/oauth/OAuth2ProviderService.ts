@@ -27,7 +27,7 @@ import { DI } from '@/di-symbols.js';
 import { bindThis } from '@/decorators.js';
 import type { AccessTokensRepository, UsersRepository } from '@/models/_.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
-import { CacheService } from '@/core/CacheService.js';
+import { CacheService } from '@features/users/backend/services/CacheService.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 import { MemoryKVCache } from '@features/runtime/backend/cache/cache.js';
 import { LoggerService } from '@features/runtime/backend/services/LoggerService.js';

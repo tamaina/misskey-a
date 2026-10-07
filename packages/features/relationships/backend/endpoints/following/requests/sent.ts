@@ -7,7 +7,7 @@ import { ContractEndpoint, projectEndpointContract } from '@features/api/backend
 import { packedFollowingRequestsSentDefinition, packedFollowingRequestsSentInput, packedFollowingRequestsSentOutput } from '../../../../contract/packed-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
 
-import { QueryService } from '@/core/QueryService.js';
+import { QueryService } from '@features/notes/backend/services/QueryService.js';
 import type { FollowRequestsRepository } from '@/models/_.js';
 import { FollowRequestEntityService } from '../../../serializers/FollowRequestEntityService.js';
 import { DI } from '@/di-symbols.js';

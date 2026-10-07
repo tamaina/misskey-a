@@ -9,8 +9,8 @@ import type { NotesRepository, UserPublickeysRepository, UsersRepository } from 
 import type { Config } from '@/config.js';
 import { MemoryKVCache } from '@features/runtime/backend/cache/cache.js';
 import type { MiUserPublickey } from '../models/UserPublickey.js';
-import { CacheService } from '@/core/CacheService.js';
-import { UtilityService } from '@/core/UtilityService.js';
+import { CacheService } from '@features/users/backend/services/CacheService.js';
+import { UtilityService } from './UtilityService.js';
 import type { MiNote } from '@features/notes/backend/models/Note.js';
 import { bindThis } from '@/decorators.js';
 import { MiLocalUser, MiRemoteUser } from '@features/users/backend/models/User.js';

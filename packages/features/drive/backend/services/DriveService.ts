@@ -43,7 +43,7 @@ import { RoleService } from '@features/roles/backend/services/RoleService.js';
 import { correctFilename } from '@/misc/correct-filename.js';
 import { isMimeImage } from '@/misc/is-mime-image.js';
 import { ModerationLogService } from '@features/moderation/backend/services/ModerationLogService.js';
-import { UtilityService } from '@/core/UtilityService.js';
+import { UtilityService } from '@features/federation/backend/services/UtilityService.js';
 
 type AddFileArgs = {
 	/** User who wish to add file */

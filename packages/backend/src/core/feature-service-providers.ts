@@ -36,8 +36,8 @@ import { SystemAccountService } from '@features/users/backend/services/SystemAcc
 import { SystemWebhookEntityService } from '@features/integrations/backend/serializers/SystemWebhookEntityService.js';
 import { HttpRequestService } from '@features/runtime/backend/services/HttpRequestService.js';
 import { LoggerService } from '@features/runtime/backend/services/LoggerService.js';
-import { QueryService } from './QueryService.js';
-import { UtilityService } from './UtilityService.js';
+import { QueryService } from '@features/notes/backend/services/QueryService.js';
+import { UtilityService } from '@features/federation/backend/services/UtilityService.js';
 import { bindLegacyService, toNestProviders } from './feature-service-provider-types.js';
 
 const legacyServiceBindings = [

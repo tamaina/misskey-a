@@ -49,13 +49,13 @@ import { RoleService } from '@features/roles/backend/services/RoleService.js';
 import { SearchService } from '@features/discovery/backend/services/SearchService.js';
 import { FeaturedService } from '@features/discovery/backend/services/FeaturedService.js';
 import { FanoutTimelineService } from '@features/timelines/backend/services/FanoutTimelineService.js';
-import { UtilityService } from '@/core/UtilityService.js';
+import { UtilityService } from '@features/federation/backend/services/UtilityService.js';
 import { UserBlockingService } from '@features/relationships/backend/services/UserBlockingService.js';
 import { isReply } from '@/misc/is-reply.js';
 import { trackPromise } from '@features/runtime/backend/async/promise-tracker.js';
 import { IdentifiableError } from '@features/runtime/backend/errors/identifiable-error.js';
 import { CollapsedQueue } from '@features/runtime/backend/async/collapsed-queue.js';
-import { CacheService } from '@/core/CacheService.js';
+import { CacheService } from '@features/users/backend/services/CacheService.js';
 import { isQuote, isRenote } from '@/misc/is-renote.js';
 import { isCreationQuote, isCreationRenote } from '@features/notes/shared';
 

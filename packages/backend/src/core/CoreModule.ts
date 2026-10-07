@@ -100,9 +100,9 @@ import { ActiveUsersChart } from '@features/statistics/backend/charts/active-use
 import { UsersChart } from '@features/statistics/backend/charts/users.js';
 import { NotesChart } from '@features/statistics/backend/charts/notes.js';
 import { FederationChart } from '@features/statistics/backend/charts/federation.js';
-import { UtilityService } from './UtilityService.js';
-import { CacheService } from './CacheService.js';
-import { QueryService } from './QueryService.js';
+import { UtilityService } from '@features/federation/backend/services/UtilityService.js';
+import { CacheService } from '@features/users/backend/services/CacheService.js';
+import { QueryService } from '@features/notes/backend/services/QueryService.js';
 import { EmailService } from '@features/email/backend/services/EmailService.js';
 import { featureServiceProviders, featureServiceExports } from './feature-service-providers.js';
 import type { ExistingProvider } from '@nestjs/common';

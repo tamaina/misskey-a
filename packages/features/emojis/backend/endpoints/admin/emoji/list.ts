@@ -9,7 +9,7 @@ import { Inject, Injectable } from '@nestjs/common';
 
 import type { EmojisRepository } from '@/models/_.js';
 import type { MiEmoji } from '../../../models/Emoji.js';
-import { QueryService } from '@/core/QueryService.js';
+import { QueryService } from '@features/notes/backend/services/QueryService.js';
 import { DI } from '@/di-symbols.js';
 import { EmojiEntityService } from '../../../serializers/EmojiEntityService.js';
 //import { sqlLikeEscape } from '@features/persistence/backend/utility/sql-like-escape.js';

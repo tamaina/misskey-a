@@ -19,7 +19,7 @@ import type { MiRemoteUser } from '@features/users/backend/models/User.js';
 import type { MiUserPublickey } from '../models/UserPublickey.js';
 import { ApDbResolverService } from '../services/ApDbResolverService.js';
 import { StatusError } from '@features/runtime/backend/http/status-error.js';
-import { UtilityService } from '@/core/UtilityService.js';
+import { UtilityService } from '../services/UtilityService.js';
 import { ApPersonService } from '../services/ApPersonService.js';
 import { JsonLdError, JsonLdService } from '../services/JsonLdService.js';
 import { ApInboxService } from '../services/ApInboxService.js';

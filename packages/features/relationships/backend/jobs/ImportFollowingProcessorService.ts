@@ -11,7 +11,7 @@ import type { Logger } from '@features/runtime/backend/logging/logger.js';
 import * as Acct from '@/misc/acct.js';
 import { RemoteUserResolveService } from '@features/federation/backend/services/RemoteUserResolveService.js';
 import { DownloadService } from '@features/runtime/backend/services/DownloadService.js';
-import { UtilityService } from '@/core/UtilityService.js';
+import { UtilityService } from '@features/federation/backend/services/UtilityService.js';
 import { bindThis } from '@/decorators.js';
 import { QueueService } from '@features/runtime/backend/services/QueueService.js';
 import { QueueLoggerService } from '@/queue/QueueLoggerService.js';

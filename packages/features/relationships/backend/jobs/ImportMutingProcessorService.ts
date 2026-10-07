@@ -12,7 +12,7 @@ import * as Acct from '@/misc/acct.js';
 import { RemoteUserResolveService } from '@features/federation/backend/services/RemoteUserResolveService.js';
 import { DownloadService } from '@features/runtime/backend/services/DownloadService.js';
 import { UserMutingService } from '../services/UserMutingService.js';
-import { UtilityService } from '@/core/UtilityService.js';
+import { UtilityService } from '@features/federation/backend/services/UtilityService.js';
 import { bindThis } from '@/decorators.js';
 import { QueueLoggerService } from '@/queue/QueueLoggerService.js';
 import type * as Bull from 'bullmq';

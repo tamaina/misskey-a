@@ -9,7 +9,7 @@ import { Inject, Injectable } from '@nestjs/common';
 
 import type { InstancesRepository } from '@/models/_.js';
 import { FetchInstanceMetadataService } from '../../../services/FetchInstanceMetadataService.js';
-import { UtilityService } from '@/core/UtilityService.js';
+import { UtilityService } from '../../../services/UtilityService.js';
 import { DI } from '@/di-symbols.js';
 
 const contractProjection = projectEndpointContract(voidAdminFederationRefreshRemoteInstanceMetadataDefinition);
