@@ -19,7 +19,7 @@ import {
 	UsersRepository,
 } from '@features/persistence/backend/repositories/models.js';
 import { DI } from '@/di-symbols.js';
-import { GlobalModule } from '@/GlobalModule.js';
+import { GlobalModule } from '@features/boot/backend/assembly/GlobalModule.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { EmailService } from '@features/email/backend/services/EmailService.js';
 import { RoleService } from '@features/roles/backend/services/RoleService.js';

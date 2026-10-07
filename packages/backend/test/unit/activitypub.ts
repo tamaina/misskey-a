@@ -22,8 +22,8 @@ import { ApPersonService } from '@features/federation/backend/services/ApPersonS
 import { ApRendererService } from '@features/federation/backend/services/ApRendererService.js';
 import { JsonLdService } from '@features/federation/backend/services/JsonLdService.js';
 import { CONTEXT } from '@features/federation/backend/protocol/misc/contexts.js';
-import { GlobalModule } from '@/GlobalModule.js';
-import { CoreModule } from '@/core/CoreModule.js';
+import { GlobalModule } from '@features/boot/backend/assembly/GlobalModule.js';
+import { CoreModule } from '@features/boot/backend/assembly/CoreModule.js';
 import { FederatedInstanceService } from '@features/federation/backend/services/FederatedInstanceService.js';
 import { LoggerService } from '@features/runtime/backend/services/LoggerService.js';
 import { MiMeta, MiNote, UserProfilesRepository } from '@features/persistence/backend/repositories/models.js';

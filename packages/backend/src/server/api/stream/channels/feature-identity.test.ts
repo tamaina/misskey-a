@@ -6,7 +6,7 @@
 import 'reflect-metadata';
 import { MODULE_METADATA } from '@nestjs/common/constants.js';
 import { expect, test } from 'vitest';
-import { ServerModule } from '../../../ServerModule.js';
+import { ServerModule } from '@features/boot/backend/assembly/ServerModule.js';
 
 import * as moved_admin from '@features/operations/backend/stream/admin.js';
 

@@ -10,7 +10,7 @@ import type { Mocked } from 'vitest';
 import { Test } from '@nestjs/testing';
 import { Redis } from 'ioredis';
 import type { TestingModule } from '@nestjs/testing';
-import { GlobalModule } from '@/GlobalModule.js';
+import { GlobalModule } from '@features/boot/backend/assembly/GlobalModule.js';
 import { FetchInstanceMetadataService } from '@features/federation/backend/services/FetchInstanceMetadataService.js';
 import { FederatedInstanceService } from '@features/federation/backend/services/FederatedInstanceService.js';
 import { HttpRequestService } from '@features/runtime/backend/services/HttpRequestService.js';

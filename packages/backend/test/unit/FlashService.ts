@@ -10,8 +10,8 @@ import { FlashService } from '@features/play/backend/services/FlashService.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { FlashLikesRepository, FlashsRepository, MiFlash, MiUser, UserProfilesRepository, UsersRepository } from '@features/persistence/backend/repositories/models.js';
 import { DI } from '@/di-symbols.js';
-import { GlobalModule } from '@/GlobalModule.js';
-import { CoreModule } from '@/core/CoreModule.js';
+import { GlobalModule } from '@features/boot/backend/assembly/GlobalModule.js';
+import { CoreModule } from '@features/boot/backend/assembly/CoreModule.js';
 
 describe('FlashService', () => {
 	let app: TestingModule;

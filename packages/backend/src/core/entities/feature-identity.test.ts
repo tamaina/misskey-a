@@ -6,7 +6,7 @@
 import 'reflect-metadata';
 import { MODULE_METADATA } from '@nestjs/common/constants.js';
 import { expect, test } from 'vitest';
-import { CoreModule } from '../CoreModule.js';
+import { CoreModule } from '@features/boot/backend/assembly/CoreModule.js';
 
 import { AbuseReportNotificationRecipientEntityService } from '@features/moderation/backend/serializers/AbuseReportNotificationRecipientEntityService.js';
 

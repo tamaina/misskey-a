@@ -9,7 +9,7 @@ import { describe, expect, beforeEach, afterEach, test, vi } from 'vitest';
 import type { Mocked } from 'vitest';
 import { mockDeep } from 'vitest-mock-extended';
 import { Test } from '@nestjs/testing';
-import { GlobalModule } from '@/GlobalModule.js';
+import { GlobalModule } from '@features/boot/backend/assembly/GlobalModule.js';
 import { AnnouncementService } from '@features/announcements/backend/services/AnnouncementService.js';
 import { featureServiceGroups } from '@/core/feature-service-providers.js';
 import type {

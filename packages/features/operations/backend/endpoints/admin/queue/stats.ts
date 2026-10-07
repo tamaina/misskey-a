@@ -6,7 +6,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
 import { queueStatsDefinition, queueStatsInput, queueStatsOutput } from '../../../../contract/queue-stats-endpoint-definition.js';
-import type { DbQueue, DeliverQueue, EndedPollNotificationQueue, PostScheduledNoteQueue, InboxQueue, ObjectStorageQueue, SystemQueue, UserWebhookDeliverQueue, SystemWebhookDeliverQueue } from '@/core/QueueModule.js';
+import type { DbQueue, DeliverQueue, EndedPollNotificationQueue, PostScheduledNoteQueue, InboxQueue, ObjectStorageQueue, SystemQueue, UserWebhookDeliverQueue, SystemWebhookDeliverQueue } from '@features/boot/backend/assembly/QueueModule.js';
 
 const contractProjection = projectEndpointContract(queueStatsDefinition);
 

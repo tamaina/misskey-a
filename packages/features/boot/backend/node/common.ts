@@ -27,11 +27,11 @@ export function initExtraThreadPool(config: Config) {
 export async function acquireLegacyRole(name: RoleName): Promise<ProcessRole> {
 	const [{ MainModule }, { QueueProcessorModule }, { ServerService }, { QueueProcessorService },
 		{ ChartManagementService }, { QueueStatsService }, { ServerStatsService }, { NoteCreateService }, { InboxProcessorService }, { GlobalModule }, { QueueModule }] = await Promise.all([
-		import('@/MainModule.js'), import('@/queue/QueueProcessorModule.js'),
-		import('@/server/ServerService.js'), import('@features/runtime/backend/queue/QueueProcessorService.js'),
+		import('../assembly/MainModule.js'), import('../assembly/QueueProcessorModule.js'),
+		import('../assembly/ServerService.mjs'), import('@features/runtime/backend/queue/QueueProcessorService.js'),
 		import('@features/statistics/backend/services/ChartManagementService.js'), import('@features/runtime/backend/queue/QueueStatsService.js'),
 		import('@/daemons/ServerStatsService.js'), import('@features/notes/backend/services/NoteCreateService.js'),
-		import('@features/federation/backend/jobs/InboxProcessorService.js'), import('@/GlobalModule.js'), import('@/core/QueueModule.js'),
+		import('@features/federation/backend/jobs/InboxProcessorService.js'), import('../assembly/GlobalModule.js'), import('../assembly/QueueModule.js'),
 	]);
 	const app = await NestFactory.createApplicationContext(name === 'server' ? MainModule : QueueProcessorModule, {
 		logger: new NestLogger(), abortOnError: false,

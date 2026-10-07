@@ -7,8 +7,8 @@
 
 import { afterEach, beforeEach, describe, expect, beforeAll, afterAll, test } from 'vitest';
 import { Test, TestingModule } from '@nestjs/testing';
-import { GlobalModule } from '@/GlobalModule.js';
-import { CoreModule } from '@/core/CoreModule.js';
+import { GlobalModule } from '@features/boot/backend/assembly/GlobalModule.js';
+import { CoreModule } from '@features/boot/backend/assembly/CoreModule.js';
 import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { ChannelMutingService } from '@features/channels/backend/services/ChannelMutingService.js';

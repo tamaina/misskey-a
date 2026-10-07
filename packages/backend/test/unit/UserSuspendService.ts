@@ -11,7 +11,7 @@ import type { Mocked } from 'vitest';
 import { Test } from '@nestjs/testing';
 import { setTimeout } from 'node:timers/promises';
 import type { TestingModule } from '@nestjs/testing';
-import { GlobalModule } from '@/GlobalModule.js';
+import { GlobalModule } from '@features/boot/backend/assembly/GlobalModule.js';
 import { UserSuspendService } from '@features/moderation/backend/services/UserSuspendService.js';
 import {
 	MiFollowing,

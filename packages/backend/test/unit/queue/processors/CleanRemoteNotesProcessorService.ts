@@ -22,7 +22,7 @@ import { CleanRemoteNotesProcessorService } from '@/queue/processors/CleanRemote
 import { DI } from '@/di-symbols.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { QueueLoggerService } from '@features/runtime/backend/queue/QueueLoggerService.js';
-import { GlobalModule } from '@/GlobalModule.js';
+import { GlobalModule } from '@features/boot/backend/assembly/GlobalModule.js';
 import { secureRndstr } from '@features/auth/backend/utility/secure-rndstr.js';
 
 describe('CleanRemoteNotesProcessorService', () => {

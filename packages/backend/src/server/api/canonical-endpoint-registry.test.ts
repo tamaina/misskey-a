@@ -10,7 +10,7 @@ import { MODULE_METADATA } from '@nestjs/common/constants.js';
 import { expect, test } from 'vitest';
 import * as ts from 'typescript';
 import * as endpointRegistry from './endpoint-list.js';
-import { EndpointsModule } from './EndpointsModule.js';
+import { EndpointsModule } from '@features/boot/backend/assembly/EndpointsModule.js';
 import { featureTokens } from './feature-providers.js';
 import * as featureDefaultEndpoint0 from '@features/federation/backend/endpoints/admin/federation/delete-all-files.js';
 import * as featureDefaultEndpoint1 from '@features/federation/backend/endpoints/admin/federation/remove-all-following.js';

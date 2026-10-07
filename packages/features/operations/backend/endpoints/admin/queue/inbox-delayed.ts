@@ -7,7 +7,7 @@ import { ContractEndpoint, projectEndpointContract } from '@features/api/backend
 import { delayedTupleAdminQueueInboxDelayedDefinition, delayedTupleAdminQueueInboxDelayedInput, delayedTupleAdminQueueInboxDelayedOutput } from '../../../../contract/delayed-tuple-endpoint-definitions.js';
 import { URL } from 'node:url';
 import { Inject, Injectable } from '@nestjs/common';
-import type { InboxQueue } from '@/core/QueueModule.js';
+import type { InboxQueue } from '@features/boot/backend/assembly/QueueModule.js';
 
 const contractProjection = projectEndpointContract(delayedTupleAdminQueueInboxDelayedDefinition);
 

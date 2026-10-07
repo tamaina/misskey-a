@@ -9,8 +9,8 @@ import { afterAll, beforeAll, beforeEach, describe, expect, vi, test } from 'vit
 import { Test } from '@nestjs/testing';
 import type { TestingModule } from '@nestjs/testing';
 import type { DriveFilesRepository, DriveFoldersRepository, UsersRepository } from '@features/persistence/backend/repositories/models.js';
-import { GlobalModule } from '@/GlobalModule.js';
-import { CoreModule } from '@/core/CoreModule.js';
+import { GlobalModule } from '@features/boot/backend/assembly/GlobalModule.js';
+import { CoreModule } from '@features/boot/backend/assembly/CoreModule.js';
 import { DriveFileEntityService } from '@features/drive/backend/serializers/DriveFileEntityService.js';
 import { DriveFolderEntityService } from '@features/drive/backend/serializers/DriveFolderEntityService.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';

@@ -37,7 +37,7 @@ import type {
 	SystemQueue,
 	SystemWebhookDeliverQueue,
 	UserWebhookDeliverQueue,
-} from '@/core/QueueModule.js';
+} from '@features/boot/backend/assembly/QueueModule.js';
 import type httpSignature from '@peertube/http-signature';
 import type * as Bull from 'bullmq';
 

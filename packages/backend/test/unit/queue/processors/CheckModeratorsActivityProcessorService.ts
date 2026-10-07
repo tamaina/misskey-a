@@ -12,7 +12,7 @@ import { CheckModeratorsActivityProcessorService } from '@features/moderation/ba
 import { MiSystemWebhook, MiUser, MiUserProfile, UserProfilesRepository, UsersRepository } from '@features/persistence/backend/repositories/models.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { RoleService } from '@features/roles/backend/services/RoleService.js';
-import { GlobalModule } from '@/GlobalModule.js';
+import { GlobalModule } from '@features/boot/backend/assembly/GlobalModule.js';
 import { MetaService } from '@features/instance/backend/services/MetaService.js';
 import { DI } from '@/di-symbols.js';
 import { QueueLoggerService } from '@features/runtime/backend/queue/QueueLoggerService.js';

@@ -15,9 +15,9 @@ import {
 	S3Client,
 } from '@aws-sdk/client-s3';
 import { mockClient } from 'aws-sdk-client-mock';
-import { GlobalModule } from '@/GlobalModule.js';
+import { GlobalModule } from '@features/boot/backend/assembly/GlobalModule.js';
 import { DriveService } from '@features/drive/backend/services/DriveService.js';
-import { CoreModule } from '@/core/CoreModule.js';
+import { CoreModule } from '@features/boot/backend/assembly/CoreModule.js';
 import type { TestingModule } from '@nestjs/testing';
 
 describe('DriveService', () => {

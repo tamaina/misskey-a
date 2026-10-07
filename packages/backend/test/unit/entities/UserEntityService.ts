@@ -5,8 +5,8 @@
 
 import { Test, TestingModule } from '@nestjs/testing';
 import { describe, expect, beforeAll, afterAll, test } from 'vitest';
-import { GlobalModule } from '@/GlobalModule.js';
-import { CoreModule } from '@/core/CoreModule.js';
+import { GlobalModule } from '@features/boot/backend/assembly/GlobalModule.js';
+import { CoreModule } from '@features/boot/backend/assembly/CoreModule.js';
 import { featureServiceGroups } from '@/core/feature-service-providers.js';
 import { secureRndstr } from '@features/auth/backend/utility/secure-rndstr.js';
 import { genAidx } from '@features/runtime/backend/id/aidx.js';

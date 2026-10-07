@@ -6,7 +6,7 @@
 import 'reflect-metadata';
 import { MODULE_METADATA } from '@nestjs/common/constants.js';
 import { expect, test } from 'vitest';
-import { QueueProcessorModule } from '../QueueProcessorModule.js';
+import { QueueProcessorModule } from '@features/boot/backend/assembly/QueueProcessorModule.js';
 
 import { AggregateRetentionProcessorService } from '@features/statistics/backend/jobs/AggregateRetentionProcessorService.js';
 

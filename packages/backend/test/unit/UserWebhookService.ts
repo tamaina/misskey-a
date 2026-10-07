@@ -10,7 +10,7 @@ import { randomString } from '../utils.js';
 import { MiUser } from '@features/users/backend/models/User.js';
 import { MiWebhook, UsersRepository, WebhooksRepository } from '@features/persistence/backend/repositories/models.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
-import { GlobalModule } from '@/GlobalModule.js';
+import { GlobalModule } from '@features/boot/backend/assembly/GlobalModule.js';
 import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
 import { DI } from '@/di-symbols.js';
 import { QueueService } from '@features/runtime/backend/services/QueueService.js';

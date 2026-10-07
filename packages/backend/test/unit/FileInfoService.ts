@@ -11,7 +11,7 @@ import { dirname } from 'node:path';
 import { Test } from '@nestjs/testing';
 import { afterAll, beforeAll, describe, test } from 'vitest';
 import { mockDeep } from 'vitest-mock-extended';
-import { GlobalModule } from '@/GlobalModule.js';
+import { GlobalModule } from '@features/boot/backend/assembly/GlobalModule.js';
 import { DI } from '@/di-symbols.js';
 import type { MiMeta } from '@features/persistence/backend/repositories/models.js';
 import { FileInfo, FileInfoService } from '@features/media/backend/services/FileInfoService.js';

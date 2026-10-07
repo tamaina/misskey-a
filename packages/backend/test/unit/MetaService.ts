@@ -7,10 +7,10 @@ process.env.NODE_ENV = 'test';
 
 import { afterAll, beforeAll, describe, test, expect, vi } from 'vitest';
 import { Test } from '@nestjs/testing';
-import { GlobalModule } from '@/GlobalModule.js';
+import { GlobalModule } from '@features/boot/backend/assembly/GlobalModule.js';
 import { DI } from '@/di-symbols.js';
 import { MetaService } from '@features/instance/backend/services/MetaService.js';
-import { CoreModule } from '@/core/CoreModule.js';
+import { CoreModule } from '@features/boot/backend/assembly/CoreModule.js';
 import type { TestingModule } from '@nestjs/testing';
 import type { DataSource } from 'typeorm';
 

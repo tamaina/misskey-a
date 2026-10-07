@@ -8,7 +8,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { featureServiceGroups } from '@/core/feature-service-providers.js';
 import { UtilityService } from '@features/federation/backend/services/UtilityService.js';
 import { DI } from '@/di-symbols.js';
-import { GlobalModule } from '@/GlobalModule.js';
+import { GlobalModule } from '@features/boot/backend/assembly/GlobalModule.js';
 import { type ModerationLogsRepository, EmojisRepository } from '@features/persistence/backend/repositories/models.js';
 import { ModerationLogService } from '@features/moderation/backend/services/ModerationLogService.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';

@@ -4,9 +4,9 @@
  */
 
 import { Module } from '@nestjs/common';
-import { ServerModule } from '@/server/ServerModule.js';
-import { GlobalModule } from '@/GlobalModule.js';
-import { DaemonModule } from '@/daemons/DaemonModule.js';
+import { ServerModule } from './ServerModule.js';
+import { GlobalModule } from './GlobalModule.js';
+import { DaemonModule } from './DaemonModule.js';
 
 @Module({
 	imports: [

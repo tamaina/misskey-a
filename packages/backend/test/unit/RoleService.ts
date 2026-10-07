@@ -12,7 +12,7 @@ import { mockDeep } from 'vitest-mock-extended';
 import { Test } from '@nestjs/testing';
 import * as lolex from '@sinonjs/fake-timers';
 import type { TestingModule } from '@nestjs/testing';
-import { GlobalModule } from '@/GlobalModule.js';
+import { GlobalModule } from '@features/boot/backend/assembly/GlobalModule.js';
 import { RoleService } from '@features/roles/backend/services/RoleService.js';
 import {
 	MiMeta,

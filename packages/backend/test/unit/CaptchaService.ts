@@ -14,7 +14,7 @@ import {
 	CaptchaSaveResult,
 	CaptchaService,
 } from '@features/auth/backend/services/CaptchaService.js';
-import { GlobalModule } from '@/GlobalModule.js';
+import { GlobalModule } from '@features/boot/backend/assembly/GlobalModule.js';
 import { HttpRequestService } from '@features/runtime/backend/services/HttpRequestService.js';
 import { MetaService } from '@features/instance/backend/services/MetaService.js';
 import { MiMeta } from '@features/instance/backend/models/Meta.js';

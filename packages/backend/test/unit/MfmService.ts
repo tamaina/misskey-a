@@ -8,9 +8,9 @@ import * as mfm from 'mfm-js';
 import { beforeAll, describe, test } from 'vitest';
 import { Test } from '@nestjs/testing';
 
-import { CoreModule } from '@/core/CoreModule.js';
+import { CoreModule } from '@features/boot/backend/assembly/CoreModule.js';
 import { MfmService } from '@features/markup/backend/services/MfmService.js';
-import { GlobalModule } from '@/GlobalModule.js';
+import { GlobalModule } from '@features/boot/backend/assembly/GlobalModule.js';
 
 describe('MfmService', () => {
 	let mfmService: MfmService;

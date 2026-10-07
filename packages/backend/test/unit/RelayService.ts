@@ -16,7 +16,7 @@ import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { QueueService } from '@features/runtime/backend/services/QueueService.js';
 import { RelayService } from '@features/federation/backend/services/RelayService.js';
 import { SystemAccountService } from '@features/users/backend/services/SystemAccountService.js';
-import { GlobalModule } from '@/GlobalModule.js';
+import { GlobalModule } from '@features/boot/backend/assembly/GlobalModule.js';
 import { UtilityService } from '@features/federation/backend/services/UtilityService.js';
 
 describe('RelayService', () => {

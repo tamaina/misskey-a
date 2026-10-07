@@ -7,7 +7,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { describe, beforeEach, beforeAll, afterEach, afterAll, vi, test, expect } from 'vitest';
 import { In } from 'typeorm';
 import { FollowingsRepository, MiUser, UserProfilesRepository, UsersRepository } from '@features/persistence/backend/repositories/models.js';
-import { GlobalModule } from '@/GlobalModule.js';
+import { GlobalModule } from '@features/boot/backend/assembly/GlobalModule.js';
 import type { Config } from '@/config.js';
 import type { MutingsRepository } from '@features/persistence/backend/repositories/models.js';
 import { DI } from '@/di-symbols.js';

@@ -5,9 +5,9 @@
 
 import { Module } from '@nestjs/common';
 
-import { CoreModule } from '@/core/CoreModule.js';
-import { featureProviders, featureTokens } from './feature-providers.js';
-import * as endpointsObject from './endpoint-list.js';
+import { CoreModule } from './CoreModule.js';
+import { featureProviders, featureTokens } from '@/server/api/feature-providers.js';
+import * as endpointsObject from '@/server/api/endpoint-list.js';
 import { GetterService } from '@features/api/backend/transport/GetterService.js';
 import { ApiLoggerService } from '@features/api/backend/transport/ApiLoggerService.js';
 import type { Provider } from '@nestjs/common';

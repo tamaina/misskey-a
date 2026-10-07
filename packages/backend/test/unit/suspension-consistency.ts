@@ -8,7 +8,7 @@ import { Test } from '@nestjs/testing';
 import type { TestingModule } from '@nestjs/testing';
 import { mockDeep } from 'vitest-mock-extended';
 import { In } from 'typeorm';
-import { GlobalModule } from '@/GlobalModule.js';
+import { GlobalModule } from '@features/boot/backend/assembly/GlobalModule.js';
 import { DI } from '@/di-symbols.js';
 import { UserSuspendService } from '@features/moderation/backend/services/UserSuspendService.js';
 import { UserFollowingService } from '@features/relationships/backend/services/UserFollowingService.js';

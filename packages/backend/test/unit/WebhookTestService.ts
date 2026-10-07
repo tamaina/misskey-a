@@ -10,7 +10,7 @@ import type { Mocked } from 'vitest';
 import { WebhookTestService } from '@features/integrations/backend/services/WebhookTestService.js';
 import { UserWebhookPayload, UserWebhookService } from '@features/integrations/backend/services/UserWebhookService.js';
 import { SystemWebhookService } from '@features/integrations/backend/services/SystemWebhookService.js';
-import { GlobalModule } from '@/GlobalModule.js';
+import { GlobalModule } from '@features/boot/backend/assembly/GlobalModule.js';
 import { MiSystemWebhook, MiUser, MiWebhook, UserProfilesRepository, UsersRepository } from '@features/persistence/backend/repositories/models.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { DI } from '@/di-symbols.js';
