@@ -10,6 +10,7 @@
  */
 
 import * as nestedProperty from 'nested-property';
+import type { ChartMetricDescriptor, ChartValueRange } from '../../../../features/statistics/shared/chart-descriptors.js';
 import { EntitySchema, LessThan, Between } from 'typeorm';
 import { dateUTC, isTimeSame, isTimeBefore, subtractTime, addTime } from '@/misc/prelude/time.js';
 import { sqlStringEscape } from '@/misc/sql-string-escape.js';
@@ -22,18 +23,8 @@ const COLUMN_PREFIX = '___' as const;
 const UNIQUE_TEMP_COLUMN_PREFIX = 'unique_temp___' as const;
 const COLUMN_DELIMITER = '_' as const;
 
-type ValueRange = 'big' | 'medium' | 'small';
-
-type Schema = Record<string, {
-	uniqueIncrement?: boolean;
-
-	intersection?: string[] | ReadonlyArray<string>;
-
-	range?: ValueRange;
-
-	// previousな値を引き継ぐかどうか
-	accumulate?: boolean;
-}>;
+type ValueRange = ChartValueRange;
+type Schema = ChartMetricDescriptor;
 
 type KeyToColumnName<T extends string> = T extends `${infer R1}.${infer R2}` ? `${R1}${typeof COLUMN_DELIMITER}${KeyToColumnName<R2>}` : T;
 
@@ -124,51 +115,6 @@ type Unflatten<T extends Record<string, any>> = UnionToIntersection<
 		[K in Extract<keyof T, string>]: UnflattenSingleton<K, T[K]>;
 	}[Extract<keyof T, string>]
 >;
-
-type ToJsonSchema<S> = {
-	type: 'object';
-	properties: {
-		[K in keyof S]: S[K] extends number[] ? { type: 'array'; items: { type: 'number'; }; } : ToJsonSchema<S[K]>;
-	},
-	required: (keyof S)[];
-};
-
-export function getJsonSchema<S extends Schema>(schema: S): ToJsonSchema<Unflatten<ChartResult<S>>> {
-	const unflatten = (str: string, parent: Record<string, any>) => {
-		const keys = str.split('.');
-		const key = keys.shift();
-		const nextKey = keys[0];
-
-		if (key == null) return;
-
-		if (parent.properties[key] == null) {
-			parent.properties[key] = nextKey ? {
-				type: 'object',
-				properties: {},
-				required: [],
-			} : {
-				type: 'array',
-				items: {
-					type: 'number',
-				},
-			};
-		}
-
-		if (nextKey) unflatten(keys.join('.'), parent.properties[key] as Record<string, any>);
-	};
-
-	const jsonSchema = {
-		type: 'object',
-		properties: {} as Record<string, unknown>,
-		required: [],
-	};
-
-	for (const k in schema) {
-		unflatten(k, jsonSchema);
-	}
-
-	return jsonSchema as ToJsonSchema<Unflatten<ChartResult<S>>>;
-}
 
 /**
  * 様々なチャートの管理を司るクラス

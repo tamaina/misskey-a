@@ -4,12 +4,12 @@
  */
 
 import Chart from '../../core.js';
+import { perUserReactionsChartDescriptor } from '../../../../../../features/statistics/shared/chart-descriptors.js';
 
 export const name = 'perUserReaction';
 
-export const schema = {
-	'local.count': { range: 'small' },
-	'remote.count': { range: 'small' },
-} as const;
+export { perUserReactionsChartDescriptor as schema } from '../../../../../../features/statistics/shared/chart-descriptors.js';
+
+const schema = perUserReactionsChartDescriptor;
 
 export const entity = Chart.schemaToEntity(name, schema, true);

@@ -468,3 +468,14 @@ Another 50 components use local VVI dictionaries while retaining their original
 setup/computed/event timing. Parameterized outputs are checked across all active
 languages. Components whose formatting differs, including a trailing-whitespace
 case in MkUploaderItems, stay on the legacy path until separately reconciled.
+
+## Portable chart contracts
+
+All twelve chart APIs now derive required numeric-series response schemas from
+portable feature-owned metric descriptors. Native coverage is 383 of 438 routes.
+The same descriptors still drive the unchanged hour/day entity definitions;
+collection, queries, grouping and resource lifecycles are not changed. Regression
+fixtures preserve descriptor order, all 24 entity metadata objects, complete
+GET/POST documentation and existing offset/default/error behavior, including
+out-of-range dates and integers beyond the safe-integer range. The old chart
+JSON-schema response generator is no longer a production source of truth.

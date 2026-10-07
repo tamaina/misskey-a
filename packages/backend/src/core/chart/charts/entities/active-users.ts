@@ -4,19 +4,12 @@
  */
 
 import Chart from '../../core.js';
+import { activeUsersChartDescriptor } from '../../../../../../features/statistics/shared/chart-descriptors.js';
 
 export const name = 'activeUsers';
 
-export const schema = {
-	'readWrite': { intersection: ['read', 'write'] },
-	'read': { uniqueIncrement: true },
-	'write': { uniqueIncrement: true },
-	'registeredWithinWeek': { uniqueIncrement: true },
-	'registeredWithinMonth': { uniqueIncrement: true },
-	'registeredWithinYear': { uniqueIncrement: true },
-	'registeredOutsideWeek': { uniqueIncrement: true },
-	'registeredOutsideMonth': { uniqueIncrement: true },
-	'registeredOutsideYear': { uniqueIncrement: true },
-} as const;
+export { activeUsersChartDescriptor as schema } from '../../../../../../features/statistics/shared/chart-descriptors.js';
+
+const schema = activeUsersChartDescriptor;
 
 export const entity = Chart.schemaToEntity(name, schema);

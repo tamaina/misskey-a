@@ -8,6 +8,7 @@ import type { DriveListingNativeEndpoints } from './drive-listing-native-endpoin
 import type { UniqueStringNativeEndpoints } from './unique-string-native-endpoints.js';
 import type { InstanceEndpoints } from '../../instance/contract/index.js';
 import type { StatisticsEndpoints } from '../../statistics/contract/index.js';
+import type { ChartsEndpoints } from '../../statistics/contract/chart-endpoint-definitions.js';
 import type { AvatarDecorationEndpoints } from '../../avatar-decorations/contract/index.js';
 import type { EmojiEndpoints } from '../../emojis/contract/index.js';
 import type { OperationsEndpoints } from '../../operations/contract/index.js';
@@ -37,6 +38,7 @@ export type FeatureEndpoints = ModerationCommandEndpoints
 	& PortabilityImportEndpoints
 	& InstanceEndpoints
 	& StatisticsEndpoints
+	& ChartsEndpoints
 	& AvatarDecorationEndpoints
 	& EmojiEndpoints
 	& OperationsEndpoints

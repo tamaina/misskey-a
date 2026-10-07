@@ -4,13 +4,12 @@
  */
 
 import Chart from '../../core.js';
+import { apRequestChartDescriptor } from '../../../../../../features/statistics/shared/chart-descriptors.js';
 
 export const name = 'apRequest';
 
-export const schema = {
-	'deliverFailed': { },
-	'deliverSucceeded': { },
-	'inboxReceived': { },
-} as const;
+export { apRequestChartDescriptor as schema } from '../../../../../../features/statistics/shared/chart-descriptors.js';
+
+const schema = apRequestChartDescriptor;
 
 export const entity = Chart.schemaToEntity(name, schema);
