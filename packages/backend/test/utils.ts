@@ -21,7 +21,7 @@ import { DEFAULT_POLICIES } from '@features/roles/backend/services/RoleService.j
 import { validateContentTypeSetAsActivityPub } from '@features/federation/backend/protocol/misc/validator.js';
 import { ApiError } from '@features/api/backend/transport/error.js';
 
-export { server as startServer, jobQueue as startJobQueue } from '@/boot/common.js';
+export { server as startServer, jobQueue as startJobQueue } from '@features/boot/backend/node/common.js';
 
 export interface UserToken {
 	token: string;

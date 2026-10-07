@@ -2,7 +2,7 @@ import { portToPid } from 'pid-port';
 import fkill from 'fkill';
 import Fastify from 'fastify';
 import { loadConfig } from '@/config.js';
-import { server } from '@/boot/common.js';
+import { server } from '@features/boot/backend/node/common.js';
 import type { FastifyInstance } from 'fastify';
 
 const config = loadConfig();

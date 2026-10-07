@@ -157,8 +157,8 @@ export default defineConfig((args) => {
 		return {
 			onLog,
 			input: {
-				entry: './src/boot/entry.ts',
-				cli: './src/boot/cli.ts',
+				entry: '../features/boot/backend/node/entry.mts',
+				cli: '../features/boot/backend/node/cli.mts',
 				config: './src/config.ts',
 				postgres: '../features/persistence/backend/postgres.ts',
 				'gen-spec': '../features/api/backend/transport/openapi/gen-spec.ts',
@@ -186,7 +186,7 @@ export default defineConfig((args) => {
 				format: 'esm',
 			},
 			watch: {
-				include: ['src/**/*.{ts,js,mjs,cjs,tsx,json}', '../features/*/{backend,contract,shared}/**/*.{ts,js,mjs,cjs,tsx,json}'],
+				include: ['src/**/*.{ts,mts,js,mjs,cjs,tsx,json}', '../features/*/{backend,contract,shared}/**/*.{ts,mts,js,mjs,cjs,tsx,json}'],
 				clearScreen: false,
 			},
 			// ビルドの高速化のために、watchモードのときは外部モジュールは全てバンドルしないようにする

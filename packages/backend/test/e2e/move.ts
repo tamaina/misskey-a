@@ -11,7 +11,7 @@ import { afterAll, beforeAll, afterEach, describe, test, vi } from 'vitest';
 import { loadConfig } from '@/config.js';
 import { MiRepository, MiUser, UsersRepository, miRepository } from '@features/persistence/backend/repositories/models.js';
 import { secureRndstr } from '@features/auth/backend/utility/secure-rndstr.js';
-import { jobQueue } from '@/boot/common.js';
+import { jobQueue } from '@features/boot/backend/node/common.js';
 import { api, castAsError, initTestDb, signup, successfulApiCall, uploadFile } from '../utils.js';
 import type * as misskey from 'misskey-js';
 
