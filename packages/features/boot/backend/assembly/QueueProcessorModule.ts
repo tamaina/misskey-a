@@ -14,12 +14,12 @@ import { PostScheduledNoteProcessorService } from '@features/notes/backend/jobs/
 import { InboxProcessorService } from '@features/federation/backend/jobs/InboxProcessorService.js';
 import { UserWebhookDeliverProcessorService } from '@features/integrations/backend/jobs/UserWebhookDeliverProcessorService.js';
 import { SystemWebhookDeliverProcessorService } from '@features/integrations/backend/jobs/SystemWebhookDeliverProcessorService.js';
-import { CheckExpiredMutingsProcessorService } from '@/queue/processors/CheckExpiredMutingsProcessorService.js';
+import { CheckExpiredMutingsProcessorService } from '@features/relationships/backend/jobs/CheckExpiredMutingsProcessorService.js';
 import { BakeBufferedReactionsProcessorService } from '@features/notes/backend/jobs/BakeBufferedReactionsProcessorService.js';
 import { CleanChartsProcessorService } from '@features/statistics/backend/jobs/CleanChartsProcessorService.js';
-import { CleanProcessorService } from '@/queue/processors/CleanProcessorService.js';
+import { CleanProcessorService } from '@features/operations/backend/jobs/CleanProcessorService.js';
 import { CheckModeratorsActivityProcessorService } from '@features/moderation/backend/jobs/CheckModeratorsActivityProcessorService.js';
-import { CleanRemoteNotesProcessorService } from '@/queue/processors/CleanRemoteNotesProcessorService.js';
+import { CleanRemoteNotesProcessorService } from '@features/notes/backend/jobs/CleanRemoteNotesProcessorService.js';
 import { CleanRemoteFilesProcessorService } from '@features/drive/backend/jobs/CleanRemoteFilesProcessorService.js';
 import { DeleteAccountProcessorService } from '@features/users/backend/jobs/DeleteAccountProcessorService.js';
 import { DeleteDriveFilesProcessorService } from '@features/drive/backend/jobs/DeleteDriveFilesProcessorService.js';

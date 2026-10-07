@@ -275,3 +275,55 @@ that 6285-byte fixture is SHA256-identical to the versioned `server/assets/dummy
 
 Asset relocation and the missing-path repair need a separate behavior change.
 The mechanical placement cohorts neither repair the path nor remove these PNGs.
+
+## Remaining backend implementation ownership checkpoint
+
+The approved final 42 implementations now live in their feature backend directories:
+25 domain utilities, four statistics telemetry/server-metrics files, ten HTTP/file
+adapters and three cleanup jobs. Jobs use the existing `backend/jobs` convention.
+Bodies, DI identities, route/stream behavior and the explicit fallback asset path
+are preserved. The anonymous reaction helper uses `.mts` to retain its ESM default
+function without a package configuration or forwarding stub.
+
+`packages/backend/src` retains 91 files: `config.ts`, `env.ts`, `di-symbols.ts` and
+`global.d.ts`; ten package ambient/dependency declarations; 70 test sources (including
+five compile-time test files), one test fixture and the six held PNG assets.
+Package-owned launch, build, migration and central test configuration remain in
+backend. Cross-feature DI, entity identity, endpoint registry and HTTP/SDK parity
+tests remain package integration tests. Single-owner tests can move separately
+using that same central runner and type resolution.
+
+This completes the approved backend implementation placement, not the whole
+architecture migration. Remaining VVI work and legacy i18n/frontend-builder
+retirement are still separate work, as is the fallback asset defect above.
+
+### Proposed test placement after backend source ownership
+
+This is a proposal; tests have not moved. Single-owner unit/validator tests can
+use `features/<owner>/test/backend/` with the existing backend-owned Vitest,
+TypeScript and lint configuration. Update those central include patterns and
+explicit CI file selections together; keep shared test helpers/fixtures
+package-owned unless their ownership is separately established. No per-feature
+package or tsconfig is needed.
+
+| Owner | First relocation candidates (paths relative to `packages/backend/`) |
+| --- | --- |
+| api | `src/server/api/{feature-id,json-object-contract,json-selector-and-common,result-object,unique-string-array}.test.ts` |
+| runtime | `src/misc/collapsed-queue.test.ts`, `src/types.test.ts`, `src/core/queue-service.pack-job-data.test.ts`; pure helper tests under `test/unit/misc/{zip,loader,id,ulid,cache}.ts` |
+| notes | `src/server/api/endpoints/notes/create.test.ts`, `test/unit/misc/{should-hide-note-by-time,is-renote}.ts` |
+| users | `src/server/api/endpoints/users/show.test.ts` |
+| notifications | `src/core/entities/notification-entity-service.test.ts` (its collaborating services are mocked) |
+| relationships | `test/unit/misc/check-word-mute.ts` |
+| media | `test/unit/misc/correct-filename.ts`, `test/unit/misc/others.ts` (currently only content-disposition cases) |
+| markup | `test/unit/extract-mentions.ts` |
+| statistics | `test/unit/telemetry-registry.ts`, `test/unit/core/telemetry/adapters/SentryTelemetryAdapter.ts` (mocked adapter/logging boundaries) |
+
+Keep actual cross-feature integrations in backend: Nest provider/alias resolution,
+entity/repository constructor identity, complete endpoint and packed registries,
+HTTP/OpenAPI/SDK parity across feature contracts, active-following reader policy,
+role/stream shutdown, real file-server/storage/DB integration and the Nest/Redis/DB
+CleanRemoteNotesProcessorService integration. This includes
+the five cross-feature compile-time test files. The BullMQ package-version and
+declaration contract test also remains backend-owned. Existing E2E/federation,
+boot/maintenance integration tests and shared runner/config/fixtures remain
+package-owned. Test relocation must preserve every assertion and fixture.

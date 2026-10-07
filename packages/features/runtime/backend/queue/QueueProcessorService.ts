@@ -41,11 +41,11 @@ import { RelationshipProcessorService } from '@features/relationships/backend/jo
 import { TickChartsProcessorService } from '@features/statistics/backend/jobs/TickChartsProcessorService.js';
 import { ResyncChartsProcessorService } from '@features/statistics/backend/jobs/ResyncChartsProcessorService.js';
 import { CleanChartsProcessorService } from '@features/statistics/backend/jobs/CleanChartsProcessorService.js';
-import { CheckExpiredMutingsProcessorService } from '@/queue/processors/CheckExpiredMutingsProcessorService.js';
+import { CheckExpiredMutingsProcessorService } from '@features/relationships/backend/jobs/CheckExpiredMutingsProcessorService.js';
 import { BakeBufferedReactionsProcessorService } from '@features/notes/backend/jobs/BakeBufferedReactionsProcessorService.js';
-import { CleanProcessorService } from '@/queue/processors/CleanProcessorService.js';
+import { CleanProcessorService } from '@features/operations/backend/jobs/CleanProcessorService.js';
 import { AggregateRetentionProcessorService } from '@features/statistics/backend/jobs/AggregateRetentionProcessorService.js';
-import { CleanRemoteNotesProcessorService } from '@/queue/processors/CleanRemoteNotesProcessorService.js';
+import { CleanRemoteNotesProcessorService } from '@features/notes/backend/jobs/CleanRemoteNotesProcessorService.js';
 import { QueueLoggerService } from './QueueLoggerService.js';
 import { QUEUE, baseWorkerOptions } from './const.js';
 
