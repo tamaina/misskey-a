@@ -1,0 +1,44 @@
+{
+  "originalSha256": "2446db7c801fe4d4380c71c29a05c28ff2d4a294c0df34614c39a62da3f5bb65",
+  "originalSource": "/*\n * SPDX-FileCopyrightText: syuilo and misskey-project\n * SPDX-License-Identifier: AGPL-3.0-only\n */\n\nimport { createApp, defineAsyncComponent } from 'vue';\nimport defaultLightTheme from '@features/preferences/frontend/themes/l-light.json5';\nimport defaultDarkTheme from '@features/preferences/frontend/themes/d-dark.json5';\nimport { MediaProxy } from '@features/drive/frontend/shared/media-proxy.js';\nimport { storeBootloaderErrors } from '@features/boot/frontend/shared/store-boot-errors.js';\nimport { applyTheme, assertIsTheme } from '@features/preferences/frontend/embed/theme.js';\nimport { fetchCustomEmojis } from '@features/emojis/frontend/embed/custom-emojis.js';\nimport { DI } from '@features/boot/frontend/embed/di.js';\nimport { serverMetadata } from '@features/instance/frontend/embed/server-metadata.js';\nimport { url, version, lang } from '@features/boot/frontend/shared/config.js';\nimport { parseEmbedParams } from '@features/web/frontend/shared/embed-page.js';\nimport { postMessageToParentWindow, setIframeId } from '@features/web/frontend/embed/post-message.js';\nimport { serverContext } from '@features/boot/frontend/embed/server-context.js';\nimport { i18n } from '@features/runtime/frontend/embed/i18n.js';\n\nimport type { Theme } from '@features/preferences/frontend/shared/theme.js';\n\nimport type { InternationalizationInstance } from '../index.js';\n\nexport async function embedBoot(internationalization: InternationalizationInstance) {\n\tconsole.log('Misskey Embed');\n\n\t//#region Embedパラメータの取得・パース\n\tconst params = new URLSearchParams(window.location.search);\n\tconst embedParams = parseEmbedParams(params);\n\tif (_DEV_) console.log(embedParams);\n\t//#endregion\n\n\t//#region テーマ\n\tfunction parseThemeOrNull(theme: string | null): Theme | null {\n\t\tif (theme == null) return null;\n\t\ttry {\n\t\t\tconst parsed = JSON.parse(theme);\n\t\t\tif (assertIsTheme(parsed)) {\n\t\t\t\treturn parsed;\n\t\t\t} else {\n\t\t\t\treturn null;\n\t\t\t}\n\t\t} catch (err) {\n\t\t\treturn null;\n\t\t}\n\t}\n\n\tconst lightTheme = parseThemeOrNull(serverMetadata.defaultLightTheme) ?? defaultLightTheme;\n\tconst darkTheme = parseThemeOrNull(serverMetadata.defaultDarkTheme) ?? defaultDarkTheme;\n\n\tif (embedParams.colorMode === 'dark') {\n\t\tapplyTheme(darkTheme);\n\t} else if (embedParams.colorMode === 'light') {\n\t\tapplyTheme(lightTheme);\n\t} else {\n\t\tif (window.matchMedia('(prefers-color-scheme: dark)').matches) {\n\t\t\tapplyTheme(darkTheme);\n\t\t} else {\n\t\t\tapplyTheme(lightTheme);\n\t\t}\n\t\twindow.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (mql) => {\n\t\t\tif (mql.matches) {\n\t\t\t\tapplyTheme(darkTheme);\n\t\t\t} else {\n\t\t\t\tapplyTheme(lightTheme);\n\t\t\t}\n\t\t});\n\t}\n\t//#endregion\n\n\t//#region Detect language & fetch translations\n\tstoreBootloaderErrors({ ...i18n.ts._bootErrors, reload: i18n.ts.reload });\n\t//#endregion\n\n\t// サイズの制限\n\twindow.document.documentElement.style.maxWidth = '500px';\n\n\t// iframeIdの設定\n\tfunction setIframeIdHandler(event: MessageEvent) {\n\t\tif (event.data?.type === 'misskey:embedParent:registerIframeId' && event.data.payload?.iframeId != null) {\n\t\t\tsetIframeId(event.data.payload.iframeId);\n\t\t\twindow.removeEventListener('message', setIframeIdHandler);\n\t\t}\n\t}\n\n\twindow.addEventListener('message', setIframeIdHandler);\n\n\ttry {\n\t\tawait fetchCustomEmojis();\n\t} catch (err) { /* empty */ }\n\n\tconst app = createApp(\n\t\tdefineAsyncComponent(() => import('@features/boot/frontend/embed/ui.vue')),\n\t);\n\n\tapp.use(internationalization);\n\n\tapp.provide(DI.mediaProxy, new MediaProxy(serverMetadata, url));\n\n\tapp.provide(DI.serverMetadata, serverMetadata);\n\n\tapp.provide(DI.serverContext, serverContext);\n\n\tapp.provide(DI.embedParams, embedParams);\n\n\t// https://github.com/misskey-dev/misskey/pull/8575#issuecomment-1114239210\n\t// なぜか2回実行されることがあるため、mountするdivを1つに制限する\n\tconst rootEl = ((): HTMLElement => {\n\t\tconst MISSKEY_MOUNT_DIV_ID = 'misskey_app';\n\n\t\tconst currentRoot = window.document.getElementById(MISSKEY_MOUNT_DIV_ID);\n\n\t\tif (currentRoot) {\n\t\t\tconsole.warn('multiple import detected');\n\t\t\treturn currentRoot;\n\t\t}\n\n\t\tconst root = window.document.createElement('div');\n\t\troot.id = MISSKEY_MOUNT_DIV_ID;\n\t\twindow.document.body.appendChild(root);\n\t\treturn root;\n\t})();\n\n\tpostMessageToParentWindow('misskey:embed:ready');\n\n\tapp.mount(rootEl);\n\n\t// boot.jsのやつを解除\n\twindow.onerror = null;\n\twindow.onunhandledrejection = null;\n\n\tremoveSplash();\n\n\t//#region Self-XSS 対策メッセージ\n\tconsole.log(\n\t\t`%c${i18n.ts._selfXssPrevention.warning}`,\n\t\t'color: #f00; background-color: #ff0; font-size: 36px; padding: 4px;',\n\t);\n\tconsole.log(\n\t\t`%c${i18n.ts._selfXssPrevention.title}`,\n\t\t'color: #f00; font-weight: 900; font-family: \"Hiragino Sans W9\", \"Hiragino Kaku Gothic ProN\", sans-serif; font-size: 24px;',\n\t);\n\tconsole.log(\n\t\t`%c${i18n.ts._selfXssPrevention.description1}`,\n\t\t'font-size: 16px; font-weight: 700;',\n\t);\n\tconsole.log(\n\t\t`%c${i18n.ts._selfXssPrevention.description2}`,\n\t\t'font-size: 16px;',\n\t\t'font-size: 20px; font-weight: 700; color: #f00;',\n\t);\n\tconsole.log(i18n.tsx._selfXssPrevention.description3({ link: 'https://misskey-hub.net/docs/for-users/resources/self-xss/' }));\n\t//#endregion\n\n\tfunction removeSplash() {\n\t\tconst splash = window.document.getElementById('splash');\n\t\tif (splash) {\n\t\t\tsplash.style.opacity = '0';\n\t\t\tsplash.style.pointerEvents = 'none';\n\n\t\t\t// transitionendイベントが発火しない場合があるため\n\t\t\twindow.setTimeout(() => {\n\t\t\t\tsplash.remove();\n\t\t\t}, 1000);\n\t\t}\n\t}\n}\n",
+  "dictionarySha256": "2c94dee621011787eb1ddfc3d64d7d2bc366409cff3fb88b89f7919c12bf67ec",
+  "bootErrorKeys": [
+    "title",
+    "serverError",
+    "solution",
+    "solution1",
+    "solution2",
+    "solution3",
+    "solution4",
+    "otherOption",
+    "otherOption1",
+    "otherOption2",
+    "otherOption3",
+    "otherOption4"
+  ],
+  "oldStore": "\tstoreBootloaderErrors({ ...i18n.ts._bootErrors, reload: i18n.ts.reload });",
+  "newStore": "\tstoreBootloaderErrors({ ...messages._bootErrors, reload: messages.reload });",
+  "rewrites": [
+    [
+      "i18n.ts._selfXssPrevention.warning",
+      "messages._selfXssPrevention.warning"
+    ],
+    [
+      "i18n.ts._selfXssPrevention.title",
+      "messages._selfXssPrevention.title"
+    ],
+    [
+      "i18n.ts._selfXssPrevention.description1",
+      "messages._selfXssPrevention.description1"
+    ],
+    [
+      "i18n.ts._selfXssPrevention.description2",
+      "messages._selfXssPrevention.description2"
+    ],
+    [
+      "i18n.tsx._selfXssPrevention.description3(",
+      "t._selfXssPrevention.description3("
+    ]
+  ],
+  "newSetup": "\tconst { env: messages } = useLocale<typeof bootMessages['ja-JP']>(import.meta.url).value;\n\tconst { env: t } = useLocalizer<typeof bootMessages['ja-JP']>(import.meta.url).value;"
+}

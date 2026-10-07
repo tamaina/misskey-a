@@ -16,7 +16,8 @@ import { url, version, lang } from '@features/boot/frontend/shared/config.js';
 import { parseEmbedParams } from '@features/web/frontend/shared/embed-page.js';
 import { postMessageToParentWindow, setIframeId } from '@features/web/frontend/embed/post-message.js';
 import { serverContext } from '@features/boot/frontend/embed/server-context.js';
-import { i18n } from '@features/runtime/frontend/embed/i18n.js';
+import { useLocale, useLocalizer } from 'vite-vue-internationalization/runtime';
+import type bootMessages from './boot-messages.json';
 
 import type { Theme } from '@features/preferences/frontend/shared/theme.js';
 
@@ -24,6 +25,8 @@ import type { InternationalizationInstance } from '../index.js';
 
 export async function embedBoot(internationalization: InternationalizationInstance) {
 	console.log('Misskey Embed');
+	const { env: messages } = useLocale<typeof bootMessages['ja-JP']>(import.meta.url).value;
+	const { env: t } = useLocalizer<typeof bootMessages['ja-JP']>(import.meta.url).value;
 
 	//#region Embedパラメータの取得・パース
 	const params = new URLSearchParams(window.location.search);
@@ -70,7 +73,7 @@ export async function embedBoot(internationalization: InternationalizationInstan
 	//#endregion
 
 	//#region Detect language & fetch translations
-	storeBootloaderErrors({ ...i18n.ts._bootErrors, reload: i18n.ts.reload });
+	storeBootloaderErrors({ ...messages._bootErrors, reload: messages.reload });
 	//#endregion
 
 	// サイズの制限
@@ -134,23 +137,23 @@ export async function embedBoot(internationalization: InternationalizationInstan
 
 	//#region Self-XSS 対策メッセージ
 	console.log(
-		`%c${i18n.ts._selfXssPrevention.warning}`,
+		`%c${messages._selfXssPrevention.warning}`,
 		'color: #f00; background-color: #ff0; font-size: 36px; padding: 4px;',
 	);
 	console.log(
-		`%c${i18n.ts._selfXssPrevention.title}`,
+		`%c${messages._selfXssPrevention.title}`,
 		'color: #f00; font-weight: 900; font-family: "Hiragino Sans W9", "Hiragino Kaku Gothic ProN", sans-serif; font-size: 24px;',
 	);
 	console.log(
-		`%c${i18n.ts._selfXssPrevention.description1}`,
+		`%c${messages._selfXssPrevention.description1}`,
 		'font-size: 16px; font-weight: 700;',
 	);
 	console.log(
-		`%c${i18n.ts._selfXssPrevention.description2}`,
+		`%c${messages._selfXssPrevention.description2}`,
 		'font-size: 16px;',
 		'font-size: 20px; font-weight: 700; color: #f00;',
 	);
-	console.log(i18n.tsx._selfXssPrevention.description3({ link: 'https://misskey-hub.net/docs/for-users/resources/self-xss/' }));
+	console.log(t._selfXssPrevention.description3({ link: 'https://misskey-hub.net/docs/for-users/resources/self-xss/' }));
 	//#endregion
 
 	function removeSplash() {

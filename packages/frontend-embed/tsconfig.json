@@ -24,6 +24,7 @@
 		"useDefineForClassFields": true,
 		"verbatimModuleSyntax": true,
 		"paths": {
+			"vite-vue-internationalization/runtime": ["./node_modules/vite-vue-internationalization/dist/runtime.d.ts"],
 			"@/*": [
 				"./src/*"
 			],

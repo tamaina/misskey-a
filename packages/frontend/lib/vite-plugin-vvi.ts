@@ -5,14 +5,14 @@
 
 import { resolve } from 'node:path';
 import { vueInternationalization } from 'vite-vue-internationalization';
-import { languages } from 'i18n';
+import embedBootMessages from '../../features/boot/frontend/embed/boot-messages.json' with { type: 'json' };
 
 /** Keep VVI 1.1.3 from replacing an SFC dictionary with a style/template fragment. */
 export function pluginVvi(options: { embed?: boolean } = {}) {
 	const plugin = vueInternationalization({
 		primaryLocale: 'ja-JP',
-		// Embed has no migrated SFCs yet; retain all supported loader languages.
-		global: options.embed ? Object.fromEntries(languages.map(language => [language, {}])) : undefined,
+		// Embed boot messages also retain all supported loader languages.
+		global: options.embed ? embedBootMessages : undefined,
 		scan: options.embed
 			? { include: ['features/*/frontend/embed/**/*.vue'] }
 			: { include: ['features/*/frontend/**/*.vue'], exclude: ['features/*/frontend/embed/**'] },
