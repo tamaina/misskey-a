@@ -13,13 +13,18 @@ if (import.meta.env.DEV) {
 }
 
 import '@/style.scss';
-import { mainBoot } from '@features/boot/frontend/boot/main-boot.js';
-import { subBoot } from '@features/boot/frontend/boot/sub-boot.js';
+import { createInternationalization, setActiveInternationalization } from 'virtual:vite-vue-internationalization';
+import { startComponentLocales } from '@features/boot/frontend/index.js';
+import { lang } from '@features/boot/frontend/shared/config.js';
+
+const internationalization = await startComponentLocales(lang, createInternationalization, setActiveInternationalization);
 
 const subBootPaths = ['/share', '/auth', '/miauth', '/oauth', '/signup-complete', '/verify-email', '/install-extensions'];
 
 if (subBootPaths.some(i => window.location.pathname === i || window.location.pathname.startsWith(i + '/'))) {
-	subBoot();
+	const { subBoot } = await import('@features/boot/frontend/boot/sub-boot.js');
+	await subBoot(internationalization);
 } else {
-	mainBoot();
+	const { mainBoot } = await import('@features/boot/frontend/boot/main-boot.js');
+	await mainBoot(internationalization);
 }

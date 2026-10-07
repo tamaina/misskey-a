@@ -4,8 +4,7 @@
  */
 
 import { watch, version as vueVersion } from 'vue';
-import { createInternationalization } from 'virtual:vite-vue-internationalization';
-import { startComponentLocales } from '@features/index/frontend';
+import type { InternationalizationInstance } from '../index.js';
 import { compareVersions } from 'compare-versions';
 import { version, lang, isSafeMode } from '@features/boot/frontend/shared/config.js';
 import defaultLightTheme from '@features/preferences/frontend/themes/l-light.json5';
@@ -34,7 +33,7 @@ import { $i } from '@features/auth/frontend/i.js';
 import { launchPlugins } from '@features/integrations/frontend/plugin.js';
 import { initTelemetry } from '@features/statistics/frontend/telemetry.js';
 
-export async function common(createVue: () => Promise<App<Element>>) {
+export async function common(createVue: () => Promise<App<Element>>, internationalization: InternationalizationInstance) {
 	console.info(`Misskey v${version}`);
 
 	if (_DEV_) {
@@ -262,7 +261,7 @@ export async function common(createVue: () => Promise<App<Element>>) {
 	});
 
 	const app = await createVue();
-	await startComponentLocales(lang, createInternationalization, runtime => app.use(runtime));
+	app.use(internationalization);
 
 	if (_DEV_) {
 		app.config.performance = true;
