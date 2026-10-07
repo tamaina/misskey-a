@@ -10,7 +10,7 @@ import { jsonString, misskeyId } from '../../api/contract/index.js';
 import { resultObject } from '../../api/contract/result-object.js';
 import { packedReference } from '../../api/contract/packed-reference.js';
 
-export const packedAdminAbuseReportNotificationRecipientCreateInput = v.looseObject({
+export const packedAdminAbuseReportNotificationRecipientCreateInput = v.object({
 	"isActive": v.boolean(),
 	"name": jsonString({ "minLength": 1, "maxLength": 255 }),
 	"method": v.picklist(["email", "webhook"]),
@@ -24,7 +24,7 @@ export const packedAdminAbuseReportNotificationRecipientCreateDefinition = defin
 	packedAdminAbuseReportNotificationRecipientCreateOutput,
 );
 
-export const packedAdminAbuseReportNotificationRecipientListInput = v.looseObject({
+export const packedAdminAbuseReportNotificationRecipientListInput = v.object({
 	"method": v.exactOptional(v.array(v.picklist(["email", "webhook"]))),
 });
 export const packedAdminAbuseReportNotificationRecipientListOutput = v.array(packedReference("AbuseReportNotificationRecipient"));
@@ -34,7 +34,7 @@ export const packedAdminAbuseReportNotificationRecipientListDefinition = defineE
 	packedAdminAbuseReportNotificationRecipientListOutput,
 );
 
-export const packedAdminAbuseReportNotificationRecipientShowInput = v.looseObject({
+export const packedAdminAbuseReportNotificationRecipientShowInput = v.object({
 	"id": misskeyId,
 });
 export const packedAdminAbuseReportNotificationRecipientShowOutput = packedReference("AbuseReportNotificationRecipient");
@@ -44,7 +44,7 @@ export const packedAdminAbuseReportNotificationRecipientShowDefinition = defineE
 	packedAdminAbuseReportNotificationRecipientShowOutput,
 );
 
-export const packedAdminAbuseReportNotificationRecipientUpdateInput = v.looseObject({
+export const packedAdminAbuseReportNotificationRecipientUpdateInput = v.object({
 	"id": misskeyId,
 	"isActive": v.boolean(),
 	"name": jsonString({ "minLength": 1, "maxLength": 255 }),
@@ -59,7 +59,7 @@ export const packedAdminAbuseReportNotificationRecipientUpdateDefinition = defin
 	packedAdminAbuseReportNotificationRecipientUpdateOutput,
 );
 
-export const packedAdminAbuseUserReportsInput = v.looseObject({
+export const packedAdminAbuseUserReportsInput = v.object({
 	"limit": v.optional(v.pipe(v.pipe(v.number(), v.integer()), v.minValue(1), v.maxValue(100)), 10),
 	"sinceId": v.exactOptional(misskeyId),
 	"untilId": v.exactOptional(misskeyId),
@@ -69,7 +69,7 @@ export const packedAdminAbuseUserReportsInput = v.looseObject({
 	"reporterOrigin": v.optional(v.picklist(["combined", "local", "remote"]), "combined"),
 	"targetUserOrigin": v.optional(v.picklist(["combined", "local", "remote"]), "combined"),
 });
-export const packedAdminAbuseUserReportsOutput = v.array(resultObject({
+export const packedAdminAbuseUserReportsOutput = v.array(v.strictObject({
 		"id": v.pipe(v.string(), v.metadata({ "format": "id", "example": "xxxxxxxxxx" })),
 		"createdAt": v.pipe(v.string(), v.metadata({ "format": "date-time" })),
 		"comment": v.string(),
@@ -90,7 +90,7 @@ export const packedAdminAbuseUserReportsDefinition = defineEndpointContract(
 	packedAdminAbuseUserReportsOutput,
 );
 
-export const packedAdminShowModerationLogsInput = v.looseObject({
+export const packedAdminShowModerationLogsInput = v.object({
 	"limit": v.optional(v.pipe(v.pipe(v.number(), v.integer()), v.minValue(1), v.maxValue(100)), 10),
 	"sinceId": v.exactOptional(misskeyId),
 	"untilId": v.exactOptional(misskeyId),
@@ -100,7 +100,7 @@ export const packedAdminShowModerationLogsInput = v.looseObject({
 	"userId": v.exactOptional(v.nullable(misskeyId)),
 	"search": v.exactOptional(v.nullable(v.string())),
 });
-export const packedAdminShowModerationLogsOutput = v.array(resultObject({
+export const packedAdminShowModerationLogsOutput = v.array(v.strictObject({
 		"id": v.pipe(v.string(), v.metadata({ "format": "id" })),
 		"createdAt": v.pipe(v.string(), v.metadata({ "format": "date-time" })),
 		"type": v.string(),
@@ -114,7 +114,7 @@ export const packedAdminShowModerationLogsDefinition = defineEndpointContract(
 	packedAdminShowModerationLogsOutput,
 );
 
-export const packedAdminShowUsersInput = v.looseObject({
+export const packedAdminShowUsersInput = v.object({
 	"limit": v.optional(v.pipe(v.pipe(v.number(), v.integer()), v.minValue(1), v.maxValue(100)), 10),
 	"offset": v.optional(v.pipe(v.number(), v.integer()), 0),
 	"sort": v.exactOptional(v.picklist(["+follower", "-follower", "+createdAt", "-createdAt", "+updatedAt", "-updatedAt", "+lastActiveDate", "-lastActiveDate"])),

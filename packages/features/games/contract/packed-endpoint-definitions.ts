@@ -7,16 +7,15 @@ import type { InferContractRouterInputs, InferContractRouterOutputs } from '@orp
 import * as v from 'valibot';
 import { defineEndpointContract } from '../../api/contract/definition.js';
 import { misskeyId } from '../../api/contract/index.js';
-import { resultObject } from '../../api/contract/result-object.js';
 import { packedReference } from '../../api/contract/packed-reference.js';
 
-export const packedBubbleGameRankingInput = v.looseObject({
+export const packedBubbleGameRankingInput = v.object({
 	"gameMode": v.string(),
 });
-export const packedBubbleGameRankingOutput = v.array(resultObject({
+export const packedBubbleGameRankingOutput = v.array(v.strictObject({
 		"id": v.pipe(v.string(), v.metadata({ "format": "misskey:id" })),
 		"score": v.pipe(v.number(), v.integer()),
-		"user": v.exactOptional(packedReference("UserLite")),
+		"user": v.optional(packedReference("UserLite")),
 	}));
 export const packedBubbleGameRankingDefinition = defineEndpointContract(
 	{ method: 'POST', path: "/bubble-game/ranking" },
@@ -24,7 +23,7 @@ export const packedBubbleGameRankingDefinition = defineEndpointContract(
 	packedBubbleGameRankingOutput,
 );
 
-export const packedReversiMatchInput = v.looseObject({
+export const packedReversiMatchInput = v.object({
 	"userId": v.exactOptional(v.nullable(misskeyId)),
 	"noIrregularRules": v.optional(v.boolean(), false),
 	"multiple": v.optional(v.boolean(), false),
@@ -36,7 +35,7 @@ export const packedReversiMatchDefinition = defineEndpointContract(
 	packedReversiMatchOutput,
 );
 
-export const packedReversiShowGameInput = v.looseObject({
+export const packedReversiShowGameInput = v.object({
 	"gameId": misskeyId,
 });
 export const packedReversiShowGameOutput = packedReference("ReversiGameDetailed");
@@ -46,11 +45,11 @@ export const packedReversiShowGameDefinition = defineEndpointContract(
 	packedReversiShowGameOutput,
 );
 
-export const packedReversiVerifyInput = v.looseObject({
+export const packedReversiVerifyInput = v.object({
 	"gameId": misskeyId,
 	"crc32": v.string(),
 });
-export const packedReversiVerifyOutput = resultObject({
+export const packedReversiVerifyOutput = v.strictObject({
 	"desynced": v.boolean(),
 	"game": v.exactOptional(v.nullable(packedReference("ReversiGameDetailed"))),
 });

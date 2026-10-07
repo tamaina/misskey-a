@@ -4,9 +4,8 @@
  */
 
 import * as v from 'valibot';
-import { resultObject } from '../../api/contract/result-object.js';
 
-export const packedSystemWebhookSchema = resultObject({
+export const packedSystemWebhookSchema = v.strictObject({
 	"id": v.string(),
 	"isActive": v.boolean(),
 	"updatedAt": v.pipe(v.string(), v.metadata({ "format": "date-time" })),
@@ -17,7 +16,7 @@ export const packedSystemWebhookSchema = resultObject({
 	"url": v.string(),
 	"secret": v.string()
 });
-export const packedUserWebhookSchema = resultObject({
+export const packedUserWebhookSchema = v.strictObject({
 	"id": v.pipe(v.string(), v.metadata({ "format": "id" })),
 	"userId": v.pipe(v.string(), v.metadata({ "format": "id" })),
 	"name": v.string(),

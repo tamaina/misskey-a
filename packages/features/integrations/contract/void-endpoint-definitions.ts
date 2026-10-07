@@ -8,7 +8,7 @@ import * as v from 'valibot';
 import { defineEndpointContract } from '../../api/contract/definition.js';
 import { misskeyId } from '../../api/contract/index.js';
 
-export const voidAdminSendEmailInput = v.looseObject({
+export const voidAdminSendEmailInput = v.object({
 	"to": v.string(),
 	"subject": v.string(),
 	"text": v.string(),
@@ -20,7 +20,7 @@ export const voidAdminSendEmailDefinition = defineEndpointContract(
 	voidAdminSendEmailOutput,
 );
 
-export const voidAdminSystemWebhookDeleteInput = v.looseObject({
+export const voidAdminSystemWebhookDeleteInput = v.object({
 	"id": misskeyId,
 });
 export const voidAdminSystemWebhookDeleteOutput = v.void();

@@ -8,7 +8,7 @@ import * as v from 'valibot';
 import { defineEndpointContract } from '../../api/contract/definition.js';
 import { jsonString, misskeyId } from '../../api/contract/index.js';
 
-export const voidAdminDeleteAllFilesOfAUserInput = v.looseObject({
+export const voidAdminDeleteAllFilesOfAUserInput = v.object({
 	"userId": misskeyId,
 });
 export const voidAdminDeleteAllFilesOfAUserOutput = v.void();
@@ -18,7 +18,7 @@ export const voidAdminDeleteAllFilesOfAUserDefinition = defineEndpointContract(
 	voidAdminDeleteAllFilesOfAUserOutput,
 );
 
-export const voidAdminDriveCleanRemoteFilesInput = v.looseObject({});
+export const voidAdminDriveCleanRemoteFilesInput = v.object({});
 export const voidAdminDriveCleanRemoteFilesOutput = v.void();
 export const voidAdminDriveCleanRemoteFilesDefinition = defineEndpointContract(
 	{ method: 'POST', path: "/admin/drive/clean-remote-files", tags: ["admin"] },
@@ -26,7 +26,7 @@ export const voidAdminDriveCleanRemoteFilesDefinition = defineEndpointContract(
 	voidAdminDriveCleanRemoteFilesOutput,
 );
 
-export const voidAdminDriveCleanupInput = v.looseObject({});
+export const voidAdminDriveCleanupInput = v.object({});
 export const voidAdminDriveCleanupOutput = v.void();
 export const voidAdminDriveCleanupDefinition = defineEndpointContract(
 	{ method: 'POST', path: "/admin/drive/cleanup", tags: ["admin"] },
@@ -34,7 +34,7 @@ export const voidAdminDriveCleanupDefinition = defineEndpointContract(
 	voidAdminDriveCleanupOutput,
 );
 
-export const voidDriveFilesDeleteInput = v.looseObject({
+export const voidDriveFilesDeleteInput = v.object({
 	"fileId": misskeyId,
 });
 export const voidDriveFilesDeleteOutput = v.void();
@@ -44,7 +44,7 @@ export const voidDriveFilesDeleteDefinition = defineEndpointContract(
 	voidDriveFilesDeleteOutput,
 );
 
-export const voidDriveFilesUploadFromUrlInput = v.looseObject({
+export const voidDriveFilesUploadFromUrlInput = v.object({
 	"url": v.string(),
 	"folderId": v.optional(v.nullable(misskeyId), null),
 	"isSensitive": v.optional(v.boolean(), false),
@@ -59,7 +59,7 @@ export const voidDriveFilesUploadFromUrlDefinition = defineEndpointContract(
 	voidDriveFilesUploadFromUrlOutput,
 );
 
-export const voidDriveFoldersDeleteInput = v.looseObject({
+export const voidDriveFoldersDeleteInput = v.object({
 	"folderId": misskeyId,
 });
 export const voidDriveFoldersDeleteOutput = v.void();

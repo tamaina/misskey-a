@@ -5064,6 +5064,8 @@ export type components = {
             completed: number;
             failed: number;
             delayed: number;
+            prioritized?: number;
+            'waiting-children'?: number;
         };
         QueueMetrics: {
             meta: {
@@ -7850,6 +7852,7 @@ export interface operations {
                         url: string | null;
                         /** Format: url */
                         thumbnailUrl: string | null;
+                        webpublicType: string | null;
                         /** Format: url */
                         webpublicUrl: string | null;
                         accessKey: string | null;
@@ -9563,6 +9566,8 @@ export interface operations {
                         defaultLightTheme: string | null;
                         clientOptions: components['schemas']['MetaClientOptions'];
                         description: string | null;
+                        langs: string[];
+                        logoImageUrl: string | null;
                         disableRegistration: boolean;
                         impressumUrl: string | null;
                         maintainerEmail: string | null;
@@ -11696,6 +11701,7 @@ export interface operations {
                         os: string;
                         node: string;
                         psql: string;
+                        redis?: string;
                         cpu: {
                             model: string;
                             cores: number;
@@ -36161,7 +36167,17 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    'application/json': components['schemas']['UserList'] & {
+                    'application/json': {
+                        /**
+                         * Format: id
+                         * @example xxxxxxxxxx
+                         */
+                        id: string;
+                        /** Format: date-time */
+                        createdAt: string;
+                        name: string;
+                        userIds?: string[];
+                        isPublic: boolean;
                         likedCount?: number;
                         isLiked?: boolean;
                     };

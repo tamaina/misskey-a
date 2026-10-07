@@ -4,9 +4,8 @@
  */
 
 import * as v from 'valibot';
-import { resultObject } from '../../api/contract/result-object.js';
 
-export const packedAntennaSchema = resultObject({
+export const packedAntennaSchema = v.strictObject({
 	"id": v.pipe(v.string(), v.metadata({ "format": "id" })),
 	"createdAt": v.pipe(v.string(), v.metadata({ "format": "date-time" })),
 	"name": v.string(),

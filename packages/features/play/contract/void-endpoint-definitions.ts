@@ -8,7 +8,7 @@ import * as v from 'valibot';
 import { defineEndpointContract } from '../../api/contract/definition.js';
 import { misskeyId } from '../../api/contract/index.js';
 
-export const voidFlashDeleteInput = v.looseObject({
+export const voidFlashDeleteInput = v.object({
 	"flashId": misskeyId,
 });
 export const voidFlashDeleteOutput = v.void();
@@ -18,7 +18,7 @@ export const voidFlashDeleteDefinition = defineEndpointContract(
 	voidFlashDeleteOutput,
 );
 
-export const voidFlashLikeInput = v.looseObject({
+export const voidFlashLikeInput = v.object({
 	"flashId": misskeyId,
 });
 export const voidFlashLikeOutput = v.void();
@@ -28,7 +28,7 @@ export const voidFlashLikeDefinition = defineEndpointContract(
 	voidFlashLikeOutput,
 );
 
-export const voidFlashUnlikeInput = v.looseObject({
+export const voidFlashUnlikeInput = v.object({
 	"flashId": misskeyId,
 });
 export const voidFlashUnlikeOutput = v.void();
@@ -38,7 +38,7 @@ export const voidFlashUnlikeDefinition = defineEndpointContract(
 	voidFlashUnlikeOutput,
 );
 
-export const voidFlashUpdateInput = v.looseObject({
+export const voidFlashUpdateInput = v.object({
 	"flashId": misskeyId,
 	"title": v.exactOptional(v.string()),
 	"summary": v.exactOptional(v.string()),

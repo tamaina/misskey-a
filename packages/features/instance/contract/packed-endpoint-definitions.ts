@@ -9,7 +9,7 @@ import { defineEndpointContract } from '../../api/contract/definition.js';
 import { jsonString, misskeyId } from '../../api/contract/index.js';
 import { packedReference } from '../../api/contract/packed-reference.js';
 
-export const packedAdminAdCreateInput = v.looseObject({
+export const packedAdminAdCreateInput = v.object({
 	"url": jsonString({ "minLength": 1 }),
 	"memo": v.string(),
 	"place": v.string(),
@@ -28,7 +28,7 @@ export const packedAdminAdCreateDefinition = defineEndpointContract(
 	packedAdminAdCreateOutput,
 );
 
-export const packedAdminAdListInput = v.looseObject({
+export const packedAdminAdListInput = v.object({
 	"limit": v.optional(v.pipe(v.pipe(v.number(), v.integer()), v.minValue(1), v.maxValue(100)), 10),
 	"sinceId": v.exactOptional(misskeyId),
 	"untilId": v.exactOptional(misskeyId),
@@ -43,7 +43,7 @@ export const packedAdminAdListDefinition = defineEndpointContract(
 	packedAdminAdListOutput,
 );
 
-export const packedPinnedUsersInput = v.looseObject({});
+export const packedPinnedUsersInput = v.object({});
 export const packedPinnedUsersOutput = v.array(packedReference("UserDetailed"));
 export const packedPinnedUsersDefinition = defineEndpointContract(
 	{ method: 'POST', path: "/pinned-users", tags: ["users"] },

@@ -8,7 +8,7 @@ import * as v from 'valibot';
 import { defineEndpointContract } from '../../api/contract/definition.js';
 import { resultObject } from '../../api/contract/result-object.js';
 
-export const inlineFetchRssInput = v.looseObject({
+export const inlineFetchRssInput = v.object({
 	"url": v.string(),
 });
 export const inlineFetchRssOutput = resultObject({
@@ -64,11 +64,11 @@ export const inlineFetchRssDefinition = defineEndpointContract(
 	inlineFetchRssOutput,
 );
 
-export const inlineFetchExternalResourcesInput = v.looseObject({
+export const inlineFetchExternalResourcesInput = v.object({
 	"url": v.string(),
 	"hash": v.string(),
 });
-export const inlineFetchExternalResourcesOutput = resultObject({
+export const inlineFetchExternalResourcesOutput = v.strictObject({
 	"type": v.string(),
 	"data": v.string(),
 });

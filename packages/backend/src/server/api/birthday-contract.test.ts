@@ -6,20 +6,21 @@ import fs from 'node:fs';
 import { expect, test } from 'vitest';
 import * as v from 'valibot';
 import _Ajv from 'ajv';
-import { birthdayUsersInput, birthdayUsersDefinition } from '@features/relationships/contract/birthday-endpoint-definitions.js';
+import { birthdayUsersInput, birthdayUsersDefinition, birthdayUsersOutput } from '@features/relationships/contract/birthday-endpoint-definitions.js';
 import { jsonExclusiveObject, getJsonExclusiveObjectSchemaRegistration } from '@features/api/contract/json-exclusive-object.js';
 import { jsonObject } from '@features/api/contract/json-object.js';
 import { jsonNumber } from '@features/api/contract/json-number.js';
 import { toLegacyJsonSchema } from '@features/api/backend/index.js';
-import { projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
+import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
 import { convertSchemaToOpenApiSchema } from '@features/api/backend/transport/openapi/schemas.js';
 const Ajv = _Ajv.default;
 const legacy = JSON.parse(fs.readFileSync(new URL('../../../test/fixtures/birthday-contract-baseline.json', import.meta.url), 'utf8'));
 const canonical = (x:unknown) => JSON.parse(JSON.stringify(x));
 const projection = () => projectEndpointContract(birthdayUsersDefinition);
-test('full frozen input/response projection parity', () => {
+const reviewedResponse = { ...legacy.meta.res, items: { ...legacy.meta.res.items, additionalProperties: false } };
+test('full frozen input parity and explicitly reviewed finite response projection', () => {
  expect(canonical(projection().input)).toEqual(canonical(legacy.paramDef));
- expect(canonical(convertSchemaToOpenApiSchema(projection().response!, 'res', true))).toEqual(canonical(convertSchemaToOpenApiSchema(legacy.meta.res, 'res', true))); 
+ expect(canonical(convertSchemaToOpenApiSchema(projection().response!, 'res', true))).toEqual(canonical(convertSchemaToOpenApiSchema(reviewedResponse, 'res', true)));
 });
 const dates = [{ month: 1, day: 2 }, { month: 2, day: 31 }, { month: 12, day: 31, extra: 1 }];
 const values = [...dates, ...dates.map(begin => ({ begin, end: { month: 1, day: 1 } })), { month: 1, day: 2, begin: null, end: null }, { month: 1, day: 2, begin: { month: 1, day: 1 }, end: { month: 1, day: 1 } }, null, [], {}, { month: 0, day: 1 }, { month: 1.5, day: 2 }, { begin: { month: 1, day: 1 } }, { begin: { month: 1, day: 2 }, end: { month: 2, day: 3 }, month: 'x' }, { month: Infinity, day: 1 }];
@@ -52,4 +53,16 @@ test('reject defaults, transforms, lazy, optional, predicates, third branch and 
 test('shared and named definitions retain exclusive projection', () => {
  const result = toLegacyJsonSchema(jsonObject({ first: exclusive, second: exclusive }), { definitions: { choice: exclusive }, target: 'openapi-3.0', typeMode: 'ignore' });
  expect(JSON.stringify(result)).toContain('oneOf'); expect(JSON.stringify(result)).not.toContain('anyOf');
+});
+
+test('finite birthday results reject native extras while HTTP keeps unparsed response identity', async () => {
+ const user = { id: 'user1', name: null, username: 'alice', host: null, avatarUrl: 'https://example/avatar', avatarBlurhash: null, avatarDecorations: [], emojis: {}, onlineStatus: 'unknown' as const };
+ const item = { id: user.id, birthday: '2026-10-07', user };
+ expect(v.parse(birthdayUsersOutput, [item])).toEqual([item]);
+ for (const value of [{ ...item, extra: true }, { id: item.id, user }, { ...item, birthday: 1 }]) expect(v.safeParse(birthdayUsersOutput, [value]).success).toBe(false);
+ const response = [{ ...item, extra: true }];
+ const params = { birthday: { month: 10, day: 7 }, future: true };
+ const endpoint = new ContractEndpoint({}, projection(), async ps => { expect(ps).toBe(params); return response; });
+ expect(await endpoint.exec(params, null, null)).toBe(response);
+ expect(params).toEqual({ birthday: { month: 10, day: 7 }, future: true, limit: 10, offset: 0 });
 });

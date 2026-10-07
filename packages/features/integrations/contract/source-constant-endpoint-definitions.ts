@@ -8,7 +8,6 @@ import * as v from 'valibot';
 import { jsonObject } from '../../api/contract/json-object.js';
 import { defineEndpointContract } from '../../api/contract/definition.js';
 import { jsonString, misskeyId } from '../../api/contract/index.js';
-import { resultObject } from '../../api/contract/result-object.js';
 import { webhookEventTypes } from './index.js';
 
 export const constantIWebhooksCreateInput = jsonObject({
@@ -17,7 +16,7 @@ export const constantIWebhooksCreateInput = jsonObject({
 	"secret": v.optional(jsonString({ "maxLength": 1024 }), ""),
 	"on": v.array(v.picklist(webhookEventTypes)),
 });
-export const constantIWebhooksCreateOutput = resultObject({
+export const constantIWebhooksCreateOutput = v.strictObject({
 	"id": v.pipe(v.string(), v.metadata({ "format": "misskey:id" })),
 	"userId": v.pipe(v.string(), v.metadata({ "format": "misskey:id" })),
 	"name": v.string(),

@@ -9,9 +9,9 @@ import * as v from 'valibot';
 import type { ApiErrorDefinition } from '../../api/contract/index.js';
 import { misskeyId } from '../../api/contract/index.js';
 
-const listIdInput = v.looseObject({ listId: misskeyId });
-const membershipInput = v.looseObject({ listId: misskeyId, userId: misskeyId });
-const updateMembershipInput = v.looseObject({
+const listIdInput = v.object({ listId: misskeyId });
+const membershipInput = v.object({ listId: misskeyId, userId: misskeyId });
+const updateMembershipInput = v.object({
 	listId: misskeyId,
 	userId: misskeyId,
 	withReplies: v.optional(v.boolean()),

@@ -12,10 +12,10 @@ import { jsonString } from '../../api/contract/index.js';
 import { misskeyId } from '../../api/contract/index.js';
 import { resultObject } from '../../api/contract/result-object.js';
 
-export const inlineAdminResetPasswordInput = v.looseObject({
+export const inlineAdminResetPasswordInput = v.object({
 	"userId": misskeyId,
 });
-export const inlineAdminResetPasswordOutput = resultObject({
+export const inlineAdminResetPasswordOutput = v.strictObject({
 	"password": v.pipe(v.string(), v.metadata({ "minLength": 8, "maxLength": 8 })),
 });
 export const inlineAdminResetPasswordDefinition = defineEndpointContract(
@@ -24,10 +24,10 @@ export const inlineAdminResetPasswordDefinition = defineEndpointContract(
 	inlineAdminResetPasswordOutput,
 );
 
-export const inlineAuthSessionGenerateInput = v.looseObject({
+export const inlineAuthSessionGenerateInput = v.object({
 	"appSecret": v.string(),
 });
-export const inlineAuthSessionGenerateOutput = resultObject({
+export const inlineAuthSessionGenerateOutput = v.strictObject({
 	"token": v.string(),
 	"url": v.pipe(v.string(), v.metadata({ "format": "url" })),
 });
@@ -37,10 +37,10 @@ export const inlineAuthSessionGenerateDefinition = defineEndpointContract(
 	inlineAuthSessionGenerateOutput,
 );
 
-export const inlineEmailAddressAvailableInput = v.looseObject({
+export const inlineEmailAddressAvailableInput = v.object({
 	"emailAddress": v.string(),
 });
-export const inlineEmailAddressAvailableOutput = resultObject({
+export const inlineEmailAddressAvailableOutput = v.strictObject({
 	"available": v.boolean(),
 	"reason": v.nullable(v.string()),
 });
@@ -50,10 +50,10 @@ export const inlineEmailAddressAvailableDefinition = defineEndpointContract(
 	inlineEmailAddressAvailableOutput,
 );
 
-export const inlineI2faDoneInput = v.looseObject({
+export const inlineI2faDoneInput = v.object({
 	"token": v.string(),
 });
-export const inlineI2faDoneOutput = resultObject({
+export const inlineI2faDoneOutput = v.strictObject({
 	"backupCodes": v.array(v.string()),
 });
 export const inlineI2faDoneDefinition = defineEndpointContract(
@@ -62,11 +62,11 @@ export const inlineI2faDoneDefinition = defineEndpointContract(
 	inlineI2faDoneOutput,
 );
 
-export const inlineI2faRegisterInput = v.looseObject({
+export const inlineI2faRegisterInput = v.object({
 	"password": v.string(),
 	"token": v.exactOptional(v.nullable(v.string())),
 });
-export const inlineI2faRegisterOutput = resultObject({
+export const inlineI2faRegisterOutput = v.strictObject({
 	"qr": v.string(),
 	"url": v.string(),
 	"secret": v.string(),
@@ -79,7 +79,7 @@ export const inlineI2faRegisterDefinition = defineEndpointContract(
 	inlineI2faRegisterOutput,
 );
 
-export const inlineI2faRegisterKeyInput = v.looseObject({
+export const inlineI2faRegisterKeyInput = v.object({
 	"password": v.string(),
 	"token": v.exactOptional(v.nullable(v.string())),
 });
@@ -90,14 +90,14 @@ export const inlineI2faRegisterKeyDefinition = defineEndpointContract(
 	inlineI2faRegisterKeyOutput,
 );
 
-export const inlineIAppsInput = v.looseObject({
+export const inlineIAppsInput = v.object({
 	"sort": v.exactOptional(v.picklist(["+createdAt", "-createdAt", "+lastUsedAt", "-lastUsedAt"])),
 });
-export const inlineIAppsOutput = v.array(resultObject({
+export const inlineIAppsOutput = v.array(v.strictObject({
 		"id": v.pipe(v.string(), v.metadata({ "format": "misskey:id" })),
-		"name": v.exactOptional(v.string()),
+		"name": v.optional(v.string()),
 		"createdAt": v.pipe(v.string(), v.metadata({ "format": "date-time" })),
-		"lastUsedAt": v.exactOptional(v.pipe(v.string(), v.metadata({ "format": "date-time" }))),
+		"lastUsedAt": v.optional(v.pipe(v.string(), v.metadata({ "format": "date-time" }))),
 		"permission": v.pipe(v.array(v.string()), v.metadata({ "uniqueItems": true })),
 		"iconUrl": v.exactOptional(v.nullable(v.string())),
 		"description": v.exactOptional(v.nullable(v.string())),
@@ -108,12 +108,12 @@ export const inlineIAppsDefinition = defineEndpointContract(
 	inlineIAppsOutput,
 );
 
-export const inlineIAuthorizedAppsInput = v.looseObject({
+export const inlineIAuthorizedAppsInput = v.object({
 	"limit": v.optional(v.pipe(v.pipe(v.number(), v.integer()), v.minValue(1), v.maxValue(100)), 10),
 	"offset": v.optional(v.pipe(v.number(), v.integer()), 0),
 	"sort": v.optional(v.picklist(["desc", "asc"]), "desc"),
 });
-export const inlineIAuthorizedAppsOutput = v.array(resultObject({
+export const inlineIAuthorizedAppsOutput = v.array(v.strictObject({
 		"id": v.pipe(v.string(), v.metadata({ "format": "misskey:id" })),
 		"name": v.string(),
 		"callbackUrl": v.nullable(v.string()),
@@ -126,8 +126,8 @@ export const inlineIAuthorizedAppsDefinition = defineEndpointContract(
 	inlineIAuthorizedAppsOutput,
 );
 
-export const inlineInviteLimitInput = v.looseObject({});
-export const inlineInviteLimitOutput = resultObject({
+export const inlineInviteLimitInput = v.object({});
+export const inlineInviteLimitOutput = v.strictObject({
 	"remaining": v.nullable(v.pipe(v.number(), v.integer())),
 });
 export const inlineInviteLimitDefinition = defineEndpointContract(
@@ -142,7 +142,7 @@ export const inlineI2faKeyDoneInput = jsonObject({
 	name: jsonString({ minLength: 1, maxLength: 30 }),
 	credential: opaqueObject,
 });
-export const inlineI2faKeyDoneOutput = resultObject({ id: v.string(), name: v.string() });
+export const inlineI2faKeyDoneOutput = v.strictObject({ id: v.string(), name: v.string() });
 export const inlineI2faKeyDoneDefinition = defineEndpointContract(
 	{ method: 'POST', path: '/i/2fa/key-done' },
 	inlineI2faKeyDoneInput,

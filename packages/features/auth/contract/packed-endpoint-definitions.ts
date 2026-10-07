@@ -7,10 +7,9 @@ import type { InferContractRouterInputs, InferContractRouterOutputs } from '@orp
 import * as v from 'valibot';
 import { defineEndpointContract } from '../../api/contract/definition.js';
 import { misskeyId } from '../../api/contract/index.js';
-import { resultObject } from '../../api/contract/result-object.js';
 import { packedReference } from '../../api/contract/packed-reference.js';
 
-export const packedAdminInviteCreateInput = v.looseObject({
+export const packedAdminInviteCreateInput = v.object({
 	"count": v.optional(v.pipe(v.pipe(v.number(), v.integer()), v.minValue(1), v.maxValue(100)), 1),
 	"expiresAt": v.exactOptional(v.nullable(v.string())),
 });
@@ -21,7 +20,7 @@ export const packedAdminInviteCreateDefinition = defineEndpointContract(
 	packedAdminInviteCreateOutput,
 );
 
-export const packedAdminInviteListInput = v.looseObject({
+export const packedAdminInviteListInput = v.object({
 	"limit": v.optional(v.pipe(v.pipe(v.number(), v.integer()), v.minValue(1), v.maxValue(100)), 30),
 	"offset": v.optional(v.pipe(v.number(), v.integer()), 0),
 	"type": v.optional(v.picklist(["unused", "used", "expired", "all"]), "all"),
@@ -34,7 +33,7 @@ export const packedAdminInviteListDefinition = defineEndpointContract(
 	packedAdminInviteListOutput,
 );
 
-export const packedAppShowInput = v.looseObject({
+export const packedAppShowInput = v.object({
 	"appId": misskeyId,
 });
 export const packedAppShowOutput = packedReference("App");
@@ -44,10 +43,10 @@ export const packedAppShowDefinition = defineEndpointContract(
 	packedAppShowOutput,
 );
 
-export const packedAuthSessionShowInput = v.looseObject({
+export const packedAuthSessionShowInput = v.object({
 	"token": v.string(),
 });
-export const packedAuthSessionShowOutput = resultObject({
+export const packedAuthSessionShowOutput = v.strictObject({
 	"id": v.pipe(v.string(), v.metadata({ "format": "id" })),
 	"app": packedReference("App"),
 	"token": v.string(),
@@ -58,11 +57,11 @@ export const packedAuthSessionShowDefinition = defineEndpointContract(
 	packedAuthSessionShowOutput,
 );
 
-export const packedAuthSessionUserkeyInput = v.looseObject({
+export const packedAuthSessionUserkeyInput = v.object({
 	"appSecret": v.string(),
 	"token": v.string(),
 });
-export const packedAuthSessionUserkeyOutput = resultObject({
+export const packedAuthSessionUserkeyOutput = v.strictObject({
 	"accessToken": v.string(),
 	"user": packedReference("UserDetailedNotMe"),
 });
@@ -72,7 +71,7 @@ export const packedAuthSessionUserkeyDefinition = defineEndpointContract(
 	packedAuthSessionUserkeyOutput,
 );
 
-export const packedISigninHistoryInput = v.looseObject({
+export const packedISigninHistoryInput = v.object({
 	"limit": v.optional(v.pipe(v.pipe(v.number(), v.integer()), v.minValue(1), v.maxValue(100)), 10),
 	"sinceId": v.exactOptional(misskeyId),
 	"untilId": v.exactOptional(misskeyId),
@@ -86,7 +85,7 @@ export const packedISigninHistoryDefinition = defineEndpointContract(
 	packedISigninHistoryOutput,
 );
 
-export const packedIUpdateEmailInput = v.looseObject({
+export const packedIUpdateEmailInput = v.object({
 	"password": v.string(),
 	"email": v.exactOptional(v.nullable(v.string())),
 	"token": v.exactOptional(v.nullable(v.string())),
@@ -98,7 +97,7 @@ export const packedIUpdateEmailDefinition = defineEndpointContract(
 	packedIUpdateEmailOutput,
 );
 
-export const packedInviteCreateInput = v.looseObject({});
+export const packedInviteCreateInput = v.object({});
 export const packedInviteCreateOutput = packedReference("InviteCode");
 export const packedInviteCreateDefinition = defineEndpointContract(
 	{ method: 'POST', path: "/invite/create", tags: ["meta"] },
@@ -106,7 +105,7 @@ export const packedInviteCreateDefinition = defineEndpointContract(
 	packedInviteCreateOutput,
 );
 
-export const packedInviteListInput = v.looseObject({
+export const packedInviteListInput = v.object({
 	"limit": v.optional(v.pipe(v.pipe(v.number(), v.integer()), v.minValue(1), v.maxValue(100)), 30),
 	"sinceId": v.exactOptional(misskeyId),
 	"untilId": v.exactOptional(misskeyId),
@@ -120,7 +119,7 @@ export const packedInviteListDefinition = defineEndpointContract(
 	packedInviteListOutput,
 );
 
-export const packedMyAppsInput = v.looseObject({
+export const packedMyAppsInput = v.object({
 	"limit": v.optional(v.pipe(v.pipe(v.number(), v.integer()), v.minValue(1), v.maxValue(100)), 10),
 	"offset": v.optional(v.pipe(v.number(), v.integer()), 0),
 });

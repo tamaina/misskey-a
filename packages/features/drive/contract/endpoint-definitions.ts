@@ -6,10 +6,9 @@
 import type { InferContractRouterInputs, InferContractRouterOutputs } from '@orpc/contract';
 import * as v from 'valibot';
 import { defineEndpointContract } from '../../api/contract/definition.js';
-import { resultObject } from '../../api/contract/result-object.js';
 
-export const inlineDriveInput = v.looseObject({});
-export const inlineDriveOutput = resultObject({
+export const inlineDriveInput = v.object({});
+export const inlineDriveOutput = v.strictObject({
 	"capacity": v.number(),
 	"usage": v.number(),
 });
@@ -19,7 +18,7 @@ export const inlineDriveDefinition = defineEndpointContract(
 	inlineDriveOutput,
 );
 
-export const inlineDriveFilesCheckExistenceInput = v.looseObject({
+export const inlineDriveFilesCheckExistenceInput = v.object({
 	"md5": v.string(),
 });
 export const inlineDriveFilesCheckExistenceOutput = v.boolean();

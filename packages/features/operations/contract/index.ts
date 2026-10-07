@@ -15,12 +15,12 @@ const queueStateInput = v.picklist(QUEUE_CLEAR_STATES);
 const voidOutput = v.void();
 
 export const operationsInputs = {
-	'admin/queue/pause': v.looseObject({ queue: queueInput }),
-	'admin/queue/resume': v.looseObject({ queue: queueInput }),
-	'admin/queue/clear': v.looseObject({ queue: queueInput, state: queueStateInput }),
-	'admin/queue/promote-jobs': v.looseObject({ queue: queueInput }),
-	'admin/queue/retry-job': v.looseObject({ queue: queueInput, jobId: v.string() }),
-	'admin/queue/remove-job': v.looseObject({ queue: queueInput, jobId: v.string() }),
+	'admin/queue/pause': v.object({ queue: queueInput }),
+	'admin/queue/resume': v.object({ queue: queueInput }),
+	'admin/queue/clear': v.object({ queue: queueInput, state: queueStateInput }),
+	'admin/queue/promote-jobs': v.object({ queue: queueInput }),
+	'admin/queue/retry-job': v.object({ queue: queueInput, jobId: v.string() }),
+	'admin/queue/remove-job': v.object({ queue: queueInput, jobId: v.string() }),
 };
 
 export const operationsContract = {

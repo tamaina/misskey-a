@@ -117,6 +117,22 @@ const frozenMetas = {
     }
   }
 } as const;
+
+// Apply only the reviewed strict-object documentation additions to frozen evidence.
+// Every other key and value remains intact; missing paths fail this oracle.
+function reviewedClosedObjects(value: unknown, paths: readonly (readonly string[])[]): unknown {
+	function closeAt(current: unknown, path: readonly string[]): unknown {
+		if (current === null || typeof current !== 'object' || Array.isArray(current)) throw new Error('Expected frozen object at reviewed response path');
+		if (path.length === 0) return { ...current, additionalProperties: false };
+		if (!Object.hasOwn(current, path[0])) throw new Error('Missing reviewed response path: ' + path.join('.'));
+		return Object.fromEntries(Object.entries(current).map(([key, child]) => [key, key === path[0] ? closeAt(child, path.slice(1)) : child]));
+	}
+
+	return paths.reduce<unknown>((current, path) => closeAt(current, path), value);
+}
+
+const captchaClosedPaths = [[], ['properties', 'hcaptcha'], ['properties', 'mcaptcha'], ['properties', 'recaptcha'], ['properties', 'turnstile']] as const;
+
 const transportMeta = { requireCredential: false } as const;
 const samples = [
 	{ name: 'undefined', input: undefined },
@@ -142,7 +158,9 @@ for (const route of Object.keys(definitions) as (keyof typeof definitions)[]) {
 		expect(JSON.parse(JSON.stringify(projection.input))).toEqual({});
 		expect(projection.input).toEqual(row.input);
 		expect(frozenMetas[route]).toEqual(row.meta);
-		expect(convertSchemaToOpenApiSchema(projection.response!, 'res', true)).toEqual(row.openapi.post.responses['200'].content['application/json'].schema);
+		const baselineResponse = row.openapi.post.responses['200'].content['application/json'].schema;
+		expect(convertSchemaToOpenApiSchema(projection.response!, 'res', true)).toEqual(route === 'admin/captcha/current'
+			? reviewedClosedObjects(baselineResponse, captchaClosedPaths) : baselineResponse);
 		expect(definition.contract['~orpc'].route.method).toBe('POST');
 		expect(definition.contract['~orpc'].route.path).toBe('/' + route);
 	});
@@ -192,13 +210,16 @@ test('captcha output reuses the provider tuple and retains every nullable field'
 	for (const provider of supportedCaptchaProviders) {
 		const setting = {
 			provider,
-			hcaptcha: { siteKey: null, secretKey: null, extra: 'retained' },
+			hcaptcha: { siteKey: null, secretKey: null },
 			mcaptcha: { siteKey: null, secretKey: null, instanceUrl: null },
 			recaptcha: { siteKey: null, secretKey: null },
 			turnstile: { siteKey: null, secretKey: null },
-			extra: 'retained',
 		};
 		expect(v.parse(emptyAdminCaptchaCurrentOutput, setting)).toEqual(setting);
+		expect(v.safeParse(emptyAdminCaptchaCurrentOutput, { ...setting, extra: 'rejected' }).success).toBe(false);
+		for (const field of ['hcaptcha', 'mcaptcha', 'recaptcha', 'turnstile'] as const) {
+			expect(v.safeParse(emptyAdminCaptchaCurrentOutput, { ...setting, [field]: { ...setting[field], extra: 'rejected' } }).success).toBe(false);
+		}
 	}
 });
 
@@ -215,7 +236,10 @@ test('the actual OpenAPI writer preserves both complete paths, authentication an
 		const spec = genOpenapiSpec(config);
 		expect(Object.keys(spec.paths).sort()).toEqual(frozen.routes.map(row => '/' + row.route).sort());
 		for (const row of frozen.routes) {
-			expect(JSON.parse(JSON.stringify(spec.paths['/' + row.route]))).toEqual(row.openapi);
+			const expected = row.route === 'admin/captcha/current'
+				? reviewedClosedObjects(row.openapi, captchaClosedPaths.map(path => ['post', 'responses', '200', 'content', 'application/json', 'schema', ...path]))
+				: row.openapi;
+			expect(JSON.parse(JSON.stringify(spec.paths['/' + row.route]))).toEqual(expected);
 			expect(spec.paths['/' + row.route].post.security).toEqual([{ bearerAuth: [] }]);
 			expect(spec.paths['/' + row.route].post).not.toHaveProperty('requestBody');
 		}

@@ -9,9 +9,9 @@ import * as v from 'valibot';
 import type { ApiErrorDefinition } from '../../api/contract/index.js';
 import { misskeyId, objectParams } from '../../api/contract/index.js';
 
-const roomIdInput = v.looseObject({ roomId: misskeyId });
-const messageIdInput = v.looseObject({ messageId: misskeyId });
-const reactionInput = v.looseObject({ messageId: misskeyId, reaction: v.string() });
+const roomIdInput = v.object({ roomId: misskeyId });
+const messageIdInput = v.object({ messageId: misskeyId });
+const reactionInput = v.object({ messageId: misskeyId, reaction: v.string() });
 const voidOutput = v.void();
 
 /** Route-specific errors stay in the portable contract and retain legacy UUIDs. */
@@ -78,7 +78,7 @@ export const chatInputs = {
 	'chat/read-all': objectParams,
 	'chat/rooms/join': roomIdInput,
 	'chat/rooms/leave': roomIdInput,
-	'chat/rooms/mute': v.looseObject({ roomId: misskeyId, mute: v.boolean() }),
+	'chat/rooms/mute': v.object({ roomId: misskeyId, mute: v.boolean() }),
 	'chat/rooms/delete': roomIdInput,
 	'chat/rooms/invitations/ignore': roomIdInput,
 	'chat/messages/react': reactionInput,

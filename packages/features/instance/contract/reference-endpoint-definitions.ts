@@ -11,7 +11,7 @@ import { resultObject } from '../../api/contract/result-object.js';
 import { packedReference } from '../../api/contract/packed-reference.js';
 
 export const referenceAdminMetaInput = jsonObject({});
-export const referenceAdminMetaOutput = resultObject({
+export const referenceAdminMetaOutput = v.strictObject({
 	"cacheRemoteFiles": v.boolean(),
 	"cacheRemoteSensitiveFiles": v.boolean(),
 	"emailRequiredForSignup": v.boolean(),
@@ -93,6 +93,7 @@ export const referenceAdminMetaOutput = resultObject({
 	"enableServerMachineStats": v.boolean(),
 	"enableIdenticonGeneration": v.boolean(),
 	"manifestJsonOverride": v.string(),
+	// Instance policy rows are arbitrary keys merged with the default policy table.
 	"policies": resultObject({}),
 	"enableFanoutTimeline": v.boolean(),
 	"enableFanoutTimelineDbFallback": v.boolean(),
@@ -109,6 +110,8 @@ export const referenceAdminMetaOutput = resultObject({
 	"defaultLightTheme": v.nullable(v.string()),
 	"clientOptions": packedReference("MetaClientOptions", { legacyOutputType: 'omit' }),
 	"description": v.nullable(v.string()),
+	"langs": v.array(v.string()),
+	"logoImageUrl": v.nullable(v.string()),
 	"disableRegistration": v.boolean(),
 	"impressumUrl": v.nullable(v.string()),
 	"maintainerEmail": v.nullable(v.string()),
@@ -135,7 +138,7 @@ export const referenceAdminMetaOutput = resultObject({
 	"urlPreviewSensitiveList": v.array(v.string()),
 	"federation": v.picklist(["all", "specified", "none"]),
 	"federationHosts": v.array(v.string()),
-	"deliverSuspendedSoftware": v.array(resultObject({
+	"deliverSuspendedSoftware": v.array(v.strictObject({
 			"software": v.string(),
 			"versionRange": v.string(),
 		})),

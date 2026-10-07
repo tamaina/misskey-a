@@ -8,10 +8,10 @@ import * as v from 'valibot';
 import { defineEndpointContract } from '../../api/contract/definition.js';
 import { resultObject } from '../../api/contract/result-object.js';
 
-export const inlineAdminRelaysAddInput = v.looseObject({
+export const inlineAdminRelaysAddInput = v.object({
 	"inbox": v.string(),
 });
-export const inlineAdminRelaysAddOutput = resultObject({
+export const inlineAdminRelaysAddOutput = v.strictObject({
 	"id": v.pipe(v.string(), v.metadata({ "format": "id" })),
 	"inbox": v.pipe(v.string(), v.metadata({ "format": "url" })),
 	"status": v.pipe(v.picklist(["requesting", "accepted", "rejected"]), v.metadata({ "default": "requesting" })),
@@ -22,8 +22,8 @@ export const inlineAdminRelaysAddDefinition = defineEndpointContract(
 	inlineAdminRelaysAddOutput,
 );
 
-export const inlineAdminRelaysListInput = v.looseObject({});
-export const inlineAdminRelaysListOutput = v.array(resultObject({
+export const inlineAdminRelaysListInput = v.object({});
+export const inlineAdminRelaysListOutput = v.array(v.strictObject({
 		"id": v.pipe(v.string(), v.metadata({ "format": "id" })),
 		"inbox": v.pipe(v.string(), v.metadata({ "format": "url" })),
 		"status": v.pipe(v.picklist(["requesting", "accepted", "rejected"]), v.metadata({ "default": "requesting" })),
@@ -34,9 +34,10 @@ export const inlineAdminRelaysListDefinition = defineEndpointContract(
 	inlineAdminRelaysListOutput,
 );
 
-export const inlineApGetInput = v.looseObject({
+export const inlineApGetInput = v.object({
 	"uri": v.string(),
 });
+// Resolver output is an open ActivityPub document with extension properties.
 export const inlineApGetOutput = resultObject({});
 export const inlineApGetDefinition = defineEndpointContract(
 	{ method: 'POST', path: '/ap/get', tags: ["federation"] },

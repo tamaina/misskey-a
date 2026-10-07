@@ -8,7 +8,6 @@ import { defineEndpointContract } from '../../api/contract/definition.js';
 import { jsonObject } from '../../api/contract/json-object.js';
 import { jsonExclusiveObject } from '../../api/contract/json-exclusive-object.js';
 import { jsonNumber } from '../../api/contract/json-number.js';
-import { resultObject } from '../../api/contract/result-object.js';
 import { packedReference } from '../../api/contract/packed-reference.js';
 
 const date = jsonObject({
@@ -20,7 +19,7 @@ export const birthdayUsersInput = jsonObject({
 	offset: v.optional(v.pipe(jsonNumber, v.integer()), 0),
 	birthday: jsonExclusiveObject([date, jsonObject({ begin: date, end: date })]),
 });
-export const birthdayUsersOutput = v.array(resultObject({
+export const birthdayUsersOutput = v.array(v.strictObject({
 	id: v.pipe(v.string(), v.metadata({ format: 'misskey:id' })),
 	birthday: v.string(),
 	user: packedReference('UserLite'),

@@ -9,7 +9,7 @@ import { defineEndpointContract } from '../../api/contract/definition.js';
 import { jsonString, misskeyId } from '../../api/contract/index.js';
 import { packedReference } from '../../api/contract/packed-reference.js';
 
-export const packedChatHistoryInput = v.looseObject({
+export const packedChatHistoryInput = v.object({
 	"limit": v.optional(v.pipe(v.pipe(v.number(), v.integer()), v.minValue(1), v.maxValue(100)), 10),
 	"room": v.optional(v.boolean(), false),
 });
@@ -20,7 +20,7 @@ export const packedChatHistoryDefinition = defineEndpointContract(
 	packedChatHistoryOutput,
 );
 
-export const packedChatMessagesCreateToRoomInput = v.looseObject({
+export const packedChatMessagesCreateToRoomInput = v.object({
 	"text": v.exactOptional(v.nullable(jsonString({ "maxLength": 2000 }))),
 	"fileId": v.exactOptional(misskeyId),
 	"toRoomId": misskeyId,
@@ -32,7 +32,7 @@ export const packedChatMessagesCreateToRoomDefinition = defineEndpointContract(
 	packedChatMessagesCreateToRoomOutput,
 );
 
-export const packedChatMessagesCreateToUserInput = v.looseObject({
+export const packedChatMessagesCreateToUserInput = v.object({
 	"text": v.exactOptional(v.nullable(jsonString({ "maxLength": 2000 }))),
 	"fileId": v.exactOptional(misskeyId),
 	"toUserId": misskeyId,
@@ -44,7 +44,7 @@ export const packedChatMessagesCreateToUserDefinition = defineEndpointContract(
 	packedChatMessagesCreateToUserOutput,
 );
 
-export const packedChatMessagesRoomTimelineInput = v.looseObject({
+export const packedChatMessagesRoomTimelineInput = v.object({
 	"limit": v.optional(v.pipe(v.pipe(v.number(), v.integer()), v.minValue(1), v.maxValue(100)), 10),
 	"sinceId": v.exactOptional(misskeyId),
 	"untilId": v.exactOptional(misskeyId),
@@ -59,7 +59,7 @@ export const packedChatMessagesRoomTimelineDefinition = defineEndpointContract(
 	packedChatMessagesRoomTimelineOutput,
 );
 
-export const packedChatMessagesSearchInput = v.looseObject({
+export const packedChatMessagesSearchInput = v.object({
 	"query": jsonString({ "minLength": 1, "maxLength": 256 }),
 	"limit": v.optional(v.pipe(v.pipe(v.number(), v.integer()), v.minValue(1), v.maxValue(100)), 10),
 	"userId": v.exactOptional(v.nullable(misskeyId)),
@@ -72,7 +72,7 @@ export const packedChatMessagesSearchDefinition = defineEndpointContract(
 	packedChatMessagesSearchOutput,
 );
 
-export const packedChatMessagesShowInput = v.looseObject({
+export const packedChatMessagesShowInput = v.object({
 	"messageId": misskeyId,
 });
 export const packedChatMessagesShowOutput = packedReference("ChatMessage");
@@ -82,7 +82,7 @@ export const packedChatMessagesShowDefinition = defineEndpointContract(
 	packedChatMessagesShowOutput,
 );
 
-export const packedChatMessagesUserTimelineInput = v.looseObject({
+export const packedChatMessagesUserTimelineInput = v.object({
 	"limit": v.optional(v.pipe(v.pipe(v.number(), v.integer()), v.minValue(1), v.maxValue(100)), 10),
 	"sinceId": v.exactOptional(misskeyId),
 	"untilId": v.exactOptional(misskeyId),
@@ -97,7 +97,7 @@ export const packedChatMessagesUserTimelineDefinition = defineEndpointContract(
 	packedChatMessagesUserTimelineOutput,
 );
 
-export const packedChatRoomsCreateInput = v.looseObject({
+export const packedChatRoomsCreateInput = v.object({
 	"name": jsonString({ "maxLength": 256 }),
 	"description": v.exactOptional(jsonString({ "maxLength": 1024 })),
 });
@@ -108,7 +108,7 @@ export const packedChatRoomsCreateDefinition = defineEndpointContract(
 	packedChatRoomsCreateOutput,
 );
 
-export const packedChatRoomsInvitationsCreateInput = v.looseObject({
+export const packedChatRoomsInvitationsCreateInput = v.object({
 	"roomId": misskeyId,
 	"userId": misskeyId,
 });
@@ -119,7 +119,7 @@ export const packedChatRoomsInvitationsCreateDefinition = defineEndpointContract
 	packedChatRoomsInvitationsCreateOutput,
 );
 
-export const packedChatRoomsInvitationsInboxInput = v.looseObject({
+export const packedChatRoomsInvitationsInboxInput = v.object({
 	"limit": v.optional(v.pipe(v.pipe(v.number(), v.integer()), v.minValue(1), v.maxValue(100)), 30),
 	"sinceId": v.exactOptional(misskeyId),
 	"untilId": v.exactOptional(misskeyId),
@@ -133,7 +133,7 @@ export const packedChatRoomsInvitationsInboxDefinition = defineEndpointContract(
 	packedChatRoomsInvitationsInboxOutput,
 );
 
-export const packedChatRoomsInvitationsOutboxInput = v.looseObject({
+export const packedChatRoomsInvitationsOutboxInput = v.object({
 	"roomId": misskeyId,
 	"limit": v.optional(v.pipe(v.pipe(v.number(), v.integer()), v.minValue(1), v.maxValue(100)), 30),
 	"sinceId": v.exactOptional(misskeyId),
@@ -148,7 +148,7 @@ export const packedChatRoomsInvitationsOutboxDefinition = defineEndpointContract
 	packedChatRoomsInvitationsOutboxOutput,
 );
 
-export const packedChatRoomsJoiningInput = v.looseObject({
+export const packedChatRoomsJoiningInput = v.object({
 	"limit": v.optional(v.pipe(v.pipe(v.number(), v.integer()), v.minValue(1), v.maxValue(100)), 30),
 	"sinceId": v.exactOptional(misskeyId),
 	"untilId": v.exactOptional(misskeyId),
@@ -162,7 +162,7 @@ export const packedChatRoomsJoiningDefinition = defineEndpointContract(
 	packedChatRoomsJoiningOutput,
 );
 
-export const packedChatRoomsMembersInput = v.looseObject({
+export const packedChatRoomsMembersInput = v.object({
 	"roomId": misskeyId,
 	"limit": v.optional(v.pipe(v.pipe(v.number(), v.integer()), v.minValue(1), v.maxValue(100)), 30),
 	"sinceId": v.exactOptional(misskeyId),
@@ -177,7 +177,7 @@ export const packedChatRoomsMembersDefinition = defineEndpointContract(
 	packedChatRoomsMembersOutput,
 );
 
-export const packedChatRoomsOwnedInput = v.looseObject({
+export const packedChatRoomsOwnedInput = v.object({
 	"limit": v.optional(v.pipe(v.pipe(v.number(), v.integer()), v.minValue(1), v.maxValue(100)), 30),
 	"sinceId": v.exactOptional(misskeyId),
 	"untilId": v.exactOptional(misskeyId),
@@ -191,7 +191,7 @@ export const packedChatRoomsOwnedDefinition = defineEndpointContract(
 	packedChatRoomsOwnedOutput,
 );
 
-export const packedChatRoomsShowInput = v.looseObject({
+export const packedChatRoomsShowInput = v.object({
 	"roomId": misskeyId,
 });
 export const packedChatRoomsShowOutput = packedReference("ChatRoom");
@@ -201,7 +201,7 @@ export const packedChatRoomsShowDefinition = defineEndpointContract(
 	packedChatRoomsShowOutput,
 );
 
-export const packedChatRoomsUpdateInput = v.looseObject({
+export const packedChatRoomsUpdateInput = v.object({
 	"roomId": misskeyId,
 	"name": v.exactOptional(jsonString({ "maxLength": 256 })),
 	"description": v.exactOptional(jsonString({ "maxLength": 1024 })),

@@ -4,12 +4,11 @@
  */
 
 import * as v from 'valibot';
-import { resultObject } from '../../api/contract/result-object.js';
 import {
 	packedUserLiteSchema as __ref_UserLite
 } from '../../users/contract/packed.js';
 
-export const packedFlashSchema = resultObject({
+export const packedFlashSchema = v.strictObject({
 	"id": v.pipe(v.string(), v.metadata({ "format": "id", "example": "xxxxxxxxxx" })),
 	"createdAt": v.pipe(v.string(), v.metadata({ "format": "date-time" })),
 	"updatedAt": v.pipe(v.string(), v.metadata({ "format": "date-time" })),

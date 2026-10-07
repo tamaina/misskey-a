@@ -15,7 +15,7 @@ const webhookEventTypeInput = v.picklist(webhookEventTypes);
 const voidOutput = v.void();
 
 export const webhookInputs = {
-	'i/webhooks/update': v.looseObject({
+	'i/webhooks/update': v.object({
 		webhookId: misskeyId,
 		name: v.exactOptional(jsonString({ minLength: 1, maxLength: 100 })),
 		url: v.exactOptional(jsonString({ minLength: 1, maxLength: 1024 })),
@@ -23,7 +23,7 @@ export const webhookInputs = {
 		on: v.exactOptional(v.array(webhookEventTypeInput)),
 		active: v.exactOptional(v.boolean()),
 	}),
-	'i/webhooks/delete': v.looseObject({
+	'i/webhooks/delete': v.object({
 		webhookId: misskeyId,
 	}),
 };

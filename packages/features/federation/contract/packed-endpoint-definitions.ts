@@ -7,10 +7,9 @@ import type { InferContractRouterInputs, InferContractRouterOutputs } from '@orp
 import * as v from 'valibot';
 import { defineEndpointContract } from '../../api/contract/definition.js';
 import { misskeyId } from '../../api/contract/index.js';
-import { resultObject } from '../../api/contract/result-object.js';
 import { packedReference } from '../../api/contract/packed-reference.js';
 
-export const packedFederationFollowersInput = v.looseObject({
+export const packedFederationFollowersInput = v.object({
 	"host": v.string(),
 	"sinceId": v.exactOptional(misskeyId),
 	"untilId": v.exactOptional(misskeyId),
@@ -25,7 +24,7 @@ export const packedFederationFollowersDefinition = defineEndpointContract(
 	packedFederationFollowersOutput,
 );
 
-export const packedFederationFollowingInput = v.looseObject({
+export const packedFederationFollowingInput = v.object({
 	"host": v.string(),
 	"sinceId": v.exactOptional(misskeyId),
 	"untilId": v.exactOptional(misskeyId),
@@ -40,7 +39,7 @@ export const packedFederationFollowingDefinition = defineEndpointContract(
 	packedFederationFollowingOutput,
 );
 
-export const packedFederationInstancesInput = v.looseObject({
+export const packedFederationInstancesInput = v.object({
 	"host": v.exactOptional(v.pipe(v.nullable(v.string()), v.metadata({ "description": "Omit or use `null` to not filter by host." }))),
 	"blocked": v.exactOptional(v.nullable(v.boolean())),
 	"notResponding": v.exactOptional(v.nullable(v.boolean())),
@@ -60,7 +59,7 @@ export const packedFederationInstancesDefinition = defineEndpointContract(
 	packedFederationInstancesOutput,
 );
 
-export const packedFederationShowInstanceInput = v.looseObject({
+export const packedFederationShowInstanceInput = v.object({
 	"host": v.string(),
 });
 export const packedFederationShowInstanceOutput = v.nullable(packedReference("FederationInstance"));
@@ -70,10 +69,10 @@ export const packedFederationShowInstanceDefinition = defineEndpointContract(
 	packedFederationShowInstanceOutput,
 );
 
-export const packedFederationStatsInput = v.looseObject({
+export const packedFederationStatsInput = v.object({
 	"limit": v.optional(v.pipe(v.pipe(v.number(), v.integer()), v.minValue(1), v.maxValue(100)), 10),
 });
-export const packedFederationStatsOutput = resultObject({
+export const packedFederationStatsOutput = v.strictObject({
 	"topSubInstances": v.array(packedReference("FederationInstance")),
 	"otherFollowersCount": v.number(),
 	"topPubInstances": v.array(packedReference("FederationInstance")),
@@ -85,7 +84,7 @@ export const packedFederationStatsDefinition = defineEndpointContract(
 	packedFederationStatsOutput,
 );
 
-export const packedFederationUsersInput = v.looseObject({
+export const packedFederationUsersInput = v.object({
 	"host": v.string(),
 	"sinceId": v.exactOptional(misskeyId),
 	"untilId": v.exactOptional(misskeyId),

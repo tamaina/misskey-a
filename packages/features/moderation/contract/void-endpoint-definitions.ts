@@ -8,7 +8,7 @@ import * as v from 'valibot';
 import { defineEndpointContract } from '../../api/contract/definition.js';
 import { jsonString, misskeyId } from '../../api/contract/index.js';
 
-export const voidUsersReportAbuseInput = v.looseObject({
+export const voidUsersReportAbuseInput = v.object({
 	"userId": misskeyId,
 	"comment": jsonString({ "minLength": 1, "maxLength": 2048 }),
 });

@@ -9,7 +9,7 @@ import { defineEndpointContract } from '../../api/contract/definition.js';
 import { jsonString, misskeyId } from '../../api/contract/index.js';
 import { packedReference } from '../../api/contract/packed-reference.js';
 
-export const packedAntennasCreateInput = v.looseObject({
+export const packedAntennasCreateInput = v.object({
 	"name": jsonString({ "minLength": 1, "maxLength": 100 }),
 	"src": v.picklist(["home", "all", "users", "list", "users_blacklist"]),
 	"userListId": v.exactOptional(v.nullable(misskeyId)),
@@ -30,7 +30,7 @@ export const packedAntennasCreateDefinition = defineEndpointContract(
 	packedAntennasCreateOutput,
 );
 
-export const packedAntennasListInput = v.looseObject({});
+export const packedAntennasListInput = v.object({});
 export const packedAntennasListOutput = v.array(packedReference("Antenna"));
 export const packedAntennasListDefinition = defineEndpointContract(
 	{ method: 'POST', path: "/antennas/list", tags: ["antennas", "account"] },
@@ -38,7 +38,7 @@ export const packedAntennasListDefinition = defineEndpointContract(
 	packedAntennasListOutput,
 );
 
-export const packedAntennasNotesInput = v.looseObject({
+export const packedAntennasNotesInput = v.object({
 	"antennaId": misskeyId,
 	"limit": v.optional(v.pipe(v.pipe(v.number(), v.integer()), v.minValue(1), v.maxValue(100)), 10),
 	"sinceId": v.exactOptional(misskeyId),
@@ -53,7 +53,7 @@ export const packedAntennasNotesDefinition = defineEndpointContract(
 	packedAntennasNotesOutput,
 );
 
-export const packedAntennasShowInput = v.looseObject({
+export const packedAntennasShowInput = v.object({
 	"antennaId": misskeyId,
 });
 export const packedAntennasShowOutput = packedReference("Antenna");
@@ -63,7 +63,7 @@ export const packedAntennasShowDefinition = defineEndpointContract(
 	packedAntennasShowOutput,
 );
 
-export const packedAntennasUpdateInput = v.looseObject({
+export const packedAntennasUpdateInput = v.object({
 	"antennaId": misskeyId,
 	"name": v.exactOptional(jsonString({ "minLength": 1, "maxLength": 100 })),
 	"src": v.exactOptional(v.picklist(["home", "all", "users", "list", "users_blacklist"])),
@@ -85,7 +85,7 @@ export const packedAntennasUpdateDefinition = defineEndpointContract(
 	packedAntennasUpdateOutput,
 );
 
-export const packedNotesGlobalTimelineInput = v.looseObject({
+export const packedNotesGlobalTimelineInput = v.object({
 	"withFiles": v.optional(v.boolean(), false),
 	"withRenotes": v.optional(v.boolean(), true),
 	"limit": v.optional(v.pipe(v.pipe(v.number(), v.integer()), v.minValue(1), v.maxValue(100)), 10),
@@ -101,7 +101,7 @@ export const packedNotesGlobalTimelineDefinition = defineEndpointContract(
 	packedNotesGlobalTimelineOutput,
 );
 
-export const packedNotesHybridTimelineInput = v.looseObject({
+export const packedNotesHybridTimelineInput = v.object({
 	"limit": v.optional(v.pipe(v.pipe(v.number(), v.integer()), v.minValue(1), v.maxValue(100)), 10),
 	"sinceId": v.exactOptional(misskeyId),
 	"untilId": v.exactOptional(misskeyId),
@@ -122,7 +122,7 @@ export const packedNotesHybridTimelineDefinition = defineEndpointContract(
 	packedNotesHybridTimelineOutput,
 );
 
-export const packedNotesLocalTimelineInput = v.looseObject({
+export const packedNotesLocalTimelineInput = v.object({
 	"withFiles": v.optional(v.boolean(), false),
 	"withRenotes": v.optional(v.boolean(), true),
 	"withReplies": v.optional(v.boolean(), false),
@@ -140,7 +140,7 @@ export const packedNotesLocalTimelineDefinition = defineEndpointContract(
 	packedNotesLocalTimelineOutput,
 );
 
-export const packedNotesMentionsInput = v.looseObject({
+export const packedNotesMentionsInput = v.object({
 	"following": v.optional(v.boolean(), false),
 	"limit": v.optional(v.pipe(v.pipe(v.number(), v.integer()), v.minValue(1), v.maxValue(100)), 10),
 	"sinceId": v.exactOptional(misskeyId),
@@ -156,7 +156,7 @@ export const packedNotesMentionsDefinition = defineEndpointContract(
 	packedNotesMentionsOutput,
 );
 
-export const packedNotesTimelineInput = v.looseObject({
+export const packedNotesTimelineInput = v.object({
 	"limit": v.optional(v.pipe(v.pipe(v.number(), v.integer()), v.minValue(1), v.maxValue(100)), 10),
 	"sinceId": v.exactOptional(misskeyId),
 	"untilId": v.exactOptional(misskeyId),
@@ -176,7 +176,7 @@ export const packedNotesTimelineDefinition = defineEndpointContract(
 	packedNotesTimelineOutput,
 );
 
-export const packedNotesUserListTimelineInput = v.looseObject({
+export const packedNotesUserListTimelineInput = v.object({
 	"listId": misskeyId,
 	"limit": v.optional(v.pipe(v.pipe(v.number(), v.integer()), v.minValue(1), v.maxValue(100)), 10),
 	"sinceId": v.exactOptional(misskeyId),
@@ -197,7 +197,7 @@ export const packedNotesUserListTimelineDefinition = defineEndpointContract(
 	packedNotesUserListTimelineOutput,
 );
 
-export const packedUsersNotesInput = v.looseObject({
+export const packedUsersNotesInput = v.object({
 	"userId": misskeyId,
 	"withReplies": v.optional(v.boolean(), false),
 	"withRenotes": v.optional(v.boolean(), true),

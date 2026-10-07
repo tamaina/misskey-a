@@ -9,7 +9,10 @@ import {
 	packedUserLiteSchema as __ref_UserLite
 } from '../../users/contract/packed.js';
 
-export const packedReversiGameDetailedSchema = resultObject({
+// Reviewed exception: form1/form2 are nullable jsonb `any` copied by the
+// serializer, with no writer proving their shape. Preserve the existing dynamic
+// object contract; the legacy HTTP path also retains raw saved non-object values.
+export const packedReversiGameDetailedSchema = v.strictObject({
 	"id": v.pipe(v.string(), v.metadata({ "format": "id" })),
 	"createdAt": v.pipe(v.string(), v.metadata({ "format": "date-time" })),
 	"startedAt": v.pipe(v.nullable(v.string()), v.metadata({ "format": "date-time" })),
@@ -38,7 +41,7 @@ export const packedReversiGameDetailedSchema = resultObject({
 	"logs": v.array(v.array(v.number())),
 	"map": v.array(v.string())
 });
-export const packedReversiGameLiteSchema = resultObject({
+export const packedReversiGameLiteSchema = v.strictObject({
 	"id": v.pipe(v.string(), v.metadata({ "format": "id" })),
 	"createdAt": v.pipe(v.string(), v.metadata({ "format": "date-time" })),
 	"startedAt": v.pipe(v.nullable(v.string()), v.metadata({ "format": "date-time" })),

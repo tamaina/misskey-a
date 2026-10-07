@@ -8,7 +8,7 @@ import * as v from 'valibot';
 import { defineEndpointContract } from '../../api/contract/definition.js';
 import { jsonString, misskeyId } from '../../api/contract/index.js';
 
-export const voidAdminAdDeleteInput = v.looseObject({
+export const voidAdminAdDeleteInput = v.object({
 	"id": misskeyId,
 });
 export const voidAdminAdDeleteOutput = v.void();
@@ -18,7 +18,7 @@ export const voidAdminAdDeleteDefinition = defineEndpointContract(
 	voidAdminAdDeleteOutput,
 );
 
-export const voidAdminAdUpdateInput = v.looseObject({
+export const voidAdminAdUpdateInput = v.object({
 	"id": misskeyId,
 	"memo": v.exactOptional(v.string()),
 	"url": v.exactOptional(jsonString({ "minLength": 1 })),

@@ -7,7 +7,6 @@ import type { InferContractRouterInputs, InferContractRouterOutputs } from '@orp
 import * as v from 'valibot';
 import { defineEndpointContract } from '../../api/contract/definition.js';
 import { jsonObject } from '../../api/contract/json-object.js';
-import { resultObject } from '../../api/contract/result-object.js';
 import { packedReference } from '../../api/contract/packed-reference.js';
 import { QUEUE_TYPES } from '../../runtime/shared/queue-types.js';
 
@@ -35,11 +34,11 @@ export const referenceAdminQueueJobsDefinition = defineEndpointContract(
 );
 
 export const referenceAdminQueueQueuesInput = jsonObject({});
-export const referenceAdminQueueQueuesOutput = v.array(resultObject({
+export const referenceAdminQueueQueuesOutput = v.array(v.strictObject({
 		"name": v.picklist(QUEUE_TYPES),
 		"counts": v.record(v.string(), v.number()),
 		"isPaused": v.boolean(),
-		"metrics": resultObject({
+		"metrics": v.strictObject({
 			"completed": packedReference("QueueMetrics", { legacyOutputType: 'omit' }),
 			"failed": packedReference("QueueMetrics", { legacyOutputType: 'omit' }),
 		}),
@@ -53,16 +52,16 @@ export const referenceAdminQueueQueuesDefinition = defineEndpointContract(
 export const referenceAdminQueueQueueStatsInput = jsonObject({
 	"queue": v.picklist(QUEUE_TYPES),
 });
-export const referenceAdminQueueQueueStatsOutput = resultObject({
+export const referenceAdminQueueQueueStatsOutput = v.strictObject({
 	"name": v.picklist(QUEUE_TYPES),
 	"qualifiedName": v.string(),
 	"counts": v.record(v.string(), v.number()),
 	"isPaused": v.boolean(),
-	"metrics": resultObject({
+	"metrics": v.strictObject({
 		"completed": packedReference("QueueMetrics", { legacyOutputType: 'omit' }),
 		"failed": packedReference("QueueMetrics", { legacyOutputType: 'omit' }),
 	}),
-	"db": resultObject({
+	"db": v.strictObject({
 		"version": v.string(),
 		"mode": v.picklist(["cluster", "standalone", "sentinel"]),
 		"runId": v.string(),
@@ -70,13 +69,13 @@ export const referenceAdminQueueQueueStatsOutput = resultObject({
 		"port": v.number(),
 		"os": v.string(),
 		"uptime": v.number(),
-		"memory": resultObject({
+		"memory": v.strictObject({
 			"total": v.number(),
 			"used": v.number(),
 			"fragmentationRatio": v.number(),
 			"peak": v.number(),
 		}),
-		"clients": resultObject({
+		"clients": v.strictObject({
 			"blocked": v.number(),
 			"connected": v.number(),
 		}),

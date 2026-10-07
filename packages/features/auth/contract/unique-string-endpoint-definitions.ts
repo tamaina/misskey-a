@@ -6,11 +6,10 @@
 import type { InferContractRouterInputs, InferContractRouterOutputs } from '@orpc/contract';
 import * as v from 'valibot';
 import { defineEndpointContract } from '../../api/contract/definition.js';
-import { resultObject } from '../../api/contract/result-object.js';
 import { packedReference } from '../../api/contract/packed-reference.js';
 import { uniqueStringArray } from '../../api/contract/index.js';
 
-export const uniqueAppCreateInput = v.looseObject({
+export const uniqueAppCreateInput = v.object({
 	"name": v.string(),
 	"description": v.string(),
 	"permission": uniqueStringArray(v.string()),
@@ -23,14 +22,14 @@ export const uniqueAppCreateDefinition = defineEndpointContract(
 	uniqueAppCreateOutput,
 );
 
-export const uniqueMiauthGenTokenInput = v.looseObject({
+export const uniqueMiauthGenTokenInput = v.object({
 	"session": v.nullable(v.string()),
 	"name": v.exactOptional(v.nullable(v.string())),
 	"description": v.exactOptional(v.nullable(v.string())),
 	"iconUrl": v.exactOptional(v.nullable(v.string())),
 	"permission": uniqueStringArray(v.string()),
 });
-export const uniqueMiauthGenTokenOutput = resultObject({
+export const uniqueMiauthGenTokenOutput = v.strictObject({
 	"token": v.string(),
 });
 export const uniqueMiauthGenTokenDefinition = defineEndpointContract(

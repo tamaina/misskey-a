@@ -11,7 +11,7 @@ import { misskeyId } from '../../api/contract/index.js';
 
 // Nullable sort keeps null in its legacy enum because AJV checks enum separately.
 
-export const listingAdminDriveFilesInput = v.looseObject({
+export const listingAdminDriveFilesInput = v.object({
 	"limit": v.optional(v.pipe(v.pipe(v.number(), v.integer()), v.minValue(1), v.maxValue(100)), 10),
 	"sinceId": v.exactOptional(misskeyId),
 	"untilId": v.exactOptional(misskeyId),
@@ -29,7 +29,7 @@ export const listingAdminDriveFilesDefinition = defineEndpointContract(
 	listingAdminDriveFilesOutput,
 );
 
-export const listingDriveFilesInput = v.looseObject({
+export const listingDriveFilesInput = v.object({
 	"limit": v.optional(v.pipe(v.pipe(v.number(), v.integer()), v.minValue(1), v.maxValue(100)), 10),
 	"sinceId": v.exactOptional(misskeyId),
 	"untilId": v.exactOptional(misskeyId),
@@ -46,7 +46,7 @@ export const listingDriveFilesDefinition = defineEndpointContract(
 	listingDriveFilesOutput,
 );
 
-export const listingDriveStreamInput = v.looseObject({
+export const listingDriveStreamInput = v.object({
 	"limit": v.optional(v.pipe(v.pipe(v.number(), v.integer()), v.minValue(1), v.maxValue(100)), 10),
 	"sinceId": v.exactOptional(misskeyId),
 	"untilId": v.exactOptional(misskeyId),

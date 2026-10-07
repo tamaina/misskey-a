@@ -7,12 +7,11 @@ import type { InferContractRouterInputs, InferContractRouterOutputs } from '@orp
 import * as v from 'valibot';
 import { defineEndpointContract } from '../../api/contract/definition.js';
 import { misskeyId } from '../../api/contract/index.js';
-import { resultObject } from '../../api/contract/result-object.js';
 
-export const inlineAdminGetUserIpsInput = v.looseObject({
+export const inlineAdminGetUserIpsInput = v.object({
 	"userId": misskeyId,
 });
-export const inlineAdminGetUserIpsOutput = v.array(resultObject({
+export const inlineAdminGetUserIpsOutput = v.array(v.strictObject({
 		"ip": v.string(),
 		"createdAt": v.pipe(v.string(), v.metadata({ "format": "date-time" })),
 	}));

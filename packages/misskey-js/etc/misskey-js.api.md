@@ -5,21 +5,13 @@
 ```ts
 
 import type { AuthenticationResponseJSON } from '@simplewebauthn/browser';
-import { BaseIssue } from 'valibot';
-import { BaseSchema } from 'valibot';
 import { ContractProcedureBuilderWithInputOutput } from '@orpc/contract';
-import { CustomIssue } from 'valibot';
-import { CustomSchema } from 'valibot';
-import { ErrorMessage } from 'valibot';
 import { EventEmitter } from 'eventemitter3';
-import { GenericSchema } from 'valibot';
 import type { InferContractRouterInputs } from '@orpc/contract';
 import type { InferContractRouterOutputs } from '@orpc/contract';
-import { LooseObjectSchema } from 'valibot';
 import { Options } from 'reconnecting-websocket';
 import type { PublicKeyCredentialCreationOptionsJSON as PublicKeyCredentialCreationOptionsJSON_2 } from '@simplewebauthn/browser';
 import type { PublicKeyCredentialRequestOptionsJSON as PublicKeyCredentialRequestOptionsJSON_2 } from '@simplewebauthn/browser';
-import { RawTransformAction } from 'valibot';
 import _ReconnectingWebSocket from 'reconnecting-websocket';
 import type { RegistrationResponseJSON } from '@simplewebauthn/browser';
 import * as v from 'valibot';

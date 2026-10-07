@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import type { InferContractRouterInputs, InferContractRouterOutputs } from '@orpc/contract';
 import * as v from 'valibot';
 import { defineEndpointContract } from '../../api/contract/definition.js';
 import { jsonString, misskeyId, uniqueStringArray } from '../../api/contract/index.js';
@@ -84,8 +83,11 @@ export const noteDraftEndpointContracts = {
 	'notes/drafts/update': notesDraftsUpdateDefinition.contract,
 } as const;
 
-type Inputs = InferContractRouterInputs<typeof noteDraftEndpointContracts>;
-type Outputs = InferContractRouterOutputs<typeof noteDraftEndpointContracts>;
+// Infer directly from the authoritative schemas; router inference also traverses
+// recursive packed outputs while computing otherwise finite request fields.
 export type NativeNoteDraftEndpoints = {
-	[K in keyof typeof noteDraftEndpointContracts]: { req: Inputs[K]; res: Outputs[K] };
+	[K in keyof typeof noteDraftEndpointDefinitions]: {
+		req: v.InferInput<(typeof noteDraftEndpointDefinitions)[K]['input']>;
+		res: v.InferOutput<(typeof noteDraftEndpointDefinitions)[K]['output']>;
+	};
 };

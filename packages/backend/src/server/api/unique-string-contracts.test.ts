@@ -244,13 +244,15 @@ function canonical(value: unknown): unknown {
 }
 
 for (const fixture of fixtures) {
-	test(fixture.route + ' retains HTTP unique-string input and native validation with finite gallery key selection', () => {
+	test(fixture.route + ' retains HTTP unique-string input and native validation with finite declared-key selection', () => {
 		const definition = definitions[fixture.route];
 		const projection = projectEndpointContract<v.GenericSchema, v.GenericSchema>(definition);
 		expect(canonical(projection.input)).toEqual(canonical(fixture.input));
 		const documentedOutput = projection.response === undefined ? null
 			: convertSchemaToOpenApiSchema(projection.response, 'res', true);
-		expect(documentedOutput).toEqual(fixture.output);
+		// Only the approved finite miauth token envelope adds strict response documentation.
+		expect(documentedOutput).toEqual(fixture.route === 'miauth/gen-token'
+			? { ...fixture.output, additionalProperties: false } : fixture.output);
 		const ajv = new Ajv({ useDefaults: true }).addFormat('misskey:id', misskeyIdPattern);
 		const legacy = ajv.compile(fixture.input);
 		const current = ajv.compile(projection.input);
@@ -265,13 +267,9 @@ for (const fixture of fixtures) {
 			const native = v.safeParse<v.GenericSchema>(definition.input, structuredClone(sample));
 			expect(native.success).toBe(oldValid);
 			if (native.success) {
-				if (fixture.route.startsWith('gallery/posts/')) {
-					if (before === null || typeof before !== 'object') throw new Error('Expected valid gallery object');
-					const declared = new Set(Object.keys(fixture.input.properties));
-					expect(native.output).toEqual(Object.fromEntries(Object.entries(before).filter(([key]) => declared.has(key))));
-				} else {
-					expect(native.output).toEqual(before);
-				}
+				if (before === null || typeof before !== 'object') throw new Error('Expected valid input object');
+				const declared = new Set(Object.keys(fixture.input.properties));
+				expect(native.output).toEqual(Object.fromEntries(Object.entries(before).filter(([key]) => declared.has(key))));
 			}
 		}
 	});

@@ -1,0 +1,122 @@
+/*
+ * SPDX-FileCopyrightText: syuilo and misskey-project
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
+
+import { expect, test } from 'vitest';
+import * as v from 'valibot';
+import { mockDeep } from 'vitest-mock-extended';
+import { packedReversiGameDetailedSchema, packedReversiGameLiteSchema } from '../../contract/packed.js';
+import { packedReversiMatchInput, packedReversiMatchOutput, packedReversiMatchDefinition, packedReversiVerifyOutput, packedBubbleGameRankingOutput } from '../../contract/packed-endpoint-definitions.js';
+import { voidBubbleGameRegisterInput } from '../../contract/void-endpoint-definitions.js';
+import { emptyReversiInvitationsInput } from '../../contract/empty-input-endpoint-definitions.js';
+import { ReversiGameEntityService } from '../../backend/serializers/ReversiGameEntityService.js';
+import { EndpointImplementation as RankingEndpoint } from '../../backend/endpoints/bubble-game/ranking.js';
+import { EndpointImplementation as VerifyEndpoint } from '../../backend/endpoints/reversi/verify.js';
+import type { MiReversiGame } from '../../backend/models/ReversiGame.js';
+import type { MiBubbleGameRecord } from '../../backend/models/BubbleGameRecord.js';
+import type { MiUser } from '@features/users/backend/models/User.js';
+import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
+
+const date = new Date('2026-01-01T00:00:00Z');
+const user = { id: 'user123', name: null, username: 'alice', host: null, avatarUrl: 'https://example/avatar', avatarBlurhash: null, avatarDecorations: [], emojis: {}, onlineStatus: 'unknown' as const };
+
+function checkClosed(schema: v.GenericSchema, value: Record<string, unknown>, required: string, wrong: Record<string, unknown>) {
+	expect(v.safeParse(schema, value).success).toBe(true);
+	expect(v.safeParse(schema, { ...value, future: true }).success).toBe(false);
+	const missing = { ...value };
+	delete missing[required];
+	expect(v.safeParse(schema, missing).success).toBe(false);
+	expect(v.safeParse(schema, { ...value, ...wrong }).success).toBe(false);
+}
+
+function fixture() {
+	const users = mockDeep<ConstructorParameters<typeof ReversiGameEntityService>[1]>();
+	users.pack.mockImplementation(async src => ({ ...user, id: typeof src === 'string' ? src : src.id }));
+	const ids = mockDeep<ConstructorParameters<typeof ReversiGameEntityService>[2]>();
+	ids.parse.mockReturnValue({ date });
+	const service = new ReversiGameEntityService(mockDeep(), users, ids);
+	const game: MiReversiGame = mockDeep<MiReversiGame>({ id: 'game123', startedAt: null, endedAt: null, isStarted: false, isEnded: false, form1: null, form2: null, user1Ready: false, user2Ready: false, user1Id: user.id, user2Id: 'other123', user1: null, user2: null, winnerId: null, surrenderedUserId: null, timeoutUserId: null, black: null, bw: 'invalid', noIrregularRules: false, isLlotheo: false, canPutEverywhere: false, loopedBoard: false, timeLimitForEachTurn: 90, logs: [], map: ['--------'] });
+	return { service, game };
+}
+
+test('actual Reversi serializers retain nullable state, winner, surrender, timeout and bw fallback', async () => {
+	const { service, game } = fixture();
+	const pending = await service.packDetail(game);
+	checkClosed(packedReversiGameDetailedSchema, pending, 'user1Ready', { logs: [['wrong']] });
+	expect(pending.bw).toBe('random');
+	expect(pending.winner).toBeNull();
+	expect(v.parse(packedReversiMatchOutput, undefined)).toBeUndefined();
+	game.startedAt = date; game.endedAt = date; game.isStarted = true; game.isEnded = true;
+	game.winnerId = user.id; game.surrenderedUserId = 'other123'; game.timeoutUserId = 'other123'; game.bw = '1'; game.black = 1;
+	game.logs = [[0, 1, 2], []];
+	game.form1 = { saved: [1, { nested: true }] }; game.form2 = { custom: 'value' };
+	const detailed = await service.packDetail(game);
+	checkClosed(packedReversiGameDetailedSchema, detailed, 'form1', { bw: 'invalid' });
+	expect(v.parse(packedReversiGameDetailedSchema, detailed).form1).toEqual(game.form1);
+	expect(detailed.form1).toEqual(game.form1);
+	expect(detailed.winner?.id).toBe(user.id);
+	const lite = await service.packLite(game);
+	checkClosed(packedReversiGameLiteSchema, lite, 'isStarted', { black: '1' });
+	expect(lite.startedAt).toBe(date.toISOString());
+	expect(lite.timeoutUserId).toBe('other123');
+});
+
+// Establish each saved-form boundary independently; the other form stays null.
+// The retained loose object accepts arrays, while scalar forms fail native parsing.
+// The serializer continues to emit either saved value through the legacy HTTP path.
+test.each([
+	{ field: 'form1' as const, saved: [1, 'saved'], accepted: true },
+	{ field: 'form2' as const, saved: [1, 'saved'], accepted: true },
+	{ field: 'form1' as const, saved: 'saved scalar', accepted: false },
+	{ field: 'form2' as const, saved: 'saved scalar', accepted: false },
+])('retained saved-form boundary for $field=$saved', async ({ field, saved, accepted }) => {
+	const { service, game } = fixture();
+	game[field] = saved;
+	const output = await service.packDetail(game);
+	expect(output[field]).toEqual(saved);
+	expect(output[field === 'form1' ? 'form2' : 'form1']).toBeNull();
+	expect(v.safeParse(packedReversiGameDetailedSchema.entries[field], saved).success).toBe(accepted);
+	expect(v.safeParse(packedReversiGameDetailedSchema, output).success).toBe(accepted);
+});
+
+test.each([false, true])('actual verify handler preserves desynced=%s variants', async desynced => {
+	const { service, game } = fixture();
+	const reversi = mockDeep<ConstructorParameters<typeof VerifyEndpoint>[0]>();
+	reversi.checkCrc.mockResolvedValue(desynced ? game : null);
+	const result = await new VerifyEndpoint(reversi, service).exec({ gameId: game.id, crc32: 'crc' }, null, null);
+	expect(v.safeParse(packedReversiVerifyOutput, result).success).toBe(true);
+	expect(result.desynced).toBe(desynced);
+	checkClosed(packedReversiVerifyOutput, result, 'desynced', { desynced: 7 });
+});
+
+test.each([false, true])('actual ranking handler retains missing packed user=%s and closes wrapper', async missingUser => {
+	const records = mockDeep<ConstructorParameters<typeof RankingEndpoint>[0]>();
+	records.find.mockResolvedValue([mockDeep<MiBubbleGameRecord>({ id: 'record123', score: 9, user: mockDeep<MiUser>({ id: user.id }) })]);
+	const users = mockDeep<ConstructorParameters<typeof RankingEndpoint>[1]>();
+	users.packMany.mockResolvedValue(missingUser ? [] : [user]);
+	const result = await new RankingEndpoint(records, users).exec({ gameMode: 'normal' }, null, null);
+	expect(v.safeParse(packedBubbleGameRankingOutput, result).success).toBe(true);
+	expect(result[0].user).toEqual(missingUser ? undefined : user);
+	expect(Object.hasOwn(result[0], 'user')).toBe(true);
+	for (const value of [{ ...result[0], future: true }, { score: 9 }, { ...result[0], score: '9' }]) expect(v.safeParse(packedBubbleGameRankingOutput, [value]).success).toBe(false);
+});
+
+test('native game defaults and constraints stay separate from open HTTP inputs and unparsed results', async () => {
+	expect(v.parse(packedReversiMatchInput, { future: true })).toEqual({ noIrregularRules: false, multiple: false });
+	for (const value of [{ userId: 7 }, { multiple: null }]) expect(v.safeParse(packedReversiMatchInput, value).success).toBe(false);
+	const register = { score: 0, seed: 'seed', logs: [[1, 2]], gameMode: 'normal', gameVersion: 1 };
+	expect(v.parse(voidBubbleGameRegisterInput, { ...register, future: true })).toEqual(register);
+	for (const value of [{ ...register, score: -1 }, { ...register, logs: [['bad']] }, {}]) expect(v.safeParse(voidBubbleGameRegisterInput, value).success).toBe(false);
+	for (const value of [null, [], 7, 'ignored']) expect(v.safeParse(emptyReversiInvitationsInput, value).success).toBe(true);
+	const { service, game } = fixture();
+	const response = { ...await service.packDetail(game), future: true };
+	const params = { future: true };
+	const projection = projectEndpointContract(packedReversiMatchDefinition);
+	expect(projection.input).not.toHaveProperty('additionalProperties');
+	const endpoint = new ContractEndpoint({}, projection, async ps => { expect(ps).toBe(params); return response; });
+	expect(await endpoint.exec(params, null, null)).toBe(response);
+	expect(params).toEqual({ future: true, noIrregularRules: false, multiple: false });
+	expect(v.safeParse(packedReversiMatchOutput, response).success).toBe(false);
+	await expect(endpoint.exec({ multiple: 7 }, null, null)).rejects.toMatchObject({ code: 'INVALID_PARAM', info: { param: '#/properties/multiple/type' } });
+});

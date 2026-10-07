@@ -7,8 +7,7 @@ import type { InferContractRouterInputs, InferContractRouterOutputs } from '@orp
 import * as v from 'valibot';
 import { defineEndpointContract } from '../../api/contract/definition.js';
 import { jsonObject } from '../../api/contract/json-object.js';
-import { jsonString } from '../../api/contract/index.js';
-import { resultObject } from '../../api/contract/result-object.js';
+import { jsonString, objectParams } from '../../api/contract/index.js';
 
 export const emptyObjectI2faRemoveKeyInput = jsonObject({
 	password: v.string(),
@@ -16,7 +15,8 @@ export const emptyObjectI2faRemoveKeyInput = jsonObject({
 	credentialId: v.string(),
 });
 // The legacy HTTP handler returns {}, although its unchanged metadata documents 204.
-export const emptyObjectI2faRemoveKeyOutput = resultObject({});
+// Public metadata keeps the empty shape object-only in TypeScript; strictObject validates its keys.
+export const emptyObjectI2faRemoveKeyOutput = v.pipe(objectParams, v.strictObject({}), v.metadata<object, Record<string, never>>({}));
 export const emptyObjectI2faRemoveKeyDefinition = defineEndpointContract(
 	{ method: 'POST', path: '/i/2fa/remove-key' },
 	emptyObjectI2faRemoveKeyInput,
@@ -27,7 +27,7 @@ export const emptyObjectI2faUpdateKeyInput = jsonObject({
 	name: jsonString({ minLength: 1, maxLength: 30 }),
 	credentialId: v.string(),
 });
-export const emptyObjectI2faUpdateKeyOutput = resultObject({});
+export const emptyObjectI2faUpdateKeyOutput = v.pipe(objectParams, v.strictObject({}), v.metadata<object, Record<string, never>>({}));
 export const emptyObjectI2faUpdateKeyDefinition = defineEndpointContract(
 	{ method: 'POST', path: '/i/2fa/update-key' },
 	emptyObjectI2faUpdateKeyInput,

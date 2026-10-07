@@ -4,7 +4,6 @@
  */
 
 import * as v from 'valibot';
-import { resultObject } from '../../api/contract/result-object.js';
 import {
 	packedSystemWebhookSchema as __ref_SystemWebhook
 } from '../../integrations/contract/packed.js';
@@ -12,7 +11,7 @@ import {
 	packedUserLiteSchema as __ref_UserLite
 } from '../../users/contract/packed.js';
 
-export const packedAbuseReportNotificationRecipientSchema = resultObject({
+export const packedAbuseReportNotificationRecipientSchema = v.strictObject({
 	"id": v.string(),
 	"isActive": v.boolean(),
 	"updatedAt": v.pipe(v.string(), v.metadata({ "format": "date-time" })),

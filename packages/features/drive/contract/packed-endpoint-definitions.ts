@@ -9,7 +9,7 @@ import { defineEndpointContract } from '../../api/contract/definition.js';
 import { jsonString, misskeyId } from '../../api/contract/index.js';
 import { packedReference } from '../../api/contract/packed-reference.js';
 
-export const packedDriveFilesAttachedChatMessagesInput = v.looseObject({
+export const packedDriveFilesAttachedChatMessagesInput = v.object({
 	"sinceId": v.exactOptional(misskeyId),
 	"untilId": v.exactOptional(misskeyId),
 	"sinceDate": v.exactOptional(v.pipe(v.number(), v.integer())),
@@ -24,7 +24,7 @@ export const packedDriveFilesAttachedChatMessagesDefinition = defineEndpointCont
 	packedDriveFilesAttachedChatMessagesOutput,
 );
 
-export const packedDriveFilesAttachedNotesInput = v.looseObject({
+export const packedDriveFilesAttachedNotesInput = v.object({
 	"sinceId": v.exactOptional(misskeyId),
 	"untilId": v.exactOptional(misskeyId),
 	"sinceDate": v.exactOptional(v.pipe(v.number(), v.integer())),
@@ -39,7 +39,7 @@ export const packedDriveFilesAttachedNotesDefinition = defineEndpointContract(
 	packedDriveFilesAttachedNotesOutput,
 );
 
-export const packedDriveFilesFindInput = v.looseObject({
+export const packedDriveFilesFindInput = v.object({
 	"name": v.string(),
 	"folderId": v.optional(v.nullable(misskeyId), null),
 });
@@ -50,7 +50,7 @@ export const packedDriveFilesFindDefinition = defineEndpointContract(
 	packedDriveFilesFindOutput,
 );
 
-export const packedDriveFilesFindByHashInput = v.looseObject({
+export const packedDriveFilesFindByHashInput = v.object({
 	"md5": v.string(),
 });
 export const packedDriveFilesFindByHashOutput = v.array(packedReference("DriveFile"));
@@ -60,7 +60,7 @@ export const packedDriveFilesFindByHashDefinition = defineEndpointContract(
 	packedDriveFilesFindByHashOutput,
 );
 
-export const packedDriveFilesUpdateInput = v.looseObject({
+export const packedDriveFilesUpdateInput = v.object({
 	"fileId": misskeyId,
 	"folderId": v.exactOptional(v.nullable(misskeyId)),
 	"name": v.exactOptional(v.string()),
@@ -74,7 +74,7 @@ export const packedDriveFilesUpdateDefinition = defineEndpointContract(
 	packedDriveFilesUpdateOutput,
 );
 
-export const packedDriveFoldersInput = v.looseObject({
+export const packedDriveFoldersInput = v.object({
 	"limit": v.optional(v.pipe(v.pipe(v.number(), v.integer()), v.minValue(1), v.maxValue(100)), 10),
 	"sinceId": v.exactOptional(misskeyId),
 	"untilId": v.exactOptional(misskeyId),
@@ -89,7 +89,7 @@ export const packedDriveFoldersDefinition = defineEndpointContract(
 	packedDriveFoldersOutput,
 );
 
-export const packedDriveFoldersCreateInput = v.looseObject({
+export const packedDriveFoldersCreateInput = v.object({
 	"name": v.optional(jsonString({ "maxLength": 200 }), "Untitled"),
 	"parentId": v.exactOptional(v.nullable(misskeyId)),
 });
@@ -100,7 +100,7 @@ export const packedDriveFoldersCreateDefinition = defineEndpointContract(
 	packedDriveFoldersCreateOutput,
 );
 
-export const packedDriveFoldersFindInput = v.looseObject({
+export const packedDriveFoldersFindInput = v.object({
 	"name": v.string(),
 	"parentId": v.optional(v.nullable(misskeyId), null),
 });
@@ -111,7 +111,7 @@ export const packedDriveFoldersFindDefinition = defineEndpointContract(
 	packedDriveFoldersFindOutput,
 );
 
-export const packedDriveFoldersShowInput = v.looseObject({
+export const packedDriveFoldersShowInput = v.object({
 	"folderId": misskeyId,
 });
 export const packedDriveFoldersShowOutput = packedReference("DriveFolder");
@@ -121,7 +121,7 @@ export const packedDriveFoldersShowDefinition = defineEndpointContract(
 	packedDriveFoldersShowOutput,
 );
 
-export const packedDriveFoldersUpdateInput = v.looseObject({
+export const packedDriveFoldersUpdateInput = v.object({
 	"folderId": misskeyId,
 	"name": v.exactOptional(jsonString({ "maxLength": 200 })),
 	"parentId": v.exactOptional(v.nullable(misskeyId)),

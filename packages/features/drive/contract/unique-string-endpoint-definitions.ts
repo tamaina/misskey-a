@@ -8,7 +8,7 @@ import * as v from 'valibot';
 import { defineEndpointContract } from '../../api/contract/definition.js';
 import { misskeyId, uniqueStringArray } from '../../api/contract/index.js';
 
-export const uniqueDriveFilesMoveBulkInput = v.looseObject({
+export const uniqueDriveFilesMoveBulkInput = v.object({
 	"fileIds": v.pipe(uniqueStringArray(misskeyId), v.minLength(1), v.maxLength(100)),
 	"folderId": v.exactOptional(v.nullable(misskeyId)),
 });

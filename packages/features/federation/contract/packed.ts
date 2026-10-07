@@ -4,9 +4,8 @@
  */
 
 import * as v from 'valibot';
-import { resultObject } from '../../api/contract/result-object.js';
 
-export const packedFederationInstanceSchema = resultObject({
+export const packedFederationInstanceSchema = v.strictObject({
 	"id": v.pipe(v.string(), v.metadata({ "format": "id" })),
 	"firstRetrievedAt": v.pipe(v.string(), v.metadata({ "format": "date-time" })),
 	"host": v.pipe(v.string(), v.metadata({ "example": "misskey.example.com" })),

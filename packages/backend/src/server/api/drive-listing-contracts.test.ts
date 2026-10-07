@@ -44,7 +44,7 @@ test('drive listings retain native defaults and open AJV input objects', async (
 			return response;
 		});
 		expect(await endpoint.exec(params, null, null)).toBe(response);
-		expect(v.parse(definition.input, { future: { preserved: true } })).toEqual({ future: { preserved: true }, ...expected[index] });
+		expect(v.parse(definition.input, { future: { preserved: true } })).toEqual(expected[index]);
 	}
 });
 
@@ -112,4 +112,16 @@ test('drive outputs retain canonical packed types, references and payload identi
 	const response: Packed<'DriveFile'>[] = [];
 	const endpoint = new ContractEndpoint({}, projection, async () => response);
 	expect(await endpoint.exec({}, null, null)).toBe(response);
+});
+
+test('drive native finite inputs select declared keys without mutating caller extras', () => {
+	for (const definition of definitions) {
+		const input = { limit: 20, future: { retained: true } };
+		const before = structuredClone(input);
+		const parsed = v.parse(definition.input, input);
+		expect(parsed.limit).toBe(20);
+		expect(parsed).not.toHaveProperty('future');
+		expect(input).toEqual(before);
+		for (const invalid of [{ limit: '20' }, { limit: 0 }, { sinceId: 'bad-id' }]) expect(v.safeParse(definition.input, invalid).success).toBe(false);
+	}
 });

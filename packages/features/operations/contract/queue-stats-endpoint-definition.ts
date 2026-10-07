@@ -3,14 +3,14 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import * as v from 'valibot';
 import type { InferContractRouterInputs, InferContractRouterOutputs } from '@orpc/contract';
 import { defineEndpointContract } from '../../api/contract/definition.js';
 import { jsonObject } from '../../api/contract/json-object.js';
-import { resultObject } from '../../api/contract/result-object.js';
 import { packedReference } from '../../api/contract/packed-reference.js';
 
 export const queueStatsInput = jsonObject({});
-export const queueStatsOutput = resultObject({
+export const queueStatsOutput = v.strictObject({
 	deliver: packedReference('QueueCount', { legacyOutputType: 'omit' }),
 	inbox: packedReference('QueueCount', { legacyOutputType: 'omit' }),
 	db: packedReference('QueueCount', { legacyOutputType: 'omit' }),

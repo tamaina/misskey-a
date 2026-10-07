@@ -75,7 +75,7 @@ for (const row of rows) {
 		expect(canonical(projection.input)).toEqual(row.input);
 		expect(canonical(row.route === 'i/2fa/remove-key' ? removeMeta : updateMeta)).toEqual(row.meta);
 		expect(Object.hasOwn(row.route === 'i/2fa/remove-key' ? removeMeta : updateMeta, 'res')).toBe(false);
-		expect(projection.response).toEqual({ type: 'object' });
+		expect(projection.response).toEqual({ type: 'object', additionalProperties: false });
 	});
 }
 
@@ -228,6 +228,7 @@ test('native output inference is object while no-res metadata stays independent'
 	expectTypeOf<object>().toMatchTypeOf<v.InferOutput<typeof emptyObjectI2faRemoveKeyOutput>>();
 	expectTypeOf<object>().toMatchTypeOf<v.InferOutput<typeof emptyObjectI2faUpdateKeyOutput>>();
 	for (const output of [emptyObjectI2faRemoveKeyOutput, emptyObjectI2faUpdateKeyOutput]) {
-		expect(v.safeParse(output, {}).success).toBe(true); expect(v.safeParse(output, undefined).success).toBe(false);
+		expect(v.safeParse(output, {}).success).toBe(true);
+		for (const invalid of [undefined, null, [], 1, 'primitive', { future: true }]) expect(v.safeParse(output, invalid).success).toBe(false);
 	}
 });

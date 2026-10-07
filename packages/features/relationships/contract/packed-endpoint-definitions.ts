@@ -7,10 +7,9 @@ import type { InferContractRouterInputs, InferContractRouterOutputs } from '@orp
 import * as v from 'valibot';
 import { defineEndpointContract } from '../../api/contract/definition.js';
 import { jsonString, misskeyId } from '../../api/contract/index.js';
-import { resultObject } from '../../api/contract/result-object.js';
 import { packedReference } from '../../api/contract/packed-reference.js';
 
-export const packedBlockingCreateInput = v.looseObject({
+export const packedBlockingCreateInput = v.object({
 	"userId": misskeyId,
 });
 export const packedBlockingCreateOutput = packedReference("UserDetailedNotMe");
@@ -20,7 +19,7 @@ export const packedBlockingCreateDefinition = defineEndpointContract(
 	packedBlockingCreateOutput,
 );
 
-export const packedBlockingDeleteInput = v.looseObject({
+export const packedBlockingDeleteInput = v.object({
 	"userId": misskeyId,
 });
 export const packedBlockingDeleteOutput = packedReference("UserDetailedNotMe");
@@ -30,7 +29,7 @@ export const packedBlockingDeleteDefinition = defineEndpointContract(
 	packedBlockingDeleteOutput,
 );
 
-export const packedBlockingListInput = v.looseObject({
+export const packedBlockingListInput = v.object({
 	"limit": v.optional(v.pipe(v.pipe(v.number(), v.integer()), v.minValue(1), v.maxValue(100)), 30),
 	"sinceId": v.exactOptional(misskeyId),
 	"untilId": v.exactOptional(misskeyId),
@@ -44,7 +43,7 @@ export const packedBlockingListDefinition = defineEndpointContract(
 	packedBlockingListOutput,
 );
 
-export const packedFollowingCreateInput = v.looseObject({
+export const packedFollowingCreateInput = v.object({
 	"userId": misskeyId,
 	"withReplies": v.exactOptional(v.boolean()),
 });
@@ -55,7 +54,7 @@ export const packedFollowingCreateDefinition = defineEndpointContract(
 	packedFollowingCreateOutput,
 );
 
-export const packedFollowingDeleteInput = v.looseObject({
+export const packedFollowingDeleteInput = v.object({
 	"userId": misskeyId,
 });
 export const packedFollowingDeleteOutput = packedReference("UserLite");
@@ -65,7 +64,7 @@ export const packedFollowingDeleteDefinition = defineEndpointContract(
 	packedFollowingDeleteOutput,
 );
 
-export const packedFollowingInvalidateInput = v.looseObject({
+export const packedFollowingInvalidateInput = v.object({
 	"userId": misskeyId,
 });
 export const packedFollowingInvalidateOutput = packedReference("UserLite");
@@ -75,7 +74,7 @@ export const packedFollowingInvalidateDefinition = defineEndpointContract(
 	packedFollowingInvalidateOutput,
 );
 
-export const packedFollowingListInput = v.looseObject({
+export const packedFollowingListInput = v.object({
 	"notification": v.optional(v.boolean(), false),
 	"sinceId": v.exactOptional(misskeyId),
 	"untilId": v.exactOptional(misskeyId),
@@ -90,7 +89,7 @@ export const packedFollowingListDefinition = defineEndpointContract(
 	packedFollowingListOutput,
 );
 
-export const packedFollowingRequestsCancelInput = v.looseObject({
+export const packedFollowingRequestsCancelInput = v.object({
 	"userId": misskeyId,
 });
 export const packedFollowingRequestsCancelOutput = packedReference("UserLite");
@@ -100,14 +99,14 @@ export const packedFollowingRequestsCancelDefinition = defineEndpointContract(
 	packedFollowingRequestsCancelOutput,
 );
 
-export const packedFollowingRequestsListInput = v.looseObject({
+export const packedFollowingRequestsListInput = v.object({
 	"sinceId": v.exactOptional(misskeyId),
 	"untilId": v.exactOptional(misskeyId),
 	"sinceDate": v.exactOptional(v.pipe(v.number(), v.integer())),
 	"untilDate": v.exactOptional(v.pipe(v.number(), v.integer())),
 	"limit": v.optional(v.pipe(v.pipe(v.number(), v.integer()), v.minValue(1), v.maxValue(100)), 10),
 });
-export const packedFollowingRequestsListOutput = v.array(resultObject({
+export const packedFollowingRequestsListOutput = v.array(v.strictObject({
 		"id": v.pipe(v.string(), v.metadata({ "format": "id" })),
 		"follower": packedReference("UserLite"),
 		"followee": packedReference("UserLite"),
@@ -118,14 +117,14 @@ export const packedFollowingRequestsListDefinition = defineEndpointContract(
 	packedFollowingRequestsListOutput,
 );
 
-export const packedFollowingRequestsSentInput = v.looseObject({
+export const packedFollowingRequestsSentInput = v.object({
 	"sinceId": v.exactOptional(misskeyId),
 	"untilId": v.exactOptional(misskeyId),
 	"sinceDate": v.exactOptional(v.pipe(v.number(), v.integer())),
 	"untilDate": v.exactOptional(v.pipe(v.number(), v.integer())),
 	"limit": v.optional(v.pipe(v.pipe(v.number(), v.integer()), v.minValue(1), v.maxValue(100)), 10),
 });
-export const packedFollowingRequestsSentOutput = v.array(resultObject({
+export const packedFollowingRequestsSentOutput = v.array(v.strictObject({
 		"id": v.pipe(v.string(), v.metadata({ "format": "id" })),
 		"follower": packedReference("UserLite"),
 		"followee": packedReference("UserLite"),
@@ -136,7 +135,7 @@ export const packedFollowingRequestsSentDefinition = defineEndpointContract(
 	packedFollowingRequestsSentOutput,
 );
 
-export const packedFollowingUpdateInput = v.looseObject({
+export const packedFollowingUpdateInput = v.object({
 	"userId": misskeyId,
 	"notify": v.exactOptional(v.picklist(["normal", "none"])),
 	"withReplies": v.exactOptional(v.boolean()),
@@ -148,7 +147,7 @@ export const packedFollowingUpdateDefinition = defineEndpointContract(
 	packedFollowingUpdateOutput,
 );
 
-export const packedMuteListInput = v.looseObject({
+export const packedMuteListInput = v.object({
 	"limit": v.optional(v.pipe(v.pipe(v.number(), v.integer()), v.minValue(1), v.maxValue(100)), 30),
 	"sinceId": v.exactOptional(misskeyId),
 	"untilId": v.exactOptional(misskeyId),
@@ -162,7 +161,7 @@ export const packedMuteListDefinition = defineEndpointContract(
 	packedMuteListOutput,
 );
 
-export const packedRenoteMuteListInput = v.looseObject({
+export const packedRenoteMuteListInput = v.object({
 	"limit": v.optional(v.pipe(v.pipe(v.number(), v.integer()), v.minValue(1), v.maxValue(100)), 30),
 	"sinceId": v.exactOptional(misskeyId),
 	"untilId": v.exactOptional(misskeyId),
@@ -176,7 +175,7 @@ export const packedRenoteMuteListDefinition = defineEndpointContract(
 	packedRenoteMuteListOutput,
 );
 
-export const packedUsersListsCreateInput = v.looseObject({
+export const packedUsersListsCreateInput = v.object({
 	"name": jsonString({ "minLength": 1, "maxLength": 100 }),
 });
 export const packedUsersListsCreateOutput = packedReference("UserList");
@@ -186,7 +185,7 @@ export const packedUsersListsCreateDefinition = defineEndpointContract(
 	packedUsersListsCreateOutput,
 );
 
-export const packedUsersListsCreateFromPublicInput = v.looseObject({
+export const packedUsersListsCreateFromPublicInput = v.object({
 	"name": jsonString({ "minLength": 1, "maxLength": 100 }),
 	"listId": misskeyId,
 });
@@ -197,7 +196,7 @@ export const packedUsersListsCreateFromPublicDefinition = defineEndpointContract
 	packedUsersListsCreateFromPublicOutput,
 );
 
-export const packedUsersListsGetMembershipsInput = v.looseObject({
+export const packedUsersListsGetMembershipsInput = v.object({
 	"listId": misskeyId,
 	"forPublic": v.optional(v.boolean(), false),
 	"limit": v.optional(v.pipe(v.pipe(v.number(), v.integer()), v.minValue(1), v.maxValue(100)), 30),
@@ -206,7 +205,7 @@ export const packedUsersListsGetMembershipsInput = v.looseObject({
 	"sinceDate": v.exactOptional(v.pipe(v.number(), v.integer())),
 	"untilDate": v.exactOptional(v.pipe(v.number(), v.integer())),
 });
-export const packedUsersListsGetMembershipsOutput = v.array(resultObject({
+export const packedUsersListsGetMembershipsOutput = v.array(v.strictObject({
 		"id": v.pipe(v.string(), v.metadata({ "format": "misskey:id" })),
 		"createdAt": v.pipe(v.string(), v.metadata({ "format": "date-time" })),
 		"userId": v.pipe(v.string(), v.metadata({ "format": "misskey:id" })),
@@ -219,7 +218,7 @@ export const packedUsersListsGetMembershipsDefinition = defineEndpointContract(
 	packedUsersListsGetMembershipsOutput,
 );
 
-export const packedUsersListsListInput = v.looseObject({
+export const packedUsersListsListInput = v.object({
 	"userId": v.exactOptional(misskeyId),
 });
 export const packedUsersListsListOutput = v.array(packedReference("UserList"));
@@ -229,7 +228,7 @@ export const packedUsersListsListDefinition = defineEndpointContract(
 	packedUsersListsListOutput,
 );
 
-export const packedUsersListsUpdateInput = v.looseObject({
+export const packedUsersListsUpdateInput = v.object({
 	"listId": misskeyId,
 	"name": v.exactOptional(jsonString({ "minLength": 1, "maxLength": 100 })),
 	"isPublic": v.exactOptional(v.boolean()),

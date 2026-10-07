@@ -9,18 +9,18 @@ import type { InferContractRouterInputs, InferContractRouterOutputs } from '@orp
 import { objectParams } from '../../api/contract/index.js';
 export { objectParams };
 
-export const pingResult = v.object({ pong: v.number() });
-export const onlineUsersCountResult = v.object({ count: v.number() });
-export const serverInfoResult = v.object({
+export const pingResult = v.strictObject({ pong: v.number() });
+export const onlineUsersCountResult = v.strictObject({ count: v.number() });
+export const serverInfoResult = v.strictObject({
 	machine: v.string(),
-	cpu: v.object({ model: v.string(), cores: v.number() }),
-	mem: v.object({ total: v.number() }),
-	fs: v.object({ total: v.number(), used: v.number() }),
+	cpu: v.strictObject({ model: v.string(), cores: v.number() }),
+	mem: v.strictObject({ total: v.number() }),
+	fs: v.strictObject({ total: v.number(), used: v.number() }),
 });
 export const endpointsResult = v.array(v.string());
 export const endpointInput = v.object({ endpoint: v.string() });
-export const endpointResult = v.nullable(v.object({
-	params: v.array(v.object({
+export const endpointResult = v.nullable(v.strictObject({
+	params: v.array(v.strictObject({
 		name: v.string(),
 		type: v.string(),
 	})),

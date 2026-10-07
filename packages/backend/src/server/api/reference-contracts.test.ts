@@ -221,6 +221,64 @@ function canonical(value: unknown): unknown {
 	return value;
 }
 
+function objectAt(value: unknown, ...path: string[]): Record<string, unknown> {
+	for (const key of path) {
+		if (typeof value !== 'object' || value === null || Array.isArray(value) || !(key in value)) throw new Error(`Missing expected schema path: ${path.join('.')}`);
+		value = Reflect.get(value, key);
+	}
+	if (typeof value !== 'object' || value === null || Array.isArray(value)) throw new Error(`Expected schema object: ${path.join('.')}`);
+	return Object.fromEntries(Object.entries(value));
+}
+
+/** Apply only the reviewed output deltas to an independent copy of the frozen path. */
+function reviewedPublishedPath(original: (typeof baseline.routes)[number]) {
+	const expected = structuredClone(original.openapi);
+	// Traverse the copy itself: these changes never mutate or normalize the frozen fixture.
+	const response = expected.post.responses['200'].content['application/json'];
+	const schema: Record<string, unknown> = structuredClone(response.schema);
+	const properties = Object.hasOwn(schema, 'properties') ? objectAt(schema, 'properties') : {};
+	if (original.route === 'admin/meta') {
+		schema.additionalProperties = false;
+		properties.langs = { type: 'array', items: { type: 'string' } };
+		properties.logoImageUrl = { type: ['string', 'null'] };
+		const required = schema.required;
+		if (!Array.isArray(required) || !required.includes('description')) throw new Error('Expected frozen admin metadata required fields');
+		required.splice(required.indexOf('description') + 1, 0, 'langs', 'logoImageUrl');
+		const suspended = objectAt(properties, 'deliverSuspendedSoftware');
+		const item = objectAt(suspended, 'items');
+		item.additionalProperties = false;
+		suspended.items = item;
+		properties.deliverSuspendedSoftware = suspended;
+	} else if (original.route === 'admin/queue/queues') {
+		const item = objectAt(schema, 'items');
+		item.additionalProperties = false;
+		const itemProperties = objectAt(item, 'properties');
+		const metrics = objectAt(itemProperties, 'metrics');
+		metrics.additionalProperties = false;
+		itemProperties.metrics = metrics;
+		item.properties = itemProperties;
+		schema.items = item;
+	} else if (original.route === 'admin/queue/queue-stats') {
+		schema.additionalProperties = false;
+		const metrics = objectAt(properties, 'metrics');
+		metrics.additionalProperties = false;
+		properties.metrics = metrics;
+		const db = objectAt(properties, 'db');
+		db.additionalProperties = false;
+		const dbProperties = objectAt(db, 'properties');
+		for (const key of ['memory', 'clients']) {
+			const child = objectAt(dbProperties, key);
+			child.additionalProperties = false;
+			dbProperties[key] = child;
+		}
+		db.properties = dbProperties;
+		properties.db = db;
+	}
+	// Array-root properties must remain absent; all existing fields stay in the copied schema.
+	if (Object.hasOwn(schema, 'properties')) schema.properties = properties;
+	return { ...expected, post: { ...expected.post, responses: { ...expected.post.responses, '200': { ...expected.post.responses['200'], content: { ...expected.post.responses['200'].content, 'application/json': { ...response, schema } } } } } };
+}
+
 function references(value: unknown, at = 'res'): { path: string; ref: unknown; hasType: boolean }[] {
 	if (value === null || typeof value !== 'object') return [];
 	const found = 'ref' in value ? [{ path: at, ref: value.ref, hasType: Object.hasOwn(value, 'type') }] : [];
@@ -285,14 +343,14 @@ test.each(packedInputs)('omitted type references are rejected as endpoint inputs
 		.toThrow('Legacy input contracts cannot use packed references');
 });
 
-describe('clean eight route projections', () => {
+describe('eight route projections with explicit reviewed output deltas', () => {
 	for (const [route, definition] of Object.entries(definitions)) {
 		test(route, () => {
 			const original = baseline.routes.find(row => row.route === route)!;
 			const projected = projectEndpointContract<v.GenericSchema, v.GenericSchema>(definition);
 			expect(canonical(projected.input)).toEqual(canonical(original.input));
 			expect(convertSchemaToOpenApiSchema(projected.response!, 'res', true))
-				.toEqual(original.openapi.post.responses['200'].content['application/json'].schema);
+				.toEqual(reviewedPublishedPath(original).post.responses['200'].content['application/json'].schema);
 			expect(references(projected.response)).toEqual(references(original.output));
 		});
 	}
@@ -331,7 +389,7 @@ test('new bridge retains actual legacy AJV defaults, unknown fields and errors',
 	}
 });
 
-test('the actual writer preserves all eight complete published OpenAPI paths', () => {
+test('the actual writer preserves eight complete published paths with only reviewed output deltas', () => {
 	const saved = documentedEndpoints.slice();
 	try {
 		documentedEndpoints.splice(0, documentedEndpoints.length, ...Object.entries(definitions).map(([route, definition]) => {
@@ -344,7 +402,7 @@ test('the actual writer preserves all eight complete published OpenAPI paths', (
 		const spec = genOpenapiSpec(config);
 		expect(Object.keys(spec.paths).sort()).toEqual(baseline.routes.map(row => '/' + row.route).sort());
 		for (const original of baseline.routes) {
-			expect(JSON.parse(JSON.stringify(spec.paths['/' + original.route]))).toEqual(original.openapi);
+			expect(JSON.parse(JSON.stringify(spec.paths['/' + original.route]))).toEqual(reviewedPublishedPath(original));
 		}
 		expect(genOpenapiSpec(config).paths).toEqual(spec.paths);
 	} finally {
@@ -391,4 +449,27 @@ test('every migrated request preserves native/AJV object, array and unknown-own-
 			}
 		}
 	}
+});
+
+test('finite native queue outputs reject extensions while HTTP returns their original identity', async () => {
+	const metric = { meta: { count: 0, prevTS: 0, prevCount: 0 }, data: [], count: 0 };
+	const value = [{ name: 'deliver' as const, counts: { waiting: 0, prioritized: 0, 'waiting-children': 0 }, isPaused: false, metrics: { completed: metric, failed: metric } }];
+	const definition = operationDefinitions['admin/queue/queues'];
+	expect(v.parse(definition.output, value)).toEqual(value);
+	const extended = [{ ...value[0], retainedExtension: true }];
+	expect(v.safeParse(definition.output, extended).success).toBe(false);
+	expect(v.safeParse(definition.output, [{ ...value[0], metrics: { ...value[0].metrics, retainedExtension: true } }]).success).toBe(false);
+	const request = { future: true };
+	const endpoint = new ContractEndpoint({}, projectEndpointContract(definition), async params => { expect(params).toBe(request); return extended; });
+	expect(await endpoint.exec(request, null, null)).toBe(extended);
+	expect(request).toEqual({ future: true });
+});
+
+test('published Bull default count component retains five required fields and the two reviewed optional states', () => {
+	const spec = genOpenapiSpec({ version: 'reference-contract-test', apiUrl: 'https://reference.test/api' } as Config);
+	expect(spec.components.schemas.QueueCount).toEqual({
+		type: 'object', additionalProperties: false,
+		properties: { waiting: { type: 'number' }, active: { type: 'number' }, completed: { type: 'number' }, failed: { type: 'number' }, delayed: { type: 'number' }, prioritized: { type: 'number' }, 'waiting-children': { type: 'number' } },
+		required: ['waiting', 'active', 'completed', 'failed', 'delayed'],
+	});
 });

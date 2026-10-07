@@ -7,7 +7,7 @@ import type { InferContractRouterInputs, InferContractRouterOutputs } from '@orp
 import * as v from 'valibot';
 import { defineEndpointContract } from '../../api/contract/definition.js';
 
-export const voidResetDbInput = v.looseObject({});
+export const voidResetDbInput = v.object({});
 export const voidResetDbOutput = v.void();
 export const voidResetDbDefinition = defineEndpointContract(
 	{ method: 'POST', path: "/reset-db", tags: ["non-productive"] },

@@ -6,26 +6,26 @@
 import type { InferContractRouterInputs, InferContractRouterOutputs } from '@orpc/contract';
 import * as v from 'valibot';
 import { defineEndpointContract } from '../../api/contract/definition.js';
-import { resultObject } from '../../api/contract/result-object.js';
 
-export const inlineAdminServerInfoInput = v.looseObject({});
-export const inlineAdminServerInfoOutput = resultObject({
+export const inlineAdminServerInfoInput = v.object({});
+export const inlineAdminServerInfoOutput = v.strictObject({
 	"machine": v.string(),
 	"os": v.pipe(v.string(), v.metadata({ "example": "linux" })),
 	"node": v.string(),
 	"psql": v.string(),
-	"cpu": resultObject({
+	"redis": v.optional(v.string()),
+	"cpu": v.strictObject({
 		"model": v.string(),
 		"cores": v.number(),
 	}),
-	"mem": resultObject({
+	"mem": v.strictObject({
 		"total": v.pipe(v.number(), v.metadata({ "format": "bytes" })),
 	}),
-	"fs": resultObject({
+	"fs": v.strictObject({
 		"total": v.pipe(v.number(), v.metadata({ "format": "bytes" })),
 		"used": v.pipe(v.number(), v.metadata({ "format": "bytes" })),
 	}),
-	"net": resultObject({
+	"net": v.strictObject({
 		"interface": v.pipe(v.string(), v.metadata({ "example": "eth0" })),
 	}),
 });

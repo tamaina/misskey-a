@@ -4,9 +4,10 @@
  */
 
 import type * as v from 'valibot';
+import type { InferContractRouterInputs, InferContractRouterOutputs } from '@orpc/contract';
 import type { ContractEndpoints } from '../../../../misskey-js/src/contract.types.js';
 import type { Packed } from '@features/index/contract/packed.js';
-import type { NativeNoteDraftEndpoints, notesDraftsCreateInput, notesDraftsUpdateInput } from '@features/notes/contract/draft-endpoint-definitions.js';
+import type { NativeNoteDraftEndpoints, noteDraftEndpointDefinitions, notesDraftsCreateDefinition, notesDraftsUpdateDefinition, notesDraftsCreateInput, notesDraftsUpdateInput } from '@features/notes/contract/draft-endpoint-definitions.js';
 
 type Equal<A, B> = (<T>() => T extends A ? 1 : 2) extends (<T>() => T extends B ? 1 : 2) ? true : false;
 type Assert<T extends true> = T;
@@ -18,6 +19,11 @@ type UpdateHandler = v.InferOutput<typeof notesDraftsUpdateInput>;
 type Reaction = null | 'likeOnly' | 'likeOnlyForRemote' | 'nonSensitiveOnly' | 'nonSensitiveOnlyForLocalLikeOnlyForRemote';
 type Visibility = 'public' | 'home' | 'followers' | 'specified';
 
+type NativeKeys = Assert<Equal<keyof NativeNoteDraftEndpoints, keyof typeof noteDraftEndpointDefinitions>>;
+type CreateContractInput = Assert<Equal<NativeNoteDraftEndpoints['notes/drafts/create']['req'], InferContractRouterInputs<typeof notesDraftsCreateDefinition.contract>>>;
+type UpdateContractInput = Assert<Equal<NativeNoteDraftEndpoints['notes/drafts/update']['req'], InferContractRouterInputs<typeof notesDraftsUpdateDefinition.contract>>>;
+type CreateContractOutput = Assert<Equal<NativeNoteDraftEndpoints['notes/drafts/create']['res'], InferContractRouterOutputs<typeof notesDraftsCreateDefinition.contract>>>;
+type UpdateContractOutput = Assert<Equal<NativeNoteDraftEndpoints['notes/drafts/update']['res'], InferContractRouterOutputs<typeof notesDraftsUpdateDefinition.contract>>>;
 type CreateResponse = Assert<Equal<Flatten<ContractEndpoints['notes/drafts/create']['res']>, { createdDraft: Packed<'NoteDraft'> }>>;
 type UpdateResponse = Assert<Equal<Flatten<ContractEndpoints['notes/drafts/update']['res']>, { updatedDraft: Packed<'NoteDraft'> }>>;
 type NativeResponse = Assert<Equal<Flatten<NativeNoteDraftEndpoints['notes/drafts/create']['res']>, { createdDraft: Packed<'NoteDraft'> }>>;
@@ -60,4 +66,4 @@ const invalidSchedule: CreateRequest = { scheduledAt: '123' };
 // @ts-expect-error The SDK request omits the transport's unknown-key index signature.
 const extraRequestField: CreateRequest = { future: true };
 void create; void update; void nullable; void emptyPoll; void duplicatesRemainStrings; void missingDraftId; void nullDraftId; void missingChoices; void invalidVisibility; void invalidReaction; void invalidSchedule; void extraRequestField;
-export type Cases = [CreateResponse, UpdateResponse, NativeResponse, RequestFields, UpdateFields, CreateDefaultInput, CreateDefaultOutput, CreateBooleanInput, CreateBooleanOutput, CreateSchedulingOutput, CreateReactionInput, CreateReactionOutput, UpdateVisibility, UpdateReaction, DraftId, NullableText, NullableSchedule, PollChoices, PollMultiple, PollExpiry, OptionalFileIds];
+export type Cases = [NativeKeys, CreateContractInput, UpdateContractInput, CreateContractOutput, UpdateContractOutput, CreateResponse, UpdateResponse, NativeResponse, RequestFields, UpdateFields, CreateDefaultInput, CreateDefaultOutput, CreateBooleanInput, CreateBooleanOutput, CreateSchedulingOutput, CreateReactionInput, CreateReactionOutput, UpdateVisibility, UpdateReaction, DraftId, NullableText, NullableSchedule, PollChoices, PollMultiple, PollExpiry, OptionalFileIds];

@@ -8,17 +8,16 @@ import * as v from 'valibot';
 import { defineEndpointContract } from '../../api/contract/definition.js';
 import { jsonObject } from '../../api/contract/json-object.js';
 import { packedReference } from '../../api/contract/packed-reference.js';
-import { resultObject } from '../../api/contract/result-object.js';
 
 export const compositionApShowInput = jsonObject({
 	uri: v.string(),
 });
 export const compositionApShowOutput = v.variant('type', [
-	resultObject({
+	v.strictObject({
 		type: v.picklist(['User']),
 		object: packedReference('UserDetailedNotMe'),
 	}),
-	resultObject({
+	v.strictObject({
 		type: v.picklist(['Note']),
 		object: packedReference('Note'),
 	}),

@@ -38,12 +38,12 @@ test('native object-only credential is honest and does not claim WebAuthn domain
 	for (const token of [null, undefined, '']) expect(v.safeParse(inlineI2faKeyDoneInput, { ...input, token }).success).toBe(true);
 });
 
-test('frozen input and written response docs retain legacy shape and branch flags', () => {
+test('frozen input retains legacy shape while finite key result docs close extra properties', () => {
 	expect(paramDef).toEqual(originalInput);
 	expect(meta.requireCredential).toBe(true); expect(meta.secure).toBe(true);
 	expect(meta.res.nullable).toBe(false); expect(meta.res.optional).toBe(false);
-	expect(convertSchemaToOpenApiSchema(meta.res, 'res', true)).toEqual(convertSchemaToOpenApiSchema(originalOutput, 'res', true));
-	expect(projectEndpointContract(inlineI2faKeyDoneDefinition).response).toEqual({ type: 'object', properties: { id: { type: 'string', optional: false }, name: { type: 'string', optional: false } }, required: ['id', 'name'] });
+	expect(convertSchemaToOpenApiSchema(meta.res, 'res', true)).toEqual(convertSchemaToOpenApiSchema({ ...originalOutput, additionalProperties: false }, 'res', true));
+	expect(projectEndpointContract(inlineI2faKeyDoneDefinition).response).toEqual({ type: 'object', properties: { id: { type: 'string', optional: false }, name: { type: 'string', optional: false } }, required: ['id', 'name'], additionalProperties: false });
 });
 
 test('original/projected AJV errors and mutations match for malformed and Unicode inputs', () => {

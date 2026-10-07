@@ -40,6 +40,22 @@ interface FrozenRow {
 const frozenRows = baseline.rows as unknown as readonly FrozenRow[];
 const oldInput = (route: keyof typeof definitions) => frozenRows.find(row => row.route === route)!.input;
 
+/** Reviewed changes are limited to this finite response and its fixed metadata object. */
+function reviewedOutput(row: FrozenRow): Schema | null {
+	if (row.route !== 'admin/drive/show-file') return row.output;
+	const output = row.output!;
+	const properties = Object.fromEntries(Object.entries(output.properties!).flatMap(([key, value]) => {
+		if (key === 'properties') return [[key, { ...value, additionalProperties: false }]];
+		if (key === 'requestHeaders') return [[key, { ...value, additionalProperties: undefined }]];
+		if (key === 'webpublicUrl') return [
+			['webpublicType', { type: 'string', nullable: true, optional: false }],
+			[key, value],
+		];
+		return [[key, value]];
+	}));
+	return { ...output, additionalProperties: false, properties };
+}
+
 describe('root-anyOf selector projections', () => {
 	for (const [route, definition] of Object.entries(definitions)) {
 		test(route, () => {
@@ -51,7 +67,7 @@ describe('root-anyOf selector projections', () => {
 			expect(projection.input.allOf).toBeUndefined();
 			if (row.output) {
 				expect(convertSchemaToOpenApiSchema(projection.response!, 'res', true))
-					.toEqual(convertSchemaToOpenApiSchema(row.output, 'res', true));
+					.toEqual(convertSchemaToOpenApiSchema(reviewedOutput(row)!, 'res', true));
 			} else expect(projection.response).toBeUndefined();
 		});
 	}
@@ -217,11 +233,11 @@ test('input-view mode does not relax static-projection rejection or parse output
 	expect(await endpoint.exec({ url: 'ok' }, null, null)).toBe(output);
 });
 
-test('actual writer preserves the complete OpenAPI document, refs, auth, errors and 200/204 branches', () => {
+test('actual writer retains the complete document around explicitly reviewed finite response changes', () => {
 	const saved = documentedEndpoints.slice();
 	const config = { version: 'selector-proof', apiUrl: 'https://selector.test/api' } as Config;
 	try {
-		documentedEndpoints.splice(0, documentedEndpoints.length, ...frozenRows.map(row => ({ name: row.route, meta: row.meta, params: row.input })));
+		documentedEndpoints.splice(0, documentedEndpoints.length, ...frozenRows.map(row => ({ name: row.route, meta: row.output ? { ...row.meta, res: reviewedOutput(row)! } : row.meta, params: row.input })));
 		const original = genOpenapiSpec(config);
 		documentedEndpoints.splice(0, documentedEndpoints.length, ...Object.entries(definitions).map(([route, definition]) => {
 			const row = frozenRows.find(value => value.route === route)!;
@@ -247,4 +263,22 @@ test('opaque request headers preserve populated values and object identity witho
 	const probe = defineEndpointContract({ path: '/opaque-header-proof' }, selectorAdminDriveShowFileInput, output);
 	const endpoint = new ContractEndpoint<typeof transportMeta, typeof probe.input, typeof output, 'legacy-declared'>(transportMeta, projectEndpointContract(probe), async () => headers);
 	expect(await endpoint.exec({ url: 'ok' }, null, null)).toBe(headers);
+});
+
+test('admin file native output rejects unknown keys and requires the actual webpublicType field', () => {
+	const value: v.InferOutput<typeof selectorAdminDriveShowFileOutput> = {
+		id: 'file1', createdAt: '2026-10-07T00:00:00Z', userId: null, userHost: null,
+		md5: 'hash', name: 'image.jpg', type: 'image/jpeg', size: 1, comment: null, blurhash: null,
+		properties: { width: 2, height: 3, orientation: 1, avgColor: 'rgb(1,2,3)' }, storedInternal: true,
+		url: null, thumbnailUrl: null, webpublicType: null, webpublicUrl: null, accessKey: null,
+		thumbnailAccessKey: null, webpublicAccessKey: null, uri: null, src: null, folderId: null,
+		isSensitive: false, isLink: false, maybeSensitive: false, maybePorn: false, requestIp: null,
+		requestHeaders: { 'x-extension': { retained: true } },
+	};
+	expect(v.parse(selectorAdminDriveShowFileOutput, value)).toEqual(value);
+	const { webpublicType, ...missing } = value;
+	expect(webpublicType).toBeNull();
+	for (const output of [missing, { ...value, webpublicType: 1 }, { ...value, future: true }, { ...value, properties: { ...value.properties, future: true } }]) {
+		expect(v.safeParse(selectorAdminDriveShowFileOutput, output).success).toBe(false);
+	}
 });

@@ -9,23 +9,23 @@ import * as v from 'valibot';
 import type { ApiErrorDefinition } from '../../api/contract/index.js';
 import { misskeyId } from '../../api/contract/index.js';
 
-/** Legacy API objects accept unrecognized fields; these validators intentionally remain loose. */
+/** Native command inputs strip unknown keys; legacy HTTP validation stays open. */
 export const moderationCommandInputs = {
-	'admin/suspend-user': v.looseObject({ userId: misskeyId }),
-	'admin/unsuspend-user': v.looseObject({ userId: misskeyId }),
-	'admin/unset-user-avatar': v.looseObject({ userId: misskeyId }),
-	'admin/unset-user-banner': v.looseObject({ userId: misskeyId }),
-	'admin/update-user-note': v.looseObject({ userId: misskeyId, text: v.string() }),
-	'admin/forward-abuse-user-report': v.looseObject({ reportId: misskeyId }),
-	'admin/resolve-abuse-user-report': v.looseObject({
+	'admin/suspend-user': v.object({ userId: misskeyId }),
+	'admin/unsuspend-user': v.object({ userId: misskeyId }),
+	'admin/unset-user-avatar': v.object({ userId: misskeyId }),
+	'admin/unset-user-banner': v.object({ userId: misskeyId }),
+	'admin/update-user-note': v.object({ userId: misskeyId, text: v.string() }),
+	'admin/forward-abuse-user-report': v.object({ reportId: misskeyId }),
+	'admin/resolve-abuse-user-report': v.object({
 		reportId: misskeyId,
 		resolvedAs: v.exactOptional(v.nullable(v.picklist(['accept', 'reject']))),
 	}),
-	'admin/update-abuse-user-report': v.looseObject({
+	'admin/update-abuse-user-report': v.object({
 		reportId: misskeyId,
 		moderationNote: v.exactOptional(v.string()),
 	}),
-	'admin/abuse-report/notification-recipient/delete': v.looseObject({ id: misskeyId }),
+	'admin/abuse-report/notification-recipient/delete': v.object({ id: misskeyId }),
 };
 
 export const moderationCommandErrors = {

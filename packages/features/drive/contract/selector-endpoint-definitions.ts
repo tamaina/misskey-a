@@ -9,7 +9,6 @@ import { defineEndpointContract } from '../../api/contract/definition.js';
 import { jsonObject } from '../../api/contract/json-object.js';
 import { misskeyId, objectParams } from '../../api/contract/index.js';
 import { packedReference } from '../../api/contract/packed-reference.js';
-import { resultObject } from '../../api/contract/result-object.js';
 
 export const selectorAdminDriveShowFileInput = v.union([
 	jsonObject({
@@ -19,7 +18,7 @@ export const selectorAdminDriveShowFileInput = v.union([
 		url: v.string(),
 	}),
 ]);
-export const selectorAdminDriveShowFileOutput = resultObject({
+export const selectorAdminDriveShowFileOutput = v.strictObject({
 	id: v.pipe(v.string(), v.metadata({ "format": "id", "example": "xxxxxxxxxx" })),
 	createdAt: v.pipe(v.string(), v.metadata({ "format": "date-time" })),
 	userId: v.pipe(v.nullable(v.string()), v.metadata({ "format": "id", "example": "xxxxxxxxxx" })),
@@ -30,7 +29,7 @@ export const selectorAdminDriveShowFileOutput = resultObject({
 	size: v.pipe(v.number(), v.metadata({ "example": 51469 })),
 	comment: v.nullable(v.string()),
 	blurhash: v.nullable(v.string()),
-	properties: resultObject({
+	properties: v.strictObject({
 		width: v.exactOptional(v.number()),
 		height: v.exactOptional(v.number()),
 		orientation: v.exactOptional(v.number()),
@@ -39,6 +38,7 @@ export const selectorAdminDriveShowFileOutput = resultObject({
 	storedInternal: v.pipe(v.nullable(v.boolean()), v.metadata({ "example": true })),
 	url: v.pipe(v.nullable(v.string()), v.metadata({ "format": "url" })),
 	thumbnailUrl: v.pipe(v.nullable(v.string()), v.metadata({ "format": "url" })),
+	webpublicType: v.nullable(v.string()),
 	webpublicUrl: v.pipe(v.nullable(v.string()), v.metadata({ "format": "url" })),
 	accessKey: v.nullable(v.string()),
 	thumbnailAccessKey: v.nullable(v.string()),

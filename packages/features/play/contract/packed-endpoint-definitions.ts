@@ -7,10 +7,9 @@ import type { InferContractRouterInputs, InferContractRouterOutputs } from '@orp
 import * as v from 'valibot';
 import { defineEndpointContract } from '../../api/contract/definition.js';
 import { jsonString, misskeyId } from '../../api/contract/index.js';
-import { resultObject } from '../../api/contract/result-object.js';
 import { packedReference } from '../../api/contract/packed-reference.js';
 
-export const packedFlashCreateInput = v.looseObject({
+export const packedFlashCreateInput = v.object({
 	"title": v.string(),
 	"summary": v.string(),
 	"script": v.string(),
@@ -24,7 +23,7 @@ export const packedFlashCreateDefinition = defineEndpointContract(
 	packedFlashCreateOutput,
 );
 
-export const packedFlashFeaturedInput = v.looseObject({
+export const packedFlashFeaturedInput = v.object({
 	"offset": v.optional(v.pipe(v.pipe(v.number(), v.integer()), v.minValue(0)), 0),
 	"limit": v.optional(v.pipe(v.pipe(v.number(), v.integer()), v.minValue(1), v.maxValue(100)), 10),
 });
@@ -35,7 +34,7 @@ export const packedFlashFeaturedDefinition = defineEndpointContract(
 	packedFlashFeaturedOutput,
 );
 
-export const packedFlashMyInput = v.looseObject({
+export const packedFlashMyInput = v.object({
 	"limit": v.optional(v.pipe(v.pipe(v.number(), v.integer()), v.minValue(1), v.maxValue(100)), 10),
 	"sinceId": v.exactOptional(misskeyId),
 	"untilId": v.exactOptional(misskeyId),
@@ -49,7 +48,7 @@ export const packedFlashMyDefinition = defineEndpointContract(
 	packedFlashMyOutput,
 );
 
-export const packedFlashMyLikesInput = v.looseObject({
+export const packedFlashMyLikesInput = v.object({
 	"limit": v.optional(v.pipe(v.pipe(v.number(), v.integer()), v.minValue(1), v.maxValue(100)), 10),
 	"sinceId": v.exactOptional(misskeyId),
 	"untilId": v.exactOptional(misskeyId),
@@ -57,7 +56,7 @@ export const packedFlashMyLikesInput = v.looseObject({
 	"untilDate": v.exactOptional(v.pipe(v.number(), v.integer())),
 	"search": v.exactOptional(v.nullable(jsonString({ "minLength": 1, "maxLength": 100 }))),
 });
-export const packedFlashMyLikesOutput = v.array(resultObject({
+export const packedFlashMyLikesOutput = v.array(v.strictObject({
 		"id": v.pipe(v.string(), v.metadata({ "format": "id" })),
 		"flash": packedReference("Flash"),
 	}));
@@ -67,7 +66,7 @@ export const packedFlashMyLikesDefinition = defineEndpointContract(
 	packedFlashMyLikesOutput,
 );
 
-export const packedFlashSearchInput = v.looseObject({
+export const packedFlashSearchInput = v.object({
 	"query": jsonString({ "minLength": 1, "maxLength": 100 }),
 	"sinceId": v.exactOptional(misskeyId),
 	"untilId": v.exactOptional(misskeyId),
@@ -82,7 +81,7 @@ export const packedFlashSearchDefinition = defineEndpointContract(
 	packedFlashSearchOutput,
 );
 
-export const packedFlashShowInput = v.looseObject({
+export const packedFlashShowInput = v.object({
 	"flashId": misskeyId,
 });
 export const packedFlashShowOutput = packedReference("Flash");
@@ -92,7 +91,7 @@ export const packedFlashShowDefinition = defineEndpointContract(
 	packedFlashShowOutput,
 );
 
-export const packedUsersFlashsInput = v.looseObject({
+export const packedUsersFlashsInput = v.object({
 	"userId": misskeyId,
 	"limit": v.optional(v.pipe(v.pipe(v.number(), v.integer()), v.minValue(1), v.maxValue(100)), 10),
 	"sinceId": v.exactOptional(misskeyId),

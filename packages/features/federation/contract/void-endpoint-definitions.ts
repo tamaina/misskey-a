@@ -8,7 +8,7 @@ import * as v from 'valibot';
 import { defineEndpointContract } from '../../api/contract/definition.js';
 import { misskeyId } from '../../api/contract/index.js';
 
-export const voidAdminFederationDeleteAllFilesInput = v.looseObject({
+export const voidAdminFederationDeleteAllFilesInput = v.object({
 	"host": v.string(),
 });
 export const voidAdminFederationDeleteAllFilesOutput = v.void();
@@ -18,7 +18,7 @@ export const voidAdminFederationDeleteAllFilesDefinition = defineEndpointContrac
 	voidAdminFederationDeleteAllFilesOutput,
 );
 
-export const voidAdminFederationRefreshRemoteInstanceMetadataInput = v.looseObject({
+export const voidAdminFederationRefreshRemoteInstanceMetadataInput = v.object({
 	"host": v.string(),
 });
 export const voidAdminFederationRefreshRemoteInstanceMetadataOutput = v.void();
@@ -28,7 +28,7 @@ export const voidAdminFederationRefreshRemoteInstanceMetadataDefinition = define
 	voidAdminFederationRefreshRemoteInstanceMetadataOutput,
 );
 
-export const voidAdminFederationRemoveAllFollowingInput = v.looseObject({
+export const voidAdminFederationRemoveAllFollowingInput = v.object({
 	"host": v.string(),
 });
 export const voidAdminFederationRemoveAllFollowingOutput = v.void();
@@ -38,7 +38,7 @@ export const voidAdminFederationRemoveAllFollowingDefinition = defineEndpointCon
 	voidAdminFederationRemoveAllFollowingOutput,
 );
 
-export const voidAdminFederationUpdateInstanceInput = v.looseObject({
+export const voidAdminFederationUpdateInstanceInput = v.object({
 	"host": v.string(),
 	"isSuspended": v.exactOptional(v.boolean()),
 	"moderationNote": v.exactOptional(v.string()),
@@ -50,7 +50,7 @@ export const voidAdminFederationUpdateInstanceDefinition = defineEndpointContrac
 	voidAdminFederationUpdateInstanceOutput,
 );
 
-export const voidAdminRelaysRemoveInput = v.looseObject({
+export const voidAdminRelaysRemoveInput = v.object({
 	"inbox": v.string(),
 });
 export const voidAdminRelaysRemoveOutput = v.void();
@@ -60,7 +60,7 @@ export const voidAdminRelaysRemoveDefinition = defineEndpointContract(
 	voidAdminRelaysRemoveOutput,
 );
 
-export const voidFederationUpdateRemoteUserInput = v.looseObject({
+export const voidFederationUpdateRemoteUserInput = v.object({
 	"userId": misskeyId,
 });
 export const voidFederationUpdateRemoteUserOutput = v.void();

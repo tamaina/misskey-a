@@ -38,6 +38,19 @@ const definitions = {
 };
 type Route = keyof typeof definitions;
 
+// Apply only the reviewed strict-object documentation additions to frozen evidence.
+// Every other key and value remains intact; missing paths fail this oracle.
+function reviewedClosedObjects(value: unknown, paths: readonly (readonly string[])[]): unknown {
+	function closeAt(current: unknown, path: readonly string[]): unknown {
+		if (current === null || typeof current !== 'object' || Array.isArray(current)) throw new Error('Expected frozen object at reviewed response path');
+		if (path.length === 0) return { ...current, additionalProperties: false };
+		if (!Object.hasOwn(current, path[0])) throw new Error('Missing reviewed response path: ' + path.join('.'));
+		return Object.fromEntries(Object.entries(current).map(([key, child]) => [key, key === path[0] ? closeAt(child, path.slice(1)) : child]));
+	}
+
+	return paths.reduce<unknown>((current, path) => closeAt(current, path), value);
+}
+
 // Independently frozen typed schema literals, kept in sync with the JSON provenance fixture.
 const frozenInputs = {
 	"admin/queue/show-job-logs": {
@@ -943,7 +956,7 @@ for (const route of Object.keys(definitions) as Route[]) {
 		expect(normalizeInput(projection.input)).toEqual(normalizeInput(fixture.input));
 		const before = fixture.openapi.post.responses['200']?.content['application/json'].schema;
 		const after = projection.response === undefined ? undefined : convertSchemaToOpenApiSchema(projection.response, 'res', true);
-		expect(after).toEqual(before);
+		expect(after).toEqual(route === 'i/webhooks/create' ? reviewedClosedObjects(before, [[]]) : before);
 	});
 
 	test(route + ' retains real AJV errors, defaults, mutations, extra fields and callback suppression', async () => {
@@ -1027,7 +1040,9 @@ test('nested webhook/admin request objects and opaque response extensions retain
 	const response = { id: 'id1', userId: 'user1', name: 'n', url: 'u', secret: '', on: ['mention' as const], active: true, latestSentAt: null, latestStatus: null, future: { keep: true } };
 	const create = new ContractEndpoint({}, projectEndpointContract(constantIWebhooksCreateDefinition), async () => response);
 	expect(await create.exec({ name: 'n', url: 'u', on: [] }, null, null)).toBe(response);
-	expect(v.parse(constantIWebhooksCreateOutput, response)).toEqual(response);
+	expect(v.safeParse(constantIWebhooksCreateOutput, response).success).toBe(false);
+	const { future: _future, ...declaredResponse } = response;
+	expect(v.parse(constantIWebhooksCreateOutput, declaredResponse)).toEqual(declaredResponse);
 });
 
 test('portable admin schemas keep regex, nullability, loose nested objects and unrestricted numeric ranges', () => {
@@ -1075,7 +1090,10 @@ test('the actual OpenAPI writer preserves all five complete published paths and 
 		const spec = genOpenapiSpec(config);
 		expect(Object.keys(spec.paths).sort()).toEqual(frozen.routes.map(row => '/' + row.route).sort());
 		for (const route of Object.keys(definitions) as Route[]) {
-			expect(JSON.parse(JSON.stringify(spec.paths['/' + route]))).toEqual(baseline(route).openapi);
+			const expected = route === 'i/webhooks/create'
+				? reviewedClosedObjects(baseline(route).openapi, [['post', 'responses', '200', 'content', 'application/json', 'schema']])
+				: baseline(route).openapi;
+			expect(JSON.parse(JSON.stringify(spec.paths['/' + route]))).toEqual(expected);
 			const noContent = baseline(route).output === null;
 			const projection = projectEndpointContract<v.GenericSchema, v.GenericSchema>(definitions[route]);
 			if (noContent) {

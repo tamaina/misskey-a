@@ -9,7 +9,7 @@ import * as v from 'valibot';
 import type { ApiErrorDefinition } from '../../api/contract/index.js';
 import { misskeyId } from '../../api/contract/index.js';
 
-const userIdInput = v.looseObject({ userId: misskeyId });
+const userIdInput = v.object({ userId: misskeyId });
 const voidOutput = v.void();
 
 export const relationshipErrors = {

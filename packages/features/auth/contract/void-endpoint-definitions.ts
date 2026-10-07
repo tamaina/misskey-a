@@ -8,7 +8,7 @@ import * as v from 'valibot';
 import { defineEndpointContract } from '../../api/contract/definition.js';
 import { jsonString, misskeyId } from '../../api/contract/index.js';
 
-export const voidAdminUnsetMfaInput = v.looseObject({
+export const voidAdminUnsetMfaInput = v.object({
 	"userId": misskeyId,
 });
 export const voidAdminUnsetMfaOutput = v.void();
@@ -18,7 +18,7 @@ export const voidAdminUnsetMfaDefinition = defineEndpointContract(
 	voidAdminUnsetMfaOutput,
 );
 
-export const voidAuthAcceptInput = v.looseObject({
+export const voidAuthAcceptInput = v.object({
 	"token": v.string(),
 });
 export const voidAuthAcceptOutput = v.void();
@@ -28,7 +28,7 @@ export const voidAuthAcceptDefinition = defineEndpointContract(
 	voidAuthAcceptOutput,
 );
 
-export const voidI2faPasswordLessInput = v.looseObject({
+export const voidI2faPasswordLessInput = v.object({
 	"value": v.boolean(),
 });
 export const voidI2faPasswordLessOutput = v.void();
@@ -38,7 +38,7 @@ export const voidI2faPasswordLessDefinition = defineEndpointContract(
 	voidI2faPasswordLessOutput,
 );
 
-export const voidI2faUnregisterInput = v.looseObject({
+export const voidI2faUnregisterInput = v.object({
 	"password": v.string(),
 	"token": v.exactOptional(v.nullable(v.string())),
 });
@@ -49,7 +49,7 @@ export const voidI2faUnregisterDefinition = defineEndpointContract(
 	voidI2faUnregisterOutput,
 );
 
-export const voidIChangePasswordInput = v.looseObject({
+export const voidIChangePasswordInput = v.object({
 	"currentPassword": v.string(),
 	"newPassword": jsonString({ "minLength": 1 }),
 	"token": v.exactOptional(v.nullable(v.string())),
@@ -61,7 +61,7 @@ export const voidIChangePasswordDefinition = defineEndpointContract(
 	voidIChangePasswordOutput,
 );
 
-export const voidIRegenerateTokenInput = v.looseObject({
+export const voidIRegenerateTokenInput = v.object({
 	"password": v.string(),
 });
 export const voidIRegenerateTokenOutput = v.void();
@@ -71,7 +71,7 @@ export const voidIRegenerateTokenDefinition = defineEndpointContract(
 	voidIRegenerateTokenOutput,
 );
 
-export const voidInviteDeleteInput = v.looseObject({
+export const voidInviteDeleteInput = v.object({
 	"inviteId": misskeyId,
 });
 export const voidInviteDeleteOutput = v.void();
@@ -81,7 +81,7 @@ export const voidInviteDeleteDefinition = defineEndpointContract(
 	voidInviteDeleteOutput,
 );
 
-export const voidRequestResetPasswordInput = v.looseObject({
+export const voidRequestResetPasswordInput = v.object({
 	"username": v.string(),
 	"email": v.string(),
 });
@@ -92,7 +92,7 @@ export const voidRequestResetPasswordDefinition = defineEndpointContract(
 	voidRequestResetPasswordOutput,
 );
 
-export const voidResetPasswordInput = v.looseObject({
+export const voidResetPasswordInput = v.object({
 	"token": v.string(),
 	"password": v.string(),
 });
@@ -103,7 +103,7 @@ export const voidResetPasswordDefinition = defineEndpointContract(
 	voidResetPasswordOutput,
 );
 
-export const voidVerifyEmailInput = v.looseObject({
+export const voidVerifyEmailInput = v.object({
 	"code": v.string(),
 });
 export const voidVerifyEmailOutput = v.void();

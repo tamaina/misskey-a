@@ -8,7 +8,7 @@ import * as v from 'valibot';
 import { defineEndpointContract } from '../../api/contract/definition.js';
 import { jsonString, misskeyId } from '../../api/contract/index.js';
 
-export const voidBubbleGameRegisterInput = v.looseObject({
+export const voidBubbleGameRegisterInput = v.object({
 	"score": v.pipe(v.pipe(v.number(), v.integer()), v.minValue(0)),
 	"seed": jsonString({ "minLength": 1, "maxLength": 1024 }),
 	"logs": v.array(v.array(v.number())),
@@ -22,7 +22,7 @@ export const voidBubbleGameRegisterDefinition = defineEndpointContract(
 	voidBubbleGameRegisterOutput,
 );
 
-export const voidReversiCancelMatchInput = v.looseObject({
+export const voidReversiCancelMatchInput = v.object({
 	"userId": v.exactOptional(v.nullable(misskeyId)),
 });
 export const voidReversiCancelMatchOutput = v.void();
@@ -32,7 +32,7 @@ export const voidReversiCancelMatchDefinition = defineEndpointContract(
 	voidReversiCancelMatchOutput,
 );
 
-export const voidReversiSurrenderInput = v.looseObject({
+export const voidReversiSurrenderInput = v.object({
 	"gameId": misskeyId,
 });
 export const voidReversiSurrenderOutput = v.void();

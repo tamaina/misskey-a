@@ -8,7 +8,7 @@ import * as v from 'valibot';
 import { defineEndpointContract } from '../../api/contract/definition.js';
 import { misskeyId } from '../../api/contract/index.js';
 
-export const voidFollowingUpdateAllInput = v.looseObject({
+export const voidFollowingUpdateAllInput = v.object({
 	"notify": v.exactOptional(v.picklist(["normal", "none"])),
 	"withReplies": v.exactOptional(v.boolean()),
 });
@@ -19,7 +19,7 @@ export const voidFollowingUpdateAllDefinition = defineEndpointContract(
 	voidFollowingUpdateAllOutput,
 );
 
-export const voidMuteCreateInput = v.looseObject({
+export const voidMuteCreateInput = v.object({
 	"userId": misskeyId,
 	"expiresAt": v.exactOptional(v.pipe(v.nullable(v.pipe(v.number(), v.integer())), v.metadata({ "description": "A Unix Epoch timestamp that must lie in the future. `null` means an indefinite mute." }))),
 });

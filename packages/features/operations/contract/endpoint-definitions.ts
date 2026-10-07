@@ -8,7 +8,8 @@ import * as v from 'valibot';
 import { defineEndpointContract } from '../../api/contract/definition.js';
 import { resultObject } from '../../api/contract/result-object.js';
 
-export const inlineAdminGetIndexStatsInput = v.looseObject({});
+export const inlineAdminGetIndexStatsInput = v.object({});
+// SELECT * FROM pg_indexes returns complete database rows beyond these documented fields.
 export const inlineAdminGetIndexStatsOutput = v.array(resultObject({
 		"tablename": v.string(),
 		"indexname": v.string(),
@@ -19,8 +20,8 @@ export const inlineAdminGetIndexStatsDefinition = defineEndpointContract(
 	inlineAdminGetIndexStatsOutput,
 );
 
-export const inlineAdminGetTableStatsInput = v.looseObject({});
-export const inlineAdminGetTableStatsOutput = v.pipe(v.record(v.string(), resultObject({
+export const inlineAdminGetTableStatsInput = v.object({});
+export const inlineAdminGetTableStatsOutput = v.pipe(v.record(v.string(), v.strictObject({
 		"count": v.number(),
 		"size": v.number(),
 	})), v.metadata({ "example": { "migrations": { "count": 66, "size": 32768 } } }));

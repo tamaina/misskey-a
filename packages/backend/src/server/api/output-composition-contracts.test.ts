@@ -41,6 +41,27 @@ interface FrozenSchemaRow {
 // The generator snapshots legacy schema ASTs; this assertion is not for runtime payloads.
 const frozenRows = baseline.rows as unknown as readonly FrozenSchemaRow[];
 
+/** Resolve only the reviewed finite wrappers; account/User compositions stay unchanged. */
+function reviewedOutput(row: FrozenSchemaRow): Schema {
+	if (row.route === 'ap/show') return {
+		...row.output,
+		oneOf: row.output.oneOf!.map(branch => ({ ...branch, additionalProperties: false })),
+	};
+	if (row.route === 'users/lists/show') {
+		const { allOf, ...root } = row.output;
+		// The captured UserList reference is flattened using its reviewed existing public fields.
+		return { ...root, additionalProperties: false, properties: {
+			id: { type: 'string', optional: false, nullable: false, format: 'id', example: 'xxxxxxxxxx' },
+			createdAt: { type: 'string', optional: false, nullable: false, format: 'date-time' },
+			name: { type: 'string', optional: false, nullable: false },
+			userIds: { type: 'array', optional: true, nullable: false, items: { type: 'string', optional: false, nullable: false, format: 'id' } },
+			isPublic: { type: 'boolean', optional: false, nullable: false },
+			...allOf![1].properties,
+		} };
+	}
+	return row.output;
+}
+
 // Assertions bridge only the frozen legacy schema dialect, never payloads.
 function oldInput(route: string): Schema {
 	return frozenRows.find(row => row.route === route)!.input as Schema;
@@ -70,7 +91,7 @@ describe('three output-composition projections', () => {
 			const projection = projectEndpointContract<v.GenericSchema, v.GenericSchema>(definition);
 			expect(canonical(projection.input)).toEqual(row.input);
 			expect(convertSchemaToOpenApiSchema(projection.response!, 'res', true))
-				.toEqual(convertSchemaToOpenApiSchema(row.output as Schema, 'res', true));
+				.toEqual(convertSchemaToOpenApiSchema(reviewedOutput(row), 'res', true));
 		});
 	}
 });
@@ -84,23 +105,28 @@ test('ap/show retains ordered tagged oneOf with no root object type', () => {
 	expect(response.oneOf!.map(branch => branch.properties!.object.ref)).toEqual(['UserDetailedNotMe', 'Note']);
 });
 
-test('allOf retains explicit root object and optional list extensions', () => {
+test('account retains allOf while the finite list schema flattens its optional extensions', () => {
 	const account = projectEndpointContract(compositionAdminAccountsCreateDefinition).response!;
 	const list = projectEndpointContract(compositionUsersListsShowDefinition).response!;
 	expect(account.type).toBe('object');
 	expect(list.type).toBe('object');
 	expect(account.allOf).toHaveLength(2);
-	expect(list.allOf).toHaveLength(2);
+	expect(list.allOf).toBeUndefined();
+	expect(list.additionalProperties).toBe(false);
 	expect(account.allOf![1].properties!.token.optional).toBe(false);
-	expect(list.allOf![1].properties!.likedCount.optional).toBe(true);
-	expect(list.allOf![1].properties!.isLiked.optional).toBe(true);
+	expect(list.properties!.likedCount.optional).toBe(true);
+	expect(list.properties!.isLiked.optional).toBe(true);
 });
 
 test('packed compositions keep canonical validation', () => {
 	const value: Packed<'UserList'> = { id: 'list1', createdAt: '2026-10-07T00:00:00Z', name: 'List', userIds: [], isPublic: true };
 	expect(v.is(packedSchemas.UserList, value)).toBe(true);
 	expect(v.safeParse(compositionUsersListsShowOutput, value).success).toBe(true);
-	expect(v.safeParse(compositionUsersListsShowOutput, { ...value, likedCount: 1, isLiked: false, extension: true }).success).toBe(true);
+	expect(v.safeParse(compositionUsersListsShowOutput, { ...value, likedCount: 1, isLiked: false }).success).toBe(true);
+	expect(v.safeParse(compositionUsersListsShowOutput, { ...value, likedCount: 1, isLiked: false, extension: true }).success).toBe(false);
+	const { name, ...missingName } = value;
+	expect(name).toBe('List');
+	expect(v.safeParse(compositionUsersListsShowOutput, missingName).success).toBe(false);
 	expect(v.safeParse(compositionUsersListsShowOutput, { ...value, likedCount: null }).success).toBe(false);
 	expect(v.safeParse(compositionUsersListsShowOutput, { ...value, isLiked: 'false' }).success).toBe(false);
 	expect(v.safeParse(compositionApShowOutput, { type: 'User', object: {} }).success).toBe(false);
@@ -169,12 +195,12 @@ test('native validation matches legacy AJV defaults, errors and unknown own keys
 	}
 });
 
-test('actual writer preserves complete document, auth, errors and response branches', () => {
+test('actual writer preserves complete document around explicitly reviewed finite wrappers and flattened list schema', () => {
 	const saved = documentedEndpoints.slice();
 	const config = { version: 'output-composition-test', apiUrl: 'https://composition.test/api' } as Config;
 	try {
 		documentedEndpoints.splice(0, documentedEndpoints.length, ...frozenRows.map(row => ({
-			name: row.route, meta: row.meta as IEndpointMeta, params: row.input as Schema,
+			name: row.route, meta: { ...row.meta, res: reviewedOutput(row) }, params: row.input,
 		})));
 		const original = genOpenapiSpec(config);
 		documentedEndpoints.splice(0, documentedEndpoints.length, ...Object.entries(definitions).map(([route, definition]) => {
@@ -199,9 +225,18 @@ test('native inference retains discriminator, intersections and request optional
 	expectTypeOf<NoteBranch['object']>().toEqualTypeOf<Packed<'Note'>>();
 	expectTypeOf<FederationCompositionEndpoints['ap/show']['res']>().toEqualTypeOf<ApOutput>();
 	expectTypeOf<AuthCompositionEndpoints['admin/accounts/create']['res']>().toEqualTypeOf<Packed<'MeDetailed'> & { token: string } & object>();
-	expectTypeOf<RelationshipCompositionEndpoints['users/lists/show']['res']>().toEqualTypeOf<Packed<'UserList'> & { likedCount?: number; isLiked?: boolean } & object>();
+	type Flatten<T> = { [K in keyof T]: T[K] };
+	expectTypeOf<Flatten<RelationshipCompositionEndpoints['users/lists/show']['res']>>().toEqualTypeOf<Flatten<Packed<'UserList'> & { likedCount?: number; isLiked?: boolean }>>();
 	expectTypeOf<v.InferOutput<typeof compositionApShowInput>['uri']>().toEqualTypeOf<string>();
 	expectTypeOf<v.InferOutput<typeof compositionAdminAccountsCreateInput>['username']>().toEqualTypeOf<string>();
 	expectTypeOf<v.InferInput<typeof compositionUsersListsShowInput>['forPublic']>().toEqualTypeOf<boolean | undefined>();
 	expectTypeOf<v.InferOutput<typeof compositionUsersListsShowInput>['forPublic']>().toEqualTypeOf<boolean>();
+});
+
+test('ap/show closes only its tagged outer wrapper and preserves the existing nested Note boundary', () => {
+	const user = { id: 'user1', name: null, username: 'alice', host: null, avatarUrl: 'https://example/avatar', avatarBlurhash: null, avatarDecorations: [], emojis: {}, onlineStatus: 'unknown' as const };
+	const note = { id: 'note1', createdAt: '2026-10-07T00:00:00Z', text: null, userId: user.id, user, visibility: 'public' as const, reactionAcceptance: null, reactionEmojis: {}, reactions: {}, reactionCount: 0, renoteCount: 0, repliesCount: 0, future: true };
+	const value = { type: 'Note' as const, object: note };
+	expect(v.parse(compositionApShowOutput, value)).toEqual(value);
+	for (const output of [{ ...value, future: true }, { type: 'Note' }, { ...value, type: 1 }]) expect(v.safeParse(compositionApShowOutput, output).success).toBe(false);
 });

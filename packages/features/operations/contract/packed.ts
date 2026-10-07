@@ -6,13 +6,17 @@
 import * as v from 'valibot';
 import { resultObject } from '../../api/contract/result-object.js';
 
-export const packedQueueCountSchema = resultObject({
+export const packedQueueCountSchema = v.strictObject({
 	"waiting": v.number(),
 	"active": v.number(),
 	"completed": v.number(),
 	"failed": v.number(),
-	"delayed": v.number()
+	"delayed": v.number(),
+	// Bull default counts include these states; keep additions optional for existing callers.
+	"prioritized": v.optional(v.number()),
+	"waiting-children": v.optional(v.number())
 });
+// Bull job payloads, options, progress and return values need a separate producer review.
 export const packedQueueJobSchema = resultObject({
 	"id": v.string(),
 	"name": v.string(),
@@ -30,8 +34,8 @@ export const packedQueueJobSchema = resultObject({
 	"returnValue": v.unknown(),
 	"isFailed": v.boolean()
 });
-export const packedQueueMetricsSchema = resultObject({
-	"meta": resultObject({
+export const packedQueueMetricsSchema = v.strictObject({
+	"meta": v.strictObject({
 	"count": v.number(),
 	"prevTS": v.number(),
 	"prevCount": v.number()

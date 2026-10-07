@@ -9,7 +9,7 @@ import {
 	packedRolePoliciesSchema as __ref_RolePolicies
 } from '../../roles/contract/packed.js';
 
-export const packedAdSchema = resultObject({
+export const packedAdSchema = v.strictObject({
 	"id": v.pipe(v.string(), v.metadata({ "format": "id", "example": "xxxxxxxxxx" })),
 	"expiresAt": v.pipe(v.string(), v.metadata({ "format": "date-time" })),
 	"startsAt": v.pipe(v.string(), v.metadata({ "format": "date-time" })),
@@ -22,11 +22,13 @@ export const packedAdSchema = resultObject({
 	"dayOfWeek": v.pipe(v.number(), v.integer()),
 	"isSensitive": v.boolean()
 });
+// admin/update-meta persists all clientOptions keys and serializers return them verbatim.
 export const packedMetaClientOptionsSchema = resultObject({
 	"entrancePageStyle": v.picklist(["classic", "simple"]),
 	"showTimelineForVisitor": v.boolean(),
 	"showActivitiesForVisitor": v.boolean()
 });
+// Intersection sides remain open so each accepts the fields supplied by the other.
 export const packedMetaDetailedSchema = v.intersect([v.lazy(() => packedMetaLiteSchema), v.lazy(() => packedMetaDetailedOnlySchema)]);
 export const packedMetaDetailedOnlySchema = resultObject({
 	"features": v.optional(resultObject({

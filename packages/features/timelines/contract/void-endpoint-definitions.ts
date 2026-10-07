@@ -8,7 +8,7 @@ import * as v from 'valibot';
 import { defineEndpointContract } from '../../api/contract/definition.js';
 import { misskeyId } from '../../api/contract/index.js';
 
-export const voidAntennasDeleteInput = v.looseObject({
+export const voidAntennasDeleteInput = v.object({
 	"antennaId": misskeyId,
 });
 export const voidAntennasDeleteOutput = v.void();
@@ -18,7 +18,7 @@ export const voidAntennasDeleteDefinition = defineEndpointContract(
 	voidAntennasDeleteOutput,
 );
 
-export const voidAntennasRemoveNoteInput = v.looseObject({
+export const voidAntennasRemoveNoteInput = v.object({
 	"antennaId": misskeyId,
 	"noteId": misskeyId,
 });

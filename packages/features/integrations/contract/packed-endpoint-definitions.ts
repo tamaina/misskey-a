@@ -9,7 +9,7 @@ import { defineEndpointContract } from '../../api/contract/definition.js';
 import { misskeyId } from '../../api/contract/index.js';
 import { packedReference } from '../../api/contract/packed-reference.js';
 
-export const packedAdminSystemWebhookShowInput = v.looseObject({
+export const packedAdminSystemWebhookShowInput = v.object({
 	"id": misskeyId,
 });
 export const packedAdminSystemWebhookShowOutput = packedReference("SystemWebhook");
@@ -19,7 +19,7 @@ export const packedAdminSystemWebhookShowDefinition = defineEndpointContract(
 	packedAdminSystemWebhookShowOutput,
 );
 
-export const packedIWebhooksListInput = v.looseObject({});
+export const packedIWebhooksListInput = v.object({});
 export const packedIWebhooksListOutput = v.array(packedReference("UserWebhook"));
 export const packedIWebhooksListDefinition = defineEndpointContract(
 	{ method: 'POST', path: "/i/webhooks/list", tags: ["webhooks", "account"] },
@@ -27,7 +27,7 @@ export const packedIWebhooksListDefinition = defineEndpointContract(
 	packedIWebhooksListOutput,
 );
 
-export const packedIWebhooksShowInput = v.looseObject({
+export const packedIWebhooksShowInput = v.object({
 	"webhookId": misskeyId,
 });
 export const packedIWebhooksShowOutput = packedReference("UserWebhook");

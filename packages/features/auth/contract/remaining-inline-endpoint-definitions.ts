@@ -6,12 +6,11 @@
 import type { InferContractRouterInputs, InferContractRouterOutputs } from '@orpc/contract';
 import * as v from 'valibot';
 import { defineEndpointContract } from '../../api/contract/definition.js';
-import { resultObject } from '../../api/contract/result-object.js';
 
-export const remainingUsernameAvailableInput = v.looseObject({
+export const remainingUsernameAvailableInput = v.object({
 	"username": v.pipe(v.string(), v.regex(new RegExp("^\\w{1,20}$"))),
 });
-export const remainingUsernameAvailableOutput = resultObject({
+export const remainingUsernameAvailableOutput = v.strictObject({
 	"available": v.boolean(),
 });
 export const remainingUsernameAvailableDefinition = defineEndpointContract(

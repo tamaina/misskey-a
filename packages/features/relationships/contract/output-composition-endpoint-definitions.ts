@@ -7,21 +7,18 @@ import type { InferContractRouterInputs, InferContractRouterOutputs } from '@orp
 import * as v from 'valibot';
 import { defineEndpointContract } from '../../api/contract/definition.js';
 import { jsonObject } from '../../api/contract/json-object.js';
-import { packedReference } from '../../api/contract/packed-reference.js';
-import { resultObject } from '../../api/contract/result-object.js';
+import { packedUserListSchema } from './packed.js';
 import { misskeyId } from '../../api/contract/index.js';
 
 export const compositionUsersListsShowInput = jsonObject({
 	listId: misskeyId,
 	forPublic: v.optional(v.boolean(), false),
 });
-export const compositionUsersListsShowOutput = v.pipe(v.intersect([
-	packedReference('UserList'),
-	resultObject({
-		likedCount: v.exactOptional(v.number()),
-		isLiked: v.exactOptional(v.boolean()),
-	}),
-]), v.metadata({ type: 'object' }));
+export const compositionUsersListsShowOutput = v.strictObject({
+	...packedUserListSchema.entries,
+	likedCount: v.exactOptional(v.number()),
+	isLiked: v.exactOptional(v.boolean()),
+});
 export const compositionUsersListsShowDefinition = defineEndpointContract(
 	{ method: 'POST', path: '/users/lists/show', tags: ["lists", "account"] },
 	compositionUsersListsShowInput,

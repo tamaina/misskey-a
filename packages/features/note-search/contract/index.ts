@@ -9,7 +9,7 @@ import { defineEndpointContract } from '../../api/contract/definition.js';
 import { misskeyId } from '../../api/contract/index.js';
 import { packedReference } from '../../api/contract/packed-reference.js';
 
-export const packedNotesSearchInput = v.looseObject({
+export const packedNotesSearchInput = v.object({
 	"query": v.string(),
 	"rangeStartAt": v.exactOptional(v.nullable(v.pipe(v.number(), v.integer()))),
 	"rangeEndAt": v.exactOptional(v.nullable(v.pipe(v.number(), v.integer()))),

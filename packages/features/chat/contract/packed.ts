@@ -4,7 +4,6 @@
  */
 
 import * as v from 'valibot';
-import { resultObject } from '../../api/contract/result-object.js';
 import {
 	packedDriveFileSchema as __ref_DriveFile
 } from '../../drive/contract/packed.js';
@@ -12,7 +11,7 @@ import {
 	packedUserLiteSchema as __ref_UserLite
 } from '../../users/contract/packed.js';
 
-export const packedChatMessageSchema = resultObject({
+export const packedChatMessageSchema = v.strictObject({
 	"id": v.string(),
 	"createdAt": v.pipe(v.string(), v.metadata({ "format": "date-time" })),
 	"fromUserId": v.string(),
@@ -25,12 +24,12 @@ export const packedChatMessageSchema = resultObject({
 	"fileId": v.optional(v.nullable(v.string())),
 	"file": v.optional(v.nullable(v.lazy(() => __ref_DriveFile))),
 	"isRead": v.optional(v.boolean()),
-	"reactions": v.array(resultObject({
+	"reactions": v.array(v.strictObject({
 	"reaction": v.string(),
 	"user": v.lazy(() => __ref_UserLite)
 }))
 });
-export const packedChatMessageLiteSchema = resultObject({
+export const packedChatMessageLiteSchema = v.strictObject({
 	"id": v.string(),
 	"createdAt": v.pipe(v.string(), v.metadata({ "format": "date-time" })),
 	"fromUserId": v.string(),
@@ -40,12 +39,12 @@ export const packedChatMessageLiteSchema = resultObject({
 	"text": v.optional(v.nullable(v.string())),
 	"fileId": v.optional(v.nullable(v.string())),
 	"file": v.optional(v.nullable(v.lazy(() => __ref_DriveFile))),
-	"reactions": v.array(resultObject({
+	"reactions": v.array(v.strictObject({
 	"reaction": v.string(),
 	"user": v.optional(v.nullable(v.lazy(() => __ref_UserLite)))
 }))
 });
-export const packedChatMessageLiteFor1on1Schema = resultObject({
+export const packedChatMessageLiteFor1on1Schema = v.strictObject({
 	"id": v.string(),
 	"createdAt": v.pipe(v.string(), v.metadata({ "format": "date-time" })),
 	"fromUserId": v.string(),
@@ -53,11 +52,11 @@ export const packedChatMessageLiteFor1on1Schema = resultObject({
 	"text": v.optional(v.nullable(v.string())),
 	"fileId": v.optional(v.nullable(v.string())),
 	"file": v.optional(v.nullable(v.lazy(() => __ref_DriveFile))),
-	"reactions": v.array(resultObject({
+	"reactions": v.array(v.strictObject({
 	"reaction": v.string()
 }))
 });
-export const packedChatMessageLiteForRoomSchema = resultObject({
+export const packedChatMessageLiteForRoomSchema = v.strictObject({
 	"id": v.string(),
 	"createdAt": v.pipe(v.string(), v.metadata({ "format": "date-time" })),
 	"fromUserId": v.string(),
@@ -66,12 +65,12 @@ export const packedChatMessageLiteForRoomSchema = resultObject({
 	"text": v.optional(v.nullable(v.string())),
 	"fileId": v.optional(v.nullable(v.string())),
 	"file": v.optional(v.nullable(v.lazy(() => __ref_DriveFile))),
-	"reactions": v.array(resultObject({
+	"reactions": v.array(v.strictObject({
 	"reaction": v.string(),
 	"user": v.lazy(() => __ref_UserLite)
 }))
 });
-export const packedChatRoomSchema = resultObject({
+export const packedChatRoomSchema = v.strictObject({
 	"id": v.string(),
 	"createdAt": v.pipe(v.string(), v.metadata({ "format": "date-time" })),
 	"ownerId": v.string(),
@@ -81,7 +80,7 @@ export const packedChatRoomSchema = resultObject({
 	"isMuted": v.optional(v.boolean()),
 	"invitationExists": v.optional(v.boolean())
 });
-export const packedChatRoomInvitationSchema = resultObject({
+export const packedChatRoomInvitationSchema = v.strictObject({
 	"id": v.string(),
 	"createdAt": v.pipe(v.string(), v.metadata({ "format": "date-time" })),
 	"userId": v.string(),
@@ -89,7 +88,7 @@ export const packedChatRoomInvitationSchema = resultObject({
 	"roomId": v.string(),
 	"room": v.lazy(() => packedChatRoomSchema)
 });
-export const packedChatRoomMembershipSchema = resultObject({
+export const packedChatRoomMembershipSchema = v.strictObject({
 	"id": v.string(),
 	"createdAt": v.pipe(v.string(), v.metadata({ "format": "date-time" })),
 	"userId": v.string(),
