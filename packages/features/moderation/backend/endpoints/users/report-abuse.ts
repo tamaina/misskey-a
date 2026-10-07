@@ -3,12 +3,16 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { voidUsersReportAbuseDefinition, voidUsersReportAbuseInput, voidUsersReportAbuseOutput } from '../../../contract/void-endpoint-definitions.js';
 import { Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
+
 import { GetterService } from '@/server/api/GetterService.js';
 import { RoleService } from '../../../../roles/backend/services/RoleService.js';
 import { AbuseReportService } from '../../services/AbuseReportService.js';
 import { ApiError } from '@/server/api/error.js';
+
+const contractProjection = projectEndpointContract(voidUsersReportAbuseDefinition);
 
 export const meta = {
 	tags: ['users'],
@@ -39,23 +43,16 @@ export const meta = {
 	},
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {
-		userId: { type: 'string', format: 'misskey:id' },
-		comment: { type: 'string', minLength: 1, maxLength: 2048 },
-	},
-	required: ['userId', 'comment'],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof voidUsersReportAbuseInput, typeof voidUsersReportAbuseOutput> {
 	constructor(
 		private getterService: GetterService,
 		private roleService: RoleService,
 		private abuseReportService: AbuseReportService,
 	) {
-		super(meta, paramDef, async (ps, me) => {
+		super(meta, contractProjection, async (ps, me) => {
 			// Lookup user
 			const targetUser = await this.getterService.getUser(ps.userId).catch(err => {
 				if (err.id === '15348ddd-432d-49c2-8a5a-8069753becff') throw new ApiError(meta.errors.noSuchUser);

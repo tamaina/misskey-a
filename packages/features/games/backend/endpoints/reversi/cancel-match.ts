@@ -3,9 +3,13 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { voidReversiCancelMatchDefinition, voidReversiCancelMatchInput, voidReversiCancelMatchOutput } from '../../../contract/void-endpoint-definitions.js';
 import { Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
+
 import { ReversiService } from '../../services/ReversiService.js';
+
+const contractProjection = projectEndpointContract(voidReversiCancelMatchDefinition);
 
 export const meta = {
 	requireCredential: true,
@@ -16,20 +20,14 @@ export const meta = {
 	},
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {
-		userId: { type: 'string', format: 'misskey:id', nullable: true },
-	},
-	required: [],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof voidReversiCancelMatchInput, typeof voidReversiCancelMatchOutput> {
 	constructor(
 		private reversiService: ReversiService,
 	) {
-		super(meta, paramDef, async (ps, me) => {
+		super(meta, contractProjection, async (ps, me) => {
 			if (ps.userId) {
 				await this.reversiService.matchSpecificUserCancel(me, ps.userId);
 				return;

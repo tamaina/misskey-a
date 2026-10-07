@@ -3,40 +3,27 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { remainingUsernameAvailableDefinition, remainingUsernameAvailableInput, remainingUsernameAvailableOutput } from '../../../contract/remaining-inline-endpoint-definitions.js';
 import { IsNull } from 'typeorm';
 import { Inject, Injectable } from '@nestjs/common';
 import type { MiMeta, UsedUsernamesRepository, UsersRepository } from '@/models/_.js';
-import { Endpoint } from '@/server/api/endpoint-base.js';
-import { localUsernameSchema } from '../../../../users/backend/models/User.js';
 import { DI } from '@/di-symbols.js';
+
+const contractProjection = projectEndpointContract(remainingUsernameAvailableDefinition);
 
 export const meta = {
 	tags: ['users'],
 
 	requireCredential: false,
 
-	res: {
-		type: 'object',
-		optional: false, nullable: false,
-		properties: {
-			available: {
-				type: 'boolean',
-				optional: false, nullable: false,
-			},
-		},
-	},
+	res: contractProjection.response,
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {
-		username: localUsernameSchema,
-	},
-	required: ['username'],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof remainingUsernameAvailableInput, typeof remainingUsernameAvailableOutput> {
 	constructor(
 		@Inject(DI.meta)
 		private serverSettings: MiMeta,
@@ -47,7 +34,7 @@ export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDe
 		@Inject(DI.usedUsernamesRepository)
 		private usedUsernamesRepository: UsedUsernamesRepository,
 	) {
-		super(meta, paramDef, async (ps, me) => {
+		super(meta, contractProjection, async (ps, me) => {
 			const exist = await this.usersRepository.countBy({
 				host: IsNull(),
 				usernameLower: ps.username.toLowerCase(),

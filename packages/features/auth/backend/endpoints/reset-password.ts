@@ -3,12 +3,16 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { voidResetPasswordDefinition, voidResetPasswordInput, voidResetPasswordOutput } from '../../contract/void-endpoint-definitions.js';
 import bcrypt from 'bcryptjs';
 import { Inject, Injectable } from '@nestjs/common';
 import type { UserProfilesRepository, PasswordResetRequestsRepository } from '@/models/_.js';
-import { Endpoint } from '@/server/api/endpoint-base.js';
+
 import { DI } from '@/di-symbols.js';
 import { IdService } from '../../../runtime/backend/services/IdService.js';
+
+const contractProjection = projectEndpointContract(voidResetPasswordDefinition);
 
 export const meta = {
 	tags: ['reset password'],
@@ -22,17 +26,10 @@ export const meta = {
 	},
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {
-		token: { type: 'string' },
-		password: { type: 'string' },
-	},
-	required: ['token', 'password'],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof voidResetPasswordInput, typeof voidResetPasswordOutput> {
 	constructor(
 		@Inject(DI.passwordResetRequestsRepository)
 		private passwordResetRequestsRepository: PasswordResetRequestsRepository,
@@ -42,7 +39,7 @@ export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDe
 
 		private idService: IdService,
 	) {
-		super(meta, paramDef, async (ps, me) => {
+		super(meta, contractProjection, async (ps, me) => {
 			const req = await this.passwordResetRequestsRepository.findOneByOrFail({
 				token: ps.token,
 			});

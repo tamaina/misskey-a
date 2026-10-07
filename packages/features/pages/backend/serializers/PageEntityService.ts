@@ -3,8 +3,6 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Inject, Injectable } from '@nestjs/common';
-import { DI } from '@/di-symbols.js';
 import type { DriveFilesRepository, PagesRepository, PageLikesRepository } from '@/models/_.js';
 import { awaitAll } from '@/misc/prelude/await-all.js';
 import type { Packed } from '../../../index/contract/packed.js';
@@ -13,25 +11,21 @@ import type { MiUser } from '../../../users/backend/models/User.js';
 import type { MiPage } from '../models/Page.js';
 import type { MiDriveFile } from '../../../drive/backend/models/DriveFile.js';
 import { bindThis } from '@/decorators.js';
-import { IdService } from '../../../runtime/backend/services/IdService.js';
-import { UserEntityService } from '../../../users/backend/serializers/UserEntityService.js';
-import { DriveFileEntityService } from '../../../drive/backend/serializers/DriveFileEntityService.js';
+import type { IdService } from '../../../runtime/backend/services/IdService.js';
+import type { UserEntityService } from '../../../users/backend/serializers/UserEntityService.js';
+import type { DriveFileEntityService } from '../../../drive/backend/serializers/DriveFileEntityService.js';
 
-@Injectable()
 export class PageEntityService {
 	constructor(
-		@Inject(DI.pagesRepository)
 		private pagesRepository: PagesRepository,
 
-		@Inject(DI.pageLikesRepository)
 		private pageLikesRepository: PageLikesRepository,
 
-		@Inject(DI.driveFilesRepository)
 		private driveFilesRepository: DriveFilesRepository,
 
-		private userEntityService: UserEntityService,
-		private driveFileEntityService: DriveFileEntityService,
-		private idService: IdService,
+		private userEntityService: Pick<UserEntityService, 'pack' | 'packMany'>,
+		private driveFileEntityService: Pick<DriveFileEntityService, 'pack' | 'packMany'>,
+		private idService: Pick<IdService, 'parse'>,
 	) {
 	}
 

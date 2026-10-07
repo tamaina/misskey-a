@@ -3,9 +3,11 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { voidAdminUnsetMfaDefinition, voidAdminUnsetMfaInput, voidAdminUnsetMfaOutput } from '../../../contract/void-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
 import { DataSource } from 'typeorm';
-import { Endpoint } from '@/server/api/endpoint-base.js';
+
 import { ApiError } from '@/server/api/error.js';
 import { MiUserProfile } from '../../../../users/backend/models/UserProfile.js';
 import { MiUserSecurityKey } from '../../models/UserSecurityKey.js';
@@ -13,6 +15,8 @@ import type { UsersRepository } from '@/models/_.js';
 import { DI } from '@/di-symbols.js';
 import { RoleService } from '../../../../roles/backend/services/RoleService.js';
 import { ModerationLogService } from '../../../../moderation/backend/services/ModerationLogService.js';
+
+const contractProjection = projectEndpointContract(voidAdminUnsetMfaDefinition);
 
 export const meta = {
 	tags: ['admin'],
@@ -35,16 +39,10 @@ export const meta = {
 	},
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {
-		userId: { type: 'string', format: 'misskey:id' },
-	},
-	required: ['userId'],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof voidAdminUnsetMfaInput, typeof voidAdminUnsetMfaOutput> {
 	constructor(
 		@Inject(DI.db)
 		private db: DataSource,
@@ -55,7 +53,7 @@ export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDe
 		private roleService: RoleService,
 		private moderationLogService: ModerationLogService,
 	) {
-		super(meta, paramDef, async (ps, me) => {
+		super(meta, contractProjection, async (ps, me) => {
 			const user = await this.usersRepository.findOneBy({ id: ps.userId });
 
 			if (user == null) {

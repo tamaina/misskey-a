@@ -3,22 +3,18 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Inject, Injectable } from '@nestjs/common';
-import { DI } from '@/di-symbols.js';
 import type { PageLikesRepository } from '@/models/_.js';
 import type { } from '../../../relationships/backend/models/Blocking.js';
 import type { MiUser } from '../../../users/backend/models/User.js';
 import type { MiPageLike } from '../models/PageLike.js';
 import { bindThis } from '@/decorators.js';
-import { PageEntityService } from './PageEntityService.js';
+import type { PageEntityService } from './PageEntityService.js';
 
-@Injectable()
 export class PageLikeEntityService {
 	constructor(
-		@Inject(DI.pageLikesRepository)
 		private pageLikesRepository: PageLikesRepository,
 
-		private pageEntityService: PageEntityService,
+		private pageEntityService: Pick<PageEntityService, 'pack'>,
 	) {
 	}
 

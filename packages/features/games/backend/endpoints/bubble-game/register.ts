@@ -3,13 +3,17 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { voidBubbleGameRegisterDefinition, voidBubbleGameRegisterInput, voidBubbleGameRegisterOutput } from '../../../contract/void-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
 import ms from '@/runtime-dependencies/ms.js';
-import { Endpoint } from '@/server/api/endpoint-base.js';
+
 import { IdService } from '../../../../runtime/backend/services/IdService.js';
 import type { BubbleGameRecordsRepository } from '@/models/_.js';
 import { DI } from '@/di-symbols.js';
 import { ApiError } from '@/server/api/error.js';
+
+const contractProjection = projectEndpointContract(voidBubbleGameRegisterDefinition);
 
 export const meta = {
 	requireCredential: true,
@@ -31,35 +35,17 @@ export const meta = {
 	},
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {
-		score: { type: 'integer', minimum: 0 },
-		seed: { type: 'string', minLength: 1, maxLength: 1024 },
-		logs: {
-			type: 'array',
-			items: {
-				type: 'array',
-				items: {
-					type: 'number',
-				},
-			},
-		},
-		gameMode: { type: 'string' },
-		gameVersion: { type: 'integer' },
-	},
-	required: ['score', 'seed', 'logs', 'gameMode', 'gameVersion'],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof voidBubbleGameRegisterInput, typeof voidBubbleGameRegisterOutput> {
 	constructor(
 		@Inject(DI.bubbleGameRecordsRepository)
 		private bubbleGameRecordsRepository: BubbleGameRecordsRepository,
 
 		private idService: IdService,
 	) {
-		super(meta, paramDef, async (ps, me) => {
+		super(meta, contractProjection, async (ps, me) => {
 			const seedDate = new Date(parseInt(ps.seed, 10));
 			const now = new Date();
 

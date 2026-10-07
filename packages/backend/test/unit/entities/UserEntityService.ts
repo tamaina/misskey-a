@@ -9,6 +9,7 @@ import type { MiUser } from '../../../../features/users/backend/models/User.js';
 import { UserEntityService } from '../../../../features/users/backend/serializers/UserEntityService.js';
 import { GlobalModule } from '@/GlobalModule.js';
 import { CoreModule } from '@/core/CoreModule.js';
+import { featureServiceGroups } from '@/core/feature-service-providers.js';
 import { secureRndstr } from '@/misc/secure-rndstr.js';
 import { genAidx } from '@/misc/id/aidx.js';
 import {
@@ -23,9 +24,7 @@ import { DI } from '@/di-symbols.js';
 import { AvatarDecorationService } from '../../../../features/avatar-decorations/backend/services/AvatarDecorationService.js';
 import { ApPersonService } from '../../../../features/federation/backend/services/ApPersonService.js';
 import { NoteEntityService } from '../../../../features/notes/backend/serializers/NoteEntityService.js';
-import { PageEntityService } from '../../../../features/pages/backend/serializers/PageEntityService.js';
 import { CustomEmojiService } from '../../../../features/emojis/backend/services/CustomEmojiService.js';
-import { AnnouncementService } from '../../../../features/announcements/backend/services/AnnouncementService.js';
 import { RoleService } from '../../../../features/roles/backend/services/RoleService.js';
 import { FederatedInstanceService } from '../../../../features/federation/backend/services/FederatedInstanceService.js';
 import { IdService } from '../../../../features/runtime/backend/services/IdService.js';
@@ -145,9 +144,7 @@ describe('UserEntityService', () => {
 				UserEntityService,
 				ApPersonService,
 				NoteEntityService,
-				PageEntityService,
 				CustomEmojiService,
-				AnnouncementService,
 				RoleService,
 				FederatedInstanceService,
 				IdService,
@@ -181,6 +178,8 @@ describe('UserEntityService', () => {
 				imports: [GlobalModule, CoreModule],
 				providers: [
 					...services,
+					...featureServiceGroups.announcements.providers,
+					...featureServiceGroups.pages.providers,
 					...services.map(x => ({ provide: x.name, useExisting: x })),
 				],
 			}).compile();

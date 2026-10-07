@@ -3,11 +3,15 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { voidFederationUpdateRemoteUserDefinition, voidFederationUpdateRemoteUserInput, voidFederationUpdateRemoteUserOutput } from '../../../contract/void-endpoint-definitions.js';
 import { Injectable } from '@nestjs/common';
 import ms from '@/runtime-dependencies/ms.js';
-import { Endpoint } from '@/server/api/endpoint-base.js';
+
 import { ApPersonService } from '../../services/ApPersonService.js';
 import { GetterService } from '@/server/api/GetterService.js';
+
+const contractProjection = projectEndpointContract(voidFederationUpdateRemoteUserDefinition);
 
 export const meta = {
 	tags: ['federation'],
@@ -21,21 +25,15 @@ export const meta = {
 	},
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {
-		userId: { type: 'string', format: 'misskey:id' },
-	},
-	required: ['userId'],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof voidFederationUpdateRemoteUserInput, typeof voidFederationUpdateRemoteUserOutput> {
 	constructor(
 		private getterService: GetterService,
 		private apPersonService: ApPersonService,
 	) {
-		super(meta, paramDef, async (ps) => {
+		super(meta, contractProjection, async (ps) => {
 			const user = await this.getterService.getRemoteUser(ps.userId);
 
 			await this.apPersonService.updatePerson(user.uri!);

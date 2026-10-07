@@ -133,7 +133,13 @@ const cases = [
 
 for (const [moved, parameterCount] of cases) {
 	test(`${moved.name} is registered from its canonical feature module`, () => {
-		expect(coreProviders.filter(provider => provider === moved)).toHaveLength(1);
-		expect(Reflect.getMetadata('design:paramtypes', moved) ?? []).toHaveLength(parameterCount);
+		const registrations = coreProviders.filter(provider => provider === moved || (typeof provider === 'object' && provider !== null && 'provide' in provider && provider.provide === moved));
+		expect(registrations).toHaveLength(1);
+		if (registrations[0] === moved) {
+			expect(Reflect.getMetadata('design:paramtypes', moved) ?? []).toHaveLength(parameterCount);
+		} else {
+			expect(registrations[0]).toHaveProperty('useFactory');
+			expect(moved.length).toBe(parameterCount);
+		}
 	});
 }

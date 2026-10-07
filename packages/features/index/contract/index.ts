@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import type { RemainingInlineNativeEndpoints } from './remaining-inline-native-endpoints.js';
+import type { DriveListingNativeEndpoints } from './drive-listing-native-endpoints.js';
 import type { InstanceEndpoints } from '../../instance/contract/index.js';
 import type { StatisticsEndpoints } from '../../statistics/contract/index.js';
 import type { AvatarDecorationEndpoints } from '../../avatar-decorations/contract/index.js';
@@ -26,6 +28,7 @@ import type { RelationshipEndpoints } from '../../relationships/contract/command
 import type { PortabilityImportEndpoints } from '../../portability/contract/imports.js';
 import type { InlineNativeEndpoints } from './inline-native-endpoints.js';
 import type { PackedNativeEndpoints } from './packed-native-endpoints.js';
+import type { VoidNativeEndpoints } from './void-native-endpoints.js';
 
 export type FeatureEndpoints = ModerationCommandEndpoints
 	& NotesCommandEndpoints
@@ -45,6 +48,9 @@ export type FeatureEndpoints = ModerationCommandEndpoints
 	& ListEndpoints
 	& ChannelEndpoints
 	& InlineNativeEndpoints
-	& PackedNativeEndpoints;
+	& PackedNativeEndpoints
+	& VoidNativeEndpoints
+	& RemainingInlineNativeEndpoints
+	& DriveListingNativeEndpoints;
 
 export type { PackedModels } from './packed.js';

@@ -3,9 +3,13 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { voidAdminDriveCleanRemoteFilesDefinition, voidAdminDriveCleanRemoteFilesInput, voidAdminDriveCleanRemoteFilesOutput } from '../../../../contract/void-endpoint-definitions.js';
 import { Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
+
 import { QueueService } from '../../../../../runtime/backend/services/QueueService.js';
+
+const contractProjection = projectEndpointContract(voidAdminDriveCleanRemoteFilesDefinition);
 
 export const meta = {
 	tags: ['admin'],
@@ -15,18 +19,14 @@ export const meta = {
 	kind: 'write:admin:drive',
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {},
-	required: [],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof voidAdminDriveCleanRemoteFilesInput, typeof voidAdminDriveCleanRemoteFilesOutput> {
 	constructor(
 		private queueService: QueueService,
 	) {
-		super(meta, paramDef, async (ps, me) => {
+		super(meta, contractProjection, async (ps, me) => {
 			this.queueService.createCleanRemoteFilesJob();
 		});
 	}

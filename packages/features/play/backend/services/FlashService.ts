@@ -3,26 +3,21 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Inject, Injectable } from '@nestjs/common';
 import { Brackets } from 'typeorm';
-import { DI } from '@/di-symbols.js';
 import { type FlashLikesRepository, MiUser, type FlashsRepository } from '@/models/_.js';
-import { QueryService } from '@/core/QueryService.js';
+import type { QueryService } from '@/core/QueryService.js';
 import { sqlLikeEscape } from '@/misc/sql-like-escape.js';
 
 /**
  * MisskeyPlay関係のService
  */
-@Injectable()
 export class FlashService {
 	constructor(
-		@Inject(DI.flashsRepository)
 		private flashRepository: FlashsRepository,
 
-		@Inject(DI.flashLikesRepository)
 		private flashLikesRepository: FlashLikesRepository,
 
-		private queryService: QueryService,
+		private queryService: Pick<QueryService, 'makePaginationQuery'>,
 	) {
 	}
 

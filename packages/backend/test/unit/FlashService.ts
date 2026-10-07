@@ -71,7 +71,6 @@ describe('FlashService', () => {
 				CoreModule,
 			],
 			providers: [
-				FlashService,
 				IdService,
 			],
 		}).compile();

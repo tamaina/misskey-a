@@ -3,25 +3,20 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Inject, Injectable } from '@nestjs/common';
-import { DI } from '@/di-symbols.js';
 import type { FlashLikesRepository, FlashsRepository } from '@/models/_.js';
 import type { Packed } from '../../../index/contract/packed.js';
 import type { MiUser } from '../../../users/backend/models/User.js';
 import type { MiFlash } from '../models/Flash.js';
 import { bindThis } from '@/decorators.js';
-import { IdService } from '../../../runtime/backend/services/IdService.js';
-import { UserEntityService } from '../../../users/backend/serializers/UserEntityService.js';
+import type { IdService } from '../../../runtime/backend/services/IdService.js';
+import type { UserEntityService } from '../../../users/backend/serializers/UserEntityService.js';
 
-@Injectable()
 export class FlashEntityService {
 	constructor(
-		@Inject(DI.flashsRepository)
 		private flashsRepository: FlashsRepository,
-		@Inject(DI.flashLikesRepository)
 		private flashLikesRepository: FlashLikesRepository,
-		private userEntityService: UserEntityService,
-		private idService: IdService,
+		private userEntityService: Pick<UserEntityService, 'pack' | 'packMany'>,
+		private idService: Pick<IdService, 'parse'>,
 	) {
 	}
 

@@ -3,12 +3,16 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { voidDriveFilesUploadFromUrlDefinition, voidDriveFilesUploadFromUrlInput, voidDriveFilesUploadFromUrlOutput } from '../../../../contract/void-endpoint-definitions.js';
 import ms from '@/runtime-dependencies/ms.js';
 import { Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
+
 import { GlobalEventService } from '../../../../../runtime/backend/services/GlobalEventService.js';
 import { DriveFileEntityService } from '../../../serializers/DriveFileEntityService.js';
 import { DriveService } from '../../../services/DriveService.js';
+
+const contractProjection = projectEndpointContract(voidDriveFilesUploadFromUrlDefinition);
 
 export const meta = {
 	tags: ['drive'],
@@ -27,27 +31,16 @@ export const meta = {
 	kind: 'write:drive',
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {
-		url: { type: 'string' },
-		folderId: { type: 'string', format: 'misskey:id', nullable: true, default: null },
-		isSensitive: { type: 'boolean', default: false },
-		comment: { type: 'string', nullable: true, maxLength: 512, default: null },
-		marker: { type: 'string', nullable: true, default: null },
-		force: { type: 'boolean', default: false },
-	},
-	required: ['url'],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof voidDriveFilesUploadFromUrlInput, typeof voidDriveFilesUploadFromUrlOutput> {
 	constructor(
 		private driveFileEntityService: DriveFileEntityService,
 		private driveService: DriveService,
 		private globalEventService: GlobalEventService,
 	) {
-		super(meta, paramDef, async (ps, user, _1, _2, _3, ip, headers) => {
+		super(meta, contractProjection, async (ps, user, _1, _2, _3, ip, headers) => {
 			this.driveService.uploadFromUrl({ url: ps.url, user, folderId: ps.folderId, sensitive: ps.isSensitive, force: ps.force, comment: ps.comment, requestIp: ip, requestHeaders: headers }).then(file => {
 				this.driveFileEntityService.pack(file, { self: true }).then(packedFile => {
 					this.globalEventService.publishMainStream(user.id, 'urlUploadFinished', {

@@ -43,7 +43,6 @@ import { ref, shallowRef, inject, computed, watch, onBeforeUnmount } from 'vue';
 import type { MenuItem } from '@features/navigation/frontend/types/menu.js';
 import { DI } from '@features/ui/frontend/di.js';
 import { hms } from '@features/ui/frontend/filters/hms.js';
-import { i18n } from '@features/runtime/frontend/i18n.js';
 import * as os from '@features/ui/frontend/os.js';
 import hasAudio from '@features/media/frontend/utility/media-has-audio.js';
 import MkMediaRange from '@features/media/frontend/components/MkMediaRange.vue';
@@ -68,13 +67,13 @@ function showMenu(ev: PointerEvent) {
 		// TODO: 再生キューに追加
 		{
 			type: 'switch',
-			text: i18n.ts._mediaControls.loop,
+			text: $locale.value.sfc.loop,
 			icon: 'ti ti-repeat',
 			ref: loop,
 		},
 		{
 			type: 'radio',
-			text: i18n.ts._mediaControls.playbackRate,
+			text: $locale.value.sfc.playbackRate,
 			icon: 'ti ti-clock-play',
 			ref: speed,
 			options: [{
@@ -101,7 +100,7 @@ function showMenu(ev: PointerEvent) {
 			}],
 		},
 		...(window.document.pictureInPictureEnabled && isVideo.value ? [{
-			text: i18n.ts._mediaControls.pip,
+			text: $locale.value.sfc.pip,
 			icon: 'ti ti-picture-in-picture',
 			action: togglePictureInPicture,
 		}] : []),
@@ -453,3 +452,227 @@ defineExpose({
 	grid-area: seekbar;
 }
 </style>
+
+<locale locale="ar-SA" lang="json">
+{
+	"loop": "Loop playback",
+	"playbackRate": "Playback Speed",
+	"pip": "Picture in Picture"
+}
+</locale>
+
+<locale locale="ca-ES" lang="json">
+{
+	"loop": "Reproducció en bucle",
+	"playbackRate": "Velocitat de reproducció ",
+	"pip": "Imatge sobre impressionada "
+}
+</locale>
+
+<locale locale="cs-CZ" lang="json">
+{
+	"loop": "Loop playback",
+	"playbackRate": "Playback Speed",
+	"pip": "Picture in Picture"
+}
+</locale>
+
+<locale locale="da-DK" lang="json">
+{
+	"loop": "Loop playback",
+	"playbackRate": "Playback Speed",
+	"pip": "Picture in Picture"
+}
+</locale>
+
+<locale locale="de-DE" lang="json">
+{
+	"loop": "Endloswiedergabe",
+	"playbackRate": "Wiedergabegeschwindigkeit",
+	"pip": "Bild-in-Bild"
+}
+</locale>
+
+<locale locale="en-US" lang="json">
+{
+	"loop": "Loop playback",
+	"playbackRate": "Playback Speed",
+	"pip": "Picture in Picture"
+}
+</locale>
+
+<locale locale="es-ES" lang="json">
+{
+	"loop": "Reproducción en bucle",
+	"playbackRate": "Velocidad de reproducción",
+	"pip": "Picture in Picture"
+}
+</locale>
+
+<locale locale="fr-FR" lang="json">
+{
+	"loop": "Loop playback",
+	"playbackRate": "Vitesse de lecture",
+	"pip": "Picture in Picture"
+}
+</locale>
+
+<locale locale="id-ID" lang="json">
+{
+	"loop": "Ulangi Pemutaran",
+	"playbackRate": "Kecepatan Pemutaran",
+	"pip": "Gambar dalam Gambar"
+}
+</locale>
+
+<locale locale="it-IT" lang="json">
+{
+	"loop": "Ripetizione infinita",
+	"playbackRate": "Velocità di riproduzione",
+	"pip": "Sovraimpressione"
+}
+</locale>
+
+<locale locale="ja-JP" lang="json">
+{
+	"loop": "ループ再生",
+	"playbackRate": "再生速度",
+	"pip": "ピクチャインピクチャ"
+}
+</locale>
+
+<locale locale="ja-KS" lang="json">
+{
+	"loop": "ループ再生",
+	"playbackRate": "再生速度",
+	"pip": "ピクチャインピクチャ"
+}
+</locale>
+
+<locale locale="kab-KAB" lang="json">
+{
+	"loop": "Loop playback",
+	"playbackRate": "Playback Speed",
+	"pip": "Picture in Picture"
+}
+</locale>
+
+<locale locale="kn-IN" lang="json">
+{
+	"loop": "Loop playback",
+	"playbackRate": "Playback Speed",
+	"pip": "Picture in Picture"
+}
+</locale>
+
+<locale locale="ko-KR" lang="json">
+{
+	"loop": "반복 재생",
+	"playbackRate": "재생 속도",
+	"pip": "화면 속 화면"
+}
+</locale>
+
+<locale locale="nl-NL" lang="json">
+{
+	"loop": "Loop playback",
+	"playbackRate": "Playback Speed",
+	"pip": "Picture in Picture"
+}
+</locale>
+
+<locale locale="no-NO" lang="json">
+{
+	"loop": "Loop playback",
+	"playbackRate": "Playback Speed",
+	"pip": "Picture in Picture"
+}
+</locale>
+
+<locale locale="pl-PL" lang="json">
+{
+	"loop": "Loop playback",
+	"playbackRate": "Playback Speed",
+	"pip": "Picture in Picture"
+}
+</locale>
+
+<locale locale="pt-PT" lang="json">
+{
+	"loop": "Reprodução em Loop",
+	"playbackRate": "Velocidade de Reprodução",
+	"pip": "Picture-in-Picture"
+}
+</locale>
+
+<locale locale="ru-RU" lang="json">
+{
+	"loop": "Loop playback",
+	"playbackRate": "Playback Speed",
+	"pip": "Picture in Picture"
+}
+</locale>
+
+<locale locale="sk-SK" lang="json">
+{
+	"loop": "Loop playback",
+	"playbackRate": "Playback Speed",
+	"pip": "Picture in Picture"
+}
+</locale>
+
+<locale locale="th-TH" lang="json">
+{
+	"loop": "เล่นวนซ้ำ",
+	"playbackRate": "ความเร็วในการเล่น",
+	"pip": "ภาพซ้อนภาพ (PiP)"
+}
+</locale>
+
+<locale locale="tr-TR" lang="json">
+{
+	"loop": "Döngüsel oynatma",
+	"playbackRate": "Oynatma Hızı",
+	"pip": "Resim içinde resim"
+}
+</locale>
+
+<locale locale="ug-CN" lang="json">
+{
+	"loop": "Loop playback",
+	"playbackRate": "Playback Speed",
+	"pip": "Picture in Picture"
+}
+</locale>
+
+<locale locale="uk-UA" lang="json">
+{
+	"loop": "Loop playback",
+	"playbackRate": "Playback Speed",
+	"pip": "Picture in Picture"
+}
+</locale>
+
+<locale locale="vi-VN" lang="json">
+{
+	"loop": "Loop playback",
+	"playbackRate": "Playback Speed",
+	"pip": "Picture in Picture"
+}
+</locale>
+
+<locale locale="zh-CN" lang="json">
+{
+	"loop": "循环播放",
+	"playbackRate": "播放速度",
+	"pip": "画中画"
+}
+</locale>
+
+<locale locale="zh-TW" lang="json">
+{
+	"loop": "循環播放",
+	"playbackRate": "播放速度",
+	"pip": "畫中畫"
+}
+</locale>

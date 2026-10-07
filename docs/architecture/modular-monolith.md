@@ -418,3 +418,31 @@ Pick/Omit without a broad top-level index signature erasing required fields;
 transport validation and preservation of extra input keys are unchanged. Opaque
 Page data and queue options are represented as records, retaining arbitrary data.
 These changes do not introduce response parsing or alter the HTTP client runtime.
+
+## No-content contracts and source-constant constraints
+
+Another 64 no-content endpoints and twelve endpoints with source-constant regular
+expressions or registry defaults use feature contracts. Native coverage is now
+366 of 438 routes; 72 retain the legacy path. The no-content routes preserve
+missing response metadata and their existing HTTP 204 behavior. Registry scope
+keeps its legacy required declaration and static default, while opaque values
+and extra input fields remain untouched. Maintained tests exercise the real
+Endpoint/AJV bridge for field allowlists, invalid input, defaults, authorization
+and response identity. The complete generated OpenAPI document remains equal
+to the pre-migration baseline.
+
+## Explicit feature service construction
+
+Announcements, collections, gallery, pages and play now construct 13 services
+through typed feature-owned factories. Their dependencies are named ports with
+narrow cross-feature capabilities; their existing method implementations and
+binding behavior are retained. The temporary Nest host adapter creates each
+feature graph once and exposes the previous class and string tokens without
+expanding their export visibility. Remaining CoreModule registrations use a
+single canonical service index instead of repeated provider/alias/export lists.
+
+The initial slice reduces production code by 373 lines. It does not migrate
+resource-owning constructors or lazy ModuleRef lifecycle resolution. Boot will
+ultimately own construction and disposal directly, at which point the Nest-only
+adapter can be removed. Regression tests preserve all existing provider/export
+and alias identities, singleton sharing, and strict local test-module resolution.

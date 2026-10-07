@@ -3,12 +3,16 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { voidAdminPromoCreateDefinition, voidAdminPromoCreateInput, voidAdminPromoCreateOutput } from '../../../../contract/void-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
+
 import type { PromoNotesRepository } from '@/models/_.js';
 import { GetterService } from '@/server/api/GetterService.js';
 import { DI } from '@/di-symbols.js';
 import { ApiError } from '@/server/api/error.js';
+
+const contractProjection = projectEndpointContract(voidAdminPromoCreateDefinition);
 
 export const meta = {
 	tags: ['admin'],
@@ -32,24 +36,17 @@ export const meta = {
 	},
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {
-		noteId: { type: 'string', format: 'misskey:id' },
-		expiresAt: { type: 'integer' },
-	},
-	required: ['noteId', 'expiresAt'],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof voidAdminPromoCreateInput, typeof voidAdminPromoCreateOutput> {
 	constructor(
 		@Inject(DI.promoNotesRepository)
 		private promoNotesRepository: PromoNotesRepository,
 
 		private getterService: GetterService,
 	) {
-		super(meta, paramDef, async (ps, me) => {
+		super(meta, contractProjection, async (ps, me) => {
 			const note = await this.getterService.getNote(ps.noteId).catch(e => {
 				if (e.id === '9725d0ce-ba28-4dde-95a7-2cbb2c15de24') throw new ApiError(meta.errors.noSuchNote);
 				throw e;

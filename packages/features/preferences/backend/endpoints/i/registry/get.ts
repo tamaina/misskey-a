@@ -3,10 +3,13 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { remainingIRegistryGetDefinition, remainingIRegistryGetInput, remainingIRegistryGetOutput } from '../../../../contract/remaining-inline-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
 import { RegistryApiService } from '../../../services/RegistryApiService.js';
 import { ApiError } from '@/server/api/error.js';
+
+const contractProjection = projectEndpointContract(remainingIRegistryGetDefinition);
 
 export const meta = {
 	requireCredential: true,
@@ -20,29 +23,17 @@ export const meta = {
 		},
 	},
 
-	res: {
-		type: 'object',
-	}
+	res: contractProjection.response
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {
-		key: { type: 'string' },
-		scope: { type: 'array', default: [], items: {
-			type: 'string', pattern: /^[a-zA-Z0-9_]+$/.toString().slice(1, -1),
-		} },
-		domain: { type: 'string', nullable: true },
-	},
-	required: ['key', 'scope'],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof remainingIRegistryGetInput, typeof remainingIRegistryGetOutput> {
 	constructor(
 		private registryApiService: RegistryApiService,
 	) {
-		super(meta, paramDef, async (ps, me, accessToken) => {
+		super(meta, contractProjection, async (ps, me, accessToken) => {
 			const item = await this.registryApiService.getItem(me.id, accessToken != null ? accessToken.id : (ps.domain ?? null), ps.scope, ps.key);
 
 			if (item == null) {

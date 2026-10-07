@@ -3,10 +3,14 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { voidExportCustomEmojisDefinition, voidExportCustomEmojisInput, voidExportCustomEmojisOutput } from '../../contract/void-endpoint-definitions.js';
 import ms from '@/runtime-dependencies/ms.js';
 import { Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
+
 import { QueueService } from '../../../runtime/backend/services/QueueService.js';
+
+const contractProjection = projectEndpointContract(voidExportCustomEmojisDefinition);
 
 export const meta = {
 	secure: true,
@@ -17,18 +21,14 @@ export const meta = {
 	},
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {},
-	required: [],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof voidExportCustomEmojisInput, typeof voidExportCustomEmojisOutput> {
 	constructor(
 		private queueService: QueueService,
 	) {
-		super(meta, paramDef, async (ps, me) => {
+		super(meta, contractProjection, async (ps, me) => {
 			this.queueService.createExportCustomEmojisJob(me);
 		});
 	}

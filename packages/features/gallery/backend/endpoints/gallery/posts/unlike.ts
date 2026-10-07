@@ -3,13 +3,17 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { voidGalleryPostsUnlikeDefinition, voidGalleryPostsUnlikeInput, voidGalleryPostsUnlikeOutput } from '../../../../contract/void-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
+
 import type { GalleryPostsRepository, GalleryLikesRepository } from '@/models/_.js';
 import { FeaturedService, GALLERY_POSTS_RANKING_WINDOW } from '../../../../../discovery/backend/services/FeaturedService.js';
 import { IdService } from '../../../../../runtime/backend/services/IdService.js';
 import { DI } from '@/di-symbols.js';
 import { ApiError } from '@/server/api/error.js';
+
+const contractProjection = projectEndpointContract(voidGalleryPostsUnlikeDefinition);
 
 export const meta = {
 	tags: ['gallery'],
@@ -35,16 +39,10 @@ export const meta = {
 	},
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {
-		postId: { type: 'string', format: 'misskey:id' },
-	},
-	required: ['postId'],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof voidGalleryPostsUnlikeInput, typeof voidGalleryPostsUnlikeOutput> {
 	constructor(
 		@Inject(DI.galleryPostsRepository)
 		private galleryPostsRepository: GalleryPostsRepository,
@@ -55,7 +53,7 @@ export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDe
 		private featuredService: FeaturedService,
 		private idService: IdService,
 	) {
-		super(meta, paramDef, async (ps, me) => {
+		super(meta, contractProjection, async (ps, me) => {
 			const post = await this.galleryPostsRepository.findOneBy({ id: ps.postId });
 			if (post == null) {
 				throw new ApiError(meta.errors.noSuchPost);

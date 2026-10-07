@@ -3,9 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Inject, Injectable } from '@nestjs/common';
-import { DataSource, In, Not } from 'typeorm';
-import { DI } from '@/di-symbols.js';
+import { type DataSource, In, Not } from 'typeorm';
 import {
 	type NotesRepository,
 	MiPage,
@@ -15,11 +13,11 @@ import {
 	MiNote,
 } from '@/models/_.js';
 import { bindThis } from '@/decorators.js';
-import { RoleService } from '../../../roles/backend/services/RoleService.js';
-import { IdService } from '../../../runtime/backend/services/IdService.js';
+import type { RoleService } from '../../../roles/backend/services/RoleService.js';
+import type { IdService } from '../../../runtime/backend/services/IdService.js';
 import type { MiUser } from '../../../users/backend/models/User.js';
 import { IdentifiableError } from '@/misc/identifiable-error.js';
-import { ModerationLogService } from '../../../moderation/backend/services/ModerationLogService.js';
+import type { ModerationLogService } from '../../../moderation/backend/services/ModerationLogService.js';
 
 export interface PageBody {
 	title: string;
@@ -34,24 +32,19 @@ export interface PageBody {
 	hideTitleWhenPinned: boolean;
 }
 
-@Injectable()
 export class PageService {
 	constructor(
-		@Inject(DI.db)
 		private db: DataSource,
 
-		@Inject(DI.pagesRepository)
 		private pagesRepository: PagesRepository,
 
-		@Inject(DI.notesRepository)
 		private notesRepository: NotesRepository,
 
-		@Inject(DI.usersRepository)
 		private usersRepository: UsersRepository,
 
-		private roleService: RoleService,
-		private moderationLogService: ModerationLogService,
-		private idService: IdService,
+		private roleService: Pick<RoleService, 'isModerator'>,
+		private moderationLogService: Pick<ModerationLogService, 'log'>,
+		private idService: Pick<IdService, 'gen'>,
 	) {
 	}
 

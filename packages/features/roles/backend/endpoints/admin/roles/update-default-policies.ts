@@ -3,11 +3,15 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { voidAdminRolesUpdateDefaultPoliciesDefinition, voidAdminRolesUpdateDefaultPoliciesInput, voidAdminRolesUpdateDefaultPoliciesOutput } from '../../../../contract/void-endpoint-definitions.js';
 import { Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
+
 import { GlobalEventService } from '../../../../../runtime/backend/services/GlobalEventService.js';
 import { MetaService } from '../../../../../instance/backend/services/MetaService.js';
 import { ModerationLogService } from '../../../../../moderation/backend/services/ModerationLogService.js';
+
+const contractProjection = projectEndpointContract(voidAdminRolesUpdateDefaultPoliciesDefinition);
 
 export const meta = {
 	tags: ['admin', 'role'],
@@ -17,26 +21,16 @@ export const meta = {
 	kind: 'write:admin:roles',
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {
-		policies: {
-			type: 'object',
-		},
-	},
-	required: [
-		'policies',
-	],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof voidAdminRolesUpdateDefaultPoliciesInput, typeof voidAdminRolesUpdateDefaultPoliciesOutput> {
 	constructor(
 		private metaService: MetaService,
 		private globalEventService: GlobalEventService,
 		private moderationLogService: ModerationLogService,
 	) {
-		super(meta, paramDef, async (ps, me) => {
+		super(meta, contractProjection, async (ps, me) => {
 			const before = await this.metaService.fetch(true);
 
 			await this.metaService.update({

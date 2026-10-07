@@ -3,12 +3,15 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { remainingIRegistryRemoveDefinition, remainingIRegistryRemoveInput, remainingIRegistryRemoveOutput } from '../../../../contract/remaining-inline-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
 import type { RegistryItemsRepository } from '@/models/_.js';
 import { DI } from '@/di-symbols.js';
 import { RegistryApiService } from '../../../services/RegistryApiService.js';
 import { ApiError } from '@/server/api/error.js';
+
+const contractProjection = projectEndpointContract(remainingIRegistryRemoveDefinition);
 
 export const meta = {
 	requireCredential: true,
@@ -23,24 +26,14 @@ export const meta = {
 	},
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {
-		key: { type: 'string' },
-		scope: { type: 'array', default: [], items: {
-			type: 'string', pattern: /^[a-zA-Z0-9_]+$/.toString().slice(1, -1),
-		} },
-		domain: { type: 'string', nullable: true },
-	},
-	required: ['key', 'scope'],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof remainingIRegistryRemoveInput, typeof remainingIRegistryRemoveOutput> {
 	constructor(
 		private registryApiService: RegistryApiService,
 	) {
-		super(meta, paramDef, async (ps, me, accessToken) => {
+		super(meta, contractProjection, async (ps, me, accessToken) => {
 			await this.registryApiService.remove(me.id, accessToken != null ? accessToken.id : (ps.domain ?? null), ps.scope, ps.key);
 		});
 	}

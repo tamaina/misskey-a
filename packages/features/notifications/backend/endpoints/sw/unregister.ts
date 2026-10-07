@@ -3,12 +3,16 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { voidSwUnregisterDefinition, voidSwUnregisterInput, voidSwUnregisterOutput } from '../../../contract/void-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
 import ms from '@/runtime-dependencies/ms.js';
 import type { SwSubscriptionsRepository } from '@/models/_.js';
-import { Endpoint } from '@/server/api/endpoint-base.js';
+
 import { DI } from '@/di-symbols.js';
 import { PushNotificationService } from '../../services/PushNotificationService.js';
+
+const contractProjection = projectEndpointContract(voidSwUnregisterDefinition);
 
 export const meta = {
 	tags: ['account'],
@@ -25,25 +29,17 @@ export const meta = {
 	description: 'Unregister from receiving push notifications.',
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {
-		endpoint: { type: 'string' },
-		auth: { type: 'string' },
-		publickey: { type: 'string' },
-	},
-	required: ['endpoint', 'auth', 'publickey'],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof voidSwUnregisterInput, typeof voidSwUnregisterOutput> {
 	constructor(
 		@Inject(DI.swSubscriptionsRepository)
 		private swSubscriptionsRepository: SwSubscriptionsRepository,
 
 		private pushNotificationService: PushNotificationService,
 	) {
-		super(meta, paramDef, async (ps, me) => {
+		super(meta, contractProjection, async (ps, me) => {
 			const subscriptions = await this.swSubscriptionsRepository.findBy({
 				...(me ? { userId: me.id } : {}),
 				endpoint: ps.endpoint,

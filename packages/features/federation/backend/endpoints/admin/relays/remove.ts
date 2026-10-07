@@ -3,9 +3,13 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { voidAdminRelaysRemoveDefinition, voidAdminRelaysRemoveInput, voidAdminRelaysRemoveOutput } from '../../../../contract/void-endpoint-definitions.js';
 import { Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
+
 import { RelayService } from '../../../services/RelayService.js';
+
+const contractProjection = projectEndpointContract(voidAdminRelaysRemoveDefinition);
 
 export const meta = {
 	tags: ['admin'],
@@ -15,20 +19,14 @@ export const meta = {
 	kind: 'write:admin:relays',
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {
-		inbox: { type: 'string' },
-	},
-	required: ['inbox'],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof voidAdminRelaysRemoveInput, typeof voidAdminRelaysRemoveOutput> {
 	constructor(
 		private relayService: RelayService,
 	) {
-		super(meta, paramDef, async (ps, me) => {
+		super(meta, contractProjection, async (ps, me) => {
 			return await this.relayService.removeRelay(ps.inbox);
 		});
 	}

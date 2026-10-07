@@ -3,13 +3,17 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { voidVerifyEmailDefinition, voidVerifyEmailInput, voidVerifyEmailOutput } from '../../contract/void-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
+
 import type { UserProfilesRepository } from '@/models/_.js';
 import { UserEntityService } from '../../../users/backend/serializers/UserEntityService.js';
 import { DI } from '@/di-symbols.js';
 import { GlobalEventService } from '../../../runtime/backend/services/GlobalEventService.js';
 import { ApiError } from '@/server/api/error.js';
+
+const contractProjection = projectEndpointContract(voidVerifyEmailDefinition);
 
 export const meta = {
 	requireCredential: false,
@@ -25,16 +29,10 @@ export const meta = {
 	},
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {
-		code: { type: 'string' },
-	},
-	required: ['code'],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof voidVerifyEmailInput, typeof voidVerifyEmailOutput> {
 	constructor(
 		@Inject(DI.userProfilesRepository)
 		private userProfilesRepository: UserProfilesRepository,
@@ -42,7 +40,7 @@ export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDe
 		private userEntityService: UserEntityService,
 		private globalEventService: GlobalEventService,
 	) {
-		super(meta, paramDef, async (ps) => {
+		super(meta, contractProjection, async (ps) => {
 			const profile = await this.userProfilesRepository.findOneBy({
 				emailVerifyCode: ps.code,
 			});

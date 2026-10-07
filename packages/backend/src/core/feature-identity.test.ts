@@ -285,7 +285,13 @@ const services = [
 
 for (const [name, feature, parameterCount] of services) {
 	test(`${name} is registered as the canonical feature provider`, () => {
-		expect(coreProviders.filter(provider => provider === feature)).toHaveLength(1);
-		expect(Reflect.getMetadata('design:paramtypes', feature) ?? []).toHaveLength(parameterCount);
+		const registrations = coreProviders.filter(provider => provider === feature || (typeof provider === 'object' && provider !== null && 'provide' in provider && provider.provide === feature));
+		expect(registrations).toHaveLength(1);
+		if (registrations[0] === feature) {
+			expect(Reflect.getMetadata('design:paramtypes', feature) ?? []).toHaveLength(parameterCount);
+		} else {
+			expect(registrations[0]).toHaveProperty('useFactory');
+			expect(feature.length).toBe(parameterCount);
+		}
 	});
 }

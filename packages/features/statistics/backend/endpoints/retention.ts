@@ -3,62 +3,34 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { remainingRetentionDefinition, remainingRetentionInput, remainingRetentionOutput } from '../../contract/remaining-inline-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
 import type { RetentionAggregationsRepository } from '@/models/_.js';
-import { Endpoint } from '@/server/api/endpoint-base.js';
 import { DI } from '@/di-symbols.js';
+
+const contractProjection = projectEndpointContract(remainingRetentionDefinition);
 
 export const meta = {
 	tags: ['users'],
 
 	requireCredential: false,
 
-	res: {
-		type: 'array',
-		items: {
-			type: 'object',
-			properties: {
-				createdAt: {
-					type: 'string',
-					format: 'date-time',
-				},
-				users: {
-					type: 'number',
-				},
-				data: {
-					type: 'object',
-					additionalProperties: {
-						anyOf: [{
-							type: 'number',
-						}],
-					},
-				},
-			},
-			required: [
-				'createdAt',
-				'users',
-				'data',
-			],
-		},
-	},
+	res: contractProjection.response,
 
 	allowGet: true,
 	cacheSec: 60 * 60,
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {},
-	required: [],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof remainingRetentionInput, typeof remainingRetentionOutput> {
 	constructor(
 		@Inject(DI.retentionAggregationsRepository)
 		private retentionAggregationsRepository: RetentionAggregationsRepository,
 	) {
-		super(meta, paramDef, async (ps, me) => {
+		super(meta, contractProjection, async (ps, me) => {
 			const records = await this.retentionAggregationsRepository.find({
 				order: {
 					id: 'DESC',

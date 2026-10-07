@@ -11,7 +11,7 @@ import { mockDeep } from 'vitest-mock-extended';
 import { Test } from '@nestjs/testing';
 import { GlobalModule } from '@/GlobalModule.js';
 import { AnnouncementService } from '../../../features/announcements/backend/services/AnnouncementService.js';
-import { AnnouncementEntityService } from '../../../features/announcements/backend/serializers/AnnouncementEntityService.js';
+import { featureServiceGroups } from '@/core/feature-service-providers.js';
 import type {
 	AnnouncementReadsRepository,
 	AnnouncementsRepository,
@@ -65,8 +65,7 @@ describe('AnnouncementService', () => {
 				GlobalModule,
 			],
 			providers: [
-				AnnouncementService,
-				AnnouncementEntityService,
+				...featureServiceGroups.announcements.providers,
 				CacheService,
 				IdService,
 			],

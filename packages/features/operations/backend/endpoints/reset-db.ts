@@ -3,15 +3,19 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { voidResetDbDefinition, voidResetDbInput, voidResetDbOutput } from '../../contract/void-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
 import { DataSource } from 'typeorm';
 import * as Redis from 'ioredis';
 import { LoggerService } from '../../../runtime/backend/services/LoggerService.js';
-import { Endpoint } from '@/server/api/endpoint-base.js';
+
 import { DI } from '@/di-symbols.js';
 import { resetDb } from '@/misc/reset-db.js';
 import { MetaService } from '../../../instance/backend/services/MetaService.js';
 import { GlobalEventService } from '../../../runtime/backend/services/GlobalEventService.js';
+
+const contractProjection = projectEndpointContract(voidResetDbDefinition);
 
 export const meta = {
 	tags: ['non-productive'],
@@ -25,14 +29,10 @@ export const meta = {
 	},
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {},
-	required: [],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof voidResetDbInput, typeof voidResetDbOutput> {
 	constructor(
 		@Inject(DI.db)
 		private db: DataSource,
@@ -44,7 +44,7 @@ export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDe
 		private metaService: MetaService,
 		private globalEventService: GlobalEventService,
 	) {
-		super(meta, paramDef, async (ps, me) => {
+		super(meta, contractProjection, async (ps, me) => {
 			if (process.env.NODE_ENV !== 'test') throw new Error('NODE_ENV is not a test');
 
 			const logger = this.loggerService.getLogger('reset-db');

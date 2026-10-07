@@ -3,17 +3,14 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Inject, Injectable } from '@nestjs/common';
 import { QueryFailedError } from 'typeorm';
-import { DI } from '@/di-symbols.js';
 import type { ClipsRepository, MiNote, MiClip, ClipNotesRepository, NotesRepository } from '@/models/_.js';
 import { bindThis } from '@/decorators.js';
 import { isDuplicateKeyValueError } from '@/misc/is-duplicate-key-value-error.js';
-import { RoleService } from '../../../roles/backend/services/RoleService.js';
-import { IdService } from '../../../runtime/backend/services/IdService.js';
+import type { RoleService } from '../../../roles/backend/services/RoleService.js';
+import type { IdService } from '../../../runtime/backend/services/IdService.js';
 import type { MiLocalUser } from '../../../users/backend/models/User.js';
 
-@Injectable()
 export class ClipService {
 	public static NoSuchNoteError = class extends Error {};
 	public static NoSuchClipError = class extends Error {};
@@ -22,17 +19,14 @@ export class ClipService {
 	public static TooManyClipsError = class extends Error {};
 
 	constructor(
-		@Inject(DI.clipsRepository)
 		private clipsRepository: ClipsRepository,
 
-		@Inject(DI.clipNotesRepository)
 		private clipNotesRepository: ClipNotesRepository,
 
-		@Inject(DI.notesRepository)
 		private notesRepository: NotesRepository,
 
-		private roleService: RoleService,
-		private idService: IdService,
+		private roleService: Pick<RoleService, 'getUserPolicies'>,
+		private idService: Pick<IdService, 'gen'>,
 	) {
 	}
 

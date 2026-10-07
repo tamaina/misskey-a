@@ -36,15 +36,14 @@ import { ensureSignin } from '@features/auth/frontend/i.js';
 import { userPage, userName } from '@features/users/frontend/filters/user.js';
 import misskeysvg from '/client-assets/misskey.svg';
 import { getStaticImageUrl } from '@features/media/frontend/utility/media-proxy.js';
-import { i18n } from '@features/runtime/frontend/i18n.js';
 
 const $i = ensureSignin();
 
 const acct = computed(() => `@${$i.username}@${host}`);
 const userProfileUrl = computed(() => userPage($i, undefined, true));
 const shareData = computed(() => ({
-	title: i18n.tsx._qr.shareTitle({ name: userName($i), acct: acct.value }),
-	text: i18n.ts._qr.shareText,
+	title: $l.value.sfc.shareTitle({ name: userName($i), acct: acct.value }),
+	text: $locale.value.sfc.shareText,
 	url: userProfileUrl.value,
 }));
 const canShare = computed(() => navigator.canShare && navigator.canShare(shareData.value));
@@ -232,3 +231,199 @@ $avatarSize: 58px;
   rotate: x 180deg;
 }
 </style>
+
+<locale locale="ar-SA" lang="json">
+{
+	"shareTitle": "{name} {acct}",
+	"shareText": "Follow me on the Fediverse!"
+}
+</locale>
+
+<locale locale="ca-ES" lang="json">
+{
+	"shareTitle": "{name} {acct}",
+	"shareText": "Segueix-me al Fediverse"
+}
+</locale>
+
+<locale locale="cs-CZ" lang="json">
+{
+	"shareTitle": "{name} {acct}",
+	"shareText": "Follow me on the Fediverse!"
+}
+</locale>
+
+<locale locale="da-DK" lang="json">
+{
+	"shareTitle": "{name} {acct}",
+	"shareText": "Follow me on the Fediverse!"
+}
+</locale>
+
+<locale locale="de-DE" lang="json">
+{
+	"shareTitle": "{name} {acct}",
+	"shareText": "Bitte folge mir im Fediverse!"
+}
+</locale>
+
+<locale locale="en-US" lang="json">
+{
+	"shareTitle": "{name} {acct}",
+	"shareText": "Follow me on the Fediverse!"
+}
+</locale>
+
+<locale locale="es-ES" lang="json">
+{
+	"shareTitle": "{name} {acct}",
+	"shareText": "¡Sígueme en el Fediverso!"
+}
+</locale>
+
+<locale locale="fr-FR" lang="json">
+{
+	"shareTitle": "{name} {acct}",
+	"shareText": "Follow me on the Fediverse!"
+}
+</locale>
+
+<locale locale="id-ID" lang="json">
+{
+	"shareTitle": "{name} {acct}",
+	"shareText": "Follow me on the Fediverse!"
+}
+</locale>
+
+<locale locale="it-IT" lang="json">
+{
+	"shareTitle": "{name} {acct}",
+	"shareText": "Seguimi nel Fediverso!"
+}
+</locale>
+
+<locale locale="ja-JP" lang="json">
+{
+	"shareTitle": "{name} {acct}",
+	"shareText": "Fediverseで私をフォローしてください！"
+}
+</locale>
+
+<locale locale="ja-KS" lang="json">
+{
+	"shareTitle": "{name} {acct}",
+	"shareText": "Fediverseでフォローしてな！"
+}
+</locale>
+
+<locale locale="kab-KAB" lang="json">
+{
+	"shareTitle": "{name} {acct}",
+	"shareText": "Follow me on the Fediverse!"
+}
+</locale>
+
+<locale locale="kn-IN" lang="json">
+{
+	"shareTitle": "{name} {acct}",
+	"shareText": "Follow me on the Fediverse!"
+}
+</locale>
+
+<locale locale="ko-KR" lang="json">
+{
+	"shareTitle": "{name} {acct}",
+	"shareText": "Fediverse로 저를 팔로우해 주세요!"
+}
+</locale>
+
+<locale locale="nl-NL" lang="json">
+{
+	"shareTitle": "{name} {acct}",
+	"shareText": "Follow me on the Fediverse!"
+}
+</locale>
+
+<locale locale="no-NO" lang="json">
+{
+	"shareTitle": "{name} {acct}",
+	"shareText": "Follow me on the Fediverse!"
+}
+</locale>
+
+<locale locale="pl-PL" lang="json">
+{
+	"shareTitle": "{name} {acct}",
+	"shareText": "Follow me on the Fediverse!"
+}
+</locale>
+
+<locale locale="pt-PT" lang="json">
+{
+	"shareTitle": "{name} {acct}",
+	"shareText": "Siga-me no Fediverso!"
+}
+</locale>
+
+<locale locale="ru-RU" lang="json">
+{
+	"shareTitle": "{name} {acct}",
+	"shareText": "Follow me on the Fediverse!"
+}
+</locale>
+
+<locale locale="sk-SK" lang="json">
+{
+	"shareTitle": "{name} {acct}",
+	"shareText": "Follow me on the Fediverse!"
+}
+</locale>
+
+<locale locale="th-TH" lang="json">
+{
+	"shareTitle": "{name}{acct}",
+	"shareText": "โปรดติดตามฉันบน Fediverse ด้วย!"
+}
+</locale>
+
+<locale locale="tr-TR" lang="json">
+{
+	"shareTitle": "{name}{acct}",
+	"shareText": "Beni Fediverse'te takip edin!"
+}
+</locale>
+
+<locale locale="ug-CN" lang="json">
+{
+	"shareTitle": "{name} {acct}",
+	"shareText": "Follow me on the Fediverse!"
+}
+</locale>
+
+<locale locale="uk-UA" lang="json">
+{
+	"shareTitle": "{name} {acct}",
+	"shareText": "Follow me on the Fediverse!"
+}
+</locale>
+
+<locale locale="vi-VN" lang="json">
+{
+	"shareTitle": "{name} {acct}",
+	"shareText": "Follow me on the Fediverse!"
+}
+</locale>
+
+<locale locale="zh-CN" lang="json">
+{
+	"shareTitle": "{name} {acct}",
+	"shareText": "请在 Fediverse 上关注我！"
+}
+</locale>
+
+<locale locale="zh-TW" lang="json">
+{
+	"shareTitle": "{name} {acct}",
+	"shareText": "請在聯邦宇宙追隨我吧！"
+}
+</locale>

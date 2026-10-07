@@ -3,16 +3,20 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { voidNotesFavoritesCreateDefinition, voidNotesFavoritesCreateInput, voidNotesFavoritesCreateOutput } from '../../../../contract/void-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
 import ms from '@/runtime-dependencies/ms.js';
 import type { NoteFavoritesRepository } from '@/models/_.js';
 import { IdService } from '../../../../../runtime/backend/services/IdService.js';
-import { Endpoint } from '@/server/api/endpoint-base.js';
+
 import { GetterService } from '@/server/api/GetterService.js';
 import { DI } from '@/di-symbols.js';
 import { AchievementService } from '../../../../../users/backend/services/AchievementService.js';
 import { NoteEntityService } from '../../../../../notes/backend/serializers/NoteEntityService.js';
 import { ApiError } from '@/server/api/error.js';
+
+const contractProjection = projectEndpointContract(voidNotesFavoritesCreateDefinition);
 
 export const meta = {
 	tags: ['notes', 'favorites'],
@@ -42,16 +46,10 @@ export const meta = {
 	},
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {
-		noteId: { type: 'string', format: 'misskey:id' },
-	},
-	required: ['noteId'],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof voidNotesFavoritesCreateInput, typeof voidNotesFavoritesCreateOutput> {
 	constructor(
 		@Inject(DI.noteFavoritesRepository)
 		private noteFavoritesRepository: NoteFavoritesRepository,
@@ -61,7 +59,7 @@ export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDe
 		private achievementService: AchievementService,
 		private noteEntityService: NoteEntityService,
 	) {
-		super(meta, paramDef, async (ps, me) => {
+		super(meta, contractProjection, async (ps, me) => {
 			// Get favoritee
 			const note = await this.getterService.getNote(ps.noteId).catch(err => {
 				if (err.id === '9725d0ce-ba28-4dde-95a7-2cbb2c15de24') throw new ApiError(meta.errors.noSuchNote);

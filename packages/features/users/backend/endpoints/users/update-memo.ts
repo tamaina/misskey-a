@@ -3,13 +3,17 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { voidUsersUpdateMemoDefinition, voidUsersUpdateMemoInput, voidUsersUpdateMemoOutput } from '../../../contract/void-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
+
 import { IdService } from '../../../../runtime/backend/services/IdService.js';
 import type { UserMemoRepository } from '@/models/_.js';
 import { DI } from '@/di-symbols.js';
 import { GetterService } from '@/server/api/GetterService.js';
 import { ApiError } from '@/server/api/error.js';
+
+const contractProjection = projectEndpointContract(voidUsersUpdateMemoDefinition);
 
 export const meta = {
 	tags: ['account'],
@@ -27,28 +31,17 @@ export const meta = {
 	},
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {
-		userId: { type: 'string', format: 'misskey:id' },
-		memo: {
-			type: 'string',
-			nullable: true,
-			description: 'A personal memo for the target user. If null or empty, delete the memo.',
-		},
-	},
-	required: ['userId', 'memo'],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof voidUsersUpdateMemoInput, typeof voidUsersUpdateMemoOutput> {
 	constructor(
 		@Inject(DI.userMemosRepository)
 		private userMemosRepository: UserMemoRepository,
 		private getterService: GetterService,
 		private idService: IdService,
 	) {
-		super(meta, paramDef, async (ps, me) => {
+		super(meta, contractProjection, async (ps, me) => {
 			// Get target
 			const target = await this.getterService.getUser(ps.userId).catch(err => {
 				if (err.id === '15348ddd-432d-49c2-8a5a-8069753becff') throw new ApiError(meta.errors.noSuchUser);

@@ -3,12 +3,16 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { voidAdminFederationRefreshRemoteInstanceMetadataDefinition, voidAdminFederationRefreshRemoteInstanceMetadataInput, voidAdminFederationRefreshRemoteInstanceMetadataOutput } from '../../../../contract/void-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
+
 import type { InstancesRepository } from '@/models/_.js';
 import { FetchInstanceMetadataService } from '../../../services/FetchInstanceMetadataService.js';
 import { UtilityService } from '@/core/UtilityService.js';
 import { DI } from '@/di-symbols.js';
+
+const contractProjection = projectEndpointContract(voidAdminFederationRefreshRemoteInstanceMetadataDefinition);
 
 export const meta = {
 	tags: ['admin'],
@@ -18,16 +22,10 @@ export const meta = {
 	kind: 'write:admin:federation',
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {
-		host: { type: 'string' },
-	},
-	required: ['host'],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof voidAdminFederationRefreshRemoteInstanceMetadataInput, typeof voidAdminFederationRefreshRemoteInstanceMetadataOutput> {
 	constructor(
 		@Inject(DI.instancesRepository)
 		private instancesRepository: InstancesRepository,
@@ -35,7 +33,7 @@ export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDe
 		private utilityService: UtilityService,
 		private fetchInstanceMetadataService: FetchInstanceMetadataService,
 	) {
-		super(meta, paramDef, async (ps, me) => {
+		super(meta, contractProjection, async (ps, me) => {
 			const instance = await this.instancesRepository.findOneBy({ host: this.utilityService.toPuny(ps.host) });
 
 			if (instance == null) {

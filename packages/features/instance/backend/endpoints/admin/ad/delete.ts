@@ -3,12 +3,16 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { voidAdminAdDeleteDefinition, voidAdminAdDeleteInput, voidAdminAdDeleteOutput } from '../../../../contract/void-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
+
 import type { AdsRepository } from '@/models/_.js';
 import { DI } from '@/di-symbols.js';
 import { ModerationLogService } from '../../../../../moderation/backend/services/ModerationLogService.js';
 import { ApiError } from '@/server/api/error.js';
+
+const contractProjection = projectEndpointContract(voidAdminAdDeleteDefinition);
 
 export const meta = {
 	tags: ['admin'],
@@ -26,23 +30,17 @@ export const meta = {
 	},
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {
-		id: { type: 'string', format: 'misskey:id' },
-	},
-	required: ['id'],
-} as const;
+export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof voidAdminAdDeleteInput, typeof voidAdminAdDeleteOutput> {
 	constructor(
 		@Inject(DI.adsRepository)
 		private adsRepository: AdsRepository,
 
 		private moderationLogService: ModerationLogService,
 	) {
-		super(meta, paramDef, async (ps, me) => {
+		super(meta, contractProjection, async (ps, me) => {
 			const ad = await this.adsRepository.findOneBy({ id: ps.id });
 
 			if (ad == null) throw new ApiError(meta.errors.noSuchAd);

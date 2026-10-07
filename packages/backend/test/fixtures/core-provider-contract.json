@@ -1,0 +1,1163 @@
+{
+  "source": "CoreModule provider and export contract before feature factory composition",
+  "providers": [
+    "class:LoggerService",
+    "class:AbuseReportService",
+    "class:AbuseReportNotificationService",
+    "class:AccountMoveService",
+    "class:AccountUpdateService",
+    "class:SensitiveMediaDetectionService",
+    "class:AnnouncementService",
+    "class:AntennaService",
+    "class:AchievementService",
+    "class:AvatarDecorationService",
+    "class:CaptchaService",
+    "class:CustomEmojiService",
+    "class:DeleteAccountService",
+    "class:DownloadService",
+    "class:DriveService",
+    "class:EmailService",
+    "class:FederatedInstanceService",
+    "class:FetchInstanceMetadataService",
+    "class:GlobalEventService",
+    "class:HashtagService",
+    "class:HttpRequestService",
+    "class:IdService",
+    "class:ImageProcessingService",
+    "class:InternalStorageService",
+    "class:MetaService",
+    "class:MfmService",
+    "class:ModerationLogService",
+    "class:NoteCreateService",
+    "class:NoteDeleteService",
+    "class:NotePiningService",
+    "class:NoteDraftService",
+    "class:NotificationService",
+    "class:PollService",
+    "class:SystemAccountService",
+    "class:PushNotificationService",
+    "class:QueryService",
+    "class:ReactionService",
+    "class:ReactionsBufferingService",
+    "class:RelayService",
+    "class:RoleService",
+    "class:S3Service",
+    "class:SignupService",
+    "class:WebAuthnService",
+    "class:UserBlockingService",
+    "class:CacheService",
+    "class:UserService",
+    "class:UserFollowingService",
+    "class:UserKeypairService",
+    "class:UserListService",
+    "class:UserMutingService",
+    "class:UserRenoteMutingService",
+    "class:UserSearchService",
+    "class:UserSuspendService",
+    "class:UserAuthService",
+    "class:VideoProcessingService",
+    "class:UserWebhookService",
+    "class:SystemWebhookService",
+    "class:WebhookTestService",
+    "class:UtilityService",
+    "class:FileInfoService",
+    "class:FlashService",
+    "class:SearchService",
+    "class:ClipService",
+    "class:FeaturedService",
+    "class:FanoutTimelineService",
+    "class:FanoutTimelineEndpointService",
+    "class:ChannelFollowingService",
+    "class:ChannelMutingService",
+    "class:ChatService",
+    "class:RegistryApiService",
+    "class:ReversiService",
+    "class:PageService",
+    "class:ChartLoggerService",
+    "class:FederationChart",
+    "class:NotesChart",
+    "class:UsersChart",
+    "class:ActiveUsersChart",
+    "class:InstanceChart",
+    "class:PerUserNotesChart",
+    "class:PerUserPvChart",
+    "class:DriveChart",
+    "class:PerUserReactionsChart",
+    "class:PerUserFollowingChart",
+    "class:PerUserDriveChart",
+    "class:ApRequestChart",
+    "class:ChartManagementService",
+    "class:AbuseUserReportEntityService",
+    "class:AnnouncementEntityService",
+    "class:AbuseReportNotificationRecipientEntityService",
+    "class:AntennaEntityService",
+    "class:AppEntityService",
+    "class:AuthSessionEntityService",
+    "class:BlockingEntityService",
+    "class:ChannelEntityService",
+    "class:ChatEntityService",
+    "class:ClipEntityService",
+    "class:DriveFileEntityService",
+    "class:DriveFolderEntityService",
+    "class:EmojiEntityService",
+    "class:FollowingEntityService",
+    "class:FollowRequestEntityService",
+    "class:GalleryLikeEntityService",
+    "class:GalleryPostEntityService",
+    "class:HashtagEntityService",
+    "class:InstanceEntityService",
+    "class:InviteCodeEntityService",
+    "class:ModerationLogEntityService",
+    "class:MutingEntityService",
+    "class:RenoteMutingEntityService",
+    "class:NoteEntityService",
+    "class:NoteFavoriteEntityService",
+    "class:NoteReactionEntityService",
+    "class:NoteDraftEntityService",
+    "class:NotificationEntityService",
+    "class:PageEntityService",
+    "class:PageLikeEntityService",
+    "class:SigninEntityService",
+    "class:UserEntityService",
+    "class:UserListEntityService",
+    "class:FlashEntityService",
+    "class:FlashLikeEntityService",
+    "class:RoleEntityService",
+    "class:ReversiGameEntityService",
+    "class:MetaEntityService",
+    "class:SystemWebhookEntityService",
+    "class:ApAudienceService",
+    "class:ApDbResolverService",
+    "class:ApDeliverManagerService",
+    "class:ApInboxService",
+    "class:ApLoggerService",
+    "class:ApMfmService",
+    "class:ApRendererService",
+    "class:ApRequestService",
+    "class:ApResolverService",
+    "class:Resolver",
+    "class:JsonLdService",
+    "class:RemoteLoggerService",
+    "class:RemoteUserResolveService",
+    "class:WebfingerService",
+    "class:ApImageService",
+    "class:ApMentionService",
+    "class:ApNoteService",
+    "class:ApPersonService",
+    "class:ApQuestionService",
+    "class:QueueService",
+    "class:TelemetryService",
+    "alias:LoggerService",
+    "alias:AbuseReportService",
+    "alias:AbuseReportNotificationService",
+    "alias:AccountMoveService",
+    "alias:AccountUpdateService",
+    "alias:SensitiveMediaDetectionService",
+    "alias:AnnouncementService",
+    "alias:AntennaService",
+    "alias:AchievementService",
+    "alias:AvatarDecorationService",
+    "alias:CaptchaService",
+    "alias:CustomEmojiService",
+    "alias:DeleteAccountService",
+    "alias:DownloadService",
+    "alias:DriveService",
+    "alias:EmailService",
+    "alias:FederatedInstanceService",
+    "alias:FetchInstanceMetadataService",
+    "alias:GlobalEventService",
+    "alias:HashtagService",
+    "alias:HttpRequestService",
+    "alias:IdService",
+    "alias:ImageProcessingService",
+    "alias:InternalStorageService",
+    "alias:MetaService",
+    "alias:MfmService",
+    "alias:ModerationLogService",
+    "alias:NoteCreateService",
+    "alias:NoteDeleteService",
+    "alias:NotePiningService",
+    "alias:NoteDraftService",
+    "alias:NotificationService",
+    "alias:PollService",
+    "alias:SystemAccountService",
+    "alias:PushNotificationService",
+    "alias:QueryService",
+    "alias:ReactionService",
+    "alias:ReactionsBufferingService",
+    "alias:RelayService",
+    "alias:RoleService",
+    "alias:S3Service",
+    "alias:SignupService",
+    "alias:WebAuthnService",
+    "alias:UserBlockingService",
+    "alias:CacheService",
+    "alias:UserService",
+    "alias:UserFollowingService",
+    "alias:UserKeypairService",
+    "alias:UserListService",
+    "alias:UserMutingService",
+    "alias:UserRenoteMutingService",
+    "alias:UserSearchService",
+    "alias:UserSuspendService",
+    "alias:UserAuthService",
+    "alias:VideoProcessingService",
+    "alias:UserWebhookService",
+    "alias:SystemWebhookService",
+    "alias:WebhookTestService",
+    "alias:UtilityService",
+    "alias:FileInfoService",
+    "alias:FlashService",
+    "alias:SearchService",
+    "alias:ClipService",
+    "alias:FeaturedService",
+    "alias:FanoutTimelineService",
+    "alias:FanoutTimelineEndpointService",
+    "alias:ChannelFollowingService",
+    "alias:ChannelMutingService",
+    "alias:ChatService",
+    "alias:RegistryApiService",
+    "alias:ReversiService",
+    "alias:PageService",
+    "alias:ChartLoggerService",
+    "alias:FederationChart",
+    "alias:NotesChart",
+    "alias:UsersChart",
+    "alias:ActiveUsersChart",
+    "alias:InstanceChart",
+    "alias:PerUserNotesChart",
+    "alias:PerUserPvChart",
+    "alias:DriveChart",
+    "alias:PerUserReactionsChart",
+    "alias:PerUserFollowingChart",
+    "alias:PerUserDriveChart",
+    "alias:ApRequestChart",
+    "alias:ChartManagementService",
+    "alias:AbuseUserReportEntityService",
+    "alias:AnnouncementEntityService",
+    "alias:AbuseReportNotificationRecipientEntityService",
+    "alias:AntennaEntityService",
+    "alias:AppEntityService",
+    "alias:AuthSessionEntityService",
+    "alias:BlockingEntityService",
+    "alias:ChannelEntityService",
+    "alias:ChatEntityService",
+    "alias:ClipEntityService",
+    "alias:DriveFileEntityService",
+    "alias:DriveFolderEntityService",
+    "alias:EmojiEntityService",
+    "alias:FollowingEntityService",
+    "alias:FollowRequestEntityService",
+    "alias:GalleryLikeEntityService",
+    "alias:GalleryPostEntityService",
+    "alias:HashtagEntityService",
+    "alias:InstanceEntityService",
+    "alias:InviteCodeEntityService",
+    "alias:ModerationLogEntityService",
+    "alias:MutingEntityService",
+    "alias:RenoteMutingEntityService",
+    "alias:NoteEntityService",
+    "alias:NoteFavoriteEntityService",
+    "alias:NoteReactionEntityService",
+    "alias:NoteDraftEntityService",
+    "alias:NotificationEntityService",
+    "alias:PageEntityService",
+    "alias:PageLikeEntityService",
+    "alias:SigninEntityService",
+    "alias:UserEntityService",
+    "alias:UserListEntityService",
+    "alias:FlashEntityService",
+    "alias:FlashLikeEntityService",
+    "alias:RoleEntityService",
+    "alias:ReversiGameEntityService",
+    "alias:MetaEntityService",
+    "alias:SystemWebhookEntityService",
+    "alias:ApAudienceService",
+    "alias:ApDbResolverService",
+    "alias:ApDeliverManagerService",
+    "alias:ApInboxService",
+    "alias:ApLoggerService",
+    "alias:ApMfmService",
+    "alias:ApRendererService",
+    "alias:ApRequestService",
+    "alias:ApResolverService",
+    "alias:JsonLdService",
+    "alias:RemoteLoggerService",
+    "alias:RemoteUserResolveService",
+    "alias:WebfingerService",
+    "alias:ApImageService",
+    "alias:ApMentionService",
+    "alias:ApNoteService",
+    "alias:ApPersonService",
+    "alias:ApQuestionService",
+    "alias:TelemetryService"
+  ],
+  "exports": [
+    "class:QueueModule",
+    "class:LoggerService",
+    "class:AbuseReportService",
+    "class:AbuseReportNotificationService",
+    "class:AccountMoveService",
+    "class:AccountUpdateService",
+    "class:SensitiveMediaDetectionService",
+    "class:AnnouncementService",
+    "class:AntennaService",
+    "class:AchievementService",
+    "class:AvatarDecorationService",
+    "class:CaptchaService",
+    "class:CustomEmojiService",
+    "class:DeleteAccountService",
+    "class:DownloadService",
+    "class:DriveService",
+    "class:EmailService",
+    "class:FederatedInstanceService",
+    "class:FetchInstanceMetadataService",
+    "class:GlobalEventService",
+    "class:HashtagService",
+    "class:HttpRequestService",
+    "class:IdService",
+    "class:ImageProcessingService",
+    "class:InternalStorageService",
+    "class:MetaService",
+    "class:MfmService",
+    "class:ModerationLogService",
+    "class:NoteCreateService",
+    "class:NoteDeleteService",
+    "class:NotePiningService",
+    "class:NoteDraftService",
+    "class:NotificationService",
+    "class:PollService",
+    "class:SystemAccountService",
+    "class:PushNotificationService",
+    "class:QueryService",
+    "class:ReactionService",
+    "class:ReactionsBufferingService",
+    "class:RelayService",
+    "class:RoleService",
+    "class:S3Service",
+    "class:SignupService",
+    "class:WebAuthnService",
+    "class:UserBlockingService",
+    "class:CacheService",
+    "class:UserService",
+    "class:UserFollowingService",
+    "class:UserKeypairService",
+    "class:UserListService",
+    "class:UserMutingService",
+    "class:UserRenoteMutingService",
+    "class:UserSearchService",
+    "class:UserSuspendService",
+    "class:UserAuthService",
+    "class:VideoProcessingService",
+    "class:UserWebhookService",
+    "class:SystemWebhookService",
+    "class:WebhookTestService",
+    "class:UtilityService",
+    "class:FileInfoService",
+    "class:FlashService",
+    "class:SearchService",
+    "class:ClipService",
+    "class:FeaturedService",
+    "class:FanoutTimelineService",
+    "class:FanoutTimelineEndpointService",
+    "class:ChannelFollowingService",
+    "class:ChannelMutingService",
+    "class:ChatService",
+    "class:RegistryApiService",
+    "class:ReversiService",
+    "class:PageService",
+    "class:FederationChart",
+    "class:NotesChart",
+    "class:UsersChart",
+    "class:ActiveUsersChart",
+    "class:InstanceChart",
+    "class:PerUserNotesChart",
+    "class:PerUserPvChart",
+    "class:DriveChart",
+    "class:PerUserReactionsChart",
+    "class:PerUserFollowingChart",
+    "class:PerUserDriveChart",
+    "class:ApRequestChart",
+    "class:ChartManagementService",
+    "class:AbuseUserReportEntityService",
+    "class:AnnouncementEntityService",
+    "class:AbuseReportNotificationRecipientEntityService",
+    "class:AntennaEntityService",
+    "class:AppEntityService",
+    "class:AuthSessionEntityService",
+    "class:BlockingEntityService",
+    "class:ChannelEntityService",
+    "class:ChatEntityService",
+    "class:ClipEntityService",
+    "class:DriveFileEntityService",
+    "class:DriveFolderEntityService",
+    "class:EmojiEntityService",
+    "class:FollowingEntityService",
+    "class:FollowRequestEntityService",
+    "class:GalleryLikeEntityService",
+    "class:GalleryPostEntityService",
+    "class:HashtagEntityService",
+    "class:InstanceEntityService",
+    "class:InviteCodeEntityService",
+    "class:ModerationLogEntityService",
+    "class:MutingEntityService",
+    "class:RenoteMutingEntityService",
+    "class:NoteEntityService",
+    "class:NoteFavoriteEntityService",
+    "class:NoteReactionEntityService",
+    "class:NoteDraftEntityService",
+    "class:NotificationEntityService",
+    "class:PageEntityService",
+    "class:PageLikeEntityService",
+    "class:SigninEntityService",
+    "class:UserEntityService",
+    "class:UserListEntityService",
+    "class:FlashEntityService",
+    "class:FlashLikeEntityService",
+    "class:RoleEntityService",
+    "class:ReversiGameEntityService",
+    "class:MetaEntityService",
+    "class:SystemWebhookEntityService",
+    "class:ApAudienceService",
+    "class:ApDbResolverService",
+    "class:ApDeliverManagerService",
+    "class:ApInboxService",
+    "class:ApLoggerService",
+    "class:ApMfmService",
+    "class:ApRendererService",
+    "class:ApRequestService",
+    "class:ApResolverService",
+    "class:Resolver",
+    "class:JsonLdService",
+    "class:RemoteLoggerService",
+    "class:RemoteUserResolveService",
+    "class:WebfingerService",
+    "class:ApImageService",
+    "class:ApMentionService",
+    "class:ApNoteService",
+    "class:ApPersonService",
+    "class:ApQuestionService",
+    "class:QueueService",
+    "class:TelemetryService",
+    "alias:LoggerService",
+    "alias:AbuseReportService",
+    "alias:AbuseReportNotificationService",
+    "alias:AccountMoveService",
+    "alias:AccountUpdateService",
+    "alias:SensitiveMediaDetectionService",
+    "alias:AnnouncementService",
+    "alias:AntennaService",
+    "alias:AchievementService",
+    "alias:AvatarDecorationService",
+    "alias:CaptchaService",
+    "alias:CustomEmojiService",
+    "alias:DeleteAccountService",
+    "alias:DownloadService",
+    "alias:DriveService",
+    "alias:EmailService",
+    "alias:FederatedInstanceService",
+    "alias:FetchInstanceMetadataService",
+    "alias:GlobalEventService",
+    "alias:HashtagService",
+    "alias:HttpRequestService",
+    "alias:IdService",
+    "alias:ImageProcessingService",
+    "alias:InternalStorageService",
+    "alias:MetaService",
+    "alias:MfmService",
+    "alias:ModerationLogService",
+    "alias:NoteCreateService",
+    "alias:NoteDeleteService",
+    "alias:NotePiningService",
+    "alias:NoteDraftService",
+    "alias:NotificationService",
+    "alias:PollService",
+    "alias:SystemAccountService",
+    "alias:PushNotificationService",
+    "alias:QueryService",
+    "alias:ReactionService",
+    "alias:ReactionsBufferingService",
+    "alias:RelayService",
+    "alias:RoleService",
+    "alias:S3Service",
+    "alias:SignupService",
+    "alias:WebAuthnService",
+    "alias:UserBlockingService",
+    "alias:CacheService",
+    "alias:UserService",
+    "alias:UserFollowingService",
+    "alias:UserKeypairService",
+    "alias:UserListService",
+    "alias:UserMutingService",
+    "alias:UserRenoteMutingService",
+    "alias:UserSearchService",
+    "alias:UserSuspendService",
+    "alias:UserAuthService",
+    "alias:VideoProcessingService",
+    "alias:UserWebhookService",
+    "alias:SystemWebhookService",
+    "alias:WebhookTestService",
+    "alias:UtilityService",
+    "alias:FileInfoService",
+    "alias:SearchService",
+    "alias:ClipService",
+    "alias:FeaturedService",
+    "alias:FanoutTimelineService",
+    "alias:FanoutTimelineEndpointService",
+    "alias:ChannelFollowingService",
+    "alias:ChannelMutingService",
+    "alias:ChatService",
+    "alias:RegistryApiService",
+    "alias:ReversiService",
+    "alias:PageService",
+    "alias:FederationChart",
+    "alias:NotesChart",
+    "alias:UsersChart",
+    "alias:ActiveUsersChart",
+    "alias:InstanceChart",
+    "alias:PerUserNotesChart",
+    "alias:PerUserPvChart",
+    "alias:DriveChart",
+    "alias:PerUserReactionsChart",
+    "alias:PerUserFollowingChart",
+    "alias:PerUserDriveChart",
+    "alias:ApRequestChart",
+    "alias:ChartManagementService",
+    "alias:AbuseUserReportEntityService",
+    "alias:AnnouncementEntityService",
+    "alias:AbuseReportNotificationRecipientEntityService",
+    "alias:AntennaEntityService",
+    "alias:AppEntityService",
+    "alias:AuthSessionEntityService",
+    "alias:BlockingEntityService",
+    "alias:ChannelEntityService",
+    "alias:ChatEntityService",
+    "alias:ClipEntityService",
+    "alias:DriveFileEntityService",
+    "alias:DriveFolderEntityService",
+    "alias:EmojiEntityService",
+    "alias:FollowingEntityService",
+    "alias:FollowRequestEntityService",
+    "alias:GalleryLikeEntityService",
+    "alias:GalleryPostEntityService",
+    "alias:HashtagEntityService",
+    "alias:InstanceEntityService",
+    "alias:InviteCodeEntityService",
+    "alias:ModerationLogEntityService",
+    "alias:MutingEntityService",
+    "alias:RenoteMutingEntityService",
+    "alias:NoteEntityService",
+    "alias:NoteFavoriteEntityService",
+    "alias:NoteReactionEntityService",
+    "alias:NoteDraftEntityService",
+    "alias:NotificationEntityService",
+    "alias:PageEntityService",
+    "alias:PageLikeEntityService",
+    "alias:SigninEntityService",
+    "alias:UserEntityService",
+    "alias:UserListEntityService",
+    "alias:FlashEntityService",
+    "alias:FlashLikeEntityService",
+    "alias:RoleEntityService",
+    "alias:ReversiGameEntityService",
+    "alias:MetaEntityService",
+    "alias:SystemWebhookEntityService",
+    "alias:ApAudienceService",
+    "alias:ApDbResolverService",
+    "alias:ApDeliverManagerService",
+    "alias:ApInboxService",
+    "alias:ApLoggerService",
+    "alias:ApMfmService",
+    "alias:ApRendererService",
+    "alias:ApRequestService",
+    "alias:ApResolverService",
+    "alias:JsonLdService",
+    "alias:RemoteLoggerService",
+    "alias:RemoteUserResolveService",
+    "alias:WebfingerService",
+    "alias:ApImageService",
+    "alias:ApMentionService",
+    "alias:ApNoteService",
+    "alias:ApPersonService",
+    "alias:ApQuestionService",
+    "alias:TelemetryService"
+  ],
+  "aliases": [
+    {
+      "name": "LoggerService",
+      "target": "LoggerService"
+    },
+    {
+      "name": "AbuseReportService",
+      "target": "AbuseReportService"
+    },
+    {
+      "name": "AbuseReportNotificationService",
+      "target": "AbuseReportNotificationService"
+    },
+    {
+      "name": "AccountMoveService",
+      "target": "AccountMoveService"
+    },
+    {
+      "name": "AccountUpdateService",
+      "target": "AccountUpdateService"
+    },
+    {
+      "name": "SensitiveMediaDetectionService",
+      "target": "SensitiveMediaDetectionService"
+    },
+    {
+      "name": "AnnouncementService",
+      "target": "AnnouncementService"
+    },
+    {
+      "name": "AntennaService",
+      "target": "AntennaService"
+    },
+    {
+      "name": "AchievementService",
+      "target": "AchievementService"
+    },
+    {
+      "name": "AvatarDecorationService",
+      "target": "AvatarDecorationService"
+    },
+    {
+      "name": "CaptchaService",
+      "target": "CaptchaService"
+    },
+    {
+      "name": "CustomEmojiService",
+      "target": "CustomEmojiService"
+    },
+    {
+      "name": "DeleteAccountService",
+      "target": "DeleteAccountService"
+    },
+    {
+      "name": "DownloadService",
+      "target": "DownloadService"
+    },
+    {
+      "name": "DriveService",
+      "target": "DriveService"
+    },
+    {
+      "name": "EmailService",
+      "target": "EmailService"
+    },
+    {
+      "name": "FederatedInstanceService",
+      "target": "FederatedInstanceService"
+    },
+    {
+      "name": "FetchInstanceMetadataService",
+      "target": "FetchInstanceMetadataService"
+    },
+    {
+      "name": "GlobalEventService",
+      "target": "GlobalEventService"
+    },
+    {
+      "name": "HashtagService",
+      "target": "HashtagService"
+    },
+    {
+      "name": "HttpRequestService",
+      "target": "HttpRequestService"
+    },
+    {
+      "name": "IdService",
+      "target": "IdService"
+    },
+    {
+      "name": "ImageProcessingService",
+      "target": "ImageProcessingService"
+    },
+    {
+      "name": "InternalStorageService",
+      "target": "InternalStorageService"
+    },
+    {
+      "name": "MetaService",
+      "target": "MetaService"
+    },
+    {
+      "name": "MfmService",
+      "target": "MfmService"
+    },
+    {
+      "name": "ModerationLogService",
+      "target": "ModerationLogService"
+    },
+    {
+      "name": "NoteCreateService",
+      "target": "NoteCreateService"
+    },
+    {
+      "name": "NoteDeleteService",
+      "target": "NoteDeleteService"
+    },
+    {
+      "name": "NotePiningService",
+      "target": "NotePiningService"
+    },
+    {
+      "name": "NoteDraftService",
+      "target": "NoteDraftService"
+    },
+    {
+      "name": "NotificationService",
+      "target": "NotificationService"
+    },
+    {
+      "name": "PollService",
+      "target": "PollService"
+    },
+    {
+      "name": "SystemAccountService",
+      "target": "SystemAccountService"
+    },
+    {
+      "name": "PushNotificationService",
+      "target": "PushNotificationService"
+    },
+    {
+      "name": "QueryService",
+      "target": "QueryService"
+    },
+    {
+      "name": "ReactionService",
+      "target": "ReactionService"
+    },
+    {
+      "name": "ReactionsBufferingService",
+      "target": "ReactionsBufferingService"
+    },
+    {
+      "name": "RelayService",
+      "target": "RelayService"
+    },
+    {
+      "name": "RoleService",
+      "target": "RoleService"
+    },
+    {
+      "name": "S3Service",
+      "target": "S3Service"
+    },
+    {
+      "name": "SignupService",
+      "target": "SignupService"
+    },
+    {
+      "name": "WebAuthnService",
+      "target": "WebAuthnService"
+    },
+    {
+      "name": "UserBlockingService",
+      "target": "UserBlockingService"
+    },
+    {
+      "name": "CacheService",
+      "target": "CacheService"
+    },
+    {
+      "name": "UserService",
+      "target": "UserService"
+    },
+    {
+      "name": "UserFollowingService",
+      "target": "UserFollowingService"
+    },
+    {
+      "name": "UserKeypairService",
+      "target": "UserKeypairService"
+    },
+    {
+      "name": "UserListService",
+      "target": "UserListService"
+    },
+    {
+      "name": "UserMutingService",
+      "target": "UserMutingService"
+    },
+    {
+      "name": "UserRenoteMutingService",
+      "target": "UserRenoteMutingService"
+    },
+    {
+      "name": "UserSearchService",
+      "target": "UserSearchService"
+    },
+    {
+      "name": "UserSuspendService",
+      "target": "UserSuspendService"
+    },
+    {
+      "name": "UserAuthService",
+      "target": "UserAuthService"
+    },
+    {
+      "name": "VideoProcessingService",
+      "target": "VideoProcessingService"
+    },
+    {
+      "name": "UserWebhookService",
+      "target": "UserWebhookService"
+    },
+    {
+      "name": "SystemWebhookService",
+      "target": "SystemWebhookService"
+    },
+    {
+      "name": "WebhookTestService",
+      "target": "WebhookTestService"
+    },
+    {
+      "name": "UtilityService",
+      "target": "UtilityService"
+    },
+    {
+      "name": "FileInfoService",
+      "target": "FileInfoService"
+    },
+    {
+      "name": "FlashService",
+      "target": "FlashService"
+    },
+    {
+      "name": "SearchService",
+      "target": "SearchService"
+    },
+    {
+      "name": "ClipService",
+      "target": "ClipService"
+    },
+    {
+      "name": "FeaturedService",
+      "target": "FeaturedService"
+    },
+    {
+      "name": "FanoutTimelineService",
+      "target": "FanoutTimelineService"
+    },
+    {
+      "name": "FanoutTimelineEndpointService",
+      "target": "FanoutTimelineEndpointService"
+    },
+    {
+      "name": "ChannelFollowingService",
+      "target": "ChannelFollowingService"
+    },
+    {
+      "name": "ChannelMutingService",
+      "target": "ChannelMutingService"
+    },
+    {
+      "name": "ChatService",
+      "target": "ChatService"
+    },
+    {
+      "name": "RegistryApiService",
+      "target": "RegistryApiService"
+    },
+    {
+      "name": "ReversiService",
+      "target": "ReversiService"
+    },
+    {
+      "name": "PageService",
+      "target": "PageService"
+    },
+    {
+      "name": "ChartLoggerService",
+      "target": "ChartLoggerService"
+    },
+    {
+      "name": "FederationChart",
+      "target": "FederationChart"
+    },
+    {
+      "name": "NotesChart",
+      "target": "NotesChart"
+    },
+    {
+      "name": "UsersChart",
+      "target": "UsersChart"
+    },
+    {
+      "name": "ActiveUsersChart",
+      "target": "ActiveUsersChart"
+    },
+    {
+      "name": "InstanceChart",
+      "target": "InstanceChart"
+    },
+    {
+      "name": "PerUserNotesChart",
+      "target": "PerUserNotesChart"
+    },
+    {
+      "name": "PerUserPvChart",
+      "target": "PerUserPvChart"
+    },
+    {
+      "name": "DriveChart",
+      "target": "DriveChart"
+    },
+    {
+      "name": "PerUserReactionsChart",
+      "target": "PerUserReactionsChart"
+    },
+    {
+      "name": "PerUserFollowingChart",
+      "target": "PerUserFollowingChart"
+    },
+    {
+      "name": "PerUserDriveChart",
+      "target": "PerUserDriveChart"
+    },
+    {
+      "name": "ApRequestChart",
+      "target": "ApRequestChart"
+    },
+    {
+      "name": "ChartManagementService",
+      "target": "ChartManagementService"
+    },
+    {
+      "name": "AbuseUserReportEntityService",
+      "target": "AbuseUserReportEntityService"
+    },
+    {
+      "name": "AnnouncementEntityService",
+      "target": "AnnouncementEntityService"
+    },
+    {
+      "name": "AbuseReportNotificationRecipientEntityService",
+      "target": "AbuseReportNotificationRecipientEntityService"
+    },
+    {
+      "name": "AntennaEntityService",
+      "target": "AntennaEntityService"
+    },
+    {
+      "name": "AppEntityService",
+      "target": "AppEntityService"
+    },
+    {
+      "name": "AuthSessionEntityService",
+      "target": "AuthSessionEntityService"
+    },
+    {
+      "name": "BlockingEntityService",
+      "target": "BlockingEntityService"
+    },
+    {
+      "name": "ChannelEntityService",
+      "target": "ChannelEntityService"
+    },
+    {
+      "name": "ChatEntityService",
+      "target": "ChatEntityService"
+    },
+    {
+      "name": "ClipEntityService",
+      "target": "ClipEntityService"
+    },
+    {
+      "name": "DriveFileEntityService",
+      "target": "DriveFileEntityService"
+    },
+    {
+      "name": "DriveFolderEntityService",
+      "target": "DriveFolderEntityService"
+    },
+    {
+      "name": "EmojiEntityService",
+      "target": "EmojiEntityService"
+    },
+    {
+      "name": "FollowingEntityService",
+      "target": "FollowingEntityService"
+    },
+    {
+      "name": "FollowRequestEntityService",
+      "target": "FollowRequestEntityService"
+    },
+    {
+      "name": "GalleryLikeEntityService",
+      "target": "GalleryLikeEntityService"
+    },
+    {
+      "name": "GalleryPostEntityService",
+      "target": "GalleryPostEntityService"
+    },
+    {
+      "name": "HashtagEntityService",
+      "target": "HashtagEntityService"
+    },
+    {
+      "name": "InstanceEntityService",
+      "target": "InstanceEntityService"
+    },
+    {
+      "name": "InviteCodeEntityService",
+      "target": "InviteCodeEntityService"
+    },
+    {
+      "name": "ModerationLogEntityService",
+      "target": "ModerationLogEntityService"
+    },
+    {
+      "name": "MutingEntityService",
+      "target": "MutingEntityService"
+    },
+    {
+      "name": "RenoteMutingEntityService",
+      "target": "RenoteMutingEntityService"
+    },
+    {
+      "name": "NoteEntityService",
+      "target": "NoteEntityService"
+    },
+    {
+      "name": "NoteFavoriteEntityService",
+      "target": "NoteFavoriteEntityService"
+    },
+    {
+      "name": "NoteReactionEntityService",
+      "target": "NoteReactionEntityService"
+    },
+    {
+      "name": "NoteDraftEntityService",
+      "target": "NoteDraftEntityService"
+    },
+    {
+      "name": "NotificationEntityService",
+      "target": "NotificationEntityService"
+    },
+    {
+      "name": "PageEntityService",
+      "target": "PageEntityService"
+    },
+    {
+      "name": "PageLikeEntityService",
+      "target": "PageLikeEntityService"
+    },
+    {
+      "name": "SigninEntityService",
+      "target": "SigninEntityService"
+    },
+    {
+      "name": "UserEntityService",
+      "target": "UserEntityService"
+    },
+    {
+      "name": "UserListEntityService",
+      "target": "UserListEntityService"
+    },
+    {
+      "name": "FlashEntityService",
+      "target": "FlashEntityService"
+    },
+    {
+      "name": "FlashLikeEntityService",
+      "target": "FlashLikeEntityService"
+    },
+    {
+      "name": "RoleEntityService",
+      "target": "RoleEntityService"
+    },
+    {
+      "name": "ReversiGameEntityService",
+      "target": "ReversiGameEntityService"
+    },
+    {
+      "name": "MetaEntityService",
+      "target": "MetaEntityService"
+    },
+    {
+      "name": "SystemWebhookEntityService",
+      "target": "SystemWebhookEntityService"
+    },
+    {
+      "name": "ApAudienceService",
+      "target": "ApAudienceService"
+    },
+    {
+      "name": "ApDbResolverService",
+      "target": "ApDbResolverService"
+    },
+    {
+      "name": "ApDeliverManagerService",
+      "target": "ApDeliverManagerService"
+    },
+    {
+      "name": "ApInboxService",
+      "target": "ApInboxService"
+    },
+    {
+      "name": "ApLoggerService",
+      "target": "ApLoggerService"
+    },
+    {
+      "name": "ApMfmService",
+      "target": "ApMfmService"
+    },
+    {
+      "name": "ApRendererService",
+      "target": "ApRendererService"
+    },
+    {
+      "name": "ApRequestService",
+      "target": "ApRequestService"
+    },
+    {
+      "name": "ApResolverService",
+      "target": "ApResolverService"
+    },
+    {
+      "name": "JsonLdService",
+      "target": "JsonLdService"
+    },
+    {
+      "name": "RemoteLoggerService",
+      "target": "RemoteLoggerService"
+    },
+    {
+      "name": "RemoteUserResolveService",
+      "target": "RemoteUserResolveService"
+    },
+    {
+      "name": "WebfingerService",
+      "target": "WebfingerService"
+    },
+    {
+      "name": "ApImageService",
+      "target": "ApImageService"
+    },
+    {
+      "name": "ApMentionService",
+      "target": "ApMentionService"
+    },
+    {
+      "name": "ApNoteService",
+      "target": "ApNoteService"
+    },
+    {
+      "name": "ApPersonService",
+      "target": "ApPersonService"
+    },
+    {
+      "name": "ApQuestionService",
+      "target": "ApQuestionService"
+    },
+    {
+      "name": "TelemetryService",
+      "target": "TelemetryService"
+    }
+  ]
+}

@@ -3,11 +3,13 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { voidNotesPollsVoteDefinition, voidNotesPollsVoteInput, voidNotesPollsVoteOutput } from '../../../../contract/void-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
 import type { UsersRepository, PollsRepository, PollVotesRepository } from '@/models/_.js';
 import type { MiRemoteUser } from '../../../../../users/backend/models/User.js';
 import { IdService } from '../../../../../runtime/backend/services/IdService.js';
-import { Endpoint } from '@/server/api/endpoint-base.js';
+
 import { GetterService } from '@/server/api/GetterService.js';
 import { QueueService } from '../../../../../runtime/backend/services/QueueService.js';
 import { PollService } from '../../../services/PollService.js';
@@ -17,6 +19,8 @@ import { DI } from '@/di-symbols.js';
 import { UserBlockingService } from '../../../../../relationships/backend/services/UserBlockingService.js';
 import { NoteEntityService } from '../../../serializers/NoteEntityService.js';
 import { ApiError } from '@/server/api/error.js';
+
+const contractProjection = projectEndpointContract(voidNotesPollsVoteDefinition);
 
 export const meta = {
 	tags: ['notes'],
@@ -66,19 +70,12 @@ export const meta = {
 	},
 } as const;
 
-export const paramDef = {
-	type: 'object',
-	properties: {
-		noteId: { type: 'string', format: 'misskey:id' },
-		choice: { type: 'integer' },
-	},
-	required: ['noteId', 'choice'],
-} as const;
+export const paramDef = contractProjection.input;
 
 // TODO: ロジックをサービスに切り出す
 
 @Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof voidNotesPollsVoteInput, typeof voidNotesPollsVoteOutput> {
 	constructor(
 		@Inject(DI.usersRepository)
 		private usersRepository: UsersRepository,
@@ -98,7 +95,7 @@ export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDe
 		private userBlockingService: UserBlockingService,
 		private noteEntityService: NoteEntityService,
 	) {
-		super(meta, paramDef, async (ps, me) => {
+		super(meta, contractProjection, async (ps, me) => {
 			const createdAt = new Date();
 
 			// Get votee
