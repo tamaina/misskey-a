@@ -7,16 +7,16 @@ import { expect, test, vi } from 'vitest';
 import { DataSource } from 'typeorm';
 import { entities } from '@/postgres.js';
 import { QueryService } from '@/core/QueryService.js';
-import { MiFollowing } from '../../../../features/relationships/backend/models/Following.js';
-import { MiUserProfile } from '../../../../features/users/backend/models/UserProfile.js';
+import { MiFollowing } from '@features/relationships/backend/models/Following.js';
+import { MiUserProfile } from '@features/users/backend/models/UserProfile.js';
 import { CacheService } from '@/core/CacheService.js';
-import { AccountMoveService } from '../../../../features/users/backend/services/AccountMoveService.js';
-import { UserFollowingService } from '../../../../features/relationships/backend/services/UserFollowingService.js';
-import type { MiUser } from '../../../../features/users/backend/models/User.js';
+import { AccountMoveService } from '@features/users/backend/services/AccountMoveService.js';
+import { UserFollowingService } from '@features/relationships/backend/services/UserFollowingService.js';
+import type { MiUser } from '@features/users/backend/models/User.js';
 import { ActivityPubServerService } from '@/server/ActivityPubServerService.js';
-import { NoteEntityService } from '../../../../features/notes/backend/serializers/NoteEntityService.js';
-import { UserEntityService } from '../../../../features/users/backend/serializers/UserEntityService.js';
-import { MiNote } from '../../../../features/notes/backend/models/Note.js';
+import { NoteEntityService } from '@features/notes/backend/serializers/NoteEntityService.js';
+import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
+import { MiNote } from '@features/notes/backend/models/Note.js';
 
 function instance<T extends object>(prototype: T, dependencies: Record<string, unknown>): T {
 	const value = Object.create(prototype);

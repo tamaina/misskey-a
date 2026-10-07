@@ -4,10 +4,10 @@
  */
 
 import type { InferOutput } from 'valibot';
-import type { MiSignin } from '../../../features/auth/backend/models/Signin.js';
-import type { adminShowUserInput, adminShowUserOutput, AdminUserEndpoints } from '../../../features/moderation/contract/admin-user-endpoint-definition.js';
-import type { LegacyAdminUserProducerOutput } from '../../../features/moderation/backend/legacy-admin-user-producer-endpoint.js';
-import { LegacyAdminUserProducerEndpoint } from '../../../features/moderation/backend/legacy-admin-user-producer-endpoint.js';
+import type { MiSignin } from '@features/auth/backend/models/Signin.js';
+import type { adminShowUserInput, adminShowUserOutput, AdminUserEndpoints } from '@features/moderation/contract/admin-user-endpoint-definition.js';
+import type { LegacyAdminUserProducerOutput } from '@features/moderation/backend/legacy-admin-user-producer-endpoint.js';
+import { LegacyAdminUserProducerEndpoint } from '@features/moderation/backend/legacy-admin-user-producer-endpoint.js';
 type Documented = InferOutput<typeof adminShowUserOutput>;
 declare const raw:MiSignin[];
 declare const producer:LegacyAdminUserProducerOutput;

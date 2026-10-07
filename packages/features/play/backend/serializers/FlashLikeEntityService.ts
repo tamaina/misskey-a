@@ -4,8 +4,8 @@
  */
 
 import type { FlashLikesRepository } from '@/models/_.js';
-import type { } from '../../../relationships/backend/models/Blocking.js';
-import type { MiUser } from '../../../users/backend/models/User.js';
+import type { } from '@features/relationships/backend/models/Blocking.js';
+import type { MiUser } from '@features/users/backend/models/User.js';
 import type { MiFlashLike } from '../models/FlashLike.js';
 import { bindThis } from '@/decorators.js';
 import type { FlashEntityService } from './FlashEntityService.js';

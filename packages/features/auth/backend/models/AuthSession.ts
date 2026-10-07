@@ -5,7 +5,7 @@
 
 import { Entity, PrimaryColumn, Index, Column, ManyToOne, JoinColumn } from 'typeorm';
 import { id } from '@/models/util/id.js';
-import { MiUser } from '../../../users/backend/models/User.js';
+import { MiUser } from '@features/users/backend/models/User.js';
 import { MiApp } from './App.js';
 
 @Entity('auth_session')

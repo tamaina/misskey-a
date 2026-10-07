@@ -3,25 +3,25 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { DI } from '../../../backend/src/di-symbols.js';
-import type { RepositorySet } from '../../../backend/src/models/repository-factory.js';
-import type { UserEntityService } from '../../users/backend/serializers/UserEntityService.js';
-import type { NoteEntityService } from '../../notes/backend/serializers/NoteEntityService.js';
-import type { DriveFileEntityService } from '../../drive/backend/serializers/DriveFileEntityService.js';
-import type { IdService } from '../../runtime/backend/services/IdService.js';
-import type { GlobalEventService } from '../../runtime/backend/services/GlobalEventService.js';
-import type { ModerationLogService } from '../../moderation/backend/services/ModerationLogService.js';
-import type { RoleService } from '../../roles/backend/services/RoleService.js';
-import type { QueryService } from '../../../backend/src/core/QueryService.js';
-import type { UtilityService } from '../../../backend/src/core/UtilityService.js';
-import type { SystemAccountService } from '../../users/backend/services/SystemAccountService.js';
-import type { SystemWebhookEntityService } from '../../integrations/backend/serializers/SystemWebhookEntityService.js';
-import type { HttpRequestService } from '../../runtime/backend/services/HttpRequestService.js';
-import type { LoggerService } from '../../runtime/backend/services/LoggerService.js';
-import type { Config } from '../../../backend/src/config.js';
+import { DI } from '@/di-symbols.js';
+import type { RepositorySet } from '@/models/repository-factory.js';
+import type { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
+import type { NoteEntityService } from '@features/notes/backend/serializers/NoteEntityService.js';
+import type { DriveFileEntityService } from '@features/drive/backend/serializers/DriveFileEntityService.js';
+import type { IdService } from '@features/runtime/backend/services/IdService.js';
+import type { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
+import type { ModerationLogService } from '@features/moderation/backend/services/ModerationLogService.js';
+import type { RoleService } from '@features/roles/backend/services/RoleService.js';
+import type { QueryService } from '@/core/QueryService.js';
+import type { UtilityService } from '@/core/UtilityService.js';
+import type { SystemAccountService } from '@features/users/backend/services/SystemAccountService.js';
+import type { SystemWebhookEntityService } from '@features/integrations/backend/serializers/SystemWebhookEntityService.js';
+import type { HttpRequestService } from '@features/runtime/backend/services/HttpRequestService.js';
+import type { LoggerService } from '@features/runtime/backend/services/LoggerService.js';
+import type { Config } from '@/config.js';
 import type * as Redis from 'ioredis';
 import type { DataSource } from 'typeorm';
-import type { MiMeta } from '../../../backend/src/models/_.js';
+import type { MiMeta } from '@/models/_.js';
 import type { Port, PortToken } from './service-definitions.js';
 
 /** Audited legacy bridge: property names agree with RepositorySet providers. */

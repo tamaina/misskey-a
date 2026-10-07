@@ -8,39 +8,39 @@ import { MODULE_METADATA } from '@nestjs/common/constants.js';
 import { expect, test } from 'vitest';
 import { ServerModule } from '../../../ServerModule.js';
 
-import * as moved_admin from '../../../../../../features/operations/backend/stream/admin.js';
+import * as moved_admin from '@features/operations/backend/stream/admin.js';
 
-import * as moved_antenna from '../../../../../../features/timelines/backend/stream/antenna.js';
+import * as moved_antenna from '@features/timelines/backend/stream/antenna.js';
 
-import * as moved_channel from '../../../../../../features/channels/backend/stream/channel.js';
+import * as moved_channel from '@features/channels/backend/stream/channel.js';
 
-import * as moved_chat_room from '../../../../../../features/chat/backend/stream/chat-room.js';
+import * as moved_chat_room from '@features/chat/backend/stream/chat-room.js';
 
-import * as moved_chat_user from '../../../../../../features/chat/backend/stream/chat-user.js';
+import * as moved_chat_user from '@features/chat/backend/stream/chat-user.js';
 
-import * as moved_drive from '../../../../../../features/drive/backend/stream/drive.js';
+import * as moved_drive from '@features/drive/backend/stream/drive.js';
 
-import * as moved_global_timeline from '../../../../../../features/timelines/backend/stream/global-timeline.js';
+import * as moved_global_timeline from '@features/timelines/backend/stream/global-timeline.js';
 
-import * as moved_hashtag from '../../../../../../features/discovery/backend/stream/hashtag.js';
+import * as moved_hashtag from '@features/discovery/backend/stream/hashtag.js';
 
-import * as moved_home_timeline from '../../../../../../features/timelines/backend/stream/home-timeline.js';
+import * as moved_home_timeline from '@features/timelines/backend/stream/home-timeline.js';
 
-import * as moved_hybrid_timeline from '../../../../../../features/timelines/backend/stream/hybrid-timeline.js';
+import * as moved_hybrid_timeline from '@features/timelines/backend/stream/hybrid-timeline.js';
 
-import * as moved_local_timeline from '../../../../../../features/timelines/backend/stream/local-timeline.js';
+import * as moved_local_timeline from '@features/timelines/backend/stream/local-timeline.js';
 
-import * as moved_queue_stats from '../../../../../../features/operations/backend/stream/queue-stats.js';
+import * as moved_queue_stats from '@features/operations/backend/stream/queue-stats.js';
 
-import * as moved_reversi from '../../../../../../features/games/backend/stream/reversi.js';
+import * as moved_reversi from '@features/games/backend/stream/reversi.js';
 
-import * as moved_reversi_game from '../../../../../../features/games/backend/stream/reversi-game.js';
+import * as moved_reversi_game from '@features/games/backend/stream/reversi-game.js';
 
-import * as moved_role_timeline from '../../../../../../features/timelines/backend/stream/role-timeline.js';
+import * as moved_role_timeline from '@features/timelines/backend/stream/role-timeline.js';
 
-import * as moved_server_stats from '../../../../../../features/statistics/backend/stream/server-stats.js';
+import * as moved_server_stats from '@features/statistics/backend/stream/server-stats.js';
 
-import * as moved_user_list from '../../../../../../features/timelines/backend/stream/user-list.js';
+import * as moved_user_list from '@features/timelines/backend/stream/user-list.js';
 
 const serverProviders = Reflect.getMetadata(MODULE_METADATA.PROVIDERS, ServerModule) as unknown[];
 

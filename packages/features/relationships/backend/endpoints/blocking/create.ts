@@ -9,7 +9,7 @@ import ms from '@/runtime-dependencies/ms.js';
 import { Inject, Injectable } from '@nestjs/common';
 
 import type { UsersRepository, BlockingsRepository } from '@/models/_.js';
-import { UserEntityService } from '../../../../users/backend/serializers/UserEntityService.js';
+import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import { UserBlockingService } from '../../services/UserBlockingService.js';
 import { DI } from '@/di-symbols.js';
 import { GetterService } from '@/server/api/GetterService.js';

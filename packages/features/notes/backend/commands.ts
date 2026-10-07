@@ -4,8 +4,8 @@
  */
 
 import type { JsonSchema } from '@valibot/to-json-schema';
-import type { ApiErrorDefinition } from '../../api/contract/index.js';
-import { toLegacyJsonSchema, featureProcedure } from '../../api/backend/index.js';
+import type { ApiErrorDefinition } from '@features/api/contract/index.js';
+import { toLegacyJsonSchema, featureProcedure } from '@features/api/backend/index.js';
 import { notesCommandErrors, notesCommandInputs, notesCommandsContract } from '../contract/index.js';
 
 export interface NotesCommandActor {

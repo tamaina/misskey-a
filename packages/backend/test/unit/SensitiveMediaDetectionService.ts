@@ -5,9 +5,9 @@
 
 import { describe, test, expect, vi, beforeEach } from 'vitest';
 import type { MiMeta } from '@/models/_.js';
-import type { HttpRequestService } from '../../../features/runtime/backend/services/HttpRequestService.js';
-import type { LoggerService } from '../../../features/runtime/backend/services/LoggerService.js';
-import { SensitiveMediaDetectionService, type Prediction } from '../../../features/media/backend/services/SensitiveMediaDetectionService.js';
+import type { HttpRequestService } from '@features/runtime/backend/services/HttpRequestService.js';
+import type { LoggerService } from '@features/runtime/backend/services/LoggerService.js';
+import { SensitiveMediaDetectionService, type Prediction } from '@features/media/backend/services/SensitiveMediaDetectionService.js';
 
 const sendMock = vi.fn();
 

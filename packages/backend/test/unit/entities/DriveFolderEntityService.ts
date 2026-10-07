@@ -11,7 +11,7 @@ import type { TestingModule } from '@nestjs/testing';
 import type { DriveFilesRepository, DriveFoldersRepository } from '@/models/_.js';
 import { GlobalModule } from '@/GlobalModule.js';
 import { CoreModule } from '@/core/CoreModule.js';
-import { DriveFolderEntityService } from '../../../../features/drive/backend/serializers/DriveFolderEntityService.js';
+import { DriveFolderEntityService } from '@features/drive/backend/serializers/DriveFolderEntityService.js';
 import { DI } from '@/di-symbols.js';
 import { genAidx } from '@/misc/id/aidx.js';
 import { secureRndstr } from '@/misc/secure-rndstr.js';

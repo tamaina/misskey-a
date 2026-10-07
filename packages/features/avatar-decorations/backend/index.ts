@@ -7,8 +7,8 @@ import { createProcedureClient, implement } from '@orpc/server';
 import type { JsonSchema } from '@valibot/to-json-schema';
 import { avatarDecorationResult, avatarDecorationsContract } from '../contract/index.js';
 import type { AvatarDecorationEndpoints } from '../contract/index.js';
-import { objectParams } from '../../api/contract/index.js';
-import { toLegacyJsonSchema } from '../../api/backend/index.js';
+import { objectParams } from '@features/api/contract/index.js';
+import { toLegacyJsonSchema } from '@features/api/backend/index.js';
 import { avatarDecorationCommandInputs, avatarDecorationCommandsContract } from '../contract/index.js';
 
 export interface AvatarDecorationCommandsContext<Actor extends { id: string }> {

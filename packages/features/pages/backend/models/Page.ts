@@ -5,8 +5,8 @@
 
 import { Entity, Index, JoinColumn, Column, PrimaryColumn, ManyToOne } from 'typeorm';
 import { id } from '@/models/util/id.js';
-import { MiUser } from '../../../users/backend/models/User.js';
-import { MiDriveFile } from '../../../drive/backend/models/DriveFile.js';
+import { MiUser } from '@features/users/backend/models/User.js';
+import { MiDriveFile } from '@features/drive/backend/models/DriveFile.js';
 
 export { pageNameSchema } from '../../contract/page-name.js';
 

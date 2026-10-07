@@ -3,25 +3,25 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { getJsonExclusiveObjectGuardRegistration, getJsonExclusiveObjectParserRegistration } from '../../../../features/api/contract/json-exclusive-object.js';
-import { assertJsonExclusiveObjectMetadata } from '../../../../features/api/backend/json-exclusive-object-projection.js';
+import { getJsonExclusiveObjectGuardRegistration, getJsonExclusiveObjectParserRegistration } from '@features/api/contract/json-exclusive-object.js';
+import { assertJsonExclusiveObjectMetadata } from '@features/api/backend/json-exclusive-object-projection.js';
 import type { InferSchemaOutput } from '@orpc/contract';
 import type { JsonSchema } from '@valibot/to-json-schema';
 import type * as v from 'valibot';
-import type { EndpointContractDefinition } from '../../../../features/api/contract/definition.js';
-import { getMultipartEndpointContractRegistration } from '../../../../features/api/contract/multipart-endpoint.js';
-import { toLegacyJsonSchema } from '../../../../features/api/backend/index.js';
+import type { EndpointContractDefinition } from '@features/api/contract/definition.js';
+import { getMultipartEndpointContractRegistration } from '@features/api/contract/multipart-endpoint.js';
+import { toLegacyJsonSchema } from '@features/api/backend/index.js';
 import type { Schema } from '@/misc/json-schema.js';
-import { assertLegacyOutputTupleMetadata } from '../../../../features/api/backend/legacy-output-tuple-projection.js';
-import { getPackedReference, getPackedReferenceLegacyOutputSchema } from '../../../../features/api/contract/packed-reference.js';
-import { getJsonObjectGuardRegistration, getJsonObjectParserRegistration } from '../../../../features/api/contract/json-object.js';
-import { getJsonSelectorAndCommonGuardRegistration, getJsonSelectorAndCommonParserRegistration } from '../../../../features/api/contract/json-selector-and-common.js';
-import { assertJsonSelectorAndCommonMetadata } from '../../../../features/api/backend/json-selector-and-common-projection.js';
-import { getLegacyOutputTupleItems, getLegacyOutputTupleLegacyItems } from '../../../../features/api/contract/legacy-output-tuple.js';
-import { getUniqueStringArrayBaseSchema } from '../../../../features/api/contract/unique-string-array.js';
-import { getRequireWhenAllNullishRegistration } from '../../../../features/api/contract/require-when-all-nullish.js';
-import { getLegacyOutputOneOfRegistration, hasLegacyOutputOneOfOptions } from '../../../../features/api/contract/legacy-output-one-of.js';
-import { assertLegacyOutputOneOfMetadata } from '../../../../features/api/backend/legacy-output-one-of-projection.js';
+import { assertLegacyOutputTupleMetadata } from '@features/api/backend/legacy-output-tuple-projection.js';
+import { getPackedReference, getPackedReferenceLegacyOutputSchema } from '@features/api/contract/packed-reference.js';
+import { getJsonObjectGuardRegistration, getJsonObjectParserRegistration } from '@features/api/contract/json-object.js';
+import { getJsonSelectorAndCommonGuardRegistration, getJsonSelectorAndCommonParserRegistration } from '@features/api/contract/json-selector-and-common.js';
+import { assertJsonSelectorAndCommonMetadata } from '@features/api/backend/json-selector-and-common-projection.js';
+import { getLegacyOutputTupleItems, getLegacyOutputTupleLegacyItems } from '@features/api/contract/legacy-output-tuple.js';
+import { getUniqueStringArrayBaseSchema } from '@features/api/contract/unique-string-array.js';
+import { getRequireWhenAllNullishRegistration } from '@features/api/contract/require-when-all-nullish.js';
+import { getLegacyOutputOneOfRegistration, hasLegacyOutputOneOfOptions } from '@features/api/contract/legacy-output-one-of.js';
+import { assertLegacyOutputOneOfMetadata } from '@features/api/backend/legacy-output-one-of-projection.js';
 import { convertSchemaToOpenApiSchema } from './openapi/schemas.js';
 import { Endpoint } from './endpoint-base.js';
 import type { EndpointExecutor } from './endpoint-base.js';

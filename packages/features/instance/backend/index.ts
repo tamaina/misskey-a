@@ -18,7 +18,7 @@ import {
 import type { InstanceEndpoints } from '../contract/index.js';
 import { createGetOnlineUsersCount } from './get-online-users-count.js';
 import type { OnlineUsersCountDependencies } from './get-online-users-count.js';
-import { toLegacyJsonSchema } from '../../api/backend/index.js';
+import { toLegacyJsonSchema } from '@features/api/backend/index.js';
 
 /** The clock is a narrow dependency and can be replaced without a container. */
 export function createPing(now: () => number = Date.now) {

@@ -5,8 +5,8 @@
 
 import { PrimaryColumn, Entity, Index, JoinColumn, Column, OneToOne } from 'typeorm';
 import { id } from '@/models/util/id.js';
-import { MiNote } from '../../../notes/backend/models/Note.js';
-import type { MiUser } from '../../../users/backend/models/User.js';
+import { MiNote } from '@features/notes/backend/models/Note.js';
+import type { MiUser } from '@features/users/backend/models/User.js';
 
 @Entity('promo_note')
 export class MiPromoNote {

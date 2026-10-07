@@ -11,7 +11,7 @@ import type { UsersRepository, UserProfilesRepository } from '@/models/_.js';
 
 import { DeleteAccountService } from '../../services/DeleteAccountService.js';
 import { DI } from '@/di-symbols.js';
-import { UserAuthService } from '../../../../auth/backend/services/UserAuthService.js';
+import { UserAuthService } from '@features/auth/backend/services/UserAuthService.js';
 
 const contractProjection = projectEndpointContract(voidIDeleteAccountDefinition);
 

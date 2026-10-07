@@ -9,7 +9,7 @@ import { Inject, Injectable } from '@nestjs/common';
 
 import type { FollowingsRepository, UsersRepository } from '@/models/_.js';
 import { DI } from '@/di-symbols.js';
-import { QueueService } from '../../../../../runtime/backend/services/QueueService.js';
+import { QueueService } from '@features/runtime/backend/services/QueueService.js';
 
 const contractProjection = projectEndpointContract(voidAdminFederationRemoveAllFollowingDefinition);
 

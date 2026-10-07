@@ -9,7 +9,7 @@ import { Inject, Injectable } from '@nestjs/common';
 
 import type { AdsRepository } from '@/models/_.js';
 import { DI } from '@/di-symbols.js';
-import { ModerationLogService } from '../../../../../moderation/backend/services/ModerationLogService.js';
+import { ModerationLogService } from '@features/moderation/backend/services/ModerationLogService.js';
 import { ApiError } from '@/server/api/error.js';
 
 const contractProjection = projectEndpointContract(voidAdminAdDeleteDefinition);

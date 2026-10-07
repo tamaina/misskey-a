@@ -5,10 +5,10 @@
 
 import { Inject, Injectable, Scope } from '@nestjs/common';
 import { isInstanceMuted, isUserFromMutedInstance } from '@/misc/is-instance-muted.js';
-import { NoteEntityService } from '../../../../../../features/notes/backend/serializers/NoteEntityService.js';
+import { NoteEntityService } from '@features/notes/backend/serializers/NoteEntityService.js';
 import { bindThis } from '@/decorators.js';
 import type { JsonObject } from '@/misc/json-value.js';
-import type { MainEventTypes, EventTypesToEventPayload } from '../../../../../../features/runtime/backend/services/GlobalEventService.js';
+import type { MainEventTypes, EventTypesToEventPayload } from '@features/runtime/backend/services/GlobalEventService.js';
 import Channel, { type ChannelRequest } from '../channel.js';
 import { REQUEST } from '@nestjs/core';
 

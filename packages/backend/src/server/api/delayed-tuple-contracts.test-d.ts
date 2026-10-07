@@ -4,9 +4,9 @@
  */
 
 import type * as v from 'valibot';
-import type { EndpointImplementation as DeliverDelayedEndpoint } from '../../../../features/operations/backend/endpoints/admin/queue/deliver-delayed.js';
-import type { EndpointImplementation as InboxDelayedEndpoint } from '../../../../features/operations/backend/endpoints/admin/queue/inbox-delayed.js';
-import type { DelayedTupleEndpoints, delayedTupleAdminQueueDeliverDelayedInput } from '../../../../features/operations/contract/delayed-tuple-endpoint-definitions.js';
+import type { EndpointImplementation as DeliverDelayedEndpoint } from '@features/operations/backend/endpoints/admin/queue/deliver-delayed.js';
+import type { EndpointImplementation as InboxDelayedEndpoint } from '@features/operations/backend/endpoints/admin/queue/inbox-delayed.js';
+import type { DelayedTupleEndpoints, delayedTupleAdminQueueDeliverDelayedInput } from '@features/operations/contract/delayed-tuple-endpoint-definitions.js';
 
 type Equal<A, B> = (<T>() => T extends A ? 1 : 2) extends (<T>() => T extends B ? 1 : 2) ? true : false;
 type Assert<T extends true> = T;

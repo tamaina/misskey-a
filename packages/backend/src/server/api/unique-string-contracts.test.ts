@@ -6,10 +6,10 @@
 import _Ajv from 'ajv';
 import { expect, test } from 'vitest';
 import * as v from 'valibot';
-import { uniqueStringEndpointDefinitions as authDefinitions } from '../../../../features/auth/contract/unique-string-endpoint-definitions.js';
-import { uniqueStringEndpointDefinitions as driveDefinitions } from '../../../../features/drive/contract/unique-string-endpoint-definitions.js';
-import { uniqueStringEndpointDefinitions as galleryDefinitions } from '../../../../features/gallery/contract/unique-string-endpoint-definitions.js';
-import { misskeyIdPattern } from '../../../../features/api/contract/index.js';
+import { uniqueStringEndpointDefinitions as authDefinitions } from '@features/auth/contract/unique-string-endpoint-definitions.js';
+import { uniqueStringEndpointDefinitions as driveDefinitions } from '@features/drive/contract/unique-string-endpoint-definitions.js';
+import { uniqueStringEndpointDefinitions as galleryDefinitions } from '@features/gallery/contract/unique-string-endpoint-definitions.js';
+import { misskeyIdPattern } from '@features/api/contract/index.js';
 import { projectEndpointContract } from './contract-endpoint.js';
 import { convertSchemaToOpenApiSchema } from './openapi/schemas.js';
 

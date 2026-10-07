@@ -10,15 +10,15 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { FastifyReply, FastifyRequest } from 'fastify';
 import type { AuthenticationResponseJSON } from '@simplewebauthn/server';
 import { HttpHeader } from 'fastify/types/utils.js';
-import { MiUser } from '../../../features/users/backend/models/User.js';
+import { MiUser } from '@features/users/backend/models/User.js';
 import { MiUserProfile, UserProfilesRepository, UsersRepository } from '@/models/_.js';
-import { IdService } from '../../../features/runtime/backend/services/IdService.js';
+import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { GlobalModule } from '@/GlobalModule.js';
 import { DI } from '@/di-symbols.js';
 import { CoreModule } from '@/core/CoreModule.js';
 import { SigninWithPasskeyApiService } from '@/server/api/SigninWithPasskeyApiService.js';
 import { RateLimiterService } from '@/server/api/RateLimiterService.js';
-import { WebAuthnService } from '../../../features/auth/backend/services/WebAuthnService.js';
+import { WebAuthnService } from '@features/auth/backend/services/WebAuthnService.js';
 import { SigninService } from '@/server/api/SigninService.js';
 import { IdentifiableError } from '@/misc/identifiable-error.js';
 

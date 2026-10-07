@@ -5,12 +5,12 @@
 
 import { createProcedureClient, implement } from '@orpc/server';
 import type { JsonSchema } from '@valibot/to-json-schema';
-import type { ApiErrorDefinition } from '../../api/contract/index.js';
+import type { ApiErrorDefinition } from '@features/api/contract/index.js';
 import { collectionsContract, collectionsErrors, collectionsInputs } from '../contract/index.js';
 export { collectionsErrors } from '../contract/index.js';
 export { clipFavoriteErrors } from '../contract/index.js';
 import type { CollectionEndpoints } from '../contract/index.js';
-import { toLegacyJsonSchema } from '../../api/backend/index.js';
+import { toLegacyJsonSchema } from '@features/api/backend/index.js';
 
 export interface CollectionsActor {
 	id: string;

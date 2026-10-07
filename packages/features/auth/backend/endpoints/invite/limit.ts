@@ -9,9 +9,9 @@ import { Inject, Injectable } from '@nestjs/common';
 import { MoreThan } from 'typeorm';
 
 import type { RegistrationTicketsRepository } from '@/models/_.js';
-import { RoleService } from '../../../../roles/backend/services/RoleService.js';
+import { RoleService } from '@features/roles/backend/services/RoleService.js';
 import { DI } from '@/di-symbols.js';
-import { IdService } from '../../../../runtime/backend/services/IdService.js';
+import { IdService } from '@features/runtime/backend/services/IdService.js';
 
 const contractProjection = projectEndpointContract(inlineInviteLimitDefinition);
 

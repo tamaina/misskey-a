@@ -5,7 +5,7 @@
 
 import { PrimaryColumn, Entity, JoinColumn, Column, ManyToOne, Index } from 'typeorm';
 import { id } from '@/models/util/id.js';
-import { MiUser } from '../../../users/backend/models/User.js';
+import { MiUser } from '@features/users/backend/models/User.js';
 
 @Entity('user_security_key')
 export class MiUserSecurityKey {

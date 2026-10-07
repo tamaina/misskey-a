@@ -4,14 +4,14 @@
  */
 
 import { Brackets, EntityNotFoundError } from 'typeorm';
-import type { MiUser } from '../../../users/backend/models/User.js';
+import type { MiUser } from '@features/users/backend/models/User.js';
 import type { AnnouncementReadsRepository, AnnouncementsRepository, MiAnnouncement, MiAnnouncementRead, UsersRepository } from '@/models/_.js';
 import { bindThis } from '@/decorators.js';
-import { Packed } from '../../../index/contract/packed.js';
-import type { IdService } from '../../../runtime/backend/services/IdService.js';
+import { Packed } from '@features/index/contract/packed.js';
+import type { IdService } from '@features/runtime/backend/services/IdService.js';
 import type { AnnouncementEntityService } from '../serializers/AnnouncementEntityService.js';
-import type { GlobalEventService } from '../../../runtime/backend/services/GlobalEventService.js';
-import type { ModerationLogService } from '../../../moderation/backend/services/ModerationLogService.js';
+import type { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
+import type { ModerationLogService } from '@features/moderation/backend/services/ModerationLogService.js';
 
 export class AnnouncementService {
 	constructor(

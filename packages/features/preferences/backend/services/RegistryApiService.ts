@@ -6,9 +6,9 @@
 import type { MiRegistryItem, RegistryItemsRepository } from '@/models/_.js';
 import { IdentifiableError } from '@/misc/identifiable-error.js';
 import { bindThis } from '@/decorators.js';
-import type { MiUser } from '../../../users/backend/models/User.js';
-import type { IdService } from '../../../runtime/backend/services/IdService.js';
-import type { GlobalEventService } from '../../../runtime/backend/services/GlobalEventService.js';
+import type { MiUser } from '@features/users/backend/models/User.js';
+import type { IdService } from '@features/runtime/backend/services/IdService.js';
+import type { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
 
 export class RegistryApiService {
 	constructor(

@@ -7,29 +7,29 @@
 // RepositorySet tokens, including narrow factory inputs and invalid bindings.
 import type { MiSystemWebhook, SystemWebhooksRepository } from '@/models/_.js';
 import type { RepositorySet } from '@/models/repository-factory.js';
-import { authSecurityServices, authServices } from '../../../features/auth/backend/services.js';
-import { channelServices } from '../../../features/channels/backend/services.js';
-import { discoveryServices, rankingServices, userSearchServices } from '../../../features/discovery/backend/services.js';
-import { AppEntityService } from '../../../features/auth/backend/serializers/AppEntityService.js';
-import { AuthSessionEntityService } from '../../../features/auth/backend/serializers/AuthSessionEntityService.js';
-import { InviteCodeEntityService } from '../../../features/auth/backend/serializers/InviteCodeEntityService.js';
-import { SigninEntityService } from '../../../features/auth/backend/serializers/SigninEntityService.js';
-import { ChannelEntityService } from '../../../features/channels/backend/serializers/ChannelEntityService.js';
-import { HashtagEntityService } from '../../../features/discovery/backend/serializers/HashtagEntityService.js';
-import { SystemWebhookEntityService } from '../../../features/integrations/backend/serializers/SystemWebhookEntityService.js';
-import { mediaServices } from '../../../features/media/backend/services.js';
-import { markupServices } from '../../../features/markup/backend/services.js';
-import { preferencesServices } from '../../../features/preferences/backend/services.js';
-import { moderationLoggingServices, moderationServices } from '../../../features/moderation/backend/services.js';
-import { SensitiveMediaDetectionService } from '../../../features/media/backend/services/SensitiveMediaDetectionService.js';
-import { AbuseReportNotificationRecipientEntityService } from '../../../features/moderation/backend/serializers/AbuseReportNotificationRecipientEntityService.js';
-import { AbuseUserReportEntityService } from '../../../features/moderation/backend/serializers/AbuseUserReportEntityService.js';
-import { ModerationLogEntityService } from '../../../features/moderation/backend/serializers/ModerationLogEntityService.js';
-import { service } from '../../../features/index/backend/service-definitions.js';
-import { ports } from '../../../features/index/backend/service-ports.js';
-import { UserAuthService } from '../../../features/auth/backend/services/UserAuthService.js';
-import { WebAuthnService } from '../../../features/auth/backend/services/WebAuthnService.js';
-import type { Inputs } from '../../../features/index/backend/service-definitions.js';
+import { authSecurityServices, authServices } from '@features/auth/backend/services.js';
+import { channelServices } from '@features/channels/backend/services.js';
+import { discoveryServices, rankingServices, userSearchServices } from '@features/discovery/backend/services.js';
+import { AppEntityService } from '@features/auth/backend/serializers/AppEntityService.js';
+import { AuthSessionEntityService } from '@features/auth/backend/serializers/AuthSessionEntityService.js';
+import { InviteCodeEntityService } from '@features/auth/backend/serializers/InviteCodeEntityService.js';
+import { SigninEntityService } from '@features/auth/backend/serializers/SigninEntityService.js';
+import { ChannelEntityService } from '@features/channels/backend/serializers/ChannelEntityService.js';
+import { HashtagEntityService } from '@features/discovery/backend/serializers/HashtagEntityService.js';
+import { SystemWebhookEntityService } from '@features/integrations/backend/serializers/SystemWebhookEntityService.js';
+import { mediaServices } from '@features/media/backend/services.js';
+import { markupServices } from '@features/markup/backend/services.js';
+import { preferencesServices } from '@features/preferences/backend/services.js';
+import { moderationLoggingServices, moderationServices } from '@features/moderation/backend/services.js';
+import { SensitiveMediaDetectionService } from '@features/media/backend/services/SensitiveMediaDetectionService.js';
+import { AbuseReportNotificationRecipientEntityService } from '@features/moderation/backend/serializers/AbuseReportNotificationRecipientEntityService.js';
+import { AbuseUserReportEntityService } from '@features/moderation/backend/serializers/AbuseUserReportEntityService.js';
+import { ModerationLogEntityService } from '@features/moderation/backend/serializers/ModerationLogEntityService.js';
+import { service } from '@features/index/backend/service-definitions.js';
+import { ports } from '@features/index/backend/service-ports.js';
+import { UserAuthService } from '@features/auth/backend/services/UserAuthService.js';
+import { WebAuthnService } from '@features/auth/backend/services/WebAuthnService.js';
+import type { Inputs } from '@features/index/backend/service-definitions.js';
 
 type NarrowAuth = {
 	appsRepository: ConstructorParameters<typeof AppEntityService>[0];
@@ -159,7 +159,7 @@ service(UserAuthService, [ports.config, ports.usersRepository, ports.userProfile
 authSecurityServices.create({ config: security.config, meta: security.meta, usersRepository: security.usersRepository, userProfilesRepository: security.userProfilesRepository, userSecurityKeysRepository: security.userSecurityKeysRepository });
 
 // Ranking keeps the former constructor types and excludes its local Featured edge from inputs.
-type RankingArgs = ConstructorParameters<typeof import('../../../features/discovery/backend/services/HashtagService.js').HashtagService>;
+type RankingArgs = ConstructorParameters<typeof import('@features/discovery/backend/services/HashtagService.js').HashtagService>;
 type OriginalRankingInputs = {
 	db: RankingArgs[0];
 	meta: RankingArgs[1];
@@ -174,8 +174,8 @@ declare const rankingInferred: Inputs<typeof rankingServices>;
 const rankingForward: Inputs<typeof rankingServices> = rankingOriginal;
 const rankingBackward: OriginalRankingInputs = rankingInferred;
 const rankingOutput: {
-	FeaturedService: import('../../../features/discovery/backend/services/FeaturedService.js').FeaturedService;
-	HashtagService: import('../../../features/discovery/backend/services/HashtagService.js').HashtagService;
+	FeaturedService: import('@features/discovery/backend/services/FeaturedService.js').FeaturedService;
+	HashtagService: import('@features/discovery/backend/services/HashtagService.js').HashtagService;
 } = rankingServices.create(rankingOriginal);
 const rankingOutputReverse: ReturnType<typeof rankingServices.create> = rankingOutput;
 void [rankingForward, rankingBackward, rankingOutputReverse];

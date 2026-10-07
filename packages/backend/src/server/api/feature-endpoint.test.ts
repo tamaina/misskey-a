@@ -3,10 +3,10 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import type { Packed } from '../../../../features/index/contract/packed.js';
+import type { Packed } from '@features/index/contract/packed.js';
 import type * as v from 'valibot';
 import type { EmojiSimple, EmojiDetailed } from '@features/emojis/contract';
-import type { packedEmojiSimpleSchema, packedEmojiDetailedSchema } from '../../../../features/emojis/contract/packed.js';
+import type { packedEmojiSimpleSchema, packedEmojiDetailedSchema } from '@features/emojis/contract/packed.js';
 import { expect, expectTypeOf, test, vi } from 'vitest';
 import type { InstanceFeature } from '@features/instance/backend';
 import type { StatisticsFeature } from '@features/statistics/backend';

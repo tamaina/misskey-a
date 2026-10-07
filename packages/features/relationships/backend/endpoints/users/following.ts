@@ -12,7 +12,7 @@ import { QueryService } from '@/core/QueryService.js';
 import { FollowingEntityService } from '../../serializers/FollowingEntityService.js';
 import { UtilityService } from '@/core/UtilityService.js';
 import { DI } from '@/di-symbols.js';
-import { RoleService } from '../../../../roles/backend/services/RoleService.js';
+import { RoleService } from '@features/roles/backend/services/RoleService.js';
 import { ApiError } from '@/server/api/error.js';
 
 const contractProjection = projectEndpointContract(allOfUsersFollowingDefinition);

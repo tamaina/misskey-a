@@ -8,7 +8,7 @@ import { voidAdminFederationDeleteAllFilesDefinition, voidAdminFederationDeleteA
 import { Inject, Injectable } from '@nestjs/common';
 
 import type { DriveFilesRepository } from '@/models/_.js';
-import { DriveService } from '../../../../../drive/backend/services/DriveService.js';
+import { DriveService } from '@features/drive/backend/services/DriveService.js';
 import { DI } from '@/di-symbols.js';
 
 const contractProjection = projectEndpointContract(voidAdminFederationDeleteAllFilesDefinition);

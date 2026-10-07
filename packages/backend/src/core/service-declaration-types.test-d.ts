@@ -3,9 +3,9 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { defineServices, service } from '../../../features/index/backend/service-definitions.js';
+import { defineServices, service } from '@features/index/backend/service-definitions.js';
 import { bindLegacyService } from './feature-service-provider-types.js';
-import type { Inputs, Port } from '../../../features/index/backend/service-definitions.js';
+import type { Inputs, Port } from '@features/index/backend/service-definitions.js';
 
 interface Apps { apps(): void }
 interface Access { access(): void }

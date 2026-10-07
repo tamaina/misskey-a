@@ -5,13 +5,13 @@
 
 import { Injectable, Inject } from '@nestjs/common';
 import { Ajv } from 'ajv';
-import { IdService } from '../../../runtime/backend/services/IdService.js';
-import { GlobalEventService } from '../../../runtime/backend/services/GlobalEventService.js';
+import { IdService } from '@features/runtime/backend/services/IdService.js';
+import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
 import Logger from '@/logger.js';
 import type { AntennasRepository } from '@/models/_.js';
 import { DI } from '@/di-symbols.js';
 import { bindThis } from '@/decorators.js';
-import { toLegacyJsonSchema } from '../../../api/backend/index.js';
+import { toLegacyJsonSchema } from '@features/api/backend/index.js';
 import { exportedAntenna } from '../../contract/antenna-export.js';
 import type { ExportedAntenna } from '../../contract/antenna-export.js';
 import { QueueLoggerService } from '@/queue/QueueLoggerService.js';

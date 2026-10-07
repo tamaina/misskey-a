@@ -10,8 +10,8 @@ import { Brackets } from 'typeorm';
 import type { RoleAssignmentsRepository, RolesRepository } from '@/models/_.js';
 import { QueryService } from '@/core/QueryService.js';
 import { DI } from '@/di-symbols.js';
-import { UserEntityService } from '../../../../../users/backend/serializers/UserEntityService.js';
-import { IdService } from '../../../../../runtime/backend/services/IdService.js';
+import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
+import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { ApiError } from '@/server/api/error.js';
 
 const contractProjection = projectEndpointContract(referenceAdminRolesUsersDefinition);

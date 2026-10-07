@@ -4,10 +4,10 @@
  */
 import { expect, test } from 'vitest';
 import * as v from 'valibot';
-import { opaqueObject } from '../../../../features/api/contract/opaque-object.js';
-import { toLegacyJsonSchema } from '../../../../features/api/backend/index.js';
-import { packedAdminRolesCreateInput } from '../../../../features/roles/contract/packed-endpoint-definitions.js';
-import { voidAdminRolesUpdateInput, voidAdminRolesUpdateDefaultPoliciesInput } from '../../../../features/roles/contract/void-endpoint-definitions.js';
+import { opaqueObject } from '@features/api/contract/opaque-object.js';
+import { toLegacyJsonSchema } from '@features/api/backend/index.js';
+import { packedAdminRolesCreateInput } from '@features/roles/contract/packed-endpoint-definitions.js';
+import { voidAdminRolesUpdateInput, voidAdminRolesUpdateDefaultPoliciesInput } from '@features/roles/contract/void-endpoint-definitions.js';
 
 const body = () => ({ name: 'x', description: '', color: null, iconUrl: null, target: 'manual', condFormula: { nonsense: true }, isPublic: true, isModerator: false, isAdministrator: false, asBadge: false, canEditMembersByModerator: false, displayOrder: 0, policies: { invalid: 'still accepted' } });
 

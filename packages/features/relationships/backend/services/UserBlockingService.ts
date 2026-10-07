@@ -5,18 +5,18 @@
 
 import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
 import { ModuleRef } from '@nestjs/core';
-import { IdService } from '../../../runtime/backend/services/IdService.js';
-import type { MiUser } from '../../../users/backend/models/User.js';
+import { IdService } from '@features/runtime/backend/services/IdService.js';
+import type { MiUser } from '@features/users/backend/models/User.js';
 import type { MiBlocking } from '../models/Blocking.js';
-import { QueueService } from '../../../runtime/backend/services/QueueService.js';
-import { GlobalEventService } from '../../../runtime/backend/services/GlobalEventService.js';
+import { QueueService } from '@features/runtime/backend/services/QueueService.js';
+import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
 import { DI } from '@/di-symbols.js';
 import type { FollowRequestsRepository, BlockingsRepository, UserListsRepository, UserListMembershipsRepository } from '@/models/_.js';
 import Logger from '@/logger.js';
-import { UserEntityService } from '../../../users/backend/serializers/UserEntityService.js';
-import { ApRendererService } from '../../../federation/backend/services/ApRendererService.js';
-import { LoggerService } from '../../../runtime/backend/services/LoggerService.js';
-import { UserWebhookService } from '../../../integrations/backend/services/UserWebhookService.js';
+import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
+import { ApRendererService } from '@features/federation/backend/services/ApRendererService.js';
+import { LoggerService } from '@features/runtime/backend/services/LoggerService.js';
+import { UserWebhookService } from '@features/integrations/backend/services/UserWebhookService.js';
 import { bindThis } from '@/decorators.js';
 import { CacheService } from '@/core/CacheService.js';
 import { UserFollowingService } from './UserFollowingService.js';

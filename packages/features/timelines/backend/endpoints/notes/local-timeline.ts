@@ -9,15 +9,15 @@ import { Brackets } from 'typeorm';
 import { Inject, Injectable } from '@nestjs/common';
 import type { MiMeta, NotesRepository } from '@/models/_.js';
 
-import { NoteEntityService } from '../../../../notes/backend/serializers/NoteEntityService.js';
+import { NoteEntityService } from '@features/notes/backend/serializers/NoteEntityService.js';
 import ActiveUsersChart from '@/core/chart/charts/active-users.js';
 import { DI } from '@/di-symbols.js';
-import { RoleService } from '../../../../roles/backend/services/RoleService.js';
-import { IdService } from '../../../../runtime/backend/services/IdService.js';
+import { RoleService } from '@features/roles/backend/services/RoleService.js';
+import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { QueryService } from '@/core/QueryService.js';
-import { MiLocalUser } from '../../../../users/backend/models/User.js';
+import { MiLocalUser } from '@features/users/backend/models/User.js';
 import { FanoutTimelineEndpointService } from '../../services/FanoutTimelineEndpointService.js';
-import { ChannelMutingService } from '../../../../channels/backend/services/ChannelMutingService.js';
+import { ChannelMutingService } from '@features/channels/backend/services/ChannelMutingService.js';
 import { ApiError } from '@/server/api/error.js';
 
 const contractProjection = projectEndpointContract(packedNotesLocalTimelineDefinition);

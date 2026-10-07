@@ -7,7 +7,7 @@ import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract
 import { portableAdminUpdateProxyAccountDefinition, portableAdminUpdateProxyAccountInput, portableAdminUpdateProxyAccountOutput } from '../../../contract/portable-constant-endpoint-definitions.js';
 import { Injectable } from '@nestjs/common';
 import { UserEntityService } from '../../serializers/UserEntityService.js';
-import { ModerationLogService } from '../../../../moderation/backend/services/ModerationLogService.js';
+import { ModerationLogService } from '@features/moderation/backend/services/ModerationLogService.js';
 import { SystemAccountService } from '../../services/SystemAccountService.js';
 
 const contractProjection = projectEndpointContract(portableAdminUpdateProxyAccountDefinition);

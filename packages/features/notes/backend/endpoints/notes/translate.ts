@@ -9,9 +9,9 @@ import { URLSearchParams } from 'node:url';
 import { Inject, Injectable } from '@nestjs/common';
 
 import { NoteEntityService } from '../../serializers/NoteEntityService.js';
-import { HttpRequestService } from '../../../../runtime/backend/services/HttpRequestService.js';
+import { HttpRequestService } from '@features/runtime/backend/services/HttpRequestService.js';
 import { GetterService } from '@/server/api/GetterService.js';
-import { RoleService } from '../../../../roles/backend/services/RoleService.js';
+import { RoleService } from '@features/roles/backend/services/RoleService.js';
 import { MiMeta } from '@/models/_.js';
 import { DI } from '@/di-symbols.js';
 import { ApiError } from '@/server/api/error.js';

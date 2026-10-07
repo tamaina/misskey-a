@@ -6,9 +6,9 @@
 import _Ajv from 'ajv';
 import { expect, expectTypeOf, test } from 'vitest';
 import * as v from 'valibot';
-import { defineEndpointContract } from '../../../../features/api/contract/definition.js';
-import { jsonString, misskeyId, misskeyIdPattern, objectParams, uniqueStringArray } from '../../../../features/api/contract/index.js';
-import { toLegacyJsonSchema } from '../../../../features/api/backend/index.js';
+import { defineEndpointContract } from '@features/api/contract/definition.js';
+import { jsonString, misskeyId, misskeyIdPattern, objectParams, uniqueStringArray } from '@features/api/contract/index.js';
+import { toLegacyJsonSchema } from '@features/api/backend/index.js';
 import { ContractEndpoint, projectEndpointContract } from './contract-endpoint.js';
 import { convertSchemaToOpenApiSchema } from './openapi/schemas.js';
 

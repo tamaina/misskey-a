@@ -5,7 +5,7 @@
 
 import { Inject, Injectable, Scope } from '@nestjs/common';
 import { IsNull, Not } from 'typeorm';
-import type { MiLocalUser, MiRemoteUser } from '../../../users/backend/models/User.js';
+import type { MiLocalUser, MiRemoteUser } from '@features/users/backend/models/User.js';
 import type {
 	FollowRequestsRepository,
 	MiMeta,
@@ -15,13 +15,13 @@ import type {
 	UsersRepository
 } from '@/models/_.js';
 import type { Config } from '@/config.js';
-import { HttpRequestService } from '../../../runtime/backend/services/HttpRequestService.js';
+import { HttpRequestService } from '@features/runtime/backend/services/HttpRequestService.js';
 import { DI } from '@/di-symbols.js';
 import { UtilityService } from '@/core/UtilityService.js';
 import { bindThis } from '@/decorators.js';
-import { LoggerService } from '../../../runtime/backend/services/LoggerService.js';
+import { LoggerService } from '@features/runtime/backend/services/LoggerService.js';
 import type Logger from '@/logger.js';
-import { SystemAccountService } from '../../../users/backend/services/SystemAccountService.js';
+import { SystemAccountService } from '@features/users/backend/services/SystemAccountService.js';
 import { IdentifiableError } from '@/misc/identifiable-error.js';
 import type { ICollection, IObject, IOrderedCollection } from '../protocol/type.js';
 import { isCollectionOrOrderedCollection } from '../protocol/type.js';

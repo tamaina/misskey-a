@@ -4,7 +4,7 @@
  */
 
 import type { GalleryLikesRepository } from '@/models/_.js';
-import type { } from '../../../relationships/backend/models/Blocking.js';
+import type { } from '@features/relationships/backend/models/Blocking.js';
 import type { MiGalleryLike } from '../models/GalleryLike.js';
 import { bindThis } from '@/decorators.js';
 import type { GalleryPostEntityService } from './GalleryPostEntityService.js';

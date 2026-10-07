@@ -9,7 +9,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import type { DriveFilesRepository } from '@/models/_.js';
 
 import { DI } from '@/di-symbols.js';
-import { RoleService } from '../../../../../roles/backend/services/RoleService.js';
+import { RoleService } from '@features/roles/backend/services/RoleService.js';
 import { DriveService } from '../../../services/DriveService.js';
 import { ApiError } from '@/server/api/error.js';
 

@@ -8,7 +8,7 @@ import { constantAdminUpdateMetaDefinition, constantAdminUpdateMetaInput, consta
 import { Injectable, Inject } from '@nestjs/common';
 import { DI } from '@/di-symbols.js';
 import type { MiMeta } from '../../models/Meta.js';
-import { ModerationLogService } from '../../../../moderation/backend/services/ModerationLogService.js';
+import { ModerationLogService } from '@features/moderation/backend/services/ModerationLogService.js';
 import { MetaService } from '../../services/MetaService.js';
 
 const contractProjection = projectEndpointContract(constantAdminUpdateMetaDefinition);

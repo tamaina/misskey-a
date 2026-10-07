@@ -5,8 +5,8 @@
 
 import { expect, expectTypeOf, test } from 'vitest';
 import * as v from 'valibot';
-import { listingAdminDriveFilesDefinition, listingDriveFilesDefinition, listingDriveStreamDefinition } from '../../../../features/drive/contract/drive-listing-endpoint-definitions.js';
-import type { Packed } from '../../../../features/index/contract/packed.js';
+import { listingAdminDriveFilesDefinition, listingDriveFilesDefinition, listingDriveStreamDefinition } from '@features/drive/contract/drive-listing-endpoint-definitions.js';
+import type { Packed } from '@features/index/contract/packed.js';
 import { ContractEndpoint, projectEndpointContract } from './contract-endpoint.js';
 import { Endpoint } from './endpoint-base.js';
 import { convertSchemaToOpenApiSchema } from './openapi/schemas.js';

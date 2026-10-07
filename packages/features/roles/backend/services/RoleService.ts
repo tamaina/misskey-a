@@ -16,20 +16,20 @@ import type {
 	UsersRepository,
 } from '@/models/_.js';
 import { MemoryKVCache, MemorySingleCache } from '@/misc/cache.js';
-import type { MiUser } from '../../../users/backend/models/User.js';
+import type { MiUser } from '@features/users/backend/models/User.js';
 import type { Config } from '@/config.js';
 import { DI } from '@/di-symbols.js';
 import { bindThis } from '@/decorators.js';
 import { CacheService } from '@/core/CacheService.js';
 import type { RoleCondFormulaValue } from '../models/Role.js';
-import { UserEntityService } from '../../../users/backend/serializers/UserEntityService.js';
-import type { GlobalEvents } from '../../../runtime/backend/services/GlobalEventService.js';
-import { GlobalEventService } from '../../../runtime/backend/services/GlobalEventService.js';
-import { IdService } from '../../../runtime/backend/services/IdService.js';
-import { ModerationLogService } from '../../../moderation/backend/services/ModerationLogService.js';
-import type { Packed } from '../../../index/contract/packed.js';
-import { FanoutTimelineService } from '../../../timelines/backend/services/FanoutTimelineService.js';
-import { NotificationService } from '../../../notifications/backend/services/NotificationService.js';
+import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
+import type { GlobalEvents } from '@features/runtime/backend/services/GlobalEventService.js';
+import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
+import { IdService } from '@features/runtime/backend/services/IdService.js';
+import { ModerationLogService } from '@features/moderation/backend/services/ModerationLogService.js';
+import type { Packed } from '@features/index/contract/packed.js';
+import { FanoutTimelineService } from '@features/timelines/backend/services/FanoutTimelineService.js';
+import { NotificationService } from '@features/notifications/backend/services/NotificationService.js';
 import type { OnApplicationShutdown, OnModuleInit } from '@nestjs/common';
 
 // misskey-js の rolePolicies と同期すべし

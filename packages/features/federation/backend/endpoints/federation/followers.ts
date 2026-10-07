@@ -9,8 +9,8 @@ import { Inject, Injectable } from '@nestjs/common';
 
 import type { FollowingsRepository } from '@/models/_.js';
 import { QueryService } from '@/core/QueryService.js';
-import { FollowingEntityService } from '../../../../relationships/backend/serializers/FollowingEntityService.js';
-import { RoleService } from '../../../../roles/backend/services/RoleService.js';
+import { FollowingEntityService } from '@features/relationships/backend/serializers/FollowingEntityService.js';
+import { RoleService } from '@features/roles/backend/services/RoleService.js';
 import { DI } from '@/di-symbols.js';
 
 const contractProjection = projectEndpointContract(packedFederationFollowersDefinition);

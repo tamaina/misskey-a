@@ -8,7 +8,7 @@ import { portableV2AdminEmojiListDefinition, portableV2AdminEmojiListInput, port
 import { Injectable } from '@nestjs/common';
 import { EmojiEntityService } from '../../../../serializers/EmojiEntityService.js';
 import { CustomEmojiService } from '../../../../services/CustomEmojiService.js';
-import { IdService } from '../../../../../../runtime/backend/services/IdService.js';
+import { IdService } from '@features/runtime/backend/services/IdService.js';
 
 const contractProjection = projectEndpointContract(portableV2AdminEmojiListDefinition);
 

@@ -12,8 +12,8 @@ import { ApiError } from '@/server/api/error.js';
 import type { UsersRepository, UserProfilesRepository, MiMeta } from '@/models/_.js';
 import { DI } from '@/di-symbols.js';
 import { secureRndstr } from '@/misc/secure-rndstr.js';
-import { RoleService } from '../../../../roles/backend/services/RoleService.js';
-import { ModerationLogService } from '../../../../moderation/backend/services/ModerationLogService.js';
+import { RoleService } from '@features/roles/backend/services/RoleService.js';
+import { ModerationLogService } from '@features/moderation/backend/services/ModerationLogService.js';
 
 const contractProjection = projectEndpointContract(inlineAdminResetPasswordDefinition);
 

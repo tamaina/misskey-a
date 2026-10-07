@@ -4,11 +4,11 @@
  */
 
 import Chart from '../../core.js';
-import { perUserReactionsChartDescriptor } from '../../../../../../features/statistics/shared/chart-descriptors.js';
+import { perUserReactionsChartDescriptor } from '@features/statistics/shared/chart-descriptors.js';
 
 export const name = 'perUserReaction';
 
-export { perUserReactionsChartDescriptor as schema } from '../../../../../../features/statistics/shared/chart-descriptors.js';
+export { perUserReactionsChartDescriptor as schema } from '@features/statistics/shared/chart-descriptors.js';
 
 const schema = perUserReactionsChartDescriptor;
 

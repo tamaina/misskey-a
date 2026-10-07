@@ -4,9 +4,9 @@
  */
 
 import type { AccessTokensRepository, AppsRepository } from '@/models/_.js';
-import type { Packed } from '../../../index/contract/packed.js';
+import type { Packed } from '@features/index/contract/packed.js';
 import type { MiApp } from '../models/App.js';
-import type { MiUser } from '../../../users/backend/models/User.js';
+import type { MiUser } from '@features/users/backend/models/User.js';
 import { bindThis } from '@/decorators.js';
 
 export class AppEntityService {

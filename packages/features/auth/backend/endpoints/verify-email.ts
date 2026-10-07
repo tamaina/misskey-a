@@ -8,9 +8,9 @@ import { voidVerifyEmailDefinition, voidVerifyEmailInput, voidVerifyEmailOutput 
 import { Inject, Injectable } from '@nestjs/common';
 
 import type { UserProfilesRepository } from '@/models/_.js';
-import { UserEntityService } from '../../../users/backend/serializers/UserEntityService.js';
+import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import { DI } from '@/di-symbols.js';
-import { GlobalEventService } from '../../../runtime/backend/services/GlobalEventService.js';
+import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
 import { ApiError } from '@/server/api/error.js';
 
 const contractProjection = projectEndpointContract(voidVerifyEmailDefinition);

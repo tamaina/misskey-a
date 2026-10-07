@@ -8,7 +8,7 @@ import { voidBubbleGameRegisterDefinition, voidBubbleGameRegisterInput, voidBubb
 import { Inject, Injectable } from '@nestjs/common';
 import ms from '@/runtime-dependencies/ms.js';
 
-import { IdService } from '../../../../runtime/backend/services/IdService.js';
+import { IdService } from '@features/runtime/backend/services/IdService.js';
 import type { BubbleGameRecordsRepository } from '@/models/_.js';
 import { DI } from '@/di-symbols.js';
 import { ApiError } from '@/server/api/error.js';

@@ -5,15 +5,15 @@
 
 import { describe, expect, expectTypeOf, test, vi } from 'vitest';
 import * as v from 'valibot';
-import { compositionApShowDefinition, compositionApShowInput, compositionApShowOutput } from '../../../../features/federation/contract/output-composition-endpoint-definitions.js';
-import { compositionAdminAccountsCreateDefinition, compositionAdminAccountsCreateInput, compositionAdminAccountsCreateOutput } from '../../../../features/auth/contract/output-composition-endpoint-definitions.js';
-import { compositionUsersListsShowDefinition, compositionUsersListsShowInput, compositionUsersListsShowOutput } from '../../../../features/relationships/contract/output-composition-endpoint-definitions.js';
-import type { OutputCompositionEndpoints as FederationCompositionEndpoints } from '../../../../features/federation/contract/output-composition-endpoint-definitions.js';
-import type { OutputCompositionEndpoints as AuthCompositionEndpoints } from '../../../../features/auth/contract/output-composition-endpoint-definitions.js';
-import type { OutputCompositionEndpoints as RelationshipCompositionEndpoints } from '../../../../features/relationships/contract/output-composition-endpoint-definitions.js';
-import { localUsernameSchema, passwordSchema } from '../../../../features/users/contract/user-credentials.js';
-import { packedSchemas } from '../../../../features/index/contract/packed.js';
-import type { Packed } from '../../../../features/index/contract/packed.js';
+import { compositionApShowDefinition, compositionApShowInput, compositionApShowOutput } from '@features/federation/contract/output-composition-endpoint-definitions.js';
+import { compositionAdminAccountsCreateDefinition, compositionAdminAccountsCreateInput, compositionAdminAccountsCreateOutput } from '@features/auth/contract/output-composition-endpoint-definitions.js';
+import { compositionUsersListsShowDefinition, compositionUsersListsShowInput, compositionUsersListsShowOutput } from '@features/relationships/contract/output-composition-endpoint-definitions.js';
+import type { OutputCompositionEndpoints as FederationCompositionEndpoints } from '@features/federation/contract/output-composition-endpoint-definitions.js';
+import type { OutputCompositionEndpoints as AuthCompositionEndpoints } from '@features/auth/contract/output-composition-endpoint-definitions.js';
+import type { OutputCompositionEndpoints as RelationshipCompositionEndpoints } from '@features/relationships/contract/output-composition-endpoint-definitions.js';
+import { localUsernameSchema, passwordSchema } from '@features/users/contract/user-credentials.js';
+import { packedSchemas } from '@features/index/contract/packed.js';
+import type { Packed } from '@features/index/contract/packed.js';
 import type { Schema } from '@/misc/json-schema.js';
 import type { Config } from '@/config.js';
 import type { IEndpointMeta } from './endpoints.js';

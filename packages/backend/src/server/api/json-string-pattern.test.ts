@@ -5,10 +5,10 @@
 
 import { expect, test } from 'vitest';
 import * as v from 'valibot';
-import { jsonString, getJsonStringLegacySchema } from '../../../../features/api/contract/index.js';
-import { jsonObject } from '../../../../features/api/contract/json-object.js';
-import { defineEndpointContract } from '../../../../features/api/contract/definition.js';
-import { pageNameSchema } from '../../../../features/pages/contract/page-name.js';
+import { jsonString, getJsonStringLegacySchema } from '@features/api/contract/index.js';
+import { jsonObject } from '@features/api/contract/json-object.js';
+import { defineEndpointContract } from '@features/api/contract/definition.js';
+import { pageNameSchema } from '@features/pages/contract/page-name.js';
 import { ContractEndpoint, projectEndpointContract } from './contract-endpoint.js';
 import { Endpoint } from './endpoint-base.js';
 

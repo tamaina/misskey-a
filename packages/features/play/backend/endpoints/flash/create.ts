@@ -8,7 +8,7 @@ import { packedFlashCreateDefinition, packedFlashCreateInput, packedFlashCreateO
 import ms from '@/runtime-dependencies/ms.js';
 import { Inject, Injectable } from '@nestjs/common';
 import type { FlashsRepository } from '@/models/_.js';
-import { IdService } from '../../../../runtime/backend/services/IdService.js';
+import { IdService } from '@features/runtime/backend/services/IdService.js';
 
 import { DI } from '@/di-symbols.js';
 import { FlashEntityService } from '../../serializers/FlashEntityService.js';

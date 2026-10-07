@@ -4,11 +4,11 @@
  */
 
 import Chart from '../../core.js';
-import { apRequestChartDescriptor } from '../../../../../../features/statistics/shared/chart-descriptors.js';
+import { apRequestChartDescriptor } from '@features/statistics/shared/chart-descriptors.js';
 
 export const name = 'apRequest';
 
-export { apRequestChartDescriptor as schema } from '../../../../../../features/statistics/shared/chart-descriptors.js';
+export { apRequestChartDescriptor as schema } from '@features/statistics/shared/chart-descriptors.js';
 
 const schema = apRequestChartDescriptor;
 

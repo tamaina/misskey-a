@@ -9,8 +9,8 @@ import { Inject, Injectable } from '@nestjs/common';
 import { MetaService } from '../../services/MetaService.js';
 import type { Config } from '@/config.js';
 import { DI } from '@/di-symbols.js';
-import { DEFAULT_POLICIES } from '../../../../roles/backend/services/RoleService.js';
-import { SystemAccountService } from '../../../../users/backend/services/SystemAccountService.js';
+import { DEFAULT_POLICIES } from '@features/roles/backend/services/RoleService.js';
+import { SystemAccountService } from '@features/users/backend/services/SystemAccountService.js';
 
 const contractProjection = projectEndpointContract(referenceAdminMetaDefinition);
 

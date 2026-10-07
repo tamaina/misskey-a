@@ -6,9 +6,9 @@
 import { In } from 'typeorm';
 import type { AbuseReportNotificationRecipientRepository, MiAbuseReportNotificationRecipient } from '@/models/_.js';
 import { bindThis } from '@/decorators.js';
-import type { UserEntityService } from '../../../users/backend/serializers/UserEntityService.js';
-import { Packed } from '../../../index/contract/packed.js';
-import type { SystemWebhookEntityService } from '../../../integrations/backend/serializers/SystemWebhookEntityService.js';
+import type { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
+import { Packed } from '@features/index/contract/packed.js';
+import type { SystemWebhookEntityService } from '@features/integrations/backend/serializers/SystemWebhookEntityService.js';
 
 export class AbuseReportNotificationRecipientEntityService {
 	constructor(

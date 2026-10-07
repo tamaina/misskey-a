@@ -8,7 +8,7 @@ import { packedAntennasUpdateDefinition, packedAntennasUpdateInput, packedAntenn
 import { Inject, Injectable } from '@nestjs/common';
 
 import type { AntennasRepository, UserListsRepository } from '@/models/_.js';
-import { GlobalEventService } from '../../../../runtime/backend/services/GlobalEventService.js';
+import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
 import { AntennaEntityService } from '../../serializers/AntennaEntityService.js';
 import { DI } from '@/di-symbols.js';
 import { ApiError } from '@/server/api/error.js';

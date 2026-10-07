@@ -5,7 +5,7 @@
 
 import { describe, expect, test, vi } from 'vitest';
 import { runQueueJob } from '@/queue/queue-job-runner.js';
-import { TelemetryService } from '../../../../features/statistics/backend/services/TelemetryService.js';
+import { TelemetryService } from '@features/statistics/backend/services/TelemetryService.js';
 
 describe('runQueueJob', () => {
 	test('returns the processor result without invoking the error handler', async () => {

@@ -8,12 +8,12 @@ import { voidResetDbDefinition, voidResetDbInput, voidResetDbOutput } from '../.
 import { Inject, Injectable } from '@nestjs/common';
 import { DataSource } from 'typeorm';
 import * as Redis from 'ioredis';
-import { LoggerService } from '../../../runtime/backend/services/LoggerService.js';
+import { LoggerService } from '@features/runtime/backend/services/LoggerService.js';
 
 import { DI } from '@/di-symbols.js';
 import { resetDb } from '@/misc/reset-db.js';
-import { MetaService } from '../../../instance/backend/services/MetaService.js';
-import { GlobalEventService } from '../../../runtime/backend/services/GlobalEventService.js';
+import { MetaService } from '@features/instance/backend/services/MetaService.js';
+import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
 
 const contractProjection = projectEndpointContract(voidResetDbDefinition);
 

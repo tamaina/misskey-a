@@ -9,12 +9,12 @@ import { Inject, Injectable } from '@nestjs/common';
 
 import type { ChannelsRepository, MiMeta, NotesRepository } from '@/models/_.js';
 import { QueryService } from '@/core/QueryService.js';
-import { NoteEntityService } from '../../../../notes/backend/serializers/NoteEntityService.js';
+import { NoteEntityService } from '@features/notes/backend/serializers/NoteEntityService.js';
 import ActiveUsersChart from '@/core/chart/charts/active-users.js';
 import { DI } from '@/di-symbols.js';
-import { IdService } from '../../../../runtime/backend/services/IdService.js';
-import { FanoutTimelineEndpointService } from '../../../../timelines/backend/services/FanoutTimelineEndpointService.js';
-import { MiLocalUser } from '../../../../users/backend/models/User.js';
+import { IdService } from '@features/runtime/backend/services/IdService.js';
+import { FanoutTimelineEndpointService } from '@features/timelines/backend/services/FanoutTimelineEndpointService.js';
+import { MiLocalUser } from '@features/users/backend/models/User.js';
 import { ChannelMutingService } from '../../services/ChannelMutingService.js';
 import { ApiError } from '@/server/api/error.js';
 import { Brackets } from 'typeorm';

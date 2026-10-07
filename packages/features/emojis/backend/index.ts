@@ -13,8 +13,8 @@ import {
 	emojiSimpleResult,
 } from '../contract/index.js';
 import type { EmojiDetailed, EmojiEndpoints, EmojiSimple } from '../contract/index.js';
-import { objectParams } from '../../api/contract/index.js';
-import { toLegacyJsonSchema } from '../../api/backend/index.js';
+import { objectParams } from '@features/api/contract/index.js';
+import { toLegacyJsonSchema } from '@features/api/backend/index.js';
 
 export interface EmojisDependencies {
 	listLocal(): Promise<EmojiSimple[]>;

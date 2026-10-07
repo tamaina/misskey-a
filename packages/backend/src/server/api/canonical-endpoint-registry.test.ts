@@ -12,14 +12,14 @@ import * as ts from 'typescript';
 import * as endpointRegistry from './endpoint-list.js';
 import { EndpointsModule } from './EndpointsModule.js';
 import { featureTokens } from './feature-providers.js';
-import * as featureDefaultEndpoint0 from '../../../../features/federation/backend/endpoints/admin/federation/delete-all-files.js';
-import * as featureDefaultEndpoint1 from '../../../../features/federation/backend/endpoints/admin/federation/remove-all-following.js';
-import * as featureDefaultEndpoint2 from '../../../../features/integrations/backend/endpoints/admin/send-email.js';
-import * as featureDefaultEndpoint3 from '../../../../features/moderation/backend/endpoints/admin/show-users.js';
-import * as featureDefaultEndpoint4 from '../../../../features/users/backend/endpoints/admin/update-proxy-account.js';
-import * as featureDefaultEndpoint5 from '../../../../features/integrations/backend/endpoints/fetch-rss.js';
-import * as featureDefaultEndpoint6 from '../../../../features/timelines/backend/endpoints/notes/mentions.js';
-import * as featureDefaultEndpoint7 from '../../../../features/timelines/backend/endpoints/users/notes.js';
+import * as featureDefaultEndpoint0 from '@features/federation/backend/endpoints/admin/federation/delete-all-files.js';
+import * as featureDefaultEndpoint1 from '@features/federation/backend/endpoints/admin/federation/remove-all-following.js';
+import * as featureDefaultEndpoint2 from '@features/integrations/backend/endpoints/admin/send-email.js';
+import * as featureDefaultEndpoint3 from '@features/moderation/backend/endpoints/admin/show-users.js';
+import * as featureDefaultEndpoint4 from '@features/users/backend/endpoints/admin/update-proxy-account.js';
+import * as featureDefaultEndpoint5 from '@features/integrations/backend/endpoints/fetch-rss.js';
+import * as featureDefaultEndpoint6 from '@features/timelines/backend/endpoints/notes/mentions.js';
+import * as featureDefaultEndpoint7 from '@features/timelines/backend/endpoints/users/notes.js';
 
 type EndpointModule = {
 	EndpointImplementation?: unknown;
@@ -54,7 +54,9 @@ const ast = ts.createSourceFile(sourceFile, source, ts.ScriptTarget.Latest, true
 const routeSources = new Map<string, string>();
 for (const statement of ast.statements) {
 	if (!ts.isExportDeclaration(statement) || !statement.moduleSpecifier || !ts.isStringLiteral(statement.moduleSpecifier) || !statement.exportClause || !ts.isNamespaceExport(statement.exportClause)) continue;
-	routeSources.set(statement.exportClause.name.text, statement.moduleSpecifier.text);
+	// Compare canonical filesystem ownership independently of the import spelling.
+	expect(statement.moduleSpecifier.text).toMatch(/^@features\/[^/]+\/backend\/endpoints\/.+\.js$/);
+	routeSources.set(statement.exportClause.name.text, statement.moduleSpecifier.text.replace(/^@features\//, '../../../../features/'));
 }
 const routeFixturePath = fileURLToPath(new URL('../../../test/fixtures/backend-api-routes.json', import.meta.url));
 const expectedRouteKeys = JSON.parse(readFileSync(routeFixturePath, 'utf8')) as string[];

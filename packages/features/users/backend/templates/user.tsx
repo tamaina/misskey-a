@@ -3,10 +3,10 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import type { Packed } from '../../../index/contract/packed.js';
+import type { Packed } from '@features/index/contract/packed.js';
 import type { MiUserProfile } from '../models/UserProfile.js';
-import type { CommonProps } from '../../../web/backend/templates/_.js';
-import { Layout } from '../../../web/backend/templates/base.js';
+import type { CommonProps } from '@features/web/backend/templates/_.js';
+import { Layout } from '@features/web/backend/templates/base.js';
 
 export function UserPage(props: CommonProps<{
 	user: Packed<'UserDetailed'>;

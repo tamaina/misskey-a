@@ -8,9 +8,9 @@ import { inlineI2faDoneDefinition, inlineI2faDoneInput, inlineI2faDoneOutput } f
 import * as OTPAuth from 'otpauth';
 import { Inject, Injectable } from '@nestjs/common';
 
-import { UserEntityService } from '../../../../../users/backend/serializers/UserEntityService.js';
+import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import type { UserProfilesRepository } from '@/models/_.js';
-import { GlobalEventService } from '../../../../../runtime/backend/services/GlobalEventService.js';
+import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
 import { DI } from '@/di-symbols.js';
 import { UserAuthService } from "../../../services/UserAuthService.js";
 

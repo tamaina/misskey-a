@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import type { MiNote } from '../../../features/notes/backend/models/Note.js';
-import type { Packed } from '../../../features/index/contract/packed.js';
+import type { MiNote } from '@features/notes/backend/models/Note.js';
+import type { Packed } from '@features/index/contract/packed.js';
 
 // NoteEntityService.isPureRenote とよしなにリンク
 

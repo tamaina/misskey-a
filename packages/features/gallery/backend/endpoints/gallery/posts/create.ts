@@ -9,8 +9,8 @@ import ms from '@/runtime-dependencies/ms.js';
 import { Inject, Injectable } from '@nestjs/common';
 import type { DriveFilesRepository, GalleryPostsRepository } from '@/models/_.js';
 import { MiGalleryPost } from '../../../models/GalleryPost.js';
-import type { MiDriveFile } from '../../../../../drive/backend/models/DriveFile.js';
-import { IdService } from '../../../../../runtime/backend/services/IdService.js';
+import type { MiDriveFile } from '@features/drive/backend/models/DriveFile.js';
+import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { GalleryPostEntityService } from '../../../serializers/GalleryPostEntityService.js';
 import { DI } from '@/di-symbols.js';
 

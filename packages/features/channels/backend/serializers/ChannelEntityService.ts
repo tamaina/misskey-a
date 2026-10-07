@@ -13,13 +13,13 @@ import type {
 	MiNote,
 	NotesRepository,
 } from '@/models/_.js';
-import type { Packed } from '../../../index/contract/packed.js';
-import type { MiUser } from '../../../users/backend/models/User.js';
+import type { Packed } from '@features/index/contract/packed.js';
+import type { MiUser } from '@features/users/backend/models/User.js';
 import type { MiChannel } from '../models/Channel.js';
 import { bindThis } from '@/decorators.js';
-import type { IdService } from '../../../runtime/backend/services/IdService.js';
-import type { DriveFileEntityService } from '../../../drive/backend/serializers/DriveFileEntityService.js';
-import type { NoteEntityService } from '../../../notes/backend/serializers/NoteEntityService.js';
+import type { IdService } from '@features/runtime/backend/services/IdService.js';
+import type { DriveFileEntityService } from '@features/drive/backend/serializers/DriveFileEntityService.js';
+import type { NoteEntityService } from '@features/notes/backend/serializers/NoteEntityService.js';
 
 export class ChannelEntityService {
 	constructor(

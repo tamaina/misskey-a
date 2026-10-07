@@ -10,7 +10,7 @@
  */
 
 import * as nestedProperty from 'nested-property';
-import type { ChartMetricDescriptor, ChartValueRange } from '../../../../features/statistics/shared/chart-descriptors.js';
+import type { ChartMetricDescriptor, ChartValueRange } from '@features/statistics/shared/chart-descriptors.js';
 import { EntitySchema, LessThan, Between } from 'typeorm';
 import { dateUTC, isTimeSame, isTimeBefore, subtractTime, addTime } from '@/misc/prelude/time.js';
 import { sqlStringEscape } from '@/misc/sql-string-escape.js';

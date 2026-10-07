@@ -10,7 +10,7 @@ import ms from '@/runtime-dependencies/ms.js';
 
 import type { ChannelsRepository, DriveFilesRepository } from '@/models/_.js';
 import type { MiChannel } from '../../models/Channel.js';
-import { IdService } from '../../../../runtime/backend/services/IdService.js';
+import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { ChannelEntityService } from '../../serializers/ChannelEntityService.js';
 import { DI } from '@/di-symbols.js';
 import { ApiError } from '@/server/api/error.js';

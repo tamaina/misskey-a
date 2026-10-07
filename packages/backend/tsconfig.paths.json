@@ -2,7 +2,7 @@
 	"compilerOptions": {
 		"paths": {
 			"@/*": ["./src/*"],
-			"@features/*": ["../features/*/index.ts"],
+			"@features/*": ["../features/*/index.ts", "../features/*"],
 			"@kitajs/html": ["./node_modules/@kitajs/html"],
 			"@kitajs/html/*": ["./node_modules/@kitajs/html/*"],
 			"@nestjs/common": ["./node_modules/@nestjs/common"],

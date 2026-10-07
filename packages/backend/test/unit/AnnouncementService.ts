@@ -10,7 +10,7 @@ import type { Mocked } from 'vitest';
 import { mockDeep } from 'vitest-mock-extended';
 import { Test } from '@nestjs/testing';
 import { GlobalModule } from '@/GlobalModule.js';
-import { AnnouncementService } from '../../../features/announcements/backend/services/AnnouncementService.js';
+import { AnnouncementService } from '@features/announcements/backend/services/AnnouncementService.js';
 import { featureServiceGroups } from '@/core/feature-service-providers.js';
 import type {
 	AnnouncementReadsRepository,
@@ -22,9 +22,9 @@ import type {
 import { DI } from '@/di-symbols.js';
 import { genAidx } from '@/misc/id/aidx.js';
 import { CacheService } from '@/core/CacheService.js';
-import { IdService } from '../../../features/runtime/backend/services/IdService.js';
-import { GlobalEventService } from '../../../features/runtime/backend/services/GlobalEventService.js';
-import { ModerationLogService } from '../../../features/moderation/backend/services/ModerationLogService.js';
+import { IdService } from '@features/runtime/backend/services/IdService.js';
+import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
+import { ModerationLogService } from '@features/moderation/backend/services/ModerationLogService.js';
 import { secureRndstr } from '@/misc/secure-rndstr.js';
 import type { TestingModule } from '@nestjs/testing';
 

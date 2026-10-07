@@ -8,8 +8,8 @@ import { inlineFetchRssDefinition, inlineFetchRssInput, inlineFetchRssOutput } f
 import Parser from 'rss-parser';
 import { Injectable } from '@nestjs/common';
 
-import { HttpRequestService } from '../../../runtime/backend/services/HttpRequestService.js';
-import { ApiError } from '../../../../backend/src/server/api/error.js';
+import { HttpRequestService } from '@features/runtime/backend/services/HttpRequestService.js';
+import { ApiError } from '@/server/api/error.js';
 
 const MAX_URL_LENGTH = 8192;
 const MAX_RESPONSE_SIZE = 1024 * 1024;

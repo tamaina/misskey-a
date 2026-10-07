@@ -3,9 +3,9 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 import type * as v from 'valibot';
-import type { inlineI2faKeyDoneInput, inlineI2faKeyDoneOutput } from '../../../features/auth/contract/endpoint-definitions.js';
-import type { WebAuthnService } from '../../../features/auth/backend/services/WebAuthnService.js';
-import type { LegacyWebAuthnRegistrationConsumerInput } from '../../../features/auth/backend/legacy-webauthn-registration-consumer-endpoint.js';
+import type { inlineI2faKeyDoneInput, inlineI2faKeyDoneOutput } from '@features/auth/contract/endpoint-definitions.js';
+import type { WebAuthnService } from '@features/auth/backend/services/WebAuthnService.js';
+import type { LegacyWebAuthnRegistrationConsumerInput } from '@features/auth/backend/legacy-webauthn-registration-consumer-endpoint.js';
 
 type Assert<T extends true> = T;
 type IsAny<T> = 0 extends (1 & T) ? true : false;

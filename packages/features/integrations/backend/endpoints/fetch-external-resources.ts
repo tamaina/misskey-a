@@ -9,7 +9,7 @@ import { createHash } from 'crypto';
 import ms from '@/runtime-dependencies/ms.js';
 import { Injectable } from '@nestjs/common';
 
-import { HttpRequestService } from '../../../runtime/backend/services/HttpRequestService.js';
+import { HttpRequestService } from '@features/runtime/backend/services/HttpRequestService.js';
 import { ApiError } from '@/server/api/error.js';
 
 const contractProjection = projectEndpointContract(inlineFetchExternalResourcesDefinition);

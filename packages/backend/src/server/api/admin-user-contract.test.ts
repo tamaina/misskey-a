@@ -5,13 +5,13 @@
 
 import { expect, test, vi } from 'vitest';
 import * as v from 'valibot';
-import { packedSigninSchema } from '../../../../features/auth/contract/packed.js';
+import { packedSigninSchema } from '@features/auth/contract/packed.js';
 vi.mock('../../../../features/roles/backend/services/RoleService.js', () => ({ RoleService: class {} }));
 vi.mock('../../../../features/roles/backend/serializers/RoleEntityService.js', () => ({ RoleEntityService: class {} }));
 vi.mock('../../../../features/runtime/backend/services/IdService.js', () => ({ IdService: class {} }));
 import { convertSchemaToOpenApiSchema } from '@/server/api/openapi/schemas.js';
-import { EndpointImplementation as After, meta, paramDef } from '../../../../features/moderation/backend/endpoints/admin/show-user.js';
-import { adminShowUserInput, adminShowUserOutput } from '../../../../features/moderation/contract/admin-user-endpoint-definition.js';
+import { EndpointImplementation as After, meta, paramDef } from '@features/moderation/backend/endpoints/admin/show-user.js';
+import { adminShowUserInput, adminShowUserOutput } from '@features/moderation/contract/admin-user-endpoint-definition.js';
 test('native input and documented output remain distinct from raw producer', () => {
 	expect(v.safeParse(adminShowUserInput, { userId: 'Ab12', extra: 42 }).success).toBe(true);
 	for (const input of [{}, { userId: null }, { userId: 'a-b' }, []]) expect(v.safeParse(adminShowUserInput, input).success).toBe(false);

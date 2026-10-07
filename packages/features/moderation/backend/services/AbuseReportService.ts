@@ -9,11 +9,11 @@ import { DI } from '@/di-symbols.js';
 import { bindThis } from '@/decorators.js';
 import type { AbuseUserReportsRepository, MiAbuseUserReport, MiUser, UsersRepository } from '@/models/_.js';
 import { AbuseReportNotificationService } from './AbuseReportNotificationService.js';
-import { QueueService } from '../../../runtime/backend/services/QueueService.js';
-import { ApRendererService } from '../../../federation/backend/services/ApRendererService.js';
+import { QueueService } from '@features/runtime/backend/services/QueueService.js';
+import { ApRendererService } from '@features/federation/backend/services/ApRendererService.js';
 import { ModerationLogService } from './ModerationLogService.js';
-import { SystemAccountService } from '../../../users/backend/services/SystemAccountService.js';
-import { IdService } from '../../../runtime/backend/services/IdService.js';
+import { SystemAccountService } from '@features/users/backend/services/SystemAccountService.js';
+import { IdService } from '@features/runtime/backend/services/IdService.js';
 
 @Injectable()
 export class AbuseReportService {

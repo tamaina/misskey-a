@@ -7,16 +7,16 @@ import { Inject, Injectable } from '@nestjs/common';
 import { ModuleRef } from '@nestjs/core';
 import { EntityNotFoundError } from 'typeorm';
 import { DI } from '@/di-symbols.js';
-import type { Packed } from '../../../index/contract/packed.js';
+import type { Packed } from '@features/index/contract/packed.js';
 import { awaitAll } from '@/misc/prelude/await-all.js';
 import type { MiUser, MiNote, MiNoteDraft } from '@/models/_.js';
 import type { NoteDraftsRepository, ChannelsRepository } from '@/models/_.js';
 import { bindThis } from '@/decorators.js';
 import { DebounceLoader } from '@/misc/loader.js';
-import { IdService } from '../../../runtime/backend/services/IdService.js';
+import { IdService } from '@features/runtime/backend/services/IdService.js';
 import type { OnModuleInit } from '@nestjs/common';
-import type { UserEntityService } from '../../../users/backend/serializers/UserEntityService.js';
-import type { DriveFileEntityService } from '../../../drive/backend/serializers/DriveFileEntityService.js';
+import type { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
+import type { DriveFileEntityService } from '@features/drive/backend/serializers/DriveFileEntityService.js';
 import type { NoteEntityService } from './NoteEntityService.js';
 
 @Injectable()

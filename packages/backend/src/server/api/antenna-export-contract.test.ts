@@ -6,9 +6,9 @@
 import { describe, expect, it, expectTypeOf } from 'vitest';
 import { Ajv } from 'ajv';
 import * as v from 'valibot';
-import { exportedAntenna } from '../../../../features/timelines/contract/antenna-export.js';
-import type { ExportedAntenna } from '../../../../features/timelines/contract/antenna-export.js';
-import { toLegacyJsonSchema } from '../../../../features/api/backend/index.js';
+import { exportedAntenna } from '@features/timelines/contract/antenna-export.js';
+import type { ExportedAntenna } from '@features/timelines/contract/antenna-export.js';
+import { toLegacyJsonSchema } from '@features/api/backend/index.js';
 
 // Frozen before migration, independent of the native contract and converter.
 const exportedAntennaSchema = {

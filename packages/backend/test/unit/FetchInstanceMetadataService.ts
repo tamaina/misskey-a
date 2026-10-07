@@ -11,12 +11,12 @@ import { Test } from '@nestjs/testing';
 import { Redis } from 'ioredis';
 import type { TestingModule } from '@nestjs/testing';
 import { GlobalModule } from '@/GlobalModule.js';
-import { FetchInstanceMetadataService } from '../../../features/federation/backend/services/FetchInstanceMetadataService.js';
-import { FederatedInstanceService } from '../../../features/federation/backend/services/FederatedInstanceService.js';
-import { HttpRequestService } from '../../../features/runtime/backend/services/HttpRequestService.js';
-import { LoggerService } from '../../../features/runtime/backend/services/LoggerService.js';
+import { FetchInstanceMetadataService } from '@features/federation/backend/services/FetchInstanceMetadataService.js';
+import { FederatedInstanceService } from '@features/federation/backend/services/FederatedInstanceService.js';
+import { HttpRequestService } from '@features/runtime/backend/services/HttpRequestService.js';
+import { LoggerService } from '@features/runtime/backend/services/LoggerService.js';
 import { UtilityService } from '@/core/UtilityService.js';
-import { IdService } from '../../../features/runtime/backend/services/IdService.js';
+import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { DI } from '@/di-symbols.js';
 
 function createMockRedis() {

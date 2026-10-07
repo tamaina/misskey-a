@@ -6,19 +6,19 @@ import assert from 'node:assert/strict';
 import { test } from 'vitest';
 import * as v from 'valibot';
 import _Ajv from 'ajv';
-import { jsonString, misskeyId } from '../../../../features/api/contract/index.js';
-import { jsonNumber } from '../../../../features/api/contract/json-number.js';
-import { jsonObject } from '../../../../features/api/contract/json-object.js';
+import { jsonString, misskeyId } from '@features/api/contract/index.js';
+import { jsonNumber } from '@features/api/contract/json-number.js';
+import { jsonObject } from '@features/api/contract/json-object.js';
 import {
 	uniqueStringArray, getUniqueStringArrayBaseSchema, getUniqueStringArraySchemaRegistration,
-} from '../../../../features/api/contract/unique-string-array.js';
+} from '@features/api/contract/unique-string-array.js';
 import {
 	jsonSelectorUnion, jsonSelectorAndCommon,
 	getJsonSelectorAndCommonSchemaRegistration, getJsonSelectorUnionRegistration,
 	getJsonSelectorUnionOptionsRegistration,
-} from '../../../../features/api/contract/json-selector-and-common.js';
-import { toLegacyJsonSchema } from '../../../../features/api/backend/index.js';
-import { defineEndpointContract } from '../../../../features/api/contract/definition.js';
+} from '@features/api/contract/json-selector-and-common.js';
+import { toLegacyJsonSchema } from '@features/api/backend/index.js';
+import { defineEndpointContract } from '@features/api/contract/definition.js';
 import { ContractEndpoint, projectEndpointContract } from './contract-endpoint.js';
 
 const Ajv = _Ajv.default;

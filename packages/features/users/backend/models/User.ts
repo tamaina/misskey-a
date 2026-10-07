@@ -5,7 +5,7 @@
 
 import { Entity, Column, Index, OneToOne, JoinColumn, PrimaryColumn } from 'typeorm';
 import { id } from '@/models/util/id.js';
-import { MiDriveFile } from '../../../drive/backend/models/DriveFile.js';
+import { MiDriveFile } from '@features/drive/backend/models/DriveFile.js';
 
 export { localUsernameSchema, passwordSchema } from '../../contract/user-credentials.js';
 export { descriptionSchema } from '../../contract/user-description.js';

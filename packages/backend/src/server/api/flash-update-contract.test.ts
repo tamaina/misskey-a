@@ -6,10 +6,10 @@
 import { expect, test } from 'vitest';
 import { mockDeep } from 'vitest-mock-extended';
 import type { FlashsRepository } from '@/models/_.js';
-import type { MiFlash } from '../../../../features/play/backend/models/Flash.js';
-import type { MiLocalUser } from '../../../../features/users/backend/models/User.js';
-import { EndpointImplementation, meta } from '../../../../features/play/backend/endpoints/flash/update.js';
-import { voidFlashUpdateDefinition, voidFlashUpdateInput } from '../../../../features/play/contract/void-endpoint-definitions.js';
+import type { MiFlash } from '@features/play/backend/models/Flash.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+import { EndpointImplementation, meta } from '@features/play/backend/endpoints/flash/update.js';
+import { voidFlashUpdateDefinition, voidFlashUpdateInput } from '@features/play/contract/void-endpoint-definitions.js';
 import { ContractEndpoint, projectEndpointContract } from './contract-endpoint.js';
 import { Endpoint } from './endpoint-base.js';
 

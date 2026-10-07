@@ -6,7 +6,7 @@
 import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
 import { referenceAdminQueueQueuesDefinition, referenceAdminQueueQueuesInput, referenceAdminQueueQueuesOutput } from '../../../../contract/reference-endpoint-definitions.js';
 import { Injectable } from '@nestjs/common';
-import { QueueService } from '../../../../../runtime/backend/services/QueueService.js';
+import { QueueService } from '@features/runtime/backend/services/QueueService.js';
 
 const contractProjection = projectEndpointContract(referenceAdminQueueQueuesDefinition);
 

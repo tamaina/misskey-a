@@ -9,19 +9,19 @@ import bcrypt from 'bcryptjs';
 import { DataSource, IsNull } from 'typeorm';
 import { DI } from '@/di-symbols.js';
 import type { MiMeta, UsedUsernamesRepository, UsersRepository } from '@/models/_.js';
-import { MiUser } from '../../../users/backend/models/User.js';
-import { MiUserProfile } from '../../../users/backend/models/UserProfile.js';
-import { IdService } from '../../../runtime/backend/services/IdService.js';
-import { MiUserKeypair } from '../../../federation/backend/models/UserKeypair.js';
-import { MiUsedUsername } from '../../../users/backend/models/UsedUsername.js';
+import { MiUser } from '@features/users/backend/models/User.js';
+import { MiUserProfile } from '@features/users/backend/models/UserProfile.js';
+import { IdService } from '@features/runtime/backend/services/IdService.js';
+import { MiUserKeypair } from '@features/federation/backend/models/UserKeypair.js';
+import { MiUsedUsername } from '@features/users/backend/models/UsedUsername.js';
 import { generateNativeUserToken } from '@/misc/token.js';
-import { UserEntityService } from '../../../users/backend/serializers/UserEntityService.js';
+import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import { bindThis } from '@/decorators.js';
 import UsersChart from '@/core/chart/charts/users.js';
 import { UtilityService } from '@/core/UtilityService.js';
-import { UserService } from '../../../users/backend/services/UserService.js';
-import { SystemAccountService } from '../../../users/backend/services/SystemAccountService.js';
-import { MetaService } from '../../../instance/backend/services/MetaService.js';
+import { UserService } from '@features/users/backend/services/UserService.js';
+import { SystemAccountService } from '@features/users/backend/services/SystemAccountService.js';
+import { MetaService } from '@features/instance/backend/services/MetaService.js';
 
 @Injectable()
 export class SignupService {

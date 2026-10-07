@@ -10,7 +10,7 @@ import { beforeAll, beforeEach, describe, test } from 'vitest';
 import { inspect } from 'node:util';
 import { api, post, role, signup, successfulApiCall, uploadFile } from '../utils.js';
 import type * as misskey from 'misskey-js';
-import { DEFAULT_POLICIES } from '../../../features/roles/backend/services/RoleService.js';
+import { DEFAULT_POLICIES } from '@features/roles/backend/services/RoleService.js';
 
 describe('ユーザー', () => {
 	// エンティティとしてのユーザーを主眼においたテストを記述する

@@ -3,12 +3,12 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import type { Packed } from '../../../index/contract/packed.js';
-import type { MiInstance } from '../../../federation/backend/models/Instance.js';
+import type { Packed } from '@features/index/contract/packed.js';
+import type { MiInstance } from '@features/federation/backend/models/Instance.js';
 import { bindThis } from '@/decorators.js';
 import type { UtilityService } from '@/core/UtilityService.js';
-import type { RoleService } from '../../../roles/backend/services/RoleService.js';
-import { MiUser } from '../../../users/backend/models/User.js';
+import type { RoleService } from '@features/roles/backend/services/RoleService.js';
+import { MiUser } from '@features/users/backend/models/User.js';
 import { MiMeta } from '@/models/_.js';
 
 export class InstanceEntityService {

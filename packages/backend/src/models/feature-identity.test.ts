@@ -7,157 +7,157 @@ import 'reflect-metadata';
 import { getMetadataArgsStorage } from 'typeorm';
 import { expect, test } from 'vitest';
 
-import { MiAbuseReportNotificationRecipient } from '../../../features/moderation/backend/models/AbuseReportNotificationRecipient.js';
+import { MiAbuseReportNotificationRecipient } from '@features/moderation/backend/models/AbuseReportNotificationRecipient.js';
 
-import { MiAbuseUserReport } from '../../../features/moderation/backend/models/AbuseUserReport.js';
+import { MiAbuseUserReport } from '@features/moderation/backend/models/AbuseUserReport.js';
 
-import { MiAccessToken } from '../../../features/auth/backend/models/AccessToken.js';
+import { MiAccessToken } from '@features/auth/backend/models/AccessToken.js';
 
-import { MiAd } from '../../../features/instance/backend/models/Ad.js';
+import { MiAd } from '@features/instance/backend/models/Ad.js';
 
-import { MiAnnouncement } from '../../../features/announcements/backend/models/Announcement.js';
+import { MiAnnouncement } from '@features/announcements/backend/models/Announcement.js';
 
-import { MiAnnouncementRead } from '../../../features/announcements/backend/models/AnnouncementRead.js';
+import { MiAnnouncementRead } from '@features/announcements/backend/models/AnnouncementRead.js';
 
-import { MiAntenna } from '../../../features/timelines/backend/models/Antenna.js';
+import { MiAntenna } from '@features/timelines/backend/models/Antenna.js';
 
-import { MiApp } from '../../../features/auth/backend/models/App.js';
+import { MiApp } from '@features/auth/backend/models/App.js';
 
-import { MiAuthSession } from '../../../features/auth/backend/models/AuthSession.js';
+import { MiAuthSession } from '@features/auth/backend/models/AuthSession.js';
 
-import { MiAvatarDecoration } from '../../../features/avatar-decorations/backend/models/AvatarDecoration.js';
+import { MiAvatarDecoration } from '@features/avatar-decorations/backend/models/AvatarDecoration.js';
 
-import { MiBlocking } from '../../../features/relationships/backend/models/Blocking.js';
+import { MiBlocking } from '@features/relationships/backend/models/Blocking.js';
 
-import { MiBubbleGameRecord } from '../../../features/games/backend/models/BubbleGameRecord.js';
+import { MiBubbleGameRecord } from '@features/games/backend/models/BubbleGameRecord.js';
 
-import { MiChannel } from '../../../features/channels/backend/models/Channel.js';
+import { MiChannel } from '@features/channels/backend/models/Channel.js';
 
-import { MiChannelFavorite } from '../../../features/channels/backend/models/ChannelFavorite.js';
+import { MiChannelFavorite } from '@features/channels/backend/models/ChannelFavorite.js';
 
-import { MiChannelFollowing } from '../../../features/channels/backend/models/ChannelFollowing.js';
+import { MiChannelFollowing } from '@features/channels/backend/models/ChannelFollowing.js';
 
-import { MiChannelMuting } from '../../../features/channels/backend/models/ChannelMuting.js';
+import { MiChannelMuting } from '@features/channels/backend/models/ChannelMuting.js';
 
-import { MiChatApproval } from '../../../features/chat/backend/models/ChatApproval.js';
+import { MiChatApproval } from '@features/chat/backend/models/ChatApproval.js';
 
-import { MiChatMessage } from '../../../features/chat/backend/models/ChatMessage.js';
+import { MiChatMessage } from '@features/chat/backend/models/ChatMessage.js';
 
-import { MiChatRoom } from '../../../features/chat/backend/models/ChatRoom.js';
+import { MiChatRoom } from '@features/chat/backend/models/ChatRoom.js';
 
-import { MiChatRoomInvitation } from '../../../features/chat/backend/models/ChatRoomInvitation.js';
+import { MiChatRoomInvitation } from '@features/chat/backend/models/ChatRoomInvitation.js';
 
-import { MiChatRoomMembership } from '../../../features/chat/backend/models/ChatRoomMembership.js';
+import { MiChatRoomMembership } from '@features/chat/backend/models/ChatRoomMembership.js';
 
-import { MiClip } from '../../../features/collections/backend/models/Clip.js';
+import { MiClip } from '@features/collections/backend/models/Clip.js';
 
-import { MiClipFavorite } from '../../../features/collections/backend/models/ClipFavorite.js';
+import { MiClipFavorite } from '@features/collections/backend/models/ClipFavorite.js';
 
-import { MiClipNote } from '../../../features/collections/backend/models/ClipNote.js';
+import { MiClipNote } from '@features/collections/backend/models/ClipNote.js';
 
-import { MiDriveFile } from '../../../features/drive/backend/models/DriveFile.js';
+import { MiDriveFile } from '@features/drive/backend/models/DriveFile.js';
 
-import { MiDriveFolder } from '../../../features/drive/backend/models/DriveFolder.js';
+import { MiDriveFolder } from '@features/drive/backend/models/DriveFolder.js';
 
-import { MiEmoji } from '../../../features/emojis/backend/models/Emoji.js';
+import { MiEmoji } from '@features/emojis/backend/models/Emoji.js';
 
-import { MiFlash } from '../../../features/play/backend/models/Flash.js';
+import { MiFlash } from '@features/play/backend/models/Flash.js';
 
-import { MiFlashLike } from '../../../features/play/backend/models/FlashLike.js';
+import { MiFlashLike } from '@features/play/backend/models/FlashLike.js';
 
-import { MiFollowRequest } from '../../../features/relationships/backend/models/FollowRequest.js';
+import { MiFollowRequest } from '@features/relationships/backend/models/FollowRequest.js';
 
-import { MiFollowing } from '../../../features/relationships/backend/models/Following.js';
+import { MiFollowing } from '@features/relationships/backend/models/Following.js';
 
-import { MiGalleryLike } from '../../../features/gallery/backend/models/GalleryLike.js';
+import { MiGalleryLike } from '@features/gallery/backend/models/GalleryLike.js';
 
-import { MiGalleryPost } from '../../../features/gallery/backend/models/GalleryPost.js';
+import { MiGalleryPost } from '@features/gallery/backend/models/GalleryPost.js';
 
-import { MiHashtag } from '../../../features/discovery/backend/models/Hashtag.js';
+import { MiHashtag } from '@features/discovery/backend/models/Hashtag.js';
 
-import { MiInstance } from '../../../features/federation/backend/models/Instance.js';
+import { MiInstance } from '@features/federation/backend/models/Instance.js';
 
-import { MiMeta } from '../../../features/instance/backend/models/Meta.js';
+import { MiMeta } from '@features/instance/backend/models/Meta.js';
 
-import { MiModerationLog } from '../../../features/moderation/backend/models/ModerationLog.js';
+import { MiModerationLog } from '@features/moderation/backend/models/ModerationLog.js';
 
-import { MiMuting } from '../../../features/relationships/backend/models/Muting.js';
+import { MiMuting } from '@features/relationships/backend/models/Muting.js';
 
-import { MiNote } from '../../../features/notes/backend/models/Note.js';
+import { MiNote } from '@features/notes/backend/models/Note.js';
 
-import { MiNoteDraft } from '../../../features/notes/backend/models/NoteDraft.js';
+import { MiNoteDraft } from '@features/notes/backend/models/NoteDraft.js';
 
-import { MiNoteFavorite } from '../../../features/collections/backend/models/NoteFavorite.js';
+import { MiNoteFavorite } from '@features/collections/backend/models/NoteFavorite.js';
 
-import { MiNoteReaction } from '../../../features/notes/backend/models/NoteReaction.js';
+import { MiNoteReaction } from '@features/notes/backend/models/NoteReaction.js';
 
-import { MiNoteThreadMuting } from '../../../features/notes/backend/models/NoteThreadMuting.js';
+import { MiNoteThreadMuting } from '@features/notes/backend/models/NoteThreadMuting.js';
 
-import { MiPage } from '../../../features/pages/backend/models/Page.js';
+import { MiPage } from '@features/pages/backend/models/Page.js';
 
-import { MiPageLike } from '../../../features/pages/backend/models/PageLike.js';
+import { MiPageLike } from '@features/pages/backend/models/PageLike.js';
 
-import { MiPasswordResetRequest } from '../../../features/auth/backend/models/PasswordResetRequest.js';
+import { MiPasswordResetRequest } from '@features/auth/backend/models/PasswordResetRequest.js';
 
-import { MiPoll } from '../../../features/notes/backend/models/Poll.js';
+import { MiPoll } from '@features/notes/backend/models/Poll.js';
 
-import { MiPollVote } from '../../../features/notes/backend/models/PollVote.js';
+import { MiPollVote } from '@features/notes/backend/models/PollVote.js';
 
-import { MiPromoNote } from '../../../features/instance/backend/models/PromoNote.js';
+import { MiPromoNote } from '@features/instance/backend/models/PromoNote.js';
 
-import { MiPromoRead } from '../../../features/instance/backend/models/PromoRead.js';
+import { MiPromoRead } from '@features/instance/backend/models/PromoRead.js';
 
-import { MiRegistrationTicket } from '../../../features/auth/backend/models/RegistrationTicket.js';
+import { MiRegistrationTicket } from '@features/auth/backend/models/RegistrationTicket.js';
 
-import { MiRegistryItem } from '../../../features/preferences/backend/models/RegistryItem.js';
+import { MiRegistryItem } from '@features/preferences/backend/models/RegistryItem.js';
 
-import { MiRelay } from '../../../features/federation/backend/models/Relay.js';
+import { MiRelay } from '@features/federation/backend/models/Relay.js';
 
-import { MiRenoteMuting } from '../../../features/relationships/backend/models/RenoteMuting.js';
+import { MiRenoteMuting } from '@features/relationships/backend/models/RenoteMuting.js';
 
-import { MiRetentionAggregation } from '../../../features/statistics/backend/models/RetentionAggregation.js';
+import { MiRetentionAggregation } from '@features/statistics/backend/models/RetentionAggregation.js';
 
-import { MiReversiGame } from '../../../features/games/backend/models/ReversiGame.js';
+import { MiReversiGame } from '@features/games/backend/models/ReversiGame.js';
 
-import { MiRole } from '../../../features/roles/backend/models/Role.js';
+import { MiRole } from '@features/roles/backend/models/Role.js';
 
-import { MiRoleAssignment } from '../../../features/roles/backend/models/RoleAssignment.js';
+import { MiRoleAssignment } from '@features/roles/backend/models/RoleAssignment.js';
 
-import { MiSignin } from '../../../features/auth/backend/models/Signin.js';
+import { MiSignin } from '@features/auth/backend/models/Signin.js';
 
-import { MiSwSubscription } from '../../../features/notifications/backend/models/SwSubscription.js';
+import { MiSwSubscription } from '@features/notifications/backend/models/SwSubscription.js';
 
-import { MiSystemAccount } from '../../../features/users/backend/models/SystemAccount.js';
+import { MiSystemAccount } from '@features/users/backend/models/SystemAccount.js';
 
-import { MiSystemWebhook } from '../../../features/integrations/backend/models/SystemWebhook.js';
+import { MiSystemWebhook } from '@features/integrations/backend/models/SystemWebhook.js';
 
-import { MiUsedUsername } from '../../../features/users/backend/models/UsedUsername.js';
+import { MiUsedUsername } from '@features/users/backend/models/UsedUsername.js';
 
-import { MiUser } from '../../../features/users/backend/models/User.js';
+import { MiUser } from '@features/users/backend/models/User.js';
 
-import { MiUserIp } from '../../../features/auth/backend/models/UserIp.js';
+import { MiUserIp } from '@features/auth/backend/models/UserIp.js';
 
-import { MiUserKeypair } from '../../../features/federation/backend/models/UserKeypair.js';
+import { MiUserKeypair } from '@features/federation/backend/models/UserKeypair.js';
 
-import { MiUserList } from '../../../features/relationships/backend/models/UserList.js';
+import { MiUserList } from '@features/relationships/backend/models/UserList.js';
 
-import { MiUserListFavorite } from '../../../features/relationships/backend/models/UserListFavorite.js';
+import { MiUserListFavorite } from '@features/relationships/backend/models/UserListFavorite.js';
 
-import { MiUserListMembership } from '../../../features/relationships/backend/models/UserListMembership.js';
+import { MiUserListMembership } from '@features/relationships/backend/models/UserListMembership.js';
 
-import { MiUserMemo } from '../../../features/users/backend/models/UserMemo.js';
+import { MiUserMemo } from '@features/users/backend/models/UserMemo.js';
 
-import { MiUserNotePining } from '../../../features/notes/backend/models/UserNotePining.js';
+import { MiUserNotePining } from '@features/notes/backend/models/UserNotePining.js';
 
-import { MiUserPending } from '../../../features/auth/backend/models/UserPending.js';
+import { MiUserPending } from '@features/auth/backend/models/UserPending.js';
 
-import { MiUserProfile } from '../../../features/users/backend/models/UserProfile.js';
+import { MiUserProfile } from '@features/users/backend/models/UserProfile.js';
 
-import { MiUserPublickey } from '../../../features/federation/backend/models/UserPublickey.js';
+import { MiUserPublickey } from '@features/federation/backend/models/UserPublickey.js';
 
-import { MiUserSecurityKey } from '../../../features/auth/backend/models/UserSecurityKey.js';
+import { MiUserSecurityKey } from '@features/auth/backend/models/UserSecurityKey.js';
 
-import { MiWebhook } from '../../../features/integrations/backend/models/Webhook.js';
+import { MiWebhook } from '@features/integrations/backend/models/Webhook.js';
 
 const entities = [
 	['MiAbuseReportNotificationRecipient', MiAbuseReportNotificationRecipient, 'abuse_report_notification_recipient'],

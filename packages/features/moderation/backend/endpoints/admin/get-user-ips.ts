@@ -9,7 +9,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import type { UserIpsRepository } from '@/models/_.js';
 
 import { DI } from '@/di-symbols.js';
-import { IdService } from '../../../../runtime/backend/services/IdService.js';
+import { IdService } from '@features/runtime/backend/services/IdService.js';
 
 const contractProjection = projectEndpointContract(inlineAdminGetUserIpsDefinition);
 

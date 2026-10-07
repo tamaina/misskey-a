@@ -4,9 +4,9 @@
  */
 
 import type { AnnouncementsRepository, AnnouncementReadsRepository, MiAnnouncement, MiUser } from '@/models/_.js';
-import type { Packed } from '../../../index/contract/packed.js';
+import type { Packed } from '@features/index/contract/packed.js';
 import { bindThis } from '@/decorators.js';
-import type { IdService } from '../../../runtime/backend/services/IdService.js';
+import type { IdService } from '@features/runtime/backend/services/IdService.js';
 
 export class AnnouncementEntityService {
 	constructor(

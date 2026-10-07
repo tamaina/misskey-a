@@ -10,7 +10,7 @@ import { Brackets } from 'typeorm';
 
 import type { NotesRepository, ClipsRepository, ClipNotesRepository } from '@/models/_.js';
 import { QueryService } from '@/core/QueryService.js';
-import { NoteEntityService } from '../../../../notes/backend/serializers/NoteEntityService.js';
+import { NoteEntityService } from '@features/notes/backend/serializers/NoteEntityService.js';
 import { DI } from '@/di-symbols.js';
 import { sqlLikeEscape } from '@/misc/sql-like-escape.js';
 import { ApiError } from '@/server/api/error.js';

@@ -12,7 +12,7 @@ import type Logger from '@/logger.js';
 
 import type { UsersRepository } from '@/models/_.js';
 import { DI } from '@/di-symbols.js';
-import { MiLocalUser, MiRemoteUser } from '../../../users/backend/models/User.js';
+import { MiLocalUser, MiRemoteUser } from '@features/users/backend/models/User.js';
 import { RelationshipJobData } from '@/queue/types.js';
 import { QueueLoggerService } from '@/queue/QueueLoggerService.js';
 import type * as Bull from 'bullmq';

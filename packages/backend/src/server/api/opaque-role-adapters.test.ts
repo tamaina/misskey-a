@@ -5,9 +5,9 @@
 
 import { expect, test, vi } from 'vitest';
 import { Ajv } from 'ajv';
-import { EndpointImplementation as Create, paramDef as createSchema } from '../../../../features/roles/backend/endpoints/admin/roles/create.js';
-import { EndpointImplementation as Update, paramDef as updateSchema } from '../../../../features/roles/backend/endpoints/admin/roles/update.js';
-import { EndpointImplementation as DefaultPolicies, paramDef as defaultSchema } from '../../../../features/roles/backend/endpoints/admin/roles/update-default-policies.js';
+import { EndpointImplementation as Create, paramDef as createSchema } from '@features/roles/backend/endpoints/admin/roles/create.js';
+import { EndpointImplementation as Update, paramDef as updateSchema } from '@features/roles/backend/endpoints/admin/roles/update.js';
+import { EndpointImplementation as DefaultPolicies, paramDef as defaultSchema } from '@features/roles/backend/endpoints/admin/roles/update-default-policies.js';
 
 vi.mock('../../../../features/roles/backend/serializers/RoleEntityService.js', () => ({ RoleEntityService: class {} }));
 vi.mock('../../../../features/roles/backend/services/RoleService.js', () => ({ RoleService: class {} }));

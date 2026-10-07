@@ -8,7 +8,7 @@ import { packedFollowingRequestsCancelDefinition, packedFollowingRequestsCancelI
 import { Injectable } from '@nestjs/common';
 
 import { IdentifiableError } from '@/misc/identifiable-error.js';
-import { UserEntityService } from '../../../../../users/backend/serializers/UserEntityService.js';
+import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import { GetterService } from '@/server/api/GetterService.js';
 import { UserFollowingService } from '../../../services/UserFollowingService.js';
 import { ApiError } from '@/server/api/error.js';

@@ -8,8 +8,8 @@ import { packedFederationInstancesDefinition, packedFederationInstancesInput, pa
 import { Inject, Injectable } from '@nestjs/common';
 
 import type { InstancesRepository } from '@/models/_.js';
-import { InstanceEntityService } from '../../../../instance/backend/serializers/InstanceEntityService.js';
-import { MetaService } from '../../../../instance/backend/services/MetaService.js';
+import { InstanceEntityService } from '@features/instance/backend/serializers/InstanceEntityService.js';
+import { MetaService } from '@features/instance/backend/services/MetaService.js';
 import { DI } from '@/di-symbols.js';
 import { sqlLikeEscape } from '@/misc/sql-like-escape.js';
 

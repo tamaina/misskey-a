@@ -5,7 +5,7 @@
 
 import * as v from 'valibot';
 import { expect, test } from 'vitest';
-import { resultObject } from '../../../../features/api/contract/result-object.js';
+import { resultObject } from '@features/api/contract/result-object.js';
 
 const declaredResult = resultObject({
 	id: v.string(),

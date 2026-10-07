@@ -6,12 +6,12 @@
 import { expect, expectTypeOf, test, vi } from 'vitest';
 import * as v from 'valibot';
 import type { Config } from '@/config.js';
-import type { Packed } from '../../../../features/index/contract/packed.js';
+import type { Packed } from '@features/index/contract/packed.js';
 import frozen from '../../../test/fixtures/empty-input-contract-baseline.json' with { type: 'json' };
-import { emptyAdminCaptchaCurrentInput, emptyAdminCaptchaCurrentOutput, emptyInputEndpointDefinitions as authDefinitions } from '../../../../features/auth/contract/empty-input-endpoint-definitions.js';
-import { supportedCaptchaProviders } from '../../../../features/auth/contract/captcha-providers.js';
-import { emptyReversiInvitationsInput, emptyReversiInvitationsOutput, emptyInputEndpointDefinitions as gamesDefinitions } from '../../../../features/games/contract/empty-input-endpoint-definitions.js';
-import { getPackedReference, getPackedReferenceLegacyOutputSchema } from '../../../../features/api/contract/packed-reference.js';
+import { emptyAdminCaptchaCurrentInput, emptyAdminCaptchaCurrentOutput, emptyInputEndpointDefinitions as authDefinitions } from '@features/auth/contract/empty-input-endpoint-definitions.js';
+import { supportedCaptchaProviders } from '@features/auth/contract/captcha-providers.js';
+import { emptyReversiInvitationsInput, emptyReversiInvitationsOutput, emptyInputEndpointDefinitions as gamesDefinitions } from '@features/games/contract/empty-input-endpoint-definitions.js';
+import { getPackedReference, getPackedReferenceLegacyOutputSchema } from '@features/api/contract/packed-reference.js';
 import { ContractEndpoint, projectEndpointContract } from './contract-endpoint.js';
 import { Endpoint } from './endpoint-base.js';
 import documentedEndpoints from './endpoints.js';

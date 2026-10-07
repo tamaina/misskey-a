@@ -21,20 +21,20 @@ import {
 	UnsupportedResponseTypeError,
 } from './errors.js';
 import { secureRndstr } from '@/misc/secure-rndstr.js';
-import { HttpRequestService } from '../../../../features/runtime/backend/services/HttpRequestService.js';
+import { HttpRequestService } from '@features/runtime/backend/services/HttpRequestService.js';
 import type { Config } from '@/config.js';
 import { DI } from '@/di-symbols.js';
 import { bindThis } from '@/decorators.js';
 import type { AccessTokensRepository, UsersRepository } from '@/models/_.js';
-import { IdService } from '../../../../features/runtime/backend/services/IdService.js';
+import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { CacheService } from '@/core/CacheService.js';
-import type { MiLocalUser } from '../../../../features/users/backend/models/User.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
 import { MemoryKVCache } from '@/misc/cache.js';
-import { LoggerService } from '../../../../features/runtime/backend/services/LoggerService.js';
+import { LoggerService } from '@features/runtime/backend/services/LoggerService.js';
 import Logger from '@/logger.js';
 import { StatusError } from '@/misc/status-error.js';
 import { HtmlTemplateService } from '@/server/web/HtmlTemplateService.js';
-import { OAuthPage } from '../../../../features/auth/backend/templates/oauth.js';
+import { OAuthPage } from '@features/auth/backend/templates/oauth.js';
 import type { FastifyInstance, FastifyReply } from 'fastify';
 
 // TODO: Consider migrating to @node-oauth/oauth2-server once

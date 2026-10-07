@@ -10,7 +10,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import type { NotesRepository, FollowingsRepository } from '@/models/_.js';
 
 import { QueryService } from '@/core/QueryService.js';
-import { NoteEntityService } from '../../../../notes/backend/serializers/NoteEntityService.js';
+import { NoteEntityService } from '@features/notes/backend/serializers/NoteEntityService.js';
 import { DI } from '@/di-symbols.js';
 
 const contractProjection = projectEndpointContract(packedNotesMentionsDefinition);

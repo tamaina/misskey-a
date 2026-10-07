@@ -6,7 +6,7 @@
 import { createProcedureClient, implement } from '@orpc/server';
 import type { JsonSchema } from '@valibot/to-json-schema';
 import { emojiAdministrationInputs, emojisContract } from '../contract/index.js';
-import { toLegacyJsonSchema } from '../../api/backend/index.js';
+import { toLegacyJsonSchema } from '@features/api/backend/index.js';
 
 export interface EmojiAdministrationDependencies {
 	setCategoryBulk(ids: string[], category: string | null): Promise<unknown>;

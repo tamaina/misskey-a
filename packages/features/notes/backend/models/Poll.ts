@@ -7,8 +7,8 @@ import { PrimaryColumn, Entity, Index, JoinColumn, Column, OneToOne } from 'type
 import { noteVisibilities } from '@/types.js';
 import { id } from '@/models/util/id.js';
 import { MiNote } from './Note.js';
-import type { MiUser } from '../../../users/backend/models/User.js';
-import type { MiChannel } from "../../../channels/backend/models/Channel.js";
+import type { MiUser } from '@features/users/backend/models/User.js';
+import type { MiChannel } from "@features/channels/backend/models/Channel.js";
 
 @Entity('poll')
 export class MiPoll {

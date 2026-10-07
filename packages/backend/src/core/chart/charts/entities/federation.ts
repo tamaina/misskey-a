@@ -4,11 +4,11 @@
  */
 
 import Chart from '../../core.js';
-import { federationChartDescriptor } from '../../../../../../features/statistics/shared/chart-descriptors.js';
+import { federationChartDescriptor } from '@features/statistics/shared/chart-descriptors.js';
 
 export const name = 'federation';
 
-export { federationChartDescriptor as schema } from '../../../../../../features/statistics/shared/chart-descriptors.js';
+export { federationChartDescriptor as schema } from '@features/statistics/shared/chart-descriptors.js';
 
 const schema = federationChartDescriptor;
 

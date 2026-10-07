@@ -4,11 +4,11 @@
  */
 
 import type * as v from 'valibot';
-import type { Packed } from '../../../../features/index/contract/packed.js';
-import type { EndpointImplementation as MetaEndpoint } from '../../../../features/instance/backend/endpoints/meta.js';
-import type { EndpointImplementation as RelationEndpoint } from '../../../../features/relationships/backend/endpoints/users/relation.js';
-import type { unionMetaInput, UnionEndpoints as InstanceUnionEndpoints } from '../../../../features/instance/contract/union-endpoint-definitions.js';
-import type { unionUsersRelationInput, unionUsersRelationModel, UnionEndpoints as RelationshipUnionEndpoints } from '../../../../features/relationships/contract/union-endpoint-definitions.js';
+import type { Packed } from '@features/index/contract/packed.js';
+import type { EndpointImplementation as MetaEndpoint } from '@features/instance/backend/endpoints/meta.js';
+import type { EndpointImplementation as RelationEndpoint } from '@features/relationships/backend/endpoints/users/relation.js';
+import type { unionMetaInput, UnionEndpoints as InstanceUnionEndpoints } from '@features/instance/contract/union-endpoint-definitions.js';
+import type { unionUsersRelationInput, unionUsersRelationModel, UnionEndpoints as RelationshipUnionEndpoints } from '@features/relationships/contract/union-endpoint-definitions.js';
 
 type Equal<A, B> = (<T>() => T extends A ? 1 : 2) extends (<T>() => T extends B ? 1 : 2) ? true : false;
 type Assert<T extends true> = T;

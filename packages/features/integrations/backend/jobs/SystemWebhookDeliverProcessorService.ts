@@ -9,7 +9,7 @@ import { DI } from '@/di-symbols.js';
 import type { SystemWebhooksRepository } from '@/models/_.js';
 import type { Config } from '@/config.js';
 import type Logger from '@/logger.js';
-import { HttpRequestService } from '../../../runtime/backend/services/HttpRequestService.js';
+import { HttpRequestService } from '@features/runtime/backend/services/HttpRequestService.js';
 import { StatusError } from '@/misc/status-error.js';
 import { bindThis } from '@/decorators.js';
 import { QueueLoggerService } from '@/queue/QueueLoggerService.js';

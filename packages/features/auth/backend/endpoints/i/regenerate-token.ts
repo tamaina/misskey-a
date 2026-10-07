@@ -10,7 +10,7 @@ import { Inject, Injectable } from '@nestjs/common';
 
 import type { UsersRepository, UserProfilesRepository } from '@/models/_.js';
 import { generateNativeUserToken } from '@/misc/token.js';
-import { GlobalEventService } from '../../../../runtime/backend/services/GlobalEventService.js';
+import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
 import { DI } from '@/di-symbols.js';
 
 const contractProjection = projectEndpointContract(voidIRegenerateTokenDefinition);

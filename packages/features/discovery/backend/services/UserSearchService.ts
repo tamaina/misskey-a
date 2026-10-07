@@ -8,8 +8,8 @@ import { type FollowingsRepository, MiUser, type MutingsRepository, type UserPro
 import { bindThis } from '@/decorators.js';
 import { sqlLikeEscape } from '@/misc/sql-like-escape.js';
 import type { Config } from '@/config.js';
-import { Packed } from '../../../index/contract/packed.js';
-import type { UserEntityService } from '../../../users/backend/serializers/UserEntityService.js';
+import { Packed } from '@features/index/contract/packed.js';
+import type { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 
 function defaultActiveThreshold() {
 	return new Date(Date.now() - 1000 * 60 * 60 * 24 * 30);

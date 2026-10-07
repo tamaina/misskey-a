@@ -13,19 +13,19 @@ import { afterEach, describe, expect, test, vi } from 'vitest';
 import { mockDeep } from 'vitest-mock-extended';
 import { DI } from '@/di-symbols.js';
 import type { MiUser, MiUserProfile } from '@/models/_.js';
-import { authSecurityServices, authServices } from '../../../features/auth/backend/services.js';
-import { discoveryServices, userSearchServices } from '../../../features/discovery/backend/services.js';
-import { UserAuthService } from '../../../features/auth/backend/services/UserAuthService.js';
-import { WebAuthnService } from '../../../features/auth/backend/services/WebAuthnService.js';
-import { UserSearchService } from '../../../features/discovery/backend/services/UserSearchService.js';
-import { UserEntityService } from '../../../features/users/backend/serializers/UserEntityService.js';
-import { MiUserSecurityKey } from '../../../features/auth/backend/models/UserSecurityKey.js';
-import { ports } from '../../../features/index/backend/service-ports.js';
+import { authSecurityServices, authServices } from '@features/auth/backend/services.js';
+import { discoveryServices, userSearchServices } from '@features/discovery/backend/services.js';
+import { UserAuthService } from '@features/auth/backend/services/UserAuthService.js';
+import { WebAuthnService } from '@features/auth/backend/services/WebAuthnService.js';
+import { UserSearchService } from '@features/discovery/backend/services/UserSearchService.js';
+import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
+import { MiUserSecurityKey } from '@features/auth/backend/models/UserSecurityKey.js';
+import { ports } from '@features/index/backend/service-ports.js';
 import { featureServiceGroups } from './feature-service-providers.js';
 import type { FactoryProvider, InjectionToken, Provider } from '@nestjs/common';
 import type { AuthenticationResponseJSON, PublicKeyCredentialRequestOptionsJSON, PublicKeyCredentialCreationOptionsJSON, RegistrationResponseJSON } from '@simplewebauthn/server';
 import type { SelectQueryBuilder } from 'typeorm';
-import type { Inputs } from '../../../features/index/backend/service-definitions.js';
+import type { Inputs } from '@features/index/backend/service-definitions.js';
 
 vi.mock('@simplewebauthn/server', () => ({
 	generateAuthenticationOptions: vi.fn(), generateRegistrationOptions: vi.fn(),

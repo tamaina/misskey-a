@@ -11,9 +11,9 @@ import { GlobalModule } from '@/GlobalModule.js';
 import type { Config } from '@/config.js';
 import type { MutingsRepository } from '@/models/_.js';
 import { DI } from '@/di-symbols.js';
-import { IdService } from '../../../features/runtime/backend/services/IdService.js';
-import { UserSearchService } from '../../../features/discovery/backend/services/UserSearchService.js';
-import { UserEntityService } from '../../../features/users/backend/serializers/UserEntityService.js';
+import { IdService } from '@features/runtime/backend/services/IdService.js';
+import { UserSearchService } from '@features/discovery/backend/services/UserSearchService.js';
+import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 
 describe('UserSearchService', () => {
 	let app: TestingModule;

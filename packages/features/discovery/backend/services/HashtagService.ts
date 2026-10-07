@@ -10,10 +10,10 @@ import type { UtilityService } from '@/core/UtilityService.js';
 import Logger from '@/logger.js';
 import type * as Redis from 'ioredis';
 import type { DataSource } from 'typeorm';
-import type { MiUser } from '../../../users/backend/models/User.js';
-import type { IdService } from '../../../runtime/backend/services/IdService.js';
+import type { MiUser } from '@features/users/backend/models/User.js';
+import type { IdService } from '@features/runtime/backend/services/IdService.js';
 import type { MiHashtag } from '../models/Hashtag.js';
-import type { UserEntityService } from '../../../users/backend/serializers/UserEntityService.js';
+import type { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import type { FeaturedService } from './FeaturedService.js';
 
 const logger = new Logger('hashtag/create');

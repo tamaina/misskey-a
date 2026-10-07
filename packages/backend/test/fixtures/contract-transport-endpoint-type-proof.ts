@@ -6,15 +6,15 @@
 // Compile-only proof. The root aggregate owns compiler execution; never execute this file.
 import { oc } from '@orpc/contract';
 import * as v from 'valibot';
-import type { MiLocalUser } from '../../../features/users/backend/models/User.js';
-import type { MiAccessToken } from '../../../features/auth/backend/models/AccessToken.js';
-import { channelContract, channelInputs } from '../../../features/channels/contract/index.js';
-import { clipFavoriteContract, clipFavoriteInputs } from '../../../features/collections/contract/index.js';
-import { portabilityContract } from '../../../features/portability/contract/index.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+import type { MiAccessToken } from '@features/auth/backend/models/AccessToken.js';
+import { channelContract, channelInputs } from '@features/channels/contract/index.js';
+import { clipFavoriteContract, clipFavoriteInputs } from '@features/collections/contract/index.js';
+import { portabilityContract } from '@features/portability/contract/index.js';
 import { createContractTransportEndpoint } from '../../src/server/api/contract-transport-endpoint.js';
 import type { EndpointExecutor } from '../../src/server/api/endpoint-base.js';
-import type { createEndpoint as createFollow } from '../../../features/channels/backend/endpoints/channels/follow.js';
-import type { createEndpoint as createFavorite } from '../../../features/collections/backend/endpoints/clips/favorite.js';
+import type { createEndpoint as createFollow } from '@features/channels/backend/endpoints/channels/follow.js';
+import type { createEndpoint as createFavorite } from '@features/collections/backend/endpoints/clips/favorite.js';
 
 type Equal<A, B> = (<T>() => T extends A ? 1 : 2) extends (<T>() => T extends B ? 1 : 2) ? true : false;
 type Assert<T extends true> = T;

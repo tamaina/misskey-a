@@ -13,14 +13,14 @@ import * as v from 'valibot';
 import { ContractEndpoint, projectEndpointContract } from './contract-endpoint.js';
 import { Endpoint } from './endpoint-base.js';
 import { convertSchemaToOpenApiSchema } from './openapi/schemas.js';
-import type { Packed } from '../../../../features/index/contract/packed.js';
+import type { Packed } from '@features/index/contract/packed.js';
 import baseline from '../../../test/fixtures/portable-constant-contract-baseline.json' with { type: 'json' };
-import { portableConstantEndpointDefinitions as definitions0 } from '../../../../features/auth/contract/portable-constant-endpoint-definitions.js';
-import { portableConstantEndpointDefinitions as definitions1 } from '../../../../features/integrations/contract/portable-constant-endpoint-definitions.js';
-import { portableConstantEndpointDefinitions as definitions2 } from '../../../../features/users/contract/portable-constant-endpoint-definitions.js';
-import { portableConstantEndpointDefinitions as definitions3 } from '../../../../features/notifications/contract/portable-constant-endpoint-definitions.js';
-import { portableConstantEndpointDefinitions as definitions4 } from '../../../../features/pages/contract/portable-constant-endpoint-definitions.js';
-import { portableConstantEndpointDefinitions as definitions5 } from '../../../../features/emojis/contract/portable-constant-endpoint-definitions.js';
+import { portableConstantEndpointDefinitions as definitions0 } from '@features/auth/contract/portable-constant-endpoint-definitions.js';
+import { portableConstantEndpointDefinitions as definitions1 } from '@features/integrations/contract/portable-constant-endpoint-definitions.js';
+import { portableConstantEndpointDefinitions as definitions2 } from '@features/users/contract/portable-constant-endpoint-definitions.js';
+import { portableConstantEndpointDefinitions as definitions3 } from '@features/notifications/contract/portable-constant-endpoint-definitions.js';
+import { portableConstantEndpointDefinitions as definitions4 } from '@features/pages/contract/portable-constant-endpoint-definitions.js';
+import { portableConstantEndpointDefinitions as definitions5 } from '@features/emojis/contract/portable-constant-endpoint-definitions.js';
 
 const definitions = { ...definitions0, ...definitions1, ...definitions2, ...definitions3, ...definitions4, ...definitions5 };
 

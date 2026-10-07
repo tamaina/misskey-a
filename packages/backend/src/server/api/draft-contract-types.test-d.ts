@@ -5,8 +5,8 @@
 
 import type * as v from 'valibot';
 import type { ContractEndpoints } from '../../../../misskey-js/src/contract.types.js';
-import type { Packed } from '../../../../features/index/contract/packed.js';
-import type { NativeNoteDraftEndpoints, notesDraftsCreateInput, notesDraftsUpdateInput } from '../../../../features/notes/contract/draft-endpoint-definitions.js';
+import type { Packed } from '@features/index/contract/packed.js';
+import type { NativeNoteDraftEndpoints, notesDraftsCreateInput, notesDraftsUpdateInput } from '@features/notes/contract/draft-endpoint-definitions.js';
 
 type Equal<A, B> = (<T>() => T extends A ? 1 : 2) extends (<T>() => T extends B ? 1 : 2) ? true : false;
 type Assert<T extends true> = T;

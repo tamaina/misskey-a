@@ -8,9 +8,9 @@ import { packedNotesSearchDefinition, packedNotesSearchInput, packedNotesSearchO
 import { Injectable } from '@nestjs/common';
 
 import { SearchService } from '../../services/SearchService.js';
-import { NoteEntityService } from '../../../../notes/backend/serializers/NoteEntityService.js';
-import { RoleService } from '../../../../roles/backend/services/RoleService.js';
-import { IdService } from '../../../../runtime/backend/services/IdService.js';
+import { NoteEntityService } from '@features/notes/backend/serializers/NoteEntityService.js';
+import { RoleService } from '@features/roles/backend/services/RoleService.js';
+import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { ApiError } from '@/server/api/error.js';
 
 const contractProjection = projectEndpointContract(packedNotesSearchDefinition);

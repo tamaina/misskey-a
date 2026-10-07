@@ -7,12 +7,12 @@ import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract
 import { packedAntennasCreateDefinition, packedAntennasCreateInput, packedAntennasCreateOutput } from '../../../contract/packed-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
 
-import { IdService } from '../../../../runtime/backend/services/IdService.js';
+import { IdService } from '@features/runtime/backend/services/IdService.js';
 import type { UserListsRepository, AntennasRepository } from '@/models/_.js';
-import { GlobalEventService } from '../../../../runtime/backend/services/GlobalEventService.js';
+import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
 import { AntennaEntityService } from '../../serializers/AntennaEntityService.js';
 import { DI } from '@/di-symbols.js';
-import { RoleService } from '../../../../roles/backend/services/RoleService.js';
+import { RoleService } from '@features/roles/backend/services/RoleService.js';
 import { ApiError } from '@/server/api/error.js';
 
 const contractProjection = projectEndpointContract(packedAntennasCreateDefinition);

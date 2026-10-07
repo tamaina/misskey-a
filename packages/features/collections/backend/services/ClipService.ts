@@ -7,9 +7,9 @@ import { QueryFailedError } from 'typeorm';
 import type { ClipsRepository, MiNote, MiClip, ClipNotesRepository, NotesRepository } from '@/models/_.js';
 import { bindThis } from '@/decorators.js';
 import { isDuplicateKeyValueError } from '@/misc/is-duplicate-key-value-error.js';
-import type { RoleService } from '../../../roles/backend/services/RoleService.js';
-import type { IdService } from '../../../runtime/backend/services/IdService.js';
-import type { MiLocalUser } from '../../../users/backend/models/User.js';
+import type { RoleService } from '@features/roles/backend/services/RoleService.js';
+import type { IdService } from '@features/runtime/backend/services/IdService.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
 
 export class ClipService {
 	public static NoSuchNoteError = class extends Error {};

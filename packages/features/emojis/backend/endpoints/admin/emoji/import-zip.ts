@@ -7,7 +7,7 @@ import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract
 import { voidAdminEmojiImportZipDefinition, voidAdminEmojiImportZipInput, voidAdminEmojiImportZipOutput } from '../../../../contract/void-endpoint-definitions.js';
 import { Injectable } from '@nestjs/common';
 
-import { QueueService } from '../../../../../runtime/backend/services/QueueService.js';
+import { QueueService } from '@features/runtime/backend/services/QueueService.js';
 
 const contractProjection = projectEndpointContract(voidAdminEmojiImportZipDefinition);
 

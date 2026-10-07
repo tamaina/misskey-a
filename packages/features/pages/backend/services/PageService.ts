@@ -13,11 +13,11 @@ import {
 	MiNote,
 } from '@/models/_.js';
 import { bindThis } from '@/decorators.js';
-import type { RoleService } from '../../../roles/backend/services/RoleService.js';
-import type { IdService } from '../../../runtime/backend/services/IdService.js';
-import type { MiUser } from '../../../users/backend/models/User.js';
+import type { RoleService } from '@features/roles/backend/services/RoleService.js';
+import type { IdService } from '@features/runtime/backend/services/IdService.js';
+import type { MiUser } from '@features/users/backend/models/User.js';
 import { IdentifiableError } from '@/misc/identifiable-error.js';
-import type { ModerationLogService } from '../../../moderation/backend/services/ModerationLogService.js';
+import type { ModerationLogService } from '@features/moderation/backend/services/ModerationLogService.js';
 
 export interface PageBody {
 	title: string;

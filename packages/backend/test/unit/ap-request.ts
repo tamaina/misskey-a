@@ -8,9 +8,9 @@ import * as assert from 'assert';
 import httpSignature from '@peertube/http-signature';
 
 import { genRsaKeyPair } from '@/misc/gen-key-pair.js';
-import { ApRequestCreator } from '../../../features/federation/backend/services/ApRequestService.js';
-import { assertActivityMatchesUrl, FetchAllowSoftFailMask } from '../../../features/federation/backend/protocol/misc/check-against-url.js';
-import { IObject } from '../../../features/federation/backend/protocol/type.js';
+import { ApRequestCreator } from '@features/federation/backend/services/ApRequestService.js';
+import { assertActivityMatchesUrl, FetchAllowSoftFailMask } from '@features/federation/backend/protocol/misc/check-against-url.js';
+import { IObject } from '@features/federation/backend/protocol/type.js';
 
 export const buildParsedSignature = (signingString: string, signature: string, algorithm: string) => {
 	return {

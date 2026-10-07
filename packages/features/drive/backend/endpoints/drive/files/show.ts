@@ -10,7 +10,7 @@ import type { MiDriveFile } from '../../../models/DriveFile.js';
 import type { DriveFilesRepository } from '@/models/_.js';
 import { DriveFileEntityService } from '../../../serializers/DriveFileEntityService.js';
 import { DI } from '@/di-symbols.js';
-import { RoleService } from '../../../../../roles/backend/services/RoleService.js';
+import { RoleService } from '@features/roles/backend/services/RoleService.js';
 import { ApiError } from '@/server/api/error.js';
 
 const contractProjection = projectEndpointContract(selectorDriveFilesShowDefinition);

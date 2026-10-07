@@ -7,12 +7,12 @@ import { describe, expect, test, vi } from 'vitest';
 import type { ModuleRef } from '@nestjs/core';
 import type { FollowRequestsRepository, NotesRepository, UsersRepository, MiNote, MiUser } from '@/models/_.js';
 import type { CacheService } from '@/core/CacheService.js';
-import type { Packed } from '../../../../features/index/contract/packed.js';
-import type { UserEntityService } from '../../../../features/users/backend/serializers/UserEntityService.js';
-import type { NoteEntityService } from '../../../../features/notes/backend/serializers/NoteEntityService.js';
-import type { RoleEntityService } from '../../../../features/roles/backend/serializers/RoleEntityService.js';
-import type { ChatEntityService } from '../../../../features/chat/backend/serializers/ChatEntityService.js';
-import { NotificationEntityService } from '../../../../features/notifications/backend/serializers/NotificationEntityService.js';
+import type { Packed } from '@features/index/contract/packed.js';
+import type { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
+import type { NoteEntityService } from '@features/notes/backend/serializers/NoteEntityService.js';
+import type { RoleEntityService } from '@features/roles/backend/serializers/RoleEntityService.js';
+import type { ChatEntityService } from '@features/chat/backend/serializers/ChatEntityService.js';
+import { NotificationEntityService } from '@features/notifications/backend/serializers/NotificationEntityService.js';
 
 const meId = 'me';
 const notifierId = 'notifier';

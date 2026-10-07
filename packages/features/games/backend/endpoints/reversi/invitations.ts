@@ -7,7 +7,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
 import { emptyReversiInvitationsDefinition, emptyReversiInvitationsInput, emptyReversiInvitationsOutput } from '../../../contract/empty-input-endpoint-definitions.js';
 import { DI } from '@/di-symbols.js';
-import { UserEntityService } from '../../../../users/backend/serializers/UserEntityService.js';
+import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import { ReversiService } from '../../services/ReversiService.js';
 
 const contractProjection = projectEndpointContract(emptyReversiInvitationsDefinition);

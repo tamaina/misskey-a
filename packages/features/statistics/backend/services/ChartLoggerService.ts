@@ -5,7 +5,7 @@
 
 import { Injectable } from '@nestjs/common';
 import type Logger from '@/logger.js';
-import { LoggerService } from '../../../runtime/backend/services/LoggerService.js';
+import { LoggerService } from '@features/runtime/backend/services/LoggerService.js';
 
 @Injectable()
 export class ChartLoggerService {

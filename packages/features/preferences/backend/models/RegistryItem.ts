@@ -5,7 +5,7 @@
 
 import { PrimaryColumn, Entity, Index, JoinColumn, Column, ManyToOne } from 'typeorm';
 import { id } from '@/models/util/id.js';
-import { MiUser } from '../../../users/backend/models/User.js';
+import { MiUser } from '@features/users/backend/models/User.js';
 
 // TODO: 同じdomain、同じscope、同じkeyのレコードは二つ以上存在しないように制約付けたい
 @Entity('registry_item')

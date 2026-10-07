@@ -8,7 +8,7 @@ import { voidAntennasDeleteDefinition, voidAntennasDeleteInput, voidAntennasDele
 import { Inject, Injectable } from '@nestjs/common';
 
 import type { AntennasRepository } from '@/models/_.js';
-import { GlobalEventService } from '../../../../runtime/backend/services/GlobalEventService.js';
+import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
 import { DI } from '@/di-symbols.js';
 import { ApiError } from '@/server/api/error.js';
 

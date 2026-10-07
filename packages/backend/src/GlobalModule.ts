@@ -7,13 +7,13 @@ import { Global, Inject, Module } from '@nestjs/common';
 import * as Redis from 'ioredis';
 import { DataSource } from 'typeorm';
 import { Meilisearch } from 'meilisearch';
-import { MiMeta } from '../../features/instance/backend/models/Meta.js';
+import { MiMeta } from '@features/instance/backend/models/Meta.js';
 import { DI } from './di-symbols.js';
 import { Config, loadConfig } from './config.js';
 import { createPostgresDataSource } from './postgres.js';
 import { RepositoryModule } from './models/RepositoryModule.js';
 import { allSettled } from './misc/promise-tracker.js';
-import { GlobalEvents } from '../../features/runtime/backend/services/GlobalEventService.js';
+import { GlobalEvents } from '@features/runtime/backend/services/GlobalEventService.js';
 import type { Provider, OnApplicationShutdown } from '@nestjs/common';
 
 const $config: Provider = {

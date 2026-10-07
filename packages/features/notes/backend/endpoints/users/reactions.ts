@@ -12,8 +12,8 @@ import { QueryService } from '@/core/QueryService.js';
 import { NoteReactionEntityService } from '../../serializers/NoteReactionEntityService.js';
 import { DI } from '@/di-symbols.js';
 import { CacheService } from '@/core/CacheService.js';
-import { UserEntityService } from '../../../../users/backend/serializers/UserEntityService.js';
-import { RoleService } from '../../../../roles/backend/services/RoleService.js';
+import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
+import { RoleService } from '@features/roles/backend/services/RoleService.js';
 import { isUserRelated } from '@/misc/is-user-related.js';
 import { ApiError } from '@/server/api/error.js';
 

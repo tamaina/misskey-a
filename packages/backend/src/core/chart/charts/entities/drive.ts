@@ -4,11 +4,11 @@
  */
 
 import Chart from '../../core.js';
-import { driveChartDescriptor } from '../../../../../../features/statistics/shared/chart-descriptors.js';
+import { driveChartDescriptor } from '@features/statistics/shared/chart-descriptors.js';
 
 export const name = 'drive';
 
-export { driveChartDescriptor as schema } from '../../../../../../features/statistics/shared/chart-descriptors.js';
+export { driveChartDescriptor as schema } from '@features/statistics/shared/chart-descriptors.js';
 
 const schema = driveChartDescriptor;
 

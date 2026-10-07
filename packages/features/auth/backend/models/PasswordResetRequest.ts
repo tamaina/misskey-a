@@ -5,7 +5,7 @@
 
 import { PrimaryColumn, Entity, Index, Column, ManyToOne, JoinColumn } from 'typeorm';
 import { id } from '@/models/util/id.js';
-import { MiUser } from '../../../users/backend/models/User.js';
+import { MiUser } from '@features/users/backend/models/User.js';
 
 @Entity('password_reset_request')
 export class MiPasswordResetRequest {

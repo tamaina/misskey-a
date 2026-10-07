@@ -8,7 +8,7 @@ import { inlineDriveDefinition, inlineDriveInput, inlineDriveOutput } from '../.
 import { Injectable } from '@nestjs/common';
 
 import { DriveFileEntityService } from '../serializers/DriveFileEntityService.js';
-import { RoleService } from '../../../roles/backend/services/RoleService.js';
+import { RoleService } from '@features/roles/backend/services/RoleService.js';
 
 const contractProjection = projectEndpointContract(inlineDriveDefinition);
 

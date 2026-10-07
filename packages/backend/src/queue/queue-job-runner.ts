@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import type { TelemetryService } from '../../../features/statistics/backend/services/TelemetryService.js';
+import type { TelemetryService } from '@features/statistics/backend/services/TelemetryService.js';
 
 type QueueTelemetryService = Pick<TelemetryService, 'startSpan'>;
 

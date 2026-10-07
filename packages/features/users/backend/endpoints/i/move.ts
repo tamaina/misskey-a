@@ -13,10 +13,10 @@ import { ApiError } from '@/server/api/error.js';
 import { MiLocalUser, MiRemoteUser } from '../../models/User.js';
 
 import { AccountMoveService } from '../../services/AccountMoveService.js';
-import { RemoteUserResolveService } from '../../../../federation/backend/services/RemoteUserResolveService.js';
+import { RemoteUserResolveService } from '@features/federation/backend/services/RemoteUserResolveService.js';
 import { ApiLoggerService } from '@/server/api/ApiLoggerService.js';
 import { GetterService } from '@/server/api/GetterService.js';
-import { ApPersonService } from '../../../../federation/backend/services/ApPersonService.js';
+import { ApPersonService } from '@features/federation/backend/services/ApPersonService.js';
 import { UserEntityService } from '../../serializers/UserEntityService.js';
 
 import * as Acct from '@/misc/acct.js';

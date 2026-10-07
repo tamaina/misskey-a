@@ -5,7 +5,7 @@
 
 import type { JsonValue } from './misc/json-value.js';
 
-export { notificationTypes, groupedNotificationTypes, obsoleteNotificationTypes } from '../../features/notifications/contract/notification-types.js';
+export { notificationTypes, groupedNotificationTypes, obsoleteNotificationTypes } from '@features/notifications/contract/notification-types.js';
 
 export const noteVisibilities = ['public', 'home', 'followers', 'specified'] as const;
 

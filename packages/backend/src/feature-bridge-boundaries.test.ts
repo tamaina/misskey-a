@@ -60,7 +60,8 @@ function moduleReferences(file: string): ModuleReference[] {
 
 function resolvedModuleStem(importer: string, specifier: string): string | null {
 	let resolved: string;
-	if (specifier.startsWith('@/')) resolved = path.resolve(backendSourceRoot, specifier.slice(2));
+	if (specifier.startsWith('@features/')) resolved = path.resolve(featureRoot, specifier.slice('@features/'.length));
+	else if (specifier.startsWith('@/')) resolved = path.resolve(backendSourceRoot, specifier.slice(2));
 	else if (specifier.startsWith('packages/backend/src/')) resolved = path.resolve(repositoryRoot, specifier);
 	else if (specifier.startsWith('./') || specifier.startsWith('../')) resolved = path.resolve(path.dirname(importer), specifier);
 	else return null;
@@ -68,13 +69,6 @@ function resolvedModuleStem(importer: string, specifier: string): string | null 
 }
 
 function resolveExistingModule(importer: string, specifier: string): string | null {
-	if (specifier.startsWith('@features/')) {
-		const featurePath = specifier.slice('@features/'.length).split('/');
-		const mappedPath = path.join(featureRoot, ...featurePath, 'index.ts');
-		const directPath = path.join(featureRoot, ...featurePath);
-		const candidates = [mappedPath, directPath, `${directPath}.ts`, `${directPath}.tsx`, `${directPath}.js`, path.join(directPath, 'index.ts')];
-		return candidates.find(candidate => existsSync(candidate)) ?? null;
-	}
 	const stem = resolvedModuleStem(importer, specifier);
 	if (stem == null) return null;
 	const candidates = [stem, `${stem}.ts`, `${stem}.tsx`, `${stem}.js`, `${stem}.mjs`, `${stem}.cjs`, path.join(stem, 'index.ts')];
@@ -95,8 +89,7 @@ function isCanonicalEndpointRegistry(file: string, ast: ts.SourceFile): boolean 
 			&& statement.exportClause.name.text === expectedRouteOrder[index]);
 }
 
-function isFeatureReexportBridge(file: string): boolean {
-	const source = readFileSync(file, 'utf8');
+function isFeatureReexportBridge(file: string, source = readFileSync(file, 'utf8')): boolean {
 	const kind = file.endsWith('.tsx') ? ts.ScriptKind.TSX : ts.ScriptKind.TS;
 	const ast = ts.createSourceFile(file, source, ts.ScriptTarget.Latest, true, kind);
 	if (isCanonicalEndpointRegistry(file, ast)) return false;
@@ -126,7 +119,7 @@ test('removed backend feature bridge paths stay absent and unreferenced', () => 
 });
 
 test('backend source has no export-only forwarders into feature modules', () => {
-	const bridges = sourceFilesIn(backendSourceRoot).filter(isFeatureReexportBridge).map(file => path.relative(repositoryRoot, file));
+	const bridges = sourceFilesIn(backendSourceRoot).filter(file => isFeatureReexportBridge(file)).map(file => path.relative(repositoryRoot, file));
 	expect(bridges).toEqual([]);
 });
 
@@ -149,4 +142,14 @@ test('only the complete ordered host namespace registry is a composition excepti
 	for (const invalidSource of invalidSources) {
 		expect(isCanonicalEndpointRegistry(endpointRegistryPath, parse(invalidSource))).toBe(false);
 	}
+});
+
+test('feature leaf aliases cannot hide export-only bridges', () => {
+	const importer = path.join(backendSourceRoot, 'alias-bridge.ts');
+	const specifier = '@features/users/backend/models/User.js';
+	expect(resolveExistingModule(importer, specifier)).toBe(path.join(featureRoot, 'users/backend/models/User.ts'));
+	expect(resolveExistingModule(importer, '@features/users/backend/missing.js')).toBeNull();
+	expect(isFeatureReexportBridge(importer, `export { MiUser } from '${specifier}';`)).toBe(true);
+	expect(isFeatureReexportBridge(importer, `export type { MiUser } from '${specifier}';`)).toBe(true);
+	expect(isFeatureReexportBridge(importer, `export * as users from '${specifier}';`)).toBe(true);
 });

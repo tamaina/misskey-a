@@ -6,14 +6,14 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { DI } from '@/di-symbols.js';
 import type { Config } from '@/config.js';
-import { MetaService } from '../../../features/instance/backend/services/MetaService.js';
+import { MetaService } from '@features/instance/backend/services/MetaService.js';
 import { MAX_NOTE_TEXT_LENGTH } from '@/const.js';
 import { MemorySingleCache } from '@/misc/cache.js';
 import { bindThis } from '@/decorators.js';
 import NotesChart from '@/core/chart/charts/notes.js';
 import UsersChart from '@/core/chart/charts/users.js';
-import { DEFAULT_POLICIES } from '../../../features/roles/backend/services/RoleService.js';
-import { SystemAccountService } from '../../../features/users/backend/services/SystemAccountService.js';
+import { DEFAULT_POLICIES } from '@features/roles/backend/services/RoleService.js';
+import { SystemAccountService } from '@features/users/backend/services/SystemAccountService.js';
 import type { FastifyInstance, FastifyPluginOptions } from 'fastify';
 
 const nodeinfo2_1path = '/nodeinfo/2.1';

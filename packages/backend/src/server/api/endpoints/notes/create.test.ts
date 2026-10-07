@@ -10,7 +10,7 @@ import { fileURLToPath } from 'node:url';
 import { dirname } from 'node:path';
 import { describe, test, expect } from 'vitest';
 import { getValidator } from '../../../../../test/prelude/get-api-validator.js';
-import { paramDef } from '../../../../../../features/notes/backend/endpoints/notes/create.js';
+import { paramDef } from '@features/notes/backend/endpoints/notes/create.js';
 
 const _filename = fileURLToPath(import.meta.url);
 const _dirname = dirname(_filename);

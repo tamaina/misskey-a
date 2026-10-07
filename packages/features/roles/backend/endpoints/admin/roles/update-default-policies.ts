@@ -7,9 +7,9 @@ import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract
 import { voidAdminRolesUpdateDefaultPoliciesDefinition, voidAdminRolesUpdateDefaultPoliciesInput, voidAdminRolesUpdateDefaultPoliciesOutput } from '../../../../contract/void-endpoint-definitions.js';
 import { Injectable } from '@nestjs/common';
 
-import { GlobalEventService } from '../../../../../runtime/backend/services/GlobalEventService.js';
-import { MetaService } from '../../../../../instance/backend/services/MetaService.js';
-import { ModerationLogService } from '../../../../../moderation/backend/services/ModerationLogService.js';
+import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
+import { MetaService } from '@features/instance/backend/services/MetaService.js';
+import { ModerationLogService } from '@features/moderation/backend/services/ModerationLogService.js';
 
 const contractProjection = projectEndpointContract(voidAdminRolesUpdateDefaultPoliciesDefinition);
 

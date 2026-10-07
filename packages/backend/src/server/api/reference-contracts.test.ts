@@ -5,17 +5,17 @@
 
 import { describe, expect, expectTypeOf, test, vi } from 'vitest';
 import * as v from 'valibot';
-import { defineEndpointContract } from '../../../../features/api/contract/definition.js';
-import { toLegacyJsonSchema } from '../../../../features/api/backend/index.js';
-import { packedReference, getPackedReference, getPackedReferenceLegacyOutputSchema } from '../../../../features/api/contract/packed-reference.js';
-import { resultObject } from '../../../../features/api/contract/result-object.js';
-import { jsonObject } from '../../../../features/api/contract/json-object.js';
-import type { Packed } from '../../../../features/index/contract/packed.js';
-import { referenceEndpointDefinitions as instanceDefinitions } from '../../../../features/instance/contract/reference-endpoint-definitions.js';
-import { referenceEndpointDefinitions as operationDefinitions } from '../../../../features/operations/contract/reference-endpoint-definitions.js';
-import { referenceEndpointDefinitions as roleDefinitions } from '../../../../features/roles/contract/reference-endpoint-definitions.js';
-import { referenceEndpointDefinitions as gameDefinitions } from '../../../../features/games/contract/reference-endpoint-definitions.js';
-import { referenceEndpointDefinitions as userDefinitions } from '../../../../features/users/contract/reference-endpoint-definitions.js';
+import { defineEndpointContract } from '@features/api/contract/definition.js';
+import { toLegacyJsonSchema } from '@features/api/backend/index.js';
+import { packedReference, getPackedReference, getPackedReferenceLegacyOutputSchema } from '@features/api/contract/packed-reference.js';
+import { resultObject } from '@features/api/contract/result-object.js';
+import { jsonObject } from '@features/api/contract/json-object.js';
+import type { Packed } from '@features/index/contract/packed.js';
+import { referenceEndpointDefinitions as instanceDefinitions } from '@features/instance/contract/reference-endpoint-definitions.js';
+import { referenceEndpointDefinitions as operationDefinitions } from '@features/operations/contract/reference-endpoint-definitions.js';
+import { referenceEndpointDefinitions as roleDefinitions } from '@features/roles/contract/reference-endpoint-definitions.js';
+import { referenceEndpointDefinitions as gameDefinitions } from '@features/games/contract/reference-endpoint-definitions.js';
+import { referenceEndpointDefinitions as userDefinitions } from '@features/users/contract/reference-endpoint-definitions.js';
 import type { Schema } from '@/misc/json-schema.js';
 import { Endpoint } from './endpoint-base.js';
 import { ContractEndpoint, projectEndpointContract } from './contract-endpoint.js';

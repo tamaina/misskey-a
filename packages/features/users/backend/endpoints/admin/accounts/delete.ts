@@ -8,7 +8,7 @@ import { voidAdminAccountsDeleteDefinition, voidAdminAccountsDeleteInput, voidAd
 import { Inject, Injectable } from '@nestjs/common';
 
 import type { UsersRepository } from '@/models/_.js';
-import { QueueService } from '../../../../../runtime/backend/services/QueueService.js';
+import { QueueService } from '@features/runtime/backend/services/QueueService.js';
 import { DI } from '@/di-symbols.js';
 import { UserEntityService } from '../../../serializers/UserEntityService.js';
 import { DeleteAccountService } from '../../../services/DeleteAccountService.js';

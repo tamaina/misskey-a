@@ -4,12 +4,12 @@
  */
 
 import type { NoteFavoritesRepository } from '@/models/_.js';
-import type { } from '../../../relationships/backend/models/Blocking.js';
-import type { MiUser } from '../../../users/backend/models/User.js';
+import type { } from '@features/relationships/backend/models/Blocking.js';
+import type { MiUser } from '@features/users/backend/models/User.js';
 import type { MiNoteFavorite } from '../models/NoteFavorite.js';
 import { bindThis } from '@/decorators.js';
-import type { IdService } from '../../../runtime/backend/services/IdService.js';
-import type { NoteEntityService } from '../../../notes/backend/serializers/NoteEntityService.js';
+import type { IdService } from '@features/runtime/backend/services/IdService.js';
+import type { NoteEntityService } from '@features/notes/backend/serializers/NoteEntityService.js';
 
 export class NoteFavoriteEntityService {
 	constructor(

@@ -4,7 +4,7 @@
  */
 
 import type { ExistingProvider, Provider } from '@nestjs/common';
-import type { Definitions, Feature, Port } from '../../../features/index/backend/service-definitions.js';
+import type { Definitions, Feature, Port } from '@features/index/backend/service-definitions.js';
 
 type Constructor = new (...args: never[]) => object;
 type PortValue<P> = P extends Port<string, infer V> ? V : never;

@@ -5,7 +5,7 @@
 
 import { Injectable } from '@nestjs/common';
 import type Logger from '@/logger.js';
-import { RemoteLoggerService } from '../../../runtime/backend/services/RemoteLoggerService.js';
+import { RemoteLoggerService } from '@features/runtime/backend/services/RemoteLoggerService.js';
 
 @Injectable()
 export class ApLoggerService {

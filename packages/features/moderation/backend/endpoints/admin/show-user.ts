@@ -7,9 +7,9 @@ import { Inject, Injectable } from '@nestjs/common';
 import type { UsersRepository, SigninsRepository, UserProfilesRepository } from '@/models/_.js';
 import { LegacyAdminUserProducerEndpoint, legacyAdminShowUserMeta, legacyAdminShowUserParamDef } from '../../legacy-admin-user-producer-endpoint.js';
 import { DI } from '@/di-symbols.js';
-import { RoleService } from '../../../../roles/backend/services/RoleService.js';
-import { RoleEntityService } from '../../../../roles/backend/serializers/RoleEntityService.js';
-import { IdService } from '../../../../runtime/backend/services/IdService.js';
+import { RoleService } from '@features/roles/backend/services/RoleService.js';
+import { RoleEntityService } from '@features/roles/backend/serializers/RoleEntityService.js';
+import { IdService } from '@features/runtime/backend/services/IdService.js';
 
 export const meta = legacyAdminShowUserMeta;
 export const paramDef = legacyAdminShowUserParamDef;

@@ -5,7 +5,7 @@
 
 import type { Job, IQueueBackend } from 'bullmq';
 import type { InferOutput } from 'valibot';
-import type { packedQueueCountSchema } from '../../../features/operations/contract/packed.js';
+import type { packedQueueCountSchema } from '@features/operations/contract/packed.js';
 
 /**
  * Trusted dependency declaration correction for BullMQ 6.3.2, not response validation.

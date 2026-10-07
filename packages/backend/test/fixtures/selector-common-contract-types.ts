@@ -5,9 +5,9 @@
 
 import type * as v from 'valibot';
 import type { ContractEndpointInput } from '../../src/server/api/contract-endpoint.js';
-import type { allOfAdminEmojiUpdateInput } from '../../../features/emojis/contract/selector-common-endpoint-definitions.js';
-import type { allOfNotesSearchByTagInput, allOfUsersSearchByUsernameAndHostInput } from '../../../features/discovery/contract/selector-common-endpoint-definitions.js';
-import type { allOfUsersFollowersInput, allOfUsersFollowingInput } from '../../../features/relationships/contract/selector-common-endpoint-definitions.js';
+import type { allOfAdminEmojiUpdateInput } from '@features/emojis/contract/selector-common-endpoint-definitions.js';
+import type { allOfNotesSearchByTagInput, allOfUsersSearchByUsernameAndHostInput } from '@features/discovery/contract/selector-common-endpoint-definitions.js';
+import type { allOfUsersFollowersInput, allOfUsersFollowingInput } from '@features/relationships/contract/selector-common-endpoint-definitions.js';
 
 type Assert<T extends true> = T;
 type Equal<A, B> = (<T>() => T extends A ? 1 : 2) extends (<T>() => T extends B ? 1 : 2) ? true : false;

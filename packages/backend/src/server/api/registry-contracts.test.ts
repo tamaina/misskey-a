@@ -5,9 +5,9 @@
 
 import { expect, test } from 'vitest';
 import * as v from 'valibot';
-import { remainingIRegistryGetDefinition, remainingIRegistryKeysDefinition, remainingIRegistrySetDefinition } from '../../../../features/preferences/contract/remaining-inline-endpoint-definitions.js';
-import { remainingUsernameAvailableDefinition } from '../../../../features/auth/contract/remaining-inline-endpoint-definitions.js';
-import { remainingRetentionDefinition } from '../../../../features/statistics/contract/remaining-inline-endpoint-definitions.js';
+import { remainingIRegistryGetDefinition, remainingIRegistryKeysDefinition, remainingIRegistrySetDefinition } from '@features/preferences/contract/remaining-inline-endpoint-definitions.js';
+import { remainingUsernameAvailableDefinition } from '@features/auth/contract/remaining-inline-endpoint-definitions.js';
+import { remainingRetentionDefinition } from '@features/statistics/contract/remaining-inline-endpoint-definitions.js';
 import { ContractEndpoint, projectEndpointContract } from './contract-endpoint.js';
 import { Endpoint } from './endpoint-base.js';
 import { convertSchemaToOpenApiSchema } from './openapi/schemas.js';

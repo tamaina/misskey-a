@@ -10,8 +10,8 @@ import { Inject, Injectable } from '@nestjs/common';
 
 import type { RegistrationTicketsRepository } from '@/models/_.js';
 import { InviteCodeEntityService } from '../../serializers/InviteCodeEntityService.js';
-import { IdService } from '../../../../runtime/backend/services/IdService.js';
-import { RoleService } from '../../../../roles/backend/services/RoleService.js';
+import { IdService } from '@features/runtime/backend/services/IdService.js';
+import { RoleService } from '@features/roles/backend/services/RoleService.js';
 import { DI } from '@/di-symbols.js';
 import { generateInviteCode } from '@/misc/generate-invite-code.js';
 import { ApiError } from '@/server/api/error.js';

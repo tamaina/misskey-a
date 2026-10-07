@@ -10,9 +10,9 @@ import { Inject, Injectable } from '@nestjs/common';
 import type { DriveFilesRepository, ChatMessagesRepository } from '@/models/_.js';
 import { QueryService } from '@/core/QueryService.js';
 import { DI } from '@/di-symbols.js';
-import { RoleService } from '../../../../../roles/backend/services/RoleService.js';
-import { ChatEntityService } from '../../../../../chat/backend/serializers/ChatEntityService.js';
-import { ChatService } from '../../../../../chat/backend/services/ChatService.js';
+import { RoleService } from '@features/roles/backend/services/RoleService.js';
+import { ChatEntityService } from '@features/chat/backend/serializers/ChatEntityService.js';
+import { ChatService } from '@features/chat/backend/services/ChatService.js';
 import { ApiError } from '@/server/api/error.js';
 
 const contractProjection = projectEndpointContract(packedDriveFilesAttachedChatMessagesDefinition);

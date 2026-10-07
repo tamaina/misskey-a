@@ -9,9 +9,9 @@ import { MiUser, type WebhooksRepository } from '@/models/_.js';
 import { MiWebhook, WebhookEventTypes } from '../models/Webhook.js';
 import { DI } from '@/di-symbols.js';
 import { bindThis } from '@/decorators.js';
-import { GlobalEvents } from '../../../runtime/backend/services/GlobalEventService.js';
-import type { Packed } from '../../../index/contract/packed.js';
-import { QueueService } from '../../../runtime/backend/services/QueueService.js';
+import { GlobalEvents } from '@features/runtime/backend/services/GlobalEventService.js';
+import type { Packed } from '@features/index/contract/packed.js';
+import { QueueService } from '@features/runtime/backend/services/QueueService.js';
 import type { OnApplicationShutdown } from '@nestjs/common';
 
 export type UserWebhookPayload<T extends WebhookEventTypes> =

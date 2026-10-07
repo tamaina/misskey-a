@@ -7,7 +7,7 @@ import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract
 import { voidFlashLikeDefinition, voidFlashLikeInput, voidFlashLikeOutput } from '../../../contract/void-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
 import type { FlashsRepository, FlashLikesRepository } from '@/models/_.js';
-import { IdService } from '../../../../runtime/backend/services/IdService.js';
+import { IdService } from '@features/runtime/backend/services/IdService.js';
 
 import { DI } from '@/di-symbols.js';
 import { ApiError } from '@/server/api/error.js';

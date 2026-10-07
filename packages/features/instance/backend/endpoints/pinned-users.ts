@@ -9,9 +9,9 @@ import { IsNull } from 'typeorm';
 import { Inject, Injectable } from '@nestjs/common';
 import type { MiMeta, UsersRepository } from '@/models/_.js';
 import * as Acct from '@/misc/acct.js';
-import type { MiUser } from '../../../users/backend/models/User.js';
+import type { MiUser } from '@features/users/backend/models/User.js';
 
-import { UserEntityService } from '../../../users/backend/serializers/UserEntityService.js';
+import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import { DI } from '@/di-symbols.js';
 
 const contractProjection = projectEndpointContract(packedPinnedUsersDefinition);

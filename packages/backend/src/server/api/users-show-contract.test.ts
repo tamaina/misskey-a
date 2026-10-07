@@ -6,10 +6,10 @@
 import { expect, test, vi } from 'vitest';
 import _Ajv from 'ajv';
 import * as v from 'valibot';
-import { usersShowDefinition } from '../../../../features/users/contract/show-endpoint-definition.js';
-import { EndpointImplementation, meta, paramDef } from '../../../../features/users/backend/endpoints/users/show.js';
-import { misskeyIdPattern } from '../../../../features/api/contract/index.js';
-import { defineEndpointContract } from '../../../../features/api/contract/definition.js';
+import { usersShowDefinition } from '@features/users/contract/show-endpoint-definition.js';
+import { EndpointImplementation, meta, paramDef } from '@features/users/backend/endpoints/users/show.js';
+import { misskeyIdPattern } from '@features/api/contract/index.js';
+import { defineEndpointContract } from '@features/api/contract/definition.js';
 import type { Config } from '@/config.js';
 import type { Schema } from '@/misc/json-schema.js';
 import type { IEndpointMeta } from './endpoints.js';

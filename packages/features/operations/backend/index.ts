@@ -6,8 +6,8 @@
 import { createProcedureClient, implement } from '@orpc/server';
 import type { JsonSchema } from '@valibot/to-json-schema';
 import { operationsContract, operationsInputs, QUEUE_CLEAR_STATES } from '../contract/index.js';
-import type { QueueType } from '../../runtime/shared/queue-types.js';
-import { toLegacyJsonSchema } from '../../api/backend/index.js';
+import type { QueueType } from '@features/runtime/shared/queue-types.js';
+import { toLegacyJsonSchema } from '@features/api/backend/index.js';
 
 export type OperationsActor = { id: string };
 export type QueueClearState = typeof QUEUE_CLEAR_STATES[number];

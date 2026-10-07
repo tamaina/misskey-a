@@ -5,8 +5,8 @@
 
 import { createProcedureClient, implement } from '@orpc/server';
 import type { JsonSchema } from '@valibot/to-json-schema';
-import type { ApiErrorDefinition } from '../../api/contract/index.js';
-import { toLegacyJsonSchema } from '../../api/backend/index.js';
+import type { ApiErrorDefinition } from '@features/api/contract/index.js';
+import { toLegacyJsonSchema } from '@features/api/backend/index.js';
 import { channelContract, channelErrors, channelInputs } from '../contract/index.js';
 import type { ChannelEndpoints } from '../contract/index.js';
 

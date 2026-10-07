@@ -6,7 +6,7 @@
 import { Inject, Injectable, OnApplicationShutdown } from '@nestjs/common';
 import * as Redis from 'ioredis';
 import * as nodeCrypto from 'crypto';
-import type { MiUser } from '../../../users/backend/models/User.js';
+import type { MiUser } from '@features/users/backend/models/User.js';
 import type { UserKeypairsRepository } from '@/models/_.js';
 import { RedisKVCache } from '@/misc/cache.js';
 import type { MiUserKeypair } from '../models/UserKeypair.js';

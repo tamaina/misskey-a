@@ -14,10 +14,10 @@ import { mockDeep } from 'vitest-mock-extended';
 import { GlobalModule } from '@/GlobalModule.js';
 import { DI } from '@/di-symbols.js';
 import type { MiMeta } from '@/models/_.js';
-import { FileInfo, FileInfoService } from '../../../features/media/backend/services/FileInfoService.js';
-import { SensitiveMediaDetectionService } from '../../../features/media/backend/services/SensitiveMediaDetectionService.js';
-import { LoggerService } from '../../../features/runtime/backend/services/LoggerService.js';
-import { HttpRequestService } from '../../../features/runtime/backend/services/HttpRequestService.js';
+import { FileInfo, FileInfoService } from '@features/media/backend/services/FileInfoService.js';
+import { SensitiveMediaDetectionService } from '@features/media/backend/services/SensitiveMediaDetectionService.js';
+import { LoggerService } from '@features/runtime/backend/services/LoggerService.js';
+import { HttpRequestService } from '@features/runtime/backend/services/HttpRequestService.js';
 import type { TestingModule } from '@nestjs/testing';
 
 const _filename = fileURLToPath(import.meta.url);

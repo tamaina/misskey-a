@@ -6,12 +6,12 @@
 import { supportedCaptchaProviders } from '../../contract/captcha-providers.js';
 import type { CaptchaProvider } from '../../contract/captcha-providers.js';
 import { Injectable } from '@nestjs/common';
-import { HttpRequestService } from '../../../runtime/backend/services/HttpRequestService.js';
+import { HttpRequestService } from '@features/runtime/backend/services/HttpRequestService.js';
 import { bindThis } from '@/decorators.js';
-import { MetaService } from '../../../instance/backend/services/MetaService.js';
-import { MiMeta } from '../../../instance/backend/models/Meta.js';
+import { MetaService } from '@features/instance/backend/services/MetaService.js';
+import { MiMeta } from '@features/instance/backend/models/Meta.js';
 import Logger from '@/logger.js';
-import { LoggerService } from '../../../runtime/backend/services/LoggerService.js';
+import { LoggerService } from '@features/runtime/backend/services/LoggerService.js';
 
 export { supportedCaptchaProviders } from '../../contract/captcha-providers.js';
 export type { CaptchaProvider } from '../../contract/captcha-providers.js';

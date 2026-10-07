@@ -8,7 +8,7 @@ import type { UserProfilesRepository } from '@/models/_.js';
 import type { MiUser } from '../models/User.js';
 import { DI } from '@/di-symbols.js';
 import { bindThis } from '@/decorators.js';
-import { NotificationService } from '../../../notifications/backend/services/NotificationService.js';
+import { NotificationService } from '@features/notifications/backend/services/NotificationService.js';
 import { ACHIEVEMENT_TYPES } from '../models/UserProfile.js';
 
 @Injectable()

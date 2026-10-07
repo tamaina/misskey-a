@@ -20,7 +20,7 @@ import {
 } from '@/models/_.js';
 import { CleanRemoteNotesProcessorService } from '@/queue/processors/CleanRemoteNotesProcessorService.js';
 import { DI } from '@/di-symbols.js';
-import { IdService } from '../../../../../features/runtime/backend/services/IdService.js';
+import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { QueueLoggerService } from '@/queue/QueueLoggerService.js';
 import { GlobalModule } from '@/GlobalModule.js';
 import { secureRndstr } from '@/misc/secure-rndstr.js';

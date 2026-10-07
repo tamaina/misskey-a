@@ -4,7 +4,7 @@
  */
 
 import { comment, CommonPropsMinimum } from './_.js';
-import type { MiMeta } from '../../../instance/backend/models/Meta.js';
+import type { MiMeta } from '@features/instance/backend/models/Meta.js';
 
 export function InfoCardPage(props: CommonPropsMinimum<{
 	meta: MiMeta;

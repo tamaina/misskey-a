@@ -18,7 +18,7 @@ import { createTempDir } from '@/misc/create-temp.js';
 import type Logger from '@/logger.js';
 import { bindThis } from '@/decorators.js';
 import { isMimeImage } from '@/misc/is-mime-image.js';
-import type { LoggerService } from '../../../runtime/backend/services/LoggerService.js';
+import type { LoggerService } from '@features/runtime/backend/services/LoggerService.js';
 import type { SensitiveMediaDetectionService } from './SensitiveMediaDetectionService.js';
 import type { Prediction } from './SensitiveMediaDetectionService.js';
 

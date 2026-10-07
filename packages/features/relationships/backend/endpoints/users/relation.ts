@@ -6,7 +6,7 @@
 import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
 import { unionUsersRelationDefinition, unionUsersRelationInput, unionUsersRelationOutput } from '../../../contract/union-endpoint-definitions.js';
 import { Injectable } from '@nestjs/common';
-import { UserEntityService } from '../../../../users/backend/serializers/UserEntityService.js';
+import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 
 const contractProjection = projectEndpointContract(unionUsersRelationDefinition);
 

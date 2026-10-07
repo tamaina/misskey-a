@@ -5,12 +5,12 @@
 
 import type { ClipNotesRepository, ClipFavoritesRepository, ClipsRepository, MiUser } from '@/models/_.js';
 import { awaitAll } from '@/misc/prelude/await-all.js';
-import type { Packed } from '../../../index/contract/packed.js';
-import type { } from '../../../relationships/backend/models/Blocking.js';
+import type { Packed } from '@features/index/contract/packed.js';
+import type { } from '@features/relationships/backend/models/Blocking.js';
 import type { MiClip } from '../models/Clip.js';
 import { bindThis } from '@/decorators.js';
-import type { IdService } from '../../../runtime/backend/services/IdService.js';
-import type { UserEntityService } from '../../../users/backend/serializers/UserEntityService.js';
+import type { IdService } from '@features/runtime/backend/services/IdService.js';
+import type { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 
 export class ClipEntityService {
 	constructor(

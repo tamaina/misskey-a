@@ -12,7 +12,7 @@ import { GetterService } from '@/server/api/GetterService.js';
 import { ChatService } from '../../../services/ChatService.js';
 import { ChatEntityService } from '../../../serializers/ChatEntityService.js';
 import { ApiError } from '@/server/api/error.js';
-import { RoleService } from '../../../../../roles/backend/services/RoleService.js';
+import { RoleService } from '@features/roles/backend/services/RoleService.js';
 
 const contractProjection = projectEndpointContract(packedChatMessagesShowDefinition);
 

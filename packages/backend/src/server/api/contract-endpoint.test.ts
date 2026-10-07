@@ -5,12 +5,12 @@
 
 import { expect, expectTypeOf, test } from 'vitest';
 import * as v from 'valibot';
-import { defineEndpointContract } from '../../../../features/api/contract/definition.js';
-import { jsonString, misskeyId, objectParams } from '../../../../features/api/contract/index.js';
-import { getPackedReference, packedReference } from '../../../../features/api/contract/packed-reference.js';
-import { toLegacyJsonSchema } from '../../../../features/api/backend/index.js';
-import type { Packed } from '../../../../features/index/contract/packed.js';
-import { resultObject } from '../../../../features/api/contract/result-object.js';
+import { defineEndpointContract } from '@features/api/contract/definition.js';
+import { jsonString, misskeyId, objectParams } from '@features/api/contract/index.js';
+import { getPackedReference, packedReference } from '@features/api/contract/packed-reference.js';
+import { toLegacyJsonSchema } from '@features/api/backend/index.js';
+import type { Packed } from '@features/index/contract/packed.js';
+import { resultObject } from '@features/api/contract/result-object.js';
 import { ContractEndpoint, projectEndpointContract } from './contract-endpoint.js';
 import { convertSchemaToOpenApiSchema } from './openapi/schemas.js';
 

@@ -8,9 +8,9 @@ import { packedAdminAdCreateDefinition, packedAdminAdCreateInput, packedAdminAdC
 import { Inject, Injectable } from '@nestjs/common';
 
 import type { AdsRepository } from '@/models/_.js';
-import { IdService } from '../../../../../runtime/backend/services/IdService.js';
+import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { DI } from '@/di-symbols.js';
-import { ModerationLogService } from '../../../../../moderation/backend/services/ModerationLogService.js';
+import { ModerationLogService } from '@features/moderation/backend/services/ModerationLogService.js';
 
 const contractProjection = projectEndpointContract(packedAdminAdCreateDefinition);
 

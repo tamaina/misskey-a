@@ -8,9 +8,9 @@ import { inlineAdminEmojiCopyDefinition, inlineAdminEmojiCopyInput, inlineAdminE
 import { Inject, Injectable } from '@nestjs/common';
 
 import type { EmojisRepository } from '@/models/_.js';
-import type { MiDriveFile } from '../../../../../drive/backend/models/DriveFile.js';
+import type { MiDriveFile } from '@features/drive/backend/models/DriveFile.js';
 import { DI } from '@/di-symbols.js';
-import { DriveService } from '../../../../../drive/backend/services/DriveService.js';
+import { DriveService } from '@features/drive/backend/services/DriveService.js';
 import { CustomEmojiService } from '../../../services/CustomEmojiService.js';
 import { EmojiEntityService } from '../../../serializers/EmojiEntityService.js';
 import { ApiError } from '@/server/api/error.js';

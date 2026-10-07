@@ -6,12 +6,12 @@
 import { Brackets } from 'typeorm';
 import type { RoleAssignmentsRepository, RolesRepository } from '@/models/_.js';
 import { awaitAll } from '@/misc/prelude/await-all.js';
-import type { MiUser } from '../../../users/backend/models/User.js';
+import type { MiUser } from '@features/users/backend/models/User.js';
 import type { MiRole } from '../models/Role.js';
 import { bindThis } from '@/decorators.js';
 import { DEFAULT_POLICIES } from '../services/RoleService.js';
-import type { IdService } from '../../../runtime/backend/services/IdService.js';
-import { Packed } from '../../../index/contract/packed.js';
+import type { IdService } from '@features/runtime/backend/services/IdService.js';
+import { Packed } from '@features/index/contract/packed.js';
 
 export class RoleEntityService {
 	constructor(

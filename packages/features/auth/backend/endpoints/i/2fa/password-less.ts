@@ -7,9 +7,9 @@ import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract
 import { voidI2faPasswordLessDefinition, voidI2faPasswordLessInput, voidI2faPasswordLessOutput } from '../../../../contract/void-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
 
-import { UserEntityService } from '../../../../../users/backend/serializers/UserEntityService.js';
+import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import type { UserProfilesRepository, UserSecurityKeysRepository } from '@/models/_.js';
-import { GlobalEventService } from '../../../../../runtime/backend/services/GlobalEventService.js';
+import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
 import { DI } from '@/di-symbols.js';
 import { ApiError } from '@/server/api/error.js';
 

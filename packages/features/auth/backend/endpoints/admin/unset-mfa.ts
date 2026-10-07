@@ -9,12 +9,12 @@ import { Inject, Injectable } from '@nestjs/common';
 import { DataSource } from 'typeorm';
 
 import { ApiError } from '@/server/api/error.js';
-import { MiUserProfile } from '../../../../users/backend/models/UserProfile.js';
+import { MiUserProfile } from '@features/users/backend/models/UserProfile.js';
 import { MiUserSecurityKey } from '../../models/UserSecurityKey.js';
 import type { UsersRepository } from '@/models/_.js';
 import { DI } from '@/di-symbols.js';
-import { RoleService } from '../../../../roles/backend/services/RoleService.js';
-import { ModerationLogService } from '../../../../moderation/backend/services/ModerationLogService.js';
+import { RoleService } from '@features/roles/backend/services/RoleService.js';
+import { ModerationLogService } from '@features/moderation/backend/services/ModerationLogService.js';
 
 const contractProjection = projectEndpointContract(voidAdminUnsetMfaDefinition);
 

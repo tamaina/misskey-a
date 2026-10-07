@@ -8,16 +8,16 @@ import * as Redis from 'ioredis';
 import type { MiUser, SystemWebhooksRepository } from '@/models/_.js';
 import { DI } from '@/di-symbols.js';
 import { bindThis } from '@/decorators.js';
-import { GlobalEvents, GlobalEventService } from '../../../runtime/backend/services/GlobalEventService.js';
+import { GlobalEvents, GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
 import { MiSystemWebhook, type SystemWebhookEventType } from '../models/SystemWebhook.js';
-import { IdService } from '../../../runtime/backend/services/IdService.js';
-import { QueueService } from '../../../runtime/backend/services/QueueService.js';
-import { ModerationLogService } from '../../../moderation/backend/services/ModerationLogService.js';
-import { LoggerService } from '../../../runtime/backend/services/LoggerService.js';
+import { IdService } from '@features/runtime/backend/services/IdService.js';
+import { QueueService } from '@features/runtime/backend/services/QueueService.js';
+import { ModerationLogService } from '@features/moderation/backend/services/ModerationLogService.js';
+import { LoggerService } from '@features/runtime/backend/services/LoggerService.js';
 import Logger from '@/logger.js';
-import { Packed } from '../../../index/contract/packed.js';
-import { AbuseReportResolveType } from '../../../moderation/backend/models/AbuseUserReport.js';
-import { ModeratorInactivityRemainingTime } from '../../../moderation/backend/jobs/CheckModeratorsActivityProcessorService.js';
+import { Packed } from '@features/index/contract/packed.js';
+import { AbuseReportResolveType } from '@features/moderation/backend/models/AbuseUserReport.js';
+import { ModeratorInactivityRemainingTime } from '@features/moderation/backend/jobs/CheckModeratorsActivityProcessorService.js';
 import type { OnApplicationShutdown } from '@nestjs/common';
 
 export type AbuseReportPayload = {

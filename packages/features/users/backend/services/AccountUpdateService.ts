@@ -7,9 +7,9 @@ import { Inject, Injectable } from '@nestjs/common';
 import { DI } from '@/di-symbols.js';
 import type { UsersRepository } from '@/models/_.js';
 import type { MiUser } from '../models/User.js';
-import { ApRendererService } from '../../../federation/backend/services/ApRendererService.js';
-import { RelayService } from '../../../federation/backend/services/RelayService.js';
-import { ApDeliverManagerService } from '../../../federation/backend/services/ApDeliverManagerService.js';
+import { ApRendererService } from '@features/federation/backend/services/ApRendererService.js';
+import { RelayService } from '@features/federation/backend/services/RelayService.js';
+import { ApDeliverManagerService } from '@features/federation/backend/services/ApDeliverManagerService.js';
 import { UserEntityService } from '../serializers/UserEntityService.js';
 import { bindThis } from '@/decorators.js';
 

@@ -9,9 +9,9 @@ import { DI } from '@/di-symbols.js';
 import type { AntennasRepository, RoleAssignmentsRepository, UserIpsRepository } from '@/models/_.js';
 import type Logger from '@/logger.js';
 import { bindThis } from '@/decorators.js';
-import { IdService } from '../../../../features/runtime/backend/services/IdService.js';
+import { IdService } from '@features/runtime/backend/services/IdService.js';
 import type { Config } from '@/config.js';
-import { ReversiService } from '../../../../features/games/backend/services/ReversiService.js';
+import { ReversiService } from '@features/games/backend/services/ReversiService.js';
 import { QueueLoggerService } from '../QueueLoggerService.js';
 import type * as Bull from 'bullmq';
 

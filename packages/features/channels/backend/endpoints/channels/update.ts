@@ -10,7 +10,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import type { DriveFilesRepository, ChannelsRepository } from '@/models/_.js';
 import { ChannelEntityService } from '../../serializers/ChannelEntityService.js';
 import { DI } from '@/di-symbols.js';
-import { RoleService } from '../../../../roles/backend/services/RoleService.js';
+import { RoleService } from '@features/roles/backend/services/RoleService.js';
 import { ApiError } from '@/server/api/error.js';
 
 const contractProjection = projectEndpointContract(packedChannelsUpdateDefinition);

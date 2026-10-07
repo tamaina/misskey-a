@@ -6,11 +6,11 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { DI } from '@/di-symbols.js';
 import type { DriveFilesRepository, MiMeta } from '@/models/_.js';
-import type { MiRemoteUser } from '../../../users/backend/models/User.js';
-import type { MiDriveFile } from '../../../drive/backend/models/DriveFile.js';
+import type { MiRemoteUser } from '@features/users/backend/models/User.js';
+import type { MiDriveFile } from '@features/drive/backend/models/DriveFile.js';
 import { truncate } from '@/misc/truncate.js';
 import { DB_MAX_IMAGE_COMMENT_LENGTH } from '@/const.js';
-import { DriveService } from '../../../drive/backend/services/DriveService.js';
+import { DriveService } from '@features/drive/backend/services/DriveService.js';
 import type Logger from '@/logger.js';
 import { bindThis } from '@/decorators.js';
 import { checkHttps } from '@/misc/check-https.js';

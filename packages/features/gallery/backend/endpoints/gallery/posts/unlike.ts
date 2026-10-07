@@ -8,8 +8,8 @@ import { voidGalleryPostsUnlikeDefinition, voidGalleryPostsUnlikeInput, voidGall
 import { Inject, Injectable } from '@nestjs/common';
 
 import type { GalleryPostsRepository, GalleryLikesRepository } from '@/models/_.js';
-import { FeaturedService, GALLERY_POSTS_RANKING_WINDOW } from '../../../../../discovery/backend/services/FeaturedService.js';
-import { IdService } from '../../../../../runtime/backend/services/IdService.js';
+import { FeaturedService, GALLERY_POSTS_RANKING_WINDOW } from '@features/discovery/backend/services/FeaturedService.js';
+import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { DI } from '@/di-symbols.js';
 import { ApiError } from '@/server/api/error.js';
 

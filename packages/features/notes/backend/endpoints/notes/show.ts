@@ -10,7 +10,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { NoteEntityService } from '../../serializers/NoteEntityService.js';
 import { GetterService } from '@/server/api/GetterService.js';
 import { DI } from '@/di-symbols.js';
-import { MiMeta } from '../../../../instance/backend/models/Meta.js';
+import { MiMeta } from '@features/instance/backend/models/Meta.js';
 import { ApiError } from '@/server/api/error.js';
 
 const contractProjection = projectEndpointContract(packedNotesShowDefinition);

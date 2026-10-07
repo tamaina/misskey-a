@@ -8,7 +8,7 @@ import { voidDriveFoldersDeleteDefinition, voidDriveFoldersDeleteInput, voidDriv
 import { Inject, Injectable } from '@nestjs/common';
 
 import type { DriveFoldersRepository, DriveFilesRepository } from '@/models/_.js';
-import { GlobalEventService } from '../../../../../runtime/backend/services/GlobalEventService.js';
+import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
 import { DI } from '@/di-symbols.js';
 import { ApiError } from '@/server/api/error.js';
 

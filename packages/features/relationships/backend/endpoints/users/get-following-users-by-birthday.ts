@@ -12,7 +12,7 @@ import type {
 } from '@/models/_.js';
 import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
 import { birthdayUsersDefinition, birthdayUsersInput, birthdayUsersOutput } from '../../../contract/birthday-endpoint-definitions.js';
-import { UserEntityService } from '../../../../users/backend/serializers/UserEntityService.js';
+import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import type * as v from 'valibot';
 
 const contractProjection = projectEndpointContract(birthdayUsersDefinition);

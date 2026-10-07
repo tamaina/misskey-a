@@ -3,11 +3,11 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 import type * as v from 'valibot';
-import type { opaqueObject } from '../../../features/api/contract/opaque-object.js';
-import type { packedAdminRolesCreateInput } from '../../../features/roles/contract/packed-endpoint-definitions.js';
-import type { voidAdminRolesUpdateInput } from '../../../features/roles/contract/void-endpoint-definitions.js';
-import type { RoleService } from '../../../features/roles/backend/services/RoleService.js';
-import type { LegacyRoleCreateConsumerInput, LegacyRoleUpdateConsumerInput } from '../../../features/roles/backend/legacy-role-consumer-endpoint.js';
+import type { opaqueObject } from '@features/api/contract/opaque-object.js';
+import type { packedAdminRolesCreateInput } from '@features/roles/contract/packed-endpoint-definitions.js';
+import type { voidAdminRolesUpdateInput } from '@features/roles/contract/void-endpoint-definitions.js';
+import type { RoleService } from '@features/roles/backend/services/RoleService.js';
+import type { LegacyRoleCreateConsumerInput, LegacyRoleUpdateConsumerInput } from '@features/roles/backend/legacy-role-consumer-endpoint.js';
 
 type Assert<T extends true> = T;
 type IsAny<T> = 0 extends (1 & T) ? true : false;

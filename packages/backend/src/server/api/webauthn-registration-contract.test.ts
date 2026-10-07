@@ -5,9 +5,9 @@
 import { beforeEach, expect, test, vi } from 'vitest';
 import * as v from 'valibot';
 import { Ajv } from 'ajv';
-import { inlineI2faKeyDoneInput, inlineI2faKeyDoneDefinition } from '../../../../features/auth/contract/endpoint-definitions.js';
-import { EndpointImplementation, meta, paramDef } from '../../../../features/auth/backend/endpoints/i/2fa/key-done.js';
-import { WebAuthnService } from '../../../../features/auth/backend/services/WebAuthnService.js';
+import { inlineI2faKeyDoneInput, inlineI2faKeyDoneDefinition } from '@features/auth/contract/endpoint-definitions.js';
+import { EndpointImplementation, meta, paramDef } from '@features/auth/backend/endpoints/i/2fa/key-done.js';
+import { WebAuthnService } from '@features/auth/backend/services/WebAuthnService.js';
 import { projectEndpointContract } from './contract-endpoint.js';
 import { convertSchemaToOpenApiSchema } from './openapi/schemas.js';
 

@@ -11,7 +11,7 @@ import type { RoleAssignmentsRepository, RolesRepository } from '@/models/_.js';
 
 import { QueryService } from '@/core/QueryService.js';
 import { DI } from '@/di-symbols.js';
-import { UserEntityService } from '../../../../users/backend/serializers/UserEntityService.js';
+import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import { ApiError } from '@/server/api/error.js';
 
 const contractProjection = projectEndpointContract(packedRolesUsersDefinition);

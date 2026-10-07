@@ -5,8 +5,8 @@
 
 import { AhoCorasick } from 'slacc';
 import RE2 from 're2';
-import type { MiNote } from '../../../features/notes/backend/models/Note.js';
-import type { MiUser } from '../../../features/users/backend/models/User.js';
+import type { MiNote } from '@features/notes/backend/models/Note.js';
+import type { MiUser } from '@features/users/backend/models/User.js';
 
 type NoteLike = {
 	userId: MiNote['userId'];

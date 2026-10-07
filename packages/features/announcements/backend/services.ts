@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { defineServices, service } from '../../index/backend/service-definitions.js';
-import { ports } from '../../index/backend/service-ports.js';
+import { defineServices, service } from '@features/index/backend/service-definitions.js';
+import { ports } from '@features/index/backend/service-ports.js';
 import { AnnouncementEntityService } from './serializers/AnnouncementEntityService.js';
 import { AnnouncementService } from './services/AnnouncementService.js';
 

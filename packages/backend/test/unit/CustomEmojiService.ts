@@ -10,11 +10,11 @@ import { UtilityService } from '@/core/UtilityService.js';
 import { DI } from '@/di-symbols.js';
 import { GlobalModule } from '@/GlobalModule.js';
 import { type ModerationLogsRepository, EmojisRepository } from '@/models/_.js';
-import { ModerationLogService } from '../../../features/moderation/backend/services/ModerationLogService.js';
-import { IdService } from '../../../features/runtime/backend/services/IdService.js';
-import { GlobalEventService } from '../../../features/runtime/backend/services/GlobalEventService.js';
-import { CustomEmojiService } from '../../../features/emojis/backend/services/CustomEmojiService.js';
-import { MiEmoji } from '../../../features/emojis/backend/models/Emoji.js';
+import { ModerationLogService } from '@features/moderation/backend/services/ModerationLogService.js';
+import { IdService } from '@features/runtime/backend/services/IdService.js';
+import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
+import { CustomEmojiService } from '@features/emojis/backend/services/CustomEmojiService.js';
+import { MiEmoji } from '@features/emojis/backend/models/Emoji.js';
 
 describe('CustomEmojiService', () => {
 	let app: TestingModule;

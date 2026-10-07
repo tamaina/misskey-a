@@ -7,7 +7,7 @@ import { Injectable } from '@nestjs/common';
 import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
 import { createAvatarDecorationDefinition, createAvatarDecorationInput, createAvatarDecorationOutput } from '../../../../contract/index.js';
 import { AvatarDecorationService } from '../../../services/AvatarDecorationService.js';
-import { IdService } from '../../../../../runtime/backend/services/IdService.js';
+import { IdService } from '@features/runtime/backend/services/IdService.js';
 
 const contractProjection = projectEndpointContract(createAvatarDecorationDefinition);
 

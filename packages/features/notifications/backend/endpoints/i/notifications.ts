@@ -13,7 +13,7 @@ import { FilterUnionByProperty, notificationTypes, obsoleteNotificationTypes } f
 import { NotificationEntityService } from '../../serializers/NotificationEntityService.js';
 import { NotificationService } from '../../services/NotificationService.js';
 import { DI } from '@/di-symbols.js';
-import { IdService } from '../../../../runtime/backend/services/IdService.js';
+import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { MiNotification } from '../../models/Notification.js';
 
 const contractProjection = projectEndpointContract(portableINotificationsDefinition);

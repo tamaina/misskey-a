@@ -4,10 +4,10 @@
  */
 
 import type { AntennasRepository } from '@/models/_.js';
-import type { Packed } from '../../../index/contract/packed.js';
+import type { Packed } from '@features/index/contract/packed.js';
 import type { MiAntenna } from '../models/Antenna.js';
 import { bindThis } from '@/decorators.js';
-import type { IdService } from '../../../runtime/backend/services/IdService.js';
+import type { IdService } from '@features/runtime/backend/services/IdService.js';
 
 export class AntennaEntityService {
 	constructor(

@@ -6,11 +6,11 @@
 import { describe, expect, test, vi } from 'vitest';
 import _Ajv from 'ajv';
 import * as v from 'valibot';
-import { selectorAdminDriveShowFileDefinition, selectorAdminDriveShowFileInput, selectorAdminDriveShowFileOutput, selectorDriveFilesShowDefinition, selectorDriveFilesShowInput } from '../../../../features/drive/contract/selector-endpoint-definitions.js';
-import { selectorIRevokeTokenDefinition, selectorIRevokeTokenInput } from '../../../../features/auth/contract/selector-endpoint-definitions.js';
-import { selectorPagesShowDefinition, selectorPagesShowInput } from '../../../../features/pages/contract/selector-endpoint-definitions.js';
-import { defineEndpointContract } from '../../../../features/api/contract/definition.js';
-import { misskeyIdPattern } from '../../../../features/api/contract/index.js';
+import { selectorAdminDriveShowFileDefinition, selectorAdminDriveShowFileInput, selectorAdminDriveShowFileOutput, selectorDriveFilesShowDefinition, selectorDriveFilesShowInput } from '@features/drive/contract/selector-endpoint-definitions.js';
+import { selectorIRevokeTokenDefinition, selectorIRevokeTokenInput } from '@features/auth/contract/selector-endpoint-definitions.js';
+import { selectorPagesShowDefinition, selectorPagesShowInput } from '@features/pages/contract/selector-endpoint-definitions.js';
+import { defineEndpointContract } from '@features/api/contract/definition.js';
+import { misskeyIdPattern } from '@features/api/contract/index.js';
 import type { Schema } from '@/misc/json-schema.js';
 import type { Config } from '@/config.js';
 import type { IEndpointMeta } from './endpoints.js';

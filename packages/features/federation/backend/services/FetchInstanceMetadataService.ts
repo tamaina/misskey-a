@@ -11,8 +11,8 @@ import * as htmlParser from 'node-html-parser';
 import type { MiInstance } from '../models/Instance.js';
 import type Logger from '@/logger.js';
 import { DI } from '@/di-symbols.js';
-import { LoggerService } from '../../../runtime/backend/services/LoggerService.js';
-import { HttpRequestService } from '../../../runtime/backend/services/HttpRequestService.js';
+import { LoggerService } from '@features/runtime/backend/services/LoggerService.js';
+import { HttpRequestService } from '@features/runtime/backend/services/HttpRequestService.js';
 import { bindThis } from '@/decorators.js';
 import { FederatedInstanceService } from './FederatedInstanceService.js';
 

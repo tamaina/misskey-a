@@ -4,8 +4,8 @@
  */
 
 import { expect, test } from 'vitest';
-import { QueueService } from '../../../features/runtime/backend/services/QueueService.js';
-import type { Packed } from '../../../features/index/contract/packed.js';
+import { QueueService } from '@features/runtime/backend/services/QueueService.js';
+import type { Packed } from '@features/index/contract/packed.js';
 
 type JobSnapshotInput = {
 	id?: string;

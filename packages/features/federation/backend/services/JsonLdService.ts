@@ -7,7 +7,7 @@ import * as crypto from 'node:crypto';
 import { promisify } from 'node:util';
 import { Injectable } from '@nestjs/common';
 import { RsaKeyPair } from 'slacc';
-import { HttpRequestService } from '../../../runtime/backend/services/HttpRequestService.js';
+import { HttpRequestService } from '@features/runtime/backend/services/HttpRequestService.js';
 import { bindThis } from '@/decorators.js';
 import { IdentifiableError } from '@/misc/identifiable-error.js';
 import { CONTEXT, PRELOADED_CONTEXTS } from '../protocol/misc/contexts.js';

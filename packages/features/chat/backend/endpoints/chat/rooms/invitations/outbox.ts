@@ -12,7 +12,7 @@ import { DI } from '@/di-symbols.js';
 import { ApiError } from '@/server/api/error.js';
 import { ChatService } from '../../../../services/ChatService.js';
 import { ChatEntityService } from '../../../../serializers/ChatEntityService.js';
-import { IdService } from '../../../../../../runtime/backend/services/IdService.js';
+import { IdService } from '@features/runtime/backend/services/IdService.js';
 
 const contractProjection = projectEndpointContract(packedChatRoomsInvitationsOutboxDefinition);
 

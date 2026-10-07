@@ -6,8 +6,8 @@
 import { bindThis } from '@/decorators.js';
 import type { MiMeta } from '@/models/_.js';
 import type Logger from '@/logger.js';
-import type { HttpRequestService } from '../../../runtime/backend/services/HttpRequestService.js';
-import type { LoggerService } from '../../../runtime/backend/services/LoggerService.js';
+import type { HttpRequestService } from '@features/runtime/backend/services/HttpRequestService.js';
+import type { LoggerService } from '@features/runtime/backend/services/LoggerService.js';
 
 /**
  * 正規化済み画像に対する nsfwjs 互換の予測値。

@@ -9,16 +9,16 @@ import { ModuleRef } from '@nestjs/core';
 import { afterEach, describe, expect, test, vi } from 'vitest';
 import { mockDeep } from 'vitest-mock-extended';
 import { DI } from '@/di-symbols.js';
-import { discoveryServices, rankingServices, userSearchServices } from '../../../features/discovery/backend/services.js';
-import { FeaturedService } from '../../../features/discovery/backend/services/FeaturedService.js';
-import { HashtagService } from '../../../features/discovery/backend/services/HashtagService.js';
-import { UserEntityService } from '../../../features/users/backend/serializers/UserEntityService.js';
-import { IdService } from '../../../features/runtime/backend/services/IdService.js';
+import { discoveryServices, rankingServices, userSearchServices } from '@features/discovery/backend/services.js';
+import { FeaturedService } from '@features/discovery/backend/services/FeaturedService.js';
+import { HashtagService } from '@features/discovery/backend/services/HashtagService.js';
+import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
+import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { UtilityService } from './UtilityService.js';
 import { featureServiceGroups } from './feature-service-providers.js';
 import type { FactoryProvider } from '@nestjs/common';
 import type { ChainableCommander } from 'ioredis';
-import type { Inputs } from '../../../features/index/backend/service-definitions.js';
+import type { Inputs } from '@features/index/backend/service-definitions.js';
 
 function setup() {
 	const inputs = mockDeep<Inputs<typeof rankingServices>>({ meta: { hiddenTags: [], sensitiveWords: [] } });

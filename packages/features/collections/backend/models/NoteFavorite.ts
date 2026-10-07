@@ -5,8 +5,8 @@
 
 import { PrimaryColumn, Entity, Index, JoinColumn, Column, ManyToOne } from 'typeorm';
 import { id } from '@/models/util/id.js';
-import { MiNote } from '../../../notes/backend/models/Note.js';
-import { MiUser } from '../../../users/backend/models/User.js';
+import { MiNote } from '@features/notes/backend/models/Note.js';
+import { MiUser } from '@features/users/backend/models/User.js';
 
 @Entity('note_favorite')
 @Index(['userId', 'noteId'], { unique: true })

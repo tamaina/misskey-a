@@ -6,8 +6,8 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { In } from 'typeorm';
 import type { MutingsRepository, MiMuting } from '@/models/_.js';
-import { IdService } from '../../../runtime/backend/services/IdService.js';
-import type { MiUser } from '../../../users/backend/models/User.js';
+import { IdService } from '@features/runtime/backend/services/IdService.js';
+import type { MiUser } from '@features/users/backend/models/User.js';
 import { DI } from '@/di-symbols.js';
 import { bindThis } from '@/decorators.js';
 import { CacheService } from '@/core/CacheService.js';

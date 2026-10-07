@@ -5,7 +5,7 @@
 
 import { Inject, Injectable, Scope } from '@nestjs/common';
 import { bindThis } from '@/decorators.js';
-import type { GlobalEvents } from '../../../runtime/backend/services/GlobalEventService.js';
+import type { GlobalEvents } from '@features/runtime/backend/services/GlobalEventService.js';
 import type { JsonObject } from '@/misc/json-value.js';
 import { ChatService } from '../services/ChatService.js';
 import Channel, { type ChannelRequest } from '@/server/api/stream/channel.js';

@@ -6,18 +6,18 @@
 import { randomUUID } from 'node:crypto';
 import { Inject, Injectable } from '@nestjs/common';
 import { MetricsTime, type JobType } from 'bullmq';
-import type { IActivity } from '../../../federation/backend/protocol/type.js';
-import type { MiDriveFile } from '../../../drive/backend/models/DriveFile.js';
-import type { MiWebhook, WebhookEventTypes } from '../../../integrations/backend/models/Webhook.js';
-import type { MiSystemWebhook, SystemWebhookEventType } from '../../../integrations/backend/models/SystemWebhook.js';
+import type { IActivity } from '@features/federation/backend/protocol/type.js';
+import type { MiDriveFile } from '@features/drive/backend/models/DriveFile.js';
+import type { MiWebhook, WebhookEventTypes } from '@features/integrations/backend/models/Webhook.js';
+import type { MiSystemWebhook, SystemWebhookEventType } from '@features/integrations/backend/models/SystemWebhook.js';
 import type { Config } from '@/config.js';
 import { DI } from '@/di-symbols.js';
 import { bindThis } from '@/decorators.js';
-import type { Antenna } from '../../../portability/backend/endpoints/i/import-antennas.js';
-import { ApRequestCreator } from '../../../federation/backend/services/ApRequestService.js';
-import { type SystemWebhookPayload } from '../../../integrations/backend/services/SystemWebhookService.js';
-import type { Packed } from '../../../index/contract/packed.js';
-import { type UserWebhookPayload } from '../../../integrations/backend/services/UserWebhookService.js';
+import type { Antenna } from '@features/portability/backend/endpoints/i/import-antennas.js';
+import { ApRequestCreator } from '@features/federation/backend/services/ApRequestService.js';
+import { type SystemWebhookPayload } from '@features/integrations/backend/services/SystemWebhookService.js';
+import type { Packed } from '@features/index/contract/packed.js';
+import { type UserWebhookPayload } from '@features/integrations/backend/services/UserWebhookService.js';
 import type {
 	DbJobData,
 	DeliverJobData,

@@ -8,69 +8,69 @@ import { MODULE_METADATA } from '@nestjs/common/constants.js';
 import { expect, test } from 'vitest';
 import { QueueProcessorModule } from '../QueueProcessorModule.js';
 
-import { AggregateRetentionProcessorService } from '../../../../features/statistics/backend/jobs/AggregateRetentionProcessorService.js';
+import { AggregateRetentionProcessorService } from '@features/statistics/backend/jobs/AggregateRetentionProcessorService.js';
 
-import { BakeBufferedReactionsProcessorService } from '../../../../features/notes/backend/jobs/BakeBufferedReactionsProcessorService.js';
+import { BakeBufferedReactionsProcessorService } from '@features/notes/backend/jobs/BakeBufferedReactionsProcessorService.js';
 
-import { CheckModeratorsActivityProcessorService } from '../../../../features/moderation/backend/jobs/CheckModeratorsActivityProcessorService.js';
+import { CheckModeratorsActivityProcessorService } from '@features/moderation/backend/jobs/CheckModeratorsActivityProcessorService.js';
 
-import { CleanChartsProcessorService } from '../../../../features/statistics/backend/jobs/CleanChartsProcessorService.js';
+import { CleanChartsProcessorService } from '@features/statistics/backend/jobs/CleanChartsProcessorService.js';
 
-import { CleanRemoteFilesProcessorService } from '../../../../features/drive/backend/jobs/CleanRemoteFilesProcessorService.js';
+import { CleanRemoteFilesProcessorService } from '@features/drive/backend/jobs/CleanRemoteFilesProcessorService.js';
 
-import { DeleteAccountProcessorService } from '../../../../features/users/backend/jobs/DeleteAccountProcessorService.js';
+import { DeleteAccountProcessorService } from '@features/users/backend/jobs/DeleteAccountProcessorService.js';
 
-import { DeleteDriveFilesProcessorService } from '../../../../features/drive/backend/jobs/DeleteDriveFilesProcessorService.js';
+import { DeleteDriveFilesProcessorService } from '@features/drive/backend/jobs/DeleteDriveFilesProcessorService.js';
 
-import { DeleteFileProcessorService } from '../../../../features/drive/backend/jobs/DeleteFileProcessorService.js';
+import { DeleteFileProcessorService } from '@features/drive/backend/jobs/DeleteFileProcessorService.js';
 
-import { DeliverProcessorService } from '../../../../features/federation/backend/jobs/DeliverProcessorService.js';
+import { DeliverProcessorService } from '@features/federation/backend/jobs/DeliverProcessorService.js';
 
-import { EndedPollNotificationProcessorService } from '../../../../features/notes/backend/jobs/EndedPollNotificationProcessorService.js';
+import { EndedPollNotificationProcessorService } from '@features/notes/backend/jobs/EndedPollNotificationProcessorService.js';
 
-import { ExportAntennasProcessorService } from '../../../../features/timelines/backend/jobs/ExportAntennasProcessorService.js';
+import { ExportAntennasProcessorService } from '@features/timelines/backend/jobs/ExportAntennasProcessorService.js';
 
-import { ExportBlockingProcessorService } from '../../../../features/relationships/backend/jobs/ExportBlockingProcessorService.js';
+import { ExportBlockingProcessorService } from '@features/relationships/backend/jobs/ExportBlockingProcessorService.js';
 
-import { ExportClipsProcessorService } from '../../../../features/collections/backend/jobs/ExportClipsProcessorService.js';
+import { ExportClipsProcessorService } from '@features/collections/backend/jobs/ExportClipsProcessorService.js';
 
-import { ExportCustomEmojisProcessorService } from '../../../../features/emojis/backend/jobs/ExportCustomEmojisProcessorService.js';
+import { ExportCustomEmojisProcessorService } from '@features/emojis/backend/jobs/ExportCustomEmojisProcessorService.js';
 
-import { ExportFavoritesProcessorService } from '../../../../features/collections/backend/jobs/ExportFavoritesProcessorService.js';
+import { ExportFavoritesProcessorService } from '@features/collections/backend/jobs/ExportFavoritesProcessorService.js';
 
-import { ExportFollowingProcessorService } from '../../../../features/relationships/backend/jobs/ExportFollowingProcessorService.js';
+import { ExportFollowingProcessorService } from '@features/relationships/backend/jobs/ExportFollowingProcessorService.js';
 
-import { ExportMutingProcessorService } from '../../../../features/relationships/backend/jobs/ExportMutingProcessorService.js';
+import { ExportMutingProcessorService } from '@features/relationships/backend/jobs/ExportMutingProcessorService.js';
 
-import { ExportNotesProcessorService } from '../../../../features/notes/backend/jobs/ExportNotesProcessorService.js';
+import { ExportNotesProcessorService } from '@features/notes/backend/jobs/ExportNotesProcessorService.js';
 
-import { ExportUserListsProcessorService } from '../../../../features/relationships/backend/jobs/ExportUserListsProcessorService.js';
+import { ExportUserListsProcessorService } from '@features/relationships/backend/jobs/ExportUserListsProcessorService.js';
 
-import { ImportAntennasProcessorService } from '../../../../features/timelines/backend/jobs/ImportAntennasProcessorService.js';
+import { ImportAntennasProcessorService } from '@features/timelines/backend/jobs/ImportAntennasProcessorService.js';
 
-import { ImportBlockingProcessorService } from '../../../../features/relationships/backend/jobs/ImportBlockingProcessorService.js';
+import { ImportBlockingProcessorService } from '@features/relationships/backend/jobs/ImportBlockingProcessorService.js';
 
-import { ImportCustomEmojisProcessorService } from '../../../../features/emojis/backend/jobs/ImportCustomEmojisProcessorService.js';
+import { ImportCustomEmojisProcessorService } from '@features/emojis/backend/jobs/ImportCustomEmojisProcessorService.js';
 
-import { ImportFollowingProcessorService } from '../../../../features/relationships/backend/jobs/ImportFollowingProcessorService.js';
+import { ImportFollowingProcessorService } from '@features/relationships/backend/jobs/ImportFollowingProcessorService.js';
 
-import { ImportMutingProcessorService } from '../../../../features/relationships/backend/jobs/ImportMutingProcessorService.js';
+import { ImportMutingProcessorService } from '@features/relationships/backend/jobs/ImportMutingProcessorService.js';
 
-import { ImportUserListsProcessorService } from '../../../../features/relationships/backend/jobs/ImportUserListsProcessorService.js';
+import { ImportUserListsProcessorService } from '@features/relationships/backend/jobs/ImportUserListsProcessorService.js';
 
-import { InboxProcessorService } from '../../../../features/federation/backend/jobs/InboxProcessorService.js';
+import { InboxProcessorService } from '@features/federation/backend/jobs/InboxProcessorService.js';
 
-import { PostScheduledNoteProcessorService } from '../../../../features/notes/backend/jobs/PostScheduledNoteProcessorService.js';
+import { PostScheduledNoteProcessorService } from '@features/notes/backend/jobs/PostScheduledNoteProcessorService.js';
 
-import { RelationshipProcessorService } from '../../../../features/relationships/backend/jobs/RelationshipProcessorService.js';
+import { RelationshipProcessorService } from '@features/relationships/backend/jobs/RelationshipProcessorService.js';
 
-import { ResyncChartsProcessorService } from '../../../../features/statistics/backend/jobs/ResyncChartsProcessorService.js';
+import { ResyncChartsProcessorService } from '@features/statistics/backend/jobs/ResyncChartsProcessorService.js';
 
-import { SystemWebhookDeliverProcessorService } from '../../../../features/integrations/backend/jobs/SystemWebhookDeliverProcessorService.js';
+import { SystemWebhookDeliverProcessorService } from '@features/integrations/backend/jobs/SystemWebhookDeliverProcessorService.js';
 
-import { TickChartsProcessorService } from '../../../../features/statistics/backend/jobs/TickChartsProcessorService.js';
+import { TickChartsProcessorService } from '@features/statistics/backend/jobs/TickChartsProcessorService.js';
 
-import { UserWebhookDeliverProcessorService } from '../../../../features/integrations/backend/jobs/UserWebhookDeliverProcessorService.js';
+import { UserWebhookDeliverProcessorService } from '@features/integrations/backend/jobs/UserWebhookDeliverProcessorService.js';
 
 const processorProviders = Reflect.getMetadata(MODULE_METADATA.PROVIDERS, QueueProcessorModule) as unknown[];
 

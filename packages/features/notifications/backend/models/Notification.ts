@@ -4,13 +4,13 @@
  */
 
 import { userExportableEntities } from '@/types.js';
-import { MiUser } from '../../../users/backend/models/User.js';
-import { MiNote } from '../../../notes/backend/models/Note.js';
-import { MiAccessToken } from '../../../auth/backend/models/AccessToken.js';
-import { MiRole } from '../../../roles/backend/models/Role.js';
-import { MiDriveFile } from '../../../drive/backend/models/DriveFile.js';
-import { MiNoteDraft } from '../../../notes/backend/models/NoteDraft.js';
-import type { Packed } from '../../../index/contract/packed.js';
+import { MiUser } from '@features/users/backend/models/User.js';
+import { MiNote } from '@features/notes/backend/models/Note.js';
+import { MiAccessToken } from '@features/auth/backend/models/AccessToken.js';
+import { MiRole } from '@features/roles/backend/models/Role.js';
+import { MiDriveFile } from '@features/drive/backend/models/DriveFile.js';
+import { MiNoteDraft } from '@features/notes/backend/models/NoteDraft.js';
+import type { Packed } from '@features/index/contract/packed.js';
 
 // misskey-js の notificationTypes と同期すべし
 export type MiNotification = {

@@ -10,7 +10,7 @@ import { intersperse } from '@/misc/prelude/array.js';
 import { normalizeForSearch } from '@/misc/normalize-for-search.js';
 import { bindThis } from '@/decorators.js';
 import { escapeHtml } from '@/misc/escape-html.js';
-import type { IMentionedRemoteUsers } from '../../../notes/backend/models/Note.js';
+import type { IMentionedRemoteUsers } from '@features/notes/backend/models/Note.js';
 import type * as mfm from 'mfm-js';
 
 const urlRegex = /^https?:\/\/[\w\/:%#@$&?!()\[\]~.,=+\-]+/;

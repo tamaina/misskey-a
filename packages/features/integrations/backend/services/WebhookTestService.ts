@@ -8,12 +8,12 @@ import { MiAbuseUserReport, MiNote, MiUser, MiWebhook } from '@/models/_.js';
 import { bindThis } from '@/decorators.js';
 import { MiSystemWebhook, type SystemWebhookEventType } from '../models/SystemWebhook.js';
 import { type AbuseReportPayload, SystemWebhookPayload, SystemWebhookService } from './SystemWebhookService.js';
-import { type Packed } from '../../../index/contract/packed.js';
+import { type Packed } from '@features/index/contract/packed.js';
 import { type WebhookEventTypes } from '../models/Webhook.js';
-import { CustomEmojiService } from '../../../emojis/backend/services/CustomEmojiService.js';
+import { CustomEmojiService } from '@features/emojis/backend/services/CustomEmojiService.js';
 import { type UserWebhookPayload, UserWebhookService } from './UserWebhookService.js';
-import { QueueService } from '../../../runtime/backend/services/QueueService.js';
-import { ModeratorInactivityRemainingTime } from '../../../moderation/backend/jobs/CheckModeratorsActivityProcessorService.js';
+import { QueueService } from '@features/runtime/backend/services/QueueService.js';
+import { ModeratorInactivityRemainingTime } from '@features/moderation/backend/jobs/CheckModeratorsActivityProcessorService.js';
 
 const oneDayMillis = 24 * 60 * 60 * 1000;
 

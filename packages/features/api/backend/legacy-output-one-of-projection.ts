@@ -9,7 +9,7 @@ import { getLegacyOutputOneOfRegistration, hasLegacyOutputOneOfOptions, assertLe
 import { isMisskeyIdOrIds, hasMisskeyIdOrIdsOptions } from '../contract/misskey-id-or-ids.js';
 
 import { isMuteWordInputItem, hasMuteWordInputItemOptions } from '../contract/mute-word-input-item.js';
-import { isNotificationReceiveRule, hasNotificationReceiveRuleOptions } from '../../users/contract/notification-receive-config.js';
+import { isNotificationReceiveRule, hasNotificationReceiveRuleOptions } from '@features/users/contract/notification-receive-config.js';
 import { isJsonObjectNoopMetadata } from './json-object-projection.js';
 
 const annotationKeys = new Set([

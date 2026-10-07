@@ -10,7 +10,7 @@ import { MoreThan } from 'typeorm';
 
 import type { BubbleGameRecordsRepository } from '@/models/_.js';
 import { DI } from '@/di-symbols.js';
-import { UserEntityService } from '../../../../users/backend/serializers/UserEntityService.js';
+import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 
 const contractProjection = projectEndpointContract(packedBubbleGameRankingDefinition);
 

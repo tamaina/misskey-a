@@ -5,7 +5,7 @@
 
 import { Entity, PrimaryColumn, Index, Column } from 'typeorm';
 import { id } from '@/models/util/id.js';
-import type { MiUser } from '../../../users/backend/models/User.js';
+import type { MiUser } from '@features/users/backend/models/User.js';
 
 @Entity('hashtag')
 export class MiHashtag {

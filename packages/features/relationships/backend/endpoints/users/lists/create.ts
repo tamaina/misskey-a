@@ -7,13 +7,13 @@ import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract
 import { packedUsersListsCreateDefinition, packedUsersListsCreateInput, packedUsersListsCreateOutput } from '../../../../contract/packed-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
 import type { UserListsRepository } from '@/models/_.js';
-import { IdService } from '../../../../../runtime/backend/services/IdService.js';
+import { IdService } from '@features/runtime/backend/services/IdService.js';
 import type { MiUserList } from '../../../models/UserList.js';
 
 import { UserListEntityService } from '../../../serializers/UserListEntityService.js';
 import { DI } from '@/di-symbols.js';
 import { ApiError } from '@/server/api/error.js';
-import { RoleService } from '../../../../../roles/backend/services/RoleService.js';
+import { RoleService } from '@features/roles/backend/services/RoleService.js';
 
 const contractProjection = projectEndpointContract(packedUsersListsCreateDefinition);
 

@@ -7,8 +7,8 @@ import type { ModerationLogsRepository } from '@/models/_.js';
 import { bindThis } from '@/decorators.js';
 import type { ModerationLogPayloads } from '@/types.js';
 import { moderationLogTypes } from '@/types.js';
-import type { IdService } from '../../../runtime/backend/services/IdService.js';
-import type { MiUser } from '../../../users/backend/models/User.js';
+import type { IdService } from '@features/runtime/backend/services/IdService.js';
+import type { MiUser } from '@features/users/backend/models/User.js';
 
 export class ModerationLogService {
 	constructor(

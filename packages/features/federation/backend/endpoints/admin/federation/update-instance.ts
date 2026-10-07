@@ -11,7 +11,7 @@ import type { InstancesRepository } from '@/models/_.js';
 import { UtilityService } from '@/core/UtilityService.js';
 import { DI } from '@/di-symbols.js';
 import { FederatedInstanceService } from '../../../services/FederatedInstanceService.js';
-import { ModerationLogService } from '../../../../../moderation/backend/services/ModerationLogService.js';
+import { ModerationLogService } from '@features/moderation/backend/services/ModerationLogService.js';
 
 const contractProjection = projectEndpointContract(voidAdminFederationUpdateInstanceDefinition);
 

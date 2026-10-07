@@ -6,11 +6,11 @@
 import { describe, expect, test, vi } from 'vitest';
 import { createOperations } from '@features/operations/backend';
 import { createPortability } from '@features/portability/backend';
-import type { MiLocalUser } from '../../../../features/users/backend/models/User.js';
-import * as pause from '../../../../features/operations/backend/endpoints/admin/queue/pause.js';
-import * as clear from '../../../../features/operations/backend/endpoints/admin/queue/clear.js';
-import * as following from '../../../../features/portability/backend/endpoints/i/export-following.js';
-import * as notes from '../../../../features/portability/backend/endpoints/i/export-notes.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+import * as pause from '@features/operations/backend/endpoints/admin/queue/pause.js';
+import * as clear from '@features/operations/backend/endpoints/admin/queue/clear.js';
+import * as following from '@features/portability/backend/endpoints/i/export-following.js';
+import * as notes from '@features/portability/backend/endpoints/i/export-notes.js';
 
 const actor = { id: 'trusted-user' } as MiLocalUser;
 

@@ -9,8 +9,8 @@ import { Inject, Injectable } from '@nestjs/common';
 import type { MiDriveFile, PagesRepository, UsersRepository } from '@/models/_.js';
 
 import { DI } from '@/di-symbols.js';
-import { ModerationLogService } from '../../../../moderation/backend/services/ModerationLogService.js';
-import { RoleService } from '../../../../roles/backend/services/RoleService.js';
+import { ModerationLogService } from '@features/moderation/backend/services/ModerationLogService.js';
+import { RoleService } from '@features/roles/backend/services/RoleService.js';
 import { ApiError } from '@/server/api/error.js';
 import { IdentifiableError } from '@/misc/identifiable-error.js';
 import { PageService } from '../../services/PageService.js';

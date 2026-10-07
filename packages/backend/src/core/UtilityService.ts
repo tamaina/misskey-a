@@ -10,8 +10,8 @@ import semver from 'semver';
 import { DI } from '@/di-symbols.js';
 import type { Config } from '@/config.js';
 import { bindThis } from '@/decorators.js';
-import { MiMeta, SoftwareSuspension } from '../../../features/instance/backend/models/Meta.js';
-import { MiInstance } from '../../../features/federation/backend/models/Instance.js';
+import { MiMeta, SoftwareSuspension } from '@features/instance/backend/models/Meta.js';
+import { MiInstance } from '@features/federation/backend/models/Instance.js';
 
 @Injectable()
 export class UtilityService {

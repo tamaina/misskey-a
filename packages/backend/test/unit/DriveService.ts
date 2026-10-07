@@ -16,7 +16,7 @@ import {
 } from '@aws-sdk/client-s3';
 import { mockClient } from 'aws-sdk-client-mock';
 import { GlobalModule } from '@/GlobalModule.js';
-import { DriveService } from '../../../features/drive/backend/services/DriveService.js';
+import { DriveService } from '@features/drive/backend/services/DriveService.js';
 import { CoreModule } from '@/core/CoreModule.js';
 import type { TestingModule } from '@nestjs/testing';
 

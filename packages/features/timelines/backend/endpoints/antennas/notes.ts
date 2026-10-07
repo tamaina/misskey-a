@@ -12,12 +12,12 @@ import { Brackets } from 'typeorm';
 import type { NotesRepository, AntennasRepository } from '@/models/_.js';
 import { QueryService } from '@/core/QueryService.js';
 import { DI } from '@/di-symbols.js';
-import { NoteEntityService } from '../../../../notes/backend/serializers/NoteEntityService.js';
-import { IdService } from '../../../../runtime/backend/services/IdService.js';
+import { NoteEntityService } from '@features/notes/backend/serializers/NoteEntityService.js';
+import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { FanoutTimelineService } from '../../services/FanoutTimelineService.js';
-import { GlobalEventService } from '../../../../runtime/backend/services/GlobalEventService.js';
+import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
 import { trackPromise } from '@/misc/promise-tracker.js';
-import { ChannelMutingService } from '../../../../channels/backend/services/ChannelMutingService.js';
+import { ChannelMutingService } from '@features/channels/backend/services/ChannelMutingService.js';
 import { ApiError } from '@/server/api/error.js';
 
 const contractProjection = projectEndpointContract(packedAntennasNotesDefinition);

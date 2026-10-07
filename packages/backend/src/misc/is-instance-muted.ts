@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { MiNote } from '../../../features/notes/backend/models/Note.js';
-import type { Packed } from '../../../features/index/contract/packed.js';
+import { MiNote } from '@features/notes/backend/models/Note.js';
+import type { Packed } from '@features/index/contract/packed.js';
 
 export function isInstanceMuted(note: Packed<'Note'> | MiNote, mutedInstances: Set<string>): boolean {
 	if (mutedInstances.has(note.user?.host ?? '')) return true;

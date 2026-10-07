@@ -21,7 +21,7 @@ import { getRequireWhenAllNullishRegistration } from '../contract/require-when-a
 import { assertRequireWhenAllNullishPlacement } from './require-when-all-nullish-projection.js';
 
 import { isMuteWordInputItem } from '../contract/mute-word-input-item.js';
-import { isNotificationReceiveRule } from '../../users/contract/notification-receive-config.js';
+import { isNotificationReceiveRule } from '@features/users/contract/notification-receive-config.js';
 import { assertClosedUserInputUnionMetadata } from './legacy-output-one-of-projection.js';
 import { isMisskeyIdOrIds } from '../contract/misskey-id-or-ids.js';
 import { assertMisskeyIdOrIdsMetadata } from './legacy-output-one-of-projection.js';

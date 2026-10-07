@@ -6,11 +6,11 @@
 import { expect, test, vi } from 'vitest';
 import _Ajv from 'ajv';
 import * as v from 'valibot';
-import { allOfAdminEmojiUpdateDefinition } from '../../../../features/emojis/contract/selector-common-endpoint-definitions.js';
-import { allOfNotesSearchByTagDefinition, allOfUsersSearchByUsernameAndHostDefinition } from '../../../../features/discovery/contract/selector-common-endpoint-definitions.js';
-import { allOfUsersFollowersDefinition, allOfUsersFollowingDefinition } from '../../../../features/relationships/contract/selector-common-endpoint-definitions.js';
-import { misskeyIdPattern } from '../../../../features/api/contract/index.js';
-import { defineEndpointContract } from '../../../../features/api/contract/definition.js';
+import { allOfAdminEmojiUpdateDefinition } from '@features/emojis/contract/selector-common-endpoint-definitions.js';
+import { allOfNotesSearchByTagDefinition, allOfUsersSearchByUsernameAndHostDefinition } from '@features/discovery/contract/selector-common-endpoint-definitions.js';
+import { allOfUsersFollowersDefinition, allOfUsersFollowingDefinition } from '@features/relationships/contract/selector-common-endpoint-definitions.js';
+import { misskeyIdPattern } from '@features/api/contract/index.js';
+import { defineEndpointContract } from '@features/api/contract/definition.js';
 import type { Schema } from '@/misc/json-schema.js';
 import type { Config } from '@/config.js';
 import type { IEndpointMeta } from './endpoints.js';

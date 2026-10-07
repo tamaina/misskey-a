@@ -6,8 +6,8 @@
 import { createProcedureClient, implement } from '@orpc/server';
 import type { JsonSchema } from '@valibot/to-json-schema';
 import { statisticsContract, statsResult } from '../contract/index.js';
-import { objectParams } from '../../api/contract/index.js';
-import { toLegacyJsonSchema } from '../../api/backend/index.js';
+import { objectParams } from '@features/api/contract/index.js';
+import { toLegacyJsonSchema } from '@features/api/backend/index.js';
 import type { StatisticsEndpoints } from '../contract/index.js';
 
 export interface StatisticsDependencies {

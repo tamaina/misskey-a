@@ -4,7 +4,7 @@
  */
 
 import type { InferOutput } from 'valibot';
-import type { MiSignin } from '../../auth/backend/models/Signin.js';
+import type { MiSignin } from '@features/auth/backend/models/Signin.js';
 import { Endpoint } from '@/server/api/endpoint-base.js';
 import type { EndpointExecutor } from '@/server/api/endpoint-base.js';
 import { projectEndpointContract } from '@/server/api/contract-endpoint.js';

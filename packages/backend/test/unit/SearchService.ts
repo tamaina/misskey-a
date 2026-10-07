@@ -9,9 +9,9 @@ import type { Index, Meilisearch } from 'meilisearch';
 import { type Config, loadConfig } from '@/config.js';
 import { GlobalModule } from '@/GlobalModule.js';
 import { CoreModule } from '@/core/CoreModule.js';
-import { SearchService } from '../../../features/discovery/backend/services/SearchService.js';
+import { SearchService } from '@features/discovery/backend/services/SearchService.js';
 import { CacheService } from '@/core/CacheService.js';
-import { IdService } from '../../../features/runtime/backend/services/IdService.js';
+import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { DI } from '@/di-symbols.js';
 import {
 	type BlockingsRepository,

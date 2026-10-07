@@ -8,7 +8,7 @@ import { describe, test, beforeAll } from 'vitest';
 import { Test } from '@nestjs/testing';
 
 import { CoreModule } from '@/core/CoreModule.js';
-import { ApMfmService } from '../../../features/federation/backend/services/ApMfmService.js';
+import { ApMfmService } from '@features/federation/backend/services/ApMfmService.js';
 import { GlobalModule } from '@/GlobalModule.js';
 
 describe('ApMfmService', () => {

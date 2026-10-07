@@ -8,7 +8,7 @@ import { voidDriveFilesUploadFromUrlDefinition, voidDriveFilesUploadFromUrlInput
 import ms from '@/runtime-dependencies/ms.js';
 import { Injectable } from '@nestjs/common';
 
-import { GlobalEventService } from '../../../../../runtime/backend/services/GlobalEventService.js';
+import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
 import { DriveFileEntityService } from '../../../serializers/DriveFileEntityService.js';
 import { DriveService } from '../../../services/DriveService.js';
 

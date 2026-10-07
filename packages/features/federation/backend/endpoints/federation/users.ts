@@ -9,7 +9,7 @@ import { Inject, Injectable } from '@nestjs/common';
 
 import type { UsersRepository } from '@/models/_.js';
 import { QueryService } from '@/core/QueryService.js';
-import { UserEntityService } from '../../../../users/backend/serializers/UserEntityService.js';
+import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import { DI } from '@/di-symbols.js';
 
 const contractProjection = projectEndpointContract(packedFederationUsersDefinition);

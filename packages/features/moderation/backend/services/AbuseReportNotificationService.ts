@@ -9,7 +9,7 @@ import * as Redis from 'ioredis';
 import sanitizeHtml from '@/runtime-dependencies/sanitize-html.js';
 import { DI } from '@/di-symbols.js';
 import { bindThis } from '@/decorators.js';
-import { GlobalEvents, GlobalEventService } from '../../../runtime/backend/services/GlobalEventService.js';
+import { GlobalEvents, GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
 import type {
 	AbuseReportNotificationRecipientRepository,
 	MiAbuseReportNotificationRecipient,
@@ -18,12 +18,12 @@ import type {
 	MiUser,
 } from '@/models/_.js';
 import { EmailService } from '@/core/EmailService.js';
-import { RoleService } from '../../../roles/backend/services/RoleService.js';
+import { RoleService } from '@features/roles/backend/services/RoleService.js';
 import { RecipientMethod } from '../models/AbuseReportNotificationRecipient.js';
 import { ModerationLogService } from './ModerationLogService.js';
-import { SystemWebhookService } from '../../../integrations/backend/services/SystemWebhookService.js';
-import { UserEntityService } from '../../../users/backend/serializers/UserEntityService.js';
-import { IdService } from '../../../runtime/backend/services/IdService.js';
+import { SystemWebhookService } from '@features/integrations/backend/services/SystemWebhookService.js';
+import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
+import { IdService } from '@features/runtime/backend/services/IdService.js';
 
 @Injectable()
 export class AbuseReportNotificationService implements OnApplicationShutdown {
