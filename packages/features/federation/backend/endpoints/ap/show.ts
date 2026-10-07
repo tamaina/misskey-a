@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
 import { compositionApShowDefinition, compositionApShowInput, compositionApShowOutput } from '../../../contract/output-composition-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
 import ms from '@/runtime-dependencies/ms.js';
@@ -21,7 +21,7 @@ import { UtilityService } from '@/core/UtilityService.js';
 import { bindThis } from '@/decorators.js';
 import { IdentifiableError } from '@/misc/identifiable-error.js';
 import { FetchAllowSoftFailMask } from '../../protocol/misc/check-against-url.js';
-import { ApiError } from '@/server/api/error.js';
+import { ApiError } from '@features/api/backend/transport/error.js';
 
 const contractProjection = projectEndpointContract(compositionApShowDefinition);
 

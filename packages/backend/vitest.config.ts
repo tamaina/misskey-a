@@ -10,7 +10,7 @@ const dependencyAliases = Object.entries(sourcePaths.compilerOptions.paths)
 	.map(([name, [target]]) => ({
 		// Do not turn package subpaths into filesystem paths that bypass exports.
 		find: new RegExp('^' + name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '$'),
-		replacement: target.endsWith('.d.ts')
+		replacement: /\.d\.[cm]?ts$/.test(target)
 			? fileURLToPath(import.meta.resolve(name))
 			: resolve(import.meta.dirname, target),
 	}));

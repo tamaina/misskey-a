@@ -3,14 +3,14 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
 import { voidNotesPollsVoteDefinition, voidNotesPollsVoteInput, voidNotesPollsVoteOutput } from '../../../../contract/void-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
 import type { UsersRepository, PollsRepository, PollVotesRepository } from '@/models/_.js';
 import type { MiRemoteUser } from '@features/users/backend/models/User.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 
-import { GetterService } from '@/server/api/GetterService.js';
+import { GetterService } from '@features/api/backend/transport/GetterService.js';
 import { QueueService } from '@features/runtime/backend/services/QueueService.js';
 import { PollService } from '../../../services/PollService.js';
 import { ApRendererService } from '@features/federation/backend/services/ApRendererService.js';
@@ -18,7 +18,7 @@ import { GlobalEventService } from '@features/runtime/backend/services/GlobalEve
 import { DI } from '@/di-symbols.js';
 import { UserBlockingService } from '@features/relationships/backend/services/UserBlockingService.js';
 import { NoteEntityService } from '../../../serializers/NoteEntityService.js';
-import { ApiError } from '@/server/api/error.js';
+import { ApiError } from '@features/api/backend/transport/error.js';
 
 const contractProjection = projectEndpointContract(voidNotesPollsVoteDefinition);
 

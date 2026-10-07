@@ -6,9 +6,9 @@
 import { relationshipContract } from '../../../contract/commands.js';
 import { relationshipErrors } from '@features/relationships/contract';
 import { legacyRelationshipSchemas } from '@features/relationships/backend';
-import type { Schema } from '@/misc/json-schema.js';
-import { createContractTransportEndpoint } from '@/server/api/contract-transport-endpoint.js';
-import { defineFeatureEndpoint } from '@/server/api/feature-endpoint.js';
+import type { Schema } from '@features/api/backend/utility/json-schema.js';
+import { createContractTransportEndpoint } from '@features/api/backend/transport/contract-transport-endpoint.js';
+import { defineFeatureEndpoint } from '@features/api/backend/transport/feature-endpoint.js';
 
 const featureMeta = {
 	tags: ['account'],

@@ -11,8 +11,8 @@ import { getPackedReference, packedReference } from '@features/api/contract/pack
 import { toLegacyJsonSchema } from '@features/api/backend/index.js';
 import type { Packed } from '@features/index/contract/packed.js';
 import { resultObject } from '@features/api/contract/result-object.js';
-import { ContractEndpoint, projectEndpointContract } from './contract-endpoint.js';
-import { convertSchemaToOpenApiSchema } from './openapi/schemas.js';
+import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
+import { convertSchemaToOpenApiSchema } from '@features/api/backend/transport/openapi/schemas.js';
 
 const definition = defineEndpointContract({ method: 'POST', path: '/test' }, v.looseObject({
 	name: jsonString({ minLength: 2 }),

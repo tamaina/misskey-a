@@ -11,12 +11,12 @@ import { EndpointImplementation, meta, paramDef } from '@features/users/backend/
 import { misskeyIdPattern } from '@features/api/contract/index.js';
 import { defineEndpointContract } from '@features/api/contract/definition.js';
 import type { Config } from '@/config.js';
-import type { Schema } from '@/misc/json-schema.js';
+import type { Schema } from '@features/api/backend/utility/json-schema.js';
 import type { IEndpointMeta } from './endpoints.js';
 import documentedEndpoints from './endpoints.js';
-import { Endpoint } from './endpoint-base.js';
-import { ContractEndpoint, projectEndpointContract } from './contract-endpoint.js';
-import { genOpenapiSpec } from './openapi/gen-spec.js';
+import { Endpoint } from '@features/api/backend/transport/endpoint-base.js';
+import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
+import { genOpenapiSpec } from '@features/api/backend/transport/openapi/gen-spec.js';
 import baseline from '../../../test/fixtures/users-show-contract-baseline.json' with { type: 'json' };
 
 vi.mock('./endpoints.js', () => ({ default: [] }));
@@ -24,7 +24,7 @@ vi.mock('../../../../features/users/backend/serializers/UserEntityService.js', (
 vi.mock('../../../../features/federation/backend/services/RemoteUserResolveService.js', () => ({ RemoteUserResolveService: class {} }));
 vi.mock('../../../../features/roles/backend/services/RoleService.js', () => ({ RoleService: class {} }));
 vi.mock('@features/statistics/backend/charts/per-user-pv.js', () => ({ PerUserPvChart: class {} }));
-vi.mock('@/server/api/ApiLoggerService.js', () => ({ ApiLoggerService: class {} }));
+vi.mock('@features/api/backend/transport/ApiLoggerService.js', () => ({ ApiLoggerService: class {} }));
 const Ajv = _Ajv.default;
 const projection = projectEndpointContract(usersShowDefinition);
 // Captured legacy schema dialects, never request or response payload assertions.

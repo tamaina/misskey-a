@@ -5,7 +5,7 @@
 
 import { expect, test } from 'vitest';
 import { packedSchemas } from '@features/index/contract/packed.js';
-import { getSchemas } from './schemas.js';
+import { getSchemas } from '@features/api/backend/transport/openapi/schemas.js';
 
 const schemas = getSchemas(false);
 

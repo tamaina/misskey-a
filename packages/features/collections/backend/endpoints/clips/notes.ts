@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
 import { packedClipsNotesDefinition, packedClipsNotesInput, packedClipsNotesOutput } from '../../../contract/packed-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
 import { Brackets } from 'typeorm';
@@ -13,7 +13,7 @@ import { QueryService } from '@/core/QueryService.js';
 import { NoteEntityService } from '@features/notes/backend/serializers/NoteEntityService.js';
 import { DI } from '@/di-symbols.js';
 import { sqlLikeEscape } from '@features/persistence/backend/utility/sql-like-escape.js';
-import { ApiError } from '@/server/api/error.js';
+import { ApiError } from '@features/api/backend/transport/error.js';
 
 const contractProjection = projectEndpointContract(packedClipsNotesDefinition);
 

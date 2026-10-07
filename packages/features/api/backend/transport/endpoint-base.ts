@@ -4,13 +4,13 @@
  */
 
 import * as fs from 'node:fs';
-import _Ajv from 'ajv';
+import * as _Ajv from 'ajv';
 import { misskeyIdPattern } from '@features/api/contract';
-import type { Schema } from '@/misc/json-schema.js';
+import type { Schema } from '../utility/json-schema.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 import type { MiAccessToken } from '@features/auth/backend/models/AccessToken.js';
 import { ApiError } from './error.js';
-import type { IEndpointMeta } from './endpoints.js';
+import type { IEndpointMeta } from '@/server/api/endpoints.js';
 
 const Ajv = _Ajv.default;
 

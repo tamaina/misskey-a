@@ -3,13 +3,13 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
 import { compositionUsersListsShowDefinition, compositionUsersListsShowInput, compositionUsersListsShowOutput } from '../../../../contract/output-composition-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
 import type { UserListsRepository, UserListFavoritesRepository } from '@/models/_.js';
 import { UserListEntityService } from '../../../serializers/UserListEntityService.js';
 import { DI } from '@/di-symbols.js';
-import { ApiError } from '@/server/api/error.js';
+import { ApiError } from '@features/api/backend/transport/error.js';
 
 const contractProjection = projectEndpointContract(compositionUsersListsShowDefinition);
 

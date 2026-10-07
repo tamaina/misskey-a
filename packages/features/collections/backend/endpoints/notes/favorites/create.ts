@@ -3,18 +3,18 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
 import { voidNotesFavoritesCreateDefinition, voidNotesFavoritesCreateInput, voidNotesFavoritesCreateOutput } from '../../../../contract/void-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
 import ms from '@/runtime-dependencies/ms.js';
 import type { NoteFavoritesRepository } from '@/models/_.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 
-import { GetterService } from '@/server/api/GetterService.js';
+import { GetterService } from '@features/api/backend/transport/GetterService.js';
 import { DI } from '@/di-symbols.js';
 import { AchievementService } from '@features/users/backend/services/AchievementService.js';
 import { NoteEntityService } from '@features/notes/backend/serializers/NoteEntityService.js';
-import { ApiError } from '@/server/api/error.js';
+import { ApiError } from '@features/api/backend/transport/error.js';
 
 const contractProjection = projectEndpointContract(voidNotesFavoritesCreateDefinition);
 

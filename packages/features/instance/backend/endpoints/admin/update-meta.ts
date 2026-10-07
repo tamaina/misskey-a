@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
 import { constantAdminUpdateMetaDefinition, constantAdminUpdateMetaInput, constantAdminUpdateMetaOutput } from '../../../contract/source-constant-endpoint-definitions.js';
 import { Injectable, Inject } from '@nestjs/common';
 import { DI } from '@/di-symbols.js';

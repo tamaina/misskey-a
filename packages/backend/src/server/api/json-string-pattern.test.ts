@@ -9,8 +9,8 @@ import { jsonString, getJsonStringLegacySchema } from '@features/api/contract/in
 import { jsonObject } from '@features/api/contract/json-object.js';
 import { defineEndpointContract } from '@features/api/contract/definition.js';
 import { pageNameSchema } from '@features/pages/contract/page-name.js';
-import { ContractEndpoint, projectEndpointContract } from './contract-endpoint.js';
-import { Endpoint } from './endpoint-base.js';
+import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
+import { Endpoint } from '@features/api/backend/transport/endpoint-base.js';
 
 const meta = { requireCredential: false } as const;
 

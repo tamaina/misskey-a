@@ -3,13 +3,13 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
 import { inlineNotesShowPartialBulkDefinition, inlineNotesShowPartialBulkInput, inlineNotesShowPartialBulkOutput } from '../../../contract/endpoint-definitions.js';
 import { Injectable } from '@nestjs/common';
 
 import { NoteEntityService } from '../../serializers/NoteEntityService.js';
-import { GetterService } from '@/server/api/GetterService.js';
-import { ApiError } from '@/server/api/error.js';
+import { GetterService } from '@features/api/backend/transport/GetterService.js';
+import { ApiError } from '@features/api/backend/transport/error.js';
 
 const contractProjection = projectEndpointContract(inlineNotesShowPartialBulkDefinition);
 

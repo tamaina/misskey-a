@@ -4,7 +4,7 @@
  */
 
 import type * as v from 'valibot';
-import type { ContractEndpointInput } from '../../src/server/api/contract-endpoint.js';
+import type { ContractEndpointInput } from '@features/api/backend/transport/contract-endpoint.js';
 import type { allOfAdminEmojiUpdateInput } from '@features/emojis/contract/selector-common-endpoint-definitions.js';
 import type { allOfNotesSearchByTagInput, allOfUsersSearchByUsernameAndHostInput } from '@features/discovery/contract/selector-common-endpoint-definitions.js';
 import type { allOfUsersFollowersInput, allOfUsersFollowingInput } from '@features/relationships/contract/selector-common-endpoint-definitions.js';

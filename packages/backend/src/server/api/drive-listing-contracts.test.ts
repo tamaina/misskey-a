@@ -7,9 +7,9 @@ import { expect, expectTypeOf, test } from 'vitest';
 import * as v from 'valibot';
 import { listingAdminDriveFilesDefinition, listingDriveFilesDefinition, listingDriveStreamDefinition } from '@features/drive/contract/drive-listing-endpoint-definitions.js';
 import type { Packed } from '@features/index/contract/packed.js';
-import { ContractEndpoint, projectEndpointContract } from './contract-endpoint.js';
-import { Endpoint } from './endpoint-base.js';
-import { convertSchemaToOpenApiSchema } from './openapi/schemas.js';
+import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
+import { Endpoint } from '@features/api/backend/transport/endpoint-base.js';
+import { convertSchemaToOpenApiSchema } from '@features/api/backend/transport/openapi/schemas.js';
 
 const legacyDriveStreamInput = {
 	type: 'object',

@@ -10,7 +10,7 @@ import type { packedEmojiSimpleSchema, packedEmojiDetailedSchema } from '@featur
 import { expect, expectTypeOf, test, vi } from 'vitest';
 import type { InstanceFeature } from '@features/instance/backend';
 import type { StatisticsFeature } from '@features/statistics/backend';
-import { defineFeatureEndpoint } from './feature-endpoint.js';
+import { defineFeatureEndpoint } from '@features/api/backend/transport/feature-endpoint.js';
 
 test('feature binding preserves the typed factory without constructing a handler', () => {
 	const factory = vi.fn((statistics: StatisticsFeature) => ({ exec: statistics.stats }));

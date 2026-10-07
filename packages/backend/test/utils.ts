@@ -19,7 +19,7 @@ import { loadConfig } from '@/config.js';
 import type * as misskey from 'misskey-js';
 import { DEFAULT_POLICIES } from '@features/roles/backend/services/RoleService.js';
 import { validateContentTypeSetAsActivityPub } from '@features/federation/backend/protocol/misc/validator.js';
-import { ApiError } from '@/server/api/error.js';
+import { ApiError } from '@features/api/backend/transport/error.js';
 
 export { server as startServer, jobQueue as startJobQueue } from '@/boot/common.js';
 

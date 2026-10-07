@@ -17,7 +17,7 @@ import { GlobalModule } from '@/GlobalModule.js';
 import { DI } from '@/di-symbols.js';
 import { CoreModule } from '@/core/CoreModule.js';
 import { SigninWithPasskeyApiService } from '@features/auth/backend/transport/SigninWithPasskeyApiService.js';
-import { RateLimiterService } from '@/server/api/RateLimiterService.js';
+import { RateLimiterService } from '@features/api/backend/transport/RateLimiterService.js';
 import { WebAuthnService } from '@features/auth/backend/services/WebAuthnService.js';
 import { SigninService } from '@features/auth/backend/transport/SigninService.js';
 import { IdentifiableError } from '@/misc/identifiable-error.js';

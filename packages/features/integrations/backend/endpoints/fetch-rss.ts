@@ -3,13 +3,13 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
 import { inlineFetchRssDefinition, inlineFetchRssInput, inlineFetchRssOutput } from '../../contract/endpoint-definitions.js';
 import Parser from 'rss-parser';
 import { Injectable } from '@nestjs/common';
 
 import { HttpRequestService } from '@features/runtime/backend/services/HttpRequestService.js';
-import { ApiError } from '@/server/api/error.js';
+import { ApiError } from '@features/api/backend/transport/error.js';
 
 const MAX_URL_LENGTH = 8192;
 const MAX_RESPONSE_SIZE = 1024 * 1024;

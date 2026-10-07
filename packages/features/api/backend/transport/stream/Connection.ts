@@ -20,7 +20,7 @@ import { bindThis } from '@/decorators.js';
 import { NotificationService } from '@features/notifications/backend/services/NotificationService.js';
 import type { MiAccessToken } from '@features/auth/backend/models/AccessToken.js';
 import type { MiUser } from '@features/users/backend/models/User.js';
-import { MainChannel } from '@/server/api/stream/channels/main.js';
+import { MainChannel } from './channels/main.js';
 import { HomeTimelineChannel } from '@features/timelines/backend/stream/home-timeline.js';
 import { LocalTimelineChannel } from '@features/timelines/backend/stream/local-timeline.js';
 import { HybridTimelineChannel } from '@features/timelines/backend/stream/hybrid-timeline.js';
@@ -40,7 +40,7 @@ import { ReversiChannel } from '@features/games/backend/stream/reversi.js';
 import { ReversiGameChannel } from '@features/games/backend/stream/reversi-game.js';
 import type { ChannelRequest } from './channel.js';
 import type { ChannelConstructor } from './channel.js';
-import type Channel from './channel.js';
+import type { Channel } from './channel.js';
 import type { EventEmitter } from 'events';
 
 const MAX_CHANNELS_PER_CONNECTION = 32;
@@ -425,3 +425,5 @@ export interface ConnectionRequest {
 	user: MiUser | null | undefined,
 	token: MiAccessToken | null | undefined,
 }
+
+export { Connection };

@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
 import { packedAntennasNotesDefinition, packedAntennasNotesInput, packedAntennasNotesOutput } from '../../../contract/packed-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
 import * as Redis from 'ioredis';
@@ -18,7 +18,7 @@ import { FanoutTimelineService } from '../../services/FanoutTimelineService.js';
 import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
 import { trackPromise } from '@/misc/promise-tracker.js';
 import { ChannelMutingService } from '@features/channels/backend/services/ChannelMutingService.js';
-import { ApiError } from '@/server/api/error.js';
+import { ApiError } from '@features/api/backend/transport/error.js';
 
 const contractProjection = projectEndpointContract(packedAntennasNotesDefinition);
 

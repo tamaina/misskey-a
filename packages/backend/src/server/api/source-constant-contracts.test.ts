@@ -6,7 +6,7 @@
 import { expect, expectTypeOf, test, vi } from 'vitest';
 import * as v from 'valibot';
 import type { Config } from '@/config.js';
-import type { Schema } from '@/misc/json-schema.js';
+import type { Schema } from '@features/api/backend/utility/json-schema.js';
 import frozen from '../../../test/fixtures/source-constant-contract-baseline.json' with { type: 'json' };
 import { constantAdminQueueShowJobLogsDefinition, constantAdminQueueShowJobLogsInput, sourceConstantEndpointDefinitions as operationsDefinitions } from '@features/operations/contract/source-constant-endpoint-definitions.js';
 import { constantIWebhooksCreateDefinition, constantIWebhooksCreateInput, constantIWebhooksCreateOutput, constantIWebhooksTestDefinition, constantIWebhooksTestInput, sourceConstantEndpointDefinitions as integrationsDefinitions } from '@features/integrations/contract/source-constant-endpoint-definitions.js';
@@ -19,13 +19,13 @@ import type { SourceConstantEndpoints as UsersEndpoints } from '@features/users/
 import { QUEUE_TYPES } from '@features/runtime/shared/queue-types.js';
 import { webhookEventTypes } from '@features/integrations/contract/index.js';
 import { packedAchievementNameSchema } from '@features/users/contract/packed.js';
-import { ContractEndpoint, projectEndpointContract } from './contract-endpoint.js';
-import { Endpoint } from './endpoint-base.js';
-import { ApiError } from './error.js';
+import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
+import { Endpoint } from '@features/api/backend/transport/endpoint-base.js';
+import { ApiError } from '@features/api/backend/transport/error.js';
 import documentedEndpoints from './endpoints.js';
 import type { IEndpointMeta } from './endpoints.js';
-import { genOpenapiSpec } from './openapi/gen-spec.js';
-import { convertSchemaToOpenApiSchema } from './openapi/schemas.js';
+import { genOpenapiSpec } from '@features/api/backend/transport/openapi/gen-spec.js';
+import { convertSchemaToOpenApiSchema } from '@features/api/backend/transport/openapi/schemas.js';
 
 // Exercise the real writer without importing Nest handlers or unrelated runtime services.
 vi.mock('./endpoints.js', () => ({ default: [] }));

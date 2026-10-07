@@ -3,13 +3,13 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
 import { voidFederationUpdateRemoteUserDefinition, voidFederationUpdateRemoteUserInput, voidFederationUpdateRemoteUserOutput } from '../../../contract/void-endpoint-definitions.js';
 import { Injectable } from '@nestjs/common';
 import ms from '@/runtime-dependencies/ms.js';
 
 import { ApPersonService } from '../../services/ApPersonService.js';
-import { GetterService } from '@/server/api/GetterService.js';
+import { GetterService } from '@features/api/backend/transport/GetterService.js';
 
 const contractProjection = projectEndpointContract(voidFederationUpdateRemoteUserDefinition);
 

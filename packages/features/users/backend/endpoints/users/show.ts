@@ -7,15 +7,15 @@ import { In, IsNull } from 'typeorm';
 import { Inject, Injectable } from '@nestjs/common';
 import type { MiMeta, UsersRepository } from '@/models/_.js';
 import type { MiUser } from '../../models/User.js';
-import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
 import { usersShowDefinition } from '../../../contract/show-endpoint-definition.js';
 import { UserEntityService } from '../../serializers/UserEntityService.js';
 import { RemoteUserResolveService } from '@features/federation/backend/services/RemoteUserResolveService.js';
 import { DI } from '@/di-symbols.js';
 import { PerUserPvChart } from '@features/statistics/backend/charts/per-user-pv.js';
 import { RoleService } from '@features/roles/backend/services/RoleService.js';
-import { ApiError } from '@/server/api/error.js';
-import { ApiLoggerService } from '@/server/api/ApiLoggerService.js';
+import { ApiError } from '@features/api/backend/transport/error.js';
+import { ApiLoggerService } from '@features/api/backend/transport/ApiLoggerService.js';
 import type { FindOptionsWhere } from 'typeorm';
 
 const projection = projectEndpointContract(usersShowDefinition);

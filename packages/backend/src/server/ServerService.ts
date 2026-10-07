@@ -24,13 +24,13 @@ import { bindThis } from '@/decorators.js';
 import { envOption } from '@/env.js';
 import { ActivityPubServerService } from './ActivityPubServerService.js';
 import { NodeinfoServerService } from './NodeinfoServerService.js';
-import { ApiServerService } from './api/ApiServerService.js';
-import { StreamingApiServerService } from './api/StreamingApiServerService.js';
+import { ApiServerService } from '@features/api/backend/transport/ApiServerService.js';
+import { StreamingApiServerService } from '@features/api/backend/transport/StreamingApiServerService.js';
 import { WellKnownServerService } from './WellKnownServerService.js';
 import { FileServerService } from './FileServerService.js';
 import { HealthServerService } from './HealthServerService.js';
 import { ClientServerService } from './web/ClientServerService.js';
-import { OpenApiServerService } from './api/openapi/OpenApiServerService.js';
+import { OpenApiServerService } from '@features/api/backend/transport/openapi/OpenApiServerService.js';
 import { OAuth2ProviderService } from '@features/auth/backend/oauth/OAuth2ProviderService.js';
 import { registerHttpAccessLog } from './http-access-log.js';
 

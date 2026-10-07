@@ -4,7 +4,7 @@
  */
 
 import Ajv from 'ajv';
-import { Schema } from '@/misc/json-schema.js';
+import { Schema } from '@features/api/backend/utility/json-schema.js';
 
 export const getValidator = (paramDef: Schema) => {
 	const ajv = new Ajv.default({

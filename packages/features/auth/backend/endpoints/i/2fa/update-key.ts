@@ -5,13 +5,13 @@
 
 import bcrypt from 'bcryptjs';
 import { Inject, Injectable } from '@nestjs/common';
-import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
 import { emptyObjectI2faUpdateKeyDefinition, emptyObjectI2faUpdateKeyInput, emptyObjectI2faUpdateKeyOutput } from '../../../../contract/empty-object-key-endpoint-definitions.js';
 import type { UserSecurityKeysRepository } from '@/models/_.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
 import { DI } from '@/di-symbols.js';
-import { ApiError } from '@/server/api/error.js';
+import { ApiError } from '@features/api/backend/transport/error.js';
 
 const contractProjection = projectEndpointContract(emptyObjectI2faUpdateKeyDefinition);
 

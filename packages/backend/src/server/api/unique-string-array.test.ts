@@ -9,8 +9,8 @@ import * as v from 'valibot';
 import { defineEndpointContract } from '@features/api/contract/definition.js';
 import { jsonString, misskeyId, misskeyIdPattern, objectParams, uniqueStringArray } from '@features/api/contract/index.js';
 import { toLegacyJsonSchema } from '@features/api/backend/index.js';
-import { ContractEndpoint, projectEndpointContract } from './contract-endpoint.js';
-import { convertSchemaToOpenApiSchema } from './openapi/schemas.js';
+import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
+import { convertSchemaToOpenApiSchema } from '@features/api/backend/transport/openapi/schemas.js';
 
 const Ajv = _Ajv.default;
 

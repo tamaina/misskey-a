@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
 import { packedBlockingCreateDefinition, packedBlockingCreateInput, packedBlockingCreateOutput } from '../../../contract/packed-endpoint-definitions.js';
 import ms from '@/runtime-dependencies/ms.js';
 import { Inject, Injectable } from '@nestjs/common';
@@ -12,8 +12,8 @@ import type { UsersRepository, BlockingsRepository } from '@/models/_.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import { UserBlockingService } from '../../services/UserBlockingService.js';
 import { DI } from '@/di-symbols.js';
-import { GetterService } from '@/server/api/GetterService.js';
-import { ApiError } from '@/server/api/error.js';
+import { GetterService } from '@features/api/backend/transport/GetterService.js';
+import { ApiError } from '@features/api/backend/transport/error.js';
 
 const contractProjection = projectEndpointContract(packedBlockingCreateDefinition);
 

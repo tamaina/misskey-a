@@ -16,9 +16,9 @@ import { EndpointImplementation as Upload, meta as uploadMeta, paramDef } from '
 import { EndpointImplementation as LegacyUpload, meta as legacyMeta, paramDef as legacyParams } from '../../../test/fixtures/multipart-drive-create-original.js';
 import { IdentifiableError } from '@/misc/identifiable-error.js';
 import type { Config } from '@/config.js';
-import { Endpoint } from './endpoint-base.js';
-import { ContractEndpoint, projectEndpointContract } from './contract-endpoint.js';
-import { genOpenapiSpec } from './openapi/gen-spec.js';
+import { Endpoint } from '@features/api/backend/transport/endpoint-base.js';
+import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
+import { genOpenapiSpec } from '@features/api/backend/transport/openapi/gen-spec.js';
 import documentedEndpoints from './endpoints.js';
 
 vi.mock('./endpoints.js', () => ({ default: [] }));

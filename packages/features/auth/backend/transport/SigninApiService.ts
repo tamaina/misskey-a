@@ -26,7 +26,7 @@ import { UserAuthService } from '@features/auth/backend/services/UserAuthService
 import { CaptchaService } from '@features/auth/backend/services/CaptchaService.js';
 import { LoggerService } from '@features/runtime/backend/services/LoggerService.js';
 import { FastifyReplyError } from '@/misc/fastify-reply-error.js';
-import { RateLimiterService } from '@/server/api/RateLimiterService.js';
+import { RateLimiterService } from '@features/api/backend/transport/RateLimiterService.js';
 import { SigninService } from './SigninService.js';
 import type { AuthenticationResponseJSON } from '@simplewebauthn/server';
 import type { FastifyReply, FastifyRequest } from 'fastify';

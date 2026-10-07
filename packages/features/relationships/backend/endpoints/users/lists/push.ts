@@ -6,9 +6,9 @@
 import { listContract } from '../../../../contract/lists.js';
 import { listErrors } from '@features/relationships/contract';
 import { legacyListSchemas } from '@features/relationships/backend';
-import type { Schema } from '@/misc/json-schema.js';
-import { createContractTransportEndpoint } from '@/server/api/contract-transport-endpoint.js';
-import { defineFeatureEndpoint } from '@/server/api/feature-endpoint.js';
+import type { Schema } from '@features/api/backend/utility/json-schema.js';
+import { createContractTransportEndpoint } from '@features/api/backend/transport/contract-transport-endpoint.js';
+import { defineFeatureEndpoint } from '@features/api/backend/transport/feature-endpoint.js';
 import ms from '@/runtime-dependencies/ms.js';
 
 export const meta = {

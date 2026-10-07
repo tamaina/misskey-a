@@ -6,7 +6,7 @@
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 import { HttpRequestService } from '@features/runtime/backend/services/HttpRequestService.js';
 import { FetchRssEndpoint, meta } from '@features/integrations/backend/endpoints/fetch-rss.js';
-import { ApiError } from '@/server/api/error.js';
+import { ApiError } from '@features/api/backend/transport/error.js';
 import type { Mocked } from 'vitest';
 import type { Response } from 'node-fetch';
 

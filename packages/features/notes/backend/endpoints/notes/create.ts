@@ -6,12 +6,12 @@
 import ms from '@/runtime-dependencies/ms.js';
 import { In } from 'typeorm';
 import { Inject, Injectable } from '@nestjs/common';
-import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
 import { notesCreateDefinition } from '../../../contract/create-endpoint-definition.js';
 import { NoteEntityService } from '../../serializers/NoteEntityService.js';
 import { NoteCreateService } from '../../services/NoteCreateService.js';
 import { IdentifiableError } from '@/misc/identifiable-error.js';
-import { ApiError } from '@/server/api/error.js';
+import { ApiError } from '@features/api/backend/transport/error.js';
 
 const contractProjection = projectEndpointContract(notesCreateDefinition);
 

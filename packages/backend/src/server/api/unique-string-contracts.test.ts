@@ -10,8 +10,8 @@ import { uniqueStringEndpointDefinitions as authDefinitions } from '@features/au
 import { uniqueStringEndpointDefinitions as driveDefinitions } from '@features/drive/contract/unique-string-endpoint-definitions.js';
 import { uniqueStringEndpointDefinitions as galleryDefinitions } from '@features/gallery/contract/unique-string-endpoint-definitions.js';
 import { misskeyIdPattern } from '@features/api/contract/index.js';
-import { projectEndpointContract } from './contract-endpoint.js';
-import { convertSchemaToOpenApiSchema } from './openapi/schemas.js';
+import { projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
+import { convertSchemaToOpenApiSchema } from '@features/api/backend/transport/openapi/schemas.js';
 
 const Ajv = _Ajv.default;
 const definitions = { ...authDefinitions, ...driveDefinitions, ...galleryDefinitions };

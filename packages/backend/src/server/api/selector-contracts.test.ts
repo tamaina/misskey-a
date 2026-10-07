@@ -11,14 +11,14 @@ import { selectorIRevokeTokenDefinition, selectorIRevokeTokenInput } from '@feat
 import { selectorPagesShowDefinition, selectorPagesShowInput } from '@features/pages/contract/selector-endpoint-definitions.js';
 import { defineEndpointContract } from '@features/api/contract/definition.js';
 import { misskeyIdPattern } from '@features/api/contract/index.js';
-import type { Schema } from '@/misc/json-schema.js';
+import type { Schema } from '@features/api/backend/utility/json-schema.js';
 import type { Config } from '@/config.js';
 import type { IEndpointMeta } from './endpoints.js';
 import documentedEndpoints from './endpoints.js';
-import { Endpoint } from './endpoint-base.js';
-import { ContractEndpoint, projectEndpointContract } from './contract-endpoint.js';
-import { convertSchemaToOpenApiSchema } from './openapi/schemas.js';
-import { genOpenapiSpec } from './openapi/gen-spec.js';
+import { Endpoint } from '@features/api/backend/transport/endpoint-base.js';
+import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
+import { convertSchemaToOpenApiSchema } from '@features/api/backend/transport/openapi/schemas.js';
+import { genOpenapiSpec } from '@features/api/backend/transport/openapi/gen-spec.js';
 import baseline from '../../../test/fixtures/selector-contract-baseline.json' with { type: 'json' };
 
 vi.mock('./endpoints.js', () => ({ default: [] }));

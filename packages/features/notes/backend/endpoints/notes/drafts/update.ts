@@ -5,12 +5,12 @@
 
 import { Injectable } from '@nestjs/common';
 import ms from '@/runtime-dependencies/ms.js';
-import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
 import { notesDraftsUpdateDefinition } from '../../../../contract/draft-endpoint-definitions.js';
 import { NoteDraftService } from '../../../services/NoteDraftService.js';
 import { NoteDraftEntityService } from '../../../serializers/NoteDraftEntityService.js';
 import { IdentifiableError } from '@/misc/identifiable-error.js';
-import { ApiError } from '@/server/api/error.js';
+import { ApiError } from '@features/api/backend/transport/error.js';
 
 const contractProjection = projectEndpointContract(notesDraftsUpdateDefinition);
 

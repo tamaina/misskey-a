@@ -11,7 +11,7 @@ import { isChannelRelated } from '@/misc/is-channel-related.js';
 import type { Awaitable } from '@/types.js';
 import type { Packed } from '@features/index/contract/packed.js';
 import type { JsonObject, JsonValue } from '@/misc/json-value.js';
-import type Connection from './Connection.js';
+import type { Connection } from './Connection.js';
 
 /**
  * Stream channel
@@ -167,3 +167,5 @@ export interface ChannelConstructor<T extends boolean> {
 	requireCredential: T;
 	kind: T extends true ? string : string | null | undefined;
 }
+
+export { Channel };

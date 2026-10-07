@@ -7,11 +7,11 @@ import { Inject, Injectable, Scope } from '@nestjs/common';
 import { normalizeForSearch } from '@/misc/normalize-for-search.js';
 import type { Packed } from '@features/index/contract/packed.js';
 import { NoteEntityService } from '@features/notes/backend/serializers/NoteEntityService.js';
-import { NoteStreamingHidingService } from '@/server/api/stream/NoteStreamingHidingService.js';
+import { NoteStreamingHidingService } from '@features/api/backend/transport/stream/NoteStreamingHidingService.js';
 import { bindThis } from '@/decorators.js';
 import { isRenotePacked, isQuotePacked } from '@/misc/is-renote.js';
 import type { JsonObject } from '@/misc/json-value.js';
-import Channel, { type ChannelRequest } from '@/server/api/stream/channel.js';
+import Channel, { type ChannelRequest } from '@features/api/backend/transport/stream/channel.js';
 import { REQUEST } from '@nestjs/core';
 @Injectable({ scope: Scope.TRANSIENT })
 export class HashtagChannel extends Channel {

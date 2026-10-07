@@ -17,12 +17,12 @@ import { EndpointImplementation as DeliverDelayedEndpoint, meta as deliverMeta }
 import { EndpointImplementation as InboxDelayedEndpoint, meta as inboxMeta } from '@features/operations/backend/endpoints/admin/queue/inbox-delayed.js';
 import { delayedTupleEndpointDefinitions as definitions, delayedTupleAdminQueueDeliverDelayedOutput, delayedTupleAdminQueueInboxDelayedOutput } from '@features/operations/contract/delayed-tuple-endpoint-definitions.js';
 import type { DelayedTupleEndpoints } from '@features/operations/contract/delayed-tuple-endpoint-definitions.js';
-import { Endpoint } from './endpoint-base.js';
-import { ContractEndpoint, projectEndpointContract } from './contract-endpoint.js';
-import { convertSchemaToOpenApiSchema } from './openapi/schemas.js';
-import { genOpenapiSpec } from './openapi/gen-spec.js';
+import { Endpoint } from '@features/api/backend/transport/endpoint-base.js';
+import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
+import { convertSchemaToOpenApiSchema } from '@features/api/backend/transport/openapi/schemas.js';
+import { genOpenapiSpec } from '@features/api/backend/transport/openapi/gen-spec.js';
 import type { Config } from '@/config.js';
-import type { Schema } from '@/misc/json-schema.js';
+import type { Schema } from '@features/api/backend/utility/json-schema.js';
 import type { IEndpointMeta } from './endpoints.js';
 import documentedEndpoints from './endpoints.js';
 import baseline from '../../../test/fixtures/delayed-tuple-contract-baseline.json' with { type: 'json' };

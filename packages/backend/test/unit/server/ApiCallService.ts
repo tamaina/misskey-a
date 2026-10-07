@@ -4,7 +4,7 @@
  */
 
 import { describe, expect, test, vi } from 'vitest';
-import { ApiCallService } from '@/server/api/ApiCallService.js';
+import { ApiCallService } from '@features/api/backend/transport/ApiCallService.js';
 import { Logger } from '@features/runtime/backend/logging/logger.js';
 import { envOption } from '@/env.js';
 import { logManager } from '@features/runtime/backend/logging/logging-runtime.js';

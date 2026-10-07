@@ -11,8 +11,8 @@ import type { MiAccessToken } from '@features/auth/backend/models/AccessToken.js
 import { channelContract, channelInputs } from '@features/channels/contract/index.js';
 import { clipFavoriteContract, clipFavoriteInputs } from '@features/collections/contract/index.js';
 import { portabilityContract } from '@features/portability/contract/index.js';
-import { createContractTransportEndpoint } from '../../src/server/api/contract-transport-endpoint.js';
-import type { EndpointExecutor } from '../../src/server/api/endpoint-base.js';
+import { createContractTransportEndpoint } from '@features/api/backend/transport/contract-transport-endpoint.js';
+import type { EndpointExecutor } from '@features/api/backend/transport/endpoint-base.js';
 import type { createEndpoint as createFollow } from '@features/channels/backend/endpoints/channels/follow.js';
 import type { createEndpoint as createFavorite } from '@features/collections/backend/endpoints/clips/favorite.js';
 

@@ -4,7 +4,7 @@
  */
 
 import { Injectable } from '@nestjs/common';
-import { projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
 import { packedAdminRolesCreateDefinition } from '../../../../contract/packed-endpoint-definitions.js';
 import { LegacyRoleCreateConsumerEndpoint } from '../../../legacy-role-consumer-endpoint.js';
 import { RoleEntityService } from '../../../serializers/RoleEntityService.js';

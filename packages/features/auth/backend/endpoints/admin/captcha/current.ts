@@ -4,7 +4,7 @@
  */
 
 import { Injectable } from '@nestjs/common';
-import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
 import { emptyAdminCaptchaCurrentDefinition, emptyAdminCaptchaCurrentInput, emptyAdminCaptchaCurrentOutput } from '../../../../contract/empty-input-endpoint-definitions.js';
 import { CaptchaService } from '../../../services/CaptchaService.js';
 

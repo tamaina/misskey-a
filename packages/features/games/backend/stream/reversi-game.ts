@@ -10,7 +10,7 @@ import { ReversiService } from '../services/ReversiService.js';
 import { ReversiGameEntityService } from '../serializers/ReversiGameEntityService.js';
 import { isJsonObject } from '@/misc/json-value.js';
 import type { JsonObject, JsonValue } from '@/misc/json-value.js';
-import Channel, { type ChannelRequest } from '@/server/api/stream/channel.js';
+import Channel, { type ChannelRequest } from '@features/api/backend/transport/stream/channel.js';
 import { reversiUpdateKeys } from 'misskey-js';
 import { REQUEST } from '@nestjs/core';
 

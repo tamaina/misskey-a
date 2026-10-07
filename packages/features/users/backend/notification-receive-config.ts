@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import type { Schema } from '@/misc/json-schema.js';
+import type { Schema } from '@features/api/backend/utility/json-schema.js';
 import { toLegacyJsonSchema } from '@features/api/backend/index.js';
 import { notificationReceiveRule } from '../contract/notification-receive-config.js';
 

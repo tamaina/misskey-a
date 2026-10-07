@@ -3,13 +3,13 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
 import { allOfAdminEmojiUpdateDefinition, allOfAdminEmojiUpdateInput, allOfAdminEmojiUpdateOutput } from '../../../../contract/selector-common-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
 import { CustomEmojiService } from '../../../services/CustomEmojiService.js';
 import type { DriveFilesRepository, MiEmoji } from '@/models/_.js';
 import { DI } from '@/di-symbols.js';
-import { ApiError } from '@/server/api/error.js';
+import { ApiError } from '@features/api/backend/transport/error.js';
 
 const contractProjection = projectEndpointContract(allOfAdminEmojiUpdateDefinition);
 

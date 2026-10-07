@@ -13,7 +13,7 @@ import type { InstancesRepository, AccessTokensRepository } from '@/models/_.js'
 import { DI } from '@/di-symbols.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import { bindThis } from '@/decorators.js';
-import endpoints from './endpoints.js';
+import endpoints from '@/server/api/endpoints.js';
 import { ApiCallService } from './ApiCallService.js';
 import { SignupApiService } from '@features/auth/backend/transport/SignupApiService.js';
 import { SigninApiService } from '@features/auth/backend/transport/SigninApiService.js';

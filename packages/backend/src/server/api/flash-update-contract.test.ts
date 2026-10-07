@@ -10,8 +10,8 @@ import type { MiFlash } from '@features/play/backend/models/Flash.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 import { EndpointImplementation, meta } from '@features/play/backend/endpoints/flash/update.js';
 import { voidFlashUpdateDefinition, voidFlashUpdateInput } from '@features/play/contract/void-endpoint-definitions.js';
-import { ContractEndpoint, projectEndpointContract } from './contract-endpoint.js';
-import { Endpoint } from './endpoint-base.js';
+import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
+import { Endpoint } from '@features/api/backend/transport/endpoint-base.js';
 
 function setup() {
 	const flash = mockDeep<MiFlash>({ id: 'flash1', userId: 'user1' });

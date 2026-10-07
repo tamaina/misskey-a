@@ -6,13 +6,13 @@
 import ms from '@/runtime-dependencies/ms.js';
 import { Inject, Injectable } from '@nestjs/common';
 import { IdentifiableError } from '@/misc/identifiable-error.js';
-import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
 import { driveFilesCreateDefinition, driveFilesCreateInput, driveFilesCreateWireInput, driveFilesCreateOutput } from '../../../../contract/create-endpoint-definition.js';
 import { DriveFileEntityService } from '../../../serializers/DriveFileEntityService.js';
 import { DriveService } from '../../../services/DriveService.js';
 import { MiMeta } from '@/models/_.js';
 import { DI } from '@/di-symbols.js';
-import { ApiError } from '@/server/api/error.js';
+import { ApiError } from '@features/api/backend/transport/error.js';
 
 const contractProjection = projectEndpointContract(driveFilesCreateDefinition);
 

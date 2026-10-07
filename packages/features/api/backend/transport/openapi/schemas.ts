@@ -5,7 +5,7 @@
 
 import { deepClone } from '@/misc/clone.js';
 import { toJsonSchemaDefs } from '@valibot/to-json-schema';
-import type { Schema } from '@/misc/json-schema.js';
+import type { Schema } from '../../utility/json-schema.js';
 import { packedSchemas } from '@features/index/contract/packed.js';
 
 export function convertSchemaToOpenApiSchema(schema: Schema, type: 'param' | 'res', includeSelfRef: boolean): any {

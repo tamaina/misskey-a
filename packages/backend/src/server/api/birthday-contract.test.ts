@@ -11,8 +11,8 @@ import { jsonExclusiveObject, getJsonExclusiveObjectSchemaRegistration } from '@
 import { jsonObject } from '@features/api/contract/json-object.js';
 import { jsonNumber } from '@features/api/contract/json-number.js';
 import { toLegacyJsonSchema } from '@features/api/backend/index.js';
-import { projectEndpointContract } from './contract-endpoint.js';
-import { convertSchemaToOpenApiSchema } from './openapi/schemas.js';
+import { projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
+import { convertSchemaToOpenApiSchema } from '@features/api/backend/transport/openapi/schemas.js';
 const Ajv = _Ajv.default;
 const legacy = JSON.parse(fs.readFileSync(new URL('../../../test/fixtures/birthday-contract-baseline.json', import.meta.url), 'utf8'));
 const canonical = (x:unknown) => JSON.parse(JSON.stringify(x));

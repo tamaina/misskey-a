@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
 import { portableINotificationsDefinition, portableINotificationsInput, portableINotificationsOutput } from '../../../contract/portable-constant-endpoint-definitions.js';
 import { In } from 'typeorm';
 import * as Redis from 'ioredis';

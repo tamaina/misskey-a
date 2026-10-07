@@ -4,10 +4,10 @@
  */
 
 import type { InferSchemaOutput } from '@orpc/contract';
-import { Endpoint } from '@/server/api/endpoint-base.js';
-import type { EndpointExecutor } from '@/server/api/endpoint-base.js';
+import { Endpoint } from '@features/api/backend/transport/endpoint-base.js';
+import type { EndpointExecutor } from '@features/api/backend/transport/endpoint-base.js';
 import type { IEndpointMeta } from '@/server/api/endpoints.js';
-import type { projectEndpointContract, LegacyDeclaredInput } from '@/server/api/contract-endpoint.js';
+import type { projectEndpointContract, LegacyDeclaredInput } from '@features/api/backend/transport/contract-endpoint.js';
 import type { inlineI2faKeyDoneInput, inlineI2faKeyDoneOutput } from '../contract/endpoint-definitions.js';
 import type { WebAuthnService } from './services/WebAuthnService.js';
 

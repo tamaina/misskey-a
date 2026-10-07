@@ -32,13 +32,13 @@ for (const mode of ['production', 'e2e']) {
 					resolveId(id) { return id === entry ? entry : undefined; },
 					load(id) {
 						if (id !== entry) return undefined;
-						return "import { verifyChallenge } from 'pkce-challenge'; export async function probe() { return [typeof verifyChallenge, typeof (await import('deep-email-validator')).validate]; }";
+						return "import { verifyChallenge } from 'pkce-challenge'; import { oc } from '@orpc/contract'; import { WebSocket } from 'ws'; import Limiter from 'ratelimiter'; export async function probe() { return [typeof verifyChallenge, typeof (await import('deep-email-validator')).validate, typeof oc, typeof WebSocket, typeof Limiter]; }";
 					},
 				}],
 			});
 			await bundle.write({ ...output, dir: directory, entryFileNames: 'probe.mjs', chunkFileNames: '[name]-[hash].mjs' });
 			const { probe } = await import(pathToFileURL(join(directory, 'probe.mjs')).href);
-			assert.deepEqual(await probe(), ['function', 'function']);
+			assert.deepEqual(await probe(), ['function', 'function', 'object', 'function', 'function']);
 		} finally {
 			await bundle?.close();
 			await rm(directory, { recursive: true, force: true });

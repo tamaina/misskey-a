@@ -12,12 +12,12 @@ import { chartEndpointDefinitions, chartInput, instanceChartInput, userChartInpu
 import type { ChartsEndpoints } from '@features/statistics/contract/chart-endpoint-definitions.js';
 import { chartOutputSchema } from '@features/statistics/contract/chart-output-schema.js';
 import * as descriptors from '@features/statistics/shared/chart-descriptors.js';
-import { Endpoint } from './endpoint-base.js';
-import { projectEndpointContract } from './contract-endpoint.js';
-import { ApiError } from './error.js';
+import { Endpoint } from '@features/api/backend/transport/endpoint-base.js';
+import { projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
+import { ApiError } from '@features/api/backend/transport/error.js';
 import documentedEndpoints from './endpoints.js';
-import { genOpenapiSpec } from './openapi/gen-spec.js';
-import { convertSchemaToOpenApiSchema } from './openapi/schemas.js';
+import { genOpenapiSpec } from '@features/api/backend/transport/openapi/gen-spec.js';
+import { convertSchemaToOpenApiSchema } from '@features/api/backend/transport/openapi/schemas.js';
 import * as endpoint0 from '@features/statistics/backend/endpoints/charts/active-users.js';
 import * as chartEntity0 from '@features/statistics/backend/charts/definitions/active-users.js';
 import * as endpoint1 from '@features/statistics/backend/endpoints/charts/ap-request.js';

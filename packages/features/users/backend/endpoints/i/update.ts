@@ -15,7 +15,7 @@ import type { UsersRepository, DriveFilesRepository, MiMeta, UserProfilesReposit
 import type { MiLocalUser, MiUser } from '../../models/User.js';
 import type { MiUserProfile } from '../../models/UserProfile.js';
 import { normalizeForSearch } from '@/misc/normalize-for-search.js';
-import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
 import { iUpdateDefinition, iUpdateInput, iUpdateOutput } from '../../../contract/user-update-endpoint-definitions.js';
 import { UserEntityService } from '../../serializers/UserEntityService.js';
 import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
@@ -31,8 +31,8 @@ import { DriveFileEntityService } from '@features/drive/backend/serializers/Driv
 import { HttpRequestService } from '@features/runtime/backend/services/HttpRequestService.js';
 import type { Config } from '@/config.js';
 import { AvatarDecorationService } from '@features/avatar-decorations/backend/services/AvatarDecorationService.js';
-import { ApiLoggerService } from '@/server/api/ApiLoggerService.js';
-import { ApiError } from '@/server/api/error.js';
+import { ApiLoggerService } from '@features/api/backend/transport/ApiLoggerService.js';
+import { ApiError } from '@features/api/backend/transport/error.js';
 
 const contractProjection = projectEndpointContract(iUpdateDefinition);
 

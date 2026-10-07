@@ -9,7 +9,7 @@ import { packedSigninSchema } from '@features/auth/contract/packed.js';
 vi.mock('../../../../features/roles/backend/services/RoleService.js', () => ({ RoleService: class {} }));
 vi.mock('../../../../features/roles/backend/serializers/RoleEntityService.js', () => ({ RoleEntityService: class {} }));
 vi.mock('../../../../features/runtime/backend/services/IdService.js', () => ({ IdService: class {} }));
-import { convertSchemaToOpenApiSchema } from '@/server/api/openapi/schemas.js';
+import { convertSchemaToOpenApiSchema } from '@features/api/backend/transport/openapi/schemas.js';
 import { EndpointImplementation as After, meta, paramDef } from '@features/moderation/backend/endpoints/admin/show-user.js';
 import { adminShowUserInput, adminShowUserOutput } from '@features/moderation/contract/admin-user-endpoint-definition.js';
 test('native input and documented output remain distinct from raw producer', () => {

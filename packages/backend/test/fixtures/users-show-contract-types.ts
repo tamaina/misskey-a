@@ -5,7 +5,7 @@
 
 import type * as v from 'valibot';
 import type { Packed } from '@features/index/contract/packed.js';
-import type { ContractEndpointInput } from '../../src/server/api/contract-endpoint.js';
+import type { ContractEndpointInput } from '@features/api/backend/transport/contract-endpoint.js';
 import type { usersShowInput, usersShowOutput, usersShowSelector } from '@features/users/contract/show-endpoint-definition.js';
 
 type Assert<T extends true> = T;

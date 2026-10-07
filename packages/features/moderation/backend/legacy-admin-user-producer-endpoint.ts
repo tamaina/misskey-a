@@ -5,9 +5,9 @@
 
 import type { InferOutput } from 'valibot';
 import type { MiSignin } from '@features/auth/backend/models/Signin.js';
-import { Endpoint } from '@/server/api/endpoint-base.js';
-import type { EndpointExecutor } from '@/server/api/endpoint-base.js';
-import { projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { Endpoint } from '@features/api/backend/transport/endpoint-base.js';
+import type { EndpointExecutor } from '@features/api/backend/transport/endpoint-base.js';
+import { projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
 import { adminShowUserDefinition, adminShowUserInput, adminShowUserOutput } from '../contract/admin-user-endpoint-definition.js';
 
 const projection = projectEndpointContract(adminShowUserDefinition);

@@ -5,9 +5,9 @@
 
 import { moderationCommandsContract } from '../../../contract/index.js';
 import { moderationCommandMeta, legacyModerationCommandSchemas } from '../../index.js';
-import type { Schema } from '@/misc/json-schema.js';
-import { createContractTransportEndpoint } from '@/server/api/contract-transport-endpoint.js';
-import { defineFeatureEndpoint } from '@/server/api/feature-endpoint.js';
+import type { Schema } from '@features/api/backend/utility/json-schema.js';
+import { createContractTransportEndpoint } from '@features/api/backend/transport/contract-transport-endpoint.js';
+import { defineFeatureEndpoint } from '@features/api/backend/transport/feature-endpoint.js';
 
 export const meta = moderationCommandMeta['admin/forward-abuse-user-report'];
 const paramDefFromFeature = legacyModerationCommandSchemas['admin/forward-abuse-user-report'].input;

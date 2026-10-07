@@ -4,7 +4,7 @@
  */
 
 import { Injectable } from '@nestjs/common';
-import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
 import { listAvatarDecorationsDefinition, listAvatarDecorationsInput, listAvatarDecorationsOutput } from '../../../../contract/index.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { AvatarDecorationService } from '../../../services/AvatarDecorationService.js';

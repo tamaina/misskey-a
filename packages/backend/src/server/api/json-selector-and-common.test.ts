@@ -19,7 +19,7 @@ import {
 } from '@features/api/contract/json-selector-and-common.js';
 import { toLegacyJsonSchema } from '@features/api/backend/index.js';
 import { defineEndpointContract } from '@features/api/contract/definition.js';
-import { ContractEndpoint, projectEndpointContract } from './contract-endpoint.js';
+import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
 
 const Ajv = _Ajv.default;
 const first = jsonObject({ userId: misskeyId });

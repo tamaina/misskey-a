@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
 import { voidI2faPasswordLessDefinition, voidI2faPasswordLessInput, voidI2faPasswordLessOutput } from '../../../../contract/void-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
 
@@ -11,7 +11,7 @@ import { UserEntityService } from '@features/users/backend/serializers/UserEntit
 import type { UserProfilesRepository, UserSecurityKeysRepository } from '@/models/_.js';
 import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
 import { DI } from '@/di-symbols.js';
-import { ApiError } from '@/server/api/error.js';
+import { ApiError } from '@features/api/backend/transport/error.js';
 
 const contractProjection = projectEndpointContract(voidI2faPasswordLessDefinition);
 

@@ -16,15 +16,15 @@ import { referenceEndpointDefinitions as operationDefinitions } from '@features/
 import { referenceEndpointDefinitions as roleDefinitions } from '@features/roles/contract/reference-endpoint-definitions.js';
 import { referenceEndpointDefinitions as gameDefinitions } from '@features/games/contract/reference-endpoint-definitions.js';
 import { referenceEndpointDefinitions as userDefinitions } from '@features/users/contract/reference-endpoint-definitions.js';
-import type { Schema } from '@/misc/json-schema.js';
-import { Endpoint } from './endpoint-base.js';
-import { ContractEndpoint, projectEndpointContract } from './contract-endpoint.js';
-import { convertSchemaToOpenApiSchema } from './openapi/schemas.js';
+import type { Schema } from '@features/api/backend/utility/json-schema.js';
+import { Endpoint } from '@features/api/backend/transport/endpoint-base.js';
+import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
+import { convertSchemaToOpenApiSchema } from '@features/api/backend/transport/openapi/schemas.js';
 import baseline from '../../../test/fixtures/reference-contract-baseline.json' with { type: 'json' };
 import type { Config } from '@/config.js';
 import type { IEndpointMeta } from './endpoints.js';
 import documentedEndpoints from './endpoints.js';
-import { genOpenapiSpec } from './openapi/gen-spec.js';
+import { genOpenapiSpec } from '@features/api/backend/transport/openapi/gen-spec.js';
 
 // Run the real writer without importing endpoint handlers or Nest services.
 vi.mock('./endpoints.js', () => ({ default: [] }));

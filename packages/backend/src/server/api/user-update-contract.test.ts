@@ -13,9 +13,9 @@ import { notificationReceiveRule } from '@features/users/contract/notification-r
 import { jsonObject } from '@features/api/contract/json-object.js';
 import { uniqueStringArray } from '@features/api/contract/unique-string-array.js';
 import { toLegacyJsonSchema } from '@features/api/backend/index.js';
-import { projectEndpointContract } from './contract-endpoint.js';
-import { convertSchemaToOpenApiSchema } from './openapi/schemas.js';
-import type { Schema } from '@/misc/json-schema.js';
+import { projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
+import { convertSchemaToOpenApiSchema } from '@features/api/backend/transport/openapi/schemas.js';
+import type { Schema } from '@features/api/backend/utility/json-schema.js';
 import legacy from '../../../test/fixtures/user-update-contract-baseline.json' with { type: 'json' };
 vi.mock('./endpoints.js', () => ({ default: [] }));
 const projection = () => projectEndpointContract(iUpdateDefinition).input;

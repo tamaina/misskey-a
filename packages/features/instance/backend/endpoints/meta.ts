@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
 import { unionMetaDefinition, unionMetaInput, unionMetaOutput } from '../../contract/union-endpoint-definitions.js';
 import { Injectable } from '@nestjs/common';
 import { MetaEntityService } from '../serializers/MetaEntityService.js';

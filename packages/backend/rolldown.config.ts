@@ -116,7 +116,7 @@ export default defineConfig((args) => {
 
 	// Resolve declaration-only aliases before Rolldown applies TypeScript paths.
 	const declarationDependencies = new Map(Object.entries(sourcePaths.compilerOptions.paths)
-		.filter(([name, [target]]) => !name.includes('*') && target.endsWith('.d.ts'))
+		.filter(([name, [target]]) => !name.includes('*') && /\.d\.[cm]?ts$/.test(target))
 		.map(([name]) => [name, fileURLToPath(import.meta.resolve(name))]));
 	const declarationDependencyPlugin: Plugin = {
 		name: 'backend-declaration-dependencies',
@@ -161,7 +161,7 @@ export default defineConfig((args) => {
 				cli: './src/boot/cli.ts',
 				config: './src/config.ts',
 				postgres: './src/postgres.ts',
-				'gen-spec': './src/server/api/openapi/gen-spec.ts',
+				'gen-spec': '../features/api/backend/transport/openapi/gen-spec.ts',
 				...Object.fromEntries([...globSync('../features/*/{backend,shared}/index.ts')].map(file => [
 					file.replace('../', '').replace('/index.ts', ''), file,
 				])),

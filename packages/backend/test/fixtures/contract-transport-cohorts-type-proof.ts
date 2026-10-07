@@ -8,7 +8,7 @@ import type { InferContractRouterOutputs } from '@orpc/contract';
 import type { Endpoints } from '../../../misskey-js/src/api.types.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 import type { MiAccessToken } from '@features/auth/backend/models/AccessToken.js';
-import { createContractTransportEndpoint } from '../../src/server/api/contract-transport-endpoint.js';
+import { createContractTransportEndpoint } from '@features/api/backend/transport/contract-transport-endpoint.js';
 import { moderationCommandsContract } from '@features/moderation/contract/index.js';
 import { announcementCommandsContract } from '@features/announcements/contract/index.js';
 import { avatarDecorationCommandsContract, avatarDecorationsContract } from '@features/avatar-decorations/contract/index.js';

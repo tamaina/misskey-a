@@ -4,7 +4,7 @@
  */
 
 import { permissions } from 'misskey-js';
-import type { Schema } from '@/misc/json-schema.js';
+import type { Schema } from '@features/api/backend/utility/json-schema.js';
 import type { packedRolePoliciesSchema } from '@features/roles/contract/packed.js';
 
 import * as endpointsObject from './endpoint-list.js';

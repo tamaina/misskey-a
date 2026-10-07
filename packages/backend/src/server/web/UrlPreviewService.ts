@@ -15,7 +15,7 @@ import { MemoryKVCache } from '@/misc/cache.js';
 import { LoggerService } from '@features/runtime/backend/services/LoggerService.js';
 import { UtilityService } from '@/core/UtilityService.js';
 import { bindThis } from '@/decorators.js';
-import { ApiError } from '@/server/api/error.js';
+import { ApiError } from '@features/api/backend/transport/error.js';
 import { MiMeta } from '@features/instance/backend/models/Meta.js';
 import type { FastifyRequest, FastifyReply } from 'fastify';
 

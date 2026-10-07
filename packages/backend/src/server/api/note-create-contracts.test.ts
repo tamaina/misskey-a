@@ -15,10 +15,10 @@ import { requireWhenAllNullish } from '@features/api/contract/require-when-all-n
 import { toLegacyJsonSchema } from '@features/api/backend/index.js';
 import { defineEndpointContract } from '@features/api/contract/definition.js';
 import documentedEndpoints from './endpoints.js';
-import { genOpenapiSpec } from './openapi/gen-spec.js';
-import { ContractEndpoint, projectEndpointContract } from './contract-endpoint.js';
-import { Endpoint } from './endpoint-base.js';
-import { convertSchemaToOpenApiSchema } from './openapi/schemas.js';
+import { genOpenapiSpec } from '@features/api/backend/transport/openapi/gen-spec.js';
+import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
+import { Endpoint } from '@features/api/backend/transport/endpoint-base.js';
+import { convertSchemaToOpenApiSchema } from '@features/api/backend/transport/openapi/schemas.js';
 import baseline from '../../../test/fixtures/note-create-contract-baseline.json' with { type: 'json' };
 
 const frozenInput = {

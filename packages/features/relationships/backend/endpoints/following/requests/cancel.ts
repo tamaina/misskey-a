@@ -3,15 +3,15 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
 import { packedFollowingRequestsCancelDefinition, packedFollowingRequestsCancelInput, packedFollowingRequestsCancelOutput } from '../../../../contract/packed-endpoint-definitions.js';
 import { Injectable } from '@nestjs/common';
 
 import { IdentifiableError } from '@/misc/identifiable-error.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
-import { GetterService } from '@/server/api/GetterService.js';
+import { GetterService } from '@features/api/backend/transport/GetterService.js';
 import { UserFollowingService } from '../../../services/UserFollowingService.js';
-import { ApiError } from '@/server/api/error.js';
+import { ApiError } from '@features/api/backend/transport/error.js';
 
 const contractProjection = projectEndpointContract(packedFollowingRequestsCancelDefinition);
 

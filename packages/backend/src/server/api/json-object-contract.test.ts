@@ -9,13 +9,13 @@ import _Ajv from 'ajv';
 import { jsonNumber } from '@features/api/contract/json-number.js';
 import { jsonObject, getJsonObjectGuardRegistration } from '@features/api/contract/json-object.js';
 import { toLegacyJsonSchema as proposed } from '@features/api/backend/index.js';
-import { projectEndpointContract } from './contract-endpoint.js';
+import { projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
 import { getJsonObjectParserRegistration } from '@features/api/contract/json-object.js';
 import { uniqueStringArray } from '@features/api/contract/unique-string-array.js';
 import { objectParams, misskeyId } from '@features/api/contract/index.js';
 import { toLegacyJsonSchema as current } from '@features/api/backend/index.js';
 import { defineEndpointContract } from '@features/api/contract/definition.js';
-import { Endpoint } from './endpoint-base.js';
+import { Endpoint } from '@features/api/backend/transport/endpoint-base.js';
 
 const Ajv = _Ajv.default;
 const proof = test;

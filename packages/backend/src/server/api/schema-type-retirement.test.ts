@@ -19,7 +19,7 @@ function sources(directory: string): string[] {
 }
 
 test('JSON metadata no longer exports a payload type interpreter', () => {
-	const source = readFileSync(new URL('../../misc/json-schema.ts', import.meta.url), 'utf8');
+	const source = readFileSync(new URL('../../../../features/api/backend/utility/json-schema.ts', import.meta.url), 'utf8');
 	expect(source).not.toMatch(/\b(?:SchemaType|SchemaTypeDef|ObjType|ObjectSchemaTypeDef|UnionSchemaType)\b/);
 	expect(source).toContain('export interface Schema');
 	expect(source).toContain('export type Obj = Record<string, Schema>');
@@ -27,7 +27,7 @@ test('JSON metadata no longer exports a payload type interpreter', () => {
 });
 
 test('AJV transport requires explicit payload parameters without schema or broad defaults', () => {
-	const source = readFileSync(new URL('./endpoint-base.ts', import.meta.url), 'utf8');
+	const source = readFileSync(new URL('../../../../features/api/backend/transport/endpoint-base.ts', import.meta.url), 'utf8');
 	const ast = ts.createSourceFile('endpoint-base.ts', source, ts.ScriptTarget.Latest, true);
 	const endpoint = ast.statements.find((node): node is ts.ClassDeclaration => ts.isClassDeclaration(node) && node.name?.text === 'Endpoint');
 	expect(endpoint?.typeParameters?.map(parameter => parameter.name.text)).toEqual(['T', 'Input', 'Output']);
@@ -50,12 +50,12 @@ test('production contracts contain no imports of the retired payload interpreter
 test('production transport construction has native witnesses or named compatibility boundaries', () => {
 	const files = [sources(join(packagesRoot, 'backend/src')), sources(join(packagesRoot, 'features'))].flat();
 	const allowedBases = new Set([
-		join(packagesRoot, 'backend/src/server/api/contract-endpoint.ts'),
+		join(packagesRoot, 'features/api/backend/transport/contract-endpoint.ts'),
 		join(packagesRoot, 'features/roles/backend/legacy-role-consumer-endpoint.ts'),
 		join(packagesRoot, 'features/auth/backend/legacy-webauthn-registration-consumer-endpoint.ts'),
 		join(packagesRoot, 'features/moderation/backend/legacy-admin-user-producer-endpoint.ts'),
 	]);
-	const witness = join(packagesRoot, 'backend/src/server/api/contract-transport-endpoint.ts');
+	const witness = join(packagesRoot, 'features/api/backend/transport/contract-transport-endpoint.ts');
 	for (const file of files) {
 		if (file.endsWith('.test.ts')) continue;
 			const ast = ts.createSourceFile(file, readFileSync(file, 'utf8'), ts.ScriptTarget.Latest, true);

@@ -5,7 +5,7 @@
 
 import bcrypt from 'bcryptjs';
 import { Inject, Injectable } from '@nestjs/common';
-import { projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
 import { inlineI2faKeyDoneDefinition } from '../../../../contract/endpoint-definitions.js';
 import { LegacyWebAuthnRegistrationConsumerEndpoint } from '../../../legacy-webauthn-registration-consumer-endpoint.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
@@ -13,7 +13,7 @@ import { DI } from '@/di-symbols.js';
 import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
 import type { UserProfilesRepository, UserSecurityKeysRepository } from '@/models/_.js';
 import { WebAuthnService } from '../../../services/WebAuthnService.js';
-import { ApiError } from '@/server/api/error.js';
+import { ApiError } from '@features/api/backend/transport/error.js';
 import { UserAuthService } from '../../../services/UserAuthService.js';
 
 const contractProjection = projectEndpointContract(inlineI2faKeyDoneDefinition);

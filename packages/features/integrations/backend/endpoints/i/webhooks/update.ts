@@ -4,11 +4,11 @@
  */
 
 import { webhookContract } from '../../../../contract/index.js';
-import type { Schema } from '@/misc/json-schema.js';
-import { createContractTransportEndpoint } from '@/server/api/contract-transport-endpoint.js';
+import type { Schema } from '@features/api/backend/utility/json-schema.js';
+import { createContractTransportEndpoint } from '@features/api/backend/transport/contract-transport-endpoint.js';
 import { webhookErrors } from '@features/integrations/contract';
 import { legacyWebhookSchemas } from '@features/integrations/backend';
-import { defineFeatureEndpoint } from '@/server/api/feature-endpoint.js';
+import { defineFeatureEndpoint } from '@features/api/backend/transport/feature-endpoint.js';
 
 export const meta = {
 	tags: ['webhooks'],

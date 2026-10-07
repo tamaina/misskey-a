@@ -10,7 +10,7 @@ import type {
 	FollowingsRepository,
 	UserProfilesRepository,
 } from '@/models/_.js';
-import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
 import { birthdayUsersDefinition, birthdayUsersInput, birthdayUsersOutput } from '../../../contract/birthday-endpoint-definitions.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import type * as v from 'valibot';

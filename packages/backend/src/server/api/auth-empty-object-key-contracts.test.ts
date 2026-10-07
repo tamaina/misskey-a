@@ -7,18 +7,18 @@ import { describe, expect, expectTypeOf, test, vi } from 'vitest';
 import * as v from 'valibot';
 import Fastify from 'fastify';
 import type { Config } from '@/config.js';
-import type { Schema } from '@/misc/json-schema.js';
+import type { Schema } from '@features/api/backend/utility/json-schema.js';
 import type { IEndpointMeta } from './endpoints.js';
 import frozen from '../../../test/fixtures/auth-empty-object-key-contract-baseline.json' with { type: 'json' };
 import { emptyObjectKeyEndpointDefinitions as definitions, emptyObjectI2faRemoveKeyInput, emptyObjectI2faRemoveKeyOutput, emptyObjectI2faUpdateKeyInput, emptyObjectI2faUpdateKeyOutput } from '@features/auth/contract/empty-object-key-endpoint-definitions.js';
 import { EndpointImplementation as RemoveEndpoint, meta as removeMeta, paramDef as removeParams } from '@features/auth/backend/endpoints/i/2fa/remove-key.js';
 import { EndpointImplementation as UpdateEndpoint, meta as updateMeta, paramDef as updateParams } from '@features/auth/backend/endpoints/i/2fa/update-key.js';
-import { Endpoint } from './endpoint-base.js';
-import { ContractEndpoint, projectEndpointContract } from './contract-endpoint.js';
-import { ApiError } from './error.js';
-import { ApiCallService } from './ApiCallService.js';
+import { Endpoint } from '@features/api/backend/transport/endpoint-base.js';
+import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
+import { ApiError } from '@features/api/backend/transport/error.js';
+import { ApiCallService } from '@features/api/backend/transport/ApiCallService.js';
 import documentedEndpoints from './endpoints.js';
-import { genOpenapiSpec } from './openapi/gen-spec.js';
+import { genOpenapiSpec } from '@features/api/backend/transport/openapi/gen-spec.js';
 
 vi.mock('./endpoints.js', () => ({ default: [] }));
 vi.mock('bcryptjs', () => ({ default: { compare: vi.fn(async (password: string) => password === 'correct') } }));
@@ -27,8 +27,8 @@ vi.mock('../../../../features/runtime/backend/services/GlobalEventService.js', (
 vi.mock('../../../../features/auth/backend/services/UserAuthService.js', () => ({ UserAuthService: class {} }));
 vi.mock('../../../../features/roles/backend/services/RoleService.js', () => ({ RoleService: class {} }));
 vi.mock('../../../../features/statistics/backend/services/TelemetryService.js', () => ({ TelemetryService: class {} }));
-vi.mock('./RateLimiterService.js', () => ({ RateLimiterService: class {} }));
-vi.mock('./ApiLoggerService.js', () => ({ ApiLoggerService: class {} }));
+vi.mock('@features/api/backend/transport/RateLimiterService.js', () => ({ RateLimiterService: class {} }));
+vi.mock('@features/api/backend/transport/ApiLoggerService.js', () => ({ ApiLoggerService: class {} }));
 vi.mock('@features/auth/backend/transport/AuthenticateService.js', () => ({ AuthenticateService: class {}, AuthenticationError: class extends Error {} }));
 
 const me = { id: 'Owner1' };

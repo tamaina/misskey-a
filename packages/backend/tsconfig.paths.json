@@ -51,7 +51,13 @@
 			"fastify": ["./node_modules/fastify"],
 			"http-link-header": ["./node_modules/http-link-header"],
 			"ip-cidr": ["./node_modules/ip-cidr"],
-			"pkce-challenge": ["./node_modules/pkce-challenge/dist/index.node.d.ts"]
+			"pkce-challenge": ["./node_modules/pkce-challenge/dist/index.node.d.ts"],
+			"@fastify/multipart": ["./node_modules/@fastify/multipart"],
+			"ws": ["./node_modules/@types/ws/index.d.ts"],
+			"ratelimiter": ["./node_modules/@types/ratelimiter/index.d.ts"],
+			"@orpc/contract": ["./node_modules/@orpc/contract/dist/index.d.mts"],
+			"@valibot/to-json-schema": ["./node_modules/@valibot/to-json-schema"],
+			"valibot": ["./node_modules/valibot"]
 		}
 	}
 }

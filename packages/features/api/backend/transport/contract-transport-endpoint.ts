@@ -4,10 +4,10 @@
  */
 
 import type { AnySchema, ContractProcedure, ErrorMap, InferSchemaOutput, Meta } from '@orpc/contract';
-import type { Schema } from '@/misc/json-schema.js';
+import type { Schema } from '../utility/json-schema.js';
 import { Endpoint } from './endpoint-base.js';
 import type { EndpointExecutor } from './endpoint-base.js';
-import type { IEndpointMeta } from './endpoints.js';
+import type { IEndpointMeta } from '@/server/api/endpoints.js';
 
 /**
  * Derive forwarding callback types from the native contract without projecting it.

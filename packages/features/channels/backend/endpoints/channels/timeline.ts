@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
 import { packedChannelsTimelineDefinition, packedChannelsTimelineInput, packedChannelsTimelineOutput } from '../../../contract/packed-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
 
@@ -16,7 +16,7 @@ import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { FanoutTimelineEndpointService } from '@features/timelines/backend/services/FanoutTimelineEndpointService.js';
 import { MiLocalUser } from '@features/users/backend/models/User.js';
 import { ChannelMutingService } from '../../services/ChannelMutingService.js';
-import { ApiError } from '@/server/api/error.js';
+import { ApiError } from '@features/api/backend/transport/error.js';
 import { Brackets } from 'typeorm';
 
 const contractProjection = projectEndpointContract(packedChannelsTimelineDefinition);

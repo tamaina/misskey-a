@@ -11,7 +11,7 @@ import type * as v from 'valibot';
 import type { EndpointContractDefinition } from '@features/api/contract/definition.js';
 import { getMultipartEndpointContractRegistration } from '@features/api/contract/multipart-endpoint.js';
 import { toLegacyJsonSchema } from '@features/api/backend/index.js';
-import type { Schema } from '@/misc/json-schema.js';
+import type { Schema } from '../utility/json-schema.js';
 import { assertLegacyOutputTupleMetadata } from '@features/api/backend/legacy-output-tuple-projection.js';
 import { getPackedReference, getPackedReferenceLegacyOutputSchema } from '@features/api/contract/packed-reference.js';
 import { getJsonObjectGuardRegistration, getJsonObjectParserRegistration } from '@features/api/contract/json-object.js';
@@ -25,7 +25,7 @@ import { assertLegacyOutputOneOfMetadata } from '@features/api/backend/legacy-ou
 import { convertSchemaToOpenApiSchema } from './openapi/schemas.js';
 import { Endpoint } from './endpoint-base.js';
 import type { EndpointExecutor } from './endpoint-base.js';
-import type { IEndpointMeta } from './endpoints.js';
+import type { IEndpointMeta } from '@/server/api/endpoints.js';
 
 /** Flatten public Valibot pipelines in the same order as the JSON Schema converter. */
 function* flattenInputPipe(pipe: unknown[], parents = new Set<object>()): Generator<unknown> {

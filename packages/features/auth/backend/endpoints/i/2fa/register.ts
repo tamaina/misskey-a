@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
 import { inlineI2faRegisterDefinition, inlineI2faRegisterInput, inlineI2faRegisterOutput } from '../../../../contract/endpoint-definitions.js';
 import bcrypt from 'bcryptjs';
 import * as OTPAuth from 'otpauth';
@@ -13,7 +13,7 @@ import type { UserProfilesRepository } from '@/models/_.js';
 
 import { DI } from '@/di-symbols.js';
 import type { Config } from '@/config.js';
-import { ApiError } from '@/server/api/error.js';
+import { ApiError } from '@features/api/backend/transport/error.js';
 import { UserAuthService } from '../../../services/UserAuthService.js';
 
 const contractProjection = projectEndpointContract(inlineI2faRegisterDefinition);

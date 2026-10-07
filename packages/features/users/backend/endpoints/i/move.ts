@@ -3,19 +3,19 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@/server/api/contract-endpoint.js';
+import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
 import { inlineIMoveDefinition, inlineIMoveInput, inlineIMoveOutput } from '../../../contract/endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
 import ms from '@/runtime-dependencies/ms.js';
 
-import { ApiError } from '@/server/api/error.js';
+import { ApiError } from '@features/api/backend/transport/error.js';
 
 import { MiLocalUser, MiRemoteUser } from '../../models/User.js';
 
 import { AccountMoveService } from '../../services/AccountMoveService.js';
 import { RemoteUserResolveService } from '@features/federation/backend/services/RemoteUserResolveService.js';
-import { ApiLoggerService } from '@/server/api/ApiLoggerService.js';
-import { GetterService } from '@/server/api/GetterService.js';
+import { ApiLoggerService } from '@features/api/backend/transport/ApiLoggerService.js';
+import { GetterService } from '@features/api/backend/transport/GetterService.js';
 import { ApPersonService } from '@features/federation/backend/services/ApPersonService.js';
 import { UserEntityService } from '../../serializers/UserEntityService.js';
 
