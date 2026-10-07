@@ -16,11 +16,11 @@ import { GetterService } from './api/GetterService.js';
 import { ActivityPubServerService } from './ActivityPubServerService.js';
 import { ApiLoggerService } from './api/ApiLoggerService.js';
 import { ApiServerService } from './api/ApiServerService.js';
-import { AuthenticateService } from './api/AuthenticateService.js';
+import { AuthenticateService } from '@features/auth/backend/transport/AuthenticateService.js';
 import { RateLimiterService } from './api/RateLimiterService.js';
-import { SigninApiService } from './api/SigninApiService.js';
-import { SigninService } from './api/SigninService.js';
-import { SignupApiService } from './api/SignupApiService.js';
+import { SigninApiService } from '@features/auth/backend/transport/SigninApiService.js';
+import { SigninService } from '@features/auth/backend/transport/SigninService.js';
+import { SignupApiService } from '@features/auth/backend/transport/SignupApiService.js';
 import { StreamingApiServerService } from './api/StreamingApiServerService.js';
 import { OpenApiServerService } from './api/openapi/OpenApiServerService.js';
 import { ClientServerService } from './web/ClientServerService.js';
@@ -28,7 +28,7 @@ import { HtmlTemplateService } from './web/HtmlTemplateService.js';
 import { FeedService } from './web/FeedService.js';
 import { UrlPreviewService } from './web/UrlPreviewService.js';
 import { ClientLoggerService } from './web/ClientLoggerService.js';
-import { OAuth2ProviderService } from './oauth/OAuth2ProviderService.js';
+import { OAuth2ProviderService } from '@features/auth/backend/oauth/OAuth2ProviderService.js';
 
 import MainStreamConnection from '@/server/api/stream/Connection.js';
 import { MainChannel } from './api/stream/channels/main.js';
@@ -50,7 +50,7 @@ import { ChatRoomChannel } from '@features/chat/backend/stream/chat-room.js';
 import { ReversiChannel } from '@features/games/backend/stream/reversi.js';
 import { ReversiGameChannel } from '@features/games/backend/stream/reversi-game.js';
 import { NoteStreamingHidingService } from './api/stream/NoteStreamingHidingService.js';
-import { SigninWithPasskeyApiService } from './api/SigninWithPasskeyApiService.js';
+import { SigninWithPasskeyApiService } from '@features/auth/backend/transport/SigninWithPasskeyApiService.js';
 
 @Module({
 	imports: [

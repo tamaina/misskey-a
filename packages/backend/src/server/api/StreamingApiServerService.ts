@@ -13,7 +13,7 @@ import type { MiAccessToken } from '@/models/_.js';
 import { bindThis } from '@/decorators.js';
 import { MiLocalUser } from '@features/users/backend/models/User.js';
 import { UserService } from '@features/users/backend/services/UserService.js';
-import { AuthenticateService, AuthenticationError } from './AuthenticateService.js';
+import { AuthenticateService, AuthenticationError } from '@features/auth/backend/transport/AuthenticateService.js';
 import MainStreamConnection, { ConnectionRequest } from './stream/Connection.js';
 import type * as http from 'node:http';
 import { ContextIdFactory, ModuleRef } from '@nestjs/core';

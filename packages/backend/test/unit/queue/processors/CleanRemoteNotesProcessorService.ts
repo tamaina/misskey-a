@@ -23,7 +23,7 @@ import { DI } from '@/di-symbols.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { QueueLoggerService } from '@/queue/QueueLoggerService.js';
 import { GlobalModule } from '@/GlobalModule.js';
-import { secureRndstr } from '@/misc/secure-rndstr.js';
+import { secureRndstr } from '@features/auth/backend/utility/secure-rndstr.js';
 
 describe('CleanRemoteNotesProcessorService', () => {
 	let app: TestingModule;

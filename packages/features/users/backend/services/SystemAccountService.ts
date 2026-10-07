@@ -16,7 +16,7 @@ import type { GlobalEvents } from '@features/runtime/backend/services/GlobalEven
 import { MemoryKVCache } from '@/misc/cache.js';
 import { DI } from '@/di-symbols.js';
 import { bindThis } from '@/decorators.js';
-import { generateNativeUserToken } from '@/misc/token.js';
+import { generateNativeUserToken } from '@features/auth/backend/utility/token.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { genRsaKeyPair } from '@/misc/gen-key-pair.js';
 

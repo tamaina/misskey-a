@@ -9,7 +9,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import type { AccessTokensRepository } from '@/models/_.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { NotificationService } from '@features/notifications/backend/services/NotificationService.js';
-import { secureRndstr } from '@/misc/secure-rndstr.js';
+import { secureRndstr } from '../../utility/secure-rndstr.js';
 import { DI } from '@/di-symbols.js';
 
 const contractProjection = projectEndpointContract(uniqueMiauthGenTokenDefinition);

@@ -28,7 +28,7 @@ import { FederatedInstanceService } from '@features/federation/backend/services/
 import { LoggerService } from '@features/runtime/backend/services/LoggerService.js';
 import { MiMeta, MiNote, UserProfilesRepository } from '@/models/_.js';
 import { DI } from '@/di-symbols.js';
-import { secureRndstr } from '@/misc/secure-rndstr.js';
+import { secureRndstr } from '@features/auth/backend/utility/secure-rndstr.js';
 import { DownloadService } from '@features/runtime/backend/services/DownloadService.js';
 import { genAidx } from '@/misc/id/aidx.js';
 

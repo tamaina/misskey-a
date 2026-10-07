@@ -1,6 +1,7 @@
 import { defineConfig } from 'rolldown';
 import { globSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
+import sourcePaths from './tsconfig.paths.json' with { type: 'json' };
 import { version as summalyVersion } from '@misskey-dev/summaly';
 import type { Plugin, ExternalOption, InputOptions } from 'rolldown';
 import { execa, execaNode } from 'execa';
@@ -113,8 +114,16 @@ export default defineConfig((args) => {
 		'pg',
 	];
 
-	// Resolve the runtime import condition while TypeScript uses the shipped declaration.
-	const resolve = { alias: { 'deep-email-validator': fileURLToPath(import.meta.resolve('deep-email-validator')) } };
+	// Resolve declaration-only aliases before Rolldown applies TypeScript paths.
+	const declarationDependencies = new Map(Object.entries(sourcePaths.compilerOptions.paths)
+		.filter(([name, [target]]) => !name.includes('*') && target.endsWith('.d.ts'))
+		.map(([name]) => [name, fileURLToPath(import.meta.resolve(name))]));
+	const declarationDependencyPlugin: Plugin = {
+		name: 'backend-declaration-dependencies',
+		resolveId(source) {
+			return declarationDependencies.get(source) ?? null;
+		},
+	};
 
 	const define: Record<string, string> = {
 		// Summalyのバージョンを埋め込む
@@ -124,11 +133,11 @@ export default defineConfig((args) => {
 	if (isE2E) {
 		return {
 			onLog,
-			resolve,
 			input: './test-server/entry.ts',
 			platform: 'node',
 			tsconfig: './test-server/tsconfig.json',
 			plugins: [
+				declarationDependencyPlugin,
 				esmShim(),
 			],
 			transform: {
@@ -147,7 +156,6 @@ export default defineConfig((args) => {
 	} else {
 		return {
 			onLog,
-			resolve,
 			input: {
 				entry: './src/boot/entry.ts',
 				cli: './src/boot/cli.ts',
@@ -162,6 +170,7 @@ export default defineConfig((args) => {
 			// Feature sources are outside this package; use the backend-owned transform and path settings.
 			tsconfig: './tsconfig.json',
 			plugins: [
+				declarationDependencyPlugin,
 				esmShim(),
 				(isWatchMode ? backendDevServerPlugin() : undefined),
 			],

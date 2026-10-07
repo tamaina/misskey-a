@@ -14,7 +14,7 @@ import { IdService } from '@features/runtime/backend/services/IdService.js';
 import type { Config } from '@/config.js';
 import { DI } from '@/di-symbols.js';
 import { EmailService } from '@features/email/backend/services/EmailService.js';
-import { L_CHARS, secureRndstr } from '@/misc/secure-rndstr.js';
+import { L_CHARS, secureRndstr } from '../utility/secure-rndstr.js';
 
 const contractProjection = projectEndpointContract(voidRequestResetPasswordDefinition);
 

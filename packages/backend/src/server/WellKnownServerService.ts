@@ -16,7 +16,7 @@ import * as Acct from '@/misc/acct.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import { bindThis } from '@/decorators.js';
 import { NodeinfoServerService } from './NodeinfoServerService.js';
-import { OAuth2ProviderService } from './oauth/OAuth2ProviderService.js';
+import { OAuth2ProviderService } from '@features/auth/backend/oauth/OAuth2ProviderService.js';
 import type { FindOptionsWhere } from 'typeorm';
 import type { FastifyInstance, FastifyPluginOptions } from 'fastify';
 

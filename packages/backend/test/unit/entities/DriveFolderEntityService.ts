@@ -14,7 +14,7 @@ import { CoreModule } from '@/core/CoreModule.js';
 import { DriveFolderEntityService } from '@features/drive/backend/serializers/DriveFolderEntityService.js';
 import { DI } from '@/di-symbols.js';
 import { genAidx } from '@/misc/id/aidx.js';
-import { secureRndstr } from '@/misc/secure-rndstr.js';
+import { secureRndstr } from '@features/auth/backend/utility/secure-rndstr.js';
 
 const describeBenchmark = process.env.RUN_BENCHMARKS === '1' ? describe : describe.skip;
 

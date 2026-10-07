@@ -15,9 +15,9 @@ import { UserEntityService } from '@features/users/backend/serializers/UserEntit
 import { bindThis } from '@/decorators.js';
 import endpoints from './endpoints.js';
 import { ApiCallService } from './ApiCallService.js';
-import { SignupApiService } from './SignupApiService.js';
-import { SigninApiService } from './SigninApiService.js';
-import { SigninWithPasskeyApiService } from './SigninWithPasskeyApiService.js';
+import { SignupApiService } from '@features/auth/backend/transport/SignupApiService.js';
+import { SigninApiService } from '@features/auth/backend/transport/SigninApiService.js';
+import { SigninWithPasskeyApiService } from '@features/auth/backend/transport/SigninWithPasskeyApiService.js';
 import type { FastifyInstance, FastifyPluginOptions } from 'fastify';
 
 @Injectable()

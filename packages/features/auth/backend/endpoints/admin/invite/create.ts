@@ -11,7 +11,7 @@ import type { RegistrationTicketsRepository } from '@/models/_.js';
 import { InviteCodeEntityService } from '../../../serializers/InviteCodeEntityService.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { DI } from '@/di-symbols.js';
-import { generateInviteCode } from '@/misc/generate-invite-code.js';
+import { generateInviteCode } from '../../../utility/generate-invite-code.js';
 import { ModerationLogService } from '@features/moderation/backend/services/ModerationLogService.js';
 import { ApiError } from '@/server/api/error.js';
 

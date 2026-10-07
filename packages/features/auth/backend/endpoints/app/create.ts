@@ -9,7 +9,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import type { AppsRepository } from '@/models/_.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { unique } from '@/misc/prelude/array.js';
-import { secureRndstr } from '@/misc/secure-rndstr.js';
+import { secureRndstr } from '../../utility/secure-rndstr.js';
 import { AppEntityService } from '../../serializers/AppEntityService.js';
 import { DI } from '@/di-symbols.js';
 

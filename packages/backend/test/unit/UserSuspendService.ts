@@ -26,7 +26,7 @@ import { QueueService } from '@features/runtime/backend/services/QueueService.js
 import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
 import { ApRendererService } from '@features/federation/backend/services/ApRendererService.js';
 import { ModerationLogService } from '@features/moderation/backend/services/ModerationLogService.js';
-import { secureRndstr } from '@/misc/secure-rndstr.js';
+import { secureRndstr } from '@features/auth/backend/utility/secure-rndstr.js';
 import { randomString } from '../utils.js';
 
 function genHost() {

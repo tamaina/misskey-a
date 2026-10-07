@@ -10,7 +10,7 @@ import { Inject, Injectable } from '@nestjs/common';
 
 import type { AuthSessionsRepository, AppsRepository, AccessTokensRepository } from '@/models/_.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
-import { secureRndstr } from '@/misc/secure-rndstr.js';
+import { secureRndstr } from '../../utility/secure-rndstr.js';
 import { DI } from '@/di-symbols.js';
 import { ApiError } from '@/server/api/error.js';
 

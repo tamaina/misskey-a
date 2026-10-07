@@ -13,7 +13,7 @@ import type {
 	UsersRepository,
 } from '@/models/_.js';
 import type { Config } from '@/config.js';
-import { getIpHash } from '@/misc/get-ip-hash.js';
+import { getIpHash } from '../utility/get-ip-hash.js';
 import type { MiLocalUser, MiUser } from '@features/users/backend/models/User.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { bindThis } from '@/decorators.js';
@@ -21,7 +21,7 @@ import { WebAuthnService } from '@features/auth/backend/services/WebAuthnService
 import { Logger } from '@features/runtime/backend/logging/logger.js';
 import { LoggerService } from '@features/runtime/backend/services/LoggerService.js';
 import type { IdentifiableError } from '@/misc/identifiable-error.js';
-import { RateLimiterService } from './RateLimiterService.js';
+import { RateLimiterService } from '@/server/api/RateLimiterService.js';
 import { SigninService } from './SigninService.js';
 import type { AuthenticationResponseJSON } from '@simplewebauthn/server';
 import type { FastifyReply, FastifyRequest } from 'fastify';

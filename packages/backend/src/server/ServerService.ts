@@ -31,7 +31,7 @@ import { FileServerService } from './FileServerService.js';
 import { HealthServerService } from './HealthServerService.js';
 import { ClientServerService } from './web/ClientServerService.js';
 import { OpenApiServerService } from './api/openapi/OpenApiServerService.js';
-import { OAuth2ProviderService } from './oauth/OAuth2ProviderService.js';
+import { OAuth2ProviderService } from '@features/auth/backend/oauth/OAuth2ProviderService.js';
 import { registerHttpAccessLog } from './http-access-log.js';
 
 const _dirname = fileURLToPath(new URL('.', import.meta.url));

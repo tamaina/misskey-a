@@ -46,7 +46,12 @@
 			"nested-property": ["./node_modules/nested-property"],
 			"nodemailer": ["./node_modules/nodemailer"],
 			"juice": ["./node_modules/juice"],
-			"deep-email-validator": ["./node_modules/deep-email-validator/dist/index.d.ts"]
+			"deep-email-validator": ["./node_modules/deep-email-validator/dist/index.d.ts"],
+			"@fastify/cors": ["./node_modules/@fastify/cors"],
+			"fastify": ["./node_modules/fastify"],
+			"http-link-header": ["./node_modules/http-link-header"],
+			"ip-cidr": ["./node_modules/ip-cidr"],
+			"pkce-challenge": ["./node_modules/pkce-challenge/dist/index.node.d.ts"]
 		}
 	}
 }

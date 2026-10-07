@@ -15,7 +15,7 @@ import { EmailService } from '@features/email/backend/services/EmailService.js';
 import type { Config } from '@/config.js';
 import { DI } from '@/di-symbols.js';
 import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
-import { L_CHARS, secureRndstr } from '@/misc/secure-rndstr.js';
+import { L_CHARS, secureRndstr } from '../../utility/secure-rndstr.js';
 import { UserAuthService } from '../../services/UserAuthService.js';
 import { ApiError } from '@/server/api/error.js';
 

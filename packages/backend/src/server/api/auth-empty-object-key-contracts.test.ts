@@ -29,7 +29,7 @@ vi.mock('../../../../features/roles/backend/services/RoleService.js', () => ({ R
 vi.mock('../../../../features/statistics/backend/services/TelemetryService.js', () => ({ TelemetryService: class {} }));
 vi.mock('./RateLimiterService.js', () => ({ RateLimiterService: class {} }));
 vi.mock('./ApiLoggerService.js', () => ({ ApiLoggerService: class {} }));
-vi.mock('./AuthenticateService.js', () => ({ AuthenticateService: class {}, AuthenticationError: class extends Error {} }));
+vi.mock('@features/auth/backend/transport/AuthenticateService.js', () => ({ AuthenticateService: class {}, AuthenticationError: class extends Error {} }));
 
 const me = { id: 'Owner1' };
 // This assertion types frozen schema AST/metadata, never request or response payloads.

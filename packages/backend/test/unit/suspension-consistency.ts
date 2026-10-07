@@ -15,7 +15,7 @@ import { UserFollowingService } from '@features/relationships/backend/services/U
 import type { InstanceEntityService } from '@features/instance/backend/serializers/InstanceEntityService.js';
 import type { FollowingsRepository, InstancesRepository, MiUser, UsersRepository } from '@/models/_.js';
 import { EndpointImplementation as FederationStats } from '@features/federation/backend/endpoints/federation/stats.js';
-import { secureRndstr } from '@/misc/secure-rndstr.js';
+import { secureRndstr } from '@features/auth/backend/utility/secure-rndstr.js';
 import { FollowingIsFollowerSuspended1791310067731 as SuspensionSchemaMigration } from '../../migration/1791310067731-FollowingIsFollowerSuspended.js';
 import { FollowingIsFollowerSuspendedCopySuspendedState1791310067732 as SuspensionBackfillMigration } from '../../migration/1791310067732-FollowingIsFollowerSuspendedCopySuspendedState.js';
 

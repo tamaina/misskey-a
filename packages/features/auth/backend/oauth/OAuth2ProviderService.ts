@@ -20,7 +20,7 @@ import {
 	UnsupportedGrantTypeError,
 	UnsupportedResponseTypeError,
 } from './errors.js';
-import { secureRndstr } from '@/misc/secure-rndstr.js';
+import { secureRndstr } from '../utility/secure-rndstr.js';
 import { HttpRequestService } from '@features/runtime/backend/services/HttpRequestService.js';
 import type { Config } from '@/config.js';
 import { DI } from '@/di-symbols.js';

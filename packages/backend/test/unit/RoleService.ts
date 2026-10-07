@@ -29,7 +29,7 @@ import { genAidx } from '@/misc/id/aidx.js';
 import { CacheService } from '@/core/CacheService.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
-import { secureRndstr } from '@/misc/secure-rndstr.js';
+import { secureRndstr } from '@features/auth/backend/utility/secure-rndstr.js';
 import { NotificationService } from '@features/notifications/backend/services/NotificationService.js';
 import { RoleCondFormulaValue } from '@features/roles/backend/models/Role.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';

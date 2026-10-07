@@ -11,7 +11,7 @@ import type { MiAccessToken } from '@features/auth/backend/models/AccessToken.js
 import { MemoryKVCache } from '@/misc/cache.js';
 import type { MiApp } from '@features/auth/backend/models/App.js';
 import { CacheService } from '@/core/CacheService.js';
-import { isNativeUserToken } from '@/misc/token.js';
+import { isNativeUserToken } from '../utility/token.js';
 import { bindThis } from '@/decorators.js';
 
 export class AuthenticationError extends Error {

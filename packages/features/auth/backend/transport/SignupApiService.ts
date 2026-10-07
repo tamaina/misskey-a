@@ -17,7 +17,7 @@ import { EmailService } from '@features/email/backend/services/EmailService.js';
 import { MiLocalUser } from '@features/users/backend/models/User.js';
 import { FastifyReplyError } from '@/misc/fastify-reply-error.js';
 import { bindThis } from '@/decorators.js';
-import { L_CHARS, secureRndstr } from '@/misc/secure-rndstr.js';
+import { L_CHARS, secureRndstr } from '../utility/secure-rndstr.js';
 import { SigninService } from './SigninService.js';
 import type { FindOptionsWhere } from 'typeorm';
 import type { FastifyRequest, FastifyReply } from 'fastify';

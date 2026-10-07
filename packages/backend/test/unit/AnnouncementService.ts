@@ -25,7 +25,7 @@ import { CacheService } from '@/core/CacheService.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
 import { ModerationLogService } from '@features/moderation/backend/services/ModerationLogService.js';
-import { secureRndstr } from '@/misc/secure-rndstr.js';
+import { secureRndstr } from '@features/auth/backend/utility/secure-rndstr.js';
 import type { TestingModule } from '@nestjs/testing';
 
 describe('AnnouncementService', () => {

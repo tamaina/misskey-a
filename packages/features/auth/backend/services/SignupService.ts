@@ -14,7 +14,7 @@ import { MiUserProfile } from '@features/users/backend/models/UserProfile.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { MiUserKeypair } from '@features/federation/backend/models/UserKeypair.js';
 import { MiUsedUsername } from '@features/users/backend/models/UsedUsername.js';
-import { generateNativeUserToken } from '@/misc/token.js';
+import { generateNativeUserToken } from '../utility/token.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import { bindThis } from '@/decorators.js';
 import { UsersChart } from '@features/statistics/backend/charts/users.js';
