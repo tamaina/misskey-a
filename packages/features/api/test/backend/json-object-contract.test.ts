@@ -7,10 +7,11 @@ import { test } from 'vitest';
 import * as v from 'valibot';
 import * as _Ajv from 'ajv';
 import { jsonNumber } from '@features/api/contract/json-number.js';
-import { jsonObject, getJsonObjectGuardRegistration } from '@features/api/contract/json-object.js';
+import { jsonObject, jsonObjectWithRest, getJsonObjectGuardRegistration } from '@features/api/contract/json-object.js';
 import { toLegacyJsonSchema as proposed } from '@features/api/backend/index.js';
 import { projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
 import { getJsonObjectParserRegistration } from '@features/api/contract/json-object.js';
+import { jsonValueSchema } from '@features/api/contract/json-value.js';
 import { uniqueStringArray } from '@features/api/contract/unique-string-array.js';
 import { objectParams, misskeyId } from '@features/api/contract/index.js';
 import { toLegacyJsonSchema as current } from '@features/api/backend/index.js';
@@ -248,4 +249,54 @@ proof('jsonNumber singleton exactly projects finite number semantics with defaul
 		const transport = structuredClone(value); const native = v.safeParse(schema, value); assert.equal(native.success, validate(transport)); if (native.success)assert.deepEqual(native.output, transport);
 	}
 	const opaque = { outside: Infinity }; assert.equal(v.parse(jsonObject({ number: jsonNumber }), { number: 1, opaque }).opaque, opaque);
+});
+
+proof('typed JSON extensions preserve every own key, reject native values and project canonical references', () => {
+	const schema = jsonObjectWithRest({ name: v.string() }, jsonValueSchema);
+	const input = JSON.parse('{"name":"fixture","constructor":{"nested":[1,true,null]},"__proto__":{"safe":true},"prototype":false}');
+	const output = v.parse(schema, input);
+	assert.deepEqual(output, input);
+	assert.equal(Object.getPrototypeOf(output), Object.prototype);
+	assert.equal(Object.hasOwn(output, '__proto__'), true);
+	for (const key of ['future', 'constructor', '__proto__', 'prototype']) {
+		for (const value of [undefined, new Date(), NaN, Infinity, 1n, () => true]) {
+			const invalid = { name: 'fixture' };
+			Object.defineProperty(invalid, key, { value, enumerable: true });
+			assert.equal(v.safeParse(schema, invalid).success, false);
+		}
+	}
+	assert.equal(v.safeParse(schema, { name: 1 }).success, false);
+	assert.equal(v.safeParse(schema, { name: 'fixture', [Symbol('native')]: true }).success, false);
+	assert.deepEqual(proposed(schema, { typeMode: 'output' }).additionalProperties, { ref: 'JsonValue' });
+	assert.throws(() => proposed(v.pipe(schema, v.metadata({ additionalProperties: true })), { typeMode: 'output' }));
+	const badRest = jsonObjectWithRest({}, v.pipe(jsonValueSchema, v.metadata({ type: 'string' })));
+	assert.throws(() => proposed(badRest, { typeMode: 'output' }), /annotation-only metadata/);
+	assert.throws(() => projectEndpointContract(defineEndpointContract({ method: 'POST', path: '/json-rest' }, schema, v.void())), /output-only JSON value/);
+});
+
+proof('typed extension parsers execute once per own key and retain transformed outputs', () => {
+	let calls = 0;
+	const rest = v.pipe(v.number(), v.transform(value => { calls++; return value + 1; }));
+	const schema = jsonObjectWithRest({ name: v.string() }, rest);
+	const input = JSON.parse('{"name":"fixture","ordinary":1,"constructor":2,"__proto__":3}');
+	const output = v.parse(schema, input);
+	assert.equal(calls, 3);
+	assert.equal(output.ordinary, 2);
+	assert.equal(output.constructor, 3);
+	assert.equal(Reflect.get(output, '__proto__'), 4);
+	assert.equal(Object.getPrototypeOf(output), Object.prototype);
+});
+
+proof('typed poison-key errors preserve the same object and nested path as ordinary extensions', () => {
+	const schema = jsonObjectWithRest({}, v.object({ nested: v.number() }));
+	for (const key of ['future', 'constructor', '__proto__', 'prototype']) {
+		const input = {};
+		Object.defineProperty(input, key, { value: { nested: 'bad' }, enumerable: true });
+		const result = v.safeParse(schema, input);
+		assert.equal(result.success, false);
+		if (result.success) throw new Error('Expected the invalid nested number to fail');
+		assert.deepEqual(result.issues[0].path?.map(item => item.key), [key, 'nested']);
+		assert.equal(result.issues[0].expected, 'number');
+		assert.equal(result.issues[0].received, '"bad"');
+	}
 });

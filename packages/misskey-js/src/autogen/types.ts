@@ -5344,7 +5344,24 @@ export type components = {
             /** @example 0 */
             displayOrder: number;
         };
-        Role: components['schemas']['RoleLite'] & {
+        Role: {
+            /**
+             * Format: id
+             * @example xxxxxxxxxx
+             */
+            id: string;
+            /** @example New Role */
+            name: string;
+            /** @example #000000 */
+            color: string | null;
+            iconUrl: string | null;
+            description: string;
+            /** @example false */
+            isModerator: boolean;
+            /** @example false */
+            isAdministrator: boolean;
+            /** @example 0 */
+            displayOrder: number;
             /** Format: date-time */
             createdAt: string;
             /** Format: date-time */
@@ -5364,9 +5381,11 @@ export type components = {
             canEditMembersByModerator: boolean;
             policies: {
                 [key: string]: {
-                    value?: number | boolean;
+                    value?: components['schemas']['JsonValue'];
                     priority?: number;
                     useDefault?: boolean;
+                } & {
+                    [key: string]: components['schemas']['JsonValue'];
                 };
             };
             usersCount: number;

@@ -8,6 +8,7 @@ import type { GenericSchema } from 'valibot';
 import { getGlobalDefs, toJsonSchemaDefs } from '@valibot/to-json-schema';
 import { getJsonValueReference, jsonValueSchema } from '../contract/json-value.js';
 import { jsonObjectProjectionView } from './json-object-projection-view.js';
+import { getJsonObjectGuardRegistration, getJsonObjectParserRegistration } from '../contract/json-object.js';
 
 const annotations = new Set(['title', 'description', 'example', 'examples', '$comment', 'deprecated', 'readOnly', 'writeOnly', 'externalDocs']);
 
@@ -32,6 +33,8 @@ export function assertJsonValueMetadata(schema: object, definitions = getGlobalD
 			throw new Error('JSON value references require their canonical schema identity');
 		}
 		if (getJsonValueReference(value) !== undefined) affected.add(value);
+		const object = getJsonObjectGuardRegistration(value) ?? getJsonObjectParserRegistration(value);
+		if (object !== undefined) visit(object.base, value);
 		if (Array.isArray(value)) { for (const item of value) visit(item, value); return; }
 		for (const [key, item] of Object.entries(value)) {
 			if (['pipe', 'wrapped', 'item', 'items', 'rest', 'key', 'value', 'options'].includes(key)) visit(item, value);

@@ -10,7 +10,7 @@ import { Brackets } from 'typeorm';
 import * as p from '../../contract/packed-endpoint-definitions.js';
 import * as q from '../../contract/void-endpoint-definitions.js';
 import * as r from '../../contract/reference-endpoint-definitions.js';
-import { packedRoleSchema } from '../../contract/packed.js';
+import { packedRoleSchema, packedRoleLiteSchema } from '../../contract/packed.js';
 import { EndpointImplementation as UsersEndpoint } from '../../backend/endpoints/roles/users.js';
 import { EndpointImplementation as AdminUsersEndpoint } from '../../backend/endpoints/admin/roles/users.js';
 import { EndpointImplementation as ShowEndpoint } from '../../backend/endpoints/roles/show.js';
@@ -182,8 +182,13 @@ test('real Role serializer retains stored extensions and producer policy default
 	expect(result.policies.custom).toEqual(customPolicy);
 	expect(result.policies.chatAvailability).toEqual({ value: 'available', priority: 0, useDefault: true });
 	expect(result.policies.uploadableFileTypes).toEqual({ value: DEFAULT_POLICIES.uploadableFileTypes, priority: 0, useDefault: true });
-	// Existing int/bool value declarations do not validate these real producer defaults.
-	expect(v.safeParse(packedRoleSchema, result).success).toBe(false);
+	// Stored JSON policy values include strings, arrays and unknown policy/item keys.
+	expect(v.parse(packedRoleSchema, result)).toEqual(result);
+	expect(v.safeParse(packedRoleSchema, { ...result, future: true }).success).toBe(false);
+	const lite = { id: role.id, name: role.name, description: role.description, color: role.color, iconUrl: role.iconUrl, isAdministrator: role.isAdministrator, isModerator: role.isModerator, displayOrder: role.displayOrder };
+	expect(v.parse(packedRoleLiteSchema, lite)).toEqual(lite);
+	expect(v.safeParse(packedRoleLiteSchema, { ...lite, future: true }).success).toBe(false);
+	expect(v.safeParse(packedRoleSchema, { ...result, policies: { ...result.policies, custom: { ...customPolicy, extension: new Date() } } }).success).toBe(false);
 	roles.findOneBy.mockResolvedValue(role);
 	roles.findBy.mockResolvedValue([role]);
 	const actor = mockDeep<MiLocalUser>({ id: 'actor123' });

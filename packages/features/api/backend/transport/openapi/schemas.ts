@@ -6,7 +6,10 @@
 import { deepClone } from '@features/runtime/backend/data/clone.js';
 import { toJsonSchemaDefs } from '@valibot/to-json-schema';
 import type { Schema } from '../../utility/json-schema.js';
-import { getJsonValueComponents } from '../../json-value-projection.js';
+import { assertJsonValueMetadata, getJsonValueComponents } from '../../json-value-projection.js';
+import { jsonObjectProjectionView } from '../../json-object-projection-view.js';
+import { getJsonValueReference } from '../../../contract/json-value.js';
+import { getJsonObjectParserRegistration } from '../../../contract/json-object.js';
 import { packedSchemas } from '@features/index/contract/packed.js';
 
 export function convertSchemaToOpenApiSchema(schema: Schema, type: 'param' | 'res', includeSelfRef: boolean): any {
@@ -57,6 +60,8 @@ export function convertSchemaToOpenApiSchema(schema: Schema, type: 'param' | 're
 }
 
 export function getSchemas(_includeSelfRef: boolean) {
+	assertJsonValueMetadata(packedSchemas.Role, packedSchemas);
+	const projection = jsonObjectProjectionView(packedSchemas.Role, packedSchemas, true);
 	return {
 		Error: {
 			type: 'object',
@@ -86,10 +91,15 @@ export function getSchemas(_includeSelfRef: boolean) {
 		},
 
 		...getJsonValueComponents(),
-		...toJsonSchemaDefs(packedSchemas, {
+		// This cast bridges the converter-only public AST, never payload values.
+		...toJsonSchemaDefs(projection.definitions as typeof packedSchemas, {
 			target: 'draft-2020-12',
 			typeMode: 'output',
 			overrideRef: ctx => `#/components/schemas/${ctx.referenceId}`,
+			overrideAction: ctx => getJsonObjectParserRegistration(projection.originals.get(ctx.valibotAction) ?? ctx.valibotAction) !== undefined
+				? ctx.jsonSchema : undefined,
+			overrideSchema: ctx => getJsonValueReference(projection.originals.get(ctx.valibotSchema) ?? ctx.valibotSchema) === 'JsonValue'
+				? { $ref: '#/components/schemas/JsonValue' } : undefined,
 		}),
 	};
 }
