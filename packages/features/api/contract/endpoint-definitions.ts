@@ -9,7 +9,7 @@ import { defineEndpointContract } from '../../api/contract/definition.js';
 import { misskeyId } from '../../api/contract/index.js';
 import { resultObject } from '../../api/contract/result-object.js';
 
-export const inlineTestInput = v.looseObject({
+export const inlineTestInput = v.object({
 	"required": v.boolean(),
 	"string": v.exactOptional(v.string()),
 	"default": v.optional(v.string(), "hello"),

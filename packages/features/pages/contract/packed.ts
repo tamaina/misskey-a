@@ -4,7 +4,6 @@
  */
 
 import * as v from 'valibot';
-import { resultObject } from '../../api/contract/result-object.js';
 import { packedPageBlockSchema } from './page-block.js';
 export { packedPageBlockSchema } from './page-block.js';
 export type { PackedPageBlock } from './page-block.js';
@@ -15,7 +14,7 @@ import {
 	packedUserLiteSchema as __ref_UserLite
 } from '../../users/contract/packed.js';
 
-export const packedPageSchema = resultObject({
+export const packedPageSchema = v.strictObject({
 	"id": v.pipe(v.string(), v.metadata({ "format": "id", "example": "xxxxxxxxxx" })),
 	"createdAt": v.pipe(v.string(), v.metadata({ "format": "date-time" })),
 	"updatedAt": v.pipe(v.string(), v.metadata({ "format": "date-time" })),

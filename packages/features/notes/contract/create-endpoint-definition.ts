@@ -11,7 +11,6 @@ import { jsonNumber } from '../../api/contract/json-number.js';
 import { jsonObject } from '../../api/contract/json-object.js';
 import { requireWhenAllNullish } from '../../api/contract/require-when-all-nullish.js';
 import { packedReference } from '../../api/contract/packed-reference.js';
-import { resultObject } from '../../api/contract/result-object.js';
 import { MAX_NOTE_TEXT_LENGTH } from './note-text-limit.js';
 
 const notesCreateBase = jsonObject({
@@ -43,7 +42,7 @@ export const notesCreateInput = v.pipe(notesCreateBase, requireWhenAllNullish(no
 	key: 'text',
 	schema: notesCreateRequiredText,
 }));
-export const notesCreateOutput = v.pipe(resultObject({
+export const notesCreateOutput = v.pipe(v.strictObject({
 	createdNote: v.pipe(packedReference('Note'), v.metadata({ optional: false, nullable: false })),
 }), v.metadata({ optional: false, nullable: false }));
 export const notesCreateDefinition = defineEndpointContract(

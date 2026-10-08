@@ -11,29 +11,29 @@ import { jsonString, misskeyId } from '../../api/contract/index.js';
 
 /** Inputs for the existing void-returning note commands being served through oRPC. */
 export const notesCommandInputs = {
-	'notes/delete': v.looseObject({
+	'notes/delete': v.object({
 		noteId: misskeyId,
 	}),
-	'notes/drafts/delete': v.looseObject({
+	'notes/drafts/delete': v.object({
 		draftId: misskeyId,
 	}),
-	'notes/reactions/create': v.looseObject({
+	'notes/reactions/create': v.object({
 		noteId: misskeyId,
 		reaction: jsonString(),
 	}),
-	'notes/reactions/delete': v.looseObject({
+	'notes/reactions/delete': v.object({
 		noteId: misskeyId,
 	}),
-	'notes/thread-muting/create': v.looseObject({
+	'notes/thread-muting/create': v.object({
 		noteId: misskeyId,
 	}),
-	'notes/thread-muting/delete': v.looseObject({
+	'notes/thread-muting/delete': v.object({
 		noteId: misskeyId,
 	}),
-	'notes/unrenote': v.looseObject({
+	'notes/unrenote': v.object({
 		noteId: misskeyId,
 	}),
-	'promo/read': v.looseObject({
+	'promo/read': v.object({
 		noteId: misskeyId,
 	}),
 };

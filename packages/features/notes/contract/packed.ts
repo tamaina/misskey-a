@@ -68,7 +68,7 @@ export const packedNoteSchema: v.GenericSchema<PackedNote, PackedNote> = resultO
 "reply": v.optional(v.nullable(v.lazy(() => packedNoteSchema))),
 "renote": v.optional(v.nullable(v.lazy(() => packedNoteSchema)))
 });
-export const packedNoteDraftSchema = resultObject({
+export const packedNoteDraftSchema = v.strictObject({
 	"id": v.pipe(v.string(), v.metadata({ "format": "id", "example": "xxxxxxxxxx" })),
 	"createdAt": v.pipe(v.string(), v.metadata({ "format": "date-time" })),
 	"text": v.nullable(v.string()),
@@ -84,14 +84,14 @@ export const packedNoteDraftSchema = resultObject({
 	"fileIds": v.array(v.pipe(v.string(), v.metadata({ "format": "id" }))),
 	"files": v.optional(v.array(v.lazy(() => __ref_DriveFile))),
 	"hashtag": v.nullable(v.string()),
-	"poll": v.nullable(resultObject({
+	"poll": v.nullable(v.strictObject({
 	"expiresAt": v.optional(v.pipe(v.nullable(v.string()), v.metadata({ "format": "date-time" }))),
 	"expiredAfter": v.optional(v.nullable(v.number())),
 	"multiple": v.boolean(),
 	"choices": v.array(v.string())
 })),
 	"channelId": v.pipe(v.nullable(v.string()), v.metadata({ "format": "id" })),
-	"channel": v.optional(v.nullable(resultObject({
+	"channel": v.optional(v.nullable(v.strictObject({
 	"id": v.string(),
 	"name": v.string(),
 	"color": v.string(),
@@ -104,13 +104,13 @@ export const packedNoteDraftSchema = resultObject({
 	"scheduledAt": v.nullable(v.number()),
 	"isActuallyScheduled": v.boolean()
 });
-export const packedNoteReactionSchema = resultObject({
+export const packedNoteReactionSchema = v.strictObject({
 	"id": v.pipe(v.string(), v.metadata({ "format": "id" })),
 	"createdAt": v.pipe(v.string(), v.metadata({ "format": "date-time" })),
 	"user": v.lazy(() => __ref_UserLite),
 	"type": v.string()
 });
-export const packedNoteReactionWithNoteSchema = resultObject({
+export const packedNoteReactionWithNoteSchema = v.strictObject({
 	"id": v.pipe(v.string(), v.metadata({ "format": "id" })),
 	"createdAt": v.pipe(v.string(), v.metadata({ "format": "date-time" })),
 	"user": v.lazy(() => __ref_UserLite),

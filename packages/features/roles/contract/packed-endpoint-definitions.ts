@@ -10,10 +10,9 @@ import { opaqueObject } from '../../api/contract/opaque-object.js';
 import { jsonObject } from '../../api/contract/json-object.js';
 import { jsonNumber } from '../../api/contract/json-number.js';
 import { misskeyId } from '../../api/contract/index.js';
-import { resultObject } from '../../api/contract/result-object.js';
 import { packedReference } from '../../api/contract/packed-reference.js';
 
-export const packedAdminRolesListInput = v.looseObject({});
+export const packedAdminRolesListInput = v.object({});
 export const packedAdminRolesListOutput = v.array(packedReference("Role"));
 export const packedAdminRolesListDefinition = defineEndpointContract(
 	{ method: 'POST', path: "/admin/roles/list", tags: ["admin", "role"] },
@@ -21,7 +20,7 @@ export const packedAdminRolesListDefinition = defineEndpointContract(
 	packedAdminRolesListOutput,
 );
 
-export const packedAdminRolesShowInput = v.looseObject({
+export const packedAdminRolesShowInput = v.object({
 	"roleId": misskeyId,
 });
 export const packedAdminRolesShowOutput = packedReference("Role");
@@ -31,7 +30,7 @@ export const packedAdminRolesShowDefinition = defineEndpointContract(
 	packedAdminRolesShowOutput,
 );
 
-export const packedRolesListInput = v.looseObject({});
+export const packedRolesListInput = v.object({});
 export const packedRolesListOutput = v.array(packedReference("Role"));
 export const packedRolesListDefinition = defineEndpointContract(
 	{ method: 'POST', path: "/roles/list", tags: ["role"] },
@@ -39,7 +38,7 @@ export const packedRolesListDefinition = defineEndpointContract(
 	packedRolesListOutput,
 );
 
-export const packedRolesNotesInput = v.looseObject({
+export const packedRolesNotesInput = v.object({
 	"roleId": misskeyId,
 	"limit": v.optional(v.pipe(v.pipe(v.number(), v.integer()), v.minValue(1), v.maxValue(100)), 10),
 	"sinceId": v.exactOptional(misskeyId),
@@ -54,7 +53,7 @@ export const packedRolesNotesDefinition = defineEndpointContract(
 	packedRolesNotesOutput,
 );
 
-export const packedRolesShowInput = v.looseObject({
+export const packedRolesShowInput = v.object({
 	"roleId": misskeyId,
 });
 export const packedRolesShowOutput = packedReference("Role");
@@ -64,7 +63,7 @@ export const packedRolesShowDefinition = defineEndpointContract(
 	packedRolesShowOutput,
 );
 
-export const packedRolesUsersInput = v.looseObject({
+export const packedRolesUsersInput = v.object({
 	"roleId": misskeyId,
 	"sinceId": v.exactOptional(misskeyId),
 	"untilId": v.exactOptional(misskeyId),
@@ -72,7 +71,7 @@ export const packedRolesUsersInput = v.looseObject({
 	"untilDate": v.exactOptional(v.pipe(v.number(), v.integer())),
 	"limit": v.optional(v.pipe(v.pipe(v.number(), v.integer()), v.minValue(1), v.maxValue(100)), 10),
 });
-export const packedRolesUsersOutput = v.array(resultObject({
+export const packedRolesUsersOutput = v.array(v.strictObject({
 		"id": v.pipe(v.string(), v.metadata({ "format": "misskey:id" })),
 		"user": packedReference("UserDetailed"),
 	}));

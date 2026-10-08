@@ -9,7 +9,7 @@ import { defineEndpointContract } from '../../api/contract/definition.js';
 import { opaqueObject } from '../../api/contract/opaque-object.js';
 import { misskeyId } from '../../api/contract/index.js';
 
-export const voidAdminRolesAssignInput = v.looseObject({
+export const voidAdminRolesAssignInput = v.object({
 	"roleId": misskeyId,
 	"userId": misskeyId,
 	"expiresAt": v.exactOptional(v.nullable(v.pipe(v.number(), v.integer()))),
@@ -21,7 +21,7 @@ export const voidAdminRolesAssignDefinition = defineEndpointContract(
 	voidAdminRolesAssignOutput,
 );
 
-export const voidAdminRolesDeleteInput = v.looseObject({
+export const voidAdminRolesDeleteInput = v.object({
 	"roleId": misskeyId,
 });
 export const voidAdminRolesDeleteOutput = v.void();
@@ -31,7 +31,7 @@ export const voidAdminRolesDeleteDefinition = defineEndpointContract(
 	voidAdminRolesDeleteOutput,
 );
 
-export const voidAdminRolesUnassignInput = v.looseObject({
+export const voidAdminRolesUnassignInput = v.object({
 	"roleId": misskeyId,
 	"userId": misskeyId,
 });
@@ -42,7 +42,7 @@ export const voidAdminRolesUnassignDefinition = defineEndpointContract(
 	voidAdminRolesUnassignOutput,
 );
 
-export const voidAdminRolesUpdateInput = v.looseObject({
+export const voidAdminRolesUpdateInput = v.object({
 	"roleId": misskeyId,
 	"name": v.exactOptional(v.string()),
 	"description": v.exactOptional(v.string()),
@@ -67,7 +67,7 @@ export const voidAdminRolesUpdateDefinition = defineEndpointContract(
 	voidAdminRolesUpdateOutput,
 );
 
-export const voidAdminRolesUpdateDefaultPoliciesInput = v.looseObject({
+export const voidAdminRolesUpdateDefaultPoliciesInput = v.object({
 	"policies": opaqueObject,
 });
 export const voidAdminRolesUpdateDefaultPoliciesOutput = v.void();

@@ -9,7 +9,7 @@ import { defineEndpointContract } from '../../api/contract/definition.js';
 import { misskeyId } from '../../api/contract/index.js';
 import { packedReference } from '../../api/contract/packed-reference.js';
 
-export const packedIPinInput = v.looseObject({
+export const packedIPinInput = v.object({
 	"noteId": misskeyId,
 });
 export const packedIPinOutput = packedReference("MeDetailed");
@@ -19,7 +19,7 @@ export const packedIPinDefinition = defineEndpointContract(
 	packedIPinOutput,
 );
 
-export const packedIUnpinInput = v.looseObject({
+export const packedIUnpinInput = v.object({
 	"noteId": misskeyId,
 });
 export const packedIUnpinOutput = packedReference("MeDetailed");
@@ -29,7 +29,7 @@ export const packedIUnpinDefinition = defineEndpointContract(
 	packedIUnpinOutput,
 );
 
-export const packedNotesInput = v.looseObject({
+export const packedNotesInput = v.object({
 	"local": v.optional(v.boolean(), false),
 	"reply": v.exactOptional(v.boolean()),
 	"renote": v.exactOptional(v.boolean()),
@@ -48,7 +48,7 @@ export const packedNotesDefinition = defineEndpointContract(
 	packedNotesOutput,
 );
 
-export const packedNotesChildrenInput = v.looseObject({
+export const packedNotesChildrenInput = v.object({
 	"noteId": misskeyId,
 	"limit": v.optional(v.pipe(v.pipe(v.number(), v.integer()), v.minValue(1), v.maxValue(100)), 10),
 	"sinceId": v.exactOptional(misskeyId),
@@ -63,7 +63,7 @@ export const packedNotesChildrenDefinition = defineEndpointContract(
 	packedNotesChildrenOutput,
 );
 
-export const packedNotesConversationInput = v.looseObject({
+export const packedNotesConversationInput = v.object({
 	"noteId": misskeyId,
 	"limit": v.optional(v.pipe(v.pipe(v.number(), v.integer()), v.minValue(1), v.maxValue(100)), 10),
 	"offset": v.optional(v.pipe(v.number(), v.integer()), 0),
@@ -75,7 +75,7 @@ export const packedNotesConversationDefinition = defineEndpointContract(
 	packedNotesConversationOutput,
 );
 
-export const packedNotesDraftsListInput = v.looseObject({
+export const packedNotesDraftsListInput = v.object({
 	"limit": v.optional(v.pipe(v.pipe(v.number(), v.integer()), v.minValue(1), v.maxValue(100)), 30),
 	"sinceId": v.exactOptional(misskeyId),
 	"untilId": v.exactOptional(misskeyId),
@@ -90,7 +90,7 @@ export const packedNotesDraftsListDefinition = defineEndpointContract(
 	packedNotesDraftsListOutput,
 );
 
-export const packedNotesPollsRecommendationInput = v.looseObject({
+export const packedNotesPollsRecommendationInput = v.object({
 	"limit": v.optional(v.pipe(v.pipe(v.number(), v.integer()), v.minValue(1), v.maxValue(100)), 10),
 	"offset": v.optional(v.pipe(v.number(), v.integer()), 0),
 	"excludeChannels": v.optional(v.boolean(), false),
@@ -102,7 +102,7 @@ export const packedNotesPollsRecommendationDefinition = defineEndpointContract(
 	packedNotesPollsRecommendationOutput,
 );
 
-export const packedNotesReactionsInput = v.looseObject({
+export const packedNotesReactionsInput = v.object({
 	"noteId": misskeyId,
 	"type": v.exactOptional(v.nullable(v.string())),
 	"limit": v.optional(v.pipe(v.pipe(v.number(), v.integer()), v.minValue(1), v.maxValue(100)), 10),
@@ -118,7 +118,7 @@ export const packedNotesReactionsDefinition = defineEndpointContract(
 	packedNotesReactionsOutput,
 );
 
-export const packedNotesRenotesInput = v.looseObject({
+export const packedNotesRenotesInput = v.object({
 	"noteId": misskeyId,
 	"limit": v.optional(v.pipe(v.pipe(v.number(), v.integer()), v.minValue(1), v.maxValue(100)), 10),
 	"sinceId": v.exactOptional(misskeyId),
@@ -133,7 +133,7 @@ export const packedNotesRenotesDefinition = defineEndpointContract(
 	packedNotesRenotesOutput,
 );
 
-export const packedNotesRepliesInput = v.looseObject({
+export const packedNotesRepliesInput = v.object({
 	"noteId": misskeyId,
 	"sinceId": v.exactOptional(misskeyId),
 	"untilId": v.exactOptional(misskeyId),
@@ -148,7 +148,7 @@ export const packedNotesRepliesDefinition = defineEndpointContract(
 	packedNotesRepliesOutput,
 );
 
-export const packedNotesShowInput = v.looseObject({
+export const packedNotesShowInput = v.object({
 	"noteId": misskeyId,
 });
 export const packedNotesShowOutput = packedReference("Note");
@@ -158,7 +158,7 @@ export const packedNotesShowDefinition = defineEndpointContract(
 	packedNotesShowOutput,
 );
 
-export const packedUsersReactionsInput = v.looseObject({
+export const packedUsersReactionsInput = v.object({
 	"userId": misskeyId,
 	"limit": v.optional(v.pipe(v.pipe(v.number(), v.integer()), v.minValue(1), v.maxValue(100)), 10),
 	"sinceId": v.exactOptional(misskeyId),

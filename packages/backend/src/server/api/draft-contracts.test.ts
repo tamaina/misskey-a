@@ -553,6 +553,12 @@ function normalize(value: unknown): unknown {
  return value;
 }
 
+function reviewedPublishedPath(row: (typeof baseline.routes)[number]) {
+ const expected = structuredClone(row.openapi);
+ const response = expected.post.responses['200'].content['application/json'];
+ return { ...expected, post: { ...expected.post, responses: { ...expected.post.responses, '200': { ...expected.post.responses['200'], content: { ...expected.post.responses['200'].content, 'application/json': { ...response, schema: { ...response.schema, additionalProperties: false } } } } } } };
+}
+
 for (const route of Object.keys(definitions) as Route[]) {
  const row = baseline.routes.find(item => item.route === route)!;
  const definition = definitions[route];
@@ -560,9 +566,9 @@ for (const route of Object.keys(definitions) as Route[]) {
  test(route + ' preserves exact public schema and response documentation', () => {
   expect(JSON.parse(JSON.stringify(projection.input))).toEqual(row.input);
   expect(frozenInputs[route]).toEqual(row.input);
-  // The bridge makes legacy required-property flags explicit without changing OpenAPI.
-  expect(normalize(projection.response)).toEqual({ ...row.output, required: Object.keys(row.output.properties) });
-  expect(convertSchemaToOpenApiSchema(projection.response!, 'res', true)).toEqual(row.openapi.post.responses['200'].content['application/json'].schema);
+  // The finite envelope closes only the outer object; frozen inputs and referenced payloads stay intact.
+  expect(normalize(projection.response)).toEqual({ ...row.output, required: Object.keys(row.output.properties), additionalProperties: false });
+  expect(convertSchemaToOpenApiSchema(projection.response!, 'res', true)).toEqual(reviewedPublishedPath(row).post.responses['200'].content['application/json'].schema);
  });
  test(route + ' matches AJV validation, exact errors, defaults, unknown fields and response identity', async () => {
   for (const sample of baseline.samples[route]) {
@@ -647,7 +653,7 @@ test('the real OpenAPI writer preserves both complete paths, errors, auth, metad
   const config = { version: 'draft-contract-test', apiUrl: 'https://draft-contract.test/api' } as Config;
   const spec = genOpenapiSpec(config);
   expect(Object.keys(spec.paths).sort()).toEqual(baseline.routes.map(row => '/' + row.route).sort());
-  for (const row of baseline.routes) expect(JSON.parse(JSON.stringify(spec.paths['/' + row.route]))).toEqual(row.openapi);
+  for (const row of baseline.routes) expect(JSON.parse(JSON.stringify(spec.paths['/' + row.route]))).toEqual(reviewedPublishedPath(row));
   expect(genOpenapiSpec(config).paths).toEqual(spec.paths);
  } finally { documentedEndpoints.splice(0, documentedEndpoints.length, ...saved); }
 });

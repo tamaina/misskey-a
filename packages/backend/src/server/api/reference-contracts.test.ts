@@ -249,6 +249,10 @@ function reviewedPublishedPath(original: (typeof baseline.routes)[number]) {
 		item.additionalProperties = false;
 		suspended.items = item;
 		properties.deliverSuspendedSoftware = suspended;
+	} else if (original.route === 'admin/roles/users') {
+		const item = objectAt(schema, 'items');
+		item.additionalProperties = false;
+		schema.items = item;
 	} else if (original.route === 'admin/queue/queues') {
 		const item = objectAt(schema, 'items');
 		item.additionalProperties = false;

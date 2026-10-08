@@ -8,7 +8,7 @@ import * as v from 'valibot';
 import { defineEndpointContract } from '../../api/contract/definition.js';
 import { misskeyId } from '../../api/contract/index.js';
 
-export const voidAdminAccountsDeleteInput = v.looseObject({
+export const voidAdminAccountsDeleteInput = v.object({
 	"userId": misskeyId,
 });
 export const voidAdminAccountsDeleteOutput = v.void();
@@ -18,7 +18,7 @@ export const voidAdminAccountsDeleteDefinition = defineEndpointContract(
 	voidAdminAccountsDeleteOutput,
 );
 
-export const voidAdminDeleteAccountInput = v.looseObject({
+export const voidAdminDeleteAccountInput = v.object({
 	"userId": misskeyId,
 });
 export const voidAdminDeleteAccountOutput = v.void();
@@ -28,7 +28,7 @@ export const voidAdminDeleteAccountDefinition = defineEndpointContract(
 	voidAdminDeleteAccountOutput,
 );
 
-export const voidIDeleteAccountInput = v.looseObject({
+export const voidIDeleteAccountInput = v.object({
 	"password": v.string(),
 	"token": v.exactOptional(v.nullable(v.string())),
 });
@@ -39,7 +39,7 @@ export const voidIDeleteAccountDefinition = defineEndpointContract(
 	voidIDeleteAccountOutput,
 );
 
-export const voidUsersUpdateMemoInput = v.looseObject({
+export const voidUsersUpdateMemoInput = v.object({
 	"userId": misskeyId,
 	"memo": v.pipe(v.nullable(v.string()), v.metadata({ "description": "A personal memo for the target user. If null or empty, delete the memo." })),
 });

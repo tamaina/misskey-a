@@ -8,7 +8,7 @@ import * as v from 'valibot';
 import { defineEndpointContract } from '../../api/contract/definition.js';
 import { misskeyId } from '../../api/contract/index.js';
 
-export const voidAdminPromoCreateInput = v.looseObject({
+export const voidAdminPromoCreateInput = v.object({
 	"noteId": misskeyId,
 	"expiresAt": v.pipe(v.number(), v.integer()),
 });
@@ -19,7 +19,7 @@ export const voidAdminPromoCreateDefinition = defineEndpointContract(
 	voidAdminPromoCreateOutput,
 );
 
-export const voidNotesPollsVoteInput = v.looseObject({
+export const voidNotesPollsVoteInput = v.object({
 	"noteId": misskeyId,
 	"choice": v.pipe(v.number(), v.integer()),
 });

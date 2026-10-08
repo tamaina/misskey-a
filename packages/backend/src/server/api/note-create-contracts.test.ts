@@ -288,11 +288,15 @@ function normalize(value: unknown): unknown {
 	return value;
 }
 
+const reviewedOpenapi = structuredClone(baseline.routes[0].openapi);
+const reviewedResponse = { ...reviewedOpenapi.post.responses['200'].content['application/json'].schema, additionalProperties: false };
+reviewedOpenapi.post.responses['200'].content['application/json'].schema = reviewedResponse;
+
 test('notes/create preserves exact frozen input, condition, response and public3000 limit', () => {
 	expect(JSON.parse(JSON.stringify(projection.input))).toEqual(baseline.routes[0].input);
 	expect(frozenInput).toEqual(baseline.routes[0].input);
-	expect(normalize(projection.response)).toEqual({ ...baseline.routes[0].output, required: ['createdNote'] });
-	expect(convertSchemaToOpenApiSchema(projection.response!, 'res', true)).toEqual(baseline.routes[0].openapi.post.responses['200'].content['application/json'].schema);
+	expect(normalize(projection.response)).toEqual({ ...baseline.routes[0].output, required: ['createdNote'], additionalProperties: false });
+	expect(convertSchemaToOpenApiSchema(projection.response!, 'res', true)).toEqual(reviewedResponse);
 	expect(MAX_NOTE_TEXT_LENGTH).toBe(3000);
 });
 
@@ -378,7 +382,7 @@ test('real OpenAPI writer preserves complete notes/create path, auth, errors and
 		const config = { version: 'note-create-contract-test', apiUrl: 'https://note-create-contract.test/api' } as Config;
 		const spec = genOpenapiSpec(config);
 		expect(Object.keys(spec.paths)).toEqual(['/notes/create']);
-		expect(JSON.parse(JSON.stringify(spec.paths['/notes/create']))).toEqual(baseline.routes[0].openapi);
+		expect(JSON.parse(JSON.stringify(spec.paths['/notes/create']))).toEqual(reviewedOpenapi);
 		expect(genOpenapiSpec(config).paths).toEqual(spec.paths);
 	} finally { documentedEndpoints.splice(0, documentedEndpoints.length, ...saved); }
 });

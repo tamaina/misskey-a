@@ -3,8 +3,6 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import * as v from 'valibot';
-
 import {
 	packedAnnouncementSchema,
 } from '../../announcements/contract/packed.js';
@@ -287,7 +285,13 @@ export const packedSchemas: PackedSchemaRegistry = {
 	ChatRoomMembership: packedChatRoomMembershipSchema,
 };
 
-export type Packed<K extends keyof typeof packedSchemas> = v.InferOutput<(typeof packedSchemas)[K]>;
+// Defer output inference to a concrete registry key so recursive packed models
+// do not force a structural check of the entire schema union in SDK declarations.
+type PackedSchemaOutput<Schema> = Schema extends {
+	readonly '~standard': { readonly types?: { readonly output: infer Output } | undefined };
+} ? Output : never;
+
+export type Packed<K extends keyof typeof packedSchemas> = PackedSchemaOutput<(typeof packedSchemas)[K]>;
 
 /** Canonical SDK model types, inferred directly from the feature schemas. */
 export type PackedModels = { [Name in keyof typeof packedSchemas]: Packed<Name> };

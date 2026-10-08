@@ -8,7 +8,7 @@ import * as v from 'valibot';
 import { defineEndpointContract } from '../../api/contract/definition.js';
 import { misskeyId } from '../../api/contract/index.js';
 
-export const voidPagePushInput = v.looseObject({
+export const voidPagePushInput = v.object({
 	"pageId": misskeyId,
 	"event": v.string(),
 	"var": v.exactOptional(v.unknown()),
@@ -20,7 +20,7 @@ export const voidPagePushDefinition = defineEndpointContract(
 	voidPagePushOutput,
 );
 
-export const voidPagesDeleteInput = v.looseObject({
+export const voidPagesDeleteInput = v.object({
 	"pageId": misskeyId,
 });
 export const voidPagesDeleteOutput = v.void();
@@ -30,7 +30,7 @@ export const voidPagesDeleteDefinition = defineEndpointContract(
 	voidPagesDeleteOutput,
 );
 
-export const voidPagesLikeInput = v.looseObject({
+export const voidPagesLikeInput = v.object({
 	"pageId": misskeyId,
 });
 export const voidPagesLikeOutput = v.void();
@@ -40,7 +40,7 @@ export const voidPagesLikeDefinition = defineEndpointContract(
 	voidPagesLikeOutput,
 );
 
-export const voidPagesUnlikeInput = v.looseObject({
+export const voidPagesUnlikeInput = v.object({
 	"pageId": misskeyId,
 });
 export const voidPagesUnlikeOutput = v.void();

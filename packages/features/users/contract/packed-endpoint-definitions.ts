@@ -8,7 +8,7 @@ import * as v from 'valibot';
 import { defineEndpointContract } from '../../api/contract/definition.js';
 import { packedReference } from '../../api/contract/packed-reference.js';
 
-export const packedAdminAccountsFindByEmailInput = v.looseObject({
+export const packedAdminAccountsFindByEmailInput = v.object({
 	"email": v.string(),
 });
 export const packedAdminAccountsFindByEmailOutput = packedReference("UserDetailedNotMe");
@@ -18,7 +18,7 @@ export const packedAdminAccountsFindByEmailDefinition = defineEndpointContract(
 	packedAdminAccountsFindByEmailOutput,
 );
 
-export const packedIInput = v.looseObject({});
+export const packedIInput = v.object({});
 export const packedIOutput = packedReference("MeDetailed");
 export const packedIDefinition = defineEndpointContract(
 	{ method: 'POST', path: "/i", tags: ["account"] },
@@ -26,7 +26,7 @@ export const packedIDefinition = defineEndpointContract(
 	packedIOutput,
 );
 
-export const packedUsersInput = v.looseObject({
+export const packedUsersInput = v.object({
 	"limit": v.optional(v.pipe(v.pipe(v.number(), v.integer()), v.minValue(1), v.maxValue(100)), 10),
 	"offset": v.optional(v.pipe(v.number(), v.integer()), 0),
 	"sort": v.exactOptional(v.picklist(["+follower", "-follower", "+createdAt", "-createdAt", "+updatedAt", "-updatedAt"])),

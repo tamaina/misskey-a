@@ -8,7 +8,6 @@ import * as v from 'valibot';
 import { defineEndpointContract } from '../../api/contract/definition.js';
 import { misskeyId } from '../../api/contract/index.js';
 import { jsonObject } from '../../api/contract/json-object.js';
-import { resultObject } from '../../api/contract/result-object.js';
 import { packedReference } from '../../api/contract/packed-reference.js';
 
 export const referenceAdminRolesUsersInput = jsonObject({
@@ -19,7 +18,7 @@ export const referenceAdminRolesUsersInput = jsonObject({
 	"untilDate": v.exactOptional(v.pipe(v.number(), v.integer())),
 	"limit": v.optional(v.pipe(v.number(), v.integer(), v.minValue(1), v.maxValue(100)), 10),
 });
-export const referenceAdminRolesUsersOutput = v.array(resultObject({
+export const referenceAdminRolesUsersOutput = v.array(v.strictObject({
 		"id": v.pipe(v.string(), v.metadata({ "format": "misskey:id" })),
 		"createdAt": v.pipe(v.string(), v.metadata({ "format": "date-time" })),
 		"user": packedReference("UserDetailed", { legacyOutputType: 'omit' }),

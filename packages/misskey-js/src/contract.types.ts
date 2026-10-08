@@ -5,7 +5,7 @@ type DeclaredFields<T> = {
 	[K in keyof T as string extends K ? never : number extends K ? never : symbol extends K ? never : K]: T[K];
 };
 type RequestFields<T> = T extends object
-	? keyof DeclaredFields<T> extends never ? T : DeclaredFields<T>
+	? keyof DeclaredFields<T> extends never ? T & object : DeclaredFields<T>
 	: T;
 
 export type ContractEndpoints = {

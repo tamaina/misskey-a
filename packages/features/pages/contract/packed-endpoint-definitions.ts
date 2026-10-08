@@ -7,17 +7,16 @@ import type { InferContractRouterInputs, InferContractRouterOutputs } from '@orp
 import * as v from 'valibot';
 import { defineEndpointContract } from '../../api/contract/definition.js';
 import { misskeyId } from '../../api/contract/index.js';
-import { resultObject } from '../../api/contract/result-object.js';
 import { packedReference } from '../../api/contract/packed-reference.js';
 
-export const packedIPageLikesInput = v.looseObject({
+export const packedIPageLikesInput = v.object({
 	"limit": v.optional(v.pipe(v.pipe(v.number(), v.integer()), v.minValue(1), v.maxValue(100)), 10),
 	"sinceId": v.exactOptional(misskeyId),
 	"untilId": v.exactOptional(misskeyId),
 	"sinceDate": v.exactOptional(v.pipe(v.number(), v.integer())),
 	"untilDate": v.exactOptional(v.pipe(v.number(), v.integer())),
 });
-export const packedIPageLikesOutput = v.array(resultObject({
+export const packedIPageLikesOutput = v.array(v.strictObject({
 		"id": v.pipe(v.string(), v.metadata({ "format": "id" })),
 		"page": packedReference("Page"),
 	}));
@@ -27,7 +26,7 @@ export const packedIPageLikesDefinition = defineEndpointContract(
 	packedIPageLikesOutput,
 );
 
-export const packedIPagesInput = v.looseObject({
+export const packedIPagesInput = v.object({
 	"limit": v.optional(v.pipe(v.pipe(v.number(), v.integer()), v.minValue(1), v.maxValue(100)), 10),
 	"sinceId": v.exactOptional(misskeyId),
 	"untilId": v.exactOptional(misskeyId),
@@ -41,7 +40,7 @@ export const packedIPagesDefinition = defineEndpointContract(
 	packedIPagesOutput,
 );
 
-export const packedPagesFeaturedInput = v.looseObject({});
+export const packedPagesFeaturedInput = v.object({});
 export const packedPagesFeaturedOutput = v.array(packedReference("Page"));
 export const packedPagesFeaturedDefinition = defineEndpointContract(
 	{ method: 'POST', path: "/pages/featured", tags: ["pages"] },
@@ -49,7 +48,7 @@ export const packedPagesFeaturedDefinition = defineEndpointContract(
 	packedPagesFeaturedOutput,
 );
 
-export const packedUsersPagesInput = v.looseObject({
+export const packedUsersPagesInput = v.object({
 	"userId": misskeyId,
 	"limit": v.optional(v.pipe(v.pipe(v.number(), v.integer()), v.minValue(1), v.maxValue(100)), 10),
 	"sinceId": v.exactOptional(misskeyId),

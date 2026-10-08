@@ -19,7 +19,7 @@ import {
 	packedRolePoliciesSchema as __ref_RolePolicies
 } from '../../roles/contract/packed.js';
 
-export const packedAchievementSchema = resultObject({
+export const packedAchievementSchema = v.strictObject({
 	"name": v.lazy(() => packedAchievementNameSchema),
 	"unlockedAt": v.number()
 });

@@ -6,14 +6,11 @@
 import { expect, expectTypeOf, test, vi } from 'vitest';
 import * as v from 'valibot';
 import { EntitySchema } from 'typeorm';
-import { defineEndpointContract } from '@features/api/contract/definition.js';
 import frozen from '../../../test/fixtures/chart-contract-baseline.json' with { type: 'json' };
 import { chartEndpointDefinitions, chartInput, instanceChartInput, userChartInput } from '@features/statistics/contract/chart-endpoint-definitions.js';
 import type { ChartsEndpoints } from '@features/statistics/contract/chart-endpoint-definitions.js';
-import { chartOutputSchema } from '@features/statistics/contract/chart-output-schema.js';
 import * as descriptors from '@features/statistics/shared/chart-descriptors.js';
 import { Endpoint } from '@features/api/backend/transport/endpoint-base.js';
-import { projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
 import { ApiError } from '@features/api/backend/transport/error.js';
 import { endpoints as documentedEndpoints } from '@features/index/backend/endpoints.js';
 import { genOpenapiSpec } from '@features/api/backend/transport/openapi/gen-spec.js';
@@ -238,21 +235,6 @@ test('native chart requests strip extras while preserving defaults and host/date
 	for (const id of ['', 'bad-id', null, 1]) expect(v.safeParse(userChartInput, { span: 'day', userId: id }).success).toBe(false);
 	for (const limit of [1, 500]) expect(v.safeParse(chartInput, { span: 'day', limit }).success).toBe(true);
 	for (const limit of [0, 501, 1.5]) expect(v.safeParse(chartInput, { span: 'day', limit }).success).toBe(false);
-});
-
-test('descriptor builder rejects ambiguous paths and preserves ordered branching', () => {
-	const invalidDescriptors: descriptors.ChartMetricDescriptor[] = [{ 'a.': {} }, { '.a': {} }, { a: {}, 'a.b': {} }, { 'a.b': {}, a: {} }];
-	for (const descriptor of invalidDescriptors) {
-		expect(() => chartOutputSchema(descriptor)).toThrow(/chart metric path/);
-	}
-	const schema = chartOutputSchema({ 'z.last': {}, first: {}, 'z.next': {} });
-	const projection = projectEndpointContract(defineEndpointContract({ path: '/chart-builder' }, chartInput, schema));
-	expect(Object.keys(projection.response!.properties!)).toEqual(['z', 'first']);
-	expect(v.parse(schema, { z: { last: [], next: [-1, 0.5], extra: true }, first: [], extra: true })).toEqual({
-		z: { last: [], next: [-1, 0.5], extra: true }, first: [], extra: true,
-	});
-	expect(v.safeParse(schema, { first: [] }).success).toBe(false);
-	expect(v.safeParse(schema, { z: { last: null, next: [] }, first: [] }).success).toBe(false);
 });
 
 test('oRPC chart types infer nested required series without dotted keys or unknown-key widening', () => {

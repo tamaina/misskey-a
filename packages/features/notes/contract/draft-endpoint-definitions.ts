@@ -9,7 +9,6 @@ import { jsonString, misskeyId, uniqueStringArray } from '../../api/contract/ind
 import { jsonNumber } from '../../api/contract/json-number.js';
 import { jsonObject } from '../../api/contract/json-object.js';
 import { packedReference } from '../../api/contract/packed-reference.js';
-import { resultObject } from '../../api/contract/result-object.js';
 import { MAX_NOTE_TEXT_LENGTH } from './note-text-limit.js';
 
 export const notesDraftsCreateInput = jsonObject({
@@ -33,7 +32,7 @@ export const notesDraftsCreateInput = jsonObject({
 	scheduledAt: v.exactOptional(v.nullable(v.pipe(jsonNumber, v.integer()))),
 	isActuallyScheduled: v.optional(v.boolean(), false),
 });
-export const notesDraftsCreateOutput = v.pipe(resultObject({
+export const notesDraftsCreateOutput = v.pipe(v.strictObject({
 	createdDraft: v.pipe(packedReference('NoteDraft'), v.metadata({ optional: false, nullable: false })),
 }), v.metadata({ optional: false, nullable: false }));
 export const notesDraftsCreateDefinition = defineEndpointContract(
@@ -64,7 +63,7 @@ export const notesDraftsUpdateInput = jsonObject({
 	scheduledAt: v.exactOptional(v.nullable(v.pipe(jsonNumber, v.integer()))),
 	isActuallyScheduled: v.exactOptional(v.boolean()),
 });
-export const notesDraftsUpdateOutput = v.pipe(resultObject({
+export const notesDraftsUpdateOutput = v.pipe(v.strictObject({
 	updatedDraft: v.pipe(packedReference('NoteDraft'), v.metadata({ optional: false, nullable: false })),
 }), v.metadata({ optional: false, nullable: false }));
 export const notesDraftsUpdateDefinition = defineEndpointContract(
