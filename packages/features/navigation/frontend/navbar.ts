@@ -12,8 +12,12 @@ import { miLocalStorage } from '@features/preferences/frontend/local-storage.js'
 import { openInstanceMenu, openToolsMenu } from '@features/navigation/frontend/ui/_common_/common.js';
 import { lookup } from '@features/discovery/frontend/utility/lookup.js';
 import * as os from '@features/ui/frontend/os.js';
-import { i18n } from '@features/runtime/frontend/i18n.js';
+import { getNavbarMessages } from './navbar-locale.js';
 import { unisonReload } from '@features/runtime/frontend/utility/unison-reload.js';
+
+const messages = getNavbarMessages();
+const defaultUiLabel = messages.default;
+const deckUiLabel = messages.deck;
 
 export const navbarItemDef = reactive<{
 	[key: string]: {
@@ -27,7 +31,7 @@ export const navbarItemDef = reactive<{
 	};
 }>({
 	notifications: {
-		title: i18n.ts.notifications,
+		title: messages.notifications,
 		icon: 'ti ti-bell',
 		show: computed(() => $i != null),
 		indicated: computed(() => $i != null && $i.hasUnreadNotification),
@@ -43,66 +47,66 @@ export const navbarItemDef = reactive<{
 		to: '/my/notifications',
 	},
 	drive: {
-		title: i18n.ts.drive,
+		title: messages.drive,
 		icon: 'ti ti-cloud',
 		show: computed(() => $i != null),
 		to: '/my/drive',
 	},
 	followRequests: {
-		title: i18n.ts.followRequests,
+		title: messages.followRequests,
 		icon: 'ti ti-user-plus',
 		indicated: computed(() => $i != null && $i.hasPendingReceivedFollowRequest),
 		to: '/my/follow-requests',
 	},
 	explore: {
-		title: i18n.ts.explore,
+		title: messages.explore,
 		icon: 'ti ti-hash',
 		to: '/explore',
 	},
 	announcements: {
-		title: i18n.ts.announcements,
+		title: messages.announcements,
 		icon: 'ti ti-speakerphone',
 		indicated: computed(() => $i != null && $i.hasUnreadAnnouncement),
 		to: '/announcements',
 	},
 	search: {
-		title: i18n.ts.search,
+		title: messages.search,
 		icon: 'ti ti-search',
 		to: '/search',
 	},
 	lookup: {
-		title: i18n.ts.lookup,
+		title: messages.lookup,
 		icon: 'ti ti-world-search',
 		action: (ev) => {
 			lookup();
 		},
 	},
 	qr: {
-		title: i18n.ts.qr,
+		title: messages.qr,
 		icon: 'ti ti-qrcode',
 		show: computed(() => $i != null),
 		to: '/qr',
 	},
 	lists: {
-		title: i18n.ts.lists,
+		title: messages.lists,
 		icon: 'ti ti-list',
 		show: computed(() => $i != null),
 		to: '/my/lists',
 	},
 	antennas: {
-		title: i18n.ts.antennas,
+		title: messages.antennas,
 		icon: 'ti ti-antenna',
 		show: computed(() => $i != null),
 		to: '/my/antennas',
 	},
 	favorites: {
-		title: i18n.ts.favorites,
+		title: messages.favorites,
 		icon: 'ti ti-star',
 		show: computed(() => $i != null),
 		to: '/my/favorites',
 	},
 	pages: {
-		title: i18n.ts.pages,
+		title: messages.pages,
 		icon: 'ti ti-news',
 		to: '/pages',
 	},
@@ -112,30 +116,30 @@ export const navbarItemDef = reactive<{
 		to: '/play',
 	},
 	gallery: {
-		title: i18n.ts.gallery,
+		title: messages.gallery,
 		icon: 'ti ti-icons',
 		to: '/gallery',
 	},
 	clips: {
-		title: i18n.ts.clip,
+		title: messages.clip,
 		icon: 'ti ti-paperclip',
 		show: computed(() => $i != null),
 		to: '/my/clips',
 	},
 	channels: {
-		title: i18n.ts.channel,
+		title: messages.channel,
 		icon: 'ti ti-device-tv',
 		to: '/channels',
 	},
 	chat: {
-		title: i18n.ts.directMessage_short,
+		title: messages.directMessage_short,
 		icon: 'ti ti-messages',
 		to: '/chat',
 		show: computed(() => $i != null && $i.policies.chatAvailability !== 'unavailable'),
 		indicated: computed(() => $i != null && $i.hasUnreadChatMessages),
 	},
 	achievements: {
-		title: i18n.ts.achievements,
+		title: messages.achievements,
 		icon: 'ti ti-medal',
 		show: computed(() => $i != null),
 		to: '/my/achievements',
@@ -146,18 +150,18 @@ export const navbarItemDef = reactive<{
 		to: '/games',
 	},
 	ui: {
-		title: i18n.ts.switchUi,
+		title: messages.switchUi,
 		icon: 'ti ti-devices',
 		action: (ev) => {
 			os.popupMenu([{
-				text: i18n.ts.default,
+				text: defaultUiLabel,
 				active: ui === 'default' || ui === null,
 				action: () => {
 					miLocalStorage.setItem('ui', 'default');
 					unisonReload();
 				},
 			}, {
-				text: i18n.ts.deck,
+				text: deckUiLabel,
 				active: ui === 'deck',
 				action: () => {
 					miLocalStorage.setItem('ui', 'deck');
@@ -167,34 +171,34 @@ export const navbarItemDef = reactive<{
 		},
 	},
 	about: {
-		title: i18n.ts.about,
+		title: messages.about,
 		icon: 'ti ti-info-circle',
 		action: (ev) => {
 			openInstanceMenu(ev);
 		},
 	},
 	tools: {
-		title: i18n.ts.tools,
+		title: messages.tools,
 		icon: 'ti ti-tool',
 		action: (ev) => {
 			openToolsMenu(ev);
 		},
 	},
 	reload: {
-		title: i18n.ts.reload,
+		title: messages.reload,
 		icon: 'ti ti-refresh',
 		action: (ev) => {
 			window.location.reload();
 		},
 	},
 	profile: {
-		title: i18n.ts.profile,
+		title: messages.profile,
 		icon: 'ti ti-user',
 		show: computed(() => $i != null),
 		to: `/@${$i?.username}`,
 	},
 	cacheClear: {
-		title: i18n.ts.clearCache,
+		title: messages.clearCache,
 		icon: 'ti ti-trash',
 		action: (ev) => {
 			clearCache();

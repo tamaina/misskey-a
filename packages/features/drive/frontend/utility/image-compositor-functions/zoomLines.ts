@@ -6,7 +6,9 @@
 import shader from './zoomLines.glsl';
 import type { ImageEffectorUiDefinition } from '../image-effector/ImageEffector.js';
 import { defineImageCompositorFunction } from '@features/drive/frontend/utility/ImageCompositor.js';
-import { i18n } from '@features/runtime/frontend/i18n.js';
+import { getImageEffectorMessages } from './locale.js';
+
+const messages = getImageEffectorMessages();
 
 export const fn = defineImageCompositorFunction<{
 	x: number;
@@ -27,10 +29,10 @@ export const fn = defineImageCompositorFunction<{
 });
 
 export const uiDefinition = {
-	name: i18n.ts._imageEffector._fxs.zoomLines,
+	name: messages._imageEffector._fxs.zoomLines,
 	params: {
 		x: {
-			label: i18n.ts._imageEffector._fxProps.centerX,
+			label: messages._imageEffector._fxProps.centerX,
 			type: 'number',
 			default: 0.0,
 			min: -1.0,
@@ -38,7 +40,7 @@ export const uiDefinition = {
 			step: 0.01,
 		},
 		y: {
-			label: i18n.ts._imageEffector._fxProps.centerY,
+			label: messages._imageEffector._fxProps.centerY,
 			type: 'number',
 			default: 0.0,
 			min: -1.0,
@@ -46,7 +48,7 @@ export const uiDefinition = {
 			step: 0.01,
 		},
 		frequency: {
-			label: i18n.ts._imageEffector._fxProps.frequency,
+			label: messages._imageEffector._fxProps.frequency,
 			type: 'number',
 			default: 5.0,
 			min: 0.0,
@@ -54,7 +56,7 @@ export const uiDefinition = {
 			step: 0.1,
 		},
 		density: {
-			label: i18n.ts._imageEffector._fxProps.density,
+			label: messages._imageEffector._fxProps.density,
 			type: 'number',
 			default: 0.5,
 			min: 0.0,
@@ -62,7 +64,7 @@ export const uiDefinition = {
 			step: 0.01,
 		},
 		outlineThickness: {
-			label: i18n.ts._imageEffector._fxProps.zoomLinesOutlineThickness,
+			label: messages._imageEffector._fxProps.zoomLinesOutlineThickness,
 			type: 'number',
 			default: 0.25,
 			min: 0.0,
@@ -70,7 +72,7 @@ export const uiDefinition = {
 			step: 0.01,
 		},
 		maskSize: {
-			label: i18n.ts._imageEffector._fxProps.zoomLinesMaskSize,
+			label: messages._imageEffector._fxProps.zoomLinesMaskSize,
 			type: 'number',
 			default: 0.5,
 			min: 0.0,

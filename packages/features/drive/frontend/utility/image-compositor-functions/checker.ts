@@ -6,7 +6,9 @@
 import shader from './checker.glsl';
 import type { ImageEffectorUiDefinition } from '../image-effector/ImageEffector.js';
 import { defineImageCompositorFunction } from '@features/drive/frontend/utility/ImageCompositor.js';
-import { i18n } from '@features/runtime/frontend/i18n.js';
+import { getImageEffectorMessages } from './locale.js';
+
+const messages = getImageEffectorMessages();
 
 export const fn = defineImageCompositorFunction<{
 	angle: number;
@@ -24,10 +26,10 @@ export const fn = defineImageCompositorFunction<{
 });
 
 export const uiDefinition = {
-	name: i18n.ts._imageEffector._fxs.checker,
+	name: messages._imageEffector._fxs.checker,
 	params: {
 		angle: {
-			label: i18n.ts._imageEffector._fxProps.angle,
+			label: messages._imageEffector._fxProps.angle,
 			type: 'number',
 			default: 0,
 			min: -1.0,
@@ -36,7 +38,7 @@ export const uiDefinition = {
 			toViewValue: v => Math.round(v * 90) + '°',
 		},
 		scale: {
-			label: i18n.ts._imageEffector._fxProps.scale,
+			label: messages._imageEffector._fxProps.scale,
 			type: 'number',
 			default: 3.0,
 			min: 1.0,
@@ -44,12 +46,12 @@ export const uiDefinition = {
 			step: 0.1,
 		},
 		color: {
-			label: i18n.ts._imageEffector._fxProps.color,
+			label: messages._imageEffector._fxProps.color,
 			type: 'color',
 			default: [1, 1, 1],
 		},
 		opacity: {
-			label: i18n.ts._imageEffector._fxProps.opacity,
+			label: messages._imageEffector._fxProps.opacity,
 			type: 'number',
 			default: 0.5,
 			min: 0.0,

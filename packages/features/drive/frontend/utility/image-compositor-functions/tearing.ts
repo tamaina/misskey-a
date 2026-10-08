@@ -7,7 +7,9 @@ import seedrandom from 'seedrandom';
 import shader from './tearing.glsl';
 import type { ImageEffectorUiDefinition } from '../image-effector/ImageEffector.js';
 import { defineImageCompositorFunction } from '@features/drive/frontend/utility/ImageCompositor.js';
-import { i18n } from '@features/runtime/frontend/i18n.js';
+import { getImageEffectorMessages } from './locale.js';
+
+const messages = getImageEffectorMessages();
 
 export const fn = defineImageCompositorFunction<{
 	amount: number;
@@ -37,10 +39,10 @@ export const fn = defineImageCompositorFunction<{
 });
 
 export const uiDefinition = {
-	name: i18n.ts._imageEffector._fxs.glitch + ': ' + i18n.ts._imageEffector._fxs.tearing,
+	name: messages._imageEffector._fxs.glitch + ': ' + messages._imageEffector._fxs.tearing,
 	params: {
 		amount: {
-			label: i18n.ts._imageEffector._fxProps.amount,
+			label: messages._imageEffector._fxProps.amount,
 			type: 'number',
 			default: 3,
 			min: 1,
@@ -48,7 +50,7 @@ export const uiDefinition = {
 			step: 1,
 		},
 		strength: {
-			label: i18n.ts._imageEffector._fxProps.strength,
+			label: messages._imageEffector._fxProps.strength,
 			type: 'number',
 			default: 0.05,
 			min: -1,
@@ -57,7 +59,7 @@ export const uiDefinition = {
 			toViewValue: v => Math.round(v * 100) + '%',
 		},
 		size: {
-			label: i18n.ts._imageEffector._fxProps.size,
+			label: messages._imageEffector._fxProps.size,
 			type: 'number',
 			default: 0.2,
 			min: 0,
@@ -66,7 +68,7 @@ export const uiDefinition = {
 			toViewValue: v => Math.round(v * 100) + '%',
 		},
 		channelShift: {
-			label: i18n.ts._imageEffector._fxProps.glitchChannelShift,
+			label: messages._imageEffector._fxProps.glitchChannelShift,
 			type: 'number',
 			default: 0.5,
 			min: 0,
@@ -75,7 +77,7 @@ export const uiDefinition = {
 			toViewValue: v => Math.round(v * 100) + '%',
 		},
 		seed: {
-			label: i18n.ts._imageEffector._fxProps.seed,
+			label: messages._imageEffector._fxProps.seed,
 			type: 'seed',
 			default: 100,
 		},

@@ -6,7 +6,9 @@
 import shader from './colorClamp.glsl';
 import type { ImageEffectorUiDefinition } from '../image-effector/ImageEffector.js';
 import { defineImageCompositorFunction } from '@features/drive/frontend/utility/ImageCompositor.js';
-import { i18n } from '@features/runtime/frontend/i18n.js';
+import { getImageEffectorMessages } from './locale.js';
+
+const messages = getImageEffectorMessages();
 
 export const fn = defineImageCompositorFunction<{
 	max: number;
@@ -24,10 +26,10 @@ export const fn = defineImageCompositorFunction<{
 });
 
 export const uiDefinition = {
-	name: i18n.ts._imageEffector._fxs.colorClamp,
+	name: messages._imageEffector._fxs.colorClamp,
 	params: {
 		max: {
-			label: i18n.ts._imageEffector._fxProps.max,
+			label: messages._imageEffector._fxProps.max,
 			type: 'number',
 			default: 1.0,
 			min: 0.0,
@@ -36,7 +38,7 @@ export const uiDefinition = {
 			toViewValue: v => Math.round(v * 100) + '%',
 		},
 		min: {
-			label: i18n.ts._imageEffector._fxProps.min,
+			label: messages._imageEffector._fxProps.min,
 			type: 'number',
 			default: -1.0,
 			min: -1.0,

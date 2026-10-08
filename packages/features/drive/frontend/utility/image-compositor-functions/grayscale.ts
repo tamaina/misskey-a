@@ -6,7 +6,9 @@
 import shader from './grayscale.glsl';
 import type { ImageEffectorUiDefinition } from '../image-effector/ImageEffector.js';
 import { defineImageCompositorFunction } from '@features/drive/frontend/utility/ImageCompositor.js';
-import { i18n } from '@features/runtime/frontend/i18n.js';
+import { getImageEffectorMessages } from './locale.js';
+
+const messages = getImageEffectorMessages();
 
 export const fn = defineImageCompositorFunction({
 	shader,
@@ -15,7 +17,7 @@ export const fn = defineImageCompositorFunction({
 });
 
 export const uiDefinition = {
-	name: i18n.ts._imageEffector._fxs.grayscale,
+	name: messages._imageEffector._fxs.grayscale,
 	params: {
 	},
 } satisfies ImageEffectorUiDefinition<typeof fn>;

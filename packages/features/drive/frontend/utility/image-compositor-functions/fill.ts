@@ -6,7 +6,9 @@
 import shader from './fill.glsl';
 import type { ImageEffectorUiDefinition } from '../image-effector/ImageEffector.js';
 import { defineImageCompositorFunction } from '@features/drive/frontend/utility/ImageCompositor.js';
-import { i18n } from '@features/runtime/frontend/i18n.js';
+import { getImageEffectorMessages } from './locale.js';
+
+const messages = getImageEffectorMessages();
 
 export const fn = defineImageCompositorFunction<{
 	offsetX: number;
@@ -30,10 +32,10 @@ export const fn = defineImageCompositorFunction<{
 });
 
 export const uiDefinition = {
-	name: i18n.ts._imageEffector._fxs.fill,
+	name: messages._imageEffector._fxs.fill,
 	params: {
 		offsetX: {
-			label: i18n.ts._imageEffector._fxProps.offset + ' X',
+			label: messages._imageEffector._fxProps.offset + ' X',
 			type: 'number',
 			default: 0.0,
 			min: -1.0,
@@ -42,7 +44,7 @@ export const uiDefinition = {
 			toViewValue: v => Math.round(v * 100) + '%',
 		},
 		offsetY: {
-			label: i18n.ts._imageEffector._fxProps.offset + ' Y',
+			label: messages._imageEffector._fxProps.offset + ' Y',
 			type: 'number',
 			default: 0.0,
 			min: -1.0,
@@ -51,7 +53,7 @@ export const uiDefinition = {
 			toViewValue: v => Math.round(v * 100) + '%',
 		},
 		scaleX: {
-			label: i18n.ts._imageEffector._fxProps.scale + ' W',
+			label: messages._imageEffector._fxProps.scale + ' W',
 			type: 'number',
 			default: 0.5,
 			min: 0.0,
@@ -60,7 +62,7 @@ export const uiDefinition = {
 			toViewValue: v => Math.round(v * 100) + '%',
 		},
 		scaleY: {
-			label: i18n.ts._imageEffector._fxProps.scale + ' H',
+			label: messages._imageEffector._fxProps.scale + ' H',
 			type: 'number',
 			default: 0.5,
 			min: 0.0,
@@ -69,12 +71,12 @@ export const uiDefinition = {
 			toViewValue: v => Math.round(v * 100) + '%',
 		},
 		ellipse: {
-			label: i18n.ts._imageEffector._fxProps.circle,
+			label: messages._imageEffector._fxProps.circle,
 			type: 'boolean',
 			default: false,
 		},
 		angle: {
-			label: i18n.ts._imageEffector._fxProps.angle,
+			label: messages._imageEffector._fxProps.angle,
 			type: 'number',
 			default: 0,
 			min: -1.0,
@@ -83,12 +85,12 @@ export const uiDefinition = {
 			toViewValue: v => Math.round(v * 90) + '°',
 		},
 		color: {
-			label: i18n.ts._imageEffector._fxProps.color,
+			label: messages._imageEffector._fxProps.color,
 			type: 'color',
 			default: [1, 1, 1],
 		},
 		opacity: {
-			label: i18n.ts._imageEffector._fxProps.opacity,
+			label: messages._imageEffector._fxProps.opacity,
 			type: 'number',
 			default: 1.0,
 			min: 0.0,

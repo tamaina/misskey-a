@@ -6,7 +6,9 @@
 import shader from './mirror.glsl';
 import type { ImageEffectorUiDefinition } from '../image-effector/ImageEffector.js';
 import { defineImageCompositorFunction } from '@features/drive/frontend/utility/ImageCompositor.js';
-import { i18n } from '@features/runtime/frontend/i18n.js';
+import { getImageEffectorMessages } from './locale.js';
+
+const messages = getImageEffectorMessages();
 
 export const fn = defineImageCompositorFunction<{
 	h: number;
@@ -20,10 +22,10 @@ export const fn = defineImageCompositorFunction<{
 });
 
 export const uiDefinition = {
-	name: i18n.ts._imageEffector._fxs.mirror,
+	name: messages._imageEffector._fxs.mirror,
 	params: {
 		h: {
-			label: i18n.ts.horizontal,
+			label: messages.horizontal,
 			type: 'number:enum',
 			enum: [
 				{ value: -1 as const, icon: 'ti ti-arrow-bar-right' },
@@ -33,7 +35,7 @@ export const uiDefinition = {
 			default: -1,
 		},
 		v: {
-			label: i18n.ts.vertical,
+			label: messages.vertical,
 			type: 'number:enum',
 			enum: [
 				{ value: -1 as const, icon: 'ti ti-arrow-bar-down' },

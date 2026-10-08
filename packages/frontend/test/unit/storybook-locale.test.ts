@@ -8,7 +8,7 @@ import { createApp, defineComponent, h } from 'vue';
 import type { App } from 'vue';
 import { expect, test, vi } from 'vitest';
 import ts from 'typescript';
-import { createInternationalization } from 'virtual:vite-vue-internationalization';
+import { createInternationalization, setActiveInternationalization } from 'virtual:vite-vue-internationalization';
 import locales from 'i18n';
 import previewSource from '../../.storybook/preview.ts?raw';
 import { preferState } from '../setup.unit.js';
@@ -18,15 +18,18 @@ import registerDirectives from '@features/index/frontend/directives.js';
 import MkEmoji from '@features/emojis/frontend/components/global/MkEmoji.vue';
 import MkResult from '@features/ui/frontend/components/global/MkResult.vue';
 import { lang } from '@features/boot/frontend/shared/config.js';
+import { getNavbarMessages } from '@features/navigation/frontend/navbar-locale.js';
 
 test('actual Storybook preview setup readies real component locales and installs once per app', async () => {
 	const setup = vi.fn<(callback: (app: App) => void) => void>();
 	const create = vi.fn(createInternationalization);
+	const activate = vi.fn(setActiveInternationalization);
+	const initialized: string[] = [];
 	const collaborators: Record<string, unknown> = {
 		'@storybook/core-events': { FORCE_RE_RENDER: 'render', FORCE_REMOUNT: 'remount' },
 		'@storybook/preview-api': { addons: { getChannel: () => ({ emit: vi.fn() }) } },
 		'@storybook/vue3': { setup },
-		'virtual:vite-vue-internationalization': { createInternationalization: create },
+		'virtual:vite-vue-internationalization': { createInternationalization: create, setActiveInternationalization: activate },
 		'@features/boot/frontend/index.js': { startComponentLocales },
 		'chromatic/isChromatic': { default: () => false },
 		'msw-storybook-addon': { initialize: vi.fn(), mswLoader: vi.fn() },
@@ -50,9 +53,14 @@ test('actual Storybook preview setup readies real component locales and installs
 		reportDiagnostics: true,
 	});
 	expect(compiled.diagnostics).toEqual([]);
-	runInNewContext(compiled.outputText, {
+	await runInNewContext('(async () => {\n' + compiled.outputText + '\n})()', {
 		exports: {},
 		require(specifier: string) {
+			if (specifier.startsWith('../../features/')) {
+				expect(activate).toHaveBeenCalledOnce();
+				expect(getNavbarMessages().notifications).toBe(locales[lang].notifications);
+				initialized.push(specifier);
+			}
 			if (!Object.hasOwn(collaborators, specifier)) throw new Error(`Unexpected preview dependency: ${specifier}`);
 			return { __esModule: true, ...(collaborators[specifier] as Record<string, unknown>) };
 		},
@@ -60,6 +68,8 @@ test('actual Storybook preview setup readies real component locales and installs
 	});
 	await vi.waitFor(() => expect(setup).toHaveBeenCalledOnce());
 	expect(create).toHaveBeenCalledExactlyOnceWith({ initialLocale: lang });
+	expect(initialized).toHaveLength(6);
+	expect(activate).toHaveBeenCalledOnce();
 	const configure = setup.mock.calls[0][0];
 	preferState.emojiStyle = 'native';
 	const app = createApp(defineComponent({

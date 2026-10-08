@@ -6,7 +6,9 @@
 import shader from './threshold.glsl';
 import type { ImageEffectorUiDefinition } from '../image-effector/ImageEffector.js';
 import { defineImageCompositorFunction } from '@features/drive/frontend/utility/ImageCompositor.js';
-import { i18n } from '@features/runtime/frontend/i18n.js';
+import { getImageEffectorMessages } from './locale.js';
+
+const messages = getImageEffectorMessages();
 
 export const fn = defineImageCompositorFunction<{
 	r: number;
@@ -22,10 +24,10 @@ export const fn = defineImageCompositorFunction<{
 });
 
 export const uiDefinition = {
-	name: i18n.ts._imageEffector._fxs.threshold,
+	name: messages._imageEffector._fxs.threshold,
 	params: {
 		r: {
-			label: i18n.ts._imageEffector._fxProps.redComponent,
+			label: messages._imageEffector._fxProps.redComponent,
 			type: 'number',
 			default: 0.5,
 			min: 0.0,
@@ -33,7 +35,7 @@ export const uiDefinition = {
 			step: 0.01,
 		},
 		g: {
-			label: i18n.ts._imageEffector._fxProps.greenComponent,
+			label: messages._imageEffector._fxProps.greenComponent,
 			type: 'number',
 			default: 0.5,
 			min: 0.0,
@@ -41,7 +43,7 @@ export const uiDefinition = {
 			step: 0.01,
 		},
 		b: {
-			label: i18n.ts._imageEffector._fxProps.blueComponent,
+			label: messages._imageEffector._fxProps.blueComponent,
 			type: 'number',
 			default: 0.5,
 			min: 0.0,

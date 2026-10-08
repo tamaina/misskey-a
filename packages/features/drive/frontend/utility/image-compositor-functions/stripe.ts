@@ -6,7 +6,9 @@
 import shader from './stripe.glsl';
 import type { ImageEffectorUiDefinition } from '../image-effector/ImageEffector.js';
 import { defineImageCompositorFunction } from '@features/drive/frontend/utility/ImageCompositor.js';
-import { i18n } from '@features/runtime/frontend/i18n.js';
+import { getImageEffectorMessages } from './locale.js';
+
+const messages = getImageEffectorMessages();
 
 export const fn = defineImageCompositorFunction<{
 	angle: number;
@@ -27,10 +29,10 @@ export const fn = defineImageCompositorFunction<{
 });
 
 export const uiDefinition = {
-	name: i18n.ts._imageEffector._fxs.stripe,
+	name: messages._imageEffector._fxs.stripe,
 	params: {
 		angle: {
-			label: i18n.ts._imageEffector._fxProps.angle,
+			label: messages._imageEffector._fxProps.angle,
 			type: 'number',
 			default: 0.5,
 			min: -1.0,
@@ -39,7 +41,7 @@ export const uiDefinition = {
 			toViewValue: v => Math.round(v * 90) + '°',
 		},
 		frequency: {
-			label: i18n.ts._watermarkEditor.stripeFrequency,
+			label: messages._watermarkEditor.stripeFrequency,
 			type: 'number',
 			default: 10.0,
 			min: 1.0,
@@ -47,7 +49,7 @@ export const uiDefinition = {
 			step: 0.1,
 		},
 		threshold: {
-			label: i18n.ts._watermarkEditor.stripeWidth,
+			label: messages._watermarkEditor.stripeWidth,
 			type: 'number',
 			default: 0.1,
 			min: 0.0,
@@ -56,12 +58,12 @@ export const uiDefinition = {
 			toViewValue: v => Math.round(v * 100) + '%',
 		},
 		color: {
-			label: i18n.ts._imageEffector._fxProps.color,
+			label: messages._imageEffector._fxProps.color,
 			type: 'color',
 			default: [1, 1, 1],
 		},
 		opacity: {
-			label: i18n.ts._imageEffector._fxProps.opacity,
+			label: messages._imageEffector._fxProps.opacity,
 			type: 'number',
 			default: 0.5,
 			min: 0.0,
