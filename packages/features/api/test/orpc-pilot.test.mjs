@@ -257,3 +257,28 @@ test('canceled and truncated uploads clean staging without invoking consumers', 
 		}
 	} finally { await rm(directory, { recursive: true, force: true }); }
 });
+
+test('already-aborted and staging-init aborts never start the multipart iterator and clean up', { timeout: 2000 }, async () => {
+	const directory = await mkdtemp(join(tmpdir(), 'misskey-pilot-init-abort-'));
+	try {
+		for (const mode of ['already-aborted', 'during-init']) {
+			const request = multipartRequest();
+			let parserStarted = false;
+			request.parts = () => { parserStarted = true; throw Error('Parser must not start after an early abort'); };
+			if (mode === 'already-aborted') request.raw.aborted = true;
+			else {
+				const once = request.raw.once.bind(request.raw);
+				request.raw.once = (name, listener) => {
+					const result = once(name, listener);
+					// A microtask fires while the first filesystem await is unresolved.
+					queueMicrotask(() => { request.raw.aborted = true; request.raw.emit('aborted'); });
+					return result;
+				};
+			}
+			await assert.rejects(withStagedUpload(request, { maxFileSize: 1024, directory }, async () => { throw Error('Must not consume'); }), error => error.status === 400);
+			assert.equal(parserStarted, false);
+			assert.equal(request.raw.listenerCount('aborted'), 0);
+			assert.deepEqual(await readdir(directory), []);
+		}
+	} finally { await rm(directory, { recursive: true, force: true }); }
+});

@@ -8,6 +8,8 @@ import * as path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { expect, test } from 'vitest';
 import * as ts from 'typescript';
+import { pilotContract } from '@features/index/backend/api.contract.js';
+import { requestRoutes } from '@features/api/shared/api-routing.js';
 
 const testDirectory = path.dirname(fileURLToPath(import.meta.url));
 const repositoryRoot = path.resolve(testDirectory, '../../..');
@@ -15,6 +17,8 @@ const backendSourceRoot = testDirectory;
 const featureRoot = path.resolve(repositoryRoot, 'packages/features');
 const endpointRegistryPath = path.resolve(featureRoot, 'index/backend/endpoint-list.ts');
 const expectedRouteOrder = JSON.parse(readFileSync(path.resolve(testDirectory, '../test/fixtures/backend-api-registry-order.json'), 'utf8')) as string[];
+const nativeRoutes = new Set(requestRoutes(pilotContract).map(route => route.name));
+const legacyRouteOrder = expectedRouteOrder.filter(route => !nativeRoutes.has(route));
 const removedBridgePaths = JSON.parse(readFileSync(path.resolve(testDirectory, '../test/fixtures/backend-feature-bridge-removal.json'), 'utf8')) as string[];
 const removedBridgeStems = new Set(removedBridgePaths.map(bridgePath => path.resolve(repositoryRoot, bridgePath).replace(/\.tsx?$/, '')));
 
@@ -79,14 +83,14 @@ function resolveExistingModule(importer: string, specifier: string): string | nu
 // Recognize its exact namespace contract, never a general barrel/path exemption.
 function isCanonicalEndpointRegistry(file: string, ast: ts.SourceFile): boolean {
 	return path.resolve(file) === endpointRegistryPath
-		&& ast.statements.length === expectedRouteOrder.length
+		&& ast.statements.length === legacyRouteOrder.length
 		&& ast.statements.every((statement, index) => ts.isExportDeclaration(statement)
 			&& !statement.isTypeOnly
 			&& statement.moduleSpecifier != null
 			&& ts.isStringLiteralLike(statement.moduleSpecifier)
 			&& statement.exportClause != null
 			&& ts.isNamespaceExport(statement.exportClause)
-			&& statement.exportClause.name.text === expectedRouteOrder[index]);
+			&& statement.exportClause.name.text === legacyRouteOrder[index]);
 }
 
 function isFeatureReexportBridge(file: string, source = readFileSync(file, 'utf8')): boolean {
@@ -123,14 +127,15 @@ test('backend source has no export-only forwarders into feature modules', () => 
 	expect(bridges).toEqual([]);
 });
 
-test('only the complete ordered index namespace registry is a composition exception', () => {
+test('only the complete ordered legacy index namespace registry is a composition exception', () => {
 	const source = readFileSync(endpointRegistryPath, 'utf8');
 	const parse = (text: string) => ts.createSourceFile(endpointRegistryPath, text, ts.ScriptTarget.Latest, true);
 	const ast = parse(source);
 	expect(isCanonicalEndpointRegistry(endpointRegistryPath, ast)).toBe(true);
 	expect(isCanonicalEndpointRegistry(path.join(backendSourceRoot, 'barrel.ts'), ast)).toBe(false);
 
-	const namespaceExports = expectedRouteOrder.map(route => `export * as '${route}' from './owner.js';`);
+	expect([...legacyRouteOrder, ...nativeRoutes].sort()).toEqual([...expectedRouteOrder].sort());
+	const namespaceExports = legacyRouteOrder.map(route => `export * as '${route}' from './owner.js';`);
 	const invalidSources = [
 		namespaceExports.slice(1).join('\n'),
 		[...namespaceExports].reverse().join('\n'),

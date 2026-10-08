@@ -52,15 +52,23 @@ export async function withStagedUpload(
 	options: { maxFileSize: number; directory?: string },
 	consume: (body: Record<string, unknown>, upload: UploadResource, cleanup: () => Promise<void>) => Promise<void>,
 ): Promise<void> {
-	const directory = await mkdtemp(join(options.directory ?? tmpdir(), 'misskey-upload-'));
-	const path = join(directory, 'file');
-	let cleanupPromise: Promise<void> | undefined;
-	const cleanup = () => cleanupPromise ??= rm(directory, { recursive: true, force: true });
 	const controller = new AbortController();
 	const abort = () => controller.abort();
+	// Listen before the first asynchronous staging operation; an early close is not replayed.
 	request.raw.once('aborted', abort);
 	if (request.raw.aborted) abort();
+	let directory: string | undefined;
+	let cleanupPromise: Promise<void> | undefined;
+	const cleanup = () => cleanupPromise ??= directory === undefined
+		? Promise.resolve() : rm(directory, { recursive: true, force: true });
+	const checkCanceled = () => {
+		if (controller.signal.aborted) throw new UploadRequestError(400, 'Upload canceled');
+	};
 	try {
+		checkCanceled();
+		directory = await mkdtemp(join(options.directory ?? tmpdir(), 'misskey-upload-'));
+		checkCanceled();
+		const path = join(directory, 'file');
 		const fields: Record<string, unknown> = {};
 		let upload: UploadResource | undefined;
 		try {
@@ -68,6 +76,7 @@ export async function withStagedUpload(
 			const parts = request.parts({ limits: { files: 1, fileSize: options.maxFileSize } });
 			try {
 				while (true) {
+					checkCanceled();
 					const result = await parts.next().catch((error: unknown) => {
 						const limited = error !== null && typeof error === 'object' && 'code' in error
 							&& typeof error.code === 'string' && /TOO_LARGE|LIMIT/.test(error.code);

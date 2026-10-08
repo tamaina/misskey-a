@@ -22,7 +22,7 @@ test('204 does not read a nonexistent JSON body; native Responses retain real he
 		new Request('https://example.com/api/notes/delete', { method: 'POST', body: '{}' }));
 	assert.equal(empty.status, 204);
 	assert.equal(await empty.text(), '');
-	const expected = new Response('{}', { status: 429, headers: { 'Retry-After': '5' } });
+	const expected = new Response('{}', { status: 429, headers: { 'Content-Type': 'application/json', 'Retry-After': '5' } });
 	const actual = await fetchPilotResponse(async () => expected, new Request('https://example.com/api/server-info'));
 	assert.equal(actual, expected);
 	assert.equal(actual.headers.get('Retry-After'), '5');
@@ -56,4 +56,13 @@ test('oRPC cancellation reaches injected fetch and pre-aborted requests never st
 	controller.abort();
 	assert.equal(signal.aborted, true);
 	await assert.rejects(fetchPilotResponse(async () => { throw Error('must not fetch'); }, request), { name: 'AbortError' });
+});
+
+
+test('JSON-only injected Responses decode as JSON even when headers default to text/plain', async () => {
+	const original = new Response('{"id":"file1"}', { headers: { 'Retry-After': '5' } });
+	const response = await fetchPilotResponse(async () => original, new Request('https://example.com/api/drive/files/create'));
+	assert.equal(response.headers.get('content-type'), 'application/json');
+	assert.equal(response.headers.get('Retry-After'), '5');
+	assert.deepEqual(await response.json(), { id: 'file1' });
 });

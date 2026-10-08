@@ -12,9 +12,10 @@ import { tmpdir } from 'node:os';
 import { setTimeout as delay } from 'node:timers/promises';
 import Fastify from 'fastify';
 import multipart from '@fastify/multipart';
+import { safe, isDefinedError } from '@orpc/server';
 import { OpenAPIHandler } from '@orpc/openapi/fastify';
 import { APIClient } from '../../misskey-js/built/api.js';
-import { createApiRouter, registerPilotHttp, bodyCredential, misskeyErrorBody, genPilotOpenapiSpec, getPilotEndpointDescriptors } from '../built/features/api/pilot.js';
+import { createApiRouter, createDeleteNote, registerPilotHttp, bodyCredential, misskeyErrorBody, genPilotOpenapiSpec, getPilotEndpointDescriptors } from '../built/features/api/pilot.js';
 
 const actor = { id: 'alice', isSuspended: false, movedToUri: null };
 const stats = { machine: '?', cpu: { model: '?', cores: 0 }, mem: { total: 0 }, fs: { total: 0, used: 0 } };
@@ -90,11 +91,12 @@ test('HTTP failures and SDK error decoding retain envelope, UUID and policy orde
 
 test('real SDK multipart reaches the single File contract, defaults and cleanup', async t => {
 	const { client, events } = await fixture(t);
-	assert.deepEqual(await client.request('drive/files/create', { file: new File(['bytes'], 'file.txt', { type: 'text/plain' }), comment: '😀'.repeat(512) }), output);
+	assert.deepEqual(await client.request('drive/files/create', { file: new File(['bytes'], 'file.txt', { type: 'text/plain' }), comment: '😀'.repeat(512), future: { kept: true }, path: '/untrusted/body/path' }), output);
 	assert.deepEqual(await client.orpc.drive.files.create({ file: new File(['bytes'], 'file.txt'), force: true }), output);
 	const uploads = events.filter(event => event[0] === 'upload');
 	assert.equal(uploads.length, 2);
 	assert.equal(uploads[0][1].force, false);
+	for (const ignored of ['future', 'future[kept]', 'path']) assert.equal(ignored in uploads[0][1], false);
 	assert.equal(uploads[0][1].folderId, null);
 	assert.equal(uploads[0][3], 'bytes');
 	assert.equal(uploads[1][1].force, true);
@@ -188,4 +190,70 @@ test('legacy non-GET method aliases retain POST semantics without changing contr
 	assert.equal(head.status, 200);
 	assert.equal(await head.text(), '');
 	assert.equal((await app.inject({ method: 'GET', url: '/api/notes/delete' })).statusCode, 405);
+});
+
+
+test('JSON pilot routes reject oversized unsupported multipart before auth or raw decoding', async t => {
+	const { origin, events } = await fixture(t);
+	for (const name of ['server-info', 'notes/delete']) {
+		const body = new FormData();
+		body.set('file', new File(['x'.repeat(2 * 1024 * 1024)], 'oversized.txt'));
+		const response = await fetch(`${origin}/api/${name}`, { method: 'POST', body, signal: AbortSignal.timeout(5000) });
+		assert.equal(response.status, 415);
+		assert.equal(response.headers.get('connection'), 'close');
+		assert.equal(await response.text(), '');
+	}
+	assert.deepEqual(events, []);
+});
+
+test('safe and isDefinedError recognize contract-declared errors over the real typed HTTP client', async t => {
+	const { origin } = await fixture(t);
+	const anonymous = new APIClient({ origin });
+	const required = await safe(anonymous.orpc.notes.delete({ noteId: 'note1' }));
+	assert.equal(required.isDefined, true);
+	assert.equal(isDefinedError(required.error), true);
+	assert.equal(required.error.code, 'CREDENTIAL_REQUIRED');
+	assert.equal(required.error.data.id, '1384574d-a912-4b81-8601-c7b1c4085df1');
+	assert.equal('code' in required.error.data, false);
+	const missing = await fixture(t, { deleteNote: createDeleteNote({
+		getNote: async () => { throw { id: '9725d0ce-ba28-4dde-95a7-2cbb2c15de24' }; },
+		isModerator: async () => false, findAuthor: async () => { throw Error('Must not read'); },
+		delete: async () => { throw Error('Must not delete'); },
+	}) });
+	const result = await safe(missing.client.orpc.notes.delete({ noteId: 'missing1' }));
+	assert.equal(result.isDefined, true);
+	assert.equal(result.error.code, 'NO_SUCH_NOTE');
+	assert.equal(result.error.data.id, '490be23f-8c1f-4796-819f-94cb4f9d1630');
+	await assert.rejects(missing.client.request('notes/delete', { noteId: 'missing1' }), error =>
+		error.code === 'NO_SUCH_NOTE' && error.id === result.error.data.id);
+});
+
+test('unknown, malformed, wrong-status and wrong-route proxy errors never become defined', async t => {
+	const app = Fastify();
+	const data = { id: 'proxy-error', kind: 'client' };
+	const cases = [
+		{ status: 502, body: { error: { code: 'PROXY_ERROR', message: 'proxy', ...data } } },
+		{ status: 401, body: { error: { code: 'CREDENTIAL_REQUIRED', message: 'bad id', ...data, id: 1 } } },
+		{ status: 401, body: { error: { code: 'CREDENTIAL_REQUIRED', message: 'bad kind', id: 'id1', kind: 'invalid' } } },
+		{ status: 401, body: { error: { code: 'CREDENTIAL_REQUIRED', message: 1, ...data } } },
+		{ status: 401, body: { error: { code: 'CREDENTIAL_REQUIRED', message: 'bad info', ...data, info: [] } } },
+		{ status: 400, body: { error: { code: 'CREDENTIAL_REQUIRED', message: 'wrong status', ...data } } },
+		{ status: 413, body: { error: { code: 'MAX_FILE_SIZE_EXCEEDED', message: 'wrong route', ...data } } },
+		{ status: 500, body: { error: { code: 'toString', message: 'inherited property', ...data } } },
+		{ status: 500, body: { defined: true, code: 'PROXY_ERROR', message: 'forged defined', status: 500, data } },
+	];
+	let index = 0;
+	app.post('/api/notes/delete', (_request, reply) => {
+		const current = cases[index++];
+		return reply.code(current.status).send(current.body);
+	});
+	const origin = await app.listen({ host: '127.0.0.1', port: 0 });
+	t.after(() => app.close());
+	const client = new APIClient({ origin });
+	for (const current of cases) {
+		const result = await safe(client.orpc.notes.delete({ noteId: 'note1' }));
+		assert.equal(result.isSuccess, false);
+		assert.equal(result.isDefined, false, JSON.stringify(current));
+		assert.equal(isDefinedError(result.error), false, JSON.stringify(current));
+	}
 });

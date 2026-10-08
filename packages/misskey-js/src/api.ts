@@ -40,10 +40,13 @@ export class APIClient {
 	public origin: string;
 	public credential: string | null | undefined;
 	public fetch: FetchLike;
+	private readonly defaultFetch: FetchLike = (...args) => fetch(...args);
 	private readonly pilot = createPilotClient({
 		origin: () => this.origin,
 		credential: () => this.credential,
 		fetch: () => this.fetch,
+		nativeFetch: (request, init) => this.fetch === this.defaultFetch
+			? fetch(request, { ...init, credentials: 'omit', cache: 'no-cache' }) : undefined,
 	});
 	/** Native nested oRPC client; legacy request names remain available below. */
 	public readonly orpc = this.pilot.client;
@@ -57,7 +60,7 @@ export class APIClient {
 		this.credential = opts.credential;
 		// ネイティブ関数をそのまま変数に代入して使おうとするとChromiumではIllegal invocationエラーが発生するため、
 		// 環境で実装されているfetchを使う場合は無名関数でラップして使用する
-		this.fetch = opts.fetch ?? ((...args) => fetch(...args));
+		this.fetch = opts.fetch ?? this.defaultFetch;
 	}
 
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any

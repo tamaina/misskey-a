@@ -43,7 +43,6 @@ export interface NotesCommandsDependencies<
 > {
 	getNote(noteId: string): Promise<Note>;
 
-	isModerator(actor: Actor): Promise<boolean>;
 	findUserByIdOrFail(userId: string): Promise<Author>;
 	deleteNote(author: Author, note: Note, quiet?: boolean, deleter?: Actor): Promise<unknown>;
 
@@ -108,17 +107,6 @@ export function createNotesCommands<
 	};
 
 	return {
-		'notes/delete': bind(notesCommandsContract['notes/delete'], async ({ input, context }) => {
-			const actor = requireActor(context);
-			const note = await getNote(input.noteId, notesCommandErrors['notes/delete'].noSuchNote);
-
-			if (!await deps.isModerator(actor) && note.userId !== actor.id) {
-				throw deps.createError(notesCommandErrors['notes/delete'].accessDenied);
-			}
-
-			const author = await deps.findUserByIdOrFail(note.userId);
-			await deps.deleteNote(author, note, false, actor);
-		}),
 		'notes/drafts/delete': bind(notesCommandsContract['notes/drafts/delete'], async ({ input, context }) => {
 			const actor = requireActor(context);
 			const draft = await deps.getDraft(actor, input.draftId);

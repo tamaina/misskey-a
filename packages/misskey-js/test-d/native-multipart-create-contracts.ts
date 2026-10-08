@@ -18,8 +18,13 @@ type A2 = Assert<Equal<v.InferInput<typeof driveFilesCreateWireInput>['file'], B
 type A3 = Assert<Equal<ContractEndpoints['drive/files/create']['req']['file'], Blob>>;
 type A4 = Assert<Equal<Endpoints['drive/files/create']['req']['file'], Blob>>;
 type A5 = Assert<Equal<DriveFilesCreateRequest, Endpoints['drive/files/create']['req']>>;
-type A6 = Assert<Equal<Native['res'], Packed<'DriveFile'>>>;
-type A7 = Assert<Equal<Endpoints['drive/files/create']['res'], Packed<'DriveFile'>>>;
+// pack(..., { self: true }) emits these three relationships as required nulls.
+// Preserve assignability to Packed while checking the more precise finite upload DTO.
+type SelfUploadedDriveFile = { [K in keyof Packed<'DriveFile'>]-?: K extends 'folder' | 'user' | 'userId' ? null : Packed<'DriveFile'>[K] };
+type A6 = Assert<Equal<Native['res'], SelfUploadedDriveFile>>;
+type A7 = Assert<Equal<Endpoints['drive/files/create']['res'], SelfUploadedDriveFile>>;
+type A12 = Assert<Native['res'] extends Packed<'DriveFile'> ? true : false>;
+type A13 = Assert<Equal<Equal<Native['res'], Packed<'DriveFile'>>, false>>;
 type A8 = Assert<Equal<IsAny<Router['file']>, false>>;
 type A9 = Assert<Equal<'file' extends keyof DeclaredFields<v.InferOutput<typeof driveFilesCreateInput>> ? true : false, false>>;
 type A10 = Assert<Equal<v.InferOutput<typeof driveFilesCreateInput>['force'], boolean>>;

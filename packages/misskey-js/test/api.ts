@@ -107,6 +107,8 @@ describe('API', () => {
 		const cli = new APIClient({
 			origin: 'https://misskey.test',
 			credential: 'TOKEN',
+			// Explicit FetchLike injection retains the legacy string/options surface.
+			fetch: fetchMock,
 		});
 
 		const testFile = new File([], 'foo.txt');
@@ -123,6 +125,7 @@ describe('API', () => {
 		expect(fetchMock).toHaveBeenCalledWith('https://misskey.test/api/drive/files/create', {
 			method: 'POST',
 			body: expect.any(FormData),
+			signal: expect.any(AbortSignal),
 			headers: {},
 			credentials: 'omit',
 			cache: 'no-cache',
@@ -309,4 +312,23 @@ describe('API', () => {
 
 		fetchMock.mockRestore();
 	})
+});
+
+
+test('default native fetch receives the official Request without reparsing multipart', async () => {
+	const formReader = vi.spyOn(Request.prototype, 'formData').mockImplementation(async () => { throw Error('Must not materialize FormData'); });
+	const nativeFetch = vi.spyOn(globalThis, 'fetch').mockImplementation(async (request, init) => {
+		expect(request).toBeInstanceOf(Request);
+		if (!(request instanceof Request)) throw Error('Expected official Request');
+		expect(request.headers.get('content-type')).toMatch(/^multipart\/form-data; boundary=/);
+		expect(init?.credentials).toBe('omit');
+		expect(init?.cache).toBe('no-cache');
+		expect(await request.text()).toContain('native-bytes');
+		return new Response('{"id":"file1"}', { headers: { 'Content-Type': 'application/json' } });
+	});
+	try {
+		const client = new APIClient({ origin: 'https://native.test' });
+		expect(await client.request('drive/files/create', { file: new Blob(['native-bytes']) })).toEqual({ id: 'file1' });
+		expect(formReader).not.toHaveBeenCalled();
+	} finally { nativeFetch.mockRestore(); formReader.mockRestore(); }
 });

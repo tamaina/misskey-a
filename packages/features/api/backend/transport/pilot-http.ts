@@ -40,6 +40,11 @@ export function registerPilotHttp<Actor extends ApiActor>(
 		},
 	}, async (request, reply) => {
 		if (request.method === 'GET' && route.name !== 'server-info') return reply.code(405).send();
+		// JSON routes must never enter the adapter's unbounded raw multipart reader.
+		if (route.name !== 'drive/files/create' && request.isMultipart()) {
+			// End the rejected upload connection instead of leaving an unread body stalled.
+			return reply.header('Connection', 'close').code(415).send();
+		}
 		const run = async (upload?: UploadResource) => {
 			const context = options.context(request, reply, route.name, upload);
 			if (request.method === 'GET' && !context.credential) reply.header('Cache-Control', 'public, max-age=60');

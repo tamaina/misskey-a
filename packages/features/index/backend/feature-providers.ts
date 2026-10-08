@@ -4,7 +4,6 @@
  */
 
 import { getPilotEndpointDescriptors } from '@features/api/backend/transport/openapi/pilot-spec.js';
-import * as os from 'node:os';
 import {
 	createModerationCommands,
 	createNotesCommands,
@@ -156,10 +155,9 @@ export const featureProviders: Provider[] = [{
 	}),
 }, {
 	provide: featureTokens.notesCommands,
-	inject: [GetterService, RoleService, DI.usersRepository, NoteDeleteService, NoteDraftService, ReactionService, DI.noteThreadMutingsRepository, DI.notesRepository, DI.promoReadsRepository, IdService],
-	useFactory: (getter: GetterService, roles: RoleService, users: UsersRepository, deletion: NoteDeleteService, drafts: NoteDraftService, reactions: ReactionService, threadMutings: NoteThreadMutingsRepository, notes: NotesRepository, promoReads: PromoReadsRepository, ids: IdService) => createNotesCommands<MiLocalUser, MiNote, MiNoteDraft, MiUser>({
+	inject: [GetterService, DI.usersRepository, NoteDeleteService, NoteDraftService, ReactionService, DI.noteThreadMutingsRepository, DI.notesRepository, DI.promoReadsRepository, IdService],
+	useFactory: (getter: GetterService, users: UsersRepository, deletion: NoteDeleteService, drafts: NoteDraftService, reactions: ReactionService, threadMutings: NoteThreadMutingsRepository, notes: NotesRepository, promoReads: PromoReadsRepository, ids: IdService) => createNotesCommands<MiLocalUser, MiNote, MiNoteDraft, MiUser>({
 		getNote: id => getter.getNote(id),
-		isModerator: actor => roles.isModerator(actor),
 		findUserByIdOrFail: id => users.findOneByOrFail({ id }),
 		deleteNote: (author, note, quiet, deleter) => deletion.delete(author, note, quiet, deleter),
 		getDraft: (actor, id) => drafts.get(actor, id),
@@ -373,22 +371,8 @@ export const featureProviders: Provider[] = [{
 	}),
 }, {
 	provide: featureTokens.instance,
-	inject: [DI.meta, DI.usersRepository],
-	useFactory: (settings: MiMeta, usersRepository: UsersRepository) => createInstance({
-		serverInfo: {
-			enabled: () => settings.enableServerMachineStats,
-			read: async () => {
-				const si = await import('systeminformation');
-				const memStats = await si.mem();
-				const fsStats = await si.fsSize();
-				return {
-					machine: os.hostname(),
-					cpu: { model: os.cpus()[0].model, cores: os.cpus().length },
-					mem: { total: memStats.total },
-					fs: { total: fsStats[0].size, used: fsStats[0].used },
-				};
-			},
-		},
+	inject: [DI.usersRepository],
+	useFactory: (usersRepository: UsersRepository) => createInstance({
 		getOnlineUsersCount: {
 			thresholdMs: USER_ONLINE_THRESHOLD,
 			countSince: cutoff => usersRepository.countBy({ lastActiveDate: MoreThan(cutoff) }),

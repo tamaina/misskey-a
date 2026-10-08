@@ -27,7 +27,6 @@ function createDeps(overrides = {}) {
 	let nextId = 0;
 	const deps = {
 		getNote: async id => { calls.push(['getNote', id]); return note; },
-		isModerator: async user => { calls.push(['isModerator', user]); return false; },
 		findUserByIdOrFail: async id => { calls.push(['findUserByIdOrFail', id]); return { id, uri: null, host: null, isBot: false }; },
 		deleteNote: async (...args) => { calls.push(['deleteNote', ...args]); },
 		getDraft: async (user, id) => { calls.push(['getDraft', user, id]); return draft; },
@@ -73,7 +72,7 @@ test('note command legacy schemas preserve required IDs and unbounded reaction s
 	assert.deepEqual(reaction, { type: 'string' });
 });
 
-test('all eight command success paths call only their explicit ports and use the trusted actor', async () => {
+test('all seven legacy command success paths call only their explicit ports and use the trusted actor', async () => {
 	const { deps, calls } = createDeps({
 		findRenotesByUserAndRenote: async (userId, renoteId) => {
 			calls.push(['findRenotesByUserAndRenote', userId, renoteId]);
@@ -83,7 +82,6 @@ test('all eight command success paths call only their explicit ports and use the
 	const feature = createNotesCommands(deps);
 	const spoofed = { id: 'mallory' };
 
-	await invoke(feature, 'notes/delete', { noteId: note.id, actor: spoofed });
 	await invoke(feature, 'notes/drafts/delete', { draftId: draft.id, actor: spoofed });
 	await invoke(feature, 'notes/reactions/create', { noteId: note.id, reaction: '🍰', actor: spoofed });
 	await invoke(feature, 'notes/reactions/delete', { noteId: note.id });
@@ -93,7 +91,6 @@ test('all eight command success paths call only their explicit ports and use the
 	await invoke(feature, 'promo/read', { noteId: note.id });
 
 	assert.deepEqual(calls.map(([name]) => name), [
-		'getNote', 'isModerator', 'findUserByIdOrFail', 'deleteNote',
 		'getDraft', 'deleteDraft',
 		'getNote', 'createReaction',
 		'getNote', 'deleteReaction',
@@ -102,24 +99,21 @@ test('all eight command success paths call only their explicit ports and use the
 		'getNote', 'findRenotesByUserAndRenote', 'findUserByIdOrFail', 'deleteNote',
 		'getNote', 'promoReadExists', 'newId', 'insertPromoRead',
 	]);
-	assert.equal(calls[1][1], actor);
-	assert.equal(calls[2][1], note.userId);
-	assert.deepEqual(calls[3], ['deleteNote', { id: note.userId, uri: null, host: null, isBot: false }, note, false, actor]);
-	assert.equal(calls[4][1], actor);
-	assert.deepEqual(calls[5], ['deleteDraft', actor, draft.id]);
-	assert.deepEqual(calls[7], ['createReaction', actor, note, '🍰']);
-	assert.deepEqual(calls[11], ['threadMuteExists', note.id, actor.id]);
-	assert.deepEqual(calls[13], ['insertThreadMute', 'generated1', note.id, actor.id]);
-	assert.deepEqual(calls[15], ['deleteThreadMute', note.id, actor.id]);
-	assert.deepEqual(calls[17], ['findRenotesByUserAndRenote', actor.id, note.id]);
-	assert.deepEqual(calls[19], ['deleteNote', { id: actor.id, uri: null, host: null, isBot: false }, { id: 'renote1', userId: actor.id, threadId: null }]);
-	assert.deepEqual(calls[21], ['promoReadExists', note.id, actor.id]);
-	assert.deepEqual(calls[23], ['insertPromoRead', 'generated2', note.id, actor.id]);
+	assert.equal(calls[0][1], actor);
+	assert.deepEqual(calls[1], ['deleteDraft', actor, draft.id]);
+	assert.deepEqual(calls[3], ['createReaction', actor, note, '🍰']);
+	assert.deepEqual(calls[7], ['threadMuteExists', note.id, actor.id]);
+	assert.deepEqual(calls[9], ['insertThreadMute', 'generated1', note.id, actor.id]);
+	assert.deepEqual(calls[11], ['deleteThreadMute', note.id, actor.id]);
+	assert.deepEqual(calls[13], ['findRenotesByUserAndRenote', actor.id, note.id]);
+	assert.deepEqual(calls[15], ['deleteNote', { id: actor.id, uri: null, host: null, isBot: false }, { id: 'renote1', userId: actor.id, threadId: null }]);
+	assert.deepEqual(calls[17], ['promoReadExists', note.id, actor.id]);
+	assert.deepEqual(calls[19], ['insertPromoRead', 'generated2', note.id, actor.id]);
 });
 
 test('note and draft lookups map their exact route errors before later side effects', async () => {
 	for (const key of [
-		'notes/delete', 'notes/reactions/create', 'notes/reactions/delete',
+		'notes/reactions/create', 'notes/reactions/delete',
 		'notes/thread-muting/create', 'notes/thread-muting/delete', 'notes/unrenote', 'promo/read',
 	]) {
 		const { deps, calls } = createDeps({ getNote: async id => { calls.push(['getNote', id]); throw serviceError(missingNoteId); } });
@@ -147,7 +141,6 @@ test('missing or malformed authenticated actors fail before any dependency call'
 	const { deps, calls } = createDeps();
 	const feature = createNotesCommands(deps);
 	const requests = [
-		['notes/delete', { noteId: note.id }],
 		['notes/drafts/delete', { draftId: draft.id }],
 		['notes/reactions/create', { noteId: note.id, reaction: '⭐' }],
 		['notes/reactions/delete', { noteId: note.id }],
@@ -159,20 +152,11 @@ test('missing or malformed authenticated actors fail before any dependency call'
 	for (const [key, input] of requests) {
 		await assert.rejects(invoke(feature, key, input, null));
 	}
-	await assert.rejects(invoke(feature, 'notes/delete', { noteId: note.id }, { id: '' }));
+	await assert.rejects(invoke(feature, 'notes/reactions/delete', { noteId: note.id }, { id: '' }));
 	assert.deepEqual(calls, []);
 });
 
 test('ownership failures and already-completed records do not perform follow-up writes', async () => {
-	const otherNote = { ...note, userId: 'bob' };
-	const noteCase = createDeps({ getNote: async id => { noteCase.calls.push(['getNote', id]); return otherNote; } });
-	const noteFeature = createNotesCommands(noteCase.deps);
-	await assert.rejects(invoke(noteFeature, 'notes/delete', { noteId: note.id }), error => {
-		assert.equal(error.definition.id, notesCommandErrors['notes/delete'].accessDenied.id);
-		return true;
-	});
-	assert.deepEqual(noteCase.calls.map(([name]) => name), ['getNote', 'isModerator']);
-
 	const draftCase = createDeps({ getDraft: async (user, id) => { draftCase.calls.push(['getDraft', user, id]); return { ...draft, userId: 'bob' }; } });
 	const draftFeature = createNotesCommands(draftCase.deps);
 	await assert.rejects(invoke(draftFeature, 'notes/drafts/delete', { draftId: draft.id }), error => {
@@ -223,7 +207,7 @@ test('reaction failures preserve their route-specific errors and skip any later 
 test('misskey IDs are validated, extra object fields remain ignored, and Unicode reaction text is not truncated', async () => {
 	const { deps, calls } = createDeps();
 	const feature = createNotesCommands(deps);
-	await assert.rejects(invoke(feature, 'notes/delete', { noteId: 'invalid-id' }));
+	await assert.rejects(invoke(feature, 'notes/reactions/delete', { noteId: 'invalid-id' }));
 	await assert.rejects(invoke(feature, 'notes/reactions/create', { noteId: note.id, reaction: 123 }));
 	assert.deepEqual(calls, []);
 
@@ -252,4 +236,9 @@ test('unrenote preserves the legacy fire-and-forget delete timing', async () => 
 	assert.equal(typeof releaseDelete, 'function');
 	assert.deepEqual(calls.map(([name]) => name), ['getNote', 'findRenotesByUserAndRenote', 'findUserByIdOrFail', 'deleteNote-start']);
 	releaseDelete();
+});
+
+test('converted note deletion is absent from the legacy command feature', () => {
+	const { deps } = createDeps();
+	assert.equal('notes/delete' in createNotesCommands(deps), false);
 });

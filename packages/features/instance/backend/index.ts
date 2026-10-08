@@ -103,14 +103,12 @@ export type { OnlineUsersCountDependencies } from './get-online-users-count.js';
 
 /** One feature instance per role, with explicit dependencies and no container access. */
 export function createInstance(deps: {
-	serverInfo: ServerInfoDependencies;
 	getOnlineUsersCount: OnlineUsersCountDependencies;
 	readEndpoints: ReadEndpoints;
 	now?: () => number;
 }) {
 	return {
 		ping: createPing(deps.now),
-		'server-info': createServerInfo(deps.serverInfo),
 		'get-online-users-count': createGetOnlineUsersCount(deps.getOnlineUsersCount, deps.now),
 		endpoints: createEndpoints(deps.readEndpoints),
 		endpoint: createEndpoint(deps.readEndpoints),
