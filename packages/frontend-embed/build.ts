@@ -28,6 +28,8 @@ async function buildAllLocale() {
 		logger,
 		scriptsDir: 'scripts',
 		i18nFile: '../features/runtime/frontend/embed/i18n.ts',
+		// VVI owns every embed label; retain language directories and reject legacy reintroduction.
+		legacyLabels: 'absent',
 	});
 
 	await inliner.loadFiles();

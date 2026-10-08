@@ -50,3 +50,28 @@ test('unsupported direct legacy dictionary uses still report errors and preserve
 	expect(collectModifications(source, 'unsupported.js', logger, inliner)).toEqual([]);
 	expect(logger.errorCount).toBe(1);
 });
+
+
+function buildFixture(legacyLabels: 'required' | 'absent', consumer: string) {
+	const inliner = new LocaleInliner({
+		outputDir: '/unused', scriptsDir: 'scripts', i18nFile: 'i18n.ts', legacyLabels,
+		manifest: {
+			'i18n.ts': { file: 'scripts/i18n.js', src: 'i18n.ts' },
+			'client.ts': { file: 'scripts/client.js', src: 'client.ts' },
+		},
+		logger: createLogger(),
+	});
+	inliner.chunks[0].sourceCode = 'export const i18n = {};';
+	inliner.chunks[1].sourceCode = consumer;
+	return inliner;
+}
+
+test('ordinary builds still require legacy labels, while VVI-only builds require their absence', () => {
+	const owner = 'export const label = "A VVI-owned label";';
+	expect(() => buildFixture('required', owner).collectsModifications()).toThrow('No localizations are inlined');
+	expect(() => buildFixture('absent', owner).collectsModifications()).not.toThrow();
+	for (const access of ['i18n.ts.notifications', 'i18n.tsx.withNFiles({ n: 2 })']) {
+		const legacy = `import { i18n } from "./i18n.js"; export const label = ${access};`;
+		expect(() => buildFixture('absent', legacy).collectsModifications()).toThrow('Legacy labels remain');
+	}
+});

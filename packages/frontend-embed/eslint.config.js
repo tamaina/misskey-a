@@ -13,6 +13,10 @@ export default [
 	},
 	...pluginVue.configs['flat/recommended'],
 	{
+		files: ['src/**/*.vue', '**/frontend/embed/**/*.vue'],
+		languageOptions: { globals: { $locale: 'readonly', $l: 'readonly' } },
+	},
+	{
 		files: ['src/**/*.{ts,vue}', '**/frontend/embed/**/*.{ts,vue}'],
 		languageOptions: {
 			globals: {

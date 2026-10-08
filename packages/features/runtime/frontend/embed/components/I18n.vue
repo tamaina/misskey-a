@@ -20,7 +20,11 @@ const props = withDefaults(defineProps<{
 	tag: 'span',
 });
 
-const slots = defineSlots<T extends ParameterizedString<infer R> ? { [K in R]: () => unknown } : NonNullable<unknown>>();
+type LiteralSlotNames<S extends string> = string extends S ? never :
+	S extends `${string}{${infer Name}}${infer Rest}` ? Name | LiteralSlotNames<Rest> : never;
+type SlotNames<S extends string> = S extends ParameterizedString<infer R> ? R : LiteralSlotNames<S>;
+
+const slots = defineSlots<{ [K in SlotNames<T>]: () => unknown }>();
 
 const parsed = computed(() => {
 	let str = props.src as string;

@@ -13,7 +13,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 				</div>
 				<div :class="$style.headerTitle" @click="top">
 					<div class="_nowrap"><a :href="`/tags/${tag}`" target="_blank" rel="noopener">#{{ tag }}</a></div>
-					<div :class="$style.sub">{{ i18n.tsx.fromX({ x: instanceName }) }}</div>
+					<div :class="$style.sub">{{ interpolateLocaleParameters($locale.sfc.fromX, { x: instanceName }) }}</div>
 				</div>
 				<a :href="url" :class="$style.instanceIconLink" target="_blank" rel="noopener noreferrer">
 					<img
@@ -47,7 +47,7 @@ import type { Paging } from '@features/ui/frontend/embed/components/EmPagination
 import EmNotes from '@features/notes/frontend/embed/components/EmNotes.vue';
 import XNotFound from '@features/web/frontend/embed/pages/not-found.vue';
 import EmTimelineContainer from '@features/timelines/frontend/embed/components/EmTimelineContainer.vue';
-import { i18n } from '@features/runtime/frontend/embed/i18n.js';
+import { interpolateLocaleParameters } from '@features/runtime/frontend/interpolate-locale-parameters.js';
 import { DI } from '@features/boot/frontend/embed/di.js';
 
 const props = defineProps<{
@@ -124,3 +124,171 @@ function top(ev: PointerEvent) {
 	}
 }
 </style>
+
+<locale lang="json" locale="ar-SA">
+{
+	"fromX": "From {x}"
+}
+</locale>
+
+<locale lang="json" locale="ca-ES">
+{
+	"fromX": "De {x}"
+}
+</locale>
+
+<locale lang="json" locale="cs-CZ">
+{
+	"fromX": "From {x}"
+}
+</locale>
+
+<locale lang="json" locale="da-DK">
+{
+	"fromX": "From {x}"
+}
+</locale>
+
+<locale lang="json" locale="de-DE">
+{
+	"fromX": "Von {x}"
+}
+</locale>
+
+<locale lang="json" locale="en-US">
+{
+	"fromX": "From {x}"
+}
+</locale>
+
+<locale lang="json" locale="es-ES">
+{
+	"fromX": "De {x}"
+}
+</locale>
+
+<locale lang="json" locale="fr-FR">
+{
+	"fromX": "De {x}"
+}
+</locale>
+
+<locale lang="json" locale="id-ID">
+{
+	"fromX": "Dari {x}"
+}
+</locale>
+
+<locale lang="json" locale="it-IT">
+{
+	"fromX": "Da {x}"
+}
+</locale>
+
+<locale lang="json" locale="ja-JP">
+{
+	"fromX": "{x}から"
+}
+</locale>
+
+<locale lang="json" locale="ja-KS">
+{
+	"fromX": "{x}から"
+}
+</locale>
+
+<locale lang="json" locale="kab-KAB">
+{
+	"fromX": "From {x}"
+}
+</locale>
+
+<locale lang="json" locale="kn-IN">
+{
+	"fromX": "From {x}"
+}
+</locale>
+
+<locale lang="json" locale="ko-KR">
+{
+	"fromX": "{x}에서"
+}
+</locale>
+
+<locale lang="json" locale="nl-NL">
+{
+	"fromX": "From {x}"
+}
+</locale>
+
+<locale lang="json" locale="no-NO">
+{
+	"fromX": "From {x}"
+}
+</locale>
+
+<locale lang="json" locale="pl-PL">
+{
+	"fromX": "From {x}"
+}
+</locale>
+
+<locale lang="json" locale="pt-PT">
+{
+	"fromX": "De {x}"
+}
+</locale>
+
+<locale lang="json" locale="ru-RU">
+{
+	"fromX": "Из {x}"
+}
+</locale>
+
+<locale lang="json" locale="sk-SK">
+{
+	"fromX": "From {x}"
+}
+</locale>
+
+<locale lang="json" locale="th-TH">
+{
+	"fromX": "จาก {x}"
+}
+</locale>
+
+<locale lang="json" locale="tr-TR">
+{
+	"fromX": "{x}'den"
+}
+</locale>
+
+<locale lang="json" locale="ug-CN">
+{
+	"fromX": "From {x}"
+}
+</locale>
+
+<locale lang="json" locale="uk-UA">
+{
+	"fromX": "З {x}"
+}
+</locale>
+
+<locale lang="json" locale="vi-VN">
+{
+	"fromX": "From {x}"
+}
+</locale>
+
+<locale lang="json" locale="zh-CN">
+{
+	"fromX": "从 {x}"
+}
+</locale>
+
+<locale lang="json" locale="zh-TW">
+{
+	"fromX": "自 {x}"
+}
+</locale>

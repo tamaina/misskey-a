@@ -21,6 +21,7 @@ export class LocaleInliner {
 	i18nFileName: string;
 	i18nSymbol: string;
 	logger: Logger;
+	legacyLabels: 'required' | 'absent';
 	chunks: ScriptChunk[];
 
 	static async create(options: {
@@ -28,6 +29,7 @@ export class LocaleInliner {
 		scriptsDir: string,
 		i18nFile: string,
 		logger: Logger,
+		legacyLabels?: 'required' | 'absent',
 	}): Promise<LocaleInliner> {
 		const manifest: ViteManifest = JSON.parse(await fs.readFile(`${options.outputDir}/manifest.json`, 'utf-8'));
 		return new LocaleInliner({ ...options, manifest });
@@ -39,12 +41,14 @@ export class LocaleInliner {
 		i18nFile: string,
 		manifest: ViteManifest,
 		logger: Logger,
+		legacyLabels?: 'required' | 'absent',
 	}) {
 		this.outputDir = options.outputDir;
 		this.scriptsDir = options.scriptsDir;
 		this.i18nFile = options.i18nFile;
 		this.i18nFileName = this.stripScriptDir(options.manifest[this.i18nFile].file);
 		this.logger = options.logger;
+		this.legacyLabels = options.legacyLabels ?? 'required';
 		this.i18nSymbol = 'i18n';
 		this.chunks = Object.values(options.manifest).filter(chunk => this.isScriptFile(chunk.file)).map(chunk => ({
 			fileName: this.stripScriptDir(chunk.file),
@@ -75,7 +79,11 @@ export class LocaleInliner {
 			chunk.modifications = collectModifications(chunk.sourceCode, chunk.fileName, fileLogger, this);
 		}
 
-		if (!this.chunks.flatMap(x => x.modifications ?? []).some(x => x.type === 'localized')) {
+		const modifications = this.chunks.flatMap(x => x.modifications ?? []);
+		if (this.legacyLabels === 'absent' && modifications.some(x => x.type === 'localized' || x.type === 'parameterized-function')) {
+			throw new Error('Legacy labels remain in a VVI-only locale build.');
+		}
+		if (this.legacyLabels === 'required' && !modifications.some(x => x.type === 'localized')) {
 			throw new Error('No localizations are inlined! this should mean locale inliner is not working well!');
 		}
 	}

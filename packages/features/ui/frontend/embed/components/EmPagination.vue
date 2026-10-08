@@ -11,7 +11,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 <div v-else-if="empty" key="_empty_" class="empty">
 	<slot name="empty">
 		<div class="_fullinfo">
-			<div>{{ i18n.ts.nothing }}</div>
+			<div>{{ $locale.sfc.nothing }}</div>
 		</div>
 	</slot>
 </div>
@@ -19,14 +19,14 @@ SPDX-License-Identifier: AGPL-3.0-only
 <div v-else ref="rootEl">
 	<div v-show="pagination.reversed && more" key="_more_" class="_margin">
 		<button v-if="!moreFetching" class="_buttonPrimary" :class="$style.more" :disabled="moreFetching" :style="{ cursor: moreFetching ? 'wait' : 'pointer' }" @click="fetchMoreAhead">
-			{{ i18n.ts.loadMore }}
+			{{ $locale.sfc.loadMore }}
 		</button>
 		<EmLoading v-else class="loading"/>
 	</div>
 	<slot :items="Array.from(items.values())" :fetching="fetching || moreFetching"></slot>
 	<div v-show="!pagination.reversed && more" key="_more_" class="_margin">
 		<button v-if="!moreFetching" class="_buttonRounded _buttonPrimary" :class="$style.more" :disabled="moreFetching" :style="{ cursor: moreFetching ? 'wait' : 'pointer' }" @click="fetchMore">
-			{{ i18n.ts.loadMore }}
+			{{ $locale.sfc.loadMore }}
 		</button>
 		<EmLoading v-else class="loading"/>
 	</div>
@@ -40,7 +40,6 @@ import { useDocumentVisibility } from '@features/ui/frontend/shared/use-document
 import { onScrollTop, getBodyScrollHeight, getScrollContainer, onScrollBottom, scrollToBottom, scrollInContainer, isTailVisible, isHeadVisible } from '@features/ui/frontend/shared/scroll.js';
 import type { ComputedRef } from 'vue';
 import { misskeyApi } from '@features/api/frontend/embed/misskey-api.js';
-import { i18n } from '@features/runtime/frontend/embed/i18n.js';
 
 const SECOND_FETCH_LIMIT = 30;
 const TOLERANCE = 16;
@@ -506,3 +505,199 @@ defineExpose({
 	margin-right: auto;
 }
 </style>
+
+<locale lang="json" locale="ar-SA">
+{
+	"nothing": "لا يوجد شيء هنا",
+	"loadMore": "عرض المزيد"
+}
+</locale>
+
+<locale lang="json" locale="ca-ES">
+{
+	"nothing": "No hi ha res per veure aquí ",
+	"loadMore": "Carregar més"
+}
+</locale>
+
+<locale lang="json" locale="cs-CZ">
+{
+	"nothing": "Nic nebylo nalezeno",
+	"loadMore": "Zobrazit více"
+}
+</locale>
+
+<locale lang="json" locale="da-DK">
+{
+	"nothing": "There's nothing to see here",
+	"loadMore": "Load more"
+}
+</locale>
+
+<locale lang="json" locale="de-DE">
+{
+	"nothing": "Hier gibt es nichts zu sehen",
+	"loadMore": "Mehr laden"
+}
+</locale>
+
+<locale lang="json" locale="en-US">
+{
+	"nothing": "There's nothing to see here",
+	"loadMore": "Load more"
+}
+</locale>
+
+<locale lang="json" locale="es-ES">
+{
+	"nothing": "No hay nada que ver aqui",
+	"loadMore": "Ver más"
+}
+</locale>
+
+<locale lang="json" locale="fr-FR">
+{
+	"nothing": "Il n'y a rien à voir ici",
+	"loadMore": "Afficher plus …"
+}
+</locale>
+
+<locale lang="json" locale="id-ID">
+{
+	"nothing": "Tidak ada sama sekali disini",
+	"loadMore": "Selebihnya"
+}
+</locale>
+
+<locale lang="json" locale="it-IT">
+{
+	"nothing": "Niente da visualizzare",
+	"loadMore": "Mostra di più"
+}
+</locale>
+
+<locale lang="json" locale="ja-JP">
+{
+	"nothing": "ありません",
+	"loadMore": "もっと見る"
+}
+</locale>
+
+<locale lang="json" locale="ja-KS">
+{
+	"nothing": "あらへん",
+	"loadMore": "まだまだあるで！"
+}
+</locale>
+
+<locale lang="json" locale="kab-KAB">
+{
+	"nothing": "There's nothing to see here",
+	"loadMore": "Wali ugar"
+}
+</locale>
+
+<locale lang="json" locale="kn-IN">
+{
+	"nothing": "There's nothing to see here",
+	"loadMore": "ಇನ್ನಷ್ಟು ನೋಡು"
+}
+</locale>
+
+<locale lang="json" locale="ko-KR">
+{
+	"nothing": "아무것도 없습니다",
+	"loadMore": "더 보기"
+}
+</locale>
+
+<locale lang="json" locale="nl-NL">
+{
+	"nothing": "Niets te zien hier",
+	"loadMore": "Laad meer"
+}
+</locale>
+
+<locale lang="json" locale="no-NO">
+{
+	"nothing": "Ingenting",
+	"loadMore": "Vis mer"
+}
+</locale>
+
+<locale lang="json" locale="pl-PL">
+{
+	"nothing": "Nie ma tu niczego",
+	"loadMore": "Załaduj więcej"
+}
+</locale>
+
+<locale lang="json" locale="pt-PT">
+{
+	"nothing": "Não há nada aqui",
+	"loadMore": "Carregar mais"
+}
+</locale>
+
+<locale lang="json" locale="ru-RU">
+{
+	"nothing": "Ничего нет",
+	"loadMore": "Загрузить ещё"
+}
+</locale>
+
+<locale lang="json" locale="sk-SK">
+{
+	"nothing": "Nič tu nie je",
+	"loadMore": "Zobraziť viac"
+}
+</locale>
+
+<locale lang="json" locale="th-TH">
+{
+	"nothing": "ไม่พบผลลัพธ์",
+	"loadMore": "แสดงเพิ่มเติม"
+}
+</locale>
+
+<locale lang="json" locale="tr-TR">
+{
+	"nothing": "Burada görülecek bir şey yok.",
+	"loadMore": "Daha fazla yükle"
+}
+</locale>
+
+<locale lang="json" locale="ug-CN">
+{
+	"nothing": "There's nothing to see here",
+	"loadMore": "Load more"
+}
+</locale>
+
+<locale lang="json" locale="uk-UA">
+{
+	"nothing": "Тут нічого немає",
+	"loadMore": "Показати більше"
+}
+</locale>
+
+<locale lang="json" locale="vi-VN">
+{
+	"nothing": "Không có gì ở đây",
+	"loadMore": "Tải thêm"
+}
+</locale>
+
+<locale lang="json" locale="zh-CN">
+{
+	"nothing": "无",
+	"loadMore": "查看更多"
+}
+</locale>
+
+<locale lang="json" locale="zh-TW">
+{
+	"nothing": "查無項目",
+	"loadMore": "載入更多"
+}
+</locale>

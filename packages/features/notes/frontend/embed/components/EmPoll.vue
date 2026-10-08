@@ -11,12 +11,12 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<span :class="$style.fg">
 				<template v-if="choice.isVoted"><i class="ti ti-check" style="margin-right: 4px; color: var(--MI_THEME-accent);"></i></template>
 				<EmMfm :text="choice.text" :plain="true"/>
-				<span style="margin-left: 4px; opacity: 0.7;">({{ i18n.tsx._poll.votesCount({ n: choice.votes }) }})</span>
+				<span style="margin-left: 4px; opacity: 0.7;">({{ interpolateLocaleParameters($locale.sfc.pollVotesCount, { n: choice.votes }) }})</span>
 			</span>
 		</li>
 	</ul>
 	<p :class="$style.info">
-		<span>{{ i18n.tsx._poll.totalVotes({ n: total }) }}</span>
+		<span>{{ interpolateLocaleParameters($locale.sfc.pollTotalVotes, { n: total }) }}</span>
 	</p>
 </div>
 </template>
@@ -24,7 +24,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script lang="ts" setup>
 import { computed } from 'vue';
 import * as Misskey from 'misskey-js';
-import { i18n } from '@features/runtime/frontend/embed/i18n.js';
+import { interpolateLocaleParameters } from '@features/runtime/frontend/interpolate-locale-parameters.js';
 import EmMfm from '@features/markup/frontend/embed/components/EmMfm.js';
 
 function sum(xs: number[]): number {
@@ -80,3 +80,199 @@ const total = computed(() => sum(props.poll.choices.map(x => x.votes)));
 	color: var(--MI_THEME-fg);
 }
 </style>
+
+<locale lang="json" locale="ar-SA">
+{
+	"pollVotesCount": "{n} أصوات",
+	"pollTotalVotes": "المجموع {n} أصوات"
+}
+</locale>
+
+<locale lang="json" locale="ca-ES">
+{
+	"pollVotesCount": "{n} vots",
+	"pollTotalVotes": "{n} vots en total"
+}
+</locale>
+
+<locale lang="json" locale="cs-CZ">
+{
+	"pollVotesCount": "{n} hlasů",
+	"pollTotalVotes": "{n} hlasů celkově"
+}
+</locale>
+
+<locale lang="json" locale="da-DK">
+{
+	"pollVotesCount": "{n} votes",
+	"pollTotalVotes": "{n} votes in total"
+}
+</locale>
+
+<locale lang="json" locale="de-DE">
+{
+	"pollVotesCount": "{n} Stimmen",
+	"pollTotalVotes": "Insgesamt {n} Stimmen"
+}
+</locale>
+
+<locale lang="json" locale="en-US">
+{
+	"pollVotesCount": "{n} votes",
+	"pollTotalVotes": "{n} votes in total"
+}
+</locale>
+
+<locale lang="json" locale="es-ES">
+{
+	"pollVotesCount": "{n} votos",
+	"pollTotalVotes": "Total {n} votos"
+}
+</locale>
+
+<locale lang="json" locale="fr-FR">
+{
+	"pollVotesCount": "{n} votes",
+	"pollTotalVotes": "{n} votes au total"
+}
+</locale>
+
+<locale lang="json" locale="id-ID">
+{
+	"pollVotesCount": "{n} suara",
+	"pollTotalVotes": "Total {n} suara"
+}
+</locale>
+
+<locale lang="json" locale="it-IT">
+{
+	"pollVotesCount": "{n} voti",
+	"pollTotalVotes": "Totale di {n} voti"
+}
+</locale>
+
+<locale lang="json" locale="ja-JP">
+{
+	"pollVotesCount": "{n}票",
+	"pollTotalVotes": "計{n}票"
+}
+</locale>
+
+<locale lang="json" locale="ja-KS">
+{
+	"pollVotesCount": "{n}票",
+	"pollTotalVotes": "計{n}票"
+}
+</locale>
+
+<locale lang="json" locale="kab-KAB">
+{
+	"pollVotesCount": "{n} votes",
+	"pollTotalVotes": "{n} votes in total"
+}
+</locale>
+
+<locale lang="json" locale="kn-IN">
+{
+	"pollVotesCount": "{n} votes",
+	"pollTotalVotes": "{n} votes in total"
+}
+</locale>
+
+<locale lang="json" locale="ko-KR">
+{
+	"pollVotesCount": "{n}표",
+	"pollTotalVotes": "총 {n}표"
+}
+</locale>
+
+<locale lang="json" locale="nl-NL">
+{
+	"pollVotesCount": "{n} votes",
+	"pollTotalVotes": "{n} votes in total"
+}
+</locale>
+
+<locale lang="json" locale="no-NO">
+{
+	"pollVotesCount": "{n} stemmer",
+	"pollTotalVotes": "{n} votes in total"
+}
+</locale>
+
+<locale lang="json" locale="pl-PL">
+{
+	"pollVotesCount": "{n} głosów",
+	"pollTotalVotes": "Łącznie {n} głosów"
+}
+</locale>
+
+<locale lang="json" locale="pt-PT">
+{
+	"pollVotesCount": "{n} votos",
+	"pollTotalVotes": "{n} votos totais"
+}
+</locale>
+
+<locale lang="json" locale="ru-RU">
+{
+	"pollVotesCount": "Голосов: {n}",
+	"pollTotalVotes": "Голосов всего: {n}"
+}
+</locale>
+
+<locale lang="json" locale="sk-SK">
+{
+	"pollVotesCount": "{n} hlasov",
+	"pollTotalVotes": "{n} hlasov celkom"
+}
+</locale>
+
+<locale lang="json" locale="th-TH">
+{
+	"pollVotesCount": "{n} คะแนนเสียง",
+	"pollTotalVotes": "ทั้งหมด {n} คะแนนเสียง"
+}
+</locale>
+
+<locale lang="json" locale="tr-TR">
+{
+	"pollVotesCount": "{n} oy",
+	"pollTotalVotes": "Toplam {n} oy"
+}
+</locale>
+
+<locale lang="json" locale="ug-CN">
+{
+	"pollVotesCount": "{n} votes",
+	"pollTotalVotes": "{n} votes in total"
+}
+</locale>
+
+<locale lang="json" locale="uk-UA">
+{
+	"pollVotesCount": "{n} голосів",
+	"pollTotalVotes": "Всього {n} голосів"
+}
+</locale>
+
+<locale lang="json" locale="vi-VN">
+{
+	"pollVotesCount": "{n} bình chọn",
+	"pollTotalVotes": "{n} tổng bình chọn"
+}
+</locale>
+
+<locale lang="json" locale="zh-CN">
+{
+	"pollVotesCount": "{n}票",
+	"pollTotalVotes": "总计{n}票"
+}
+</locale>
+
+<locale lang="json" locale="zh-TW">
+{
+	"pollVotesCount": "{n}票",
+	"pollTotalVotes": "合計 {n} 票"
+}
+</locale>

@@ -27,16 +27,16 @@ SPDX-License-Identifier: AGPL-3.0-only
 	<template v-if="hide">
 		<div :class="$style.hiddenText">
 			<div :class="$style.hiddenTextWrapper">
-				<b v-if="image.isSensitive" style="display: block;"><i class="ti ti-eye-exclamation"></i> {{ i18n.ts.sensitive }}</b>
-				<b v-else style="display: block;"><i class="ti ti-photo"></i> {{ i18n.ts.image }}</b>
-				<span style="display: block;">{{ i18n.ts.clickToShow }}</span>
+				<b v-if="image.isSensitive" style="display: block;"><i class="ti ti-eye-exclamation"></i> {{ $locale.sfc.sensitive }}</b>
+				<b v-else style="display: block;"><i class="ti ti-photo"></i> {{ $locale.sfc.image }}</b>
+				<span style="display: block;">{{ $locale.sfc.clickToShow }}</span>
 			</div>
 		</div>
 	</template>
 	<div :class="$style.indicators">
 		<div v-if="['image/gif', 'image/apng'].includes(image.type)" :class="$style.indicator">GIF</div>
 		<div v-if="image.comment" :class="$style.indicator">ALT</div>
-		<div v-if="image.isSensitive" :class="$style.indicator" style="color: var(--MI_THEME-warn);" :title="i18n.ts.sensitive"><i class="ti ti-eye-exclamation"></i></div>
+		<div v-if="image.isSensitive" :class="$style.indicator" style="color: var(--MI_THEME-warn);" :title="$locale.sfc.sensitive"><i class="ti ti-eye-exclamation"></i></div>
 	</div>
 	<i v-if="!hide" class="ti ti-eye-off" :class="$style.hide" @click.stop="hide = true"></i>
 </div>
@@ -46,7 +46,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 import { ref, computed } from 'vue';
 import * as Misskey from 'misskey-js';
 import EmImgWithBlurhash from '@features/drive/frontend/embed/components/EmImgWithBlurhash.vue';
-import { i18n } from '@features/runtime/frontend/embed/i18n.js';
 
 const props = withDefaults(defineProps<{
 	image: Misskey.entities.DriveFile;
@@ -160,3 +159,227 @@ html[data-color-scheme=light] .visible {
 	padding: 2px 5px;
 }
 </style>
+
+<locale lang="json" locale="ar-SA">
+{
+	"sensitive": "محتوى حساس",
+	"image": "صور",
+	"clickToShow": "اضغط للعرض"
+}
+</locale>
+
+<locale lang="json" locale="ca-ES">
+{
+	"sensitive": "Sensible",
+	"image": "Imatge",
+	"clickToShow": "Fes clic per mostrar"
+}
+</locale>
+
+<locale lang="json" locale="cs-CZ">
+{
+	"sensitive": "NSFW",
+	"image": "Obrázky",
+	"clickToShow": "Klikněte pro zobrazení"
+}
+</locale>
+
+<locale lang="json" locale="da-DK">
+{
+	"sensitive": "Sensitive",
+	"image": "Image",
+	"clickToShow": "Click to show"
+}
+</locale>
+
+<locale lang="json" locale="de-DE">
+{
+	"sensitive": "Sensibel",
+	"image": "Bild",
+	"clickToShow": "Zum Anzeigen anklicken"
+}
+</locale>
+
+<locale lang="json" locale="en-US">
+{
+	"sensitive": "Sensitive",
+	"image": "Image",
+	"clickToShow": "Click to show"
+}
+</locale>
+
+<locale lang="json" locale="es-ES">
+{
+	"sensitive": "Marcado como sensible (NSFW)",
+	"image": "Imágenes",
+	"clickToShow": "Haz clic para verlo"
+}
+</locale>
+
+<locale lang="json" locale="fr-FR">
+{
+	"sensitive": "Contenu sensible",
+	"image": "Images",
+	"clickToShow": "Cliquer pour afficher"
+}
+</locale>
+
+<locale lang="json" locale="id-ID">
+{
+	"sensitive": "Konten sensitif",
+	"image": "Gambar",
+	"clickToShow": "Klik untuk melihat"
+}
+</locale>
+
+<locale lang="json" locale="it-IT">
+{
+	"sensitive": "Esplicito",
+	"image": "Immagini",
+	"clickToShow": "Media nascosto, cliccare solo se si intende vedere"
+}
+</locale>
+
+<locale lang="json" locale="ja-JP">
+{
+	"sensitive": "センシティブ",
+	"image": "画像",
+	"clickToShow": "クリックして表示"
+}
+</locale>
+
+<locale lang="json" locale="ja-KS">
+{
+	"sensitive": "気いつけて見いや",
+	"image": "画像",
+	"clickToShow": "押したら見えるで"
+}
+</locale>
+
+<locale lang="json" locale="kab-KAB">
+{
+	"sensitive": "Sensitive",
+	"image": "Image",
+	"clickToShow": "Click to show"
+}
+</locale>
+
+<locale lang="json" locale="kn-IN">
+{
+	"sensitive": "Sensitive",
+	"image": "Image",
+	"clickToShow": "Click to show"
+}
+</locale>
+
+<locale lang="json" locale="ko-KR">
+{
+	"sensitive": "열람 주의",
+	"image": "이미지",
+	"clickToShow": "클릭하여 보기"
+}
+</locale>
+
+<locale lang="json" locale="nl-NL">
+{
+	"sensitive": "NSFW",
+	"image": "Afbeeldingen",
+	"clickToShow": "Klik om te bekijken"
+}
+</locale>
+
+<locale lang="json" locale="no-NO">
+{
+	"sensitive": "Sensitive",
+	"image": "Bilde",
+	"clickToShow": "Klikk for å vise"
+}
+</locale>
+
+<locale lang="json" locale="pl-PL">
+{
+	"sensitive": "NSFW",
+	"image": "Zdjęcia",
+	"clickToShow": "Kliknij, aby wyświetlić"
+}
+</locale>
+
+<locale lang="json" locale="pt-PT">
+{
+	"sensitive": "Conteúdo sensível",
+	"image": "imagem",
+	"clickToShow": "Clique para ver"
+}
+</locale>
+
+<locale lang="json" locale="ru-RU">
+{
+	"sensitive": "Содержимое не для всех",
+	"image": "Изображения",
+	"clickToShow": "Нажмите для просмотра"
+}
+</locale>
+
+<locale lang="json" locale="sk-SK">
+{
+	"sensitive": "NSFW",
+	"image": "Obrázky",
+	"clickToShow": "Kliknutím zobrazíte"
+}
+</locale>
+
+<locale lang="json" locale="th-TH">
+{
+	"sensitive": "เนื้อหาที่ละเอียดอ่อน",
+	"image": "รูปภาพ",
+	"clickToShow": "คลิกเพื่อแสดง"
+}
+</locale>
+
+<locale lang="json" locale="tr-TR">
+{
+	"sensitive": "Hassas",
+	"image": "Görsel",
+	"clickToShow": "Göstermek için tıklayın"
+}
+</locale>
+
+<locale lang="json" locale="ug-CN">
+{
+	"sensitive": "Sensitive",
+	"image": "Image",
+	"clickToShow": "Click to show"
+}
+</locale>
+
+<locale lang="json" locale="uk-UA">
+{
+	"sensitive": "NSFW",
+	"image": "Зображення",
+	"clickToShow": "Натисніть для перегляду"
+}
+</locale>
+
+<locale lang="json" locale="vi-VN">
+{
+	"sensitive": "Nhạy cảm",
+	"image": "Hình ảnh",
+	"clickToShow": "Nhấn để xem"
+}
+</locale>
+
+<locale lang="json" locale="zh-CN">
+{
+	"sensitive": "敏感内容",
+	"image": "图片",
+	"clickToShow": "点击以显示"
+}
+</locale>
+
+<locale lang="json" locale="zh-TW">
+{
+	"sensitive": "敏感內容",
+	"image": "圖片",
+	"clickToShow": "點擊查看"
+}
+</locale>

@@ -13,7 +13,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<div>
 				<p v-if="note.cw != null" :class="$style.cw">
 					<EmMfm v-if="note.cw != ''" style="margin-right: 8px;" :text="note.cw" :author="note.user" :nyaize="'respect'"/>
-					<button style="display: block; width: 100%;" class="_buttonGray _buttonRounded" @click="showContent = !showContent">{{ showContent ? i18n.ts._cw.hide : i18n.ts._cw.show }}</button>
+					<button style="display: block; width: 100%;" class="_buttonGray _buttonRounded" @click="showContent = !showContent">{{ showContent ? $locale.sfc.cwHide : $locale.sfc.cwShow }}</button>
 				</p>
 				<div v-show="note.cw == null || showContent">
 					<EmSubNoteContent :class="$style.text" :note="note"/>
@@ -25,7 +25,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 		<EmNoteSub v-for="reply in replies" :key="reply.id" :note="reply" :class="$style.reply" :detail="true" :depth="depth + 1"/>
 	</template>
 	<div v-else :class="$style.more">
-		<EmA class="_link" :to="notePage(note)">{{ i18n.ts.continueThread }} <i class="ti ti-chevron-double-right"></i></EmA>
+		<EmA class="_link" :to="notePage(note)">{{ $locale.sfc.continueThread }} <i class="ti ti-chevron-double-right"></i></EmA>
 	</div>
 </div>
 </template>
@@ -39,7 +39,6 @@ import EmNoteHeader from '@features/notes/frontend/embed/components/EmNoteHeader
 import EmSubNoteContent from '@features/notes/frontend/embed/components/EmSubNoteContent.vue';
 import { notePage } from '@features/web/frontend/embed/utils.js';
 import { misskeyApi } from '@features/api/frontend/embed/misskey-api.js';
-import { i18n } from '@features/runtime/frontend/embed/i18n.js';
 import EmMfm from '@features/markup/frontend/embed/components/EmMfm.js';
 
 const props = withDefaults(defineProps<{
@@ -149,3 +148,227 @@ if (props.detail) {
 	border-radius: 8px;
 }
 </style>
+
+<locale lang="json" locale="ar-SA">
+{
+	"cwHide": "إخفاء",
+	"cwShow": "عرض المزيد",
+	"continueThread": "اعرض بقية النقاش"
+}
+</locale>
+
+<locale lang="json" locale="ca-ES">
+{
+	"cwHide": "Amagar",
+	"cwShow": "Carregar més",
+	"continueThread": "Veure la continuació del fil"
+}
+</locale>
+
+<locale lang="json" locale="cs-CZ">
+{
+	"cwHide": "Skrýt",
+	"cwShow": "Zobrazit více",
+	"continueThread": "Zobrazit pokračování vlákna"
+}
+</locale>
+
+<locale lang="json" locale="da-DK">
+{
+	"cwHide": "Hide",
+	"cwShow": "Show content",
+	"continueThread": "View thread continuation"
+}
+</locale>
+
+<locale lang="json" locale="de-DE">
+{
+	"cwHide": "Inhalt verbergen",
+	"cwShow": "Inhalt anzeigen",
+	"continueThread": "Weiteren Threadverlauf anzeigen"
+}
+</locale>
+
+<locale lang="json" locale="en-US">
+{
+	"cwHide": "Hide",
+	"cwShow": "Show content",
+	"continueThread": "View thread continuation"
+}
+</locale>
+
+<locale lang="json" locale="es-ES">
+{
+	"cwHide": "Ocultar",
+	"cwShow": "Ver más",
+	"continueThread": "Ver la continuación del hilo"
+}
+</locale>
+
+<locale lang="json" locale="fr-FR">
+{
+	"cwHide": "Masquer",
+	"cwShow": "Afficher le contenu",
+	"continueThread": "Afficher la suite du fil"
+}
+</locale>
+
+<locale lang="json" locale="id-ID">
+{
+	"cwHide": "Sembunyikan",
+	"cwShow": "Lihat konten",
+	"continueThread": "Lihat lanjutan thread"
+}
+</locale>
+
+<locale lang="json" locale="it-IT">
+{
+	"cwHide": "Nascondere",
+	"cwShow": "Continua la lettura...",
+	"continueThread": "Altre conversazioni"
+}
+</locale>
+
+<locale lang="json" locale="ja-JP">
+{
+	"cwHide": "隠す",
+	"cwShow": "もっと見る",
+	"continueThread": "さらにスレッドを見る"
+}
+</locale>
+
+<locale lang="json" locale="ja-KS">
+{
+	"cwHide": "隠す",
+	"cwShow": "続き見して！",
+	"continueThread": "さらにスレッドを見るで"
+}
+</locale>
+
+<locale lang="json" locale="kab-KAB">
+{
+	"cwHide": "Hide",
+	"cwShow": "Wali ugar",
+	"continueThread": "View thread continuation"
+}
+</locale>
+
+<locale lang="json" locale="kn-IN">
+{
+	"cwHide": "Hide",
+	"cwShow": "ಇನ್ನಷ್ಟು ನೋಡು",
+	"continueThread": "View thread continuation"
+}
+</locale>
+
+<locale lang="json" locale="ko-KR">
+{
+	"cwHide": "숨기기",
+	"cwShow": "더 보기",
+	"continueThread": "글타래 더 보기"
+}
+</locale>
+
+<locale lang="json" locale="nl-NL">
+{
+	"cwHide": "Hide",
+	"cwShow": "Laad meer",
+	"continueThread": "Bekijk draad voortzetting"
+}
+</locale>
+
+<locale lang="json" locale="no-NO">
+{
+	"cwHide": "Skjul",
+	"cwShow": "Vis mer",
+	"continueThread": "Vis fortsettelse av tråden"
+}
+</locale>
+
+<locale lang="json" locale="pl-PL">
+{
+	"cwHide": "Ukryj",
+	"cwShow": "Załaduj więcej",
+	"continueThread": "Pokaż kontynuację wątku"
+}
+</locale>
+
+<locale lang="json" locale="pt-PT">
+{
+	"cwHide": "Esconder",
+	"cwShow": "Carregar mais",
+	"continueThread": "Ver mais desta conversa"
+}
+</locale>
+
+<locale lang="json" locale="ru-RU">
+{
+	"cwHide": "Спрятать",
+	"cwShow": "Показать",
+	"continueThread": "Показать следующие ответы"
+}
+</locale>
+
+<locale lang="json" locale="sk-SK">
+{
+	"cwHide": "Skryť",
+	"cwShow": "Zobraziť viac",
+	"continueThread": "Zobraziť pokračovanie vlákna"
+}
+</locale>
+
+<locale lang="json" locale="th-TH">
+{
+	"cwHide": "ซ่อน",
+	"cwShow": "ดูเพิ่มเติม",
+	"continueThread": "ดูความต่อเนื่องเธรด"
+}
+</locale>
+
+<locale lang="json" locale="tr-TR">
+{
+	"cwHide": "Gizle",
+	"cwShow": "İçeriği göster",
+	"continueThread": "Konunun devamını görüntüle"
+}
+</locale>
+
+<locale lang="json" locale="ug-CN">
+{
+	"cwHide": "Hide",
+	"cwShow": "Show content",
+	"continueThread": "View thread continuation"
+}
+</locale>
+
+<locale lang="json" locale="uk-UA">
+{
+	"cwHide": "Сховати",
+	"cwShow": "Показати більше",
+	"continueThread": "Показати продовження треду"
+}
+</locale>
+
+<locale lang="json" locale="vi-VN">
+{
+	"cwHide": "Ẩn",
+	"cwShow": "Tải thêm",
+	"continueThread": "Tiếp tục xem chuỗi tút"
+}
+</locale>
+
+<locale lang="json" locale="zh-CN">
+{
+	"cwHide": "隐藏",
+	"cwShow": "查看更多",
+	"continueThread": "查看更多帖子"
+}
+</locale>
+
+<locale lang="json" locale="zh-TW">
+{
+	"cwHide": "隱藏",
+	"cwShow": "顯示內容",
+	"continueThread": "查看更多貼文"
+}
+</locale>

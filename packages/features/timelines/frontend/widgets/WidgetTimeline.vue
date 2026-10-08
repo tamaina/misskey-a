@@ -20,9 +20,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 	<div v-if="isBasicTimeline(widgetProps.src) && !isAvailableBasicTimeline(widgetProps.src)" :class="$style.disabled">
 		<p :class="$style.disabledTitle">
 			<i class="ti ti-minus"></i>
-			{{ i18n.ts._disabledTimeline.title }}
+			{{ $locale.sfc.disabledTimelineTitle }}
 		</p>
-		<p :class="$style.disabledDescription">{{ i18n.ts._disabledTimeline.description }}</p>
+		<p :class="$style.disabledDescription">{{ $locale.sfc.disabledTimelineDescription }}</p>
 	</div>
 	<div v-else>
 		<MkStreamingNotesTimeline
@@ -46,7 +46,7 @@ import * as os from '@features/ui/frontend/os.js';
 import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 import MkContainer from '@features/ui/frontend/components/MkContainer.vue';
 import MkStreamingNotesTimeline from '@features/timelines/frontend/components/MkStreamingNotesTimeline.vue';
-import { i18n } from '@features/runtime/frontend/i18n.js';
+import { copyLocaleDictionary } from '@features/runtime/frontend/copy-locale-dictionary.js';
 import { availableBasicTimelines, isAvailableBasicTimeline, isBasicTimeline, basicTimelineIconClass, basicTimelineTypes } from '@features/timelines/frontend/timelines.js';
 
 const name = 'timeline';
@@ -98,7 +98,7 @@ const headerTitle = computed<string>(() => {
 	} else if (widgetProps.src === 'antenna') {
 		return widgetProps.antenna != null ? widgetProps.antenna.name : '?';
 	} else {
-		return i18n.ts._timelines[widgetProps.src] ?? '?';
+		return copyLocaleDictionary($locale.value.sfc.timelinesLabels)[widgetProps.src] ?? '?';
 	}
 });
 
@@ -133,7 +133,7 @@ const choose = async (ev: PointerEvent) => {
 	const menuItems: MenuItem[] = [];
 
 	menuItems.push(...availableBasicTimelines().map(tl => ({
-		text: i18n.ts._timelines[tl],
+		text: copyLocaleDictionary($locale.value.sfc.timelinesLabels)[tl],
 		icon: basicTimelineIconClass(tl),
 		action: () => { setSrc(tl); },
 	})));
@@ -173,3 +173,367 @@ defineExpose<WidgetComponentExpose>({
 	font-size: 90%;
 }
 </style>
+
+<locale lang="json" locale="ar-SA">
+{
+	"disabledTimelineTitle": "Timeline disabled",
+	"disabledTimelineDescription": "You cannot use this timeline under your current roles.",
+	"timelinesLabels": {
+		"home": "الرئيسي",
+		"local": "المحلي",
+		"social": "الاجتماعي",
+		"global": "الشامل"
+	}
+}
+</locale>
+
+<locale lang="json" locale="ca-ES">
+{
+	"disabledTimelineTitle": "Línia de tems desactivada",
+	"disabledTimelineDescription": "No pots fer servir aquesta línia de temps amb els teus rols actuals.",
+	"timelinesLabels": {
+		"home": "Inici",
+		"local": "Local",
+		"social": "Social",
+		"global": "Global"
+	}
+}
+</locale>
+
+<locale lang="json" locale="cs-CZ">
+{
+	"disabledTimelineTitle": "Časová osa vypnuta",
+	"disabledTimelineDescription": "Tuto časovou osu nemůžete používat v rámci svých současných rolí.",
+	"timelinesLabels": {
+		"home": "Domů",
+		"local": "Místní",
+		"social": "Sociální síť",
+		"global": "Globální"
+	}
+}
+</locale>
+
+<locale lang="json" locale="da-DK">
+{
+	"disabledTimelineTitle": "Timeline disabled",
+	"disabledTimelineDescription": "You cannot use this timeline under your current roles.",
+	"timelinesLabels": {
+		"home": "Home",
+		"local": "Local",
+		"social": "Social",
+		"global": "Global"
+	}
+}
+</locale>
+
+<locale lang="json" locale="de-DE">
+{
+	"disabledTimelineTitle": "Chronik deaktiviert",
+	"disabledTimelineDescription": "Mit deinen jetzigen Rollen ist diese Chronik nicht verfügbar.",
+	"timelinesLabels": {
+		"home": "Startseite",
+		"local": "Lokal",
+		"social": "Sozial",
+		"global": "Global"
+	}
+}
+</locale>
+
+<locale lang="json" locale="en-US">
+{
+	"disabledTimelineTitle": "Timeline disabled",
+	"disabledTimelineDescription": "You cannot use this timeline under your current roles.",
+	"timelinesLabels": {
+		"home": "Home",
+		"local": "Local",
+		"social": "Social",
+		"global": "Global"
+	}
+}
+</locale>
+
+<locale lang="json" locale="es-ES">
+{
+	"disabledTimelineTitle": "Línea de tiempo deshabilitada",
+	"disabledTimelineDescription": "No puedes usar esta línea de tiempo con tus roles actuales.",
+	"timelinesLabels": {
+		"home": "Inicio",
+		"local": "Local",
+		"social": "Social",
+		"global": "Global"
+	}
+}
+</locale>
+
+<locale lang="json" locale="fr-FR">
+{
+	"disabledTimelineTitle": "Timeline disabled",
+	"disabledTimelineDescription": "You cannot use this timeline under your current roles.",
+	"timelinesLabels": {
+		"home": "Principal",
+		"local": "Local",
+		"social": "Social",
+		"global": "Global"
+	}
+}
+</locale>
+
+<locale lang="json" locale="id-ID">
+{
+	"disabledTimelineTitle": "Lini masa dinonaktifkan",
+	"disabledTimelineDescription": "Saat ini kamu tidak dapat menggunakan lini masa ini karena peran kamu saat ini.",
+	"timelinesLabels": {
+		"home": "Beranda",
+		"local": "Lokal",
+		"social": "Sosial",
+		"global": "Global"
+	}
+}
+</locale>
+
+<locale lang="json" locale="it-IT">
+{
+	"disabledTimelineTitle": "Timeline disabilitata",
+	"disabledTimelineDescription": "Il ruolo in cui sei non ti permette di leggere questa timeline",
+	"timelinesLabels": {
+		"home": "Home",
+		"local": "Locale",
+		"social": "Sociale",
+		"global": "Federata"
+	}
+}
+</locale>
+
+<locale lang="json" locale="ja-JP">
+{
+	"disabledTimelineTitle": "無効化されたタイムライン",
+	"disabledTimelineDescription": "現在のロールでは、このタイムラインを使用することはできません。",
+	"timelinesLabels": {
+		"home": "ホーム",
+		"local": "ローカル",
+		"social": "ソーシャル",
+		"global": "グローバル"
+	}
+}
+</locale>
+
+<locale lang="json" locale="ja-KS">
+{
+	"disabledTimelineTitle": "使われへんタイムライン",
+	"disabledTimelineDescription": "あんたの今のロールやったら、このタイムラインは使われへんで。",
+	"timelinesLabels": {
+		"home": "ホーム",
+		"local": "ローカル",
+		"social": "ソーシャル",
+		"global": "グローバル"
+	}
+}
+</locale>
+
+<locale lang="json" locale="kab-KAB">
+{
+	"disabledTimelineTitle": "Timeline disabled",
+	"disabledTimelineDescription": "You cannot use this timeline under your current roles.",
+	"timelinesLabels": {
+		"home": "Home",
+		"local": "Local",
+		"social": "Social",
+		"global": "Global"
+	}
+}
+</locale>
+
+<locale lang="json" locale="kn-IN">
+{
+	"disabledTimelineTitle": "Timeline disabled",
+	"disabledTimelineDescription": "You cannot use this timeline under your current roles.",
+	"timelinesLabels": {
+		"home": "Home",
+		"local": "Local",
+		"social": "Social",
+		"global": "Global"
+	}
+}
+</locale>
+
+<locale lang="json" locale="ko-KR">
+{
+	"disabledTimelineTitle": "비활성화된 타임라인",
+	"disabledTimelineDescription": "현재 역할에서는 이 타임라인을 이용할 수 없습니다.",
+	"timelinesLabels": {
+		"home": "홈",
+		"local": "로컬",
+		"social": "소셜",
+		"global": "글로벌"
+	}
+}
+</locale>
+
+<locale lang="json" locale="nl-NL">
+{
+	"disabledTimelineTitle": "Timeline disabled",
+	"disabledTimelineDescription": "You cannot use this timeline under your current roles.",
+	"timelinesLabels": {
+		"home": "Startpagina",
+		"local": "Local",
+		"social": "Social",
+		"global": "Global"
+	}
+}
+</locale>
+
+<locale lang="json" locale="no-NO">
+{
+	"disabledTimelineTitle": "Timeline disabled",
+	"disabledTimelineDescription": "You cannot use this timeline under your current roles.",
+	"timelinesLabels": {
+		"home": "Hjem",
+		"local": "Local",
+		"social": "Social",
+		"global": "Global"
+	}
+}
+</locale>
+
+<locale lang="json" locale="pl-PL">
+{
+	"disabledTimelineTitle": "Timeline disabled",
+	"disabledTimelineDescription": "You cannot use this timeline under your current roles.",
+	"timelinesLabels": {
+		"home": "Strona główna",
+		"local": "Lokalne",
+		"social": "Społeczność",
+		"global": "Globalna"
+	}
+}
+</locale>
+
+<locale lang="json" locale="pt-PT">
+{
+	"disabledTimelineTitle": "Linha do tempo desabilitada",
+	"disabledTimelineDescription": "Você não pode acessar essa linha do tempo sob o seu cargo atual.",
+	"timelinesLabels": {
+		"home": "Início",
+		"local": "Local",
+		"social": "Social",
+		"global": "Global"
+	}
+}
+</locale>
+
+<locale lang="json" locale="ru-RU">
+{
+	"disabledTimelineTitle": "Лента отключена",
+	"disabledTimelineDescription": "Ваша текущая роль не позволяет пользоваться этой лентой.",
+	"timelinesLabels": {
+		"home": "Персональная",
+		"local": "Местная",
+		"social": "Социальная",
+		"global": "Всеобщая"
+	}
+}
+</locale>
+
+<locale lang="json" locale="sk-SK">
+{
+	"disabledTimelineTitle": "Timeline disabled",
+	"disabledTimelineDescription": "You cannot use this timeline under your current roles.",
+	"timelinesLabels": {
+		"home": "Domov",
+		"local": "Lokálne",
+		"social": "Sociálne",
+		"global": "Globálne"
+	}
+}
+</locale>
+
+<locale lang="json" locale="th-TH">
+{
+	"disabledTimelineTitle": "ปิดใช้งานไทม์ไลน์",
+	"disabledTimelineDescription": "คุณไม่สามารถใช้ไทม์ไลน์นี้ภายใต้บทบาทปัจจุบันของคุณได้",
+	"timelinesLabels": {
+		"home": "หน้าหลัก",
+		"local": "ท้องถิ่น",
+		"social": "โซเชียล",
+		"global": "ทั่วโลก"
+	}
+}
+</locale>
+
+<locale lang="json" locale="tr-TR">
+{
+	"disabledTimelineTitle": "Pano devre dışı bırakıldı",
+	"disabledTimelineDescription": "Mevcut rollerinle bu Pano kullanılamaz.",
+	"timelinesLabels": {
+		"home": "Pano",
+		"local": "Yerel",
+		"social": "Sosyal",
+		"global": "Global"
+	}
+}
+</locale>
+
+<locale lang="json" locale="ug-CN">
+{
+	"disabledTimelineTitle": "Timeline disabled",
+	"disabledTimelineDescription": "You cannot use this timeline under your current roles.",
+	"timelinesLabels": {
+		"home": "Home",
+		"local": "Local",
+		"social": "Social",
+		"global": "Global"
+	}
+}
+</locale>
+
+<locale lang="json" locale="uk-UA">
+{
+	"disabledTimelineTitle": "Timeline disabled",
+	"disabledTimelineDescription": "You cannot use this timeline under your current roles.",
+	"timelinesLabels": {
+		"home": "Домівка",
+		"local": "Локальна",
+		"social": "Соціальна",
+		"global": "Глобальна"
+	}
+}
+</locale>
+
+<locale lang="json" locale="vi-VN">
+{
+	"disabledTimelineTitle": "Timeline disabled",
+	"disabledTimelineDescription": "You cannot use this timeline under your current roles.",
+	"timelinesLabels": {
+		"home": "Trang chính",
+		"local": "Máy chủ này",
+		"social": "Xã hội",
+		"global": "Liên hợp"
+	}
+}
+</locale>
+
+<locale lang="json" locale="zh-CN">
+{
+	"disabledTimelineTitle": "时间线已禁用",
+	"disabledTimelineDescription": "您不能在当前角色使用时间线。",
+	"timelinesLabels": {
+		"home": "首页",
+		"local": "本地",
+		"social": "社交",
+		"global": "全局"
+	}
+}
+</locale>
+
+<locale lang="json" locale="zh-TW">
+{
+	"disabledTimelineTitle": "時間軸已停用",
+	"disabledTimelineDescription": "目前角色無法使用這個時間軸。",
+	"timelinesLabels": {
+		"home": "首頁",
+		"local": "本地",
+		"social": "社交",
+		"global": "公開"
+	}
+}
+</locale>
