@@ -152,7 +152,6 @@ export function getConfig(): UserConfig {
 					nativeMagicString: true,
 				},
 				input: {
-					i18n: '../features/runtime/frontend/embed/i18n.ts',
 					entry: './src/boot.ts',
 				},
 				external: externalPackages.map(p => p.match),
@@ -162,11 +161,6 @@ export function getConfig(): UserConfig {
 						groups: [{
 							name: 'vue',
 							test: /node_modules[\\/]vue/,
-						}, {
-							// split i18n related module to distinct module
-							name: 'i18n',
-							includeDependenciesRecursively: false,
-							test: /i18n\.ts|locale\.ts/,
 						}],
 					},
 					entryFileNames: `scripts/${localesHash}-[hash:8].js`,

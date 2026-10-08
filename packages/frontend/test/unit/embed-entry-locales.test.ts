@@ -8,6 +8,7 @@ import { runInNewContext } from 'node:vm';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createApp } from 'vue';
+import { languages } from 'i18n';
 import { afterEach, describe, expect, test, vi } from 'vitest';
 import { createInternationalization, setActiveInternationalization, useLocale } from 'vite-vue-internationalization/runtime';
 import type { InternationalizationInstance } from 'vite-vue-internationalization/runtime';
@@ -65,7 +66,7 @@ afterEach(() => {
 
 describe('embed entry locale activation', () => {
 	test.each([
-		['fr-FR', 'ja-JP', 'fr-FR'],
+		...languages.map(language => [language, 'ja-JP', language]),
 		[null, 'ja-JP', 'ja-JP'],
 		['unsupported', 'fr', 'fr-FR'],
 		[null, 'unknown', 'en-US'],
@@ -76,7 +77,7 @@ describe('embed entry locale activation', () => {
 		const imports: { target: string; language: string | undefined }[] = [];
 		const document = { readyState: 'complete', documentElement: { classList: { add() {} } } };
 		const context = {
-			LANGS: ['ja-JP', 'en-US', 'fr-FR'], CLIENT_ENTRY: 'scripts/client.js',
+			LANGS: [...languages], CLIENT_ENTRY: 'scripts/client.js',
 			navigator: { language: browser }, location: { search: '' }, URLSearchParams,
 			localStorage: { getItem: (key: string) => values.get(key) ?? null, setItem: (key: string, value: string) => values.set(key, value) },
 			window: { document }, document, console,
@@ -89,7 +90,7 @@ describe('embed entry locale activation', () => {
 		expect(source.match(/await import\(/g)).toHaveLength(1);
 		await runInNewContext(source.replace('await import(', 'await importEntry('), context);
 		await Promise.resolve();
-		expect(imports).toEqual([{ target: `/embed_vite/${expected}/client.js`, language: expected }]);
+		expect(imports).toEqual([{ target: '/embed_vite/scripts/client.js', language: expected }]);
 	});
 
 	test('waits for loading before evaluating eager translations and installs the same instance', async () => {
