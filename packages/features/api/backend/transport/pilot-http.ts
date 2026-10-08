@@ -11,6 +11,8 @@ import type { ApiActor, ApiContext, UploadResource } from './context.js';
 import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 
 const requests = requestRoutes(pilotContract);
+const jsonBodyLimit = 1024 * 1024;
+const bodylessMethods = new Set(['GET', 'HEAD', 'TRACE']);
 
 export function bodyCredential(request: FastifyRequest): string | null | undefined {
 	const body = request.method === 'GET' ? request.query : request.body;
@@ -31,7 +33,21 @@ export function registerPilotHttp<Actor extends ApiActor>(
 ) {
 	const uploadCleanups = new WeakMap<FastifyRequest, () => Promise<void>>();
 	for (const route of requests) fastify.all(route.httpPath, {
-		bodyLimit: 1024 * 1024,
+		bodyLimit: jsonBodyLimit,
+		onRequest: async (request, reply) => {
+			const reject = (status: number) => reply.header('Connection', 'close').code(status).send();
+			if (request.method === 'GET' && route.name !== 'server-info') return reject(405);
+			// HEAD/TRACE bypass Fastify parsers: inspect the header before parser side effects.
+			const mediaType = request.headers['content-type']?.split(';', 1)[0]?.trim().toLowerCase();
+			if (route.name !== 'drive/files/create' && mediaType !== undefined
+				&& mediaType !== 'application/json' && !/^application\/[^/]+\+json$/.test(mediaType)) return reject(415);
+			// Preserve bodyless semantics. Never normalize a framed bodyless request into
+			// an unbounded reader; reject framing, including chunked/unknown-size bodies.
+			if (bodylessMethods.has(request.method)
+				&& (request.headers['transfer-encoding'] !== undefined || Number(request.headers['content-length'] ?? 0) > 0)) {
+				return reject(Number(request.headers['content-length'] ?? 0) > jsonBodyLimit ? 413 : 400);
+			}
+		},
 		onSend: async (request, _reply, payload) => {
 			// Handler consumers and output validation have finished before onSend.
 			await uploadCleanups.get(request)?.();
@@ -40,11 +56,6 @@ export function registerPilotHttp<Actor extends ApiActor>(
 		},
 	}, async (request, reply) => {
 		if (request.method === 'GET' && route.name !== 'server-info') return reply.code(405).send();
-		// JSON routes must never enter the adapter's unbounded raw multipart reader.
-		if (route.name !== 'drive/files/create' && request.isMultipart()) {
-			// End the rejected upload connection instead of leaving an unread body stalled.
-			return reply.header('Connection', 'close').code(415).send();
-		}
 		const run = async (upload?: UploadResource) => {
 			const context = options.context(request, reply, route.name, upload);
 			if (request.method === 'GET' && !context.credential) reply.header('Cache-Control', 'public, max-age=60');
@@ -55,7 +66,13 @@ export function registerPilotHttp<Actor extends ApiActor>(
 					? 'POST' : Reflect.get(target, property, receiver),
 			});
 			const adapted = new Proxy(request, {
-				get: (target, property, receiver) => property === 'raw' ? raw : Reflect.get(target, property, receiver),
+				get: (target, property, receiver) => {
+					if (property === 'raw') return raw;
+					// Parsed JSON, an empty body, or staged upload fields are the complete input.
+					// Do not let the official adapter fall back to decoding an unchecked stream.
+					if (property === 'body') return target.body === undefined ? {} : target.body;
+					return Reflect.get(target, property, receiver);
+				},
 			});
 			await options.runSpan('API: ' + route.name, () => handler.handle(adapted, reply, { prefix: '/api', context }));
 		};

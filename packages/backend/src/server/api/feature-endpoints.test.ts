@@ -22,7 +22,6 @@ import { createEndpoint as createEndpointsEndpoint, meta as endpointsMeta } from
 function makeInstance(readEndpoints: ReadEndpoints) {
 	return createInstance({
 		now: () => 123,
-		serverInfo: { enabled: () => false, read: async () => { throw new Error('Must not read'); } },
 		getOnlineUsersCount: { thresholdMs: 1000, countSince: async () => 8 },
 		readEndpoints,
 	});
@@ -32,7 +31,6 @@ describe('feature endpoint transport adapters', () => {
 	test('keeps legacy validation and anonymous endpoint policy around the feature', async () => {
 		const feature = createInstance({
 			now: () => 123,
-			serverInfo: { enabled: () => false, read: async () => { throw new Error('Must not read'); } },
 			getOnlineUsersCount: { thresholdMs: 1000, countSince: async () => 8 },
 			readEndpoints: async () => [],
 		});
@@ -52,7 +50,6 @@ describe('feature endpoint transport adapters', () => {
 	test('online count endpoint validates before touching its dependency', async () => {
 		let calls = 0;
 		const feature = createInstance({
-			serverInfo: { enabled: () => false, read: async () => { throw new Error('Must not read'); } },
 			getOnlineUsersCount: { thresholdMs: 1000, countSince: async () => { calls++; return 1; } },
 			readEndpoints: async () => [],
 		});

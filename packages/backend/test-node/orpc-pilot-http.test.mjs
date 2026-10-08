@@ -257,3 +257,67 @@ test('unknown, malformed, wrong-status and wrong-route proxy errors never become
 		assert.equal(isDefinedError(result.error), false, JSON.stringify(current));
 	}
 });
+
+function rawBodyRequest(origin, name, method, contentType, body, chunked = false) {
+	return new Promise((resolve, reject) => {
+		const request = httpRequest(`${origin}/api/${name}`, { method, headers: {
+			'content-type': contentType, authorization: 'Bearer native', connection: 'close',
+			...(chunked ? { 'transfer-encoding': 'chunked' } : { 'content-length': Buffer.byteLength(body) }),
+		} }, response => {
+			response.resume();
+			response.on('end', () => resolve({ status: response.statusCode, headers: response.headers }));
+		});
+		request.setTimeout(3000, () => request.destroy(new Error('Raw alias fixture timed out')));
+		request.on('error', reject);
+		request.end(body);
+	});
+}
+
+test('raw bodyless aliases reject oversized JSON and multipart before context or decoding', async t => {
+	const { origin, events } = await fixture(t);
+	for (const method of ['HEAD', 'TRACE', 'GET']) {
+		for (const name of ['server-info', 'notes/delete']) {
+			for (const multipartBody of [false, true]) {
+				await t.test(`${method} ${name} ${multipartBody ? 'multipart' : 'JSON'}`, async () => {
+					const body = multipartBody ? `--pilot\r\nContent-Disposition: form-data; name="padding"\r\n\r\n${'x'.repeat(1100000)}\r\n--pilot--\r\n`
+						: JSON.stringify({ i: 'native', noteId: 'note1', padding: 'x'.repeat(1100000) });
+					const result = await rawBodyRequest(origin, name, method,
+						multipartBody ? 'multipart/form-data; boundary=pilot' : 'application/json', body);
+					assert.equal(result.status, method === 'GET' && name !== 'server-info' ? 405 : multipartBody ? 415 : 413);
+					assert.equal(result.headers.connection, 'close');
+				});
+			}
+		}
+	}
+	assert.deepEqual(events, []);
+});
+
+test('bodyless aliases cannot turn small or chunked bodies into a raw adapter reader', async t => {
+	const { origin, events } = await fixture(t);
+	for (const method of ['HEAD', 'TRACE', 'GET']) {
+		for (const chunked of [false, true]) {
+			const body = JSON.stringify({ padding: chunked ? 'x'.repeat(1100000) : 'small' });
+			const result = await rawBodyRequest(origin, 'server-info', method, 'application/json', body, chunked);
+			assert.equal(result.status, 400);
+			assert.equal(result.headers.connection, 'close');
+		}
+	}
+	assert.deepEqual(events, []);
+});
+
+test('media rejection is parser-independent and empty bodyless aliases retain their semantics', async t => {
+	const { origin, events } = await fixture(t);
+	for (const method of ['HEAD', 'TRACE', 'GET']) {
+		for (const contentType of ['text/plain', 'application/octet-stream', 'multipart/form-data; boundary=pilot']) {
+			const result = await rawBodyRequest(origin, 'server-info', method, contentType, '');
+			assert.equal(result.status, 415);
+		}
+	}
+	assert.deepEqual(events, []);
+	for (const method of ['HEAD', 'TRACE']) {
+		assert.equal((await rawBodyRequest(origin, 'server-info', method, 'application/json', '')).status, 200);
+		assert.equal((await rawBodyRequest(origin, 'notes/delete', method, 'application/json', '')).status, 400);
+		assert.equal((await rawBodyRequest(origin, 'drive/files/create', method, 'multipart/form-data; boundary=pilot', 'small')).status, 400);
+	}
+	assert.equal(events.some(event => event[0] === 'delete' || event[0] === 'upload'), false);
+});
