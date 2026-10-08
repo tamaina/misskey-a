@@ -35,7 +35,6 @@ export function toLegacyJsonSchema(
 	schema: Parameters<typeof toJsonSchema>[0],
 	config?: Parameters<typeof toJsonSchema>[1],
 ): JsonSchema {
-	assertJsonValueMetadata(schema, config?.definitions ?? getGlobalDefs());
 	assertOpaqueObjectProjection(schema, config?.definitions ?? getGlobalDefs());
 	assertRequireWhenAllNullishPlacement(schema);
 	assertMisskeyIdOrIdsMetadata(schema, config?.definitions ?? getGlobalDefs());
@@ -50,6 +49,8 @@ export function toLegacyJsonSchema(
 	assertJsonSelectorAndCommonMetadata([schema, ...Object.values(definitions ?? {})]);
 	assertJsonExclusiveObjectMetadata([schema, ...Object.values(definitions ?? {})]);
 	assertUniqueStringArrayMetadata(schema);
+	// Preserve existing lazy admission checks before traversing canonical JSON leaves.
+	assertJsonValueMetadata(schema, definitions);
 	const projection = jsonObjectProjectionView(schema, definitions, config?.typeMode === 'output');
 	const mapProxies = new WeakMap<object, object>();
 	const source = (value: unknown) => value !== null && (typeof value === 'object' || typeof value === 'function')
