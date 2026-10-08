@@ -9,19 +9,29 @@ export interface JsonObjectRegistration {
 	readonly base: v.GenericSchema;
 	readonly parser: v.GenericTransformation;
 }
+/** Exact public wrapper shape; name it to avoid expanding Valibot object inference in every declaration. */
+export type JsonObjectContractSchema<Base extends v.GenericSchema, Entries extends v.ObjectEntries> =
+	v.BaseSchema<v.InferInput<Base>, v.InferOutput<Base>, v.BaseIssue<unknown>> & {
+		readonly entries: Entries;
+		readonly pipe: readonly [
+			Readonly<v.CustomSchema<v.InferInput<Base>, v.ErrorMessage<v.CustomIssue> | undefined>>,
+			Readonly<v.RawTransformAction<v.InferInput<Base>, v.InferOutput<Base>>>,
+		];
+	};
+
 const schemaRegistrations = new WeakMap<object, JsonObjectRegistration>();
 const guardRegistrations = new WeakMap<object, JsonObjectRegistration>();
 const parserRegistrations = new WeakMap<object, JsonObjectRegistration>();
 
 /** Candidate public parser: validate/default known fields and safely retain every unknown own key. */
-export function jsonObject<const Entries extends v.ObjectEntries>(entries: Entries) {
+export function jsonObject<const Entries extends v.ObjectEntries>(entries: Entries): JsonObjectContractSchema<v.LooseObjectSchema<Readonly<Entries>, undefined>, Readonly<Entries>> {
 	const capturedEntries = Object.freeze({ ...entries });
 	const base = Object.freeze(v.looseObject(capturedEntries));
 	return objectContract(entries, base);
 }
 
 /** Validate every extension through its public schema, including prototype-related own keys. */
-export function jsonObjectWithRest<const Entries extends v.ObjectEntries, const Rest extends v.GenericSchema>(entries: Entries, rest: Rest) {
+export function jsonObjectWithRest<const Entries extends v.ObjectEntries, const Rest extends v.GenericSchema>(entries: Entries, rest: Rest): JsonObjectContractSchema<v.ObjectWithRestSchema<Readonly<Entries>, Rest, undefined>, Readonly<Entries>> {
 	return objectContract(entries, v.objectWithRest(Object.freeze({ ...entries }), rest), rest);
 }
 
@@ -86,7 +96,7 @@ function objectContract<
 	parserRegistrations.set(parser, registration);
 	const schema = Object.assign(v.pipe(guard, parser), { entries: capturedEntries });
 	Object.freeze(schema.pipe);
-	const typed: v.BaseSchema<v.InferInput<typeof base>, v.InferOutput<typeof base>, v.BaseIssue<unknown>> & { readonly entries: typeof capturedEntries; readonly pipe: typeof schema.pipe } = Object.freeze(schema);
+	const typed: JsonObjectContractSchema<Base, typeof capturedEntries> = Object.freeze(schema);
 	schemaRegistrations.set(typed, registration);
 	return typed;
 }

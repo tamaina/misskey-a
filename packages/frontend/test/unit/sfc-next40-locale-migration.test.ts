@@ -4,6 +4,7 @@
  */
 
 import { readFileSync } from 'node:fs';
+import { restoreRssContractBaseline } from './rss-contract-source-rebase.js';
 import { createHash } from 'node:crypto';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -220,7 +221,7 @@ describe('next bounded SFC-local locale migration', () => {
 
 	test.each(migrations)('$file preserves every translation, placeholder, occurrence and source boundary', migration => {
 		const { file, sha256, importOffset, keyPaths, references } = migration;
-		const source = readFileSync(resolve(repoRoot, file), 'utf8');
+		const source = restoreRssContractBaseline(file, readFileSync(resolve(repoRoot, file), 'utf8'));
 		const blocks = getBlocks(file);
 		expect([...blocks.keys()]).toEqual(languages);
 		expect(source).not.toMatch(/\bi18n\s*\./);

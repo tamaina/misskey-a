@@ -10,7 +10,7 @@ import { opaqueObject } from '../../api/contract/opaque-object.js';
 import { jsonObject } from '../../api/contract/json-object.js';
 import { jsonString } from '../../api/contract/index.js';
 import { misskeyId } from '../../api/contract/index.js';
-import { resultObject } from '../../api/contract/result-object.js';
+import { webAuthnRegistrationOptionsSchema } from './webauthn-registration-options.js';
 
 export const inlineAdminResetPasswordInput = v.object({
 	"userId": misskeyId,
@@ -83,7 +83,7 @@ export const inlineI2faRegisterKeyInput = v.object({
 	"password": v.string(),
 	"token": v.exactOptional(v.nullable(v.string())),
 });
-export const inlineI2faRegisterKeyOutput = resultObject({});
+export const inlineI2faRegisterKeyOutput = webAuthnRegistrationOptionsSchema;
 export const inlineI2faRegisterKeyDefinition = defineEndpointContract(
 	{ method: 'POST', path: '/i/2fa/register-key' },
 	inlineI2faRegisterKeyInput,

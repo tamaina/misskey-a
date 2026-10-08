@@ -15,7 +15,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 		>
 			<MkMarqueeText :key="key" :duration="marqueeDuration" :reverse="marqueeReverse">
 				<span v-for="item in items" :class="$style.item">
-					<a :href="item.link" rel="nofollow noopener" target="_blank" :title="item.title">{{ item.title }}</a><span :class="$style.divider"></span>
+					<a :href="rssDomAttribute(item.link)" rel="nofollow noopener" target="_blank" :title="rssDomAttribute(item.title)">{{ item.title }}</a><span :class="$style.divider"></span>
 				</span>
 			</MkMarqueeText>
 		</Transition>
@@ -27,11 +27,11 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue';
+import { ref, shallowRef } from 'vue';
 import * as Misskey from 'misskey-js';
 import { useInterval } from '@features/ui/frontend/shared/use-interval.js';
 import { url as baseUrl } from '@features/boot/frontend/shared/config.js';
-import { tryParseUrl } from '@features/web/frontend/shared/url.js';
+import { isAllowedRssLink, rssDomAttribute } from '@features/web/frontend/shared/rss-value.js';
 import MkMarqueeText from '@features/ui/frontend/components/MkMarqueeText.vue';
 import { shuffle } from '@features/runtime/frontend/utility/shuffle.js';
 
@@ -45,7 +45,7 @@ const props = defineProps<{
 	refreshIntervalSec: number;
 }>();
 
-const items = ref<Misskey.entities.FetchRssResponse['items']>([]);
+const items = shallowRef<Misskey.entities.FetchRssResponse['items']>([]);
 const fetching = ref(true);
 const key = ref(0);
 
@@ -55,11 +55,7 @@ const tick = () => {
 			if (props.shuffle) {
 				shuffle(feed.items);
 			}
-			items.value = feed.items.filter((item) => {
-				if (!item.link) return false;
-				const itemUrl = tryParseUrl(item.link, baseUrl);
-				return itemUrl != null && ['http:', 'https:'].includes(itemUrl.protocol);
-			});
+			items.value = feed.items.filter(item => isAllowedRssLink(item.link, baseUrl));
 			fetching.value = false;
 			key.value++;
 		});

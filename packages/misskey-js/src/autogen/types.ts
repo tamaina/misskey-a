@@ -22751,10 +22751,117 @@ export interface operations {
                 };
                 content: {
                     'application/json': {
+                        items: {
+                            link?: string | {
+                                [key: string]: components['schemas']['JsonValue'];
+                            };
+                            guid?: string | {
+                                [key: string]: components['schemas']['JsonValue'];
+                            };
+                            title?: string | {
+                                [key: string]: components['schemas']['JsonValue'];
+                            };
+                            pubDate?: string | {
+                                [key: string]: components['schemas']['JsonValue'];
+                            };
+                            creator?: string | {
+                                [key: string]: components['schemas']['JsonValue'];
+                            };
+                            summary?: string | {
+                                [key: string]: components['schemas']['JsonValue'];
+                            };
+                            content?: string;
+                            isoDate?: string;
+                            contentSnippet?: string;
+                            author?: string | {
+                                [key: string]: components['schemas']['JsonValue'];
+                            };
+                            id?: string | {
+                                [key: string]: components['schemas']['JsonValue'];
+                            };
+                            date?: string | {
+                                [key: string]: components['schemas']['JsonValue'];
+                            };
+                            language?: string | {
+                                [key: string]: components['schemas']['JsonValue'];
+                            };
+                            rights?: string | {
+                                [key: string]: components['schemas']['JsonValue'];
+                            };
+                            source?: string | {
+                                [key: string]: components['schemas']['JsonValue'];
+                            };
+                            'dc:creator'?: string | {
+                                [key: string]: components['schemas']['JsonValue'];
+                            };
+                            'dc:date'?: string | {
+                                [key: string]: components['schemas']['JsonValue'];
+                            };
+                            comments?: string | {
+                                [key: string]: components['schemas']['JsonValue'];
+                            };
+                            'rdf:about'?: string;
+                            'content:encoded'?: string | {
+                                [key: string]: components['schemas']['JsonValue'];
+                            };
+                            'content:encodedSnippet'?: string;
+                            categories?: components['schemas']['JsonValue'][];
+                            enclosure?: {
+                                url?: string;
+                                length?: string;
+                                type?: string;
+                            } & {
+                                [key: string]: string;
+                            };
+                            itunes?: {
+                                author?: string | {
+                                    [key: string]: components['schemas']['JsonValue'];
+                                };
+                                subtitle?: string | {
+                                    [key: string]: components['schemas']['JsonValue'];
+                                };
+                                summary?: string | {
+                                    [key: string]: components['schemas']['JsonValue'];
+                                };
+                                explicit?: string | {
+                                    [key: string]: components['schemas']['JsonValue'];
+                                };
+                                duration?: string | {
+                                    [key: string]: components['schemas']['JsonValue'];
+                                };
+                                image?: string | {
+                                    [key: string]: components['schemas']['JsonValue'];
+                                };
+                                episode?: string | {
+                                    [key: string]: components['schemas']['JsonValue'];
+                                };
+                                season?: string | {
+                                    [key: string]: components['schemas']['JsonValue'];
+                                };
+                                keywords?: string | {
+                                    [key: string]: components['schemas']['JsonValue'];
+                                };
+                                episodeType?: string | {
+                                    [key: string]: components['schemas']['JsonValue'];
+                                };
+                            };
+                        }[];
                         image?: {
-                            link?: string;
-                            url: string;
-                            title?: string;
+                            url: string | {
+                                [key: string]: components['schemas']['JsonValue'];
+                            };
+                            link?: string | {
+                                [key: string]: components['schemas']['JsonValue'];
+                            };
+                            title?: string | {
+                                [key: string]: components['schemas']['JsonValue'];
+                            };
+                            width?: string | {
+                                [key: string]: components['schemas']['JsonValue'];
+                            };
+                            height?: string | {
+                                [key: string]: components['schemas']['JsonValue'];
+                            };
                         };
                         paginationLinks?: {
                             self?: string;
@@ -22763,40 +22870,93 @@ export interface operations {
                             last?: string;
                             prev?: string;
                         };
-                        link?: string;
-                        title?: string;
-                        items: {
-                            link?: string;
-                            guid?: string;
-                            title?: string;
-                            pubDate?: string;
-                            creator?: string;
-                            summary?: string;
-                            content?: string;
-                            isoDate?: string;
-                            categories?: string[];
-                            contentSnippet?: string;
-                            enclosure?: {
-                                url: string;
-                                length?: number;
-                                type?: string;
-                            };
-                        }[];
+                        link?: string | {
+                            [key: string]: components['schemas']['JsonValue'];
+                        };
+                        title?: string | {
+                            [key: string]: components['schemas']['JsonValue'];
+                        };
                         feedUrl?: string;
-                        description?: string;
+                        description?: string | {
+                            [key: string]: components['schemas']['JsonValue'];
+                        };
+                        author?: string | {
+                            [key: string]: components['schemas']['JsonValue'];
+                        };
+                        creator?: string | {
+                            [key: string]: components['schemas']['JsonValue'];
+                        };
+                        publisher?: string | {
+                            [key: string]: components['schemas']['JsonValue'];
+                        };
+                        source?: string | {
+                            [key: string]: components['schemas']['JsonValue'];
+                        };
+                        type?: string | {
+                            [key: string]: components['schemas']['JsonValue'];
+                        };
+                        pubDate?: string | {
+                            [key: string]: components['schemas']['JsonValue'];
+                        };
+                        webMaster?: string | {
+                            [key: string]: components['schemas']['JsonValue'];
+                        };
+                        managingEditor?: string | {
+                            [key: string]: components['schemas']['JsonValue'];
+                        };
+                        generator?: string | {
+                            [key: string]: components['schemas']['JsonValue'];
+                        };
+                        language?: string | {
+                            [key: string]: components['schemas']['JsonValue'];
+                        };
+                        copyright?: string | {
+                            [key: string]: components['schemas']['JsonValue'];
+                        };
+                        lastBuildDate?: string | {
+                            [key: string]: components['schemas']['JsonValue'];
+                        };
+                        docs?: string | {
+                            [key: string]: components['schemas']['JsonValue'];
+                        };
+                        ttl?: string | {
+                            [key: string]: components['schemas']['JsonValue'];
+                        };
+                        rating?: string | {
+                            [key: string]: components['schemas']['JsonValue'];
+                        };
+                        skipHours?: components['schemas']['JsonValue'];
+                        skipDays?: components['schemas']['JsonValue'];
                         itunes?: {
                             image?: string;
                             owner?: {
-                                name?: string;
-                                email?: string;
+                                name?: string | {
+                                    [key: string]: components['schemas']['JsonValue'];
+                                };
+                                email?: string | {
+                                    [key: string]: components['schemas']['JsonValue'];
+                                };
                             };
-                            author?: string;
-                            summary?: string;
-                            explicit?: string;
-                            categories?: string[];
-                            keywords?: string[];
-                        } & {
-                            [key: string]: unknown;
+                            author?: string | {
+                                [key: string]: components['schemas']['JsonValue'];
+                            };
+                            subtitle?: string | {
+                                [key: string]: components['schemas']['JsonValue'];
+                            };
+                            summary?: string | {
+                                [key: string]: components['schemas']['JsonValue'];
+                            };
+                            explicit?: string | {
+                                [key: string]: components['schemas']['JsonValue'];
+                            };
+                            categories?: (string | null)[];
+                            keywords?: (string | null)[];
+                            categoriesWithSubs?: {
+                                name?: string;
+                                subs: {
+                                    name?: string;
+                                }[] | null;
+                            }[];
                         };
                     };
                 };
@@ -25796,7 +25956,45 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    'application/json': Record<string, never>;
+                    'application/json': {
+                        challenge: string;
+                        rp: {
+                            name: string;
+                            id?: string;
+                        };
+                        user: {
+                            id: string;
+                            name: string;
+                            displayName: string;
+                        };
+                        pubKeyCredParams: {
+                            /** @enum {unknown} */
+                            type: 'public-key';
+                            alg: number;
+                        }[];
+                        timeout?: number;
+                        /** @enum {string} */
+                        attestation?: 'none' | 'indirect' | 'direct' | 'enterprise';
+                        excludeCredentials?: {
+                            id: string;
+                            /** @enum {unknown} */
+                            type: 'public-key';
+                            transports?: ('ble' | 'cable' | 'hybrid' | 'internal' | 'nfc' | 'smart-card' | 'usb')[];
+                        }[];
+                        authenticatorSelection?: {
+                            /** @enum {string} */
+                            authenticatorAttachment?: 'platform' | 'cross-platform';
+                            /** @enum {string} */
+                            residentKey?: 'discouraged' | 'preferred' | 'required';
+                            requireResidentKey?: boolean;
+                            /** @enum {string} */
+                            userVerification?: 'discouraged' | 'preferred' | 'required';
+                        };
+                        extensions?: {
+                            credProps?: boolean;
+                        };
+                        hints?: ('security-key' | 'client-device' | 'hybrid')[];
+                    };
                 };
             };
             /** @description Client error */

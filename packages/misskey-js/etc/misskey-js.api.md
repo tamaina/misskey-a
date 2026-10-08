@@ -10,7 +10,6 @@ import { EventEmitter } from 'eventemitter3';
 import type { InferContractRouterInputs } from '@orpc/contract';
 import type { InferContractRouterOutputs } from '@orpc/contract';
 import { Options } from 'reconnecting-websocket';
-import type { PublicKeyCredentialCreationOptionsJSON as PublicKeyCredentialCreationOptionsJSON_2 } from '@simplewebauthn/browser';
 import type { PublicKeyCredentialRequestOptionsJSON as PublicKeyCredentialRequestOptionsJSON_2 } from '@simplewebauthn/browser';
 import _ReconnectingWebSocket from 'reconnecting-websocket';
 import type { RegistrationResponseJSON } from '@simplewebauthn/browser';
@@ -1495,7 +1494,7 @@ export type Endpoints = Overwrite<Overwrite<Endpoints_2, ContractEndpoints>, {
     };
     'i/2fa/register-key': {
         req: I2faRegisterKeyRequest;
-        res: I2faRegisterKeyResponse_2;
+        res: I2faRegisterKeyResponse;
     };
     'i/2fa/key-done': {
         req: I2faKeyDoneRequest_2;
@@ -1540,7 +1539,6 @@ declare namespace entities {
         SigninWithPasskeyRequest,
         SigninWithPasskeyInitResponse,
         SigninWithPasskeyResponse,
-        I2faRegisterKeyResponse_2 as I2faRegisterKeyResponse,
         I2faKeyDoneRequest_2 as I2faKeyDoneRequest,
         PartialRolePolicyOverride,
         EmptyRequest,
@@ -1954,6 +1952,7 @@ declare namespace entities {
         I2faRegisterRequest,
         I2faRegisterResponse,
         I2faRegisterKeyRequest,
+        I2faRegisterKeyResponse,
         I2faRemoveKeyRequest,
         I2faUnregisterRequest,
         I2faUpdateKeyRequest,
@@ -2575,7 +2574,7 @@ type I2faPasswordLessRequest = ContractRequest<'i/2fa/password-less', operations
 type I2faRegisterKeyRequest = ContractRequest<'i/2fa/register-key', operations['i___2fa___register-key']['requestBody']['content']['application/json']>;
 
 // @public (undocumented)
-type I2faRegisterKeyResponse_2 = PublicKeyCredentialCreationOptionsJSON_2;
+type I2faRegisterKeyResponse = ContractResponse<'i/2fa/register-key', operations['i___2fa___register-key']['responses']['200']['content']['application/json']>;
 
 // @public (undocumented)
 type I2faRegisterRequest = ContractRequest<'i/2fa/register', operations['i___2fa___register']['requestBody']['content']['application/json']>;

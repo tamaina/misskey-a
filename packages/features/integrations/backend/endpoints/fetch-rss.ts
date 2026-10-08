@@ -3,9 +3,11 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { inlineFetchRssDefinition, inlineFetchRssInput, inlineFetchRssOutput } from '../../contract/endpoint-definitions.js';
+import { projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
+import { inlineFetchRssDefinition } from '../../contract/endpoint-definitions.js';
 import Parser from 'rss-parser';
+import { LegacyRssParserProducerEndpoint } from '../legacy-rss-parser-producer-endpoint.js';
+import type { LegacyRssParserProducerEndpointOutput } from '../legacy-rss-parser-producer-endpoint.js';
 import { Injectable } from '@nestjs/common';
 
 import { HttpRequestService } from '@features/runtime/backend/services/HttpRequestService.js';
@@ -58,8 +60,8 @@ export const meta = {
 export const paramDef = contractProjection.input;
 
 @Injectable()
-export default class FetchRssEndpoint extends ContractEndpoint<typeof meta, typeof inlineFetchRssInput, typeof inlineFetchRssOutput> { // eslint-disable-line import/no-default-export
-	private readonly inFlightRequests = new Map<string, Promise<Awaited<ReturnType<Parser['parseString']>>>>();
+export default class FetchRssEndpoint extends LegacyRssParserProducerEndpoint<typeof meta> { // eslint-disable-line import/no-default-export
+	private readonly inFlightRequests = new Map<string, Promise<LegacyRssParserProducerEndpointOutput>>();
 	private activeRequestCount = 0;
 
 	constructor(
@@ -115,7 +117,7 @@ export default class FetchRssEndpoint extends ContractEndpoint<typeof meta, type
 		return url.href;
 	}
 
-	private async fetchRss(url: string): Promise<Awaited<ReturnType<Parser['parseString']>>> {
+	private async fetchRss(url: string): Promise<LegacyRssParserProducerEndpointOutput> {
 		const res = await this.httpRequestService.send(url, {
 			method: 'GET',
 			headers: {

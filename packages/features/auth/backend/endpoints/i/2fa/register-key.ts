@@ -3,9 +3,10 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { inlineI2faRegisterKeyDefinition, inlineI2faRegisterKeyInput, inlineI2faRegisterKeyOutput } from '../../../../contract/endpoint-definitions.js';
+import { projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
+import { inlineI2faRegisterKeyDefinition } from '../../../../contract/endpoint-definitions.js';
 import bcrypt from 'bcryptjs';
+import { LegacyWebAuthnOptionsProducerEndpoint } from '../../../legacy-webauthn-options-producer-endpoint.js';
 import { Inject, Injectable } from '@nestjs/common';
 
 import type { UserProfilesRepository } from '@features/persistence/backend/repositories/models.js';
@@ -48,7 +49,7 @@ export const paramDef = contractProjection.input;
 
 // eslint-disable-next-line import/no-default-export
 @Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof inlineI2faRegisterKeyInput, typeof inlineI2faRegisterKeyOutput> {
+export class EndpointImplementation extends LegacyWebAuthnOptionsProducerEndpoint<typeof meta> {
 	constructor(
 		@Inject(DI.userProfilesRepository)
 		private userProfilesRepository: UserProfilesRepository,

@@ -122,7 +122,7 @@ test('native finite auth inputs/defaults and outputs enforce declared fields', (
 		for (const invalid of [[], null, 'empty']) expect(v.safeParse(schema, invalid).success).toBe(false);
 	}
 	expect(v.parse(emptyAdminCaptchaCurrentInput, null)).toBeNull();
-	expect(v.parse(inline.inlineI2faRegisterKeyOutput, { challenge: 'opaque', rp: { name: 'server' } })).toHaveProperty('challenge', 'opaque');
+	expect(v.safeParse(inline.inlineI2faRegisterKeyOutput, { challenge: 'opaque', rp: { name: 'server' } }).success).toBe(false);
 	const captcha = { provider: 'none' as const, hcaptcha: { siteKey: null, secretKey: null }, mcaptcha: { siteKey: null, secretKey: null, instanceUrl: null }, recaptcha: { siteKey: null, secretKey: null }, turnstile: { siteKey: null, secretKey: null } };
 	expect(v.parse(emptyAdminCaptchaCurrentOutput, captcha)).toEqual(captcha);
 	expect(v.safeParse(emptyAdminCaptchaCurrentOutput, { ...captcha, hcaptcha: { ...captcha.hcaptcha, future: true } }).success).toBe(false);

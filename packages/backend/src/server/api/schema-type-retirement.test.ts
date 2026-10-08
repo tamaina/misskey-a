@@ -53,6 +53,8 @@ test('production transport construction has native witnesses or named compatibil
 		join(packagesRoot, 'features/api/backend/transport/contract-endpoint.ts'),
 		join(packagesRoot, 'features/roles/backend/legacy-role-consumer-endpoint.ts'),
 		join(packagesRoot, 'features/auth/backend/legacy-webauthn-registration-consumer-endpoint.ts'),
+		join(packagesRoot, 'features/auth/backend/legacy-webauthn-options-producer-endpoint.ts'),
+		join(packagesRoot, 'features/integrations/backend/legacy-rss-parser-producer-endpoint.ts'),
 		join(packagesRoot, 'features/moderation/backend/legacy-admin-user-producer-endpoint.ts'),
 	]);
 	const witness = join(packagesRoot, 'features/api/backend/transport/contract-transport-endpoint.ts');

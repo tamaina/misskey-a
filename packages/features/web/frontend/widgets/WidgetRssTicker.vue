@@ -16,8 +16,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 		<div v-else>
 			<Transition :name="$style.change" mode="default" appear>
 				<MkMarqueeText :key="key" :duration="widgetProps.duration" :reverse="widgetProps.reverse">
-					<span v-for="item in items" :key="item.link" :class="$style.item">
-						<a :href="item.link" rel="nofollow noopener" target="_blank" :title="item.title">{{ item.title }}</a><span :class="$style.divider"></span>
+					<span v-for="(item, index) in items" :key="typeof item.link === 'string' ? item.link : index" :class="$style.item">
+						<a :href="rssDomAttribute(item.link)" rel="nofollow noopener" target="_blank" :title="rssDomAttribute(item.title)">{{ item.title }}</a><span :class="$style.divider"></span>
 					</span>
 				</MkMarqueeText>
 			</Transition>
@@ -27,11 +27,11 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { ref, watch, computed } from 'vue';
+import { ref, shallowRef, watch, computed } from 'vue';
 import * as Misskey from 'misskey-js';
 import { url as base } from '@features/boot/frontend/shared/config.js';
 import { useInterval } from '@features/ui/frontend/shared/use-interval.js';
-import { tryParseUrl } from '@features/web/frontend/shared/url.js';
+import { isAllowedRssLink, rssDomAttribute } from '@features/web/frontend/shared/rss-value.js';
 import { useWidgetPropsManager } from '../../../ui/frontend/widgets/widget.js';
 import type { WidgetComponentEmits, WidgetComponentExpose, WidgetComponentProps } from '../../../ui/frontend/widgets/widget.js';
 import type { FormWithDefault, GetFormResultType } from '@features/ui/frontend/utility/form.js';
@@ -99,7 +99,7 @@ const { widgetProps, configure } = useWidgetPropsManager(name,
 	emit,
 );
 
-const rawItems = ref<Misskey.entities.FetchRssResponse['items']>([]);
+const rawItems = shallowRef<Misskey.entities.FetchRssResponse['items']>([]);
 const items = computed(() => {
 	const newItems = rawItems.value.slice(0, widgetProps.maxEntries);
 	if (widgetProps.shuffle) {
@@ -121,11 +121,7 @@ const tick = () => {
 	window.fetch(fetchEndpoint.value, {})
 		.then(res => res.json())
 		.then((feed: Misskey.entities.FetchRssResponse) => {
-			rawItems.value = feed.items.filter((item) => {
-				if (!item.link) return false;
-				const itemUrl = tryParseUrl(item.link, base);
-				return itemUrl != null && ['http:', 'https:'].includes(itemUrl.protocol);
-			});
+			rawItems.value = feed.items.filter(item => isAllowedRssLink(item.link, base));
 			fetching.value = false;
 			key.value++;
 		});
