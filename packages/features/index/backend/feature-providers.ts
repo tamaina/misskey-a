@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { getPilotEndpointDescriptors } from '@features/api/backend/transport/openapi/pilot-spec.js';
 import * as os from 'node:os';
 import {
 	createModerationCommands,
@@ -394,7 +395,7 @@ export const featureProviders: Provider[] = [{
 		},
 		readEndpoints: async () => {
 			const { endpoints } = await import('./endpoints.js');
-			return endpoints.map(endpoint => {
+			const legacy = endpoints.map(endpoint => {
 				const properties = Object.fromEntries(Object.entries(endpoint.params.properties ?? {}).map(([name, property]) => {
 					const projected: { type?: string } = {};
 					if (property.type !== undefined) projected.type = property.type;
@@ -402,6 +403,7 @@ export const featureProviders: Provider[] = [{
 				}));
 				return { name: endpoint.name, properties };
 			});
+			return [...legacy, ...await getPilotEndpointDescriptors()].sort((a, b) => a.name < b.name ? -1 : a.name > b.name ? 1 : 0);
 		},
 	}),
 }, {

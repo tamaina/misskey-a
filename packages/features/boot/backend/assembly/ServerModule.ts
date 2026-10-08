@@ -16,6 +16,7 @@ import { GetterService } from '@features/api/backend/transport/GetterService.js'
 import { ActivityPubServerService } from '@features/federation/backend/http/ActivityPubServerService.js';
 import { ApiLoggerService } from '@features/api/backend/transport/ApiLoggerService.js';
 import { ApiServerService } from '@features/api/backend/transport/ApiServerService.js';
+import { OrpcPilotService } from '@features/api/backend/transport/OrpcPilotService.js';
 import { AuthenticateService } from '@features/auth/backend/transport/AuthenticateService.js';
 import { RateLimiterService } from '@features/api/backend/transport/RateLimiterService.js';
 import { SigninApiService } from '@features/auth/backend/transport/SigninApiService.js';
@@ -74,6 +75,7 @@ import { SigninWithPasskeyApiService } from '@features/auth/backend/transport/Si
 		ApiCallService,
 		ApiLoggerService,
 		ApiServerService,
+		OrpcPilotService,
 		AuthenticateService,
 		RateLimiterService,
 		SigninApiService,

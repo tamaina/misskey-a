@@ -2,6 +2,7 @@ import './autogen/apiClientJSDoc.js';
 
 import { endpointReqTypes } from './autogen/endpoint.js';
 import type { SwitchCaseResponseType, Endpoints } from './api.types.js';
+import { createPilotClient } from './pilot-client.js';
 
 export type {
 	SwitchCaseResponseType,
@@ -27,6 +28,7 @@ export type FetchLike = (input: string, init?: {
 	body?: Blob | FormData | string;
 	credentials?: RequestCredentials;
 	cache?: RequestCache;
+	signal?: AbortSignal;
 	headers: { [key in string]: string }
 }) => Promise<{
 	status: number;
@@ -38,6 +40,13 @@ export class APIClient {
 	public origin: string;
 	public credential: string | null | undefined;
 	public fetch: FetchLike;
+	private readonly pilot = createPilotClient({
+		origin: () => this.origin,
+		credential: () => this.credential,
+		fetch: () => this.fetch,
+	});
+	/** Native nested oRPC client; legacy request names remain available below. */
+	public readonly orpc = this.pilot.client;
 
 	constructor(opts: {
 		origin: APIClient['origin'];
@@ -62,9 +71,19 @@ export class APIClient {
 
 	public request<E extends keyof Endpoints, P extends Endpoints[E]['req']>(
 		endpoint: E,
-		params: P = {} as P,
+		params?: P,
 		credential?: string | null,
-	): Promise<SwitchCaseResponseType<E, P>> {
+	): Promise<SwitchCaseResponseType<E, P>>;
+	public request(endpoint: keyof Endpoints, params: unknown = {}, credential?: string | null): Promise<unknown> {
+		const path = this.pilot.path(endpoint);
+		if (path) return this.pilot.request(path, params, credential).catch((error: unknown) => {
+			if (error !== null && typeof error === 'object' && 'id' in error && 'code' in error && 'message' in error) {
+				// Preserve the existing SDK's plain, symbol-tagged APIError rejection value.
+				// eslint-disable-next-line no-throw-literal
+				throw { [MK_API_ERROR]: true, ...error };
+			}
+			throw error;
+		});
 		return new Promise((resolve, reject) => {
 			let mediaType = 'application/json';
 			// （autogenがバグったときのため、念の為nullチェックも行う）

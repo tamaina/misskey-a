@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { genPilotOpenapiSpec } from './pilot-spec.js';
 import type { Config } from '@/config.js';
 import { endpoints, IEndpoint } from '@features/index/backend/endpoints.js';
 import { errors as basicErrors } from './errors.js';
@@ -224,4 +225,13 @@ export function genOpenapiSpec(config: Config, includeSelfRef = false) {
 	}
 
 	return spec;
+}
+
+/** Native pilot output replaces legacy projection only at the external specification boundary. */
+export async function genCompatibleOpenapiSpec(config: Config, includeSelfRef = false) {
+	const legacy = genOpenapiSpec(config, includeSelfRef);
+	const native = await genPilotOpenapiSpec(config);
+	return { ...legacy, paths: { ...legacy.paths, ...native.paths }, components: {
+		...legacy.components, schemas: { ...legacy.components.schemas, ...native.components?.schemas },
+	} };
 }

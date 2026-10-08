@@ -60,18 +60,21 @@ for (const statement of ast.statements) {
 	routeSources.set(statement.exportClause.name.text, statement.moduleSpecifier.text.replace(/^@features\//, '../../../../features/'));
 }
 const routeFixturePath = fileURLToPath(new URL('../../../test/fixtures/backend-api-routes.json', import.meta.url));
+const nativeNames = new Set(['server-info', 'notes/delete', 'drive/files/create']);
 const expectedRouteKeys = JSON.parse(readFileSync(routeFixturePath, 'utf8')) as string[];
 const expectedRouteOrder = JSON.parse(readFileSync(fileURLToPath(new URL('../../../test/fixtures/backend-api-registry-order.json', import.meta.url)), 'utf8')) as string[];
-const expectedFeatureFactories = JSON.parse(readFileSync(fileURLToPath(new URL('../../../test/fixtures/backend-api-feature-factories.json', import.meta.url)), 'utf8')) as Record<string, { source: string; feature: string }>;
+const legacyRouteKeys = expectedRouteKeys.filter(name => !nativeNames.has(name));
+const expectedFeatureFactories = Object.fromEntries(Object.entries(JSON.parse(readFileSync(fileURLToPath(new URL('../../../test/fixtures/backend-api-feature-factories.json', import.meta.url)), 'utf8')) as Record<string, { source: string; feature: string }>).filter(([name]) => !nativeNames.has(name)));
 const moduleProviders = Reflect.getMetadata(MODULE_METADATA.PROVIDERS, EndpointsModule) as ProviderDefinition[];
 
 test('API endpoint route keys retain the published contract', () => {
 	expect(namedEndpoints).toBe(documentedEndpoints);
 	expect(namedEndpoints.map(endpoint => endpoint.name)).toEqual(Object.keys(endpointModules));
 	const routeKeys = Object.keys(endpointModules).sort();
-	expect([...routeSources.keys()].sort()).toEqual(expectedRouteKeys);
-	expect([...routeSources.keys()]).toEqual(expectedRouteOrder);
-	expect(routeKeys).toEqual(expectedRouteKeys);
+	expect([...routeSources.keys()].sort()).toEqual(legacyRouteKeys);
+	expect([...routeSources.keys()]).toEqual(expectedRouteOrder.filter(name => !nativeNames.has(name)));
+	expect(routeKeys).toEqual(legacyRouteKeys);
+	expect([...routeKeys, ...nativeNames].sort()).toEqual(expectedRouteKeys);
 });
 
 test('API endpoint registry binds canonical classes and feature factories exactly once', () => {

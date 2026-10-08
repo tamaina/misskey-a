@@ -93,7 +93,6 @@ import type { createEndpoint as factory64 } from '@features/notifications/backen
 import type { createEndpoint as factory65 } from '@features/instance/backend/endpoints/ping.js';
 import type { createEndpoint as factory66 } from '@features/relationships/backend/endpoints/renote-mute/create.js';
 import type { createEndpoint as factory67 } from '@features/relationships/backend/endpoints/renote-mute/delete.js';
-import type { createEndpoint as factory68 } from '@features/instance/backend/endpoints/server-info.js';
 import type { createEndpoint as factory69 } from '@features/statistics/backend/endpoints/stats.js';
 import type { createEndpoint as factory70 } from '@features/relationships/backend/endpoints/users/lists/delete.js';
 import type { createEndpoint as factory71 } from '@features/relationships/backend/endpoints/users/lists/favorite.js';
@@ -101,7 +100,6 @@ import type { createEndpoint as factory72 } from '@features/relationships/backen
 import type { createEndpoint as factory73 } from '@features/relationships/backend/endpoints/users/lists/push.js';
 import type { createEndpoint as factory74 } from '@features/relationships/backend/endpoints/users/lists/unfavorite.js';
 import type { createEndpoint as factory75 } from '@features/relationships/backend/endpoints/users/lists/update-membership.js';
-import type { createEndpoint as factory76 } from '@features/notes/backend/endpoints/notes/delete.js';
 import type { createEndpoint as factory77 } from '@features/notes/backend/endpoints/notes/drafts/delete.js';
 import type { createEndpoint as factory78 } from '@features/notes/backend/endpoints/notes/reactions/create.js';
 import type { createEndpoint as factory79 } from '@features/notes/backend/endpoints/notes/reactions/delete.js';
@@ -388,9 +386,6 @@ export type ContractTransportCohortAssertions = [
 	Assert<Equal<IsAny<Awaited<ReturnType<ReturnType<typeof factory67>['exec']>>>, false>>,
 	Assert<Equal<Awaited<ReturnType<ReturnType<typeof factory67>['exec']>>, Endpoints['renote-mute/delete']['res']>>,
 	// server-info
-	Assert<Equal<Awaited<ReturnType<ReturnType<typeof factory68>['exec']>>, InferContractRouterOutputs<{ route: typeof instanceContract['server-info'] }>['route']>>,
-	Assert<Equal<IsAny<Awaited<ReturnType<ReturnType<typeof factory68>['exec']>>>, false>>,
-	Assert<Equal<Awaited<ReturnType<ReturnType<typeof factory68>['exec']>>, Endpoints['server-info']['res']>>,
 	// stats
 	Assert<Equal<Awaited<ReturnType<ReturnType<typeof factory69>['exec']>>, InferContractRouterOutputs<{ route: typeof statisticsContract['stats'] }>['route']>>,
 	Assert<Equal<IsAny<Awaited<ReturnType<ReturnType<typeof factory69>['exec']>>>, false>>,
@@ -420,9 +415,6 @@ export type ContractTransportCohortAssertions = [
 	Assert<Equal<IsAny<Awaited<ReturnType<ReturnType<typeof factory75>['exec']>>>, false>>,
 	Assert<Equal<Awaited<ReturnType<ReturnType<typeof factory75>['exec']>>, Endpoints['users/lists/update-membership']['res']>>,
 	// notes/delete
-	Assert<Equal<Awaited<ReturnType<ReturnType<typeof factory76>['exec']>>, InferContractRouterOutputs<{ route: typeof notesCommandsContract['notes/delete'] }>['route']>>,
-	Assert<Equal<IsAny<Awaited<ReturnType<ReturnType<typeof factory76>['exec']>>>, false>>,
-	Assert<Equal<Awaited<ReturnType<ReturnType<typeof factory76>['exec']>>, Endpoints['notes/delete']['res']>>,
 	// notes/drafts/delete
 	Assert<Equal<Awaited<ReturnType<ReturnType<typeof factory77>['exec']>>, InferContractRouterOutputs<{ route: typeof notesCommandsContract['notes/drafts/delete'] }>['route']>>,
 	Assert<Equal<IsAny<Awaited<ReturnType<ReturnType<typeof factory77>['exec']>>>, false>>,

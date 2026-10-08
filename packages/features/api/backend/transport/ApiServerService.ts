@@ -15,6 +15,7 @@ import { UserEntityService } from '@features/users/backend/serializers/UserEntit
 import { bindThis } from '@features/runtime/backend/decorators.js';
 import { endpoints } from '@features/index/backend/endpoints.js';
 import { ApiCallService } from './ApiCallService.js';
+import { OrpcPilotService } from './OrpcPilotService.js';
 import { SignupApiService } from '@features/auth/backend/transport/SignupApiService.js';
 import { SigninApiService } from '@features/auth/backend/transport/SigninApiService.js';
 import { SigninWithPasskeyApiService } from '@features/auth/backend/transport/SigninWithPasskeyApiService.js';
@@ -36,6 +37,7 @@ export class ApiServerService {
 
 		private userEntityService: UserEntityService,
 		private apiCallService: ApiCallService,
+		private orpcPilot: OrpcPilotService,
 		private signupApiService: SignupApiService,
 		private signinApiService: SigninApiService,
 		private signinWithPasskeyApiService: SigninWithPasskeyApiService,
@@ -62,6 +64,7 @@ export class ApiServerService {
 			done();
 		});
 
+		this.orpcPilot.register(fastify);
 		for (const endpoint of endpoints) {
 			const ep = {
 				name: endpoint.name,

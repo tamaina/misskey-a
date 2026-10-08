@@ -53,7 +53,6 @@ function invoke(feature, key, input, currentActor = actor) {
 
 test('note command legacy schemas preserve required IDs and unbounded reaction strings', () => {
 	const keys = [
-		'notes/delete',
 		'notes/drafts/delete',
 		'notes/reactions/create',
 		'notes/reactions/delete',

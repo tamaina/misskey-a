@@ -70,7 +70,7 @@ type AddFileArgs = {
 	ext?: string | null;
 
 	requestIp?: string | null;
-	requestHeaders?: Record<string, string> | null;
+	requestHeaders?: Record<string, string | string[] | undefined> | null;
 };
 
 type UploadFromUrlArgs = {

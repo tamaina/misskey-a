@@ -1,4 +1,5 @@
 import type { FeatureEndpoints } from '#feature-contracts/index';
+import type { PilotEndpoints } from './pilot.types.js';
 
 /** Keep declared request fields usable with Pick/Omit while transport retains extra keys. */
 type DeclaredFields<T> = {
@@ -8,9 +9,11 @@ type RequestFields<T> = T extends object
 	? keyof DeclaredFields<T> extends never ? T & object : DeclaredFields<T>
 	: T;
 
-export type ContractEndpoints = {
+type LegacyContractEndpoints = {
 	[K in keyof FeatureEndpoints]: {
 		req: RequestFields<FeatureEndpoints[K]['req']>;
 		res: FeatureEndpoints[K]['res'];
 	};
 };
+
+export type ContractEndpoints = Omit<LegacyContractEndpoints, keyof PilotEndpoints> & PilotEndpoints;

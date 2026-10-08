@@ -291,8 +291,6 @@ import type {
 	DriveFilesAttachedNotesResponse,
 	DriveFilesCheckExistenceRequest,
 	DriveFilesCheckExistenceResponse,
-	DriveFilesCreateRequest,
-	DriveFilesCreateResponse,
 	DriveFilesDeleteRequest,
 	DriveFilesFindRequest,
 	DriveFilesFindResponse,
@@ -503,7 +501,6 @@ import type {
 	NotesConversationResponse,
 	NotesCreateRequest,
 	NotesCreateResponse,
-	NotesDeleteRequest,
 	NotesDraftsCountResponse,
 	NotesDraftsCreateRequest,
 	NotesDraftsCreateResponse,
@@ -593,7 +590,6 @@ import type {
 	RolesShowResponse,
 	RolesUsersRequest,
 	RolesUsersResponse,
-	ServerInfoResponse,
 	StatsResponse,
 	SwRegisterRequest,
 	SwRegisterResponse,
@@ -665,6 +661,11 @@ import type {
 	V2AdminEmojiListRequest,
 	V2AdminEmojiListResponse,
 	VerifyEmailRequest,
+	ServerInfoRequest,
+	ServerInfoResponse,
+	NotesDeleteRequest,
+	DriveFilesCreateRequest,
+	DriveFilesCreateResponse,
 } from './entities.js';
 
 export type Endpoints = {
@@ -861,7 +862,6 @@ export type Endpoints = {
 	'drive/files/attached-chat-messages': { req: DriveFilesAttachedChatMessagesRequest; res: DriveFilesAttachedChatMessagesResponse };
 	'drive/files/attached-notes': { req: DriveFilesAttachedNotesRequest; res: DriveFilesAttachedNotesResponse };
 	'drive/files/check-existence': { req: DriveFilesCheckExistenceRequest; res: DriveFilesCheckExistenceResponse };
-	'drive/files/create': { req: DriveFilesCreateRequest; res: DriveFilesCreateResponse };
 	'drive/files/delete': { req: DriveFilesDeleteRequest; res: EmptyResponse };
 	'drive/files/find': { req: DriveFilesFindRequest; res: DriveFilesFindResponse };
 	'drive/files/find-by-hash': { req: DriveFilesFindByHashRequest; res: DriveFilesFindByHashResponse };
@@ -1000,7 +1000,6 @@ export type Endpoints = {
 	'notes/clips': { req: NotesClipsRequest; res: NotesClipsResponse };
 	'notes/conversation': { req: NotesConversationRequest; res: NotesConversationResponse };
 	'notes/create': { req: NotesCreateRequest; res: NotesCreateResponse };
-	'notes/delete': { req: NotesDeleteRequest; res: EmptyResponse };
 	'notes/drafts/count': { req: EmptyRequest; res: NotesDraftsCountResponse };
 	'notes/drafts/create': { req: NotesDraftsCreateRequest; res: NotesDraftsCreateResponse };
 	'notes/drafts/delete': { req: NotesDraftsDeleteRequest; res: EmptyResponse };
@@ -1064,7 +1063,6 @@ export type Endpoints = {
 	'roles/notes': { req: RolesNotesRequest; res: RolesNotesResponse };
 	'roles/show': { req: RolesShowRequest; res: RolesShowResponse };
 	'roles/users': { req: RolesUsersRequest; res: RolesUsersResponse };
-	'server-info': { req: EmptyRequest; res: ServerInfoResponse };
 	'stats': { req: EmptyRequest; res: StatsResponse };
 	'sw/register': { req: SwRegisterRequest; res: SwRegisterResponse };
 	'sw/show-registration': { req: SwShowRegistrationRequest; res: SwShowRegistrationResponse };
@@ -1106,6 +1104,9 @@ export type Endpoints = {
 	'users/update-memo': { req: UsersUpdateMemoRequest; res: EmptyResponse };
 	'v2/admin/emoji/list': { req: V2AdminEmojiListRequest; res: V2AdminEmojiListResponse };
 	'verify-email': { req: VerifyEmailRequest; res: EmptyResponse };
+	'server-info': { req: ServerInfoRequest; res: ServerInfoResponse };
+	'notes/delete': { req: NotesDeleteRequest; res: EmptyResponse };
+	'drive/files/create': { req: DriveFilesCreateRequest; res: DriveFilesCreateResponse };
 };
 
 /**

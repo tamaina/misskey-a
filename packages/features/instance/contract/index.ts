@@ -2,6 +2,7 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
+import { serverInfoContract, serverInfoOutput } from '../backend/endpoints/server-info.contract.js';
 import { oc } from '@orpc/contract';
 import * as v from 'valibot';
 import type { InferContractRouterInputs, InferContractRouterOutputs } from '@orpc/contract';
@@ -11,12 +12,7 @@ export { objectParams };
 
 export const pingResult = v.strictObject({ pong: v.number() });
 export const onlineUsersCountResult = v.strictObject({ count: v.number() });
-export const serverInfoResult = v.strictObject({
-	machine: v.string(),
-	cpu: v.strictObject({ model: v.string(), cores: v.number() }),
-	mem: v.strictObject({ total: v.number() }),
-	fs: v.strictObject({ total: v.number(), used: v.number() }),
-});
+export const serverInfoResult = serverInfoOutput;
 export const endpointsResult = v.array(v.string());
 export const endpointInput = v.object({ endpoint: v.string() });
 export const endpointResult = v.nullable(v.strictObject({
@@ -33,9 +29,7 @@ export const instanceContract = {
 	'get-online-users-count': oc.route({ method: 'POST', path: '/get-online-users-count', tags: ['meta'] })
 		.input(v.optional(objectParams, {}))
 		.output(onlineUsersCountResult),
-	'server-info': oc.route({ method: 'POST', path: '/server-info', tags: ['meta'] })
-		.input(v.optional(objectParams, {}))
-		.output(serverInfoResult),
+	'server-info': serverInfoContract,
 	endpoints: oc.route({ method: 'POST', path: '/endpoints', tags: ['meta'] })
 		.input(v.optional(objectParams, {}))
 		.output(endpointsResult),

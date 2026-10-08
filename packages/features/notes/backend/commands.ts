@@ -206,8 +206,7 @@ export type NotesCommandsFeature<
 	Author extends NotesCommandAuthor,
 > = ReturnType<typeof createNotesCommands<Actor, Note, Draft, Author>>;
 
-export const legacyNotesCommandSchemas: Record<keyof typeof notesCommandInputs, { input: JsonSchema }> = {
-	'notes/delete': { input: toLegacyJsonSchema(notesCommandInputs['notes/delete'], { target: 'openapi-3.0' }) },
+export const legacyNotesCommandSchemas: Record<Exclude<keyof typeof notesCommandInputs, 'notes/delete'>, { input: JsonSchema }> = {
 	'notes/drafts/delete': { input: toLegacyJsonSchema(notesCommandInputs['notes/drafts/delete'], { target: 'openapi-3.0' }) },
 	'notes/reactions/create': { input: toLegacyJsonSchema(notesCommandInputs['notes/reactions/create'], { target: 'openapi-3.0' }) },
 	'notes/reactions/delete': { input: toLegacyJsonSchema(notesCommandInputs['notes/reactions/delete'], { target: 'openapi-3.0' }) },

@@ -1,0 +1,129 @@
+/*
+ * SPDX-FileCopyrightText: syuilo and misskey-project
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
+/** Pinned pre-pilot adapter used only to compare the bounded legacy transport. */
+
+import ms from 'ms';
+import { Inject, Injectable } from '@nestjs/common';
+import { IdentifiableError } from '@features/runtime/backend/errors/identifiable-error.js';
+import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
+import { driveFilesCreateDefinition, driveFilesCreateInput, driveFilesCreateWireInput, driveFilesCreateOutput } from './multipart-drive-create-contract-definition.js';
+import { DriveFileEntityService } from '@features/drive/backend/serializers/DriveFileEntityService.js';
+import { DriveService } from '@features/drive/backend/services/DriveService.js';
+import { MiMeta } from '@features/persistence/backend/repositories/models.js';
+import { DI } from '@/di-symbols.js';
+import { ApiError } from '@features/api/backend/transport/error.js';
+
+const contractProjection = projectEndpointContract(driveFilesCreateDefinition);
+
+export const meta = {
+	tags: ['drive'],
+
+	requireCredential: true,
+
+	prohibitMoved: true,
+
+	limit: {
+		duration: ms('1hour'),
+		max: 120,
+	},
+
+	requireFile: true,
+
+	kind: 'write:drive',
+
+	description: 'Upload a new drive file.',
+
+	res: contractProjection.response,
+
+	errors: {
+		invalidFileName: {
+			message: 'Invalid file name.',
+			code: 'INVALID_FILE_NAME',
+			id: 'f449b209-0c60-4e51-84d5-29486263bfd4',
+		},
+
+		inappropriate: {
+			message: 'Cannot upload the file because it has been determined that it possibly contains inappropriate content.',
+			code: 'INAPPROPRIATE',
+			id: 'bec5bd69-fba3-43c9-b4fb-2894b66ad5d2',
+		},
+
+		noFreeSpace: {
+			message: 'Cannot upload the file because you have no free space of drive.',
+			code: 'NO_FREE_SPACE',
+			id: 'd08dbc37-a6a9-463a-8c47-96c32ab5f064',
+		},
+
+		maxFileSizeExceeded: {
+			message: 'Cannot upload the file because it exceeds the maximum file size.',
+			code: 'MAX_FILE_SIZE_EXCEEDED',
+			id: 'b9d8c348-33f0-4673-b9a9-5d4da058977a',
+			httpStatusCode: 413,
+		},
+
+		unallowedFileType: {
+			message: 'Cannot upload the file because it is an unallowed file type.',
+			code: 'UNALLOWED_FILE_TYPE',
+			id: '4becd248-7f2c-48c4-a9f0-75edc4f9a1ea',
+		},
+	},
+} as const;
+
+export const paramDef = contractProjection.input;
+
+@Injectable()
+export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof driveFilesCreateInput, typeof driveFilesCreateOutput, 'native', typeof driveFilesCreateWireInput> {
+	constructor(
+		@Inject(DI.meta)
+		private serverSettings: MiMeta,
+
+		private driveFileEntityService: DriveFileEntityService,
+		private driveService: DriveService,
+	) {
+		super(meta, contractProjection, async (ps, me, _, file, cleanup, ip, headers) => {
+			// Get 'name' parameter
+			let name = ps.name ?? file!.name ?? null;
+			if (name != null) {
+				name = name.trim();
+				if (name.length === 0) {
+					name = null;
+				} else if (name === 'blob') {
+					name = null;
+				} else if (!this.driveFileEntityService.validateFileName(name)) {
+					throw new ApiError(meta.errors.invalidFileName);
+				}
+			}
+
+			try {
+				// Create file
+				const driveFile = await this.driveService.addFile({
+					user: me,
+					path: file!.path,
+					name,
+					comment: ps.comment,
+					folderId: ps.folderId,
+					force: ps.force,
+					sensitive: ps.isSensitive,
+					requestIp: this.serverSettings.enableIpLogging ? ip : null,
+					requestHeaders: this.serverSettings.enableIpLogging ? headers : null,
+				});
+				return await this.driveFileEntityService.pack(driveFile, { self: true });
+			} catch (err) {
+				if (err instanceof Error || typeof err === 'string') {
+					console.error(err);
+				}
+				if (err instanceof IdentifiableError) {
+					if (err.id === '282f77bf-5816-4f72-9264-aa14d8261a21') throw new ApiError(meta.errors.inappropriate);
+					if (err.id === 'c6244ed2-a39a-4e1c-bf93-f0fbd7764fa6') throw new ApiError(meta.errors.noFreeSpace);
+					if (err.id === 'f9e4e5f3-4df4-40b5-b400-f236945f7073') throw new ApiError(meta.errors.maxFileSizeExceeded);
+					if (err.id === 'bd71c601-f9b0-4808-9137-a330647ced9b') throw new ApiError(meta.errors.unallowedFileType);
+				}
+				throw new ApiError();
+			} finally {
+				cleanup!();
+			}
+		});
+	}
+}

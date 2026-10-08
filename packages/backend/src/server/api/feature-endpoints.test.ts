@@ -16,7 +16,6 @@ import { createInstance } from '@features/instance/backend';
 import type { EndpointDescriptor, ReadEndpoints } from '@features/instance/backend';
 import { createEndpoint as createPingEndpoint, meta as pingMeta } from '@features/instance/backend/endpoints/ping.js';
 import { createEndpoint as createOnlineUsersCountEndpoint, meta as onlineUsersCountMeta } from '@features/instance/backend/endpoints/get-online-users-count.js';
-import { createEndpoint as createServerInfoEndpoint, meta as serverInfoMeta } from '@features/instance/backend/endpoints/server-info.js';
 import { createEndpoint as createEndpointIntrospectionEndpoint, meta as endpointMeta } from '@features/instance/backend/endpoints/endpoint.js';
 import { createEndpoint as createEndpointsEndpoint, meta as endpointsMeta } from '@features/instance/backend/endpoints/endpoints.js';
 
@@ -39,17 +38,14 @@ describe('feature endpoint transport adapters', () => {
 		});
 		const ping = createPingEndpoint(feature);
 		const onlineUsersCount = createOnlineUsersCountEndpoint(feature);
-		const info = createServerInfoEndpoint(feature);
 		expect(await ping.exec({}, null, null)).toEqual({ pong: 123 });
 		expect(await onlineUsersCount.exec({}, null, null)).toEqual({ count: 8 });
-		expect((await info.exec({}, null, null)).machine).toBe('?');
-		for (const endpoint of [ping, onlineUsersCount, info]) {
+		for (const endpoint of [ping, onlineUsersCount]) {
 			for (const invalid of [null, [], 'invalid']) {
 				await expect(endpoint.exec(invalid, null, null)).rejects.toMatchObject({ code: 'INVALID_PARAM' });
 			}
 		}
 		expect(pingMeta.requireCredential).toBe(false);
-		expect(serverInfoMeta).toMatchObject({ requireCredential: false, allowGet: true, cacheSec: 60 });
 		expect(onlineUsersCountMeta).toMatchObject({ requireCredential: false, allowGet: true, cacheSec: 60 });
 	});
 

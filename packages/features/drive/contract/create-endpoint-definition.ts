@@ -4,31 +4,12 @@
  */
 
 import type { InferContractRouterInputs, InferContractRouterOutputs } from '@orpc/contract';
-import * as v from 'valibot';
-import { jsonString, misskeyId } from '../../api/contract/index.js';
-import { defineMultipartEndpointContract } from '../../api/contract/multipart-endpoint.js';
-import { packedReference } from '../../api/contract/packed-reference.js';
-import { DB_MAX_IMAGE_COMMENT_LENGTH } from './image-comment-limit.js';
+import { driveCreateContract } from '../backend/endpoints/drive/files/create.contract.js';
+export { driveCreateInput as driveFilesCreateInput, driveCreateWireInput as driveFilesCreateWireInput,
+	driveCreateOutput as driveFilesCreateOutput } from '../backend/endpoints/drive/files/create.schema.js';
 
-export const driveFilesCreateOutput = packedReference('DriveFile');
-export const driveFilesCreateDefinition = defineMultipartEndpointContract(
-	{ method: 'POST', path: '/drive/files/create', tags: ['drive'] },
-	{
-		folderId: v.optional(v.nullable(misskeyId), null),
-		name: v.optional(v.nullable(v.string()), null),
-		comment: v.optional(v.nullable(jsonString({ maxLength: DB_MAX_IMAGE_COMMENT_LENGTH })), null),
-		isSensitive: v.optional(v.boolean(), false),
-		force: v.optional(v.boolean(), false),
-	},
-	driveFilesCreateOutput,
-);
-export const driveFilesCreateInput = driveFilesCreateDefinition.input;
-export const driveFilesCreateWireInput = driveFilesCreateDefinition.wireInput;
-
-export const driveFileCreateContracts = {
-	'drive/files/create': driveFilesCreateDefinition.contract,
-} as const;
-
+/** Compatibility exports share the colocated contract; they define no second schema or route. */
+export const driveFileCreateContracts = { 'drive/files/create': driveCreateContract };
 type Inputs = InferContractRouterInputs<typeof driveFileCreateContracts>;
 type Outputs = InferContractRouterOutputs<typeof driveFileCreateContracts>;
 export type NativeDriveFileCreateEndpoints = {

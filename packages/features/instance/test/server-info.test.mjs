@@ -4,7 +4,9 @@
  */
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { createServerInfo, legacyServerInfoSchemas } from '../../../backend/built/features/instance/backend.js';
+import { createServerInfo } from '../../../backend/built/features/instance/backend.js';
+
+import { genPilotOpenapiSpec } from '../../../backend/built/features/api/pilot.js';
 
 const metrics = { machine: 'fixture', cpu: { model: 'fixture-cpu', cores: 4 }, mem: { total: 1024 }, fs: { total: 512, used: 64 } };
 const hidden = { machine: '?', cpu: { model: '?', cores: 0 }, mem: { total: 0 }, fs: { total: 0, used: 0 } };
@@ -18,7 +20,7 @@ test('settings are checked on every call, not captured when creating the service
 	let enabled = true;
 	let reads = 0;
 	const endpoint = createServerInfo({ enabled: () => enabled, read: async () => { reads++; return metrics; } });
-	assert.deepEqual(await endpoint(undefined), metrics);
+	assert.deepEqual(await endpoint({}), metrics);
 	enabled = false;
 	assert.deepEqual(await endpoint({ extra: true }), hidden);
 	assert.equal(reads, 1);
@@ -34,7 +36,9 @@ test('reader failures and malformed output are not silently replaced with hidden
 	await assert.rejects(createServerInfo({ enabled: () => true, read: async () => ({ ...metrics, cpu: { model: 'fixture', cores: 'invalid' } }) })({}));
 });
 
-test('legacy documentation retains the complete response shape', () => {
-	assert.deepEqual(legacyServerInfoSchemas.output.required, ['machine', 'cpu', 'mem', 'fs']);
-	assert.equal(legacyServerInfoSchemas.output.properties.cpu.properties.cores.type, 'number');
+test('official external documentation retains the complete response shape', async () => {
+	const spec = await genPilotOpenapiSpec({ version: 'test', apiUrl: '/api' });
+	const output = spec.paths['/server-info'].post.responses['200'].content['application/json'].schema;
+	assert.deepEqual(output.required, ['machine', 'cpu', 'mem', 'fs']);
+	assert.equal(output.properties.cpu.properties.cores.type, 'number');
 });

@@ -4,16 +4,38 @@
 
 ```ts
 
+import type { AnyContractProcedure } from '@orpc/contract';
 import type { AuthenticationResponseJSON } from '@simplewebauthn/browser';
+import { BlobSchema } from 'valibot';
+import { BooleanSchema } from 'valibot';
+import { CheckAction } from 'valibot';
 import { ContractProcedureBuilderWithInputOutput } from '@orpc/contract';
+import { ContractProcedureClient } from '@orpc/contract';
+import type { ContractRouterClient } from '@orpc/contract';
+import { CustomSchema } from 'valibot';
 import { EventEmitter } from 'eventemitter3';
+import { FiniteAction } from 'valibot';
 import type { InferContractRouterInputs } from '@orpc/contract';
 import type { InferContractRouterOutputs } from '@orpc/contract';
+import { MergedErrorMap } from '@orpc/contract';
+import { NullableSchema } from 'valibot';
+import { NullSchema } from 'valibot';
+import { NumberSchema } from 'valibot';
+import { ObjectSchema } from 'valibot';
+import { OptionalSchema } from 'valibot';
 import { Options } from 'reconnecting-websocket';
+import { PicklistSchema } from 'valibot';
 import type { PublicKeyCredentialRequestOptionsJSON as PublicKeyCredentialRequestOptionsJSON_2 } from '@simplewebauthn/browser';
 import _ReconnectingWebSocket from 'reconnecting-websocket';
+import { RecordSchema } from 'valibot';
+import { RegexAction } from 'valibot';
 import type { RegistrationResponseJSON } from '@simplewebauthn/browser';
+import { SchemaWithPipe } from 'valibot';
+import { StrictObjectSchema } from 'valibot';
+import { StringSchema } from 'valibot';
+import { UnknownSchema } from 'valibot';
 import * as v from 'valibot';
+import { VoidSchema } from 'valibot';
 
 // Warning: (ae-forgotten-export) The symbol "ContractModel" needs to be exported by the entry point index.d.ts
 //
@@ -552,6 +574,404 @@ class APIClient {
     fetch: FetchLike;
     // (undocumented)
     origin: string;
+    // (undocumented)
+    readonly orpc: {
+        instance: {
+            serverInfo: ContractProcedureClient<PilotClientContext, OptionalSchema<SchemaWithPipe<readonly [CustomSchema<object, undefined>, ObjectSchema<    {}, undefined>]>, {}>, StrictObjectSchema<    {
+            readonly machine: StringSchema<undefined>;
+            readonly cpu: StrictObjectSchema<    {
+            readonly model: StringSchema<undefined>;
+            readonly cores: SchemaWithPipe<readonly [NumberSchema<undefined>, FiniteAction<number, undefined>]>;
+            }, undefined>;
+            readonly mem: StrictObjectSchema<    {
+            readonly total: SchemaWithPipe<readonly [NumberSchema<undefined>, FiniteAction<number, undefined>]>;
+            }, undefined>;
+            readonly fs: StrictObjectSchema<    {
+            readonly total: SchemaWithPipe<readonly [NumberSchema<undefined>, FiniteAction<number, undefined>]>;
+            readonly used: SchemaWithPipe<readonly [NumberSchema<undefined>, FiniteAction<number, undefined>]>;
+            }, undefined>;
+            }, undefined>, MergedErrorMap<Record<never, never>, {
+            readonly AUTHENTICATION_FAILED: {
+            readonly status: 401;
+            readonly data: ObjectSchema<    {
+            readonly id: StringSchema<undefined>;
+            readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
+            readonly info: OptionalSchema<RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>, undefined>;
+            }, undefined>;
+            };
+            readonly CREDENTIAL_REQUIRED: {
+            readonly status: 401;
+            readonly data: ObjectSchema<    {
+            readonly id: StringSchema<undefined>;
+            readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
+            readonly info: OptionalSchema<RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>, undefined>;
+            }, undefined>;
+            };
+            readonly YOUR_ACCOUNT_SUSPENDED: {
+            readonly status: 403;
+            readonly data: ObjectSchema<    {
+            readonly id: StringSchema<undefined>;
+            readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
+            readonly info: OptionalSchema<RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>, undefined>;
+            }, undefined>;
+            };
+            readonly YOUR_ACCOUNT_MOVED: {
+            readonly status: 403;
+            readonly data: ObjectSchema<    {
+            readonly id: StringSchema<undefined>;
+            readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
+            readonly info: OptionalSchema<RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>, undefined>;
+            }, undefined>;
+            };
+            readonly PERMISSION_DENIED: {
+            readonly status: 403;
+            readonly data: ObjectSchema<    {
+            readonly id: StringSchema<undefined>;
+            readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
+            readonly info: OptionalSchema<RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>, undefined>;
+            }, undefined>;
+            };
+            readonly RATE_LIMIT_EXCEEDED: {
+            readonly status: 429;
+            readonly data: ObjectSchema<    {
+            readonly id: StringSchema<undefined>;
+            readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
+            readonly info: OptionalSchema<RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>, undefined>;
+            }, undefined>;
+            };
+            readonly INVALID_PARAM: {
+            readonly status: 400;
+            readonly data: ObjectSchema<    {
+            readonly id: StringSchema<undefined>;
+            readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
+            readonly info: OptionalSchema<RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>, undefined>;
+            }, undefined>;
+            };
+            readonly INTERNAL_ERROR: {
+            readonly status: 500;
+            readonly data: ObjectSchema<    {
+            readonly id: StringSchema<undefined>;
+            readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
+            readonly info: OptionalSchema<RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>, undefined>;
+            }, undefined>;
+            };
+            }>>;
+            serverInfoGet: ContractProcedureClient<PilotClientContext, OptionalSchema<SchemaWithPipe<readonly [CustomSchema<object, undefined>, ObjectSchema<    {}, undefined>]>, {}>, StrictObjectSchema<    {
+            readonly machine: StringSchema<undefined>;
+            readonly cpu: StrictObjectSchema<    {
+            readonly model: StringSchema<undefined>;
+            readonly cores: SchemaWithPipe<readonly [NumberSchema<undefined>, FiniteAction<number, undefined>]>;
+            }, undefined>;
+            readonly mem: StrictObjectSchema<    {
+            readonly total: SchemaWithPipe<readonly [NumberSchema<undefined>, FiniteAction<number, undefined>]>;
+            }, undefined>;
+            readonly fs: StrictObjectSchema<    {
+            readonly total: SchemaWithPipe<readonly [NumberSchema<undefined>, FiniteAction<number, undefined>]>;
+            readonly used: SchemaWithPipe<readonly [NumberSchema<undefined>, FiniteAction<number, undefined>]>;
+            }, undefined>;
+            }, undefined>, MergedErrorMap<Record<never, never>, {
+            readonly AUTHENTICATION_FAILED: {
+            readonly status: 401;
+            readonly data: ObjectSchema<    {
+            readonly id: StringSchema<undefined>;
+            readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
+            readonly info: OptionalSchema<RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>, undefined>;
+            }, undefined>;
+            };
+            readonly CREDENTIAL_REQUIRED: {
+            readonly status: 401;
+            readonly data: ObjectSchema<    {
+            readonly id: StringSchema<undefined>;
+            readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
+            readonly info: OptionalSchema<RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>, undefined>;
+            }, undefined>;
+            };
+            readonly YOUR_ACCOUNT_SUSPENDED: {
+            readonly status: 403;
+            readonly data: ObjectSchema<    {
+            readonly id: StringSchema<undefined>;
+            readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
+            readonly info: OptionalSchema<RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>, undefined>;
+            }, undefined>;
+            };
+            readonly YOUR_ACCOUNT_MOVED: {
+            readonly status: 403;
+            readonly data: ObjectSchema<    {
+            readonly id: StringSchema<undefined>;
+            readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
+            readonly info: OptionalSchema<RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>, undefined>;
+            }, undefined>;
+            };
+            readonly PERMISSION_DENIED: {
+            readonly status: 403;
+            readonly data: ObjectSchema<    {
+            readonly id: StringSchema<undefined>;
+            readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
+            readonly info: OptionalSchema<RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>, undefined>;
+            }, undefined>;
+            };
+            readonly RATE_LIMIT_EXCEEDED: {
+            readonly status: 429;
+            readonly data: ObjectSchema<    {
+            readonly id: StringSchema<undefined>;
+            readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
+            readonly info: OptionalSchema<RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>, undefined>;
+            }, undefined>;
+            };
+            readonly INVALID_PARAM: {
+            readonly status: 400;
+            readonly data: ObjectSchema<    {
+            readonly id: StringSchema<undefined>;
+            readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
+            readonly info: OptionalSchema<RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>, undefined>;
+            }, undefined>;
+            };
+            readonly INTERNAL_ERROR: {
+            readonly status: 500;
+            readonly data: ObjectSchema<    {
+            readonly id: StringSchema<undefined>;
+            readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
+            readonly info: OptionalSchema<RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>, undefined>;
+            }, undefined>;
+            };
+            }>>;
+        };
+        notes: {
+            delete: ContractProcedureClient<PilotClientContext, ObjectSchema<    {
+            readonly noteId: SchemaWithPipe<readonly [StringSchema<undefined>, RegexAction<string, undefined>]>;
+            }, undefined>, VoidSchema<undefined>, MergedErrorMap<Record<never, never>, {
+            AUTHENTICATION_FAILED: {
+            readonly status: 401;
+            readonly data: ObjectSchema<    {
+            readonly id: StringSchema<undefined>;
+            readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
+            readonly info: OptionalSchema<RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>, undefined>;
+            }, undefined>;
+            };
+            CREDENTIAL_REQUIRED: {
+            readonly status: 401;
+            readonly data: ObjectSchema<    {
+            readonly id: StringSchema<undefined>;
+            readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
+            readonly info: OptionalSchema<RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>, undefined>;
+            }, undefined>;
+            };
+            YOUR_ACCOUNT_SUSPENDED: {
+            readonly status: 403;
+            readonly data: ObjectSchema<    {
+            readonly id: StringSchema<undefined>;
+            readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
+            readonly info: OptionalSchema<RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>, undefined>;
+            }, undefined>;
+            };
+            YOUR_ACCOUNT_MOVED: {
+            readonly status: 403;
+            readonly data: ObjectSchema<    {
+            readonly id: StringSchema<undefined>;
+            readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
+            readonly info: OptionalSchema<RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>, undefined>;
+            }, undefined>;
+            };
+            PERMISSION_DENIED: {
+            readonly status: 403;
+            readonly data: ObjectSchema<    {
+            readonly id: StringSchema<undefined>;
+            readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
+            readonly info: OptionalSchema<RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>, undefined>;
+            }, undefined>;
+            };
+            RATE_LIMIT_EXCEEDED: {
+            readonly status: 429;
+            readonly data: ObjectSchema<    {
+            readonly id: StringSchema<undefined>;
+            readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
+            readonly info: OptionalSchema<RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>, undefined>;
+            }, undefined>;
+            };
+            INVALID_PARAM: {
+            readonly status: 400;
+            readonly data: ObjectSchema<    {
+            readonly id: StringSchema<undefined>;
+            readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
+            readonly info: OptionalSchema<RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>, undefined>;
+            }, undefined>;
+            };
+            INTERNAL_ERROR: {
+            readonly status: 500;
+            readonly data: ObjectSchema<    {
+            readonly id: StringSchema<undefined>;
+            readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
+            readonly info: OptionalSchema<RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>, undefined>;
+            }, undefined>;
+            };
+            NO_SUCH_NOTE: {
+            status: number;
+            data: ObjectSchema<    {
+            readonly id: StringSchema<undefined>;
+            readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
+            readonly info: OptionalSchema<RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>, undefined>;
+            }, undefined>;
+            };
+            ACCESS_DENIED: {
+            status: number;
+            data: ObjectSchema<    {
+            readonly id: StringSchema<undefined>;
+            readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
+            readonly info: OptionalSchema<RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>, undefined>;
+            }, undefined>;
+            };
+            }>>;
+        };
+        drive: {
+            files: {
+                create: ContractProcedureClient<PilotClientContext, ObjectSchema<    {
+                readonly folderId: OptionalSchema<NullableSchema<SchemaWithPipe<readonly [StringSchema<undefined>, RegexAction<string, undefined>]>, undefined>, null>;
+                readonly name: OptionalSchema<NullableSchema<StringSchema<undefined>, undefined>, null>;
+                readonly comment: OptionalSchema<NullableSchema<SchemaWithPipe<readonly [StringSchema<undefined>, CheckAction<string, "Expected at most 512 Unicode code points">]>, undefined>, null>;
+                readonly isSensitive: OptionalSchema<BooleanSchema<undefined>, false>;
+                readonly force: OptionalSchema<BooleanSchema<undefined>, false>;
+                readonly file: BlobSchema<undefined>;
+                }, undefined>, StrictObjectSchema<    {
+                readonly id: StringSchema<undefined>;
+                readonly createdAt: StringSchema<undefined>;
+                readonly name: StringSchema<undefined>;
+                readonly type: StringSchema<undefined>;
+                readonly md5: StringSchema<undefined>;
+                readonly size: SchemaWithPipe<readonly [NumberSchema<undefined>, FiniteAction<number, undefined>]>;
+                readonly isSensitive: BooleanSchema<undefined>;
+                readonly blurhash: NullableSchema<StringSchema<undefined>, undefined>;
+                readonly properties: StrictObjectSchema<    {
+                readonly width: OptionalSchema<SchemaWithPipe<readonly [NumberSchema<undefined>, FiniteAction<number, undefined>]>, undefined>;
+                readonly height: OptionalSchema<SchemaWithPipe<readonly [NumberSchema<undefined>, FiniteAction<number, undefined>]>, undefined>;
+                readonly orientation: OptionalSchema<SchemaWithPipe<readonly [NumberSchema<undefined>, FiniteAction<number, undefined>]>, undefined>;
+                readonly avgColor: OptionalSchema<StringSchema<undefined>, undefined>;
+                }, undefined>;
+                readonly url: StringSchema<undefined>;
+                readonly thumbnailUrl: NullableSchema<StringSchema<undefined>, undefined>;
+                readonly comment: NullableSchema<StringSchema<undefined>, undefined>;
+                readonly folderId: NullableSchema<StringSchema<undefined>, undefined>;
+                readonly folder: NullSchema<undefined>;
+                readonly userId: NullSchema<undefined>;
+                readonly user: NullSchema<undefined>;
+                }, undefined>, MergedErrorMap<Record<never, never>, {
+                AUTHENTICATION_FAILED: {
+                readonly status: 401;
+                readonly data: ObjectSchema<    {
+                readonly id: StringSchema<undefined>;
+                readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
+                readonly info: OptionalSchema<RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>, undefined>;
+                }, undefined>;
+                };
+                CREDENTIAL_REQUIRED: {
+                readonly status: 401;
+                readonly data: ObjectSchema<    {
+                readonly id: StringSchema<undefined>;
+                readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
+                readonly info: OptionalSchema<RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>, undefined>;
+                }, undefined>;
+                };
+                YOUR_ACCOUNT_SUSPENDED: {
+                readonly status: 403;
+                readonly data: ObjectSchema<    {
+                readonly id: StringSchema<undefined>;
+                readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
+                readonly info: OptionalSchema<RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>, undefined>;
+                }, undefined>;
+                };
+                YOUR_ACCOUNT_MOVED: {
+                readonly status: 403;
+                readonly data: ObjectSchema<    {
+                readonly id: StringSchema<undefined>;
+                readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
+                readonly info: OptionalSchema<RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>, undefined>;
+                }, undefined>;
+                };
+                PERMISSION_DENIED: {
+                readonly status: 403;
+                readonly data: ObjectSchema<    {
+                readonly id: StringSchema<undefined>;
+                readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
+                readonly info: OptionalSchema<RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>, undefined>;
+                }, undefined>;
+                };
+                RATE_LIMIT_EXCEEDED: {
+                readonly status: 429;
+                readonly data: ObjectSchema<    {
+                readonly id: StringSchema<undefined>;
+                readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
+                readonly info: OptionalSchema<RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>, undefined>;
+                }, undefined>;
+                };
+                INVALID_PARAM: {
+                readonly status: 400;
+                readonly data: ObjectSchema<    {
+                readonly id: StringSchema<undefined>;
+                readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
+                readonly info: OptionalSchema<RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>, undefined>;
+                }, undefined>;
+                };
+                INTERNAL_ERROR: {
+                readonly status: 500;
+                readonly data: ObjectSchema<    {
+                readonly id: StringSchema<undefined>;
+                readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
+                readonly info: OptionalSchema<RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>, undefined>;
+                }, undefined>;
+                };
+                FILE_REQUIRED: {
+                status: number;
+                data: ObjectSchema<    {
+                readonly id: StringSchema<undefined>;
+                readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
+                readonly info: OptionalSchema<RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>, undefined>;
+                }, undefined>;
+                };
+                INVALID_FILE_NAME: {
+                status: number;
+                data: ObjectSchema<    {
+                readonly id: StringSchema<undefined>;
+                readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
+                readonly info: OptionalSchema<RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>, undefined>;
+                }, undefined>;
+                };
+                INAPPROPRIATE: {
+                status: number;
+                data: ObjectSchema<    {
+                readonly id: StringSchema<undefined>;
+                readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
+                readonly info: OptionalSchema<RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>, undefined>;
+                }, undefined>;
+                };
+                NO_FREE_SPACE: {
+                status: number;
+                data: ObjectSchema<    {
+                readonly id: StringSchema<undefined>;
+                readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
+                readonly info: OptionalSchema<RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>, undefined>;
+                }, undefined>;
+                };
+                MAX_FILE_SIZE_EXCEEDED: {
+                status: number;
+                data: ObjectSchema<    {
+                readonly id: StringSchema<undefined>;
+                readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
+                readonly info: OptionalSchema<RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>, undefined>;
+                }, undefined>;
+                };
+                UNALLOWED_FILE_TYPE: {
+                status: number;
+                data: ObjectSchema<    {
+                readonly id: StringSchema<undefined>;
+                readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
+                readonly info: OptionalSchema<RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>, undefined>;
+                }, undefined>;
+                };
+                }>>;
+            };
+        };
+    };
+    // (undocumented)
+    request<E extends keyof Endpoints, P extends Endpoints[E]['req']>(endpoint: E, params?: P, credential?: string | null): Promise<SwitchCaseResponseType<E, P>>;
 }
 
 // @public (undocumented)
@@ -1833,8 +2253,6 @@ declare namespace entities {
         DriveFilesAttachedNotesResponse,
         DriveFilesCheckExistenceRequest,
         DriveFilesCheckExistenceResponse,
-        DriveFilesCreateRequest,
-        DriveFilesCreateResponse,
         DriveFilesDeleteRequest,
         DriveFilesFindRequest,
         DriveFilesFindResponse,
@@ -2044,7 +2462,6 @@ declare namespace entities {
         NotesConversationResponse,
         NotesCreateRequest,
         NotesCreateResponse,
-        NotesDeleteRequest,
         NotesDraftsCountResponse,
         NotesDraftsCreateRequest,
         NotesDraftsCreateResponse,
@@ -2134,7 +2551,6 @@ declare namespace entities {
         RolesShowResponse,
         RolesUsersRequest,
         RolesUsersResponse,
-        ServerInfoResponse,
         StatsResponse,
         SwRegisterRequest,
         SwRegisterResponse,
@@ -2206,6 +2622,11 @@ declare namespace entities {
         V2AdminEmojiListRequest,
         V2AdminEmojiListResponse,
         VerifyEmailRequest,
+        ServerInfoRequest,
+        ServerInfoResponse,
+        NotesDeleteRequest,
+        DriveFilesCreateRequest,
+        DriveFilesCreateResponse,
         Error_2 as Error,
         JsonValue_2 as JsonValue,
         UserLite,
@@ -2338,6 +2759,7 @@ type FetchLike = (input: string, init?: {
     body?: Blob | FormData | string;
     credentials?: RequestCredentials;
     cache?: RequestCache;
+    signal?: AbortSignal;
     headers: {
         [key in string]: string;
     };
@@ -3217,6 +3639,17 @@ type PartialRolePolicyOverride = Partial<{
 // @public (undocumented)
 export const permissions: readonly ["read:account", "write:account", "read:blocks", "write:blocks", "read:drive", "write:drive", "read:favorites", "write:favorites", "read:following", "write:following", "read:messaging", "write:messaging", "read:mutes", "write:mutes", "write:notes", "read:notifications", "write:notifications", "read:reactions", "write:reactions", "write:votes", "read:pages", "write:pages", "write:page-likes", "read:page-likes", "read:user-groups", "write:user-groups", "read:channels", "write:channels", "read:gallery", "write:gallery", "read:gallery-likes", "write:gallery-likes", "read:flash", "write:flash", "read:flash-likes", "write:flash-likes", "read:admin:abuse-user-reports", "write:admin:delete-account", "write:admin:delete-all-files-of-a-user", "read:admin:index-stats", "read:admin:table-stats", "read:admin:user-ips", "read:admin:meta", "write:admin:reset-password", "write:admin:resolve-abuse-user-report", "write:admin:send-email", "read:admin:server-info", "read:admin:show-moderation-log", "read:admin:show-user", "write:admin:suspend-user", "write:admin:unset-mfa", "write:admin:unset-user-avatar", "write:admin:unset-user-banner", "write:admin:unsuspend-user", "write:admin:meta", "write:admin:user-note", "write:admin:roles", "read:admin:roles", "write:admin:relays", "read:admin:relays", "write:admin:invite-codes", "read:admin:invite-codes", "write:admin:announcements", "read:admin:announcements", "write:admin:avatar-decorations", "read:admin:avatar-decorations", "write:admin:federation", "write:admin:account", "read:admin:account", "write:admin:emoji", "read:admin:emoji", "write:admin:queue", "read:admin:queue", "write:admin:promo", "write:admin:drive", "read:admin:drive", "write:admin:ad", "read:admin:ad", "write:invite-codes", "read:invite-codes", "write:clip-favorite", "read:clip-favorite", "read:federation", "write:report-abuse", "write:chat", "read:chat"];
 
+// Warning: (ae-forgotten-export) The symbol "pilotContract" needs to be exported by the entry point index.d.ts
+//
+// @public (undocumented)
+export type PilotClient = ContractRouterClient<typeof pilotContract, PilotClientContext>;
+
+// @public (undocumented)
+export interface PilotClientContext {
+    // (undocumented)
+    credential?: string | null | undefined;
+}
+
 // @public (undocumented)
 type PingResponse = ContractResponse<'ping', operations['ping']['responses']['200']['content']['application/json']>;
 
@@ -3389,6 +3822,9 @@ type RolesUsersRequest = ContractRequest<'roles/users', operations['roles___user
 
 // @public (undocumented)
 type RolesUsersResponse = ContractResponse<'roles/users', operations['roles___users']['responses']['200']['content']['application/json']>;
+
+// @public (undocumented)
+type ServerInfoRequest = ContractRequest<'server-info', operations['server-info']['requestBody']['content']['application/json']>;
 
 // @public (undocumented)
 type ServerInfoResponse = ContractResponse<'server-info', operations['server-info']['responses']['200']['content']['application/json']>;

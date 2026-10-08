@@ -178,7 +178,6 @@ export * as 'drive/files' from '@features/drive/backend/endpoints/drive/files.js
 export * as 'drive/files/attached-notes' from '@features/drive/backend/endpoints/drive/files/attached-notes.js';
 export * as 'drive/files/attached-chat-messages' from '@features/drive/backend/endpoints/drive/files/attached-chat-messages.js';
 export * as 'drive/files/check-existence' from '@features/drive/backend/endpoints/drive/files/check-existence.js';
-export * as 'drive/files/create' from '@features/drive/backend/endpoints/drive/files/create.js';
 export * as 'drive/files/delete' from '@features/drive/backend/endpoints/drive/files/delete.js';
 export * as 'drive/files/find' from '@features/drive/backend/endpoints/drive/files/find.js';
 export * as 'drive/files/find-by-hash' from '@features/drive/backend/endpoints/drive/files/find-by-hash.js';
@@ -317,7 +316,6 @@ export * as 'notes/children' from '@features/notes/backend/endpoints/notes/child
 export * as 'notes/clips' from '@features/collections/backend/endpoints/notes/clips.js';
 export * as 'notes/conversation' from '@features/notes/backend/endpoints/notes/conversation.js';
 export * as 'notes/create' from '@features/notes/backend/endpoints/notes/create.js';
-export * as 'notes/delete' from '@features/notes/backend/endpoints/notes/delete.js';
 export * as 'notes/drafts/list' from '@features/notes/backend/endpoints/notes/drafts/list.js';
 export * as 'notes/drafts/create' from '@features/notes/backend/endpoints/notes/drafts/create.js';
 export * as 'notes/drafts/delete' from '@features/notes/backend/endpoints/notes/drafts/delete.js';
@@ -381,7 +379,6 @@ export * as 'roles/list' from '@features/roles/backend/endpoints/roles/list.js';
 export * as 'roles/notes' from '@features/roles/backend/endpoints/roles/notes.js';
 export * as 'roles/show' from '@features/roles/backend/endpoints/roles/show.js';
 export * as 'roles/users' from '@features/roles/backend/endpoints/roles/users.js';
-export * as 'server-info' from '@features/instance/backend/endpoints/server-info.js';
 export * as 'stats' from '@features/statistics/backend/endpoints/stats.js';
 export * as 'sw/register' from '@features/notifications/backend/endpoints/sw/register.js';
 export * as 'sw/show-registration' from '@features/notifications/backend/endpoints/sw/show-registration.js';

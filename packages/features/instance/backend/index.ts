@@ -13,9 +13,9 @@ import {
 	objectParams,
 	onlineUsersCountResult,
 	pingResult,
-	serverInfoResult,
 } from '../contract/index.js';
 import type { InstanceEndpoints } from '../contract/index.js';
+import { createServerInfoService } from './server-info.js';
 import { createGetOnlineUsersCount } from './get-online-users-count.js';
 import type { OnlineUsersCountDependencies } from './get-online-users-count.js';
 import { toLegacyJsonSchema } from '@features/api/backend/index.js';
@@ -39,13 +39,8 @@ export type ReadEndpoints = () => Promise<readonly EndpointDescriptor[]>;
 
 /** Check current settings on every request before reading machine information. */
 export function createServerInfo(deps: ServerInfoDependencies) {
-	return createProcedureClient(implement(instanceContract['server-info']).handler(async () => {
-		if (!deps.enabled()) return {
-			machine: '?', cpu: { model: '?', cores: 0 },
-			mem: { total: 0 }, fs: { total: 0, used: 0 },
-		};
-		return deps.read();
-	}));
+	const service = createServerInfoService(deps);
+	return createProcedureClient(implement(instanceContract['server-info']).handler(() => service()));
 }
 
 export function createEndpoints(readEndpoints: ReadEndpoints) {
@@ -74,8 +69,6 @@ export function createEndpoint(readEndpoints: ReadEndpoints) {
 const input = toLegacyJsonSchema(objectParams);
 const output = toLegacyJsonSchema(pingResult);
 export const legacyPingSchemas: { input: JsonSchema; output: JsonSchema } = { input, output };
-const serverInfoOutput = toLegacyJsonSchema(serverInfoResult);
-export const legacyServerInfoSchemas: { input: JsonSchema; output: JsonSchema } = { input, output: serverInfoOutput };
 const onlineUsersCountOutput = toLegacyJsonSchema(onlineUsersCountResult);
 export const legacyOnlineUsersCountSchemas: { input: JsonSchema; output: JsonSchema } = { input, output: onlineUsersCountOutput };
 const endpointsInput = toLegacyJsonSchema(objectParams, {

@@ -34,6 +34,7 @@
 		"test-and-coverage:e2e": "pnpm build:e2e && cross-env NODE_ENV=test pnpm compile-config && vitest --coverage --config vitest.config.e2e.ts",
 		"check-migrations": "node scripts/check_migrations_clean.js",
 		"generate-api-json": "pnpm compile-config && node ./scripts/generate_api_json.js",
+		"test:orpc": "pnpm --filter misskey-js build && pnpm build && node --test --test-concurrency=1 ../features/api/test/orpc-pilot.test.mjs test-node/orpc-pilot-http.test.mjs",
 		"test:features": "pnpm build && node --test ../features/*/test/*.test.mjs",
 		"lint:features": "cd ../.. && eslint --quiet --config packages/backend/eslint.config.js \"packages/features/*/{backend,contract,shared}/**/*.{ts,tsx,mts}\" \"packages/features/*/test/*.mjs\" \"packages/features/*/test/backend/**/*.ts\""
 	},
@@ -55,6 +56,8 @@
 		"utf-8-validate": "6.0.6"
 	},
 	"dependencies": {
+		"@orpc/openapi": "1.15.4",
+		"@orpc/valibot": "1.15.4",
 		"@aws-sdk/client-s3": "3.1121.0",
 		"@aws-sdk/lib-storage": "3.1121.0",
 		"@fastify/accepts": "5.0.4",

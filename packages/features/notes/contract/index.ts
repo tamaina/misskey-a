@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { notesDeleteContract, notesDeleteInput } from '../backend/endpoints/notes/delete.contract.js';
 import { oc } from '@orpc/contract';
 import type { InferContractRouterInputs, InferContractRouterOutputs } from '@orpc/contract';
 import * as v from 'valibot';
@@ -11,9 +12,7 @@ import { jsonString, misskeyId } from '../../api/contract/index.js';
 
 /** Inputs for the existing void-returning note commands being served through oRPC. */
 export const notesCommandInputs = {
-	'notes/delete': v.object({
-		noteId: misskeyId,
-	}),
+	'notes/delete': notesDeleteInput,
 	'notes/drafts/delete': v.object({
 		draftId: misskeyId,
 	}),
@@ -136,9 +135,7 @@ export const notesCommandErrors = {
 const voidOutput = v.void();
 
 export const notesCommandsContract = {
-	'notes/delete': oc.route({ method: 'POST', path: '/notes/delete', tags: ['notes'] })
-		.input(notesCommandInputs['notes/delete'])
-		.output(voidOutput),
+	'notes/delete': notesDeleteContract,
 	'notes/drafts/delete': oc.route({ method: 'POST', path: '/notes/drafts/delete', tags: ['notes', 'drafts'] })
 		.input(notesCommandInputs['notes/drafts/delete'])
 		.output(voidOutput),

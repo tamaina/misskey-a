@@ -2140,17 +2140,6 @@ declare module '../api.js' {
     ): Promise<SwitchCaseResponseType<E, P>>;
 
     /**
-     * Upload a new drive file.
-     * 
-     * **Credential required**: *Yes* / **Permission**: *write:drive*
-     */
-    request<E extends 'drive/files/create', P extends Endpoints[E]['req']>(
-      endpoint: E,
-      params: P,
-      credential?: string | null,
-    ): Promise<SwitchCaseResponseType<E, P>>;
-
-    /**
      * Delete an existing drive file.
      * 
      * **Credential required**: *Yes* / **Permission**: *write:drive*
@@ -3705,17 +3694,6 @@ declare module '../api.js' {
     /**
      * No description provided.
      * 
-     * **Credential required**: *Yes* / **Permission**: *write:notes*
-     */
-    request<E extends 'notes/delete', P extends Endpoints[E]['req']>(
-      endpoint: E,
-      params: P,
-      credential?: string | null,
-    ): Promise<SwitchCaseResponseType<E, P>>;
-
-    /**
-     * No description provided.
-     * 
      * **Credential required**: *Yes* / **Permission**: *read:account*
      */
     request<E extends 'notes/drafts/count', P extends Endpoints[E]['req']>(
@@ -4412,17 +4390,6 @@ declare module '../api.js' {
      * 
      * **Credential required**: *No*
      */
-    request<E extends 'server-info', P extends Endpoints[E]['req']>(
-      endpoint: E,
-      params: P,
-      credential?: string | null,
-    ): Promise<SwitchCaseResponseType<E, P>>;
-
-    /**
-     * No description provided.
-     * 
-     * **Credential required**: *No*
-     */
     request<E extends 'stats', P extends Endpoints[E]['req']>(
       endpoint: E,
       params: P,
@@ -4867,6 +4834,24 @@ declare module '../api.js' {
      * **Credential required**: *No*
      */
     request<E extends 'verify-email', P extends Endpoints[E]['req']>(
+      endpoint: E,
+      params: P,
+      credential?: string | null,
+    ): Promise<SwitchCaseResponseType<E, P>>;
+
+    /**
+     * Delete a note. Requires write:notes permission.
+     */
+    request<E extends 'notes/delete', P extends Endpoints[E]['req']>(
+      endpoint: E,
+      params: P,
+      credential?: string | null,
+    ): Promise<SwitchCaseResponseType<E, P>>;
+
+    /**
+     * Upload a new drive file. Requires write:drive permission.
+     */
+    request<E extends 'drive/files/create', P extends Endpoints[E]['req']>(
       endpoint: E,
       params: P,
       credential?: string | null,

@@ -29,6 +29,8 @@
 		"lint": "pnpm typecheck && pnpm eslint",
 		"vitest": "vitest run --coverage",
 		"test": "pnpm vitest && pnpm tsd",
+		"test:orpc-fetch": "node --test test-node/orpc-fetch.test.mjs",
+		"test:orpc": "pnpm build && node --test --test-concurrency=1 test-node/*.test.mjs",
 		"update-autogen-code": "pnpm --filter misskey-js-type-generator generate && ncp generator/built/autogen src/autogen"
 	},
 	"repository": {
@@ -54,6 +56,8 @@
 		"built"
 	],
 	"dependencies": {
+		"@orpc/client": "1.15.4",
+		"@orpc/openapi-client": "1.15.4",
 		"@simplewebauthn/browser": "13.3.0",
 		"eventemitter3": "5.0.4",
 		"reconnecting-websocket": "4.4.0",
@@ -61,6 +65,8 @@
 		"valibot": "1.5.0"
 	},
 	"imports": {
+		"#api-routing": "./built/contracts/api/shared/api-routing.js",
+		"#pilot-contract": "./built/contracts/index/backend/api.contract.js",
 		"#feature-contracts/*": "./built/contracts/*/contract/index.js"
 	}
 }
