@@ -8,7 +8,7 @@ import { expect, userEvent, waitFor, within } from '@storybook/test';
 import type { StoryObj } from '@storybook/vue3';
 import { onBeforeUnmount } from 'vue';
 import MkSignupServerRules from '@features/auth/frontend/components/MkSignupDialog.rules.vue';
-import { i18n } from '@features/runtime/frontend/i18n.js';
+import FeatureLocaleMessages from '@features/auth/frontend/ts-messages.vue';
 import { instance } from '@features/instance/frontend/instance.js';
 export const Empty = {
 	render(args) {
@@ -43,7 +43,7 @@ export const Empty = {
 			userEvent.click(button);
 			await waitFor(() => expect(group).toHaveAttribute('aria-expanded', 'true'));
 		}
-		const labels = await canvas.findAllByText(i18n.ts.agree);
+		const labels = await canvas.findAllByText(FeatureLocaleMessages.$locale.agree);
 		for (const label of labels) {
 			expect(buttons.at(-1)).toBeDisabled();
 			await waitFor(() => userEvent.click(label));

@@ -11,7 +11,7 @@ import type { Ref } from 'vue';
 import type { MenuItem } from '@features/navigation/frontend/types/menu.js';
 import { genId } from '@features/runtime/frontend/utility/id.js';
 import { copyToClipboard } from '@features/ui/frontend/utility/copy-to-clipboard.js';
-import { i18n } from '@features/runtime/frontend/i18n.js';
+import FeatureLocaleMessages from '@features/preferences/frontend/ts-messages.vue';
 import * as os from '@features/ui/frontend/os.js';
 import { deepEqual } from '@features/runtime/frontend/utility/deep-equal.js';
 import { deepClone } from '@features/runtime/frontend/utility/clone.js';
@@ -470,19 +470,19 @@ export class PreferencesManager extends EventEmitter<PreferencesManagerEvents> {
 				// nop
 			}
 			const { canceled, result: choice } = await os.select({
-				title: i18n.ts.preferenceSyncConflictTitle,
-				text: i18n.ts.preferenceSyncConflictText,
+				title: FeatureLocaleMessages.$locale.preferenceSyncConflictTitle,
+				text: FeatureLocaleMessages.$locale.preferenceSyncConflictText,
 				items: [...(mergedValue !== undefined ? [{
-					label: i18n.ts.preferenceSyncConflictChoiceMerge,
+					label: FeatureLocaleMessages.$locale.preferenceSyncConflictChoiceMerge,
 					value: 'merge' as const,
 				}] : []), {
-					label: i18n.ts.preferenceSyncConflictChoiceServer,
+					label: FeatureLocaleMessages.$locale.preferenceSyncConflictChoiceServer,
 					value: 'remote' as const,
 				}, {
-					label: i18n.ts.preferenceSyncConflictChoiceDevice,
+					label: FeatureLocaleMessages.$locale.preferenceSyncConflictChoiceDevice,
 					value: 'local' as const,
 				}, {
-					label: i18n.ts.preferenceSyncConflictChoiceCancel,
+					label: FeatureLocaleMessages.$locale.preferenceSyncConflictChoiceCancel,
 					value: null,
 				}],
 				default: mergedValue !== undefined ? 'merge' : 'remote',
@@ -522,7 +522,7 @@ export class PreferencesManager extends EventEmitter<PreferencesManagerEvents> {
 
 			os.alert({
 				type: 'error',
-				title: i18n.ts.somethingHappened,
+				title: FeatureLocaleMessages.$locale.somethingHappened,
 			});
 
 			console.error(err);
@@ -594,13 +594,13 @@ export class PreferencesManager extends EventEmitter<PreferencesManagerEvents> {
 
 		return [{
 			icon: 'ti ti-copy',
-			text: i18n.ts.copyPreferenceId,
+			text: FeatureLocaleMessages.$locale.copyPreferenceId,
 			action: () => {
 				copyToClipboard(key);
 			},
 		}, {
 			icon: 'ti ti-refresh',
-			text: i18n.ts.resetToDefaultValue,
+			text: FeatureLocaleMessages.$locale.resetToDefaultValue,
 			danger: true,
 			action: () => {
 				this.commit(key, getInitialPrefValue(key));
@@ -610,12 +610,12 @@ export class PreferencesManager extends EventEmitter<PreferencesManagerEvents> {
 		}, {
 			type: 'switch',
 			icon: 'ti ti-user-cog',
-			text: i18n.ts.overrideByAccount,
+			text: FeatureLocaleMessages.$locale.overrideByAccount,
 			ref: overrideByAccount,
 		}, {
 			type: 'switch',
 			icon: 'ti ti-cloud-cog',
-			text: i18n.ts.syncBetweenDevices,
+			text: FeatureLocaleMessages.$locale.syncBetweenDevices,
 			ref: sync,
 		}];
 	}

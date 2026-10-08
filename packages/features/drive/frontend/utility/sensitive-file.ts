@@ -6,7 +6,7 @@
 import * as Misskey from 'misskey-js';
 import * as os from '@features/ui/frontend/os.js';
 import { prefer } from '@features/preferences/frontend/preferences.js';
-import { i18n } from '@features/runtime/frontend/i18n.js';
+import FeatureLocaleMessages from '@features/drive/frontend/ts-messages.vue';
 
 export function shouldHideFileByDefault(file: Misskey.entities.DriveFile, ignoreDataSaver = false): boolean {
 	if (prefer.s.nsfw === 'force' || (!ignoreDataSaver && prefer.s.dataSaver.media)) {
@@ -24,7 +24,7 @@ export async function canRevealFile(file: Misskey.entities.DriveFile): Promise<b
 	if (file.isSensitive && prefer.s.confirmWhenRevealingSensitiveMedia) {
 		const { canceled } = await os.confirm({
 			type: 'question',
-			text: i18n.ts.sensitiveMediaRevealConfirm,
+			text: FeatureLocaleMessages.$locale.sensitiveMediaRevealConfirm,
 		});
 		if (canceled) return false;
 	}

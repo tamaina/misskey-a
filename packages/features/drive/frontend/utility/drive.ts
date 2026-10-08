@@ -10,7 +10,7 @@ import type { UploaderFeatures } from '@features/drive/frontend/composables/use-
 import * as os from '@features/ui/frontend/os.js';
 import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 import { useStream } from '@features/api/frontend/stream.js';
-import { i18n } from '@features/runtime/frontend/i18n.js';
+import FeatureLocaleMessages from '@features/drive/frontend/ts-messages.vue';
 import { prefer } from '@features/preferences/frontend/preferences.js';
 import { $i } from '@features/auth/frontend/i.js';
 import { instance } from '@features/instance/frontend/instance.js';
@@ -63,8 +63,8 @@ export function uploadFile(file: File | Blob, options: {
 		if ((file.size > instance.maxFileSize) || (file.size > ($i.policies.maxFileSizeMb * 1024 * 1024))) {
 			os.alert({
 				type: 'error',
-				title: i18n.ts.failedToUpload,
-				text: i18n.ts.cannotUploadBecauseExceedsFileSizeLimit,
+				title: FeatureLocaleMessages.$locale.failedToUpload,
+				text: FeatureLocaleMessages.$locale.cannotUploadBecauseExceedsFileSizeLimit,
 			});
 			return reject();
 		}
@@ -79,33 +79,33 @@ export function uploadFile(file: File | Blob, options: {
 				if (xhr.status === 413) {
 					os.alert({
 						type: 'error',
-						title: i18n.ts.failedToUpload,
-						text: i18n.ts.cannotUploadBecauseExceedsFileSizeLimit,
+						title: FeatureLocaleMessages.$locale.failedToUpload,
+						text: FeatureLocaleMessages.$locale.cannotUploadBecauseExceedsFileSizeLimit,
 					});
 				} else if (ev.target?.response) {
 					const res = JSON.parse(ev.target.response);
 					if (res.error?.id === 'bec5bd69-fba3-43c9-b4fb-2894b66ad5d2') {
 						os.alert({
 							type: 'error',
-							title: i18n.ts.failedToUpload,
-							text: i18n.ts.cannotUploadBecauseInappropriate,
+							title: FeatureLocaleMessages.$locale.failedToUpload,
+							text: FeatureLocaleMessages.$locale.cannotUploadBecauseInappropriate,
 						});
 					} else if (res.error?.id === 'd08dbc37-a6a9-463a-8c47-96c32ab5f064') {
 						os.alert({
 							type: 'error',
-							title: i18n.ts.failedToUpload,
-							text: i18n.ts.cannotUploadBecauseNoFreeSpace,
+							title: FeatureLocaleMessages.$locale.failedToUpload,
+							text: FeatureLocaleMessages.$locale.cannotUploadBecauseNoFreeSpace,
 						});
 					} else if (res.error?.id === '4becd248-7f2c-48c4-a9f0-75edc4f9a1ea') {
 						os.alert({
 							type: 'error',
-							title: i18n.ts.failedToUpload,
-							text: i18n.ts.cannotUploadBecauseUnallowedFileType,
+							title: FeatureLocaleMessages.$locale.failedToUpload,
+							text: FeatureLocaleMessages.$locale.cannotUploadBecauseUnallowedFileType,
 						});
 					} else {
 						os.alert({
 							type: 'error',
-							title: i18n.ts.failedToUpload,
+							title: FeatureLocaleMessages.$locale.failedToUpload,
 							text: `${res.error?.message}\n${res.error?.code}\n${res.error?.id}`,
 						});
 					}
@@ -198,9 +198,9 @@ export function chooseDriveFile(options: {
 export function chooseFileFromUrl(): Promise<Misskey.entities.DriveFile> {
 	return new Promise((res, rej) => {
 		os.inputText({
-			title: i18n.ts.uploadFromUrl,
+			title: FeatureLocaleMessages.$locale.uploadFromUrl,
 			type: 'url',
-			placeholder: i18n.ts.uploadFromUrlDescription,
+			placeholder: FeatureLocaleMessages.$locale.uploadFromUrlDescription,
 		}).then(({ canceled, result: url }) => {
 			if (canceled || url == null) return;
 
@@ -222,8 +222,8 @@ export function chooseFileFromUrl(): Promise<Misskey.entities.DriveFile> {
 			});
 
 			os.alert({
-				title: i18n.ts.uploadFromUrlRequested,
-				text: i18n.ts.uploadFromUrlMayTakeTime,
+				title: FeatureLocaleMessages.$locale.uploadFromUrlRequested,
+				text: FeatureLocaleMessages.$locale.uploadFromUrlMayTakeTime,
 			});
 		});
 	});
@@ -235,15 +235,15 @@ function select(anchorElement: HTMLElement | EventTarget | null, label: string |
 			text: label,
 			type: 'label',
 		} : null, {
-			text: i18n.ts.upload,
+			text: FeatureLocaleMessages.$locale.upload,
 			icon: 'ti ti-upload',
 			action: () => chooseFileFromPcAndUpload({ multiple, features }).then(files => res(files)),
 		}, {
-			text: i18n.ts.fromDrive,
+			text: FeatureLocaleMessages.$locale.fromDrive,
 			icon: 'ti ti-cloud',
 			action: () => chooseDriveFile({ multiple }).then(files => res(files)),
 		}, {
-			text: i18n.ts.fromUrl,
+			text: FeatureLocaleMessages.$locale.fromUrl,
 			icon: 'ti ti-link',
 			action: () => chooseFileFromUrl().then(file => res([file])),
 		}], anchorElement);

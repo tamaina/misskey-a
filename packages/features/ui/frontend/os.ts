@@ -21,7 +21,7 @@ import type MkRoleSelectDialog_TypeReferenceOnly from '@features/roles/frontend/
 import type MkEmojiPickerDialog_TypeReferenceOnly from '@features/emojis/frontend/components/MkEmojiPickerDialog.vue';
 import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 import { prefer } from '@features/preferences/frontend/preferences.js';
-import { i18n } from '@features/runtime/frontend/i18n.js';
+import FeatureLocaleMessages from '@features/ui/frontend/ts-messages.vue';
 import MkPostFormDialog from '@features/notes/frontend/components/MkPostFormDialog.vue';
 import MkWaitingDialog from '@features/ui/frontend/components/MkWaitingDialog.vue';
 import MkPageWindow from '@features/pages/frontend/components/MkPageWindow.vue';
@@ -49,8 +49,8 @@ export const apiWithDialog = (<E extends keyof Misskey.Endpoints>(
 		let title: string | undefined;
 		let text = err.message + '\n' + err.id;
 		if (err.code === 'INTERNAL_ERROR') {
-			title = i18n.ts.internalServerError;
-			text = i18n.ts.internalServerErrorDescription;
+			title = FeatureLocaleMessages.$locale.internalServerError;
+			text = FeatureLocaleMessages.$locale.internalServerErrorDescription;
 			const date = new Date().toISOString();
 			const { result } = await actions({
 				type: 'error',
@@ -58,11 +58,11 @@ export const apiWithDialog = (<E extends keyof Misskey.Endpoints>(
 				text,
 				actions: [{
 					value: 'ok',
-					text: i18n.ts.gotIt,
+					text: FeatureLocaleMessages.$locale.gotIt,
 					primary: true,
 				}, {
 					value: 'copy',
-					text: i18n.ts.copyErrorInfo,
+					text: FeatureLocaleMessages.$locale.copyErrorInfo,
 				}],
 			});
 			if (result === 'copy') {
@@ -70,20 +70,20 @@ export const apiWithDialog = (<E extends keyof Misskey.Endpoints>(
 			}
 			return;
 		} else if (err.code === 'RATE_LIMIT_EXCEEDED') {
-			title = i18n.ts.cannotPerformTemporary;
-			text = i18n.ts.cannotPerformTemporaryDescription;
+			title = FeatureLocaleMessages.$locale.cannotPerformTemporary;
+			text = FeatureLocaleMessages.$locale.cannotPerformTemporaryDescription;
 		} else if (err.code === 'INVALID_PARAM') {
-			title = i18n.ts.invalidParamError;
-			text = i18n.ts.invalidParamErrorDescription;
+			title = FeatureLocaleMessages.$locale.invalidParamError;
+			text = FeatureLocaleMessages.$locale.invalidParamErrorDescription;
 		} else if (err.code === 'ROLE_PERMISSION_DENIED') {
-			title = i18n.ts.permissionDeniedError;
-			text = i18n.ts.permissionDeniedErrorDescription;
+			title = FeatureLocaleMessages.$locale.permissionDeniedError;
+			text = FeatureLocaleMessages.$locale.permissionDeniedErrorDescription;
 		} else if (err.code.startsWith('TOO_MANY')) { // TODO: バックエンドに kind: client/contentsLimitExceeded みたいな感じで送るように統一してもらってそれで判定する
-			title = i18n.ts.youCannotCreateAnymore;
-			text = `${i18n.ts.error}: ${err.id}`;
+			title = FeatureLocaleMessages.$locale.youCannotCreateAnymore;
+			text = `${FeatureLocaleMessages.$locale.error}: ${err.id}`;
 		} else if (err.message.startsWith('Unexpected token')) {
-			title = i18n.ts.gotInvalidResponseError;
-			text = i18n.ts.gotInvalidResponseErrorDescription;
+			title = FeatureLocaleMessages.$locale.gotInvalidResponseError;
+			text = FeatureLocaleMessages.$locale.gotInvalidResponseErrorDescription;
 		} else if (customErrors && customErrors[err.id] != null) {
 			title = customErrors[err.id].title;
 			text = customErrors[err.id].text;
@@ -231,7 +231,7 @@ export async function popupAsyncWithDialog<T extends Component>(
 		closeWaiting();
 		alert({
 			type: 'error',
-			title: i18n.ts.somethingHappened,
+			title: FeatureLocaleMessages.$locale.somethingHappened,
 			text: 'CODE: ASYNC_COMP_LOAD_FAIL',
 		});
 		throw err;

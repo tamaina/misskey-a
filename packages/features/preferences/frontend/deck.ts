@@ -6,7 +6,7 @@
 import { notificationTypes } from 'misskey-js';
 import { ref } from 'vue';
 import { EventEmitter } from 'eventemitter3';
-import { i18n } from '../../runtime/frontend/i18n.js';
+import FeatureLocaleMessages from '@features/preferences/frontend/ts-messages.vue';
 import type { BasicTimelineType } from '@features/timelines/frontend/timelines.js';
 import type { SoundStore } from '@features/preferences/frontend/state/def.js';
 import type { MenuItem } from '@features/navigation/frontend/types/menu.js';
@@ -346,11 +346,11 @@ export function switchProfileMenu(ev: PointerEvent) {
 			switchProfile(p);
 		},
 	}))), { type: 'divider' as const }, {
-		text: i18n.ts._deck.newProfile,
+		text: FeatureLocaleMessages.$locale._deck.newProfile,
 		icon: 'ti ti-plus',
 		action: async () => {
 			const { canceled, result: name } = await os.inputText({
-				title: i18n.ts._deck.profile,
+				title: FeatureLocaleMessages.$locale._deck.profile,
 				minLength: 1,
 			});
 

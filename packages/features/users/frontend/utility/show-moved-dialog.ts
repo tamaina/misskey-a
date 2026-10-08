@@ -5,7 +5,7 @@
 
 import * as os from '@features/ui/frontend/os.js';
 import { $i } from '@features/auth/frontend/i.js';
-import { i18n } from '@features/runtime/frontend/i18n.js';
+import FeatureLocaleMessages from '@features/users/frontend/ts-messages.vue';
 
 export function showMovedDialog() {
 	if (!$i) return;
@@ -13,8 +13,8 @@ export function showMovedDialog() {
 
 	os.alert({
 		type: 'error',
-		title: i18n.ts.accountMovedShort,
-		text: i18n.ts.operationForbidden,
+		title: FeatureLocaleMessages.$locale.accountMovedShort,
+		text: FeatureLocaleMessages.$locale.operationForbidden,
 	});
 
 	throw new Error('account moved');

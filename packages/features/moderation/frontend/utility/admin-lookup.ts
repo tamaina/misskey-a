@@ -4,13 +4,13 @@
  */
 
 import * as Misskey from 'misskey-js';
-import { i18n } from '@features/runtime/frontend/i18n.js';
+import FeatureLocaleMessages from '@features/moderation/frontend/ts-messages.vue';
 import * as os from '@features/ui/frontend/os.js';
 import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 
 export async function lookupUser() {
 	const { canceled, result } = await os.inputText({
-		title: i18n.ts.usernameOrUserId,
+		title: FeatureLocaleMessages.$locale.usernameOrUserId,
 	});
 	if (canceled || result == null) return;
 
@@ -25,7 +25,7 @@ export async function lookupUser() {
 		if (_notFound) {
 			os.alert({
 				type: 'error',
-				text: i18n.ts.noSuchUser,
+				text: FeatureLocaleMessages.$locale.noSuchUser,
 			});
 		} else {
 			_notFound = true;
@@ -43,14 +43,14 @@ export async function lookupUser() {
 
 export async function lookupUserByEmail() {
 	const { canceled, result } = await os.inputText({
-		title: i18n.ts.emailAddress,
+		title: FeatureLocaleMessages.$locale.emailAddress,
 		type: 'email',
 	});
 	if (canceled || result == null) return;
 
 	os.apiWithDialog('admin/accounts/find-by-email', { email: result }, undefined, {
 		'cb865949-8af5-4062-a88c-ef55e8786d1d': {
-			text: i18n.ts.noSuchUser,
+			text: FeatureLocaleMessages.$locale.noSuchUser,
 		},
 	}).then(user => {
 		os.pageWindow(`/admin/user/${user.id}`);
@@ -59,7 +59,7 @@ export async function lookupUserByEmail() {
 
 export async function lookupFile() {
 	const { canceled, result: q } = await os.inputText({
-		title: i18n.ts.fileIdOrUrl,
+		title: FeatureLocaleMessages.$locale.fileIdOrUrl,
 		minLength: 1,
 	});
 	if (canceled) return;
@@ -70,7 +70,7 @@ export async function lookupFile() {
 		if (err.code === 'NO_SUCH_FILE') {
 			os.alert({
 				type: 'error',
-				text: i18n.ts.notFound,
+				text: FeatureLocaleMessages.$locale.notFound,
 			});
 		}
 	});

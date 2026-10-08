@@ -8,7 +8,7 @@ import * as Misskey from 'misskey-js';
 import { apiUrl, host } from '@features/boot/frontend/shared/config.js';
 import type { MenuItem } from '@features/navigation/frontend/types/menu.js';
 import { showSuspendedDialog } from '@features/moderation/frontend/utility/show-suspended-dialog.js';
-import { i18n } from '@features/runtime/frontend/i18n.js';
+import FeatureLocaleMessages from '@features/auth/frontend/ts-messages.vue';
 import { miLocalStorage } from '@features/preferences/frontend/local-storage.js';
 import { waiting, popup, popupMenu, success, alert } from '@features/ui/frontend/os.js';
 import { unisonReload, reloadChannel } from '@features/runtime/frontend/utility/unison-reload.js';
@@ -91,8 +91,8 @@ function fetchAccount(token: string, id?: string, forceShowDialog?: boolean): Pr
 						if (forceShowDialog || $i && (token === $i.token || id === $i.id)) {
 							await alert({
 								type: 'error',
-								title: i18n.ts.accountDeleted,
-								text: i18n.ts.accountDeletedDescription,
+								title: FeatureLocaleMessages.$locale.accountDeleted,
+								text: FeatureLocaleMessages.$locale.accountDeletedDescription,
 							});
 						}
 					} else if (res.error.id === 'b0a7f5f8-dc2f-4171-b91f-de88ad238e14') {
@@ -101,14 +101,14 @@ function fetchAccount(token: string, id?: string, forceShowDialog?: boolean): Pr
 						if (forceShowDialog || $i && (token === $i.token || id === $i.id)) {
 							await alert({
 								type: 'error',
-								title: i18n.ts.tokenRevoked,
-								text: i18n.ts.tokenRevokedDescription,
+								title: FeatureLocaleMessages.$locale.tokenRevoked,
+								text: FeatureLocaleMessages.$locale.tokenRevokedDescription,
 							});
 						}
 					} else {
 						await alert({
 							type: 'error',
-							title: i18n.ts.failedToFetchAccountInformation,
+							title: FeatureLocaleMessages.$locale.failedToFetchAccountInformation,
 							text: JSON.stringify(res.error),
 						});
 					}
@@ -288,7 +288,7 @@ export async function getAccountMenu(opts: {
 	if (opts.withExtraOperation) {
 		menuItems.push({
 			type: 'link',
-			text: i18n.ts.profile,
+			text: FeatureLocaleMessages.$locale.profile,
 			to: `/@${$i.username}`,
 			avatar: $i,
 		}, {
@@ -304,9 +304,9 @@ export async function getAccountMenu(opts: {
 		menuItems.push({
 			type: 'parent',
 			icon: 'ti ti-plus',
-			text: i18n.ts.addAccount,
+			text: FeatureLocaleMessages.$locale.addAccount,
 			children: [{
-				text: i18n.ts.existingAccount,
+				text: FeatureLocaleMessages.$locale.existingAccount,
 				action: () => {
 					getAccountWithSigninDialog().then(res => {
 						if (res != null) {
@@ -315,7 +315,7 @@ export async function getAccountMenu(opts: {
 					});
 				},
 			}, {
-				text: i18n.ts.createAccount,
+				text: FeatureLocaleMessages.$locale.createAccount,
 				action: () => {
 					getAccountWithSignupDialog().then(res => {
 						if (res != null) {
@@ -327,7 +327,7 @@ export async function getAccountMenu(opts: {
 		}, {
 			type: 'link',
 			icon: 'ti ti-users',
-			text: i18n.ts.manageAccounts,
+			text: FeatureLocaleMessages.$locale.manageAccounts,
 			to: '/settings/accounts',
 		});
 	} else {

@@ -15,7 +15,7 @@ import type { Theme, CompiledTheme } from '@features/preferences/frontend/shared
 import { deepClone } from '@features/runtime/frontend/utility/clone.js';
 import { miLocalStorage } from '@features/preferences/frontend/local-storage.js';
 import { $i } from '@features/auth/frontend/i.js';
-import { i18n } from '@features/runtime/frontend/i18n.js';
+import FeatureLocaleMessages from '@features/preferences/frontend/ts-messages.vue';
 import * as os from '@features/ui/frontend/os.js';
 import { prefer } from '@features/preferences/frontend/preferences.js';
 
@@ -222,10 +222,10 @@ export function handleThemeInstallError(err: unknown) {
 			case 'this theme is already installed':
 			case 'already exists':
 			case 'builtin theme':
-				message = i18n.ts._theme.alreadyInstalled;
+				message = FeatureLocaleMessages.$locale._theme.alreadyInstalled;
 				break;
 			default:
-				message = i18n.ts._theme.invalid;
+				message = FeatureLocaleMessages.$locale._theme.invalid;
 				break;
 		}
 

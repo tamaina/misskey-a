@@ -5,24 +5,24 @@
 
 import { prefer } from '@features/preferences/frontend/preferences.js';
 import * as os from '@features/ui/frontend/os.js';
-import { i18n } from '@features/runtime/frontend/i18n.js';
+import FeatureLocaleMessages from '@features/emojis/frontend/ts-messages.vue';
 import type { MkSelectItem } from '@features/ui/frontend/components/MkSelect.vue';
 
 export function chooseEmojiPalette() {
 	return os.select({
-		title: i18n.ts.chooseEmojiPalette,
+		title: FeatureLocaleMessages.$locale.chooseEmojiPalette,
 		default: prefer.s.emojiPaletteForMain ?? prefer.s.emojiPaletteForReaction ?? prefer.s.emojiPalettes[0]?.id,
 		items: prefer.s.emojiPalettes.map<MkSelectItem<string>>((palette) => {
 			let caption: string | undefined = undefined;
 
 			if (prefer.s.emojiPaletteForMain === palette.id) {
-				caption = i18n.ts._emojiPalette.paletteForMain;
+				caption = FeatureLocaleMessages.$locale._emojiPalette.paletteForMain;
 			} else if (prefer.s.emojiPaletteForReaction === palette.id) {
-				caption = i18n.ts._emojiPalette.paletteForReaction;
+				caption = FeatureLocaleMessages.$locale._emojiPalette.paletteForReaction;
 			}
 
 			return {
-				label: palette.name || `(${i18n.ts.noName})`,
+				label: palette.name || `(${FeatureLocaleMessages.$locale.noName})`,
 				caption,
 				value: palette.id,
 			};
@@ -55,16 +55,16 @@ export async function addToEmojiPalette(emoji: string) {
 	} else {
 		const res = await os.actions({
 			type: 'warning',
-			text: i18n.ts.emojiPaletteAlreadyAddedConfirm,
+			text: FeatureLocaleMessages.$locale.emojiPaletteAlreadyAddedConfirm,
 			actions: [{
 				value: 'prepend',
-				text: i18n.ts.prepend,
+				text: FeatureLocaleMessages.$locale.prepend,
 			}, {
 				value: 'append',
-				text: i18n.ts.append,
+				text: FeatureLocaleMessages.$locale.append,
 			}, {
 				value: 'doNothing',
-				text: i18n.ts.doNothing,
+				text: FeatureLocaleMessages.$locale.doNothing,
 			}],
 		});
 

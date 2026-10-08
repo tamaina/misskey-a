@@ -4,12 +4,12 @@
  */
 
 import * as os from '@features/ui/frontend/os.js';
-import { i18n } from '@features/runtime/frontend/i18n.js';
+import FeatureLocaleMessages from '@features/moderation/frontend/ts-messages.vue';
 
 export function showSuspendedDialog() {
 	return os.alert({
 		type: 'error',
-		title: i18n.ts.yourAccountSuspendedTitle,
-		text: i18n.ts.yourAccountSuspendedDescription,
+		title: FeatureLocaleMessages.$locale.yourAccountSuspendedTitle,
+		text: FeatureLocaleMessages.$locale.yourAccountSuspendedDescription,
 	});
 }

@@ -13,7 +13,7 @@ import { genId } from '@features/runtime/frontend/utility/id.js';
 import { store } from '@features/preferences/frontend/store.js';
 import * as os from '@features/ui/frontend/os.js';
 import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
-import { i18n } from '@features/runtime/frontend/i18n.js';
+import FeatureLocaleMessages from '@features/integrations/frontend/ts-messages.vue';
 import { prefer } from '@features/preferences/frontend/preferences.js';
 
 export type Plugin = {
@@ -109,8 +109,8 @@ export async function authorizePlugin(plugin: Plugin) {
 	const token = await new Promise<string>((res, rej) => {
 		let dispose: () => void;
 		os.popupAsyncWithDialog(import('@features/auth/frontend/components/MkTokenGenerateWindow.vue').then(x => x.default), {
-			title: i18n.ts.tokenRequested,
-			information: i18n.ts.pluginTokenRequestedDescription,
+			title: FeatureLocaleMessages.$locale.tokenRequested,
+			information: FeatureLocaleMessages.$locale.pluginTokenRequestedDescription,
 			initialName: plugin.name,
 			initialPermissions: plugin.permissions as typeof Misskey.permissions[number][],
 		}, {

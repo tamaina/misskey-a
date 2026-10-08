@@ -4,7 +4,7 @@
  */
 
 import * as os from '@features/ui/frontend/os.js';
-import { i18n } from '@features/runtime/frontend/i18n.js';
+import FeatureLocaleMessages from '@features/ui/frontend/ts-messages.vue';
 
 /**
  * Clipboardに値をコピー(TODO: 文字列以外も対応)
@@ -12,6 +12,6 @@ import { i18n } from '@features/runtime/frontend/i18n.js';
 export function copyToClipboard(input: string | null) {
 	if (input) {
 		navigator.clipboard.writeText(input);
-		os.toast(i18n.ts.copiedToClipboard);
+		os.toast(FeatureLocaleMessages.$locale.copiedToClipboard);
 	}
 };

@@ -29,6 +29,8 @@ async function buildAllLocale() {
 		logger,
 		scriptsDir: 'scripts',
 		i18nFile: '../features/runtime/frontend/i18n.ts',
+		// VVI owns every application label; retain language directories and reject legacy reintroduction.
+		legacyLabels: 'absent',
 	})
 
 	await inliner.loadFiles();

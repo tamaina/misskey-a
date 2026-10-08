@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { i18n } from '@features/runtime/frontend/i18n.js';
+import FeatureLocaleMessages from '@features/ui/frontend/ts-messages.vue';
 
 export function hms(ms: number, options?: {
 	textFormat?: 'colon' | 'locale';
@@ -49,9 +49,9 @@ export function hms(ms: number, options?: {
 
 	// 結果を返す
 	if (_options.textFormat === 'locale') {
-		res.h += i18n.ts._time.hour;
-		res.m += i18n.ts._time.minute;
-		res.s += i18n.ts._time.second;
+		res.h += FeatureLocaleMessages.$locale._time.hour;
+		res.m += FeatureLocaleMessages.$locale._time.minute;
+		res.s += FeatureLocaleMessages.$locale._time.second;
 	}
 	return [
 		res.h.startsWith('00') ? undefined : res.h,

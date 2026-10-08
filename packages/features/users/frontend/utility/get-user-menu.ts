@@ -9,7 +9,7 @@ import * as Misskey from 'misskey-js';
 import { host, url } from '@features/boot/frontend/shared/config.js';
 import type { Router } from '@features/navigation/frontend/router.js';
 import type { MenuItem } from '@features/navigation/frontend/types/menu.js';
-import { i18n } from '@features/runtime/frontend/i18n.js';
+import FeatureLocaleMessages from '@features/users/frontend/ts-messages.vue';
 import { copyToClipboard } from '@features/ui/frontend/utility/copy-to-clipboard.js';
 import * as os from '@features/ui/frontend/os.js';
 import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
@@ -35,17 +35,17 @@ export function getUserMenu(user: Misskey.entities.UserDetailed, router: Router 
 			});
 		} else {
 			const { canceled, result: period } = await os.select({
-				title: i18n.ts.mutePeriod,
+				title: FeatureLocaleMessages.$locale.mutePeriod,
 				items: [{
-					value: 'indefinitely', label: i18n.ts.indefinitely,
+					value: 'indefinitely', label: FeatureLocaleMessages.$locale.indefinitely,
 				}, {
-					value: 'tenMinutes', label: i18n.ts.tenMinutes,
+					value: 'tenMinutes', label: FeatureLocaleMessages.$locale.tenMinutes,
 				}, {
-					value: 'oneHour', label: i18n.ts.oneHour,
+					value: 'oneHour', label: FeatureLocaleMessages.$locale.oneHour,
 				}, {
-					value: 'oneDay', label: i18n.ts.oneDay,
+					value: 'oneDay', label: FeatureLocaleMessages.$locale.oneDay,
 				}, {
-					value: 'oneWeek', label: i18n.ts.oneWeek,
+					value: 'oneWeek', label: FeatureLocaleMessages.$locale.oneWeek,
 				}],
 				default: 'indefinitely',
 			});
@@ -76,7 +76,7 @@ export function getUserMenu(user: Misskey.entities.UserDetailed, router: Router 
 	}
 
 	async function toggleBlock() {
-		if (!await getConfirmed(user.isBlocking ? i18n.ts.unblockConfirm : i18n.ts.blockConfirm)) return;
+		if (!await getConfirmed(user.isBlocking ? FeatureLocaleMessages.$locale.unblockConfirm : FeatureLocaleMessages.$locale.blockConfirm)) return;
 
 		os.apiWithDialog(user.isBlocking ? 'blocking/delete' : 'blocking/create', {
 			userId: user.id,
@@ -119,7 +119,7 @@ export function getUserMenu(user: Misskey.entities.UserDetailed, router: Router 
 	}
 
 	async function invalidateFollow() {
-		if (!await getConfirmed(i18n.ts.breakFollowConfirm)) return;
+		if (!await getConfirmed(FeatureLocaleMessages.$locale.breakFollowConfirm)) return;
 
 		os.apiWithDialog('following/invalidate', {
 			userId: user.id,
@@ -133,12 +133,12 @@ export function getUserMenu(user: Misskey.entities.UserDetailed, router: Router 
 			userId: user.id,
 		});
 
-		const { canceled, result } = await os.form(i18n.ts.editMemo, {
+		const { canceled, result } = await os.form(FeatureLocaleMessages.$locale.editMemo, {
 			memo: {
 				type: 'string',
 				required: true,
 				multiline: true,
-				label: i18n.ts.memo,
+				label: FeatureLocaleMessages.$locale.memo,
 				default: userDetailed.memo,
 			},
 		});
@@ -156,7 +156,7 @@ export function getUserMenu(user: Misskey.entities.UserDetailed, router: Router 
 	if (iAmModerator) {
 		menuItems.push({
 			icon: 'ti ti-user-exclamation',
-			text: i18n.ts.moderation,
+			text: FeatureLocaleMessages.$locale.moderation,
 			action: () => {
 				router.push('/admin/user/:userId', {
 					params: {
@@ -169,7 +169,7 @@ export function getUserMenu(user: Misskey.entities.UserDetailed, router: Router 
 
 	menuItems.push({
 		icon: 'ti ti-at',
-		text: i18n.ts.copyUsername,
+		text: FeatureLocaleMessages.$locale.copyUsername,
 		action: () => {
 			copyToClipboard(`@${user.username}@${user.host ?? host}`);
 		},
@@ -177,7 +177,7 @@ export function getUserMenu(user: Misskey.entities.UserDetailed, router: Router 
 
 	menuItems.push({
 		icon: 'ti ti-share',
-		text: i18n.ts.copyProfileUrl,
+		text: FeatureLocaleMessages.$locale.copyProfileUrl,
 		action: () => {
 			const canonical = user.host === null ? `@${user.username}` : `@${user.username}@${toUnicode(user.host)}`;
 			copyToClipboard(`${url}/${canonical}`);
@@ -186,7 +186,7 @@ export function getUserMenu(user: Misskey.entities.UserDetailed, router: Router 
 
 	menuItems.push({
 		icon: 'ti ti-rss',
-		text: i18n.ts.copyRSS,
+		text: FeatureLocaleMessages.$locale.copyRSS,
 		action: () => {
 			copyToClipboard(`${user.host ?? host}/@${user.username}.atom`);
 		},
@@ -195,7 +195,7 @@ export function getUserMenu(user: Misskey.entities.UserDetailed, router: Router 
 	if (user.host != null && user.url != null) {
 		menuItems.push({
 			icon: 'ti ti-external-link',
-			text: i18n.ts.showOnRemote,
+			text: FeatureLocaleMessages.$locale.showOnRemote,
 			action: () => {
 				if (user.url == null) return;
 				window.open(user.url, '_blank', 'noopener');
@@ -204,10 +204,10 @@ export function getUserMenu(user: Misskey.entities.UserDetailed, router: Router 
 	} else {
 		menuItems.push({
 			icon: 'ti ti-code',
-			text: i18n.ts.embed,
+			text: FeatureLocaleMessages.$locale.embed,
 			type: 'parent',
 			children: [{
-				text: i18n.ts.noteOfThisUser,
+				text: FeatureLocaleMessages.$locale.noteOfThisUser,
 				action: () => {
 					genEmbedCode('user-timeline', user.id);
 				},
@@ -218,7 +218,7 @@ export function getUserMenu(user: Misskey.entities.UserDetailed, router: Router 
 	if ($i && meId === user.id) {
 		menuItems.push({
 			icon: 'ti ti-qrcode',
-			text: i18n.ts.qr,
+			text: FeatureLocaleMessages.$locale.qr,
 			action: () => {
 				router.push('/qr');
 			},
@@ -228,7 +228,7 @@ export function getUserMenu(user: Misskey.entities.UserDetailed, router: Router 
 	if (notesSearchAvailable && (user.host == null || canSearchNonLocalNotes)) {
 		menuItems.push({
 			icon: 'ti ti-search',
-			text: i18n.ts.searchThisUsersNotes,
+			text: FeatureLocaleMessages.$locale.searchThisUsersNotes,
 			action: () => {
 				const query = {
 						username: user.username,
@@ -248,12 +248,12 @@ export function getUserMenu(user: Misskey.entities.UserDetailed, router: Router 
 	if ($i) {
 		menuItems.push({ type: 'divider' }, {
 			icon: 'ti ti-pencil',
-			text: i18n.ts.editMemo,
+			text: FeatureLocaleMessages.$locale.editMemo,
 			action: editMemo,
 		}, {
 			type: 'parent',
 			icon: 'ti ti-list',
-			text: i18n.ts.addToList,
+			text: FeatureLocaleMessages.$locale.addToList,
 			children: async () => {
 				const lists = await userListsCache.fetch();
 				return lists.map(list => {
@@ -286,7 +286,7 @@ export function getUserMenu(user: Misskey.entities.UserDetailed, router: Router 
 		}, {
 			type: 'parent',
 			icon: 'ti ti-antenna',
-			text: i18n.ts.addToAntenna,
+			text: FeatureLocaleMessages.$locale.addToAntenna,
 			children: async () => {
 				const antennas = await antennasCache.fetch();
 				const canonical = user.host === null ? `@${user.username}` : `@${user.username}@${toUnicode(user.host)}`;
@@ -317,7 +317,7 @@ export function getUserMenu(user: Misskey.entities.UserDetailed, router: Router 
 			menuItems.push({
 				type: 'parent',
 				icon: 'ti ti-badges',
-				text: i18n.ts.roles,
+				text: FeatureLocaleMessages.$locale.roles,
 				children: async () => {
 					const roles = await rolesCache.fetch();
 
@@ -325,17 +325,17 @@ export function getUserMenu(user: Misskey.entities.UserDetailed, router: Router 
 						text: r.name,
 						action: async () => {
 							const { canceled, result: period } = await os.select({
-								title: i18n.ts.period + ': ' + r.name,
+								title: FeatureLocaleMessages.$locale.period + ': ' + r.name,
 								items: [{
-									value: 'indefinitely', label: i18n.ts.indefinitely,
+									value: 'indefinitely', label: FeatureLocaleMessages.$locale.indefinitely,
 								}, {
-									value: 'oneHour', label: i18n.ts.oneHour,
+									value: 'oneHour', label: FeatureLocaleMessages.$locale.oneHour,
 								}, {
-									value: 'oneDay', label: i18n.ts.oneDay,
+									value: 'oneDay', label: FeatureLocaleMessages.$locale.oneDay,
 								}, {
-									value: 'oneWeek', label: i18n.ts.oneWeek,
+									value: 'oneWeek', label: FeatureLocaleMessages.$locale.oneWeek,
 								}, {
-									value: 'oneMonth', label: i18n.ts.oneMonth,
+									value: 'oneMonth', label: FeatureLocaleMessages.$locale.oneMonth,
 								}],
 								default: 'indefinitely',
 							});
@@ -362,11 +362,11 @@ export function getUserMenu(user: Misskey.entities.UserDetailed, router: Router 
 		menuItems.push({
 			type: 'switch',
 			icon: 'ti ti-messages',
-			text: i18n.ts.showRepliesToOthersInTimeline,
+			text: FeatureLocaleMessages.$locale.showRepliesToOthersInTimeline,
 			ref: withRepliesRef,
 		}, {
 			icon: user.notify === 'none' ? 'ti ti-bell' : 'ti ti-bell-off',
-			text: user.notify === 'none' ? i18n.ts.notifyNotes : i18n.ts.unnotifyNotes,
+			text: user.notify === 'none' ? FeatureLocaleMessages.$locale.notifyNotes : FeatureLocaleMessages.$locale.unnotifyNotes,
 			action: toggleNotify,
 		});
 
@@ -382,7 +382,7 @@ export function getUserMenu(user: Misskey.entities.UserDetailed, router: Router 
 
 		menuItems.push({ type: 'divider' }, {
 			icon: 'ti ti-pencil-heart',
-			text: i18n.ts.createUserSpecifiedNote,
+			text: FeatureLocaleMessages.$locale.createUserSpecifiedNote,
 			action: () => {
 				const canonical = user.host === null ? `@${user.username}` : `@${user.username}@${user.host}`;
 				os.post({ specified: user, initialText: `${canonical} ` });
@@ -393,36 +393,36 @@ export function getUserMenu(user: Misskey.entities.UserDetailed, router: Router 
 			menuItems.push({
 				type: 'link',
 				icon: 'ti ti-messages',
-				text: i18n.ts._chat.chatWithThisUser,
+				text: FeatureLocaleMessages.$locale._chat.chatWithThisUser,
 				to: `/chat/user/${user.id}`,
 			});
 		}
 
 		menuItems.push({ type: 'divider' }, {
 			icon: user.isMuted ? 'ti ti-eye' : 'ti ti-eye-off',
-			text: user.isMuted ? i18n.ts.unmute : i18n.ts.mute,
+			text: user.isMuted ? FeatureLocaleMessages.$locale.unmute : FeatureLocaleMessages.$locale.mute,
 			action: toggleMute,
 		}, {
 			icon: user.isRenoteMuted ? 'ti ti-repeat' : 'ti ti-repeat-off',
-			text: user.isRenoteMuted ? i18n.ts.renoteUnmute : i18n.ts.renoteMute,
+			text: user.isRenoteMuted ? FeatureLocaleMessages.$locale.renoteUnmute : FeatureLocaleMessages.$locale.renoteMute,
 			action: toggleRenoteMute,
 		}, {
 			icon: 'ti ti-ban',
-			text: user.isBlocking ? i18n.ts.unblock : i18n.ts.block,
+			text: user.isBlocking ? FeatureLocaleMessages.$locale.unblock : FeatureLocaleMessages.$locale.block,
 			action: toggleBlock,
 		});
 
 		if (user.isFollowed) {
 			menuItems.push({
 				icon: 'ti ti-link-off',
-				text: i18n.ts.breakFollow,
+				text: FeatureLocaleMessages.$locale.breakFollow,
 				action: invalidateFollow,
 			});
 		}
 
 		menuItems.push({ type: 'divider' }, {
 			icon: 'ti ti-exclamation-circle',
-			text: i18n.ts.reportAbuse,
+			text: FeatureLocaleMessages.$locale.reportAbuse,
 			action: reportAbuse,
 		});
 	}
@@ -430,7 +430,7 @@ export function getUserMenu(user: Misskey.entities.UserDetailed, router: Router 
 	if ($i != null && user.host !== null) {
 		menuItems.push({ type: 'divider' }, {
 			icon: 'ti ti-refresh',
-			text: i18n.ts.updateRemoteUser,
+			text: FeatureLocaleMessages.$locale.updateRemoteUser,
 			action: userInfoUpdate,
 		});
 	}
@@ -438,7 +438,7 @@ export function getUserMenu(user: Misskey.entities.UserDetailed, router: Router 
 	if (prefer.s.devMode) {
 		menuItems.push({ type: 'divider' }, {
 			icon: 'ti ti-hash',
-			text: i18n.ts.copyUserId,
+			text: FeatureLocaleMessages.$locale.copyUserId,
 			action: () => {
 				copyToClipboard(user.id);
 			},
@@ -448,7 +448,7 @@ export function getUserMenu(user: Misskey.entities.UserDetailed, router: Router 
 	if ($i && meId === user.id) {
 		menuItems.push({ type: 'divider' }, {
 			icon: 'ti ti-pencil',
-			text: i18n.ts.editProfile,
+			text: FeatureLocaleMessages.$locale.editProfile,
 			action: () => {
 				router.push('/settings/profile');
 			},

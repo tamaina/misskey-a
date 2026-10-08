@@ -12,7 +12,7 @@ import type { MenuItem } from '@features/navigation/frontend/types/menu.js';
 import type { WatermarkLayers, WatermarkPreset } from '@features/drive/frontend/utility/watermark/WatermarkRenderer.js';
 import type { ImageFrameParams, ImageFramePreset } from '@features/drive/frontend/utility/image-frame-renderer/ImageFrameRenderer.js';
 import { genId } from '@features/runtime/frontend/utility/id.js';
-import { i18n } from '@features/runtime/frontend/i18n.js';
+import FeatureLocaleMessages from '@features/drive/frontend/ts-messages.vue';
 import { prefer } from '@features/preferences/frontend/preferences.js';
 import { isWebpSupported } from '@features/drive/frontend/utility/isWebpSupported.js';
 import { uploadFile, UploadAbortedError } from '@features/drive/frontend/utility/drive.js';
@@ -199,11 +199,11 @@ export function useUploader(options: {
 		) {
 			menu.push({
 				icon: 'ti ti-forms',
-				text: i18n.ts.rename,
+				text: FeatureLocaleMessages.$locale.rename,
 				action: async () => {
 					const { result, canceled } = await os.inputText({
 						type: 'text',
-						title: i18n.ts.rename,
+						title: FeatureLocaleMessages.$locale.rename,
 						placeholder: item.name,
 						default: item.name,
 					});
@@ -214,14 +214,14 @@ export function useUploader(options: {
 				},
 			}, {
 				type: 'switch',
-				text: i18n.ts.sensitive,
+				text: FeatureLocaleMessages.$locale.sensitive,
 				icon: 'ti ti-eye-exclamation',
 				ref: computed({
 					get: () => item.isSensitive ?? false,
 					set: (value) => item.isSensitive = value,
 				}),
 			}, {
-				text: i18n.ts.describeFile,
+				text: FeatureLocaleMessages.$locale.describeFile,
 				icon: 'ti ti-text-caption',
 				action: async () => {
 					const { dispose } = await os.popupAsyncWithDialog(import('@features/drive/frontend/components/MkFileCaptionEditWindow.vue').then(x => x.default), {
@@ -239,7 +239,7 @@ export function useUploader(options: {
 
 			if (isPreviewable(item.file.type)) {
 				menu.push({
-					text: i18n.ts.preview,
+					text: FeatureLocaleMessages.$locale.preview,
 					icon: 'ti ti-photo-search',
 					action: async () => {
 						const contents = items.value
@@ -278,10 +278,10 @@ export function useUploader(options: {
 			menu.push({
 				type: 'parent',
 				icon: 'ti ti-photo-edit',
-				text: i18n.ts._uploader.editImage,
+				text: FeatureLocaleMessages.$locale._uploader.editImage,
 				children: [{
 					icon: 'ti ti-crop',
-					text: i18n.ts.cropImage,
+					text: FeatureLocaleMessages.$locale.cropImage,
 					action: async () => {
 						const cropped = await os.cropImageFile(item.file, { aspectRatio: null });
 						const newObjectUrl = createItemObjectUrl(item, cropped);
@@ -304,7 +304,7 @@ export function useUploader(options: {
 					},
 				},*/ {
 					icon: 'ti ti-sparkles',
-					text: i18n.ts._imageEffector.title,
+					text: FeatureLocaleMessages.$locale._imageEffector.title,
 					action: async () => {
 						const { dispose } = await os.popupAsyncWithDialog(import('@features/drive/frontend/components/MkImageEffectorDialog.vue').then(x => x.default), {
 							image: item.file,
@@ -347,13 +347,13 @@ export function useUploader(options: {
 
 			menu.push({
 				icon: 'ti ti-copyright',
-				text: i18n.ts.watermark,
-				caption: computed(() => item.watermarkPreset != null ? item.watermarkPreset.name : item.watermarkLayers != null ? i18n.ts.custom : null),
+				text: FeatureLocaleMessages.$locale.watermark,
+				caption: computed(() => item.watermarkPreset != null ? item.watermarkPreset.name : item.watermarkLayers != null ? FeatureLocaleMessages.$locale.custom : null),
 				type: 'parent',
 				children: [{
 					type: 'button' as const,
 					icon: 'ti ti-pencil',
-					text: i18n.ts.edit,
+					text: FeatureLocaleMessages.$locale.edit,
 					action: async () => {
 						const { dispose } = await os.popupAsyncWithDialog(import('@features/drive/frontend/components/MkWatermarkEditorDialog.vue').then(x => x.default), {
 							layers: item.watermarkLayers,
@@ -368,13 +368,13 @@ export function useUploader(options: {
 				}, {
 					type: 'button' as const,
 					icon: 'ti ti-x',
-					text: i18n.ts.remove,
+					text: FeatureLocaleMessages.$locale.remove,
 					action: () => change(null),
 				}, {
 					type: 'divider',
 				}, {
 					type: 'label',
-					text: i18n.ts.presets,
+					text: FeatureLocaleMessages.$locale.presets,
 				}, ...prefer.s.watermarkPresets.map(preset => ({
 					type: 'radioOption' as const,
 					text: preset.name,
@@ -400,12 +400,12 @@ export function useUploader(options: {
 
 			menu.push({
 				icon: 'ti ti-device-ipad-horizontal',
-				text: i18n.ts.frame,
+				text: FeatureLocaleMessages.$locale.frame,
 				type: 'parent' as const,
 				children: [{
 					type: 'button' as const,
 					icon: 'ti ti-pencil',
-					text: i18n.ts.edit,
+					text: FeatureLocaleMessages.$locale.edit,
 					action: async () => {
 						const { dispose } = await os.popupAsyncWithDialog(import('@features/drive/frontend/components/MkImageFrameEditorDialog.vue').then(x => x.default), {
 							params: item.imageFrameParams,
@@ -422,13 +422,13 @@ export function useUploader(options: {
 				}, ...(item.imageFrameParams != null ? [{
 					type: 'button' as const,
 					icon: 'ti ti-x',
-					text: i18n.ts.remove,
+					text: FeatureLocaleMessages.$locale.remove,
 					action: () => change(null),
 				}] : []), {
 					type: 'divider' as const,
 				}, {
 					type: 'label' as const,
-					text: i18n.ts.presets,
+					text: FeatureLocaleMessages.$locale.presets,
 				}, ...prefer.s.imageFramePresets.map(preset => ({
 					type: 'button' as const,
 					text: preset.name,
@@ -465,16 +465,16 @@ export function useUploader(options: {
 			menu.push({
 				icon: 'ti ti-leaf',
 				text: computed(() => {
-					let text = i18n.ts.compress;
+					let text = FeatureLocaleMessages.$locale.compress;
 
 					if (item.compressionLevel === 0 || item.compressionLevel == null) {
-						text += `: ${i18n.ts.none}`;
+						text += `: ${FeatureLocaleMessages.$locale.none}`;
 					} else if (item.compressionLevel === 1) {
-						text += `: ${i18n.ts.low}`;
+						text += `: ${FeatureLocaleMessages.$locale.low}`;
 					} else if (item.compressionLevel === 2) {
-						text += `: ${i18n.ts.medium}`;
+						text += `: ${FeatureLocaleMessages.$locale.medium}`;
 					} else if (item.compressionLevel === 3) {
-						text += `: ${i18n.ts.high}`;
+						text += `: ${FeatureLocaleMessages.$locale.high}`;
 					}
 
 					return text;
@@ -482,24 +482,24 @@ export function useUploader(options: {
 				type: 'parent',
 				children: [{
 					type: 'radioOption',
-					text: i18n.ts.none,
+					text: FeatureLocaleMessages.$locale.none,
 					active: computed(() => item.compressionLevel === 0 || item.compressionLevel == null),
 					action: () => changeCompressionLevel(0),
 				}, {
 					type: 'divider',
 				}, {
 					type: 'radioOption',
-					text: i18n.ts.low,
+					text: FeatureLocaleMessages.$locale.low,
 					active: computed(() => item.compressionLevel === 1),
 					action: () => changeCompressionLevel(1),
 				}, {
 					type: 'radioOption',
-					text: i18n.ts.medium,
+					text: FeatureLocaleMessages.$locale.medium,
 					active: computed(() => item.compressionLevel === 2),
 					action: () => changeCompressionLevel(2),
 				}, {
 					type: 'radioOption',
-					text: i18n.ts.high,
+					text: FeatureLocaleMessages.$locale.high,
 					active: computed(() => item.compressionLevel === 3),
 					action: () => changeCompressionLevel(3),
 				}],
@@ -511,13 +511,13 @@ export function useUploader(options: {
 				type: 'divider',
 			}, {
 				icon: 'ti ti-upload',
-				text: i18n.ts.upload,
+				text: FeatureLocaleMessages.$locale.upload,
 				action: () => {
 					uploadOne(item);
 				},
 			}, {
 				icon: 'ti ti-x',
-				text: i18n.ts.remove,
+				text: FeatureLocaleMessages.$locale.remove,
 				danger: true,
 				action: () => {
 					removeItem(item);
@@ -528,7 +528,7 @@ export function useUploader(options: {
 				type: 'divider',
 			}, {
 				icon: 'ti ti-player-stop',
-				text: i18n.ts.abort,
+				text: FeatureLocaleMessages.$locale.abort,
 				danger: true,
 				action: () => {
 					if (item.abortPreprocess != null) {
@@ -541,7 +541,7 @@ export function useUploader(options: {
 				type: 'divider',
 			}, {
 				icon: 'ti ti-cloud-pause',
-				text: i18n.ts.abort,
+				text: FeatureLocaleMessages.$locale.abort,
 				danger: true,
 				action: () => {
 					if (item.abort != null) {

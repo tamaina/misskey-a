@@ -6,7 +6,7 @@
 import { readonly, ref } from 'vue';
 import * as os from '@features/ui/frontend/os.js';
 import { store } from '@features/preferences/frontend/store.js';
-import { i18n } from '@features/runtime/frontend/i18n.js';
+import FeatureLocaleMessages from '@features/runtime/frontend/ts-messages.vue';
 
 export const storagePersistenceSupported = window.isSecureContext && 'storage' in navigator;
 const storagePersisted = ref(false);
@@ -28,13 +28,13 @@ export async function enableStoragePersistence() {
 		} else {
 			os.alert({
 				type: 'error',
-				text: i18n.ts.somethingHappened,
+				text: FeatureLocaleMessages.$locale.somethingHappened,
 			});
 		}
 	}	catch (err) {
 		os.alert({
 			type: 'error',
-			text: i18n.ts.somethingHappened,
+			text: FeatureLocaleMessages.$locale.somethingHappened,
 		});
 	}
 }

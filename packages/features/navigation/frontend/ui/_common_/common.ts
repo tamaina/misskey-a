@@ -8,14 +8,14 @@ import { host } from '@features/boot/frontend/shared/config.js';
 import type { MenuItem } from '@features/navigation/frontend/types/menu.js';
 import * as os from '@features/ui/frontend/os.js';
 import { instance } from '@features/instance/frontend/instance.js';
-import { i18n } from '@features/runtime/frontend/i18n.js';
+import FeatureLocaleMessages from '@features/navigation/frontend/ts-messages.vue';
 import { $i } from '@features/auth/frontend/i.js';
 
 function toolsMenuItems(): MenuItem[] {
 	const items: MenuItem[] = [{
 		type: 'link',
 		to: '/scratchpad',
-		text: i18n.ts.scratchpad,
+		text: FeatureLocaleMessages.$locale.scratchpad,
 		icon: 'ti ti-terminal-2',
 	}, {
 		type: 'link',
@@ -33,7 +33,7 @@ function toolsMenuItems(): MenuItem[] {
 		items.push({
 			type: 'link',
 			to: '/custom-emojis-manager',
-			text: i18n.ts.manageCustomEmojis,
+			text: FeatureLocaleMessages.$locale.manageCustomEmojis,
 			icon: 'ti ti-icons',
 		});
 	}
@@ -42,7 +42,7 @@ function toolsMenuItems(): MenuItem[] {
 		items.push({
 			type: 'link' as const,
 			to: '/avatar-decorations',
-			text: i18n.ts.manageAvatarDecorations,
+			text: FeatureLocaleMessages.$locale.manageAvatarDecorations,
 			icon: 'ti ti-sparkles',
 		});
 	}
@@ -58,12 +58,12 @@ export function openInstanceMenu(ev: PointerEvent) {
 		type: 'label',
 	}, {
 		type: 'link',
-		text: i18n.ts.instanceInfo,
+		text: FeatureLocaleMessages.$locale.instanceInfo,
 		icon: 'ti ti-info-circle',
 		to: '/about',
 	}, {
 		type: 'link',
-		text: i18n.ts.customEmojis,
+		text: FeatureLocaleMessages.$locale.customEmojis,
 		icon: 'ti ti-icons',
 		to: '/about#emojis',
 	});
@@ -71,7 +71,7 @@ export function openInstanceMenu(ev: PointerEvent) {
 	if (instance.federation !== 'none') {
 		menuItems.push({
 			type: 'link',
-			text: i18n.ts.federation,
+			text: FeatureLocaleMessages.$locale.federation,
 			icon: 'ti ti-whirl',
 			to: '/about#federation',
 		});
@@ -79,12 +79,12 @@ export function openInstanceMenu(ev: PointerEvent) {
 
 	menuItems.push({
 		type: 'link',
-		text: i18n.ts.charts,
+		text: FeatureLocaleMessages.$locale.charts,
 		icon: 'ti ti-chart-line',
 		to: '/about#charts',
 	}, { type: 'divider' }, {
 		type: 'link',
-		text: i18n.ts.ads,
+		text: FeatureLocaleMessages.$locale.ads,
 		icon: 'ti ti-ad',
 		to: '/ads',
 	});
@@ -93,19 +93,19 @@ export function openInstanceMenu(ev: PointerEvent) {
 		menuItems.push({
 			type: 'link',
 			to: '/invite',
-			text: i18n.ts.invite,
+			text: FeatureLocaleMessages.$locale.invite,
 			icon: 'ti ti-user-plus',
 		});
 	}
 
 	menuItems.push({
 		type: 'parent',
-		text: i18n.ts.tools,
+		text: FeatureLocaleMessages.$locale.tools,
 		icon: 'ti ti-tool',
 		children: toolsMenuItems(),
 	}, { type: 'divider' }, {
 		type: 'link',
-		text: i18n.ts.inquiry,
+		text: FeatureLocaleMessages.$locale.inquiry,
 		icon: 'ti ti-help-circle',
 		to: '/contact',
 	});
@@ -113,7 +113,7 @@ export function openInstanceMenu(ev: PointerEvent) {
 	if (instance.impressumUrl) {
 		menuItems.push({
 			type: 'a',
-			text: i18n.ts.impressum,
+			text: FeatureLocaleMessages.$locale.impressum,
 			icon: 'ti ti-file-invoice',
 			href: instance.impressumUrl,
 			target: '_blank',
@@ -123,7 +123,7 @@ export function openInstanceMenu(ev: PointerEvent) {
 	if (instance.tosUrl) {
 		menuItems.push({
 			type: 'a',
-			text: i18n.ts.termsOfService,
+			text: FeatureLocaleMessages.$locale.termsOfService,
 			icon: 'ti ti-notebook',
 			href: instance.tosUrl,
 			target: '_blank',
@@ -133,7 +133,7 @@ export function openInstanceMenu(ev: PointerEvent) {
 	if (instance.privacyPolicyUrl) {
 		menuItems.push({
 			type: 'a',
-			text: i18n.ts.privacyPolicy,
+			text: FeatureLocaleMessages.$locale.privacyPolicy,
 			icon: 'ti ti-shield-lock',
 			href: instance.privacyPolicyUrl,
 			target: '_blank',
@@ -146,7 +146,7 @@ export function openInstanceMenu(ev: PointerEvent) {
 
 	menuItems.push({
 		type: 'a',
-		text: i18n.ts.document,
+		text: FeatureLocaleMessages.$locale.document,
 		icon: 'ti ti-bulb',
 		href: 'https://misskey-hub.net/docs/for-users/',
 		target: '_blank',
@@ -154,7 +154,7 @@ export function openInstanceMenu(ev: PointerEvent) {
 
 	if ($i) {
 		menuItems.push({
-			text: i18n.ts._initialTutorial.launchTutorial,
+			text: FeatureLocaleMessages.$locale._initialTutorial.launchTutorial,
 			icon: 'ti ti-presentation',
 			action: async () => {
 				const { dispose } = await os.popupAsyncWithDialog(import('@features/navigation/frontend/components/MkTutorialDialog.vue').then(x => x.default), {}, {
@@ -166,7 +166,7 @@ export function openInstanceMenu(ev: PointerEvent) {
 
 	menuItems.push({
 		type: 'link',
-		text: i18n.ts.aboutMisskey,
+		text: FeatureLocaleMessages.$locale.aboutMisskey,
 		to: '/about-misskey',
 	});
 

@@ -28,7 +28,8 @@ import { getAppearNote } from '@features/notes/frontend/utility/get-appear-note.
 import { prefer } from '@features/preferences/frontend/preferences.js';
 import { getPluginHandlers } from '@features/integrations/frontend/plugin.js';
 import { $i } from '@features/auth/frontend/i.js';
-import { i18n } from '@features/runtime/frontend/i18n.js';
+import FeatureLocaleMessages from '@features/notes/frontend/ts-messages.vue';
+import { interpolateLocaleParameters } from '@features/runtime/frontend/interpolate-locale-parameters.js';
 import { globalEvents, useGlobalEvent } from '@features/runtime/frontend/events.js';
 import MkUsersTooltip from '@features/users/frontend/components/MkUsersTooltip.vue';
 import MkReactionsViewerDetails from '@features/notes/frontend/components/MkReactionsViewer.details.vue';
@@ -275,7 +276,7 @@ export function useNote(
 				if (prefer.s.confirmOnReact) {
 					const confirm = await os.confirm({
 						type: 'question',
-						text: i18n.tsx.reactAreYouSure({ emoji: reaction.replace('@.', '') }),
+						text: interpolateLocaleParameters(FeatureLocaleMessages.$locale.reactAreYouSure, { emoji: reaction.replace('@.', '') }),
 					});
 					if (confirm.canceled) return;
 				}
@@ -381,7 +382,7 @@ export function useNote(
 		if (!isLoggedIn) return;
 
 		const getUnrenote = () => ({
-			text: i18n.ts.unrenote,
+			text: FeatureLocaleMessages.$locale.unrenote,
 			icon: 'ti ti-trash',
 			danger: true,
 			action: () => {
@@ -391,7 +392,7 @@ export function useNote(
 
 		const menuItems: MenuItem[] = [{
 			type: 'link',
-			text: i18n.ts.renoteDetails,
+			text: FeatureLocaleMessages.$locale.renoteDetails,
 			icon: 'ti ti-info-circle',
 			to: notePage(rawNote),
 		}];
@@ -399,20 +400,20 @@ export function useNote(
 		if (props.note.channelId != null && (inChannel == null || props.note.channelId !== inChannel.value)) {
 			menuItems.push({
 				type: 'link',
-				text: i18n.ts.viewRenotedChannel,
+				text: FeatureLocaleMessages.$locale.viewRenotedChannel,
 				icon: 'ti ti-device-tv',
 				to: `/channels/${props.note.channelId}`,
 			});
 		}
 
-		menuItems.push(getCopyNoteLinkMenu(rawNote, i18n.ts.copyLinkRenote));
+		menuItems.push(getCopyNoteLinkMenu(rawNote, FeatureLocaleMessages.$locale.copyLinkRenote));
 		menuItems.push({ type: 'divider' });
 
 		if (isMyRenote) {
 			menuItems.push(getUnrenote());
 			os.popupMenu(menuItems, els.renoteTime?.value);
 		} else {
-			menuItems.push(getAbuseNoteMenu(rawNote, i18n.ts.reportAbuseRenote));
+			menuItems.push(getAbuseNoteMenu(rawNote, FeatureLocaleMessages.$locale.reportAbuseRenote));
 			if ($i?.isModerator || $i?.isAdmin) {
 				menuItems.push(getUnrenote());
 			}

@@ -11,7 +11,8 @@ import { common } from './common.js';
 import type { InternationalizationInstance } from '../index.js';
 import type { Component } from 'vue';
 import type { Keymap } from '@features/ui/frontend/utility/hotkey.js';
-import { i18n } from '@features/runtime/frontend/i18n.js';
+import FeatureLocaleMessages from '@features/boot/frontend/ts-messages.vue';
+import { interpolateLocaleParameters } from '@features/runtime/frontend/interpolate-locale-parameters.js';
 import { alert, confirm, popup, post } from '@features/ui/frontend/os.js';
 import { useStream } from '@features/api/frontend/stream.js';
 import * as sound from '@features/preferences/frontend/utility/sound.js';
@@ -129,7 +130,7 @@ export async function mainBoot(internationalization: InternationalizationInstanc
 		if ($i.isDeleted) {
 			alert({
 				type: 'warning',
-				text: i18n.ts.accountDeletionInProgress,
+				text: FeatureLocaleMessages.$locale.accountDeletionInProgress,
 			});
 		}
 
@@ -304,8 +305,8 @@ export async function mainBoot(internationalization: InternationalizationInstanc
 					reloadDialogShowing = true;
 					const { canceled } = await confirm({
 						type: 'warning',
-						title: i18n.ts.disconnectedFromServer,
-						text: i18n.ts.reloadConfirm,
+						title: FeatureLocaleMessages.$locale.disconnectedFromServer,
+						text: FeatureLocaleMessages.$locale.reloadConfirm,
 					});
 					reloadDialogShowing = false;
 					if (!canceled) {
@@ -377,7 +378,7 @@ export async function mainBoot(internationalization: InternationalizationInstanc
 			if (prefer.s.syncDeviceDarkMode) {
 				const { canceled } = await confirm({
 					type: 'question',
-					text: i18n.tsx.switchDarkModeManuallyWhenSyncEnabledConfirm({ x: i18n.ts.syncDeviceDarkMode }),
+					text: interpolateLocaleParameters(FeatureLocaleMessages.$locale.switchDarkModeManuallyWhenSyncEnabledConfirm, { x: FeatureLocaleMessages.$locale.syncDeviceDarkMode }),
 				});
 				if (canceled) return;
 

@@ -6,7 +6,7 @@
 import { action } from 'storybook/actions';
 import { expect, userEvent, waitFor, within } from '@storybook/test';
 import type { StoryObj } from '@storybook/vue3';
-import { i18n } from '@features/runtime/frontend/i18n.js';
+import FeatureLocaleMessages from '@features/emojis/frontend/ts-messages.vue';
 import MkEmojiPicker from '@features/emojis/frontend/components/MkEmojiPicker.vue';
 export const Default = {
 	render(args) {
@@ -42,7 +42,7 @@ export const Default = {
 		await expect(grinning).toBeInTheDocument();
 		if (grinning == null) throw new Error(); // NOTE: not called
 		await waitFor(() => userEvent.click(grinning));
-		const recentUsedSection = canvas.getByText(new RegExp(i18n.ts.recentUsed)).parentElement;
+		const recentUsedSection = canvas.getByText(new RegExp(FeatureLocaleMessages.$locale.recentUsed)).parentElement;
 		await expect(recentUsedSection).toBeInTheDocument();
 		if (recentUsedSection == null) throw new Error(); // NOTE: not called
 		await expect(within(recentUsedSection).getByAltText('😀')).toBeInTheDocument();

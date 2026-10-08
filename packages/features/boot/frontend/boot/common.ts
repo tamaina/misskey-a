@@ -16,7 +16,8 @@ import directives from '@features/index/frontend/directives.js';
 import components from '@features/index/frontend/components.js';
 import { themeManager } from '@features/preferences/frontend/theme.js';
 import { isDeviceDarkmode } from '@features/ui/frontend/utility/is-device-darkmode.js';
-import { i18n } from '@features/runtime/frontend/i18n.js';
+import FeatureLocaleMessages from '@features/boot/frontend/ts-messages.vue';
+import { interpolateLocaleParameters } from '@features/runtime/frontend/interpolate-locale-parameters.js';
 import { refreshCurrentAccount, login } from '@features/auth/frontend/accounts.js';
 import { store } from '@features/preferences/frontend/store.js';
 import { fetchInstance, instance } from '@features/instance/frontend/instance.js';
@@ -80,7 +81,7 @@ export async function common(createVue: () => Promise<App<Element>>, internation
 	//#endregion
 
 	//#region Detect language & fetch translations
-	storeBootloaderErrors({ ...i18n.ts._bootErrors, reload: i18n.ts.reload });
+	storeBootloaderErrors({ ...FeatureLocaleMessages.$locale._bootErrors, reload: FeatureLocaleMessages.$locale.reload });
 
 	if (import.meta.hot) {
 		import.meta.hot.on('locale-update', async (updatedLang: string) => {
@@ -308,23 +309,23 @@ export async function common(createVue: () => Promise<App<Element>>, internation
 	//#region Self-XSS 対策メッセージ
 	if (!_DEV_) {
 		console.log(
-			`%c${i18n.ts._selfXssPrevention.warning}`,
+			`%c${FeatureLocaleMessages.$locale._selfXssPrevention.warning}`,
 			'color: #f00; background-color: #ff0; font-size: 36px; padding: 4px;',
 		);
 		console.log(
-			`%c${i18n.ts._selfXssPrevention.title}`,
+			`%c${FeatureLocaleMessages.$locale._selfXssPrevention.title}`,
 			'color: #f00; font-weight: 900; font-family: "Hiragino Sans W9", "Hiragino Kaku Gothic ProN", sans-serif; font-size: 24px;',
 		);
 		console.log(
-			`%c${i18n.ts._selfXssPrevention.description1}`,
+			`%c${FeatureLocaleMessages.$locale._selfXssPrevention.description1}`,
 			'font-size: 16px; font-weight: 700;',
 		);
 		console.log(
-			`%c${i18n.ts._selfXssPrevention.description2}`,
+			`%c${FeatureLocaleMessages.$locale._selfXssPrevention.description2}`,
 			'font-size: 16px;',
 			'font-size: 20px; font-weight: 700; color: #f00;',
 		);
-		console.log(i18n.tsx._selfXssPrevention.description3({ link: 'https://misskey-hub.net/docs/for-users/resources/self-xss/' }));
+		console.log(interpolateLocaleParameters(FeatureLocaleMessages.$locale._selfXssPrevention.description3, { link: 'https://misskey-hub.net/docs/for-users/resources/self-xss/' }));
 	}
 	//#endregion
 

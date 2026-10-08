@@ -5,7 +5,7 @@
 
 import * as Misskey from 'misskey-js';
 import { $i, iAmModerator } from '@features/auth/frontend/i.js';
-import { i18n } from '@features/runtime/frontend/i18n.js';
+import FeatureLocaleMessages from '@features/drive/frontend/ts-messages.vue';
 import { prefer } from '@features/preferences/frontend/preferences.js';
 import { copyToClipboard } from '@features/ui/frontend/utility/copy-to-clipboard.js';
 import * as os from '@features/ui/frontend/os.js';
@@ -17,7 +17,7 @@ export function getFileMenu(file: Misskey.entities.DriveFile, onHideStateUpdated
 
 	if (onHideStateUpdated != null) {
 		menuItems.push({
-			text: i18n.ts.hide,
+			text: FeatureLocaleMessages.$locale.hide,
 			icon: 'ti ti-eye-off',
 			action: () => {
 				onHideStateUpdated(true);
@@ -27,13 +27,13 @@ export function getFileMenu(file: Misskey.entities.DriveFile, onHideStateUpdated
 
 	if (iAmModerator) {
 		menuItems.push({
-			text: file.isSensitive ? i18n.ts.unmarkAsSensitive : i18n.ts.markAsSensitive,
+			text: file.isSensitive ? FeatureLocaleMessages.$locale.unmarkAsSensitive : FeatureLocaleMessages.$locale.markAsSensitive,
 			icon: 'ti ti-eye-exclamation',
 			danger: true,
 			action: async () => {
 				const { canceled } = await os.confirm({
 					type: 'warning',
-					text: file.isSensitive ? i18n.ts.unmarkAsSensitiveConfirm : i18n.ts.markAsSensitiveConfirm,
+					text: file.isSensitive ? FeatureLocaleMessages.$locale.unmarkAsSensitiveConfirm : FeatureLocaleMessages.$locale.markAsSensitiveConfirm,
 				});
 
 				if (canceled) return;
@@ -50,7 +50,7 @@ export function getFileMenu(file: Misskey.entities.DriveFile, onHideStateUpdated
 	if ($i?.id === file.userId) {
 		details.push({
 			type: 'link',
-			text: i18n.ts._fileViewer.title,
+			text: FeatureLocaleMessages.$locale._fileViewer.title,
 			icon: 'ti ti-info-circle',
 			to: `/my/drive/file/${file.id}`,
 		});
@@ -59,7 +59,7 @@ export function getFileMenu(file: Misskey.entities.DriveFile, onHideStateUpdated
 	if (iAmModerator) {
 		details.push({
 			type: 'link',
-			text: i18n.ts.moderation,
+			text: FeatureLocaleMessages.$locale.moderation,
 			icon: 'ti ti-photo-exclamation',
 			to: `/admin/file/${file.id}`,
 		});
@@ -72,7 +72,7 @@ export function getFileMenu(file: Misskey.entities.DriveFile, onHideStateUpdated
 	if (prefer.s.devMode) {
 		menuItems.push({ type: 'divider' }, {
 			icon: 'ti ti-hash',
-			text: i18n.ts.copyFileId,
+			text: FeatureLocaleMessages.$locale.copyFileId,
 			action: () => {
 				copyToClipboard(file.id);
 			},

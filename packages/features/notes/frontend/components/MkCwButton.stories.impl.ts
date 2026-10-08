@@ -10,7 +10,8 @@ import { action } from 'storybook/actions';
 import { expect, userEvent, within } from '@storybook/test';
 import { file } from '../../../../frontend/.storybook/fakes.js';
 import MkCwButton from '@features/notes/frontend/components/MkCwButton.vue';
-import { i18n } from '@features/runtime/frontend/i18n.js';
+import FeatureLocaleMessages from '@features/notes/frontend/ts-messages.vue';
+import { interpolateLocaleParameters } from '@features/runtime/frontend/interpolate-locale-parameters.js';
 
 export const Default = {
 	render(args) {
@@ -49,10 +50,10 @@ export const Default = {
 	async play({ canvasElement }) {
 		const canvas = within(canvasElement);
 		const buttonElement = canvas.getByRole<HTMLButtonElement>('button');
-		await expect(buttonElement).toHaveTextContent(i18n.ts._cw.show);
-		await expect(buttonElement).toHaveTextContent(i18n.tsx._cw.chars({ count: 15 }));
+		await expect(buttonElement).toHaveTextContent(FeatureLocaleMessages.$locale._cw.show);
+		await expect(buttonElement).toHaveTextContent(interpolateLocaleParameters(FeatureLocaleMessages.$locale._cw.chars, { count: 15 }));
 		await userEvent.click(buttonElement);
-		await expect(buttonElement).toHaveTextContent(i18n.ts._cw.hide);
+		await expect(buttonElement).toHaveTextContent(FeatureLocaleMessages.$locale._cw.hide);
 		await userEvent.click(buttonElement);
 	},
 	parameters: {
@@ -72,8 +73,8 @@ export const IncludesTextAndDriveFile = {
 	async play({ canvasElement }) {
 		const canvas = within(canvasElement);
 		const buttonElement = canvas.getByRole<HTMLButtonElement>('button');
-		await expect(buttonElement).toHaveTextContent(i18n.tsx._cw.chars({ count: 15 }));
+		await expect(buttonElement).toHaveTextContent(interpolateLocaleParameters(FeatureLocaleMessages.$locale._cw.chars, { count: 15 }));
 		await expect(buttonElement).toHaveTextContent(' / ');
-		await expect(buttonElement).toHaveTextContent(i18n.tsx._cw.files({ count: 1 }));
+		await expect(buttonElement).toHaveTextContent(interpolateLocaleParameters(FeatureLocaleMessages.$locale._cw.files, { count: 1 }));
 	},
 } satisfies StoryObj<typeof MkCwButton>;

@@ -4,7 +4,8 @@
  */
 
 import * as Misskey from 'misskey-js';
-import { i18n } from '@features/runtime/frontend/i18n.js';
+import FeatureLocaleMessages from '@features/notes/frontend/ts-messages.vue';
+import { interpolateLocaleParameters } from '@features/runtime/frontend/interpolate-locale-parameters.js';
 
 /**
  * 投稿を表す文字列を取得します。
@@ -40,11 +41,11 @@ export const getNoteSummary = (note?: Misskey.entities.Note | Misskey.entities.N
 	}
 
 	if ('deletedAt' in note && note.deletedAt) {
-		return `(${i18n.ts.deletedNote})`;
+		return `(${FeatureLocaleMessages.$locale.deletedNote})`;
 	}
 
 	if ('isHidden' in note && note.isHidden) {
-		return `(${i18n.ts.invisibleNote})`;
+		return `(${FeatureLocaleMessages.$locale.invisibleNote})`;
 	}
 
 	let summary = '';
@@ -58,12 +59,12 @@ export const getNoteSummary = (note?: Misskey.entities.Note | Misskey.entities.N
 
 	// ファイルが添付されているとき
 	if (_opts.showFiles && (note.files || []).length !== 0) {
-		summary += ` (${i18n.tsx.withNFiles({ n: note.files!.length })})`;
+		summary += ` (${interpolateLocaleParameters(FeatureLocaleMessages.$locale.withNFiles, { n: note.files!.length })})`;
 	}
 
 	// 投票が添付されているとき
 	if (_opts.showPoll && note.poll) {
-		summary += ` (${i18n.ts.poll})`;
+		summary += ` (${FeatureLocaleMessages.$locale.poll})`;
 	}
 
 	// 返信のとき

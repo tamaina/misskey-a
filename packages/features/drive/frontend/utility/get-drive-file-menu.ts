@@ -7,7 +7,8 @@ import * as Misskey from 'misskey-js';
 import { defineAsyncComponent } from 'vue';
 import { selectDriveFolder } from '@features/drive/frontend/utility/drive.js';
 import type { MenuItem } from '@features/navigation/frontend/types/menu.js';
-import { i18n } from '@features/runtime/frontend/i18n.js';
+import FeatureLocaleMessages from '@features/drive/frontend/ts-messages.vue';
+import { interpolateLocaleParameters } from '@features/runtime/frontend/interpolate-locale-parameters.js';
 import { copyToClipboard } from '@features/ui/frontend/utility/copy-to-clipboard.js';
 import * as os from '@features/ui/frontend/os.js';
 import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
@@ -16,8 +17,8 @@ import { globalEvents } from '@features/runtime/frontend/events.js';
 
 function rename(file: Misskey.entities.DriveFile) {
 	os.inputText({
-		title: i18n.ts.renameFile,
-		placeholder: i18n.ts.inputNewFileName,
+		title: FeatureLocaleMessages.$locale.renameFile,
+		placeholder: FeatureLocaleMessages.$locale.inputNewFileName,
 		default: file.name,
 	}).then(({ canceled, result: name }) => {
 		if (canceled) return;
@@ -68,7 +69,7 @@ function toggleSensitive(file: Misskey.entities.DriveFile) {
 	}).catch(err => {
 		os.alert({
 			type: 'error',
-			title: i18n.ts.error,
+			title: FeatureLocaleMessages.$locale.error,
 			text: err.message,
 		});
 	});
@@ -86,7 +87,7 @@ function addApp() {
 async function deleteFile(file: Misskey.entities.DriveFile) {
 	const { canceled } = await os.confirm({
 		type: 'warning',
-		text: i18n.tsx.driveFileDeleteConfirm({ name: file.name }),
+		text: interpolateLocaleParameters(FeatureLocaleMessages.$locale.driveFileDeleteConfirm, { name: file.name }),
 	});
 	if (canceled) return;
 
@@ -106,46 +107,46 @@ export function getDriveFileMenu(file: Misskey.entities.DriveFile, folder?: Miss
 	menuItems.push({
 		type: 'link',
 		to: `/my/drive/file/${file.id}`,
-		text: i18n.ts._fileViewer.title,
+		text: FeatureLocaleMessages.$locale._fileViewer.title,
 		icon: 'ti ti-info-circle',
 	}, { type: 'divider' }, {
-		text: i18n.ts.rename,
+		text: FeatureLocaleMessages.$locale.rename,
 		icon: 'ti ti-forms',
 		action: () => rename(file),
 	}, {
-		text: i18n.ts.move,
+		text: FeatureLocaleMessages.$locale.move,
 		icon: 'ti ti-folder-symlink',
 		action: () => move(file),
 	}, {
-		text: file.isSensitive ? i18n.ts.unmarkAsSensitive : i18n.ts.markAsSensitive,
+		text: file.isSensitive ? FeatureLocaleMessages.$locale.unmarkAsSensitive : FeatureLocaleMessages.$locale.markAsSensitive,
 		icon: file.isSensitive ? 'ti ti-eye' : 'ti ti-eye-exclamation',
 		action: () => toggleSensitive(file),
 	}, {
-		text: i18n.ts.describeFile,
+		text: FeatureLocaleMessages.$locale.describeFile,
 		icon: 'ti ti-text-caption',
 		action: () => describe(file),
 	});
 
 	menuItems.push({ type: 'divider' }, {
-		text: i18n.ts.createNoteFromTheFile,
+		text: FeatureLocaleMessages.$locale.createNoteFromTheFile,
 		icon: 'ti ti-pencil',
 		action: () => os.post({
 			initialFiles: [file],
 			instant: true,
 		}),
 	}, {
-		text: i18n.ts.copyUrl,
+		text: FeatureLocaleMessages.$locale.copyUrl,
 		icon: 'ti ti-link',
 		action: () => copyUrl(file),
 	}, {
 		type: 'a',
 		href: file.url,
 		target: '_blank',
-		text: i18n.ts.download,
+		text: FeatureLocaleMessages.$locale.download,
 		icon: 'ti ti-download',
 		download: file.name,
 	}, { type: 'divider' }, {
-		text: i18n.ts.delete,
+		text: FeatureLocaleMessages.$locale.delete,
 		icon: 'ti ti-trash',
 		danger: true,
 		action: () => deleteFile(file),
@@ -154,7 +155,7 @@ export function getDriveFileMenu(file: Misskey.entities.DriveFile, folder?: Miss
 	if (prefer.s.devMode) {
 		menuItems.push({ type: 'divider' }, {
 			icon: 'ti ti-hash',
-			text: i18n.ts.copyFileId,
+			text: FeatureLocaleMessages.$locale.copyFileId,
 			action: () => {
 				copyToClipboard(file.id);
 			},
