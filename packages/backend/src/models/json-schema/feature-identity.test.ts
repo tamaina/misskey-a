@@ -153,7 +153,8 @@ test('packed schemas parse recursive notes and validate referenced users', () =>
 	const recursiveNote = { ...note, reply: note };
 
 	expect(v.safeParse(packedSchemas.Note, recursiveNote).success).toBe(true);
-	expect(v.parse(packedSchemas.Note, { ...recursiveNote, futureField: { preserved: true } })).toHaveProperty('futureField', { preserved: true });
+	expect(v.safeParse(packedSchemas.Note, { ...recursiveNote, futureField: { preserved: true } }).success).toBe(false);
+	expect(v.safeParse(packedSchemas.Note, { ...recursiveNote, reply: { ...note, futureField: true } }).success).toBe(false);
 	expect(v.safeParse(packedSchemas.Note, { ...note, user: { ...user, username: 1 } }).success).toBe(false);
 });
 

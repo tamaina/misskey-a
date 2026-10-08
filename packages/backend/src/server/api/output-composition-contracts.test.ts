@@ -233,10 +233,10 @@ test('native inference retains discriminator, intersections and request optional
 	expectTypeOf<v.InferOutput<typeof compositionUsersListsShowInput>['forPublic']>().toEqualTypeOf<boolean>();
 });
 
-test('ap/show closes only its tagged outer wrapper and preserves the existing nested Note boundary', () => {
+test('ap/show closes its tagged wrapper and delegates nested Note validation', () => {
 	const user = { id: 'user1', name: null, username: 'alice', host: null, avatarUrl: 'https://example/avatar', avatarBlurhash: null, avatarDecorations: [], emojis: {}, onlineStatus: 'unknown' as const };
-	const note = { id: 'note1', createdAt: '2026-10-07T00:00:00Z', text: null, userId: user.id, user, visibility: 'public' as const, reactionAcceptance: null, reactionEmojis: {}, reactions: {}, reactionCount: 0, renoteCount: 0, repliesCount: 0, future: true };
+	const note = { id: 'note1', createdAt: '2026-10-07T00:00:00Z', text: null, userId: user.id, user, visibility: 'public' as const, reactionAcceptance: null, reactionEmojis: {}, reactions: {}, reactionCount: 0, renoteCount: 0, repliesCount: 0 };
 	const value = { type: 'Note' as const, object: note };
 	expect(v.parse(compositionApShowOutput, value)).toEqual(value);
-	for (const output of [{ ...value, future: true }, { type: 'Note' }, { ...value, type: 1 }]) expect(v.safeParse(compositionApShowOutput, output).success).toBe(false);
+	for (const output of [{ ...value, future: true }, { ...value, object: { ...note, future: true } }, { type: 'Note' }, { ...value, type: 1 }]) expect(v.safeParse(compositionApShowOutput, output).success).toBe(false);
 });

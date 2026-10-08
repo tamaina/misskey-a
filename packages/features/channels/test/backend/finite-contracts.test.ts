@@ -114,7 +114,7 @@ test('HTTP retains extra input/output keys and AJV errors while native strict ou
 	expect(timelineParams).toEqual({ channelId: 'channel123', future: true, limit: 10, allowPartial: false });
 });
 
-test('detailed Channel lazy pinnedNotes preserves existing Note/User extension fields and dynamic reactions', async () => {
+test('detailed Channel lazy pinnedNotes validates finite Notes and preserves User extensions and dynamic reactions', async () => {
 	const { serializer, notes } = fixture();
 	const baseUser: Packed<'Note'>['user'] = { id: 'user123', name: null, username: 'alice', host: null, avatarUrl: 'https://example.test/avatar.png', avatarBlurhash: null, avatarDecorations: [], emojis: {}, onlineStatus: 'unknown' };
 	const extendedUser = { ...baseUser, producerExtension: true };
@@ -124,10 +124,13 @@ test('detailed Channel lazy pinnedNotes preserves existing Note/User extension f
 		visibility: 'public', reactionAcceptance: null, reactionEmojis: { 'remote@host': 'https://host/emoji.png' }, reactions: { '🔥': 1 }, reactionCount: 1, renoteCount: 0, repliesCount: 0,
 	};
 	const note = { ...baseNote, producerExtension: true };
-	notes.packMany.mockResolvedValue([note]);
+	notes.packMany.mockResolvedValue([baseNote]);
 	const result = await serializer.pack(channel, null, true);
 	expect(v.parse(packedChannelSchema, result)).toEqual(result);
-	expect(result.pinnedNotes).toEqual([note]);
-	expect(v.safeParse(packedChannelSchema, { ...result, pinnedNotes: [{ ...note, reactions: { x: 'bad' } }] }).success).toBe(false);
-	expect(v.safeParse(packedChannelSchema, { ...result, pinnedNotes: [{ ...note, user: { ...note.user, username: undefined } }] }).success).toBe(false);
+	expect(result.pinnedNotes).toEqual([baseNote]);
+	expect(v.safeParse(packedChannelSchema, { ...result, pinnedNotes: [note] }).success).toBe(false);
+	notes.packMany.mockResolvedValue([note]);
+	expect((await serializer.pack(channel, null, true)).pinnedNotes).toEqual([note]);
+	expect(v.safeParse(packedChannelSchema, { ...result, pinnedNotes: [{ ...baseNote, reactions: { x: 'bad' } }] }).success).toBe(false);
+	expect(v.safeParse(packedChannelSchema, { ...result, pinnedNotes: [{ ...baseNote, user: { ...baseNote.user, username: undefined } }] }).success).toBe(false);
 });

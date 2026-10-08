@@ -119,7 +119,8 @@ test.each(fixtures)('real notification serializer has a finite outer shape: $typ
 test('finite notification closure preserves nested compositions and optional draft semantics', async () => {
 	const { serializer } = serializerFixture();
 	const packed = await serializer.pack(fixtures[0], user.id, { checkValidNotifier: false });
-	expect(v.safeParse(packedNotificationSchema, { ...packed, user: { ...user, nestedFuture: true }, note: { ...note, nestedFuture: true } }).success).toBe(true);
+	expect(v.safeParse(packedNotificationSchema, { ...packed, user: { ...user, nestedFuture: true } }).success).toBe(true);
+	expect(v.safeParse(packedNotificationSchema, { ...packed, note: { ...note, nestedFuture: true } }).success).toBe(false);
 	const draftless = await serializer.pack(fixtures[9], user.id, { checkValidNotifier: false });
 	expect(v.safeParse(packedNotificationSchema, { ...draftless, noteDraft: undefined }).success).toBe(true);
 	expect(v.safeParse(packedNotificationSchema, { ...draftless, noteDraft: draft }).success).toBe(true);
