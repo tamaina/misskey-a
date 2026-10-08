@@ -66,7 +66,7 @@ afterEach(() => {
 
 describe('embed entry locale activation', () => {
 	test.each([
-		...languages.map(language => [language, 'ja-JP', language]),
+		...languages.map((language): [string, string, string] => [language, 'ja-JP', language]),
 		[null, 'ja-JP', 'ja-JP'],
 		['unsupported', 'fr', 'fr-FR'],
 		[null, 'unknown', 'en-US'],
