@@ -45,9 +45,10 @@ export class HtmlTemplateService {
 	// 初期ロードで読み込むべきファイルのパスを収集する。
 	// See https://ja.vite.dev/guide/backend-integration
 	@bindThis
-	private collectViteAssetFiles(manifest: Manifest): ViteFiles {
-		const entryFile = Object.values(manifest).find((chunk) => chunk.isEntry);
-		if (!entryFile) return {
+	private collectViteAssetFiles(manifest: Manifest, entrySource: 'src/_boot_.ts' | 'src/boot.ts'): ViteFiles {
+		// The explicit i18n build input is also an entry; manifest order does not identify the application.
+		const entryFile = manifest[entrySource];
+		if (!entryFile?.isEntry) return {
 			entryJs: null,
 			css: [],
 			modulePreloads: [],
@@ -125,7 +126,7 @@ export class HtmlTemplateService {
 		}
 
 		if (feViteManifest != null) {
-			this.frontendViteFiles = this.collectViteAssetFiles(feViteManifest);
+			this.frontendViteFiles = this.collectViteAssetFiles(feViteManifest, 'src/_boot_.ts');
 		}
 
 		if (bootJs != null) {
@@ -137,7 +138,7 @@ export class HtmlTemplateService {
 		}
 
 		if (embedFeViteManifest != null) {
-			this.frontendEmbedViteFiles = this.collectViteAssetFiles(embedFeViteManifest);
+			this.frontendEmbedViteFiles = this.collectViteAssetFiles(embedFeViteManifest, 'src/boot.ts');
 		}
 
 		if (embedBootJs != null) {
