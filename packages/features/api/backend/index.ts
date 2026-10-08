@@ -13,6 +13,8 @@ import { assertJsonSelectorAndCommonMetadata } from './json-selector-and-common-
 import { isOpaqueObject } from '../contract/opaque-object.js';
 import { assertOpaqueObjectProjection } from './opaque-object-projection.js';
 import { jsonNumber } from '../contract/json-number.js';
+import { getJsonValueReference } from '../contract/json-value.js';
+import { assertJsonValueMetadata } from './json-value-projection.js';
 import { getJsonObjectParserRegistration } from '../contract/json-object.js';
 import { assertJsonObjectMetadata } from './json-object-projection.js';
 import { jsonObjectProjectionView } from './json-object-projection-view.js';
@@ -33,6 +35,7 @@ export function toLegacyJsonSchema(
 	schema: Parameters<typeof toJsonSchema>[0],
 	config?: Parameters<typeof toJsonSchema>[1],
 ): JsonSchema {
+	assertJsonValueMetadata(schema, config?.definitions ?? getGlobalDefs());
 	assertOpaqueObjectProjection(schema, config?.definitions ?? getGlobalDefs());
 	assertRequireWhenAllNullishPlacement(schema);
 	assertMisskeyIdOrIdsMetadata(schema, config?.definitions ?? getGlobalDefs());
@@ -47,7 +50,7 @@ export function toLegacyJsonSchema(
 	assertJsonSelectorAndCommonMetadata([schema, ...Object.values(definitions ?? {})]);
 	assertJsonExclusiveObjectMetadata([schema, ...Object.values(definitions ?? {})]);
 	assertUniqueStringArrayMetadata(schema);
-	const projection = jsonObjectProjectionView(schema, definitions);
+	const projection = jsonObjectProjectionView(schema, definitions, config?.typeMode === 'output');
 	const mapProxies = new WeakMap<object, object>();
 	const source = (value: unknown) => value !== null && (typeof value === 'object' || typeof value === 'function')
 		? projection.originals.get(value) ?? value : value;
@@ -98,6 +101,13 @@ export function toLegacyJsonSchema(
 			}
 			const { anyOf, ...rest } = jsonSchema;
 			return { ...rest, ...(isNotificationReceiveRule(valibotSchema) ? { type: 'object' as const } : {}), oneOf: anyOf };
+		}
+		if (config?.typeMode === 'output') {
+			const ref = getJsonValueReference(valibotSchema);
+			if (ref !== undefined) {
+				const reference: JsonSchema & { readonly ref: 'JsonValue' } = { ref };
+				return reference;
+			}
 		}
 		const jsonStringSchema = getJsonStringLegacySchema(valibotSchema);
 		if (jsonStringSchema !== undefined) return jsonStringSchema;

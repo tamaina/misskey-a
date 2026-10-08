@@ -35,7 +35,7 @@ export interface Schema extends OfSchema {
 	readonly description?: string;
 	readonly example?: any;
 	readonly format?: string;
-	readonly ref?: keyof typeof packedSchemas;
+	readonly ref?: keyof typeof packedSchemas | 'JsonValue';
 	readonly selfRef?: boolean;
 	readonly enum?: ReadonlyArray<string | null>;
 	readonly default?: (this['type'] extends TypeStringef ? StringDefToType<this['type']> : any) | null;

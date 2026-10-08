@@ -2,8 +2,11 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
+import { assertJsonValueMetadata } from './json-value-projection.js';
 import { assertNoOpaqueObjectLazyReturn } from './opaque-object-projection.js';
-import { intersect, union } from 'valibot';
+import { custom, intersect, union } from 'valibot';
+import { getJsonValueReference, getJsonValueObjectProjection } from '../contract/json-value.js';
+import type { JsonValue } from '../contract/json-value.js';
 import { assertJsonSelectorAndCommonMetadata, assertNoSelectorCommonLazyReturn } from './json-selector-and-common-projection.js';
 import { getJsonSelectorAndCommonGuardRegistration, getJsonSelectorAndCommonParserRegistration } from '../contract/json-selector-and-common.js';
 import { assertJsonExclusiveObjectMetadata, assertNoExclusiveObjectLazyReturn } from './json-exclusive-object-projection.js';
@@ -14,7 +17,7 @@ import { assertOwnedUnionLazyReturn } from './legacy-output-one-of-projection.js
 import { getJsonObjectGuardRegistration, getJsonObjectParserRegistration, getJsonObjectSchemaRegistration } from '../contract/json-object.js';
 
 /** Converter-only public AST view. It is never a runtime parser and contains no private Valibot members. */
-export function jsonObjectProjectionView(schema: object, definitions?: Record<string, object>) {
+export function jsonObjectProjectionView(schema: object, definitions?: Record<string, object>, jsonValueReferences = false) {
 	const views = new Map<object, object>();
 	const originals = new Map<object, object>();
 	const namedBases = new Set(Object.values(definitions ?? {}));
@@ -44,6 +47,19 @@ export function jsonObjectProjectionView(schema: object, definitions?: Record<st
 	function project(value: unknown): unknown {
 		if (value === null || typeof value !== 'object') return value;
 		const existing = views.get(value); if (existing !== undefined) return existing;
+		if (jsonValueReferences && getJsonValueReference(value) !== undefined) {
+			// Converter-only terminal: canonical validation remains on the original schema.
+			const terminal = custom<JsonValue>(() => false);
+			views.set(value, terminal); originals.set(terminal, value);
+			return terminal;
+		}
+		const jsonRecord = getJsonValueObjectProjection(value);
+		if (jsonRecord !== undefined) {
+			const result = project(jsonRecord);
+			if (result === null || typeof result !== 'object') throw new Error('Expected a JSON record projection');
+			views.set(value, result); originals.set(result, value);
+			return result;
+		}
 		if (Array.isArray(value)) {const result:unknown[] = []; views.set(value, result); originals.set(result, value); for (const item of value)result.push(project(item)); if (result.every((item, index) => item === value[index])) {views.set(value, value); return value;} return result;}
 		if (!['pipe', 'wrapped', 'item', 'items', 'key', 'value', 'rest', 'options', 'entries', 'getter'].some(key => key in value)) {views.set(value, value); return value;}
 		let changed = false;
@@ -104,7 +120,7 @@ export function jsonObjectProjectionView(schema: object, definitions?: Record<st
 		if ('type' in value && value.type === 'lazy' && 'getter' in value && typeof value.getter === 'function') {
 			changed = true;
 			const getter = value.getter;
-			const projectedGetter = (input:unknown) => {const returned = Reflect.apply(getter, undefined, [input]); if (returned !== null && typeof returned === 'object') {assertNoOpaqueObjectLazyReturn(returned); assertNoSelectorCommonLazyReturn(returned); assertNoExclusiveObjectLazyReturn(returned); assertJsonExclusiveObjectMetadata(returned); assertRequireWhenAllNullishPlacement(returned); assertJsonObjectMetadata(returned); assertJsonSelectorAndCommonMetadata(returned); assertOwnedUnionLazyReturn(returned);} return project(returned);};
+			const projectedGetter = (input:unknown) => {const returned = Reflect.apply(getter, undefined, [input]); if (returned !== null && typeof returned === 'object') {assertJsonValueMetadata(returned); assertNoOpaqueObjectLazyReturn(returned); assertNoSelectorCommonLazyReturn(returned); assertNoExclusiveObjectLazyReturn(returned); assertJsonExclusiveObjectMetadata(returned); assertRequireWhenAllNullishPlacement(returned); assertJsonObjectMetadata(returned); assertJsonSelectorAndCommonMetadata(returned); assertOwnedUnionLazyReturn(returned);} return project(returned);};
 			views.set(getter, projectedGetter); originals.set(projectedGetter, getter); copy.getter = projectedGetter;
 		}
 		if (!changed) {views.set(value, value); return value;}

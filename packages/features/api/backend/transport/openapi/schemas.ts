@@ -6,6 +6,7 @@
 import { deepClone } from '@features/runtime/backend/data/clone.js';
 import { toJsonSchemaDefs } from '@valibot/to-json-schema';
 import type { Schema } from '../../utility/json-schema.js';
+import { getJsonValueComponents } from '../../json-value-projection.js';
 import { packedSchemas } from '@features/index/contract/packed.js';
 
 export function convertSchemaToOpenApiSchema(schema: Schema, type: 'param' | 'res', includeSelfRef: boolean): any {
@@ -84,6 +85,7 @@ export function getSchemas(_includeSelfRef: boolean) {
 			required: ['error'],
 		},
 
+		...getJsonValueComponents(),
 		...toJsonSchemaDefs(packedSchemas, {
 			target: 'draft-2020-12',
 			typeMode: 'output',

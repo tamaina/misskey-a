@@ -2208,6 +2208,7 @@ declare namespace entities {
         V2AdminEmojiListResponse,
         VerifyEmailRequest,
         Error_2 as Error,
+        JsonValue_2 as JsonValue,
         UserLite,
         UserDetailedNotMeOnly,
         MeDetailedOnly,
@@ -2861,6 +2862,9 @@ type IWebhooksTestRequest = ContractRequest<'i/webhooks/test', operations['i___w
 
 // @public (undocumented)
 type IWebhooksUpdateRequest = ContractRequest<'i/webhooks/update', operations['i___webhooks___update']['requestBody']['content']['application/json']>;
+
+// @public (undocumented)
+type JsonValue_2 = ContractModel<'JsonValue'>;
 
 // @public (undocumented)
 type MeDetailed = ContractModel<'MeDetailed'>;

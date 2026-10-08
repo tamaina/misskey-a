@@ -23,6 +23,9 @@ async function generateBaseTypes(
 		lines.push(`/* eslint ${lint}: 0 */`);
 	}
 	lines.push('');
+	if (Object.hasOwn(openApiDocs.components?.schemas ?? {}, 'JsonValue')) {
+		lines.push("import type { JsonValue as ContractJsonValue } from '#feature-contracts/api';");
+	}
 
 	// NOTE: Align `operationId` of GET and POST to avoid duplication of type definitions
 	const openApi = JSON.parse(await readFile(openApiJsonPath, 'utf8')) as OpenAPI3;
@@ -44,7 +47,12 @@ async function generateBaseTypes(
 
 	const generatedTypesAst = await openapiTS(openApi, {
 		exportType: true,
-		transform(schemaObject) {
+		transform(schemaObject, options) {
+			// Recursive unions through components['schemas'][Name] hit TS2502.
+			// Reference the single public wire alias instead of generating a second model.
+			if (options.path === '#/components/schemas/JsonValue') {
+				return ts.factory.createTypeReferenceNode('ContractJsonValue');
+			}
 			if ('format' in schemaObject && schemaObject.format === 'binary') {
 				if (schemaObject.nullable) {
 					return ts.factory.createUnionTypeNode([tsBlobNode, tsNullNode]);

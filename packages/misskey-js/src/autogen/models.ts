@@ -2,6 +2,7 @@ import type { components } from './types.js';
 import type { PackedModels } from '#feature-contracts/index';
 type ContractModel<Name extends keyof components['schemas']> = Name extends keyof PackedModels ? PackedModels[Name] : components['schemas'][Name];
 export type Error = ContractModel<'Error'>;
+export type JsonValue = ContractModel<'JsonValue'>;
 export type UserLite = ContractModel<'UserLite'>;
 export type UserDetailedNotMeOnly = ContractModel<'UserDetailedNotMeOnly'>;
 export type MeDetailedOnly = ContractModel<'MeDetailedOnly'>;

@@ -1,6 +1,7 @@
 /* eslint @typescript-eslint/naming-convention: 0 */
 /* eslint @typescript-eslint/no-explicit-any: 0 */
 
+import type { JsonValue as ContractJsonValue } from '#feature-contracts/api';
 export type paths = {
     '/admin/abuse-report/notification-recipient/create': {
         /**
@@ -4013,6 +4014,7 @@ export type components = {
                 id: string;
             };
         };
+        JsonValue: ContractJsonValue;
         UserLite: {
             /**
              * Format: id

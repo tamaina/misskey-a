@@ -4,6 +4,9 @@
  */
 import * as v from 'valibot';
 
+export { jsonValueSchema } from './json-value.js';
+export type { JsonValue, JsonObject } from './json-value.js';
+
 export { uniqueStringArray } from './unique-string-array.js';
 
 /** Preserve the legacy JSON-object request semantics, including extra fields. */

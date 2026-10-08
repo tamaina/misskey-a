@@ -9,6 +9,7 @@ import type { InferSchemaOutput } from '@orpc/contract';
 import type { JsonSchema } from '@valibot/to-json-schema';
 import type * as v from 'valibot';
 import type { EndpointContractDefinition } from '@features/api/contract/definition.js';
+import { getJsonValueReference } from '@features/api/contract/json-value.js';
 import { getMultipartEndpointContractRegistration } from '@features/api/contract/multipart-endpoint.js';
 import { toLegacyJsonSchema } from '@features/api/backend/index.js';
 import type { Schema } from '../utility/json-schema.js';
@@ -94,6 +95,7 @@ function assertStaticInputProjection(value: unknown, seen = new Set<object>(), p
 	if (getLegacyOutputOneOfRegistration(value) !== undefined || hasLegacyOutputOneOfOptions(value)) {
 		throw new Error('Legacy input contracts cannot use output-only oneOf projections');
 	}
+	if (getJsonValueReference(value) !== undefined) throw new Error('Legacy input contracts cannot use output-only JSON value references');
 	if (getPackedReference(value) !== undefined) {
 		throw new Error('Legacy input contracts cannot use packed references');
 	}
