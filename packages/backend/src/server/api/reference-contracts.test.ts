@@ -241,6 +241,8 @@ function reviewedPublishedPath(original: (typeof baseline.routes)[number]) {
 		schema.additionalProperties = false;
 		properties.langs = { type: 'array', items: { type: 'string' } };
 		properties.logoImageUrl = { type: ['string', 'null'] };
+		// Persistent policy extensions are canonical JSON values on the public wire.
+		properties.policies = { type: 'object', additionalProperties: { $ref: '#/components/schemas/JsonValue' } };
 		const required = schema.required;
 		if (!Array.isArray(required) || !required.includes('description')) throw new Error('Expected frozen admin metadata required fields');
 		required.splice(required.indexOf('description') + 1, 0, 'langs', 'logoImageUrl');

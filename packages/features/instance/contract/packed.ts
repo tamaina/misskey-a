@@ -4,7 +4,8 @@
  */
 
 import * as v from 'valibot';
-import { resultObject } from '../../api/contract/result-object.js';
+import { jsonObjectWithRest } from '../../api/contract/json-object.js';
+import { jsonValueSchema } from '../../api/contract/json-value.js';
 import {
 	packedRolePoliciesSchema as __ref_RolePolicies
 } from '../../roles/contract/packed.js';
@@ -23,15 +24,13 @@ export const packedAdSchema = v.strictObject({
 	"isSensitive": v.boolean()
 });
 // admin/update-meta persists all clientOptions keys and serializers return them verbatim.
-export const packedMetaClientOptionsSchema = resultObject({
+export const packedMetaClientOptionsSchema = jsonObjectWithRest({
 	"entrancePageStyle": v.picklist(["classic", "simple"]),
 	"showTimelineForVisitor": v.boolean(),
 	"showActivitiesForVisitor": v.boolean()
-});
-// Intersection sides remain open so each accepts the fields supplied by the other.
-export const packedMetaDetailedSchema = v.intersect([v.lazy(() => packedMetaLiteSchema), v.lazy(() => packedMetaDetailedOnlySchema)]);
-export const packedMetaDetailedOnlySchema = resultObject({
-	"features": v.optional(resultObject({
+}, jsonValueSchema);
+export const packedMetaDetailedOnlySchema = v.strictObject({
+	"features": v.optional(v.strictObject({
 	"registration": v.boolean(),
 	"emailRequiredForSignup": v.boolean(),
 	"localTimeline": v.boolean(),
@@ -48,7 +47,7 @@ export const packedMetaDetailedOnlySchema = resultObject({
 	"cacheRemoteFiles": v.boolean(),
 	"cacheRemoteSensitiveFiles": v.boolean()
 });
-export const packedMetaLiteSchema = resultObject({
+export const packedMetaLiteSchema = v.strictObject({
 	"maintainerName": v.nullable(v.string()),
 	"maintainerEmail": v.nullable(v.string()),
 	"version": v.string(),
@@ -85,7 +84,7 @@ export const packedMetaLiteSchema = resultObject({
 	"notFoundImageUrl": v.nullable(v.string()),
 	"iconUrl": v.nullable(v.string()),
 	"maxNoteTextLength": v.number(),
-	"ads": v.array(resultObject({
+	"ads": v.array(v.strictObject({
 	"id": v.pipe(v.string(), v.metadata({ "format": "id", "example": "xxxxxxxxxx" })),
 	"url": v.pipe(v.string(), v.metadata({ "format": "url" })),
 	"place": v.string(),
@@ -98,14 +97,13 @@ export const packedMetaLiteSchema = resultObject({
 	"enableEmail": v.boolean(),
 	"enableServiceWorker": v.boolean(),
 	"translatorAvailable": v.boolean(),
-	"sentryForFrontend": v.nullable(resultObject({
-	"options": v.pipe(resultObject({
-	"dsn": v.string()
-}), v.metadata({ additionalProperties: true })),
-	"vueIntegration": v.optional(v.nullable(v.pipe(resultObject({}), v.metadata({ additionalProperties: true })))),
-	"browserTracingIntegration": v.optional(v.nullable(v.pipe(resultObject({}), v.metadata({ additionalProperties: true })))),
-	"replayIntegration": v.optional(v.nullable(v.pipe(resultObject({}), v.metadata({ additionalProperties: true }))))
-})),
+	// These configured extension objects are delivered as JSON, not executable SDK options.
+	"sentryForFrontend": v.nullable(v.strictObject({
+		"options": jsonObjectWithRest({ "dsn": v.string() }, jsonValueSchema),
+		"vueIntegration": v.optional(v.nullable(jsonObjectWithRest({}, jsonValueSchema))),
+		"browserTracingIntegration": v.optional(v.nullable(jsonObjectWithRest({}, jsonValueSchema))),
+		"replayIntegration": v.optional(v.nullable(jsonObjectWithRest({}, jsonValueSchema))),
+	})),
 	"mediaProxy": v.string(),
 	"enableUrlPreview": v.boolean(),
 	"backgroundImageUrl": v.nullable(v.string()),
@@ -119,4 +117,10 @@ export const packedMetaLiteSchema = resultObject({
 	"noteSearchableScope": v.pipe(v.picklist(["local", "global"]), v.metadata({ "default": "local" })),
 	"maxFileSize": v.number(),
 	"federation": v.picklist(["all", "specified", "none"])
+});
+
+// Flatten public entries: strict intersection sides would reject each other's finite fields.
+export const packedMetaDetailedSchema = v.strictObject({
+	...packedMetaLiteSchema.entries,
+	...packedMetaDetailedOnlySchema.entries,
 });

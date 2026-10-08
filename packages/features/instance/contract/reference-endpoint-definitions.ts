@@ -6,8 +6,8 @@
 import type { InferContractRouterInputs, InferContractRouterOutputs } from '@orpc/contract';
 import * as v from 'valibot';
 import { defineEndpointContract } from '../../api/contract/definition.js';
-import { jsonObject } from '../../api/contract/json-object.js';
-import { resultObject } from '../../api/contract/result-object.js';
+import { jsonObject, jsonObjectWithRest } from '../../api/contract/json-object.js';
+import { jsonValueSchema } from '../../api/contract/json-value.js';
 import { packedReference } from '../../api/contract/packed-reference.js';
 
 export const referenceAdminMetaInput = jsonObject({});
@@ -94,7 +94,7 @@ export const referenceAdminMetaOutput = v.strictObject({
 	"enableIdenticonGeneration": v.boolean(),
 	"manifestJsonOverride": v.string(),
 	// Instance policy rows are arbitrary keys merged with the default policy table.
-	"policies": resultObject({}),
+	"policies": jsonObjectWithRest({}, jsonValueSchema),
 	"enableFanoutTimeline": v.boolean(),
 	"enableFanoutTimelineDbFallback": v.boolean(),
 	"perLocalUserUserTimelineCacheMax": v.number(),

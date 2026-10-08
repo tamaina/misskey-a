@@ -21,7 +21,11 @@ import XEntranceSimple from '@features/web/frontend/pages/welcome.entrance.simpl
 import { definePage } from '@features/navigation/frontend/page.js';
 import { fetchInstance } from '@features/instance/frontend/instance.js';
 
-const instance = ref<Misskey.entities.MetaDetailed | null>(null);
+// This view reads only setup/style; retain ordinary deep reactivity without unwrapping extension JSON.
+type WelcomeMeta = Pick<Misskey.entities.MetaDetailed, 'requireSetup'> & {
+	clientOptions: Pick<Misskey.entities.MetaDetailed['clientOptions'], 'entrancePageStyle'>;
+};
+const instance = ref<WelcomeMeta | null>(null);
 
 fetchInstance(true).then((res) => {
 	instance.value = res;

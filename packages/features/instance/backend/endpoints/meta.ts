@@ -3,9 +3,10 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { unionMetaDefinition, unionMetaInput, unionMetaOutput } from '../../contract/union-endpoint-definitions.js';
+import { projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
+import { unionMetaDefinition } from '../../contract/union-endpoint-definitions.js';
 import { Injectable } from '@nestjs/common';
+import { LegacyMetaConfigurationProducerEndpoint } from '../legacy-meta-configuration-producer-endpoint.js';
 import { MetaEntityService } from '../serializers/MetaEntityService.js';
 
 const contractProjection = projectEndpointContract(unionMetaDefinition);
@@ -21,7 +22,7 @@ export const meta = {
 export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof unionMetaInput, typeof unionMetaOutput> {
+export class EndpointImplementation extends LegacyMetaConfigurationProducerEndpoint<typeof meta> {
 	constructor(
 		private metaEntityService: MetaEntityService,
 	) {

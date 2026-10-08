@@ -5,7 +5,7 @@
 
 import { Brackets } from 'typeorm';
 import JSON5 from 'json5';
-import type { Packed } from '@features/index/contract/packed.js';
+import type { NativeMetaLite, NativeMetaDetailed } from './native-meta.js';
 import type { MiMeta } from '../models/Meta.js';
 import type { AdsRepository } from '@features/persistence/backend/repositories/models.js';
 import { MAX_NOTE_TEXT_LENGTH } from '@features/notes/contract/note-text-limit.js';
@@ -26,7 +26,7 @@ export class MetaEntityService {
 	) { }
 
 	@bindThis
-	public async pack(meta?: MiMeta): Promise<Packed<'MetaLite'>> {
+	public async pack(meta?: MiMeta): Promise<NativeMetaLite> {
 		let instance = meta;
 
 		if (!instance) {
@@ -59,7 +59,7 @@ export class MetaEntityService {
 			}
 		}
 
-		const packed: Packed<'MetaLite'> = {
+		const packed: NativeMetaLite = {
 			maintainerName: instance.maintainerName,
 			maintainerEmail: instance.maintainerEmail,
 
@@ -135,7 +135,7 @@ export class MetaEntityService {
 	}
 
 	@bindThis
-	public async packDetailed(meta?: MiMeta): Promise<Packed<'MetaDetailed'>> {
+	public async packDetailed(meta?: MiMeta): Promise<NativeMetaDetailed> {
 		let instance = meta;
 
 		if (!instance) {
@@ -146,7 +146,7 @@ export class MetaEntityService {
 
 		const proxyAccount = await this.systemAccountService.fetch('proxy');
 
-		const packDetailed: Packed<'MetaDetailed'> = {
+		const packDetailed: NativeMetaDetailed = {
 			...packed,
 			cacheRemoteFiles: instance.cacheRemoteFiles,
 			cacheRemoteSensitiveFiles: instance.cacheRemoteSensitiveFiles,

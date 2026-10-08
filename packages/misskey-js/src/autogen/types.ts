@@ -6083,16 +6083,16 @@ export type components = {
                 options: {
                     dsn: string;
                 } & {
-                    [key: string]: unknown;
+                    [key: string]: components['schemas']['JsonValue'];
                 };
                 vueIntegration?: {
-                    [key: string]: unknown;
+                    [key: string]: components['schemas']['JsonValue'];
                 } | null;
                 browserTracingIntegration?: {
-                    [key: string]: unknown;
+                    [key: string]: components['schemas']['JsonValue'];
                 } | null;
                 replayIntegration?: {
-                    [key: string]: unknown;
+                    [key: string]: components['schemas']['JsonValue'];
                 } | null;
             } | null;
             mediaProxy: string;
@@ -6134,12 +6134,130 @@ export type components = {
             cacheRemoteFiles: boolean;
             cacheRemoteSensitiveFiles: boolean;
         };
-        MetaDetailed: components['schemas']['MetaLite'] & components['schemas']['MetaDetailedOnly'];
+        MetaDetailed: {
+            maintainerName: string | null;
+            maintainerEmail: string | null;
+            version: string;
+            providesTarball: boolean;
+            name: string | null;
+            shortName: string | null;
+            /**
+             * Format: url
+             * @example https://misskey.example.com
+             */
+            uri: string;
+            description: string | null;
+            langs: string[];
+            tosUrl: string | null;
+            /** @default https://github.com/misskey-dev/misskey */
+            repositoryUrl: string | null;
+            /** @default https://github.com/misskey-dev/misskey/issues/new */
+            feedbackUrl: string | null;
+            defaultDarkTheme: string | null;
+            defaultLightTheme: string | null;
+            clientOptions: components['schemas']['MetaClientOptions'];
+            disableRegistration: boolean;
+            emailRequiredForSignup: boolean;
+            enableHcaptcha: boolean;
+            hcaptchaSiteKey: string | null;
+            enableMcaptcha: boolean;
+            mcaptchaSiteKey: string | null;
+            mcaptchaInstanceUrl: string | null;
+            enableRecaptcha: boolean;
+            recaptchaSiteKey: string | null;
+            enableTurnstile: boolean;
+            turnstileSiteKey: string | null;
+            enableTestcaptcha: boolean;
+            googleAnalyticsMeasurementId: string | null;
+            swPublickey: string | null;
+            /** @default /assets/ai.png */
+            mascotImageUrl: string;
+            bannerUrl: string | null;
+            serverErrorImageUrl: string | null;
+            infoImageUrl: string | null;
+            notFoundImageUrl: string | null;
+            iconUrl: string | null;
+            maxNoteTextLength: number;
+            ads: {
+                /**
+                 * Format: id
+                 * @example xxxxxxxxxx
+                 */
+                id: string;
+                /** Format: url */
+                url: string;
+                place: string;
+                ratio: number;
+                /** Format: url */
+                imageUrl: string;
+                dayOfWeek: number;
+                isSensitive?: boolean;
+            }[];
+            /** @default 0 */
+            notesPerOneAd: number;
+            enableEmail: boolean;
+            enableServiceWorker: boolean;
+            translatorAvailable: boolean;
+            sentryForFrontend: {
+                options: {
+                    dsn: string;
+                } & {
+                    [key: string]: components['schemas']['JsonValue'];
+                };
+                vueIntegration?: {
+                    [key: string]: components['schemas']['JsonValue'];
+                } | null;
+                browserTracingIntegration?: {
+                    [key: string]: components['schemas']['JsonValue'];
+                } | null;
+                replayIntegration?: {
+                    [key: string]: components['schemas']['JsonValue'];
+                } | null;
+            } | null;
+            mediaProxy: string;
+            enableUrlPreview: boolean;
+            backgroundImageUrl: string | null;
+            impressumUrl: string | null;
+            logoImageUrl: string | null;
+            privacyPolicyUrl: string | null;
+            inquiryUrl: string | null;
+            serverRules: string[];
+            themeColor: string | null;
+            policies: components['schemas']['RolePolicies'];
+            /**
+             * @default local
+             * @enum {string}
+             */
+            noteSearchableScope: 'local' | 'global';
+            maxFileSize: number;
+            /** @enum {string} */
+            federation: 'all' | 'specified' | 'none';
+            features?: {
+                registration: boolean;
+                emailRequiredForSignup: boolean;
+                localTimeline: boolean;
+                globalTimeline: boolean;
+                hcaptcha: boolean;
+                turnstile: boolean;
+                recaptcha: boolean;
+                objectStorage: boolean;
+                serviceWorker: boolean;
+                /** @default true */
+                miauth: boolean;
+            };
+            proxyAccountName: string | null;
+            /** @example false */
+            requireSetup: boolean;
+            cacheRemoteFiles: boolean;
+            cacheRemoteSensitiveFiles: boolean;
+        };
         MetaClientOptions: {
             /** @enum {string} */
             entrancePageStyle: 'classic' | 'simple';
             showTimelineForVisitor: boolean;
             showActivitiesForVisitor: boolean;
+        } & {
+            [key: string]: components['schemas']['JsonValue'];
         };
         UserWebhook: {
             /** Format: id */
@@ -10460,7 +10578,9 @@ export interface operations {
                         enableServerMachineStats: boolean;
                         enableIdenticonGeneration: boolean;
                         manifestJsonOverride: string;
-                        policies: Record<string, never>;
+                        policies: {
+                            [key: string]: components['schemas']['JsonValue'];
+                        };
                         enableFanoutTimeline: boolean;
                         enableFanoutTimelineDbFallback: boolean;
                         perLocalUserUserTimelineCacheMax: number;

@@ -20,6 +20,7 @@ import type { MetaService } from '../../backend/services/MetaService.js';
 import { MetaEntityService } from '../../backend/serializers/MetaEntityService.js';
 import { createServerInfo, createEndpoint, createPing, createGetOnlineUsersCount } from '../../backend/index.js';
 import { EndpointImplementation as AdminServerInfo } from '../../backend/endpoints/admin/server-info.js';
+import { EndpointImplementation as MetaEndpoint } from '../../backend/endpoints/meta.js';
 import { EndpointImplementation as AdminMeta } from '../../backend/endpoints/admin/meta.js';
 import { EndpointImplementation as CreateAd } from '../../backend/endpoints/admin/ad/create.js';
 import type { AdsRepository } from '../../../persistence/backend/repositories/models.js';
@@ -263,17 +264,49 @@ test('actual admin metadata and public metadata preserve nullable images, client
 	expect(lite.mascotImageUrl).toBe('/assets/ai.png');
 	expect(lite.ads.map(ad => ad.isSensitive)).toEqual([undefined, true]);
 	for (const ad of lite.ads) {
-		expect(v.parse(packedMetaLiteSchema, { ...lite, ads: [{ ...ad, future: true }] }).ads[0]).toHaveProperty('future', true);
+		expect(v.safeParse(packedMetaLiteSchema, { ...lite, ads: [{ ...ad, future: true }] }).success).toBe(false);
 		for (const invalid of [{ ...ad, id: undefined }, { ...ad, ratio: 'bad' }]) expect(v.safeParse(packedMetaLiteSchema, { ...lite, ads: [invalid] }).success).toBe(false);
 	}
 	const detailed = await serializer.packDetailed();
 	expect(v.parse(packedMetaDetailedSchema, detailed)).toEqual(detailed);
 	expect(detailed.features?.miauth).toBe(true);
-	expect(v.parse(packedMetaDetailedSchema, { ...detailed, features: { ...detailed.features, future: true } }).features).toHaveProperty('future', true);
+	expect(v.safeParse(packedMetaDetailedSchema, { ...detailed, features: { ...detailed.features, future: true } }).success).toBe(false);
 	for (const features of [{ ...detailed.features, registration: undefined }, { ...detailed.features, registration: 'bad' }]) expect(v.safeParse(packedMetaDetailedSchema, { ...detailed, features }).success).toBe(false);
 	expect(v.parse(packedMetaLiteSchema, lite).clientOptions).toHaveProperty('extension', { enabled: true });
 	expect(v.parse(referenceAdminMetaOutput, result).clientOptions).toHaveProperty('extension', { enabled: true });
 	expect(v.safeParse(packedMetaLiteSchema, { ...lite, clientOptions: { ...lite.clientOptions, showTimelineForVisitor: 'bad' } }).success).toBe(false);
+	rejectsDrift(packedMetaLiteSchema, lite);
+	rejectsDrift(packedMetaDetailedSchema, detailed, ['features']);
+	expect(v.safeParse(packedMetaLiteSchema, detailed).success).toBe(false);
+	for (const invalid of [new Date(), () => 1, Infinity, undefined]) {
+		expect(v.safeParse(packedMetaLiteSchema, { ...lite, clientOptions: { ...lite.clientOptions, extension: invalid } }).success).toBe(false);
+		expect(v.safeParse(referenceAdminMetaOutput, { ...result, policies: { extension: invalid } }).success).toBe(false);
+	}
+	config.sentryForFrontend = {
+		options: { dsn: 'https://sentry.test/1', tracesSampleRate: 0.5, beforeSend: event => event },
+		vueIntegration: null, browserTracingIntegration: null, replayIntegration: null,
+	};
+	Object.assign(config.sentryForFrontend.options, { extension: { retained: [null, true, 1, 'value'] } });
+	const nativeSentry = await serializer.pack();
+	expect(nativeSentry.sentryForFrontend).toBe(config.sentryForFrontend);
+	expect(v.safeParse(packedMetaLiteSchema, nativeSentry).success).toBe(false);
+	const wireSentry: unknown = JSON.parse(JSON.stringify(nativeSentry));
+	const validatedSentry = v.parse(packedMetaLiteSchema, wireSentry);
+	expect(validatedSentry.sentryForFrontend?.options).toHaveProperty('extension', { retained: [null, true, 1, 'value'] });
+	for (const sentryForFrontend of [
+		{ options: { dsn: 1 } },
+		{ options: { dsn: 'https://sentry.test', invalid: new Date() } },
+		{ options: { dsn: 'https://sentry.test' }, vueIntegration: { invalid: () => 1 } },
+		{ options: { dsn: 'https://sentry.test' }, unexpected: true },
+	]) expect(v.safeParse(packedMetaLiteSchema, { ...lite, sentryForFrontend }).success).toBe(false);
+	const endpoint = new MetaEndpoint(serializer);
+	const input = { detail: false, future: 'retained' };
+	const raw = await endpoint.exec(input, null, null);
+	expect(input.future).toBe('retained');
+	expect(raw.sentryForFrontend).toBe(config.sentryForFrontend);
+	expect(typeof raw.sentryForFrontend?.options.beforeSend).toBe('function');
+	const rawDetailed = await endpoint.exec({ detail: true }, null, null);
+	expect(rawDetailed).toHaveProperty('features.miauth', true);
 });
 
 test('actual ad create serializer emits dates and sensitivity without response defaults', async () => {
