@@ -67,6 +67,7 @@
 	"imports": {
 		"#api-routing": "./built/contracts/api/shared/api-routing.js",
 		"#pilot-contract": "./built/contracts/index/backend/api.contract.js",
+		"#pilot-error-data": "./built/contracts/api/backend/transport/errors.schema.js",
 		"#feature-contracts/*": "./built/contracts/*/contract/index.js"
 	}
 }

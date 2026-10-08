@@ -5,11 +5,15 @@
 
 import * as v from 'valibot';
 
+// Valibot 1.5 record accepts arrays; preserve the public object-only error detail.
+export const apiErrorInfoObject = v.custom<Record<string, unknown>>(value =>
+	value !== null && typeof value === 'object' && !Array.isArray(value));
+
 /** Error detail remains extensible; successful response DTOs are finite. */
 export const apiErrorData = v.object({
 	id: v.string(),
 	kind: v.picklist(['client', 'permission', 'server']),
-	info: v.optional(v.record(v.string(), v.unknown())),
+	info: v.optional(v.pipe(apiErrorInfoObject, v.record(v.string(), v.unknown()))),
 });
 
 export const commonErrors = {

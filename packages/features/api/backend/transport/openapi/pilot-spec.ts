@@ -7,6 +7,7 @@ import { OpenAPIGenerator } from '@orpc/openapi';
 import { experimental_ValibotToJsonSchemaConverter } from '@orpc/valibot';
 import { pilotContract } from '../../../../index/backend/api.contract.js';
 import { serverInfoObjectInput } from '../../../../instance/backend/endpoints/server-info.contract.js';
+import { apiErrorInfoObject } from '../errors.schema.js';
 import { imageCommentLength } from '../../../../drive/backend/endpoints/drive/files/create.schema.js';
 
 /** JSON Schema exists only as generated external documentation, never request validation. */
@@ -16,7 +17,7 @@ export async function genPilotOpenapiSpec(config: { version: string; apiUrl: str
 			? { ...jsonSchema, maxLength: 512 } : undefined,
 		overrideSchema: ({ valibotSchema }) => valibotSchema.type === 'blob'
 			? { type: 'string', format: 'binary', contentMediaType: 'application/octet-stream' }
-			: valibotSchema === serverInfoObjectInput ? { type: 'object' } : undefined,
+			: valibotSchema === serverInfoObjectInput || valibotSchema === apiErrorInfoObject ? { type: 'object' } : undefined,
 	});
 	const spec = await new OpenAPIGenerator({ schemaConverters: [converter] }).generate(pilotContract, {
 		info: { version: config.version, title: 'Misskey API' }, servers: [{ url: config.apiUrl }],

@@ -1,7 +1,8 @@
 import { createORPCClient, ORPCError } from '@orpc/client';
 import { getContractRouter, isContractProcedure, validateORPCError } from '@orpc/contract';
-import type { ContractRouterClient } from '@orpc/contract';
+import type { ContractRouterClient, ErrorMap } from '@orpc/contract';
 import { requestRoutes } from '#api-routing';
+import { apiErrorData } from '#pilot-error-data';
 import { OpenAPILink } from '@orpc/openapi-client/fetch';
 import type { pilotContract } from '#pilot-contract';
 import routing from './autogen/pilot-routing.js';
@@ -13,13 +14,6 @@ export type PilotClient = ContractRouterClient<typeof pilotContract, PilotClient
 
 function isRecord(value: unknown): value is Record<string, unknown> {
 	return value !== null && typeof value === 'object' && !Array.isArray(value);
-}
-
-/** Shared Misskey envelope boundary. The generator rejects contracts with another error DTO. */
-function isErrorData(value: unknown): boolean {
-	return isRecord(value) && typeof value.id === 'string'
-		&& (value.kind === 'client' || value.kind === 'permission' || value.kind === 'server')
-		&& (value.info === undefined || isRecord(value.info));
 }
 
 const paths = new Map(requestRoutes(routing).map(route => [route.name, route.path]));
@@ -47,9 +41,13 @@ export function createPilotClient(options: {
 				const normalized = new ORPCError(error.code, { defined: false, status: error.status,
 					message: error.message, data: error.data, cause: error });
 				const procedure = getContractRouter(routing, call.path);
-				if (!isContractProcedure(procedure) || !Object.hasOwn(procedure['~orpc'].errorMap, error.code)
-					|| !isErrorData(error.data)) throw normalized;
-				throw await validateORPCError(procedure['~orpc'].errorMap, normalized);
+				if (!isContractProcedure(procedure) || !Object.hasOwn(procedure['~orpc'].errorMap, error.code)) throw normalized;
+				// Generated route membership/status stays authoritative. Its shared data schema
+				// is checked by the official validator, including defaults and unknown keys.
+				const generatedErrors: ErrorMap = procedure['~orpc'].errorMap;
+				const errorMap = Object.fromEntries(Object.entries(generatedErrors)
+					.map(([code, definition]) => [code, { ...definition, data: apiErrorData }] satisfies [string, ErrorMap[string]]));
+				throw await validateORPCError(errorMap, normalized);
 			}
 		}],
 		fetch: async (request, init) => {

@@ -321,3 +321,18 @@ test('media rejection is parser-independent and empty bodyless aliases retain th
 	}
 	assert.equal(events.some(event => event[0] === 'delete' || event[0] === 'upload'), false);
 });
+
+test('defined error data is validated and normalized by the shared portable contract schema', async t => {
+	const app = Fastify();
+	app.post('/api/notes/delete', (_request, reply) => reply.code(401).send({ error: {
+		code: 'CREDENTIAL_REQUIRED', message: 'Credential required.', id: 'contract-error', kind: 'client',
+		info: { remaining: 0 }, future: 'ignored by the declared error DTO',
+	} }));
+	const origin = await app.listen({ host: '127.0.0.1', port: 0 });
+	t.after(() => app.close());
+	const client = new APIClient({ origin });
+	const result = await safe(client.orpc.notes.delete({ noteId: 'note1' }));
+	assert.equal(result.isDefined, true);
+	assert.equal(isDefinedError(result.error), true);
+	assert.deepEqual(result.error.data, { id: 'contract-error', kind: 'client', info: { remaining: 0 } });
+});

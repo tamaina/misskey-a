@@ -596,7 +596,7 @@ class APIClient {
             readonly data: ObjectSchema<    {
             readonly id: StringSchema<undefined>;
             readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
-            readonly info: OptionalSchema<RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>, undefined>;
+            readonly info: OptionalSchema<SchemaWithPipe<readonly [CustomSchema<Record<string, unknown>, undefined>, RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>]>, undefined>;
             }, undefined>;
             };
             readonly CREDENTIAL_REQUIRED: {
@@ -604,7 +604,7 @@ class APIClient {
             readonly data: ObjectSchema<    {
             readonly id: StringSchema<undefined>;
             readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
-            readonly info: OptionalSchema<RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>, undefined>;
+            readonly info: OptionalSchema<SchemaWithPipe<readonly [CustomSchema<Record<string, unknown>, undefined>, RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>]>, undefined>;
             }, undefined>;
             };
             readonly YOUR_ACCOUNT_SUSPENDED: {
@@ -612,7 +612,7 @@ class APIClient {
             readonly data: ObjectSchema<    {
             readonly id: StringSchema<undefined>;
             readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
-            readonly info: OptionalSchema<RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>, undefined>;
+            readonly info: OptionalSchema<SchemaWithPipe<readonly [CustomSchema<Record<string, unknown>, undefined>, RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>]>, undefined>;
             }, undefined>;
             };
             readonly YOUR_ACCOUNT_MOVED: {
@@ -620,7 +620,7 @@ class APIClient {
             readonly data: ObjectSchema<    {
             readonly id: StringSchema<undefined>;
             readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
-            readonly info: OptionalSchema<RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>, undefined>;
+            readonly info: OptionalSchema<SchemaWithPipe<readonly [CustomSchema<Record<string, unknown>, undefined>, RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>]>, undefined>;
             }, undefined>;
             };
             readonly PERMISSION_DENIED: {
@@ -628,7 +628,7 @@ class APIClient {
             readonly data: ObjectSchema<    {
             readonly id: StringSchema<undefined>;
             readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
-            readonly info: OptionalSchema<RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>, undefined>;
+            readonly info: OptionalSchema<SchemaWithPipe<readonly [CustomSchema<Record<string, unknown>, undefined>, RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>]>, undefined>;
             }, undefined>;
             };
             readonly RATE_LIMIT_EXCEEDED: {
@@ -636,7 +636,7 @@ class APIClient {
             readonly data: ObjectSchema<    {
             readonly id: StringSchema<undefined>;
             readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
-            readonly info: OptionalSchema<RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>, undefined>;
+            readonly info: OptionalSchema<SchemaWithPipe<readonly [CustomSchema<Record<string, unknown>, undefined>, RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>]>, undefined>;
             }, undefined>;
             };
             readonly INVALID_PARAM: {
@@ -644,7 +644,7 @@ class APIClient {
             readonly data: ObjectSchema<    {
             readonly id: StringSchema<undefined>;
             readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
-            readonly info: OptionalSchema<RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>, undefined>;
+            readonly info: OptionalSchema<SchemaWithPipe<readonly [CustomSchema<Record<string, unknown>, undefined>, RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>]>, undefined>;
             }, undefined>;
             };
             readonly INTERNAL_ERROR: {
@@ -652,7 +652,7 @@ class APIClient {
             readonly data: ObjectSchema<    {
             readonly id: StringSchema<undefined>;
             readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
-            readonly info: OptionalSchema<RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>, undefined>;
+            readonly info: OptionalSchema<SchemaWithPipe<readonly [CustomSchema<Record<string, unknown>, undefined>, RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>]>, undefined>;
             }, undefined>;
             };
             }>>;
@@ -675,7 +675,7 @@ class APIClient {
             readonly data: ObjectSchema<    {
             readonly id: StringSchema<undefined>;
             readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
-            readonly info: OptionalSchema<RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>, undefined>;
+            readonly info: OptionalSchema<SchemaWithPipe<readonly [CustomSchema<Record<string, unknown>, undefined>, RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>]>, undefined>;
             }, undefined>;
             };
             readonly CREDENTIAL_REQUIRED: {
@@ -683,7 +683,7 @@ class APIClient {
             readonly data: ObjectSchema<    {
             readonly id: StringSchema<undefined>;
             readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
-            readonly info: OptionalSchema<RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>, undefined>;
+            readonly info: OptionalSchema<SchemaWithPipe<readonly [CustomSchema<Record<string, unknown>, undefined>, RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>]>, undefined>;
             }, undefined>;
             };
             readonly YOUR_ACCOUNT_SUSPENDED: {
@@ -691,7 +691,7 @@ class APIClient {
             readonly data: ObjectSchema<    {
             readonly id: StringSchema<undefined>;
             readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
-            readonly info: OptionalSchema<RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>, undefined>;
+            readonly info: OptionalSchema<SchemaWithPipe<readonly [CustomSchema<Record<string, unknown>, undefined>, RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>]>, undefined>;
             }, undefined>;
             };
             readonly YOUR_ACCOUNT_MOVED: {
@@ -699,7 +699,7 @@ class APIClient {
             readonly data: ObjectSchema<    {
             readonly id: StringSchema<undefined>;
             readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
-            readonly info: OptionalSchema<RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>, undefined>;
+            readonly info: OptionalSchema<SchemaWithPipe<readonly [CustomSchema<Record<string, unknown>, undefined>, RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>]>, undefined>;
             }, undefined>;
             };
             readonly PERMISSION_DENIED: {
@@ -707,7 +707,7 @@ class APIClient {
             readonly data: ObjectSchema<    {
             readonly id: StringSchema<undefined>;
             readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
-            readonly info: OptionalSchema<RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>, undefined>;
+            readonly info: OptionalSchema<SchemaWithPipe<readonly [CustomSchema<Record<string, unknown>, undefined>, RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>]>, undefined>;
             }, undefined>;
             };
             readonly RATE_LIMIT_EXCEEDED: {
@@ -715,7 +715,7 @@ class APIClient {
             readonly data: ObjectSchema<    {
             readonly id: StringSchema<undefined>;
             readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
-            readonly info: OptionalSchema<RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>, undefined>;
+            readonly info: OptionalSchema<SchemaWithPipe<readonly [CustomSchema<Record<string, unknown>, undefined>, RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>]>, undefined>;
             }, undefined>;
             };
             readonly INVALID_PARAM: {
@@ -723,7 +723,7 @@ class APIClient {
             readonly data: ObjectSchema<    {
             readonly id: StringSchema<undefined>;
             readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
-            readonly info: OptionalSchema<RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>, undefined>;
+            readonly info: OptionalSchema<SchemaWithPipe<readonly [CustomSchema<Record<string, unknown>, undefined>, RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>]>, undefined>;
             }, undefined>;
             };
             readonly INTERNAL_ERROR: {
@@ -731,7 +731,7 @@ class APIClient {
             readonly data: ObjectSchema<    {
             readonly id: StringSchema<undefined>;
             readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
-            readonly info: OptionalSchema<RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>, undefined>;
+            readonly info: OptionalSchema<SchemaWithPipe<readonly [CustomSchema<Record<string, unknown>, undefined>, RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>]>, undefined>;
             }, undefined>;
             };
             }>>;
@@ -745,7 +745,7 @@ class APIClient {
             readonly data: ObjectSchema<    {
             readonly id: StringSchema<undefined>;
             readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
-            readonly info: OptionalSchema<RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>, undefined>;
+            readonly info: OptionalSchema<SchemaWithPipe<readonly [CustomSchema<Record<string, unknown>, undefined>, RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>]>, undefined>;
             }, undefined>;
             };
             CREDENTIAL_REQUIRED: {
@@ -753,7 +753,7 @@ class APIClient {
             readonly data: ObjectSchema<    {
             readonly id: StringSchema<undefined>;
             readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
-            readonly info: OptionalSchema<RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>, undefined>;
+            readonly info: OptionalSchema<SchemaWithPipe<readonly [CustomSchema<Record<string, unknown>, undefined>, RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>]>, undefined>;
             }, undefined>;
             };
             YOUR_ACCOUNT_SUSPENDED: {
@@ -761,7 +761,7 @@ class APIClient {
             readonly data: ObjectSchema<    {
             readonly id: StringSchema<undefined>;
             readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
-            readonly info: OptionalSchema<RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>, undefined>;
+            readonly info: OptionalSchema<SchemaWithPipe<readonly [CustomSchema<Record<string, unknown>, undefined>, RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>]>, undefined>;
             }, undefined>;
             };
             YOUR_ACCOUNT_MOVED: {
@@ -769,7 +769,7 @@ class APIClient {
             readonly data: ObjectSchema<    {
             readonly id: StringSchema<undefined>;
             readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
-            readonly info: OptionalSchema<RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>, undefined>;
+            readonly info: OptionalSchema<SchemaWithPipe<readonly [CustomSchema<Record<string, unknown>, undefined>, RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>]>, undefined>;
             }, undefined>;
             };
             PERMISSION_DENIED: {
@@ -777,7 +777,7 @@ class APIClient {
             readonly data: ObjectSchema<    {
             readonly id: StringSchema<undefined>;
             readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
-            readonly info: OptionalSchema<RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>, undefined>;
+            readonly info: OptionalSchema<SchemaWithPipe<readonly [CustomSchema<Record<string, unknown>, undefined>, RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>]>, undefined>;
             }, undefined>;
             };
             RATE_LIMIT_EXCEEDED: {
@@ -785,7 +785,7 @@ class APIClient {
             readonly data: ObjectSchema<    {
             readonly id: StringSchema<undefined>;
             readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
-            readonly info: OptionalSchema<RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>, undefined>;
+            readonly info: OptionalSchema<SchemaWithPipe<readonly [CustomSchema<Record<string, unknown>, undefined>, RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>]>, undefined>;
             }, undefined>;
             };
             INVALID_PARAM: {
@@ -793,7 +793,7 @@ class APIClient {
             readonly data: ObjectSchema<    {
             readonly id: StringSchema<undefined>;
             readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
-            readonly info: OptionalSchema<RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>, undefined>;
+            readonly info: OptionalSchema<SchemaWithPipe<readonly [CustomSchema<Record<string, unknown>, undefined>, RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>]>, undefined>;
             }, undefined>;
             };
             INTERNAL_ERROR: {
@@ -801,7 +801,7 @@ class APIClient {
             readonly data: ObjectSchema<    {
             readonly id: StringSchema<undefined>;
             readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
-            readonly info: OptionalSchema<RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>, undefined>;
+            readonly info: OptionalSchema<SchemaWithPipe<readonly [CustomSchema<Record<string, unknown>, undefined>, RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>]>, undefined>;
             }, undefined>;
             };
             NO_SUCH_NOTE: {
@@ -809,7 +809,7 @@ class APIClient {
             data: ObjectSchema<    {
             readonly id: StringSchema<undefined>;
             readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
-            readonly info: OptionalSchema<RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>, undefined>;
+            readonly info: OptionalSchema<SchemaWithPipe<readonly [CustomSchema<Record<string, unknown>, undefined>, RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>]>, undefined>;
             }, undefined>;
             };
             ACCESS_DENIED: {
@@ -817,7 +817,7 @@ class APIClient {
             data: ObjectSchema<    {
             readonly id: StringSchema<undefined>;
             readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
-            readonly info: OptionalSchema<RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>, undefined>;
+            readonly info: OptionalSchema<SchemaWithPipe<readonly [CustomSchema<Record<string, unknown>, undefined>, RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>]>, undefined>;
             }, undefined>;
             };
             }>>;
@@ -859,7 +859,7 @@ class APIClient {
                 readonly data: ObjectSchema<    {
                 readonly id: StringSchema<undefined>;
                 readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
-                readonly info: OptionalSchema<RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>, undefined>;
+                readonly info: OptionalSchema<SchemaWithPipe<readonly [CustomSchema<Record<string, unknown>, undefined>, RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>]>, undefined>;
                 }, undefined>;
                 };
                 CREDENTIAL_REQUIRED: {
@@ -867,7 +867,7 @@ class APIClient {
                 readonly data: ObjectSchema<    {
                 readonly id: StringSchema<undefined>;
                 readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
-                readonly info: OptionalSchema<RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>, undefined>;
+                readonly info: OptionalSchema<SchemaWithPipe<readonly [CustomSchema<Record<string, unknown>, undefined>, RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>]>, undefined>;
                 }, undefined>;
                 };
                 YOUR_ACCOUNT_SUSPENDED: {
@@ -875,7 +875,7 @@ class APIClient {
                 readonly data: ObjectSchema<    {
                 readonly id: StringSchema<undefined>;
                 readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
-                readonly info: OptionalSchema<RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>, undefined>;
+                readonly info: OptionalSchema<SchemaWithPipe<readonly [CustomSchema<Record<string, unknown>, undefined>, RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>]>, undefined>;
                 }, undefined>;
                 };
                 YOUR_ACCOUNT_MOVED: {
@@ -883,7 +883,7 @@ class APIClient {
                 readonly data: ObjectSchema<    {
                 readonly id: StringSchema<undefined>;
                 readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
-                readonly info: OptionalSchema<RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>, undefined>;
+                readonly info: OptionalSchema<SchemaWithPipe<readonly [CustomSchema<Record<string, unknown>, undefined>, RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>]>, undefined>;
                 }, undefined>;
                 };
                 PERMISSION_DENIED: {
@@ -891,7 +891,7 @@ class APIClient {
                 readonly data: ObjectSchema<    {
                 readonly id: StringSchema<undefined>;
                 readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
-                readonly info: OptionalSchema<RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>, undefined>;
+                readonly info: OptionalSchema<SchemaWithPipe<readonly [CustomSchema<Record<string, unknown>, undefined>, RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>]>, undefined>;
                 }, undefined>;
                 };
                 RATE_LIMIT_EXCEEDED: {
@@ -899,7 +899,7 @@ class APIClient {
                 readonly data: ObjectSchema<    {
                 readonly id: StringSchema<undefined>;
                 readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
-                readonly info: OptionalSchema<RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>, undefined>;
+                readonly info: OptionalSchema<SchemaWithPipe<readonly [CustomSchema<Record<string, unknown>, undefined>, RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>]>, undefined>;
                 }, undefined>;
                 };
                 INVALID_PARAM: {
@@ -907,7 +907,7 @@ class APIClient {
                 readonly data: ObjectSchema<    {
                 readonly id: StringSchema<undefined>;
                 readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
-                readonly info: OptionalSchema<RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>, undefined>;
+                readonly info: OptionalSchema<SchemaWithPipe<readonly [CustomSchema<Record<string, unknown>, undefined>, RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>]>, undefined>;
                 }, undefined>;
                 };
                 INTERNAL_ERROR: {
@@ -915,7 +915,7 @@ class APIClient {
                 readonly data: ObjectSchema<    {
                 readonly id: StringSchema<undefined>;
                 readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
-                readonly info: OptionalSchema<RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>, undefined>;
+                readonly info: OptionalSchema<SchemaWithPipe<readonly [CustomSchema<Record<string, unknown>, undefined>, RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>]>, undefined>;
                 }, undefined>;
                 };
                 FILE_REQUIRED: {
@@ -923,7 +923,7 @@ class APIClient {
                 data: ObjectSchema<    {
                 readonly id: StringSchema<undefined>;
                 readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
-                readonly info: OptionalSchema<RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>, undefined>;
+                readonly info: OptionalSchema<SchemaWithPipe<readonly [CustomSchema<Record<string, unknown>, undefined>, RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>]>, undefined>;
                 }, undefined>;
                 };
                 INVALID_FILE_NAME: {
@@ -931,7 +931,7 @@ class APIClient {
                 data: ObjectSchema<    {
                 readonly id: StringSchema<undefined>;
                 readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
-                readonly info: OptionalSchema<RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>, undefined>;
+                readonly info: OptionalSchema<SchemaWithPipe<readonly [CustomSchema<Record<string, unknown>, undefined>, RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>]>, undefined>;
                 }, undefined>;
                 };
                 INAPPROPRIATE: {
@@ -939,7 +939,7 @@ class APIClient {
                 data: ObjectSchema<    {
                 readonly id: StringSchema<undefined>;
                 readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
-                readonly info: OptionalSchema<RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>, undefined>;
+                readonly info: OptionalSchema<SchemaWithPipe<readonly [CustomSchema<Record<string, unknown>, undefined>, RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>]>, undefined>;
                 }, undefined>;
                 };
                 NO_FREE_SPACE: {
@@ -947,7 +947,7 @@ class APIClient {
                 data: ObjectSchema<    {
                 readonly id: StringSchema<undefined>;
                 readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
-                readonly info: OptionalSchema<RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>, undefined>;
+                readonly info: OptionalSchema<SchemaWithPipe<readonly [CustomSchema<Record<string, unknown>, undefined>, RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>]>, undefined>;
                 }, undefined>;
                 };
                 MAX_FILE_SIZE_EXCEEDED: {
@@ -955,7 +955,7 @@ class APIClient {
                 data: ObjectSchema<    {
                 readonly id: StringSchema<undefined>;
                 readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
-                readonly info: OptionalSchema<RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>, undefined>;
+                readonly info: OptionalSchema<SchemaWithPipe<readonly [CustomSchema<Record<string, unknown>, undefined>, RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>]>, undefined>;
                 }, undefined>;
                 };
                 UNALLOWED_FILE_TYPE: {
@@ -963,7 +963,7 @@ class APIClient {
                 data: ObjectSchema<    {
                 readonly id: StringSchema<undefined>;
                 readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
-                readonly info: OptionalSchema<RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>, undefined>;
+                readonly info: OptionalSchema<SchemaWithPipe<readonly [CustomSchema<Record<string, unknown>, undefined>, RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>]>, undefined>;
                 }, undefined>;
                 };
                 }>>;
