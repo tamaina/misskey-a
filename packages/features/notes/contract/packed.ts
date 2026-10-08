@@ -4,7 +4,6 @@
  */
 
 import * as v from 'valibot';
-import { resultObject } from '../../api/contract/result-object.js';
 import {
 	packedDriveFileSchema as __ref_DriveFile
 } from '../../drive/contract/packed.js';
@@ -12,7 +11,7 @@ import {
 	packedUserLiteSchema as __ref_UserLite
 } from '../../users/contract/packed.js';
 
-const noteBaseSchema = resultObject({
+const noteBaseSchema = v.strictObject({
 "id": v.pipe(v.string(), v.metadata({ "format": "id", "example": "xxxxxxxxxx" })),
 "createdAt": v.pipe(v.string(), v.metadata({ "format": "date-time" })),
 "deletedAt": v.optional(v.pipe(v.nullable(v.string()), v.metadata({ "format": "date-time" }))),
@@ -29,10 +28,10 @@ const noteBaseSchema = resultObject({
 "fileIds": v.optional(v.array(v.pipe(v.string(), v.metadata({ "format": "id" })))),
 "files": v.optional(v.array(v.lazy(() => __ref_DriveFile))),
 "tags": v.optional(v.array(v.string())),
-"poll": v.optional(v.nullable(resultObject({
+"poll": v.optional(v.nullable(v.strictObject({
 	"expiresAt": v.optional(v.pipe(v.nullable(v.string()), v.metadata({ "format": "date-time" }))),
 	"multiple": v.boolean(),
-	"choices": v.array(resultObject({
+	"choices": v.array(v.strictObject({
 	"isVoted": v.boolean(),
 	"text": v.string(),
 	"votes": v.number()
@@ -40,7 +39,7 @@ const noteBaseSchema = resultObject({
 }))),
 "emojis": v.optional(v.record(v.string(), v.union([v.string()]))),
 "channelId": v.optional(v.pipe(v.nullable(v.string()), v.metadata({ "format": "id", "example": "xxxxxxxxxx" }))),
-"channel": v.optional(v.nullable(resultObject({
+"channel": v.optional(v.nullable(v.strictObject({
 	"id": v.string(),
 	"name": v.string(),
 	"color": v.string(),
@@ -63,7 +62,7 @@ const noteBaseSchema = resultObject({
 "myReaction": v.optional(v.nullable(v.string()))
 });
 export type PackedNote = v.InferOutput<typeof noteBaseSchema> & { reply?: PackedNote | null | undefined; renote?: PackedNote | null | undefined };
-export const packedNoteSchema: v.GenericSchema<PackedNote, PackedNote> = resultObject({
+export const packedNoteSchema: v.GenericSchema<PackedNote, PackedNote> = v.strictObject({
 ...noteBaseSchema.entries,
 "reply": v.optional(v.nullable(v.lazy(() => packedNoteSchema))),
 "renote": v.optional(v.nullable(v.lazy(() => packedNoteSchema)))

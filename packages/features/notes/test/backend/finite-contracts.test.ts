@@ -19,6 +19,12 @@ import { toLegacyJsonSchema } from '@features/api/backend/index.js';
 import type { NotesRepository, NoteDraftsRepository, MiMeta } from '@features/persistence/backend/repositories/models.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 import { MiNote } from '../../backend/models/Note.js';
+import { packedNoteSchema } from '../../contract/packed.js';
+import { packedNotesShowDefinition } from '../../contract/packed-endpoint-definitions.js';
+import type { IdService } from '@features/runtime/backend/services/IdService.js';
+import type { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
+import type { DriveFileEntityService } from '@features/drive/backend/serializers/DriveFileEntityService.js';
+import type { MiChannel } from '@features/channels/backend/models/Channel.js';
 import type { CustomEmojiService } from '@features/emojis/backend/services/CustomEmojiService.js';
 import type { GetterService } from '@features/api/backend/transport/GetterService.js';
 import type { HttpRequestService } from '@features/runtime/backend/services/HttpRequestService.js';
@@ -138,4 +144,63 @@ test.each([false, true])('translate handler projects provider response and retai
 	note.text = ' ';
 	expect(await endpoint.exec({ noteId: note.id, targetLang: 'en-US' }, user, null)).toBeUndefined();
 	expect(http.send).toHaveBeenCalledTimes(1);
+});
+
+test.each([false, true])('real Note serializer preserves native undefined and JSON wire fields with detail=%s', async detail => {
+	const moduleRef = mockDeep<ModuleRef>();
+	const users = mockDeep<UserEntityService>();
+	const files = mockDeep<DriveFileEntityService>();
+	const emoji = mockDeep<CustomEmojiService>();
+	const reaction = mockDeep<ReactionService>();
+	const buffering = mockDeep<ReactionsBufferingService>();
+	const ids = mockDeep<IdService>();
+	const polls = mockDeep<ConstructorParameters<typeof NoteEntityService>[5]>();
+	const date = new Date('2026-10-08T00:00:00.000Z');
+	const user = { id: 'user123', name: null, username: 'alice', host: null, avatarUrl: 'https://example.com/avatar.png', avatarBlurhash: null, avatarDecorations: [], emojis: {}, onlineStatus: 'unknown' } satisfies Packed<'UserLite'>;
+	users.pack.mockResolvedValue(user);
+	files.packManyByIds.mockResolvedValue([]);
+	emoji.populateEmojis.mockResolvedValue({});
+	reaction.convertLegacyReactions.mockReturnValue({});
+	buffering.mergeReactions.mockReturnValue({});
+	ids.parse.mockReturnValue({ date });
+	polls.findOneByOrFail.mockResolvedValue(mockDeep<Awaited<ReturnType<typeof polls.findOneByOrFail>>>({ choices: ['one', 'two'], votes: [2, 0], multiple: false, expiresAt: date }));
+	moduleRef.get.mockReturnValueOnce(users).mockReturnValueOnce(files).mockReturnValueOnce(emoji).mockReturnValueOnce(reaction).mockReturnValueOnce(buffering).mockReturnValueOnce(ids).mockReturnValueOnce(mockDeep());
+	const channel = mockDeep<MiChannel>({ id: 'channel123', name: 'Fixture', color: '#000000', isSensitive: false, allowRenoteToExternal: true, userId: null });
+	const values = { userId: user.id, userHost: null, text: 'fixture', cw: null, name: null, url: null, uri: null, visibility: 'public', localOnly: false, reactionAcceptance: null, repliesCount: 0, renoteCount: 0, reactions: {}, reactionAndUserPairCache: [], emojis: [], fileIds: [], tags: [], mentions: [], hasPoll: true, replyId: null, renoteId: null, channelId: channel.id, channel, clippedCount: 0 } satisfies Partial<MiNote>;
+	const reply = new MiNote({ ...values, id: 'reply123', hasPoll: false });
+	const note = new MiNote({ ...values, id: 'note123', replyId: reply.id, reply });
+	const serializer = new NoteEntityService(moduleRef, mockDeep<MiMeta>({ enableReactionsBuffering: false }), mockDeep(), mockDeep(), mockDeep(), polls, mockDeep(), mockDeep(), mockDeep());
+	serializer.onModuleInit();
+	const raw = await serializer.pack(note, null, { detail, skipHide: true });
+	expect(raw.createdAt).toBe(date.toISOString());
+	expect(Object.hasOwn(raw, 'uri')).toBe(true);
+	expect(raw.uri).toBeUndefined();
+	expect(v.parse(packedNoteSchema, raw)).toEqual(raw);
+	const wire = JSON.parse(JSON.stringify(raw));
+	expect(Object.hasOwn(wire, 'uri')).toBe(false);
+	expect(v.parse(packedNoteSchema, wire)).toEqual(wire);
+	expect(wire.channel).toEqual({ id: channel.id, name: channel.name, color: channel.color, isSensitive: false, allowRenoteToExternal: true, userId: null });
+	if (detail) {
+		expect(raw.poll?.expiresAt).toBe(date.toISOString());
+		expect(raw.poll?.choices).toEqual([{ text: 'one', votes: 2, isVoted: false }, { text: 'two', votes: 0, isVoted: false }]);
+		expect(raw.reply?.id).toBe(reply.id);
+		for (const invalid of [
+			{ ...wire, poll: { ...wire.poll, future: true } },
+			{ ...wire, poll: { ...wire.poll, multiple: null } },
+			{ ...wire, poll: { ...wire.poll, choices: [{ text: 'one', votes: 2, isVoted: false, future: true }] } },
+			{ ...wire, poll: { ...wire.poll, choices: [{ text: 'one', votes: '2', isVoted: false }] } },
+			{ ...wire, reply: { ...wire.reply, future: true } },
+		]) expect(v.safeParse(packedNoteSchema, invalid).success).toBe(false);
+	} else {
+		expect(Object.hasOwn(raw, 'poll')).toBe(false);
+		expect(Object.hasOwn(raw, 'reply')).toBe(false);
+	}
+	for (const invalid of [{ ...wire, future: true }, { ...wire, id: 7 }, { ...wire, channel: { ...wire.channel, future: true } }]) expect(v.safeParse(packedNoteSchema, invalid).success).toBe(false);
+	const { id: _id, ...missing } = wire;
+	expect(v.safeParse(packedNoteSchema, missing).success).toBe(false);
+	const params = { noteId: note.id, future: true };
+	const response = { ...raw, future: true };
+	const endpoint = new ContractEndpoint({}, projectEndpointContract(packedNotesShowDefinition), async input => { expect(input).toBe(params); return response; });
+	expect(await endpoint.exec(params, null, null)).toBe(response);
+	expect(v.safeParse(packedNoteSchema, response).success).toBe(false);
 });
