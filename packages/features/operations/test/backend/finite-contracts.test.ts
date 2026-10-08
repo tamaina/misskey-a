@@ -108,13 +108,35 @@ test('native queue requests strip extras while HTTP retains the original request
 	await expect(endpoint.exec({ queue: 'unsupported' }, null, null)).rejects.toMatchObject({ code: 'INVALID_PARAM' });
 });
 
-test('reviewed pg_indexes producer boundary preserves full SELECT-star rows', async () => {
+test('finite pg_indexes wire schema preserves all five SELECT-star columns and nullable source paths', async () => {
 	const rows = [{ schemaname: 'public', tablename: 'note', indexname: 'note_pkey', tablespace: null, indexdef: 'CREATE UNIQUE INDEX ...' }];
 	const db = mockDeep<DataSource>();
 	db.query.mockResolvedValue(rows);
 	const result = await new IndexStats(db).exec({}, mockDeep<MiLocalUser>(), null);
 	expect(v.parse(inlineAdminGetIndexStatsOutput, result)).toEqual(rows);
 	expect(db.query).toHaveBeenCalledWith('SELECT * FROM pg_indexes;');
+	expect(result[0]).toBe(rows[0]);
+	for (const field of ['schemaname', 'tablespace', 'indexdef'] as const) {
+		const nullable = [{ ...rows[0], [field]: null }];
+		expect(v.parse(inlineAdminGetIndexStatsOutput, nullable)).toEqual(nullable);
+	}
+	for (const value of [
+		{ ...rows[0], future: true },
+		{ ...rows[0], schemaname: 7 },
+		{ ...rows[0], tablespace: 7 },
+		{ ...rows[0], indexdef: 7 },
+		{ ...rows[0], tablename: null },
+		{ ...rows[0], indexname: null },
+	]) expect(v.safeParse(inlineAdminGetIndexStatsOutput, [value]).success).toBe(false);
+	for (const field of ['schemaname', 'tablename', 'indexname', 'tablespace', 'indexdef'] as const) {
+		const missing: Record<string, string | null> = { ...rows[0] };
+		delete missing[field];
+		expect(v.safeParse(inlineAdminGetIndexStatsOutput, [missing]).success).toBe(false);
+	}
+	const extended = [{ ...rows[0], future: true }];
+	db.query.mockResolvedValue(extended);
+	const unparsed = await new IndexStats(db).exec({}, mockDeep<MiLocalUser>(), null);
+	expect(unparsed[0]).toBe(extended[0]);
 	// The dynamic job schema stays a separate producer review boundary in this cohort.
 	expect(packedQueueJobSchema.type).toBe('loose_object');
 });

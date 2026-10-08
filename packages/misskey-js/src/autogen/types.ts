@@ -9129,8 +9129,11 @@ export interface operations {
                 };
                 content: {
                     'application/json': {
+                        schemaname: string | null;
                         tablename: string;
                         indexname: string;
+                        tablespace: string | null;
+                        indexdef: string | null;
                     }[];
                 };
             };

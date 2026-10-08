@@ -6,6 +6,7 @@
 import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
 import { inlineAdminGetIndexStatsDefinition, inlineAdminGetIndexStatsInput, inlineAdminGetIndexStatsOutput } from '../../../contract/endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
+import type * as v from 'valibot';
 import { DataSource } from 'typeorm';
 
 import { DI } from '@/di-symbols.js';
@@ -30,8 +31,8 @@ export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof
 		private db: DataSource,
 	) {
 		super(meta, contractProjection, async () => {
-			const stats = await this.db.query('SELECT * FROM pg_indexes;').then(recs => {
-				const res = [] as { tablename: string; indexname: string; }[];
+			const stats = await this.db.query<v.InferOutput<typeof inlineAdminGetIndexStatsOutput>>('SELECT * FROM pg_indexes;').then(recs => {
+				const res: v.InferOutput<typeof inlineAdminGetIndexStatsOutput> = [];
 				for (const rec of recs) {
 					res.push(rec);
 				}

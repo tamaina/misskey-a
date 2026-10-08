@@ -6,13 +6,16 @@
 import type { InferContractRouterInputs, InferContractRouterOutputs } from '@orpc/contract';
 import * as v from 'valibot';
 import { defineEndpointContract } from '../../api/contract/definition.js';
-import { resultObject } from '../../api/contract/result-object.js';
 
 export const inlineAdminGetIndexStatsInput = v.object({});
-// SELECT * FROM pg_indexes returns complete database rows beyond these documented fields.
-export const inlineAdminGetIndexStatsOutput = v.array(resultObject({
+// PostgreSQL pg_indexes exposes these five columns; namespace/tablespace joins and
+// pg_get_indexdef's missing-index path can yield null without changing SELECT *.
+export const inlineAdminGetIndexStatsOutput = v.array(v.strictObject({
+		"schemaname": v.nullable(v.string()),
 		"tablename": v.string(),
 		"indexname": v.string(),
+		"tablespace": v.nullable(v.string()),
+		"indexdef": v.nullable(v.string()),
 	}));
 export const inlineAdminGetIndexStatsDefinition = defineEndpointContract(
 	{ method: 'POST', path: '/admin/get-index-stats', tags: ["admin"] },

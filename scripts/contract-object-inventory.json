@@ -116,7 +116,6 @@
   "packages/features/moderation/contract/admin-user-endpoint-definition.ts|resultObject|adminShowUserOutput|748067320fa69aabf329d2b404968290b701ebc7b05e6d48b945db278ca1ba57": 1,
   "packages/features/moderation/contract/admin-user-endpoint-definition.ts|resultObject|adminShowUserOutput|eeffb8fc038360510bbbc9e472d57cd6ef2fb9e56b7cca41cad0713cf0c79dec": 1,
   "packages/features/moderation/contract/packed-endpoint-definitions.ts|resultObject|packedAdminShowModerationLogsOutput|53de2ee826425139dd4547b9ebbb3c615430a60419e2d28cbdc14b57e4149ccb": 1,
-  "packages/features/operations/contract/endpoint-definitions.ts|resultObject|inlineAdminGetIndexStatsOutput|94dba944afcdcf02bc20baff1ecf1246151e32c2cb09256bac8450ac98084984": 1,
   "packages/features/operations/contract/packed.ts|looseObject|packedQueueJobSchema|62f7469d91f1a13a93d5562a7302f3de810db02b3a72983c85b078829a7f0265": 1,
   "packages/features/operations/contract/packed.ts|resultObject|packedQueueJobSchema|3dc6cc93a524961f63e51e60764b5c16e2de5a5ca5e9e8dec0d5267d82035432": 1,
   "packages/features/operations/contract/packed.ts|resultObject|packedQueueJobSchema|53de2ee826425139dd4547b9ebbb3c615430a60419e2d28cbdc14b57e4149ccb": 2,
