@@ -1,4 +1,0 @@
-import Marker from './marker.vue';Reflect.set(window,'__marker',Marker);
-import './style.css';import image from './image.png';
-const img=document.createElement('img');img.id='probe-image';img.src=image;document.body.appendChild(img);const a=document.createElement('p');a.textContent='Rendered content';a.style.fontFamily='ProbeA';document.body.appendChild(a);const c=document.createElement('p');c.textContent='Rendered content';c.style.fontFamily='ProbeB';document.body.appendChild(c);
-await Promise.all([img.decode(),document.fonts.load('16px ProbeA'),document.fonts.load('16px ProbeB')]);window.__assetProbe={imageLoaded:img.complete&&img.naturalWidth>0,imageWidth:img.naturalWidth,fontA:document.fonts.check('16px ProbeA'),fontB:document.fonts.check('16px ProbeB'),text:document.body.textContent};
