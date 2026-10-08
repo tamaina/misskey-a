@@ -35,6 +35,8 @@ allowBuilds:
   pnpm: true
 minimumReleaseAge: 10080 # delay 7days to mitigate supply-chain attack
 minimumReleaseAgeExclude:
+  # Reviewed and owner-approved VVI release: https://github.com/tamaina/vite-vue-internationalization/pull/56
+  - vite-vue-internationalization@1.1.4
   - '@misskey-dev/*'
   - '@syuilo/aiscript'
   - buraha
