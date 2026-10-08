@@ -8,7 +8,7 @@ import { type FollowingsRepository, MiUser, type MutingsRepository, type UserPro
 import { bindThis } from '@features/runtime/backend/decorators.js';
 import { sqlLikeEscape } from '@features/persistence/backend/utility/sql-like-escape.js';
 import type { Config } from '@/config.js';
-import { Packed } from '@features/index/contract/packed.js';
+import type { NativeUser } from '@features/users/backend/serializers/native-user.js';
 import type { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 
 function defaultActiveThreshold() {
@@ -70,7 +70,7 @@ export class UserSearchService {
 			detail?: boolean,
 		},
 		me?: MiUser | null,
-	): Promise<Packed<'User'>[]> {
+	): Promise<NativeUser[]> {
 		const queries = me ? this.buildSearchUserQueries(me, params) : this.buildSearchUserNoLoginQueries(params);
 
 		let resultSet = new Set<MiUser['id']>();
@@ -89,7 +89,7 @@ export class UserSearchService {
 			}
 		}
 
-		return this.userEntityService.packMany<'UserLite' | 'UserDetailed'>(
+		return this.userEntityService.packMany(
 			[...resultSet].slice(0, limit),
 			me,
 			{ schema: opts?.detail ? 'UserDetailed' : 'UserLite' },

@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
+import { NativeContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
 import { packedFederationFollowersDefinition, packedFederationFollowersInput, packedFederationFollowersOutput } from '../../../contract/packed-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
 
@@ -12,6 +12,11 @@ import { QueryService } from '@features/notes/backend/services/QueryService.js';
 import { FollowingEntityService } from '@features/relationships/backend/serializers/FollowingEntityService.js';
 import { RoleService } from '@features/roles/backend/services/RoleService.js';
 import { DI } from '@/di-symbols.js';
+
+import * as v from 'valibot';
+import { nativeFollowingSchema } from '@features/relationships/backend/serializers/FollowingEntityService.js';
+
+export const nativeOutputSchema = v.array(nativeFollowingSchema);
 
 const contractProjection = projectEndpointContract(packedFederationFollowersDefinition);
 
@@ -26,7 +31,7 @@ export const meta = {
 export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedFederationFollowersInput, typeof packedFederationFollowersOutput> {
+export class EndpointImplementation extends NativeContractEndpoint<typeof meta, typeof packedFederationFollowersInput, typeof packedFederationFollowersOutput, typeof nativeOutputSchema> {
 	constructor(
 		@Inject(DI.followingsRepository)
 		private followingsRepository: FollowingsRepository,
@@ -35,7 +40,7 @@ export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof
 		private queryService: QueryService,
 		private roleService: RoleService,
 	) {
-		super(meta, contractProjection, async (ps, me) => {
+		super(meta, contractProjection, nativeOutputSchema, async (ps, me) => {
 			const query = this.queryService.makePaginationQuery(this.followingsRepository.createQueryBuilder('following'), ps.sinceId, ps.untilId, ps.sinceDate, ps.untilDate)
 				.andWhere('following.followeeHost = :host', { host: ps.host })
 				.andWhere('following.isFollowerSuspended = false');

@@ -3,8 +3,9 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
+import { NativeContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
 import { inlineIMoveDefinition, inlineIMoveInput, inlineIMoveOutput } from '../../../contract/endpoint-definitions.js';
+import { nativeMeDetailedSchema } from '@features/users/backend/serializers/native-user.js';
 import { Inject, Injectable } from '@nestjs/common';
 import ms from 'ms';
 
@@ -76,7 +77,7 @@ export const meta = {
 export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof inlineIMoveInput, typeof inlineIMoveOutput> {
+export class EndpointImplementation extends NativeContractEndpoint<typeof meta, typeof inlineIMoveInput, typeof inlineIMoveOutput, typeof nativeMeDetailedSchema> {
 	constructor(
 		@Inject(DI.meta)
 		private serverSettings: MiMeta,
@@ -88,7 +89,7 @@ export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof
 		private apPersonService: ApPersonService,
 		private userEntityService: UserEntityService,
 	) {
-		super(meta, contractProjection, async (ps, me) => {
+		super(meta, contractProjection, nativeMeDetailedSchema, async (ps, me) => {
 			// check parameter
 			if (!ps.moveToAccount) throw new ApiError(meta.errors.noSuchUser);
 			// abort if user is the root

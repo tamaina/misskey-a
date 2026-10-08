@@ -30,7 +30,7 @@ export class AbuseReportNotificationRecipientEntityService {
 			? src
 			: await this.abuseReportNotificationRecipientRepository.findOneByOrFail({ id: src });
 		const user = recipient.userId
-			? (opts?.users.get(recipient.userId) ?? await this.userEntityService.pack<'UserLite'>(recipient.userId))
+			? (opts?.users.get(recipient.userId) ?? await this.userEntityService.pack(recipient.userId))
 			: undefined;
 		const webhook = recipient.systemWebhookId
 			? (opts?.webhooks.get(recipient.systemWebhookId) ?? await this.systemWebhookEntityService.pack(recipient.systemWebhookId))

@@ -5,6 +5,7 @@
 
 import RE2 from 're2';
 import * as mfm from 'mfm-js';
+import { nativeMeDetailedSchema } from '@features/users/backend/serializers/native-user.js';
 import { Inject, Injectable } from '@nestjs/common';
 import ms from 'ms';
 import * as htmlParser from 'node-html-parser';
@@ -15,7 +16,7 @@ import type { UsersRepository, DriveFilesRepository, MiMeta, UserProfilesReposit
 import type { MiLocalUser, MiUser } from '../../models/User.js';
 import type { MiUserProfile } from '../../models/UserProfile.js';
 import { normalizeForSearch } from '@features/discovery/backend/utility/normalize-for-search.js';
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
+import { NativeContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
 import { iUpdateDefinition, iUpdateInput, iUpdateOutput } from '../../../contract/user-update-endpoint-definitions.js';
 import { UserEntityService } from '../../serializers/UserEntityService.js';
 import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
@@ -129,7 +130,7 @@ export const meta = {
 export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof iUpdateInput, typeof iUpdateOutput> {
+export class EndpointImplementation extends NativeContractEndpoint<typeof meta, typeof iUpdateInput, typeof iUpdateOutput, typeof nativeMeDetailedSchema> {
 	constructor(
 		@Inject(DI.config)
 		private config: Config,
@@ -163,7 +164,7 @@ export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof
 		private avatarDecorationService: AvatarDecorationService,
 		private utilityService: UtilityService,
 	) {
-		super(meta, contractProjection, async (ps, _user, token) => {
+		super(meta, contractProjection, nativeMeDetailedSchema, async (ps, _user, token) => {
 			const user = await this.usersRepository.findOneByOrFail({ id: _user.id }) as MiLocalUser;
 			const isSecure = token == null;
 
@@ -430,8 +431,7 @@ export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof
 				verifiedLinks: [],
 			});
 
-			const iObj = await this.userEntityService.pack(user.id, user, {
-				schema: 'MeDetailed',
+			const iObj = await this.userEntityService.packSelf(user.id, {
 				includeSecrets: isSecure,
 			});
 

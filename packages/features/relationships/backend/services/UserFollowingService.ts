@@ -537,9 +537,7 @@ export class UserFollowingService implements OnModuleInit {
 		if (this.userEntityService.isLocalUser(followee)) {
 			this.userEntityService.pack(follower.id, followee).then(packed => this.globalEventService.publishMainStream(followee.id, 'receiveFollowRequest', packed));
 
-			this.userEntityService.pack(followee.id, followee, {
-				schema: 'MeDetailed',
-			}).then(packed => this.globalEventService.publishMainStream(followee.id, 'meUpdated', packed));
+			this.userEntityService.packSelf(followee.id).then(packed => this.globalEventService.publishMainStream(followee.id, 'meUpdated', packed));
 
 			// 通知を作成
 			this.notificationService.createNotification(followee.id, 'receiveFollowRequest', {
@@ -585,9 +583,7 @@ export class UserFollowingService implements OnModuleInit {
 			followerId: follower.id,
 		});
 
-		this.userEntityService.pack(followee.id, followee, {
-			schema: 'MeDetailed',
-		}).then(packed => this.globalEventService.publishMainStream(followee.id, 'meUpdated', packed));
+		this.userEntityService.packSelf(followee.id).then(packed => this.globalEventService.publishMainStream(followee.id, 'meUpdated', packed));
 	}
 
 	@bindThis
@@ -612,9 +608,7 @@ export class UserFollowingService implements OnModuleInit {
 			this.deliverAccept(follower, followee as MiPartialLocalUser, request.requestId ?? undefined);
 		}
 
-		this.userEntityService.pack(followee.id, followee, {
-			schema: 'MeDetailed',
-		}).then(packed => this.globalEventService.publishMainStream(followee.id, 'meUpdated', packed));
+		this.userEntityService.packSelf(followee.id).then(packed => this.globalEventService.publishMainStream(followee.id, 'meUpdated', packed));
 	}
 
 	@bindThis

@@ -3,8 +3,9 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
+import { NativeContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
 import { packedIUnpinDefinition, packedIUnpinInput, packedIUnpinOutput } from '../../../contract/packed-endpoint-definitions.js';
+import { nativeMeDetailedSchema } from '@features/users/backend/serializers/native-user.js';
 import { Injectable } from '@nestjs/common';
 
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
@@ -34,20 +35,18 @@ export const meta = {
 export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedIUnpinInput, typeof packedIUnpinOutput> {
+export class EndpointImplementation extends NativeContractEndpoint<typeof meta, typeof packedIUnpinInput, typeof packedIUnpinOutput, typeof nativeMeDetailedSchema> {
 	constructor(
 		private userEntityService: UserEntityService,
 		private notePiningService: NotePiningService,
 	) {
-		super(meta, contractProjection, async (ps, me) => {
+		super(meta, contractProjection, nativeMeDetailedSchema, async (ps, me) => {
 			await this.notePiningService.removePinned(me, ps.noteId).catch(err => {
 				if (err.id === 'b302d4cf-c050-400a-bbb3-be208681f40c') throw new ApiError(meta.errors.noSuchNote);
 				throw err;
 			});
 
-			return await this.userEntityService.pack(me.id, me, {
-				schema: 'MeDetailed',
-			});
+			return await this.userEntityService.packSelf(me.id);
 		});
 	}
 }

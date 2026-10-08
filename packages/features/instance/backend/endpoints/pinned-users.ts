@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
+import { NativeContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
 import { packedPinnedUsersDefinition, packedPinnedUsersInput, packedPinnedUsersOutput } from '../../contract/packed-endpoint-definitions.js';
 import { IsNull } from 'typeorm';
 import { Inject, Injectable } from '@nestjs/common';
@@ -13,6 +13,11 @@ import type { MiUser } from '@features/users/backend/models/User.js';
 
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import { DI } from '@/di-symbols.js';
+
+import * as v from 'valibot';
+import { nativeUserDetailedSchema } from '@features/users/backend/serializers/native-user.js';
+
+export const nativeOutputSchema = v.array(nativeUserDetailedSchema);
 
 const contractProjection = projectEndpointContract(packedPinnedUsersDefinition);
 
@@ -27,7 +32,7 @@ export const meta = {
 export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedPinnedUsersInput, typeof packedPinnedUsersOutput> {
+export class EndpointImplementation extends NativeContractEndpoint<typeof meta, typeof packedPinnedUsersInput, typeof packedPinnedUsersOutput, typeof nativeOutputSchema> {
 	constructor(
 		@Inject(DI.meta)
 		private serverSettings: MiMeta,
@@ -37,7 +42,7 @@ export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof
 
 		private userEntityService: UserEntityService,
 	) {
-		super(meta, contractProjection, async (ps, me) => {
+		super(meta, contractProjection, nativeOutputSchema, async (ps, me) => {
 			const users = await Promise.all(this.serverSettings.pinnedUsers.map(acct => Acct.parse(acct)).map(acct => this.usersRepository.findOneBy({
 				usernameLower: acct.username.toLowerCase(),
 				host: acct.host ?? IsNull(),

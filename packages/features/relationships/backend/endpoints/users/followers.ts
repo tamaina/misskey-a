@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
+import { NativeContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
 import { allOfUsersFollowersDefinition, allOfUsersFollowersInput, allOfUsersFollowersOutput } from '../../../contract/selector-common-endpoint-definitions.js';
 import { IsNull } from 'typeorm';
 import { Inject, Injectable } from '@nestjs/common';
@@ -14,6 +14,11 @@ import { UtilityService } from '@features/federation/backend/services/UtilitySer
 import { DI } from '@/di-symbols.js';
 import { RoleService } from '@features/roles/backend/services/RoleService.js';
 import { ApiError } from '@features/api/backend/transport/error.js';
+
+import * as v from 'valibot';
+import { nativeFollowingSchema } from '@features/relationships/backend/serializers/FollowingEntityService.js';
+
+export const nativeOutputSchema = v.array(nativeFollowingSchema);
 
 const contractProjection = projectEndpointContract(allOfUsersFollowersDefinition);
 
@@ -44,7 +49,7 @@ export const meta = {
 export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof allOfUsersFollowersInput, typeof allOfUsersFollowersOutput, 'legacy-declared'> {
+export class EndpointImplementation extends NativeContractEndpoint<typeof meta, typeof allOfUsersFollowersInput, typeof allOfUsersFollowersOutput, typeof nativeOutputSchema, 'legacy-declared'> {
 	constructor(
 		@Inject(DI.usersRepository)
 		private usersRepository: UsersRepository,
@@ -60,7 +65,7 @@ export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof
 		private queryService: QueryService,
 		private roleService: RoleService,
 	) {
-		super(meta, contractProjection, async (ps, me) => {
+		super(meta, contractProjection, nativeOutputSchema, async (ps, me) => {
 			const user = await this.usersRepository.findOneBy('userId' in ps
 				? { id: ps.userId }
 				: { usernameLower: ps.username.toLowerCase(), host: this.utilityService.toPunyNullable(ps.host) ?? IsNull() });

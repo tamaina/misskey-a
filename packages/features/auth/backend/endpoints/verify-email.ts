@@ -54,8 +54,7 @@ export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof
 				emailVerifyCode: null,
 			});
 
-			this.globalEventService.publishMainStream(profile.userId, 'meUpdated', await this.userEntityService.pack(profile.userId, { id: profile.userId }, {
-				schema: 'MeDetailed',
+			this.globalEventService.publishMainStream(profile.userId, 'meUpdated', await this.userEntityService.packSelf(profile.userId, {
 				includeSecrets: true,
 			}));
 		});

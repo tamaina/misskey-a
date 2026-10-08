@@ -40,7 +40,7 @@ import { $i } from '@features/auth/frontend/i.js';
 import { updateCurrentAccountPartial } from '@features/auth/frontend/accounts.js';
 
 const props = defineProps<{
-	announcement: Misskey.entities.Announcement;
+	announcement: Misskey.entities.Announcement | Misskey.entities.MeDetailed['unreadAnnouncements'][number];
 }>();
 
 const emit = defineEmits<{

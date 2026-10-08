@@ -297,3 +297,29 @@ export class ContractEndpoint<
 		super(meta, projection.input, handler);
 	}
 }
+
+/**
+ * Native handlers can return finite backend DTOs containing Dates before transport serialization.
+ * The required native schema defines their type; public metadata still uses the wire contract.
+ * Like ContractEndpoint, this class neither parses nor transforms handler responses.
+ */
+export class NativeContractEndpoint<
+	Meta extends IEndpointMeta,
+	Input extends v.GenericSchema,
+	WireOutput extends v.GenericSchema,
+	NativeOutput extends v.GenericSchema,
+	Mode extends ContractEndpointInputMode = 'native',
+	WireInput extends v.GenericSchema = Input,
+> extends Endpoint<Meta, ContractEndpointInput<Input, Mode>, InferSchemaOutput<NativeOutput>> {
+	constructor(
+		meta: Meta,
+		projection: ReturnType<typeof projectEndpointContract<Input, WireOutput, WireInput>>,
+		public readonly nativeOutputSchema: NativeOutput,
+		handler: EndpointExecutor<Meta, ContractEndpointInput<Input, Mode>, InferSchemaOutput<NativeOutput>>,
+	) {
+		if (Boolean(meta.requireFile) !== (projection.definition.transport === 'multipart/form-data')) {
+			throw new Error('Endpoint requireFile metadata does not match its contract transport');
+		}
+		super(meta, projection.input, handler);
+	}
+}

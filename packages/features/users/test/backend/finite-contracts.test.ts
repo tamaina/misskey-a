@@ -94,6 +94,8 @@ test('actual achievement writer and self serializer emit the closed achievement 
 	notes.packMany.mockResolvedValue([]);
 	emojis.populateEmojis.mockResolvedValue({});
 	announcements.getUnreadAnnouncements.mockResolvedValue([]);
+	roles.isModerator.mockResolvedValue(false);
+	roles.isAdministrator.mockResolvedValue(false);
 	roles.getUserBadgeRoles.mockResolvedValue([]);
 	roles.getUserRoles.mockResolvedValue([]);
 	roles.getUserPolicies.mockResolvedValue(mockDeep<Awaited<ReturnType<RoleService['getUserPolicies']>>>({ canPublicNote: true, chatAvailability: 'available' }));
@@ -103,7 +105,7 @@ test('actual achievement writer and self serializer emit the closed achievement 
 	const service = new UserEntityService(moduleRef, mockDeep<ConstructorParameters<typeof UserEntityService>[1]>({ url: 'https://example.com', host: 'example.com' }), mockDeep(), mockDeep(), mockDeep(), mockDeep(), mockDeep(), mockDeep(), mockDeep(), mockDeep(), mockDeep(), mockDeep(), profiles, mockDeep());
 	service.onModuleInit();
 	const user = mockDeep<MiLocalUser>({ id: 'user123', username: 'alice', host: null, avatarId: null, bannerId: null, avatarDecorations: [], emojis: [], movedToUri: null, alsoKnownAs: null, updatedAt: null, lastFetchedAt: null });
-	const output = await service.pack(user, user, { schema: 'MeDetailed', userProfile: profile, userMemos: new Map(), pinNotes: new Map() });
+	const output = await service.packSelf(user, { userProfile: profile, userMemos: new Map(), pinNotes: new Map() });
 	expect(output.achievements).toBe(profile.achievements);
 	for (const value of output.achievements) {
 		expect(v.parse(packedAchievementSchema, value)).toEqual(value);

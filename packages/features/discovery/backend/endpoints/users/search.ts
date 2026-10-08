@@ -3,13 +3,18 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
+import { NativeContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
 import { packedUsersSearchDefinition, packedUsersSearchInput, packedUsersSearchOutput } from '../../../contract/packed-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
 
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import { DI } from '@/di-symbols.js';
 import { UserSearchService } from '../../services/UserSearchService.js';
+
+import * as v from 'valibot';
+import { nativeUserSchema } from '@features/users/backend/serializers/native-user.js';
+
+export const nativeOutputSchema = v.array(nativeUserSchema);
 
 const contractProjection = projectEndpointContract(packedUsersSearchDefinition);
 
@@ -27,12 +32,12 @@ export const meta = {
 export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedUsersSearchInput, typeof packedUsersSearchOutput> {
+export class EndpointImplementation extends NativeContractEndpoint<typeof meta, typeof packedUsersSearchInput, typeof packedUsersSearchOutput, typeof nativeOutputSchema> {
 	constructor(
 		private userEntityService: UserEntityService,
 		private userSearchService: UserSearchService,
 	) {
-		super(meta, contractProjection, async (ps, me) => {
+		super(meta, contractProjection, nativeOutputSchema, async (ps, me) => {
 			const users = await this.userSearchService.search(ps.query.trim(), me?.id ?? null, {
 				offset: ps.offset,
 				limit: ps.limit,

@@ -63,7 +63,7 @@ function harness(options: { twoFactorEnabled?: boolean; authenticationFails?: bo
 		{ insert: async (...args: unknown[]) => { calls.push(['insert', ...args]); } },
 		{ verifyRegistration: async (...args: unknown[]) => { calls.push(['verify', ...args]); if (options.verificationFails) throw new Error('library rejected'); return info; } },
 		{ twoFactorAuthenticate: async (...args: unknown[]) => { calls.push(['2fa', ...args]); if (options.authenticationFails) throw new Error('auth rejected'); } },
-		{ pack: async (...args: unknown[]) => { calls.push(['pack', ...args]); return packed; } },
+		{ packSelf: async (...args: unknown[]) => { calls.push(['packSelf', ...args]); return packed; } },
 		{ publishMainStream: (...args: unknown[]) => calls.push(['event', ...args]) },
 	]);
 	return { endpoint, calls, me, profile, packed, info };
@@ -76,7 +76,7 @@ test('actual key-done adapter preserves unchecked credential identity and every 
 		['profile', { userId: h.me.id }], ['2fa', h.profile, input.token], ['password', input.password, h.profile.password],
 		['verify', h.me.id, input.credential],
 		['insert', { id: 'credential-id', userId: h.me.id, name: 'Key', publicKey: 'AQID', counter: 7, credentialDeviceType: 'singleDevice', credentialBackedUp: false, transports: ['usb'] }],
-		['pack', h.me.id, h.me, { schema: 'MeDetailed', includeSecrets: true }], ['event', h.me.id, 'meUpdated', h.packed],
+		['packSelf', h.me.id, { includeSecrets: true }], ['event', h.me.id, 'meUpdated', h.packed],
 	]);
 	expect(h.calls[3][2]).toBe(input.credential);
 });

@@ -3,12 +3,16 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
+import { NativeContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
 import { portableAdminUpdateProxyAccountDefinition, portableAdminUpdateProxyAccountInput, portableAdminUpdateProxyAccountOutput } from '../../../contract/portable-constant-endpoint-definitions.js';
 import { Injectable } from '@nestjs/common';
 import { UserEntityService } from '../../serializers/UserEntityService.js';
 import { ModerationLogService } from '@features/moderation/backend/services/ModerationLogService.js';
 import { SystemAccountService } from '../../services/SystemAccountService.js';
+
+import { nativeMeDetailedSchema } from '@features/users/backend/serializers/native-user.js';
+
+export const nativeOutputSchema = nativeMeDetailedSchema;
 
 const contractProjection = projectEndpointContract(portableAdminUpdateProxyAccountDefinition);
 
@@ -25,20 +29,18 @@ export const meta = {
 export const paramDef = contractProjection.input;
 
 @Injectable()
-export default class extends ContractEndpoint<typeof meta, typeof portableAdminUpdateProxyAccountInput, typeof portableAdminUpdateProxyAccountOutput> { // eslint-disable-line import/no-default-export
+export default class extends NativeContractEndpoint<typeof meta, typeof portableAdminUpdateProxyAccountInput, typeof portableAdminUpdateProxyAccountOutput, typeof nativeOutputSchema> { // eslint-disable-line import/no-default-export
 	constructor(
 		private userEntityService: UserEntityService,
 		private moderationLogService: ModerationLogService,
 		private systemAccountService: SystemAccountService,
 	) {
-		super(meta, contractProjection, async (ps, me) => {
+		super(meta, contractProjection, nativeOutputSchema, async (ps, me) => {
 			const proxy = await this.systemAccountService.updateCorrespondingUserProfile('proxy', {
 				description: ps.description,
 			});
 
-			const updated = await this.userEntityService.pack(proxy.id, proxy, {
-				schema: 'MeDetailed',
-			});
+			const updated = await this.userEntityService.packSelf(proxy.id);
 
 			if (ps.description !== undefined) {
 				this.moderationLogService.log(me, 'updateProxyAccountDescription', {

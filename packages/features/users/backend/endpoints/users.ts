@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
+import { NativeContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
 import { packedUsersDefinition, packedUsersInput, packedUsersOutput } from '../../contract/packed-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
 import type { UsersRepository } from '@features/persistence/backend/repositories/models.js';
@@ -11,6 +11,11 @@ import type { UsersRepository } from '@features/persistence/backend/repositories
 import { QueryService } from '@features/notes/backend/services/QueryService.js';
 import { UserEntityService } from '../serializers/UserEntityService.js';
 import { DI } from '@/di-symbols.js';
+
+import * as v from 'valibot';
+import { nativeUserDetailedSchema } from '@features/users/backend/serializers/native-user.js';
+
+export const nativeOutputSchema = v.array(nativeUserDetailedSchema);
 
 const contractProjection = projectEndpointContract(packedUsersDefinition);
 
@@ -25,7 +30,7 @@ export const meta = {
 export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedUsersInput, typeof packedUsersOutput> {
+export class EndpointImplementation extends NativeContractEndpoint<typeof meta, typeof packedUsersInput, typeof packedUsersOutput, typeof nativeOutputSchema> {
 	constructor(
 		@Inject(DI.usersRepository)
 		private usersRepository: UsersRepository,
@@ -33,7 +38,7 @@ export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof
 		private userEntityService: UserEntityService,
 		private queryService: QueryService,
 	) {
-		super(meta, contractProjection, async (ps, me) => {
+		super(meta, contractProjection, nativeOutputSchema, async (ps, me) => {
 			const query = this.usersRepository.createQueryBuilder('user')
 				.where('user.isExplorable = TRUE')
 				.andWhere('user.isSuspended = FALSE');

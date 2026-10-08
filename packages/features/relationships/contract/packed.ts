@@ -5,6 +5,7 @@
 
 import * as v from 'valibot';
 import {
+	packedUserDetailedSchema,
 	packedUserDetailedNotMeSchema as __ref_UserDetailedNotMe
 } from '../../users/contract/packed.js';
 
@@ -19,8 +20,8 @@ export const packedFollowingSchema = v.strictObject({
 	"createdAt": v.pipe(v.string(), v.metadata({ "format": "date-time" })),
 	"followeeId": v.pipe(v.string(), v.metadata({ "format": "id" })),
 	"followerId": v.pipe(v.string(), v.metadata({ "format": "id" })),
-	"followee": v.optional(v.lazy(() => __ref_UserDetailedNotMe)),
-	"follower": v.optional(v.lazy(() => __ref_UserDetailedNotMe))
+	"followee": v.optional(packedUserDetailedSchema),
+	"follower": v.optional(packedUserDetailedSchema)
 });
 export const packedMutingSchema = v.strictObject({
 	"id": v.pipe(v.string(), v.metadata({ "format": "id", "example": "xxxxxxxxxx" })),

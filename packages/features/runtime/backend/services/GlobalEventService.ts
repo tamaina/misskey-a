@@ -21,6 +21,7 @@ import type { MiWebhook } from '@features/integrations/backend/models/Webhook.js
 import type { MiSystemWebhook } from '@features/integrations/backend/models/SystemWebhook.js';
 import type { MiMeta } from '@features/instance/backend/models/Meta.js';
 import { MiAvatarDecoration, MiChatMessage, MiChatRoom, MiReversiGame, MiRole, MiRoleAssignment } from '@features/persistence/backend/repositories/models.js';
+import type { NativeMeDetailed } from '@features/users/backend/serializers/native-user.js';
 import type { Packed } from '@features/index/contract/packed.js';
 import { DI } from '@/di-symbols.js';
 import type { Config } from '@/config.js';
@@ -53,7 +54,7 @@ export interface MainEventTypes {
 	follow: Packed<'UserDetailedNotMe'>;
 	followed: Packed<'UserLite'>;
 	unfollow: Packed<'UserDetailedNotMe'>;
-	meUpdated: Packed<'MeDetailed'>;
+	meUpdated: NativeMeDetailed;
 	pageEvent: {
 		pageId: MiPage['id'];
 		event: string;

@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
+import { NativeContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
 import { packedHashtagsUsersDefinition, packedHashtagsUsersInput, packedHashtagsUsersOutput } from '../../../contract/packed-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
 
@@ -12,6 +12,11 @@ import { safeForSql } from "@features/persistence/backend/utility/safe-for-sql.j
 import { normalizeForSearch } from '../../utility/normalize-for-search.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import { DI } from '@/di-symbols.js';
+
+import * as v from 'valibot';
+import { nativeUserDetailedSchema } from '@features/users/backend/serializers/native-user.js';
+
+export const nativeOutputSchema = v.array(nativeUserDetailedSchema);
 
 const contractProjection = projectEndpointContract(packedHashtagsUsersDefinition);
 
@@ -26,14 +31,14 @@ export const meta = {
 export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedHashtagsUsersInput, typeof packedHashtagsUsersOutput> {
+export class EndpointImplementation extends NativeContractEndpoint<typeof meta, typeof packedHashtagsUsersInput, typeof packedHashtagsUsersOutput, typeof nativeOutputSchema> {
 	constructor(
 		@Inject(DI.usersRepository)
 		private usersRepository: UsersRepository,
 
 		private userEntityService: UserEntityService,
 	) {
-		super(meta, contractProjection, async (ps, me) => {
+		super(meta, contractProjection, nativeOutputSchema, async (ps, me) => {
 			if (!safeForSql(normalizeForSearch(ps.tag))) throw new Error('Injection');
 			const query = this.usersRepository.createQueryBuilder('user')
 				.where(':tag <@ user.tags', { tag: [normalizeForSearch(ps.tag)] })

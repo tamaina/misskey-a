@@ -43,7 +43,7 @@ function dependencies(enabled = false, keyUserId: string | null = me.id, keyCoun
 		delete: vi.fn(async () => {}), count: vi.fn(async () => keyCount), update: vi.fn(async () => {}),
 		findOneBy: vi.fn(async () => keyUserId === null ? null : { id: 'cred-_=', userId: keyUserId }),
 	};
-	const users = { pack: vi.fn(async () => packed) };
+	const users = { packSelf: vi.fn(async () => packed) };
 	const auth = { twoFactorAuthenticate: vi.fn(async (_profile: unknown, token: string) => { if (token !== '123456') throw new Error('invalid TOTP'); }) };
 	const events = { publishMainStream: vi.fn() };
 	return { packed, profiles, keys, users, auth, events };
@@ -135,7 +135,7 @@ for (const item of nativeCases) {
 				expect(result).toEqual({});
 				expect(Object.getPrototypeOf(body)).toBe(prototype); expect(Object.keys(body)).toEqual(ownKeys);
 				expect(actual.deps.events.publishMainStream).toHaveBeenCalledWith(me.id, 'meUpdated', actual.deps.packed);
-				expect(actual.deps.users.pack).toHaveBeenCalledWith(me.id, me, { schema: 'MeDetailed', includeSecrets: true });
+				expect(actual.deps.users.packSelf).toHaveBeenCalledWith(me.id, { includeSecrets: true });
 			});
 		}
 	});

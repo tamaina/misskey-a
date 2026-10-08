@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
+import { NativeContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
 import { referenceAdminRolesUsersDefinition, referenceAdminRolesUsersInput, referenceAdminRolesUsersOutput } from '../../../../contract/reference-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
 import { Brackets } from 'typeorm';
@@ -13,6 +13,11 @@ import { DI } from '@/di-symbols.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { ApiError } from '@features/api/backend/transport/error.js';
+
+import * as v from 'valibot';
+import { nativeUserDetailedSchema } from '@features/users/backend/serializers/native-user.js';
+
+export const nativeOutputSchema = v.array(v.strictObject({ ...referenceAdminRolesUsersOutput.item.entries, user: nativeUserDetailedSchema }));
 
 const contractProjection = projectEndpointContract(referenceAdminRolesUsersDefinition);
 
@@ -37,7 +42,7 @@ export const meta = {
 export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof referenceAdminRolesUsersInput, typeof referenceAdminRolesUsersOutput> {
+export class EndpointImplementation extends NativeContractEndpoint<typeof meta, typeof referenceAdminRolesUsersInput, typeof referenceAdminRolesUsersOutput, typeof nativeOutputSchema> {
 	constructor(
 		@Inject(DI.rolesRepository)
 		private rolesRepository: RolesRepository,
@@ -49,7 +54,7 @@ export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof
 		private userEntityService: UserEntityService,
 		private idService: IdService,
 	) {
-		super(meta, contractProjection, async (ps, me) => {
+		super(meta, contractProjection, nativeOutputSchema, async (ps, me) => {
 			const role = await this.rolesRepository.findOneBy({
 				id: ps.roleId,
 			});

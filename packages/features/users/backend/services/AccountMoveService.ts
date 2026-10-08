@@ -11,7 +11,7 @@ import { DI } from '@/di-symbols.js';
 import type { MiLocalUser, MiRemoteUser, MiUser } from '../models/User.js';
 import type { BlockingsRepository, FollowingsRepository, InstancesRepository, MiMeta, MutingsRepository, UserListMembershipsRepository, UsersRepository } from '@features/persistence/backend/repositories/models.js';
 import type { RelationshipJobData, ThinUser } from '@features/runtime/backend/queue/types.js';
-import type { Packed } from '@features/index/contract/packed.js';
+import type { NativeMeDetailed } from '../serializers/native-user.js';
 
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
@@ -75,7 +75,7 @@ export class AccountMoveService {
 	 * After delivering Move activity, its local followers unfollow the old account and then follow the new one.
 	 */
 	@bindThis
-	public async moveFromLocal(src: MiLocalUser, dst: MiLocalUser | MiRemoteUser): Promise<Packed<'MeDetailed'>> {
+	public async moveFromLocal(src: MiLocalUser, dst: MiLocalUser | MiRemoteUser): Promise<NativeMeDetailed> {
 		const _srcUri = this.userEntityService.getUserUri(src);
 		const dstUri = this.userEntityService.getUserUri(dst);
 
@@ -100,7 +100,8 @@ export class AccountMoveService {
 		await this.apDeliverManagerService.deliverToFollowers(src, moveAct);
 
 		// Publish meUpdated event
-		const iObj = await this.userEntityService.pack(src.id, src, { schema: 'MeDetailed', includeSecrets: true });
+		const iObj = await this.userEntityService.packSelf(src.id, {
+			includeSecrets: true });
 		this.globalEventService.publishMainStream(src.id, 'meUpdated', iObj);
 
 		// Unfollow after 24 hours

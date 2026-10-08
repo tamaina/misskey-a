@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
+import { NativeContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
 import { packedUsersGetFrequentlyRepliedUsersDefinition, packedUsersGetFrequentlyRepliedUsersInput, packedUsersGetFrequentlyRepliedUsersOutput } from '../../../contract/packed-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
 import { maximum } from '@features/runtime/backend/data/array.js';
@@ -14,6 +14,11 @@ import { QueryService } from '@features/notes/backend/services/QueryService.js';
 import { DI } from '@/di-symbols.js';
 import { GetterService } from '@features/api/backend/transport/GetterService.js';
 import { ApiError } from '@features/api/backend/transport/error.js';
+
+import * as v from 'valibot';
+import { nativeUserDetailedSchema } from '@features/users/backend/serializers/native-user.js';
+
+export const nativeOutputSchema = v.array(v.strictObject({ ...packedUsersGetFrequentlyRepliedUsersOutput.item.entries, user: nativeUserDetailedSchema }));
 
 const contractProjection = projectEndpointContract(packedUsersGetFrequentlyRepliedUsersDefinition);
 
@@ -38,7 +43,7 @@ export const meta = {
 export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedUsersGetFrequentlyRepliedUsersInput, typeof packedUsersGetFrequentlyRepliedUsersOutput> {
+export class EndpointImplementation extends NativeContractEndpoint<typeof meta, typeof packedUsersGetFrequentlyRepliedUsersInput, typeof packedUsersGetFrequentlyRepliedUsersOutput, typeof nativeOutputSchema> {
 	constructor(
 		@Inject(DI.notesRepository)
 		private notesRepository: NotesRepository,
@@ -47,7 +52,7 @@ export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof
 		private queryService: QueryService,
 		private getterService: GetterService,
 	) {
-		super(meta, contractProjection, async (ps, me) => {
+		super(meta, contractProjection, nativeOutputSchema, async (ps, me) => {
 			// Lookup user
 			const user = await this.getterService.getUser(ps.userId).catch(err => {
 				if (err.id === '15348ddd-432d-49c2-8a5a-8069753becff') throw new ApiError(meta.errors.noSuchUser);

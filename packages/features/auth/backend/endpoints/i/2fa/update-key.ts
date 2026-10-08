@@ -64,8 +64,7 @@ export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof
 			});
 
 			// Publish meUpdated event
-			this.globalEventService.publishMainStream(me.id, 'meUpdated', await this.userEntityService.pack(me.id, me, {
-				schema: 'MeDetailed',
+			this.globalEventService.publishMainStream(me.id, 'meUpdated', await this.userEntityService.packSelf(me.id, {
 				includeSecrets: true,
 			}));
 

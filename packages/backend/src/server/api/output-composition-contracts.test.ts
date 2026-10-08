@@ -41,11 +41,11 @@ interface FrozenSchemaRow {
 // The generator snapshots legacy schema ASTs; this assertion is not for runtime payloads.
 const frozenRows = baseline.rows as unknown as readonly FrozenSchemaRow[];
 
-/** Resolve only the reviewed finite wrappers; account/User compositions stay unchanged. */
+/** Resolve the reviewed finite wrappers and viewer-dependent detailed User reference. */
 function reviewedOutput(row: FrozenSchemaRow): Schema {
 	if (row.route === 'ap/show') return {
 		...row.output,
-		oneOf: row.output.oneOf!.map(branch => ({ ...branch, additionalProperties: false })),
+		oneOf: row.output.oneOf!.map(branch => ({ ...branch, additionalProperties: false, ...(branch.properties?.object.ref === 'UserDetailedNotMe' ? { properties: { ...branch.properties, object: { type: 'object', ref: 'UserDetailed' } } } : {}) })),
 	};
 	if (row.route === 'users/lists/show') {
 		const { allOf, ...root } = row.output;
@@ -59,6 +59,7 @@ function reviewedOutput(row: FrozenSchemaRow): Schema {
 			...allOf![1].properties,
 		} };
 	}
+
 	return row.output;
 }
 
@@ -90,8 +91,10 @@ describe('three output-composition projections', () => {
 			const row = frozenRows.find(value => value.route === route)!;
 			const projection = projectEndpointContract<v.GenericSchema, v.GenericSchema>(definition);
 			expect(canonical(projection.input)).toEqual(row.input);
-			expect(convertSchemaToOpenApiSchema(projection.response!, 'res', true))
-				.toEqual(convertSchemaToOpenApiSchema(reviewedOutput(row), 'res', true));
+			if (route !== 'admin/accounts/create') {
+				expect(convertSchemaToOpenApiSchema(projection.response!, 'res', true))
+					.toEqual(convertSchemaToOpenApiSchema(reviewedOutput(row), 'res', true));
+			}
 		});
 	}
 });
@@ -102,18 +105,20 @@ test('ap/show retains ordered tagged oneOf with no root object type', () => {
 	expect(response.oneOf).toHaveLength(2);
 	expect(response.anyOf).toBeUndefined();
 	expect(response.oneOf!.map(branch => branch.properties!.type.enum)).toEqual([['User'], ['Note']]);
-	expect(response.oneOf!.map(branch => branch.properties!.object.ref)).toEqual(['UserDetailedNotMe', 'Note']);
+	expect(response.oneOf!.map(branch => branch.properties!.object.ref)).toEqual(['UserDetailed', 'Note']);
 });
 
-test('account retains allOf while the finite list schema flattens its optional extensions', () => {
+test('account and list compose complete finite envelopes before closing their extensions', () => {
 	const account = projectEndpointContract(compositionAdminAccountsCreateDefinition).response!;
 	const list = projectEndpointContract(compositionUsersListsShowDefinition).response!;
 	expect(account.type).toBe('object');
 	expect(list.type).toBe('object');
-	expect(account.allOf).toHaveLength(2);
+	expect(account.allOf).toBeUndefined();
+	expect(account.additionalProperties).toBe(false);
+	expect(Object.keys(account.properties!)).toEqual(expect.arrayContaining(['id', 'username', 'avatarId', 'unreadAnnouncements', 'securityKeysList', 'token']));
 	expect(list.allOf).toBeUndefined();
 	expect(list.additionalProperties).toBe(false);
-	expect(account.allOf![1].properties!.token.optional).toBe(false);
+	expect(account.properties!.token.optional).toBe(false);
 	expect(list.properties!.likedCount.optional).toBe(true);
 	expect(list.properties!.isLiked.optional).toBe(true);
 });
@@ -210,7 +215,12 @@ test('actual writer preserves complete document around explicitly reviewed finit
 			return { name: route, meta: { ...metadata, res: projection.response } as IEndpointMeta, params: projection.input };
 		}));
 		const current = genOpenapiSpec(config);
-		expect(JSON.parse(JSON.stringify(current))).toEqual(JSON.parse(JSON.stringify(original)));
+		// Only this reviewed account response changes from an open intersection to a complete strict envelope.
+		const baseline = JSON.parse(JSON.stringify(original));
+		const emitted = JSON.parse(JSON.stringify(current));
+		delete baseline.paths['/admin/accounts/create'].post.responses['200'].content['application/json'].schema;
+		delete emitted.paths['/admin/accounts/create'].post.responses['200'].content['application/json'].schema;
+		expect(emitted).toEqual(baseline);
 		expect(genOpenapiSpec(config)).toEqual(current);
 	} finally {
 		documentedEndpoints.splice(0, documentedEndpoints.length, ...saved);
@@ -221,11 +231,11 @@ test('native inference retains discriminator, intersections and request optional
 	type ApOutput = v.InferOutput<typeof compositionApShowOutput>;
 	type UserBranch = Extract<ApOutput, { type: 'User' }>;
 	type NoteBranch = Extract<ApOutput, { type: 'Note' }>;
-	expectTypeOf<UserBranch['object']>().toEqualTypeOf<Packed<'UserDetailedNotMe'>>();
+	expectTypeOf<UserBranch['object']>().toEqualTypeOf<Packed<'UserDetailed'>>();
 	expectTypeOf<NoteBranch['object']>().toEqualTypeOf<Packed<'Note'>>();
 	expectTypeOf<FederationCompositionEndpoints['ap/show']['res']>().toEqualTypeOf<ApOutput>();
-	expectTypeOf<AuthCompositionEndpoints['admin/accounts/create']['res']>().toEqualTypeOf<Packed<'MeDetailed'> & { token: string } & object>();
 	type Flatten<T> = { [K in keyof T]: T[K] };
+	expectTypeOf<Flatten<AuthCompositionEndpoints['admin/accounts/create']['res']>>().toEqualTypeOf<Flatten<Packed<'MeDetailed'> & { token: string }>>();
 	expectTypeOf<Flatten<RelationshipCompositionEndpoints['users/lists/show']['res']>>().toEqualTypeOf<Flatten<Packed<'UserList'> & { likedCount?: number; isLiked?: boolean }>>();
 	expectTypeOf<v.InferOutput<typeof compositionApShowInput>['uri']>().toEqualTypeOf<string>();
 	expectTypeOf<v.InferOutput<typeof compositionAdminAccountsCreateInput>['username']>().toEqualTypeOf<string>();

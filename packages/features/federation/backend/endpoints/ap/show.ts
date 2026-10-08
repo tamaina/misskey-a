@@ -3,14 +3,16 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
+import { NativeContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
 import { compositionApShowDefinition, compositionApShowInput, compositionApShowOutput } from '../../../contract/output-composition-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
 import ms from 'ms';
 import type { MiNote } from '@features/notes/backend/models/Note.js';
 import type { MiLocalUser, MiUser } from '@features/users/backend/models/User.js';
 import { isActor, isPost, getApId } from '../../protocol/type.js';
-import type { InferOutput } from 'valibot';
+import * as v from 'valibot';
+import { nativeUserDetailedSchema } from '@features/users/backend/serializers/native-user.js';
+import { packedNoteSchema } from '@features/notes/contract/packed.js';
 import { ApResolverService } from '../../services/ApResolverService.js';
 import { ApDbResolverService } from '../../services/ApDbResolverService.js';
 import { ApPersonService } from '../../services/ApPersonService.js';
@@ -22,6 +24,11 @@ import { bindThis } from '@features/runtime/backend/decorators.js';
 import { IdentifiableError } from '@features/runtime/backend/errors/identifiable-error.js';
 import { FetchAllowSoftFailMask } from '../../protocol/misc/check-against-url.js';
 import { ApiError } from '@features/api/backend/transport/error.js';
+
+export const nativeApShowSchema = v.variant('type', [
+	v.strictObject({ type: v.literal('User'), object: nativeUserDetailedSchema }),
+	v.strictObject({ type: v.literal('Note'), object: packedNoteSchema }),
+]);
 
 const contractProjection = projectEndpointContract(compositionApShowDefinition);
 
@@ -70,7 +77,7 @@ export const meta = {
 export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof compositionApShowInput, typeof compositionApShowOutput> {
+export class EndpointImplementation extends NativeContractEndpoint<typeof meta, typeof compositionApShowInput, typeof compositionApShowOutput, typeof nativeApShowSchema> {
 	constructor(
 		private utilityService: UtilityService,
 		private userEntityService: UserEntityService,
@@ -80,7 +87,7 @@ export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof
 		private apPersonService: ApPersonService,
 		private apNoteService: ApNoteService,
 	) {
-		super(meta, contractProjection, async (ps, me) => {
+		super(meta, contractProjection, nativeApShowSchema, async (ps, me) => {
 			const object = await this.fetchAny(ps.uri, me);
 			if (object) {
 				return object;
@@ -94,7 +101,7 @@ export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof
 	 * URIからUserかNoteを解決する
 	 */
 	@bindThis
-	private async fetchAny(uri: string, me: MiLocalUser | null | undefined): Promise<InferOutput<typeof compositionApShowOutput> | null> {
+	private async fetchAny(uri: string, me: MiLocalUser | null | undefined): Promise<v.InferOutput<typeof nativeApShowSchema> | null> {
 		if (!this.utilityService.isFederationAllowedUri(uri)) {
 			throw new ApiError(meta.errors.federationNotAllowed);
 		}
@@ -164,7 +171,7 @@ export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof
 	}
 
 	@bindThis
-	private async mergePack(me: MiLocalUser | null | undefined, user: MiUser | null | undefined, note: MiNote | null | undefined): Promise<InferOutput<typeof compositionApShowOutput> | null> {
+	private async mergePack(me: MiLocalUser | null | undefined, user: MiUser | null | undefined, note: MiNote | null | undefined): Promise<v.InferOutput<typeof nativeApShowSchema> | null> {
 		if (user != null) {
 			return {
 				type: 'User',

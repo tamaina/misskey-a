@@ -3,8 +3,9 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
+import { NativeContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
 import { packedIDefinition, packedIInput, packedIOutput } from '../../contract/packed-endpoint-definitions.js';
+import { nativeMeDetailedSchema } from '@features/users/backend/serializers/native-user.js';
 import { Inject, Injectable } from '@nestjs/common';
 import type { UserProfilesRepository } from '@features/persistence/backend/repositories/models.js';
 
@@ -35,14 +36,14 @@ export const meta = {
 export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedIInput, typeof packedIOutput> {
+export class EndpointImplementation extends NativeContractEndpoint<typeof meta, typeof packedIInput, typeof packedIOutput, typeof nativeMeDetailedSchema> {
 	constructor(
 		@Inject(DI.userProfilesRepository)
 		private userProfilesRepository: UserProfilesRepository,
 
 		private userEntityService: UserEntityService,
 	) {
-		super(meta, contractProjection, async (ps, user, token) => {
+		super(meta, contractProjection, nativeMeDetailedSchema, async (ps, user, token) => {
 			const isSecure = token == null;
 
 			const now = new Date();
@@ -67,8 +68,7 @@ export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof
 				userProfile.loggedInDates = [...userProfile.loggedInDates, today];
 			}
 
-			return await this.userEntityService.pack(userProfile.user!, userProfile.user!, {
-				schema: 'MeDetailed',
+			return await this.userEntityService.packSelf(userProfile.user!, {
 				includeSecrets: isSecure,
 				userProfile,
 			});

@@ -15,7 +15,7 @@ export const compositionApShowInput = jsonObject({
 export const compositionApShowOutput = v.variant('type', [
 	v.strictObject({
 		type: v.picklist(['User']),
-		object: packedReference('UserDetailedNotMe'),
+		object: packedReference('UserDetailed'),
 	}),
 	v.strictObject({
 		type: v.picklist(['Note']),

@@ -91,15 +91,15 @@ test('two registered JSON-object inputs retain exact registration and opaque sto
 	}
 });
 
-test('two strict assignment envelopes reject extra, missing and wrong outer fields; nested reference remains open', () => {
-	const member = { id: 'assign123', user: { ...user, future: true } };
+test('strict assignment envelopes and their detailed User references reject extra, missing and wrong fields', () => {
+	const member = { id: 'assign123', user };
 	const admin = { ...member, createdAt: date.toISOString(), expiresAt: null };
 	expect(v.parse(p.packedRolesUsersOutput, [member])).toEqual([member]);
 	expect(v.parse(r.referenceAdminRolesUsersOutput, [admin])).toEqual([admin]);
 	expect(v.parse(r.referenceAdminRolesUsersOutput, [{ ...admin, expiresAt: date.toISOString() }])).toEqual([{ ...admin, expiresAt: date.toISOString() }]);
 	for (const output of [p.packedRolesUsersOutput, r.referenceAdminRolesUsersOutput]) {
 		const item = output === p.packedRolesUsersOutput ? member : admin;
-		for (const invalid of [{ ...item, future: true }, { ...item, id: 7 }, { id: item.id }, { ...item, user: null }]) expect(v.safeParse(output, [invalid]).success).toBe(false);
+		for (const invalid of [{ ...item, future: true }, { ...item, id: 7 }, { id: item.id }, { ...item, user: null }, { ...item, user: { ...user, future: true } }]) expect(v.safeParse(output, [invalid]).success).toBe(false);
 	}
 	for (const invalid of [member, { ...admin, createdAt: null }, { ...admin, expiresAt: 42 }]) expect(v.safeParse(r.referenceAdminRolesUsersOutput, [invalid]).success).toBe(false);
 	expect(projectEndpointContract(r.referenceAdminRolesUsersDefinition).response).toMatchObject({ items: { additionalProperties: false, properties: { user: { ref: 'UserDetailed' } } } });

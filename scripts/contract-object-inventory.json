@@ -92,7 +92,6 @@
   "packages/features/api/test/backend/unique-string-array.test.ts|looseObject|schema|2b6564cd38fb6ca7cbccfbd039e83ab314c56314b82c7c554163f12b6b69f60f": 1,
   "packages/features/api/test/procedure.test.mjs|looseObject|contract|09ab916338c123fe3691beb5b63d001b17f691e5848f19fcf88794c504608c21": 1,
   "packages/features/auth/contract/endpoint-definitions.ts|resultObject|inlineI2faRegisterKeyOutput|53de2ee826425139dd4547b9ebbb3c615430a60419e2d28cbdc14b57e4149ccb": 1,
-  "packages/features/auth/contract/output-composition-endpoint-definitions.ts|resultObject|compositionAdminAccountsCreateOutput|7fc5a09be7c7dfc4b2a41b21739b9fd2dd0e32369aed40da17fb29c279c2363c": 1,
   "packages/features/auth/contract/packed.ts|resultObject|packedSigninSchema|53de2ee826425139dd4547b9ebbb3c615430a60419e2d28cbdc14b57e4149ccb": 1,
   "packages/features/federation/contract/endpoint-definitions.ts|resultObject|inlineApGetOutput|53de2ee826425139dd4547b9ebbb3c615430a60419e2d28cbdc14b57e4149ccb": 1,
   "packages/features/games/contract/packed.ts|resultObject|packedReversiGameDetailedSchema|53de2ee826425139dd4547b9ebbb3c615430a60419e2d28cbdc14b57e4149ccb": 2,
@@ -139,16 +138,7 @@
   "packages/features/roles/contract/packed.ts|resultObject|packedRolePoliciesSchema|7de842bd6045247033341ebb805f90fefe9af26ff536aece8a73272085a8574b": 1,
   "packages/features/roles/contract/packed.ts|resultObject|roleLogicBaseSchema|8086410c65c02f552df12b76bd24498406585b433a1227eef95f687deb8721a2": 1,
   "packages/features/roles/contract/packed.ts|resultObject|roleNotBaseSchema|32d95f9df11c2330cc6c52f38e07913eb5266add0ab670d8188e8937e372f38a": 1,
-  "packages/features/users/contract/endpoint-definitions.ts|resultObject|inlineIMoveOutput|53de2ee826425139dd4547b9ebbb3c615430a60419e2d28cbdc14b57e4149ccb": 1,
-  "packages/features/users/contract/packed.ts|resultObject|packedMeDetailedOnlySchema|3d31ca60ce00a52b6b4878a2be1e350682b0dee7c8d605a675b492e6ddf5399f": 1,
   "packages/features/users/contract/packed.ts|resultObject|packedMeDetailedOnlySchema|c0fe124a46d60706ba8621c1c425d390f17d27bc8e420fa761688a392225b60e": 20,
   "packages/features/users/contract/packed.ts|resultObject|packedMeDetailedOnlySchema|ddcd686674cbf21b9082ab2e1be57641df67de417e27eeeebfd3b5c159240f35": 20,
-  "packages/features/users/contract/packed.ts|resultObject|packedMeDetailedOnlySchema|e44e83c3a1a8c53f12fb242dc9bf9028790f6dc7acd5e6b097c1b9a75eeea3ce": 1,
-  "packages/features/users/contract/packed.ts|resultObject|packedMeDetailedOnlySchema|f217b1ff0186511c39161a56f6bc30917dba0aab392e7e6d565d6643c85e7007": 1,
-  "packages/features/users/contract/packed.ts|resultObject|packedUserDetailedNotMeOnlySchema|054700029ce081f7ee6a3feb3411fdee92a3d75e3263e054ea8d0fc65578d75e": 1,
-  "packages/features/users/contract/packed.ts|resultObject|packedUserDetailedNotMeOnlySchema|d189e6a7ed57b14b47918d17f658e1a1a2427982ad6d85481a7900aa592c9d26": 1,
-  "packages/features/users/contract/packed.ts|resultObject|packedUserLiteSchema|0aa0965e4942f612155b6143e248ccf7b1e93fb4905fd6bbd8644fadbc239ed7": 1,
-  "packages/features/users/contract/packed.ts|resultObject|packedUserLiteSchema|4fc6dcbe130c710fc85f65c974264f285a6dd5bc3b4a350ca8cbd02bf02a8b1f": 1,
-  "packages/features/users/contract/packed.ts|resultObject|packedUserLiteSchema|6d91fd87f5ad90ec78c10b0e3a7bc76ead96bf8b61273a355a5e5a85d33ee151": 1,
-  "packages/features/users/contract/packed.ts|resultObject|packedUserLiteSchema|72b5d4762fda5939bef5699c998ddac27be7fe2777a689164300ce4c3f9e536a": 1
+  "packages/features/users/contract/packed.ts|resultObject|packedMeDetailedOnlySchema|e44e83c3a1a8c53f12fb242dc9bf9028790f6dc7acd5e6b097c1b9a75eeea3ce": 1
 }

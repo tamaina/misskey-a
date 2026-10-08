@@ -11,7 +11,7 @@ import { getPackedReference, packedReference } from '@features/api/contract/pack
 import { toLegacyJsonSchema } from '@features/api/backend/index.js';
 import type { Packed } from '@features/index/contract/packed.js';
 import { resultObject } from '@features/api/contract/result-object.js';
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
+import { ContractEndpoint, NativeContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
 import { convertSchemaToOpenApiSchema } from '@features/api/backend/transport/openapi/schemas.js';
 
 const definition = defineEndpointContract({ method: 'POST', path: '/test' }, v.looseObject({
@@ -225,4 +225,25 @@ test('packed response handlers return the original payload object without parsin
 	const returned = await endpoint.exec({}, null, null);
 	expect(returned).toBe(value);
 	expect(returned).toHaveProperty('retainedExtension', true);
+});
+
+test('native DTO bridge retains AJV inputs and Date identity without response parsing or wire alias leakage', async () => {
+	const wire = v.strictObject({ lastUsed: v.string() });
+	const nativeSchema = v.strictObject({ ...wire.entries, lastUsed: v.date() });
+	const definition = defineEndpointContract({ path: '/native-dto' }, v.object({ limit: v.optional(v.number(), 10) }), wire);
+	const projected = projectEndpointContract(definition);
+	const response = { lastUsed: new Date('2026-01-01T00:00:00Z'), producerExtension: true };
+	const params = { extension: 'retained' };
+	const endpoint = new NativeContractEndpoint({}, projected, nativeSchema, async input => {
+		expect(input).toBe(params);
+		expect(input.limit).toBe(10);
+		return response;
+	});
+	expect(endpoint.nativeOutputSchema).toBe(nativeSchema);
+	const result = await endpoint.exec(params, null, null);
+	expectTypeOf(result.lastUsed).toEqualTypeOf<Date>();
+	expect(result).toBe(response);
+	expect(v.safeParse(nativeSchema, response).success).toBe(false);
+	expect(projected.response).toMatchObject({ type: 'object', properties: { lastUsed: { type: 'string' } } });
+	await expect(endpoint.exec({ limit: 'invalid' }, null, null)).rejects.toMatchObject({ code: 'INVALID_PARAM', id: '3d81ceae-475f-4600-b2a8-2bc116157532' });
 });

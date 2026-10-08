@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
+import { NativeContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
 import { compositionAdminAccountsCreateDefinition, compositionAdminAccountsCreateInput, compositionAdminAccountsCreateOutput } from '../../../../contract/output-composition-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
 import type { MiMeta, UsersRepository } from '@features/persistence/backend/repositories/models.js';
@@ -13,7 +13,10 @@ import { UserEntityService } from '@features/users/backend/serializers/UserEntit
 import { DI } from '@/di-symbols.js';
 import type { Config } from '@/config.js';
 import { ApiError } from '@features/api/backend/transport/error.js';
-import { Packed } from '@features/index/contract/packed.js';
+import * as v from 'valibot';
+import { nativeMeDetailedSchema } from '@features/users/backend/serializers/native-user.js';
+
+const nativeOutputSchema = v.strictObject({ ...nativeMeDetailedSchema.entries, token: v.string() });
 
 const contractProjection = projectEndpointContract(compositionAdminAccountsCreateDefinition);
 
@@ -40,7 +43,7 @@ export const meta = {
 export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof compositionAdminAccountsCreateInput, typeof compositionAdminAccountsCreateOutput> {
+export class EndpointImplementation extends NativeContractEndpoint<typeof meta, typeof compositionAdminAccountsCreateInput, typeof compositionAdminAccountsCreateOutput, typeof nativeOutputSchema> {
 	constructor(
 		@Inject(DI.config)
 		private config: Config,
@@ -55,7 +58,7 @@ export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof
 		private signupService: SignupService,
 		private roleService: RoleService,
 	) {
-		super(meta, contractProjection, async (ps, _me, token) => {
+		super(meta, contractProjection, nativeOutputSchema, async (ps, _me, token) => {
 			const me = _me ? await this.usersRepository.findOneByOrFail({ id: _me.id }) : null;
 
 			if (this.serverSettings.rootUserId == null && me == null && token == null) {
@@ -81,14 +84,11 @@ export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof
 				ignorePreservedUsernames: true,
 			});
 
-			const res = await this.userEntityService.pack(account, account, {
-				schema: 'MeDetailed',
+			const res = await this.userEntityService.packSelf(account, {
 				includeSecrets: true,
-			}) as Packed<'MeDetailed'> & { token: string };
+			});
 
-			res.token = secret;
-
-			return res;
+			return { ...res, token: secret };
 		});
 	}
 }

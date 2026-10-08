@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
+import { NativeContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
 import { packedAdminShowUsersDefinition, packedAdminShowUsersInput, packedAdminShowUsersOutput } from '../../../contract/packed-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
 import type { UsersRepository } from '@features/persistence/backend/repositories/models.js';
@@ -12,6 +12,11 @@ import { DI } from '@/di-symbols.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import { sqlLikeEscape } from '@features/persistence/backend/utility/sql-like-escape.js';
 import { RoleService } from '@features/roles/backend/services/RoleService.js';
+
+import * as v from 'valibot';
+import { nativeUserDetailedSchema } from '@features/users/backend/serializers/native-user.js';
+
+export const nativeOutputSchema = v.array(nativeUserDetailedSchema);
 
 const contractProjection = projectEndpointContract(packedAdminShowUsersDefinition);
 
@@ -28,7 +33,7 @@ export const meta = {
 export const paramDef = contractProjection.input;
 
 @Injectable()
-export default class extends ContractEndpoint<typeof meta, typeof packedAdminShowUsersInput, typeof packedAdminShowUsersOutput> { // eslint-disable-line import/no-default-export
+export default class extends NativeContractEndpoint<typeof meta, typeof packedAdminShowUsersInput, typeof packedAdminShowUsersOutput, typeof nativeOutputSchema> { // eslint-disable-line import/no-default-export
 	constructor(
 		@Inject(DI.usersRepository)
 		private usersRepository: UsersRepository,
@@ -36,7 +41,7 @@ export default class extends ContractEndpoint<typeof meta, typeof packedAdminSho
 		private userEntityService: UserEntityService,
 		private roleService: RoleService,
 	) {
-		super(meta, contractProjection, async (ps, me) => {
+		super(meta, contractProjection, nativeOutputSchema, async (ps, me) => {
 			const query = this.usersRepository.createQueryBuilder('user');
 
 			switch (ps.state) {

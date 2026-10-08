@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
+import { NativeContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
 import { packedFollowingListDefinition, packedFollowingListInput, packedFollowingListOutput } from '../../../contract/packed-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
 import { FollowingEntityService } from '../../serializers/FollowingEntityService.js';
@@ -11,6 +11,11 @@ import type { FollowingsRepository } from '@features/persistence/backend/reposit
 
 import { QueryService } from '@features/notes/backend/services/QueryService.js';
 import { DI } from '@/di-symbols.js';
+
+import * as v from 'valibot';
+import { nativeFollowingSchema } from '@features/relationships/backend/serializers/FollowingEntityService.js';
+
+export const nativeOutputSchema = v.array(nativeFollowingSchema);
 
 const contractProjection = projectEndpointContract(packedFollowingListDefinition);
 
@@ -27,7 +32,7 @@ export const meta = {
 export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedFollowingListInput, typeof packedFollowingListOutput> {
+export class EndpointImplementation extends NativeContractEndpoint<typeof meta, typeof packedFollowingListInput, typeof packedFollowingListOutput, typeof nativeOutputSchema> {
 	constructor(
 		@Inject(DI.followingsRepository)
 		private followingsRepository: FollowingsRepository,
@@ -35,7 +40,7 @@ export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof
 		private followingEntityService: FollowingEntityService,
 		private queryService: QueryService,
 	) {
-		super(meta, contractProjection, async (ps, me) => {
+		super(meta, contractProjection, nativeOutputSchema, async (ps, me) => {
 			const query = this.queryService.makePaginationQuery(this.followingsRepository.createQueryBuilder('following'), ps.sinceId, ps.untilId, ps.sinceDate, ps.untilDate)
 				.andWhere('following.followerId = :userId', { userId: me.id });
 

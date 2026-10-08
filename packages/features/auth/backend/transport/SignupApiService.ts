@@ -246,8 +246,7 @@ export class SignupApiService {
 					});
 				}
 
-				const res = await this.userEntityService.pack(account, account, {
-					schema: 'MeDetailed',
+				const res = await this.userEntityService.packSelf(account, {
 					includeSecrets: true,
 				});
 

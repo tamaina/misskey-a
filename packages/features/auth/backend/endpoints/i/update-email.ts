@@ -3,8 +3,9 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
+import { NativeContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
 import { packedIUpdateEmailDefinition, packedIUpdateEmailInput, packedIUpdateEmailOutput } from '../../../contract/packed-endpoint-definitions.js';
+import { nativeMeDetailedSchema } from '@features/users/backend/serializers/native-user.js';
 import { Inject, Injectable } from '@nestjs/common';
 import ms from 'ms';
 import bcrypt from 'bcryptjs';
@@ -57,7 +58,7 @@ export const meta = {
 export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedIUpdateEmailInput, typeof packedIUpdateEmailOutput> {
+export class EndpointImplementation extends NativeContractEndpoint<typeof meta, typeof packedIUpdateEmailInput, typeof packedIUpdateEmailOutput, typeof nativeMeDetailedSchema> {
 	constructor(
 		@Inject(DI.config)
 		private config: Config,
@@ -73,7 +74,7 @@ export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof
 		private userAuthService: UserAuthService,
 		private globalEventService: GlobalEventService,
 	) {
-		super(meta, contractProjection, async (ps, me) => {
+		super(meta, contractProjection, nativeMeDetailedSchema, async (ps, me) => {
 			const token = ps.token;
 			const profile = await this.userProfilesRepository.findOneByOrFail({ userId: me.id });
 
@@ -109,8 +110,7 @@ export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof
 				emailVerifyCode: null,
 			});
 
-			const iObj = await this.userEntityService.pack(me.id, me, {
-				schema: 'MeDetailed',
+			const iObj = await this.userEntityService.packSelf(me.id, {
 				includeSecrets: true,
 			});
 

@@ -7,7 +7,9 @@ import { In, IsNull } from 'typeorm';
 import { Inject, Injectable } from '@nestjs/common';
 import type { MiMeta, UsersRepository } from '@features/persistence/backend/repositories/models.js';
 import type { MiUser } from '../../models/User.js';
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
+import { NativeContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
+import * as v from 'valibot';
+import { nativeUserDetailedSchema } from '../../serializers/native-user.js';
 import { usersShowDefinition } from '../../../contract/show-endpoint-definition.js';
 import { UserEntityService } from '../../serializers/UserEntityService.js';
 import { RemoteUserResolveService } from '@features/federation/backend/services/RemoteUserResolveService.js';
@@ -17,6 +19,8 @@ import { RoleService } from '@features/roles/backend/services/RoleService.js';
 import { ApiError } from '@features/api/backend/transport/error.js';
 import { ApiLoggerService } from '@features/api/backend/transport/ApiLoggerService.js';
 import type { FindOptionsWhere } from 'typeorm';
+
+export const nativeOutputSchema = v.union([nativeUserDetailedSchema, v.array(nativeUserDetailedSchema)]);
 
 const projection = projectEndpointContract(usersShowDefinition);
 
@@ -49,7 +53,7 @@ export const meta = {
 export const paramDef = projection.input;
 
 @Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof usersShowDefinition.input, typeof usersShowDefinition.output, 'legacy-declared'> {
+export class EndpointImplementation extends NativeContractEndpoint<typeof meta, typeof usersShowDefinition.input, typeof usersShowDefinition.output, typeof nativeOutputSchema, 'legacy-declared'> {
 	constructor(
 		@Inject(DI.meta)
 		private serverSettings: MiMeta,
@@ -63,7 +67,7 @@ export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof
 		private perUserPvChart: PerUserPvChart,
 		private apiLoggerService: ApiLoggerService,
 	) {
-		super(meta, projection, async (ps, me, _1, _2, _3, ip) => {
+		super(meta, projection, nativeOutputSchema, async (ps, me, _1, _2, _3, ip) => {
 			// ログイン時にusers/showできなくなってしまう
 			//if (this.serverSettings.ugcVisibilityForVisitor === 'none' && me == null) {
 			//	throw new ApiError(meta.errors.noSuchUser);

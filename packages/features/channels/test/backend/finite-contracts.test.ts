@@ -114,13 +114,13 @@ test('HTTP retains extra input/output keys and AJV errors while native strict ou
 	expect(timelineParams).toEqual({ channelId: 'channel123', future: true, limit: 10, allowPartial: false });
 });
 
-test('detailed Channel lazy pinnedNotes validates finite Notes and preserves User extensions and dynamic reactions', async () => {
+test('detailed Channel validates finite Notes/UserLite and dynamic reactions without parsing producer values', async () => {
 	const { serializer, notes } = fixture();
 	const baseUser: Packed<'Note'>['user'] = { id: 'user123', name: null, username: 'alice', host: null, avatarUrl: 'https://example.test/avatar.png', avatarBlurhash: null, avatarDecorations: [], emojis: {}, onlineStatus: 'unknown' };
 	const extendedUser = { ...baseUser, producerExtension: true };
 	const baseNote: Packed<'Note'> = {
 		id: 'note123', createdAt: date.toISOString(), text: 'Pinned', userId: 'user123',
-		user: extendedUser,
+		user: baseUser,
 		visibility: 'public', reactionAcceptance: null, reactionEmojis: { 'remote@host': 'https://host/emoji.png' }, reactions: { '🔥': 1 }, reactionCount: 1, renoteCount: 0, repliesCount: 0,
 	};
 	const note = { ...baseNote, producerExtension: true };
@@ -129,6 +129,10 @@ test('detailed Channel lazy pinnedNotes validates finite Notes and preserves Use
 	expect(v.parse(packedChannelSchema, result)).toEqual(result);
 	expect(result.pinnedNotes).toEqual([baseNote]);
 	expect(v.safeParse(packedChannelSchema, { ...result, pinnedNotes: [note] }).success).toBe(false);
+	const extendedUserNote = { ...baseNote, user: extendedUser };
+	expect(v.safeParse(packedChannelSchema, { ...result, pinnedNotes: [extendedUserNote] }).success).toBe(false);
+	notes.packMany.mockResolvedValue([extendedUserNote]);
+	expect((await serializer.pack(channel, null, true)).pinnedNotes?.[0].user).toBe(extendedUser);
 	notes.packMany.mockResolvedValue([note]);
 	expect((await serializer.pack(channel, null, true)).pinnedNotes).toEqual([note]);
 	expect(v.safeParse(packedChannelSchema, { ...result, pinnedNotes: [{ ...baseNote, reactions: { x: 'bad' } }] }).success).toBe(false);

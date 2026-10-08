@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
+import { NativeContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
 import { packedUsersRecommendationDefinition, packedUsersRecommendationInput, packedUsersRecommendationOutput } from '../../../contract/packed-endpoint-definitions.js';
 import ms from 'ms';
 import { Inject, Injectable } from '@nestjs/common';
@@ -12,6 +12,11 @@ import type { UsersRepository, FollowingsRepository } from '@features/persistenc
 import { QueryService } from '@features/notes/backend/services/QueryService.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import { DI } from '@/di-symbols.js';
+
+import * as v from 'valibot';
+import { nativeUserDetailedSchema } from '@features/users/backend/serializers/native-user.js';
+
+export const nativeOutputSchema = v.array(nativeUserDetailedSchema);
 
 const contractProjection = projectEndpointContract(packedUsersRecommendationDefinition);
 
@@ -30,7 +35,7 @@ export const meta = {
 export const paramDef = contractProjection.input;
 
 @Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedUsersRecommendationInput, typeof packedUsersRecommendationOutput> {
+export class EndpointImplementation extends NativeContractEndpoint<typeof meta, typeof packedUsersRecommendationInput, typeof packedUsersRecommendationOutput, typeof nativeOutputSchema> {
 	constructor(
 		@Inject(DI.usersRepository)
 		private usersRepository: UsersRepository,
@@ -41,7 +46,7 @@ export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof
 		private userEntityService: UserEntityService,
 		private queryService: QueryService,
 	) {
-		super(meta, contractProjection, async (ps, me) => {
+		super(meta, contractProjection, nativeOutputSchema, async (ps, me) => {
 			const query = this.usersRepository.createQueryBuilder('user')
 				.where('user.isLocked = FALSE')
 				.andWhere('user.isExplorable = TRUE')
