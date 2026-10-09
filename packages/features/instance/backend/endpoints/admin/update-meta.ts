@@ -2,12 +2,12 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-import type { ApiActor, ApiContext } from '../../../../api/backend/transport/context.js';
+import type { ApiActor, ApiContext } from '@features/api/backend/transport/context.js';
 import type { MiMeta } from '../../models/Meta.js';
 import { implement } from '@orpc/server';
-import { authentication, apiPolicy, requirePrincipal } from '../../../../api/backend/transport/middleware.js';
+import { authentication, apiPolicy, requirePrincipal } from '@features/api/backend/transport/middleware.js';
 import { updateMetaContract } from './update-meta.contract.js';
-import type { InstanceApiDependencies } from '../../api.dependencies.js';
+import type { InstanceApiDependencies } from '../../api.implementation.js';
 export type UpdateMetaDependencies = Pick<InstanceApiDependencies, 'serverSettings' | 'metaService' | 'moderationLogService'>;
 export function createUpdateMetaProcedure<Actor extends ApiActor>(deps: UpdateMetaDependencies) {
 	return implement(updateMetaContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>()

@@ -15,7 +15,7 @@ import { createAdminQueuePauseProcedure } from '@features/operations/backend/end
 import { createAdminQueueClearProcedure } from '@features/operations/backend/endpoints/admin/queue/clear.js';
 import { createIExportFollowingProcedure } from '@features/portability/backend/endpoints/i/export-following.js';
 import { createIExportNotesProcedure } from '@features/portability/backend/endpoints/i/export-notes.js';
-import type { PortabilityDependencies } from '@features/portability/backend/api.dependencies.js';
+import type { PortabilityDependencies } from '@features/portability/backend/api.implementation.js';
 const actor = mockDeep<MiLocalUser>({ id: 'trusted-user', isSuspended: false, movedToUri: null });
 
 function services(principal: MiLocalUser | null = actor) {

@@ -3,11 +3,11 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 import { implement } from '@orpc/server';
-import { authentication, apiPolicy } from '../../../../../api/backend/transport/middleware.js';
-import type { ApiActor, ApiContext } from '../../../../../api/backend/transport/context.js';
-import { collectionsContract } from '../../../api.contract.js';
-import type { CollectionsDependencies } from '../../../api.dependencies.js';
-import { apiError } from '../../../../../api/backend/transport/orpc-error.js';
+import { authentication, apiPolicy } from '@features/api/backend/transport/middleware.js';
+import type { ApiActor, ApiContext } from '@features/api/backend/transport/context.js';
+import { collectionsContract } from '../../../api.definition.js';
+import type { CollectionsDependencies } from '../../../api.implementation.js';
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
 import { collectionsErrors } from '../../../api.errors.js';
 export interface GalleryPostsShowDependencies<Actor extends ApiActor> {
 	galleryPostsRepository: Pick<CollectionsDependencies<Actor>['galleryPostsRepository'], 'findOneBy'>;

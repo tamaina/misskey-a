@@ -5,7 +5,7 @@
 import { expect, test } from 'vitest';
 import { mockDeep } from 'vitest-mock-extended';
 import type { ModuleRef } from '@nestjs/core';
-import { TimelinesApiProvider } from '../../backend/api.provider.js';
+import { TimelinesApiProvider } from '../../backend/api.implementation.js';
 test('feature composition resolves initialized singletons once and caches its router', () => {
 	const moduleRef = mockDeep<ModuleRef>();
 	moduleRef.get.mockReturnValue(mockDeep());

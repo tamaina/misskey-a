@@ -3,12 +3,12 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 import { implement } from '@orpc/server';
-import type { ApiActor, ApiContext } from '../../../../../api/backend/transport/context.js';
-import { authentication, apiPolicy, requirePrincipal } from '../../../../../api/backend/transport/middleware.js';
-import { emojisContract } from '../../../api.contract.js';
-import type { EmojisDependencies } from '../../../api.dependencies.js';
-import { apiError, internalError } from '../../../../../api/backend/transport/orpc-error.js';
-import type { MiDriveFile } from '../../../../../drive/backend/models/DriveFile.js';
+import type { ApiActor, ApiContext } from '@features/api/backend/transport/context.js';
+import { authentication, apiPolicy, requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import { emojisContract } from '../../../api.definition.js';
+import type { EmojisDependencies } from '../../../api.implementation.js';
+import { apiError, internalError } from '@features/api/backend/transport/orpc-error.js';
+import type { MiDriveFile } from '@features/drive/backend/models/DriveFile.js';
 export function createCopyProcedure<Actor extends ApiActor>(deps: Pick<EmojisDependencies<Actor>, 'emojisRepository' | 'driveService' | 'customEmojiService' | 'emojiEntityService'>) {
 	return implement(emojisContract.copy, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>().use(authentication<Actor>()).use(apiPolicy<Actor>({ name: 'admin/emoji/copy', requireCredential: true, requiredRolePolicy: 'canManageCustomEmojis', kind: 'write:admin:emoji' })).use(requirePrincipal<Actor>())
 		.handler(async ({ input, context }) => {

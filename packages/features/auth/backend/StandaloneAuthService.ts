@@ -5,7 +5,7 @@
 
 import { Injectable } from '@nestjs/common';
 import type { FastifyInstance } from 'fastify';
-import { AuthSessionApiProvider } from './session.provider.js';
+import { AuthSessionApiProvider } from './api.implementation.js';
 import { registerAuthSessionHttp } from './session.http.js';
 
 @Injectable()

@@ -4,6 +4,6 @@
  */
 
 export { playContract } from './endpoints/play.contract.js';
-export { createPlayRouter } from './router.js';
-export { PlayApiProvider } from './api.provider.js';
-export type { PlayDependencies } from './api.dependencies.js';
+export { createPlayRouter } from './api.implementation.js';
+export { PlayApiProvider } from './api.implementation.js';
+export type { PlayDependencies } from './api.implementation.js';

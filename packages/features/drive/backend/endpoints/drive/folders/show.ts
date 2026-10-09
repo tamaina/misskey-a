@@ -8,7 +8,7 @@ import { driveFoldersShowErrors } from './show.contract.js';
 import type { DriveFoldersRepository } from '@features/persistence/backend/repositories/models.js';
 import { DriveFolderEntityService } from '../../../serializers/DriveFolderEntityService.js';
 import { apiError } from '@features/api/backend/transport/orpc-error.js';
-import { driveManagementContract } from '../../../management.contract.js';
+import { driveManagementContract } from '../../../api.definition.js';
 import { implement } from '@orpc/server';
 import { authentication, apiPolicy, requirePrincipal } from '@features/api/backend/transport/middleware.js';
 import type { ApiContext } from '@features/api/backend/transport/context.js';

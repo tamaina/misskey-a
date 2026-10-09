@@ -3,13 +3,13 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 import { implement } from '@orpc/server';
-import { authentication, apiPolicy, decodeScalarInput } from '../../../../api/backend/transport/middleware.js';
-import type { ApiActor, ApiContext } from '../../../../api/backend/transport/context.js';
-import { collectionsContract } from '../../api.contract.js';
-import type { CollectionsDependencies } from '../../api.dependencies.js';
+import { authentication, apiPolicy, decodeScalarInput } from '@features/api/backend/transport/middleware.js';
+import type { ApiActor, ApiContext } from '@features/api/backend/transport/context.js';
+import { collectionsContract } from '../../api.definition.js';
+import type { CollectionsDependencies } from '../../api.implementation.js';
 import { Brackets } from 'typeorm';
-import { apiError } from '../../../../api/backend/transport/orpc-error.js';
-import { sqlLikeEscape } from '../../../../persistence/backend/utility/sql-like-escape.js';
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
+import { sqlLikeEscape } from '@features/persistence/backend/utility/sql-like-escape.js';
 import { collectionsErrors } from '../../api.errors.js';
 export interface ClipsNotesDependencies<Actor extends ApiActor> {
 	clipsRepository: Pick<CollectionsDependencies<Actor>['clipsRepository'], 'findOneBy'>;

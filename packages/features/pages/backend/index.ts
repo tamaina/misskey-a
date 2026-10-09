@@ -4,6 +4,6 @@
  */
 
 export { pagesContract } from './endpoints/pages.contract.js';
-export { createPagesRouter } from './router.js';
-export { PagesApiProvider } from './api.provider.js';
-export type { PagesDependencies } from './api.dependencies.js';
+export { createPagesRouter } from './api.implementation.js';
+export { PagesApiProvider } from './api.implementation.js';
+export type { PagesDependencies } from './api.implementation.js';

@@ -3,11 +3,11 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 import { implement } from '@orpc/server';
-import { authentication, apiPolicy } from '../../../../api/backend/transport/middleware.js';
-import type { ApiActor, ApiContext } from '../../../../api/backend/transport/context.js';
-import { announcementsContract } from '../../api.contract.js';
-import type { AnnouncementsDependencies } from '../../api.dependencies.js';
-import { apiError } from '../../../../api/backend/transport/orpc-error.js';
+import { authentication, apiPolicy } from '@features/api/backend/transport/middleware.js';
+import type { ApiActor, ApiContext } from '@features/api/backend/transport/context.js';
+import { announcementsContract } from '../../api.definition.js';
+import type { AnnouncementsDependencies } from '../../api.implementation.js';
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
 import { EntityNotFoundError } from 'typeorm';
 export interface AnnouncementShowDependencies<Actor extends ApiActor> {
 	announcementService: Pick<AnnouncementsDependencies<Actor>['announcementService'], 'getAnnouncement'>;

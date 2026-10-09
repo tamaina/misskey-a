@@ -16,9 +16,9 @@ import { L_CHARS, secureRndstr } from '../utility/secure-rndstr.js';
 import type { RegistrationTicketsRepository, UsedUsernamesRepository, UserPendingsRepository, UsersRepository, MiRegistrationTicket, MiMeta } from '@features/persistence/backend/repositories/models.js';
 import { implement } from '@orpc/server';
 import * as v from 'valibot';
-import { authSessionsContract } from '../session.contract.js';
+import { authSessionsContract } from '../api.definition.js';
 import { sessionErrors } from '../session.middleware.js';
-import { toPackedUserDetailed } from '../../../users/backend/user.schema.js';
+import { toPackedUserDetailed } from '@features/users/backend/user.schema.js';
 const invitationCodeMailTimeoutMs = 1000 * 60 * 30;
 export interface SignupDependencies {
 	config: Config;

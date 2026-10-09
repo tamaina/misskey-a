@@ -5,7 +5,7 @@
 
 import { expect, test } from 'vitest';
 import * as v from 'valibot';
-import { portabilityApiContract } from '../../backend/api.contract.js';
+import { portabilityApiContract } from '../../backend/api.definition.js';
 import { iExportFollowingContract } from '../../backend/endpoints/i/export-following.contract.js';
 import { iImportFollowingContract } from '../../backend/endpoints/i/import-following.contract.js';
 

@@ -4,5 +4,5 @@
  */
 export { createDiscoveryRouter } from './endpoints/discovery.js';
 export type { DiscoveryDependencies } from './endpoints/discovery.js';
-export { DiscoveryApiProvider } from './api.provider.js';
+export { DiscoveryApiProvider } from './api.implementation.js';
 export { discoveryContract } from './endpoints/discovery.contract.js';

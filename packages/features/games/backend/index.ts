@@ -4,6 +4,6 @@
  */
 
 export { gamesContract } from './endpoints/games.contract.js';
-export { createGamesRouter } from './router.js';
-export { GamesApiProvider } from './api.provider.js';
-export type { GamesDependencies } from './api.dependencies.js';
+export { createGamesRouter } from './api.implementation.js';
+export { GamesApiProvider } from './api.implementation.js';
+export type { GamesDependencies } from './api.implementation.js';

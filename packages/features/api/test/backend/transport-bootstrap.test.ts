@@ -11,7 +11,7 @@ import Fastify from 'fastify';
 import { expect, test } from 'vitest';
 import { mockDeep } from 'vitest-mock-extended';
 import { createApiTestRouter } from '../../../index/backend/api.test-fixture.js';
-import { createUsersRouter } from '../../../users/backend/api.router.js';
+import { createUsersRouter } from '../../../users/backend/api.implementation.js';
 import type { MiUserProfile } from '../../../users/backend/models/UserProfile.js';
 import * as v from 'valibot';
 import { DI } from '@/di-symbols.js';

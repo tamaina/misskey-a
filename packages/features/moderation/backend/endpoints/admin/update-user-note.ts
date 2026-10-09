@@ -3,10 +3,10 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 import { implement } from '@orpc/server';
-import type { ApiActor, ApiContext } from '../../../../api/backend/transport/context.js';
-import { authentication, apiPolicy, requirePrincipal } from '../../../../api/backend/transport/middleware.js';
-import { moderationContract } from '../../api.contract.js';
-import type { ModerationApiDependencies } from '../../api.dependencies.js';
+import type { ApiActor, ApiContext } from '@features/api/backend/transport/context.js';
+import { authentication, apiPolicy, requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import { moderationContract } from '../../api.definition.js';
+import type { ModerationApiDependencies } from '../../api.implementation.js';
 export function createAdminUpdateUserNoteProcedure<Actor extends ApiActor>(deps: Pick<ModerationApiDependencies<Actor>, 'usersRepository' | 'userProfilesRepository' | 'moderationLogService'>) {
 	return implement(moderationContract.adminUpdateUserNote, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>().use(authentication<Actor>()).use(apiPolicy<Actor>({ name: 'admin/update-user-note', requireCredential: true, requireModerator: true, kind: 'write:admin:user-note' })).use(requirePrincipal<Actor>())
 		.handler(async ({ input, context }) => {

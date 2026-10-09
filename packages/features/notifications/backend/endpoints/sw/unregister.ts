@@ -4,11 +4,11 @@
  */
 
 import { implement } from '@orpc/server';
-import { authentication, apiPolicy } from '../../../../api/backend/transport/middleware.js';
+import { authentication, apiPolicy } from '@features/api/backend/transport/middleware.js';
 import { unregisterContract } from './unregister.contract.js';
 import type { ApiContext } from '@features/api/backend/transport/context.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
-import type { NotificationsDependencies } from '@features/notifications/backend/api.dependencies.js';
+import type { NotificationsDependencies } from '@features/notifications/backend/api.implementation.js';
 export type UnregisterDependencies = Pick<NotificationsDependencies, 'findSubscriptions' | 'deleteSubscriptions' | 'refreshSubscriptionCache'>;
 export function createUnregisterProcedure(deps: UnregisterDependencies) {
 	return implement(unregisterContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>()

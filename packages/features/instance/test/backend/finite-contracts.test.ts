@@ -17,8 +17,8 @@ import { adminMetaContract } from '../../backend/endpoints/admin/meta.contract.j
 
 import { MiMeta } from '../../backend/models/Meta.js';
 import { MetaEntityService } from '../../backend/serializers/MetaEntityService.js';
-import { createInstanceRouter } from '../../backend/api.router.js';
-import type { InstanceApiDependencies } from '../../backend/api.dependencies.js';
+import { createInstanceRouter } from '../../backend/api.implementation.js';
+import type { InstanceApiDependencies } from '../../backend/api.implementation.js';
 import { createProcedureClient, createRouterClient } from '@orpc/server';
 import { testContext } from './native-context.js';
 import { createServerInfoRouter, createEndpointProcedure, createPingProcedure, createOnlineUsersCountProcedure } from '../../backend/index.js';

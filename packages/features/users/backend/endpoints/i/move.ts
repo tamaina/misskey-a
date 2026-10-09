@@ -13,7 +13,7 @@ import { type UserEntityService } from '../../serializers/UserEntityService.js';
 import { type AccountMoveService } from '../../services/AccountMoveService.js';
 import { type MiLocalUser } from '../../models/User.js';
 import { iMoveErrors } from './move.contract.js';
-import type { UsersInputs } from '../../api.contract.js';
+import type { UsersInputs } from '../../api.definition.js';
 import type { ApiToken } from '@features/api/backend/transport/context.js';
 import { iMoveContract } from './move.contract.js';
 import { implement } from '@orpc/server';

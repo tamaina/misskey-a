@@ -6,16 +6,16 @@
 import { expect, test } from 'vitest';
 import * as v from 'valibot';
 import { mockDeep } from 'vitest-mock-extended';
-import { emojiSimpleResult, emojiDetailedResult } from '../../backend/api.schema.js';
+import { emojiSimpleResult, emojiDetailedResult } from '../../backend/api.definition.js';
 
 import { EmojiEntityService } from '../../backend/serializers/EmojiEntityService.js';
 
 import { packedSchemas } from '../../../index/backend/packed.schema.js';
-import { emojisContract as nativeContract1 } from '../../backend/api.contract.js';
-import { emojisContract as nativeContract2 } from '../../backend/api.contract.js';
-import { emojisContract as nativeContract3 } from '../../backend/api.contract.js';
-import { emojisContract as nativeContract4 } from '../../backend/api.contract.js';
-import { emojisContract as nativeContract5 } from '../../backend/api.contract.js';
+import { emojisContract as nativeContract1 } from '../../backend/api.definition.js';
+import { emojisContract as nativeContract2 } from '../../backend/api.definition.js';
+import { emojisContract as nativeContract3 } from '../../backend/api.definition.js';
+import { emojisContract as nativeContract4 } from '../../backend/api.definition.js';
+import { emojisContract as nativeContract5 } from '../../backend/api.definition.js';
 import type { MiEmoji } from '../../backend/models/Emoji.js';
 import type { MiRole } from '@features/roles/backend/models/Role.js';
 import type { MiDriveFile } from '@features/drive/backend/models/DriveFile.js';

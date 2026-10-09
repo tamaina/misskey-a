@@ -3,13 +3,13 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 import { IsNull } from 'typeorm';
-import * as Acct from '../../../federation/backend/utility/acct.js';
-import { toPackedUserDetailed } from '../../../users/backend/user.schema.js';
-import type { ApiActor, ApiContext } from '../../../api/backend/transport/context.js';
+import * as Acct from '@features/federation/backend/utility/acct.js';
+import { toPackedUserDetailed } from '@features/users/backend/user.schema.js';
+import type { ApiActor, ApiContext } from '@features/api/backend/transport/context.js';
 import { implement } from '@orpc/server';
-import { authentication, apiPolicy } from '../../../api/backend/transport/middleware.js';
+import { authentication, apiPolicy } from '@features/api/backend/transport/middleware.js';
 import { pinnedUsersContract } from './pinned-users.contract.js';
-import type { InstanceApiDependencies } from '../api.dependencies.js';
+import type { InstanceApiDependencies } from '../api.implementation.js';
 export type PinnedUsersDependencies = Pick<InstanceApiDependencies, 'serverSettings' | 'usersRepository' | 'userEntityService'>;
 export function createPinnedUsersProcedure<Actor extends ApiActor>(deps: PinnedUsersDependencies) {
 	return implement(pinnedUsersContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>()

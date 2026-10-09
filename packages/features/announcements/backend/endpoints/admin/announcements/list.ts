@@ -3,10 +3,10 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 import { implement } from '@orpc/server';
-import { authentication, apiPolicy, requirePrincipal } from '../../../../../api/backend/transport/middleware.js';
-import type { ApiActor, ApiContext } from '../../../../../api/backend/transport/context.js';
-import { announcementsContract } from '../../../api.contract.js';
-import type { AnnouncementsDependencies } from '../../../api.dependencies.js';
+import { authentication, apiPolicy, requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import type { ApiActor, ApiContext } from '@features/api/backend/transport/context.js';
+import { announcementsContract } from '../../../api.definition.js';
+import type { AnnouncementsDependencies } from '../../../api.implementation.js';
 import type { InferContractRouterOutputs } from '@orpc/contract';
 export interface AnnouncementAdminListDependencies<Actor extends ApiActor> {
 	announcementsRepository: Pick<AnnouncementsDependencies<Actor>['announcementsRepository'], 'createQueryBuilder'>;

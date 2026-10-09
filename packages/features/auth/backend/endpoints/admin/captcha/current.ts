@@ -3,12 +3,12 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 import { CaptchaService } from '../../../services/CaptchaService.js';
-import { AdminCaptchaCurrentContract } from '../../../api.contract.js';
+import { AdminCaptchaCurrentContract } from '../../../api.definition.js';
 import { implement } from '@orpc/server';
 import * as v from 'valibot';
-import { authentication, apiPolicy, requirePrincipal } from '../../../../../api/backend/transport/middleware.js';
-import type { ApiContext } from '../../../../../api/backend/transport/context.js';
-import type { MiLocalUser } from '../../../../../users/backend/models/User.js';
+import { authentication, apiPolicy, requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import type { ApiContext } from '@features/api/backend/transport/context.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
 export const meta = {
 	tags: ['admin', 'captcha'],
 

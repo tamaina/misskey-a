@@ -10,7 +10,7 @@ import { SigninService } from '../transport/SigninService.js';
 import type { RegistrationTicketsRepository, UserPendingsRepository, UserProfilesRepository } from '@features/persistence/backend/repositories/models.js';
 import { implement } from '@orpc/server';
 import * as v from 'valibot';
-import { authSessionsContract } from '../session.contract.js';
+import { authSessionsContract } from '../api.definition.js';
 import { sessionErrors } from '../session.middleware.js';
 const invitationCodeMailTimeoutMs = 1000 * 60 * 30;
 export interface SignupPendingDependencies {

@@ -11,7 +11,7 @@ import { RoleService } from '@features/roles/backend/services/RoleService.js';
 import { ChatEntityService } from '@features/chat/backend/serializers/ChatEntityService.js';
 import { ChatService } from '@features/chat/backend/services/ChatService.js';
 import { apiError } from '@features/api/backend/transport/orpc-error.js';
-import { driveManagementContract } from '../../../management.contract.js';
+import { driveManagementContract } from '../../../api.definition.js';
 import { implement } from '@orpc/server';
 import { authentication, apiPolicy, requirePrincipal } from '@features/api/backend/transport/middleware.js';
 import type { ApiContext } from '@features/api/backend/transport/context.js';

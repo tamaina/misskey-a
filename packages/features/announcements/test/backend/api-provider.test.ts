@@ -11,7 +11,7 @@ import Fastify from 'fastify';
 import { expect, test, vi } from 'vitest';
 import { mockDeep } from 'vitest-mock-extended';
 import { DI } from '@/di-symbols.js';
-import { AnnouncementsApiProvider } from '../../backend/api.provider.js';
+import { AnnouncementsApiProvider } from '../../backend/api.implementation.js';
 import { AnnouncementService } from '../../backend/services/AnnouncementService.js';
 import { AnnouncementEntityService } from '../../backend/serializers/AnnouncementEntityService.js';
 import { IdService } from '../../../runtime/backend/services/IdService.js';

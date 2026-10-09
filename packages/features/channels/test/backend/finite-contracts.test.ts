@@ -6,7 +6,7 @@
 import { expect, expectTypeOf, test } from 'vitest';
 import * as v from 'valibot';
 import { mockDeep } from 'vitest-mock-extended';
-import { channelsApiContract } from '../../backend/api.contract.js';
+import { channelsApiContract } from '../../backend/api.definition.js';
 import { channelsCreateContract } from '../../backend/endpoints/channels/create.contract.js';
 import { channelsUpdateContract } from '../../backend/endpoints/channels/update.contract.js';
 import { channelsTimelineContract } from '../../backend/endpoints/channels/timeline.contract.js';

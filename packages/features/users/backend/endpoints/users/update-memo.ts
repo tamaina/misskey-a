@@ -7,7 +7,7 @@ import { type GetterService } from '@features/api/backend/transport/GetterServic
 import { apiError } from '@features/api/backend/transport/orpc-error.js';
 import { usersUpdateMemoErrors } from './update-memo.contract.js';
 import type { ApiToken } from '@features/api/backend/transport/context.js';
-import type { UsersInputs } from '../../api.contract.js';
+import type { UsersInputs } from '../../api.definition.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 
 import type { UserMemoRepository } from '@features/persistence/backend/repositories/models.js';

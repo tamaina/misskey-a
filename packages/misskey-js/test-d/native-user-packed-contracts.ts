@@ -4,12 +4,12 @@
  */
 import type * as v from 'valibot';
 import type { InferContractRouterInputs, InferContractRouterOutputs } from '@orpc/contract';
-import type { usersContract } from '../built/contracts/users/backend/api.contract.js';
-import type { notesApiContract } from '../built/contracts/notes/backend/api.contract.js';
+import type { usersContract } from '../built/contracts/users/backend/api.definition.js';
+import type { notesApiContract } from '../built/contracts/notes/backend/api.definition.js';
 import type { relationshipsContract } from '../built/contracts/relationships/backend/endpoints/relationships.contract.js';
 import type { PackedModels } from '../built/contracts/index/backend/packed.schema.js';
-import type { authContract } from '../built/contracts/auth/backend/api.contract.js';
-import type { federationContract } from '../built/contracts/federation/backend/api.contract.js';
+import type { authContract } from '../built/contracts/auth/backend/api.definition.js';
+import type { federationContract } from '../built/contracts/federation/backend/api.definition.js';
 import type { ContractEndpoints } from '../built/contract.types.js';
 import type { Endpoints } from '../built/api.types.js';
 import type { UserLite, UserDetailedNotMe, MeDetailed, UserDetailed, User, Following } from '../built/autogen/models.js';

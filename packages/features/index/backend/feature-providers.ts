@@ -4,35 +4,35 @@
  */
 
 import type { Provider } from '@nestjs/common';
-import { ApiRouterProvider } from './api.provider.js';
-import { RolesApiProvider } from '../../roles/backend/api.provider.js';
-import { ModerationApiProvider } from '../../moderation/backend/api.provider.js';
-import { AuthApiProvider } from '../../auth/backend/api.provider.js';
-import { PortabilityApiProvider } from '../../portability/backend/api.provider.js';
-import { DriveManagementApiProvider } from '../../drive/backend/management.provider.js';
-import { IntegrationsApiProvider } from '../../integrations/backend/api.provider.js';
-import { OperationsApiProvider } from '../../operations/backend/api.provider.js';
-import { FederationApiProvider } from '../../federation/backend/api.provider.js';
-import { GamesApiProvider } from '../../games/backend/api.provider.js';
-import { PlayApiProvider } from '../../play/backend/api.provider.js';
-import { PagesApiProvider } from '../../pages/backend/api.provider.js';
-import { ChannelsApiProvider } from '../../channels/backend/api.provider.js';
-import { ChatApiProvider } from '../../chat/backend/api.provider.js';
-import { InstanceApiProvider } from '../../instance/backend/api.provider.js';
-import { StatisticsApiProvider } from '../../statistics/backend/api.provider.js';
-import { DiscoveryApiProvider } from '../../discovery/backend/api.provider.js';
-import { AnnouncementsApiProvider } from '../../announcements/backend/api.provider.js';
-import { AvatarDecorationsApiProvider } from '../../avatar-decorations/backend/api.implementation.js';
-import { PreferencesApiProvider } from '../../preferences/backend/api.provider.js';
-import { EmojisApiProvider } from '../../emojis/backend/api.provider.js';
-import { NotificationsApiProvider } from '../../notifications/backend/api.provider.js';
-import { NotesApiProvider } from '../../notes/backend/api.provider.js';
-import { UsersApiProvider } from '../../users/backend/api.provider.js';
-import { TimelinesApiProvider } from '../../timelines/backend/api.provider.js';
-import { NoteSearchApiProvider } from '../../note-search/backend/api.provider.js';
-import { RelationshipsApiProvider } from '../../relationships/backend/api.provider.js';
-import { CollectionsApiProvider } from '../../collections/backend/api.provider.js';
-import { DriveApiProvider } from '../../drive/backend/api.provider.js';
+import { ApiRouterProvider } from './api.implementation.js';
+import { RolesApiProvider } from '@features/roles/backend/api.implementation.js';
+import { ModerationApiProvider } from '@features/moderation/backend/api.implementation.js';
+import { AuthApiProvider } from '@features/auth/backend/api.implementation.js';
+import { PortabilityApiProvider } from '@features/portability/backend/api.implementation.js';
+import { DriveManagementApiProvider } from '@features/drive/backend/api.implementation.js';
+import { IntegrationsApiProvider } from '@features/integrations/backend/api.implementation.js';
+import { OperationsApiProvider } from '@features/operations/backend/api.implementation.js';
+import { FederationApiProvider } from '@features/federation/backend/api.implementation.js';
+import { GamesApiProvider } from '@features/games/backend/api.implementation.js';
+import { PlayApiProvider } from '@features/play/backend/api.implementation.js';
+import { PagesApiProvider } from '@features/pages/backend/api.implementation.js';
+import { ChannelsApiProvider } from '@features/channels/backend/api.implementation.js';
+import { ChatApiProvider } from '@features/chat/backend/api.implementation.js';
+import { InstanceApiProvider } from '@features/instance/backend/api.implementation.js';
+import { StatisticsApiProvider } from '@features/statistics/backend/api.implementation.js';
+import { DiscoveryApiProvider } from '@features/discovery/backend/api.implementation.js';
+import { AnnouncementsApiProvider } from '@features/announcements/backend/api.implementation.js';
+import { AvatarDecorationsApiProvider } from '@features/avatar-decorations/backend/api.implementation.js';
+import { PreferencesApiProvider } from '@features/preferences/backend/api.implementation.js';
+import { EmojisApiProvider } from '@features/emojis/backend/api.implementation.js';
+import { NotificationsApiProvider } from '@features/notifications/backend/api.implementation.js';
+import { NotesApiProvider } from '@features/notes/backend/api.implementation.js';
+import { UsersApiProvider } from '@features/users/backend/api.implementation.js';
+import { TimelinesApiProvider } from '@features/timelines/backend/api.implementation.js';
+import { NoteSearchApiProvider } from '@features/note-search/backend/api.implementation.js';
+import { RelationshipsApiProvider } from '@features/relationships/backend/api.implementation.js';
+import { CollectionsApiProvider } from '@features/collections/backend/api.implementation.js';
+import { DriveApiProvider } from '@features/drive/backend/api.implementation.js';
 export const featureProviders: Provider[] = [
 	ApiRouterProvider,
 	RolesApiProvider,

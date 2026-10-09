@@ -3,12 +3,12 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 import { implement } from '@orpc/server';
-import type { ApiActor, ApiContext } from '../../../../../api/backend/transport/context.js';
-import { authentication, apiPolicy, requirePrincipal, decodeScalarInput } from '../../../../../api/backend/transport/middleware.js';
-import { rolesContract } from '../../../api.contract.js';
-import type { RolesDependencies } from '../../../api.dependencies.js';
+import type { ApiActor, ApiContext } from '@features/api/backend/transport/context.js';
+import { authentication, apiPolicy, requirePrincipal, decodeScalarInput } from '@features/api/backend/transport/middleware.js';
+import { rolesContract } from '../../../api.definition.js';
+import type { RolesDependencies } from '../../../api.implementation.js';
 import { Brackets } from 'typeorm';
-import { apiError } from '../../../../../api/backend/transport/orpc-error.js';
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
 import { rolesErrors } from '../../../api.errors.js';
 export function createAdminRolesUsersProcedure<Actor extends ApiActor>(deps: Pick<RolesDependencies<Actor>, 'rolesRepository' | 'queryService' | 'roleAssignmentsRepository' | 'userEntityService' | 'idService'>) {
 	return implement(rolesContract.adminRolesUsers, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>().use(authentication<Actor>()).use(apiPolicy<Actor>({ name: 'admin/roles/users', requireCredential: false, requireModerator: true, kind: 'read:admin:roles' })).use(requirePrincipal<Actor>()).use(decodeScalarInput<Actor>({ sinceDate: 'number', untilDate: 'number', limit: 'number' }))

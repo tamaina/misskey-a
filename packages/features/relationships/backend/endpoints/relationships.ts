@@ -4,10 +4,10 @@
  */
 
 import { implement } from '@orpc/server';
-import type { ApiContext } from '../../../api/backend/transport/context.js';
-import type { MiLocalUser } from '../../../users/backend/models/User.js';
+import type { ApiContext } from '@features/api/backend/transport/context.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
 import { relationshipsContract } from './relationships.contract.js';
-import type { RelationshipsDependencies } from '../api.dependencies.js';
+import type { RelationshipsDependencies } from '../api.implementation.js';
 import { createBlockingCreateProcedure } from './blocking/create.js';
 import { createBlockingDeleteProcedure } from './blocking/delete.js';
 import { createBlockingListProcedure } from './blocking/list.js';

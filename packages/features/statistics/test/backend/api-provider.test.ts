@@ -5,10 +5,10 @@
 import { expect, test } from 'vitest';
 import { mockDeep } from 'vitest-mock-extended';
 import type { ModuleRef } from '@nestjs/core';
-import { StatisticsApiProvider } from '../../backend/api.provider.js';
-import { OperationsApiProvider } from '../../../operations/backend/api.provider.js';
-import { FederationApiProvider } from '../../../federation/backend/api.provider.js';
-import { PortabilityApiProvider } from '../../../portability/backend/api.provider.js';
+import { StatisticsApiProvider } from '../../backend/api.implementation.js';
+import { OperationsApiProvider } from '../../../operations/backend/api.implementation.js';
+import { FederationApiProvider } from '../../../federation/backend/api.implementation.js';
+import { PortabilityApiProvider } from '../../../portability/backend/api.implementation.js';
 import { DI } from '@/di-symbols.js';
 for (const Provider of [StatisticsApiProvider, OperationsApiProvider, FederationApiProvider, PortabilityApiProvider]) {
 	test(`${Provider.name} resolves singleton dependencies only at composition and caches the router`, () => {

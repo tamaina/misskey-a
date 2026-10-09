@@ -3,10 +3,10 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 import { implement } from '@orpc/server';
-import { authentication, apiPolicy, decodeScalarInput } from '../../../../../api/backend/transport/middleware.js';
-import type { ApiActor, ApiContext } from '../../../../../api/backend/transport/context.js';
-import { collectionsContract } from '../../../api.contract.js';
-import type { CollectionsDependencies } from '../../../api.dependencies.js';
+import { authentication, apiPolicy, decodeScalarInput } from '@features/api/backend/transport/middleware.js';
+import type { ApiActor, ApiContext } from '@features/api/backend/transport/context.js';
+import { collectionsContract } from '../../../api.definition.js';
+import type { CollectionsDependencies } from '../../../api.implementation.js';
 export interface UsersGalleryPostsDependencies<Actor extends ApiActor> {
 	queryService: Pick<CollectionsDependencies<Actor>['queryService'], 'makePaginationQuery'>;
 	galleryPostsRepository: Pick<CollectionsDependencies<Actor>['galleryPostsRepository'], 'createQueryBuilder'>;

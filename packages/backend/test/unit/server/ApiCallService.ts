@@ -18,7 +18,7 @@ import { logManager } from '@features/runtime/backend/logging/logging-runtime.js
 import { PrettyConsoleBackend } from '@features/runtime/backend/logging/PrettyConsoleBackend.js';
 import { mockDeep } from 'vitest-mock-extended';
 import { createApiTestRouter } from '@features/index/backend/api.test-fixture.js';
-import { createNotesRouter } from '@features/notes/backend/api.router.js';
+import { createNotesRouter } from '@features/notes/backend/api.implementation.js';
 import type { LogBackend } from '@features/runtime/backend/logging/LogBackend.js';
 
 function injectionToken(value: unknown): InjectionToken {

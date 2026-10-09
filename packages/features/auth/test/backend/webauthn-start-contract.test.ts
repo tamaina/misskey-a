@@ -11,7 +11,7 @@ import { MiUserSecurityKey } from '../../backend/models/UserSecurityKey.js';
 import { mockDeep } from 'vitest-mock-extended';
 import { WebAuthnService } from '../../backend/services/WebAuthnService.js';
 import { createI2faRegisterKeyProcedure } from '../../backend/endpoints/i/2fa/register-key.js';
-import { I2faRegisterKeyContract } from '../../backend/api.contract.js';
+import { I2faRegisterKeyContract } from '../../backend/api.definition.js';
 import { toWebAuthnRegistrationOptions } from '../../backend/webauthn.schema.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 

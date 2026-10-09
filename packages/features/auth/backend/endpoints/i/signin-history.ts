@@ -6,11 +6,11 @@ import type { SigninsRepository } from '@features/persistence/backend/repositori
 import { QueryService } from '@features/notes/backend/services/QueryService.js';
 import { SigninEntityService } from '../../serializers/SigninEntityService.js';
 import * as v from 'valibot';
-import { ISigninHistoryContract } from '../../api.contract.js';
+import { ISigninHistoryContract } from '../../api.definition.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 import { implement } from '@orpc/server';
-import { authentication, apiPolicy, requirePrincipal } from '../../../../api/backend/transport/middleware.js';
-import type { ApiContext } from '../../../../api/backend/transport/context.js';
+import { authentication, apiPolicy, requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import type { ApiContext } from '@features/api/backend/transport/context.js';
 export const meta = {
 	requireCredential: true,
 	secure: true,

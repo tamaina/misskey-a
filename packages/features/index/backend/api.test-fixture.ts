@@ -3,37 +3,37 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 import { mockDeep } from 'vitest-mock-extended';
-import type { MiLocalUser } from '../../users/backend/models/User.js';
-import type { MiDriveFile } from '../../drive/backend/models/DriveFile.js';
-import { createApiRouter, type ApiRouterFeatures } from './api.router.js';
-import { createRolesRouter } from '../../roles/backend/api.router.js';
-import { createModerationRouter } from '../../moderation/backend/api.router.js';
-import { createAuthRouter } from '../../auth/backend/api.router.js';
-import { createPortabilityRouter } from '../../portability/backend/api.router.js';
-import { createDriveManagementRouter } from '../../drive/backend/management.router.js';
-import { createIntegrationsRouter } from '../../integrations/backend/router.js';
-import { createOperationsRouter } from '../../operations/backend/router.js';
-import { createFederationRouter } from '../../federation/backend/router.js';
-import { createGamesRouter } from '../../games/backend/router.js';
-import { createPlayRouter } from '../../play/backend/router.js';
-import { createPagesRouter } from '../../pages/backend/router.js';
-import { createChannelsRouter } from '../../channels/backend/api.router.js';
-import { createChatRouter } from '../../chat/backend/api.router.js';
-import { createInstanceRouter } from '../../instance/backend/api.router.js';
-import { createStatisticsRouter } from '../../statistics/backend/router.js';
-import { createDiscoveryRouter } from '../../discovery/backend/endpoints/discovery.js';
-import { createAnnouncementsRouter } from '../../announcements/backend/api.router.js';
-import { createAvatarDecorationsRouter } from '../../avatar-decorations/backend/api.implementation.js';
-import { createPreferencesRouter } from '../../preferences/backend/router.js';
-import { createEmojisRouter } from '../../emojis/backend/api.router.js';
-import { createNotificationsRouter } from '../../notifications/backend/router.js';
-import { createNotesRouter } from '../../notes/backend/api.router.js';
-import { createUsersRouter } from '../../users/backend/api.router.js';
-import { createTimelinesRouter } from '../../timelines/backend/router.js';
-import { createNoteSearchRouter } from '../../note-search/backend/router.js';
-import { createRelationshipsRouter } from '../../relationships/backend/endpoints/relationships.js';
-import { createCollectionsRouter } from '../../collections/backend/api.router.js';
-import { createDriveRouter } from '../../drive/backend/api.router.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+import type { MiDriveFile } from '@features/drive/backend/models/DriveFile.js';
+import { createApiRouter, type ApiRouterFeatures } from './api.implementation.js';
+import { createRolesRouter } from '@features/roles/backend/api.implementation.js';
+import { createModerationRouter } from '@features/moderation/backend/api.implementation.js';
+import { createAuthRouter } from '@features/auth/backend/api.implementation.js';
+import { createPortabilityRouter } from '@features/portability/backend/api.implementation.js';
+import { createDriveManagementRouter } from '@features/drive/backend/api.implementation.js';
+import { createIntegrationsRouter } from '@features/integrations/backend/api.implementation.js';
+import { createOperationsRouter } from '@features/operations/backend/api.implementation.js';
+import { createFederationRouter } from '@features/federation/backend/api.implementation.js';
+import { createGamesRouter } from '@features/games/backend/api.implementation.js';
+import { createPlayRouter } from '@features/play/backend/api.implementation.js';
+import { createPagesRouter } from '@features/pages/backend/api.implementation.js';
+import { createChannelsRouter } from '@features/channels/backend/api.implementation.js';
+import { createChatRouter } from '@features/chat/backend/api.implementation.js';
+import { createInstanceRouter } from '@features/instance/backend/api.implementation.js';
+import { createStatisticsRouter } from '@features/statistics/backend/api.implementation.js';
+import { createDiscoveryRouter } from '@features/discovery/backend/endpoints/discovery.js';
+import { createAnnouncementsRouter } from '@features/announcements/backend/api.implementation.js';
+import { createAvatarDecorationsRouter } from '@features/avatar-decorations/backend/api.implementation.js';
+import { createPreferencesRouter } from '@features/preferences/backend/api.implementation.js';
+import { createEmojisRouter } from '@features/emojis/backend/api.implementation.js';
+import { createNotificationsRouter } from '@features/notifications/backend/api.implementation.js';
+import { createNotesRouter } from '@features/notes/backend/api.implementation.js';
+import { createUsersRouter } from '@features/users/backend/api.implementation.js';
+import { createTimelinesRouter } from '@features/timelines/backend/api.implementation.js';
+import { createNoteSearchRouter } from '@features/note-search/backend/api.implementation.js';
+import { createRelationshipsRouter } from '@features/relationships/backend/endpoints/relationships.js';
+import { createCollectionsRouter } from '@features/collections/backend/api.implementation.js';
+import { createDriveRouter } from '@features/drive/backend/api.implementation.js';
 export function createApiTestFeatures(): ApiRouterFeatures {
 	return {
 		roles: createRolesRouter<MiLocalUser>(mockDeep<Parameters<typeof createRolesRouter<MiLocalUser>>[0]>()),

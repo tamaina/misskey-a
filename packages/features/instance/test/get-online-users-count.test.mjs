@@ -5,7 +5,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import * as v from 'valibot';
-import { instanceApiContract } from '../../../misskey-js/built/contracts/instance/backend/api.contract.js';
+import { instanceApiContract } from '../../../misskey-js/built/contracts/instance/backend/api.definition.js';
 import { createOnlineUsersCountProcedure } from '../../../backend/built/features/instance/backend.js';
 import { createProcedureClient } from '@orpc/server';
 

@@ -6,7 +6,7 @@
 import { expectAssignable, expectNotAssignable } from 'tsd';
 import type { InferContractRouterInputs, InferContractRouterOutputs } from '@orpc/contract';
 import type * as v from 'valibot';
-import type { rolesContract } from '../built/contracts/roles/backend/api.contract.js';
+import type { rolesContract } from '../built/contracts/roles/backend/api.definition.js';
 import type { roleSchema, roleCondFormulaSchema, packedRoleLiteSchema, rolePoliciesSchema } from '../built/contracts/roles/backend/role.schema.js';
 import type { PackedModels } from '../built/contracts/index/backend/packed.schema.js';
 import type { ContractEndpoints } from '../built/contract.types.js';

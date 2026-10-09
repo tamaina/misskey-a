@@ -5,7 +5,7 @@ import type { Endpoints } from '../src/api.types.js';
 import type { ContractEndpoints } from '../src/contract.types.js';
 import type { I2faKeyDoneRequest } from '../src/entities.js';
 import type { InferContractRouterInputs } from '@orpc/contract';
-import type { authContract } from '../built/contracts/auth/backend/api.contract.js';
+import type { authContract } from '../built/contracts/auth/backend/api.definition.js';
 import type { PackedJsonValue } from '../built/contracts/users/backend/json-value.schema.js';
 
 type Assert<T extends true> = T;

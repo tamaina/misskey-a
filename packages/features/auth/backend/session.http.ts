@@ -8,9 +8,9 @@ import type { StandardHandlerOptions } from '@orpc/server/standard';
 import { STATUS_CODES } from 'node:http';
 import * as v from 'valibot';
 import type { FastifyInstance } from 'fastify';
-import { createAuthSessionRouter, type AuthSessionContext } from './session.router.js';
+import { createAuthSessionRouter, type AuthSessionContext } from './api.implementation.js';
 import { requestRoutes } from '../../api/shared/api-routing.js';
-import { sessionContract } from './session.contract.js';
+import { sessionContract } from './api.definition.js';
 import { fastifyFailureSchema } from './session-errors.schema.js';
 
 /** Apply the applications' original HTTP statuses after native output validation. */

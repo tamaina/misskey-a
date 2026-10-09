@@ -4,10 +4,10 @@
  */
 
 import { implement } from '@orpc/server';
-import { authentication, apiPolicy, requirePrincipal } from '../../../../../api/backend/transport/middleware.js';
+import { authentication, apiPolicy, requirePrincipal } from '@features/api/backend/transport/middleware.js';
 import { registrySetContract } from './set.contract.js';
-import type { ApiActor, ApiContext } from '../../../../../api/backend/transport/context.js';
-import type { PreferencesDependencies } from '../../../api.dependencies.js';
+import type { ApiActor, ApiContext } from '@features/api/backend/transport/context.js';
+import type { PreferencesDependencies } from '../../../api.implementation.js';
 import { registryTenant } from './registry.helpers.js';
 export function createRegistrySetProcedure<Actor extends ApiActor>(deps: PreferencesDependencies) {
 	return implement(registrySetContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>()

@@ -2,11 +2,11 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-import type { ApiActor, ApiContext } from '../../../api/backend/transport/context.js';
+import type { ApiActor, ApiContext } from '@features/api/backend/transport/context.js';
 import { implement } from '@orpc/server';
-import { authentication, apiPolicy } from '../../../api/backend/transport/middleware.js';
+import { authentication, apiPolicy } from '@features/api/backend/transport/middleware.js';
 import { onlineUsersCountContract, onlineUsersCountGetContract } from './get-online-users-count.contract.js';
-import type { InstanceApiDependencies } from '../api.dependencies.js';
+import type { InstanceApiDependencies } from '../api.implementation.js';
 export type OnlineUsersCountDependencies = Pick<InstanceApiDependencies, 'getOnlineUsersCount' | 'now'>;
 export function createOnlineUsersCountProcedure<Actor extends ApiActor>(deps: OnlineUsersCountDependencies) {
 	const now = deps.now ?? Date.now;

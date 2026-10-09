@@ -3,11 +3,11 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 import { implement } from '@orpc/server';
-import { authentication, apiPolicy, requirePrincipal, decodeScalarInput } from '../../../../../api/backend/transport/middleware.js';
-import type { ApiActor, ApiContext } from '../../../../../api/backend/transport/context.js';
-import { collectionsContract } from '../../../api.contract.js';
-import type { CollectionsDependencies } from '../../../api.dependencies.js';
-import type { MiDriveFile } from '../../../../../drive/backend/models/DriveFile.js';
+import { authentication, apiPolicy, requirePrincipal, decodeScalarInput } from '@features/api/backend/transport/middleware.js';
+import type { ApiActor, ApiContext } from '@features/api/backend/transport/context.js';
+import { collectionsContract } from '../../../api.definition.js';
+import type { CollectionsDependencies } from '../../../api.implementation.js';
+import type { MiDriveFile } from '@features/drive/backend/models/DriveFile.js';
 export interface GalleryPostsUpdateDependencies<Actor extends ApiActor> {
 	driveFilesRepository: Pick<CollectionsDependencies<Actor>['driveFilesRepository'], 'findOneBy'>;
 	galleryPostsRepository: Pick<CollectionsDependencies<Actor>['galleryPostsRepository'], 'findOneByOrFail' | 'update'>;

@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-export { emojisContract } from './api.contract.js';
-export { createEmojisRouter } from './api.router.js';
-export { EmojisApiProvider } from './api.provider.js';
-export type { EmojisDependencies } from './api.dependencies.js';
+export { emojisContract } from './api.definition.js';
+export { createEmojisRouter } from './api.implementation.js';
+export { EmojisApiProvider } from './api.implementation.js';
+export type { EmojisDependencies } from './api.implementation.js';

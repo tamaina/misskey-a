@@ -5,7 +5,7 @@
 import { type QueryService } from '@features/notes/backend/services/QueryService.js';
 import { type UserEntityService } from '../serializers/UserEntityService.js';
 import type { ApiToken } from '@features/api/backend/transport/context.js';
-import type { UsersInputs } from '../api.contract.js';
+import type { UsersInputs } from '../api.definition.js';
 
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 import type { UsersRepository } from '@features/persistence/backend/repositories/models.js';

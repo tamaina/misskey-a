@@ -8,14 +8,14 @@ import { mockDeep } from 'vitest-mock-extended';
 import { call } from '@orpc/server';
 import { OpenAPIHandler } from '@orpc/openapi/fetch';
 import type { ApiActor, ApiServices, ApiContext } from '@features/api/backend/transport/context.js';
-import type { EndpointDescriptor, InstanceApiDependencies } from '@features/instance/backend/api.dependencies.js';
-import { createInstanceRouter } from '@features/instance/backend/api.router.js';
+import type { EndpointDescriptor, InstanceApiDependencies } from '@features/instance/backend/api.implementation.js';
+import { createInstanceRouter } from '@features/instance/backend/api.implementation.js';
 import { createStatsProcedure } from '@features/statistics/backend/endpoints/stats.js';
 import { statsContract } from '@features/statistics/backend/endpoints/stats.contract.js';
 import { createAvatarDecorationsRouter } from '@features/avatar-decorations/backend/api.implementation.js';
 import type { AvatarDecorationsDependencies } from '@features/avatar-decorations/backend/api.implementation.js';
-import { createEmojisRouter } from '@features/emojis/backend/api.router.js';
-import type { EmojisDependencies } from '@features/emojis/backend/api.dependencies.js';
+import { createEmojisRouter } from '@features/emojis/backend/api.implementation.js';
+import type { EmojisDependencies } from '@features/emojis/backend/api.implementation.js';
 import type { MiAvatarDecoration, MiEmoji } from '@features/persistence/backend/repositories/models.js';
 
 const actor: ApiActor = { id: 'local-user', isSuspended: false, movedToUri: null };

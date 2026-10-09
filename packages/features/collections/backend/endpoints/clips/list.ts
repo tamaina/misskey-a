@@ -3,10 +3,10 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 import { implement } from '@orpc/server';
-import { authentication, apiPolicy, requirePrincipal, decodeScalarInput } from '../../../../api/backend/transport/middleware.js';
-import type { ApiActor, ApiContext } from '../../../../api/backend/transport/context.js';
-import { collectionsContract } from '../../api.contract.js';
-import type { CollectionsDependencies } from '../../api.dependencies.js';
+import { authentication, apiPolicy, requirePrincipal, decodeScalarInput } from '@features/api/backend/transport/middleware.js';
+import type { ApiActor, ApiContext } from '@features/api/backend/transport/context.js';
+import { collectionsContract } from '../../api.definition.js';
+import type { CollectionsDependencies } from '../../api.implementation.js';
 export interface ClipsListDependencies<Actor extends ApiActor> {
 	queryService: Pick<CollectionsDependencies<Actor>['queryService'], 'makePaginationQuery'>;
 	clipsRepository: Pick<CollectionsDependencies<Actor>['clipsRepository'], 'createQueryBuilder'>;

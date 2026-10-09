@@ -7,7 +7,7 @@ import type { InferSchemaOutput } from '@orpc/contract';
 import { call, type InferRouterCurrentContexts } from '@orpc/server';
 import type { createAdminShowUserProcedure } from '@features/moderation/backend/endpoints/admin/show-user.js';
 import type { ApiActor, ApiContext } from '@features/api/backend/transport/context.js';
-import type { moderationContract } from '@features/moderation/backend/api.contract.js';
+import type { moderationContract } from '@features/moderation/backend/api.definition.js';
 type Documented = InferSchemaOutput<NonNullable<typeof moderationContract.adminShowUser['~orpc']['outputSchema']>>;
 type Input = InferSchemaOutput<NonNullable<typeof moderationContract.adminShowUser['~orpc']['inputSchema']>>;
 declare const actor: ApiActor;

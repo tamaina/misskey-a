@@ -4,6 +4,6 @@
  */
 
 export { statisticsContract } from './endpoints/statistics.contract.js';
-export { createStatisticsRouter } from './router.js';
-export { StatisticsApiProvider } from './api.provider.js';
-export type { StatisticsDependencies, ChartReader, GroupedChartReader } from './api.dependencies.js';
+export { createStatisticsRouter } from './api.implementation.js';
+export { StatisticsApiProvider } from './api.implementation.js';
+export type { StatisticsDependencies, ChartReader, GroupedChartReader } from './api.implementation.js';

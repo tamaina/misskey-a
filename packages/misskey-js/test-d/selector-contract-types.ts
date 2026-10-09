@@ -6,7 +6,7 @@ import type * as v from 'valibot';
 import { expectAssignable, expectNotAssignable } from 'tsd';
 import type { adminDriveShowFileContract } from '../built/contracts/drive/backend/endpoints/admin/drive/show-file.contract.js';
 import type { driveFilesShowContract } from '../built/contracts/drive/backend/endpoints/drive/files/show.contract.js';
-import type { IRevokeTokenContract } from '../built/contracts/auth/backend/api.contract.js';
+import type { IRevokeTokenContract } from '../built/contracts/auth/backend/api.definition.js';
 import type { pagesShowContract } from '../built/contracts/pages/backend/endpoints/pages/show.contract.js';
 import type { InferContractRouterOutputs } from '@orpc/contract';
 import type { PackedJsonValue } from '../built/contracts/users/backend/json-value.schema.js';

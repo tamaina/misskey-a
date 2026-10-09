@@ -2,7 +2,7 @@ import type { Endpoints } from '../src/api.types.js';
 import type { ContractEndpoints } from '../src/contract.types.js';
 import type { EmptyResponse, I2faRemoveKeyRequest, I2faUpdateKeyRequest } from '../src/autogen/entities.js';
 import type { InferContractRouterInputs, InferContractRouterOutputs } from '@orpc/contract';
-import type { authContract } from '../built/contracts/auth/backend/api.contract.js';
+import type { authContract } from '../built/contracts/auth/backend/api.definition.js';
 type AuthInputs = InferContractRouterInputs<typeof authContract>;
 type AuthOutputs = InferContractRouterOutputs<typeof authContract>;
 type EmptyObjectKeyEndpoints = { [Name in keyof AuthInputs]: { req: AuthInputs[Name]; res: AuthOutputs[Name] } };

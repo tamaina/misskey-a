@@ -8,7 +8,7 @@ import * as path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { expect, test } from 'vitest';
 import * as ts from 'typescript';
-import { pilotContract } from '@features/index/backend/api.contract.js';
+import { pilotContract } from '@features/index/backend/api.definition.js';
 import { requestRoutes } from '@features/api/shared/api-routing.js';
 
 const testDirectory = path.dirname(fileURLToPath(import.meta.url));
@@ -116,27 +116,27 @@ test('native feature composition owns every published route without a legacy reg
 	expect(existsSync(path.join(featureRoot, 'boot/backend/assembly/EndpointsModule.ts'))).toBe(false);
 	expect(expectedRouteOrder.filter(route => !nativeRoutes.has(route))).toEqual([]);
 
-	const contractPath = path.join(featureRoot, 'index/backend/api.contract.ts');
-	const routerPath = path.join(featureRoot, 'index/backend/api.router.ts');
+	const contractPath = path.join(featureRoot, 'index/backend/api.definition.ts');
+	const routerPath = path.join(featureRoot, 'index/backend/api.implementation.ts');
 	for (const compositionPath of [contractPath, routerPath]) {
 		expect(isFeatureReexportBridge(compositionPath)).toBe(false);
 		const references = moduleReferences(compositionPath);
 		expect(references.length).toBeGreaterThan(0);
 		for (const reference of references) {
-			if (compositionPath === routerPath && reference.specifier === '@orpc/server') continue;
+			if (compositionPath === routerPath && ['@orpc/server', '@nestjs/common', '@nestjs/core'].includes(reference.specifier)) continue;
 			const target = resolveExistingModule(compositionPath, reference.specifier);
 			expect(target, reference.specifier).not.toBeNull();
 			expect(target?.startsWith(`${featureRoot}${path.sep}`), reference.specifier).toBe(true);
 			if (compositionPath === contractPath) {
 				// The portable root composes feature contracts, never application implementations.
-				expect(target, reference.specifier).toMatch(/\/backend\/.*\.contract\.ts$/);
+				expect(target, reference.specifier).toMatch(/\/backend\/(?:.*\.contract|api\.definition)\.ts$/);
 			}
 		}
 	}
 
 	// Retiring the registry also retires its special exemption for namespace barrels.
 	expect(isFeatureReexportBridge(endpointRegistryPath,
-		"export * as instance from '../../instance/backend/api.contract.js';")).toBe(true);
+		"export * as instance from '../../instance/backend/api.definition.js';")).toBe(true);
 });
 
 test('feature leaf aliases cannot hide export-only bridges', () => {

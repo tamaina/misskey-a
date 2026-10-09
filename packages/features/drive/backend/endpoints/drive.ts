@@ -6,7 +6,7 @@
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 import { DriveFileEntityService } from '../serializers/DriveFileEntityService.js';
 import { RoleService } from '@features/roles/backend/services/RoleService.js';
-import { driveManagementContract } from '../management.contract.js';
+import { driveManagementContract } from '../api.definition.js';
 import { implement } from '@orpc/server';
 import { authentication, apiPolicy, requirePrincipal } from '@features/api/backend/transport/middleware.js';
 import type { ApiContext } from '@features/api/backend/transport/context.js';

@@ -10,7 +10,7 @@ import { DI } from '@/di-symbols.js';
 import type { Config } from '@/config.js';
 import type { MiMeta } from '@features/persistence/backend/repositories/models.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
-import { ApiRouterProvider } from '@features/index/backend/api.provider.js';
+import { ApiRouterProvider } from '@features/index/backend/api.implementation.js';
 import type { ApiExecutionContext } from '@features/index/backend/api.context.js';
 import { AuthenticateService, AuthenticationError } from '@features/auth/backend/transport/AuthenticateService.js';
 import { getIpHash } from '@features/auth/backend/utility/get-ip-hash.js';

@@ -11,11 +11,11 @@ import type { UsersRepository } from '@features/persistence/backend/repositories
 import { RoleService } from '@features/roles/backend/services/RoleService.js';
 import { ModerationLogService } from '@features/moderation/backend/services/ModerationLogService.js';
 import * as v from 'valibot';
-import { AdminUnsetMfaContract } from '../../api.contract.js';
+import { AdminUnsetMfaContract } from '../../api.definition.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 import { implement } from '@orpc/server';
-import { authentication, apiPolicy, requirePrincipal } from '../../../../api/backend/transport/middleware.js';
-import type { ApiContext } from '../../../../api/backend/transport/context.js';
+import { authentication, apiPolicy, requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import type { ApiContext } from '@features/api/backend/transport/context.js';
 export const meta = {
 	tags: ['admin'],
 

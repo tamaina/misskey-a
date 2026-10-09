@@ -4,7 +4,7 @@
  */
 import { call } from '@orpc/server';
 import type { ApiContext } from '../../../api/backend/transport/context.js';
-import type { RelationshipsDependencies } from '../../backend/api.dependencies.js';
+import type { RelationshipsDependencies } from '../../backend/api.implementation.js';
 import { expect, test } from 'vitest';
 import * as v from 'valibot';
 import { mockDeep } from 'vitest-mock-extended';

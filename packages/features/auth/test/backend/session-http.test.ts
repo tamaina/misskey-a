@@ -10,7 +10,7 @@ import { APIClient, isAPIError } from '../../../../misskey-js/built/api.js';
 import { registerAuthSessionHttp } from '../../backend/session.http.js';
 import { FastifyReplyError } from '../../../runtime/backend/http/fastify-reply-error.js';
 import { implement } from '@orpc/server';
-import { authSessionsContract, type AuthSessionInputs, type AuthSessionOutputs } from '../../backend/session.contract.js';
+import { authSessionsContract, type AuthSessionInputs, type AuthSessionOutputs } from '../../backend/api.definition.js';
 import type { AuthSessionContext, AuthSessionRequest, AuthSessionEffects } from '../../backend/session.effects.js';
 import { sessionErrors } from '../../backend/session.middleware.js';
 type AuthSessionOperations = { [Name in keyof AuthSessionInputs]: (input: AuthSessionInputs[Name], request: AuthSessionRequest, effects: AuthSessionEffects) => Promise<AuthSessionOutputs[Name]> };

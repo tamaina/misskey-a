@@ -2,12 +2,12 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-import { apiError } from '../../../../../api/backend/transport/orpc-error.js';
-import type { ApiActor, ApiContext } from '../../../../../api/backend/transport/context.js';
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
+import type { ApiActor, ApiContext } from '@features/api/backend/transport/context.js';
 import { implement } from '@orpc/server';
-import { authentication, apiPolicy, requirePrincipal } from '../../../../../api/backend/transport/middleware.js';
+import { authentication, apiPolicy, requirePrincipal } from '@features/api/backend/transport/middleware.js';
 import { adDeleteContract } from './delete.contract.js';
-import type { InstanceApiDependencies } from '../../../api.dependencies.js';
+import type { InstanceApiDependencies } from '../../../api.implementation.js';
 export type AdDeleteDependencies = Pick<InstanceApiDependencies, 'adsRepository' | 'moderationLogService'>;
 export function createAdDeleteProcedure<Actor extends ApiActor>(deps: AdDeleteDependencies) {
 	return implement(adDeleteContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>()

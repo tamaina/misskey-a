@@ -6,10 +6,10 @@
 import { expect, test } from 'vitest';
 import * as v from 'valibot';
 import { createRouterClient } from '@orpc/server';
-import { createModerationRouter } from '../../backend/api.router.js';
+import { createModerationRouter } from '../../backend/api.implementation.js';
 import { mockDeep } from 'vitest-mock-extended';
-import { moderationContract } from '../../backend/api.contract.js';
-import type { ModerationApiDependencies } from '../../backend/api.dependencies.js';
+import { moderationContract } from '../../backend/api.definition.js';
+import type { ModerationApiDependencies } from '../../backend/api.implementation.js';
 import type { ApiActor, ApiContext, ApiAuthorization } from '../../../api/backend/transport/context.js';
 import type { MiSignin } from '../../../auth/backend/models/Signin.js';
 import { DEFAULT_POLICIES } from '../../../roles/backend/services/RoleService.js';

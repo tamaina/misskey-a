@@ -3,15 +3,15 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { collectionsContract } from '../../backend/api.contract.js';
+import { collectionsContract } from '../../backend/api.definition.js';
 
 import { expect, test } from 'vitest';
 import * as v from 'valibot';
 import { mockDeep } from 'vitest-mock-extended';
 import { createRouterClient } from '@orpc/server';
-import { packedClipSchema, packedNoteFavoriteSchema, packedGalleryPostSchema } from '../../backend/api.schema.js';
-import { createCollectionsRouter } from '../../backend/api.router.js';
-import type { CollectionsDependencies } from '../../backend/api.dependencies.js';
+import { packedClipSchema, packedNoteFavoriteSchema, packedGalleryPostSchema } from '../../backend/api.definition.js';
+import { createCollectionsRouter } from '../../backend/api.implementation.js';
+import type { CollectionsDependencies } from '../../backend/api.implementation.js';
 import type { SelectQueryBuilder } from 'typeorm';
 import { ClipEntityService } from '../../backend/serializers/ClipEntityService.js';
 import { GalleryPostEntityService } from '../../backend/serializers/GalleryPostEntityService.js';

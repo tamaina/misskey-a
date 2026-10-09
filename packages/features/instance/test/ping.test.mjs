@@ -7,7 +7,7 @@ import { createProcedureClient } from '@orpc/server';
 import assert from 'node:assert/strict';
 import * as v from 'valibot';
 import { createPingProcedure } from '../../../backend/built/features/instance/backend.js';
-import { instanceApiContract as instanceContract } from '../../../misskey-js/built/contracts/instance/backend/api.contract.js';
+import { instanceApiContract as instanceContract } from '../../../misskey-js/built/contracts/instance/backend/api.definition.js';
 
 test('implementation uses the contract and an injectable clock', async () => {
 	const ping = createPing(() => 123);

@@ -21,7 +21,7 @@ import type { MiMeta, UserProfilesRepository, UserSecurityKeysRepository, UsersR
 import type { SigninHistoryRepository } from '../session-signin-repository.js';
 import { implement } from '@orpc/server';
 import * as v from 'valibot';
-import { authSessionsContract } from '../session.contract.js';
+import { authSessionsContract } from '../api.definition.js';
 import { sessionErrors } from '../session.middleware.js';
 export interface SigninFlowDependencies {
 	config: Config;

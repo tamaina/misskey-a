@@ -3,10 +3,10 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 import { implement } from '@orpc/server';
-import type { ApiActor, ApiContext } from '../../../../api/backend/transport/context.js';
-import { authentication, apiPolicy, requirePrincipal } from '../../../../api/backend/transport/middleware.js';
-import { moderationContract } from '../../api.contract.js';
-import type { ModerationApiDependencies } from '../../api.dependencies.js';
+import type { ApiActor, ApiContext } from '@features/api/backend/transport/context.js';
+import { authentication, apiPolicy, requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import { moderationContract } from '../../api.definition.js';
+import type { ModerationApiDependencies } from '../../api.implementation.js';
 export function createAdminUnsetUserAvatarProcedure<Actor extends ApiActor>(deps: Pick<ModerationApiDependencies<Actor>, 'usersRepository' | 'moderationLogService'>) {
 	return implement(moderationContract.adminUnsetUserAvatar, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>().use(authentication<Actor>()).use(apiPolicy<Actor>({ name: 'admin/unset-user-avatar', requireCredential: true, requireModerator: true, kind: 'write:admin:unset-user-avatar' })).use(requirePrincipal<Actor>())
 		.handler(async ({ input, context }) => {

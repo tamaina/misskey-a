@@ -8,11 +8,11 @@ import { unique } from '@features/runtime/backend/data/array.js';
 import { secureRndstr } from '../../utility/secure-rndstr.js';
 import { AppEntityService } from '../../serializers/AppEntityService.js';
 import * as v from 'valibot';
-import { AppCreateContract } from '../../api.contract.js';
+import { AppCreateContract } from '../../api.definition.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 import { implement } from '@orpc/server';
-import { authentication, apiPolicy } from '../../../../api/backend/transport/middleware.js';
-import type { ApiContext } from '../../../../api/backend/transport/context.js';
+import { authentication, apiPolicy } from '@features/api/backend/transport/middleware.js';
+import type { ApiContext } from '@features/api/backend/transport/context.js';
 export const meta = {
 	tags: ['app'],
 

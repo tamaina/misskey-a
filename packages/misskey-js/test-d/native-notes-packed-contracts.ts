@@ -4,7 +4,7 @@
  */
 
 import type { InferContractRouterInputs, InferContractRouterOutputs } from '@orpc/contract';
-import type { notesApiContract } from '../built/contracts/notes/backend/api.contract.js';
+import type { notesApiContract } from '../built/contracts/notes/backend/api.definition.js';
 import type { Endpoints } from '../built/api.types.js';
 
 type Equal<A, B> = (<T>() => T extends A ? 1 : 2) extends (<T>() => T extends B ? 1 : 2) ? true : false;

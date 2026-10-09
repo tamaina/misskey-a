@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-export { collectionsContract } from './api.contract.js';
-export { createCollectionsRouter } from './api.router.js';
+export { collectionsContract } from './api.definition.js';
+export { createCollectionsRouter } from './api.implementation.js';
 export { ClipService } from './services/ClipService.js';
-export { CollectionsApiProvider } from './api.provider.js';
-export type { CollectionsDependencies } from './api.dependencies.js';
+export { CollectionsApiProvider } from './api.implementation.js';
+export type { CollectionsDependencies } from './api.implementation.js';

@@ -31,7 +31,7 @@ import type { MiLocalUser } from '../../../users/backend/models/User.js';
 import type { ApiContext, ApiServices, ApiAuthorization } from '../../../api/backend/transport/context.js';
 import { createStatsProcedure } from '../../backend/endpoints/stats.js';
 import { createApRequestProcedure, createApRequestGetProcedure } from '../../backend/endpoints/charts/ap-request.js';
-import type { StatisticsDependencies } from '../../backend/api.dependencies.js';
+import type { StatisticsDependencies } from '../../backend/api.implementation.js';
 import { retentionContract as nativeContract1, retentionContract as nativeContract2 } from '../../backend/endpoints/retention.contract.js';
 import type { RetentionAggregationsRepository } from '@features/persistence/backend/repositories/models.js';
 import type { MiRetentionAggregation } from '../../backend/models/RetentionAggregation.js';

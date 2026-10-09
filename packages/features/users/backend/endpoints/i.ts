@@ -6,7 +6,7 @@ import { apiError } from '@features/api/backend/transport/orpc-error.js';
 import { type UserEntityService } from '../serializers/UserEntityService.js';
 import { iErrors } from './i.contract.js';
 import type { ApiToken } from '@features/api/backend/transport/context.js';
-import type { UsersInputs } from '../api.contract.js';
+import type { UsersInputs } from '../api.definition.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 import type { UserProfilesRepository } from '@features/persistence/backend/repositories/models.js';
 import { iContract } from './i.contract.js';

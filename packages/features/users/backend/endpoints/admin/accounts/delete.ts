@@ -4,7 +4,7 @@
  */
 import { type DeleteAccountService } from '../../../services/DeleteAccountService.js';
 import type { ApiToken } from '@features/api/backend/transport/context.js';
-import type { UsersInputs } from '../../../api.contract.js';
+import type { UsersInputs } from '../../../api.definition.js';
 
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 

@@ -5,15 +5,15 @@
 
 import { OpenAPIGenerator } from '@orpc/openapi';
 import { experimental_ValibotToJsonSchemaConverter } from '@orpc/valibot';
-import { packedJsonValueSchema } from '../../../../users/backend/json-value.schema.js';
-import { clientContract } from '../../../../index/backend/client.contract.js';
-import { packedSchemas } from '../../../../index/backend/packed.schema.js';
-import { pilotContract } from '../../../../index/backend/api.contract.js';
+import { packedJsonValueSchema } from '@features/users/backend/json-value.schema.js';
+import { clientContract } from '@features/index/backend/client.contract.js';
+import { packedSchemas } from '@features/index/backend/packed.schema.js';
+import { pilotContract } from '@features/index/backend/api.definition.js';
 import { rawObjectInputGuard } from '../input.schema.js';
 import { apiErrorInfoObject } from '../errors.schema.js';
 import { requestRoutes, nullableResponsePaths } from '../../../shared/api-routing.js';
-import { galleryFileIdsUnique } from '../../../../collections/backend/api.schema.js';
-import { imageCommentLength } from '../../../../drive/backend/endpoints/drive/files/create.schema.js';
+import { galleryFileIdsUnique } from '@features/collections/backend/api.definition.js';
+import { imageCommentLength } from '@features/drive/backend/endpoints/drive/files/create.schema.js';
 
 /** JSON Schema exists only as generated external documentation, never request validation. */
 export async function genPilotOpenapiSpec(config: { version: string; apiUrl: string }) {

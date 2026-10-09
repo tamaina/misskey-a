@@ -12,7 +12,7 @@ import { relationshipsContract } from '../../backend/endpoints/relationships.con
 import { readBirthdayDate } from '../../backend/endpoints/birthday.schema.js';
 import { packedUserRelationSchema } from '../../backend/endpoints/relationships.schema.js';
 import type { MiLocalUser } from '../../../users/backend/models/User.js';
-import type { RelationshipsDependencies } from '../../backend/api.dependencies.js';
+import type { RelationshipsDependencies } from '../../backend/api.implementation.js';
 import type { ApiContext, ApiServices } from '../../../api/backend/transport/context.js';
 
 function requiredSchema<S extends v.GenericSchema>(schema: S | undefined): S {

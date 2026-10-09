@@ -29,7 +29,7 @@ import { iUpdateErrors } from './update.contract.js';
 import type { MiUserProfile } from '../../models/UserProfile.js';
 import type { MiLocalUser, MiUser } from '../../models/User.js';
 import type { UsersRepository, DriveFilesRepository, MiMeta, UserProfilesRepository, PagesRepository } from '@features/persistence/backend/repositories/models.js';
-import type { UsersInputs } from '../../api.contract.js';
+import type { UsersInputs } from '../../api.definition.js';
 import type { ApiToken } from '@features/api/backend/transport/context.js';
 
 /** Exact profile columns written by i/update; JSON columns remain their stored entity types. */

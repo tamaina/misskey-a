@@ -12,8 +12,8 @@ import { misskeyErrorBody } from '@features/api/backend/transport/orpc-error.js'
 import { registerPilotHttp } from '@features/api/backend/transport/pilot-http.js';
 import * as v from 'valibot';
 import bcrypt from 'bcryptjs';
-import { createAuthRouter, type AuthRouterDependencies } from '../../backend/api.router.js';
-import { authContract, AdminCaptchaCurrentContract, I2faKeyDoneContract, IRevokeTokenContract } from '../../backend/api.contract.js';
+import { createAuthRouter, type AuthRouterDependencies } from '../../backend/api.implementation.js';
+import { authContract, AdminCaptchaCurrentContract, I2faKeyDoneContract, IRevokeTokenContract } from '../../backend/api.definition.js';
 import { createIRevokeTokenProcedure, type TokenRevocationRepository } from '../../backend/endpoints/i/revoke-token.js';
 import { createI2faKeyDoneProcedure } from '../../backend/endpoints/i/2fa/key-done.js';
 import { WebAuthnService } from '../../backend/services/WebAuthnService.js';

@@ -4,11 +4,11 @@
  */
 
 import { implement } from '@orpc/server';
-import { authentication, apiPolicy, requirePrincipal } from '../../../../api/backend/transport/middleware.js';
+import { authentication, apiPolicy, requirePrincipal } from '@features/api/backend/transport/middleware.js';
 import { registerContract } from './register.contract.js';
 import type { ApiContext } from '@features/api/backend/transport/context.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
-import type { NotificationsDependencies } from '@features/notifications/backend/api.dependencies.js';
+import type { NotificationsDependencies } from '@features/notifications/backend/api.implementation.js';
 import { apiError } from '@features/api/backend/transport/orpc-error.js';
 export type RegisterDependencies = Pick<NotificationsDependencies, 'isValidEndpoint' | 'findSubscription' | 'getSwPublicKey' | 'insertSubscription' | 'generateId' | 'refreshSubscriptionCache'>;
 export function createRegisterProcedure(deps: RegisterDependencies) {

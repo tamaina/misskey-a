@@ -2,10 +2,10 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-export { chatApiContract } from './api.contract.js';
-export { createChatRouter } from './api.router.js';
-export type { ChatRouterDependencies } from './api.router.js';
-export { ChatApiProvider } from './api.provider.js';
+export { chatApiContract } from './api.definition.js';
+export { createChatRouter } from './api.implementation.js';
+export type { ChatRouterDependencies } from './api.implementation.js';
+export { ChatApiProvider } from './api.implementation.js';
 export { createChatHistoryProcedure } from './endpoints/chat/history.js';
 export { createChatMessagesCreateToRoomProcedure } from './endpoints/chat/messages/create-to-room.js';
 export { createChatMessagesCreateToUserProcedure } from './endpoints/chat/messages/create-to-user.js';

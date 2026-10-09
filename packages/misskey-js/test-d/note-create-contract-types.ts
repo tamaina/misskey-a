@@ -2,7 +2,7 @@ import type { ContractEndpoints } from '../src/contract.types.js';
 import type { Packed } from '../built/contracts/index/backend/packed.schema.js';
 import type { notesCreateContract } from '../built/contracts/notes/backend/endpoints/notes/create.contract.js';
 import type { InferContractRouterOutputs, InferSchemaOutput } from '@orpc/contract';
-import type { notesApiContract } from '../built/contracts/notes/backend/api.contract.js';
+import type { notesApiContract } from '../built/contracts/notes/backend/api.definition.js';
 
 type Equal<A, B> = (<T>() => T extends A ? 1 : 2) extends (<T>() => T extends B ? 1 : 2) ? true : false;
 type Assert<T extends true> = T;

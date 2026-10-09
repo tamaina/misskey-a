@@ -6,10 +6,10 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { expect, test } from 'vitest';
 import { mockDeep } from 'vitest-mock-extended';
-import { createAnnouncementsRouter } from '@features/announcements/backend/api.router.js';
+import { createAnnouncementsRouter } from '@features/announcements/backend/api.implementation.js';
 import { isContractProcedure } from '@orpc/contract';
 import * as v from 'valibot';
-import { pilotContract } from '@features/index/backend/api.contract.js';
+import { pilotContract } from '@features/index/backend/api.definition.js';
 import { createApiTestRouter } from '@features/index/backend/api.test-fixture.js';
 import { requestRoutes } from '@features/api/shared/api-routing.js';
 import type { ApiActor } from '@features/api/backend/transport/context.js';

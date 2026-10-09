@@ -3,12 +3,12 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 import * as v from 'valibot';
-import { DEFAULT_POLICIES } from '../../../../roles/backend/services/RoleService.js';
+import { DEFAULT_POLICIES } from '@features/roles/backend/services/RoleService.js';
 import { adminMetaContract } from './meta.contract.js';
-import type { ApiActor, ApiContext } from '../../../../api/backend/transport/context.js';
+import type { ApiActor, ApiContext } from '@features/api/backend/transport/context.js';
 import { implement } from '@orpc/server';
-import { authentication, apiPolicy, requirePrincipal } from '../../../../api/backend/transport/middleware.js';
-import type { InstanceApiDependencies } from '../../api.dependencies.js';
+import { authentication, apiPolicy, requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import type { InstanceApiDependencies } from '../../api.implementation.js';
 export type AdminMetaDependencies = Pick<InstanceApiDependencies, 'metaService' | 'systemAccountService' | 'config'>;
 export function createAdminMetaProcedure<Actor extends ApiActor>(deps: AdminMetaDependencies) {
 	return implement(adminMetaContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>()

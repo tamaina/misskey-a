@@ -6,7 +6,7 @@
 import { expect, test } from 'vitest';
 import * as v from 'valibot';
 import { mockDeep } from 'vitest-mock-extended';
-import { preferencesContract } from '../../backend/api.contract.js';
+import { preferencesContract } from '../../backend/api.definition.js';
 import { MiRegistryItem } from '../../backend/models/RegistryItem.js';
 import { RegistryApiService } from '../../backend/services/RegistryApiService.js';
 import type { RegistryItemsRepository } from '@features/persistence/backend/repositories/models.js';

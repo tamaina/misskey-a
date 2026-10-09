@@ -2,8 +2,8 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-import { apiError } from '../../../api/backend/transport/orpc-error.js';
-import type { RelationshipsDependencies } from '../api.dependencies.js';
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
+import type { RelationshipsDependencies } from '../api.implementation.js';
 export function hasErrorId(error: unknown, id: string): boolean {
 	return error !== null && typeof error === 'object' && 'id' in error && error.id === id;
 }

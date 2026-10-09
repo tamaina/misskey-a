@@ -30,7 +30,7 @@ import {
 import {
 	packedNoteFavoriteSchema,
 	packedClipSchema,
-} from '../../collections/backend/api.schema.js';
+} from '../../collections/backend/api.definition.js';
 
 import {
 	packedHashtagSchema,
@@ -45,7 +45,7 @@ import {
 	emojiSimpleResult as packedEmojiSimpleSchema,
 	emojiDetailedResult as packedEmojiDetailedSchema,
 	packedEmojiDetailedAdminSchema,
-} from '../../emojis/backend/api.schema.js';
+} from '../../emojis/backend/api.definition.js';
 
 import {
 	federationInstanceSchema as packedFederationInstanceSchema,
@@ -53,7 +53,7 @@ import {
 
 import {
 	packedGalleryPostSchema,
-} from '../../collections/backend/api.schema.js';
+} from '../../collections/backend/api.definition.js';
 
 import {
 	packedReversiGameLiteSchema,
@@ -75,7 +75,7 @@ import {
 
 import {
 	abuseReportNotificationRecipientSchema as packedAbuseReportNotificationRecipientSchema,
-} from '../../moderation/backend/api.schema.js';
+} from '../../moderation/backend/api.definition.js';
 
 import {
 	packedNoteSchema,

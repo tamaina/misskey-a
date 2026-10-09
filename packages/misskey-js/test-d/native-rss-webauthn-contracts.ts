@@ -5,8 +5,8 @@
 import type * as v from 'valibot';
 import type { PublicKeyCredentialCreationOptionsJSON } from '@simplewebauthn/browser';
 import type { InferContractRouterOutputs } from '@orpc/contract';
-import type { authContract } from '../built/contracts/auth/backend/api.contract.js';
-import type { integrationsContract } from '../built/contracts/integrations/backend/api.contract.js';
+import type { authContract } from '../built/contracts/auth/backend/api.definition.js';
+import type { integrationsContract } from '../built/contracts/integrations/backend/api.definition.js';
 import type { ContractEndpoints } from '../built/contract.types.js';
 import type { Endpoints } from '../built/api.types.js';
 import type { I2faRegisterKeyResponse, FetchRssResponse } from '../built/entities.js';

@@ -31,7 +31,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import { watch, ref } from 'vue';
-import type { EmojiSimple } from '../backend/api.schema.js';
+import type { EmojiSimple } from '../backend/api.definition.js';
 import EmojiCatalogItem from './EmojiCatalogItem.vue';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import MkInput from '@features/ui/frontend/components/MkInput.vue';

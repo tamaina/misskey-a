@@ -3,12 +3,12 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 import { implement } from '@orpc/server';
-import { authentication, apiPolicy, requirePrincipal } from '../../../../../api/backend/transport/middleware.js';
-import type { ApiActor, ApiContext } from '../../../../../api/backend/transport/context.js';
-import { collectionsContract } from '../../../api.contract.js';
-import type { CollectionsDependencies } from '../../../api.dependencies.js';
-import { apiError } from '../../../../../api/backend/transport/orpc-error.js';
-import { GALLERY_POSTS_RANKING_WINDOW } from '../../../../../discovery/backend/services/FeaturedService.js';
+import { authentication, apiPolicy, requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import type { ApiActor, ApiContext } from '@features/api/backend/transport/context.js';
+import { collectionsContract } from '../../../api.definition.js';
+import type { CollectionsDependencies } from '../../../api.implementation.js';
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
+import { GALLERY_POSTS_RANKING_WINDOW } from '@features/discovery/backend/services/FeaturedService.js';
 import { collectionsErrors } from '../../../api.errors.js';
 export interface GalleryPostsLikeDependencies<Actor extends ApiActor> {
 	galleryPostsRepository: Pick<CollectionsDependencies<Actor>['galleryPostsRepository'], 'findOneBy' | 'increment'>;

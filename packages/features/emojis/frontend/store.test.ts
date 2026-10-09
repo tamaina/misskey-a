@@ -5,7 +5,7 @@
 
 import { nextTick } from 'vue';
 import { describe, expect, test, vi } from 'vitest';
-import type { EmojiSimple } from '../backend/api.schema.js';
+import type { EmojiSimple } from '../backend/api.definition.js';
 import { createCustomEmojiStore } from './store.js';
 import type { CustomEmojiStoreDependencies } from './store.js';
 

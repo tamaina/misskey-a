@@ -13,12 +13,12 @@ import type { MiLocalUser } from '@features/users/backend/models/User.js';
 import type { MiNote } from '@features/notes/backend/models/Note.js';
 import { OpenAPIHandler } from '@orpc/openapi/fastify';
 import type * as v from 'valibot';
-import { createCollectionsRouter } from '../../backend/api.router.js';
+import { createCollectionsRouter } from '../../backend/api.implementation.js';
 import type { ApiContext } from '@features/api/backend/transport/context.js';
 import type { SelectQueryBuilder } from 'typeorm';
 import type { MiClip } from '../../backend/models/Clip.js';
-import type { CollectionsDependencies } from '../../backend/api.dependencies.js';
-import type { packedClipSchema } from '../../backend/api.schema.js';
+import type { CollectionsDependencies } from '../../backend/api.implementation.js';
+import type { packedClipSchema } from '../../backend/api.definition.js';
 import type { ApiServices } from '@features/api/backend/transport/context.js';
 const actor = mockDeep<MiLocalUser>({ id: 'owner1', isSuspended: false, movedToUri: null });
 const clip: v.InferOutput<typeof packedClipSchema> = {

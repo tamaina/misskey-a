@@ -7,7 +7,7 @@ import { notificationTypes } from './notification-types.schema.js';
 import type { listContract } from './endpoints/i/notifications.contract.js';
 import type { MiNotification } from './models/Notification.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
-import type { NotificationsDependencies } from './api.dependencies.js';
+import type { NotificationsDependencies } from './api.implementation.js';
 type NotificationListInput = InferSchemaOutput<NonNullable<typeof listContract['~orpc']['inputSchema']>>;
 type AcceptedNotificationType = NonNullable<NotificationListInput['includeTypes']>[number];
 export type NotificationsReadDependencies = Pick<NotificationsDependencies, 'generateId' | 'getNotifications'>;

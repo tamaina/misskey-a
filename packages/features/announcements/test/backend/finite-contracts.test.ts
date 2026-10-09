@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { announcementsContract } from '../../backend/api.contract.js';
+import { announcementsContract } from '../../backend/api.definition.js';
 
 import { expect, expectTypeOf, test } from 'vitest';
 import * as v from 'valibot';
@@ -13,20 +13,20 @@ import { AnnouncementEntityService } from '../../backend/serializers/Announcemen
 import { createRouterClient } from '@orpc/server';
 import { Brackets, EntityNotFoundError } from 'typeorm';
 import type { SelectQueryBuilder } from 'typeorm';
-import { createAnnouncementsRouter } from '../../backend/api.router.js';
-import type { AnnouncementsDependencies } from '../../backend/api.dependencies.js';
+import { createAnnouncementsRouter } from '../../backend/api.implementation.js';
+import type { AnnouncementsDependencies } from '../../backend/api.implementation.js';
 import type { ApiActor, ApiAuthorization, ApiContext, ApiServices } from '../../../api/backend/transport/context.js';
 import { MiAnnouncement } from '../../backend/models/Announcement.js';
 
 import { packedSchemas } from '../../../index/backend/packed.schema.js';
-import { announcementsContract as nativeContract2 } from '../../backend/api.contract.js';
-import { announcementsContract as nativeContract3 } from '../../backend/api.contract.js';
-import { announcementsContract as nativeContract4 } from '../../backend/api.contract.js';
-import { announcementsContract as nativeContract5 } from '../../backend/api.contract.js';
-import { announcementsContract as nativeContract6 } from '../../backend/api.contract.js';
-import { announcementsContract as nativeContract7 } from '../../backend/api.contract.js';
-import { announcementsContract as nativeContract8 } from '../../backend/api.contract.js';
-import { announcementsContract as nativeContract9 } from '../../backend/api.contract.js';
+import { announcementsContract as nativeContract2 } from '../../backend/api.definition.js';
+import { announcementsContract as nativeContract3 } from '../../backend/api.definition.js';
+import { announcementsContract as nativeContract4 } from '../../backend/api.definition.js';
+import { announcementsContract as nativeContract5 } from '../../backend/api.definition.js';
+import { announcementsContract as nativeContract6 } from '../../backend/api.definition.js';
+import { announcementsContract as nativeContract7 } from '../../backend/api.definition.js';
+import { announcementsContract as nativeContract8 } from '../../backend/api.definition.js';
+import { announcementsContract as nativeContract9 } from '../../backend/api.definition.js';
 import type { QueryService } from '@features/notes/backend/services/QueryService.js';
 import type { IdService } from '@features/runtime/backend/services/IdService.js';
 import type { AnnouncementsRepository, AnnouncementReadsRepository } from '@features/persistence/backend/repositories/models.js';

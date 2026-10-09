@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
-import type { EmojiSimple } from '../../../features/emojis/backend/api.schema.js';
+import type { EmojiSimple } from '../../../features/emojis/backend/api.definition.js';
 
 const mocks = vi.hoisted(() => ({
 	cached: undefined as unknown,

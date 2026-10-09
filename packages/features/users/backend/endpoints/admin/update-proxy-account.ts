@@ -6,7 +6,7 @@ import { type ModerationLogService } from '@features/moderation/backend/services
 import { type UserEntityService } from '../../serializers/UserEntityService.js';
 import { type SystemAccountService } from '../../services/SystemAccountService.js';
 import type { ApiToken } from '@features/api/backend/transport/context.js';
-import type { UsersInputs } from '../../api.contract.js';
+import type { UsersInputs } from '../../api.definition.js';
 
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 import { adminUpdateProxyAccountContract } from './update-proxy-account.contract.js';

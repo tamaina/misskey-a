@@ -6,11 +6,11 @@
 import { IsNull } from 'typeorm';
 import type { MiMeta, UsedUsernamesRepository, UsersRepository } from '@features/persistence/backend/repositories/models.js';
 import * as v from 'valibot';
-import { UsernameAvailableContract } from '../../api.contract.js';
+import { UsernameAvailableContract } from '../../api.definition.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 import { implement } from '@orpc/server';
-import { authentication, apiPolicy } from '../../../../api/backend/transport/middleware.js';
-import type { ApiContext } from '../../../../api/backend/transport/context.js';
+import { authentication, apiPolicy } from '@features/api/backend/transport/middleware.js';
+import type { ApiContext } from '@features/api/backend/transport/context.js';
 export const meta = {
 	tags: ['users'],
 

@@ -5,11 +5,11 @@
 import { captchaErrorCodes, CaptchaService } from '../../../services/CaptchaService.js';
 import { apiError } from '@features/api/backend/transport/orpc-error.js';
 import * as v from 'valibot';
-import { AdminCaptchaSaveContract } from '../../../api.contract.js';
+import { AdminCaptchaSaveContract } from '../../../api.definition.js';
 import { implement } from '@orpc/server';
-import { authentication, apiPolicy, requirePrincipal } from '../../../../../api/backend/transport/middleware.js';
-import type { ApiContext } from '../../../../../api/backend/transport/context.js';
-import type { MiLocalUser } from '../../../../../users/backend/models/User.js';
+import { authentication, apiPolicy, requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import type { ApiContext } from '@features/api/backend/transport/context.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
 export const meta = {
 	tags: ['admin', 'captcha'],
 

@@ -3,11 +3,11 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 import { implement } from '@orpc/server';
-import type { ApiActor, ApiContext } from '../../../../api/backend/transport/context.js';
-import { authentication, apiPolicy, requirePrincipal, decodeScalarInput } from '../../../../api/backend/transport/middleware.js';
-import { moderationContract } from '../../api.contract.js';
-import type { ModerationApiDependencies } from '../../api.dependencies.js';
-import { sqlLikeEscape } from '../../../../persistence/backend/utility/sql-like-escape.js';
+import type { ApiActor, ApiContext } from '@features/api/backend/transport/context.js';
+import { authentication, apiPolicy, requirePrincipal, decodeScalarInput } from '@features/api/backend/transport/middleware.js';
+import { moderationContract } from '../../api.definition.js';
+import type { ModerationApiDependencies } from '../../api.implementation.js';
+import { sqlLikeEscape } from '@features/persistence/backend/utility/sql-like-escape.js';
 export function createAdminShowModerationLogsProcedure<Actor extends ApiActor>(deps: Pick<ModerationApiDependencies<Actor>, 'queryService' | 'moderationLogsRepository' | 'moderationLogEntityService'>) {
 	return implement(moderationContract.adminShowModerationLogs, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>().use(authentication<Actor>()).use(apiPolicy<Actor>({ name: 'admin/show-moderation-logs', requireCredential: true, requireAdmin: true, kind: 'read:admin:show-moderation-log' })).use(requirePrincipal<Actor>()).use(decodeScalarInput<Actor>({ limit: 'number', sinceDate: 'number', untilDate: 'number' }))
 		.handler(async ({ input, context }) => {

@@ -6,7 +6,7 @@
 import type { InferSchemaInput, InferSchemaOutput } from '@orpc/contract';
 import type * as v from 'valibot';
 import type { InferContractRouterInputs, InferContractRouterOutputs } from '@orpc/contract';
-import type { notesApiContract } from '@features/notes/backend/api.contract.js';
+import type { notesApiContract } from '@features/notes/backend/api.definition.js';
 import type { createNotesDraftsCreateProcedure } from '@features/notes/backend/endpoints/notes/drafts/create.js';
 import type { InferRouterOutputs } from '@orpc/server';
 import type { packedNoteDraftSchema } from '@features/notes/backend/note-aux.schema.js';

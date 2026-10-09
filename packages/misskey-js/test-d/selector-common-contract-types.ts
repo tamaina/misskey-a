@@ -1,7 +1,7 @@
 // Compile-only test-d fixture; never execute it.
 import type { ContractEndpoints } from '../src/contract.types.js';
 import type { InferContractRouterInputs } from '@orpc/contract';
-import type { emojisContract } from '../built/contracts/emojis/backend/api.contract.js';
+import type { emojisContract } from '../built/contracts/emojis/backend/api.definition.js';
 import type { notesSearchByTagContract, usersSearchByUsernameAndHostContract } from '../built/contracts/discovery/backend/endpoints/discovery.contract.js';
 import type { UsersFollowersContract, UsersFollowingContract } from '../built/contracts/relationships/backend/endpoints/relationships.contract.js';
 

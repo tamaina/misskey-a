@@ -3,9 +3,9 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 export { notificationsContract } from './endpoints/notifications.contract.js';
-export { createNotificationsRouter } from './router.js';
-export { NotificationsApiProvider } from './api.provider.js';
-export type { NotificationsDependencies, SubscriptionRecord, SubscriptionQuery } from './api.dependencies.js';
+export { createNotificationsRouter } from './api.implementation.js';
+export { NotificationsApiProvider } from './api.implementation.js';
+export type { NotificationsDependencies, SubscriptionRecord, SubscriptionQuery } from './api.implementation.js';
 export { packedNotificationSchema } from './notification.schema.js';
 export type { NotificationDto } from './notification.schema.js';
 export { createGroupedProcedure } from './endpoints/i/notifications-grouped.js';

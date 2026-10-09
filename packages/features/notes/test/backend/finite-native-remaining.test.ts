@@ -11,7 +11,7 @@ import type { ApiContext } from '@features/api/backend/transport/context.js';
 import { mockDeep } from 'vitest-mock-extended';
 import { ModuleRef } from '@nestjs/core';
 import { EntityNotFoundError } from 'typeorm';
-import { notesApiContract } from '../../backend/api.contract.js';
+import { notesApiContract } from '../../backend/api.definition.js';
 import { notesContract } from '../../backend/endpoints/notes.contract.js';
 import { notesConversationContract } from '../../backend/endpoints/notes/conversation.contract.js';
 import { notesDraftsListContract } from '../../backend/endpoints/notes/drafts/list.contract.js';

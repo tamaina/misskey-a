@@ -10,7 +10,7 @@ import { QueryService } from '@features/notes/backend/services/QueryService.js';
 import { NoteEntityService } from '@features/notes/backend/serializers/NoteEntityService.js';
 import { RoleService } from '@features/roles/backend/services/RoleService.js';
 import { apiError } from '@features/api/backend/transport/orpc-error.js';
-import { driveManagementContract } from '../../../management.contract.js';
+import { driveManagementContract } from '../../../api.definition.js';
 import { implement } from '@orpc/server';
 import { authentication, apiPolicy, requirePrincipal } from '@features/api/backend/transport/middleware.js';
 import type { ApiContext } from '@features/api/backend/transport/context.js';
