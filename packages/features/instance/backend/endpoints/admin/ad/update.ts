@@ -2,17 +2,15 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 import { apiError } from '@features/api/backend/transport/orpc-error.js';
-import type { ApiActor, ApiContext } from '@features/api/backend/transport/context.js';
-import { implement } from '@orpc/server';
-import { authentication, apiPolicy, requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import type { ApiActor } from '@features/api/backend/transport/context.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
 import { adUpdateContract } from './update.contract.js';
 import type { InstanceApiDependencies } from '../../../api.implementation.js';
 export type AdUpdateDependencies = Pick<InstanceApiDependencies, 'adsRepository' | 'moderationLogService'>;
 export function createAdUpdateProcedure<Actor extends ApiActor>(deps: AdUpdateDependencies) {
-	return implement(adUpdateContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>()
-		.use(authentication<Actor>())
-		.use(apiPolicy<Actor>({ name: 'admin/ad/update', requireCredential: true, requireModerator: true, kind: 'write:admin:ad' }))
+	return createApiProcedure<Actor>()(adUpdateContract)
 		.use(requirePrincipal<Actor>())
 		.handler(async ({ input, context }) => {
 			const ps = input;

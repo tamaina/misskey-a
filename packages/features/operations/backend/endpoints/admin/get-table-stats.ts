@@ -3,9 +3,9 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { implement } from '@orpc/server';
-import { authentication, apiPolicy, requirePrincipal } from '../../../../api/backend/transport/middleware.js';
-import type { ApiActor, ApiContext } from '../../../../api/backend/transport/context.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import type { ApiActor } from '@features/api/backend/transport/context.js';
 import { adminGetTableStatsContract } from './get-table-stats.contract.js';
 import type { DataSource } from 'typeorm';
 import * as v from 'valibot';
@@ -13,9 +13,7 @@ export interface AdminGetTableStatsDependencies {
 	db: Pick<DataSource, 'query'>;
 }
 export function createAdminGetTableStatsProcedure<Actor extends ApiActor>(deps: AdminGetTableStatsDependencies) {
-	return implement(adminGetTableStatsContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>()
-		.use(authentication<Actor>())
-		.use(apiPolicy<Actor>({ name: adminGetTableStatsContract['~orpc'].meta.requestName, requireCredential: true, requireAdmin: true, kind: 'read:admin:table-stats' }))
+	return createApiProcedure<Actor>()(adminGetTableStatsContract)
 		.use(requirePrincipal<Actor>())
 		.handler(async () => {
 			const result = await (async () => {
@@ -37,6 +35,6 @@ export function createAdminGetTableStatsProcedure<Actor extends ApiActor>(deps: 
 					});
 				return sizes;
 			})();
-			return v.parse(adminGetTableStatsContract['~orpc'].outputSchema!, result);
+			return result;
 		});
 }

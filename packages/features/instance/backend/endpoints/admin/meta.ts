@@ -2,23 +2,21 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-import * as v from 'valibot';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import { toPackedRecord, toPackedJsonValue } from '@features/users/backend/json-value.schema.js';
 import { DEFAULT_POLICIES } from '@features/roles/backend/services/RoleService.js';
 import { adminMetaContract } from './meta.contract.js';
-import type { ApiActor, ApiContext } from '@features/api/backend/transport/context.js';
-import { implement } from '@orpc/server';
-import { authentication, apiPolicy, requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import type { ApiActor } from '@features/api/backend/transport/context.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
 import type { InstanceApiDependencies } from '../../api.implementation.js';
 export type AdminMetaDependencies = Pick<InstanceApiDependencies, 'metaService' | 'systemAccountService' | 'config'>;
 export function createAdminMetaProcedure<Actor extends ApiActor>(deps: AdminMetaDependencies) {
-	return implement(adminMetaContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>()
-		.use(authentication<Actor>())
-		.use(apiPolicy<Actor>({ name: 'admin/meta', requireCredential: true, requireAdmin: true, kind: 'read:admin:meta' }))
+	return createApiProcedure<Actor>()(adminMetaContract)
 		.use(requirePrincipal<Actor>())
 		.handler(async ({ input, context }) => {
 			const instance = await deps.metaService.fetch(true);
 			const proxy = await deps.systemAccountService.fetch('proxy');
-			return v.parse(requiredSchema(adminMetaContract['~orpc'].outputSchema), {
+			return {
 				maintainerName: instance.maintainerName,
 				maintainerEmail: instance.maintainerEmail,
 				version: deps.config.version,
@@ -123,7 +121,7 @@ export function createAdminMetaProcedure<Actor extends ApiActor>(deps: AdminMeta
 				enableServerMachineStats: instance.enableServerMachineStats,
 				enableIdenticonGeneration: instance.enableIdenticonGeneration,
 				bannedEmailDomains: instance.bannedEmailDomains,
-				policies: { ...DEFAULT_POLICIES, ...instance.policies },
+				policies: Object.fromEntries(Object.entries(toPackedRecord({ ...DEFAULT_POLICIES, ...instance.policies })).map(([key, value]) => [key, toPackedJsonValue(value)])),
 				manifestJsonOverride: instance.manifestJsonOverride,
 				enableFanoutTimeline: instance.enableFanoutTimeline,
 				enableFanoutTimelineDbFallback: instance.enableFanoutTimelineDbFallback,
@@ -154,11 +152,6 @@ export function createAdminMetaProcedure<Actor extends ApiActor>(deps: AdminMeta
 				remoteNotesCleaningExpiryDaysForEachNotes: instance.remoteNotesCleaningExpiryDaysForEachNotes,
 				remoteNotesCleaningMaxProcessingDurationInMinutes: instance.remoteNotesCleaningMaxProcessingDurationInMinutes,
 				showRoleBadgesOfRemoteUsers: instance.showRoleBadgesOfRemoteUsers,
-			});
+			};
 		});
-}
-
-function requiredSchema<Schema>(schema: Schema | undefined): Schema {
-	if (schema === undefined) throw new Error('Contract must declare its schema');
-	return schema;
 }

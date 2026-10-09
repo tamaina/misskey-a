@@ -25,8 +25,9 @@ test('contract rejects non-object inputs', async () => {
 	}
 });
 
-test('contract rejects invalid handler output', async () => {
-	await assert.rejects(createPing(() => 'invalid')({}));
+test('native delivery skips output validation while the portable schema remains finite', async () => {
+	assert.deepEqual(await createPing(() => 'invalid')({}), { pong: 'invalid' });
+	assert.equal(v.safeParse(instanceContract.ping['~orpc'].outputSchema, { pong: 'invalid' }).success, false);
 });
 
 test('native contract exposes the same path and validates finite output', () => {

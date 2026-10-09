@@ -33,10 +33,10 @@ test('uses the injected cutoff on each request and accepts legacy extra object f
 	assert.deepEqual(cutoffs, [new Date(15_000), new Date(26_000)]);
 });
 
-test('count failures and invalid handler outputs propagate', async () => {
+test('count failures propagate and delivery skips the output validator', async () => {
 	const failure = new Error('Database read failed');
 	await assert.rejects(countEndpoint({ thresholdMs: 1, countSince: async () => { throw failure; } }, () => 100)({}), error => error === failure);
-	await assert.rejects(countEndpoint({ thresholdMs: 1, countSince: async () => 'invalid' }, () => 100)({}));
+	assert.deepEqual(await countEndpoint({ thresholdMs: 1, countSince: async () => 'invalid' }, () => 100)({}), { count: 'invalid' });
 });
 
 test('native contract preserves a finite numeric count', () => {

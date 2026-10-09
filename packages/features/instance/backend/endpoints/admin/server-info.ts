@@ -2,19 +2,17 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 import * as os from 'node:os';
 import * as v from 'valibot';
 import { loadSystemInformation } from '@features/statistics/backend/runtime-dependencies/systeminformation.js';
-import type { ApiActor, ApiContext } from '@features/api/backend/transport/context.js';
-import { implement } from '@orpc/server';
-import { authentication, apiPolicy, requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import type { ApiActor } from '@features/api/backend/transport/context.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
 import { adminServerInfoContract } from './server-info.contract.js';
 import type { InstanceApiDependencies } from '../../api.implementation.js';
 export type AdminServerInfoDependencies = Pick<InstanceApiDependencies, 'redisClient' | 'db'>;
 export function createAdminServerInfoProcedure<Actor extends ApiActor>(deps: AdminServerInfoDependencies) {
-	return implement(adminServerInfoContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>()
-		.use(authentication<Actor>())
-		.use(apiPolicy<Actor>({ name: 'admin/server-info', requireCredential: true, requireModerator: true, kind: 'read:admin:server-info' }))
+	return createApiProcedure<Actor>()(adminServerInfoContract)
 		.use(requirePrincipal<Actor>())
 		.handler(async ({ input, context }) => {
 			const si = await loadSystemInformation();

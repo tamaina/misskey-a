@@ -3,20 +3,17 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { implement } from '@orpc/server';
-import { authentication, apiPolicy, requirePrincipal } from '../../../../../api/backend/transport/middleware.js';
-import type { ApiActor, ApiContext } from '../../../../../api/backend/transport/context.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import type { ApiActor } from '@features/api/backend/transport/context.js';
 import { adminQueueInboxDelayedContract } from './inbox-delayed.contract.js';
 import { URL } from 'node:url';
 import type { InboxQueue } from '../../../../../boot/backend/assembly/QueueModule.js';
-import * as v from 'valibot';
 export interface AdminQueueInboxDelayedDependencies {
 	inboxQueue: Pick<InboxQueue, 'getJobs'>;
 }
 export function createAdminQueueInboxDelayedProcedure<Actor extends ApiActor>(deps: AdminQueueInboxDelayedDependencies) {
-	return implement(adminQueueInboxDelayedContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>()
-		.use(authentication<Actor>())
-		.use(apiPolicy<Actor>({ name: adminQueueInboxDelayedContract['~orpc'].meta.requestName, requireCredential: true, requireModerator: true, kind: 'read:admin:queue' }))
+	return createApiProcedure<Actor>()(adminQueueInboxDelayedContract)
 		.use(requirePrincipal<Actor>())
 		.handler(async () => {
 			const result = await (async () => {
@@ -29,6 +26,6 @@ export function createAdminQueueInboxDelayedProcedure<Actor extends ApiActor>(de
 				const res = [...counts.entries()].sort((a, b) => b[1] - a[1]);
 				return res;
 			})();
-			return v.parse(adminQueueInboxDelayedContract['~orpc'].outputSchema!, result);
+			return result;
 		});
 }

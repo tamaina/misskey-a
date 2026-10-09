@@ -3,25 +3,23 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { implement } from '@orpc/server';
-import { authentication, apiPolicy, requirePrincipal } from '../../../../../api/backend/transport/middleware.js';
-import type { ApiActor, ApiContext } from '../../../../../api/backend/transport/context.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import type { ApiActor } from '@features/api/backend/transport/context.js';
 import { adminQueueQueueStatsContract } from './queue-stats.contract.js';
 import type { QueueService } from '../../../../../runtime/backend/services/QueueService.js';
-import * as v from 'valibot';
+import { toQueueDetails } from '../../../queue-wire.js';
 export interface AdminQueueQueueStatsDependencies {
 	queueService: Pick<QueueService, 'queueGetQueue'>;
 }
 export function createAdminQueueQueueStatsProcedure<Actor extends ApiActor>(deps: AdminQueueQueueStatsDependencies) {
-	return implement(adminQueueQueueStatsContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>()
-		.use(authentication<Actor>())
-		.use(apiPolicy<Actor>({ name: adminQueueQueueStatsContract['~orpc'].meta.requestName, requireCredential: true, requireModerator: true, kind: 'read:admin:queue' }))
+	return createApiProcedure<Actor>()(adminQueueQueueStatsContract)
 		.use(requirePrincipal<Actor>())
 		.handler(async ({ input }) => {
 			const ps = input;
 			const result = await (async () => {
 				return deps.queueService.queueGetQueue(ps.queue);
 			})();
-			return v.parse(adminQueueQueueStatsContract['~orpc'].outputSchema!, result);
+			return toQueueDetails(result);
 		});
 }

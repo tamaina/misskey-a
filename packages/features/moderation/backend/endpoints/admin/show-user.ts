@@ -2,14 +2,16 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-import { implement } from '@orpc/server';
-import type { ApiActor, ApiContext } from '@features/api/backend/transport/context.js';
-import { authentication, apiPolicy, requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import { toPackedNotificationSettings } from '@features/users/backend/notification-settings.schema.js';
+import { toRoleDto } from '@features/roles/backend/role.schema.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import type { ApiActor } from '@features/api/backend/transport/context.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
 import { moderationContract } from '../../api.definition.js';
 import type { ModerationApiDependencies } from '../../api.implementation.js';
 import { toPackedJsonObject } from '@features/users/backend/json-value.schema.js';
 export function createAdminShowUserProcedure<Actor extends ApiActor>(deps: Pick<ModerationApiDependencies<Actor>, 'usersRepository' | 'userProfilesRepository' | 'roleService' | 'signinsRepository' | 'roleEntityService' | 'idService'>) {
-	return implement(moderationContract.adminShowUser, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>().use(authentication<Actor>()).use(apiPolicy<Actor>({ name: 'admin/show-user', requireCredential: true, requireModerator: true, kind: 'read:admin:show-user' })).use(requirePrincipal<Actor>())
+	return createApiProcedure<Actor>()(moderationContract.adminShowUser).use(requirePrincipal<Actor>())
 		.handler(async ({ input, context }) => {
 			const ps = input;
 			const me = context.principal;
@@ -43,7 +45,7 @@ export function createAdminShowUserProcedure<Actor extends ApiActor>(deps: Pick<
 				receiveAnnouncementEmail: profile.receiveAnnouncementEmail,
 				mutedWords: profile.mutedWords,
 				mutedInstances: profile.mutedInstances,
-				notificationRecieveConfig: profile.notificationRecieveConfig,
+				notificationRecieveConfig: toPackedNotificationSettings(profile.notificationRecieveConfig),
 				isModerator: isModerator,
 				isSilenced: isSilenced,
 				isSuspended: user.isSuspended,
@@ -52,7 +54,7 @@ export function createAdminShowUserProcedure<Actor extends ApiActor>(deps: Pick<
 				moderationNote: profile.moderationNote ?? '',
 				signins: signins.map(({ id, userId, ip, headers, success }) => ({ id, userId, ip, headers: toPackedJsonObject(headers), success })),
 				policies: await deps.roleService.getUserPolicies(user.id),
-				roles: await deps.roleEntityService.packMany(roles, me),
+				roles: (await deps.roleEntityService.packMany(roles, me)).map(toRoleDto),
 				roleAssigns: roleAssigns.map(a => ({
 					createdAt: deps.idService.parse(a.id).date.toISOString(),
 					expiresAt: a.expiresAt ? a.expiresAt.toISOString() : null,

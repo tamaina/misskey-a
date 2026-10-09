@@ -3,7 +3,10 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { toPackedJsonObject } from '../../../users/backend/json-value.schema.js';
 import { expect, test, vi } from 'vitest';
+import { OpenAPIHandler } from '@orpc/openapi/fetch';
+import { misskeyErrorBody } from '@features/api/backend/transport/orpc-error.js';
 import * as v from 'valibot';
 import { mockDeep } from 'vitest-mock-extended';
 import type { Config } from '@/config.js';
@@ -14,12 +17,14 @@ import { onlineUsersCountContract } from '../../backend/endpoints/get-online-use
 import { adminServerInfoContract } from '../../backend/endpoints/admin/server-info.contract.js';
 
 import { adminMetaContract } from '../../backend/endpoints/admin/meta.contract.js';
+import { metaContract } from '../../backend/endpoints/meta.contract.js';
+import { createMetaProcedure } from '../../backend/endpoints/meta.js';
 
 import { MiMeta } from '../../backend/models/Meta.js';
 import { MetaEntityService } from '../../backend/serializers/MetaEntityService.js';
 import { createInstanceRouter } from '../../backend/api.implementation.js';
 import type { InstanceApiDependencies } from '../../backend/api.implementation.js';
-import { createProcedureClient, createRouterClient } from '@orpc/server';
+import { call, createProcedureClient, createRouterClient } from '@orpc/server';
 import { testContext } from './native-context.js';
 import { createServerInfoRouter, createEndpointProcedure, createPingProcedure, createOnlineUsersCountProcedure } from '../../backend/index.js';
 import { DEFAULT_POLICIES } from '../../../roles/backend/services/RoleService.js';
@@ -348,3 +353,70 @@ const createServerInfo = (deps: Parameters<typeof createServerInfoRouter>[0]) =>
 const createEndpoint = (readEndpoints: InstanceApiDependencies['readEndpoints']) => createProcedureClient(createEndpointProcedure<MiLocalUser>({ readEndpoints }), { context: anonymousContext });
 const createPing = (now: () => number) => createProcedureClient(createPingProcedure<MiLocalUser>({ now }), { context: anonymousContext });
 const createGetOnlineUsersCount = (getOnlineUsersCount: InstanceApiDependencies['getOnlineUsersCount'], now: () => number) => createProcedureClient(createOnlineUsersCountProcedure<MiLocalUser>({ getOnlineUsersCount, now }), { context: anonymousContext });
+
+test('public metadata projects outer/nested secrets without invoking its output validator', async () => {
+	const config = mockDeep<Config>({ version: 'test', url: 'https://local.test', mediaProxy: 'https://local.test/proxy', publishTarballInsteadOfProvideRepositoryUrl: false, maxFileSize: 1024, sentryForFrontend: undefined });
+	config.sentryForFrontend = { options: { dsn: 'https://sentry.test/1', beforeSend: event => event }, vueIntegration: null, browserTracingIntegration: null, replayIntegration: null };
+	const ads = mockDeep<AdsRepository>();
+	const query = mockDeep<SelectQueryBuilder<MiAd>>();
+	query.where.mockReturnThis(); query.andWhere.mockReturnThis();
+	query.getMany.mockResolvedValue([mockDeep<MiAd>({ id: 'ad123', url: 'https://ad.test', place: 'square', ratio: 1, imageUrl: 'https://ad.test/image', dayOfWeek: 0, isSensitive: false })]);
+	ads.createQueryBuilder.mockReturnValue(query);
+	const system = mockDeep<SystemAccountService>();
+	system.fetch.mockResolvedValue(mockDeep<MiLocalUser>({ username: 'proxy' }));
+	const serializer = new MetaEntityService(config, meta, ads, system);
+	const lite = Object.assign(await serializer.pack(), { hcaptchaSecretKey: 'private-key', internalMarker: 'outer' });
+	Object.assign(lite.ads[0], { internalMarker: 'nested' });
+	const detailed = Object.assign(await serializer.packDetailed(), { hcaptchaSecretKey: 'private-key', internalMarker: 'outer' });
+	Object.assign(detailed.features, { internalMarker: 'nested' });
+	const endpoint = operations({ metaEntityService: { pack: async () => lite, packDetailed: async () => detailed } });
+	const schema = requiredSchema(metaContract['~orpc'].outputSchema);
+	const outputRun = vi.spyOn(schema, '~run');
+	try {
+		const publicLite = await endpoint.meta({ detail: false });
+		const publicDetailed = await endpoint.meta({ detail: true });
+		for (const result of [publicLite, publicDetailed]) {
+			expect(result).not.toHaveProperty('hcaptchaSecretKey');
+			expect(result).not.toHaveProperty('internalMarker');
+			expect(result.ads[0]).not.toHaveProperty('internalMarker');
+			expect(result.sentryForFrontend?.options).not.toHaveProperty('beforeSend');
+			expect(result.policies).toHaveProperty('customPolicy', { enabled: true });
+		}
+		expect(publicDetailed).not.toHaveProperty('features.internalMarker');
+		const handler = new OpenAPIHandler({ meta: createMetaProcedure<MiLocalUser>({ metaEntityService: { pack: async () => lite, packDetailed: async () => detailed } }) });
+		for (const detail of [false, true]) {
+			const response = await handler.handle(new Request('https://local.test/meta', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ detail }) }), { context: testContext(null) });
+			expect(response.response?.status).toBe(200);
+			const wire: unknown = await response.response?.json();
+			expect(wire).not.toHaveProperty('hcaptchaSecretKey');
+			expect(wire).not.toHaveProperty('internalMarker');
+			expect(wire).not.toHaveProperty('ads.0.internalMarker');
+			expect(wire).not.toHaveProperty('features.internalMarker');
+			expect(wire).not.toHaveProperty('sentryForFrontend.options.beforeSend');
+			expect(wire).toHaveProperty('policies.customPolicy', { enabled: true });
+		}
+		expect(outputRun).not.toHaveBeenCalled();
+	} finally { outputRun.mockRestore(); }
+});
+
+test('admin metadata keeps authorized infrastructure secrets and rejects a moderator before malformed input', async () => {
+	const instance = Object.assign(new MiMeta(), meta, { hcaptchaSecretKey: 'authorized-secret', policies: toPackedJsonObject(JSON.parse('{"constructor":true,"prototype":true,"__proto__":true,"customPolicy":{"constructor":"retained","__proto__":"retained"}}')) });
+	const service = mockDeep<MetaService>(); service.fetch.mockResolvedValue(instance);
+	const system = mockDeep<SystemAccountService>(); system.fetch.mockResolvedValue(mockDeep<MiLocalUser>({ username: 'proxy' }));
+	const config = mockDeep<Config>({ version: 'test', url: 'https://local.test' });
+	const deps = { ...mockDeep<InstanceApiDependencies>(), config, metaService: service, systemAccountService: system, serverInfo: { enabled: () => false, read: async () => ({ machine: '?', cpu: { model: '?', cores: 0 }, mem: { total: 0 }, fs: { total: 0, used: 0 } }) } };
+	const actor = mockDeep<MiLocalUser>({ id: 'moderator123', isSuspended: false, movedToUri: null });
+	const context = testContext(actor);
+	context.authorization = { rootUserId: () => 'owner123', roles: async () => [{ isModerator: true, isAdministrator: false }], policyAllowed: async () => false };
+	const router = createInstanceRouter<MiLocalUser>(deps);
+	const handler = new OpenAPIHandler({ adminMeta: router.adminMeta }, { customErrorResponseBodyEncoder: misskeyErrorBody });
+	const denied = await handler.handle(new Request('https://local.test/admin/meta', { method: 'POST', headers: { 'content-type': 'application/json' }, body: 'null' }), { context });
+	expect(denied.response?.status).toBe(403);
+	expect(await denied.response?.json()).toMatchObject({ error: { code: 'ROLE_PERMISSION_DENIED', id: 'c3d38592-54c0-429d-be96-5636b0431a61' } });
+	expect(service.fetch).not.toHaveBeenCalled();
+	context.authorization = { rootUserId: () => actor.id, roles: async () => [], policyAllowed: async () => true };
+	const result = await call(router.adminMeta, {}, { context });
+	expect(result.hcaptchaSecretKey).toBe('authorized-secret');
+	for (const key of ['constructor', 'prototype', '__proto__']) expect(Object.hasOwn(result.policies, key)).toBe(false);
+	expect(result.policies.customPolicy).toEqual(JSON.parse('{"constructor":"retained","__proto__":"retained"}'));
+});

@@ -3,7 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { oc } from '@orpc/contract';
+import type { ApiProcedureMetadata } from '../../../../api/backend/transport/policy.types.js';
+import { oc, type Meta } from '@orpc/contract';
 import * as v from 'valibot';
 import { commonErrors, apiErrorData } from '../../../../api/backend/transport/errors.schema.js';
 import { objectInput } from '../../../../api/backend/transport/input.schema.js';
@@ -15,8 +16,18 @@ export const iImportBlockingErrors = {
 		tooBigFile: { message: 'That file is too big.', code: 'TOO_BIG_FILE', id: 'b7fbf0b1-aeef-3b21-29ef-fadd4cb72ccf' },
 		emptyFile: { message: 'That file is empty.', code: 'EMPTY_FILE', id: '6f3a4dcc-f060-a707-4950-806fbdbe60d6' },
 	} as const;
-export const iImportBlockingContract = oc.$meta({ requestName: 'i/import-blocking' } as const)
-	.route({ method: 'POST', path: '/i/import-blocking', operationId: 'post___i___import-blocking', successStatus: 204, spec: current => ({ ...current, security: [{ bearerAuth: [] }] }) })
+export const iImportBlockingContract = oc.$meta({
+	requestName: 'i/import-blocking',
+	requireCredential: true,
+	secure: true,
+	limit: {
+		'duration': 3600000,
+		'max': 1,
+	},
+	prohibitMoved: true,
+	requiredRolePolicy: 'canImportBlocking',
+} as const satisfies Meta & ApiProcedureMetadata)
+	.route({ method: 'POST', path: '/i/import-blocking', successStatus: 204, spec: current => ({ ...current, security: [{ bearerAuth: [] }] }) })
 	.errors({ ...commonErrors, NO_SUCH_FILE: { status: 400, data: apiErrorData }, UNEXPECTED_FILE_TYPE: { status: 400, data: apiErrorData }, TOO_BIG_FILE: { status: 400, data: apiErrorData }, EMPTY_FILE: { status: 400, data: apiErrorData } }).input(objectInput({ fileId: misskeyId })).output(v.void());
 
 export type IImportBlockingInput = v.InferOutput<NonNullable<typeof iImportBlockingContract['~orpc']['inputSchema']>>;

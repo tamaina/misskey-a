@@ -2,14 +2,15 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-import { implement } from '@orpc/server';
-import type { ApiActor, ApiContext } from '@features/api/backend/transport/context.js';
-import { authentication, apiPolicy, requirePrincipal, decodeScalarInput } from '@features/api/backend/transport/middleware.js';
+import { toPackedUserDetailed } from '@features/users/backend/user.schema.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import type { ApiActor } from '@features/api/backend/transport/context.js';
+import { requirePrincipal, decodeScalarInput } from '@features/api/backend/transport/middleware.js';
 import { moderationContract } from '../../api.definition.js';
 import type { ModerationApiDependencies } from '../../api.implementation.js';
 import { sqlLikeEscape } from '@features/persistence/backend/utility/sql-like-escape.js';
 export function createAdminShowUsersProcedure<Actor extends ApiActor>(deps: Pick<ModerationApiDependencies<Actor>, 'usersRepository' | 'roleService' | 'userEntityService'>) {
-	return implement(moderationContract.adminShowUsers, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>().use(authentication<Actor>()).use(apiPolicy<Actor>({ name: 'admin/show-users', requireCredential: true, requireModerator: true, kind: 'read:admin:show-user' })).use(requirePrincipal<Actor>()).use(decodeScalarInput<Actor>({ limit: 'number', offset: 'number' }))
+	return createApiProcedure<Actor>()(moderationContract.adminShowUsers).use(requirePrincipal<Actor>()).use(decodeScalarInput<Actor>({ limit: 'number', offset: 'number' }))
 		.handler(async ({ input, context }) => {
 			const ps = input;
 			const me = context.principal;
@@ -89,6 +90,6 @@ export function createAdminShowUsersProcedure<Actor extends ApiActor>(deps: Pick
 			query.limit(ps.limit);
 			query.offset(ps.offset);
 			const users = await query.getMany();
-			return await deps.userEntityService.packMany(users, me, { schema: 'UserDetailed' });
+			return (await deps.userEntityService.packMany(users, me, { schema: 'UserDetailed' })).map(toPackedUserDetailed);
 		});
 }

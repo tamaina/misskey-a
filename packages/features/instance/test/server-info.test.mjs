@@ -32,9 +32,9 @@ test('invalid input is rejected before querying settings or metrics', async () =
 	for (const input of [null, [], 'invalid', 1]) await assert.rejects(endpoint(input), error => !String(error).includes('Must not call settings'));
 });
 
-test('reader failures and malformed output are not silently replaced with hidden statistics', async () => {
+test('reader failures propagate and output projection removes outer and nested extras', async () => {
 	await assert.rejects(createServerInfo({ enabled: () => true, read: async () => { throw new Error('Probe failed'); } })({}));
-	await assert.rejects(createServerInfo({ enabled: () => true, read: async () => ({ ...metrics, cpu: { model: 'fixture', cores: 'invalid' } }) })({}));
+	assert.deepEqual(await createServerInfo({ enabled: () => true, read: async () => ({ ...metrics, internalToken: 'outer-secret', cpu: { ...metrics.cpu, internalToken: 'nested-secret' } }) })({}), metrics);
 });
 
 test('official external documentation retains the complete response shape', async () => {

@@ -3,14 +3,21 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { oc } from '@orpc/contract';
+import type { ApiProcedureMetadata } from '../../../../api/backend/transport/policy.types.js';
+import { oc, type Meta } from '@orpc/contract';
 import * as v from 'valibot';
 import { objectInput, objectInputWithRest } from '../input.schema.js';
 import { wireJson } from '../wire-json.schema.js';
 import { commonErrors } from '../../../../api/backend/transport/errors.schema.js';
 
-export const updateMetaContract = oc.$meta({ requestName: 'admin/update-meta', allowGet: false } as const)
-	.route({ method: 'POST', path: '/admin/update-meta', operationId: 'post___admin___update-meta', tags: ['admin'], successStatus: 204 })
+export const updateMetaContract = oc.$meta({
+	requestName: 'admin/update-meta',
+	allowGet: false,
+	requireCredential: true,
+	requireAdmin: true,
+	kind: 'write:admin:meta',
+} as const satisfies Meta & ApiProcedureMetadata)
+	.route({ method: 'POST', path: '/admin/update-meta', tags: ['admin'], successStatus: 204 })
 	.errors({ ...commonErrors })
 	.input(objectInput({
 	'disableRegistration': v.exactOptional(v.nullable(v.boolean())),

@@ -3,8 +3,11 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { expect, test } from 'vitest';
+import { expect, test, vi } from 'vitest';
 import * as v from 'valibot';
+import { OpenAPIHandler } from '@orpc/openapi/fetch';
+import type { PackedUserLite } from '../../../users/backend/user.schema.js';
+import { createAdminAbuseReportNotificationRecipientShowProcedure } from '../../backend/endpoints/admin/abuse-report/notification-recipient/show.js';
 import { createRouterClient } from '@orpc/server';
 import { createModerationRouter } from '../../backend/api.implementation.js';
 import { mockDeep } from 'vitest-mock-extended';
@@ -136,4 +139,28 @@ test('admin account details preserve actual raw signin wire fields without inven
 		{ id: 'signin123', userId: 'user123', ip: '127.0.0.1', headers: { 'user-agent': 'fixture' }, success: false },
 	]);
 	expect(result.signins[0]).not.toHaveProperty('createdAt');
+});
+
+test('moderation recipient HTTP projects nested users and webhooks without hiding authorized webhook secrets', async () => {
+	const deps = mockDeep<ModerationApiDependencies<ApiActor>>();
+	const user = { id: 'user123', name: null, username: 'fixture', host: null, avatarUrl: 'https://local.test/avatar', avatarBlurhash: null, avatarDecorations: [], emojis: {}, onlineStatus: 'unknown' } satisfies PackedUserLite;
+	const webhook = { id: 'webhook123', isActive: true, updatedAt: '2026-10-09T00:00:00.000Z', latestSentAt: null, latestStatus: null, name: 'Fixture', on: [], url: 'https://local.test/hook', secret: 'authorized-secret' };
+	const producedUser = { ...user, internalMarker: 'user' };
+	const producedWebhook = { ...webhook, internalMarker: 'webhook' };
+	const produced = { id: 'recipient123', isActive: true, updatedAt: webhook.updatedAt, name: 'Recipient', method: 'webhook', userId: user.id, user: producedUser, systemWebhookId: webhook.id, systemWebhook: producedWebhook, internalMarker: 'outer' } satisfies Awaited<ReturnType<typeof deps.abuseReportNotificationRecipientEntityService.pack>> & { internalMarker: string };
+	deps.abuseReportNotificationService.fetchRecipients.mockResolvedValue([mockDeep<Awaited<ReturnType<typeof deps.abuseReportNotificationService.fetchRecipients>>[number]>({ id: produced.id })]);
+	deps.abuseReportNotificationRecipientEntityService.pack.mockResolvedValue(produced);
+	const context = mockDeep<ApiContext<ApiActor>>({ credential: null, ip: '127.0.0.1', headers: {} });
+	context.services.authenticate.mockResolvedValue([actor, null]);
+	if (!context.authorization) throw new Error('Missing test authorization context');
+	context.authorization.rootUserId.mockReturnValue(actor.id);
+	const outputRun = vi.spyOn(requiredSchema(moderationContract.adminAbuseReportNotificationRecipientShow['~orpc'].outputSchema), '~run');
+	try {
+		const handler = new OpenAPIHandler({ recipient: createAdminAbuseReportNotificationRecipientShowProcedure<ApiActor>(deps) });
+		const response = await handler.handle(new Request('https://local.test/admin/abuse-report/notification-recipient/show', { method: 'POST', headers: { 'content-type': 'application/json' }, body: '{"id":"recipient123"}' }), { context });
+		expect(response.response?.status).toBe(200);
+		const wire: unknown = await response.response?.json();
+		expect(wire).toEqual({ id: produced.id, isActive: true, updatedAt: webhook.updatedAt, name: 'Recipient', method: 'webhook', userId: user.id, user, systemWebhookId: webhook.id, systemWebhook: webhook });
+		expect(outputRun).not.toHaveBeenCalled();
+	} finally { outputRun.mockRestore(); }
 });

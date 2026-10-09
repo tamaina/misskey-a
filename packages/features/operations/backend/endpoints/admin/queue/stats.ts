@@ -3,12 +3,12 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { implement } from '@orpc/server';
-import { authentication, apiPolicy, requirePrincipal } from '../../../../../api/backend/transport/middleware.js';
-import type { ApiActor, ApiContext } from '../../../../../api/backend/transport/context.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import type { ApiActor } from '@features/api/backend/transport/context.js';
 import { adminQueueStatsContract } from './stats.contract.js';
 import type { DbQueue, DeliverQueue, InboxQueue, ObjectStorageQueue } from '../../../../../boot/backend/assembly/QueueModule.js';
-import * as v from 'valibot';
+import { toQueueCounts } from '../../../queue-wire.js';
 export interface AdminQueueStatsDependencies {
 	deliverQueue: Pick<DeliverQueue, 'getJobCounts'>;
 	inboxQueue: Pick<InboxQueue, 'getJobCounts'>;
@@ -16,9 +16,7 @@ export interface AdminQueueStatsDependencies {
 	objectStorageQueue: Pick<ObjectStorageQueue, 'getJobCounts'>;
 }
 export function createAdminQueueStatsProcedure<Actor extends ApiActor>(deps: AdminQueueStatsDependencies) {
-	return implement(adminQueueStatsContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>()
-		.use(authentication<Actor>())
-		.use(apiPolicy<Actor>({ name: adminQueueStatsContract['~orpc'].meta.requestName, requireCredential: true, requireModerator: true, kind: 'read:admin:queue' }))
+	return createApiProcedure<Actor>()(adminQueueStatsContract)
 		.use(requirePrincipal<Actor>())
 		.handler(async () => {
 			const result = await (async () => {
@@ -33,6 +31,6 @@ export function createAdminQueueStatsProcedure<Actor extends ApiActor>(deps: Adm
 					objectStorage: objectStorageJobCounts,
 				};
 			})();
-			return v.parse(adminQueueStatsContract['~orpc'].outputSchema!, result);
+			return { deliver: toQueueCounts(result.deliver), inbox: toQueueCounts(result.inbox), db: toQueueCounts(result.db), objectStorage: toQueueCounts(result.objectStorage) };
 		});
 }

@@ -2,16 +2,14 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-import type { ApiActor, ApiContext } from '@features/api/backend/transport/context.js';
-import { implement } from '@orpc/server';
-import { authentication, apiPolicy, requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import type { ApiActor } from '@features/api/backend/transport/context.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
 import { adCreateContract } from './create.contract.js';
 import type { InstanceApiDependencies } from '../../../api.implementation.js';
 export type AdCreateDependencies = Pick<InstanceApiDependencies, 'adsRepository' | 'idService' | 'moderationLogService'>;
 export function createAdCreateProcedure<Actor extends ApiActor>(deps: AdCreateDependencies) {
-	return implement(adCreateContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>()
-		.use(authentication<Actor>())
-		.use(apiPolicy<Actor>({ name: 'admin/ad/create', requireCredential: true, requireModerator: true, kind: 'write:admin:ad' }))
+	return createApiProcedure<Actor>()(adCreateContract)
 		.use(requirePrincipal<Actor>())
 		.handler(async ({ input, context }) => {
 			const ps = input;

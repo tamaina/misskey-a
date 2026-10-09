@@ -2,29 +2,17 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-import * as v from 'valibot';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import { toPublicMetaLite, toPublicMetaDetailed } from '../serializers/public-meta.js';
 import { metaContract } from './meta.contract.js';
-import type { ApiActor, ApiContext } from '@features/api/backend/transport/context.js';
-import { implement } from '@orpc/server';
-import { authentication, apiPolicy } from '@features/api/backend/transport/middleware.js';
+import type { ApiActor } from '@features/api/backend/transport/context.js';
 import type { InstanceApiDependencies } from '../api.implementation.js';
 export type MetaDependencies = Pick<InstanceApiDependencies, 'metaEntityService'>;
 export function createMetaProcedure<Actor extends ApiActor>(deps: MetaDependencies) {
-	return implement(metaContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>()
-		.use(authentication<Actor>())
-		.use(apiPolicy<Actor>({ name: 'meta' }))
+	return createApiProcedure<Actor>()(metaContract)
 		.handler(async ({ input, context }) => {
-			const packed = input.detail ? await deps.metaEntityService.packDetailed() : await deps.metaEntityService.pack();
-			return v.parse(requiredSchema(metaContract['~orpc'].outputSchema), wireValue(packed));
+			return input.detail
+				? toPublicMetaDetailed(await deps.metaEntityService.packDetailed())
+				: toPublicMetaLite(await deps.metaEntityService.pack());
 		});
-}
-
-function wireValue(value: unknown): unknown {
-	const serialized = JSON.stringify(value);
-	return serialized === undefined ? undefined : JSON.parse(serialized);
-}
-
-function requiredSchema<Schema>(schema: Schema | undefined): Schema {
-	if (schema === undefined) throw new Error('Contract must declare its schema');
-	return schema;
 }

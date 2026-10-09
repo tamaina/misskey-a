@@ -2,16 +2,13 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-import type { ApiActor, ApiContext } from '@features/api/backend/transport/context.js';
-import { implement } from '@orpc/server';
-import { authentication, apiPolicy } from '@features/api/backend/transport/middleware.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import type { ApiActor } from '@features/api/backend/transport/context.js';
 import { endpointContract } from './endpoint.contract.js';
 import type { InstanceApiDependencies } from '../api.implementation.js';
 export type EndpointDependencies = Pick<InstanceApiDependencies, 'readEndpoints'>;
 export function createEndpointProcedure<Actor extends ApiActor>(deps: EndpointDependencies) {
-	return implement(endpointContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>()
-		.use(authentication<Actor>())
-		.use(apiPolicy<Actor>({ name: 'endpoint' }))
+	return createApiProcedure<Actor>()(endpointContract)
 		.handler(async ({ input, context }) => {
 			const endpoint = (await deps.readEndpoints()).find(candidate => candidate.name === input.endpoint);
 			if (endpoint == null) return null;

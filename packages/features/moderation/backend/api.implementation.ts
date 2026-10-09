@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import * as v from 'valibot';
+import { toRecipientWire, toReportWire, toModerationLogWire } from './public-wire.js';
 import type { InferContractRouterOutputs } from '@orpc/contract';
 import type { ApiActor, ApiContext } from '@features/api/backend/transport/context.js';
 import { QueryService } from '@features/notes/backend/services/QueryService.js';
@@ -123,11 +123,6 @@ export function createModerationRouter<Actor extends ApiActor>(deps: ModerationA
 	});
 }
 
-function requiredSchema<T>(schema: T | undefined): T {
-	if (schema === undefined) throw new Error("Missing native schema");
-	return schema;
-}
-
 type ModerationRouter = ReturnType<typeof createModerationRouter<MiLocalUser>>;
 
 @Injectable()
@@ -157,9 +152,9 @@ export class ModerationApiProvider {
 			moderationLogsRepository: moduleRef.get<ModerationLogsRepository>(DI.moderationLogsRepository, { strict: false }),
 			queryService, idService, roleService: roles, roleEntityService,
 			userEntityService: { packMany: async (rows, actor, options) => (await userEntityService.packMany(rows, actor, options)).map(toPackedUserDetailed) },
-			abuseReportNotificationRecipientEntityService: { pack: async (row) => v.parse(requiredSchema(moderationContract.adminAbuseReportNotificationRecipientShow['~orpc'].outputSchema), await recipientEntityService.pack(row)), packMany: async (rows) => v.parse(requiredSchema(moderationContract.adminAbuseReportNotificationRecipientList['~orpc'].outputSchema), await recipientEntityService.packMany(rows)) },
-			abuseUserReportEntityService: { packMany: async (rows) => v.parse(requiredSchema(moderationContract.adminAbuseUserReports['~orpc'].outputSchema), await reportEntityService.packMany(rows)) },
-			moderationLogEntityService: { packMany: async (rows) => v.parse(requiredSchema(moderationContract.adminShowModerationLogs['~orpc'].outputSchema), await logEntityService.packMany(rows)) },
+			abuseReportNotificationRecipientEntityService: { pack: async (row) => toRecipientWire(await recipientEntityService.pack(row)), packMany: async (rows) => (await recipientEntityService.packMany(rows)).map(toRecipientWire) },
+			abuseUserReportEntityService: { packMany: async (rows) => (await reportEntityService.packMany(rows)).map(toReportWire) },
+			moderationLogEntityService: { packMany: async (rows) => (await logEntityService.packMany(rows)).map(toModerationLogWire) },
 			abuseReportNotificationService: moduleRef.get(AbuseReportNotificationService, { strict: false }),
 			abuseReportService: moduleRef.get(AbuseReportService, { strict: false }),
 			getterService: getter, userSuspendService: moduleRef.get(UserSuspendService, { strict: false }), moderationLogService,

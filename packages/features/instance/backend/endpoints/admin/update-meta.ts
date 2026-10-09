@@ -2,17 +2,15 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-import type { ApiActor, ApiContext } from '@features/api/backend/transport/context.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import type { ApiActor } from '@features/api/backend/transport/context.js';
 import type { MiMeta } from '../../models/Meta.js';
-import { implement } from '@orpc/server';
-import { authentication, apiPolicy, requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
 import { updateMetaContract } from './update-meta.contract.js';
 import type { InstanceApiDependencies } from '../../api.implementation.js';
 export type UpdateMetaDependencies = Pick<InstanceApiDependencies, 'serverSettings' | 'metaService' | 'moderationLogService'>;
 export function createUpdateMetaProcedure<Actor extends ApiActor>(deps: UpdateMetaDependencies) {
-	return implement(updateMetaContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>()
-		.use(authentication<Actor>())
-		.use(apiPolicy<Actor>({ name: 'admin/update-meta', requireCredential: true, requireAdmin: true, kind: 'write:admin:meta' }))
+	return createApiProcedure<Actor>()(updateMetaContract)
 		.use(requirePrincipal<Actor>())
 		.handler(async ({ input, context }) => {
 			const ps = input;

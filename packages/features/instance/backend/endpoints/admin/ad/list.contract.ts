@@ -3,14 +3,21 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { oc } from '@orpc/contract';
+import type { ApiProcedureMetadata } from '../../../../../api/backend/transport/policy.types.js';
+import { oc, type Meta } from '@orpc/contract';
 import * as v from 'valibot';
 import { objectInput } from '../../input.schema.js';
 import { commonErrors } from '../../../../../api/backend/transport/errors.schema.js';
 import { packedAdSchema } from '../../meta.schema.js';
 
-export const adListContract = oc.$meta({ requestName: 'admin/ad/list', allowGet: false } as const)
-	.route({ method: 'POST', path: '/admin/ad/list', operationId: 'post___admin___ad___list', tags: ['admin'] })
+export const adListContract = oc.$meta({
+	requestName: 'admin/ad/list',
+	allowGet: false,
+	requireCredential: true,
+	requireModerator: true,
+	kind: 'read:admin:ad',
+} as const satisfies Meta & ApiProcedureMetadata)
+	.route({ method: 'POST', path: '/admin/ad/list', tags: ['admin'] })
 	.errors({ ...commonErrors })
 	.input(objectInput({
 	'limit': v.optional(v.pipe(v.pipe(v.pipe(v.number(), v.finite()), v.integer()), v.minValue(1), v.maxValue(100)), 10),

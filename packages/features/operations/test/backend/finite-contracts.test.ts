@@ -3,8 +3,11 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 import { createProcedureClient } from '@orpc/server';
+import { OpenAPIHandler } from '@orpc/openapi/fetch';
+import { toQueueJob } from '../../backend/queue-wire.js';
+import { toPackedJsonValue } from '../../../users/backend/json-value.schema.js';
 import type { ApiContext, ApiServices, ApiAuthorization } from '../../../api/backend/transport/context.js';
-import { expect, test } from 'vitest';
+import { expect, test, vi } from 'vitest';
 import * as v from 'valibot';
 import { mockDeep } from 'vitest-mock-extended';
 import { QueueGetters } from 'bullmq';
@@ -21,6 +24,9 @@ import { adminQueueQueueStatsContract } from '../../backend/endpoints/admin/queu
 import { adminGetTableStatsContract } from '../../backend/endpoints/admin/get-table-stats.contract.js';
 import { adminGetIndexStatsContract } from '../../backend/endpoints/admin/get-index-stats.contract.js';
 import { adminQueueStatsContract } from '../../backend/endpoints/admin/queue/stats.contract.js';
+import { createAdminQueueShowJobProcedure } from '../../backend/endpoints/admin/queue/show-job.js';
+import { adminQueueShowJobContract } from '../../backend/endpoints/admin/queue/show-job.contract.js';
+import { createAdminQueueQueuesProcedure } from '../../backend/endpoints/admin/queue/queues.js';
 import { createAdminQueueStatsProcedure } from '../../backend/endpoints/admin/queue/stats.js';
 import { createAdminGetTableStatsProcedure } from '../../backend/endpoints/admin/get-table-stats.js';
 import { createAdminGetIndexStatsProcedure } from '../../backend/endpoints/admin/get-index-stats.js';
@@ -131,7 +137,7 @@ test('finite pg_indexes wire schema preserves all five SELECT-star columns and n
 	}
 	const extended = [{ ...rows[0], future: true }];
 	db.query.mockResolvedValue(extended);
-	await expect(createProcedureClient(createAdminGetIndexStatsProcedure({ db }), { context: nativeContext() })({})).rejects.toThrow();
+	expect(await createProcedureClient(createAdminGetIndexStatsProcedure({ db }), { context: nativeContext() })({})).toEqual(rows);
 	const json: unknown = JSON.parse('{"__proto__":{"note":true},"constructor":null}');
 	const job = { id: 'job1', name: 'deliver', data: json, opts: {}, timestamp: 1, progress: 0, attempts: 0, delay: 0, stacktrace: [], returnValue: json, isFailed: false };
 	expect(v.parse(packedQueueJobSchema, job)).toEqual(job);
@@ -183,3 +189,62 @@ function nativeContext(): ApiContext<MiLocalUser> {
 	authorization.rootUserId.mockReturnValue(actor.id);
 	return { services, authorization, credential: 'credential', ip: '127.0.0.1', headers: {} };
 }
+
+test('queue HTTP envelopes project outer and nested extras without output schema execution', async () => {
+	const queueService = mockDeep<Parameters<typeof createAdminQueueQueuesProcedure>[0]['queueService']>();
+	const producedCounts = { ...counts, internalMarker: 999 };
+	const producedMetrics = { ...metrics, internalMarker: 'metric', meta: { ...metrics.meta, internalMarker: 'meta' } };
+	const produced = { name: 'system', counts: producedCounts, isPaused: false, metrics: { completed: producedMetrics, failed: metrics }, internalMarker: 'outer' } satisfies Awaited<ReturnType<typeof queueService.queueGetQueues>>[number] & { internalMarker: string };
+	queueService.queueGetQueues.mockResolvedValue([produced]);
+	const outputRun = vi.spyOn(adminQueueQueuesContract['~orpc'].outputSchema!, '~run');
+	try {
+		const handler = new OpenAPIHandler({ queues: createAdminQueueQueuesProcedure({ queueService }) });
+		const response = await handler.handle(new Request('https://local.test/admin/queue/queues', { method: 'POST', headers: { 'content-type': 'application/json' }, body: '{}' }), { context: nativeContext() });
+		expect(response.response?.status).toBe(200);
+		const rows: unknown = await response.response?.json();
+		expect(rows).toEqual([{ name: 'system', counts, isPaused: false, metrics: { completed: metrics, failed: metrics } }]);
+		expect(outputRun).not.toHaveBeenCalled();
+	} finally { outputRun.mockRestore(); }
+});
+
+test('queue job HTTP closes nested options and preserves baseline oRPC reserved-key serialization', async () => {
+	const queueService = mockDeep<Parameters<typeof createAdminQueueShowJobProcedure>[0]['queueService']>();
+	const json = toPackedJsonValue(JSON.parse('{"constructor":{"__proto__":"retained"},"prototype":null}'));
+	const produced = {
+		id: 'job1', name: 'deliver', data: json, timestamp: 1, progress: json, attempts: 0, delay: 0,
+		stacktrace: [], returnValue: json, isFailed: false, internalMarker: 'outer',
+		opts: {
+			internalMarker: 'opts', backoff: { type: 'fixed', delay: 10, jitter: 0.5, internalMarker: 'backoff' },
+			parent: { id: 'parent1', queue: 'deliver', internalMarker: 'parent' },
+			removeOnComplete: { age: 60, count: 2, internalMarker: 'retention' },
+			deduplication: { id: 'dedup1', ttl: 50, internalMarker: 'deduplication' },
+			telemetry: { metadata: 'public', omitContext: true, internalMarker: 'telemetry' },
+			repeat: { pattern: '* * * * *', startDate: 1000, internalMarker: 'repeat' },
+		},
+	};
+	const before = JSON.stringify(produced);
+	const projected = toQueueJob(produced);
+	expect(projected.data).toEqual(json);
+	expect(projected.progress).toEqual(json);
+	expect(projected.returnValue).toEqual(json);
+	expect(JSON.stringify(produced)).toBe(before);
+	queueService.queueGetJob.mockResolvedValue(produced);
+	const outputRun = vi.spyOn(adminQueueShowJobContract['~orpc'].outputSchema!, '~run');
+	try {
+		const handler = new OpenAPIHandler({ job: createAdminQueueShowJobProcedure({ queueService }) });
+		const response = await handler.handle(new Request('https://local.test/admin/queue/show-job', { method: 'POST', headers: { 'content-type': 'application/json' }, body: '{"queue":"deliver","jobId":"job1"}' }), { context: nativeContext() });
+		expect(response.response?.status).toBe(200);
+		const wire: unknown = await response.response?.json();
+		// Baseline and current oRPC 1.15.4 serializers assign into {}, dropping own __proto__ keys.
+		// The DTO above preserves those JSON keys; constructor/prototype survive the existing transport.
+		const transportedJson = { constructor: {}, prototype: null };
+		expect(wire).toEqual({
+			id: 'job1', name: 'deliver', data: transportedJson, timestamp: 1, progress: transportedJson, attempts: 0, delay: 0,
+			stacktrace: [], returnValue: transportedJson, isFailed: false,
+			opts: { backoff: { type: 'fixed', delay: 10, jitter: 0.5 }, parent: { id: 'parent1', queue: 'deliver' },
+				removeOnComplete: { age: 60, count: 2 }, deduplication: { id: 'dedup1', ttl: 50 },
+				telemetry: { metadata: 'public', omitContext: true }, repeat: { pattern: '* * * * *', startDate: 1000 } },
+		});
+		expect(outputRun).not.toHaveBeenCalled();
+	} finally { outputRun.mockRestore(); }
+});
