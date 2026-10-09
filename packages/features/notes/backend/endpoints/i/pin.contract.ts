@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import type { Meta } from '@orpc/contract';
+import type { ApiProcedureMetadata } from '../../../../api/backend/transport/policy.types.js';
 import { oc } from '@orpc/contract';
 import { commonErrors, apiErrorData } from '../../../../api/backend/transport/errors.schema.js';
 import { packedMeDetailedSchema } from '../../../../users/backend/user.schema.js';
@@ -28,10 +30,15 @@ export const iPinErrors = {
 		id: '8b18c2b7-68fe-4edb-9892-c0cbaeb6c913',
 	},
 } as const;
-export const iPinPolicy = { name: 'i/pin', requireCredential: true, prohibitMoved: true, kind: 'write:account' } as const;
+
 const security: OpenAPI.SecurityRequirementObject[] = [{ bearerAuth: [] }];
-export const iPinContract = oc.$meta({ requestName: 'i/pin' } as const)
-	.route({ method: 'POST', path: '/i/pin', operationId: 'post___i___pin', tags: ['account', 'notes'], spec: current => ({ ...current, security }) })
+export const iPinContract = oc.$meta({
+	requestName: 'i/pin',
+	requireCredential: true,
+	prohibitMoved: true,
+	kind: 'write:account',
+} as const satisfies Meta & ApiProcedureMetadata)
+	.route({ method: 'POST', path: '/i/pin', tags: ['account', 'notes'], spec: current => ({ ...current, security }) })
 	.errors({ ...commonErrors, NO_SUCH_NOTE: { status: 400, data: apiErrorData }, PIN_LIMIT_EXCEEDED: { status: 400, data: apiErrorData }, ALREADY_PINNED: { status: 400, data: apiErrorData } })
 	.input(objectInput({
 	'noteId': misskeyId,

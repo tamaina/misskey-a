@@ -26,3 +26,26 @@ export const packedAntennaSchema = v.strictObject({
 });
 
 export type PackedAntenna = v.InferOutput<typeof packedAntennaSchema>;
+
+/** Select the finite public antenna DTO without output validation. */
+export function toPackedAntenna(value: PackedAntenna): PackedAntenna {
+	return {
+		id: value.id,
+		createdAt: value.createdAt,
+		name: value.name,
+		keywords: value.keywords,
+		excludeKeywords: value.excludeKeywords,
+		src: value.src,
+		userListId: value.userListId,
+		users: value.users,
+		caseSensitive: value.caseSensitive,
+		localOnly: value.localOnly,
+		excludeBots: value.excludeBots,
+		withReplies: value.withReplies,
+		withFile: value.withFile,
+		isActive: value.isActive,
+		hasUnreadNote: value.hasUnreadNote,
+		notify: value.notify,
+		excludeNotesInSensitiveChannel: value.excludeNotesInSensitiveChannel,
+	};
+}

@@ -3,19 +3,16 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { implement } from '@orpc/server';
-import { authentication, apiPolicy, requirePrincipal } from '../../../../../api/backend/transport/middleware.js';
-import { notesReactionsDeleteContract, notesReactionsDeleteErrors, notesReactionsDeletePolicy } from './delete.contract.js';
-import type { ApiContext } from '@features/api/backend/transport/context.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import { notesReactionsDeleteContract, notesReactionsDeleteErrors } from './delete.contract.js';
+
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 import type { NotesCommandDependencies } from '../../../command.dependencies.js';
 import { getCommandNote } from '../../../get-command-note.js';
 import { readErrorId } from '../../../request.schema.js';
 export function createNotesReactionsDeleteProcedure(deps: NotesCommandDependencies) {
-	return implement(notesReactionsDeleteContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>()
-		.use(authentication<MiLocalUser>())
-		.use(apiPolicy<MiLocalUser>(notesReactionsDeletePolicy))
-		.use(requirePrincipal<MiLocalUser>())
+	return createApiProcedure<MiLocalUser>()(notesReactionsDeleteContract).use(requirePrincipal<MiLocalUser>())
 		.handler(async ({ input, context }) => {
 			const actor = context.principal;
 			const note = await getCommandNote(deps, input.noteId, notesReactionsDeleteErrors.noSuchNote);

@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import type { Meta } from '@orpc/contract';
+import type { ApiProcedureMetadata } from '../../../../api/backend/transport/policy.types.js';
 import { oc } from '@orpc/contract';
 import * as v from 'valibot';
 import { commonErrors, apiErrorData } from '../../../../api/backend/transport/errors.schema.js';
@@ -17,8 +19,13 @@ export const antennasCreateErrors = {
 } as const;
 
 const requestName = 'antennas/create';
-export const antennasCreateContract = oc.$meta({ requestName: requestName } as const)
-	.route({ method: 'POST', path: `/${requestName}`, operationId: 'post___' + requestName.replaceAll('/', '___'), tags: ['antennas'], spec: current => ({ ...current, security: [{ bearerAuth: [] }] }) })
+export const antennasCreateContract = oc.$meta({
+	requestName: requestName,
+	requireCredential: true,
+	kind: 'write:account',
+	prohibitMoved: true,
+} as const satisfies Meta & ApiProcedureMetadata)
+	.route({ method: 'POST', path: `/${requestName}`, tags: ['antennas'], spec: current => ({ ...current, security: [{ bearerAuth: [] }] }) })
 	.errors({ ...commonErrors, NO_SUCH_USER_LIST: { status: 400, data: apiErrorData }, TOO_MANY_ANTENNAS: { status: 400, data: apiErrorData }, EMPTY_KEYWORD: { status: 400, data: apiErrorData } })
 	.input(objectInput({
 		'name': antennaName,

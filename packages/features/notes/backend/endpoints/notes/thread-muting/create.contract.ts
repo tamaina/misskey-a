@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import type { Meta } from '@orpc/contract';
+import type { ApiProcedureMetadata } from '../../../../../api/backend/transport/policy.types.js';
 import { oc } from '@orpc/contract';
 import * as v from 'valibot';
 import { commonErrors, apiErrorData } from '../../../../../api/backend/transport/errors.schema.js';
@@ -21,9 +23,14 @@ export const notesThreadMutingCreateErrors = {
 		id: 'c146e22d-1141-4b31-b28d-176371014d18',
 	},
 } as const;
-export const notesThreadMutingCreatePolicy = { name: 'notes/thread-muting/create', requireCredential: true, kind: 'write:account', limit: { duration: 3600000, max: 10 } } as const;
+
 const security: OpenAPI.SecurityRequirementObject[] = [{ bearerAuth: [] }];
-export const notesThreadMutingCreateContract = oc.$meta({ requestName: 'notes/thread-muting/create' } as const)
-	.route({ method: 'POST', path: '/notes/thread-muting/create', operationId: 'post___notes___thread-muting___create', tags: ['notes'], spec: current => ({ ...current, security }), successStatus: 204 })
+export const notesThreadMutingCreateContract = oc.$meta({
+	requestName: 'notes/thread-muting/create',
+	requireCredential: true,
+	kind: 'write:account',
+	limit: { duration: 3600000, max: 10 },
+} as const satisfies Meta & ApiProcedureMetadata)
+	.route({ method: 'POST', path: '/notes/thread-muting/create', tags: ['notes'], spec: current => ({ ...current, security }), successStatus: 204 })
 	.errors({ ...commonErrors, NO_SUCH_NOTE: { status: 400, data: apiErrorData }, ALREADY_MUTING: { status: 400, data: apiErrorData } })
 	.input(objectInput({ noteId: misskeyId })).output(v.void());

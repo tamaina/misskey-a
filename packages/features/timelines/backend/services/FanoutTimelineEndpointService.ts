@@ -17,7 +17,7 @@ import { isChannelRelated } from '@features/channels/backend/utility/is-channel-
 import { DI } from '@/di-symbols.js';
 import { FanoutTimelineName, FanoutTimelineService } from './FanoutTimelineService.js';
 import type { NotesRepository } from '@features/persistence/backend/repositories/models.js';
-import type { PackedNote } from '../../../notes/backend/note.schema.js';
+import type { PackedNote } from "@features/notes/backend/note.schema.js";
 import type { MiMeta } from '@features/instance/backend/models/Meta.js';
 import type { MiNote } from '@features/notes/backend/models/Note.js';
 import type { MiUser } from '@features/users/backend/models/User.js';

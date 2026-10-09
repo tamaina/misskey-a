@@ -2,15 +2,15 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-import { implement } from '@orpc/server';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import { toPackedNote } from '@features/notes/backend/note.schema.js';
 import { Brackets, In } from 'typeorm';
-import * as v from 'valibot';
-import { authentication, apiPolicy, requirePrincipal } from '../../../../../api/backend/transport/middleware.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
 import { NoteEntityService } from '../../../serializers/NoteEntityService.js';
-import { notesPollsRecommendationContract, notesPollsRecommendationPolicy } from './recommendation.contract.js';
+import { notesPollsRecommendationContract } from './recommendation.contract.js';
 import type { NotesRepository, MutingsRepository, PollsRepository, PollVotesRepository } from '@features/persistence/backend/repositories/models.js';
-import type { MiLocalUser } from '../../../../../users/backend/models/User.js';
-import type { ApiContext } from '@features/api/backend/transport/context.js';
+import type { MiLocalUser } from "@features/users/backend/models/User.js";
+
 export interface NotesPollsRecommendationDependencies {
 	notesRepository: NotesRepository;
 	pollsRepository: PollsRepository;
@@ -19,75 +19,69 @@ export interface NotesPollsRecommendationDependencies {
 	noteEntityService: Pick<NoteEntityService, 'packMany'>;
 }
 export function createNotesPollsRecommendationProcedure(deps: NotesPollsRecommendationDependencies) {
-	return implement(notesPollsRecommendationContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>()
-		.use(authentication<MiLocalUser>())
-		.use(apiPolicy<MiLocalUser>(notesPollsRecommendationPolicy))
-		.use(requirePrincipal<MiLocalUser>())
+	return createApiProcedure<MiLocalUser>()(notesPollsRecommendationContract).use(requirePrincipal<MiLocalUser>())
 		.handler(async ({ input, context }) => {
-			const ps = input;
-			const me = context.principal;
-			return v.parse(requiredSchema(notesPollsRecommendationContract['~orpc'].outputSchema), await (async () => {
-				const query = deps.pollsRepository.createQueryBuilder('poll')
-					.where('poll.userHost IS NULL')
-					.andWhere('poll.userId != :meId', { meId: me.id })
-					.andWhere('poll.noteVisibility = \'public\'')
-					.andWhere(new Brackets(qb => {
-						qb
-							.where('poll.expiresAt IS NULL')
-							.orWhere('poll.expiresAt > :now', { now: new Date() });
-					}));
+			const result = await (async () => {
+				const ps = input;
+				const me = context.principal;
 
-				//#region exclude arleady voted polls
-				const votedQuery = deps.pollVotesRepository.createQueryBuilder('vote')
-					.select('vote.noteId')
-					.where('vote.userId = :meId', { meId: me.id });
+					const query = deps.pollsRepository.createQueryBuilder('poll')
+						.where('poll.userHost IS NULL')
+						.andWhere('poll.userId != :meId', { meId: me.id })
+						.andWhere('poll.noteVisibility = \'public\'')
+						.andWhere(new Brackets(qb => {
+							qb
+								.where('poll.expiresAt IS NULL')
+								.orWhere('poll.expiresAt > :now', { now: new Date() });
+						}));
 
-				query
-					.andWhere(`poll.noteId NOT IN (${votedQuery.getQuery()})`);
-				query.setParameters(votedQuery.getParameters());
-				//#endregion
+					//#region exclude arleady voted polls
+					const votedQuery = deps.pollVotesRepository.createQueryBuilder('vote')
+						.select('vote.noteId')
+						.where('vote.userId = :meId', { meId: me.id });
 
-				//#region mute
-				const mutingQuery = deps.mutingsRepository.createQueryBuilder('muting')
-					.select('muting.muteeId')
-					.where('muting.muterId = :muterId', { muterId: me.id });
+					query
+						.andWhere(`poll.noteId NOT IN (${votedQuery.getQuery()})`);
+					query.setParameters(votedQuery.getParameters());
+					//#endregion
 
-				query
-					.andWhere(`poll.userId NOT IN (${mutingQuery.getQuery()})`);
-				query.setParameters(mutingQuery.getParameters());
-				//#endregion
+					//#region mute
+					const mutingQuery = deps.mutingsRepository.createQueryBuilder('muting')
+						.select('muting.muteeId')
+						.where('muting.muterId = :muterId', { muterId: me.id });
 
-				//#region exclude channels
-				if (ps.excludeChannels) {
-					query.andWhere('poll.channelId IS NULL');
-				}
-				//#endregion
+					query
+						.andWhere(`poll.userId NOT IN (${mutingQuery.getQuery()})`);
+					query.setParameters(mutingQuery.getParameters());
+					//#endregion
 
-				const polls = await query
-					.orderBy('poll.noteId', 'DESC')
-					.limit(ps.limit)
-					.offset(ps.offset)
-					.getMany();
+					//#region exclude channels
+					if (ps.excludeChannels) {
+						query.andWhere('poll.channelId IS NULL');
+					}
+					//#endregion
 
-				if (polls.length === 0) return [];
+					const polls = await query
+						.orderBy('poll.noteId', 'DESC')
+						.limit(ps.limit)
+						.offset(ps.offset)
+						.getMany();
 
-				const notes = await deps.notesRepository.find({
-					where: {
-						id: In(polls.map(poll => poll.noteId)),
-					},
-					order: {
-						id: 'DESC',
-					},
-				});
+					if (polls.length === 0) return [];
 
-				return await deps.noteEntityService.packMany(notes, me, {
-					detail: true,
-				});
-			})());
+					const notes = await deps.notesRepository.find({
+						where: {
+							id: In(polls.map(poll => poll.noteId)),
+						},
+						order: {
+							id: 'DESC',
+						},
+					});
+
+					return await deps.noteEntityService.packMany(notes, me, {
+						detail: true,
+					});
+			})();
+			return result.map(toPackedNote);
 		});
-}
-
-function requiredSchema<Schema>(schema: Schema | undefined): Schema {
-	if (schema === undefined) throw new Error('Missing endpoint contract schema');
-	return schema;
 }

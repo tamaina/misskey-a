@@ -3,26 +3,19 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { implement } from '@orpc/server';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 import type { CreateFileDependencies } from '../../../create-file.js';
-import { authentication, apiPolicy, requirePrincipal } from '../../../../../api/backend/transport/middleware.js';
-import { apiError, internalError } from '../../../../../api/backend/transport/orpc-error.js';
-import { drivePilotContract } from './create.contract.js';
-import type { ApiActor, ApiContext } from '../../../../../api/backend/transport/context.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import { apiError, internalError } from "@features/api/backend/transport/orpc-error.js";
+import { driveCreateContract } from './create.contract.js';
+import type { ApiActor } from "@features/api/backend/transport/context.js";
 
 function isRecord(input: unknown): input is Record<string, unknown> {
 	return input !== null && typeof input === 'object' && !Array.isArray(input);
 }
 
 export function createDriveFileProcedure<Actor extends ApiActor, File>(deps: CreateFileDependencies<Actor, File>) {
-	const drive = implement(drivePilotContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>()
-		.use(authentication<Actor>())
-		.use(apiPolicy<Actor>({
-			name: 'drive/files/create', requireCredential: true, kind: 'write:drive', limit: {
-				key: 'drive/files/create', duration: 3600000, max: 120,
-			}, prohibitMoved: true
-		}))
-		.use(requirePrincipal<Actor>())
+	return createApiProcedure<Actor>()(driveCreateContract).use(requirePrincipal<Actor>())
 		.use(async ({ context, next }) => {
 			if (!context.upload) throw apiError({
 				code: 'FILE_REQUIRED', message: 'File required.', id: '4267801e-70d1-416a-b011-4ee502885d8b',
@@ -46,8 +39,8 @@ export function createDriveFileProcedure<Actor extends ApiActor, File>(deps: Cre
 				}
 			}
 			return next();
-		});
-	return drive.files.create.handler(async ({ input, context }) => {
+		})
+		.handler(async ({ input, context }) => {
 		if (input.file !== context.upload.file) throw new Error('Upload resource does not match its wire File');
 		const actor = context.principal;
 		const upload = context.upload;
@@ -94,11 +87,29 @@ export function createDriveFileProcedure<Actor extends ApiActor, File>(deps: Cre
 		if (packed.folder != null || packed.user != null || packed.userId != null) {
 			throw new Error('Self upload packing returned unexpected relationship fields');
 		}
-		// Copy without stripping unknown fields. Output validation rejects undeclared fields.
-		const properties = { ...packed.properties };
-		for (const key of ['width', 'height', 'orientation', 'avgColor'] as const) {
-			if (properties[key] === undefined) delete properties[key];
-		}
-		return { ...packed, properties, folder: null, user: null, userId: null };
+		// Select public wire fields; packers may also carry internal storage data.
+		return {
+			id: packed.id,
+			createdAt: packed.createdAt,
+			name: packed.name,
+			type: packed.type,
+			md5: packed.md5,
+			size: packed.size,
+			isSensitive: packed.isSensitive,
+			blurhash: packed.blurhash,
+			properties: {
+				...(packed.properties.width === undefined ? {} : { width: packed.properties.width }),
+				...(packed.properties.height === undefined ? {} : { height: packed.properties.height }),
+				...(packed.properties.orientation === undefined ? {} : { orientation: packed.properties.orientation }),
+				...(packed.properties.avgColor === undefined ? {} : { avgColor: packed.properties.avgColor }),
+			},
+			url: packed.url,
+			thumbnailUrl: packed.thumbnailUrl,
+			comment: packed.comment,
+			folderId: packed.folderId,
+			folder: null,
+			user: null,
+			userId: null,
+		};
 	});
 }

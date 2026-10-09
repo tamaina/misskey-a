@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import type { Meta } from '@orpc/contract';
+import type { ApiProcedureMetadata } from '../../../../api/backend/transport/policy.types.js';
 import { oc } from '@orpc/contract';
 import * as v from 'valibot';
 import { commonErrors, apiErrorData } from '../../../../api/backend/transport/errors.schema.js';
@@ -22,10 +24,13 @@ export const usersReactionsErrors = {
 		id: '6b95fa98-8cf9-2350-e284-f0ffdb54a805',
 	},
 } as const;
-export const usersReactionsPolicy = { name: 'users/reactions', requireCredential: false } as const;
+
 const security: OpenAPI.SecurityRequirementObject[] = [{}, { bearerAuth: [] }];
-export const usersReactionsContract = oc.$meta({ requestName: 'users/reactions' } as const)
-	.route({ method: 'POST', path: '/users/reactions', operationId: 'post___users___reactions', tags: ['users', 'reactions'], spec: current => ({ ...current, security }) })
+export const usersReactionsContract = oc.$meta({
+	requestName: 'users/reactions',
+	requireCredential: false,
+} as const satisfies Meta & ApiProcedureMetadata)
+	.route({ method: 'POST', path: '/users/reactions', tags: ['users', 'reactions'], spec: current => ({ ...current, security }) })
 	.errors({ ...commonErrors, REACTIONS_NOT_PUBLIC: { status: 400, data: apiErrorData }, IS_REMOTE_USER: { status: 400, data: apiErrorData } })
 	.input(objectInput({
 	'userId': misskeyId,

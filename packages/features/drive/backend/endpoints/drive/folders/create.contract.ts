@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import type { Meta } from '@orpc/contract';
+import type { ApiProcedureMetadata } from '../../../../../api/backend/transport/policy.types.js';
 import { oc } from '@orpc/contract';
 import * as v from 'valibot';
 import { commonErrors, apiErrorData } from '../../../../../api/backend/transport/errors.schema.js';
@@ -18,8 +20,13 @@ export const driveFoldersCreateErrors = {
 			id: '53326628-a00d-40a6-a3cd-8975105c0f95',
 		},
 	} as const;
-export const driveFoldersCreateContract = oc.$meta({ requestName: 'drive/folders/create' } as const)
-	.route({ method: 'POST', path: '/drive/folders/create', operationId: 'post___drive___folders___create', tags: ['drive'], spec: current => ({ ...current, security: [{ bearerAuth: [] }] }) })
+export const driveFoldersCreateContract = oc.$meta({
+	requestName: 'drive/folders/create',
+	'requireCredential': true,
+	'kind': 'write:drive',
+	'limit': { 'duration': 3600000, 'max': 10 },
+} as const satisfies Meta & ApiProcedureMetadata)
+	.route({ method: 'POST', path: '/drive/folders/create', tags: ['drive'], spec: current => ({ ...current, security: [{ bearerAuth: [] }] }) })
 	.errors({ ...commonErrors, NO_SUCH_FOLDER: { status: 400, data: apiErrorData } }).input(objectInput({
 		"name": v.optional(jsonString({ "maxLength": 200 }), "Untitled"),
 		"parentId": v.exactOptional(v.nullable(misskeyId)),

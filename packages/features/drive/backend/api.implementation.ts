@@ -100,7 +100,7 @@ export interface DriveManagementDependencies {
 }
 
 export function createDriveManagementRouter(deps: DriveManagementDependencies) {
-	return implement(driveManagementContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>().router({
+	return implement(driveManagementContract).$context<ApiContext<MiLocalUser>>().router({
 		'admin/delete-all-files-of-a-user': createAdminDeleteAllFilesOfAUserProcedure(deps),
 		'admin/drive/clean-remote-files': createAdminDriveCleanRemoteFilesProcedure(deps),
 		'admin/drive/cleanup': createAdminDriveCleanupProcedure(deps),

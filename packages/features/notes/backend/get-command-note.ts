@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 import { readErrorId } from './request.schema.js';
-import type { ErrorDefinition } from '../../api/backend/transport/orpc-error.js';
+import type { ErrorDefinition } from "@features/api/backend/transport/orpc-error.js";
 import type { NotesCommandDependencies } from './command.dependencies.js';
 export async function getCommandNote(deps: Pick<NotesCommandDependencies, 'getNote' | 'createError'>, noteId: string, definition: ErrorDefinition) {
 	try { return await deps.getNote(noteId); } catch (error) {

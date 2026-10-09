@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import type { Meta } from '@orpc/contract';
+import type { ApiProcedureMetadata } from '../../../../../api/backend/transport/policy.types.js';
 import { oc } from '@orpc/contract';
 import * as v from 'valibot';
 import { commonErrors, apiErrorData } from '../../../../../api/backend/transport/errors.schema.js';
@@ -17,8 +19,13 @@ export const adminDriveShowFileErrors = {
 			id: 'caf3ca38-c6e5-472e-a30c-b05377dcc240',
 		},
 	} as const;
-export const adminDriveShowFileContract = oc.$meta({ requestName: 'admin/drive/show-file' } as const)
-	.route({ method: 'POST', path: '/admin/drive/show-file', operationId: 'post___admin___drive___show-file', tags: ['admin'], spec: current => ({ ...current, security: [{ bearerAuth: [] }] }) })
+export const adminDriveShowFileContract = oc.$meta({
+	requestName: 'admin/drive/show-file',
+	'requireCredential': true,
+	'requireModerator': true,
+	'kind': 'read:admin:drive',
+} as const satisfies Meta & ApiProcedureMetadata)
+	.route({ method: 'POST', path: '/admin/drive/show-file', tags: ['admin'], spec: current => ({ ...current, security: [{ bearerAuth: [] }] }) })
 	.errors({ ...commonErrors, NO_SUCH_FILE: { status: 400, data: apiErrorData } }).input(driveFileShowSelectorSchema).output(v.strictObject({
 		id: v.pipe(v.string(), v.metadata({ "format": "id", "example": "xxxxxxxxxx" })),
 		createdAt: v.pipe(v.string(), v.metadata({ "format": "date-time" })),

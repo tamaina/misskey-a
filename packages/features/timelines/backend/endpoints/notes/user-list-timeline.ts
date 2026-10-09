@@ -3,8 +3,9 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { implement } from '@orpc/server';
-import { authentication, apiPolicy, requirePrincipal } from '../../../../api/backend/transport/middleware.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import { toPackedNote } from '@features/notes/backend/note.schema.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
 import { notesUserListTimelineContract, notesUserListTimelineErrors } from './user-list-timeline.contract.js';
 import { Brackets } from 'typeorm';
 import { NoteEntityService } from '@features/notes/backend/serializers/NoteEntityService.js';
@@ -16,7 +17,7 @@ import { apiError } from '@features/api/backend/transport/orpc-error.js';
 import { FanoutTimelineEndpointService } from '../../services/FanoutTimelineEndpointService.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 import type { MiMeta, MiUserList, NotesRepository, UserListMembershipsRepository, UserListsRepository } from '@features/persistence/backend/repositories/models.js';
-import type { ApiContext } from '@features/api/backend/transport/context.js';
+
 export interface NotesUserListTimelineDependencies {
 	serverSettings: MiMeta;
 	notesRepository: NotesRepository;
@@ -126,58 +127,58 @@ export function createNotesUserListTimelineProcedure<Actor extends MiLocalUser>(
 		return await query.limit(ps.limit).getMany();
 	}
 
-	return implement(notesUserListTimelineContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>()
-		.use(authentication<Actor>())
-		.use(apiPolicy<Actor>({ name: notesUserListTimelineContract['~orpc'].meta.requestName, requireCredential: true, kind: 'read:account' }))
-		.use(requirePrincipal<Actor>())
+	return createApiProcedure<Actor>()(notesUserListTimelineContract).use(requirePrincipal<Actor>())
 		.handler(async ({ input, context }) => {
-			const ps = input;
-			const me = context.principal;
-			const untilId = ps.untilId ?? (ps.untilDate ? deps.idService.gen(ps.untilDate!) : null);
-			const sinceId = ps.sinceId ?? (ps.sinceDate ? deps.idService.gen(ps.sinceDate!) : null);
-			const list = await deps.userListsRepository.findOneBy({
-				id: ps.listId,
-				userId: me.id,
-			});
-			if (list == null) {
-				throw apiError(notesUserListTimelineErrors.noSuchList);
-			}
-			if (!deps.serverSettings.enableFanoutTimeline) {
-				const timeline = await getFromDb(list, {
+			const result = await (async () => {
+				const ps = input;
+				const me = context.principal;
+				const untilId = ps.untilId ?? (ps.untilDate ? deps.idService.gen(ps.untilDate!) : null);
+				const sinceId = ps.sinceId ?? (ps.sinceDate ? deps.idService.gen(ps.sinceDate!) : null);
+				const list = await deps.userListsRepository.findOneBy({
+					id: ps.listId,
+					userId: me.id,
+				});
+				if (list == null) {
+					throw apiError(notesUserListTimelineErrors.noSuchList);
+				}
+				if (!deps.serverSettings.enableFanoutTimeline) {
+					const timeline = await getFromDb(list, {
+						untilId,
+						sinceId,
+						limit: ps.limit,
+						includeMyRenotes: ps.includeMyRenotes,
+						includeRenotedMyNotes: ps.includeRenotedMyNotes,
+						includeLocalRenotes: ps.includeLocalRenotes,
+						withFiles: ps.withFiles,
+						withRenotes: ps.withRenotes,
+					}, me);
+					deps.activeUsersChart.read(me);
+					return await deps.noteEntityService.packMany(timeline, me);
+				}
+				const timeline = await deps.fanoutTimelineEndpointService.timeline({
 					untilId,
 					sinceId,
 					limit: ps.limit,
-					includeMyRenotes: ps.includeMyRenotes,
-					includeRenotedMyNotes: ps.includeRenotedMyNotes,
-					includeLocalRenotes: ps.includeLocalRenotes,
-					withFiles: ps.withFiles,
-					withRenotes: ps.withRenotes,
-				}, me);
+					allowPartial: ps.allowPartial,
+					me,
+					useDbFallback: deps.serverSettings.enableFanoutTimelineDbFallback,
+					redisTimelines: ps.withFiles ? [`userListTimelineWithFiles:${list.id}`] : [`userListTimeline:${list.id}`],
+					alwaysIncludeMyNotes: true,
+					excludePureRenotes: !ps.withRenotes,
+					dbFallback: async (untilId, sinceId, limit) => await getFromDb(list, {
+						untilId,
+						sinceId,
+						limit,
+						includeMyRenotes: ps.includeMyRenotes,
+						includeRenotedMyNotes: ps.includeRenotedMyNotes,
+						includeLocalRenotes: ps.includeLocalRenotes,
+						withFiles: ps.withFiles,
+						withRenotes: ps.withRenotes,
+					}, me),
+				});
 				deps.activeUsersChart.read(me);
-				return await deps.noteEntityService.packMany(timeline, me);
-			}
-			const timeline = await deps.fanoutTimelineEndpointService.timeline({
-				untilId,
-				sinceId,
-				limit: ps.limit,
-				allowPartial: ps.allowPartial,
-				me,
-				useDbFallback: deps.serverSettings.enableFanoutTimelineDbFallback,
-				redisTimelines: ps.withFiles ? [`userListTimelineWithFiles:${list.id}`] : [`userListTimeline:${list.id}`],
-				alwaysIncludeMyNotes: true,
-				excludePureRenotes: !ps.withRenotes,
-				dbFallback: async (untilId, sinceId, limit) => await getFromDb(list, {
-					untilId,
-					sinceId,
-					limit,
-					includeMyRenotes: ps.includeMyRenotes,
-					includeRenotedMyNotes: ps.includeRenotedMyNotes,
-					includeLocalRenotes: ps.includeLocalRenotes,
-					withFiles: ps.withFiles,
-					withRenotes: ps.withRenotes,
-				}, me),
-			});
-			deps.activeUsersChart.read(me);
-			return timeline;
+				return timeline;
+			})();
+			return result.map(toPackedNote);
 		});
 }

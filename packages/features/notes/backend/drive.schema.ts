@@ -4,6 +4,7 @@
  */
 
 import * as v from 'valibot';
+import { toPackedUserLite } from '../../users/backend/user.schema.js';
 import {
 	packedUserLiteSchema as __ref_UserLite,
 } from '../../users/backend/user.schema.js';
@@ -44,3 +45,43 @@ export const packedDriveFolderSchema: v.GenericSchema<PackedDriveFolder, PackedD
 	...driveFolderBaseSchema.entries,
 	'parent': v.optional(v.nullable(v.lazy(() => packedDriveFolderSchema))),
 });
+
+/** Select the finite public DTO explicitly, including nested serializer output. */
+export function toPackedDriveFile(value: v.InferOutput<typeof packedDriveFileSchema>): v.InferOutput<typeof packedDriveFileSchema> {
+	return {
+		id: value.id,
+		createdAt: value.createdAt,
+		name: value.name,
+		type: value.type,
+		md5: value.md5,
+		size: value.size,
+		isSensitive: value.isSensitive,
+		blurhash: (value.blurhash === null ? null : value.blurhash),
+		properties: {
+			width: (value.properties.width === undefined ? undefined : value.properties.width),
+			height: (value.properties.height === undefined ? undefined : value.properties.height),
+			orientation: (value.properties.orientation === undefined ? undefined : value.properties.orientation),
+			avgColor: (value.properties.avgColor === undefined ? undefined : value.properties.avgColor),
+		},
+		url: value.url,
+		thumbnailUrl: (value.thumbnailUrl === null ? null : value.thumbnailUrl),
+		comment: (value.comment === null ? null : value.comment),
+		folderId: (value.folderId === null ? null : value.folderId),
+		folder: (value.folder === undefined ? undefined : (value.folder === null ? null : toPackedDriveFolder(value.folder))),
+		userId: (value.userId === null ? null : value.userId),
+		user: (value.user === undefined ? undefined : (value.user === null ? null : toPackedUserLite(value.user))),
+	};
+}
+
+/** Select the finite public DTO explicitly, including nested serializer output. */
+export function toPackedDriveFolder(value: PackedDriveFolder): PackedDriveFolder {
+	return {
+		id: value.id,
+		createdAt: value.createdAt,
+		name: value.name,
+		parentId: (value.parentId === null ? null : value.parentId),
+		foldersCount: (value.foldersCount === undefined ? undefined : value.foldersCount),
+		filesCount: (value.filesCount === undefined ? undefined : value.filesCount),
+		parent: (value.parent === undefined ? undefined : (value.parent === null ? null : toPackedDriveFolder(value.parent))),
+	};
+}

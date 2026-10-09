@@ -2,8 +2,8 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-import type { ErrorDefinition } from '../../api/backend/transport/orpc-error.js';
-import type { MiLocalUser, MiUser } from '../../users/backend/models/User.js';
+import type { ErrorDefinition } from "@features/api/backend/transport/orpc-error.js";
+import type { MiLocalUser, MiUser } from "@features/users/backend/models/User.js";
 import type { MiNote } from './models/Note.js';
 import type { MiNoteDraft } from './models/NoteDraft.js';
 export interface NotesCommandActor {

@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import type { Meta } from '@orpc/contract';
+import type { ApiProcedureMetadata } from '../../../../../api/backend/transport/policy.types.js';
 import { oc } from '@orpc/contract';
 import * as v from 'valibot';
 import { commonErrors, apiErrorData } from '../../../../../api/backend/transport/errors.schema.js';
@@ -125,13 +127,19 @@ export const notesDraftsCreateErrors = {
 		id: 'e4bed6c9-017e-4934-aed0-01c22cc60ec1',
 	},
 } as const;
-export const notesDraftsCreatePolicy = { name: 'notes/drafts/create', requireCredential: true, prohibitMoved: true, kind: 'write:account', limit: {
+
+const security: OpenAPI.SecurityRequirementObject[] = [{ bearerAuth: [] }];
+export const notesDraftsCreateContract = oc.$meta({
+	requestName: 'notes/drafts/create',
+	requireCredential: true,
+	prohibitMoved: true,
+	kind: 'write:account',
+	limit: {
 	duration: 3600000,
 	max: 300,
-} } as const;
-const security: OpenAPI.SecurityRequirementObject[] = [{ bearerAuth: [] }];
-export const notesDraftsCreateContract = oc.$meta({ requestName: 'notes/drafts/create' } as const)
-	.route({ method: 'POST', path: '/notes/drafts/create', operationId: 'post___notes___drafts___create', tags: ['notes', 'drafts'], spec: current => ({ ...current, security }) })
+},
+} as const satisfies Meta & ApiProcedureMetadata)
+	.route({ method: 'POST', path: '/notes/drafts/create', tags: ['notes', 'drafts'], spec: current => ({ ...current, security }) })
 	.errors({ ...commonErrors, NO_SUCH_RENOTE_TARGET: { status: 400, data: apiErrorData }, CANNOT_RENOTE_TO_A_PURE_RENOTE: { status: 400, data: apiErrorData }, CANNOT_RENOTE_DUE_TO_VISIBILITY: { status: 400, data: apiErrorData }, NO_SUCH_REPLY_TARGET: { status: 400, data: apiErrorData }, CANNOT_REPLY_TO_AN_INVISIBLE_NOTE: { status: 400, data: apiErrorData }, CANNOT_REPLY_TO_A_PURE_RENOTE: { status: 400, data: apiErrorData }, CANNOT_REPLY_TO_SPECIFIED_VISIBILITY_NOTE_WITH_EXTENDED_VISIBILITY: { status: 400, data: apiErrorData }, CANNOT_CREATE_ALREADY_EXPIRED_POLL: { status: 400, data: apiErrorData }, NO_SUCH_CHANNEL: { status: 400, data: apiErrorData }, YOU_HAVE_BEEN_BLOCKED: { status: 400, data: apiErrorData }, NO_SUCH_FILE: { status: 400, data: apiErrorData }, CANNOT_RENOTE_OUTSIDE_OF_CHANNEL: { status: 400, data: apiErrorData }, CONTAINS_PROHIBITED_WORDS: { status: 400, data: apiErrorData }, CONTAINS_TOO_MANY_MENTIONS: { status: 400, data: apiErrorData }, TOO_MANY_DRAFTS: { status: 400, data: apiErrorData }, TOO_MANY_SCHEDULED_NOTES: { status: 400, data: apiErrorData }, CANNOT_RENOTE_TO_EXTERNAL: { status: 400, data: apiErrorData }, SCHEDULED_AT_REQUIRED: { status: 400, data: apiErrorData }, SCHEDULED_AT_MUST_BE_IN_FUTURE: { status: 400, data: apiErrorData } })
 	.input(objectInput({
 	visibility: v.optional(v.picklist(['public', 'home', 'followers', 'specified']), 'public'),

@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import type { Meta } from '@orpc/contract';
+import type { ApiProcedureMetadata } from '../../../../../api/backend/transport/policy.types.js';
 import { oc } from '@orpc/contract';
 import * as v from 'valibot';
 import { commonErrors } from '../../../../../api/backend/transport/errors.schema.js';
@@ -12,8 +14,13 @@ import { misskeyId } from '../../../../../users/backend/users.input.schema.js';
 import { packedDriveFileSchema } from '../../../../../notes/backend/drive.schema.js';
 
 export const adminDriveFilesErrors = {} as const;
-export const adminDriveFilesContract = oc.$meta({ requestName: 'admin/drive/files' } as const)
-	.route({ method: 'POST', path: '/admin/drive/files', operationId: 'post___admin___drive___files', tags: ['admin'], spec: current => ({ ...current, security: [{ bearerAuth: [] }] }) })
+export const adminDriveFilesContract = oc.$meta({
+	requestName: 'admin/drive/files',
+	'requireCredential': true,
+	'requireModerator': true,
+	'kind': 'read:admin:drive',
+} as const satisfies Meta & ApiProcedureMetadata)
+	.route({ method: 'POST', path: '/admin/drive/files', tags: ['admin'], spec: current => ({ ...current, security: [{ bearerAuth: [] }] }) })
 	.errors({ ...commonErrors }).input(objectInput({
 		"limit": v.optional(v.pipe(v.pipe(v.number(), v.integer()), v.minValue(1), v.maxValue(100)), 10),
 		"sinceId": v.exactOptional(misskeyId),

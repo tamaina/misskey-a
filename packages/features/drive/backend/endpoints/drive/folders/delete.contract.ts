@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import type { Meta } from '@orpc/contract';
+import type { ApiProcedureMetadata } from '../../../../../api/backend/transport/policy.types.js';
 import { oc } from '@orpc/contract';
 import * as v from 'valibot';
 import { commonErrors, apiErrorData } from '../../../../../api/backend/transport/errors.schema.js';
@@ -23,8 +25,12 @@ export const driveFoldersDeleteErrors = {
 			id: 'b0fc8a17-963c-405d-bfbc-859a487295e1',
 		},
 	} as const;
-export const driveFoldersDeleteContract = oc.$meta({ requestName: 'drive/folders/delete' } as const)
-	.route({ method: 'POST', path: '/drive/folders/delete', operationId: 'post___drive___folders___delete', tags: ['drive'], spec: current => ({ ...current, security: [{ bearerAuth: [] }] }), successStatus: 204 })
+export const driveFoldersDeleteContract = oc.$meta({
+	requestName: 'drive/folders/delete',
+	'requireCredential': true,
+	'kind': 'write:drive',
+} as const satisfies Meta & ApiProcedureMetadata)
+	.route({ method: 'POST', path: '/drive/folders/delete', tags: ['drive'], spec: current => ({ ...current, security: [{ bearerAuth: [] }] }), successStatus: 204 })
 	.errors({ ...commonErrors, NO_SUCH_FOLDER: { status: 400, data: apiErrorData }, HAS_CHILD_FILES_OR_FOLDERS: { status: 400, data: apiErrorData } }).input(objectInput({
 		"folderId": misskeyId,
 	})).output(v.void());

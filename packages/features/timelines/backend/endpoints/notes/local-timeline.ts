@@ -3,8 +3,9 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { implement } from '@orpc/server';
-import { authentication, apiPolicy } from '../../../../api/backend/transport/middleware.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import { toPackedNote } from '@features/notes/backend/note.schema.js';
+
 import { notesLocalTimelineContract, notesLocalTimelineErrors } from './local-timeline.contract.js';
 import { Brackets } from 'typeorm';
 import { NoteEntityService } from '@features/notes/backend/serializers/NoteEntityService.js';
@@ -17,7 +18,7 @@ import { apiError } from '@features/api/backend/transport/orpc-error.js';
 import { FanoutTimelineEndpointService } from '../../services/FanoutTimelineEndpointService.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 import type { MiMeta, NotesRepository } from '@features/persistence/backend/repositories/models.js';
-import type { ApiContext } from '@features/api/backend/transport/context.js';
+
 export interface NotesLocalTimelineDependencies {
 	serverSettings: MiMeta;
 	notesRepository: NotesRepository;
@@ -76,61 +77,61 @@ export function createNotesLocalTimelineProcedure<Actor extends MiLocalUser>(dep
 		return await query.limit(ps.limit).getMany();
 	}
 
-	return implement(notesLocalTimelineContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>()
-		.use(authentication<Actor>())
-		.use(apiPolicy<Actor>({ name: notesLocalTimelineContract['~orpc'].meta.requestName }))
-		.handler(async ({ input, context }) => {
-			const ps = input;
-			const me = context.principal;
-			const untilId = ps.untilId ?? (ps.untilDate ? deps.idService.gen(ps.untilDate!) : null);
-			const sinceId = ps.sinceId ?? (ps.sinceDate ? deps.idService.gen(ps.sinceDate!) : null);
-			const policies = await deps.roleService.getUserPolicies(me ? me.id : null);
-			if (!policies.ltlAvailable) {
-				throw apiError(notesLocalTimelineErrors.ltlDisabled);
-			}
-			if (ps.withReplies && ps.withFiles) throw apiError(notesLocalTimelineErrors.bothWithRepliesAndWithFiles);
-			if (!deps.serverSettings.enableFanoutTimeline) {
-				const timeline = await getFromDb({
+	return createApiProcedure<Actor>()(notesLocalTimelineContract).handler(async ({ input, context }) => {
+			const result = await (async () => {
+				const ps = input;
+				const me = context.principal;
+				const untilId = ps.untilId ?? (ps.untilDate ? deps.idService.gen(ps.untilDate!) : null);
+				const sinceId = ps.sinceId ?? (ps.sinceDate ? deps.idService.gen(ps.sinceDate!) : null);
+				const policies = await deps.roleService.getUserPolicies(me ? me.id : null);
+				if (!policies.ltlAvailable) {
+					throw apiError(notesLocalTimelineErrors.ltlDisabled);
+				}
+				if (ps.withReplies && ps.withFiles) throw apiError(notesLocalTimelineErrors.bothWithRepliesAndWithFiles);
+				if (!deps.serverSettings.enableFanoutTimeline) {
+					const timeline = await getFromDb({
+						untilId,
+						sinceId,
+						limit: ps.limit,
+						withFiles: ps.withFiles,
+						withReplies: ps.withReplies,
+					}, me);
+					process.nextTick(() => {
+						if (me) {
+							deps.activeUsersChart.read(me);
+						}
+					});
+					return await deps.noteEntityService.packMany(timeline, me);
+				}
+				const timeline = await deps.fanoutTimelineEndpointService.timeline({
 					untilId,
 					sinceId,
 					limit: ps.limit,
-					withFiles: ps.withFiles,
-					withReplies: ps.withReplies,
-				}, me);
+					allowPartial: ps.allowPartial,
+					me,
+					useDbFallback: deps.serverSettings.enableFanoutTimelineDbFallback,
+					redisTimelines:
+						ps.withFiles ? ['localTimelineWithFiles']
+							: ps.withReplies ? ['localTimeline', 'localTimelineWithReplies']
+								: me ? ['localTimeline', `localTimelineWithReplyTo:${me.id}`]
+									: ['localTimeline'],
+					alwaysIncludeMyNotes: true,
+					excludePureRenotes: !ps.withRenotes,
+					dbFallback: async (untilId, sinceId, limit) => await getFromDb({
+						untilId,
+						sinceId,
+						limit,
+						withFiles: ps.withFiles,
+						withReplies: ps.withReplies,
+					}, me),
+				});
 				process.nextTick(() => {
 					if (me) {
 						deps.activeUsersChart.read(me);
 					}
 				});
-				return await deps.noteEntityService.packMany(timeline, me);
-			}
-			const timeline = await deps.fanoutTimelineEndpointService.timeline({
-				untilId,
-				sinceId,
-				limit: ps.limit,
-				allowPartial: ps.allowPartial,
-				me,
-				useDbFallback: deps.serverSettings.enableFanoutTimelineDbFallback,
-				redisTimelines:
-					ps.withFiles ? ['localTimelineWithFiles']
-						: ps.withReplies ? ['localTimeline', 'localTimelineWithReplies']
-							: me ? ['localTimeline', `localTimelineWithReplyTo:${me.id}`]
-								: ['localTimeline'],
-				alwaysIncludeMyNotes: true,
-				excludePureRenotes: !ps.withRenotes,
-				dbFallback: async (untilId, sinceId, limit) => await getFromDb({
-					untilId,
-					sinceId,
-					limit,
-					withFiles: ps.withFiles,
-					withReplies: ps.withReplies,
-				}, me),
-			});
-			process.nextTick(() => {
-				if (me) {
-					deps.activeUsersChart.read(me);
-				}
-			});
-			return timeline;
+				return timeline;
+			})();
+			return result.map(toPackedNote);
 		});
 }

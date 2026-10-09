@@ -11,18 +11,16 @@ import { GlobalEventService } from '@features/runtime/backend/services/GlobalEve
 import { RoleService } from '@features/roles/backend/services/RoleService.js';
 import { apiError } from '@features/api/backend/transport/orpc-error.js';
 import { driveManagementContract } from '../../../api.definition.js';
-import { implement } from '@orpc/server';
-import { authentication, apiPolicy, requirePrincipal } from '@features/api/backend/transport/middleware.js';
-import type { ApiContext } from '@features/api/backend/transport/context.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+
 export interface DriveFilesDeleteDependencies {
 	driveFilesRepository: DriveFilesRepository;
 	driveService: Pick<DriveService, 'deleteFile'>;
 	roleService: Pick<RoleService, 'isModerator'>;
 }
 export function createDriveFilesDeleteProcedure(deps: DriveFilesDeleteDependencies) {
-	return implement(driveManagementContract['drive/files/delete'], { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>()
-		.use(authentication<MiLocalUser>())
-		.use(apiPolicy<MiLocalUser>({ 'name': 'drive/files/delete', 'requireCredential': true, 'kind': 'write:drive' })).use(requirePrincipal<MiLocalUser>())
+	return createApiProcedure<MiLocalUser>()(driveManagementContract['drive/files/delete']).use(requirePrincipal<MiLocalUser>())
 		.handler(async ({ input, context }) => {
 			const ps = input;
 			const me = context.principal;

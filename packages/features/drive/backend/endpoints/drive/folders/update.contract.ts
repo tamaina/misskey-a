@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import type { Meta } from '@orpc/contract';
+import type { ApiProcedureMetadata } from '../../../../../api/backend/transport/policy.types.js';
 import { oc } from '@orpc/contract';
 import * as v from 'valibot';
 import { commonErrors, apiErrorData } from '../../../../../api/backend/transport/errors.schema.js';
@@ -30,8 +32,12 @@ export const driveFoldersUpdateErrors = {
 			id: 'dbeb024837894013aed44279f9199740',
 		},
 	} as const;
-export const driveFoldersUpdateContract = oc.$meta({ requestName: 'drive/folders/update' } as const)
-	.route({ method: 'POST', path: '/drive/folders/update', operationId: 'post___drive___folders___update', tags: ['drive'], spec: current => ({ ...current, security: [{ bearerAuth: [] }] }) })
+export const driveFoldersUpdateContract = oc.$meta({
+	requestName: 'drive/folders/update',
+	'requireCredential': true,
+	'kind': 'write:drive',
+} as const satisfies Meta & ApiProcedureMetadata)
+	.route({ method: 'POST', path: '/drive/folders/update', tags: ['drive'], spec: current => ({ ...current, security: [{ bearerAuth: [] }] }) })
 	.errors({ ...commonErrors, NO_SUCH_FOLDER: { status: 400, data: apiErrorData }, NO_SUCH_PARENT_FOLDER: { status: 400, data: apiErrorData }, RECURSIVE_NESTING: { status: 400, data: apiErrorData } }).input(objectInput({
 		"folderId": misskeyId,
 		"name": v.exactOptional(jsonString({ "maxLength": 200 })),

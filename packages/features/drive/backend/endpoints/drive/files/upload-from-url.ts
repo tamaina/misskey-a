@@ -8,18 +8,16 @@ import { GlobalEventService } from '@features/runtime/backend/services/GlobalEve
 import { DriveFileEntityService } from '../../../serializers/DriveFileEntityService.js';
 import { DriveService } from '../../../services/DriveService.js';
 import { driveManagementContract } from '../../../api.definition.js';
-import { implement } from '@orpc/server';
-import { authentication, apiPolicy, requirePrincipal } from '@features/api/backend/transport/middleware.js';
-import type { ApiContext } from '@features/api/backend/transport/context.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+
 export interface DriveFilesUploadFromUrlDependencies {
 	driveFileEntityService: Pick<DriveFileEntityService, 'pack'>;
 	driveService: Pick<DriveService, 'uploadFromUrl'>;
 	globalEventService: Pick<GlobalEventService, 'publishMainStream'>;
 }
 export function createDriveFilesUploadFromUrlProcedure(deps: DriveFilesUploadFromUrlDependencies) {
-	return implement(driveManagementContract['drive/files/upload-from-url'], { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>()
-		.use(authentication<MiLocalUser>())
-		.use(apiPolicy<MiLocalUser>({ 'name': 'drive/files/upload-from-url', 'requireCredential': true, 'prohibitMoved': true, 'kind': 'write:drive', 'limit': { 'duration': 3600000, 'max': 60 } })).use(requirePrincipal<MiLocalUser>())
+	return createApiProcedure<MiLocalUser>()(driveManagementContract['drive/files/upload-from-url']).use(requirePrincipal<MiLocalUser>())
 		.handler(async ({ input, context }) => {
 			const ps = input;
 			const user = context.principal;

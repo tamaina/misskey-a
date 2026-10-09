@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import type { Meta } from '@orpc/contract';
+import type { ApiProcedureMetadata } from '../../../../../api/backend/transport/policy.types.js';
 import { oc } from '@orpc/contract';
 import * as v from 'valibot';
 import { commonErrors, apiErrorData } from '../../../../../api/backend/transport/errors.schema.js';
@@ -46,10 +48,15 @@ export const notesPollsVoteErrors = {
 		id: '85a5377e-b1e9-4617-b0b9-5bea73331e49',
 	},
 } as const;
-export const notesPollsVotePolicy = { name: 'notes/polls/vote', requireCredential: true, prohibitMoved: true, kind: 'write:votes' } as const;
+
 const security: OpenAPI.SecurityRequirementObject[] = [{ bearerAuth: [] }];
-export const notesPollsVoteContract = oc.$meta({ requestName: 'notes/polls/vote' } as const)
-	.route({ method: 'POST', path: '/notes/polls/vote', operationId: 'post___notes___polls___vote', tags: ['notes'], spec: current => ({ ...current, security }), successStatus: 204 })
+export const notesPollsVoteContract = oc.$meta({
+	requestName: 'notes/polls/vote',
+	requireCredential: true,
+	prohibitMoved: true,
+	kind: 'write:votes',
+} as const satisfies Meta & ApiProcedureMetadata)
+	.route({ method: 'POST', path: '/notes/polls/vote', tags: ['notes'], spec: current => ({ ...current, security }), successStatus: 204 })
 	.errors({ ...commonErrors, NO_SUCH_NOTE: { status: 400, data: apiErrorData }, NO_POLL: { status: 400, data: apiErrorData }, INVALID_CHOICE: { status: 400, data: apiErrorData }, ALREADY_VOTED: { status: 400, data: apiErrorData }, ALREADY_EXPIRED: { status: 400, data: apiErrorData }, YOU_HAVE_BEEN_BLOCKED: { status: 400, data: apiErrorData } })
 	.input(objectInput({
 	'noteId': misskeyId,

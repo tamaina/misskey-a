@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import type { Meta } from '@orpc/contract';
+import type { ApiProcedureMetadata } from '../../../../api/backend/transport/policy.types.js';
 import { oc } from '@orpc/contract';
 import * as v from 'valibot';
 import { commonErrors, apiErrorData } from '../../../../api/backend/transport/errors.schema.js';
@@ -16,8 +18,11 @@ export const notesSearchErrors = {
 } as const;
 
 const requestName = 'notes/search';
-export const notesSearchContract = oc.$meta({ requestName: requestName } as const)
-	.route({ method: 'POST', path: `/${requestName}`, operationId: 'post___' + requestName.replaceAll('/', '___'), tags: ['notes'] })
+export const notesSearchContract = oc.$meta({
+	requestName: requestName,
+	requireCredential: false,
+} as const satisfies Meta & ApiProcedureMetadata)
+	.route({ method: 'POST', path: `/${requestName}`, tags: ['notes'] })
 	.errors({ ...commonErrors, UNAVAILABLE: { status: 400, data: apiErrorData } })
 	.input(objectInput({
 		'query': v.string(),

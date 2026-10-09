@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import type { Meta } from '@orpc/contract';
+import type { ApiProcedureMetadata } from '../../../../../api/backend/transport/policy.types.js';
 import { oc } from '@orpc/contract';
 import * as v from 'valibot';
 import { commonErrors, apiErrorData } from '../../../../../api/backend/transport/errors.schema.js';
@@ -31,9 +33,14 @@ export const notesReactionsCreateErrors = {
 		id: 'eaccdc08-ddef-43fe-908f-d108faad57f5',
 	},
 } as const;
-export const notesReactionsCreatePolicy = { name: 'notes/reactions/create', requireCredential: true, prohibitMoved: true, kind: 'write:reactions' } as const;
+
 const security: OpenAPI.SecurityRequirementObject[] = [{ bearerAuth: [] }];
-export const notesReactionsCreateContract = oc.$meta({ requestName: 'notes/reactions/create' } as const)
-	.route({ method: 'POST', path: '/notes/reactions/create', operationId: 'post___notes___reactions___create', tags: ['reactions', 'notes'], spec: current => ({ ...current, security }), successStatus: 204 })
+export const notesReactionsCreateContract = oc.$meta({
+	requestName: 'notes/reactions/create',
+	requireCredential: true,
+	prohibitMoved: true,
+	kind: 'write:reactions',
+} as const satisfies Meta & ApiProcedureMetadata)
+	.route({ method: 'POST', path: '/notes/reactions/create', tags: ['reactions', 'notes'], spec: current => ({ ...current, security }), successStatus: 204 })
 	.errors({ ...commonErrors, NO_SUCH_NOTE: { status: 400, data: apiErrorData }, ALREADY_REACTED: { status: 400, data: apiErrorData }, YOU_HAVE_BEEN_BLOCKED: { status: 400, data: apiErrorData }, CANNOT_REACT_TO_RENOTE: { status: 400, data: apiErrorData } })
 	.input(objectInput({ noteId: misskeyId, reaction: v.string() })).output(v.void());

@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import type { Meta } from '@orpc/contract';
+import type { ApiProcedureMetadata } from '../../../../api/backend/transport/policy.types.js';
 import { oc } from '@orpc/contract';
 import * as v from 'valibot';
 import { commonErrors } from '../../../../api/backend/transport/errors.schema.js';
@@ -11,10 +13,13 @@ import { objectInput, misskeyId } from '../../request.schema.js';
 import type { OpenAPI } from '@orpc/contract';
 
 export const notesRepliesErrors = {} as const;
-export const notesRepliesPolicy = { name: 'notes/replies', requireCredential: false } as const;
+
 const security: OpenAPI.SecurityRequirementObject[] = [{}, { bearerAuth: [] }];
-export const notesRepliesContract = oc.$meta({ requestName: 'notes/replies' } as const)
-	.route({ method: 'POST', path: '/notes/replies', operationId: 'post___notes___replies', tags: ['notes'], spec: current => ({ ...current, security }) })
+export const notesRepliesContract = oc.$meta({
+	requestName: 'notes/replies',
+	requireCredential: false,
+} as const satisfies Meta & ApiProcedureMetadata)
+	.route({ method: 'POST', path: '/notes/replies', tags: ['notes'], spec: current => ({ ...current, security }) })
 	.errors({ ...commonErrors })
 	.input(objectInput({
 	'noteId': misskeyId,

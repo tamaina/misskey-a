@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import type { Meta } from '@orpc/contract';
+import type { ApiProcedureMetadata } from '../../../../api/backend/transport/policy.types.js';
 import { oc } from '@orpc/contract';
 import * as v from 'valibot';
 import { commonErrors, apiErrorData } from '../../../../api/backend/transport/errors.schema.js';
@@ -17,10 +19,13 @@ export const notesRenotesErrors = {
 		id: '12908022-2e21-46cd-ba6a-3edaf6093f46',
 	},
 } as const;
-export const notesRenotesPolicy = { name: 'notes/renotes', requireCredential: false } as const;
+
 const security: OpenAPI.SecurityRequirementObject[] = [{}, { bearerAuth: [] }];
-export const notesRenotesContract = oc.$meta({ requestName: 'notes/renotes' } as const)
-	.route({ method: 'POST', path: '/notes/renotes', operationId: 'post___notes___renotes', tags: ['notes'], spec: current => ({ ...current, security }) })
+export const notesRenotesContract = oc.$meta({
+	requestName: 'notes/renotes',
+	requireCredential: false,
+} as const satisfies Meta & ApiProcedureMetadata)
+	.route({ method: 'POST', path: '/notes/renotes', tags: ['notes'], spec: current => ({ ...current, security }) })
 	.errors({ ...commonErrors, NO_SUCH_NOTE: { status: 400, data: apiErrorData } })
 	.input(objectInput({
 	'noteId': misskeyId,

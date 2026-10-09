@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import type { Meta } from '@orpc/contract';
+import type { ApiProcedureMetadata } from '../../../../../api/backend/transport/policy.types.js';
 import { oc } from '@orpc/contract';
 import * as v from 'valibot';
 import { commonErrors, apiErrorData } from '../../../../../api/backend/transport/errors.schema.js';
@@ -21,9 +23,14 @@ export const notesDraftsDeleteErrors = {
 		id: '56f35758-7dd5-468b-8439-5d6fb8ec9b8e',
 	},
 } as const;
-export const notesDraftsDeletePolicy = { name: 'notes/drafts/delete', requireCredential: true, prohibitMoved: true, kind: 'write:account' } as const;
+
 const security: OpenAPI.SecurityRequirementObject[] = [{ bearerAuth: [] }];
-export const notesDraftsDeleteContract = oc.$meta({ requestName: 'notes/drafts/delete' } as const)
-	.route({ method: 'POST', path: '/notes/drafts/delete', operationId: 'post___notes___drafts___delete', tags: ['notes', 'drafts'], spec: current => ({ ...current, security }), successStatus: 204 })
+export const notesDraftsDeleteContract = oc.$meta({
+	requestName: 'notes/drafts/delete',
+	requireCredential: true,
+	prohibitMoved: true,
+	kind: 'write:account',
+} as const satisfies Meta & ApiProcedureMetadata)
+	.route({ method: 'POST', path: '/notes/drafts/delete', tags: ['notes', 'drafts'], spec: current => ({ ...current, security }), successStatus: 204 })
 	.errors({ ...commonErrors, NO_SUCH_NOTE_DRAFT: { status: 400, data: apiErrorData }, ACCESS_DENIED: { status: 400, data: apiErrorData } })
 	.input(objectInput({ draftId: misskeyId })).output(v.void());

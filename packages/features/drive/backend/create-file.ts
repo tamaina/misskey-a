@@ -4,7 +4,7 @@
  */
 
 import type { DriveCreateInput, DriveCreateOutput } from './endpoints/drive/files/create.contract.js';
-import type { UploadResource } from '../../api/backend/transport/context.js';
+import type { UploadResource } from "@features/api/backend/transport/context.js";
 
 export interface CreateFileDependencies<Actor, File> {
 	validateFileName(name: string): boolean;

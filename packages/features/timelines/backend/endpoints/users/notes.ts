@@ -3,8 +3,9 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { implement } from '@orpc/server';
-import { authentication, apiPolicy } from '../../../../api/backend/transport/middleware.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import { toPackedNote } from '@features/notes/backend/note.schema.js';
+
 import { usersNotesContract, usersNotesErrors } from './notes.contract.js';
 import { Brackets } from 'typeorm';
 import { NoteEntityService } from '@features/notes/backend/serializers/NoteEntityService.js';
@@ -17,7 +18,7 @@ import { FanoutTimelineName } from '../../services/FanoutTimelineService.js';
 import { FanoutTimelineEndpointService } from '../../services/FanoutTimelineEndpointService.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 import type { MiMeta, NotesRepository } from '@features/persistence/backend/repositories/models.js';
-import type { ApiContext } from '@features/api/backend/transport/context.js';
+
 export interface UsersNotesDependencies {
 	serverSettings: MiMeta;
 	notesRepository: NotesRepository;
@@ -98,69 +99,69 @@ export function createUsersNotesProcedure<Actor extends MiLocalUser>(deps: Users
 		return await query.limit(ps.limit).getMany();
 	}
 
-	return implement(usersNotesContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>()
-		.use(authentication<Actor>())
-		.use(apiPolicy<Actor>({ name: usersNotesContract['~orpc'].meta.requestName }))
-		.handler(async ({ input, context }) => {
-			const ps = input;
-			const me = context.principal;
-			const untilId = ps.untilId ?? (ps.untilDate ? deps.idService.gen(ps.untilDate!) : null);
-			const sinceId = ps.sinceId ?? (ps.sinceDate ? deps.idService.gen(ps.sinceDate!) : null);
-			const isSelf = me && (me.id === ps.userId);
-			if (ps.withReplies && ps.withFiles) throw apiError(usersNotesErrors.bothWithRepliesAndWithFiles);
-			// early return if me is blocked by requesting user
-			if (me != null) {
-				const userIdsWhoBlockingMe = await deps.cacheService.userBlockedCache.fetch(me.id);
-				if (userIdsWhoBlockingMe.has(ps.userId)) {
-					return [];
+	return createApiProcedure<Actor>()(usersNotesContract).handler(async ({ input, context }) => {
+			const result = await (async () => {
+				const ps = input;
+				const me = context.principal;
+				const untilId = ps.untilId ?? (ps.untilDate ? deps.idService.gen(ps.untilDate!) : null);
+				const sinceId = ps.sinceId ?? (ps.sinceDate ? deps.idService.gen(ps.sinceDate!) : null);
+				const isSelf = me && (me.id === ps.userId);
+				if (ps.withReplies && ps.withFiles) throw apiError(usersNotesErrors.bothWithRepliesAndWithFiles);
+				// early return if me is blocked by requesting user
+				if (me != null) {
+					const userIdsWhoBlockingMe = await deps.cacheService.userBlockedCache.fetch(me.id);
+					if (userIdsWhoBlockingMe.has(ps.userId)) {
+						return [];
+					}
 				}
-			}
-			if (!deps.serverSettings.enableFanoutTimeline) {
-				const timeline = await getFromDb({
+				if (!deps.serverSettings.enableFanoutTimeline) {
+					const timeline = await getFromDb({
+						untilId,
+						sinceId,
+						limit: ps.limit,
+						userId: ps.userId,
+						withChannelNotes: ps.withChannelNotes,
+						withFiles: ps.withFiles,
+						withRenotes: ps.withRenotes,
+					}, me);
+					return await deps.noteEntityService.packMany(timeline, me);
+				}
+				const redisTimelines: FanoutTimelineName[] = [ps.withFiles ? `userTimelineWithFiles:${ps.userId}` : `userTimeline:${ps.userId}`];
+				if (ps.withReplies) redisTimelines.push(`userTimelineWithReplies:${ps.userId}`);
+				if (ps.withChannelNotes) redisTimelines.push(`userTimelineWithChannel:${ps.userId}`);
+				const isFollowing = me && Object.hasOwn(await deps.cacheService.userFollowingsCache.fetch(me.id), ps.userId);
+				const timeline = await deps.fanoutTimelineEndpointService.timeline({
 					untilId,
 					sinceId,
 					limit: ps.limit,
-					userId: ps.userId,
-					withChannelNotes: ps.withChannelNotes,
-					withFiles: ps.withFiles,
-					withRenotes: ps.withRenotes,
-				}, me);
-				return await deps.noteEntityService.packMany(timeline, me);
-			}
-			const redisTimelines: FanoutTimelineName[] = [ps.withFiles ? `userTimelineWithFiles:${ps.userId}` : `userTimeline:${ps.userId}`];
-			if (ps.withReplies) redisTimelines.push(`userTimelineWithReplies:${ps.userId}`);
-			if (ps.withChannelNotes) redisTimelines.push(`userTimelineWithChannel:${ps.userId}`);
-			const isFollowing = me && Object.hasOwn(await deps.cacheService.userFollowingsCache.fetch(me.id), ps.userId);
-			const timeline = await deps.fanoutTimelineEndpointService.timeline({
-				untilId,
-				sinceId,
-				limit: ps.limit,
-				allowPartial: ps.allowPartial,
-				me,
-				redisTimelines,
-				useDbFallback: true,
-				ignoreAuthorFromMute: true,
-				ignoreAuthorFromInstanceBlock: true,
-				ignoreAuthorFromUserSuspension: true,
-				excludeReplies: ps.withChannelNotes && !ps.withReplies, // userTimelineWithChannel may include replies
-				excludeNoFiles: ps.withChannelNotes && ps.withFiles, // userTimelineWithChannel may include notes without files
-				excludePureRenotes: !ps.withRenotes,
-				noteFilter: note => {
-					if (note.channel?.isSensitive && !isSelf) return false;
-					if (note.visibility === 'specified' && (!me || (me.id !== note.userId && !note.visibleUserIds.some(v => v === me.id)))) return false;
-					if (note.visibility === 'followers' && !isFollowing && !isSelf) return false;
-					return true;
-				},
-				dbFallback: async (untilId, sinceId, limit) => await getFromDb({
-					untilId,
-					sinceId,
-					limit,
-					userId: ps.userId,
-					withChannelNotes: ps.withChannelNotes,
-					withFiles: ps.withFiles,
-					withRenotes: ps.withRenotes,
-				}, me),
-			});
-			return timeline;
+					allowPartial: ps.allowPartial,
+					me,
+					redisTimelines,
+					useDbFallback: true,
+					ignoreAuthorFromMute: true,
+					ignoreAuthorFromInstanceBlock: true,
+					ignoreAuthorFromUserSuspension: true,
+					excludeReplies: ps.withChannelNotes && !ps.withReplies, // userTimelineWithChannel may include replies
+					excludeNoFiles: ps.withChannelNotes && ps.withFiles, // userTimelineWithChannel may include notes without files
+					excludePureRenotes: !ps.withRenotes,
+					noteFilter: note => {
+						if (note.channel?.isSensitive && !isSelf) return false;
+						if (note.visibility === 'specified' && (!me || (me.id !== note.userId && !note.visibleUserIds.some(v => v === me.id)))) return false;
+						if (note.visibility === 'followers' && !isFollowing && !isSelf) return false;
+						return true;
+					},
+					dbFallback: async (untilId, sinceId, limit) => await getFromDb({
+						untilId,
+						sinceId,
+						limit,
+						userId: ps.userId,
+						withChannelNotes: ps.withChannelNotes,
+						withFiles: ps.withFiles,
+						withRenotes: ps.withRenotes,
+					}, me),
+				});
+				return timeline;
+			})();
+			return result.map(toPackedNote);
 		});
 }

@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import type { Meta } from '@orpc/contract';
+import type { ApiProcedureMetadata } from '../../../../api/backend/transport/policy.types.js';
 import { oc } from '@orpc/contract';
 import { commonErrors, apiErrorData } from '../../../../api/backend/transport/errors.schema.js';
 import { packedNoteSchema } from '../../note.schema.js';
@@ -28,10 +30,13 @@ export const notesShowErrors = {
 		id: '145f88d2-b03d-4087-8143-a78928883c4b',
 	},
 } as const;
-export const notesShowPolicy = { name: 'notes/show', requireCredential: false } as const;
+
 const security: OpenAPI.SecurityRequirementObject[] = [{}, { bearerAuth: [] }];
-export const notesShowContract = oc.$meta({ requestName: 'notes/show' } as const)
-	.route({ method: 'POST', path: '/notes/show', operationId: 'post___notes___show', tags: ['notes'], spec: current => ({ ...current, security }) })
+export const notesShowContract = oc.$meta({
+	requestName: 'notes/show',
+	requireCredential: false,
+} as const satisfies Meta & ApiProcedureMetadata)
+	.route({ method: 'POST', path: '/notes/show', tags: ['notes'], spec: current => ({ ...current, security }) })
 	.errors({ ...commonErrors, NO_SUCH_NOTE: { status: 400, data: apiErrorData }, CONTENT_RESTRICTED_BY_USER: { status: 400, data: apiErrorData }, CONTENT_RESTRICTED_BY_SERVER: { status: 400, data: apiErrorData } })
 	.input(objectInput({
 	'noteId': misskeyId,

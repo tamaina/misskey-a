@@ -3,22 +3,15 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { implement } from '@orpc/server';
-import { apiError } from '../../../../api/backend/transport/orpc-error.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import { apiError } from "@features/api/backend/transport/orpc-error.js";
 import type { DeleteNoteDependencies } from '../../delete-note.js';
-import { authentication, apiPolicy, requirePrincipal } from '../../../../api/backend/transport/middleware.js';
-import { notesPilotContract } from './delete.contract.js';
-import type { ApiActor, ApiContext } from '../../../../api/backend/transport/context.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import { notesDeleteContract } from './delete.contract.js';
+import type { ApiActor } from "@features/api/backend/transport/context.js";
 export function createDeleteProcedure<Actor extends ApiActor, Note extends { userId: string }, Author>(deps: DeleteNoteDependencies<Actor, Note, Author>) {
-	const notes = implement(notesPilotContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>()
-		.use(authentication<Actor>())
-		.use(apiPolicy<Actor>({
-			name: 'notes/delete', requireCredential: true, kind: 'write:notes', limit: {
-				key: 'notes/delete', duration: 3600000, max: 300, minInterval: 1000,
-			}
-		}))
-		.use(requirePrincipal<Actor>());
-	return notes.delete.handler(async ({ input, context }) => {
+	return createApiProcedure<Actor>()(notesDeleteContract).use(requirePrincipal<Actor>())
+		.handler(async ({ input, context }) => {
 		const noteId = input.noteId;
 		const actor = context.principal;
 		let note: Note;

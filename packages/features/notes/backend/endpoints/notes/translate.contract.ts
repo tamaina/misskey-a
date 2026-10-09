@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import type { Meta } from '@orpc/contract';
+import type { ApiProcedureMetadata } from '../../../../api/backend/transport/policy.types.js';
 import { oc } from '@orpc/contract';
 import * as v from 'valibot';
 import { commonErrors, apiErrorData } from '../../../../api/backend/transport/errors.schema.js';
@@ -26,10 +28,14 @@ export const notesTranslateErrors = {
 		id: 'ea29f2ca-c368-43b3-aaf1-5ac3e74bbe5d',
 	},
 } as const;
-export const notesTranslatePolicy = { name: 'notes/translate', requireCredential: true, kind: 'read:account' } as const;
+
 const security: OpenAPI.SecurityRequirementObject[] = [{ bearerAuth: [] }];
-export const notesTranslateContract = oc.$meta({ requestName: 'notes/translate' } as const)
-	.route({ method: 'POST', path: '/notes/translate', operationId: 'post___notes___translate', tags: ['notes'], spec: current => ({ ...current, security }) })
+export const notesTranslateContract = oc.$meta({
+	requestName: 'notes/translate',
+	requireCredential: true,
+	kind: 'read:account',
+} as const satisfies Meta & ApiProcedureMetadata)
+	.route({ method: 'POST', path: '/notes/translate', tags: ['notes'], spec: current => ({ ...current, security }) })
 	.errors({ ...commonErrors, UNAVAILABLE: { status: 400, data: apiErrorData }, NO_SUCH_NOTE: { status: 400, data: apiErrorData }, CANNOT_TRANSLATE_INVISIBLE_NOTE: { status: 400, data: apiErrorData } })
 	.input(objectInput({
 	'noteId': misskeyId,

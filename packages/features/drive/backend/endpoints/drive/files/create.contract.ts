@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import type { Meta } from '@orpc/contract';
+import type { ApiProcedureMetadata } from '../../../../../api/backend/transport/policy.types.js';
 import { oc, type InferSchemaOutput } from '@orpc/contract';
 import { apiErrorData, commonErrors } from '../../../../../api/backend/transport/errors.schema.js';
 import * as v from 'valibot';
@@ -11,8 +13,17 @@ import { imageComment } from './create.schema.js';
 const finiteNumber = v.pipe(v.number(), v.finite());
 
 const requestName = 'drive/files/create';
-const base = oc.$meta({ requestName: requestName, multipart: true } as const)
-	.route({ method: 'POST', path: `/${requestName}`, operationId: 'post___' + requestName.replaceAll('/', '___'), tags: ['drive'], description: 'Upload a new drive file. Requires write:drive permission.', spec: current => ({ ...current, security: [{ bearerAuth: [] }] }) })
+const base = oc.$meta({
+	requestName: requestName,
+	multipart: true,
+	requireCredential: true,
+	kind: 'write:drive',
+	limit: {
+				key: 'drive/files/create', duration: 3600000, max: 120,
+			},
+	prohibitMoved: true,
+} as const satisfies Meta & ApiProcedureMetadata)
+	.route({ method: 'POST', path: `/${requestName}`, tags: ['drive'], description: 'Upload a new drive file. Requires write:drive permission.', spec: current => ({ ...current, security: [{ bearerAuth: [] }] }) })
 	.errors({
 		...commonErrors,
 		FILE_REQUIRED: { status: 400, data: apiErrorData },

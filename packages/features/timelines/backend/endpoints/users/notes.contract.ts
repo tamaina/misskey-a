@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import type { Meta } from '@orpc/contract';
+import type { ApiProcedureMetadata } from '../../../../api/backend/transport/policy.types.js';
 import { oc } from '@orpc/contract';
 import * as v from 'valibot';
 import { commonErrors, apiErrorData } from '../../../../api/backend/transport/errors.schema.js';
@@ -17,8 +19,11 @@ export const usersNotesErrors = {
 } as const;
 
 const requestName = 'users/notes';
-export const usersNotesContract = oc.$meta({ requestName: requestName } as const)
-	.route({ method: 'POST', path: `/${requestName}`, operationId: 'post___' + requestName.replaceAll('/', '___'), tags: ['users', 'notes'] })
+export const usersNotesContract = oc.$meta({
+	requestName: requestName,
+	requireCredential: false,
+} as const satisfies Meta & ApiProcedureMetadata)
+	.route({ method: 'POST', path: `/${requestName}`, tags: ['users', 'notes'] })
 	.errors({ ...commonErrors, NO_SUCH_USER: { status: 400, data: apiErrorData }, BOTH_WITH_REPLIES_AND_WITH_FILES: { status: 400, data: apiErrorData }, SIGNIN_REQUIRED: { status: 400, data: apiErrorData } })
 	.input(objectInput({
 		'userId': misskeyId,

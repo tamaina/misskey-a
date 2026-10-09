@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import type { Meta } from '@orpc/contract';
+import type { ApiProcedureMetadata } from '../../../../api/backend/transport/policy.types.js';
 import { oc } from '@orpc/contract';
 import * as v from 'valibot';
 import { commonErrors } from '../../../../api/backend/transport/errors.schema.js';
@@ -11,10 +13,13 @@ import type { OpenAPI } from '@orpc/contract';
 
 export const notesShowPartialBulkErrors = {
 } as const;
-export const notesShowPartialBulkPolicy = { name: 'notes/show-partial-bulk', requireCredential: false } as const;
+
 const security: OpenAPI.SecurityRequirementObject[] = [{}, { bearerAuth: [] }];
-export const notesShowPartialBulkContract = oc.$meta({ requestName: 'notes/show-partial-bulk' } as const)
-	.route({ method: 'POST', path: '/notes/show-partial-bulk', operationId: 'post___notes___show-partial-bulk', tags: ['notes'], spec: current => ({ ...current, security }) })
+export const notesShowPartialBulkContract = oc.$meta({
+	requestName: 'notes/show-partial-bulk',
+	requireCredential: false,
+} as const satisfies Meta & ApiProcedureMetadata)
+	.route({ method: 'POST', path: '/notes/show-partial-bulk', tags: ['notes'], spec: current => ({ ...current, security }) })
 	.errors({ ...commonErrors })
 	.input(objectInput({
 	'noteIds': v.pipe(v.array(misskeyId), v.minLength(1), v.maxLength(100)),

@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import type { Meta } from '@orpc/contract';
+import type { ApiProcedureMetadata } from '../../../../../api/backend/transport/policy.types.js';
 import { oc } from '@orpc/contract';
 import { commonErrors, apiErrorData } from '../../../../../api/backend/transport/errors.schema.js';
 
@@ -22,6 +24,10 @@ export const driveFilesShowErrors = {
 			id: '25b73c73-68b1-41d0-bad1-381cfdf6579f',
 		},
 	} as const;
-export const driveFilesShowContract = oc.$meta({ requestName: 'drive/files/show' } as const)
-	.route({ method: 'POST', path: '/drive/files/show', operationId: 'post___drive___files___show', tags: ['drive'], description: 'Show the properties of a drive file.', spec: current => ({ ...current, security: [{ bearerAuth: [] }] }) })
+export const driveFilesShowContract = oc.$meta({
+	requestName: 'drive/files/show',
+	'requireCredential': true,
+	'kind': 'read:drive',
+} as const satisfies Meta & ApiProcedureMetadata)
+	.route({ method: 'POST', path: '/drive/files/show', tags: ['drive'], description: 'Show the properties of a drive file.', spec: current => ({ ...current, security: [{ bearerAuth: [] }] }) })
 	.errors({ ...commonErrors, NO_SUCH_FILE: { status: 400, data: apiErrorData }, ACCESS_DENIED: { status: 400, data: apiErrorData } }).input(driveFileShowSelectorSchema).output(packedDriveFileSchema);

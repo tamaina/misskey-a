@@ -2,23 +2,22 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-import { implement } from '@orpc/server';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { GetterService } from '@features/api/backend/transport/GetterService.js';
 import { QueueService } from '@features/runtime/backend/services/QueueService.js';
 import { ApRendererService } from '@features/federation/backend/services/ApRendererService.js';
 import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
 import { UserBlockingService } from '@features/relationships/backend/services/UserBlockingService.js';
-import * as v from 'valibot';
 import { NoteEntityService } from '../../../serializers/NoteEntityService.js';
 import { PollService } from '../../../services/PollService.js';
-import { authentication, apiPolicy, requirePrincipal } from '../../../../../api/backend/transport/middleware.js';
-import { apiError } from '../../../../../api/backend/transport/orpc-error.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import { apiError } from "@features/api/backend/transport/orpc-error.js";
 import { readErrorId } from '../../../request.schema.js';
-import { notesPollsVoteContract, notesPollsVotePolicy, notesPollsVoteErrors } from './vote.contract.js';
-import type { MiLocalUser } from '../../../../../users/backend/models/User.js';
+import { notesPollsVoteContract, notesPollsVoteErrors } from './vote.contract.js';
+import type { MiLocalUser } from "@features/users/backend/models/User.js";
 import type { UsersRepository, PollsRepository, PollVotesRepository } from '@features/persistence/backend/repositories/models.js';
-import type { ApiContext } from '@features/api/backend/transport/context.js';
+
 export interface NotesPollsVoteDependencies {
 	usersRepository: UsersRepository;
 	pollsRepository: PollsRepository;
@@ -33,14 +32,11 @@ export interface NotesPollsVoteDependencies {
 	noteEntityService: Pick<NoteEntityService, 'isVisibleForMe'>;
 }
 export function createNotesPollsVoteProcedure(deps: NotesPollsVoteDependencies) {
-	return implement(notesPollsVoteContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>()
-		.use(authentication<MiLocalUser>())
-		.use(apiPolicy<MiLocalUser>(notesPollsVotePolicy))
-		.use(requirePrincipal<MiLocalUser>())
+	return createApiProcedure<MiLocalUser>()(notesPollsVoteContract).use(requirePrincipal<MiLocalUser>())
 		.handler(async ({ input, context }) => {
 			const ps = input;
 			const me = context.principal;
-			return v.parse(requiredSchema(notesPollsVoteContract['~orpc'].outputSchema), await (async () => {
+
 				const createdAt = new Date();
 
 				// Get votee
@@ -120,11 +116,5 @@ export function createNotesPollsVoteProcedure(deps: NotesPollsVoteDependencies) 
 
 				// リモートフォロワーにUpdate配信
 				deps.pollService.deliverQuestionUpdate(note.id);
-			})());
 		});
-}
-
-function requiredSchema<Schema>(schema: Schema | undefined): Schema {
-	if (schema === undefined) throw new Error('Missing endpoint contract schema');
-	return schema;
 }

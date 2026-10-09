@@ -12,9 +12,9 @@ import { RoleService } from '@features/roles/backend/services/RoleService.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { apiError } from '@features/api/backend/transport/orpc-error.js';
 import { driveManagementContract } from '../../../api.definition.js';
-import { implement } from '@orpc/server';
-import { authentication, apiPolicy, requirePrincipal } from '@features/api/backend/transport/middleware.js';
-import type { ApiContext } from '@features/api/backend/transport/context.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+
 export interface AdminDriveShowFileDependencies {
 	driveFileSelectorRepository: DriveFileSelectorRepository;
 	usersRepository: UsersRepository;
@@ -22,9 +22,7 @@ export interface AdminDriveShowFileDependencies {
 	idService: Pick<IdService, 'parse'>;
 }
 export function createAdminDriveShowFileProcedure(deps: AdminDriveShowFileDependencies) {
-	return implement(driveManagementContract['admin/drive/show-file'], { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>()
-		.use(authentication<MiLocalUser>())
-		.use(apiPolicy<MiLocalUser>({ 'name': 'admin/drive/show-file', 'requireCredential': true, 'requireModerator': true, 'kind': 'read:admin:drive' })).use(requirePrincipal<MiLocalUser>())
+	return createApiProcedure<MiLocalUser>()(driveManagementContract['admin/drive/show-file']).use(requirePrincipal<MiLocalUser>())
 		.handler(async ({ input, context }) => {
 			const ps = input;
 			const me = context.principal;
@@ -66,7 +64,12 @@ export function createAdminDriveShowFileProcedure(deps: AdminDriveShowFileDepend
 				thumbnailUrl: file.thumbnailUrl,
 				url: file.url,
 				storedInternal: file.storedInternal,
-				properties: file.properties,
+				properties: {
+					width: file.properties.width,
+					height: file.properties.height,
+					orientation: file.properties.orientation,
+					avgColor: file.properties.avgColor,
+				},
 				blurhash: file.blurhash,
 				comment: file.comment,
 				size: file.size,

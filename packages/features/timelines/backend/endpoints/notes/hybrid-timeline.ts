@@ -3,8 +3,9 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { implement } from '@orpc/server';
-import { authentication, apiPolicy, requirePrincipal } from '../../../../api/backend/transport/middleware.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import { toPackedNote } from '@features/notes/backend/note.schema.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
 import { notesHybridTimelineContract, notesHybridTimelineErrors } from './hybrid-timeline.contract.js';
 import { Brackets } from 'typeorm';
 import { ActiveUsersChart } from '@features/statistics/backend/charts/active-users.js';
@@ -21,7 +22,7 @@ import { FanoutTimelineEndpointService } from '../../services/FanoutTimelineEndp
 import { FanoutTimelineName } from '../../services/FanoutTimelineService.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 import type { NotesRepository, MiMeta } from '@features/persistence/backend/repositories/models.js';
-import type { ApiContext } from '@features/api/backend/transport/context.js';
+
 export interface NotesHybridTimelineDependencies {
 	serverSettings: MiMeta;
 	notesRepository: NotesRepository;
@@ -132,90 +133,90 @@ export function createNotesHybridTimelineProcedure<Actor extends MiLocalUser>(de
 		return await query.limit(ps.limit).getMany();
 	}
 
-	return implement(notesHybridTimelineContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>()
-		.use(authentication<Actor>())
-		.use(apiPolicy<Actor>({ name: notesHybridTimelineContract['~orpc'].meta.requestName, requireCredential: true, kind: 'read:account' }))
-		.use(requirePrincipal<Actor>())
+	return createApiProcedure<Actor>()(notesHybridTimelineContract).use(requirePrincipal<Actor>())
 		.handler(async ({ input, context }) => {
-			const ps = input;
-			const me = context.principal;
-			const untilId = ps.untilId ?? (ps.untilDate ? deps.idService.gen(ps.untilDate!) : null);
-			const sinceId = ps.sinceId ?? (ps.sinceDate ? deps.idService.gen(ps.sinceDate!) : null);
-			const policies = await deps.roleService.getUserPolicies(me.id);
-			if (!policies.ltlAvailable) {
-				throw apiError(notesHybridTimelineErrors.stlDisabled);
-			}
-			if (ps.withReplies && ps.withFiles) throw apiError(notesHybridTimelineErrors.bothWithRepliesAndWithFiles);
-			if (!deps.serverSettings.enableFanoutTimeline) {
-				const timeline = await getFromDb({
+			const result = await (async () => {
+				const ps = input;
+				const me = context.principal;
+				const untilId = ps.untilId ?? (ps.untilDate ? deps.idService.gen(ps.untilDate!) : null);
+				const sinceId = ps.sinceId ?? (ps.sinceDate ? deps.idService.gen(ps.sinceDate!) : null);
+				const policies = await deps.roleService.getUserPolicies(me.id);
+				if (!policies.ltlAvailable) {
+					throw apiError(notesHybridTimelineErrors.stlDisabled);
+				}
+				if (ps.withReplies && ps.withFiles) throw apiError(notesHybridTimelineErrors.bothWithRepliesAndWithFiles);
+				if (!deps.serverSettings.enableFanoutTimeline) {
+					const timeline = await getFromDb({
+						untilId,
+						sinceId,
+						limit: ps.limit,
+						includeMyRenotes: ps.includeMyRenotes,
+						includeRenotedMyNotes: ps.includeRenotedMyNotes,
+						includeLocalRenotes: ps.includeLocalRenotes,
+						withFiles: ps.withFiles,
+						withReplies: ps.withReplies,
+					}, me);
+					process.nextTick(() => {
+						deps.activeUsersChart.read(me);
+					});
+					return await deps.noteEntityService.packMany(timeline, me);
+				}
+				let timelineConfig: FanoutTimelineName[];
+				if (ps.withFiles) {
+					timelineConfig = [
+						`homeTimelineWithFiles:${me.id}`,
+						'localTimelineWithFiles',
+					];
+				} else if (ps.withReplies) {
+					timelineConfig = [
+						`homeTimeline:${me.id}`,
+						'localTimeline',
+						'localTimelineWithReplies',
+					];
+				} else {
+					timelineConfig = [
+						`homeTimeline:${me.id}`,
+						'localTimeline',
+						`localTimelineWithReplyTo:${me.id}`,
+					];
+				}
+				const [
+					followings,
+				] = await Promise.all([
+					deps.cacheService.userFollowingsCache.fetch(me.id),
+				]);
+				const redisTimeline = await deps.fanoutTimelineEndpointService.timeline({
 					untilId,
 					sinceId,
 					limit: ps.limit,
-					includeMyRenotes: ps.includeMyRenotes,
-					includeRenotedMyNotes: ps.includeRenotedMyNotes,
-					includeLocalRenotes: ps.includeLocalRenotes,
-					withFiles: ps.withFiles,
-					withReplies: ps.withReplies,
-				}, me);
+					allowPartial: ps.allowPartial,
+					me,
+					redisTimelines: timelineConfig,
+					useDbFallback: deps.serverSettings.enableFanoutTimelineDbFallback,
+					alwaysIncludeMyNotes: true,
+					excludePureRenotes: !ps.withRenotes,
+					noteFilter: note => {
+						if (note.reply && note.reply.visibility === 'followers') {
+							if (!Object.hasOwn(followings, note.reply.userId) && note.reply.userId !== me.id) return false;
+						}
+						return true;
+					},
+					dbFallback: async (untilId, sinceId, limit) => await getFromDb({
+						untilId,
+						sinceId,
+						limit,
+						includeMyRenotes: ps.includeMyRenotes,
+						includeRenotedMyNotes: ps.includeRenotedMyNotes,
+						includeLocalRenotes: ps.includeLocalRenotes,
+						withFiles: ps.withFiles,
+						withReplies: ps.withReplies,
+					}, me),
+				});
 				process.nextTick(() => {
 					deps.activeUsersChart.read(me);
 				});
-				return await deps.noteEntityService.packMany(timeline, me);
-			}
-			let timelineConfig: FanoutTimelineName[];
-			if (ps.withFiles) {
-				timelineConfig = [
-					`homeTimelineWithFiles:${me.id}`,
-					'localTimelineWithFiles',
-				];
-			} else if (ps.withReplies) {
-				timelineConfig = [
-					`homeTimeline:${me.id}`,
-					'localTimeline',
-					'localTimelineWithReplies',
-				];
-			} else {
-				timelineConfig = [
-					`homeTimeline:${me.id}`,
-					'localTimeline',
-					`localTimelineWithReplyTo:${me.id}`,
-				];
-			}
-			const [
-				followings,
-			] = await Promise.all([
-				deps.cacheService.userFollowingsCache.fetch(me.id),
-			]);
-			const redisTimeline = await deps.fanoutTimelineEndpointService.timeline({
-				untilId,
-				sinceId,
-				limit: ps.limit,
-				allowPartial: ps.allowPartial,
-				me,
-				redisTimelines: timelineConfig,
-				useDbFallback: deps.serverSettings.enableFanoutTimelineDbFallback,
-				alwaysIncludeMyNotes: true,
-				excludePureRenotes: !ps.withRenotes,
-				noteFilter: note => {
-					if (note.reply && note.reply.visibility === 'followers') {
-						if (!Object.hasOwn(followings, note.reply.userId) && note.reply.userId !== me.id) return false;
-					}
-					return true;
-				},
-				dbFallback: async (untilId, sinceId, limit) => await getFromDb({
-					untilId,
-					sinceId,
-					limit,
-					includeMyRenotes: ps.includeMyRenotes,
-					includeRenotedMyNotes: ps.includeRenotedMyNotes,
-					includeLocalRenotes: ps.includeLocalRenotes,
-					withFiles: ps.withFiles,
-					withReplies: ps.withReplies,
-				}, me),
-			});
-			process.nextTick(() => {
-				deps.activeUsersChart.read(me);
-			});
-			return redisTimeline;
+				return redisTimeline;
+			})();
+			return result.map(toPackedNote);
 		});
 }
