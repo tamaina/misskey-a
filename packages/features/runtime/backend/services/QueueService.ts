@@ -181,6 +181,16 @@ export class QueueService {
 	@bindThis
 	public async deliverMany(user: ThinUser, content: IActivity | null, inboxes: Map<string, boolean>) {
 		if (content == null) return null;
+		// Defend against nullable inboxes at runtime without mutating the caller's map.
+		const destinations = new Map<string, boolean>();
+		for (const [inbox, isSharedInbox] of inboxes) {
+			// Nullable legacy destinations can still reach this typed boundary at runtime.
+			// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+			if (inbox === null) continue;
+			destinations.set(inbox, isSharedInbox);
+		}
+		if (destinations.size === 0) return null;
+
 		const contentBody = JSON.stringify(content);
 		const digest = ApRequestCreator.createDigest(contentBody);
 
@@ -199,7 +209,7 @@ export class QueueService {
 			},
 		};
 
-		await this.deliverQueue.addBulk(Array.from(inboxes.entries(), d => ({
+		await this.deliverQueue.addBulk(Array.from(destinations.entries(), d => ({
 			name: d[0].replace('https://', '').replace('/inbox', ''),
 			data: {
 				user,
