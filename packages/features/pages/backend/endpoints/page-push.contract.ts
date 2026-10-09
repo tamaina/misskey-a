@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import type { Meta } from '@orpc/contract';
+import type { ApiProcedureMetadata } from '../../../api/backend/transport/policy.types.js';
 import { oc } from '@orpc/contract';
 import * as v from 'valibot';
 import { commonErrors, apiErrorData } from '../../../api/backend/transport/errors.schema.js';
@@ -17,8 +19,12 @@ export const pagePushErrors = {
 } as const;
 
 const requestName = 'page-push';
-export const pagePushContract = oc.$meta({ requestName: requestName } as const)
-	.route({ method: 'POST', path: `/${requestName}`, operationId: 'post___' + requestName.replaceAll('/', '___'), tags: [], spec: current => ({ ...current, security: [{ bearerAuth: [] }] }), successStatus: 204, })
+export const pagePushContract = oc.$meta({
+	requestName: requestName,
+	requireCredential: true,
+	secure: true,
+} as const satisfies Meta & ApiProcedureMetadata)
+	.route({ method: 'POST', path: `/${requestName}`, tags: [], spec: current => ({ ...current, security: [{ bearerAuth: [] }] }), successStatus: 204, })
 	.errors({ ...commonErrors, NO_SUCH_PAGE: { status: 400, data: apiErrorData } })
 	.input<v.GenericSchema<PagePushInput, PagePushInput>>(objectInput({
 		"pageId": misskeyId,

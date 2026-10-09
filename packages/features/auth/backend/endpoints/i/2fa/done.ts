@@ -3,21 +3,20 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 import * as OTPAuth from 'otpauth';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import type { UserProfilesRepository } from '@features/persistence/backend/repositories/models.js';
 import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
 import { UserAuthService } from '../../../services/UserAuthService.js';
-import * as v from 'valibot';
+
 import { I2faDoneContract } from '../../../api.definition.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
-import { implement } from '@orpc/server';
-import { authentication, apiPolicy, requirePrincipal } from '@features/api/backend/transport/middleware.js';
-import type { ApiContext } from '@features/api/backend/transport/context.js';
-export const meta = {
-	requireCredential: true,
 
-	secure: true,
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+
+export const meta = {
+
 } as const;
 export interface I2faDoneDependencies {
 	userProfilesRepository: UserProfilesRepository;
@@ -26,7 +25,7 @@ export interface I2faDoneDependencies {
 	globalEventService: Pick<GlobalEventService, 'publishMainStream'>;
 }
 export function createI2faDoneProcedure(deps: I2faDoneDependencies) {
-	return implement(I2faDoneContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>().use(authentication<MiLocalUser>()).use(apiPolicy<MiLocalUser>({ name: 'i/2fa/done', requireCredential: true, secure: true })).use(requirePrincipal<MiLocalUser>()).handler(async ({ input, context }) => {
+	return createApiProcedure<MiLocalUser>()(I2faDoneContract).use(requirePrincipal<MiLocalUser>()).handler(async ({ input, context }) => {
 		const ps = input;
 		const me = context.principal;
 		const result = await (async () => {
@@ -59,11 +58,6 @@ export function createI2faDoneProcedure(deps: I2faDoneDependencies) {
 				backupCodes: backupCodes,
 			};
 		})();
-		return v.parse(requiredSchema(I2faDoneContract['~orpc'].outputSchema), result);
+		return result;
 	});
-}
-
-function requiredSchema<Schema>(schema: Schema | undefined): Schema {
-	if (schema === undefined) throw new Error('Contract must declare its schema');
-	return schema;
 }

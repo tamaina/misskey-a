@@ -3,21 +3,18 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 import { randomUUID } from 'node:crypto';
 import type { AppsRepository, AuthSessionsRepository } from '@features/persistence/backend/repositories/models.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 import type { Config } from '@/config.js';
 import { apiError } from '@features/api/backend/transport/orpc-error.js';
-import * as v from 'valibot';
+
 import { AuthSessionGenerateContract } from '../../../api.definition.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
-import { implement } from '@orpc/server';
-import { authentication, apiPolicy } from '@features/api/backend/transport/middleware.js';
-import type { ApiContext } from '@features/api/backend/transport/context.js';
+
 export const meta = {
 	tags: ['auth'],
-
-	requireCredential: false,
 
 	errors: {
 		noSuchApp: {
@@ -34,7 +31,7 @@ export interface AuthSessionGenerateDependencies {
 	idService: Pick<IdService, 'gen'>;
 }
 export function createAuthSessionGenerateProcedure(deps: AuthSessionGenerateDependencies) {
-	return implement(AuthSessionGenerateContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>().use(authentication<MiLocalUser>()).use(apiPolicy<MiLocalUser>({ name: 'auth/session/generate' })).handler(async ({ input, context }) => {
+	return createApiProcedure<MiLocalUser>()(AuthSessionGenerateContract).handler(async ({ input, context }) => {
 		const ps = input;
 		const result = await (async () => {
 			// Lookup app
@@ -61,11 +58,6 @@ export function createAuthSessionGenerateProcedure(deps: AuthSessionGenerateDepe
 				url: `${deps.config.authUrl}/${doc.token}`,
 			};
 		})();
-		return v.parse(requiredSchema(AuthSessionGenerateContract['~orpc'].outputSchema), result);
+		return result;
 	});
-}
-
-function requiredSchema<Schema>(schema: Schema | undefined): Schema {
-	if (schema === undefined) throw new Error('Contract must declare its schema');
-	return schema;
 }

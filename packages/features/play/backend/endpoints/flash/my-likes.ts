@@ -2,10 +2,12 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
+import { toPackedFlash } from '../../flash.schema.js';
 
-import { implement } from '@orpc/server';
-import { authentication, apiPolicy, requirePrincipal } from '../../../../api/backend/transport/middleware.js';
-import type { ApiContext } from '../../../../api/backend/transport/context.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+
+import { requirePrincipal } from '../../../../api/backend/transport/middleware.js';
+
 import { flashMyLikesContract } from './my-likes.contract.js';
 import type { FlashLikeEntityService } from '../../serializers/FlashLikeEntityService.js';
 import type { FlashService } from '../../services/FlashService.js';
@@ -15,9 +17,7 @@ export interface FlashMyLikesDependencies {
 	flashService: Pick<FlashService, 'myLikes'>;
 }
 export function createFlashMyLikesProcedure(deps: FlashMyLikesDependencies) {
-	return implement(flashMyLikesContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>()
-		.use(authentication<MiLocalUser>())
-		.use(apiPolicy<MiLocalUser>({ name: flashMyLikesContract['~orpc'].meta.requestName, requireCredential: true, kind: 'read:flash-likes' }))
+	return createApiProcedure<MiLocalUser>()(flashMyLikesContract)
 		.use(requirePrincipal<MiLocalUser>())
 		.handler(async ({ input: ps, context }) => {
 			const me = context.principal;
@@ -29,6 +29,6 @@ export function createFlashMyLikesProcedure(deps: FlashMyLikesDependencies) {
 				limit: ps.limit,
 				search: ps.search,
 			});
-			return deps.flashLikeEntityService.packMany(likes, me);
+			return (await deps.flashLikeEntityService.packMany(likes, me)).map(like => ({ id: like.id, flash: toPackedFlash(like.flash) }));
 		});
 }

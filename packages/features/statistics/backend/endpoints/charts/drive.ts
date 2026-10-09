@@ -3,21 +3,22 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { implement } from '@orpc/server';
-import { authentication, apiPolicy, decodeScalarInput } from '@features/api/backend/transport/middleware.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+
+import { decodeScalarInput } from '@features/api/backend/transport/middleware.js';
 import { chartDriveContract, chartDriveGetContract } from './drive.contract.js';
-import type { ApiActor, ApiContext } from '@features/api/backend/transport/context.js';
+import type { ApiActor } from '@features/api/backend/transport/context.js';
 import type { StatisticsDependencies } from '../../api.implementation.js';
 export function createDriveProcedure<Actor extends ApiActor>(deps: StatisticsDependencies['charts']['drive']) {
-	return implement(chartDriveContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>()
-		.use(authentication<Actor>())
-		.use(apiPolicy<Actor>({ name: chartDriveContract['~orpc'].meta.requestName }))
-		.handler(({ input }) => deps.getChart(input.span, input.limit, input.offset ? new Date(input.offset) : null));
+	return createApiProcedure<Actor>()(chartDriveContract)
+		.handler(async ({ input }) => projectChart(await deps.getChart(input.span, input.limit, input.offset ? new Date(input.offset) : null)));
 }
 export function createDriveGetProcedure<Actor extends ApiActor>(deps: StatisticsDependencies['charts']['drive']) {
-	return implement(chartDriveGetContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>()
-		.use(authentication<Actor>())
-		.use(apiPolicy<Actor>({ name: chartDriveContract['~orpc'].meta.requestName }))
+	return createApiProcedure<Actor>()(chartDriveGetContract)
 		.use(decodeScalarInput<Actor>({ limit: 'integer', offset: 'integer' }))
-		.handler(({ input }) => deps.getChart(input.span, input.limit, input.offset ? new Date(input.offset) : null));
+		.handler(async ({ input }) => projectChart(await deps.getChart(input.span, input.limit, input.offset ? new Date(input.offset) : null)));
+}
+
+function projectChart(value: Awaited<ReturnType<StatisticsDependencies['charts']['drive']['getChart']>>) {
+	return { local: { incCount: value.local.incCount.map(item => item), incSize: value.local.incSize.map(item => item), decCount: value.local.decCount.map(item => item), decSize: value.local.decSize.map(item => item) }, remote: { incCount: value.remote.incCount.map(item => item), incSize: value.remote.incSize.map(item => item), decCount: value.remote.decCount.map(item => item), decSize: value.remote.decSize.map(item => item) } };
 }

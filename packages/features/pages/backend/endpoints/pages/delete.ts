@@ -3,9 +3,10 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { implement } from '@orpc/server';
-import { authentication, apiPolicy, requirePrincipal } from '../../../../api/backend/transport/middleware.js';
-import type { ApiContext } from '../../../../api/backend/transport/context.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+
+import { requirePrincipal } from '../../../../api/backend/transport/middleware.js';
+
 import { pagesDeleteContract, pagesDeleteErrors } from './delete.contract.js';
 import { apiError } from '@features/api/backend/transport/orpc-error.js';
 import { IdentifiableError } from '@features/runtime/backend/errors/identifiable-error.js';
@@ -15,9 +16,7 @@ export interface PagesDeleteDependencies {
 	pageService: Pick<PageService, 'delete'>;
 }
 export function createPagesDeleteProcedure(deps: PagesDeleteDependencies) {
-	return implement(pagesDeleteContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>()
-		.use(authentication<MiLocalUser>())
-		.use(apiPolicy<MiLocalUser>({ name: pagesDeleteContract['~orpc'].meta.requestName, requireCredential: true, kind: 'write:pages' }))
+	return createApiProcedure<MiLocalUser>()(pagesDeleteContract)
 		.use(requirePrincipal<MiLocalUser>())
 		.handler(async ({ input: ps, context }) => {
 			const me = context.principal;

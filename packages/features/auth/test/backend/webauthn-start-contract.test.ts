@@ -4,7 +4,7 @@
  */
 import { call } from '@orpc/server';
 import { testContext } from './native-context.js';
-import { expect, test } from 'vitest';
+import { expect, test, vi } from 'vitest';
 import * as v from 'valibot';
 import bcrypt from 'bcryptjs';
 import { MiUserSecurityKey } from '../../backend/models/UserSecurityKey.js';
@@ -38,7 +38,7 @@ test.each([false, true])('real registration producer keeps challenge storage and
 	const { challenge: _challenge, ...missing } = result;
 	expect(v.safeParse(requiredSchema(I2faRegisterKeyContract['~orpc'].outputSchema), missing).success).toBe(false);
 });
-test('real start endpoint retains password/2FA guards and validates producer output', async () => {
+test('real start endpoint retains password/2FA guards and selects finite producer fields', async () => {
 	const profiles = mockDeep<Parameters<typeof createI2faRegisterKeyProcedure>[0]['userProfilesRepository']>();
 	const producer = mockDeep<WebAuthnService>();
 	const auth = mockDeep<Parameters<typeof createI2faRegisterKeyProcedure>[0]['userAuthService']>();
@@ -54,10 +54,14 @@ test('real start endpoint retains password/2FA guards and validates producer out
 	producer.initiateRegistration.mockResolvedValue(raw);
 	expect(await call(endpoint, v.parse(requiredSchema(I2faRegisterKeyContract['~orpc'].inputSchema), { password: 'password', token: 'totp', future: true }), { context: testContext(me, null) })).toEqual(toWebAuthnRegistrationOptions(raw));
 	expect(producer.initiateRegistration).toHaveBeenCalledWith(me.id, me.id, undefined);
-	const invalid = { ...raw, future: true };
+	const invalid = { ...raw, future: true, rp: { ...raw.rp, sentinel: 'private' }, user: { ...raw.user, sentinel: 'private' }, extensions: { ...raw.extensions, sentinel: 'private' }, pubKeyCredParams: raw.pubKeyCredParams.map(param => ({ ...param, sentinel: 'private' })) };
 	producer.initiateRegistration.mockResolvedValue(invalid);
 	expect(v.safeParse(requiredSchema(I2faRegisterKeyContract['~orpc'].outputSchema), invalid).success).toBe(false);
-	await expect(call(endpoint, { password: 'password', token: 'totp' }, { context: testContext(me, null) })).rejects.toBeInstanceOf(v.ValiError);
+	const validate = vi.spyOn(requiredSchema(I2faRegisterKeyContract['~orpc'].outputSchema)['~standard'], 'validate');
+	try {
+		expect(await call(endpoint, { password: 'password', token: 'totp' }, { context: testContext(me, null) })).toEqual(toWebAuthnRegistrationOptions(raw));
+		expect(validate).not.toHaveBeenCalled();
+	} finally { validate.mockRestore(); }
 	profiles.findOne.mockResolvedValue(null);
 	await expect(call(endpoint, { password: 'wrong' }, { context: testContext(me, null) })).rejects.toMatchObject({ code: 'USER_NOT_FOUND' });
 	expect(v.safeParse(requiredSchema(I2faRegisterKeyContract['~orpc'].inputSchema), {}).success).toBe(false);

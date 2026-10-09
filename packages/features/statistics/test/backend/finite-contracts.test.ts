@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { expect, test } from 'vitest';
+import { expect, vi, test } from 'vitest';
 import * as v from 'valibot';
 import { mockDeep } from 'vitest-mock-extended';
 import { statisticsContract } from '../../backend/endpoints/statistics.contract.js';
@@ -30,6 +30,7 @@ import { createRetentionProcedure } from '../../backend/endpoints/retention.js';
 import type { MiLocalUser } from '../../../users/backend/models/User.js';
 import type { ApiContext, ApiServices, ApiAuthorization } from '../../../api/backend/transport/context.js';
 import { createStatsProcedure } from '../../backend/endpoints/stats.js';
+import { createNotesProcedure } from '../../backend/endpoints/charts/notes.js';
 import { createApRequestProcedure, createApRequestGetProcedure } from '../../backend/endpoints/charts/ap-request.js';
 import type { StatisticsDependencies } from '../../backend/api.implementation.js';
 import { retentionContract as nativeContract1, retentionContract as nativeContract2 } from '../../backend/endpoints/retention.contract.js';
@@ -141,4 +142,34 @@ test('native chart aliases reuse their reader and preserve GET scalar decoding a
 	expect(await get({ span: 'day', offset: 'null' })).toEqual(output);
 	expect(reader.getChart).toHaveBeenLastCalledWith('day', 30, null);
 	expect(reader.getChart).toHaveBeenCalledTimes(3);
+});
+
+test('chart leaves select outer and nested public fields without executing output validators', async () => {
+	const produced = { deliverFailed: [1], deliverSucceeded: [2], inboxReceived: [3], sentinel: 'private' };
+	const reader = { getChart: async () => produced };
+	const schema = requiredSchema(statisticsContract.apRequest['~orpc'].outputSchema);
+	const validate = vi.spyOn(schema['~standard'], 'validate');
+	try {
+		const result = await createProcedureClient(createApRequestProcedure(reader), { context: nativeContext() })({ span: 'day' });
+		expect(result).toEqual({ deliverFailed: [1], deliverSucceeded: [2], inboxReceived: [3] });
+		expect(validate).not.toHaveBeenCalled();
+	} finally { validate.mockRestore(); }
+});
+
+test('retention normalizes ordinary record reserved keys to its declared wire schema', async () => {
+	const data: Record<string, number> = Object.fromEntries([['normal', 5], ['__proto__', 7], ['constructor', 8], ['prototype', 9]]);
+	const produced = [{ createdAt: new Date(item.createdAt), usersCount: 1, data }];
+	const response = await createProcedureClient(createRetentionProcedure({ readRetention: async () => produced }), { context: nativeContext() })({});
+	const prior = v.parse(remainingRetentionOutput, [{ createdAt: item.createdAt, users: 1, data }]);
+	expect(response).toEqual(prior);
+	expect(response[0].data).toEqual({ normal: 5 });
+});
+
+test('nested chart projection removes sentinels at every object level', async () => {
+	const diffs = { normal: [1], reply: [2], renote: [3], withFile: [4] };
+	const branch = { total: [5], inc: [6], dec: [7], diffs };
+	const produced = { local: { ...branch, sentinel: 'private', diffs: { ...diffs, sentinel: 'private' } }, remote: { ...branch, sentinel: 'private', diffs: { ...diffs, sentinel: 'private' } }, sentinel: 'private' };
+	const reader = { getChart: async () => produced };
+	const result = await createProcedureClient(createNotesProcedure(reader), { context: nativeContext() })({ span: 'day' });
+	expect(result).toEqual({ local: branch, remote: branch });
 });

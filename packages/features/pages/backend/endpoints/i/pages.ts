@@ -2,10 +2,12 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
+import { toPackedPage } from '@features/users/backend/page.schema.js';
 
-import { implement } from '@orpc/server';
-import { authentication, apiPolicy, requirePrincipal } from '../../../../api/backend/transport/middleware.js';
-import type { ApiContext } from '../../../../api/backend/transport/context.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+
+import { requirePrincipal } from '../../../../api/backend/transport/middleware.js';
+
 import { iPagesContract } from './pages.contract.js';
 import type { PagesRepository } from '@features/persistence/backend/repositories/models.js';
 import type { QueryService } from '@features/notes/backend/services/QueryService.js';
@@ -17,9 +19,7 @@ export interface IPagesDependencies {
 	queryService: Pick<QueryService, 'makePaginationQuery'>;
 }
 export function createIPagesProcedure(deps: IPagesDependencies) {
-	return implement(iPagesContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>()
-		.use(authentication<MiLocalUser>())
-		.use(apiPolicy<MiLocalUser>({ name: iPagesContract['~orpc'].meta.requestName, requireCredential: true, kind: 'read:pages' }))
+	return createApiProcedure<MiLocalUser>()(iPagesContract)
 		.use(requirePrincipal<MiLocalUser>())
 		.handler(async ({ input: ps, context }) => {
 			const me = context.principal;
@@ -28,6 +28,6 @@ export function createIPagesProcedure(deps: IPagesDependencies) {
 			const pages = await query
 				.limit(ps.limit)
 				.getMany();
-			return await deps.pageEntityService.packMany(pages);
+			return (await deps.pageEntityService.packMany(pages)).map(toPackedPage);
 		});
 }

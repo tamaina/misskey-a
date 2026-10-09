@@ -2,20 +2,18 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import type { UserProfilesRepository, UserSecurityKeysRepository } from '@features/persistence/backend/repositories/models.js';
 import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
 import { apiError } from '@features/api/backend/transport/orpc-error.js';
-import * as v from 'valibot';
+
 import { I2faPasswordLessContract } from '../../../api.definition.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
-import { implement } from '@orpc/server';
-import { authentication, apiPolicy, requirePrincipal } from '@features/api/backend/transport/middleware.js';
-import type { ApiContext } from '@features/api/backend/transport/context.js';
-export const meta = {
-	requireCredential: true,
 
-	secure: true,
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+
+export const meta = {
 
 	errors: {
 		noKey: {
@@ -32,7 +30,7 @@ export interface I2faPasswordLessDependencies {
 	globalEventService: Pick<GlobalEventService, 'publishMainStream'>;
 }
 export function createI2faPasswordLessProcedure(deps: I2faPasswordLessDependencies) {
-	return implement(I2faPasswordLessContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>().use(authentication<MiLocalUser>()).use(apiPolicy<MiLocalUser>({ name: 'i/2fa/password-less', requireCredential: true, secure: true })).use(requirePrincipal<MiLocalUser>()).handler(async ({ input, context }) => {
+	return createApiProcedure<MiLocalUser>()(I2faPasswordLessContract).use(requirePrincipal<MiLocalUser>()).handler(async ({ input, context }) => {
 		const ps = input;
 		const me = context.principal;
 		const result = await (async () => {
@@ -67,11 +65,6 @@ export function createI2faPasswordLessProcedure(deps: I2faPasswordLessDependenci
 				includeSecrets: true,
 			}));
 		})();
-		return v.parse(requiredSchema(I2faPasswordLessContract['~orpc'].outputSchema), result);
+		return result;
 	});
-}
-
-function requiredSchema<Schema>(schema: Schema | undefined): Schema {
-	if (schema === undefined) throw new Error('Contract must declare its schema');
-	return schema;
 }

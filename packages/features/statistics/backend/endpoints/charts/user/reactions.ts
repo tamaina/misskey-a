@@ -3,21 +3,22 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { implement } from '@orpc/server';
-import { authentication, apiPolicy, decodeScalarInput } from '@features/api/backend/transport/middleware.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+
+import { decodeScalarInput } from '@features/api/backend/transport/middleware.js';
 import { chartPerUserReactionsContract, chartPerUserReactionsGetContract } from './reactions.contract.js';
-import type { ApiActor, ApiContext } from '@features/api/backend/transport/context.js';
+import type { ApiActor } from '@features/api/backend/transport/context.js';
 import type { StatisticsDependencies } from '../../../api.implementation.js';
 export function createPerUserReactionsProcedure<Actor extends ApiActor>(deps: StatisticsDependencies['charts']['userReactions']) {
-	return implement(chartPerUserReactionsContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>()
-		.use(authentication<Actor>())
-		.use(apiPolicy<Actor>({ name: chartPerUserReactionsContract['~orpc'].meta.requestName }))
-		.handler(({ input }) => deps.getChart(input.span, input.limit, input.offset ? new Date(input.offset) : null, input.userId));
+	return createApiProcedure<Actor>()(chartPerUserReactionsContract)
+		.handler(async ({ input }) => projectChart(await deps.getChart(input.span, input.limit, input.offset ? new Date(input.offset) : null, input.userId)));
 }
 export function createPerUserReactionsGetProcedure<Actor extends ApiActor>(deps: StatisticsDependencies['charts']['userReactions']) {
-	return implement(chartPerUserReactionsGetContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>()
-		.use(authentication<Actor>())
-		.use(apiPolicy<Actor>({ name: chartPerUserReactionsContract['~orpc'].meta.requestName }))
+	return createApiProcedure<Actor>()(chartPerUserReactionsGetContract)
 		.use(decodeScalarInput<Actor>({ limit: 'integer', offset: 'integer' }))
-		.handler(({ input }) => deps.getChart(input.span, input.limit, input.offset ? new Date(input.offset) : null, input.userId));
+		.handler(async ({ input }) => projectChart(await deps.getChart(input.span, input.limit, input.offset ? new Date(input.offset) : null, input.userId)));
+}
+
+function projectChart(value: Awaited<ReturnType<StatisticsDependencies['charts']['userReactions']['getChart']>>) {
+	return { local: { count: value.local.count.map(item => item) }, remote: { count: value.remote.count.map(item => item) } };
 }

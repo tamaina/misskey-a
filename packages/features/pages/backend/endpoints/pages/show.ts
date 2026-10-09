@@ -2,10 +2,10 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
+import { toPackedPage } from '@features/users/backend/page.schema.js';
 
-import { implement } from '@orpc/server';
-import { authentication, apiPolicy } from '../../../../api/backend/transport/middleware.js';
-import type { ApiContext } from '../../../../api/backend/transport/context.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+
 import { pagesShowContract, pagesShowErrors } from './show.contract.js';
 import { IsNull } from 'typeorm';
 import type { UsersRepository } from '@features/persistence/backend/repositories/models.js';
@@ -24,9 +24,7 @@ export interface PagesShowDependencies {
 	pageEntityService: Pick<PageEntityService, 'pack'>;
 }
 export function createPagesShowProcedure(deps: PagesShowDependencies) {
-	return implement(pagesShowContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>()
-		.use(authentication<MiLocalUser>())
-		.use(apiPolicy<MiLocalUser>({ name: pagesShowContract['~orpc'].meta.requestName }))
+	return createApiProcedure<MiLocalUser>()(pagesShowContract)
 		.handler(async ({ input: ps, context }) => {
 			const me = context.principal;
 			let page: MiPage | null = null;
@@ -47,6 +45,6 @@ export function createPagesShowProcedure(deps: PagesShowDependencies) {
 			if (page == null) {
 				throw apiError(pagesShowErrors.noSuchPage);
 			}
-			return await deps.pageEntityService.pack(page, me);
+			return toPackedPage(await deps.pageEntityService.pack(page, me));
 		});
 }

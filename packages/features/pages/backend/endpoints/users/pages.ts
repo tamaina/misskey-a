@@ -2,10 +2,10 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
+import { toPackedPage } from '@features/users/backend/page.schema.js';
 
-import { implement } from '@orpc/server';
-import { authentication, apiPolicy } from '../../../../api/backend/transport/middleware.js';
-import type { ApiContext } from '../../../../api/backend/transport/context.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+
 import { usersPagesContract } from './pages.contract.js';
 import type { QueryService } from '@features/notes/backend/services/QueryService.js';
 import type { PageEntityService } from '../../serializers/PageEntityService.js';
@@ -17,9 +17,7 @@ export interface UsersPagesDependencies {
 	queryService: Pick<QueryService, 'makePaginationQuery'>;
 }
 export function createUsersPagesProcedure(deps: UsersPagesDependencies) {
-	return implement(usersPagesContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>()
-		.use(authentication<MiLocalUser>())
-		.use(apiPolicy<MiLocalUser>({ name: usersPagesContract['~orpc'].meta.requestName }))
+	return createApiProcedure<MiLocalUser>()(usersPagesContract)
 		.handler(async ({ input: ps }) => {
 			const query = deps.queryService.makePaginationQuery(deps.pagesRepository.createQueryBuilder('page'), ps.sinceId, ps.untilId, ps.sinceDate, ps.untilDate)
 				.andWhere('page.userId = :userId', { userId: ps.userId })
@@ -27,6 +25,6 @@ export function createUsersPagesProcedure(deps: UsersPagesDependencies) {
 			const pages = await query
 				.limit(ps.limit)
 				.getMany();
-			return await deps.pageEntityService.packMany(pages);
+			return (await deps.pageEntityService.packMany(pages)).map(toPackedPage);
 		});
 }

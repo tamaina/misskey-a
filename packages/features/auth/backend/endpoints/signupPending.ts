@@ -9,8 +9,9 @@ import { sessionField, sessionErrorMessage, type AuthSessionContext } from '../s
 import { SigninService } from '../transport/SigninService.js';
 import type { RegistrationTicketsRepository, UserPendingsRepository, UserProfilesRepository } from '@features/persistence/backend/repositories/models.js';
 import { implement } from '@orpc/server';
-import * as v from 'valibot';
+
 import { authSessionsContract } from '../api.definition.js';
+import { toFinishedSignin } from '../session.schema.js';
 import { sessionErrors } from '../session.middleware.js';
 const invitationCodeMailTimeoutMs = 1000 * 60 * 30;
 export interface SignupPendingDependencies {
@@ -22,7 +23,7 @@ export interface SignupPendingDependencies {
 	signinService: Pick<SigninService, 'signin'>;
 }
 export function createSignupPendingProcedure(deps: SignupPendingDependencies) {
-	return implement(authSessionsContract.signupPending, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<AuthSessionContext>().use(sessionErrors()).handler(async ({ input, context }) => {
+	return implement(authSessionsContract.signupPending, { initialInputValidationIndex: Number.POSITIVE_INFINITY, initialOutputValidationIndex: Number.NaN }).$context<AuthSessionContext>().use(sessionErrors()).handler(async ({ input, context }) => {
 		const body = input;
 		const request = context.request;
 		const reply = context.effects;
@@ -59,11 +60,6 @@ export function createSignupPendingProcedure(deps: SignupPendingDependencies) {
 				throw new FastifyReplyError(400, typeof err === 'string' ? err : sessionErrorMessage(err));
 			}
 		})();
-		return v.parse(requiredSchema(authSessionsContract.signupPending['~orpc'].outputSchema), result);
+		return toFinishedSignin(result);
 	});
-}
-
-function requiredSchema<Schema>(schema: Schema | undefined): Schema {
-	if (schema === undefined) throw new Error('Contract must declare its schema');
-	return schema;
 }

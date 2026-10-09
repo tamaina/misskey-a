@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import type { Meta } from '@orpc/contract';
+import type { ApiProcedureMetadata } from '../../../../api/backend/transport/policy.types.js';
 import { oc } from '@orpc/contract';
 import * as v from 'valibot';
 import { commonErrors, apiErrorData } from '../../../../api/backend/transport/errors.schema.js';
@@ -15,8 +17,13 @@ export const pagesUnlikeErrors = {
 } as const;
 
 const requestName = 'pages/unlike';
-export const pagesUnlikeContract = oc.$meta({ requestName: requestName } as const)
-	.route({ method: 'POST', path: `/${requestName}`, operationId: 'post___' + requestName.replaceAll('/', '___'), tags: ['pages'], spec: current => ({ ...current, security: [{ bearerAuth: [] }] }), successStatus: 204, })
+export const pagesUnlikeContract = oc.$meta({
+	requestName: requestName,
+	requireCredential: true,
+	kind: 'write:page-likes',
+	prohibitMoved: true,
+} as const satisfies Meta & ApiProcedureMetadata)
+	.route({ method: 'POST', path: `/${requestName}`, tags: ['pages'], spec: current => ({ ...current, security: [{ bearerAuth: [] }] }), successStatus: 204, })
 	.errors({ ...commonErrors, NO_SUCH_PAGE: { status: 400, data: apiErrorData }, NOT_LIKED: { status: 400, data: apiErrorData } })
 	.input(objectInput({
 		"pageId": misskeyId,

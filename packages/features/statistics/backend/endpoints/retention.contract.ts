@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import type { Meta } from '@orpc/contract';
+import type { ApiProcedureMetadata } from '../../../api/backend/transport/policy.types.js';
 import { oc } from '@orpc/contract';
 import * as v from 'valibot';
 import { objectInput } from '../../../api/backend/transport/input.schema.js';
@@ -11,8 +13,13 @@ import { commonErrors } from '../../../api/backend/transport/errors.schema.js';
 const finiteNumber = v.pipe(v.number(), v.finite());
 
 const requestName = 'retention';
-export const retentionContract = oc.$meta({ requestName: requestName, allowGet: true, cacheSec: 3600 } as const)
-	.route({ method: 'POST', path: `/${requestName}`, operationId: 'post___' + requestName, tags: ['users'] })
+export const retentionContract = oc.$meta({
+	requestName: requestName,
+	allowGet: true,
+	cacheSec: 3600,
+	requireCredential: false,
+} as const satisfies Meta & ApiProcedureMetadata)
+	.route({ method: 'POST', path: `/${requestName}`, tags: ['users'] })
 	.errors(commonErrors)
 	.input(v.optional(objectInput({}), {}))
 	.output(v.array(v.strictObject({
@@ -21,8 +28,11 @@ export const retentionContract = oc.$meta({ requestName: requestName, allowGet: 
 		data: v.record(v.string(), finiteNumber),
 	})));
 
-export const retentionGetContract = oc.$meta({ allowGet: true, cacheSec: 3600 } as const)
-	.route({ method: 'GET', path: `/${requestName}`, operationId: 'get___' + requestName.replaceAll('/', '___'), tags: ['users'] })
+export const retentionGetContract = oc.$meta({
+	allowGet: true,
+	cacheSec: 3600,
+} as const satisfies Meta & ApiProcedureMetadata)
+	.route({ method: 'GET', path: `/${requestName}`, tags: ['users'] })
 	.errors(commonErrors)
 	.input(v.optional(objectInput({}), {}))
 	.output(v.array(v.strictObject({

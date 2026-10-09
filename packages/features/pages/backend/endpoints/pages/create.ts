@@ -2,10 +2,12 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
+import { toPackedPage } from '@features/users/backend/page.schema.js';
 
-import { implement } from '@orpc/server';
-import { authentication, apiPolicy, requirePrincipal } from '../../../../api/backend/transport/middleware.js';
-import type { ApiContext } from '../../../../api/backend/transport/context.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+
+import { requirePrincipal } from '../../../../api/backend/transport/middleware.js';
+
 import { pagesCreateContract, pagesCreateErrors } from './create.contract.js';
 import type { DriveFilesRepository, MiDriveFile, PagesRepository } from '@features/persistence/backend/repositories/models.js';
 import type { PageEntityService } from '../../serializers/PageEntityService.js';
@@ -20,9 +22,7 @@ export interface PagesCreateDependencies {
 	pageEntityService: Pick<PageEntityService, 'pack'>;
 }
 export function createPagesCreateProcedure(deps: PagesCreateDependencies) {
-	return implement(pagesCreateContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>()
-		.use(authentication<MiLocalUser>())
-		.use(apiPolicy<MiLocalUser>({ name: pagesCreateContract['~orpc'].meta.requestName, requireCredential: true, kind: 'write:pages', prohibitMoved: true, limit: { duration: 3_600_000, max: 10 } }))
+	return createApiProcedure<MiLocalUser>()(pagesCreateContract)
 		.use(requirePrincipal<MiLocalUser>())
 		.handler(async ({ input: ps, context }) => {
 			const me = context.principal;
@@ -50,7 +50,7 @@ export function createPagesCreateProcedure(deps: PagesCreateDependencies) {
 					eyeCatchingImage,
 					summary: ps.summary ?? null,
 				});
-				return await deps.pageEntityService.pack(page);
+				return toPackedPage(await deps.pageEntityService.pack(page));
 			} catch (err) {
 				if (err instanceof IdentifiableError && err.id === '1a79e38e-3d83-4423-845b-a9d83ff93b61') {
 					throw apiError(pagesCreateErrors.nameAlreadyExists);

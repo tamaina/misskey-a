@@ -2,19 +2,18 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 import { RoleService } from '@features/roles/backend/services/RoleService.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import { apiError } from '@features/api/backend/transport/orpc-error.js';
-import * as v from 'valibot';
+
 import type { Config } from '@/config.js';
 
 import { SignupService } from '../../../services/SignupService.js';
 import { AdminAccountsCreateContract } from '../../../api.definition.js';
 import type { MiMeta, UsersRepository } from '@features/persistence/backend/repositories/models.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
-import { implement } from '@orpc/server';
-import { authentication, apiPolicy } from '@features/api/backend/transport/middleware.js';
-import type { ApiContext } from '@features/api/backend/transport/context.js';
+
 import { toPackedUserDetailed } from '@features/users/backend/user.schema.js';
 export const meta = {
 	tags: ['admin'],
@@ -42,7 +41,7 @@ export interface AdminAccountsCreateDependencies {
 	roleService: Pick<RoleService, 'isAdministrator'>;
 }
 export function createAdminAccountsCreateProcedure(deps: AdminAccountsCreateDependencies) {
-	return implement(AdminAccountsCreateContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>().use(authentication<MiLocalUser>()).use(apiPolicy<MiLocalUser>({ name: 'admin/accounts/create' })).handler(async ({ input, context }) => {
+	return createApiProcedure<MiLocalUser>()(AdminAccountsCreateContract).handler(async ({ input, context }) => {
 		const ps = input;
 		const _me = context.principal;
 		const token = context.token;
@@ -78,11 +77,6 @@ export function createAdminAccountsCreateProcedure(deps: AdminAccountsCreateDepe
 
 			return { ...res, token: secret };
 		})();
-		return v.parse(requiredSchema(AdminAccountsCreateContract['~orpc'].outputSchema), { ...toPackedUserDetailed(result), token: result.token });
+		return { ...toPackedUserDetailed(result), token: result.token };
 	});
-}
-
-function requiredSchema<Schema>(schema: Schema | undefined): Schema {
-	if (schema === undefined) throw new Error('Contract must declare its schema');
-	return schema;
 }

@@ -13,11 +13,12 @@ import { registerPilotHttp } from '@features/api/backend/transport/pilot-http.js
 import * as v from 'valibot';
 import bcrypt from 'bcryptjs';
 import { createAuthRouter, type AuthRouterDependencies } from '../../backend/api.implementation.js';
-import { authContract, AdminCaptchaCurrentContract, I2faKeyDoneContract, IRevokeTokenContract } from '../../backend/api.definition.js';
+import { toPackedSignin } from '../../backend/auth.schema.js';
+import { authContract, AppShowContract, AdminCaptchaCurrentContract, I2faKeyDoneContract, IRevokeTokenContract } from '../../backend/api.definition.js';
 import { createIRevokeTokenProcedure, type TokenRevocationRepository } from '../../backend/endpoints/i/revoke-token.js';
 import { createI2faKeyDoneProcedure } from '../../backend/endpoints/i/2fa/key-done.js';
 import { WebAuthnService } from '../../backend/services/WebAuthnService.js';
-import type { ApiContext, ApiServices } from '../../../api/backend/transport/context.js';
+import type { ApiContext, ApiServices, ApiToken } from '../../../api/backend/transport/context.js';
 import type { MiAccessToken } from '../../backend/models/AccessToken.js';
 import type { MiLocalUser } from '../../../users/backend/models/User.js';
 const actor = mockDeep<MiLocalUser>({ id: 'user123', isSuspended: false, movedToUri: null });
@@ -110,3 +111,32 @@ function requiredSchema<Schema>(schema: Schema | undefined): Schema {
 	if (schema === undefined) throw new Error('Contract must declare its schema');
 	return schema;
 }
+
+test.each([
+	{ label: 'owner native session', principal: actor, token: null, includeSecret: true },
+	{ label: 'owner app token', principal: actor, token: mockDeep<ApiToken>({ permission: [] }), includeSecret: false },
+	{ label: 'another native user', principal: mockDeep<MiLocalUser>({ id: 'other123', isSuspended: false, movedToUri: null }), token: null, includeSecret: false },
+	{ label: 'anonymous', principal: null, token: null, includeSecret: false },
+])('app/show selects finite fields and enforces secret ownership: $label', async ({ principal, token, includeSecret }) => {
+	const h = harness();
+	h.services.authenticate.mockResolvedValue([principal, token]);
+	const app = mockDeep<NonNullable<Awaited<ReturnType<typeof h.operations['app/show']['appsRepository']['findOneBy']>>>>({ id: 'app123', userId: actor.id });
+	h.operations['app/show'].appsRepository.findOneBy.mockResolvedValue(app);
+	const produced = { id: 'app123', name: 'fixture', callbackUrl: null, permission: ['read:account'], secret: 'owner-secret', isAuthorized: true, sentinel: 'private' };
+	h.operations['app/show'].appEntityService.pack.mockResolvedValue(produced);
+	const output = requiredSchema(AppShowContract['~orpc'].outputSchema);
+	const validator = vi.spyOn(output['~standard'], 'validate');
+	try {
+		const result = await call(h.router['app/show'], { appId: app.id }, { context: h.context });
+		expect(result).toEqual({ id: produced.id, name: produced.name, callbackUrl: null, permission: produced.permission, isAuthorized: true, ...(includeSecret ? { secret: produced.secret } : {}) });
+		expect(h.operations['app/show'].appEntityService.pack).toHaveBeenCalledWith(app, principal, { detail: true, includeSecret });
+		expect(validator).not.toHaveBeenCalled();
+	} finally { validator.mockRestore(); }
+});
+
+test('sign-in header business JSON retains reserved own keys at the wire boundary', () => {
+	const headers: Record<string, string> = Object.fromEntries([['constructor', 'retained'], ['__proto__', 'retained'], ['prototype', 'retained']]);
+	const output = toPackedSignin({ id: 'signin123', createdAt: '2026-10-09T00:00:00.000Z', ip: '127.0.0.1', success: true, headers });
+	expect(output.headers).toEqual(headers);
+	expect(Object.keys(output.headers)).toEqual(['constructor', '__proto__', 'prototype']);
+});

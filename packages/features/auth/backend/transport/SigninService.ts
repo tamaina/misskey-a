@@ -35,7 +35,7 @@ export class SigninService {
 	}
 
 	@bindThis
-	public signin(request: AuthSessionRequest, reply: AuthSessionEffects, user: Pick<MiLocalUser, 'id' | 'token'>) {
+	public signin(request: AuthSessionRequest, reply: AuthSessionEffects, user: Pick<MiLocalUser, 'id' | 'token'>): { finished: true; id: string; i: string | null } {
 		setImmediate(async () => {
 			this.notificationService.createNotification(user.id, 'login', {});
 

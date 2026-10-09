@@ -3,9 +3,10 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { implement } from '@orpc/server';
-import { authentication, apiPolicy, requirePrincipal } from '../../../../api/backend/transport/middleware.js';
-import type { ApiContext } from '../../../../api/backend/transport/context.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+
+import { requirePrincipal } from '../../../../api/backend/transport/middleware.js';
+
 import { pagesUnlikeContract, pagesUnlikeErrors } from './unlike.contract.js';
 import type { PagesRepository, PageLikesRepository } from '@features/persistence/backend/repositories/models.js';
 import { apiError } from '@features/api/backend/transport/orpc-error.js';
@@ -15,9 +16,7 @@ export interface PagesUnlikeDependencies {
 	pageLikesRepository: Pick<PageLikesRepository, 'delete' | 'findOneBy'>;
 }
 export function createPagesUnlikeProcedure(deps: PagesUnlikeDependencies) {
-	return implement(pagesUnlikeContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>()
-		.use(authentication<MiLocalUser>())
-		.use(apiPolicy<MiLocalUser>({ name: pagesUnlikeContract['~orpc'].meta.requestName, requireCredential: true, kind: 'write:page-likes', prohibitMoved: true }))
+	return createApiProcedure<MiLocalUser>()(pagesUnlikeContract)
 		.use(requirePrincipal<MiLocalUser>())
 		.handler(async ({ input: ps, context }) => {
 			const me = context.principal;

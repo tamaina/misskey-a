@@ -2,10 +2,12 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
+import { toPackedFlash } from '../../flash.schema.js';
 
-import { implement } from '@orpc/server';
-import { authentication, apiPolicy, requirePrincipal } from '../../../../api/backend/transport/middleware.js';
-import type { ApiContext } from '../../../../api/backend/transport/context.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+
+import { requirePrincipal } from '../../../../api/backend/transport/middleware.js';
+
 import { flashCreateContract } from './create.contract.js';
 import type { FlashsRepository } from '@features/persistence/backend/repositories/models.js';
 import type { IdService } from '@features/runtime/backend/services/IdService.js';
@@ -17,9 +19,7 @@ export interface FlashCreateDependencies {
 	idService: Pick<IdService, 'gen'>;
 }
 export function createFlashCreateProcedure(deps: FlashCreateDependencies) {
-	return implement(flashCreateContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>()
-		.use(authentication<MiLocalUser>())
-		.use(apiPolicy<MiLocalUser>({ name: flashCreateContract['~orpc'].meta.requestName, requireCredential: true, kind: 'write:flash', prohibitMoved: true, limit: { duration: 3_600_000, max: 10 } }))
+	return createApiProcedure<MiLocalUser>()(flashCreateContract)
 		.use(requirePrincipal<MiLocalUser>())
 		.handler(async ({ input: ps, context }) => {
 			const me = context.principal;
@@ -33,6 +33,6 @@ export function createFlashCreateProcedure(deps: FlashCreateDependencies) {
 				permissions: ps.permissions,
 				visibility: ps.visibility,
 			});
-			return await deps.flashEntityService.pack(flash);
+			return toPackedFlash(await deps.flashEntityService.pack(flash));
 		});
 }

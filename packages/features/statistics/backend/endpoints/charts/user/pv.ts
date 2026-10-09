@@ -3,21 +3,22 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { implement } from '@orpc/server';
-import { authentication, apiPolicy, decodeScalarInput } from '@features/api/backend/transport/middleware.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+
+import { decodeScalarInput } from '@features/api/backend/transport/middleware.js';
 import { chartPerUserPvContract, chartPerUserPvGetContract } from './pv.contract.js';
-import type { ApiActor, ApiContext } from '@features/api/backend/transport/context.js';
+import type { ApiActor } from '@features/api/backend/transport/context.js';
 import type { StatisticsDependencies } from '../../../api.implementation.js';
 export function createPerUserPvProcedure<Actor extends ApiActor>(deps: StatisticsDependencies['charts']['userPv']) {
-	return implement(chartPerUserPvContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>()
-		.use(authentication<Actor>())
-		.use(apiPolicy<Actor>({ name: chartPerUserPvContract['~orpc'].meta.requestName }))
-		.handler(({ input }) => deps.getChart(input.span, input.limit, input.offset ? new Date(input.offset) : null, input.userId));
+	return createApiProcedure<Actor>()(chartPerUserPvContract)
+		.handler(async ({ input }) => projectChart(await deps.getChart(input.span, input.limit, input.offset ? new Date(input.offset) : null, input.userId)));
 }
 export function createPerUserPvGetProcedure<Actor extends ApiActor>(deps: StatisticsDependencies['charts']['userPv']) {
-	return implement(chartPerUserPvGetContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>()
-		.use(authentication<Actor>())
-		.use(apiPolicy<Actor>({ name: chartPerUserPvContract['~orpc'].meta.requestName }))
+	return createApiProcedure<Actor>()(chartPerUserPvGetContract)
 		.use(decodeScalarInput<Actor>({ limit: 'integer', offset: 'integer' }))
-		.handler(({ input }) => deps.getChart(input.span, input.limit, input.offset ? new Date(input.offset) : null, input.userId));
+		.handler(async ({ input }) => projectChart(await deps.getChart(input.span, input.limit, input.offset ? new Date(input.offset) : null, input.userId)));
+}
+
+function projectChart(value: Awaited<ReturnType<StatisticsDependencies['charts']['userPv']['getChart']>>) {
+	return { upv: { user: value.upv.user.map(item => item), visitor: value.upv.visitor.map(item => item) }, pv: { user: value.pv.user.map(item => item), visitor: value.pv.visitor.map(item => item) } };
 }

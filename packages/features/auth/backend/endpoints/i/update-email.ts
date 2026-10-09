@@ -2,7 +2,8 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-import ms from 'ms';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+
 import bcrypt from 'bcryptjs';
 
 import type { MiMeta, UserProfilesRepository } from '@features/persistence/backend/repositories/models.js';
@@ -13,22 +14,14 @@ import { GlobalEventService } from '@features/runtime/backend/services/GlobalEve
 import { L_CHARS, secureRndstr } from '../../utility/secure-rndstr.js';
 import { UserAuthService } from '../../services/UserAuthService.js';
 import { apiError } from '@features/api/backend/transport/orpc-error.js';
-import * as v from 'valibot';
+
 import { IUpdateEmailContract } from '../../api.definition.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
-import { implement } from '@orpc/server';
-import { authentication, apiPolicy, requirePrincipal } from '@features/api/backend/transport/middleware.js';
-import type { ApiContext } from '@features/api/backend/transport/context.js';
+
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+
 import { toPackedUserDetailed } from '@features/users/backend/user.schema.js';
 export const meta = {
-	requireCredential: true,
-
-	secure: true,
-
-	limit: {
-		duration: ms('1hour'),
-		max: 3,
-	},
 
 	errors: {
 		incorrectPassword: {
@@ -60,12 +53,7 @@ export interface IUpdateEmailDependencies {
 	globalEventService: Pick<GlobalEventService, 'publishMainStream'>;
 }
 export function createIUpdateEmailProcedure(deps: IUpdateEmailDependencies) {
-	return implement(IUpdateEmailContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>().use(authentication<MiLocalUser>()).use(apiPolicy<MiLocalUser>({
-		name: 'i/update-email', requireCredential: true, secure: true, limit: {
-			duration: 3600000,
-			max: 3,
-		}
-	})).use(requirePrincipal<MiLocalUser>()).handler(async ({ input, context }) => {
+	return createApiProcedure<MiLocalUser>()(IUpdateEmailContract).use(requirePrincipal<MiLocalUser>()).handler(async ({ input, context }) => {
 		const ps = input;
 		const me = context.principal;
 		const result = await (async () => {
@@ -127,11 +115,6 @@ export function createIUpdateEmailProcedure(deps: IUpdateEmailDependencies) {
 
 			return iObj;
 		})();
-		return v.parse(requiredSchema(IUpdateEmailContract['~orpc'].outputSchema), toPackedUserDetailed(result));
+		return toPackedUserDetailed(result);
 	});
-}
-
-function requiredSchema<Schema>(schema: Schema | undefined): Schema {
-	if (schema === undefined) throw new Error('Contract must declare its schema');
-	return schema;
 }

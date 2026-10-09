@@ -3,10 +3,10 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { expect, test } from 'vitest';
+import { expect, test, vi } from 'vitest';
 import * as v from 'valibot';
 import { mockDeep } from 'vitest-mock-extended';
-import { packedPageSchema } from '@features/users/backend/page.schema.js';
+import { packedPageSchema, toPackedPage } from '@features/users/backend/page.schema.js';
 import { packedJsonObjectSchema as packedPageBlockSchema } from '@features/users/backend/json-value.schema.js';
 import { MiPage } from '../../backend/models/Page.js';
 import { PageLikeEntityService } from '../../backend/serializers/PageLikeEntityService.js';
@@ -198,4 +198,22 @@ test('legacy number inputs retain JSON null for an unparsable default', async ()
 	page.content = [{ type: 'input', inputType: 'number', default: 'not-a-number' }];
 	const output = await service.pack(page);
 	expect(v.parse(packedPageSchema, output).content).toEqual([{ type: 'numberInput', inputType: 'number', default: null }]);
+});
+
+test('Page leaf selects finite outer/nested fields and preserves program JSON without output validation', async () => {
+	const { service, page } = fixture();
+	page.content = [{ type: 'text', customProgramField: { value: 'retained' } }];
+	const packed = await service.pack(page);
+	const produced = { ...packed, sentinel: 'private', user: { ...packed.user, sentinel: 'private' }, eyeCatchingImage: { ...file, sentinel: 'private' }, attachedFiles: [{ ...file, sentinel: 'private' }] };
+	const deps = mockDeep<PagesShowDependencies>();
+	deps.pagesSelectorRepository.findOneBy.mockResolvedValue(page);
+	deps.pageEntityService.pack.mockResolvedValue(produced);
+	const context = mockDeep<ApiContext<MiLocalUser>>({ credential: null, ip: '127.0.0.1', headers: {} });
+	context.services.authenticate.mockResolvedValue([null, null]);
+	const validate = vi.spyOn(requiredSchema(pagesShowContract['~orpc'].outputSchema)['~standard'], 'validate');
+	try {
+		const client = createRouterClient({ show: createPagesShowProcedure(deps) }, { context });
+		expect(await client.show({ pageId: page.id })).toEqual(toPackedPage({ ...packed, eyeCatchingImage: file, attachedFiles: [file] }));
+		expect(validate).not.toHaveBeenCalled();
+	} finally { validate.mockRestore(); }
 });

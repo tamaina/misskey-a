@@ -3,13 +3,15 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { expect, expectTypeOf, test } from 'vitest';
+import { expect, expectTypeOf, test, vi } from 'vitest';
 import { createProcedureClient } from '@orpc/server';
 import type { ApiContext } from '@features/api/backend/transport/context.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 import * as v from 'valibot';
 import { mockDeep } from 'vitest-mock-extended';
 import { type ModuleRef } from '@nestjs/core';
+import { toPackedNotification } from '../../backend/notification.dto.js';
+import { createListProcedure } from '../../backend/endpoints/i/notifications.js';
 import { createCreateProcedure } from '../../backend/index.js';
 import { groupedNotificationTypes } from '../../backend/notification-types.schema.js';
 
@@ -180,4 +182,48 @@ test('real create feature retains token fallbacks and explicit optional values',
 	expect(deps.createAppNotification).toHaveBeenLastCalledWith(user.id, { appAccessTokenId: 'token123', customBody: 'Fixture', customHeader: token.name, customIcon: token.iconUrl });
 	await feature({ body: 'Fixture', header: 'Title', icon: '' });
 	expect(deps.createAppNotification).toHaveBeenLastCalledWith(user.id, { appAccessTokenId: 'token123', customBody: 'Fixture', customHeader: 'Title', customIcon: '' });
+});
+
+test('notification wire construction selects nested note/user fields and skips output validation', async () => {
+	const produced = { ...base, type: 'reaction:grouped' as const, sentinel: 'private', note: { ...note, sentinel: 'private', user: { ...user, sentinel: 'private' } }, reactions: [{ reaction: '🔥', sentinel: 'private', user: { ...user, sentinel: 'private' } }] };
+	const result = toPackedNotification(produced);
+	expect(result).toEqual({ ...base, type: 'reaction:grouped', note, reactions: [{ reaction: '🔥', user }] });
+	const validate = vi.spyOn(requiredSchema(nativeContract3['~orpc'].outputSchema)['~standard'], 'validate');
+	const deps = mockDeep<Parameters<typeof createListProcedure>[0]>();
+	deps.getNotifications.mockResolvedValue([]);
+	deps.packMany.mockResolvedValue([produced]);
+	const context = mockDeep<ApiContext<MiLocalUser>>({ credential: null, ip: '127.0.0.1', headers: {} });
+	context.services.authenticate.mockResolvedValue([mockDeep<MiLocalUser>({ id: user.id, isSuspended: false, movedToUri: null }), null]);
+	try {
+		const client = createProcedureClient(createListProcedure(deps), { context });
+		expect(await client({ markAsRead: false })).toEqual([result]);
+		expect(validate).not.toHaveBeenCalled();
+	} finally { validate.mockRestore(); }
+});
+
+test('notification role, invitation, and draft projectors preserve variants and omit optional undefined wire keys', () => {
+	const roleValue = { ...base, type: 'roleAssigned' as const, userId: undefined, sentinel: 'private', role: { ...role, sentinel: 'private', condFormula: { ...role.condFormula, sentinel: 'private' } } };
+	const roleResult = toPackedNotification(roleValue);
+	expect(JSON.parse(JSON.stringify(roleResult))).toEqual({ ...base, type: 'roleAssigned', role });
+	expect(Object.hasOwn(roleResult, 'userId')).toBe(false);
+	const invitationValue = { ...base, type: 'chatRoomInvitationReceived' as const, userId: user.id, user: { ...user, sentinel: 'private' }, invitation: { ...invitation, sentinel: 'private', user: { ...user, sentinel: 'private' }, room: { ...invitation.room, sentinel: 'private', owner: { ...user, sentinel: 'private' } } } };
+	expect(JSON.parse(JSON.stringify(toPackedNotification(invitationValue)))).toEqual({ ...base, type: 'chatRoomInvitationReceived', userId: user.id, user, invitation });
+	const draftValue = { ...base, type: 'scheduledNotePostFailed' as const, userId: undefined, sentinel: 'private', noteDraft: { ...draft, sentinel: 'private', user: { ...user, sentinel: 'private' } } };
+	expect(JSON.parse(JSON.stringify(toPackedNotification(draftValue)))).toEqual({ ...base, type: 'scheduledNotePostFailed', noteDraft: draft });
+	const missingDraft = toPackedNotification({ ...base, type: 'scheduledNotePostFailed', userId: undefined, noteDraft: undefined });
+	expect(Object.hasOwn(missingDraft, 'userId')).toBe(false);
+	expect(Object.hasOwn(missingDraft, 'noteDraft')).toBe(false);
+});
+
+test('notification role policy records normalize reserved outer keys while retaining genuine value JSON', () => {
+	const value: Record<string, number> = Object.fromEntries([['constructor', 1], ['__proto__', 2], ['prototype', 3]]);
+	const policy = { value, priority: 1, useDefault: false };
+	const policies = Object.fromEntries([['normal', policy], ['constructor', policy], ['__proto__', policy], ['prototype', policy]]);
+	const produced = { ...base, type: 'roleAssigned' as const, role: { ...role, policies } };
+	const projected = toPackedNotification(produced);
+	const prior = v.parse(packedNotificationSchema, produced);
+	expect(JSON.parse(JSON.stringify(projected))).toEqual(JSON.parse(JSON.stringify(prior)));
+	if (projected.type !== 'roleAssigned') throw new Error('Role notification must retain its discriminant');
+	expect(Object.keys(projected.role.policies)).toEqual(['normal']);
+	expect(projected.role.policies.normal.value).toEqual(value);
 });

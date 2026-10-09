@@ -2,14 +2,17 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
+import { createProcedureClient } from '@orpc/server';
+import { createFlashFeaturedProcedure } from '../../backend/endpoints/flash/featured.js';
+import type { ApiContext } from '@features/api/backend/transport/context.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
 
-import { expect, test } from 'vitest';
+import { expect, test, vi } from 'vitest';
 import * as v from 'valibot';
 import { mockDeep } from 'vitest-mock-extended';
-import { packedFlashSchema } from '../../backend/flash.schema.js';
+import { packedFlashSchema, toPackedFlash } from '../../backend/flash.schema.js';
 import { flashCreateContract } from '../../backend/endpoints/flash/create.contract.js';
 import { flashFeaturedContract } from '../../backend/endpoints/flash/featured.contract.js';
-import { flashFeaturedContract as packedFlashFeaturedDefinition } from '../../backend/endpoints/flash/featured.contract.js';
 
 import { flashMyLikesContract } from '../../backend/endpoints/flash/my-likes.contract.js';
 import { flashUpdateContract } from '../../backend/endpoints/flash/update.contract.js';
@@ -81,4 +84,20 @@ test('native Flash inputs preserve defaults and finite outputs reject extra fiel
 	const params = { future: true };
 	expect(v.safeParse(packedFlashFeaturedOutput, response).success).toBe(false);
 	expect(v.safeParse(packedFlashFeaturedInput, { limit: 0 }).success).toBe(false);
+});
+
+test('Flash leaf selects outer/nested finite fields without output validation', async () => {
+	const { service, flash } = fixture();
+	const packed = await service.pack(flash);
+	const produced = { ...packed, sentinel: 'private', user: { ...packed.user, sentinel: 'private' } };
+	const deps = mockDeep<Parameters<typeof createFlashFeaturedProcedure>[0]>();
+	deps.flashService.featured.mockResolvedValue([flash]);
+	deps.flashEntityService.packMany.mockResolvedValue([produced]);
+	const context = mockDeep<ApiContext<MiLocalUser>>({ credential: null, ip: '127.0.0.1', headers: {} });
+	context.services.authenticate.mockResolvedValue([null, null]);
+	const validate = vi.spyOn(packedFlashFeaturedOutput['~standard'], 'validate');
+	try {
+		expect(await createProcedureClient(createFlashFeaturedProcedure(deps), { context })({})).toEqual([toPackedFlash(packed)]);
+		expect(validate).not.toHaveBeenCalled();
+	} finally { validate.mockRestore(); }
 });

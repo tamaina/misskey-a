@@ -3,23 +3,20 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 import * as crypto from 'node:crypto';
 import type { AuthSessionsRepository, AppsRepository, AccessTokensRepository } from '@features/persistence/backend/repositories/models.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { secureRndstr } from '../../utility/secure-rndstr.js';
 import { apiError } from '@features/api/backend/transport/orpc-error.js';
-import * as v from 'valibot';
+
 import { AuthAcceptContract } from '../../api.definition.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
-import { implement } from '@orpc/server';
-import { authentication, apiPolicy, requirePrincipal } from '@features/api/backend/transport/middleware.js';
-import type { ApiContext } from '@features/api/backend/transport/context.js';
+
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+
 export const meta = {
 	tags: ['auth'],
-
-	requireCredential: true,
-
-	secure: true,
 
 	errors: {
 		noSuchSession: {
@@ -36,7 +33,7 @@ export interface AuthAcceptDependencies {
 	idService: Pick<IdService, 'gen'>;
 }
 export function createAuthAcceptProcedure(deps: AuthAcceptDependencies) {
-	return implement(AuthAcceptContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>().use(authentication<MiLocalUser>()).use(apiPolicy<MiLocalUser>({ name: 'auth/accept', requireCredential: true, secure: true })).use(requirePrincipal<MiLocalUser>()).handler(async ({ input, context }) => {
+	return createApiProcedure<MiLocalUser>()(AuthAcceptContract).use(requirePrincipal<MiLocalUser>()).handler(async ({ input, context }) => {
 		const ps = input;
 		const me = context.principal;
 		const result = await (async () => {
@@ -83,11 +80,6 @@ export function createAuthAcceptProcedure(deps: AuthAcceptDependencies) {
 				userId: me.id,
 			});
 		})();
-		return v.parse(requiredSchema(AuthAcceptContract['~orpc'].outputSchema), result);
+		return result;
 	});
-}
-
-function requiredSchema<Schema>(schema: Schema | undefined): Schema {
-	if (schema === undefined) throw new Error('Contract must declare its schema');
-	return schema;
 }

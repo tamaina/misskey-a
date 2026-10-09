@@ -3,21 +3,22 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { implement } from '@orpc/server';
-import { authentication, apiPolicy, decodeScalarInput } from '@features/api/backend/transport/middleware.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+
+import { decodeScalarInput } from '@features/api/backend/transport/middleware.js';
 import { chartPerUserFollowingContract, chartPerUserFollowingGetContract } from './following.contract.js';
-import type { ApiActor, ApiContext } from '@features/api/backend/transport/context.js';
+import type { ApiActor } from '@features/api/backend/transport/context.js';
 import type { StatisticsDependencies } from '../../../api.implementation.js';
 export function createPerUserFollowingProcedure<Actor extends ApiActor>(deps: StatisticsDependencies['charts']['userFollowing']) {
-	return implement(chartPerUserFollowingContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>()
-		.use(authentication<Actor>())
-		.use(apiPolicy<Actor>({ name: chartPerUserFollowingContract['~orpc'].meta.requestName }))
-		.handler(({ input }) => deps.getChart(input.span, input.limit, input.offset ? new Date(input.offset) : null, input.userId));
+	return createApiProcedure<Actor>()(chartPerUserFollowingContract)
+		.handler(async ({ input }) => projectChart(await deps.getChart(input.span, input.limit, input.offset ? new Date(input.offset) : null, input.userId)));
 }
 export function createPerUserFollowingGetProcedure<Actor extends ApiActor>(deps: StatisticsDependencies['charts']['userFollowing']) {
-	return implement(chartPerUserFollowingGetContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>()
-		.use(authentication<Actor>())
-		.use(apiPolicy<Actor>({ name: chartPerUserFollowingContract['~orpc'].meta.requestName }))
+	return createApiProcedure<Actor>()(chartPerUserFollowingGetContract)
 		.use(decodeScalarInput<Actor>({ limit: 'integer', offset: 'integer' }))
-		.handler(({ input }) => deps.getChart(input.span, input.limit, input.offset ? new Date(input.offset) : null, input.userId));
+		.handler(async ({ input }) => projectChart(await deps.getChart(input.span, input.limit, input.offset ? new Date(input.offset) : null, input.userId)));
+}
+
+function projectChart(value: Awaited<ReturnType<StatisticsDependencies['charts']['userFollowing']['getChart']>>) {
+	return { local: { followings: { total: value.local.followings.total.map(item => item), inc: value.local.followings.inc.map(item => item), dec: value.local.followings.dec.map(item => item) }, followers: { total: value.local.followers.total.map(item => item), inc: value.local.followers.inc.map(item => item), dec: value.local.followers.dec.map(item => item) } }, remote: { followings: { total: value.remote.followings.total.map(item => item), inc: value.remote.followings.inc.map(item => item), dec: value.remote.followings.dec.map(item => item) }, followers: { total: value.remote.followers.total.map(item => item), inc: value.remote.followers.inc.map(item => item), dec: value.remote.followers.dec.map(item => item) } } };
 }

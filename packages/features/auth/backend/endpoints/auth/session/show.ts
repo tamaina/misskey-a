@@ -2,19 +2,16 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 import type { AuthSessionsRepository } from '@features/persistence/backend/repositories/models.js';
 import { AuthSessionEntityService } from '../../../serializers/AuthSessionEntityService.js';
 import { apiError } from '@features/api/backend/transport/orpc-error.js';
-import * as v from 'valibot';
+import { toPackedApp } from '../../../auth.schema.js';
 import { AuthSessionShowContract } from '../../../api.definition.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
-import { implement } from '@orpc/server';
-import { authentication, apiPolicy } from '@features/api/backend/transport/middleware.js';
-import type { ApiContext } from '@features/api/backend/transport/context.js';
+
 export const meta = {
 	tags: ['auth'],
-
-	requireCredential: false,
 
 	errors: {
 		noSuchSession: {
@@ -29,7 +26,7 @@ export interface AuthSessionShowDependencies {
 	authSessionEntityService: Pick<AuthSessionEntityService, 'pack'>;
 }
 export function createAuthSessionShowProcedure(deps: AuthSessionShowDependencies) {
-	return implement(AuthSessionShowContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>().use(authentication<MiLocalUser>()).use(apiPolicy<MiLocalUser>({ name: 'auth/session/show' })).handler(async ({ input, context }) => {
+	return createApiProcedure<MiLocalUser>()(AuthSessionShowContract).handler(async ({ input, context }) => {
 		const ps = input;
 		const me = context.principal;
 		const result = await (async () => {
@@ -44,11 +41,6 @@ export function createAuthSessionShowProcedure(deps: AuthSessionShowDependencies
 
 			return await deps.authSessionEntityService.pack(session, me);
 		})();
-		return v.parse(requiredSchema(AuthSessionShowContract['~orpc'].outputSchema), result);
+		return { id: result.id, app: toPackedApp(result.app), token: result.token };
 	});
-}
-
-function requiredSchema<Schema>(schema: Schema | undefined): Schema {
-	if (schema === undefined) throw new Error('Contract must declare its schema');
-	return schema;
 }

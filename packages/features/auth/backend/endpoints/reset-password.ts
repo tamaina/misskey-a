@@ -3,19 +3,16 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 import bcrypt from 'bcryptjs';
 import type { UserProfilesRepository, PasswordResetRequestsRepository } from '@features/persistence/backend/repositories/models.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
-import * as v from 'valibot';
+
 import { ResetPasswordContract } from '../api.definition.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
-import { implement } from '@orpc/server';
-import { authentication, apiPolicy } from '@features/api/backend/transport/middleware.js';
-import type { ApiContext } from '@features/api/backend/transport/context.js';
+
 export const meta = {
 	tags: ['reset password'],
-
-	requireCredential: false,
 
 	description: 'Complete the password reset that was previously requested.',
 
@@ -29,7 +26,7 @@ export interface ResetPasswordDependencies {
 	idService: Pick<IdService, 'parse'>;
 }
 export function createResetPasswordProcedure(deps: ResetPasswordDependencies) {
-	return implement(ResetPasswordContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>().use(authentication<MiLocalUser>()).use(apiPolicy<MiLocalUser>({ name: 'reset-password' })).handler(async ({ input, context }) => {
+	return createApiProcedure<MiLocalUser>()(ResetPasswordContract).handler(async ({ input, context }) => {
 		const ps = input;
 		const result = await (async () => {
 			const req = await deps.passwordResetRequestsRepository.findOneByOrFail({
@@ -51,11 +48,6 @@ export function createResetPasswordProcedure(deps: ResetPasswordDependencies) {
 
 			deps.passwordResetRequestsRepository.delete(req.id);
 		})();
-		return v.parse(requiredSchema(ResetPasswordContract['~orpc'].outputSchema), result);
+		return result;
 	});
-}
-
-function requiredSchema<Schema>(schema: Schema | undefined): Schema {
-	if (schema === undefined) throw new Error('Contract must declare its schema');
-	return schema;
 }

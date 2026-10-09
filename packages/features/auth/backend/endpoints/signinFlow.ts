@@ -14,13 +14,14 @@ import { RateLimiterService } from '@features/api/backend/transport/RateLimiterS
 import type { Config } from '@/config.js';
 import { getIpHash } from '../utility/get-ip-hash.js';
 import { toWebAuthnAuthenticationOptions } from '../webauthn.schema.js';
-import { toSessionHeaders } from '../session.schema.js';
+import { toSessionHeaders, toFinishedSignin } from '../session.schema.js';
 import { sessionField, type AuthSessionContext } from '../session.effects.js';
 import { SigninService } from '../transport/SigninService.js';
 import type { MiMeta, UserProfilesRepository, UserSecurityKeysRepository, UsersRepository } from '@features/persistence/backend/repositories/models.js';
 import type { SigninHistoryRepository } from '../session-signin-repository.js';
 import { implement } from '@orpc/server';
-import * as v from 'valibot';
+
+import type { AuthSessionOutputs } from '../api.definition.js';
 import { authSessionsContract } from '../api.definition.js';
 import { sessionErrors } from '../session.middleware.js';
 export interface SigninFlowDependencies {
@@ -40,11 +41,11 @@ export interface SigninFlowDependencies {
 }
 export function createSigninFlowProcedure(deps: SigninFlowDependencies) {
 	const logger = deps.loggerService.getLogger('Signin');
-	return implement(authSessionsContract.signinFlow, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<AuthSessionContext>().use(sessionErrors()).handler(async ({ input, context }) => {
+	return implement(authSessionsContract.signinFlow, { initialInputValidationIndex: Number.POSITIVE_INFINITY, initialOutputValidationIndex: Number.NaN }).$context<AuthSessionContext>().use(sessionErrors()).handler(async ({ input, context }) => {
 		const body = input;
 		const request = context.request;
 		const reply = context.effects;
-		const result = await (async () => {
+		const result = await (async (): Promise<AuthSessionOutputs['signinFlow']> => {
 			reply.header('Access-Control-Allow-Origin', deps.config.url);
 			reply.header('Access-Control-Allow-Credentials', 'true');
 			const username = sessionField(body, 'username');
@@ -53,7 +54,7 @@ export function createSigninFlowProcedure(deps: SigninFlowDependencies) {
 
 			function error(status: number, error: { id: string }) {
 				reply.code(status);
-				return { error };
+				return { error: { ...(error.id === undefined ? {} : { id: error.id }) } };
 			}
 
 			// not more than 1 attempt per second and not more than 10 attempts per hour
@@ -158,7 +159,7 @@ export function createSigninFlowProcedure(deps: SigninFlowDependencies) {
 					}
 				}
 				if (same) {
-					return deps.signinService.signin(request, reply, user);
+					return toFinishedSignin(deps.signinService.signin(request, reply, user));
 				} else {
 					return await fail(403, {
 						id: '932c904e-9460-45b7-9ce6-7ed33be7eb2c',
@@ -178,7 +179,7 @@ export function createSigninFlowProcedure(deps: SigninFlowDependencies) {
 						id: 'cdf1235b-ac71-46d4-a3a6-84ccce48df6f',
 					});
 				}
-				return deps.signinService.signin(request, reply, user);
+				return toFinishedSignin(deps.signinService.signin(request, reply, user));
 			} else if (sessionField(body, 'credential')) {
 				if (!same && !profile.usePasswordLessLogin) {
 					return await fail(403, {
@@ -187,7 +188,7 @@ export function createSigninFlowProcedure(deps: SigninFlowDependencies) {
 				}
 				const authorized = await deps.webAuthnService.verifyAuthentication(user.id, sessionField(body, 'credential'));
 				if (authorized) {
-					return deps.signinService.signin(request, reply, user);
+					return toFinishedSignin(deps.signinService.signin(request, reply, user));
 				} else {
 					return await fail(403, {
 						id: '93b86c4b-72f9-40eb-9815-798928603d1e',
@@ -221,11 +222,6 @@ export function createSigninFlowProcedure(deps: SigninFlowDependencies) {
 			}
 			// never get here
 		})();
-		return v.parse(requiredSchema(authSessionsContract.signinFlow['~orpc'].outputSchema), result);
+		return result;
 	});
-}
-
-function requiredSchema<Schema>(schema: Schema | undefined): Schema {
-	if (schema === undefined) throw new Error('Contract must declare its schema');
-	return schema;
 }

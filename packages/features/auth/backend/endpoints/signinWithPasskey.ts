@@ -12,14 +12,15 @@ import { RateLimiterService } from '@features/api/backend/transport/RateLimiterS
 import type { Config } from '@/config.js';
 import { getIpHash } from '../utility/get-ip-hash.js';
 import { toWebAuthnAuthenticationOptions } from '../webauthn.schema.js';
-import { toSessionHeaders } from '../session.schema.js';
+import { toSessionHeaders, toFinishedSignin } from '../session.schema.js';
 import { sessionField, type AuthSessionContext } from '../session.effects.js';
 import { SigninService } from '../transport/SigninService.js';
 import type { UserProfilesRepository, UsersRepository } from '@features/persistence/backend/repositories/models.js';
 import type { MiUser } from '@features/users/backend/models/User.js';
 import type { SigninHistoryRepository } from '../session-signin-repository.js';
 import { implement } from '@orpc/server';
-import * as v from 'valibot';
+
+import type { AuthSessionOutputs } from '../api.definition.js';
 import { authSessionsContract } from '../api.definition.js';
 import { sessionErrors } from '../session.middleware.js';
 export interface SigninWithPasskeyDependencies {
@@ -35,18 +36,18 @@ export interface SigninWithPasskeyDependencies {
 }
 export function createSigninWithPasskeyProcedure(deps: SigninWithPasskeyDependencies) {
 	const logger = deps.loggerService.getLogger('PasskeyAuth');
-	return implement(authSessionsContract.signinWithPasskey, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<AuthSessionContext>().use(sessionErrors()).handler(async ({ input, context }) => {
+	return implement(authSessionsContract.signinWithPasskey, { initialInputValidationIndex: Number.POSITIVE_INFINITY, initialOutputValidationIndex: Number.NaN }).$context<AuthSessionContext>().use(sessionErrors()).handler(async ({ input, context }) => {
 		const body = input;
 		const request = context.request;
 		const reply = context.effects;
-		const result = await (async () => {
+		const result = await (async (): Promise<AuthSessionOutputs['signinWithPasskey']> => {
 			reply.header('Access-Control-Allow-Origin', deps.config.url);
 			reply.header('Access-Control-Allow-Credentials', 'true');
 			const credential = sessionField(body, 'credential');
 
 			function error(status: number, error: { id?: string }) {
 				reply.code(status);
-				return { error };
+				return { error: { ...(error.id === undefined ? {} : { id: error.id }) } };
 			}
 
 			const fail = async (userId: MiUser['id'], status?: number, failure?: { id: string }) => {
@@ -137,14 +138,9 @@ export function createSigninWithPasskeyProcedure(deps: SigninWithPasskeyDependen
 			}
 			const signinResponse = deps.signinService.signin(request, reply, user);
 			return {
-				signinResponse: signinResponse,
+				signinResponse: toFinishedSignin(signinResponse),
 			};
 		})();
-		return v.parse(requiredSchema(authSessionsContract.signinWithPasskey['~orpc'].outputSchema), result);
+		return result;
 	});
-}
-
-function requiredSchema<Schema>(schema: Schema | undefined): Schema {
-	if (schema === undefined) throw new Error('Contract must declare its schema');
-	return schema;
 }

@@ -3,9 +3,10 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { implement } from '@orpc/server';
-import { authentication, apiPolicy, requirePrincipal } from '../../../../api/backend/transport/middleware.js';
-import type { ApiContext } from '../../../../api/backend/transport/context.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+
+import { requirePrincipal } from '../../../../api/backend/transport/middleware.js';
+
 import { flashDeleteContract, flashDeleteErrors } from './delete.contract.js';
 import type { FlashsRepository, UsersRepository } from '@features/persistence/backend/repositories/models.js';
 import type { ModerationLogService } from '@features/moderation/backend/services/ModerationLogService.js';
@@ -19,9 +20,7 @@ export interface FlashDeleteDependencies {
 	roleService: Pick<RoleService, 'isModerator'>;
 }
 export function createFlashDeleteProcedure(deps: FlashDeleteDependencies) {
-	return implement(flashDeleteContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>()
-		.use(authentication<MiLocalUser>())
-		.use(apiPolicy<MiLocalUser>({ name: flashDeleteContract['~orpc'].meta.requestName, requireCredential: true, kind: 'write:flash' }))
+	return createApiProcedure<MiLocalUser>()(flashDeleteContract)
 		.use(requirePrincipal<MiLocalUser>())
 		.handler(async ({ input: ps, context }) => {
 			const me = context.principal;

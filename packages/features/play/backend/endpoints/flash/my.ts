@@ -2,10 +2,12 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
+import { toPackedFlash } from '../../flash.schema.js';
 
-import { implement } from '@orpc/server';
-import { authentication, apiPolicy, requirePrincipal } from '../../../../api/backend/transport/middleware.js';
-import type { ApiContext } from '../../../../api/backend/transport/context.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+
+import { requirePrincipal } from '../../../../api/backend/transport/middleware.js';
+
 import { flashMyContract } from './my.contract.js';
 import type { FlashsRepository } from '@features/persistence/backend/repositories/models.js';
 import type { QueryService } from '@features/notes/backend/services/QueryService.js';
@@ -17,9 +19,7 @@ export interface FlashMyDependencies {
 	queryService: Pick<QueryService, 'makePaginationQuery'>;
 }
 export function createFlashMyProcedure(deps: FlashMyDependencies) {
-	return implement(flashMyContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>()
-		.use(authentication<MiLocalUser>())
-		.use(apiPolicy<MiLocalUser>({ name: flashMyContract['~orpc'].meta.requestName, requireCredential: true, kind: 'read:flash' }))
+	return createApiProcedure<MiLocalUser>()(flashMyContract)
 		.use(requirePrincipal<MiLocalUser>())
 		.handler(async ({ input: ps, context }) => {
 			const me = context.principal;
@@ -28,6 +28,6 @@ export function createFlashMyProcedure(deps: FlashMyDependencies) {
 			const flashs = await query
 				.limit(ps.limit)
 				.getMany();
-			return await deps.flashEntityService.packMany(flashs);
+			return (await deps.flashEntityService.packMany(flashs)).map(toPackedFlash);
 		});
 }

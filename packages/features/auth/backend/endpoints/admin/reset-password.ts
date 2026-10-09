@@ -2,6 +2,7 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 import bcrypt from 'bcryptjs';
 
 import { apiError } from '@features/api/backend/transport/orpc-error.js';
@@ -9,18 +10,14 @@ import type { UsersRepository, UserProfilesRepository, MiMeta } from '@features/
 import { secureRndstr } from '../../utility/secure-rndstr.js';
 import { RoleService } from '@features/roles/backend/services/RoleService.js';
 import { ModerationLogService } from '@features/moderation/backend/services/ModerationLogService.js';
-import * as v from 'valibot';
+
 import { AdminResetPasswordContract } from '../../api.definition.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
-import { implement } from '@orpc/server';
-import { authentication, apiPolicy, requirePrincipal } from '@features/api/backend/transport/middleware.js';
-import type { ApiContext } from '@features/api/backend/transport/context.js';
+
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+
 export const meta = {
 	tags: ['admin'],
-
-	requireCredential: true,
-	requireModerator: true,
-	kind: 'write:admin:reset-password',
 
 	errors: {
 		noSuchUser: {
@@ -43,7 +40,7 @@ export interface AdminResetPasswordDependencies {
 	moderationLogService: Pick<ModerationLogService, 'log'>;
 }
 export function createAdminResetPasswordProcedure(deps: AdminResetPasswordDependencies) {
-	return implement(AdminResetPasswordContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>().use(authentication<MiLocalUser>()).use(apiPolicy<MiLocalUser>({ name: 'admin/reset-password', requireCredential: true, requireModerator: true, kind: 'write:admin:reset-password' })).use(requirePrincipal<MiLocalUser>()).handler(async ({ input, context }) => {
+	return createApiProcedure<MiLocalUser>()(AdminResetPasswordContract).use(requirePrincipal<MiLocalUser>()).handler(async ({ input, context }) => {
 		const ps = input;
 		const me = context.principal;
 		const result = await (async () => {
@@ -78,11 +75,6 @@ export function createAdminResetPasswordProcedure(deps: AdminResetPasswordDepend
 				password: passwd,
 			};
 		})();
-		return v.parse(requiredSchema(AdminResetPasswordContract['~orpc'].outputSchema), result);
+		return result;
 	});
-}
-
-function requiredSchema<Schema>(schema: Schema | undefined): Schema {
-	if (schema === undefined) throw new Error('Contract must declare its schema');
-	return schema;
 }

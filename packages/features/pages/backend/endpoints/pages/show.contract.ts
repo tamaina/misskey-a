@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import type { Meta } from '@orpc/contract';
+import type { ApiProcedureMetadata } from '../../../../api/backend/transport/policy.types.js';
 import { oc } from '@orpc/contract';
 import * as v from 'valibot';
 import { commonErrors, apiErrorData } from '../../../../api/backend/transport/errors.schema.js';
@@ -21,8 +23,11 @@ export const pagesShowErrors = {
 } as const;
 
 const requestName = 'pages/show';
-export const pagesShowContract = oc.$meta({ requestName: requestName } as const)
-	.route({ method: 'POST', path: `/${requestName}`, operationId: 'post___' + requestName.replaceAll('/', '___'), tags: ['pages'], })
+export const pagesShowContract = oc.$meta({
+	requestName: requestName,
+	requireCredential: false,
+} as const satisfies Meta & ApiProcedureMetadata)
+	.route({ method: 'POST', path: `/${requestName}`, tags: ['pages'], })
 	.errors({ ...commonErrors, NO_SUCH_PAGE: { status: 400, data: apiErrorData } })
 	.input<v.GenericSchema<PagesShowSelector, PagesShowSelector>>(v.union([
 		objectInput({

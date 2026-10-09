@@ -17,3 +17,9 @@ export function toSessionHeaders(headers: Record<string, string | string[] | und
 	for (const [key, value] of Object.entries(headers)) if (value !== undefined) entries.push([key, value]);
 	return Object.fromEntries(entries);
 }
+
+/** Keep the authenticated session token invariant at the wire boundary after domain effects. */
+export function toFinishedSignin(result: { finished: true; id: string; i: string | null }): v.InferOutput<typeof finishedSigninSchema> {
+	if (result.i === null) throw new Error('Signed-in local user has no session token.');
+	return { finished: true, id: result.id, i: result.i };
+}

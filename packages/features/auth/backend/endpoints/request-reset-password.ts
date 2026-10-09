@@ -3,7 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import ms from 'ms';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+
 import { IsNull } from 'typeorm';
 import type { PasswordResetRequestsRepository, UserProfilesRepository, UsersRepository } from '@features/persistence/backend/repositories/models.js';
 
@@ -11,23 +12,14 @@ import { IdService } from '@features/runtime/backend/services/IdService.js';
 import type { Config } from '@/config.js';
 import { EmailService } from '@features/email/backend/services/EmailService.js';
 import { L_CHARS, secureRndstr } from '../utility/secure-rndstr.js';
-import * as v from 'valibot';
+
 import { RequestResetPasswordContract } from '../api.definition.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
-import { implement } from '@orpc/server';
-import { authentication, apiPolicy } from '@features/api/backend/transport/middleware.js';
-import type { ApiContext } from '@features/api/backend/transport/context.js';
+
 export const meta = {
 	tags: ['reset password'],
 
-	requireCredential: false,
-
 	description: 'Request a users password to be reset.',
-
-	limit: {
-		duration: ms('1hour'),
-		max: 3,
-	},
 
 	errors: {
 
@@ -42,12 +34,7 @@ export interface RequestResetPasswordDependencies {
 	emailService: Pick<EmailService, 'sendEmail'>;
 }
 export function createRequestResetPasswordProcedure(deps: RequestResetPasswordDependencies) {
-	return implement(RequestResetPasswordContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>().use(authentication<MiLocalUser>()).use(apiPolicy<MiLocalUser>({
-		name: 'request-reset-password', limit: {
-			duration: 3600000,
-			max: 3,
-		}
-	})).handler(async ({ input, context }) => {
+	return createApiProcedure<MiLocalUser>()(RequestResetPasswordContract).handler(async ({ input, context }) => {
 		const ps = input;
 		const result = await (async () => {
 			const user = await deps.usersRepository.findOneBy({
@@ -86,11 +73,6 @@ export function createRequestResetPasswordProcedure(deps: RequestResetPasswordDe
 				`To reset password, please click this link:<br><a href="${link}">${link}</a>`,
 				`To reset password, please click this link: ${link}`);
 		})();
-		return v.parse(requiredSchema(RequestResetPasswordContract['~orpc'].outputSchema), result);
+		return result;
 	});
-}
-
-function requiredSchema<Schema>(schema: Schema | undefined): Schema {
-	if (schema === undefined) throw new Error('Contract must declare its schema');
-	return schema;
 }

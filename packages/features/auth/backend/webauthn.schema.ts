@@ -54,12 +54,12 @@ const nativeRegistrationOptionsSchema = v.strictObject({
 
 /** Omit the native producer's explicit optional undefined fields at the JSON wire boundary. */
 export function toWebAuthnRegistrationOptions(input: v.InferInput<typeof nativeRegistrationOptionsSchema>): WebAuthnRegistrationOptions {
-	const { rp, excludeCredentials, authenticatorSelection, extensions, hints, timeout, attestation, attestationFormats, ...required } = input;
-	const { id: rpId, ...rpRequired } = rp;
+	const { rp, excludeCredentials, authenticatorSelection, extensions, hints, timeout, attestation, attestationFormats } = input;
+	const { id: rpId } = rp;
 	let selection;
 	if (authenticatorSelection !== undefined) {
-		const { authenticatorAttachment, residentKey, requireResidentKey, userVerification, ...rest } = authenticatorSelection;
-		selection = { ...rest,
+		const { authenticatorAttachment, residentKey, requireResidentKey, userVerification } = authenticatorSelection;
+		selection = {
 			...(authenticatorAttachment === undefined ? {} : { authenticatorAttachment }),
 			...(residentKey === undefined ? {} : { residentKey }),
 			...(requireResidentKey === undefined ? {} : { requireResidentKey }),
@@ -68,20 +68,20 @@ export function toWebAuthnRegistrationOptions(input: v.InferInput<typeof nativeR
 	}
 	let extensionValues;
 	if (extensions !== undefined) {
-		const { appid, credProps, hmacCreateSecret, minPinLength, ...rest } = extensions;
-		extensionValues = { ...rest,
+		const { appid, credProps, hmacCreateSecret, minPinLength } = extensions;
+		extensionValues = {
 			...(appid === undefined ? {} : { appid }), ...(credProps === undefined ? {} : { credProps }),
 			...(hmacCreateSecret === undefined ? {} : { hmacCreateSecret }), ...(minPinLength === undefined ? {} : { minPinLength }),
 		};
 	}
-	return v.parse(webAuthnRegistrationOptionsSchema, {
-		...required, rp: { ...rpRequired, ...(rpId === undefined ? {} : { id: rpId }) },
-		...(excludeCredentials === undefined ? {} : { excludeCredentials: excludeCredentials.map(({ transports, ...credential }) => ({ ...credential, ...(transports === undefined ? {} : { transports }) })) }),
+	return {
+		challenge: input.challenge, user: { id: input.user.id, name: input.user.name, displayName: input.user.displayName }, pubKeyCredParams: input.pubKeyCredParams.map(param => ({ type: param.type, alg: param.alg })), rp: { name: rp.name, ...(rpId === undefined ? {} : { id: rpId }) },
+		...(excludeCredentials === undefined ? {} : { excludeCredentials: excludeCredentials.map(({ id, type, transports }) => ({ id, type, ...(transports === undefined ? {} : { transports }) })) }),
 		...(selection === undefined ? {} : { authenticatorSelection: selection }),
 		...(extensionValues === undefined ? {} : { extensions: extensionValues }),
 		...(hints === undefined ? {} : { hints }), ...(timeout === undefined ? {} : { timeout }),
 		...(attestation === undefined ? {} : { attestation }), ...(attestationFormats === undefined ? {} : { attestationFormats }),
-	});
+	};
 }
 
 // These finite protocol fields match the installed library. Unknown protocol fields
@@ -124,16 +124,16 @@ const nativeAuthenticationOptionsSchema = v.strictObject({
 });
 
 export function toWebAuthnAuthenticationOptions(input: v.InferInput<typeof nativeAuthenticationOptionsSchema>): v.InferOutput<typeof webAuthnAuthenticationOptionsSchema> {
-	const { timeout, rpId, allowCredentials, userVerification, hints, extensions, ...required } = input;
+	const { timeout, rpId, allowCredentials, userVerification, hints, extensions } = input;
 	let extensionValues;
 	if (extensions !== undefined) {
-		const { appid, credProps, hmacCreateSecret, minPinLength, ...rest } = extensions;
-		extensionValues = { ...rest, ...(appid === undefined ? {} : { appid }), ...(credProps === undefined ? {} : { credProps }), ...(hmacCreateSecret === undefined ? {} : { hmacCreateSecret }), ...(minPinLength === undefined ? {} : { minPinLength }) };
+		const { appid, credProps, hmacCreateSecret, minPinLength } = extensions;
+		extensionValues = { ...(appid === undefined ? {} : { appid }), ...(credProps === undefined ? {} : { credProps }), ...(hmacCreateSecret === undefined ? {} : { hmacCreateSecret }), ...(minPinLength === undefined ? {} : { minPinLength }) };
 	}
-	return v.parse(webAuthnAuthenticationOptionsSchema, {
-		...required, ...(timeout === undefined ? {} : { timeout }), ...(rpId === undefined ? {} : { rpId }),
-		...(allowCredentials === undefined ? {} : { allowCredentials: allowCredentials.map(({ transports, ...credential }) => ({ ...credential, ...(transports === undefined ? {} : { transports }) })) }),
+	return {
+		challenge: input.challenge, ...(timeout === undefined ? {} : { timeout }), ...(rpId === undefined ? {} : { rpId }),
+		...(allowCredentials === undefined ? {} : { allowCredentials: allowCredentials.map(({ id, type, transports }) => ({ id, type, ...(transports === undefined ? {} : { transports }) })) }),
 		...(userVerification === undefined ? {} : { userVerification }), ...(hints === undefined ? {} : { hints }),
 		...(extensionValues === undefined ? {} : { extensions: extensionValues }),
-	});
+	};
 }

@@ -4,9 +4,7 @@
  */
 
 import * as v from 'valibot';
-import {
-	packedUserLiteSchema as __ref_UserLite
-} from '../../users/backend/user.schema.js';
+import { toPackedUserLite, packedUserLiteSchema as __ref_UserLite } from '../../users/backend/user.schema.js';
 
 export const packedFlashSchema = v.strictObject({
 	"id": v.pipe(v.string(), v.metadata({ "format": "id", "example": "xxxxxxxxxx" })),
@@ -23,3 +21,10 @@ export const packedFlashSchema = v.strictObject({
 });
 
 export type PackedFlash = v.InferOutput<typeof packedFlashSchema>;
+
+export function toPackedFlash(flash: PackedFlash): PackedFlash {
+	return { id: flash.id, createdAt: flash.createdAt, updatedAt: flash.updatedAt, userId: flash.userId,
+		user: toPackedUserLite(flash.user), title: flash.title, summary: flash.summary, script: flash.script,
+		visibility: flash.visibility, likedCount: flash.likedCount,
+		...(flash.isLiked === undefined ? {} : { isLiked: flash.isLiked }) };
+}

@@ -2,15 +2,14 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 import type { MiAccessToken } from '../../models/AccessToken.js';
 import { apiError } from '@features/api/backend/transport/orpc-error.js';
-import * as v from 'valibot';
+
 import { IRevokeTokenContract } from '../../api.definition.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 import type { PackedJsonValue } from '@features/users/backend/json-value.schema.js';
-import { implement } from '@orpc/server';
-import { authentication, apiPolicy } from '@features/api/backend/transport/middleware.js';
-import type { ApiContext } from '@features/api/backend/transport/context.js';
+
 /** Preserve legacy selector precedence and the original repository comparison.
  * An inactive tokenId may contain JSON when the token alternative is valid.
  * This narrow port models the actual runtime call without asserting it is a string.
@@ -46,7 +45,7 @@ export interface IRevokeTokenDependencies {
 	accessTokensRepository: TokenRevocationRepository;
 }
 export function createIRevokeTokenProcedure(deps: IRevokeTokenDependencies) {
-	return implement(IRevokeTokenContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>().use(authentication<MiLocalUser>()).use(apiPolicy<MiLocalUser>({ name: 'i/revoke-token' })).handler(async ({ input, context }) => {
+	return createApiProcedure<MiLocalUser>()(IRevokeTokenContract).handler(async ({ input, context }) => {
 		const ps = input;
 		const me = context.principal;
 		const token = context.token;
@@ -72,11 +71,6 @@ export function createIRevokeTokenProcedure(deps: IRevokeTokenDependencies) {
 
 			await deps.accessTokensRepository.delete({ id: target.id });
 		})();
-		return v.parse(requiredSchema(IRevokeTokenContract['~orpc'].outputSchema), result);
+		return result;
 	});
-}
-
-function requiredSchema<Schema>(schema: Schema | undefined): Schema {
-	if (schema === undefined) throw new Error('Contract must declare its schema');
-	return schema;
 }

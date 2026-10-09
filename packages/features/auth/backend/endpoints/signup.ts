@@ -15,7 +15,7 @@ import { sessionField, sessionText, sessionErrorMessage, type AuthSessionContext
 import { L_CHARS, secureRndstr } from '../utility/secure-rndstr.js';
 import type { RegistrationTicketsRepository, UsedUsernamesRepository, UserPendingsRepository, UsersRepository, MiRegistrationTicket, MiMeta } from '@features/persistence/backend/repositories/models.js';
 import { implement } from '@orpc/server';
-import * as v from 'valibot';
+
 import { authSessionsContract } from '../api.definition.js';
 import { sessionErrors } from '../session.middleware.js';
 import { toPackedUserDetailed } from '@features/users/backend/user.schema.js';
@@ -87,7 +87,7 @@ export function createSignupProcedure(deps: SignupDependencies) {
 		});
 	}
 
-	return implement(authSessionsContract.signup, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<AuthSessionContext>().use(sessionErrors()).handler(async ({ input, context }) => {
+	return implement(authSessionsContract.signup, { initialInputValidationIndex: Number.POSITIVE_INFINITY, initialOutputValidationIndex: Number.NaN }).$context<AuthSessionContext>().use(sessionErrors()).handler(async ({ input, context }) => {
 		const body = input;
 		const request = context.request;
 		const reply = context.effects;
@@ -248,11 +248,6 @@ export function createSignupProcedure(deps: SignupDependencies) {
 				}
 			}
 		})();
-		return v.parse(requiredSchema(authSessionsContract.signup['~orpc'].outputSchema), result === undefined ? result : { ...toPackedUserDetailed(result), token: result.token });
+		return result === undefined ? result : { ...toPackedUserDetailed(result), token: result.token };
 	});
-}
-
-function requiredSchema<Schema>(schema: Schema | undefined): Schema {
-	if (schema === undefined) throw new Error('Contract must declare its schema');
-	return schema;
 }

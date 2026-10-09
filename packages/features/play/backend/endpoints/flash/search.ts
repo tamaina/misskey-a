@@ -2,10 +2,10 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
+import { toPackedFlash } from '../../flash.schema.js';
 
-import { implement } from '@orpc/server';
-import { authentication, apiPolicy } from '../../../../api/backend/transport/middleware.js';
-import type { ApiContext } from '../../../../api/backend/transport/context.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+
 import { flashSearchContract } from './search.contract.js';
 import type { FlashEntityService } from '../../serializers/FlashEntityService.js';
 import type { FlashService } from '../../services/FlashService.js';
@@ -15,9 +15,7 @@ export interface FlashSearchDependencies {
 	flashEntityService: Pick<FlashEntityService, 'packMany'>;
 }
 export function createFlashSearchProcedure(deps: FlashSearchDependencies) {
-	return implement(flashSearchContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>()
-		.use(authentication<MiLocalUser>())
-		.use(apiPolicy<MiLocalUser>({ name: flashSearchContract['~orpc'].meta.requestName }))
+	return createApiProcedure<MiLocalUser>()(flashSearchContract)
 		.handler(async ({ input: ps, context }) => {
 			const me = context.principal;
 			const result = await deps.flashService.search(ps.query, {
@@ -27,6 +25,6 @@ export function createFlashSearchProcedure(deps: FlashSearchDependencies) {
 				untilDate: ps.untilDate,
 				limit: ps.limit,
 			});
-			return await deps.flashEntityService.packMany(result, me);
+			return (await deps.flashEntityService.packMany(result, me)).map(toPackedFlash);
 		});
 }

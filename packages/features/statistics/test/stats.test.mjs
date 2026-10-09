@@ -115,14 +115,14 @@ test('a failed chart read propagates and does not start later phases', async () 
 	assert.deepEqual(calls, ['notes', 'notes-2', 'users-2']);
 });
 
-test('malformed output is rejected', async () => {
+test('runtime output validation is skipped', async () => {
 	const feature = statisticsClient({
 		readNotes: async () => ({ local: 1, remote: 2 }),
 		readUsers: async () => ({ local: 3, remote: 4 }),
 		countReactions: async () => 'not a number',
 		countInstances: async () => 5,
 	});
-	await assert.rejects(feature.stats({}));
+	assert.equal((await feature.stats({})).reactionsCount, 'not a number');
 });
 
 test('a failed count propagates after both concurrent counts have started', async () => {

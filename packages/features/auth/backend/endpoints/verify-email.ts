@@ -2,18 +2,16 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 import type { UserProfilesRepository } from '@features/persistence/backend/repositories/models.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
 import { apiError } from '@features/api/backend/transport/orpc-error.js';
-import * as v from 'valibot';
+
 import { VerifyEmailContract } from '../api.definition.js';
-import { implement } from '@orpc/server';
-import { authentication, apiPolicy } from '@features/api/backend/transport/middleware.js';
-import type { ApiContext } from '@features/api/backend/transport/context.js';
+
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 export const meta = {
-	requireCredential: false,
 
 	tags: ['account'],
 
@@ -31,7 +29,7 @@ export interface VerifyEmailDependencies {
 	globalEventService: Pick<GlobalEventService, 'publishMainStream'>;
 }
 export function createVerifyEmailProcedure(deps: VerifyEmailDependencies) {
-	return implement(VerifyEmailContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>().use(authentication<MiLocalUser>()).use(apiPolicy<MiLocalUser>({ name: 'verify-email' })).handler(async ({ input, context }) => {
+	return createApiProcedure<MiLocalUser>()(VerifyEmailContract).handler(async ({ input, context }) => {
 		const ps = input;
 		const result = await (async () => {
 			const profile = await deps.userProfilesRepository.findOneBy({
@@ -51,11 +49,6 @@ export function createVerifyEmailProcedure(deps: VerifyEmailDependencies) {
 				includeSecrets: true,
 			}));
 		})();
-		return v.parse(requiredSchema(VerifyEmailContract['~orpc'].outputSchema), result);
+		return result;
 	});
-}
-
-function requiredSchema<Schema>(schema: Schema | undefined): Schema {
-	if (schema === undefined) throw new Error('Contract must declare its schema');
-	return schema;
 }

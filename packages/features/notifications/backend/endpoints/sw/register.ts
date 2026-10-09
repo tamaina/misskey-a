@@ -3,18 +3,17 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { implement } from '@orpc/server';
-import { authentication, apiPolicy, requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
 import { registerContract } from './register.contract.js';
-import type { ApiContext } from '@features/api/backend/transport/context.js';
+
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 import type { NotificationsDependencies } from '@features/notifications/backend/api.implementation.js';
 import { apiError } from '@features/api/backend/transport/orpc-error.js';
 export type RegisterDependencies = Pick<NotificationsDependencies, 'isValidEndpoint' | 'findSubscription' | 'getSwPublicKey' | 'insertSubscription' | 'generateId' | 'refreshSubscriptionCache'>;
 export function createRegisterProcedure(deps: RegisterDependencies) {
-	return implement(registerContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>()
-		.use(authentication<MiLocalUser>())
-		.use(apiPolicy<MiLocalUser>({ name: registerContract['~orpc'].meta.requestName, requireCredential: true, secure: true }))
+	return createApiProcedure<MiLocalUser>()(registerContract)
 		.use(requirePrincipal<MiLocalUser>())
 		.handler(async ({ input, context }) => {
 			const actor = context.principal;

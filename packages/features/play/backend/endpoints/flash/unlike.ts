@@ -3,9 +3,10 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { implement } from '@orpc/server';
-import { authentication, apiPolicy, requirePrincipal } from '../../../../api/backend/transport/middleware.js';
-import type { ApiContext } from '../../../../api/backend/transport/context.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+
+import { requirePrincipal } from '../../../../api/backend/transport/middleware.js';
+
 import { flashUnlikeContract, flashUnlikeErrors } from './unlike.contract.js';
 import type { FlashsRepository, FlashLikesRepository } from '@features/persistence/backend/repositories/models.js';
 import { apiError } from '@features/api/backend/transport/orpc-error.js';
@@ -15,9 +16,7 @@ export interface FlashUnlikeDependencies {
 	flashLikesRepository: Pick<FlashLikesRepository, 'delete' | 'findOneBy'>;
 }
 export function createFlashUnlikeProcedure(deps: FlashUnlikeDependencies) {
-	return implement(flashUnlikeContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>()
-		.use(authentication<MiLocalUser>())
-		.use(apiPolicy<MiLocalUser>({ name: flashUnlikeContract['~orpc'].meta.requestName, requireCredential: true, kind: 'write:flash-likes', prohibitMoved: true }))
+	return createApiProcedure<MiLocalUser>()(flashUnlikeContract)
 		.use(requirePrincipal<MiLocalUser>())
 		.handler(async ({ input: ps, context }) => {
 			const me = context.principal;

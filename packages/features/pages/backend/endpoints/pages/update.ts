@@ -3,9 +3,10 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { implement } from '@orpc/server';
-import { authentication, apiPolicy, requirePrincipal } from '../../../../api/backend/transport/middleware.js';
-import type { ApiContext } from '../../../../api/backend/transport/context.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+
+import { requirePrincipal } from '../../../../api/backend/transport/middleware.js';
+
 import { pagesUpdateContract, pagesUpdateErrors } from './update.contract.js';
 import type { DriveFilesRepository, MiDriveFile } from '@features/persistence/backend/repositories/models.js';
 import { apiError } from '@features/api/backend/transport/orpc-error.js';
@@ -17,9 +18,7 @@ export interface PagesUpdateDependencies {
 	pageService: Pick<PageService, 'update'>;
 }
 export function createPagesUpdateProcedure(deps: PagesUpdateDependencies) {
-	return implement(pagesUpdateContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>()
-		.use(authentication<MiLocalUser>())
-		.use(apiPolicy<MiLocalUser>({ name: pagesUpdateContract['~orpc'].meta.requestName, requireCredential: true, kind: 'write:pages', prohibitMoved: true, limit: { duration: 3_600_000, max: 300 } }))
+	return createApiProcedure<MiLocalUser>()(pagesUpdateContract)
 		.use(requirePrincipal<MiLocalUser>())
 		.handler(async ({ input: ps, context }) => {
 			const me = context.principal;

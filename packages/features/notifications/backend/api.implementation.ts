@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import * as v from 'valibot';
 import type { NotificationDto } from './notification.schema.js';
 import type { MiNotification, MiGroupedNotification } from './models/Notification.js';
 import { implement } from '@orpc/server';
@@ -29,7 +28,6 @@ import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { NotificationService } from './services/NotificationService.js';
 import { PushNotificationService } from './services/PushNotificationService.js';
 import { NotificationEntityService } from './serializers/NotificationEntityService.js';
-import { packedNotificationSchema } from './notification.schema.js';
 
 export interface AppNotificationData {
 	appAccessTokenId: string | null;
@@ -112,8 +110,8 @@ export class NotificationsApiProvider {
 		this.router = createNotificationsRouter({
 			generateId: timestamp => ids.gen(timestamp),
 			getNotifications: (userId, options) => notifications.getNotifications(userId, options),
-			packMany: async (records, userId) => v.parse(v.array(packedNotificationSchema), await serializer.packMany(records, userId)),
-			packGroupedMany: async (records, userId) => v.parse(v.array(packedNotificationSchema), await serializer.packGroupedMany(records, userId)),
+			packMany: async (records, userId) => serializer.packMany(records, userId),
+			packGroupedMany: async (records, userId) => serializer.packGroupedMany(records, userId),
 			createAppNotification: (userId, data) => notifications.createNotification(userId, 'app', data),
 			createTestNotification: userId => notifications.createNotification(userId, 'test', {}),
 			flushAllNotifications: userId => notifications.flushAllNotifications(userId),

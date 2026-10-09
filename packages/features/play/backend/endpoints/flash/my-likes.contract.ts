@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import type { Meta } from '@orpc/contract';
+import type { ApiProcedureMetadata } from '../../../../api/backend/transport/policy.types.js';
 import { oc } from '@orpc/contract';
 import * as v from 'valibot';
 import { commonErrors } from '../../../../api/backend/transport/errors.schema.js';
@@ -12,8 +14,12 @@ import { jsonString } from '../../../../api/backend/transport/string.schema.js';
 const misskeyId = v.pipe(v.string(), v.regex(/^[a-zA-Z0-9]+$/));
 
 const requestName = 'flash/my-likes';
-export const flashMyLikesContract = oc.$meta({ requestName: requestName } as const)
-	.route({ method: 'POST', path: `/${requestName}`, operationId: 'post___' + requestName.replaceAll('/', '___'), tags: ['account', 'flash'], spec: current => ({ ...current, security: [{ bearerAuth: [] }] }), })
+export const flashMyLikesContract = oc.$meta({
+	requestName: requestName,
+	requireCredential: true,
+	kind: 'read:flash-likes',
+} as const satisfies Meta & ApiProcedureMetadata)
+	.route({ method: 'POST', path: `/${requestName}`, tags: ['account', 'flash'], spec: current => ({ ...current, security: [{ bearerAuth: [] }] }), })
 	.errors(commonErrors)
 	.input(objectInput({
 		"limit": v.optional(v.pipe(v.pipe(v.number(), v.integer()), v.minValue(1), v.maxValue(100)), 10),

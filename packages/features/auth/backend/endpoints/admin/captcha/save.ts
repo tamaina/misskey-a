@@ -2,22 +2,19 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 import { captchaErrorCodes, CaptchaService } from '../../../services/CaptchaService.js';
 import { apiError } from '@features/api/backend/transport/orpc-error.js';
-import * as v from 'valibot';
+
 import { AdminCaptchaSaveContract } from '../../../api.definition.js';
-import { implement } from '@orpc/server';
-import { authentication, apiPolicy, requirePrincipal } from '@features/api/backend/transport/middleware.js';
-import type { ApiContext } from '@features/api/backend/transport/context.js';
+
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 export const meta = {
 	tags: ['admin', 'captcha'],
 
-	requireCredential: true,
-	requireAdmin: true,
-
 	// 実態はmetaの更新であるため
-	kind: 'write:admin:meta',
 
 	errors: {
 		invalidProvider: {
@@ -62,7 +59,7 @@ export interface AdminCaptchaSaveDependencies {
 	captchaService: Pick<CaptchaService, 'save'>;
 }
 export function createAdminCaptchaSaveProcedure(deps: AdminCaptchaSaveDependencies) {
-	return implement(AdminCaptchaSaveContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>().use(authentication<MiLocalUser>()).use(apiPolicy<MiLocalUser>({ name: 'admin/captcha/save', requireCredential: true, requireAdmin: true, kind: 'write:admin:meta' })).use(requirePrincipal<MiLocalUser>()).handler(async ({ input, context }) => {
+	return createApiProcedure<MiLocalUser>()(AdminCaptchaSaveContract).use(requirePrincipal<MiLocalUser>()).handler(async ({ input, context }) => {
 		const ps = input;
 		const result = await (async () => {
 			const result = await deps.captchaService.save(ps.provider, {
@@ -104,11 +101,6 @@ export function createAdminCaptchaSaveProcedure(deps: AdminCaptchaSaveDependenci
 				}
 			}
 		})();
-		return v.parse(requiredSchema(AdminCaptchaSaveContract['~orpc'].outputSchema), result);
+		return result;
 	});
-}
-
-function requiredSchema<Schema>(schema: Schema | undefined): Schema {
-	if (schema === undefined) throw new Error('Contract must declare its schema');
-	return schema;
 }

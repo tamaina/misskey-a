@@ -2,6 +2,7 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 import { DataSource } from 'typeorm';
 
 import { apiError } from '@features/api/backend/transport/orpc-error.js';
@@ -10,18 +11,14 @@ import { MiUserSecurityKey } from '../../models/UserSecurityKey.js';
 import type { UsersRepository } from '@features/persistence/backend/repositories/models.js';
 import { RoleService } from '@features/roles/backend/services/RoleService.js';
 import { ModerationLogService } from '@features/moderation/backend/services/ModerationLogService.js';
-import * as v from 'valibot';
+
 import { AdminUnsetMfaContract } from '../../api.definition.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
-import { implement } from '@orpc/server';
-import { authentication, apiPolicy, requirePrincipal } from '@features/api/backend/transport/middleware.js';
-import type { ApiContext } from '@features/api/backend/transport/context.js';
+
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+
 export const meta = {
 	tags: ['admin'],
-
-	requireCredential: true,
-	requireModerator: true,
-	kind: 'write:admin:unset-mfa',
 
 	errors: {
 		noSuchUser: {
@@ -43,7 +40,7 @@ export interface AdminUnsetMfaDependencies {
 	moderationLogService: Pick<ModerationLogService, 'log'>;
 }
 export function createAdminUnsetMfaProcedure(deps: AdminUnsetMfaDependencies) {
-	return implement(AdminUnsetMfaContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>().use(authentication<MiLocalUser>()).use(apiPolicy<MiLocalUser>({ name: 'admin/unset-mfa', requireCredential: true, requireModerator: true, kind: 'write:admin:unset-mfa' })).use(requirePrincipal<MiLocalUser>()).handler(async ({ input, context }) => {
+	return createApiProcedure<MiLocalUser>()(AdminUnsetMfaContract).use(requirePrincipal<MiLocalUser>()).handler(async ({ input, context }) => {
 		const ps = input;
 		const me = context.principal;
 		const result = await (async () => {
@@ -76,11 +73,6 @@ export function createAdminUnsetMfaProcedure(deps: AdminUnsetMfaDependencies) {
 				});
 			});
 		})();
-		return v.parse(requiredSchema(AdminUnsetMfaContract['~orpc'].outputSchema), result);
+		return result;
 	});
-}
-
-function requiredSchema<Schema>(schema: Schema | undefined): Schema {
-	if (schema === undefined) throw new Error('Contract must declare its schema');
-	return schema;
 }

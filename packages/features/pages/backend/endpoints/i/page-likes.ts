@@ -2,10 +2,12 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
+import { toPackedPage } from '@features/users/backend/page.schema.js';
 
-import { implement } from '@orpc/server';
-import { authentication, apiPolicy, requirePrincipal } from '../../../../api/backend/transport/middleware.js';
-import type { ApiContext } from '../../../../api/backend/transport/context.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+
+import { requirePrincipal } from '../../../../api/backend/transport/middleware.js';
+
 import { iPageLikesContract } from './page-likes.contract.js';
 import type { PageLikesRepository } from '@features/persistence/backend/repositories/models.js';
 import type { QueryService } from '@features/notes/backend/services/QueryService.js';
@@ -17,9 +19,7 @@ export interface IPageLikesDependencies {
 	queryService: Pick<QueryService, 'makePaginationQuery'>;
 }
 export function createIPageLikesProcedure(deps: IPageLikesDependencies) {
-	return implement(iPageLikesContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>()
-		.use(authentication<MiLocalUser>())
-		.use(apiPolicy<MiLocalUser>({ name: iPageLikesContract['~orpc'].meta.requestName, requireCredential: true, kind: 'read:page-likes' }))
+	return createApiProcedure<MiLocalUser>()(iPageLikesContract)
 		.use(requirePrincipal<MiLocalUser>())
 		.handler(async ({ input: ps, context }) => {
 			const me = context.principal;
@@ -29,6 +29,6 @@ export function createIPageLikesProcedure(deps: IPageLikesDependencies) {
 			const likes = await query
 				.limit(ps.limit)
 				.getMany();
-			return deps.pageLikeEntityService.packMany(likes, me);
+			return (await deps.pageLikeEntityService.packMany(likes, me)).map(like => ({ id: like.id, page: toPackedPage(like.page) }));
 		});
 }
