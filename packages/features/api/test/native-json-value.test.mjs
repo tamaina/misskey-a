@@ -29,6 +29,7 @@ test('native, nonfinite and cyclic values fail before JSON record projection', (
 	}
 	const shared = { value: 1 };
 	assert.deepEqual(v.parse(packedJsonValueSchema, { left: shared, right: shared }), { left: shared, right: shared });
+	assert.deepEqual(toPackedJsonValue({ left: shared, right: shared }), { left: shared, right: shared });
 });
 
 test('stored JSON boundary validates each subtree once before copying', () => {
@@ -45,9 +46,20 @@ test('stored JSON boundary validates each subtree once before copying', () => {
 			});
 		}
 		const output = materialize(input);
-		// Object.keys checks enumerability in both passes; validation reads each value once.
-		assert.equal(descriptorReads, depth * 3);
+		// Object.keys checks enumerability, then one descriptor read validates and copies the value.
+		assert.equal(descriptorReads, depth * 2);
 		assert.deepEqual(output, input);
 		assert.notEqual(output, input);
+	}
+});
+
+test('stored JSON copies the validated descriptor value without invoking a differing get trap', () => {
+	for (const materialize of [toPackedJsonValue, toPackedJsonObject]) {
+		let getReads = 0;
+		const input = new Proxy({ amount: 1 }, { get() { getReads++; return Infinity; } });
+		assert.deepEqual(materialize(input), { amount: 1 });
+		assert.equal(getReads, 0);
+		const invalid = new Proxy({ amount: Infinity }, { get() { return 1; } });
+		assert.throws(() => materialize(invalid), TypeError);
 	}
 });
