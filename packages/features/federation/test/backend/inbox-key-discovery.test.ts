@@ -10,6 +10,8 @@ import * as Bull from 'bullmq';
 import { parseRequestSignature, signAsDraftToRequest, verifyDraftSignature } from '@misskey-dev/node-http-message-signatures';
 import { ApDbResolverService } from '../../backend/services/ApDbResolverService.js';
 import { ApPersonService } from '../../backend/services/ApPersonService.js';
+import { JsonLd, JsonLdService } from '../../backend/services/JsonLdService.js';
+import type { HttpRequestService } from '@features/runtime/backend/services/HttpRequestService.js';
 import { InboxProcessorService } from '../../backend/jobs/InboxProcessorService.js';
 import { InboxKeyDiscoveryDeferredError, InboxKeyDiscoveryRefreshError, inboxKeyDiscoveryBackoff } from '../../backend/utility/inbox-key-discovery.js';
 import type { MiUserPublickey } from '../../backend/models/UserPublickey.js';
@@ -50,10 +52,9 @@ function processorFixture(auth: Awaited<ReturnType<ApDbResolverService['getAuthU
 	return { processor, resolver, perform, jsonLd };
 }
 
-function job(ld = false): Bull.Job<Parameters<InboxProcessorService['process']>[0]['data']> {
+function job(): Bull.Job<Parameters<InboxProcessorService['process']>[0]['data']> {
 	return mock<Bull.Job<Parameters<InboxProcessorService['process']>[0]['data']>>({
 		data: { activity: { id: 'https://sender.example/activity/1', type: 'Create', actor: uri,
-			...(ld ? { signature: { type: 'RsaSignature2017', creator: `${uri}#main-key`, signatureValue: 'fixture' } } : {}),
 		}, signature: { scheme: 'Signature', params: { signature: 'AAAA', keyId: `${uri}#ed25519-key`, algorithm: 'ed25519', headers: ['(request-target)'] }, keyId: `${uri}#ed25519-key`, algorithm: 'ed25519', signingString: 'invalid' } },
 	});
 }
@@ -93,22 +94,54 @@ describe('inbox Actor key discovery', () => {
 		expect(fixture.resolver.getAuthUserFromApId).toHaveBeenCalledTimes(1);
 	});
 
-	test('valid RSA LD fallback is processed before a deferred missing Ed key', async () => {
+	test.each(['cooldown', 'refresh failure', 'invalid Ed signature'] as const)('real RSA LD fallback verifies after %s and rejects tampering', async (failure) => {
 		const { user } = resolverFixture(1000);
-		const fixture = processorFixture({ user, key: null, keyDiscoveryDeferredUntil: Date.now() + 300000 });
-		fixture.resolver.getAuthUserFromApId.mockResolvedValueOnce({ user, key: null, keyDiscoveryDeferredUntil: Date.now() + 300000 });
-		fixture.resolver.getAuthUserFromApId.mockResolvedValueOnce({ user, key: mock<MiUserPublickey>({ keyId: `${uri}#main-key`, keyPem: 'rsa' }) });
-		await expect(fixture.processor.process(job(true))).resolves.toBe('ok');
-		expect(fixture.jsonLd.verifyRsaSignature2017).toHaveBeenCalledOnce();
-		expect(fixture.perform).toHaveBeenCalledOnce();
+		const rsa = generateKeyPairSync('rsa', { modulusLength: 2048 });
+		const rsaPublicKey = rsa.publicKey.export({ type: 'spki', format: 'pem' }).toString();
+		const http = mock<HttpRequestService>();
+		http.send.mockRejectedValue(new Error('Unexpected context fetch: fixture must stay offline'));
+		const jsonLdService = new JsonLdService(http);
+		const signedActivity = await new JsonLd(http).signRsaSignature2017({
+			'@context': 'https://www.w3.org/ns/activitystreams',
+			id: 'https://sender.example/activity/1', type: 'Create', actor: uri,
+			object: { id: 'https://sender.example/notes/1', type: 'Note', attributedTo: uri, content: 'signed content' },
+		}, rsa.privateKey.export({ type: 'pkcs8', format: 'pem' }).toString(), `${uri}#main-key`);
+		const ed = generateKeyPairSync('ed25519');
+		const request = { method: 'POST', url: '/inbox', headers: { host: 'recipient.example', date: new Date().toUTCString() } };
+		await signAsDraftToRequest(request, { keyId: `${uri}#ed25519-key`, privateKeyPem: ed.privateKey.export({ type: 'pkcs8', format: 'pem' }).toString() }, ['(request-target)', 'host', 'date']);
+		const parsed = parseRequestSignature(request);
+		if (parsed.version !== 'draft') throw new Error('Expected Draft');
+		parsed.value.signingString += 'tampered';
+		expect(await verifyDraftSignature(parsed.value, ed.publicKey.export({ type: 'spki', format: 'pem' }).toString())).toBe(false);
+		for (const tampered of [false, true]) {
+			const fixture = processorFixture({ user, key: mock<MiUserPublickey>({ keyId: `${uri}#main-key`, keyPem: rsaPublicKey }) });
+			Object.defineProperty(fixture.processor, 'jsonLdService', { value: jsonLdService });
+			if (failure === 'refresh failure') {
+				fixture.resolver.getAuthUserFromApId.mockRejectedValueOnce(new InboxKeyDiscoveryRefreshError(new Error('temporary refresh')));
+			} else {
+				fixture.resolver.getAuthUserFromApId.mockResolvedValueOnce(failure === 'cooldown'
+					? { user, key: null, keyDiscoveryDeferredUntil: Date.now() + 300000 }
+					: { user, key: mock<MiUserPublickey>({ keyId: `${uri}#ed25519-key`, keyPem: ed.publicKey.export({ type: 'spki', format: 'pem' }).toString() }) });
+			}
+			const activity = JSON.parse(JSON.stringify(signedActivity));
+			if (tampered) activity.object.content = 'unsigned replacement';
+			const queued = job();
+			// Keep the signed JSON plain: deep mocks add a synthetic toJSON property.
+			Object.defineProperty(queued, 'data', { value: { activity, signature: parsed.value } });
+			if (tampered) {
+				await expect(fixture.processor.process(queued)).rejects.toBeInstanceOf(Bull.UnrecoverableError);
+				expect(fixture.perform).not.toHaveBeenCalled();
+			} else {
+				await expect(fixture.processor.process(queued)).resolves.toBe('ok');
+				expect(fixture.perform).toHaveBeenCalledOnce();
+			}
+			expect(fixture.resolver.getAuthUserFromApId).toHaveBeenNthCalledWith(2, uri, `${uri}#main-key`);
+			expect(fixture.jsonLd.verifyRsaSignature2017).not.toHaveBeenCalled();
+		}
+		expect(http.send).not.toHaveBeenCalled();
 	});
 
-	test('temporary strict key refresh failure still permits cached RSA LD fallback', async () => {
-		const { user } = resolverFixture(1000);
-		const fixture = processorFixture({ user, key: mock<MiUserPublickey>({ keyId: `${uri}#main-key`, keyPem: 'rsa' }) });
-		fixture.resolver.getAuthUserFromApId.mockRejectedValueOnce(new InboxKeyDiscoveryRefreshError(new Error('temporary refresh')));
-		await expect(fixture.processor.process(job(true))).resolves.toBe('ok');
-		expect(fixture.perform).toHaveBeenCalledOnce();
+	test('temporary strict key refresh failure without LD retains ordinary retry failure', async () => {
 		const noLd = processorFixture(null);
 		noLd.resolver.getAuthUserFromApId.mockRejectedValueOnce(new InboxKeyDiscoveryRefreshError(new Error('temporary refresh')));
 		await expect(noLd.processor.process(job())).rejects.toThrow('temporary refresh');
