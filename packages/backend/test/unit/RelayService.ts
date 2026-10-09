@@ -10,14 +10,14 @@ import type { Mocked } from 'vitest';
 import { Test } from '@nestjs/testing';
 import { mockDeep } from 'vitest-mock-extended';
 import type { TestingModule } from '@nestjs/testing';
-import { ApRendererService } from '@/core/activitypub/ApRendererService.js';
-import { UserEntityService } from '@/core/entities/UserEntityService.js';
-import { IdService } from '@/core/IdService.js';
-import { QueueService } from '@/core/QueueService.js';
-import { RelayService } from '@/core/RelayService.js';
-import { SystemAccountService } from '@/core/SystemAccountService.js';
-import { GlobalModule } from '@/GlobalModule.js';
-import { UtilityService } from '@/core/UtilityService.js';
+import { ApRendererService } from '@features/federation/backend/services/ApRendererService.js';
+import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
+import { IdService } from '@features/runtime/backend/services/IdService.js';
+import { QueueService } from '@features/runtime/backend/services/QueueService.js';
+import { RelayService } from '@features/federation/backend/services/RelayService.js';
+import { SystemAccountService } from '@features/users/backend/services/SystemAccountService.js';
+import { GlobalModule } from '@features/boot/backend/assembly/GlobalModule.js';
+import { UtilityService } from '@features/federation/backend/services/UtilityService.js';
 
 describe('RelayService', () => {
 	let app: TestingModule;

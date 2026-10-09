@@ -4,13 +4,13 @@
  */
 
 import { Inject, Injectable, Scope } from '@nestjs/common';
-import type { MiReversiGame } from '@/models/_.js';
-import { bindThis } from '@/decorators.js';
-import { ReversiService } from '@/core/ReversiService.js';
-import { ReversiGameEntityService } from '@/core/entities/ReversiGameEntityService.js';
-import { isJsonObject } from '@/misc/json-value.js';
-import type { JsonObject, JsonValue } from '@/misc/json-value.js';
-import Channel, { type ChannelRequest } from '@/server/api/stream/channel.js';
+import type { MiReversiGame } from '@features/persistence/backend/repositories/models.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
+import { ReversiService } from '../services/ReversiService.js';
+import { ReversiGameEntityService } from '../serializers/ReversiGameEntityService.js';
+import { isJsonObject } from '@features/runtime/backend/formatting/json-value.js';
+import type { JsonObject, JsonValue } from '@features/runtime/backend/formatting/json-value.js';
+import Channel, { type ChannelRequest } from '@features/api/backend/transport/stream/channel.js';
 import { reversiUpdateKeys } from 'misskey-js';
 import { REQUEST } from '@nestjs/core';
 

@@ -5,12 +5,12 @@
 
 import { ulid } from 'ulid';
 import { describe, expect, test } from 'vitest';
-import { aidRegExp, genAid, parseAid } from '@/misc/id/aid.js';
-import { aidxRegExp, genAidx, parseAidx } from '@/misc/id/aidx.js';
-import { genMeid, meidRegExp, parseMeid } from '@/misc/id/meid.js';
-import { genMeidg, meidgRegExp, parseMeidg } from '@/misc/id/meidg.js';
-import { genObjectId, objectIdRegExp, parseObjectId } from '@/misc/id/object-id.js';
-import { parseUlid, ulidRegExp } from '@/misc/id/ulid.js';
+import { aidRegExp, genAid, parseAid } from '@features/runtime/backend/id/aid.js';
+import { aidxRegExp, genAidx, parseAidx } from '@features/runtime/backend/id/aidx.js';
+import { genMeid, meidRegExp, parseMeid } from '@features/runtime/backend/id/meid.js';
+import { genMeidg, meidgRegExp, parseMeidg } from '@features/runtime/backend/id/meidg.js';
+import { genObjectId, objectIdRegExp, parseObjectId } from '@features/runtime/backend/id/object-id.js';
+import { parseUlid, ulidRegExp } from '@features/runtime/backend/id/ulid.js';
 
 describe('misc:id', () => {
 	test('aid', () => {

@@ -8,9 +8,9 @@ import path from 'node:path';
 import { generateSubsettedFont } from './subsetter.js';
 
 const filesToScan = {
-	frontend: ['packages/frontend/src/**/*.{ts,vue}', 'packages/features/*/frontend/**/*.{ts,vue}'],
+	frontend: ['packages/features/*/frontend/**/*.{ts,vue}'],
 	//frontendShared: 'packages/frontend-shared/js/**/*.{ts}',  // 現時点では該当がないのでスキップ。ここをコメントアウトするときは、各フロントエンドにこのチャンクのCSSのimportを追加すること
-	frontendEmbed: 'packages/frontend-embed/src/**/*.{ts,vue}',
+	frontendEmbed: ['packages/frontend-embed/src/**/*.{ts,vue}', 'packages/features/*/frontend/embed/**/*.{ts,vue}'],
 };
 
 async function main() {
@@ -46,7 +46,7 @@ async function main() {
 		const iconsToPack = new Set<string>();
 
 		const cwd = path.resolve(process.cwd(), '../../');
-		const files = fsp.glob(dir, { cwd });
+		const files = fsp.glob(dir, { cwd, exclude: key === 'frontend' ? ['packages/features/*/frontend/embed/**'] : [] });
 		for await (const file of files) {
 			//console.log(`Scanning ${file}`);
 			const content = await fsp.readFile(path.resolve(cwd, file), 'utf-8');

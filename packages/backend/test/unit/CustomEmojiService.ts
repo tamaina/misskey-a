@@ -5,16 +5,16 @@
 
 import { afterEach, beforeAll, describe, test, expect } from 'vitest';
 import { Test, TestingModule } from '@nestjs/testing';
-import { CustomEmojiService } from '@/core/CustomEmojiService.js';
-import { EmojiEntityService } from '@/core/entities/EmojiEntityService.js';
-import { GlobalEventService } from '@/core/GlobalEventService.js';
-import { IdService } from '@/core/IdService.js';
-import { ModerationLogService } from '@/core/ModerationLogService.js';
-import { UtilityService } from '@/core/UtilityService.js';
+import { featureServiceGroups } from '@features/index/backend/feature-service-providers.js';
+import { UtilityService } from '@features/federation/backend/services/UtilityService.js';
 import { DI } from '@/di-symbols.js';
-import { GlobalModule } from '@/GlobalModule.js';
-import { EmojisRepository } from '@/models/_.js';
-import { MiEmoji } from '@/models/Emoji.js';
+import { GlobalModule } from '@features/boot/backend/assembly/GlobalModule.js';
+import { type ModerationLogsRepository, EmojisRepository } from '@features/persistence/backend/repositories/models.js';
+import { ModerationLogService } from '@features/moderation/backend/services/ModerationLogService.js';
+import { IdService } from '@features/runtime/backend/services/IdService.js';
+import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
+import { CustomEmojiService } from '@features/emojis/backend/services/CustomEmojiService.js';
+import { MiEmoji } from '@features/emojis/backend/models/Emoji.js';
 
 describe('CustomEmojiService', () => {
 	let app: TestingModule;
@@ -33,8 +33,12 @@ describe('CustomEmojiService', () => {
 					CustomEmojiService,
 					UtilityService,
 					IdService,
-					EmojiEntityService,
-					ModerationLogService,
+					...featureServiceGroups.emojis.providers,
+					{
+						provide: ModerationLogService,
+						inject: [DI.moderationLogsRepository, IdService],
+						useFactory: (repository: ModerationLogsRepository, id: IdService) => new ModerationLogService(repository, id),
+					},
 					GlobalEventService,
 				],
 			})

@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { miLocalStorage } from '@/local-storage.js';
+import { miLocalStorage } from '@features/preferences/frontend/local-storage.js';
 import { aiScriptReadline, createAiScriptEnv } from '@features/play/frontend/services/aiscript/api.js';
 import { errors, Interpreter, Parser, values } from '@syuilo/aiscript';
 import {
@@ -32,7 +32,7 @@ async function exe(script: string): Promise<values.Value[]> {
 	return outputs;
 }
 
-let $iMock = vi.hoisted<Partial<typeof import('@/i.js').$i> | null >(
+let $iMock = vi.hoisted<Partial<typeof import('@features/auth/frontend/i.js').$i> | null >(
 	() => null
 );
 
@@ -47,7 +47,7 @@ function errorWithPos<T extends errors.AiScriptError>(
 	return error;
 }
 
-vi.mock('@/i.js', () => {
+vi.mock('@features/auth/frontend/i.js', () => {
 	return {
 		get $i() {
 			return $iMock;
@@ -63,13 +63,13 @@ const osMock = vi.hoisted(() => {
 	};
 });
 
-vi.mock('@/os.js', () => {
+vi.mock('@features/ui/frontend/os.js', () => {
 	return osMock;
 });
 
 const misskeyApiMock = vi.hoisted(() => vi.fn());
 
-vi.mock('@/utility/misskey-api.js', () => {
+vi.mock('@features/api/frontend/utility/misskey-api.js', () => {
 	return { misskeyApi: misskeyApiMock };
 });
 

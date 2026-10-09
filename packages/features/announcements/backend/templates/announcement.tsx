@@ -3,9 +3,9 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import type { Packed } from '@/misc/json-schema.js';
-import type { CommonProps } from '@/server/web/views/_.js';
-import { Layout } from '@/server/web/views/base.js';
+import type { Packed } from '@features/index/backend/packed.schema.js';
+import type { CommonProps } from '@features/web/backend/templates/_.js';
+import { Layout } from '@features/web/backend/templates/base.js';
 
 export function AnnouncementPage(props: CommonProps<{
 	announcement: Packed<'Announcement'>;

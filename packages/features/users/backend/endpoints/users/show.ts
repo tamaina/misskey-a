@@ -3,194 +3,121 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 import { In, IsNull } from 'typeorm';
-import { Inject, Injectable } from '@nestjs/common';
-import type { MiMeta, UsersRepository } from '@/models/_.js';
-import type { MiUser } from '@/models/User.js';
-import { Endpoint } from '@/server/api/endpoint-base.js';
-import { UserEntityService } from '@/core/entities/UserEntityService.js';
-import { RemoteUserResolveService } from '@/core/RemoteUserResolveService.js';
-import { DI } from '@/di-symbols.js';
-import PerUserPvChart from '@/core/chart/charts/per-user-pv.js';
-import { RoleService } from '@/core/RoleService.js';
-import { ApiError } from '@/server/api/error.js';
-import { ApiLoggerService } from '@/server/api/ApiLoggerService.js';
+import { type RemoteUserResolveService } from '@features/federation/backend/services/RemoteUserResolveService.js';
+import { type PerUserPvChart } from '@features/statistics/backend/charts/per-user-pv.js';
+import { type RoleService } from '@features/roles/backend/services/RoleService.js';
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
+import { type ApiLoggerService } from '@features/api/backend/transport/ApiLoggerService.js';
+import { type UserEntityService } from '../../serializers/UserEntityService.js';
+import { usersShowErrors } from './show.contract.js';
+import type { MiUser } from '../../models/User.js';
+import type { MiMeta, UsersRepository } from '@features/persistence/backend/repositories/models.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+import type { UsersInputs } from '../../api.definition.js';
+import type { ApiToken } from '@features/api/backend/transport/context.js';
 import type { FindOptionsWhere } from 'typeorm';
+import { usersShowContract } from './show.contract.js';
 
-export const meta = {
-	tags: ['users'],
+import { toPackedUserDetailed } from '@features/users/backend/user.schema.js';
+export interface UsersShowDependencies {
+	serverSettings: MiMeta;
+	usersRepository: UsersRepository;
+	userEntityService: UserEntityService;
+	remoteUserResolveService: RemoteUserResolveService;
+	roleService: RoleService;
+	perUserPvChart: PerUserPvChart;
+	apiLoggerService: ApiLoggerService;
+}
+export function createUsersShowProcedure(deps: UsersShowDependencies) {
+	async function execute(ps: UsersInputs['users/show'], me: MiLocalUser | null, _token: ApiToken | null, ip: string) {
+		// ログイン時にusers/showできなくなってしまう
+		//if (deps.serverSettings.ugcVisibilityForVisitor === 'none' && me == null) {
+		//	throw apiError(usersShowErrors.noSuchUser);
+		//}
 
-	requireCredential: false,
+		let user: MiUser | null;
 
-	description: 'Show the properties of a user.',
+		const isModerator = await deps.roleService.isModerator(me);
+		if (ps.username !== undefined) {
+			ps.username = ps.username.trim();
+		}
 
-	res: {
-		optional: false, nullable: false,
-		oneOf: [
-			{
-				type: 'object',
-				ref: 'UserDetailed',
-			},
-			{
-				type: 'array',
-				items: {
-					type: 'object',
-					ref: 'UserDetailed',
-				},
-			},
-		],
-	},
-
-	errors: {
-		failedToResolveRemoteUser: {
-			message: 'Failed to resolve remote user.',
-			code: 'FAILED_TO_RESOLVE_REMOTE_USER',
-			id: 'ef7b9be4-9cba-4e6f-ab41-90ed171c7d3c',
-			kind: 'server',
-		},
-
-		noSuchUser: {
-			message: 'No such user.',
-			code: 'NO_SUCH_USER',
-			id: '4362f8dc-731f-4ad8-a694-be5a88922a24',
-			httpStatusCode: 404,
-		},
-	},
-} as const;
-
-export const paramDef = {
-	allOf: [
-		{
-			anyOf: [
-				{
-					type: 'object',
-					properties: {
-						userId: { type: 'string', format: 'misskey:id' },
-					},
-					required: ['userId'],
-				},
-				{
-					type: 'object',
-					properties: {
-						userIds: { type: 'array', uniqueItems: true, items: {
-							type: 'string', format: 'misskey:id',
-						} },
-					},
-					required: ['userIds'],
-				},
-				{
-					type: 'object',
-					properties: {
-						username: { type: 'string' },
-					},
-					required: ['username'],
-				},
-			],
-		},
-		{
-			type: 'object',
-			properties: {
-				host: {
-					type: 'string',
-					nullable: true,
-					description: 'The local host is represented with `null`.',
-				},
-			},
-		},
-	],
-} as const;
-
-@Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
-	constructor(
-		@Inject(DI.meta)
-		private serverSettings: MiMeta,
-
-		@Inject(DI.usersRepository)
-		private usersRepository: UsersRepository,
-
-		private userEntityService: UserEntityService,
-		private remoteUserResolveService: RemoteUserResolveService,
-		private roleService: RoleService,
-		private perUserPvChart: PerUserPvChart,
-		private apiLoggerService: ApiLoggerService,
-	) {
-		super(meta, paramDef, async (ps, me, _1, _2, _3, ip) => {
-			// ログイン時にusers/showできなくなってしまう
-			//if (this.serverSettings.ugcVisibilityForVisitor === 'none' && me == null) {
-			//	throw new ApiError(meta.errors.noSuchUser);
-			//}
-
-			let user;
-
-			const isModerator = await this.roleService.isModerator(me);
-			if ('username' in ps) {
-				ps.username = ps.username.trim();
+		if (ps.userIds !== undefined) {
+			if (ps.userIds.length === 0) {
+				return [];
 			}
 
-			if ('userIds' in ps) {
-				if (ps.userIds.length === 0) {
-					return [];
+			const users = await deps.usersRepository.findBy(isModerator ? {
+				id: In(ps.userIds),
+			} : {
+				id: In(ps.userIds),
+				isSuspended: false,
+				...(deps.serverSettings.ugcVisibilityForVisitor === 'local' && me == null ? { host: IsNull() } : {}),
+			});
+
+			// リクエストされた通りに並べ替え
+			// 順番は保持されるけど数は減ってる可能性がある
+			const _users: MiUser[] = [];
+			for (const id of ps.userIds) {
+				const user = users.find(x => x.id === id);
+				if (user != null) _users.push(user);
+			}
+
+			const _userMap = await deps.userEntityService.packMany(_users, me, { schema: 'UserDetailed' })
+				.then(users => new Map(users.map(u => [u.id, u])));
+			return _users.map(u => {
+				const packed = _userMap.get(u.id);
+				if (packed === undefined) throw new Error('Missing packed user');
+				return packed;
+			});
+		} else {
+			// Lookup user
+			if (typeof ps.host === 'string' && ps.username !== undefined) {
+				if (deps.serverSettings.ugcVisibilityForVisitor === 'local' && me == null) {
+					throw apiError(usersShowErrors.noSuchUser);
 				}
 
-				const users = await this.usersRepository.findBy(isModerator ? {
-					id: In(ps.userIds),
-				} : {
-					id: In(ps.userIds),
-					isSuspended: false,
-					...(this.serverSettings.ugcVisibilityForVisitor === 'local' && me == null ? { host: IsNull() } : {}),
+				user = await deps.remoteUserResolveService.resolveUser(ps.username, ps.host).catch(err => {
+					deps.apiLoggerService.logger.warn(`failed to resolve remote user: ${err}`);
+					throw apiError(usersShowErrors.failedToResolveRemoteUser);
 				});
-
-				// リクエストされた通りに並べ替え
-				// 順番は保持されるけど数は減ってる可能性がある
-				const _users: MiUser[] = [];
-				for (const id of ps.userIds) {
-					const user = users.find(x => x.id === id);
-					if (user != null) _users.push(user);
-				}
-
-				const _userMap = await this.userEntityService.packMany(_users, me, { schema: 'UserDetailed' })
-					.then(users => new Map(users.map(u => [u.id, u])));
-				return _users.map(u => _userMap.get(u.id)!);
 			} else {
-				// Lookup user
-				if (typeof ps.host === 'string' && 'username' in ps) {
-					if (this.serverSettings.ugcVisibilityForVisitor === 'local' && me == null) {
-						throw new ApiError(meta.errors.noSuchUser);
-					}
+				const q: FindOptionsWhere<MiUser> = ps.userId !== undefined
+					? { id: ps.userId }
+					: { usernameLower: ps.username?.toLowerCase(), host: IsNull() };
 
-					user = await this.remoteUserResolveService.resolveUser(ps.username, ps.host).catch(err => {
-						this.apiLoggerService.logger.warn(`failed to resolve remote user: ${err}`);
-						throw new ApiError(meta.errors.failedToResolveRemoteUser);
-					});
-				} else {
-					const q: FindOptionsWhere<MiUser> = 'userId' in ps
-						? { id: ps.userId }
-						: { usernameLower: ps.username!.toLowerCase(), host: IsNull() };
-
-					user = await this.usersRepository.findOneBy(q);
-				}
-
-				if (user == null || (!isModerator && user.isSuspended)) {
-					throw new ApiError(meta.errors.noSuchUser);
-				}
-
-				if (this.serverSettings.ugcVisibilityForVisitor === 'local' && user.host != null && me == null) {
-					throw new ApiError(meta.errors.noSuchUser);
-				}
-
-				if (user.host == null) {
-					if (me == null && ip != null) {
-						this.perUserPvChart.commitByVisitor(user, ip);
-					} else if (me && me.id !== user.id) {
-						this.perUserPvChart.commitByUser(user, me.id);
-					}
-				}
-
-				return await this.userEntityService.pack(user, me, {
-					schema: 'UserDetailed',
-				});
+				user = await deps.usersRepository.findOneBy(q);
 			}
-		});
+
+			if (user == null || (!isModerator && user.isSuspended)) {
+				throw apiError(usersShowErrors.noSuchUser);
+			}
+
+			if (deps.serverSettings.ugcVisibilityForVisitor === 'local' && user.host != null && me == null) {
+				throw apiError(usersShowErrors.noSuchUser);
+			}
+
+			if (user.host == null) {
+				if (me == null && ip != null) {
+					deps.perUserPvChart.commitByVisitor(user, ip);
+				} else if (me && me.id !== user.id) {
+					deps.perUserPvChart.commitByUser(user, me.id);
+				}
+			}
+
+			return await deps.userEntityService.pack(user, me, {
+				schema: 'UserDetailed',
+			});
+		}
 	}
+
+	async function packShow(input: UsersInputs['users/show'], context: { principal: MiLocalUser | null; token: ApiToken | null; ip: string }) {
+		const value = await execute(input, context.principal, context.token, context.ip);
+		return Array.isArray(value) ? value.map(user => toPackedUserDetailed(user)) : toPackedUserDetailed(value);
+	}
+
+	return createApiProcedure<MiLocalUser>()(usersShowContract)
+		.handler(async ({ input, context }) => await packShow(input, context));
 }

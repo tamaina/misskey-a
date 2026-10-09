@@ -7,7 +7,7 @@ import * as assert from 'assert';
 import { describe, test } from 'vitest';
 
 import { parse } from 'mfm-js';
-import { extractMentions } from '@/misc/extract-mentions.js';
+import { extractMentions } from '@features/markup/backend/utility/extract-mentions.js';
 
 describe('Extract mentions', () => {
 	test('simple', () => {

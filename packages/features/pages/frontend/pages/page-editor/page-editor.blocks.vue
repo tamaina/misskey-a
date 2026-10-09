@@ -5,13 +5,13 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <template>
 <MkDraggable
-	:modelValue="modelValue"
+	:modelValue="editableBlocks"
 	direction="vertical"
 	withGaps
 	canNest
 	manualDragStart
 	group="pageBlocks"
-	@update:modelValue="v => emit('update:modelValue', v)"
+	@update:modelValue="updateBlocks"
 >
 	<template #default="{ item, dragStart }">
 		<div>
@@ -30,12 +30,14 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import type { Component } from 'vue';
+import { computed } from 'vue';
 import * as Misskey from 'misskey-js';
 import XSection from '@features/pages/frontend/pages/page-editor/els/page-editor.el.section.vue';
 import XText from '@features/pages/frontend/pages/page-editor/els/page-editor.el.text.vue';
 import XImage from '@features/pages/frontend/pages/page-editor/els/page-editor.el.image.vue';
 import XNote from '@features/pages/frontend/pages/page-editor/els/page-editor.el.note.vue';
 import MkDraggable from '@features/ui/frontend/components/MkDraggable.vue';
+import { getKnownPageBlocks, replaceKnownPageBlocks } from '@features/pages/frontend/page-blocks.js';
 
 function getComponent(type: Misskey.entities.Page['content'][number]['type']): Component {
 	switch (type) {
@@ -51,26 +53,31 @@ const props = defineProps<{
 	modelValue: Misskey.entities.Page['content'];
 }>();
 
+const editableBlocks = computed(() => getKnownPageBlocks(props.modelValue));
+
 const emit = defineEmits<{
 	(ev: 'update:modelValue', value: Misskey.entities.Page['content']): void;
 }>();
 
 function updateItem(v: Misskey.entities.PageBlock) {
-	const i = props.modelValue.findIndex(x => x.id === v.id);
-	const newValue = [
-		...props.modelValue.slice(0, i),
-		v,
-		...props.modelValue.slice(i + 1),
-	];
-	emit('update:modelValue', newValue);
+	const i = editableBlocks.value.findIndex(x => x.id === v.id);
+	if (i < 0) return;
+
+	const newBlocks = [...editableBlocks.value];
+	newBlocks[i] = v;
+	updateBlocks(newBlocks);
 }
 
 function removeItem(v: Misskey.entities.PageBlock) {
-	const i = props.modelValue.findIndex(x => x.id === v.id);
-	const newValue = [
-		...props.modelValue.slice(0, i),
-		...props.modelValue.slice(i + 1),
-	];
-	emit('update:modelValue', newValue);
+	const i = editableBlocks.value.findIndex(x => x.id === v.id);
+	if (i < 0) return;
+
+	const newBlocks = [...editableBlocks.value];
+	newBlocks.splice(i, 1);
+	updateBlocks(newBlocks);
+}
+
+function updateBlocks(blocks: Misskey.entities.PageBlock[]) {
+	emit('update:modelValue', replaceKnownPageBlocks(props.modelValue, blocks));
 }
 </script>

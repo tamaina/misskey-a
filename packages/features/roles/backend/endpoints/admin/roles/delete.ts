@@ -2,54 +2,22 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-
-import { Inject, Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
-import type { RolesRepository } from '@/models/_.js';
-import { DI } from '@/di-symbols.js';
-import { ApiError } from '@/server/api/error.js';
-import { RoleService } from '@/core/RoleService.js';
-
-export const meta = {
-	tags: ['admin', 'role'],
-
-	requireCredential: true,
-	requireAdmin: true,
-	kind: 'write:admin:roles',
-
-	errors: {
-		noSuchRole: {
-			message: 'No such role.',
-			code: 'NO_SUCH_ROLE',
-			id: 'de0d6ecd-8e0a-4253-88ff-74bc89ae3d45',
-		},
-	},
-} as const;
-
-export const paramDef = {
-	type: 'object',
-	properties: {
-		roleId: { type: 'string', format: 'misskey:id' },
-	},
-	required: [
-		'roleId',
-	],
-} as const;
-
-@Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
-	constructor(
-		@Inject(DI.rolesRepository)
-		private rolesRepository: RolesRepository,
-
-		private roleService: RoleService,
-	) {
-		super(meta, paramDef, async (ps, me) => {
-			const role = await this.rolesRepository.findOneBy({ id: ps.roleId });
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import type { ApiActor } from '@features/api/backend/transport/context.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import { rolesContract } from '../../../api.definition.js';
+import type { RolesDependencies } from '../../../api.implementation.js';
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
+import { rolesErrors } from '../../../api.errors.js';
+export function createAdminRolesDeleteProcedure<Actor extends ApiActor>(deps: Pick<RolesDependencies<Actor>, 'rolesRepository' | 'roleService'>) {
+	return createApiProcedure<Actor>()(rolesContract.adminRolesDelete).use(requirePrincipal<Actor>())
+		.handler(async ({ input, context }) => {
+			const ps = input;
+			const me = context.principal;
+			const role = await deps.rolesRepository.findOneBy({ id: ps.roleId });
 			if (role == null) {
-				throw new ApiError(meta.errors.noSuchRole);
+				throw apiError(rolesErrors.adminRolesDelete.noSuchRole);
 			}
-			await this.roleService.delete(role, me);
+			await deps.roleService.delete(role, me);
 		});
-	}
 }

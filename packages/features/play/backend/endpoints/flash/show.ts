@@ -2,58 +2,27 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
+import { toPackedFlash } from '../../flash.schema.js';
 
-import { Inject, Injectable } from '@nestjs/common';
-import type { FlashsRepository } from '@/models/_.js';
-import { Endpoint } from '@/server/api/endpoint-base.js';
-import { FlashEntityService } from '@/core/entities/FlashEntityService.js';
-import { DI } from '@/di-symbols.js';
-import { ApiError } from '@/server/api/error.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 
-export const meta = {
-	tags: ['flashs'],
-
-	requireCredential: false,
-
-	res: {
-		type: 'object',
-		optional: false, nullable: false,
-		ref: 'Flash',
-	},
-
-	errors: {
-		noSuchFlash: {
-			message: 'No such flash.',
-			code: 'NO_SUCH_FLASH',
-			id: 'f0d34a1a-d29a-401d-90ba-1982122b5630',
-		},
-	},
-} as const;
-
-export const paramDef = {
-	type: 'object',
-	properties: {
-		flashId: { type: 'string', format: 'misskey:id' },
-	},
-	required: ['flashId'],
-} as const;
-
-@Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
-	constructor(
-		@Inject(DI.flashsRepository)
-		private flashsRepository: FlashsRepository,
-
-		private flashEntityService: FlashEntityService,
-	) {
-		super(meta, paramDef, async (ps, me) => {
-			const flash = await this.flashsRepository.findOneBy({ id: ps.flashId });
-
+import { flashShowContract, flashShowErrors } from './show.contract.js';
+import type { FlashsRepository } from '@features/persistence/backend/repositories/models.js';
+import type { FlashEntityService } from '../../serializers/FlashEntityService.js';
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+export interface FlashShowDependencies {
+	flashsRepository: Pick<FlashsRepository, 'findOneBy'>;
+	flashEntityService: Pick<FlashEntityService, 'pack'>;
+}
+export function createFlashShowProcedure(deps: FlashShowDependencies) {
+	return createApiProcedure<MiLocalUser>()(flashShowContract)
+		.handler(async ({ input: ps, context }) => {
+			const me = context.principal;
+			const flash = await deps.flashsRepository.findOneBy({ id: ps.flashId });
 			if (flash == null) {
-				throw new ApiError(meta.errors.noSuchFlash);
+				throw apiError(flashShowErrors.noSuchFlash);
 			}
-
-			return await this.flashEntityService.pack(flash, me);
+			return toPackedFlash(await deps.flashEntityService.pack(flash, me));
 		});
-	}
 }

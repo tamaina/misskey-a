@@ -4,7 +4,9 @@
  */
 
 import { ref, computed } from 'vue';
-import { misskeyApi } from '@/utility/misskey-api.js';
+import * as v from 'valibot';
+import { packedJsonValueSchema } from '../../../users/backend/json-value.schema.js';
+import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 
 type SaveData = {
 	gameVersion: number;
@@ -46,13 +48,15 @@ export async function load() {
 }
 
 export async function save() {
-	const current = JSON.stringify(saveData.value);
+	if (saveData.value === undefined) return;
+	const value = v.parse(packedJsonValueSchema, saveData.value);
+	const current = JSON.stringify(value);
 	if (current === prev) return;
 
 	await misskeyApi('i/registry/set', {
 		scope: ['clickerGame'],
 		key: 'saveData',
-		value: saveData.value,
+		value,
 	});
 
 	prev = current;

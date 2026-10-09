@@ -2,72 +2,33 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
+import { FeaturedService } from '../../services/FeaturedService.js';
+import { HashtagService } from '../../services/HashtagService.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 
-import { Inject, Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
-import { DI } from '@/di-symbols.js';
-import { FeaturedService } from '@/core/FeaturedService.js';
-import { HashtagService } from '@/core/HashtagService.js';
+import type { ApiContext } from '@features/api/backend/transport/context.js';
+import { discoveryContract, type DiscoveryInputs } from '../discovery.contract.js';
+export interface HashtagsTrendDependencies {
+	featuredService: FeaturedService;
+	hashtagService: HashtagService;
+}
+export function createHashtagsTrendProcedure<Actor extends MiLocalUser>(deps: HashtagsTrendDependencies) {
+	const handler = async (_request: { input: DiscoveryInputs['hashtags/trend']; context: ApiContext<Actor> & { principal: Actor | null } }) => {
+		const ranking = await deps.featuredService.getHashtagsRanking(10);
 
-export const meta = {
-	tags: ['hashtags'],
+		const charts = ranking.length === 0 ? {} : await deps.hashtagService.getCharts(ranking, 20);
 
-	requireCredential: false,
-	allowGet: true,
-	cacheSec: 60 * 1,
+		const stats = ranking.map(tag => ({
+			tag,
+			chart: charts[tag],
+			usersCount: Math.max(...charts[tag]),
+		}));
 
-	res: {
-		type: 'array',
-		optional: false, nullable: false,
-		items: {
-			type: 'object',
-			optional: false, nullable: false,
-			properties: {
-				tag: {
-					type: 'string',
-					optional: false, nullable: false,
-				},
-				chart: {
-					type: 'array',
-					optional: false, nullable: false,
-					items: {
-						type: 'number',
-						optional: false, nullable: false,
-					},
-				},
-				usersCount: {
-					type: 'number',
-					optional: false, nullable: false,
-				},
-			},
-		},
-	},
-} as const;
-
-export const paramDef = {
-	type: 'object',
-	properties: {},
-	required: [],
-} as const;
-
-@Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
-	constructor(
-		private featuredService: FeaturedService,
-		private hashtagService: HashtagService,
-	) {
-		super(meta, paramDef, async () => {
-			const ranking = await this.featuredService.getHashtagsRanking(10);
-
-			const charts = ranking.length === 0 ? {} : await this.hashtagService.getCharts(ranking, 20);
-
-			const stats = ranking.map((tag, i) => ({
-				tag,
-				chart: charts[tag],
-				usersCount: Math.max(...charts[tag]),
-			}));
-
-			return stats;
-		});
-	}
+		return stats;
+	};
+	return {
+		canonical: createApiProcedure<Actor>()(discoveryContract['hashtags/trend']).handler(handler),
+		get: createApiProcedure<Actor>()(discoveryContract['hashtags/trend:get']).handler(handler),
+	};
 }

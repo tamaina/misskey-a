@@ -1,0 +1,29 @@
+/*
+ * SPDX-FileCopyrightText: syuilo and misskey-project
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
+
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import type { ApiActor } from '@features/api/backend/transport/context.js';
+import { collectionsContract } from '../../api.definition.js';
+import type { CollectionsDependencies } from '../../api.implementation.js';
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
+import { collectionsErrors } from '../../api.errors.js';
+import { ClipService } from '../../services/ClipService.js';
+export interface ClipsAddNoteDependencies<Actor extends ApiActor> {
+	clipService: Pick<CollectionsDependencies<Actor>['clipService'], 'addNote'>;
+}
+export function createClipsAddNoteProcedure<Actor extends ApiActor>(deps: ClipsAddNoteDependencies<Actor>) {
+	return createApiProcedure<Actor>()(collectionsContract.clipsAddNote).use(requirePrincipal<Actor>())
+		.handler(async ({ input: ps, context }) => {
+			const me = context.principal;
+			try { await deps.clipService.addNote(me, ps.clipId, ps.noteId); } catch (error) {
+				if (error instanceof ClipService.NoSuchClipError) throw apiError(collectionsErrors.clipsAddNote.noSuchClip);
+				if (error instanceof ClipService.NoSuchNoteError) throw apiError(collectionsErrors.clipsAddNote.noSuchNote);
+				if (error instanceof ClipService.AlreadyAddedError) throw apiError(collectionsErrors.clipsAddNote.alreadyClipped);
+				if (error instanceof ClipService.TooManyClipNotesError) throw apiError(collectionsErrors.clipsAddNote.tooManyClipNotes);
+				throw error;
+			}
+		});
+}

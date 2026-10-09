@@ -5,7 +5,7 @@
 
 import { onUnmounted, onDeactivated, ref } from 'vue';
 import type { Chart, ChartType, TooltipModel } from 'chart.js';
-import * as os from '@/os.js';
+import * as os from '@features/ui/frontend/os.js';
 import MkChartTooltip from '@features/statistics/frontend/components/MkChartTooltip.vue';
 
 export function useChartTooltip(opts: { position: 'top' | 'middle' } = { position: 'top' }) {

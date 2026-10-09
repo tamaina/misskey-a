@@ -14,8 +14,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script lang="ts" setup>
 import { onMounted, ref } from 'vue';
 import MkUrlPreview from '@features/markup/frontend/components/MkUrlPreview.vue';
-import * as os from '@/os.js';
-import { prefer } from '@/preferences.js';
+import * as os from '@features/ui/frontend/os.js';
+import { prefer } from '@features/preferences/frontend/preferences.js';
 
 const props = defineProps<{
 	showing: boolean;

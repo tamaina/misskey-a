@@ -1,0 +1,67 @@
+/*
+ * SPDX-FileCopyrightText: syuilo and misskey-project
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
+
+import type { SigninHistoryRepository } from '../session-signin-repository.js';
+import { Inject, Injectable } from '@nestjs/common';
+import { DI } from '@/di-symbols.js';
+import type { UserProfilesRepository } from '@features/persistence/backend/repositories/models.js';
+import { IdService } from '@features/runtime/backend/services/IdService.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
+import { SigninEntityService } from '@features/auth/backend/serializers/SigninEntityService.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
+import { EmailService } from '@features/email/backend/services/EmailService.js';
+import { NotificationService } from '@features/notifications/backend/services/NotificationService.js';
+import type { AuthSessionRequest, AuthSessionEffects } from '../session.effects.js';
+import { toSessionHeaders } from '../session.schema.js';
+
+@Injectable()
+export class SigninService {
+	constructor(
+		@Inject(DI.signinsRepository)
+		private signinsRepository: SigninHistoryRepository,
+
+		@Inject(DI.userProfilesRepository)
+		private userProfilesRepository: UserProfilesRepository,
+
+		private signinEntityService: SigninEntityService,
+		private emailService: EmailService,
+		private notificationService: NotificationService,
+		private idService: IdService,
+		private globalEventService: GlobalEventService,
+	) {
+	}
+
+	@bindThis
+	public signin(request: AuthSessionRequest, reply: AuthSessionEffects, user: Pick<MiLocalUser, 'id' | 'token'>): { finished: true; id: string; i: string | null } {
+		setImmediate(async () => {
+			this.notificationService.createNotification(user.id, 'login', {});
+
+			const record = await this.signinsRepository.insertOne({
+				id: this.idService.gen(),
+				userId: user.id,
+				ip: request.ip,
+				headers: toSessionHeaders(request.headers),
+				success: true,
+			});
+
+			this.globalEventService.publishMainStream(user.id, 'signin', await this.signinEntityService.pack(record));
+
+			const profile = await this.userProfilesRepository.findOneByOrFail({ userId: user.id });
+			if (profile.email && profile.emailVerified) {
+				this.emailService.sendEmail(profile.email, 'New login / ログインがありました',
+					'There is a new login. If you do not recognize this login, update the security status of your account, including changing your password. / 新しいログインがありました。このログインに心当たりがない場合は、パスワードを変更するなど、アカウントのセキュリティ状態を更新してください。',
+					'There is a new login. If you do not recognize this login, update the security status of your account, including changing your password. / 新しいログインがありました。このログインに心当たりがない場合は、パスワードを変更するなど、アカウントのセキュリティ状態を更新してください。');
+			}
+		});
+
+		reply.code(200);
+		return {
+			finished: true,
+			id: user.id,
+			i: user.token,
+		};
+	}
+}

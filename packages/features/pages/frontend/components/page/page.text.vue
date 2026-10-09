@@ -17,7 +17,7 @@ import { defineAsyncComponent } from 'vue';
 import * as mfm from 'mfm-js';
 import * as Misskey from 'misskey-js';
 import { extractUrlFromMfm } from '@features/markup/frontend/utility/extract-url-from-mfm.js';
-import { isEnabledUrlPreview } from '@/utility/url-preview.js';
+import { isEnabledUrlPreview } from '@features/markup/frontend/utility/url-preview.js';
 
 const MkUrlPreview = defineAsyncComponent(() => import('@features/markup/frontend/components/MkUrlPreview.vue'));
 

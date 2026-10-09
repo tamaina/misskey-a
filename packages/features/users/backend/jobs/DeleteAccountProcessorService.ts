@@ -6,18 +6,18 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { MoreThan } from 'typeorm';
 import { DI } from '@/di-symbols.js';
-import type { DriveFilesRepository, NotesRepository, PagesRepository, UserProfilesRepository, UsersRepository } from '@/models/_.js';
-import type Logger from '@/logger.js';
-import { DriveService } from '@/core/DriveService.js';
-import type { MiDriveFile } from '@/models/DriveFile.js';
-import type { MiNote } from '@/models/Note.js';
-import { EmailService } from '@/core/EmailService.js';
-import { bindThis } from '@/decorators.js';
-import { SearchService } from '@/core/SearchService.js';
-import { PageService } from '@/core/PageService.js';
-import { QueueLoggerService } from '@/queue/QueueLoggerService.js';
+import type { DriveFilesRepository, NotesRepository, PagesRepository, UserProfilesRepository, UsersRepository } from '@features/persistence/backend/repositories/models.js';
+import type { Logger } from '@features/runtime/backend/logging/logger.js';
+import { DriveService } from '@features/drive/backend/services/DriveService.js';
+import type { MiDriveFile } from '@features/drive/backend/models/DriveFile.js';
+import type { MiNote } from '@features/notes/backend/models/Note.js';
+import { EmailService } from '@features/email/backend/services/EmailService.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
+import { SearchService } from '@features/note-search/backend/services/SearchService.js';
+import { PageService } from '@features/pages/backend/services/PageService.js';
+import { QueueLoggerService } from '@features/runtime/backend/queue/QueueLoggerService.js';
 import type * as Bull from 'bullmq';
-import type { DbUserDeleteJobData } from '@/queue/types.js';
+import type { DbUserDeleteJobData } from '@features/runtime/backend/queue/types.js';
 
 @Injectable()
 export class DeleteAccountProcessorService {

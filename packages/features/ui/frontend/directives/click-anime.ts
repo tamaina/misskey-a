@@ -4,7 +4,7 @@
  */
 
 import type { Directive } from 'vue';
-import { prefer } from '@/preferences.js';
+import { prefer } from '@features/preferences/frontend/preferences.js';
 
 const abortControllers = new WeakMap<HTMLElement, AbortController>();
 

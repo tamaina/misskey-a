@@ -3,67 +3,38 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Inject, Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
-import type { FollowingsRepository } from '@/models/_.js';
-import { QueryService } from '@/core/QueryService.js';
-import { FollowingEntityService } from '@/core/entities/FollowingEntityService.js';
-import { RoleService } from '@/core/RoleService.js';
-import { DI } from '@/di-symbols.js';
+import { toPackedFollowing } from '@features/relationships/backend/endpoints/relationships.schema.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 
-export const meta = {
-	tags: ['federation'],
-
-	requireCredential: false,
-
-	res: {
-		type: 'array',
-		optional: false, nullable: false,
-		items: {
-			type: 'object',
-			optional: false, nullable: false,
-			ref: 'Following',
-		},
-	},
-} as const;
-
-export const paramDef = {
-	type: 'object',
-	properties: {
-		host: { type: 'string' },
-		sinceId: { type: 'string', format: 'misskey:id' },
-		untilId: { type: 'string', format: 'misskey:id' },
-		sinceDate: { type: 'integer' },
-		untilDate: { type: 'integer' },
-		limit: { type: 'integer', minimum: 1, maximum: 100, default: 10 },
-	},
-	required: ['host'],
-} as const;
-
-@Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
-	constructor(
-		@Inject(DI.followingsRepository)
-		private followingsRepository: FollowingsRepository,
-
-		private followingEntityService: FollowingEntityService,
-		private queryService: QueryService,
-		private roleService: RoleService,
-	) {
-		super(meta, paramDef, async (ps, me) => {
-			const query = this.queryService.makePaginationQuery(this.followingsRepository.createQueryBuilder('following'), ps.sinceId, ps.untilId, ps.sinceDate, ps.untilDate)
-				.andWhere('following.followeeHost = :host', { host: ps.host })
-				.andWhere('following.isFollowerSuspended = false');
-
-			if (!await this.roleService.isModerator(me)) {
-				this.queryService.generateFollowingRelationVisibilityQuery(query, 'followers', me);
-			}
-
-			const followings = await query
-				.limit(ps.limit)
-				.getMany();
-
-			return await this.followingEntityService.packMany(followings, me, { populateFollowee: true });
+import type { ApiActor } from '../../../../api/backend/transport/context.js';
+import { federationFollowersContract } from './followers.contract.js';
+import type { FollowingsRepository } from '../../../../persistence/backend/repositories/models.js';
+import type { QueryService } from '../../../../notes/backend/services/QueryService.js';
+import type { FollowingEntityService } from '../../../../relationships/backend/serializers/FollowingEntityService.js';
+import type { RoleService } from '../../../../roles/backend/services/RoleService.js';
+export interface FederationFollowersDependencies {
+	followingsRepository: Pick<FollowingsRepository, 'createQueryBuilder'>;
+	followingEntityService: Pick<FollowingEntityService, 'packMany'>;
+	queryService: Pick<QueryService, 'makePaginationQuery' | 'generateFollowingRelationVisibilityQuery'>;
+	roleService: Pick<RoleService, 'isModerator'>;
+}
+export function createFederationFollowersProcedure<Actor extends ApiActor>(deps: FederationFollowersDependencies) {
+	return createApiProcedure<Actor>()(federationFollowersContract)
+		.handler(async ({ input, context }) => {
+			const ps = input;
+			const me = context.principal;
+			const result = await (async () => {
+				const query = deps.queryService.makePaginationQuery(deps.followingsRepository.createQueryBuilder('following'), ps.sinceId, ps.untilId, ps.sinceDate, ps.untilDate)
+					.andWhere('following.followeeHost = :host', { host: ps.host })
+					.andWhere('following.isFollowerSuspended = false');
+				if (!await deps.roleService.isModerator(me)) {
+					deps.queryService.generateFollowingRelationVisibilityQuery(query, 'followers', me);
+				}
+				const followings = await query
+					.limit(ps.limit)
+					.getMany();
+				return (await deps.followingEntityService.packMany(followings, me, { populateFollowee: true })).map(toPackedFollowing);
+			})();
+			return result;
 		});
-	}
 }

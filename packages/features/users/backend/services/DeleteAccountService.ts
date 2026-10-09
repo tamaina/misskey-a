@@ -5,15 +5,15 @@
 
 import { Inject, Injectable } from '@nestjs/common';
 import { Not, IsNull } from 'typeorm';
-import type { FollowingsRepository, MiMeta, MiUser, UsersRepository } from '@/models/_.js';
-import { QueueService } from '@/core/QueueService.js';
+import type { FollowingsRepository, MiMeta, MiUser, UsersRepository } from '@features/persistence/backend/repositories/models.js';
+import { QueueService } from '@features/runtime/backend/services/QueueService.js';
 import { DI } from '@/di-symbols.js';
-import { bindThis } from '@/decorators.js';
-import { GlobalEventService } from '@/core/GlobalEventService.js';
-import { UserEntityService } from '@/core/entities/UserEntityService.js';
-import { ApRendererService } from '@/core/activitypub/ApRendererService.js';
-import { ModerationLogService } from '@/core/ModerationLogService.js';
-import { SystemAccountService } from '@/core/SystemAccountService.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
+import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
+import { UserEntityService } from '../serializers/UserEntityService.js';
+import { ApRendererService } from '@features/federation/backend/services/ApRendererService.js';
+import { ModerationLogService } from '@features/moderation/backend/services/ModerationLogService.js';
+import { SystemAccountService } from './SystemAccountService.js';
 
 @Injectable()
 export class DeleteAccountService {

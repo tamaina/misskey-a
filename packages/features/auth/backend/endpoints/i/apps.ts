@@ -2,81 +2,28 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import type { AccessTokensRepository } from '@features/persistence/backend/repositories/models.js';
+import { IdService } from '@features/runtime/backend/services/IdService.js';
 
-import { Inject, Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
-import type { AccessTokensRepository } from '@/models/_.js';
-import { DI } from '@/di-symbols.js';
-import { IdService } from '@/core/IdService.js';
+import { IAppsContract } from '../../api.definition.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
 
 export const meta = {
-	requireCredential: true,
 
-	secure: true,
-
-	res: {
-		type: 'array',
-		items: {
-			type: 'object',
-			properties: {
-				id: {
-					type: 'string',
-					optional: false,
-					format: 'misskey:id',
-				},
-				name: {
-					type: 'string',
-					optional: true,
-				},
-				createdAt: {
-					type: 'string',
-					optional: false,
-					format: 'date-time',
-				},
-				lastUsedAt: {
-					type: 'string',
-					optional: true,
-					format: 'date-time',
-				},
-				permission: {
-					type: 'array',
-					optional: false,
-					uniqueItems: true,
-					items: {
-						type: 'string',
-					},
-				},
-				iconUrl: {
-					type: 'string',
-					optional: true, nullable: true,
-				},
-				description: {
-					type: 'string',
-					optional: true, nullable: true,
-				},
-			},
-		},
-	},
 } as const;
-
-export const paramDef = {
-	type: 'object',
-	properties: {
-		sort: { type: 'string', enum: ['+createdAt', '-createdAt', '+lastUsedAt', '-lastUsedAt'] },
-	},
-	required: [],
-} as const;
-
-@Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
-	constructor(
-		@Inject(DI.accessTokensRepository)
-		private accessTokensRepository: AccessTokensRepository,
-
-		private idService: IdService,
-	) {
-		super(meta, paramDef, async (ps, me) => {
-			const query = this.accessTokensRepository.createQueryBuilder('token')
+export interface IAppsDependencies {
+	accessTokensRepository: AccessTokensRepository;
+	idService: Pick<IdService, 'parse'>;
+}
+export function createIAppsProcedure(deps: IAppsDependencies) {
+	return createApiProcedure<MiLocalUser>()(IAppsContract).use(requirePrincipal<MiLocalUser>()).handler(async ({ input, context }) => {
+		const ps = input;
+		const me = context.principal;
+		const result = await (async () => {
+			const query = deps.accessTokensRepository.createQueryBuilder('token')
 				.where('token.userId = :userId', { userId: me.id })
 				.leftJoinAndSelect('token.app', 'app');
 
@@ -93,12 +40,13 @@ export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDe
 			return await Promise.all(tokens.map(token => ({
 				id: token.id,
 				name: token.name ?? token.app?.name,
-				createdAt: this.idService.parse(token.id).date.toISOString(),
+				createdAt: deps.idService.parse(token.id).date.toISOString(),
 				lastUsedAt: token.lastUsedAt?.toISOString(),
 				permission: token.app ? token.app.permission : token.permission,
 				iconUrl: token.iconUrl,
 				description: token.description ?? token.app?.description ?? null,
 			})));
-		});
-	}
+		})();
+		return result;
+	});
 }

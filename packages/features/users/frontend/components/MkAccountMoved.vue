@@ -15,8 +15,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 import { ref } from 'vue';
 import * as Misskey from 'misskey-js';
 import MkMention from '@features/users/frontend/components/MkMention.vue';
-import { host as localHost } from '@@/js/config.js';
-import { misskeyApi } from '@/utility/misskey-api.js';
+import { host as localHost } from '@features/boot/frontend/shared/config.js';
+import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 
 const user = ref<Misskey.entities.UserLite>();
 

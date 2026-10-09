@@ -2,132 +2,32 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-
-import { loadSystemInformation } from '@/runtime-dependencies/systeminformation.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 import * as os from 'node:os';
-import { Inject, Injectable } from '@nestjs/common';
-import { DataSource } from 'typeorm';
-import * as Redis from 'ioredis';
-import { Endpoint } from '@/server/api/endpoint-base.js';
-import { DI } from '@/di-symbols.js';
-
-export const meta = {
-	requireCredential: true,
-	requireModerator: true,
-	kind: 'read:admin:server-info',
-
-	tags: ['admin', 'meta'],
-
-	res: {
-		type: 'object',
-		optional: false, nullable: false,
-		properties: {
-			machine: {
-				type: 'string',
-				optional: false, nullable: false,
-			},
-			os: {
-				type: 'string',
-				optional: false, nullable: false,
-				example: 'linux',
-			},
-			node: {
-				type: 'string',
-				optional: false, nullable: false,
-			},
-			psql: {
-				type: 'string',
-				optional: false, nullable: false,
-			},
-			cpu: {
-				type: 'object',
-				optional: false, nullable: false,
-				properties: {
-					model: {
-						type: 'string',
-						optional: false, nullable: false,
-					},
-					cores: {
-						type: 'number',
-						optional: false, nullable: false,
-					},
-				},
-			},
-			mem: {
-				type: 'object',
-				optional: false, nullable: false,
-				properties: {
-					total: {
-						type: 'number',
-						optional: false, nullable: false,
-						format: 'bytes',
-					},
-				},
-			},
-			fs: {
-				type: 'object',
-				optional: false, nullable: false,
-				properties: {
-					total: {
-						type: 'number',
-						optional: false, nullable: false,
-						format: 'bytes',
-					},
-					used: {
-						type: 'number',
-						optional: false, nullable: false,
-						format: 'bytes',
-					},
-				},
-			},
-			net: {
-				type: 'object',
-				optional: false, nullable: false,
-				properties: {
-					interface: {
-						type: 'string',
-						optional: false, nullable: false,
-						example: 'eth0',
-					},
-				},
-			},
-		},
-	},
-} as const;
-
-export const paramDef = {
-	type: 'object',
-	properties: {},
-	required: [],
-} as const;
-
-@Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
-	constructor(
-		@Inject(DI.db)
-		private db: DataSource,
-
-		@Inject(DI.redis)
-		private redisClient: Redis.Redis,
-
-	) {
-		super(meta, paramDef, async () => {
+import * as v from 'valibot';
+import { loadSystemInformation } from '@features/statistics/backend/runtime-dependencies/systeminformation.js';
+import type { ApiActor } from '@features/api/backend/transport/context.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import { adminServerInfoContract } from './server-info.contract.js';
+import type { InstanceApiDependencies } from '../../api.implementation.js';
+export type AdminServerInfoDependencies = Pick<InstanceApiDependencies, 'redisClient' | 'db'>;
+export function createAdminServerInfoProcedure<Actor extends ApiActor>(deps: AdminServerInfoDependencies) {
+	return createApiProcedure<Actor>()(adminServerInfoContract)
+		.use(requirePrincipal<Actor>())
+		.handler(async ({ input, context }) => {
 			const si = await loadSystemInformation();
-
 			const memStats = await si.mem();
 			const fsStats = await si.fsSize();
 			const netInterface = await si.networkInterfaceDefault();
-
-			const redisServerInfo = await this.redisClient.info('Server');
+			const redisServerInfo = await deps.redisClient.info('Server');
 			const m = redisServerInfo.match(new RegExp('^redis_version:(.*)', 'm'));
 			const redis_version = m?.[1];
-
 			return {
 				machine: os.hostname(),
 				os: os.platform(),
 				node: process.version,
-				psql: await this.db.query('SHOW server_version').then(x => x[0].server_version),
-				redis: redis_version,
+				psql: v.parse(v.array(v.object({ server_version: v.string() })), await deps.db.query<unknown>('SHOW server_version'))[0].server_version,
+				...(redis_version === undefined ? {} : { redis: redis_version }),
 				cpu: {
 					model: os.cpus()[0].model,
 					cores: os.cpus().length,
@@ -144,5 +44,4 @@ export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDe
 				},
 			};
 		});
-	}
 }

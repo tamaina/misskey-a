@@ -2,17 +2,13 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
+import type { MiSignin } from '../models/Signin.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
+import type { IdService } from '@features/runtime/backend/services/IdService.js';
 
-import { Injectable } from '@nestjs/common';
-import type { } from '@/models/Blocking.js';
-import type { MiSignin } from '@/models/Signin.js';
-import { bindThis } from '@/decorators.js';
-import { IdService } from '@/core/IdService.js';
-
-@Injectable()
 export class SigninEntityService {
 	constructor(
-		private idService: IdService,
+		private idService: Pick<IdService, 'parse'>,
 	) {
 	}
 

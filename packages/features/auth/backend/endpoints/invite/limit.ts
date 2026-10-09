@@ -2,60 +2,42 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-
-import { Inject, Injectable } from '@nestjs/common';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 import { MoreThan } from 'typeorm';
-import { Endpoint } from '@/server/api/endpoint-base.js';
-import type { RegistrationTicketsRepository } from '@/models/_.js';
-import { RoleService } from '@/core/RoleService.js';
-import { DI } from '@/di-symbols.js';
-import { IdService } from '@/core/IdService.js';
+
+import type { RegistrationTicketsRepository } from '@features/persistence/backend/repositories/models.js';
+import { RoleService } from '@features/roles/backend/services/RoleService.js';
+import { IdService } from '@features/runtime/backend/services/IdService.js';
+
+import { InviteLimitContract } from '../../api.definition.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
 
 export const meta = {
 	tags: ['meta'],
 
-	requireCredential: true,
-	requiredRolePolicy: 'canInvite',
-	kind: 'read:invite-codes',
-
-	res: {
-		type: 'object',
-		optional: false, nullable: false,
-		properties: {
-			remaining: {
-				type: 'integer',
-				optional: false, nullable: true,
-			},
-		},
-	},
 } as const;
+export interface InviteLimitDependencies {
+	registrationTicketsRepository: RegistrationTicketsRepository;
+	roleService: Pick<RoleService, 'getUserPolicies'>;
+	idService: Pick<IdService, 'gen'>;
+}
+export function createInviteLimitProcedure(deps: InviteLimitDependencies) {
+	return createApiProcedure<MiLocalUser>()(InviteLimitContract).use(requirePrincipal<MiLocalUser>()).handler(async ({ input, context }) => {
+		const me = context.principal;
+		const result = await (async () => {
+			const policies = await deps.roleService.getUserPolicies(me.id);
 
-export const paramDef = {
-	type: 'object',
-	properties: {},
-	required: [],
-} as const;
-
-@Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
-	constructor(
-		@Inject(DI.registrationTicketsRepository)
-		private registrationTicketsRepository: RegistrationTicketsRepository,
-
-		private roleService: RoleService,
-		private idService: IdService,
-	) {
-		super(meta, paramDef, async (ps, me) => {
-			const policies = await this.roleService.getUserPolicies(me.id);
-
-			const count = policies.inviteLimit ? await this.registrationTicketsRepository.countBy({
-				id: MoreThan(this.idService.gen(Date.now() - (policies.inviteLimitCycle * 60 * 1000))),
+			const count = policies.inviteLimit ? await deps.registrationTicketsRepository.countBy({
+				id: MoreThan(deps.idService.gen(Date.now() - (policies.inviteLimitCycle * 60 * 1000))),
 				createdById: me.id,
 			}) : null;
 
 			return {
 				remaining: count !== null ? Math.max(0, policies.inviteLimit - count) : null,
 			};
-		});
-	}
+		})();
+		return result;
+	});
 }

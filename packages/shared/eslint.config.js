@@ -2,7 +2,9 @@ import globals from 'globals';
 import pluginMisskey from '@misskey-dev/eslint-plugin';
 
 export default [
-	...pluginMisskey.configs['recommended'],
+	...pluginMisskey.configs['recommended'].map(config => config.files?.includes('**/*.ts')
+		? { ...config, files: [...config.files, '**/*.mts'] }
+		: config),
 	{
 		files: ['**/*.cjs'],
 		languageOptions: {
@@ -45,7 +47,7 @@ export default [
 	},
 	{
 		// typescript
-		files: ['**/*.ts', '**/*.tsx'],
+		files: ['**/*.ts', '**/*.tsx', '**/*.mts'],
 		rules: {
 			'@typescript-eslint/no-unused-vars': ['warn', {
 				'args': 'all',

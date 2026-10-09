@@ -3,16 +3,20 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import * as v from 'valibot';
+import { packedJsonValueSchema, type PackedJsonValue } from '@features/users/backend/json-value.schema.js';
+type CaptchaProvider = typeof supportedCaptchaProviders[number];
 import { Injectable } from '@nestjs/common';
-import { HttpRequestService } from '@/core/HttpRequestService.js';
-import { bindThis } from '@/decorators.js';
-import { MetaService } from '@/core/MetaService.js';
-import { MiMeta } from '@/models/Meta.js';
-import Logger from '@/logger.js';
-import { LoggerService } from '@/core/LoggerService.js';
+import { HttpRequestService } from '@features/runtime/backend/services/HttpRequestService.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
+import { MetaService } from '@features/instance/backend/services/MetaService.js';
+import { MiMeta } from '@features/instance/backend/models/Meta.js';
+import { Logger } from '@features/runtime/backend/logging/logger.js';
+import { LoggerService } from '@features/runtime/backend/services/LoggerService.js';
+import { supportedCaptchaProviders } from '../auth.schema.js';
 
-export const supportedCaptchaProviders = ['none', 'hcaptcha', 'mcaptcha', 'recaptcha', 'turnstile', 'testcaptcha'] as const;
-export type CaptchaProvider = typeof supportedCaptchaProviders[number];
+export { supportedCaptchaProviders } from '../auth.schema.js';
+export type { CaptchaProvider };
 
 export const captchaErrorCodes = {
 	invalidProvider: Symbol('invalidProvider'),
@@ -66,10 +70,20 @@ export type CaptchaSaveFailure = {
 };
 export type CaptchaSaveResult = CaptchaSaveSuccess | CaptchaSaveFailure;
 
-type CaptchaResponse = {
-	success: boolean;
-	'error-codes'?: string[];
-};
+type CaptchaResponse = PackedJsonValue;
+
+function captchaField(response: PackedJsonValue, name: string): PackedJsonValue | undefined {
+	if (response === null) throw new TypeError('Cannot read properties of null');
+	if (typeof response === 'object' && !Array.isArray(response)) return response[name];
+	return undefined;
+}
+
+function captchaErrorText(response: PackedJsonValue): string {
+	const codes = captchaField(response, 'error-codes');
+	if (!codes) return '';
+	if (!Array.isArray(codes)) throw new TypeError('result.error-codes.join is not a function');
+	return codes.join(', ');
+}
 
 @Injectable()
 export class CaptchaService {
@@ -84,10 +98,10 @@ export class CaptchaService {
 	}
 
 	@bindThis
-	private async getCaptchaResponse(url: string, secret: string, response: string): Promise<CaptchaResponse> {
+	private async getCaptchaResponse(url: string, secret: string, response: PackedJsonValue): Promise<CaptchaResponse> {
 		const params = new URLSearchParams({
 			secret,
-			response,
+			response: String(response),
 		});
 
 		const res = await this.httpRequestService.send(url, {
@@ -102,11 +116,11 @@ export class CaptchaService {
 			throw new Error(`${res.status}`);
 		}
 
-		return await res.json() as CaptchaResponse;
+		return v.parse(packedJsonValueSchema, await res.json());
 	}
 
 	@bindThis
-	public async verifyRecaptcha(secret: string, response: string | null | undefined): Promise<void> {
+	public async verifyRecaptcha(secret: string, response: PackedJsonValue | undefined): Promise<void> {
 		if (response == null) {
 			throw new CaptchaError(captchaErrorCodes.noResponseProvided, 'recaptcha-failed: no response provided');
 		}
@@ -115,14 +129,14 @@ export class CaptchaService {
 			throw new CaptchaError(captchaErrorCodes.requestFailed, `recaptcha-request-failed: ${err}`);
 		});
 
-		if (result.success !== true) {
-			const errorCodes = result['error-codes'] ? result['error-codes'].join(', ') : '';
+		if (captchaField(result, 'success') !== true) {
+			const errorCodes = captchaErrorText(result);
 			throw new CaptchaError(captchaErrorCodes.verificationFailed, `recaptcha-failed: ${errorCodes}`);
 		}
 	}
 
 	@bindThis
-	public async verifyHcaptcha(secret: string, response: string | null | undefined): Promise<void> {
+	public async verifyHcaptcha(secret: string, response: PackedJsonValue | undefined): Promise<void> {
 		if (response == null) {
 			throw new CaptchaError(captchaErrorCodes.noResponseProvided, 'hcaptcha-failed: no response provided');
 		}
@@ -131,15 +145,15 @@ export class CaptchaService {
 			throw new CaptchaError(captchaErrorCodes.requestFailed, `hcaptcha-request-failed: ${err}`);
 		});
 
-		if (result.success !== true) {
-			const errorCodes = result['error-codes'] ? result['error-codes'].join(', ') : '';
+		if (captchaField(result, 'success') !== true) {
+			const errorCodes = captchaErrorText(result);
 			throw new CaptchaError(captchaErrorCodes.verificationFailed, `hcaptcha-failed: ${errorCodes}`);
 		}
 	}
 
 	// https://codeberg.org/Gusted/mCaptcha/src/branch/main/mcaptcha.go
 	@bindThis
-	public async verifyMcaptcha(secret: string, siteKey: string, instanceHost: string, response: string | null | undefined): Promise<void> {
+	public async verifyMcaptcha(secret: string, siteKey: string, instanceHost: string, response: PackedJsonValue | undefined): Promise<void> {
 		if (response == null) {
 			throw new CaptchaError(captchaErrorCodes.noResponseProvided, 'mcaptcha-failed: no response provided');
 		}
@@ -161,15 +175,15 @@ export class CaptchaService {
 			throw new CaptchaError(captchaErrorCodes.requestFailed, 'mcaptcha-failed: mcaptcha didn\'t return 200 OK');
 		}
 
-		const resp = (await result.json()) as { valid: boolean };
+		const resp = v.parse(packedJsonValueSchema, await result.json());
 
-		if (!resp.valid) {
+		if (!captchaField(resp, 'valid')) {
 			throw new CaptchaError(captchaErrorCodes.verificationFailed, 'mcaptcha-request-failed');
 		}
 	}
 
 	@bindThis
-	public async verifyTurnstile(secret: string, response: string | null | undefined): Promise<void> {
+	public async verifyTurnstile(secret: string, response: PackedJsonValue | undefined): Promise<void> {
 		if (response == null) {
 			throw new CaptchaError(captchaErrorCodes.noResponseProvided, 'turnstile-failed: no response provided');
 		}
@@ -178,14 +192,14 @@ export class CaptchaService {
 			throw new CaptchaError(captchaErrorCodes.requestFailed, `turnstile-request-failed: ${err}`);
 		});
 
-		if (result.success !== true) {
-			const errorCodes = result['error-codes'] ? result['error-codes'].join(', ') : '';
+		if (captchaField(result, 'success') !== true) {
+			const errorCodes = captchaErrorText(result);
 			throw new CaptchaError(captchaErrorCodes.verificationFailed, `turnstile-failed: ${errorCodes}`);
 		}
 	}
 
 	@bindThis
-	public async verifyTestcaptcha(response: string | null | undefined): Promise<void> {
+	public async verifyTestcaptcha(response: PackedJsonValue | undefined): Promise<void> {
 		if (response == null) {
 			throw new CaptchaError(captchaErrorCodes.noResponseProvided, 'testcaptcha-failed: no response provided');
 		}
@@ -331,7 +345,7 @@ export class CaptchaService {
 		}[provider];
 
 		return operation()
-			.then(() => ({ success: true }) as CaptchaSaveSuccess)
+			.then((): CaptchaSaveSuccess => ({ success: true }))
 			.catch(err => {
 				this.logger.info(err);
 				const error = err instanceof CaptchaError

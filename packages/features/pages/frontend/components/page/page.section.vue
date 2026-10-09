@@ -17,22 +17,25 @@ SPDX-License-Identifier: AGPL-3.0-only
 	</component>
 
 	<div class="_gaps">
-		<XBlock v-for="child in block.children" :key="child.id" :page="page" :block="child" :h="h + 1"/>
+		<XBlock v-for="child in renderableBlocks" :key="child.id" :page="page" :block="child" :h="h + 1"/>
 	</div>
 </section>
 </template>
 
 <script lang="ts" setup>
-import { defineAsyncComponent } from 'vue';
+import { computed, defineAsyncComponent } from 'vue';
 import * as Misskey from 'misskey-js';
+import { isKnownPageBlock } from '@features/pages/frontend/page-blocks.js';
 
 const XBlock = defineAsyncComponent(() => import('@features/pages/frontend/components/page/page.block.vue'));
 
-defineProps<{
+const props = defineProps<{
 	block: Extract<Misskey.entities.PageBlock, { type: 'section' }>,
 	h: number,
 	page: Misskey.entities.Page,
 }>();
+
+const renderableBlocks = computed(() => props.block.children.filter(isKnownPageBlock));
 </script>
 
 <style lang="scss" module>

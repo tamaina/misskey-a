@@ -3,61 +3,38 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Inject, Injectable } from '@nestjs/common';
-import type { PagesRepository } from '@/models/_.js';
-import { Endpoint } from '@/server/api/endpoint-base.js';
-import { UserEntityService } from '@/core/entities/UserEntityService.js';
-import { GlobalEventService } from '@/core/GlobalEventService.js';
-import { DI } from '@/di-symbols.js';
-import { ApiError } from '@/server/api/error.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 
-export const meta = {
-	requireCredential: true,
-	secure: true,
+import { requirePrincipal } from '../../../api/backend/transport/middleware.js';
 
-	errors: {
-		noSuchPage: {
-			message: 'No such page.',
-			code: 'NO_SUCH_PAGE',
-			id: '4a13ad31-6729-46b4-b9af-e86b265c2e74',
-		},
-	},
-} as const;
-
-export const paramDef = {
-	type: 'object',
-	properties: {
-		pageId: { type: 'string', format: 'misskey:id' },
-		event: { type: 'string' },
-		var: {},
-	},
-	required: ['pageId', 'event'],
-} as const;
-
-@Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
-	constructor(
-		@Inject(DI.pagesRepository)
-		private pagesRepository: PagesRepository,
-
-		private userEntityService: UserEntityService,
-		private globalEventService: GlobalEventService,
-	) {
-		super(meta, paramDef, async (ps, me) => {
-			const page = await this.pagesRepository.findOneBy({ id: ps.pageId });
+import { pagePushContract, pagePushErrors } from './page-push.contract.js';
+import type { PagesRepository } from '@features/persistence/backend/repositories/models.js';
+import type { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
+import type { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+export interface PagePushDependencies {
+	pagesRepository: Pick<PagesRepository, 'findOneBy'>;
+	userEntityService: Pick<UserEntityService, 'pack'>;
+	globalEventService: Pick<GlobalEventService, 'publishMainStream'>;
+}
+export function createPagePushProcedure(deps: PagePushDependencies) {
+	return createApiProcedure<MiLocalUser>()(pagePushContract)
+		.use(requirePrincipal<MiLocalUser>())
+		.handler(async ({ input: ps, context }) => {
+			const me = context.principal;
+			const page = await deps.pagesRepository.findOneBy({ id: ps.pageId });
 			if (page == null) {
-				throw new ApiError(meta.errors.noSuchPage);
+				throw apiError(pagePushErrors.noSuchPage);
 			}
-
-			this.globalEventService.publishMainStream(page.userId, 'pageEvent', {
+			deps.globalEventService.publishMainStream(page.userId, 'pageEvent', {
 				pageId: ps.pageId,
 				event: ps.event,
 				var: ps.var,
 				userId: me.id,
-				user: await this.userEntityService.pack(me.id, { id: page.userId }, {
+				user: await deps.userEntityService.pack(me.id, { id: page.userId }, {
 					schema: 'UserDetailed',
 				}),
 			});
 		});
-	}
 }

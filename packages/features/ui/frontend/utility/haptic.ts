@@ -4,7 +4,7 @@
  */
 
 import { haptic as _haptic } from 'ios-haptics';
-import { prefer } from '@/preferences.js';
+import { prefer } from '@features/preferences/frontend/preferences.js';
 
 export function haptic() {
 	if (prefer.s['experimental.enableHapticFeedback']) {

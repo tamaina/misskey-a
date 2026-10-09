@@ -30,6 +30,7 @@
 			"@syuilo/aiscript": ["./node_modules/@syuilo/aiscript/built/dts/index.d.ts"],
 			"@syuilo/aiscript/*": ["./node_modules/@syuilo/aiscript/built/dts/*"],
 			"@syuilo/aiscript-0-19-0": ["./node_modules/@syuilo/aiscript-0-19-0/built/dts/index.d.ts"],
+			"@misskey-dev/emoji-data/emojilist.json": ["./node_modules/@misskey-dev/emoji-data/built/emojilist.json"],
 			"@misskey-dev/emoji-data/indexes/*.json": ["./node_modules/@misskey-dev/emoji-data/built/indexes/*.json"],
 			"shiki/core": ["./node_modules/shiki/dist/core.d.mts"],
 			"shiki/langs": ["./node_modules/shiki/dist/langs.d.mts"],
@@ -40,6 +41,7 @@
 			"misskey-js/*": ["./node_modules/misskey-js/built/*"],
 			"chartjs-adapter-date-fns": ["./node_modules/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.esm.js"],
 			"vitest": ["./node_modules/vitest"],
+			"intersection-observer": ["./node_modules/intersection-observer"],
 			"i18n": ["./node_modules/i18n"],
 			"@/*": ["./src/*"],
 			"@@/*": ["../frontend-shared/*"],
@@ -75,10 +77,13 @@
 		"./@types/**/*.ts",
 		"../features/*/frontend/**/*.ts",
 		"../features/*/frontend/**/*.vue",
-		"../features/*/shared/**/*.ts"
+		"../features/*/shared/**/*.ts",
+		"../features/*/test/frontend/**/*.ts"
 	],
 	"exclude": [
+		"../features/*/frontend/embed/**",
 		"./src/**/*.stories.ts",
-		"../features/*/frontend/**/*.stories.ts"
+		"../features/*/frontend/**/*.stories.ts",
+		"../features/drive/frontend/workers/**/*.ts"
 	]
 }

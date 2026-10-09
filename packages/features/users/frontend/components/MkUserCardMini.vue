@@ -18,8 +18,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 import * as Misskey from 'misskey-js';
 import { onMounted, ref } from 'vue';
 import MkMiniChart from '@features/statistics/frontend/components/MkMiniChart.vue';
-import { misskeyApiGet } from '@/utility/misskey-api.js';
-import { acct } from '@features/users/frontend/filters/user.js';
+import { misskeyApiGet } from '@features/api/frontend/utility/misskey-api.js';
+import { acct } from '@features/users/frontend/shared/user.js';
 
 const props = withDefaults(defineProps<{
 	user: Misskey.entities.User;

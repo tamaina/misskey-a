@@ -2,125 +2,82 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import { toPackedNoteReactionWithNote } from '@features/notes/backend/note.schema.js';
+import { CacheService } from '@features/users/backend/services/CacheService.js';
+import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
+import { RoleService } from '@features/roles/backend/services/RoleService.js';
+import { isUserRelated } from '@features/relationships/backend/utility/is-user-related.js';
+import { NoteReactionEntityService } from '../../serializers/NoteReactionEntityService.js';
+import { QueryService } from '../../services/QueryService.js';
 
-import { Inject, Injectable } from '@nestjs/common';
-import type { UserProfilesRepository, NoteReactionsRepository } from '@/models/_.js';
-import { Endpoint } from '@/server/api/endpoint-base.js';
-import { QueryService } from '@/core/QueryService.js';
-import { NoteReactionEntityService } from '@/core/entities/NoteReactionEntityService.js';
-import { DI } from '@/di-symbols.js';
-import { CacheService } from '@/core/CacheService.js';
-import { UserEntityService } from '@/core/entities/UserEntityService.js';
-import { RoleService } from '@/core/RoleService.js';
-import { isUserRelated } from '@/misc/is-user-related.js';
-import { ApiError } from '@/server/api/error.js';
+import { apiError } from "@features/api/backend/transport/orpc-error.js";
+import { usersReactionsContract, usersReactionsErrors } from './reactions.contract.js';
+import type { MiLocalUser } from "@features/users/backend/models/User.js";
+import type { UserProfilesRepository, NoteReactionsRepository } from '@features/persistence/backend/repositories/models.js';
 
-export const meta = {
-	tags: ['users', 'reactions'],
+export interface UsersReactionsDependencies {
+	userProfilesRepository: UserProfilesRepository;
+	noteReactionsRepository: NoteReactionsRepository;
+	cacheService: Pick<CacheService, 'userBlockedCache' | 'findUserById' | 'userMutingsCache'>;
+	userEntityService: Pick<UserEntityService, 'isRemoteUser'>;
+	noteReactionEntityService: Pick<NoteReactionEntityService, 'packManyWithNote'>;
+	queryService: Pick<QueryService, 'makePaginationQuery' | 'generateVisibilityQuery' | 'generateBlockedHostQueryForNote' | 'generateSuspendedUserQueryForNote'>;
+	roleService: Pick<RoleService, 'isModerator'>;
+}
+export function createUsersReactionsProcedure(deps: UsersReactionsDependencies) {
+	return createApiProcedure<MiLocalUser>()(usersReactionsContract).handler(async ({ input, context }) => {
+			const result = await (async () => {
+				const ps = input;
+				const me = context.principal;
 
-	requireCredential: false,
+					const userIdsWhoBlockingMe = me ? await deps.cacheService.userBlockedCache.fetch(me.id) : new Set<string>();
+					const iAmModerator = me ? await deps.roleService.isModerator(me) : false; // Moderators can see reactions of all users
+					if (!iAmModerator) {
+						const user = await deps.cacheService.findUserById(ps.userId);
+						if (deps.userEntityService.isRemoteUser(user)) {
+							throw apiError(usersReactionsErrors.isRemoteUser);
+						}
 
-	description: 'Show all reactions this user made.',
+						const profile = await deps.userProfilesRepository.findOneByOrFail({ userId: ps.userId });
+						if ((me == null || me.id !== ps.userId) && !profile.publicReactions) {
+							throw apiError(usersReactionsErrors.reactionsNotPublic);
+						}
 
-	res: {
-		type: 'array',
-		optional: false, nullable: false,
-		items: {
-			type: 'object',
-			optional: false, nullable: false,
-			ref: 'NoteReactionWithNote',
-		},
-	},
+						// early return if me is blocked by requesting user
+						if (userIdsWhoBlockingMe.has(ps.userId)) {
+							return [];
+						}
+					}
 
-	errors: {
-		reactionsNotPublic: {
-			message: 'Reactions of the user is not public.',
-			code: 'REACTIONS_NOT_PUBLIC',
-			id: '673a7dd2-6924-1093-e0c0-e68456ceae5c',
-		},
-		isRemoteUser: {
-			message: 'Currently unavailable to display reactions of remote users. See https://github.com/misskey-dev/misskey/issues/12964',
-			code: 'IS_REMOTE_USER',
-			id: '6b95fa98-8cf9-2350-e284-f0ffdb54a805',
-		},
-	},
-} as const;
+					const userIdsWhoMeMuting = me ? await deps.cacheService.userMutingsCache.fetch(me.id) : new Set<string>();
 
-export const paramDef = {
-	type: 'object',
-	properties: {
-		userId: { type: 'string', format: 'misskey:id' },
-		limit: { type: 'integer', minimum: 1, maximum: 100, default: 10 },
-		sinceId: { type: 'string', format: 'misskey:id' },
-		untilId: { type: 'string', format: 'misskey:id' },
-		sinceDate: { type: 'integer' },
-		untilDate: { type: 'integer' },
-	},
-	required: ['userId'],
-} as const;
+					const query = deps.queryService.makePaginationQuery(deps.noteReactionsRepository.createQueryBuilder('reaction'),
+						ps.sinceId, ps.untilId, ps.sinceDate, ps.untilDate)
+						.andWhere('reaction.userId = :userId', { userId: ps.userId })
+						.leftJoinAndSelect('reaction.note', 'note')
+						.leftJoinAndSelect('note.user', 'user')
+						.leftJoinAndSelect('note.reply', 'reply')
+						.leftJoinAndSelect('note.renote', 'renote')
+						.leftJoinAndSelect('reply.user', 'replyUser')
+						.leftJoinAndSelect('renote.user', 'renoteUser');
 
-@Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
-	constructor(
-		@Inject(DI.userProfilesRepository)
-		private userProfilesRepository: UserProfilesRepository,
+					deps.queryService.generateVisibilityQuery(query, me);
+					deps.queryService.generateBlockedHostQueryForNote(query);
+					deps.queryService.generateSuspendedUserQueryForNote(query);
 
-		@Inject(DI.noteReactionsRepository)
-		private noteReactionsRepository: NoteReactionsRepository,
+					const reactions = (await query
+						.limit(ps.limit)
+						.getMany()).filter(reaction => {
+							if (reaction.note?.userId === ps.userId) return true; // we can see reactions to note of requesting user
+							if (me && isUserRelated(reaction.note, userIdsWhoBlockingMe)) return false;
+							if (me && isUserRelated(reaction.note, userIdsWhoMeMuting)) return false;
 
-		private cacheService: CacheService,
-		private userEntityService: UserEntityService,
-		private noteReactionEntityService: NoteReactionEntityService,
-		private queryService: QueryService,
-		private roleService: RoleService,
-	) {
-		super(meta, paramDef, async (ps, me) => {
-			const userIdsWhoBlockingMe = me ? await this.cacheService.userBlockedCache.fetch(me.id) : new Set<string>();
-			const iAmModerator = me ? await this.roleService.isModerator(me) : false; // Moderators can see reactions of all users
-			if (!iAmModerator) {
-				const user = await this.cacheService.findUserById(ps.userId);
-				if (this.userEntityService.isRemoteUser(user)) {
-					throw new ApiError(meta.errors.isRemoteUser);
-				}
+							return true;
+						});
 
-				const profile = await this.userProfilesRepository.findOneByOrFail({ userId: ps.userId });
-				if ((me == null || me.id !== ps.userId) && !profile.publicReactions) {
-					throw new ApiError(meta.errors.reactionsNotPublic);
-				}
-
-				// early return if me is blocked by requesting user
-				if (userIdsWhoBlockingMe.has(ps.userId)) {
-					return [];
-				}
-			}
-
-			const userIdsWhoMeMuting = me ? await this.cacheService.userMutingsCache.fetch(me.id) : new Set<string>();
-
-			const query = this.queryService.makePaginationQuery(this.noteReactionsRepository.createQueryBuilder('reaction'),
-				ps.sinceId, ps.untilId, ps.sinceDate, ps.untilDate)
-				.andWhere('reaction.userId = :userId', { userId: ps.userId })
-				.leftJoinAndSelect('reaction.note', 'note')
-				.leftJoinAndSelect('note.user', 'user')
-				.leftJoinAndSelect('note.reply', 'reply')
-				.leftJoinAndSelect('note.renote', 'renote')
-				.leftJoinAndSelect('reply.user', 'replyUser')
-				.leftJoinAndSelect('renote.user', 'renoteUser');
-
-			this.queryService.generateVisibilityQuery(query, me);
-			this.queryService.generateBlockedHostQueryForNote(query);
-			this.queryService.generateSuspendedUserQueryForNote(query);
-
-			const reactions = (await query
-				.limit(ps.limit)
-				.getMany()).filter(reaction => {
-				if (reaction.note?.userId === ps.userId) return true; // we can see reactions to note of requesting user
-				if (me && isUserRelated(reaction.note, userIdsWhoBlockingMe)) return false;
-				if (me && isUserRelated(reaction.note, userIdsWhoMeMuting)) return false;
-
-				return true;
-			});
-
-			return await this.noteReactionEntityService.packManyWithNote(reactions, me);
+					return await deps.noteReactionEntityService.packManyWithNote(reactions, me);
+			})();
+			return result.map(toPackedNoteReactionWithNote);
 		});
-	}
 }

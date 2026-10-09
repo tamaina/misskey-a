@@ -32,22 +32,21 @@ SPDX-License-Identifier: AGPL-3.0-only
 	<div v-else :class="$style.menu">
 		<div>Ads by {{ host }}</div>
 		<!--<MkButton class="button" primary>{{ i18n.ts._ad.like }}</MkButton>-->
-		<MkButton v-if="chosen.ratio !== 0" :class="$style.menuButton" @click="reduceFrequency">{{ i18n.ts._ad.reduceFrequencyOfThisAd }}</MkButton>
-		<button class="_textButton" @click="toggleMenu">{{ i18n.ts._ad.back }}</button>
+		<MkButton v-if="chosen.ratio !== 0" :class="$style.menuButton" @click="reduceFrequency">{{ $locale.sfc.reduceFrequencyOfThisAd }}</MkButton>
+		<button class="_textButton" @click="toggleMenu">{{ $locale.sfc.back }}</button>
 	</div>
 </div>
 </template>
 
 <script lang="ts" setup>
 import { ref, computed } from 'vue';
-import { url as local, host } from '@@/js/config.js';
-import { i18n } from '@/i18n.js';
-import { instance } from '@/instance.js';
+import { url as local, host } from '@features/boot/frontend/shared/config.js';
+import { instance } from '@features/instance/frontend/instance.js';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
-import { store } from '@/store.js';
-import * as os from '@/os.js';
-import { $i } from '@/i.js';
-import { prefer } from '@/preferences.js';
+import { store } from '@features/preferences/frontend/store.js';
+import * as os from '@features/ui/frontend/os.js';
+import { $i } from '@features/auth/frontend/i.js';
+import { prefer } from '@features/preferences/frontend/preferences.js';
 
 type Ad = (typeof instance)['ads'][number];
 
@@ -203,3 +202,199 @@ function reduceFrequency(): void {
 	margin: 8px auto;
 }
 </style>
+
+<locale locale="ar-SA" lang="json">
+{
+	"reduceFrequencyOfThisAd": "قلل عرض هذا الإعلان",
+	"back": "رجوع"
+}
+</locale>
+
+<locale locale="ca-ES" lang="json">
+{
+	"reduceFrequencyOfThisAd": "Mostrar menys aquest anunci",
+	"back": "Tornar"
+}
+</locale>
+
+<locale locale="cs-CZ" lang="json">
+{
+	"reduceFrequencyOfThisAd": "Zobrazovat tuto reklamu méně",
+	"back": "Zpět"
+}
+</locale>
+
+<locale locale="da-DK" lang="json">
+{
+	"reduceFrequencyOfThisAd": "Show this ad less",
+	"back": "Back"
+}
+</locale>
+
+<locale locale="de-DE" lang="json">
+{
+	"reduceFrequencyOfThisAd": "Diese Werbung weniger anzeigen",
+	"back": "Zurück"
+}
+</locale>
+
+<locale locale="en-US" lang="json">
+{
+	"reduceFrequencyOfThisAd": "Show this ad less",
+	"back": "Back"
+}
+</locale>
+
+<locale locale="es-ES" lang="json">
+{
+	"reduceFrequencyOfThisAd": "Mostrar menos este anuncio.",
+	"back": "Anterior"
+}
+</locale>
+
+<locale locale="fr-FR" lang="json">
+{
+	"reduceFrequencyOfThisAd": "Voir cette publicité moins souvent",
+	"back": "Retour"
+}
+</locale>
+
+<locale locale="id-ID" lang="json">
+{
+	"reduceFrequencyOfThisAd": "Tampilkan iklan ini lebih sedikit",
+	"back": "Kembali"
+}
+</locale>
+
+<locale locale="it-IT" lang="json">
+{
+	"reduceFrequencyOfThisAd": "Visualizza questa pubblicità meno spesso",
+	"back": "Indietro"
+}
+</locale>
+
+<locale locale="ja-JP" lang="json">
+{
+	"reduceFrequencyOfThisAd": "この広告の表示頻度を下げる",
+	"back": "戻る"
+}
+</locale>
+
+<locale locale="ja-KS" lang="json">
+{
+	"reduceFrequencyOfThisAd": "この広告ちょっとうざったらしいわ",
+	"back": "戻る"
+}
+</locale>
+
+<locale locale="kab-KAB" lang="json">
+{
+	"reduceFrequencyOfThisAd": "Show this ad less",
+	"back": "Back"
+}
+</locale>
+
+<locale locale="kn-IN" lang="json">
+{
+	"reduceFrequencyOfThisAd": "Show this ad less",
+	"back": "Back"
+}
+</locale>
+
+<locale locale="ko-KR" lang="json">
+{
+	"reduceFrequencyOfThisAd": "이 광고의 표시 빈도 낮추기",
+	"back": "뒤로"
+}
+</locale>
+
+<locale locale="nl-NL" lang="json">
+{
+	"reduceFrequencyOfThisAd": "Show this ad less",
+	"back": "Terug"
+}
+</locale>
+
+<locale locale="no-NO" lang="json">
+{
+	"reduceFrequencyOfThisAd": "Show this ad less",
+	"back": "Back"
+}
+</locale>
+
+<locale locale="pl-PL" lang="json">
+{
+	"reduceFrequencyOfThisAd": "Pokazuj tę reklamę rzadziej",
+	"back": "Wróć"
+}
+</locale>
+
+<locale locale="pt-PT" lang="json">
+{
+	"reduceFrequencyOfThisAd": "Diminuir frequência deste anúncio",
+	"back": "Voltar"
+}
+</locale>
+
+<locale locale="ru-RU" lang="json">
+{
+	"reduceFrequencyOfThisAd": "Реже показывать эту рекламу",
+	"back": "Выход"
+}
+</locale>
+
+<locale locale="sk-SK" lang="json">
+{
+	"reduceFrequencyOfThisAd": "Túto reklamu zobrazovať menej",
+	"back": "Späť"
+}
+</locale>
+
+<locale locale="th-TH" lang="json">
+{
+	"reduceFrequencyOfThisAd": "แสดงโฆษณานี้ให้น้อยลง",
+	"back": "ย้อนกลับ"
+}
+</locale>
+
+<locale locale="tr-TR" lang="json">
+{
+	"reduceFrequencyOfThisAd": "Bu reklamı daha az göster",
+	"back": "Geri"
+}
+</locale>
+
+<locale locale="ug-CN" lang="json">
+{
+	"reduceFrequencyOfThisAd": "Show this ad less",
+	"back": "Back"
+}
+</locale>
+
+<locale locale="uk-UA" lang="json">
+{
+	"reduceFrequencyOfThisAd": "Показувати цю рекламу менше",
+	"back": "Назад"
+}
+</locale>
+
+<locale locale="vi-VN" lang="json">
+{
+	"reduceFrequencyOfThisAd": "Hiện ít lại",
+	"back": "Quay lại"
+}
+</locale>
+
+<locale locale="zh-CN" lang="json">
+{
+	"reduceFrequencyOfThisAd": "减少此广告的频率",
+	"back": "返回"
+}
+</locale>
+
+<locale locale="zh-TW" lang="json">
+{
+	"reduceFrequencyOfThisAd": "降低此廣告的頻率 ",
+	"back": "返回"
+}
+</locale>

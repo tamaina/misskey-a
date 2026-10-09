@@ -27,8 +27,9 @@ import { execaSync } from 'execa';
 import { DEFAULT_INTEGRATION_REFS, findClosestMergeBase, gitLines, gitMergeBase, gitPaths } from './lib/git.mjs';
 
 const LINT_TARGETS = [
-	{ root: 'packages/features', config: '../frontend/eslint.config.js', pattern: /^packages\/features\/[^/]+\/frontend\/.*\.(ts|vue)$/ },
-	{ root: 'packages/features', config: '../backend/eslint.config.js', pattern: /^packages\/features\/[^/]+\/(backend|contract|shared|test)\/.*\.(ts|tsx|mjs)$/ },
+	{ root: 'packages/features', config: '../frontend-embed/eslint.config.js', pattern: /^packages\/features\/[^/]+\/frontend\/embed\/.*\.(ts|vue)$/ },
+	{ root: 'packages/features', config: '../frontend/eslint.config.js', pattern: /^packages\/features\/[^/]+\/(frontend\/(?!embed\/)|test\/frontend\/).*\.(ts|vue)$/ },
+	{ root: 'packages/features', config: '../backend/eslint.config.js', pattern: /^packages\/features\/[^/]+\/(backend|contract|shared|test(?!\/frontend))\/.*\.(ts|tsx|mts|mjs)$/ },
 	{ root: 'packages/backend', pattern: /^packages\/backend\/(src|test-federation)\/.*\.ts$/ },
 	{ root: 'packages/frontend', pattern: /^packages\/frontend\/src\/.*\.(ts|vue)$/ },
 	{ root: 'packages/frontend-embed', pattern: /^packages\/frontend-embed\/src\/.*\.(ts|vue)$/ },

@@ -14,7 +14,7 @@ import { onActivated, onDeactivated, onMounted, onUnmounted } from 'vue';
 import * as Misskey from 'misskey-js';
 import MkAchievements from '@features/users/frontend/components/MkAchievements.vue';
 import { claimAchievement } from '@features/users/frontend/utility/achievements.js';
-import { $i } from '@/i.js';
+import { $i } from '@features/auth/frontend/i.js';
 
 const props = defineProps<{
 	user: Misskey.entities.User;

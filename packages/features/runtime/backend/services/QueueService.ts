@@ -4,20 +4,21 @@
  */
 
 import { randomUUID } from 'node:crypto';
+import { toPackedJsonValue, type PackedJsonValue } from '@features/users/backend/json-value.schema.js';
 import { Inject, Injectable } from '@nestjs/common';
 import { MetricsTime, type JobType } from 'bullmq';
-import type { IActivity } from '@/core/activitypub/type.js';
-import type { MiDriveFile } from '@/models/DriveFile.js';
-import type { MiWebhook, WebhookEventTypes } from '@/models/Webhook.js';
-import type { MiSystemWebhook, SystemWebhookEventType } from '@/models/SystemWebhook.js';
+import type { IActivity } from '@features/federation/backend/protocol/type.js';
+import type { MiDriveFile } from '@features/drive/backend/models/DriveFile.js';
+import type { MiWebhook, WebhookEventTypes } from '@features/integrations/backend/models/Webhook.js';
+import type { MiSystemWebhook, SystemWebhookEventType } from '@features/integrations/backend/models/SystemWebhook.js';
 import type { Config } from '@/config.js';
 import { DI } from '@/di-symbols.js';
-import { bindThis } from '@/decorators.js';
-import type { Antenna } from '@/server/api/endpoints/i/import-antennas.js';
-import { ApRequestCreator } from '@/core/activitypub/ApRequestService.js';
-import { type SystemWebhookPayload } from '@/core/SystemWebhookService.js';
-import type { Packed } from '@/misc/json-schema.js';
-import { type UserWebhookPayload } from '@/core/UserWebhookService.js';
+import { bindThis } from '../decorators.js';
+import type { AntennaArtifact } from '@features/portability/backend/antenna-artifact.schema.js';
+import { ApRequestCreator } from '@features/federation/backend/services/ApRequestService.js';
+import { type SystemWebhookPayload } from '@features/integrations/backend/services/SystemWebhookService.js';
+import type { Packed } from '@features/index/backend/packed.schema.js';
+import { type UserWebhookPayload } from '@features/integrations/backend/services/UserWebhookService.js';
 import type {
 	DbJobData,
 	DeliverJobData,
@@ -25,7 +26,7 @@ import type {
 	SystemWebhookDeliverJobData,
 	ThinUser,
 	UserWebhookDeliverJobData,
-} from '@/queue/types.js';
+} from '../queue/types.js';
 import type {
 	DbQueue,
 	DeliverQueue,
@@ -37,7 +38,7 @@ import type {
 	SystemQueue,
 	SystemWebhookDeliverQueue,
 	UserWebhookDeliverQueue,
-} from '@/core/QueueModule.js';
+} from '@features/boot/backend/assembly/QueueModule.js';
 import type httpSignature from '@peertube/http-signature';
 import type * as Bull from 'bullmq';
 
@@ -181,8 +182,13 @@ export class QueueService {
 	public async deliverMany(user: ThinUser, content: IActivity | null, inboxes: Map<string, boolean>) {
 		if (content == null) return null;
 		// Defend against nullable inboxes at runtime without mutating the caller's map.
-		const destinations = new Map(inboxes);
-		destinations.delete(null as unknown as string);
+		const destinations = new Map<string, boolean>();
+		for (const [inbox, isSharedInbox] of inboxes) {
+			// Nullable legacy destinations can still reach this typed boundary at runtime.
+			// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+			if (inbox === null) continue;
+			destinations.set(inbox, isSharedInbox);
+		}
 		if (destinations.size === 0) return null;
 
 		const contentBody = JSON.stringify(content);
@@ -526,7 +532,7 @@ export class QueueService {
 	}
 
 	@bindThis
-	public createImportAntennasJob(user: ThinUser, antenna: Antenna) {
+	public createImportAntennasJob(user: ThinUser, antenna: AntennaArtifact) {
 		return this.dbQueue.add('importAntennas', {
 			user: { id: user.id },
 			antenna,
@@ -800,14 +806,14 @@ export class QueueService {
 	}
 
 	@bindThis
-	private redactJobData<T>(queueType: typeof QUEUE_TYPES[number], data: T): T {
-		// Webhookのsecret
-		if (queueType === 'userWebhookDeliver' || queueType === 'systemWebhookDeliver') {
-			if (typeof data === 'object' && data != null && 'secret' in data) {
-				return { ...data, secret: '(redacted)' } as T;
-			}
+	private redactJobData(queueType: typeof QUEUE_TYPES[number], data: unknown): PackedJsonValue {
+		// BullMQ has already decoded persisted JSON; validate every original business key.
+		const json = toPackedJsonValue(data);
+		if ((queueType === 'userWebhookDeliver' || queueType === 'systemWebhookDeliver')
+			&& json !== null && typeof json === 'object' && !Array.isArray(json) && Object.hasOwn(json, 'secret')) {
+			return { ...json, secret: '(redacted)' };
 		}
-		return data;
+		return json;
 	}
 
 	@bindThis
@@ -820,17 +826,17 @@ export class QueueService {
 			id: job.id!,
 			name: job.name,
 			data: this.redactJobData(queueType, job.data),
-			opts: job.opts,
+			opts: { ...job.opts },
 			timestamp: job.timestamp,
 			processedOn: job.processedOn,
 			processedBy: job.processedBy,
 			finishedOn: job.finishedOn,
-			progress: job.progress,
+			progress: toPackedJsonValue(job.progress),
 			attempts: job.attemptsMade,
 			delay: job.delay,
 			failedReason: job.failedReason,
 			stacktrace: stacktrace,
-			returnValue: job.returnvalue,
+			returnValue: job.returnvalue === undefined ? undefined : toPackedJsonValue(job.returnvalue),
 			isFailed: !!job.failedReason || (Array.isArray(stacktrace) && stacktrace.length > 0),
 		};
 	}

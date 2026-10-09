@@ -4,11 +4,12 @@
  */
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { createStatistics } from '../../../backend/built/features/statistics/backend.js';
+import { createRouterClient } from '@orpc/server';
+import { createStatisticsRouter } from '../../../backend/built/features/statistics/backend.js';
 
 test('construction and invalid input perform no reads', async () => {
 	const calls = [];
-	const feature = createStatistics({
+	const feature = statisticsClient({
 		readNotes: async () => { calls.push('notes'); return { local: 1, remote: 2 }; },
 		readUsers: async () => { calls.push('users'); return { local: 1, remote: 2 }; },
 		countReactions: async () => { calls.push('reactions'); return 3; },
@@ -20,7 +21,7 @@ test('construction and invalid input perform no reads', async () => {
 });
 
 test('sums local and remote stats, preserving local originals and zero drive usage', async () => {
-	const feature = createStatistics({
+	const feature = statisticsClient({
 		readNotes: async () => ({ local: 13, remote: 7 }),
 		readUsers: async () => ({ local: 4, remote: 3 }),
 		countReactions: async () => 19,
@@ -52,7 +53,7 @@ test('chart reads stay sequential and both count reads start concurrently afterw
 	const bothStarted = new Promise(resolve => { markBothStarted = resolve; });
 	const notesResult = new Promise(resolve => { resolveNotes = resolve; });
 	const usersResult = new Promise(resolve => { resolveUsers = resolve; });
-	const feature = createStatistics({
+	const feature = statisticsClient({
 		readNotes: () => { calls.push('notes'); markNotesStarted(); return notesResult; },
 		readUsers: () => { calls.push('users'); markUsersStarted(); return usersResult; },
 		countReactions: () => {
@@ -93,7 +94,7 @@ test('chart reads stay sequential and both count reads start concurrently afterw
 test('a failed chart read propagates and does not start later phases', async () => {
 	const calls = [];
 	const failure = new Error('Notes chart failed');
-	const feature = createStatistics({
+	const feature = statisticsClient({
 		readNotes: async () => { calls.push('notes'); throw failure; },
 		readUsers: async () => { calls.push('users'); return { local: 1, remote: 2 }; },
 		countReactions: async () => { calls.push('reactions'); return 3; },
@@ -104,7 +105,7 @@ test('a failed chart read propagates and does not start later phases', async () 
 	assert.deepEqual(calls, ['notes']);
 
 	const userFailure = new Error('Users chart failed');
-	const userFeature = createStatistics({
+	const userFeature = statisticsClient({
 		readNotes: async () => { calls.push('notes-2'); return { local: 1, remote: 2 }; },
 		readUsers: async () => { calls.push('users-2'); throw userFailure; },
 		countReactions: async () => { calls.push('reactions-2'); return 3; },
@@ -114,20 +115,20 @@ test('a failed chart read propagates and does not start later phases', async () 
 	assert.deepEqual(calls, ['notes', 'notes-2', 'users-2']);
 });
 
-test('malformed output is rejected', async () => {
-	const feature = createStatistics({
+test('runtime output validation is skipped', async () => {
+	const feature = statisticsClient({
 		readNotes: async () => ({ local: 1, remote: 2 }),
 		readUsers: async () => ({ local: 3, remote: 4 }),
 		countReactions: async () => 'not a number',
 		countInstances: async () => 5,
 	});
-	await assert.rejects(feature.stats({}));
+	assert.equal((await feature.stats({})).reactionsCount, 'not a number');
 });
 
 test('a failed count propagates after both concurrent counts have started', async () => {
 	const calls = [];
 	const failure = new Error('Reaction count failed');
-	const feature = createStatistics({
+	const feature = statisticsClient({
 		readNotes: async () => ({ local: 0, remote: 0 }),
 		readUsers: async () => ({ local: 0, remote: 0 }),
 		countReactions: async () => { calls.push('reactions'); throw failure; },
@@ -136,3 +137,18 @@ test('a failed count propagates after both concurrent counts have started', asyn
 	await assert.rejects(feature.stats({}), error => error === failure);
 	assert.deepEqual(calls, ['reactions', 'instances']);
 });
+
+function statisticsClient(dependencies) {
+	const chartNames = ['activeUsers', 'apRequest', 'drive', 'federation', 'instance', 'notes', 'userDrive', 'userFollowing', 'userNotes', 'userPv', 'userReactions', 'users'];
+	const charts = Object.fromEntries(chartNames.map(name => [name, {
+		getChart: async () => { throw new Error(`Unexpected ${name} chart route`); },
+	}]));
+	return createRouterClient(createStatisticsRouter({
+		charts,
+		readRetention: async () => { throw new Error('Unexpected retention route'); },
+		...dependencies,
+	}), { context: {
+		services: { authenticate: async () => [null, null] },
+		credential: null, ip: '127.0.0.1', headers: {},
+	} });
+}

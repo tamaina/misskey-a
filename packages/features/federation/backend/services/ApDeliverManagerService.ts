@@ -6,13 +6,13 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { IsNull, Not } from 'typeorm';
 import { DI } from '@/di-symbols.js';
-import type { FollowingsRepository } from '@/models/_.js';
-import type { MiLocalUser, MiRemoteUser, MiUser } from '@/models/User.js';
-import { QueueService } from '@/core/QueueService.js';
-import { bindThis } from '@/decorators.js';
-import type { IActivity } from '@/core/activitypub/type.js';
-import { ThinUser } from '@/queue/types.js';
-import type Logger from '@/logger.js';
+import type { FollowingsRepository } from '@features/persistence/backend/repositories/models.js';
+import type { MiLocalUser, MiRemoteUser, MiUser } from '@features/users/backend/models/User.js';
+import { QueueService } from '@features/runtime/backend/services/QueueService.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
+import type { IActivity } from '../protocol/type.js';
+import { ThinUser } from '@features/runtime/backend/queue/types.js';
+import type { Logger } from '@features/runtime/backend/logging/logger.js';
 import { ApLoggerService } from './ApLoggerService.js';
 
 interface IRecipe {

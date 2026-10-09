@@ -6,20 +6,20 @@
 import { Inject, Injectable, OnApplicationShutdown, OnModuleInit } from '@nestjs/common';
 import * as Redis from 'ioredis';
 import { ModuleRef } from '@nestjs/core';
-import type { UserListMembershipsRepository } from '@/models/_.js';
-import type { MiUser } from '@/models/User.js';
-import type { MiUserList } from '@/models/UserList.js';
-import type { MiUserListMembership } from '@/models/UserListMembership.js';
-import { IdService } from '@/core/IdService.js';
-import type { GlobalEvents } from '@/core/GlobalEventService.js';
-import { GlobalEventService } from '@/core/GlobalEventService.js';
+import type { UserListMembershipsRepository } from '@features/persistence/backend/repositories/models.js';
+import type { MiUser } from '@features/users/backend/models/User.js';
+import type { MiUserList } from '../models/UserList.js';
+import type { MiUserListMembership } from '../models/UserListMembership.js';
+import { IdService } from '@features/runtime/backend/services/IdService.js';
+import type { GlobalEvents } from '@features/runtime/backend/services/GlobalEventService.js';
+import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
 import { DI } from '@/di-symbols.js';
-import { UserEntityService } from '@/core/entities/UserEntityService.js';
-import { bindThis } from '@/decorators.js';
-import { QueueService } from '@/core/QueueService.js';
-import { RedisKVCache } from '@/misc/cache.js';
-import { RoleService } from '@/core/RoleService.js';
-import { SystemAccountService } from '@/core/SystemAccountService.js';
+import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
+import { QueueService } from '@features/runtime/backend/services/QueueService.js';
+import { RedisKVCache } from '@features/runtime/backend/cache/cache.js';
+import { RoleService } from '@features/roles/backend/services/RoleService.js';
+import { SystemAccountService } from '@features/users/backend/services/SystemAccountService.js';
 
 @Injectable()
 export class UserListService implements OnApplicationShutdown, OnModuleInit {

@@ -51,7 +51,7 @@
 		"./src/**/*.tsx",
 		"../features/*/backend/**/*.ts",
 		"../features/*/backend/**/*.tsx",
-		"../features/*/contract/**/*.ts",
+		"../features/*/backend/**/*.mts",
 		"../features/*/shared/**/*.ts"
 	],
 	"exclude": [

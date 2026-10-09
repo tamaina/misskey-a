@@ -25,7 +25,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<div class="body">
 					<div v-if="federationSubActive != null" class="value">
 						{{ number(federationSubActive) }}
-						<MkNumberDiff v-if="federationSubActiveDiff != null" v-tooltip="i18n.ts.dayOverDayChanges" class="diff" :value="federationSubActiveDiff"></MkNumberDiff>
+						<MkNumberDiff v-if="federationSubActiveDiff != null" v-tooltip="$locale.sfc.dayOverDayChanges" class="diff" :value="federationSubActiveDiff"></MkNumberDiff>
 					</div>
 					<div class="label">Sub</div>
 				</div>
@@ -35,7 +35,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<div class="body">
 					<div v-if="federationPubActive != null" class="value">
 						{{ number(federationPubActive) }}
-						<MkNumberDiff v-if="federationPubActiveDiff != null" v-tooltip="i18n.ts.dayOverDayChanges" class="diff" :value="federationPubActiveDiff"></MkNumberDiff>
+						<MkNumberDiff v-if="federationPubActiveDiff != null" v-tooltip="$locale.sfc.dayOverDayChanges" class="diff" :value="federationPubActiveDiff"></MkNumberDiff>
 					</div>
 					<div class="label">Pub</div>
 				</div>
@@ -49,11 +49,10 @@ SPDX-License-Identifier: AGPL-3.0-only
 import { onMounted, ref } from 'vue';
 import XPie from '@features/statistics/frontend/pages/admin/overview.pie.vue';
 import type { InstanceForPie } from '@features/statistics/frontend/pages/admin/overview.pie.vue';
-import * as os from '@/os.js';
-import { misskeyApiGet } from '@/utility/misskey-api.js';
+import * as os from '@features/ui/frontend/os.js';
+import { misskeyApiGet } from '@features/api/frontend/utility/misskey-api.js';
 import number from '@features/ui/frontend/filters/number.js';
 import MkNumberDiff from '@features/ui/frontend/components/MkNumberDiff.vue';
-import { i18n } from '@/i18n.js';
 import { useChartTooltip } from '@features/statistics/frontend/composables/use-chart-tooltip.js';
 
 const topSubInstancesForPie = ref<InstanceForPie[] | null>(null);
@@ -195,3 +194,170 @@ onMounted(async () => {
 }
 </style>
 
+<locale locale="ar-SA" lang="json">
+{
+  "dayOverDayChanges": "يوميا"
+}
+</locale>
+
+<locale locale="ca-ES" lang="json">
+{
+  "dayOverDayChanges": "Canvis ahir"
+}
+</locale>
+
+<locale locale="cs-CZ" lang="json">
+{
+  "dayOverDayChanges": "Denně"
+}
+</locale>
+
+<locale locale="da-DK" lang="json">
+{
+  "dayOverDayChanges": "Changes to yesterday"
+}
+</locale>
+
+<locale locale="de-DE" lang="json">
+{
+  "dayOverDayChanges": "Veränderung zu Gestern"
+}
+</locale>
+
+<locale locale="en-US" lang="json">
+{
+  "dayOverDayChanges": "Changes to yesterday"
+}
+</locale>
+
+<locale locale="es-ES" lang="json">
+{
+  "dayOverDayChanges": "Dif diaria"
+}
+</locale>
+
+<locale locale="fr-FR" lang="json">
+{
+  "dayOverDayChanges": "Journalier"
+}
+</locale>
+
+<locale locale="id-ID" lang="json">
+{
+  "dayOverDayChanges": "Harian"
+}
+</locale>
+
+<locale locale="it-IT" lang="json">
+{
+  "dayOverDayChanges": "Giornaliero"
+}
+</locale>
+
+<locale locale="ja-JP" lang="json">
+{
+  "dayOverDayChanges": "前日比"
+}
+</locale>
+
+<locale locale="ja-KS" lang="json">
+{
+  "dayOverDayChanges": "前日比"
+}
+</locale>
+
+<locale locale="kab-KAB" lang="json">
+{
+  "dayOverDayChanges": "Changes to yesterday"
+}
+</locale>
+
+<locale locale="kn-IN" lang="json">
+{
+  "dayOverDayChanges": "Changes to yesterday"
+}
+</locale>
+
+<locale locale="ko-KR" lang="json">
+{
+  "dayOverDayChanges": "어제보다"
+}
+</locale>
+
+<locale locale="nl-NL" lang="json">
+{
+  "dayOverDayChanges": "Dagelijkse wijzigingen"
+}
+</locale>
+
+<locale locale="no-NO" lang="json">
+{
+  "dayOverDayChanges": "Changes to yesterday"
+}
+</locale>
+
+<locale locale="pl-PL" lang="json">
+{
+  "dayOverDayChanges": "Codziennie"
+}
+</locale>
+
+<locale locale="pt-PT" lang="json">
+{
+  "dayOverDayChanges": "Dia anterior"
+}
+</locale>
+
+<locale locale="ru-RU" lang="json">
+{
+  "dayOverDayChanges": "За день"
+}
+</locale>
+
+<locale locale="sk-SK" lang="json">
+{
+  "dayOverDayChanges": "Medzidenné zmeny"
+}
+</locale>
+
+<locale locale="th-TH" lang="json">
+{
+  "dayOverDayChanges": "เทียบกับเมื่อวาน"
+}
+</locale>
+
+<locale locale="tr-TR" lang="json">
+{
+  "dayOverDayChanges": "Dünkü değişiklikler"
+}
+</locale>
+
+<locale locale="ug-CN" lang="json">
+{
+  "dayOverDayChanges": "Changes to yesterday"
+}
+</locale>
+
+<locale locale="uk-UA" lang="json">
+{
+  "dayOverDayChanges": "Доба"
+}
+</locale>
+
+<locale locale="vi-VN" lang="json">
+{
+  "dayOverDayChanges": "Thay đổi hôm qua"
+}
+</locale>
+
+<locale locale="zh-CN" lang="json">
+{
+  "dayOverDayChanges": "与前一日相比"
+}
+</locale>
+
+<locale locale="zh-TW" lang="json">
+{
+  "dayOverDayChanges": "與昨日相比"
+}
+</locale>

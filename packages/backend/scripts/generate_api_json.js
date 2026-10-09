@@ -21,11 +21,11 @@ async function main() {
 	/** @type {import('../src/config.js')} */
 	const { loadConfig } = await import('../built/config.js');
 
-	/** @type {import('../src/server/api/openapi/gen-spec.js')} */
-	const { genOpenapiSpec } = await import('../built/gen-spec.js');
+	/** @type {import('@features/api/backend/transport/openapi/gen-spec.js')} */
+	const { genCompatibleOpenapiSpec } = await import('../built/gen-spec.js');
 
 	const config = loadConfig();
-	const spec = genOpenapiSpec(config, true);
+	const spec = await genCompatibleOpenapiSpec(config, true);
 
 	writeFileSync('./built/api.json', JSON.stringify(spec), 'utf-8');
 }

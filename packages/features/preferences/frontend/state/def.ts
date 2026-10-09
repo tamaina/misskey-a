@@ -4,20 +4,20 @@
  */
 
 import * as Misskey from 'misskey-js';
-import { hemisphere } from '@@/js/intl-const.js';
-import { DEFAULT_EMOJIS } from '@@/js/const.js';
-import { prefersReducedMotion } from '@@/js/config.js';
+import { hemisphere } from '@features/ui/frontend/shared/intl-const.js';
+import { DEFAULT_EMOJIS } from '@features/emojis/frontend/shared/default-emojis.js';
+import { prefersReducedMotion } from '@features/boot/frontend/shared/config.js';
 import { definePreferences } from '@features/preferences/frontend/state/manager.js';
-import type { Theme } from '@@/js/theme.js';
-import type { SoundType } from '@/utility/sound.js';
-import type { Plugin } from '@/plugin.js';
+import type { Theme } from '@features/preferences/frontend/shared/theme.js';
+import type { SoundType } from '@features/preferences/frontend/utility/sound.js';
+import type { Plugin } from '@features/integrations/frontend/plugin.js';
 import type { DeviceKind } from '@features/ui/frontend/utility/device-kind.js';
-import type { DeckProfile } from '@/deck.js';
-import type { WatermarkPreset } from '@/utility/watermark/WatermarkRenderer.js';
-import type { ImageFramePreset } from '@/utility/image-frame-renderer/ImageFrameRenderer.js';
-import { genId } from '@/utility/id.js';
+import type { DeckProfile } from '@features/preferences/frontend/deck.js';
+import type { WatermarkPreset } from '@features/drive/frontend/utility/watermark/WatermarkRenderer.js';
+import type { ImageFramePreset } from '@features/drive/frontend/utility/image-frame-renderer/ImageFrameRenderer.js';
+import { genId } from '@features/runtime/frontend/utility/id.js';
 import { DEFAULT_DEVICE_KIND } from '@features/ui/frontend/utility/device-kind.js';
-import { deepEqual } from '@/utility/deep-equal.js';
+import { deepEqual } from '@features/runtime/frontend/utility/deep-equal.js';
 
 /** サウンド設定 */
 export type SoundStore = {

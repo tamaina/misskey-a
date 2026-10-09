@@ -4,7 +4,7 @@
  */
 
 import { afterEach, expect, test, vi } from 'vitest';
-import { CollapsedQueue } from './collapsed-queue.js';
+import { CollapsedQueue } from '@features/runtime/backend/async/collapsed-queue.js';
 
 afterEach(() => { vi.useRealTimers(); });
 test('flush waits for a job whose timer already fired', async () => {

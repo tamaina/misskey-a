@@ -22,8 +22,7 @@ function hasPluginName(plugin: PluginOption, name: string): boolean {
 
 const config = {
 	stories: [
-		'../src/**/*.mdx',
-		'../src/**/*.stories.@(js|jsx|ts|tsx)',
+		'./index.mdx',
 		'../../features/*/frontend/**/*.mdx',
 		'../../features/*/frontend/**/*.stories.@(js|jsx|ts|tsx)',
 	],

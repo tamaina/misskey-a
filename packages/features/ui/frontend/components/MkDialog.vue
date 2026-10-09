@@ -25,14 +25,14 @@ SPDX-License-Identifier: AGPL-3.0-only
 		<MkInput v-if="input" v-model="inputValue" autofocus :type="input.type || 'text'" :placeholder="input.placeholder || undefined" :autocomplete="input.autocomplete" @keydown="onInputKeydown">
 			<template v-if="input.type === 'password'" #prefix><i class="ti ti-lock"></i></template>
 			<template #caption>
-				<span v-if="okButtonDisabledReason === 'charactersExceeded'" v-text="i18n.tsx._dialog.charactersExceeded({ current: (inputValue as string)?.length ?? 0, max: input.maxLength ?? 'NaN' })"></span>
-				<span v-else-if="okButtonDisabledReason === 'charactersBelow'" v-text="i18n.tsx._dialog.charactersBelow({ current: (inputValue as string)?.length ?? 0, min: input.minLength ?? 'NaN' })"></span>
+				<span v-if="okButtonDisabledReason === 'charactersExceeded'" v-text="interpolateLocaleParameters($locale.sfc.charactersExceeded, { current: (inputValue as string)?.length ?? 0, max: input.maxLength ?? 'NaN' })"></span>
+				<span v-else-if="okButtonDisabledReason === 'charactersBelow'" v-text="interpolateLocaleParameters($locale.sfc.charactersBelow, { current: (inputValue as string)?.length ?? 0, min: input.minLength ?? 'NaN' })"></span>
 			</template>
 		</MkInput>
 		<MkSelect v-if="select" v-model="selectedValue" :items="selectDef" autofocus></MkSelect>
 		<div v-if="(showOkButton || showCancelButton) && !actions" :class="$style.buttons">
-			<MkButton v-if="showOkButton" data-testid="modal-dialog-ok" inline primary rounded :autofocus="!input && !select" :disabled="okButtonDisabledReason != null" @click="ok">{{ okText ?? ((showCancelButton || input || select) ? i18n.ts.ok : i18n.ts.gotIt) }}</MkButton>
-			<MkButton v-if="showCancelButton || input || select" data-testid="modal-dialog-cancel" inline rounded @click="cancel">{{ cancelText ?? i18n.ts.cancel }}</MkButton>
+			<MkButton v-if="showOkButton" data-testid="modal-dialog-ok" inline primary rounded :autofocus="!input && !select" :disabled="okButtonDisabledReason != null" @click="ok">{{ okText ?? ((showCancelButton || input || select) ? $locale.sfc.ok : $locale.sfc.gotIt) }}</MkButton>
+			<MkButton v-if="showCancelButton || input || select" data-testid="modal-dialog-cancel" inline rounded @click="cancel">{{ cancelText ?? $locale.sfc.cancel }}</MkButton>
 		</div>
 		<div v-if="actions" :class="$style.buttons">
 			<MkButton v-for="action in actions" :key="action.text" inline rounded :primary="action.primary" :danger="action.danger" @click="() => { action.callback(); modal?.close(); }">{{ action.text }}</MkButton>
@@ -55,7 +55,7 @@ import MkSelect from '@features/ui/frontend/components/MkSelect.vue';
 import type { MkSelectItem } from '@features/ui/frontend/components/MkSelect.vue';
 import type { OptionValue } from '@features/ui/frontend/types/option-value.js';
 import { useMkSelect } from '@features/ui/frontend/composables/use-mkselect.js';
-import { i18n } from '@/i18n.js';
+import { interpolateLocaleParameters } from '@features/runtime/frontend/interpolate-locale-parameters.js';
 
 type Input = {
 	type?: 'text' | 'number' | 'password' | 'email' | 'url' | 'date' | 'time' | 'search' | 'datetime-local';
@@ -215,3 +215,283 @@ function onInputKeydown(evt: KeyboardEvent) {
 	justify-content: center;
 }
 </style>
+
+<locale lang="json" locale="ar-SA">
+{
+	"charactersExceeded": "You've exceeded the maximum character limit! Currently at {current} of {max}.",
+	"charactersBelow": "You're below the minimum character limit! Currently at {current} of {min}.",
+	"ok": " حسناً",
+	"gotIt": "فهِمت",
+	"cancel": " إلغاء"
+}
+</locale>
+
+<locale lang="json" locale="ca-ES">
+{
+	"charactersExceeded": "Has arribat al màxim de caràcters! Actualment és {current} de {max}",
+	"charactersBelow": "Ets per sota del mínim de caràcters! Actualment és {current} de {min}",
+	"ok": "OK",
+	"gotIt": "D'acord ",
+	"cancel": "Cancel·lar"
+}
+</locale>
+
+<locale lang="json" locale="cs-CZ">
+{
+	"charactersExceeded": "Překročili jste maximální počet znaků! V současné době je na hodnotě {current} z {max}.",
+	"charactersBelow": "Nedosahujete minimálního limitu znaků! V současné době je na {current} z {min}.",
+	"ok": "Potvrdit",
+	"gotIt": "Rozumím!",
+	"cancel": "Zrušit"
+}
+</locale>
+
+<locale lang="json" locale="da-DK">
+{
+	"charactersExceeded": "You've exceeded the maximum character limit! Currently at {current} of {max}.",
+	"charactersBelow": "You're below the minimum character limit! Currently at {current} of {min}.",
+	"ok": "OK",
+	"gotIt": "Got it!",
+	"cancel": "Cancel"
+}
+</locale>
+
+<locale lang="json" locale="de-DE">
+{
+	"charactersExceeded": "Maximallänge überschritten! Momentan {current} von {max}",
+	"charactersBelow": "Minimallänge unterschritten! Momentan {current} von {min}",
+	"ok": "OK",
+	"gotIt": "Verstanden!",
+	"cancel": "Abbrechen"
+}
+</locale>
+
+<locale lang="json" locale="en-US">
+{
+	"charactersExceeded": "You've exceeded the maximum character limit! Currently at {current} of {max}.",
+	"charactersBelow": "You're below the minimum character limit! Currently at {current} of {min}.",
+	"ok": "OK",
+	"gotIt": "Got it!",
+	"cancel": "Cancel"
+}
+</locale>
+
+<locale lang="json" locale="es-ES">
+{
+	"charactersExceeded": "¡Has excedido el límite de caracteres! Actualmente {current} de {max}.",
+	"charactersBelow": "¡Estás por debajo del límite de caracteres! Actualmente {current} de {min}.",
+	"ok": "OK",
+	"gotIt": "¡Lo tengo!",
+	"cancel": "Cancelar"
+}
+</locale>
+
+<locale lang="json" locale="fr-FR">
+{
+	"charactersExceeded": "You've exceeded the maximum character limit! Currently at {current} of {max}.",
+	"charactersBelow": "You're below the minimum character limit! Currently at {current} of {min}.",
+	"ok": "OK",
+	"gotIt": "J’ai compris !",
+	"cancel": "Annuler"
+}
+</locale>
+
+<locale lang="json" locale="id-ID">
+{
+	"charactersExceeded": "Kamu telah melebihi batas karakter maksimum! Saat ini pada {current} dari {max}.",
+	"charactersBelow": "Kamu berada di bawah batas minimum karakter! Saat ini pada {current} dari {min}.",
+	"ok": "Oke",
+	"gotIt": "Mengerti",
+	"cancel": "Batalkan"
+}
+</locale>
+
+<locale lang="json" locale="it-IT">
+{
+	"charactersExceeded": "Hai superato il limite di {max} caratteri! ({current})",
+	"charactersBelow": "Sei al di sotto del minimo di {min} caratteri!  ({current})",
+	"ok": "OK",
+	"gotIt": "ok!",
+	"cancel": "Annulla"
+}
+</locale>
+
+<locale lang="json" locale="ja-JP">
+{
+	"charactersExceeded": "最大文字数を超えています！ 現在 {current} / 制限 {max}",
+	"charactersBelow": "最小文字数を下回っています！ 現在 {current} / 制限 {min}",
+	"ok": "OK",
+	"gotIt": "わかった",
+	"cancel": "キャンセル"
+}
+</locale>
+
+<locale lang="json" locale="ja-KS">
+{
+	"charactersExceeded": "最大の文字数を上回っとるで！今は {current} / 最大でも {max}",
+	"charactersBelow": "最小の文字数を下回っとるで！今は {current} / 最低でも {min}",
+	"ok": "ええで",
+	"gotIt": "ほい",
+	"cancel": "やめる"
+}
+</locale>
+
+<locale lang="json" locale="kab-KAB">
+{
+	"charactersExceeded": "You've exceeded the maximum character limit! Currently at {current} of {max}.",
+	"charactersBelow": "You're below the minimum character limit! Currently at {current} of {min}.",
+	"ok": "IH",
+	"gotIt": "Got it!",
+	"cancel": "Cancel"
+}
+</locale>
+
+<locale lang="json" locale="kn-IN">
+{
+	"charactersExceeded": "You've exceeded the maximum character limit! Currently at {current} of {max}.",
+	"charactersBelow": "You're below the minimum character limit! Currently at {current} of {min}.",
+	"ok": "ಸರಿ",
+	"gotIt": "ಅರ್ಥವಾಯಿತು!",
+	"cancel": "ರದ್ದು"
+}
+</locale>
+
+<locale lang="json" locale="ko-KR">
+{
+	"charactersExceeded": "최대 글자수를 초과하였습니다! 현재 {current} / 최대 {max}",
+	"charactersBelow": "최소 글자수 미만입니다! 현재 {current} / 최소 {min}",
+	"ok": "확인",
+	"gotIt": "알겠어요",
+	"cancel": "취소"
+}
+</locale>
+
+<locale lang="json" locale="nl-NL">
+{
+	"charactersExceeded": "You've exceeded the maximum character limit! Currently at {current} of {max}.",
+	"charactersBelow": "You're below the minimum character limit! Currently at {current} of {min}.",
+	"ok": "Ok",
+	"gotIt": "Begrepen",
+	"cancel": "Annuleren"
+}
+</locale>
+
+<locale lang="json" locale="no-NO">
+{
+	"charactersExceeded": "You've exceeded the maximum character limit! Currently at {current} of {max}.",
+	"charactersBelow": "You're below the minimum character limit! Currently at {current} of {min}.",
+	"ok": "OK",
+	"gotIt": "Skjønner",
+	"cancel": "Avbryt"
+}
+</locale>
+
+<locale lang="json" locale="pl-PL">
+{
+	"charactersExceeded": "You've exceeded the maximum character limit! Currently at {current} of {max}.",
+	"charactersBelow": "You're below the minimum character limit! Currently at {current} of {min}.",
+	"ok": "OK",
+	"gotIt": "Rozumiem!",
+	"cancel": "Anuluj"
+}
+</locale>
+
+<locale lang="json" locale="pt-PT">
+{
+	"charactersExceeded": "Você excedeu o limite de caracteres! Atualmente em {current} de {max}.",
+	"charactersBelow": "Você está abaixo do limite mínimo de caracteres! Atualmente em {current} of {min}.",
+	"ok": "OK",
+	"gotIt": "Entendi",
+	"cancel": "Cancelar"
+}
+</locale>
+
+<locale lang="json" locale="ru-RU">
+{
+	"charactersExceeded": "Превышено максимальное количество символов! У вас {current} / из   {max}",
+	"charactersBelow": "Это ниже минимального количества символов! У вас {current} / из {min}",
+	"ok": "Подтвердить",
+	"gotIt": "Ясно!",
+	"cancel": "Отмена"
+}
+</locale>
+
+<locale lang="json" locale="sk-SK">
+{
+	"charactersExceeded": "You've exceeded the maximum character limit! Currently at {current} of {max}.",
+	"charactersBelow": "You're below the minimum character limit! Currently at {current} of {min}.",
+	"ok": "OK",
+	"gotIt": "Rozumiem!",
+	"cancel": "Zrušiť"
+}
+</locale>
+
+<locale lang="json" locale="th-TH">
+{
+	"charactersExceeded": "คุณกำลังมีตัวอักขระเกินขีดจำกัดสูงสุดแล้วนะ! ปัจจุบันอยู่ที่ {current} จาก {max}",
+	"charactersBelow": "คุณกำลังใช้อักขระต่ำกว่าขีดจำกัดขั้นต่ำเลยนะ! ปัจจุบันอยู่ที่ {current} จาก {min}",
+	"ok": "ตกลง",
+	"gotIt": "เข้าใจแล้ว !",
+	"cancel": "ยกเลิก"
+}
+</locale>
+
+<locale lang="json" locale="tr-TR">
+{
+	"charactersExceeded": "Maksimum karakter sınırını aştınız! Şu anda {current} karakterde {max} karakterlik sınırın {current} karakterinde bulunuyorsunuz.",
+	"charactersBelow": "You're below the minimum character limit! Currently at {current} of {min}.",
+	"ok": "Tamam",
+	"gotIt": "Anladım!",
+	"cancel": "Vazgeç"
+}
+</locale>
+
+<locale lang="json" locale="ug-CN">
+{
+	"charactersExceeded": "You've exceeded the maximum character limit! Currently at {current} of {max}.",
+	"charactersBelow": "You're below the minimum character limit! Currently at {current} of {min}.",
+	"ok": "ماقۇل",
+	"gotIt": "Got it!",
+	"cancel": "Cancel"
+}
+</locale>
+
+<locale lang="json" locale="uk-UA">
+{
+	"charactersExceeded": "You've exceeded the maximum character limit! Currently at {current} of {max}.",
+	"charactersBelow": "You're below the minimum character limit! Currently at {current} of {min}.",
+	"ok": "OK",
+	"gotIt": "Зрозуміло!",
+	"cancel": "Скасувати"
+}
+</locale>
+
+<locale lang="json" locale="vi-VN">
+{
+	"charactersExceeded": "Bạn nhắn quá giới hạn ký tự!! Hiện nay {current} / giới hạn {max}",
+	"charactersBelow": "Bạn nhắn quá ít tối thiểu ký tự!! Hiện nay {current} / Tối thiểu {min}",
+	"ok": "Đồng ý",
+	"gotIt": "Hiểu rồi!",
+	"cancel": "Hủy"
+}
+</locale>
+
+<locale lang="json" locale="zh-CN">
+{
+	"charactersExceeded": "已经超过了最大字符数! 当前字符数 {current} / 限制字符数 {max}",
+	"charactersBelow": "低于最小字符数！当前字符数 {current} / 限制字符数 {min}",
+	"ok": "OK",
+	"gotIt": "好",
+	"cancel": "取消"
+}
+</locale>
+
+<locale lang="json" locale="zh-TW">
+{
+	"charactersExceeded": "您的貼文太長了！現時字數 {current}／限制字數 {max}",
+	"charactersBelow": "您的貼文太短了！現時字數 {current}／限制字數 {min}",
+	"ok": "OK",
+	"gotIt": "知道了",
+	"cancel": "取消"
+}
+</locale>

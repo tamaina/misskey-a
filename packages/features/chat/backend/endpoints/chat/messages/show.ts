@@ -3,63 +3,44 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Inject, Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
-import { DI } from '@/di-symbols.js';
-import { GetterService } from '@/server/api/GetterService.js';
-import { ChatService } from '@/core/ChatService.js';
-import { ChatEntityService } from '@/core/entities/ChatEntityService.js';
-import { ApiError } from '@/server/api/error.js';
-import { RoleService } from '@/core/RoleService.js';
+import { toPackedChatMessage } from '../../../api.dto.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 
-export const meta = {
-	tags: ['chat'],
+import type { InferSchemaOutput } from '@orpc/contract';
 
-	requireCredential: true,
+import { type RoleService } from '@features/roles/backend/services/RoleService.js';
 
-	kind: 'read:chat',
+import { type ChatEntityService } from '../../../serializers/ChatEntityService.js';
+import { type ChatService } from '../../../services/ChatService.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
+import { chatMessagesShowContract, chatMessagesShowErrors } from './show.contract.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
 
-	res: {
-		type: 'object',
-		optional: false, nullable: false,
-		ref: 'ChatMessage',
-	},
-
-	errors: {
-		noSuchMessage: {
-			message: 'No such message.',
-			code: 'NO_SUCH_MESSAGE',
-			id: '3710865b-1848-4da9-8d61-cfed15510b93',
-		},
-	},
-} as const;
-
-export const paramDef = {
-	type: 'object',
-	properties: {
-		messageId: { type: 'string', format: 'misskey:id' },
-	},
-	required: ['messageId'],
-} as const;
-
-@Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
-	constructor(
-		private chatService: ChatService,
-		private roleService: RoleService,
-		private chatEntityService: ChatEntityService,
-	) {
-		super(meta, paramDef, async (ps, me) => {
-			await this.chatService.checkChatAvailability(me.id, 'read');
-
-			const message = await this.chatService.findMessageById(ps.messageId);
-			if (message == null) {
-				throw new ApiError(meta.errors.noSuchMessage);
-			}
-			if (message.fromUserId !== me.id && message.toUserId !== me.id && !(await this.roleService.isModerator(me))) {
-				throw new ApiError(meta.errors.noSuchMessage);
-			}
-			return this.chatEntityService.packMessageDetailed(message, me);
-		});
+export interface ChatMessagesShowDependencies {
+	chatService: ChatService;
+	roleService: RoleService;
+	chatEntityService: ChatEntityService;
+}
+export function createChatMessagesShowProcedure(deps: ChatMessagesShowDependencies) {
+	async function execute(ps: InferSchemaOutput<NonNullable<typeof chatMessagesShowContract['~orpc']['inputSchema']>>, me: MiLocalUser): Promise<InferSchemaOutput<NonNullable<typeof chatMessagesShowContract['~orpc']['outputSchema']>>> {
+		return toPackedChatMessage(await run(ps, me));
 	}
+
+	async function run(ps: InferSchemaOutput<NonNullable<typeof chatMessagesShowContract['~orpc']['inputSchema']>>, me: MiLocalUser) {
+		await deps.chatService.checkChatAvailability(me.id, 'read');
+
+		const message = await deps.chatService.findMessageById(ps.messageId);
+		if (message == null) {
+			throw apiError(chatMessagesShowErrors.noSuchMessage);
+		}
+		if (message.fromUserId !== me.id && message.toUserId !== me.id && !(await deps.roleService.isModerator(me))) {
+			throw apiError(chatMessagesShowErrors.noSuchMessage);
+		}
+		return deps.chatEntityService.packMessageDetailed(message, me);
+	}
+
+	return createApiProcedure<MiLocalUser>()(chatMessagesShowContract)
+		.use(requirePrincipal<MiLocalUser>())
+		.handler(({ input, context }) => execute(input, context.principal));
 }

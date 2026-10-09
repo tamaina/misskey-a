@@ -1,0 +1,787 @@
+{
+  "files": [
+    {
+      "file": "packages/features/drive/frontend/utility/image-compositor-functions/blockNoise.ts",
+      "originalSource": "/*\n * SPDX-FileCopyrightText: syuilo and misskey-project\n * SPDX-License-Identifier: AGPL-3.0-only\n */\n\nimport seedrandom from 'seedrandom';\nimport shader from './blockNoise.glsl';\nimport type { ImageEffectorUiDefinition } from '../image-effector/ImageEffector.js';\nimport { defineImageCompositorFunction } from '@features/drive/frontend/utility/ImageCompositor.js';\nimport { i18n } from '@features/runtime/frontend/i18n.js';\n\nexport const fn = defineImageCompositorFunction<{\n\tamount: number;\n\tstrength: number;\n\twidth: number;\n\theight: number;\n\tchannelShift: number;\n\tseed: number;\n}>({\n\tshader,\n\tmain: ({ gl, program, u, params }) => {\n\t\tgl.uniform1i(u.amount, params.amount);\n\t\tgl.uniform1f(u.channelShift, params.channelShift);\n\n\t\tconst margin = 0;\n\n\t\tconst rnd = seedrandom(params.seed.toString());\n\n\t\tfor (let i = 0; i < params.amount; i++) {\n\t\t\tconst o = gl.getUniformLocation(program, `u_shiftOrigins[${i.toString()}]`);\n\t\t\tgl.uniform2f(o, (rnd() * (1 + (margin * 2))) - margin, (rnd() * (1 + (margin * 2))) - margin);\n\n\t\t\tconst s = gl.getUniformLocation(program, `u_shiftStrengths[${i.toString()}]`);\n\t\t\tgl.uniform1f(s, (1 - (rnd() * 2)) * params.strength);\n\n\t\t\tconst sizes = gl.getUniformLocation(program, `u_shiftSizes[${i.toString()}]`);\n\t\t\tgl.uniform2f(sizes, params.width, params.height);\n\t\t}\n\t},\n});\n\nexport const uiDefinition = {\n\tname: i18n.ts._imageEffector._fxs.glitch + ': ' + i18n.ts._imageEffector._fxs.blockNoise,\n\tparams: {\n\t\tamount: {\n\t\t\tlabel: i18n.ts._imageEffector._fxProps.amount,\n\t\t\ttype: 'number',\n\t\t\tdefault: 50,\n\t\t\tmin: 1,\n\t\t\tmax: 100,\n\t\t\tstep: 1,\n\t\t},\n\t\tstrength: {\n\t\t\tlabel: i18n.ts._imageEffector._fxProps.strength,\n\t\t\ttype: 'number',\n\t\t\tdefault: 0.05,\n\t\t\tmin: -1,\n\t\t\tmax: 1,\n\t\t\tstep: 0.01,\n\t\t\ttoViewValue: v => Math.round(v * 100) + '%',\n\t\t},\n\t\twidth: {\n\t\t\tlabel: i18n.ts.width,\n\t\t\ttype: 'number',\n\t\t\tdefault: 0.05,\n\t\t\tmin: 0.01,\n\t\t\tmax: 1,\n\t\t\tstep: 0.01,\n\t\t\ttoViewValue: v => Math.round(v * 100) + '%',\n\t\t},\n\t\theight: {\n\t\t\tlabel: i18n.ts.height,\n\t\t\ttype: 'number',\n\t\t\tdefault: 0.01,\n\t\t\tmin: 0.01,\n\t\t\tmax: 1,\n\t\t\tstep: 0.01,\n\t\t\ttoViewValue: v => Math.round(v * 100) + '%',\n\t\t},\n\t\tchannelShift: {\n\t\t\tlabel: i18n.ts._imageEffector._fxProps.glitchChannelShift,\n\t\t\ttype: 'number',\n\t\t\tdefault: 0,\n\t\t\tmin: 0,\n\t\t\tmax: 10,\n\t\t\tstep: 0.01,\n\t\t\ttoViewValue: v => Math.round(v * 100) + '%',\n\t\t},\n\t\tseed: {\n\t\t\tlabel: i18n.ts._imageEffector._fxProps.seed,\n\t\t\ttype: 'seed',\n\t\t\tdefault: 100,\n\t\t},\n\t},\n} satisfies ImageEffectorUiDefinition<typeof fn>;\n",
+      "originalSha256": "72463d11bcfaa4b9a11c99dc837be04316bea40a180e236048faf07bcb4620d3",
+      "oldImport": "import { i18n } from '@features/runtime/frontend/i18n.js';",
+      "newImport": "import { getImageEffectorMessages } from './locale.js';",
+      "setup": "const messages = getImageEffectorMessages();\n\n",
+      "rewrites": [
+        [
+          "i18n.ts._imageEffector._fxProps.amount",
+          "messages._imageEffector._fxProps.amount"
+        ],
+        [
+          "i18n.ts._imageEffector._fxProps.glitchChannelShift",
+          "messages._imageEffector._fxProps.glitchChannelShift"
+        ],
+        [
+          "i18n.ts._imageEffector._fxProps.seed",
+          "messages._imageEffector._fxProps.seed"
+        ],
+        [
+          "i18n.ts._imageEffector._fxProps.strength",
+          "messages._imageEffector._fxProps.strength"
+        ],
+        [
+          "i18n.ts._imageEffector._fxs.blockNoise",
+          "messages._imageEffector._fxs.blockNoise"
+        ],
+        [
+          "i18n.ts._imageEffector._fxs.glitch",
+          "messages._imageEffector._fxs.glitch"
+        ],
+        [
+          "i18n.ts.height",
+          "messages.height"
+        ],
+        [
+          "i18n.ts.width",
+          "messages.width"
+        ]
+      ]
+    },
+    {
+      "file": "packages/features/drive/frontend/utility/image-compositor-functions/blur.ts",
+      "originalSource": "/*\n * SPDX-FileCopyrightText: syuilo and misskey-project\n * SPDX-License-Identifier: AGPL-3.0-only\n */\n\nimport shader from './blur.glsl';\nimport type { ImageEffectorUiDefinition } from '../image-effector/ImageEffector.js';\nimport { defineImageCompositorFunction } from '@features/drive/frontend/utility/ImageCompositor.js';\nimport { i18n } from '@features/runtime/frontend/i18n.js';\n\nexport const fn = defineImageCompositorFunction<{\n\toffsetX: number;\n\toffsetY: number;\n\tscaleX: number;\n\tscaleY: number;\n\tellipse: boolean;\n\tangle: number;\n\tradius: number;\n}>({\n\tshader,\n\tmain: ({ gl, u, params }) => {\n\t\tgl.uniform2f(u.offset, params.offsetX / 2, params.offsetY / 2);\n\t\tgl.uniform2f(u.scale, params.scaleX / 2, params.scaleY / 2);\n\t\tgl.uniform1i(u.ellipse, params.ellipse ? 1 : 0);\n\t\tgl.uniform1f(u.angle, params.angle / 2);\n\t\tgl.uniform1f(u.radius, params.radius);\n\t},\n});\n\nexport const uiDefinition = {\n\tname: i18n.ts._imageEffector._fxs.blur,\n\tparams: {\n\t\toffsetX: {\n\t\t\tlabel: i18n.ts._imageEffector._fxProps.offset + ' X',\n\t\t\ttype: 'number',\n\t\t\tdefault: 0.0,\n\t\t\tmin: -1.0,\n\t\t\tmax: 1.0,\n\t\t\tstep: 0.01,\n\t\t\ttoViewValue: v => Math.round(v * 100) + '%',\n\t\t},\n\t\toffsetY: {\n\t\t\tlabel: i18n.ts._imageEffector._fxProps.offset + ' Y',\n\t\t\ttype: 'number',\n\t\t\tdefault: 0.0,\n\t\t\tmin: -1.0,\n\t\t\tmax: 1.0,\n\t\t\tstep: 0.01,\n\t\t\ttoViewValue: v => Math.round(v * 100) + '%',\n\t\t},\n\t\tscaleX: {\n\t\t\tlabel: i18n.ts._imageEffector._fxProps.scale + ' W',\n\t\t\ttype: 'number',\n\t\t\tdefault: 0.5,\n\t\t\tmin: 0.0,\n\t\t\tmax: 1.0,\n\t\t\tstep: 0.01,\n\t\t\ttoViewValue: v => Math.round(v * 100) + '%',\n\t\t},\n\t\tscaleY: {\n\t\t\tlabel: i18n.ts._imageEffector._fxProps.scale + ' H',\n\t\t\ttype: 'number',\n\t\t\tdefault: 0.5,\n\t\t\tmin: 0.0,\n\t\t\tmax: 1.0,\n\t\t\tstep: 0.01,\n\t\t\ttoViewValue: v => Math.round(v * 100) + '%',\n\t\t},\n\t\tellipse: {\n\t\t\tlabel: i18n.ts._imageEffector._fxProps.circle,\n\t\t\ttype: 'boolean',\n\t\t\tdefault: false,\n\t\t},\n\t\tangle: {\n\t\t\tlabel: i18n.ts._imageEffector._fxProps.angle,\n\t\t\ttype: 'number',\n\t\t\tdefault: 0,\n\t\t\tmin: -1.0,\n\t\t\tmax: 1.0,\n\t\t\tstep: 0.01,\n\t\t\ttoViewValue: v => Math.round(v * 90) + '°',\n\t\t},\n\t\tradius: {\n\t\t\tlabel: i18n.ts._imageEffector._fxProps.strength,\n\t\t\ttype: 'number',\n\t\t\tdefault: 0.15,\n\t\t\tmin: 0.0,\n\t\t\tmax: 0.3,\n\t\t\tstep: 0.01,\n\t\t},\n\t},\n} satisfies ImageEffectorUiDefinition<typeof fn>;\n",
+      "originalSha256": "aae0aa9a0d54133c688488f7b4e82ce2da1ef6e44ab2fa18b2816aff75f1b408",
+      "oldImport": "import { i18n } from '@features/runtime/frontend/i18n.js';",
+      "newImport": "import { getImageEffectorMessages } from './locale.js';",
+      "setup": "const messages = getImageEffectorMessages();\n\n",
+      "rewrites": [
+        [
+          "i18n.ts._imageEffector._fxProps.angle",
+          "messages._imageEffector._fxProps.angle"
+        ],
+        [
+          "i18n.ts._imageEffector._fxProps.circle",
+          "messages._imageEffector._fxProps.circle"
+        ],
+        [
+          "i18n.ts._imageEffector._fxProps.offset",
+          "messages._imageEffector._fxProps.offset"
+        ],
+        [
+          "i18n.ts._imageEffector._fxProps.scale",
+          "messages._imageEffector._fxProps.scale"
+        ],
+        [
+          "i18n.ts._imageEffector._fxProps.strength",
+          "messages._imageEffector._fxProps.strength"
+        ],
+        [
+          "i18n.ts._imageEffector._fxs.blur",
+          "messages._imageEffector._fxs.blur"
+        ]
+      ]
+    },
+    {
+      "file": "packages/features/drive/frontend/utility/image-compositor-functions/checker.ts",
+      "originalSource": "/*\n * SPDX-FileCopyrightText: syuilo and misskey-project\n * SPDX-License-Identifier: AGPL-3.0-only\n */\n\nimport shader from './checker.glsl';\nimport type { ImageEffectorUiDefinition } from '../image-effector/ImageEffector.js';\nimport { defineImageCompositorFunction } from '@features/drive/frontend/utility/ImageCompositor.js';\nimport { i18n } from '@features/runtime/frontend/i18n.js';\n\nexport const fn = defineImageCompositorFunction<{\n\tangle: number;\n\tscale: number;\n\tcolor: [number, number, number];\n\topacity: number;\n}>({\n\tshader,\n\tmain: ({ gl, u, params }) => {\n\t\tgl.uniform1f(u.angle, params.angle / 2);\n\t\tgl.uniform1f(u.scale, params.scale * params.scale);\n\t\tgl.uniform3f(u.color, params.color[0], params.color[1], params.color[2]);\n\t\tgl.uniform1f(u.opacity, params.opacity);\n\t},\n});\n\nexport const uiDefinition = {\n\tname: i18n.ts._imageEffector._fxs.checker,\n\tparams: {\n\t\tangle: {\n\t\t\tlabel: i18n.ts._imageEffector._fxProps.angle,\n\t\t\ttype: 'number',\n\t\t\tdefault: 0,\n\t\t\tmin: -1.0,\n\t\t\tmax: 1.0,\n\t\t\tstep: 0.01,\n\t\t\ttoViewValue: v => Math.round(v * 90) + '°',\n\t\t},\n\t\tscale: {\n\t\t\tlabel: i18n.ts._imageEffector._fxProps.scale,\n\t\t\ttype: 'number',\n\t\t\tdefault: 3.0,\n\t\t\tmin: 1.0,\n\t\t\tmax: 10.0,\n\t\t\tstep: 0.1,\n\t\t},\n\t\tcolor: {\n\t\t\tlabel: i18n.ts._imageEffector._fxProps.color,\n\t\t\ttype: 'color',\n\t\t\tdefault: [1, 1, 1],\n\t\t},\n\t\topacity: {\n\t\t\tlabel: i18n.ts._imageEffector._fxProps.opacity,\n\t\t\ttype: 'number',\n\t\t\tdefault: 0.5,\n\t\t\tmin: 0.0,\n\t\t\tmax: 1.0,\n\t\t\tstep: 0.01,\n\t\t\ttoViewValue: v => Math.round(v * 100) + '%',\n\t\t},\n\t},\n} satisfies ImageEffectorUiDefinition<typeof fn>;\n",
+      "originalSha256": "9e1bed5aa9b8ed1852dd8be4c6e760e12e66c5a139c351a42a1737d47588d0b7",
+      "oldImport": "import { i18n } from '@features/runtime/frontend/i18n.js';",
+      "newImport": "import { getImageEffectorMessages } from './locale.js';",
+      "setup": "const messages = getImageEffectorMessages();\n\n",
+      "rewrites": [
+        [
+          "i18n.ts._imageEffector._fxProps.angle",
+          "messages._imageEffector._fxProps.angle"
+        ],
+        [
+          "i18n.ts._imageEffector._fxProps.color",
+          "messages._imageEffector._fxProps.color"
+        ],
+        [
+          "i18n.ts._imageEffector._fxProps.opacity",
+          "messages._imageEffector._fxProps.opacity"
+        ],
+        [
+          "i18n.ts._imageEffector._fxProps.scale",
+          "messages._imageEffector._fxProps.scale"
+        ],
+        [
+          "i18n.ts._imageEffector._fxs.checker",
+          "messages._imageEffector._fxs.checker"
+        ]
+      ]
+    },
+    {
+      "file": "packages/features/drive/frontend/utility/image-compositor-functions/chromaticAberration.ts",
+      "originalSource": "/*\n * SPDX-FileCopyrightText: syuilo and misskey-project\n * SPDX-License-Identifier: AGPL-3.0-only\n */\n\nimport shader from './chromaticAberration.glsl';\nimport type { ImageEffectorUiDefinition } from '../image-effector/ImageEffector.js';\nimport { defineImageCompositorFunction } from '@features/drive/frontend/utility/ImageCompositor.js';\nimport { i18n } from '@features/runtime/frontend/i18n.js';\n\nexport const fn = defineImageCompositorFunction<{\n\tnormalize: boolean;\n\tamount: number;\n}>({\n\tshader,\n\tmain: ({ gl, u, params }) => {\n\t\tgl.uniform1f(u.amount, params.amount);\n\t\tgl.uniform1i(u.normalize, params.normalize ? 1 : 0);\n\t},\n});\n\nexport const uiDefinition = {\n\tname: i18n.ts._imageEffector._fxs.chromaticAberration,\n\tparams: {\n\t\tnormalize: {\n\t\t\tlabel: i18n.ts._imageEffector._fxProps.normalize,\n\t\t\ttype: 'boolean',\n\t\t\tdefault: false,\n\t\t},\n\t\tamount: {\n\t\t\tlabel: i18n.ts._imageEffector._fxProps.amount,\n\t\t\ttype: 'number',\n\t\t\tdefault: 0.1,\n\t\t\tmin: 0.0,\n\t\t\tmax: 1.0,\n\t\t\tstep: 0.01,\n\t\t},\n\t},\n} satisfies ImageEffectorUiDefinition<typeof fn>;\n",
+      "originalSha256": "0ddfc115acc5b4015ff11d729f5d020cf30152fbc393a56b481bae25c9ba1a0a",
+      "oldImport": "import { i18n } from '@features/runtime/frontend/i18n.js';",
+      "newImport": "import { getImageEffectorMessages } from './locale.js';",
+      "setup": "const messages = getImageEffectorMessages();\n\n",
+      "rewrites": [
+        [
+          "i18n.ts._imageEffector._fxProps.amount",
+          "messages._imageEffector._fxProps.amount"
+        ],
+        [
+          "i18n.ts._imageEffector._fxProps.normalize",
+          "messages._imageEffector._fxProps.normalize"
+        ],
+        [
+          "i18n.ts._imageEffector._fxs.chromaticAberration",
+          "messages._imageEffector._fxs.chromaticAberration"
+        ]
+      ]
+    },
+    {
+      "file": "packages/features/drive/frontend/utility/image-compositor-functions/colorAdjust.ts",
+      "originalSource": "/*\n * SPDX-FileCopyrightText: syuilo and misskey-project\n * SPDX-License-Identifier: AGPL-3.0-only\n */\n\nimport shader from './colorAdjust.glsl';\nimport type { ImageEffectorUiDefinition } from '../image-effector/ImageEffector.js';\nimport { defineImageCompositorFunction } from '@features/drive/frontend/utility/ImageCompositor.js';\nimport { i18n } from '@features/runtime/frontend/i18n.js';\n\nexport const fn = defineImageCompositorFunction<{\n\tlightness: number;\n\tcontrast: number;\n\thue: number;\n\tbrightness: number;\n\tsaturation: number;\n}>({\n\tshader,\n\tmain: ({ gl, u, params }) => {\n\t\tgl.uniform1f(u.brightness, params.brightness);\n\t\tgl.uniform1f(u.contrast, params.contrast);\n\t\tgl.uniform1f(u.hue, params.hue / 2);\n\t\tgl.uniform1f(u.lightness, params.lightness);\n\t\tgl.uniform1f(u.saturation, params.saturation);\n\t},\n});\n\nexport const uiDefinition = {\n\tname: i18n.ts._imageEffector._fxs.colorAdjust,\n\tparams: {\n\t\tlightness: {\n\t\t\tlabel: i18n.ts._imageEffector._fxProps.lightness,\n\t\t\ttype: 'number',\n\t\t\tdefault: 0,\n\t\t\tmin: -1,\n\t\t\tmax: 1,\n\t\t\tstep: 0.01,\n\t\t\ttoViewValue: v => Math.round(v * 100) + '%',\n\t\t},\n\t\tcontrast: {\n\t\t\tlabel: i18n.ts._imageEffector._fxProps.contrast,\n\t\t\ttype: 'number',\n\t\t\tdefault: 1,\n\t\t\tmin: 0,\n\t\t\tmax: 4,\n\t\t\tstep: 0.01,\n\t\t\ttoViewValue: v => Math.round(v * 100) + '%',\n\t\t},\n\t\thue: {\n\t\t\tlabel: i18n.ts._imageEffector._fxProps.hue,\n\t\t\ttype: 'number',\n\t\t\tdefault: 0,\n\t\t\tmin: -1,\n\t\t\tmax: 1,\n\t\t\tstep: 0.01,\n\t\t\ttoViewValue: v => Math.round(v * 180) + '°',\n\t\t},\n\t\tbrightness: {\n\t\t\tlabel: i18n.ts._imageEffector._fxProps.brightness,\n\t\t\ttype: 'number',\n\t\t\tdefault: 1,\n\t\t\tmin: 0,\n\t\t\tmax: 4,\n\t\t\tstep: 0.01,\n\t\t\ttoViewValue: v => Math.round(v * 100) + '%',\n\t\t},\n\t\tsaturation: {\n\t\t\tlabel: i18n.ts._imageEffector._fxProps.saturation,\n\t\t\ttype: 'number',\n\t\t\tdefault: 1,\n\t\t\tmin: 0,\n\t\t\tmax: 4,\n\t\t\tstep: 0.01,\n\t\t\ttoViewValue: v => Math.round(v * 100) + '%',\n\t\t},\n\t},\n} satisfies ImageEffectorUiDefinition<typeof fn>;\n",
+      "originalSha256": "4c8f8569d0d3f7095d8005ef4e577a30e01fb18d81d61f64d545dcf30e193ea9",
+      "oldImport": "import { i18n } from '@features/runtime/frontend/i18n.js';",
+      "newImport": "import { getImageEffectorMessages } from './locale.js';",
+      "setup": "const messages = getImageEffectorMessages();\n\n",
+      "rewrites": [
+        [
+          "i18n.ts._imageEffector._fxProps.brightness",
+          "messages._imageEffector._fxProps.brightness"
+        ],
+        [
+          "i18n.ts._imageEffector._fxProps.contrast",
+          "messages._imageEffector._fxProps.contrast"
+        ],
+        [
+          "i18n.ts._imageEffector._fxProps.hue",
+          "messages._imageEffector._fxProps.hue"
+        ],
+        [
+          "i18n.ts._imageEffector._fxProps.lightness",
+          "messages._imageEffector._fxProps.lightness"
+        ],
+        [
+          "i18n.ts._imageEffector._fxProps.saturation",
+          "messages._imageEffector._fxProps.saturation"
+        ],
+        [
+          "i18n.ts._imageEffector._fxs.colorAdjust",
+          "messages._imageEffector._fxs.colorAdjust"
+        ]
+      ]
+    },
+    {
+      "file": "packages/features/drive/frontend/utility/image-compositor-functions/colorClamp.ts",
+      "originalSource": "/*\n * SPDX-FileCopyrightText: syuilo and misskey-project\n * SPDX-License-Identifier: AGPL-3.0-only\n */\n\nimport shader from './colorClamp.glsl';\nimport type { ImageEffectorUiDefinition } from '../image-effector/ImageEffector.js';\nimport { defineImageCompositorFunction } from '@features/drive/frontend/utility/ImageCompositor.js';\nimport { i18n } from '@features/runtime/frontend/i18n.js';\n\nexport const fn = defineImageCompositorFunction<{\n\tmax: number;\n\tmin: number;\n}>({\n\tshader,\n\tmain: ({ gl, u, params }) => {\n\t\tgl.uniform1f(u.rMax, params.max);\n\t\tgl.uniform1f(u.rMin, 1.0 + params.min);\n\t\tgl.uniform1f(u.gMax, params.max);\n\t\tgl.uniform1f(u.gMin, 1.0 + params.min);\n\t\tgl.uniform1f(u.bMax, params.max);\n\t\tgl.uniform1f(u.bMin, 1.0 + params.min);\n\t},\n});\n\nexport const uiDefinition = {\n\tname: i18n.ts._imageEffector._fxs.colorClamp,\n\tparams: {\n\t\tmax: {\n\t\t\tlabel: i18n.ts._imageEffector._fxProps.max,\n\t\t\ttype: 'number',\n\t\t\tdefault: 1.0,\n\t\t\tmin: 0.0,\n\t\t\tmax: 1.0,\n\t\t\tstep: 0.01,\n\t\t\ttoViewValue: v => Math.round(v * 100) + '%',\n\t\t},\n\t\tmin: {\n\t\t\tlabel: i18n.ts._imageEffector._fxProps.min,\n\t\t\ttype: 'number',\n\t\t\tdefault: -1.0,\n\t\t\tmin: -1.0,\n\t\t\tmax: 0.0,\n\t\t\tstep: 0.01,\n\t\t\ttoViewValue: v => Math.round(v * 100) + '%',\n\t\t},\n\t},\n} satisfies ImageEffectorUiDefinition<typeof fn>;\n",
+      "originalSha256": "f01eef1ffc8d3d2f73165fcef6c5229e832d107f42b3e9a32c3a42f1903a77e2",
+      "oldImport": "import { i18n } from '@features/runtime/frontend/i18n.js';",
+      "newImport": "import { getImageEffectorMessages } from './locale.js';",
+      "setup": "const messages = getImageEffectorMessages();\n\n",
+      "rewrites": [
+        [
+          "i18n.ts._imageEffector._fxProps.max",
+          "messages._imageEffector._fxProps.max"
+        ],
+        [
+          "i18n.ts._imageEffector._fxProps.min",
+          "messages._imageEffector._fxProps.min"
+        ],
+        [
+          "i18n.ts._imageEffector._fxs.colorClamp",
+          "messages._imageEffector._fxs.colorClamp"
+        ]
+      ]
+    },
+    {
+      "file": "packages/features/drive/frontend/utility/image-compositor-functions/colorClampAdvanced.ts",
+      "originalSource": "/*\n * SPDX-FileCopyrightText: syuilo and misskey-project\n * SPDX-License-Identifier: AGPL-3.0-only\n */\n\nimport shader from './colorClamp.glsl';\nimport type { ImageEffectorUiDefinition } from '../image-effector/ImageEffector.js';\nimport { defineImageCompositorFunction } from '@features/drive/frontend/utility/ImageCompositor.js';\nimport { i18n } from '@features/runtime/frontend/i18n.js';\n\nexport const fn = defineImageCompositorFunction<{\n\trMax: number;\n\trMin: number;\n\tgMax: number;\n\tgMin: number;\n\tbMax: number;\n\tbMin: number;\n}>({\n\tshader,\n\tmain: ({ gl, u, params }) => {\n\t\tgl.uniform1f(u.rMax, params.rMax);\n\t\tgl.uniform1f(u.rMin, 1.0 + params.rMin);\n\t\tgl.uniform1f(u.gMax, params.gMax);\n\t\tgl.uniform1f(u.gMin, 1.0 + params.gMin);\n\t\tgl.uniform1f(u.bMax, params.bMax);\n\t\tgl.uniform1f(u.bMin, 1.0 + params.bMin);\n\t},\n});\n\nexport const uiDefinition = {\n\tname: i18n.ts._imageEffector._fxs.colorClampAdvanced,\n\tparams: {\n\t\trMax: {\n\t\t\tlabel: `${i18n.ts._imageEffector._fxProps.max} (${i18n.ts._imageEffector._fxProps.redComponent})`,\n\t\t\ttype: 'number',\n\t\t\tdefault: 1.0,\n\t\t\tmin: 0.0,\n\t\t\tmax: 1.0,\n\t\t\tstep: 0.01,\n\t\t\ttoViewValue: v => Math.round(v * 100) + '%',\n\t\t},\n\t\trMin: {\n\t\t\tlabel: `${i18n.ts._imageEffector._fxProps.min} (${i18n.ts._imageEffector._fxProps.redComponent})`,\n\t\t\ttype: 'number',\n\t\t\tdefault: -1.0,\n\t\t\tmin: -1.0,\n\t\t\tmax: 0.0,\n\t\t\tstep: 0.01,\n\t\t\ttoViewValue: v => Math.round(v * 100) + '%',\n\t\t},\n\t\tgMax: {\n\t\t\tlabel: `${i18n.ts._imageEffector._fxProps.max} (${i18n.ts._imageEffector._fxProps.greenComponent})`,\n\t\t\ttype: 'number',\n\t\t\tdefault: 1.0,\n\t\t\tmin: 0.0,\n\t\t\tmax: 1.0,\n\t\t\tstep: 0.01,\n\t\t\ttoViewValue: v => Math.round(v * 100) + '%',\n\t\t},\n\t\tgMin: {\n\t\t\tlabel: `${i18n.ts._imageEffector._fxProps.min} (${i18n.ts._imageEffector._fxProps.greenComponent})`,\n\t\t\ttype: 'number',\n\t\t\tdefault: -1.0,\n\t\t\tmin: -1.0,\n\t\t\tmax: 0.0,\n\t\t\tstep: 0.01,\n\t\t\ttoViewValue: v => Math.round(v * 100) + '%',\n\t\t},\n\t\tbMax: {\n\t\t\tlabel: `${i18n.ts._imageEffector._fxProps.max} (${i18n.ts._imageEffector._fxProps.blueComponent})`,\n\t\t\ttype: 'number',\n\t\t\tdefault: 1.0,\n\t\t\tmin: 0.0,\n\t\t\tmax: 1.0,\n\t\t\tstep: 0.01,\n\t\t\ttoViewValue: v => Math.round(v * 100) + '%',\n\t\t},\n\t\tbMin: {\n\t\t\tlabel: `${i18n.ts._imageEffector._fxProps.min} (${i18n.ts._imageEffector._fxProps.blueComponent})`,\n\t\t\ttype: 'number',\n\t\t\tdefault: -1.0,\n\t\t\tmin: -1.0,\n\t\t\tmax: 0.0,\n\t\t\tstep: 0.01,\n\t\t\ttoViewValue: v => Math.round(v * 100) + '%',\n\t\t},\n\t},\n} satisfies ImageEffectorUiDefinition<typeof fn>;\n",
+      "originalSha256": "e53361a130746aefbf402c544f93a4e5d5cd7688f443190362540322d7a79c03",
+      "oldImport": "import { i18n } from '@features/runtime/frontend/i18n.js';",
+      "newImport": "import { getImageEffectorMessages } from './locale.js';",
+      "setup": "const messages = getImageEffectorMessages();\n\n",
+      "rewrites": [
+        [
+          "i18n.ts._imageEffector._fxProps.blueComponent",
+          "messages._imageEffector._fxProps.blueComponent"
+        ],
+        [
+          "i18n.ts._imageEffector._fxProps.greenComponent",
+          "messages._imageEffector._fxProps.greenComponent"
+        ],
+        [
+          "i18n.ts._imageEffector._fxProps.max",
+          "messages._imageEffector._fxProps.max"
+        ],
+        [
+          "i18n.ts._imageEffector._fxProps.min",
+          "messages._imageEffector._fxProps.min"
+        ],
+        [
+          "i18n.ts._imageEffector._fxProps.redComponent",
+          "messages._imageEffector._fxProps.redComponent"
+        ],
+        [
+          "i18n.ts._imageEffector._fxs.colorClampAdvanced",
+          "messages._imageEffector._fxs.colorClampAdvanced"
+        ]
+      ]
+    },
+    {
+      "file": "packages/features/drive/frontend/utility/image-compositor-functions/distort.ts",
+      "originalSource": "/*\n * SPDX-FileCopyrightText: syuilo and misskey-project\n * SPDX-License-Identifier: AGPL-3.0-only\n */\n\nimport shader from './distort.glsl';\nimport type { ImageEffectorUiDefinition } from '../image-effector/ImageEffector.js';\nimport { defineImageCompositorFunction } from '@features/drive/frontend/utility/ImageCompositor.js';\nimport { i18n } from '@features/runtime/frontend/i18n.js';\n\nexport const fn = defineImageCompositorFunction<{\n\tdirection: number;\n\tphase: number;\n\tfrequency: number;\n\tstrength: number;\n}>({\n\tshader,\n\tmain: ({ gl, u, params }) => {\n\t\tgl.uniform1f(u.phase, params.phase);\n\t\tgl.uniform1f(u.frequency, params.frequency);\n\t\tgl.uniform1f(u.strength, params.strength);\n\t\tgl.uniform1i(u.direction, params.direction);\n\t},\n});\n\nexport const uiDefinition = {\n\tname: i18n.ts._imageEffector._fxs.distort,\n\tparams: {\n\t\tdirection: {\n\t\t\tlabel: i18n.ts._imageEffector._fxProps.direction,\n\t\t\ttype: 'number:enum',\n\t\t\tenum: [\n\t\t\t\t{ value: 0 as const, label: i18n.ts.horizontal },\n\t\t\t\t{ value: 1 as const, label: i18n.ts.vertical },\n\t\t\t],\n\t\t\tdefault: 1,\n\t\t},\n\t\tphase: {\n\t\t\tlabel: i18n.ts._imageEffector._fxProps.phase,\n\t\t\ttype: 'number',\n\t\t\tdefault: 0.0,\n\t\t\tmin: -1.0,\n\t\t\tmax: 1.0,\n\t\t\tstep: 0.01,\n\t\t\ttoViewValue: v => Math.round(v * 100) + '%',\n\t\t},\n\t\tfrequency: {\n\t\t\tlabel: i18n.ts._imageEffector._fxProps.frequency,\n\t\t\ttype: 'number',\n\t\t\tdefault: 30,\n\t\t\tmin: 0,\n\t\t\tmax: 100,\n\t\t\tstep: 0.1,\n\t\t},\n\t\tstrength: {\n\t\t\tlabel: i18n.ts._imageEffector._fxProps.strength,\n\t\t\ttype: 'number',\n\t\t\tdefault: 0.05,\n\t\t\tmin: 0,\n\t\t\tmax: 1,\n\t\t\tstep: 0.01,\n\t\t\ttoViewValue: v => Math.round(v * 100) + '%',\n\t\t},\n\t},\n} satisfies ImageEffectorUiDefinition<typeof fn>;\n",
+      "originalSha256": "72f72d126be0b1ca592d4eb02c9893320a594bbcf87f34954f48ee7c5ce01f56",
+      "oldImport": "import { i18n } from '@features/runtime/frontend/i18n.js';",
+      "newImport": "import { getImageEffectorMessages } from './locale.js';",
+      "setup": "const messages = getImageEffectorMessages();\n\n",
+      "rewrites": [
+        [
+          "i18n.ts._imageEffector._fxProps.direction",
+          "messages._imageEffector._fxProps.direction"
+        ],
+        [
+          "i18n.ts._imageEffector._fxProps.frequency",
+          "messages._imageEffector._fxProps.frequency"
+        ],
+        [
+          "i18n.ts._imageEffector._fxProps.phase",
+          "messages._imageEffector._fxProps.phase"
+        ],
+        [
+          "i18n.ts._imageEffector._fxProps.strength",
+          "messages._imageEffector._fxProps.strength"
+        ],
+        [
+          "i18n.ts._imageEffector._fxs.distort",
+          "messages._imageEffector._fxs.distort"
+        ],
+        [
+          "i18n.ts.horizontal",
+          "messages.horizontal"
+        ],
+        [
+          "i18n.ts.vertical",
+          "messages.vertical"
+        ]
+      ]
+    },
+    {
+      "file": "packages/features/drive/frontend/utility/image-compositor-functions/fill.ts",
+      "originalSource": "/*\n * SPDX-FileCopyrightText: syuilo and misskey-project\n * SPDX-License-Identifier: AGPL-3.0-only\n */\n\nimport shader from './fill.glsl';\nimport type { ImageEffectorUiDefinition } from '../image-effector/ImageEffector.js';\nimport { defineImageCompositorFunction } from '@features/drive/frontend/utility/ImageCompositor.js';\nimport { i18n } from '@features/runtime/frontend/i18n.js';\n\nexport const fn = defineImageCompositorFunction<{\n\toffsetX: number;\n\toffsetY: number;\n\tscaleX: number;\n\tscaleY: number;\n\tellipse: boolean;\n\tangle: number;\n\tcolor: [number, number, number];\n\topacity: number;\n}>({\n\tshader,\n\tmain: ({ gl, u, params }) => {\n\t\tgl.uniform2f(u.offset, params.offsetX / 2, params.offsetY / 2);\n\t\tgl.uniform2f(u.scale, params.scaleX / 2, params.scaleY / 2);\n\t\tgl.uniform1i(u.ellipse, params.ellipse ? 1 : 0);\n\t\tgl.uniform1f(u.angle, params.angle / 2);\n\t\tgl.uniform3f(u.color, params.color[0], params.color[1], params.color[2]);\n\t\tgl.uniform1f(u.opacity, params.opacity);\n\t},\n});\n\nexport const uiDefinition = {\n\tname: i18n.ts._imageEffector._fxs.fill,\n\tparams: {\n\t\toffsetX: {\n\t\t\tlabel: i18n.ts._imageEffector._fxProps.offset + ' X',\n\t\t\ttype: 'number',\n\t\t\tdefault: 0.0,\n\t\t\tmin: -1.0,\n\t\t\tmax: 1.0,\n\t\t\tstep: 0.01,\n\t\t\ttoViewValue: v => Math.round(v * 100) + '%',\n\t\t},\n\t\toffsetY: {\n\t\t\tlabel: i18n.ts._imageEffector._fxProps.offset + ' Y',\n\t\t\ttype: 'number',\n\t\t\tdefault: 0.0,\n\t\t\tmin: -1.0,\n\t\t\tmax: 1.0,\n\t\t\tstep: 0.01,\n\t\t\ttoViewValue: v => Math.round(v * 100) + '%',\n\t\t},\n\t\tscaleX: {\n\t\t\tlabel: i18n.ts._imageEffector._fxProps.scale + ' W',\n\t\t\ttype: 'number',\n\t\t\tdefault: 0.5,\n\t\t\tmin: 0.0,\n\t\t\tmax: 1.0,\n\t\t\tstep: 0.01,\n\t\t\ttoViewValue: v => Math.round(v * 100) + '%',\n\t\t},\n\t\tscaleY: {\n\t\t\tlabel: i18n.ts._imageEffector._fxProps.scale + ' H',\n\t\t\ttype: 'number',\n\t\t\tdefault: 0.5,\n\t\t\tmin: 0.0,\n\t\t\tmax: 1.0,\n\t\t\tstep: 0.01,\n\t\t\ttoViewValue: v => Math.round(v * 100) + '%',\n\t\t},\n\t\tellipse: {\n\t\t\tlabel: i18n.ts._imageEffector._fxProps.circle,\n\t\t\ttype: 'boolean',\n\t\t\tdefault: false,\n\t\t},\n\t\tangle: {\n\t\t\tlabel: i18n.ts._imageEffector._fxProps.angle,\n\t\t\ttype: 'number',\n\t\t\tdefault: 0,\n\t\t\tmin: -1.0,\n\t\t\tmax: 1.0,\n\t\t\tstep: 0.01,\n\t\t\ttoViewValue: v => Math.round(v * 90) + '°',\n\t\t},\n\t\tcolor: {\n\t\t\tlabel: i18n.ts._imageEffector._fxProps.color,\n\t\t\ttype: 'color',\n\t\t\tdefault: [1, 1, 1],\n\t\t},\n\t\topacity: {\n\t\t\tlabel: i18n.ts._imageEffector._fxProps.opacity,\n\t\t\ttype: 'number',\n\t\t\tdefault: 1.0,\n\t\t\tmin: 0.0,\n\t\t\tmax: 1.0,\n\t\t\tstep: 0.01,\n\t\t\ttoViewValue: v => Math.round(v * 100) + '%',\n\t\t},\n\t},\n} satisfies ImageEffectorUiDefinition<typeof fn>;\n",
+      "originalSha256": "9deb00c819e3b0cb7113971fc7902d49262bcd933954eff4c408fd1194af6189",
+      "oldImport": "import { i18n } from '@features/runtime/frontend/i18n.js';",
+      "newImport": "import { getImageEffectorMessages } from './locale.js';",
+      "setup": "const messages = getImageEffectorMessages();\n\n",
+      "rewrites": [
+        [
+          "i18n.ts._imageEffector._fxProps.angle",
+          "messages._imageEffector._fxProps.angle"
+        ],
+        [
+          "i18n.ts._imageEffector._fxProps.circle",
+          "messages._imageEffector._fxProps.circle"
+        ],
+        [
+          "i18n.ts._imageEffector._fxProps.color",
+          "messages._imageEffector._fxProps.color"
+        ],
+        [
+          "i18n.ts._imageEffector._fxProps.offset",
+          "messages._imageEffector._fxProps.offset"
+        ],
+        [
+          "i18n.ts._imageEffector._fxProps.opacity",
+          "messages._imageEffector._fxProps.opacity"
+        ],
+        [
+          "i18n.ts._imageEffector._fxProps.scale",
+          "messages._imageEffector._fxProps.scale"
+        ],
+        [
+          "i18n.ts._imageEffector._fxs.fill",
+          "messages._imageEffector._fxs.fill"
+        ]
+      ]
+    },
+    {
+      "file": "packages/features/drive/frontend/utility/image-compositor-functions/grayscale.ts",
+      "originalSource": "/*\n * SPDX-FileCopyrightText: syuilo and misskey-project\n * SPDX-License-Identifier: AGPL-3.0-only\n */\n\nimport shader from './grayscale.glsl';\nimport type { ImageEffectorUiDefinition } from '../image-effector/ImageEffector.js';\nimport { defineImageCompositorFunction } from '@features/drive/frontend/utility/ImageCompositor.js';\nimport { i18n } from '@features/runtime/frontend/i18n.js';\n\nexport const fn = defineImageCompositorFunction({\n\tshader,\n\tmain: ({ gl, u, params }) => {\n\t},\n});\n\nexport const uiDefinition = {\n\tname: i18n.ts._imageEffector._fxs.grayscale,\n\tparams: {\n\t},\n} satisfies ImageEffectorUiDefinition<typeof fn>;\n",
+      "originalSha256": "c701c297a0934836957a871bfd0d07da514627463767c1f64285a77fbf3b6be3",
+      "oldImport": "import { i18n } from '@features/runtime/frontend/i18n.js';",
+      "newImport": "import { getImageEffectorMessages } from './locale.js';",
+      "setup": "const messages = getImageEffectorMessages();\n\n",
+      "rewrites": [
+        [
+          "i18n.ts._imageEffector._fxs.grayscale",
+          "messages._imageEffector._fxs.grayscale"
+        ]
+      ]
+    },
+    {
+      "file": "packages/features/drive/frontend/utility/image-compositor-functions/invert.ts",
+      "originalSource": "/*\n * SPDX-FileCopyrightText: syuilo and misskey-project\n * SPDX-License-Identifier: AGPL-3.0-only\n */\n\nimport shader from './invert.glsl';\nimport type { ImageEffectorUiDefinition } from '../image-effector/ImageEffector.js';\nimport { defineImageCompositorFunction } from '@features/drive/frontend/utility/ImageCompositor.js';\nimport { i18n } from '@features/runtime/frontend/i18n.js';\n\nexport const fn = defineImageCompositorFunction<{\n\tr: boolean;\n\tg: boolean;\n\tb: boolean;\n}>({\n\tshader,\n\tmain: ({ gl, u, params }) => {\n\t\tgl.uniform1i(u.r, params.r ? 1 : 0);\n\t\tgl.uniform1i(u.g, params.g ? 1 : 0);\n\t\tgl.uniform1i(u.b, params.b ? 1 : 0);\n\t},\n});\n\nexport const uiDefinition = {\n\tname: i18n.ts._imageEffector._fxs.invert,\n\tparams: {\n\t\tr: {\n\t\t\tlabel: i18n.ts._imageEffector._fxProps.redComponent,\n\t\t\ttype: 'boolean',\n\t\t\tdefault: true,\n\t\t},\n\t\tg: {\n\t\t\tlabel: i18n.ts._imageEffector._fxProps.greenComponent,\n\t\t\ttype: 'boolean',\n\t\t\tdefault: true,\n\t\t},\n\t\tb: {\n\t\t\tlabel: i18n.ts._imageEffector._fxProps.blueComponent,\n\t\t\ttype: 'boolean',\n\t\t\tdefault: true,\n\t\t},\n\t},\n} satisfies ImageEffectorUiDefinition<typeof fn>;\n",
+      "originalSha256": "b706b50c903f1850d63f37ed8e6262bdc73577ee9cdb135c33f5506118d7ffce",
+      "oldImport": "import { i18n } from '@features/runtime/frontend/i18n.js';",
+      "newImport": "import { getImageEffectorMessages } from './locale.js';",
+      "setup": "const messages = getImageEffectorMessages();\n\n",
+      "rewrites": [
+        [
+          "i18n.ts._imageEffector._fxProps.blueComponent",
+          "messages._imageEffector._fxProps.blueComponent"
+        ],
+        [
+          "i18n.ts._imageEffector._fxProps.greenComponent",
+          "messages._imageEffector._fxProps.greenComponent"
+        ],
+        [
+          "i18n.ts._imageEffector._fxProps.redComponent",
+          "messages._imageEffector._fxProps.redComponent"
+        ],
+        [
+          "i18n.ts._imageEffector._fxs.invert",
+          "messages._imageEffector._fxs.invert"
+        ]
+      ]
+    },
+    {
+      "file": "packages/features/drive/frontend/utility/image-compositor-functions/mirror.ts",
+      "originalSource": "/*\n * SPDX-FileCopyrightText: syuilo and misskey-project\n * SPDX-License-Identifier: AGPL-3.0-only\n */\n\nimport shader from './mirror.glsl';\nimport type { ImageEffectorUiDefinition } from '../image-effector/ImageEffector.js';\nimport { defineImageCompositorFunction } from '@features/drive/frontend/utility/ImageCompositor.js';\nimport { i18n } from '@features/runtime/frontend/i18n.js';\n\nexport const fn = defineImageCompositorFunction<{\n\th: number;\n\tv: number;\n}>({\n\tshader,\n\tmain: ({ gl, u, params }) => {\n\t\tgl.uniform1i(u.h, params.h);\n\t\tgl.uniform1i(u.v, params.v);\n\t},\n});\n\nexport const uiDefinition = {\n\tname: i18n.ts._imageEffector._fxs.mirror,\n\tparams: {\n\t\th: {\n\t\t\tlabel: i18n.ts.horizontal,\n\t\t\ttype: 'number:enum',\n\t\t\tenum: [\n\t\t\t\t{ value: -1 as const, icon: 'ti ti-arrow-bar-right' },\n\t\t\t\t{ value: 0 as const, icon: 'ti ti-minus-vertical' },\n\t\t\t\t{ value: 1 as const, icon: 'ti ti-arrow-bar-left' },\n\t\t\t],\n\t\t\tdefault: -1,\n\t\t},\n\t\tv: {\n\t\t\tlabel: i18n.ts.vertical,\n\t\t\ttype: 'number:enum',\n\t\t\tenum: [\n\t\t\t\t{ value: -1 as const, icon: 'ti ti-arrow-bar-down' },\n\t\t\t\t{ value: 0 as const, icon: 'ti ti-minus' },\n\t\t\t\t{ value: 1 as const, icon: 'ti ti-arrow-bar-up' },\n\t\t\t],\n\t\t\tdefault: 0,\n\t\t},\n\t},\n} satisfies ImageEffectorUiDefinition<typeof fn>;\n",
+      "originalSha256": "720b2ee3e78abe405c88d9a0fe6ff433f82d86325d1ff5e77439b8840e517dc0",
+      "oldImport": "import { i18n } from '@features/runtime/frontend/i18n.js';",
+      "newImport": "import { getImageEffectorMessages } from './locale.js';",
+      "setup": "const messages = getImageEffectorMessages();\n\n",
+      "rewrites": [
+        [
+          "i18n.ts._imageEffector._fxs.mirror",
+          "messages._imageEffector._fxs.mirror"
+        ],
+        [
+          "i18n.ts.horizontal",
+          "messages.horizontal"
+        ],
+        [
+          "i18n.ts.vertical",
+          "messages.vertical"
+        ]
+      ]
+    },
+    {
+      "file": "packages/features/drive/frontend/utility/image-compositor-functions/pixelate.ts",
+      "originalSource": "/*\n * SPDX-FileCopyrightText: syuilo and misskey-project\n * SPDX-License-Identifier: AGPL-3.0-only\n */\n\nimport shader from './pixelate.glsl';\nimport type { ImageEffectorUiDefinition } from '../image-effector/ImageEffector.js';\nimport { defineImageCompositorFunction } from '@features/drive/frontend/utility/ImageCompositor.js';\nimport { i18n } from '@features/runtime/frontend/i18n.js';\n\nexport const fn = defineImageCompositorFunction<{\n\toffsetX: number;\n\toffsetY: number;\n\tscaleX: number;\n\tscaleY: number;\n\tellipse: boolean;\n\tangle: number;\n\tstrength: number;\n}>({\n\tshader,\n\tmain: ({ gl, u, params }) => {\n\t\tgl.uniform2f(u.offset, params.offsetX / 2, params.offsetY / 2);\n\t\tgl.uniform2f(u.scale, params.scaleX / 2, params.scaleY / 2);\n\t\tgl.uniform1i(u.ellipse, params.ellipse ? 1 : 0);\n\t\tgl.uniform1f(u.angle, params.angle / 2);\n\t\tgl.uniform1f(u.strength, params.strength * params.strength);\n\t\tgl.uniform1i(u.samples, 256);\n\t},\n});\n\nexport const uiDefinition = {\n\tname: i18n.ts._imageEffector._fxs.pixelate,\n\tparams: {\n\t\toffsetX: {\n\t\t\tlabel: i18n.ts._imageEffector._fxProps.offset + ' X',\n\t\t\ttype: 'number',\n\t\t\tdefault: 0.0,\n\t\t\tmin: -1.0,\n\t\t\tmax: 1.0,\n\t\t\tstep: 0.01,\n\t\t\ttoViewValue: v => Math.round(v * 100) + '%',\n\t\t},\n\t\toffsetY: {\n\t\t\tlabel: i18n.ts._imageEffector._fxProps.offset + ' Y',\n\t\t\ttype: 'number',\n\t\t\tdefault: 0.0,\n\t\t\tmin: -1.0,\n\t\t\tmax: 1.0,\n\t\t\tstep: 0.01,\n\t\t\ttoViewValue: v => Math.round(v * 100) + '%',\n\t\t},\n\t\tscaleX: {\n\t\t\tlabel: i18n.ts._imageEffector._fxProps.scale + ' W',\n\t\t\ttype: 'number',\n\t\t\tdefault: 0.5,\n\t\t\tmin: 0.0,\n\t\t\tmax: 1.0,\n\t\t\tstep: 0.01,\n\t\t\ttoViewValue: v => Math.round(v * 100) + '%',\n\t\t},\n\t\tscaleY: {\n\t\t\tlabel: i18n.ts._imageEffector._fxProps.scale + ' H',\n\t\t\ttype: 'number',\n\t\t\tdefault: 0.5,\n\t\t\tmin: 0.0,\n\t\t\tmax: 1.0,\n\t\t\tstep: 0.01,\n\t\t\ttoViewValue: v => Math.round(v * 100) + '%',\n\t\t},\n\t\tellipse: {\n\t\t\tlabel: i18n.ts._imageEffector._fxProps.circle,\n\t\t\ttype: 'boolean',\n\t\t\tdefault: false,\n\t\t},\n\t\tangle: {\n\t\t\tlabel: i18n.ts._imageEffector._fxProps.angle,\n\t\t\ttype: 'number',\n\t\t\tdefault: 0,\n\t\t\tmin: -1.0,\n\t\t\tmax: 1.0,\n\t\t\tstep: 0.01,\n\t\t\ttoViewValue: v => Math.round(v * 90) + '°',\n\t\t},\n\t\tstrength: {\n\t\t\tlabel: i18n.ts._imageEffector._fxProps.strength,\n\t\t\ttype: 'number',\n\t\t\tdefault: 0.2,\n\t\t\tmin: 0.0,\n\t\t\tmax: 0.5,\n\t\t\tstep: 0.01,\n\t\t},\n\t},\n} satisfies ImageEffectorUiDefinition<typeof fn>;\n",
+      "originalSha256": "1fb416adef326052f336f88cf05372ebfef034eaf838a1952edb6912fc5b65b9",
+      "oldImport": "import { i18n } from '@features/runtime/frontend/i18n.js';",
+      "newImport": "import { getImageEffectorMessages } from './locale.js';",
+      "setup": "const messages = getImageEffectorMessages();\n\n",
+      "rewrites": [
+        [
+          "i18n.ts._imageEffector._fxProps.angle",
+          "messages._imageEffector._fxProps.angle"
+        ],
+        [
+          "i18n.ts._imageEffector._fxProps.circle",
+          "messages._imageEffector._fxProps.circle"
+        ],
+        [
+          "i18n.ts._imageEffector._fxProps.offset",
+          "messages._imageEffector._fxProps.offset"
+        ],
+        [
+          "i18n.ts._imageEffector._fxProps.scale",
+          "messages._imageEffector._fxProps.scale"
+        ],
+        [
+          "i18n.ts._imageEffector._fxProps.strength",
+          "messages._imageEffector._fxProps.strength"
+        ],
+        [
+          "i18n.ts._imageEffector._fxs.pixelate",
+          "messages._imageEffector._fxs.pixelate"
+        ]
+      ]
+    },
+    {
+      "file": "packages/features/drive/frontend/utility/image-compositor-functions/polkadot.ts",
+      "originalSource": "/*\n * SPDX-FileCopyrightText: syuilo and misskey-project\n * SPDX-License-Identifier: AGPL-3.0-only\n */\n\nimport shader from './polkadot.glsl';\nimport type { ImageEffectorUiDefinition } from '../image-effector/ImageEffector.js';\nimport { defineImageCompositorFunction } from '@features/drive/frontend/utility/ImageCompositor.js';\nimport { i18n } from '@features/runtime/frontend/i18n.js';\n\nexport const fn = defineImageCompositorFunction<{\n\tangle: number;\n\tscale: number;\n\tmajorRadius: number;\n\tmajorOpacity: number;\n\tminorDivisions: number;\n\tminorRadius: number;\n\tminorOpacity: number;\n\tcolor: [number, number, number];\n}>({\n\tshader,\n\tmain: ({ gl, u, params }) => {\n\t\tgl.uniform1f(u.angle, params.angle / 2);\n\t\tgl.uniform1f(u.scale, params.scale * params.scale);\n\t\tgl.uniform1f(u.major_radius, params.majorRadius);\n\t\tgl.uniform1f(u.major_opacity, params.majorOpacity);\n\t\tgl.uniform1f(u.minor_divisions, params.minorDivisions);\n\t\tgl.uniform1f(u.minor_radius, params.minorRadius);\n\t\tgl.uniform3f(u.color, params.color[0], params.color[1], params.color[2]);\n\t\tgl.uniform1f(u.minor_opacity, params.minorOpacity);\n\t},\n});\n\nexport const uiDefinition = {\n\tname: i18n.ts._imageEffector._fxs.polkadot,\n\tparams: {\n\t\tangle: {\n\t\t\tlabel: i18n.ts._imageEffector._fxProps.angle,\n\t\t\ttype: 'number',\n\t\t\tdefault: 0,\n\t\t\tmin: -1.0,\n\t\t\tmax: 1.0,\n\t\t\tstep: 0.01,\n\t\t\ttoViewValue: v => Math.round(v * 90) + '°',\n\t\t},\n\t\tscale: {\n\t\t\tlabel: i18n.ts._imageEffector._fxProps.scale,\n\t\t\ttype: 'number',\n\t\t\tdefault: 3.0,\n\t\t\tmin: 1.0,\n\t\t\tmax: 10.0,\n\t\t\tstep: 0.1,\n\t\t},\n\t\tmajorRadius: {\n\t\t\tlabel: i18n.ts._watermarkEditor.polkadotMainDotRadius,\n\t\t\ttype: 'number',\n\t\t\tdefault: 0.1,\n\t\t\tmin: 0.0,\n\t\t\tmax: 1.0,\n\t\t\tstep: 0.01,\n\t\t},\n\t\tmajorOpacity: {\n\t\t\tlabel: i18n.ts._watermarkEditor.polkadotMainDotOpacity,\n\t\t\ttype: 'number',\n\t\t\tdefault: 0.75,\n\t\t\tmin: 0.0,\n\t\t\tmax: 1.0,\n\t\t\tstep: 0.01,\n\t\t\ttoViewValue: v => Math.round(v * 100) + '%',\n\t\t},\n\t\tminorDivisions: {\n\t\t\tlabel: i18n.ts._watermarkEditor.polkadotSubDotDivisions,\n\t\t\ttype: 'number',\n\t\t\tdefault: 4,\n\t\t\tmin: 0,\n\t\t\tmax: 16,\n\t\t\tstep: 1,\n\t\t},\n\t\tminorRadius: {\n\t\t\tlabel: i18n.ts._watermarkEditor.polkadotSubDotRadius,\n\t\t\ttype: 'number',\n\t\t\tdefault: 0.25,\n\t\t\tmin: 0.0,\n\t\t\tmax: 1.0,\n\t\t\tstep: 0.01,\n\t\t},\n\t\tminorOpacity: {\n\t\t\tlabel: i18n.ts._watermarkEditor.polkadotSubDotOpacity,\n\t\t\ttype: 'number',\n\t\t\tdefault: 0.5,\n\t\t\tmin: 0.0,\n\t\t\tmax: 1.0,\n\t\t\tstep: 0.01,\n\t\t\ttoViewValue: v => Math.round(v * 100) + '%',\n\t\t},\n\t\tcolor: {\n\t\t\tlabel: i18n.ts._imageEffector._fxProps.color,\n\t\t\ttype: 'color',\n\t\t\tdefault: [1, 1, 1],\n\t\t},\n\t},\n} satisfies ImageEffectorUiDefinition<typeof fn>;\n",
+      "originalSha256": "6cbb4446c4ffb9ce6fd68a7cb18dfb269986285c01910c34c62c88a2f19cb622",
+      "oldImport": "import { i18n } from '@features/runtime/frontend/i18n.js';",
+      "newImport": "import { getImageEffectorMessages } from './locale.js';",
+      "setup": "const messages = getImageEffectorMessages();\n\n",
+      "rewrites": [
+        [
+          "i18n.ts._imageEffector._fxProps.angle",
+          "messages._imageEffector._fxProps.angle"
+        ],
+        [
+          "i18n.ts._imageEffector._fxProps.color",
+          "messages._imageEffector._fxProps.color"
+        ],
+        [
+          "i18n.ts._imageEffector._fxProps.scale",
+          "messages._imageEffector._fxProps.scale"
+        ],
+        [
+          "i18n.ts._imageEffector._fxs.polkadot",
+          "messages._imageEffector._fxs.polkadot"
+        ],
+        [
+          "i18n.ts._watermarkEditor.polkadotMainDotOpacity",
+          "messages._watermarkEditor.polkadotMainDotOpacity"
+        ],
+        [
+          "i18n.ts._watermarkEditor.polkadotMainDotRadius",
+          "messages._watermarkEditor.polkadotMainDotRadius"
+        ],
+        [
+          "i18n.ts._watermarkEditor.polkadotSubDotDivisions",
+          "messages._watermarkEditor.polkadotSubDotDivisions"
+        ],
+        [
+          "i18n.ts._watermarkEditor.polkadotSubDotOpacity",
+          "messages._watermarkEditor.polkadotSubDotOpacity"
+        ],
+        [
+          "i18n.ts._watermarkEditor.polkadotSubDotRadius",
+          "messages._watermarkEditor.polkadotSubDotRadius"
+        ]
+      ]
+    },
+    {
+      "file": "packages/features/drive/frontend/utility/image-compositor-functions/stripe.ts",
+      "originalSource": "/*\n * SPDX-FileCopyrightText: syuilo and misskey-project\n * SPDX-License-Identifier: AGPL-3.0-only\n */\n\nimport shader from './stripe.glsl';\nimport type { ImageEffectorUiDefinition } from '../image-effector/ImageEffector.js';\nimport { defineImageCompositorFunction } from '@features/drive/frontend/utility/ImageCompositor.js';\nimport { i18n } from '@features/runtime/frontend/i18n.js';\n\nexport const fn = defineImageCompositorFunction<{\n\tangle: number;\n\tfrequency: number;\n\tthreshold: number;\n\tcolor: [number, number, number];\n\topacity: number;\n}>({\n\tshader,\n\tmain: ({ gl, u, params }) => {\n\t\tgl.uniform1f(u.angle, params.angle / 2);\n\t\tgl.uniform1f(u.frequency, params.frequency * params.frequency);\n\t\tgl.uniform1f(u.phase, 0.0);\n\t\tgl.uniform1f(u.threshold, params.threshold);\n\t\tgl.uniform3f(u.color, params.color[0], params.color[1], params.color[2]);\n\t\tgl.uniform1f(u.opacity, params.opacity);\n\t},\n});\n\nexport const uiDefinition = {\n\tname: i18n.ts._imageEffector._fxs.stripe,\n\tparams: {\n\t\tangle: {\n\t\t\tlabel: i18n.ts._imageEffector._fxProps.angle,\n\t\t\ttype: 'number',\n\t\t\tdefault: 0.5,\n\t\t\tmin: -1.0,\n\t\t\tmax: 1.0,\n\t\t\tstep: 0.01,\n\t\t\ttoViewValue: v => Math.round(v * 90) + '°',\n\t\t},\n\t\tfrequency: {\n\t\t\tlabel: i18n.ts._watermarkEditor.stripeFrequency,\n\t\t\ttype: 'number',\n\t\t\tdefault: 10.0,\n\t\t\tmin: 1.0,\n\t\t\tmax: 30.0,\n\t\t\tstep: 0.1,\n\t\t},\n\t\tthreshold: {\n\t\t\tlabel: i18n.ts._watermarkEditor.stripeWidth,\n\t\t\ttype: 'number',\n\t\t\tdefault: 0.1,\n\t\t\tmin: 0.0,\n\t\t\tmax: 1.0,\n\t\t\tstep: 0.01,\n\t\t\ttoViewValue: v => Math.round(v * 100) + '%',\n\t\t},\n\t\tcolor: {\n\t\t\tlabel: i18n.ts._imageEffector._fxProps.color,\n\t\t\ttype: 'color',\n\t\t\tdefault: [1, 1, 1],\n\t\t},\n\t\topacity: {\n\t\t\tlabel: i18n.ts._imageEffector._fxProps.opacity,\n\t\t\ttype: 'number',\n\t\t\tdefault: 0.5,\n\t\t\tmin: 0.0,\n\t\t\tmax: 1.0,\n\t\t\tstep: 0.01,\n\t\t\ttoViewValue: v => Math.round(v * 100) + '%',\n\t\t},\n\t},\n} satisfies ImageEffectorUiDefinition<typeof fn>;\n",
+      "originalSha256": "1506900df3710a747599b654cd885a146917cd75c41409c2c86c60ff0e63808d",
+      "oldImport": "import { i18n } from '@features/runtime/frontend/i18n.js';",
+      "newImport": "import { getImageEffectorMessages } from './locale.js';",
+      "setup": "const messages = getImageEffectorMessages();\n\n",
+      "rewrites": [
+        [
+          "i18n.ts._imageEffector._fxProps.angle",
+          "messages._imageEffector._fxProps.angle"
+        ],
+        [
+          "i18n.ts._imageEffector._fxProps.color",
+          "messages._imageEffector._fxProps.color"
+        ],
+        [
+          "i18n.ts._imageEffector._fxProps.opacity",
+          "messages._imageEffector._fxProps.opacity"
+        ],
+        [
+          "i18n.ts._imageEffector._fxs.stripe",
+          "messages._imageEffector._fxs.stripe"
+        ],
+        [
+          "i18n.ts._watermarkEditor.stripeFrequency",
+          "messages._watermarkEditor.stripeFrequency"
+        ],
+        [
+          "i18n.ts._watermarkEditor.stripeWidth",
+          "messages._watermarkEditor.stripeWidth"
+        ]
+      ]
+    },
+    {
+      "file": "packages/features/drive/frontend/utility/image-compositor-functions/tearing.ts",
+      "originalSource": "/*\n * SPDX-FileCopyrightText: syuilo and misskey-project\n * SPDX-License-Identifier: AGPL-3.0-only\n */\n\nimport seedrandom from 'seedrandom';\nimport shader from './tearing.glsl';\nimport type { ImageEffectorUiDefinition } from '../image-effector/ImageEffector.js';\nimport { defineImageCompositorFunction } from '@features/drive/frontend/utility/ImageCompositor.js';\nimport { i18n } from '@features/runtime/frontend/i18n.js';\n\nexport const fn = defineImageCompositorFunction<{\n\tamount: number;\n\tstrength: number;\n\tsize: number;\n\tchannelShift: number;\n\tseed: number;\n}>({\n\tshader,\n\tmain: ({ gl, program, u, params }) => {\n\t\tgl.uniform1i(u.amount, params.amount);\n\t\tgl.uniform1f(u.channelShift, params.channelShift);\n\n\t\tconst rnd = seedrandom(params.seed.toString());\n\n\t\tfor (let i = 0; i < params.amount; i++) {\n\t\t\tconst o = gl.getUniformLocation(program, `u_shiftOrigins[${i.toString()}]`);\n\t\t\tgl.uniform1f(o, rnd());\n\n\t\t\tconst s = gl.getUniformLocation(program, `u_shiftStrengths[${i.toString()}]`);\n\t\t\tgl.uniform1f(s, (1 - (rnd() * 2)) * params.strength);\n\n\t\t\tconst h = gl.getUniformLocation(program, `u_shiftHeights[${i.toString()}]`);\n\t\t\tgl.uniform1f(h, rnd() * params.size);\n\t\t}\n\t},\n});\n\nexport const uiDefinition = {\n\tname: i18n.ts._imageEffector._fxs.glitch + ': ' + i18n.ts._imageEffector._fxs.tearing,\n\tparams: {\n\t\tamount: {\n\t\t\tlabel: i18n.ts._imageEffector._fxProps.amount,\n\t\t\ttype: 'number',\n\t\t\tdefault: 3,\n\t\t\tmin: 1,\n\t\t\tmax: 100,\n\t\t\tstep: 1,\n\t\t},\n\t\tstrength: {\n\t\t\tlabel: i18n.ts._imageEffector._fxProps.strength,\n\t\t\ttype: 'number',\n\t\t\tdefault: 0.05,\n\t\t\tmin: -1,\n\t\t\tmax: 1,\n\t\t\tstep: 0.01,\n\t\t\ttoViewValue: v => Math.round(v * 100) + '%',\n\t\t},\n\t\tsize: {\n\t\t\tlabel: i18n.ts._imageEffector._fxProps.size,\n\t\t\ttype: 'number',\n\t\t\tdefault: 0.2,\n\t\t\tmin: 0,\n\t\t\tmax: 1,\n\t\t\tstep: 0.01,\n\t\t\ttoViewValue: v => Math.round(v * 100) + '%',\n\t\t},\n\t\tchannelShift: {\n\t\t\tlabel: i18n.ts._imageEffector._fxProps.glitchChannelShift,\n\t\t\ttype: 'number',\n\t\t\tdefault: 0.5,\n\t\t\tmin: 0,\n\t\t\tmax: 10,\n\t\t\tstep: 0.01,\n\t\t\ttoViewValue: v => Math.round(v * 100) + '%',\n\t\t},\n\t\tseed: {\n\t\t\tlabel: i18n.ts._imageEffector._fxProps.seed,\n\t\t\ttype: 'seed',\n\t\t\tdefault: 100,\n\t\t},\n\t},\n} satisfies ImageEffectorUiDefinition<typeof fn>;\n",
+      "originalSha256": "29f996fd26e0b40064c303c434cd5ece8fe1721d5cabda81ed05c765f22813c4",
+      "oldImport": "import { i18n } from '@features/runtime/frontend/i18n.js';",
+      "newImport": "import { getImageEffectorMessages } from './locale.js';",
+      "setup": "const messages = getImageEffectorMessages();\n\n",
+      "rewrites": [
+        [
+          "i18n.ts._imageEffector._fxProps.amount",
+          "messages._imageEffector._fxProps.amount"
+        ],
+        [
+          "i18n.ts._imageEffector._fxProps.glitchChannelShift",
+          "messages._imageEffector._fxProps.glitchChannelShift"
+        ],
+        [
+          "i18n.ts._imageEffector._fxProps.seed",
+          "messages._imageEffector._fxProps.seed"
+        ],
+        [
+          "i18n.ts._imageEffector._fxProps.size",
+          "messages._imageEffector._fxProps.size"
+        ],
+        [
+          "i18n.ts._imageEffector._fxProps.strength",
+          "messages._imageEffector._fxProps.strength"
+        ],
+        [
+          "i18n.ts._imageEffector._fxs.glitch",
+          "messages._imageEffector._fxs.glitch"
+        ],
+        [
+          "i18n.ts._imageEffector._fxs.tearing",
+          "messages._imageEffector._fxs.tearing"
+        ]
+      ]
+    },
+    {
+      "file": "packages/features/drive/frontend/utility/image-compositor-functions/threshold.ts",
+      "originalSource": "/*\n * SPDX-FileCopyrightText: syuilo and misskey-project\n * SPDX-License-Identifier: AGPL-3.0-only\n */\n\nimport shader from './threshold.glsl';\nimport type { ImageEffectorUiDefinition } from '../image-effector/ImageEffector.js';\nimport { defineImageCompositorFunction } from '@features/drive/frontend/utility/ImageCompositor.js';\nimport { i18n } from '@features/runtime/frontend/i18n.js';\n\nexport const fn = defineImageCompositorFunction<{\n\tr: number;\n\tg: number;\n\tb: number;\n}>({\n\tshader,\n\tmain: ({ gl, u, params }) => {\n\t\tgl.uniform1f(u.r, params.r);\n\t\tgl.uniform1f(u.g, params.g);\n\t\tgl.uniform1f(u.b, params.b);\n\t},\n});\n\nexport const uiDefinition = {\n\tname: i18n.ts._imageEffector._fxs.threshold,\n\tparams: {\n\t\tr: {\n\t\t\tlabel: i18n.ts._imageEffector._fxProps.redComponent,\n\t\t\ttype: 'number',\n\t\t\tdefault: 0.5,\n\t\t\tmin: 0.0,\n\t\t\tmax: 1.0,\n\t\t\tstep: 0.01,\n\t\t},\n\t\tg: {\n\t\t\tlabel: i18n.ts._imageEffector._fxProps.greenComponent,\n\t\t\ttype: 'number',\n\t\t\tdefault: 0.5,\n\t\t\tmin: 0.0,\n\t\t\tmax: 1.0,\n\t\t\tstep: 0.01,\n\t\t},\n\t\tb: {\n\t\t\tlabel: i18n.ts._imageEffector._fxProps.blueComponent,\n\t\t\ttype: 'number',\n\t\t\tdefault: 0.5,\n\t\t\tmin: 0.0,\n\t\t\tmax: 1.0,\n\t\t\tstep: 0.01,\n\t\t},\n\t},\n} satisfies ImageEffectorUiDefinition<typeof fn>;\n",
+      "originalSha256": "ca1cc900813d0f51b03789fe54601e276bee27dc01602a92935dec92db25755e",
+      "oldImport": "import { i18n } from '@features/runtime/frontend/i18n.js';",
+      "newImport": "import { getImageEffectorMessages } from './locale.js';",
+      "setup": "const messages = getImageEffectorMessages();\n\n",
+      "rewrites": [
+        [
+          "i18n.ts._imageEffector._fxProps.blueComponent",
+          "messages._imageEffector._fxProps.blueComponent"
+        ],
+        [
+          "i18n.ts._imageEffector._fxProps.greenComponent",
+          "messages._imageEffector._fxProps.greenComponent"
+        ],
+        [
+          "i18n.ts._imageEffector._fxProps.redComponent",
+          "messages._imageEffector._fxProps.redComponent"
+        ],
+        [
+          "i18n.ts._imageEffector._fxs.threshold",
+          "messages._imageEffector._fxs.threshold"
+        ]
+      ]
+    },
+    {
+      "file": "packages/features/drive/frontend/utility/image-compositor-functions/zoomLines.ts",
+      "originalSource": "/*\n * SPDX-FileCopyrightText: syuilo and misskey-project\n * SPDX-License-Identifier: AGPL-3.0-only\n */\n\nimport shader from './zoomLines.glsl';\nimport type { ImageEffectorUiDefinition } from '../image-effector/ImageEffector.js';\nimport { defineImageCompositorFunction } from '@features/drive/frontend/utility/ImageCompositor.js';\nimport { i18n } from '@features/runtime/frontend/i18n.js';\n\nexport const fn = defineImageCompositorFunction<{\n\tx: number;\n\ty: number;\n\tfrequency: number;\n\tdensity: number;\n\toutlineThickness: number;\n\tmaskSize: number;\n}>({\n\tshader,\n\tmain: ({ gl, u, params }) => {\n\t\tgl.uniform2f(u.pos, params.x / 2, params.y / 2);\n\t\tgl.uniform1f(u.frequency, params.frequency * params.frequency);\n\t\tgl.uniform1f(u.threshold, 1.0 - params.density);\n\t\tgl.uniform1f(u.outlineThickness, params.outlineThickness);\n\t\tgl.uniform1f(u.maskSize, params.maskSize);\n\t},\n});\n\nexport const uiDefinition = {\n\tname: i18n.ts._imageEffector._fxs.zoomLines,\n\tparams: {\n\t\tx: {\n\t\t\tlabel: i18n.ts._imageEffector._fxProps.centerX,\n\t\t\ttype: 'number',\n\t\t\tdefault: 0.0,\n\t\t\tmin: -1.0,\n\t\t\tmax: 1.0,\n\t\t\tstep: 0.01,\n\t\t},\n\t\ty: {\n\t\t\tlabel: i18n.ts._imageEffector._fxProps.centerY,\n\t\t\ttype: 'number',\n\t\t\tdefault: 0.0,\n\t\t\tmin: -1.0,\n\t\t\tmax: 1.0,\n\t\t\tstep: 0.01,\n\t\t},\n\t\tfrequency: {\n\t\t\tlabel: i18n.ts._imageEffector._fxProps.frequency,\n\t\t\ttype: 'number',\n\t\t\tdefault: 5.0,\n\t\t\tmin: 0.0,\n\t\t\tmax: 15.0,\n\t\t\tstep: 0.1,\n\t\t},\n\t\tdensity: {\n\t\t\tlabel: i18n.ts._imageEffector._fxProps.density,\n\t\t\ttype: 'number',\n\t\t\tdefault: 0.5,\n\t\t\tmin: 0.0,\n\t\t\tmax: 1.0,\n\t\t\tstep: 0.01,\n\t\t},\n\t\toutlineThickness: {\n\t\t\tlabel: i18n.ts._imageEffector._fxProps.zoomLinesOutlineThickness,\n\t\t\ttype: 'number',\n\t\t\tdefault: 0.25,\n\t\t\tmin: 0.0,\n\t\t\tmax: 1.0,\n\t\t\tstep: 0.01,\n\t\t},\n\t\tmaskSize: {\n\t\t\tlabel: i18n.ts._imageEffector._fxProps.zoomLinesMaskSize,\n\t\t\ttype: 'number',\n\t\t\tdefault: 0.5,\n\t\t\tmin: 0.0,\n\t\t\tmax: 1.0,\n\t\t\tstep: 0.01,\n\t\t},\n\t},\n} satisfies ImageEffectorUiDefinition<typeof fn>;\n",
+      "originalSha256": "25d1e0ada2117587a57bbfcf595fa84b39ab21e4726063d17802d3853bd6624e",
+      "oldImport": "import { i18n } from '@features/runtime/frontend/i18n.js';",
+      "newImport": "import { getImageEffectorMessages } from './locale.js';",
+      "setup": "const messages = getImageEffectorMessages();\n\n",
+      "rewrites": [
+        [
+          "i18n.ts._imageEffector._fxProps.centerX",
+          "messages._imageEffector._fxProps.centerX"
+        ],
+        [
+          "i18n.ts._imageEffector._fxProps.centerY",
+          "messages._imageEffector._fxProps.centerY"
+        ],
+        [
+          "i18n.ts._imageEffector._fxProps.density",
+          "messages._imageEffector._fxProps.density"
+        ],
+        [
+          "i18n.ts._imageEffector._fxProps.frequency",
+          "messages._imageEffector._fxProps.frequency"
+        ],
+        [
+          "i18n.ts._imageEffector._fxProps.zoomLinesMaskSize",
+          "messages._imageEffector._fxProps.zoomLinesMaskSize"
+        ],
+        [
+          "i18n.ts._imageEffector._fxProps.zoomLinesOutlineThickness",
+          "messages._imageEffector._fxProps.zoomLinesOutlineThickness"
+        ],
+        [
+          "i18n.ts._imageEffector._fxs.zoomLines",
+          "messages._imageEffector._fxs.zoomLines"
+        ]
+      ]
+    },
+    {
+      "file": "packages/features/navigation/frontend/navbar.ts",
+      "originalSource": "/*\n * SPDX-FileCopyrightText: syuilo and misskey-project\n * SPDX-License-Identifier: AGPL-3.0-only\n */\n\nimport { computed, reactive } from 'vue';\nimport { ui } from '@features/boot/frontend/shared/config.js';\nimport { clearCache } from '../../runtime/frontend/utility/clear-cache.js';\nimport type { ComputedRef } from 'vue';\nimport { $i } from '@features/auth/frontend/i.js';\nimport { miLocalStorage } from '@features/preferences/frontend/local-storage.js';\nimport { openInstanceMenu, openToolsMenu } from '@features/navigation/frontend/ui/_common_/common.js';\nimport { lookup } from '@features/discovery/frontend/utility/lookup.js';\nimport * as os from '@features/ui/frontend/os.js';\nimport { i18n } from '@features/runtime/frontend/i18n.js';\nimport { unisonReload } from '@features/runtime/frontend/utility/unison-reload.js';\n\nexport const navbarItemDef = reactive<{\n\t[key: string]: {\n\t\ttitle: string;\n\t\ticon: string;\n\t\tshow?: ComputedRef<boolean>;\n\t\tindicated?: ComputedRef<boolean>;\n\t\tindicateValue?: ComputedRef<string>;\n\t\tto?: string;\n\t\taction?: (ev: PointerEvent) => void;\n\t};\n}>({\n\tnotifications: {\n\t\ttitle: i18n.ts.notifications,\n\t\ticon: 'ti ti-bell',\n\t\tshow: computed(() => $i != null),\n\t\tindicated: computed(() => $i != null && $i.hasUnreadNotification),\n\t\tindicateValue: computed(() => {\n\t\t\tif (!$i || $i.unreadNotificationsCount === 0) return '';\n\n\t\t\tif ($i.unreadNotificationsCount > 99) {\n\t\t\t\treturn '99+';\n\t\t\t} else {\n\t\t\t\treturn $i.unreadNotificationsCount.toString();\n\t\t\t}\n\t\t}),\n\t\tto: '/my/notifications',\n\t},\n\tdrive: {\n\t\ttitle: i18n.ts.drive,\n\t\ticon: 'ti ti-cloud',\n\t\tshow: computed(() => $i != null),\n\t\tto: '/my/drive',\n\t},\n\tfollowRequests: {\n\t\ttitle: i18n.ts.followRequests,\n\t\ticon: 'ti ti-user-plus',\n\t\tindicated: computed(() => $i != null && $i.hasPendingReceivedFollowRequest),\n\t\tto: '/my/follow-requests',\n\t},\n\texplore: {\n\t\ttitle: i18n.ts.explore,\n\t\ticon: 'ti ti-hash',\n\t\tto: '/explore',\n\t},\n\tannouncements: {\n\t\ttitle: i18n.ts.announcements,\n\t\ticon: 'ti ti-speakerphone',\n\t\tindicated: computed(() => $i != null && $i.hasUnreadAnnouncement),\n\t\tto: '/announcements',\n\t},\n\tsearch: {\n\t\ttitle: i18n.ts.search,\n\t\ticon: 'ti ti-search',\n\t\tto: '/search',\n\t},\n\tlookup: {\n\t\ttitle: i18n.ts.lookup,\n\t\ticon: 'ti ti-world-search',\n\t\taction: (ev) => {\n\t\t\tlookup();\n\t\t},\n\t},\n\tqr: {\n\t\ttitle: i18n.ts.qr,\n\t\ticon: 'ti ti-qrcode',\n\t\tshow: computed(() => $i != null),\n\t\tto: '/qr',\n\t},\n\tlists: {\n\t\ttitle: i18n.ts.lists,\n\t\ticon: 'ti ti-list',\n\t\tshow: computed(() => $i != null),\n\t\tto: '/my/lists',\n\t},\n\tantennas: {\n\t\ttitle: i18n.ts.antennas,\n\t\ticon: 'ti ti-antenna',\n\t\tshow: computed(() => $i != null),\n\t\tto: '/my/antennas',\n\t},\n\tfavorites: {\n\t\ttitle: i18n.ts.favorites,\n\t\ticon: 'ti ti-star',\n\t\tshow: computed(() => $i != null),\n\t\tto: '/my/favorites',\n\t},\n\tpages: {\n\t\ttitle: i18n.ts.pages,\n\t\ticon: 'ti ti-news',\n\t\tto: '/pages',\n\t},\n\tplay: {\n\t\ttitle: 'Play',\n\t\ticon: 'ti ti-player-play',\n\t\tto: '/play',\n\t},\n\tgallery: {\n\t\ttitle: i18n.ts.gallery,\n\t\ticon: 'ti ti-icons',\n\t\tto: '/gallery',\n\t},\n\tclips: {\n\t\ttitle: i18n.ts.clip,\n\t\ticon: 'ti ti-paperclip',\n\t\tshow: computed(() => $i != null),\n\t\tto: '/my/clips',\n\t},\n\tchannels: {\n\t\ttitle: i18n.ts.channel,\n\t\ticon: 'ti ti-device-tv',\n\t\tto: '/channels',\n\t},\n\tchat: {\n\t\ttitle: i18n.ts.directMessage_short,\n\t\ticon: 'ti ti-messages',\n\t\tto: '/chat',\n\t\tshow: computed(() => $i != null && $i.policies.chatAvailability !== 'unavailable'),\n\t\tindicated: computed(() => $i != null && $i.hasUnreadChatMessages),\n\t},\n\tachievements: {\n\t\ttitle: i18n.ts.achievements,\n\t\ticon: 'ti ti-medal',\n\t\tshow: computed(() => $i != null),\n\t\tto: '/my/achievements',\n\t},\n\tgames: {\n\t\ttitle: 'Misskey Games',\n\t\ticon: 'ti ti-device-gamepad',\n\t\tto: '/games',\n\t},\n\tui: {\n\t\ttitle: i18n.ts.switchUi,\n\t\ticon: 'ti ti-devices',\n\t\taction: (ev) => {\n\t\t\tos.popupMenu([{\n\t\t\t\ttext: i18n.ts.default,\n\t\t\t\tactive: ui === 'default' || ui === null,\n\t\t\t\taction: () => {\n\t\t\t\t\tmiLocalStorage.setItem('ui', 'default');\n\t\t\t\t\tunisonReload();\n\t\t\t\t},\n\t\t\t}, {\n\t\t\t\ttext: i18n.ts.deck,\n\t\t\t\tactive: ui === 'deck',\n\t\t\t\taction: () => {\n\t\t\t\t\tmiLocalStorage.setItem('ui', 'deck');\n\t\t\t\t\tunisonReload();\n\t\t\t\t},\n\t\t\t}], ev.currentTarget ?? ev.target);\n\t\t},\n\t},\n\tabout: {\n\t\ttitle: i18n.ts.about,\n\t\ticon: 'ti ti-info-circle',\n\t\taction: (ev) => {\n\t\t\topenInstanceMenu(ev);\n\t\t},\n\t},\n\ttools: {\n\t\ttitle: i18n.ts.tools,\n\t\ticon: 'ti ti-tool',\n\t\taction: (ev) => {\n\t\t\topenToolsMenu(ev);\n\t\t},\n\t},\n\treload: {\n\t\ttitle: i18n.ts.reload,\n\t\ticon: 'ti ti-refresh',\n\t\taction: (ev) => {\n\t\t\twindow.location.reload();\n\t\t},\n\t},\n\tprofile: {\n\t\ttitle: i18n.ts.profile,\n\t\ticon: 'ti ti-user',\n\t\tshow: computed(() => $i != null),\n\t\tto: `/@${$i?.username}`,\n\t},\n\tcacheClear: {\n\t\ttitle: i18n.ts.clearCache,\n\t\ticon: 'ti ti-trash',\n\t\taction: (ev) => {\n\t\t\tclearCache();\n\t\t},\n\t},\n});\n",
+      "originalSha256": "ab47a34c21f7d9e5d4ef3774c7c4fafc376d21f2527c5f53f83472b6c5e83f7f",
+      "oldImport": "import { i18n } from '@features/runtime/frontend/i18n.js';",
+      "newImport": "import { getNavbarMessages } from './navbar-locale.js';",
+      "setup": "const messages = getNavbarMessages();\nconst defaultUiLabel = messages.default;\nconst deckUiLabel = messages.deck;\n\n",
+      "rewrites": [
+        [
+          "i18n.ts.about",
+          "messages.about"
+        ],
+        [
+          "i18n.ts.achievements",
+          "messages.achievements"
+        ],
+        [
+          "i18n.ts.announcements",
+          "messages.announcements"
+        ],
+        [
+          "i18n.ts.antennas",
+          "messages.antennas"
+        ],
+        [
+          "i18n.ts.channel",
+          "messages.channel"
+        ],
+        [
+          "i18n.ts.clearCache",
+          "messages.clearCache"
+        ],
+        [
+          "i18n.ts.clip",
+          "messages.clip"
+        ],
+        [
+          "i18n.ts.deck",
+          "deckUiLabel"
+        ],
+        [
+          "i18n.ts.default",
+          "defaultUiLabel"
+        ],
+        [
+          "i18n.ts.directMessage_short",
+          "messages.directMessage_short"
+        ],
+        [
+          "i18n.ts.drive",
+          "messages.drive"
+        ],
+        [
+          "i18n.ts.explore",
+          "messages.explore"
+        ],
+        [
+          "i18n.ts.favorites",
+          "messages.favorites"
+        ],
+        [
+          "i18n.ts.followRequests",
+          "messages.followRequests"
+        ],
+        [
+          "i18n.ts.gallery",
+          "messages.gallery"
+        ],
+        [
+          "i18n.ts.lists",
+          "messages.lists"
+        ],
+        [
+          "i18n.ts.lookup",
+          "messages.lookup"
+        ],
+        [
+          "i18n.ts.notifications",
+          "messages.notifications"
+        ],
+        [
+          "i18n.ts.pages",
+          "messages.pages"
+        ],
+        [
+          "i18n.ts.profile",
+          "messages.profile"
+        ],
+        [
+          "i18n.ts.qr",
+          "messages.qr"
+        ],
+        [
+          "i18n.ts.reload",
+          "messages.reload"
+        ],
+        [
+          "i18n.ts.search",
+          "messages.search"
+        ],
+        [
+          "i18n.ts.switchUi",
+          "messages.switchUi"
+        ],
+        [
+          "i18n.ts.tools",
+          "messages.tools"
+        ]
+      ]
+    }
+  ],
+  "owners": {
+    "drive": {
+      "dictionary": "packages/features/drive/frontend/utility/image-compositor-functions/messages.vue",
+      "dictionarySha256": "3c0fa97d0faf9917711218f7fe2a935eadcbbde27f814752b771e923d58c6384",
+      "host": "/features/drive/frontend/utility/image-compositor-functions/messages.vue",
+      "keys": [
+        "_imageEffector._fxProps.amount",
+        "_imageEffector._fxProps.angle",
+        "_imageEffector._fxProps.blueComponent",
+        "_imageEffector._fxProps.brightness",
+        "_imageEffector._fxProps.centerX",
+        "_imageEffector._fxProps.centerY",
+        "_imageEffector._fxProps.circle",
+        "_imageEffector._fxProps.color",
+        "_imageEffector._fxProps.contrast",
+        "_imageEffector._fxProps.density",
+        "_imageEffector._fxProps.direction",
+        "_imageEffector._fxProps.frequency",
+        "_imageEffector._fxProps.glitchChannelShift",
+        "_imageEffector._fxProps.greenComponent",
+        "_imageEffector._fxProps.hue",
+        "_imageEffector._fxProps.lightness",
+        "_imageEffector._fxProps.max",
+        "_imageEffector._fxProps.min",
+        "_imageEffector._fxProps.normalize",
+        "_imageEffector._fxProps.offset",
+        "_imageEffector._fxProps.opacity",
+        "_imageEffector._fxProps.phase",
+        "_imageEffector._fxProps.redComponent",
+        "_imageEffector._fxProps.saturation",
+        "_imageEffector._fxProps.scale",
+        "_imageEffector._fxProps.seed",
+        "_imageEffector._fxProps.size",
+        "_imageEffector._fxProps.strength",
+        "_imageEffector._fxProps.zoomLinesMaskSize",
+        "_imageEffector._fxProps.zoomLinesOutlineThickness",
+        "_imageEffector._fxs.blockNoise",
+        "_imageEffector._fxs.blur",
+        "_imageEffector._fxs.checker",
+        "_imageEffector._fxs.chromaticAberration",
+        "_imageEffector._fxs.colorAdjust",
+        "_imageEffector._fxs.colorClamp",
+        "_imageEffector._fxs.colorClampAdvanced",
+        "_imageEffector._fxs.distort",
+        "_imageEffector._fxs.fill",
+        "_imageEffector._fxs.glitch",
+        "_imageEffector._fxs.grayscale",
+        "_imageEffector._fxs.invert",
+        "_imageEffector._fxs.mirror",
+        "_imageEffector._fxs.pixelate",
+        "_imageEffector._fxs.polkadot",
+        "_imageEffector._fxs.stripe",
+        "_imageEffector._fxs.tearing",
+        "_imageEffector._fxs.threshold",
+        "_imageEffector._fxs.zoomLines",
+        "_watermarkEditor.polkadotMainDotOpacity",
+        "_watermarkEditor.polkadotMainDotRadius",
+        "_watermarkEditor.polkadotSubDotDivisions",
+        "_watermarkEditor.polkadotSubDotOpacity",
+        "_watermarkEditor.polkadotSubDotRadius",
+        "_watermarkEditor.stripeFrequency",
+        "_watermarkEditor.stripeWidth",
+        "height",
+        "horizontal",
+        "vertical",
+        "width"
+      ]
+    },
+    "navigation": {
+      "dictionary": "packages/features/navigation/frontend/navbar-messages.vue",
+      "dictionarySha256": "02369c6c5a500efaad1b2033bbb54f6bc7febef88439754e1ab3f5ca6932d168",
+      "host": "/features/navigation/frontend/navbar-messages.vue",
+      "keys": [
+        "about",
+        "achievements",
+        "announcements",
+        "antennas",
+        "channel",
+        "clearCache",
+        "clip",
+        "deck",
+        "default",
+        "directMessage_short",
+        "drive",
+        "explore",
+        "favorites",
+        "followRequests",
+        "gallery",
+        "lists",
+        "lookup",
+        "notifications",
+        "pages",
+        "profile",
+        "qr",
+        "reload",
+        "search",
+        "switchUi",
+        "tools"
+      ]
+    }
+  }
+}

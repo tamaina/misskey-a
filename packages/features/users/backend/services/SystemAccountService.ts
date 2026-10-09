@@ -9,16 +9,16 @@ import type { OnApplicationShutdown } from '@nestjs/common';
 import { DataSource, IsNull } from 'typeorm';
 import * as Redis from 'ioredis';
 import bcrypt from 'bcryptjs';
-import { MiLocalUser, MiUser } from '@/models/User.js';
-import { MiSystemAccount, MiUsedUsername, MiUserKeypair, MiUserProfile, type UsersRepository, type SystemAccountsRepository } from '@/models/_.js';
-import type { MiMeta, UserProfilesRepository } from '@/models/_.js';
-import type { GlobalEvents } from '@/core/GlobalEventService.js';
-import { MemoryKVCache } from '@/misc/cache.js';
+import { MiLocalUser, MiUser } from '../models/User.js';
+import { MiSystemAccount, MiUsedUsername, MiUserKeypair, MiUserProfile, type UsersRepository, type SystemAccountsRepository } from '@features/persistence/backend/repositories/models.js';
+import type { MiMeta, UserProfilesRepository } from '@features/persistence/backend/repositories/models.js';
+import type { GlobalEvents } from '@features/runtime/backend/services/GlobalEventService.js';
+import { MemoryKVCache } from '@features/runtime/backend/cache/cache.js';
 import { DI } from '@/di-symbols.js';
-import { bindThis } from '@/decorators.js';
-import { generateNativeUserToken } from '@/misc/token.js';
-import { IdService } from '@/core/IdService.js';
-import { genRsaKeyPair } from '@/misc/gen-key-pair.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
+import { generateNativeUserToken } from '@features/auth/backend/utility/token.js';
+import { IdService } from '@features/runtime/backend/services/IdService.js';
+import { genRsaKeyPair } from '@features/federation/backend/utility/gen-key-pair.js';
 
 export const SYSTEM_ACCOUNT_TYPES = ['actor', 'relay', 'proxy'] as const;
 
@@ -181,14 +181,14 @@ export class SystemAccountService implements OnApplicationShutdown {
 	}): Promise<MiLocalUser> {
 		const user = await this.fetch(type);
 
-		const updates = {} as Partial<MiUser>;
+		const updates: { name?: MiUser['name'] } = {};
 		if (extra.name !== undefined) updates.name = extra.name;
 
 		if (Object.keys(updates).length > 0) {
 			await this.usersRepository.update(user.id, updates);
 		}
 
-		const profileUpdates = {} as Partial<MiUserProfile>;
+		const profileUpdates: { description?: MiUserProfile['description'] } = {};
 		if (extra.description !== undefined) profileUpdates.description = extra.description;
 
 		if (Object.keys(profileUpdates).length > 0) {

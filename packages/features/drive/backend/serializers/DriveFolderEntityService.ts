@@ -3,29 +3,24 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Inject, Injectable } from '@nestjs/common';
-import { DI } from '@/di-symbols.js';
-import type { DriveFilesRepository, DriveFoldersRepository } from '@/models/_.js';
-import { awaitAll } from '@/misc/prelude/await-all.js';
-import type { Packed } from '@/misc/json-schema.js';
-import type { } from '@/models/Blocking.js';
-import type { MiDriveFolder } from '@/models/DriveFolder.js';
-import { bindThis } from '@/decorators.js';
-import { IdService } from '@/core/IdService.js';
+import type { DriveFilesRepository, DriveFoldersRepository } from '@features/persistence/backend/repositories/models.js';
+import { awaitAll } from '@features/runtime/backend/async/await-all.js';
+import type { Packed } from '@features/index/backend/packed.schema.js';
+import type { } from '@features/relationships/backend/models/Blocking.js';
+import type { MiDriveFolder } from '../models/DriveFolder.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
+import type { IdService } from '@features/runtime/backend/services/IdService.js';
 import { In } from 'typeorm';
-import { uniqueByKey } from '@/misc/unique-by-key.js';
-import { splitIdAndObjects } from '@/misc/split-id-and-objects.js';
+import { uniqueByKey } from '@features/runtime/backend/data/unique-by-key.js';
+import { splitIdAndObjects } from '@features/runtime/backend/data/split-id-and-objects.js';
 
-@Injectable()
 export class DriveFolderEntityService {
 	constructor(
-		@Inject(DI.driveFoldersRepository)
 		private driveFoldersRepository: DriveFoldersRepository,
 
-		@Inject(DI.driveFilesRepository)
 		private driveFilesRepository: DriveFilesRepository,
 
-		private idService: IdService,
+		private idService: Pick<IdService, 'parse'>,
 	) {
 	}
 

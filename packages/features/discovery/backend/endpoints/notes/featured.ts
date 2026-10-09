@@ -3,111 +3,84 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Inject, Injectable } from '@nestjs/common';
-import type { NotesRepository } from '@/models/_.js';
-import { Endpoint } from '@/server/api/endpoint-base.js';
-import { NoteEntityService } from '@/core/entities/NoteEntityService.js';
-import { DI } from '@/di-symbols.js';
-import { FeaturedService } from '@/core/FeaturedService.js';
-import { isUserRelated } from '@/misc/is-user-related.js';
-import { CacheService } from '@/core/CacheService.js';
-import { QueryService } from '@/core/QueryService.js';
-
-export const meta = {
-	tags: ['notes'],
-
-	requireCredential: false,
-	allowGet: true,
-	cacheSec: 3600,
-
-	res: {
-		type: 'array',
-		optional: false, nullable: false,
-		items: {
-			type: 'object',
-			optional: false, nullable: false,
-			ref: 'Note',
-		},
-	},
-} as const;
-
-export const paramDef = {
-	type: 'object',
-	properties: {
-		limit: { type: 'integer', minimum: 1, maximum: 100, default: 10 },
-		untilId: { type: 'string', format: 'misskey:id' },
-		channelId: { type: 'string', nullable: true, format: 'misskey:id' },
-	},
-	required: [],
-} as const;
-
-@Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
-	private globalNotesRankingCache: string[] = [];
-	private globalNotesRankingCacheLastFetchedAt = 0;
-
-	constructor(
-		@Inject(DI.notesRepository)
-		private notesRepository: NotesRepository,
-
-		private cacheService: CacheService,
-		private noteEntityService: NoteEntityService,
-		private featuredService: FeaturedService,
-		private queryService: QueryService,
-	) {
-		super(meta, paramDef, async (ps, me) => {
-			let noteIds: string[];
-			if (ps.channelId) {
-				noteIds = await this.featuredService.getInChannelNotesRanking(ps.channelId, 50);
+import { toPackedNote } from '@features/notes/backend/note.schema.js';
+import { NoteEntityService } from '@features/notes/backend/serializers/NoteEntityService.js';
+import { isUserRelated } from '@features/relationships/backend/utility/is-user-related.js';
+import { CacheService } from '@features/users/backend/services/CacheService.js';
+import { QueryService } from '@features/notes/backend/services/QueryService.js';
+import { FeaturedService } from '../../services/FeaturedService.js';
+import type { NotesRepository } from '@features/persistence/backend/repositories/models.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import { decodeScalarInput } from '@features/api/backend/transport/middleware.js';
+import type { ApiContext } from '@features/api/backend/transport/context.js';
+import { discoveryContract, type DiscoveryInputs } from '../discovery.contract.js';
+export interface NotesFeaturedDependencies {
+	notesRepository: NotesRepository;
+	cacheService: CacheService;
+	noteEntityService: NoteEntityService;
+	featuredService: FeaturedService;
+	queryService: QueryService;
+}
+export function createNotesFeaturedProcedure<Actor extends MiLocalUser>(deps: NotesFeaturedDependencies) {
+	let globalNotesRankingCache: string[] = [];
+	let globalNotesRankingCacheLastFetchedAt = 0;
+	const handler = async ({ input: ps, context: { principal: me } }: { input: DiscoveryInputs['notes/featured']; context: ApiContext<Actor> & { principal: Actor | null } }) => {
+		let noteIds: string[];
+		if (ps.channelId) {
+			noteIds = await deps.featuredService.getInChannelNotesRanking(ps.channelId, 50);
+		} else {
+			if (globalNotesRankingCacheLastFetchedAt !== 0 && (Date.now() - globalNotesRankingCacheLastFetchedAt < 1000 * 60 * 30)) {
+				noteIds = globalNotesRankingCache;
 			} else {
-				if (this.globalNotesRankingCacheLastFetchedAt !== 0 && (Date.now() - this.globalNotesRankingCacheLastFetchedAt < 1000 * 60 * 30)) {
-					noteIds = this.globalNotesRankingCache;
-				} else {
-					noteIds = await this.featuredService.getGlobalNotesRanking(100);
-					this.globalNotesRankingCache = noteIds;
-					this.globalNotesRankingCacheLastFetchedAt = Date.now();
-				}
+				noteIds = await deps.featuredService.getGlobalNotesRanking(100);
+				globalNotesRankingCache = noteIds;
+				globalNotesRankingCacheLastFetchedAt = Date.now();
 			}
+		}
 
-			noteIds.sort((a, b) => a > b ? -1 : 1);
-			if (ps.untilId) {
-				noteIds = noteIds.filter(id => id < ps.untilId!);
-			}
-			if (noteIds.length === 0) {
-				return [];
-			}
+		noteIds.sort((a, b) => a > b ? -1 : 1);
+		if (ps.untilId) {
+			noteIds = noteIds.filter(id => id < ps.untilId!);
+		}
+		if (noteIds.length === 0) {
+			return [];
+		}
 
-			const [
-				userIdsWhoMeMuting,
-				userIdsWhoBlockingMe,
-			] = me ? await Promise.all([
-				this.cacheService.userMutingsCache.fetch(me.id),
-				this.cacheService.userBlockedCache.fetch(me.id),
-			]) : [new Set<string>(), new Set<string>()];
+		const [
+			userIdsWhoMeMuting,
+			userIdsWhoBlockingMe,
+		] = me ? await Promise.all([
+			deps.cacheService.userMutingsCache.fetch(me.id),
+			deps.cacheService.userBlockedCache.fetch(me.id),
+		]) : [new Set<string>(), new Set<string>()];
 
-			const query = this.notesRepository.createQueryBuilder('note')
-				.where('note.id IN (:...noteIds)', { noteIds: noteIds })
-				.innerJoinAndSelect('note.user', 'user')
-				.leftJoinAndSelect('note.reply', 'reply')
-				.leftJoinAndSelect('note.renote', 'renote')
-				.leftJoinAndSelect('reply.user', 'replyUser')
-				.leftJoinAndSelect('renote.user', 'renoteUser')
-				.leftJoinAndSelect('note.channel', 'channel');
+		const query = deps.notesRepository.createQueryBuilder('note')
+			.where('note.id IN (:...noteIds)', { noteIds: noteIds })
+			.innerJoinAndSelect('note.user', 'user')
+			.leftJoinAndSelect('note.reply', 'reply')
+			.leftJoinAndSelect('note.renote', 'renote')
+			.leftJoinAndSelect('reply.user', 'replyUser')
+			.leftJoinAndSelect('renote.user', 'renoteUser')
+			.leftJoinAndSelect('note.channel', 'channel');
 
-			this.queryService.generateBlockedHostQueryForNote(query);
-			this.queryService.generateSuspendedUserQueryForNote(query);
-			if (me == null) this.queryService.generateUgcVisibilityQueryForVisitor(query);
+		deps.queryService.generateBlockedHostQueryForNote(query);
+		deps.queryService.generateSuspendedUserQueryForNote(query);
+		if (me == null) deps.queryService.generateUgcVisibilityQueryForVisitor(query);
 
-			const notes = (await query.getMany()).filter(note => {
-				if (me && isUserRelated(note, userIdsWhoBlockingMe)) return false;
-				if (me && isUserRelated(note, userIdsWhoMeMuting)) return false;
+		const notes = (await query.getMany()).filter(note => {
+			if (me && isUserRelated(note, userIdsWhoBlockingMe)) return false;
+			if (me && isUserRelated(note, userIdsWhoMeMuting)) return false;
 
-				return true;
-			});
-
-			notes.sort((a, b) => a.id > b.id ? -1 : 1);
-
-			return await this.noteEntityService.packMany(notes.slice(0, ps.limit), me);
+			return true;
 		});
-	}
+
+		notes.sort((a, b) => a.id > b.id ? -1 : 1);
+
+		return (await deps.noteEntityService.packMany(notes.slice(0, ps.limit), me)).map(toPackedNote);
+	};
+	return {
+		canonical: createApiProcedure<Actor>()(discoveryContract['notes/featured']).handler(handler),
+		get: createApiProcedure<Actor>()(discoveryContract['notes/featured:get']).use(decodeScalarInput<Actor>({ limit: 'integer' })).handler(handler),
+	};
 }

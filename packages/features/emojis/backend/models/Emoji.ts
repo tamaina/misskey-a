@@ -4,7 +4,7 @@
  */
 
 import { PrimaryColumn, Entity, Index, Column } from 'typeorm';
-import { id } from '@/models/util/id.js';
+import { id } from '@features/persistence/backend/models/util/id.js';
 
 @Entity('emoji')
 @Index(['name', 'host'], { unique: true })

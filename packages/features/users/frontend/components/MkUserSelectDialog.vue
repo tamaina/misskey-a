@@ -13,20 +13,20 @@ SPDX-License-Identifier: AGPL-3.0-only
 	@ok="ok()"
 	@closed="emit('closed')"
 >
-	<template #header>{{ i18n.ts.selectUser }}</template>
+	<template #header>{{ $locale.sfc.selectUser }}</template>
 	<div>
 		<div :class="$style.form">
 			<MkInput v-if="computedLocalOnly" v-model="username" :autofocus="true" @update:modelValue="search">
-				<template #label>{{ i18n.ts.username }}</template>
+				<template #label>{{ $locale.sfc.username }}</template>
 				<template #prefix>@</template>
 			</MkInput>
 			<FormSplit v-else :minWidth="170">
 				<MkInput v-model="username" :autofocus="true" @update:modelValue="search">
-					<template #label>{{ i18n.ts.username }}</template>
+					<template #label>{{ $locale.sfc.username }}</template>
 					<template #prefix>@</template>
 				</MkInput>
 				<MkInput v-model="host" :datalist="[hostname]" @update:modelValue="search">
-					<template #label>{{ i18n.ts.host }}</template>
+					<template #label>{{ $locale.sfc.host }}</template>
 					<template #prefix>@</template>
 				</MkInput>
 			</FormSplit>
@@ -42,7 +42,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 				</div>
 			</div>
 			<div v-else :class="$style.empty">
-				<span>{{ i18n.ts.noUsers }}</span>
+				<span>{{ $locale.sfc.noUsers }}</span>
 			</div>
 		</div>
 		<div v-if="username == '' && host == ''" :class="$style.recent">
@@ -63,15 +63,14 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script lang="ts" setup>
 import { onMounted, ref, computed, useTemplateRef } from 'vue';
 import * as Misskey from 'misskey-js';
-import { host as currentHost, hostname } from '@@/js/config.js';
+import { host as currentHost, hostname } from '@features/boot/frontend/shared/config.js';
 import MkInput from '@features/ui/frontend/components/MkInput.vue';
 import FormSplit from '@features/ui/frontend/components/form/split.vue';
 import MkModalWindow from '@features/ui/frontend/components/MkModalWindow.vue';
-import { misskeyApi } from '@/utility/misskey-api.js';
-import { store } from '@/store.js';
-import { i18n } from '@/i18n.js';
-import { $i } from '@/i.js';
-import { instance } from '@/instance.js';
+import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
+import { store } from '@features/preferences/frontend/store.js';
+import { $i } from '@features/auth/frontend/i.js';
+import { instance } from '@features/instance/frontend/instance.js';
 
 const emit = defineEmits<{
 	(ev: 'ok', selected: Misskey.entities.UserDetailed): void;
@@ -232,3 +231,255 @@ onMounted(() => {
 	padding: 16px;
 }
 </style>
+
+<locale locale="ar-SA" lang="json">
+{
+  "selectUser": "حدّد مستخدمًا",
+  "username": "اسم المستخدم",
+  "host": "المضيف",
+  "noUsers": "ليس هناك مستخدمون"
+}
+</locale>
+
+<locale locale="ca-ES" lang="json">
+{
+  "selectUser": "Selecciona usuari/a",
+  "username": "Nom d'usuari",
+  "host": "Amfitrió",
+  "noUsers": "No hi ha usuaris"
+}
+</locale>
+
+<locale locale="cs-CZ" lang="json">
+{
+  "selectUser": "Vyberte uživatele",
+  "username": "Uživatelské jméno",
+  "host": "Hostitel",
+  "noUsers": "Žádní uživatelé"
+}
+</locale>
+
+<locale locale="da-DK" lang="json">
+{
+  "selectUser": "Select a user",
+  "username": "Username",
+  "host": "Host",
+  "noUsers": "There are no users"
+}
+</locale>
+
+<locale locale="de-DE" lang="json">
+{
+  "selectUser": "Benutzer auswählen",
+  "username": "Benutzername",
+  "host": "Hostname",
+  "noUsers": "Keine Benutzer gefunden"
+}
+</locale>
+
+<locale locale="en-US" lang="json">
+{
+  "selectUser": "Select a user",
+  "username": "Username",
+  "host": "Host",
+  "noUsers": "There are no users"
+}
+</locale>
+
+<locale locale="es-ES" lang="json">
+{
+  "selectUser": "Elegir usuario",
+  "username": "Nombre de usuario",
+  "host": "Instancia",
+  "noUsers": "No hay usuarios"
+}
+</locale>
+
+<locale locale="fr-FR" lang="json">
+{
+  "selectUser": "Sélectionner un·e utilisateur·rice",
+  "username": "Nom d’utilisateur·rice",
+  "host": "Serveur distant",
+  "noUsers": "Il n’y a pas d’utilisateur·rice·s"
+}
+</locale>
+
+<locale locale="id-ID" lang="json">
+{
+  "selectUser": "Pilih pengguna",
+  "username": "Nama Pengguna",
+  "host": "Host",
+  "noUsers": "Tidak ada pengguna"
+}
+</locale>
+
+<locale locale="it-IT" lang="json">
+{
+  "selectUser": "Seleziona profilo",
+  "username": "Nome utente",
+  "host": "Host",
+  "noUsers": "Non ci sono profili"
+}
+</locale>
+
+<locale locale="ja-JP" lang="json">
+{
+  "selectUser": "ユーザーを選択",
+  "username": "ユーザー名",
+  "host": "ホスト",
+  "noUsers": "ユーザーはいません"
+}
+</locale>
+
+<locale locale="ja-KS" lang="json">
+{
+  "selectUser": "ユーザーを選ぶ",
+  "username": "ユーザー名",
+  "host": "ホスト",
+  "noUsers": "ユーザーはおらん"
+}
+</locale>
+
+<locale locale="kab-KAB" lang="json">
+{
+  "selectUser": "Select a user",
+  "username": "Isem n umseqdac",
+  "host": "Host",
+  "noUsers": "There are no users"
+}
+</locale>
+
+<locale locale="kn-IN" lang="json">
+{
+  "selectUser": "Select a user",
+  "username": "ಬಳಕೆಹೆಸರು",
+  "host": "Host",
+  "noUsers": "There are no users"
+}
+</locale>
+
+<locale locale="ko-KR" lang="json">
+{
+  "selectUser": "유저 선택",
+  "username": "유저명",
+  "host": "호스트",
+  "noUsers": "아무도 없습니다"
+}
+</locale>
+
+<locale locale="nl-NL" lang="json">
+{
+  "selectUser": "Kies een gebruiker",
+  "username": "Gebruikersnaam",
+  "host": "Server",
+  "noUsers": "Er zijn geen gebruikers."
+}
+</locale>
+
+<locale locale="no-NO" lang="json">
+{
+  "selectUser": "Velg en bruker",
+  "username": "Brukernavn",
+  "host": "Vert",
+  "noUsers": "Det er ingen brukere"
+}
+</locale>
+
+<locale locale="pl-PL" lang="json">
+{
+  "selectUser": "Wybierz użytkownika",
+  "username": "Nazwa użytkownika",
+  "host": "Host",
+  "noUsers": "Brak użytkowników"
+}
+</locale>
+
+<locale locale="pt-PT" lang="json">
+{
+  "selectUser": "Selecionar usuário",
+  "username": "Nome de usuário",
+  "host": "Host",
+  "noUsers": "Sem usuários"
+}
+</locale>
+
+<locale locale="ru-RU" lang="json">
+{
+  "selectUser": "Выберите пользователя",
+  "username": "Имя пользователя",
+  "host": "Хост",
+  "noUsers": "Нет ни одного пользователя"
+}
+</locale>
+
+<locale locale="sk-SK" lang="json">
+{
+  "selectUser": "Vyberte používateľa",
+  "username": "Meno používateľa",
+  "host": "Host",
+  "noUsers": "Žiadni používatelia"
+}
+</locale>
+
+<locale locale="th-TH" lang="json">
+{
+  "selectUser": "เลือกผู้ใช้งาน",
+  "username": "ชื่อผู้ใช้",
+  "host": "โฮสต์",
+  "noUsers": "ไม่พบผู้ใช้งาน"
+}
+</locale>
+
+<locale locale="tr-TR" lang="json">
+{
+  "selectUser": "Kullanıcı seç",
+  "username": "Kullanıcı Adı",
+  "host": "Host",
+  "noUsers": "Kullanıcı yok"
+}
+</locale>
+
+<locale locale="ug-CN" lang="json">
+{
+  "selectUser": "Select a user",
+  "username": "Username",
+  "host": "Host",
+  "noUsers": "There are no users"
+}
+</locale>
+
+<locale locale="uk-UA" lang="json">
+{
+  "selectUser": "Виберіть користувача",
+  "username": "Ім'я користувача",
+  "host": "Хост",
+  "noUsers": "Немає користувачів"
+}
+</locale>
+
+<locale locale="vi-VN" lang="json">
+{
+  "selectUser": "Chọn người dùng",
+  "username": "Tên người dùng",
+  "host": "Host",
+  "noUsers": "Chưa có ai"
+}
+</locale>
+
+<locale locale="zh-CN" lang="json">
+{
+  "selectUser": "选择用户",
+  "username": "用户名",
+  "host": "主机名",
+  "noUsers": "无用户"
+}
+</locale>
+
+<locale locale="zh-TW" lang="json">
+{
+  "selectUser": "選取使用者",
+  "username": "使用者名稱",
+  "host": "主機",
+  "noUsers": "沒有任何使用者"
+}
+</locale>

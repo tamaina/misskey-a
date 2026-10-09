@@ -7,11 +7,11 @@
 
 import { afterEach, beforeEach, describe, expect, beforeAll, afterAll, test } from 'vitest';
 import { Test, TestingModule } from '@nestjs/testing';
-import { GlobalModule } from '@/GlobalModule.js';
-import { CoreModule } from '@/core/CoreModule.js';
-import { GlobalEventService } from '@/core/GlobalEventService.js';
-import { IdService } from '@/core/IdService.js';
-import { ChannelMutingService } from '@/core/ChannelMutingService.js';
+import { GlobalModule } from '@features/boot/backend/assembly/GlobalModule.js';
+import { CoreModule } from '@features/boot/backend/assembly/CoreModule.js';
+import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
+import { IdService } from '@features/runtime/backend/services/IdService.js';
+import { ChannelMutingService } from '@features/channels/backend/services/ChannelMutingService.js';
 import {
 	ChannelMutingRepository,
 	ChannelsRepository,
@@ -22,7 +22,7 @@ import {
 	MiUser,
 	UserProfilesRepository,
 	UsersRepository,
-} from '@/models/_.js';
+} from '@features/persistence/backend/repositories/models.js';
 import { DI } from '@/di-symbols.js';
 import { setTimeout } from 'node:timers/promises';
 

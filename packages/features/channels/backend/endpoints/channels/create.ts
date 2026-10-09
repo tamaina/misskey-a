@@ -3,87 +3,45 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Inject, Injectable } from '@nestjs/common';
-import ms from '@/runtime-dependencies/ms.js';
-import { Endpoint } from '@/server/api/endpoint-base.js';
-import type { ChannelsRepository, DriveFilesRepository } from '@/models/_.js';
-import type { MiChannel } from '@/models/Channel.js';
-import { IdService } from '@/core/IdService.js';
-import { ChannelEntityService } from '@/core/entities/ChannelEntityService.js';
-import { DI } from '@/di-symbols.js';
-import { ApiError } from '@/server/api/error.js';
+import { toPackedChannel } from '../../api.dto.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 
-export const meta = {
-	tags: ['channels'],
+import { type IdService } from '@features/runtime/backend/services/IdService.js';
 
-	requireCredential: true,
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import { type ChannelEntityService } from '../../serializers/ChannelEntityService.js';
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
+import { channelsCreateContract, channelsCreateErrors } from './create.contract.js';
+import type { ChannelsRepository, DriveFilesRepository } from '@features/persistence/backend/repositories/models.js';
 
-	prohibitMoved: true,
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
 
-	kind: 'write:channels',
-
-	requiredRolePolicy: 'canCreateChannel',
-
-	limit: {
-		duration: ms('1hour'),
-		max: 10,
-	},
-
-	res: {
-		type: 'object',
-		optional: false, nullable: false,
-		ref: 'Channel',
-	},
-
-	errors: {
-		noSuchFile: {
-			message: 'No such file.',
-			code: 'NO_SUCH_FILE',
-			id: 'cd1e9f3e-5a12-4ab4-96f6-5d0a2cc32050',
-		},
-	},
-} as const;
-
-export const paramDef = {
-	type: 'object',
-	properties: {
-		name: { type: 'string', minLength: 1, maxLength: 128 },
-		description: { type: 'string', nullable: true, maxLength: 2048 },
-		bannerId: { type: 'string', format: 'misskey:id', nullable: true },
-		color: { type: 'string', minLength: 1, maxLength: 16 },
-		isSensitive: { type: 'boolean', nullable: true },
-		allowRenoteToExternal: { type: 'boolean', nullable: true },
-	},
-	required: ['name'],
-} as const;
-
-@Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
-	constructor(
-		@Inject(DI.driveFilesRepository)
-		private driveFilesRepository: DriveFilesRepository,
-
-		@Inject(DI.channelsRepository)
-		private channelsRepository: ChannelsRepository,
-
-		private idService: IdService,
-		private channelEntityService: ChannelEntityService,
-	) {
-		super(meta, paramDef, async (ps, me) => {
+export interface ChannelsCreateDependencies {
+	driveFilesRepository: DriveFilesRepository;
+	channelsRepository: ChannelsRepository;
+	idService: IdService;
+	channelEntityService: ChannelEntityService;
+}
+export function createChannelsCreateProcedure<Actor extends MiLocalUser>(deps: ChannelsCreateDependencies) {
+	return createApiProcedure<Actor>()(channelsCreateContract)
+		.use(requirePrincipal<Actor>())
+		.handler(async ({ input, context }) => {
+			const ps = input;
+			const me = context.principal;
 			let banner = null;
 			if (ps.bannerId != null) {
-				banner = await this.driveFilesRepository.findOneBy({
+				banner = await deps.driveFilesRepository.findOneBy({
 					id: ps.bannerId,
 					userId: me.id,
 				});
 
 				if (banner == null) {
-					throw new ApiError(meta.errors.noSuchFile);
+					throw apiError(channelsCreateErrors.noSuchFile);
 				}
 			}
 
-			const channel = await this.channelsRepository.insertOne({
-				id: this.idService.gen(),
+			const channel = await deps.channelsRepository.insertOne({
+				id: deps.idService.gen(),
 				userId: me.id,
 				name: ps.name,
 				description: ps.description ?? null,
@@ -91,9 +49,7 @@ export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDe
 				isSensitive: ps.isSensitive ?? false,
 				...(ps.color !== undefined ? { color: ps.color } : {}),
 				allowRenoteToExternal: ps.allowRenoteToExternal ?? true,
-			} as MiChannel);
-
-			return await this.channelEntityService.pack(channel, me);
+			});
+			return toPackedChannel(await deps.channelEntityService.pack(channel, me));
 		});
-	}
 }

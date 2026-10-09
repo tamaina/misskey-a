@@ -13,7 +13,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 	<template #suffix>
 		<MkTime :time="job.finishedOn ?? job.processedOn ?? job.timestamp" mode="relative"/>
 		<span v-if="job.progress != null && typeof job.progress === 'number' && job.progress > 0" style="margin-left: 1em;">{{ Math.floor(job.progress) }}%</span>
-		<span v-if="job.opts.attempts != null && job.opts.attempts > 0 && job.attempts > 1" style="margin-left: 1em; color: var(--MI_THEME-warn); font-variant-numeric: diagonal-fractions;">{{ job.attempts }}/{{ job.opts.attempts }}</span>
+		<span v-if="job.opts.attempts != null && Number(job.opts.attempts) > 0 && job.attempts > 1" style="margin-left: 1em; color: var(--MI_THEME-warn); font-variant-numeric: diagonal-fractions;">{{ job.attempts }}/{{ job.opts.attempts }}</span>
 		<span v-if="job.isFailed && job.finishedOn != null" style="margin-left: 1em; color: var(--MI_THEME-error)"><i class="ti ti-circle-x"></i></span>
 		<span v-else-if="job.isFailed" style="margin-left: 1em; color: var(--MI_THEME-warn)"><i class="ti ti-alert-triangle"></i></span>
 		<span v-else-if="job.finishedOn != null" style="margin-left: 1em; color: var(--MI_THEME-success)"><i class="ti ti-check"></i></span>
@@ -92,7 +92,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<template #key>Failed reason</template>
 				<template #value><i style="color: var(--MI_THEME-error)" class="ti ti-alert-triangle"></i> {{ job.failedReason }}</template>
 			</MkKeyValue>
-			<MkKeyValue v-if="job.opts.attempts != null && job.opts.attempts > 0">
+			<MkKeyValue v-if="job.opts.attempts != null && Number(job.opts.attempts) > 0">
 				<template #key>Attempts</template>
 				<template #value>{{ job.attempts }} of {{ job.opts.attempts }}</template>
 			</MkKeyValue>
@@ -167,11 +167,10 @@ import { ref, computed } from 'vue';
 import * as Misskey from 'misskey-js';
 import JSON5 from 'json5';
 import type { TlEvent } from '@features/ui/frontend/components/MkTl.vue';
-import * as os from '@/os.js';
-import { i18n } from '@/i18n.js';
+import * as os from '@features/ui/frontend/os.js';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import MkTabs from '@features/ui/frontend/components/MkTabs.vue';
-import MkFolder from '@/components/MkFolder.vue';
+import MkFolder from '@features/ui/frontend/components/MkFolder.vue';
 import MkCode from '@features/markup/frontend/components/MkCode.vue';
 import MkKeyValue from '@features/ui/frontend/components/MkKeyValue.vue';
 import MkCodeEditor from '@features/markup/frontend/components/MkCodeEditor.vue';
@@ -256,7 +255,7 @@ const timeline = computed(() => {
 async function promoteJob() {
 	const { canceled } = await os.confirm({
 		type: 'warning',
-		title: i18n.ts.areYouSure,
+		title: $locale.value.sfc.areYouSure,
 	});
 	if (canceled) return;
 
@@ -266,7 +265,7 @@ async function promoteJob() {
 async function removeJob() {
 	const { canceled } = await os.confirm({
 		type: 'warning',
-		title: i18n.ts.areYouSure,
+		title: $locale.value.sfc.areYouSure,
 	});
 	if (canceled) return;
 
@@ -295,3 +294,171 @@ function copyRaw() {
 <style lang="scss" module>
 
 </style>
+
+<locale locale="ar-SA" lang="json">
+{
+	"areYouSure": "Are you sure?"
+}
+</locale>
+
+<locale locale="ca-ES" lang="json">
+{
+	"areYouSure": "Estàs segur?"
+}
+</locale>
+
+<locale locale="cs-CZ" lang="json">
+{
+	"areYouSure": "Jste si jistí?"
+}
+</locale>
+
+<locale locale="da-DK" lang="json">
+{
+	"areYouSure": "Are you sure?"
+}
+</locale>
+
+<locale locale="de-DE" lang="json">
+{
+	"areYouSure": "Bist du sicher?"
+}
+</locale>
+
+<locale locale="en-US" lang="json">
+{
+	"areYouSure": "Are you sure?"
+}
+</locale>
+
+<locale locale="es-ES" lang="json">
+{
+	"areYouSure": "¿Estás conforme?"
+}
+</locale>
+
+<locale locale="fr-FR" lang="json">
+{
+	"areYouSure": "Êtes-vous sûr·e ?"
+}
+</locale>
+
+<locale locale="id-ID" lang="json">
+{
+	"areYouSure": "Apakah kamu yakin?"
+}
+</locale>
+
+<locale locale="it-IT" lang="json">
+{
+	"areYouSure": "Confermi?"
+}
+</locale>
+
+<locale locale="ja-JP" lang="json">
+{
+	"areYouSure": "よろしいですか？"
+}
+</locale>
+
+<locale locale="ja-KS" lang="json">
+{
+	"areYouSure": "いいん？"
+}
+</locale>
+
+<locale locale="kab-KAB" lang="json">
+{
+	"areYouSure": "Are you sure?"
+}
+</locale>
+
+<locale locale="kn-IN" lang="json">
+{
+	"areYouSure": "Are you sure?"
+}
+</locale>
+
+<locale locale="ko-KR" lang="json">
+{
+	"areYouSure": "계속 진행하시겠습니까?"
+}
+</locale>
+
+<locale locale="nl-NL" lang="json">
+{
+	"areYouSure": "Weet je het zeker?"
+}
+</locale>
+
+<locale locale="no-NO" lang="json">
+{
+	"areYouSure": "Are you sure?"
+}
+</locale>
+
+<locale locale="pl-PL" lang="json">
+{
+	"areYouSure": "Na pewno?"
+}
+</locale>
+
+<locale locale="pt-PT" lang="json">
+{
+	"areYouSure": "Tem certeza?"
+}
+</locale>
+
+<locale locale="ru-RU" lang="json">
+{
+	"areYouSure": "Вы уверены?"
+}
+</locale>
+
+<locale locale="sk-SK" lang="json">
+{
+	"areYouSure": "Are you sure?"
+}
+</locale>
+
+<locale locale="th-TH" lang="json">
+{
+	"areYouSure": "แน่ใจแล้วใช่ไหมคะ?"
+}
+</locale>
+
+<locale locale="tr-TR" lang="json">
+{
+	"areYouSure": "Emin misin?"
+}
+</locale>
+
+<locale locale="ug-CN" lang="json">
+{
+	"areYouSure": "Are you sure?"
+}
+</locale>
+
+<locale locale="uk-UA" lang="json">
+{
+	"areYouSure": "Ви впевнені?"
+}
+</locale>
+
+<locale locale="vi-VN" lang="json">
+{
+	"areYouSure": "Bạn chắc chứ?"
+}
+</locale>
+
+<locale locale="zh-CN" lang="json">
+{
+	"areYouSure": "你确定吗？"
+}
+</locale>
+
+<locale locale="zh-TW" lang="json">
+{
+	"areYouSure": "是否確定？"
+}
+</locale>

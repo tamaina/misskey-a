@@ -3,30 +3,21 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Inject, Injectable } from '@nestjs/common';
-import { DataSource, In, Not } from 'typeorm';
-import { DI } from '@/di-symbols.js';
-import {
-	type NotesRepository,
-	MiPage,
-	type PagesRepository,
-	MiDriveFile,
-	type UsersRepository,
-	MiNote,
-} from '@/models/_.js';
-import { bindThis } from '@/decorators.js';
-import { RoleService } from '@/core/RoleService.js';
-import { IdService } from '@/core/IdService.js';
-import type { MiUser } from '@/models/User.js';
-import { IdentifiableError } from '@/misc/identifiable-error.js';
-import { ModerationLogService } from '@/core/ModerationLogService.js';
+import { type DeleteResult, type FindOperator, type UpdateResult, In, Not } from 'typeorm';
+import { type NotesRepository, MiPage, MiDriveFile, type UsersRepository, MiNote } from '@features/persistence/backend/repositories/models.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
+import type { RoleService } from '@features/roles/backend/services/RoleService.js';
+import type { IdService } from '@features/runtime/backend/services/IdService.js';
+import type { MiUser } from '@features/users/backend/models/User.js';
+import { IdentifiableError } from '@features/runtime/backend/errors/identifiable-error.js';
+import type { ModerationLogService } from '@features/moderation/backend/services/ModerationLogService.js';
 
 export interface PageBody {
 	title: string;
 	name: string;
 	summary: string | null;
-	content: Array<Record<string, any>>;
-	variables: Array<Record<string, any>>;
+	content: MiPage['content'];
+	variables: MiPage['variables'];
 	script: string;
 	eyeCatchingImage?: MiDriveFile | null;
 	font: 'serif' | 'sans-serif';
@@ -34,24 +25,60 @@ export interface PageBody {
 	hideTitleWhenPinned: boolean;
 }
 
-@Injectable()
+/** Exact Page queries used here keep recursive stored JSON out of ORM generic inference. */
+export interface PageWriteRepository {
+	findBy(where: { userId: MiUser['id']; name: string }): Promise<MiPage[]>;
+	insertOne(page: MiPage): Promise<MiPage>;
+}
+
+export interface PageUpdateValues {
+	updatedAt: Date;
+	title: PageBody['title'] | undefined;
+	name: PageBody['name'] | undefined;
+	summary: PageBody['summary'];
+	content: PageBody['content'] | undefined;
+	variables: PageBody['variables'] | undefined;
+	script: PageBody['script'] | undefined;
+	alignCenter: PageBody['alignCenter'] | undefined;
+	hideTitleWhenPinned: PageBody['hideTitleWhenPinned'] | undefined;
+	font: PageBody['font'] | undefined;
+	eyeCatchingImageId: MiPage['eyeCatchingImageId'] | undefined;
+}
+
+/** The existing transaction calls, with finite criteria and exact stored Page fields. */
+export interface PageTransaction {
+	findOne(entity: typeof MiPage, options: {
+		where: { id: MiPage['id'] };
+		lock: { mode: 'for_no_key_update' | 'pessimistic_write' };
+	}): Promise<MiPage | null>;
+	findBy(entity: typeof MiPage, where: {
+		id: FindOperator<MiPage['id']>;
+		userId: MiUser['id'];
+		name: string;
+	}): Promise<MiPage[]>;
+	update(entity: typeof MiPage, id: MiPage['id'], values: PageUpdateValues): Promise<UpdateResult>;
+	delete(entity: typeof MiPage, id: MiPage['id']): Promise<DeleteResult>;
+	increment(entity: typeof MiNote, where: { id: FindOperator<MiNote['id']> }, property: 'pageCount', value: number): Promise<UpdateResult>;
+	decrement(entity: typeof MiNote, where: { id: FindOperator<MiNote['id']> }, property: 'pageCount', value: number): Promise<UpdateResult>;
+}
+
+export interface PageDatabase {
+	transaction(callback: (transaction: PageTransaction) => Promise<void>): Promise<void>;
+}
+
 export class PageService {
 	constructor(
-		@Inject(DI.db)
-		private db: DataSource,
+		private db: PageDatabase,
 
-		@Inject(DI.pagesRepository)
-		private pagesRepository: PagesRepository,
+		private pagesRepository: PageWriteRepository,
 
-		@Inject(DI.notesRepository)
 		private notesRepository: NotesRepository,
 
-		@Inject(DI.usersRepository)
 		private usersRepository: UsersRepository,
 
-		private roleService: RoleService,
-		private moderationLogService: ModerationLogService,
-		private idService: IdService,
+		private roleService: Pick<RoleService, 'isModerator'>,
+		private moderationLogService: Pick<ModerationLogService, 'log'>,
+		private idService: Pick<IdService, 'gen'>,
 	) {
 	}
 

@@ -4,21 +4,21 @@
  */
 
 import { Inject, Injectable } from '@nestjs/common';
-import * as Redis from 'ioredis';
-import type { MiUser, SystemWebhooksRepository } from '@/models/_.js';
-import { DI } from '@/di-symbols.js';
-import { bindThis } from '@/decorators.js';
-import { GlobalEvents, GlobalEventService } from '@/core/GlobalEventService.js';
-import { MiSystemWebhook, type SystemWebhookEventType } from '@/models/SystemWebhook.js';
-import { IdService } from '@/core/IdService.js';
-import { QueueService } from '@/core/QueueService.js';
-import { ModerationLogService } from '@/core/ModerationLogService.js';
-import { LoggerService } from '@/core/LoggerService.js';
-import Logger from '@/logger.js';
-import { Packed } from '@/misc/json-schema.js';
-import { AbuseReportResolveType } from '@/models/AbuseUserReport.js';
-import { ModeratorInactivityRemainingTime } from '@/queue/processors/CheckModeratorsActivityProcessorService.js';
 import type { OnApplicationShutdown } from '@nestjs/common';
+import * as Redis from 'ioredis';
+import type { MiUser, SystemWebhooksRepository } from '@features/persistence/backend/repositories/models.js';
+import { DI } from '@/di-symbols.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
+import { GlobalEvents, GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
+import { MiSystemWebhook, type SystemWebhookEventType } from '../models/SystemWebhook.js';
+import { IdService } from '@features/runtime/backend/services/IdService.js';
+import { QueueService } from '@features/runtime/backend/services/QueueService.js';
+import { ModerationLogService } from '@features/moderation/backend/services/ModerationLogService.js';
+import { LoggerService } from '@features/runtime/backend/services/LoggerService.js';
+import { Logger } from '@features/runtime/backend/logging/logger.js';
+import { Packed } from '@features/index/backend/packed.schema.js';
+import { AbuseReportResolveType } from '@features/moderation/backend/models/AbuseUserReport.js';
+import { ModeratorInactivityRemainingTime } from '@features/moderation/backend/jobs/CheckModeratorsActivityProcessorService.js';
 
 export type AbuseReportPayload = {
 	id: string;

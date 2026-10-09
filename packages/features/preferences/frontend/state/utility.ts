@@ -5,16 +5,16 @@
 
 import { ref, watch } from 'vue';
 import type { PreferencesProfile } from '@features/preferences/frontend/state/manager.js';
-import type { MenuItem } from '@/types/menu.js';
+import type { MenuItem } from '@features/navigation/frontend/types/menu.js';
 import { copyToClipboard } from '@features/ui/frontend/utility/copy-to-clipboard.js';
-import { i18n } from '@/i18n.js';
-import { miLocalStorage } from '@/local-storage.js';
-import { prefer } from '@/preferences.js';
-import * as os from '@/os.js';
-import { store } from '@/store.js';
-import { $i } from '@/i.js';
-import { misskeyApi } from '@/utility/misskey-api.js';
-import { unisonReload } from '@/utility/unison-reload.js';
+import FeatureLocaleMessages from '@features/preferences/frontend/ts-messages.vue';
+import { miLocalStorage } from '@features/preferences/frontend/local-storage.js';
+import { prefer } from '@features/preferences/frontend/preferences.js';
+import * as os from '@features/ui/frontend/os.js';
+import { store } from '@features/preferences/frontend/store.js';
+import { $i } from '@features/auth/frontend/i.js';
+import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
+import { unisonReload } from '@features/runtime/frontend/utility/unison-reload.js';
 
 function canAutoBackup() {
 	return prefer.profile.name != null && prefer.profile.name.trim() !== '';
@@ -29,7 +29,7 @@ export function getPreferencesProfileMenu(): MenuItem[] {
 				autoBackupEnabled.value = false;
 				os.alert({
 					type: 'warning',
-					title: i18n.ts._preferencesBackup.youNeedToNameYourProfileToEnableAutoBackup,
+					title: FeatureLocaleMessages.$locale._preferencesBackup.youNeedToNameYourProfileToEnableAutoBackup,
 				});
 				return;
 			}
@@ -44,9 +44,9 @@ export function getPreferencesProfileMenu(): MenuItem[] {
 
 	const menu: MenuItem[] = [{
 		type: 'label',
-		text: prefer.profile.name || `(${i18n.ts.noName})`,
+		text: prefer.profile.name || `(${FeatureLocaleMessages.$locale.noName})`,
 	}, {
-		text: i18n.ts.rename,
+		text: FeatureLocaleMessages.$locale.rename,
 		icon: 'ti ti-pencil',
 		action: () => {
 			renameProfile();
@@ -54,10 +54,10 @@ export function getPreferencesProfileMenu(): MenuItem[] {
 	}, {
 		type: 'switch',
 		icon: 'ti ti-cloud-up',
-		text: i18n.ts._preferencesBackup.autoBackup,
+		text: FeatureLocaleMessages.$locale._preferencesBackup.autoBackup,
 		ref: autoBackupEnabled,
 	}, {
-		text: i18n.ts.export,
+		text: FeatureLocaleMessages.$locale.export,
 		icon: 'ti ti-download',
 		action: () => {
 			exportCurrentProfile();
@@ -65,13 +65,13 @@ export function getPreferencesProfileMenu(): MenuItem[] {
 	}, {
 		type: 'divider',
 	}, {
-		text: i18n.ts._preferencesBackup.restoreFromBackup,
+		text: FeatureLocaleMessages.$locale._preferencesBackup.restoreFromBackup,
 		icon: 'ti ti-cloud-down',
 		action: () => {
 			restoreFromCloudBackup();
 		},
 	}, {
-		text: i18n.ts.import,
+		text: FeatureLocaleMessages.$locale.import,
 		icon: 'ti ti-upload',
 		action: () => {
 			importProfile();
@@ -80,7 +80,7 @@ export function getPreferencesProfileMenu(): MenuItem[] {
 		type: 'divider',
 	}, {
 		type: 'link',
-		text: i18n.ts._preferencesProfile.manageProfiles + '...',
+		text: FeatureLocaleMessages.$locale._preferencesProfile.manageProfiles + '...',
 		icon: 'ti ti-settings-cog',
 		to: '/settings/profiles',
 	}];
@@ -100,8 +100,8 @@ export function getPreferencesProfileMenu(): MenuItem[] {
 
 async function renameProfile() {
 	const { canceled, result: name } = await os.inputText({
-		title: i18n.ts._preferencesProfile.profileName,
-		text: i18n.ts._preferencesProfile.profileNameDescription + '\n' + i18n.ts._preferencesProfile.profileNameDescription2,
+		title: FeatureLocaleMessages.$locale._preferencesProfile.profileName,
+		text: FeatureLocaleMessages.$locale._preferencesProfile.profileNameDescription + '\n' + FeatureLocaleMessages.$locale._preferencesProfile.profileNameDescription2,
 		placeholder: prefer.profile.name || null,
 		default: prefer.profile.name || null,
 	});
@@ -178,15 +178,15 @@ export async function restoreFromCloudBackup() {
 	if (backups.length === 0) {
 		os.alert({
 			type: 'warning',
-			title: i18n.ts._preferencesBackup.noBackupsFoundTitle,
-			text: i18n.ts._preferencesBackup.noBackupsFoundDescription,
+			title: FeatureLocaleMessages.$locale._preferencesBackup.noBackupsFoundTitle,
+			text: FeatureLocaleMessages.$locale._preferencesBackup.noBackupsFoundDescription,
 		});
 		return;
 	}
 
 	const select = await os.select({
-		title: i18n.ts._preferencesBackup.selectBackupToRestore,
-		text: 'ℹ️ ' + i18n.ts._preferencesProfile.shareSameProfileBetweenDevicesIsNotRecommended + ' ' + i18n.ts._preferencesProfile.useSyncBetweenDevicesOptionIfYouWantToSyncSetting,
+		title: FeatureLocaleMessages.$locale._preferencesBackup.selectBackupToRestore,
+		text: 'ℹ️ ' + FeatureLocaleMessages.$locale._preferencesProfile.shareSameProfileBetweenDevicesIsNotRecommended + ' ' + FeatureLocaleMessages.$locale._preferencesProfile.useSyncBetweenDevicesOptionIfYouWantToSyncSetting,
 		items: backups.map(backup => ({
 			label: backup.name,
 			value: backup.name,

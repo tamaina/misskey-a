@@ -6,18 +6,18 @@
 import * as fs from 'node:fs';
 import * as stream from 'node:stream/promises';
 import { Inject, Injectable } from '@nestjs/common';
-import chalk from '@/runtime-dependencies/chalk.js';
-import got, * as Got from '@/runtime-dependencies/got.js';
+import chalk from 'chalk';
+import got, * as Got from 'got';
 import { parse } from 'content-disposition';
 import { DI } from '@/di-symbols.js';
 import type { Config } from '@/config.js';
-import { HttpRequestService } from '@/core/HttpRequestService.js';
-import { createTemp } from '@/misc/create-temp.js';
-import { StatusError } from '@/misc/status-error.js';
-import { LoggerService } from '@/core/LoggerService.js';
-import type Logger from '@/logger.js';
+import { HttpRequestService } from './HttpRequestService.js';
+import { createTemp } from '../io/create-temp.js';
+import { StatusError } from '../http/status-error.js';
+import { LoggerService } from './LoggerService.js';
+import type { Logger } from '../logging/logger.js';
 
-import { bindThis } from '@/decorators.js';
+import { bindThis } from '../decorators.js';
 
 @Injectable()
 export class DownloadService {

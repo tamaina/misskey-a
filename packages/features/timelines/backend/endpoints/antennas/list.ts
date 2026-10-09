@@ -3,50 +3,28 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Inject, Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
-import type { AntennasRepository } from '@/models/_.js';
-import { AntennaEntityService } from '@/core/entities/AntennaEntityService.js';
-import { DI } from '@/di-symbols.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import { toPackedAntenna } from '@features/timelines/backend/antenna.schema.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import { antennasListContract } from './list.contract.js';
+import { AntennaEntityService } from '../../serializers/AntennaEntityService.js';
+import type { AntennasRepository } from '@features/persistence/backend/repositories/models.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
 
-export const meta = {
-	tags: ['antennas', 'account'],
-
-	requireCredential: true,
-
-	kind: 'read:account',
-
-	res: {
-		type: 'array',
-		optional: false, nullable: false,
-		items: {
-			type: 'object',
-			optional: false, nullable: false,
-			ref: 'Antenna',
-		},
-	},
-} as const;
-
-export const paramDef = {
-	type: 'object',
-	properties: {},
-	required: [],
-} as const;
-
-@Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
-	constructor(
-		@Inject(DI.antennasRepository)
-		private antennasRepository: AntennasRepository,
-
-		private antennaEntityService: AntennaEntityService,
-	) {
-		super(meta, paramDef, async (ps, me) => {
-			const antennas = await this.antennasRepository.findBy({
-				userId: me.id,
-			});
-
-			return await Promise.all(antennas.map(x => this.antennaEntityService.pack(x)));
+export interface AntennasListDependencies {
+	antennasRepository: AntennasRepository;
+	antennaEntityService: AntennaEntityService;
+}
+export function createAntennasListProcedure<Actor extends MiLocalUser>(deps: AntennasListDependencies) {
+	return createApiProcedure<Actor>()(antennasListContract).use(requirePrincipal<Actor>())
+		.handler(async ({ input, context }) => {
+			const result = await (async () => {
+				const me = context.principal;
+				const antennas = await deps.antennasRepository.findBy({
+					userId: me.id,
+				});
+				return await Promise.all(antennas.map(x => deps.antennaEntityService.pack(x)));
+			})();
+			return result.map(toPackedAntenna);
 		});
-	}
 }

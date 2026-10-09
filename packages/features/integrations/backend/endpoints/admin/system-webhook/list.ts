@@ -3,58 +3,29 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
-import { SystemWebhookEntityService } from '@/core/entities/SystemWebhookEntityService.js';
-import { systemWebhookEventTypes } from '@/models/SystemWebhook.js';
-import { SystemWebhookService } from '@/core/SystemWebhookService.js';
-
-export const meta = {
-	tags: ['admin', 'system-webhook'],
-
-	requireCredential: true,
-	requireModerator: true,
-	secure: true,
-	kind: 'write:admin:system-webhook',
-
-	res: {
-		type: 'array',
-		items: {
-			type: 'object',
-			ref: 'SystemWebhook',
-		},
-	},
-} as const;
-
-export const paramDef = {
-	type: 'object',
-	properties: {
-		isActive: {
-			type: 'boolean',
-		},
-		on: {
-			type: 'array',
-			items: {
-				type: 'string',
-				enum: systemWebhookEventTypes,
-			},
-		},
-	},
-	required: [],
-} as const;
-
-@Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
-	constructor(
-		private systemWebhookService: SystemWebhookService,
-		private systemWebhookEntityService: SystemWebhookEntityService,
-	) {
-		super(meta, paramDef, async (ps) => {
-			const webhooks = await this.systemWebhookService.fetchSystemWebhooks({
-				isActive: ps.isActive,
-				on: ps.on,
-			});
-			return this.systemWebhookEntityService.packMany(webhooks);
+import { toSystemWebhook } from '../../../webhook.schema.js';
+import { SystemWebhookEntityService } from '../../../serializers/SystemWebhookEntityService.js';
+import { SystemWebhookService } from '../../../services/SystemWebhookService.js';
+import type { MiLocalUser } from '../../../../../users/backend/models/User.js';
+import { adminSystemWebhookListContract } from './list.contract.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import { requirePrincipal } from '../../../../../api/backend/transport/middleware.js';
+export interface AdminSystemWebhookListDependencies {
+	systemWebhookService: Pick<SystemWebhookService, 'fetchSystemWebhooks'>;
+	systemWebhookEntityService: Pick<SystemWebhookEntityService, 'packMany'>;
+}
+export function createAdminSystemWebhookListProcedure(deps: AdminSystemWebhookListDependencies) {
+	return createApiProcedure<MiLocalUser>()(adminSystemWebhookListContract)
+		.use(requirePrincipal<MiLocalUser>())
+		.handler(async ({ input, context }) => {
+			const ps = input;
+			const result = await (async () => {
+				const webhooks = await deps.systemWebhookService.fetchSystemWebhooks({
+					isActive: ps.isActive,
+					on: ps.on,
+				});
+				return (await deps.systemWebhookEntityService.packMany(webhooks)).map(toSystemWebhook);
+			})();
+			return result;
 		});
-	}
 }

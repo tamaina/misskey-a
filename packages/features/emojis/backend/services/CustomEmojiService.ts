@@ -3,59 +3,27 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import type { FetchEmojisHostTypes, FetchEmojisSortKeys } from '../fetch-options.js';
 import { Inject, Injectable, OnApplicationShutdown } from '@nestjs/common';
 import * as Redis from 'ioredis';
 import { In, IsNull } from 'typeorm';
-import { EmojiEntityService } from '@/core/entities/EmojiEntityService.js';
-import { GlobalEventService } from '@/core/GlobalEventService.js';
-import { IdService } from '@/core/IdService.js';
-import { ModerationLogService } from '@/core/ModerationLogService.js';
-import { UtilityService } from '@/core/UtilityService.js';
-import { bindThis } from '@/decorators.js';
+import { EmojiEntityService } from '../serializers/EmojiEntityService.js';
+import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
+import { IdService } from '@features/runtime/backend/services/IdService.js';
+import { ModerationLogService } from '@features/moderation/backend/services/ModerationLogService.js';
+import { UtilityService } from '@features/federation/backend/services/UtilityService.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
 import { DI } from '@/di-symbols.js';
-import { MemoryKVCache, RedisSingleCache } from '@/misc/cache.js';
-import { sqlLikeEscape } from '@/misc/sql-like-escape.js';
-import type { EmojisRepository, MiRole, MiUser } from '@/models/_.js';
-import type { MiEmoji } from '@/models/Emoji.js';
-import type { Serialized } from '@/types.js';
+import { MemoryKVCache, RedisSingleCache } from '@features/runtime/backend/cache/cache.js';
+import { sqlLikeEscape } from '@features/persistence/backend/utility/sql-like-escape.js';
+import type { EmojisRepository, MiRole, MiUser } from '@features/persistence/backend/repositories/models.js';
+import type { MiEmoji } from '../models/Emoji.js';
+import type { Serialized } from '@features/runtime/backend/types.js';
+
+export { fetchEmojisHostTypes, fetchEmojisSortKeys } from '../fetch-options.js';
+export type { FetchEmojisHostTypes, FetchEmojisSortKeys } from '../fetch-options.js';
 
 const parseEmojiStrRegexp = /^([-\w]+)(?:@([\w.-]+))?$/;
-
-export const fetchEmojisHostTypes = [
-	'local',
-	'remote',
-	'all',
-] as const;
-export type FetchEmojisHostTypes = typeof fetchEmojisHostTypes[number];
-export const fetchEmojisSortKeys = [
-	'+id',
-	'-id',
-	'+updatedAt',
-	'-updatedAt',
-	'+name',
-	'-name',
-	'+host',
-	'-host',
-	'+uri',
-	'-uri',
-	'+publicUrl',
-	'-publicUrl',
-	'+type',
-	'-type',
-	'+aliases',
-	'-aliases',
-	'+category',
-	'-category',
-	'+license',
-	'-license',
-	'+isSensitive',
-	'-isSensitive',
-	'+localOnly',
-	'-localOnly',
-	'+roleIdsThatCanBeUsedThisEmojiAsReaction',
-	'-roleIdsThatCanBeUsedThisEmojiAsReaction',
-] as const;
-export type FetchEmojisSortKeys = typeof fetchEmojisSortKeys[number];
 
 @Injectable()
 export class CustomEmojiService implements OnApplicationShutdown {

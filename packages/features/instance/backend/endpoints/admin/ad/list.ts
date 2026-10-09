@@ -2,62 +2,24 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-
-import { Inject, Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
-import type { AdsRepository } from '@/models/_.js';
-import { QueryService } from '@/core/QueryService.js';
-import { DI } from '@/di-symbols.js';
-
-export const meta = {
-	tags: ['admin'],
-
-	requireCredential: true,
-	requireModerator: true,
-	kind: 'read:admin:ad',
-	res: {
-		type: 'array',
-		optional: false,
-		nullable: false,
-		items: {
-			type: 'object',
-			optional: false,
-			nullable: false,
-			ref: 'Ad',
-		},
-	},
-} as const;
-
-export const paramDef = {
-	type: 'object',
-	properties: {
-		limit: { type: 'integer', minimum: 1, maximum: 100, default: 10 },
-		sinceId: { type: 'string', format: 'misskey:id' },
-		untilId: { type: 'string', format: 'misskey:id' },
-		sinceDate: { type: 'integer' },
-		untilDate: { type: 'integer' },
-		publishing: { type: 'boolean', default: null, nullable: true },
-	},
-	required: [],
-} as const;
-
-@Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
-	constructor(
-		@Inject(DI.adsRepository)
-		private adsRepository: AdsRepository,
-
-		private queryService: QueryService,
-	) {
-		super(meta, paramDef, async (ps, me) => {
-			const query = this.queryService.makePaginationQuery(this.adsRepository.createQueryBuilder('ad'), ps.sinceId, ps.untilId, ps.sinceDate, ps.untilDate);
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import type { ApiActor } from '@features/api/backend/transport/context.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import { adListContract } from './list.contract.js';
+import type { InstanceApiDependencies } from '../../../api.implementation.js';
+export type AdListDependencies = Pick<InstanceApiDependencies, 'queryService' | 'adsRepository'>;
+export function createAdListProcedure<Actor extends ApiActor>(deps: AdListDependencies) {
+	return createApiProcedure<Actor>()(adListContract)
+		.use(requirePrincipal<Actor>())
+		.handler(async ({ input, context }) => {
+			const ps = input;
+			const query = deps.queryService.makePaginationQuery(deps.adsRepository.createQueryBuilder('ad'), ps.sinceId, ps.untilId, ps.sinceDate, ps.untilDate);
 			if (ps.publishing === true) {
 				query.andWhere('ad.expiresAt > :now', { now: new Date() }).andWhere('ad.startsAt <= :now', { now: new Date() });
 			} else if (ps.publishing === false) {
 				query.andWhere('ad.expiresAt <= :now', { now: new Date() }).orWhere('ad.startsAt > :now', { now: new Date() });
 			}
 			const ads = await query.limit(ps.limit).getMany();
-
 			return ads.map(ad => ({
 				id: ad.id,
 				expiresAt: ad.expiresAt.toISOString(),
@@ -72,5 +34,4 @@ export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDe
 				ratio: ad.ratio,
 			}));
 		});
-	}
 }

@@ -27,11 +27,11 @@ SPDX-License-Identifier: AGPL-3.0-only
 					<template v-if="!minimized">
 						<button v-for="button in buttonsRight" v-tooltip="button.title" class="_button" :class="[$style.headerButton, { [$style.highlighted]: button.highlighted }]" @click="button.onClick"><i :class="button.icon"></i></button>
 					</template>
-					<button v-if="canResize && minimized" v-tooltip="i18n.ts.windowRestore" class="_button" :class="$style.headerButton" @click="unMinimize()"><i class="ti ti-maximize"></i></button>
-					<button v-else-if="canResize && !maximized" v-tooltip="i18n.ts.windowMinimize" class="_button" :class="$style.headerButton" @click="minimize()"><i class="ti ti-minimize"></i></button>
-					<button v-if="canResize && maximized" v-tooltip="i18n.ts.windowRestore" class="_button" :class="$style.headerButton" @click="unMaximize()"><i class="ti ti-picture-in-picture"></i></button>
-					<button v-else-if="canResize && !maximized && !minimized" v-tooltip="i18n.ts.windowMaximize" class="_button" :class="$style.headerButton" @click="maximize()"><i class="ti ti-rectangle"></i></button>
-					<button v-if="closeButton" v-tooltip="i18n.ts.close" class="_button" :class="$style.headerButton" @click="close()"><i class="ti ti-x"></i></button>
+					<button v-if="canResize && minimized" v-tooltip="$locale.sfc.windowRestore" class="_button" :class="$style.headerButton" @click="unMinimize()"><i class="ti ti-maximize"></i></button>
+					<button v-else-if="canResize && !maximized" v-tooltip="$locale.sfc.windowMinimize" class="_button" :class="$style.headerButton" @click="minimize()"><i class="ti ti-minimize"></i></button>
+					<button v-if="canResize && maximized" v-tooltip="$locale.sfc.windowRestore" class="_button" :class="$style.headerButton" @click="unMaximize()"><i class="ti ti-picture-in-picture"></i></button>
+					<button v-else-if="canResize && !maximized && !minimized" v-tooltip="$locale.sfc.windowMaximize" class="_button" :class="$style.headerButton" @click="maximize()"><i class="ti ti-rectangle"></i></button>
+					<button v-if="closeButton" v-tooltip="$locale.sfc.close" class="_button" :class="$style.headerButton" @click="close()"><i class="ti ti-x"></i></button>
 				</span>
 			</div>
 			<div :class="$style.content">
@@ -54,11 +54,10 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import { onBeforeUnmount, onMounted, provide, useTemplateRef, ref } from 'vue';
-import type { MenuItem } from '@/types/menu.js';
+import type { MenuItem } from '@features/navigation/frontend/types/menu.js';
 import { elementContains } from '@features/ui/frontend/utility/element-contains.js';
-import * as os from '@/os.js';
-import { i18n } from '@/i18n.js';
-import { prefer } from '@/preferences.js';
+import * as os from '@features/ui/frontend/os.js';
+import { prefer } from '@features/preferences/frontend/preferences.js';
 
 type WindowButton = {
 	title: string;
@@ -700,3 +699,255 @@ $handleSize: 8px;
 	cursor: nesw-resize;
 }
 </style>
+
+<locale locale="ar-SA" lang="json">
+{
+  "windowRestore": "استرجاع",
+  "windowMinimize": "Minimize",
+  "windowMaximize": "املأ الشاشة",
+  "close": "اغلق"
+}
+</locale>
+
+<locale locale="ca-ES" lang="json">
+{
+  "windowRestore": "Restaurar",
+  "windowMinimize": "Minimitzar",
+  "windowMaximize": "Maximitzar ",
+  "close": "Tanca"
+}
+</locale>
+
+<locale locale="cs-CZ" lang="json">
+{
+  "windowRestore": "Obnovit",
+  "windowMinimize": "Minimalizovat",
+  "windowMaximize": "Maximalizovat",
+  "close": "Zavřít"
+}
+</locale>
+
+<locale locale="da-DK" lang="json">
+{
+  "windowRestore": "Restore",
+  "windowMinimize": "Minimize",
+  "windowMaximize": "Maximize",
+  "close": "Close"
+}
+</locale>
+
+<locale locale="de-DE" lang="json">
+{
+  "windowRestore": "Wiederherstellen",
+  "windowMinimize": "Minimieren",
+  "windowMaximize": "Maximieren",
+  "close": "Schließen"
+}
+</locale>
+
+<locale locale="en-US" lang="json">
+{
+  "windowRestore": "Restore",
+  "windowMinimize": "Minimize",
+  "windowMaximize": "Maximize",
+  "close": "Close"
+}
+</locale>
+
+<locale locale="es-ES" lang="json">
+{
+  "windowRestore": "Regresar",
+  "windowMinimize": "Minimizar",
+  "windowMaximize": "Maximizar",
+  "close": "Cerrar"
+}
+</locale>
+
+<locale locale="fr-FR" lang="json">
+{
+  "windowRestore": "Restaurer",
+  "windowMinimize": "Minimaliser",
+  "windowMaximize": "Maximiser",
+  "close": "Fermer"
+}
+</locale>
+
+<locale locale="id-ID" lang="json">
+{
+  "windowRestore": "Kembalikan",
+  "windowMinimize": "Minimalkan",
+  "windowMaximize": "Maksimalkan",
+  "close": "Tutup"
+}
+</locale>
+
+<locale locale="it-IT" lang="json">
+{
+  "windowRestore": "Ripristina",
+  "windowMinimize": "Contrai finestra",
+  "windowMaximize": "Ingrandisci",
+  "close": "Chiudi"
+}
+</locale>
+
+<locale locale="ja-JP" lang="json">
+{
+  "windowRestore": "元に戻す",
+  "windowMinimize": "最小化",
+  "windowMaximize": "最大化",
+  "close": "閉じる"
+}
+</locale>
+
+<locale locale="ja-KS" lang="json">
+{
+  "windowRestore": "元に戻す",
+  "windowMinimize": "最小化",
+  "windowMaximize": "最大化",
+  "close": "さいなら"
+}
+</locale>
+
+<locale locale="kab-KAB" lang="json">
+{
+  "windowRestore": "Restore",
+  "windowMinimize": "Minimize",
+  "windowMaximize": "Maximize",
+  "close": "Close"
+}
+</locale>
+
+<locale locale="kn-IN" lang="json">
+{
+  "windowRestore": "Restore",
+  "windowMinimize": "Minimize",
+  "windowMaximize": "Maximize",
+  "close": "Close"
+}
+</locale>
+
+<locale locale="ko-KR" lang="json">
+{
+  "windowRestore": "복구",
+  "windowMinimize": "최소화",
+  "windowMaximize": "최대화",
+  "close": "닫기"
+}
+</locale>
+
+<locale locale="nl-NL" lang="json">
+{
+  "windowRestore": "Herstellen",
+  "windowMinimize": "Minimize",
+  "windowMaximize": "Maximaliseren",
+  "close": "Sluiten"
+}
+</locale>
+
+<locale locale="no-NO" lang="json">
+{
+  "windowRestore": "Restore",
+  "windowMinimize": "Minimize",
+  "windowMaximize": "Maximize",
+  "close": "Lukk"
+}
+</locale>
+
+<locale locale="pl-PL" lang="json">
+{
+  "windowRestore": "Przywróć",
+  "windowMinimize": "Minimalizuj",
+  "windowMaximize": "Maksymalizuj",
+  "close": "Zamknij"
+}
+</locale>
+
+<locale locale="pt-PT" lang="json">
+{
+  "windowRestore": "Restaurar",
+  "windowMinimize": "Minimizar",
+  "windowMaximize": "Maximizar",
+  "close": "Fechar"
+}
+</locale>
+
+<locale locale="ru-RU" lang="json">
+{
+  "windowRestore": "Восстановить",
+  "windowMinimize": "Свернуть",
+  "windowMaximize": "Развернуть",
+  "close": "Закрыть"
+}
+</locale>
+
+<locale locale="sk-SK" lang="json">
+{
+  "windowRestore": "Obnoviť",
+  "windowMinimize": "Minimize",
+  "windowMaximize": "Maximalizovať",
+  "close": "Zavrieť"
+}
+</locale>
+
+<locale locale="th-TH" lang="json">
+{
+  "windowRestore": "เลิกทำ",
+  "windowMinimize": "ย่อเล็กที่สุด",
+  "windowMaximize": "ขยายใหญ่สุด",
+  "close": "ปิด"
+}
+</locale>
+
+<locale locale="tr-TR" lang="json">
+{
+  "windowRestore": "Geri yükle",
+  "windowMinimize": "Minimize et",
+  "windowMaximize": "Maksimize et",
+  "close": "Kapat"
+}
+</locale>
+
+<locale locale="ug-CN" lang="json">
+{
+  "windowRestore": "Restore",
+  "windowMinimize": "Minimize",
+  "windowMaximize": "Maximize",
+  "close": "Close"
+}
+</locale>
+
+<locale locale="uk-UA" lang="json">
+{
+  "windowRestore": "Відновити",
+  "windowMinimize": "Згорнути",
+  "windowMaximize": "Розгорнути",
+  "close": "Закрити"
+}
+</locale>
+
+<locale locale="vi-VN" lang="json">
+{
+  "windowRestore": "Khôi phục",
+  "windowMinimize": "Thu nhỏ tối đa",
+  "windowMaximize": "Phóng to",
+  "close": "Đóng"
+}
+</locale>
+
+<locale locale="zh-CN" lang="json">
+{
+  "windowRestore": "还原",
+  "windowMinimize": "最小化",
+  "windowMaximize": "最大化",
+  "close": "关闭"
+}
+</locale>
+
+<locale locale="zh-TW" lang="json">
+{
+  "windowRestore": "復原",
+  "windowMinimize": "最小化",
+  "windowMaximize": "最大化",
+  "close": "關閉"
+}
+</locale>

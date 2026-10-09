@@ -3,39 +3,24 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
-import { ReversiService } from '@/core/ReversiService.js';
-
-export const meta = {
-	requireCredential: true,
-
-	kind: 'write:account',
-
-	errors: {
-	},
-} as const;
-
-export const paramDef = {
-	type: 'object',
-	properties: {
-		userId: { type: 'string', format: 'misskey:id', nullable: true },
-	},
-	required: [],
-} as const;
-
-@Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
-	constructor(
-		private reversiService: ReversiService,
-	) {
-		super(meta, paramDef, async (ps, me) => {
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import { requirePrincipal } from '../../../../api/backend/transport/middleware.js';
+import { reversiCancelMatchContract } from './cancel-match.contract.js';
+import type { ReversiService } from '../../services/ReversiService.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+export interface ReversiCancelMatchDependencies {
+	reversiService: Pick<ReversiService, 'matchAnyUserCancel' | 'matchSpecificUserCancel'>;
+}
+export function createReversiCancelMatchProcedure(deps: ReversiCancelMatchDependencies) {
+	return createApiProcedure<MiLocalUser>()(reversiCancelMatchContract)
+		.use(requirePrincipal<MiLocalUser>())
+		.handler(async ({ input: ps, context }) => {
+			const me = context.principal;
 			if (ps.userId) {
-				await this.reversiService.matchSpecificUserCancel(me, ps.userId);
+				await deps.reversiService.matchSpecificUserCancel(me, ps.userId);
 				return;
 			} else {
-				await this.reversiService.matchAnyUserCancel(me);
+				await deps.reversiService.matchAnyUserCancel(me);
 			}
 		});
-	}
 }

@@ -8,24 +8,49 @@ import * as Redis from 'ioredis';
 import { ModuleRef } from '@nestjs/core';
 import { reversiUpdateKeys } from 'misskey-js';
 import * as Reversi from 'misskey-reversi';
-import { IsNull, LessThan, MoreThan } from 'typeorm';
-import type {
-	MiReversiGame,
-	ReversiGamesRepository,
-} from '@/models/_.js';
-import type { MiUser } from '@/models/User.js';
+import { type DeleteResult, type FindOperator, LessThan, MoreThan } from 'typeorm';
+import type { MiReversiGame } from '@features/persistence/backend/repositories/models.js';
+import type { MiUser } from '@features/users/backend/models/User.js';
 import { DI } from '@/di-symbols.js';
-import { bindThis } from '@/decorators.js';
-import { CacheService } from '@/core/CacheService.js';
-import { UserEntityService } from '@/core/entities/UserEntityService.js';
-import { GlobalEventService } from '@/core/GlobalEventService.js';
-import { IdService } from '@/core/IdService.js';
-import { NotificationService } from '@/core/NotificationService.js';
-import { Serialized } from '@/types.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
+import { CacheService } from '@features/users/backend/services/CacheService.js';
+import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
+import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
+import { IdService } from '@features/runtime/backend/services/IdService.js';
+import { NotificationService } from '@features/notifications/backend/services/NotificationService.js';
+import { Serialized } from '@features/runtime/backend/types.js';
 import { ReversiGameEntityService } from '../serializers/ReversiGameEntityService.js';
 import type { OnApplicationShutdown, OnModuleInit } from '@nestjs/common';
 
 const INVITATION_TIMEOUT_MS = 1000 * 20; // 20sec
+
+type ReversiBakeValues = Pick<MiReversiGame,
+	'startedAt' | 'endedAt' | 'user1Ready' | 'user2Ready' | 'black' | 'isStarted' | 'isEnded' |
+	'winnerId' | 'surrenderedUserId' | 'timeoutUserId' | 'isLlotheo' | 'canPutEverywhere' |
+	'loopedBoard' | 'timeLimitForEachTurn' | 'logs' | 'map' | 'bw' | 'crc32' | 'noIrregularRules'>;
+
+export interface ReversiGameUpdateBuilder {
+	set(values: ReversiBakeValues): ReversiGameUpdateBuilder;
+	where(expression: 'id = :id', parameters: { id: MiReversiGame['id'] }): ReversiGameUpdateBuilder;
+	returning(columns: '*'): ReversiGameUpdateBuilder;
+	execute(): Promise<{ raw: MiReversiGame[] }>;
+}
+
+/** Exact persisted operations keep recursive form JSON out of TypeORM generic expansion. */
+export interface ReversiGameRepository {
+	find(options: {
+		where: { id: FindOperator<string>; user1Id?: string; user2Id?: string; isStarted: false }[];
+		relations: { user1: true; user2: true };
+		order: { id: 'DESC' };
+	}): Promise<MiReversiGame[]>;
+	findOne(options: { where: { id: string }; relations: { user1: true; user2: true } }): Promise<MiReversiGame | null>;
+	delete(criteria: string | { id: FindOperator<string>; isStarted: false }): Promise<DeleteResult>;
+	insertOne(values: Pick<MiReversiGame,
+		'id' | 'user1Id' | 'user2Id' | 'user1Ready' | 'user2Ready' | 'isStarted' | 'isEnded' |
+		'logs' | 'map' | 'bw' | 'isLlotheo' | 'noIrregularRules'>,
+	options: { relations: { user1: true; user2: true } }): Promise<MiReversiGame>;
+	createQueryBuilder(): { update(): ReversiGameUpdateBuilder };
+}
 
 @Injectable()
 export class ReversiService implements OnApplicationShutdown, OnModuleInit {
@@ -38,7 +63,7 @@ export class ReversiService implements OnApplicationShutdown, OnModuleInit {
 		private redisClient: Redis.Redis,
 
 		@Inject(DI.reversiGamesRepository)
-		private reversiGamesRepository: ReversiGamesRepository,
+		private reversiGamesRepository: ReversiGameRepository,
 
 		private cacheService: CacheService,
 		private userEntityService: UserEntityService,

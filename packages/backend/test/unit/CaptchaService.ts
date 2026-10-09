@@ -13,12 +13,12 @@ import {
 	captchaErrorCodes,
 	CaptchaSaveResult,
 	CaptchaService,
-} from '@/core/CaptchaService.js';
-import { GlobalModule } from '@/GlobalModule.js';
-import { HttpRequestService } from '@/core/HttpRequestService.js';
-import { MetaService } from '@/core/MetaService.js';
-import { MiMeta } from '@/models/Meta.js';
-import { LoggerService } from '@/core/LoggerService.js';
+} from '@features/auth/backend/services/CaptchaService.js';
+import { GlobalModule } from '@features/boot/backend/assembly/GlobalModule.js';
+import { HttpRequestService } from '@features/runtime/backend/services/HttpRequestService.js';
+import { MetaService } from '@features/instance/backend/services/MetaService.js';
+import { MiMeta } from '@features/instance/backend/models/Meta.js';
+import { LoggerService } from '@features/runtime/backend/services/LoggerService.js';
 
 describe('CaptchaService', () => {
 	let app: TestingModule;

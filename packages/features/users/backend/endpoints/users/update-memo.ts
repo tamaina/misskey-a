@@ -2,88 +2,63 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import { type IdService } from '@features/runtime/backend/services/IdService.js';
+import { type GetterService } from '@features/api/backend/transport/GetterService.js';
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
+import { usersUpdateMemoErrors } from './update-memo.contract.js';
+import type { ApiToken } from '@features/api/backend/transport/context.js';
+import type { UsersInputs } from '../../api.definition.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
 
-import { Inject, Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
-import { IdService } from '@/core/IdService.js';
-import type { UserMemoRepository } from '@/models/_.js';
-import { DI } from '@/di-symbols.js';
-import { GetterService } from '@/server/api/GetterService.js';
-import { ApiError } from '@/server/api/error.js';
+import type { UserMemoRepository } from '@features/persistence/backend/repositories/models.js';
+import { usersUpdateMemoContract } from './update-memo.contract.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
 
-export const meta = {
-	tags: ['account'],
+export interface UsersUpdateMemoDependencies {
+	userMemosRepository: UserMemoRepository;
+	getterService: GetterService;
+	idService: IdService;
+}
+export function createUsersUpdateMemoProcedure(deps: UsersUpdateMemoDependencies) {
+	async function execute(ps: UsersInputs['users/update-memo'], me: MiLocalUser, _token: ApiToken | null, _ip: string) {
+		// Get target
+		const target = await deps.getterService.getUser(ps.userId).catch(err => {
+			if (err.id === '15348ddd-432d-49c2-8a5a-8069753becff') throw apiError(usersUpdateMemoErrors.noSuchUser);
+			throw err;
+		});
 
-	requireCredential: true,
-
-	kind: 'write:account',
-
-	errors: {
-		noSuchUser: {
-			message: 'No such user.',
-			code: 'NO_SUCH_USER',
-			id: '6fef56f3-e765-4957-88e5-c6f65329b8a5',
-		},
-	},
-} as const;
-
-export const paramDef = {
-	type: 'object',
-	properties: {
-		userId: { type: 'string', format: 'misskey:id' },
-		memo: {
-			type: 'string',
-			nullable: true,
-			description: 'A personal memo for the target user. If null or empty, delete the memo.',
-		},
-	},
-	required: ['userId', 'memo'],
-} as const;
-
-@Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
-	constructor(
-		@Inject(DI.userMemosRepository)
-		private userMemosRepository: UserMemoRepository,
-		private getterService: GetterService,
-		private idService: IdService,
-	) {
-		super(meta, paramDef, async (ps, me) => {
-			// Get target
-			const target = await this.getterService.getUser(ps.userId).catch(err => {
-				if (err.id === '15348ddd-432d-49c2-8a5a-8069753becff') throw new ApiError(meta.errors.noSuchUser);
-				throw err;
-			});
-
-			// 引数がnullか空文字であれば、パーソナルメモを削除する
-			if (ps.memo === '' || ps.memo == null) {
-				await this.userMemosRepository.delete({
-					userId: me.id,
-					targetUserId: target.id,
-				});
-				return;
-			}
-
-			// 以前に作成されたパーソナルメモがあるかどうか確認
-			const previousMemo = await this.userMemosRepository.findOneBy({
+		// 引数がnullか空文字であれば、パーソナルメモを削除する
+		if (ps.memo === '' || ps.memo == null) {
+			await deps.userMemosRepository.delete({
 				userId: me.id,
 				targetUserId: target.id,
 			});
+			return;
+		}
 
-			if (!previousMemo) {
-				await this.userMemosRepository.insert({
-					id: this.idService.gen(),
-					userId: me.id,
-					targetUserId: target.id,
-					memo: ps.memo,
-				});
-			} else {
-				await this.userMemosRepository.update(previousMemo.id, {
-					userId: me.id,
-					targetUserId: target.id,
-					memo: ps.memo,
-				});
-			}
+		// 以前に作成されたパーソナルメモがあるかどうか確認
+		const previousMemo = await deps.userMemosRepository.findOneBy({
+			userId: me.id,
+			targetUserId: target.id,
 		});
+
+		if (!previousMemo) {
+			await deps.userMemosRepository.insert({
+				id: deps.idService.gen(),
+				userId: me.id,
+				targetUserId: target.id,
+				memo: ps.memo,
+			});
+		} else {
+			await deps.userMemosRepository.update(previousMemo.id, {
+				userId: me.id,
+				targetUserId: target.id,
+				memo: ps.memo,
+			});
+		}
 	}
+
+	return createApiProcedure<MiLocalUser>()(usersUpdateMemoContract).use(requirePrincipal<MiLocalUser>())
+		.handler(async ({ input, context }) => await execute(input, context.principal, context.token, context.ip));
 }

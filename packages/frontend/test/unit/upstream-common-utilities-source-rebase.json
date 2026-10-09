@@ -1,0 +1,1679 @@
+[
+  {
+    "file": "packages/features/moderation/frontend/pages/admin-user.vue",
+    "baselineBodySha256": "d154c13be11b21a3e2b1bdbc2224c1d787585ad076fe38009e474aeba56faeb7",
+    "currentBodySha256": "cd09925fe0d5c6b3af13724f1e29497a937cc29cfc0313f4ff2bdca2ce33fc81",
+    "localeBlocksSha256": "2ca53a2c5620d5f3cfb12116a759ec558072b6020a5074aebddd8d0c040d700c",
+    "edits": [
+      {
+        "start": 10836,
+        "end": 10840,
+        "current": "shar",
+        "baseline": "filt"
+      },
+      {
+        "start": 10841,
+        "end": 10842,
+        "current": "d",
+        "baseline": "rs"
+      }
+    ],
+    "currentFile": "packages/features/moderation/frontend/pages/admin-user.vue"
+  },
+  {
+    "file": "packages/features/discovery/frontend/components/MkAutocomplete.vue",
+    "baselineBodySha256": "a5c153e29ba24bcf3ee60b2f085d5f2a526c0cb2bfb61785eb386d161410b5d3",
+    "currentBodySha256": "9f90fb381d3b11f33e9bfe067409069feb6d75f5ce0f81037d0910925ec1306f",
+    "localeBlocksSha256": "0aca44c01c67db0db5187b97e5ce5a17ef7ad345366ca03b4b53dba6dd7b87f1",
+    "edits": [
+      {
+        "start": 3066,
+        "end": 3070,
+        "current": "shar",
+        "baseline": "filt"
+      },
+      {
+        "start": 3071,
+        "end": 3072,
+        "current": "d",
+        "baseline": "rs"
+      }
+    ],
+    "currentFile": "packages/features/discovery/frontend/components/MkAutocomplete.vue"
+  },
+  {
+    "file": "packages/features/notifications/frontend/components/MkNotification.vue",
+    "baselineBodySha256": "b13e1ea36312e403824b7d15b426832a94ddd14f5b4e35b13c2f1521cdfec56d",
+    "currentBodySha256": "0300c0fca2769750539f47e154bb646c073b179bc2bea83ed51d1f962c8478a6",
+    "localeBlocksSha256": "ba9474fc8deabb6f68a13fc25f01f7a2523a77e47499c95e67feae5020a7af4b",
+    "edits": [
+      {
+        "start": 13540,
+        "end": 13544,
+        "current": "shar",
+        "baseline": "filt"
+      },
+      {
+        "start": 13545,
+        "end": 13546,
+        "current": "d",
+        "baseline": "rs"
+      },
+      {
+        "start": 13608,
+        "end": 13612,
+        "current": "shar",
+        "baseline": "filt"
+      },
+      {
+        "start": 13613,
+        "end": 13614,
+        "current": "d",
+        "baseline": "rs"
+      }
+    ],
+    "currentFile": "packages/features/notifications/frontend/components/MkNotification.vue"
+  },
+  {
+    "file": "packages/features/notifications/frontend/pages/settings/notifications.vue",
+    "baselineBodySha256": "90a9d896af6e6e94a672850abab638c1599cb4733e9c7a48387e6f51a34574b7",
+    "currentBodySha256": "4b7cb77d2cf4a112e641a79cdb265b2ff9d874772e30afbe43c0ca3ecd4cf461",
+    "localeBlocksSha256": "001516ea9eb3d6178d4279f55069819c628ae33912658fdc5f002192d4d88c77",
+    "edits": [
+      {
+        "start": 5442,
+        "end": 5446,
+        "current": "shar",
+        "baseline": "filt"
+      },
+      {
+        "start": 5447,
+        "end": 5448,
+        "current": "d",
+        "baseline": "rs"
+      }
+    ],
+    "currentFile": "packages/features/notifications/frontend/pages/settings/notifications.vue"
+  },
+  {
+    "file": "packages/features/relationships/frontend/widgets/WidgetBirthdayFollowings.user.vue",
+    "baselineBodySha256": "458cd143affa020abbb1d547c4c9480f256e1c636108f65e7fafd182203381f8",
+    "currentBodySha256": "f91fe510f09627c1bf20ba902e85a23ff6a53e4380dfb68cb5dc98fb536f2826",
+    "localeBlocksSha256": "25081cab1e473515e4d8777b1ae0a95b961e9c73bf07d8d125e6c9cbed1d45cf",
+    "edits": [
+      {
+        "start": 1174,
+        "end": 1178,
+        "current": "shar",
+        "baseline": "filt"
+      },
+      {
+        "start": 1179,
+        "end": 1180,
+        "current": "d",
+        "baseline": "rs"
+      }
+    ],
+    "currentFile": "packages/features/relationships/frontend/widgets/WidgetBirthdayFollowings.user.vue"
+  },
+  {
+    "file": "packages/features/relationships/frontend/pages/list.vue",
+    "baselineBodySha256": "ac13037a4453ccc616b5cf84fa8275b4270ea665b2f3101e446799caaf7093ec",
+    "currentBodySha256": "453866d8a12863035784ed0eb6f9cfe335ea7f0bfb37b01140aa41ccc1b3507d",
+    "localeBlocksSha256": "f9f9853b6dcbce84f7875497ac9a980567238517a8de09035d7edbddd3a98822",
+    "edits": [
+      {
+        "start": 1643,
+        "end": 1647,
+        "current": "shar",
+        "baseline": "filt"
+      },
+      {
+        "start": 1648,
+        "end": 1649,
+        "current": "d",
+        "baseline": "rs"
+      }
+    ],
+    "currentFile": "packages/features/relationships/frontend/pages/list.vue"
+  },
+  {
+    "file": "packages/features/relationships/frontend/pages/follow-requests.vue",
+    "baselineBodySha256": "27fd906793e561857447f7d524554748b522ff78a1c3940ea64d354e55c940b8",
+    "currentBodySha256": "ab735fd9d10f86f3ef63682780fe6ab51311b17d283df7c26e44ac551d915f76",
+    "localeBlocksSha256": "db37b2f8a16b0b73ef25f995b135859d980d0f9764bcb78c6a431b33524e35a9",
+    "edits": [
+      {
+        "start": 1872,
+        "end": 1876,
+        "current": "shar",
+        "baseline": "filt"
+      },
+      {
+        "start": 1877,
+        "end": 1878,
+        "current": "d",
+        "baseline": "rs"
+      }
+    ],
+    "currentFile": "packages/features/relationships/frontend/pages/follow-requests.vue"
+  },
+  {
+    "file": "packages/features/relationships/frontend/pages/my-lists/list.vue",
+    "baselineBodySha256": "601a2c5e624c3b9218af6df6aa14f6af4dc943fc5cc1c4f79060b77aea82912c",
+    "currentBodySha256": "f8f98afeb0d9bad09d9232c4a2d16c5570a5a349ac811065772e4e2e46fc5045",
+    "localeBlocksSha256": "107a1c9beaf4e873af4843a6bc132304e17b0e7b990e23bb35f7ef56094f19a0",
+    "edits": [
+      {
+        "start": 2494,
+        "end": 2498,
+        "current": "shar",
+        "baseline": "filt"
+      },
+      {
+        "start": 2499,
+        "end": 2500,
+        "current": "d",
+        "baseline": "rs"
+      }
+    ],
+    "currentFile": "packages/features/relationships/frontend/pages/my-lists/list.vue"
+  },
+  {
+    "file": "packages/features/relationships/frontend/pages/settings/mute-block.vue",
+    "baselineBodySha256": "03ef8696538d174d514db90dded49acf67691a4e51e66345e975790c4ead949e",
+    "currentBodySha256": "dc374daa7f8549184c6fb32ae7072240254fea11b30478e50b087bc75b4c2032",
+    "localeBlocksSha256": "eeab624af575bae8bf68b8c44a4ada66ca740f2cab11f449c6e87a9495228eb7",
+    "edits": [
+      {
+        "start": 7223,
+        "end": 7227,
+        "current": "shar",
+        "baseline": "filt"
+      },
+      {
+        "start": 7228,
+        "end": 7229,
+        "current": "d",
+        "baseline": "rs"
+      }
+    ],
+    "currentFile": "packages/features/relationships/frontend/pages/settings/mute-block.vue"
+  },
+  {
+    "file": "packages/features/notes/frontend/components/MkNote.vue",
+    "baselineBodySha256": "c7827973e020deb23229a531e3a63f8e5e5efa7be656ee1d8a28e56f8dd358a7",
+    "currentBodySha256": "50f03d859a0135ba41ad23d2bd44f1ebe5fe73b4bedfd90df8f0fb7a4065e8a9",
+    "localeBlocksSha256": "a3d904b6bdba57ea19eef7cf96af5ec3d3f74786ff97dd4fa904357da14b03ca",
+    "edits": [
+      {
+        "start": 10268,
+        "end": 10272,
+        "current": "shar",
+        "baseline": "filt"
+      },
+      {
+        "start": 10273,
+        "end": 10274,
+        "current": "d",
+        "baseline": "rs"
+      }
+    ],
+    "currentFile": "packages/features/notes/frontend/components/MkNote.vue"
+  },
+  {
+    "file": "packages/features/notes/frontend/components/MkNoteMediaGrid.vue",
+    "baselineBodySha256": "3bc53aae93bb96a8b6e43f203b26c9bde6acafdaf9a992c54759d215d48240b4",
+    "currentBodySha256": "eeeee6f6b9a1779fc956cf582cb6939ec0038a0b7a317565b6cb13b80d0a0372",
+    "localeBlocksSha256": "68e6495f5f178f5262a0b31ced89f1061bfffb9d61343a45e8ea40db6b2bd378",
+    "edits": [
+      {
+        "start": 1409,
+        "end": 1413,
+        "current": "shar",
+        "baseline": "filt"
+      },
+      {
+        "start": 1414,
+        "end": 1415,
+        "current": "d",
+        "baseline": "rs"
+      }
+    ],
+    "currentFile": "packages/features/notes/frontend/components/MkNoteMediaGrid.vue"
+  },
+  {
+    "file": "packages/features/notes/frontend/components/MkNoteSub.vue",
+    "baselineBodySha256": "c5e045e5b2f3357337ce83ea83ef94e23ca6f1eeb9e2e2ec6abd854d01ceef61",
+    "currentBodySha256": "96aaab6038ed08527dbe740d041d5f3dd55de490e4f6f30f91656893821c5f0a",
+    "localeBlocksSha256": "96f007b22bc8283072c5ea4b16f9a49f2fdc3c3ab2e0bc1967a6c354e7528272",
+    "edits": [
+      {
+        "start": 2023,
+        "end": 2027,
+        "current": "shar",
+        "baseline": "filt"
+      },
+      {
+        "start": 2028,
+        "end": 2029,
+        "current": "d",
+        "baseline": "rs"
+      },
+      {
+        "start": 2218,
+        "end": 2222,
+        "current": "shar",
+        "baseline": "filt"
+      },
+      {
+        "start": 2223,
+        "end": 2224,
+        "current": "d",
+        "baseline": "rs"
+      }
+    ],
+    "currentFile": "packages/features/notes/frontend/components/MkNoteSub.vue"
+  },
+  {
+    "file": "packages/features/notes/frontend/components/MkNoteHeader.vue",
+    "baselineBodySha256": "8dbbc85382692b8a1481c045f9be71b6f1e134bde2cea2906dee4eaccaa3b3f9",
+    "currentBodySha256": "e9e373b77b8abf3d8a6ceaa26947d765d6820ed6377d03732cdf572f9a309f22",
+    "localeBlocksSha256": "4eb964b9ec7d6cfb8c7e08396be9739612f06e7e8c5aff6d3da9ad88842ccef4",
+    "edits": [
+      {
+        "start": 1829,
+        "end": 1833,
+        "current": "shar",
+        "baseline": "filt"
+      },
+      {
+        "start": 1834,
+        "end": 1835,
+        "current": "d",
+        "baseline": "rs"
+      },
+      {
+        "start": 1897,
+        "end": 1901,
+        "current": "shar",
+        "baseline": "filt"
+      },
+      {
+        "start": 1902,
+        "end": 1903,
+        "current": "d",
+        "baseline": "rs"
+      }
+    ],
+    "currentFile": "packages/features/notes/frontend/components/MkNoteHeader.vue"
+  },
+  {
+    "file": "packages/features/notes/frontend/components/MkNoteDetailed.vue",
+    "baselineBodySha256": "7a0b114a836f9555f48309d0ea2f4a0f375f1b4e91545c71d062155dee0c6a74",
+    "currentBodySha256": "1eaef45af71e61a81a54819517c86ca44a45c82b367c9f5f08e15b84375d4b3d",
+    "localeBlocksSha256": "32ed5201cc5592e50f627e3254d29b51e241d25e28eb15900bc20b8322659a94",
+    "edits": [
+      {
+        "start": 12658,
+        "end": 12662,
+        "current": "shar",
+        "baseline": "filt"
+      },
+      {
+        "start": 12663,
+        "end": 12664,
+        "current": "d",
+        "baseline": "rs"
+      },
+      {
+        "start": 12726,
+        "end": 12730,
+        "current": "shar",
+        "baseline": "filt"
+      },
+      {
+        "start": 12731,
+        "end": 12732,
+        "current": "d",
+        "baseline": "rs"
+      }
+    ],
+    "currentFile": "packages/features/notes/frontend/components/MkNoteDetailed.vue"
+  },
+  {
+    "file": "packages/features/notes/frontend/embed/components/EmNoteDetailed.vue",
+    "baselineBodySha256": "216b9026709ca4279101aba4293f56ac4ebf91b8f1b6c17579ce77118a2bb3d7",
+    "currentBodySha256": "37b9b6973dfc4904bd8a154ad522e21b427908a08d09fc2be0815811d3937fa2",
+    "localeBlocksSha256": "babfe016ddaa6673450db8d1e41ec35da49b59e53dd2da7579d7a487e627dd7c",
+    "edits": [
+      {
+        "start": 8010,
+        "end": 8012,
+        "current": "us",
+        "baseline": "w"
+      },
+      {
+        "start": 8013,
+        "end": 8015,
+        "current": "rs",
+        "baseline": "b"
+      },
+      {
+        "start": 8025,
+        "end": 8029,
+        "current": "shar",
+        "baseline": "emb"
+      },
+      {
+        "start": 8033,
+        "end": 8033,
+        "current": "",
+        "baseline": "til"
+      },
+      {
+        "start": 8034,
+        "end": 8036,
+        "current": "er",
+        "baseline": ""
+      },
+      {
+        "start": 8078,
+        "end": 8081,
+        "current": "not",
+        "baseline": "w"
+      },
+      {
+        "start": 8082,
+        "end": 8083,
+        "current": "s",
+        "baseline": "b"
+      },
+      {
+        "start": 8093,
+        "end": 8097,
+        "current": "shar",
+        "baseline": "emb"
+      },
+      {
+        "start": 8100,
+        "end": 8102,
+        "current": "no",
+        "baseline": "u"
+      },
+      {
+        "start": 8103,
+        "end": 8104,
+        "current": "e",
+        "baseline": "ils"
+      }
+    ],
+    "currentFile": "packages/features/notes/frontend/embed/components/EmNoteDetailed.vue"
+  },
+  {
+    "file": "packages/features/notes/frontend/embed/components/EmNote.vue",
+    "baselineBodySha256": "f26b97e08c2e28e1b2be9ca0f9ee16dd68c57b25361eb83c6a2becdaa4f95157",
+    "currentBodySha256": "44109e25b02ba8073591cc2970f00539a5dc4fa3ef9c1029b17aa66004086d0c",
+    "localeBlocksSha256": "2dc321f47599e61f465b8d32c8387c605e8f8928ebcd6e8e07f1b8fa9da7fde7",
+    "edits": [
+      {
+        "start": 7365,
+        "end": 7367,
+        "current": "us",
+        "baseline": "w"
+      },
+      {
+        "start": 7368,
+        "end": 7370,
+        "current": "rs",
+        "baseline": "b"
+      },
+      {
+        "start": 7380,
+        "end": 7384,
+        "current": "shar",
+        "baseline": "emb"
+      },
+      {
+        "start": 7388,
+        "end": 7388,
+        "current": "",
+        "baseline": "til"
+      },
+      {
+        "start": 7389,
+        "end": 7391,
+        "current": "er",
+        "baseline": ""
+      }
+    ],
+    "currentFile": "packages/features/notes/frontend/embed/components/EmNote.vue"
+  },
+  {
+    "file": "packages/features/notes/frontend/embed/components/EmNoteSub.vue",
+    "baselineBodySha256": "2c1fabac9539ac9d3e0e1cafaeeeb66db98142bdcbb5b4b05879ab9c81a8a1cd",
+    "currentBodySha256": "2d49ee3ddccc1e8c39c202f3a6974e2771bdcd4e01c271d6dd99c7e7056e0cc1",
+    "localeBlocksSha256": "53e8cb7d946cbc5ff6f5b0a8797d9d4d51f31de1349d4e4c606bbe9d55756146",
+    "edits": [
+      {
+        "start": 1810,
+        "end": 1813,
+        "current": "not",
+        "baseline": "w"
+      },
+      {
+        "start": 1814,
+        "end": 1815,
+        "current": "s",
+        "baseline": "b"
+      },
+      {
+        "start": 1825,
+        "end": 1829,
+        "current": "shar",
+        "baseline": "emb"
+      },
+      {
+        "start": 1832,
+        "end": 1834,
+        "current": "no",
+        "baseline": "u"
+      },
+      {
+        "start": 1835,
+        "end": 1836,
+        "current": "e",
+        "baseline": "ils"
+      }
+    ],
+    "currentFile": "packages/features/notes/frontend/embed/components/EmNoteSub.vue"
+  },
+  {
+    "file": "packages/features/chat/frontend/pages/chat/room.members.vue",
+    "baselineBodySha256": "e12f1d2f9c15005d84af479e4628185713045abd8d743fecc5078bb35ed098b8",
+    "currentBodySha256": "a93810b60ee1c5d847433606c17b2245033b67d7a8a314aae5e1009dc708b8df",
+    "localeBlocksSha256": "395c3bf4b866bb562d75714a8d6d847cee90fb76212aa9cce0105d3ec28234e2",
+    "edits": [
+      {
+        "start": 1420,
+        "end": 1424,
+        "current": "shar",
+        "baseline": "filt"
+      },
+      {
+        "start": 1425,
+        "end": 1426,
+        "current": "d",
+        "baseline": "rs"
+      }
+    ],
+    "currentFile": "packages/features/chat/frontend/pages/chat/room.members.vue"
+  },
+  {
+    "file": "packages/features/share/frontend/pages/qr.show.vue",
+    "baselineBodySha256": "e67ae80913bba89724ca8e9070ae0b3d86b5db9d01490e7a116de8879b9ff998",
+    "currentBodySha256": "f7bc9a5bed69b97b79d7332922adff2db25e68bc770dd4755845611faf3bee84",
+    "localeBlocksSha256": "fc17c8abdca7c033f10e7b6b3c9e66f5b6390ca70956e1d688e402bb03eb10f6",
+    "edits": [
+      {
+        "start": 1402,
+        "end": 1406,
+        "current": "shar",
+        "baseline": "filt"
+      },
+      {
+        "start": 1407,
+        "end": 1408,
+        "current": "d",
+        "baseline": "rs"
+      }
+    ],
+    "currentFile": "packages/features/share/frontend/pages/qr.show.vue"
+  },
+  {
+    "file": "packages/features/users/frontend/components/MkUserPopup.vue",
+    "baselineBodySha256": "dbe9efff20f821fec7e4abbcf6dfc0d4ea886261a9ec6ec262cf90bce7711db1",
+    "currentBodySha256": "53d69ab2f4175aaf3c98c0acf3776c3a09e3bdc8ea90e44cc12372b628bf91e2",
+    "localeBlocksSha256": "c92fdefffbaae35978fec43e4857f2a92b6120a21b3dcd952b13ec76b8d2da80",
+    "edits": [
+      {
+        "start": 3217,
+        "end": 3221,
+        "current": "shar",
+        "baseline": "filt"
+      },
+      {
+        "start": 3222,
+        "end": 3223,
+        "current": "d",
+        "baseline": "rs"
+      }
+    ],
+    "currentFile": "packages/features/users/frontend/components/MkUserPopup.vue"
+  },
+  {
+    "file": "packages/features/users/frontend/components/MkUserInfo.vue",
+    "baselineBodySha256": "57237e9b75d8240bf8989e5f8beae0e209db19e0e6364d11ea3fbcab73b71b28",
+    "currentBodySha256": "e18183e7c559f442d2f53e4a67c0563df8e020e55c266b72bb0e3248cfbc7d8d",
+    "localeBlocksSha256": "c92fdefffbaae35978fec43e4857f2a92b6120a21b3dcd952b13ec76b8d2da80",
+    "edits": [
+      {
+        "start": 2138,
+        "end": 2142,
+        "current": "shar",
+        "baseline": "filt"
+      },
+      {
+        "start": 2143,
+        "end": 2144,
+        "current": "d",
+        "baseline": "rs"
+      }
+    ],
+    "currentFile": "packages/features/users/frontend/components/MkUserInfo.vue"
+  },
+  {
+    "file": "packages/features/users/frontend/pages/user/home.vue",
+    "baselineBodySha256": "ae05b93e56e076e1916c70700f46f6f3172583d22a6cc75d38f9f72d95c1a956",
+    "currentBodySha256": "2e56d5a316af0b1a01a9bd06f729930760f000c5b9618598e2f2ff5b75229525",
+    "localeBlocksSha256": "9faff35fb6405ad2e048c720c3313243bd3bc9d934a05b5ac4c5e7e6f7c6dbb0",
+    "edits": [
+      {
+        "start": 8740,
+        "end": 8744,
+        "current": "shar",
+        "baseline": "filt"
+      },
+      {
+        "start": 8745,
+        "end": 8746,
+        "current": "d",
+        "baseline": "rs"
+      }
+    ],
+    "currentFile": "packages/features/users/frontend/pages/user/home.vue"
+  },
+  {
+    "file": "packages/features/users/frontend/pages/user/raw.vue",
+    "baselineBodySha256": "b35c509d41bbb1656f38fde7db5f65d9936a6481946d6db49370fbd9309be599",
+    "currentBodySha256": "fffec1574e4ea2eea6f11f30e45cab5b64db1ca2ac38e5fb3f03f7ba2aa4bd49",
+    "localeBlocksSha256": "800930605aa1991a268d93a4408cfaf16fe48f310c9c5650558a9a48bc7e36d5",
+    "edits": [
+      {
+        "start": 1648,
+        "end": 1652,
+        "current": "shar",
+        "baseline": "filt"
+      },
+      {
+        "start": 1653,
+        "end": 1654,
+        "current": "d",
+        "baseline": "rs"
+      }
+    ],
+    "currentFile": "packages/features/users/frontend/pages/user/raw.vue"
+  },
+  {
+    "file": "packages/features/users/frontend/pages/user/index.vue",
+    "baselineBodySha256": "42bd7132c291d672a13b02f5d25fe3df47f776f0cfef540fa9709659f5958a58",
+    "currentBodySha256": "3deb2b1d0cad2073b8a8d91fedc471718a8d83ea8f03337daa694d7771b08826",
+    "localeBlocksSha256": "5d3916d418f02d019e93a0fbcee4d6901205bd4b1a54b4c6ad754b125d2e33d8",
+    "edits": [
+      {
+        "start": 1253,
+        "end": 1257,
+        "current": "shar",
+        "baseline": "filt"
+      },
+      {
+        "start": 1258,
+        "end": 1259,
+        "current": "d",
+        "baseline": "rs"
+      }
+    ],
+    "currentFile": "packages/features/users/frontend/pages/user/index.vue"
+  },
+  {
+    "file": "packages/features/games/frontend/pages/reversi/game.board.vue",
+    "baselineBodySha256": "37e9b161daea3ececed4132d1cf903e97007ec66e7947da5b1031296e3c41959",
+    "currentBodySha256": "a2cd49b466496f4b349a2cd1ec1f926e884169eed34178d8a286a5d9e4d1fe50",
+    "localeBlocksSha256": "f945db962a7cc780495bcef975a2f8542faf72cd7dfdb8820f72643725cd2d96",
+    "edits": [
+      {
+        "start": 8532,
+        "end": 8536,
+        "current": "shar",
+        "baseline": "filt"
+      },
+      {
+        "start": 8537,
+        "end": 8538,
+        "current": "d",
+        "baseline": "rs"
+      }
+    ],
+    "currentFile": "packages/features/games/frontend/pages/reversi/game.board.vue"
+  },
+  {
+    "file": "packages/features/ui/frontend/components/global/MkTime.vue",
+    "baselineBodySha256": "a6f3573a9d886dabad713ceaa58c2852a263269c4d690209c6bc10190fb5d9c8",
+    "currentBodySha256": "d395cee11034b73a0050eb01c7128d60d9e1963bacacc95ac189d4e01183b163",
+    "localeBlocksSha256": "7ad5ebb8aafffa4d885c9d8049fbeedca151d138a90dda49a0c34147611b7a6c",
+    "edits": [
+      {
+        "start": 863,
+        "end": 1047,
+        "current": "formatRelativeTime, parseTime } from '@features/ui/frontend/shared/relative-time.js';\nimport type { RelativeTimeLocale } from '@features/ui/frontend/shared/relative-time.js';\nimport { ",
+        "baseline": ""
+      },
+      {
+        "start": 1390,
+        "end": 1390,
+        "current": "",
+        "baseline": "function getDateSafe(n: Date | string | number) {\n\ttry {\n\t\tif (n instanceof Date) {\n\t\t\treturn n;\n\t\t}\n\t\treturn new Date(n);\n\t} catch (err) {\n\t\treturn {\n\t\t\tgetTime: () => NaN,\n\t\t};\n\t}\n}\n\n"
+      },
+      {
+        "start": 1468,
+        "end": 1469,
+        "current": "a",
+        "baseline": ""
+      },
+      {
+        "start": 1470,
+        "end": 1470,
+        "current": "",
+        "baseline": "op"
+      },
+      {
+        "start": 1471,
+        "end": 1473,
+        "current": "eT",
+        "baseline": ".t"
+      },
+      {
+        "start": 1475,
+        "end": 1475,
+        "current": "",
+        "baseline": "e == null ? NaN : getDateSaf"
+      },
+      {
+        "start": 1487,
+        "end": 1487,
+        "current": "",
+        "baseline": ").getTime("
+      },
+      {
+        "start": 1880,
+        "end": 3272,
+        "current": "TimeLocale: RelativeTimeLocale = {\n\tago: {\n\t\tyearsAgo: params => interpolateLocaleParameters($locale.value.sfc.agoYearsAgo, params),\n\t\tmonthsAgo: params => interpolateLocaleParameters($locale.value.sfc.agoMonthsAgo, params),\n\t\tweeksAgo: params => interpolateLocaleParameters($locale.value.sfc.agoWeeksAgo, params),\n\t\tdaysAgo: params => interpolateLocaleParameters($locale.value.sfc.agoDaysAgo, params),\n\t\thoursAgo: params => interpolateLocaleParameters($locale.value.sfc.agoHoursAgo, params),\n\t\tminutesAgo: params => interpolateLocaleParameters($locale.value.sfc.agoMinutesAgo, params),\n\t\tsecondsAgo: params => interpolateLocaleParameters($locale.value.sfc.agoSecondsAgo, params),\n\t},\n\ttimeIn: {\n\t\tyears: params => interpolateLocaleParameters($locale.value.sfc.timeInYears, params),\n\t\tmonths: params => interpolateLocaleParameters($locale.value.sfc.timeInMonths, params),\n\t\tweeks: params => interpolateLocaleParameters($locale.value.sfc.timeInWeeks, params),\n\t\tdays: params => interpolateLocaleParameters($locale.value.sfc.timeInDays, params),\n\t\thours: params => interpolateLocaleParameters($locale.value.sfc.timeInHours, params),\n\t\tminutes: params => interpolateLocaleParameters($locale.value.sfc.timeInMinutes, params),\n\t\tseconds: params => interpolateLocaleParameters($locale.value.sfc.timeInSeconds, params),\n\t},\n\tget justNow() { return $locale.value.sfc.agoJustNow; },\n};\n\nconst relative",
+        "baseline": ""
+      },
+      {
+        "start": 3437,
+        "end": 3441,
+        "current": "form",
+        "baseline": "(\n\t\t"
+      },
+      {
+        "start": 3442,
+        "end": 3444,
+        "current": "tR",
+        "baseline": "go.valu"
+      },
+      {
+        "start": 3445,
+        "end": 3445,
+        "current": "",
+        "baseline": " >= 31536000 ? interpo"
+      },
+      {
+        "start": 3448,
+        "end": 3450,
+        "current": "iv",
+        "baseline": ""
+      },
+      {
+        "start": 3451,
+        "end": 3453,
+        "current": "Ti",
+        "baseline": "LocalePara"
+      },
+      {
+        "start": 3455,
+        "end": 3455,
+        "current": "",
+        "baseline": "ters($locale.value.sfc.agoYearsAgo, { n: Math.round"
+      },
+      {
+        "start": 3465,
+        "end": 3466,
+        "current": ",",
+        "baseline": ""
+      },
+      {
+        "start": 3467,
+        "end": 3467,
+        "current": "",
+        "baseline": "/ 31536000).toSt"
+      },
+      {
+        "start": 3468,
+        "end": 3468,
+        "current": "",
+        "baseline": "ing() }) :\n\t\tago.valu"
+      },
+      {
+        "start": 3469,
+        "end": 3469,
+        "current": "",
+        "baseline": " >= 2592000 ? interpo"
+      },
+      {
+        "start": 3472,
+        "end": 3478,
+        "current": "iveTim",
+        "baseline": ""
+      },
+      {
+        "start": 3485,
+        "end": 3485,
+        "current": "",
+        "baseline": "Parameters($locale.value.sfc.agoMonthsAgo, { n: Math.round(ago.value / 2592000).toString() }) :\n\t\tago.value >= 604800 ? interpolateLocaleParameters($locale.value.sfc.agoWeeksAgo, { n: Math.round(ago.value / 604800).toString() }) :\n\t\tago.value >= 86400 ? interpolateLocaleParameters($locale.value.sfc.agoDaysAgo, { n: Math.round(ago.value / 86400).toString() }) :\n\t\tago.value >= 3600 ? interpolateLocaleParameters($locale.value.sfc.agoHoursAgo, { n: Math.round(ago.value / 3600).toString() }) :\n\t\tago.value >= 60 ? interpolateLocaleParameters($locale.value.sfc.agoMinutesAgo, { n: (~~(ago.value / 60)).toString() }) :\n\t\tago.value >= 10 ? interpolateLocaleParameters($locale.value.sfc.agoSecondsAgo, { n: (~~(ago.value % 60)).toString() }) :\n\t\tago.value >= -3 ? $locale.value.sfc.agoJustNow :\n\t\tago.value < -31536000 ? interpolateLocaleParameters($locale.value.sfc.timeInYears, { n: Math.round(-ago.value / 31536000).toString() }) :\n\t\tago.value < -2592000 ? interpolateLocaleParameters($locale.value.sfc.timeInMonths, { n: Math.round(-ago.value / 2592000).toString() }) :\n\t\tago.value < -604800 ? interpolateLocaleParameters($locale.value.sfc.timeInWeeks, { n: Math.round(-ago.value / 604800).toString() }) :\n\t\tago.value < -86400 ? interpolateLocaleParameters($locale.value.sfc.timeInDays, { n: Math.round(-ago.value / 86400).toString() }) :\n\t\tago.value < -3600 ? interpolateLocaleParameters($locale.value.sfc.timeInHours, { n: Math.round(-ago.value / 3600).toString() }) :\n\t\tago.value < -60 ? interpolateLocaleParameters($locale.value.sfc.timeInMinutes, { n: (~~(-ago.value / 60)).toString() }) :\n\t\tinterpolateLocaleParameters($locale.value.sfc.timeInSeconds, { n: (~~(-ago.value % 60)).toString() })\n\t"
+      }
+    ],
+    "currentFile": "packages/features/ui/frontend/components/global/MkTime.vue"
+  },
+  {
+    "file": "packages/features/ui/frontend/embed/components/EmTime.vue",
+    "baselineBodySha256": "e283691a501d916432fe4de7206d32145fb5cc84b99113163bf3f4bd41789ef3",
+    "currentBodySha256": "da8edd94562e0ce39ba3479b9a49f2c2d214f8c427b259c36db361ab8571e183",
+    "localeBlocksSha256": "7ad5ebb8aafffa4d885c9d8049fbeedca151d138a90dda49a0c34147611b7a6c",
+    "edits": [
+      {
+        "start": 814,
+        "end": 998,
+        "current": "formatRelativeTime, parseTime } from '@features/ui/frontend/shared/relative-time.js';\nimport type { RelativeTimeLocale } from '@features/ui/frontend/shared/relative-time.js';\nimport { ",
+        "baseline": ""
+      },
+      {
+        "start": 1284,
+        "end": 1284,
+        "current": "",
+        "baseline": "function getDateSafe(n: Date | string | number) {\n\ttry {\n\t\tif (n instanceof Date) {\n\t\t\treturn n;\n\t\t}\n\t\treturn new Date(n);\n\t} catch (err) {\n\t\treturn {\n\t\t\tgetTime: () => NaN,\n\t\t};\n\t}\n}\n\n"
+      },
+      {
+        "start": 1362,
+        "end": 1363,
+        "current": "a",
+        "baseline": ""
+      },
+      {
+        "start": 1364,
+        "end": 1364,
+        "current": "",
+        "baseline": "op"
+      },
+      {
+        "start": 1365,
+        "end": 1367,
+        "current": "eT",
+        "baseline": ".t"
+      },
+      {
+        "start": 1369,
+        "end": 1369,
+        "current": "",
+        "baseline": "e == null ? NaN : getDateSaf"
+      },
+      {
+        "start": 1381,
+        "end": 1381,
+        "current": "",
+        "baseline": ").getTime("
+      },
+      {
+        "start": 1774,
+        "end": 3166,
+        "current": "TimeLocale: RelativeTimeLocale = {\n\tago: {\n\t\tyearsAgo: params => interpolateLocaleParameters($locale.value.sfc.agoYearsAgo, params),\n\t\tmonthsAgo: params => interpolateLocaleParameters($locale.value.sfc.agoMonthsAgo, params),\n\t\tweeksAgo: params => interpolateLocaleParameters($locale.value.sfc.agoWeeksAgo, params),\n\t\tdaysAgo: params => interpolateLocaleParameters($locale.value.sfc.agoDaysAgo, params),\n\t\thoursAgo: params => interpolateLocaleParameters($locale.value.sfc.agoHoursAgo, params),\n\t\tminutesAgo: params => interpolateLocaleParameters($locale.value.sfc.agoMinutesAgo, params),\n\t\tsecondsAgo: params => interpolateLocaleParameters($locale.value.sfc.agoSecondsAgo, params),\n\t},\n\ttimeIn: {\n\t\tyears: params => interpolateLocaleParameters($locale.value.sfc.timeInYears, params),\n\t\tmonths: params => interpolateLocaleParameters($locale.value.sfc.timeInMonths, params),\n\t\tweeks: params => interpolateLocaleParameters($locale.value.sfc.timeInWeeks, params),\n\t\tdays: params => interpolateLocaleParameters($locale.value.sfc.timeInDays, params),\n\t\thours: params => interpolateLocaleParameters($locale.value.sfc.timeInHours, params),\n\t\tminutes: params => interpolateLocaleParameters($locale.value.sfc.timeInMinutes, params),\n\t\tseconds: params => interpolateLocaleParameters($locale.value.sfc.timeInSeconds, params),\n\t},\n\tget justNow() { return $locale.value.sfc.agoJustNow; },\n};\n\nconst relative",
+        "baseline": ""
+      },
+      {
+        "start": 3331,
+        "end": 3335,
+        "current": "form",
+        "baseline": "(\n\t\t"
+      },
+      {
+        "start": 3336,
+        "end": 3338,
+        "current": "tR",
+        "baseline": "go.valu"
+      },
+      {
+        "start": 3339,
+        "end": 3339,
+        "current": "",
+        "baseline": " >= 31536000 ? interpo"
+      },
+      {
+        "start": 3342,
+        "end": 3344,
+        "current": "iv",
+        "baseline": ""
+      },
+      {
+        "start": 3345,
+        "end": 3347,
+        "current": "Ti",
+        "baseline": "LocalePara"
+      },
+      {
+        "start": 3349,
+        "end": 3349,
+        "current": "",
+        "baseline": "ters($locale.value.sfc.agoYearsAgo, { n: Math.round"
+      },
+      {
+        "start": 3359,
+        "end": 3360,
+        "current": ",",
+        "baseline": ""
+      },
+      {
+        "start": 3361,
+        "end": 3361,
+        "current": "",
+        "baseline": "/ 31536000).toSt"
+      },
+      {
+        "start": 3362,
+        "end": 3362,
+        "current": "",
+        "baseline": "ing() }) :\n\t\tago.valu"
+      },
+      {
+        "start": 3363,
+        "end": 3363,
+        "current": "",
+        "baseline": " >= 2592000 ? interpo"
+      },
+      {
+        "start": 3366,
+        "end": 3372,
+        "current": "iveTim",
+        "baseline": ""
+      },
+      {
+        "start": 3379,
+        "end": 3379,
+        "current": "",
+        "baseline": "Parameters($locale.value.sfc.agoMonthsAgo, { n: Math.round(ago.value / 2592000).toString() }) :\n\t\tago.value >= 604800 ? interpolateLocaleParameters($locale.value.sfc.agoWeeksAgo, { n: Math.round(ago.value / 604800).toString() }) :\n\t\tago.value >= 86400 ? interpolateLocaleParameters($locale.value.sfc.agoDaysAgo, { n: Math.round(ago.value / 86400).toString() }) :\n\t\tago.value >= 3600 ? interpolateLocaleParameters($locale.value.sfc.agoHoursAgo, { n: Math.round(ago.value / 3600).toString() }) :\n\t\tago.value >= 60 ? interpolateLocaleParameters($locale.value.sfc.agoMinutesAgo, { n: (~~(ago.value / 60)).toString() }) :\n\t\tago.value >= 10 ? interpolateLocaleParameters($locale.value.sfc.agoSecondsAgo, { n: (~~(ago.value % 60)).toString() }) :\n\t\tago.value >= -3 ? $locale.value.sfc.agoJustNow :\n\t\tago.value < -31536000 ? interpolateLocaleParameters($locale.value.sfc.timeInYears, { n: Math.round(-ago.value / 31536000).toString() }) :\n\t\tago.value < -2592000 ? interpolateLocaleParameters($locale.value.sfc.timeInMonths, { n: Math.round(-ago.value / 2592000).toString() }) :\n\t\tago.value < -604800 ? interpolateLocaleParameters($locale.value.sfc.timeInWeeks, { n: Math.round(-ago.value / 604800).toString() }) :\n\t\tago.value < -86400 ? interpolateLocaleParameters($locale.value.sfc.timeInDays, { n: Math.round(-ago.value / 86400).toString() }) :\n\t\tago.value < -3600 ? interpolateLocaleParameters($locale.value.sfc.timeInHours, { n: Math.round(-ago.value / 3600).toString() }) :\n\t\tago.value < -60 ? interpolateLocaleParameters($locale.value.sfc.timeInMinutes, { n: (~~(-ago.value / 60)).toString() }) :\n\t\tinterpolateLocaleParameters($locale.value.sfc.timeInSeconds, { n: (~~(-ago.value % 60)).toString() })\n\t"
+      }
+    ],
+    "currentFile": "packages/features/ui/frontend/embed/components/EmTime.vue"
+  },
+  {
+    "file": "packages/features/boot/frontend/embed/ui.vue",
+    "currentFile": "packages/features/boot/frontend/embed/ui.vue",
+    "baselineBodySha256": "5c613ca95240c7a64d70fdecb1d2dc15f7d7e143d2a8d65792314453742e453c",
+    "currentBodySha256": "028d7a0d4a2d8edbaf254f45f2f0447cf9ee31bbbb74fbf34464ba4b05ef55fa",
+    "localeBlocksSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "edits": [
+      {
+        "start": 853,
+        "end": 923,
+        "current": "safeURIDecode } from '@features/web/frontend/shared/url.js';\nimport { ",
+        "baseline": ""
+      },
+      {
+        "start": 1679,
+        "end": 1679,
+        "current": "",
+        "baseline": "\n\nfunction safeURIDecode(str: string): string {\n\ttry {\n\t\treturn decodeURIComponent(str);\n\t} catch {\n\t\treturn str;\n\t}\n}"
+      }
+    ]
+  },
+  {
+    "file": "packages/features/discovery/frontend/utility/lookup.ts",
+    "currentFile": "packages/features/discovery/frontend/utility/lookup.ts",
+    "baselineBodySha256": "ca80d711d3fe4c9a7adc37c8945dce0dea850b9530e3ad7bb51ff0663c9f877f",
+    "currentBodySha256": "1334d3e60a3d9080f75953a776fedcb8fca468c700f87bf0fa8cf495e7c3c472",
+    "localeBlocksSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "edits": [
+      {
+        "start": 501,
+        "end": 505,
+        "current": "shar",
+        "baseline": "filt"
+      },
+      {
+        "start": 506,
+        "end": 507,
+        "current": "d",
+        "baseline": "rs"
+      }
+    ]
+  },
+  {
+    "file": "packages/features/markup/frontend/components/global/MkUrl.vue",
+    "currentFile": "packages/features/markup/frontend/components/global/MkUrl.vue",
+    "baselineBodySha256": "7cd31e88f3a7517fb327459b0a14763709bf12b673e55b1fc460a950c90fb0a4",
+    "currentBodySha256": "d9aea1054921502625279a47666956fd6fd224401c7d6eb0a653a582b3608086",
+    "localeBlocksSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "edits": [
+      {
+        "start": 1034,
+        "end": 1034,
+        "current": "",
+        "baseline": "toUnicode as decodePunycode } from 'punycode.js';\nimport { "
+      },
+      {
+        "start": 1124,
+        "end": 1144,
+        "current": ", parseUrlForDisplay",
+        "baseline": ""
+      },
+      {
+        "start": 1503,
+        "end": 1503,
+        "current": "",
+        "baseline": "function safeURIDecode(str: string): string {\n\ttry {\n\t\treturn decodeURIComponent(str);\n\t} catch {\n\t\treturn str;\n\t}\n}\n\n"
+      },
+      {
+        "start": 1784,
+        "end": 1821,
+        "current": "{ schema, hostname, port, pathname, q",
+        "baseline": ""
+      },
+      {
+        "start": 1822,
+        "end": 1823,
+        "current": "e",
+        "baseline": ""
+      },
+      {
+        "start": 1824,
+        "end": 1833,
+        "current": "y, hash }",
+        "baseline": "l"
+      },
+      {
+        "start": 1836,
+        "end": 1840,
+        "current": "pars",
+        "baseline": "n"
+      },
+      {
+        "start": 1841,
+        "end": 1841,
+        "current": "",
+        "baseline": "w "
+      },
+      {
+        "start": 1842,
+        "end": 1854,
+        "current": "rlForDisplay",
+        "baseline": "RL"
+      },
+      {
+        "start": 1864,
+        "end": 1864,
+        "current": "",
+        "baseline": ");\nif (!['http:', 'https:'].includes(url.protocol)) throw new Error('invalid url'"
+      },
+      {
+        "start": 2262,
+        "end": 2262,
+        "current": "",
+        "baseline": "\nconst schema = url.protocol;\nconst hostname = decodePunycode(url.hostname);\nconst port = url.port;\nconst pathname = safeURIDecode(url.pathname);\nconst query = safeURIDecode(url.search);\nconst hash = safeURIDecode(url.hash);"
+      }
+    ]
+  },
+  {
+    "file": "packages/features/markup/frontend/embed/components/EmUrl.vue",
+    "currentFile": "packages/features/markup/frontend/embed/components/EmUrl.vue",
+    "baselineBodySha256": "58f116c73d1336f6ba4ac8f452a072260d26e04fe3f9302045d3a17cd7cfc1e4",
+    "currentBodySha256": "e689b0fa74adb307b543c34629f67a5f93093fde8cd81c1e01a5739a1516c95c",
+    "localeBlocksSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "edits": [
+      {
+        "start": 970,
+        "end": 970,
+        "current": "",
+        "baseline": "{ toUnicode as decodePunycode } from 'punycode.js';\nimport "
+      },
+      {
+        "start": 1136,
+        "end": 1156,
+        "current": ", parseUrlForDisplay",
+        "baseline": ""
+      },
+      {
+        "start": 1203,
+        "end": 1203,
+        "current": "",
+        "baseline": "\n\nfunction safeURIDecode(str: string): string {\n\ttry {\n\t\treturn decodeURIComponent(str);\n\t} catch {\n\t\treturn str;\n\t}\n}"
+      },
+      {
+        "start": 1451,
+        "end": 1488,
+        "current": "{ schema, hostname, port, pathname, q",
+        "baseline": ""
+      },
+      {
+        "start": 1489,
+        "end": 1490,
+        "current": "e",
+        "baseline": ""
+      },
+      {
+        "start": 1491,
+        "end": 1500,
+        "current": "y, hash }",
+        "baseline": "l"
+      },
+      {
+        "start": 1503,
+        "end": 1507,
+        "current": "pars",
+        "baseline": "n"
+      },
+      {
+        "start": 1508,
+        "end": 1508,
+        "current": "",
+        "baseline": "w "
+      },
+      {
+        "start": 1509,
+        "end": 1521,
+        "current": "rlForDisplay",
+        "baseline": "RL"
+      },
+      {
+        "start": 1531,
+        "end": 1531,
+        "current": "",
+        "baseline": ");\nif (!['http:', 'https:'].includes(url.protocol)) throw new Error('invalid url'"
+      },
+      {
+        "start": 1552,
+        "end": 1552,
+        "current": "",
+        "baseline": "\nconst schema = url.protocol;\nconst hostname = decodePunycode(url.hostname);\nconst port = url.port;\nconst pathname = safeURIDecode(url.pathname);\nconst query = safeURIDecode(url.search);\nconst hash = safeURIDecode(url.hash);"
+      }
+    ]
+  },
+  {
+    "file": "packages/features/navigation/frontend/lib/nirax.ts",
+    "currentFile": "packages/features/navigation/frontend/lib/nirax.ts",
+    "baselineBodySha256": "3fb1bfbbfb4ca7a723df70f2576ac444d84b95f1ac5ce27ea9f68870d2c59c5b",
+    "currentBodySha256": "1e08ad8ab0c39da6a275e32488e7a4675daa16c65905ce8e9d7df7a010a8abe8",
+    "localeBlocksSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "edits": [
+      {
+        "start": 138,
+        "end": 208,
+        "current": "\nimport { safeURIDecode } from '@features/web/frontend/shared/url.js';",
+        "baseline": ""
+      },
+      {
+        "start": 366,
+        "end": 366,
+        "current": "",
+        "baseline": "\n\nfunction safeURIDecode(str: string): string {\n\ttry {\n\t\treturn decodeURIComponent(str);\n\t} catch {\n\t\treturn str;\n\t}\n}"
+      }
+    ]
+  },
+  {
+    "file": "packages/features/notes/frontend/composables/use-note.ts",
+    "currentFile": "packages/features/notes/frontend/composables/use-note.ts",
+    "baselineBodySha256": "d5fe814cf690f29703e0b182513a6f3e2e8d37657ac20a51e730f7c7ba9d956b",
+    "currentBodySha256": "4001033df3294031aa0dd0b3befec79c9108818a0c366ae465fd4402da3b5231",
+    "localeBlocksSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "edits": [
+      {
+        "start": 2552,
+        "end": 2556,
+        "current": "shar",
+        "baseline": "filt"
+      },
+      {
+        "start": 2557,
+        "end": 2558,
+        "current": "d",
+        "baseline": "rs"
+      }
+    ]
+  },
+  {
+    "file": "packages/features/notes/frontend/embed/components/EmNoteHeader.vue",
+    "currentFile": "packages/features/notes/frontend/embed/components/EmNoteHeader.vue",
+    "baselineBodySha256": "794809cdb205145f58886e8194c284e4b3c38856074f098f20ef030b350c4ee0",
+    "currentBodySha256": "469b171fa816b0ba9aad520073b8fb2125c67380876a92ec95886fe805eb3cdf",
+    "localeBlocksSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "edits": [
+      {
+        "start": 1335,
+        "end": 1338,
+        "current": "not",
+        "baseline": "w"
+      },
+      {
+        "start": 1339,
+        "end": 1340,
+        "current": "s",
+        "baseline": "b"
+      },
+      {
+        "start": 1350,
+        "end": 1354,
+        "current": "shar",
+        "baseline": "emb"
+      },
+      {
+        "start": 1357,
+        "end": 1359,
+        "current": "no",
+        "baseline": "u"
+      },
+      {
+        "start": 1360,
+        "end": 1361,
+        "current": "e",
+        "baseline": "ils"
+      },
+      {
+        "start": 1403,
+        "end": 1405,
+        "current": "us",
+        "baseline": "w"
+      },
+      {
+        "start": 1406,
+        "end": 1408,
+        "current": "rs",
+        "baseline": "b"
+      },
+      {
+        "start": 1418,
+        "end": 1422,
+        "current": "shar",
+        "baseline": "emb"
+      },
+      {
+        "start": 1426,
+        "end": 1426,
+        "current": "",
+        "baseline": "til"
+      },
+      {
+        "start": 1427,
+        "end": 1429,
+        "current": "er",
+        "baseline": ""
+      }
+    ]
+  },
+  {
+    "file": "packages/features/pages/frontend/components/MkPagePreview.vue",
+    "currentFile": "packages/features/pages/frontend/components/MkPagePreview.vue",
+    "baselineBodySha256": "8fa085d1597876231741e8a9b703e7cba221df9c599b2560abed0edba167e1ae",
+    "currentBodySha256": "1fc5e568d504f10f4dc42afa416939375ca8e44e5a36f540180218d11beec4f9",
+    "localeBlocksSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "edits": [
+      {
+        "start": 926,
+        "end": 930,
+        "current": "shar",
+        "baseline": "filt"
+      },
+      {
+        "start": 931,
+        "end": 932,
+        "current": "d",
+        "baseline": "rs"
+      }
+    ]
+  },
+  {
+    "file": "packages/features/play/frontend/components/MkFlashPreview.vue",
+    "currentFile": "packages/features/play/frontend/components/MkFlashPreview.vue",
+    "baselineBodySha256": "39a35e3d2e32931e1c7396467dcc2a54caa67bcedf3d5324c443631378330ba4",
+    "currentBodySha256": "846e2d0d3afa6884b87c8b85364b7a25d14b78bf88f6ef22f06d9516823af0f3",
+    "localeBlocksSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "edits": [
+      {
+        "start": 722,
+        "end": 726,
+        "current": "shar",
+        "baseline": "filt"
+      },
+      {
+        "start": 727,
+        "end": 728,
+        "current": "d",
+        "baseline": "rs"
+      }
+    ]
+  },
+  {
+    "file": "packages/features/relationships/frontend/ui/_common_/statusbar-user-list.vue",
+    "currentFile": "packages/features/relationships/frontend/ui/_common_/statusbar-user-list.vue",
+    "baselineBodySha256": "8e0080d9c74ca2d53fc595ac08a0466247d9f7a6624a254803f5c44ef8b86fcd",
+    "currentBodySha256": "a134eab7a040dcf479c636a5d808c3663cf245d79b69a52cadb1c2d44f30d016",
+    "localeBlocksSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "edits": [
+      {
+        "start": 1525,
+        "end": 1529,
+        "current": "shar",
+        "baseline": "filt"
+      },
+      {
+        "start": 1530,
+        "end": 1531,
+        "current": "d",
+        "baseline": "rs"
+      }
+    ]
+  },
+  {
+    "file": "packages/features/users/frontend/components/MkUserCardMini.vue",
+    "currentFile": "packages/features/users/frontend/components/MkUserCardMini.vue",
+    "baselineBodySha256": "b9ab72abef5c7926fb019393d9ccd64a0bb2a1e4f2be7575a2f697096e3c03fe",
+    "currentBodySha256": "088def0697e73015c6bf6bfc10d8c6c7bd790db19edec8e296c303357043d2bb",
+    "localeBlocksSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "edits": [
+      {
+        "start": 829,
+        "end": 833,
+        "current": "shar",
+        "baseline": "filt"
+      },
+      {
+        "start": 834,
+        "end": 835,
+        "current": "d",
+        "baseline": "rs"
+      }
+    ]
+  },
+  {
+    "file": "packages/features/users/frontend/components/global/MkAvatar.vue",
+    "currentFile": "packages/features/users/frontend/components/global/MkAvatar.vue",
+    "baselineBodySha256": "75d3dabebc8d6863985634d94155b5d86bb7080d18d146be1cfa46adb2953990",
+    "currentBodySha256": "79c20e515d58e305dd97dfbaff4314d58e78da59b0c6f859e6d5099aa0603cb3",
+    "localeBlocksSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "edits": [
+      {
+        "start": 2616,
+        "end": 2620,
+        "current": "shar",
+        "baseline": "filt"
+      },
+      {
+        "start": 2621,
+        "end": 2622,
+        "current": "d",
+        "baseline": "rs"
+      }
+    ]
+  },
+  {
+    "file": "packages/features/users/frontend/embed/components/EmAvatar.vue",
+    "currentFile": "packages/features/users/frontend/embed/components/EmAvatar.vue",
+    "baselineBodySha256": "bae88b4b052dd65e2594838c37d015ac05dabdee62857855a2759bc2f593d013",
+    "currentBodySha256": "4ccb39c7e742ab75b77f16001d6467829c76e84c5470f21e3e000311325c5a2d",
+    "localeBlocksSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "edits": [
+      {
+        "start": 1794,
+        "end": 1796,
+        "current": "us",
+        "baseline": "w"
+      },
+      {
+        "start": 1797,
+        "end": 1799,
+        "current": "rs",
+        "baseline": "b"
+      },
+      {
+        "start": 1809,
+        "end": 1813,
+        "current": "shar",
+        "baseline": "emb"
+      },
+      {
+        "start": 1817,
+        "end": 1817,
+        "current": "",
+        "baseline": "til"
+      },
+      {
+        "start": 1818,
+        "end": 1820,
+        "current": "er",
+        "baseline": ""
+      }
+    ]
+  },
+  {
+    "file": "packages/features/users/frontend/widgets/WidgetProfile.vue",
+    "currentFile": "packages/features/users/frontend/widgets/WidgetProfile.vue",
+    "baselineBodySha256": "9644b960b45406ae6dd5c1a44ae7b380d5846e9f0387cf94090b139ade17b6cc",
+    "currentBodySha256": "145c2912f8a65824cccac19295930651c1c3e7fde1308b09c6a56986540f19ea",
+    "localeBlocksSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "edits": [
+      {
+        "start": 1062,
+        "end": 1066,
+        "current": "shar",
+        "baseline": "filt"
+      },
+      {
+        "start": 1067,
+        "end": 1068,
+        "current": "d",
+        "baseline": "rs"
+      }
+    ]
+  },
+  {
+    "file": "packages/features/web/frontend/shared/url.ts",
+    "currentFile": "packages/features/web/frontend/shared/url.ts",
+    "baselineBodySha256": "96edfd04eb8498de844485527a532ffc5551de91c5f08248295b21511e2639d8",
+    "currentBodySha256": "ac9fe9c5bdc225daaa3f740d7bcb3ecc84f9c163cdb542a2220aa63f2f5ad1a6",
+    "localeBlocksSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "edits": [
+      {
+        "start": 102,
+        "end": 162,
+        "current": "\n\nimport { toUnicode as decodePunycode } from 'punycode.js';",
+        "baseline": ""
+      },
+      {
+        "start": 1710,
+        "end": 2211,
+        "current": "\nexport function safeURIDecode(str: string): string {\n\ttry {\n\t\treturn decodeURIComponent(str);\n\t} catch {\n\t\treturn str;\n\t}\n}\n\nexport function parseUrlForDisplay(urlStr: string) {\n\tconst url = new URL(urlStr);\n\tif (!['http:', 'https:'].includes(url.protocol)) throw new Error('invalid url');\n\treturn {\n\t\tschema: url.protocol,\n\t\thostname: decodePunycode(url.hostname),\n\t\tport: url.port,\n\t\tpathname: safeURIDecode(url.pathname),\n\t\tquery: safeURIDecode(url.search),\n\t\thash: safeURIDecode(url.hash),\n\t};\n}\n",
+        "baseline": ""
+      }
+    ]
+  },
+  {
+    "file": "packages/features/web/frontend/embed/utils.ts",
+    "currentFile": "packages/features/web/frontend/shared/url.ts",
+    "baselineBodySha256": "593e9b07c2d83a4131d23002a437ebc94229491e6ea9fa9a205bf5259b159c74",
+    "currentBodySha256": "ac9fe9c5bdc225daaa3f740d7bcb3ecc84f9c163cdb542a2220aa63f2f5ad1a6",
+    "localeBlocksSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "edits": [
+      {
+        "start": 111,
+        "end": 122,
+        "current": "{ toUnicode",
+        "baseline": "*"
+      },
+      {
+        "start": 126,
+        "end": 127,
+        "current": "d",
+        "baseline": "Missk"
+      },
+      {
+        "start": 128,
+        "end": 135,
+        "current": "codePun",
+        "baseline": ""
+      },
+      {
+        "start": 136,
+        "end": 137,
+        "current": "c",
+        "baseline": " fr"
+      },
+      {
+        "start": 138,
+        "end": 139,
+        "current": "d",
+        "baseline": "m 'missk"
+      },
+      {
+        "start": 140,
+        "end": 140,
+        "current": "",
+        "baseline": "y-js';\nimport { url"
+      },
+      {
+        "start": 149,
+        "end": 150,
+        "current": "p",
+        "baseline": "@feat"
+      },
+      {
+        "start": 151,
+        "end": 151,
+        "current": "",
+        "baseline": "res/boot/fro"
+      },
+      {
+        "start": 152,
+        "end": 153,
+        "current": "y",
+        "baseline": "tend/shared/"
+      },
+      {
+        "start": 155,
+        "end": 157,
+        "current": "de",
+        "baseline": "nfig"
+      },
+      {
+        "start": 162,
+        "end": 728,
+        "current": "\n\n/* objを検査して\n * 1. 配列に何も入っていない時はクエリを付けない\n * 2. プロパティがundefinedの時はクエリを付けない\n * （new URLSearchParams(obj)ではそこまで丁寧なことをしてくれない）\n */\nexport function query(obj: Record<string, string | number | boolean>): string {\n\tconst params = Object.entries(obj)\n\t\t.filter(([, v]) => Array.isArray(v) ? v.length : v !== undefined) // eslint-disable-line @typescript-eslint/no-unnecessary-condition\n\t\t.reduce<Record<string, string | number | boolean>>((a, [k, v]) => (a[k] = v, a), {});\n\n\treturn Object.entries(params)\n\t\t.map((p) => `${p[0]}=${encodeURIComponent(p[1])}`)\n\t\t.join('&');\n}",
+        "baseline": ""
+      },
+      {
+        "start": 737,
+        "end": 740,
+        "current": "fun",
+        "baseline": ""
+      },
+      {
+        "start": 741,
+        "end": 743,
+        "current": "ti",
+        "baseline": ""
+      },
+      {
+        "start": 745,
+        "end": 745,
+        "current": "",
+        "baseline": "st"
+      },
+      {
+        "start": 747,
+        "end": 757,
+        "current": "ppendQuery",
+        "baseline": "cct = "
+      },
+      {
+        "start": 759,
+        "end": 759,
+        "current": "",
+        "baseline": "se"
+      },
+      {
+        "start": 760,
+        "end": 761,
+        "current": "l",
+        "baseline": ": Misskey.Acct) => {\n\treturn Misskey.acct.toString(user);\n};\n\nexport const userName = (user: Misskey.entities.User) => {\n\treturn user.name || user.username;\n};\n\nexport const userPage = (user: Misskey.Acct, path?"
+      },
+      {
+        "start": 771,
+        "end": 784,
+        "current": "queryString: ",
+        "baseline": "ab"
+      },
+      {
+        "start": 785,
+        "end": 785,
+        "current": "",
+        "baseline": "olu"
+      },
+      {
+        "start": 786,
+        "end": 792,
+        "current": "ring):",
+        "baseline": "e"
+      },
+      {
+        "start": 793,
+        "end": 793,
+        "current": "",
+        "baseline": "= fal"
+      },
+      {
+        "start": 794,
+        "end": 799,
+        "current": "tring",
+        "baseline": "e) =>"
+      },
+      {
+        "start": 813,
+        "end": 815,
+        "current": "ur",
+        "baseline": "abso"
+      },
+      {
+        "start": 816,
+        "end": 824,
+        "current": "}${/\\?/.",
+        "baseline": "u"
+      },
+      {
+        "start": 826,
+        "end": 833,
+        "current": "st(url)",
+        "baseline": ""
+      },
+      {
+        "start": 839,
+        "end": 858,
+        "current": ".endsWith('?') ? ''",
+        "baseline": ""
+      },
+      {
+        "start": 862,
+        "end": 863,
+        "current": "&",
+        "baseline": ""
+      },
+      {
+        "start": 864,
+        "end": 864,
+        "current": "",
+        "baseline": "}/@${acct(user)}${(path ? `/${path}`"
+      },
+      {
+        "start": 868,
+        "end": 869,
+        "current": "?",
+        "baseline": ""
+      },
+      {
+        "start": 870,
+        "end": 884,
+        "current": "}${queryString",
+        "baseline": ")"
+      },
+      {
+        "start": 889,
+        "end": 889,
+        "current": "",
+        "baseline": ";"
+      },
+      {
+        "start": 898,
+        "end": 937,
+        "current": "function extractDomain(url: string) {\n\t",
+        "baseline": ""
+      },
+      {
+        "start": 943,
+        "end": 945,
+        "current": "ma",
+        "baseline": "no"
+      },
+      {
+        "start": 946,
+        "end": 948,
+        "current": "ch",
+        "baseline": "ePage"
+      },
+      {
+        "start": 951,
+        "end": 960,
+        "current": "url.match",
+        "baseline": ""
+      },
+      {
+        "start": 961,
+        "end": 991,
+        "current": "/^(?:https?:)?(?:\\/\\/)?(?:[^@\\",
+        "baseline": ""
+      },
+      {
+        "start": 992,
+        "end": 1000,
+        "current": "]+@)?([^",
+        "baseline": "ote"
+      },
+      {
+        "start": 1001,
+        "end": 1009,
+        "current": "\\/\\n]+)/",
+        "baseline": " M"
+      },
+      {
+        "start": 1010,
+        "end": 1011,
+        "current": "m",
+        "baseline": "sskey.entities.Note"
+      },
+      {
+        "start": 1012,
+        "end": 1013,
+        "current": ";",
+        "baseline": " => {"
+      },
+      {
+        "start": 1022,
+        "end": 1041,
+        "current": "match ? match[1] : ",
+        "baseline": "`/"
+      },
+      {
+        "start": 1042,
+        "end": 1045,
+        "current": "ull",
+        "baseline": "otes/${note.id}`"
+      },
+      {
+        "start": 1048,
+        "end": 1166,
+        "current": "\n\nexport function tryParseUrl(url: string | URL, base?: string | URL): URL | null {\n\ttry {\n\t\treturn new URL(url, base)",
+        "baseline": ""
+      },
+      {
+        "start": 1168,
+        "end": 2211,
+        "current": "\t} catch {\n\t\treturn null;\n\t}\n}\n\nexport function maybeMakeRelative(urlStr: string, baseStr: string): string {\n\ttry {\n\t\tconst baseObj = new URL(baseStr);\n\t\tconst urlObj = new URL(urlStr);\n\t\t/* in all places where maybeMakeRelative is used, baseStr is the\n\t\t * instance's public URL, which can't have path components, so the\n\t\t * relative URL will always have the whole path from the urlStr\n\t\t*/\n\t\tif (urlObj.origin === baseObj.origin) {\n\t\t\treturn urlObj.pathname + urlObj.search + urlObj.hash;\n\t\t}\n\t\treturn urlStr;\n\t} catch {\n\t\treturn '';\n\t}\n}\n\nexport function safeURIDecode(str: string): string {\n\ttry {\n\t\treturn decodeURIComponent(str);\n\t} catch {\n\t\treturn str;\n\t}\n}\n\nexport function parseUrlForDisplay(urlStr: string) {\n\tconst url = new URL(urlStr);\n\tif (!['http:', 'https:'].includes(url.protocol)) throw new Error('invalid url');\n\treturn {\n\t\tschema: url.protocol,\n\t\thostname: decodePunycode(url.hostname),\n\t\tport: url.port,\n\t\tpathname: safeURIDecode(url.pathname),\n\t\tquery: safeURIDecode(url.search),\n\t\thash: safeURIDecode(url.hash),\n\t};\n}\n",
+        "baseline": ""
+      }
+    ]
+  }
+]

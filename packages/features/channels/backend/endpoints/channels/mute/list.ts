@@ -3,47 +3,27 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
-import { ChannelMutingService } from '@/core/ChannelMutingService.js';
-import { ChannelEntityService } from '@/core/entities/ChannelEntityService.js';
+import { toPackedChannel } from '../../../api.dto.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 
-export const meta = {
-	tags: ['channels', 'mute'],
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import { type ChannelMutingService } from '../../../services/ChannelMutingService.js';
+import { type ChannelEntityService } from '../../../serializers/ChannelEntityService.js';
+import { channelsMuteListContract } from './list.contract.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
 
-	requireCredential: true,
-	prohibitMoved: true,
-
-	kind: 'read:channels',
-
-	res: {
-		type: 'array',
-		optional: false, nullable: false,
-		items: {
-			type: 'object',
-			optional: false, nullable: false,
-			ref: 'Channel',
-		},
-	},
-} as const;
-
-export const paramDef = {
-	type: 'object',
-	properties: {},
-	required: [],
-} as const;
-
-@Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
-	constructor(
-		private channelMutingService: ChannelMutingService,
-		private channelEntityService: ChannelEntityService,
-	) {
-		super(meta, paramDef, async (ps, me) => {
-			const mutings = await this.channelMutingService.list({
+export interface ChannelsMuteListDependencies {
+	channelMutingService: ChannelMutingService;
+	channelEntityService: ChannelEntityService;
+}
+export function createChannelsMuteListProcedure<Actor extends MiLocalUser>(deps: ChannelsMuteListDependencies) {
+	return createApiProcedure<Actor>()(channelsMuteListContract)
+		.use(requirePrincipal<Actor>())
+		.handler(async ({ input, context }) => {
+			const me = context.principal;
+			const mutings = await deps.channelMutingService.list({
 				requestUserId: me.id,
 			});
-			return await this.channelEntityService.packMany(mutings, me);
+			return (await deps.channelEntityService.packMany(mutings, me)).map(toPackedChannel);
 		});
-	}
 }

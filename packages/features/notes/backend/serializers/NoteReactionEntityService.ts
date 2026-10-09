@@ -5,16 +5,16 @@
 
 import { Inject, Injectable } from '@nestjs/common';
 import { DI } from '@/di-symbols.js';
-import type { NoteReactionsRepository } from '@/models/_.js';
-import type { Packed } from '@/misc/json-schema.js';
-import { bindThis } from '@/decorators.js';
-import { IdService } from '@/core/IdService.js';
+import type { NoteReactionsRepository } from '@features/persistence/backend/repositories/models.js';
+import type { Packed } from '@features/index/backend/packed.schema.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
+import { IdService } from '@features/runtime/backend/services/IdService.js';
 import type { OnModuleInit } from '@nestjs/common';
-import type { } from '@/models/Blocking.js';
-import type { MiUser } from '@/models/User.js';
-import type { MiNoteReaction } from '@/models/NoteReaction.js';
-import type { ReactionService } from '@/core/ReactionService.js';
-import type { UserEntityService } from '@/core/entities/UserEntityService.js';
+import type { } from '@features/relationships/backend/models/Blocking.js';
+import type { MiUser } from '@features/users/backend/models/User.js';
+import type { MiNoteReaction } from '../models/NoteReaction.js';
+import type { ReactionService } from '../services/ReactionService.js';
+import type { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import type { NoteEntityService } from './NoteEntityService.js';
 import { ModuleRef } from '@nestjs/core';
 

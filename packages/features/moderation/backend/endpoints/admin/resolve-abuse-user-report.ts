@@ -2,55 +2,20 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-
-import { Inject, Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
-import type { AbuseUserReportsRepository } from '@/models/_.js';
-import { DI } from '@/di-symbols.js';
-import { ApiError } from '@/server/api/error.js';
-import { AbuseReportService } from '@/core/AbuseReportService.js';
-
-export const meta = {
-	tags: ['admin'],
-
-	requireCredential: true,
-	requireModerator: true,
-	kind: 'write:admin:resolve-abuse-user-report',
-
-	errors: {
-		noSuchAbuseReport: {
-			message: 'No such abuse report.',
-			code: 'NO_SUCH_ABUSE_REPORT',
-			id: 'ac3794dd-2ce4-d878-e546-73c60c06b398',
-			kind: 'server',
-			httpStatusCode: 404,
-		},
-	},
-} as const;
-
-export const paramDef = {
-	type: 'object',
-	properties: {
-		reportId: { type: 'string', format: 'misskey:id' },
-		resolvedAs: { type: 'string', enum: ['accept', 'reject', null], nullable: true },
-	},
-	required: ['reportId'],
-} as const;
-
-@Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
-	constructor(
-		@Inject(DI.abuseUserReportsRepository)
-		private abuseUserReportsRepository: AbuseUserReportsRepository,
-		private abuseReportService: AbuseReportService,
-	) {
-		super(meta, paramDef, async (ps, me) => {
-			const report = await this.abuseUserReportsRepository.findOneBy({ id: ps.reportId });
-			if (!report) {
-				throw new ApiError(meta.errors.noSuchAbuseReport);
-			}
-
-			await this.abuseReportService.resolve([{ reportId: report.id, resolvedAs: ps.resolvedAs ?? null }], me);
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import type { ApiActor } from '@features/api/backend/transport/context.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import { moderationContract } from '../../api.definition.js';
+import type { ModerationApiDependencies } from '../../api.implementation.js';
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
+import { moderationErrors } from '../../api.errors.js';
+export function createAdminResolveAbuseUserReportProcedure<Actor extends ApiActor>(deps: Pick<ModerationApiDependencies<Actor>, 'abuseUserReportsRepository' | 'abuseReportService'>) {
+	return createApiProcedure<Actor>()(moderationContract.adminResolveAbuseUserReport).use(requirePrincipal<Actor>())
+		.handler(async ({ input, context }) => {
+			const ps = input;
+			const me = context.principal;
+			const report = await deps.abuseUserReportsRepository.findOneBy({ id: ps.reportId });
+			if (!report) throw apiError(moderationErrors.adminResolveAbuseUserReport.noSuchAbuseReport);
+			await deps.abuseReportService.resolve([{ reportId: report.id, resolvedAs: ps.resolvedAs ?? null }], me);
 		});
-	}
 }

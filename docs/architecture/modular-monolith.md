@@ -275,21 +275,54 @@ existing role IDs, matching the previous endpoint. Missing runtime context is
 anonymous. Roles and decorations are read anew through the existing services,
 whose cache and lifecycle ownership remain unchanged.
 
-## Contract-owned public entity schemas
+## Packed model contracts
 
-The public simple/detailed emoji models now live in the emoji feature contract.
-Legacy model references are generated from those schemas, and backend `Packed`
-and `KeyOf` resolve these migrated models from their inferred contract types.
-Unmigrated models, including the administrative emoji model, keep their existing
-schema/type path. This avoids maintaining a second public emoji field list.
+All 69 packed response model schemas now have authoritative static Valibot
+contracts in 23 feature-owned `contract/packed.ts` modules, with PageBlock split into a dependency-light contract for frontend consumers. The host composition
+registry `features/index/contract/packed.ts` maps the published model names to
+those feature definitions; backend `Packed<K>` is inferred with
+`v.InferOutput`, and OpenAPI named components are generated from the same registry.
+Definitions remain beside their owning features rather than in the registry.
 
-Optional wire properties use exact optional types, preserving compatibility for
-SDK consumers with `exactOptionalPropertyTypes`. Legacy packers can return own
-undefined properties, so the public emoji response boundary copies the object
-and omits those optional values just as JSON serialization would. It does not
-mutate the packer's object. Decoration category uses the same absent-property
-semantics. The schema bridge preserves existing references, descriptions and
-nullability; the complete generated OpenAPI document remains unchanged.
+`resultObject` preserves the runtime behavior of `v.looseObject`: extra response
+keys continue to pass through. Its schema type exposes only declared entries to
+TypeScript, so inferred `Packed<K>` types describe the declared contract fields
+without inventing an index signature for every extra runtime key. This change does
+not install global output validation on legacy endpoints, strip unknown response
+fields, or normalize stored data. Opaque-schema compatibility fixes and
+serializer/guard work remain separate API-host and feature responsibilities.
+
+The 69-model registry was a bounded packed-schema migration. The subsequent
+native endpoint phase removes the JSON-Schema-to-TypeScript payload interpreter
+and its endpoint generic defaults. `Schema` and inline `meta.res` projections
+remain compatibility metadata for AJV and the OpenAPI writer; retaining this
+metadata does not make it the source of handler payload types. Neither phase
+adds global runtime response validation.
+
+EmojiSimple and EmojiDetailed continue to reuse their existing emoji feature
+contract schemas rather than duplicating the field lists. Optional wire properties
+use exact optional types for `exactOptionalPropertyTypes` consumers. The emoji
+response boundary still copies packed objects and omits own `undefined` properties
+as JSON serialization would; it does not mutate the packer's object. Decoration
+category retains the same absent-property semantics.
+
+## Native endpoint contracts on the existing transport
+
+`defineEndpointContract` keeps feature-owned Valibot input/output schemas together
+with the oRPC contract. The API host's `ContractEndpoint` derives callback types
+from those schemas without using `SchemaType`. Its projection adapts documentation
+requiredness to the legacy OpenAPI writer. Request validation remains in the
+existing AJV transport, including defaults, unknown keys and `INVALID_PARAM`
+details; authentication, role policies, rate limits and file cleanup keep their
+existing owners. Responses are not newly parsed or rewritten by this adapter.
+
+The bridge accepts an audited, JSON-schema-projectable input subset. Runtime
+transformations, fallbacks, dynamic defaults, lazy inputs and optional root bodies
+are rejected instead of silently pretending AJV executes them. String length
+constraints use `jsonString` for JSON Schema Unicode-code-point semantics.
+The avatar-decoration create/list routes exercise this path; legacy inference
+remains for routes not yet converted. This is distinct from the existing feature
+procedures that intentionally run oRPC input/output validation.
 
 ## Emoji catalog frontend
 
@@ -321,3 +354,329 @@ persistence order, one-hour TTL, force-refresh behavior, concurrent completion
 order and the existing first-snapshot tag cache. It does not introduce fetch
 coalescing or silently change persistence error handling. Isolated feature tests
 and host-adapter tests cover both the state rules and concrete API/storage keys.
+
+## Static component locale migration checkpoint
+
+A further 47 feature-owned SFCs now use component locale tags for 176 static
+labels. All 28 loader-resolved translations are preserved per label (4,928
+value comparisons). The regression manifest covers these and the preceding
+37-component batch, with 84 SFCs and 5,964 exact translation comparisons.
+The URL-preview test application now installs the real VVI runtime and explicitly
+loads its selected locale before mounting. Full frontend unit tests (404),
+changed-file lint, production build and frontend type checking pass locally.
+This removes global dictionary references from those templates; embedded locale
+strings increase source bytes, and this is not a completed frontend conversion.
+
+The current priority is completing contract-first API definitions, dependency
+construction and VVI migration before resuming the separately prepared owner-PR
+ports. File placement alone is not counted as completion of those changes.
+
+
+## Inline native-contract batch
+
+A further 35 endpoints now own native Valibot input/output definitions under
+their features, with oRPC-derived SDK types collected by the feature index.
+Together with the earlier routes this brings native contracts to 129; 309
+class-based endpoints still use legacy schema inference. Of the native routes,
+92 use feature procedure factories and 37 retain their existing class adapters.
+This does not count those class adapters as completed dependency-injection migration.
+
+The HTTP input validator, handler bodies, authorization metadata and full OpenAPI
+document remain unchanged. Optional root responses retain their no-content branch,
+and opaque object output declarations retain extra payload fields. The WebAuthn
+key-completion route remains outside this batch because its opaque credential
+input needs a separate boundary review.
+
+## Packed-reference contract batch
+
+Forty further endpoints now use feature-owned native contracts across
+announcements, authentication, channels, chat and collections. The SDK derives
+these request/response types from their oRPC definitions. There are now 169
+native-contract routes (92 feature factories and 77 class adapters), with 269
+legacy schema-inference routes remaining.
+
+`packedReference(name)` preserves the canonical Valibot model type without
+expanding recursive response schemas at every endpoint. Only the legacy output
+projection maps registered references to named OpenAPI components. The generic
+schema converter does not automatically accept these output-only references,
+and the legacy input adapter rejects them. Existing handler response objects are
+not parsed, cloned or stripped. Missing-type legacy references remain outside
+this mechanical batch until their intended public schema is reviewed.
+
+
+## Expanded Packed contracts and SDK aliases
+
+A further 121 endpoints use native feature contracts, bringing coverage to 290
+routes (92 feature factories and 198 class adapters); 148 routes still use legacy
+schema inference. The role-creation endpoint stays on its legacy path until its
+opaque condition-formula input and typed service boundary can be reconciled
+without a cast or an unintended validation change.
+
+Named SDK model aliases now derive from the canonical Packed schema map. Named
+operation aliases prefer migrated contracts and fall back to the generated
+OpenAPI types for unmigrated routes. Declared request keys remain usable with
+Pick/Omit without a broad top-level index signature erasing required fields;
+transport validation and preservation of extra input keys are unchanged. Opaque
+Page data and queue options are represented as records, retaining arbitrary data.
+These changes do not introduce response parsing or alter the HTTP client runtime.
+
+## No-content contracts and source-constant constraints
+
+Another 64 no-content endpoints and twelve endpoints with source-constant regular
+expressions or registry defaults use feature contracts. Native coverage is now
+366 of 438 routes; 72 retain the legacy path. The no-content routes preserve
+missing response metadata and their existing HTTP 204 behavior. Registry scope
+keeps its legacy required declaration and static default, while opaque values
+and extra input fields remain untouched. Maintained tests exercise the real
+Endpoint/AJV bridge for field allowlists, invalid input, defaults, authorization
+and response identity. The complete generated OpenAPI document remains equal
+to the pre-migration baseline.
+
+## Explicit feature service construction
+
+Announcements, collections, gallery, pages and play now construct 13 services
+through typed feature-owned factories. Their dependencies are named ports with
+narrow cross-feature capabilities; their existing method implementations and
+binding behavior are retained. The temporary Nest host adapter creates each
+feature graph once and exposes the previous class and string tokens without
+expanding their export visibility. Remaining CoreModule registrations use a
+single canonical service index instead of repeated provider/alias/export lists.
+
+The initial slice reduces production code by 373 lines. It does not migrate
+resource-owning constructors or lazy ModuleRef lifecycle resolution. Boot will
+ultimately own construction and disposal directly, at which point the Nest-only
+adapter can be removed. Regression tests preserve all existing provider/export
+and alias identities, singleton sharing, and strict local test-module resolution.
+
+## Unique arrays, serializer factories and further local locales
+
+Five more contracts use a registered unique-string-array validator, bringing
+native endpoint coverage to 371 of 438 routes. It rejects repeated exact strings
+without changing their contents and projects the existing uniqueItems rule.
+The bridge recognizes its frozen action/base pair and rejects semantic metadata
+overrides on affected pipelines, ancestors and item schemas. Ordinary annotation
+metadata and unrelated legacy projection metadata retain their prior behavior.
+This is a supported-schema equivalence check, not a sandbox for arbitrary code.
+
+A further 24 lifecycle-free serializers now use typed factories, for 37 migrated
+classes across 18 feature groups. This second DI slice adds 359 production lines;
+it prioritizes explicit construction over a claim of immediate net reduction.
+Some serializer imports still reach RoleService through DEFAULT_POLICIES, and
+existing method-level effects remain. Pure construction does not imply complete
+transitive framework independence or a change in resource ownership.
+
+Another 50 components use local VVI dictionaries while retaining their original
+setup/computed/event timing. Parameterized outputs are checked across all active
+languages. Components whose formatting differs, including a trailing-whitespace
+case in MkUploaderItems, stay on the legacy path until separately reconciled.
+
+## Portable chart contracts
+
+All twelve chart APIs now derive required numeric-series response schemas from
+portable feature-owned metric descriptors. Native coverage is 383 of 438 routes.
+The same descriptors still drive the unchanged hour/day entity definitions;
+collection, queries, grouping and resource lifecycles are not changed. Regression
+fixtures preserve descriptor order, all 24 entity metadata objects, complete
+GET/POST documentation and existing offset/default/error behavior, including
+out-of-range dates and integers beyond the safe-integer range. The old chart
+JSON-schema response generator is no longer a production source of truth.
+
+## Portable object and source-constant contracts
+
+Twenty-four more APIs use native feature contracts, bringing coverage to 407 of
+438 routes. Feature-owned leaves now hold shared captcha, webhook, notification,
+page-name and emoji-query constants without importing backend services into the
+portable contract graph. Existing consumers retain their compatibility exports.
+
+`jsonObject` validates known fields and static defaults while retaining unknown
+own keys, including prototype-named data keys, without changing the object's
+prototype. It rejects arrays at optional-only object boundaries. Its registered
+public parser is projected through a converter-only schema view; arbitrary
+transforms and semantic metadata overrides are still rejected. Native validation
+keeps issue paths and messages, but nested union-branch issue details are not
+retained by the public parser action. HTTP validation continues to use the
+existing AJV adapter, so its error shape and input mutation remain unchanged.
+
+`jsonNumber` preserves finite-number validation, including JSON exponent
+overflow, while opaque unknown values remain opaque. `jsonString` can carry a
+JSON Schema pattern interpreted in Unicode mode, preserving astral-character
+length and pattern behavior. Packed output references can explicitly retain an
+omitted legacy object type without changing canonical model inference or adding
+runtime response parsing. Whole-document OpenAPI parity and generated SDK types
+remain integration gates.
+
+## Compact service declarations
+
+The 37 migrated services now declare their constructor dependencies once. A small
+feature composition helper derives narrow factory inputs and checks constructor
+argument compatibility. Descriptors are immutable and identity-registered;
+foreign definitions, missing ports and duplicate constructors fail before
+construction. Each factory call creates a fresh graph, sharing internal services
+within that graph. Existing named factory exports remain available.
+
+The Nest adapter translates external service ports to the original class tokens
+and leaves repository DI symbols unchanged. Selective test modules therefore
+retain their class-token behavior without extra runtime aliases. Public/private
+exports and resource ownership are unchanged. TypeScript's structural repository
+types do not prove semantic token identity; a stable fixture verifies the actual
+37 constructor argument lists and 18 feature bindings.
+
+Production wiring, including the helper, catalogue and adapter, decreases from
+825 to 589 physical lines. A repository type alias now names the same
+SystemWebhook entity that its existing factory already constructs; database
+schema and runtime entity behavior are unchanged.
+
+A further 40 frontend components use local VVI dictionaries with exact
+28-language reconstruction and compiled behavior regressions. Direct component
+tests install the real internationalization plugin just as the application does.
+
+Three output-composition APIs also use native contracts: ap/show retains its
+User/Note discriminator, while account creation and list lookup retain their
+existing intersections and optional fields. Native coverage is now 410 of 438
+routes. Username/password validation lives in a pure users contract leaf;
+request validation, error metadata and actual response handling stay unchanged.
+
+## Legacy selector compatibility and unconstrained inputs
+
+Four ordered anyOf selectors retain their existing backend presence-based branch
+selection through an explicit `legacy-declared` handler input mode. The default
+adapter mode and canonical Valibot inference remain unchanged: inactive extra
+keys are still unknown. The compatibility view preserves the old structural
+`in` assumption; it is not evidence that the selected key passed that branch's
+validation. Mixed-selector payloads retain their old callback values, validation
+errors and precedence. A stricter selector policy would be a separate API change.
+
+The administrative drive-file header dictionary now has the honest opaque type
+`Record<string, unknown> | null`, replacing the old generator's empty-record
+inference without filtering or rewriting values. Two endpoints with literal
+empty input schemas use `v.unknown()`; their SDK request types intentionally
+widen from EmptyRequest to unknown, while no-argument calls and the existing
+APIClient record normalization remain unchanged.
+
+Draft-note contracts share the public 3000-character limit through a pure notes
+leaf and retain the old backend export. The separate 8192-character database
+limit is unchanged. Their native unique-string constraints and Unicode string
+rules reproduce the existing transport behavior.
+
+Native coverage is now 421 of 438 routes. Two delayed-queue responses retain
+ordered string/number tuple types from their unchanged Map-entry producers.
+Their output-only compatibility projection preserves the old prefixItems and
+unevaluatedItems document, including its missing minItems under-specification.
+Only captured bare scalar items are supported; unsupported item kinds and all
+input tuple projections fail explicitly. Responses are never parsed or truncated.
+
+Note creation's conditional text requirement is derived from registered native
+fields: when renote, files, media and poll are nullish, text must satisfy the
+existing non-whitespace string constraint. Its action is bound to the exact
+immutable object base and registered string rule. Unsupported outer defaults,
+lazy conditional fields, cloned bases and semantic metadata overwrites reject;
+normal defaults, validation errors and handler statements remain unchanged.
+
+The last eight host-default endpoint implementations now live beside their
+feature contracts in federation, integrations, moderation, users and timelines.
+The host registry keeps the same 438 keys, order and constructor identities;
+there are no old-path re-export bridges for these moves. The RSS implementation
+also exposes its existing default constructor by name so NodeNext test consumers
+can import it without synthetic-default ambiguity. Its parser uses the backend's
+existing dependency and build configuration.
+
+Drive upload now has a native multipart contract with a required Blob field. A
+single factory derives its wire schema from the logical attribute entries; the
+backend continues validating attributes separately from the existing temporary
+file descriptor. The direct FormData transport, authentication, cleanup and
+OpenAPI binary injection are unchanged. Factory provenance and metadata/transport
+agreement are checked before adapter construction. Native coverage is 422 of 438.
+
+Generic frontend dialog requests retain the API helper's optional credential
+shape, and pagination accepts only object-shaped request contracts. Unconstrained
+API requests remain unconstrained in the SDK; their existing direct callers are
+unchanged. These frontend corrections change types only.
+
+Seven additional media, markup, preferences and moderation services use plain
+constructors with feature-owned declarations. The total is 44 classes in 22 groups.
+Moderation logging has a separate declaration in the same owner module, preserving
+the existing serializer factory's complete narrow input/output types, including
+its parse-only Id dependency. HTTP/logger/repository resources remain host-owned.
+This cohort adds 41 production lines while removing framework decorators; it does
+not claim a further net line reduction.
+
+Five selector-plus-common APIs now compose an ordered native selector union with
+shared optional fields. Both schemas parse the same original object; the common
+result supplies defaults without the recursive merge behavior of stock
+intersection parsing. The legacy allOf/anyOf document and handler branch choices
+are preserved. The existing declared-field handler compatibility mode is explicit.
+The SDK's 29 optional common values now include explicit undefined; nine native
+parsed defaults are required. JSON serialization and HTTP behavior are unchanged.
+Native definition coverage is 427 of 438 routes.
+
+Eight existing forwarding factories now derive callback types from their native
+oRPC contract witnesses. This deliberately retains the audited legacy JSON
+metadata and the existing Endpoint/AJV execution path; native transforms are not
+executed by this adapter. Only audited schema/transport pairs belong here. In
+particular, an existing own-undefined JavaScript-only mismatch still reaches the
+feature procedure and retains its native rejection. Root-optional native contracts
+do not broaden the HTTP body's object requirement. This pilot preceded the
+remaining factory/class and antenna migrations; final interpreter retirement is
+described below.
+
+Meta and relationship lookup now use native unions, bringing definition coverage
+to 429 of 438 routes. Meta's overlapping output alternatives keep ordinary native
+union semantics while retaining the old oneOf documentation. Relationship lookup
+still returns arrays for scalar IDs and preserves undeclared runtime extras. Its
+identifier/string-array input alternatives are disjoint. The new bounded union
+projections explicitly exclude lazy descendants/returns; unrelated lazy schemas
+remain supported. No response validation or data rewriting is added.
+
+Authentication/security and user search add three plain constructors, bringing
+the declaration graph to 47 classes in 24 groups. Their separate groups preserve
+the old auth factory's complete value types and zero-input discovery factory.
+Redis is still the host-owned DI.redis instance; OTP replay/TTL, backup-code and
+WebAuthn challenge/counter logic are unchanged. This cohort removes four net
+production lines and does not change resource lifecycle ownership.
+
+A further 74 static-label SFCs own their VVI dictionaries, bringing the total to
+287 components. All 31,052 migrated values retain the exact 28-language content,
+including whitespace, NBSP and newline cases. Numeric static keys keep bracket
+access, and the mutable welcome error title has an explicit string annotation.
+The note-image test mounts the real asynchronous internationalization plugin.
+Dynamic keys, formatting paths, TS consumers, SW/embedded translations and the
+i18n package remain separate work; no global locale YAML is changed.
+
+Security-key removal/update have native declared-object outputs matching their
+actual 200 {} responses. The legacy adapter deliberately retains its res-less
+metadata and 204 documentation. SDK return types now describe the actual object
+rather than EmptyResponse's undefined alternative; existing callers only await
+the result. Handler/authentication/ownership checks and response identity are
+unchanged. Native definition coverage is 431 of 438 routes.
+
+All 84 remaining host forwarding adapters now live under their feature owners.
+Nineteen metadata-only owner files gained their real closures; the other 65 owner
+files are new. The host endpoint directory retains only its two tests, with no
+production forwarding or re-export bridges. The registry still owns composition
+and preserves all 438 route keys and their order. Shared transport/OpenAPI tooling
+stays in the backend package, alongside its build configuration.
+
+All 92 forwarding factories now consume native contract witness types, including
+the initial eight and the remaining 84. Root-optional bodies, existing legacy
+metadata and trusted actor/token closures retain their execution semantics.
+The audited non-JSON mismatches remain explicit: 15 optional native roots and
+25 present-undefined optional fields keep their old validation sequence. These
+witnesses do not authorize arbitrary native transforms at the AJV boundary.
+All 438 registered routes now have native contracts, and the antenna artifact
+type is inferred from its feature-owned native schema. `SchemaType`,
+`SchemaTypeDef`, `ObjType` and the recursive JSON Schema payload interpreter are
+removed. `Endpoint<Meta, Input, Output>` has no payload defaults; its constructor
+still accepts JSON `Schema` metadata and executes the same AJV validation body.
+`ContractEndpoint` and all 92 witness factories supply native-inferred types.
+`Packed<K>` remains a lookup over native Valibot schemas. Baseline tests use
+explicit frozen shapes where they read fields and explicit unknown inputs where
+they test identity or validation only; they do not clone the retired interpreter.
+
+Named feature-owned compatibility boundaries remain deliberately narrow. Role
+creation/update and WebAuthn registration preserve existing unchecked rich
+service-input assumptions after object validation; these are not domain
+validation guarantees. The admin user producer preserves raw `MiSignin` values
+without the documented `createdAt` field. These exceptions retain native types
+for the other fields and do not create a caller-selected payload escape. No
+new response parsing, normalization, file-cleanup change or AJV behavior is
+introduced by interpreter retirement.

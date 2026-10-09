@@ -19,9 +19,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script lang="ts" setup>
 import { ref } from 'vue';
 import * as Misskey from 'misskey-js';
-import { misskeyApi } from '@/utility/misskey-api.js';
-import { globalEvents } from '@/events.js';
-import { checkDragDataType, getDragData } from '@/drag-and-drop.js';
+import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
+import { globalEvents } from '@features/runtime/frontend/events.js';
+import { checkDragDataType, getDragData } from '@features/ui/frontend/drag-and-drop.js';
 
 const props = defineProps<{
 	folder?: Misskey.entities.DriveFolder;

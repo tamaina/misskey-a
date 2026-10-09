@@ -2,65 +2,29 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
+import { toPackedFlash } from '../../flash.schema.js';
 
-import ms from '@/runtime-dependencies/ms.js';
-import { Inject, Injectable } from '@nestjs/common';
-import type { FlashsRepository } from '@/models/_.js';
-import { IdService } from '@/core/IdService.js';
-import { Endpoint } from '@/server/api/endpoint-base.js';
-import { DI } from '@/di-symbols.js';
-import { FlashEntityService } from '@/core/entities/FlashEntityService.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 
-export const meta = {
-	tags: ['flash'],
+import { requirePrincipal } from '../../../../api/backend/transport/middleware.js';
 
-	requireCredential: true,
-
-	prohibitMoved: true,
-
-	kind: 'write:flash',
-
-	limit: {
-		duration: ms('1hour'),
-		max: 10,
-	},
-
-	errors: {
-	},
-
-	res: {
-		type: 'object',
-		optional: false, nullable: false,
-		ref: 'Flash',
-	},
-} as const;
-
-export const paramDef = {
-	type: 'object',
-	properties: {
-		title: { type: 'string' },
-		summary: { type: 'string' },
-		script: { type: 'string' },
-		permissions: { type: 'array', items: {
-			type: 'string',
-		} },
-		visibility: { type: 'string', enum: ['public', 'private'], default: 'public' },
-	},
-	required: ['title', 'summary', 'script', 'permissions'],
-} as const;
-
-@Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
-	constructor(
-		@Inject(DI.flashsRepository)
-		private flashsRepository: FlashsRepository,
-
-		private flashEntityService: FlashEntityService,
-		private idService: IdService,
-	) {
-		super(meta, paramDef, async (ps, me) => {
-			const flash = await this.flashsRepository.insertOne({
-				id: this.idService.gen(),
+import { flashCreateContract } from './create.contract.js';
+import type { FlashsRepository } from '@features/persistence/backend/repositories/models.js';
+import type { IdService } from '@features/runtime/backend/services/IdService.js';
+import type { FlashEntityService } from '../../serializers/FlashEntityService.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+export interface FlashCreateDependencies {
+	flashsRepository: FlashsRepository;
+	flashEntityService: Pick<FlashEntityService, 'pack'>;
+	idService: Pick<IdService, 'gen'>;
+}
+export function createFlashCreateProcedure(deps: FlashCreateDependencies) {
+	return createApiProcedure<MiLocalUser>()(flashCreateContract)
+		.use(requirePrincipal<MiLocalUser>())
+		.handler(async ({ input: ps, context }) => {
+			const me = context.principal;
+			const flash = await deps.flashsRepository.insertOne({
+				id: deps.idService.gen(),
 				userId: me.id,
 				updatedAt: new Date(),
 				title: ps.title,
@@ -69,8 +33,6 @@ export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDe
 				permissions: ps.permissions,
 				visibility: ps.visibility,
 			});
-
-			return await this.flashEntityService.pack(flash);
+			return toPackedFlash(await deps.flashEntityService.pack(flash));
 		});
-	}
 }

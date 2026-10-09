@@ -10,7 +10,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 	<MkError v-else-if="paginator.error.value" @retry="paginator.init()"/>
 
 	<div v-else-if="paginator.items.value.length === 0" key="_empty_">
-		<slot name="empty"><MkResult type="empty" :text="i18n.ts.noNotifications"/></slot>
+		<slot name="empty"><MkResult type="empty" :text="$locale.sfc.noNotifications"/></slot>
 	</div>
 
 	<div v-else ref="rootEl">
@@ -34,7 +34,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			</div>
 		</component>
 		<button v-show="paginator.canFetchOlder.value" key="_more_" v-appear="prefer.s.enableInfiniteScroll ? paginator.fetchOlder : null" :disabled="paginator.fetchingOlder.value" class="_button" :class="$style.more" @click="paginator.fetchOlder">
-			<div v-if="!paginator.fetchingOlder.value">{{ i18n.ts.loadMore }}</div>
+			<div v-if="!paginator.fetchingOlder.value">{{ $locale.sfc.loadMore }}</div>
 			<MkLoading v-else/>
 		</button>
 	</div>
@@ -45,16 +45,15 @@ SPDX-License-Identifier: AGPL-3.0-only
 import { onUnmounted, onMounted, computed, useTemplateRef, TransitionGroup, markRaw, watch } from 'vue';
 import * as Misskey from 'misskey-js';
 import { notificationTypes } from 'misskey-js';
-import { useInterval } from '@@/js/use-interval.js';
-import { useDocumentVisibility } from '@@/js/use-document-visibility.js';
-import { getScrollContainer, scrollToTop } from '@@/js/scroll.js';
+import { useInterval } from '@features/ui/frontend/shared/use-interval.js';
+import { useDocumentVisibility } from '@features/ui/frontend/shared/use-document-visibility.js';
+import { getScrollContainer, scrollToTop } from '@features/ui/frontend/shared/scroll.js';
 import XNotification from '@features/notifications/frontend/components/MkNotification.vue';
 import MkNote from '@features/notes/frontend/components/MkNote.vue';
-import { useStream } from '@/stream.js';
-import { i18n } from '@/i18n.js';
+import { useStream } from '@features/api/frontend/stream.js';
 import MkPullToRefresh from '@features/ui/frontend/components/MkPullToRefresh.vue';
-import { prefer } from '@/preferences.js';
-import { store } from '@/store.js';
+import { prefer } from '@features/preferences/frontend/preferences.js';
+import { store } from '@features/preferences/frontend/store.js';
 import { isSeparatorNeeded, getSeparatorInfo } from '@features/timelines/frontend/utility/timeline-date-separate.js';
 import { Paginator } from '@features/ui/frontend/utility/paginator.js';
 
@@ -252,3 +251,199 @@ defineExpose({
 	border-top: solid 0.5px var(--MI_THEME-divider);
 }
 </style>
+
+<locale locale="ar-SA" lang="json">
+{
+  "noNotifications": "ليس هناك أية اشعارات",
+  "loadMore": "عرض المزيد"
+}
+</locale>
+
+<locale locale="ca-ES" lang="json">
+{
+  "noNotifications": "Cap notificació",
+  "loadMore": "Carregar més"
+}
+</locale>
+
+<locale locale="cs-CZ" lang="json">
+{
+  "noNotifications": "Žádná oznámení",
+  "loadMore": "Zobrazit více"
+}
+</locale>
+
+<locale locale="da-DK" lang="json">
+{
+  "noNotifications": "No notifications",
+  "loadMore": "Load more"
+}
+</locale>
+
+<locale locale="de-DE" lang="json">
+{
+  "noNotifications": "Keine Benachrichtigungen gefunden",
+  "loadMore": "Mehr laden"
+}
+</locale>
+
+<locale locale="en-US" lang="json">
+{
+  "noNotifications": "No notifications",
+  "loadMore": "Load more"
+}
+</locale>
+
+<locale locale="es-ES" lang="json">
+{
+  "noNotifications": "No hay notificaciones",
+  "loadMore": "Ver más"
+}
+</locale>
+
+<locale locale="fr-FR" lang="json">
+{
+  "noNotifications": "Aucune notification",
+  "loadMore": "Afficher plus …"
+}
+</locale>
+
+<locale locale="id-ID" lang="json">
+{
+  "noNotifications": "Belum ada notifikasi",
+  "loadMore": "Selebihnya"
+}
+</locale>
+
+<locale locale="it-IT" lang="json">
+{
+  "noNotifications": "Nessuna notifica",
+  "loadMore": "Mostra di più"
+}
+</locale>
+
+<locale locale="ja-JP" lang="json">
+{
+  "noNotifications": "通知はありません",
+  "loadMore": "もっと見る"
+}
+</locale>
+
+<locale locale="ja-KS" lang="json">
+{
+  "noNotifications": "通知はあらへん",
+  "loadMore": "まだまだあるで！"
+}
+</locale>
+
+<locale locale="kab-KAB" lang="json">
+{
+  "noNotifications": "No notifications",
+  "loadMore": "Wali ugar"
+}
+</locale>
+
+<locale locale="kn-IN" lang="json">
+{
+  "noNotifications": "ಅಧಿಸೂಚನೆಗಳಿಲ್ಲ",
+  "loadMore": "ಇನ್ನಷ್ಟು ನೋಡು"
+}
+</locale>
+
+<locale locale="ko-KR" lang="json">
+{
+  "noNotifications": "표시할 알림이 없습니다",
+  "loadMore": "더 보기"
+}
+</locale>
+
+<locale locale="nl-NL" lang="json">
+{
+  "noNotifications": "Geen meldingen",
+  "loadMore": "Laad meer"
+}
+</locale>
+
+<locale locale="no-NO" lang="json">
+{
+  "noNotifications": "Ingen varsler",
+  "loadMore": "Vis mer"
+}
+</locale>
+
+<locale locale="pl-PL" lang="json">
+{
+  "noNotifications": "Brak powiadomień",
+  "loadMore": "Załaduj więcej"
+}
+</locale>
+
+<locale locale="pt-PT" lang="json">
+{
+  "noNotifications": "Sem notificações",
+  "loadMore": "Carregar mais"
+}
+</locale>
+
+<locale locale="ru-RU" lang="json">
+{
+  "noNotifications": "Нет уведомлений",
+  "loadMore": "Загрузить ещё"
+}
+</locale>
+
+<locale locale="sk-SK" lang="json">
+{
+  "noNotifications": "Žiadne oznámenia",
+  "loadMore": "Zobraziť viac"
+}
+</locale>
+
+<locale locale="th-TH" lang="json">
+{
+  "noNotifications": "ไม่มีการแจ้งเตือน",
+  "loadMore": "แสดงเพิ่มเติม"
+}
+</locale>
+
+<locale locale="tr-TR" lang="json">
+{
+  "noNotifications": "Bildirim yok",
+  "loadMore": "Daha fazla yükle"
+}
+</locale>
+
+<locale locale="ug-CN" lang="json">
+{
+  "noNotifications": "No notifications",
+  "loadMore": "Load more"
+}
+</locale>
+
+<locale locale="uk-UA" lang="json">
+{
+  "noNotifications": "Немає сповіщень",
+  "loadMore": "Показати більше"
+}
+</locale>
+
+<locale locale="vi-VN" lang="json">
+{
+  "noNotifications": "Chưa có thông báo",
+  "loadMore": "Tải thêm"
+}
+</locale>
+
+<locale locale="zh-CN" lang="json">
+{
+  "noNotifications": "无通知",
+  "loadMore": "查看更多"
+}
+</locale>
+
+<locale locale="zh-TW" lang="json">
+{
+  "noNotifications": "沒有通知",
+  "loadMore": "載入更多"
+}
+</locale>

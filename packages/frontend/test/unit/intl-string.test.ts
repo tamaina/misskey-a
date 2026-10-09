@@ -10,7 +10,7 @@ import {
 	normalizeStringWithHiragana,
 	compareStringEquals,
 	compareStringIncludes,
-} from '@/utility/intl-string.js';
+} from '@features/web/frontend/utility/intl-string.js';
 
 // 共通のテストを実行するヘルパー関数
 const runCommonTests = (normalizeFn: (str: string) => string) => {

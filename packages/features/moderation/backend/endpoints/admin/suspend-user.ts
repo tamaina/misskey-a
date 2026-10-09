@@ -2,51 +2,19 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-
-import { Inject, Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
-import type { UsersRepository } from '@/models/_.js';
-import { UserSuspendService } from '@/core/UserSuspendService.js';
-import { DI } from '@/di-symbols.js';
-import { RoleService } from '@/core/RoleService.js';
-
-export const meta = {
-	tags: ['admin'],
-
-	requireCredential: true,
-	requireModerator: true,
-	kind: 'write:admin:suspend-user',
-} as const;
-
-export const paramDef = {
-	type: 'object',
-	properties: {
-		userId: { type: 'string', format: 'misskey:id' },
-	},
-	required: ['userId'],
-} as const;
-
-@Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
-	constructor(
-		@Inject(DI.usersRepository)
-		private usersRepository: UsersRepository,
-
-		private userSuspendService: UserSuspendService,
-		private roleService: RoleService,
-	) {
-		super(meta, paramDef, async (ps, me) => {
-			const user = await this.usersRepository.findOneBy({ id: ps.userId });
-
-			if (user == null) {
-				throw new Error('user not found');
-			}
-
-			if (await this.roleService.isModerator(user)) {
-				throw new Error('cannot suspend moderator account');
-			}
-
-			await this.userSuspendService.suspend(user, me);
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import type { ApiActor } from '@features/api/backend/transport/context.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import { moderationContract } from '../../api.definition.js';
+import type { ModerationApiDependencies } from '../../api.implementation.js';
+export function createAdminSuspendUserProcedure<Actor extends ApiActor>(deps: Pick<ModerationApiDependencies<Actor>, 'usersRepository' | 'roleService' | 'userSuspendService'>) {
+	return createApiProcedure<Actor>()(moderationContract.adminSuspendUser).use(requirePrincipal<Actor>())
+		.handler(async ({ input, context }) => {
+			const ps = input;
+			const me = context.principal;
+			const user = await deps.usersRepository.findOneBy({ id: ps.userId });
+			if (user == null) throw new Error('user not found');
+			if (await deps.roleService.isModerator(user)) throw new Error('cannot suspend moderator account');
+			await deps.userSuspendService.suspend(user, me);
 		});
-	}
 }

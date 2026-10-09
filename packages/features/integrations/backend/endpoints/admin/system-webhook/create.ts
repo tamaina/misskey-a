@@ -3,82 +3,36 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
-import { SystemWebhookEntityService } from '@/core/entities/SystemWebhookEntityService.js';
-import { systemWebhookEventTypes } from '@/models/SystemWebhook.js';
-import { SystemWebhookService } from '@/core/SystemWebhookService.js';
-
-export const meta = {
-	tags: ['admin', 'system-webhook'],
-
-	requireCredential: true,
-	requireModerator: true,
-	secure: true,
-	kind: 'write:admin:system-webhook',
-
-	res: {
-		type: 'object',
-		ref: 'SystemWebhook',
-	},
-} as const;
-
-export const paramDef = {
-	type: 'object',
-	properties: {
-		isActive: {
-			type: 'boolean',
-		},
-		name: {
-			type: 'string',
-			minLength: 1,
-			maxLength: 255,
-		},
-		on: {
-			type: 'array',
-			items: {
-				type: 'string',
-				enum: systemWebhookEventTypes,
-			},
-		},
-		url: {
-			type: 'string',
-			minLength: 1,
-			maxLength: 1024,
-		},
-		secret: {
-			type: 'string',
-			maxLength: 1024,
-			default: '',
-		},
-	},
-	required: [
-		'isActive',
-		'name',
-		'on',
-		'url',
-	],
-} as const;
-
-@Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
-	constructor(
-		private systemWebhookService: SystemWebhookService,
-		private systemWebhookEntityService: SystemWebhookEntityService,
-	) {
-		super(meta, paramDef, async (ps, me) => {
-			const result = await this.systemWebhookService.createSystemWebhook(
-				{
-					isActive: ps.isActive,
-					name: ps.name,
-					on: ps.on,
-					url: ps.url,
-					secret: ps.secret,
-				},
-				me,
-			);
-
-			return this.systemWebhookEntityService.pack(result);
+import { toSystemWebhook } from '../../../webhook.schema.js';
+import { SystemWebhookEntityService } from '../../../serializers/SystemWebhookEntityService.js';
+import { SystemWebhookService } from '../../../services/SystemWebhookService.js';
+import type { MiLocalUser } from '../../../../../users/backend/models/User.js';
+import { adminSystemWebhookCreateContract } from './create.contract.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import { requirePrincipal } from '../../../../../api/backend/transport/middleware.js';
+export interface AdminSystemWebhookCreateDependencies {
+	systemWebhookService: Pick<SystemWebhookService, 'createSystemWebhook'>;
+	systemWebhookEntityService: Pick<SystemWebhookEntityService, 'pack'>;
+}
+export function createAdminSystemWebhookCreateProcedure(deps: AdminSystemWebhookCreateDependencies) {
+	return createApiProcedure<MiLocalUser>()(adminSystemWebhookCreateContract)
+		.use(requirePrincipal<MiLocalUser>())
+		.handler(async ({ input, context }) => {
+			const ps = input;
+			const me = context.principal;
+			const result = await (async () => {
+				const result = await deps.systemWebhookService.createSystemWebhook(
+					{
+						isActive: ps.isActive,
+						name: ps.name,
+						on: ps.on,
+						url: ps.url,
+						secret: ps.secret,
+					},
+					me,
+				);
+				return toSystemWebhook(await deps.systemWebhookEntityService.pack(result));
+			})();
+			return result;
 		});
-	}
 }

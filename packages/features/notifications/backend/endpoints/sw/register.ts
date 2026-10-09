@@ -3,123 +3,25 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Inject, Injectable } from '@nestjs/common';
-import { IdService } from '@/core/IdService.js';
-import type { MiMeta, SwSubscriptionsRepository } from '@/models/_.js';
-import { Endpoint } from '@/server/api/endpoint-base.js';
-import { DI } from '@/di-symbols.js';
-import { PushNotificationService } from '@/core/PushNotificationService.js';
-import { ApiError } from '@/server/api/error.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 
-export const meta = {
-	tags: ['account'],
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import { registerContract } from './register.contract.js';
 
-	requireCredential: true,
-	secure: true,
-
-	description: 'Register to receive push notifications.',
-
-	res: {
-		type: 'object',
-		optional: false, nullable: false,
-		properties: {
-			state: {
-				type: 'string',
-				optional: true, nullable: false,
-				enum: ['already-subscribed', 'subscribed'],
-			},
-			key: {
-				type: 'string',
-				optional: false, nullable: true,
-			},
-			userId: {
-				type: 'string',
-				optional: false, nullable: false,
-			},
-			endpoint: {
-				type: 'string',
-				optional: false, nullable: false,
-			},
-			sendReadMessage: {
-				type: 'boolean',
-				optional: false, nullable: false,
-			},
-		},
-	},
-
-	errors: {
-		invalidEndpoint: {
-			message: 'Invalid push endpoint.',
-			code: 'INVALID_ENDPOINT',
-			id: '4432adbe-17c0-4f9f-b43c-9ceb2f8910fe',
-		},
-	},
-} as const;
-
-export const paramDef = {
-	type: 'object',
-	properties: {
-		endpoint: { type: 'string' },
-		auth: { type: 'string' },
-		publickey: { type: 'string' },
-		sendReadMessage: { type: 'boolean', default: false },
-	},
-	required: ['endpoint', 'auth', 'publickey'],
-} as const;
-
-@Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
-	constructor(
-		@Inject(DI.meta)
-		private serverSettings: MiMeta,
-
-		@Inject(DI.swSubscriptionsRepository)
-		private swSubscriptionsRepository: SwSubscriptionsRepository,
-
-		private idService: IdService,
-		private pushNotificationService: PushNotificationService,
-	) {
-		super(meta, paramDef, async (ps, me) => {
-			if (!this.pushNotificationService.isValidEndpoint(ps.endpoint)) {
-				throw new ApiError(meta.errors.invalidEndpoint);
-			}
-
-			// if already subscribed
-			const exist = await this.swSubscriptionsRepository.findOneBy({
-				userId: me.id,
-				endpoint: ps.endpoint,
-				auth: ps.auth,
-				publickey: ps.publickey,
-			});
-
-			if (exist != null) {
-				return {
-					state: 'already-subscribed' as const,
-					key: this.serverSettings.swPublicKey,
-					userId: me.id,
-					endpoint: exist.endpoint,
-					sendReadMessage: exist.sendReadMessage,
-				};
-			}
-
-			await this.swSubscriptionsRepository.insert({
-				id: this.idService.gen(),
-				userId: me.id,
-				endpoint: ps.endpoint,
-				auth: ps.auth,
-				publickey: ps.publickey,
-				sendReadMessage: ps.sendReadMessage,
-			});
-
-			this.pushNotificationService.refreshCache(me.id);
-
-			return {
-				state: 'subscribed' as const,
-				key: this.serverSettings.swPublicKey,
-				userId: me.id,
-				endpoint: ps.endpoint,
-				sendReadMessage: ps.sendReadMessage,
-			};
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+import type { NotificationsDependencies } from '@features/notifications/backend/api.implementation.js';
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
+export type RegisterDependencies = Pick<NotificationsDependencies, 'isValidEndpoint' | 'findSubscription' | 'getSwPublicKey' | 'insertSubscription' | 'generateId' | 'refreshSubscriptionCache'>;
+export function createRegisterProcedure(deps: RegisterDependencies) {
+	return createApiProcedure<MiLocalUser>()(registerContract)
+		.use(requirePrincipal<MiLocalUser>())
+		.handler(async ({ input, context }) => {
+			const actor = context.principal;
+			if (!deps.isValidEndpoint(input.endpoint)) throw apiError({ code: 'INVALID_ENDPOINT', message: 'Invalid push endpoint.', id: '4432adbe-17c0-4f9f-b43c-9ceb2f8910fe' });
+			const existing = await deps.findSubscription({ userId: actor.id, endpoint: input.endpoint, auth: input.auth, publickey: input.publickey });
+			if (existing) return { state: 'already-subscribed' as const, key: deps.getSwPublicKey(), userId: actor.id, endpoint: existing.endpoint, sendReadMessage: existing.sendReadMessage };
+			await deps.insertSubscription({ id: deps.generateId(), userId: actor.id, ...input });
+			deps.refreshSubscriptionCache(actor.id);
+			return { state: 'subscribed' as const, key: deps.getSwPublicKey(), userId: actor.id, endpoint: input.endpoint, sendReadMessage: input.sendReadMessage };
 		});
-	}
 }

@@ -2,73 +2,33 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
+import { toPackedPage } from '@features/users/backend/page.schema.js';
 
-import { Inject, Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
-import type { PageLikesRepository } from '@/models/_.js';
-import { QueryService } from '@/core/QueryService.js';
-import { PageLikeEntityService } from '@/core/entities/PageLikeEntityService.js';
-import { DI } from '@/di-symbols.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 
-export const meta = {
-	tags: ['account', 'pages'],
+import { requirePrincipal } from '../../../../api/backend/transport/middleware.js';
 
-	requireCredential: true,
-
-	kind: 'read:page-likes',
-
-	res: {
-		type: 'array',
-		optional: false, nullable: false,
-		items: {
-			type: 'object',
-			properties: {
-				id: {
-					type: 'string',
-					optional: false, nullable: false,
-					format: 'id',
-				},
-				page: {
-					type: 'object',
-					optional: false, nullable: false,
-					ref: 'Page',
-				},
-			},
-		},
-	},
-} as const;
-
-export const paramDef = {
-	type: 'object',
-	properties: {
-		limit: { type: 'integer', minimum: 1, maximum: 100, default: 10 },
-		sinceId: { type: 'string', format: 'misskey:id' },
-		untilId: { type: 'string', format: 'misskey:id' },
-		sinceDate: { type: 'integer' },
-		untilDate: { type: 'integer' },
-	},
-	required: [],
-} as const;
-
-@Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
-	constructor(
-		@Inject(DI.pageLikesRepository)
-		private pageLikesRepository: PageLikesRepository,
-
-		private pageLikeEntityService: PageLikeEntityService,
-		private queryService: QueryService,
-	) {
-		super(meta, paramDef, async (ps, me) => {
-			const query = this.queryService.makePaginationQuery(this.pageLikesRepository.createQueryBuilder('like'), ps.sinceId, ps.untilId, ps.sinceDate, ps.untilDate)
+import { iPageLikesContract } from './page-likes.contract.js';
+import type { PageLikesRepository } from '@features/persistence/backend/repositories/models.js';
+import type { QueryService } from '@features/notes/backend/services/QueryService.js';
+import type { PageLikeEntityService } from '../../serializers/PageLikeEntityService.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+export interface IPageLikesDependencies {
+	pageLikesRepository: Pick<PageLikesRepository, 'createQueryBuilder'>;
+	pageLikeEntityService: Pick<PageLikeEntityService, 'packMany'>;
+	queryService: Pick<QueryService, 'makePaginationQuery'>;
+}
+export function createIPageLikesProcedure(deps: IPageLikesDependencies) {
+	return createApiProcedure<MiLocalUser>()(iPageLikesContract)
+		.use(requirePrincipal<MiLocalUser>())
+		.handler(async ({ input: ps, context }) => {
+			const me = context.principal;
+			const query = deps.queryService.makePaginationQuery(deps.pageLikesRepository.createQueryBuilder('like'), ps.sinceId, ps.untilId, ps.sinceDate, ps.untilDate)
 				.andWhere('like.userId = :meId', { meId: me.id })
 				.leftJoinAndSelect('like.page', 'page');
-
 			const likes = await query
 				.limit(ps.limit)
 				.getMany();
-
-			return this.pageLikeEntityService.packMany(likes, me);
+			return (await deps.pageLikeEntityService.packMany(likes, me)).map(like => ({ id: like.id, page: toPackedPage(like.page) }));
 		});
-	}
 }

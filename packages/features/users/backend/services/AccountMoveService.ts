@@ -6,26 +6,27 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { IsNull, In, MoreThan, Not } from 'typeorm';
 
-import { bindThis } from '@/decorators.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
 import { DI } from '@/di-symbols.js';
-import type { MiLocalUser, MiRemoteUser, MiUser } from '@/models/User.js';
-import type { BlockingsRepository, FollowingsRepository, InstancesRepository, MiMeta, MutingsRepository, UserListMembershipsRepository, UsersRepository } from '@/models/_.js';
-import type { RelationshipJobData, ThinUser } from '@/queue/types.js';
+import type { MiLocalUser, MiRemoteUser, MiUser } from '../models/User.js';
+import type { BlockingsRepository, FollowingsRepository, InstancesRepository, MiMeta, MutingsRepository, UserListMembershipsRepository, UsersRepository } from '@features/persistence/backend/repositories/models.js';
+import type { RelationshipJobData, ThinUser } from '@features/runtime/backend/queue/types.js';
+import type { NativeMeDetailed } from '../serializers/native-user.js';
 
-import { IdService } from '@/core/IdService.js';
-import { GlobalEventService } from '@/core/GlobalEventService.js';
-import { QueueService } from '@/core/QueueService.js';
-import { RelayService } from '@/core/RelayService.js';
-import { ApPersonService } from '@/core/activitypub/models/ApPersonService.js';
-import { ApDeliverManagerService } from '@/core/activitypub/ApDeliverManagerService.js';
-import { ApRendererService } from '@/core/activitypub/ApRendererService.js';
-import { UserEntityService } from '@/core/entities/UserEntityService.js';
-import { FederatedInstanceService } from '@/core/FederatedInstanceService.js';
-import InstanceChart from '@/core/chart/charts/instance.js';
-import PerUserFollowingChart from '@/core/chart/charts/per-user-following.js';
-import { SystemAccountService } from '@/core/SystemAccountService.js';
-import { RoleService } from '@/core/RoleService.js';
-import { AntennaService } from '@/core/AntennaService.js';
+import { IdService } from '@features/runtime/backend/services/IdService.js';
+import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
+import { QueueService } from '@features/runtime/backend/services/QueueService.js';
+import { RelayService } from '@features/federation/backend/services/RelayService.js';
+import { ApPersonService } from '@features/federation/backend/services/ApPersonService.js';
+import { ApDeliverManagerService } from '@features/federation/backend/services/ApDeliverManagerService.js';
+import { ApRendererService } from '@features/federation/backend/services/ApRendererService.js';
+import { UserEntityService } from '../serializers/UserEntityService.js';
+import { FederatedInstanceService } from '@features/federation/backend/services/FederatedInstanceService.js';
+import { InstanceChart } from '@features/statistics/backend/charts/instance.js';
+import { PerUserFollowingChart } from '@features/statistics/backend/charts/per-user-following.js';
+import { SystemAccountService } from './SystemAccountService.js';
+import { RoleService } from '@features/roles/backend/services/RoleService.js';
+import { AntennaService } from '@features/timelines/backend/services/AntennaService.js';
 
 @Injectable()
 export class AccountMoveService {
@@ -74,7 +75,7 @@ export class AccountMoveService {
 	 * After delivering Move activity, its local followers unfollow the old account and then follow the new one.
 	 */
 	@bindThis
-	public async moveFromLocal(src: MiLocalUser, dst: MiLocalUser | MiRemoteUser): Promise<unknown> {
+	public async moveFromLocal(src: MiLocalUser, dst: MiLocalUser | MiRemoteUser): Promise<NativeMeDetailed> {
 		const _srcUri = this.userEntityService.getUserUri(src);
 		const dstUri = this.userEntityService.getUserUri(dst);
 
@@ -99,7 +100,8 @@ export class AccountMoveService {
 		await this.apDeliverManagerService.deliverToFollowers(src, moveAct);
 
 		// Publish meUpdated event
-		const iObj = await this.userEntityService.pack(src.id, src, { schema: 'MeDetailed', includeSecrets: true });
+		const iObj = await this.userEntityService.packSelf(src.id, {
+			includeSecrets: true });
 		this.globalEventService.publishMainStream(src.id, 'meUpdated', iObj);
 
 		// Unfollow after 24 hours

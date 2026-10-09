@@ -7,28 +7,28 @@ SPDX-License-Identifier: AGPL-3.0-only
 <div :class="[$style.root, { _panel: !widgetProps.transparent }]" data-testid="mkw-calendar">
 	<div :class="[$style.calendar, { [$style.isHoliday]: isHoliday }]">
 		<p :class="$style.monthAndYear">
-			<span :class="$style.year">{{ i18n.tsx.yearX({ year }) }}</span>
-			<span :class="$style.month">{{ i18n.tsx.monthX({ month }) }}</span>
+			<span :class="$style.year">{{ interpolateLocaleParameters($locale.sfc.yearX, { year }) }}</span>
+			<span :class="$style.month">{{ interpolateLocaleParameters($locale.sfc.monthX, { month }) }}</span>
 		</p>
-		<p v-if="month === 1 && day === 1" class="day">🎉{{ i18n.tsx.dayX({ day }) }}<span style="display: inline-block; transform: scaleX(-1);">🎉</span></p>
-		<p v-else :class="$style.day">{{ i18n.tsx.dayX({ day }) }}</p>
+		<p v-if="month === 1 && day === 1" class="day">🎉{{ interpolateLocaleParameters($locale.sfc.dayX, { day }) }}<span style="display: inline-block; transform: scaleX(-1);">🎉</span></p>
+		<p v-else :class="$style.day">{{ interpolateLocaleParameters($locale.sfc.dayX, { day }) }}</p>
 		<p :class="$style.weekDay">{{ weekDay }}</p>
 	</div>
 	<div :class="$style.info">
 		<div :class="$style.infoSection">
-			<p :class="$style.infoText">{{ i18n.ts.today }}<b :class="$style.percentage">{{ dayP.toFixed(1) }}%</b></p>
+			<p :class="$style.infoText">{{ $locale.sfc.today }}<b :class="$style.percentage">{{ dayP.toFixed(1) }}%</b></p>
 			<div :class="$style.meter">
 				<div :class="$style.meterVal" :style="{ width: `${dayP}%` }"></div>
 			</div>
 		</div>
 		<div :class="$style.infoSection">
-			<p :class="$style.infoText">{{ i18n.ts.thisMonth }}<b :class="$style.percentage">{{ monthP.toFixed(1) }}%</b></p>
+			<p :class="$style.infoText">{{ $locale.sfc.thisMonth }}<b :class="$style.percentage">{{ monthP.toFixed(1) }}%</b></p>
 			<div :class="$style.meter">
 				<div :class="$style.meterVal" :style="{ width: `${monthP}%` }"></div>
 			</div>
 		</div>
 		<div :class="$style.infoSection">
-			<p :class="$style.infoText">{{ i18n.ts.thisYear }}<b :class="$style.percentage">{{ yearP.toFixed(1) }}%</b></p>
+			<p :class="$style.infoText">{{ $locale.sfc.thisYear }}<b :class="$style.percentage">{{ yearP.toFixed(1) }}%</b></p>
 			<div :class="$style.meter">
 				<div :class="$style.meterVal" :style="{ width: `${yearP}%` }"></div>
 			</div>
@@ -39,18 +39,18 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import { ref, watch } from 'vue';
-import { useWidgetPropsManager } from '../../../../frontend/src/widgets/widget.js';
-import type { WidgetComponentEmits, WidgetComponentExpose, WidgetComponentProps } from '../../../../frontend/src/widgets/widget.js';
+import { useWidgetPropsManager } from './widget.js';
+import type { WidgetComponentEmits, WidgetComponentExpose, WidgetComponentProps } from './widget.js';
 import type { FormWithDefault, GetFormResultType } from '@features/ui/frontend/utility/form.js';
-import { i18n } from '@/i18n.js';
-import { useLowresTime, TIME_UPDATE_INTERVAL } from '@@/js/use-lowres-time.js';
+import { interpolateLocaleParameters } from '@features/runtime/frontend/interpolate-locale-parameters.js';
+import { useLowresTime, TIME_UPDATE_INTERVAL } from '@features/ui/frontend/shared/use-lowres-time.js';
 
 const name = 'calendar';
 
 const widgetPropsDef = {
 	transparent: {
 		type: 'boolean',
-		label: i18n.ts._widgetOptions.transparent,
+		label: $locale.value.sfc.widgetOptionsTransparent,
 		default: false,
 	},
 } satisfies FormWithDefault;
@@ -91,13 +91,13 @@ function update(time: number) {
 	month.value = nm + 1;
 	day.value = nd;
 	weekDay.value = [
-		i18n.ts._weekday.sunday,
-		i18n.ts._weekday.monday,
-		i18n.ts._weekday.tuesday,
-		i18n.ts._weekday.wednesday,
-		i18n.ts._weekday.thursday,
-		i18n.ts._weekday.friday,
-		i18n.ts._weekday.saturday,
+		$locale.value.sfc.weekdaySunday,
+		$locale.value.sfc.weekdayMonday,
+		$locale.value.sfc.weekdayTuesday,
+		$locale.value.sfc.weekdayWednesday,
+		$locale.value.sfc.weekdayThursday,
+		$locale.value.sfc.weekdayFriday,
+		$locale.value.sfc.weekdaySaturday,
 	][now.getDay()];
 
 	const dayNumer = now.getTime() - new Date(ny, nm, nd).getTime();
@@ -242,3 +242,535 @@ defineExpose<WidgetComponentExpose>({
 	transition: width .3s cubic-bezier(0.23, 1, 0.32, 1);
 }
 </style>
+
+<locale lang="json" locale="ar-SA">
+{
+	"yearX": "{year}",
+	"monthX": "{month}",
+	"dayX": "{day}",
+	"today": "اليوم",
+	"thisMonth": "هذا الشهر",
+	"thisYear": "هذا العام",
+	"widgetOptionsTransparent": "Make background transparent",
+	"weekdaySunday": "الأحد",
+	"weekdayMonday": "الإثنين",
+	"weekdayTuesday": "الثلاثاء",
+	"weekdayWednesday": "الأربعاء",
+	"weekdayThursday": "الخميس",
+	"weekdayFriday": "الجمعة",
+	"weekdaySaturday": "السبت"
+}
+</locale>
+
+<locale lang="json" locale="ca-ES">
+{
+	"yearX": "{year}",
+	"monthX": "{month}",
+	"dayX": "{day}",
+	"today": "Avui",
+	"thisMonth": "Aquest mes",
+	"thisYear": "Enguany",
+	"widgetOptionsTransparent": "Fons transparent",
+	"weekdaySunday": "Diumenge",
+	"weekdayMonday": "Dilluns",
+	"weekdayTuesday": "Dimarts",
+	"weekdayWednesday": "Dimecres",
+	"weekdayThursday": "Dijous",
+	"weekdayFriday": "Divendres",
+	"weekdaySaturday": "Dissabte"
+}
+</locale>
+
+<locale lang="json" locale="cs-CZ">
+{
+	"yearX": "{year}",
+	"monthX": "{month}",
+	"dayX": "{day}",
+	"today": "Dnes",
+	"thisMonth": "Tento měsíc",
+	"thisYear": "Tento rok",
+	"widgetOptionsTransparent": "Make background transparent",
+	"weekdaySunday": "Neděle",
+	"weekdayMonday": "Pondělí",
+	"weekdayTuesday": "Úterý",
+	"weekdayWednesday": "Středa",
+	"weekdayThursday": "Čtvrtek",
+	"weekdayFriday": "Pátek",
+	"weekdaySaturday": "Sobota"
+}
+</locale>
+
+<locale lang="json" locale="da-DK">
+{
+	"yearX": "{year}",
+	"monthX": "{month}",
+	"dayX": "{day}",
+	"today": "Today",
+	"thisMonth": "Month",
+	"thisYear": "Year",
+	"widgetOptionsTransparent": "Make background transparent",
+	"weekdaySunday": "Sunday",
+	"weekdayMonday": "Monday",
+	"weekdayTuesday": "Tuesday",
+	"weekdayWednesday": "Wednesday",
+	"weekdayThursday": "Thursday",
+	"weekdayFriday": "Friday",
+	"weekdaySaturday": "Saturday"
+}
+</locale>
+
+<locale lang="json" locale="de-DE">
+{
+	"yearX": "{year}",
+	"monthX": "{month}",
+	"dayX": "{day}",
+	"today": "Heute",
+	"thisMonth": "Monat",
+	"thisYear": "Jahr",
+	"widgetOptionsTransparent": "Hintergrund transparent machen",
+	"weekdaySunday": "Sonntag",
+	"weekdayMonday": "Montag",
+	"weekdayTuesday": "Dienstag",
+	"weekdayWednesday": "Mittwoch",
+	"weekdayThursday": "Donnerstag",
+	"weekdayFriday": "Freitag",
+	"weekdaySaturday": "Samstag"
+}
+</locale>
+
+<locale lang="json" locale="en-US">
+{
+	"yearX": "{year}",
+	"monthX": "{month}",
+	"dayX": "{day}",
+	"today": "Today",
+	"thisMonth": "Month",
+	"thisYear": "Year",
+	"widgetOptionsTransparent": "Make background transparent",
+	"weekdaySunday": "Sunday",
+	"weekdayMonday": "Monday",
+	"weekdayTuesday": "Tuesday",
+	"weekdayWednesday": "Wednesday",
+	"weekdayThursday": "Thursday",
+	"weekdayFriday": "Friday",
+	"weekdaySaturday": "Saturday"
+}
+</locale>
+
+<locale lang="json" locale="es-ES">
+{
+	"yearX": "Año {year}",
+	"monthX": "Mes {month}",
+	"dayX": "Día {day}",
+	"today": "Hoy",
+	"thisMonth": "Este mes",
+	"thisYear": "Este año",
+	"widgetOptionsTransparent": "Hacer fondo transparente",
+	"weekdaySunday": "Domingo",
+	"weekdayMonday": "Lunes",
+	"weekdayTuesday": "Martes",
+	"weekdayWednesday": "Miércoles",
+	"weekdayThursday": "Jueves",
+	"weekdayFriday": "Viernes",
+	"weekdaySaturday": "Sábado"
+}
+</locale>
+
+<locale lang="json" locale="fr-FR">
+{
+	"yearX": "{year}",
+	"monthX": "{month}",
+	"dayX": "{day}",
+	"today": "Aujourd’hui",
+	"thisMonth": "Ce mois-ci",
+	"thisYear": "Cette année",
+	"widgetOptionsTransparent": "Make background transparent",
+	"weekdaySunday": "Dimanche",
+	"weekdayMonday": "Lundi",
+	"weekdayTuesday": "Mardi",
+	"weekdayWednesday": "Mercredi",
+	"weekdayThursday": "Jeudi",
+	"weekdayFriday": "Vendredi",
+	"weekdaySaturday": "Samedi"
+}
+</locale>
+
+<locale lang="json" locale="id-ID">
+{
+	"yearX": "{year}",
+	"monthX": "{month}",
+	"dayX": "{day}",
+	"today": "Hari ini",
+	"thisMonth": "Bulan ini",
+	"thisYear": "Tahun ini",
+	"widgetOptionsTransparent": "Make background transparent",
+	"weekdaySunday": "Minggu",
+	"weekdayMonday": "Senin",
+	"weekdayTuesday": "Selasa",
+	"weekdayWednesday": "Rabu",
+	"weekdayThursday": "Kamis",
+	"weekdayFriday": "Jumat",
+	"weekdaySaturday": "Sabtu"
+}
+</locale>
+
+<locale lang="json" locale="it-IT">
+{
+	"yearX": "{year}",
+	"monthX": "{month}",
+	"dayX": "{day}",
+	"today": "Oggi",
+	"thisMonth": "Mese",
+	"thisYear": "Anno",
+	"widgetOptionsTransparent": "Sfondo trasparente",
+	"weekdaySunday": "Domenica",
+	"weekdayMonday": "Lunedì",
+	"weekdayTuesday": "Martedì",
+	"weekdayWednesday": "Mercoledì",
+	"weekdayThursday": "Giovedì",
+	"weekdayFriday": "Venerdì",
+	"weekdaySaturday": "Sabato"
+}
+</locale>
+
+<locale lang="json" locale="ja-JP">
+{
+	"yearX": "{year}年",
+	"monthX": "{month}月",
+	"dayX": "{day}日",
+	"today": "今日",
+	"thisMonth": "今月",
+	"thisYear": "今年",
+	"widgetOptionsTransparent": "背景を透明にする",
+	"weekdaySunday": "日曜日",
+	"weekdayMonday": "月曜日",
+	"weekdayTuesday": "火曜日",
+	"weekdayWednesday": "水曜日",
+	"weekdayThursday": "木曜日",
+	"weekdayFriday": "金曜日",
+	"weekdaySaturday": "土曜日"
+}
+</locale>
+
+<locale lang="json" locale="ja-KS">
+{
+	"yearX": "{year}年",
+	"monthX": "{month}月",
+	"dayX": "{day}日",
+	"today": "今日",
+	"thisMonth": "今月",
+	"thisYear": "今年",
+	"widgetOptionsTransparent": "背景を透明にする",
+	"weekdaySunday": "日曜日",
+	"weekdayMonday": "月曜日",
+	"weekdayTuesday": "火曜日",
+	"weekdayWednesday": "水曜日",
+	"weekdayThursday": "木曜日",
+	"weekdayFriday": "金曜日",
+	"weekdaySaturday": "土曜日"
+}
+</locale>
+
+<locale lang="json" locale="kab-KAB">
+{
+	"yearX": "{year}",
+	"monthX": "{month}",
+	"dayX": "{day}",
+	"today": "Today",
+	"thisMonth": "Month",
+	"thisYear": "Year",
+	"widgetOptionsTransparent": "Make background transparent",
+	"weekdaySunday": "Sunday",
+	"weekdayMonday": "Monday",
+	"weekdayTuesday": "Tuesday",
+	"weekdayWednesday": "Wednesday",
+	"weekdayThursday": "Thursday",
+	"weekdayFriday": "Friday",
+	"weekdaySaturday": "Saturday"
+}
+</locale>
+
+<locale lang="json" locale="kn-IN">
+{
+	"yearX": "{year}",
+	"monthX": "{month}",
+	"dayX": "{day}",
+	"today": "Today",
+	"thisMonth": "Month",
+	"thisYear": "Year",
+	"widgetOptionsTransparent": "Make background transparent",
+	"weekdaySunday": "Sunday",
+	"weekdayMonday": "Monday",
+	"weekdayTuesday": "Tuesday",
+	"weekdayWednesday": "Wednesday",
+	"weekdayThursday": "Thursday",
+	"weekdayFriday": "Friday",
+	"weekdaySaturday": "Saturday"
+}
+</locale>
+
+<locale lang="json" locale="ko-KR">
+{
+	"yearX": "{year}년",
+	"monthX": "{month}월",
+	"dayX": "{day}일",
+	"today": "오늘",
+	"thisMonth": "이달",
+	"thisYear": "올해",
+	"widgetOptionsTransparent": "배경을 투명하게 설정",
+	"weekdaySunday": "일요일",
+	"weekdayMonday": "월요일",
+	"weekdayTuesday": "화요일",
+	"weekdayWednesday": "수요일",
+	"weekdayThursday": "목요일",
+	"weekdayFriday": "금요일",
+	"weekdaySaturday": "토요일"
+}
+</locale>
+
+<locale lang="json" locale="nl-NL">
+{
+	"yearX": "{year}",
+	"monthX": "{month}",
+	"dayX": "{day}",
+	"today": "Vandaag",
+	"thisMonth": "Maand",
+	"thisYear": "Jaar",
+	"widgetOptionsTransparent": "Make background transparent",
+	"weekdaySunday": "Sunday",
+	"weekdayMonday": "Monday",
+	"weekdayTuesday": "Tuesday",
+	"weekdayWednesday": "Wednesday",
+	"weekdayThursday": "Thursday",
+	"weekdayFriday": "Friday",
+	"weekdaySaturday": "Saturday"
+}
+</locale>
+
+<locale lang="json" locale="no-NO">
+{
+	"yearX": "{year}",
+	"monthX": "{month}",
+	"dayX": "{day}",
+	"today": "I dag",
+	"thisMonth": "Måned",
+	"thisYear": "År",
+	"widgetOptionsTransparent": "Make background transparent",
+	"weekdaySunday": "Søndag",
+	"weekdayMonday": "Mandag",
+	"weekdayTuesday": "Tirsdag",
+	"weekdayWednesday": "Onsdag",
+	"weekdayThursday": "Torsdag",
+	"weekdayFriday": "Fredag",
+	"weekdaySaturday": "Lørdag"
+}
+</locale>
+
+<locale lang="json" locale="pl-PL">
+{
+	"yearX": "{year}",
+	"monthX": "{month}",
+	"dayX": "{day}",
+	"today": "Dziś",
+	"thisMonth": "Miesiąc",
+	"thisYear": "Rok",
+	"widgetOptionsTransparent": "Make background transparent",
+	"weekdaySunday": "Niedziela",
+	"weekdayMonday": "Poniedziałek",
+	"weekdayTuesday": "Wtorek",
+	"weekdayWednesday": "Środa",
+	"weekdayThursday": "Czwartek",
+	"weekdayFriday": "Piątek",
+	"weekdaySaturday": "Sobota"
+}
+</locale>
+
+<locale lang="json" locale="pt-PT">
+{
+	"yearX": "Ano {year}",
+	"monthX": "mês de {month}",
+	"dayX": " Dia {day}",
+	"today": "Hoje",
+	"thisMonth": "Este mês",
+	"thisYear": "Este ano",
+	"widgetOptionsTransparent": "Make background transparent",
+	"weekdaySunday": "Domingo",
+	"weekdayMonday": "Segunda-feira",
+	"weekdayTuesday": "Terça-feira",
+	"weekdayWednesday": "Quarta-feira",
+	"weekdayThursday": "Quinta-feira",
+	"weekdayFriday": "Sexta-feira",
+	"weekdaySaturday": "Sábado"
+}
+</locale>
+
+<locale lang="json" locale="ru-RU">
+{
+	"yearX": "{year} год",
+	"monthX": "{month} месяц",
+	"dayX": "{day} день",
+	"today": "Этот день",
+	"thisMonth": "Этот месяц",
+	"thisYear": "Этот год",
+	"widgetOptionsTransparent": "Make background transparent",
+	"weekdaySunday": "Воскресенье",
+	"weekdayMonday": "Понедельник",
+	"weekdayTuesday": "Вторник",
+	"weekdayWednesday": "Среда",
+	"weekdayThursday": "Четверг",
+	"weekdayFriday": "Пятница",
+	"weekdaySaturday": "Суббота"
+}
+</locale>
+
+<locale lang="json" locale="sk-SK">
+{
+	"yearX": "{year}",
+	"monthX": "{month}",
+	"dayX": "{day}",
+	"today": "Dnes",
+	"thisMonth": "Mesiac",
+	"thisYear": "Rok",
+	"widgetOptionsTransparent": "Make background transparent",
+	"weekdaySunday": "Nedeľa",
+	"weekdayMonday": "Pondelok",
+	"weekdayTuesday": "Utorok",
+	"weekdayWednesday": "Streda",
+	"weekdayThursday": "Štvrtok",
+	"weekdayFriday": "Piatok",
+	"weekdaySaturday": "Sobota"
+}
+</locale>
+
+<locale lang="json" locale="th-TH">
+{
+	"yearX": "{year}",
+	"monthX": "เดือน {month}",
+	"dayX": "{day}",
+	"today": "วันนี้",
+	"thisMonth": "เดือนนี้",
+	"thisYear": "ปีนี้",
+	"widgetOptionsTransparent": "ทำพื้นหลังโปรงใส",
+	"weekdaySunday": "วันอาทิตย์",
+	"weekdayMonday": "วันจันทร์",
+	"weekdayTuesday": "วันอังคาร",
+	"weekdayWednesday": "วันพุธ",
+	"weekdayThursday": "วันพฤหัสบดี",
+	"weekdayFriday": "วันศุกร์",
+	"weekdaySaturday": "วันเสาร์"
+}
+</locale>
+
+<locale lang="json" locale="tr-TR">
+{
+	"yearX": "{year}",
+	"monthX": "{month}",
+	"dayX": "{day}",
+	"today": "Bugün",
+	"thisMonth": "Ay",
+	"thisYear": "Yıl",
+	"widgetOptionsTransparent": "Arka planı şeffaf yapın",
+	"weekdaySunday": "Pazar",
+	"weekdayMonday": "Pazartesi",
+	"weekdayTuesday": "Salı",
+	"weekdayWednesday": "Çarşamba",
+	"weekdayThursday": "Perşembe",
+	"weekdayFriday": "Cuma",
+	"weekdaySaturday": "Cumartesi"
+}
+</locale>
+
+<locale lang="json" locale="ug-CN">
+{
+	"yearX": "{year}",
+	"monthX": "{month}",
+	"dayX": "{day}",
+	"today": "Today",
+	"thisMonth": "Month",
+	"thisYear": "Year",
+	"widgetOptionsTransparent": "Make background transparent",
+	"weekdaySunday": "Sunday",
+	"weekdayMonday": "Monday",
+	"weekdayTuesday": "Tuesday",
+	"weekdayWednesday": "Wednesday",
+	"weekdayThursday": "Thursday",
+	"weekdayFriday": "Friday",
+	"weekdaySaturday": "Saturday"
+}
+</locale>
+
+<locale lang="json" locale="uk-UA">
+{
+	"yearX": "{year}",
+	"monthX": "{month}",
+	"dayX": "{day}",
+	"today": "День",
+	"thisMonth": "Місяць",
+	"thisYear": "Рік",
+	"widgetOptionsTransparent": "Make background transparent",
+	"weekdaySunday": "Неділя",
+	"weekdayMonday": "Понеділок",
+	"weekdayTuesday": "Вівторок",
+	"weekdayWednesday": "Середа",
+	"weekdayThursday": "Четвер",
+	"weekdayFriday": "П'ятниця",
+	"weekdaySaturday": "Субота"
+}
+</locale>
+
+<locale lang="json" locale="vi-VN">
+{
+	"yearX": "{year}",
+	"monthX": "{month}",
+	"dayX": "{day}",
+	"today": "Hôm nay",
+	"thisMonth": "Tháng",
+	"thisYear": "Năm",
+	"widgetOptionsTransparent": "Make background transparent",
+	"weekdaySunday": "Chủ Nhật",
+	"weekdayMonday": "Thứ Hai",
+	"weekdayTuesday": "Thứ Ba",
+	"weekdayWednesday": "Thứ Tư",
+	"weekdayThursday": "Thứ Năm",
+	"weekdayFriday": "Thứ Sáu",
+	"weekdaySaturday": "Thứ Bảy"
+}
+</locale>
+
+<locale lang="json" locale="zh-CN">
+{
+	"yearX": "{year}年",
+	"monthX": "{month}月",
+	"dayX": "{day}日",
+	"today": "今天",
+	"thisMonth": "本月",
+	"thisYear": "今年",
+	"widgetOptionsTransparent": "使背景透明",
+	"weekdaySunday": "星期日",
+	"weekdayMonday": "星期一",
+	"weekdayTuesday": "星期二",
+	"weekdayWednesday": "星期三",
+	"weekdayThursday": "星期四",
+	"weekdayFriday": "星期五",
+	"weekdaySaturday": "星期六"
+}
+</locale>
+
+<locale lang="json" locale="zh-TW">
+{
+	"yearX": "{year} 年",
+	"monthX": "{month} 月",
+	"dayX": "{day} 日",
+	"today": "本日",
+	"thisMonth": "本月",
+	"thisYear": "本年",
+	"widgetOptionsTransparent": "使背景透明",
+	"weekdaySunday": "星期天",
+	"weekdayMonday": "星期一",
+	"weekdayTuesday": "星期二",
+	"weekdayWednesday": "星期三",
+	"weekdayThursday": "星期四",
+	"weekdayFriday": "星期五",
+	"weekdaySaturday": "星期六"
+}
+</locale>

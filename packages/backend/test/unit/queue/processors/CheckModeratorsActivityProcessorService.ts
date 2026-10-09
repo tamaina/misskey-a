@@ -8,18 +8,18 @@ import type { Mocked } from 'vitest';
 import { Test, TestingModule } from '@nestjs/testing';
 import * as lolex from '@sinonjs/fake-timers';
 import { addHours, addSeconds, subDays, subHours, subSeconds } from 'date-fns';
-import { CheckModeratorsActivityProcessorService } from '@/queue/processors/CheckModeratorsActivityProcessorService.js';
-import { MiSystemWebhook, MiUser, MiUserProfile, UserProfilesRepository, UsersRepository } from '@/models/_.js';
-import { IdService } from '@/core/IdService.js';
-import { RoleService } from '@/core/RoleService.js';
-import { GlobalModule } from '@/GlobalModule.js';
-import { MetaService } from '@/core/MetaService.js';
+import { CheckModeratorsActivityProcessorService } from '@features/moderation/backend/jobs/CheckModeratorsActivityProcessorService.js';
+import { MiSystemWebhook, MiUser, MiUserProfile, UserProfilesRepository, UsersRepository } from '@features/persistence/backend/repositories/models.js';
+import { IdService } from '@features/runtime/backend/services/IdService.js';
+import { RoleService } from '@features/roles/backend/services/RoleService.js';
+import { GlobalModule } from '@features/boot/backend/assembly/GlobalModule.js';
+import { MetaService } from '@features/instance/backend/services/MetaService.js';
 import { DI } from '@/di-symbols.js';
-import { QueueLoggerService } from '@/queue/QueueLoggerService.js';
-import { EmailService } from '@/core/EmailService.js';
-import { SystemWebhookService } from '@/core/SystemWebhookService.js';
-import { AnnouncementService } from '@/core/AnnouncementService.js';
-import { SystemWebhookEventType } from '@/models/SystemWebhook.js';
+import { QueueLoggerService } from '@features/runtime/backend/queue/QueueLoggerService.js';
+import { EmailService } from '@features/email/backend/services/EmailService.js';
+import { SystemWebhookService } from '@features/integrations/backend/services/SystemWebhookService.js';
+import { AnnouncementService } from '@features/announcements/backend/services/AnnouncementService.js';
+import { SystemWebhookEventType } from '@features/integrations/backend/models/SystemWebhook.js';
 
 const baseDate = new Date(Date.UTC(2000, 11, 15, 12, 0, 0));
 
@@ -44,7 +44,7 @@ describe('CheckModeratorsActivityProcessorService', () => {
 
 	// --------------------------------------------------------------------------------------
 
-	async function createUser(data: Partial<MiUser> = {}, profile: Partial<MiUserProfile> = {}): Promise<MiUser> {
+	async function createUser(data: Partial<Pick<MiUser, 'lastActiveDate'>> = {}, profile: Partial<Pick<MiUserProfile, 'email' | 'emailVerified'>> = {}): Promise<MiUser> {
 		const id = idService.gen();
 		const user = await usersRepository
 			.insert({

@@ -4,8 +4,8 @@
  */
 
 import { Entity, PrimaryColumn, Column, Index, ManyToOne } from 'typeorm';
-import { id } from '@/models/util/id.js';
-import { MiUser } from '@/models/User.js';
+import { id } from '@features/persistence/backend/models/util/id.js';
+import { MiUser } from '@features/users/backend/models/User.js';
 
 @Entity('app')
 export class MiApp {

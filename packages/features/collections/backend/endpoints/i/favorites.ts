@@ -3,62 +3,27 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Inject, Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
-import type { NoteFavoritesRepository } from '@/models/_.js';
-import { QueryService } from '@/core/QueryService.js';
-import { NoteFavoriteEntityService } from '@/core/entities/NoteFavoriteEntityService.js';
-import { DI } from '@/di-symbols.js';
-
-export const meta = {
-	tags: ['account', 'notes', 'favorites'],
-
-	requireCredential: true,
-
-	kind: 'read:favorites',
-
-	res: {
-		type: 'array',
-		optional: false, nullable: false,
-		items: {
-			type: 'object',
-			optional: false, nullable: false,
-			ref: 'NoteFavorite',
-		},
-	},
-} as const;
-
-export const paramDef = {
-	type: 'object',
-	properties: {
-		limit: { type: 'integer', minimum: 1, maximum: 100, default: 10 },
-		sinceId: { type: 'string', format: 'misskey:id' },
-		untilId: { type: 'string', format: 'misskey:id' },
-		sinceDate: { type: 'integer' },
-		untilDate: { type: 'integer' },
-	},
-	required: [],
-} as const;
-
-@Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
-	constructor(
-		@Inject(DI.noteFavoritesRepository)
-		private noteFavoritesRepository: NoteFavoritesRepository,
-
-		private noteFavoriteEntityService: NoteFavoriteEntityService,
-		private queryService: QueryService,
-	) {
-		super(meta, paramDef, async (ps, me) => {
-			const query = this.queryService.makePaginationQuery(this.noteFavoritesRepository.createQueryBuilder('favorite'), ps.sinceId, ps.untilId, ps.sinceDate, ps.untilDate)
+import { toPackedNoteFavorite } from '../../api.dto.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import { requirePrincipal, decodeScalarInput } from '@features/api/backend/transport/middleware.js';
+import type { ApiActor } from '@features/api/backend/transport/context.js';
+import { collectionsContract } from '../../api.definition.js';
+import type { CollectionsDependencies } from '../../api.implementation.js';
+export interface IFavoritesDependencies<Actor extends ApiActor> {
+	queryService: Pick<CollectionsDependencies<Actor>['queryService'], 'makePaginationQuery'>;
+	noteFavoritesRepository: Pick<CollectionsDependencies<Actor>['noteFavoritesRepository'], 'createQueryBuilder'>;
+	noteFavoriteEntityService: Pick<CollectionsDependencies<Actor>['noteFavoriteEntityService'], 'packMany'>;
+}
+export function createIFavoritesProcedure<Actor extends ApiActor>(deps: IFavoritesDependencies<Actor>) {
+	return createApiProcedure<Actor>()(collectionsContract.iFavorites).use(requirePrincipal<Actor>()).use(decodeScalarInput<Actor>({ limit: 'integer', sinceDate: 'integer', untilDate: 'integer' }))
+		.handler(async ({ input: ps, context }) => {
+			const me = context.principal;
+			const query = deps.queryService.makePaginationQuery(deps.noteFavoritesRepository.createQueryBuilder('favorite'), ps.sinceId, ps.untilId, ps.sinceDate, ps.untilDate)
 				.andWhere('favorite.userId = :meId', { meId: me.id })
 				.leftJoinAndSelect('favorite.note', 'note');
-
 			const favorites = await query
 				.limit(ps.limit)
 				.getMany();
-
-			return await this.noteFavoriteEntityService.packMany(favorites, me);
+			return (await deps.noteFavoriteEntityService.packMany(favorites, me)).map(toPackedNoteFavorite);
 		});
-	}
 }

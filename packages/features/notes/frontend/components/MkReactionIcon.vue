@@ -11,7 +11,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script lang="ts" setup>
 import { defineAsyncComponent, useTemplateRef } from 'vue';
 import { useTooltip } from '@features/ui/frontend/composables/use-tooltip.js';
-import * as os from '@/os.js';
+import * as os from '@features/ui/frontend/os.js';
 
 const props = defineProps<{
 	reaction: string;

@@ -6,7 +6,7 @@ import { EventEmitter, once } from 'node:events';
 import { createServer } from 'node:http';
 import { WebSocket } from 'ws';
 import { expect, test, vi } from 'vitest';
-import { StreamingApiServerService } from './StreamingApiServerService.js';
+import { StreamingApiServerService } from '@features/api/backend/transport/StreamingApiServerService.js';
 
 test('detach waits for authentication and prevents a late upgrade', async () => {
 	let authenticate!: (value: [null, null]) => void;

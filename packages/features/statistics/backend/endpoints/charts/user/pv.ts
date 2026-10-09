@@ -3,39 +3,22 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Injectable } from '@nestjs/common';
-import { getJsonSchema } from '@/core/chart/core.js';
-import { Endpoint } from '@/server/api/endpoint-base.js';
-import PerUserPvChart from '@/core/chart/charts/per-user-pv.js';
-import { schema } from '@/core/chart/charts/entities/per-user-pv.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 
-export const meta = {
-	tags: ['charts', 'users'],
+import { decodeScalarInput } from '@features/api/backend/transport/middleware.js';
+import { chartPerUserPvContract, chartPerUserPvGetContract } from './pv.contract.js';
+import type { ApiActor } from '@features/api/backend/transport/context.js';
+import type { StatisticsDependencies } from '../../../api.implementation.js';
+export function createPerUserPvProcedure<Actor extends ApiActor>(deps: StatisticsDependencies['charts']['userPv']) {
+	return createApiProcedure<Actor>()(chartPerUserPvContract)
+		.handler(async ({ input }) => projectChart(await deps.getChart(input.span, input.limit, input.offset ? new Date(input.offset) : null, input.userId)));
+}
+export function createPerUserPvGetProcedure<Actor extends ApiActor>(deps: StatisticsDependencies['charts']['userPv']) {
+	return createApiProcedure<Actor>()(chartPerUserPvGetContract)
+		.use(decodeScalarInput<Actor>({ limit: 'integer', offset: 'integer' }))
+		.handler(async ({ input }) => projectChart(await deps.getChart(input.span, input.limit, input.offset ? new Date(input.offset) : null, input.userId)));
+}
 
-	res: getJsonSchema(schema),
-
-	allowGet: true,
-	cacheSec: 60 * 60,
-} as const;
-
-export const paramDef = {
-	type: 'object',
-	properties: {
-		span: { type: 'string', enum: ['day', 'hour'] },
-		limit: { type: 'integer', minimum: 1, maximum: 500, default: 30 },
-		offset: { type: 'integer', nullable: true, default: null },
-		userId: { type: 'string', format: 'misskey:id' },
-	},
-	required: ['span', 'userId'],
-} as const;
-
-@Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
-	constructor(
-		private perUserPvChart: PerUserPvChart,
-	) {
-		super(meta, paramDef, async (ps, me) => {
-			return await this.perUserPvChart.getChart(ps.span, ps.limit, ps.offset ? new Date(ps.offset) : null, ps.userId);
-		});
-	}
+function projectChart(value: Awaited<ReturnType<StatisticsDependencies['charts']['userPv']['getChart']>>) {
+	return { upv: { user: value.upv.user.map(item => item), visitor: value.upv.visitor.map(item => item) }, pv: { user: value.pv.user.map(item => item), visitor: value.pv.visitor.map(item => item) } };
 }
