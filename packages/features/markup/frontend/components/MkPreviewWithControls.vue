@@ -22,7 +22,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { prefer } from '@/preferences.js';
+import { prefer } from '@features/preferences/frontend/preferences.js';
 
 const props = withDefaults(defineProps<{
 	previewLoading?: boolean;

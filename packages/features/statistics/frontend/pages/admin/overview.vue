@@ -78,13 +78,12 @@ import XRetention from '@features/statistics/frontend/pages/admin/overview.reten
 import XModerators from '@features/statistics/frontend/pages/admin/overview.moderators.vue';
 import XHeatmap from '@features/statistics/frontend/pages/admin/overview.heatmap.vue';
 import type { InstanceForPie } from '@features/statistics/frontend/pages/admin/overview.pie.vue';
-import * as os from '@/os.js';
-import { misskeyApi, misskeyApiGet } from '@/utility/misskey-api.js';
-import { useStream } from '@/stream.js';
-import { i18n } from '@/i18n.js';
-import { definePage } from '@/page.js';
+import * as os from '@features/ui/frontend/os.js';
+import { misskeyApi, misskeyApiGet } from '@features/api/frontend/utility/misskey-api.js';
+import { useStream } from '@features/api/frontend/stream.js';
+import { definePage } from '@features/navigation/frontend/page.js';
 import MkFoldableSection from '@features/ui/frontend/components/MkFoldableSection.vue';
-import { genId } from '@/utility/id.js';
+import { genId } from '@features/runtime/frontend/utility/id.js';
 
 const rootEl = useTemplateRef('rootEl');
 const serverInfo = ref<Misskey.entities.ServerInfoResponse | null>(null);
@@ -186,7 +185,7 @@ const headerActions = computed(() => []);
 const headerTabs = computed(() => []);
 
 definePage(() => ({
-	title: i18n.ts.dashboard,
+	title: $locale.value.sfc.dashboard,
 	icon: 'ti ti-dashboard',
 }));
 </script>
@@ -198,3 +197,171 @@ definePage(() => ({
 	grid-gap: 16px;
 }
 </style>
+
+<locale locale="ar-SA" lang="json">
+{
+	"dashboard": "لوحة التحكم"
+}
+</locale>
+
+<locale locale="ca-ES" lang="json">
+{
+	"dashboard": "Tauler de control"
+}
+</locale>
+
+<locale locale="cs-CZ" lang="json">
+{
+	"dashboard": "Přehled"
+}
+</locale>
+
+<locale locale="da-DK" lang="json">
+{
+	"dashboard": "Dashboard"
+}
+</locale>
+
+<locale locale="de-DE" lang="json">
+{
+	"dashboard": "Dashboard"
+}
+</locale>
+
+<locale locale="en-US" lang="json">
+{
+	"dashboard": "Dashboard"
+}
+</locale>
+
+<locale locale="es-ES" lang="json">
+{
+	"dashboard": "Panel de control"
+}
+</locale>
+
+<locale locale="fr-FR" lang="json">
+{
+	"dashboard": "Tableau de bord"
+}
+</locale>
+
+<locale locale="id-ID" lang="json">
+{
+	"dashboard": "Dasbor"
+}
+</locale>
+
+<locale locale="it-IT" lang="json">
+{
+	"dashboard": "Pannello di controllo"
+}
+</locale>
+
+<locale locale="ja-JP" lang="json">
+{
+	"dashboard": "ダッシュボード"
+}
+</locale>
+
+<locale locale="ja-KS" lang="json">
+{
+	"dashboard": "ダッシュボード"
+}
+</locale>
+
+<locale locale="kab-KAB" lang="json">
+{
+	"dashboard": "Dashboard"
+}
+</locale>
+
+<locale locale="kn-IN" lang="json">
+{
+	"dashboard": "Dashboard"
+}
+</locale>
+
+<locale locale="ko-KR" lang="json">
+{
+	"dashboard": "대시보드"
+}
+</locale>
+
+<locale locale="nl-NL" lang="json">
+{
+	"dashboard": "Overzicht"
+}
+</locale>
+
+<locale locale="no-NO" lang="json">
+{
+	"dashboard": "Dashboard"
+}
+</locale>
+
+<locale locale="pl-PL" lang="json">
+{
+	"dashboard": "Kokpit"
+}
+</locale>
+
+<locale locale="pt-PT" lang="json">
+{
+	"dashboard": "Painel de controle"
+}
+</locale>
+
+<locale locale="ru-RU" lang="json">
+{
+	"dashboard": "Панель управления"
+}
+</locale>
+
+<locale locale="sk-SK" lang="json">
+{
+	"dashboard": "Prehľad"
+}
+</locale>
+
+<locale locale="th-TH" lang="json">
+{
+	"dashboard": "หน้ากระดานหลัก"
+}
+</locale>
+
+<locale locale="tr-TR" lang="json">
+{
+	"dashboard": "Gösterge paneli"
+}
+</locale>
+
+<locale locale="ug-CN" lang="json">
+{
+	"dashboard": "Dashboard"
+}
+</locale>
+
+<locale locale="uk-UA" lang="json">
+{
+	"dashboard": "Панель приладів"
+}
+</locale>
+
+<locale locale="vi-VN" lang="json">
+{
+	"dashboard": "Trang chính"
+}
+</locale>
+
+<locale locale="zh-CN" lang="json">
+{
+	"dashboard": "管理面板"
+}
+</locale>
+
+<locale locale="zh-TW" lang="json">
+{
+	"dashboard": "儀表板"
+}
+</locale>

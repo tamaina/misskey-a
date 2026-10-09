@@ -3,61 +3,20 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Inject, Injectable } from '@nestjs/common';
-import ms from '@/runtime-dependencies/ms.js';
-import type { SwSubscriptionsRepository } from '@/models/_.js';
-import { Endpoint } from '@/server/api/endpoint-base.js';
-import { DI } from '@/di-symbols.js';
-import { PushNotificationService } from '@/core/PushNotificationService.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 
-export const meta = {
-	tags: ['account'],
+import { unregisterContract } from './unregister.contract.js';
 
-	// ブラウザ側の購読解除時に、同一ブラウザに登録された全アカウント分の登録を消せるように、
-	// 資格情報ではなく購読のauth secret (RFC 8291) で所有を確認する
-	requireCredential: false,
-
-	limit: {
-		duration: ms('1hour'),
-		max: 30,
-	},
-
-	description: 'Unregister from receiving push notifications.',
-} as const;
-
-export const paramDef = {
-	type: 'object',
-	properties: {
-		endpoint: { type: 'string' },
-		auth: { type: 'string' },
-		publickey: { type: 'string' },
-	},
-	required: ['endpoint', 'auth', 'publickey'],
-} as const;
-
-@Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
-	constructor(
-		@Inject(DI.swSubscriptionsRepository)
-		private swSubscriptionsRepository: SwSubscriptionsRepository,
-
-		private pushNotificationService: PushNotificationService,
-	) {
-		super(meta, paramDef, async (ps, me) => {
-			const subscriptions = await this.swSubscriptionsRepository.findBy({
-				...(me ? { userId: me.id } : {}),
-				endpoint: ps.endpoint,
-				auth: ps.auth,
-				publickey: ps.publickey,
-			});
-
-			if (subscriptions.length === 0) return;
-
-			await this.swSubscriptionsRepository.delete(subscriptions.map(s => s.id));
-
-			for (const userId of new Set(subscriptions.map(s => s.userId))) {
-				this.pushNotificationService.refreshCache(userId);
-			}
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+import type { NotificationsDependencies } from '@features/notifications/backend/api.implementation.js';
+export type UnregisterDependencies = Pick<NotificationsDependencies, 'findSubscriptions' | 'deleteSubscriptions' | 'refreshSubscriptionCache'>;
+export function createUnregisterProcedure(deps: UnregisterDependencies) {
+	return createApiProcedure<MiLocalUser>()(unregisterContract)
+		.handler(async ({ input, context }) => {
+			const actor = context.principal;
+			const records = await deps.findSubscriptions({ ...(actor ? { userId: actor.id } : {}), ...input });
+			if (records.length === 0) return;
+			await deps.deleteSubscriptions(records.map(record => record.id));
+			for (const userId of new Set(records.map(record => record.userId))) deps.refreshSubscriptionCache(userId);
 		});
-	}
 }

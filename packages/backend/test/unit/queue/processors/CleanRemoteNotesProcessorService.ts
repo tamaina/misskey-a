@@ -17,13 +17,13 @@ import {
 	type UsersRepository,
 	type UserProfilesRepository,
 	MiMeta,
-} from '@/models/_.js';
-import { CleanRemoteNotesProcessorService } from '@/queue/processors/CleanRemoteNotesProcessorService.js';
+} from '@features/persistence/backend/repositories/models.js';
+import { CleanRemoteNotesProcessorService } from '@features/notes/backend/jobs/CleanRemoteNotesProcessorService.js';
 import { DI } from '@/di-symbols.js';
-import { IdService } from '@/core/IdService.js';
-import { QueueLoggerService } from '@/queue/QueueLoggerService.js';
-import { GlobalModule } from '@/GlobalModule.js';
-import { secureRndstr } from '@/misc/secure-rndstr.js';
+import { IdService } from '@features/runtime/backend/services/IdService.js';
+import { QueueLoggerService } from '@features/runtime/backend/queue/QueueLoggerService.js';
+import { GlobalModule } from '@features/boot/backend/assembly/GlobalModule.js';
+import { secureRndstr } from '@features/auth/backend/utility/secure-rndstr.js';
 
 describe('CleanRemoteNotesProcessorService', () => {
 	let app: TestingModule;

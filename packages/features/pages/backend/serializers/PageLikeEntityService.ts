@@ -3,22 +3,18 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Inject, Injectable } from '@nestjs/common';
-import { DI } from '@/di-symbols.js';
-import type { PageLikesRepository } from '@/models/_.js';
-import type { } from '@/models/Blocking.js';
-import type { MiUser } from '@/models/User.js';
-import type { MiPageLike } from '@/models/PageLike.js';
-import { bindThis } from '@/decorators.js';
-import { PageEntityService } from './PageEntityService.js';
+import type { PageLikesRepository } from '@features/persistence/backend/repositories/models.js';
+import type { } from '@features/relationships/backend/models/Blocking.js';
+import type { MiUser } from '@features/users/backend/models/User.js';
+import type { MiPageLike } from '../models/PageLike.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
+import type { PageEntityService } from './PageEntityService.js';
 
-@Injectable()
 export class PageLikeEntityService {
 	constructor(
-		@Inject(DI.pageLikesRepository)
 		private pageLikesRepository: PageLikesRepository,
 
-		private pageEntityService: PageEntityService,
+		private pageEntityService: Pick<PageEntityService, 'pack'>,
 	) {
 	}
 
@@ -37,7 +33,7 @@ export class PageLikeEntityService {
 
 	@bindThis
 	public packMany(
-		likes: any[],
+		likes: MiPageLike[],
 		me: { id: MiUser['id'] },
 	) {
 		return Promise.all(likes.map(x => this.pack(x, me)));

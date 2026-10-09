@@ -3,39 +3,22 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
-import { getJsonSchema } from '@/core/chart/core.js';
-import PerUserFollowingChart from '@/core/chart/charts/per-user-following.js';
-import { schema } from '@/core/chart/charts/entities/per-user-following.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 
-export const meta = {
-	tags: ['charts', 'users', 'following'],
+import { decodeScalarInput } from '@features/api/backend/transport/middleware.js';
+import { chartPerUserFollowingContract, chartPerUserFollowingGetContract } from './following.contract.js';
+import type { ApiActor } from '@features/api/backend/transport/context.js';
+import type { StatisticsDependencies } from '../../../api.implementation.js';
+export function createPerUserFollowingProcedure<Actor extends ApiActor>(deps: StatisticsDependencies['charts']['userFollowing']) {
+	return createApiProcedure<Actor>()(chartPerUserFollowingContract)
+		.handler(async ({ input }) => projectChart(await deps.getChart(input.span, input.limit, input.offset ? new Date(input.offset) : null, input.userId)));
+}
+export function createPerUserFollowingGetProcedure<Actor extends ApiActor>(deps: StatisticsDependencies['charts']['userFollowing']) {
+	return createApiProcedure<Actor>()(chartPerUserFollowingGetContract)
+		.use(decodeScalarInput<Actor>({ limit: 'integer', offset: 'integer' }))
+		.handler(async ({ input }) => projectChart(await deps.getChart(input.span, input.limit, input.offset ? new Date(input.offset) : null, input.userId)));
+}
 
-	res: getJsonSchema(schema),
-
-	allowGet: true,
-	cacheSec: 60 * 60,
-} as const;
-
-export const paramDef = {
-	type: 'object',
-	properties: {
-		span: { type: 'string', enum: ['day', 'hour'] },
-		limit: { type: 'integer', minimum: 1, maximum: 500, default: 30 },
-		offset: { type: 'integer', nullable: true, default: null },
-		userId: { type: 'string', format: 'misskey:id' },
-	},
-	required: ['span', 'userId'],
-} as const;
-
-@Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
-	constructor(
-		private perUserFollowingChart: PerUserFollowingChart,
-	) {
-		super(meta, paramDef, async (ps, me) => {
-			return await this.perUserFollowingChart.getChart(ps.span, ps.limit, ps.offset ? new Date(ps.offset) : null, ps.userId);
-		});
-	}
+function projectChart(value: Awaited<ReturnType<StatisticsDependencies['charts']['userFollowing']['getChart']>>) {
+	return { local: { followings: { total: value.local.followings.total.map(item => item), inc: value.local.followings.inc.map(item => item), dec: value.local.followings.dec.map(item => item) }, followers: { total: value.local.followers.total.map(item => item), inc: value.local.followers.inc.map(item => item), dec: value.local.followers.dec.map(item => item) } }, remote: { followings: { total: value.remote.followings.total.map(item => item), inc: value.remote.followings.inc.map(item => item), dec: value.remote.followings.dec.map(item => item) }, followers: { total: value.remote.followers.total.map(item => item), inc: value.remote.followers.inc.map(item => item), dec: value.remote.followers.dec.map(item => item) } } };
 }

@@ -11,7 +11,7 @@ import type * as Sentry from '@sentry/node';
 import type * as SentryVue from '@sentry/vue';
 import type { RedisOptions as IoRedisRedisOptions } from 'ioredis';
 import type { RedisOptions as BullMqRedisOptions } from 'bullmq';
-import type { AccessLogConfiguration, LogFormat, LogLevelSetting } from './logging/types.js';
+import type { AccessLogConfiguration, LogFormat, LogLevelSetting } from '@features/runtime/backend/logging/types.js';
 
 type RedisOptionsRequiredFields = {
 	host: string;

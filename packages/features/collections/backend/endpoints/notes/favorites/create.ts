@@ -3,98 +3,51 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Inject, Injectable } from '@nestjs/common';
-import ms from '@/runtime-dependencies/ms.js';
-import type { NoteFavoritesRepository } from '@/models/_.js';
-import { IdService } from '@/core/IdService.js';
-import { Endpoint } from '@/server/api/endpoint-base.js';
-import { GetterService } from '@/server/api/GetterService.js';
-import { DI } from '@/di-symbols.js';
-import { AchievementService } from '@/core/AchievementService.js';
-import { NoteEntityService } from '@/core/entities/NoteEntityService.js';
-import { ApiError } from '@/server/api/error.js';
-
-export const meta = {
-	tags: ['notes', 'favorites'],
-
-	requireCredential: true,
-	prohibitMoved: true,
-
-	kind: 'write:favorites',
-
-	limit: {
-		duration: ms('1hour'),
-		max: 20,
-	},
-
-	errors: {
-		noSuchNote: {
-			message: 'No such note.',
-			code: 'NO_SUCH_NOTE',
-			id: '6dd26674-e060-4816-909a-45ba3f4da458',
-		},
-
-		alreadyFavorited: {
-			message: 'The note has already been marked as a favorite.',
-			code: 'ALREADY_FAVORITED',
-			id: 'a402c12b-34dd-41d2-97d8-4d2ffd96a1a6',
-		},
-	},
-} as const;
-
-export const paramDef = {
-	type: 'object',
-	properties: {
-		noteId: { type: 'string', format: 'misskey:id' },
-	},
-	required: ['noteId'],
-} as const;
-
-@Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
-	constructor(
-		@Inject(DI.noteFavoritesRepository)
-		private noteFavoritesRepository: NoteFavoritesRepository,
-
-		private idService: IdService,
-		private getterService: GetterService,
-		private achievementService: AchievementService,
-		private noteEntityService: NoteEntityService,
-	) {
-		super(meta, paramDef, async (ps, me) => {
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import type { ApiActor } from '@features/api/backend/transport/context.js';
+import { collectionsContract } from '../../../api.definition.js';
+import type { CollectionsDependencies } from '../../../api.implementation.js';
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
+import { collectionsErrors } from '../../../api.errors.js';
+export interface NotesFavoritesCreateDependencies<Actor extends ApiActor> {
+	getterService: Pick<CollectionsDependencies<Actor>['getterService'], 'getNote'>;
+	noteEntityService: Pick<CollectionsDependencies<Actor>['noteEntityService'], 'isVisibleForMe'>;
+	noteFavoritesRepository: Pick<CollectionsDependencies<Actor>['noteFavoritesRepository'], 'exists' | 'insert'>;
+	idService: Pick<CollectionsDependencies<Actor>['idService'], 'gen'>;
+	achievementService: Pick<CollectionsDependencies<Actor>['achievementService'], 'create'>;
+}
+export function createNotesFavoritesCreateProcedure<Actor extends ApiActor>(deps: NotesFavoritesCreateDependencies<Actor>) {
+	return createApiProcedure<Actor>()(collectionsContract.notesFavoritesCreate).use(requirePrincipal<Actor>())
+		.handler(async ({ input: ps, context }) => {
+			const me = context.principal;
 			// Get favoritee
-			const note = await this.getterService.getNote(ps.noteId).catch(err => {
-				if (err.id === '9725d0ce-ba28-4dde-95a7-2cbb2c15de24') throw new ApiError(meta.errors.noSuchNote);
+			const note = await deps.getterService.getNote(ps.noteId).catch(err => {
+				if (err !== null && typeof err === 'object' && 'id' in err && err.id === '9725d0ce-ba28-4dde-95a7-2cbb2c15de24') throw apiError(collectionsErrors.notesFavoritesCreate.noSuchNote);
 				throw err;
 			});
-
 			// check visibility
-			if (!await this.noteEntityService.isVisibleForMe(note, me.id)) {
-				throw new ApiError(meta.errors.noSuchNote);
+			if (!await deps.noteEntityService.isVisibleForMe(note, me.id)) {
+				throw apiError(collectionsErrors.notesFavoritesCreate.noSuchNote);
 			}
-
 			// if already favorited
-			const exist = await this.noteFavoritesRepository.exists({
+			const exist = await deps.noteFavoritesRepository.exists({
 				where: {
 					noteId: note.id,
 					userId: me.id,
 				},
 			});
-
 			if (exist) {
-				throw new ApiError(meta.errors.alreadyFavorited);
+				throw apiError(collectionsErrors.notesFavoritesCreate.alreadyFavorited);
 			}
-
 			// Create favorite
-			await this.noteFavoritesRepository.insert({
-				id: this.idService.gen(),
+			await deps.noteFavoritesRepository.insert({
+				id: deps.idService.gen(),
 				noteId: note.id,
 				userId: me.id,
 			});
-
 			if (note.userHost == null && note.userId !== me.id) {
-				this.achievementService.create(note.userId, 'myNoteFavorited1');
+				deps.achievementService.create(note.userId, 'myNoteFavorited1');
 			}
 		});
-	}
 }

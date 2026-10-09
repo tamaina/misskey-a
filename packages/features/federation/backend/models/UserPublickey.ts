@@ -4,8 +4,8 @@
  */
 
 import { PrimaryColumn, Entity, Index, JoinColumn, Column, OneToOne } from 'typeorm';
-import { id } from '@/models/util/id.js';
-import { MiUser } from '@/models/User.js';
+import { id } from '@features/persistence/backend/models/util/id.js';
+import { MiUser } from '@features/users/backend/models/User.js';
 
 @Entity('user_publickey')
 export class MiUserPublickey {

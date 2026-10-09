@@ -54,7 +54,7 @@ import type { CellAddress, CellValue, GridCell } from '@features/ui/frontend/com
 import type { GridContext, GridEvent } from '@features/ui/frontend/components/grid/grid-event.js';
 import type { GridColumn } from '@features/ui/frontend/components/grid/column.js';
 import type { GridRow, GridRowSetting } from '@features/ui/frontend/components/grid/row.js';
-import type { MenuItem } from '@/types/menu.js';
+import type { MenuItem } from '@features/navigation/frontend/types/menu.js';
 import { GridEventEmitter } from '@features/ui/frontend/components/grid/grid.js';
 import MkDataRow from '@features/ui/frontend/components/grid/MkDataRow.vue';
 import MkHeaderRow from '@features/ui/frontend/components/grid/MkHeaderRow.vue';
@@ -68,7 +68,7 @@ import {
 	pasteToGridFromClipboard,
 	removeDataFromGrid,
 } from '@features/ui/frontend/components/grid/grid-utils.js';
-import * as os from '@/os.js';
+import * as os from '@features/ui/frontend/os.js';
 import { createColumn } from '@features/ui/frontend/components/grid/column.js';
 import { createRow, defaultGridRowSetting, resetRow } from '@features/ui/frontend/components/grid/row.js';
 import { makeHotkey } from '@features/ui/frontend/utility/hotkey.js';

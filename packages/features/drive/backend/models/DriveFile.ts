@@ -4,8 +4,8 @@
  */
 
 import { PrimaryColumn, Entity, Index, JoinColumn, Column, ManyToOne } from 'typeorm';
-import { id } from '@/models/util/id.js';
-import { MiUser } from '@/models/User.js';
+import { id } from '@features/persistence/backend/models/util/id.js';
+import { MiUser } from '@features/users/backend/models/User.js';
 import { MiDriveFolder } from './DriveFolder.js';
 
 @Entity('drive_file')
@@ -182,7 +182,7 @@ export class MiDriveFile {
 		default: {},
 		nullable: true,
 	})
-	public requestHeaders: Record<string, string> | null;
+	public requestHeaders: Record<string, string | string[] | undefined> | null;
 
 	@Column('varchar', {
 		length: 128, nullable: true,

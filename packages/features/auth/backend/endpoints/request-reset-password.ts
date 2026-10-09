@@ -3,63 +3,41 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import ms from '@/runtime-dependencies/ms.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+
 import { IsNull } from 'typeorm';
-import { Inject, Injectable } from '@nestjs/common';
-import type { PasswordResetRequestsRepository, UserProfilesRepository, UsersRepository } from '@/models/_.js';
-import { Endpoint } from '@/server/api/endpoint-base.js';
-import { IdService } from '@/core/IdService.js';
+import type { PasswordResetRequestsRepository, UserProfilesRepository, UsersRepository } from '@features/persistence/backend/repositories/models.js';
+
+import { IdService } from '@features/runtime/backend/services/IdService.js';
 import type { Config } from '@/config.js';
-import { DI } from '@/di-symbols.js';
-import { EmailService } from '@/core/EmailService.js';
-import { L_CHARS, secureRndstr } from '@/misc/secure-rndstr.js';
+import { EmailService } from '@features/email/backend/services/EmailService.js';
+import { L_CHARS, secureRndstr } from '../utility/secure-rndstr.js';
+
+import { RequestResetPasswordContract } from '../api.definition.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
 
 export const meta = {
 	tags: ['reset password'],
 
-	requireCredential: false,
-
 	description: 'Request a users password to be reset.',
-
-	limit: {
-		duration: ms('1hour'),
-		max: 3,
-	},
 
 	errors: {
 
 	},
 } as const;
-
-export const paramDef = {
-	type: 'object',
-	properties: {
-		username: { type: 'string' },
-		email: { type: 'string' },
-	},
-	required: ['username', 'email'],
-} as const;
-
-@Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
-	constructor(
-		@Inject(DI.config)
-		private config: Config,
-
-		@Inject(DI.usersRepository)
-		private usersRepository: UsersRepository,
-
-		@Inject(DI.userProfilesRepository)
-		private userProfilesRepository: UserProfilesRepository,
-
-		@Inject(DI.passwordResetRequestsRepository)
-		private passwordResetRequestsRepository: PasswordResetRequestsRepository,
-
-		private idService: IdService,
-		private emailService: EmailService,
-	) {
-		super(meta, paramDef, async (ps, me) => {
-			const user = await this.usersRepository.findOneBy({
+export interface RequestResetPasswordDependencies {
+	config: Config;
+	usersRepository: UsersRepository;
+	userProfilesRepository: UserProfilesRepository;
+	passwordResetRequestsRepository: PasswordResetRequestsRepository;
+	idService: Pick<IdService, 'gen'>;
+	emailService: Pick<EmailService, 'sendEmail'>;
+}
+export function createRequestResetPasswordProcedure(deps: RequestResetPasswordDependencies) {
+	return createApiProcedure<MiLocalUser>()(RequestResetPasswordContract).handler(async ({ input, context }) => {
+		const ps = input;
+		const result = await (async () => {
+			const user = await deps.usersRepository.findOneBy({
 				usernameLower: ps.username.toLowerCase(),
 				host: IsNull(),
 			});
@@ -69,7 +47,7 @@ export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDe
 				return;
 			}
 
-			const profile = await this.userProfilesRepository.findOneByOrFail({ userId: user.id });
+			const profile = await deps.userProfilesRepository.findOneByOrFail({ userId: user.id });
 
 			// 合致するメアドが登録されていなかったら無視
 			if (profile.email !== ps.email) {
@@ -83,17 +61,18 @@ export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDe
 
 			const token = secureRndstr(64, { chars: L_CHARS });
 
-			await this.passwordResetRequestsRepository.insert({
-				id: this.idService.gen(),
+			await deps.passwordResetRequestsRepository.insert({
+				id: deps.idService.gen(),
 				userId: profile.userId,
 				token,
 			});
 
-			const link = `${this.config.url}/reset-password/${token}`;
+			const link = `${deps.config.url}/reset-password/${token}`;
 
-			this.emailService.sendEmail(ps.email, 'Password reset requested',
+			deps.emailService.sendEmail(ps.email, 'Password reset requested',
 				`To reset password, please click this link:<br><a href="${link}">${link}</a>`,
 				`To reset password, please click this link: ${link}`);
-		});
-	}
+		})();
+		return result;
+	});
 }

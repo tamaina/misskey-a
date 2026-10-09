@@ -10,7 +10,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script lang="ts" setup>
 import { onMounted, onUnmounted, useTemplateRef } from 'vue';
 import { Chart } from 'chart.js';
-import { themeManager } from '@/theme.js';
+import { themeManager } from '@features/preferences/frontend/theme.js';
 import { useChartTooltip } from '@features/statistics/frontend/composables/use-chart-tooltip.js';
 import { initChart } from '@features/statistics/frontend/utility/init-chart.js';
 

@@ -4,7 +4,7 @@
  */
 
 import { Column, Entity, Index, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
-import { id } from '@/models/util/id.js';
+import { id } from '@features/persistence/backend/models/util/id.js';
 import { MiUser } from './User.js';
 
 @Entity('user_memo')

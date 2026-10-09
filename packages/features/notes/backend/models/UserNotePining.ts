@@ -4,9 +4,9 @@
  */
 
 import { PrimaryColumn, Entity, Index, JoinColumn, Column, ManyToOne } from 'typeorm';
-import { id } from '@/models/util/id.js';
+import { id } from '@features/persistence/backend/models/util/id.js';
 import { MiNote } from './Note.js';
-import { MiUser } from '@/models/User.js';
+import { MiUser } from '@features/users/backend/models/User.js';
 
 @Entity('user_note_pining')
 @Index(['userId', 'noteId'], { unique: true })

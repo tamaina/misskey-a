@@ -3,228 +3,47 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Inject, Injectable } from '@nestjs/common';
-import type { DriveFilesRepository, UsersRepository } from '@/models/_.js';
-import { Endpoint } from '@/server/api/endpoint-base.js';
-import { DI } from '@/di-symbols.js';
-import { RoleService } from '@/core/RoleService.js';
-import { IdService } from '@/core/IdService.js';
-import { ApiError } from '@/server/api/error.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+import { toRequestHeaders } from '../../../management.schema.js';
+import { adminDriveShowFileErrors } from './show-file.contract.js';
+import type { DriveFileSelectorRepository } from '../../../selector.repository.js';
+import type { UsersRepository } from '@features/persistence/backend/repositories/models.js';
+import { RoleService } from '@features/roles/backend/services/RoleService.js';
+import { IdService } from '@features/runtime/backend/services/IdService.js';
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
+import { driveManagementContract } from '../../../api.definition.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
 
-export const meta = {
-	tags: ['admin'],
-
-	requireCredential: true,
-	requireModerator: true,
-	kind: 'read:admin:drive',
-
-	errors: {
-		noSuchFile: {
-			message: 'No such file.',
-			code: 'NO_SUCH_FILE',
-			id: 'caf3ca38-c6e5-472e-a30c-b05377dcc240',
-		},
-	},
-
-	res: {
-		type: 'object',
-		optional: false, nullable: false,
-		properties: {
-			id: {
-				type: 'string',
-				optional: false, nullable: false,
-				format: 'id',
-				example: 'xxxxxxxxxx',
-			},
-			createdAt: {
-				type: 'string',
-				optional: false, nullable: false,
-				format: 'date-time',
-			},
-			userId: {
-				type: 'string',
-				optional: false, nullable: true,
-				format: 'id',
-				example: 'xxxxxxxxxx',
-			},
-			userHost: {
-				type: 'string',
-				optional: false, nullable: true,
-				description: 'The local host is represented with `null`.',
-			},
-			md5: {
-				type: 'string',
-				optional: false, nullable: false,
-				format: 'md5',
-				example: '15eca7fba0480996e2245f5185bf39f2',
-			},
-			name: {
-				type: 'string',
-				optional: false, nullable: false,
-				example: '192.jpg',
-			},
-			type: {
-				type: 'string',
-				optional: false, nullable: false,
-				example: 'image/jpeg',
-			},
-			size: {
-				type: 'number',
-				optional: false, nullable: false,
-				example: 51469,
-			},
-			comment: {
-				type: 'string',
-				optional: false, nullable: true,
-			},
-			blurhash: {
-				type: 'string',
-				optional: false, nullable: true,
-			},
-			properties: {
-				type: 'object',
-				optional: false, nullable: false,
-				properties: {
-					width: {
-						type: 'number',
-						optional: true, nullable: false,
-					},
-					height: {
-						type: 'number',
-						optional: true, nullable: false,
-					},
-					orientation: {
-						type: 'number',
-						optional: true, nullable: false,
-					},
-					avgColor: {
-						type: 'string',
-						optional: true, nullable: false,
-					},
-				},
-			},
-			storedInternal: {
-				type: 'boolean',
-				optional: false, nullable: true,
-				example: true,
-			},
-			url: {
-				type: 'string',
-				optional: false, nullable: true,
-				format: 'url',
-			},
-			thumbnailUrl: {
-				type: 'string',
-				optional: false, nullable: true,
-				format: 'url',
-			},
-			webpublicUrl: {
-				type: 'string',
-				optional: false, nullable: true,
-				format: 'url',
-			},
-			accessKey: {
-				type: 'string',
-				optional: false, nullable: true,
-			},
-			thumbnailAccessKey: {
-				type: 'string',
-				optional: false, nullable: true,
-			},
-			webpublicAccessKey: {
-				type: 'string',
-				optional: false, nullable: true,
-			},
-			uri: {
-				type: 'string',
-				optional: false, nullable: true,
-			},
-			src: {
-				type: 'string',
-				optional: false, nullable: true,
-			},
-			folderId: {
-				type: 'string',
-				optional: false, nullable: true,
-				format: 'id',
-				example: 'xxxxxxxxxx',
-			},
-			isSensitive: {
-				type: 'boolean',
-				optional: false, nullable: false,
-			},
-			isLink: {
-				type: 'boolean',
-				optional: false, nullable: false,
-			},
-			maybeSensitive: {
-				type: 'boolean',
-				optional: false, nullable: false,
-			},
-			maybePorn: {
-				type: 'boolean',
-				optional: false, nullable: false,
-			},
-			requestIp: {
-				type: 'string',
-				optional: false, nullable: true,
-			},
-			requestHeaders: {
-				type: 'object',
-				optional: false, nullable: true,
-			},
-		},
-	},
-} as const;
-
-export const paramDef = {
-	anyOf: [
-		{
-			type: 'object',
-			properties: {
-				fileId: { type: 'string', format: 'misskey:id' },
-			},
-			required: ['fileId'],
-		},
-		{
-			type: 'object',
-			properties: {
-				url: { type: 'string' },
-			},
-			required: ['url'],
-		},
-	],
-} as const;
-
-@Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
-	constructor(
-		@Inject(DI.driveFilesRepository)
-		private driveFilesRepository: DriveFilesRepository,
-
-		@Inject(DI.usersRepository)
-		private usersRepository: UsersRepository,
-
-		private roleService: RoleService,
-		private idService: IdService,
-	) {
-		super(meta, paramDef, async (ps, me) => {
-			const file = await this.driveFilesRepository.findOneBy(
-				'fileId' in ps
+export interface AdminDriveShowFileDependencies {
+	driveFileSelectorRepository: DriveFileSelectorRepository;
+	usersRepository: UsersRepository;
+	roleService: Pick<RoleService, 'isModerator'>;
+	idService: Pick<IdService, 'parse'>;
+}
+export function createAdminDriveShowFileProcedure(deps: AdminDriveShowFileDependencies) {
+	return createApiProcedure<MiLocalUser>()(driveManagementContract['admin/drive/show-file']).use(requirePrincipal<MiLocalUser>())
+		.handler(async ({ input, context }) => {
+			const ps = input;
+			const me = context.principal;
+			const _ip = context.ip;
+			const _headers = context.headers;
+			const file = await deps.driveFileSelectorRepository.findOneBy(
+				ps.fileId !== undefined
 					? { id: ps.fileId }
 					: [{ url: ps.url }, { thumbnailUrl: ps.url }, { webpublicUrl: ps.url }],
 			);
 
 			if (file == null) {
-				throw new ApiError(meta.errors.noSuchFile);
+				throw apiError(adminDriveShowFileErrors.noSuchFile);
 			}
 
-			const owner = file.userId ? await this.usersRepository.findOneByOrFail({
+			const owner = file.userId ? await deps.usersRepository.findOneByOrFail({
 				id: file.userId,
 			}) : null;
 
-			const iAmModerator = await this.roleService.isModerator(me);
-			const ownerIsModerator = owner ? await this.roleService.isModerator(owner) : false;
+			const iAmModerator = await deps.roleService.isModerator(me);
+			const ownerIsModerator = owner ? await deps.roleService.isModerator(owner) : false;
 
 			return {
 				id: file.id,
@@ -245,17 +64,21 @@ export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDe
 				thumbnailUrl: file.thumbnailUrl,
 				url: file.url,
 				storedInternal: file.storedInternal,
-				properties: file.properties,
+				properties: {
+					width: file.properties.width,
+					height: file.properties.height,
+					orientation: file.properties.orientation,
+					avgColor: file.properties.avgColor,
+				},
 				blurhash: file.blurhash,
 				comment: file.comment,
 				size: file.size,
 				type: file.type,
 				name: file.name,
 				md5: file.md5,
-				createdAt: this.idService.parse(file.id).date.toISOString(),
+				createdAt: deps.idService.parse(file.id).date.toISOString(),
 				requestIp: iAmModerator ? file.requestIp : null,
-				requestHeaders: iAmModerator && !ownerIsModerator ? file.requestHeaders : null,
+				requestHeaders: iAmModerator && !ownerIsModerator ? toRequestHeaders(file.requestHeaders) : null,
 			};
 		});
-	}
 }

@@ -3,73 +3,54 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Inject, Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
-import { DI } from '@/di-symbols.js';
-import { ChatService } from '@/core/ChatService.js';
-import { ChatEntityService } from '@/core/entities/ChatEntityService.js';
-import { ApiError } from '@/server/api/error.js';
+import { toPackedChatMessage } from '../../api.dto.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 
-export const meta = {
-	tags: ['chat'],
+import type { InferSchemaOutput } from '@orpc/contract';
 
-	requireCredential: true,
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import { type ChatService } from '../../services/ChatService.js';
+import { type ChatEntityService } from '../../serializers/ChatEntityService.js';
+import { chatHistoryContract } from './history.contract.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
 
-	kind: 'read:chat',
-
-	res: {
-		type: 'array',
-		optional: false, nullable: false,
-		items: {
-			type: 'object',
-			optional: false, nullable: false,
-			ref: 'ChatMessage',
-		},
-	},
-
-	errors: {
-	},
-} as const;
-
-export const paramDef = {
-	type: 'object',
-	properties: {
-		limit: { type: 'integer', minimum: 1, maximum: 100, default: 10 },
-		room: { type: 'boolean', default: false },
-	},
-} as const;
-
-@Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
-	constructor(
-		private chatEntityService: ChatEntityService,
-		private chatService: ChatService,
-	) {
-		super(meta, paramDef, async (ps, me) => {
-			await this.chatService.checkChatAvailability(me.id, 'read');
-
-			const history = ps.room ? await this.chatService.roomHistory(me.id, ps.limit) : await this.chatService.userHistory(me.id, ps.limit);
-
-			const packedMessages = await this.chatEntityService.packMessagesDetailed(history, me);
-
-			if (ps.room) {
-				const roomIds = history.map(m => m.toRoomId!);
-				const readStateMap = await this.chatService.getRoomReadStateMap(me.id, roomIds);
-
-				for (const message of packedMessages) {
-					message.isRead = readStateMap[message.toRoomId!] ?? false;
-				}
-			} else {
-				const otherIds = history.map(m => m.fromUserId === me.id ? m.toUserId! : m.fromUserId!);
-				const readStateMap = await this.chatService.getUserReadStateMap(me.id, otherIds);
-
-				for (const message of packedMessages) {
-					const otherId = message.fromUserId === me.id ? message.toUserId! : message.fromUserId!;
-					message.isRead = readStateMap[otherId] ?? false;
-				}
-			}
-
-			return packedMessages;
-		});
+export interface ChatHistoryDependencies {
+	chatEntityService: ChatEntityService;
+	chatService: ChatService;
+}
+export function createChatHistoryProcedure(deps: ChatHistoryDependencies) {
+	async function execute(ps: InferSchemaOutput<NonNullable<typeof chatHistoryContract['~orpc']['inputSchema']>>, me: MiLocalUser): Promise<InferSchemaOutput<NonNullable<typeof chatHistoryContract['~orpc']['outputSchema']>>> {
+		return (await run(ps, me)).map(toPackedChatMessage);
 	}
+
+	async function run(ps: InferSchemaOutput<NonNullable<typeof chatHistoryContract['~orpc']['inputSchema']>>, me: MiLocalUser) {
+		await deps.chatService.checkChatAvailability(me.id, 'read');
+
+		const history = ps.room ? await deps.chatService.roomHistory(me.id, ps.limit) : await deps.chatService.userHistory(me.id, ps.limit);
+
+		const packedMessages = await deps.chatEntityService.packMessagesDetailed(history, me);
+
+		if (ps.room) {
+			const roomIds = history.map(m => m.toRoomId!);
+			const readStateMap = await deps.chatService.getRoomReadStateMap(me.id, roomIds);
+
+			for (const message of packedMessages) {
+				message.isRead = readStateMap[message.toRoomId!] ?? false;
+			}
+		} else {
+			const otherIds = history.map(m => m.fromUserId === me.id ? m.toUserId! : m.fromUserId!);
+			const readStateMap = await deps.chatService.getUserReadStateMap(me.id, otherIds);
+
+			for (const message of packedMessages) {
+				const otherId = message.fromUserId === me.id ? message.toUserId! : message.fromUserId!;
+				message.isRead = readStateMap[otherId] ?? false;
+			}
+		}
+
+		return packedMessages;
+	}
+
+	return createApiProcedure<MiLocalUser>()(chatHistoryContract)
+		.use(requirePrincipal<MiLocalUser>())
+		.handler(({ input, context }) => execute(input, context.principal));
 }

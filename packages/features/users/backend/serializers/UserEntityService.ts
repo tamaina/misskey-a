@@ -5,16 +5,19 @@
 
 import { Inject, Injectable } from '@nestjs/common';
 import * as Redis from 'ioredis';
-import { Ajv } from 'ajv';
+import * as v from 'valibot';
 import { ModuleRef } from '@nestjs/core';
 import { In } from 'typeorm';
 import { DI } from '@/di-symbols.js';
 import type { Config } from '@/config.js';
-import type { Packed } from '@/misc/json-schema.js';
-import type { Promiseable } from '@/misc/prelude/await-all.js';
-import { awaitAll } from '@/misc/prelude/await-all.js';
-import { USER_ACTIVE_THRESHOLD, USER_ONLINE_THRESHOLD } from '@/const.js';
-import type { MiLocalUser, MiPartialLocalUser, MiPartialRemoteUser, MiRemoteUser, MiUser } from '@/models/User.js';
+import type { Packed } from '@features/index/backend/packed.schema.js';
+import type { NativeUserLite, NativeUserDetailedNotMe, NativeMeDetailed, NativeUserDetailed, NativePackedUser, UserPackSchema } from './native-user.js';
+import type { MiAnnouncement } from '@features/announcements/backend/models/Announcement.js';
+import type { MiUserSecurityKey } from '@features/auth/backend/models/UserSecurityKey.js';
+import type { Promiseable } from '@features/runtime/backend/async/await-all.js';
+import { awaitAll } from '@features/runtime/backend/async/await-all.js';
+import { USER_ACTIVE_THRESHOLD, USER_ONLINE_THRESHOLD } from '../presence-constants.js';
+import type { MiLocalUser, MiPartialLocalUser, MiPartialRemoteUser, MiRemoteUser, MiUser } from '../models/User.js';
 import {
 	birthdaySchema,
 	descriptionSchema,
@@ -22,7 +25,7 @@ import {
 	locationSchema,
 	nameSchema,
 	passwordSchema,
-} from '@/models/User.js';
+} from '../user-validation.schema.js';
 import type {
 	BlockingsRepository,
 	FollowingsRepository,
@@ -38,22 +41,20 @@ import type {
 	UserProfilesRepository,
 	UserSecurityKeysRepository,
 	UsersRepository,
-} from '@/models/_.js';
-import { bindThis } from '@/decorators.js';
-import { RoleService } from '@/core/RoleService.js';
-import { ApPersonService } from '@/core/activitypub/models/ApPersonService.js';
-import { FederatedInstanceService } from '@/core/FederatedInstanceService.js';
-import { IdService } from '@/core/IdService.js';
-import type { AnnouncementService } from '@/core/AnnouncementService.js';
-import type { CustomEmojiService } from '@/core/CustomEmojiService.js';
-import { AvatarDecorationService } from '@/core/AvatarDecorationService.js';
-import { ChatService } from '@/core/ChatService.js';
+} from '@features/persistence/backend/repositories/models.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
+import { RoleService } from '@features/roles/backend/services/RoleService.js';
+import { ApPersonService } from '@features/federation/backend/services/ApPersonService.js';
+import { FederatedInstanceService } from '@features/federation/backend/services/FederatedInstanceService.js';
+import { IdService } from '@features/runtime/backend/services/IdService.js';
+import type { AnnouncementService } from '@features/announcements/backend/services/AnnouncementService.js';
+import type { CustomEmojiService } from '@features/emojis/backend/services/CustomEmojiService.js';
+import { AvatarDecorationService } from '@features/avatar-decorations/backend/services/AvatarDecorationService.js';
+import { ChatService } from '@features/chat/backend/services/ChatService.js';
 import type { OnModuleInit } from '@nestjs/common';
-import type { NoteEntityService } from '@/core/entities/NoteEntityService.js';
-import type { PageEntityService } from '@/core/entities/PageEntityService.js';
-import { toArray } from '@/misc/prelude/array.js';
-
-const ajv = new Ajv();
+import type { NoteEntityService } from '@features/notes/backend/serializers/NoteEntityService.js';
+import type { PageEntityService } from '@features/pages/backend/serializers/PageEntityService.js';
+import { toArray } from '@features/runtime/backend/data/array.js';
 
 function isLocalUser(user: MiUser): user is MiLocalUser;
 function isLocalUser<T extends { host: MiUser['host'] }>(user: T): user is (T & { host: null; });
@@ -81,6 +82,14 @@ export type UserRelation = {
 	isMuted: boolean
 	isRenoteMuted: boolean
 };
+
+type UserPackHints = {
+	userProfile?: MiUserProfile;
+	userRelations?: Map<MiUser['id'], UserRelation>;
+	userMemos?: Map<MiUser['id'], string | null>;
+	pinNotes?: Map<MiUser['id'], MiUserNotePining[]>;
+};
+type UserPackOptions<S extends UserPackSchema> = UserPackHints & { schema: S; includeSecrets?: false };
 
 @Injectable()
 export class UserEntityService implements OnModuleInit {
@@ -153,12 +162,12 @@ export class UserEntityService implements OnModuleInit {
 	}
 
 	//#region Validators
-	public validateLocalUsername = ajv.compile(localUsernameSchema);
-	public validatePassword = ajv.compile(passwordSchema);
-	public validateName = ajv.compile(nameSchema);
-	public validateDescription = ajv.compile(descriptionSchema);
-	public validateLocation = ajv.compile(locationSchema);
-	public validateBirthday = ajv.compile(birthdaySchema);
+	public validateLocalUsername = (value: unknown): boolean => v.safeParse(localUsernameSchema, value).success;
+	public validatePassword = (value: unknown): boolean => v.safeParse(passwordSchema, value).success;
+	public validateName = (value: unknown): boolean => v.safeParse(nameSchema, value).success;
+	public validateDescription = (value: unknown): boolean => v.safeParse(descriptionSchema, value).success;
+	public validateLocation = (value: unknown): boolean => v.safeParse(locationSchema, value).success;
+	public validateBirthday = (value: unknown): boolean => v.safeParse(birthdaySchema, value).success;
 	//#endregion
 
 	public isLocalUser = isLocalUser;
@@ -404,29 +413,35 @@ export class UserEntityService implements OnModuleInit {
 		return `${this.config.url}/users/${userId}`;
 	}
 
-	public async pack<S extends 'MeDetailed' | 'UserDetailedNotMe' | 'UserDetailed' | 'UserLite' = 'UserLite'>(
+	public pack(src: MiUser['id'] | MiUser, me?: { id: MiUser['id'] } | null, options?: UserPackHints & { schema?: 'UserLite'; includeSecrets?: false }): Promise<NativeUserLite>;
+	public pack<S extends UserPackSchema, Viewer extends { id: MiUser['id'] } | null | undefined>(
 		src: MiUser['id'] | MiUser,
-		me?: { id: MiUser['id']; } | null | undefined,
-		options?: {
-			schema?: S,
-			includeSecrets?: boolean,
-			userProfile?: MiUserProfile,
-			userRelations?: Map<MiUser['id'], UserRelation>,
-			userMemos?: Map<MiUser['id'], string | null>,
-			pinNotes?: Map<MiUser['id'], MiUserNotePining[]>,
-		},
-	): Promise<Packed<S>> {
-		const opts = Object.assign({
-			schema: 'UserLite',
-			includeSecrets: false,
-		}, options);
+		me: Viewer,
+		options: UserPackOptions<S>,
+	): Promise<NativePackedUser<S, Viewer>>;
+	public pack(src: MiUser['id'] | MiUser, me?: { id: MiUser['id'] } | null, options?: UserPackHints & { schema?: UserPackSchema; includeSecrets?: false }): Promise<NativeUserLite | NativeUserDetailed> {
+		return this.packInternal(src, me, { ...options, mode: 'general', schema: options?.schema ?? 'UserLite', includeSecrets: options?.includeSecrets ?? false });
+	}
 
+	/** Explicit self capability; every secret-producing caller supplies its authenticated/created user. */
+	public async packSelf(src: MiUser['id'] | MiUser, options?: UserPackHints & { includeSecrets?: boolean }): Promise<NativeMeDetailed> {
+		const user = typeof src === 'object' ? src : await this.usersRepository.findOneByOrFail({ id: src });
+		return this.packInternal(user, user, { ...options, mode: 'self', schema: 'MeDetailed', includeSecrets: options?.includeSecrets ?? false });
+	}
+
+	private packInternal(src: MiUser['id'] | MiUser, me: { id: MiUser['id'] } | null | undefined, opts: UserPackHints & { mode: 'self'; schema: 'MeDetailed'; includeSecrets: boolean }): Promise<NativeMeDetailed>;
+	private packInternal(src: MiUser['id'] | MiUser, me: { id: MiUser['id'] } | null | undefined, opts: UserPackHints & { mode: 'general'; schema: UserPackSchema; includeSecrets: false }): Promise<NativeUserLite | NativeUserDetailed>;
+	private async packInternal(
+		src: MiUser['id'] | MiUser,
+		me: { id: MiUser['id'] } | null | undefined,
+		opts: UserPackHints & { mode: 'self' | 'general'; schema: UserPackSchema; includeSecrets: boolean },
+	): Promise<NativeUserLite | NativeUserDetailed> {
 		const user = typeof src === 'object' ? src : await this.usersRepository.findOneByOrFail({ id: src });
 
 		const isDetailed = opts.schema !== 'UserLite';
 		const meId = me ? me.id : null;
 		const isMe = meId === user.id;
-		const iAmModerator = me ? await this.roleService.isModerator(me as MiUser) : false;
+		const iAmModerator = me ? await this.roleService.isModerator(me) : false;
 
 		const profile = isDetailed
 			? (opts.userProfile ?? await this.userProfilesRepository.findOneByOrFail({ userId: user.id }))
@@ -477,15 +492,14 @@ export class UserEntityService implements OnModuleInit {
 		const isModerator = isMe && isDetailed ? this.roleService.isModerator(user) : undefined;
 		const isAdmin = isMe && isDetailed ? this.roleService.isAdministrator(user) : undefined;
 		const unreadAnnouncements = isMe && isDetailed ?
-			(await this.announcementService.getUnreadAnnouncements(user)).map((announcement) => ({
+			(await this.announcementService.getUnreadAnnouncements(user)).map((announcement: Omit<MiAnnouncement, 'user'>) => ({
 				createdAt: this.idService.parse(announcement.id).date.toISOString(),
 				...announcement,
 			})) : null;
 
 		const notificationsInfo = isMe && isDetailed ? await this.getNotificationsInfo(user.id) : null;
 
-		// TODO: 例えば avatarUrl: true など間違った型を設定しても型エラーにならないのをどうにかする(ジェネリクス使わない方法で実装するしかなさそう？)
-		const packed = {
+		const base = {
 			id: user.id,
 			name: user.name,
 			username: user.username,
@@ -525,121 +539,61 @@ export class UserEntityService implements OnModuleInit {
 					displayOrder: r.displayOrder,
 				})),
 			) : undefined,
+		} satisfies Promiseable<NativeUserLite>;
+		if (!isDetailed) return await awaitAll(base);
+		if (profile === null) throw new Error('Detailed user serialization requires its fetched profile');
 
-			...(isDetailed ? {
-				url: profile!.url,
-				uri: user.uri,
-				movedTo: user.movedToUri ? this.apPersonService.resolvePerson(user.movedToUri).then(user => user.id).catch(() => null) : null,
-				alsoKnownAs: user.alsoKnownAs ?
-					Promise.all(toArray(user.alsoKnownAs).map(uri => this.apPersonService.fetchPerson(uri).then(user => user?.id).catch(() => null)))
-				.then(xs => xs.length === 0 ? null : xs.filter(x => x != null))
-				: null,
-				createdAt: this.idService.parse(user.id).date.toISOString(),
-				updatedAt: user.updatedAt ? user.updatedAt.toISOString() : null,
-				lastFetchedAt: user.lastFetchedAt ? user.lastFetchedAt.toISOString() : null,
-				bannerUrl: user.bannerId == null ? null : user.bannerUrl,
-				bannerBlurhash: user.bannerId == null ? null : user.bannerBlurhash,
-				isLocked: user.isLocked,
-				isSilenced: this.roleService.getUserPolicies(user.id).then(r => !r.canPublicNote),
-				isSuspended: user.isSuspended,
-				description: profile!.description,
-				location: profile!.location,
-				birthday: profile!.birthday,
-				lang: profile!.lang,
-				fields: profile!.fields,
-				verifiedLinks: profile!.verifiedLinks,
-				followersCount: followersCount ?? 0,
-				followingCount: followingCount ?? 0,
-				notesCount: user.notesCount,
-				pinnedNoteIds: pins.map(pin => pin.noteId),
-				pinnedNotes: this.noteEntityService.packMany(pins.map(pin => pin.note!), me, {
-					detail: true,
-				}),
-				pinnedPageId: profile!.pinnedPageId,
-				pinnedPage: profile!.pinnedPageId ? this.pageEntityService.pack(profile!.pinnedPageId, me) : null,
-				publicReactions: this.isLocalUser(user) ? profile!.publicReactions : false, // https://github.com/misskey-dev/misskey/issues/12964
-				followersVisibility: profile!.followersVisibility,
-				followingVisibility: profile!.followingVisibility,
-				chatScope: user.chatScope,
-				canChat: this.roleService.getUserPolicies(user.id).then(r => r.chatAvailability === 'available'),
-				roles: this.roleService.getUserRoles(user.id).then(roles => roles.filter(role => role.isPublic).sort((a, b) => b.displayOrder - a.displayOrder).map(role => ({
-					id: role.id,
-					name: role.name,
-					color: role.color,
-					iconUrl: role.iconUrl,
-					description: role.description,
-					isModerator: role.isModerator,
-					isAdministrator: role.isAdministrator,
-					displayOrder: role.displayOrder,
-				}))),
-				memo: memo,
-				moderationNote: iAmModerator ? (profile!.moderationNote ?? '') : undefined,
-			} : {}),
-
-			...(isDetailed && (isMe || iAmModerator) ? {
-				twoFactorEnabled: profile!.twoFactorEnabled,
-				usePasswordLessLogin: profile!.usePasswordLessLogin,
-				securityKeys: profile!.twoFactorEnabled
-					? this.userSecurityKeysRepository.countBy({ userId: user.id }).then(result => result >= 1)
-					: false,
-			} : {}),
-
-			...(isDetailed && isMe ? {
-				avatarId: user.avatarId,
-				bannerId: user.bannerId,
-				followedMessage: profile!.followedMessage,
-				isModerator: isModerator,
-				isAdmin: isAdmin,
-				injectFeaturedNote: profile!.injectFeaturedNote,
-				receiveAnnouncementEmail: profile!.receiveAnnouncementEmail,
-				alwaysMarkNsfw: profile!.alwaysMarkNsfw,
-				autoSensitive: profile!.autoSensitive,
-				carefulBot: profile!.carefulBot,
-				autoAcceptFollowed: profile!.autoAcceptFollowed,
-				noCrawle: profile!.noCrawle,
-				preventAiLearning: profile!.preventAiLearning,
-				isExplorable: user.isExplorable,
-				isDeleted: user.isDeleted,
-				twoFactorBackupCodesStock: profile?.twoFactorBackupSecret?.length === 5 ? 'full' : (profile?.twoFactorBackupSecret?.length ?? 0) > 0 ? 'partial' : 'none',
-				hideOnlineStatus: user.hideOnlineStatus,
-				hasUnreadSpecifiedNotes: false, // 後方互換性のため
-				hasUnreadMentions: false, // 後方互換性のため
-				hasUnreadChatMessages: this.chatService.hasUnreadMessages(user.id),
-				hasUnreadAnnouncement: unreadAnnouncements!.length > 0,
-				unreadAnnouncements,
-				hasUnreadAntenna: this.getHasUnreadAntenna(user.id),
-				hasUnreadChannel: false, // 後方互換性のため
-				hasUnreadNotification: notificationsInfo?.hasUnread, // 後方互換性のため
-				hasPendingReceivedFollowRequest: this.getHasPendingReceivedFollowRequest(user.id),
-				unreadNotificationsCount: notificationsInfo?.unreadCount,
-				mutedWords: profile!.mutedWords,
-				hardMutedWords: profile!.hardMutedWords,
-				mutedInstances: profile!.mutedInstances,
-				mutingNotificationTypes: [], // 後方互換性のため
-				notificationRecieveConfig: profile!.notificationRecieveConfig,
-				emailNotificationTypes: profile!.emailNotificationTypes,
-				achievements: profile!.achievements,
-				loggedInDays: profile!.loggedInDates.length,
-				policies: this.roleService.getUserPolicies(user.id),
-			} : {}),
-
-			...(opts.includeSecrets ? {
-				email: profile!.email,
-				emailVerified: profile!.emailVerified,
-				securityKeysList: profile!.twoFactorEnabled
-					? this.userSecurityKeysRepository.find({
-						where: {
-							userId: user.id,
-						},
-						select: {
-							id: true,
-							name: true,
-							lastUsed: true,
-						},
-					})
-					: [],
-			} : {}),
-
+		const detailed = {
+			...base,
+			url: profile!.url,
+			uri: user.uri,
+			movedTo: user.movedToUri ? this.apPersonService.resolvePerson(user.movedToUri).then(user => user.id).catch(() => null) : null,
+			alsoKnownAs: user.alsoKnownAs ?
+				Promise.all(toArray(user.alsoKnownAs).map(uri => this.apPersonService.fetchPerson(uri).then(user => user?.id).catch(() => null)))
+			.then(xs => xs.length === 0 ? null : xs.filter(x => x != null))
+			: null,
+			createdAt: this.idService.parse(user.id).date.toISOString(),
+			updatedAt: user.updatedAt ? user.updatedAt.toISOString() : null,
+			lastFetchedAt: user.lastFetchedAt ? user.lastFetchedAt.toISOString() : null,
+			bannerUrl: user.bannerId == null ? null : user.bannerUrl,
+			bannerBlurhash: user.bannerId == null ? null : user.bannerBlurhash,
+			isLocked: user.isLocked,
+			isSilenced: this.roleService.getUserPolicies(user.id).then(r => !r.canPublicNote),
+			isSuspended: user.isSuspended,
+			description: profile!.description,
+			location: profile!.location,
+			birthday: profile!.birthday,
+			lang: profile!.lang,
+			fields: profile!.fields,
+			verifiedLinks: profile!.verifiedLinks,
+			followersCount: followersCount ?? 0,
+			followingCount: followingCount ?? 0,
+			notesCount: user.notesCount,
+			pinnedNoteIds: pins.map(pin => pin.noteId),
+			pinnedNotes: this.noteEntityService.packMany(pins.map(pin => pin.note!), me, {
+				detail: true,
+			}),
+			pinnedPageId: profile!.pinnedPageId,
+			pinnedPage: profile!.pinnedPageId ? this.pageEntityService.pack(profile!.pinnedPageId, me) : null,
+			publicReactions: this.isLocalUser(user) ? profile!.publicReactions : false, // https://github.com/misskey-dev/misskey/issues/12964
+			followersVisibility: profile!.followersVisibility,
+			followingVisibility: profile!.followingVisibility,
+			chatScope: user.chatScope,
+			canChat: this.roleService.getUserPolicies(user.id).then(r => r.chatAvailability === 'available'),
+			roles: this.roleService.getUserRoles(user.id).then(roles => roles.filter(role => role.isPublic).sort((a, b) => b.displayOrder - a.displayOrder).map(role => ({
+				id: role.id,
+				name: role.name,
+				color: role.color,
+				iconUrl: role.iconUrl,
+				description: role.description,
+				isModerator: role.isModerator,
+				isAdministrator: role.isAdministrator,
+				displayOrder: role.displayOrder,
+			}))),
+			memo: memo,
+			moderationNote: iAmModerator ? (profile!.moderationNote ?? '') : undefined,
+		} satisfies Promiseable<NativeUserDetailedNotMe>;
+		const relationFields = {
 			...(relation ? {
 				isFollowing: relation.isFollowing,
 				isFollowed: relation.isFollowed,
@@ -653,19 +607,88 @@ export class UserEntityService implements OnModuleInit {
 				withReplies: relation.following?.withReplies ?? false,
 				followedMessage: relation.isFollowing ? profile!.followedMessage : undefined,
 			} : {}),
-		} as Promiseable<Packed<S>>;
-
-		return await awaitAll(packed);
+		};
+		const securityFields = () => ({
+			twoFactorEnabled: profile!.twoFactorEnabled,
+			usePasswordLessLogin: profile!.usePasswordLessLogin,
+			securityKeys: profile!.twoFactorEnabled
+				? this.userSecurityKeysRepository.countBy({ userId: user.id }).then(result => result >= 1)
+				: false,
+		});
+		if (!isMe) {
+			return await awaitAll(iAmModerator ? { ...detailed, ...securityFields(), ...relationFields } : { ...detailed, ...relationFields });
+		}
+		if (unreadAnnouncements === null || notificationsInfo === null || isModerator === undefined || isAdmin === undefined) {
+			throw new Error('Self user serialization requires its fetched self state');
+		}
+		const self = {
+			...detailed,
+			...securityFields(),
+			avatarId: user.avatarId,
+			bannerId: user.bannerId,
+			followedMessage: profile!.followedMessage,
+			isModerator: isModerator,
+			isAdmin: isAdmin,
+			injectFeaturedNote: profile!.injectFeaturedNote,
+			receiveAnnouncementEmail: profile!.receiveAnnouncementEmail,
+			alwaysMarkNsfw: profile!.alwaysMarkNsfw,
+			autoSensitive: profile!.autoSensitive,
+			carefulBot: profile!.carefulBot,
+			autoAcceptFollowed: profile!.autoAcceptFollowed,
+			followApprovalLocalSeconds: profile!.followApprovalLocalSeconds,
+			followApprovalRemoteSeconds: profile!.followApprovalRemoteSeconds,
+			noCrawle: profile!.noCrawle,
+			preventAiLearning: profile!.preventAiLearning,
+			isExplorable: user.isExplorable,
+			isDeleted: user.isDeleted,
+			twoFactorBackupCodesStock: profile?.twoFactorBackupSecret?.length === 5 ? 'full' : (profile?.twoFactorBackupSecret?.length ?? 0) > 0 ? 'partial' : 'none',
+			hideOnlineStatus: user.hideOnlineStatus,
+			hasUnreadSpecifiedNotes: false, // 後方互換性のため
+			hasUnreadMentions: false, // 後方互換性のため
+			hasUnreadChatMessages: this.chatService.hasUnreadMessages(user.id),
+			hasUnreadAnnouncement: unreadAnnouncements!.length > 0,
+			unreadAnnouncements,
+			hasUnreadAntenna: this.getHasUnreadAntenna(user.id),
+			hasUnreadChannel: false, // 後方互換性のため
+			hasUnreadNotification: notificationsInfo?.hasUnread, // 後方互換性のため
+			hasPendingReceivedFollowRequest: this.getHasPendingReceivedFollowRequest(user.id),
+			unreadNotificationsCount: notificationsInfo?.unreadCount,
+			mutedWords: profile!.mutedWords,
+			hardMutedWords: profile!.hardMutedWords,
+			mutedInstances: profile!.mutedInstances,
+			mutingNotificationTypes: [], // 後方互換性のため
+			notificationRecieveConfig: profile!.notificationRecieveConfig,
+			emailNotificationTypes: profile!.emailNotificationTypes,
+			achievements: profile!.achievements,
+			loggedInDays: profile!.loggedInDates.length,
+			policies: this.roleService.getUserPolicies(user.id),
+			...(opts.includeSecrets ? {
+				email: profile!.email,
+				emailVerified: profile!.emailVerified,
+				securityKeysList: profile!.twoFactorEnabled
+					? this.fetchSelectedSecurityKeys(user.id)
+					: [],
+			} : {}),
+		} satisfies Promiseable<NativeMeDetailed>;
+		return await awaitAll(self);
 	}
 
-	public async packMany<S extends 'MeDetailed' | 'UserDetailedNotMe' | 'UserDetailed' | 'UserLite' = 'UserLite'>(
+	/** The query selects these three columns; native unselected own keys are retained unchanged. */
+	private fetchSelectedSecurityKeys(userId: MiUser['id']): Promise<Pick<MiUserSecurityKey, 'id' | 'name' | 'lastUsed'>[]> {
+		return this.userSecurityKeysRepository.find({ where: { userId }, select: { id: true, name: true, lastUsed: true } });
+	}
+
+	public packMany(users: (MiUser['id'] | MiUser)[], me?: { id: MiUser['id'] } | null, options?: UserPackHints & { schema?: 'UserLite'; includeSecrets?: false }): Promise<NativeUserLite[]>;
+	public packMany<S extends UserPackSchema, Viewer extends { id: MiUser['id'] } | null | undefined>(
 		users: (MiUser['id'] | MiUser)[],
-		me?: { id: MiUser['id'] } | null | undefined,
-		options?: {
-			schema?: S,
-			includeSecrets?: boolean,
-		},
-	): Promise<Packed<S>[]> {
+		me: Viewer,
+		options: UserPackOptions<S>,
+	): Promise<NativePackedUser<S, Viewer>[]>;
+	public async packMany(
+		users: (MiUser['id'] | MiUser)[],
+		me?: { id: MiUser['id'] } | null,
+		options?: UserPackHints & { schema?: UserPackSchema; includeSecrets?: false },
+	): Promise<(NativeUserLite | NativeUserDetailed)[]> {
 		// -- IDのみの要素を補完して完全なエンティティ一覧を作る
 
 		const _users = users.filter((user): user is MiUser => typeof user !== 'string');
@@ -723,6 +746,7 @@ export class UserEntityService implements OnModuleInit {
 				me,
 				{
 					...options,
+					schema: options?.schema ?? 'UserLite',
 					userProfile: profilesMap?.get(u.id),
 					userRelations: userRelations,
 					userMemos: userMemos,

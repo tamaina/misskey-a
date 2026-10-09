@@ -3,13 +3,14 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { userExportableEntities } from '@/types.js';
-import { MiUser } from '@/models/User.js';
-import { MiNote } from '@/models/Note.js';
-import { MiAccessToken } from '@/models/AccessToken.js';
-import { MiRole } from '@/models/Role.js';
-import { MiDriveFile } from '@/models/DriveFile.js';
-import { MiNoteDraft } from '@/models/NoteDraft.js';
+import { userExportableEntities } from '@features/runtime/backend/types.js';
+import { MiUser } from '@features/users/backend/models/User.js';
+import { MiNote } from '@features/notes/backend/models/Note.js';
+import { MiAccessToken } from '@features/auth/backend/models/AccessToken.js';
+import { MiRole } from '@features/roles/backend/models/Role.js';
+import { MiDriveFile } from '@features/drive/backend/models/DriveFile.js';
+import { MiNoteDraft } from '@features/notes/backend/models/NoteDraft.js';
+import type { Packed } from '@features/index/backend/packed.schema.js';
 
 // misskey-js の notificationTypes と同期すべし
 export type MiNotification = {
@@ -97,7 +98,7 @@ export type MiNotification = {
 	type: 'achievementEarned';
 	id: string;
 	createdAt: string;
-	achievement: string;
+	achievement: Packed<'AchievementName'>;
 } | {
 	type: 'exportCompleted';
 	id: string;

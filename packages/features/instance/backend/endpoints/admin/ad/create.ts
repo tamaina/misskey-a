@@ -2,57 +2,20 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-
-import { Inject, Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
-import type { AdsRepository } from '@/models/_.js';
-import { IdService } from '@/core/IdService.js';
-import { DI } from '@/di-symbols.js';
-import { ModerationLogService } from '@/core/ModerationLogService.js';
-
-export const meta = {
-	tags: ['admin'],
-
-	requireCredential: true,
-	requireModerator: true,
-	kind: 'write:admin:ad',
-	res: {
-		type: 'object',
-		optional: false,
-		nullable: false,
-		ref: 'Ad',
-	},
-} as const;
-
-export const paramDef = {
-	type: 'object',
-	properties: {
-		url: { type: 'string', minLength: 1 },
-		memo: { type: 'string' },
-		place: { type: 'string' },
-		priority: { type: 'string' },
-		ratio: { type: 'integer' },
-		expiresAt: { type: 'integer' },
-		startsAt: { type: 'integer' },
-		imageUrl: { type: 'string', minLength: 1 },
-		dayOfWeek: { type: 'integer' },
-		isSensitive: { type: 'boolean' },
-	},
-	required: ['url', 'memo', 'place', 'priority', 'ratio', 'expiresAt', 'startsAt', 'imageUrl', 'dayOfWeek'],
-} as const;
-
-@Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
-	constructor(
-		@Inject(DI.adsRepository)
-		private adsRepository: AdsRepository,
-
-		private idService: IdService,
-		private moderationLogService: ModerationLogService,
-	) {
-		super(meta, paramDef, async (ps, me) => {
-			const ad = await this.adsRepository.insertOne({
-				id: this.idService.gen(),
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import type { ApiActor } from '@features/api/backend/transport/context.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import { adCreateContract } from './create.contract.js';
+import type { InstanceApiDependencies } from '../../../api.implementation.js';
+export type AdCreateDependencies = Pick<InstanceApiDependencies, 'adsRepository' | 'idService' | 'moderationLogService'>;
+export function createAdCreateProcedure<Actor extends ApiActor>(deps: AdCreateDependencies) {
+	return createApiProcedure<Actor>()(adCreateContract)
+		.use(requirePrincipal<Actor>())
+		.handler(async ({ input, context }) => {
+			const ps = input;
+			const me = context.principal;
+			const ad = await deps.adsRepository.insertOne({
+				id: deps.idService.gen(),
 				expiresAt: new Date(ps.expiresAt),
 				startsAt: new Date(ps.startsAt),
 				dayOfWeek: ps.dayOfWeek,
@@ -64,12 +27,10 @@ export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDe
 				place: ps.place,
 				memo: ps.memo,
 			});
-
-			this.moderationLogService.log(me, 'createAd', {
+			deps.moderationLogService.log(me, 'createAd', {
 				adId: ad.id,
 				ad: ad,
 			});
-
 			return {
 				id: ad.id,
 				expiresAt: ad.expiresAt.toISOString(),
@@ -84,5 +45,4 @@ export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDe
 				memo: ad.memo,
 			};
 		});
-	}
 }

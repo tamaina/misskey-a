@@ -51,11 +51,12 @@
 		console.error('invalid lang value detected!!!', typeof lang, lang);
 		lang = 'en-US';
 	}
+	localStorage.setItem('lang', lang);
 	//#endregion
 
 	//#region Script
 	async function importAppScript() {
-		await import(CLIENT_ENTRY ? `/embed_vite/${CLIENT_ENTRY.replace('scripts', lang)}` : '/embed_vite/src/boot.ts')
+		await import(CLIENT_ENTRY ? `/embed_vite/${CLIENT_ENTRY}` : '/embed_vite/src/boot.ts')
 			.catch(async e => {
 				console.error(e);
 				renderError('APP_IMPORT');
@@ -70,8 +71,6 @@
 			importAppScript();
 		});
 	}
-
-	localStorage.setItem('lang', lang);
 	//#endregion
 
 	async function addStyle(styleText) {

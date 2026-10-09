@@ -12,8 +12,8 @@ import { mockDeep } from 'vitest-mock-extended';
 import { Test } from '@nestjs/testing';
 import * as lolex from '@sinonjs/fake-timers';
 import type { TestingModule } from '@nestjs/testing';
-import { GlobalModule } from '@/GlobalModule.js';
-import { RoleService } from '@/core/RoleService.js';
+import { GlobalModule } from '@features/boot/backend/assembly/GlobalModule.js';
+import { RoleService } from '@features/roles/backend/services/RoleService.js';
 import {
 	MiMeta,
 	MiRole,
@@ -22,17 +22,17 @@ import {
 	RoleAssignmentsRepository,
 	RolesRepository,
 	UsersRepository,
-} from '@/models/_.js';
+} from '@features/persistence/backend/repositories/models.js';
 import { DI } from '@/di-symbols.js';
-import { MetaService } from '@/core/MetaService.js';
-import { genAidx } from '@/misc/id/aidx.js';
-import { CacheService } from '@/core/CacheService.js';
-import { IdService } from '@/core/IdService.js';
-import { GlobalEventService } from '@/core/GlobalEventService.js';
-import { secureRndstr } from '@/misc/secure-rndstr.js';
-import { NotificationService } from '@/core/NotificationService.js';
-import { RoleCondFormulaValue } from '@/models/Role.js';
-import { UserEntityService } from '@/core/entities/UserEntityService.js';
+import { MetaService } from '@features/instance/backend/services/MetaService.js';
+import { genAidx } from '@features/runtime/backend/id/aidx.js';
+import { CacheService } from '@features/users/backend/services/CacheService.js';
+import { IdService } from '@features/runtime/backend/services/IdService.js';
+import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
+import { secureRndstr } from '@features/auth/backend/utility/secure-rndstr.js';
+import { NotificationService } from '@features/notifications/backend/services/NotificationService.js';
+import { RoleCondFormulaValue } from '@features/roles/backend/models/Role.js';
+import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 
 describe('RoleService', () => {
 	let app: TestingModule;

@@ -6,18 +6,18 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { IsNull } from 'typeorm';
 import { DI } from '@/di-symbols.js';
-import type { UsersRepository, DriveFilesRepository, UserListMembershipsRepository, UserListsRepository } from '@/models/_.js';
-import type Logger from '@/logger.js';
-import * as Acct from '@/misc/acct.js';
-import { RemoteUserResolveService } from '@/core/RemoteUserResolveService.js';
-import { DownloadService } from '@/core/DownloadService.js';
-import { UserListService } from '@/core/UserListService.js';
-import { IdService } from '@/core/IdService.js';
-import { UtilityService } from '@/core/UtilityService.js';
-import { bindThis } from '@/decorators.js';
-import { QueueLoggerService } from '@/queue/QueueLoggerService.js';
+import type { UsersRepository, DriveFilesRepository, UserListMembershipsRepository, UserListsRepository } from '@features/persistence/backend/repositories/models.js';
+import type { Logger } from '@features/runtime/backend/logging/logger.js';
+import * as Acct from '@features/federation/backend/utility/acct.js';
+import { RemoteUserResolveService } from '@features/federation/backend/services/RemoteUserResolveService.js';
+import { DownloadService } from '@features/runtime/backend/services/DownloadService.js';
+import { UserListService } from '../services/UserListService.js';
+import { IdService } from '@features/runtime/backend/services/IdService.js';
+import { UtilityService } from '@features/federation/backend/services/UtilityService.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
+import { QueueLoggerService } from '@features/runtime/backend/queue/QueueLoggerService.js';
 import type * as Bull from 'bullmq';
-import type { DbUserImportJobData } from '@/queue/types.js';
+import type { DbUserImportJobData } from '@features/runtime/backend/queue/types.js';
 
 @Injectable()
 export class ImportUserListsProcessorService {

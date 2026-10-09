@@ -3,40 +3,30 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 import bcrypt from 'bcryptjs';
-import { Inject, Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
-import type { UserProfilesRepository } from '@/models/_.js';
-import { DI } from '@/di-symbols.js';
-import { UserAuthService } from '@/core/UserAuthService.js';
+import type { UserProfilesRepository } from '@features/persistence/backend/repositories/models.js';
+import { UserAuthService } from '../../services/UserAuthService.js';
+
+import { IChangePasswordContract } from '../../api.definition.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
 
 export const meta = {
-	requireCredential: true,
 
-	secure: true,
 } as const;
-
-export const paramDef = {
-	type: 'object',
-	properties: {
-		currentPassword: { type: 'string' },
-		newPassword: { type: 'string', minLength: 1 },
-		token: { type: 'string', nullable: true },
-	},
-	required: ['currentPassword', 'newPassword'],
-} as const;
-
-@Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
-	constructor(
-		@Inject(DI.userProfilesRepository)
-		private userProfilesRepository: UserProfilesRepository,
-
-		private userAuthService: UserAuthService,
-	) {
-		super(meta, paramDef, async (ps, me) => {
+export interface IChangePasswordDependencies {
+	userProfilesRepository: UserProfilesRepository;
+	userAuthService: Pick<UserAuthService, 'twoFactorAuthenticate'>;
+}
+export function createIChangePasswordProcedure(deps: IChangePasswordDependencies) {
+	return createApiProcedure<MiLocalUser>()(IChangePasswordContract).use(requirePrincipal<MiLocalUser>()).handler(async ({ input, context }) => {
+		const ps = input;
+		const me = context.principal;
+		const result = await (async () => {
 			const token = ps.token;
-			const profile = await this.userProfilesRepository.findOneByOrFail({ userId: me.id });
+			const profile = await deps.userProfilesRepository.findOneByOrFail({ userId: me.id });
 
 			if (profile.twoFactorEnabled) {
 				if (token == null) {
@@ -44,7 +34,7 @@ export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDe
 				}
 
 				try {
-					await this.userAuthService.twoFactorAuthenticate(profile, token);
+					await deps.userAuthService.twoFactorAuthenticate(profile, token);
 				} catch (_) {
 					throw new Error('authentication failed');
 				}
@@ -60,9 +50,10 @@ export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDe
 			const salt = await bcrypt.genSalt(8);
 			const hash = await bcrypt.hash(ps.newPassword, salt);
 
-			await this.userProfilesRepository.update(me.id, {
+			await deps.userProfilesRepository.update(me.id, {
 				password: hash,
 			});
-		});
-	}
+		})();
+		return result;
+	});
 }

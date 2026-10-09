@@ -3,92 +3,48 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Inject, Injectable } from '@nestjs/common';
-import type { PagesRepository, PageLikesRepository } from '@/models/_.js';
-import { IdService } from '@/core/IdService.js';
-import { Endpoint } from '@/server/api/endpoint-base.js';
-import { DI } from '@/di-symbols.js';
-import { ApiError } from '@/server/api/error.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 
-export const meta = {
-	tags: ['pages'],
+import { requirePrincipal } from '../../../../api/backend/transport/middleware.js';
 
-	requireCredential: true,
-
-	prohibitMoved: true,
-
-	kind: 'write:page-likes',
-
-	errors: {
-		noSuchPage: {
-			message: 'No such page.',
-			code: 'NO_SUCH_PAGE',
-			id: 'cc98a8a2-0dc3-4123-b198-62c71df18ed3',
-		},
-
-		yourPage: {
-			message: 'You cannot like your page.',
-			code: 'YOUR_PAGE',
-			id: '28800466-e6db-40f2-8fae-bf9e82aa92b8',
-		},
-
-		alreadyLiked: {
-			message: 'The page has already been liked.',
-			code: 'ALREADY_LIKED',
-			id: 'd4c1edbe-7da2-4eae-8714-1acfd2d63941',
-		},
-	},
-} as const;
-
-export const paramDef = {
-	type: 'object',
-	properties: {
-		pageId: { type: 'string', format: 'misskey:id' },
-	},
-	required: ['pageId'],
-} as const;
-
-@Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
-	constructor(
-		@Inject(DI.pagesRepository)
-		private pagesRepository: PagesRepository,
-
-		@Inject(DI.pageLikesRepository)
-		private pageLikesRepository: PageLikesRepository,
-
-		private idService: IdService,
-	) {
-		super(meta, paramDef, async (ps, me) => {
-			const page = await this.pagesRepository.findOneBy({ id: ps.pageId });
+import { pagesLikeContract, pagesLikeErrors } from './like.contract.js';
+import type { PagesRepository, PageLikesRepository } from '@features/persistence/backend/repositories/models.js';
+import type { IdService } from '@features/runtime/backend/services/IdService.js';
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+export interface PagesLikeDependencies {
+	pagesRepository: Pick<PagesRepository, 'findOneBy' | 'increment'>;
+	pageLikesRepository: Pick<PageLikesRepository, 'exists' | 'insert'>;
+	idService: Pick<IdService, 'gen'>;
+}
+export function createPagesLikeProcedure(deps: PagesLikeDependencies) {
+	return createApiProcedure<MiLocalUser>()(pagesLikeContract)
+		.use(requirePrincipal<MiLocalUser>())
+		.handler(async ({ input: ps, context }) => {
+			const me = context.principal;
+			const page = await deps.pagesRepository.findOneBy({ id: ps.pageId });
 			if (page == null) {
-				throw new ApiError(meta.errors.noSuchPage);
+				throw apiError(pagesLikeErrors.noSuchPage);
 			}
-
 			if (page.userId === me.id) {
-				throw new ApiError(meta.errors.yourPage);
+				throw apiError(pagesLikeErrors.yourPage);
 			}
-
 			// if already liked
-			const exist = await this.pageLikesRepository.exists({
+			const exist = await deps.pageLikesRepository.exists({
 				where: {
 					pageId: page.id,
 					userId: me.id,
 				},
 			});
-
 			if (exist) {
-				throw new ApiError(meta.errors.alreadyLiked);
+				throw apiError(pagesLikeErrors.alreadyLiked);
 			}
-
 			// Create like
-			await this.pageLikesRepository.insert({
-				id: this.idService.gen(),
+			await deps.pageLikesRepository.insert({
+				id: deps.idService.gen(),
 				pageId: page.id,
 				userId: me.id,
 			});
-
-			this.pagesRepository.increment({ id: page.id }, 'likedCount', 1);
+			deps.pagesRepository.increment({ id: page.id }, 'likedCount', 1);
 		});
-	}
 }

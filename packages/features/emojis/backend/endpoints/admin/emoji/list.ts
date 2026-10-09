@@ -3,83 +3,30 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Inject, Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
-import type { EmojisRepository } from '@/models/_.js';
-import type { MiEmoji } from '@/models/Emoji.js';
-import { QueryService } from '@/core/QueryService.js';
-import { DI } from '@/di-symbols.js';
-import { EmojiEntityService } from '@/core/entities/EmojiEntityService.js';
-//import { sqlLikeEscape } from '@/misc/sql-like-escape.js';
-
-export const meta = {
-	tags: ['admin'],
-
-	requireCredential: true,
-	requiredRolePolicy: 'canManageCustomEmojis',
-	kind: 'read:admin:emoji',
-
-	res: {
-		type: 'array',
-		optional: false, nullable: false,
-		items: {
-			type: 'object',
-			ref: 'EmojiDetailed',
-		},
-	},
-} as const;
-
-export const paramDef = {
-	type: 'object',
-	properties: {
-		query: { type: 'string', nullable: true, default: null },
-		limit: { type: 'integer', minimum: 1, maximum: 100, default: 10 },
-		sinceId: { type: 'string', format: 'misskey:id' },
-		untilId: { type: 'string', format: 'misskey:id' },
-		sinceDate: { type: 'integer' },
-		untilDate: { type: 'integer' },
-	},
-	required: [],
-} as const;
-
-@Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
-	constructor(
-		@Inject(DI.emojisRepository)
-		private emojisRepository: EmojisRepository,
-
-		private emojiEntityService: EmojiEntityService,
-		private queryService: QueryService,
-	) {
-		super(meta, paramDef, async (ps, me) => {
-			const q = this.queryService.makePaginationQuery(this.emojisRepository.createQueryBuilder('emoji'), ps.sinceId, ps.untilId, ps.sinceDate, ps.untilDate)
+import { toEmojiDetailed } from '../../../emoji-output.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import type { ApiActor } from '@features/api/backend/transport/context.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import { emojisContract } from '../../../api.definition.js';
+import type { EmojisDependencies } from '../../../api.implementation.js';
+import type { MiEmoji } from '../../../models/Emoji.js';
+export function createListProcedure<Actor extends ApiActor>(deps: Pick<EmojisDependencies<Actor>, 'queryService' | 'emojisRepository' | 'emojiEntityService'>) {
+	return createApiProcedure<Actor>()(emojisContract.list).use(requirePrincipal<Actor>())
+		.handler(async ({ input, context }) => {
+			const query = deps.queryService.makePaginationQuery(deps.emojisRepository.createQueryBuilder('emoji'), input.sinceId, input.untilId, input.sinceDate, input.untilDate)
 				.andWhere('emoji.host IS NULL');
-
-			let emojis: MiEmoji[];
-
-			if (ps.query) {
-				//q.andWhere('emoji.name ILIKE :q', { q: `%${ sqlLikeEscape(ps.query) }%` });
-				//const emojis = await q.limit(ps.limit).getMany();
-
-				emojis = await q.getMany();
-				const queryarry = ps.query.match(/\:([a-z0-9_]*)\:/g);
-
-				if (queryarry) {
-					emojis = emojis.filter(emoji =>
-						queryarry.includes(`:${emoji.name}:`),
-					);
-				} else {
-					emojis = emojis.filter(emoji =>
-						emoji.name.includes(ps.query!) ||
-						emoji.aliases.some(a => a.includes(ps.query!)) ||
-						emoji.category?.includes(ps.query!));
-				}
-				emojis.splice(ps.limit + 1);
+			let rows: MiEmoji[];
+			const search = input.query;
+			if (search) {
+				rows = await query.getMany();
+				const names = search.match(/\:([a-z0-9_]*)\:/g);
+				rows = names ? rows.filter(row => names.includes(`:${row.name}:`))
+					: rows.filter(row => row.name.includes(search) || row.aliases.some(alias => alias.includes(search)) || row.category?.includes(search));
+				// The legacy search path deliberately returns limit + 1 rows.
+				rows.splice(input.limit + 1);
 			} else {
-				emojis = await q.limit(ps.limit).getMany();
+				rows = await query.limit(input.limit).getMany();
 			}
-
-			return this.emojiEntityService.packDetailedMany(emojis);
+			return (await deps.emojiEntityService.packDetailedMany(rows)).map(toEmojiDetailed);
 		});
-	}
 }

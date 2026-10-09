@@ -3,39 +3,22 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Injectable } from '@nestjs/common';
-import { getJsonSchema } from '@/core/chart/core.js';
-import { Endpoint } from '@/server/api/endpoint-base.js';
-import PerUserNotesChart from '@/core/chart/charts/per-user-notes.js';
-import { schema } from '@/core/chart/charts/entities/per-user-notes.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 
-export const meta = {
-	tags: ['charts', 'users', 'notes'],
+import { decodeScalarInput } from '@features/api/backend/transport/middleware.js';
+import { chartPerUserNotesContract, chartPerUserNotesGetContract } from './notes.contract.js';
+import type { ApiActor } from '@features/api/backend/transport/context.js';
+import type { StatisticsDependencies } from '../../../api.implementation.js';
+export function createPerUserNotesProcedure<Actor extends ApiActor>(deps: StatisticsDependencies['charts']['userNotes']) {
+	return createApiProcedure<Actor>()(chartPerUserNotesContract)
+		.handler(async ({ input }) => projectChart(await deps.getChart(input.span, input.limit, input.offset ? new Date(input.offset) : null, input.userId)));
+}
+export function createPerUserNotesGetProcedure<Actor extends ApiActor>(deps: StatisticsDependencies['charts']['userNotes']) {
+	return createApiProcedure<Actor>()(chartPerUserNotesGetContract)
+		.use(decodeScalarInput<Actor>({ limit: 'integer', offset: 'integer' }))
+		.handler(async ({ input }) => projectChart(await deps.getChart(input.span, input.limit, input.offset ? new Date(input.offset) : null, input.userId)));
+}
 
-	res: getJsonSchema(schema),
-
-	allowGet: true,
-	cacheSec: 60 * 60,
-} as const;
-
-export const paramDef = {
-	type: 'object',
-	properties: {
-		span: { type: 'string', enum: ['day', 'hour'] },
-		limit: { type: 'integer', minimum: 1, maximum: 500, default: 30 },
-		offset: { type: 'integer', nullable: true, default: null },
-		userId: { type: 'string', format: 'misskey:id' },
-	},
-	required: ['span', 'userId'],
-} as const;
-
-@Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
-	constructor(
-		private perUserNotesChart: PerUserNotesChart,
-	) {
-		super(meta, paramDef, async (ps, me) => {
-			return await this.perUserNotesChart.getChart(ps.span, ps.limit, ps.offset ? new Date(ps.offset) : null, ps.userId);
-		});
-	}
+function projectChart(value: Awaited<ReturnType<StatisticsDependencies['charts']['userNotes']['getChart']>>) {
+	return { total: value.total.map(item => item), inc: value.inc.map(item => item), dec: value.dec.map(item => item), diffs: { normal: value.diffs.normal.map(item => item), reply: value.diffs.reply.map(item => item), renote: value.diffs.renote.map(item => item), withFile: value.diffs.withFile.map(item => item) } };
 }

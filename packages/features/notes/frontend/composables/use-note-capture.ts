@@ -6,15 +6,15 @@
 import { onUnmounted, reactive } from 'vue';
 import * as Misskey from 'misskey-js';
 import { EventEmitter } from 'eventemitter3';
-import { createVisibilityAwareInterval } from '@@/js/interval.js';
+import { createVisibilityAwareInterval } from '@features/ui/frontend/shared/interval.js';
 import type { Reactive } from 'vue';
 import type { NoteUpdatedEvent } from 'misskey-js/streaming.types.js';
-import { useStream } from '@/stream.js';
-import { $i } from '@/i.js';
-import { store } from '@/store.js';
-import { misskeyApi } from '@/utility/misskey-api.js';
-import { prefer } from '@/preferences.js';
-import { globalEvents } from '@/events.js';
+import { useStream } from '@features/api/frontend/stream.js';
+import { $i } from '@features/auth/frontend/i.js';
+import { store } from '@features/preferences/frontend/store.js';
+import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
+import { prefer } from '@features/preferences/frontend/preferences.js';
+import { globalEvents } from '@features/runtime/frontend/events.js';
 
 export const noteEvents = new EventEmitter<{
 	[ev: `reacted:${string}`]: (ctx: { userId: Misskey.entities.User['id']; reaction: string; emoji?: { name: string; url: string; } | null; }) => void;

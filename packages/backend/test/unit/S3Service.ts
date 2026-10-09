@@ -15,10 +15,10 @@ import {
 	UploadPartCommand,
 } from '@aws-sdk/client-s3';
 import { mockClient } from 'aws-sdk-client-mock';
-import { GlobalModule } from '@/GlobalModule.js';
-import { CoreModule } from '@/core/CoreModule.js';
-import { S3Service } from '@/core/S3Service.js';
-import { MiMeta } from '@/models/_.js';
+import { GlobalModule } from '@features/boot/backend/assembly/GlobalModule.js';
+import { CoreModule } from '@features/boot/backend/assembly/CoreModule.js';
+import { S3Service } from '@features/runtime/backend/services/S3Service.js';
+import { MiMeta } from '@features/persistence/backend/repositories/models.js';
 import type { TestingModule } from '@nestjs/testing';
 
 describe('S3Service', () => {

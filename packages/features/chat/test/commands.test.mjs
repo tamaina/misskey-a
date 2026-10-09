@@ -5,7 +5,9 @@
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { createChatCommands, legacyChatSchemas } from '../../../backend/built/features/chat/backend.js';
+import * as v from 'valibot';
+import { createProcedureClient } from '@orpc/server';
+import { chatApiContract, createChatRouter, ChatMessageAccessError } from '../../../backend/built/features/chat/backend.js';
 
 const inputs = {
 	'chat/read-all': {},
@@ -18,12 +20,6 @@ const inputs = {
 	'chat/messages/unreact': { messageId: 'message1', reaction: '' },
 	'chat/messages/delete': { messageId: 'message1' },
 };
-
-function createError(definition) {
-	const error = new Error(definition.code);
-	error.definition = definition;
-	return error;
-}
 
 function createDeps(overrides = {}) {
 	const calls = [];
@@ -41,39 +37,45 @@ function createDeps(overrides = {}) {
 		findRoomById: async roomId => { calls.push(['findRoomById', roomId]); return { roomId }; },
 		hasPermissionToDeleteRoom: async (userId, room) => { calls.push(['hasPermissionToDeleteRoom', userId, room]); return true; },
 		deleteRoom: async (room, actor) => { calls.push(['deleteRoom', room, actor]); },
-		createError,
-		isMessageAccessError: error => error?.name === 'ChatMessageAccessError',
 		...overrides,
 	};
 	return { deps, calls };
 }
 
-function invoke(feature, key, input = inputs[key], actor = { id: 'alice' }) {
-	return feature[key](input, { context: actor == null ? undefined : { actor } });
+function methodName(route) {
+	return route.split(/[/-]/).map((part, index) => index === 0 ? part : part.charAt(0).toUpperCase() + part.slice(1)).join('');
 }
 
-test('legacy chat inputs preserve object, ID, required-field and arbitrary reaction schemas', () => {
-	const base = (properties, required = []) => ({ type: 'object', properties, ...(required.length > 0 ? { required } : {}) });
-	const id = { type: 'string', format: 'misskey:id' };
-	const string = { type: 'string' };
+function createCommandRouter(chatService) {
+	return createChatRouter(Object.fromEntries(Object.keys(chatApiContract).map(key => [key, { chatService }])));
+}
 
-	assert.deepEqual(legacyChatSchemas['chat/read-all'].input, {
-		type: 'object', properties: {}, additionalProperties: true,
-	});
-	assert.deepEqual(legacyChatSchemas['chat/rooms/join'].input, base({ roomId: id }, ['roomId']));
-	assert.deepEqual(legacyChatSchemas['chat/rooms/leave'].input, base({ roomId: id }, ['roomId']));
-	assert.deepEqual(legacyChatSchemas['chat/rooms/mute'].input, base({ roomId: id, mute: { type: 'boolean' } }, ['roomId', 'mute']));
-	assert.deepEqual(legacyChatSchemas['chat/rooms/delete'].input, base({ roomId: id }, ['roomId']));
-	assert.deepEqual(legacyChatSchemas['chat/rooms/invitations/ignore'].input, base({ roomId: id }, ['roomId']));
-	assert.deepEqual(legacyChatSchemas['chat/messages/react'].input, base({ messageId: id, reaction: string }, ['messageId', 'reaction']));
-	assert.deepEqual(legacyChatSchemas['chat/messages/unreact'].input, base({ messageId: id, reaction: string }, ['messageId', 'reaction']));
-	assert.deepEqual(legacyChatSchemas['chat/messages/delete'].input, base({ messageId: id }, ['messageId']));
+function invoke(feature, key, input = inputs[key], actor = { id: 'alice', isSuspended: false, movedToUri: null }) {
+	const services = {
+		authenticate: async () => [actor ?? null, null],
+		limitActor: () => null, rateLimitFactor: async () => 1, limit: async () => null,
+	};
+	const procedure = feature[methodName(key)];
+	return createProcedureClient(procedure, { context: {
+		services, credential: actor ? 'fixture' : null, ip: '127.0.0.1', headers: {},
+	} })(input);
+}
+
+test('native command inputs retain required IDs and reject non-object roots', () => {
+	for (const [route, input] of Object.entries(inputs)) {
+		const schema = chatApiContract[methodName(route)]['~orpc'].inputSchema;
+		assert.equal(v.safeParse(schema, input).success, true, route);
+		assert.equal(v.safeParse(schema, []).success, false, route);
+		assert.equal(v.safeParse(schema, {}).success, route === 'chat/read-all', route);
+	}
+	const schema = chatApiContract.chatMessagesReact['~orpc'].inputSchema;
+	assert.equal(v.safeParse(schema, { messageId: 'message1', reaction: '😀'.repeat(2048) }).success, true);
 });
 
 test('commands use the correct gate, trusted actor, and service arguments; every success is void', async () => {
 	const actor = { id: 'trusted-alice', moderator: { auditData: true } };
 	const { deps, calls } = createDeps();
-	const feature = createChatCommands(deps);
+	const feature = createCommandRouter(deps);
 
 	for (const [key, input] of Object.entries(inputs)) {
 		const result = await invoke(feature, key, { ...input, extraField: 'accepted', actor: { id: 'spoofed' } }, actor);
@@ -94,14 +96,11 @@ test('commands use the correct gate, trusted actor, and service arguments; every
 	]);
 });
 
-test('missing or malformed actors fail before calling any dependency', async () => {
+test('missing or suspended authenticated actors fail before calling any dependency', async () => {
 	const { deps, calls } = createDeps();
-	const feature = createChatCommands(deps);
-
+	const feature = createCommandRouter(deps);
 	for (const [key, input] of Object.entries(inputs)) {
-		for (const actor of [undefined, null, {}, { id: '' }]) {
-			await assert.rejects(feature[key]({ ...input, actor: { id: 'spoofed' } }, { context: actor == null ? undefined : { actor } }));
-		}
+		for (const actor of [null, { id: 'alice', isSuspended: true, movedToUri: null }]) await assert.rejects(invoke(feature, key, input, actor));
 	}
 	assert.deepEqual(calls, []);
 });
@@ -113,7 +112,7 @@ test('trusted actors stay isolated across concurrent calls, including full room-
 	let notifyBothStarted;
 	const bothStarted = new Promise(resolve => { notifyBothStarted = resolve; });
 	const deletedBy = [];
-	const feature = createChatCommands(createDeps({
+	const feature = createCommandRouter(createDeps({
 		findRoomById: roomId => new Promise(resolve => {
 			started.push(roomId);
 			releases.set(roomId, () => resolve({ roomId }));
@@ -152,7 +151,7 @@ test('every command waits for its availability gate before starting its work', a
 		]) {
 			deps[method] = async () => { events.push(`command:${method}`); return method === 'findRoomById' ? { roomId: 'room1' } : method === 'findMyMessageById' ? { messageId: 'message1' } : method === 'hasPermissionToDeleteRoom' ? true : undefined; };
 		}
-		const feature = createChatCommands(deps);
+		const feature = createCommandRouter(deps);
 		let settled = false;
 		const result = invoke(feature, key, input).then(() => { settled = true; });
 		await gateStarted;
@@ -168,26 +167,25 @@ test('every command waits for its availability gate before starting its work', a
 
 test('react and unreact conceal only access errors and retain route-specific errors', async () => {
 	for (const [key, action] of [['chat/messages/react', 'react'], ['chat/messages/unreact', 'unreact']]) {
-		const denied = new Error('private reason');
-		denied.name = 'ChatMessageAccessError';
+		const denied = new ChatMessageAccessError('private reason');
 		const { deps, calls } = createDeps({ [action]: async () => { throw denied; } });
-		const feature = createChatCommands(deps);
+		const feature = createCommandRouter(deps);
 		await assert.rejects(invoke(feature, key), error => {
-			assert.equal(error.definition.id, key.endsWith('/react') && !key.endsWith('/unreact')
+			assert.equal(error.data.id, key.endsWith('/react') && !key.endsWith('/unreact')
 				? '9b5839b9-0ba0-4351-8c35-37082093d200'
 				: 'c39ea42f-e3ca-428a-ad57-390e0a711595');
-			assert.equal(error.definition.code, 'NO_SUCH_MESSAGE');
+			assert.equal(error.code, 'NO_SUCH_MESSAGE');
 			return true;
 		});
 		assert.equal(calls[0][0], 'gate');
 
 		const unexpected = new Error('unexpected failure');
-		const otherFeature = createChatCommands(createDeps({ [action]: async () => { throw unexpected; } }).deps);
+		const otherFeature = createCommandRouter(createDeps({ [action]: async () => { throw unexpected; } }).deps);
 		await assert.rejects(invoke(otherFeature, key), error => error === unexpected);
 
 		const gateError = new Error('availability denied');
 		let actionCalled = false;
-		const gatedFeature = createChatCommands(createDeps({
+		const gatedFeature = createCommandRouter(createDeps({
 			checkChatAvailability: async () => { throw gateError; },
 			[action]: async () => { actionCalled = true; },
 		}).deps);
@@ -197,21 +195,21 @@ test('react and unreact conceal only access errors and retain route-specific err
 });
 
 test('message deletion and room deletion conceal absence and permission failures', async () => {
-	const messageFeature = createChatCommands(createDeps({ findMyMessageById: async () => null }).deps);
+	const messageFeature = createCommandRouter(createDeps({ findMyMessageById: async () => null }).deps);
 	await assert.rejects(invoke(messageFeature, 'chat/messages/delete'), error => {
-		assert.equal(error.definition.id, '36b67f0e-66a6-414b-83df-992a55294f17');
+		assert.equal(error.data.id, '36b67f0e-66a6-414b-83df-992a55294f17');
 		return true;
 	});
 
 	for (const [room, allowed] of [[null, true], [{ id: 'room' }, false]]) {
 		let deleteCalled = false;
-		const feature = createChatCommands(createDeps({
+		const feature = createCommandRouter(createDeps({
 			findRoomById: async () => room,
 			hasPermissionToDeleteRoom: async () => allowed,
 			deleteRoom: async () => { deleteCalled = true; },
 		}).deps);
 		await assert.rejects(invoke(feature, 'chat/rooms/delete'), error => {
-			assert.equal(error.definition.id, 'd4e3753d-97bf-4a19-ab8e-21080fbc0f4b');
+			assert.equal(error.data.id, 'd4e3753d-97bf-4a19-ab8e-21080fbc0f4b');
 			return true;
 		});
 		assert.equal(deleteCalled, false);
@@ -220,7 +218,7 @@ test('message deletion and room deletion conceal absence and permission failures
 
 test('chat inputs retain old malformed behavior and permit unrecognized object properties', async () => {
 	const { deps, calls } = createDeps();
-	const feature = createChatCommands(deps);
+	const feature = createCommandRouter(deps);
 
 	for (const [key, input] of Object.entries({
 		'chat/rooms/join': { roomId: 'bad id' },
@@ -257,7 +255,7 @@ test('async command methods await dependencies and resolve with undefined', asyn
 				return new Promise(resolve => { release = () => resolve(method === 'findRoomById' ? { roomId: 'room1' } : method === 'findMyMessageById' ? { messageId: 'message1' } : undefined); });
 			},
 		});
-		const feature = createChatCommands(deps);
+		const feature = createCommandRouter(deps);
 		let settled = false;
 		const result = invoke(feature, key).then(value => { settled = true; return value; });
 		await started;
@@ -280,7 +278,7 @@ test('async command methods await dependencies and resolve with undefined', asyn
 				return new Promise(resolve => { release = resolve; });
 			},
 		});
-		const feature = createChatCommands(deps);
+		const feature = createCommandRouter(deps);
 		let settled = false;
 		const result = invoke(feature, key).then(value => { settled = true; return value; });
 		await started;

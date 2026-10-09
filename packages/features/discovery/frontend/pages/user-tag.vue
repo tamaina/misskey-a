@@ -15,8 +15,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import { computed, markRaw } from 'vue';
-import MkUserList from '@/components/MkUserList.vue';
-import { definePage } from '@/page.js';
+import MkUserList from '@features/relationships/frontend/components/MkUserList.vue';
+import { definePage } from '@features/navigation/frontend/page.js';
 import { Paginator } from '@features/ui/frontend/utility/paginator.js';
 
 const props = defineProps<{

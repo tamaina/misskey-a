@@ -10,7 +10,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<button v-click-anime :class="[$style.item, $style.instance]" class="_button" @click="openInstanceMenu">
 				<img :class="$style.instanceIcon" :src="instance.iconUrl ?? '/favicon.ico'" draggable="false"/>
 			</button>
-			<MkA v-click-anime v-tooltip="i18n.ts.timeline" :class="$style.item" :activeClass="$style.active" to="/" exact>
+			<MkA v-click-anime v-tooltip="$locale.sfc.timeline" :class="$style.item" :activeClass="$style.active" to="/" exact>
 				<i :class="$style.itemIcon" class="ti ti-home ti-fw"></i>
 			</MkA>
 			<template v-for="item in menu">
@@ -21,7 +21,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 				</component>
 			</template>
 			<div :class="$style.divider"></div>
-			<MkA v-if="$i && ($i.isAdmin || $i.isModerator)" v-click-anime v-tooltip="i18n.ts.controlPanel" class="item" :activeClass="$style.active" to="/admin" :behavior="settingsWindowed ? 'window' : null">
+			<MkA v-if="$i && ($i.isAdmin || $i.isModerator)" v-click-anime v-tooltip="$locale.sfc.controlPanel" class="item" :activeClass="$style.active" to="/admin" :behavior="settingsWindowed ? 'window' : null">
 				<i :class="$style.itemIcon" class="ti ti-dashboard ti-fw"></i>
 			</MkA>
 			<button v-click-anime :class="$style.item" class="_button" @click="more">
@@ -30,7 +30,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			</button>
 		</div>
 		<div :class="$style.right">
-			<MkA v-click-anime v-tooltip="i18n.ts.settings" :class="$style.item" :activeClass="$style.active" to="/settings" :behavior="settingsWindowed ? 'window' : null">
+			<MkA v-click-anime v-tooltip="$locale.sfc.settings" :class="$style.item" :activeClass="$style.active" to="/settings" :behavior="settingsWindowed ? 'window' : null">
 				<i :class="$style.itemIcon" class="ti ti-settings ti-fw"></i>
 			</MkA>
 			<button v-if="$i" v-click-anime :class="[$style.item, $style.account]" class="_button" @click="openAccountMenu">
@@ -48,15 +48,14 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import { computed, defineAsyncComponent, onMounted, ref } from 'vue';
-import { openInstanceMenu } from '@/ui/_common_/common.js';
-import * as os from '@/os.js';
-import { navbarItemDef } from '@/navbar.js';
+import { openInstanceMenu } from '@features/navigation/frontend/ui/_common_/common.js';
+import * as os from '@features/ui/frontend/os.js';
+import { navbarItemDef } from '@features/navigation/frontend/navbar.js';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
-import { instance } from '@/instance.js';
-import { i18n } from '@/i18n.js';
-import { prefer } from '@/preferences.js';
-import { getAccountMenu } from '@/accounts.js';
-import { $i } from '@/i.js';
+import { instance } from '@features/instance/frontend/instance.js';
+import { prefer } from '@features/preferences/frontend/preferences.js';
+import { getAccountMenu } from '@features/auth/frontend/accounts.js';
+import { $i } from '@features/auth/frontend/i.js';
 import { getHTMLElementOrNull } from '@features/ui/frontend/utility/get-dom-node-or-null.js';
 
 const WINDOW_THRESHOLD = 1400;
@@ -241,3 +240,227 @@ onMounted(() => {
 	margin-right: 8px;
 }
 </style>
+
+<locale locale="ar-SA" lang="json">
+{
+  "timeline": "الخيط الزمني",
+  "controlPanel": "لوحة التحكم",
+  "settings": "الاعدادات"
+}
+</locale>
+
+<locale locale="ca-ES" lang="json">
+{
+  "timeline": "Línia de temps",
+  "controlPanel": "Tauler de control",
+  "settings": "Preferències"
+}
+</locale>
+
+<locale locale="cs-CZ" lang="json">
+{
+  "timeline": "Časová osa",
+  "controlPanel": "Ovládací panel",
+  "settings": "Nastavení"
+}
+</locale>
+
+<locale locale="da-DK" lang="json">
+{
+  "timeline": "Timeline",
+  "controlPanel": "Control Panel",
+  "settings": "Settings"
+}
+</locale>
+
+<locale locale="de-DE" lang="json">
+{
+  "timeline": "Chronik",
+  "controlPanel": "Systemsteuerung",
+  "settings": "Einstellungen"
+}
+</locale>
+
+<locale locale="en-US" lang="json">
+{
+  "timeline": "Timeline",
+  "controlPanel": "Control Panel",
+  "settings": "Settings"
+}
+</locale>
+
+<locale locale="es-ES" lang="json">
+{
+  "timeline": "Línea de tiempo",
+  "controlPanel": "Panel de control",
+  "settings": "Configuración"
+}
+</locale>
+
+<locale locale="fr-FR" lang="json">
+{
+  "timeline": "Fil",
+  "controlPanel": "Panneau de configuration",
+  "settings": "Paramètres"
+}
+</locale>
+
+<locale locale="id-ID" lang="json">
+{
+  "timeline": "Lini masa",
+  "controlPanel": "Panel kendali",
+  "settings": "Pengaturan"
+}
+</locale>
+
+<locale locale="it-IT" lang="json">
+{
+  "timeline": "Timeline",
+  "controlPanel": "Pannello di controllo",
+  "settings": "Impostazioni"
+}
+</locale>
+
+<locale locale="ja-JP" lang="json">
+{
+  "timeline": "タイムライン",
+  "controlPanel": "コントロールパネル",
+  "settings": "設定"
+}
+</locale>
+
+<locale locale="ja-KS" lang="json">
+{
+  "timeline": "タイムライン",
+  "controlPanel": "コントロールパネル",
+  "settings": "設定"
+}
+</locale>
+
+<locale locale="kab-KAB" lang="json">
+{
+  "timeline": "Timeline",
+  "controlPanel": "Control Panel",
+  "settings": "Iɣewwaṛen"
+}
+</locale>
+
+<locale locale="kn-IN" lang="json">
+{
+  "timeline": "ಸಮಯಸಾಲು",
+  "controlPanel": "Control Panel",
+  "settings": "ಸಿದ್ಧತೆಗಳು"
+}
+</locale>
+
+<locale locale="ko-KR" lang="json">
+{
+  "timeline": "타임라인",
+  "controlPanel": "제어판",
+  "settings": "설정"
+}
+</locale>
+
+<locale locale="nl-NL" lang="json">
+{
+  "timeline": "Tijdlijn",
+  "controlPanel": "Controlepaneel",
+  "settings": "Instellingen"
+}
+</locale>
+
+<locale locale="no-NO" lang="json">
+{
+  "timeline": "Tidslinje",
+  "controlPanel": "Control Panel",
+  "settings": "Innstillinger"
+}
+</locale>
+
+<locale locale="pl-PL" lang="json">
+{
+  "timeline": "Oś czasu",
+  "controlPanel": "Panel sterowania",
+  "settings": "Ustawienia"
+}
+</locale>
+
+<locale locale="pt-PT" lang="json">
+{
+  "timeline": "Linha do tempo",
+  "controlPanel": "Painel de controle",
+  "settings": "Configurações"
+}
+</locale>
+
+<locale locale="ru-RU" lang="json">
+{
+  "timeline": "Лента",
+  "controlPanel": "Панель управления",
+  "settings": "Настройки"
+}
+</locale>
+
+<locale locale="sk-SK" lang="json">
+{
+  "timeline": "Časová os",
+  "controlPanel": "Ovládací panel",
+  "settings": "Nastavenia"
+}
+</locale>
+
+<locale locale="th-TH" lang="json">
+{
+  "timeline": "ไทม์ไลน์",
+  "controlPanel": "แผงควบคุม",
+  "settings": "การตั้งค่า"
+}
+</locale>
+
+<locale locale="tr-TR" lang="json">
+{
+  "timeline": "Pano",
+  "controlPanel": "Kontrol Paneli",
+  "settings": "Ayarlar"
+}
+</locale>
+
+<locale locale="ug-CN" lang="json">
+{
+  "timeline": "Timeline",
+  "controlPanel": "Control Panel",
+  "settings": "Settings"
+}
+</locale>
+
+<locale locale="uk-UA" lang="json">
+{
+  "timeline": "Стрічка",
+  "controlPanel": "Панель керування",
+  "settings": "Налаштування"
+}
+</locale>
+
+<locale locale="vi-VN" lang="json">
+{
+  "timeline": "Bảng tin",
+  "controlPanel": "Bảng điều khiển",
+  "settings": "Cài đặt"
+}
+</locale>
+
+<locale locale="zh-CN" lang="json">
+{
+  "timeline": "时间线",
+  "controlPanel": "控制面板",
+  "settings": "设置"
+}
+</locale>
+
+<locale locale="zh-TW" lang="json">
+{
+  "timeline": "時間軸",
+  "controlPanel": "控制臺",
+  "settings": "設定"
+}
+</locale>

@@ -32,9 +32,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import { onBeforeUnmount, onMounted, ref, useTemplateRef, watch } from 'vue';
-import { miLocalStorage } from '@/local-storage.js';
-import { prefer } from '@/preferences.js';
-import { themeManager } from '@/theme.js';
+import { miLocalStorage } from '@features/preferences/frontend/local-storage.js';
+import { prefer } from '@features/preferences/frontend/preferences.js';
+import { themeManager } from '@features/preferences/frontend/theme.js';
 import { getBgColor } from '@features/ui/frontend/utility/get-bg-color.js';
 
 const miLocalStoragePrefix = 'ui:folder:' as const;

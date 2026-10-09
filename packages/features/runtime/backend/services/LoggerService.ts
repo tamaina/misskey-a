@@ -4,8 +4,8 @@
  */
 
 import { Injectable } from '@nestjs/common';
-import Logger from '@/logger.js';
-import { bindThis } from '@/decorators.js';
+import { Logger } from '../logging/logger.js';
+import { bindThis } from '../decorators.js';
 import type { Keyword } from 'color-convert';
 
 @Injectable()

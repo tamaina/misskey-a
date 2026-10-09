@@ -4,10 +4,14 @@
  */
 
 import { beforeEach, describe, expect, test, vi } from 'vitest';
-import { HttpRequestService } from '@/core/HttpRequestService.js';
-import FetchRssEndpoint, { meta } from '@/server/api/endpoints/fetch-rss.js';
-import { ApiError } from '@/server/api/error.js';
-import type { Mocked } from 'vitest';
+import { HttpRequestService } from '@features/runtime/backend/services/HttpRequestService.js';
+import { fetchRssErrors } from '@features/integrations/backend/endpoints/fetch-rss.contract.js';
+import { createFetchRssProcedure } from '@features/integrations/backend/endpoints/fetch-rss.js';
+import type { ApiServices, ApiContext } from '@features/api/backend/transport/context.js';
+import { call } from '@orpc/server';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+import { mockDeep } from 'vitest-mock-extended';
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
 import type { Response } from 'node-fetch';
 
 const rssParserMocks = vi.hoisted(() => ({
@@ -40,35 +44,30 @@ function deferred<T>() {
 }
 
 function response(url: string, text = RSS): Response {
-	return {
-		url,
-		text: vi.fn().mockResolvedValue(text),
-	} as unknown as Response;
+	const result = mockDeep<Response>({ url });
+	result.text.mockResolvedValue(text);
+	return result;
 }
 
 describe('fetch-rss endpoint', () => {
-	let httpRequestService: Mocked<HttpRequestService>;
-	let endpoint: FetchRssEndpoint;
-
+	let httpRequestService: ReturnType<typeof mockDeep<HttpRequestService>>;
+	let endpoint: ReturnType<typeof createFetchRssProcedure>;
 	beforeEach(() => {
 		rssParserMocks.constructor.mockReset();
 		rssParserMocks.parseString.mockReset();
 		rssParserMocks.parseString.mockResolvedValue({ items: [] });
-		httpRequestService = {
-			send: vi.fn(),
-		} as unknown as Mocked<HttpRequestService>;
-		endpoint = new FetchRssEndpoint(httpRequestService);
+		httpRequestService = mockDeep<HttpRequestService>();
+		endpoint = createFetchRssProcedure({ httpRequestService });
 	});
 
 	async function exec(url: string) {
-		return await endpoint.exec({ url }, null, null);
+		return await call(endpoint, { url }, { context: { services: { authenticate: async () => [null, null], limitActor: () => null, rateLimitFactor: async () => 1, limit: async () => null }, credential: null, ip: '127.0.0.1', headers: {} } });
 	}
 
 	async function expectApiError(promise: Promise<unknown>, code: string, status: number) {
 		await expect(promise).rejects.toMatchObject({
 			code,
-			httpStatusCode: status,
-			info: undefined,
+			status,
 		});
 	}
 
@@ -135,8 +134,7 @@ describe('fetch-rss endpoint', () => {
 
 		const first = exec('HTTPS://EXAMPLE.COM:443/feed.xml#first');
 		const second = exec('https://example.com/feed.xml#second');
-		expect(httpRequestService.send).toHaveBeenCalledTimes(1);
-
+		await vi.waitFor(() => expect(httpRequestService.send).toHaveBeenCalledTimes(1));
 		pending.resolve(response('https://example.com/feed.xml'));
 		await expect(Promise.all([first, second])).resolves.toHaveLength(2);
 		expect(httpRequestService.send).toHaveBeenCalledTimes(1);
@@ -147,7 +145,7 @@ describe('fetch-rss endpoint', () => {
 		httpRequestService.send.mockReturnValue(pending.promise);
 
 		const requests = Array.from({ length: 32 }, (_, i) => exec(`https://example.com/${i}.xml`));
-		expect(httpRequestService.send).toHaveBeenCalledTimes(32);
+		await vi.waitFor(() => expect(httpRequestService.send).toHaveBeenCalledTimes(32));
 		await expectApiError(exec('https://example.com/overflow.xml'), 'FETCH_RSS_UNAVAILABLE', 503);
 		expect(httpRequestService.send).toHaveBeenCalledTimes(32);
 
@@ -177,16 +175,23 @@ describe('fetch-rss endpoint', () => {
 		expect(httpRequestService.send).toHaveBeenCalledTimes(33);
 	});
 
-	test('has the expected rate limit metadata', () => {
-		expect(meta.limit).toEqual({
-			duration: 60 * 1000,
-			max: 300,
+	test('native middleware applies the expected rate limit', async () => {
+		const services = mockDeep<ApiServices<MiLocalUser>>();
+		services.authenticate.mockResolvedValue([null, null]);
+		services.limitActor.mockReturnValue('ip-hash');
+		services.limit.mockResolvedValue(null);
+		httpRequestService.send.mockResolvedValue(response('https://example.com/feed.xml'));
+		await call(endpoint, { url: 'https://example.com/feed.xml' }, {
+			context: {
+				services, credential: null, ip: '127.0.0.1', headers: {},
+			}
 		});
+		expect(services.limit).toHaveBeenCalledWith({ key: 'fetch-rss', duration: 60 * 1000, max: 300 }, 'ip-hash', 1);
 	});
 
 	test('uses only the declared structured API errors', () => {
-		expect(new ApiError(meta.errors.invalidUrl)).toMatchObject({ code: 'INVALID_URL', httpStatusCode: 400 });
-		expect(new ApiError(meta.errors.fetchRssFailed)).toMatchObject({ code: 'FETCH_RSS_FAILED', httpStatusCode: 422 });
-		expect(new ApiError(meta.errors.fetchRssUnavailable)).toMatchObject({ code: 'FETCH_RSS_UNAVAILABLE', httpStatusCode: 503 });
+		expect(apiError(fetchRssErrors.invalidUrl)).toMatchObject({ code: 'INVALID_URL', status: 400 });
+		expect(apiError(fetchRssErrors.fetchRssFailed)).toMatchObject({ code: 'FETCH_RSS_FAILED', status: 422 });
+		expect(apiError(fetchRssErrors.fetchRssUnavailable)).toMatchObject({ code: 'FETCH_RSS_UNAVAILABLE', status: 503 });
 	});
 });

@@ -4,9 +4,9 @@
  */
 
 import { PrimaryColumn, Entity, Index, JoinColumn, Column, ManyToOne } from 'typeorm';
-import { id } from '@/models/util/id.js';
-import { MiUser } from '@/models/User.js';
-import { MiDriveFile } from '@/models/DriveFile.js';
+import { id } from '@features/persistence/backend/models/util/id.js';
+import { MiUser } from '@features/users/backend/models/User.js';
+import { MiDriveFile } from '@features/drive/backend/models/DriveFile.js';
 import { MiChatRoom } from './ChatRoom.js';
 
 @Entity('chat_message')

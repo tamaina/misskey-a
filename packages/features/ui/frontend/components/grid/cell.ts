@@ -7,7 +7,7 @@ import type { ValidateViolation } from '@features/ui/frontend/components/grid/ce
 import type { Size } from '@features/ui/frontend/components/grid/grid.js';
 import type { GridColumn } from '@features/ui/frontend/components/grid/column.js';
 import type { GridRow } from '@features/ui/frontend/components/grid/row.js';
-import type { MenuItem } from '@/types/menu.js';
+import type { MenuItem } from '@features/navigation/frontend/types/menu.js';
 import type { GridContext } from '@features/ui/frontend/components/grid/grid-event.js';
 
 export type CellValue = string | boolean | number | undefined | null | Array<unknown> | NonNullable<unknown>;

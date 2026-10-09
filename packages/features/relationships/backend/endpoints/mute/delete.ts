@@ -2,85 +2,24 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 
-import { Inject, Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
-import type { MutingsRepository } from '@/models/_.js';
-import { DI } from '@/di-symbols.js';
-import { GetterService } from '@/server/api/GetterService.js';
-import { UserMutingService } from '@/core/UserMutingService.js';
-import { ApiError } from '@/server/api/error.js';
-
-export const meta = {
-	tags: ['account'],
-
-	requireCredential: true,
-
-	kind: 'write:mutes',
-
-	errors: {
-		noSuchUser: {
-			message: 'No such user.',
-			code: 'NO_SUCH_USER',
-			id: 'b851d00b-8ab1-4a56-8b1b-e24187cb48ef',
-		},
-
-		muteeIsYourself: {
-			message: 'Mutee is yourself.',
-			code: 'MUTEE_IS_YOURSELF',
-			id: 'f428b029-6b39-4d48-a1d2-cc1ae6dd5cf9',
-		},
-
-		notMuting: {
-			message: 'You are not muting that user.',
-			code: 'NOT_MUTING',
-			id: '5467d020-daa9-4553-81e1-135c0c35a96d',
-		},
-	},
-} as const;
-
-export const paramDef = {
-	type: 'object',
-	properties: {
-		userId: { type: 'string', format: 'misskey:id' },
-	},
-	required: ['userId'],
-} as const;
-
-@Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
-	constructor(
-		@Inject(DI.mutingsRepository)
-		private mutingsRepository: MutingsRepository,
-
-		private userMutingService: UserMutingService,
-		private getterService: GetterService,
-	) {
-		super(meta, paramDef, async (ps, me) => {
-			const muter = me;
-
-			// Check if the mutee is yourself
-			if (me.id === ps.userId) {
-				throw new ApiError(meta.errors.muteeIsYourself);
-			}
-
-			// Get mutee
-			const mutee = await this.getterService.getUser(ps.userId).catch(err => {
-				if (err.id === '15348ddd-432d-49c2-8a5a-8069753becff') throw new ApiError(meta.errors.noSuchUser);
-				throw err;
-			});
-
-			// Check not muting
-			const exist = await this.mutingsRepository.findOneBy({
-				muterId: muter.id,
-				muteeId: mutee.id,
-			});
-
-			if (exist == null) {
-				throw new ApiError(meta.errors.notMuting);
-			}
-
-			await this.userMutingService.unmute([exist]);
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import { relationshipsContract } from '../relationships.contract.js';
+import type { RelationshipsDependencies } from '../../api.implementation.js';
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
+import { relationshipsErrors } from '../relationships.errors.js';
+import { getRelationshipUser } from '../relationship-errors.js';
+export function createMuteDeleteProcedure<Actor extends MiLocalUser>(deps: Pick<RelationshipsDependencies, 'getterService' | 'mutingsRepository' | 'userMutingService'>) {
+	return createApiProcedure<Actor>()(relationshipsContract["mute/delete"]).use(requirePrincipal<Actor>())
+		.handler(async ({ input, context }) => {
+			const actor = context.principal;
+			const errors = relationshipsErrors['mute/delete'];
+			if (actor.id === input.userId) throw apiError(errors.muteeIsYourself);
+			const mutee = await getRelationshipUser(deps.getterService, input.userId, errors.noSuchUser);
+			const existing = await deps.mutingsRepository.findOneBy({ muterId: actor.id, muteeId: mutee.id });
+			if (existing == null) throw apiError(errors.notMuting);
+			await deps.userMutingService.unmute([existing]);
 		});
-	}
 }

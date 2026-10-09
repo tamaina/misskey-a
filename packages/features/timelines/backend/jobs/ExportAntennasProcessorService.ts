@@ -8,16 +8,16 @@ import { Inject, Injectable } from '@nestjs/common';
 import { format as DateFormat } from 'date-fns';
 import { In } from 'typeorm';
 import { DI } from '@/di-symbols.js';
-import type { AntennasRepository, UsersRepository, UserListMembershipsRepository, MiUser } from '@/models/_.js';
-import Logger from '@/logger.js';
-import { DriveService } from '@/core/DriveService.js';
-import { bindThis } from '@/decorators.js';
-import { createTemp } from '@/misc/create-temp.js';
-import { UtilityService } from '@/core/UtilityService.js';
-import { NotificationService } from '@/core/NotificationService.js';
-import { ExportedAntenna } from '@/queue/processors/ImportAntennasProcessorService.js';
-import { QueueLoggerService } from '@/queue/QueueLoggerService.js';
-import type { DBExportAntennasData } from '@/queue/types.js';
+import type { AntennasRepository, UsersRepository, UserListMembershipsRepository, MiUser } from '@features/persistence/backend/repositories/models.js';
+import { Logger } from '@features/runtime/backend/logging/logger.js';
+import { DriveService } from '@features/drive/backend/services/DriveService.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
+import { createTemp } from '@features/runtime/backend/io/create-temp.js';
+import { UtilityService } from '@features/federation/backend/services/UtilityService.js';
+import { NotificationService } from '@features/notifications/backend/services/NotificationService.js';
+import type { ExportedAntenna } from '@features/portability/backend/antenna-artifact.schema.js';
+import { QueueLoggerService } from '@features/runtime/backend/queue/QueueLoggerService.js';
+import type { DBExportAntennasData } from '@features/runtime/backend/queue/types.js';
 import type * as Bull from 'bullmq';
 
 @Injectable()

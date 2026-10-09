@@ -5,24 +5,24 @@
 
 import { Brackets, In, IsNull, Not } from 'typeorm';
 import { Injectable, Inject } from '@nestjs/common';
-import type { MiUser, MiLocalUser, MiRemoteUser } from '@/models/User.js';
-import type { MiNote, IMentionedRemoteUsers } from '@/models/Note.js';
-import type { InstancesRepository, MiMeta, NotesRepository, UsersRepository } from '@/models/_.js';
-import { RelayService } from '@/core/RelayService.js';
-import { FederatedInstanceService } from '@/core/FederatedInstanceService.js';
+import type { MiUser, MiLocalUser, MiRemoteUser } from '@features/users/backend/models/User.js';
+import type { MiNote, IMentionedRemoteUsers } from '../models/Note.js';
+import type { InstancesRepository, MiMeta, NotesRepository, UsersRepository } from '@features/persistence/backend/repositories/models.js';
+import { RelayService } from '@features/federation/backend/services/RelayService.js';
+import { FederatedInstanceService } from '@features/federation/backend/services/FederatedInstanceService.js';
 import { DI } from '@/di-symbols.js';
 import type { Config } from '@/config.js';
-import NotesChart from '@/core/chart/charts/notes.js';
-import PerUserNotesChart from '@/core/chart/charts/per-user-notes.js';
-import InstanceChart from '@/core/chart/charts/instance.js';
-import { GlobalEventService } from '@/core/GlobalEventService.js';
-import { ApRendererService } from '@/core/activitypub/ApRendererService.js';
-import { ApDeliverManagerService } from '@/core/activitypub/ApDeliverManagerService.js';
-import { UserEntityService } from '@/core/entities/UserEntityService.js';
-import { bindThis } from '@/decorators.js';
-import { SearchService } from '@/core/SearchService.js';
-import { ModerationLogService } from '@/core/ModerationLogService.js';
-import { isQuote, isRenote } from '@/misc/is-renote.js';
+import { NotesChart } from '@features/statistics/backend/charts/notes.js';
+import { PerUserNotesChart } from '@features/statistics/backend/charts/per-user-notes.js';
+import { InstanceChart } from '@features/statistics/backend/charts/instance.js';
+import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
+import { ApRendererService } from '@features/federation/backend/services/ApRendererService.js';
+import { ApDeliverManagerService } from '@features/federation/backend/services/ApDeliverManagerService.js';
+import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
+import { SearchService } from '@features/note-search/backend/services/SearchService.js';
+import { ModerationLogService } from '@features/moderation/backend/services/ModerationLogService.js';
+import { isQuote, isRenote } from '../utility/is-renote.js';
 
 @Injectable()
 export class NoteDeleteService {

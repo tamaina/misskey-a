@@ -9,23 +9,23 @@ import { describe, expect, beforeEach, afterEach, test, vi } from 'vitest';
 import type { Mocked } from 'vitest';
 import { mockDeep } from 'vitest-mock-extended';
 import { Test } from '@nestjs/testing';
-import { GlobalModule } from '@/GlobalModule.js';
-import { AnnouncementService } from '@/core/AnnouncementService.js';
-import { AnnouncementEntityService } from '@/core/entities/AnnouncementEntityService.js';
+import { GlobalModule } from '@features/boot/backend/assembly/GlobalModule.js';
+import { AnnouncementService } from '@features/announcements/backend/services/AnnouncementService.js';
+import { featureServiceGroups } from '@features/index/backend/feature-service-providers.js';
 import type {
 	AnnouncementReadsRepository,
 	AnnouncementsRepository,
 	MiAnnouncement,
 	MiUser,
 	UsersRepository,
-} from '@/models/_.js';
+} from '@features/persistence/backend/repositories/models.js';
 import { DI } from '@/di-symbols.js';
-import { genAidx } from '@/misc/id/aidx.js';
-import { CacheService } from '@/core/CacheService.js';
-import { IdService } from '@/core/IdService.js';
-import { GlobalEventService } from '@/core/GlobalEventService.js';
-import { ModerationLogService } from '@/core/ModerationLogService.js';
-import { secureRndstr } from '@/misc/secure-rndstr.js';
+import { genAidx } from '@features/runtime/backend/id/aidx.js';
+import { CacheService } from '@features/users/backend/services/CacheService.js';
+import { IdService } from '@features/runtime/backend/services/IdService.js';
+import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
+import { ModerationLogService } from '@features/moderation/backend/services/ModerationLogService.js';
+import { secureRndstr } from '@features/auth/backend/utility/secure-rndstr.js';
 import type { TestingModule } from '@nestjs/testing';
 
 describe('AnnouncementService', () => {
@@ -65,8 +65,7 @@ describe('AnnouncementService', () => {
 				GlobalModule,
 			],
 			providers: [
-				AnnouncementService,
-				AnnouncementEntityService,
+				...featureServiceGroups.announcements.providers,
 				CacheService,
 				IdService,
 			],

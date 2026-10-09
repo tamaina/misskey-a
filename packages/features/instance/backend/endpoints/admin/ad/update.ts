@@ -2,62 +2,22 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-
-import { Inject, Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
-import type { AdsRepository } from '@/models/_.js';
-import { DI } from '@/di-symbols.js';
-import { ModerationLogService } from '@/core/ModerationLogService.js';
-import { ApiError } from '@/server/api/error.js';
-
-export const meta = {
-	tags: ['admin'],
-
-	requireCredential: true,
-	requireModerator: true,
-	kind: 'write:admin:ad',
-
-	errors: {
-		noSuchAd: {
-			message: 'No such ad.',
-			code: 'NO_SUCH_AD',
-			id: 'b7aa1727-1354-47bc-a182-3a9c3973d300',
-		},
-	},
-} as const;
-
-export const paramDef = {
-	type: 'object',
-	properties: {
-		id: { type: 'string', format: 'misskey:id' },
-		memo: { type: 'string' },
-		url: { type: 'string', minLength: 1 },
-		imageUrl: { type: 'string', minLength: 1 },
-		place: { type: 'string' },
-		priority: { type: 'string' },
-		ratio: { type: 'integer' },
-		expiresAt: { type: 'integer' },
-		startsAt: { type: 'integer' },
-		dayOfWeek: { type: 'integer' },
-		isSensitive: { type: 'boolean' },
-	},
-	required: ['id'],
-} as const;
-
-@Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
-	constructor(
-		@Inject(DI.adsRepository)
-		private adsRepository: AdsRepository,
-
-		private moderationLogService: ModerationLogService,
-	) {
-		super(meta, paramDef, async (ps, me) => {
-			const ad = await this.adsRepository.findOneBy({ id: ps.id });
-
-			if (ad == null) throw new ApiError(meta.errors.noSuchAd);
-
-			await this.adsRepository.update(ad.id, {
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
+import type { ApiActor } from '@features/api/backend/transport/context.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import { adUpdateContract } from './update.contract.js';
+import type { InstanceApiDependencies } from '../../../api.implementation.js';
+export type AdUpdateDependencies = Pick<InstanceApiDependencies, 'adsRepository' | 'moderationLogService'>;
+export function createAdUpdateProcedure<Actor extends ApiActor>(deps: AdUpdateDependencies) {
+	return createApiProcedure<Actor>()(adUpdateContract)
+		.use(requirePrincipal<Actor>())
+		.handler(async ({ input, context }) => {
+			const ps = input;
+			const me = context.principal;
+			const ad = await deps.adsRepository.findOneBy({ id: ps.id });
+			if (ad == null) throw apiError({ code: 'NO_SUCH_AD', message: 'No such ad.', id: 'b7aa1727-1354-47bc-a182-3a9c3973d300' });
+			await deps.adsRepository.update(ad.id, {
 				url: ps.url,
 				place: ps.place,
 				priority: ps.priority,
@@ -69,14 +29,11 @@ export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDe
 				dayOfWeek: ps.dayOfWeek,
 				isSensitive: ps.isSensitive,
 			});
-
-			const updatedAd = await this.adsRepository.findOneByOrFail({ id: ad.id });
-
-			this.moderationLogService.log(me, 'updateAd', {
+			const updatedAd = await deps.adsRepository.findOneByOrFail({ id: ad.id });
+			deps.moderationLogService.log(me, 'updateAd', {
 				adId: ad.id,
 				before: ad,
 				after: updatedAd,
 			});
 		});
-	}
 }

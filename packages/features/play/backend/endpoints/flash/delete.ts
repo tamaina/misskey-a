@@ -3,72 +3,38 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Inject, Injectable } from '@nestjs/common';
-import type { FlashsRepository, UsersRepository } from '@/models/_.js';
-import { Endpoint } from '@/server/api/endpoint-base.js';
-import { DI } from '@/di-symbols.js';
-import { ModerationLogService } from '@/core/ModerationLogService.js';
-import { RoleService } from '@/core/RoleService.js';
-import { ApiError } from '@/server/api/error.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 
-export const meta = {
-	tags: ['flashs'],
+import { requirePrincipal } from '../../../../api/backend/transport/middleware.js';
 
-	requireCredential: true,
-
-	kind: 'write:flash',
-
-	errors: {
-		noSuchFlash: {
-			message: 'No such flash.',
-			code: 'NO_SUCH_FLASH',
-			id: 'de1623ef-bbb3-4289-a71e-14cfa83d9740',
-		},
-
-		accessDenied: {
-			message: 'Access denied.',
-			code: 'ACCESS_DENIED',
-			id: '1036ad7b-9f92-4fff-89c3-0e50dc941704',
-		},
-	},
-} as const;
-
-export const paramDef = {
-	type: 'object',
-	properties: {
-		flashId: { type: 'string', format: 'misskey:id' },
-	},
-	required: ['flashId'],
-} as const;
-
-@Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
-	constructor(
-		@Inject(DI.flashsRepository)
-		private flashsRepository: FlashsRepository,
-
-		@Inject(DI.usersRepository)
-		private usersRepository: UsersRepository,
-
-		private moderationLogService: ModerationLogService,
-		private roleService: RoleService,
-	) {
-		super(meta, paramDef, async (ps, me) => {
-			const flash = await this.flashsRepository.findOneBy({ id: ps.flashId });
-
+import { flashDeleteContract, flashDeleteErrors } from './delete.contract.js';
+import type { FlashsRepository, UsersRepository } from '@features/persistence/backend/repositories/models.js';
+import type { ModerationLogService } from '@features/moderation/backend/services/ModerationLogService.js';
+import type { RoleService } from '@features/roles/backend/services/RoleService.js';
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+export interface FlashDeleteDependencies {
+	flashsRepository: Pick<FlashsRepository, 'delete' | 'findOneBy'>;
+	usersRepository: Pick<UsersRepository, 'findOneByOrFail'>;
+	moderationLogService: Pick<ModerationLogService, 'log'>;
+	roleService: Pick<RoleService, 'isModerator'>;
+}
+export function createFlashDeleteProcedure(deps: FlashDeleteDependencies) {
+	return createApiProcedure<MiLocalUser>()(flashDeleteContract)
+		.use(requirePrincipal<MiLocalUser>())
+		.handler(async ({ input: ps, context }) => {
+			const me = context.principal;
+			const flash = await deps.flashsRepository.findOneBy({ id: ps.flashId });
 			if (flash == null) {
-				throw new ApiError(meta.errors.noSuchFlash);
+				throw apiError(flashDeleteErrors.noSuchFlash);
 			}
-
-			if (!await this.roleService.isModerator(me) && flash.userId !== me.id) {
-				throw new ApiError(meta.errors.accessDenied);
+			if (!await deps.roleService.isModerator(me) && flash.userId !== me.id) {
+				throw apiError(flashDeleteErrors.accessDenied);
 			}
-
-			await this.flashsRepository.delete(flash.id);
-
+			await deps.flashsRepository.delete(flash.id);
 			if (flash.userId !== me.id) {
-				const user = await this.usersRepository.findOneByOrFail({ id: flash.userId });
-				this.moderationLogService.log(me, 'deleteFlash', {
+				const user = await deps.usersRepository.findOneByOrFail({ id: flash.userId });
+				deps.moderationLogService.log(me, 'deleteFlash', {
 					flashId: flash.id,
 					flashUserId: flash.userId,
 					flashUserUsername: user.username,
@@ -76,5 +42,4 @@ export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDe
 				});
 			}
 		});
-	}
 }

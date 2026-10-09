@@ -3,38 +3,22 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Injectable } from '@nestjs/common';
-import { getJsonSchema } from '@/core/chart/core.js';
-import { Endpoint } from '@/server/api/endpoint-base.js';
-import DriveChart from '@/core/chart/charts/drive.js';
-import { schema } from '@/core/chart/charts/entities/drive.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 
-export const meta = {
-	tags: ['charts', 'drive'],
+import { decodeScalarInput } from '@features/api/backend/transport/middleware.js';
+import { chartDriveContract, chartDriveGetContract } from './drive.contract.js';
+import type { ApiActor } from '@features/api/backend/transport/context.js';
+import type { StatisticsDependencies } from '../../api.implementation.js';
+export function createDriveProcedure<Actor extends ApiActor>(deps: StatisticsDependencies['charts']['drive']) {
+	return createApiProcedure<Actor>()(chartDriveContract)
+		.handler(async ({ input }) => projectChart(await deps.getChart(input.span, input.limit, input.offset ? new Date(input.offset) : null)));
+}
+export function createDriveGetProcedure<Actor extends ApiActor>(deps: StatisticsDependencies['charts']['drive']) {
+	return createApiProcedure<Actor>()(chartDriveGetContract)
+		.use(decodeScalarInput<Actor>({ limit: 'integer', offset: 'integer' }))
+		.handler(async ({ input }) => projectChart(await deps.getChart(input.span, input.limit, input.offset ? new Date(input.offset) : null)));
+}
 
-	res: getJsonSchema(schema),
-
-	allowGet: true,
-	cacheSec: 60 * 60,
-} as const;
-
-export const paramDef = {
-	type: 'object',
-	properties: {
-		span: { type: 'string', enum: ['day', 'hour'] },
-		limit: { type: 'integer', minimum: 1, maximum: 500, default: 30 },
-		offset: { type: 'integer', nullable: true, default: null },
-	},
-	required: ['span'],
-} as const;
-
-@Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
-	constructor(
-		private driveChart: DriveChart,
-	) {
-		super(meta, paramDef, async (ps, me) => {
-			return await this.driveChart.getChart(ps.span, ps.limit, ps.offset ? new Date(ps.offset) : null);
-		});
-	}
+function projectChart(value: Awaited<ReturnType<StatisticsDependencies['charts']['drive']['getChart']>>) {
+	return { local: { incCount: value.local.incCount.map(item => item), incSize: value.local.incSize.map(item => item), decCount: value.local.decCount.map(item => item), decSize: value.local.decSize.map(item => item) }, remote: { incCount: value.remote.incCount.map(item => item), incSize: value.remote.incSize.map(item => item), decCount: value.remote.decCount.map(item => item), decSize: value.remote.decSize.map(item => item) } };
 }

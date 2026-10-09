@@ -6,21 +6,21 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { In } from 'typeorm';
 import { DI } from '@/di-symbols.js';
-import type { DriveFilesRepository, MiMeta } from '@/models/_.js';
+import type { DriveFilesRepository, MiMeta } from '@features/persistence/backend/repositories/models.js';
 import type { Config } from '@/config.js';
-import type { Packed } from '@/misc/json-schema.js';
-import { awaitAll } from '@/misc/prelude/await-all.js';
-import type { MiUser } from '@/models/User.js';
-import type { MiDriveFile } from '@/models/DriveFile.js';
-import { appendQuery, query } from '@/misc/prelude/url.js';
-import { deepClone } from '@/misc/clone.js';
-import { bindThis } from '@/decorators.js';
-import { isMimeImage } from '@/misc/is-mime-image.js';
-import { IdService } from '@/core/IdService.js';
-import { uniqueByKey } from '@/misc/unique-by-key.js';
-import { UtilityService } from '@/core/UtilityService.js';
-import { VideoProcessingService } from '@/core/VideoProcessingService.js';
-import { UserEntityService } from '@/core/entities/UserEntityService.js';
+import type { Packed } from '@features/index/backend/packed.schema.js';
+import { awaitAll } from '@features/runtime/backend/async/await-all.js';
+import type { MiUser } from '@features/users/backend/models/User.js';
+import type { MiDriveFile } from '../models/DriveFile.js';
+import { appendQuery, query } from '@features/runtime/backend/formatting/url.js';
+import { deepClone } from '@features/runtime/backend/data/clone.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
+import { isMimeImage } from '@features/drive/backend/utility/is-mime-image.js';
+import { IdService } from '@features/runtime/backend/services/IdService.js';
+import { uniqueByKey } from '@features/runtime/backend/data/unique-by-key.js';
+import { UtilityService } from '@features/federation/backend/services/UtilityService.js';
+import { VideoProcessingService } from '@features/drive/backend/services/VideoProcessingService.js';
+import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import { DriveFolderEntityService } from './DriveFolderEntityService.js';
 
 type PackOptions = {

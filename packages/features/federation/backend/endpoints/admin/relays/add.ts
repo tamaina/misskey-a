@@ -3,76 +3,30 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import { requirePrincipal } from '../../../../../api/backend/transport/middleware.js';
+import type { ApiActor } from '../../../../../api/backend/transport/context.js';
+import { adminRelaysAddContract, adminRelaysAddErrors } from './add.contract.js';
 import { URL } from 'node:url';
-import { Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
-import { RelayService } from '@/core/RelayService.js';
-import { ApiError } from '@/server/api/error.js';
-
-export const meta = {
-	tags: ['admin'],
-
-	requireCredential: true,
-	requireModerator: true,
-	kind: 'write:admin:relays',
-
-	errors: {
-		invalidUrl: {
-			message: 'Invalid URL',
-			code: 'INVALID_URL',
-			id: 'fb8c92d3-d4e5-44e7-b3d4-800d5cef8b2c',
-		},
-	},
-
-	res: {
-		type: 'object',
-		optional: false, nullable: false,
-		properties: {
-			id: {
-				type: 'string',
-				optional: false, nullable: false,
-				format: 'id',
-			},
-			inbox: {
-				type: 'string',
-				optional: false, nullable: false,
-				format: 'url',
-			},
-			status: {
-				type: 'string',
-				optional: false, nullable: false,
-				default: 'requesting',
-				enum: [
-					'requesting',
-					'accepted',
-					'rejected',
-				],
-			},
-		},
-	},
-} as const;
-
-export const paramDef = {
-	type: 'object',
-	properties: {
-		inbox: { type: 'string' },
-	},
-	required: ['inbox'],
-} as const;
-
-@Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
-	constructor(
-		private relayService: RelayService,
-	) {
-		super(meta, paramDef, async (ps, me) => {
-			try {
-				if (new URL(ps.inbox).protocol !== 'https:') throw new Error('https only');
-			} catch {
-				throw new ApiError(meta.errors.invalidUrl);
-			}
-
-			return await this.relayService.addRelay(ps.inbox);
+import type { RelayService } from '../../../services/RelayService.js';
+import { apiError } from '../../../../../api/backend/transport/orpc-error.js';
+export interface AdminRelaysAddDependencies {
+	relayService: Pick<RelayService, 'addRelay'>;
+}
+export function createAdminRelaysAddProcedure<Actor extends ApiActor>(deps: AdminRelaysAddDependencies) {
+	return createApiProcedure<Actor>()(adminRelaysAddContract)
+		.use(requirePrincipal<Actor>())
+		.handler(async ({ input }) => {
+			const ps = input;
+			const result = await (async () => {
+				try {
+					if (new URL(ps.inbox).protocol !== 'https:') throw new Error('https only');
+				} catch {
+					throw apiError(adminRelaysAddErrors.invalidUrl);
+				}
+				const relay = await deps.relayService.addRelay(ps.inbox);
+				return { id: relay.id, inbox: relay.inbox, status: relay.status };
+			})();
+			return result;
 		});
-	}
 }

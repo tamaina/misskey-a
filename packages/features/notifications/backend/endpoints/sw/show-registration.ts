@@ -3,69 +3,20 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Inject, Injectable } from '@nestjs/common';
-import type { SwSubscriptionsRepository } from '@/models/_.js';
-import { Endpoint } from '@/server/api/endpoint-base.js';
-import { DI } from '@/di-symbols.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 
-export const meta = {
-	tags: ['account'],
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import { showRegistrationContract } from './show-registration.contract.js';
 
-	requireCredential: true,
-	secure: true,
-
-	description: 'Check push notification registration exists.',
-
-	res: {
-		type: 'object',
-		optional: false, nullable: true,
-		properties: {
-			userId: {
-				type: 'string',
-				optional: false, nullable: false,
-			},
-			endpoint: {
-				type: 'string',
-				optional: false, nullable: false,
-			},
-			sendReadMessage: {
-				type: 'boolean',
-				optional: false, nullable: false,
-			},
-		},
-	},
-} as const;
-
-export const paramDef = {
-	type: 'object',
-	properties: {
-		endpoint: { type: 'string' },
-	},
-	required: ['endpoint'],
-} as const;
-
-@Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
-	constructor(
-		@Inject(DI.swSubscriptionsRepository)
-		private swSubscriptionsRepository: SwSubscriptionsRepository,
-	) {
-		super(meta, paramDef, async (ps, me) => {
-			// if already subscribed
-			const exist = await this.swSubscriptionsRepository.findOneBy({
-				userId: me.id,
-				endpoint: ps.endpoint,
-			});
-
-			if (exist != null) {
-				return {
-					userId: exist.userId,
-					endpoint: exist.endpoint,
-					sendReadMessage: exist.sendReadMessage,
-				};
-			}
-
-			return null;
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+import type { NotificationsDependencies } from '@features/notifications/backend/api.implementation.js';
+export type ShowRegistrationDependencies = Pick<NotificationsDependencies, 'findSubscription'>;
+export function createShowRegistrationProcedure(deps: ShowRegistrationDependencies) {
+	return createApiProcedure<MiLocalUser>()(showRegistrationContract)
+		.use(requirePrincipal<MiLocalUser>())
+		.handler(async ({ input, context }) => {
+			const actor = context.principal;
+			const record = await deps.findSubscription({ userId: actor.id, endpoint: input.endpoint });
+			return record ? { userId: record.userId, endpoint: record.endpoint, sendReadMessage: record.sendReadMessage } : null;
 		});
-	}
 }

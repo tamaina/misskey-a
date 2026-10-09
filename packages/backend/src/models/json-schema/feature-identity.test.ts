@@ -4,134 +4,301 @@
  */
 
 import { expect, test } from 'vitest';
-import * as legacy_abuse_report_notification_recipient from './abuse-report-notification-recipient.js';
-import * as moved_abuse_report_notification_recipient from '../../../../features/moderation/backend/models/json-schema/abuse-report-notification-recipient.js';
-import * as legacy_achievement from './achievement.js';
-import * as moved_achievement from '../../../../features/users/backend/models/json-schema/achievement.js';
-import * as legacy_ad from './ad.js';
-import * as moved_ad from '../../../../features/instance/backend/models/json-schema/ad.js';
-import * as legacy_announcement from './announcement.js';
-import * as moved_announcement from '../../../../features/announcements/backend/models/json-schema/announcement.js';
-import * as legacy_antenna from './antenna.js';
-import * as moved_antenna from '../../../../features/timelines/backend/models/json-schema/antenna.js';
-import * as legacy_app from './app.js';
-import * as moved_app from '../../../../features/auth/backend/models/json-schema/app.js';
-import * as legacy_blocking from './blocking.js';
-import * as moved_blocking from '../../../../features/relationships/backend/models/json-schema/blocking.js';
-import * as legacy_channel from './channel.js';
-import * as moved_channel from '../../../../features/channels/backend/models/json-schema/channel.js';
-import * as legacy_chat_message from './chat-message.js';
-import * as moved_chat_message from '../../../../features/chat/backend/models/json-schema/chat-message.js';
-import * as legacy_chat_room_invitation from './chat-room-invitation.js';
-import * as moved_chat_room_invitation from '../../../../features/chat/backend/models/json-schema/chat-room-invitation.js';
-import * as legacy_chat_room_membership from './chat-room-membership.js';
-import * as moved_chat_room_membership from '../../../../features/chat/backend/models/json-schema/chat-room-membership.js';
-import * as legacy_chat_room from './chat-room.js';
-import * as moved_chat_room from '../../../../features/chat/backend/models/json-schema/chat-room.js';
-import * as legacy_clip from './clip.js';
-import * as moved_clip from '../../../../features/collections/backend/models/json-schema/clip.js';
-import * as legacy_drive_file from './drive-file.js';
-import * as moved_drive_file from '../../../../features/drive/backend/models/json-schema/drive-file.js';
-import * as legacy_drive_folder from './drive-folder.js';
-import * as moved_drive_folder from '../../../../features/drive/backend/models/json-schema/drive-folder.js';
-import * as legacy_emoji from './emoji.js';
-import * as moved_emoji from '../../../../features/emojis/backend/models/json-schema/emoji.js';
-import * as legacy_federation_instance from './federation-instance.js';
-import * as moved_federation_instance from '../../../../features/federation/backend/models/json-schema/federation-instance.js';
-import * as legacy_flash from './flash.js';
-import * as moved_flash from '../../../../features/play/backend/models/json-schema/flash.js';
-import * as legacy_following from './following.js';
-import * as moved_following from '../../../../features/relationships/backend/models/json-schema/following.js';
-import * as legacy_gallery_post from './gallery-post.js';
-import * as moved_gallery_post from '../../../../features/gallery/backend/models/json-schema/gallery-post.js';
-import * as legacy_hashtag from './hashtag.js';
-import * as moved_hashtag from '../../../../features/discovery/backend/models/json-schema/hashtag.js';
-import * as legacy_invite_code from './invite-code.js';
-import * as moved_invite_code from '../../../../features/auth/backend/models/json-schema/invite-code.js';
-import * as legacy_meta from './meta.js';
-import * as moved_meta from '../../../../features/instance/backend/models/json-schema/meta.js';
-import * as legacy_muting from './muting.js';
-import * as moved_muting from '../../../../features/relationships/backend/models/json-schema/muting.js';
-import * as legacy_note_draft from './note-draft.js';
-import * as moved_note_draft from '../../../../features/notes/backend/models/json-schema/note-draft.js';
-import * as legacy_note_favorite from './note-favorite.js';
-import * as moved_note_favorite from '../../../../features/collections/backend/models/json-schema/note-favorite.js';
-import * as legacy_note_reaction from './note-reaction.js';
-import * as moved_note_reaction from '../../../../features/notes/backend/models/json-schema/note-reaction.js';
-import * as legacy_note from './note.js';
-import * as moved_note from '../../../../features/notes/backend/models/json-schema/note.js';
-import * as legacy_notification from './notification.js';
-import * as moved_notification from '../../../../features/notifications/backend/models/json-schema/notification.js';
-import * as legacy_page from './page.js';
-import * as moved_page from '../../../../features/pages/backend/models/json-schema/page.js';
-import * as legacy_queue from './queue.js';
-import * as moved_queue from '../../../../features/operations/backend/models/json-schema/queue.js';
-import * as legacy_renote_muting from './renote-muting.js';
-import * as moved_renote_muting from '../../../../features/relationships/backend/models/json-schema/renote-muting.js';
-import * as legacy_reversi_game from './reversi-game.js';
-import * as moved_reversi_game from '../../../../features/games/backend/models/json-schema/reversi-game.js';
-import * as legacy_role from './role.js';
-import * as moved_role from '../../../../features/roles/backend/models/json-schema/role.js';
-import * as legacy_signin from './signin.js';
-import * as moved_signin from '../../../../features/auth/backend/models/json-schema/signin.js';
-import * as legacy_system_webhook from './system-webhook.js';
-import * as moved_system_webhook from '../../../../features/integrations/backend/models/json-schema/system-webhook.js';
-import * as legacy_user_list from './user-list.js';
-import * as moved_user_list from '../../../../features/relationships/backend/models/json-schema/user-list.js';
-import * as legacy_user_webhook from './user-webhook.js';
-import * as moved_user_webhook from '../../../../features/integrations/backend/models/json-schema/user-webhook.js';
-import * as legacy_user from './user.js';
-import * as moved_user from '../../../../features/users/backend/models/json-schema/user.js';
+import * as v from 'valibot';
+import { packedSchemas } from '@features/index/backend/packed.schema.js';
+import {
+	packedAnnouncementSchema,
+} from '@features/users/backend/user-related.schema.js';
 
-const cases = [
-	['abuse-report-notification-recipient', legacy_abuse_report_notification_recipient, moved_abuse_report_notification_recipient],
-	['achievement', legacy_achievement, moved_achievement],
-	['ad', legacy_ad, moved_ad],
-	['announcement', legacy_announcement, moved_announcement],
-	['antenna', legacy_antenna, moved_antenna],
-	['app', legacy_app, moved_app],
-	['blocking', legacy_blocking, moved_blocking],
-	['channel', legacy_channel, moved_channel],
-	['chat-message', legacy_chat_message, moved_chat_message],
-	['chat-room-invitation', legacy_chat_room_invitation, moved_chat_room_invitation],
-	['chat-room-membership', legacy_chat_room_membership, moved_chat_room_membership],
-	['chat-room', legacy_chat_room, moved_chat_room],
-	['clip', legacy_clip, moved_clip],
-	['drive-file', legacy_drive_file, moved_drive_file],
-	['drive-folder', legacy_drive_folder, moved_drive_folder],
-	['emoji', legacy_emoji, moved_emoji],
-	['federation-instance', legacy_federation_instance, moved_federation_instance],
-	['flash', legacy_flash, moved_flash],
-	['following', legacy_following, moved_following],
-	['gallery-post', legacy_gallery_post, moved_gallery_post],
-	['hashtag', legacy_hashtag, moved_hashtag],
-	['invite-code', legacy_invite_code, moved_invite_code],
-	['meta', legacy_meta, moved_meta],
-	['muting', legacy_muting, moved_muting],
-	['note-draft', legacy_note_draft, moved_note_draft],
-	['note-favorite', legacy_note_favorite, moved_note_favorite],
-	['note-reaction', legacy_note_reaction, moved_note_reaction],
-	['note', legacy_note, moved_note],
-	['notification', legacy_notification, moved_notification],
-	['page', legacy_page, moved_page],
-	['queue', legacy_queue, moved_queue],
-	['renote-muting', legacy_renote_muting, moved_renote_muting],
-	['reversi-game', legacy_reversi_game, moved_reversi_game],
-	['role', legacy_role, moved_role],
-	['signin', legacy_signin, moved_signin],
-	['system-webhook', legacy_system_webhook, moved_system_webhook],
-	['user-list', legacy_user_list, moved_user_list],
-	['user-webhook', legacy_user_webhook, moved_user_webhook],
-	['user', legacy_user, moved_user],
-] as const;
+import {
+	packedAppSchema,
+	packedInviteCodeSchema,
+	packedSigninSchema,
+} from '@features/auth/backend/auth.schema.js';
 
-for (const [schemaName, legacy, moved] of cases) {
-	test(`${schemaName} legacy schema exports keep their identity`, () => {
-		const legacyNames = Object.keys(legacy).sort();
-		const movedNames = Object.keys(moved).sort();
-		expect(movedNames).toEqual(legacyNames);
-		for (const name of legacyNames) {
-			expect(Reflect.get(moved, name)).toBe(Reflect.get(legacy, name));
-		}
-	});
-}
+import {
+	packedChannelSchema,
+} from '@features/channels/backend/channel.schema.js';
+
+import {
+	packedChatMessageSchema,
+	packedChatMessageLiteSchema,
+	packedChatMessageLiteFor1on1Schema,
+	packedChatMessageLiteForRoomSchema,
+	packedChatRoomSchema,
+	packedChatRoomInvitationSchema,
+	packedChatRoomMembershipSchema,
+} from '@features/chat/backend/chat.schema.js';
+
+import {
+	packedNoteFavoriteSchema,
+	packedClipSchema,
+} from '@features/collections/backend/api.definition.js';
+
+import {
+	packedHashtagSchema,
+} from '@features/discovery/backend/endpoints/hashtag.schema.js';
+
+import {
+	packedDriveFileSchema,
+	packedDriveFolderSchema,
+} from '@features/notes/backend/drive.schema.js';
+
+import {
+	emojiSimpleResult as packedEmojiSimpleSchema,
+	emojiDetailedResult as packedEmojiDetailedSchema,
+	packedEmojiDetailedAdminSchema,
+} from '@features/emojis/backend/api.definition.js';
+
+import {
+	federationInstanceSchema as packedFederationInstanceSchema,
+} from '@features/federation/backend/federation.schema.js';
+
+import {
+	packedGalleryPostSchema,
+} from '@features/collections/backend/api.definition.js';
+
+import {
+	packedReversiGameLiteSchema,
+	packedReversiGameDetailedSchema,
+} from '@features/games/backend/reversi.schema.js';
+
+import {
+	packedAdSchema,
+	packedMetaLiteSchema,
+	packedMetaDetailedOnlySchema,
+	packedMetaDetailedSchema,
+	packedMetaClientOptionsSchema,
+} from '@features/instance/backend/endpoints/meta.schema.js';
+
+import {
+	userWebhookSchema as packedUserWebhookSchema,
+	systemWebhookSchema as packedSystemWebhookSchema,
+} from '@features/integrations/backend/webhook.schema.js';
+
+import {
+	abuseReportNotificationRecipientSchema as packedAbuseReportNotificationRecipientSchema,
+} from '@features/moderation/backend/api.definition.js';
+
+import {
+	packedNoteSchema,
+	packedNoteDraftSchema,
+	packedNoteReactionSchema,
+	packedNoteReactionWithNoteSchema,
+} from '@features/notes/backend/note.schema.js';
+
+import {
+	packedNotificationSchema,
+} from '@features/notifications/backend/notification.schema.js';
+
+import {
+	queueCounterSchema as packedQueueCountSchema,
+	queueMetricsSchema as packedQueueMetricsSchema,
+	queueJobSchema as packedQueueJobSchema,
+} from '@features/operations/backend/queue.schema.js';
+
+import {
+	packedPageSchema,
+} from '@features/users/backend/page.schema.js';
+
+import {
+	packedFlashSchema,
+} from '@features/play/backend/flash.schema.js';
+
+import {
+	packedUserListSchema,
+	packedFollowingSchema,
+	packedMutingSchema,
+	packedRenoteMutingSchema,
+	packedBlockingSchema,
+} from '@features/relationships/backend/endpoints/relationships.schema.js';
+
+import {
+	packedRoleCondFormulaLogicsSchema,
+	packedRoleCondFormulaValueNot,
+	packedRoleCondFormulaValueIsLocalOrRemoteSchema,
+	packedRoleCondFormulaValueUserSettingBooleanSchema,
+	packedRoleCondFormulaValueAssignedRoleSchema,
+	packedRoleCondFormulaValueCreatedSchema,
+	packedRoleCondFormulaFollowersOrFollowingOrNotesSchema,
+	packedRoleLiteSchema,
+	packedRolePoliciesSchema,
+} from '@features/notifications/backend/notification-related.schema.js';
+
+import {
+	packedAntennaSchema,
+} from '@features/timelines/backend/antenna.schema.js';
+
+import {
+	packedUserLiteSchema,
+	packedUserDetailedNotMeOnlySchema,
+	packedMeDetailedOnlySchema,
+	packedUserDetailedNotMeSchema,
+	packedMeDetailedSchema,
+	packedUserDetailedSchema,
+	packedUserSchema,
+	packedAchievementSchema,
+	packedAchievementNameSchema,
+} from '@features/users/backend/user.schema.js';
+
+import { packedPageBlockSchema } from '@features/pages/backend/page-block.schema.js';
+
+import { packedRoleSchema, packedRoleCondFormulaValueSchema } from '@features/roles/backend/role.schema.js';
+
+const nativeDtoBindings: Array<readonly [keyof typeof packedSchemas, unknown]> = [
+	['UserLite', packedUserLiteSchema],
+	['UserDetailedNotMeOnly', packedUserDetailedNotMeOnlySchema],
+	['MeDetailedOnly', packedMeDetailedOnlySchema],
+	['UserDetailedNotMe', packedUserDetailedNotMeSchema],
+	['MeDetailed', packedMeDetailedSchema],
+	['UserDetailed', packedUserDetailedSchema],
+	['User', packedUserSchema],
+	['UserList', packedUserListSchema],
+	['Achievement', packedAchievementSchema],
+	['AchievementName', packedAchievementNameSchema],
+	['Ad', packedAdSchema],
+	['Announcement', packedAnnouncementSchema],
+	['App', packedAppSchema],
+	['Note', packedNoteSchema],
+	['NoteDraft', packedNoteDraftSchema],
+	['NoteReaction', packedNoteReactionSchema],
+	['NoteReactionWithNote', packedNoteReactionWithNoteSchema],
+	['NoteFavorite', packedNoteFavoriteSchema],
+	['Notification', packedNotificationSchema],
+	['DriveFile', packedDriveFileSchema],
+	['DriveFolder', packedDriveFolderSchema],
+	['Following', packedFollowingSchema],
+	['Muting', packedMutingSchema],
+	['RenoteMuting', packedRenoteMutingSchema],
+	['Blocking', packedBlockingSchema],
+	['Hashtag', packedHashtagSchema],
+	['InviteCode', packedInviteCodeSchema],
+	['Page', packedPageSchema],
+	['PageBlock', packedPageBlockSchema],
+	['Channel', packedChannelSchema],
+	['QueueCount', packedQueueCountSchema],
+	['QueueMetrics', packedQueueMetricsSchema],
+	['QueueJob', packedQueueJobSchema],
+	['Antenna', packedAntennaSchema],
+	['Clip', packedClipSchema],
+	['FederationInstance', packedFederationInstanceSchema],
+	['GalleryPost', packedGalleryPostSchema],
+	['EmojiSimple', packedEmojiSimpleSchema],
+	['EmojiDetailed', packedEmojiDetailedSchema],
+	['EmojiDetailedAdmin', packedEmojiDetailedAdminSchema],
+	['Flash', packedFlashSchema],
+	['Signin', packedSigninSchema],
+	['RoleCondFormulaLogics', packedRoleCondFormulaLogicsSchema],
+	['RoleCondFormulaValueNot', packedRoleCondFormulaValueNot],
+	['RoleCondFormulaValueIsLocalOrRemote', packedRoleCondFormulaValueIsLocalOrRemoteSchema],
+	['RoleCondFormulaValueUserSettingBooleanSchema', packedRoleCondFormulaValueUserSettingBooleanSchema],
+	['RoleCondFormulaValueAssignedRole', packedRoleCondFormulaValueAssignedRoleSchema],
+	['RoleCondFormulaValueCreated', packedRoleCondFormulaValueCreatedSchema],
+	['RoleCondFormulaFollowersOrFollowingOrNotes', packedRoleCondFormulaFollowersOrFollowingOrNotesSchema],
+	['RoleCondFormulaValue', packedRoleCondFormulaValueSchema],
+	['RoleLite', packedRoleLiteSchema],
+	['Role', packedRoleSchema],
+	['RolePolicies', packedRolePoliciesSchema],
+	['ReversiGameLite', packedReversiGameLiteSchema],
+	['ReversiGameDetailed', packedReversiGameDetailedSchema],
+	['MetaLite', packedMetaLiteSchema],
+	['MetaDetailedOnly', packedMetaDetailedOnlySchema],
+	['MetaDetailed', packedMetaDetailedSchema],
+	['MetaClientOptions', packedMetaClientOptionsSchema],
+	['UserWebhook', packedUserWebhookSchema],
+	['SystemWebhook', packedSystemWebhookSchema],
+	['AbuseReportNotificationRecipient', packedAbuseReportNotificationRecipientSchema],
+	['ChatMessage', packedChatMessageSchema],
+	['ChatMessageLite', packedChatMessageLiteSchema],
+	['ChatMessageLiteFor1on1', packedChatMessageLiteFor1on1Schema],
+	['ChatMessageLiteForRoom', packedChatMessageLiteForRoomSchema],
+	['ChatRoom', packedChatRoomSchema],
+	['ChatRoomInvitation', packedChatRoomInvitationSchema],
+	['ChatRoomMembership', packedChatRoomMembershipSchema],
+];
+
+test('all 69 packed models bind directly to their native feature DTO', () => {
+	expect(nativeDtoBindings).toHaveLength(69);
+	expect(Object.keys(packedSchemas).sort()).toEqual(nativeDtoBindings.map(([name]) => name).sort());
+	for (const [name, schema] of nativeDtoBindings) expect(packedSchemas[name], name).toBe(schema);
+});
+
+test('packed schemas parse recursive notes and validate referenced users', () => {
+	const user = {
+		id: 'user-id',
+		name: null,
+		username: 'alice',
+		host: null,
+		avatarUrl: 'https://example.test/avatar.png',
+		avatarBlurhash: null,
+		avatarDecorations: [],
+		emojis: {},
+		onlineStatus: 'unknown',
+	};
+	const note = {
+		id: 'note-id',
+		createdAt: '2026-01-01T00:00:00.000Z',
+		text: null,
+		userId: user.id,
+		user,
+		visibility: 'public',
+		reactionAcceptance: null,
+		reactionEmojis: {},
+		reactions: {},
+		reactionCount: 0,
+		renoteCount: 0,
+		repliesCount: 0,
+	};
+	const recursiveNote = { ...note, reply: note };
+
+	expect(v.safeParse(packedSchemas.Note, recursiveNote).success).toBe(true);
+	expect(v.safeParse(packedSchemas.Note, { ...recursiveNote, futureField: { preserved: true } }).success).toBe(false);
+	expect(v.safeParse(packedSchemas.Note, { ...recursiveNote, reply: { ...note, futureField: true } }).success).toBe(false);
+	expect(v.safeParse(packedSchemas.Note, { ...note, user: { ...user, username: 1 } }).success).toBe(false);
+});
+
+test('historical page program blocks preserve their JSON extension fields', () => {
+	const block = {
+		id: 'legacy-if', type: 'if', expression: 'old-variable',
+		children: [{ id: 'legacy-input', type: 'textInput', default: 'preserved' }],
+	};
+	expect(v.parse(packedSchemas.PageBlock, block)).toEqual(block);
+	expect(v.safeParse(packedSchemas.PageBlock, { id: 's', type: 'section' }).success).toBe(false);
+});
+
+test('queue progress and results retain genuine JSON values', () => {
+	const job = {
+		id: 'job', name: 'job', data: { nested: true }, opts: { attempts: 2 },
+		timestamp: 0, progress: 0, attempts: 0, delay: 0, failedReason: '',
+		stacktrace: [], returnValue: null, isFailed: false,
+	};
+	for (const progress of [0, 'working', true, { done: 1 }, [1, 2]]) {
+		expect(v.parse(packedSchemas.QueueJob, { ...job, progress }).progress).toEqual(progress);
+	}
+	for (const returnValue of [null, 'done', 1, false, { value: 1 }, [1]]) {
+		expect(v.parse(packedSchemas.QueueJob, { ...job, returnValue }).returnValue).toEqual(returnValue);
+	}
+});
+
+test('page content retains historical and extension-defined JSON objects', () => {
+	const content = [{ type: 'extension-block', pluginData: { old: true } }, {}];
+	expect(v.parse(packedSchemas.Page.entries.content, content)).toEqual(content);
+	expect(v.safeParse(packedSchemas.Page.entries.content, [42]).success).toBe(false);
+});
+
+test('sparse stored role policies remain valid without filling defaults', () => {
+	const role = {
+		id: 'role', name: 'Role', color: null, iconUrl: null, description: '',
+		isModerator: false, isAdministrator: false, displayOrder: 0,
+		createdAt: '2026-01-01T00:00:00.000Z', updatedAt: '2026-01-01T00:00:00.000Z',
+		target: 'conditional', condFormula: { id: 'root', type: 'and', values: [
+			{ id: 'not', type: 'not', value: { id: 'local', type: 'isLocal' } },
+		] },
+		isPublic: false, isExplorable: false, asBadge: false,
+		preserveAssignmentOnMoveAccount: false, canEditMembersByModerator: false,
+		policies: { canInvite: {}, mentionLimit: { value: 3 } }, usersCount: 0,
+	};
+	expect(v.parse(packedSchemas.Role, role)).toEqual(role);
+	expect(v.safeParse(packedSchemas.RoleCondFormulaValue, { id: 'bad', type: 'not' }).success).toBe(false);
+	expect(v.safeParse(packedSchemas.RoleCondFormulaValue, { id: 'bad', type: 'and' }).success).toBe(false);
+});

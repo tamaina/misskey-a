@@ -1,5 +1,7 @@
 import { defineConfig } from 'rolldown';
 import { globSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+import sourcePaths from './tsconfig.paths.json' with { type: 'json' };
 import { version as summalyVersion } from '@misskey-dev/summaly';
 import type { Plugin, ExternalOption, InputOptions } from 'rolldown';
 import { execa, execaNode } from 'execa';
@@ -112,6 +114,17 @@ export default defineConfig((args) => {
 		'pg',
 	];
 
+	// Resolve declaration-only aliases before Rolldown applies TypeScript paths.
+	const declarationDependencies = new Map(Object.entries(sourcePaths.compilerOptions.paths)
+		.filter(([name, [target]]) => !name.includes('*') && /\.d\.[cm]?ts$/.test(target))
+		.map(([name]) => [name, fileURLToPath(import.meta.resolve(name))]));
+	const declarationDependencyPlugin: Plugin = {
+		name: 'backend-declaration-dependencies',
+		resolveId(source) {
+			return declarationDependencies.get(source) ?? null;
+		},
+	};
+
 	const define: Record<string, string> = {
 		// Summalyのバージョンを埋め込む
 		'_SUMMALY_VERSION_': JSON.stringify(summalyVersion),
@@ -124,6 +137,7 @@ export default defineConfig((args) => {
 			platform: 'node',
 			tsconfig: './test-server/tsconfig.json',
 			plugins: [
+				declarationDependencyPlugin,
 				esmShim(),
 			],
 			transform: {
@@ -143,11 +157,12 @@ export default defineConfig((args) => {
 		return {
 			onLog,
 			input: {
-				entry: './src/boot/entry.ts',
-				cli: './src/boot/cli.ts',
+				entry: '../features/boot/backend/node/entry.mts',
+				cli: '../features/boot/backend/node/cli.mts',
 				config: './src/config.ts',
-				postgres: './src/postgres.ts',
-				'gen-spec': './src/server/api/openapi/gen-spec.ts',
+				postgres: '../features/persistence/backend/postgres.ts',
+				'gen-spec': '../features/api/backend/transport/openapi/gen-spec.ts',
+				'features/api/pilot': '../features/api/backend/pilot.ts',
 				...Object.fromEntries([...globSync('../features/*/{backend,shared}/index.ts')].map(file => [
 					file.replace('../', '').replace('/index.ts', ''), file,
 				])),
@@ -156,6 +171,7 @@ export default defineConfig((args) => {
 			// Feature sources are outside this package; use the backend-owned transform and path settings.
 			tsconfig: './tsconfig.json',
 			plugins: [
+				declarationDependencyPlugin,
 				esmShim(),
 				(isWatchMode ? backendDevServerPlugin() : undefined),
 			],
@@ -171,7 +187,7 @@ export default defineConfig((args) => {
 				format: 'esm',
 			},
 			watch: {
-				include: ['src/**/*.{ts,js,mjs,cjs,tsx,json}', '../features/*/{backend,contract,shared}/**/*.{ts,js,mjs,cjs,tsx,json}'],
+				include: ['src/**/*.{ts,mts,js,mjs,cjs,tsx,json}', '../features/*/{backend,contract,shared}/**/*.{ts,mts,js,mjs,cjs,tsx,json}'],
 				clearScreen: false,
 			},
 			// ビルドの高速化のために、watchモードのときは外部モジュールは全てバンドルしないようにする

@@ -3,62 +3,36 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Inject, Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
-import type { ChannelsRepository } from '@/models/_.js';
-import { QueryService } from '@/core/QueryService.js';
-import { ChannelEntityService } from '@/core/entities/ChannelEntityService.js';
-import { DI } from '@/di-symbols.js';
+import { toPackedChannel } from '../../api.dto.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 
-export const meta = {
-	tags: ['channels', 'account'],
+import { type QueryService } from '@features/notes/backend/services/QueryService.js';
 
-	requireCredential: true,
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import { type ChannelEntityService } from '../../serializers/ChannelEntityService.js';
+import { channelsOwnedContract } from './owned.contract.js';
+import type { ChannelsRepository } from '@features/persistence/backend/repositories/models.js';
 
-	kind: 'read:channels',
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
 
-	res: {
-		type: 'array',
-		optional: false, nullable: false,
-		items: {
-			type: 'object',
-			optional: false, nullable: false,
-			ref: 'Channel',
-		},
-	},
-} as const;
-
-export const paramDef = {
-	type: 'object',
-	properties: {
-		sinceId: { type: 'string', format: 'misskey:id' },
-		untilId: { type: 'string', format: 'misskey:id' },
-		sinceDate: { type: 'integer' },
-		untilDate: { type: 'integer' },
-		limit: { type: 'integer', minimum: 1, maximum: 100, default: 5 },
-	},
-	required: [],
-} as const;
-
-@Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
-	constructor(
-		@Inject(DI.channelsRepository)
-		private channelsRepository: ChannelsRepository,
-
-		private channelEntityService: ChannelEntityService,
-		private queryService: QueryService,
-	) {
-		super(meta, paramDef, async (ps, me) => {
-			const query = this.queryService.makePaginationQuery(this.channelsRepository.createQueryBuilder('channel'), ps.sinceId, ps.untilId, ps.sinceDate, ps.untilDate)
+export interface ChannelsOwnedDependencies {
+	channelsRepository: ChannelsRepository;
+	channelEntityService: ChannelEntityService;
+	queryService: QueryService;
+}
+export function createChannelsOwnedProcedure<Actor extends MiLocalUser>(deps: ChannelsOwnedDependencies) {
+	return createApiProcedure<Actor>()(channelsOwnedContract)
+		.use(requirePrincipal<Actor>())
+		.handler(async ({ input, context }) => {
+			const ps = input;
+			const me = context.principal;
+			const query = deps.queryService.makePaginationQuery(deps.channelsRepository.createQueryBuilder('channel'), ps.sinceId, ps.untilId, ps.sinceDate, ps.untilDate)
 				.andWhere('channel.isArchived = FALSE')
 				.andWhere({ userId: me.id });
 
 			const channels = await query
 				.limit(ps.limit)
 				.getMany();
-
-			return await Promise.all(channels.map(x => this.channelEntityService.pack(x, me)));
+			return (await Promise.all(channels.map(x => deps.channelEntityService.pack(x, me)))).map(toPackedChannel);
 		});
-	}
 }

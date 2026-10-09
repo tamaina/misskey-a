@@ -3,19 +3,16 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Inject, Injectable } from '@nestjs/common';
-import { DI } from '@/di-symbols.js';
-import type { MiRegistryItem, RegistryItemsRepository } from '@/models/_.js';
-import { IdentifiableError } from '@/misc/identifiable-error.js';
-import type { MiUser } from '@/models/User.js';
-import { IdService } from '@/core/IdService.js';
-import { GlobalEventService } from '@/core/GlobalEventService.js';
-import { bindThis } from '@/decorators.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
+import type { MiRegistryItem, RegistryItemsRepository } from '@features/persistence/backend/repositories/models.js';
+import type { MiUser } from '@features/users/backend/models/User.js';
+import type { IdService } from '@features/runtime/backend/services/IdService.js';
+import type { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
 
-@Injectable()
+import type { RegistryJsonValue } from '../endpoints/i/registry/registry.schema.js';
+
 export class RegistryApiService {
 	constructor(
-		@Inject(DI.registryItemsRepository)
 		private registryItemsRepository: RegistryItemsRepository,
 
 		private idService: IdService,
@@ -24,7 +21,7 @@ export class RegistryApiService {
 	}
 
 	@bindThis
-	public async set(userId: MiUser['id'], domain: string | null, scope: string[], key: string, value: any) {
+	public async set(userId: MiUser['id'], domain: string | null, scope: string[], key: string, value: RegistryJsonValue) {
 		// TODO: 作成できるキーの数を制限する
 
 		const query = this.registryItemsRepository.createQueryBuilder('item');
@@ -39,21 +36,19 @@ export class RegistryApiService {
 
 		const existingItem = await query.getOne();
 
+		// Bind JSON separately without TypeORM's infinitely recursive partial entity type.
+		// SQL parameters need explicit JSON encoding; retain SQL NULL for null values.
+		const jsonValue = value === null ? null : JSON.stringify(value);
 		if (existingItem) {
-			await this.registryItemsRepository.update(existingItem.id, {
-				updatedAt: new Date(),
-				value: value,
-			});
+			await this.registryItemsRepository.query(
+				'UPDATE "registry_item" SET "updatedAt" = $1, "value" = $2 WHERE "id" = $3',
+				[new Date(), jsonValue, existingItem.id],
+			);
 		} else {
-			await this.registryItemsRepository.insert({
-				id: this.idService.gen(),
-				updatedAt: new Date(),
-				userId: userId,
-				domain: domain,
-				scope: scope,
-				key: key,
-				value: value,
-			});
+			await this.registryItemsRepository.query(
+				'INSERT INTO "registry_item" ("id", "updatedAt", "userId", "domain", "scope", "key", "value") VALUES ($1, $2, $3, $4, $5, $6, $7)',
+				[this.idService.gen(), new Date(), userId, domain, scope, key, jsonValue],
+			);
 		}
 
 		if (domain == null) {
@@ -112,7 +107,7 @@ export class RegistryApiService {
 
 		const items = await query.getMany();
 
-		const res = [] as { domain: string | null; scopes: string[][] }[];
+		const res: { domain: string | null; scopes: string[][] }[] = [];
 
 		for (const item of items) {
 			const target = res.find(x => x.domain === item.domain);

@@ -3,20 +3,20 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 import bcrypt from 'bcryptjs';
-import { Inject, Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
-import type { UserProfilesRepository, UserSecurityKeysRepository } from '@/models/_.js';
-import { UserEntityService } from '@/core/entities/UserEntityService.js';
-import { GlobalEventService } from '@/core/GlobalEventService.js';
-import { DI } from '@/di-symbols.js';
-import { ApiError } from '@/server/api/error.js';
-import { UserAuthService } from '@/core/UserAuthService.js';
+import type { UserProfilesRepository, UserSecurityKeysRepository } from '@features/persistence/backend/repositories/models.js';
+import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
+import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
+import { UserAuthService } from '../../../services/UserAuthService.js';
+
+import { I2faRemoveKeyContract } from '../../../api.definition.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
 
 export const meta = {
-	requireCredential: true,
-
-	secure: true,
 
 	errors: {
 		incorrectPassword: {
@@ -26,33 +26,20 @@ export const meta = {
 		},
 	},
 } as const;
-
-export const paramDef = {
-	type: 'object',
-	properties: {
-		password: { type: 'string' },
-		token: { type: 'string', nullable: true },
-		credentialId: { type: 'string' },
-	},
-	required: ['password', 'credentialId'],
-} as const;
-
-@Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
-	constructor(
-		@Inject(DI.userSecurityKeysRepository)
-		private userSecurityKeysRepository: UserSecurityKeysRepository,
-
-		@Inject(DI.userProfilesRepository)
-		private userProfilesRepository: UserProfilesRepository,
-
-		private userEntityService: UserEntityService,
-		private userAuthService: UserAuthService,
-		private globalEventService: GlobalEventService,
-	) {
-		super(meta, paramDef, async (ps, me) => {
+export interface I2faRemoveKeyDependencies {
+	userSecurityKeysRepository: UserSecurityKeysRepository;
+	userProfilesRepository: UserProfilesRepository;
+	userEntityService: Pick<UserEntityService, 'packSelf'>;
+	userAuthService: Pick<UserAuthService, 'twoFactorAuthenticate'>;
+	globalEventService: Pick<GlobalEventService, 'publishMainStream'>;
+}
+export function createI2faRemoveKeyProcedure(deps: I2faRemoveKeyDependencies) {
+	return createApiProcedure<MiLocalUser>()(I2faRemoveKeyContract).use(requirePrincipal<MiLocalUser>()).handler(async ({ input, context }) => {
+		const ps = input;
+		const me = context.principal;
+		const result = await (async () => {
 			const token = ps.token;
-			const profile = await this.userProfilesRepository.findOneByOrFail({ userId: me.id });
+			const profile = await deps.userProfilesRepository.findOneByOrFail({ userId: me.id });
 
 			if (profile.twoFactorEnabled) {
 				if (token == null) {
@@ -60,7 +47,7 @@ export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDe
 				}
 
 				try {
-					await this.userAuthService.twoFactorAuthenticate(profile, token);
+					await deps.userAuthService.twoFactorAuthenticate(profile, token);
 				} catch (_) {
 					throw new Error('authentication failed');
 				}
@@ -68,17 +55,17 @@ export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDe
 
 			const passwordMatched = await bcrypt.compare(ps.password, profile.password ?? '');
 			if (!passwordMatched) {
-				throw new ApiError(meta.errors.incorrectPassword);
+				throw apiError(meta.errors.incorrectPassword);
 			}
 
 			// Make sure we only delete the user's own creds
-			await this.userSecurityKeysRepository.delete({
+			await deps.userSecurityKeysRepository.delete({
 				userId: me.id,
 				id: ps.credentialId,
 			});
 
 			// 使われているキーがなくなったらパスワードレスログインをやめる
-			const keyCount = await this.userSecurityKeysRepository.count({
+			const keyCount = await deps.userSecurityKeysRepository.count({
 				where: {
 					userId: me.id,
 				},
@@ -90,18 +77,18 @@ export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDe
 			});
 
 			if (keyCount === 0) {
-				await this.userProfilesRepository.update(me.id, {
+				await deps.userProfilesRepository.update(me.id, {
 					usePasswordLessLogin: false,
 				});
 			}
 
 			// Publish meUpdated event
-			this.globalEventService.publishMainStream(me.id, 'meUpdated', await this.userEntityService.pack(me.id, me, {
-				schema: 'MeDetailed',
+			deps.globalEventService.publishMainStream(me.id, 'meUpdated', await deps.userEntityService.packSelf(me.id, {
 				includeSecrets: true,
 			}));
 
 			return {};
-		});
-	}
+		})();
+		return result;
+	});
 }

@@ -14,14 +14,14 @@ import type { RequestInit, Headers, Response } from 'node-fetch';
 import * as htmlParser from 'node-html-parser';
 import { DataSource } from 'typeorm';
 import Fastify from 'fastify';
-import { entities } from '@/postgres.js';
+import { entities } from '@features/persistence/backend/postgres.js';
 import { loadConfig } from '@/config.js';
 import type * as misskey from 'misskey-js';
-import { DEFAULT_POLICIES } from '@/core/RoleService.js';
-import { validateContentTypeSetAsActivityPub } from '@/core/activitypub/misc/validator.js';
-import { ApiError } from '@/server/api/error.js';
+import { DEFAULT_POLICIES } from '@features/roles/backend/services/RoleService.js';
+import { validateContentTypeSetAsActivityPub } from '@features/federation/backend/protocol/misc/validator.js';
+import { ApiError } from '@features/api/backend/transport/error.js';
 
-export { server as startServer, jobQueue as startJobQueue } from '@/boot/common.js';
+export { server as startServer, jobQueue as startJobQueue } from '@features/boot/backend/node/common.js';
 
 export interface UserToken {
 	token: string;
@@ -279,11 +279,11 @@ export const role = async (user: UserToken, role: Partial<misskey.entities.Role>
 		name: 'New Role',
 		target: 'manual',
 		policies: {
-			...Object.entries(DEFAULT_POLICIES).map(([k, v]) => [k, {
+			...Object.fromEntries(Object.entries(DEFAULT_POLICIES).map(([k, v]) => [k, {
 				priority: 0,
 				useDefault: true,
 				value: v,
-			}]),
+			}])),
 			...policies,
 		},
 		...role,
@@ -646,7 +646,7 @@ export async function sendEnvResetRequest() {
 
 // 与えられた値を強制的にエラーとみなす。この関数は型安全性を破壊するため、異常系のアサーション以外で用いられるべきではない。
 // FIXME(misskey-js): misskey-jsがエラー情報を公開するようになったらこの関数を廃止する
-export function castAsError(obj: Record<string, unknown>): { error: ApiError } {
+export function castAsError(obj: unknown): { error: ApiError } {
 	return obj as { error: ApiError };
 }
 

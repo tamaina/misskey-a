@@ -40,8 +40,8 @@ import * as Misskey from 'misskey-js';
 import XChart from '@features/statistics/frontend/pages/admin/overview.queue.chart.vue';
 import type { ApQueueDomain } from '@features/operations/frontend/pages/admin/federation-job-queue.vue';
 import number from '@features/ui/frontend/filters/number.js';
-import { useStream } from '@/stream.js';
-import { genId } from '@/utility/id.js';
+import { useStream } from '@features/api/frontend/stream.js';
+import { genId } from '@features/runtime/frontend/utility/id.js';
 
 const connection = markRaw(useStream().useChannel('queueStats'));
 

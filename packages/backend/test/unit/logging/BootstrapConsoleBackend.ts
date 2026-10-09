@@ -4,8 +4,8 @@
  */
 
 import { describe, expect, test, vi } from 'vitest';
-import type { LogRecord } from '@/logging/types.js';
-import { BootstrapConsoleBackend } from '@/logging/BootstrapConsoleBackend.js';
+import type { LogRecord } from '@features/runtime/backend/logging/types.js';
+import { BootstrapConsoleBackend } from '@features/runtime/backend/logging/BootstrapConsoleBackend.js';
 
 function createRecord(overrides: Partial<LogRecord> = {}): LogRecord {
 	return {

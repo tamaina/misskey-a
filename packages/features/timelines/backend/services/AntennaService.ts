@@ -6,19 +6,19 @@
 import { Inject, Injectable } from '@nestjs/common';
 import * as Redis from 'ioredis';
 import { In } from 'typeorm';
-import { FanoutTimelineService } from '@/core/FanoutTimelineService.js';
-import type { GlobalEvents } from '@/core/GlobalEventService.js';
-import { GlobalEventService } from '@/core/GlobalEventService.js';
-import { UtilityService } from '@/core/UtilityService.js';
-import { bindThis } from '@/decorators.js';
+import { FanoutTimelineService } from './FanoutTimelineService.js';
+import type { GlobalEvents } from '@features/runtime/backend/services/GlobalEventService.js';
+import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
+import { UtilityService } from '@features/federation/backend/services/UtilityService.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
 import { DI } from '@/di-symbols.js';
-import * as Acct from '@/misc/acct.js';
-import type { Packed } from '@/misc/json-schema.js';
-import type { AntennasRepository, UserListMembershipsRepository } from '@/models/_.js';
-import type { MiAntenna } from '@/models/Antenna.js';
-import type { MiNote } from '@/models/Note.js';
-import type { MiUser } from '@/models/User.js';
-import { CacheService } from '@/core/CacheService.js';
+import * as Acct from '@features/federation/backend/utility/acct.js';
+import type { Packed } from '@features/index/backend/packed.schema.js';
+import type { AntennasRepository, UserListMembershipsRepository } from '@features/persistence/backend/repositories/models.js';
+import type { MiAntenna } from '../models/Antenna.js';
+import type { MiNote } from '@features/notes/backend/models/Note.js';
+import type { MiUser } from '@features/users/backend/models/User.js';
+import { CacheService } from '@features/users/backend/services/CacheService.js';
 import type { OnApplicationShutdown } from '@nestjs/common';
 
 @Injectable()

@@ -6,7 +6,7 @@
 import { ref, shallowRef, triggerRef } from 'vue';
 import * as Misskey from 'misskey-js';
 import type { ComputedRef, Ref, ShallowRef, UnwrapRef } from 'vue';
-import { misskeyApi } from '@/utility/misskey-api.js';
+import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 
 const MAX_ITEMS = 30;
 const MAX_QUEUE_ITEMS = 100;
@@ -24,12 +24,17 @@ type AbsEndpointType = {
 	res: unknown;
 };
 
-type FilterByEpRes<E extends Record<string, AbsEndpointType>> = {
-	[K in keyof E]: E[K]['res'] extends Array<{ id: string }> ? K : never
+type FilterPaginatorCompatibleEndpoints<E extends Record<string, AbsEndpointType>> = {
+	[K in keyof E]: E[K]['res'] extends Array<{ id: string }>
+		? [Exclude<E[K]['req'], undefined>] extends [object] ? K : never
+		: never
 }[keyof E];
-export type PaginatorCompatibleEndpointPaths = FilterByEpRes<Misskey.Endpoints>;
+export type PaginatorCompatibleEndpointPaths = FilterPaginatorCompatibleEndpoints<Misskey.Endpoints>;
 export type PaginatorCompatibleEndpoints = {
-	[K in PaginatorCompatibleEndpointPaths]: Misskey.Endpoints[K];
+	[K in PaginatorCompatibleEndpointPaths]: {
+		req: Exclude<Misskey.Endpoints[K]['req'], undefined>;
+		res: Misskey.Endpoints[K]['res'];
+	};
 };
 
 export type ExtractorFunction<P extends IPaginator, T> = (item: UnwrapRef<P['items']>[number]) => T;
@@ -47,7 +52,7 @@ export interface IPaginator<T = unknown, _T = T & MisskeyEntity> {
 	canFetchNewer: Ref<boolean>;
 	canSearch: boolean;
 	error: Ref<boolean>;
-	computedParams: ComputedRef<Misskey.Endpoints[PaginatorCompatibleEndpointPaths]['req'] | null | undefined> | null;
+	computedParams: ComputedRef<PaginatorCompatibleEndpoints[PaginatorCompatibleEndpointPaths]['req'] | null | undefined> | null;
 	initialId: MisskeyEntity['id'] | null;
 	initialDate: number | null;
 	initialDirection: 'newer' | 'older';
@@ -90,7 +95,7 @@ export class Paginator<
 	public error = ref(false);
 	private endpoint: Endpoint;
 	private limit: number;
-	private params: E['req'] | (() => E['req']);
+	private params: E['req'] | (() => E['req']) | undefined;
 	public computedParams: ComputedRef<E['req'] | null | undefined> | null;
 	public initialId: MisskeyEntity['id'] | null = null;
 	public initialDate: number | null = null;
@@ -150,7 +155,7 @@ export class Paginator<
 		}
 
 		this.limit = props.limit ?? FIRST_FETCH_LIMIT;
-		this.params = props.params ?? {};
+		this.params = props.params;
 		this.computedParams = props.computedParams ?? null;
 		this.order = ref(props.order ?? 'newest');
 		this.initialId = props.initialId ?? null;
@@ -213,11 +218,11 @@ export class Paginator<
 			} : {}),
 		};
 
-		const apiRes = (await misskeyApi(this.endpoint, data).catch(_ => {
+		const apiRes = (await misskeyApi<T[], Endpoint>(this.endpoint, data).catch(_ => {
 			this.error.value = true;
 			this.fetching.value = false;
 			return null;
-		})) as T[] | null;
+		}));
 
 		if (apiRes == null) {
 			return;
@@ -273,9 +278,9 @@ export class Paginator<
 			}),
 		};
 
-		const apiRes = (await misskeyApi<T[]>(this.endpoint, data).catch(_ => {
+		const apiRes = (await misskeyApi<T[], Endpoint>(this.endpoint, data).catch(_ => {
 			return null;
-		})) as T[] | null;
+		}));
 
 		this.fetchingOlder.value = false;
 
@@ -326,9 +331,9 @@ export class Paginator<
 			}),
 		};
 
-		const apiRes = (await misskeyApi<T[]>(this.endpoint, data).catch(_ => {
+		const apiRes = (await misskeyApi<T[], Endpoint>(this.endpoint, data).catch(_ => {
 			return null;
-		})) as T[] | null;
+		}));
 
 		this.fetchingNewer.value = false;
 

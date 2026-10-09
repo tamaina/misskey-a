@@ -2,32 +2,15 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-
-import { Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
-import { QueueService } from '@/core/QueueService.js';
-
-export const meta = {
-	secure: true,
-	requireCredential: true,
-	requireAdmin: true,
-} as const;
-
-export const paramDef = {
-	type: 'object',
-	properties: {
-		fileId: { type: 'string', format: 'misskey:id' },
-	},
-	required: ['fileId'],
-} as const;
-
-@Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
-	constructor(
-		private queueService: QueueService,
-	) {
-		super(meta, paramDef, async (ps, me) => {
-			this.queueService.createImportCustomEmojisJob(me, ps.fileId);
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import type { ApiActor } from '@features/api/backend/transport/context.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import { emojisContract } from '../../../api.definition.js';
+import type { EmojisDependencies } from '../../../api.implementation.js';
+export function createImportZipProcedure<Actor extends ApiActor>(deps: Pick<EmojisDependencies<Actor>, 'queueService'>) {
+	return createApiProcedure<Actor>()(emojisContract.importZip).use(requirePrincipal<Actor>())
+		.handler(async ({ input, context }) => {
+			const actor = context.principal;
+			await deps.queueService.createImportCustomEmojisJob(actor, input.fileId);
 		});
-	}
 }

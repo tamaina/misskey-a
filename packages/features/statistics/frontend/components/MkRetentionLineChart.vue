@@ -12,13 +12,13 @@ import { onMounted, onUnmounted, useTemplateRef } from 'vue';
 import { Chart } from 'chart.js';
 import type { ScatterDataPoint } from 'chart.js';
 import tinycolor from 'tinycolor2';
-import { store } from '@/store.js';
-import { themeManager } from '@/theme.js';
+import { store } from '@features/preferences/frontend/store.js';
+import { themeManager } from '@features/preferences/frontend/theme.js';
 import { useChartTooltip } from '@features/statistics/frontend/composables/use-chart-tooltip.js';
 import { chartVLine } from '@features/statistics/frontend/utility/chart-vline.js';
 import { alpha } from '@features/ui/frontend/utility/color.js';
 import { initChart } from '@features/statistics/frontend/utility/init-chart.js';
-import { misskeyApi } from '@/utility/misskey-api.js';
+import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 
 interface RetentionPoint extends ScatterDataPoint {
 	x: number;

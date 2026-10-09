@@ -3,44 +3,34 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 import bcrypt from 'bcryptjs';
-import { Inject, Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
-import type { UsersRepository, UserProfilesRepository } from '@/models/_.js';
-import { generateNativeUserToken } from '@/misc/token.js';
-import { GlobalEventService } from '@/core/GlobalEventService.js';
-import { DI } from '@/di-symbols.js';
+import type { UsersRepository, UserProfilesRepository } from '@features/persistence/backend/repositories/models.js';
+import { generateNativeUserToken } from '../../utility/token.js';
+import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
+
+import { IRegenerateTokenContract } from '../../api.definition.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
 
 export const meta = {
-	requireCredential: true,
 
-	secure: true,
 } as const;
-
-export const paramDef = {
-	type: 'object',
-	properties: {
-		password: { type: 'string' },
-	},
-	required: ['password'],
-} as const;
-
-@Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
-	constructor(
-		@Inject(DI.usersRepository)
-		private usersRepository: UsersRepository,
-
-		@Inject(DI.userProfilesRepository)
-		private userProfilesRepository: UserProfilesRepository,
-
-		private globalEventService: GlobalEventService,
-	) {
-		super(meta, paramDef, async (ps, me) => {
-			const freshUser = await this.usersRepository.findOneByOrFail({ id: me.id });
+export interface IRegenerateTokenDependencies {
+	usersRepository: UsersRepository;
+	userProfilesRepository: UserProfilesRepository;
+	globalEventService: Pick<GlobalEventService, 'publishInternalEvent' | 'publishMainStream'>;
+}
+export function createIRegenerateTokenProcedure(deps: IRegenerateTokenDependencies) {
+	return createApiProcedure<MiLocalUser>()(IRegenerateTokenContract).use(requirePrincipal<MiLocalUser>()).handler(async ({ input, context }) => {
+		const ps = input;
+		const me = context.principal;
+		const result = await (async () => {
+			const freshUser = await deps.usersRepository.findOneByOrFail({ id: me.id });
 			const oldToken = freshUser.token!;
 
-			const profile = await this.userProfilesRepository.findOneByOrFail({ userId: me.id });
+			const profile = await deps.userProfilesRepository.findOneByOrFail({ userId: me.id });
 
 			// Compare password
 			const same = await bcrypt.compare(ps.password, profile.password!);
@@ -51,13 +41,14 @@ export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDe
 
 			const newToken = generateNativeUserToken();
 
-			await this.usersRepository.update(me.id, {
+			await deps.usersRepository.update(me.id, {
 				token: newToken,
 			});
 
 			// Publish event
-			this.globalEventService.publishInternalEvent('userTokenRegenerated', { id: me.id, oldToken, newToken });
-			this.globalEventService.publishMainStream(me.id, 'myTokenRegenerated');
-		});
-	}
+			deps.globalEventService.publishInternalEvent('userTokenRegenerated', { id: me.id, oldToken, newToken });
+			deps.globalEventService.publishMainStream(me.id, 'myTokenRegenerated');
+		})();
+		return result;
+	});
 }

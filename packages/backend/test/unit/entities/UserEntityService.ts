@@ -5,53 +5,52 @@
 
 import { Test, TestingModule } from '@nestjs/testing';
 import { describe, expect, beforeAll, afterAll, test } from 'vitest';
-import type { MiUser } from '@/models/User.js';
-import { UserEntityService } from '@/core/entities/UserEntityService.js';
-import { GlobalModule } from '@/GlobalModule.js';
-import { CoreModule } from '@/core/CoreModule.js';
-import { secureRndstr } from '@/misc/secure-rndstr.js';
-import { genAidx } from '@/misc/id/aidx.js';
+import { GlobalModule } from '@features/boot/backend/assembly/GlobalModule.js';
+import { CoreModule } from '@features/boot/backend/assembly/CoreModule.js';
+import { featureServiceGroups } from '@features/index/backend/feature-service-providers.js';
+import { secureRndstr } from '@features/auth/backend/utility/secure-rndstr.js';
+import { genAidx } from '@features/runtime/backend/id/aidx.js';
 import {
 	BlockingsRepository,
 	FollowingsRepository, FollowRequestsRepository,
-	MiUserProfile, MutingsRepository, RenoteMutingsRepository,
+	type ModerationLogsRepository, MiUserProfile, MutingsRepository, RenoteMutingsRepository,
 	UserMemoRepository,
 	UserProfilesRepository,
 	UsersRepository,
-} from '@/models/_.js';
+} from '@features/persistence/backend/repositories/models.js';
+import type { Config } from '@/config.js';
 import { DI } from '@/di-symbols.js';
-import { AvatarDecorationService } from '@/core/AvatarDecorationService.js';
-import { ApPersonService } from '@/core/activitypub/models/ApPersonService.js';
-import { NoteEntityService } from '@/core/entities/NoteEntityService.js';
-import { PageEntityService } from '@/core/entities/PageEntityService.js';
-import { CustomEmojiService } from '@/core/CustomEmojiService.js';
-import { AnnouncementService } from '@/core/AnnouncementService.js';
-import { RoleService } from '@/core/RoleService.js';
-import { FederatedInstanceService } from '@/core/FederatedInstanceService.js';
-import { IdService } from '@/core/IdService.js';
-import { UtilityService } from '@/core/UtilityService.js';
-import { EmojiEntityService } from '@/core/entities/EmojiEntityService.js';
-import { ModerationLogService } from '@/core/ModerationLogService.js';
-import { GlobalEventService } from '@/core/GlobalEventService.js';
-import { DriveFileEntityService } from '@/core/entities/DriveFileEntityService.js';
-import { MetaService } from '@/core/MetaService.js';
-import { FetchInstanceMetadataService } from '@/core/FetchInstanceMetadataService.js';
-import { CacheService } from '@/core/CacheService.js';
-import { ApResolverService } from '@/core/activitypub/ApResolverService.js';
-import { ApNoteService } from '@/core/activitypub/models/ApNoteService.js';
-import { ApImageService } from '@/core/activitypub/models/ApImageService.js';
-import { ApMfmService } from '@/core/activitypub/ApMfmService.js';
-import { MfmService } from '@/core/MfmService.js';
-import { HashtagService } from '@/core/HashtagService.js';
-import UsersChart from '@/core/chart/charts/users.js';
-import { ChartLoggerService } from '@/core/chart/ChartLoggerService.js';
-import InstanceChart from '@/core/chart/charts/instance.js';
-import { ApLoggerService } from '@/core/activitypub/ApLoggerService.js';
-import { AccountMoveService } from '@/core/AccountMoveService.js';
-import { ReactionService } from '@/core/ReactionService.js';
-import { NotificationService } from '@/core/NotificationService.js';
-import { ReactionsBufferingService } from '@/core/ReactionsBufferingService.js';
-import { ChatService } from '@/core/ChatService.js';
+import { UtilityService } from '@features/federation/backend/services/UtilityService.js';
+import { CacheService } from '@features/users/backend/services/CacheService.js';
+import { UsersChart } from '@features/statistics/backend/charts/users.js';
+import { InstanceChart } from '@features/statistics/backend/charts/instance.js';
+import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
+import { AvatarDecorationService } from '@features/avatar-decorations/backend/services/AvatarDecorationService.js';
+import { ApPersonService } from '@features/federation/backend/services/ApPersonService.js';
+import { NoteEntityService } from '@features/notes/backend/serializers/NoteEntityService.js';
+import { CustomEmojiService } from '@features/emojis/backend/services/CustomEmojiService.js';
+import { RoleService } from '@features/roles/backend/services/RoleService.js';
+import { FederatedInstanceService } from '@features/federation/backend/services/FederatedInstanceService.js';
+import { IdService } from '@features/runtime/backend/services/IdService.js';
+import { ModerationLogService } from '@features/moderation/backend/services/ModerationLogService.js';
+import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
+import { DriveFileEntityService } from '@features/drive/backend/serializers/DriveFileEntityService.js';
+import { MetaService } from '@features/instance/backend/services/MetaService.js';
+import { FetchInstanceMetadataService } from '@features/federation/backend/services/FetchInstanceMetadataService.js';
+import { ApResolverService } from '@features/federation/backend/services/ApResolverService.js';
+import { ApNoteService } from '@features/federation/backend/services/ApNoteService.js';
+import { ApImageService } from '@features/federation/backend/services/ApImageService.js';
+import { ApMfmService } from '@features/federation/backend/services/ApMfmService.js';
+import { MfmService } from '@features/markup/backend/services/MfmService.js';
+import { HashtagService } from '@features/discovery/backend/services/HashtagService.js';
+import { ChartLoggerService } from '@features/statistics/backend/services/ChartLoggerService.js';
+import { ApLoggerService } from '@features/federation/backend/services/ApLoggerService.js';
+import { AccountMoveService } from '@features/users/backend/services/AccountMoveService.js';
+import { ReactionService } from '@features/notes/backend/services/ReactionService.js';
+import { NotificationService } from '@features/notifications/backend/services/NotificationService.js';
+import { ReactionsBufferingService } from '@features/notes/backend/services/ReactionsBufferingService.js';
+import { ChatService } from '@features/chat/backend/services/ChatService.js';
+import type { MiUser } from '@features/users/backend/models/User.js';
 
 process.env.NODE_ENV = 'test';
 
@@ -68,7 +67,7 @@ describe('UserEntityService', () => {
 		let mutingRepository: MutingsRepository;
 		let renoteMutingsRepository: RenoteMutingsRepository;
 
-		async function createUser(userData: Partial<MiUser> = {}, profileData: Partial<MiUserProfile> = {}) {
+		async function createUser(userData: Partial<MiUser> = {}, profileData: Partial<Pick<MiUserProfile, 'birthday' | 'achievements'>> = {}) {
 			const un = secureRndstr(16);
 			const user = await usersRepository
 				.insert({
@@ -145,15 +144,12 @@ describe('UserEntityService', () => {
 				UserEntityService,
 				ApPersonService,
 				NoteEntityService,
-				PageEntityService,
 				CustomEmojiService,
-				AnnouncementService,
 				RoleService,
 				FederatedInstanceService,
 				IdService,
 				AvatarDecorationService,
 				UtilityService,
-				EmojiEntityService,
 				ModerationLogService,
 				GlobalEventService,
 				DriveFileEntityService,
@@ -180,7 +176,21 @@ describe('UserEntityService', () => {
 			app = await Test.createTestingModule({
 				imports: [GlobalModule, CoreModule],
 				providers: [
-					...services,
+					...services.filter(service => service !== ModerationLogService && service !== MfmService && service !== HashtagService),
+					{
+						provide: ModerationLogService,
+						inject: [DI.moderationLogsRepository, IdService],
+						useFactory: (repository: ModerationLogsRepository, id: IdService) => new ModerationLogService(repository, id),
+					},
+					{
+						provide: MfmService,
+						inject: [DI.config],
+						useFactory: (config: Config) => new MfmService(config),
+					},
+					...featureServiceGroups.ranking.providers,
+					...featureServiceGroups.announcements.providers,
+					...featureServiceGroups.pages.providers,
+					...featureServiceGroups.emojis.providers,
 					...services.map(x => ({ provide: x.name, useExisting: x })),
 				],
 			}).compile();

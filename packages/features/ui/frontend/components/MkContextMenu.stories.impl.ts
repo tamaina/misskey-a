@@ -6,7 +6,7 @@
 import { userEvent, within } from '@storybook/test';
 import MkContextMenu from '@features/ui/frontend/components/MkContextMenu.vue';
 import type { StoryObj } from '@storybook/vue3';
-import * as os from '@/os.js';
+import * as os from '@features/ui/frontend/os.js';
 export const Empty = {
 	render(args) {
 		return {

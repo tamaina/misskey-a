@@ -11,11 +11,13 @@ import { dirname } from 'node:path';
 import { Test } from '@nestjs/testing';
 import { afterAll, beforeAll, describe, test } from 'vitest';
 import { mockDeep } from 'vitest-mock-extended';
-import { GlobalModule } from '@/GlobalModule.js';
-import { FileInfo, FileInfoService } from '@/core/FileInfoService.js';
-//import { DI } from '@/di-symbols.js';
-import { SensitiveMediaDetectionService } from '@/core/SensitiveMediaDetectionService.js';
-import { LoggerService } from '@/core/LoggerService.js';
+import { GlobalModule } from '@features/boot/backend/assembly/GlobalModule.js';
+import { DI } from '@/di-symbols.js';
+import type { MiMeta } from '@features/persistence/backend/repositories/models.js';
+import { FileInfo, FileInfoService } from '@features/drive/backend/services/FileInfoService.js';
+import { SensitiveMediaDetectionService } from '@features/drive/backend/services/SensitiveMediaDetectionService.js';
+import { LoggerService } from '@features/runtime/backend/services/LoggerService.js';
+import { HttpRequestService } from '@features/runtime/backend/services/HttpRequestService.js';
 import type { TestingModule } from '@nestjs/testing';
 
 const _filename = fileURLToPath(import.meta.url);
@@ -33,7 +35,7 @@ describe('FileInfoService', () => {
 		delete fi.porn;
 
 		return fi;
-	}
+	};
 
 	beforeAll(async () => {
 		app = await Test.createTestingModule({
@@ -41,9 +43,17 @@ describe('FileInfoService', () => {
 				GlobalModule,
 			],
 			providers: [
-				SensitiveMediaDetectionService,
+				{
+					provide: SensitiveMediaDetectionService,
+					inject: [DI.meta, HttpRequestService, LoggerService],
+					useFactory: (meta: MiMeta, http: HttpRequestService, logger: LoggerService) => new SensitiveMediaDetectionService(meta, http, logger),
+				},
 				LoggerService,
-				FileInfoService,
+				{
+					provide: FileInfoService,
+					inject: [SensitiveMediaDetectionService, LoggerService],
+					useFactory: (sensitive: SensitiveMediaDetectionService, logger: LoggerService) => new FileInfoService(sensitive, logger),
+				},
 			],
 		})
 			.useMocker((token) => {

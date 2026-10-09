@@ -438,29 +438,37 @@ function toStories(component: string): Promise<string> {
 // glob('src/{components,pages,ui,widgets}/**/*.vue')
 (async () => {
 	const components = [
-		globSync('src/components/global/Mk*.vue'),
+
 		globSync('../features/navigation/frontend/components/global/RouterView.vue'),
 		globSync('../features/moderation/frontend/components/MkAbuseReportWindow.vue'),
 		globSync('../features/users/frontend/components/MkAccountMoved.vue'),
 		globSync('../features/users/frontend/components/MkAchievements.vue'),
 		globSync('../features/ui/frontend/components/MkAnalogClock.vue'),
-		globSync('src/components/MkAnimBg.vue'),
+		globSync('../features/web/frontend/components/MkAnimBg.vue'),
+
 		globSync('../features/announcements/frontend/components/MkAnnouncementDialog.vue'),
 		globSync('../features/timelines/frontend/components/MkAntennaEditor.vue'),
 		globSync('../features/timelines/frontend/components/MkAntennaEditorDialog.vue'),
-		globSync('src/components/MkAsUi.vue'),
+		globSync('../features/play/frontend/components/MkAsUi.vue'),
+
 		globSync('../features/discovery/frontend/components/MkAutocomplete.vue'),
 		globSync('../features/users/frontend/components/MkAvatars.vue'),
-		globSync('src/components/Mk[B-E]*.vue'),
+		globSync('../features/instance/frontend/components/MkDonation.vue'),
+		globSync('../features/integrations/frontend/components/MkExtensionInstaller.vue'),
+		globSync('../features/drive/frontend/components/MkBlurhash.vue'),
+		globSync('../features/drive/frontend/components/MkCropperDialog.vue'),
+
 		globSync('../features/play/frontend/components/MkFlashPreview.vue'),
-		globSync('../features/gallery/frontend/components/MkGalleryPostPreview.vue'),
-		globSync('src/components/MkSignupServerRules.vue'),
-		globSync('src/components/MkUserSetupDialog.vue'),
-		globSync('src/components/MkUserSetupDialog.*.vue'),
+		globSync('../features/collections/frontend/components/MkGalleryPostPreview.vue'),
+
+		globSync('../features/users/frontend/components/MkUserSetupDialog.vue'),
+
+
 		globSync('../features/federation/frontend/components/MkInstanceCardMini.vue'),
 		globSync('../features/auth/frontend/components/MkInviteCode.vue'),
 		globSync('../features/discovery/frontend/components/MkTagItem.vue'),
-		globSync('src/components/MkRoleSelectDialog.vue'),
+		globSync('../features/roles/frontend/components/MkRoleSelectDialog.vue'),
+
 		globSync('../features/ui/frontend/components/grid/MkGrid.vue'),
 		globSync('../features/emojis/frontend/pages/admin/custom-emojis-manager2.vue'),
 		globSync('../features/statistics/frontend/pages/admin/overview.ap-requests.vue'),

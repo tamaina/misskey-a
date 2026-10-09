@@ -5,11 +5,11 @@
 
 import { Injectable } from '@nestjs/common';
 import * as mfm from 'mfm-js';
-import { MfmService } from '@/core/MfmService.js';
-import type { MiNote } from '@/models/Note.js';
-import { bindThis } from '@/decorators.js';
-import { extractApHashtagObjects } from '@/core/activitypub/models/tag.js';
-import type { IObject } from '@/core/activitypub/type.js';
+import { MfmService } from '@features/markup/backend/services/MfmService.js';
+import type { MiNote } from '@features/notes/backend/models/Note.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
+import { extractApHashtagObjects } from '../protocol/models/tag.js';
+import type { IObject } from '../protocol/type.js';
 
 @Injectable()
 export class ApMfmService {

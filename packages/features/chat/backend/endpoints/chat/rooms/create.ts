@@ -3,61 +3,37 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Inject, Injectable } from '@nestjs/common';
-import ms from '@/runtime-dependencies/ms.js';
-import { Endpoint } from '@/server/api/endpoint-base.js';
-import { DI } from '@/di-symbols.js';
-import { ApiError } from '@/server/api/error.js';
-import { ChatService } from '@/core/ChatService.js';
-import { ChatEntityService } from '@/core/entities/ChatEntityService.js';
+import { toPackedChatRoom } from '../../../api.dto.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 
-export const meta = {
-	tags: ['chat'],
+import type { InferSchemaOutput } from '@orpc/contract';
 
-	requireCredential: true,
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import { type ChatService } from '../../../services/ChatService.js';
+import { type ChatEntityService } from '../../../serializers/ChatEntityService.js';
+import { chatRoomsCreateContract } from './create.contract.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
 
-	prohibitMoved: true,
-
-	kind: 'write:chat',
-
-	limit: {
-		duration: ms('1day'),
-		max: 10,
-	},
-
-	res: {
-		type: 'object',
-		optional: false, nullable: false,
-		ref: 'ChatRoom',
-	},
-
-	errors: {
-	},
-} as const;
-
-export const paramDef = {
-	type: 'object',
-	properties: {
-		name: { type: 'string', maxLength: 256 },
-		description: { type: 'string', maxLength: 1024 },
-	},
-	required: ['name'],
-} as const;
-
-@Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
-	constructor(
-		private chatService: ChatService,
-		private chatEntityService: ChatEntityService,
-	) {
-		super(meta, paramDef, async (ps, me) => {
-			await this.chatService.checkChatAvailability(me.id, 'write');
-
-			const room = await this.chatService.createRoom(me, {
-				name: ps.name,
-				description: ps.description ?? '',
-			});
-			return await this.chatEntityService.packRoom(room);
-		});
+export interface ChatRoomsCreateDependencies {
+	chatService: ChatService;
+	chatEntityService: ChatEntityService;
+}
+export function createChatRoomsCreateProcedure(deps: ChatRoomsCreateDependencies) {
+	async function execute(ps: InferSchemaOutput<NonNullable<typeof chatRoomsCreateContract['~orpc']['inputSchema']>>, me: MiLocalUser): Promise<InferSchemaOutput<NonNullable<typeof chatRoomsCreateContract['~orpc']['outputSchema']>>> {
+		return toPackedChatRoom(await run(ps, me));
 	}
+
+	async function run(ps: InferSchemaOutput<NonNullable<typeof chatRoomsCreateContract['~orpc']['inputSchema']>>, me: MiLocalUser) {
+		await deps.chatService.checkChatAvailability(me.id, 'write');
+
+		const room = await deps.chatService.createRoom(me, {
+			name: ps.name,
+			description: ps.description ?? '',
+		});
+		return await deps.chatEntityService.packRoom(room);
+	}
+
+	return createApiProcedure<MiLocalUser>()(chatRoomsCreateContract)
+		.use(requirePrincipal<MiLocalUser>())
+		.handler(({ input, context }) => execute(input, context.principal));
 }

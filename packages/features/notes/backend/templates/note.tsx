@@ -3,12 +3,12 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import type { Packed } from '@/misc/json-schema.js';
-import type { MiUserProfile } from '@/models/UserProfile.js';
-import type { CommonProps } from '@/server/web/views/_.js';
-import { Layout } from '@/server/web/views/base.js';
-import { isRenotePacked } from '@/misc/is-renote.js';
-import { getNoteSummary } from '@/misc/get-note-summary.js';
+import type { Packed } from '@features/index/backend/packed.schema.js';
+import type { MiUserProfile } from '@features/users/backend/models/UserProfile.js';
+import type { CommonProps } from '@features/web/backend/templates/_.js';
+import { Layout } from '@features/web/backend/templates/base.js';
+import { isRenotePacked } from '../utility/is-renote.js';
+import { getNoteSummary } from '../utility/get-note-summary.js';
 
 export function NotePage(props: CommonProps<{
 	note: Packed<'Note'>;

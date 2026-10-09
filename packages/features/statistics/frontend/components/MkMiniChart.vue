@@ -32,10 +32,10 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import { watch, ref } from 'vue';
-import { genId } from '@/utility/id.js';
-import { themeManager } from '@/theme.js';
+import { genId } from '@features/runtime/frontend/utility/id.js';
+import { themeManager } from '@features/preferences/frontend/theme.js';
 import tinycolor from 'tinycolor2';
-import { useInterval } from '@@/js/use-interval.js';
+import { useInterval } from '@features/ui/frontend/shared/use-interval.js';
 
 const props = defineProps<{
 	src: number[];

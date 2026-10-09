@@ -5,10 +5,20 @@
 
 import { resolve } from 'node:path';
 import { vueInternationalization } from 'vite-vue-internationalization';
+import type { VueInternationalizationOptions } from 'vite-vue-internationalization';
+import embedBootMessages from '../../features/boot/frontend/embed/boot-messages.json' with { type: 'json' };
 
 /** Keep VVI 1.1.3 from replacing an SFC dictionary with a style/template fragment. */
-export function pluginVvi() {
-	const plugin = vueInternationalization({ primaryLocale: 'ja-JP', scan: { include: ['frontend/src/**/*.vue', 'features/*/frontend/**/*.vue'] } });
+export function pluginVvi(options: { embed?: boolean; buildStrategy?: VueInternationalizationOptions['buildStrategy'] } = {}) {
+	const plugin = vueInternationalization({
+		primaryLocale: 'ja-JP',
+		buildStrategy: options.buildStrategy,
+		// Embed boot messages also retain all supported loader languages.
+		global: options.embed ? embedBootMessages : undefined,
+		scan: options.embed
+			? { include: ['features/*/frontend/embed/**/*.vue'] }
+			: { include: ['features/*/frontend/**/*.vue'], exclude: ['features/*/frontend/embed/**'] },
+	});
 	const configure = plugin.configResolved;
 	if (typeof configure !== 'function') throw new Error('Unexpected VVI config hook; review the feature scan root on upgrade.');
 	plugin.configResolved = function (config) {

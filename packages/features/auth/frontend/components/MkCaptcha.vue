@@ -32,7 +32,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script lang="ts" setup>
 import { ref, useTemplateRef, computed, onMounted, onBeforeUnmount, watch, onUnmounted, nextTick } from 'vue';
 import type Reciever_typeReferenceOnly from '@mcaptcha/core-glue';
-import { store } from '@/store.js';
+import { store } from '@features/preferences/frontend/store.js';
 
 // APIs provided by Captcha services
 // see: https://docs.hcaptcha.com/configuration/#javascript-api

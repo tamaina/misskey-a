@@ -1,0 +1,2767 @@
+[
+	{
+		"file": "packages/features/integrations/frontend/pages/settings/webhook.edit.vue",
+		"originalSha256": "5a0a5a1f1319bf72e3192d40f12d8d789f4fd5f8b8579292967b14e06f781570",
+		"migratedSha256": "8aff757ed2f293563ba47e6cea587edb8dadb1e132b5c08a71a37894d275b3a9",
+		"edits": [
+			{
+				"start": 181,
+				"end": 210,
+				"source": "i18n.ts._webhookSettings.name",
+				"replacement": "$locale.sfc.webhookSettingsName",
+				"key": "_webhookSettings.name",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 181
+			},
+			{
+				"start": 429,
+				"end": 460,
+				"source": "i18n.ts._webhookSettings.secret",
+				"replacement": "$locale.sfc.webhookSettingsSecret",
+				"key": "_webhookSettings.secret",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 431
+			},
+			{
+				"start": 525,
+				"end": 557,
+				"source": "i18n.ts._webhookSettings.trigger",
+				"replacement": "$locale.sfc.webhookSettingsTrigger",
+				"key": "_webhookSettings.trigger",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 529
+			},
+			{
+				"start": 697,
+				"end": 736,
+				"source": "i18n.ts._webhookSettings._events.follow",
+				"replacement": "$locale.sfc.webhookSettingsEventsFollow",
+				"key": "_webhookSettings._events.follow",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 703
+			},
+			{
+				"start": 995,
+				"end": 1036,
+				"source": "i18n.ts._webhookSettings._events.followed",
+				"replacement": "$locale.sfc.webhookSettingsEventsFollowed",
+				"key": "_webhookSettings._events.followed",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 1001
+			},
+			{
+				"start": 1295,
+				"end": 1332,
+				"source": "i18n.ts._webhookSettings._events.note",
+				"replacement": "$locale.sfc.webhookSettingsEventsNote",
+				"key": "_webhookSettings._events.note",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 1301
+			},
+			{
+				"start": 1584,
+				"end": 1622,
+				"source": "i18n.ts._webhookSettings._events.reply",
+				"replacement": "$locale.sfc.webhookSettingsEventsReply",
+				"key": "_webhookSettings._events.reply",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 1590
+			},
+			{
+				"start": 1877,
+				"end": 1916,
+				"source": "i18n.ts._webhookSettings._events.renote",
+				"replacement": "$locale.sfc.webhookSettingsEventsRenote",
+				"key": "_webhookSettings._events.renote",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 1883
+			},
+			{
+				"start": 2192,
+				"end": 2233,
+				"source": "i18n.ts._webhookSettings._events.reaction",
+				"replacement": "$locale.sfc.webhookSettingsEventsReaction",
+				"key": "_webhookSettings._events.reaction",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 2198
+			},
+			{
+				"start": 2495,
+				"end": 2535,
+				"source": "i18n.ts._webhookSettings._events.mention",
+				"replacement": "$locale.sfc.webhookSettingsEventsMention",
+				"key": "_webhookSettings._events.mention",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 2501
+			},
+			{
+				"start": 2772,
+				"end": 2808,
+				"source": "i18n.ts._webhookSettings.testRemarks",
+				"replacement": "$locale.sfc.webhookSettingsTestRemarks",
+				"key": "_webhookSettings.testRemarks",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 2778
+			},
+			{
+				"start": 2879,
+				"end": 2910,
+				"source": "i18n.ts._webhookSettings.active",
+				"replacement": "$locale.sfc.webhookSettingsActive",
+				"key": "_webhookSettings.active",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 2887
+			},
+			{
+				"start": 3022,
+				"end": 3034,
+				"source": "i18n.ts.save",
+				"replacement": "$locale.sfc.save",
+				"key": "save",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 3032
+			},
+			{
+				"start": 3119,
+				"end": 3133,
+				"source": "i18n.ts.delete",
+				"replacement": "$locale.sfc.delete",
+				"key": "delete",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 3133
+			},
+			{
+				"start": 3689,
+				"end": 3747,
+				"source": "import { i18n } from '@features/runtime/frontend/i18n.js';",
+				"replacement": "import { interpolateLocaleParameters } from '@features/runtime/frontend/interpolate-locale-parameters.js';",
+				"afterStart": 3707
+			},
+			{
+				"start": 5297,
+				"end": 5323,
+				"source": "i18n.tsx.deleteAreYouSure(",
+				"replacement": "interpolateLocaleParameters($locale.value.sfc.deleteAreYouSure, ",
+				"key": "deleteAreYouSure",
+				"kind": "tsx",
+				"region": "script",
+				"afterStart": 5363
+			}
+		],
+		"keys": [
+			{
+				"global": "_webhookSettings.name",
+				"local": "webhookSettingsName",
+				"formatter": false
+			},
+			{
+				"global": "_webhookSettings.secret",
+				"local": "webhookSettingsSecret",
+				"formatter": false
+			},
+			{
+				"global": "_webhookSettings.trigger",
+				"local": "webhookSettingsTrigger",
+				"formatter": false
+			},
+			{
+				"global": "_webhookSettings._events.follow",
+				"local": "webhookSettingsEventsFollow",
+				"formatter": false
+			},
+			{
+				"global": "_webhookSettings._events.followed",
+				"local": "webhookSettingsEventsFollowed",
+				"formatter": false
+			},
+			{
+				"global": "_webhookSettings._events.note",
+				"local": "webhookSettingsEventsNote",
+				"formatter": false
+			},
+			{
+				"global": "_webhookSettings._events.reply",
+				"local": "webhookSettingsEventsReply",
+				"formatter": false
+			},
+			{
+				"global": "_webhookSettings._events.renote",
+				"local": "webhookSettingsEventsRenote",
+				"formatter": false
+			},
+			{
+				"global": "_webhookSettings._events.reaction",
+				"local": "webhookSettingsEventsReaction",
+				"formatter": false
+			},
+			{
+				"global": "_webhookSettings._events.mention",
+				"local": "webhookSettingsEventsMention",
+				"formatter": false
+			},
+			{
+				"global": "_webhookSettings.testRemarks",
+				"local": "webhookSettingsTestRemarks",
+				"formatter": false
+			},
+			{
+				"global": "_webhookSettings.active",
+				"local": "webhookSettingsActive",
+				"formatter": false
+			},
+			{
+				"global": "save",
+				"local": "save",
+				"formatter": false
+			},
+			{
+				"global": "delete",
+				"local": "delete",
+				"formatter": false
+			},
+			{
+				"global": "deleteAreYouSure",
+				"local": "deleteAreYouSure",
+				"formatter": true
+			}
+		]
+	},
+	{
+		"file": "packages/features/emojis/frontend/pages/emoji-edit-dialog.vue",
+		"originalSha256": "fcbe48400faeae7a7a8dded0d9edf74f813590c4a5113f526e706fecc827a5ae",
+		"migratedSha256": "3a2a60b8f7816d9980d3bc464c43a226f4724d760103fc8ce205ceb058820bb9",
+		"edits": [
+			{
+				"start": 1188,
+				"end": 1206,
+				"source": "i18n.ts.selectFile",
+				"replacement": "$locale.sfc.selectFile",
+				"key": "selectFile",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 1188
+			},
+			{
+				"start": 1316,
+				"end": 1328,
+				"source": "i18n.ts.name",
+				"replacement": "$locale.sfc.name",
+				"key": "name",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 1320
+			},
+			{
+				"start": 1473,
+				"end": 1489,
+				"source": "i18n.ts.category",
+				"replacement": "$locale.sfc.category",
+				"key": "category",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 1481
+			},
+			{
+				"start": 1597,
+				"end": 1609,
+				"source": "i18n.ts.tags",
+				"replacement": "$locale.sfc.tags",
+				"key": "tags",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 1609
+			},
+			{
+				"start": 1658,
+				"end": 1703,
+				"source": "i18n.ts.theKeywordWhenSearchingForCustomEmoji",
+				"replacement": "$locale.sfc.theKeywordWhenSearchingForCustomEmoji",
+				"key": "theKeywordWhenSearchingForCustomEmoji",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 1674
+			},
+			{
+				"start": 1721,
+				"end": 1761,
+				"source": "i18n.ts.setMultipleBySeparatingWithSpace",
+				"replacement": "$locale.sfc.setMultipleBySeparatingWithSpace",
+				"key": "setMultipleBySeparatingWithSpace",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 1741
+			},
+			{
+				"start": 1878,
+				"end": 1893,
+				"source": "i18n.ts.license",
+				"replacement": "$locale.sfc.license",
+				"key": "license",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 1902
+			},
+			{
+				"start": 1963,
+				"end": 2008,
+				"source": "i18n.ts.rolesThatCanBeUsedThisEmojiAsReaction",
+				"replacement": "$locale.sfc.rolesThatCanBeUsedThisEmojiAsReaction",
+				"key": "rolesThatCanBeUsedThisEmojiAsReaction",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 1991
+			},
+			{
+				"start": 2102,
+				"end": 2113,
+				"source": "i18n.ts.all",
+				"replacement": "$locale.sfc.all",
+				"key": "all",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 2134
+			},
+			{
+				"start": 2272,
+				"end": 2283,
+				"source": "i18n.ts.add",
+				"replacement": "$locale.sfc.add",
+				"key": "add",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 2308
+			},
+			{
+				"start": 2826,
+				"end": 2887,
+				"source": "i18n.ts.rolesThatCanBeUsedThisEmojiAsReactionEmptyDescription",
+				"replacement": "$locale.sfc.rolesThatCanBeUsedThisEmojiAsReactionEmptyDescription",
+				"key": "rolesThatCanBeUsedThisEmojiAsReactionEmptyDescription",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 2866
+			},
+			{
+				"start": 2922,
+				"end": 2981,
+				"source": "i18n.ts.rolesThatCanBeUsedThisEmojiAsReactionPublicRoleWarn",
+				"replacement": "$locale.sfc.rolesThatCanBeUsedThisEmojiAsReactionPublicRoleWarn",
+				"key": "rolesThatCanBeUsedThisEmojiAsReactionPublicRoleWarn",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 2966
+			},
+			{
+				"start": 3061,
+				"end": 3078,
+				"source": "i18n.ts.sensitive",
+				"replacement": "$locale.sfc.sensitive",
+				"key": "sensitive",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 3109
+			},
+			{
+				"start": 3130,
+				"end": 3147,
+				"source": "i18n.ts.localOnly",
+				"replacement": "$locale.sfc.localOnly",
+				"key": "localOnly",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 3182
+			},
+			{
+				"start": 3242,
+				"end": 3256,
+				"source": "i18n.ts.delete",
+				"replacement": "$locale.sfc.delete",
+				"key": "delete",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 3298
+			},
+			{
+				"start": 3433,
+				"end": 3447,
+				"source": "i18n.ts.update",
+				"replacement": "$locale.sfc.update",
+				"key": "update",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 3493
+			},
+			{
+				"start": 3450,
+				"end": 3464,
+				"source": "i18n.ts.create",
+				"replacement": "$locale.sfc.create",
+				"key": "create",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 3514
+			},
+			{
+				"start": 4116,
+				"end": 4174,
+				"source": "import { i18n } from '@features/runtime/frontend/i18n.js';",
+				"replacement": "import { interpolateLocaleParameters } from '@features/runtime/frontend/interpolate-locale-parameters.js';",
+				"afterStart": 4184
+			},
+			{
+				"start": 8355,
+				"end": 8381,
+				"source": "i18n.tsx.removeAreYouSure(",
+				"replacement": "interpolateLocaleParameters($locale.value.sfc.removeAreYouSure, ",
+				"key": "removeAreYouSure",
+				"kind": "tsx",
+				"region": "script",
+				"afterStart": 8471
+			}
+		],
+		"keys": [
+			{
+				"global": "selectFile",
+				"local": "selectFile",
+				"formatter": false
+			},
+			{
+				"global": "name",
+				"local": "name",
+				"formatter": false
+			},
+			{
+				"global": "category",
+				"local": "category",
+				"formatter": false
+			},
+			{
+				"global": "tags",
+				"local": "tags",
+				"formatter": false
+			},
+			{
+				"global": "theKeywordWhenSearchingForCustomEmoji",
+				"local": "theKeywordWhenSearchingForCustomEmoji",
+				"formatter": false
+			},
+			{
+				"global": "setMultipleBySeparatingWithSpace",
+				"local": "setMultipleBySeparatingWithSpace",
+				"formatter": false
+			},
+			{
+				"global": "license",
+				"local": "license",
+				"formatter": false
+			},
+			{
+				"global": "rolesThatCanBeUsedThisEmojiAsReaction",
+				"local": "rolesThatCanBeUsedThisEmojiAsReaction",
+				"formatter": false
+			},
+			{
+				"global": "all",
+				"local": "all",
+				"formatter": false
+			},
+			{
+				"global": "add",
+				"local": "add",
+				"formatter": false
+			},
+			{
+				"global": "rolesThatCanBeUsedThisEmojiAsReactionEmptyDescription",
+				"local": "rolesThatCanBeUsedThisEmojiAsReactionEmptyDescription",
+				"formatter": false
+			},
+			{
+				"global": "rolesThatCanBeUsedThisEmojiAsReactionPublicRoleWarn",
+				"local": "rolesThatCanBeUsedThisEmojiAsReactionPublicRoleWarn",
+				"formatter": false
+			},
+			{
+				"global": "sensitive",
+				"local": "sensitive",
+				"formatter": false
+			},
+			{
+				"global": "localOnly",
+				"local": "localOnly",
+				"formatter": false
+			},
+			{
+				"global": "delete",
+				"local": "delete",
+				"formatter": false
+			},
+			{
+				"global": "update",
+				"local": "update",
+				"formatter": false
+			},
+			{
+				"global": "create",
+				"local": "create",
+				"formatter": false
+			},
+			{
+				"global": "removeAreYouSure",
+				"local": "removeAreYouSure",
+				"formatter": true
+			}
+		]
+	},
+	{
+		"file": "packages/features/preferences/frontend/pages/theme-editor.vue",
+		"originalSha256": "0ebc67befd316cbdb20a04d5b092744e761e1885489f7f7e21cd5960702ca7c1",
+		"migratedSha256": "af6423eb16604002a6b366363256bb6b0ad886e213162cec3a9f3f5ac15ec6de",
+		"edits": [
+			{
+				"start": 362,
+				"end": 385,
+				"source": "i18n.ts.backgroundColor",
+				"replacement": "$locale.sfc.backgroundColor",
+				"key": "backgroundColor",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 362
+			},
+			{
+				"start": 1122,
+				"end": 1141,
+				"source": "i18n.ts.accentColor",
+				"replacement": "$locale.sfc.accentColor",
+				"key": "accentColor",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 1126
+			},
+			{
+				"start": 1548,
+				"end": 1565,
+				"source": "i18n.ts.textColor",
+				"replacement": "$locale.sfc.textColor",
+				"key": "textColor",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 1556
+			},
+			{
+				"start": 2140,
+				"end": 2156,
+				"source": "i18n.ts.editCode",
+				"replacement": "$locale.sfc.editCode",
+				"key": "editCode",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 2152
+			},
+			{
+				"start": 2277,
+				"end": 2296,
+				"source": "i18n.ts._theme.code",
+				"replacement": "$locale.sfc.themeCode",
+				"key": "_theme.code",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 2293
+			},
+			{
+				"start": 2382,
+				"end": 2395,
+				"source": "i18n.ts.apply",
+				"replacement": "$locale.sfc.apply",
+				"key": "apply",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 2400
+			},
+			{
+				"start": 2496,
+				"end": 2518,
+				"source": "i18n.ts.addDescription",
+				"replacement": "$locale.sfc.addDescription",
+				"key": "addDescription",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 2518
+			},
+			{
+				"start": 2626,
+				"end": 2652,
+				"source": "i18n.ts._theme.description",
+				"replacement": "$locale.sfc.themeDescription",
+				"key": "_theme.description",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 2652
+			},
+			{
+				"start": 3921,
+				"end": 3979,
+				"source": "import { i18n } from '@features/runtime/frontend/i18n.js';",
+				"replacement": "import { interpolateLocaleParameters } from '@features/runtime/frontend/interpolate-locale-parameters.js';",
+				"afterStart": 3949
+			},
+			{
+				"start": 7491,
+				"end": 7513,
+				"source": "i18n.ts._theme.invalid",
+				"replacement": "$locale.value.sfc.themeInvalid",
+				"key": "_theme.invalid",
+				"kind": "ts",
+				"region": "script",
+				"afterStart": 7567
+			},
+			{
+				"start": 7653,
+				"end": 7665,
+				"source": "i18n.ts.name",
+				"replacement": "$locale.value.sfc.name",
+				"key": "name",
+				"kind": "ts",
+				"region": "script",
+				"afterStart": 7737
+			},
+			{
+				"start": 8085,
+				"end": 8111,
+				"source": "i18n.tsx._theme.installed(",
+				"replacement": "interpolateLocaleParameters($locale.value.sfc.themeInstalled, ",
+				"key": "_theme.installed",
+				"kind": "tsx",
+				"region": "script",
+				"afterStart": 8179
+			},
+			{
+				"start": 8274,
+				"end": 8289,
+				"source": "i18n.ts.preview",
+				"replacement": "$locale.value.sfc.preview",
+				"key": "preview",
+				"kind": "ts",
+				"region": "script",
+				"afterStart": 8404
+			},
+			{
+				"start": 8369,
+				"end": 8383,
+				"source": "i18n.ts.saveAs",
+				"replacement": "$locale.value.sfc.saveAs",
+				"key": "saveAs",
+				"kind": "ts",
+				"region": "script",
+				"afterStart": 8509
+			},
+			{
+				"start": 8477,
+				"end": 8496,
+				"source": "i18n.ts.themeEditor",
+				"replacement": "$locale.value.sfc.themeEditor",
+				"key": "themeEditor",
+				"kind": "ts",
+				"region": "script",
+				"afterStart": 8627
+			}
+		],
+		"keys": [
+			{
+				"global": "backgroundColor",
+				"local": "backgroundColor",
+				"formatter": false
+			},
+			{
+				"global": "accentColor",
+				"local": "accentColor",
+				"formatter": false
+			},
+			{
+				"global": "textColor",
+				"local": "textColor",
+				"formatter": false
+			},
+			{
+				"global": "editCode",
+				"local": "editCode",
+				"formatter": false
+			},
+			{
+				"global": "_theme.code",
+				"local": "themeCode",
+				"formatter": false
+			},
+			{
+				"global": "apply",
+				"local": "apply",
+				"formatter": false
+			},
+			{
+				"global": "addDescription",
+				"local": "addDescription",
+				"formatter": false
+			},
+			{
+				"global": "_theme.description",
+				"local": "themeDescription",
+				"formatter": false
+			},
+			{
+				"global": "_theme.invalid",
+				"local": "themeInvalid",
+				"formatter": false
+			},
+			{
+				"global": "name",
+				"local": "name",
+				"formatter": false
+			},
+			{
+				"global": "_theme.installed",
+				"local": "themeInstalled",
+				"formatter": true
+			},
+			{
+				"global": "preview",
+				"local": "preview",
+				"formatter": false
+			},
+			{
+				"global": "saveAs",
+				"local": "saveAs",
+				"formatter": false
+			},
+			{
+				"global": "themeEditor",
+				"local": "themeEditor",
+				"formatter": false
+			}
+		]
+	},
+	{
+		"file": "packages/features/preferences/frontend/pages/settings/theme.vue",
+		"originalSha256": "759a7950cf5075a3dd0b76bc7b7cbaff868c199ea90f09a81762df61af5e2bfd",
+		"migratedSha256": "34802db1b032af2adcf10276cababe15a6345eb137f0c3e69a127f1a2666e2a5",
+		"edits": [
+			{
+				"start": 156,
+				"end": 169,
+				"source": "i18n.ts.theme",
+				"replacement": "$locale.sfc.theme",
+				"key": "theme",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 156
+			},
+			{
+				"start": 549,
+				"end": 562,
+				"source": "i18n.ts.light",
+				"replacement": "$locale.sfc.light",
+				"key": "light",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 553
+			},
+			{
+				"start": 602,
+				"end": 614,
+				"source": "i18n.ts.dark",
+				"replacement": "$locale.sfc.dark",
+				"key": "dark",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 610
+			},
+			{
+				"start": 1274,
+				"end": 1300,
+				"source": "i18n.ts.syncDeviceDarkMode",
+				"replacement": "$locale.sfc.syncDeviceDarkMode",
+				"key": "syncDeviceDarkMode",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 1286
+			},
+			{
+				"start": 1422,
+				"end": 1459,
+				"source": "i18n.ts.themeIsDefaultBecauseSafeMode",
+				"replacement": "$locale.sfc.themeIsDefaultBecauseSafeMode",
+				"key": "themeIsDefaultBecauseSafeMode",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 1438
+			},
+			{
+				"start": 1749,
+				"end": 1774,
+				"source": "i18n.ts.themeForLightMode",
+				"replacement": "$locale.sfc.themeForLightMode",
+				"key": "themeForLightMode",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 1769
+			},
+			{
+				"start": 1978,
+				"end": 2006,
+				"source": "i18n.ts._theme.instanceTheme",
+				"replacement": "$locale.sfc.themeInstanceTheme",
+				"key": "_theme.instanceTheme",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 2002
+			},
+			{
+				"start": 2992,
+				"end": 3022,
+				"source": "i18n.ts._theme.installedThemes",
+				"replacement": "$locale.sfc.themeInstalledThemes",
+				"key": "_theme.installedThemes",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 3018
+			},
+			{
+				"start": 3953,
+				"end": 3981,
+				"source": "i18n.ts._theme.builtinThemes",
+				"replacement": "$locale.sfc.themeBuiltinThemes",
+				"key": "_theme.builtinThemes",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 3981
+			},
+			{
+				"start": 5075,
+				"end": 5099,
+				"source": "i18n.ts.themeForDarkMode",
+				"replacement": "$locale.sfc.themeForDarkMode",
+				"key": "themeForDarkMode",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 5105
+			},
+			{
+				"start": 5301,
+				"end": 5329,
+				"source": "i18n.ts._theme.instanceTheme",
+				"replacement": "$locale.sfc.themeInstanceTheme",
+				"key": "_theme.instanceTheme",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 5335
+			},
+			{
+				"start": 6304,
+				"end": 6334,
+				"source": "i18n.ts._theme.installedThemes",
+				"replacement": "$locale.sfc.themeInstalledThemes",
+				"key": "_theme.installedThemes",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 6340
+			},
+			{
+				"start": 7260,
+				"end": 7288,
+				"source": "i18n.ts._theme.builtinThemes",
+				"replacement": "$locale.sfc.themeBuiltinThemes",
+				"key": "_theme.builtinThemes",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 7298
+			},
+			{
+				"start": 8385,
+				"end": 8433,
+				"source": "i18n.ts._settings.enableSyncThemesBetweenDevices",
+				"replacement": "$locale.sfc.settingsEnableSyncThemesBetweenDevices",
+				"key": "_settings.enableSyncThemesBetweenDevices",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 8425
+			},
+			{
+				"start": 8642,
+				"end": 8663,
+				"source": "i18n.ts._theme.manage",
+				"replacement": "$locale.sfc.themeManage",
+				"key": "_theme.manage",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 8684
+			},
+			{
+				"start": 8846,
+				"end": 8868,
+				"source": "i18n.ts._theme.explore",
+				"replacement": "$locale.sfc.themeExplore",
+				"key": "_theme.explore",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 8890
+			},
+			{
+				"start": 8986,
+				"end": 9008,
+				"source": "i18n.ts._theme.install",
+				"replacement": "$locale.sfc.themeInstall",
+				"key": "_theme.install",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 9032
+			},
+			{
+				"start": 9113,
+				"end": 9132,
+				"source": "i18n.ts._theme.make",
+				"replacement": "$locale.sfc.themeMake",
+				"key": "_theme.make",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 9161
+			},
+			{
+				"start": 10471,
+				"end": 10529,
+				"source": "import { i18n } from '@features/runtime/frontend/i18n.js';",
+				"replacement": "import { interpolateLocaleParameters } from '@features/runtime/frontend/interpolate-locale-parameters.js';",
+				"afterStart": 10521
+			},
+			{
+				"start": 13356,
+				"end": 13410,
+				"source": "i18n.tsx.switchDarkModeManuallyWhenSyncEnabledConfirm(",
+				"replacement": "interpolateLocaleParameters($locale.value.sfc.switchDarkModeManuallyWhenSyncEnabledConfirm, ",
+				"key": "switchDarkModeManuallyWhenSyncEnabledConfirm",
+				"kind": "tsx",
+				"region": "script",
+				"afterStart": 13454
+			},
+			{
+				"start": 13415,
+				"end": 13441,
+				"source": "i18n.ts.syncDeviceDarkMode",
+				"replacement": "$locale.value.sfc.syncDeviceDarkMode",
+				"key": "syncDeviceDarkMode",
+				"kind": "ts",
+				"region": "script",
+				"afterStart": 13551
+			},
+			{
+				"start": 14096,
+				"end": 14124,
+				"source": "i18n.ts._theme.copyThemeCode",
+				"replacement": "$locale.value.sfc.themeCopyThemeCode",
+				"key": "_theme.copyThemeCode",
+				"kind": "ts",
+				"region": "script",
+				"afterStart": 14242
+			},
+			{
+				"start": 14242,
+				"end": 14256,
+				"source": "i18n.ts.delete",
+				"replacement": "$locale.value.sfc.delete",
+				"key": "delete",
+				"kind": "ts",
+				"region": "script",
+				"afterStart": 14396
+			},
+			{
+				"start": 15091,
+				"end": 15104,
+				"source": "i18n.ts.theme",
+				"replacement": "$locale.value.sfc.theme",
+				"key": "theme",
+				"kind": "ts",
+				"region": "script",
+				"afterStart": 15255
+			}
+		],
+		"keys": [
+			{
+				"global": "theme",
+				"local": "theme",
+				"formatter": false
+			},
+			{
+				"global": "light",
+				"local": "light",
+				"formatter": false
+			},
+			{
+				"global": "dark",
+				"local": "dark",
+				"formatter": false
+			},
+			{
+				"global": "syncDeviceDarkMode",
+				"local": "syncDeviceDarkMode",
+				"formatter": false
+			},
+			{
+				"global": "themeIsDefaultBecauseSafeMode",
+				"local": "themeIsDefaultBecauseSafeMode",
+				"formatter": false
+			},
+			{
+				"global": "themeForLightMode",
+				"local": "themeForLightMode",
+				"formatter": false
+			},
+			{
+				"global": "_theme.instanceTheme",
+				"local": "themeInstanceTheme",
+				"formatter": false
+			},
+			{
+				"global": "_theme.installedThemes",
+				"local": "themeInstalledThemes",
+				"formatter": false
+			},
+			{
+				"global": "_theme.builtinThemes",
+				"local": "themeBuiltinThemes",
+				"formatter": false
+			},
+			{
+				"global": "themeForDarkMode",
+				"local": "themeForDarkMode",
+				"formatter": false
+			},
+			{
+				"global": "_settings.enableSyncThemesBetweenDevices",
+				"local": "settingsEnableSyncThemesBetweenDevices",
+				"formatter": false
+			},
+			{
+				"global": "_theme.manage",
+				"local": "themeManage",
+				"formatter": false
+			},
+			{
+				"global": "_theme.explore",
+				"local": "themeExplore",
+				"formatter": false
+			},
+			{
+				"global": "_theme.install",
+				"local": "themeInstall",
+				"formatter": false
+			},
+			{
+				"global": "_theme.make",
+				"local": "themeMake",
+				"formatter": false
+			},
+			{
+				"global": "switchDarkModeManuallyWhenSyncEnabledConfirm",
+				"local": "switchDarkModeManuallyWhenSyncEnabledConfirm",
+				"formatter": true
+			},
+			{
+				"global": "_theme.copyThemeCode",
+				"local": "themeCopyThemeCode",
+				"formatter": false
+			},
+			{
+				"global": "delete",
+				"local": "delete",
+				"formatter": false
+			}
+		]
+	},
+	{
+		"file": "packages/features/preferences/frontend/pages/settings/theme.install.vue",
+		"originalSha256": "4557ea5faa32718d4f93589178201145912985356cc9684ac823c7e476f6afb1",
+		"migratedSha256": "16f7ee0e32dc1e00d5ad17fbf6f0f5afa99a8773773bc70f233ab3aa5897f15b",
+		"edits": [
+			{
+				"start": 211,
+				"end": 230,
+				"source": "i18n.ts._theme.code",
+				"replacement": "$locale.sfc.themeCode",
+				"key": "_theme.code",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 211
+			},
+			{
+				"start": 453,
+				"end": 468,
+				"source": "i18n.ts.preview",
+				"replacement": "$locale.sfc.preview",
+				"key": "preview",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 455
+			},
+			{
+				"start": 654,
+				"end": 669,
+				"source": "i18n.ts.install",
+				"replacement": "$locale.sfc.install",
+				"key": "install",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 660
+			},
+			{
+				"start": 1169,
+				"end": 1227,
+				"source": "import { i18n } from '@features/runtime/frontend/i18n.js';",
+				"replacement": "import { interpolateLocaleParameters } from '@features/runtime/frontend/interpolate-locale-parameters.js';",
+				"afterStart": 1179
+			},
+			{
+				"start": 1628,
+				"end": 1650,
+				"source": "i18n.ts._theme.invalid",
+				"replacement": "$locale.value.sfc.themeInvalid",
+				"key": "_theme.invalid",
+				"kind": "ts",
+				"region": "script",
+				"afterStart": 1686
+			},
+			{
+				"start": 1855,
+				"end": 1881,
+				"source": "i18n.tsx._theme.installed(",
+				"replacement": "interpolateLocaleParameters($locale.value.sfc.themeInstalled, ",
+				"key": "_theme.installed",
+				"kind": "tsx",
+				"region": "script",
+				"afterStart": 1921
+			},
+			{
+				"start": 2148,
+				"end": 2170,
+				"source": "i18n.ts._theme.install",
+				"replacement": "$locale.value.sfc.themeInstall",
+				"key": "_theme.install",
+				"kind": "ts",
+				"region": "script",
+				"afterStart": 2250
+			}
+		],
+		"keys": [
+			{
+				"global": "_theme.code",
+				"local": "themeCode",
+				"formatter": false
+			},
+			{
+				"global": "preview",
+				"local": "preview",
+				"formatter": false
+			},
+			{
+				"global": "install",
+				"local": "install",
+				"formatter": false
+			},
+			{
+				"global": "_theme.invalid",
+				"local": "themeInvalid",
+				"formatter": false
+			},
+			{
+				"global": "_theme.installed",
+				"local": "themeInstalled",
+				"formatter": true
+			},
+			{
+				"global": "_theme.install",
+				"local": "themeInstall",
+				"formatter": false
+			}
+		]
+	},
+	{
+		"file": "packages/features/roles/frontend/pages/admin/roles.role.vue",
+		"originalSha256": "9e2f75a009f791fe17132519c033486a22ba2e372349c5558460e9085ea964d7",
+		"migratedSha256": "ac9fea05b438269ed0ef94cdab8620a1a2a974783a0aba1a08e4ec6bc8988298",
+		"edits": [
+			{
+				"start": 349,
+				"end": 361,
+				"source": "i18n.ts.edit",
+				"replacement": "$locale.sfc.edit",
+				"key": "edit",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 349
+			},
+			{
+				"start": 449,
+				"end": 463,
+				"source": "i18n.ts.delete",
+				"replacement": "$locale.sfc.delete",
+				"key": "delete",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 453
+			},
+			{
+				"start": 591,
+				"end": 603,
+				"source": "i18n.ts.info",
+				"replacement": "$locale.sfc.info",
+				"key": "info",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 599
+			},
+			{
+				"start": 817,
+				"end": 830,
+				"source": "i18n.ts.users",
+				"replacement": "$locale.sfc.users",
+				"key": "users",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 829
+			},
+			{
+				"start": 1001,
+				"end": 1015,
+				"source": "i18n.ts.assign",
+				"replacement": "$locale.sfc.assign",
+				"key": "assign",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 1017
+			},
+			{
+				"start": 1132,
+				"end": 1147,
+				"source": "i18n.ts.noUsers",
+				"replacement": "$locale.sfc.noUsers",
+				"key": "noUsers",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 1152
+			},
+			{
+				"start": 2170,
+				"end": 2190,
+				"source": "i18n.ts.indefinitely",
+				"replacement": "$locale.sfc.indefinitely",
+				"key": "indefinitely",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 2194
+			},
+			{
+				"start": 2331,
+				"end": 2362,
+				"source": "i18n.ts._role.isConditionalRole",
+				"replacement": "$locale.sfc.roleIsConditionalRole",
+				"key": "_role.isConditionalRole",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 2359
+			},
+			{
+				"start": 2817,
+				"end": 2875,
+				"source": "import { i18n } from '@features/runtime/frontend/i18n.js';",
+				"replacement": "import { interpolateLocaleParameters } from '@features/runtime/frontend/interpolate-locale-parameters.js';",
+				"afterStart": 2847
+			},
+			{
+				"start": 4000,
+				"end": 4026,
+				"source": "i18n.tsx.deleteAreYouSure(",
+				"replacement": "interpolateLocaleParameters($locale.value.sfc.deleteAreYouSure, ",
+				"key": "deleteAreYouSure",
+				"kind": "tsx",
+				"region": "script",
+				"afterStart": 4078
+			},
+			{
+				"start": 4341,
+				"end": 4355,
+				"source": "i18n.ts.period",
+				"replacement": "$locale.value.sfc.period",
+				"key": "period",
+				"kind": "ts",
+				"region": "script",
+				"afterStart": 4457
+			},
+			{
+				"start": 4421,
+				"end": 4441,
+				"source": "i18n.ts.indefinitely",
+				"replacement": "$locale.value.sfc.indefinitely",
+				"key": "indefinitely",
+				"kind": "ts",
+				"region": "script",
+				"afterStart": 4547
+			},
+			{
+				"start": 4478,
+				"end": 4493,
+				"source": "i18n.ts.oneHour",
+				"replacement": "$locale.value.sfc.oneHour",
+				"key": "oneHour",
+				"kind": "ts",
+				"region": "script",
+				"afterStart": 4614
+			},
+			{
+				"start": 4529,
+				"end": 4543,
+				"source": "i18n.ts.oneDay",
+				"replacement": "$locale.value.sfc.oneDay",
+				"key": "oneDay",
+				"kind": "ts",
+				"region": "script",
+				"afterStart": 4675
+			},
+			{
+				"start": 4580,
+				"end": 4595,
+				"source": "i18n.ts.oneWeek",
+				"replacement": "$locale.value.sfc.oneWeek",
+				"key": "oneWeek",
+				"kind": "ts",
+				"region": "script",
+				"afterStart": 4736
+			},
+			{
+				"start": 4633,
+				"end": 4649,
+				"source": "i18n.ts.oneMonth",
+				"replacement": "$locale.value.sfc.oneMonth",
+				"key": "oneMonth",
+				"kind": "ts",
+				"region": "script",
+				"afterStart": 4799
+			},
+			{
+				"start": 5286,
+				"end": 5302,
+				"source": "i18n.ts.unassign",
+				"replacement": "$locale.value.sfc.unassign",
+				"key": "unassign",
+				"kind": "ts",
+				"region": "script",
+				"afterStart": 5462
+			},
+			{
+				"start": 5917,
+				"end": 5929,
+				"source": "i18n.ts.role",
+				"replacement": "$locale.value.sfc.role",
+				"key": "role",
+				"kind": "ts",
+				"region": "script",
+				"afterStart": 6103
+			}
+		],
+		"keys": [
+			{
+				"global": "edit",
+				"local": "edit",
+				"formatter": false
+			},
+			{
+				"global": "delete",
+				"local": "delete",
+				"formatter": false
+			},
+			{
+				"global": "info",
+				"local": "info",
+				"formatter": false
+			},
+			{
+				"global": "users",
+				"local": "users",
+				"formatter": false
+			},
+			{
+				"global": "assign",
+				"local": "assign",
+				"formatter": false
+			},
+			{
+				"global": "noUsers",
+				"local": "noUsers",
+				"formatter": false
+			},
+			{
+				"global": "indefinitely",
+				"local": "indefinitely",
+				"formatter": false
+			},
+			{
+				"global": "_role.isConditionalRole",
+				"local": "roleIsConditionalRole",
+				"formatter": false
+			},
+			{
+				"global": "deleteAreYouSure",
+				"local": "deleteAreYouSure",
+				"formatter": true
+			},
+			{
+				"global": "period",
+				"local": "period",
+				"formatter": false
+			},
+			{
+				"global": "oneHour",
+				"local": "oneHour",
+				"formatter": false
+			},
+			{
+				"global": "oneDay",
+				"local": "oneDay",
+				"formatter": false
+			},
+			{
+				"global": "oneWeek",
+				"local": "oneWeek",
+				"formatter": false
+			},
+			{
+				"global": "oneMonth",
+				"local": "oneMonth",
+				"formatter": false
+			},
+			{
+				"global": "unassign",
+				"local": "unassign",
+				"formatter": false
+			},
+			{
+				"global": "role",
+				"local": "role",
+				"formatter": false
+			}
+		]
+	},
+	{
+		"file": "packages/features/instance/frontend/pages/admin/ads.vue",
+		"originalSha256": "ca19758acb78d9a030b355f339a92b202949e77ea177076f944e16e04a88cfe1",
+		"migratedSha256": "936172127647fee1aef9e46cdbeac73e6418b2cae2e0afe05efe5d139cb17603",
+		"edits": [
+			{
+				"start": 360,
+				"end": 373,
+				"source": "i18n.ts.state",
+				"replacement": "$locale.sfc.state",
+				"key": "state",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 360
+			},
+			{
+				"start": 701,
+				"end": 717,
+				"source": "i18n.ts.imageUrl",
+				"replacement": "$locale.sfc.imageUrl",
+				"key": "imageUrl",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 705
+			},
+			{
+				"start": 1055,
+				"end": 1068,
+				"source": "i18n.ts.ratio",
+				"replacement": "$locale.sfc.ratio",
+				"key": "ratio",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 1063
+			},
+			{
+				"start": 1184,
+				"end": 1206,
+				"source": "i18n.ts.startingperiod",
+				"replacement": "$locale.sfc.startingperiod",
+				"key": "startingperiod",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 1196
+			},
+			{
+				"start": 1323,
+				"end": 1341,
+				"source": "i18n.ts.expiration",
+				"replacement": "$locale.sfc.expiration",
+				"key": "expiration",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 1339
+			},
+			{
+				"start": 1455,
+				"end": 1472,
+				"source": "i18n.ts.sensitive",
+				"replacement": "$locale.sfc.sensitive",
+				"key": "sensitive",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 1475
+			},
+			{
+				"start": 1544,
+				"end": 1568,
+				"source": "i18n.ts.advancedSettings",
+				"replacement": "$locale.sfc.advancedSettings",
+				"key": "advancedSettings",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 1568
+			},
+			{
+				"start": 1604,
+				"end": 1628,
+				"source": "i18n.ts._ad.timezoneinfo",
+				"replacement": "$locale.sfc.adTimezoneinfo",
+				"key": "_ad.timezoneinfo",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 1632
+			},
+			{
+				"start": 2023,
+				"end": 2035,
+				"source": "i18n.ts.memo",
+				"replacement": "$locale.sfc.memo",
+				"key": "memo",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 2053
+			},
+			{
+				"start": 2232,
+				"end": 2244,
+				"source": "i18n.ts.save",
+				"replacement": "$locale.sfc.save",
+				"key": "save",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 2266
+			},
+			{
+				"start": 2352,
+				"end": 2366,
+				"source": "i18n.ts.remove",
+				"replacement": "$locale.sfc.remove",
+				"key": "remove",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 2390
+			},
+			{
+				"start": 2474,
+				"end": 2486,
+				"source": "i18n.ts.more",
+				"replacement": "$locale.sfc.more",
+				"key": "more",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 2516
+			},
+			{
+				"start": 3346,
+				"end": 3404,
+				"source": "import { i18n } from '@features/runtime/frontend/i18n.js';",
+				"replacement": "import { interpolateLocaleParameters } from '@features/runtime/frontend/interpolate-locale-parameters.js';",
+				"afterStart": 3392
+			},
+			{
+				"start": 3837,
+				"end": 3860,
+				"source": "i18n.ts._weekday.sunday",
+				"replacement": "$locale.value.sfc.weekdaySunday",
+				"key": "_weekday.sunday",
+				"kind": "ts",
+				"region": "script",
+				"afterStart": 3931
+			},
+			{
+				"start": 3862,
+				"end": 3885,
+				"source": "i18n.ts._weekday.monday",
+				"replacement": "$locale.value.sfc.weekdayMonday",
+				"key": "_weekday.monday",
+				"kind": "ts",
+				"region": "script",
+				"afterStart": 3964
+			},
+			{
+				"start": 3887,
+				"end": 3911,
+				"source": "i18n.ts._weekday.tuesday",
+				"replacement": "$locale.value.sfc.weekdayTuesday",
+				"key": "_weekday.tuesday",
+				"kind": "ts",
+				"region": "script",
+				"afterStart": 3997
+			},
+			{
+				"start": 3913,
+				"end": 3939,
+				"source": "i18n.ts._weekday.wednesday",
+				"replacement": "$locale.value.sfc.weekdayWednesday",
+				"key": "_weekday.wednesday",
+				"kind": "ts",
+				"region": "script",
+				"afterStart": 4031
+			},
+			{
+				"start": 3941,
+				"end": 3966,
+				"source": "i18n.ts._weekday.thursday",
+				"replacement": "$locale.value.sfc.weekdayThursday",
+				"key": "_weekday.thursday",
+				"kind": "ts",
+				"region": "script",
+				"afterStart": 4067
+			},
+			{
+				"start": 3968,
+				"end": 3991,
+				"source": "i18n.ts._weekday.friday",
+				"replacement": "$locale.value.sfc.weekdayFriday",
+				"key": "_weekday.friday",
+				"kind": "ts",
+				"region": "script",
+				"afterStart": 4102
+			},
+			{
+				"start": 3993,
+				"end": 4018,
+				"source": "i18n.ts._weekday.saturday",
+				"replacement": "$locale.value.sfc.weekdaySaturday",
+				"key": "_weekday.saturday",
+				"kind": "ts",
+				"region": "script",
+				"afterStart": 4135
+			},
+			{
+				"start": 4109,
+				"end": 4120,
+				"source": "i18n.ts.all",
+				"replacement": "$locale.value.sfc.all",
+				"key": "all",
+				"kind": "ts",
+				"region": "script",
+				"afterStart": 4259
+			},
+			{
+				"start": 4149,
+				"end": 4167,
+				"source": "i18n.ts.publishing",
+				"replacement": "$locale.value.sfc.publishing",
+				"key": "publishing",
+				"kind": "ts",
+				"region": "script",
+				"afterStart": 4309
+			},
+			{
+				"start": 4203,
+				"end": 4218,
+				"source": "i18n.ts.expired",
+				"replacement": "$locale.value.sfc.expired",
+				"key": "expired",
+				"kind": "ts",
+				"region": "script",
+				"afterStart": 4373
+			},
+			{
+				"start": 5503,
+				"end": 5529,
+				"source": "i18n.tsx.removeAreYouSure(",
+				"replacement": "interpolateLocaleParameters($locale.value.sfc.removeAreYouSure, ",
+				"key": "removeAreYouSure",
+				"kind": "tsx",
+				"region": "script",
+				"afterStart": 5683
+			},
+			{
+				"start": 6036,
+				"end": 6049,
+				"source": "i18n.ts.saved",
+				"replacement": "$locale.value.sfc.saved",
+				"key": "saved",
+				"kind": "ts",
+				"region": "script",
+				"afterStart": 6254
+			},
+			{
+				"start": 6364,
+				"end": 6377,
+				"source": "i18n.ts.saved",
+				"replacement": "$locale.value.sfc.saved",
+				"key": "saved",
+				"kind": "ts",
+				"region": "script",
+				"afterStart": 6592
+			},
+			{
+				"start": 7737,
+				"end": 7748,
+				"source": "i18n.ts.add",
+				"replacement": "$locale.value.sfc.add",
+				"key": "add",
+				"kind": "ts",
+				"region": "script",
+				"afterStart": 7975
+			},
+			{
+				"start": 7839,
+				"end": 7850,
+				"source": "i18n.ts.ads",
+				"replacement": "$locale.value.sfc.ads",
+				"key": "ads",
+				"kind": "ts",
+				"region": "script",
+				"afterStart": 8087
+			}
+		],
+		"keys": [
+			{
+				"global": "state",
+				"local": "state",
+				"formatter": false
+			},
+			{
+				"global": "imageUrl",
+				"local": "imageUrl",
+				"formatter": false
+			},
+			{
+				"global": "ratio",
+				"local": "ratio",
+				"formatter": false
+			},
+			{
+				"global": "startingperiod",
+				"local": "startingperiod",
+				"formatter": false
+			},
+			{
+				"global": "expiration",
+				"local": "expiration",
+				"formatter": false
+			},
+			{
+				"global": "sensitive",
+				"local": "sensitive",
+				"formatter": false
+			},
+			{
+				"global": "advancedSettings",
+				"local": "advancedSettings",
+				"formatter": false
+			},
+			{
+				"global": "_ad.timezoneinfo",
+				"local": "adTimezoneinfo",
+				"formatter": false
+			},
+			{
+				"global": "memo",
+				"local": "memo",
+				"formatter": false
+			},
+			{
+				"global": "save",
+				"local": "save",
+				"formatter": false
+			},
+			{
+				"global": "remove",
+				"local": "remove",
+				"formatter": false
+			},
+			{
+				"global": "more",
+				"local": "more",
+				"formatter": false
+			},
+			{
+				"global": "_weekday.sunday",
+				"local": "weekdaySunday",
+				"formatter": false
+			},
+			{
+				"global": "_weekday.monday",
+				"local": "weekdayMonday",
+				"formatter": false
+			},
+			{
+				"global": "_weekday.tuesday",
+				"local": "weekdayTuesday",
+				"formatter": false
+			},
+			{
+				"global": "_weekday.wednesday",
+				"local": "weekdayWednesday",
+				"formatter": false
+			},
+			{
+				"global": "_weekday.thursday",
+				"local": "weekdayThursday",
+				"formatter": false
+			},
+			{
+				"global": "_weekday.friday",
+				"local": "weekdayFriday",
+				"formatter": false
+			},
+			{
+				"global": "_weekday.saturday",
+				"local": "weekdaySaturday",
+				"formatter": false
+			},
+			{
+				"global": "all",
+				"local": "all",
+				"formatter": false
+			},
+			{
+				"global": "publishing",
+				"local": "publishing",
+				"formatter": false
+			},
+			{
+				"global": "expired",
+				"local": "expired",
+				"formatter": false
+			},
+			{
+				"global": "removeAreYouSure",
+				"local": "removeAreYouSure",
+				"formatter": true
+			},
+			{
+				"global": "saved",
+				"local": "saved",
+				"formatter": false
+			},
+			{
+				"global": "add",
+				"local": "add",
+				"formatter": false
+			},
+			{
+				"global": "ads",
+				"local": "ads",
+				"formatter": false
+			}
+		]
+	},
+	{
+		"file": "packages/features/timelines/frontend/components/MkAntennaEditor.vue",
+		"originalSha256": "d1258b34c9dc07d76fedb72d731322acf65534bfbb0e37899a9a23e5f8a0efe3",
+		"migratedSha256": "066854366235268030daf7138d2346d4526bd9f947d63a2934085781ece62e32",
+		"edits": [
+			{
+				"start": 246,
+				"end": 258,
+				"source": "i18n.ts.name",
+				"replacement": "$locale.sfc.name",
+				"key": "name",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 246
+			},
+			{
+				"start": 372,
+				"end": 393,
+				"source": "i18n.ts.antennaSource",
+				"replacement": "$locale.sfc.antennaSource",
+				"key": "antennaSource",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 376
+			},
+			{
+				"start": 532,
+				"end": 548,
+				"source": "i18n.ts.userList",
+				"replacement": "$locale.sfc.userList",
+				"key": "userList",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 540
+			},
+			{
+				"start": 691,
+				"end": 704,
+				"source": "i18n.ts.users",
+				"replacement": "$locale.sfc.users",
+				"key": "users",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 703
+			},
+			{
+				"start": 745,
+				"end": 776,
+				"source": "i18n.ts.antennaUsersDescription",
+				"replacement": "$locale.sfc.antennaUsersDescription",
+				"key": "antennaUsersDescription",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 761
+			},
+			{
+				"start": 828,
+				"end": 843,
+				"source": "i18n.ts.addUser",
+				"replacement": "$locale.sfc.addUser",
+				"key": "addUser",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 848
+			},
+			{
+				"start": 922,
+				"end": 948,
+				"source": "i18n.ts.antennaExcludeBots",
+				"replacement": "$locale.sfc.antennaExcludeBots",
+				"key": "antennaExcludeBots",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 946
+			},
+			{
+				"start": 1001,
+				"end": 1020,
+				"source": "i18n.ts.withReplies",
+				"replacement": "$locale.sfc.withReplies",
+				"key": "withReplies",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 1029
+			},
+			{
+				"start": 1094,
+				"end": 1117,
+				"source": "i18n.ts.antennaKeywords",
+				"replacement": "$locale.sfc.antennaKeywords",
+				"key": "antennaKeywords",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 1126
+			},
+			{
+				"start": 1158,
+				"end": 1192,
+				"source": "i18n.ts.antennaKeywordsDescription",
+				"replacement": "$locale.sfc.antennaKeywordsDescription",
+				"key": "antennaKeywordsDescription",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 1194
+			},
+			{
+				"start": 1290,
+				"end": 1320,
+				"source": "i18n.ts.antennaExcludeKeywords",
+				"replacement": "$locale.sfc.antennaExcludeKeywords",
+				"key": "antennaExcludeKeywords",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 1330
+			},
+			{
+				"start": 1361,
+				"end": 1395,
+				"source": "i18n.ts.antennaKeywordsDescription",
+				"replacement": "$locale.sfc.antennaKeywordsDescription",
+				"key": "antennaKeywordsDescription",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 1405
+			},
+			{
+				"start": 1463,
+				"end": 1480,
+				"source": "i18n.ts.localOnly",
+				"replacement": "$locale.sfc.localOnly",
+				"key": "localOnly",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 1511
+			},
+			{
+				"start": 1535,
+				"end": 1556,
+				"source": "i18n.ts.caseSensitive",
+				"replacement": "$locale.sfc.caseSensitive",
+				"key": "caseSensitive",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 1587
+			},
+			{
+				"start": 1606,
+				"end": 1629,
+				"source": "i18n.ts.withFileAntenna",
+				"replacement": "$locale.sfc.withFileAntenna",
+				"key": "withFileAntenna",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 1662
+			},
+			{
+				"start": 1701,
+				"end": 1739,
+				"source": "i18n.ts.excludeNotesInSensitiveChannel",
+				"replacement": "$locale.sfc.excludeNotesInSensitiveChannel",
+				"key": "excludeNotesInSensitiveChannel",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 1761
+			},
+			{
+				"start": 1912,
+				"end": 1924,
+				"source": "i18n.ts.save",
+				"replacement": "$locale.sfc.save",
+				"key": "save",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 1976
+			},
+			{
+				"start": 2056,
+				"end": 2070,
+				"source": "i18n.ts.delete",
+				"replacement": "$locale.sfc.delete",
+				"key": "delete",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 2124
+			},
+			{
+				"start": 2799,
+				"end": 2857,
+				"source": "import { i18n } from '@features/runtime/frontend/i18n.js';",
+				"replacement": "import { interpolateLocaleParameters } from '@features/runtime/frontend/interpolate-locale-parameters.js';",
+				"afterStart": 2871
+			},
+			{
+				"start": 3917,
+				"end": 3944,
+				"source": "i18n.ts._antennaSources.all",
+				"replacement": "$locale.value.sfc.antennaSourcesAll",
+				"key": "_antennaSources.all",
+				"kind": "ts",
+				"region": "script",
+				"afterStart": 4037
+			},
+			{
+				"start": 3976,
+				"end": 4012,
+				"source": "i18n.ts._antennaSources.homeTimeline",
+				"replacement": "$locale.value.sfc.antennaSourcesHomeTimeline",
+				"key": "_antennaSources.homeTimeline",
+				"kind": "ts",
+				"region": "script",
+				"afterStart": 4104
+			},
+			{
+				"start": 4043,
+				"end": 4072,
+				"source": "i18n.ts._antennaSources.users",
+				"replacement": "$locale.value.sfc.antennaSourcesUsers",
+				"key": "_antennaSources.users",
+				"kind": "ts",
+				"region": "script",
+				"afterStart": 4179
+			},
+			{
+				"start": 4104,
+				"end": 4136,
+				"source": "i18n.ts._antennaSources.userList",
+				"replacement": "$locale.value.sfc.antennaSourcesUserList",
+				"key": "_antennaSources.userList",
+				"kind": "ts",
+				"region": "script",
+				"afterStart": 4248
+			},
+			{
+				"start": 4177,
+				"end": 4214,
+				"source": "i18n.ts._antennaSources.userBlacklist",
+				"replacement": "$locale.value.sfc.antennaSourcesUserBlacklist",
+				"key": "_antennaSources.userBlacklist",
+				"kind": "ts",
+				"region": "script",
+				"afterStart": 4329
+			},
+			{
+				"start": 6477,
+				"end": 6503,
+				"source": "i18n.tsx.removeAreYouSure(",
+				"replacement": "interpolateLocaleParameters($locale.value.sfc.removeAreYouSure, ",
+				"key": "removeAreYouSure",
+				"kind": "tsx",
+				"region": "script",
+				"afterStart": 6637
+			}
+		],
+		"keys": [
+			{
+				"global": "name",
+				"local": "name",
+				"formatter": false
+			},
+			{
+				"global": "antennaSource",
+				"local": "antennaSource",
+				"formatter": false
+			},
+			{
+				"global": "userList",
+				"local": "userList",
+				"formatter": false
+			},
+			{
+				"global": "users",
+				"local": "users",
+				"formatter": false
+			},
+			{
+				"global": "antennaUsersDescription",
+				"local": "antennaUsersDescription",
+				"formatter": false
+			},
+			{
+				"global": "addUser",
+				"local": "addUser",
+				"formatter": false
+			},
+			{
+				"global": "antennaExcludeBots",
+				"local": "antennaExcludeBots",
+				"formatter": false
+			},
+			{
+				"global": "withReplies",
+				"local": "withReplies",
+				"formatter": false
+			},
+			{
+				"global": "antennaKeywords",
+				"local": "antennaKeywords",
+				"formatter": false
+			},
+			{
+				"global": "antennaKeywordsDescription",
+				"local": "antennaKeywordsDescription",
+				"formatter": false
+			},
+			{
+				"global": "antennaExcludeKeywords",
+				"local": "antennaExcludeKeywords",
+				"formatter": false
+			},
+			{
+				"global": "localOnly",
+				"local": "localOnly",
+				"formatter": false
+			},
+			{
+				"global": "caseSensitive",
+				"local": "caseSensitive",
+				"formatter": false
+			},
+			{
+				"global": "withFileAntenna",
+				"local": "withFileAntenna",
+				"formatter": false
+			},
+			{
+				"global": "excludeNotesInSensitiveChannel",
+				"local": "excludeNotesInSensitiveChannel",
+				"formatter": false
+			},
+			{
+				"global": "save",
+				"local": "save",
+				"formatter": false
+			},
+			{
+				"global": "delete",
+				"local": "delete",
+				"formatter": false
+			},
+			{
+				"global": "_antennaSources.all",
+				"local": "antennaSourcesAll",
+				"formatter": false
+			},
+			{
+				"global": "_antennaSources.homeTimeline",
+				"local": "antennaSourcesHomeTimeline",
+				"formatter": false
+			},
+			{
+				"global": "_antennaSources.users",
+				"local": "antennaSourcesUsers",
+				"formatter": false
+			},
+			{
+				"global": "_antennaSources.userList",
+				"local": "antennaSourcesUserList",
+				"formatter": false
+			},
+			{
+				"global": "_antennaSources.userBlacklist",
+				"local": "antennaSourcesUserBlacklist",
+				"formatter": false
+			},
+			{
+				"global": "removeAreYouSure",
+				"local": "removeAreYouSure",
+				"formatter": true
+			}
+		]
+	},
+	{
+		"file": "packages/features/collections/frontend/pages/clip.vue",
+		"originalSha256": "9ed9a823e820bebc9364b17d500ba4610a5a3ebb822f7ab69ef2830a34aaa8fa",
+		"migratedSha256": "0b55e9b6cddb4dca1bc1091919a2d5739d64768c4136fc4688a9814b172b1e4c",
+		"edits": [
+			{
+				"start": 440,
+				"end": 461,
+				"source": "i18n.ts.noDescription",
+				"replacement": "$locale.sfc.noDescription",
+				"key": "noDescription",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 440
+			},
+			{
+				"start": 527,
+				"end": 545,
+				"source": "i18n.ts.unfavorite",
+				"replacement": "$locale.sfc.unfavorite",
+				"key": "unfavorite",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 531
+			},
+			{
+				"start": 760,
+				"end": 776,
+				"source": "i18n.ts.favorite",
+				"replacement": "$locale.sfc.favorite",
+				"key": "favorite",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 768
+			},
+			{
+				"start": 1759,
+				"end": 1817,
+				"source": "import { i18n } from '@features/runtime/frontend/i18n.js';",
+				"replacement": "import { interpolateLocaleParameters } from '@features/runtime/frontend/interpolate-locale-parameters.js';",
+				"afterStart": 1771
+			},
+			{
+				"start": 3653,
+				"end": 3678,
+				"source": "i18n.ts.unfavoriteConfirm",
+				"replacement": "$locale.value.sfc.unfavoriteConfirm",
+				"key": "unfavoriteConfirm",
+				"kind": "ts",
+				"region": "script",
+				"afterStart": 3713
+			},
+			{
+				"start": 3957,
+				"end": 3969,
+				"source": "i18n.ts.edit",
+				"replacement": "$locale.value.sfc.edit",
+				"key": "edit",
+				"kind": "ts",
+				"region": "script",
+				"afterStart": 4027
+			},
+			{
+				"start": 4151,
+				"end": 4163,
+				"source": "i18n.ts.name",
+				"replacement": "$locale.value.sfc.name",
+				"key": "name",
+				"kind": "ts",
+				"region": "script",
+				"afterStart": 4231
+			},
+			{
+				"start": 4314,
+				"end": 4333,
+				"source": "i18n.ts.description",
+				"replacement": "$locale.value.sfc.description",
+				"key": "description",
+				"kind": "ts",
+				"region": "script",
+				"afterStart": 4404
+			},
+			{
+				"start": 4425,
+				"end": 4439,
+				"source": "i18n.ts.public",
+				"replacement": "$locale.value.sfc.public",
+				"key": "public",
+				"kind": "ts",
+				"region": "script",
+				"afterStart": 4525
+			},
+			{
+				"start": 4685,
+				"end": 4698,
+				"source": "i18n.ts.share",
+				"replacement": "$locale.value.sfc.share",
+				"key": "share",
+				"kind": "ts",
+				"region": "script",
+				"afterStart": 4795
+			},
+			{
+				"start": 4814,
+				"end": 4829,
+				"source": "i18n.ts.copyUrl",
+				"replacement": "$locale.value.sfc.copyUrl",
+				"key": "copyUrl",
+				"kind": "ts",
+				"region": "script",
+				"afterStart": 4934
+			},
+			{
+				"start": 4950,
+				"end": 4963,
+				"source": "i18n.ts.embed",
+				"replacement": "$locale.value.sfc.embed",
+				"key": "embed",
+				"kind": "ts",
+				"region": "script",
+				"afterStart": 5080
+			},
+			{
+				"start": 5121,
+				"end": 5134,
+				"source": "i18n.ts.share",
+				"replacement": "$locale.value.sfc.share",
+				"key": "share",
+				"kind": "ts",
+				"region": "script",
+				"afterStart": 5261
+			},
+			{
+				"start": 5462,
+				"end": 5476,
+				"source": "i18n.ts.delete",
+				"replacement": "$locale.value.sfc.delete",
+				"key": "delete",
+				"kind": "ts",
+				"region": "script",
+				"afterStart": 5612
+			},
+			{
+				"start": 5638,
+				"end": 5664,
+				"source": "i18n.tsx.deleteAreYouSure(",
+				"replacement": "interpolateLocaleParameters($locale.value.sfc.deleteAreYouSure, ",
+				"key": "deleteAreYouSure",
+				"kind": "tsx",
+				"region": "script",
+				"afterStart": 5798
+			},
+			{
+				"start": 5922,
+				"end": 5934,
+				"source": "i18n.ts.clip",
+				"replacement": "$locale.value.sfc.clip",
+				"key": "clip",
+				"kind": "ts",
+				"region": "script",
+				"afterStart": 6120
+			}
+		],
+		"keys": [
+			{
+				"global": "noDescription",
+				"local": "noDescription",
+				"formatter": false
+			},
+			{
+				"global": "unfavorite",
+				"local": "unfavorite",
+				"formatter": false
+			},
+			{
+				"global": "favorite",
+				"local": "favorite",
+				"formatter": false
+			},
+			{
+				"global": "unfavoriteConfirm",
+				"local": "unfavoriteConfirm",
+				"formatter": false
+			},
+			{
+				"global": "edit",
+				"local": "edit",
+				"formatter": false
+			},
+			{
+				"global": "name",
+				"local": "name",
+				"formatter": false
+			},
+			{
+				"global": "description",
+				"local": "description",
+				"formatter": false
+			},
+			{
+				"global": "public",
+				"local": "public",
+				"formatter": false
+			},
+			{
+				"global": "share",
+				"local": "share",
+				"formatter": false
+			},
+			{
+				"global": "copyUrl",
+				"local": "copyUrl",
+				"formatter": false
+			},
+			{
+				"global": "embed",
+				"local": "embed",
+				"formatter": false
+			},
+			{
+				"global": "delete",
+				"local": "delete",
+				"formatter": false
+			},
+			{
+				"global": "deleteAreYouSure",
+				"local": "deleteAreYouSure",
+				"formatter": true
+			},
+			{
+				"global": "clip",
+				"local": "clip",
+				"formatter": false
+			}
+		]
+	},
+	{
+		"file": "packages/features/drive/frontend/pages/drive.file.info.vue",
+		"originalSha256": "62487d2fb138d66f5f226bd64e7ce0ab2318667181e312db345bcaa0d621df90",
+		"migratedSha256": "db9985b735a088f46889e26f6ecf3fd338776ca3d7802efee9c6de67435aed3f",
+		"edits": [
+			{
+				"start": 143,
+				"end": 193,
+				"source": "i18n.ts._fileViewer.thisPageCanBeSeenFromTheAuthor",
+				"replacement": "$locale.sfc.fileViewerThisPageCanBeSeenFromTheAuthor",
+				"key": "_fileViewer.thisPageCanBeSeenFromTheAuthor",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 143
+			},
+			{
+				"start": 735,
+				"end": 764,
+				"source": "i18n.ts.createNoteFromTheFile",
+				"replacement": "$locale.sfc.createNoteFromTheFile",
+				"key": "createNoteFromTheFile",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 737
+			},
+			{
+				"start": 943,
+				"end": 968,
+				"source": "i18n.ts.unmarkAsSensitive",
+				"replacement": "$locale.sfc.unmarkAsSensitive",
+				"key": "unmarkAsSensitive",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 949
+			},
+			{
+				"start": 1134,
+				"end": 1157,
+				"source": "i18n.ts.markAsSensitive",
+				"replacement": "$locale.sfc.markAsSensitive",
+				"key": "markAsSensitive",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 1144
+			},
+			{
+				"start": 1323,
+				"end": 1339,
+				"source": "i18n.ts.download",
+				"replacement": "$locale.sfc.download",
+				"key": "download",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 1337
+			},
+			{
+				"start": 1510,
+				"end": 1524,
+				"source": "i18n.ts.delete",
+				"replacement": "$locale.sfc.delete",
+				"key": "delete",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 1528
+			},
+			{
+				"start": 1827,
+				"end": 1841,
+				"source": "i18n.ts.folder",
+				"replacement": "$locale.sfc.folder",
+				"key": "folder",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 1849
+			},
+			{
+				"start": 2149,
+				"end": 2168,
+				"source": "i18n.ts.description",
+				"replacement": "$locale.sfc.description",
+				"key": "description",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 2175
+			},
+			{
+				"start": 2242,
+				"end": 2254,
+				"source": "i18n.ts.none",
+				"replacement": "$locale.sfc.none",
+				"key": "none",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 2272
+			},
+			{
+				"start": 2433,
+				"end": 2463,
+				"source": "i18n.ts._fileViewer.uploadedAt",
+				"replacement": "$locale.sfc.fileViewerUploadedAt",
+				"key": "_fileViewer.uploadedAt",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 2467
+			},
+			{
+				"start": 2649,
+				"end": 2673,
+				"source": "i18n.ts._fileViewer.type",
+				"replacement": "$locale.sfc.fileViewerType",
+				"key": "_fileViewer.type",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 2685
+			},
+			{
+				"start": 2828,
+				"end": 2852,
+				"source": "i18n.ts._fileViewer.size",
+				"replacement": "$locale.sfc.fileViewerSize",
+				"key": "_fileViewer.size",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 2866
+			},
+			{
+				"start": 3590,
+				"end": 3648,
+				"source": "import { i18n } from '@features/runtime/frontend/i18n.js';",
+				"replacement": "import { interpolateLocaleParameters } from '@features/runtime/frontend/interpolate-locale-parameters.js';",
+				"afterStart": 3630
+			},
+			{
+				"start": 4218,
+				"end": 4231,
+				"source": "i18n.ts.drive",
+				"replacement": "$locale.value.sfc.drive",
+				"key": "drive",
+				"kind": "ts",
+				"region": "script",
+				"afterStart": 4306
+			},
+			{
+				"start": 4256,
+				"end": 4269,
+				"source": "i18n.ts.drive",
+				"replacement": "$locale.value.sfc.drive",
+				"key": "drive",
+				"kind": "ts",
+				"region": "script",
+				"afterStart": 4354
+			},
+			{
+				"start": 5489,
+				"end": 5502,
+				"source": "i18n.ts.error",
+				"replacement": "$locale.value.sfc.error",
+				"key": "error",
+				"kind": "ts",
+				"region": "script",
+				"afterStart": 5597
+			},
+			{
+				"start": 5643,
+				"end": 5661,
+				"source": "i18n.ts.renameFile",
+				"replacement": "$locale.value.sfc.renameFile",
+				"key": "renameFile",
+				"kind": "ts",
+				"region": "script",
+				"afterStart": 5761
+			},
+			{
+				"start": 5678,
+				"end": 5702,
+				"source": "i18n.ts.inputNewFileName",
+				"replacement": "$locale.value.sfc.inputNewFileName",
+				"key": "inputNewFileName",
+				"kind": "ts",
+				"region": "script",
+				"afterStart": 5806
+			},
+			{
+				"start": 6590,
+				"end": 6622,
+				"source": "i18n.tsx.driveFileDeleteConfirm(",
+				"replacement": "interpolateLocaleParameters($locale.value.sfc.driveFileDeleteConfirm, ",
+				"key": "driveFileDeleteConfirm",
+				"kind": "tsx",
+				"region": "script",
+				"afterStart": 6728
+			}
+		],
+		"keys": [
+			{
+				"global": "_fileViewer.thisPageCanBeSeenFromTheAuthor",
+				"local": "fileViewerThisPageCanBeSeenFromTheAuthor",
+				"formatter": false
+			},
+			{
+				"global": "createNoteFromTheFile",
+				"local": "createNoteFromTheFile",
+				"formatter": false
+			},
+			{
+				"global": "unmarkAsSensitive",
+				"local": "unmarkAsSensitive",
+				"formatter": false
+			},
+			{
+				"global": "markAsSensitive",
+				"local": "markAsSensitive",
+				"formatter": false
+			},
+			{
+				"global": "download",
+				"local": "download",
+				"formatter": false
+			},
+			{
+				"global": "delete",
+				"local": "delete",
+				"formatter": false
+			},
+			{
+				"global": "folder",
+				"local": "folder",
+				"formatter": false
+			},
+			{
+				"global": "description",
+				"local": "description",
+				"formatter": false
+			},
+			{
+				"global": "none",
+				"local": "none",
+				"formatter": false
+			},
+			{
+				"global": "_fileViewer.uploadedAt",
+				"local": "fileViewerUploadedAt",
+				"formatter": false
+			},
+			{
+				"global": "_fileViewer.type",
+				"local": "fileViewerType",
+				"formatter": false
+			},
+			{
+				"global": "_fileViewer.size",
+				"local": "fileViewerSize",
+				"formatter": false
+			},
+			{
+				"global": "drive",
+				"local": "drive",
+				"formatter": false
+			},
+			{
+				"global": "error",
+				"local": "error",
+				"formatter": false
+			},
+			{
+				"global": "renameFile",
+				"local": "renameFile",
+				"formatter": false
+			},
+			{
+				"global": "inputNewFileName",
+				"local": "inputNewFileName",
+				"formatter": false
+			},
+			{
+				"global": "driveFileDeleteConfirm",
+				"local": "driveFileDeleteConfirm",
+				"formatter": true
+			}
+		]
+	}
+]

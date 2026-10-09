@@ -10,7 +10,7 @@ import { beforeAll, beforeEach, describe, test } from 'vitest';
 import { inspect } from 'node:util';
 import { api, post, role, signup, successfulApiCall, uploadFile } from '../utils.js';
 import type * as misskey from 'misskey-js';
-import { DEFAULT_POLICIES } from '@/core/RoleService.js';
+import { DEFAULT_POLICIES } from '@features/roles/backend/services/RoleService.js';
 
 describe('ユーザー', () => {
 	// エンティティとしてのユーザーを主眼においたテストを記述する
@@ -124,6 +124,8 @@ describe('ユーザー', () => {
 			autoSensitive: user.autoSensitive,
 			carefulBot: user.carefulBot,
 			autoAcceptFollowed: user.autoAcceptFollowed,
+			followApprovalLocalSeconds: user.followApprovalLocalSeconds,
+			followApprovalRemoteSeconds: user.followApprovalRemoteSeconds,
 			noCrawle: user.noCrawle,
 			preventAiLearning: user.preventAiLearning,
 			isExplorable: user.isExplorable,
@@ -143,7 +145,6 @@ describe('ユーザー', () => {
 			mutedWords: user.mutedWords,
 			hardMutedWords: user.hardMutedWords,
 			mutedInstances: user.mutedInstances,
-			// @ts-expect-error 後方互換性
 			mutingNotificationTypes: user.mutingNotificationTypes,
 			notificationRecieveConfig: user.notificationRecieveConfig,
 			emailNotificationTypes: user.emailNotificationTypes,
@@ -309,7 +310,7 @@ describe('ユーザー', () => {
 		assert.strictEqual(response.name, null);
 		assert.strictEqual(response.username, 'zoe');
 		assert.strictEqual(response.host, null);
-		response.avatarUrl && assert.match(response.avatarUrl, /^[-a-zA-Z0-9@:%._\+~#&?=\/]+$/);
+		if (response.avatarUrl) assert.match(response.avatarUrl, /^[-a-zA-Z0-9@:%._\+~#&?=\/]+$/);
 		assert.strictEqual(response.avatarBlurhash, null);
 		assert.deepStrictEqual(response.avatarDecorations, []);
 		assert.strictEqual(response.isBot, false);
@@ -382,7 +383,6 @@ describe('ユーザー', () => {
 		assert.deepStrictEqual(response.unreadAnnouncements, []);
 		assert.deepStrictEqual(response.mutedWords, []);
 		assert.deepStrictEqual(response.mutedInstances, []);
-		// @ts-expect-error 後方互換のため
 		assert.deepStrictEqual(response.mutingNotificationTypes, []);
 		assert.deepStrictEqual(response.notificationRecieveConfig, {});
 		assert.deepStrictEqual(response.emailNotificationTypes, ['follow', 'receiveFollowRequest']);

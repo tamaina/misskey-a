@@ -2,60 +2,21 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-
-import { Inject, Injectable } from '@nestjs/common';
-import type { UsersRepository } from '@/models/_.js';
-import { Endpoint } from '@/server/api/endpoint-base.js';
-import { DI } from '@/di-symbols.js';
-import { ModerationLogService } from '@/core/ModerationLogService.js';
-
-export const meta = {
-	tags: ['admin'],
-
-	requireCredential: true,
-	requireModerator: true,
-	kind: 'write:admin:unset-user-avatar',
-} as const;
-
-export const paramDef = {
-	type: 'object',
-	properties: {
-		userId: { type: 'string', format: 'misskey:id' },
-	},
-	required: ['userId'],
-} as const;
-
-// eslint-disable-next-line import/no-default-export
-@Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
-	constructor(
-		@Inject(DI.usersRepository)
-		private usersRepository: UsersRepository,
-
-		private moderationLogService: ModerationLogService,
-	) {
-		super(meta, paramDef, async (ps, me) => {
-			const user = await this.usersRepository.findOneBy({ id: ps.userId });
-
-			if (user == null) {
-				throw new Error('user not found');
-			}
-
-			if (user.avatarId == null) return;
-
-			await this.usersRepository.update(user.id, {
-				avatar: null,
-				avatarId: null,
-				avatarUrl: null,
-				avatarBlurhash: null,
-			});
-
-			this.moderationLogService.log(me, 'unsetUserAvatar', {
-				userId: user.id,
-				userUsername: user.username,
-				userHost: user.host,
-				fileId: user.avatarId,
-			});
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import type { ApiActor } from '@features/api/backend/transport/context.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import { moderationContract } from '../../api.definition.js';
+import type { ModerationApiDependencies } from '../../api.implementation.js';
+export function createAdminUnsetUserAvatarProcedure<Actor extends ApiActor>(deps: Pick<ModerationApiDependencies<Actor>, 'usersRepository' | 'moderationLogService'>) {
+	return createApiProcedure<Actor>()(moderationContract.adminUnsetUserAvatar).use(requirePrincipal<Actor>())
+		.handler(async ({ input, context }) => {
+			const ps = input;
+			const me = context.principal;
+			const user = await deps.usersRepository.findOneBy({ id: ps.userId });
+			if (user == null) throw new Error('user not found');
+			const fileId = user.avatarId;
+			if (fileId == null) return;
+			await deps.usersRepository.update(user.id, { avatar: null, avatarId: null, avatarUrl: null, avatarBlurhash: null });
+			void deps.moderationLogService.log(me, 'unsetUserAvatar', { userId: user.id, userUsername: user.username, userHost: user.host, fileId });
 		});
-	}
 }

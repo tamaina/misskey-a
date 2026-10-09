@@ -20,10 +20,10 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script lang="ts" setup>
 import { onMounted, onBeforeUnmount, useTemplateRef, ref } from 'vue';
 import MkMenu from '@features/ui/frontend/components/MkMenu.vue';
-import type { MenuItem } from '@/types/menu.js';
+import type { MenuItem } from '@features/navigation/frontend/types/menu.js';
 import { elementContains } from '@features/ui/frontend/utility/element-contains.js';
-import { prefer } from '@/preferences.js';
-import * as os from '@/os.js';
+import { prefer } from '@features/preferences/frontend/preferences.js';
+import * as os from '@features/ui/frontend/os.js';
 
 const props = defineProps<{
 	items: MenuItem[];

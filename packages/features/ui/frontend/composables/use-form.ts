@@ -5,7 +5,7 @@
 
 import { computed, reactive, watch } from 'vue';
 import type { Reactive } from 'vue';
-import { deepEqual } from '@/utility/deep-equal';
+import { deepEqual } from '@features/runtime/frontend/utility/deep-equal';
 
 function copy<T>(v: T): T {
 	return JSON.parse(JSON.stringify(v));

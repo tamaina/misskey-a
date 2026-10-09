@@ -234,10 +234,10 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts">
 import { computed, defineAsyncComponent, inject, nextTick, onBeforeUnmount, onMounted, ref, useTemplateRef, unref, watch, shallowRef, reactive, isRef } from 'vue';
-import type { MenuItem, InnerMenuItem, MenuPending, MenuAction, MenuSwitch, MenuRadio, MenuRadioOption, MenuParent } from '@/types/menu.js';
+import type { MenuItem, InnerMenuItem, MenuPending, MenuAction, MenuSwitch, MenuRadio, MenuRadioOption, MenuParent } from '@features/navigation/frontend/types/menu.js';
 import type { Keymap } from '@features/ui/frontend/utility/hotkey.js';
 import MkSwitchButton from '@features/ui/frontend/components/MkSwitch.button.vue';
-import * as os from '@/os.js';
+import * as os from '@features/ui/frontend/os.js';
 import { isTouchUsing } from '@features/ui/frontend/utility/touch.js';
 import { isFocusable } from '@features/ui/frontend/utility/focus.js';
 import { getNodeOrNull } from '@features/ui/frontend/utility/get-dom-node-or-null.js';

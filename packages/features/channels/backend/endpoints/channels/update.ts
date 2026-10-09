@@ -3,112 +3,60 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Inject, Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
-import type { DriveFilesRepository, ChannelsRepository } from '@/models/_.js';
-import { ChannelEntityService } from '@/core/entities/ChannelEntityService.js';
-import { DI } from '@/di-symbols.js';
-import { RoleService } from '@/core/RoleService.js';
-import { ApiError } from '@/server/api/error.js';
+import { toPackedChannel } from '../../api.dto.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 
-export const meta = {
-	tags: ['channels'],
+import { type RoleService } from '@features/roles/backend/services/RoleService.js';
 
-	requireCredential: true,
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import { type ChannelEntityService } from '../../serializers/ChannelEntityService.js';
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
+import { channelsUpdateContract, channelsUpdateErrors } from './update.contract.js';
+import type { DriveFilesRepository, ChannelsRepository } from '@features/persistence/backend/repositories/models.js';
 
-	kind: 'write:channels',
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
 
-	res: {
-		type: 'object',
-		optional: false, nullable: false,
-		ref: 'Channel',
-	},
-
-	errors: {
-		noSuchChannel: {
-			message: 'No such channel.',
-			code: 'NO_SUCH_CHANNEL',
-			id: 'f9c5467f-d492-4c3c-9a8d-a70dacc86512',
-		},
-
-		accessDenied: {
-			message: 'You do not have edit privilege of the channel.',
-			code: 'ACCESS_DENIED',
-			id: '1fb7cb09-d46a-4fdf-b8df-057788cce513',
-		},
-
-		noSuchFile: {
-			message: 'No such file.',
-			code: 'NO_SUCH_FILE',
-			id: 'e86c14a4-0da2-4032-8df3-e737a04c7f3b',
-		},
-	},
-} as const;
-
-export const paramDef = {
-	type: 'object',
-	properties: {
-		channelId: { type: 'string', format: 'misskey:id' },
-		name: { type: 'string', minLength: 1, maxLength: 128 },
-		description: { type: 'string', nullable: true, maxLength: 2048 },
-		bannerId: { type: 'string', format: 'misskey:id', nullable: true },
-		isArchived: { type: 'boolean', nullable: true },
-		pinnedNoteIds: {
-			type: 'array',
-			items: {
-				type: 'string', format: 'misskey:id',
-			},
-		},
-		color: { type: 'string', minLength: 1, maxLength: 16 },
-		isSensitive: { type: 'boolean', nullable: true },
-		allowRenoteToExternal: { type: 'boolean', nullable: true },
-	},
-	required: ['channelId'],
-} as const;
-
-@Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
-	constructor(
-		@Inject(DI.channelsRepository)
-		private channelsRepository: ChannelsRepository,
-
-		@Inject(DI.driveFilesRepository)
-		private driveFilesRepository: DriveFilesRepository,
-
-		private channelEntityService: ChannelEntityService,
-
-		private roleService: RoleService,
-	) {
-		super(meta, paramDef, async (ps, me) => {
-			const channel = await this.channelsRepository.findOneBy({
+export interface ChannelsUpdateDependencies {
+	channelsRepository: ChannelsRepository;
+	driveFilesRepository: DriveFilesRepository;
+	channelEntityService: ChannelEntityService;
+	roleService: RoleService;
+}
+export function createChannelsUpdateProcedure<Actor extends MiLocalUser>(deps: ChannelsUpdateDependencies) {
+	return createApiProcedure<Actor>()(channelsUpdateContract)
+		.use(requirePrincipal<Actor>())
+		.handler(async ({ input, context }) => {
+			const ps = input;
+			const me = context.principal;
+			const channel = await deps.channelsRepository.findOneBy({
 				id: ps.channelId,
 			});
 
 			if (channel == null) {
-				throw new ApiError(meta.errors.noSuchChannel);
+				throw apiError(channelsUpdateErrors.noSuchChannel);
 			}
 
-			const iAmModerator = await this.roleService.isModerator(me);
+			const iAmModerator = await deps.roleService.isModerator(me);
 			if (channel.userId !== me.id && !iAmModerator) {
-				throw new ApiError(meta.errors.accessDenied);
+				throw apiError(channelsUpdateErrors.accessDenied);
 			}
 
 			// eslint:disable-next-line:no-unnecessary-initializer
 			let banner = undefined;
 			if (ps.bannerId != null) {
-				banner = await this.driveFilesRepository.findOneBy({
+				banner = await deps.driveFilesRepository.findOneBy({
 					id: ps.bannerId,
 					userId: me.id,
 				});
 
 				if (banner == null) {
-					throw new ApiError(meta.errors.noSuchFile);
+					throw apiError(channelsUpdateErrors.noSuchFile);
 				}
 			} else if (ps.bannerId === null) {
 				banner = null;
 			}
 
-			await this.channelsRepository.update(channel.id, {
+			await deps.channelsRepository.update(channel.id, {
 				...(ps.name !== undefined ? { name: ps.name } : {}),
 				...(ps.description !== undefined ? { description: ps.description } : {}),
 				...(ps.pinnedNoteIds !== undefined ? { pinnedNoteIds: ps.pinnedNoteIds } : {}),
@@ -118,8 +66,6 @@ export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDe
 				...(typeof ps.isSensitive === 'boolean' ? { isSensitive: ps.isSensitive } : {}),
 				...(typeof ps.allowRenoteToExternal === 'boolean' ? { allowRenoteToExternal: ps.allowRenoteToExternal } : {}),
 			});
-
-			return await this.channelEntityService.pack(channel.id, me);
+			return toPackedChannel(await deps.channelEntityService.pack(channel.id, me));
 		});
-	}
 }

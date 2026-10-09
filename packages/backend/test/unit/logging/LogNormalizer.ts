@@ -9,7 +9,7 @@ import {
 	normalizeLogAttributes,
 	normalizeLogValue,
 	serializeLogError,
-} from '@/logging/LogNormalizer.js';
+} from '@features/runtime/backend/logging/LogNormalizer.js';
 
 describe('LogNormalizer', () => {
 	test('normalizes common non-JSON values', () => {

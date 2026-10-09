@@ -8,7 +8,7 @@ import * as Path from 'node:path';
 import { Inject, Injectable } from '@nestjs/common';
 import { DI } from '@/di-symbols.js';
 import type { Config } from '@/config.js';
-import { bindThis } from '@/decorators.js';
+import { bindThis } from '../decorators.js';
 
 @Injectable()
 export class InternalStorageService {

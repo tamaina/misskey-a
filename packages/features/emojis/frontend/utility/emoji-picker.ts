@@ -5,8 +5,8 @@
 
 import { shallowRef, ref, watch } from 'vue';
 import MkEmojiPickerDialog from '@features/emojis/frontend/components/MkEmojiPickerDialog.vue';
-import { popup } from '@/os.js';
-import { prefer } from '@/preferences.js';
+import { popup } from '@features/ui/frontend/os.js';
+import { prefer } from '@features/preferences/frontend/preferences.js';
 
 /**
  * 絵文字ピッカーを表示する。

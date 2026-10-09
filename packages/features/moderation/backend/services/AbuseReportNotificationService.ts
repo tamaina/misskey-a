@@ -6,24 +6,24 @@
 import { Inject, Injectable, type OnApplicationShutdown } from '@nestjs/common';
 import { Brackets, In, IsNull, Not } from 'typeorm';
 import * as Redis from 'ioredis';
-import sanitizeHtml from '@/runtime-dependencies/sanitize-html.js';
+import sanitizeHtml from 'sanitize-html';
 import { DI } from '@/di-symbols.js';
-import { bindThis } from '@/decorators.js';
-import { GlobalEvents, GlobalEventService } from '@/core/GlobalEventService.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
+import { GlobalEvents, GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
 import type {
 	AbuseReportNotificationRecipientRepository,
 	MiAbuseReportNotificationRecipient,
 	MiAbuseUserReport,
 	MiMeta,
 	MiUser,
-} from '@/models/_.js';
-import { EmailService } from '@/core/EmailService.js';
-import { RoleService } from '@/core/RoleService.js';
-import { RecipientMethod } from '@/models/AbuseReportNotificationRecipient.js';
-import { ModerationLogService } from '@/core/ModerationLogService.js';
-import { SystemWebhookService } from '@/core/SystemWebhookService.js';
-import { UserEntityService } from '@/core/entities/UserEntityService.js';
-import { IdService } from '@/core/IdService.js';
+} from '@features/persistence/backend/repositories/models.js';
+import { EmailService } from '@features/email/backend/services/EmailService.js';
+import { RoleService } from '@features/roles/backend/services/RoleService.js';
+import { RecipientMethod } from '../models/AbuseReportNotificationRecipient.js';
+import { ModerationLogService } from './ModerationLogService.js';
+import { SystemWebhookService } from '@features/integrations/backend/services/SystemWebhookService.js';
+import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
+import { IdService } from '@features/runtime/backend/services/IdService.js';
 
 @Injectable()
 export class AbuseReportNotificationService implements OnApplicationShutdown {

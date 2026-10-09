@@ -6,7 +6,8 @@
 import type { CellValue, GridCell } from '@features/ui/frontend/components/grid/cell.js';
 import type { GridColumn } from '@features/ui/frontend/components/grid/column.js';
 import type { GridRow } from '@features/ui/frontend/components/grid/row.js';
-import { i18n } from '@/i18n.js';
+import FeatureLocaleMessages from '@features/ui/frontend/ts-messages.vue';
+import { interpolateLocaleParameters } from '@features/runtime/frontend/interpolate-locale-parameters.js';
 
 export type ValidatorParams = {
 	column: GridColumn;
@@ -72,7 +73,7 @@ class ValidatorPreset {
 			validate: ({ value }): ValidatorResult => {
 				return {
 					valid: value !== null && value !== undefined && value !== '',
-					message: i18n.ts._gridComponent._error.requiredValue,
+					message: FeatureLocaleMessages.$locale._gridComponent._error.requiredValue,
 				};
 			},
 		};
@@ -84,7 +85,7 @@ class ValidatorPreset {
 			validate: ({ value }): ValidatorResult => {
 				return {
 					valid: (typeof value !== 'string') || pattern.test(value.toString() ?? ''),
-					message: i18n.tsx._gridComponent._error.patternNotMatch({ pattern: pattern.source }),
+					message: interpolateLocaleParameters(FeatureLocaleMessages.$locale._gridComponent._error.patternNotMatch, { pattern: pattern.source }),
 				};
 			},
 		};
@@ -100,7 +101,7 @@ class ValidatorPreset {
 					.every(cell => cell.value !== value);
 				return {
 					valid: isUnique,
-					message: i18n.ts._gridComponent._error.notUnique,
+					message: FeatureLocaleMessages.$locale._gridComponent._error.notUnique,
 				};
 			},
 		};

@@ -25,11 +25,11 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script setup lang="ts" generic="T extends string">
 import { toRefs } from 'vue';
-import type { MenuItem } from '@/types/menu.js';
+import type { MenuItem } from '@features/navigation/frontend/types/menu.js';
 import type { SortOrder } from '@features/preferences/frontend/components/MkSortOrderEditor.define.js';
 import MkTagItem from '@features/discovery/frontend/components/MkTagItem.vue';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
-import * as os from '@/os.js';
+import * as os from '@features/ui/frontend/os.js';
 
 const emit = defineEmits<{
 	(ev: 'update', sortOrders: SortOrder<T>[]): void;

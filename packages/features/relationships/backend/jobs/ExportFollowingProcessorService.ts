@@ -8,17 +8,17 @@ import { Inject, Injectable } from '@nestjs/common';
 import { In, MoreThan, Not } from 'typeorm';
 import { format as dateFormat } from 'date-fns';
 import { DI } from '@/di-symbols.js';
-import type { UsersRepository, FollowingsRepository, MutingsRepository } from '@/models/_.js';
-import type Logger from '@/logger.js';
-import { DriveService } from '@/core/DriveService.js';
-import { createTemp } from '@/misc/create-temp.js';
-import type { MiFollowing } from '@/models/Following.js';
-import { UtilityService } from '@/core/UtilityService.js';
-import { NotificationService } from '@/core/NotificationService.js';
-import { bindThis } from '@/decorators.js';
-import { QueueLoggerService } from '@/queue/QueueLoggerService.js';
+import type { UsersRepository, FollowingsRepository, MutingsRepository } from '@features/persistence/backend/repositories/models.js';
+import type { Logger } from '@features/runtime/backend/logging/logger.js';
+import { DriveService } from '@features/drive/backend/services/DriveService.js';
+import { createTemp } from '@features/runtime/backend/io/create-temp.js';
+import type { MiFollowing } from '../models/Following.js';
+import { UtilityService } from '@features/federation/backend/services/UtilityService.js';
+import { NotificationService } from '@features/notifications/backend/services/NotificationService.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
+import { QueueLoggerService } from '@features/runtime/backend/queue/QueueLoggerService.js';
 import type * as Bull from 'bullmq';
-import type { DbExportFollowingData } from '@/queue/types.js';
+import type { DbExportFollowingData } from '@features/runtime/backend/queue/types.js';
 
 @Injectable()
 export class ExportFollowingProcessorService {

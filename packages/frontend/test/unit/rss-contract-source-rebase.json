@@ -1,0 +1,78 @@
+[
+	{
+		"file": "packages/features/web/frontend/widgets/WidgetRss.vue",
+		"baselineBodySha256": "3f96440a49038fe2bef4cb0e7b7ef2b7990f94d94bb97b32e86831e5f609be7f",
+		"currentBodySha256": "650c04e673ff0cbddef9b0cb1904c6f61a11488a674c6c5c1ceb9a816d11c79b",
+		"localeBlocksSha256": "72192fa048f8a0a44238205feff6a91ea6849425f67622937d7a0fe08d9da91a",
+		"edits": [
+			{
+				"start": 636,
+				"end": 884,
+				"baseline": "\t\t\t<a v-for=\"item in items\" :key=\"item.link\" :class=\"$style.item\" :href=\"item.link\" rel=\"nofollow noopener\" target=\"_blank\" :title=\"item.title\">{{ item.title }}</a>\n",
+				"current": "\t\t\t<a v-for=\"(item, index) in items\" :key=\"typeof item.link === 'string' ? item.link : index\" :class=\"$style.item\" :href=\"rssDomAttribute(item.link)\" rel=\"nofollow noopener\" target=\"_blank\" :title=\"rssDomAttribute(item.title)\">{{ item.title }}</a>\n"
+			},
+			{
+				"start": 954,
+				"end": 1010,
+				"baseline": "import { ref, watch, computed } from 'vue';\n",
+				"current": "import { ref, shallowRef, watch, computed } from 'vue';\n"
+			},
+			{
+				"start": 1197,
+				"end": 1293,
+				"baseline": "import { tryParseUrl } from '@features/web/frontend/shared/url.js';\n",
+				"current": "import { isAllowedRssLink, rssDomAttribute } from '@features/web/frontend/shared/rss-value.js';\n"
+			},
+			{
+				"start": 2472,
+				"end": 2549,
+				"baseline": "const rawItems = ref<Misskey.entities.FetchRssResponse['items']>([]);\n",
+				"current": "const rawItems = shallowRef<Misskey.entities.FetchRssResponse['items']>([]);\n"
+			},
+			{
+				"start": 3018,
+				"end": 3100,
+				"baseline": "\t\t\trawItems.value = feed.items.filter((item) => {\n\t\t\t\tif (!item.link) return false;\n\t\t\t\tconst itemUrl = tryParseUrl(item.link, base);\n\t\t\t\treturn itemUrl != null && ['http:', 'https:'].includes(itemUrl.protocol);\n\t\t\t});\n",
+				"current": "\t\t\trawItems.value = feed.items.filter(item => isAllowedRssLink(item.link, base));\n"
+			}
+		]
+	},
+	{
+		"file": "packages/features/web/frontend/widgets/WidgetRssTicker.vue",
+		"baselineBodySha256": "8a94504781124edc70733808133866583653ffc29299858a0a7c0951ab6bd241",
+		"currentBodySha256": "4b68683b254c232143f0b826fc80d0a528767ca4a43d7c2bbd2548117fd0ba5a",
+		"localeBlocksSha256": "d0f846aceeb8624bae0d222cd366b98a04c27e10adfac21dc3a9052ff15d1410",
+		"edits": [
+			{
+				"start": 739,
+				"end": 1039,
+				"baseline": "\t\t\t\t\t<span v-for=\"item in items\" :key=\"item.link\" :class=\"$style.item\">\n\t\t\t\t\t\t<a :href=\"item.link\" rel=\"nofollow noopener\" target=\"_blank\" :title=\"item.title\">{{ item.title }}</a><span :class=\"$style.divider\"></span>\n",
+				"current": "\t\t\t\t\t<span v-for=\"(item, index) in items\" :key=\"typeof item.link === 'string' ? item.link : index\" :class=\"$style.item\">\n\t\t\t\t\t\t<a :href=\"rssDomAttribute(item.link)\" rel=\"nofollow noopener\" target=\"_blank\" :title=\"rssDomAttribute(item.title)\">{{ item.title }}</a><span :class=\"$style.divider\"></span>\n"
+			},
+			{
+				"start": 1160,
+				"end": 1216,
+				"baseline": "import { ref, watch, computed } from 'vue';\n",
+				"current": "import { ref, shallowRef, watch, computed } from 'vue';\n"
+			},
+			{
+				"start": 1403,
+				"end": 1499,
+				"baseline": "import { tryParseUrl } from '@features/web/frontend/shared/url.js';\n",
+				"current": "import { isAllowedRssLink, rssDomAttribute } from '@features/web/frontend/shared/rss-value.js';\n"
+			},
+			{
+				"start": 3231,
+				"end": 3308,
+				"baseline": "const rawItems = ref<Misskey.entities.FetchRssResponse['items']>([]);\n",
+				"current": "const rawItems = shallowRef<Misskey.entities.FetchRssResponse['items']>([]);\n"
+			},
+			{
+				"start": 3880,
+				"end": 3962,
+				"baseline": "\t\t\trawItems.value = feed.items.filter((item) => {\n\t\t\t\tif (!item.link) return false;\n\t\t\t\tconst itemUrl = tryParseUrl(item.link, base);\n\t\t\t\treturn itemUrl != null && ['http:', 'https:'].includes(itemUrl.protocol);\n\t\t\t});\n",
+				"current": "\t\t\trawItems.value = feed.items.filter(item => isAllowedRssLink(item.link, base));\n"
+			}
+		]
+	}
+]

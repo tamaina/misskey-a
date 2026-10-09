@@ -4,24 +4,20 @@
  */
 
 import { URL } from 'node:url';
-import { Inject, Injectable } from '@nestjs/common';
 import * as htmlParser from 'node-html-parser';
-import { DI } from '@/di-symbols.js';
 import type { Config } from '@/config.js';
-import { intersperse } from '@/misc/prelude/array.js';
-import { normalizeForSearch } from '@/misc/normalize-for-search.js';
-import type { IMentionedRemoteUsers } from '@/models/Note.js';
-import { bindThis } from '@/decorators.js';
-import { escapeHtml } from '@/misc/escape-html.js';
+import { intersperse } from '@features/runtime/backend/data/array.js';
+import { normalizeForSearch } from '@features/discovery/backend/utility/normalize-for-search.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
+import { escapeHtml } from '../utility/escape-html.js';
+import type { IMentionedRemoteUsers } from '@features/notes/backend/models/Note.js';
 import type * as mfm from 'mfm-js';
 
 const urlRegex = /^https?:\/\/[\w\/:%#@$&?!()\[\]~.,=+\-]+/;
 const urlRegexFull = /^https?:\/\/[\w\/:%#@$&?!()\[\]~.,=+\-]+$/;
 
-@Injectable()
 export class MfmService {
 	constructor(
-		@Inject(DI.config)
 		private config: Config,
 	) {
 	}
