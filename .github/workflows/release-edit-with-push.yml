@@ -11,9 +11,12 @@ env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 permissions:
-  contents: write
-  issues: write
+  contents: read
   pull-requests: write
+
+concurrency:
+  group: release-manager
+  cancel-in-progress: false
 
 jobs:
   edit:
@@ -23,10 +26,16 @@ jobs:
       # headが$GITHUB_REF_NAME, baseが$STABLE_BRANCHかつopenのPRを1つ取得
       - name: Get PR
         run: |
-          echo "pr_number=$(gh pr list --limit 1 --search "head:$GITHUB_REF_NAME base:$STABLE_BRANCH is:open" --json number  --jq '.[] | .number')" >> $GITHUB_OUTPUT
+          prs=$(gh pr list --head develop --base "$STABLE_BRANCH" --state open --json number)
+          count=$(jq 'length' <<< "$prs")
+          if [ "$count" -gt 1 ]; then
+            echo '::error::More than one develop -> main release PR exists.'
+            exit 1
+          fi
+          echo "pr_number=$(jq -r '.[0].number // empty' <<< "$prs")" >> "$GITHUB_OUTPUT"
         id: get_pr
         env:
-          STABLE_BRANCH: ${{ vars.STABLE_BRANCH }}
+          STABLE_BRANCH: main
       - name: Get target version
         if: steps.get_pr.outputs.pr_number != ''
         uses: misskey-dev/release-manager-actions/.github/actions/get-target-version@v2

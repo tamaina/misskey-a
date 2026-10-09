@@ -30,20 +30,94 @@ permissions:
   issues: write
   pull-requests: write
 
+concurrency:
+  group: release-manager
+  cancel-in-progress: false
+
 jobs:
   get-pr:
+    permissions:
+      contents: read
+      pull-requests: read
     runs-on: ubuntu-latest
     outputs:
       pr_number: ${{ steps.get_pr.outputs.pr_number }}
     steps:
-      - uses: actions/checkout@v7
-      # headが$GITHUB_REF_NAME, baseが$STABLE_BRANCHかつopenのPRを1つ取得
-      - name: Get PRs
-        run: |
-          echo "pr_number=$(gh pr list --limit 1 --search "head:$GITHUB_REF_NAME base:$STABLE_BRANCH is:open" --json number  --jq '.[] | .number')" >> $GITHUB_OUTPUT
+      - name: Validate release prerequisites and find release PR
         id: get_pr
+        uses: actions/github-script@v9
         env:
-          STABLE_BRANCH: ${{ vars.STABLE_BRANCH }}
+          MERGE: ${{ inputs.merge }}
+          START_RC: ${{ inputs.start-rc }}
+        with:
+          script: |
+            const fail = message => { throw new Error(message); };
+            if (context.ref !== 'refs/heads/develop') {
+              fail('Run Release Manager on develop, never main or a feature branch.');
+            }
+            const { owner, repo } = context.repo;
+            const { data: repository } = await github.rest.repos.get({ owner, repo });
+            if (repository.default_branch !== 'develop') {
+              fail('Setup incomplete: develop must be the default branch for development PRs.');
+            }
+            if (!repository.allow_merge_commit) {
+              fail('Release Manager v2 requires merge commits.');
+            }
+            // Read branch metadata only; do not inspect or change protection settings.
+            await github.rest.repos.getBranch({ owner, repo, branch: 'main' });
+            const { data: develop } = await github.rest.repos.getBranch({ owner, repo, branch: 'develop' });
+            if (develop.commit.sha !== context.sha) {
+              fail('develop moved since dispatch. Run again on its current HEAD.');
+            }
+            const prs = await github.paginate(github.rest.pulls.list, {
+              owner, repo, state: 'open', base: 'main', head: `${owner}:develop`,
+            });
+            if (prs.length > 1) fail('More than one develop -> main release PR exists.');
+            if (process.env.MERGE === 'true' && process.env.START_RC === 'true') {
+              fail('Choose either merge or start-rc, not both.');
+            }
+            if (!prs.length && (process.env.MERGE === 'true' || process.env.START_RC === 'true')) {
+              fail('No release PR exists. First run with merge=false and start-rc=false.');
+            }
+            if (prs.length && prs[0].head.sha !== context.sha) {
+              fail('Release PR HEAD differs from the dispatched commit.');
+            }
+            if (process.env.MERGE === 'true') {
+              // v2 accepts BLOCKED and later uses --admin. Refuse it before any writes.
+              const { repository: { pullRequest: pr } } = await github.graphql(`
+                query($owner: String!, $repo: String!, $number: Int!) {
+                  repository(owner: $owner, name: $repo) {
+                    pullRequest(number: $number) {
+                      isDraft reviewDecision mergeable mergeStateStatus headRefOid
+                      commits(last: 1) {
+                        nodes { commit { statusCheckRollup {
+                          state contexts(first: 100) {
+                            totalCount nodes {
+                              ... on CheckRun { name status conclusion }
+                              ... on StatusContext { context state }
+                            }
+                          }
+                        } } }
+                      }
+                    }
+                  }
+                }`, { owner, repo, number: prs[0].number });
+              if (pr.headRefOid !== context.sha) fail('Release PR moved. Run again.');
+              if (pr.isDraft || pr.reviewDecision !== 'APPROVED') {
+                fail('Mark the release PR ready and obtain the required approval from another reviewer.');
+              }
+              if (pr.mergeable !== 'MERGEABLE' || pr.mergeStateStatus !== 'CLEAN') {
+                fail(`Release PR must be MERGEABLE/CLEAN; got ${pr.mergeable}/${pr.mergeStateStatus}. Resolve protections/checks without bypass.`);
+              }
+              const rollup = pr.commits.nodes[0]?.commit.statusCheckRollup;
+              if (!rollup || !rollup.contexts.totalCount || rollup.contexts.totalCount > 100 ||
+                  rollup.state !== 'SUCCESS' || rollup.contexts.nodes.some(check =>
+                    check.context !== undefined ? check.state !== 'SUCCESS' :
+                      check.status !== 'COMPLETED' || check.conclusion !== 'SUCCESS')) {
+                fail('Every check on the release HEAD must finish SUCCESS; missing, skipped, neutral or pending checks block v2.');
+              }
+            }
+            core.setOutput('pr_number', prs[0]?.number ?? '');
 
   merge:
     uses: misskey-dev/release-manager-actions/.github/workflows/merge.yml@v2
@@ -52,7 +126,7 @@ jobs:
     with:
       pr_number: ${{ needs.get-pr.outputs.pr_number }}
       user: 'github-actions[bot]'
-      package_jsons_to_rewrite: ${{ vars.PACKAGE_JSONS_TO_REWRITE }}
+      package_jsons_to_rewrite: 'package.json'
       # Text to prepend to the changelog
       # The first line must be `## Unreleased`
       changes_template: |
@@ -67,11 +141,8 @@ jobs:
         ### Server
         -
 
-      use_external_app_to_release: ${{ vars.USE_RELEASE_APP == 'true' }}
-      indent: ${{ vars.INDENT }}
-    secrets:
-      RELEASE_APP_ID: ${{ secrets.RELEASE_APP_ID }}
-      RELEASE_APP_PRIVATE_KEY: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
+      use_external_app_to_release: false
+      indent: 'tab'
 
   create-prerelease:
     uses: misskey-dev/release-manager-actions/.github/workflows/create-prerelease.yml@v2
@@ -80,16 +151,13 @@ jobs:
     with:
       pr_number: ${{ needs.get-pr.outputs.pr_number }}
       user: 'github-actions[bot]'
-      package_jsons_to_rewrite: ${{ vars.PACKAGE_JSONS_TO_REWRITE }}
-      use_external_app_to_release: ${{ vars.USE_RELEASE_APP == 'true' }}
-      indent: ${{ vars.INDENT }}
+      package_jsons_to_rewrite: 'package.json'
+      use_external_app_to_release: false
+      indent: 'tab'
       draft_prerelease_channel: alpha
       ready_start_prerelease_channel: beta
       prerelease_channel: ${{ inputs.start-rc && 'rc' || '' }}
       reset_number_on_channel_change: true
-    secrets:
-      RELEASE_APP_ID: ${{ secrets.RELEASE_APP_ID }}
-      RELEASE_APP_PRIVATE_KEY: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
 
   create-target:
     uses: misskey-dev/release-manager-actions/.github/workflows/create-target.yml@v2
@@ -126,11 +194,8 @@ jobs:
       #  } else {
       #    return `${major}.${minor}.${Number(patch) + 1}`;
       #  }
-      package_jsons_to_rewrite: ${{ vars.PACKAGE_JSONS_TO_REWRITE }}
-      use_external_app_to_release: ${{ vars.USE_RELEASE_APP == 'true' }}
-      indent: ${{ vars.INDENT }}
-      stable_branch: ${{ vars.STABLE_BRANCH }}
+      package_jsons_to_rewrite: 'package.json'
+      use_external_app_to_release: false
+      indent: 'tab'
+      stable_branch: main
       draft_prerelease_channel: alpha
-    secrets:
-      RELEASE_APP_ID: ${{ secrets.RELEASE_APP_ID }}
-      RELEASE_APP_PRIVATE_KEY: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}

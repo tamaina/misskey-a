@@ -44,10 +44,21 @@ The Committers may:
 @syuilo reserves the Final Decision rights including whether the project will implement feature and how to implement, these rights are not always exercised.
 
 ## Well-known branches
-- **`master`** branch is tracking the latest release and used for production purposes.
+- **`main`** branch is tracking the latest release and used for production purposes.
 - **`develop`** branch is where we work for the next release.
 	- When you create a PR, basically target it to this branch.
 - **`l10n_develop`** branch is reserved for localization management.
+
+## Releases
+
+Use **Release Manager [Dispatch]** (`.github/workflows/release-with-dispatch.yml`) on `develop`.
+Before enabling releases, maintainers must create `develop` from the adopted `main`, make it the default branch, and configure required review/check rules on `main`. Merge commits and Actions PR creation must be allowed. This workflow does not change those settings.
+
+Run with `merge=false` and `start-rc=false` to prepare a draft `develop` → `main` release PR and an alpha release. Mark the PR ready and obtain an independent reviewer approval; subsequent runs create beta/RC releases. Run with `merge=true` only after approval and every HEAD check succeeds. Bot authors cannot approve their own release PR; `reviewDecision` must be `APPROVED` under the configured review rules.
+
+The existing v2 action uses `GITHUB_TOKEN` to push version/changelog commits to `develop` and tags, create releases, and merge into `main`. Strict PR-only protection on `develop` blocks those pushes; do not add a bypass to make it work. The merge action itself invokes `--admin`, so the caller refuses a `BLOCKED` PR before handing off. Its version push, tag, release and merge are separate operations: a later failure can leave partial release state. Review the upstream action and branch policy compatibility before running it.
+
+All reported checks must succeed, including optional checks: skipped or neutral checks block v2. Fork-disabled Storybook/Docker jobs and other conditional CI jobs need separate reconciliation before production use. Events created by `GITHUB_TOKEN` generally do not start downstream workflows; do not assume release-triggered Docker/npm publication occurs. npm publication remains restricted to the upstream repository until a fork package name and destination are separately reviewed.
 
 ## Creating a PR
 Thank you for your PR! Before creating a PR, please check the following:
