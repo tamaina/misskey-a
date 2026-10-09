@@ -10,8 +10,11 @@ import { commonErrors } from '../transport/errors.schema.js';
 
 const id = v.pipe(v.string(), v.regex(/^[a-zA-Z0-9]+$/));
 const requestName = 'test';
-export const testContract = oc.$meta({ requestName: requestName } as const)
- .route({ method: 'POST', path: '/test', operationId: 'post___test', tags: ['non-productive'], description: 'Endpoint for testing input validation.' })
+export const testContract = oc.$meta({
+	requestName: requestName,
+	requireCredential: false,
+} as const)
+ .route({ method: 'POST', path: '/test', tags: ['non-productive'], description: 'Endpoint for testing input validation.' })
  .errors(commonErrors).input(objectInput({ required: v.boolean(), string: v.exactOptional(v.string()),
  default: v.optional(v.string(), 'hello'), nullableDefault: v.optional(v.nullable(v.string()), 'hello'), id: v.exactOptional(id),
 })).output(v.strictObject({ required: v.boolean(), string: v.exactOptional(v.string()),

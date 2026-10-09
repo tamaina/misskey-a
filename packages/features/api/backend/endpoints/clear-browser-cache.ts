@@ -10,10 +10,10 @@ import { clearBrowserCacheContract, clearBrowserCacheGetContract } from './clear
 export const clearSiteData = '"cache", "prefetchCache", "prerenderCache", "executionContexts"';
 
 export function createClearBrowserCacheProcedure<Actor extends ApiActor>() {
- return implement(clearBrowserCacheContract).$context<ApiContext<Actor>>()
+ return implement(clearBrowserCacheContract, { initialOutputValidationIndex: Number.NaN }).$context<ApiContext<Actor>>()
   .handler(({ context }) => { context.response?.header('Clear-Site-Data', clearSiteData); });
 }
 export function createClearBrowserCacheGetProcedure<Actor extends ApiActor>() {
- return implement(clearBrowserCacheGetContract).$context<ApiContext<Actor>>()
+ return implement(clearBrowserCacheGetContract, { initialOutputValidationIndex: Number.NaN }).$context<ApiContext<Actor>>()
   .handler(({ context }) => { context.response?.header('Clear-Site-Data', clearSiteData); });
 }

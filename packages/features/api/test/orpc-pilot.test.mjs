@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { test } from 'node:test';
+import { mock, test } from 'node:test';
 import assert from 'node:assert/strict';
 import { EventEmitter } from 'node:events';
 import { Readable } from 'node:stream';
@@ -38,8 +38,9 @@ function fixture(overrides = {}, domainOverrides = {}) {
 	const dependencies = nativeTestDependencies({ actor, serverInfo, packedFile: file, events,
 		uploadAtPath: path => context.upload?.path === path ? context.upload : undefined });
 	for (const [feature, ports] of Object.entries(domainOverrides)) Object.assign(dependencies[feature], ports);
-	const client = createRouterClient(composeNativeTestRouter(dependencies), { context });
-	return { context, dependencies, events, client, upload: input => client.drive.files.create({ file: uploadFile, ...input }) };
+	const router = composeNativeTestRouter(dependencies);
+	const client = createRouterClient(router, { context });
+	return { context, dependencies, events, router, client, upload: input => client.drive.files.create({ file: uploadFile, ...input }) };
 }
 
 test('public server info keeps privacy defaults and reads current settings', async () => {
@@ -111,13 +112,14 @@ test('moved accounts and missing upload resources reject before field validation
 	await assert.rejects(missing.client.drive.files.create({ force: 'wrong' }), error => error.code === 'FILE_REQUIRED');
 });
 
-test('successful outputs are validated and unknown response fields are rejected', async () => {
-	const wrong = fixture({}, { instance: { serverInfo: { enabled: () => true, read: async () => ({ ...serverInfo, secret: true }) } } });
-	await assert.rejects(wrong.client.instance.serverInfo({}), error => error.code === 'INTERNAL_ERROR');
-	const infinite = fixture({}, { instance: { serverInfo: { enabled: () => true, read: async () => ({ ...serverInfo, mem: { total: Infinity } }) } } });
-	await assert.rejects(infinite.client.instance.serverInfo({}), error => error.code === 'INTERNAL_ERROR');
-	const invalid = fixture({}, { drive: { pack: async () => ({ ...file, createdAt: new Date() }) } });
-	await assert.rejects(invalid.upload({}), error => error.code === 'INTERNAL_ERROR');
+test('successful outputs select finite public fields without output schema validation', async () => {
+	const selected = fixture({}, { instance: { serverInfo: { enabled: () => true, read: async () => ({ ...serverInfo, secret: true, mem: { ...serverInfo.mem, secret: true } }) } }, drive: { pack: async () => ({ ...file, secret: true, properties: { width: 12, secret: true } }) } });
+	const validators = [selected.router.instance.serverInfo, selected.router.drive.files.create].map(procedure => mock.method(procedure['~orpc'].outputSchema['~standard'], 'validate', () => { throw Error('Output validation must be disabled'); }));
+	try {
+		assert.deepEqual(await selected.client.instance.serverInfo({}), serverInfo);
+		assert.deepEqual(await selected.upload({}), { ...file, properties: { width: 12 } });
+		for (const validator of validators) assert.equal(validator.mock.callCount(), 0);
+	} finally { for (const validator of validators) validator.mock.restore(); }
 });
 
 test('native delete handler preserves owner/moderator authorization and missing-note UUID', async () => {
@@ -196,13 +198,13 @@ test('parallel staged uploads keep files alive for consumers and clean every res
 	} finally { await rm(directory, { recursive: true, force: true }); }
 });
 
-test('staging cleans up after input, business and output failures', async () => {
+test('staging cleans up after input, business and DTO conversion failures', async () => {
 	const directory = await mkdtemp(join(tmpdir(), 'misskey-pilot-test-'));
 	try {
 		for (const ports of [
 			{},
 			{ addFile: async () => { throw Error('business failure'); } },
-			{ pack: async () => ({ ...file, secret: true }) },
+			{ pack: async () => ({ ...file, properties: null }) },
 		]) {
 			const { context, client } = fixture({}, { drive: ports });
 			const fields = Object.keys(ports).length === 0 ? [['force', '1']] : [];
@@ -300,8 +302,8 @@ test('native moderation checks precede malformed fields and preserve root bypass
 	assert.equal(rolesRead, false);
 });
 
-test('native public defaults, GET scalar decoding and output validation execute directly', async () => {
-	const { client, dependencies } = fixture({ authenticate: async () => [null, null] });
+test('native public defaults and GET scalar decoding remain validated while output validation is disabled', async () => {
+	const { client, dependencies, router } = fixture({ authenticate: async () => [null, null] });
 	let parsed;
 	const side = { total: [], inc: [], dec: [], diffs: { normal: [], reply: [], renote: [], withFile: [] } };
 	dependencies.statistics.charts.notes.getChart = async (span, limit, offset) => {
@@ -313,6 +315,10 @@ test('native public defaults, GET scalar decoding and output validation execute 
 	assert.deepEqual(parsed, { span: 'day', limit: 2, offset: null });
 	for (const limit of ['01', '+1', '0x10']) await assert.rejects(client.statistics.notesGet({ span: 'day', limit }),
 		error => error.code === 'INVALID_PARAM' && error.data.id === '0b5f1631-7c1a-41a6-b399-cce335f34d85');
-	dependencies.statistics.countReactions = async () => Infinity;
-	await assert.rejects(client.statistics.stats({}), error => error.code === 'INTERNAL_ERROR');
+	dependencies.statistics.countReactions = async () => 3;
+	const validate = mock.method(router.statistics.stats['~orpc'].outputSchema['~standard'], 'validate', () => { throw Error('Output validation must be disabled'); });
+	try {
+		assert.equal((await client.statistics.stats({})).reactionsCount, 3);
+		assert.equal(validate.mock.callCount(), 0);
+	} finally { validate.mock.restore(); }
 });

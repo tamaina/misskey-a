@@ -4,6 +4,7 @@
  */
 
 import { OpenAPIGenerator } from '@orpc/openapi';
+import { assignExternalOperationIds } from './operation-ids.js';
 import { experimental_ValibotToJsonSchemaConverter } from '@orpc/valibot';
 import { packedJsonValueSchema } from '@features/users/backend/json-value.schema.js';
 import { clientContract } from '@features/index/backend/client.contract.js';
@@ -65,6 +66,7 @@ export async function genPilotOpenapiSpec(config: { version: string; apiUrl: str
 			},
 		},
 	});
+	assignExternalOperationIds(spec);
 	const nullable = new Set((await nullableResponsePaths(pilotContract)).map(path => JSON.stringify(path)));
 	for (const route of requestRoutes(pilotContract)) {
 		if (!nullable.has(JSON.stringify(route.path))) continue;

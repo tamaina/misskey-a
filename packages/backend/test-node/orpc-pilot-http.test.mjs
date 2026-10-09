@@ -33,7 +33,8 @@ async function fixture(t, overrides = {}, domainOverrides = {}) {
 		events, uploadAtPath: path => uploads.get(path) });
 	for (const [feature, ports] of Object.entries(domainOverrides)) Object.assign(dependencies[feature], ports);
 	const app = Fastify();
-	const handler = new OpenAPIHandler(composeNativeTestRouter(dependencies), { customErrorResponseBodyEncoder: misskeyErrorBody, interceptors: [nullSuccessToNoContent()] });
+	const router = composeNativeTestRouter(dependencies);
+	const handler = new OpenAPIHandler(router, { customErrorResponseBodyEncoder: misskeyErrorBody, interceptors: [nullSuccessToNoContent()] });
 	await app.register(async api => {
 		await api.register(multipart, { limits: { fileSize: 1024, files: 1 } });
 		registerPilotHttp(api, handler, {
@@ -58,7 +59,7 @@ async function fixture(t, overrides = {}, domainOverrides = {}) {
 	}, { prefix: '/api' });
 	const origin = await app.listen({ host: '127.0.0.1', port: 0 });
 	t.after(async () => { await app.close(); uploads.clear(); });
-	return { app, dependencies, events, origin, client: new APIClient({ origin, credential: 'native' }) };
+	return { app, dependencies, events, origin, router, client: new APIClient({ origin, credential: 'native' }) };
 }
 
 test('real HTTP and SDK preserve public JSON, auth precedence and 204/null', async t => {
@@ -136,11 +137,13 @@ test('real SDK multipart reaches the single File contract, defaults and cleanup'
 	await assert.rejects(client.request('drive/files/create', { file: new File(['bytes'], 'file.txt'), comment: '😀'.repeat(513) }), error => error.code === 'INVALID_PARAM');
 });
 
-test('HTTP upload limit and finite output validation remain enabled', async t => {
-	const { origin, app, events } = await fixture(t, {}, { instance: { serverInfo: { enabled: () => true, read: async () => ({ ...stats, secret: true }) } } });
-	const invalid = await app.inject({ method: 'POST', url: '/api/server-info', payload: {} });
-	assert.equal(invalid.statusCode, 500);
-	assert.equal(invalid.json().error.code, 'INTERNAL_ERROR');
+test('HTTP upload limit remains enforced and finite projection skips output validation', async t => {
+	const { origin, app, events, router } = await fixture(t, {}, { instance: { serverInfo: { enabled: () => true, read: async () => ({ ...stats, secret: true }) } } });
+	const validate = t.mock.method(router.instance.serverInfo['~orpc'].outputSchema['~standard'], 'validate', () => { throw Error('Output validation must be disabled'); });
+	const projected = await app.inject({ method: 'POST', url: '/api/server-info', payload: {} });
+	assert.equal(projected.statusCode, 200);
+	assert.deepEqual(projected.json(), stats);
+	assert.equal(validate.mock.callCount(), 0);
 	const form = new FormData();
 	form.set('i', 'native');
 	form.set('file', new File(['x'.repeat(1025)], 'large.txt'));
@@ -414,7 +417,7 @@ test('external generated references resolve after component hoisting and GET sch
 });
 
 
-test('nullable success becomes empty204 after validation while nonnull results retain JSON200', async t => {
+test('nullable success becomes empty204 while finite nonnull results retain JSON200 without output validation', async t => {
 	const { app, client } = await fixture(t);
 	for (const [name, absent, present, expected] of [
 		['endpoint', { endpoint: 'unknown-name' }, { endpoint: 'ping' }, { params: [] }],
@@ -430,10 +433,12 @@ test('nullable success becomes empty204 after validation while nonnull results r
 		assert.deepEqual(await client.request(name, present, 'session'), expected);
 	}
 	assert.equal(await client.orpc.instance.endpoint({ endpoint: 'unknown-name' }), null);
-	const invalid = await fixture(t, {}, { notifications: { findSubscription: async () => ({ userId: actor.id, endpoint: 'x', sendReadMessage: 'invalid' }) } });
-	const rejected = await invalid.app.inject({ method: 'POST', url: '/api/sw/show-registration', payload: { endpoint: 'x', i: 'session' } });
-	assert.equal(rejected.statusCode, 500);
-	assert.equal(rejected.json().error.code, 'INTERNAL_ERROR');
+	const extended = await fixture(t, {}, { notifications: { findSubscription: async () => ({ userId: actor.id, endpoint: 'x', sendReadMessage: false, accessKey: 'secret' }) } });
+	const validate = t.mock.method(extended.router.notifications.showRegistration['~orpc'].outputSchema['~standard'], 'validate', () => { throw Error('Output validation must be disabled'); });
+	const projected = await extended.app.inject({ method: 'POST', url: '/api/sw/show-registration', payload: { endpoint: 'x', i: 'session' } });
+	assert.equal(projected.statusCode, 200);
+	assert.deepEqual(projected.json(), { userId: actor.id, endpoint: 'x', sendReadMessage: false });
+	assert.equal(validate.mock.callCount(), 0);
 });
 
 test('push registration reads live settings for both new and existing subscriptions', async t => {
@@ -487,6 +492,10 @@ test('expanded native cohorts execute business handlers with defaults, public ac
 	assert.equal(denied.json().error.code, 'PERMISSION_DENIED');
 	assert.equal(events.filter(event => event[0] === 'following').length, followingWrites);
 	await assert.rejects(client.request('notes/global-timeline', { limit: 101 }), error => error.code === 'INVALID_PARAM');
-	const invalid = await fixture(t, {}, { notes: { noteDraftsRepository: { createQueryBuilder: () => ({ where() { return this; }, getCount: async () => Infinity }) } } });
-	assert.equal((await invalid.app.inject({ method: 'POST', url: '/api/notes/drafts/count', payload: { i: 'session' } })).statusCode, 500);
+	const counts = await fixture(t, {}, { notes: { noteDraftsRepository: { createQueryBuilder: () => ({ where() { return this; }, getCount: async () => 5 }) } } });
+	const validate = t.mock.method(counts.router.notes.notesDraftsCount['~orpc'].outputSchema['~standard'], 'validate', () => { throw Error('Output validation must be disabled'); });
+	const counted = await counts.app.inject({ method: 'POST', url: '/api/notes/drafts/count', payload: { i: 'session' } });
+	assert.equal(counted.statusCode, 200);
+	assert.equal(counted.json(), 5);
+	assert.equal(validate.mock.callCount(), 0);
 });

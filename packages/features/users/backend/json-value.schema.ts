@@ -55,6 +55,11 @@ export const packedOptionalJsonValueSchema: v.GenericSchema<PackedJsonValue | un
 export const packedOptionalJsonObjectSchema: v.GenericSchema<{ [key: string]: PackedJsonValue } | undefined> = v.optional(packedJsonObjectSchema);
 export const packedNullableJsonValueSchema: v.GenericSchema<PackedJsonValue | null> = v.nullable(packedJsonValueSchema);
 
+/** Preserve ordinary record wire normalization without running a schema validator. */
+export function toPackedRecord<Value>(input: Readonly<Record<string, Value>>): Record<string, Value> {
+	return Object.fromEntries(Object.entries(input).filter(([key]) => key !== '__proto__' && key !== 'prototype' && key !== 'constructor'));
+}
+
 /** Materialize genuine stored JSON; Object.fromEntries preserves reserved names as own data keys. */
 export function toPackedJsonValue(input: unknown): PackedJsonValue {
 	if (!isJsonTree(input)) throw new TypeError('Stored JSON must contain only acyclic JSON values');

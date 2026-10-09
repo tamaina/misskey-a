@@ -9,7 +9,7 @@ import * as v from 'valibot';
 import type { ApiContext } from '@features/api/backend/transport/context.js';
 import { createProcedureClient } from '@orpc/server';
 import { mockDeep } from 'vitest-mock-extended';
-import { notesCreateContract, notesCreateErrors, notesCreatePolicy } from '@features/notes/backend/endpoints/notes/create.contract.js';
+import { notesCreateContract, notesCreateErrors } from '@features/notes/backend/endpoints/notes/create.contract.js';
 import { createNotesCreateProcedure as NotesCreateOperation, createNotesCreateProcedure } from '@features/notes/backend/endpoints/notes/create.js';
 import { MAX_NOTE_TEXT_LENGTH } from '@features/notes/backend/request.schema.js';
 import { packedNoteSchema } from '@features/notes/backend/note.schema.js';
@@ -30,8 +30,8 @@ const packedNote = {
 
 test('notes/create retains the frozen public limit, security policy and every route error ID', () => {
 	expect(MAX_NOTE_TEXT_LENGTH).toBe(3000);
-	expect(notesCreatePolicy).toEqual({
-		name: 'notes/create', requireCredential: true, prohibitMoved: true,
+	expect(notesCreateContract['~orpc'].meta).toMatchObject({
+		requestName: 'notes/create', requireCredential: true, prohibitMoved: true,
 		limit: baseline.routes[0].meta.limit, kind: 'write:notes',
 	});
 	expect(notesCreateErrors).toEqual(baseline.routes[0].meta.errors);
@@ -123,7 +123,7 @@ test('native procedure validates before application side effects and passes pars
 	expect(deps.noteCreateService.fetchAndCreate.mock.calls[0][1]).not.toHaveProperty('future');
 	const invalidOutput = { ...packedNote, future: true };
 	deps.noteEntityService.pack.mockResolvedValue(invalidOutput);
-	await expect(client({ text: 'hello' })).rejects.toThrow();
+	expect(await client({ text: 'hello' })).toEqual({ createdNote: packedNote });
 });
 
 test('authentication and moved-account checks run before input validation or application calls', async () => {

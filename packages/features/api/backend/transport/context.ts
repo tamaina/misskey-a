@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 import type { ORPCError } from '@orpc/server';
+import type { RateLimit } from './policy.types.js';
+export type { RateLimit } from './policy.types.js';
 
 export interface ApiActor {
 	id: string;
@@ -18,7 +20,6 @@ export interface ApiAuthorization<Actor extends ApiActor> {
 
 export interface ApiToken { id?: string; name?: string | null; iconUrl?: string | null; permission: readonly string[] }
 export interface UploadResource { path: string; name: string | null; file: File }
-export interface RateLimit { key: string; duration: number; max: number; minInterval?: number }
 
 /** The host binds existing services to these narrow ports once per server role. */
 export interface ApiServices<Actor extends ApiActor> {

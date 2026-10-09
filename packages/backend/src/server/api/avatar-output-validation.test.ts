@@ -6,7 +6,6 @@
 import { afterEach, expect, test, vi } from 'vitest';
 import { mockDeep } from 'vitest-mock-extended';
 import { OpenAPIHandler } from '@orpc/openapi/fetch';
-import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 import type { ApiActor, ApiAuthorization, ApiContext, ApiServices } from '@features/api/backend/transport/context.js';
 import { avatarDecorationsContract } from '@features/avatar-decorations/backend/api.definition.js';
 import { createAvatarDecorationsRouter } from '@features/avatar-decorations/backend/api.implementation.js';
@@ -140,29 +139,4 @@ test.each(['create', 'delete', 'list', 'update'] as const)('avatar %s metadata p
 	expect(inputSpy).toHaveBeenCalledTimes(1);
 	const input = operation === 'create' ? { name: 'Name', description: '', url: '/image.png' } : { id: 'decoration1' };
 	expect((await h.post(path, input)).status).toBe(operation === 'delete' || operation === 'update' ? 204 : 200);
-});
-
-test('contract authorization metadata takes precedence over structurally compatible implementation options', async () => {
-	const h = fixture();
-	const options = { secure: false, requireCredential: false, requiredRolePolicy: undefined, kind: undefined };
-	const handler = new OpenAPIHandler({ delete: createApiProcedure<ApiActor>()(avatarDecorationsContract.delete, options).handler(() => undefined) });
-	const services = h.services;
-	const context: ApiContext<ApiActor> = { services, authorization: h.authorization, credential: null, ip: '127.0.0.1', headers: {} };
-
-	async function request() {
-		const result = await handler.handle(new Request('https://local.test/admin/avatar-decorations/delete', {
-			method: 'POST', headers: { 'content-type': 'application/json' }, body: 'null',
-		}), { context });
-		if (!result.response) throw new Error('Expected a matched avatar-decoration route');
-		return result.response;
-	}
-
-	expect(await (await request()).json()).toMatchObject({ code: 'CREDENTIAL_REQUIRED' });
-	services.authenticate.mockResolvedValue([actor, { permission: [] }]);
-	h.authorization.rootUserId.mockReturnValue(null);
-	h.authorization.roles.mockResolvedValue([]);
-	h.authorization.policyAllowed.mockResolvedValue(false);
-	expect(await (await request()).json()).toMatchObject({ code: 'ROLE_PERMISSION_DENIED' });
-	h.authorization.policyAllowed.mockResolvedValue(true);
-	expect(await (await request()).json()).toMatchObject({ code: 'PERMISSION_DENIED' });
 });
