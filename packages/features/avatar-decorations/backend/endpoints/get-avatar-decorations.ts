@@ -2,9 +2,8 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-import { implement } from '@orpc/server';
-import { authentication, apiPolicy } from '../../../api/backend/transport/middleware.js';
-import type { ApiActor, ApiContext } from '../../../api/backend/transport/context.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import type { ApiActor } from '@features/api/backend/transport/context.js';
 import { avatarDecorationsContract } from '../api.definition.js';
 import type { AvatarDecorationsDependencies } from '../api.implementation.js';
 export interface GetAvatarDecorationsDependencies<Actor extends ApiActor> {
@@ -12,8 +11,8 @@ export interface GetAvatarDecorationsDependencies<Actor extends ApiActor> {
 	readRoles: AvatarDecorationsDependencies<Actor>['readRoles'];
 }
 export function createGetAvatarDecorationsProcedure<Actor extends ApiActor>(deps: GetAvatarDecorationsDependencies<Actor>) {
-	return implement(avatarDecorationsContract.get, { initialInputValidationIndex: Number.POSITIVE_INFINITY, initialOutputValidationIndex: Number.NaN }).$context<ApiContext<Actor>>()
-		.use(authentication<Actor>()).use(apiPolicy<Actor>({ name: avatarDecorationsContract.get['~orpc'].meta.requestName }))
+	const procedure = createApiProcedure<Actor>();
+	return procedure(avatarDecorationsContract.get)
 		.handler(async ({ context }) => {
 			const actor = context.principal;
 			const decorations = await deps.avatarDecorationService.getAll(true);

@@ -6,10 +6,10 @@
 import { Injectable } from '@nestjs/common';
 import { ModuleRef } from '@nestjs/core';
 import { implement } from '@orpc/server';
-import type { ApiActor, ApiContext } from '../../api/backend/transport/context.js';
-import { RoleService } from '../../roles/backend/services/RoleService.js';
-import { IdService } from '../../runtime/backend/services/IdService.js';
-import type { MiLocalUser } from '../../users/backend/models/User.js';
+import type { ApiActor, ApiContext } from '@features/api/backend/transport/context.js';
+import { RoleService } from '@features/roles/backend/services/RoleService.js';
+import { IdService } from '@features/runtime/backend/services/IdService.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
 import type { MiAvatarDecoration } from './models/AvatarDecoration.js';
 import { AvatarDecorationService } from './services/AvatarDecorationService.js';
 import { avatarDecorationsContract } from './api.definition.js';
@@ -38,8 +38,7 @@ export interface AvatarDecorationsDependencies<Actor extends ApiActor> {
 }
 
 export function createAvatarDecorationsRouter<Actor extends ApiActor>(deps: AvatarDecorationsDependencies<Actor>) {
-	// oRPC 1.x skips the output validation index when it is NaN; contracts remain typed.
-	return implement(avatarDecorationsContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY, initialOutputValidationIndex: Number.NaN }).$context<ApiContext<Actor>>().router({
+	return implement(avatarDecorationsContract).$context<ApiContext<Actor>>().router({
 		create: createAvatarDecorationCreateProcedure(deps),
 		delete: createAvatarDecorationDeleteProcedure(deps),
 		list: createAvatarDecorationListProcedure(deps),

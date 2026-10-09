@@ -93,14 +93,14 @@ test('avatar input validation, default pagination and unknown-key stripping rema
 
 test('avatar credential and role policy rejection still run before business logic', async () => {
 	const h = fixture();
-	const unauthenticated = await h.post('admin/avatar-decorations/delete', { id: 'decoration1' });
+	const unauthenticated = await h.post('admin/avatar-decorations/delete', null);
 	expect(unauthenticated.status).toBe(401);
 	expect(await unauthenticated.json()).toMatchObject({ code: 'CREDENTIAL_REQUIRED' });
 	h.services.authenticate.mockResolvedValue([actor, null]);
 	h.authorization.rootUserId.mockReturnValue(null);
 	h.authorization.roles.mockResolvedValue([]);
 	h.authorization.policyAllowed.mockResolvedValue(false);
-	const unauthorized = await h.post('admin/avatar-decorations/delete', { id: 'decoration1' });
+	const unauthorized = await h.post('admin/avatar-decorations/delete', { id: 'invalid-id!' });
 	expect(unauthorized.status).toBe(403);
 	expect(await unauthorized.json()).toMatchObject({ code: 'ROLE_PERMISSION_DENIED' });
 	expect(h.deps.avatarDecorationService.delete).not.toHaveBeenCalled();
