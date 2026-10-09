@@ -27,6 +27,7 @@ import { CollapsedQueue } from '@features/runtime/backend/async/collapsed-queue.
 import { MiNote } from '@features/notes/backend/models/Note.js';
 import { MiMeta } from '@features/instance/backend/models/Meta.js';
 import { DI } from '@/di-symbols.js';
+import { InboxKeyDiscoveryDeferredError, InboxKeyDiscoveryRefreshError } from '../utility/inbox-key-discovery.js';
 import { QueueLoggerService } from '@features/runtime/backend/queue/QueueLoggerService.js';
 import type { InboxJobData } from '@features/runtime/backend/queue/types.js';
 
@@ -105,16 +106,21 @@ export class InboxProcessorService implements OnApplicationShutdown {
 		// HTTP-Signature keyIdを元にDBから取得
 		let authUser: Awaited<ReturnType<typeof this.apDbResolverService.getAuthUserFromApId>> = null;
 		let httpSignatureIsValid = null as boolean | null;
+		let keyResolutionError: unknown;
 
 		try {
 			authUser = await this.apDbResolverService.getAuthUserFromApId(actorUri, signature?.keyId);
 		} catch (err) {
-			// 対象が4xxならスキップ
-			if (err instanceof StatusError) {
+			// A failed key refresh must still allow a cached RSA LD signature.
+			if (err instanceof InboxKeyDiscoveryRefreshError) {
+				keyResolutionError = err.cause;
+			} else if (err instanceof StatusError) {
 				if (!err.isRetryable) {
 					throw new Bull.UnrecoverableError(`skip: Ignored deleted actors on both ends ${activity.actor} - ${err.statusCode}`);
 				}
 				throw new Error(`Error in actor ${activity.actor} - ${err.statusCode}`);
+			} else {
+				keyResolutionError = err;
 			}
 		}
 
@@ -228,6 +234,15 @@ export class InboxProcessorService implements OnApplicationShutdown {
 					throw new Bull.UnrecoverableError(`Blocked request: ${ldHost}`);
 				}
 			} else {
+				if (keyResolutionError != null) {
+					if (keyResolutionError instanceof StatusError && !keyResolutionError.isRetryable) {
+						throw new Bull.UnrecoverableError(`skip: Actor key refresh failed - ${keyResolutionError.statusCode}`);
+					}
+					throw keyResolutionError;
+				}
+				if (signature != null && authUser?.user?.uri === actorUri && authUser.key == null && authUser.keyDiscoveryDeferredUntil != null) {
+					throw new InboxKeyDiscoveryDeferredError(authUser.keyDiscoveryDeferredUntil);
+				}
 				throw new Bull.UnrecoverableError(`skip: http-signature verification failed and no LD-Signature. http_signature_keyId=${signature?.keyId}`);
 			}
 		}

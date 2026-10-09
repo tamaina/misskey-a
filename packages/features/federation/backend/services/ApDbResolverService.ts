@@ -20,6 +20,7 @@ import { getApId } from '../protocol/type.js';
 import { ApPersonService } from './ApPersonService.js';
 import { ApLoggerService } from '@features/federation/backend/services/ApLoggerService.js';
 import type { IObject } from '../protocol/type.js';
+import { InboxKeyDiscoveryRefreshError } from '../utility/inbox-key-discovery.js';
 import { GlobalEvents } from '@features/runtime/backend/services/GlobalEventService.js';
 
 export type UriParseResult = {
@@ -157,6 +158,7 @@ export class ApDbResolverService implements OnApplicationShutdown {
 	public async getAuthUserFromApId(uri: string, keyId?: string): Promise<{
 		user: MiRemoteUser;
 		key: MiUserPublickey | null;
+		keyDiscoveryDeferredUntil?: number;
 	} | {
 		user: null;
 		key: null;
@@ -189,6 +191,7 @@ export class ApDbResolverService implements OnApplicationShutdown {
 			}
 		}
 
+		const resolutionStartedAt = Date.now();
 		const user = await this.apPersonService.resolvePerson(uri, undefined, true) as MiRemoteUser;
 		this.logger.debug(`getAuthUserFromApId: User resolved uri=${uri} userId=${user.id} keyId=${keyId}`);
 
@@ -253,7 +256,12 @@ export class ApDbResolverService implements OnApplicationShutdown {
 		 */
 		if (user.lastFetchedAt == null || Date.now() - user.lastFetchedAt.getTime() > 1000 * 60 * 5) {
 			this.logger.info(`getAuthUserFromApId: Renewing remote user uri=${uri} userId=${user.id} keyId=${keyId}`);
-			const renewed = await this.apPersonService.fetchPersonWithRenewal(uri, 0);
+			let renewed: Awaited<ReturnType<ApPersonService['fetchPersonWithRenewal']>>;
+			try {
+				renewed = await this.apPersonService.fetchPersonWithRenewal(uri, 0, true);
+			} catch (cause) {
+				throw new InboxKeyDiscoveryRefreshError(cause);
+			}
 			if (renewed == null) {
 				this.logger.warn(`getAuthUserFromApId: User not found uri=${uri} userId=${user.id} keyId=${keyId}`);
 				return null;
@@ -269,7 +277,9 @@ export class ApDbResolverService implements OnApplicationShutdown {
 		}
 
 		this.logger.warn(`getAuthUserFromApId: No key found uri=${uri} userId=${user.id} keyId=${keyId}`);
-		return { user, key: null };
+		// A new or normally renewed Actor has already supplied a fresh key set.
+		if (user.lastFetchedAt.getTime() >= resolutionStartedAt) return { user, key: null };
+		return { user, key: null, keyDiscoveryDeferredUntil: user.lastFetchedAt.getTime() + 5 * 60 * 1000 + 1 };
 	}
 
 	@bindThis

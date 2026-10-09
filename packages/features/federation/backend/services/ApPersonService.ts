@@ -273,7 +273,7 @@ export class ApPersonService implements OnModuleInit {
 	 * また、TTLが0でない場合、TTLを過ぎていた場合はupdatePersonを実行します。
 	 */
 	@bindThis
-	async fetchPersonWithRenewal(uri: string, TTL = REMOTE_USER_CACHE_TTL): Promise<MiLocalUser | MiRemoteUser | null> {
+	async fetchPersonWithRenewal(uri: string, TTL = REMOTE_USER_CACHE_TTL, throwOnRefreshError = false): Promise<MiLocalUser | MiRemoteUser | null> {
 		const exist = await this.fetchPerson(uri);
 		if (exist == null) return null;
 
@@ -285,6 +285,7 @@ export class ApPersonService implements OnModuleInit {
 					return await this.fetchPerson(uri);
 				} catch (err) {
 					this.logger.error('error occurred while renewing user', { err });
+					if (throwOnRefreshError) throw err;
 				}
 			}
 			this.logger.debug('fetchPersonWithRenewal: use cache', { uri, TTL, lastFetchedAt: exist.lastFetchedAt });
