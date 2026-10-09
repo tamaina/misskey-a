@@ -28,10 +28,16 @@ test.beforeAll(async () => {
 		entryPoints: [resolve(import.meta.dirname, '../../../frontend-shared/js/shared-files.ts')],
 		bundle: true, format: 'esm', write: false,
 	});
+	const handler = await build({
+		entryPoints: [resolve(import.meta.dirname, '../../../sw/src/scripts/share.ts')],
+		bundle: true, format: 'esm', write: false,
+		tsconfig: resolve(import.meta.dirname, '../../../sw/tsconfig.json'),
+	});
 	server = createServer((req, res) => {
 		const path = req.url?.split('?')[0];
 		res.setHeader('content-type', path?.endsWith('.js') ? 'text/javascript' : 'text/html');
 		res.end(path === '/sw.js' ? worker : path === '/shared-files.js' ? client.outputFiles[0].text
+			: path === '/share-handler.js' ? handler.outputFiles[0].text
 			: '<!doctype html><form action="/sw/share" method="post" enctype="multipart/form-data"><input type="file" name="files"><input name="text" value="Shared text"><button>Share</button></form>');
 	});
 	origin = await listen(server);
@@ -107,9 +113,9 @@ test('shared drafts remain isolated across requests and accounts', async ({ page
 		open.onerror = () => reject(open.error);
 		open.onsuccess = () => {
 			const db = open.result;
-			const count = db.transaction('shares').objectStore('shares').count();
+			const count = db.transaction('shares').objectStore('shares').getAllKeys();
 			count.onerror = () => { db.close(); reject(count.error); };
-			count.onsuccess = () => { db.close(); done(count.result); };
+			count.onsuccess = () => { db.close(); done(count.result.filter(key => typeof key === 'string' && /^[0-9a-f]{8}-/.test(key)).length); };
 		};
 	}));
 	const pendingCount = await countRecords();
@@ -216,4 +222,131 @@ test('a stopped service worker restarts for another share and retains the previo
 	expect(await read(page, newId, 'A')).toEqual([{ name: 'after.txt', text: 'after' }]);
 	expect(await read(page, oldId, 'A')).toEqual([{ name: 'before.txt', text: 'before' }]);
 	await session.detach();
+});
+
+test('an old-account share waiting on its body does not reappear after account cleanup', async ({ page, context }) => {
+	await page.goto(origin);
+	const other = await context.newPage();
+	await other.goto(origin);
+	await page.evaluate(async origin => {
+		const handler = await import(`${origin}/share-handler.js`);
+		const shared = await import(`${origin}/shared-files.js`);
+		const body = new FormData();
+		body.append('files', new File(['old-account-secret'], 'old.txt'));
+		let release!: (body: FormData) => void;
+		const delayed = new Promise<FormData>(resolve => { release = resolve; });
+		let entered!: () => void;
+		const bodyStarted = new Promise<void>(resolve => { entered = resolve; });
+		const request = new Request(`${origin}/sw/share`, { method: 'POST', body });
+		Object.defineProperty(request, 'formData', { value: () => { entered(); return delayed; } });
+		// Invoke the actual handler before account A switches; body parsing remains pending.
+		const response = handler.respondToShare(request);
+		await bodyStarted;
+		Object.defineProperty(window, '__finishOldShare', { configurable: true, value: async () => {
+			release(body);
+			const result: Response = await response;
+			const location = result.headers.get('location');
+			const id = location ? new URL(location).searchParams.get('shareId') : null;
+			const files: File[] = await shared.readSharedFiles(id, 'B');
+			return { status: result.status, location, contents: await Promise.all(files.map(file => file.text())) };
+		} });
+	}, origin);
+	// The real account-boundary helper completes in a different page before body release.
+	await other.evaluate(async origin => {
+		const shared = await import(`${origin}/shared-files.js`);
+		await shared.clearSharedFiles();
+	}, origin);
+	const visibleToNewAccount = await page.evaluate(async () => {
+		const finish = Reflect.get(window, '__finishOldShare') as () => Promise<{ status: number; location: string | null; contents: string[] }>;
+		return finish();
+	});
+	expect(visibleToNewAccount).toEqual({ status: 409, location: null, contents: [] });
+	await other.close();
+});
+
+test('a fresh share beginning after account cleanup can be claimed by the new account', async ({ page }) => {
+	await page.goto(origin);
+	const files = await page.evaluate(async origin => {
+		const handler = await import(`${origin}/share-handler.js`);
+		const shared = await import(`${origin}/shared-files.js`);
+		await shared.clearSharedFiles();
+		const body = new FormData();
+		body.append('files', new File(['new-share'], 'new.txt'));
+		const response: Response = await handler.respondToShare(new Request(`${origin}/sw/share`, { method: 'POST', body }));
+		const id = new URL(response.headers.get('location')!).searchParams.get('shareId');
+		const files: File[] = await shared.readSharedFiles(id, 'B');
+		return Promise.all(files.map(file => file.text()));
+	}, origin);
+	expect(files).toEqual(['new-share']);
+});
+
+test('generation survives reload and TTL cleanup and never resets on repeated clear', async ({ page }) => {
+	await page.goto(origin);
+	const before = await page.evaluate(async origin => {
+		const shared = await import(`${origin}/shared-files.js`);
+		const old = await shared.getSharedFilesGeneration();
+		await shared.clearSharedFiles();
+		const current = await shared.getSharedFilesGeneration();
+		return { old, current };
+	}, origin);
+	expect(before.current).not.toBe(before.old);
+	await page.reload();
+	const after = await page.evaluate(async ({ origin, before }) => {
+		const shared = await import(`${origin}/shared-files.js?restart=1`);
+		const now = Date.now;
+		Date.now = () => now() + 2 * 60 * 60 * 1000;
+		try { await shared.cleanupSharedFiles(); } finally { Date.now = now; }
+		const current = await shared.getSharedFilesGeneration();
+		const stale = await shared.saveSharedFiles([new File(['stale'], 'stale.txt')], before.old);
+		await shared.clearSharedFiles();
+		const next = await shared.getSharedFilesGeneration();
+		const alsoStale = await shared.saveSharedFiles([new File(['stale'], 'stale.txt')], before.current);
+		return { current, stale, next, alsoStale };
+	}, { origin, before });
+	expect(after.current).toBe(before.current);
+	expect(after.stale).toBeNull();
+	expect(after.alsoStale).toBeNull();
+	expect(after.next).not.toBe(before.old);
+	expect(after.next).not.toBe(before.current);
+});
+
+test('concurrent saves racing account cleanup cannot leave old-generation records', async ({ page }) => {
+	await page.goto(origin);
+	const result = await page.evaluate(async origin => {
+		const shared = await import(`${origin}/shared-files.js`);
+		const old = await shared.getSharedFilesGeneration();
+		const pending: Promise<string | null>[] = Array.from({ length: 8 }, (_, i) => shared.saveSharedFiles([new File([`old${i}`], `old${i}.txt`)], old));
+		await shared.clearSharedFiles();
+		const ids = await Promise.all(pending);
+		const contents = await Promise.all(ids.map(async id => {
+			const files: File[] = await shared.readSharedFiles(id, 'new-account');
+			return files.length;
+		}));
+		const fresh = await shared.saveSharedFiles([new File(['fresh'], 'fresh.txt')]);
+		const freshFiles: File[] = await shared.readSharedFiles(fresh, 'new-account');
+		return { contents, fresh: await Promise.all(freshFiles.map(file => file.text())) };
+	}, origin);
+	expect(result.contents).toEqual(Array(8).fill(0));
+	expect(result.fresh).toEqual(['fresh']);
+});
+
+test('discard and expired-record cleanup retain the current generation', async ({ page }) => {
+	await page.goto(origin);
+	const result = await page.evaluate(async origin => {
+		const shared = await import(`${origin}/shared-files.js`);
+		const generation = await shared.getSharedFilesGeneration();
+		const id = await shared.saveSharedFiles([new File(['cancel'], 'cancel.txt')], generation);
+		await shared.readSharedFiles(id, 'A');
+		await shared.discardSharedFiles(id, 'A');
+		const canceled: File[] = await shared.readSharedFiles(id, 'A');
+		const expiring = await shared.saveSharedFiles([new File(['expire'], 'expire.txt')], generation);
+		const now = Date.now;
+		Date.now = () => now() + 2 * 60 * 60 * 1000;
+		try { await shared.cleanupSharedFiles(); } finally { Date.now = now; }
+		const expired: File[] = await shared.readSharedFiles(expiring, 'A');
+		return { generation, current: await shared.getSharedFilesGeneration(), canceled: canceled.length, expired: expired.length };
+	}, origin);
+	expect(result.current).toBe(result.generation);
+	expect(result.canceled).toBe(0);
+	expect(result.expired).toBe(0);
 });

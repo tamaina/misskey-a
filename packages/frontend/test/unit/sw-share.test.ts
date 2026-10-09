@@ -4,10 +4,10 @@
  */
 
 import { beforeEach, describe, expect, test, vi } from 'vitest';
-import { saveSharedFiles } from '@@/js/shared-files.js';
+import { getSharedFilesGeneration, saveSharedFiles } from '@@/js/shared-files.js';
 import { respondToShare } from '../../../sw/src/scripts/share.js';
 
-vi.mock('@@/js/shared-files.js', () => ({ saveSharedFiles: vi.fn() }));
+vi.mock('@@/js/shared-files.js', () => ({ getSharedFilesGeneration: vi.fn(), saveSharedFiles: vi.fn() }));
 const shareId = '00000000-0000-4000-8000-000000000001';
 
 function request(form: FormData) {
@@ -15,7 +15,10 @@ function request(form: FormData) {
 }
 
 describe('PWA share target', () => {
-	beforeEach(() => { vi.mocked(saveSharedFiles).mockReset().mockResolvedValue(shareId); });
+	beforeEach(() => {
+		vi.mocked(getSharedFilesGeneration).mockReset().mockResolvedValue('generation-a');
+		vi.mocked(saveSharedFiles).mockReset().mockResolvedValue(shareId);
+	});
 
 	test('rejects a foreign web Origin without touching stored shares', async () => {
 		const incoming = request(new FormData());
@@ -71,7 +74,7 @@ describe('PWA share target', () => {
 		expect((await response).status).toBe(303);
 	});
 
-	test.each([false, true])('does not use storage when there are no valid files (invalid entry: %s)', async invalid => {
+	test.each([false, true])('does not save a record when there are no valid files (invalid entry: %s)', async invalid => {
 		const form = new FormData();
 		if (invalid) form.append('files', 'not a file');
 		await respondToShare(request(form));
