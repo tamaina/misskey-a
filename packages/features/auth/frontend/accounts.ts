@@ -5,6 +5,7 @@
 
 import { defineAsyncComponent, ref } from 'vue';
 import * as Misskey from 'misskey-js';
+import { clearSharedFiles } from '@@/js/shared-files.js';
 import { apiUrl, host } from '@features/boot/frontend/shared/config.js';
 import type { MenuItem } from '@features/navigation/frontend/types/menu.js';
 import { showSuspendedDialog } from '@features/moderation/frontend/utility/show-suspended-dialog.js';
@@ -194,6 +195,13 @@ export async function login(token: AccountWithToken['token'], redirect?: string)
 		showing.value = false;
 		throw reason;
 	});
+
+	if ($i != null && $i.id !== me.id) {
+		await clearSharedFiles().catch(reason => {
+			showing.value = false;
+			throw reason;
+		});
+	}
 
 	miLocalStorage.setItem('account', JSON.stringify({
 		...me,
