@@ -8,9 +8,8 @@ import { apiError } from '../../../api/backend/transport/orpc-error.js';
 import type { MiLocalUser } from '../../../users/backend/models/User.js';
 import * as v from 'valibot';
 import { fetchRssErrors, fetchRssContract } from './fetch-rss.contract.js';
-import { implement } from '@orpc/server';
-import { authentication, apiPolicy } from '../../../api/backend/transport/middleware.js';
-import type { ApiContext } from '../../../api/backend/transport/context.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+
 const MAX_URL_LENGTH = 8192;
 const MAX_RESPONSE_SIZE = 1024 * 1024;
 const MAX_CONCURRENT_REQUESTS = 32;
@@ -64,14 +63,7 @@ export function createFetchRssProcedure(deps: FetchRssDependencies) {
 		return v.parse(requiredSchema(fetchRssContract['~orpc'].outputSchema), await rssParser.parseString(text));
 	}
 
-	return implement(fetchRssContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>()
-		.use(authentication<MiLocalUser>())
-		.use(apiPolicy<MiLocalUser>({
-			name: 'fetch-rss', limit: {
-				duration: 60 * 1000,
-				max: 300,
-			}
-		}))
+	return createApiProcedure<MiLocalUser>()(fetchRssContract)
 		.handler(async ({ input, context }) => {
 			const ps = input;
 			const result = await (async () => {
@@ -95,7 +87,7 @@ export function createFetchRssProcedure(deps: FetchRssDependencies) {
 				inFlightRequests.set(url, request);
 				return await request;
 			})();
-			return v.parse(requiredSchema(fetchRssContract['~orpc'].outputSchema), result);
+			return result;
 		});
 }
 

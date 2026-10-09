@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { toPackedReversiGameDetailed } from '../../backend/reversi.schema.js';
 import { expect, test } from 'vitest';
 import * as v from 'valibot';
 import { mockDeep } from 'vitest-mock-extended';
@@ -143,3 +144,18 @@ function anonymousContext(): ApiContext<MiLocalUser> {
 	services.authenticate.mockResolvedValue([null, null]);
 	return { services, credential: null, headers: {}, ip: '127.0.0.1' };
 }
+
+test('Reversi DTO selection strips outer and nested producer secrets while retaining saved JSON', async () => {
+	const { service, game } = fixture();
+	game.form1 = { extension: ['retained', { constructor: 'business-value' }] };
+	const packed = await service.packDetail(game);
+	const producer = {
+		...packed, privateToken: 'outer-secret',
+		user1: { ...packed.user1, privateToken: 'nested-secret', email: 'private@example.test' },
+	};
+	const selected = toPackedReversiGameDetailed(producer);
+	expect(selected).not.toHaveProperty('privateToken');
+	expect(selected.user1).not.toHaveProperty('privateToken');
+	expect(selected.user1).not.toHaveProperty('email');
+	expect(selected.form1).toEqual(game.form1);
+});

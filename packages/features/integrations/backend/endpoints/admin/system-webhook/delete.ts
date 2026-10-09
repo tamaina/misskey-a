@@ -4,18 +4,14 @@
  */
 import { SystemWebhookService } from '../../../services/SystemWebhookService.js';
 import type { MiLocalUser } from '../../../../../users/backend/models/User.js';
-import * as v from 'valibot';
 import { adminSystemWebhookDeleteContract } from './delete.contract.js';
-import { implement } from '@orpc/server';
-import { authentication, apiPolicy, requirePrincipal } from '../../../../../api/backend/transport/middleware.js';
-import type { ApiContext } from '../../../../../api/backend/transport/context.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import { requirePrincipal } from '../../../../../api/backend/transport/middleware.js';
 export interface AdminSystemWebhookDeleteDependencies {
 	systemWebhookService: Pick<SystemWebhookService, 'deleteSystemWebhook'>;
 }
 export function createAdminSystemWebhookDeleteProcedure(deps: AdminSystemWebhookDeleteDependencies) {
-	return implement(adminSystemWebhookDeleteContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>()
-		.use(authentication<MiLocalUser>())
-		.use(apiPolicy<MiLocalUser>({ name: 'admin/system-webhook/delete', requireCredential: true, requireModerator: true, secure: true, kind: 'write:admin:system-webhook' }))
+	return createApiProcedure<MiLocalUser>()(adminSystemWebhookDeleteContract)
 		.use(requirePrincipal<MiLocalUser>())
 		.handler(async ({ input, context }) => {
 			const ps = input;
@@ -26,11 +22,6 @@ export function createAdminSystemWebhookDeleteProcedure(deps: AdminSystemWebhook
 					me,
 				);
 			})();
-			return v.parse(requiredSchema(adminSystemWebhookDeleteContract['~orpc'].outputSchema), result);
+			return result;
 		});
-}
-
-function requiredSchema<Schema>(schema: Schema | undefined): Schema {
-	if (schema === undefined) throw new Error('Contract must declare its schema');
-	return schema;
 }

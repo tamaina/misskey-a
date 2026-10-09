@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import type { Meta } from '@orpc/contract';
+import type { ApiProcedureMetadata } from '../../../../../api/backend/transport/policy.types.js';
 import { oc } from '@orpc/contract';
 import * as v from 'valibot';
 import { objectInput } from '../../../../../api/backend/transport/input.schema.js';
@@ -20,8 +22,12 @@ export const iWebhooksCreateErrors = {
 	} as const;
 
 const requestName = 'i/webhooks/create';
-export const iWebhooksCreateContract = oc.$meta({ requestName: requestName } as const)
-	.route({ method: 'POST', path: `/${requestName}`, operationId: 'post___' + requestName.replaceAll('/', '___'), tags: ['webhooks'], spec: current => ({ ...current, security: [{ bearerAuth: [] }] }) })
+export const iWebhooksCreateContract = oc.$meta({
+	requestName: requestName,
+	requireCredential: true,
+	kind: 'write:account',
+} as const satisfies Meta & ApiProcedureMetadata)
+	.route({ method: 'POST', path: `/${requestName}`, tags: ['webhooks'], spec: current => ({ ...current, security: [{ bearerAuth: [] }] }) })
 	.errors({ ...commonErrors, TOO_MANY_WEBHOOKS: { status: 400, data: apiErrorData } })
 	.input(objectInput({
 	"name": jsonString({ "minLength": 1, "maxLength": 100 }),

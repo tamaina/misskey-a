@@ -3,15 +3,15 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { implement } from '@orpc/server';
-import { authentication, apiPolicy } from '../../../../api/backend/transport/middleware.js';
+import { toFederationInstance } from '../../federation.schema.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+
 import { federationStatsContract } from './stats.contract.js';
-import type { ApiActor, ApiContext } from '../../../../api/backend/transport/context.js';
+import type { ApiActor } from '../../../../api/backend/transport/context.js';
 import { In, IsNull, Not } from 'typeorm';
 import type { FollowingsRepository, InstancesRepository } from '../../../../persistence/backend/repositories/models.js';
 import { awaitAll } from '../../../../runtime/backend/async/await-all.js';
 import type { InstanceEntityService } from '../../../../instance/backend/serializers/InstanceEntityService.js';
-import * as v from 'valibot';
 export interface FederationStatsDependencies {
 	instancesRepository: Pick<InstancesRepository, 'metadata' | 'findBy'>;
 	followingsRepository: Pick<FollowingsRepository, 'count' | 'createQueryBuilder'>;
@@ -36,9 +36,7 @@ export function createFederationStatsProcedure<Actor extends ApiActor>(deps: Fed
 		});
 	}
 
-	return implement(federationStatsContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>()
-		.use(authentication<Actor>())
-		.use(apiPolicy<Actor>({ name: federationStatsContract['~orpc'].meta.requestName }))
+	return createApiProcedure<Actor>()(federationStatsContract)
 		.handler(async ({ input, context }) => {
 			const ps = input;
 			const me = context.principal;
@@ -74,12 +72,12 @@ export function createFederationStatsProcedure<Actor extends ApiActor>(deps: Fed
 					}),
 				]);
 				return await awaitAll({
-					topSubInstances: deps.instanceEntityService.packMany(topSubInstances, me),
+					topSubInstances: deps.instanceEntityService.packMany(topSubInstances, me).then(instances => instances.map(toFederationInstance)),
 					otherFollowersCount: Math.max(0, allSubCount - gotSubCount),
-					topPubInstances: deps.instanceEntityService.packMany(topPubInstances, me),
+					topPubInstances: deps.instanceEntityService.packMany(topPubInstances, me).then(instances => instances.map(toFederationInstance)),
 					otherFollowingCount: Math.max(0, allPubCount - gotPubCount),
 				});
 			})();
-			return v.parse(federationStatsContract['~orpc'].outputSchema!, result);
+			return result;
 		});
 }

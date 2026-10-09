@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import type { Meta } from '@orpc/contract';
+import type { ApiProcedureMetadata } from '../../../api/backend/transport/policy.types.js';
 import { oc } from '@orpc/contract';
 import * as v from 'valibot';
 import { objectInput } from '../../../api/backend/transport/input.schema.js';
@@ -103,8 +105,17 @@ export const fetchRssErrors = {
 	} as const;
 
 const requestName = 'fetch-rss';
-export const fetchRssContract = oc.$meta({ requestName: requestName, allowGet: true, cacheSec: 180 } as const)
-	.route({ method: 'POST', path: `/${requestName}`, operationId: 'post___' + requestName.replaceAll('/', '___'), tags: ['meta'] })
+export const fetchRssContract = oc.$meta({
+	requestName: requestName,
+	allowGet: true,
+	cacheSec: 180,
+	limit: {
+		duration: 60 * 1000,
+		max: 300,
+	},
+	requireCredential: false,
+} as const satisfies Meta & ApiProcedureMetadata)
+	.route({ method: 'POST', path: `/${requestName}`, tags: ['meta'] })
 	.errors({ ...commonErrors, INVALID_URL: { status: 400, data: apiErrorData }, FETCH_RSS_FAILED: { status: 422, data: apiErrorData }, FETCH_RSS_UNAVAILABLE: { status: 503, data: apiErrorData } })
 	.input(objectInput({
 	"url": v.string(),

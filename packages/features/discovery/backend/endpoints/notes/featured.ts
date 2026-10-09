@@ -2,6 +2,8 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
+
+import { toPackedNote } from '@features/notes/backend/note.schema.js';
 import { NoteEntityService } from '@features/notes/backend/serializers/NoteEntityService.js';
 import { isUserRelated } from '@features/relationships/backend/utility/is-user-related.js';
 import { CacheService } from '@features/users/backend/services/CacheService.js';
@@ -9,8 +11,8 @@ import { QueryService } from '@features/notes/backend/services/QueryService.js';
 import { FeaturedService } from '../../services/FeaturedService.js';
 import type { NotesRepository } from '@features/persistence/backend/repositories/models.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
-import { implement } from '@orpc/server';
-import { authentication, apiPolicy, decodeScalarInput } from '@features/api/backend/transport/middleware.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import { decodeScalarInput } from '@features/api/backend/transport/middleware.js';
 import type { ApiContext } from '@features/api/backend/transport/context.js';
 import { discoveryContract, type DiscoveryInputs } from '../discovery.contract.js';
 export interface NotesFeaturedDependencies {
@@ -75,10 +77,10 @@ export function createNotesFeaturedProcedure<Actor extends MiLocalUser>(deps: No
 
 		notes.sort((a, b) => a.id > b.id ? -1 : 1);
 
-		return await deps.noteEntityService.packMany(notes.slice(0, ps.limit), me);
+		return (await deps.noteEntityService.packMany(notes.slice(0, ps.limit), me)).map(toPackedNote);
 	};
 	return {
-		canonical: implement(discoveryContract['notes/featured'], { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>().use(authentication<Actor>()).use(apiPolicy<Actor>({ name: discoveryContract['notes/featured']['~orpc'].meta.requestName })).handler(handler),
-		get: implement(discoveryContract['notes/featured:get'], { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>().use(authentication<Actor>()).use(apiPolicy<Actor>({ name: discoveryContract['notes/featured']['~orpc'].meta.requestName })).use(decodeScalarInput<Actor>({ limit: 'integer' })).handler(handler),
+		canonical: createApiProcedure<Actor>()(discoveryContract['notes/featured']).handler(handler),
+		get: createApiProcedure<Actor>()(discoveryContract['notes/featured:get']).use(decodeScalarInput<Actor>({ limit: 'integer' })).handler(handler),
 	};
 }

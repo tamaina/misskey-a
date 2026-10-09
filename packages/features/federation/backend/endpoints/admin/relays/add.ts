@@ -3,21 +3,18 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { implement } from '@orpc/server';
-import { authentication, apiPolicy, requirePrincipal } from '../../../../../api/backend/transport/middleware.js';
-import type { ApiActor, ApiContext } from '../../../../../api/backend/transport/context.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import { requirePrincipal } from '../../../../../api/backend/transport/middleware.js';
+import type { ApiActor } from '../../../../../api/backend/transport/context.js';
 import { adminRelaysAddContract, adminRelaysAddErrors } from './add.contract.js';
 import { URL } from 'node:url';
 import type { RelayService } from '../../../services/RelayService.js';
 import { apiError } from '../../../../../api/backend/transport/orpc-error.js';
-import * as v from 'valibot';
 export interface AdminRelaysAddDependencies {
 	relayService: Pick<RelayService, 'addRelay'>;
 }
 export function createAdminRelaysAddProcedure<Actor extends ApiActor>(deps: AdminRelaysAddDependencies) {
-	return implement(adminRelaysAddContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>()
-		.use(authentication<Actor>())
-		.use(apiPolicy<Actor>({ name: adminRelaysAddContract['~orpc'].meta.requestName, requireCredential: true, requireModerator: true, kind: 'write:admin:relays' }))
+	return createApiProcedure<Actor>()(adminRelaysAddContract)
 		.use(requirePrincipal<Actor>())
 		.handler(async ({ input }) => {
 			const ps = input;
@@ -27,8 +24,9 @@ export function createAdminRelaysAddProcedure<Actor extends ApiActor>(deps: Admi
 				} catch {
 					throw apiError(adminRelaysAddErrors.invalidUrl);
 				}
-				return await deps.relayService.addRelay(ps.inbox);
+				const relay = await deps.relayService.addRelay(ps.inbox);
+				return { id: relay.id, inbox: relay.inbox, status: relay.status };
 			})();
-			return v.parse(adminRelaysAddContract['~orpc'].outputSchema!, result);
+			return result;
 		});
 }

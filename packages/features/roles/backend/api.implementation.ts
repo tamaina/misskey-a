@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import * as v from 'valibot';
 import type { InferContractRouterOutputs } from '@orpc/contract';
 import type { ApiActor, ApiContext } from '@features/api/backend/transport/context.js';
 import { QueryService } from '@features/notes/backend/services/QueryService.js';
@@ -99,11 +98,6 @@ export function createRolesRouter<Actor extends ApiActor>(deps: RolesDependencie
 	});
 }
 
-function requiredSchema<T>(schema: T | undefined): T {
-	if (schema === undefined) throw new Error("Missing native schema");
-	return schema;
-}
-
 type RolesRouter = ReturnType<typeof createRolesRouter<MiLocalUser>>;
 
 @Injectable()
@@ -129,7 +123,7 @@ export class RolesApiProvider {
 			notesRepository: moduleRef.get<NotesRepository>(DI.notesRepository, { strict: false }),
 			queryService, idService, roleService: roles, roleEntityService,
 			userEntityService: { pack: async (row, actor, options) => toPackedUserDetailed(await userEntityService.pack(row, actor, options)), packMany: async (rows, actor, options) => (await userEntityService.packMany(rows, actor, options)).map(toPackedUserDetailed) },
-			noteEntityService: { packMany: async (rows, actor) => v.parse(requiredSchema(rolesContract.rolesNotes['~orpc'].outputSchema), await noteEntityService.packMany(rows, actor)) },
+			noteEntityService,
 			metaService, globalEventService: moduleRef.get(GlobalEventService, { strict: false }), moderationLogService,
 			fanoutTimelineService: moduleRef.get(FanoutTimelineService, { strict: false }), channelMutingService: moduleRef.get(ChannelMutingService, { strict: false }),
 		});

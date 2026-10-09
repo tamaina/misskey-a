@@ -3,9 +3,9 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { implement } from '@orpc/server';
-import { authentication, apiPolicy } from '../../../../api/backend/transport/middleware.js';
-import type { ApiContext } from '../../../../api/backend/transport/context.js';
+import { toPackedReversiGameLite } from '../../reversi.schema.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+
 import { reversiGamesContract } from './games.contract.js';
 import { Brackets } from 'typeorm';
 import type { ReversiGameEntityService } from '../../serializers/ReversiGameEntityService.js';
@@ -18,9 +18,7 @@ export interface ReversiGamesDependencies {
 	queryService: Pick<QueryService, 'makePaginationQuery'>;
 }
 export function createReversiGamesProcedure(deps: ReversiGamesDependencies) {
-	return implement(reversiGamesContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>()
-		.use(authentication<MiLocalUser>())
-		.use(apiPolicy<MiLocalUser>({ name: reversiGamesContract['~orpc'].meta.requestName }))
+	return createApiProcedure<MiLocalUser>()(reversiGamesContract)
 		.handler(async ({ input: ps, context }) => {
 			const me = context.principal;
 			const query = deps.queryService.makePaginationQuery(deps.reversiGamesRepository.createQueryBuilder('game'), ps.sinceId, ps.untilId, ps.sinceDate, ps.untilDate)
@@ -36,6 +34,6 @@ export function createReversiGamesProcedure(deps: ReversiGamesDependencies) {
 				query.andWhere('game.isStarted = TRUE');
 			}
 			const games = await query.take(ps.limit).getMany();
-			return await deps.reversiGameEntityService.packLiteMany(games);
+			return (await deps.reversiGameEntityService.packLiteMany(games)).map(toPackedReversiGameLite);
 		});
 }

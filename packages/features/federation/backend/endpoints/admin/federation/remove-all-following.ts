@@ -3,22 +3,19 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { implement } from '@orpc/server';
-import { authentication, apiPolicy, requirePrincipal } from '../../../../../api/backend/transport/middleware.js';
-import type { ApiActor, ApiContext } from '../../../../../api/backend/transport/context.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import { requirePrincipal } from '../../../../../api/backend/transport/middleware.js';
+import type { ApiActor } from '../../../../../api/backend/transport/context.js';
 import { adminFederationRemoveAllFollowingContract } from './remove-all-following.contract.js';
 import type { FollowingsRepository, UsersRepository } from '../../../../../persistence/backend/repositories/models.js';
 import type { QueueService } from '../../../../../runtime/backend/services/QueueService.js';
-import * as v from 'valibot';
 export interface AdminFederationRemoveAllFollowingDependencies {
 	usersRepository: Pick<UsersRepository, 'findOneByOrFail'>;
 	followingsRepository: Pick<FollowingsRepository, 'findBy'>;
 	queueService: Pick<QueueService, 'createUnfollowJob'>;
 }
 export function createAdminFederationRemoveAllFollowingProcedure<Actor extends ApiActor>(deps: AdminFederationRemoveAllFollowingDependencies) {
-	return implement(adminFederationRemoveAllFollowingContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>()
-		.use(authentication<Actor>())
-		.use(apiPolicy<Actor>({ name: adminFederationRemoveAllFollowingContract['~orpc'].meta.requestName, requireCredential: true, requireModerator: true, kind: 'write:admin:federation' }))
+	return createApiProcedure<Actor>()(adminFederationRemoveAllFollowingContract)
 		.use(requirePrincipal<Actor>())
 		.handler(async ({ input }) => {
 			const ps = input;
@@ -32,6 +29,6 @@ export function createAdminFederationRemoveAllFollowingProcedure<Actor extends A
 				]).then(([from, to]) => [{ id: from.id }, { id: to.id }])));
 				deps.queueService.createUnfollowJob(pairs.map(p => ({ from: p[0], to: p[1], silent: true })));
 			})();
-			return v.parse(adminFederationRemoveAllFollowingContract['~orpc'].outputSchema!, result);
+			return result;
 		});
 }

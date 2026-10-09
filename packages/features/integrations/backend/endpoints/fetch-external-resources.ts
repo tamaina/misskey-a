@@ -8,22 +8,13 @@ import { apiError } from '../../../api/backend/transport/orpc-error.js';
 import type { MiLocalUser } from '../../../users/backend/models/User.js';
 import * as v from 'valibot';
 import { fetchExternalResourcesErrors, fetchExternalResourcesContract } from './fetch-external-resources.contract.js';
-import { implement } from '@orpc/server';
-import { authentication, apiPolicy, requirePrincipal } from '../../../api/backend/transport/middleware.js';
-import type { ApiContext } from '../../../api/backend/transport/context.js';
-import ms from 'ms';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import { requirePrincipal } from '../../../api/backend/transport/middleware.js';
 export interface FetchExternalResourcesDependencies {
 	httpRequestService: Pick<HttpRequestService, 'getJson'>;
 }
 export function createFetchExternalResourcesProcedure(deps: FetchExternalResourcesDependencies) {
-	return implement(fetchExternalResourcesContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>()
-		.use(authentication<MiLocalUser>())
-		.use(apiPolicy<MiLocalUser>({
-			name: 'fetch-external-resources', requireCredential: true, secure: true, limit: {
-				duration: ms('1hour'),
-				max: 50,
-			}
-		}))
+	return createApiProcedure<MiLocalUser>()(fetchExternalResourcesContract)
 		.use(requirePrincipal<MiLocalUser>())
 		.handler(async ({ input, context }) => {
 			const ps = input;
@@ -46,11 +37,6 @@ export function createFetchExternalResourcesProcedure(deps: FetchExternalResourc
 					data: res.data,
 				};
 			})();
-			return v.parse(requiredSchema(fetchExternalResourcesContract['~orpc'].outputSchema), result);
+			return result;
 		});
-}
-
-function requiredSchema<Schema>(schema: Schema | undefined): Schema {
-	if (schema === undefined) throw new Error('Contract must declare its schema');
-	return schema;
 }

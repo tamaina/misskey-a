@@ -3,15 +3,14 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { implement } from '@orpc/server';
-import { authentication, apiPolicy, requirePrincipal } from '../../../../../api/backend/transport/middleware.js';
-import type { ApiActor, ApiContext } from '../../../../../api/backend/transport/context.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import { requirePrincipal } from '../../../../../api/backend/transport/middleware.js';
+import type { ApiActor } from '../../../../../api/backend/transport/context.js';
 import { adminFederationUpdateInstanceContract } from './update-instance.contract.js';
 import type { InstancesRepository } from '../../../../../persistence/backend/repositories/models.js';
 import type { UtilityService } from '../../../services/UtilityService.js';
 import type { FederatedInstanceService } from '../../../services/FederatedInstanceService.js';
 import type { ModerationLogService } from '../../../../../moderation/backend/services/ModerationLogService.js';
-import * as v from 'valibot';
 export interface AdminFederationUpdateInstanceDependencies {
 	instancesRepository: Pick<InstancesRepository, 'findOneBy'>;
 	utilityService: Pick<UtilityService, 'toPuny'>;
@@ -19,9 +18,7 @@ export interface AdminFederationUpdateInstanceDependencies {
 	moderationLogService: Pick<ModerationLogService, 'log'>;
 }
 export function createAdminFederationUpdateInstanceProcedure<Actor extends ApiActor>(deps: AdminFederationUpdateInstanceDependencies) {
-	return implement(adminFederationUpdateInstanceContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>()
-		.use(authentication<Actor>())
-		.use(apiPolicy<Actor>({ name: adminFederationUpdateInstanceContract['~orpc'].meta.requestName, requireCredential: true, requireModerator: true, kind: 'write:admin:federation' }))
+	return createApiProcedure<Actor>()(adminFederationUpdateInstanceContract)
 		.use(requirePrincipal<Actor>())
 		.handler(async ({ input, context }) => {
 			const ps = input;
@@ -62,6 +59,6 @@ export function createAdminFederationUpdateInstanceProcedure<Actor extends ApiAc
 					});
 				}
 			})();
-			return v.parse(adminFederationUpdateInstanceContract['~orpc'].outputSchema!, result);
+			return result;
 		});
 }

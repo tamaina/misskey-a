@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import type { Meta } from '@orpc/contract';
+import type { ApiProcedureMetadata } from '../../../api/backend/transport/policy.types.js';
 import { oc, type InferContractRouterOutputs, type InferSchemaOutput } from '@orpc/contract';
 import * as v from 'valibot';
 import { objectInput } from '../../../api/backend/transport/input.schema.js';
@@ -26,7 +28,10 @@ const searchTagCommon = {
 	limit: v.optional(v.pipe(v.number(), v.integer(), v.minValue(1), v.maxValue(100)), 10),
 };
 
-export const hashtagsListContract = oc.$meta({ requestName: 'hashtags/list' } as const).route({ method: 'POST', path: '/hashtags/list', operationId: 'post___hashtags___list', tags: ['hashtags'] })
+export const hashtagsListContract = oc.$meta({
+	requestName: 'hashtags/list',
+	requireCredential: false,
+} as const satisfies Meta & ApiProcedureMetadata).route({ method: 'POST', path: '/hashtags/list', tags: ['hashtags'] })
 	.errors({ ...commonErrors }).input(objectInput({
 		'limit': v.optional(v.pipe(v.pipe(v.number(), v.integer()), v.minValue(1), v.maxValue(100)), 10),
 		'attachedToUserOnly': v.optional(v.boolean(), false),
@@ -34,20 +39,36 @@ export const hashtagsListContract = oc.$meta({ requestName: 'hashtags/list' } as
 		'attachedToRemoteUserOnly': v.optional(v.boolean(), false),
 		'sort': v.picklist(['+mentionedUsers', '-mentionedUsers', '+mentionedLocalUsers', '-mentionedLocalUsers', '+mentionedRemoteUsers', '-mentionedRemoteUsers', '+attachedUsers', '-attachedUsers', '+attachedLocalUsers', '-attachedLocalUsers', '+attachedRemoteUsers', '-attachedRemoteUsers']),
 	})).output(v.array(packedHashtagSchema));
-export const hashtagsSearchContract = oc.$meta({ requestName: 'hashtags/search' } as const).route({ method: 'POST', path: '/hashtags/search', operationId: 'post___hashtags___search', tags: ['hashtags'] })
+export const hashtagsSearchContract = oc.$meta({
+	requestName: 'hashtags/search',
+	requireCredential: false,
+} as const satisfies Meta & ApiProcedureMetadata).route({ method: 'POST', path: '/hashtags/search', tags: ['hashtags'] })
 	.errors({ ...commonErrors }).input(objectInput({
 		'limit': v.optional(v.pipe(v.pipe(v.number(), v.integer()), v.minValue(1), v.maxValue(100)), 10),
 		'query': v.string(),
 		'offset': v.optional(v.pipe(v.number(), v.integer()), 0),
 	})).output(v.array(v.string()));
-export const hashtagsShowContract = oc.$meta({ requestName: 'hashtags/show' } as const).route({ method: 'POST', path: '/hashtags/show', operationId: 'post___hashtags___show', tags: ['hashtags'] })
+export const hashtagsShowContract = oc.$meta({
+	requestName: 'hashtags/show',
+	requireCredential: false,
+} as const satisfies Meta & ApiProcedureMetadata).route({ method: 'POST', path: '/hashtags/show', tags: ['hashtags'] })
 	.errors({ ...commonErrors, NO_SUCH_HASHTAG: { status: 400, data: apiErrorData } }).input(objectInput({
 		'tag': v.string(),
 	})).output(packedHashtagSchema);
-export const hashtagsTrendContract = oc.$meta({ requestName: 'hashtags/trend', allowGet: true, cacheSec: 60 } as const).route({ method: 'POST', path: '/hashtags/trend', operationId: 'post___hashtags___trend', tags: ['hashtags'] })
+export const hashtagsTrendContract = oc.$meta({
+	requestName: 'hashtags/trend',
+	allowGet: true,
+	cacheSec: 60,
+	requireCredential: false,
+} as const satisfies Meta & ApiProcedureMetadata).route({ method: 'POST', path: '/hashtags/trend', tags: ['hashtags'] })
 	.errors({ ...commonErrors }).input(v.optional(objectInput({}), {})).output(v.array(v.strictObject({ tag: v.string(), chart: v.array(v.number()), usersCount: v.number() })));
-export const hashtagsTrendGetContract = oc.route({ method: 'GET', path: '/hashtags/trend', operationId: 'get___hashtags___trend', tags: ['hashtags'] }).errors(commonErrors).input(requiredContractSchema(hashtagsTrendContract['~orpc'].inputSchema)).output(requiredContractSchema(hashtagsTrendContract['~orpc'].outputSchema));
-export const hashtagsUsersContract = oc.$meta({ requestName: 'hashtags/users' } as const).route({ method: 'POST', path: '/hashtags/users', operationId: 'post___hashtags___users', tags: ['hashtags', 'users'] })
+export const hashtagsTrendGetContract = oc.$meta({
+
+} as const satisfies Meta & ApiProcedureMetadata).route({ method: 'GET', path: '/hashtags/trend', tags: ['hashtags'] }).errors(commonErrors).input(requiredContractSchema(hashtagsTrendContract['~orpc'].inputSchema)).output(requiredContractSchema(hashtagsTrendContract['~orpc'].outputSchema));
+export const hashtagsUsersContract = oc.$meta({
+	requestName: 'hashtags/users',
+	requireCredential: false,
+} as const satisfies Meta & ApiProcedureMetadata).route({ method: 'POST', path: '/hashtags/users', tags: ['hashtags', 'users'] })
 	.errors({ ...commonErrors }).input(objectInput({
 		'tag': v.string(),
 		'limit': v.optional(v.pipe(v.pipe(v.number(), v.integer()), v.minValue(1), v.maxValue(100)), 10),
@@ -56,36 +77,64 @@ export const hashtagsUsersContract = oc.$meta({ requestName: 'hashtags/users' } 
 		'state': v.optional(v.picklist(['all', 'alive']), 'all'),
 		'origin': v.optional(v.picklist(['combined', 'local', 'remote']), 'local'),
 	})).output(v.array(packedUserDetailedSchema));
-export const notesFeaturedContract = oc.$meta({ requestName: 'notes/featured', allowGet: true, cacheSec: 3600 } as const).route({ method: 'POST', path: '/notes/featured', operationId: 'post___notes___featured', tags: ['notes'] })
+export const notesFeaturedContract = oc.$meta({
+	requestName: 'notes/featured',
+	allowGet: true,
+	cacheSec: 3600,
+	requireCredential: false,
+} as const satisfies Meta & ApiProcedureMetadata).route({ method: 'POST', path: '/notes/featured', tags: ['notes'] })
 	.errors({ ...commonErrors }).input(objectInput({
 		'limit': v.optional(v.pipe(v.pipe(v.number(), v.integer()), v.minValue(1), v.maxValue(100)), 10),
 		'untilId': v.exactOptional(misskeyId),
 		'channelId': v.exactOptional(v.nullable(misskeyId)),
 	})).output(v.array(packedNoteSchema));
-export const notesFeaturedGetContract = oc.route({ method: 'GET', path: '/notes/featured', operationId: 'get___notes___featured', tags: ['notes'] }).errors(commonErrors).input(requiredContractSchema(notesFeaturedContract['~orpc'].inputSchema)).output(requiredContractSchema(notesFeaturedContract['~orpc'].outputSchema));
-export const notesSearchByTagContract = oc.$meta({ requestName: 'notes/search-by-tag' } as const).route({ method: 'POST', path: '/notes/search-by-tag', operationId: 'post___notes___search-by-tag', tags: ['notes', 'hashtags'] })
+export const notesFeaturedGetContract = oc.$meta({
+
+} as const satisfies Meta & ApiProcedureMetadata).route({ method: 'GET', path: '/notes/featured', tags: ['notes'] }).errors(commonErrors).input(requiredContractSchema(notesFeaturedContract['~orpc'].inputSchema)).output(requiredContractSchema(notesFeaturedContract['~orpc'].outputSchema));
+export const notesSearchByTagContract = oc.$meta({
+	requestName: 'notes/search-by-tag',
+	requireCredential: false,
+} as const satisfies Meta & ApiProcedureMetadata).route({ method: 'POST', path: '/notes/search-by-tag', tags: ['notes', 'hashtags'] })
 	.errors({ ...commonErrors }).input(v.union([
 		objectInput({ tag: v.pipe(v.string(), v.minLength(1)), ...searchTagCommon }),
 		objectInput({ query: v.pipe(v.array(v.pipe(v.array(v.pipe(v.string(), v.minLength(1))), v.minLength(1))), v.minLength(1)), ...searchTagCommon }),
 	])).output(v.array(packedNoteSchema));
-export const usersFeaturedNotesContract = oc.$meta({ requestName: 'users/featured-notes', allowGet: true, cacheSec: 3600 } as const).route({ method: 'POST', path: '/users/featured-notes', operationId: 'post___users___featured-notes', tags: ['notes'] })
+export const usersFeaturedNotesContract = oc.$meta({
+	requestName: 'users/featured-notes',
+	allowGet: true,
+	cacheSec: 3600,
+	requireCredential: false,
+} as const satisfies Meta & ApiProcedureMetadata).route({ method: 'POST', path: '/users/featured-notes', tags: ['notes'] })
 	.errors({ ...commonErrors }).input(objectInput({
 		'limit': v.optional(v.pipe(v.pipe(v.number(), v.integer()), v.minValue(1), v.maxValue(100)), 10),
 		'untilId': v.exactOptional(misskeyId),
 		'userId': misskeyId,
 	})).output(v.array(packedNoteSchema));
-export const usersFeaturedNotesGetContract = oc.route({ method: 'GET', path: '/users/featured-notes', operationId: 'get___users___featured-notes', tags: ['notes'] }).errors(commonErrors).input(requiredContractSchema(usersFeaturedNotesContract['~orpc'].inputSchema)).output(requiredContractSchema(usersFeaturedNotesContract['~orpc'].outputSchema));
-export const usersGetFrequentlyRepliedUsersContract = oc.$meta({ requestName: 'users/get-frequently-replied-users' } as const).route({ method: 'POST', path: '/users/get-frequently-replied-users', operationId: 'post___users___get-frequently-replied-users', tags: ['users'], description: 'Get a list of other users that the specified user frequently replies to.' })
+export const usersFeaturedNotesGetContract = oc.$meta({
+
+} as const satisfies Meta & ApiProcedureMetadata).route({ method: 'GET', path: '/users/featured-notes', tags: ['notes'] }).errors(commonErrors).input(requiredContractSchema(usersFeaturedNotesContract['~orpc'].inputSchema)).output(requiredContractSchema(usersFeaturedNotesContract['~orpc'].outputSchema));
+export const usersGetFrequentlyRepliedUsersContract = oc.$meta({
+	requestName: 'users/get-frequently-replied-users',
+	requireCredential: false,
+} as const satisfies Meta & ApiProcedureMetadata).route({ method: 'POST', path: '/users/get-frequently-replied-users', tags: ['users'], description: 'Get a list of other users that the specified user frequently replies to.' })
 	.errors({ ...commonErrors, NO_SUCH_USER: { status: 400, data: apiErrorData } }).input(objectInput({
 		'userId': misskeyId,
 		'limit': v.optional(v.pipe(v.pipe(v.number(), v.integer()), v.minValue(1), v.maxValue(100)), 10),
 	})).output(v.array(v.strictObject({ user: packedUserDetailedSchema, weight: v.number() })));
-export const usersRecommendationContract = oc.$meta({ requestName: 'users/recommendation' } as const).route({ method: 'POST', path: '/users/recommendation', operationId: 'post___users___recommendation', tags: ['users'], description: 'Show users that the authenticated user might be interested to follow.', spec: current => ({ ...current, security: [{ bearerAuth: [] }] }) })
+export const usersRecommendationContract = oc.$meta({
+	requestName: 'users/recommendation',
+	requireCredential: true,
+	kind: 'read:account',
+} as const satisfies Meta & ApiProcedureMetadata).route({ method: 'POST', path: '/users/recommendation', tags: ['users'], description: 'Show users that the authenticated user might be interested to follow.', spec: current => ({ ...current, security: [{ bearerAuth: [] }] }) })
 	.errors({ ...commonErrors }).input(objectInput({
 		'limit': v.optional(v.pipe(v.pipe(v.number(), v.integer()), v.minValue(1), v.maxValue(100)), 10),
 		'offset': v.optional(v.pipe(v.number(), v.integer()), 0),
 	})).output(v.array(packedUserDetailedSchema));
-export const usersSearchContract = oc.$meta({ requestName: 'users/search' } as const).route({ method: 'POST', path: '/users/search', operationId: 'post___users___search', tags: ['users'], description: 'Search for users.' })
+export const usersSearchContract = oc.$meta({
+	requestName: 'users/search',
+	requiredRolePolicy: 'canSearchUsers',
+	requireCredential: false,
+} as const satisfies Meta & ApiProcedureMetadata).route({ method: 'POST', path: '/users/search', tags: ['users'], description: 'Search for users.' })
 	.errors({ ...commonErrors }).input(objectInput({
 		'query': v.string(),
 		'offset': v.optional(v.pipe(v.number(), v.integer()), 0),
@@ -93,7 +142,10 @@ export const usersSearchContract = oc.$meta({ requestName: 'users/search' } as c
 		'origin': v.optional(v.picklist(['local', 'remote', 'combined']), 'combined'),
 		'detail': v.optional(v.boolean(), true),
 	})).output(v.array(packedUserSchema));
-export const usersSearchByUsernameAndHostContract = oc.$meta({ requestName: 'users/search-by-username-and-host' } as const).route({ method: 'POST', path: '/users/search-by-username-and-host', operationId: 'post___users___search-by-username-and-host', tags: ['users'], description: 'Search for a user by username and/or host.' })
+export const usersSearchByUsernameAndHostContract = oc.$meta({
+	requestName: 'users/search-by-username-and-host',
+	requireCredential: false,
+} as const satisfies Meta & ApiProcedureMetadata).route({ method: 'POST', path: '/users/search-by-username-and-host', tags: ['users'], description: 'Search for a user by username and/or host.' })
 	.errors({ ...commonErrors }).input(v.pipe(objectInput({
 		username: v.exactOptional(v.nullable(v.string())), host: v.exactOptional(v.nullable(v.string())),
 		limit: v.optional(v.pipe(v.number(), v.integer(), v.minValue(1), v.maxValue(100)), 10), detail: v.optional(v.boolean(), true),

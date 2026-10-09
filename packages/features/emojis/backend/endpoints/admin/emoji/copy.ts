@@ -2,15 +2,17 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-import { implement } from '@orpc/server';
-import type { ApiActor, ApiContext } from '@features/api/backend/transport/context.js';
-import { authentication, apiPolicy, requirePrincipal } from '@features/api/backend/transport/middleware.js';
+
+import { toEmojiDetailed } from '../../../emoji-output.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import type { ApiActor } from '@features/api/backend/transport/context.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
 import { emojisContract } from '../../../api.definition.js';
 import type { EmojisDependencies } from '../../../api.implementation.js';
 import { apiError, internalError } from '@features/api/backend/transport/orpc-error.js';
 import type { MiDriveFile } from '@features/drive/backend/models/DriveFile.js';
 export function createCopyProcedure<Actor extends ApiActor>(deps: Pick<EmojisDependencies<Actor>, 'emojisRepository' | 'driveService' | 'customEmojiService' | 'emojiEntityService'>) {
-	return implement(emojisContract.copy, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>().use(authentication<Actor>()).use(apiPolicy<Actor>({ name: 'admin/emoji/copy', requireCredential: true, requiredRolePolicy: 'canManageCustomEmojis', kind: 'write:admin:emoji' })).use(requirePrincipal<Actor>())
+	return createApiProcedure<Actor>()(emojisContract.copy).use(requirePrincipal<Actor>())
 		.handler(async ({ input, context }) => {
 			const actor = context.principal;
 			const fail = (code: string, message: string, id: string) => apiError({ code, message, id });
@@ -29,6 +31,6 @@ export function createCopyProcedure<Actor extends ApiActor>(deps: Pick<EmojisDep
 				license: emoji.license, isSensitive: emoji.isSensitive, localOnly: emoji.localOnly,
 				roleIdsThatCanBeUsedThisEmojiAsReaction: emoji.roleIdsThatCanBeUsedThisEmojiAsReaction,
 			}, actor);
-			return deps.emojiEntityService.packDetailed(added);
+			return toEmojiDetailed(await deps.emojiEntityService.packDetailed(added));
 		});
 }

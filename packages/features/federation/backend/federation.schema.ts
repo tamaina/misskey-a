@@ -35,3 +35,36 @@ export const federationInstanceSchema = v.strictObject({
 	"latestRequestReceivedAt": v.pipe(v.nullable(v.string()), v.metadata({ "format": "date-time" })),
 	"moderationNote": v.optional(v.nullable(v.string()))
 });
+
+export type FederationInstance = v.InferOutput<typeof federationInstanceSchema>;
+
+export function toFederationInstance(instance: FederationInstance): FederationInstance {
+	return {
+		id: instance.id,
+		firstRetrievedAt: instance.firstRetrievedAt,
+		host: instance.host,
+		usersCount: instance.usersCount,
+		notesCount: instance.notesCount,
+		followingCount: instance.followingCount,
+		followersCount: instance.followersCount,
+		isNotResponding: instance.isNotResponding,
+		isSuspended: instance.isSuspended,
+		suspensionState: instance.suspensionState,
+		isBlocked: instance.isBlocked,
+		softwareName: instance.softwareName,
+		softwareVersion: instance.softwareVersion,
+		openRegistrations: instance.openRegistrations,
+		name: instance.name,
+		description: instance.description,
+		maintainerName: instance.maintainerName,
+		maintainerEmail: instance.maintainerEmail,
+		isSilenced: instance.isSilenced,
+		isMediaSilenced: instance.isMediaSilenced,
+		iconUrl: instance.iconUrl,
+		faviconUrl: instance.faviconUrl,
+		themeColor: instance.themeColor,
+		infoUpdatedAt: instance.infoUpdatedAt,
+		latestRequestReceivedAt: instance.latestRequestReceivedAt,
+		...(instance.moderationNote === undefined ? {} : { moderationNote: instance.moderationNote }),
+	};
+}

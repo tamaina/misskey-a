@@ -3,9 +3,9 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { implement } from '@orpc/server';
-import { authentication, apiPolicy, requirePrincipal } from '../../../../api/backend/transport/middleware.js';
-import type { ApiContext } from '../../../../api/backend/transport/context.js';
+import { toPackedUserLite } from '@features/users/backend/user.schema.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import { requirePrincipal } from '../../../../api/backend/transport/middleware.js';
 import { reversiInvitationsContract } from './invitations.contract.js';
 import type { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import type { ReversiService } from '../../services/ReversiService.js';
@@ -15,13 +15,11 @@ export interface ReversiInvitationsDependencies {
 	reversiService: Pick<ReversiService, 'getInvitations'>;
 }
 export function createReversiInvitationsProcedure(deps: ReversiInvitationsDependencies) {
-	return implement(reversiInvitationsContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>()
-		.use(authentication<MiLocalUser>())
-		.use(apiPolicy<MiLocalUser>({ name: reversiInvitationsContract['~orpc'].meta.requestName, requireCredential: true, kind: 'read:account' }))
+	return createApiProcedure<MiLocalUser>()(reversiInvitationsContract)
 		.use(requirePrincipal<MiLocalUser>())
 		.handler(async ({ context }) => {
 			const me = context.principal;
 			const invitations = await deps.reversiService.getInvitations(me);
-			return await deps.userEntityService.packMany(invitations, me);
+			return (await deps.userEntityService.packMany(invitations, me)).map(toPackedUserLite);
 		});
 }

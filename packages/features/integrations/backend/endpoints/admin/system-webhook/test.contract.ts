@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import type { Meta } from '@orpc/contract';
+import type { ApiProcedureMetadata } from '../../../../../api/backend/transport/policy.types.js';
 import { oc } from '@orpc/contract';
 import * as v from 'valibot';
 import { objectInput } from '../../../../../api/backend/transport/input.schema.js';
@@ -19,8 +21,18 @@ export const adminSystemWebhookTestErrors = {
 	} as const;
 
 const requestName = 'admin/system-webhook/test';
-export const adminSystemWebhookTestContract = oc.$meta({ requestName: requestName } as const)
-	.route({ method: 'POST', path: `/${requestName}`, operationId: 'post___' + requestName.replaceAll('/', '___'), tags: ['webhooks'], spec: current => ({ ...current, security: [{ bearerAuth: [] }] }) })
+export const adminSystemWebhookTestContract = oc.$meta({
+	requestName: requestName,
+	requireCredential: true,
+	requireModerator: true,
+	secure: true,
+	kind: 'read:admin:system-webhook',
+	limit: {
+		duration: 900000,
+		max: 60,
+	},
+} as const satisfies Meta & ApiProcedureMetadata)
+	.route({ method: 'POST', path: `/${requestName}`, tags: ['webhooks'], spec: current => ({ ...current, security: [{ bearerAuth: [] }] }) })
 	.errors({ ...commonErrors, NO_SUCH_WEBHOOK: { status: 400, data: apiErrorData } })
 	.input(objectInput({
 	"webhookId": misskeyId,

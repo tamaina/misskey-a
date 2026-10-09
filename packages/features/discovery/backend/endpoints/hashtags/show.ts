@@ -2,13 +2,15 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
+
+import { toPackedHashtag } from '../hashtag.schema.js';
 import { apiError } from '@features/api/backend/transport/orpc-error.js';
 import { normalizeForSearch } from '../../utility/normalize-for-search.js';
 import { HashtagEntityService } from '../../serializers/HashtagEntityService.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 import type { HashtagsRepository } from '@features/persistence/backend/repositories/models.js';
-import { implement } from '@orpc/server';
-import { authentication, apiPolicy } from '@features/api/backend/transport/middleware.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+
 import type { ApiContext } from '@features/api/backend/transport/context.js';
 import { discoveryContract, type DiscoveryInputs } from '../discovery.contract.js';
 const errors = {
@@ -29,7 +31,7 @@ export function createHashtagsShowProcedure<Actor extends MiLocalUser>(deps: Has
 			throw apiError(errors.noSuchHashtag);
 		}
 
-		return await deps.hashtagEntityService.pack(hashtag);
+		return toPackedHashtag(await deps.hashtagEntityService.pack(hashtag));
 	};
-	return implement(discoveryContract['hashtags/show'], { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>().use(authentication<Actor>()).use(apiPolicy<Actor>({ name: discoveryContract['hashtags/show']['~orpc'].meta.requestName })).handler(handler);
+	return createApiProcedure<Actor>()(discoveryContract['hashtags/show']).handler(handler);
 }

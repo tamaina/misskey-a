@@ -7,7 +7,7 @@ import type { ApiContext, ApiServices, ApiAuthorization } from '../../../api/bac
 import { expect, test } from 'vitest';
 import * as v from 'valibot';
 import { mockDeep } from 'vitest-mock-extended';
-import { federationInstanceSchema as packedFederationInstanceSchema } from '../../backend/federation.schema.js';
+import { federationInstanceSchema as packedFederationInstanceSchema, toFederationInstance } from '../../backend/federation.schema.js';
 import { federationInstancesContract } from '../../backend/endpoints/federation/instances.contract.js';
 import { federationStatsContract } from '../../backend/endpoints/federation/stats.contract.js';
 import { adminRelaysAddContract } from '../../backend/endpoints/admin/relays/add.contract.js';
@@ -57,14 +57,19 @@ test('actual federation serializer covers moderator, nullable dates and software
 	}
 	const dated = await service.pack({ ...instance, infoUpdatedAt: new Date('2026-02-01Z'), latestRequestReceivedAt: new Date('2026-02-02Z'), suspensionState: 'manuallySuspended', moderationNote: '' });
 	expect(v.parse(packedFederationInstanceSchema, dated)).toEqual(dated);
+	const producer = { ...dated, privateToken: 'secret', moderationNote: 'authorized moderation note' };
+	const selected = toFederationInstance(producer);
+	expect(selected).not.toHaveProperty('privateToken');
+	expect(selected.moderationNote).toBe('authorized moderation note');
 });
 
 test('actual relay list fields remain finite and metadata does not supply missing status', async () => {
-	const relay = Object.assign(new MiRelay(), { id: 'relay1', inbox: 'https://relay.test/inbox', status: 'requesting' as const });
+	const relay = Object.assign(new MiRelay(), { id: 'relay1', inbox: 'https://relay.test/inbox', status: 'requesting' as const, privateToken: 'secret' });
 	const service = mockDeep<RelayService>();
 	service.listRelay.mockResolvedValue([relay]);
 	const result = await createProcedureClient(createAdminRelaysListProcedure({ relayService: service }), { context: nativeContext() })({});
-	expect(v.parse(adminRelaysListContract['~orpc'].outputSchema!, result)).toEqual([relay]);
+	expect(v.parse(adminRelaysListContract['~orpc'].outputSchema!, result)).toEqual([{ id: relay.id, inbox: relay.inbox, status: relay.status }]);
+	expect(result[0]).not.toHaveProperty('privateToken');
 	for (const invalid of [{ ...relay, future: true }, { id: relay.id, inbox: relay.inbox }, { ...relay, status: 'bad' }]) {
 		expect(v.safeParse(adminRelaysAddContract['~orpc'].outputSchema!, invalid).success).toBe(false);
 		expect(v.safeParse(adminRelaysListContract['~orpc'].outputSchema!, [invalid]).success).toBe(false);

@@ -5,8 +5,8 @@
 import { sqlLikeEscape } from '@features/persistence/backend/utility/sql-like-escape.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 import type { HashtagsRepository } from '@features/persistence/backend/repositories/models.js';
-import { implement } from '@orpc/server';
-import { authentication, apiPolicy } from '@features/api/backend/transport/middleware.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+
 import type { ApiContext } from '@features/api/backend/transport/context.js';
 import { discoveryContract, type DiscoveryInputs } from '../discovery.contract.js';
 export interface HashtagsSearchDependencies {
@@ -24,5 +24,5 @@ export function createHashtagsSearchProcedure<Actor extends MiLocalUser>(deps: H
 
 		return hashtags.map(tag => tag.name);
 	};
-	return implement(discoveryContract['hashtags/search'], { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>().use(authentication<Actor>()).use(apiPolicy<Actor>({ name: discoveryContract['hashtags/search']['~orpc'].meta.requestName })).handler(handler);
+	return createApiProcedure<Actor>()(discoveryContract['hashtags/search']).handler(handler);
 }

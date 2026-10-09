@@ -10,8 +10,8 @@ import { GetterService } from '@features/api/backend/transport/GetterService.js'
 import { apiError } from '@features/api/backend/transport/orpc-error.js';
 import type { NotesRepository } from '@features/persistence/backend/repositories/models.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
-import { implement } from '@orpc/server';
-import { authentication, apiPolicy } from '@features/api/backend/transport/middleware.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+
 import type { ApiContext } from '@features/api/backend/transport/context.js';
 import { discoveryContract, type DiscoveryInputs } from '../discovery.contract.js';
 import { toPackedUserDetailed } from '@features/users/backend/user.schema.js';
@@ -96,5 +96,5 @@ export function createUsersGetFrequentlyRepliedUsersProcedure<Actor extends MiLo
 		})));
 		return repliesObj.map(item => ({ user: toPackedUserDetailed(item.user), weight: item.weight }));
 	};
-	return implement(discoveryContract['users/get-frequently-replied-users'], { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>().use(authentication<Actor>()).use(apiPolicy<Actor>({ name: discoveryContract['users/get-frequently-replied-users']['~orpc'].meta.requestName })).handler(handler);
+	return createApiProcedure<Actor>()(discoveryContract['users/get-frequently-replied-users']).handler(handler);
 }

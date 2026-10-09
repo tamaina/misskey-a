@@ -2,16 +2,17 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-import { implement } from '@orpc/server';
-import type { ApiActor, ApiContext } from '@features/api/backend/transport/context.js';
-import { authentication, apiPolicy, requirePrincipal, decodeScalarInput } from '@features/api/backend/transport/middleware.js';
+import { toPackedNote } from '@features/notes/backend/note.schema.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import type { ApiActor } from '@features/api/backend/transport/context.js';
+import { requirePrincipal, decodeScalarInput } from '@features/api/backend/transport/middleware.js';
 import { rolesContract } from '../../api.definition.js';
 import type { RolesDependencies } from '../../api.implementation.js';
 import { Brackets } from 'typeorm';
 import { apiError } from '@features/api/backend/transport/orpc-error.js';
 import { rolesErrors } from '../../api.errors.js';
 export function createRolesNotesProcedure<Actor extends ApiActor>(deps: Pick<RolesDependencies<Actor>, 'idService' | 'rolesRepository' | 'fanoutTimelineService' | 'notesRepository' | 'channelMutingService' | 'queryService' | 'noteEntityService'>) {
-	return implement(rolesContract.rolesNotes, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>().use(authentication<Actor>()).use(apiPolicy<Actor>({ name: 'roles/notes', requireCredential: true, kind: 'read:account' })).use(requirePrincipal<Actor>()).use(decodeScalarInput<Actor>({ limit: 'number', sinceDate: 'number', untilDate: 'number' }))
+	return createApiProcedure<Actor>()(rolesContract.rolesNotes).use(requirePrincipal<Actor>()).use(decodeScalarInput<Actor>({ limit: 'number', sinceDate: 'number', untilDate: 'number' }))
 		.handler(async ({ input, context }) => {
 			const ps = input;
 			const me = context.principal;
@@ -58,6 +59,6 @@ export function createRolesNotesProcedure<Actor extends ApiActor>(deps: Pick<Rol
 			deps.queryService.generateBaseNoteFilteringQuery(query, me);
 			const notes = await query.getMany();
 			notes.sort((a, b) => a.id > b.id ? -1 : 1);
-			return await deps.noteEntityService.packMany(notes, me);
+			return (await deps.noteEntityService.packMany(notes, me)).map(toPackedNote);
 		});
 }

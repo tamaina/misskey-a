@@ -3,9 +3,9 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { implement } from '@orpc/server';
-import { authentication, apiPolicy } from '../../../../api/backend/transport/middleware.js';
-import type { ApiContext } from '../../../../api/backend/transport/context.js';
+import { toPackedReversiGameDetailed } from '../../reversi.schema.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+
 import { reversiVerifyContract } from './verify.contract.js';
 import type { ReversiService } from '../../services/ReversiService.js';
 import type { ReversiGameEntityService } from '../../serializers/ReversiGameEntityService.js';
@@ -15,15 +15,13 @@ export interface ReversiVerifyDependencies {
 	reversiGameEntityService: Pick<ReversiGameEntityService, 'packDetail'>;
 }
 export function createReversiVerifyProcedure(deps: ReversiVerifyDependencies) {
-	return implement(reversiVerifyContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>()
-		.use(authentication<MiLocalUser>())
-		.use(apiPolicy<MiLocalUser>({ name: reversiVerifyContract['~orpc'].meta.requestName }))
+	return createApiProcedure<MiLocalUser>()(reversiVerifyContract)
 		.handler(async ({ input: ps }) => {
 			const game = await deps.reversiService.checkCrc(ps.gameId, ps.crc32);
 			if (game) {
 				return {
 					desynced: true,
-					game: await deps.reversiGameEntityService.packDetail(game),
+					game: toPackedReversiGameDetailed(await deps.reversiGameEntityService.packDetail(game)),
 				};
 			} else {
 				return {

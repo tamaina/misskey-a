@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import type { Meta } from '@orpc/contract';
+import type { ApiProcedureMetadata } from '../../../../api/backend/transport/policy.types.js';
 import { oc } from '@orpc/contract';
 import * as v from 'valibot';
 import { commonErrors, apiErrorData } from '../../../../api/backend/transport/errors.schema.js';
@@ -14,8 +16,17 @@ export const bubbleGameRegisterErrors = {
 } as const;
 
 const requestName = 'bubble-game/register';
-export const bubbleGameRegisterContract = oc.$meta({ requestName: requestName } as const)
-	.route({ method: 'POST', path: `/${requestName}`, operationId: 'post___' + requestName.replaceAll('/', '___'), tags: [], spec: current => ({ ...current, security: [{ bearerAuth: [] }] }), successStatus: 204, })
+export const bubbleGameRegisterContract = oc.$meta({
+	requestName: requestName,
+	requireCredential: true,
+	kind: 'write:account',
+	limit: {
+		duration: 3_600_000,
+		max: 120,
+		minInterval: 30_000,
+	},
+} as const satisfies Meta & ApiProcedureMetadata)
+	.route({ method: 'POST', path: `/${requestName}`, tags: [], spec: current => ({ ...current, security: [{ bearerAuth: [] }] }), successStatus: 204, })
 	.errors({ ...commonErrors, INVALID_SEED: { status: 400, data: apiErrorData } })
 	.input(objectInput({
 		"score": v.pipe(v.pipe(v.number(), v.integer()), v.minValue(0)),

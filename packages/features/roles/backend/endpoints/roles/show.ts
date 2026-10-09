@@ -2,15 +2,17 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-import { implement } from '@orpc/server';
-import type { ApiActor, ApiContext } from '@features/api/backend/transport/context.js';
-import { authentication, apiPolicy } from '@features/api/backend/transport/middleware.js';
+
+import { toRoleDto } from '../../role.schema.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import type { ApiActor } from '@features/api/backend/transport/context.js';
+
 import { rolesContract } from '../../api.definition.js';
 import type { RolesDependencies } from '../../api.implementation.js';
 import { apiError } from '@features/api/backend/transport/orpc-error.js';
 import { rolesErrors } from '../../api.errors.js';
 export function createRolesShowProcedure<Actor extends ApiActor>(deps: Pick<RolesDependencies<Actor>, 'rolesRepository' | 'roleEntityService'>) {
-	return implement(rolesContract.rolesShow, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>().use(authentication<Actor>()).use(apiPolicy<Actor>({ name: 'roles/show', requireCredential: false }))
+	return createApiProcedure<Actor>()(rolesContract.rolesShow)
 		.handler(async ({ input, context }) => {
 			const ps = input;
 			const me = context.principal;
@@ -21,6 +23,6 @@ export function createRolesShowProcedure<Actor extends ApiActor>(deps: Pick<Role
 			if (role == null) {
 				throw apiError(rolesErrors.rolesShow.noSuchRole);
 			}
-			return await deps.roleEntityService.pack(role, me);
+			return toRoleDto(await deps.roleEntityService.pack(role, me));
 		});
 }

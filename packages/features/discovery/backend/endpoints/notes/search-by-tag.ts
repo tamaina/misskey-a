@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { toPackedNote } from '@features/notes/backend/note.schema.js';
 import { Brackets } from 'typeorm';
 import { safeForSql } from '@features/persistence/backend/utility/safe-for-sql.js';
 import { QueryService } from '@features/notes/backend/services/QueryService.js';
@@ -10,8 +11,8 @@ import { NoteEntityService } from '@features/notes/backend/serializers/NoteEntit
 import { normalizeForSearch } from '../../utility/normalize-for-search.js';
 import type { NotesRepository } from '@features/persistence/backend/repositories/models.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
-import { implement } from '@orpc/server';
-import { authentication, apiPolicy } from '@features/api/backend/transport/middleware.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+
 import type { ApiContext } from '@features/api/backend/transport/context.js';
 import { discoveryContract, type DiscoveryInputs } from '../discovery.contract.js';
 export interface NotesSearchByTagDependencies {
@@ -84,7 +85,7 @@ export function createNotesSearchByTagProcedure<Actor extends MiLocalUser>(deps:
 		// Search notes
 		const notes = await query.limit(ps.limit).getMany();
 
-		return await deps.noteEntityService.packMany(notes, me);
+		return (await deps.noteEntityService.packMany(notes, me)).map(toPackedNote);
 	};
-	return implement(discoveryContract['notes/search-by-tag'], { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>().use(authentication<Actor>()).use(apiPolicy<Actor>({ name: discoveryContract['notes/search-by-tag']['~orpc'].meta.requestName })).handler(handler);
+	return createApiProcedure<Actor>()(discoveryContract['notes/search-by-tag']).handler(handler);
 }

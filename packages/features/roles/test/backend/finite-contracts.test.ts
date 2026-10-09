@@ -21,7 +21,7 @@ import { MiRole } from '../../backend/models/Role.js';
 import { RoleEntityService } from '../../backend/serializers/RoleEntityService.js';
 import type { RolesRepository, RoleAssignmentsRepository } from '../../../persistence/backend/repositories/models.js';
 import type { IdService } from '../../../runtime/backend/services/IdService.js';
-import { roleSchema } from '../../backend/role.schema.js';
+import { roleSchema, toRoleDto } from '../../backend/role.schema.js';
 import { DEFAULT_POLICIES } from '../../backend/services/RoleService.js';
 import { normalizeError, misskeyErrorBody } from '../../../api/backend/transport/orpc-error.js';
 import { packedRoleSchema as notificationRoleSchema } from '../../../notifications/backend/notification-related.schema.js';
@@ -138,6 +138,25 @@ test('the role serializer materializes canonical defaults and finite policy valu
 		policies: { rateLimitFactor: { useDefault: false, priority: 1, value: 0.5 } },
 	});
 	const packed = v.parse(roleSchema, await serializer.pack(row, actor));
+	const withExtras = {
+		...packed, privateToken: 'outer-secret',
+		condFormula: { id: 'root', type: 'not' as const, value: { id: 'child', type: 'isLocal' as const, privateToken: 'nested-secret' }, privateToken: 'formula-secret' },
+		policies: { ...packed.policies, custom: { priority: 1, value: { retained: true }, privateToken: 'policy-secret' } },
+	};
+	const selected = toRoleDto(withExtras);
+	expect(selected).not.toHaveProperty('privateToken');
+	expect(selected.condFormula).toEqual({ id: 'root', type: 'not', value: { id: 'child', type: 'isLocal' } });
+	expect(selected.policies.custom).toEqual({ priority: 1, value: { retained: true } });
+	const jsonValue = Object.fromEntries(['__proto__', 'prototype', 'constructor'].map(key => [key, `JSON ${key}`]));
+	const recordPolicies = { ...packed.policies, custom: { value: jsonValue } };
+	for (const key of ['__proto__', 'prototype', 'constructor']) {
+		Object.defineProperty(recordPolicies, key, { value: { value: Infinity }, enumerable: true });
+	}
+	const recordSelected = toRoleDto({ ...packed, policies: recordPolicies }).policies;
+	expect(recordSelected).toEqual(v.parse(rolePolicySettingsSchema, recordPolicies));
+	for (const key of ['__proto__', 'prototype', 'constructor']) expect(Object.hasOwn(recordSelected, key)).toBe(false);
+	expect(recordSelected.custom.value).toEqual(jsonValue);
+
 	expect(packed).toMatchObject({
 		createdAt: date.toISOString(), updatedAt: date.toISOString(), usersCount: 3,
 		policies: { rateLimitFactor: { useDefault: false, priority: 1, value: 0.5 }, canPublicNote: { useDefault: true, priority: 0, value: true } }
@@ -165,7 +184,7 @@ test('role formula/settings inputs preserve original object-only acceptance, inc
 	expect(v.safeParse(roleCondFormulaSchema, formula).success).toBe(false);
 });
 
-test('legacy empty formulas survive manual and conditional create/list/show/update; nonempty malformed output still rejects', async () => {
+test('legacy empty formulas survive manual and conditional create/list/show/update; malformed persisted formulas fail finite domain conversion', async () => {
 	const date = new Date('2026-10-09T00:00:00Z');
 	const legacy = Object.assign(new MiRole(), {
 		id: 'role123', updatedAt: date, name: 'Role', description: '', color: null, iconUrl: null,
@@ -225,7 +244,7 @@ test('legacy empty formulas survive manual and conditional create/list/show/upda
 	expect((await client.rolesShow({ roleId: conditional.id })).condFormula).toEqual({});
 	await client.adminRolesUpdate(v.parse(requiredSchema(rolesContract.adminRolesUpdate['~orpc'].inputSchema), { roleId: conditional.id, target: 'conditional', condFormula: {} }));
 	expect(deps.roleService.update).toHaveBeenLastCalledWith(conditional, expect.objectContaining({ target: 'conditional', condFormula: {} }), actor);
-	// Object-only input still writes nonempty malformed formulas before the output boundary rejects them.
+	// Object-only input still writes legacy malformed formulas before finite domain conversion rejects them.
 	const malformedFormulas: v.InferOutput<NonNullable<typeof rolesContract.adminRolesCreate['~orpc']['inputSchema']>>['condFormula'][] = [
 		{ type: 'isLocal' }, { id: 'unknown', type: 'unknown' }, { future: true },
 	];
@@ -233,7 +252,7 @@ test('legacy empty formulas survive manual and conditional create/list/show/upda
 		const malformed = Object.assign(new MiRole(), conditional, { condFormula: formula });
 		deps.roleService.create.mockResolvedValue(malformed);
 		await expect(client.adminRolesCreate({ ...request, target: 'conditional', condFormula: formula }))
-			.rejects.toMatchObject({ code: 'INTERNAL_SERVER_ERROR' });
+			.rejects.toThrow('Cannot serialize invalid persisted role formula');
 		expect(deps.roleService.create).toHaveBeenLastCalledWith({ ...request, target: 'conditional', condFormula: formula }, actor);
 		expect(deps.roleEntityService.pack).toHaveBeenLastCalledWith(malformed, actor);
 	}
@@ -251,6 +270,21 @@ test('legacy empty formulas survive manual and conditional create/list/show/upda
 		maxFileSize: 1024, context: () => context, runSpan: (_name, run) => run(),
 	}), { prefix: '/api' });
 	try {
+		for (const formula of malformedFormulas) {
+			const malformed = Object.assign(new MiRole(), conditional, { condFormula: formula });
+			deps.roleService.create.mockResolvedValue(malformed);
+			const malformedRequest = { ...request, target: 'conditional', condFormula: formula };
+			const response = await app.inject({ method: 'POST', url: '/api/admin/roles/create', payload: malformedRequest });
+			expect(response.statusCode).toBe(500);
+			expect(response.json()).toMatchObject({ error: { code: 'INTERNAL_ERROR' } });
+			expect(deps.roleService.create).toHaveBeenLastCalledWith(malformedRequest, actor);
+			expect(deps.roleEntityService.pack).toHaveBeenLastCalledWith(malformed, actor);
+			const writeOrder = deps.roleService.create.mock.invocationCallOrder.at(-1);
+			const packOrder = deps.roleEntityService.pack.mock.invocationCallOrder.at(-1);
+			if (writeOrder === undefined || packOrder === undefined) throw new Error('Expected role write and serializer calls');
+			expect(writeOrder).toBeLessThan(packOrder);
+		}
+		deps.roleService.create.mockResolvedValue(legacy);
 		const created = await app.inject({ method: 'POST', url: '/api/admin/roles/create', payload: request });
 		expect(created.statusCode).toBe(200);
 		expect(v.parse(roleSchema, created.json())).toMatchObject({

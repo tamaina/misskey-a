@@ -8,8 +8,8 @@ import { QueryService } from '@features/notes/backend/services/QueryService.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import type { UsersRepository, FollowingsRepository } from '@features/persistence/backend/repositories/models.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
-import { implement } from '@orpc/server';
-import { authentication, apiPolicy, requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
 import type { ApiContext } from '@features/api/backend/transport/context.js';
 import { discoveryContract, type DiscoveryInputs } from '../discovery.contract.js';
 import { toPackedUserDetailed } from '@features/users/backend/user.schema.js';
@@ -46,5 +46,5 @@ export function createUsersRecommendationProcedure<Actor extends MiLocalUser>(de
 		const users = await query.limit(ps.limit).offset(ps.offset).getMany();
 		return (await deps.userEntityService.packMany(users, me, { schema: 'UserDetailed' })).map(user => toPackedUserDetailed(user));
 	};
-	return implement(discoveryContract['users/recommendation'], { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>().use(authentication<Actor>()).use(apiPolicy<Actor>({ name: discoveryContract['users/recommendation']['~orpc'].meta.requestName, requireCredential: true, kind: 'read:account' })).use(requirePrincipal<Actor>()).handler(handler);
+	return createApiProcedure<Actor>()(discoveryContract['users/recommendation']).use(requirePrincipal<Actor>()).handler(handler);
 }

@@ -4,18 +4,14 @@
  */
 import type { WebhooksRepository } from '../../../../../persistence/backend/repositories/models.js';
 import type { MiLocalUser } from '../../../../../users/backend/models/User.js';
-import * as v from 'valibot';
 import { iWebhooksListContract } from './list.contract.js';
-import { implement } from '@orpc/server';
-import { authentication, apiPolicy, requirePrincipal } from '../../../../../api/backend/transport/middleware.js';
-import type { ApiContext } from '../../../../../api/backend/transport/context.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import { requirePrincipal } from '../../../../../api/backend/transport/middleware.js';
 export interface IWebhooksListDependencies {
 	webhooksRepository: WebhooksRepository;
 }
 export function createIWebhooksListProcedure(deps: IWebhooksListDependencies) {
-	return implement(iWebhooksListContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>()
-		.use(authentication<MiLocalUser>())
-		.use(apiPolicy<MiLocalUser>({ name: 'i/webhooks/list', requireCredential: true, kind: 'read:account' }))
+	return createApiProcedure<MiLocalUser>()(iWebhooksListContract)
 		.use(requirePrincipal<MiLocalUser>())
 		.handler(async ({ input, context }) => {
 			const me = context.principal;
@@ -35,11 +31,6 @@ export function createIWebhooksListProcedure(deps: IWebhooksListDependencies) {
 					latestStatus: webhook.latestStatus,
 				}));
 			})();
-			return v.parse(requiredSchema(iWebhooksListContract['~orpc'].outputSchema), result);
+			return result;
 		});
-}
-
-function requiredSchema<Schema>(schema: Schema | undefined): Schema {
-	if (schema === undefined) throw new Error('Contract must declare its schema');
-	return schema;
 }

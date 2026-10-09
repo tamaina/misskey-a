@@ -5,8 +5,8 @@
 import { UserSearchService } from '../../services/UserSearchService.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 import { toPackedUser } from '@features/users/backend/user.schema.js';
-import { implement } from '@orpc/server';
-import { authentication, apiPolicy } from '@features/api/backend/transport/middleware.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+
 import type { ApiContext } from '@features/api/backend/transport/context.js';
 import { discoveryContract, type DiscoveryInputs } from '../discovery.contract.js';
 export interface UsersSearchByUsernameAndHostDependencies {
@@ -23,5 +23,5 @@ export function createUsersSearchByUsernameAndHostProcedure<Actor extends MiLoca
 		}, me);
 		return users.map(user => toPackedUser(user));
 	};
-	return implement(discoveryContract['users/search-by-username-and-host'], { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>().use(authentication<Actor>()).use(apiPolicy<Actor>({ name: discoveryContract['users/search-by-username-and-host']['~orpc'].meta.requestName })).handler(handler);
+	return createApiProcedure<Actor>()(discoveryContract['users/search-by-username-and-host']).handler(handler);
 }

@@ -5,8 +5,8 @@
 import { FeaturedService } from '../../services/FeaturedService.js';
 import { HashtagService } from '../../services/HashtagService.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
-import { implement } from '@orpc/server';
-import { authentication, apiPolicy } from '@features/api/backend/transport/middleware.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+
 import type { ApiContext } from '@features/api/backend/transport/context.js';
 import { discoveryContract, type DiscoveryInputs } from '../discovery.contract.js';
 export interface HashtagsTrendDependencies {
@@ -28,7 +28,7 @@ export function createHashtagsTrendProcedure<Actor extends MiLocalUser>(deps: Ha
 		return stats;
 	};
 	return {
-		canonical: implement(discoveryContract['hashtags/trend'], { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>().use(authentication<Actor>()).use(apiPolicy<Actor>({ name: discoveryContract['hashtags/trend']['~orpc'].meta.requestName })).handler(handler),
-		get: implement(discoveryContract['hashtags/trend:get'], { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>().use(authentication<Actor>()).use(apiPolicy<Actor>({ name: discoveryContract['hashtags/trend']['~orpc'].meta.requestName })).handler(handler),
+		canonical: createApiProcedure<Actor>()(discoveryContract['hashtags/trend']).handler(handler),
+		get: createApiProcedure<Actor>()(discoveryContract['hashtags/trend:get']).handler(handler),
 	};
 }

@@ -3,9 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { implement } from '@orpc/server';
-import { authentication, apiPolicy, requirePrincipal } from '../../../../api/backend/transport/middleware.js';
-import type { ApiContext } from '../../../../api/backend/transport/context.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import { requirePrincipal } from '../../../../api/backend/transport/middleware.js';
 import { reversiSurrenderContract, reversiSurrenderErrors } from './surrender.contract.js';
 import type { ReversiService } from '../../services/ReversiService.js';
 import { apiError } from '@features/api/backend/transport/orpc-error.js';
@@ -14,9 +13,7 @@ export interface ReversiSurrenderDependencies {
 	reversiService: Pick<ReversiService, 'get' | 'surrender'>;
 }
 export function createReversiSurrenderProcedure(deps: ReversiSurrenderDependencies) {
-	return implement(reversiSurrenderContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>()
-		.use(authentication<MiLocalUser>())
-		.use(apiPolicy<MiLocalUser>({ name: reversiSurrenderContract['~orpc'].meta.requestName, requireCredential: true, kind: 'write:account' }))
+	return createApiProcedure<MiLocalUser>()(reversiSurrenderContract)
 		.use(requirePrincipal<MiLocalUser>())
 		.handler(async ({ input: ps, context }) => {
 			const me = context.principal;

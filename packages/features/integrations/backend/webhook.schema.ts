@@ -1,7 +1,7 @@
 /*
- * SPDX-FileCopyrightText: syuilo and misskey-project
- * SPDX-License-Identifier: AGPL-3.0-only
- */
+	* SPDX-FileCopyrightText: syuilo and misskey-project
+	* SPDX-License-Identifier: AGPL-3.0-only
+	*/
 
 import * as v from 'valibot';
 
@@ -29,3 +29,11 @@ export const userWebhookSchema = v.strictObject({
 	"latestSentAt": v.pipe(v.nullable(v.string()), v.metadata({ "format": "date-time" })),
 	"latestStatus": v.nullable(v.pipe(finiteNumber, v.integer()))
 });
+
+export function toSystemWebhook(webhook: v.InferOutput<typeof systemWebhookSchema>): v.InferOutput<typeof systemWebhookSchema> {
+	return {
+		id: webhook.id, isActive: webhook.isActive, updatedAt: webhook.updatedAt,
+		latestSentAt: webhook.latestSentAt, latestStatus: webhook.latestStatus,
+		name: webhook.name, on: [...webhook.on], url: webhook.url, secret: webhook.secret,
+	};
+}

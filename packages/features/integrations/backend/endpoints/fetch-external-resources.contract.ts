@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import type { Meta } from '@orpc/contract';
+import type { ApiProcedureMetadata } from '../../../api/backend/transport/policy.types.js';
 import { oc } from '@orpc/contract';
 import * as v from 'valibot';
 import { objectInput } from '../../../api/backend/transport/input.schema.js';
@@ -22,8 +24,16 @@ export const fetchExternalResourcesErrors = {
 	} as const;
 
 const requestName = 'fetch-external-resources';
-export const fetchExternalResourcesContract = oc.$meta({ requestName: requestName } as const)
-	.route({ method: 'POST', path: `/${requestName}`, operationId: 'post___' + requestName.replaceAll('/', '___'), tags: ['meta'], spec: current => ({ ...current, security: [{ bearerAuth: [] }] }) })
+export const fetchExternalResourcesContract = oc.$meta({
+	requestName: requestName,
+	requireCredential: true,
+	secure: true,
+	limit: {
+		duration: 3600000,
+		max: 50,
+	},
+} as const satisfies Meta & ApiProcedureMetadata)
+	.route({ method: 'POST', path: `/${requestName}`, tags: ['meta'], spec: current => ({ ...current, security: [{ bearerAuth: [] }] }) })
 	.errors({ ...commonErrors, EXT_RESOURCE_RETURNED_INVALID_SCHEMA: { status: 400, data: apiErrorData }, EXT_RESOURCE_HASH_DIDNT_MATCH: { status: 400, data: apiErrorData } })
 	.input(objectInput({
 	"url": v.string(),

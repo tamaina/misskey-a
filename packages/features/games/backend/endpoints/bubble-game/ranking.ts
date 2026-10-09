@@ -3,9 +3,9 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { implement } from '@orpc/server';
-import { authentication, apiPolicy } from '../../../../api/backend/transport/middleware.js';
-import type { ApiContext } from '../../../../api/backend/transport/context.js';
+import { toPackedUserLite } from '@features/users/backend/user.schema.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+
 import { bubbleGameRankingContract, bubbleGameRankingGetContract } from './ranking.contract.js';
 import { MoreThan } from 'typeorm';
 import type { BubbleGameRecordsRepository } from '@features/persistence/backend/repositories/models.js';
@@ -16,9 +16,7 @@ export interface BubbleGameRankingDependencies {
 	userEntityService: Pick<UserEntityService, 'packMany'>;
 }
 export function createBubbleGameRankingProcedure(deps: BubbleGameRankingDependencies) {
-	return implement(bubbleGameRankingContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>()
-		.use(authentication<MiLocalUser>())
-		.use(apiPolicy<MiLocalUser>({ name: bubbleGameRankingContract['~orpc'].meta.requestName }))
+	return createApiProcedure<MiLocalUser>()(bubbleGameRankingContract)
 		.handler(async ({ input: ps }) => {
 			const records = await deps.bubbleGameRecordsRepository.find({
 				where: {
@@ -31,7 +29,7 @@ export function createBubbleGameRankingProcedure(deps: BubbleGameRankingDependen
 				take: 10,
 				relations: { user: true },
 			});
-			const users = await deps.userEntityService.packMany(records.map(r => r.user!), null);
+			const users = (await deps.userEntityService.packMany(records.map(r => r.user!), null)).map(toPackedUserLite);
 			return records.map(r => ({
 				id: r.id,
 				score: r.score,
@@ -40,9 +38,7 @@ export function createBubbleGameRankingProcedure(deps: BubbleGameRankingDependen
 		});
 }
 export function createBubbleGameRankingGetProcedure(deps: BubbleGameRankingDependencies) {
-	return implement(bubbleGameRankingGetContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>()
-		.use(authentication<MiLocalUser>())
-		.use(apiPolicy<MiLocalUser>({ name: bubbleGameRankingContract['~orpc'].meta.requestName }))
+	return createApiProcedure<MiLocalUser>()(bubbleGameRankingGetContract)
 		.handler(async ({ input: ps }) => {
 			const records = await deps.bubbleGameRecordsRepository.find({
 				where: {
@@ -55,7 +51,7 @@ export function createBubbleGameRankingGetProcedure(deps: BubbleGameRankingDepen
 				take: 10,
 				relations: { user: true },
 			});
-			const users = await deps.userEntityService.packMany(records.map(r => r.user!), null);
+			const users = (await deps.userEntityService.packMany(records.map(r => r.user!), null)).map(toPackedUserLite);
 			return records.map(r => ({
 				id: r.id,
 				score: r.score,

@@ -3,12 +3,10 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { implement } from '@orpc/server';
-import { authentication, apiPolicy, requirePrincipal } from '../../../../api/backend/transport/middleware.js';
-import type { ApiActor, ApiContext } from '../../../../api/backend/transport/context.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import { requirePrincipal } from '../../../../api/backend/transport/middleware.js';
+import type { ApiActor } from '../../../../api/backend/transport/context.js';
 import { apGetContract } from './get.contract.js';
-import ms from 'ms';
-import * as v from 'valibot';
 import type { ApResolverService } from '../../services/ApResolverService.js';
 import type { PackedJsonValue } from '../../../../users/backend/json-value.schema.js';
 
@@ -37,22 +35,17 @@ export interface ApGetDependencies {
 	apResolverService: Pick<ApResolverService, 'createResolver'>;
 }
 export function createApGetProcedure<Actor extends ApiActor>(deps: ApGetDependencies) {
-	return implement(apGetContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>()
-		.use(authentication<Actor>())
-		.use(apiPolicy<Actor>({
-			name: apGetContract['~orpc'].meta.requestName, requireCredential: true, requireAdmin: true, kind: 'read:federation', limit: {
-				duration: ms('1hour'),
-				max: 30,
-			}
-		}))
+	return createApiProcedure<Actor>()(apGetContract)
 		.use(requirePrincipal<Actor>())
 		.handler(async ({ input }) => {
 			const ps = input;
 			const result = await (async () => {
 				const resolver = await deps.apResolverService.createResolver();
 				const object = await resolver.resolve(ps.uri);
-				return protocolJsonValue(object, new WeakSet());
+				const packed = protocolJsonValue(object, new WeakSet());
+				if (packed === null || typeof packed !== 'object' || Array.isArray(packed)) throw new TypeError('Expected ActivityPub JSON object');
+				return packed;
 			})();
-			return v.parse(apGetContract['~orpc'].outputSchema!, result);
+			return result;
 		});
 }

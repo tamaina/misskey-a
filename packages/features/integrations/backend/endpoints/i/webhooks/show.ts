@@ -5,18 +5,14 @@
 import type { WebhooksRepository } from '../../../../../persistence/backend/repositories/models.js';
 import { apiError } from '../../../../../api/backend/transport/orpc-error.js';
 import type { MiLocalUser } from '../../../../../users/backend/models/User.js';
-import * as v from 'valibot';
 import { iWebhooksShowErrors, iWebhooksShowContract } from './show.contract.js';
-import { implement } from '@orpc/server';
-import { authentication, apiPolicy, requirePrincipal } from '../../../../../api/backend/transport/middleware.js';
-import type { ApiContext } from '../../../../../api/backend/transport/context.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import { requirePrincipal } from '../../../../../api/backend/transport/middleware.js';
 export interface IWebhooksShowDependencies {
 	webhooksRepository: WebhooksRepository;
 }
 export function createIWebhooksShowProcedure(deps: IWebhooksShowDependencies) {
-	return implement(iWebhooksShowContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>()
-		.use(authentication<MiLocalUser>())
-		.use(apiPolicy<MiLocalUser>({ name: 'i/webhooks/show', requireCredential: true, kind: 'read:account' }))
+	return createApiProcedure<MiLocalUser>()(iWebhooksShowContract)
 		.use(requirePrincipal<MiLocalUser>())
 		.handler(async ({ input, context }) => {
 			const ps = input;
@@ -41,11 +37,6 @@ export function createIWebhooksShowProcedure(deps: IWebhooksShowDependencies) {
 					latestStatus: webhook.latestStatus,
 				};
 			})();
-			return v.parse(requiredSchema(iWebhooksShowContract['~orpc'].outputSchema), result);
+			return result;
 		});
-}
-
-function requiredSchema<Schema>(schema: Schema | undefined): Schema {
-	if (schema === undefined) throw new Error('Contract must declare its schema');
-	return schema;
 }

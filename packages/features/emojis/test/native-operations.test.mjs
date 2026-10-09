@@ -139,3 +139,36 @@ test('failed emoji queue insertion rejects the application operation instead of 
 	await assert.rejects(operations.importZip({ fileId: 'archive1' }), error => error === failure);
 	await assert.rejects(operations.exportCustomEmojis({}), error => error === failure);
 });
+
+test('native emoji responses select public fields without invoking output validators', async () => {
+	const { emojisContract } = await import('../../../backend/built/features/emojis/backend.js');
+	const simple = {
+		aliases: [], name: 'smile', category: null, url: 'https://example.test/emoji.png',
+		privateStorageKey: 'outer-secret',
+	};
+	const admin = {
+		id: 'emoji1', updatedAt: null, name: 'smile', host: null,
+		publicUrl: simple.url, originalUrl: simple.url, uri: null, type: null,
+		aliases: [], category: null, license: null, localOnly: false, isSensitive: false,
+		privateStorageKey: 'outer-secret',
+		roleIdsThatCanBeUsedThisEmojiAsReaction: [{ id: 'role1', name: 'Members', privateToken: 'nested-secret' }],
+	};
+	const schemas = [emojisContract.emojis['~orpc'].outputSchema, emojisContract.v2List['~orpc'].outputSchema];
+	let validations = 0;
+	const originals = schemas.map(schema => schema['~run']);
+	for (const schema of schemas) schema['~run'] = () => { validations++; throw new Error('Output validator must be skipped'); };
+	try {
+		const client = createEmojisClient({
+			emojisRepository: { find: async () => [] },
+			emojiEntityService: { packSimpleMany: async () => [simple], packDetailedAdminMany: async () => [admin] },
+			customEmojiService: { fetchEmojis: async () => ({ emojis: [], count: 1, allCount: 1, allPages: 1 }) },
+		});
+		assert.deepEqual(await client.emojis({}), { emojis: [{ aliases: [], name: simple.name, category: null, url: simple.url }] });
+		const result = await client.v2List({});
+		assert.equal(Object.hasOwn(result.emojis[0], 'privateStorageKey'), false);
+		assert.deepEqual(result.emojis[0].roleIdsThatCanBeUsedThisEmojiAsReaction, [{ id: 'role1', name: 'Members' }]);
+		assert.equal(validations, 0);
+	} finally {
+		for (let index = 0; index < schemas.length; index++) schemas[index]['~run'] = originals[index];
+	}
+});

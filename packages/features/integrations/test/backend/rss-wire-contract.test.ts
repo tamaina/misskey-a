@@ -73,3 +73,12 @@ function requiredSchema<Schema>(schema: Schema | undefined): Schema {
 	if (schema === undefined) throw new Error('Contract must declare its schema');
 	return schema;
 }
+
+test('invalid external RSS remains a business parsing error with status 422', async () => {
+	const http = mockDeep<Pick<HttpRequestService, 'send'>>();
+	const response = new Response('<rss><channel><title>broken', { status: 200 });
+	Object.defineProperty(response, 'url', { value: 'https://example.com/feed' });
+	http.send.mockResolvedValue(response);
+	await expect(call(FetchRssEndpoint({ httpRequestService: http }), { url: 'https://example.com/feed' }, { context: testContext(null, null) }))
+		.rejects.toMatchObject({ code: 'FETCH_RSS_FAILED', status: 422, data: { id: '8db5d3d8-31d7-452f-b0cc-ca3b8925de12' } });
+});

@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import type { Meta } from '@orpc/contract';
+import type { ApiProcedureMetadata } from '../../../../api/backend/transport/policy.types.js';
 import { oc } from '@orpc/contract';
 import * as v from 'valibot';
 import { commonErrors, apiErrorData } from '../../../../api/backend/transport/errors.schema.js';
@@ -15,8 +17,11 @@ export const reversiVerifyErrors = {
 } as const;
 
 const requestName = 'reversi/verify';
-export const reversiVerifyContract = oc.$meta({ requestName: requestName } as const)
-	.route({ method: 'POST', path: `/${requestName}`, operationId: 'post___' + requestName.replaceAll('/', '___'), tags: [], })
+export const reversiVerifyContract = oc.$meta({
+	requestName: requestName,
+	requireCredential: false,
+} as const satisfies Meta & ApiProcedureMetadata)
+	.route({ method: 'POST', path: `/${requestName}`, tags: [], })
 	.errors({ ...commonErrors, NO_SUCH_GAME: { status: 400, data: apiErrorData } })
 	.input(objectInput({
 		"gameId": misskeyId,

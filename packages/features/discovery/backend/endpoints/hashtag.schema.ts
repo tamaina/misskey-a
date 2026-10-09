@@ -14,3 +14,12 @@ export const packedHashtagSchema = v.strictObject({
 	'attachedLocalUsersCount': v.pipe(v.number(), v.finite()),
 	'attachedRemoteUsersCount': v.pipe(v.number(), v.finite()),
 });
+
+export function toPackedHashtag(tag: v.InferOutput<typeof packedHashtagSchema>): v.InferOutput<typeof packedHashtagSchema> {
+	return {
+		tag: tag.tag, mentionedUsersCount: tag.mentionedUsersCount,
+		mentionedLocalUsersCount: tag.mentionedLocalUsersCount, mentionedRemoteUsersCount: tag.mentionedRemoteUsersCount,
+		attachedUsersCount: tag.attachedUsersCount, attachedLocalUsersCount: tag.attachedLocalUsersCount,
+		attachedRemoteUsersCount: tag.attachedRemoteUsersCount,
+	};
+}

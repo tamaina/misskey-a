@@ -3,11 +3,12 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { implement } from '@orpc/server';
-import { authentication, apiPolicy, requirePrincipal } from '../../../../api/backend/transport/middleware.js';
-import type { ApiActor, ApiContext } from '../../../../api/backend/transport/context.js';
+import { toPackedUserDetailed } from '@features/users/backend/user.schema.js';
+import { toPackedNote } from '@features/notes/backend/note.schema.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import { requirePrincipal } from '../../../../api/backend/transport/middleware.js';
+import type { ApiActor } from '../../../../api/backend/transport/context.js';
 import { apShowContract, apShowErrors } from './show.contract.js';
-import ms from 'ms';
 import type { MiNote } from '../../../../notes/backend/models/Note.js';
 import type { MiUser } from '../../../../users/backend/models/User.js';
 import { isActor, isPost, getApId } from '../../protocol/type.js';
@@ -21,7 +22,6 @@ import type { UtilityService } from '../../services/UtilityService.js';
 import { IdentifiableError } from '../../../../runtime/backend/errors/identifiable-error.js';
 import { FetchAllowSoftFailMask } from '../../protocol/misc/check-against-url.js';
 import { apiError } from '../../../../api/backend/transport/orpc-error.js';
-import * as v from 'valibot';
 import type { ApShowOutput } from './show.contract.js';
 export interface ApShowDependencies {
 	utilityService: Pick<UtilityService, 'isFederationAllowedUri' | 'extractDbHost' | 'isSelfHost'>;
@@ -97,14 +97,14 @@ export function createApShowProcedure<Actor extends ApiActor>(deps: ApShowDepend
 		if (user != null) {
 			return {
 				type: 'User',
-				object: await deps.userEntityService.pack(user, me, { schema: 'UserDetailedNotMe' }),
+				object: toPackedUserDetailed(await deps.userEntityService.pack(user, me, { schema: 'UserDetailedNotMe' })),
 			};
 		} else if (note != null) {
 			try {
 				const object = await deps.noteEntityService.pack(note, me, { detail: true });
 				return {
 					type: 'Note',
-					object,
+					object: toPackedNote(object),
 				};
 			} catch (_) {
 				return null;
@@ -113,14 +113,7 @@ export function createApShowProcedure<Actor extends ApiActor>(deps: ApShowDepend
 		return null;
 	}
 
-	return implement(apShowContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>()
-		.use(authentication<Actor>())
-		.use(apiPolicy<Actor>({
-			name: apShowContract['~orpc'].meta.requestName, requireCredential: true, kind: 'read:account', limit: {
-				duration: ms('1hour'),
-				max: 30,
-			}
-		}))
+	return createApiProcedure<Actor>()(apShowContract)
 		.use(requirePrincipal<Actor>())
 		.handler(async ({ input, context }) => {
 			const ps = input;
@@ -133,6 +126,6 @@ export function createApShowProcedure<Actor extends ApiActor>(deps: ApShowDepend
 					throw apiError(apShowErrors.noSuchObject);
 				}
 			})();
-			return v.parse(apShowContract['~orpc'].outputSchema!, result);
+			return result;
 		});
 }

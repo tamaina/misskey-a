@@ -3,9 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { implement } from '@orpc/server';
-import { authentication, apiPolicy, requirePrincipal } from '../../../../api/backend/transport/middleware.js';
-import type { ApiContext } from '../../../../api/backend/transport/context.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import { requirePrincipal } from '../../../../api/backend/transport/middleware.js';
 import { bubbleGameRegisterContract, bubbleGameRegisterErrors } from './register.contract.js';
 import type { IdService } from '@features/runtime/backend/services/IdService.js';
 import type { BubbleGameRecordsRepository } from '@features/persistence/backend/repositories/models.js';
@@ -16,9 +15,7 @@ export interface BubbleGameRegisterDependencies {
 	idService: Pick<IdService, 'gen'>;
 }
 export function createBubbleGameRegisterProcedure(deps: BubbleGameRegisterDependencies) {
-	return implement(bubbleGameRegisterContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>()
-		.use(authentication<MiLocalUser>())
-		.use(apiPolicy<MiLocalUser>({ name: bubbleGameRegisterContract['~orpc'].meta.requestName, requireCredential: true, kind: 'write:account', limit: { duration: 3_600_000, max: 120, minInterval: 30_000 } }))
+	return createApiProcedure<MiLocalUser>()(bubbleGameRegisterContract)
 		.use(requirePrincipal<MiLocalUser>())
 		.handler(async ({ input: ps, context }) => {
 			const me = context.principal;

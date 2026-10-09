@@ -5,7 +5,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createRouterClient } from '@orpc/server';
-import { createEmojisRouter } from '../../../backend/built/features/emojis/backend.js';
+import { createEmojisRouter, emojisContract } from '../../../backend/built/features/emojis/backend.js';
 
 function publicEmojis(deps) {
 	const router = createEmojisRouter({
@@ -82,11 +82,19 @@ test('wire normalization omits undefined optional fields without mutating packed
 	assert.equal(Object.hasOwn(result.emojis[0], 'localOnly'), false);
 });
 
-test('list input is validated before dependencies and malformed packed results reject', async () => {
+test('list validates input before dependencies and selects public DTOs without output validation', async t => {
 	let reads = 0;
-	const feature = publicEmojis({ listLocal: async () => { reads++; return [{ aliases: [], name: 'bad', category: null, url: '/bad', localOnly: 'false' }]; }, findLocal: async () => { throw new Error('unused'); } });
+	const packed = { aliases: ['sample'], name: 'sample', category: null, url: '/sample', localOnly: false, privateStorageKey: 'outer-secret' };
+	const outputValidator = t.mock.method(emojisContract.emojis['~orpc'].outputSchema, '~run', () => {
+		throw new Error('HTTP output validator must not run');
+	});
+	const feature = publicEmojis({ listLocal: async () => { reads++; return [packed]; }, findLocal: async () => { throw new Error('unused'); } });
 	for (const invalid of [null, [], 1, 'invalid']) await assert.rejects(feature.emojis(invalid));
 	assert.equal(reads, 0);
-	await assert.rejects(feature.emojis({}));
+	const result = await feature.emojis({});
+	assert.deepEqual(result, { emojis: [{ aliases: ['sample'], name: 'sample', category: null, url: '/sample', localOnly: false }] });
+	assert.equal(Object.hasOwn(result.emojis[0], 'privateStorageKey'), false);
+	assert.equal(packed.privateStorageKey, 'outer-secret');
+	assert.equal(outputValidator.mock.callCount(), 0);
 	assert.equal(reads, 1);
 });

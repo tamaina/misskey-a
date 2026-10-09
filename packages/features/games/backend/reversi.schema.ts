@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { toPackedUserLite } from '../../users/backend/user.schema.js';
+import { toPackedJsonValue } from '../../users/backend/json-value.schema.js';
 import * as v from 'valibot';
 import { packedNullableJsonValueSchema } from '../../users/backend/json-value.schema.js';
 import {
@@ -64,3 +66,61 @@ export const packedReversiGameLiteSchema = v.strictObject({
 
 export type PackedReversiGameDetailed = v.InferOutput<typeof packedReversiGameDetailedSchema>;
 export type PackedReversiGameLite = v.InferOutput<typeof packedReversiGameLiteSchema>;
+
+export function toPackedReversiGameDetailed(game: PackedReversiGameDetailed): PackedReversiGameDetailed {
+	return {
+		id: game.id,
+		createdAt: game.createdAt,
+		startedAt: game.startedAt,
+		endedAt: game.endedAt,
+		isStarted: game.isStarted,
+		isEnded: game.isEnded,
+		form1: toPackedJsonValue(game.form1),
+		form2: toPackedJsonValue(game.form2),
+		user1Ready: game.user1Ready,
+		user2Ready: game.user2Ready,
+		user1Id: game.user1Id,
+		user2Id: game.user2Id,
+		user1: toPackedUserLite(game.user1),
+		user2: toPackedUserLite(game.user2),
+		winnerId: game.winnerId,
+		winner: game.winner === null ? null : toPackedUserLite(game.winner),
+		surrenderedUserId: game.surrenderedUserId,
+		timeoutUserId: game.timeoutUserId,
+		black: game.black,
+		bw: game.bw,
+		noIrregularRules: game.noIrregularRules,
+		isLlotheo: game.isLlotheo,
+		canPutEverywhere: game.canPutEverywhere,
+		loopedBoard: game.loopedBoard,
+		timeLimitForEachTurn: game.timeLimitForEachTurn,
+		logs: game.logs.map(log => [...log]),
+		map: [...game.map],
+	};
+}
+
+export function toPackedReversiGameLite(game: PackedReversiGameLite): PackedReversiGameLite {
+	return {
+		id: game.id,
+		createdAt: game.createdAt,
+		startedAt: game.startedAt,
+		endedAt: game.endedAt,
+		isStarted: game.isStarted,
+		isEnded: game.isEnded,
+		user1Id: game.user1Id,
+		user2Id: game.user2Id,
+		user1: toPackedUserLite(game.user1),
+		user2: toPackedUserLite(game.user2),
+		winnerId: game.winnerId,
+		winner: game.winner === null ? null : toPackedUserLite(game.winner),
+		surrenderedUserId: game.surrenderedUserId,
+		timeoutUserId: game.timeoutUserId,
+		black: game.black,
+		bw: game.bw,
+		noIrregularRules: game.noIrregularRules,
+		isLlotheo: game.isLlotheo,
+		canPutEverywhere: game.canPutEverywhere,
+		loopedBoard: game.loopedBoard,
+		timeLimitForEachTurn: game.timeLimitForEachTurn,
+	};
+}

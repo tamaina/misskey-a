@@ -3,24 +3,22 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { implement } from '@orpc/server';
-import { authentication, apiPolicy } from '../../../../api/backend/transport/middleware.js';
+import { toFederationInstance } from '../../federation.schema.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+
 import { federationInstancesContract } from './instances.contract.js';
-import type { ApiActor, ApiContext } from '../../../../api/backend/transport/context.js';
+import type { ApiActor } from '../../../../api/backend/transport/context.js';
 import type { InstancesRepository } from '../../../../persistence/backend/repositories/models.js';
 import type { InstanceEntityService } from '../../../../instance/backend/serializers/InstanceEntityService.js';
 import type { MetaService } from '../../../../instance/backend/services/MetaService.js';
 import { sqlLikeEscape } from '../../../../persistence/backend/utility/sql-like-escape.js';
-import * as v from 'valibot';
 export interface FederationInstancesDependencies {
 	instancesRepository: Pick<InstancesRepository, 'createQueryBuilder'>;
 	instanceEntityService: Pick<InstanceEntityService, 'packMany'>;
 	metaService: Pick<MetaService, 'fetch'>;
 }
 export function createFederationInstancesProcedure<Actor extends ApiActor>(deps: FederationInstancesDependencies) {
-	return implement(federationInstancesContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>()
-		.use(authentication<Actor>())
-		.use(apiPolicy<Actor>({ name: federationInstancesContract['~orpc'].meta.requestName }))
+	return createApiProcedure<Actor>()(federationInstancesContract)
 		.handler(async ({ input, context }) => {
 			const ps = input;
 			const me = context.principal;
@@ -105,8 +103,8 @@ export function createFederationInstancesProcedure<Actor extends ApiActor>(deps:
 					query.andWhere('instance.host like :host', { host: '%' + sqlLikeEscape(ps.host.toLowerCase()) + '%' });
 				}
 				const instances = await query.limit(ps.limit).offset(ps.offset).getMany();
-				return await deps.instanceEntityService.packMany(instances, me);
+				return (await deps.instanceEntityService.packMany(instances, me)).map(toFederationInstance);
 			})();
-			return v.parse(federationInstancesContract['~orpc'].outputSchema!, result);
+			return result;
 		});
 }

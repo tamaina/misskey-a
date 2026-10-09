@@ -3,9 +3,9 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { implement } from '@orpc/server';
-import { authentication, apiPolicy, requirePrincipal } from '../../../../api/backend/transport/middleware.js';
-import type { ApiContext } from '../../../../api/backend/transport/context.js';
+import { toPackedReversiGameDetailed } from '../../reversi.schema.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import { requirePrincipal } from '../../../../api/backend/transport/middleware.js';
 import { reversiMatchContract, reversiMatchErrors } from './match.contract.js';
 import type { ReversiService } from '../../services/ReversiService.js';
 import type { ReversiGameEntityService } from '../../serializers/ReversiGameEntityService.js';
@@ -18,9 +18,7 @@ export interface ReversiMatchDependencies {
 	reversiGameEntityService: Pick<ReversiGameEntityService, 'packDetail'>;
 }
 export function createReversiMatchProcedure(deps: ReversiMatchDependencies) {
-	return implement(reversiMatchContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>()
-		.use(authentication<MiLocalUser>())
-		.use(apiPolicy<MiLocalUser>({ name: reversiMatchContract['~orpc'].meta.requestName, requireCredential: true, kind: 'write:account' }))
+	return createApiProcedure<MiLocalUser>()(reversiMatchContract)
 		.use(requirePrincipal<MiLocalUser>())
 		.handler(async ({ input: ps, context }) => {
 			const me = context.principal;
@@ -33,6 +31,6 @@ export function createReversiMatchProcedure(deps: ReversiMatchDependencies) {
 				? await deps.reversiService.matchSpecificUser(me, target, ps.multiple)
 				: await deps.reversiService.matchAnyUser(me, { noIrregularRules: ps.noIrregularRules }, ps.multiple);
 			if (game == null) return;
-			return await deps.reversiGameEntityService.packDetail(game);
+			return toPackedReversiGameDetailed(await deps.reversiGameEntityService.packDetail(game));
 		});
 }

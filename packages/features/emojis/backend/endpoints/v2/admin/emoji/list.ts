@@ -2,13 +2,15 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-import { implement } from '@orpc/server';
-import type { ApiActor, ApiContext } from '@features/api/backend/transport/context.js';
-import { authentication, apiPolicy, requirePrincipal } from '@features/api/backend/transport/middleware.js';
+
+import { toEmojiDetailedAdmin } from '../../../../emoji-output.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import type { ApiActor } from '@features/api/backend/transport/context.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
 import { emojisContract } from '../../../../api.definition.js';
 import type { EmojisDependencies } from '../../../../api.implementation.js';
 export function createV2ListProcedure<Actor extends ApiActor>(deps: Pick<EmojisDependencies<Actor>, 'customEmojiService' | 'idService' | 'emojiEntityService'>) {
-	return implement(emojisContract.v2List, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>().use(authentication<Actor>()).use(apiPolicy<Actor>({ name: 'v2/admin/emoji/list', requireCredential: true, requiredRolePolicy: 'canManageCustomEmojis', kind: 'read:admin:emoji' })).use(requirePrincipal<Actor>())
+	return createApiProcedure<Actor>()(emojisContract.v2List).use(requirePrincipal<Actor>())
 		.handler(async ({ input, context }) => {
 			const q = input.query;
 			const result = await deps.customEmojiService.fetchEmojis({
@@ -21,7 +23,7 @@ export function createV2ListProcedure<Actor extends ApiActor>(deps: Pick<EmojisD
 				untilId: input.untilId ?? (input.untilDate ? deps.idService.gen(input.untilDate) : undefined),
 			}, { limit: input.limit, page: input.page, sortKeys: input.sortKeys });
 			return {
-				emojis: await deps.emojiEntityService.packDetailedAdminMany(result.emojis),
+				emojis: (await deps.emojiEntityService.packDetailedAdminMany(result.emojis)).map(toEmojiDetailedAdmin),
 				count: result.count, allCount: result.allCount, allPages: result.allPages,
 			};
 		});
