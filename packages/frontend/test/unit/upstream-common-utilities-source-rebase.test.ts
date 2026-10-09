@@ -14,7 +14,7 @@ const root = resolve(import.meta.dirname, '../../../..');
 const sha256 = (source: string) => createHash('sha256').update(source).digest('hex');
 
 test.each(rebases)('$file restores the frozen body and rejects any unreviewed body or locale edit', proof => {
-	const source = readFileSync(resolve(root, proof.file), 'utf8');
+	const source = readFileSync(resolve(root, proof.currentFile), 'utf8');
 	const restored = restoreCommonUtilitiesBaseline(proof.file, source);
 	const localeStart = restored.search(/<locale\s/);
 	const body = localeStart < 0 ? restored : restored.slice(0, localeStart);
