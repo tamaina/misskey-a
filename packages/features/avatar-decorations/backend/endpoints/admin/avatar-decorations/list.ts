@@ -12,8 +12,7 @@ export interface AvatarDecorationListDependencies<Actor extends ApiActor> {
 	idService: Pick<AvatarDecorationsDependencies<Actor>['idService'], 'parse'>;
 }
 export function createAvatarDecorationListProcedure<Actor extends ApiActor>(deps: AvatarDecorationListDependencies<Actor>) {
-	const procedure = createApiProcedure<Actor>();
-	return procedure(avatarDecorationsContract.list, { requireCredential: true, requiredRolePolicy: 'canManageAvatarDecorations', kind: 'read:admin:avatar-decorations' })
+	return createApiProcedure<Actor>()(avatarDecorationsContract.list)
 		.use(requirePrincipal<Actor>())
 		.handler(async () => {
 			return (await deps.avatarDecorationService.getAll(true)).map(row => ({

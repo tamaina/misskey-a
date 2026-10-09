@@ -14669,7 +14669,10 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "admin/avatar-decorations/create"
+					"requestName": "admin/avatar-decorations/create",
+					"requireCredential": true,
+					"requiredRolePolicy": "canManageAvatarDecorations",
+					"kind": "write:admin:avatar-decorations"
 				},
 				"route": {
 					"method": "POST",
@@ -14716,7 +14719,10 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "admin/avatar-decorations/delete"
+					"requestName": "admin/avatar-decorations/delete",
+					"requireCredential": true,
+					"requiredRolePolicy": "canManageAvatarDecorations",
+					"kind": "write:admin:avatar-decorations"
 				},
 				"route": {
 					"method": "POST",
@@ -14764,7 +14770,10 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "admin/avatar-decorations/list"
+					"requestName": "admin/avatar-decorations/list",
+					"requireCredential": true,
+					"requiredRolePolicy": "canManageAvatarDecorations",
+					"kind": "read:admin:avatar-decorations"
 				},
 				"route": {
 					"method": "POST",
@@ -14811,7 +14820,10 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "admin/avatar-decorations/update"
+					"requestName": "admin/avatar-decorations/update",
+					"requireCredential": true,
+					"requiredRolePolicy": "canManageAvatarDecorations",
+					"kind": "write:admin:avatar-decorations"
 				},
 				"route": {
 					"method": "POST",
@@ -14859,7 +14871,8 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "get-avatar-decorations"
+					"requestName": "get-avatar-decorations",
+					"requireCredential": false
 				},
 				"route": {
 					"method": "POST",

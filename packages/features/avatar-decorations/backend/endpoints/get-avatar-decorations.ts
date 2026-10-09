@@ -11,8 +11,7 @@ export interface GetAvatarDecorationsDependencies<Actor extends ApiActor> {
 	readRoles: AvatarDecorationsDependencies<Actor>['readRoles'];
 }
 export function createGetAvatarDecorationsProcedure<Actor extends ApiActor>(deps: GetAvatarDecorationsDependencies<Actor>) {
-	const procedure = createApiProcedure<Actor>();
-	return procedure(avatarDecorationsContract.get)
+	return createApiProcedure<Actor>()(avatarDecorationsContract.get)
 		.handler(async ({ context }) => {
 			const actor = context.principal;
 			const decorations = await deps.avatarDecorationService.getAll(true);
