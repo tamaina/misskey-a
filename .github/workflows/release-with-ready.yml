@@ -1,0 +1,33 @@
+# Based on release-manager-actions v2 README Installation 2 (iii).
+name: "Release Manager: prerelease when ready for review"
+
+on:
+  pull_request:
+    branches: [main]
+    types: [ready_for_review]
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+concurrency:
+  group: release-manager
+  cancel-in-progress: false
+
+jobs:
+  release:
+    if: >-
+      github.event.repository.default_branch == 'develop' &&
+      github.event.pull_request.head.ref == 'develop' &&
+      github.event.pull_request.head.repo.full_name == github.repository
+    uses: misskey-dev/release-manager-actions/.github/workflows/create-prerelease.yml@v2
+    with:
+      pr_number: ${{ format('{0}', github.event.pull_request.number) }}
+      user: 'github-actions[bot]'
+      package_jsons_to_rewrite: 'package.json'
+      use_external_app_to_release: false
+      indent: 'tab'
+      draft_prerelease_channel: alpha
+      ready_start_prerelease_channel: beta
+      reset_number_on_channel_change: true

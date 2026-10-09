@@ -52,9 +52,11 @@ The Committers may:
 ## Releases
 
 Use **Release Manager [Dispatch]** (`.github/workflows/release-with-dispatch.yml`) on `develop`.
+Following the [v2 installation guide](https://github.com/misskey-dev/release-manager-actions/blob/v2/README.md), this repository includes dispatch, changelog-sync and ready-for-review workflows. `STABLE_BRANCH`, `PACKAGE_JSONS_TO_REWRITE` and `INDENT` are specified in those workflows as `main`, `package.json` and `tab`; no repository variables are needed for this path. The optional external App is disabled.
+
 Before enabling releases, maintainers must create `develop` from the adopted `main`, make it the default branch, and configure required review/check rules on `main`. Merge commits and Actions PR creation must be allowed. This workflow does not change those settings.
 
-Run with `merge=false` and `start-rc=false` to prepare a draft `develop` → `main` release PR and an alpha release. Mark the PR ready and obtain an independent reviewer approval; subsequent runs create beta/RC releases. Run with `merge=true` only after approval and every HEAD check succeeds. Bot authors cannot approve their own release PR; `reviewDecision` must be `APPROVED` under the configured review rules.
+Run with `merge=false` and `start-rc=false` to prepare a draft `develop` → `main` release PR and an alpha release. The README's `release-with-ready.yml` creates a beta prerelease when the release PR is marked ready (the current v2 template uses beta despite its older RC label). Obtain an independent reviewer approval; subsequent dispatch runs create beta/RC releases. Run with `merge=true` only after approval and every HEAD check succeeds. Bot authors cannot approve their own release PR; `reviewDecision` must be `APPROVED` under the configured review rules.
 
 The existing v2 action uses `GITHUB_TOKEN` to push version/changelog commits to `develop` and tags, create releases, and merge into `main`. Strict PR-only protection on `develop` blocks those pushes; do not add a bypass to make it work. The merge action itself invokes `--admin`, so the caller refuses a `BLOCKED` PR before handing off. Its version push, tag, release and merge are separate operations: a later failure can leave partial release state. Review the upstream action and branch policy compatibility before running it.
 
