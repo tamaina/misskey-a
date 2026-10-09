@@ -36,7 +36,7 @@ async function ownerScript(filename: string): Promise<string> {
 
 	const plugin = pluginVvi();
 	hook(plugin.configResolved, { root: resolve(root, 'packages/frontend'), command: 'serve', base: '/', build: { ssr: false } });
-	hook(plugin.buildStart);
+	// transform collects this owner; generated() retains the full SFC scan.
 	const transformed = await hook(plugin.transform, readFileSync(filename, 'utf8'), filename);
 	if (!transformed || typeof transformed !== 'object' || !('code' in transformed) || typeof transformed.code !== 'string') throw new Error('Expected transformed owner SFC');
 	const script = compileScript(parse(transformed.code, { filename }).descriptor, { id: filename }).content;
