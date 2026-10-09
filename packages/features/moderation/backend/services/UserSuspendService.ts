@@ -4,15 +4,14 @@
  */
 
 import { Inject, Injectable } from '@nestjs/common';
-import { Not, IsNull } from 'typeorm';
 import type { FollowingsRepository, FollowRequestsRepository, UsersRepository } from '@features/persistence/backend/repositories/models.js';
 import type { MiUser } from '@features/users/backend/models/User.js';
-import { QueueService } from '@features/runtime/backend/services/QueueService.js';
 import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
 import { DI } from '@/di-symbols.js';
 import { ApRendererService } from '@features/federation/backend/services/ApRendererService.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import { bindThis } from '@features/runtime/backend/decorators.js';
+import { ApDeliverManagerService } from '@features/federation/backend/services/ApDeliverManagerService.js';
 import { ModerationLogService } from './ModerationLogService.js';
 
 @Injectable()
@@ -28,9 +27,9 @@ export class UserSuspendService {
 		private followRequestsRepository: FollowRequestsRepository,
 
 		private userEntityService: UserEntityService,
-		private queueService: QueueService,
 		private globalEventService: GlobalEventService,
 		private apRendererService: ApRendererService,
+		private apDeliverManagerService: ApDeliverManagerService,
 		private moderationLogService: ModerationLogService,
 	) {
 	}
@@ -77,31 +76,11 @@ export class UserSuspendService {
 		});
 
 		if (this.userEntityService.isLocalUser(user)) {
-			// 知り得る全SharedInboxにDelete配信
 			const content = this.apRendererService.addContext(this.apRendererService.renderDelete(this.userEntityService.genLocalUserUri(user.id), user));
-
-			const queue: string[] = [];
-
-			const followings = await this.followingsRepository.find({
-				where: [
-					{ followerSharedInbox: Not(IsNull()) },
-					{ followeeSharedInbox: Not(IsNull()) },
-				],
-				select: {
-					followerSharedInbox: true,
-					followeeSharedInbox: true,
-				},
-			});
-
-			const inboxes = followings.map(x => x.followerSharedInbox ?? x.followeeSharedInbox);
-
-			for (const inbox of inboxes) {
-				if (inbox != null && !queue.includes(inbox)) queue.push(inbox);
-			}
-
-			for (const inbox of queue) {
-				this.queueService.deliver(user, content, inbox, true);
-			}
+			const manager = this.apDeliverManagerService.createDeliverManager(user, content);
+			manager.addAllKnowingSharedInboxRecipe();
+			manager.addFollowersRecipe();
+			await manager.execute();
 		}
 	}
 
@@ -110,31 +89,11 @@ export class UserSuspendService {
 		this.globalEventService.publishInternalEvent('userChangeSuspendedState', { id: user.id, isSuspended: false });
 
 		if (this.userEntityService.isLocalUser(user)) {
-			// 知り得る全SharedInboxにUndo Delete配信
 			const content = this.apRendererService.addContext(this.apRendererService.renderUndo(this.apRendererService.renderDelete(this.userEntityService.genLocalUserUri(user.id), user), user));
-
-			const queue: string[] = [];
-
-			const followings = await this.followingsRepository.find({
-				where: [
-					{ followerSharedInbox: Not(IsNull()) },
-					{ followeeSharedInbox: Not(IsNull()) },
-				],
-				select: {
-					followerSharedInbox: true,
-					followeeSharedInbox: true,
-				},
-			});
-
-			const inboxes = followings.map(x => x.followerSharedInbox ?? x.followeeSharedInbox);
-
-			for (const inbox of inboxes) {
-				if (inbox != null && !queue.includes(inbox)) queue.push(inbox);
-			}
-
-			for (const inbox of queue) {
-				this.queueService.deliver(user as any, content, inbox, true);
-			}
+			const manager = this.apDeliverManagerService.createDeliverManager(user, content);
+			manager.addAllKnowingSharedInboxRecipe();
+			manager.addFollowersRecipe();
+			await manager.execute();
 		}
 	}
 

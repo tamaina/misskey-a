@@ -28,6 +28,9 @@ import { ApRendererService } from '@features/federation/backend/services/ApRende
 import { ModerationLogService } from '@features/moderation/backend/services/ModerationLogService.js';
 import { secureRndstr } from '@features/auth/backend/utility/secure-rndstr.js';
 import { randomString } from '../utils.js';
+import { ApDeliverManagerService } from '@features/federation/backend/services/ApDeliverManagerService.js';
+import { RelayService } from '@features/federation/backend/services/RelayService.js';
+import { ApLoggerService } from '@features/federation/backend/services/ApLoggerService.js';
 
 function genHost() {
 	return randomString() + '.example.com';
@@ -88,6 +91,7 @@ describe('UserSuspendService', () => {
 			imports: [GlobalModule],
 			providers: [
 				UserSuspendService,
+				ApDeliverManagerService,
 				{
 					provide: UserEntityService,
 					useFactory: () => ({
@@ -98,6 +102,7 @@ describe('UserSuspendService', () => {
 				{
 					provide: QueueService,
 					useFactory: () => ({
+						deliverMany: vi.fn(),
 						deliver: vi.fn(),
 					}),
 				},
@@ -108,17 +113,35 @@ describe('UserSuspendService', () => {
 					}),
 				},
 				{
-					provide: ApRendererService,
-					useFactory: () => ({
-						addContext: vi.fn(),
-						renderDelete: vi.fn(),
-						renderUndo: vi.fn(),
-					}),
-				},
-				{
 					provide: ModerationLogService,
 					useFactory: () => ({
 						log: vi.fn(),
+					}),
+				},
+				{
+					provide: RelayService,
+					useFactory: () => ({
+						deliverToRelays: vi.fn(),
+					}),
+				},
+				{
+					provide: ApRendererService,
+					useFactory: () => ({
+						renderDelete: vi.fn(),
+						renderUndo: vi.fn(),
+						renderPerson: vi.fn(),
+						renderUpdate: vi.fn(),
+						addContext: vi.fn(),
+					}),
+				},
+				{
+					provide: ApLoggerService,
+					useFactory: () => ({
+						logger: {
+							createSubLogger: vi.fn().mockReturnValue({
+								info: vi.fn(), error: vi.fn(), warn: vi.fn(), debug: vi.fn(),
+							}),
+						},
 					}),
 				},
 			],
@@ -329,7 +352,9 @@ describe('UserSuspendService', () => {
 			apRendererService.addContext.mockReturnValue({ '@context': '...', type: 'Delete' } as any);
 
 			await userSuspendService.suspend(localUser, moderator);
-			await setTimeout(250);
+			await vi.waitFor(() => expect(queueService.deliverMany).toHaveBeenCalledWith(
+				{ id: localUser.id }, expect.objectContaining({ type: 'Delete' }), expect.any(Map),
+			));
 
 			// ActivityPub配信が呼ばれているかチェック
 			expect(userEntityService.isLocalUser).toHaveBeenCalledWith(localUser);
@@ -348,7 +373,9 @@ describe('UserSuspendService', () => {
 			apRendererService.addContext.mockReturnValue({ '@context': '...', type: 'Undo' } as any);
 
 			await userSuspendService.unsuspend(localUser, moderator);
-			await setTimeout(250);
+			await vi.waitFor(() => expect(queueService.deliverMany).toHaveBeenCalledWith(
+				{ id: localUser.id }, expect.objectContaining({ type: 'Undo' }), expect.any(Map),
+			));
 
 			// ActivityPub配信が呼ばれているかチェック
 			expect(userEntityService.isLocalUser).toHaveBeenCalledWith(localUser);
@@ -370,6 +397,7 @@ describe('UserSuspendService', () => {
 			expect(userEntityService.isLocalUser).toHaveBeenCalledWith(remoteUser);
 			expect(apRendererService.renderDelete).not.toHaveBeenCalled();
 			expect(queueService.deliver).not.toHaveBeenCalled();
+			expect(queueService.deliverMany).not.toHaveBeenCalled();
 		});
 	});
 
@@ -394,6 +422,7 @@ describe('UserSuspendService', () => {
 
 			// ActivityPub配信が呼ばれていないことを確認
 			expect(queueService.deliver).not.toHaveBeenCalled();
+			expect(queueService.deliverMany).not.toHaveBeenCalled();
 		});
 	});
 
@@ -419,6 +448,7 @@ describe('UserSuspendService', () => {
 
 			// ActivityPub配信が呼ばれていないことを確認
 			expect(queueService.deliver).not.toHaveBeenCalled();
+			expect(queueService.deliverMany).not.toHaveBeenCalled();
 		});
 	});
 });
