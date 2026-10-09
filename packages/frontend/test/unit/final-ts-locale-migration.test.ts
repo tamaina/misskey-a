@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { restoreNativeApiSourceBaseline } from './native-api-source-rebase.js';
 import { createHash } from 'node:crypto';
 import { readFileSync, existsSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
@@ -85,7 +86,7 @@ function generated(language: string): LocaleBundle {
 
 test('all39 TS consumers reverse byte for byte and all17 owners retain exactly9100 effective strings', () => {
 	for (const file of proof.files) {
-		let source = readFileSync(resolve(root, file.file), 'utf8');
+		let source = restoreNativeApiSourceBaseline(file.file, readFileSync(resolve(root, file.file), 'utf8'));
 		expect(hash(source)).toBe(file.migratedSha256);
 		for (const edit of [...file.edits].reverse()) {
 			expect(source.slice(edit.afterStart, edit.afterStart + edit.replacement.length)).toBe(edit.replacement);

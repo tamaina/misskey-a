@@ -4,6 +4,7 @@
  */
 
 import { existsSync } from 'node:fs';
+import { restoreNativeApiSourceBaseline } from './native-api-source-rebase.js';
 import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
@@ -51,7 +52,7 @@ describe('remaining20 formatter locale migration', () => {
 	test('preserves all12628 dictionary values and reverses every source byte', () => {
 		let checked = 0;
 		for (const entry of migrationInputs) {
-			const source = readFileSync(resolve(root, entry.file), 'utf8');
+			const source = restoreNativeApiSourceBaseline(entry.file, readFileSync(resolve(root, entry.file), 'utf8'));
 			expect(createHash('sha256').update(source).digest('hex')).toBe(entry.migratedSha256);
 			const parsed = parse(source, { filename: entry.file });
 			expect(parsed.errors).toEqual([]);

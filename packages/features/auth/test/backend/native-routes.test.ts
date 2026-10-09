@@ -6,6 +6,10 @@
 import { expect, test, vi } from 'vitest';
 import { mockDeep } from 'vitest-mock-extended';
 import { call } from '@orpc/server';
+import { OpenAPIHandler } from '@orpc/openapi/fastify';
+import Fastify from 'fastify';
+import { misskeyErrorBody } from '@features/api/backend/transport/orpc-error.js';
+import { registerPilotHttp } from '@features/api/backend/transport/pilot-http.js';
 import * as v from 'valibot';
 import bcrypt from 'bcryptjs';
 import { createAuthRouter, type AuthContext, type AuthOperations } from '../../backend/api.router.js';
@@ -31,7 +35,7 @@ function harness() {
 	return { services, operations, context, router: createAuthRouter<ApiActor>() };
 }
 
-test('all 39 native auth routes retain policy-before-input validation', async () => {
+test('all 39 native auth routes retain secure policy enforcement', async () => {
 	expect(Object.keys(authContract)).toHaveLength(39);
 	const h = harness();
 	h.services.authenticate.mockResolvedValue([actor, { permission: ['write:account'] }]);
@@ -40,6 +44,32 @@ test('all 39 native auth routes retain policy-before-input validation', async ()
 	h.services.authenticate.mockResolvedValue([null, null]);
 	await expect(call(h.router['i/2fa/key-done'], { password: 'password', name: '', credential: null }, { context: h.context })).rejects.toMatchObject({ code: 'ACCESS_DENIED' });
 	for (const value of [undefined, null, 5, true, ['ignored'], { ignored: { future: true } }]) expect(v.safeParse(emptyAdminCaptchaCurrentInput, value).success).toBe(true);
+});
+
+test('malformed HTTP inputs fail authentication and secure-token policy before input validation', async () => {
+	const h = harness();
+	const handler = new OpenAPIHandler(h.router, { customErrorResponseBodyEncoder: misskeyErrorBody });
+	const app = Fastify();
+	await app.register(async api => registerPilotHttp(api, handler, {
+		maxFileSize: 1024, context: () => h.context, runSpan: (_name, run) => run(),
+	}), { prefix: '/api' });
+	try {
+		h.services.authenticate.mockResolvedValue([actor, { permission: ['write:account'] }]);
+		const secure = await app.inject({ method: 'POST', url: '/api/i/change-password', payload: { currentPassword: 42, newPassword: null } });
+		expect(secure.statusCode).toBe(400);
+		expect(secure.json()).toMatchObject({ error: { code: 'ACCESS_DENIED', id: '56f35758-7dd5-468b-8439-5d6fb8ec9b8e' } });
+		h.services.authenticate.mockResolvedValue([null, null]);
+		const anonymous = await app.inject({ method: 'POST', url: '/api/i/2fa/key-done', payload: { password: 42, name: false, credential: [] } });
+		expect(anonymous.statusCode).toBe(400);
+		expect(anonymous.json()).toMatchObject({ error: { code: 'ACCESS_DENIED' } });
+		h.services.authenticate.mockResolvedValue([actor, null]);
+		const authenticated = await app.inject({ method: 'POST', url: '/api/i/change-password', payload: { currentPassword: 42, newPassword: null } });
+		expect(authenticated.statusCode).toBe(400);
+		expect(authenticated.json()).toMatchObject({ error: { code: 'INVALID_PARAM' } });
+		expect(h.services.authenticate).toHaveBeenCalledTimes(3);
+		expect(h.operations['i/change-password']).not.toHaveBeenCalled();
+		expect(h.operations['i/2fa/key-done']).not.toHaveBeenCalled();
+	} finally { await app.close(); }
 });
 
 test('token revocation preserves manual credentials, own-token restriction and competing selector precedence', async () => {

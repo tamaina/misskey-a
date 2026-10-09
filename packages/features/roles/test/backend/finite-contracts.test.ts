@@ -233,6 +233,14 @@ test('legacy empty formulas survive manual and conditional create/list/show/upda
 		expect(v.parse(roleSchema, created.json())).toMatchObject({ id: legacy.id, condFormula: {}, policies: {
 			canPublicNote: { useDefault: true, priority: 0, value: true },
 		} });
+		// Federation fixtures use the same complete condition DTO as the role editor.
+		const remoteFormula = { id: 'remote', type: 'isRemote' } as const;
+		const remote = Object.assign(new MiRole(), legacy, { target: 'conditional', condFormula: remoteFormula });
+		deps.roleService.create.mockResolvedValue(remote);
+		const remoteCreated = await app.inject({ method: 'POST', url: '/api/admin/roles/create', payload: { ...request, target: 'conditional', condFormula: remoteFormula } });
+		expect(remoteCreated.statusCode).toBe(200);
+		expect(v.parse(roleSchema, remoteCreated.json())).toMatchObject({ target: 'conditional', condFormula: remoteFormula });
+		expect(deps.roleService.create).toHaveBeenLastCalledWith({ ...request, target: 'conditional', condFormula: remoteFormula }, actor);
 		const assigned = await app.inject({ method: 'POST', url: '/api/admin/roles/assign', payload: { roleId: legacy.id, userId: 'user123' } });
 		expect(assigned.statusCode).toBe(204);
 		expect(assigned.body).toBe('');
