@@ -4,19 +4,23 @@
  */
 
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
-import type { DriveManagementInputs } from '../../../management.contract.js';
-import { Injectable } from '@nestjs/common';
-
 import { QueueService } from '@features/runtime/backend/services/QueueService.js';
-
-@Injectable()
-export class AdminDriveCleanRemoteFilesOperation {
-	constructor(
-		private queueService: QueueService,
-	) {
-	}
-
-	async execute(_ps: DriveManagementInputs['admin/drive/clean-remote-files'], _me: MiLocalUser, _ip: string, _headers: Record<string, string | string[] | undefined>) {
-		this.queueService.createCleanRemoteFilesJob();
-	}
+import { driveManagementContract } from '../../../management.contract.js';
+import { implement } from '@orpc/server';
+import { authentication, apiPolicy, requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import type { ApiContext } from '@features/api/backend/transport/context.js';
+export interface AdminDriveCleanRemoteFilesDependencies {
+	queueService: Pick<QueueService, 'createCleanRemoteFilesJob'>;
+}
+export function createAdminDriveCleanRemoteFilesProcedure(deps: AdminDriveCleanRemoteFilesDependencies) {
+	return implement(driveManagementContract['admin/drive/clean-remote-files'], { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>()
+		.use(authentication<MiLocalUser>())
+		.use(apiPolicy<MiLocalUser>({ 'name': 'admin/drive/clean-remote-files', 'requireCredential': true, 'requireModerator': true, 'kind': 'write:admin:drive' })).use(requirePrincipal<MiLocalUser>())
+		.handler(async ({ input, context }) => {
+			const _ps = input;
+			const _me = context.principal;
+			const _ip = context.ip;
+			const _headers = context.headers;
+			deps.queueService.createCleanRemoteFilesJob();
+		});
 }

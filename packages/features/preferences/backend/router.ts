@@ -13,18 +13,17 @@ import { createRegistryKeysWithTypeProcedure } from './endpoints/i/registry/keys
 import { createRegistryRemoveProcedure } from './endpoints/i/registry/remove.js';
 import { createRegistryScopesWithDomainProcedure } from './endpoints/i/registry/scopes-with-domain.js';
 import { createRegistrySetProcedure } from './endpoints/i/registry/set.js';
-import type { PreferencesContext } from './operations.js';
-import type { ApiActor } from '../../api/backend/transport/context.js';
-
-export function createPreferencesRouter<Actor extends ApiActor>() {
-	return implement(preferencesContract).$context<PreferencesContext<Actor>>().router({
-		get: createRegistryGetProcedure<Actor>(),
-		getAll: createRegistryGetAllProcedure<Actor>(),
-		getDetail: createRegistryGetDetailProcedure<Actor>(),
-		keys: createRegistryKeysProcedure<Actor>(),
-		keysWithType: createRegistryKeysWithTypeProcedure<Actor>(),
-		remove: createRegistryRemoveProcedure<Actor>(),
-		scopesWithDomain: createRegistryScopesWithDomainProcedure<Actor>(),
-		set: createRegistrySetProcedure<Actor>(),
+import type { PreferencesDependencies } from './api.dependencies.js';
+import type { ApiActor, ApiContext } from '../../api/backend/transport/context.js';
+export function createPreferencesRouter<Actor extends ApiActor>(deps: PreferencesDependencies) {
+	return implement(preferencesContract).$context<ApiContext<Actor>>().router({
+		get: createRegistryGetProcedure<Actor>(deps),
+		getAll: createRegistryGetAllProcedure<Actor>(deps),
+		getDetail: createRegistryGetDetailProcedure<Actor>(deps),
+		keys: createRegistryKeysProcedure<Actor>(deps),
+		keysWithType: createRegistryKeysWithTypeProcedure<Actor>(deps),
+		remove: createRegistryRemoveProcedure<Actor>(deps),
+		scopesWithDomain: createRegistryScopesWithDomainProcedure<Actor>(deps),
+		set: createRegistrySetProcedure<Actor>(deps),
 	});
 }

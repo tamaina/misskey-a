@@ -6,14 +6,16 @@
 import type { InferSchemaOutput } from '@orpc/contract';
 import { expect, expectTypeOf, test, vi } from 'vitest';
 import * as v from 'valibot';
+import { createProcedureClient } from '@orpc/server';
+import type { ApiContext } from '@features/api/backend/transport/context.js';
 import { mockDeep } from 'vitest-mock-extended';
 import { ModuleRef } from '@nestjs/core';
 import { notesDraftsCountContract } from '../../backend/endpoints/notes/drafts/count.contract.js';
 import { notesShowPartialBulkContract } from '../../backend/endpoints/notes/show-partial-bulk.contract.js';
 import { notesTranslateContract } from '../../backend/endpoints/notes/translate.contract.js';
-import { NotesDraftsCountOperation as CountOperation } from '../../backend/endpoints/notes/drafts/count.js';
-import { NotesShowPartialBulkOperation as PartialOperation } from '../../backend/endpoints/notes/show-partial-bulk.js';
-import { NotesTranslateOperation as TranslateOperation } from '../../backend/endpoints/notes/translate.js';
+import { createNotesDraftsCountProcedure as CountOperation } from '../../backend/endpoints/notes/drafts/count.js';
+import { createNotesShowPartialBulkProcedure as PartialOperation } from '../../backend/endpoints/notes/show-partial-bulk.js';
+import { createNotesTranslateProcedure as TranslateOperation } from '../../backend/endpoints/notes/translate.js';
 import { NoteEntityService } from '../../backend/serializers/NoteEntityService.js';
 import { MiNote } from '../../backend/models/Note.js';
 import { packedNoteSchema } from '../../backend/note.schema.js';
@@ -67,8 +69,8 @@ test('draft count handler retains author filtering and scalar response', async (
 	query.where.mockReturnValue(query);
 	query.getCount.mockResolvedValue(7);
 	const user = mockDeep<MiLocalUser>({ id: 'user123' });
-	const endpoint = new CountOperation(repository);
-	expect(await endpoint.execute(v.parse(requiredSchema(notesDraftsCountContract['~orpc'].inputSchema), { i: 'transport' }), user)).toBe(7);
+	const endpoint = CountOperation({ noteDraftsRepository: repository });
+	expect(await createProcedureClient(endpoint, { context: apiTestContext(user) })(v.parse(requiredSchema(notesDraftsCountContract['~orpc'].inputSchema), { i: 'transport' }))).toBe(7);
 	expect(query.where).toHaveBeenCalledWith('drafts.userId = :meId', { meId: user.id });
 });
 
@@ -90,8 +92,8 @@ test.each([false, true])('real partial serializer emits exactly the documented f
 	buffering.mergeReactions.mockReturnValue(item.reactions);
 	reaction.convertLegacyReactions.mockReturnValue(item.reactions);
 	emoji.populateEmojis.mockResolvedValue(item.reactionEmojis);
-	const endpoint = new PartialOperation(serializer);
-	const result = await endpoint.execute({ noteIds: [visible.id, hidden.id] }, null);
+	const endpoint = PartialOperation({ noteEntityService: serializer });
+	const result = await createProcedureClient(endpoint, { context: apiTestContext(null) })({ noteIds: [visible.id, hidden.id] });
 	expect(result).toEqual([item]);
 	expect(v.parse(requiredSchema(notesShowPartialBulkContract['~orpc'].outputSchema), result)).toEqual(result);
 	expect(Object.keys(result[0])).toEqual(['id', 'reactions', 'reactionEmojis']);
@@ -114,15 +116,15 @@ test.each([false, true])('translate handler projects provider response and retai
 	const response = mockDeep<Awaited<ReturnType<HttpRequestService['send']>>>();
 	response.json.mockResolvedValue({ translations: [{ detected_source_language: 'JA', text: 'hello', providerExtra: true }], providerExtra: true });
 	http.send.mockResolvedValue(response);
-	const endpoint = new TranslateOperation(settings, notes, getter, http, roles);
-	const result = await endpoint.execute({ noteId: note.id, targetLang: 'en-US' }, user);
+	const endpoint = TranslateOperation({ serverSettings: settings, noteEntityService: notes, getterService: getter, httpRequestService: http, roleService: roles });
+	const result = await createProcedureClient(endpoint, { context: apiTestContext(user) })({ noteId: note.id, targetLang: 'en-US' });
 	expect(result).toEqual(translation);
 	expect(v.parse(requiredSchema(notesTranslateContract['~orpc'].outputSchema), result)).toEqual(result);
 	expect(Object.keys(result!)).toEqual(['sourceLang', 'text']);
 	expect(http.send.mock.calls[0][0]).toBe(deeplIsPro ? 'https://api.deepl.com/v2/translate' : 'https://api-free.deepl.com/v2/translate');
 	expect(new URLSearchParams(String(http.send.mock.calls[0][1]?.body)).get('target_lang')).toBe('en');
 	note.text = ' ';
-	expect(await endpoint.execute({ noteId: note.id, targetLang: 'en-US' }, user)).toBeUndefined();
+	expect(await createProcedureClient(endpoint, { context: apiTestContext(user) })({ noteId: note.id, targetLang: 'en-US' })).toBeUndefined();
 	expect(http.send).toHaveBeenCalledTimes(1);
 });
 
@@ -184,4 +186,12 @@ test.each([false, true])('real Note serializer preserves native undefined and JS
 function requiredSchema<Schema>(schema: Schema | undefined): Schema {
 	if (schema === undefined) throw new Error('Missing endpoint contract schema');
 	return schema;
+}
+
+function apiTestContext(actor: MiLocalUser | null): ApiContext<MiLocalUser> {
+	if (actor !== null) { actor.isSuspended = false; actor.movedToUri = null; }
+	const context = mockDeep<ApiContext<MiLocalUser>>({ credential: actor ? 'fixture' : null, ip: '127.0.0.1', headers: {} });
+	context.services.authenticate.mockResolvedValue([actor, null]);
+	context.services.limitActor.mockReturnValue(null);
+	return context;
 }

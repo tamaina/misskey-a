@@ -2,18 +2,15 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-
-import { Inject, Injectable } from '@nestjs/common';
-
 import type { RegistrationTicketsRepository } from '@features/persistence/backend/repositories/models.js';
 import { RoleService } from '@features/roles/backend/services/RoleService.js';
-import { DI } from '@/di-symbols.js';
 import { apiError } from '@features/api/backend/transport/orpc-error.js';
-
-import type * as v from 'valibot';
-import type { InviteDeleteContract } from '../../api.contract.js';
+import * as v from 'valibot';
+import { InviteDeleteContract } from '../../api.contract.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
-
+import { implement } from '@orpc/server';
+import { authentication, apiPolicy, requirePrincipal } from '../../../../api/backend/transport/middleware.js';
+import type { ApiContext } from '../../../../api/backend/transport/context.js';
 export const meta = {
 	tags: ['meta'],
 
@@ -41,32 +38,37 @@ export const meta = {
 		},
 	},
 } as const;
+export interface InviteDeleteDependencies {
+	registrationTicketsRepository: RegistrationTicketsRepository;
+	roleService: Pick<RoleService, 'isModerator'>;
+}
+export function createInviteDeleteProcedure(deps: InviteDeleteDependencies) {
+	return implement(InviteDeleteContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>().use(authentication<MiLocalUser>()).use(apiPolicy<MiLocalUser>({ name: 'invite/delete', requireCredential: true, kind: 'write:invite-codes', requiredRolePolicy: 'canInvite' })).use(requirePrincipal<MiLocalUser>()).handler(async ({ input, context }) => {
+		const ps = input;
+		const me = context.principal;
+		const result = await (async () => {
+			const ticket = await deps.registrationTicketsRepository.findOneBy({ id: ps.inviteId });
+			const isModerator = await deps.roleService.isModerator(me);
 
-@Injectable()
-export class InviteDeleteOperation {
-	constructor(
-		@Inject(DI.registrationTicketsRepository)
-		private registrationTicketsRepository: RegistrationTicketsRepository,
+			if (ticket == null) {
+				throw apiError(meta.errors.noSuchCode);
+			}
 
-		private roleService: RoleService,
-	) {}
+			if (ticket.createdById !== me.id && !isModerator) {
+				throw apiError(meta.errors.accessDenied);
+			}
 
-	async execute(ps: v.InferOutput<NonNullable<typeof InviteDeleteContract['~orpc']['inputSchema']>>, me: MiLocalUser) {
-		const ticket = await this.registrationTicketsRepository.findOneBy({ id: ps.inviteId });
-		const isModerator = await this.roleService.isModerator(me);
+			if (ticket.usedAt && !isModerator) {
+				throw apiError(meta.errors.cantDelete);
+			}
 
-		if (ticket == null) {
-			throw apiError(meta.errors.noSuchCode);
-		}
+			await deps.registrationTicketsRepository.delete(ticket.id);
+		})();
+		return v.parse(requiredSchema(InviteDeleteContract['~orpc'].outputSchema), result);
+	});
+}
 
-		if (ticket.createdById !== me.id && !isModerator) {
-			throw apiError(meta.errors.accessDenied);
-		}
-
-		if (ticket.usedAt && !isModerator) {
-			throw apiError(meta.errors.cantDelete);
-		}
-
-		await this.registrationTicketsRepository.delete(ticket.id);
-	}
+function requiredSchema<Schema>(schema: Schema | undefined): Schema {
+	if (schema === undefined) throw new Error('Contract must declare its schema');
+	return schema;
 }

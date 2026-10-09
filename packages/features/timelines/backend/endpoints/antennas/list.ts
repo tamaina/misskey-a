@@ -6,13 +6,24 @@
 import { implement } from '@orpc/server';
 import { authentication, apiPolicy, requirePrincipal } from '../../../../api/backend/transport/middleware.js';
 import { antennasListContract } from './list.contract.js';
-import type { ApiActor } from '../../../../api/backend/transport/context.js';
-import type { TimelinesContext } from '../../operations.js';
-
-export function createAntennasListProcedure<Actor extends ApiActor>() {
-	return implement(antennasListContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<TimelinesContext<Actor>>()
+import { AntennaEntityService } from '../../serializers/AntennaEntityService.js';
+import type { AntennasRepository } from '@features/persistence/backend/repositories/models.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+import type { ApiContext } from '@features/api/backend/transport/context.js';
+export interface AntennasListDependencies {
+	antennasRepository: AntennasRepository;
+	antennaEntityService: AntennaEntityService;
+}
+export function createAntennasListProcedure<Actor extends MiLocalUser>(deps: AntennasListDependencies) {
+	return implement(antennasListContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>()
 		.use(authentication<Actor>())
-		.use(apiPolicy<Actor>({ name: 'antennas/list', requireCredential: true, kind: 'read:account' }))
+		.use(apiPolicy<Actor>({ name: antennasListContract['~orpc'].meta.requestName, requireCredential: true, kind: 'read:account' }))
 		.use(requirePrincipal<Actor>())
-		.handler(({ input, context }) => context.operations.timelines.antennasList(input, context.principal));
+		.handler(async ({ input, context }) => {
+			const me = context.principal;
+			const antennas = await deps.antennasRepository.findBy({
+				userId: me.id,
+			});
+			return await Promise.all(antennas.map(x => deps.antennaEntityService.pack(x)));
+		});
 }

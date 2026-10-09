@@ -2,8 +2,6 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-
-import { Inject, Injectable } from '@nestjs/common';
 import ms from 'ms';
 import bcrypt from 'bcryptjs';
 
@@ -11,16 +9,17 @@ import type { MiMeta, UserProfilesRepository } from '@features/persistence/backe
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import { EmailService } from '@features/email/backend/services/EmailService.js';
 import type { Config } from '@/config.js';
-import { DI } from '@/di-symbols.js';
 import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
 import { L_CHARS, secureRndstr } from '../../utility/secure-rndstr.js';
 import { UserAuthService } from '../../services/UserAuthService.js';
 import { apiError } from '@features/api/backend/transport/orpc-error.js';
-
-import type * as v from 'valibot';
-import type { IUpdateEmailContract } from '../../api.contract.js';
+import * as v from 'valibot';
+import { IUpdateEmailContract } from '../../api.contract.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
-
+import { implement } from '@orpc/server';
+import { authentication, apiPolicy, requirePrincipal } from '../../../../api/backend/transport/middleware.js';
+import type { ApiContext } from '../../../../api/backend/transport/context.js';
+import { toPackedUserDetailed } from '../../../../users/backend/user.schema.js';
 export const meta = {
 	requireCredential: true,
 
@@ -51,82 +50,88 @@ export const meta = {
 		},
 	},
 } as const;
+export interface IUpdateEmailDependencies {
+	config: Config;
+	serverSettings: MiMeta;
+	userProfilesRepository: UserProfilesRepository;
+	userEntityService: Pick<UserEntityService, 'packSelf'>;
+	emailService: Pick<EmailService, 'sendEmail' | 'validateEmailForAccount'>;
+	userAuthService: Pick<UserAuthService, 'twoFactorAuthenticate'>;
+	globalEventService: Pick<GlobalEventService, 'publishMainStream'>;
+}
+export function createIUpdateEmailProcedure(deps: IUpdateEmailDependencies) {
+	return implement(IUpdateEmailContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>().use(authentication<MiLocalUser>()).use(apiPolicy<MiLocalUser>({
+		name: 'i/update-email', requireCredential: true, secure: true, limit: {
+			duration: 3600000,
+			max: 3,
+		}
+	})).use(requirePrincipal<MiLocalUser>()).handler(async ({ input, context }) => {
+		const ps = input;
+		const me = context.principal;
+		const result = await (async () => {
+			const token = ps.token;
+			const profile = await deps.userProfilesRepository.findOneByOrFail({ userId: me.id });
 
-@Injectable()
-export class IUpdateEmailOperation {
-	constructor(
-		@Inject(DI.config)
-		private config: Config,
+			if (profile.twoFactorEnabled) {
+				if (token == null) {
+					throw new Error('authentication failed');
+				}
 
-		@Inject(DI.meta)
-		private serverSettings: MiMeta,
-
-		@Inject(DI.userProfilesRepository)
-		private userProfilesRepository: UserProfilesRepository,
-
-		private userEntityService: UserEntityService,
-		private emailService: EmailService,
-		private userAuthService: UserAuthService,
-		private globalEventService: GlobalEventService,
-	) {}
-
-	async execute(ps: v.InferOutput<NonNullable<typeof IUpdateEmailContract['~orpc']['inputSchema']>>, me: MiLocalUser) {
-		const token = ps.token;
-		const profile = await this.userProfilesRepository.findOneByOrFail({ userId: me.id });
-
-		if (profile.twoFactorEnabled) {
-			if (token == null) {
-				throw new Error('authentication failed');
+				try {
+					await deps.userAuthService.twoFactorAuthenticate(profile, token);
+				} catch (_) {
+					throw new Error('authentication failed');
+				}
 			}
 
-			try {
-				await this.userAuthService.twoFactorAuthenticate(profile, token);
-			} catch (_) {
-				throw new Error('authentication failed');
+			const passwordMatched = await bcrypt.compare(ps.password, profile.password!);
+			if (!passwordMatched) {
+				throw apiError(meta.errors.incorrectPassword);
 			}
-		}
 
-		const passwordMatched = await bcrypt.compare(ps.password, profile.password!);
-		if (!passwordMatched) {
-			throw apiError(meta.errors.incorrectPassword);
-		}
-
-		if (ps.email != null) {
-			const res = await this.emailService.validateEmailForAccount(ps.email);
-			if (!res.available) {
-				throw apiError(meta.errors.unavailable);
+			if (ps.email != null) {
+				const res = await deps.emailService.validateEmailForAccount(ps.email);
+				if (!res.available) {
+					throw apiError(meta.errors.unavailable);
+				}
+			} else if (deps.serverSettings.emailRequiredForSignup) {
+				throw apiError(meta.errors.emailRequired);
 			}
-		} else if (this.serverSettings.emailRequiredForSignup) {
-			throw apiError(meta.errors.emailRequired);
-		}
 
-		await this.userProfilesRepository.update(me.id, {
-			email: ps.email,
-			emailVerified: false,
-			emailVerifyCode: null,
-		});
-
-		const iObj = await this.userEntityService.packSelf(me.id, {
-			includeSecrets: true,
-		});
-
-		// Publish meUpdated event
-		this.globalEventService.publishMainStream(me.id, 'meUpdated', iObj);
-
-		if (ps.email != null) {
-			const code = secureRndstr(16, { chars: L_CHARS });
-
-			await this.userProfilesRepository.update(me.id, {
-				emailVerifyCode: code,
+			await deps.userProfilesRepository.update(me.id, {
+				email: ps.email,
+				emailVerified: false,
+				emailVerifyCode: null,
 			});
 
-			const link = `${this.config.url}/verify-email/${code}`;
+			const iObj = await deps.userEntityService.packSelf(me.id, {
+				includeSecrets: true,
+			});
 
-			this.emailService.sendEmail(ps.email, 'Email verification',
-				`To verify email, please click this link:<br><a href="${link}">${link}</a>`,
-				`To verify email, please click this link: ${link}`);
-		}
+			// Publish meUpdated event
+			deps.globalEventService.publishMainStream(me.id, 'meUpdated', iObj);
 
-		return iObj;
-	}
+			if (ps.email != null) {
+				const code = secureRndstr(16, { chars: L_CHARS });
+
+				await deps.userProfilesRepository.update(me.id, {
+					emailVerifyCode: code,
+				});
+
+				const link = `${deps.config.url}/verify-email/${code}`;
+
+				deps.emailService.sendEmail(ps.email, 'Email verification',
+					`To verify email, please click this link:<br><a href="${link}">${link}</a>`,
+					`To verify email, please click this link: ${link}`);
+			}
+
+			return iObj;
+		})();
+		return v.parse(requiredSchema(IUpdateEmailContract['~orpc'].outputSchema), toPackedUserDetailed(result));
+	});
+}
+
+function requiredSchema<Schema>(schema: Schema | undefined): Schema {
+	if (schema === undefined) throw new Error('Contract must declare its schema');
+	return schema;
 }

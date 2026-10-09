@@ -4,58 +4,129 @@
  */
 
 import { implement } from '@orpc/server';
-import type { ApiActor, ApiContext, ApiToken } from '../../api/backend/transport/context.js';
-import { authentication, apiPolicy, requirePrincipal } from '../../api/backend/transport/middleware.js';
-import { authContract, type AuthParsedInputs, type AuthOutputs } from './api.contract.js';
-export type AuthOperations<Actor extends ApiActor> = { [Name in keyof AuthParsedInputs]: (input: AuthParsedInputs[Name], actor: Name extends 'admin/accounts/create' | 'app/create' | 'app/show' | 'auth/session/generate' | 'auth/session/show' | 'auth/session/userkey' | 'email-address/available' | 'i/revoke-token' | 'request-reset-password' | 'reset-password' | 'username/available' | 'verify-email' ? Actor | null : Actor, token: ApiToken | null, ip: string) => Promise<AuthOutputs[Name]> };
-export type AuthContext<Actor extends ApiActor> = ApiContext<Actor> & { operations: { auth: AuthOperations<Actor> } };
-export function createAuthRouter<Actor extends ApiActor>() {
-	const api = implement(authContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<AuthContext<Actor>>().use(authentication<Actor>());
-	return api.router({
-		'admin/accounts/create': api['admin/accounts/create'].use(apiPolicy<Actor>({ name: 'admin/accounts/create' })).handler(({ input, context }) => context.operations.auth['admin/accounts/create'](input, context.principal, context.token, context.ip)),
-		'admin/captcha/current': api['admin/captcha/current'].use(apiPolicy<Actor>({ name: 'admin/captcha/current', requireCredential: true, requireAdmin: true, kind: 'read:admin:meta' })).use(requirePrincipal<Actor>()).handler(({ input, context }) => context.operations.auth['admin/captcha/current'](input, context.principal, context.token, context.ip)),
-		'admin/captcha/save': api['admin/captcha/save'].use(apiPolicy<Actor>({ name: 'admin/captcha/save', requireCredential: true, requireAdmin: true, kind: 'write:admin:meta' })).use(requirePrincipal<Actor>()).handler(({ input, context }) => context.operations.auth['admin/captcha/save'](input, context.principal, context.token, context.ip)),
-		'admin/invite/create': api['admin/invite/create'].use(apiPolicy<Actor>({ name: 'admin/invite/create', requireCredential: true, requireModerator: true, kind: 'write:admin:invite-codes' })).use(requirePrincipal<Actor>()).handler(({ input, context }) => context.operations.auth['admin/invite/create'](input, context.principal, context.token, context.ip)),
-		'admin/invite/list': api['admin/invite/list'].use(apiPolicy<Actor>({ name: 'admin/invite/list', requireCredential: true, requireModerator: true, kind: 'read:admin:invite-codes' })).use(requirePrincipal<Actor>()).handler(({ input, context }) => context.operations.auth['admin/invite/list'](input, context.principal, context.token, context.ip)),
-		'admin/reset-password': api['admin/reset-password'].use(apiPolicy<Actor>({ name: 'admin/reset-password', requireCredential: true, requireModerator: true, kind: 'write:admin:reset-password' })).use(requirePrincipal<Actor>()).handler(({ input, context }) => context.operations.auth['admin/reset-password'](input, context.principal, context.token, context.ip)),
-		'admin/unset-mfa': api['admin/unset-mfa'].use(apiPolicy<Actor>({ name: 'admin/unset-mfa', requireCredential: true, requireModerator: true, kind: 'write:admin:unset-mfa' })).use(requirePrincipal<Actor>()).handler(({ input, context }) => context.operations.auth['admin/unset-mfa'](input, context.principal, context.token, context.ip)),
-		'app/create': api['app/create'].use(apiPolicy<Actor>({ name: 'app/create' })).handler(({ input, context }) => context.operations.auth['app/create'](input, context.principal, context.token, context.ip)),
-		'app/show': api['app/show'].use(apiPolicy<Actor>({ name: 'app/show' })).handler(({ input, context }) => context.operations.auth['app/show'](input, context.principal, context.token, context.ip)),
-		'auth/accept': api['auth/accept'].use(apiPolicy<Actor>({ name: 'auth/accept', requireCredential: true, secure: true })).use(requirePrincipal<Actor>()).handler(({ input, context }) => context.operations.auth['auth/accept'](input, context.principal, context.token, context.ip)),
-		'auth/session/generate': api['auth/session/generate'].use(apiPolicy<Actor>({ name: 'auth/session/generate' })).handler(({ input, context }) => context.operations.auth['auth/session/generate'](input, context.principal, context.token, context.ip)),
-		'auth/session/show': api['auth/session/show'].use(apiPolicy<Actor>({ name: 'auth/session/show' })).handler(({ input, context }) => context.operations.auth['auth/session/show'](input, context.principal, context.token, context.ip)),
-		'auth/session/userkey': api['auth/session/userkey'].use(apiPolicy<Actor>({ name: 'auth/session/userkey' })).handler(({ input, context }) => context.operations.auth['auth/session/userkey'](input, context.principal, context.token, context.ip)),
-		'email-address/available': api['email-address/available'].use(apiPolicy<Actor>({ name: 'email-address/available' })).handler(({ input, context }) => context.operations.auth['email-address/available'](input, context.principal, context.token, context.ip)),
-		'i/2fa/done': api['i/2fa/done'].use(apiPolicy<Actor>({ name: 'i/2fa/done', requireCredential: true, secure: true })).use(requirePrincipal<Actor>()).handler(({ input, context }) => context.operations.auth['i/2fa/done'](input, context.principal, context.token, context.ip)),
-		'i/2fa/key-done': api['i/2fa/key-done'].use(apiPolicy<Actor>({ name: 'i/2fa/key-done', requireCredential: true, secure: true })).use(requirePrincipal<Actor>()).handler(({ input, context }) => context.operations.auth['i/2fa/key-done'](input, context.principal, context.token, context.ip)),
-		'i/2fa/password-less': api['i/2fa/password-less'].use(apiPolicy<Actor>({ name: 'i/2fa/password-less', requireCredential: true, secure: true })).use(requirePrincipal<Actor>()).handler(({ input, context }) => context.operations.auth['i/2fa/password-less'](input, context.principal, context.token, context.ip)),
-		'i/2fa/register': api['i/2fa/register'].use(apiPolicy<Actor>({ name: 'i/2fa/register', requireCredential: true, secure: true })).use(requirePrincipal<Actor>()).handler(({ input, context }) => context.operations.auth['i/2fa/register'](input, context.principal, context.token, context.ip)),
-		'i/2fa/register-key': api['i/2fa/register-key'].use(apiPolicy<Actor>({ name: 'i/2fa/register-key', requireCredential: true, secure: true })).use(requirePrincipal<Actor>()).handler(({ input, context }) => context.operations.auth['i/2fa/register-key'](input, context.principal, context.token, context.ip)),
-		'i/2fa/remove-key': api['i/2fa/remove-key'].use(apiPolicy<Actor>({ name: 'i/2fa/remove-key', requireCredential: true, secure: true })).use(requirePrincipal<Actor>()).handler(({ input, context }) => context.operations.auth['i/2fa/remove-key'](input, context.principal, context.token, context.ip)),
-		'i/2fa/unregister': api['i/2fa/unregister'].use(apiPolicy<Actor>({ name: 'i/2fa/unregister', requireCredential: true, secure: true })).use(requirePrincipal<Actor>()).handler(({ input, context }) => context.operations.auth['i/2fa/unregister'](input, context.principal, context.token, context.ip)),
-		'i/2fa/update-key': api['i/2fa/update-key'].use(apiPolicy<Actor>({ name: 'i/2fa/update-key', requireCredential: true, secure: true })).use(requirePrincipal<Actor>()).handler(({ input, context }) => context.operations.auth['i/2fa/update-key'](input, context.principal, context.token, context.ip)),
-		'i/apps': api['i/apps'].use(apiPolicy<Actor>({ name: 'i/apps', requireCredential: true, secure: true })).use(requirePrincipal<Actor>()).handler(({ input, context }) => context.operations.auth['i/apps'](input, context.principal, context.token, context.ip)),
-		'i/authorized-apps': api['i/authorized-apps'].use(apiPolicy<Actor>({ name: 'i/authorized-apps', requireCredential: true, secure: true })).use(requirePrincipal<Actor>()).handler(({ input, context }) => context.operations.auth['i/authorized-apps'](input, context.principal, context.token, context.ip)),
-		'i/change-password': api['i/change-password'].use(apiPolicy<Actor>({ name: 'i/change-password', requireCredential: true, secure: true })).use(requirePrincipal<Actor>()).handler(({ input, context }) => context.operations.auth['i/change-password'](input, context.principal, context.token, context.ip)),
-		'i/regenerate-token': api['i/regenerate-token'].use(apiPolicy<Actor>({ name: 'i/regenerate-token', requireCredential: true, secure: true })).use(requirePrincipal<Actor>()).handler(({ input, context }) => context.operations.auth['i/regenerate-token'](input, context.principal, context.token, context.ip)),
-		'i/revoke-token': api['i/revoke-token'].use(apiPolicy<Actor>({ name: 'i/revoke-token' })).handler(({ input, context }) => context.operations.auth['i/revoke-token'](input, context.principal, context.token, context.ip)),
-		'i/signin-history': api['i/signin-history'].use(apiPolicy<Actor>({ name: 'i/signin-history', requireCredential: true, secure: true })).use(requirePrincipal<Actor>()).handler(({ input, context }) => context.operations.auth['i/signin-history'](input, context.principal, context.token, context.ip)),
-		'i/update-email': api['i/update-email'].use(apiPolicy<Actor>({ name: 'i/update-email', requireCredential: true, secure: true, limit: {
-		duration: 3600000,
-		max: 3,
-	} })).use(requirePrincipal<Actor>()).handler(({ input, context }) => context.operations.auth['i/update-email'](input, context.principal, context.token, context.ip)),
-		'invite/create': api['invite/create'].use(apiPolicy<Actor>({ name: 'invite/create', requireCredential: true, kind: 'write:invite-codes', requiredRolePolicy: 'canInvite' })).use(requirePrincipal<Actor>()).handler(({ input, context }) => context.operations.auth['invite/create'](input, context.principal, context.token, context.ip)),
-		'invite/delete': api['invite/delete'].use(apiPolicy<Actor>({ name: 'invite/delete', requireCredential: true, kind: 'write:invite-codes', requiredRolePolicy: 'canInvite' })).use(requirePrincipal<Actor>()).handler(({ input, context }) => context.operations.auth['invite/delete'](input, context.principal, context.token, context.ip)),
-		'invite/limit': api['invite/limit'].use(apiPolicy<Actor>({ name: 'invite/limit', requireCredential: true, kind: 'read:invite-codes', requiredRolePolicy: 'canInvite' })).use(requirePrincipal<Actor>()).handler(({ input, context }) => context.operations.auth['invite/limit'](input, context.principal, context.token, context.ip)),
-		'invite/list': api['invite/list'].use(apiPolicy<Actor>({ name: 'invite/list', requireCredential: true, kind: 'read:invite-codes', requiredRolePolicy: 'canInvite' })).use(requirePrincipal<Actor>()).handler(({ input, context }) => context.operations.auth['invite/list'](input, context.principal, context.token, context.ip)),
-		'miauth/gen-token': api['miauth/gen-token'].use(apiPolicy<Actor>({ name: 'miauth/gen-token', requireCredential: true, secure: true })).use(requirePrincipal<Actor>()).handler(({ input, context }) => context.operations.auth['miauth/gen-token'](input, context.principal, context.token, context.ip)),
-		'my/apps': api['my/apps'].use(apiPolicy<Actor>({ name: 'my/apps', requireCredential: true, kind: 'read:account' })).use(requirePrincipal<Actor>()).handler(({ input, context }) => context.operations.auth['my/apps'](input, context.principal, context.token, context.ip)),
-		'request-reset-password': api['request-reset-password'].use(apiPolicy<Actor>({ name: 'request-reset-password', limit: {
-		duration: 3600000,
-		max: 3,
-	} })).handler(({ input, context }) => context.operations.auth['request-reset-password'](input, context.principal, context.token, context.ip)),
-		'reset-password': api['reset-password'].use(apiPolicy<Actor>({ name: 'reset-password' })).handler(({ input, context }) => context.operations.auth['reset-password'](input, context.principal, context.token, context.ip)),
-		'username/available': api['username/available'].use(apiPolicy<Actor>({ name: 'username/available' })).handler(({ input, context }) => context.operations.auth['username/available'](input, context.principal, context.token, context.ip)),
-		'verify-email': api['verify-email'].use(apiPolicy<Actor>({ name: 'verify-email' })).handler(({ input, context }) => context.operations.auth['verify-email'](input, context.principal, context.token, context.ip)),
+import { authContract } from './api.contract.js';
+import type { ApiContext } from '../../api/backend/transport/context.js';
+import type { MiLocalUser } from '../../users/backend/models/User.js';
+import { createAdminAccountsCreateProcedure, type AdminAccountsCreateDependencies } from './endpoints/admin/accounts/create.js';
+import { createAdminCaptchaCurrentProcedure, type AdminCaptchaCurrentDependencies } from './endpoints/admin/captcha/current.js';
+import { createAdminCaptchaSaveProcedure, type AdminCaptchaSaveDependencies } from './endpoints/admin/captcha/save.js';
+import { createAdminInviteCreateProcedure, type AdminInviteCreateDependencies } from './endpoints/admin/invite/create.js';
+import { createAdminInviteListProcedure, type AdminInviteListDependencies } from './endpoints/admin/invite/list.js';
+import { createAdminResetPasswordProcedure, type AdminResetPasswordDependencies } from './endpoints/admin/reset-password.js';
+import { createAdminUnsetMfaProcedure, type AdminUnsetMfaDependencies } from './endpoints/admin/unset-mfa.js';
+import { createAppCreateProcedure, type AppCreateDependencies } from './endpoints/app/create.js';
+import { createAppShowProcedure, type AppShowDependencies } from './endpoints/app/show.js';
+import { createAuthAcceptProcedure, type AuthAcceptDependencies } from './endpoints/auth/accept.js';
+import { createAuthSessionGenerateProcedure, type AuthSessionGenerateDependencies } from './endpoints/auth/session/generate.js';
+import { createAuthSessionShowProcedure, type AuthSessionShowDependencies } from './endpoints/auth/session/show.js';
+import { createAuthSessionUserkeyProcedure, type AuthSessionUserkeyDependencies } from './endpoints/auth/session/userkey.js';
+import { createEmailAddressAvailableProcedure, type EmailAddressAvailableDependencies } from './endpoints/email-address/available.js';
+import { createI2faDoneProcedure, type I2faDoneDependencies } from './endpoints/i/2fa/done.js';
+import { createI2faKeyDoneProcedure, type I2faKeyDoneDependencies } from './endpoints/i/2fa/key-done.js';
+import { createI2faPasswordLessProcedure, type I2faPasswordLessDependencies } from './endpoints/i/2fa/password-less.js';
+import { createI2faRegisterProcedure, type I2faRegisterDependencies } from './endpoints/i/2fa/register.js';
+import { createI2faRegisterKeyProcedure, type I2faRegisterKeyDependencies } from './endpoints/i/2fa/register-key.js';
+import { createI2faRemoveKeyProcedure, type I2faRemoveKeyDependencies } from './endpoints/i/2fa/remove-key.js';
+import { createI2faUnregisterProcedure, type I2faUnregisterDependencies } from './endpoints/i/2fa/unregister.js';
+import { createI2faUpdateKeyProcedure, type I2faUpdateKeyDependencies } from './endpoints/i/2fa/update-key.js';
+import { createIAppsProcedure, type IAppsDependencies } from './endpoints/i/apps.js';
+import { createIAuthorizedAppsProcedure, type IAuthorizedAppsDependencies } from './endpoints/i/authorized-apps.js';
+import { createIChangePasswordProcedure, type IChangePasswordDependencies } from './endpoints/i/change-password.js';
+import { createIRegenerateTokenProcedure, type IRegenerateTokenDependencies } from './endpoints/i/regenerate-token.js';
+import { createIRevokeTokenProcedure, type IRevokeTokenDependencies } from './endpoints/i/revoke-token.js';
+import { createISigninHistoryProcedure, type ISigninHistoryDependencies } from './endpoints/i/signin-history.js';
+import { createIUpdateEmailProcedure, type IUpdateEmailDependencies } from './endpoints/i/update-email.js';
+import { createInviteCreateProcedure, type InviteCreateDependencies } from './endpoints/invite/create.js';
+import { createInviteDeleteProcedure, type InviteDeleteDependencies } from './endpoints/invite/delete.js';
+import { createInviteLimitProcedure, type InviteLimitDependencies } from './endpoints/invite/limit.js';
+import { createInviteListProcedure, type InviteListDependencies } from './endpoints/invite/list.js';
+import { createMiauthGenTokenProcedure, type MiauthGenTokenDependencies } from './endpoints/miauth/gen-token.js';
+import { createMyAppsProcedure, type MyAppsDependencies } from './endpoints/my/apps.js';
+import { createRequestResetPasswordProcedure, type RequestResetPasswordDependencies } from './endpoints/request-reset-password.js';
+import { createResetPasswordProcedure, type ResetPasswordDependencies } from './endpoints/reset-password.js';
+import { createUsernameAvailableProcedure, type UsernameAvailableDependencies } from './endpoints/username/available.js';
+import { createVerifyEmailProcedure, type VerifyEmailDependencies } from './endpoints/verify-email.js';
+export interface AuthRouterDependencies {
+	'admin/accounts/create': AdminAccountsCreateDependencies;
+	'admin/captcha/current': AdminCaptchaCurrentDependencies;
+	'admin/captcha/save': AdminCaptchaSaveDependencies;
+	'admin/invite/create': AdminInviteCreateDependencies;
+	'admin/invite/list': AdminInviteListDependencies;
+	'admin/reset-password': AdminResetPasswordDependencies;
+	'admin/unset-mfa': AdminUnsetMfaDependencies;
+	'app/create': AppCreateDependencies;
+	'app/show': AppShowDependencies;
+	'auth/accept': AuthAcceptDependencies;
+	'auth/session/generate': AuthSessionGenerateDependencies;
+	'auth/session/show': AuthSessionShowDependencies;
+	'auth/session/userkey': AuthSessionUserkeyDependencies;
+	'email-address/available': EmailAddressAvailableDependencies;
+	'i/2fa/done': I2faDoneDependencies;
+	'i/2fa/key-done': I2faKeyDoneDependencies;
+	'i/2fa/password-less': I2faPasswordLessDependencies;
+	'i/2fa/register': I2faRegisterDependencies;
+	'i/2fa/register-key': I2faRegisterKeyDependencies;
+	'i/2fa/remove-key': I2faRemoveKeyDependencies;
+	'i/2fa/unregister': I2faUnregisterDependencies;
+	'i/2fa/update-key': I2faUpdateKeyDependencies;
+	'i/apps': IAppsDependencies;
+	'i/authorized-apps': IAuthorizedAppsDependencies;
+	'i/change-password': IChangePasswordDependencies;
+	'i/regenerate-token': IRegenerateTokenDependencies;
+	'i/revoke-token': IRevokeTokenDependencies;
+	'i/signin-history': ISigninHistoryDependencies;
+	'i/update-email': IUpdateEmailDependencies;
+	'invite/create': InviteCreateDependencies;
+	'invite/delete': InviteDeleteDependencies;
+	'invite/limit': InviteLimitDependencies;
+	'invite/list': InviteListDependencies;
+	'miauth/gen-token': MiauthGenTokenDependencies;
+	'my/apps': MyAppsDependencies;
+	'request-reset-password': RequestResetPasswordDependencies;
+	'reset-password': ResetPasswordDependencies;
+	'username/available': UsernameAvailableDependencies;
+	'verify-email': VerifyEmailDependencies;
+}
+export function createAuthRouter(deps: AuthRouterDependencies) {
+	return implement(authContract).$context<ApiContext<MiLocalUser>>().router({
+		'admin/accounts/create': createAdminAccountsCreateProcedure(deps['admin/accounts/create']),
+		'admin/captcha/current': createAdminCaptchaCurrentProcedure(deps['admin/captcha/current']),
+		'admin/captcha/save': createAdminCaptchaSaveProcedure(deps['admin/captcha/save']),
+		'admin/invite/create': createAdminInviteCreateProcedure(deps['admin/invite/create']),
+		'admin/invite/list': createAdminInviteListProcedure(deps['admin/invite/list']),
+		'admin/reset-password': createAdminResetPasswordProcedure(deps['admin/reset-password']),
+		'admin/unset-mfa': createAdminUnsetMfaProcedure(deps['admin/unset-mfa']),
+		'app/create': createAppCreateProcedure(deps['app/create']),
+		'app/show': createAppShowProcedure(deps['app/show']),
+		'auth/accept': createAuthAcceptProcedure(deps['auth/accept']),
+		'auth/session/generate': createAuthSessionGenerateProcedure(deps['auth/session/generate']),
+		'auth/session/show': createAuthSessionShowProcedure(deps['auth/session/show']),
+		'auth/session/userkey': createAuthSessionUserkeyProcedure(deps['auth/session/userkey']),
+		'email-address/available': createEmailAddressAvailableProcedure(deps['email-address/available']),
+		'i/2fa/done': createI2faDoneProcedure(deps['i/2fa/done']),
+		'i/2fa/key-done': createI2faKeyDoneProcedure(deps['i/2fa/key-done']),
+		'i/2fa/password-less': createI2faPasswordLessProcedure(deps['i/2fa/password-less']),
+		'i/2fa/register': createI2faRegisterProcedure(deps['i/2fa/register']),
+		'i/2fa/register-key': createI2faRegisterKeyProcedure(deps['i/2fa/register-key']),
+		'i/2fa/remove-key': createI2faRemoveKeyProcedure(deps['i/2fa/remove-key']),
+		'i/2fa/unregister': createI2faUnregisterProcedure(deps['i/2fa/unregister']),
+		'i/2fa/update-key': createI2faUpdateKeyProcedure(deps['i/2fa/update-key']),
+		'i/apps': createIAppsProcedure(deps['i/apps']),
+		'i/authorized-apps': createIAuthorizedAppsProcedure(deps['i/authorized-apps']),
+		'i/change-password': createIChangePasswordProcedure(deps['i/change-password']),
+		'i/regenerate-token': createIRegenerateTokenProcedure(deps['i/regenerate-token']),
+		'i/revoke-token': createIRevokeTokenProcedure(deps['i/revoke-token']),
+		'i/signin-history': createISigninHistoryProcedure(deps['i/signin-history']),
+		'i/update-email': createIUpdateEmailProcedure(deps['i/update-email']),
+		'invite/create': createInviteCreateProcedure(deps['invite/create']),
+		'invite/delete': createInviteDeleteProcedure(deps['invite/delete']),
+		'invite/limit': createInviteLimitProcedure(deps['invite/limit']),
+		'invite/list': createInviteListProcedure(deps['invite/list']),
+		'miauth/gen-token': createMiauthGenTokenProcedure(deps['miauth/gen-token']),
+		'my/apps': createMyAppsProcedure(deps['my/apps']),
+		'request-reset-password': createRequestResetPasswordProcedure(deps['request-reset-password']),
+		'reset-password': createResetPasswordProcedure(deps['reset-password']),
+		'username/available': createUsernameAvailableProcedure(deps['username/available']),
+		'verify-email': createVerifyEmailProcedure(deps['verify-email']),
 	});
 }

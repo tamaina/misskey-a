@@ -5,13 +5,13 @@
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { createAnnouncementsOperations, createAnnouncementsRouter, announcementsContract } from '../../../backend/built/features/announcements/backend.js';
+import { createAnnouncementsRouter, announcementsContract } from '../../../backend/built/features/announcements/backend.js';
 
 import { createRouterClient } from '@orpc/server';
 import * as v from 'valibot';
 
-function announcementOperationsFixture(deps) {
-	return createAnnouncementsOperations({ announcementsRepository: { findOneBy: ({ id }) => deps.findById(id) }, announcementService: deps });
+function announcementDependenciesFixture(deps) {
+	return { announcementsRepository: { findOneBy: ({ id }) => deps.findById(id) }, announcementService: deps };
 }
 
 const updateKey = 'admin/announcements/update';
@@ -32,10 +32,10 @@ function createDeps(overrides = {}) {
 	return { deps, calls };
 }
 
-function invoke(operations, key, input, ...actorArg) {
+function invoke(dependencies, key, input, ...actorArg) {
 	const actor = actorArg.length === 0 ? { id: 'alice' } : actorArg[0];
-	const client = createRouterClient(createAnnouncementsRouter(), { context: {
-		credential: 'native', ip: '127.0.0.1', headers: {}, operations: { announcements: operations },
+	const client = createRouterClient(createAnnouncementsRouter(dependencies), { context: {
+		credential: 'native', ip: '127.0.0.1', headers: {},
 		services: { authenticate: async () => [actor ?? null, null], limitActor: () => null },
 		authorization: { rootUserId: () => null, roles: async () => [{ isModerator: true, isAdministrator: true }] },
 	} });
@@ -61,7 +61,7 @@ test('update awaits lookup and update ports, forwards the trusted actor and pres
 	let releaseUpdate;
 	let notifyUpdateStarted;
 	const updateStarted = new Promise(resolve => { notifyUpdateStarted = resolve; });
-	const feature = announcementOperationsFixture({
+	const feature = announcementDependenciesFixture({
 		findById: id => new Promise(resolve => { calls.push(['find-start', id]); releaseFind = () => resolve(announcement); notifyFindStarted(); }),
 		update: (found, values, actorArg) => new Promise(resolve => { calls.push(['update-start', found, values, actorArg]); releaseUpdate = resolve; notifyUpdateStarted(); }),
 		delete: async () => {},
@@ -98,7 +98,7 @@ test('update awaits lookup and update ports, forwards the trusted actor and pres
 	assert.equal(await pending, undefined);
 
 	const { deps, calls: omittedCalls } = createDeps();
-	const omittedFeature = announcementOperationsFixture(deps);
+	const omittedFeature = announcementDependenciesFixture(deps);
 	assert.equal(await invoke(omittedFeature, updateKey, { id: 'announcement2', title: 'Next' }, actor), undefined);
 	assert.equal(omittedCalls[1][2].imageUrl, null);
 	assert.equal(omittedCalls[1][2].text, undefined);
@@ -107,7 +107,7 @@ test('update awaits lookup and update ports, forwards the trusted actor and pres
 test('missing announcements use route-specific errors and never call update/delete', async () => {
 	for (const [key, expectedId] of [[updateKey, missingUpdateId], [deleteKey, missingDeleteId]]) {
 		const { deps, calls } = createDeps({ findById: async id => { calls.push(['findById', id]); return null; } });
-		const feature = announcementOperationsFixture(deps);
+		const feature = announcementDependenciesFixture(deps);
 		await assert.rejects(invoke(feature, key, { id: 'missing1' }), error => {
 			assert.equal(error.data.id, expectedId);
 			assert.equal(error.code, 'NO_SUCH_ANNOUNCEMENT');
@@ -126,7 +126,7 @@ test('delete and read await their ports; missing credentials fail before any dep
 	let releaseRead;
 	let notifyReadStarted;
 	const readStarted = new Promise(resolve => { notifyReadStarted = resolve; });
-	const feature = announcementOperationsFixture({
+	const feature = announcementDependenciesFixture({
 		findById: async id => { calls.push(['findById', id]); return { id }; },
 		update: async () => {},
 		delete: (announcement, actorArg) => new Promise(resolve => { calls.push(['delete', announcement, actorArg]); releaseDelete = resolve; notifyDeleteStarted(); }),
@@ -150,7 +150,7 @@ test('delete and read await their ports; missing credentials fail before any dep
 	await reading;
 
 	const { deps, calls: invalidCalls } = createDeps();
-	const invalidFeature = announcementOperationsFixture(deps);
+	const invalidFeature = announcementDependenciesFixture(deps);
 	for (const key of [updateKey, deleteKey, readKey]) {
 		for (const invalidActor of [undefined, null]) {
 			const input = key === readKey ? { announcementId: 'announcement1' } : { id: 'announcement1' };

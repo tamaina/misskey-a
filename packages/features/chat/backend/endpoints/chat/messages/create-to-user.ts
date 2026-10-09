@@ -5,49 +5,32 @@
 
 import type { InferSchemaOutput } from '@orpc/contract';
 import { implement } from '@orpc/server';
-import { Inject, Injectable } from '@nestjs/common';
-import { GetterService } from '@features/api/backend/transport/GetterService.js';
+import { type GetterService } from '@features/api/backend/transport/GetterService.js';
 import * as v from 'valibot';
-import { DI } from '@/di-symbols.js';
 import { authentication, apiPolicy, requirePrincipal } from '../../../../../api/backend/transport/middleware.js';
-import { ChatService } from '../../../services/ChatService.js';
+import { type ChatService } from '../../../services/ChatService.js';
 import { apiError } from '../../../../../api/backend/transport/orpc-error.js';
 import { readErrorId } from '../../../request.schema.js';
 import { chatMessagesCreateToUserContract, chatMessagesCreateToUserPolicy, chatMessagesCreateToUserErrors } from './create-to-user.contract.js';
-import type { ApiActor } from '../../../../../api/backend/transport/context.js';
-import type { ChatApiContext } from '../../../operations.js';
-
-import type { DriveFilesRepository, MiUser } from '@features/persistence/backend/repositories/models.js';
-
+import type { DriveFilesRepository } from '@features/persistence/backend/repositories/models.js';
 import type { MiLocalUser } from '../../../../../users/backend/models/User.js';
-
-export function createChatMessagesCreateToUserProcedure<Actor extends ApiActor>() {
-	return implement(chatMessagesCreateToUserContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ChatApiContext<Actor>>()
-		.use(authentication<Actor>())
-		.use(apiPolicy<Actor>(chatMessagesCreateToUserPolicy))
-		.use(requirePrincipal<Actor>())
-		.handler(({ input, context }) => context.operations.chat.chatMessagesCreateToUser(input, context.principal));
+import type { ApiContext } from '@features/api/backend/transport/context.js';
+export interface ChatMessagesCreateToUserDependencies {
+	driveFilesRepository: DriveFilesRepository;
+	getterService: GetterService;
+	chatService: ChatService;
 }
-
-@Injectable()
-export class ChatMessagesCreateToUserOperation {
-	constructor(
-		@Inject(DI.driveFilesRepository)
-		private driveFilesRepository: DriveFilesRepository,
-
-		private getterService: GetterService,
-		private chatService: ChatService,
-	) {}
-	async execute(ps: InferSchemaOutput<NonNullable<typeof chatMessagesCreateToUserContract['~orpc']['inputSchema']>>, me: MiLocalUser): Promise<InferSchemaOutput<NonNullable<typeof chatMessagesCreateToUserContract['~orpc']['outputSchema']>>> {
-		return v.parse(requiredSchema(chatMessagesCreateToUserContract['~orpc'].outputSchema), await this.run(ps, me));
+export function createChatMessagesCreateToUserProcedure(deps: ChatMessagesCreateToUserDependencies) {
+	async function execute(ps: InferSchemaOutput<NonNullable<typeof chatMessagesCreateToUserContract['~orpc']['inputSchema']>>, me: MiLocalUser): Promise<InferSchemaOutput<NonNullable<typeof chatMessagesCreateToUserContract['~orpc']['outputSchema']>>> {
+		return v.parse(requiredSchema(chatMessagesCreateToUserContract['~orpc'].outputSchema), await run(ps, me));
 	}
 
-	private async run(ps: InferSchemaOutput<NonNullable<typeof chatMessagesCreateToUserContract['~orpc']['inputSchema']>>, me: MiLocalUser) {
-		await this.chatService.checkChatAvailability(me.id, 'write');
+	async function run(ps: InferSchemaOutput<NonNullable<typeof chatMessagesCreateToUserContract['~orpc']['inputSchema']>>, me: MiLocalUser) {
+		await deps.chatService.checkChatAvailability(me.id, 'write');
 
 		let file = null;
 		if (ps.fileId != null) {
-			file = await this.driveFilesRepository.findOneBy({
+			file = await deps.driveFilesRepository.findOneBy({
 				id: ps.fileId,
 				userId: me.id,
 			});
@@ -67,16 +50,22 @@ export class ChatMessagesCreateToUserOperation {
 			throw apiError(chatMessagesCreateToUserErrors.recipientIsYourself);
 		}
 
-		const toUser = await this.getterService.getUser(ps.toUserId).catch((err: unknown) => {
+		const toUser = await deps.getterService.getUser(ps.toUserId).catch((err: unknown) => {
 			if (readErrorId(err) === '15348ddd-432d-49c2-8a5a-8069753becff') throw apiError(chatMessagesCreateToUserErrors.noSuchUser);
 			throw err;
 		});
 
-		return await this.chatService.createMessageToUser(me, toUser, {
+		return await deps.chatService.createMessageToUser(me, toUser, {
 			text: ps.text,
 			file: file,
 		});
 	}
+
+	return implement(chatMessagesCreateToUserContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>()
+		.use(authentication<MiLocalUser>())
+		.use(apiPolicy<MiLocalUser>(chatMessagesCreateToUserPolicy))
+		.use(requirePrincipal<MiLocalUser>())
+		.handler(({ input, context }) => execute(input, context.principal));
 }
 
 function requiredSchema<Schema>(schema: Schema | undefined): Schema {

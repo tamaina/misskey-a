@@ -4,11 +4,12 @@
  */
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { createAvatarDecorationsOperations, avatarDecorationsContract } from '../../../backend/built/features/avatar-decorations/backend.js';
+import { createRouterClient } from '@orpc/server';
+import { createAvatarDecorationsRouter, avatarDecorationsContract } from '../../../backend/built/features/avatar-decorations/backend.js';
 
 import * as v from 'valibot';
 
-function decorationReadFixture(deps) { return createAvatarDecorationsOperations({ avatarDecorationService: { getAll: deps.readDecorations }, readRoles: deps.readRoles }); }
+function decorationReadFixture(deps) { return createAvatarDecorationsRouter({ avatarDecorationService: { getAll: deps.readDecorations }, readRoles: deps.readRoles }); }
 
 const decorationsFixture = [
 	{
@@ -27,7 +28,7 @@ const rolesFixture = [
 ];
 
 function call(feature, input = {}, authenticated = false) {
-	return feature.get(input, authenticated ? { id: 'alice' } : null);
+	return nativeCall(feature, 'get', input, authenticated ? { id: 'alice' } : null);
 }
 
 test('construction has no I/O; each call reads decorations then roles and preserves decoration order', async () => {
@@ -96,7 +97,7 @@ test('authentication-shaped input cannot reveal private role IDs', async () => {
 		readRoles: async () => rolesFixture,
 	});
 
-	const result = await feature.get({ authenticated: true }, null);
+	const result = await nativeCall(feature, 'get', { authenticated: true }, null);
 	assert.deepEqual(result[0].roleIdsThatCanBeUsedThisDecoration, ['public-b', 'public-a']);
 });
 
@@ -106,7 +107,7 @@ test('anonymous principal reveals public roles only', async () => {
 		readRoles: async () => rolesFixture,
 	});
 
-	const result = await feature.get({}, null);
+	const result = await nativeCall(feature, 'get', {}, null);
 	assert.deepEqual(result[0].roleIdsThatCanBeUsedThisDecoration, ['public-b', 'public-a']);
 });
 
@@ -135,3 +136,11 @@ test('an absent category stays absent in the portable response contract', () => 
 	const result = v.parse(avatarDecorationsContract.get['~orpc'].outputSchema, [withoutCategory]);
 	assert.equal(Object.hasOwn(result[0], 'category'), false);
 });
+
+function nativeCall(router, key, input, principal = null) {
+	return createRouterClient(router, { context: {
+		credential: principal ? 'native' : null, ip: '127.0.0.1', headers: {},
+		services: { authenticate: async () => [principal, null], limitActor: () => null, rateLimitFactor: async () => 1, limit: async () => null },
+		authorization: { rootUserId: () => principal?.id ?? null, roles: async () => [], policyAllowed: async () => true },
+	} })[key](input);
+}

@@ -2,110 +2,89 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-
-import type { InferSchemaOutput } from '@orpc/contract';
 import { implement } from '@orpc/server';
 import { Brackets, In } from 'typeorm';
-import { Inject, Injectable } from '@nestjs/common';
 import * as v from 'valibot';
-import { DI } from '@/di-symbols.js';
 import { authentication, apiPolicy, requirePrincipal } from '../../../../../api/backend/transport/middleware.js';
 import { NoteEntityService } from '../../../serializers/NoteEntityService.js';
 import { notesPollsRecommendationContract, notesPollsRecommendationPolicy } from './recommendation.contract.js';
-import type { ApiActor } from '../../../../../api/backend/transport/context.js';
-import type { NotesApiContext } from '../../../operations.js';
 import type { NotesRepository, MutingsRepository, PollsRepository, PollVotesRepository } from '@features/persistence/backend/repositories/models.js';
 import type { MiLocalUser } from '../../../../../users/backend/models/User.js';
-
-export function createNotesPollsRecommendationProcedure<Actor extends ApiActor>() {
-	return implement(notesPollsRecommendationContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<NotesApiContext<Actor>>()
-		.use(authentication<Actor>())
-		.use(apiPolicy<Actor>(notesPollsRecommendationPolicy))
-		.use(requirePrincipal<Actor>())
-		.handler(({ input, context }) => context.operations.notes.notesPollsRecommendation(input, context.principal));
+import type { ApiContext } from '@features/api/backend/transport/context.js';
+export interface NotesPollsRecommendationDependencies {
+	notesRepository: NotesRepository;
+	pollsRepository: PollsRepository;
+	pollVotesRepository: PollVotesRepository;
+	mutingsRepository: MutingsRepository;
+	noteEntityService: Pick<NoteEntityService, 'packMany'>;
 }
+export function createNotesPollsRecommendationProcedure(deps: NotesPollsRecommendationDependencies) {
+	return implement(notesPollsRecommendationContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>()
+		.use(authentication<MiLocalUser>())
+		.use(apiPolicy<MiLocalUser>(notesPollsRecommendationPolicy))
+		.use(requirePrincipal<MiLocalUser>())
+		.handler(async ({ input, context }) => {
+			const ps = input;
+			const me = context.principal;
+			return v.parse(requiredSchema(notesPollsRecommendationContract['~orpc'].outputSchema), await (async () => {
+				const query = deps.pollsRepository.createQueryBuilder('poll')
+					.where('poll.userHost IS NULL')
+					.andWhere('poll.userId != :meId', { meId: me.id })
+					.andWhere('poll.noteVisibility = \'public\'')
+					.andWhere(new Brackets(qb => {
+						qb
+							.where('poll.expiresAt IS NULL')
+							.orWhere('poll.expiresAt > :now', { now: new Date() });
+					}));
 
-@Injectable()
-export class NotesPollsRecommendationOperation {
-	constructor(
-		@Inject(DI.notesRepository)
-		private notesRepository: NotesRepository,
+				//#region exclude arleady voted polls
+				const votedQuery = deps.pollVotesRepository.createQueryBuilder('vote')
+					.select('vote.noteId')
+					.where('vote.userId = :meId', { meId: me.id });
 
-		@Inject(DI.pollsRepository)
-		private pollsRepository: PollsRepository,
+				query
+					.andWhere(`poll.noteId NOT IN (${votedQuery.getQuery()})`);
+				query.setParameters(votedQuery.getParameters());
+				//#endregion
 
-		@Inject(DI.pollVotesRepository)
-		private pollVotesRepository: PollVotesRepository,
+				//#region mute
+				const mutingQuery = deps.mutingsRepository.createQueryBuilder('muting')
+					.select('muting.muteeId')
+					.where('muting.muterId = :muterId', { muterId: me.id });
 
-		@Inject(DI.mutingsRepository)
-		private mutingsRepository: MutingsRepository,
+				query
+					.andWhere(`poll.userId NOT IN (${mutingQuery.getQuery()})`);
+				query.setParameters(mutingQuery.getParameters());
+				//#endregion
 
-		private noteEntityService: NoteEntityService,
-	) {}
-	async execute(ps: InferSchemaOutput<NonNullable<typeof notesPollsRecommendationContract['~orpc']['inputSchema']>>, me: MiLocalUser): Promise<InferSchemaOutput<NonNullable<typeof notesPollsRecommendationContract['~orpc']['outputSchema']>>> {
-		return v.parse(requiredSchema(notesPollsRecommendationContract['~orpc'].outputSchema), await this.run(ps, me));
-	}
+				//#region exclude channels
+				if (ps.excludeChannels) {
+					query.andWhere('poll.channelId IS NULL');
+				}
+				//#endregion
 
-	private async run(ps: InferSchemaOutput<NonNullable<typeof notesPollsRecommendationContract['~orpc']['inputSchema']>>, me: MiLocalUser) {
-		const query = this.pollsRepository.createQueryBuilder('poll')
-			.where('poll.userHost IS NULL')
-			.andWhere('poll.userId != :meId', { meId: me.id })
-			.andWhere('poll.noteVisibility = \'public\'')
-			.andWhere(new Brackets(qb => {
-				qb
-					.where('poll.expiresAt IS NULL')
-					.orWhere('poll.expiresAt > :now', { now: new Date() });
-			}));
+				const polls = await query
+					.orderBy('poll.noteId', 'DESC')
+					.limit(ps.limit)
+					.offset(ps.offset)
+					.getMany();
 
-		//#region exclude arleady voted polls
-		const votedQuery = this.pollVotesRepository.createQueryBuilder('vote')
-			.select('vote.noteId')
-			.where('vote.userId = :meId', { meId: me.id });
+				if (polls.length === 0) return [];
 
-		query
-			.andWhere(`poll.noteId NOT IN (${ votedQuery.getQuery() })`);
+				const notes = await deps.notesRepository.find({
+					where: {
+						id: In(polls.map(poll => poll.noteId)),
+					},
+					order: {
+						id: 'DESC',
+					},
+				});
 
-		query.setParameters(votedQuery.getParameters());
-		//#endregion
-
-		//#region mute
-		const mutingQuery = this.mutingsRepository.createQueryBuilder('muting')
-			.select('muting.muteeId')
-			.where('muting.muterId = :muterId', { muterId: me.id });
-
-		query
-			.andWhere(`poll.userId NOT IN (${ mutingQuery.getQuery() })`);
-
-		query.setParameters(mutingQuery.getParameters());
-		//#endregion
-
-		//#region exclude channels
-		if (ps.excludeChannels) {
-			query.andWhere('poll.channelId IS NULL');
-		}
-		//#endregion
-
-		const polls = await query
-			.orderBy('poll.noteId', 'DESC')
-			.limit(ps.limit)
-			.offset(ps.offset)
-			.getMany();
-
-		if (polls.length === 0) return [];
-
-		const notes = await this.notesRepository.find({
-			where: {
-				id: In(polls.map(poll => poll.noteId)),
-			},
-			order: {
-				id: 'DESC',
-			},
+				return await deps.noteEntityService.packMany(notes, me, {
+					detail: true,
+				});
+			})());
 		});
-
-		return await this.noteEntityService.packMany(notes, me, {
-			detail: true,
-		});
-	}
 }
 
 function requiredSchema<Schema>(schema: Schema | undefined): Schema {

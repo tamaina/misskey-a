@@ -2,7 +2,8 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-
+import { call } from '@orpc/server';
+import { testContext } from './native-context.js';
 import { createHash } from 'node:crypto';
 import { expect, expectTypeOf, test } from 'vitest';
 import * as v from 'valibot';
@@ -15,10 +16,10 @@ import { fetchExternalResourcesContract } from '../../backend/endpoints/fetch-ex
 import { fetchRssContract } from '../../backend/endpoints/fetch-rss.contract.js';
 import { iWebhooksUpdateContract } from '../../backend/endpoints/i/webhooks/update.contract.js';
 import { SystemWebhookEntityService } from '../../backend/serializers/SystemWebhookEntityService.js';
-import { IWebhooksCreateApplicationService as CreateEndpoint } from '../../backend/endpoints/i/webhooks/create.application.js';
-import { IWebhooksListApplicationService as ListEndpoint } from '../../backend/endpoints/i/webhooks/list.application.js';
-import { IWebhooksShowApplicationService as ShowEndpoint } from '../../backend/endpoints/i/webhooks/show.application.js';
-import { FetchExternalResourcesApplicationService as ResourcesEndpoint } from '../../backend/endpoints/fetch-external-resources.application.js';
+import { createIWebhooksCreateProcedure as CreateEndpoint } from '../../backend/endpoints/i/webhooks/create.js';
+import { createIWebhooksListProcedure as ListEndpoint } from '../../backend/endpoints/i/webhooks/list.js';
+import { createIWebhooksShowProcedure as ShowEndpoint } from '../../backend/endpoints/i/webhooks/show.js';
+import { createFetchExternalResourcesProcedure as ResourcesEndpoint } from '../../backend/endpoints/fetch-external-resources.js';
 import type { MiSystemWebhook, WebhooksRepository } from '@features/persistence/backend/repositories/models.js';
 import type { RolePolicies, RoleService } from '@features/roles/backend/services/RoleService.js';
 import type { IdService } from '@features/runtime/backend/services/IdService.js';
@@ -26,7 +27,7 @@ import type { HttpRequestService } from '@features/runtime/backend/services/Http
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 
 const date = new Date('2026-10-07T00:00:00.000Z');
-const me = mockDeep<MiLocalUser>({ id: 'user123' });
+const me = mockDeep<MiLocalUser>({ id: 'user123', isSuspended: false, movedToUri: null });
 const params = { name: 'Fixture', url: 'https://example.com/webhook', on: ['note'] as ['note'] };
 const webhook = { id: 'webhook123', userId: me.id, name: params.name, on: params.on, url: params.url, secret: '', active: true, latestSentAt: null, latestStatus: null };
 
@@ -55,30 +56,30 @@ test('real user webhook create/list/show handlers retain defaults, timestamps, o
 	repository.insertOne.mockResolvedValue({ ...webhook, user: null });
 	repository.findBy.mockResolvedValue([{ ...webhook, user: null }]);
 	repository.findOneBy.mockResolvedValue({ ...webhook, user: null });
-	const created = await new CreateEndpoint(repository, ids, mockDeep(), roles).execute(v.parse(requiredSchema(iWebhooksCreateContract['~orpc'].inputSchema), params), me);
+	const created = await call(CreateEndpoint({ webhooksRepository: repository, idService: ids, globalEventService: mockDeep(), roleService: roles }), v.parse(requiredSchema(iWebhooksCreateContract['~orpc'].inputSchema), params), { context: testContext(me, null) });
 	checkFinite(requiredSchema(iWebhooksCreateContract['~orpc'].outputSchema), created);
 	expect(created.secret).toBe('');
-	const listed = await new ListEndpoint(repository).execute({}, me);
+	const listed = await call(ListEndpoint({ webhooksRepository: repository }), {}, { context: testContext(me, null) });
 	checkFinite(packedUserWebhookSchema, listed[0]);
-	const show = new ShowEndpoint(repository);
-	checkFinite(packedUserWebhookSchema, await show.execute({ webhookId: webhook.id }, me));
+	const show = ShowEndpoint({ webhooksRepository: repository });
+	checkFinite(packedUserWebhookSchema, await call(show, { webhookId: webhook.id }, { context: testContext(me, null) }));
 	expect(repository.findOneBy).toHaveBeenCalledWith({ id: webhook.id, userId: me.id });
 	repository.findOneBy.mockResolvedValue({ ...webhook, user: null, latestSentAt: date, latestStatus: 202 });
-	expect(await show.execute({ webhookId: webhook.id }, me)).toHaveProperty('latestSentAt', date.toISOString());
+	expect(await call(show, { webhookId: webhook.id }, { context: testContext(me, null) })).toHaveProperty('latestSentAt', date.toISOString());
 	repository.findOneBy.mockResolvedValue(null);
-	await expect(show.execute({ webhookId: webhook.id }, me)).rejects.toMatchObject({ code: 'NO_SUCH_WEBHOOK' });
+	await expect(call(show, { webhookId: webhook.id }, { context: testContext(me, null) })).rejects.toMatchObject({ code: 'NO_SUCH_WEBHOOK' });
 });
 
 test('real external resource handler retains hash verification and only its finite declared result', async () => {
 	const http = mockDeep<HttpRequestService>();
 	const data = 'Fixture\r\nresource';
 	http.getJson.mockResolvedValue({ type: 'fixture', data, extraRemote: true });
-	const endpoint = new ResourcesEndpoint(http);
+	const endpoint = ResourcesEndpoint({ httpRequestService: http });
 	const hash = createHash('sha512').update(data.replace(/\r\n/g, '\n')).digest('hex');
-	const result = await endpoint.execute({ url: 'https://example.com/resource', hash }, me);
+	const result = await call(endpoint, { url: 'https://example.com/resource', hash }, { context: testContext(me, null) });
 	expect(v.parse(requiredSchema(fetchExternalResourcesContract['~orpc'].outputSchema), result)).toEqual({ type: 'fixture', data });
 	expect(v.safeParse(requiredSchema(fetchExternalResourcesContract['~orpc'].outputSchema), { ...result, future: true }).success).toBe(false);
-	await expect(endpoint.execute({ url: 'https://example.com/resource', hash: 'wrong' }, me)).rejects.toMatchObject({ code: 'EXT_RESOURCE_HASH_DIDNT_MATCH' });
+	await expect(call(endpoint, { url: 'https://example.com/resource', hash: 'wrong' }, { context: testContext(me, null) })).rejects.toMatchObject({ code: 'EXT_RESOURCE_HASH_DIDNT_MATCH' });
 });
 
 test('native webhook and resource inputs strip extras, preserve defaults and reject missing/wrong fields', () => {

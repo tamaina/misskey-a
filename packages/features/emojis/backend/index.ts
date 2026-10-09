@@ -5,5 +5,5 @@
 
 export { emojisContract } from './api.contract.js';
 export { createEmojisRouter } from './api.router.js';
-export { createEmojisOperations } from './api.operations.js';
-export type { EmojisOperations } from './api.operations.js';
+export { EmojisApiProvider } from './api.provider.js';
+export type { EmojisDependencies } from './api.dependencies.js';

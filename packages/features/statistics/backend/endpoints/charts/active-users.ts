@@ -6,20 +6,18 @@
 import { implement } from '@orpc/server';
 import { authentication, apiPolicy, decodeScalarInput } from '../../../../api/backend/transport/middleware.js';
 import { chartActiveUsersContract, chartActiveUsersGetContract } from './active-users.contract.js';
-import type { ApiActor } from '../../../../api/backend/transport/context.js';
-import type { StatisticsContext } from '../../operations.js';
-
-export function createActiveUsersProcedure<Actor extends ApiActor>() {
-	return implement(chartActiveUsersContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<StatisticsContext<Actor>>()
+import type { ApiActor, ApiContext } from '../../../../api/backend/transport/context.js';
+import type { StatisticsDependencies } from '../../api.dependencies.js';
+export function createActiveUsersProcedure<Actor extends ApiActor>(deps: StatisticsDependencies['charts']['activeUsers']) {
+	return implement(chartActiveUsersContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>()
 		.use(authentication<Actor>())
-		.use(apiPolicy<Actor>({ name: 'charts/active-users' }))
-		.handler(({ input, context }) => context.operations.statistics.activeUsers(input, context.principal));
+		.use(apiPolicy<Actor>({ name: chartActiveUsersContract['~orpc'].meta.requestName }))
+		.handler(({ input }) => deps.getChart(input.span, input.limit, input.offset ? new Date(input.offset) : null));
 }
-
-export function createActiveUsersGetProcedure<Actor extends ApiActor>() {
-	return implement(chartActiveUsersGetContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<StatisticsContext<Actor>>()
+export function createActiveUsersGetProcedure<Actor extends ApiActor>(deps: StatisticsDependencies['charts']['activeUsers']) {
+	return implement(chartActiveUsersGetContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>()
 		.use(authentication<Actor>())
-		.use(apiPolicy<Actor>({ name: 'charts/active-users' }))
+		.use(apiPolicy<Actor>({ name: chartActiveUsersContract['~orpc'].meta.requestName }))
 		.use(decodeScalarInput<Actor>({ limit: 'integer', offset: 'integer' }))
-		.handler(({ input, context }) => context.operations.statistics.activeUsers(input, context.principal));
+		.handler(({ input }) => deps.getChart(input.span, input.limit, input.offset ? new Date(input.offset) : null));
 }

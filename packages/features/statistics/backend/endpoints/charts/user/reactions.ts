@@ -6,20 +6,18 @@
 import { implement } from '@orpc/server';
 import { authentication, apiPolicy, decodeScalarInput } from '../../../../../api/backend/transport/middleware.js';
 import { chartPerUserReactionsContract, chartPerUserReactionsGetContract } from './reactions.contract.js';
-import type { ApiActor } from '../../../../../api/backend/transport/context.js';
-import type { StatisticsContext } from '../../../operations.js';
-
-export function createPerUserReactionsProcedure<Actor extends ApiActor>() {
-	return implement(chartPerUserReactionsContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<StatisticsContext<Actor>>()
+import type { ApiActor, ApiContext } from '../../../../../api/backend/transport/context.js';
+import type { StatisticsDependencies } from '../../../api.dependencies.js';
+export function createPerUserReactionsProcedure<Actor extends ApiActor>(deps: StatisticsDependencies['charts']['userReactions']) {
+	return implement(chartPerUserReactionsContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>()
 		.use(authentication<Actor>())
-		.use(apiPolicy<Actor>({ name: 'charts/user/reactions' }))
-		.handler(({ input, context }) => context.operations.statistics.userReactions(input, context.principal));
+		.use(apiPolicy<Actor>({ name: chartPerUserReactionsContract['~orpc'].meta.requestName }))
+		.handler(({ input }) => deps.getChart(input.span, input.limit, input.offset ? new Date(input.offset) : null, input.userId));
 }
-
-export function createPerUserReactionsGetProcedure<Actor extends ApiActor>() {
-	return implement(chartPerUserReactionsGetContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<StatisticsContext<Actor>>()
+export function createPerUserReactionsGetProcedure<Actor extends ApiActor>(deps: StatisticsDependencies['charts']['userReactions']) {
+	return implement(chartPerUserReactionsGetContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>()
 		.use(authentication<Actor>())
-		.use(apiPolicy<Actor>({ name: 'charts/user/reactions' }))
+		.use(apiPolicy<Actor>({ name: chartPerUserReactionsContract['~orpc'].meta.requestName }))
 		.use(decodeScalarInput<Actor>({ limit: 'integer', offset: 'integer' }))
-		.handler(({ input, context }) => context.operations.statistics.userReactions(input, context.principal));
+		.handler(({ input }) => deps.getChart(input.span, input.limit, input.offset ? new Date(input.offset) : null, input.userId));
 }

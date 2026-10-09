@@ -4,51 +4,50 @@
  */
 
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
-import type { DriveManagementInputs } from '../../../management.contract.js';
 import { driveFoldersDeleteErrors } from './delete.contract.js';
-import { Inject, Injectable } from '@nestjs/common';
-
 import type { DriveFoldersRepository, DriveFilesRepository } from '@features/persistence/backend/repositories/models.js';
 import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
-import { DI } from '@/di-symbols.js';
 import { apiError } from '@features/api/backend/transport/orpc-error.js';
+import { driveManagementContract } from '../../../management.contract.js';
+import { implement } from '@orpc/server';
+import { authentication, apiPolicy, requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import type { ApiContext } from '@features/api/backend/transport/context.js';
+export interface DriveFoldersDeleteDependencies {
+	driveFilesRepository: DriveFilesRepository;
+	driveFoldersRepository: DriveFoldersRepository;
+	globalEventService: Pick<GlobalEventService, 'publishDriveStream'>;
+}
+export function createDriveFoldersDeleteProcedure(deps: DriveFoldersDeleteDependencies) {
+	return implement(driveManagementContract['drive/folders/delete'], { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>()
+		.use(authentication<MiLocalUser>())
+		.use(apiPolicy<MiLocalUser>({ 'name': 'drive/folders/delete', 'requireCredential': true, 'kind': 'write:drive' })).use(requirePrincipal<MiLocalUser>())
+		.handler(async ({ input, context }) => {
+			const ps = input;
+			const me = context.principal;
+			const _ip = context.ip;
+			const _headers = context.headers;
+			// Get folder
+			const folder = await deps.driveFoldersRepository.findOneBy({
+				id: ps.folderId,
+				userId: me.id,
+			});
 
-@Injectable()
-export class DriveFoldersDeleteOperation {
-	constructor(
-		@Inject(DI.driveFilesRepository)
-		private driveFilesRepository: DriveFilesRepository,
+			if (folder == null) {
+				throw apiError(driveFoldersDeleteErrors.noSuchFolder);
+			}
 
-		@Inject(DI.driveFoldersRepository)
-		private driveFoldersRepository: DriveFoldersRepository,
+			const [childFoldersCount, childFilesCount] = await Promise.all([
+				deps.driveFoldersRepository.countBy({ parentId: folder.id }),
+				deps.driveFilesRepository.countBy({ folderId: folder.id }),
+			]);
 
-		private globalEventService: GlobalEventService,
-	) {
-	}
+			if (childFoldersCount !== 0 || childFilesCount !== 0) {
+				throw apiError(driveFoldersDeleteErrors.hasChildFilesOrFolders);
+			}
 
-	async execute(ps: DriveManagementInputs['drive/folders/delete'], me: MiLocalUser, _ip: string, _headers: Record<string, string | string[] | undefined>) {
-		// Get folder
-		const folder = await this.driveFoldersRepository.findOneBy({
-			id: ps.folderId,
-			userId: me.id,
+			await deps.driveFoldersRepository.delete(folder.id);
+
+			// Publish folderCreated event
+			deps.globalEventService.publishDriveStream(me.id, 'folderDeleted', folder.id);
 		});
-
-		if (folder == null) {
-			throw apiError(driveFoldersDeleteErrors.noSuchFolder);
-		}
-
-		const [childFoldersCount, childFilesCount] = await Promise.all([
-			this.driveFoldersRepository.countBy({ parentId: folder.id }),
-			this.driveFilesRepository.countBy({ folderId: folder.id }),
-		]);
-
-		if (childFoldersCount !== 0 || childFilesCount !== 0) {
-			throw apiError(driveFoldersDeleteErrors.hasChildFilesOrFolders);
-		}
-
-		await this.driveFoldersRepository.delete(folder.id);
-
-		// Publish folderCreated event
-		this.globalEventService.publishDriveStream(me.id, 'folderDeleted', folder.id);
-	}
 }

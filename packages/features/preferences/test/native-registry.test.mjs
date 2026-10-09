@@ -6,7 +6,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createRouterClient } from '@orpc/server';
-import { createApiRouter, createPreferencesOperations, RegistryApiService } from '../../../backend/built/features/api/pilot.js';
+import { createPreferencesRouter, RegistryApiService } from '../../../backend/built/features/preferences/backend.js';
 
 const actor = { id: 'registry-owner', isSuspended: false, movedToUri: null };
 const updatedAt = new Date('2026-10-09T12:34:56.000Z');
@@ -23,7 +23,7 @@ function fixture({ token = null, overrides = {} } = {}) {
 		set: async (...args) => { calls.push(['set', ...args]); },
 		...overrides,
 	};
-	const operations = createPreferencesOperations({ registry });
+	const router = createPreferencesRouter({ registry });
 	const context = {
 		credential: 'credential', ip: '192.0.2.1', headers: {},
 		services: {
@@ -32,9 +32,8 @@ function fixture({ token = null, overrides = {} } = {}) {
 			rateLimitFactor: async () => 1,
 			limit: async () => null,
 		},
-		operations: { preferences: operations },
 	};
-	return { calls, operations, client: createRouterClient(createApiRouter(), { context }).preferences };
+	return { calls, client: createRouterClient(router, { context }) };
 }
 
 test('every scoped registry route uses the token tenant instead of client domain', async () => {
@@ -101,7 +100,7 @@ test('JSON values and dynamic registry keys preserve reserved names through rout
 test('set rejects non-JSON objects and nonfinite values before invoking storage', async () => {
 	const { client, calls } = fixture();
 	for (const value of [new Date(), new Map(), new Set(), NaN, Infinity, { nested: new Date() }]) {
-		await assert.rejects(client.set({ key: 'setting', value }), error => error.code === 'INVALID_PARAM');
+		await assert.rejects(client.set({ key: 'setting', value }), error => error.code === 'BAD_REQUEST' && error.message === 'Input validation failed');
 	}
 	assert.deepEqual(calls, []);
 });

@@ -3,9 +3,10 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 import { test } from 'node:test';
+import { createProcedureClient } from '@orpc/server';
 import assert from 'node:assert/strict';
 import * as v from 'valibot';
-import { createPing } from '../../../backend/built/features/instance/backend.js';
+import { createPingProcedure } from '../../../backend/built/features/instance/backend.js';
 import { instanceApiContract as instanceContract } from '../../../misskey-js/built/contracts/instance/backend/api.contract.js';
 
 test('implementation uses the contract and an injectable clock', async () => {
@@ -35,3 +36,5 @@ test('native contract exposes the same path and validates finite output', () => 
 	assert.equal(v.safeParse(instanceContract.ping['~orpc'].outputSchema, { pong: Infinity }).success, false);
 	assert.equal(v.safeParse(instanceContract.ping['~orpc'].outputSchema, { pong: 1, secret: true }).success, false);
 });
+
+function createPing(now = Date.now) { return createProcedureClient(createPingProcedure({ now }), { context: { credential: null, ip: '127.0.0.1', headers: {}, services: { authenticate: async () => [null, null], limitActor: () => null, rateLimitFactor: async () => 1, limit: async () => null } } }); }

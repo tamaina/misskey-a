@@ -5,12 +5,12 @@
 
 import { implement } from '@orpc/server';
 import { noteSearchContract } from './endpoints/noteSearch.contract.js';
-import { createNotesSearchProcedure } from './endpoints/notes/search.js';
-import type { ApiActor } from '../../api/backend/transport/context.js';
-import type { NoteSearchContext } from './operations.js';
-
-export function createNoteSearchRouter<Actor extends ApiActor>() {
-	return implement(noteSearchContract).$context<NoteSearchContext<Actor>>().router({
-		notesSearch: createNotesSearchProcedure<Actor>(),
+import { createNotesSearchProcedure, type NotesSearchDependencies } from './endpoints/notes/search.js';
+import type { ApiContext } from '@features/api/backend/transport/context.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+export type NoteSearchDependencies = NotesSearchDependencies;
+export function createNoteSearchRouter<Actor extends MiLocalUser>(deps: NoteSearchDependencies) {
+	return implement(noteSearchContract).$context<ApiContext<Actor>>().router({
+		notesSearch: createNotesSearchProcedure<Actor>(deps),
 	});
 }

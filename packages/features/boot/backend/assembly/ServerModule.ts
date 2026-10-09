@@ -2,74 +2,6 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-
-import { DiscoveryApplicationService } from '@features/discovery/backend/endpoints/discovery.application.js';
-import { HashtagsListOperation } from '@features/discovery/backend/endpoints/hashtags/list.js';
-import { HashtagsSearchOperation } from '@features/discovery/backend/endpoints/hashtags/search.js';
-import { HashtagsShowOperation } from '@features/discovery/backend/endpoints/hashtags/show.js';
-import { HashtagsTrendOperation } from '@features/discovery/backend/endpoints/hashtags/trend.js';
-import { HashtagsUsersOperation } from '@features/discovery/backend/endpoints/hashtags/users.js';
-import { NotesFeaturedOperation } from '@features/discovery/backend/endpoints/notes/featured.js';
-import { NotesSearchByTagOperation } from '@features/discovery/backend/endpoints/notes/search-by-tag.js';
-import { UsersFeaturedNotesOperation } from '@features/discovery/backend/endpoints/users/featured-notes.js';
-import { UsersGetFrequentlyRepliedUsersOperation } from '@features/discovery/backend/endpoints/users/get-frequently-replied-users.js';
-import { UsersRecommendationOperation } from '@features/discovery/backend/endpoints/users/recommendation.js';
-import { UsersSearchOperation } from '@features/discovery/backend/endpoints/users/search.js';
-import { UsersSearchByUsernameAndHostOperation } from '@features/discovery/backend/endpoints/users/search-by-username-and-host.js';
-import { notesOperationProviders } from '@features/notes/backend/operations.js';
-import { timelinesApplicationProviders } from '@features/timelines/backend/application-providers.js';
-import { noteSearchApplicationProviders } from '@features/note-search/backend/application-providers.js';
-import { relationshipsProviders } from '@features/relationships/backend/endpoints/relationships.providers.js';
-import { AdminAccountsDeleteOperation } from '@features/users/backend/endpoints/admin/accounts/delete.js';
-import { AdminAccountsFindByEmailOperation } from '@features/users/backend/endpoints/admin/accounts/find-by-email.js';
-import { AdminDeleteAccountOperation } from '@features/users/backend/endpoints/admin/delete-account.js';
-import { AdminUpdateProxyAccountOperation } from '@features/users/backend/endpoints/admin/update-proxy-account.js';
-import { IOperation } from '@features/users/backend/endpoints/i.js';
-import { IClaimAchievementOperation } from '@features/users/backend/endpoints/i/claim-achievement.js';
-import { IDeleteAccountOperation } from '@features/users/backend/endpoints/i/delete-account.js';
-import { IMoveOperation } from '@features/users/backend/endpoints/i/move.js';
-import { IUpdateOperation } from '@features/users/backend/endpoints/i/update.js';
-import { UsersOperation } from '@features/users/backend/endpoints/users.js';
-import { UsersAchievementsOperation } from '@features/users/backend/endpoints/users/achievements.js';
-import { UsersShowOperation } from '@features/users/backend/endpoints/users/show.js';
-import { UsersUpdateMemoOperation } from '@features/users/backend/endpoints/users/update-memo.js';
-import { UsersApplicationService } from '@features/users/backend/api.application.js';
-import { chatOperationProviders } from '@features/chat/backend/operations.js';
-import { channelOperationProviders } from '@features/channels/backend/operations.js';
-import { pagesApplicationProviders } from '@features/pages/backend/application-providers.js';
-import { playApplicationProviders } from '@features/play/backend/application-providers.js';
-import { gamesApplicationProviders } from '@features/games/backend/application-providers.js';
-import { federationApplicationProviders } from '@features/federation/backend/application-providers.js';
-import { operationsApplicationProviders } from '@features/operations/backend/application-providers.js';
-import { integrationsApplicationProviders } from '@features/integrations/backend/application-providers.js';
-import { DriveManagementApplicationService } from '@features/drive/backend/management.application.js';
-import { AdminDeleteAllFilesOfAUserOperation } from '@features/drive/backend/endpoints/admin/delete-all-files-of-a-user.js';
-import { AdminDriveCleanRemoteFilesOperation } from '@features/drive/backend/endpoints/admin/drive/clean-remote-files.js';
-import { AdminDriveCleanupOperation } from '@features/drive/backend/endpoints/admin/drive/cleanup.js';
-import { AdminDriveFilesOperation } from '@features/drive/backend/endpoints/admin/drive/files.js';
-import { AdminDriveShowFileOperation } from '@features/drive/backend/endpoints/admin/drive/show-file.js';
-import { DriveOperation } from '@features/drive/backend/endpoints/drive.js';
-import { DriveFilesOperation } from '@features/drive/backend/endpoints/drive/files.js';
-import { DriveFilesAttachedNotesOperation } from '@features/drive/backend/endpoints/drive/files/attached-notes.js';
-import { DriveFilesAttachedChatMessagesOperation } from '@features/drive/backend/endpoints/drive/files/attached-chat-messages.js';
-import { DriveFilesCheckExistenceOperation } from '@features/drive/backend/endpoints/drive/files/check-existence.js';
-import { DriveFilesDeleteOperation } from '@features/drive/backend/endpoints/drive/files/delete.js';
-import { DriveFilesFindOperation } from '@features/drive/backend/endpoints/drive/files/find.js';
-import { DriveFilesFindByHashOperation } from '@features/drive/backend/endpoints/drive/files/find-by-hash.js';
-import { DriveFilesShowOperation } from '@features/drive/backend/endpoints/drive/files/show.js';
-import { DriveFilesUpdateOperation } from '@features/drive/backend/endpoints/drive/files/update.js';
-import { DriveFilesMoveBulkOperation } from '@features/drive/backend/endpoints/drive/files/move-bulk.js';
-import { DriveFilesUploadFromUrlOperation } from '@features/drive/backend/endpoints/drive/files/upload-from-url.js';
-import { DriveFoldersOperation } from '@features/drive/backend/endpoints/drive/folders.js';
-import { DriveFoldersCreateOperation } from '@features/drive/backend/endpoints/drive/folders/create.js';
-import { DriveFoldersDeleteOperation } from '@features/drive/backend/endpoints/drive/folders/delete.js';
-import { DriveFoldersFindOperation } from '@features/drive/backend/endpoints/drive/folders/find.js';
-import { DriveFoldersShowOperation } from '@features/drive/backend/endpoints/drive/folders/show.js';
-import { DriveFoldersUpdateOperation } from '@features/drive/backend/endpoints/drive/folders/update.js';
-import { DriveStreamOperation } from '@features/drive/backend/endpoints/drive/stream.js';
-import { PortabilityApplicationService } from '@features/portability/backend/api.application.js';
-import { authProviders } from '@features/auth/backend/api.providers.js';
-import { sessionProviders } from '@features/auth/backend/session.providers.js';
 import { Module } from '@nestjs/common';
 import { ApiIpLoggingService } from '@features/api/backend/transport/ApiIpLoggingService.js';
 import { FileServerService } from '@features/drive/backend/http/FileServerService.js';
@@ -83,9 +15,7 @@ import { ApiServerService } from '@features/api/backend/transport/ApiServerServi
 import { OrpcPilotService } from '@features/api/backend/transport/OrpcPilotService.js';
 import { AuthenticateService } from '@features/auth/backend/transport/AuthenticateService.js';
 import { RateLimiterService } from '@features/api/backend/transport/RateLimiterService.js';
-import { SigninApiService } from '@features/auth/backend/transport/SigninApiService.js';
 import { SigninService } from '@features/auth/backend/transport/SigninService.js';
-import { SignupApiService } from '@features/auth/backend/transport/SignupApiService.js';
 import { StreamingApiServerService } from '@features/api/backend/transport/StreamingApiServerService.js';
 import { OpenApiServerService } from '@features/api/backend/transport/openapi/OpenApiServerService.js';
 import { ClientServerService } from '@features/web/backend/http/ClientServerService.js';
@@ -115,9 +45,9 @@ import { ChatRoomChannel } from '@features/chat/backend/stream/chat-room.js';
 import { ReversiChannel } from '@features/games/backend/stream/reversi.js';
 import { ReversiGameChannel } from '@features/games/backend/stream/reversi-game.js';
 import { NoteStreamingHidingService } from '@features/api/backend/transport/stream/NoteStreamingHidingService.js';
-import { SigninWithPasskeyApiService } from '@features/auth/backend/transport/SigninWithPasskeyApiService.js';
 import { ServerService } from './ServerService.mjs';
 import { CoreModule } from './CoreModule.js';
+import { sessionProviders } from '@features/auth/backend/session.providers.js';
 import { featureProviders } from '@features/index/backend/feature-providers.js';
 
 @Module({
@@ -126,6 +56,7 @@ import { featureProviders } from '@features/index/backend/feature-providers.js';
 	],
 	providers: [
 		...featureProviders,
+		...sessionProviders,
 		ClientServerService,
 		ClientLoggerService,
 		HtmlTemplateService,
@@ -143,80 +74,9 @@ import { featureProviders } from '@features/index/backend/feature-providers.js';
 		ApiLoggerService,
 		ApiServerService,
 		OrpcPilotService,
-		...chatOperationProviders,
-		...channelOperationProviders,
-		...pagesApplicationProviders,
-		...playApplicationProviders,
-		...gamesApplicationProviders,
-		...federationApplicationProviders,
-		...operationsApplicationProviders,
-		...integrationsApplicationProviders,
-		DriveManagementApplicationService,
-		AdminDeleteAllFilesOfAUserOperation,
-		AdminDriveCleanRemoteFilesOperation,
-		AdminDriveCleanupOperation,
-		AdminDriveFilesOperation,
-		AdminDriveShowFileOperation,
-		DriveOperation,
-		DriveFilesOperation,
-		DriveFilesAttachedNotesOperation,
-		DriveFilesAttachedChatMessagesOperation,
-		DriveFilesCheckExistenceOperation,
-		DriveFilesDeleteOperation,
-		DriveFilesFindOperation,
-		DriveFilesFindByHashOperation,
-		DriveFilesShowOperation,
-		DriveFilesUpdateOperation,
-		DriveFilesMoveBulkOperation,
-		DriveFilesUploadFromUrlOperation,
-		DriveFoldersOperation,
-		DriveFoldersCreateOperation,
-		DriveFoldersDeleteOperation,
-		DriveFoldersFindOperation,
-		DriveFoldersShowOperation,
-		DriveFoldersUpdateOperation,
-		DriveStreamOperation,
-		PortabilityApplicationService,
-		...authProviders,
-		...sessionProviders,
-		...notesOperationProviders,
-		...timelinesApplicationProviders,
-		...noteSearchApplicationProviders,
-		...relationshipsProviders,
-		AdminAccountsDeleteOperation,
-		AdminAccountsFindByEmailOperation,
-		AdminDeleteAccountOperation,
-		AdminUpdateProxyAccountOperation,
-		IOperation,
-		IClaimAchievementOperation,
-		IDeleteAccountOperation,
-		IMoveOperation,
-		IUpdateOperation,
-		UsersOperation,
-		UsersAchievementsOperation,
-		UsersShowOperation,
-		UsersUpdateMemoOperation,
-		UsersApplicationService,
-		DiscoveryApplicationService,
-		HashtagsListOperation,
-		HashtagsSearchOperation,
-		HashtagsShowOperation,
-		HashtagsTrendOperation,
-		HashtagsUsersOperation,
-		NotesFeaturedOperation,
-		NotesSearchByTagOperation,
-		UsersFeaturedNotesOperation,
-		UsersGetFrequentlyRepliedUsersOperation,
-		UsersRecommendationOperation,
-		UsersSearchOperation,
-		UsersSearchByUsernameAndHostOperation,
-
 		AuthenticateService,
 		RateLimiterService,
-		SigninApiService,
-		SigninWithPasskeyApiService,
 		SigninService,
-		SignupApiService,
 		StreamingApiServerService,
 		MainChannel,
 		AdminChannel,
@@ -244,4 +104,4 @@ import { featureProviders } from '@features/index/backend/feature-providers.js';
 		ServerService,
 	],
 })
-export class ServerModule {}
+export class ServerModule { }

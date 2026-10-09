@@ -16,6 +16,9 @@ import { Logger } from '@features/runtime/backend/logging/logger.js';
 import { envOption } from '@/env.js';
 import { logManager } from '@features/runtime/backend/logging/logging-runtime.js';
 import { PrettyConsoleBackend } from '@features/runtime/backend/logging/PrettyConsoleBackend.js';
+import { mockDeep } from 'vitest-mock-extended';
+import { createApiTestRouter } from '@features/index/backend/api.test-fixture.js';
+import { createNotesRouter } from '@features/notes/backend/api.router.js';
 import type { LogBackend } from '@features/runtime/backend/logging/LogBackend.js';
 
 function injectionToken(value: unknown): InjectionToken {
@@ -32,8 +35,11 @@ async function createService() {
 		startSpan: vi.fn((_name: string, callback: () => unknown) => callback()),
 		captureMessage: vi.fn((_message: string, _details: { level: string; extra: Record<string, unknown> }) => undefined),
 	};
-	const failedOperation = { execute: vi.fn().mockRejectedValue(new TypeError('broken endpoint')) };
-	const lookup = { get: (token: InjectionToken) => typeof token === 'function' && token.name === 'NotesShowOperation' ? failedOperation : {} };
+	const notes = mockDeep<Parameters<typeof createNotesRouter>[0]>();
+	const failedOperation = notes.getterService.getNoteWithRelations;
+	failedOperation.mockRejectedValue(new TypeError('broken endpoint'));
+	const router = createApiTestRouter({ notes: createNotesRouter(notes) });
+	const lookup = { get: () => ({ compose: () => router }) };
 	const providers: Provider[] = [...new Set(tokens)].map(token => ({
 		provide: token,
 		useValue: token === ModuleRef ? lookup
@@ -62,7 +68,7 @@ describe('native transport structured error logging', () => {
 				noteId: 'note123', i: 'native-token', password: 'password', options: { visible: true },
 			} });
 			expect(response.statusCode).toBe(500);
-			expect(h.failedOperation.execute).toHaveBeenCalledWith({ noteId: 'note123' }, null);
+			expect(h.failedOperation).toHaveBeenCalledWith('note123');
 			const record = write.mock.calls[0][0];
 			expect(record).toMatchObject({
 				eventName: 'api.endpoint.failed',

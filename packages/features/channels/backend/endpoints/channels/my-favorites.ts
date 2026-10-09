@@ -4,48 +4,32 @@
  */
 
 import { implement } from '@orpc/server';
-import { Inject, Injectable } from '@nestjs/common';
 import * as v from 'valibot';
 import { packedChannelSchema } from '../../channel.schema.js';
-import { DI } from '@/di-symbols.js';
 import { authentication, apiPolicy, requirePrincipal } from '../../../../api/backend/transport/middleware.js';
 import { ChannelEntityService } from '../../serializers/ChannelEntityService.js';
-import { channelsMyFavoritesContract, channelsMyFavoritesPolicy, channelsMyFavoritesErrors } from './my-favorites.contract.js';
-import type { ApiActor } from '../../../../api/backend/transport/context.js';
-import type { ChannelsApiContext } from '../../operations.js';
-
+import { channelsMyFavoritesContract, channelsMyFavoritesPolicy } from './my-favorites.contract.js';
 import type { ChannelFavoritesRepository } from '@features/persistence/backend/repositories/models.js';
 
 import type { MiLocalUser } from '../../../../users/backend/models/User.js';
-
-export function createChannelsMyFavoritesProcedure<Actor extends ApiActor>() {
-	return implement(channelsMyFavoritesContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ChannelsApiContext<Actor>>()
+import type { ApiContext } from '@features/api/backend/transport/context.js';
+export interface ChannelsMyFavoritesDependencies {
+	channelFavoritesRepository: ChannelFavoritesRepository;
+	channelEntityService: ChannelEntityService;
+}
+export function createChannelsMyFavoritesProcedure<Actor extends MiLocalUser>(deps: ChannelsMyFavoritesDependencies) {
+	return implement(channelsMyFavoritesContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>()
 		.use(authentication<Actor>())
 		.use(apiPolicy<Actor>(channelsMyFavoritesPolicy))
 		.use(requirePrincipal<Actor>())
-		.handler(({ input, context }) => context.operations.channels.channelsMyFavorites(input, context.principal));
-}
+		.handler(async ({ input, context }) => {
+			const me = context.principal;
+			const query = deps.channelFavoritesRepository.createQueryBuilder('favorite')
+				.andWhere('favorite.userId = :meId', { meId: me.id })
+				.leftJoinAndSelect('favorite.channel', 'channel');
 
-@Injectable()
-export class ChannelsMyFavoritesOperation {
-	constructor(
-		@Inject(DI.channelFavoritesRepository)
-		private channelFavoritesRepository: ChannelFavoritesRepository,
-
-		private channelEntityService: ChannelEntityService,
-	) {}
-	async execute(ps: v.InferOutput<NonNullable<typeof channelsMyFavoritesContract['~orpc']['inputSchema']>>, me: MiLocalUser): Promise<v.InferOutput<NonNullable<typeof channelsMyFavoritesContract['~orpc']['outputSchema']>>> {
-		return v.parse(v.array(packedChannelSchema), await this.run(ps, me));
-	}
-
-	private async run(ps: v.InferOutput<NonNullable<typeof channelsMyFavoritesContract['~orpc']['inputSchema']>>, me: MiLocalUser) {
-		const query = this.channelFavoritesRepository.createQueryBuilder('favorite')
-			.andWhere('favorite.userId = :meId', { meId: me.id })
-			.leftJoinAndSelect('favorite.channel', 'channel');
-
-		const favorites = await query
-			.getMany();
-
-		return await Promise.all(favorites.map(x => this.channelEntityService.pack(x.channel!, me)));
-	}
+			const favorites = await query
+				.getMany();
+			return v.parse(v.array(packedChannelSchema), await Promise.all(favorites.map(x => deps.channelEntityService.pack(x.channel!, me))));
+		});
 }

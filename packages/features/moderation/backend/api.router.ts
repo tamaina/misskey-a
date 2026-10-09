@@ -5,30 +5,47 @@
 
 import { implement } from '@orpc/server';
 import type { ApiActor, ApiContext } from '../../api/backend/transport/context.js';
-import { authentication, apiPolicy, requirePrincipal, decodeScalarInput } from '../../api/backend/transport/middleware.js';
 import { moderationContract } from './api.contract.js';
-import type { ModerationOperations } from './api.operations.js';
-export type ModerationContext<Actor extends ApiActor> = ApiContext<Actor> & { operations: { moderation: ModerationOperations<Actor> } };
-export function createModerationRouter<Actor extends ApiActor>() {
- const native = implement(moderationContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ModerationContext<Actor>>().use(authentication<Actor>());
- const adminAbuseReportNotificationRecipientCreate = native.adminAbuseReportNotificationRecipientCreate.use(apiPolicy<Actor>({ name: 'admin/abuse-report/notification-recipient/create', requireCredential: true, requireModerator: true, secure: true, kind: 'write:admin:abuse-report:notification-recipient' })).use(requirePrincipal<Actor>()).use(decodeScalarInput<Actor>({ isActive: 'boolean' })).handler(({ input, context }) => context.operations.moderation.adminAbuseReportNotificationRecipientCreate(input, context.principal));
- const adminAbuseReportNotificationRecipientDelete = native.adminAbuseReportNotificationRecipientDelete.use(apiPolicy<Actor>({ name: 'admin/abuse-report/notification-recipient/delete', requireCredential: true, requireModerator: true, secure: true, kind: 'write:admin:abuse-report:notification-recipient' })).use(requirePrincipal<Actor>()).handler(({ input, context }) => context.operations.moderation.adminAbuseReportNotificationRecipientDelete(input, context.principal));
- const adminAbuseReportNotificationRecipientList = native.adminAbuseReportNotificationRecipientList.use(apiPolicy<Actor>({ name: 'admin/abuse-report/notification-recipient/list', requireCredential: true, requireModerator: true, secure: true, kind: 'read:admin:abuse-report:notification-recipient' })).use(requirePrincipal<Actor>()).handler(({ input, context }) => context.operations.moderation.adminAbuseReportNotificationRecipientList(input, context.principal));
- const adminAbuseReportNotificationRecipientShow = native.adminAbuseReportNotificationRecipientShow.use(apiPolicy<Actor>({ name: 'admin/abuse-report/notification-recipient/show', requireCredential: true, requireModerator: true, secure: true, kind: 'read:admin:abuse-report:notification-recipient' })).use(requirePrincipal<Actor>()).handler(({ input, context }) => context.operations.moderation.adminAbuseReportNotificationRecipientShow(input, context.principal));
- const adminAbuseReportNotificationRecipientUpdate = native.adminAbuseReportNotificationRecipientUpdate.use(apiPolicy<Actor>({ name: 'admin/abuse-report/notification-recipient/update', requireCredential: true, requireModerator: true, secure: true, kind: 'write:admin:abuse-report:notification-recipient' })).use(requirePrincipal<Actor>()).use(decodeScalarInput<Actor>({ isActive: 'boolean' })).handler(({ input, context }) => context.operations.moderation.adminAbuseReportNotificationRecipientUpdate(input, context.principal));
- const adminAbuseUserReports = native.adminAbuseUserReports.use(apiPolicy<Actor>({ name: 'admin/abuse-user-reports', requireCredential: true, requireModerator: true, kind: 'read:admin:abuse-user-reports' })).use(requirePrincipal<Actor>()).use(decodeScalarInput<Actor>({ limit: 'number', sinceDate: 'number', untilDate: 'number' })).handler(({ input, context }) => context.operations.moderation.adminAbuseUserReports(input, context.principal));
- const adminForwardAbuseUserReport = native.adminForwardAbuseUserReport.use(apiPolicy<Actor>({ name: 'admin/forward-abuse-user-report', requireCredential: true, requireModerator: true, kind: 'write:admin:resolve-abuse-user-report' })).use(requirePrincipal<Actor>()).handler(({ input, context }) => context.operations.moderation.adminForwardAbuseUserReport(input, context.principal));
- const adminGetUserIps = native.adminGetUserIps.use(apiPolicy<Actor>({ name: 'admin/get-user-ips', requireCredential: true, requireAdmin: true, kind: 'read:admin:user-ips' })).use(requirePrincipal<Actor>()).handler(({ input, context }) => context.operations.moderation.adminGetUserIps(input, context.principal));
- const adminResolveAbuseUserReport = native.adminResolveAbuseUserReport.use(apiPolicy<Actor>({ name: 'admin/resolve-abuse-user-report', requireCredential: true, requireModerator: true, kind: 'write:admin:resolve-abuse-user-report' })).use(requirePrincipal<Actor>()).handler(({ input, context }) => context.operations.moderation.adminResolveAbuseUserReport(input, context.principal));
- const adminShowModerationLogs = native.adminShowModerationLogs.use(apiPolicy<Actor>({ name: 'admin/show-moderation-logs', requireCredential: true, requireAdmin: true, kind: 'read:admin:show-moderation-log' })).use(requirePrincipal<Actor>()).use(decodeScalarInput<Actor>({ limit: 'number', sinceDate: 'number', untilDate: 'number' })).handler(({ input, context }) => context.operations.moderation.adminShowModerationLogs(input, context.principal));
- const adminShowUser = native.adminShowUser.use(apiPolicy<Actor>({ name: 'admin/show-user', requireCredential: true, requireModerator: true, kind: 'read:admin:show-user' })).use(requirePrincipal<Actor>()).handler(({ input, context }) => context.operations.moderation.adminShowUser(input, context.principal));
- const adminShowUsers = native.adminShowUsers.use(apiPolicy<Actor>({ name: 'admin/show-users', requireCredential: true, requireModerator: true, kind: 'read:admin:show-user' })).use(requirePrincipal<Actor>()).use(decodeScalarInput<Actor>({ limit: 'number', offset: 'number' })).handler(({ input, context }) => context.operations.moderation.adminShowUsers(input, context.principal));
- const adminSuspendUser = native.adminSuspendUser.use(apiPolicy<Actor>({ name: 'admin/suspend-user', requireCredential: true, requireModerator: true, kind: 'write:admin:suspend-user' })).use(requirePrincipal<Actor>()).handler(({ input, context }) => context.operations.moderation.adminSuspendUser(input, context.principal));
- const adminUnsetUserAvatar = native.adminUnsetUserAvatar.use(apiPolicy<Actor>({ name: 'admin/unset-user-avatar', requireCredential: true, requireModerator: true, kind: 'write:admin:unset-user-avatar' })).use(requirePrincipal<Actor>()).handler(({ input, context }) => context.operations.moderation.adminUnsetUserAvatar(input, context.principal));
- const adminUnsetUserBanner = native.adminUnsetUserBanner.use(apiPolicy<Actor>({ name: 'admin/unset-user-banner', requireCredential: true, requireModerator: true, kind: 'write:admin:unset-user-banner' })).use(requirePrincipal<Actor>()).handler(({ input, context }) => context.operations.moderation.adminUnsetUserBanner(input, context.principal));
- const adminUnsuspendUser = native.adminUnsuspendUser.use(apiPolicy<Actor>({ name: 'admin/unsuspend-user', requireCredential: true, requireModerator: true, kind: 'write:admin:unsuspend-user' })).use(requirePrincipal<Actor>()).handler(({ input, context }) => context.operations.moderation.adminUnsuspendUser(input, context.principal));
- const adminUpdateAbuseUserReport = native.adminUpdateAbuseUserReport.use(apiPolicy<Actor>({ name: 'admin/update-abuse-user-report', requireCredential: true, requireModerator: true, kind: 'write:admin:resolve-abuse-user-report' })).use(requirePrincipal<Actor>()).handler(({ input, context }) => context.operations.moderation.adminUpdateAbuseUserReport(input, context.principal));
- const adminUpdateUserNote = native.adminUpdateUserNote.use(apiPolicy<Actor>({ name: 'admin/update-user-note', requireCredential: true, requireModerator: true, kind: 'write:admin:user-note' })).use(requirePrincipal<Actor>()).handler(({ input, context }) => context.operations.moderation.adminUpdateUserNote(input, context.principal));
- const usersReportAbuse = native.usersReportAbuse.use(apiPolicy<Actor>({ name: 'users/report-abuse', requireCredential: true, kind: 'write:report-abuse' })).use(requirePrincipal<Actor>()).handler(({ input, context }) => context.operations.moderation.usersReportAbuse(input, context.principal));
- return native.router({ adminAbuseReportNotificationRecipientCreate, adminAbuseReportNotificationRecipientDelete, adminAbuseReportNotificationRecipientList, adminAbuseReportNotificationRecipientShow, adminAbuseReportNotificationRecipientUpdate, adminAbuseUserReports, adminForwardAbuseUserReport, adminGetUserIps, adminResolveAbuseUserReport, adminShowModerationLogs, adminShowUser, adminShowUsers, adminSuspendUser, adminUnsetUserAvatar, adminUnsetUserBanner, adminUnsuspendUser, adminUpdateAbuseUserReport, adminUpdateUserNote, usersReportAbuse });
+import type { ModerationApiDependencies } from './api.dependencies.js';
+import { createAdminAbuseReportNotificationRecipientCreateProcedure } from './endpoints/admin/abuse-report/notification-recipient/create.js';
+import { createAdminAbuseReportNotificationRecipientDeleteProcedure } from './endpoints/admin/abuse-report/notification-recipient/delete.js';
+import { createAdminAbuseReportNotificationRecipientListProcedure } from './endpoints/admin/abuse-report/notification-recipient/list.js';
+import { createAdminAbuseReportNotificationRecipientShowProcedure } from './endpoints/admin/abuse-report/notification-recipient/show.js';
+import { createAdminAbuseReportNotificationRecipientUpdateProcedure } from './endpoints/admin/abuse-report/notification-recipient/update.js';
+import { createAdminAbuseUserReportsProcedure } from './endpoints/admin/abuse-user-reports.js';
+import { createAdminForwardAbuseUserReportProcedure } from './endpoints/admin/forward-abuse-user-report.js';
+import { createAdminGetUserIpsProcedure } from './endpoints/admin/get-user-ips.js';
+import { createAdminResolveAbuseUserReportProcedure } from './endpoints/admin/resolve-abuse-user-report.js';
+import { createAdminShowModerationLogsProcedure } from './endpoints/admin/show-moderation-logs.js';
+import { createAdminShowUserProcedure } from './endpoints/admin/show-user.js';
+import { createAdminShowUsersProcedure } from './endpoints/admin/show-users.js';
+import { createAdminSuspendUserProcedure } from './endpoints/admin/suspend-user.js';
+import { createAdminUnsetUserAvatarProcedure } from './endpoints/admin/unset-user-avatar.js';
+import { createAdminUnsetUserBannerProcedure } from './endpoints/admin/unset-user-banner.js';
+import { createAdminUnsuspendUserProcedure } from './endpoints/admin/unsuspend-user.js';
+import { createAdminUpdateAbuseUserReportProcedure } from './endpoints/admin/update-abuse-user-report.js';
+import { createAdminUpdateUserNoteProcedure } from './endpoints/admin/update-user-note.js';
+import { createUsersReportAbuseProcedure } from './endpoints/users/report-abuse.js';
+export function createModerationRouter<Actor extends ApiActor>(deps: ModerationApiDependencies<Actor>) {
+	return implement(moderationContract).$context<ApiContext<Actor>>().router({
+		adminAbuseReportNotificationRecipientCreate: createAdminAbuseReportNotificationRecipientCreateProcedure<Actor>(deps),
+		adminAbuseReportNotificationRecipientDelete: createAdminAbuseReportNotificationRecipientDeleteProcedure<Actor>(deps),
+		adminAbuseReportNotificationRecipientList: createAdminAbuseReportNotificationRecipientListProcedure<Actor>(deps),
+		adminAbuseReportNotificationRecipientShow: createAdminAbuseReportNotificationRecipientShowProcedure<Actor>(deps),
+		adminAbuseReportNotificationRecipientUpdate: createAdminAbuseReportNotificationRecipientUpdateProcedure<Actor>(deps),
+		adminAbuseUserReports: createAdminAbuseUserReportsProcedure<Actor>(deps),
+		adminForwardAbuseUserReport: createAdminForwardAbuseUserReportProcedure<Actor>(deps),
+		adminGetUserIps: createAdminGetUserIpsProcedure<Actor>(deps),
+		adminResolveAbuseUserReport: createAdminResolveAbuseUserReportProcedure<Actor>(deps),
+		adminShowModerationLogs: createAdminShowModerationLogsProcedure<Actor>(deps),
+		adminShowUser: createAdminShowUserProcedure<Actor>(deps),
+		adminShowUsers: createAdminShowUsersProcedure<Actor>(deps),
+		adminSuspendUser: createAdminSuspendUserProcedure<Actor>(deps),
+		adminUnsetUserAvatar: createAdminUnsetUserAvatarProcedure<Actor>(deps),
+		adminUnsetUserBanner: createAdminUnsetUserBannerProcedure<Actor>(deps),
+		adminUnsuspendUser: createAdminUnsuspendUserProcedure<Actor>(deps),
+		adminUpdateAbuseUserReport: createAdminUpdateAbuseUserReportProcedure<Actor>(deps),
+		adminUpdateUserNote: createAdminUpdateUserNoteProcedure<Actor>(deps),
+		usersReportAbuse: createUsersReportAbuseProcedure<Actor>(deps),
+	});
 }

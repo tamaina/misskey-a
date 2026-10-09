@@ -4,41 +4,57 @@
  */
 
 import { implement } from '@orpc/server';
-import type { ApiActor } from '../../api/backend/transport/context.js';
-import type { IntegrationsContext } from './operations.js';
 import { integrationsContract } from './api.contract.js';
-import { createAdminSendEmailProcedure } from './endpoints/admin/send-email.js';
-import { createAdminSystemWebhookCreateProcedure } from './endpoints/admin/system-webhook/create.js';
-import { createAdminSystemWebhookDeleteProcedure } from './endpoints/admin/system-webhook/delete.js';
-import { createAdminSystemWebhookListProcedure } from './endpoints/admin/system-webhook/list.js';
-import { createAdminSystemWebhookShowProcedure } from './endpoints/admin/system-webhook/show.js';
-import { createAdminSystemWebhookTestProcedure } from './endpoints/admin/system-webhook/test.js';
-import { createAdminSystemWebhookUpdateProcedure } from './endpoints/admin/system-webhook/update.js';
-import { createFetchExternalResourcesProcedure } from './endpoints/fetch-external-resources.js';
-import { createFetchRssProcedure } from './endpoints/fetch-rss.js';
-import { createIWebhooksCreateProcedure } from './endpoints/i/webhooks/create.js';
-import { createIWebhooksDeleteProcedure } from './endpoints/i/webhooks/delete.js';
-import { createIWebhooksListProcedure } from './endpoints/i/webhooks/list.js';
-import { createIWebhooksShowProcedure } from './endpoints/i/webhooks/show.js';
-import { createIWebhooksTestProcedure } from './endpoints/i/webhooks/test.js';
-import { createIWebhooksUpdateProcedure } from './endpoints/i/webhooks/update.js';
-
-export function createIntegrationsRouter<Actor extends ApiActor>() {
-	return implement(integrationsContract).$context<IntegrationsContext<Actor>>().router({
-		adminSendEmail: createAdminSendEmailProcedure<Actor>(),
-		adminSystemWebhookCreate: createAdminSystemWebhookCreateProcedure<Actor>(),
-		adminSystemWebhookDelete: createAdminSystemWebhookDeleteProcedure<Actor>(),
-		adminSystemWebhookList: createAdminSystemWebhookListProcedure<Actor>(),
-		adminSystemWebhookShow: createAdminSystemWebhookShowProcedure<Actor>(),
-		adminSystemWebhookTest: createAdminSystemWebhookTestProcedure<Actor>(),
-		adminSystemWebhookUpdate: createAdminSystemWebhookUpdateProcedure<Actor>(),
-		fetchExternalResources: createFetchExternalResourcesProcedure<Actor>(),
-		fetchRss: createFetchRssProcedure<Actor>(),
-		iWebhooksCreate: createIWebhooksCreateProcedure<Actor>(),
-		iWebhooksDelete: createIWebhooksDeleteProcedure<Actor>(),
-		iWebhooksList: createIWebhooksListProcedure<Actor>(),
-		iWebhooksShow: createIWebhooksShowProcedure<Actor>(),
-		iWebhooksTest: createIWebhooksTestProcedure<Actor>(),
-		iWebhooksUpdate: createIWebhooksUpdateProcedure<Actor>(),
+import type { ApiContext } from '../../api/backend/transport/context.js';
+import type { MiLocalUser } from '../../users/backend/models/User.js';
+import { createAdminSendEmailProcedure, type AdminSendEmailDependencies } from './endpoints/admin/send-email.js';
+import { createAdminSystemWebhookCreateProcedure, type AdminSystemWebhookCreateDependencies } from './endpoints/admin/system-webhook/create.js';
+import { createAdminSystemWebhookDeleteProcedure, type AdminSystemWebhookDeleteDependencies } from './endpoints/admin/system-webhook/delete.js';
+import { createAdminSystemWebhookListProcedure, type AdminSystemWebhookListDependencies } from './endpoints/admin/system-webhook/list.js';
+import { createAdminSystemWebhookShowProcedure, type AdminSystemWebhookShowDependencies } from './endpoints/admin/system-webhook/show.js';
+import { createAdminSystemWebhookTestProcedure, type AdminSystemWebhookTestDependencies } from './endpoints/admin/system-webhook/test.js';
+import { createAdminSystemWebhookUpdateProcedure, type AdminSystemWebhookUpdateDependencies } from './endpoints/admin/system-webhook/update.js';
+import { createFetchExternalResourcesProcedure, type FetchExternalResourcesDependencies } from './endpoints/fetch-external-resources.js';
+import { createFetchRssProcedure, type FetchRssDependencies } from './endpoints/fetch-rss.js';
+import { createIWebhooksCreateProcedure, type IWebhooksCreateDependencies } from './endpoints/i/webhooks/create.js';
+import { createIWebhooksDeleteProcedure, type IWebhooksDeleteDependencies } from './endpoints/i/webhooks/delete.js';
+import { createIWebhooksListProcedure, type IWebhooksListDependencies } from './endpoints/i/webhooks/list.js';
+import { createIWebhooksShowProcedure, type IWebhooksShowDependencies } from './endpoints/i/webhooks/show.js';
+import { createIWebhooksTestProcedure, type IWebhooksTestDependencies } from './endpoints/i/webhooks/test.js';
+import { createIWebhooksUpdateProcedure, type IWebhooksUpdateDependencies } from './endpoints/i/webhooks/update.js';
+export interface IntegrationsRouterDependencies {
+	adminSendEmail: AdminSendEmailDependencies;
+	adminSystemWebhookCreate: AdminSystemWebhookCreateDependencies;
+	adminSystemWebhookDelete: AdminSystemWebhookDeleteDependencies;
+	adminSystemWebhookList: AdminSystemWebhookListDependencies;
+	adminSystemWebhookShow: AdminSystemWebhookShowDependencies;
+	adminSystemWebhookTest: AdminSystemWebhookTestDependencies;
+	adminSystemWebhookUpdate: AdminSystemWebhookUpdateDependencies;
+	fetchExternalResources: FetchExternalResourcesDependencies;
+	fetchRss: FetchRssDependencies;
+	iWebhooksCreate: IWebhooksCreateDependencies;
+	iWebhooksDelete: IWebhooksDeleteDependencies;
+	iWebhooksList: IWebhooksListDependencies;
+	iWebhooksShow: IWebhooksShowDependencies;
+	iWebhooksTest: IWebhooksTestDependencies;
+	iWebhooksUpdate: IWebhooksUpdateDependencies;
+}
+export function createIntegrationsRouter(deps: IntegrationsRouterDependencies) {
+	return implement(integrationsContract).$context<ApiContext<MiLocalUser>>().router({
+		adminSendEmail: createAdminSendEmailProcedure(deps.adminSendEmail),
+		adminSystemWebhookCreate: createAdminSystemWebhookCreateProcedure(deps.adminSystemWebhookCreate),
+		adminSystemWebhookDelete: createAdminSystemWebhookDeleteProcedure(deps.adminSystemWebhookDelete),
+		adminSystemWebhookList: createAdminSystemWebhookListProcedure(deps.adminSystemWebhookList),
+		adminSystemWebhookShow: createAdminSystemWebhookShowProcedure(deps.adminSystemWebhookShow),
+		adminSystemWebhookTest: createAdminSystemWebhookTestProcedure(deps.adminSystemWebhookTest),
+		adminSystemWebhookUpdate: createAdminSystemWebhookUpdateProcedure(deps.adminSystemWebhookUpdate),
+		fetchExternalResources: createFetchExternalResourcesProcedure(deps.fetchExternalResources),
+		fetchRss: createFetchRssProcedure(deps.fetchRss),
+		iWebhooksCreate: createIWebhooksCreateProcedure(deps.iWebhooksCreate),
+		iWebhooksDelete: createIWebhooksDeleteProcedure(deps.iWebhooksDelete),
+		iWebhooksList: createIWebhooksListProcedure(deps.iWebhooksList),
+		iWebhooksShow: createIWebhooksShowProcedure(deps.iWebhooksShow),
+		iWebhooksTest: createIWebhooksTestProcedure(deps.iWebhooksTest),
+		iWebhooksUpdate: createIWebhooksUpdateProcedure(deps.iWebhooksUpdate),
 	});
 }

@@ -2,14 +2,15 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-
+import { call } from '@orpc/server';
+import { testContext } from './native-context.js';
 import { expect, test } from 'vitest';
 import * as v from 'valibot';
 import bcrypt from 'bcryptjs';
 import { MiUserSecurityKey } from '../../backend/models/UserSecurityKey.js';
 import { mockDeep } from 'vitest-mock-extended';
 import { WebAuthnService } from '../../backend/services/WebAuthnService.js';
-import { I2faRegisterKeyOperation } from '../../backend/endpoints/i/2fa/register-key.js';
+import { createI2faRegisterKeyProcedure } from '../../backend/endpoints/i/2fa/register-key.js';
 import { I2faRegisterKeyContract } from '../../backend/api.contract.js';
 import { toWebAuthnRegistrationOptions } from '../../backend/webauthn.schema.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
@@ -37,26 +38,28 @@ test.each([false, true])('real registration producer keeps challenge storage and
 	const { challenge: _challenge, ...missing } = result;
 	expect(v.safeParse(requiredSchema(I2faRegisterKeyContract['~orpc'].outputSchema), missing).success).toBe(false);
 });
-
-test('real start endpoint retains password/2FA guards and forwards unparsed producer identity', async () => {
-	const profiles = mockDeep<ConstructorParameters<typeof I2faRegisterKeyOperation>[0]>();
+test('real start endpoint retains password/2FA guards and validates producer output', async () => {
+	const profiles = mockDeep<Parameters<typeof createI2faRegisterKeyProcedure>[0]['userProfilesRepository']>();
 	const producer = mockDeep<WebAuthnService>();
-	const auth = mockDeep<ConstructorParameters<typeof I2faRegisterKeyOperation>[2]>();
-	const me = mockDeep<MiLocalUser>({ id: 'user123' });
-	const profile = mockDeep<NonNullable<Awaited<ReturnType<ConstructorParameters<typeof I2faRegisterKeyOperation>[0]['findOne']>>>>({ userId: me.id, password: bcrypt.hashSync('password', 4), twoFactorEnabled: true, user: null });
+	const auth = mockDeep<Parameters<typeof createI2faRegisterKeyProcedure>[0]['userAuthService']>();
+	const me = mockDeep<MiLocalUser>({ id: 'user123', isSuspended: false, movedToUri: null });
+	const profile = mockDeep<NonNullable<Awaited<ReturnType<Parameters<typeof createI2faRegisterKeyProcedure>[0]['userProfilesRepository']['findOne']>>>>({ userId: me.id, password: bcrypt.hashSync('password', 4), twoFactorEnabled: true, user: null });
 	profiles.findOne.mockResolvedValue(profile);
-	const endpoint = new I2faRegisterKeyOperation(profiles, producer, auth);
-	await expect(endpoint.execute({ password: 'wrong', token: null }, me)).rejects.toThrow('authentication failed');
+	const endpoint = createI2faRegisterKeyProcedure({ userProfilesRepository: profiles, webAuthnService: producer, userAuthService: auth });
+	await expect(call(endpoint, { password: 'wrong', token: null }, { context: testContext(me, null) })).rejects.toThrow('authentication failed');
 	expect(producer.initiateRegistration).not.toHaveBeenCalled();
-	await expect(endpoint.execute({ password: 'wrong', token: 'totp' }, me)).rejects.toMatchObject({ code: 'INCORRECT_PASSWORD' });
+	await expect(call(endpoint, { password: 'wrong', token: 'totp' }, { context: testContext(me, null) })).rejects.toMatchObject({ code: 'INCORRECT_PASSWORD' });
 	expect(auth.twoFactorAuthenticate).toHaveBeenCalledWith(profile, 'totp');
-	const raw = { ...await service(false).producer.initiateRegistration(me.id, 'fixture'), future: true };
+	const raw = await service(false).producer.initiateRegistration(me.id, 'fixture');
 	producer.initiateRegistration.mockResolvedValue(raw);
-	expect(await endpoint.execute(v.parse(requiredSchema(I2faRegisterKeyContract['~orpc'].inputSchema), { password: 'password', token: 'totp', future: true }), me)).toBe(raw);
+	expect(await call(endpoint, v.parse(requiredSchema(I2faRegisterKeyContract['~orpc'].inputSchema), { password: 'password', token: 'totp', future: true }), { context: testContext(me, null) })).toEqual(toWebAuthnRegistrationOptions(raw));
 	expect(producer.initiateRegistration).toHaveBeenCalledWith(me.id, me.id, undefined);
-	expect(v.safeParse(requiredSchema(I2faRegisterKeyContract['~orpc'].outputSchema), raw).success).toBe(false);
+	const invalid = { ...raw, future: true };
+	producer.initiateRegistration.mockResolvedValue(invalid);
+	expect(v.safeParse(requiredSchema(I2faRegisterKeyContract['~orpc'].outputSchema), invalid).success).toBe(false);
+	await expect(call(endpoint, { password: 'password', token: 'totp' }, { context: testContext(me, null) })).rejects.toBeInstanceOf(v.ValiError);
 	profiles.findOne.mockResolvedValue(null);
-	await expect(endpoint.execute({ password: 'wrong' }, me)).rejects.toMatchObject({ code: 'USER_NOT_FOUND' });
+	await expect(call(endpoint, { password: 'wrong' }, { context: testContext(me, null) })).rejects.toMatchObject({ code: 'USER_NOT_FOUND' });
 	expect(v.safeParse(requiredSchema(I2faRegisterKeyContract['~orpc'].inputSchema), {}).success).toBe(false);
 });
 

@@ -5,14 +5,34 @@
 
 import { implement } from '@orpc/server';
 import { authentication, apiPolicy, requirePrincipal } from '../../../../../api/backend/transport/middleware.js';
-import { notesReactionsCreateContract, notesReactionsCreatePolicy } from './create.contract.js';
-import type { ApiActor } from '../../../../../api/backend/transport/context.js';
-import type { NotesApiContext } from '../../../operations.js';
-
-export function createNotesReactionsCreateProcedure<Actor extends ApiActor>() {
-	return implement(notesReactionsCreateContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<NotesApiContext<Actor>>()
-		.use(authentication<Actor>())
-		.use(apiPolicy<Actor>(notesReactionsCreatePolicy))
-		.use(requirePrincipal<Actor>())
-		.handler(({ input, context }) => context.operations.notes.notesReactionsCreate(input, context.principal));
+import { notesReactionsCreateContract, notesReactionsCreateErrors, notesReactionsCreatePolicy } from './create.contract.js';
+import type { ApiContext } from '@features/api/backend/transport/context.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+import type { NotesCommandDependencies } from '../../../command.dependencies.js';
+import { getCommandNote } from '../../../get-command-note.js';
+import { readErrorId } from '../../../request.schema.js';
+export function createNotesReactionsCreateProcedure(deps: NotesCommandDependencies) {
+	return implement(notesReactionsCreateContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>()
+		.use(authentication<MiLocalUser>())
+		.use(apiPolicy<MiLocalUser>(notesReactionsCreatePolicy))
+		.use(requirePrincipal<MiLocalUser>())
+		.handler(async ({ input, context }) => {
+			const actor = context.principal;
+			const note = await getCommandNote(deps, input.noteId, notesReactionsCreateErrors.noSuchNote);
+			try {
+				await deps.createReaction(actor, note, input.reaction);
+			} catch (error) {
+				const errorId = readErrorId(error);
+				if (errorId === '51c42bb4-931a-456b-bff7-e5a8a70dd298') {
+					throw deps.createError(notesReactionsCreateErrors.alreadyReacted);
+				}
+				if (errorId === 'e70412a4-7197-4726-8e74-f3e0deb92aa7') {
+					throw deps.createError(notesReactionsCreateErrors.youHaveBeenBlocked);
+				}
+				if (errorId === '12c35529-3c79-4327-b1cc-e2cf63a71925') {
+					throw deps.createError(notesReactionsCreateErrors.cannotReactToRenote);
+				}
+				throw error;
+			}
+		});
 }

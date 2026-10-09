@@ -10,8 +10,9 @@ import { Readable } from 'node:stream';
 import { mkdtemp, readdir, rm, access, appendFile, unlink } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { composeNativeTestRouter, nativeTestDependencies } from './native-router-fixture.mjs';
 import { createRouterClient } from '@orpc/server';
-import { createApiRouter, createServerInfoService, createDeleteNote, createFileService, withStagedUpload, requestRoutes } from '../../../backend/built/features/api/pilot.js';
+import { withStagedUpload, requestRoutes } from '../../../backend/built/features/api/pilot.js';
 
 const actor = { id: 'alice', isSuspended: false, movedToUri: null };
 const serverInfo = { machine: '?', cpu: { model: '?', cores: 0 }, mem: { total: 0 }, fs: { total: 0, used: 0 } };
@@ -21,32 +22,30 @@ const file = {
 	thumbnailUrl: null, comment: null, folderId: null, folder: null, userId: null, user: null,
 };
 
-function fixture(overrides = {}) {
+function fixture(overrides = {}, domainOverrides = {}) {
 	const events = [];
 	const uploadFile = new File(['bytes'], 'image.png');
 	const context = {
 		credential: 'native', ip: '192.0.2.1', headers: {}, upload: { path: '/tmp/upload', name: 'image.png', file: uploadFile },
 		services: {
 			authenticate: async () => { events.push('authenticate'); return [actor, null]; },
-			logIp: () => events.push('logIp'),
 			limitActor: principal => principal?.id ?? null,
 			rateLimitFactor: async () => 1,
 			limit: async limit => { events.push(['limit', limit]); return null; },
-			serverInfo: async () => serverInfo,
-			deleteNote: async () => { events.push('delete'); },
-			createFile: async input => { events.push(['create', input]); return file; },
 			...overrides,
 		},
 	};
-	const client = createRouterClient(createApiRouter(), { context });
-	return { context, events, client, upload: input => client.drive.files.create({ file: uploadFile, ...input }) };
+	const dependencies = nativeTestDependencies({ actor, serverInfo, packedFile: file, events,
+		uploadAtPath: path => context.upload?.path === path ? context.upload : undefined });
+	for (const [feature, ports] of Object.entries(domainOverrides)) Object.assign(dependencies[feature], ports);
+	const client = createRouterClient(composeNativeTestRouter(dependencies), { context });
+	return { context, dependencies, events, client, upload: input => client.drive.files.create({ file: uploadFile, ...input }) };
 }
 
 test('public server info keeps privacy defaults and reads current settings', async () => {
 	let reads = 0;
 	let enabled = false;
-	const service = createServerInfoService({ enabled: () => enabled, read: async () => { reads++; return serverInfo; } });
-	const { client } = fixture({ authenticate: async () => [null, null], serverInfo: service });
+	const { client } = fixture({ authenticate: async () => [null, null] }, { instance: { serverInfo: { enabled: () => enabled, read: async () => { reads++; return serverInfo; } } } });
 	assert.deepEqual(await client.instance.serverInfo({ extra: 'accepted' }), serverInfo);
 	assert.equal(reads, 0);
 	enabled = true;
@@ -59,7 +58,7 @@ test('credential and rate policy run before invalid input', async () => {
 	await assert.rejects(client.notes.delete({ noteId: false }), error =>
 		error.code === 'CREDENTIAL_REQUIRED' && error.status === 401
 		&& error.data.id === '1384574d-a912-4b81-8601-c7b1c4085df1');
-	assert.equal(events.includes('delete'), false);
+	assert.equal(events.some(event => Array.isArray(event) && event[0] === 'delete'), false);
 });
 
 test('rate rejection precedes credential enforcement and preserves limit info', async () => {
@@ -78,25 +77,25 @@ test('scope and suspension deny writes before the handler', async () => {
 	]) {
 		const { client, events } = fixture({ authenticate: async () => [principal, token] });
 		await assert.rejects(client.notes.delete({ noteId: 'note1' }), error => error.code === code);
-		assert.equal(events.includes('delete'), false);
+		assert.equal(events.some(event => Array.isArray(event) && event[0] === 'delete'), false);
 	}
 });
 
 test('authenticated delete validates input, ignores unused extras and returns void', async () => {
 	const { client, events } = fixture();
 	await assert.rejects(client.notes.delete({ noteId: 'bad!' }), error => error.code === 'INVALID_PARAM');
-	assert.equal(events.includes('delete'), false);
+	assert.equal(events.some(event => Array.isArray(event) && event[0] === 'delete'), false);
 	assert.equal(await client.notes.delete({ noteId: 'note1', extra: true }), undefined);
-	assert.equal(events.filter(event => event === 'delete').length, 1);
+	assert.equal(events.filter(event => Array.isArray(event) && event[0] === 'delete').length, 1);
 });
 
 test('upload defaults, nullability and Unicode code-point limit', async () => {
 	const { events, upload } = fixture();
 	assert.deepEqual(await upload({ comment: '😀'.repeat(512), extra: true }), file);
-	const input = events.find(event => Array.isArray(event) && event[0] === 'create')[1];
+	const input = events.find(event => Array.isArray(event) && event[0] === 'upload')[1];
 	assert.equal(input.comment.length, 1024);
 	assert.equal(input.folderId, null);
-	assert.equal(input.name, null);
+	assert.equal(input.name, 'image.png');
 	assert.equal(input.force, false);
 	assert.equal(input.isSensitive, false);
 	assert.equal(Object.hasOwn(input, 'extra'), false);
@@ -113,39 +112,44 @@ test('moved accounts and missing upload resources reject before field validation
 });
 
 test('successful outputs are validated and unknown response fields are rejected', async () => {
-	const wrong = fixture({ serverInfo: async () => ({ ...serverInfo, secret: true }) });
+	const wrong = fixture({}, { instance: { serverInfo: { enabled: () => true, read: async () => ({ ...serverInfo, secret: true }) } } });
 	await assert.rejects(wrong.client.instance.serverInfo({}), error => error.code === 'INTERNAL_ERROR');
-	const infinite = fixture({ serverInfo: async () => ({ ...serverInfo, mem: { total: Infinity } }) });
+	const infinite = fixture({}, { instance: { serverInfo: { enabled: () => true, read: async () => ({ ...serverInfo, mem: { total: Infinity } }) } } });
 	await assert.rejects(infinite.client.instance.serverInfo({}), error => error.code === 'INTERNAL_ERROR');
-	const invalid = fixture({ createFile: async () => ({ ...file, createdAt: new Date() }) });
+	const invalid = fixture({}, { drive: { pack: async () => ({ ...file, createdAt: new Date() }) } });
 	await assert.rejects(invalid.upload({}), error => error.code === 'INTERNAL_ERROR');
 });
 
-test('note service preserves owner/moderator authorization and missing-note UUID', async () => {
+test('native delete handler preserves owner/moderator authorization and missing-note UUID', async () => {
 	const events = [];
-	const service = createDeleteNote({
-		getNote: async () => ({ userId: 'bob' }), isModerator: async () => false,
-		findAuthor: async id => ({ id }), delete: async (...args) => events.push(args),
-	});
-	await assert.rejects(service('note1', actor), error => error.code === 'ACCESS_DENIED'
+	const deps = { getNote: async () => ({ userId: 'bob' }), isModerator: async () => false,
+		findAuthor: async id => ({ id }), delete: async (...args) => events.push(args) };
+	const denied = fixture({}, { notes: deps });
+	await assert.rejects(denied.client.notes.delete({ noteId: 'note1' }), error => error.code === 'ACCESS_DENIED'
 		&& error.data.id === 'fe8d7103-0ea8-4ec3-814d-f8b401dc69e9');
 	assert.equal(events.length, 0);
-	const missing = createDeleteNote({
+	deps.isModerator = async () => true;
+	const allowed = fixture({}, { notes: deps });
+	assert.equal(await allowed.client.notes.delete({ noteId: 'note1' }), undefined);
+	assert.equal(events.length, 1);
+	assert.deepEqual(events[0][0], { id: 'bob' });
+	assert.equal(events[0][2], false);
+	assert.equal(events[0][3], actor);
+	const missing = fixture({}, { notes: {
 		getNote: async () => { throw Object.assign(new Error('Missing note'), { id: '9725d0ce-ba28-4dde-95a7-2cbb2c15de24' }); },
-	});
-	await assert.rejects(missing('note1', actor), error => error.code === 'NO_SUCH_NOTE'
+	} });
+	await assert.rejects(missing.client.notes.delete({ noteId: 'note1' }), error => error.code === 'NO_SUCH_NOTE'
 		&& error.data.id === '490be23f-8c1f-4796-819f-94cb4f9d1630');
 });
 
-test('upload service trims names, controls IP logging and intentionally omits undefined properties', async () => {
+test('native upload handler trims names, controls IP logging and omits undefined properties', async () => {
 	let options;
-	const service = createFileService({
+	const { upload } = fixture({}, { drive: {
 		validateFileName: () => true, enableIpLogging: () => false,
 		addFile: async value => { options = value; return {}; },
 		pack: async () => ({ ...file, properties: { width: undefined, height: 1 } }), logError: () => {},
-	});
-	const result = await service({ name: ' blob ', comment: null, folderId: null, force: false, isSensitive: false },
-		actor, { path: '/tmp/file', name: 'fallback' }, { ip: '192.0.2.1', headers: {} });
+	} });
+	const result = await upload({ name: ' blob ', comment: null, folderId: null, force: false, isSensitive: false });
 	assert.equal(options.name, null);
 	assert.equal(options.requestIp, null);
 	assert.deepEqual(result.properties, { height: 1 });
@@ -166,7 +170,7 @@ test('wire File must match the trusted upload resource', async () => {
 test('multipart booleans decode after scope checks and validate through the public contract', async () => {
 	const { upload, events } = fixture();
 	await upload({ force: 'true', isSensitive: 'false' });
-	const input = events.find(event => Array.isArray(event) && event[0] === 'create')[1];
+	const input = events.find(event => Array.isArray(event) && event[0] === 'upload')[1];
 	assert.equal(input.force, true);
 	assert.equal(input.isSensitive, false);
 	await assert.rejects(upload({ force: '1' }), error => error.code === 'INVALID_PARAM');
@@ -195,13 +199,13 @@ test('parallel staged uploads keep files alive for consumers and clean every res
 test('staging cleans up after input, business and output failures', async () => {
 	const directory = await mkdtemp(join(tmpdir(), 'misskey-pilot-test-'));
 	try {
-		for (const services of [
+		for (const ports of [
 			{},
-			{ createFile: async () => { throw Error('business failure'); } },
-			{ createFile: async () => ({ ...file, secret: true }) },
+			{ addFile: async () => { throw Error('business failure'); } },
+			{ pack: async () => ({ ...file, secret: true }) },
 		]) {
-			const { context, client } = fixture(services);
-			const fields = Object.keys(services).length === 0 ? [['force', '1']] : [];
+			const { context, client } = fixture({}, { drive: ports });
+			const fields = Object.keys(ports).length === 0 ? [['force', '1']] : [];
 			await assert.rejects(withStagedUpload(multipartRequest(fields), { maxFileSize: 1024, directory }, async (body, upload) => {
 				context.upload = upload;
 				await client.drive.files.create(body);
@@ -297,20 +301,18 @@ test('native moderation checks precede malformed fields and preserve root bypass
 });
 
 test('native public defaults, GET scalar decoding and output validation execute directly', async () => {
-	const { client, context } = fixture({ authenticate: async () => [null, null] });
+	const { client, dependencies } = fixture({ authenticate: async () => [null, null] });
 	let parsed;
 	const side = { total: [], inc: [], dec: [], diffs: { normal: [], reply: [], renote: [], withFile: [] } };
-	context.operations = { statistics: {
-		stats: async () => ({ notesCount: 0, originalNotesCount: 0, usersCount: 0, originalUsersCount: 0,
-																								reactionsCount: 0, instances: 0, driveUsageLocal: 0, driveUsageRemote: 0 }),
-		notes: async input => { parsed = input; return { local: side, remote: side }; },
-	} };
+	dependencies.statistics.charts.notes.getChart = async (span, limit, offset) => {
+		parsed = { span, limit, offset }; return { local: side, remote: side };
+	};
 	assert.equal((await client.statistics.stats(undefined)).notesCount, 0);
 	await assert.rejects(client.statistics.stats([]), error => error.code === 'INVALID_PARAM');
 	await client.statistics.notesGet({ span: 'day', limit: '2', offset: 'null', extra: true });
 	assert.deepEqual(parsed, { span: 'day', limit: 2, offset: null });
 	for (const limit of ['01', '+1', '0x10']) await assert.rejects(client.statistics.notesGet({ span: 'day', limit }),
 		error => error.code === 'INVALID_PARAM' && error.data.id === '0b5f1631-7c1a-41a6-b399-cce335f34d85');
-	context.operations.statistics.stats = async () => ({ secret: true });
+	dependencies.statistics.countReactions = async () => Infinity;
 	await assert.rejects(client.statistics.stats({}), error => error.code === 'INTERNAL_ERROR');
 });

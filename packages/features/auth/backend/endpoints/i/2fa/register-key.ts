@@ -4,18 +4,17 @@
  */
 
 import bcrypt from 'bcryptjs';
-import { Inject, Injectable } from '@nestjs/common';
-
 import type { UserProfilesRepository } from '@features/persistence/backend/repositories/models.js';
-import { DI } from '@/di-symbols.js';
 import { WebAuthnService } from '../../../services/WebAuthnService.js';
 import { apiError } from '@features/api/backend/transport/orpc-error.js';
 import { UserAuthService } from '../../../services/UserAuthService.js';
-
-import type * as v from 'valibot';
-import type { I2faRegisterKeyContract } from '../../../api.contract.js';
+import * as v from 'valibot';
+import { I2faRegisterKeyContract } from '../../../api.contract.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
-
+import { implement } from '@orpc/server';
+import { authentication, apiPolicy, requirePrincipal } from '../../../../../api/backend/transport/middleware.js';
+import type { ApiContext } from '../../../../../api/backend/transport/context.js';
+import { toWebAuthnRegistrationOptions } from '../../../webauthn.schema.js';
 export const meta = {
 	requireCredential: true,
 
@@ -41,55 +40,60 @@ export const meta = {
 		},
 	},
 } as const;
+export interface I2faRegisterKeyDependencies {
+	userProfilesRepository: UserProfilesRepository;
+	webAuthnService: Pick<WebAuthnService, 'initiateRegistration'>;
+	userAuthService: Pick<UserAuthService, 'twoFactorAuthenticate'>;
+}
+export function createI2faRegisterKeyProcedure(deps: I2faRegisterKeyDependencies) {
+	return implement(I2faRegisterKeyContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>().use(authentication<MiLocalUser>()).use(apiPolicy<MiLocalUser>({ name: 'i/2fa/register-key', requireCredential: true, secure: true })).use(requirePrincipal<MiLocalUser>()).handler(async ({ input, context }) => {
+		const ps = input;
+		const me = context.principal;
+		const result = await (async () => {
+			const token = ps.token;
+			const profile = await deps.userProfilesRepository.findOne({
+				where: {
+					userId: me.id,
+				},
+				relations: { user: true },
+			});
 
-@Injectable()
-export class I2faRegisterKeyOperation {
-	constructor(
-		@Inject(DI.userProfilesRepository)
-		private userProfilesRepository: UserProfilesRepository,
-
-		private webAuthnService: WebAuthnService,
-		private userAuthService: UserAuthService,
-	) {}
-
-	async execute(ps: v.InferOutput<NonNullable<typeof I2faRegisterKeyContract['~orpc']['inputSchema']>>, me: MiLocalUser) {
-		const token = ps.token;
-		const profile = await this.userProfilesRepository.findOne({
-			where: {
-				userId: me.id,
-			},
-			relations: { user: true },
-		});
-
-		if (profile == null) {
-			throw apiError(meta.errors.userNotFound);
-		}
-
-		if (profile.twoFactorEnabled) {
-			if (token == null) {
-				throw new Error('authentication failed');
+			if (profile == null) {
+				throw apiError(meta.errors.userNotFound);
 			}
 
-			try {
-				await this.userAuthService.twoFactorAuthenticate(profile, token);
-			} catch (_) {
-				throw new Error('authentication failed');
+			if (profile.twoFactorEnabled) {
+				if (token == null) {
+					throw new Error('authentication failed');
+				}
+
+				try {
+					await deps.userAuthService.twoFactorAuthenticate(profile, token);
+				} catch (_) {
+					throw new Error('authentication failed');
+				}
 			}
-		}
 
-		const passwordMatched = await bcrypt.compare(ps.password, profile.password ?? '');
-		if (!passwordMatched) {
-			throw apiError(meta.errors.incorrectPassword);
-		}
+			const passwordMatched = await bcrypt.compare(ps.password, profile.password ?? '');
+			if (!passwordMatched) {
+				throw apiError(meta.errors.incorrectPassword);
+			}
 
-		if (!profile.twoFactorEnabled) {
-			throw apiError(meta.errors.twoFactorNotEnabled);
-		}
+			if (!profile.twoFactorEnabled) {
+				throw apiError(meta.errors.twoFactorNotEnabled);
+			}
 
-		return await this.webAuthnService.initiateRegistration(
-			me.id,
-			profile.user?.username ?? me.id,
-			profile.user?.name ?? undefined,
-		);
-	}
+			return await deps.webAuthnService.initiateRegistration(
+				me.id,
+				profile.user?.username ?? me.id,
+				profile.user?.name ?? undefined,
+			);
+		})();
+		return v.parse(requiredSchema(I2faRegisterKeyContract['~orpc'].outputSchema), toWebAuthnRegistrationOptions(result));
+	});
+}
+
+function requiredSchema<Schema>(schema: Schema | undefined): Schema {
+	if (schema === undefined) throw new Error('Contract must declare its schema');
+	return schema;
 }

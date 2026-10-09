@@ -2,13 +2,16 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-
-import { expect, test } from 'vitest';
+import { expect, test, vi } from 'vitest';
 import * as v from 'valibot';
 import { mockDeep } from 'vitest-mock-extended';
 
 import { HashtagEntityService } from '../../backend/serializers/HashtagEntityService.js';
-import { HashtagsTrendOperation } from '../../backend/endpoints/hashtags/trend.js';
+import { createNotesFeaturedProcedure, type NotesFeaturedDependencies } from '../../backend/endpoints/notes/featured.js';
+import { createHashtagsTrendProcedure } from '../../backend/endpoints/hashtags/trend.js';
+import { createProcedureClient } from '@orpc/server';
+import type { ApiServices } from '@features/api/backend/transport/context.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
 import { FeaturedService } from '../../backend/services/FeaturedService.js';
 import { HashtagService } from '../../backend/services/HashtagService.js';
 
@@ -39,11 +42,33 @@ test('actual trend and hashtag producers emit declared fields', async () => {
 	const hashtags = mockDeep<HashtagService>();
 	featured.getHashtagsRanking.mockResolvedValue(['misskey']);
 	hashtags.getCharts.mockResolvedValue({ misskey: [1, 3] });
-	const endpoint = new HashtagsTrendOperation(featured, hashtags);
-	expect(v.parse(output, await endpoint.execute({}, null))).toEqual([item]);
+	const services = mockDeep<ApiServices<MiLocalUser>>();
+	services.authenticate.mockResolvedValue([null, null]);
+	const endpoint = createProcedureClient(createHashtagsTrendProcedure<MiLocalUser>({ featuredService: featured, hashtagService: hashtags }).canonical, { context: { services, credential: null, ip: '127.0.0.1', headers: {} } });
+	expect(v.parse(output, await endpoint({}))).toEqual([item]);
 	const packed = await new HashtagEntityService().pack(mockDeep<MiHashtag>({ name: 'misskey', mentionedUsersCount: 1, mentionedLocalUsersCount: 1, mentionedRemoteUsersCount: 0, attachedUsersCount: 2, attachedLocalUsersCount: 1, attachedRemoteUsersCount: 1 }));
 	expect(v.parse(packedHashtagSchema, packed)).toEqual(packed);
 	expect(Object.keys(packed)).toHaveLength(7);
 	expect(v.safeParse(packedHashtagSchema, { ...packed, future: true }).success).toBe(false);
 	expect(v.safeParse(packedHashtagSchema, { ...packed, attachedUsersCount: undefined }).success).toBe(false);
+});
+test('featured POST and GET share the ranking cache across requests and refresh after thirty minutes', async () => {
+	const clock = vi.spyOn(Date, 'now').mockReturnValue(1_700_000_000_000);
+	try {
+		const dependencies = mockDeep<NotesFeaturedDependencies>();
+		dependencies.featuredService.getGlobalNotesRanking.mockResolvedValue([]);
+		const services = mockDeep<ApiServices<MiLocalUser>>();
+		services.authenticate.mockResolvedValue([null, null]);
+		const context = { services, credential: null, ip: '127.0.0.1', headers: {} };
+		const procedures = createNotesFeaturedProcedure<MiLocalUser>(dependencies);
+		const post = createProcedureClient(procedures.canonical, { context });
+		const get = createProcedureClient(procedures.get, { context });
+		await post({});
+		await get({ limit: 3 });
+		expect(dependencies.featuredService.getGlobalNotesRanking).toHaveBeenCalledTimes(1);
+		clock.mockReturnValue(1_700_000_000_000 + 30 * 60 * 1000);
+		await post({});
+		expect(dependencies.featuredService.getGlobalNotesRanking).toHaveBeenCalledTimes(2);
+		expect(dependencies.notesRepository.createQueryBuilder).not.toHaveBeenCalled();
+	} finally { clock.mockRestore(); }
 });

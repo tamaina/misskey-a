@@ -29,3 +29,8 @@ export function sessionText(value: PackedJsonValue | undefined): string {
 export function sessionErrorMessage(error: unknown): string {
 	return typeof error === 'string' ? error : String(error);
 }
+export interface AuthSessionContext {
+	request: AuthSessionRequest;
+	effects: AuthSessionEffects;
+	response: { status?: number };
+}

@@ -8,9 +8,9 @@ import { expect, expectTypeOf, test } from 'vitest';
 import * as v from 'valibot';
 import { mockDeep } from 'vitest-mock-extended';
 import { createProcedureClient } from '@orpc/server';
+import type { ApiContext } from '@features/api/backend/transport/context.js';
 import { notesStateContract } from '../../backend/endpoints/notes/state.contract.js';
-import { NotesStateOperation, createNotesStateProcedure } from '../../backend/endpoints/notes/state.js';
-import type { NotesApiContext } from '../../backend/operations.js';
+import { createNotesStateProcedure as NotesStateOperation, createNotesStateProcedure } from '../../backend/endpoints/notes/state.js';
 import type { NotesRepository, NoteThreadMutingsRepository, NoteFavoritesRepository } from '@features/persistence/backend/repositories/models.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 import type { MiNote } from '@features/notes/backend/models/Note.js';
@@ -33,30 +33,23 @@ test('native input and output infer their complete explicit properties', () => {
 		expect(v.safeParse(requiredSchema(notesStateContract['~orpc'].outputSchema), value).success).toBe(false);
 	}
 });
-
-test('native procedure strips transport fields and keeps authenticated actor separate', async () => {
-	const params = { ...input, i: 'transport', future: true };
+test('native procedure strips transport fields and uses the authenticated principal in repository queries', async () => {
 	const user = mockDeep<MiLocalUser>({ id: 'user123', isSuspended: false, movedToUri: null });
-	const context = mockDeep<NotesApiContext<MiLocalUser>>({ credential: 'fixture', ip: '127.0.0.1', headers: {} });
-	context.services.authenticate.mockResolvedValue([user, null]);
-	context.operations.notes.notesState.mockResolvedValue(output);
-	const client = createProcedureClient(createNotesStateProcedure<MiLocalUser>(), { context });
+	const deps = mockDeep<Parameters<typeof createNotesStateProcedure>[0]>();
+	deps.notesRepository.findOneByOrFail.mockResolvedValue(mockDeep<MiNote>({ id: input.noteId, threadId: null }));
+	deps.noteFavoritesRepository.count.mockResolvedValue(1);
+	deps.noteThreadMutingsRepository.count.mockResolvedValue(0);
+	const client = createProcedureClient(createNotesStateProcedure(deps), { context: apiTestContext(user) });
+	const params = { ...input, i: 'transport', actor: { id: 'forged' }, future: true };
 	expect(await client(params)).toEqual(output);
-	expect(context.operations.notes.notesState).toHaveBeenCalledWith(input, user);
+	expect(deps.notesRepository.findOneByOrFail).toHaveBeenCalledWith({ id: input.noteId });
+	expect(deps.noteFavoritesRepository.count).toHaveBeenCalledWith({ where: { userId: user.id, noteId: input.noteId }, take: 1 });
 });
-
-test('native procedure requires authentication and validates the operation response', async () => {
-	const context = mockDeep<NotesApiContext<MiLocalUser>>({ credential: null, ip: '127.0.0.1', headers: {} });
-	context.services.authenticate.mockResolvedValue([null, null]);
-	const client = createProcedureClient(createNotesStateProcedure<MiLocalUser>(), { context });
+test('native procedure requires authentication before querying repositories', async () => {
+	const deps = mockDeep<Parameters<typeof createNotesStateProcedure>[0]>();
+	const client = createProcedureClient(createNotesStateProcedure(deps), { context: apiTestContext(null) });
 	await expect(client(input)).rejects.toMatchObject({ code: 'CREDENTIAL_REQUIRED' });
-	expect(context.operations.notes.notesState).not.toHaveBeenCalled();
-
-	const user = mockDeep<MiLocalUser>({ id: 'user123', isSuspended: false, movedToUri: null });
-	context.services.authenticate.mockResolvedValue([user, null]);
-	const invalidOutput = { ...output, future: true };
-	context.operations.notes.notesState.mockResolvedValue(invalidOutput);
-	await expect(client(input)).rejects.toThrow();
+	expect(deps.notesRepository.findOneByOrFail).not.toHaveBeenCalled();
 });
 
 test.each([
@@ -71,8 +64,8 @@ test.each([
 	notes.findOneByOrFail.mockResolvedValue(note);
 	favorites.count.mockResolvedValue(favorite);
 	mutings.count.mockResolvedValue(muting);
-	const endpoint = new NotesStateOperation(notes, mutings, favorites);
-	const result = await endpoint.execute(input, user);
+	const endpoint = NotesStateOperation({ notesRepository: notes, noteThreadMutingsRepository: mutings, noteFavoritesRepository: favorites });
+	const result = await createProcedureClient(endpoint, { context: apiTestContext(user) })(input);
 	expectTypeOf(result).toEqualTypeOf<{ isFavorited: boolean; isMutedThread: boolean }>();
 	expect(result).toEqual({ isFavorited: favorite !== 0, isMutedThread: muting !== 0 });
 	expect(v.parse(requiredSchema(notesStateContract['~orpc'].outputSchema), result)).toEqual(result);
@@ -84,4 +77,12 @@ test.each([
 function requiredSchema<Schema>(schema: Schema | undefined): Schema {
 	if (schema === undefined) throw new Error('Missing endpoint contract schema');
 	return schema;
+}
+
+function apiTestContext(actor: MiLocalUser | null): ApiContext<MiLocalUser> {
+	if (actor !== null) { actor.isSuspended = false; actor.movedToUri = null; }
+	const context = mockDeep<ApiContext<MiLocalUser>>({ credential: actor ? 'fixture' : null, ip: '127.0.0.1', headers: {} });
+	context.services.authenticate.mockResolvedValue([actor, null]);
+	context.services.limitActor.mockReturnValue(null);
+	return context;
 }

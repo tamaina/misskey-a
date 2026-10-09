@@ -2,19 +2,16 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-
-import bcrypt from 'bcryptjs';
-import { Inject, Injectable } from '@nestjs/common';
 import type { UserSecurityKeysRepository } from '@features/persistence/backend/repositories/models.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
-import { DI } from '@/di-symbols.js';
 import { apiError } from '@features/api/backend/transport/orpc-error.js';
-
-import type * as v from 'valibot';
-import type { I2faUpdateKeyContract } from '../../../api.contract.js';
+import * as v from 'valibot';
+import { I2faUpdateKeyContract } from '../../../api.contract.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
-
+import { implement } from '@orpc/server';
+import { authentication, apiPolicy, requirePrincipal } from '../../../../../api/backend/transport/middleware.js';
+import type { ApiContext } from '../../../../../api/backend/transport/context.js';
 export const meta = {
 	requireCredential: true,
 
@@ -34,39 +31,44 @@ export const meta = {
 		},
 	},
 } as const;
+export interface I2faUpdateKeyDependencies {
+	userSecurityKeysRepository: UserSecurityKeysRepository;
+	userEntityService: Pick<UserEntityService, 'packSelf'>;
+	globalEventService: Pick<GlobalEventService, 'publishMainStream'>;
+}
+export function createI2faUpdateKeyProcedure(deps: I2faUpdateKeyDependencies) {
+	return implement(I2faUpdateKeyContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>().use(authentication<MiLocalUser>()).use(apiPolicy<MiLocalUser>({ name: 'i/2fa/update-key', requireCredential: true, secure: true })).use(requirePrincipal<MiLocalUser>()).handler(async ({ input, context }) => {
+		const ps = input;
+		const me = context.principal;
+		const result = await (async () => {
+			const key = await deps.userSecurityKeysRepository.findOneBy({
+				id: ps.credentialId,
+			});
 
-@Injectable()
-export class I2faUpdateKeyOperation {
-	constructor(
-		@Inject(DI.userSecurityKeysRepository)
-		private userSecurityKeysRepository: UserSecurityKeysRepository,
+			if (key == null) {
+				throw apiError(meta.errors.noSuchKey);
+			}
 
-		private userEntityService: UserEntityService,
-		private globalEventService: GlobalEventService,
-	) {}
+			if (key.userId !== me.id) {
+				throw apiError(meta.errors.accessDenied);
+			}
 
-	async execute(ps: v.InferOutput<NonNullable<typeof I2faUpdateKeyContract['~orpc']['inputSchema']>>, me: MiLocalUser) {
-		const key = await this.userSecurityKeysRepository.findOneBy({
-			id: ps.credentialId,
-		});
+			await deps.userSecurityKeysRepository.update(key.id, {
+				name: ps.name,
+			});
 
-		if (key == null) {
-			throw apiError(meta.errors.noSuchKey);
-		}
+			// Publish meUpdated event
+			deps.globalEventService.publishMainStream(me.id, 'meUpdated', await deps.userEntityService.packSelf(me.id, {
+				includeSecrets: true,
+			}));
 
-		if (key.userId !== me.id) {
-			throw apiError(meta.errors.accessDenied);
-		}
+			return {};
+		})();
+		return v.parse(requiredSchema(I2faUpdateKeyContract['~orpc'].outputSchema), result);
+	});
+}
 
-		await this.userSecurityKeysRepository.update(key.id, {
-			name: ps.name,
-		});
-
-		// Publish meUpdated event
-		this.globalEventService.publishMainStream(me.id, 'meUpdated', await this.userEntityService.packSelf(me.id, {
-			includeSecrets: true,
-		}));
-
-		return {};
-	}
+function requiredSchema<Schema>(schema: Schema | undefined): Schema {
+	if (schema === undefined) throw new Error('Contract must declare its schema');
+	return schema;
 }

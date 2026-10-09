@@ -2,19 +2,19 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-
-import { Inject, Injectable } from '@nestjs/common';
 import { maximum } from '@features/runtime/backend/data/array.js';
 
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import { QueryService } from '@features/notes/backend/services/QueryService.js';
 import { GetterService } from '@features/api/backend/transport/GetterService.js';
 import { apiError } from '@features/api/backend/transport/orpc-error.js';
-import { DI } from '@/di-symbols.js';
 import type { NotesRepository } from '@features/persistence/backend/repositories/models.js';
-import type { DiscoveryInputs } from '../discovery.contract.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
-
+import { implement } from '@orpc/server';
+import { authentication, apiPolicy } from '@features/api/backend/transport/middleware.js';
+import type { ApiContext } from '@features/api/backend/transport/context.js';
+import { discoveryContract, type DiscoveryInputs } from '../discovery.contract.js';
+import { toPackedUserDetailed } from '@features/users/backend/user.schema.js';
 const errors = {
 	noSuchUser: {
 		message: 'No such user.',
@@ -22,28 +22,22 @@ const errors = {
 		id: 'e6965129-7b2a-40a4-bae2-cd84cd434822',
 	},
 } as const;
-
-@Injectable()
-export class UsersGetFrequentlyRepliedUsersOperation {
-	constructor(
-		@Inject(DI.notesRepository)
-		private notesRepository: NotesRepository,
-
-		private userEntityService: UserEntityService,
-		private queryService: QueryService,
-		private getterService: GetterService,
-	) {
-	}
-
-	async execute(ps: DiscoveryInputs['users/get-frequently-replied-users'], me: MiLocalUser | null) {
+export interface UsersGetFrequentlyRepliedUsersDependencies {
+	notesRepository: NotesRepository;
+	userEntityService: UserEntityService;
+	queryService: QueryService;
+	getterService: GetterService;
+}
+export function createUsersGetFrequentlyRepliedUsersProcedure<Actor extends MiLocalUser>(deps: UsersGetFrequentlyRepliedUsersDependencies) {
+	const handler = async ({ input: ps, context: { principal: me } }: { input: DiscoveryInputs['users/get-frequently-replied-users']; context: ApiContext<Actor> & { principal: Actor | null } }) => {
 		// Lookup user
-		const user = await this.getterService.getUser(ps.userId).catch(err => {
+		const user = await deps.getterService.getUser(ps.userId).catch(err => {
 			if (err.id === '15348ddd-432d-49c2-8a5a-8069753becff') throw apiError(errors.noSuchUser);
 			throw err;
 		});
 
 		// Fetch recent notes
-		const recentNotesQuery = this.notesRepository.createQueryBuilder('note')
+		const recentNotesQuery = deps.notesRepository.createQueryBuilder('note')
 			.select(['note.id', 'note.replyId'])
 			.where('note.userId = :userId', { userId: user.id })
 			.andWhere('note.replyId IS NOT NULL')
@@ -54,7 +48,7 @@ export class UsersGetFrequentlyRepliedUsersOperation {
 		// `note.userId = :meId` に必ず一致して常に真になるので、条件ごと省略する
 		const isSelf = me != null && me.id === user.id;
 		if (!isSelf) {
-			this.queryService.generateVisibilityQuery(recentNotesQuery, me);
+			deps.queryService.generateVisibilityQuery(recentNotesQuery, me);
 		}
 
 		const recentNotes = await recentNotesQuery.getMany();
@@ -65,11 +59,11 @@ export class UsersGetFrequentlyRepliedUsersOperation {
 		}
 
 		// TODO ミュートを考慮
-		const replyTargetNotesQuery = this.notesRepository.createQueryBuilder('note')
+		const replyTargetNotesQuery = deps.notesRepository.createQueryBuilder('note')
 			.select(['note.id', 'note.userId'])
 			.where('note.id IN (:...replyIds)', { replyIds: recentNotes.map(p => p.replyId) });
 
-		this.queryService.generateVisibilityQuery(replyTargetNotesQuery, me);
+		deps.queryService.generateVisibilityQuery(replyTargetNotesQuery, me);
 
 		const replyTargetNotes = await replyTargetNotesQuery.getMany();
 
@@ -94,13 +88,13 @@ export class UsersGetFrequentlyRepliedUsersOperation {
 		const topRepliedUserIds = repliedUsersSorted.slice(0, ps.limit);
 
 		// Make replies object (includes weights)
-		const _userMap = await this.userEntityService.packMany(topRepliedUserIds, me, { schema: 'UserDetailed' })
+		const _userMap = await deps.userEntityService.packMany(topRepliedUserIds, me, { schema: 'UserDetailed' })
 			.then(users => new Map(users.map(u => [u.id, u])));
 		const repliesObj = await Promise.all(topRepliedUserIds.map(async (userId) => ({
-			user: _userMap.get(userId) ?? (await this.userEntityService.pack(userId, me, { schema: 'UserDetailed' })),
+			user: _userMap.get(userId) ?? (await deps.userEntityService.pack(userId, me, { schema: 'UserDetailed' })),
 			weight: repliedUsers[userId] / peak,
 		})));
-
-		return repliesObj;
-	}
+		return repliesObj.map(item => ({ user: toPackedUserDetailed(item.user), weight: item.weight }));
+	};
+	return implement(discoveryContract['users/get-frequently-replied-users'], { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>().use(authentication<Actor>()).use(apiPolicy<Actor>({ name: discoveryContract['users/get-frequently-replied-users']['~orpc'].meta.requestName })).handler(handler);
 }

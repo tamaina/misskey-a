@@ -6,12 +6,20 @@
 import { implement } from '@orpc/server';
 import { authentication, apiPolicy } from '../../../api/backend/transport/middleware.js';
 import { statsContract } from './stats.contract.js';
-import type { ApiActor } from '../../../api/backend/transport/context.js';
-import type { StatisticsContext } from '../operations.js';
-
-export function createStatsProcedure<Actor extends ApiActor>() {
-	return implement(statsContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<StatisticsContext<Actor>>()
+import type { ApiActor, ApiContext } from '../../../api/backend/transport/context.js';
+import type { StatisticsDependencies } from '../api.dependencies.js';
+export function createStatsProcedure<Actor extends ApiActor>(deps: Pick<StatisticsDependencies, 'readNotes' | 'readUsers' | 'countReactions' | 'countInstances'>) {
+	return implement(statsContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>()
 		.use(authentication<Actor>())
-		.use(apiPolicy<Actor>({ name: 'stats' }))
-		.handler(({ input, context }) => context.operations.statistics.stats(input, context.principal));
+		.use(apiPolicy<Actor>({ name: statsContract['~orpc'].meta.requestName }))
+		.handler(async () => {
+			const notes = await deps.readNotes();
+			const users = await deps.readUsers();
+			const [reactionsCount, instances] = await Promise.all([deps.countReactions(), deps.countInstances()]);
+			return {
+				notesCount: notes.local + notes.remote, originalNotesCount: notes.local,
+				usersCount: users.local + users.remote, originalUsersCount: users.local,
+				reactionsCount, instances, driveUsageLocal: 0, driveUsageRemote: 0
+			};
+		});
 }

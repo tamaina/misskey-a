@@ -5,18 +5,18 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createRouterClient } from '@orpc/server';
-import { createEmojisOperations, createEmojisRouter } from '../../../backend/built/features/emojis/backend.js';
+import { createEmojisRouter } from '../../../backend/built/features/emojis/backend.js';
 
 function publicEmojis(deps) {
-	const operations = createEmojisOperations({
+	const router = createEmojisRouter({
 		emojisRepository: {
 			find: () => deps.listLocal(),
 			findOneOrFail: ({ where }) => deps.findLocal(where.name),
 		},
 		emojiEntityService: { packSimpleMany: async rows => rows, packDetailed: async row => row },
 	});
-	return createRouterClient(createEmojisRouter(), { context: {
-		credential: undefined, ip: '192.0.2.1', headers: {}, operations: { emojis: operations },
+	return createRouterClient(router, { context: {
+		credential: undefined, ip: '192.0.2.1', headers: {},
 		services: { authenticate: async () => [null, null], limitActor: () => null, rateLimitFactor: async () => 1, limit: async () => null },
 	} });
 }

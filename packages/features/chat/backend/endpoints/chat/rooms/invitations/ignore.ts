@@ -5,14 +5,23 @@
 
 import { implement } from '@orpc/server';
 import { chatRoomsInvitationsIgnoreContract, chatRoomsInvitationsIgnorePolicy } from './ignore.contract.js';
-import type { ApiActor } from '../../../../../../api/backend/transport/context.js';
 import { authentication, apiPolicy, requirePrincipal } from '../../../../../../api/backend/transport/middleware.js';
-import type { ChatApiContext } from '../../../../operations.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+import type { ApiContext } from '@features/api/backend/transport/context.js';
+import type { InferSchemaOutput } from '@orpc/contract';
+import { type ChatService } from '@features/chat/backend/services/ChatService.js';
+export interface ChatRoomsInvitationsIgnoreDependencies {
+	chatService: Pick<ChatService, 'checkChatAvailability' | 'ignoreRoomInvitation'>;
+}
+export function createChatRoomsInvitationsIgnoreProcedure(deps: ChatRoomsInvitationsIgnoreDependencies) {
+	async function execute(input: InferSchemaOutput<NonNullable<typeof chatRoomsInvitationsIgnoreContract['~orpc']['inputSchema']>>, actor: MiLocalUser): Promise<void> {
+		await deps.chatService.checkChatAvailability(actor.id, 'write');
+		await deps.chatService.ignoreRoomInvitation(actor.id, input.roomId);
+	}
 
-export function createChatRoomsInvitationsIgnoreProcedure<Actor extends ApiActor>() {
-	return implement(chatRoomsInvitationsIgnoreContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ChatApiContext<Actor>>()
-		.use(authentication<Actor>())
-		.use(apiPolicy<Actor>(chatRoomsInvitationsIgnorePolicy))
-		.use(requirePrincipal<Actor>())
-		.handler(({ input, context }) => context.operations.chat.chatRoomsInvitationsIgnore(input, context.principal));
+	return implement(chatRoomsInvitationsIgnoreContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>()
+		.use(authentication<MiLocalUser>())
+		.use(apiPolicy<MiLocalUser>(chatRoomsInvitationsIgnorePolicy))
+		.use(requirePrincipal<MiLocalUser>())
+		.handler(({ input, context }) => execute(input, context.principal));
 }

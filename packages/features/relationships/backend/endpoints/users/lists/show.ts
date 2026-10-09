@@ -2,61 +2,54 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-
-import { Inject, Injectable } from '@nestjs/common';
+import { implement } from '@orpc/server';
+import type { ApiContext } from '../../../../../api/backend/transport/context.js';
+import type { MiLocalUser } from '../../../../../users/backend/models/User.js';
+import { authentication, apiPolicy } from '../../../../../api/backend/transport/middleware.js';
+import { relationshipsContract } from '../../relationships.contract.js';
+import type { RelationshipsDependencies } from '../../../api.dependencies.js';
 import { apiError } from '@features/api/backend/transport/orpc-error.js';
-import { DI } from '@/di-symbols.js';
-import { UserListEntityService } from '../../../serializers/UserListEntityService.js';
 import { relationshipsErrors } from '../../relationships.errors.js';
-import type { MiLocalUser } from '@features/users/backend/models/User.js';
-import type { RelationshipsInputs } from '../../relationships.contract.js';
-import type { UserListsRepository, UserListFavoritesRepository } from '@features/persistence/backend/repositories/models.js';
-
-@Injectable()
-export class UsersListsShowOperation {
-	constructor(
-		@Inject(DI.userListsRepository)
-		private userListsRepository: UserListsRepository,
-
-		@Inject(DI.userListFavoritesRepository)
-		private userListFavoritesRepository: UserListFavoritesRepository,
-
-		private userListEntityService: UserListEntityService,
-	) {}
-
-	async execute(ps: RelationshipsInputs['users/lists/show'], me: MiLocalUser | null) {
-		const additionalProperties: Partial<{ likedCount: number, isLiked: boolean }> = {};
-		// Fetch the list
-		const userList = await this.userListsRepository.findOneBy(!ps.forPublic && me !== null ? {
-			id: ps.listId,
-			userId: me.id,
-		} : {
-			id: ps.listId,
-			isPublic: true,
-		});
-
-		if (userList == null) {
-			throw apiError(relationshipsErrors['users/lists/show'].noSuchList);
-		}
-
-		if (ps.forPublic && userList.isPublic) {
-			additionalProperties.likedCount = await this.userListFavoritesRepository.countBy({
-				userListId: ps.listId,
+export function createUsersListsShowProcedure<Actor extends MiLocalUser>(deps: Pick<RelationshipsDependencies, 'userListsRepository' | 'userListFavoritesRepository' | 'userListEntityService'>) {
+	return implement(relationshipsContract["users/lists/show"], { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>().use(authentication<Actor>()).use(apiPolicy<Actor>({ name: 'users/lists/show', requireCredential: false, kind: 'read:account' }))
+		.handler(async ({ input, context }) => {
+			const ps = input;
+			const me = context.principal;
+			const additionalProperties: Partial<{
+				likedCount: number;
+				isLiked: boolean;
+			}> = {};
+			// Fetch the list
+			const userList = await deps.userListsRepository.findOneBy(!ps.forPublic && me !== null ? {
+				id: ps.listId,
+				userId: me.id,
+			} : {
+				id: ps.listId,
+				isPublic: true,
 			});
-			if (me !== null) {
-				additionalProperties.isLiked = await this.userListFavoritesRepository.exists({
-					where: {
-						userId: me.id,
-						userListId: ps.listId,
-					},
-				});
-			} else {
-				additionalProperties.isLiked = false;
+
+			if (userList == null) {
+				throw apiError(relationshipsErrors['users/lists/show'].noSuchList);
 			}
-		}
-		return {
-			...await this.userListEntityService.pack(userList),
-			...additionalProperties,
-		};
-	}
+
+			if (ps.forPublic && userList.isPublic) {
+				additionalProperties.likedCount = await deps.userListFavoritesRepository.countBy({
+					userListId: ps.listId,
+				});
+				if (me !== null) {
+					additionalProperties.isLiked = await deps.userListFavoritesRepository.exists({
+						where: {
+							userId: me.id,
+							userListId: ps.listId,
+						},
+					});
+				} else {
+					additionalProperties.isLiked = false;
+				}
+			}
+			return {
+				...await deps.userListEntityService.pack(userList),
+				...additionalProperties,
+			};
+		});
 }

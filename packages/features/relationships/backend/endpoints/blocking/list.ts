@@ -2,34 +2,24 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
+import { implement } from '@orpc/server';
+import type { ApiContext } from '../../../../api/backend/transport/context.js';
+import type { MiLocalUser } from '../../../../users/backend/models/User.js';
+import { authentication, apiPolicy, requirePrincipal } from '../../../../api/backend/transport/middleware.js';
+import { relationshipsContract } from '../relationships.contract.js';
+import type { RelationshipsDependencies } from '../../api.dependencies.js';
+import { toPackedUserDetailed } from '../../../../users/backend/user.schema.js';
+export function createBlockingListProcedure<Actor extends MiLocalUser>(deps: Pick<RelationshipsDependencies, 'queryService' | 'blockingsRepository' | 'blockingEntityService'>) {
+	return implement(relationshipsContract["blocking/list"], { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>().use(authentication<Actor>()).use(apiPolicy<Actor>({ name: 'blocking/list', requireCredential: true, kind: 'read:blocks' })).use(requirePrincipal<Actor>())
+		.handler(async ({ input, context }) => {
+			const ps = input;
+			const me = context.principal;
+			const query = deps.queryService.makePaginationQuery(deps.blockingsRepository.createQueryBuilder('blocking'), ps.sinceId, ps.untilId, ps.sinceDate, ps.untilDate)
+				.andWhere('blocking.blockerId = :meId', { meId: me.id });
 
-import { Inject, Injectable } from '@nestjs/common';
-import { QueryService } from '@features/notes/backend/services/QueryService.js';
-import { DI } from '@/di-symbols.js';
-import { BlockingEntityService } from '../../serializers/BlockingEntityService.js';
-import type { MiLocalUser } from '@features/users/backend/models/User.js';
-import type { RelationshipsInputs } from '../relationships.contract.js';
-
-import type { BlockingsRepository } from '@features/persistence/backend/repositories/models.js';
-
-@Injectable()
-export class BlockingListOperation {
-	constructor(
-		@Inject(DI.blockingsRepository)
-		private blockingsRepository: BlockingsRepository,
-
-		private blockingEntityService: BlockingEntityService,
-		private queryService: QueryService,
-	) {}
-
-	async execute(ps: RelationshipsInputs['blocking/list'], me: MiLocalUser) {
-		const query = this.queryService.makePaginationQuery(this.blockingsRepository.createQueryBuilder('blocking'), ps.sinceId, ps.untilId, ps.sinceDate, ps.untilDate)
-			.andWhere('blocking.blockerId = :meId', { meId: me.id });
-
-		const blockings = await query
-			.limit(ps.limit)
-			.getMany();
-
-		return await this.blockingEntityService.packMany(blockings, me);
-	}
+			const blockings = await query
+				.limit(ps.limit)
+				.getMany();
+			return (await deps.blockingEntityService.packMany(blockings, me)).map(row => ({ ...row, blockee: toPackedUserDetailed(row.blockee) }));
+		});
 }

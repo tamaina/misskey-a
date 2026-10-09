@@ -6,19 +6,23 @@
 import { implement } from '@orpc/server';
 import { authentication, apiPolicy } from '../../../api/backend/transport/middleware.js';
 import { retentionContract, retentionGetContract } from './retention.contract.js';
-import type { ApiActor } from '../../../api/backend/transport/context.js';
-import type { StatisticsContext } from '../operations.js';
-
-export function createRetentionProcedure<Actor extends ApiActor>() {
-	return implement(retentionContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<StatisticsContext<Actor>>()
+import type { ApiActor, ApiContext } from '../../../api/backend/transport/context.js';
+import type { StatisticsDependencies } from '../api.dependencies.js';
+export function createRetentionProcedure<Actor extends ApiActor>(deps: Pick<StatisticsDependencies, 'readRetention'>) {
+	return implement(retentionContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>()
 		.use(authentication<Actor>())
-		.use(apiPolicy<Actor>({ name: 'retention' }))
-		.handler(({ input, context }) => context.operations.statistics.retention(input, context.principal));
+		.use(apiPolicy<Actor>({ name: retentionContract['~orpc'].meta.requestName }))
+		.handler(async () => {
+			const records = await deps.readRetention({ order: { id: 'DESC' }, take: 30 });
+			return records.map(record => ({ createdAt: record.createdAt.toISOString(), users: record.usersCount, data: record.data }));
+		});
 }
-
-export function createRetentionGetProcedure<Actor extends ApiActor>() {
-	return implement(retentionGetContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<StatisticsContext<Actor>>()
+export function createRetentionGetProcedure<Actor extends ApiActor>(deps: Pick<StatisticsDependencies, 'readRetention'>) {
+	return implement(retentionGetContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>()
 		.use(authentication<Actor>())
-		.use(apiPolicy<Actor>({ name: 'retention' }))
-		.handler(({ input, context }) => context.operations.statistics.retention(input, context.principal));
+		.use(apiPolicy<Actor>({ name: retentionContract['~orpc'].meta.requestName }))
+		.handler(async () => {
+			const records = await deps.readRetention({ order: { id: 'DESC' }, take: 30 });
+			return records.map(record => ({ createdAt: record.createdAt.toISOString(), users: record.usersCount, data: record.data }));
+		});
 }

@@ -4,38 +4,40 @@
  */
 
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
-import type { DriveManagementInputs } from '../../management.contract.js';
-import { Inject, Injectable } from '@nestjs/common';
 import type { DriveFilesRepository } from '@features/persistence/backend/repositories/models.js';
 import { QueryService } from '@features/notes/backend/services/QueryService.js';
 import { DriveFileEntityService } from '../../serializers/DriveFileEntityService.js';
-import { DI } from '@/di-symbols.js';
+import { driveManagementContract } from '../../management.contract.js';
+import { implement } from '@orpc/server';
+import { authentication, apiPolicy, requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import type { ApiContext } from '@features/api/backend/transport/context.js';
+export interface DriveStreamDependencies {
+	driveFilesRepository: DriveFilesRepository;
+	driveFileEntityService: Pick<DriveFileEntityService, 'packMany'>;
+	queryService: Pick<QueryService, 'makePaginationQuery'>;
+}
+export function createDriveStreamProcedure(deps: DriveStreamDependencies) {
+	return implement(driveManagementContract['drive/stream'], { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>()
+		.use(authentication<MiLocalUser>())
+		.use(apiPolicy<MiLocalUser>({ 'name': 'drive/stream', 'requireCredential': true, 'kind': 'read:drive' })).use(requirePrincipal<MiLocalUser>())
+		.handler(async ({ input, context }) => {
+			const ps = input;
+			const me = context.principal;
+			const _ip = context.ip;
+			const _headers = context.headers;
+			const query = deps.queryService.makePaginationQuery(deps.driveFilesRepository.createQueryBuilder('file'), ps.sinceId, ps.untilId, ps.sinceDate, ps.untilDate)
+				.andWhere('file.userId = :userId', { userId: me.id });
 
-@Injectable()
-export class DriveStreamOperation {
-	constructor(
-		@Inject(DI.driveFilesRepository)
-		private driveFilesRepository: DriveFilesRepository,
-
-		private driveFileEntityService: DriveFileEntityService,
-		private queryService: QueryService,
-	) {
-	}
-
-	async execute(ps: DriveManagementInputs['drive/stream'], me: MiLocalUser, _ip: string, _headers: Record<string, string | string[] | undefined>) {
-		const query = this.queryService.makePaginationQuery(this.driveFilesRepository.createQueryBuilder('file'), ps.sinceId, ps.untilId, ps.sinceDate, ps.untilDate)
-			.andWhere('file.userId = :userId', { userId: me.id });
-
-		if (ps.type) {
-			if (ps.type.endsWith('/*')) {
-				query.andWhere('file.type like :type', { type: ps.type.replace('/*', '/') + '%' });
-			} else {
-				query.andWhere('file.type = :type', { type: ps.type });
+			if (ps.type) {
+				if (ps.type.endsWith('/*')) {
+					query.andWhere('file.type like :type', { type: ps.type.replace('/*', '/') + '%' });
+				} else {
+					query.andWhere('file.type = :type', { type: ps.type });
+				}
 			}
-		}
 
-		const files = await query.limit(ps.limit).getMany();
+			const files = await query.limit(ps.limit).getMany();
 
-		return await this.driveFileEntityService.packMany(files, { detail: false, self: true });
-	}
+			return await deps.driveFileEntityService.packMany(files, { detail: false, self: true });
+		});
 }

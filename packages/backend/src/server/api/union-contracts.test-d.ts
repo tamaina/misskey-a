@@ -4,8 +4,10 @@
  */
 
 import type * as v from 'valibot';
-import type { InstanceOperations } from '@features/instance/backend/operations.js';
-import type { RelationshipsOperations } from '@features/relationships/backend/endpoints/relationships.js';
+import type { createMetaProcedure } from '@features/instance/backend/endpoints/meta.js';
+import type { InferRouterOutputs } from '@orpc/server';
+import type { createUsersRelationProcedure } from '@features/relationships/backend/endpoints/users/relation.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
 import type { ApiActor } from '@features/api/backend/transport/context.js';
 import type { metaContract } from '@features/instance/backend/endpoints/meta.contract.js';
 import type { packedMetaLiteSchema, packedMetaDetailedSchema } from '@features/instance/backend/endpoints/meta.schema.js';
@@ -30,8 +32,8 @@ type A4 = Assert<Equal<RelationInput['userId'], string | string[]>>;
 type A5 = Assert<Equal<keyof RelationInput, 'userId'>>;
 type A6 = Assert<Equal<MetaResponse, v.InferOutput<typeof packedMetaLiteSchema> | v.InferOutput<typeof packedMetaDetailedSchema>>>;
 type A7 = Assert<Equal<RelationResponse, Relation[]>>;
-type A8 = Assert<Equal<Awaited<ReturnType<InstanceOperations<ApiActor>['meta']>>, InferSchemaOutput<NonNullable<typeof metaContract['~orpc']['outputSchema']>>>>;
-type A9 = Assert<Equal<Awaited<ReturnType<RelationshipsOperations<ApiActor>['users/relation']>>, RelationResponse>>;
+type A8 = Assert<Equal<InferRouterOutputs<ReturnType<typeof createMetaProcedure<ApiActor>>>, InferSchemaOutput<NonNullable<typeof metaContract['~orpc']['outputSchema']>>>>;
+type A9 = Assert<Equal<InferRouterOutputs<ReturnType<typeof createUsersRelationProcedure<MiLocalUser>>>, RelationResponse>>;
 type A10 = Assert<Equal<IsAny<MetaResponse>, false>>;
 type A11 = Assert<Equal<IsAny<RelationResponse>, false>>;
 type A12 = Assert<Equal<Relation['following'], v.InferOutput<typeof packedRelationFollowingSchema> | null>>;

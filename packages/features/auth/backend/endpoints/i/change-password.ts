@@ -4,59 +4,62 @@
  */
 
 import bcrypt from 'bcryptjs';
-import { Inject, Injectable } from '@nestjs/common';
-
 import type { UserProfilesRepository } from '@features/persistence/backend/repositories/models.js';
-import { DI } from '@/di-symbols.js';
 import { UserAuthService } from '../../services/UserAuthService.js';
-
-import type * as v from 'valibot';
-import type { IChangePasswordContract } from '../../api.contract.js';
+import * as v from 'valibot';
+import { IChangePasswordContract } from '../../api.contract.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
-
+import { implement } from '@orpc/server';
+import { authentication, apiPolicy, requirePrincipal } from '../../../../api/backend/transport/middleware.js';
+import type { ApiContext } from '../../../../api/backend/transport/context.js';
 export const meta = {
 	requireCredential: true,
 
 	secure: true,
 } as const;
+export interface IChangePasswordDependencies {
+	userProfilesRepository: UserProfilesRepository;
+	userAuthService: Pick<UserAuthService, 'twoFactorAuthenticate'>;
+}
+export function createIChangePasswordProcedure(deps: IChangePasswordDependencies) {
+	return implement(IChangePasswordContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>().use(authentication<MiLocalUser>()).use(apiPolicy<MiLocalUser>({ name: 'i/change-password', requireCredential: true, secure: true })).use(requirePrincipal<MiLocalUser>()).handler(async ({ input, context }) => {
+		const ps = input;
+		const me = context.principal;
+		const result = await (async () => {
+			const token = ps.token;
+			const profile = await deps.userProfilesRepository.findOneByOrFail({ userId: me.id });
 
-@Injectable()
-export class IChangePasswordOperation {
-	constructor(
-		@Inject(DI.userProfilesRepository)
-		private userProfilesRepository: UserProfilesRepository,
+			if (profile.twoFactorEnabled) {
+				if (token == null) {
+					throw new Error('authentication failed');
+				}
 
-		private userAuthService: UserAuthService,
-	) {}
-
-	async execute(ps: v.InferOutput<NonNullable<typeof IChangePasswordContract['~orpc']['inputSchema']>>, me: MiLocalUser) {
-		const token = ps.token;
-		const profile = await this.userProfilesRepository.findOneByOrFail({ userId: me.id });
-
-		if (profile.twoFactorEnabled) {
-			if (token == null) {
-				throw new Error('authentication failed');
+				try {
+					await deps.userAuthService.twoFactorAuthenticate(profile, token);
+				} catch (_) {
+					throw new Error('authentication failed');
+				}
 			}
 
-			try {
-				await this.userAuthService.twoFactorAuthenticate(profile, token);
-			} catch (_) {
-				throw new Error('authentication failed');
+			const passwordMatched = await bcrypt.compare(ps.currentPassword, profile.password!);
+
+			if (!passwordMatched) {
+				throw new Error('incorrect password');
 			}
-		}
 
-		const passwordMatched = await bcrypt.compare(ps.currentPassword, profile.password!);
+			// Generate hash of password
+			const salt = await bcrypt.genSalt(8);
+			const hash = await bcrypt.hash(ps.newPassword, salt);
 
-		if (!passwordMatched) {
-			throw new Error('incorrect password');
-		}
+			await deps.userProfilesRepository.update(me.id, {
+				password: hash,
+			});
+		})();
+		return v.parse(requiredSchema(IChangePasswordContract['~orpc'].outputSchema), result);
+	});
+}
 
-		// Generate hash of password
-		const salt = await bcrypt.genSalt(8);
-		const hash = await bcrypt.hash(ps.newPassword, salt);
-
-		await this.userProfilesRepository.update(me.id, {
-			password: hash,
-		});
-	}
+function requiredSchema<Schema>(schema: Schema | undefined): Schema {
+	if (schema === undefined) throw new Error('Contract must declare its schema');
+	return schema;
 }

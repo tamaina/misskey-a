@@ -5,14 +5,19 @@
 
 import { implement } from '@orpc/server';
 import { authentication, apiPolicy, requirePrincipal } from '../../../../../api/backend/transport/middleware.js';
-import type { ApiActor } from '../../../../../api/backend/transport/context.js';
-import type { OperationsApiContext } from '../../../operations.js';
+import type { ApiActor, ApiContext } from '../../../../../api/backend/transport/context.js';
 import { adminQueueRemoveJobContract } from './remove-job.contract.js';
-
-export function createAdminQueueRemoveJobProcedure<Actor extends ApiActor>() {
-	return implement(adminQueueRemoveJobContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<OperationsApiContext<Actor>>()
+import type { QueueService } from '../../../../../runtime/backend/services/QueueService.js';
+export interface AdminQueueRemoveJobDependencies {
+	queueService: Pick<QueueService, 'queueRemoveJob'>;
+}
+export function createAdminQueueRemoveJobProcedure<Actor extends ApiActor>(deps: AdminQueueRemoveJobDependencies) {
+	return implement(adminQueueRemoveJobContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>()
 		.use(authentication<Actor>())
-		.use(apiPolicy<Actor>({ name: 'admin/queue/remove-job', requireCredential: true, requireModerator: true, kind: 'write:admin:queue' }))
+		.use(apiPolicy<Actor>({ name: adminQueueRemoveJobContract['~orpc'].meta.requestName, requireCredential: true, requireModerator: true, kind: 'write:admin:queue' }))
 		.use(requirePrincipal<Actor>())
-		.handler(({ input, context }) => context.operations.operations.adminQueueRemoveJob(input, context.principal));
+		.handler(async ({ input }) => {
+			const ps = input;
+			void deps.queueService.queueRemoveJob(ps.queue, ps.jobId);
+		});
 }

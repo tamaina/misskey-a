@@ -2,21 +2,18 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-
-import { Inject, Injectable } from '@nestjs/common';
-
 import type { RegistrationTicketsRepository } from '@features/persistence/backend/repositories/models.js';
 import { InviteCodeEntityService } from '../../../serializers/InviteCodeEntityService.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
-import { DI } from '@/di-symbols.js';
 import { generateInviteCode } from '../../../utility/generate-invite-code.js';
 import { ModerationLogService } from '@features/moderation/backend/services/ModerationLogService.js';
 import { apiError } from '@features/api/backend/transport/orpc-error.js';
-
-import type * as v from 'valibot';
-import type { AdminInviteCreateContract } from '../../../api.contract.js';
+import * as v from 'valibot';
+import { AdminInviteCreateContract } from '../../../api.contract.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
-
+import { implement } from '@orpc/server';
+import { authentication, apiPolicy, requirePrincipal } from '../../../../../api/backend/transport/middleware.js';
+import type { ApiContext } from '../../../../../api/backend/transport/context.js';
 export const meta = {
 	tags: ['admin'],
 
@@ -32,41 +29,46 @@ export const meta = {
 		},
 	},
 } as const;
+export interface AdminInviteCreateDependencies {
+	registrationTicketsRepository: RegistrationTicketsRepository;
+	inviteCodeEntityService: Pick<InviteCodeEntityService, 'packMany'>;
+	idService: Pick<IdService, 'gen'>;
+	moderationLogService: Pick<ModerationLogService, 'log'>;
+}
+export function createAdminInviteCreateProcedure(deps: AdminInviteCreateDependencies) {
+	return implement(AdminInviteCreateContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>().use(authentication<MiLocalUser>()).use(apiPolicy<MiLocalUser>({ name: 'admin/invite/create', requireCredential: true, requireModerator: true, kind: 'write:admin:invite-codes' })).use(requirePrincipal<MiLocalUser>()).handler(async ({ input, context }) => {
+		const ps = input;
+		const me = context.principal;
+		const result = await (async () => {
+			if (ps.expiresAt && isNaN(Date.parse(ps.expiresAt))) {
+				throw apiError(meta.errors.invalidDateTime);
+			}
 
-@Injectable()
-export class AdminInviteCreateOperation {
-	constructor(
-		@Inject(DI.registrationTicketsRepository)
-		private registrationTicketsRepository: RegistrationTicketsRepository,
+			const ticketsPromises = [];
 
-		private inviteCodeEntityService: InviteCodeEntityService,
-		private idService: IdService,
-		private moderationLogService: ModerationLogService,
-	) {}
+			for (let i = 0; i < ps.count; i++) {
+				ticketsPromises.push(deps.registrationTicketsRepository.insertOne({
+					id: deps.idService.gen(),
+					createdBy: me,
+					createdById: me.id,
+					expiresAt: ps.expiresAt ? new Date(ps.expiresAt) : null,
+					code: generateInviteCode(),
+				}));
+			}
 
-	async execute(ps: v.InferOutput<NonNullable<typeof AdminInviteCreateContract['~orpc']['inputSchema']>>, me: MiLocalUser) {
-		if (ps.expiresAt && isNaN(Date.parse(ps.expiresAt))) {
-			throw apiError(meta.errors.invalidDateTime);
-		}
+			const tickets = await Promise.all(ticketsPromises);
 
-		const ticketsPromises = [];
+			deps.moderationLogService.log(me, 'createInvitation', {
+				invitations: tickets,
+			});
 
-		for (let i = 0; i < ps.count; i++) {
-			ticketsPromises.push(this.registrationTicketsRepository.insertOne({
-				id: this.idService.gen(),
-				createdBy: me,
-				createdById: me.id,
-				expiresAt: ps.expiresAt ? new Date(ps.expiresAt) : null,
-				code: generateInviteCode(),
-			}));
-		}
+			return await deps.inviteCodeEntityService.packMany(tickets, me);
+		})();
+		return v.parse(requiredSchema(AdminInviteCreateContract['~orpc'].outputSchema), result);
+	});
+}
 
-		const tickets = await Promise.all(ticketsPromises);
-
-		this.moderationLogService.log(me, 'createInvitation', {
-			invitations: tickets,
-		});
-
-		return await this.inviteCodeEntityService.packMany(tickets, me);
-	}
+function requiredSchema<Schema>(schema: Schema | undefined): Schema {
+	if (schema === undefined) throw new Error('Contract must declare its schema');
+	return schema;
 }

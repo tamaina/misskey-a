@@ -16,8 +16,13 @@ import { bubbleGameRankingContract } from '../../backend/endpoints/bubble-game/r
 import { bubbleGameRegisterContract } from '../../backend/endpoints/bubble-game/register.contract.js';
 import { reversiInvitationsContract } from '../../backend/endpoints/reversi/invitations.contract.js';
 import { ReversiGameEntityService } from '../../backend/serializers/ReversiGameEntityService.js';
-import { BubbleGameRankingApplicationService as RankingEndpoint } from '../../backend/applications/bubble-game/ranking.js';
-import { ReversiVerifyApplicationService as VerifyEndpoint } from '../../backend/applications/reversi/verify.js';
+import { createRouterClient } from '@orpc/server';
+import { createBubbleGameRankingProcedure } from '../../backend/endpoints/bubble-game/ranking.js';
+import type { BubbleGameRankingDependencies } from '../../backend/endpoints/bubble-game/ranking.js';
+import type { ApiContext, ApiServices } from '../../../api/backend/transport/context.js';
+import type { MiLocalUser } from '../../../users/backend/models/User.js';
+import { createReversiVerifyProcedure } from '../../backend/endpoints/reversi/verify.js';
+import type { ReversiVerifyDependencies } from '../../backend/endpoints/reversi/verify.js';
 import { MiReversiGame } from '../../backend/models/ReversiGame.js';
 import type { MiBubbleGameRecord } from '../../backend/models/BubbleGameRecord.js';
 import type { MiUser } from '@features/users/backend/models/User.js';
@@ -97,20 +102,22 @@ test.each([
 
 test.each([false, true])('actual verify handler preserves desynced=%s variants', async desynced => {
 	const { service, game } = fixture();
-	const reversi = mockDeep<ConstructorParameters<typeof VerifyEndpoint>[0]>();
+	const reversi = mockDeep<ReversiVerifyDependencies['reversiService']>();
 	reversi.checkCrc.mockResolvedValue(desynced ? game : null);
-	const result = await new VerifyEndpoint(reversi, service).execute({ gameId: game.id, crc32: 'crc' }, null);
+	const client = createRouterClient({ verify: createReversiVerifyProcedure({ reversiService: reversi, reversiGameEntityService: service }) }, { context: anonymousContext() });
+	const result = await client.verify({ gameId: game.id, crc32: 'crc' });
 	expect(v.safeParse(packedReversiVerifyOutput, result).success).toBe(true);
 	expect(result.desynced).toBe(desynced);
 	checkClosed(packedReversiVerifyOutput, result, 'desynced', { desynced: 7 });
 });
 
 test.each([false, true])('actual ranking handler retains missing packed user=%s and closes wrapper', async missingUser => {
-	const records = mockDeep<ConstructorParameters<typeof RankingEndpoint>[0]>();
+	const records = mockDeep<BubbleGameRankingDependencies['bubbleGameRecordsRepository']>();
 	records.find.mockResolvedValue([mockDeep<MiBubbleGameRecord>({ id: 'record123', score: 9, user: mockDeep<MiUser>({ id: user.id }) })]);
-	const users = mockDeep<ConstructorParameters<typeof RankingEndpoint>[1]>();
+	const users = mockDeep<BubbleGameRankingDependencies['userEntityService']>();
 	users.packMany.mockResolvedValue(missingUser ? [] : [user]);
-	const result = await new RankingEndpoint(records, users).execute({ gameMode: 'normal' }, null);
+	const client = createRouterClient({ ranking: createBubbleGameRankingProcedure({ bubbleGameRecordsRepository: records, userEntityService: users }) }, { context: anonymousContext() });
+	const result = await client.ranking({ gameMode: 'normal' });
 	expect(v.safeParse(packedBubbleGameRankingOutput, result).success).toBe(true);
 	expect(result[0].user).toEqual(missingUser ? undefined : user);
 	expect(Object.hasOwn(result[0], 'user')).toBe(true);
@@ -130,3 +137,9 @@ test('native game defaults, empty invitation JSON and finite responses retain wi
 	expect(v.safeParse(packedReversiMatchOutput, response).success).toBe(false);
 	expect(v.safeParse(packedReversiMatchInput, { multiple: 7 }).success).toBe(false);
 });
+
+function anonymousContext(): ApiContext<MiLocalUser> {
+	const services = mockDeep<ApiServices<MiLocalUser>>();
+	services.authenticate.mockResolvedValue([null, null]);
+	return { services, credential: null, headers: {}, ip: '127.0.0.1' };
+}

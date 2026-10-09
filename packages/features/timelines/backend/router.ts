@@ -5,38 +5,38 @@
 
 import { implement } from '@orpc/server';
 import { timelinesContract } from './endpoints/timelines.contract.js';
-import { createAntennasCreateProcedure } from './endpoints/antennas/create.js';
-import { createAntennasDeleteProcedure } from './endpoints/antennas/delete.js';
-import { createAntennasListProcedure } from './endpoints/antennas/list.js';
-import { createAntennasNotesProcedure } from './endpoints/antennas/notes.js';
-import { createAntennasRemoveNoteProcedure } from './endpoints/antennas/remove-note.js';
-import { createAntennasShowProcedure } from './endpoints/antennas/show.js';
-import { createAntennasUpdateProcedure } from './endpoints/antennas/update.js';
-import { createNotesGlobalTimelineProcedure } from './endpoints/notes/global-timeline.js';
-import { createNotesHybridTimelineProcedure } from './endpoints/notes/hybrid-timeline.js';
-import { createNotesLocalTimelineProcedure } from './endpoints/notes/local-timeline.js';
-import { createNotesMentionsProcedure } from './endpoints/notes/mentions.js';
-import { createNotesTimelineProcedure } from './endpoints/notes/timeline.js';
-import { createNotesUserListTimelineProcedure } from './endpoints/notes/user-list-timeline.js';
-import { createUsersNotesProcedure } from './endpoints/users/notes.js';
-import type { TimelinesContext } from './operations.js';
-import type { ApiActor } from '../../api/backend/transport/context.js';
-
-export function createTimelinesRouter<Actor extends ApiActor>() {
-	return implement(timelinesContract).$context<TimelinesContext<Actor>>().router({
-		antennasCreate: createAntennasCreateProcedure<Actor>(),
-		antennasDelete: createAntennasDeleteProcedure<Actor>(),
-		antennasList: createAntennasListProcedure<Actor>(),
-		antennasNotes: createAntennasNotesProcedure<Actor>(),
-		antennasRemoveNote: createAntennasRemoveNoteProcedure<Actor>(),
-		antennasShow: createAntennasShowProcedure<Actor>(),
-		antennasUpdate: createAntennasUpdateProcedure<Actor>(),
-		notesGlobalTimeline: createNotesGlobalTimelineProcedure<Actor>(),
-		notesHybridTimeline: createNotesHybridTimelineProcedure<Actor>(),
-		notesLocalTimeline: createNotesLocalTimelineProcedure<Actor>(),
-		notesMentions: createNotesMentionsProcedure<Actor>(),
-		notesTimeline: createNotesTimelineProcedure<Actor>(),
-		notesUserListTimeline: createNotesUserListTimelineProcedure<Actor>(),
-		usersNotes: createUsersNotesProcedure<Actor>(),
+import { createAntennasCreateProcedure, type AntennasCreateDependencies } from './endpoints/antennas/create.js';
+import { createAntennasDeleteProcedure, type AntennasDeleteDependencies } from './endpoints/antennas/delete.js';
+import { createAntennasListProcedure, type AntennasListDependencies } from './endpoints/antennas/list.js';
+import { createAntennasNotesProcedure, type AntennasNotesDependencies } from './endpoints/antennas/notes.js';
+import { createAntennasRemoveNoteProcedure, type AntennasRemoveNoteDependencies } from './endpoints/antennas/remove-note.js';
+import { createAntennasShowProcedure, type AntennasShowDependencies } from './endpoints/antennas/show.js';
+import { createAntennasUpdateProcedure, type AntennasUpdateDependencies } from './endpoints/antennas/update.js';
+import { createNotesGlobalTimelineProcedure, type NotesGlobalTimelineDependencies } from './endpoints/notes/global-timeline.js';
+import { createNotesHybridTimelineProcedure, type NotesHybridTimelineDependencies } from './endpoints/notes/hybrid-timeline.js';
+import { createNotesLocalTimelineProcedure, type NotesLocalTimelineDependencies } from './endpoints/notes/local-timeline.js';
+import { createNotesMentionsProcedure, type NotesMentionsDependencies } from './endpoints/notes/mentions.js';
+import { createNotesTimelineProcedure, type NotesTimelineDependencies } from './endpoints/notes/timeline.js';
+import { createNotesUserListTimelineProcedure, type NotesUserListTimelineDependencies } from './endpoints/notes/user-list-timeline.js';
+import { createUsersNotesProcedure, type UsersNotesDependencies } from './endpoints/users/notes.js';
+import type { ApiContext } from '@features/api/backend/transport/context.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+export type TimelinesDependencies = AntennasCreateDependencies & AntennasDeleteDependencies & AntennasListDependencies & AntennasNotesDependencies & AntennasRemoveNoteDependencies & AntennasShowDependencies & AntennasUpdateDependencies & NotesGlobalTimelineDependencies & NotesHybridTimelineDependencies & NotesLocalTimelineDependencies & NotesMentionsDependencies & NotesTimelineDependencies & NotesUserListTimelineDependencies & UsersNotesDependencies;
+export function createTimelinesRouter<Actor extends MiLocalUser>(deps: TimelinesDependencies) {
+	return implement(timelinesContract).$context<ApiContext<Actor>>().router({
+		antennasCreate: createAntennasCreateProcedure<Actor>(deps),
+		antennasDelete: createAntennasDeleteProcedure<Actor>(deps),
+		antennasList: createAntennasListProcedure<Actor>(deps),
+		antennasNotes: createAntennasNotesProcedure<Actor>(deps),
+		antennasRemoveNote: createAntennasRemoveNoteProcedure<Actor>(deps),
+		antennasShow: createAntennasShowProcedure<Actor>(deps),
+		antennasUpdate: createAntennasUpdateProcedure<Actor>(deps),
+		notesGlobalTimeline: createNotesGlobalTimelineProcedure<Actor>(deps),
+		notesHybridTimeline: createNotesHybridTimelineProcedure<Actor>(deps),
+		notesLocalTimeline: createNotesLocalTimelineProcedure<Actor>(deps),
+		notesMentions: createNotesMentionsProcedure<Actor>(deps),
+		notesTimeline: createNotesTimelineProcedure<Actor>(deps),
+		notesUserListTimeline: createNotesUserListTimelineProcedure<Actor>(deps),
+		usersNotes: createUsersNotesProcedure<Actor>(deps),
 	});
 }

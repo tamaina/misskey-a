@@ -19,37 +19,36 @@ import { createPerUserReactionsProcedure, createPerUserReactionsGetProcedure } f
 import { createUsersProcedure, createUsersGetProcedure } from './endpoints/charts/users.js';
 import { createRetentionProcedure, createRetentionGetProcedure } from './endpoints/retention.js';
 import { createStatsProcedure } from './endpoints/stats.js';
-import type { StatisticsContext } from './operations.js';
-import type { ApiActor } from '../../api/backend/transport/context.js';
-
-export function createStatisticsRouter<Actor extends ApiActor>() {
-	return implement(statisticsContract).$context<StatisticsContext<Actor>>().router({
-		activeUsers: createActiveUsersProcedure<Actor>(),
-		activeUsersGet: createActiveUsersGetProcedure<Actor>(),
-		apRequest: createApRequestProcedure<Actor>(),
-		apRequestGet: createApRequestGetProcedure<Actor>(),
-		drive: createDriveProcedure<Actor>(),
-		driveGet: createDriveGetProcedure<Actor>(),
-		federation: createFederationProcedure<Actor>(),
-		federationGet: createFederationGetProcedure<Actor>(),
-		instance: createInstanceProcedure<Actor>(),
-		instanceGet: createInstanceGetProcedure<Actor>(),
-		notes: createNotesProcedure<Actor>(),
-		notesGet: createNotesGetProcedure<Actor>(),
-		userDrive: createPerUserDriveProcedure<Actor>(),
-		userDriveGet: createPerUserDriveGetProcedure<Actor>(),
-		userFollowing: createPerUserFollowingProcedure<Actor>(),
-		userFollowingGet: createPerUserFollowingGetProcedure<Actor>(),
-		userNotes: createPerUserNotesProcedure<Actor>(),
-		userNotesGet: createPerUserNotesGetProcedure<Actor>(),
-		userPv: createPerUserPvProcedure<Actor>(),
-		userPvGet: createPerUserPvGetProcedure<Actor>(),
-		userReactions: createPerUserReactionsProcedure<Actor>(),
-		userReactionsGet: createPerUserReactionsGetProcedure<Actor>(),
-		users: createUsersProcedure<Actor>(),
-		usersGet: createUsersGetProcedure<Actor>(),
-		retention: createRetentionProcedure<Actor>(),
-		retentionGet: createRetentionGetProcedure<Actor>(),
-		stats: createStatsProcedure<Actor>(),
+import type { StatisticsDependencies } from './api.dependencies.js';
+import type { ApiActor, ApiContext } from '../../api/backend/transport/context.js';
+export function createStatisticsRouter<Actor extends ApiActor>(deps: StatisticsDependencies) {
+	return implement(statisticsContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>().router({
+		activeUsers: createActiveUsersProcedure<Actor>(deps.charts.activeUsers),
+		activeUsersGet: createActiveUsersGetProcedure<Actor>(deps.charts.activeUsers),
+		apRequest: createApRequestProcedure<Actor>(deps.charts.apRequest),
+		apRequestGet: createApRequestGetProcedure<Actor>(deps.charts.apRequest),
+		drive: createDriveProcedure<Actor>(deps.charts.drive),
+		driveGet: createDriveGetProcedure<Actor>(deps.charts.drive),
+		federation: createFederationProcedure<Actor>(deps.charts.federation),
+		federationGet: createFederationGetProcedure<Actor>(deps.charts.federation),
+		instance: createInstanceProcedure<Actor>(deps.charts.instance),
+		instanceGet: createInstanceGetProcedure<Actor>(deps.charts.instance),
+		notes: createNotesProcedure<Actor>(deps.charts.notes),
+		notesGet: createNotesGetProcedure<Actor>(deps.charts.notes),
+		userDrive: createPerUserDriveProcedure<Actor>(deps.charts.userDrive),
+		userDriveGet: createPerUserDriveGetProcedure<Actor>(deps.charts.userDrive),
+		userFollowing: createPerUserFollowingProcedure<Actor>(deps.charts.userFollowing),
+		userFollowingGet: createPerUserFollowingGetProcedure<Actor>(deps.charts.userFollowing),
+		userNotes: createPerUserNotesProcedure<Actor>(deps.charts.userNotes),
+		userNotesGet: createPerUserNotesGetProcedure<Actor>(deps.charts.userNotes),
+		userPv: createPerUserPvProcedure<Actor>(deps.charts.userPv),
+		userPvGet: createPerUserPvGetProcedure<Actor>(deps.charts.userPv),
+		userReactions: createPerUserReactionsProcedure<Actor>(deps.charts.userReactions),
+		userReactionsGet: createPerUserReactionsGetProcedure<Actor>(deps.charts.userReactions),
+		users: createUsersProcedure<Actor>(deps.charts.users),
+		usersGet: createUsersGetProcedure<Actor>(deps.charts.users),
+		retention: createRetentionProcedure<Actor>(deps),
+		retentionGet: createRetentionGetProcedure<Actor>(deps),
+		stats: createStatsProcedure<Actor>(deps),
 	});
 }

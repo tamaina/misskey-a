@@ -4,18 +4,20 @@
  */
 
 import { expect, test } from 'vitest';
+import { createProcedureClient } from '@orpc/server';
+import type { ApiContext, ApiToken } from '@features/api/backend/transport/context.js';
+import { createUserSerializationFixture } from './user-serialization-fixture.js';
 import * as v from 'valibot';
-import { mock, mockDeep } from 'vitest-mock-extended';
+import { mockDeep } from 'vitest-mock-extended';
 import { packedMeDetailedOnlySchema } from '../../backend/user.schema.js';
-import { IOperation } from '../../backend/endpoints/i.js';
-import { UsersShowOperation } from '../../backend/endpoints/users/show.js';
+import { createIProcedure } from '../../backend/endpoints/i.js';
+import { createUsersShowProcedure } from '../../backend/endpoints/users/show.js';
 import { usersShowContract } from '../../backend/endpoints/users/show.contract.js';
 import { iUpdateContract } from '../../backend/endpoints/i/update.contract.js';
 import { usersContract } from '../../backend/endpoints/users.contract.js';
 import type { MiLocalUser, MiRemoteUser } from '../../backend/models/User.js';
 import { MiUserProfile } from '../../backend/models/UserProfile.js';
 import type { UserEntityService } from '../../backend/serializers/UserEntityService.js';
-import type { NativeMeDetailed } from '../../backend/serializers/native-user.js';
 import type { UsersRepository, UserProfilesRepository, MiMeta } from '@features/persistence/backend/repositories/models.js';
 import type { RemoteUserResolveService } from '@features/federation/backend/services/RemoteUserResolveService.js';
 import type { RoleService } from '@features/roles/backend/services/RoleService.js';
@@ -29,7 +31,8 @@ function showFixture() {
 	const remote = mockDeep<RemoteUserResolveService>();
 	const roles = mockDeep<RoleService>();
 	roles.isModerator.mockResolvedValue(false);
-	const operation = new UsersShowOperation(settings, repository, serializer, remote, roles, mockDeep<PerUserPvChart>(), mockDeep<ApiLoggerService>());
+	const procedure = createUsersShowProcedure({ serverSettings: settings, usersRepository: repository, userEntityService: serializer, remoteUserResolveService: remote, roleService: roles, perUserPvChart: mockDeep<PerUserPvChart>(), apiLoggerService: mockDeep<ApiLoggerService>() });
+	const operation = createProcedureClient(procedure, { context: userContext(null) });
 	return { settings, repository, serializer, remote, operation };
 }
 
@@ -38,7 +41,7 @@ test('users/show preserves competing selectors and prioritizes a present userIds
 	const parsed = v.parse(requiredSchema(usersShowContract['~orpc'].inputSchema), input);
 	expect(parsed).toEqual(input);
 	const fixture = showFixture();
-	expect(await fixture.operation.execute(parsed, null, null, '127.0.0.1')).toEqual([]);
+	expect(await fixture.operation(parsed)).toEqual([]);
 	expect(fixture.repository.findOneBy).not.toHaveBeenCalled();
 	expect(fixture.remote.resolveUser).not.toHaveBeenCalled();
 });
@@ -47,24 +50,28 @@ test('users/show respects live visitor settings before resolving a remote accoun
 	const fixture = showFixture();
 	const input = v.parse(requiredSchema(usersShowContract['~orpc'].inputSchema), { username: 'alice', host: 'remote.example' });
 	fixture.settings.ugcVisibilityForVisitor = 'local';
-	await expect(fixture.operation.execute(input, null, null, '127.0.0.1')).rejects.toMatchObject({ code: 'NO_SUCH_USER', status: 404 });
+	await expect(fixture.operation(input)).rejects.toMatchObject({ code: 'NO_SUCH_USER', status: 404 });
 	expect(fixture.remote.resolveUser).not.toHaveBeenCalled();
 	fixture.settings.ugcVisibilityForVisitor = 'none';
 	fixture.remote.resolveUser.mockResolvedValue(mockDeep<MiRemoteUser>({ id: 'remote1', host: 'remote.example', uri: 'https://remote.example/users/remote1', isSuspended: false }));
-	await fixture.operation.execute(input, null, null, '127.0.0.1');
+	const producer = createUserSerializationFixture();
+	fixture.serializer.pack.mockResolvedValue(await producer.service.pack(producer.user, null, { schema: 'UserDetailedNotMe', ...producer.hints }));
+	await fixture.operation(input);
 	expect(fixture.remote.resolveUser).toHaveBeenCalledWith('alice', 'remote.example');
 });
 
 test('i includes self secrets only for a native session', async () => {
 	const profiles = mockDeep<UserProfilesRepository>();
 	const serializer = mockDeep<UserEntityService>();
-	const actor = mockDeep<MiLocalUser>({ id: 'local1', host: null, uri: null });
+	const actor = mockDeep<MiLocalUser>({ id: 'local1', host: null, uri: null, isSuspended: false, movedToUri: null });
 	profiles.findOne.mockResolvedValue(new MiUserProfile({ user: actor, loggedInDates: [] }));
-	serializer.packSelf.mockResolvedValue(mock<NativeMeDetailed>({}));
-	const operation = new IOperation(profiles, serializer);
-	await operation.execute({}, actor, { id: 'app1', permission: ['read:account'] }, '127.0.0.1');
+	const producer = createUserSerializationFixture();
+	serializer.packSelf.mockResolvedValue(await producer.service.packSelf(producer.user, { ...producer.hints, includeSecrets: true }));
+	const procedure = createIProcedure({ userProfilesRepository: profiles, userEntityService: serializer });
+	await createProcedureClient(procedure, { context: userContext(actor, { id: 'app1', permission: ['read:account'] }) })({});
 	expect(serializer.packSelf).toHaveBeenLastCalledWith(actor, expect.objectContaining({ includeSecrets: false }));
-	await operation.execute({}, actor, null, '127.0.0.1');
+	const result = await createProcedureClient(procedure, { context: userContext(actor) })({});
+	expect(result.securityKeysList?.[0].lastUsed).toBe('2026-01-01T00:00:00.000Z');
 	expect(serializer.packSelf).toHaveBeenLastCalledWith(actor, expect.objectContaining({ includeSecrets: true }));
 });
 
@@ -108,4 +115,10 @@ test('notification settings retain reserved JSON keys and reject invalid reserve
 function requiredSchema<Schema>(schema: Schema | undefined): Schema {
 	if (schema === undefined) throw new Error('Missing endpoint contract schema');
 	return schema;
+}
+
+function userContext(actor: MiLocalUser | null, token: ApiToken | null = null) {
+	const context = mockDeep<ApiContext<MiLocalUser>>({ credential: actor ? 'fixture' : null, ip: '127.0.0.1', headers: {} });
+	context.services.authenticate.mockResolvedValue([actor, token]);
+	return context;
 }

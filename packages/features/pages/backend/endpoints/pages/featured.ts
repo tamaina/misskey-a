@@ -5,13 +5,26 @@
 
 import { implement } from '@orpc/server';
 import { authentication, apiPolicy } from '../../../../api/backend/transport/middleware.js';
-import type { ApiActor } from '../../../../api/backend/transport/context.js';
-import type { PagesContext } from '../../operations.js';
+import type { ApiContext } from '../../../../api/backend/transport/context.js';
 import { pagesFeaturedContract } from './featured.contract.js';
-
-export function createPagesFeaturedProcedure<Actor extends ApiActor>() {
-	return implement(pagesFeaturedContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<PagesContext<Actor>>()
-		.use(authentication<Actor>())
-		.use(apiPolicy<Actor>({ name: 'pages/featured' }))
-		.handler(({ input, context }) => context.operations.pages.pagesFeatured(input, context.principal));
+import type { PagesRepository } from '@features/persistence/backend/repositories/models.js';
+import type { PageEntityService } from '../../serializers/PageEntityService.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+export interface PagesFeaturedDependencies {
+	pagesRepository: Pick<PagesRepository, 'createQueryBuilder'>;
+	pageEntityService: Pick<PageEntityService, 'packMany'>;
+}
+export function createPagesFeaturedProcedure(deps: PagesFeaturedDependencies) {
+	return implement(pagesFeaturedContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>()
+		.use(authentication<MiLocalUser>())
+		.use(apiPolicy<MiLocalUser>({ name: pagesFeaturedContract['~orpc'].meta.requestName }))
+		.handler(async ({ context }) => {
+			const me = context.principal;
+			const query = deps.pagesRepository.createQueryBuilder('page')
+				.where('page.visibility = \'public\'')
+				.andWhere('page.likedCount > 0')
+				.orderBy('page.likedCount', 'DESC');
+			const pages = await query.limit(10).getMany();
+			return await deps.pageEntityService.packMany(pages, me);
+		});
 }

@@ -2,10 +2,9 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-
+import type { FederationDependencies } from './api.dependencies.js';
 import { implement } from '@orpc/server';
-import type { ApiActor } from '../../api/backend/transport/context.js';
-import type { FederationContext } from './operations.js';
+import type { ApiActor, ApiContext } from '../../api/backend/transport/context.js';
 import { federationContract } from './api.contract.js';
 import { createAdminFederationDeleteAllFilesProcedure } from './endpoints/admin/federation/delete-all-files.js';
 import { createAdminFederationRefreshRemoteInstanceMetadataProcedure } from './endpoints/admin/federation/refresh-remote-instance-metadata.js';
@@ -23,24 +22,23 @@ import { createFederationShowInstanceProcedure } from './endpoints/federation/sh
 import { createFederationStatsProcedure } from './endpoints/federation/stats.js';
 import { createFederationUpdateRemoteUserProcedure } from './endpoints/federation/update-remote-user.js';
 import { createFederationUsersProcedure } from './endpoints/federation/users.js';
-
-export function createFederationRouter<Actor extends ApiActor>() {
-	return implement(federationContract).$context<FederationContext<Actor>>().router({
-		adminFederationDeleteAllFiles: createAdminFederationDeleteAllFilesProcedure<Actor>(),
-		adminFederationRefreshRemoteInstanceMetadata: createAdminFederationRefreshRemoteInstanceMetadataProcedure<Actor>(),
-		adminFederationRemoveAllFollowing: createAdminFederationRemoveAllFollowingProcedure<Actor>(),
-		adminFederationUpdateInstance: createAdminFederationUpdateInstanceProcedure<Actor>(),
-		adminRelaysAdd: createAdminRelaysAddProcedure<Actor>(),
-		adminRelaysList: createAdminRelaysListProcedure<Actor>(),
-		adminRelaysRemove: createAdminRelaysRemoveProcedure<Actor>(),
-		apGet: createApGetProcedure<Actor>(),
-		apShow: createApShowProcedure<Actor>(),
-		federationFollowers: createFederationFollowersProcedure<Actor>(),
-		federationFollowing: createFederationFollowingProcedure<Actor>(),
-		federationInstances: createFederationInstancesProcedure<Actor>(),
-		federationShowInstance: createFederationShowInstanceProcedure<Actor>(),
-		federationStats: createFederationStatsProcedure<Actor>(),
-		federationUpdateRemoteUser: createFederationUpdateRemoteUserProcedure<Actor>(),
-		federationUsers: createFederationUsersProcedure<Actor>(),
+export function createFederationRouter<Actor extends ApiActor>(deps: FederationDependencies) {
+	return implement(federationContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>().router({
+		adminFederationDeleteAllFiles: createAdminFederationDeleteAllFilesProcedure<Actor>(deps),
+		adminFederationRefreshRemoteInstanceMetadata: createAdminFederationRefreshRemoteInstanceMetadataProcedure<Actor>(deps),
+		adminFederationRemoveAllFollowing: createAdminFederationRemoveAllFollowingProcedure<Actor>({ ...deps, followingsRepository: deps.removeAllFollowingsRepository }),
+		adminFederationUpdateInstance: createAdminFederationUpdateInstanceProcedure<Actor>(deps),
+		adminRelaysAdd: createAdminRelaysAddProcedure<Actor>(deps),
+		adminRelaysList: createAdminRelaysListProcedure<Actor>(deps),
+		adminRelaysRemove: createAdminRelaysRemoveProcedure<Actor>(deps),
+		apGet: createApGetProcedure<Actor>(deps),
+		apShow: createApShowProcedure<Actor>(deps),
+		federationFollowers: createFederationFollowersProcedure<Actor>(deps),
+		federationFollowing: createFederationFollowingProcedure<Actor>(deps),
+		federationInstances: createFederationInstancesProcedure<Actor>(deps),
+		federationShowInstance: createFederationShowInstanceProcedure<Actor>(deps),
+		federationStats: createFederationStatsProcedure<Actor>(deps),
+		federationUpdateRemoteUser: createFederationUpdateRemoteUserProcedure<Actor>(deps),
+		federationUsers: createFederationUsersProcedure<Actor>(deps),
 	});
 }

@@ -6,7 +6,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createRouterClient } from '@orpc/server';
-import { createCollectionsOperations, createCollectionsRouter, ClipService } from '../../../backend/built/features/collections/backend.js';
+import { createCollectionsRouter, ClipService } from '../../../backend/built/features/collections/backend.js';
 
 const routeMethods = { 'clips/delete': 'clipsDelete', 'clips/add-note': 'clipsAddNote', 'clips/remove-note': 'clipsRemoveNote' };
 const collectionsErrors = {
@@ -23,7 +23,7 @@ const collectionsErrors = {
 	},
 };
 
-function collectionOperations(deps) { return createCollectionsOperations({ clipService: deps }); }
+function collectionDependencies(deps) { return { clipService: deps }; }
 
 const validInputs = {
 	'clips/delete': { clipId: 'clip0123' },
@@ -39,13 +39,13 @@ function createFeature(overrides = {}) {
 		removeNote: async (actor, clipId, noteId) => { calls.push(['removeNote', actor, clipId, noteId]); return 'ignored remove result'; },
 		...overrides,
 	};
-	return { feature: collectionOperations(deps), calls, deps };
+	return { feature: collectionDependencies(deps), calls, deps };
 }
 
-function invoke(operations, route, input = validInputs[route], actor = { id: 'actor-1' }, options = {}) {
+function invoke(dependencies, route, input = validInputs[route], actor = { id: 'actor-1' }, options = {}) {
 	const principal = options.missingContext || actor === null ? null : { isSuspended: false, movedToUri: null, ...actor };
-	const client = createRouterClient(createCollectionsRouter(), { context: {
-		credential: 'session', ip: '192.0.2.1', headers: {}, operations: { collections: operations },
+	const client = createRouterClient(createCollectionsRouter(dependencies), { context: {
+		credential: 'session', ip: '192.0.2.1', headers: {},
 		services: { authenticate: async () => [principal, null], limitActor: () => null, rateLimitFactor: async () => 1, limit: async () => null },
 	} });
 	return client[routeMethods[route]](input);
@@ -104,7 +104,7 @@ test('only actual domain errors mapped by each native route become its correspon
 
 	const unavailableForRoute = new ClipService.NoSuchNoteError('clip route cannot map note errors');
 	deps.delete = async () => { throw unavailableForRoute; };
-	const deleteOnlyNoClipFeature = collectionOperations(deps);
+	const deleteOnlyNoClipFeature = collectionDependencies(deps);
 	await assert.rejects(invoke(deleteOnlyNoClipFeature, 'clips/delete'), error => error === unavailableForRoute);
 });
 
@@ -113,7 +113,7 @@ test('unclassified service failures propagate by identity on every route', async
 	for (const method of ['delete', 'addNote', 'removeNote']) {
 		const deps = createFeature().deps;
 		deps[method] = async () => { throw failure; };
-		await assert.rejects(invoke(collectionOperations(deps), `clips/${method === 'delete' ? 'delete' : method === 'addNote' ? 'add-note' : 'remove-note'}`), error => error === failure);
+		await assert.rejects(invoke(collectionDependencies(deps), `clips/${method === 'delete' ? 'delete' : method === 'addNote' ? 'add-note' : 'remove-note'}`), error => error === failure);
 	}
 });
 
@@ -135,7 +135,7 @@ test('all commands await their service operation and return only void', async ()
 			events.push(['finish']);
 			return 'service response is intentionally discarded';
 		};
-		const feature = collectionOperations(deps);
+		const feature = collectionDependencies(deps);
 		let settled = false;
 		const result = invoke(feature, route).then(value => { settled = true; return value; });
 		await serviceStarted;

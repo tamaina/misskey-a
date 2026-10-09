@@ -5,14 +5,23 @@
 
 import { implement } from '@orpc/server';
 import { chatRoomsMuteContract, chatRoomsMutePolicy } from './mute.contract.js';
-import type { ApiActor } from '../../../../../api/backend/transport/context.js';
 import { authentication, apiPolicy, requirePrincipal } from '../../../../../api/backend/transport/middleware.js';
-import type { ChatApiContext } from '../../../operations.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+import type { ApiContext } from '@features/api/backend/transport/context.js';
+import type { InferSchemaOutput } from '@orpc/contract';
+import { type ChatService } from '@features/chat/backend/services/ChatService.js';
+export interface ChatRoomsMuteDependencies {
+	chatService: Pick<ChatService, 'checkChatAvailability' | 'muteRoom'>;
+}
+export function createChatRoomsMuteProcedure(deps: ChatRoomsMuteDependencies) {
+	async function execute(input: InferSchemaOutput<NonNullable<typeof chatRoomsMuteContract['~orpc']['inputSchema']>>, actor: MiLocalUser): Promise<void> {
+		await deps.chatService.checkChatAvailability(actor.id, 'write');
+		await deps.chatService.muteRoom(actor.id, input.roomId, input.mute);
+	}
 
-export function createChatRoomsMuteProcedure<Actor extends ApiActor>() {
-	return implement(chatRoomsMuteContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ChatApiContext<Actor>>()
-		.use(authentication<Actor>())
-		.use(apiPolicy<Actor>(chatRoomsMutePolicy))
-		.use(requirePrincipal<Actor>())
-		.handler(({ input, context }) => context.operations.chat.chatRoomsMute(input, context.principal));
+	return implement(chatRoomsMuteContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>()
+		.use(authentication<MiLocalUser>())
+		.use(apiPolicy<MiLocalUser>(chatRoomsMutePolicy))
+		.use(requirePrincipal<MiLocalUser>())
+		.handler(({ input, context }) => execute(input, context.principal));
 }

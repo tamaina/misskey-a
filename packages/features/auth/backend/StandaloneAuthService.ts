@@ -5,11 +5,11 @@
 
 import { Injectable } from '@nestjs/common';
 import type { FastifyInstance } from 'fastify';
-import { AuthSessionApplicationService } from './session.application.js';
+import { AuthSessionApiProvider } from './session.provider.js';
 import { registerAuthSessionHttp } from './session.http.js';
 
 @Injectable()
 export class StandaloneAuthService {
-	constructor(private readonly application: AuthSessionApplicationService) {}
-	register(fastify: FastifyInstance) { registerAuthSessionHttp(fastify, this.application); }
+	constructor(private readonly provider: AuthSessionApiProvider) { }
+	register(fastify: FastifyInstance) { registerAuthSessionHttp(fastify, this.provider.compose()); }
 }

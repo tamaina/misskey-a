@@ -2,46 +2,38 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-
-import { Inject, Injectable } from '@nestjs/common';
-
 import { NoteEntityService } from '@features/notes/backend/serializers/NoteEntityService.js';
 import { isUserRelated } from '@features/relationships/backend/utility/is-user-related.js';
 import { CacheService } from '@features/users/backend/services/CacheService.js';
 import { QueryService } from '@features/notes/backend/services/QueryService.js';
-import { DI } from '@/di-symbols.js';
 import { FeaturedService } from '../../services/FeaturedService.js';
 import type { NotesRepository } from '@features/persistence/backend/repositories/models.js';
-import type { DiscoveryInputs } from '../discovery.contract.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
-
-@Injectable()
-export class NotesFeaturedOperation {
-	private globalNotesRankingCache: string[] = [];
-	private globalNotesRankingCacheLastFetchedAt = 0;
-
-	constructor(
-		@Inject(DI.notesRepository)
-		private notesRepository: NotesRepository,
-
-		private cacheService: CacheService,
-		private noteEntityService: NoteEntityService,
-		private featuredService: FeaturedService,
-		private queryService: QueryService,
-	) {
-	}
-
-	async execute(ps: DiscoveryInputs['notes/featured'], me: MiLocalUser | null) {
+import { implement } from '@orpc/server';
+import { authentication, apiPolicy, decodeScalarInput } from '@features/api/backend/transport/middleware.js';
+import type { ApiContext } from '@features/api/backend/transport/context.js';
+import { discoveryContract, type DiscoveryInputs } from '../discovery.contract.js';
+export interface NotesFeaturedDependencies {
+	notesRepository: NotesRepository;
+	cacheService: CacheService;
+	noteEntityService: NoteEntityService;
+	featuredService: FeaturedService;
+	queryService: QueryService;
+}
+export function createNotesFeaturedProcedure<Actor extends MiLocalUser>(deps: NotesFeaturedDependencies) {
+	let globalNotesRankingCache: string[] = [];
+	let globalNotesRankingCacheLastFetchedAt = 0;
+	const handler = async ({ input: ps, context: { principal: me } }: { input: DiscoveryInputs['notes/featured']; context: ApiContext<Actor> & { principal: Actor | null } }) => {
 		let noteIds: string[];
 		if (ps.channelId) {
-			noteIds = await this.featuredService.getInChannelNotesRanking(ps.channelId, 50);
+			noteIds = await deps.featuredService.getInChannelNotesRanking(ps.channelId, 50);
 		} else {
-			if (this.globalNotesRankingCacheLastFetchedAt !== 0 && (Date.now() - this.globalNotesRankingCacheLastFetchedAt < 1000 * 60 * 30)) {
-				noteIds = this.globalNotesRankingCache;
+			if (globalNotesRankingCacheLastFetchedAt !== 0 && (Date.now() - globalNotesRankingCacheLastFetchedAt < 1000 * 60 * 30)) {
+				noteIds = globalNotesRankingCache;
 			} else {
-				noteIds = await this.featuredService.getGlobalNotesRanking(100);
-				this.globalNotesRankingCache = noteIds;
-				this.globalNotesRankingCacheLastFetchedAt = Date.now();
+				noteIds = await deps.featuredService.getGlobalNotesRanking(100);
+				globalNotesRankingCache = noteIds;
+				globalNotesRankingCacheLastFetchedAt = Date.now();
 			}
 		}
 
@@ -57,11 +49,11 @@ export class NotesFeaturedOperation {
 			userIdsWhoMeMuting,
 			userIdsWhoBlockingMe,
 		] = me ? await Promise.all([
-			this.cacheService.userMutingsCache.fetch(me.id),
-			this.cacheService.userBlockedCache.fetch(me.id),
+			deps.cacheService.userMutingsCache.fetch(me.id),
+			deps.cacheService.userBlockedCache.fetch(me.id),
 		]) : [new Set<string>(), new Set<string>()];
 
-		const query = this.notesRepository.createQueryBuilder('note')
+		const query = deps.notesRepository.createQueryBuilder('note')
 			.where('note.id IN (:...noteIds)', { noteIds: noteIds })
 			.innerJoinAndSelect('note.user', 'user')
 			.leftJoinAndSelect('note.reply', 'reply')
@@ -70,9 +62,9 @@ export class NotesFeaturedOperation {
 			.leftJoinAndSelect('renote.user', 'renoteUser')
 			.leftJoinAndSelect('note.channel', 'channel');
 
-		this.queryService.generateBlockedHostQueryForNote(query);
-		this.queryService.generateSuspendedUserQueryForNote(query);
-		if (me == null) this.queryService.generateUgcVisibilityQueryForVisitor(query);
+		deps.queryService.generateBlockedHostQueryForNote(query);
+		deps.queryService.generateSuspendedUserQueryForNote(query);
+		if (me == null) deps.queryService.generateUgcVisibilityQueryForVisitor(query);
 
 		const notes = (await query.getMany()).filter(note => {
 			if (me && isUserRelated(note, userIdsWhoBlockingMe)) return false;
@@ -83,6 +75,10 @@ export class NotesFeaturedOperation {
 
 		notes.sort((a, b) => a.id > b.id ? -1 : 1);
 
-		return await this.noteEntityService.packMany(notes.slice(0, ps.limit), me);
-	}
+		return await deps.noteEntityService.packMany(notes.slice(0, ps.limit), me);
+	};
+	return {
+		canonical: implement(discoveryContract['notes/featured'], { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>().use(authentication<Actor>()).use(apiPolicy<Actor>({ name: discoveryContract['notes/featured']['~orpc'].meta.requestName })).handler(handler),
+		get: implement(discoveryContract['notes/featured:get'], { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>().use(authentication<Actor>()).use(apiPolicy<Actor>({ name: discoveryContract['notes/featured']['~orpc'].meta.requestName })).use(decodeScalarInput<Actor>({ limit: 'integer' })).handler(handler),
+	};
 }

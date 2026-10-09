@@ -11,7 +11,11 @@ import { packedJsonObjectSchema as packedPageBlockSchema } from '@features/users
 import { MiPage } from '../../backend/models/Page.js';
 import { PageLikeEntityService } from '../../backend/serializers/PageLikeEntityService.js';
 import { PageEntityService } from '../../backend/serializers/PageEntityService.js';
-import { PagesShowApplicationService } from '../../backend/applications/pages/show.js';
+import { createRouterClient } from '@orpc/server';
+import { createPagesShowProcedure } from '../../backend/endpoints/pages/show.js';
+import type { PagesShowDependencies } from '../../backend/endpoints/pages/show.js';
+import type { ApiContext, ApiServices } from '../../../api/backend/transport/context.js';
+import type { MiLocalUser } from '../../../users/backend/models/User.js';
 import { iPageLikesContract } from '../../backend/endpoints/i/page-likes.contract.js';
 
 import { iPagesContract } from '../../backend/endpoints/i/pages.contract.js';
@@ -176,12 +180,15 @@ test('stored block acceptance and dynamic create, update and show inputs remain 
 
 test.each(['bad-id', null, 42, false, ['legacy'], { legacy: true }])('competing pageId selector reaches the original repository boundary: %j', async pageId => {
 	const { service, page } = fixture();
-	const users = mockDeep<ConstructorParameters<typeof PagesShowApplicationService>[0]>();
-	const pages = mockDeep<ConstructorParameters<typeof PagesShowApplicationService>[1]>();
+	const users = mockDeep<PagesShowDependencies['usersRepository']>();
+	const pages = mockDeep<PagesShowDependencies['pagesSelectorRepository']>();
 	pages.findOneBy.mockResolvedValue(page);
-	const application = new PagesShowApplicationService(users, pages, service);
+	const services = mockDeep<ApiServices<MiLocalUser>>();
+	services.authenticate.mockResolvedValue([null, null]);
+	const context: ApiContext<MiLocalUser> = { services, credential: null, headers: {}, ip: '127.0.0.1' };
+	const client = createRouterClient({ show: createPagesShowProcedure({ usersRepository: users, pagesSelectorRepository: pages, pageEntityService: service }) }, { context });
 	const input = v.parse(selectorPagesShowInput, { name: 'page', username: 'alice', pageId });
-	await application.execute(input, null);
+	await client.show(input);
 	expect(pages.findOneBy).toHaveBeenCalledWith({ id: pageId });
 	expect(users.findOneBy).not.toHaveBeenCalled();
 });

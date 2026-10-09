@@ -4,40 +4,59 @@
  */
 
 import { implement } from '@orpc/server';
-import { authentication, apiPolicy, requirePrincipal } from '../../api/backend/transport/middleware.js';
-import { driveManagementContract, type DriveManagementInputs, type DriveManagementOutputs } from './management.contract.js';
-import type { ApiActor, ApiContext } from '../../api/backend/transport/context.js';
-
-export type DriveManagementOperations<Actor extends ApiActor> = {
-	[Name in keyof DriveManagementInputs]: (input: DriveManagementInputs[Name], actor: Actor, ip: string, headers: Record<string, string | string[] | undefined>) => Promise<DriveManagementOutputs[Name]>;
-};
-export type DriveManagementContext<Actor extends ApiActor> = ApiContext<Actor> & { operations: { driveManagement: DriveManagementOperations<Actor> } };
-export function createDriveManagementRouter<Actor extends ApiActor>() {
-	const api = implement(driveManagementContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<DriveManagementContext<Actor>>().use(authentication<Actor>());
-	return api.router({
-		'admin/delete-all-files-of-a-user': api['admin/delete-all-files-of-a-user'].use(apiPolicy<Actor>({ 'name': 'admin/delete-all-files-of-a-user', 'requireCredential': true, 'requireAdmin': true, 'kind': 'write:admin:delete-all-files-of-a-user' })).use(requirePrincipal<Actor>()).handler(({ input, context }) => context.operations.driveManagement['admin/delete-all-files-of-a-user'](input, context.principal, context.ip, context.headers)),
-		'admin/drive/clean-remote-files': api['admin/drive/clean-remote-files'].use(apiPolicy<Actor>({ 'name': 'admin/drive/clean-remote-files', 'requireCredential': true, 'requireModerator': true, 'kind': 'write:admin:drive' })).use(requirePrincipal<Actor>()).handler(({ input, context }) => context.operations.driveManagement['admin/drive/clean-remote-files'](input, context.principal, context.ip, context.headers)),
-		'admin/drive/cleanup': api['admin/drive/cleanup'].use(apiPolicy<Actor>({ 'name': 'admin/drive/cleanup', 'requireCredential': true, 'requireModerator': true, 'kind': 'write:admin:drive' })).use(requirePrincipal<Actor>()).handler(({ input, context }) => context.operations.driveManagement['admin/drive/cleanup'](input, context.principal, context.ip, context.headers)),
-		'admin/drive/files': api['admin/drive/files'].use(apiPolicy<Actor>({ 'name': 'admin/drive/files', 'requireCredential': true, 'requireModerator': true, 'kind': 'read:admin:drive' })).use(requirePrincipal<Actor>()).handler(({ input, context }) => context.operations.driveManagement['admin/drive/files'](input, context.principal, context.ip, context.headers)),
-		'admin/drive/show-file': api['admin/drive/show-file'].use(apiPolicy<Actor>({ 'name': 'admin/drive/show-file', 'requireCredential': true, 'requireModerator': true, 'kind': 'read:admin:drive' })).use(requirePrincipal<Actor>()).handler(({ input, context }) => context.operations.driveManagement['admin/drive/show-file'](input, context.principal, context.ip, context.headers)),
-		'drive': api['drive'].use(apiPolicy<Actor>({ 'name': 'drive', 'requireCredential': true, 'kind': 'read:drive' })).use(requirePrincipal<Actor>()).handler(({ input, context }) => context.operations.driveManagement['drive'](input, context.principal, context.ip, context.headers)),
-		'drive/files': api['drive/files'].use(apiPolicy<Actor>({ 'name': 'drive/files', 'requireCredential': true, 'kind': 'read:drive' })).use(requirePrincipal<Actor>()).handler(({ input, context }) => context.operations.driveManagement['drive/files'](input, context.principal, context.ip, context.headers)),
-		'drive/files/attached-notes': api['drive/files/attached-notes'].use(apiPolicy<Actor>({ 'name': 'drive/files/attached-notes', 'requireCredential': true, 'kind': 'read:drive' })).use(requirePrincipal<Actor>()).handler(({ input, context }) => context.operations.driveManagement['drive/files/attached-notes'](input, context.principal, context.ip, context.headers)),
-		'drive/files/attached-chat-messages': api['drive/files/attached-chat-messages'].use(apiPolicy<Actor>({ 'name': 'drive/files/attached-chat-messages', 'requireCredential': true, 'kind': 'read:drive' })).use(requirePrincipal<Actor>()).handler(({ input, context }) => context.operations.driveManagement['drive/files/attached-chat-messages'](input, context.principal, context.ip, context.headers)),
-		'drive/files/check-existence': api['drive/files/check-existence'].use(apiPolicy<Actor>({ 'name': 'drive/files/check-existence', 'requireCredential': true, 'kind': 'read:drive' })).use(requirePrincipal<Actor>()).handler(({ input, context }) => context.operations.driveManagement['drive/files/check-existence'](input, context.principal, context.ip, context.headers)),
-		'drive/files/delete': api['drive/files/delete'].use(apiPolicy<Actor>({ 'name': 'drive/files/delete', 'requireCredential': true, 'kind': 'write:drive' })).use(requirePrincipal<Actor>()).handler(({ input, context }) => context.operations.driveManagement['drive/files/delete'](input, context.principal, context.ip, context.headers)),
-		'drive/files/find': api['drive/files/find'].use(apiPolicy<Actor>({ 'name': 'drive/files/find', 'requireCredential': true, 'kind': 'read:drive' })).use(requirePrincipal<Actor>()).handler(({ input, context }) => context.operations.driveManagement['drive/files/find'](input, context.principal, context.ip, context.headers)),
-		'drive/files/find-by-hash': api['drive/files/find-by-hash'].use(apiPolicy<Actor>({ 'name': 'drive/files/find-by-hash', 'requireCredential': true, 'kind': 'read:drive' })).use(requirePrincipal<Actor>()).handler(({ input, context }) => context.operations.driveManagement['drive/files/find-by-hash'](input, context.principal, context.ip, context.headers)),
-		'drive/files/show': api['drive/files/show'].use(apiPolicy<Actor>({ 'name': 'drive/files/show', 'requireCredential': true, 'kind': 'read:drive' })).use(requirePrincipal<Actor>()).handler(({ input, context }) => context.operations.driveManagement['drive/files/show'](input, context.principal, context.ip, context.headers)),
-		'drive/files/update': api['drive/files/update'].use(apiPolicy<Actor>({ 'name': 'drive/files/update', 'requireCredential': true, 'kind': 'write:drive' })).use(requirePrincipal<Actor>()).handler(({ input, context }) => context.operations.driveManagement['drive/files/update'](input, context.principal, context.ip, context.headers)),
-		'drive/files/move-bulk': api['drive/files/move-bulk'].use(apiPolicy<Actor>({ 'name': 'drive/files/move-bulk', 'requireCredential': true, 'kind': 'write:drive' })).use(requirePrincipal<Actor>()).handler(({ input, context }) => context.operations.driveManagement['drive/files/move-bulk'](input, context.principal, context.ip, context.headers)),
-		'drive/files/upload-from-url': api['drive/files/upload-from-url'].use(apiPolicy<Actor>({ 'name': 'drive/files/upload-from-url', 'requireCredential': true, 'prohibitMoved': true, 'kind': 'write:drive', 'limit': { 'duration': 3600000, 'max': 60 } })).use(requirePrincipal<Actor>()).handler(({ input, context }) => context.operations.driveManagement['drive/files/upload-from-url'](input, context.principal, context.ip, context.headers)),
-		'drive/folders': api['drive/folders'].use(apiPolicy<Actor>({ 'name': 'drive/folders', 'requireCredential': true, 'kind': 'read:drive' })).use(requirePrincipal<Actor>()).handler(({ input, context }) => context.operations.driveManagement['drive/folders'](input, context.principal, context.ip, context.headers)),
-		'drive/folders/create': api['drive/folders/create'].use(apiPolicy<Actor>({ 'name': 'drive/folders/create', 'requireCredential': true, 'kind': 'write:drive', 'limit': { 'duration': 3600000, 'max': 10 } })).use(requirePrincipal<Actor>()).handler(({ input, context }) => context.operations.driveManagement['drive/folders/create'](input, context.principal, context.ip, context.headers)),
-		'drive/folders/delete': api['drive/folders/delete'].use(apiPolicy<Actor>({ 'name': 'drive/folders/delete', 'requireCredential': true, 'kind': 'write:drive' })).use(requirePrincipal<Actor>()).handler(({ input, context }) => context.operations.driveManagement['drive/folders/delete'](input, context.principal, context.ip, context.headers)),
-		'drive/folders/find': api['drive/folders/find'].use(apiPolicy<Actor>({ 'name': 'drive/folders/find', 'requireCredential': true, 'kind': 'read:drive' })).use(requirePrincipal<Actor>()).handler(({ input, context }) => context.operations.driveManagement['drive/folders/find'](input, context.principal, context.ip, context.headers)),
-		'drive/folders/show': api['drive/folders/show'].use(apiPolicy<Actor>({ 'name': 'drive/folders/show', 'requireCredential': true, 'kind': 'read:drive' })).use(requirePrincipal<Actor>()).handler(({ input, context }) => context.operations.driveManagement['drive/folders/show'](input, context.principal, context.ip, context.headers)),
-		'drive/folders/update': api['drive/folders/update'].use(apiPolicy<Actor>({ 'name': 'drive/folders/update', 'requireCredential': true, 'kind': 'write:drive' })).use(requirePrincipal<Actor>()).handler(({ input, context }) => context.operations.driveManagement['drive/folders/update'](input, context.principal, context.ip, context.headers)),
-		'drive/stream': api['drive/stream'].use(apiPolicy<Actor>({ 'name': 'drive/stream', 'requireCredential': true, 'kind': 'read:drive' })).use(requirePrincipal<Actor>()).handler(({ input, context }) => context.operations.driveManagement['drive/stream'](input, context.principal, context.ip, context.headers)),
+import { driveManagementContract } from './management.contract.js';
+import type { DriveManagementDependencies } from './management.dependencies.js';
+import type { ApiContext } from '@features/api/backend/transport/context.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+import { createAdminDeleteAllFilesOfAUserProcedure } from './endpoints/admin/delete-all-files-of-a-user.js';
+import { createAdminDriveCleanRemoteFilesProcedure } from './endpoints/admin/drive/clean-remote-files.js';
+import { createAdminDriveCleanupProcedure } from './endpoints/admin/drive/cleanup.js';
+import { createAdminDriveFilesProcedure } from './endpoints/admin/drive/files.js';
+import { createAdminDriveShowFileProcedure } from './endpoints/admin/drive/show-file.js';
+import { createDriveFilesAttachedChatMessagesProcedure } from './endpoints/drive/files/attached-chat-messages.js';
+import { createDriveFilesAttachedNotesProcedure } from './endpoints/drive/files/attached-notes.js';
+import { createDriveFilesCheckExistenceProcedure } from './endpoints/drive/files/check-existence.js';
+import { createDriveFilesDeleteProcedure } from './endpoints/drive/files/delete.js';
+import { createDriveFilesFindByHashProcedure } from './endpoints/drive/files/find-by-hash.js';
+import { createDriveFilesFindProcedure } from './endpoints/drive/files/find.js';
+import { createDriveFilesMoveBulkProcedure } from './endpoints/drive/files/move-bulk.js';
+import { createDriveFilesShowProcedure } from './endpoints/drive/files/show.js';
+import { createDriveFilesUpdateProcedure } from './endpoints/drive/files/update.js';
+import { createDriveFilesUploadFromUrlProcedure } from './endpoints/drive/files/upload-from-url.js';
+import { createDriveFilesProcedure } from './endpoints/drive/files.js';
+import { createDriveFoldersCreateProcedure } from './endpoints/drive/folders/create.js';
+import { createDriveFoldersDeleteProcedure } from './endpoints/drive/folders/delete.js';
+import { createDriveFoldersFindProcedure } from './endpoints/drive/folders/find.js';
+import { createDriveFoldersShowProcedure } from './endpoints/drive/folders/show.js';
+import { createDriveFoldersUpdateProcedure } from './endpoints/drive/folders/update.js';
+import { createDriveFoldersProcedure } from './endpoints/drive/folders.js';
+import { createDriveStreamProcedure } from './endpoints/drive/stream.js';
+import { createDriveProcedure } from './endpoints/drive.js';
+export function createDriveManagementRouter(deps: DriveManagementDependencies) {
+	return implement(driveManagementContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>().router({
+		'admin/delete-all-files-of-a-user': createAdminDeleteAllFilesOfAUserProcedure(deps),
+		'admin/drive/clean-remote-files': createAdminDriveCleanRemoteFilesProcedure(deps),
+		'admin/drive/cleanup': createAdminDriveCleanupProcedure(deps),
+		'admin/drive/files': createAdminDriveFilesProcedure(deps),
+		'admin/drive/show-file': createAdminDriveShowFileProcedure(deps),
+		'drive/files/attached-chat-messages': createDriveFilesAttachedChatMessagesProcedure(deps),
+		'drive/files/attached-notes': createDriveFilesAttachedNotesProcedure(deps),
+		'drive/files/check-existence': createDriveFilesCheckExistenceProcedure(deps),
+		'drive/files/delete': createDriveFilesDeleteProcedure(deps),
+		'drive/files/find-by-hash': createDriveFilesFindByHashProcedure(deps),
+		'drive/files/find': createDriveFilesFindProcedure(deps),
+		'drive/files/move-bulk': createDriveFilesMoveBulkProcedure(deps),
+		'drive/files/show': createDriveFilesShowProcedure(deps),
+		'drive/files/update': createDriveFilesUpdateProcedure(deps),
+		'drive/files/upload-from-url': createDriveFilesUploadFromUrlProcedure(deps),
+		'drive/files': createDriveFilesProcedure(deps),
+		'drive/folders/create': createDriveFoldersCreateProcedure(deps),
+		'drive/folders/delete': createDriveFoldersDeleteProcedure(deps),
+		'drive/folders/find': createDriveFoldersFindProcedure(deps),
+		'drive/folders/show': createDriveFoldersShowProcedure(deps),
+		'drive/folders/update': createDriveFoldersUpdateProcedure(deps),
+		'drive/folders': createDriveFoldersProcedure(deps),
+		'drive/stream': createDriveStreamProcedure(deps),
+		'drive': createDriveProcedure(deps),
 	});
 }

@@ -15,20 +15,20 @@ import { createRegisterProcedure } from './endpoints/sw/register.js';
 import { createShowRegistrationProcedure } from './endpoints/sw/show-registration.js';
 import { createUnregisterProcedure } from './endpoints/sw/unregister.js';
 import { createUpdateRegistrationProcedure } from './endpoints/sw/update-registration.js';
-import type { NotificationsContext } from './operations.js';
-import type { ApiActor } from '../../api/backend/transport/context.js';
-
-export function createNotificationsRouter<Actor extends ApiActor>() {
-	return implement(notificationsContract).$context<NotificationsContext<Actor>>().router({
-		list: createListProcedure<Actor>(),
-		grouped: createGroupedProcedure<Actor>(),
-		create: createCreateProcedure<Actor>(),
-		flush: createFlushProcedure<Actor>(),
-		markAllAsRead: createMarkAllAsReadProcedure<Actor>(),
-		testNotification: createTestNotificationProcedure<Actor>(),
-		register: createRegisterProcedure<Actor>(),
-		showRegistration: createShowRegistrationProcedure<Actor>(),
-		unregister: createUnregisterProcedure<Actor>(),
-		updateRegistration: createUpdateRegistrationProcedure<Actor>(),
+import type { ApiContext } from '@features/api/backend/transport/context.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+import type { NotificationsDependencies } from './api.dependencies.js';
+export function createNotificationsRouter(deps: NotificationsDependencies) {
+	return implement(notificationsContract).$context<ApiContext<MiLocalUser>>().router({
+		list: createListProcedure(deps),
+		grouped: createGroupedProcedure(deps),
+		create: createCreateProcedure(deps),
+		flush: createFlushProcedure(deps),
+		markAllAsRead: createMarkAllAsReadProcedure(deps),
+		testNotification: createTestNotificationProcedure(deps),
+		register: createRegisterProcedure(deps),
+		showRegistration: createShowRegistrationProcedure(deps),
+		unregister: createUnregisterProcedure(deps),
+		updateRegistration: createUpdateRegistrationProcedure(deps),
 	});
 }

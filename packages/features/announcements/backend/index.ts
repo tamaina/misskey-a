@@ -5,5 +5,5 @@
 
 export { announcementsContract } from './api.contract.js';
 export { createAnnouncementsRouter } from './api.router.js';
-export { createAnnouncementsOperations } from './api.operations.js';
-export type { AnnouncementsOperations } from './api.operations.js';
+export { AnnouncementsApiProvider } from './api.provider.js';
+export type { AnnouncementsDependencies, AnnouncementUpdateValues } from './api.dependencies.js';

@@ -5,5 +5,5 @@
 
 export { avatarDecorationsContract } from './api.contract.js';
 export { createAvatarDecorationsRouter } from './api.router.js';
-export { createAvatarDecorationsOperations } from './api.operations.js';
-export type { AvatarDecorationsOperations } from './api.operations.js';
+export { AvatarDecorationsApiProvider } from './api.provider.js';
+export type { AvatarDecorationsDependencies, AvatarDecorationUpdateValues } from './api.dependencies.js';

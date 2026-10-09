@@ -4,33 +4,27 @@
  */
 
 import bcrypt from 'bcryptjs';
-import { Inject, Injectable } from '@nestjs/common';
-import { UserAuthService } from '@features/auth/backend/services/UserAuthService.js';
-import { DI } from '@/di-symbols.js';
-import { DeleteAccountService } from '../../services/DeleteAccountService.js';
+import { type UserAuthService } from '@features/auth/backend/services/UserAuthService.js';
+import { type DeleteAccountService } from '../../services/DeleteAccountService.js';
 import type { ApiToken } from '@features/api/backend/transport/context.js';
 import type { UsersInputs } from '../../api.contract.js';
 
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 import type { UsersRepository, UserProfilesRepository } from '@features/persistence/backend/repositories/models.js';
-
-@Injectable()
-export class IDeleteAccountOperation {
-	constructor(
-		@Inject(DI.usersRepository)
-		private usersRepository: UsersRepository,
-
-		@Inject(DI.userProfilesRepository)
-		private userProfilesRepository: UserProfilesRepository,
-
-		private userAuthService: UserAuthService,
-		private deleteAccountService: DeleteAccountService,
-	) {
-	}
-
-	async execute(ps: UsersInputs['i/delete-account'], me: MiLocalUser, _apiToken: ApiToken | null, _ip: string) {
+import { iDeleteAccountContract } from './delete-account.contract.js';
+import { implement } from '@orpc/server';
+import { authentication, apiPolicy, requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import type { ApiContext } from '@features/api/backend/transport/context.js';
+export interface IDeleteAccountDependencies {
+	usersRepository: UsersRepository;
+	userProfilesRepository: UserProfilesRepository;
+	userAuthService: UserAuthService;
+	deleteAccountService: DeleteAccountService;
+}
+export function createIDeleteAccountProcedure(deps: IDeleteAccountDependencies) {
+	async function execute(ps: UsersInputs['i/delete-account'], me: MiLocalUser, _apiToken: ApiToken | null, _ip: string) {
 		const token = ps.token;
-		const profile = await this.userProfilesRepository.findOneByOrFail({ userId: me.id });
+		const profile = await deps.userProfilesRepository.findOneByOrFail({ userId: me.id });
 
 		if (profile.twoFactorEnabled) {
 			if (token == null) {
@@ -38,13 +32,13 @@ export class IDeleteAccountOperation {
 			}
 
 			try {
-				await this.userAuthService.twoFactorAuthenticate(profile, token);
+				await deps.userAuthService.twoFactorAuthenticate(profile, token);
 			} catch (_) {
 				throw new Error('authentication failed');
 			}
 		}
 
-		const userDetailed = await this.usersRepository.findOneByOrFail({ id: me.id });
+		const userDetailed = await deps.usersRepository.findOneByOrFail({ id: me.id });
 		if (userDetailed.isDeleted) {
 			return;
 		}
@@ -54,6 +48,9 @@ export class IDeleteAccountOperation {
 			throw new Error('incorrect password');
 		}
 
-		await this.deleteAccountService.deleteAccount(me);
+		await deps.deleteAccountService.deleteAccount(me);
 	}
+
+	return implement(iDeleteAccountContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>().use(authentication<MiLocalUser>()).use(apiPolicy<MiLocalUser>({ name: iDeleteAccountContract['~orpc'].meta.requestName, requireCredential: true, secure: true })).use(requirePrincipal<MiLocalUser>())
+		.handler(async ({ input, context }) => await execute(input, context.principal, context.token, context.ip));
 }

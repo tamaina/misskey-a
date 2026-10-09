@@ -17,8 +17,11 @@ import { adminMetaContract } from '../../backend/endpoints/admin/meta.contract.j
 
 import { MiMeta } from '../../backend/models/Meta.js';
 import { MetaEntityService } from '../../backend/serializers/MetaEntityService.js';
-import { createInstanceOperations, type InstanceOperationDependencies } from '../../backend/operations.js';
-import { createServerInfo, createEndpoint, createPing, createGetOnlineUsersCount } from '../../backend/index.js';
+import { createInstanceRouter } from '../../backend/api.router.js';
+import type { InstanceApiDependencies } from '../../backend/api.dependencies.js';
+import { createProcedureClient, createRouterClient } from '@orpc/server';
+import { testContext } from './native-context.js';
+import { createServerInfoRouter, createEndpointProcedure, createPingProcedure, createOnlineUsersCountProcedure } from '../../backend/index.js';
 import { DEFAULT_POLICIES } from '../../../roles/backend/services/RoleService.js';
 import type { MetaService } from '../../backend/services/MetaService.js';
 import type { AdsRepository } from '../../../persistence/backend/repositories/models.js';
@@ -42,8 +45,8 @@ function requiredSchema<S extends v.GenericSchema>(schema: S | undefined): S { i
 const endpointResult = requiredSchema(endpointContract['~orpc'].outputSchema);
 const pingResult = requiredSchema(pingContract['~orpc'].outputSchema);
 
-function operations(overrides: Partial<InstanceOperationDependencies>) {
-	return createInstanceOperations<MiLocalUser>({ ...mockDeep<InstanceOperationDependencies>(), ...overrides });
+function operations(overrides: Partial<InstanceApiDependencies>) {
+	return createRouterClient(createInstanceRouter<MiLocalUser>({ ...mockDeep<InstanceApiDependencies>(), ...overrides, serverInfo: { enabled: () => true, read: async () => ({ machine: 'fixture', cpu: { model: 'cpu', cores: 1 }, mem: { total: 1 }, fs: { total: 1, used: 0 } }) } }), { context: testContext(mockDeep<MiLocalUser>({ id: 'admin123', isSuspended: false, movedToUri: null })) });
 }
 
 const packedAdSchema = packedSchemas.Ad;
@@ -247,7 +250,7 @@ test('actual admin machine producer includes optional Redis version and finite n
 	const redis = mockDeep<Redis>();
 	for (const info of ['redis_version:7.2.0\r\n', 'no version']) {
 		redis.info.mockResolvedValue(info);
-		const result = await operations({ db, redisClient: redis }).adminServerInfo({}, mockDeep<MiLocalUser>());
+		const result = await operations({ db, redisClient: redis }).adminServerInfo({});
 		rejectsDrift(requiredSchema(adminServerInfoContract['~orpc'].outputSchema), result, ['redis']);
 		expect(result.redis).toBe(info.startsWith('redis_version:') ? '7.2.0' : undefined);
 		rejectsNested(requiredSchema(adminServerInfoContract['~orpc'].outputSchema), result, [['cpu'], ['mem'], ['fs'], ['net']]);
@@ -260,7 +263,7 @@ test('actual admin metadata and public metadata preserve nullable images, client
 	service.fetch.mockResolvedValue(meta);
 	const system = mockDeep<SystemAccountService>();
 	system.fetch.mockResolvedValue(mockDeep<MiLocalUser>({ id: 'proxy1', username: 'proxy', host: null, uri: null }));
-	const result = await operations({ config, metaService: service, systemAccountService: system }).adminMeta({}, mockDeep<MiLocalUser>());
+	const result = await operations({ config, metaService: service, systemAccountService: system }).adminMeta({});
 	rejectsDrift(requiredSchema(adminMetaContract['~orpc'].outputSchema), result, ['policies', 'silencedHosts', 'bannedEmailDomains']);
 	expect(result.langs).toEqual([]);
 	expect(result.logoImageUrl).toBeNull();
@@ -335,8 +338,13 @@ test('actual ad create serializer emits dates and sensitivity without response d
 	const ads = mockDeep<AdsRepository>();
 	ads.insertOne.mockResolvedValue(ad);
 	const endpoint = operations({ adsRepository: ads, idService: mockDeep<IdService>(), moderationLogService: mockDeep<ModerationLogService>() });
-	const result = await endpoint.adCreate({ url: ad.url, memo: '', place: ad.place, priority: ad.priority, ratio: ad.ratio, expiresAt: ad.expiresAt.getTime(), startsAt: ad.startsAt.getTime(), imageUrl: ad.imageUrl, dayOfWeek: ad.dayOfWeek }, mockDeep<MiLocalUser>());
+	const result = await endpoint.adCreate({ url: ad.url, memo: '', place: ad.place, priority: ad.priority, ratio: ad.ratio, expiresAt: ad.expiresAt.getTime(), startsAt: ad.startsAt.getTime(), imageUrl: ad.imageUrl, dayOfWeek: ad.dayOfWeek });
 	rejectsDrift(packedAdSchema, result);
 	expect(result.isSensitive).toBe(false);
 	expect(result.expiresAt).toBe(ad.expiresAt.toISOString());
 });
+const anonymousContext = testContext(null);
+const createServerInfo = (deps: Parameters<typeof createServerInfoRouter>[0]) => createProcedureClient(createServerInfoRouter<MiLocalUser>(deps).serverInfo, { context: anonymousContext });
+const createEndpoint = (readEndpoints: InstanceApiDependencies['readEndpoints']) => createProcedureClient(createEndpointProcedure<MiLocalUser>({ readEndpoints }), { context: anonymousContext });
+const createPing = (now: () => number) => createProcedureClient(createPingProcedure<MiLocalUser>({ now }), { context: anonymousContext });
+const createGetOnlineUsersCount = (getOnlineUsersCount: InstanceApiDependencies['getOnlineUsersCount'], now: () => number) => createProcedureClient(createOnlineUsersCountProcedure<MiLocalUser>({ getOnlineUsersCount, now }), { context: anonymousContext });

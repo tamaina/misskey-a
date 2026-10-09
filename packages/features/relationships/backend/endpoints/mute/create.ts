@@ -2,60 +2,54 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-
-import { Inject, Injectable } from '@nestjs/common';
+import { implement } from '@orpc/server';
+import type { ApiContext } from '../../../../api/backend/transport/context.js';
+import type { MiLocalUser } from '../../../../users/backend/models/User.js';
+import { authentication, apiPolicy, requirePrincipal } from '../../../../api/backend/transport/middleware.js';
+import { relationshipsContract } from '../relationships.contract.js';
+import type { RelationshipsDependencies } from '../../api.dependencies.js';
 import ms from 'ms';
-
-import { GetterService } from '@features/api/backend/transport/GetterService.js';
 import { apiError } from '@features/api/backend/transport/orpc-error.js';
-import { DI } from '@/di-symbols.js';
-import { UserMutingService } from '../../services/UserMutingService.js';
-
 import { relationshipsErrors } from '../relationships.errors.js';
-import type { MutingsRepository } from '@features/persistence/backend/repositories/models.js';
-import type { RelationshipsInputs } from '../relationships.contract.js';
-import type { MiLocalUser } from '@features/users/backend/models/User.js';
-
-@Injectable()
-export class MuteCreateOperation {
-	constructor(
-		@Inject(DI.mutingsRepository)
-		private mutingsRepository: MutingsRepository,
-
-		private getterService: GetterService,
-		private userMutingService: UserMutingService,
-	) {}
-
-	async execute(ps: RelationshipsInputs['mute/create'], me: MiLocalUser) {
-		const muter = me;
-
-		// 自分自身
-		if (me.id === ps.userId) {
-			throw apiError(relationshipsErrors['mute/create'].muteeIsYourself);
+export function createMuteCreateProcedure<Actor extends MiLocalUser>(deps: Pick<RelationshipsDependencies, 'getterService' | 'mutingsRepository' | 'userMutingService'>) {
+	return implement(relationshipsContract["mute/create"], { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>().use(authentication<Actor>()).use(apiPolicy<Actor>({
+		name: 'mute/create', requireCredential: true, prohibitMoved: true, kind: 'write:mutes', limit: {
+			duration: ms('1hour'),
+			max: 20,
 		}
+	})).use(requirePrincipal<Actor>())
+		.handler(async ({ input, context }) => {
+			const ps = input;
+			const me = context.principal;
+			const muter = me;
 
-		// Get mutee
-		const mutee = await this.getterService.getUser(ps.userId).catch(err => {
-			if (err.id === '15348ddd-432d-49c2-8a5a-8069753becff') throw apiError(relationshipsErrors['mute/create'].noSuchUser);
-			throw err;
+			// 自分自身
+			if (me.id === ps.userId) {
+				throw apiError(relationshipsErrors['mute/create'].muteeIsYourself);
+			}
+
+			// Get mutee
+			const mutee = await deps.getterService.getUser(ps.userId).catch(err => {
+				if (err.id === '15348ddd-432d-49c2-8a5a-8069753becff') throw apiError(relationshipsErrors['mute/create'].noSuchUser);
+				throw err;
+			});
+
+			// Check if already muting
+			const exist = await deps.mutingsRepository.exists({
+				where: {
+					muterId: muter.id,
+					muteeId: mutee.id,
+				},
+			});
+
+			if (exist) {
+				throw apiError(relationshipsErrors['mute/create'].alreadyMuting);
+			}
+
+			if (ps.expiresAt && ps.expiresAt <= Date.now()) {
+				return;
+			}
+
+			await deps.userMutingService.mute(muter, mutee, ps.expiresAt ? new Date(ps.expiresAt) : null);
 		});
-
-		// Check if already muting
-		const exist = await this.mutingsRepository.exists({
-			where: {
-				muterId: muter.id,
-				muteeId: mutee.id,
-			},
-		});
-
-		if (exist) {
-			throw apiError(relationshipsErrors['mute/create'].alreadyMuting);
-		}
-
-		if (ps.expiresAt && ps.expiresAt <= Date.now()) {
-			return;
-		}
-
-		await this.userMutingService.mute(muter, mutee, ps.expiresAt ? new Date(ps.expiresAt) : null);
-	}
 }

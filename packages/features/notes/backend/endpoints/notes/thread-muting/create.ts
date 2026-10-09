@@ -5,14 +5,24 @@
 
 import { implement } from '@orpc/server';
 import { authentication, apiPolicy, requirePrincipal } from '../../../../../api/backend/transport/middleware.js';
-import { notesThreadMutingCreateContract, notesThreadMutingCreatePolicy } from './create.contract.js';
-import type { ApiActor } from '../../../../../api/backend/transport/context.js';
-import type { NotesApiContext } from '../../../operations.js';
-
-export function createNotesThreadMutingCreateProcedure<Actor extends ApiActor>() {
-	return implement(notesThreadMutingCreateContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<NotesApiContext<Actor>>()
-		.use(authentication<Actor>())
-		.use(apiPolicy<Actor>(notesThreadMutingCreatePolicy))
-		.use(requirePrincipal<Actor>())
-		.handler(({ input, context }) => context.operations.notes.notesThreadMutingCreate(input, context.principal));
+import { notesThreadMutingCreateContract, notesThreadMutingCreateErrors, notesThreadMutingCreatePolicy } from './create.contract.js';
+import type { ApiContext } from '@features/api/backend/transport/context.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+import type { NotesCommandDependencies } from '../../../command.dependencies.js';
+import { getCommandNote } from '../../../get-command-note.js';
+import { readErrorId } from '../../../request.schema.js';
+export function createNotesThreadMutingCreateProcedure(deps: NotesCommandDependencies) {
+	return implement(notesThreadMutingCreateContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>()
+		.use(authentication<MiLocalUser>())
+		.use(apiPolicy<MiLocalUser>(notesThreadMutingCreatePolicy))
+		.use(requirePrincipal<MiLocalUser>())
+		.handler(async ({ input, context }) => {
+			const actor = context.principal;
+			const note = await getCommandNote(deps, input.noteId, notesThreadMutingCreateErrors.noSuchNote);
+			const threadId = note.threadId ?? note.id;
+			if (await deps.threadMuteExists(threadId, actor.id)) {
+				throw deps.createError(notesThreadMutingCreateErrors.alreadyMuting);
+			}
+			await deps.insertThreadMute(deps.newId(), threadId, actor.id);
+		});
 }

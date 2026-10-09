@@ -2,14 +2,15 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-
+import { call } from '@orpc/server';
+import { testContext } from './native-context.js';
 import { expect, test } from 'vitest';
 import * as v from 'valibot';
 import Parser from 'rss-parser';
 import { Response } from 'node-fetch';
 import { mockDeep } from 'vitest-mock-extended';
 import { fetchRssContract } from '../../backend/endpoints/fetch-rss.contract.js';
-import { FetchRssApplicationService as FetchRssEndpoint } from '../../backend/endpoints/fetch-rss.application.js';
+import { createFetchRssProcedure as FetchRssEndpoint } from '../../backend/endpoints/fetch-rss.js';
 import type { HttpRequestService } from '@features/runtime/backend/services/HttpRequestService.js';
 
 const richRss = `<rss version="2.0" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd" xmlns:content="http://purl.org/rss/1.0/modules/content/"><channel>
@@ -56,15 +57,15 @@ test('actual RSS HTTP handler keeps XML output, URL normalization, limits and do
 	const response = new Response(richRss);
 	Object.defineProperty(response, 'url', { value: 'https://example.com/feed' });
 	http.send.mockResolvedValue(response);
-	const endpoint = new FetchRssEndpoint(http);
-	const raw = await endpoint.execute(v.parse(requiredSchema(fetchRssContract['~orpc'].inputSchema), { url: 'https://example.com/feed#fragment', future: true }), null);
+	const endpoint = FetchRssEndpoint({ httpRequestService: http });
+	const raw = await call(endpoint, v.parse(requiredSchema(fetchRssContract['~orpc'].inputSchema), { url: 'https://example.com/feed#fragment', future: true }), { context: testContext(null, null) });
 	expect(raw.items[0].enclosure).toHaveProperty('length', '123');
 	expect(v.parse(requiredSchema(fetchRssContract['~orpc'].outputSchema), JSON.parse(JSON.stringify(raw)))).toEqual(raw);
 	expect(http.send).toHaveBeenCalledWith('https://example.com/feed', { method: 'GET', headers: { Accept: 'application/rss+xml, */*' }, timeout: 5000, size: 1024 * 1024 });
-	await expect(endpoint.execute({ url: 'file:///tmp/feed' }, null)).rejects.toMatchObject({ code: 'INVALID_URL' });
+	await expect(call(endpoint, { url: 'file:///tmp/feed' }, { context: testContext(null, null) })).rejects.toMatchObject({ code: 'INVALID_URL' });
 	expect(v.safeParse(requiredSchema(fetchRssContract['~orpc'].inputSchema), {}).success).toBe(false);
 	http.send.mockRejectedValue(new Error('network'));
-	await expect(endpoint.execute({ url: 'https://example.com/failure' }, null)).rejects.toMatchObject({ code: 'FETCH_RSS_FAILED' });
+	await expect(call(endpoint, { url: 'https://example.com/failure' }, { context: testContext(null, null) })).rejects.toMatchObject({ code: 'FETCH_RSS_FAILED' });
 	expect(v.parse(requiredSchema(fetchRssContract['~orpc'].inputSchema), { url: 'https://example.com/feed', future: true })).toEqual({ url: 'https://example.com/feed' });
 });
 

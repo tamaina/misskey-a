@@ -2,16 +2,23 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-
+import type { ApiActor, ApiContext } from '../../../api/backend/transport/context.js';
 import { implement } from '@orpc/server';
 import { authentication, apiPolicy } from '../../../api/backend/transport/middleware.js';
 import { endpointContract } from './endpoint.contract.js';
-import type { ApiActor } from '../../../api/backend/transport/context.js';
-import type { InstanceApiContext } from '../operations.js';
-
-export function createEndpointProcedure<Actor extends ApiActor>() {
-	return implement(endpointContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<InstanceApiContext<Actor>>()
+import type { InstanceApiDependencies } from '../api.dependencies.js';
+export type EndpointDependencies = Pick<InstanceApiDependencies, 'readEndpoints'>;
+export function createEndpointProcedure<Actor extends ApiActor>(deps: EndpointDependencies) {
+	return implement(endpointContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>()
 		.use(authentication<Actor>())
 		.use(apiPolicy<Actor>({ name: 'endpoint' }))
-		.handler(({ input, context }) => context.operations.instance.endpoint(input));
+		.handler(async ({ input, context }) => {
+			const endpoint = (await deps.readEndpoints()).find(candidate => candidate.name === input.endpoint);
+			if (endpoint == null) return null;
+			return {
+				params: Object.entries(endpoint.properties).map(([name, property]) => ({
+					name, type: property.type ? property.type.charAt(0).toUpperCase() + property.type.slice(1) : 'string',
+				}))
+			};
+		});
 }

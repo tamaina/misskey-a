@@ -4,56 +4,57 @@
  */
 
 import bcrypt from 'bcryptjs';
-import { Inject, Injectable } from '@nestjs/common';
-
 import type { UsersRepository, UserProfilesRepository } from '@features/persistence/backend/repositories/models.js';
 import { generateNativeUserToken } from '../../utility/token.js';
 import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
-import { DI } from '@/di-symbols.js';
-
-import type * as v from 'valibot';
-import type { IRegenerateTokenContract } from '../../api.contract.js';
+import * as v from 'valibot';
+import { IRegenerateTokenContract } from '../../api.contract.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
-
+import { implement } from '@orpc/server';
+import { authentication, apiPolicy, requirePrincipal } from '../../../../api/backend/transport/middleware.js';
+import type { ApiContext } from '../../../../api/backend/transport/context.js';
 export const meta = {
 	requireCredential: true,
 
 	secure: true,
 } as const;
+export interface IRegenerateTokenDependencies {
+	usersRepository: UsersRepository;
+	userProfilesRepository: UserProfilesRepository;
+	globalEventService: Pick<GlobalEventService, 'publishInternalEvent' | 'publishMainStream'>;
+}
+export function createIRegenerateTokenProcedure(deps: IRegenerateTokenDependencies) {
+	return implement(IRegenerateTokenContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>().use(authentication<MiLocalUser>()).use(apiPolicy<MiLocalUser>({ name: 'i/regenerate-token', requireCredential: true, secure: true })).use(requirePrincipal<MiLocalUser>()).handler(async ({ input, context }) => {
+		const ps = input;
+		const me = context.principal;
+		const result = await (async () => {
+			const freshUser = await deps.usersRepository.findOneByOrFail({ id: me.id });
+			const oldToken = freshUser.token!;
 
-@Injectable()
-export class IRegenerateTokenOperation {
-	constructor(
-		@Inject(DI.usersRepository)
-		private usersRepository: UsersRepository,
+			const profile = await deps.userProfilesRepository.findOneByOrFail({ userId: me.id });
 
-		@Inject(DI.userProfilesRepository)
-		private userProfilesRepository: UserProfilesRepository,
+			// Compare password
+			const same = await bcrypt.compare(ps.password, profile.password!);
 
-		private globalEventService: GlobalEventService,
-	) {}
+			if (!same) {
+				throw new Error('incorrect password');
+			}
 
-	async execute(ps: v.InferOutput<NonNullable<typeof IRegenerateTokenContract['~orpc']['inputSchema']>>, me: MiLocalUser) {
-		const freshUser = await this.usersRepository.findOneByOrFail({ id: me.id });
-		const oldToken = freshUser.token!;
+			const newToken = generateNativeUserToken();
 
-		const profile = await this.userProfilesRepository.findOneByOrFail({ userId: me.id });
+			await deps.usersRepository.update(me.id, {
+				token: newToken,
+			});
 
-		// Compare password
-		const same = await bcrypt.compare(ps.password, profile.password!);
+			// Publish event
+			deps.globalEventService.publishInternalEvent('userTokenRegenerated', { id: me.id, oldToken, newToken });
+			deps.globalEventService.publishMainStream(me.id, 'myTokenRegenerated');
+		})();
+		return v.parse(requiredSchema(IRegenerateTokenContract['~orpc'].outputSchema), result);
+	});
+}
 
-		if (!same) {
-			throw new Error('incorrect password');
-		}
-
-		const newToken = generateNativeUserToken();
-
-		await this.usersRepository.update(me.id, {
-			token: newToken,
-		});
-
-		// Publish event
-		this.globalEventService.publishInternalEvent('userTokenRegenerated', { id: me.id, oldToken, newToken });
-		this.globalEventService.publishMainStream(me.id, 'myTokenRegenerated');
-	}
+function requiredSchema<Schema>(schema: Schema | undefined): Schema {
+	if (schema === undefined) throw new Error('Contract must declare its schema');
+	return schema;
 }

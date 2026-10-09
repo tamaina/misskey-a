@@ -6,7 +6,8 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import * as v from 'valibot';
-import { createPortabilityOperations, portabilityApiContract } from '../../../backend/built/features/portability/backend.js';
+import { createRouterClient } from '@orpc/server';
+import { createPortabilityRouter, portabilityApiContract } from '../../../backend/built/features/portability/backend.js';
 
 const routeMethods = {
 	'i/export-antennas': 'createExportAntennasJob',
@@ -29,7 +30,8 @@ function makeDependencies(overrides = {}) {
 }
 
 async function call(feature, route, input = {}, actorId = 'trusted-user') {
-	return feature[route](v.parse(portabilityApiContract[route]['~orpc'].inputSchema, input), { id: actorId });
+	const client = createRouterClient(feature, { context: nativeContext({ id: actorId, isSuspended: false, movedToUri: null }) });
+	return client[route](input);
 }
 
 test('native following input retains false flag defaults', () => {
@@ -38,7 +40,7 @@ test('native following input retains false flag defaults', () => {
 
 test('each export selects only its matching job and following uses false defaults', async () => {
 	const { dependencies, calls } = makeDependencies();
-	const feature = createPortabilityOperations(dependencies);
+	const feature = createPortabilityRouter(dependencies);
 
 	for (const [route, method] of Object.entries(routeMethods)) {
 		const output = await call(feature, route);
@@ -62,7 +64,7 @@ test('trusted context is isolated across concurrent calls and request input cann
 	const { dependencies } = makeDependencies({
 		createExportNotesJob: actor => { calls.push(actor); return Promise.resolve(); },
 	});
-	const feature = createPortabilityOperations(dependencies);
+	const feature = createPortabilityRouter(dependencies);
 	await Promise.all([
 		call(feature, 'i/export-notes', { actor: { id: 'spoofed-one' }, userId: 'spoofed-two' }, 'trusted-one'),
 		call(feature, 'i/export-notes', { actor: { id: 'spoofed-two' }, userId: 'spoofed-one' }, 'trusted-two'),
@@ -76,7 +78,7 @@ test('queue promises are deliberately fire-and-forget', async () => {
 	const { dependencies } = makeDependencies({
 		createExportAntennasJob: () => { invoked = true; return neverSettles; },
 	});
-	const feature = createPortabilityOperations(dependencies);
+	const feature = createPortabilityRouter(dependencies);
 	const result = await Promise.race([
 		call(feature, 'i/export-antennas').then(() => 'handler-finished'),
 		new Promise(resolve => setTimeout(() => resolve('handler-blocked'), 50)),
@@ -90,7 +92,14 @@ test('synchronous queue errors propagate without retrying or starting another jo
 	const { dependencies, calls } = makeDependencies({
 		createExportBlockingJob: () => { calls.push({ method: 'createExportBlockingJob', args: [] }); throw error; },
 	});
-	const feature = createPortabilityOperations(dependencies);
+	const feature = createPortabilityRouter(dependencies);
 	await assert.rejects(call(feature, 'i/export-blocking'), candidate => candidate === error);
 	assert.deepEqual(calls, [{ method: 'createExportBlockingJob', args: [] }]);
 });
+
+function nativeContext(actor) {
+	return { credential: 'credential', ip: '192.0.2.1', headers: {},
+		services: { authenticate: async () => [actor, null], limitActor: () => null, rateLimitFactor: async () => 1, limit: async () => null },
+		authorization: { rootUserId: () => actor.id, roles: async () => [], policyAllowed: async () => true },
+	};
+}

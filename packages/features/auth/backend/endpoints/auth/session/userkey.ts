@@ -2,18 +2,15 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-
-import { Inject, Injectable } from '@nestjs/common';
-
 import type { AppsRepository, AccessTokensRepository, AuthSessionsRepository } from '@features/persistence/backend/repositories/models.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
-import { DI } from '@/di-symbols.js';
 import { apiError } from '@features/api/backend/transport/orpc-error.js';
-
-import type * as v from 'valibot';
-import type { AuthSessionUserkeyContract } from '../../../api.contract.js';
+import * as v from 'valibot';
+import { AuthSessionUserkeyContract } from '../../../api.contract.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
-
+import { implement } from '@orpc/server';
+import { authentication, apiPolicy } from '../../../../../api/backend/transport/middleware.js';
+import type { ApiContext } from '../../../../../api/backend/transport/context.js';
 export const meta = {
 	tags: ['auth'],
 
@@ -39,60 +36,60 @@ export const meta = {
 		},
 	},
 } as const;
+export interface AuthSessionUserkeyDependencies {
+	appsRepository: AppsRepository;
+	authSessionsRepository: AuthSessionsRepository;
+	accessTokensRepository: AccessTokensRepository;
+	userEntityService: Pick<UserEntityService, 'pack'>;
+}
+export function createAuthSessionUserkeyProcedure(deps: AuthSessionUserkeyDependencies) {
+	return implement(AuthSessionUserkeyContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>().use(authentication<MiLocalUser>()).use(apiPolicy<MiLocalUser>({ name: 'auth/session/userkey' })).handler(async ({ input, context }) => {
+		const ps = input;
+		const result = await (async () => {
+			// Lookup app
+			const app = await deps.appsRepository.findOneBy({
+				secret: ps.appSecret,
+			});
 
-@Injectable()
-export class AuthSessionUserkeyOperation {
-	constructor(
-		@Inject(DI.appsRepository)
-		private appsRepository: AppsRepository,
+			if (app == null) {
+				throw apiError(meta.errors.noSuchApp);
+			}
 
-		@Inject(DI.authSessionsRepository)
-		private authSessionsRepository: AuthSessionsRepository,
+			// Fetch token
+			const session = await deps.authSessionsRepository.findOneBy({
+				token: ps.token,
+				appId: app.id,
+			});
 
-		@Inject(DI.accessTokensRepository)
-		private accessTokensRepository: AccessTokensRepository,
+			if (session == null) {
+				throw apiError(meta.errors.noSuchSession);
+			}
 
-		private userEntityService: UserEntityService,
-	) {}
+			if (session.userId == null) {
+				throw apiError(meta.errors.pendingSession);
+			}
 
-	async execute(ps: v.InferOutput<NonNullable<typeof AuthSessionUserkeyContract['~orpc']['inputSchema']>>, me: MiLocalUser | null) {
-		// Lookup app
-		const app = await this.appsRepository.findOneBy({
-			secret: ps.appSecret,
-		});
+			// Lookup access token
+			const accessToken = await deps.accessTokensRepository.findOneByOrFail({
+				appId: app.id,
+				userId: session.userId,
+			});
 
-		if (app == null) {
-			throw apiError(meta.errors.noSuchApp);
-		}
+			// Delete session
+			deps.authSessionsRepository.delete(session.id);
 
-		// Fetch token
-		const session = await this.authSessionsRepository.findOneBy({
-			token: ps.token,
-			appId: app.id,
-		});
+			return {
+				accessToken: accessToken.token,
+				user: await deps.userEntityService.pack(session.userId, null, {
+					schema: 'UserDetailedNotMe',
+				}),
+			};
+		})();
+		return v.parse(requiredSchema(AuthSessionUserkeyContract['~orpc'].outputSchema), result);
+	});
+}
 
-		if (session == null) {
-			throw apiError(meta.errors.noSuchSession);
-		}
-
-		if (session.userId == null) {
-			throw apiError(meta.errors.pendingSession);
-		}
-
-		// Lookup access token
-		const accessToken = await this.accessTokensRepository.findOneByOrFail({
-			appId: app.id,
-			userId: session.userId,
-		});
-
-		// Delete session
-		this.authSessionsRepository.delete(session.id);
-
-		return {
-			accessToken: accessToken.token,
-			user: await this.userEntityService.pack(session.userId, null, {
-				schema: 'UserDetailedNotMe',
-			}),
-		};
-	}
+function requiredSchema<Schema>(schema: Schema | undefined): Schema {
+	if (schema === undefined) throw new Error('Contract must declare its schema');
+	return schema;
 }

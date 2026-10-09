@@ -5,14 +5,33 @@
 
 import { implement } from '@orpc/server';
 import { authentication, apiPolicy, requirePrincipal } from '../../../../../api/backend/transport/middleware.js';
-import type { ApiActor } from '../../../../../api/backend/transport/context.js';
-import type { FederationContext } from '../../../operations.js';
+import type { ApiActor, ApiContext } from '../../../../../api/backend/transport/context.js';
 import { adminFederationRemoveAllFollowingContract } from './remove-all-following.contract.js';
-
-export function createAdminFederationRemoveAllFollowingProcedure<Actor extends ApiActor>() {
-	return implement(adminFederationRemoveAllFollowingContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<FederationContext<Actor>>()
+import type { FollowingsRepository, UsersRepository } from '../../../../../persistence/backend/repositories/models.js';
+import type { QueueService } from '../../../../../runtime/backend/services/QueueService.js';
+import * as v from 'valibot';
+export interface AdminFederationRemoveAllFollowingDependencies {
+	usersRepository: Pick<UsersRepository, 'findOneByOrFail'>;
+	followingsRepository: Pick<FollowingsRepository, 'findBy'>;
+	queueService: Pick<QueueService, 'createUnfollowJob'>;
+}
+export function createAdminFederationRemoveAllFollowingProcedure<Actor extends ApiActor>(deps: AdminFederationRemoveAllFollowingDependencies) {
+	return implement(adminFederationRemoveAllFollowingContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>()
 		.use(authentication<Actor>())
-		.use(apiPolicy<Actor>({ name: 'admin/federation/remove-all-following', requireCredential: true, requireModerator: true, kind: 'write:admin:federation' }))
+		.use(apiPolicy<Actor>({ name: adminFederationRemoveAllFollowingContract['~orpc'].meta.requestName, requireCredential: true, requireModerator: true, kind: 'write:admin:federation' }))
 		.use(requirePrincipal<Actor>())
-		.handler(({ input, context }) => context.operations.federation.adminFederationRemoveAllFollowing(input, context.principal));
+		.handler(async ({ input }) => {
+			const ps = input;
+			const result = await (async () => {
+				const followings = await deps.followingsRepository.findBy({
+					followerHost: ps.host,
+				});
+				const pairs = await Promise.all(followings.map(f => Promise.all([
+					deps.usersRepository.findOneByOrFail({ id: f.followerId }),
+					deps.usersRepository.findOneByOrFail({ id: f.followeeId }),
+				]).then(([from, to]) => [{ id: from.id }, { id: to.id }])));
+				deps.queueService.createUnfollowJob(pairs.map(p => ({ from: p[0], to: p[1], silent: true })));
+			})();
+			return v.parse(adminFederationRemoveAllFollowingContract['~orpc'].outputSchema!, result);
+		});
 }

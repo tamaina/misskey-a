@@ -2,10 +2,9 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-
+import type { OperationsDependencies } from './api.dependencies.js';
 import { implement } from '@orpc/server';
-import type { ApiActor } from '../../api/backend/transport/context.js';
-import type { OperationsApiContext } from './operations.js';
+import type { ApiActor, ApiContext } from '../../api/backend/transport/context.js';
 import { operationsApiContract } from './api.contract.js';
 import { createAdminGetIndexStatsProcedure } from './endpoints/admin/get-index-stats.js';
 import { createAdminGetTableStatsProcedure } from './endpoints/admin/get-table-stats.js';
@@ -24,25 +23,24 @@ import { createAdminQueueShowJobLogsProcedure } from './endpoints/admin/queue/sh
 import { createAdminQueueShowJobProcedure } from './endpoints/admin/queue/show-job.js';
 import { createAdminQueueStatsProcedure } from './endpoints/admin/queue/stats.js';
 import { createResetDbProcedure } from './endpoints/reset-db.js';
-
-export function createOperationsRouter<Actor extends ApiActor>() {
-	return implement(operationsApiContract).$context<OperationsApiContext<Actor>>().router({
-		adminGetIndexStats: createAdminGetIndexStatsProcedure<Actor>(),
-		adminGetTableStats: createAdminGetTableStatsProcedure<Actor>(),
-		adminQueueClear: createAdminQueueClearProcedure<Actor>(),
-		adminQueueDeliverDelayed: createAdminQueueDeliverDelayedProcedure<Actor>(),
-		adminQueueInboxDelayed: createAdminQueueInboxDelayedProcedure<Actor>(),
-		adminQueueJobs: createAdminQueueJobsProcedure<Actor>(),
-		adminQueuePause: createAdminQueuePauseProcedure<Actor>(),
-		adminQueuePromoteJobs: createAdminQueuePromoteJobsProcedure<Actor>(),
-		adminQueueQueueStats: createAdminQueueQueueStatsProcedure<Actor>(),
-		adminQueueQueues: createAdminQueueQueuesProcedure<Actor>(),
-		adminQueueRemoveJob: createAdminQueueRemoveJobProcedure<Actor>(),
-		adminQueueResume: createAdminQueueResumeProcedure<Actor>(),
-		adminQueueRetryJob: createAdminQueueRetryJobProcedure<Actor>(),
-		adminQueueShowJobLogs: createAdminQueueShowJobLogsProcedure<Actor>(),
-		adminQueueShowJob: createAdminQueueShowJobProcedure<Actor>(),
-		adminQueueStats: createAdminQueueStatsProcedure<Actor>(),
-		resetDb: createResetDbProcedure<Actor>(),
+export function createOperationsRouter<Actor extends ApiActor>(deps: OperationsDependencies) {
+	return implement(operationsApiContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>().router({
+		adminGetIndexStats: createAdminGetIndexStatsProcedure<Actor>(deps),
+		adminGetTableStats: createAdminGetTableStatsProcedure<Actor>(deps),
+		adminQueueClear: createAdminQueueClearProcedure<Actor>(deps),
+		adminQueueDeliverDelayed: createAdminQueueDeliverDelayedProcedure<Actor>(deps),
+		adminQueueInboxDelayed: createAdminQueueInboxDelayedProcedure<Actor>(deps),
+		adminQueueJobs: createAdminQueueJobsProcedure<Actor>(deps),
+		adminQueuePause: createAdminQueuePauseProcedure<Actor>(deps),
+		adminQueuePromoteJobs: createAdminQueuePromoteJobsProcedure<Actor>(deps),
+		adminQueueQueueStats: createAdminQueueQueueStatsProcedure<Actor>(deps),
+		adminQueueQueues: createAdminQueueQueuesProcedure<Actor>(deps),
+		adminQueueRemoveJob: createAdminQueueRemoveJobProcedure<Actor>(deps),
+		adminQueueResume: createAdminQueueResumeProcedure<Actor>(deps),
+		adminQueueRetryJob: createAdminQueueRetryJobProcedure<Actor>(deps),
+		adminQueueShowJobLogs: createAdminQueueShowJobLogsProcedure<Actor>(deps),
+		adminQueueShowJob: createAdminQueueShowJobProcedure<Actor>(deps),
+		adminQueueStats: createAdminQueueStatsProcedure<Actor>(deps),
+		resetDb: createResetDbProcedure<Actor>(deps),
 	});
 }

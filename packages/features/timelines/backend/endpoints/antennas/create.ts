@@ -5,14 +5,69 @@
 
 import { implement } from '@orpc/server';
 import { authentication, apiPolicy, requirePrincipal } from '../../../../api/backend/transport/middleware.js';
-import { antennasCreateContract } from './create.contract.js';
-import type { ApiActor } from '../../../../api/backend/transport/context.js';
-import type { TimelinesContext } from '../../operations.js';
-
-export function createAntennasCreateProcedure<Actor extends ApiActor>() {
-	return implement(antennasCreateContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<TimelinesContext<Actor>>()
+import { antennasCreateContract, antennasCreateErrors } from './create.contract.js';
+import { IdService } from '@features/runtime/backend/services/IdService.js';
+import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
+import { RoleService } from '@features/roles/backend/services/RoleService.js';
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
+import { AntennaEntityService } from '../../serializers/AntennaEntityService.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+import type { UserListsRepository, AntennasRepository } from '@features/persistence/backend/repositories/models.js';
+import type { ApiContext } from '@features/api/backend/transport/context.js';
+export interface AntennasCreateDependencies {
+	antennasRepository: AntennasRepository;
+	userListsRepository: UserListsRepository;
+	antennaEntityService: AntennaEntityService;
+	roleService: RoleService;
+	idService: IdService;
+	globalEventService: GlobalEventService;
+}
+export function createAntennasCreateProcedure<Actor extends MiLocalUser>(deps: AntennasCreateDependencies) {
+	return implement(antennasCreateContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>()
 		.use(authentication<Actor>())
-		.use(apiPolicy<Actor>({ name: 'antennas/create', requireCredential: true, kind: 'write:account', prohibitMoved: true }))
+		.use(apiPolicy<Actor>({ name: antennasCreateContract['~orpc'].meta.requestName, requireCredential: true, kind: 'write:account', prohibitMoved: true }))
 		.use(requirePrincipal<Actor>())
-		.handler(({ input, context }) => context.operations.timelines.antennasCreate(input, context.principal));
+		.handler(async ({ input, context }) => {
+			const ps = input;
+			const me = context.principal;
+			if (ps.keywords.flat().every(x => x === '') && ps.excludeKeywords.flat().every(x => x === '')) {
+				throw apiError(antennasCreateErrors.emptyKeyword);
+			}
+			const currentAntennasCount = await deps.antennasRepository.countBy({
+				userId: me.id,
+			});
+			if (currentAntennasCount >= (await deps.roleService.getUserPolicies(me.id)).antennaLimit) {
+				throw apiError(antennasCreateErrors.tooManyAntennas);
+			}
+			let userList;
+			if (ps.src === 'list' && ps.userListId) {
+				userList = await deps.userListsRepository.findOneBy({
+					id: ps.userListId,
+					userId: me.id,
+				});
+				if (userList == null) {
+					throw apiError(antennasCreateErrors.noSuchUserList);
+				}
+			}
+			const now = new Date();
+			const antenna = await deps.antennasRepository.insertOne({
+				id: deps.idService.gen(now.getTime()),
+				lastUsedAt: now,
+				userId: me.id,
+				name: ps.name,
+				src: ps.src,
+				userListId: userList ? userList.id : null,
+				keywords: ps.keywords,
+				excludeKeywords: ps.excludeKeywords,
+				users: ps.users,
+				caseSensitive: ps.caseSensitive,
+				localOnly: ps.localOnly,
+				excludeBots: ps.excludeBots,
+				withReplies: ps.withReplies,
+				withFile: ps.withFile,
+				excludeNotesInSensitiveChannel: ps.excludeNotesInSensitiveChannel,
+			});
+			deps.globalEventService.publishInternalEvent('antennaCreated', antenna);
+			return await deps.antennaEntityService.pack(antenna);
+		});
 }

@@ -3,8 +3,9 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 import { test } from 'node:test';
+import { createRouterClient } from '@orpc/server';
 import assert from 'node:assert/strict';
-import { createInstance } from '../../../backend/built/features/instance/backend.js';
+import { createInstanceRouter } from '../../../backend/built/features/instance/backend.js';
 
 test('feature construction does not read settings, metrics, or the clock', async () => {
 	const calls = [];
@@ -26,3 +27,5 @@ test('separate role instances keep their injected dependencies independent', asy
 	assert.deepEqual(await second.ping({}), { pong: 2 });
 	assert.deepEqual(await first.ping({}), { pong: 1 });
 });
+
+function createInstance(deps) { return createRouterClient(createInstanceRouter({ ...deps, serverInfo: { enabled: () => false, read: async () => { throw new Error('Must not read'); } } }), { context: { credential: null, ip: '127.0.0.1', headers: {}, services: { authenticate: async () => [null, null], limitActor: () => null, rateLimitFactor: async () => 1, limit: async () => null } } }); }

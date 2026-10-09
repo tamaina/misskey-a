@@ -2,34 +2,24 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
+import { implement } from '@orpc/server';
+import type { ApiContext } from '../../../../api/backend/transport/context.js';
+import type { MiLocalUser } from '../../../../users/backend/models/User.js';
+import { authentication, apiPolicy, requirePrincipal } from '../../../../api/backend/transport/middleware.js';
+import { relationshipsContract } from '../relationships.contract.js';
+import type { RelationshipsDependencies } from '../../api.dependencies.js';
+import { toPackedUserDetailed } from '../../../../users/backend/user.schema.js';
+export function createMuteListProcedure<Actor extends MiLocalUser>(deps: Pick<RelationshipsDependencies, 'queryService' | 'mutingsRepository' | 'mutingEntityService'>) {
+	return implement(relationshipsContract["mute/list"], { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>().use(authentication<Actor>()).use(apiPolicy<Actor>({ name: 'mute/list', requireCredential: true, kind: 'read:mutes' })).use(requirePrincipal<Actor>())
+		.handler(async ({ input, context }) => {
+			const ps = input;
+			const me = context.principal;
+			const query = deps.queryService.makePaginationQuery(deps.mutingsRepository.createQueryBuilder('muting'), ps.sinceId, ps.untilId, ps.sinceDate, ps.untilDate)
+				.andWhere('muting.muterId = :meId', { meId: me.id });
 
-import { Inject, Injectable } from '@nestjs/common';
-import { QueryService } from '@features/notes/backend/services/QueryService.js';
-import { DI } from '@/di-symbols.js';
-import { MutingEntityService } from '../../serializers/MutingEntityService.js';
-import type { MiLocalUser } from '@features/users/backend/models/User.js';
-import type { RelationshipsInputs } from '../relationships.contract.js';
-
-import type { MutingsRepository } from '@features/persistence/backend/repositories/models.js';
-
-@Injectable()
-export class MuteListOperation {
-	constructor(
-		@Inject(DI.mutingsRepository)
-		private mutingsRepository: MutingsRepository,
-
-		private mutingEntityService: MutingEntityService,
-		private queryService: QueryService,
-	) {}
-
-	async execute(ps: RelationshipsInputs['mute/list'], me: MiLocalUser) {
-		const query = this.queryService.makePaginationQuery(this.mutingsRepository.createQueryBuilder('muting'), ps.sinceId, ps.untilId, ps.sinceDate, ps.untilDate)
-			.andWhere('muting.muterId = :meId', { meId: me.id });
-
-		const mutings = await query
-			.limit(ps.limit)
-			.getMany();
-
-		return await this.mutingEntityService.packMany(mutings, me);
-	}
+			const mutings = await query
+				.limit(ps.limit)
+				.getMany();
+			return (await deps.mutingEntityService.packMany(mutings, me)).map(row => ({ ...row, mutee: toPackedUserDetailed(row.mutee) }));
+		});
 }

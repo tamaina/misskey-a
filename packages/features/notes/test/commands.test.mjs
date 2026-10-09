@@ -7,7 +7,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import * as v from 'valibot';
 import { createProcedureClient } from '@orpc/server';
-import { createNotesCommandOperations, notesApiContract, createNotesRouter } from '../../../backend/built/features/notes/backend.js';
+import { notesApiContract, createNotesRouter } from '../../../backend/built/features/notes/backend.js';
 
 const actor = { id: 'alice', host: null, isBot: false, isSuspended: false, movedToUri: null };
 const note = { id: 'note1', userId: actor.id, threadId: null };
@@ -146,8 +146,8 @@ function methodName(key) {
 	return key.split(/[/-]/).map((part, index) => index === 0 ? part : part.charAt(0).toUpperCase() + part.slice(1)).join('');
 }
 
-async function invoke(operations, key, input, currentActor = actor) {
-	const procedure = createNotesRouter()[methodName(key)];
+async function invoke(dependencies, key, input, currentActor = actor) {
+	const procedure = createNotesRouter(dependencies)[methodName(key)];
 	const services = {
 		authenticate: async () => [currentActor, null],
 		limitActor: () => null,
@@ -156,7 +156,6 @@ async function invoke(operations, key, input, currentActor = actor) {
 	};
 	return createProcedureClient(procedure, { context: {
 		services, credential: currentActor ? 'fixture' : null, ip: '127.0.0.1', headers: {},
-		operations: { notes: operations },
 	} })(input);
 }
 
@@ -177,7 +176,7 @@ test('all seven native command success paths call only their explicit ports and 
 			return [{ id: 'renote1', userId: actor.id, threadId: null }];
 		},
 	});
-	const feature = createNotesCommandOperations(deps);
+	const feature = deps;
 	const spoofed = { id: 'mallory' };
 
 	await invoke(feature, 'notes/drafts/delete', { draftId: draft.id, actor: spoofed });
@@ -215,7 +214,7 @@ test('note and draft lookups map their exact route errors before later side effe
 		'notes/thread-muting/create', 'notes/thread-muting/delete', 'notes/unrenote', 'promo/read',
 	]) {
 		const { deps, calls } = createDeps({ getNote: async id => { calls.push(['getNote', id]); throw serviceError(missingNoteId); } });
-		const feature = createNotesCommandOperations(deps);
+		const feature = deps;
 		const input = key === 'notes/reactions/create'
 			? { noteId: 'missing1', reaction: '⭐' }
 			: { noteId: 'missing1' };
@@ -227,7 +226,7 @@ test('note and draft lookups map their exact route errors before later side effe
 	}
 
 	const { deps, calls } = createDeps({ getDraft: async (user, id) => { calls.push(['getDraft', user, id]); return null; } });
-	const feature = createNotesCommandOperations(deps);
+	const feature = deps;
 	await assert.rejects(invoke(feature, 'notes/drafts/delete', { draftId: 'missing1' }), error => {
 		assert.equal(error.definition.id, expectedErrors['notes/drafts/delete'].noSuchNoteDraft.id);
 		return true;
@@ -237,7 +236,7 @@ test('note and draft lookups map their exact route errors before later side effe
 
 test('missing or suspended authenticated actors fail before any dependency call', async () => {
 	const { deps, calls } = createDeps();
-	const feature = createNotesCommandOperations(deps);
+	const feature = deps;
 	const requests = [
 		['notes/drafts/delete', { draftId: draft.id }],
 		['notes/reactions/create', { noteId: note.id, reaction: '⭐' }],
@@ -256,7 +255,7 @@ test('missing or suspended authenticated actors fail before any dependency call'
 
 test('ownership failures and already-completed records do not perform follow-up writes', async () => {
 	const draftCase = createDeps({ getDraft: async (user, id) => { draftCase.calls.push(['getDraft', user, id]); return { ...draft, userId: 'bob' }; } });
-	const draftFeature = createNotesCommandOperations(draftCase.deps);
+	const draftFeature = draftCase.deps;
 	await assert.rejects(invoke(draftFeature, 'notes/drafts/delete', { draftId: draft.id }), error => {
 		assert.equal(error.definition.id, expectedErrors['notes/drafts/delete'].accessDenied.id);
 		return true;
@@ -264,7 +263,7 @@ test('ownership failures and already-completed records do not perform follow-up 
 	assert.deepEqual(draftCase.calls.map(([name]) => name), ['getDraft']);
 
 	const threadCase = createDeps({ threadMuteExists: async (threadId, userId) => { threadCase.calls.push(['threadMuteExists', threadId, userId]); return true; } });
-	const threadFeature = createNotesCommandOperations(threadCase.deps);
+	const threadFeature = threadCase.deps;
 	await assert.rejects(invoke(threadFeature, 'notes/thread-muting/create', { noteId: note.id }), error => {
 		assert.equal(error.definition.id, expectedErrors['notes/thread-muting/create'].alreadyMuting.id);
 		return true;
@@ -272,7 +271,7 @@ test('ownership failures and already-completed records do not perform follow-up 
 	assert.deepEqual(threadCase.calls.map(([name]) => name), ['getNote', 'threadMuteExists']);
 
 	const promoCase = createDeps({ promoReadExists: async (noteId, userId) => { promoCase.calls.push(['promoReadExists', noteId, userId]); return true; } });
-	const promoFeature = createNotesCommandOperations(promoCase.deps);
+	const promoFeature = promoCase.deps;
 	await invoke(promoFeature, 'promo/read', { noteId: note.id });
 	assert.deepEqual(promoCase.calls.map(([name]) => name), ['getNote', 'promoReadExists']);
 });
@@ -285,7 +284,7 @@ test('reaction failures preserve their route-specific errors and skip any later 
 	];
 	for (const [serviceId, errorName] of createMappings) {
 		const { deps, calls } = createDeps({ createReaction: async (...args) => { calls.push(['createReaction', ...args]); throw serviceError(serviceId); } });
-		const feature = createNotesCommandOperations(deps);
+		const feature = deps;
 		await assert.rejects(invoke(feature, 'notes/reactions/create', { noteId: note.id, reaction: '⭐' }), error => {
 			assert.equal(error.definition.id, expectedErrors['notes/reactions/create'][errorName].id);
 			return true;
@@ -294,7 +293,7 @@ test('reaction failures preserve their route-specific errors and skip any later 
 	}
 
 	const { deps, calls } = createDeps({ deleteReaction: async (...args) => { calls.push(['deleteReaction', ...args]); throw serviceError('60527ec9-b4cb-4a88-a6bd-32d3ad26817d'); } });
-	const feature = createNotesCommandOperations(deps);
+	const feature = deps;
 	await assert.rejects(invoke(feature, 'notes/reactions/delete', { noteId: note.id }), error => {
 		assert.equal(error.definition.id, expectedErrors['notes/reactions/delete'].notReacted.id);
 		return true;
@@ -304,7 +303,7 @@ test('reaction failures preserve their route-specific errors and skip any later 
 
 test('misskey IDs are validated, extra object fields remain ignored, and Unicode reaction text is not truncated', async () => {
 	const { deps, calls } = createDeps();
-	const feature = createNotesCommandOperations(deps);
+	const feature = deps;
 	await assert.rejects(invoke(feature, 'notes/reactions/delete', { noteId: 'invalid-id' }));
 	await assert.rejects(invoke(feature, 'notes/reactions/create', { noteId: note.id, reaction: 123 }));
 	assert.deepEqual(calls, []);
@@ -326,7 +325,7 @@ test('unrenote preserves the legacy fire-and-forget delete timing', async () => 
 			return new Promise(resolve => { releaseDelete = resolve; });
 		},
 	});
-	const feature = createNotesCommandOperations(deps);
+	const feature = deps;
 	let settled = false;
 	const pending = invoke(feature, 'notes/unrenote', { noteId: note.id }).then(() => { settled = true; });
 	await pending;
@@ -334,9 +333,4 @@ test('unrenote preserves the legacy fire-and-forget delete timing', async () => 
 	assert.equal(typeof releaseDelete, 'function');
 	assert.deepEqual(calls.map(([name]) => name), ['getNote', 'findRenotesByUserAndRenote', 'findUserByIdOrFail', 'deleteNote-start']);
 	releaseDelete();
-});
-
-test('the delete pilot stays separate from the native command operations', () => {
-	const { deps } = createDeps();
-	assert.equal('delete' in createNotesCommandOperations(deps), false);
 });

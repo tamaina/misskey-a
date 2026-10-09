@@ -2,21 +2,19 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-
-import { Inject, Injectable } from '@nestjs/common';
 import bcrypt from 'bcryptjs';
 
 import { apiError } from '@features/api/backend/transport/orpc-error.js';
 import type { UsersRepository, UserProfilesRepository, MiMeta } from '@features/persistence/backend/repositories/models.js';
-import { DI } from '@/di-symbols.js';
 import { secureRndstr } from '../../utility/secure-rndstr.js';
 import { RoleService } from '@features/roles/backend/services/RoleService.js';
 import { ModerationLogService } from '@features/moderation/backend/services/ModerationLogService.js';
-
-import type * as v from 'valibot';
-import type { AdminResetPasswordContract } from '../../api.contract.js';
+import * as v from 'valibot';
+import { AdminResetPasswordContract } from '../../api.contract.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
-
+import { implement } from '@orpc/server';
+import { authentication, apiPolicy, requirePrincipal } from '../../../../api/backend/transport/middleware.js';
+import type { ApiContext } from '../../../../api/backend/transport/context.js';
 export const meta = {
 	tags: ['admin'],
 
@@ -37,53 +35,54 @@ export const meta = {
 		},
 	},
 } as const;
+export interface AdminResetPasswordDependencies {
+	serverSettings: MiMeta;
+	usersRepository: UsersRepository;
+	userProfilesRepository: UserProfilesRepository;
+	roleService: Pick<RoleService, 'isAdministrator'>;
+	moderationLogService: Pick<ModerationLogService, 'log'>;
+}
+export function createAdminResetPasswordProcedure(deps: AdminResetPasswordDependencies) {
+	return implement(AdminResetPasswordContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>().use(authentication<MiLocalUser>()).use(apiPolicy<MiLocalUser>({ name: 'admin/reset-password', requireCredential: true, requireModerator: true, kind: 'write:admin:reset-password' })).use(requirePrincipal<MiLocalUser>()).handler(async ({ input, context }) => {
+		const ps = input;
+		const me = context.principal;
+		const result = await (async () => {
+			const user = await deps.usersRepository.findOneBy({ id: ps.userId });
 
-@Injectable()
-export class AdminResetPasswordOperation {
-	constructor(
-		@Inject(DI.meta)
-		private serverSettings: MiMeta,
+			if (user == null) {
+				throw apiError(meta.errors.noSuchUser);
+			}
 
-		@Inject(DI.usersRepository)
-		private usersRepository: UsersRepository,
+			if (await deps.roleService.isAdministrator(user) && me.id !== user.id) {
+				throw apiError(meta.errors.accessDenied);
+			}
 
-		@Inject(DI.userProfilesRepository)
-		private userProfilesRepository: UserProfilesRepository,
+			const passwd = secureRndstr(8);
 
-		private roleService: RoleService,
-		private moderationLogService: ModerationLogService,
-	) {}
+			// Generate hash of password
+			const hash = bcrypt.hashSync(passwd);
 
-	async execute(ps: v.InferOutput<NonNullable<typeof AdminResetPasswordContract['~orpc']['inputSchema']>>, me: MiLocalUser) {
-		const user = await this.usersRepository.findOneBy({ id: ps.userId });
+			await deps.userProfilesRepository.update({
+				userId: user.id,
+			}, {
+				password: hash,
+			});
 
-		if (user == null) {
-			throw apiError(meta.errors.noSuchUser);
-		}
+			deps.moderationLogService.log(me, 'resetPassword', {
+				userId: user.id,
+				userUsername: user.username,
+				userHost: user.host,
+			});
 
-		if (await this.roleService.isAdministrator(user) && me.id !== user.id) {
-			throw apiError(meta.errors.accessDenied);
-		}
+			return {
+				password: passwd,
+			};
+		})();
+		return v.parse(requiredSchema(AdminResetPasswordContract['~orpc'].outputSchema), result);
+	});
+}
 
-		const passwd = secureRndstr(8);
-
-		// Generate hash of password
-		const hash = bcrypt.hashSync(passwd);
-
-		await this.userProfilesRepository.update({
-			userId: user.id,
-		}, {
-			password: hash,
-		});
-
-		this.moderationLogService.log(me, 'resetPassword', {
-			userId: user.id,
-			userUsername: user.username,
-			userHost: user.host,
-		});
-
-		return {
-			password: passwd,
-		};
-	}
+function requiredSchema<Schema>(schema: Schema | undefined): Schema {
+	if (schema === undefined) throw new Error('Contract must declare its schema');
+	return schema;
 }

@@ -6,7 +6,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createRouterClient } from '@orpc/server';
-import { createCollectionsOperations, createCollectionsRouter } from '../../../backend/built/features/collections/backend.js';
+import { createCollectionsRouter } from '../../../backend/built/features/collections/backend.js';
 
 const input = { clipId: 'clip0123' };
 const defaultClip = { id: input.clipId, userId: 'owner-1', isPublic: true };
@@ -22,8 +22,8 @@ const clipFavoriteErrors = {
 	},
 };
 
-function favoriteOperations(deps) {
-	return createCollectionsOperations({
+function favoriteDependencies(deps) {
+	return {
 		clipsRepository: { findOneBy: ({ id }) => deps.findClipById(id) },
 		clipFavoritesRepository: {
 			exists: ({ where }) => deps.hasFavorite(where.clipId, where.userId),
@@ -32,7 +32,7 @@ function favoriteOperations(deps) {
 			delete: id => deps.deleteFavorite(id),
 		},
 		idService: { gen: () => deps.generateFavoriteId() },
-	});
+	};
 }
 
 function createFeature(overrides = {}) {
@@ -64,13 +64,13 @@ function createFeature(overrides = {}) {
 		},
 
 	};
-	return { feature: favoriteOperations(deps), calls, deps };
+	return { feature: favoriteDependencies(deps), calls, deps };
 }
 
-function invoke(operations, route, params = input, actor = { id: 'owner-1' }, options = {}) {
+function invoke(dependencies, route, params = input, actor = { id: 'owner-1' }, options = {}) {
 	const principal = options.missingContext ? null : { isSuspended: false, movedToUri: null, ...actor };
-	const client = createRouterClient(createCollectionsRouter(), { context: {
-		credential: 'session', ip: '192.0.2.1', headers: {}, operations: { collections: operations },
+	const client = createRouterClient(createCollectionsRouter(dependencies), { context: {
+		credential: 'session', ip: '192.0.2.1', headers: {},
 		services: { authenticate: async () => [principal, null], limitActor: () => null, rateLimitFactor: async () => 1, limit: async () => null },
 	} });
 	return client[route === 'clips/favorite' ? 'clipsFavorite' : 'clipsUnfavorite'](params);
@@ -124,14 +124,14 @@ test('unfavorite permits deleting an existing favorite after the clip becomes pr
 test('unfavorite distinguishes missing clips from missing owned favorites', async () => {
 	const missingClip = createFeature();
 	missingClip.deps.findClipById = async id => { missingClip.calls.push(['findClipById', id]); return null; };
-	missingClip.feature = favoriteOperations(missingClip.deps);
+	missingClip.feature = favoriteDependencies(missingClip.deps);
 	await assert.rejects(invoke(missingClip.feature, 'clips/unfavorite'), error => error.code === 'NO_SUCH_CLIP'
 		&& error.data.id === clipFavoriteErrors['clips/unfavorite'].noSuchClip.id);
 	assert.deepEqual(missingClip.calls.map(call => call[0]), ['findClipById']);
 
 	const notFavorited = createFeature();
 	notFavorited.deps.findFavorite = async (clipId, userId) => { notFavorited.calls.push(['findFavorite', clipId, userId]); return null; };
-	notFavorited.feature = favoriteOperations(notFavorited.deps);
+	notFavorited.feature = favoriteDependencies(notFavorited.deps);
 	await assert.rejects(invoke(notFavorited.feature, 'clips/unfavorite'), error => error.code === 'NOT_FAVORITED'
 		&& error.data.id === clipFavoriteErrors['clips/unfavorite'].notFavorited.id
 		&& error.message === 'You have not favorited the clip.');

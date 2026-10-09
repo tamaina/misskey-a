@@ -2,30 +2,26 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-
-import { Inject, Injectable } from '@nestjs/common';
-import { QueryService } from '@features/notes/backend/services/QueryService.js';
-import { DI } from '@/di-symbols.js';
-import { UserEntityService } from '../serializers/UserEntityService.js';
+import { type QueryService } from '@features/notes/backend/services/QueryService.js';
+import { type UserEntityService } from '../serializers/UserEntityService.js';
 import type { ApiToken } from '@features/api/backend/transport/context.js';
 import type { UsersInputs } from '../api.contract.js';
 
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 import type { UsersRepository } from '@features/persistence/backend/repositories/models.js';
-
-@Injectable()
-export class UsersOperation {
-	constructor(
-		@Inject(DI.usersRepository)
-		private usersRepository: UsersRepository,
-
-		private userEntityService: UserEntityService,
-		private queryService: QueryService,
-	) {
-	}
-
-	async execute(ps: UsersInputs['users'], me: MiLocalUser | null, _token: ApiToken | null, _ip: string) {
-		const query = this.usersRepository.createQueryBuilder('user')
+import { usersContract } from './users.contract.js';
+import { implement } from '@orpc/server';
+import { authentication, apiPolicy } from '@features/api/backend/transport/middleware.js';
+import type { ApiContext } from '@features/api/backend/transport/context.js';
+import { toPackedUserDetailed } from '@features/users/backend/user.schema.js';
+export interface UsersDependencies {
+	usersRepository: UsersRepository;
+	userEntityService: UserEntityService;
+	queryService: QueryService;
+}
+export function createUsersProcedure(deps: UsersDependencies) {
+	async function execute(ps: UsersInputs['users'], me: MiLocalUser | null, _token: ApiToken | null, _ip: string) {
+		const query = deps.usersRepository.createQueryBuilder('user')
 			.where('user.isExplorable = TRUE')
 			.andWhere('user.isSuspended = FALSE');
 
@@ -52,14 +48,17 @@ export class UsersOperation {
 			default: query.orderBy('user.id', 'ASC'); break;
 		}
 
-		if (me) this.queryService.generateMutedUserQueryForUsers(query, me);
-		if (me) this.queryService.generateBlockQueryForUsers(query, me);
+		if (me) deps.queryService.generateMutedUserQueryForUsers(query, me);
+		if (me) deps.queryService.generateBlockQueryForUsers(query, me);
 
 		query.limit(ps.limit);
 		query.offset(ps.offset);
 
 		const users = await query.getMany();
 
-		return await this.userEntityService.packMany(users, me, { schema: 'UserDetailed' });
+		return await deps.userEntityService.packMany(users, me, { schema: 'UserDetailed' });
 	}
+
+	return implement(usersContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>().use(authentication<MiLocalUser>()).use(apiPolicy<MiLocalUser>({ name: usersContract['~orpc'].meta.requestName }))
+		.handler(async ({ input, context }) => (await execute(input, context.principal, context.token, context.ip)).map(user => toPackedUserDetailed(user)));
 }

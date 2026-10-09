@@ -5,8 +5,6 @@
 
 export { relationshipsContract } from './endpoints/relationships.contract.js';
 export { createRelationshipsRouter } from './endpoints/relationships.js';
-export { RelationshipsApplicationService } from './endpoints/relationships.application.js';
-export { relationshipsProviders } from './endpoints/relationships.providers.js';
-export type { RelationshipsOperations, RelationshipsContext } from './endpoints/relationships.js';
-
 export { UserListService } from './services/UserListService.js';
+export { RelationshipsApiProvider } from './api.provider.js';
+export type { RelationshipsDependencies } from './api.dependencies.js';

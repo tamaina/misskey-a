@@ -2,7 +2,8 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-
+import { createProcedureClient } from '@orpc/server';
+import type { ApiContext, ApiServices, ApiAuthorization } from '../../../api/backend/transport/context.js';
 import { expect, test } from 'vitest';
 import * as v from 'valibot';
 import { mockDeep } from 'vitest-mock-extended';
@@ -20,11 +21,10 @@ import type { MiMeta } from '../../../instance/backend/models/Meta.js';
 import type { RoleService } from '../../../roles/backend/services/RoleService.js';
 import type { UtilityService } from '../../backend/services/UtilityService.js';
 import type { RelayService } from '../../backend/services/RelayService.js';
-import { ApGetApplicationService } from '../../backend/endpoints/ap/get.application.js';
+import { createApGetProcedure } from '../../backend/endpoints/ap/get.js';
 import type { ApResolverService } from '../../backend/services/ApResolverService.js';
 import { MiRelay } from '../../backend/models/Relay.js';
-import { AdminRelaysListApplicationService as ListRelays } from '../../backend/endpoints/admin/relays/list.application.js';
-
+import { createAdminRelaysListProcedure } from '../../backend/endpoints/admin/relays/list.js';
 const instance = mockDeep<MiInstance>({
 	id: 'instance1', firstRetrievedAt: new Date('2026-01-01T00:00:00Z'), host: 'remote.test',
 	usersCount: 3, notesCount: 5, followingCount: 2, followersCount: 4,
@@ -63,7 +63,7 @@ test('actual relay list fields remain finite and metadata does not supply missin
 	const relay = Object.assign(new MiRelay(), { id: 'relay1', inbox: 'https://relay.test/inbox', status: 'requesting' as const });
 	const service = mockDeep<RelayService>();
 	service.listRelay.mockResolvedValue([relay]);
-	const result = await new ListRelays(service).execute({}, mockDeep<MiLocalUser>());
+	const result = await createProcedureClient(createAdminRelaysListProcedure({ relayService: service }), { context: nativeContext() })({});
 	expect(v.parse(adminRelaysListContract['~orpc'].outputSchema!, result)).toEqual([relay]);
 	for (const invalid of [{ ...relay, future: true }, { id: relay.id, inbox: relay.inbox }, { ...relay, status: 'bad' }]) {
 		expect(v.safeParse(adminRelaysAddContract['~orpc'].outputSchema!, invalid).success).toBe(false);
@@ -82,18 +82,29 @@ test('native finite inputs strip extras and preserve defaults, nulls and invalid
 });
 
 test('native defaults and genuine ActivityPub extensions preserve JSON keys', () => {
- expect(v.parse(federationStatsContract['~orpc'].inputSchema!, { future: true })).toEqual({ limit: 10 });
- expect(v.safeParse(federationStatsContract['~orpc'].inputSchema!, { limit: 0 }).success).toBe(false);
- const activity: unknown = JSON.parse('{"@context":["https://www.w3.org/ns/activitystreams"],"type":"Person","__proto__":{"nested":true},"constructor":null}');
- expect(v.parse(apGetContract['~orpc'].outputSchema!, activity)).toEqual(activity);
- for (const bad of [new Date(), new Map(), { extension: undefined }, { extension: () => 1 }]) expect(v.safeParse(apGetContract['~orpc'].outputSchema!, bad).success).toBe(false);
+	expect(v.parse(federationStatsContract['~orpc'].inputSchema!, { future: true })).toEqual({ limit: 10 });
+	expect(v.safeParse(federationStatsContract['~orpc'].inputSchema!, { limit: 0 }).success).toBe(false);
+	const activity: unknown = JSON.parse('{"@context":["https://www.w3.org/ns/activitystreams"],"type":"Person","__proto__":{"nested":true},"constructor":null}');
+	expect(v.parse(apGetContract['~orpc'].outputSchema!, activity)).toEqual(activity);
+	for (const bad of [new Date(), new Map(), { extension: undefined }, { extension: () => 1 }]) expect(v.safeParse(apGetContract['~orpc'].outputSchema!, bad).success).toBe(false);
 });
 
 test('local AP renderer optional fields retain JSON wire omissions without admitting native objects', async () => {
- const service = mockDeep<ApResolverService>();
- const resolver = mockDeep<Awaited<ReturnType<ApResolverService['createResolver']>>>();
- service.createResolver.mockResolvedValue(resolver);
- resolver.resolve.mockResolvedValue({ type: 'Note', content: undefined, name: null, id: 'https://local.test/notes/note1' });
- const application = new ApGetApplicationService(service);
- expect(await application.execute({ uri: 'https://local.test/notes/note1' }, mockDeep<MiLocalUser>())).toEqual({ type: 'Note', name: null, id: 'https://local.test/notes/note1' });
+	const service = mockDeep<ApResolverService>();
+	const resolver = mockDeep<Awaited<ReturnType<ApResolverService['createResolver']>>>();
+	service.createResolver.mockResolvedValue(resolver);
+	resolver.resolve.mockResolvedValue({ type: 'Note', content: undefined, name: null, id: 'https://local.test/notes/note1' });
+	const application = createProcedureClient(createApGetProcedure({ apResolverService: service }), { context: nativeContext() });
+	expect(await application({ uri: 'https://local.test/notes/note1' })).toEqual({ type: 'Note', name: null, id: 'https://local.test/notes/note1' });
+	await application({ uri: 'https://local.test/notes/note1' });
+	expect(service.createResolver).toHaveBeenCalledTimes(2);
 });
+
+function nativeContext(): ApiContext<MiLocalUser> {
+	const actor = mockDeep<MiLocalUser>({ id: 'trusted-user', isSuspended: false, movedToUri: null });
+	const services = mockDeep<ApiServices<MiLocalUser>>();
+	services.authenticate.mockResolvedValue([actor, null]);
+	const authorization = mockDeep<ApiAuthorization<MiLocalUser>>();
+	authorization.rootUserId.mockReturnValue(actor.id);
+	return { services, authorization, credential: 'credential', ip: '127.0.0.1', headers: {} };
+}

@@ -6,13 +6,17 @@
 import { implement } from '@orpc/server';
 import { authentication, apiPolicy, requirePrincipal } from '../../../../api/backend/transport/middleware.js';
 import { testNotificationContract } from './test-notification.contract.js';
-import type { ApiActor } from '../../../../api/backend/transport/context.js';
-import type { NotificationsContext } from '../../operations.js';
-
-export function createTestNotificationProcedure<Actor extends ApiActor>() {
-	return implement(testNotificationContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<NotificationsContext<Actor>>()
-		.use(authentication<Actor>())
-		.use(apiPolicy<Actor>({ name: 'notifications/test-notification', requireCredential: true, kind: 'write:notifications', limit: { duration: 60000, max: 10 } }))
-		.use(requirePrincipal<Actor>())
-		.handler(({ input, context }) => context.operations.notifications.testNotification(input, context.principal));
+import type { ApiContext } from '@features/api/backend/transport/context.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+import type { NotificationsDependencies } from '@features/notifications/backend/api.dependencies.js';
+export type TestNotificationDependencies = Pick<NotificationsDependencies, 'createTestNotification'>;
+export function createTestNotificationProcedure(deps: TestNotificationDependencies) {
+	return implement(testNotificationContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>()
+		.use(authentication<MiLocalUser>())
+		.use(apiPolicy<MiLocalUser>({ name: testNotificationContract['~orpc'].meta.requestName, requireCredential: true, kind: 'write:notifications', limit: { duration: 60000, max: 10 } }))
+		.use(requirePrincipal<MiLocalUser>())
+		.handler(async ({ input, context }) => {
+			const actor = context.principal;
+			deps.createTestNotification(actor.id);
+		});
 }

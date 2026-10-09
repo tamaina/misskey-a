@@ -6,12 +6,13 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import * as v from 'valibot';
 import { instanceApiContract } from '../../../misskey-js/built/contracts/instance/backend/api.contract.js';
-import { createGetOnlineUsersCount } from '../../../backend/built/features/instance/backend.js';
+import { createOnlineUsersCountProcedure } from '../../../backend/built/features/instance/backend.js';
+import { createProcedureClient } from '@orpc/server';
 
 test('construction and invalid input do not read the online count or clock', async () => {
 	let clockCalls = 0;
 	let countCalls = 0;
-	const endpoint = createGetOnlineUsersCount({ thresholdMs: 5000, countSince: async () => { countCalls++; return 7; } }, () => { clockCalls++; return 20_000; });
+	const endpoint = countEndpoint({ thresholdMs: 5000, countSince: async () => { countCalls++; return 7; } }, () => { clockCalls++; return 20_000; });
 	assert.equal(clockCalls, 0);
 	assert.equal(countCalls, 0);
 	for (const input of [null, [], 'invalid', 1]) await assert.rejects(endpoint(input));
@@ -23,7 +24,7 @@ test('uses the injected cutoff on each request and accepts legacy extra object f
 	const cutoffs = [];
 	const times = [20_000, 31_000];
 	const counts = [3, 4];
-	const endpoint = createGetOnlineUsersCount({
+	const endpoint = countEndpoint({
 		thresholdMs: 5000,
 		countSince: async cutoff => { cutoffs.push(cutoff); return counts[cutoffs.length - 1]; },
 	}, () => times.shift());
@@ -34,8 +35,8 @@ test('uses the injected cutoff on each request and accepts legacy extra object f
 
 test('count failures and invalid handler outputs propagate', async () => {
 	const failure = new Error('Database read failed');
-	await assert.rejects(createGetOnlineUsersCount({ thresholdMs: 1, countSince: async () => { throw failure; } }, () => 100)({}), error => error === failure);
-	await assert.rejects(createGetOnlineUsersCount({ thresholdMs: 1, countSince: async () => 'invalid' }, () => 100)({}));
+	await assert.rejects(countEndpoint({ thresholdMs: 1, countSince: async () => { throw failure; } }, () => 100)({}), error => error === failure);
+	await assert.rejects(countEndpoint({ thresholdMs: 1, countSince: async () => 'invalid' }, () => 100)({}));
 });
 
 test('native contract preserves a finite numeric count', () => {
@@ -44,3 +45,17 @@ test('native contract preserves a finite numeric count', () => {
 	assert.equal(v.safeParse(output, { count: '7' }).success, false);
 	assert.equal(v.safeParse(output, { count: Infinity }).success, false);
 });
+
+function countEndpoint(getOnlineUsersCount, now) {
+	return createProcedureClient(createOnlineUsersCountProcedure({ getOnlineUsersCount, now }), {
+		context: {
+			credential: null, ip: '127.0.0.1', headers: {},
+			services: {
+				authenticate: async () => [null, null],
+				limitActor: () => null,
+				rateLimitFactor: async () => 1,
+				limit: async () => null,
+			},
+		},
+	});
+}

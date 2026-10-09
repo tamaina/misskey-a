@@ -9,12 +9,24 @@ import Fastify from 'fastify';
 import { APIClient, isAPIError } from '../../../../misskey-js/built/api.js';
 import { registerAuthSessionHttp } from '../../backend/session.http.js';
 import { FastifyReplyError } from '../../../runtime/backend/http/fastify-reply-error.js';
-import type { AuthSessionOperations } from '../../backend/session.router.js';
+import { implement } from '@orpc/server';
+import { authSessionsContract, type AuthSessionInputs, type AuthSessionOutputs } from '../../backend/session.contract.js';
+import type { AuthSessionContext, AuthSessionRequest, AuthSessionEffects } from '../../backend/session.effects.js';
+import { sessionErrors } from '../../backend/session.middleware.js';
+type AuthSessionOperations = { [Name in keyof AuthSessionInputs]: (input: AuthSessionInputs[Name], request: AuthSessionRequest, effects: AuthSessionEffects) => Promise<AuthSessionOutputs[Name]> };
 
 async function fixture() {
 	const operations = mockDeep<AuthSessionOperations>();
+	const native = implement(authSessionsContract).$context<AuthSessionContext>().use(sessionErrors());
 	const app = Fastify();
-	await app.register(async api => registerAuthSessionHttp(api, operations), { prefix: '/api' });
+	await app.register(async api => registerAuthSessionHttp(api, {
+authSessions: native.router({
+			signup: native.signup.handler(({ input, context }) => operations.signup(input, context.request, context.effects)),
+			signupPending: native.signupPending.handler(({ input, context }) => operations.signupPending(input, context.request, context.effects)),
+			signinFlow: native.signinFlow.handler(({ input, context }) => operations.signinFlow(input, context.request, context.effects)),
+			signinWithPasskey: native.signinWithPasskey.handler(({ input, context }) => operations.signinWithPasskey(input, context.request, context.effects)),
+		})
+}), { prefix: '/api' });
 	return { operations, app };
 }
 

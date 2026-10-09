@@ -2,14 +2,14 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-
-import { Injectable } from '@nestjs/common';
 import { captchaErrorCodes, CaptchaService } from '../../../services/CaptchaService.js';
 import { apiError } from '@features/api/backend/transport/orpc-error.js';
-
-import type * as v from 'valibot';
-import type { AdminCaptchaSaveContract } from '../../../api.contract.js';
-
+import * as v from 'valibot';
+import { AdminCaptchaSaveContract } from '../../../api.contract.js';
+import { implement } from '@orpc/server';
+import { authentication, apiPolicy, requirePrincipal } from '../../../../../api/backend/transport/middleware.js';
+import type { ApiContext } from '../../../../../api/backend/transport/context.js';
+import type { MiLocalUser } from '../../../../../users/backend/models/User.js';
 export const meta = {
 	tags: ['admin', 'captcha'],
 
@@ -58,51 +58,57 @@ export const meta = {
 		},
 	},
 } as const;
+export interface AdminCaptchaSaveDependencies {
+	captchaService: Pick<CaptchaService, 'save'>;
+}
+export function createAdminCaptchaSaveProcedure(deps: AdminCaptchaSaveDependencies) {
+	return implement(AdminCaptchaSaveContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>().use(authentication<MiLocalUser>()).use(apiPolicy<MiLocalUser>({ name: 'admin/captcha/save', requireCredential: true, requireAdmin: true, kind: 'write:admin:meta' })).use(requirePrincipal<MiLocalUser>()).handler(async ({ input, context }) => {
+		const ps = input;
+		const result = await (async () => {
+			const result = await deps.captchaService.save(ps.provider, {
+				sitekey: ps.sitekey,
+				secret: ps.secret,
+				instanceUrl: ps.instanceUrl,
+				captchaResult: ps.captchaResult,
+			});
 
-@Injectable()
-export class AdminCaptchaSaveOperation {
-	constructor(
-		private captchaService: CaptchaService,
-	) {}
-
-	async execute(ps: v.InferOutput<NonNullable<typeof AdminCaptchaSaveContract['~orpc']['inputSchema']>>) {
-		const result = await this.captchaService.save(ps.provider, {
-			sitekey: ps.sitekey,
-			secret: ps.secret,
-			instanceUrl: ps.instanceUrl,
-			captchaResult: ps.captchaResult,
-		});
-
-		if (!result.success) {
-			switch (result.error.code) {
-				case captchaErrorCodes.invalidProvider:
-					throw apiError({
-						...meta.errors.invalidProvider,
-						message: result.error.message,
-					});
-				case captchaErrorCodes.invalidParameters:
-					throw apiError({
-						...meta.errors.invalidParameters,
-						message: result.error.message,
-					});
-				case captchaErrorCodes.noResponseProvided:
-					throw apiError({
-						...meta.errors.noResponseProvided,
-						message: result.error.message,
-					});
-				case captchaErrorCodes.requestFailed:
-					throw apiError({
-						...meta.errors.requestFailed,
-						message: result.error.message,
-					});
-				case captchaErrorCodes.verificationFailed:
-					throw apiError({
-						...meta.errors.verificationFailed,
-						message: result.error.message,
-					});
-				default:
-					throw apiError(meta.errors.unknown);
+			if (!result.success) {
+				switch (result.error.code) {
+					case captchaErrorCodes.invalidProvider:
+						throw apiError({
+							...meta.errors.invalidProvider,
+							message: result.error.message,
+						});
+					case captchaErrorCodes.invalidParameters:
+						throw apiError({
+							...meta.errors.invalidParameters,
+							message: result.error.message,
+						});
+					case captchaErrorCodes.noResponseProvided:
+						throw apiError({
+							...meta.errors.noResponseProvided,
+							message: result.error.message,
+						});
+					case captchaErrorCodes.requestFailed:
+						throw apiError({
+							...meta.errors.requestFailed,
+							message: result.error.message,
+						});
+					case captchaErrorCodes.verificationFailed:
+						throw apiError({
+							...meta.errors.verificationFailed,
+							message: result.error.message,
+						});
+					default:
+						throw apiError(meta.errors.unknown);
+				}
 			}
-		}
-	}
+		})();
+		return v.parse(requiredSchema(AdminCaptchaSaveContract['~orpc'].outputSchema), result);
+	});
+}
+
+function requiredSchema<Schema>(schema: Schema | undefined): Schema {
+	if (schema === undefined) throw new Error('Contract must declare its schema');
+	return schema;
 }

@@ -2,5 +2,23 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-
-export { RelationshipsCommandOperations } from '../../relationships-command.operations.js';
+import { implement } from '@orpc/server';
+import type { ApiContext } from '../../../../../api/backend/transport/context.js';
+import type { MiLocalUser } from '../../../../../users/backend/models/User.js';
+import { authentication, apiPolicy, requirePrincipal } from '../../../../../api/backend/transport/middleware.js';
+import { relationshipsContract } from '../../relationships.contract.js';
+import type { RelationshipsDependencies } from '../../../api.dependencies.js';
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
+import { relationshipsErrors } from '../../relationships.errors.js';
+import { getRelationshipUser } from '../../relationship-errors.js';
+export function createUsersListsPullProcedure<Actor extends MiLocalUser>(deps: Pick<RelationshipsDependencies, 'userListsRepository' | 'getterService' | 'userListService'>) {
+	return implement(relationshipsContract["users/lists/pull"], { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>().use(authentication<Actor>()).use(apiPolicy<Actor>({ name: 'users/lists/pull', requireCredential: true, prohibitMoved: true, kind: 'write:account' })).use(requirePrincipal<Actor>())
+		.handler(async ({ input, context }) => {
+			const actor = context.principal;
+			const errors = relationshipsErrors['users/lists/pull'];
+			const list = await deps.userListsRepository.findOneBy({ id: input.listId, userId: actor.id });
+			if (list == null) throw apiError(errors.noSuchList);
+			const user = await getRelationshipUser(deps.getterService, input.userId, errors.noSuchUser);
+			await deps.userListService.removeMember(user, list);
+		});
+}

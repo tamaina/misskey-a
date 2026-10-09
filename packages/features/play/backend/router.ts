@@ -4,8 +4,9 @@
  */
 
 import { implement } from '@orpc/server';
-import type { ApiActor } from '../../api/backend/transport/context.js';
-import type { PlayContext } from './operations.js';
+import type { ApiContext } from '../../api/backend/transport/context.js';
+import type { MiLocalUser } from '../../users/backend/models/User.js';
+import type { PlayDependencies } from './api.dependencies.js';
 import { playContract } from './endpoints/play.contract.js';
 import { createFlashCreateProcedure } from './endpoints/flash/create.js';
 import { createFlashDeleteProcedure } from './endpoints/flash/delete.js';
@@ -18,19 +19,18 @@ import { createFlashUnlikeProcedure } from './endpoints/flash/unlike.js';
 import { createFlashUpdateProcedure } from './endpoints/flash/update.js';
 import { createFlashSearchProcedure } from './endpoints/flash/search.js';
 import { createUsersFlashsProcedure } from './endpoints/users/flashs.js';
-
-export function createPlayRouter<Actor extends ApiActor>() {
-	return implement(playContract).$context<PlayContext<Actor>>().router({
-		flashCreate: createFlashCreateProcedure<Actor>(),
-		flashDelete: createFlashDeleteProcedure<Actor>(),
-		flashFeatured: createFlashFeaturedProcedure<Actor>(),
-		flashLike: createFlashLikeProcedure<Actor>(),
-		flashMy: createFlashMyProcedure<Actor>(),
-		flashMyLikes: createFlashMyLikesProcedure<Actor>(),
-		flashShow: createFlashShowProcedure<Actor>(),
-		flashUnlike: createFlashUnlikeProcedure<Actor>(),
-		flashUpdate: createFlashUpdateProcedure<Actor>(),
-		flashSearch: createFlashSearchProcedure<Actor>(),
-		usersFlashs: createUsersFlashsProcedure<Actor>(),
+export function createPlayRouter(deps: PlayDependencies) {
+	return implement(playContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>().router({
+		flashCreate: createFlashCreateProcedure(deps),
+		flashDelete: createFlashDeleteProcedure(deps),
+		flashFeatured: createFlashFeaturedProcedure(deps),
+		flashLike: createFlashLikeProcedure(deps),
+		flashMy: createFlashMyProcedure(deps),
+		flashMyLikes: createFlashMyLikesProcedure(deps),
+		flashShow: createFlashShowProcedure(deps),
+		flashUnlike: createFlashUnlikeProcedure(deps),
+		flashUpdate: createFlashUpdateProcedure(deps),
+		flashSearch: createFlashSearchProcedure(deps),
+		usersFlashs: createUsersFlashsProcedure(deps),
 	});
 }

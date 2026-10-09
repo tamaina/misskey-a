@@ -14,7 +14,9 @@ import { UserSuspendService } from '@features/moderation/backend/services/UserSu
 import { UserFollowingService } from '@features/relationships/backend/services/UserFollowingService.js';
 import { InstanceEntityService } from '@features/instance/backend/serializers/InstanceEntityService.js';
 import type { FollowingsRepository, InstancesRepository, MiUser, UsersRepository } from '@features/persistence/backend/repositories/models.js';
-import { FederationStatsApplicationService as FederationStats } from '@features/federation/backend/endpoints/federation/stats.application.js';
+import { createProcedureClient } from '@orpc/server';
+import type { ApiActor, ApiContext, ApiServices } from '@features/api/backend/transport/context.js';
+import { createFederationStatsProcedure } from '@features/federation/backend/endpoints/federation/stats.js';
 import { secureRndstr } from '@features/auth/backend/utility/secure-rndstr.js';
 import { FollowingIsFollowerSuspended1791310067731 as SuspensionSchemaMigration } from '../../migration/1791310067731-FollowingIsFollowerSuspended.js';
 import { FollowingIsFollowerSuspendedCopySuspendedState1791310067732 as SuspensionBackfillMigration } from '../../migration/1791310067732-FollowingIsFollowerSuspendedCopySuspendedState.js';
@@ -136,8 +138,11 @@ describe('suspension consistency', () => {
 			}
 		}
 		const packer = new InstanceEntityService(app.get(DI.meta), { isModerator: async () => false }, { isBlockedHost: () => false, isDeliverSuspendedSoftware: () => undefined, isMediaSilencedHost: () => false, isSilencedHost: () => false });
-		const endpoint = new FederationStats(instances, followings, packer);
-		const result = await endpoint.execute({ limit: 1 }, null);
+		const services = mockDeep<ApiServices<ApiActor>>();
+		services.authenticate.mockResolvedValue([null, null]);
+		const context: ApiContext<ApiActor> = { services, credential: null, ip: '127.0.0.1', headers: {} };
+		const endpoint = createProcedureClient(createFederationStatsProcedure({ instancesRepository: instances, followingsRepository: followings, instanceEntityService: packer }), { context });
+		const result = await endpoint({ limit: 1 });
 		expect(result.topSubInstances[0]).toMatchObject({ host: hosts[0], followersCount: 2 });
 		expect(result.topPubInstances[0]).toMatchObject({ host: hosts[0], followingCount: 1 });
 		expect(result.otherFollowersCount).toBe(1);
@@ -146,8 +151,11 @@ describe('suspension consistency', () => {
 
 	test('statistics handle no relationships', async () => {
 		const packer = new InstanceEntityService(app.get(DI.meta), { isModerator: async () => false }, { isBlockedHost: () => false, isDeliverSuspendedSoftware: () => undefined, isMediaSilencedHost: () => false, isSilencedHost: () => false });
-		const endpoint = new FederationStats(instances, followings, packer);
-		expect(await endpoint.execute({ limit: 1 }, null)).toEqual({
+		const services = mockDeep<ApiServices<ApiActor>>();
+		services.authenticate.mockResolvedValue([null, null]);
+		const context: ApiContext<ApiActor> = { services, credential: null, ip: '127.0.0.1', headers: {} };
+		const endpoint = createProcedureClient(createFederationStatsProcedure({ instancesRepository: instances, followingsRepository: followings, instanceEntityService: packer }), { context });
+		expect(await endpoint({ limit: 1 })).toEqual({
 			topSubInstances: [], topPubInstances: [], otherFollowersCount: 0, otherFollowingCount: 0,
 		});
 	});

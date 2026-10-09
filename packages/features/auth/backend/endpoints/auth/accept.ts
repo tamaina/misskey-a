@@ -4,18 +4,16 @@
  */
 
 import * as crypto from 'node:crypto';
-import { Inject, Injectable } from '@nestjs/common';
-
 import type { AuthSessionsRepository, AppsRepository, AccessTokensRepository } from '@features/persistence/backend/repositories/models.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { secureRndstr } from '../../utility/secure-rndstr.js';
-import { DI } from '@/di-symbols.js';
 import { apiError } from '@features/api/backend/transport/orpc-error.js';
-
-import type * as v from 'valibot';
-import type { AuthAcceptContract } from '../../api.contract.js';
+import * as v from 'valibot';
+import { AuthAcceptContract } from '../../api.contract.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
-
+import { implement } from '@orpc/server';
+import { authentication, apiPolicy, requirePrincipal } from '../../../../api/backend/transport/middleware.js';
+import type { ApiContext } from '../../../../api/backend/transport/context.js';
 export const meta = {
 	tags: ['auth'],
 
@@ -31,64 +29,65 @@ export const meta = {
 		},
 	},
 } as const;
+export interface AuthAcceptDependencies {
+	appsRepository: AppsRepository;
+	authSessionsRepository: AuthSessionsRepository;
+	accessTokensRepository: AccessTokensRepository;
+	idService: Pick<IdService, 'gen'>;
+}
+export function createAuthAcceptProcedure(deps: AuthAcceptDependencies) {
+	return implement(AuthAcceptContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>().use(authentication<MiLocalUser>()).use(apiPolicy<MiLocalUser>({ name: 'auth/accept', requireCredential: true, secure: true })).use(requirePrincipal<MiLocalUser>()).handler(async ({ input, context }) => {
+		const ps = input;
+		const me = context.principal;
+		const result = await (async () => {
+			// Fetch token
+			const session = await deps.authSessionsRepository
+				.findOneBy({ token: ps.token });
 
-@Injectable()
-export class AuthAcceptOperation {
-	constructor(
-		@Inject(DI.appsRepository)
-		private appsRepository: AppsRepository,
+			if (session == null) {
+				throw apiError(meta.errors.noSuchSession);
+			}
 
-		@Inject(DI.authSessionsRepository)
-		private authSessionsRepository: AuthSessionsRepository,
+			const accessToken = secureRndstr(32);
 
-		@Inject(DI.accessTokensRepository)
-		private accessTokensRepository: AccessTokensRepository,
-
-		private idService: IdService,
-	) {}
-
-	async execute(ps: v.InferOutput<NonNullable<typeof AuthAcceptContract['~orpc']['inputSchema']>>, me: MiLocalUser) {
-		// Fetch token
-		const session = await this.authSessionsRepository
-			.findOneBy({ token: ps.token });
-
-		if (session == null) {
-			throw apiError(meta.errors.noSuchSession);
-		}
-
-		const accessToken = secureRndstr(32);
-
-		// Fetch exist access token
-		const exist = await this.accessTokensRepository.exists({
-			where: {
-				appId: session.appId,
-				userId: me.id,
-			},
-		});
-
-		if (!exist) {
-			const app = await this.appsRepository.findOneByOrFail({ id: session.appId });
-
-			// Generate Hash
-			const sha256 = crypto.createHash('sha256');
-			sha256.update(accessToken + app.secret);
-			const hash = sha256.digest('hex');
-
-			const now = new Date();
-
-			await this.accessTokensRepository.insert({
-				id: this.idService.gen(now.getTime()),
-				lastUsedAt: now,
-				appId: session.appId,
-				userId: me.id,
-				token: accessToken,
-				hash: hash,
+			// Fetch exist access token
+			const exist = await deps.accessTokensRepository.exists({
+				where: {
+					appId: session.appId,
+					userId: me.id,
+				},
 			});
-		}
 
-		// Update session
-		await this.authSessionsRepository.update(session.id, {
-			userId: me.id,
-		});
-	}
+			if (!exist) {
+				const app = await deps.appsRepository.findOneByOrFail({ id: session.appId });
+
+				// Generate Hash
+				const sha256 = crypto.createHash('sha256');
+				sha256.update(accessToken + app.secret);
+				const hash = sha256.digest('hex');
+
+				const now = new Date();
+
+				await deps.accessTokensRepository.insert({
+					id: deps.idService.gen(now.getTime()),
+					lastUsedAt: now,
+					appId: session.appId,
+					userId: me.id,
+					token: accessToken,
+					hash: hash,
+				});
+			}
+
+			// Update session
+			await deps.authSessionsRepository.update(session.id, {
+				userId: me.id,
+			});
+		})();
+		return v.parse(requiredSchema(AuthAcceptContract['~orpc'].outputSchema), result);
+	});
+}
+
+function requiredSchema<Schema>(schema: Schema | undefined): Schema {
+	if (schema === undefined) throw new Error('Contract must declare its schema');
+	return schema;
 }

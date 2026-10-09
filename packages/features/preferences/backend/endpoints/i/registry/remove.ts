@@ -6,13 +6,17 @@
 import { implement } from '@orpc/server';
 import { authentication, apiPolicy, requirePrincipal } from '../../../../../api/backend/transport/middleware.js';
 import { registryRemoveContract } from './remove.contract.js';
-import type { ApiActor } from '../../../../../api/backend/transport/context.js';
-import type { PreferencesContext } from '../../../operations.js';
-
-export function createRegistryRemoveProcedure<Actor extends ApiActor>() {
-	return implement(registryRemoveContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<PreferencesContext<Actor>>()
+import type { ApiActor, ApiContext } from '../../../../../api/backend/transport/context.js';
+import type { PreferencesDependencies } from '../../../api.dependencies.js';
+import { registryTenant } from './registry.helpers.js';
+export function createRegistryRemoveProcedure<Actor extends ApiActor>(deps: PreferencesDependencies) {
+	return implement(registryRemoveContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>()
 		.use(authentication<Actor>())
 		.use(apiPolicy<Actor>({ name: 'i/registry/remove', requireCredential: true, kind: 'write:account' }))
 		.use(requirePrincipal<Actor>())
-		.handler(({ input, context }) => context.operations.preferences.remove(input, context.principal, context.token));
+		.handler(async ({ input, context }) => {
+			const principal = context.principal;
+			const token = context.token;
+			return deps.registry.remove(principal.id, registryTenant(input.domain, token), input.scope, input.key);
+		});
 }

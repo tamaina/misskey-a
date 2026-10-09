@@ -2,19 +2,15 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-
-import { Inject, Injectable } from '@nestjs/common';
 import type { MiAccessToken } from '../../models/AccessToken.js';
-import { DI } from '@/di-symbols.js';
 import { apiError } from '@features/api/backend/transport/orpc-error.js';
-
-import type * as v from 'valibot';
-import type { IRevokeTokenContract } from '../../api.contract.js';
+import * as v from 'valibot';
+import { IRevokeTokenContract } from '../../api.contract.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
-import type { ApiToken } from '@features/api/backend/transport/context.js';
-
 import type { PackedJsonValue } from '@features/users/backend/json-value.schema.js';
-
+import { implement } from '@orpc/server';
+import { authentication, apiPolicy } from '../../../../api/backend/transport/middleware.js';
+import type { ApiContext } from '../../../../api/backend/transport/context.js';
 /** Preserve legacy selector precedence and the original repository comparison.
  * An inactive tokenId may contain JSON when the token alternative is valid.
  * This narrow port models the actual runtime call without asserting it is a string.
@@ -46,34 +42,41 @@ export const meta = {
 		},
 	},
 } as const;
+export interface IRevokeTokenDependencies {
+	accessTokensRepository: TokenRevocationRepository;
+}
+export function createIRevokeTokenProcedure(deps: IRevokeTokenDependencies) {
+	return implement(IRevokeTokenContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>().use(authentication<MiLocalUser>()).use(apiPolicy<MiLocalUser>({ name: 'i/revoke-token' })).handler(async ({ input, context }) => {
+		const ps = input;
+		const me = context.principal;
+		const token = context.token;
+		const result = await (async () => {
+			if (me == null) {
+				throw apiError(meta.errors.credentialRequired);
+			}
 
-@Injectable()
-export class IRevokeTokenOperation {
-	constructor(
-		@Inject(DI.accessTokensRepository)
-		private accessTokensRepository: TokenRevocationRepository,
-	) {}
+			let target: MiAccessToken | null = null;
+			if ('tokenId' in ps) {
+				target = await deps.accessTokensRepository.findOneBy({ id: ps.tokenId, userId: me.id });
+			} else {
+				if (ps.token == null || ps.token === '') return;
+				target = await deps.accessTokensRepository.findOneBy({ token: ps.token, userId: me.id });
+			}
 
-	async execute(ps: v.InferOutput<NonNullable<typeof IRevokeTokenContract['~orpc']['inputSchema']>>, me: MiLocalUser | null, token: ApiToken | null) {
-		if (me == null) {
-			throw apiError(meta.errors.credentialRequired);
-		}
+			if (target == null) return;
 
-		let target: MiAccessToken | null = null;
-		if ('tokenId' in ps) {
-			target = await this.accessTokensRepository.findOneBy({ id: ps.tokenId, userId: me.id });
-		} else {
-			if (ps.token == null || ps.token === '') return;
-			target = await this.accessTokensRepository.findOneBy({ token: ps.token, userId: me.id });
-		}
+			// サードパーティアプリ (アクセストークン) からのリクエストでは、いま使われているトークン自身のみ失効できる
+			if (token != null && token.id !== target.id) {
+				throw apiError(meta.errors.permissionDenied);
+			}
 
-		if (target == null) return;
+			await deps.accessTokensRepository.delete({ id: target.id });
+		})();
+		return v.parse(requiredSchema(IRevokeTokenContract['~orpc'].outputSchema), result);
+	});
+}
 
-		// サードパーティアプリ (アクセストークン) からのリクエストでは、いま使われているトークン自身のみ失効できる
-		if (token != null && token.id !== target.id) {
-			throw apiError(meta.errors.permissionDenied);
-		}
-
-		await this.accessTokensRepository.delete({ id: target.id });
-	}
+function requiredSchema<Schema>(schema: Schema | undefined): Schema {
+	if (schema === undefined) throw new Error('Contract must declare its schema');
+	return schema;
 }

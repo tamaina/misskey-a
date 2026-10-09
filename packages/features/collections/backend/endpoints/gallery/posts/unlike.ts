@@ -1,0 +1,43 @@
+/*
+ * SPDX-FileCopyrightText: syuilo and misskey-project
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
+import { implement } from '@orpc/server';
+import { authentication, apiPolicy, requirePrincipal } from '../../../../../api/backend/transport/middleware.js';
+import type { ApiActor, ApiContext } from '../../../../../api/backend/transport/context.js';
+import { collectionsContract } from '../../../api.contract.js';
+import type { CollectionsDependencies } from '../../../api.dependencies.js';
+import { apiError } from '../../../../../api/backend/transport/orpc-error.js';
+import { GALLERY_POSTS_RANKING_WINDOW } from '../../../../../discovery/backend/services/FeaturedService.js';
+import { collectionsErrors } from '../../../api.errors.js';
+export interface GalleryPostsUnlikeDependencies<Actor extends ApiActor> {
+	galleryPostsRepository: Pick<CollectionsDependencies<Actor>['galleryPostsRepository'], 'decrement' | 'findOneBy'>;
+	galleryLikesRepository: Pick<CollectionsDependencies<Actor>['galleryLikesRepository'], 'delete' | 'findOneBy'>;
+	idService: Pick<CollectionsDependencies<Actor>['idService'], 'parse'>;
+	featuredService: Pick<CollectionsDependencies<Actor>['featuredService'], 'updateGalleryPostsRanking'>;
+}
+export function createGalleryPostsUnlikeProcedure<Actor extends ApiActor>(deps: GalleryPostsUnlikeDependencies<Actor>) {
+	return implement(collectionsContract.galleryPostsUnlike, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>()
+		.use(authentication<Actor>()).use(apiPolicy<Actor>({ name: collectionsContract.galleryPostsUnlike['~orpc'].meta.requestName, requireCredential: true, prohibitMoved: true, kind: 'write:gallery-likes' })).use(requirePrincipal<Actor>())
+		.handler(async ({ input: ps, context }) => {
+			const me = context.principal;
+			const post = await deps.galleryPostsRepository.findOneBy({ id: ps.postId });
+			if (post == null) {
+				throw apiError(collectionsErrors.galleryPostsUnlike.noSuchPost);
+			}
+			const exist = await deps.galleryLikesRepository.findOneBy({
+				postId: post.id,
+				userId: me.id,
+			});
+			if (exist == null) {
+				throw apiError(collectionsErrors.galleryPostsUnlike.notLiked);
+			}
+			// Delete like
+			await deps.galleryLikesRepository.delete(exist.id);
+			// ランキング更新
+			if (Date.now() - deps.idService.parse(post.id).date.getTime() < GALLERY_POSTS_RANKING_WINDOW) {
+				await deps.featuredService.updateGalleryPostsRanking(post.id, -1);
+			}
+			deps.galleryPostsRepository.decrement({ id: post.id }, 'likedCount', 1);
+		});
+}

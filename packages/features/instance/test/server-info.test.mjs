@@ -3,8 +3,9 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 import { test } from 'node:test';
+import { createProcedureClient } from '@orpc/server';
 import assert from 'node:assert/strict';
-import { createServerInfo } from '../../../backend/built/features/instance/backend.js';
+import { createServerInfoRouter } from '../../../backend/built/features/instance/backend.js';
 
 import { genPilotOpenapiSpec } from '../../../backend/built/features/api/pilot.js';
 
@@ -42,3 +43,5 @@ test('official external documentation retains the complete response shape', asyn
 	assert.deepEqual(output.required, ['machine', 'cpu', 'mem', 'fs']);
 	assert.equal(output.properties.cpu.properties.cores.type, 'number');
 });
+
+function createServerInfo(deps) { return createProcedureClient(createServerInfoRouter(deps).serverInfo, { context: { credential: null, ip: '127.0.0.1', headers: {}, services: { authenticate: async () => [null, null], limitActor: () => null, rateLimitFactor: async () => 1, limit: async () => null } } }); }

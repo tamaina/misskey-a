@@ -4,63 +4,66 @@
  */
 
 import * as OTPAuth from 'otpauth';
-import { Inject, Injectable } from '@nestjs/common';
-
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import type { UserProfilesRepository } from '@features/persistence/backend/repositories/models.js';
 import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
-import { DI } from '@/di-symbols.js';
-import { UserAuthService } from "../../../services/UserAuthService.js";
-
-import type * as v from 'valibot';
-import type { I2faDoneContract } from '../../../api.contract.js';
+import { UserAuthService } from '../../../services/UserAuthService.js';
+import * as v from 'valibot';
+import { I2faDoneContract } from '../../../api.contract.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
-
+import { implement } from '@orpc/server';
+import { authentication, apiPolicy, requirePrincipal } from '../../../../../api/backend/transport/middleware.js';
+import type { ApiContext } from '../../../../../api/backend/transport/context.js';
 export const meta = {
 	requireCredential: true,
 
 	secure: true,
 } as const;
+export interface I2faDoneDependencies {
+	userProfilesRepository: UserProfilesRepository;
+	userEntityService: Pick<UserEntityService, 'packSelf'>;
+	userAuthService: Pick<UserAuthService, 'validateOtp'>;
+	globalEventService: Pick<GlobalEventService, 'publishMainStream'>;
+}
+export function createI2faDoneProcedure(deps: I2faDoneDependencies) {
+	return implement(I2faDoneContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>().use(authentication<MiLocalUser>()).use(apiPolicy<MiLocalUser>({ name: 'i/2fa/done', requireCredential: true, secure: true })).use(requirePrincipal<MiLocalUser>()).handler(async ({ input, context }) => {
+		const ps = input;
+		const me = context.principal;
+		const result = await (async () => {
+			const token = ps.token.replace(/\s/g, '');
 
-@Injectable()
-export class I2faDoneOperation {
-	constructor(
-		@Inject(DI.userProfilesRepository)
-		private userProfilesRepository: UserProfilesRepository,
+			const profile = await deps.userProfilesRepository.findOneByOrFail({ userId: me.id });
 
-		private userEntityService: UserEntityService,
-		private userAuthService: UserAuthService,
-		private globalEventService: GlobalEventService,
-	) {}
+			if (profile.twoFactorTempSecret == null) {
+				throw new Error('二段階認証の設定が開始されていません');
+			}
 
-	async execute(ps: v.InferOutput<NonNullable<typeof I2faDoneContract['~orpc']['inputSchema']>>, me: MiLocalUser) {
-		const token = ps.token.replace(/\s/g, '');
+			if (!await deps.userAuthService.validateOtp(profile.userId, profile.twoFactorTempSecret, token)) {
+				throw new Error('not verified');
+			}
 
-		const profile = await this.userProfilesRepository.findOneByOrFail({ userId: me.id });
+			const backupCodes = Array.from({ length: 5 }, () => new OTPAuth.Secret().base32);
 
-		if (profile.twoFactorTempSecret == null) {
-			throw new Error('二段階認証の設定が開始されていません');
-		}
+			await deps.userProfilesRepository.update(me.id, {
+				twoFactorSecret: profile.twoFactorTempSecret,
+				twoFactorBackupSecret: backupCodes,
+				twoFactorEnabled: true,
+			});
 
-		if (!await this.userAuthService.validateOtp(profile.userId, profile.twoFactorTempSecret, token)) {
-			throw new Error('not verified');
-		}
+			// Publish meUpdated event
+			deps.globalEventService.publishMainStream(me.id, 'meUpdated', await deps.userEntityService.packSelf(me.id, {
+				includeSecrets: true,
+			}));
 
-		const backupCodes = Array.from({ length: 5 }, () => new OTPAuth.Secret().base32);
+			return {
+				backupCodes: backupCodes,
+			};
+		})();
+		return v.parse(requiredSchema(I2faDoneContract['~orpc'].outputSchema), result);
+	});
+}
 
-		await this.userProfilesRepository.update(me.id, {
-			twoFactorSecret: profile.twoFactorTempSecret,
-			twoFactorBackupSecret: backupCodes,
-			twoFactorEnabled: true,
-		});
-
-		// Publish meUpdated event
-		this.globalEventService.publishMainStream(me.id, 'meUpdated', await this.userEntityService.packSelf(me.id, {
-			includeSecrets: true,
-		}));
-
-		return {
-			backupCodes: backupCodes,
-		};
-	}
+function requiredSchema<Schema>(schema: Schema | undefined): Schema {
+	if (schema === undefined) throw new Error('Contract must declare its schema');
+	return schema;
 }

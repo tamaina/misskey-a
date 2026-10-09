@@ -4,40 +4,40 @@
  */
 
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
-import type { DriveManagementInputs } from '../../../management.contract.js';
 import { driveFilesDeleteErrors } from './delete.contract.js';
-import { Inject, Injectable } from '@nestjs/common';
-
 import type { DriveFilesRepository } from '@features/persistence/backend/repositories/models.js';
 import { DriveService } from '../../../services/DriveService.js';
 import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
-import { DI } from '@/di-symbols.js';
 import { RoleService } from '@features/roles/backend/services/RoleService.js';
 import { apiError } from '@features/api/backend/transport/orpc-error.js';
+import { driveManagementContract } from '../../../management.contract.js';
+import { implement } from '@orpc/server';
+import { authentication, apiPolicy, requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import type { ApiContext } from '@features/api/backend/transport/context.js';
+export interface DriveFilesDeleteDependencies {
+	driveFilesRepository: DriveFilesRepository;
+	driveService: Pick<DriveService, 'deleteFile'>;
+	roleService: Pick<RoleService, 'isModerator'>;
+}
+export function createDriveFilesDeleteProcedure(deps: DriveFilesDeleteDependencies) {
+	return implement(driveManagementContract['drive/files/delete'], { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>()
+		.use(authentication<MiLocalUser>())
+		.use(apiPolicy<MiLocalUser>({ 'name': 'drive/files/delete', 'requireCredential': true, 'kind': 'write:drive' })).use(requirePrincipal<MiLocalUser>())
+		.handler(async ({ input, context }) => {
+			const ps = input;
+			const me = context.principal;
+			const _ip = context.ip;
+			const _headers = context.headers;
+			const file = await deps.driveFilesRepository.findOneBy({ id: ps.fileId });
 
-@Injectable()
-export class DriveFilesDeleteOperation {
-	constructor(
-		@Inject(DI.driveFilesRepository)
-		private driveFilesRepository: DriveFilesRepository,
+			if (file == null) {
+				throw apiError(driveFilesDeleteErrors.noSuchFile);
+			}
 
-		private driveService: DriveService,
-		private roleService: RoleService,
-		private globalEventService: GlobalEventService,
-	) {
-	}
+			if (!await deps.roleService.isModerator(me) && (file.userId !== me.id)) {
+				throw apiError(driveFilesDeleteErrors.accessDenied);
+			}
 
-	async execute(ps: DriveManagementInputs['drive/files/delete'], me: MiLocalUser, _ip: string, _headers: Record<string, string | string[] | undefined>) {
-		const file = await this.driveFilesRepository.findOneBy({ id: ps.fileId });
-
-		if (file == null) {
-			throw apiError(driveFilesDeleteErrors.noSuchFile);
-		}
-
-		if (!await this.roleService.isModerator(me) && (file.userId !== me.id)) {
-			throw apiError(driveFilesDeleteErrors.accessDenied);
-		}
-
-		await this.driveService.deleteFile(file, false, me);
-	}
+			await deps.driveService.deleteFile(file, false, me);
+		});
 }

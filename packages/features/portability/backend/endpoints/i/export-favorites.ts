@@ -6,11 +6,13 @@
 import { implement } from '@orpc/server';
 import { authentication, apiPolicy, requirePrincipal } from '../../../../api/backend/transport/middleware.js';
 import { iExportFavoritesContract } from './export-favorites.contract.js';
-import type { ApiActor } from '../../../../api/backend/transport/context.js';
-import type { PortabilityContext } from '../../api.router.js';
-
-export function createIExportFavoritesProcedure<Actor extends ApiActor>() {
-	return implement(iExportFavoritesContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<PortabilityContext<Actor>>()
-		.use(authentication<Actor>()).use(apiPolicy<Actor>({ 'name': 'i/export-favorites', 'requireCredential': true, 'secure': true, 'limit': { 'duration': 86400000, 'max': 1 } })).use(requirePrincipal<Actor>())
-		.handler(({ input, context }) => context.operations.portability['i/export-favorites'](input, context.principal));
+import type { ApiActor, ApiContext } from '../../../../api/backend/transport/context.js';
+import type { PortabilityDependencies } from '../../api.dependencies.js';
+export function createIExportFavoritesProcedure<Actor extends ApiActor, File extends { id: string; size: number; url: string }>(deps: Pick<PortabilityDependencies<Actor, File>, 'createExportFavoritesJob'>) {
+	return implement(iExportFavoritesContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>()
+		.use(authentication<Actor>()).use(apiPolicy<Actor>({ 'name': iExportFavoritesContract['~orpc'].meta.requestName, 'requireCredential': true, 'secure': true, 'limit': { 'duration': 86400000, 'max': 1 } })).use(requirePrincipal<Actor>())
+		.handler(async ({ context }) => {
+			const actor = context.principal;
+			deps.createExportFavoritesJob({ id: actor.id });
+		});
 }

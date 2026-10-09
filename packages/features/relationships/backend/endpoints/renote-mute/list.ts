@@ -2,34 +2,24 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
+import { implement } from '@orpc/server';
+import type { ApiContext } from '../../../../api/backend/transport/context.js';
+import type { MiLocalUser } from '../../../../users/backend/models/User.js';
+import { authentication, apiPolicy, requirePrincipal } from '../../../../api/backend/transport/middleware.js';
+import { relationshipsContract } from '../relationships.contract.js';
+import type { RelationshipsDependencies } from '../../api.dependencies.js';
+import { toPackedUserDetailed } from '../../../../users/backend/user.schema.js';
+export function createRenoteMuteListProcedure<Actor extends MiLocalUser>(deps: Pick<RelationshipsDependencies, 'queryService' | 'renoteMutingsRepository' | 'renoteMutingEntityService'>) {
+	return implement(relationshipsContract["renote-mute/list"], { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>().use(authentication<Actor>()).use(apiPolicy<Actor>({ name: 'renote-mute/list', requireCredential: true, kind: 'read:mutes' })).use(requirePrincipal<Actor>())
+		.handler(async ({ input, context }) => {
+			const ps = input;
+			const me = context.principal;
+			const query = deps.queryService.makePaginationQuery(deps.renoteMutingsRepository.createQueryBuilder('muting'), ps.sinceId, ps.untilId, ps.sinceDate, ps.untilDate)
+				.andWhere('muting.muterId = :meId', { meId: me.id });
 
-import { Inject, Injectable } from '@nestjs/common';
-import { QueryService } from '@features/notes/backend/services/QueryService.js';
-import { DI } from '@/di-symbols.js';
-import { RenoteMutingEntityService } from '../../serializers/RenoteMutingEntityService.js';
-import type { MiLocalUser } from '@features/users/backend/models/User.js';
-import type { RelationshipsInputs } from '../relationships.contract.js';
-
-import type { RenoteMutingsRepository } from '@features/persistence/backend/repositories/models.js';
-
-@Injectable()
-export class RenoteMuteListOperation {
-	constructor(
-		@Inject(DI.renoteMutingsRepository)
-		private renoteMutingsRepository: RenoteMutingsRepository,
-
-		private renoteMutingEntityService: RenoteMutingEntityService,
-		private queryService: QueryService,
-	) {}
-
-	async execute(ps: RelationshipsInputs['renote-mute/list'], me: MiLocalUser) {
-		const query = this.queryService.makePaginationQuery(this.renoteMutingsRepository.createQueryBuilder('muting'), ps.sinceId, ps.untilId, ps.sinceDate, ps.untilDate)
-			.andWhere('muting.muterId = :meId', { meId: me.id });
-
-		const mutings = await query
-			.limit(ps.limit)
-			.getMany();
-
-		return await this.renoteMutingEntityService.packMany(mutings, me);
-	}
+			const mutings = await query
+				.limit(ps.limit)
+				.getMany();
+			return (await deps.renoteMutingEntityService.packMany(mutings, me)).map(row => ({ ...row, mutee: toPackedUserDetailed(row.mutee) }));
+		});
 }

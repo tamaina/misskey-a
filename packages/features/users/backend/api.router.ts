@@ -4,34 +4,51 @@
  */
 
 import { implement } from '@orpc/server';
-import { authentication, apiPolicy, requirePrincipal } from '../../api/backend/transport/middleware.js';
-import { usersContract, type UsersInputs, type UsersOutputs } from './api.contract.js';
-import type { ApiActor, ApiContext, ApiToken } from '../../api/backend/transport/context.js';
-export type UsersOperations<Actor extends ApiActor> = {
-	[Name in keyof UsersInputs]: (input: UsersInputs[Name], actor: Name extends 'users' | 'users/show' | 'users/achievements' ? Actor | null : Actor, token: ApiToken | null, ip: string) => Promise<UsersOutputs[Name]>;
-};
-export type UsersContext<Actor extends ApiActor> = ApiContext<Actor> & { operations: { users: UsersOperations<Actor> } };
-export function createUsersRouter<Actor extends ApiActor>() {
-	const api = implement(usersContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<UsersContext<Actor>>().use(authentication<Actor>());
-	return api.router({
-		'admin/accounts/delete': api['admin/accounts/delete'].use(apiPolicy<Actor>({ name: 'admin/accounts/delete', requireCredential: true, requireAdmin: true, kind: 'write:admin:account' })).use(requirePrincipal<Actor>()).handler(({ input, context }) => context.operations.users['admin/accounts/delete'](input, context.principal, context.token, context.ip)),
-		'admin/accounts/find-by-email': api['admin/accounts/find-by-email'].use(apiPolicy<Actor>({ name: 'admin/accounts/find-by-email', requireCredential: true, requireAdmin: true, kind: 'read:admin:account' })).use(requirePrincipal<Actor>()).handler(({ input, context }) => context.operations.users['admin/accounts/find-by-email'](input, context.principal, context.token, context.ip)),
-		'admin/delete-account': api['admin/delete-account'].use(apiPolicy<Actor>({ name: 'admin/delete-account', requireCredential: true, requireAdmin: true, kind: 'write:admin:delete-account' })).use(requirePrincipal<Actor>()).handler(({ input, context }) => context.operations.users['admin/delete-account'](input, context.principal, context.token, context.ip)),
-		'admin/update-proxy-account': api['admin/update-proxy-account'].use(apiPolicy<Actor>({ name: 'admin/update-proxy-account', requireCredential: true, requireModerator: true, kind: 'write:admin:account' })).use(requirePrincipal<Actor>()).handler(({ input, context }) => context.operations.users['admin/update-proxy-account'](input, context.principal, context.token, context.ip)),
-		'i': api['i'].use(apiPolicy<Actor>({ name: 'i', requireCredential: true, kind: 'read:account' })).use(requirePrincipal<Actor>()).handler(({ input, context }) => context.operations.users['i'](input, context.principal, context.token, context.ip)),
-		'i/claim-achievement': api['i/claim-achievement'].use(apiPolicy<Actor>({ name: 'i/claim-achievement', requireCredential: true, prohibitMoved: true, kind: 'write:account' })).use(requirePrincipal<Actor>()).handler(({ input, context }) => context.operations.users['i/claim-achievement'](input, context.principal, context.token, context.ip)),
-		'i/delete-account': api['i/delete-account'].use(apiPolicy<Actor>({ name: 'i/delete-account', requireCredential: true, secure: true })).use(requirePrincipal<Actor>()).handler(({ input, context }) => context.operations.users['i/delete-account'](input, context.principal, context.token, context.ip)),
-		'i/move': api['i/move'].use(apiPolicy<Actor>({ name: 'i/move', requireCredential: true, secure: true, prohibitMoved: true, limit: {
-			duration: 86400000,
-			max: 5,
-		} })).use(requirePrincipal<Actor>()).handler(({ input, context }) => context.operations.users['i/move'](input, context.principal, context.token, context.ip)),
-		'i/update': api['i/update'].use(apiPolicy<Actor>({ name: 'i/update', requireCredential: true, kind: 'write:account', limit: {
-			duration: 3600000,
-			max: 20,
-		} })).use(requirePrincipal<Actor>()).handler(({ input, context }) => context.operations.users['i/update'](input, context.principal, context.token, context.ip)),
-		'users': api['users'].use(apiPolicy<Actor>({ name: 'users' })).handler(({ input, context }) => context.operations.users['users'](input, context.principal, context.token, context.ip)),
-		'users/achievements': api['users/achievements'].use(apiPolicy<Actor>({ name: 'users/achievements' })).handler(({ input, context }) => context.operations.users['users/achievements'](input, context.principal, context.token, context.ip)),
-		'users/show': api['users/show'].use(apiPolicy<Actor>({ name: 'users/show' })).handler(({ input, context }) => context.operations.users['users/show'](input, context.principal, context.token, context.ip)),
-		'users/update-memo': api['users/update-memo'].use(apiPolicy<Actor>({ name: 'users/update-memo', requireCredential: true, kind: 'write:account' })).use(requirePrincipal<Actor>()).handler(({ input, context }) => context.operations.users['users/update-memo'](input, context.principal, context.token, context.ip)),
+import { usersContract } from './api.contract.js';
+import type { ApiContext } from '@features/api/backend/transport/context.js';
+import type { MiLocalUser } from './models/User.js';
+import { createAdminAccountsDeleteProcedure, type AdminAccountsDeleteDependencies } from './endpoints/admin/accounts/delete.js';
+import { createAdminAccountsFindByEmailProcedure, type AdminAccountsFindByEmailDependencies } from './endpoints/admin/accounts/find-by-email.js';
+import { createAdminDeleteAccountProcedure, type AdminDeleteAccountDependencies } from './endpoints/admin/delete-account.js';
+import { createAdminUpdateProxyAccountProcedure, type AdminUpdateProxyAccountDependencies } from './endpoints/admin/update-proxy-account.js';
+import { createIProcedure, type IDependencies } from './endpoints/i.js';
+import { createIClaimAchievementProcedure, type IClaimAchievementDependencies } from './endpoints/i/claim-achievement.js';
+import { createIDeleteAccountProcedure, type IDeleteAccountDependencies } from './endpoints/i/delete-account.js';
+import { createIMoveProcedure, type IMoveDependencies } from './endpoints/i/move.js';
+import { createIUpdateProcedure, type IUpdateDependencies } from './endpoints/i/update.js';
+import { createUsersProcedure, type UsersDependencies } from './endpoints/users.js';
+import { createUsersAchievementsProcedure, type UsersAchievementsDependencies } from './endpoints/users/achievements.js';
+import { createUsersShowProcedure, type UsersShowDependencies } from './endpoints/users/show.js';
+import { createUsersUpdateMemoProcedure, type UsersUpdateMemoDependencies } from './endpoints/users/update-memo.js';
+export interface UsersRouterDependencies {
+	'admin/accounts/delete': AdminAccountsDeleteDependencies;
+	'admin/accounts/find-by-email': AdminAccountsFindByEmailDependencies;
+	'admin/delete-account': AdminDeleteAccountDependencies;
+	'admin/update-proxy-account': AdminUpdateProxyAccountDependencies;
+	'i': IDependencies;
+	'i/claim-achievement': IClaimAchievementDependencies;
+	'i/delete-account': IDeleteAccountDependencies;
+	'i/move': IMoveDependencies;
+	'i/update': IUpdateDependencies;
+	'users': UsersDependencies;
+	'users/achievements': UsersAchievementsDependencies;
+	'users/show': UsersShowDependencies;
+	'users/update-memo': UsersUpdateMemoDependencies;
+}
+export function createUsersRouter(deps: UsersRouterDependencies) {
+	return implement(usersContract).$context<ApiContext<MiLocalUser>>().router({
+		'admin/accounts/delete': createAdminAccountsDeleteProcedure(deps['admin/accounts/delete']),
+		'admin/accounts/find-by-email': createAdminAccountsFindByEmailProcedure(deps['admin/accounts/find-by-email']),
+		'admin/delete-account': createAdminDeleteAccountProcedure(deps['admin/delete-account']),
+		'admin/update-proxy-account': createAdminUpdateProxyAccountProcedure(deps['admin/update-proxy-account']),
+		'i': createIProcedure(deps['i']),
+		'i/claim-achievement': createIClaimAchievementProcedure(deps['i/claim-achievement']),
+		'i/delete-account': createIDeleteAccountProcedure(deps['i/delete-account']),
+		'i/move': createIMoveProcedure(deps['i/move']),
+		'i/update': createIUpdateProcedure(deps['i/update']),
+		'users': createUsersProcedure(deps['users']),
+		'users/achievements': createUsersAchievementsProcedure(deps['users/achievements']),
+		'users/show': createUsersShowProcedure(deps['users/show']),
+		'users/update-memo': createUsersUpdateMemoProcedure(deps['users/update-memo']),
 	});
 }

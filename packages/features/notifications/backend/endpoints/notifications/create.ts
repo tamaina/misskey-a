@@ -6,13 +6,22 @@
 import { implement } from '@orpc/server';
 import { authentication, apiPolicy, requirePrincipal } from '../../../../api/backend/transport/middleware.js';
 import { createContract } from './create.contract.js';
-import type { ApiActor } from '../../../../api/backend/transport/context.js';
-import type { NotificationsContext } from '../../operations.js';
-
-export function createCreateProcedure<Actor extends ApiActor>() {
-	return implement(createContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<NotificationsContext<Actor>>()
-		.use(authentication<Actor>())
-		.use(apiPolicy<Actor>({ name: 'notifications/create', requireCredential: true, kind: 'write:notifications', limit: { duration: 60000, max: 10 } }))
-		.use(requirePrincipal<Actor>())
-		.handler(({ input, context }) => context.operations.notifications.create(input, context.principal, context.token));
+import type { ApiContext } from '@features/api/backend/transport/context.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+import type { NotificationsDependencies } from '@features/notifications/backend/api.dependencies.js';
+export type CreateDependencies = Pick<NotificationsDependencies, 'createAppNotification'>;
+export function createCreateProcedure(deps: CreateDependencies) {
+	return implement(createContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>()
+		.use(authentication<MiLocalUser>())
+		.use(apiPolicy<MiLocalUser>({ name: createContract['~orpc'].meta.requestName, requireCredential: true, kind: 'write:notifications', limit: { duration: 60000, max: 10 } }))
+		.use(requirePrincipal<MiLocalUser>())
+		.handler(async ({ input, context }) => {
+			const actor = context.principal;
+			const token = context.token;
+			deps.createAppNotification(actor.id, {
+				appAccessTokenId: token?.id ?? null, customBody: input.body,
+				customHeader: input.header ?? token?.name ?? null,
+				customIcon: input.icon ?? token?.iconUrl ?? null,
+			});
+		});
 }

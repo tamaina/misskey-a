@@ -4,8 +4,9 @@
  */
 
 import { implement } from '@orpc/server';
+import type { CreateFileDependencies } from '../../../create-file.js';
 import { authentication, apiPolicy, requirePrincipal } from '../../../../../api/backend/transport/middleware.js';
-import { apiError } from '../../../../../api/backend/transport/orpc-error.js';
+import { apiError, internalError } from '../../../../../api/backend/transport/orpc-error.js';
 import { drivePilotContract } from './create.contract.js';
 import type { ApiActor, ApiContext } from '../../../../../api/backend/transport/context.js';
 
@@ -13,12 +14,14 @@ function isRecord(input: unknown): input is Record<string, unknown> {
 	return input !== null && typeof input === 'object' && !Array.isArray(input);
 }
 
-export function createDriveFileProcedure<Actor extends ApiActor>() {
+export function createDriveFileProcedure<Actor extends ApiActor, File>(deps: CreateFileDependencies<Actor, File>) {
 	const drive = implement(drivePilotContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>()
 		.use(authentication<Actor>())
-		.use(apiPolicy<Actor>({ name: 'drive/files/create', requireCredential: true, kind: 'write:drive', limit: {
-			key: 'drive/files/create', duration: 3600000, max: 120,
-		}, prohibitMoved: true }))
+		.use(apiPolicy<Actor>({
+			name: 'drive/files/create', requireCredential: true, kind: 'write:drive', limit: {
+				key: 'drive/files/create', duration: 3600000, max: 120,
+			}, prohibitMoved: true
+		}))
 		.use(requirePrincipal<Actor>())
 		.use(async ({ context, next }) => {
 			if (!context.upload) throw apiError({
@@ -34,16 +37,68 @@ export function createDriveFileProcedure<Actor extends ApiActor>() {
 						try {
 							input[key] = JSON.parse(input[key]);
 						} catch {
-							throw apiError({ code: 'INVALID_PARAM', message: 'Invalid param.',
-																								id: '0b5f1631-7c1a-41a6-b399-cce335f34d85' }, { param: key, reason: 'cannot cast to boolean' });
+							throw apiError({
+								code: 'INVALID_PARAM', message: 'Invalid param.',
+								id: '0b5f1631-7c1a-41a6-b399-cce335f34d85'
+							}, { param: key, reason: 'cannot cast to boolean' });
 						}
 					}
 				}
 			}
 			return next();
 		});
-	return drive.files.create.handler(({ input, context }) => {
+	return drive.files.create.handler(async ({ input, context }) => {
 		if (input.file !== context.upload.file) throw new Error('Upload resource does not match its wire File');
-		return context.services.createFile(input, context.principal, context.upload, context);
+		const actor = context.principal;
+		const upload = context.upload;
+		const request = context;
+		let name = input.name ?? upload.name;
+		if (name !== null) {
+			name = name.trim();
+			if (name.length === 0 || name === 'blob') name = null;
+			else if (!deps.validateFileName(name)) throw apiError({
+				code: 'INVALID_FILE_NAME', message: 'Invalid file name.',
+				id: 'f449b209-0c60-4e51-84d5-29486263bfd4',
+			});
+		}
+		let packed: Awaited<ReturnType<typeof deps.pack>>;
+		try {
+			const file = await deps.addFile({
+				user: actor, path: upload.path, name, comment: input.comment, folderId: input.folderId,
+				force: input.force, sensitive: input.isSensitive,
+				requestIp: deps.enableIpLogging() ? request.ip : null,
+				requestHeaders: deps.enableIpLogging() ? request.headers : null,
+			});
+			packed = await deps.pack(file);
+		} catch (error) {
+			deps.logError(error);
+			const id = error !== null && typeof error === 'object' && 'id' in error ? error.id : undefined;
+			if (id === '282f77bf-5816-4f72-9264-aa14d8261a21') throw apiError({
+				code: 'INAPPROPRIATE', message: 'Cannot upload the file because it has been determined that it possibly contains inappropriate content.',
+				id: 'bec5bd69-fba3-43c9-b4fb-2894b66ad5d2',
+			});
+			if (id === 'c6244ed2-a39a-4e1c-bf93-f0fbd7764fa6') throw apiError({
+				code: 'NO_FREE_SPACE', message: 'Cannot upload the file because you have no free space of drive.',
+				id: 'd08dbc37-a6a9-463a-8c47-96c32ab5f064',
+			});
+			if (id === 'f9e4e5f3-4df4-40b5-b400-f236945f7073') throw apiError({
+				code: 'MAX_FILE_SIZE_EXCEEDED', message: 'Cannot upload the file because it exceeds the maximum file size.',
+				id: 'b9d8c348-33f0-4673-b9a9-5d4da058977a', status: 413,
+			});
+			if (id === 'bd71c601-f9b0-4808-9137-a330647ced9b') throw apiError({
+				code: 'UNALLOWED_FILE_TYPE', message: 'Cannot upload the file because it is an unallowed file type.',
+				id: '4becd248-7f2c-48c4-a9f0-75edc4f9a1ea',
+			});
+			throw apiError(internalError);
+		}
+		if (packed.folder != null || packed.user != null || packed.userId != null) {
+			throw new Error('Self upload packing returned unexpected relationship fields');
+		}
+		// Copy without stripping unknown fields. Output validation rejects undeclared fields.
+		const properties = { ...packed.properties };
+		for (const key of ['width', 'height', 'orientation', 'avgColor'] as const) {
+			if (properties[key] === undefined) delete properties[key];
+		}
+		return { ...packed, properties, folder: null, user: null, userId: null };
 	});
 }

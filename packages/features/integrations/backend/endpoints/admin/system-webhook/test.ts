@@ -2,21 +2,49 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-
+import { WebhookTestService } from '../../../services/WebhookTestService.js';
+import { apiError } from '../../../../../api/backend/transport/orpc-error.js';
+import type { MiLocalUser } from '../../../../../users/backend/models/User.js';
+import * as v from 'valibot';
+import { adminSystemWebhookTestErrors, adminSystemWebhookTestContract } from './test.contract.js';
 import { implement } from '@orpc/server';
 import { authentication, apiPolicy, requirePrincipal } from '../../../../../api/backend/transport/middleware.js';
-import type { ApiActor } from '../../../../../api/backend/transport/context.js';
-import type { IntegrationsContext } from '../../../operations.js';
-import { adminSystemWebhookTestContract } from './test.contract.js';
+import type { ApiContext } from '../../../../../api/backend/transport/context.js';
 import ms from 'ms';
+export interface AdminSystemWebhookTestDependencies {
+	webhookTestService: Pick<WebhookTestService, 'testSystemWebhook'>;
+}
+export function createAdminSystemWebhookTestProcedure(deps: AdminSystemWebhookTestDependencies) {
+	return implement(adminSystemWebhookTestContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>()
+		.use(authentication<MiLocalUser>())
+		.use(apiPolicy<MiLocalUser>({
+			name: 'admin/system-webhook/test', requireCredential: true, requireModerator: true, secure: true, kind: 'read:admin:system-webhook', limit: {
+				duration: ms('15min'),
+				max: 60,
+			}
+		}))
+		.use(requirePrincipal<MiLocalUser>())
+		.handler(async ({ input, context }) => {
+			const ps = input;
+			const result = await (async () => {
+				try {
+					await deps.webhookTestService.testSystemWebhook({
+						webhookId: ps.webhookId,
+						type: ps.type,
+						override: ps.override,
+					});
+				} catch (e) {
+					if (e instanceof WebhookTestService.NoSuchWebhookError) {
+						throw apiError(adminSystemWebhookTestErrors.noSuchWebhook);
+					}
+					throw e;
+				}
+			})();
+			return v.parse(requiredSchema(adminSystemWebhookTestContract['~orpc'].outputSchema), result);
+		});
+}
 
-export function createAdminSystemWebhookTestProcedure<Actor extends ApiActor>() {
-	return implement(adminSystemWebhookTestContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<IntegrationsContext<Actor>>()
-		.use(authentication<Actor>())
-		.use(apiPolicy<Actor>({ name: 'admin/system-webhook/test', requireCredential: true, requireModerator: true, secure: true, kind: 'read:admin:system-webhook', limit: {
-		duration: ms('15min'),
-		max: 60,
-	} }))
-		.use(requirePrincipal<Actor>())
-		.handler(({ input, context }) => context.operations.integrations.adminSystemWebhookTest(input, context.principal));
+function requiredSchema<Schema>(schema: Schema | undefined): Schema {
+	if (schema === undefined) throw new Error('Contract must declare its schema');
+	return schema;
 }

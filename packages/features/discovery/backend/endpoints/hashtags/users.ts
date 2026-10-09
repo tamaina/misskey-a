@@ -2,30 +2,24 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-
-import { Inject, Injectable } from '@nestjs/common';
-
 import { safeForSql } from '@features/persistence/backend/utility/safe-for-sql.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
-import { DI } from '@/di-symbols.js';
 import { normalizeForSearch } from '../../utility/normalize-for-search.js';
 import type { UsersRepository } from '@features/persistence/backend/repositories/models.js';
-import type { DiscoveryInputs } from '../discovery.contract.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
-
-@Injectable()
-export class HashtagsUsersOperation {
-	constructor(
-		@Inject(DI.usersRepository)
-		private usersRepository: UsersRepository,
-
-		private userEntityService: UserEntityService,
-	) {
-	}
-
-	async execute(ps: DiscoveryInputs['hashtags/users'], me: MiLocalUser | null) {
+import { implement } from '@orpc/server';
+import { authentication, apiPolicy } from '@features/api/backend/transport/middleware.js';
+import type { ApiContext } from '@features/api/backend/transport/context.js';
+import { discoveryContract, type DiscoveryInputs } from '../discovery.contract.js';
+import { toPackedUserDetailed } from '@features/users/backend/user.schema.js';
+export interface HashtagsUsersDependencies {
+	usersRepository: UsersRepository;
+	userEntityService: UserEntityService;
+}
+export function createHashtagsUsersProcedure<Actor extends MiLocalUser>(deps: HashtagsUsersDependencies) {
+	const handler = async ({ input: ps, context: { principal: me } }: { input: DiscoveryInputs['hashtags/users']; context: ApiContext<Actor> & { principal: Actor | null } }) => {
 		if (!safeForSql(normalizeForSearch(ps.tag))) throw new Error('Injection');
-		const query = this.usersRepository.createQueryBuilder('user')
+		const query = deps.usersRepository.createQueryBuilder('user')
 			.where(':tag <@ user.tags', { tag: [normalizeForSearch(ps.tag)] })
 			.andWhere('user.isSuspended = FALSE');
 
@@ -54,7 +48,7 @@ export class HashtagsUsersOperation {
 			.limit(ps.limit)
 			.offset(ps.offset)
 			.getMany();
-
-		return await this.userEntityService.packMany(users, me, { schema: 'UserDetailed' });
-	}
+		return (await deps.userEntityService.packMany(users, me, { schema: 'UserDetailed' })).map(user => toPackedUserDetailed(user));
+	};
+	return implement(discoveryContract['hashtags/users'], { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>().use(authentication<Actor>()).use(apiPolicy<Actor>({ name: discoveryContract['hashtags/users']['~orpc'].meta.requestName })).handler(handler);
 }

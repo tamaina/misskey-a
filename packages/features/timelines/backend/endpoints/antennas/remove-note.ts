@@ -5,14 +5,31 @@
 
 import { implement } from '@orpc/server';
 import { authentication, apiPolicy, requirePrincipal } from '../../../../api/backend/transport/middleware.js';
-import { antennasRemoveNoteContract } from './remove-note.contract.js';
-import type { ApiActor } from '../../../../api/backend/transport/context.js';
-import type { TimelinesContext } from '../../operations.js';
-
-export function createAntennasRemoveNoteProcedure<Actor extends ApiActor>() {
-	return implement(antennasRemoveNoteContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<TimelinesContext<Actor>>()
+import { antennasRemoveNoteContract, antennasRemoveNoteErrors } from './remove-note.contract.js';
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
+import { FanoutTimelineService } from '../../services/FanoutTimelineService.js';
+import type { AntennasRepository } from '@features/persistence/backend/repositories/models.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+import type { ApiContext } from '@features/api/backend/transport/context.js';
+export interface AntennasRemoveNoteDependencies {
+	antennasRepository: AntennasRepository;
+	fanoutTimelineService: FanoutTimelineService;
+}
+export function createAntennasRemoveNoteProcedure<Actor extends MiLocalUser>(deps: AntennasRemoveNoteDependencies) {
+	return implement(antennasRemoveNoteContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>()
 		.use(authentication<Actor>())
-		.use(apiPolicy<Actor>({ name: 'antennas/remove-note', requireCredential: true, kind: 'write:account', prohibitMoved: true }))
+		.use(apiPolicy<Actor>({ name: antennasRemoveNoteContract['~orpc'].meta.requestName, requireCredential: true, kind: 'write:account', prohibitMoved: true }))
 		.use(requirePrincipal<Actor>())
-		.handler(({ input, context }) => context.operations.timelines.antennasRemoveNote(input, context.principal));
+		.handler(async ({ input, context }) => {
+			const ps = input;
+			const me = context.principal;
+			const antenna = await deps.antennasRepository.findOneBy({
+				id: ps.antennaId,
+				userId: me.id,
+			});
+			if (antenna == null) {
+				throw apiError(antennasRemoveNoteErrors.noSuchAntenna);
+			}
+			await deps.fanoutTimelineService.remove(`antennaTimeline:${antenna.id}`, ps.noteId);
+		});
 }

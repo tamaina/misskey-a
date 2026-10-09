@@ -2,40 +2,33 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-
-import { Inject, Injectable } from '@nestjs/common';
+import { implement } from '@orpc/server';
+import type { ApiContext } from '../../../../../api/backend/transport/context.js';
+import type { MiLocalUser } from '../../../../../users/backend/models/User.js';
+import { authentication, apiPolicy, requirePrincipal } from '../../../../../api/backend/transport/middleware.js';
+import { relationshipsContract } from '../../relationships.contract.js';
+import type { RelationshipsDependencies } from '../../../api.dependencies.js';
 import { apiError } from '@features/api/backend/transport/orpc-error.js';
-import { DI } from '@/di-symbols.js';
-import { UserListEntityService } from '../../../serializers/UserListEntityService.js';
 import { relationshipsErrors } from '../../relationships.errors.js';
-import type { MiLocalUser } from '@features/users/backend/models/User.js';
-import type { RelationshipsInputs } from '../../relationships.contract.js';
-import type { UserListsRepository } from '@features/persistence/backend/repositories/models.js';
+export function createUsersListsUpdateProcedure<Actor extends MiLocalUser>(deps: Pick<RelationshipsDependencies, 'userListsRepository' | 'userListEntityService'>) {
+	return implement(relationshipsContract["users/lists/update"], { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>().use(authentication<Actor>()).use(apiPolicy<Actor>({ name: 'users/lists/update', requireCredential: true, kind: 'write:account' })).use(requirePrincipal<Actor>())
+		.handler(async ({ input, context }) => {
+			const ps = input;
+			const me = context.principal;
+			const userList = await deps.userListsRepository.findOneBy({
+				id: ps.listId,
+				userId: me.id,
+			});
 
-@Injectable()
-export class UsersListsUpdateOperation {
-	constructor(
-		@Inject(DI.userListsRepository)
-		private userListsRepository: UserListsRepository,
+			if (userList == null) {
+				throw apiError(relationshipsErrors['users/lists/update'].noSuchList);
+			}
 
-		private userListEntityService: UserListEntityService,
-	) {}
+			await deps.userListsRepository.update(userList.id, {
+				name: ps.name,
+				isPublic: ps.isPublic,
+			});
 
-	async execute(ps: RelationshipsInputs['users/lists/update'], me: MiLocalUser) {
-		const userList = await this.userListsRepository.findOneBy({
-			id: ps.listId,
-			userId: me.id,
+			return await deps.userListEntityService.pack(userList.id);
 		});
-
-		if (userList == null) {
-			throw apiError(relationshipsErrors['users/lists/update'].noSuchList);
-		}
-
-		await this.userListsRepository.update(userList.id, {
-			name: ps.name,
-			isPublic: ps.isPublic,
-		});
-
-		return await this.userListEntityService.pack(userList.id);
-	}
 }

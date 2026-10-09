@@ -6,7 +6,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createRouterClient } from '@orpc/server';
-import { createOperationsApiOperations, createOperationsRouter, operationsApplicationMap } from '../../../backend/built/features/operations/backend.js';
+import { createOperationsRouter } from '../../../backend/built/features/operations/backend.js';
 
 const actor = { id: 'moderator', isSuspended: false, movedToUri: null };
 const commands = ['Pause', 'Resume', 'Clear', 'PromoteJobs', 'RetryJob', 'RemoveJob'];
@@ -17,18 +17,12 @@ function fixture({ principal = actor, token = null, overrides = {} } = {}) {
  const queue = Object.fromEntries(['Pause', 'Resume', 'Clear', 'PromoteJobs', 'RetryJob', 'RemoveJob'].map(command => ['queue' + command, async (...args) => { calls.push([command, ...args]); }]));
  Object.assign(queue, overrides);
  const log = { log: (me, action) => { calls.push(['log', me.id, action]); } };
- const applications = Object.fromEntries(commands.map(command => {
-  const name = 'adminQueue' + command;
-  return [name, new operationsApplicationMap[name](queue, log)];
- }));
- const operations = createOperationsApiOperations(applications);
  const context = {
   credential: principal ? 'credential' : null, ip: '192.0.2.1', headers: {},
   services: { authenticate: async () => [principal, token], limitActor: () => actor.id, rateLimitFactor: async () => 1, limit: async () => null },
   authorization: { rootUserId: () => actor.id, roles: async () => [], policyAllowed: async () => false },
-  operations: { operations },
  };
- return { calls, client: createRouterClient(createOperationsRouter(), { context }) };
+ return { calls, client: createRouterClient(createOperationsRouter({ queueService: queue, moderationLogService: log }), { context }) };
 }
 
 test('native queue commands accept every queue selector and reject invalid inputs', async () => {

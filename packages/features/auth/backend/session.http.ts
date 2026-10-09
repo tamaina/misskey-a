@@ -8,7 +8,7 @@ import type { StandardHandlerOptions } from '@orpc/server/standard';
 import { STATUS_CODES } from 'node:http';
 import * as v from 'valibot';
 import type { FastifyInstance } from 'fastify';
-import { createAuthSessionRouter, type AuthSessionContext, type AuthSessionOperations } from './session.router.js';
+import { createAuthSessionRouter, type AuthSessionContext } from './session.router.js';
 import { requestRoutes } from '../../api/shared/api-routing.js';
 import { sessionContract } from './session.contract.js';
 import { fastifyFailureSchema } from './session-errors.schema.js';
@@ -23,8 +23,8 @@ function sessionStatusInterceptor(): NonNullable<StandardHandlerOptions<AuthSess
 }
 
 /** The standalone routes retain the standard Fastify envelope, independent of canonical API errors. */
-export function registerAuthSessionHttp(fastify: FastifyInstance, operations: AuthSessionOperations) {
-	const handler = new OpenAPIHandler(createAuthSessionRouter(), {
+export function registerAuthSessionHttp(fastify: FastifyInstance, router: ReturnType<typeof createAuthSessionRouter>) {
+	const handler = new OpenAPIHandler(router, {
 		interceptors: [sessionStatusInterceptor()],
 		customErrorResponseBodyEncoder: error => {
 			const data = v.safeParse(fastifyFailureSchema, error.data);
@@ -35,7 +35,7 @@ export function registerAuthSessionHttp(fastify: FastifyInstance, operations: Au
 	for (const route of requestRoutes(sessionContract)) {
 		fastify.post(route.httpPath, async (request, reply) => {
 			const context: AuthSessionContext = {
-				operations, request: { ip: request.ip, headers: request.headers }, response: {},
+				request: { ip: request.ip, headers: request.headers }, response: {},
 				effects: {
 					code: status => { context.response.status = status; },
 					header: (name, value) => { reply.header(name, value); },

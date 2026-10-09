@@ -6,13 +6,17 @@
 import { implement } from '@orpc/server';
 import { authentication, apiPolicy, requirePrincipal } from '../../../../api/backend/transport/middleware.js';
 import { flushContract } from './flush.contract.js';
-import type { ApiActor } from '../../../../api/backend/transport/context.js';
-import type { NotificationsContext } from '../../operations.js';
-
-export function createFlushProcedure<Actor extends ApiActor>() {
-	return implement(flushContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<NotificationsContext<Actor>>()
-		.use(authentication<Actor>())
-		.use(apiPolicy<Actor>({ name: 'notifications/flush', requireCredential: true, kind: 'write:notifications' }))
-		.use(requirePrincipal<Actor>())
-		.handler(({ input, context }) => context.operations.notifications.flush(input, context.principal));
+import type { ApiContext } from '@features/api/backend/transport/context.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+import type { NotificationsDependencies } from '@features/notifications/backend/api.dependencies.js';
+export type FlushDependencies = Pick<NotificationsDependencies, 'flushAllNotifications'>;
+export function createFlushProcedure(deps: FlushDependencies) {
+	return implement(flushContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>()
+		.use(authentication<MiLocalUser>())
+		.use(apiPolicy<MiLocalUser>({ name: flushContract['~orpc'].meta.requestName, requireCredential: true, kind: 'write:notifications' }))
+		.use(requirePrincipal<MiLocalUser>())
+		.handler(async ({ input, context }) => {
+			const actor = context.principal;
+			void deps.flushAllNotifications(actor.id);
+		});
 }

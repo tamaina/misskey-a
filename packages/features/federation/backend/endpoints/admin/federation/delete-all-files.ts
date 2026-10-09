@@ -5,14 +5,30 @@
 
 import { implement } from '@orpc/server';
 import { authentication, apiPolicy, requirePrincipal } from '../../../../../api/backend/transport/middleware.js';
-import type { ApiActor } from '../../../../../api/backend/transport/context.js';
-import type { FederationContext } from '../../../operations.js';
+import type { ApiActor, ApiContext } from '../../../../../api/backend/transport/context.js';
 import { adminFederationDeleteAllFilesContract } from './delete-all-files.contract.js';
-
-export function createAdminFederationDeleteAllFilesProcedure<Actor extends ApiActor>() {
-	return implement(adminFederationDeleteAllFilesContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<FederationContext<Actor>>()
+import type { DriveFilesRepository } from '../../../../../persistence/backend/repositories/models.js';
+import type { DriveService } from '../../../../../drive/backend/services/DriveService.js';
+import * as v from 'valibot';
+export interface AdminFederationDeleteAllFilesDependencies {
+	driveFilesRepository: Pick<DriveFilesRepository, 'findBy'>;
+	driveService: Pick<DriveService, 'deleteFile'>;
+}
+export function createAdminFederationDeleteAllFilesProcedure<Actor extends ApiActor>(deps: AdminFederationDeleteAllFilesDependencies) {
+	return implement(adminFederationDeleteAllFilesContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>()
 		.use(authentication<Actor>())
-		.use(apiPolicy<Actor>({ name: 'admin/federation/delete-all-files', requireCredential: true, requireModerator: true, kind: 'write:admin:federation' }))
+		.use(apiPolicy<Actor>({ name: adminFederationDeleteAllFilesContract['~orpc'].meta.requestName, requireCredential: true, requireModerator: true, kind: 'write:admin:federation' }))
 		.use(requirePrincipal<Actor>())
-		.handler(({ input, context }) => context.operations.federation.adminFederationDeleteAllFiles(input, context.principal));
+		.handler(async ({ input }) => {
+			const ps = input;
+			const result = await (async () => {
+				const files = await deps.driveFilesRepository.findBy({
+					userHost: ps.host,
+				});
+				for (const file of files) {
+					deps.driveService.deleteFile(file);
+				}
+			})();
+			return v.parse(adminFederationDeleteAllFilesContract['~orpc'].outputSchema!, result);
+		});
 }

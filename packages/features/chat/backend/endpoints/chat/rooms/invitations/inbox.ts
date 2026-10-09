@@ -5,47 +5,39 @@
 
 import type { InferSchemaOutput } from '@orpc/contract';
 import { implement } from '@orpc/server';
-import { Inject, Injectable } from '@nestjs/common';
-import { IdService } from '@features/runtime/backend/services/IdService.js';
+import { type IdService } from '@features/runtime/backend/services/IdService.js';
 import * as v from 'valibot';
-import { DI } from '@/di-symbols.js';
 import { authentication, apiPolicy, requirePrincipal } from '../../../../../../api/backend/transport/middleware.js';
-import { ChatService } from '../../../../services/ChatService.js';
-import { ChatEntityService } from '../../../../serializers/ChatEntityService.js';
-import { chatRoomsInvitationsInboxContract, chatRoomsInvitationsInboxPolicy, chatRoomsInvitationsInboxErrors } from './inbox.contract.js';
-import type { ApiActor } from '../../../../../../api/backend/transport/context.js';
-import type { ChatApiContext } from '../../../../operations.js';
-
+import { type ChatService } from '../../../../services/ChatService.js';
+import { type ChatEntityService } from '../../../../serializers/ChatEntityService.js';
+import { chatRoomsInvitationsInboxContract, chatRoomsInvitationsInboxPolicy } from './inbox.contract.js';
 import type { MiLocalUser } from '../../../../../../users/backend/models/User.js';
-
-export function createChatRoomsInvitationsInboxProcedure<Actor extends ApiActor>() {
-	return implement(chatRoomsInvitationsInboxContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ChatApiContext<Actor>>()
-		.use(authentication<Actor>())
-		.use(apiPolicy<Actor>(chatRoomsInvitationsInboxPolicy))
-		.use(requirePrincipal<Actor>())
-		.handler(({ input, context }) => context.operations.chat.chatRoomsInvitationsInbox(input, context.principal));
+import type { ApiContext } from '@features/api/backend/transport/context.js';
+export interface ChatRoomsInvitationsInboxDependencies {
+	chatEntityService: ChatEntityService;
+	chatService: ChatService;
+	idService: IdService;
 }
-
-@Injectable()
-export class ChatRoomsInvitationsInboxOperation {
-	constructor(
-		private chatEntityService: ChatEntityService,
-		private chatService: ChatService,
-		private idService: IdService,
-	) {}
-	async execute(ps: InferSchemaOutput<NonNullable<typeof chatRoomsInvitationsInboxContract['~orpc']['inputSchema']>>, me: MiLocalUser): Promise<InferSchemaOutput<NonNullable<typeof chatRoomsInvitationsInboxContract['~orpc']['outputSchema']>>> {
-		return v.parse(requiredSchema(chatRoomsInvitationsInboxContract['~orpc'].outputSchema), await this.run(ps, me));
+export function createChatRoomsInvitationsInboxProcedure(deps: ChatRoomsInvitationsInboxDependencies) {
+	async function execute(ps: InferSchemaOutput<NonNullable<typeof chatRoomsInvitationsInboxContract['~orpc']['inputSchema']>>, me: MiLocalUser): Promise<InferSchemaOutput<NonNullable<typeof chatRoomsInvitationsInboxContract['~orpc']['outputSchema']>>> {
+		return v.parse(requiredSchema(chatRoomsInvitationsInboxContract['~orpc'].outputSchema), await run(ps, me));
 	}
 
-	private async run(ps: InferSchemaOutput<NonNullable<typeof chatRoomsInvitationsInboxContract['~orpc']['inputSchema']>>, me: MiLocalUser) {
-		const untilId = ps.untilId ?? (ps.untilDate ? this.idService.gen(ps.untilDate!) : null);
-		const sinceId = ps.sinceId ?? (ps.sinceDate ? this.idService.gen(ps.sinceDate!) : null);
+	async function run(ps: InferSchemaOutput<NonNullable<typeof chatRoomsInvitationsInboxContract['~orpc']['inputSchema']>>, me: MiLocalUser) {
+		const untilId = ps.untilId ?? (ps.untilDate ? deps.idService.gen(ps.untilDate!) : null);
+		const sinceId = ps.sinceId ?? (ps.sinceDate ? deps.idService.gen(ps.sinceDate!) : null);
 
-		await this.chatService.checkChatAvailability(me.id, 'read');
+		await deps.chatService.checkChatAvailability(me.id, 'read');
 
-		const invitations = await this.chatService.getReceivedRoomInvitationsWithPagination(me.id, ps.limit, sinceId, untilId);
-		return this.chatEntityService.packRoomInvitations(invitations, me);
+		const invitations = await deps.chatService.getReceivedRoomInvitationsWithPagination(me.id, ps.limit, sinceId, untilId);
+		return deps.chatEntityService.packRoomInvitations(invitations, me);
 	}
+
+	return implement(chatRoomsInvitationsInboxContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>()
+		.use(authentication<MiLocalUser>())
+		.use(apiPolicy<MiLocalUser>(chatRoomsInvitationsInboxPolicy))
+		.use(requirePrincipal<MiLocalUser>())
+		.handler(({ input, context }) => execute(input, context.principal));
 }
 
 function requiredSchema<Schema>(schema: Schema | undefined): Schema {

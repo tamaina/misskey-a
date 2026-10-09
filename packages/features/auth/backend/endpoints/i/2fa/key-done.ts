@@ -4,19 +4,18 @@
  */
 
 import bcrypt from 'bcryptjs';
-import { Inject, Injectable } from '@nestjs/common';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
-import { DI } from '@/di-symbols.js';
 import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
 import type { UserProfilesRepository, UserSecurityKeysRepository } from '@features/persistence/backend/repositories/models.js';
 import { WebAuthnService } from '../../../services/WebAuthnService.js';
 import { apiError } from '@features/api/backend/transport/orpc-error.js';
 import { UserAuthService } from '../../../services/UserAuthService.js';
-
-import type * as v from 'valibot';
-import type { I2faKeyDoneContract } from '../../../api.contract.js';
+import * as v from 'valibot';
+import { I2faKeyDoneContract } from '../../../api.contract.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
-
+import { implement } from '@orpc/server';
+import { authentication, apiPolicy, requirePrincipal } from '../../../../../api/backend/transport/middleware.js';
+import type { ApiContext } from '../../../../../api/backend/transport/context.js';
 export const meta = {
 	requireCredential: true,
 
@@ -36,69 +35,72 @@ export const meta = {
 		},
 	},
 } as const;
+export interface I2faKeyDoneDependencies {
+	userProfilesRepository: UserProfilesRepository;
+	userSecurityKeysRepository: UserSecurityKeysRepository;
+	webAuthnService: Pick<WebAuthnService, 'verifyRegistration'>;
+	userAuthService: Pick<UserAuthService, 'twoFactorAuthenticate'>;
+	userEntityService: Pick<UserEntityService, 'packSelf'>;
+	globalEventService: Pick<GlobalEventService, 'publishMainStream'>;
+}
+export function createI2faKeyDoneProcedure(deps: I2faKeyDoneDependencies) {
+	return implement(I2faKeyDoneContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>().use(authentication<MiLocalUser>()).use(apiPolicy<MiLocalUser>({ name: 'i/2fa/key-done', requireCredential: true, secure: true })).use(requirePrincipal<MiLocalUser>()).handler(async ({ input, context }) => {
+		const ps = input;
+		const me = context.principal;
+		const result = await (async () => {
+			const token = ps.token;
+			const profile = await deps.userProfilesRepository.findOneByOrFail({ userId: me.id });
 
-@Injectable()
-export class I2faKeyDoneOperation {
-	constructor(
-		@Inject(DI.userProfilesRepository)
-		private userProfilesRepository: UserProfilesRepository,
+			if (profile.twoFactorEnabled) {
+				if (token == null) {
+					throw new Error('authentication failed');
+				}
 
-		@Inject(DI.userSecurityKeysRepository)
-		private userSecurityKeysRepository: UserSecurityKeysRepository,
-
-		private webAuthnService: WebAuthnService,
-		private userAuthService: UserAuthService,
-		private userEntityService: UserEntityService,
-		private globalEventService: GlobalEventService,
-	) {}
-
-	async execute(ps: v.InferOutput<NonNullable<typeof I2faKeyDoneContract['~orpc']['inputSchema']>>, me: MiLocalUser) {
-		const token = ps.token;
-		const profile = await this.userProfilesRepository.findOneByOrFail({ userId: me.id });
-
-		if (profile.twoFactorEnabled) {
-			if (token == null) {
-				throw new Error('authentication failed');
+				try {
+					await deps.userAuthService.twoFactorAuthenticate(profile, token);
+				} catch (_) {
+					throw new Error('authentication failed');
+				}
 			}
 
-			try {
-				await this.userAuthService.twoFactorAuthenticate(profile, token);
-			} catch (_) {
-				throw new Error('authentication failed');
+			const passwordMatched = await bcrypt.compare(ps.password, profile.password ?? '');
+			if (!passwordMatched) {
+				throw apiError(meta.errors.incorrectPassword);
 			}
-		}
 
-		const passwordMatched = await bcrypt.compare(ps.password, profile.password ?? '');
-		if (!passwordMatched) {
-			throw apiError(meta.errors.incorrectPassword);
-		}
+			if (!profile.twoFactorEnabled) {
+				throw apiError(meta.errors.twoFactorNotEnabled);
+			}
 
-		if (!profile.twoFactorEnabled) {
-			throw apiError(meta.errors.twoFactorNotEnabled);
-		}
+			const keyInfo = await deps.webAuthnService.verifyRegistration(me.id, ps.credential);
+			const keyId = keyInfo.credentialID;
 
-		const keyInfo = await this.webAuthnService.verifyRegistration(me.id, ps.credential);
-		const keyId = keyInfo.credentialID;
+			await deps.userSecurityKeysRepository.insert({
+				id: keyId,
+				userId: me.id,
+				name: ps.name,
+				publicKey: Buffer.from(keyInfo.credentialPublicKey).toString('base64url'),
+				counter: keyInfo.counter,
+				credentialDeviceType: keyInfo.credentialDeviceType,
+				credentialBackedUp: keyInfo.credentialBackedUp,
+				transports: keyInfo.transports,
+			});
 
-		await this.userSecurityKeysRepository.insert({
-			id: keyId,
-			userId: me.id,
-			name: ps.name,
-			publicKey: Buffer.from(keyInfo.credentialPublicKey).toString('base64url'),
-			counter: keyInfo.counter,
-			credentialDeviceType: keyInfo.credentialDeviceType,
-			credentialBackedUp: keyInfo.credentialBackedUp,
-			transports: keyInfo.transports,
-		});
+			// Publish meUpdated event
+			deps.globalEventService.publishMainStream(me.id, 'meUpdated', await deps.userEntityService.packSelf(me.id, {
+				includeSecrets: true,
+			}));
 
-		// Publish meUpdated event
-		this.globalEventService.publishMainStream(me.id, 'meUpdated', await this.userEntityService.packSelf(me.id, {
-			includeSecrets: true,
-		}));
+			return {
+				id: keyId,
+				name: ps.name,
+			};
+		})();
+		return v.parse(requiredSchema(I2faKeyDoneContract['~orpc'].outputSchema), result);
+	});
+}
 
-		return {
-			id: keyId,
-			name: ps.name,
-		};
-	}
+function requiredSchema<Schema>(schema: Schema | undefined): Schema {
+	if (schema === undefined) throw new Error('Contract must declare its schema');
+	return schema;
 }

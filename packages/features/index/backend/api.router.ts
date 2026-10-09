@@ -4,97 +4,79 @@
  */
 
 import { implement } from '@orpc/server';
-import { createInstanceRouter } from '../../instance/backend/api.router.js';
-import { createNotesRouter } from '../../notes/backend/api.router.js';
-import { createDriveRouter } from '../../drive/backend/api.router.js';
-import { createStatisticsRouter } from '../../statistics/backend/router.js';
-import { createDiscoveryRouter } from '../../discovery/backend/endpoints/discovery.js';
-import { createAnnouncementsRouter } from '../../announcements/backend/api.router.js';
-import { createAvatarDecorationsRouter } from '../../avatar-decorations/backend/api.router.js';
-import { createEmojisRouter } from '../../emojis/backend/api.router.js';
-import { createNotificationsRouter } from '../../notifications/backend/router.js';
-import { createPreferencesRouter } from '../../preferences/backend/router.js';
-import { normalizeError } from '../../api/backend/transport/orpc-error.js';
-
-import { createUsersRouter } from '../../users/backend/api.router.js';
-
-import { createTimelinesRouter } from '../../timelines/backend/router.js';
-
-import { createNoteSearchRouter } from '../../note-search/backend/router.js';
-
-import { createRelationshipsRouter } from '../../relationships/backend/endpoints/relationships.js';
-
-import { createCollectionsRouter } from '../../collections/backend/api.router.js';
 import { pilotContract } from './api.contract.js';
-import type { ApiActor } from '../../api/backend/transport/context.js';
-import type { ApiExecutionContext } from './api.context.js';
-
-import { createChatRouter } from '../../chat/backend/api.router.js';
-
-import { createChannelsRouter } from '../../channels/backend/api.router.js';
-
-import { createPagesRouter } from '../../pages/backend/router.js';
-
-import { createPlayRouter } from '../../play/backend/router.js';
-
-import { createGamesRouter } from '../../games/backend/router.js';
-
-import { createFederationRouter } from '../../federation/backend/router.js';
-
-import { createOperationsRouter } from '../../operations/backend/router.js';
-
-import { createIntegrationsRouter } from '../../integrations/backend/router.js';
-
+import type { ApiContext } from '../../api/backend/transport/context.js';
+import type { MiLocalUser } from '../../users/backend/models/User.js';
+import { normalizeError } from '../../api/backend/transport/orpc-error.js';
 import { createTestProcedure } from '../../api/backend/endpoints/test.js';
-
-import { createDriveManagementRouter } from '../../drive/backend/management.router.js';
-
-import { createPortabilityRouter } from '../../portability/backend/api.router.js';
-
-import { createAuthRouter } from '../../auth/backend/api.router.js';
-
-import { createModerationRouter } from '../../moderation/backend/api.router.js';
-
-import { createRolesRouter } from '../../roles/backend/api.router.js';
-
 import { createClearBrowserCacheProcedure, createClearBrowserCacheGetProcedure } from '../../api/backend/endpoints/clear-browser-cache.js';
-
-export function createApiRouter<Actor extends ApiActor>() {
-	const api = implement(pilotContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiExecutionContext<Actor>>()
+import type { RolesApiProvider } from '../../roles/backend/api.provider.js';
+import type { ModerationApiProvider } from '../../moderation/backend/api.provider.js';
+import type { AuthApiProvider } from '../../auth/backend/api.provider.js';
+import type { PortabilityApiProvider } from '../../portability/backend/api.provider.js';
+import type { DriveManagementApiProvider } from '../../drive/backend/management.provider.js';
+import type { IntegrationsApiProvider } from '../../integrations/backend/api.provider.js';
+import type { OperationsApiProvider } from '../../operations/backend/api.provider.js';
+import type { FederationApiProvider } from '../../federation/backend/api.provider.js';
+import type { GamesApiProvider } from '../../games/backend/api.provider.js';
+import type { PlayApiProvider } from '../../play/backend/api.provider.js';
+import type { PagesApiProvider } from '../../pages/backend/api.provider.js';
+import type { ChannelsApiProvider } from '../../channels/backend/api.provider.js';
+import type { ChatApiProvider } from '../../chat/backend/api.provider.js';
+import type { InstanceApiProvider } from '../../instance/backend/api.provider.js';
+import type { StatisticsApiProvider } from '../../statistics/backend/api.provider.js';
+import type { DiscoveryApiProvider } from '../../discovery/backend/api.provider.js';
+import type { AnnouncementsApiProvider } from '../../announcements/backend/api.provider.js';
+import type { AvatarDecorationsApiProvider } from '../../avatar-decorations/backend/api.provider.js';
+import type { PreferencesApiProvider } from '../../preferences/backend/api.provider.js';
+import type { EmojisApiProvider } from '../../emojis/backend/api.provider.js';
+import type { NotificationsApiProvider } from '../../notifications/backend/api.provider.js';
+import type { NotesApiProvider } from '../../notes/backend/api.provider.js';
+import type { UsersApiProvider } from '../../users/backend/api.provider.js';
+import type { TimelinesApiProvider } from '../../timelines/backend/api.provider.js';
+import type { NoteSearchApiProvider } from '../../note-search/backend/api.provider.js';
+import type { RelationshipsApiProvider } from '../../relationships/backend/api.provider.js';
+import type { CollectionsApiProvider } from '../../collections/backend/api.provider.js';
+import type { DriveApiProvider } from '../../drive/backend/api.provider.js';
+export interface ApiRouterFeatures {
+	roles: ReturnType<RolesApiProvider['compose']>;
+	moderation: ReturnType<ModerationApiProvider['compose']>;
+	auth: ReturnType<AuthApiProvider['compose']>;
+	portability: ReturnType<PortabilityApiProvider['compose']>;
+	driveManagement: ReturnType<DriveManagementApiProvider['compose']>;
+	integrations: ReturnType<IntegrationsApiProvider['compose']>;
+	operations: ReturnType<OperationsApiProvider['compose']>;
+	federation: ReturnType<FederationApiProvider['compose']>;
+	games: ReturnType<GamesApiProvider['compose']>;
+	play: ReturnType<PlayApiProvider['compose']>;
+	pages: ReturnType<PagesApiProvider['compose']>;
+	channels: ReturnType<ChannelsApiProvider['compose']>;
+	chat: ReturnType<ChatApiProvider['compose']>;
+	instance: ReturnType<InstanceApiProvider['compose']>;
+	statistics: ReturnType<StatisticsApiProvider['compose']>;
+	discovery: ReturnType<DiscoveryApiProvider['compose']>;
+	announcements: ReturnType<AnnouncementsApiProvider['compose']>;
+	avatarDecorations: ReturnType<AvatarDecorationsApiProvider['compose']>;
+	preferences: ReturnType<PreferencesApiProvider['compose']>;
+	emojis: ReturnType<EmojisApiProvider['compose']>;
+	notifications: ReturnType<NotificationsApiProvider['compose']>;
+	notes: ReturnType<NotesApiProvider['compose']>;
+	users: ReturnType<UsersApiProvider['compose']>;
+	timelines: ReturnType<TimelinesApiProvider['compose']>;
+	noteSearch: ReturnType<NoteSearchApiProvider['compose']>;
+	relationships: ReturnType<RelationshipsApiProvider['compose']>;
+	collections: ReturnType<CollectionsApiProvider['compose']>;
+	drive: ReturnType<DriveApiProvider['compose']>;
+}
+export function createApiRouter(features: ApiRouterFeatures) {
+	const api = implement(pilotContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>()
 		.use(async ({ context, next }) => {
 			try { return await next(); } catch (error) { throw context.mapError ? context.mapError(error) : normalizeError(error); }
 		});
 	return api.router({
-		clearBrowserCache: createClearBrowserCacheProcedure<Actor>(),
-		clearBrowserCacheGet: createClearBrowserCacheGetProcedure<Actor>(),
-		roles: createRolesRouter<Actor>(),
-		moderation: createModerationRouter<Actor>(),
-		auth: createAuthRouter<Actor>(),
-		portability: createPortabilityRouter<Actor>(),
-		driveManagement: createDriveManagementRouter<Actor>(),
-		test: createTestProcedure<Actor>(),
-		integrations: createIntegrationsRouter<Actor>(),
-		operations: createOperationsRouter<Actor>(),
-		federation: createFederationRouter<Actor>(),
-		games: createGamesRouter<Actor>(),
-		play: createPlayRouter<Actor>(),
-		pages: createPagesRouter<Actor>(),
-		channels: createChannelsRouter<Actor>(),
-		chat: createChatRouter<Actor>(),
-		instance: createInstanceRouter<Actor>(),
-		statistics: createStatisticsRouter<Actor>(),
-		discovery: createDiscoveryRouter<Actor>(),
-		announcements: createAnnouncementsRouter<Actor>(),
-		avatarDecorations: createAvatarDecorationsRouter<Actor>(),
-		preferences: createPreferencesRouter<Actor>(),
-		emojis: createEmojisRouter<Actor>(),
-		notifications: createNotificationsRouter<Actor>(),
-		notes: createNotesRouter<Actor>(),
-		users: createUsersRouter<Actor>(),
-		timelines: createTimelinesRouter<Actor>(),
-		noteSearch: createNoteSearchRouter<Actor>(),
-		relationships: createRelationshipsRouter<Actor>(),
-		collections: createCollectionsRouter<Actor>(),
-		drive: createDriveRouter<Actor>(),
+		clearBrowserCache: createClearBrowserCacheProcedure<MiLocalUser>(),
+		clearBrowserCacheGet: createClearBrowserCacheGetProcedure<MiLocalUser>(),
+		test: createTestProcedure<MiLocalUser>(),
+		...features,
 	});
 }

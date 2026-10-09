@@ -6,6 +6,8 @@
 import type { InferSchemaOutput } from '@orpc/contract';
 import { expect, expectTypeOf, test } from 'vitest';
 import * as v from 'valibot';
+import { createProcedureClient } from '@orpc/server';
+import type { ApiContext } from '@features/api/backend/transport/context.js';
 import { mockDeep } from 'vitest-mock-extended';
 import { ModuleRef } from '@nestjs/core';
 import { EntityNotFoundError } from 'typeorm';
@@ -22,9 +24,9 @@ import { notesDraftsUpdateContract } from '../../backend/endpoints/notes/drafts/
 import { packedNoteDraftSchema, packedNoteReactionSchema, packedNoteReactionWithNoteSchema } from '../../backend/note-aux.schema.js';
 import { NoteDraftEntityService } from '../../backend/serializers/NoteDraftEntityService.js';
 import { NoteReactionEntityService } from '../../backend/serializers/NoteReactionEntityService.js';
-import { NotesCreateOperation as CreateOperation } from '../../backend/endpoints/notes/create.js';
-import { NotesDraftsCreateOperation as DraftCreateOperation } from '../../backend/endpoints/notes/drafts/create.js';
-import { NotesDraftsUpdateOperation as DraftUpdateOperation } from '../../backend/endpoints/notes/drafts/update.js';
+import { createNotesCreateProcedure as CreateOperation } from '../../backend/endpoints/notes/create.js';
+import { createNotesDraftsCreateProcedure as DraftCreateOperation } from '../../backend/endpoints/notes/drafts/create.js';
+import { createNotesDraftsUpdateProcedure as DraftUpdateOperation } from '../../backend/endpoints/notes/drafts/update.js';
 import { MiNoteDraft } from '../../backend/models/NoteDraft.js';
 import type { NoteEntityService } from '../../backend/serializers/NoteEntityService.js';
 import type { NoteDraftService } from '../../backend/services/NoteDraftService.js';
@@ -199,9 +201,9 @@ test('actual create and draft handlers emit the three closed envelopes', async (
 	const model = mockDeep<MiNote>({ id: note.id });
 	create.fetchAndCreate.mockResolvedValue(model); notes.pack.mockResolvedValue(note);
 	const me = mockDeep<MiLocalUser>({ id: user.id });
-	const created = await new CreateOperation(notes, create).execute(v.parse(requiredSchema(notesCreateContract['~orpc'].inputSchema), { text: 'hello' }), me);
-	const createdDraft = await new DraftCreateOperation(drafts, draftSerializer).execute(v.parse(requiredSchema(notesDraftsCreateContract['~orpc'].inputSchema), {}), me);
-	const updatedDraft = await new DraftUpdateOperation(drafts, draftSerializer).execute(v.parse(requiredSchema(notesDraftsUpdateContract['~orpc'].inputSchema), { draftId: draft.id }), me);
+	const created = await createProcedureClient(CreateOperation({ noteEntityService: notes, noteCreateService: create }), { context: apiTestContext(me) })(v.parse(requiredSchema(notesCreateContract['~orpc'].inputSchema), { text: 'hello' }));
+	const createdDraft = await createProcedureClient(DraftCreateOperation({ noteDraftService: drafts, noteDraftEntityService: draftSerializer }), { context: apiTestContext(me) })(v.parse(requiredSchema(notesDraftsCreateContract['~orpc'].inputSchema), {}));
+	const updatedDraft = await createProcedureClient(DraftUpdateOperation({ noteDraftService: drafts, noteDraftEntityService: draftSerializer }), { context: apiTestContext(me) })(v.parse(requiredSchema(notesDraftsUpdateContract['~orpc'].inputSchema), { draftId: draft.id }));
 	expect(created).toEqual({ createdNote: note });
 	expect(createdDraft).toEqual({ createdDraft: packedDraft });
 	expect(updatedDraft).toEqual({ updatedDraft: packedDraft });
@@ -216,4 +218,12 @@ test('actual create and draft handlers emit the three closed envelopes', async (
 function requiredSchema<Schema>(schema: Schema | undefined): Schema {
 	if (schema === undefined) throw new Error('Missing endpoint contract schema');
 	return schema;
+}
+
+function apiTestContext(actor: MiLocalUser | null): ApiContext<MiLocalUser> {
+	if (actor !== null) { actor.isSuspended = false; actor.movedToUri = null; }
+	const context = mockDeep<ApiContext<MiLocalUser>>({ credential: actor ? 'fixture' : null, ip: '127.0.0.1', headers: {} });
+	context.services.authenticate.mockResolvedValue([actor, null]);
+	context.services.limitActor.mockReturnValue(null);
+	return context;
 }

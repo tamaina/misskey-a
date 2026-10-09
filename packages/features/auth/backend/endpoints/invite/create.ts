@@ -4,20 +4,18 @@
  */
 
 import { MoreThan } from 'typeorm';
-import { Inject, Injectable } from '@nestjs/common';
-
 import type { RegistrationTicketsRepository } from '@features/persistence/backend/repositories/models.js';
 import { InviteCodeEntityService } from '../../serializers/InviteCodeEntityService.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { RoleService } from '@features/roles/backend/services/RoleService.js';
-import { DI } from '@/di-symbols.js';
 import { generateInviteCode } from '../../utility/generate-invite-code.js';
 import { apiError } from '@features/api/backend/transport/orpc-error.js';
-
-import type * as v from 'valibot';
-import type { InviteCreateContract } from '../../api.contract.js';
+import * as v from 'valibot';
+import { InviteCreateContract } from '../../api.contract.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
-
+import { implement } from '@orpc/server';
+import { authentication, apiPolicy, requirePrincipal } from '../../../../api/backend/transport/middleware.js';
+import type { ApiContext } from '../../../../api/backend/transport/context.js';
 export const meta = {
 	tags: ['meta'],
 
@@ -33,40 +31,44 @@ export const meta = {
 		},
 	},
 } as const;
+export interface InviteCreateDependencies {
+	registrationTicketsRepository: RegistrationTicketsRepository;
+	inviteCodeEntityService: Pick<InviteCodeEntityService, 'pack'>;
+	idService: Pick<IdService, 'gen'>;
+	roleService: Pick<RoleService, 'getUserPolicies'>;
+}
+export function createInviteCreateProcedure(deps: InviteCreateDependencies) {
+	return implement(InviteCreateContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>().use(authentication<MiLocalUser>()).use(apiPolicy<MiLocalUser>({ name: 'invite/create', requireCredential: true, kind: 'write:invite-codes', requiredRolePolicy: 'canInvite' })).use(requirePrincipal<MiLocalUser>()).handler(async ({ input, context }) => {
+		const me = context.principal;
+		const result = await (async () => {
+			const policies = await deps.roleService.getUserPolicies(me.id);
 
-@Injectable()
-export class InviteCreateOperation {
-	constructor(
-		@Inject(DI.registrationTicketsRepository)
-		private registrationTicketsRepository: RegistrationTicketsRepository,
+			if (policies.inviteLimit) {
+				const count = await deps.registrationTicketsRepository.countBy({
+					id: MoreThan(deps.idService.gen(Date.now() - (policies.inviteLimitCycle * 1000 * 60))),
+					createdById: me.id,
+				});
 
-		private inviteCodeEntityService: InviteCodeEntityService,
-		private idService: IdService,
-		private roleService: RoleService,
-	) {}
+				if (count >= policies.inviteLimit) {
+					throw apiError(meta.errors.exceededCreateLimit);
+				}
+			}
 
-	async execute(ps: v.InferOutput<NonNullable<typeof InviteCreateContract['~orpc']['inputSchema']>>, me: MiLocalUser) {
-		const policies = await this.roleService.getUserPolicies(me.id);
-
-		if (policies.inviteLimit) {
-			const count = await this.registrationTicketsRepository.countBy({
-				id: MoreThan(this.idService.gen(Date.now() - (policies.inviteLimitCycle * 1000 * 60))),
+			const ticket = await deps.registrationTicketsRepository.insertOne({
+				id: deps.idService.gen(),
+				createdBy: me,
 				createdById: me.id,
+				expiresAt: policies.inviteExpirationTime ? new Date(Date.now() + (policies.inviteExpirationTime * 1000 * 60)) : null,
+				code: generateInviteCode(),
 			});
 
-			if (count >= policies.inviteLimit) {
-				throw apiError(meta.errors.exceededCreateLimit);
-			}
-		}
+			return await deps.inviteCodeEntityService.pack(ticket, me);
+		})();
+		return v.parse(requiredSchema(InviteCreateContract['~orpc'].outputSchema), result);
+	});
+}
 
-		const ticket = await this.registrationTicketsRepository.insertOne({
-			id: this.idService.gen(),
-			createdBy: me,
-			createdById: me.id,
-			expiresAt: policies.inviteExpirationTime ? new Date(Date.now() + (policies.inviteExpirationTime * 1000 * 60)) : null,
-			code: generateInviteCode(),
-		});
-
-		return await this.inviteCodeEntityService.pack(ticket, me);
-	}
+function requiredSchema<Schema>(schema: Schema | undefined): Schema {
+	if (schema === undefined) throw new Error('Contract must declare its schema');
+	return schema;
 }

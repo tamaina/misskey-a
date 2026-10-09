@@ -2,7 +2,8 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-
+import { createProcedureClient } from '@orpc/server';
+import type { ApiContext, ApiServices, ApiAuthorization } from '../../../api/backend/transport/context.js';
 import { expect, test } from 'vitest';
 import * as v from 'valibot';
 import { mockDeep } from 'vitest-mock-extended';
@@ -20,10 +21,9 @@ import { adminQueueQueueStatsContract } from '../../backend/endpoints/admin/queu
 import { adminGetTableStatsContract } from '../../backend/endpoints/admin/get-table-stats.contract.js';
 import { adminGetIndexStatsContract } from '../../backend/endpoints/admin/get-index-stats.contract.js';
 import { adminQueueStatsContract } from '../../backend/endpoints/admin/queue/stats.contract.js';
-import { AdminQueueStatsApplicationService as AggregateStats } from '../../backend/endpoints/admin/queue/stats.application.js';
-import { AdminGetTableStatsApplicationService as TableStats } from '../../backend/endpoints/admin/get-table-stats.application.js';
-import { AdminGetIndexStatsApplicationService as IndexStats } from '../../backend/endpoints/admin/get-index-stats.application.js';
-
+import { createAdminQueueStatsProcedure } from '../../backend/endpoints/admin/queue/stats.js';
+import { createAdminGetTableStatsProcedure } from '../../backend/endpoints/admin/get-table-stats.js';
+import { createAdminGetIndexStatsProcedure } from '../../backend/endpoints/admin/get-index-stats.js';
 const metrics = { meta: { count: 3, prevTS: 1, prevCount: 2 }, data: [1, 2], count: 3 };
 const counts = { waiting: 1, active: 2, completed: 3, failed: 4, delayed: 5 };
 const redisInfo = [
@@ -97,18 +97,18 @@ test('finite queue counts, metrics, aggregate wrappers and table record values r
 });
 
 test('native queue requests strip extras and reject invalid selectors', () => {
- for (const schema of [adminQueuePauseContract['~orpc'].inputSchema!, adminQueueClearContract['~orpc'].inputSchema!, adminQueueRetryJobContract['~orpc'].inputSchema!]) {
-  expect(v.parse(schema, { queue: 'system', state: '*', jobId: 'job1', future: true })).not.toHaveProperty('future');
-  for (const input of [{}, { queue: 'unsupported' }, { queue: 1 }]) expect(v.safeParse(schema, input).success).toBe(false);
- }
- expect(v.safeParse(adminQueuePauseContract['~orpc'].inputSchema!, []).success).toBe(false);
+	for (const schema of [adminQueuePauseContract['~orpc'].inputSchema!, adminQueueClearContract['~orpc'].inputSchema!, adminQueueRetryJobContract['~orpc'].inputSchema!]) {
+		expect(v.parse(schema, { queue: 'system', state: '*', jobId: 'job1', future: true })).not.toHaveProperty('future');
+		for (const input of [{}, { queue: 'unsupported' }, { queue: 1 }]) expect(v.safeParse(schema, input).success).toBe(false);
+	}
+	expect(v.safeParse(adminQueuePauseContract['~orpc'].inputSchema!, []).success).toBe(false);
 });
 
 test('finite pg_indexes wire schema preserves all five SELECT-star columns and nullable source paths', async () => {
 	const rows = [{ schemaname: 'public', tablename: 'note', indexname: 'note_pkey', tablespace: null, indexdef: 'CREATE UNIQUE INDEX ...' }];
 	const db = mockDeep<DataSource>();
 	db.query.mockResolvedValue(rows);
-	const result = await new IndexStats(db).execute({}, mockDeep<MiLocalUser>());
+	const result = await createProcedureClient(createAdminGetIndexStatsProcedure({ db }), { context: nativeContext() })({});
 	expect(v.parse(adminGetIndexStatsContract['~orpc'].outputSchema!, result)).toEqual(rows);
 	expect(db.query).toHaveBeenCalledWith('SELECT * FROM pg_indexes;');
 	expect(result[0]).toEqual(rows[0]);
@@ -130,12 +130,12 @@ test('finite pg_indexes wire schema preserves all five SELECT-star columns and n
 		expect(v.safeParse(adminGetIndexStatsContract['~orpc'].outputSchema!, [missing]).success).toBe(false);
 	}
 	const extended = [{ ...rows[0], future: true }];
- db.query.mockResolvedValue(extended);
- await expect(new IndexStats(db).execute({}, mockDeep<MiLocalUser>())).rejects.toThrow();
- const json: unknown = JSON.parse('{"__proto__":{"note":true},"constructor":null}');
- const job = { id: 'job1', name: 'deliver', data: json, opts: {}, timestamp: 1, progress: 0, attempts: 0, delay: 0, stacktrace: [], returnValue: json, isFailed: false };
- expect(v.parse(packedQueueJobSchema, job)).toEqual(job);
- for (const data of [new Map(), new Date(), { invalid: undefined }]) expect(v.safeParse(packedQueueJobSchema, { ...job, data }).success).toBe(false);
+	db.query.mockResolvedValue(extended);
+	await expect(createProcedureClient(createAdminGetIndexStatsProcedure({ db }), { context: nativeContext() })({})).rejects.toThrow();
+	const json: unknown = JSON.parse('{"__proto__":{"note":true},"constructor":null}');
+	const job = { id: 'job1', name: 'deliver', data: json, opts: {}, timestamp: 1, progress: 0, attempts: 0, delay: 0, stacktrace: [], returnValue: json, isFailed: false };
+	expect(v.parse(packedQueueJobSchema, job)).toEqual(job);
+	for (const data of [new Map(), new Date(), { invalid: undefined }]) expect(v.safeParse(packedQueueJobSchema, { ...job, data }).success).toBe(false);
 });
 
 test('installed Bull default counts and metrics agree with actual aggregate/table producers', async () => {
@@ -160,17 +160,26 @@ test('installed Bull default counts and metrics agree with actual aggregate/tabl
 	backend.getMetrics.mockResolvedValue([[], [], 0]);
 	const emptyMetrics = await queue.getMetrics('completed');
 	expect(v.parse(packedQueueMetricsSchema, emptyMetrics)).toEqual({ meta: { count: 0, prevTS: 0, prevCount: 0 }, data: [], count: 0 });
-	type Parameters = ConstructorParameters<typeof AggregateStats>;
-	const deliver = mockDeep<Parameters[3]>();
-	const inbox = mockDeep<Parameters[4]>();
-	const dbQueue = mockDeep<Parameters[5]>();
-	const storage = mockDeep<Parameters[6]>();
+	type Dependencies = Parameters<typeof createAdminQueueStatsProcedure>[0];
+	const deliver = mockDeep<Dependencies['deliverQueue']>();
+	const inbox = mockDeep<Dependencies['inboxQueue']>();
+	const dbQueue = mockDeep<Dependencies['dbQueue']>();
+	const storage = mockDeep<Dependencies['objectStorageQueue']>();
 	for (const queue of [deliver, inbox, dbQueue, storage]) queue.getJobCounts.mockResolvedValue(produced);
-	const result = await new AggregateStats(mockDeep(), mockDeep(), mockDeep(), deliver, inbox, dbQueue, storage, mockDeep(), mockDeep()).execute({}, mockDeep<MiLocalUser>());
+	const result = await createProcedureClient(createAdminQueueStatsProcedure({ deliverQueue: deliver, inboxQueue: inbox, dbQueue, objectStorageQueue: storage }), { context: nativeContext() })({});
 	expect(v.parse(adminQueueStatsContract['~orpc'].outputSchema!, result)).toEqual({ deliver: produced, inbox: produced, db: produced, objectStorage: produced });
 	for (const queue of [deliver, inbox, dbQueue, storage]) expect(queue.getJobCounts).toHaveBeenCalledWith();
 	const db = mockDeep<DataSource>();
 	db.query.mockResolvedValue([{ table: 'custom_table', count: '3', size: '1024' }]);
-	const tables = await new TableStats(db).execute({}, mockDeep<MiLocalUser>());
+	const tables = await createProcedureClient(createAdminGetTableStatsProcedure({ db }), { context: nativeContext() })({});
 	expect(v.parse(adminGetTableStatsContract['~orpc'].outputSchema!, tables)).toEqual({ custom_table: { count: 3, size: 1024 } });
 });
+
+function nativeContext(): ApiContext<MiLocalUser> {
+	const actor = mockDeep<MiLocalUser>({ id: 'trusted-user', isSuspended: false, movedToUri: null });
+	const services = mockDeep<ApiServices<MiLocalUser>>();
+	services.authenticate.mockResolvedValue([actor, null]);
+	const authorization = mockDeep<ApiAuthorization<MiLocalUser>>();
+	authorization.rootUserId.mockReturnValue(actor.id);
+	return { services, authorization, credential: 'credential', ip: '127.0.0.1', headers: {} };
+}

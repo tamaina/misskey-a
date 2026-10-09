@@ -2,27 +2,20 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-
-import { Inject, Injectable } from '@nestjs/common';
-import { DI } from '@/di-symbols.js';
 import { HashtagEntityService } from '../../serializers/HashtagEntityService.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
-import type { DiscoveryInputs } from '../discovery.contract.js';
-
 import type { HashtagsRepository } from '@features/persistence/backend/repositories/models.js';
-
-@Injectable()
-export class HashtagsListOperation {
-	constructor(
-		@Inject(DI.hashtagsRepository)
-		private hashtagsRepository: HashtagsRepository,
-
-		private hashtagEntityService: HashtagEntityService,
-	) {
-	}
-
-	async execute(ps: DiscoveryInputs['hashtags/list'], _me: MiLocalUser | null) {
-		const query = this.hashtagsRepository.createQueryBuilder('tag');
+import { implement } from '@orpc/server';
+import { authentication, apiPolicy } from '@features/api/backend/transport/middleware.js';
+import type { ApiContext } from '@features/api/backend/transport/context.js';
+import { discoveryContract, type DiscoveryInputs } from '../discovery.contract.js';
+export interface HashtagsListDependencies {
+	hashtagsRepository: HashtagsRepository;
+	hashtagEntityService: HashtagEntityService;
+}
+export function createHashtagsListProcedure<Actor extends MiLocalUser>(deps: HashtagsListDependencies) {
+	const handler = async ({ input: ps, }: { input: DiscoveryInputs['hashtags/list']; context: ApiContext<Actor> & { principal: Actor | null } }) => {
+		const query = deps.hashtagsRepository.createQueryBuilder('tag');
 
 		if (ps.attachedToUserOnly) query.andWhere('tag.attachedUsersCount != 0');
 		if (ps.attachedToLocalUserOnly) query.andWhere('tag.attachedLocalUsersCount != 0');
@@ -55,6 +48,7 @@ export class HashtagsListOperation {
 
 		const tags = await query.limit(ps.limit).getMany();
 
-		return this.hashtagEntityService.packMany(tags);
-	}
+		return deps.hashtagEntityService.packMany(tags);
+	};
+	return implement(discoveryContract['hashtags/list'], { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>().use(authentication<Actor>()).use(apiPolicy<Actor>({ name: discoveryContract['hashtags/list']['~orpc'].meta.requestName })).handler(handler);
 }

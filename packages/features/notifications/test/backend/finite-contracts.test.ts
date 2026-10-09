@@ -4,11 +4,13 @@
  */
 
 import { expect, expectTypeOf, test } from 'vitest';
+import { createProcedureClient } from '@orpc/server';
+import type { ApiContext } from '@features/api/backend/transport/context.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
 import * as v from 'valibot';
 import { mockDeep } from 'vitest-mock-extended';
-import { ModuleRef } from '@nestjs/core';
-
-import { createNotifications } from '../../backend/index.js';
+import { type ModuleRef } from '@nestjs/core';
+import { createCreateProcedure } from '../../backend/index.js';
 import { groupedNotificationTypes } from '../../backend/notification-types.schema.js';
 
 import { NotificationEntityService } from '../../backend/serializers/NotificationEntityService.js';
@@ -28,14 +30,10 @@ import { updateRegistrationContract as nativeContract11 } from '../../backend/en
 import { updateRegistrationContract as nativeContract12 } from '../../backend/endpoints/sw/update-registration.contract.js';
 import { updateRegistrationContract as nativeContract13 } from '../../backend/endpoints/sw/update-registration.contract.js';
 import type { Packed } from '@features/index/backend/packed.schema.js';
-import type { IdService } from '@features/runtime/backend/services/IdService.js';
 import type { ChatEntityService } from '@features/chat/backend/serializers/ChatEntityService.js';
 import type { RoleEntityService } from '@features/roles/backend/serializers/RoleEntityService.js';
 import type { NoteEntityService } from '@features/notes/backend/serializers/NoteEntityService.js';
 import type { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
-import type { MiLocalUser } from '@features/users/backend/models/User.js';
-import type { MiMeta, SwSubscriptionsRepository } from '@features/persistence/backend/repositories/models.js';
-import type { PushNotificationService } from '../../backend/services/PushNotificationService.js';
 import type { MiGroupedNotification } from '../../backend/models/Notification.js';
 
 function requiredSchema<S extends v.GenericSchema>(schema: S | undefined): S { if (schema === undefined) throw new Error('Missing native schema'); return schema; }
@@ -172,11 +170,14 @@ test('native sw inputs strip extras and preserve defaults; outputs reject missin
 });
 
 test('real create feature retains token fallbacks and explicit optional values', async () => {
-	const deps = mockDeep<Parameters<typeof createNotifications>[0]>();
-	const feature = createNotifications(deps);
-	const context = { actor: { id: user.id }, token: { id: 'token123', name: 'Token title', iconUrl: 'https://example.com/token.png' } };
-	await feature['notifications/create']({ body: 'Fixture' }, { context });
-	expect(deps.createAppNotification).toHaveBeenLastCalledWith(user.id, { appAccessTokenId: 'token123', customBody: 'Fixture', customHeader: context.token.name, customIcon: context.token.iconUrl });
-	await feature['notifications/create']({ body: 'Fixture', header: 'Title', icon: '' }, { context });
+	const deps = mockDeep<Parameters<typeof createCreateProcedure>[0]>();
+	const procedure = createCreateProcedure(deps);
+	const token = { id: 'token123', name: 'Token title', iconUrl: 'https://example.com/token.png', permission: ['write:notifications'] };
+	const context = mockDeep<ApiContext<MiLocalUser>>({ credential: 'fixture', ip: '127.0.0.1', headers: {} });
+	context.services.authenticate.mockResolvedValue([mockDeep<MiLocalUser>({ id: user.id, isSuspended: false, movedToUri: null }), token]);
+	const feature = createProcedureClient(procedure, { context });
+	await feature({ body: 'Fixture' });
+	expect(deps.createAppNotification).toHaveBeenLastCalledWith(user.id, { appAccessTokenId: 'token123', customBody: 'Fixture', customHeader: token.name, customIcon: token.iconUrl });
+	await feature({ body: 'Fixture', header: 'Title', icon: '' });
 	expect(deps.createAppNotification).toHaveBeenLastCalledWith(user.id, { appAccessTokenId: 'token123', customBody: 'Fixture', customHeader: 'Title', customIcon: '' });
 });

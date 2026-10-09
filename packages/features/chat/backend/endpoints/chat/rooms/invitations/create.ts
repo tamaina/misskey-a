@@ -5,47 +5,39 @@
 
 import type { InferSchemaOutput } from '@orpc/contract';
 import { implement } from '@orpc/server';
-import { Inject, Injectable } from '@nestjs/common';
 import * as v from 'valibot';
-import { DI } from '@/di-symbols.js';
 import { authentication, apiPolicy, requirePrincipal } from '../../../../../../api/backend/transport/middleware.js';
-import { ChatService } from '../../../../services/ChatService.js';
-import { ChatEntityService } from '../../../../serializers/ChatEntityService.js';
+import { type ChatService } from '../../../../services/ChatService.js';
+import { type ChatEntityService } from '../../../../serializers/ChatEntityService.js';
 import { apiError } from '../../../../../../api/backend/transport/orpc-error.js';
 import { chatRoomsInvitationsCreateContract, chatRoomsInvitationsCreatePolicy, chatRoomsInvitationsCreateErrors } from './create.contract.js';
-import type { ApiActor } from '../../../../../../api/backend/transport/context.js';
-import type { ChatApiContext } from '../../../../operations.js';
-
 import type { MiLocalUser } from '../../../../../../users/backend/models/User.js';
-
-export function createChatRoomsInvitationsCreateProcedure<Actor extends ApiActor>() {
-	return implement(chatRoomsInvitationsCreateContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ChatApiContext<Actor>>()
-		.use(authentication<Actor>())
-		.use(apiPolicy<Actor>(chatRoomsInvitationsCreatePolicy))
-		.use(requirePrincipal<Actor>())
-		.handler(({ input, context }) => context.operations.chat.chatRoomsInvitationsCreate(input, context.principal));
+import type { ApiContext } from '@features/api/backend/transport/context.js';
+export interface ChatRoomsInvitationsCreateDependencies {
+	chatService: ChatService;
+	chatEntityService: ChatEntityService;
 }
-
-@Injectable()
-export class ChatRoomsInvitationsCreateOperation {
-	constructor(
-		private chatService: ChatService,
-		private chatEntityService: ChatEntityService,
-	) {}
-	async execute(ps: InferSchemaOutput<NonNullable<typeof chatRoomsInvitationsCreateContract['~orpc']['inputSchema']>>, me: MiLocalUser): Promise<InferSchemaOutput<NonNullable<typeof chatRoomsInvitationsCreateContract['~orpc']['outputSchema']>>> {
-		return v.parse(requiredSchema(chatRoomsInvitationsCreateContract['~orpc'].outputSchema), await this.run(ps, me));
+export function createChatRoomsInvitationsCreateProcedure(deps: ChatRoomsInvitationsCreateDependencies) {
+	async function execute(ps: InferSchemaOutput<NonNullable<typeof chatRoomsInvitationsCreateContract['~orpc']['inputSchema']>>, me: MiLocalUser): Promise<InferSchemaOutput<NonNullable<typeof chatRoomsInvitationsCreateContract['~orpc']['outputSchema']>>> {
+		return v.parse(requiredSchema(chatRoomsInvitationsCreateContract['~orpc'].outputSchema), await run(ps, me));
 	}
 
-	private async run(ps: InferSchemaOutput<NonNullable<typeof chatRoomsInvitationsCreateContract['~orpc']['inputSchema']>>, me: MiLocalUser) {
-		await this.chatService.checkChatAvailability(me.id, 'write');
+	async function run(ps: InferSchemaOutput<NonNullable<typeof chatRoomsInvitationsCreateContract['~orpc']['inputSchema']>>, me: MiLocalUser) {
+		await deps.chatService.checkChatAvailability(me.id, 'write');
 
-		const room = await this.chatService.findMyRoomById(me.id, ps.roomId);
+		const room = await deps.chatService.findMyRoomById(me.id, ps.roomId);
 		if (room == null) {
 			throw apiError(chatRoomsInvitationsCreateErrors.noSuchRoom);
 		}
-		const invitation = await this.chatService.createRoomInvitation(me.id, room.id, ps.userId);
-		return await this.chatEntityService.packRoomInvitation(invitation, me);
+		const invitation = await deps.chatService.createRoomInvitation(me.id, room.id, ps.userId);
+		return await deps.chatEntityService.packRoomInvitation(invitation, me);
 	}
+
+	return implement(chatRoomsInvitationsCreateContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>()
+		.use(authentication<MiLocalUser>())
+		.use(apiPolicy<MiLocalUser>(chatRoomsInvitationsCreatePolicy))
+		.use(requirePrincipal<MiLocalUser>())
+		.handler(({ input, context }) => execute(input, context.principal));
 }
 
 function requiredSchema<Schema>(schema: Schema | undefined): Schema {

@@ -5,51 +5,43 @@
 
 import type { InferSchemaOutput } from '@orpc/contract';
 import { implement } from '@orpc/server';
-import { Inject, Injectable } from '@nestjs/common';
 import * as v from 'valibot';
-import { DI } from '@/di-symbols.js';
 import { authentication, apiPolicy, requirePrincipal } from '../../../../../api/backend/transport/middleware.js';
-import { ChatService } from '../../../services/ChatService.js';
-import { ChatEntityService } from '../../../serializers/ChatEntityService.js';
+import { type ChatService } from '../../../services/ChatService.js';
+import { type ChatEntityService } from '../../../serializers/ChatEntityService.js';
 import { apiError } from '../../../../../api/backend/transport/orpc-error.js';
 import { chatRoomsShowContract, chatRoomsShowPolicy, chatRoomsShowErrors } from './show.contract.js';
-import type { ApiActor } from '../../../../../api/backend/transport/context.js';
-import type { ChatApiContext } from '../../../operations.js';
-
 import type { MiLocalUser } from '../../../../../users/backend/models/User.js';
-
-export function createChatRoomsShowProcedure<Actor extends ApiActor>() {
-	return implement(chatRoomsShowContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ChatApiContext<Actor>>()
-		.use(authentication<Actor>())
-		.use(apiPolicy<Actor>(chatRoomsShowPolicy))
-		.use(requirePrincipal<Actor>())
-		.handler(({ input, context }) => context.operations.chat.chatRoomsShow(input, context.principal));
+import type { ApiContext } from '@features/api/backend/transport/context.js';
+export interface ChatRoomsShowDependencies {
+	chatService: ChatService;
+	chatEntityService: ChatEntityService;
 }
-
-@Injectable()
-export class ChatRoomsShowOperation {
-	constructor(
-		private chatService: ChatService,
-		private chatEntityService: ChatEntityService,
-	) {}
-	async execute(ps: InferSchemaOutput<NonNullable<typeof chatRoomsShowContract['~orpc']['inputSchema']>>, me: MiLocalUser): Promise<InferSchemaOutput<NonNullable<typeof chatRoomsShowContract['~orpc']['outputSchema']>>> {
-		return v.parse(requiredSchema(chatRoomsShowContract['~orpc'].outputSchema), await this.run(ps, me));
+export function createChatRoomsShowProcedure(deps: ChatRoomsShowDependencies) {
+	async function execute(ps: InferSchemaOutput<NonNullable<typeof chatRoomsShowContract['~orpc']['inputSchema']>>, me: MiLocalUser): Promise<InferSchemaOutput<NonNullable<typeof chatRoomsShowContract['~orpc']['outputSchema']>>> {
+		return v.parse(requiredSchema(chatRoomsShowContract['~orpc'].outputSchema), await run(ps, me));
 	}
 
-	private async run(ps: InferSchemaOutput<NonNullable<typeof chatRoomsShowContract['~orpc']['inputSchema']>>, me: MiLocalUser) {
-		await this.chatService.checkChatAvailability(me.id, 'read');
+	async function run(ps: InferSchemaOutput<NonNullable<typeof chatRoomsShowContract['~orpc']['inputSchema']>>, me: MiLocalUser) {
+		await deps.chatService.checkChatAvailability(me.id, 'read');
 
-		const room = await this.chatService.findRoomById(ps.roomId);
+		const room = await deps.chatService.findRoomById(ps.roomId);
 		if (room == null) {
 			throw apiError(chatRoomsShowErrors.noSuchRoom);
 		}
 
-		if (!await this.chatService.hasPermissionToViewRoomInfo(me.id, room)) {
+		if (!await deps.chatService.hasPermissionToViewRoomInfo(me.id, room)) {
 			throw apiError(chatRoomsShowErrors.noSuchRoom);
 		}
 
-		return this.chatEntityService.packRoom(room, me);
+		return deps.chatEntityService.packRoom(room, me);
 	}
+
+	return implement(chatRoomsShowContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>()
+		.use(authentication<MiLocalUser>())
+		.use(apiPolicy<MiLocalUser>(chatRoomsShowPolicy))
+		.use(requirePrincipal<MiLocalUser>())
+		.handler(({ input, context }) => execute(input, context.principal));
 }
 
 function requiredSchema<Schema>(schema: Schema | undefined): Schema {

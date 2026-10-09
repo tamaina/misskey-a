@@ -1,0 +1,26 @@
+/*
+ * SPDX-FileCopyrightText: syuilo and misskey-project
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
+import { implement } from '@orpc/server';
+import { authentication, apiPolicy, requirePrincipal } from '../../../../api/backend/transport/middleware.js';
+import type { ApiActor, ApiContext } from '../../../../api/backend/transport/context.js';
+import { collectionsContract } from '../../api.contract.js';
+import type { CollectionsDependencies } from '../../api.dependencies.js';
+import { apiError } from '../../../../api/backend/transport/orpc-error.js';
+import { collectionsErrors } from '../../api.errors.js';
+import { ClipService } from '../../services/ClipService.js';
+export interface ClipsDeleteDependencies<Actor extends ApiActor> {
+	clipService: Pick<CollectionsDependencies<Actor>['clipService'], 'delete'>;
+}
+export function createClipsDeleteProcedure<Actor extends ApiActor>(deps: ClipsDeleteDependencies<Actor>) {
+	return implement(collectionsContract.clipsDelete, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>()
+		.use(authentication<Actor>()).use(apiPolicy<Actor>({ name: collectionsContract.clipsDelete['~orpc'].meta.requestName, requireCredential: true, kind: 'write:account' })).use(requirePrincipal<Actor>())
+		.handler(async ({ input: ps, context }) => {
+			const me = context.principal;
+			try { await deps.clipService.delete(me, ps.clipId); } catch (error) {
+				if (error instanceof ClipService.NoSuchClipError) throw apiError(collectionsErrors.clipsDelete.noSuchClip);
+				throw error;
+			}
+		});
+}

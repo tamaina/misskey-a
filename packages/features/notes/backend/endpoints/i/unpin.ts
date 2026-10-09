@@ -2,10 +2,7 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-
-import type { InferSchemaOutput } from '@orpc/contract';
 import { implement } from '@orpc/server';
-import { Injectable } from '@nestjs/common';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import * as v from 'valibot';
 import { NotePiningService } from '../../services/NotePiningService.js';
@@ -15,35 +12,28 @@ import { readErrorId } from '../../request.schema.js';
 import { toPackedUserDetailed } from '../../../../users/backend/user.schema.js';
 import { iUnpinContract, iUnpinPolicy, iUnpinErrors } from './unpin.contract.js';
 import type { MiLocalUser } from '../../../../users/backend/models/User.js';
-import type { NotesApiContext } from '../../operations.js';
-import type { ApiActor } from '../../../../api/backend/transport/context.js';
-
-export function createIUnpinProcedure<Actor extends ApiActor>() {
-	return implement(iUnpinContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<NotesApiContext<Actor>>()
-		.use(authentication<Actor>())
-		.use(apiPolicy<Actor>(iUnpinPolicy))
-		.use(requirePrincipal<Actor>())
-		.handler(({ input, context }) => context.operations.notes.iUnpin(input, context.principal));
+import type { ApiContext } from '@features/api/backend/transport/context.js';
+export interface IUnpinDependencies {
+	userEntityService: Pick<UserEntityService, 'packSelf'>;
+	notePiningService: Pick<NotePiningService, 'removePinned'>;
 }
+export function createIUnpinProcedure(deps: IUnpinDependencies) {
+	return implement(iUnpinContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>()
+		.use(authentication<MiLocalUser>())
+		.use(apiPolicy<MiLocalUser>(iUnpinPolicy))
+		.use(requirePrincipal<MiLocalUser>())
+		.handler(async ({ input, context }) => {
+			const ps = input;
+			const me = context.principal;
+			return v.parse(requiredSchema(iUnpinContract['~orpc'].outputSchema), toPackedUserDetailed(await (async () => {
+				await deps.notePiningService.removePinned(me, ps.noteId).catch((err: unknown) => {
+					if (readErrorId(err) === 'b302d4cf-c050-400a-bbb3-be208681f40c') throw apiError(iUnpinErrors.noSuchNote);
+					throw err;
+				});
 
-@Injectable()
-export class IUnpinOperation {
-	constructor(
-		private userEntityService: UserEntityService,
-		private notePiningService: NotePiningService,
-	) {}
-	async execute(ps: InferSchemaOutput<NonNullable<typeof iUnpinContract['~orpc']['inputSchema']>>, me: MiLocalUser): Promise<InferSchemaOutput<NonNullable<typeof iUnpinContract['~orpc']['outputSchema']>>> {
-		return v.parse(requiredSchema(iUnpinContract['~orpc'].outputSchema), toPackedUserDetailed(await this.run(ps, me)));
-	}
-
-	private async run(ps: InferSchemaOutput<NonNullable<typeof iUnpinContract['~orpc']['inputSchema']>>, me: MiLocalUser) {
-		await this.notePiningService.removePinned(me, ps.noteId).catch((err: unknown) => {
-			if (readErrorId(err) === 'b302d4cf-c050-400a-bbb3-be208681f40c') throw apiError(iUnpinErrors.noSuchNote);
-			throw err;
+				return await deps.userEntityService.packSelf(me.id);
+			})()));
 		});
-
-		return await this.userEntityService.packSelf(me.id);
-	}
 }
 
 function requiredSchema<Schema>(schema: Schema | undefined): Schema {

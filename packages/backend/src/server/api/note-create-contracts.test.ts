@@ -6,16 +6,16 @@
 import type { InferSchemaOutput } from '@orpc/contract';
 import { expect, expectTypeOf, test } from 'vitest';
 import * as v from 'valibot';
+import type { ApiContext } from '@features/api/backend/transport/context.js';
 import { createProcedureClient } from '@orpc/server';
 import { mockDeep } from 'vitest-mock-extended';
 import { notesCreateContract, notesCreateErrors, notesCreatePolicy } from '@features/notes/backend/endpoints/notes/create.contract.js';
-import { NotesCreateOperation, createNotesCreateProcedure } from '@features/notes/backend/endpoints/notes/create.js';
+import { createNotesCreateProcedure as NotesCreateOperation, createNotesCreateProcedure } from '@features/notes/backend/endpoints/notes/create.js';
 import { MAX_NOTE_TEXT_LENGTH } from '@features/notes/backend/request.schema.js';
 import { packedNoteSchema } from '@features/notes/backend/note.schema.js';
 import { genPilotOpenapiSpec } from '@features/api/backend/transport/openapi/pilot-spec.js';
 import { IdentifiableError } from '@features/runtime/backend/errors/identifiable-error.js';
 import baseline from '../../../test/fixtures/note-create-contract-baseline.json' with { type: 'json' };
-import type { NotesApiContext } from '@features/notes/backend/operations.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 import type { NoteEntityService } from '@features/notes/backend/serializers/NoteEntityService.js';
 import type { NoteCreateService } from '@features/notes/backend/services/NoteCreateService.js';
@@ -102,33 +102,37 @@ test('native inference retains the complete Note and exact defaulted handler fie
 
 function contextFixture() {
 	const actor = mockDeep<MiLocalUser>({ id: 'user123', isSuspended: false, movedToUri: null });
-	const context = mockDeep<NotesApiContext<MiLocalUser>>({ credential: 'fixture', ip: '127.0.0.1', headers: {} });
+	const context = mockDeep<ApiContext<MiLocalUser>>({ credential: 'fixture', ip: '127.0.0.1', headers: {} });
 	context.services.authenticate.mockResolvedValue([actor, null]);
 	context.services.limitActor.mockReturnValue(null);
 	context.services.rateLimitFactor.mockResolvedValue(1);
-	context.operations.notes.notesCreate.mockResolvedValue({ createdNote: packedNote });
-	return { context, actor, client: createProcedureClient(createNotesCreateProcedure<MiLocalUser>(), { context }) };
+	const deps = mockDeep<Parameters<typeof createNotesCreateProcedure>[0]>();
+	deps.noteCreateService.fetchAndCreate.mockResolvedValue(mockDeep<MiNote>({ id: packedNote.id }));
+	deps.noteEntityService.pack.mockResolvedValue(packedNote);
+	return { context, actor, deps, client: createProcedureClient(createNotesCreateProcedure(deps), { context }) };
 }
 
 test('native procedure validates before application side effects and passes parsed defaults with the trusted actor', async () => {
-	const { context, actor, client } = contextFixture();
+	const { context, actor, deps, client } = contextFixture();
 	await expect(client({ text: '' })).rejects.toThrow();
-	expect(context.operations.notes.notesCreate).not.toHaveBeenCalled();
+	expect(deps.noteCreateService.fetchAndCreate).not.toHaveBeenCalled();
 	const input = { text: 'hello', i: 'transport', actor: { id: 'spoofed' }, future: true };
 	expect(await client(input)).toEqual({ createdNote: packedNote });
-	expect(context.operations.notes.notesCreate).toHaveBeenCalledWith({ text: 'hello', ...defaults }, actor);
-	const invalidOutput = { createdNote: packedNote, future: true };
-	context.operations.notes.notesCreate.mockResolvedValue(invalidOutput);
+	expect(deps.noteCreateService.fetchAndCreate).toHaveBeenCalledWith(actor, expect.objectContaining({ text: 'hello', visibility: 'public', localOnly: false, reactionAcceptance: null }));
+	expect(deps.noteCreateService.fetchAndCreate.mock.calls[0][1]).not.toHaveProperty('actor');
+	expect(deps.noteCreateService.fetchAndCreate.mock.calls[0][1]).not.toHaveProperty('future');
+	const invalidOutput = { ...packedNote, future: true };
+	deps.noteEntityService.pack.mockResolvedValue(invalidOutput);
 	await expect(client({ text: 'hello' })).rejects.toThrow();
 });
 
 test('authentication and moved-account checks run before input validation or application calls', async () => {
-	const { context, actor, client } = contextFixture();
+	const { context, actor, deps, client } = contextFixture();
 	context.services.authenticate.mockResolvedValue([null, null]);
 	await expect(client({ text: '' })).rejects.toMatchObject({ code: 'CREDENTIAL_REQUIRED' });
 	context.services.authenticate.mockResolvedValue([{ ...actor, movedToUri: 'https://example.com/users/moved' }, null]);
 	await expect(client({ text: '' })).rejects.toMatchObject({ code: 'YOUR_ACCOUNT_MOVED' });
-	expect(context.operations.notes.notesCreate).not.toHaveBeenCalled();
+	expect(deps.noteCreateService.fetchAndCreate).not.toHaveBeenCalled();
 });
 
 test('application operation retains file precedence, poll defaults, extraction controls and validates its envelope', async () => {
@@ -138,13 +142,13 @@ test('application operation retains file precedence, poll defaults, extraction c
 	const note = mockDeep<MiNote>({ id: packedNote.id });
 	create.fetchAndCreate.mockResolvedValue(note);
 	entities.pack.mockResolvedValue(packedNote);
-	const operation = new NotesCreateOperation(entities, create);
+	const operation = NotesCreateOperation({ noteEntityService: entities, noteCreateService: create });
 	const input = v.parse(requiredSchema(notesCreateContract['~orpc'].inputSchema), { fileIds: ['file1'], mediaIds: ['media1'], poll: { choices: ['a', 'b'] }, noExtractMentions: true });
-	expect(await operation.execute(input, actor)).toEqual({ createdNote: packedNote });
+	expect(await createProcedureClient(operation, { context: apiTestContext(actor) })(input)).toEqual({ createdNote: packedNote });
 	expect(create.fetchAndCreate).toHaveBeenCalledWith(actor, expect.objectContaining({ fileIds: ['file1'], poll: { choices: ['a', 'b'], multiple: false, expiresAt: null }, apMentions: [], apHashtags: undefined, apEmojis: undefined }));
 	expect(entities.pack).toHaveBeenCalledWith(note, actor);
 	create.fetchAndCreate.mockRejectedValue(new IdentifiableError('689ee33f-f97c-479a-ac49-1b9f8140af99'));
-	await expect(operation.execute(input, actor)).rejects.toMatchObject({ code: notesCreateErrors.containsProhibitedWords.code, data: { id: notesCreateErrors.containsProhibitedWords.id } });
+	await expect(createProcedureClient(operation, { context: apiTestContext(actor) })(input)).rejects.toMatchObject({ code: notesCreateErrors.containsProhibitedWords.code, data: { id: notesCreateErrors.containsProhibitedWords.id } });
 });
 
 test('native OpenAPI generator documents notes/create auth, route errors and the 200 envelope', async () => {
@@ -161,4 +165,13 @@ test('native OpenAPI generator documents notes/create auth, route errors and the
 function requiredSchema<Schema>(schema: Schema | undefined): Schema {
 	if (schema === undefined) throw new Error('Missing endpoint contract schema');
 	return schema;
+}
+
+function apiTestContext(actor: MiLocalUser | null, ip = '127.0.0.1', headers: Record<string, string | string[] | undefined> = {}): ApiContext<MiLocalUser> {
+	if (actor !== null) { actor.isSuspended = false; actor.movedToUri = null; }
+	const context = mockDeep<ApiContext<MiLocalUser>>({ credential: actor ? 'fixture' : null, ip, headers });
+	context.services.authenticate.mockResolvedValue([actor, null]);
+	context.services.limitActor.mockReturnValue(null);
+	context.authorization?.rootUserId.mockReturnValue(actor?.id ?? null);
+	return context;
 }

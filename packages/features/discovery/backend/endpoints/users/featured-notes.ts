@@ -2,41 +2,34 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-
-import { Inject, Injectable } from '@nestjs/common';
-
 import { NoteEntityService } from '@features/notes/backend/serializers/NoteEntityService.js';
 import { CacheService } from '@features/users/backend/services/CacheService.js';
 import { isUserRelated } from '@features/relationships/backend/utility/is-user-related.js';
 import { QueryService } from '@features/notes/backend/services/QueryService.js';
-import { DI } from '@/di-symbols.js';
 import { FeaturedService } from '../../services/FeaturedService.js';
 import type { NotesRepository } from '@features/persistence/backend/repositories/models.js';
-import type { DiscoveryInputs } from '../discovery.contract.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
-
-@Injectable()
-export class UsersFeaturedNotesOperation {
-	constructor(
-		@Inject(DI.notesRepository)
-		private notesRepository: NotesRepository,
-
-		private noteEntityService: NoteEntityService,
-		private featuredService: FeaturedService,
-		private cacheService: CacheService,
-		private queryService: QueryService,
-	) {
-	}
-
-	async execute(ps: DiscoveryInputs['users/featured-notes'], me: MiLocalUser | null) {
-		const userIdsWhoBlockingMe = me ? await this.cacheService.userBlockedCache.fetch(me.id) : new Set<string>();
+import { implement } from '@orpc/server';
+import { authentication, apiPolicy, decodeScalarInput } from '@features/api/backend/transport/middleware.js';
+import type { ApiContext } from '@features/api/backend/transport/context.js';
+import { discoveryContract, type DiscoveryInputs } from '../discovery.contract.js';
+export interface UsersFeaturedNotesDependencies {
+	notesRepository: NotesRepository;
+	noteEntityService: NoteEntityService;
+	featuredService: FeaturedService;
+	cacheService: CacheService;
+	queryService: QueryService;
+}
+export function createUsersFeaturedNotesProcedure<Actor extends MiLocalUser>(deps: UsersFeaturedNotesDependencies) {
+	const handler = async ({ input: ps, context: { principal: me } }: { input: DiscoveryInputs['users/featured-notes']; context: ApiContext<Actor> & { principal: Actor | null } }) => {
+		const userIdsWhoBlockingMe = me ? await deps.cacheService.userBlockedCache.fetch(me.id) : new Set<string>();
 
 		// early return if me is blocked by requesting user
 		if (userIdsWhoBlockingMe.has(ps.userId)) {
 			return [];
 		}
 
-		let noteIds = await this.featuredService.getPerUserNotesRanking(ps.userId, 50);
+		let noteIds = await deps.featuredService.getPerUserNotesRanking(ps.userId, 50);
 
 		noteIds.sort((a, b) => a > b ? -1 : 1);
 		if (ps.untilId) {
@@ -51,10 +44,10 @@ export class UsersFeaturedNotesOperation {
 		const [
 			userIdsWhoMeMuting,
 		] = me ? await Promise.all([
-			this.cacheService.userMutingsCache.fetch(me.id),
+			deps.cacheService.userMutingsCache.fetch(me.id),
 		]) : [new Set<string>()];
 
-		const query = this.notesRepository.createQueryBuilder('note')
+		const query = deps.notesRepository.createQueryBuilder('note')
 			.where('note.id IN (:...noteIds)', { noteIds: noteIds })
 			.innerJoinAndSelect('note.user', 'user')
 			.leftJoinAndSelect('note.reply', 'reply')
@@ -63,8 +56,8 @@ export class UsersFeaturedNotesOperation {
 			.leftJoinAndSelect('renote.user', 'renoteUser')
 			.leftJoinAndSelect('note.channel', 'channel');
 
-		this.queryService.generateBlockedHostQueryForNote(query);
-		this.queryService.generateSuspendedUserQueryForNote(query);
+		deps.queryService.generateBlockedHostQueryForNote(query);
+		deps.queryService.generateSuspendedUserQueryForNote(query);
 
 		const notes = (await query.getMany()).filter(note => {
 			if (me && isUserRelated(note, userIdsWhoBlockingMe, false)) return false;
@@ -75,6 +68,10 @@ export class UsersFeaturedNotesOperation {
 
 		notes.sort((a, b) => a.id > b.id ? -1 : 1);
 
-		return await this.noteEntityService.packMany(notes, me);
-	}
+		return await deps.noteEntityService.packMany(notes, me);
+	};
+	return {
+		canonical: implement(discoveryContract['users/featured-notes'], { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>().use(authentication<Actor>()).use(apiPolicy<Actor>({ name: discoveryContract['users/featured-notes']['~orpc'].meta.requestName })).handler(handler),
+		get: implement(discoveryContract['users/featured-notes:get'], { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>().use(authentication<Actor>()).use(apiPolicy<Actor>({ name: discoveryContract['users/featured-notes']['~orpc'].meta.requestName })).use(decodeScalarInput<Actor>({ limit: 'integer' })).handler(handler),
+	};
 }

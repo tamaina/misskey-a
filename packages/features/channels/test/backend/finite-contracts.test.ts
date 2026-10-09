@@ -14,7 +14,9 @@ import { channelsShowContract } from '../../backend/endpoints/channels/show.cont
 
 import { packedChannelSchema } from '../../backend/channel.schema.js';
 import { ChannelEntityService } from '../../backend/serializers/ChannelEntityService.js';
-import { ChannelsShowOperation as ShowEndpoint } from '../../backend/endpoints/channels/show.js';
+import { createChannelsShowProcedure } from '../../backend/endpoints/channels/show.js';
+import { createProcedureClient } from '@orpc/server';
+import type { ApiServices } from '@features/api/backend/transport/context.js';
 import { MiChannel } from '../../backend/models/Channel.js';
 import type { Packed } from '@features/index/backend/packed.schema.js';
 import type { ChannelsRepository, ChannelFollowingsRepository, ChannelFavoritesRepository, ChannelMutingRepository } from '@features/persistence/backend/repositories/models.js';
@@ -122,13 +124,16 @@ test.each([{ authenticated: false, detailed: false }, { authenticated: false, de
 test('show handler runs actual detailed serializer, preserving missing-channel error', async () => {
 	const { channels, serializer, notes } = fixture();
 	channels.findOneBy.mockResolvedValue(channel);
-	const endpoint = new ShowEndpoint(channels, serializer);
-	const result = await endpoint.execute(v.parse(channelsShowInput, { channelId: channel.id, future: true }), mockDeep<MiLocalUser>({ id: 'user123' }));
+	const actor = mockDeep<MiLocalUser>({ id: 'user123', isSuspended: false, movedToUri: null });
+	const services = mockDeep<ApiServices<MiLocalUser>>();
+	services.authenticate.mockResolvedValue([actor, null]);
+	const endpoint = createProcedureClient(createChannelsShowProcedure<MiLocalUser>({ channelsRepository: channels, channelEntityService: serializer }), { context: { services, credential: 'fixture', ip: '127.0.0.1', headers: {} } });
+	const result = await endpoint({ channelId: channel.id });
 	expect(v.parse(showOutput, result)).toEqual(result);
 	expect(result).toMatchObject({ hasUnreadNote: false, pinnedNotes: [] });
 	expect(notes.packMany).toHaveBeenCalledWith([], expect.objectContaining({ id: 'user123' }));
 	channels.findOneBy.mockResolvedValue(null);
-	await expect(endpoint.execute({ channelId: channel.id }, null)).rejects.toMatchObject({ code: 'NO_SUCH_CHANNEL', data: { id: '6f6c314b-7486-4897-8966-c04a66a02923' } });
+	await expect(endpoint({ channelId: channel.id })).rejects.toMatchObject({ code: 'NO_SUCH_CHANNEL', data: { id: '6f6c314b-7486-4897-8966-c04a66a02923' } });
 });
 
 test('native show input strips transport keys and producer output rejects extra fields', async () => {

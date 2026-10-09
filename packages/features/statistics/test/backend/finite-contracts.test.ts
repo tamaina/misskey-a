@@ -25,8 +25,13 @@ const chartEndpointDefinitions = {
 import * as descriptors from '../../shared/chart-descriptors.js';
 import Chart from '../../backend/charts/core.js';
 import { statsContract } from '../../backend/endpoints/stats.contract.js';
-import { createStatisticsOperations } from '../../backend/operations.js';
-import { createStats } from '../../backend/index.js';
+import { createProcedureClient } from '@orpc/server';
+import { createRetentionProcedure } from '../../backend/endpoints/retention.js';
+import type { MiLocalUser } from '../../../users/backend/models/User.js';
+import type { ApiContext, ApiServices, ApiAuthorization } from '../../../api/backend/transport/context.js';
+import { createStatsProcedure } from '../../backend/endpoints/stats.js';
+import { createApRequestProcedure, createApRequestGetProcedure } from '../../backend/endpoints/charts/ap-request.js';
+import type { StatisticsDependencies } from '../../backend/api.dependencies.js';
 import { retentionContract as nativeContract1, retentionContract as nativeContract2 } from '../../backend/endpoints/retention.contract.js';
 import type { RetentionAggregationsRepository } from '@features/persistence/backend/repositories/models.js';
 import type { MiRetentionAggregation } from '../../backend/models/RetentionAggregation.js';
@@ -101,11 +106,39 @@ test('stats empty input retains its non-array JSON-object guard and missing-body
 });
 
 test('actual statistics and retention producers produce declared fields', async () => {
-	const stats = createStats({ readNotes: async () => ({ local: 2, remote: 3 }), readUsers: async () => ({ local: 4, remote: 5 }), countReactions: async () => 6, countInstances: async () => 7 });
+	const stats = createProcedureClient(createStatsProcedure({ readNotes: async () => ({ local: 2, remote: 3 }), readUsers: async () => ({ local: 4, remote: 5 }), countReactions: async () => 6, countInstances: async () => 7 }), { context: nativeContext() });
 	const result = await stats({});
 	expect(v.parse(statsContract['~orpc'].outputSchema!, result)).toEqual({ notesCount: 5, originalNotesCount: 2, usersCount: 9, originalUsersCount: 4, reactionsCount: 6, instances: 7, driveUsageLocal: 0, driveUsageRemote: 0 });
 	expect(v.safeParse(statsContract['~orpc'].outputSchema!, { ...result, future: true }).success).toBe(false);
 	const repository = mockDeep<RetentionAggregationsRepository>();
 	repository.find.mockResolvedValue([mockDeep<MiRetentionAggregation>({ createdAt: new Date(item.createdAt), usersCount: item.users, data: item.data })]);
-	expect(v.parse(remainingRetentionOutput, await createStatisticsOperations({ ...mockDeep<Parameters<typeof createStatisticsOperations>[0]>(), readRetention: () => repository.find() }).retention({}, null))).toEqual([item]);
+	expect(v.parse(remainingRetentionOutput, await createProcedureClient(createRetentionProcedure({ readRetention: options => repository.find(options) }), { context: nativeContext() })({}))).toEqual([item]);
+	expect(repository.find).toHaveBeenCalledExactlyOnceWith({ order: { id: 'DESC' }, take: 30 });
+});
+
+function nativeContext(): ApiContext<MiLocalUser> {
+	const actor = mockDeep<MiLocalUser>({ id: 'trusted-user', isSuspended: false, movedToUri: null });
+	const services = mockDeep<ApiServices<MiLocalUser>>();
+	services.authenticate.mockResolvedValue([actor, null]);
+	const authorization = mockDeep<ApiAuthorization<MiLocalUser>>();
+	authorization.rootUserId.mockReturnValue(actor.id);
+	return { services, authorization, credential: 'credential', ip: '127.0.0.1', headers: {} };
+}
+
+test('native chart aliases reuse their reader and preserve GET scalar decoding and offset conversion', async () => {
+	const reader = mockDeep<StatisticsDependencies['charts']['apRequest']>();
+	const output = { deliverFailed: [1], deliverSucceeded: [2], inboxReceived: [3] };
+	reader.getChart.mockResolvedValue(output);
+	const context = nativeContext();
+	const post = createProcedureClient(createApRequestProcedure(reader), { context });
+	const get = createProcedureClient(createApRequestGetProcedure(reader), { context });
+	expect(await post({ span: 'hour', offset: 0 })).toEqual(output);
+	expect(reader.getChart).toHaveBeenLastCalledWith('hour', 30, null);
+	// @ts-expect-error GET transport presents numeric query scalars as strings before middleware decoding.
+	expect(await get({ span: 'day', limit: '1', offset: '1000' })).toEqual(output);
+	expect(reader.getChart).toHaveBeenLastCalledWith('day', 1, new Date(1000));
+	// @ts-expect-error GET middleware also accepts the legacy JSON null scalar.
+	expect(await get({ span: 'day', offset: 'null' })).toEqual(output);
+	expect(reader.getChart).toHaveBeenLastCalledWith('day', 30, null);
+	expect(reader.getChart).toHaveBeenCalledTimes(3);
 });

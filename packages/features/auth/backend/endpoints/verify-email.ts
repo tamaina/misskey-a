@@ -2,18 +2,16 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-
-import { Inject, Injectable } from '@nestjs/common';
-
 import type { UserProfilesRepository } from '@features/persistence/backend/repositories/models.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
-import { DI } from '@/di-symbols.js';
 import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
 import { apiError } from '@features/api/backend/transport/orpc-error.js';
-
-import type * as v from 'valibot';
-import type { VerifyEmailContract } from '../api.contract.js';
-
+import * as v from 'valibot';
+import { VerifyEmailContract } from '../api.contract.js';
+import { implement } from '@orpc/server';
+import { authentication, apiPolicy } from '../../../api/backend/transport/middleware.js';
+import type { ApiContext } from '../../../api/backend/transport/context.js';
+import type { MiLocalUser } from '../../../users/backend/models/User.js';
 export const meta = {
 	requireCredential: false,
 
@@ -27,33 +25,37 @@ export const meta = {
 		},
 	},
 } as const;
+export interface VerifyEmailDependencies {
+	userProfilesRepository: UserProfilesRepository;
+	userEntityService: Pick<UserEntityService, 'packSelf'>;
+	globalEventService: Pick<GlobalEventService, 'publishMainStream'>;
+}
+export function createVerifyEmailProcedure(deps: VerifyEmailDependencies) {
+	return implement(VerifyEmailContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>().use(authentication<MiLocalUser>()).use(apiPolicy<MiLocalUser>({ name: 'verify-email' })).handler(async ({ input, context }) => {
+		const ps = input;
+		const result = await (async () => {
+			const profile = await deps.userProfilesRepository.findOneBy({
+				emailVerifyCode: ps.code,
+			});
 
-@Injectable()
-export class VerifyEmailOperation {
-	constructor(
-		@Inject(DI.userProfilesRepository)
-		private userProfilesRepository: UserProfilesRepository,
+			if (profile == null) {
+				throw apiError(meta.errors.noSuchCode);
+			}
 
-		private userEntityService: UserEntityService,
-		private globalEventService: GlobalEventService,
-	) {}
+			await deps.userProfilesRepository.update({ userId: profile.userId }, {
+				emailVerified: true,
+				emailVerifyCode: null,
+			});
 
-	async execute(ps: v.InferOutput<NonNullable<typeof VerifyEmailContract['~orpc']['inputSchema']>>) {
-		const profile = await this.userProfilesRepository.findOneBy({
-			emailVerifyCode: ps.code,
-		});
+			deps.globalEventService.publishMainStream(profile.userId, 'meUpdated', await deps.userEntityService.packSelf(profile.userId, {
+				includeSecrets: true,
+			}));
+		})();
+		return v.parse(requiredSchema(VerifyEmailContract['~orpc'].outputSchema), result);
+	});
+}
 
-		if (profile == null) {
-			throw apiError(meta.errors.noSuchCode);
-		}
-
-		await this.userProfilesRepository.update({ userId: profile.userId }, {
-			emailVerified: true,
-			emailVerifyCode: null,
-		});
-
-		this.globalEventService.publishMainStream(profile.userId, 'meUpdated', await this.userEntityService.packSelf(profile.userId, {
-			includeSecrets: true,
-		}));
-	}
+function requiredSchema<Schema>(schema: Schema | undefined): Schema {
+	if (schema === undefined) throw new Error('Contract must declare its schema');
+	return schema;
 }

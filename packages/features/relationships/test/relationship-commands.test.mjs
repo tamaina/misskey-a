@@ -6,7 +6,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createRouterClient } from '@orpc/server';
-import { RelationshipsApplicationService, createRelationshipsRouter, relationshipsProviders } from '../../../backend/built/features/relationships/backend.js';
+import { createRelationshipsRouter } from '../../../backend/built/features/relationships/backend.js';
 
 const actor = { id: 'actor123', isSuspended: false, movedToUri: null, profile: { retained: true } };
 const user = { id: 'user123', profile: { retained: true } };
@@ -27,35 +27,31 @@ function createFixture(overrides = {}) {
 		unmuteRenotes: async (...args) => { calls.push(['unmuteRenotes', ...args]); },
 		...overrides,
 	};
-	return { feature: createNativeOperations(deps), calls };
+	return { feature: createNativeRouter(deps), calls };
 }
 
-function createNativeOperations(deps) {
-	const Commands = relationshipsProviders.find(provider => provider.name === 'RelationshipsCommandOperations');
-	assert.ok(Commands, 'real relationship command application provider');
-	const commands = new Commands(
-		{ getUser: (...args) => deps.getUser(...args) },
-		{ acceptFollowRequest: (...args) => deps.acceptFollowRequest(...args), rejectFollowRequest: (...args) => deps.rejectFollowRequest(...args) },
-		{ unmute: (...args) => deps.unmute(...args) },
-		{ mute: (...args) => deps.muteRenotes(...args), unmute: (...args) => deps.unmuteRenotes(...args) },
-		{ removeMember: (...args) => deps.removeMember(...args), addMember: (...args) => deps.addMember(...args), updateMembership: (...args) => deps.updateMembership(...args) },
-		{ gen: () => deps.generateFavoriteId() },
-		{ findOneBy: query => deps.findMuting(query.muterId, query.muteeId) },
-		{ exists: ({ where }) => deps.isRenoteMuting(where.muterId, where.muteeId), findOneBy: query => deps.findRenoteMuting(query.muterId, query.muteeId) },
-		{ findOneBy: query => deps.findOwnedList(query.id, query.userId), delete: id => deps.deleteList(id), exists: ({ where }) => deps.findPublicList(where.id) },
-		{ exists: ({ where }) => deps.hasFavorite(where.userId, where.userListId), insert: value => deps.insertFavorite(value), findOneBy: query => deps.findFavorite(query.userListId, query.userId), delete: query => deps.deleteFavorite(query.id) },
-		{ exists: ({ where }) => deps.hasMembership(where.userListId, where.userId) },
-		{ exists: ({ where }) => deps.hasReverseBlock(where.blockerId, where.blockeeId) },
-	);
-	return new RelationshipsApplicationService(commands);
+function createNativeRouter(deps) {
+return createRelationshipsRouter({
+getterService: { getUser: (...args) => deps.getUser(...args) },
+userFollowingService: { acceptFollowRequest: (...args) => deps.acceptFollowRequest(...args), rejectFollowRequest: (...args) => deps.rejectFollowRequest(...args) },
+userMutingService: { unmute: (...args) => deps.unmute(...args) },
+userRenoteMutingService: { mute: (...args) => deps.muteRenotes(...args), unmute: (...args) => deps.unmuteRenotes(...args) },
+userListService: { removeMember: (...args) => deps.removeMember(...args), addMember: (...args) => deps.addMember(...args), updateMembership: (...args) => deps.updateMembership(...args) },
+idService: { gen: () => deps.generateFavoriteId() },
+mutingsRepository: { findOneBy: query => deps.findMuting(query.muterId, query.muteeId) },
+renoteMutingsRepository: { exists: ({ where }) => deps.isRenoteMuting(where.muterId, where.muteeId), findOneBy: query => deps.findRenoteMuting(query.muterId, query.muteeId) },
+userListsRepository: { findOneBy: query => deps.findOwnedList(query.id, query.userId), delete: id => deps.deleteList(id), exists: ({ where }) => deps.findPublicList(where.id) },
+userListFavoritesRepository: { exists: ({ where }) => deps.hasFavorite(where.userId, where.userListId), insert: value => deps.insertFavorite(value), findOneBy: query => deps.findFavorite(query.userListId, query.userId), delete: query => deps.deleteFavorite(query.id) },
+userListMembershipsRepository: { exists: ({ where }) => deps.hasMembership(where.userListId, where.userId) },
+blockingsRepository: { exists: ({ where }) => deps.hasReverseBlock(where.blockerId, where.blockeeId) },
+});
 }
 
 function invoke(feature, route, input = { userId: user.id }, trustedActor = actor, token = null) {
 	const context = { credential: trustedActor ? 'credential' : null, ip: '192.0.2.1', headers: {},
 		services: { authenticate: async () => [trustedActor, token], limitActor: () => actor.id, rateLimitFactor: async () => 1, limit: async () => null },
-		operations: { relationships: feature },
 	};
-	return createRouterClient(createRelationshipsRouter(), { context })[route](input);
+	return createRouterClient(feature, { context })[route](input);
 }
 
 test('relationship contract validates IDs before invoking dependency ports', async () => {

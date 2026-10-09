@@ -2,19 +2,16 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-
-import { Inject, Injectable } from '@nestjs/common';
-
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import type { UserProfilesRepository, UserSecurityKeysRepository } from '@features/persistence/backend/repositories/models.js';
 import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
-import { DI } from '@/di-symbols.js';
 import { apiError } from '@features/api/backend/transport/orpc-error.js';
-
-import type * as v from 'valibot';
-import type { I2faPasswordLessContract } from '../../../api.contract.js';
+import * as v from 'valibot';
+import { I2faPasswordLessContract } from '../../../api.contract.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
-
+import { implement } from '@orpc/server';
+import { authentication, apiPolicy, requirePrincipal } from '../../../../../api/backend/transport/middleware.js';
+import type { ApiContext } from '../../../../../api/backend/transport/context.js';
 export const meta = {
 	requireCredential: true,
 
@@ -28,50 +25,53 @@ export const meta = {
 		},
 	},
 } as const;
-
-@Injectable()
-export class I2faPasswordLessOperation {
-	constructor(
-		@Inject(DI.userProfilesRepository)
-		private userProfilesRepository: UserProfilesRepository,
-
-		@Inject(DI.userSecurityKeysRepository)
-		private userSecurityKeysRepository: UserSecurityKeysRepository,
-
-		private userEntityService: UserEntityService,
-		private globalEventService: GlobalEventService,
-	) {}
-
-	async execute(ps: v.InferOutput<NonNullable<typeof I2faPasswordLessContract['~orpc']['inputSchema']>>, me: MiLocalUser) {
-		if (ps.value === true) {
-			// セキュリティキーがなければパスワードレスを有効にはできない
-			const keyCount = await this.userSecurityKeysRepository.count({
-				where: {
-					userId: me.id,
-				},
-				select: {
-					id: true,
-					name: true,
-					lastUsed: true,
-				},
-			});
-
-			if (keyCount === 0) {
-				await this.userProfilesRepository.update(me.id, {
-					usePasswordLessLogin: false,
+export interface I2faPasswordLessDependencies {
+	userProfilesRepository: UserProfilesRepository;
+	userSecurityKeysRepository: UserSecurityKeysRepository;
+	userEntityService: Pick<UserEntityService, 'packSelf'>;
+	globalEventService: Pick<GlobalEventService, 'publishMainStream'>;
+}
+export function createI2faPasswordLessProcedure(deps: I2faPasswordLessDependencies) {
+	return implement(I2faPasswordLessContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>().use(authentication<MiLocalUser>()).use(apiPolicy<MiLocalUser>({ name: 'i/2fa/password-less', requireCredential: true, secure: true })).use(requirePrincipal<MiLocalUser>()).handler(async ({ input, context }) => {
+		const ps = input;
+		const me = context.principal;
+		const result = await (async () => {
+			if (ps.value === true) {
+				// セキュリティキーがなければパスワードレスを有効にはできない
+				const keyCount = await deps.userSecurityKeysRepository.count({
+					where: {
+						userId: me.id,
+					},
+					select: {
+						id: true,
+						name: true,
+						lastUsed: true,
+					},
 				});
 
-				throw apiError(meta.errors.noKey);
+				if (keyCount === 0) {
+					await deps.userProfilesRepository.update(me.id, {
+						usePasswordLessLogin: false,
+					});
+
+					throw apiError(meta.errors.noKey);
+				}
 			}
-		}
 
-		await this.userProfilesRepository.update(me.id, {
-			usePasswordLessLogin: ps.value,
-		});
+			await deps.userProfilesRepository.update(me.id, {
+				usePasswordLessLogin: ps.value,
+			});
 
-		// Publish meUpdated event
-		this.globalEventService.publishMainStream(me.id, 'meUpdated', await this.userEntityService.packSelf(me.id, {
-			includeSecrets: true,
-		}));
-	}
+			// Publish meUpdated event
+			deps.globalEventService.publishMainStream(me.id, 'meUpdated', await deps.userEntityService.packSelf(me.id, {
+				includeSecrets: true,
+			}));
+		})();
+		return v.parse(requiredSchema(I2faPasswordLessContract['~orpc'].outputSchema), result);
+	});
+}
+
+function requiredSchema<Schema>(schema: Schema | undefined): Schema {
+	if (schema === undefined) throw new Error('Contract must declare its schema');
+	return schema;
 }

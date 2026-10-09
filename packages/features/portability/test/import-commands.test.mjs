@@ -6,9 +6,10 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import * as v from 'valibot';
-import { createPortabilityOperations, portabilityApiContract } from '../../../backend/built/features/portability/backend.js';
+import { createRouterClient } from '@orpc/server';
+import { createPortabilityRouter, portabilityApiContract } from '../../../backend/built/features/portability/backend.js';
 
-const actor = { id: 'trusted123', data: 'kept' };
+const actor = { id: 'trusted123', data: 'kept', isSuspended: false, movedToUri: null };
 const file = { id: 'file123', size: 12, url: 'https://example.test/file' };
 
 function createFixture(overrides = {}) {
@@ -27,11 +28,12 @@ function createFixture(overrides = {}) {
 		createImportUserListsJob: (...args) => { calls.push(['createImportUserListsJob', ...args]); },
 		...overrides,
 	};
-	return { calls, feature: createPortabilityOperations(deps) };
+	return { calls, feature: createPortabilityRouter(deps) };
 }
 
 async function invoke(feature, route, input = { fileId: file.id }, trustedActor = actor) {
-	return feature[route](v.parse(portabilityApiContract[route]['~orpc'].inputSchema, input), trustedActor);
+	const client = createRouterClient(feature, { context: nativeContext(trustedActor) });
+	return client[route](input);
 }
 
 test('native import schemas retain misskey IDs and optional withReplies', () => {
@@ -111,3 +113,10 @@ test('empty/missing files stop before move validation or queueing; antenna cap i
 	await assert.rejects(invoke(atLimit.feature, 'i/import-antennas'), error => error.code === 'TOO_MANY_ANTENNAS');
 	assert.equal(atLimit.calls.some(([method]) => method === 'createImportAntennasJob'), false);
 });
+
+function nativeContext(actor) {
+	return { credential: 'credential', ip: '192.0.2.1', headers: {},
+		services: { authenticate: async () => [actor, null], limitActor: () => null, rateLimitFactor: async () => 1, limit: async () => null },
+		authorization: { rootUserId: () => actor.id, roles: async () => [], policyAllowed: async () => true },
+	};
+}

@@ -1,0 +1,70 @@
+/*
+ * SPDX-FileCopyrightText: syuilo and misskey-project
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
+import type { PromoNotesRepository } from '@features/persistence/backend/repositories/models.js';
+import type { GetterService } from '@features/api/backend/transport/GetterService.js';
+import type { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
+import type { NotePiningService } from './services/NotePiningService.js';
+import type { NotesRepository } from '@features/persistence/backend/repositories/models.js';
+import type { NoteEntityService } from './serializers/NoteEntityService.js';
+import type { QueryService } from './services/QueryService.js';
+import type { MiMeta } from '@features/persistence/backend/repositories/models.js';
+import type { NoteCreateService } from './services/NoteCreateService.js';
+import type { NoteDraftsRepository } from '@features/persistence/backend/repositories/models.js';
+import type { NoteDraftService } from './services/NoteDraftService.js';
+import type { NoteDraftEntityService } from './serializers/NoteDraftEntityService.js';
+import type { PollsRepository } from '@features/persistence/backend/repositories/models.js';
+import type { PollVotesRepository } from '@features/persistence/backend/repositories/models.js';
+import type { MutingsRepository } from '@features/persistence/backend/repositories/models.js';
+import type { UsersRepository } from '@features/persistence/backend/repositories/models.js';
+import type { IdService } from '@features/runtime/backend/services/IdService.js';
+import type { QueueService } from '@features/runtime/backend/services/QueueService.js';
+import type { PollService } from './services/PollService.js';
+import type { ApRendererService } from '@features/federation/backend/services/ApRendererService.js';
+import type { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
+import type { UserBlockingService } from '@features/relationships/backend/services/UserBlockingService.js';
+import type { NoteReactionsRepository } from '@features/persistence/backend/repositories/models.js';
+import type { NoteReactionEntityService } from './serializers/NoteReactionEntityService.js';
+import type { NoteThreadMutingsRepository } from '@features/persistence/backend/repositories/models.js';
+import type { NoteFavoritesRepository } from '@features/persistence/backend/repositories/models.js';
+import type { HttpRequestService } from '@features/runtime/backend/services/HttpRequestService.js';
+import type { RoleService } from '@features/roles/backend/services/RoleService.js';
+import type { UserProfilesRepository } from '@features/persistence/backend/repositories/models.js';
+import type { CacheService } from '@features/users/backend/services/CacheService.js';
+import type { NotesCommandDependencies } from './command.dependencies.js';
+import type { DeleteNoteDependencies } from './delete-note.js';
+import type { MiLocalUser, MiUser } from '../../users/backend/models/User.js';
+import type { MiNote } from './models/Note.js';
+export interface NotesDependencies extends NotesCommandDependencies, DeleteNoteDependencies<MiLocalUser, MiNote, MiUser> {
+	promoNotesRepository: PromoNotesRepository;
+	getterService: Pick<GetterService, 'getNote' | 'getNoteWithRelations'>;
+	userEntityService: Pick<UserEntityService, 'packSelf' | 'isRemoteUser'>;
+	notePiningService: Pick<NotePiningService, 'addPinned' | 'removePinned'>;
+	notesRepository: NotesRepository;
+	noteEntityService: Pick<NoteEntityService, 'packMany' | 'pack' | 'isVisibleForMe' | 'fetchDiffs'>;
+	queryService: Pick<QueryService, 'makePaginationQuery' | 'generateVisibilityQuery' | 'generateBaseNoteFilteringQuery' | 'generateUgcVisibilityQueryForVisitor' | 'generateBlockedHostQueryForNote' | 'generateSuspendedUserQueryForNote'>;
+	serverSettings: MiMeta;
+	noteCreateService: Pick<NoteCreateService, 'fetchAndCreate'>;
+	noteDraftsRepository: NoteDraftsRepository;
+	noteDraftService: Pick<NoteDraftService, 'create' | 'update'>;
+	noteDraftEntityService: Pick<NoteDraftEntityService, 'pack' | 'packMany'>;
+	pollsRepository: PollsRepository;
+	pollVotesRepository: PollVotesRepository;
+	mutingsRepository: MutingsRepository;
+	usersRepository: UsersRepository;
+	idService: Pick<IdService, 'gen'>;
+	queueService: Pick<QueueService, 'deliver'>;
+	pollService: Pick<PollService, 'deliverQuestionUpdate'>;
+	apRendererService: Pick<ApRendererService, 'addContext' | 'renderVote'>;
+	globalEventService: Pick<GlobalEventService, 'publishNoteStream'>;
+	userBlockingService: Pick<UserBlockingService, 'checkBlocked'>;
+	noteReactionsRepository: NoteReactionsRepository;
+	noteReactionEntityService: Pick<NoteReactionEntityService, 'packMany' | 'packManyWithNote'>;
+	noteThreadMutingsRepository: NoteThreadMutingsRepository;
+	noteFavoritesRepository: NoteFavoritesRepository;
+	httpRequestService: Pick<HttpRequestService, 'send'>;
+	roleService: Pick<RoleService, 'getUserPolicies' | 'isModerator'>;
+	userProfilesRepository: UserProfilesRepository;
+	cacheService: Pick<CacheService, 'userBlockedCache' | 'findUserById' | 'userMutingsCache'>;
+}

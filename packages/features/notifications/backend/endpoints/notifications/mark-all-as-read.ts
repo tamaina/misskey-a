@@ -6,13 +6,17 @@
 import { implement } from '@orpc/server';
 import { authentication, apiPolicy, requirePrincipal } from '../../../../api/backend/transport/middleware.js';
 import { markAllAsReadContract } from './mark-all-as-read.contract.js';
-import type { ApiActor } from '../../../../api/backend/transport/context.js';
-import type { NotificationsContext } from '../../operations.js';
-
-export function createMarkAllAsReadProcedure<Actor extends ApiActor>() {
-	return implement(markAllAsReadContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<NotificationsContext<Actor>>()
-		.use(authentication<Actor>())
-		.use(apiPolicy<Actor>({ name: 'notifications/mark-all-as-read', requireCredential: true, kind: 'write:notifications' }))
-		.use(requirePrincipal<Actor>())
-		.handler(({ input, context }) => context.operations.notifications.markAllAsRead(input, context.principal));
+import type { ApiContext } from '@features/api/backend/transport/context.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+import type { NotificationsDependencies } from '@features/notifications/backend/api.dependencies.js';
+export type MarkAllAsReadDependencies = Pick<NotificationsDependencies, 'readAllNotification'>;
+export function createMarkAllAsReadProcedure(deps: MarkAllAsReadDependencies) {
+	return implement(markAllAsReadContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>()
+		.use(authentication<MiLocalUser>())
+		.use(apiPolicy<MiLocalUser>({ name: markAllAsReadContract['~orpc'].meta.requestName, requireCredential: true, kind: 'write:notifications' }))
+		.use(requirePrincipal<MiLocalUser>())
+		.handler(async ({ input, context }) => {
+			const actor = context.principal;
+			void deps.readAllNotification(actor.id, true);
+		});
 }

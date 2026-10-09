@@ -19,25 +19,26 @@ import { createOnlineUsersCountProcedure, createOnlineUsersCountGetProcedure } f
 import { createMetaProcedure } from './endpoints/meta.js';
 import { createPingProcedure } from './endpoints/ping.js';
 import { createPinnedUsersProcedure } from './endpoints/pinned-users.js';
-import type { InstanceApiContext } from './operations.js';
+import type { ApiContext } from '../../api/backend/transport/context.js';
+import type { InstanceApiDependencies } from './api.dependencies.js';
+import type { ServerInfoDependencies } from './server-info.js';
 import type { ApiActor } from '../../api/backend/transport/context.js';
-
-export function createInstanceRouter<Actor extends ApiActor>() {
-	return implement(instanceApiContract).$context<InstanceApiContext<Actor>>().router({
-		...createServerInfoRouter<Actor>(),
-		adCreate: createAdCreateProcedure<Actor>(),
-		adDelete: createAdDeleteProcedure<Actor>(),
-		adList: createAdListProcedure<Actor>(),
-		adUpdate: createAdUpdateProcedure<Actor>(),
-		adminMeta: createAdminMetaProcedure<Actor>(),
-		adminServerInfo: createAdminServerInfoProcedure<Actor>(),
-		updateMeta: createUpdateMetaProcedure<Actor>(),
-		endpoint: createEndpointProcedure<Actor>(),
-		endpoints: createEndpointsProcedure<Actor>(),
-		onlineUsersCount: createOnlineUsersCountProcedure<Actor>(),
-		onlineUsersCountGet: createOnlineUsersCountGetProcedure<Actor>(),
-		meta: createMetaProcedure<Actor>(),
-		ping: createPingProcedure<Actor>(),
-		pinnedUsers: createPinnedUsersProcedure<Actor>(),
+export function createInstanceRouter<Actor extends ApiActor>(deps: InstanceApiDependencies & { serverInfo: ServerInfoDependencies }) {
+	return implement(instanceApiContract).$context<ApiContext<Actor>>().router({
+		...createServerInfoRouter<Actor>(deps.serverInfo),
+		adCreate: createAdCreateProcedure<Actor>(deps),
+		adDelete: createAdDeleteProcedure<Actor>(deps),
+		adList: createAdListProcedure<Actor>(deps),
+		adUpdate: createAdUpdateProcedure<Actor>(deps),
+		adminMeta: createAdminMetaProcedure<Actor>(deps),
+		adminServerInfo: createAdminServerInfoProcedure<Actor>(deps),
+		updateMeta: createUpdateMetaProcedure<Actor>(deps),
+		endpoint: createEndpointProcedure<Actor>(deps),
+		endpoints: createEndpointsProcedure<Actor>(deps),
+		onlineUsersCount: createOnlineUsersCountProcedure<Actor>(deps),
+		onlineUsersCountGet: createOnlineUsersCountGetProcedure<Actor>(deps),
+		meta: createMetaProcedure<Actor>(deps),
+		ping: createPingProcedure<Actor>(deps),
+		pinnedUsers: createPinnedUsersProcedure<Actor>(deps),
 	});
 }

@@ -4,17 +4,20 @@
  */
 
 import type { InferSchemaOutput } from '@orpc/contract';
-import type { ApiActor } from '@features/api/backend/transport/context.js';
+import { call, type InferRouterCurrentContexts } from '@orpc/server';
+import type { createAdminShowUserProcedure } from '@features/moderation/backend/endpoints/admin/show-user.js';
+import type { ApiActor, ApiContext } from '@features/api/backend/transport/context.js';
 import type { moderationContract } from '@features/moderation/backend/api.contract.js';
-import type { ModerationOperations } from '@features/moderation/backend/api.operations.js';
-
 type Documented = InferSchemaOutput<NonNullable<typeof moderationContract.adminShowUser['~orpc']['outputSchema']>>;
 type Input = InferSchemaOutput<NonNullable<typeof moderationContract.adminShowUser['~orpc']['inputSchema']>>;
 declare const actor: ApiActor;
-declare const operations: ModerationOperations<ApiActor>;
+type Procedure = ReturnType<typeof createAdminShowUserProcedure<ApiActor>>;
+type HandlerContext = InferRouterCurrentContexts<Procedure>;
+declare const procedure: Procedure;
+declare const context: ApiContext<ApiActor>;
+const trustedPrincipal: HandlerContext['principal'] = actor;
 const input: Input = { userId: 'user123' };
-const native: Promise<Documented> = operations.adminShowUser(input, actor);
-
+const native: Promise<Documented> = call(procedure, input, { context });
 // Signins expose the real producer fields; their stored headers are genuine JSON.
 const signins: Documented['signins'] = [{
 	id: 'signin123', userId: 'user123', ip: '127.0.0.1',
@@ -25,6 +28,6 @@ const unconvertedDate: Documented['lastActiveDate'] = new Date();
 // @ts-expect-error Stored headers cannot contain native Date instances.
 const unconvertedHeaders: Documented['signins'][number]['headers'] = { receivedAt: new Date() };
 // @ts-expect-error Required credentials cannot be replaced by an anonymous principal.
-operations.adminShowUser(input, null);
+const anonymousPrincipal: HandlerContext['principal'] = null;
 // @ts-expect-error A caller cannot substitute a numeric user selector.
 const wrongInput: Input = { userId: 42 };

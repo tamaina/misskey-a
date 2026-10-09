@@ -5,13 +5,28 @@
 
 import { implement } from '@orpc/server';
 import { authentication, apiPolicy } from '../../../../api/backend/transport/middleware.js';
-import type { ApiActor } from '../../../../api/backend/transport/context.js';
-import type { PlayContext } from '../../operations.js';
+import type { ApiContext } from '../../../../api/backend/transport/context.js';
 import { flashSearchContract } from './search.contract.js';
-
-export function createFlashSearchProcedure<Actor extends ApiActor>() {
-	return implement(flashSearchContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<PlayContext<Actor>>()
-		.use(authentication<Actor>())
-		.use(apiPolicy<Actor>({ name: 'flash/search' }))
-		.handler(({ input, context }) => context.operations.play.flashSearch(input, context.principal));
+import type { FlashEntityService } from '../../serializers/FlashEntityService.js';
+import type { FlashService } from '../../services/FlashService.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+export interface FlashSearchDependencies {
+	flashService: Pick<FlashService, 'search'>;
+	flashEntityService: Pick<FlashEntityService, 'packMany'>;
+}
+export function createFlashSearchProcedure(deps: FlashSearchDependencies) {
+	return implement(flashSearchContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>()
+		.use(authentication<MiLocalUser>())
+		.use(apiPolicy<MiLocalUser>({ name: flashSearchContract['~orpc'].meta.requestName }))
+		.handler(async ({ input: ps, context }) => {
+			const me = context.principal;
+			const result = await deps.flashService.search(ps.query, {
+				sinceId: ps.sinceId,
+				untilId: ps.untilId,
+				sinceDate: ps.sinceDate,
+				untilDate: ps.untilDate,
+				limit: ps.limit,
+			});
+			return await deps.flashEntityService.packMany(result, me);
+		});
 }

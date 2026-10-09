@@ -5,20 +5,20 @@
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { createAvatarDecorationsOperations, createAvatarDecorationsRouter, avatarDecorationsContract } from '../../../backend/built/features/avatar-decorations/backend.js';
+import { createAvatarDecorationsRouter, avatarDecorationsContract } from '../../../backend/built/features/avatar-decorations/backend.js';
 
 import { createRouterClient } from '@orpc/server';
 import * as v from 'valibot';
 
-function decorationOperationsFixture(deps) { return createAvatarDecorationsOperations({ avatarDecorationService: deps }); }
+function decorationDependenciesFixture(deps) { return { avatarDecorationService: deps }; }
 
 const updateKey = 'admin/avatar-decorations/update';
 const deleteKey = 'admin/avatar-decorations/delete';
 
-function invoke(operations, key, input, ...actorArg) {
+function invoke(dependencies, key, input, ...actorArg) {
 	const actor = actorArg.length === 0 ? { id: 'alice' } : actorArg[0];
-	const client = createRouterClient(createAvatarDecorationsRouter(), { context: {
-		credential: 'native', ip: '127.0.0.1', headers: {}, operations: { avatarDecorations: operations },
+	const client = createRouterClient(createAvatarDecorationsRouter(dependencies), { context: {
+		credential: 'native', ip: '127.0.0.1', headers: {},
 		services: { authenticate: async () => [actor ?? null, null], limitActor: () => null },
 		authorization: { rootUserId: () => null, roles: async () => [], policyAllowed: async () => true },
 	} });
@@ -38,7 +38,7 @@ test('update and delete use the trusted full actor, preserve legacy patch fields
 	let releaseUpdate;
 	let resolveUpdateStarted;
 	const updateStarted = new Promise(resolve => { resolveUpdateStarted = resolve; });
-	const feature = decorationOperationsFixture({
+	const feature = decorationDependenciesFixture({
 		update: (id, values, actorArg) => new Promise(resolve => {
 			calls.push(['update', id, values, actorArg]);
 			releaseUpdate = resolve;
@@ -75,7 +75,7 @@ test('update and delete use the trusted full actor, preserve legacy patch fields
 
 test('missing credentials fail before service calls and command inputs keep legacy validation limits', async () => {
 	const calls = [];
-	const feature = decorationOperationsFixture({
+	const feature = decorationDependenciesFixture({
 		update: async (...args) => { calls.push(args); },
 		delete: async (...args) => { calls.push(args); },
 	});

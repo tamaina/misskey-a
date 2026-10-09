@@ -5,14 +5,35 @@
 
 import { implement } from '@orpc/server';
 import { authentication, apiPolicy, requirePrincipal } from '../../../../api/backend/transport/middleware.js';
-import type { ApiActor } from '../../../../api/backend/transport/context.js';
-import type { PagesContext } from '../../operations.js';
-import { pagesUnlikeContract } from './unlike.contract.js';
-
-export function createPagesUnlikeProcedure<Actor extends ApiActor>() {
-	return implement(pagesUnlikeContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<PagesContext<Actor>>()
-		.use(authentication<Actor>())
-		.use(apiPolicy<Actor>({ name: 'pages/unlike', requireCredential: true, kind: 'write:page-likes', prohibitMoved: true }))
-		.use(requirePrincipal<Actor>())
-		.handler(({ input, context }) => context.operations.pages.pagesUnlike(input, context.principal));
+import type { ApiContext } from '../../../../api/backend/transport/context.js';
+import { pagesUnlikeContract, pagesUnlikeErrors } from './unlike.contract.js';
+import type { PagesRepository, PageLikesRepository } from '@features/persistence/backend/repositories/models.js';
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+export interface PagesUnlikeDependencies {
+	pagesRepository: Pick<PagesRepository, 'decrement' | 'findOneBy'>;
+	pageLikesRepository: Pick<PageLikesRepository, 'delete' | 'findOneBy'>;
+}
+export function createPagesUnlikeProcedure(deps: PagesUnlikeDependencies) {
+	return implement(pagesUnlikeContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>()
+		.use(authentication<MiLocalUser>())
+		.use(apiPolicy<MiLocalUser>({ name: pagesUnlikeContract['~orpc'].meta.requestName, requireCredential: true, kind: 'write:page-likes', prohibitMoved: true }))
+		.use(requirePrincipal<MiLocalUser>())
+		.handler(async ({ input: ps, context }) => {
+			const me = context.principal;
+			const page = await deps.pagesRepository.findOneBy({ id: ps.pageId });
+			if (page == null) {
+				throw apiError(pagesUnlikeErrors.noSuchPage);
+			}
+			const exist = await deps.pageLikesRepository.findOneBy({
+				pageId: page.id,
+				userId: me.id,
+			});
+			if (exist == null) {
+				throw apiError(pagesUnlikeErrors.notLiked);
+			}
+			// Delete like
+			await deps.pageLikesRepository.delete(exist.id);
+			deps.pagesRepository.decrement({ id: page.id }, 'likedCount', 1);
+		});
 }

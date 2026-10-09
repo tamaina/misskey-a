@@ -6,7 +6,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createRouterClient } from '@orpc/server';
-import { createEmojisOperations, createEmojisRouter } from '../../../backend/built/features/emojis/backend.js';
+import { createEmojisRouter } from '../../../backend/built/features/emojis/backend.js';
 
 const routeMethods = {
 	'admin/emoji/set-category-bulk': 'setCategoryBulk',
@@ -18,9 +18,9 @@ const routeMethods = {
 
 function bulkClient(deps) {
 	const actor = { id: 'admin1', isSuspended: false, movedToUri: null };
-	const operations = createEmojisOperations({ customEmojiService: deps });
-	const client = createRouterClient(createEmojisRouter(), { context: {
-		credential: 'session', ip: '192.0.2.1', headers: {}, operations: { emojis: operations },
+	const router = createEmojisRouter({ customEmojiService: deps });
+	const client = createRouterClient(router, { context: {
+		credential: 'session', ip: '192.0.2.1', headers: {},
 		services: { authenticate: async () => [actor, null], limitActor: () => null, rateLimitFactor: async () => 1, limit: async () => null },
 		authorization: { rootUserId: () => actor.id },
 	} });

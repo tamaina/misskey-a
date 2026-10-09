@@ -2,7 +2,9 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-
+import { call } from '@orpc/server';
+import type { ApiContext } from '../../../api/backend/transport/context.js';
+import type { RelationshipsDependencies } from '../../backend/api.dependencies.js';
 import { expect, test } from 'vitest';
 import * as v from 'valibot';
 import { mockDeep } from 'vitest-mock-extended';
@@ -14,9 +16,9 @@ import { MutingEntityService } from '../../backend/serializers/MutingEntityServi
 import { RenoteMutingEntityService } from '../../backend/serializers/RenoteMutingEntityService.js';
 import { FollowRequestEntityService } from '../../backend/serializers/FollowRequestEntityService.js';
 import { UserListEntityService } from '../../backend/serializers/UserListEntityService.js';
-import { UsersListsShowOperation as ListShow } from '../../backend/endpoints/users/lists/show.js';
+import { createUsersListsShowProcedure } from '../../backend/endpoints/users/lists/show.js';
 import { packedUserRelationSchema as unionUsersRelationModel } from '../../backend/endpoints/relationships.schema.js';
-import { UsersRelationOperation as Relation } from '../../backend/endpoints/users/relation.js';
+import { createUsersRelationProcedure } from '../../backend/endpoints/users/relation.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 import type { MiFollowing } from '../../backend/models/Following.js';
 import type { MiBlocking } from '../../backend/models/Blocking.js';
@@ -36,6 +38,14 @@ const packedFollowingRequestsListInput = requiredSchema(FollowingRequestsListCon
 const packedFollowingRequestsListOutput = requiredSchema(FollowingRequestsListContract['~orpc'].outputSchema);
 const packedUsersListsGetMembershipsOutput = requiredSchema(UsersListsGetMembershipsContract['~orpc'].outputSchema);
 const unionUsersRelationOutput = requiredSchema(UsersRelationContract['~orpc'].outputSchema);
+
+function context(principal: MiLocalUser | null): ApiContext<MiLocalUser> {
+	const result = mockDeep<ApiContext<MiLocalUser>>();
+	result.services.authenticate.mockResolvedValue([principal, null]);
+	result.services.rateLimitFactor.mockResolvedValue(1);
+	result.services.limit.mockResolvedValue(null);
+	return result;
+}
 
 const date = new Date('2026-01-01T00:00:00Z');
 
@@ -95,8 +105,8 @@ test('actual request and membership producers validate strict array items', asyn
 });
 
 test.each([false, true])('actual list serializer and show handler validate flattened private/public fields: %s', async forPublic => {
-	const lists = mockDeep<ConstructorParameters<typeof ListShow>[0]>();
-	const favorites = mockDeep<ConstructorParameters<typeof ListShow>[1]>();
+	const lists = mockDeep<ConstructorParameters<typeof UserListEntityService>[0]>();
+	const favorites = mockDeep<RelationshipsDependencies['userListFavoritesRepository']>();
 	favorites.countBy.mockResolvedValue(4);
 	const memberships = mockDeep<ConstructorParameters<typeof UserListEntityService>[1]>();
 	memberships.findBy.mockResolvedValue([]);
@@ -106,7 +116,7 @@ test.each([false, true])('actual list serializer and show handler validate flatt
 	lists.findOneBy.mockResolvedValue(list);
 	const serializer = new UserListEntityService(lists, memberships, mockDeep(), ids);
 	checkClosed(packedUserListSchema, await serializer.pack(list), 'name', { isPublic: 1 });
-	const output = await new ListShow(lists, favorites, serializer).execute({ listId: list.id, forPublic }, null);
+	const output = await call(createUsersListsShowProcedure({ userListsRepository: lists, userListFavoritesRepository: favorites, userListEntityService: serializer }), { listId: list.id, forPublic }, { context: context(null) });
 	checkClosed(compositionUsersListsShowOutput, output, 'name', { likedCount: '4' });
 	expect(output.likedCount).toBe(forPublic ? 4 : undefined);
 	expect(output.isLiked).toBe(forPublic ? false : undefined);
@@ -120,11 +130,11 @@ test('native relationships inputs project known fields and reject malformed pagi
 });
 
 test('actual relation handler preserves the single-id array branch and producer following field', async () => {
-	const users = mockDeep<ConstructorParameters<typeof Relation>[0]>();
+	const users = mockDeep<RelationshipsDependencies['userEntityService']>();
 	const relation = { id: user.id, following: null, isFollowing: false, hasPendingFollowRequestFromYou: false, hasPendingFollowRequestToYou: false, isFollowed: false, isBlocking: false, isBlocked: false, isMuted: false, isRenoteMuted: false };
 	users.getRelation.mockResolvedValue(relation);
-	const endpoint = new Relation(users);
-	const output = await endpoint.execute({ userId: user.id }, mockDeep<MiLocalUser>({ id: 'viewer123' }));
+	const endpoint = createUsersRelationProcedure({ userEntityService: users });
+	const output = await call(endpoint, { userId: user.id }, { context: context(mockDeep<MiLocalUser>({ id: 'viewer123', isSuspended: false, movedToUri: null })) });
 	expect(output).toEqual([relation]);
 	expect(v.parse(unionUsersRelationOutput, output)).toEqual([relation]);
 	expect(v.parse(unionUsersRelationModel, relation)).toHaveProperty('following', null);

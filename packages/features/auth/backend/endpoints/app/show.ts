@@ -2,19 +2,15 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-
-import { Inject, Injectable } from '@nestjs/common';
-
 import type { AppsRepository } from '@features/persistence/backend/repositories/models.js';
 import { AppEntityService } from '../../serializers/AppEntityService.js';
-import { DI } from '@/di-symbols.js';
 import { apiError } from '@features/api/backend/transport/orpc-error.js';
-
-import type * as v from 'valibot';
-import type { AppShowContract } from '../../api.contract.js';
+import * as v from 'valibot';
+import { AppShowContract } from '../../api.contract.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
-import type { ApiToken } from '@features/api/backend/transport/context.js';
-
+import { implement } from '@orpc/server';
+import { authentication, apiPolicy } from '../../../../api/backend/transport/middleware.js';
+import type { ApiContext } from '../../../../api/backend/transport/context.js';
 export const meta = {
 	tags: ['app'],
 
@@ -26,29 +22,35 @@ export const meta = {
 		},
 	},
 } as const;
+export interface AppShowDependencies {
+	appsRepository: AppsRepository;
+	appEntityService: Pick<AppEntityService, 'pack'>;
+}
+export function createAppShowProcedure(deps: AppShowDependencies) {
+	return implement(AppShowContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>().use(authentication<MiLocalUser>()).use(apiPolicy<MiLocalUser>({ name: 'app/show' })).handler(async ({ input, context }) => {
+		const ps = input;
+		const user = context.principal;
+		const token = context.token;
+		const result = await (async () => {
+			const isSecure = user != null && token == null;
 
-@Injectable()
-export class AppShowOperation {
-	constructor(
-		@Inject(DI.appsRepository)
-		private appsRepository: AppsRepository,
+			// Lookup app
+			const ap = await deps.appsRepository.findOneBy({ id: ps.appId });
 
-		private appEntityService: AppEntityService,
-	) {}
+			if (ap == null) {
+				throw apiError(meta.errors.noSuchApp);
+			}
 
-	async execute(ps: v.InferOutput<NonNullable<typeof AppShowContract['~orpc']['inputSchema']>>, user: MiLocalUser | null, token: ApiToken | null) {
-		const isSecure = user != null && token == null;
+			return await deps.appEntityService.pack(ap, user, {
+				detail: true,
+				includeSecret: isSecure && (ap.userId === user!.id),
+			});
+		})();
+		return v.parse(requiredSchema(AppShowContract['~orpc'].outputSchema), result);
+	});
+}
 
-		// Lookup app
-		const ap = await this.appsRepository.findOneBy({ id: ps.appId });
-
-		if (ap == null) {
-			throw apiError(meta.errors.noSuchApp);
-		}
-
-		return await this.appEntityService.pack(ap, user, {
-			detail: true,
-			includeSecret: isSecure && (ap.userId === user!.id),
-		});
-	}
+function requiredSchema<Schema>(schema: Schema | undefined): Schema {
+	if (schema === undefined) throw new Error('Contract must declare its schema');
+	return schema;
 }

@@ -5,14 +5,23 @@
 
 import { implement } from '@orpc/server';
 import { chatReadAllContract, chatReadAllPolicy } from './read-all.contract.js';
-import type { ApiActor } from '../../../../api/backend/transport/context.js';
 import { authentication, apiPolicy, requirePrincipal } from '../../../../api/backend/transport/middleware.js';
-import type { ChatApiContext } from '../../operations.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+import type { ApiContext } from '@features/api/backend/transport/context.js';
+import type { InferSchemaOutput } from '@orpc/contract';
+import { type ChatService } from '@features/chat/backend/services/ChatService.js';
+export interface ChatReadAllDependencies {
+	chatService: Pick<ChatService, 'checkChatAvailability' | 'readAllChatMessages'>;
+}
+export function createChatReadAllProcedure(deps: ChatReadAllDependencies) {
+	async function execute(input: InferSchemaOutput<NonNullable<typeof chatReadAllContract['~orpc']['inputSchema']>>, actor: MiLocalUser): Promise<void> {
+		await deps.chatService.checkChatAvailability(actor.id, 'read');
+		await deps.chatService.readAllChatMessages(actor.id);
+	}
 
-export function createChatReadAllProcedure<Actor extends ApiActor>() {
-	return implement(chatReadAllContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ChatApiContext<Actor>>()
-		.use(authentication<Actor>())
-		.use(apiPolicy<Actor>(chatReadAllPolicy))
-		.use(requirePrincipal<Actor>())
-		.handler(({ input, context }) => context.operations.chat.chatReadAll(input, context.principal));
+	return implement(chatReadAllContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>()
+		.use(authentication<MiLocalUser>())
+		.use(apiPolicy<MiLocalUser>(chatReadAllPolicy))
+		.use(requirePrincipal<MiLocalUser>())
+		.handler(({ input, context }) => execute(input, context.principal));
 }

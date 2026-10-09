@@ -6,20 +6,18 @@
 import { implement } from '@orpc/server';
 import { authentication, apiPolicy, decodeScalarInput } from '../../../../../api/backend/transport/middleware.js';
 import { chartPerUserDriveContract, chartPerUserDriveGetContract } from './drive.contract.js';
-import type { ApiActor } from '../../../../../api/backend/transport/context.js';
-import type { StatisticsContext } from '../../../operations.js';
-
-export function createPerUserDriveProcedure<Actor extends ApiActor>() {
-	return implement(chartPerUserDriveContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<StatisticsContext<Actor>>()
+import type { ApiActor, ApiContext } from '../../../../../api/backend/transport/context.js';
+import type { StatisticsDependencies } from '../../../api.dependencies.js';
+export function createPerUserDriveProcedure<Actor extends ApiActor>(deps: StatisticsDependencies['charts']['userDrive']) {
+	return implement(chartPerUserDriveContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>()
 		.use(authentication<Actor>())
-		.use(apiPolicy<Actor>({ name: 'charts/user/drive' }))
-		.handler(({ input, context }) => context.operations.statistics.userDrive(input, context.principal));
+		.use(apiPolicy<Actor>({ name: chartPerUserDriveContract['~orpc'].meta.requestName }))
+		.handler(({ input }) => deps.getChart(input.span, input.limit, input.offset ? new Date(input.offset) : null, input.userId));
 }
-
-export function createPerUserDriveGetProcedure<Actor extends ApiActor>() {
-	return implement(chartPerUserDriveGetContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<StatisticsContext<Actor>>()
+export function createPerUserDriveGetProcedure<Actor extends ApiActor>(deps: StatisticsDependencies['charts']['userDrive']) {
+	return implement(chartPerUserDriveGetContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>()
 		.use(authentication<Actor>())
-		.use(apiPolicy<Actor>({ name: 'charts/user/drive' }))
+		.use(apiPolicy<Actor>({ name: chartPerUserDriveContract['~orpc'].meta.requestName }))
 		.use(decodeScalarInput<Actor>({ limit: 'integer', offset: 'integer' }))
-		.handler(({ input, context }) => context.operations.statistics.userDrive(input, context.principal));
+		.handler(({ input }) => deps.getChart(input.span, input.limit, input.offset ? new Date(input.offset) : null, input.userId));
 }

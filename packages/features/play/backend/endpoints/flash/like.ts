@@ -5,14 +5,47 @@
 
 import { implement } from '@orpc/server';
 import { authentication, apiPolicy, requirePrincipal } from '../../../../api/backend/transport/middleware.js';
-import type { ApiActor } from '../../../../api/backend/transport/context.js';
-import type { PlayContext } from '../../operations.js';
-import { flashLikeContract } from './like.contract.js';
-
-export function createFlashLikeProcedure<Actor extends ApiActor>() {
-	return implement(flashLikeContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<PlayContext<Actor>>()
-		.use(authentication<Actor>())
-		.use(apiPolicy<Actor>({ name: 'flash/like', requireCredential: true, kind: 'write:flash-likes', prohibitMoved: true }))
-		.use(requirePrincipal<Actor>())
-		.handler(({ input, context }) => context.operations.play.flashLike(input, context.principal));
+import type { ApiContext } from '../../../../api/backend/transport/context.js';
+import { flashLikeContract, flashLikeErrors } from './like.contract.js';
+import type { FlashsRepository, FlashLikesRepository } from '@features/persistence/backend/repositories/models.js';
+import type { IdService } from '@features/runtime/backend/services/IdService.js';
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+export interface FlashLikeDependencies {
+	flashsRepository: Pick<FlashsRepository, 'findOneBy' | 'increment'>;
+	flashLikesRepository: Pick<FlashLikesRepository, 'exists' | 'insert'>;
+	idService: Pick<IdService, 'gen'>;
+}
+export function createFlashLikeProcedure(deps: FlashLikeDependencies) {
+	return implement(flashLikeContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>()
+		.use(authentication<MiLocalUser>())
+		.use(apiPolicy<MiLocalUser>({ name: flashLikeContract['~orpc'].meta.requestName, requireCredential: true, kind: 'write:flash-likes', prohibitMoved: true }))
+		.use(requirePrincipal<MiLocalUser>())
+		.handler(async ({ input: ps, context }) => {
+			const me = context.principal;
+			const flash = await deps.flashsRepository.findOneBy({ id: ps.flashId });
+			if (flash == null) {
+				throw apiError(flashLikeErrors.noSuchFlash);
+			}
+			if (flash.userId === me.id) {
+				throw apiError(flashLikeErrors.yourFlash);
+			}
+			// if already liked
+			const exist = await deps.flashLikesRepository.exists({
+				where: {
+					flashId: flash.id,
+					userId: me.id,
+				},
+			});
+			if (exist) {
+				throw apiError(flashLikeErrors.alreadyLiked);
+			}
+			// Create like
+			await deps.flashLikesRepository.insert({
+				id: deps.idService.gen(),
+				flashId: flash.id,
+				userId: me.id,
+			});
+			deps.flashsRepository.increment({ id: flash.id }, 'likedCount', 1);
+		});
 }

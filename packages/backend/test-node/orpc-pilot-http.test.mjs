@@ -14,8 +14,9 @@ import Fastify from 'fastify';
 import multipart from '@fastify/multipart';
 import { safe, isDefinedError } from '@orpc/server';
 import { OpenAPIHandler } from '@orpc/openapi/fastify';
+import { composeNativeTestRouter, nativeTestDependencies } from '../../features/api/test/native-router-fixture.mjs';
 import { APIClient } from '../../misskey-js/built/api.js';
-import { createApiRouter, createDeleteNote, registerPilotHttp, bodyCredential, misskeyErrorBody, genPilotOpenapiSpec, getPilotEndpointDescriptors, nullSuccessToNoContent, createNotificationsOperations } from '../built/features/api/pilot.js';
+import { registerPilotHttp, bodyCredential, misskeyErrorBody, genPilotOpenapiSpec, getPilotEndpointDescriptors, nullSuccessToNoContent } from '../built/features/api/pilot.js';
 
 const actor = { id: 'alice', isSuspended: false, movedToUri: null };
 const chartSection = { total: [1], inc: [1], dec: [0], diffs: { normal: [1], reply: [0], renote: [0], withFile: [0] } };
@@ -25,44 +26,39 @@ const output = { id: 'file1', createdAt: '2026-10-08T00:00:00.000Z', name: 'file
 	md5: 'hash', size: 5, isSensitive: false, blurhash: null, properties: {}, url: 'https://example.com/file',
 	thumbnailUrl: null, comment: null, folderId: null, folder: null, userId: null, user: null };
 
-async function fixture(t, overrides = {}, operationOverrides = {}) {
+async function fixture(t, overrides = {}, domainOverrides = {}) {
 	const events = [];
+	const uploads = new Map();
+	const dependencies = nativeTestDependencies({ actor, serverInfo: stats, packedFile: output, chartOutput,
+		events, uploadAtPath: path => uploads.get(path) });
+	for (const [feature, ports] of Object.entries(domainOverrides)) Object.assign(dependencies[feature], ports);
 	const app = Fastify();
-	const handler = new OpenAPIHandler(createApiRouter(), { customErrorResponseBodyEncoder: misskeyErrorBody, interceptors: [nullSuccessToNoContent()] });
+	const handler = new OpenAPIHandler(composeNativeTestRouter(dependencies), { customErrorResponseBodyEncoder: misskeyErrorBody, interceptors: [nullSuccessToNoContent()] });
 	await app.register(async api => {
 		await api.register(multipart, { limits: { fileSize: 1024, files: 1 } });
 		registerPilotHttp(api, handler, {
 			maxFileSize: 1024, runSpan: (_name, run) => run(),
-			context: (request, reply, name, upload) => ({
-				credential: name === 'clear-browser-cache' ? undefined : bodyCredential(request), ip: request.ip, headers: request.headers, upload,
-				response: { header: (key, value) => { reply.header(key, value); } },
-				operations: {
-					instance: { ping: async () => ({ pong: 123 }), onlineUsersCount: async () => ({ count: 7 }), endpoint: async input => input.endpoint === 'ping' ? { params: [] } : null },
-					emojis: { emojis: async () => ({ emojis: [] }) },
-					statistics: { notes: async input => { events.push(['chart', input]); return chartOutput; } },
-					notifications: { flush: async () => { events.push(['flush']); }, showRegistration: async input => input.endpoint === 'found' ? { userId: actor.id, endpoint: 'found', sendReadMessage: false } : null },
-					...operationOverrides,
-				},
-				services: {
-					authenticate: async credential => {
-						events.push(['credential', credential]);
-						return credential ? [actor, credential === 'session' ? null : { permission: credential === 'restricted' ? [] : ['write:notes', 'write:drive', 'write:notifications'] }] : [null, null];
+			context: (request, reply, name, upload) => {
+				if (upload) uploads.set(upload.path, upload);
+				return {
+					credential: name === 'clear-browser-cache' ? undefined : bodyCredential(request), ip: request.ip, headers: request.headers, upload,
+					response: { header: (key, value) => { reply.header(key, value); } },
+					services: {
+						authenticate: async credential => {
+							events.push(['credential', credential]);
+							return credential ? [actor, credential === 'session' ? null : { permission: credential === 'restricted' ? [] : ['write:notes', 'write:drive', 'write:notifications'] }] : [null, null];
+						},
+						limitActor: principal => principal?.id ?? 'ip',
+						rateLimitFactor: async () => 1, limit: async () => null,
+						...overrides,
 					},
-					logIp: () => {}, limitActor: principal => principal?.id ?? 'ip',
-					rateLimitFactor: async () => 1, limit: async () => null,
-					serverInfo: async () => stats, deleteNote: async id => { events.push(['delete', id]); },
-					createFile: async (input, _actor, resource) => {
-						assert.equal(input.file, resource.file);
-						events.push(['upload', input, resource.path, await input.file.text()]);
-						return output;
-					}, ...overrides,
-				},
-			}),
+				};
+			},
 		});
 	}, { prefix: '/api' });
 	const origin = await app.listen({ host: '127.0.0.1', port: 0 });
-	t.after(() => app.close());
-	return { app, events, origin, client: new APIClient({ origin, credential: 'native' }) };
+	t.after(async () => { await app.close(); uploads.clear(); });
+	return { app, dependencies, events, origin, client: new APIClient({ origin, credential: 'native' }) };
 }
 
 test('real HTTP and SDK preserve public JSON, auth precedence and 204/null', async t => {
@@ -141,7 +137,7 @@ test('real SDK multipart reaches the single File contract, defaults and cleanup'
 });
 
 test('HTTP upload limit and finite output validation remain enabled', async t => {
-	const { origin, app, events } = await fixture(t, { serverInfo: async () => ({ ...stats, secret: true }) });
+	const { origin, app, events } = await fixture(t, {}, { instance: { serverInfo: { enabled: () => true, read: async () => ({ ...stats, secret: true }) } } });
 	const invalid = await app.inject({ method: 'POST', url: '/api/server-info', payload: {} });
 	assert.equal(invalid.statusCode, 500);
 	assert.equal(invalid.json().error.code, 'INTERNAL_ERROR');
@@ -253,11 +249,11 @@ test('safe and isDefinedError recognize contract-declared errors over the real t
 	assert.equal(required.error.code, 'CREDENTIAL_REQUIRED');
 	assert.equal(required.error.data.id, '1384574d-a912-4b81-8601-c7b1c4085df1');
 	assert.equal('code' in required.error.data, false);
-	const missing = await fixture(t, { deleteNote: createDeleteNote({
+	const missing = await fixture(t, {}, { notes: {
 		getNote: async () => { throw { id: '9725d0ce-ba28-4dde-95a7-2cbb2c15de24' }; },
 		isModerator: async () => false, findAuthor: async () => { throw Error('Must not read'); },
 		delete: async () => { throw Error('Must not delete'); },
-	}) });
+	} });
 	const result = await safe(missing.client.orpc.notes.delete({ noteId: 'missing1' }));
 	assert.equal(result.isDefined, true);
 	assert.equal(result.error.code, 'NO_SUCH_NOTE');
@@ -434,8 +430,8 @@ test('nullable success becomes empty204 after validation while nonnull results r
 		assert.deepEqual(await client.request(name, present, 'session'), expected);
 	}
 	assert.equal(await client.orpc.instance.endpoint({ endpoint: 'unknown-name' }), null);
-	const invalid = await fixture(t, {}, { instance: { endpoint: async () => ({ params: 'invalid' }) } });
-	const rejected = await invalid.app.inject({ method: 'POST', url: '/api/endpoint', payload: { endpoint: 'x' } });
+	const invalid = await fixture(t, {}, { notifications: { findSubscription: async () => ({ userId: actor.id, endpoint: 'x', sendReadMessage: 'invalid' }) } });
+	const rejected = await invalid.app.inject({ method: 'POST', url: '/api/sw/show-registration', payload: { endpoint: 'x', i: 'session' } });
 	assert.equal(rejected.statusCode, 500);
 	assert.equal(rejected.json().error.code, 'INTERNAL_ERROR');
 });
@@ -443,14 +439,14 @@ test('nullable success becomes empty204 after validation while nonnull results r
 test('push registration reads live settings for both new and existing subscriptions', async t => {
 	const settings = { swPublicKey: null };
 	let existing = null;
-	const operations = createNotificationsOperations({
+	const subscriptions = {
 		generateId: () => 'subscription1', getSwPublicKey: () => settings.swPublicKey,
 		isValidEndpoint: () => true,
 		findSubscription: async () => existing,
 		insertSubscription: async record => { existing = record; },
 		refreshSubscriptionCache: () => {},
-	});
-	const { app, client } = await fixture(t, {}, { notifications: operations });
+	};
+	const { app, client } = await fixture(t, {}, { notifications: subscriptions });
 	const payload = { endpoint: 'https://push.example.test', auth: 'auth', publickey: 'client-key' };
 	assert.equal((await client.request('sw/register', payload, 'session')).key, null);
 	settings.swPublicKey = 'hot-updated-key';
@@ -462,38 +458,35 @@ test('push registration reads live settings for both new and existing subscripti
 	assert.equal((await client.request('sw/register', payload, 'session')).key, 'hot-updated-key');
 });
 
-test('expanded native cohorts round-trip defaults, public actors and protected void commands', async t => {
-	const seen = [];
-	const record = (name, output) => async (input, principal, token, ip) => {
-		seen.push({ name, input, principal, token, ip });
-		return output;
-	};
-	const { app, client } = await fixture(t, {}, {
-		notes: { notesDraftsCount: record('drafts', 3), notesTranslate: record('translate', undefined) },
-		timelines: { notesGlobalTimeline: record('timeline', []) },
-		noteSearch: { notesSearch: record('search', []) },
-		users: { 'users/achievements': record('achievements', []) },
-		relationships: { 'following/update-all': record('following', undefined) },
-		collections: { galleryPosts: record('gallery', []) },
-	});
+test('expanded native cohorts execute business handlers with defaults, public actors and protected writes', async t => {
+	const { app, client, events } = await fixture(t);
 	for (const [name, input, expected] of [
 		['notes/translate', { noteId: 'note1', targetLang: 'en' }, null],
 		['notes/drafts/count', {}, 3], ['notes/global-timeline', {}, []],
 		['notes/search', { query: '😀' }, []], ['users/achievements', { userId: 'bob' }, []],
 		['following/update-all', { withReplies: false }, null], ['gallery/posts', {}, []],
 	]) assert.deepEqual(await client.request(name, { ...input, extra: 'stripped' }, 'session'), expected);
-	assert.deepEqual(seen.find(item => item.name === 'timeline').input, { withFiles: false, withRenotes: true, limit: 10 });
-	assert.deepEqual(seen.find(item => item.name === 'search').input, { query: '😀', limit: 10, offset: 0, userId: null, channelId: null });
-	assert.deepEqual(seen.find(item => item.name === 'gallery').input, { limit: 10 });
+	assert.deepEqual(events.find(event => event[0] === 'draftsQuery' && event[1] === 'where').slice(2), ['drafts.userId = :meId', { meId: actor.id }]);
+	assert.deepEqual(events.find(event => event[0] === 'timelineQuery' && event[1] === 'limit'), ['timelineQuery', 'limit', 10]);
+	assert.equal(events.some(event => event[0] === 'timelineQuery' && event[1] === 'andWhere' && event[2] === 'note.fileIds != \'{}\''), false);
+	const search = events.find(event => event[0] === 'search');
+	assert.equal(search[1], '😀');
+	assert.equal(search[2], actor);
+	assert.equal(search[3].userId, null);
+	assert.equal(search[3].channelId, null);
+	assert.equal(search[4].limit, 10);
+	assert.deepEqual(events.find(event => event[0] === 'galleryQuery' && event[1] === 'limit'), ['galleryQuery', 'limit', 10]);
+	assert.deepEqual(events.find(event => event[0] === 'following').slice(1), [{ followerId: actor.id }, { notify: undefined, withReplies: false }]);
 	const anonymous = await app.inject({ method: 'POST', url: '/api/users/achievements', payload: { userId: 'bob' } });
 	assert.equal(anonymous.statusCode, 200);
-	assert.equal(seen.at(-1).principal, null);
-	assert.equal(seen.at(-1).token, null);
-	assert.equal(typeof seen.at(-1).ip, 'string');
+	assert.deepEqual(events.filter(event => event[0] === 'profile').at(-1), ['profile', { userId: 'bob' }]);
+	assert.equal(events.filter(event => event[0] === 'credential').at(-1)[1], undefined);
+	const followingWrites = events.filter(event => event[0] === 'following').length;
 	const denied = await app.inject({ method: 'POST', url: '/api/following/update-all', payload: { i: 'restricted' } });
 	assert.equal(denied.statusCode, 403);
 	assert.equal(denied.json().error.code, 'PERMISSION_DENIED');
+	assert.equal(events.filter(event => event[0] === 'following').length, followingWrites);
 	await assert.rejects(client.request('notes/global-timeline', { limit: 101 }), error => error.code === 'INVALID_PARAM');
-	const invalid = await fixture(t, {}, { notes: { notesDraftsCount: async () => Infinity } });
+	const invalid = await fixture(t, {}, { notes: { noteDraftsRepository: { createQueryBuilder: () => ({ where() { return this; }, getCount: async () => Infinity }) } } });
 	assert.equal((await invalid.app.inject({ method: 'POST', url: '/api/notes/drafts/count', payload: { i: 'session' } })).statusCode, 500);
 });

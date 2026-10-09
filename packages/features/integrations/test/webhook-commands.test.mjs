@@ -6,7 +6,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createRouterClient } from '@orpc/server';
-import { createIntegrationsOperations, createIntegrationsRouter, integrationsApplicationMap } from '../../../backend/built/features/integrations/backend.js';
+import { createIntegrationsRouter } from '../../../backend/built/features/integrations/backend.js';
 
 const actor = { id: 'owner', isSuspended: false, movedToUri: null };
 
@@ -20,16 +20,12 @@ function fixture({ principal = actor, token = null, exists = true } = {}) {
 		delete: async id => { calls.push(['delete', id]); },
 	};
 	const events = { publishInternalEvent: (name, value) => { calls.push([name, value]); return new Promise(() => {}); } };
-	const applications = Object.fromEntries(['Update', 'Delete'].map(command => {
-		const name = 'iWebhooks' + command;
-		return [name, new integrationsApplicationMap[name](repository, events)];
-	}));
-	const operations = createIntegrationsOperations(applications);
+	const dependencies = { iWebhooksUpdate: { webhooksRepository: repository, globalEventService: events }, iWebhooksDelete: { webhooksRepository: repository, globalEventService: events } };
 	const context = { credential: principal ? 'credential' : null, ip: '192.0.2.1', headers: {},
 																			services: { authenticate: async () => [principal, token], limitActor: () => actor.id, rateLimitFactor: async () => 1, limit: async () => null },
-																			operations: { integrations: operations },
+
 	};
-	return { calls, webhook, client: createRouterClient(createIntegrationsRouter(), { context }) };
+	return { calls, webhook, client: createRouterClient(createIntegrationsRouter(dependencies), { context }) };
 }
 
 test('native update scopes ownership, strips undeclared input and clears null secret', async () => {

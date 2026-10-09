@@ -5,14 +5,23 @@
 
 import { implement } from '@orpc/server';
 import { chatRoomsLeaveContract, chatRoomsLeavePolicy } from './leave.contract.js';
-import type { ApiActor } from '../../../../../api/backend/transport/context.js';
 import { authentication, apiPolicy, requirePrincipal } from '../../../../../api/backend/transport/middleware.js';
-import type { ChatApiContext } from '../../../operations.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+import type { ApiContext } from '@features/api/backend/transport/context.js';
+import type { InferSchemaOutput } from '@orpc/contract';
+import { type ChatService } from '@features/chat/backend/services/ChatService.js';
+export interface ChatRoomsLeaveDependencies {
+	chatService: Pick<ChatService, 'checkChatAvailability' | 'leaveRoom'>;
+}
+export function createChatRoomsLeaveProcedure(deps: ChatRoomsLeaveDependencies) {
+	async function execute(input: InferSchemaOutput<NonNullable<typeof chatRoomsLeaveContract['~orpc']['inputSchema']>>, actor: MiLocalUser): Promise<void> {
+		await deps.chatService.checkChatAvailability(actor.id, 'write');
+		await deps.chatService.leaveRoom(actor.id, input.roomId);
+	}
 
-export function createChatRoomsLeaveProcedure<Actor extends ApiActor>() {
-	return implement(chatRoomsLeaveContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ChatApiContext<Actor>>()
-		.use(authentication<Actor>())
-		.use(apiPolicy<Actor>(chatRoomsLeavePolicy))
-		.use(requirePrincipal<Actor>())
-		.handler(({ input, context }) => context.operations.chat.chatRoomsLeave(input, context.principal));
+	return implement(chatRoomsLeaveContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>()
+		.use(authentication<MiLocalUser>())
+		.use(apiPolicy<MiLocalUser>(chatRoomsLeavePolicy))
+		.use(requirePrincipal<MiLocalUser>())
+		.handler(({ input, context }) => execute(input, context.principal));
 }

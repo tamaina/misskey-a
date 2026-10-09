@@ -4,32 +4,41 @@
  */
 
 import { implement } from '@orpc/server';
-import { authentication, apiPolicy, requirePrincipal, decodeScalarInput } from '../../../api/backend/transport/middleware.js';
-import { discoveryContract, type DiscoveryInputs, type DiscoveryOutputs } from './discovery.contract.js';
-import type { ApiActor, ApiContext } from '../../../api/backend/transport/context.js';
-
-export type DiscoveryOperations<Actor extends ApiActor> = {
-	[Name in keyof DiscoveryInputs]: (input: DiscoveryInputs[Name], actor: Name extends 'users/recommendation' ? Actor : Actor | null) => Promise<DiscoveryOutputs[Name]>;
-};
-export type DiscoveryContext<Actor extends ApiActor> = ApiContext<Actor> & { operations: { discovery: DiscoveryOperations<Actor> } };
-
-export function createDiscoveryRouter<Actor extends ApiActor>() {
-	const discovery = implement(discoveryContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<DiscoveryContext<Actor>>().use(authentication<Actor>());
-	return discovery.router({
-		'hashtags/list': discovery['hashtags/list'].use(apiPolicy<Actor>({ name: 'hashtags/list' })).handler(({ input, context }) => context.operations.discovery['hashtags/list'](input, context.principal)),
-		'hashtags/search': discovery['hashtags/search'].use(apiPolicy<Actor>({ name: 'hashtags/search' })).handler(({ input, context }) => context.operations.discovery['hashtags/search'](input, context.principal)),
-		'hashtags/show': discovery['hashtags/show'].use(apiPolicy<Actor>({ name: 'hashtags/show' })).handler(({ input, context }) => context.operations.discovery['hashtags/show'](input, context.principal)),
-		'hashtags/trend': discovery['hashtags/trend'].use(apiPolicy<Actor>({ name: 'hashtags/trend' })).handler(({ input, context }) => context.operations.discovery['hashtags/trend'](input, context.principal)),
-		'hashtags/trend:get': discovery['hashtags/trend:get'].use(apiPolicy<Actor>({ name: 'hashtags/trend' })).handler(({ input, context }) => context.operations.discovery['hashtags/trend'](input, context.principal)),
-		'hashtags/users': discovery['hashtags/users'].use(apiPolicy<Actor>({ name: 'hashtags/users' })).handler(({ input, context }) => context.operations.discovery['hashtags/users'](input, context.principal)),
-		'notes/featured': discovery['notes/featured'].use(apiPolicy<Actor>({ name: 'notes/featured' })).handler(({ input, context }) => context.operations.discovery['notes/featured'](input, context.principal)),
-		'notes/featured:get': discovery['notes/featured:get'].use(apiPolicy<Actor>({ name: 'notes/featured' })).use(decodeScalarInput<Actor>({ limit: 'integer' })).handler(({ input, context }) => context.operations.discovery['notes/featured'](input, context.principal)),
-		'notes/search-by-tag': discovery['notes/search-by-tag'].use(apiPolicy<Actor>({ name: 'notes/search-by-tag' })).handler(({ input, context }) => context.operations.discovery['notes/search-by-tag'](input, context.principal)),
-		'users/featured-notes': discovery['users/featured-notes'].use(apiPolicy<Actor>({ name: 'users/featured-notes' })).handler(({ input, context }) => context.operations.discovery['users/featured-notes'](input, context.principal)),
-		'users/featured-notes:get': discovery['users/featured-notes:get'].use(apiPolicy<Actor>({ name: 'users/featured-notes' })).use(decodeScalarInput<Actor>({ limit: 'integer' })).handler(({ input, context }) => context.operations.discovery['users/featured-notes'](input, context.principal)),
-		'users/get-frequently-replied-users': discovery['users/get-frequently-replied-users'].use(apiPolicy<Actor>({ name: 'users/get-frequently-replied-users' })).handler(({ input, context }) => context.operations.discovery['users/get-frequently-replied-users'](input, context.principal)),
-		'users/recommendation': discovery['users/recommendation'].use(apiPolicy<Actor>({ name: 'users/recommendation', requireCredential: true, kind: 'read:account' })).use(requirePrincipal<Actor>()).handler(({ input, context }) => context.operations.discovery['users/recommendation'](input, context.principal)),
-		'users/search': discovery['users/search'].use(apiPolicy<Actor>({ name: 'users/search', requiredRolePolicy: 'canSearchUsers' })).handler(({ input, context }) => context.operations.discovery['users/search'](input, context.principal)),
-		'users/search-by-username-and-host': discovery['users/search-by-username-and-host'].use(apiPolicy<Actor>({ name: 'users/search-by-username-and-host' })).handler(({ input, context }) => context.operations.discovery['users/search-by-username-and-host'](input, context.principal)),
+import { discoveryContract } from './discovery.contract.js';
+import type { ApiContext } from '@features/api/backend/transport/context.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+import { createHashtagsListProcedure, type HashtagsListDependencies } from './hashtags/list.js';
+import { createHashtagsSearchProcedure, type HashtagsSearchDependencies } from './hashtags/search.js';
+import { createHashtagsShowProcedure, type HashtagsShowDependencies } from './hashtags/show.js';
+import { createHashtagsTrendProcedure, type HashtagsTrendDependencies } from './hashtags/trend.js';
+import { createHashtagsUsersProcedure, type HashtagsUsersDependencies } from './hashtags/users.js';
+import { createNotesFeaturedProcedure, type NotesFeaturedDependencies } from './notes/featured.js';
+import { createNotesSearchByTagProcedure, type NotesSearchByTagDependencies } from './notes/search-by-tag.js';
+import { createUsersFeaturedNotesProcedure, type UsersFeaturedNotesDependencies } from './users/featured-notes.js';
+import { createUsersGetFrequentlyRepliedUsersProcedure, type UsersGetFrequentlyRepliedUsersDependencies } from './users/get-frequently-replied-users.js';
+import { createUsersRecommendationProcedure, type UsersRecommendationDependencies } from './users/recommendation.js';
+import { createUsersSearchByUsernameAndHostProcedure, type UsersSearchByUsernameAndHostDependencies } from './users/search-by-username-and-host.js';
+import { createUsersSearchProcedure, type UsersSearchDependencies } from './users/search.js';
+export type DiscoveryDependencies = HashtagsListDependencies & HashtagsSearchDependencies & HashtagsShowDependencies & HashtagsTrendDependencies & HashtagsUsersDependencies & NotesFeaturedDependencies & NotesSearchByTagDependencies & UsersFeaturedNotesDependencies & UsersGetFrequentlyRepliedUsersDependencies & UsersRecommendationDependencies & UsersSearchByUsernameAndHostDependencies & UsersSearchDependencies;
+export function createDiscoveryRouter<Actor extends MiLocalUser>(deps: DiscoveryDependencies) {
+	const hashtagsTrend = createHashtagsTrendProcedure<Actor>(deps);
+	const notesFeatured = createNotesFeaturedProcedure<Actor>(deps);
+	const usersFeaturedNotes = createUsersFeaturedNotesProcedure<Actor>(deps);
+	return implement(discoveryContract).$context<ApiContext<Actor>>().router({
+		'hashtags/list': createHashtagsListProcedure<Actor>(deps),
+		'hashtags/search': createHashtagsSearchProcedure<Actor>(deps),
+		'hashtags/show': createHashtagsShowProcedure<Actor>(deps),
+		'hashtags/trend': hashtagsTrend.canonical,
+		'hashtags/trend:get': hashtagsTrend.get,
+		'hashtags/users': createHashtagsUsersProcedure<Actor>(deps),
+		'notes/featured': notesFeatured.canonical,
+		'notes/featured:get': notesFeatured.get,
+		'notes/search-by-tag': createNotesSearchByTagProcedure<Actor>(deps),
+		'users/featured-notes': usersFeaturedNotes.canonical,
+		'users/featured-notes:get': usersFeaturedNotes.get,
+		'users/get-frequently-replied-users': createUsersGetFrequentlyRepliedUsersProcedure<Actor>(deps),
+		'users/recommendation': createUsersRecommendationProcedure<Actor>(deps),
+		'users/search-by-username-and-host': createUsersSearchByUsernameAndHostProcedure<Actor>(deps),
+		'users/search': createUsersSearchProcedure<Actor>(deps),
 	});
 }

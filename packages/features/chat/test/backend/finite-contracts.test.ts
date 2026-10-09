@@ -4,6 +4,8 @@
  */
 
 import { expect, test } from 'vitest';
+import { createProcedureClient } from '@orpc/server';
+import type { ApiContext } from '@features/api/backend/transport/context.js';
 import * as v from 'valibot';
 import { mockDeep } from 'vitest-mock-extended';
 import { packedChatMessageSchema, packedChatMessageLiteSchema, packedChatMessageLiteFor1on1Schema, packedChatMessageLiteForRoomSchema, packedChatRoomSchema, packedChatRoomInvitationSchema, packedChatRoomMembershipSchema } from '../../backend/chat.schema.js';
@@ -13,7 +15,7 @@ import { chatReadAllContract } from '../../backend/endpoints/chat/read-all.contr
 import { chatRoomsMuteContract } from '../../backend/endpoints/chat/rooms/mute.contract.js';
 import { chatRoomsJoinErrors } from '../../backend/endpoints/chat/rooms/join.contract.js';
 import { ChatEntityService } from '../../backend/serializers/ChatEntityService.js';
-import { ChatHistoryOperation as HistoryEndpoint } from '../../backend/endpoints/chat/history.js';
+import { createChatHistoryProcedure } from '../../backend/endpoints/chat/history.js';
 import type { MiChatMessage } from '../../backend/models/ChatMessage.js';
 import type { MiChatRoom } from '../../backend/models/ChatRoom.js';
 import type { MiChatRoomInvitation } from '../../backend/models/ChatRoomInvitation.js';
@@ -103,15 +105,17 @@ test.each([false, true])('actual history handler adds its read state for room=%s
 	const { service, message, room } = fixture();
 	if (roomHistory) { message.toUserId = null; message.toRoomId = room.id; message.toRoom = room; }
 	const packed = await service.packMessageDetailed(message);
-	const entities = mockDeep<ConstructorParameters<typeof HistoryEndpoint>[0]>();
+	const entities = mockDeep<Parameters<typeof createChatHistoryProcedure>[0]['chatEntityService']>();
 	entities.packMessagesDetailed.mockResolvedValue([packed]);
-	const chats = mockDeep<ConstructorParameters<typeof HistoryEndpoint>[1]>();
+	const chats = mockDeep<Parameters<typeof createChatHistoryProcedure>[0]['chatService']>();
 	chats.userHistory.mockResolvedValue([message]);
 	chats.roomHistory.mockResolvedValue([message]);
 	chats.getRoomReadStateMap.mockResolvedValue({ [room.id]: true });
 	chats.getUserReadStateMap.mockResolvedValue({ other123: true });
-	const endpoint = new HistoryEndpoint(entities, chats);
-	const result = await endpoint.execute(v.parse(requiredSchema(chatHistoryContract['~orpc'].inputSchema), { room: roomHistory }), mockDeep<MiLocalUser>({ id: user.id }));
+	const context = mockDeep<ApiContext<MiLocalUser>>({ credential: 'fixture', ip: '127.0.0.1', headers: {} });
+	context.services.authenticate.mockResolvedValue([mockDeep<MiLocalUser>({ id: user.id, isSuspended: false, movedToUri: null }), null]);
+	const endpoint = createProcedureClient(createChatHistoryProcedure({ chatEntityService: entities, chatService: chats }), { context });
+	const result = await endpoint({ room: roomHistory });
 	expect(v.parse(requiredSchema(chatHistoryContract['~orpc'].outputSchema), result)[0].isRead).toBe(true);
 });
 

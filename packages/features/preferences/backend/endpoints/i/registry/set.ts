@@ -6,13 +6,17 @@
 import { implement } from '@orpc/server';
 import { authentication, apiPolicy, requirePrincipal } from '../../../../../api/backend/transport/middleware.js';
 import { registrySetContract } from './set.contract.js';
-import type { ApiActor } from '../../../../../api/backend/transport/context.js';
-import type { PreferencesContext } from '../../../operations.js';
-
-export function createRegistrySetProcedure<Actor extends ApiActor>() {
-	return implement(registrySetContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<PreferencesContext<Actor>>()
+import type { ApiActor, ApiContext } from '../../../../../api/backend/transport/context.js';
+import type { PreferencesDependencies } from '../../../api.dependencies.js';
+import { registryTenant } from './registry.helpers.js';
+export function createRegistrySetProcedure<Actor extends ApiActor>(deps: PreferencesDependencies) {
+	return implement(registrySetContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>()
 		.use(authentication<Actor>())
 		.use(apiPolicy<Actor>({ name: 'i/registry/set', requireCredential: true, kind: 'write:account' }))
 		.use(requirePrincipal<Actor>())
-		.handler(({ input, context }) => context.operations.preferences.set(input, context.principal, context.token));
+		.handler(async ({ input, context }) => {
+			const principal = context.principal;
+			const token = context.token;
+			return deps.registry.set(principal.id, registryTenant(input.domain, token), input.scope, input.key, input.value);
+		});
 }

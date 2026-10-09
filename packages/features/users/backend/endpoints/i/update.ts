@@ -5,28 +5,26 @@
 
 import RE2 from 're2';
 import * as mfm from 'mfm-js';
-import { Inject, Injectable } from '@nestjs/common';
 import * as htmlParser from 'node-html-parser';
 import { extractCustomEmojisFromMfm } from '@features/emojis/backend/utility/extract-custom-emojis-from-mfm.js';
 import { extractHashtags } from '@features/discovery/backend/utility/extract-hashtags.js';
 import * as Acct from '@features/federation/backend/utility/acct.js';
 import { normalizeForSearch } from '@features/discovery/backend/utility/normalize-for-search.js';
-import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
-import { UserFollowingService } from '@features/relationships/backend/services/UserFollowingService.js';
-import { UtilityService } from '@features/federation/backend/services/UtilityService.js';
-import { HashtagService } from '@features/discovery/backend/services/HashtagService.js';
-import { RolePolicies, RoleService } from '@features/roles/backend/services/RoleService.js';
-import { RemoteUserResolveService } from '@features/federation/backend/services/RemoteUserResolveService.js';
-import { DriveFileEntityService } from '@features/drive/backend/serializers/DriveFileEntityService.js';
-import { HttpRequestService } from '@features/runtime/backend/services/HttpRequestService.js';
-import { AvatarDecorationService } from '@features/avatar-decorations/backend/services/AvatarDecorationService.js';
-import { ApiLoggerService } from '@features/api/backend/transport/ApiLoggerService.js';
+import { type GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
+import { type UserFollowingService } from '@features/relationships/backend/services/UserFollowingService.js';
+import { type UtilityService } from '@features/federation/backend/services/UtilityService.js';
+import { type HashtagService } from '@features/discovery/backend/services/HashtagService.js';
+import { type RolePolicies, type RoleService } from '@features/roles/backend/services/RoleService.js';
+import { type RemoteUserResolveService } from '@features/federation/backend/services/RemoteUserResolveService.js';
+import { type DriveFileEntityService } from '@features/drive/backend/serializers/DriveFileEntityService.js';
+import { type HttpRequestService } from '@features/runtime/backend/services/HttpRequestService.js';
+import { type AvatarDecorationService } from '@features/avatar-decorations/backend/services/AvatarDecorationService.js';
+import { type ApiLoggerService } from '@features/api/backend/transport/ApiLoggerService.js';
 import { apiError } from '@features/api/backend/transport/orpc-error.js';
 import type { Config } from '@/config.js';
-import { DI } from '@/di-symbols.js';
-import { CacheService } from '../../services/CacheService.js';
-import { AccountUpdateService } from '../../services/AccountUpdateService.js';
-import { UserEntityService } from '../../serializers/UserEntityService.js';
+import { type CacheService } from '../../services/CacheService.js';
+import { type AccountUpdateService } from '../../services/AccountUpdateService.js';
+import { type UserEntityService } from '../../serializers/UserEntityService.js';
 import { iUpdateErrors } from './update.contract.js';
 import type { MiUserProfile } from '../../models/UserProfile.js';
 import type { MiLocalUser, MiUser } from '../../models/User.js';
@@ -67,53 +65,42 @@ export type UserProfileUpdatePatch = Partial<Pick<MiUserProfile,
 export type UserProfileUpdateRepository = Omit<UserProfilesRepository, 'update'> & {
 	update(userId: string, patch: UserProfileUpdatePatch): Promise<import('typeorm').UpdateResult>;
 };
-
-@Injectable()
-export class IUpdateOperation {
-	constructor(
-		@Inject(DI.config)
-		private config: Config,
-
-		@Inject(DI.meta)
-		private instanceMeta: MiMeta,
-
-		@Inject(DI.usersRepository)
-		private usersRepository: UsersRepository,
-
-		@Inject(DI.userProfilesRepository)
-		private userProfilesRepository: UserProfileUpdateRepository,
-
-		@Inject(DI.driveFilesRepository)
-		private driveFilesRepository: DriveFilesRepository,
-
-		@Inject(DI.pagesRepository)
-		private pagesRepository: PagesRepository,
-
-		private userEntityService: UserEntityService,
-		private driveFileEntityService: DriveFileEntityService,
-		private globalEventService: GlobalEventService,
-		private userFollowingService: UserFollowingService,
-		private accountUpdateService: AccountUpdateService,
-		private remoteUserResolveService: RemoteUserResolveService,
-		private apiLoggerService: ApiLoggerService,
-		private hashtagService: HashtagService,
-		private roleService: RoleService,
-		private cacheService: CacheService,
-		private httpRequestService: HttpRequestService,
-		private avatarDecorationService: AvatarDecorationService,
-		private utilityService: UtilityService,
-	) {
-	}
-
-	async execute(ps: UsersInputs['i/update'], _user: MiLocalUser, token: ApiToken | null, _ip: string) {
-		const user = await this.usersRepository.findOneByOrFail({ id: _user.id });
+import { iUpdateContract } from './update.contract.js';
+import { implement } from '@orpc/server';
+import { authentication, apiPolicy, requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import type { ApiContext } from '@features/api/backend/transport/context.js';
+import { toPackedUserDetailed } from '@features/users/backend/user.schema.js';
+export interface IUpdateDependencies {
+	config: Config;
+	instanceMeta: MiMeta;
+	usersRepository: UsersRepository;
+	userProfilesRepository: UserProfileUpdateRepository;
+	driveFilesRepository: DriveFilesRepository;
+	pagesRepository: PagesRepository;
+	userEntityService: UserEntityService;
+	driveFileEntityService: DriveFileEntityService;
+	globalEventService: GlobalEventService;
+	userFollowingService: UserFollowingService;
+	accountUpdateService: AccountUpdateService;
+	remoteUserResolveService: RemoteUserResolveService;
+	apiLoggerService: ApiLoggerService;
+	hashtagService: HashtagService;
+	roleService: RoleService;
+	cacheService: CacheService;
+	httpRequestService: HttpRequestService;
+	avatarDecorationService: AvatarDecorationService;
+	utilityService: UtilityService;
+}
+export function createIUpdateProcedure(deps: IUpdateDependencies) {
+	async function execute(ps: UsersInputs['i/update'], _user: MiLocalUser, token: ApiToken | null, _ip: string) {
+		const user = await deps.usersRepository.findOneByOrFail({ id: _user.id });
 		if (!isLocalUser(user)) throw new Error('Expected a local user');
 		const isSecure = token == null;
 
 		const updates: Partial<MiUser> = {};
 		const profileUpdates: UserProfileUpdatePatch = {};
 
-		const profile = await this.userProfilesRepository.findOneByOrFail({ userId: user.id });
+		const profile = await deps.userProfilesRepository.findOneByOrFail({ userId: user.id });
 		let policies: RolePolicies | null = null;
 
 		if (ps.name !== undefined) {
@@ -169,7 +156,7 @@ export class IUpdateOperation {
 		}
 
 		if (ps.mutedWords !== undefined) {
-			policies ??= await this.roleService.getUserPolicies(user.id);
+			policies ??= await deps.roleService.getUserPolicies(user.id);
 			checkMuteWordCount(ps.mutedWords, policies.wordMuteLimit);
 			validateMuteWordRegex(ps.mutedWords);
 
@@ -177,7 +164,7 @@ export class IUpdateOperation {
 			profileUpdates.enableWordMute = ps.mutedWords.length > 0;
 		}
 		if (ps.hardMutedWords !== undefined) {
-			policies ??= await this.roleService.getUserPolicies(user.id);
+			policies ??= await deps.roleService.getUserPolicies(user.id);
 			checkMuteWordCount(ps.hardMutedWords, policies.wordMuteLimit);
 			validateMuteWordRegex(ps.hardMutedWords);
 			profileUpdates.hardMutedWords = ps.hardMutedWords;
@@ -200,7 +187,7 @@ export class IUpdateOperation {
 		if (typeof ps.injectFeaturedNote === 'boolean') profileUpdates.injectFeaturedNote = ps.injectFeaturedNote;
 		if (typeof ps.receiveAnnouncementEmail === 'boolean') profileUpdates.receiveAnnouncementEmail = ps.receiveAnnouncementEmail;
 		if (typeof ps.alwaysMarkNsfw === 'boolean') {
-			policies ??= await this.roleService.getUserPolicies(user.id);
+			policies ??= await deps.roleService.getUserPolicies(user.id);
 			if (policies.alwaysMarkNsfw) throw apiError(iUpdateErrors.restrictedByRole);
 			profileUpdates.alwaysMarkNsfw = ps.alwaysMarkNsfw;
 		}
@@ -208,16 +195,16 @@ export class IUpdateOperation {
 		if (ps.emailNotificationTypes !== undefined) profileUpdates.emailNotificationTypes = ps.emailNotificationTypes;
 
 		if (ps.avatarId) {
-			policies ??= await this.roleService.getUserPolicies(user.id);
+			policies ??= await deps.roleService.getUserPolicies(user.id);
 			if (!policies.canUpdateBioMedia) throw apiError(iUpdateErrors.restrictedByRole);
 
-			const avatar = await this.driveFilesRepository.findOneBy({ id: ps.avatarId });
+			const avatar = await deps.driveFilesRepository.findOneBy({ id: ps.avatarId });
 
 			if (avatar == null || avatar.userId !== user.id) throw apiError(iUpdateErrors.noSuchAvatar);
 			if (!avatar.type.startsWith('image/')) throw apiError(iUpdateErrors.avatarNotAnImage);
 
 			updates.avatarId = avatar.id;
-			updates.avatarUrl = this.driveFileEntityService.getPublicUrl(avatar, 'avatar');
+			updates.avatarUrl = deps.driveFileEntityService.getPublicUrl(avatar, 'avatar');
 			updates.avatarBlurhash = avatar.blurhash;
 		} else if (ps.avatarId === null) {
 			updates.avatarId = null;
@@ -226,16 +213,16 @@ export class IUpdateOperation {
 		}
 
 		if (ps.bannerId) {
-			policies ??= await this.roleService.getUserPolicies(user.id);
+			policies ??= await deps.roleService.getUserPolicies(user.id);
 			if (!policies.canUpdateBioMedia) throw apiError(iUpdateErrors.restrictedByRole);
 
-			const banner = await this.driveFilesRepository.findOneBy({ id: ps.bannerId });
+			const banner = await deps.driveFilesRepository.findOneBy({ id: ps.bannerId });
 
 			if (banner == null || banner.userId !== user.id) throw apiError(iUpdateErrors.noSuchBanner);
 			if (!banner.type.startsWith('image/')) throw apiError(iUpdateErrors.bannerNotAnImage);
 
 			updates.bannerId = banner.id;
-			updates.bannerUrl = this.driveFileEntityService.getPublicUrl(banner);
+			updates.bannerUrl = deps.driveFileEntityService.getPublicUrl(banner);
 			updates.bannerBlurhash = banner.blurhash;
 		} else if (ps.bannerId === null) {
 			updates.bannerId = null;
@@ -244,10 +231,10 @@ export class IUpdateOperation {
 		}
 
 		if (ps.avatarDecorations) {
-			policies ??= await this.roleService.getUserPolicies(user.id);
-			const decorations = await this.avatarDecorationService.getAll(true);
-			const myRoles = await this.roleService.getUserRoles(user.id);
-			const allRoles = await this.roleService.getRoles();
+			policies ??= await deps.roleService.getUserPolicies(user.id);
+			const decorations = await deps.avatarDecorationService.getAll(true);
+			const myRoles = await deps.roleService.getUserRoles(user.id);
+			const allRoles = await deps.roleService.getRoles();
 			const decorationIds = decorations
 				.filter(d => d.roleIdsThatCanBeUsedThisDecoration.filter(roleId => allRoles.some(r => r.id === roleId)).length === 0 || myRoles.some(r => d.roleIdsThatCanBeUsedThisDecoration.includes(r.id)))
 				.map(d => d.id);
@@ -264,7 +251,7 @@ export class IUpdateOperation {
 		}
 
 		if (ps.pinnedPageId) {
-			const page = await this.pagesRepository.findOneBy({ id: ps.pinnedPageId });
+			const page = await deps.pagesRepository.findOneBy({ id: ps.pinnedPageId });
 
 			if (page == null || page.userId !== user.id) throw apiError(iUpdateErrors.noSuchPage);
 
@@ -298,13 +285,13 @@ export class IUpdateOperation {
 				const { username, host } = Acct.parse(line);
 
 				// Retrieve the old account
-				const knownAs = await this.remoteUserResolveService.resolveUser(username, host).catch((e) => {
-					this.apiLoggerService.logger.warn(`failed to resolve dstination user: ${e}`);
+				const knownAs = await deps.remoteUserResolveService.resolveUser(username, host).catch((e) => {
+					deps.apiLoggerService.logger.warn(`failed to resolve dstination user: ${e}`);
 					throw apiError(iUpdateErrors.noSuchUser);
 				});
 				if (knownAs.id === _user.id) throw apiError(iUpdateErrors.forbiddenToSetYourself);
 
-				const toUrl = this.userEntityService.getUserUri(knownAs);
+				const toUrl = deps.userEntityService.getUserUri(knownAs);
 				if (!toUrl) throw apiError(iUpdateErrors.uriNull);
 
 				newAlsoKnownAs.add(toUrl);
@@ -325,8 +312,8 @@ export class IUpdateOperation {
 
 		if (newName != null) {
 			let hasProhibitedWords = false;
-			if (!await this.roleService.isModerator(user)) {
-				hasProhibitedWords = this.utilityService.isKeyWordIncluded(newName, this.instanceMeta.prohibitedWordsForNameOfUser);
+			if (!await deps.roleService.isModerator(user)) {
+				hasProhibitedWords = deps.utilityService.isKeyWordIncluded(newName, deps.instanceMeta.prohibitedWordsForNameOfUser);
 			}
 			if (hasProhibitedWords) {
 				throw apiError(iUpdateErrors.nameContainsProhibitedWords);
@@ -360,55 +347,55 @@ export class IUpdateOperation {
 		updates.tags = tags;
 
 		// ハッシュタグ更新
-		this.hashtagService.updateUsertags(user, tags);
+		deps.hashtagService.updateUsertags(user, tags);
 		//#endregion
 
 		if (Object.keys(updates).length > 0) {
-			await this.usersRepository.update(user.id, updates);
-			this.globalEventService.publishInternalEvent('localUserUpdated', { id: user.id });
+			await deps.usersRepository.update(user.id, updates);
+			deps.globalEventService.publishInternalEvent('localUserUpdated', { id: user.id });
 		}
 
-		await this.userProfilesRepository.update(user.id, {
+		await deps.userProfilesRepository.update(user.id, {
 			...profileUpdates,
 			verifiedLinks: [],
 		});
 
-		const iObj = await this.userEntityService.packSelf(user.id, {
+		const iObj = await deps.userEntityService.packSelf(user.id, {
 			includeSecrets: isSecure,
 		});
 
-		const updatedProfile = await this.userProfilesRepository.findOneByOrFail({ userId: user.id });
+		const updatedProfile = await deps.userProfilesRepository.findOneByOrFail({ userId: user.id });
 
-		this.cacheService.userProfileCache.set(user.id, updatedProfile);
+		deps.cacheService.userProfileCache.set(user.id, updatedProfile);
 
 		// Publish meUpdated event
-		this.globalEventService.publishMainStream(user.id, 'meUpdated', iObj);
+		deps.globalEventService.publishMainStream(user.id, 'meUpdated', iObj);
 
 		// 鍵垢を解除したとき、溜まっていたフォローリクエストがあるならすべて承認
 		if (user.isLocked && ps.isLocked === false) {
-			this.userFollowingService.acceptAllFollowRequests(user);
+			deps.userFollowingService.acceptAllFollowRequests(user);
 		}
 
 		// フォロワーにUpdateを配信
-		this.accountUpdateService.publishToFollowers(user.id);
+		deps.accountUpdateService.publishToFollowers(user.id);
 
 		const urls = updatedProfile.fields.filter(x => x.value.startsWith('https://'));
 		for (const url of urls) {
-			this.verifyLink(url.value, user);
+			verifyLink(url.value, user);
 		}
 
 		return iObj;
 	}
 
-	private async verifyLink(url: string, user: MiLocalUser) {
+	async function verifyLink(url: string, user: MiLocalUser) {
 		if (!URL.canParse(url)) return;
 
 		try {
-			const html = await this.httpRequestService.getHtml(url);
+			const html = await deps.httpRequestService.getHtml(url);
 
 			const doc = htmlParser.parse(html);
 
-			const myLink = `${this.config.url}/@${user.username}`;
+			const myLink = `${deps.config.url}/@${user.username}`;
 
 			const aEls = Array.from(doc.getElementsByTagName('a'));
 			const linkEls = Array.from(doc.getElementsByTagName('link'));
@@ -417,7 +404,7 @@ export class IUpdateOperation {
 			const includesRelMeLinks = [...aEls, ...linkEls].some(link => link.attributes.rel?.split(/\s+/).includes('me') && link.attributes.href === myLink);
 
 			if (includesMyLink || includesRelMeLinks) {
-				await this.userProfilesRepository.createQueryBuilder('profile').update()
+				await deps.userProfilesRepository.createQueryBuilder('profile').update()
 					.where('userId = :userId', { userId: user.id })
 					.set({
 						verifiedLinks: () => 'array_append("verifiedLinks", :url)',
@@ -426,9 +413,17 @@ export class IUpdateOperation {
 					.execute();
 			}
 		} catch (_) {
-		// なにもしない
+			// なにもしない
 		}
 	}
+
+	return implement(iUpdateContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>().use(authentication<MiLocalUser>()).use(apiPolicy<MiLocalUser>({
+		name: iUpdateContract['~orpc'].meta.requestName, requireCredential: true, kind: 'write:account', limit: {
+			duration: 3600000,
+			max: 20,
+		}
+	})).use(requirePrincipal<MiLocalUser>())
+		.handler(async ({ input, context }) => toPackedUserDetailed(await execute(input, context.principal, context.token, context.ip)));
 }
 
 function isLocalUser(user: MiUser): user is MiLocalUser { return user.host === null && user.uri === null; }
