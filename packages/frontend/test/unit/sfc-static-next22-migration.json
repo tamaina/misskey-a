@@ -2216,8 +2216,8 @@
 	},
 	{
 		"file": "packages/features/users/frontend/pages/settings/privacy.vue",
-		"originalSha256": "fc8310db8d6bfdc8daa6ca646e206088cb4f0693acd4401aced3d15a1a42ba98",
-		"migratedSha256": "3b0f242fc9457961fd91dfeab3cbe04bb170899f5be4cfbb3d97031d8bb19efb",
+		"originalSha256": "f409b899453b7099786dadbd7ff7024290b4bc77b3f74825a16c3fbef6c5ee95",
+		"migratedSha256": "b3d6adf5cec421df2975efe19ab1ae8d2c94040b23c44fe1bba120c5728d719d",
 		"edits": [
 			{
 				"start": 158,
@@ -2240,661 +2240,871 @@
 				"afterStart": 335
 			},
 			{
-				"start": 547,
-				"end": 580,
+				"start": 459,
+				"end": 493,
+				"source": "i18n.ts._followApproval.groupTitle",
+				"replacement": "$locale.sfc.followApprovalGroupTitle",
+				"key": "_followApproval.groupTitle",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 465
+			},
+			{
+				"start": 699,
+				"end": 732,
 				"source": "i18n.ts.makeFollowManuallyApprove",
 				"replacement": "$locale.sfc.makeFollowManuallyApprove",
 				"key": "makeFollowManuallyApprove",
 				"kind": "ts",
 				"region": "template",
-				"afterStart": 553
+				"afterStart": 707
 			},
 			{
-				"start": 647,
-				"end": 672,
+				"start": 801,
+				"end": 826,
 				"source": "i18n.ts.lockedAccountInfo",
 				"replacement": "$locale.sfc.lockedAccountInfo",
 				"key": "lockedAccountInfo",
 				"kind": "ts",
 				"region": "template",
-				"afterStart": 657
+				"afterStart": 813
 			},
 			{
-				"start": 946,
-				"end": 972,
+				"start": 1019,
+				"end": 1048,
+				"source": "i18n.ts._followApproval.title",
+				"replacement": "$locale.sfc.followApprovalTitle",
+				"key": "_followApproval.title",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 1035
+			},
+			{
+				"start": 1132,
+				"end": 1167,
+				"source": "i18n.ts._followApproval.description",
+				"replacement": "$locale.sfc.followApprovalDescription",
+				"key": "_followApproval.description",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 1150
+			},
+			{
+				"start": 1236,
+				"end": 1279,
+				"source": "i18n.ts._followApproval.inactiveDescription",
+				"replacement": "$locale.sfc.followApprovalInactiveDescription",
+				"key": "_followApproval.inactiveDescription",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 1256
+			},
+			{
+				"start": 2117,
+				"end": 2147,
+				"source": "i18n.ts._followApproval.period",
+				"replacement": "$locale.sfc.followApprovalPeriod",
+				"key": "_followApproval.period",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 2139
+			},
+			{
+				"start": 2219,
+				"end": 2236,
+				"source": "i18n.ts._time.day",
+				"replacement": "$locale.sfc.timeDay",
+				"key": "_time.day",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 2243
+			},
+			{
+				"start": 2239,
+				"end": 2257,
+				"source": "i18n.ts._time.hour",
+				"replacement": "$locale.sfc.timeHour",
+				"key": "_time.hour",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 2265
+			},
+			{
+				"start": 2380,
+				"end": 2417,
+				"source": "i18n.ts._followApproval.invalidPeriod",
+				"replacement": "$locale.sfc.followApprovalInvalidPeriod",
+				"key": "_followApproval.invalidPeriod",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 2408
+			},
+			{
+				"start": 2639,
+				"end": 2667,
+				"source": "i18n.ts._followApproval.unit",
+				"replacement": "$locale.sfc.followApprovalUnit",
+				"key": "_followApproval.unit",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 2669
+			},
+			{
+				"start": 2985,
+				"end": 3011,
 				"source": "i18n.ts.autoAcceptFollowed",
 				"replacement": "$locale.sfc.autoAcceptFollowed",
 				"key": "autoAcceptFollowed",
 				"kind": "ts",
 				"region": "template",
-				"afterStart": 960
+				"afterStart": 3017
 			},
 			{
-				"start": 1216,
-				"end": 1243,
+				"start": 3080,
+				"end": 3125,
+				"source": "i18n.ts._followApproval.autoAcceptDescription",
+				"replacement": "$locale.sfc.followApprovalAutoAcceptDescription",
+				"key": "_followApproval.autoAcceptDescription",
+				"kind": "ts",
+				"region": "template",
+				"afterStart": 3116
+			},
+			{
+				"start": 3375,
+				"end": 3402,
 				"source": "i18n.ts.makeReactionsPublic",
 				"replacement": "$locale.sfc.makeReactionsPublic",
 				"key": "makeReactionsPublic",
 				"kind": "ts",
 				"region": "template",
-				"afterStart": 1234
+				"afterStart": 3413
 			},
 			{
-				"start": 1310,
-				"end": 1348,
+				"start": 3469,
+				"end": 3507,
 				"source": "i18n.ts.makeReactionsPublicDescription",
 				"replacement": "$locale.sfc.makeReactionsPublicDescription",
 				"key": "makeReactionsPublicDescription",
 				"kind": "ts",
 				"region": "template",
-				"afterStart": 1332
+				"afterStart": 3511
 			},
 			{
-				"start": 1608,
-				"end": 1635,
+				"start": 3767,
+				"end": 3794,
 				"source": "i18n.ts.followingVisibility",
 				"replacement": "$locale.sfc.followingVisibility",
 				"key": "followingVisibility",
 				"kind": "ts",
 				"region": "template",
-				"afterStart": 1634
+				"afterStart": 3813
 			},
 			{
-				"start": 1895,
-				"end": 1922,
+				"start": 4054,
+				"end": 4081,
 				"source": "i18n.ts.followersVisibility",
 				"replacement": "$locale.sfc.followersVisibility",
 				"key": "followersVisibility",
 				"kind": "ts",
 				"region": "template",
-				"afterStart": 1925
+				"afterStart": 4104
 			},
 			{
-				"start": 2141,
-				"end": 2165,
+				"start": 4300,
+				"end": 4324,
 				"source": "i18n.ts.hideOnlineStatus",
 				"replacement": "$locale.sfc.hideOnlineStatus",
 				"key": "hideOnlineStatus",
 				"kind": "ts",
 				"region": "template",
-				"afterStart": 2175
+				"afterStart": 4354
 			},
 			{
-				"start": 2232,
-				"end": 2267,
+				"start": 4391,
+				"end": 4426,
 				"source": "i18n.ts.hideOnlineStatusDescription",
 				"replacement": "$locale.sfc.hideOnlineStatusDescription",
 				"key": "hideOnlineStatusDescription",
 				"kind": "ts",
 				"region": "template",
-				"afterStart": 2270
+				"afterStart": 4449
 			},
 			{
-				"start": 2486,
-				"end": 2502,
+				"start": 4645,
+				"end": 4661,
 				"source": "i18n.ts.noCrawle",
 				"replacement": "$locale.sfc.noCrawle",
 				"key": "noCrawle",
 				"kind": "ts",
 				"region": "template",
-				"afterStart": 2528
+				"afterStart": 4707
 			},
 			{
-				"start": 2569,
-				"end": 2596,
+				"start": 4728,
+				"end": 4755,
 				"source": "i18n.ts.noCrawleDescription",
 				"replacement": "$locale.sfc.noCrawleDescription",
 				"key": "noCrawleDescription",
 				"kind": "ts",
 				"region": "template",
-				"afterStart": 2615
+				"afterStart": 4794
 			},
 			{
-				"start": 2811,
-				"end": 2836,
+				"start": 4970,
+				"end": 4995,
 				"source": "i18n.ts.preventAiLearning",
 				"replacement": "$locale.sfc.preventAiLearning",
 				"key": "preventAiLearning",
 				"kind": "ts",
 				"region": "template",
-				"afterStart": 2861
+				"afterStart": 5040
 			},
 			{
-				"start": 2903,
-				"end": 2939,
+				"start": 5062,
+				"end": 5098,
 				"source": "i18n.ts.preventAiLearningDescription",
 				"replacement": "$locale.sfc.preventAiLearningDescription",
 				"key": "preventAiLearningDescription",
 				"kind": "ts",
 				"region": "template",
-				"afterStart": 2957
+				"afterStart": 5136
 			},
 			{
-				"start": 3144,
-				"end": 3166,
+				"start": 5303,
+				"end": 5325,
 				"source": "i18n.ts.makeExplorable",
 				"replacement": "$locale.sfc.makeExplorable",
 				"key": "makeExplorable",
 				"kind": "ts",
 				"region": "template",
-				"afterStart": 3202
+				"afterStart": 5381
 			},
 			{
-				"start": 3233,
-				"end": 3266,
+				"start": 5392,
+				"end": 5425,
 				"source": "i18n.ts.makeExplorableDescription",
 				"replacement": "$locale.sfc.makeExplorableDescription",
 				"key": "makeExplorableDescription",
 				"kind": "ts",
 				"region": "template",
-				"afterStart": 3295
+				"afterStart": 5474
 			},
 			{
-				"start": 3420,
-				"end": 3441,
+				"start": 5579,
+				"end": 5600,
 				"source": "i18n.ts.directMessage",
 				"replacement": "$locale.sfc.directMessage",
 				"key": "directMessage",
 				"kind": "ts",
 				"region": "template",
-				"afterStart": 3486
+				"afterStart": 5665
 			},
 			{
-				"start": 3567,
-				"end": 3619,
+				"start": 5726,
+				"end": 5778,
 				"source": "i18n.ts._chat.chatNotAvailableForThisAccountOrServer",
 				"replacement": "$locale.sfc.chatChatNotAvailableForThisAccountOrServer",
 				"key": "_chat.chatNotAvailableForThisAccountOrServer",
 				"kind": "ts",
 				"region": "template",
-				"afterStart": 3637
+				"afterStart": 5816
 			},
 			{
-				"start": 3800,
-				"end": 3830,
+				"start": 5959,
+				"end": 5989,
 				"source": "i18n.ts._chat.chatAllowedUsers",
 				"replacement": "$locale.sfc.chatChatAllowedUsers",
 				"key": "_chat.chatAllowedUsers",
 				"kind": "ts",
 				"region": "template",
-				"afterStart": 3872
+				"afterStart": 6051
 			},
 			{
-				"start": 3888,
-				"end": 3923,
+				"start": 6047,
+				"end": 6082,
 				"source": "i18n.ts._chat.chatAllowedUsers_note",
 				"replacement": "$locale.sfc.chatChatAllowedUsers_note",
 				"key": "_chat.chatAllowedUsers_note",
 				"kind": "ts",
 				"region": "template",
-				"afterStart": 3962
+				"afterStart": 6141
 			},
 			{
-				"start": 4121,
-				"end": 4137,
+				"start": 6280,
+				"end": 6296,
 				"source": "i18n.ts.lockdown",
 				"replacement": "$locale.sfc.lockdown",
 				"key": "lockdown",
 				"kind": "ts",
 				"region": "template",
-				"afterStart": 4197
+				"afterStart": 6376
 			},
 			{
-				"start": 4400,
-				"end": 4452,
+				"start": 6559,
+				"end": 6611,
 				"source": "i18n.ts._accountSettings.requireSigninToViewContents",
 				"replacement": "$locale.sfc.accountSettingsRequireSigninToViewContents",
 				"key": "_accountSettings.requireSigninToViewContents",
 				"kind": "ts",
 				"region": "template",
-				"afterStart": 4480
+				"afterStart": 6659
 			},
 			{
-				"start": 4524,
-				"end": 4588,
+				"start": 6683,
+				"end": 6747,
 				"source": "i18n.ts._accountSettings.requireSigninToViewContentsDescription1",
 				"replacement": "$locale.sfc.accountSettingsRequireSigninToViewContentsDescription1",
 				"key": "_accountSettings.requireSigninToViewContentsDescription1",
 				"kind": "ts",
 				"region": "template",
-				"afterStart": 4606
+				"afterStart": 6785
 			},
 			{
-				"start": 4688,
-				"end": 4752,
+				"start": 6847,
+				"end": 6911,
 				"source": "i18n.ts._accountSettings.requireSigninToViewContentsDescription2",
 				"replacement": "$locale.sfc.accountSettingsRequireSigninToViewContentsDescription2",
 				"key": "_accountSettings.requireSigninToViewContentsDescription2",
 				"kind": "ts",
 				"region": "template",
-				"afterStart": 4772
+				"afterStart": 6951
 			},
 			{
-				"start": 4923,
-				"end": 4976,
+				"start": 7082,
+				"end": 7135,
 				"source": "i18n.ts._accountSettings.makeNotesFollowersOnlyBefore",
 				"replacement": "$locale.sfc.accountSettingsMakeNotesFollowersOnlyBefore",
 				"key": "_accountSettings.makeNotesFollowersOnlyBefore",
 				"kind": "ts",
 				"region": "template",
-				"afterStart": 5009
+				"afterStart": 7188
 			},
 			{
-				"start": 5144,
-				"end": 5156,
+				"start": 7303,
+				"end": 7315,
 				"source": "i18n.ts.none",
 				"replacement": "$locale.sfc.none",
 				"key": "none",
 				"kind": "ts",
 				"region": "template",
-				"afterStart": 5232
+				"afterStart": 7411
 			},
 			{
-				"start": 5192,
-				"end": 5247,
+				"start": 7351,
+				"end": 7406,
 				"source": "i18n.ts._accountSettings.notesHavePassedSpecifiedPeriod",
 				"replacement": "$locale.sfc.accountSettingsNotesHavePassedSpecifiedPeriod",
 				"key": "_accountSettings.notesHavePassedSpecifiedPeriod",
 				"kind": "ts",
 				"region": "template",
-				"afterStart": 5284
+				"afterStart": 7463
 			},
 			{
-				"start": 5289,
-				"end": 5348,
+				"start": 7448,
+				"end": 7507,
 				"source": "i18n.ts._accountSettings.notesOlderThanSpecifiedDateAndTime",
 				"replacement": "$locale.sfc.accountSettingsNotesOlderThanSpecifiedDateAndTime",
 				"key": "_accountSettings.notesOlderThanSpecifiedDateAndTime",
 				"kind": "ts",
 				"region": "template",
-				"afterStart": 5383
+				"afterStart": 7562
 			},
 			{
-				"start": 5644,
-				"end": 5658,
+				"start": 7803,
+				"end": 7817,
 				"source": "i18n.ts.custom",
 				"replacement": "$locale.sfc.custom",
 				"key": "custom",
 				"kind": "ts",
 				"region": "template",
-				"afterStart": 5740
+				"afterStart": 7919
 			},
 			{
-				"start": 5991,
-				"end": 6010,
+				"start": 8150,
+				"end": 8169,
 				"source": "i18n.ts._time.month",
 				"replacement": "$locale.sfc.timeMonth",
 				"key": "_time.month",
 				"kind": "ts",
 				"region": "template",
-				"afterStart": 6091
+				"afterStart": 8270
 			},
 			{
-				"start": 6527,
-				"end": 6591,
+				"start": 8686,
+				"end": 8750,
 				"source": "i18n.ts._accountSettings.makeNotesFollowersOnlyBeforeDescription",
 				"replacement": "$locale.sfc.accountSettingsMakeNotesFollowersOnlyBeforeDescription",
 				"key": "_accountSettings.makeNotesFollowersOnlyBeforeDescription",
 				"kind": "ts",
 				"region": "template",
-				"afterStart": 6629
+				"afterStart": 8808
 			},
 			{
-				"start": 6773,
-				"end": 6819,
+				"start": 8932,
+				"end": 8978,
 				"source": "i18n.ts._accountSettings.makeNotesHiddenBefore",
 				"replacement": "$locale.sfc.accountSettingsMakeNotesHiddenBefore",
 				"key": "_accountSettings.makeNotesHiddenBefore",
 				"kind": "ts",
 				"region": "template",
-				"afterStart": 6877
+				"afterStart": 9056
 			},
 			{
-				"start": 6980,
-				"end": 6992,
+				"start": 9139,
+				"end": 9151,
 				"source": "i18n.ts.none",
 				"replacement": "$locale.sfc.none",
 				"key": "none",
 				"kind": "ts",
 				"region": "template",
-				"afterStart": 7086
+				"afterStart": 9265
 			},
 			{
-				"start": 7028,
-				"end": 7083,
+				"start": 9187,
+				"end": 9242,
 				"source": "i18n.ts._accountSettings.notesHavePassedSpecifiedPeriod",
 				"replacement": "$locale.sfc.accountSettingsNotesHavePassedSpecifiedPeriod",
 				"key": "_accountSettings.notesHavePassedSpecifiedPeriod",
 				"kind": "ts",
 				"region": "template",
-				"afterStart": 7138
+				"afterStart": 9317
 			},
 			{
-				"start": 7125,
-				"end": 7184,
+				"start": 9284,
+				"end": 9343,
 				"source": "i18n.ts._accountSettings.notesOlderThanSpecifiedDateAndTime",
 				"replacement": "$locale.sfc.accountSettingsNotesOlderThanSpecifiedDateAndTime",
 				"key": "_accountSettings.notesOlderThanSpecifiedDateAndTime",
 				"kind": "ts",
 				"region": "template",
-				"afterStart": 7237
+				"afterStart": 9416
 			},
 			{
-				"start": 7459,
-				"end": 7473,
+				"start": 9618,
+				"end": 9632,
 				"source": "i18n.ts.custom",
 				"replacement": "$locale.sfc.custom",
 				"key": "custom",
 				"kind": "ts",
 				"region": "template",
-				"afterStart": 7573
+				"afterStart": 9752
 			},
 			{
-				"start": 7785,
-				"end": 7804,
+				"start": 9944,
+				"end": 9963,
 				"source": "i18n.ts._time.month",
 				"replacement": "$locale.sfc.timeMonth",
 				"key": "_time.month",
 				"kind": "ts",
 				"region": "template",
-				"afterStart": 7903
+				"afterStart": 10082
 			},
 			{
-				"start": 8293,
-				"end": 8350,
+				"start": 10452,
+				"end": 10509,
 				"source": "i18n.ts._accountSettings.makeNotesHiddenBeforeDescription",
 				"replacement": "$locale.sfc.accountSettingsMakeNotesHiddenBeforeDescription",
 				"key": "_accountSettings.makeNotesHiddenBeforeDescription",
 				"kind": "ts",
 				"region": "template",
-				"afterStart": 8413
+				"afterStart": 10592
 			},
 			{
-				"start": 8453,
-				"end": 8504,
+				"start": 10612,
+				"end": 10663,
 				"source": "i18n.ts._accountSettings.mayNotEffectSomeSituations",
 				"replacement": "$locale.sfc.accountSettingsMayNotEffectSomeSituations",
 				"key": "_accountSettings.mayNotEffectSomeSituations",
 				"kind": "ts",
 				"region": "template",
-				"afterStart": 8575
+				"afterStart": 10754
 			},
 			{
-				"start": 9046,
-				"end": 9105,
+				"start": 11516,
+				"end": 11575,
 				"source": "import { i18n } from '@features/runtime/frontend/i18n.js';\n",
 				"replacement": "",
-				"afterStart": 9170
+				"afterStart": 11660
 			},
 			{
-				"start": 10592,
-				"end": 10606,
+				"start": 13056,
+				"end": 13085,
+				"source": "i18n.ts._followApproval.local",
+				"replacement": "$locale.value.sfc.followApprovalLocal",
+				"key": "_followApproval.local",
+				"kind": "ts",
+				"region": "script",
+				"afterStart": 13141
+			},
+			{
+				"start": 13115,
+				"end": 13155,
+				"source": "i18n.ts._followApproval.localDescription",
+				"replacement": "$locale.value.sfc.followApprovalLocalDescription",
+				"key": "_followApproval.localDescription",
+				"kind": "ts",
+				"region": "script",
+				"afterStart": 13208
+			},
+			{
+				"start": 13434,
+				"end": 13464,
+				"source": "i18n.ts._followApproval.remote",
+				"replacement": "$locale.value.sfc.followApprovalRemote",
+				"key": "_followApproval.remote",
+				"kind": "ts",
+				"region": "script",
+				"afterStart": 13535
+			},
+			{
+				"start": 13494,
+				"end": 13535,
+				"source": "i18n.ts._followApproval.remoteDescription",
+				"replacement": "$locale.value.sfc.followApprovalRemoteDescription",
+				"key": "_followApproval.remoteDescription",
+				"kind": "ts",
+				"region": "script",
+				"afterStart": 13603
+			},
+			{
+				"start": 13604,
+				"end": 13638,
+				"source": "i18n.ts._followApproval.useDefault",
+				"replacement": "$locale.value.sfc.followApprovalUseDefault",
+				"key": "_followApproval.useDefault",
+				"kind": "ts",
+				"region": "script",
+				"afterStart": 13721
+			},
+			{
+				"start": 13670,
+				"end": 13686,
+				"source": "i18n.ts.disabled",
+				"replacement": "$locale.value.sfc.disabled",
+				"key": "disabled",
+				"kind": "ts",
+				"region": "script",
+				"afterStart": 13795
+			},
+			{
+				"start": 13719,
+				"end": 13749,
+				"source": "i18n.ts._followApproval.custom",
+				"replacement": "$locale.value.sfc.followApprovalCustom",
+				"key": "_followApproval.custom",
+				"kind": "ts",
+				"region": "script",
+				"afterStart": 13854
+			},
+			{
+				"start": 13830,
+				"end": 13848,
+				"source": "i18n.ts._time.hour",
+				"replacement": "$locale.value.sfc.timeHour",
+				"key": "_time.hour",
+				"kind": "ts",
+				"region": "script",
+				"afterStart": 13973
+			},
+			{
+				"start": 13877,
+				"end": 13894,
+				"source": "i18n.ts._time.day",
+				"replacement": "$locale.value.sfc.timeDay",
+				"key": "_time.day",
+				"kind": "ts",
+				"region": "script",
+				"afterStart": 14028
+			},
+			{
+				"start": 14907,
+				"end": 14920,
+				"source": "i18n.ts.error",
+				"replacement": "$locale.value.sfc.error",
+				"key": "error",
+				"kind": "ts",
+				"region": "script",
+				"afterStart": 15066
+			},
+			{
+				"start": 14968,
+				"end": 15009,
+				"source": "i18n.ts.cannotPerformTemporaryDescription",
+				"replacement": "$locale.value.sfc.cannotPerformTemporaryDescription",
+				"key": "cannotPerformTemporaryDescription",
+				"kind": "ts",
+				"region": "script",
+				"afterStart": 15137
+			},
+			{
+				"start": 15610,
+				"end": 15624,
 				"source": "i18n.ts.public",
 				"replacement": "$locale.value.sfc.public",
 				"key": "public",
 				"kind": "ts",
 				"region": "script",
-				"afterStart": 10657
+				"afterStart": 15789
 			},
 			{
-				"start": 10638,
-				"end": 10655,
+				"start": 15656,
+				"end": 15673,
 				"source": "i18n.ts.followers",
 				"replacement": "$locale.value.sfc.followers",
 				"key": "followers",
 				"kind": "ts",
 				"region": "script",
-				"afterStart": 10713
+				"afterStart": 15845
 			},
 			{
-				"start": 10690,
-				"end": 10705,
+				"start": 15708,
+				"end": 15723,
 				"source": "i18n.ts.private",
 				"replacement": "$locale.value.sfc.private",
 				"key": "private",
 				"kind": "ts",
 				"region": "script",
-				"afterStart": 10775
+				"afterStart": 15907
 			},
 			{
-				"start": 10880,
-				"end": 10894,
+				"start": 15898,
+				"end": 15912,
 				"source": "i18n.ts.public",
 				"replacement": "$locale.value.sfc.public",
 				"key": "public",
 				"kind": "ts",
 				"region": "script",
-				"afterStart": 10975
+				"afterStart": 16107
 			},
 			{
-				"start": 10926,
-				"end": 10943,
+				"start": 15944,
+				"end": 15961,
 				"source": "i18n.ts.followers",
 				"replacement": "$locale.value.sfc.followers",
 				"key": "followers",
 				"kind": "ts",
 				"region": "script",
-				"afterStart": 11031
+				"afterStart": 16163
 			},
 			{
-				"start": 10978,
-				"end": 10993,
+				"start": 15996,
+				"end": 16011,
 				"source": "i18n.ts.private",
 				"replacement": "$locale.value.sfc.private",
 				"key": "private",
 				"kind": "ts",
 				"region": "script",
-				"afterStart": 11093
+				"afterStart": 16225
 			},
 			{
-				"start": 11148,
-				"end": 11188,
+				"start": 16166,
+				"end": 16206,
 				"source": "i18n.ts._chat._chatAllowedUsers.everyone",
 				"replacement": "$locale.value.sfc.chatChatAllowedUsersEveryone",
 				"key": "_chat._chatAllowedUsers.everyone",
 				"kind": "ts",
 				"region": "script",
-				"afterStart": 11273
+				"afterStart": 16405
 			},
 			{
-				"start": 11222,
-				"end": 11263,
+				"start": 16240,
+				"end": 16281,
 				"source": "i18n.ts._chat._chatAllowedUsers.followers",
 				"replacement": "$locale.value.sfc.chatChatAllowedUsersFollowers",
 				"key": "_chat._chatAllowedUsers.followers",
 				"kind": "ts",
 				"region": "script",
-				"afterStart": 11353
+				"afterStart": 16485
 			},
 			{
-				"start": 11298,
-				"end": 11339,
+				"start": 16316,
+				"end": 16357,
 				"source": "i18n.ts._chat._chatAllowedUsers.following",
 				"replacement": "$locale.value.sfc.chatChatAllowedUsersFollowing",
 				"key": "_chat._chatAllowedUsers.following",
 				"kind": "ts",
 				"region": "script",
-				"afterStart": 11435
+				"afterStart": 16567
 			},
 			{
-				"start": 11374,
-				"end": 11412,
+				"start": 16392,
+				"end": 16430,
 				"source": "i18n.ts._chat._chatAllowedUsers.mutual",
 				"replacement": "$locale.value.sfc.chatChatAllowedUsersMutual",
 				"key": "_chat._chatAllowedUsers.mutual",
 				"kind": "ts",
 				"region": "script",
-				"afterStart": 11517
+				"afterStart": 16649
 			},
 			{
-				"start": 11444,
-				"end": 11480,
+				"start": 16462,
+				"end": 16498,
 				"source": "i18n.ts._chat._chatAllowedUsers.none",
 				"replacement": "$locale.value.sfc.chatChatAllowedUsersNone",
 				"key": "_chat._chatAllowedUsers.none",
 				"kind": "ts",
 				"region": "script",
-				"afterStart": 11593
+				"afterStart": 16725
 			},
 			{
-				"start": 12119,
-				"end": 12134,
+				"start": 17137,
+				"end": 17152,
 				"source": "i18n.ts.oneHour",
 				"replacement": "$locale.value.sfc.oneHour",
 				"key": "oneHour",
 				"kind": "ts",
 				"region": "script",
-				"afterStart": 12274
+				"afterStart": 17406
 			},
 			{
-				"start": 12162,
-				"end": 12176,
+				"start": 17180,
+				"end": 17194,
 				"source": "i18n.ts.oneDay",
 				"replacement": "$locale.value.sfc.oneDay",
 				"key": "oneDay",
 				"kind": "ts",
 				"region": "script",
-				"afterStart": 12327
+				"afterStart": 17459
 			},
 			{
-				"start": 12205,
-				"end": 12222,
+				"start": 17223,
+				"end": 17240,
 				"source": "i18n.ts.threeDays",
 				"replacement": "$locale.value.sfc.threeDays",
 				"key": "threeDays",
 				"kind": "ts",
 				"region": "script",
-				"afterStart": 12380
+				"afterStart": 17512
 			},
 			{
-				"start": 12252,
-				"end": 12267,
+				"start": 17270,
+				"end": 17285,
 				"source": "i18n.ts.oneWeek",
 				"replacement": "$locale.value.sfc.oneWeek",
 				"key": "oneWeek",
 				"kind": "ts",
 				"region": "script",
-				"afterStart": 12437
+				"afterStart": 17569
 			},
 			{
-				"start": 12297,
-				"end": 12313,
+				"start": 17315,
+				"end": 17331,
 				"source": "i18n.ts.oneMonth",
 				"replacement": "$locale.value.sfc.oneMonth",
 				"key": "oneMonth",
 				"kind": "ts",
 				"region": "script",
-				"afterStart": 12492
+				"afterStart": 17624
 			},
 			{
-				"start": 12344,
-				"end": 12363,
+				"start": 17362,
+				"end": 17381,
 				"source": "i18n.ts.threeMonths",
 				"replacement": "$locale.value.sfc.threeMonths",
 				"key": "threeMonths",
 				"kind": "ts",
 				"region": "script",
-				"afterStart": 12549
+				"afterStart": 17681
 			},
 			{
-				"start": 12394,
-				"end": 12409,
+				"start": 17412,
+				"end": 17427,
 				"source": "i18n.ts.oneYear",
 				"replacement": "$locale.value.sfc.oneYear",
 				"key": "oneYear",
 				"kind": "ts",
 				"region": "script",
-				"afterStart": 12609
+				"afterStart": 17741
 			},
 			{
-				"start": 13921,
-				"end": 13936,
+				"start": 18939,
+				"end": 18954,
 				"source": "i18n.ts.oneHour",
 				"replacement": "$locale.value.sfc.oneHour",
 				"key": "oneHour",
 				"kind": "ts",
 				"region": "script",
-				"afterStart": 14146
+				"afterStart": 19278
 			},
 			{
-				"start": 13964,
-				"end": 13978,
+				"start": 18982,
+				"end": 18996,
 				"source": "i18n.ts.oneDay",
 				"replacement": "$locale.value.sfc.oneDay",
 				"key": "oneDay",
 				"kind": "ts",
 				"region": "script",
-				"afterStart": 14199
+				"afterStart": 19331
 			},
 			{
-				"start": 14007,
-				"end": 14024,
+				"start": 19025,
+				"end": 19042,
 				"source": "i18n.ts.threeDays",
 				"replacement": "$locale.value.sfc.threeDays",
 				"key": "threeDays",
 				"kind": "ts",
 				"region": "script",
-				"afterStart": 14252
+				"afterStart": 19384
 			},
 			{
-				"start": 14054,
-				"end": 14069,
+				"start": 19072,
+				"end": 19087,
 				"source": "i18n.ts.oneWeek",
 				"replacement": "$locale.value.sfc.oneWeek",
 				"key": "oneWeek",
 				"kind": "ts",
 				"region": "script",
-				"afterStart": 14309
+				"afterStart": 19441
 			},
 			{
-				"start": 14099,
-				"end": 14115,
+				"start": 19117,
+				"end": 19133,
 				"source": "i18n.ts.oneMonth",
 				"replacement": "$locale.value.sfc.oneMonth",
 				"key": "oneMonth",
 				"kind": "ts",
 				"region": "script",
-				"afterStart": 14364
+				"afterStart": 19496
 			},
 			{
-				"start": 14146,
-				"end": 14165,
+				"start": 19164,
+				"end": 19183,
 				"source": "i18n.ts.threeMonths",
 				"replacement": "$locale.value.sfc.threeMonths",
 				"key": "threeMonths",
 				"kind": "ts",
 				"region": "script",
-				"afterStart": 14421
+				"afterStart": 19553
 			},
 			{
-				"start": 14196,
-				"end": 14211,
+				"start": 19214,
+				"end": 19229,
 				"source": "i18n.ts.oneYear",
 				"replacement": "$locale.value.sfc.oneYear",
 				"key": "oneYear",
 				"kind": "ts",
 				"region": "script",
-				"afterStart": 14481
+				"afterStart": 19613
 			},
 			{
-				"start": 15371,
-				"end": 15404,
+				"start": 20389,
+				"end": 20422,
 				"source": "i18n.ts.acknowledgeNotesAndEnable",
 				"replacement": "$locale.value.sfc.acknowledgeNotesAndEnable",
 				"key": "acknowledgeNotesAndEnable",
 				"kind": "ts",
 				"region": "script",
-				"afterStart": 15666
+				"afterStart": 20798
 			},
 			{
-				"start": 16265,
-				"end": 16280,
+				"start": 21283,
+				"end": 21298,
 				"source": "i18n.ts.privacy",
 				"replacement": "$locale.value.sfc.privacy",
 				"key": "privacy",
 				"kind": "ts",
 				"region": "script",
-				"afterStart": 16570
+				"afterStart": 21702
 			}
 		],
 		"keys": [
@@ -3151,6 +3361,101 @@
 			{
 				"global": "acknowledgeNotesAndEnable",
 				"local": "acknowledgeNotesAndEnable",
+				"formatter": false
+			},
+			{
+				"global": "_followApproval.groupTitle",
+				"local": "followApprovalGroupTitle",
+				"formatter": false
+			},
+			{
+				"global": "_followApproval.inactiveDescription",
+				"local": "followApprovalInactiveDescription",
+				"formatter": false
+			},
+			{
+				"global": "_followApproval.title",
+				"local": "followApprovalTitle",
+				"formatter": false
+			},
+			{
+				"global": "_followApproval.autoAcceptDescription",
+				"local": "followApprovalAutoAcceptDescription",
+				"formatter": false
+			},
+			{
+				"global": "_followApproval.description",
+				"local": "followApprovalDescription",
+				"formatter": false
+			},
+			{
+				"global": "_followApproval.local",
+				"local": "followApprovalLocal",
+				"formatter": false
+			},
+			{
+				"global": "_followApproval.localDescription",
+				"local": "followApprovalLocalDescription",
+				"formatter": false
+			},
+			{
+				"global": "_followApproval.remote",
+				"local": "followApprovalRemote",
+				"formatter": false
+			},
+			{
+				"global": "_followApproval.remoteDescription",
+				"local": "followApprovalRemoteDescription",
+				"formatter": false
+			},
+			{
+				"global": "_followApproval.useDefault",
+				"local": "followApprovalUseDefault",
+				"formatter": false
+			},
+			{
+				"global": "_followApproval.custom",
+				"local": "followApprovalCustom",
+				"formatter": false
+			},
+			{
+				"global": "_followApproval.period",
+				"local": "followApprovalPeriod",
+				"formatter": false
+			},
+			{
+				"global": "_followApproval.unit",
+				"local": "followApprovalUnit",
+				"formatter": false
+			},
+			{
+				"global": "_followApproval.invalidPeriod",
+				"local": "followApprovalInvalidPeriod",
+				"formatter": false
+			},
+			{
+				"global": "disabled",
+				"local": "disabled",
+				"formatter": false
+			},
+			{
+				"global": "_time.hour",
+				"local": "timeHour",
+				"formatter": false
+			},
+			{
+				"global": "_time.day",
+				"local": "timeDay",
+				"formatter": false
+			},
+			{
+				"global": "error",
+				"local": "error",
+				"formatter": false
+			},
+			{
+				"global": "cannotPerformTemporaryDescription",
+				"local": "cannotPerformTemporaryDescription",
 				"formatter": false
 			}
 		]

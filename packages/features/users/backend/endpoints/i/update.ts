@@ -37,6 +37,8 @@ import type { ApiToken } from '@features/api/backend/transport/context.js';
 export type UserProfileUpdatePatch = Partial<Pick<MiUserProfile,
 	| 'alwaysMarkNsfw'
 	| 'autoAcceptFollowed'
+	| 'followApprovalLocalSeconds'
+	| 'followApprovalRemoteSeconds'
 	| 'autoSensitive'
 	| 'birthday'
 	| 'carefulBot'
@@ -178,6 +180,8 @@ export function createIUpdateProcedure(deps: IUpdateDependencies) {
 		if (typeof ps.isBot === 'boolean') updates.isBot = ps.isBot;
 		if (typeof ps.carefulBot === 'boolean') profileUpdates.carefulBot = ps.carefulBot;
 		if (typeof ps.autoAcceptFollowed === 'boolean') profileUpdates.autoAcceptFollowed = ps.autoAcceptFollowed;
+		if (ps.followApprovalLocalSeconds !== undefined) profileUpdates.followApprovalLocalSeconds = ps.followApprovalLocalSeconds;
+		if (ps.followApprovalRemoteSeconds !== undefined) profileUpdates.followApprovalRemoteSeconds = ps.followApprovalRemoteSeconds;
 		if (typeof ps.noCrawle === 'boolean') profileUpdates.noCrawle = ps.noCrawle;
 		if (typeof ps.preventAiLearning === 'boolean') profileUpdates.preventAiLearning = ps.preventAiLearning;
 		if (typeof ps.requireSigninToViewContents === 'boolean') updates.requireSigninToViewContents = ps.requireSigninToViewContents;
@@ -373,7 +377,7 @@ export function createIUpdateProcedure(deps: IUpdateDependencies) {
 
 		// 鍵垢を解除したとき、溜まっていたフォローリクエストがあるならすべて承認
 		if (user.isLocked && ps.isLocked === false) {
-			deps.userFollowingService.acceptAllFollowRequests(user);
+			await deps.userFollowingService.acceptAllFollowRequests(user);
 		}
 
 		// フォロワーにUpdateを配信

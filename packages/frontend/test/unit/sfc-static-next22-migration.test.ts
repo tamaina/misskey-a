@@ -48,7 +48,7 @@ async function activate(language: string) {
 }
 
 describe('next22 raw locale migration', () => {
-	test('preserves all9324 dictionary values and reverses every source byte', () => {
+	test('preserves all9856 dictionary values and reverses every source byte', () => {
 		let checked = 0;
 		for (const entry of migrationInputs) {
 			const source = restoreCommonUtilitiesBaseline(entry.file, readFileSync(resolve(root, entry.file), 'utf8'));
@@ -73,7 +73,7 @@ describe('next22 raw locale migration', () => {
 			}
 			expect(createHash('sha256').update(original).digest('hex')).toBe(entry.originalSha256);
 		}
-		expect(checked).toBe(9324);
+		expect(checked).toBe(9856);
 	});
 
 	test('transforms every real SFC with the installed VVI plugin and Vue compiler', async () => {
@@ -111,6 +111,6 @@ describe('next22 raw locale migration', () => {
 				}
 			}
 		}
-		expect(checked).toBe(9324);
+		expect(checked).toBe(9856);
 	}, 30000);
 });

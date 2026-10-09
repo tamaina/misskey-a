@@ -120,6 +120,8 @@ export const iUpdateContract = oc.$meta({
 	publicReactions: v.optional(v.boolean()),
 	carefulBot: v.optional(v.boolean()),
 	autoAcceptFollowed: v.optional(v.boolean()),
+	followApprovalLocalSeconds: v.optional(v.nullable(v.pipe(v.number(), v.integer(), v.minValue(0), v.maxValue(30 * 24 * 60 * 60)))),
+	followApprovalRemoteSeconds: v.optional(v.nullable(v.pipe(v.number(), v.integer(), v.minValue(0), v.maxValue(30 * 24 * 60 * 60)))),
 	noCrawle: v.optional(v.boolean()),
 	preventAiLearning: v.optional(v.boolean()),
 	requireSigninToViewContents: v.optional(v.boolean()),
