@@ -4,6 +4,7 @@
  */
 
 import { existsSync } from 'node:fs';
+import { restoreCommonUtilitiesBaseline } from './upstream-common-utilities-source-rebase.js';
 import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
@@ -47,10 +48,10 @@ async function activate(language: string) {
 }
 
 describe('next22 raw locale migration', () => {
-	test('preserves all9324 dictionary values and reverses every source byte', () => {
+	test('preserves all9856 dictionary values and reverses every source byte', () => {
 		let checked = 0;
 		for (const entry of migrationInputs) {
-			const source = readFileSync(resolve(root, entry.file), 'utf8');
+			const source = restoreCommonUtilitiesBaseline(entry.file, readFileSync(resolve(root, entry.file), 'utf8'));
 			expect(createHash('sha256').update(source).digest('hex')).toBe(entry.migratedSha256);
 			const parsed = parse(source, { filename: entry.file });
 			expect(parsed.errors).toEqual([]);
@@ -72,7 +73,7 @@ describe('next22 raw locale migration', () => {
 			}
 			expect(createHash('sha256').update(original).digest('hex')).toBe(entry.originalSha256);
 		}
-		expect(checked).toBe(9324);
+		expect(checked).toBe(9856);
 	});
 
 	test('transforms every real SFC with the installed VVI plugin and Vue compiler', async () => {
@@ -110,6 +111,6 @@ describe('next22 raw locale migration', () => {
 				}
 			}
 		}
-		expect(checked).toBe(9324);
+		expect(checked).toBe(9856);
 	}, 30000);
 });

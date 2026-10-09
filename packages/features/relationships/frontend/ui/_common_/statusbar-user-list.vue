@@ -37,7 +37,7 @@ import { useInterval } from '@features/ui/frontend/shared/use-interval.js';
 import MkMarqueeText from '@features/ui/frontend/components/MkMarqueeText.vue';
 import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 import { getNoteSummary } from '@features/notes/frontend/utility/get-note-summary.js';
-import { notePage } from '@features/notes/frontend/filters/note.js';
+import { notePage } from '@features/notes/frontend/shared/note.js';
 
 const props = defineProps<{
 	userListId?: string;

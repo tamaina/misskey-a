@@ -16,6 +16,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 import { computed } from 'vue';
 import { interpolateLocaleParameters } from '@features/runtime/frontend/interpolate-locale-parameters.js';
 import { dateTimeFormat } from '@features/ui/frontend/shared/intl-const.js';
+import { formatRelativeTime, parseTime } from '@features/ui/frontend/shared/relative-time.js';
+import type { RelativeTimeLocale } from '@features/ui/frontend/shared/relative-time.js';
 import { useLowresTime } from '@features/ui/frontend/shared/use-lowres-time.js';
 
 const props = withDefaults(defineProps<{
@@ -28,21 +30,8 @@ const props = withDefaults(defineProps<{
 	mode: 'relative',
 });
 
-function getDateSafe(n: Date | string | number) {
-	try {
-		if (n instanceof Date) {
-			return n;
-		}
-		return new Date(n);
-	} catch (err) {
-		return {
-			getTime: () => NaN,
-		};
-	}
-}
-
 // eslint-disable-next-line vue/no-setup-props-reactivity-loss
-const _time = props.time == null ? NaN : getDateSafe(props.time).getTime();
+const _time = parseTime(props.time);
 const invalid = Number.isNaN(_time);
 const absolute = !invalid ? dateTimeFormat.format(_time) : $locale.value.sfc.agoInvalid;
 
@@ -52,27 +41,33 @@ const now = computed(() => (props.origin ? props.origin.getTime() : actualNow.va
 // eslint-disable-next-line vue/no-setup-props-reactivity-loss
 const ago = computed(() => (now.value - _time) / 1000/*ms*/);
 
+const relativeTimeLocale: RelativeTimeLocale = {
+	ago: {
+		yearsAgo: params => interpolateLocaleParameters($locale.value.sfc.agoYearsAgo, params),
+		monthsAgo: params => interpolateLocaleParameters($locale.value.sfc.agoMonthsAgo, params),
+		weeksAgo: params => interpolateLocaleParameters($locale.value.sfc.agoWeeksAgo, params),
+		daysAgo: params => interpolateLocaleParameters($locale.value.sfc.agoDaysAgo, params),
+		hoursAgo: params => interpolateLocaleParameters($locale.value.sfc.agoHoursAgo, params),
+		minutesAgo: params => interpolateLocaleParameters($locale.value.sfc.agoMinutesAgo, params),
+		secondsAgo: params => interpolateLocaleParameters($locale.value.sfc.agoSecondsAgo, params),
+	},
+	timeIn: {
+		years: params => interpolateLocaleParameters($locale.value.sfc.timeInYears, params),
+		months: params => interpolateLocaleParameters($locale.value.sfc.timeInMonths, params),
+		weeks: params => interpolateLocaleParameters($locale.value.sfc.timeInWeeks, params),
+		days: params => interpolateLocaleParameters($locale.value.sfc.timeInDays, params),
+		hours: params => interpolateLocaleParameters($locale.value.sfc.timeInHours, params),
+		minutes: params => interpolateLocaleParameters($locale.value.sfc.timeInMinutes, params),
+		seconds: params => interpolateLocaleParameters($locale.value.sfc.timeInSeconds, params),
+	},
+	get justNow() { return $locale.value.sfc.agoJustNow; },
+};
+
 const relative = computed<string>(() => {
 	if (props.mode === 'absolute') return ''; // absoluteではrelativeを使わないので計算しない
 	if (invalid) return $locale.value.sfc.agoInvalid;
 
-	return (
-		ago.value >= 31536000 ? interpolateLocaleParameters($locale.value.sfc.agoYearsAgo, { n: Math.round(ago.value / 31536000).toString() }) :
-		ago.value >= 2592000 ? interpolateLocaleParameters($locale.value.sfc.agoMonthsAgo, { n: Math.round(ago.value / 2592000).toString() }) :
-		ago.value >= 604800 ? interpolateLocaleParameters($locale.value.sfc.agoWeeksAgo, { n: Math.round(ago.value / 604800).toString() }) :
-		ago.value >= 86400 ? interpolateLocaleParameters($locale.value.sfc.agoDaysAgo, { n: Math.round(ago.value / 86400).toString() }) :
-		ago.value >= 3600 ? interpolateLocaleParameters($locale.value.sfc.agoHoursAgo, { n: Math.round(ago.value / 3600).toString() }) :
-		ago.value >= 60 ? interpolateLocaleParameters($locale.value.sfc.agoMinutesAgo, { n: (~~(ago.value / 60)).toString() }) :
-		ago.value >= 10 ? interpolateLocaleParameters($locale.value.sfc.agoSecondsAgo, { n: (~~(ago.value % 60)).toString() }) :
-		ago.value >= -3 ? $locale.value.sfc.agoJustNow :
-		ago.value < -31536000 ? interpolateLocaleParameters($locale.value.sfc.timeInYears, { n: Math.round(-ago.value / 31536000).toString() }) :
-		ago.value < -2592000 ? interpolateLocaleParameters($locale.value.sfc.timeInMonths, { n: Math.round(-ago.value / 2592000).toString() }) :
-		ago.value < -604800 ? interpolateLocaleParameters($locale.value.sfc.timeInWeeks, { n: Math.round(-ago.value / 604800).toString() }) :
-		ago.value < -86400 ? interpolateLocaleParameters($locale.value.sfc.timeInDays, { n: Math.round(-ago.value / 86400).toString() }) :
-		ago.value < -3600 ? interpolateLocaleParameters($locale.value.sfc.timeInHours, { n: Math.round(-ago.value / 3600).toString() }) :
-		ago.value < -60 ? interpolateLocaleParameters($locale.value.sfc.timeInMinutes, { n: (~~(-ago.value / 60)).toString() }) :
-		interpolateLocaleParameters($locale.value.sfc.timeInSeconds, { n: (~~(-ago.value % 60)).toString() })
-	);
+	return formatRelativeTime(ago.value, relativeTimeLocale);
 });
 </script>
 

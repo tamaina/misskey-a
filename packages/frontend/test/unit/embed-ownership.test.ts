@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { restoreCommonUtilitiesBaseline } from './upstream-common-utilities-source-rebase.js';
+import commonUtilities from './upstream-common-utilities-source-rebase.json';
 import { readFileSync, existsSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { resolve } from 'node:path';
@@ -28,11 +30,12 @@ function beforeLocaleMigration(file: string, source: string): string {
 	return original;
 }
 
-
 describe('embed feature ownership', () => {
 	test.each(ownership)('$destination preserves the complete source apart from reviewed module paths and typed parameter unwrapping', entry => {
 		let expected = entry.rewrites.reduce((source, edit) => source.split(edit.source).join(edit.replacement), entry.originalSource);
-		const source = readFileSync(resolve(root, entry.destination), 'utf8');
+		const currentFile = commonUtilities.find(proof => proof.file === entry.destination)?.currentFile ?? entry.destination;
+		const actualSource = readFileSync(resolve(root, currentFile), 'utf8');
+		const source = restoreCommonUtilitiesBaseline(entry.destination, actualSource);
 		if (entry.destination === 'packages/features/runtime/frontend/embed/components/I18n.vue') {
 			const oldSlots = 'const slots = defineSlots<T extends ParameterizedString<infer R> ? { [K in R]: () => unknown } : NonNullable<unknown>>();';
 			const literalSlots = "type LiteralSlotNames<S extends string> = string extends S ? never :\n\tS extends `${string}{${infer Name}}${infer Rest}` ? Name | LiteralSlotNames<Rest> : never;\ntype SlotNames<S extends string> = S extends ParameterizedString<infer R> ? R : LiteralSlotNames<S>;\n\nconst slots = defineSlots<{ [K in SlotNames<T>]: () => unknown }>();";
@@ -42,7 +45,7 @@ describe('embed feature ownership', () => {
 		expect(beforeLocaleMigration(entry.destination, source)).toBe(expected);
 		expect(existsSync(resolve(root, entry.source))).toBe(false);
 		if (entry.destination.endsWith('.vue')) {
-			const parsed = parse(source, { filename: resolve(root, entry.destination) });
+			const parsed = parse(actualSource, { filename: resolve(root, currentFile) });
 			expect(parsed.errors).toEqual([]);
 			if (parsed.descriptor.scriptSetup) expect(compileScript(parsed.descriptor, { id: entry.destination, fs: { fileExists: existsSync, readFile: path => readFileSync(path, 'utf8') } }).content).toBeTruthy();
 		}

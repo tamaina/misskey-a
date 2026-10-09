@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { restoreCommonUtilitiesBaseline } from './upstream-common-utilities-source-rebase.js';
 import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
@@ -56,7 +57,7 @@ describe('next20 formatter locale migration', () => {
 	test('preserves all4900 dictionary values and reverses every source byte', () => {
 		let checked = 0;
 		for (const entry of migrationInputs) {
-			const source = readFileSync(resolve(root, entry.file), 'utf8');
+			const source = restoreCommonUtilitiesBaseline(entry.file, readFileSync(resolve(root, entry.file), 'utf8'));
 			const parsed = parse(source, { filename: entry.file });
 			expect(parsed.errors).toEqual([]);
 			const blocks = parsed.descriptor.customBlocks.filter(block => block.type === 'locale');

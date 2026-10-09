@@ -27,7 +27,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script lang="ts" setup>
 import { defineAsyncComponent, computed, watch, ref } from 'vue';
 import * as Misskey from 'misskey-js';
-import { acct as getAcct } from '@features/users/frontend/filters/user.js';
+import { acct as getAcct } from '@features/users/frontend/shared/user.js';
 import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 import { definePage } from '@features/navigation/frontend/page.js';
 import { $i } from '@features/auth/frontend/i.js';

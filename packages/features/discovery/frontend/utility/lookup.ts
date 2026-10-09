@@ -8,7 +8,7 @@ import * as os from '@features/ui/frontend/os.js';
 import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 import FeatureLocaleMessages from '@features/discovery/frontend/ts-messages.vue';
 import { mainRouter } from '@features/navigation/frontend/router.js';
-import { acct } from '@features/users/frontend/filters/user.js';
+import { acct } from '@features/users/frontend/shared/user.js';
 
 export async function lookup(router?: Router) {
 	const _router = router ?? mainRouter;

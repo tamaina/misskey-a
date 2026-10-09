@@ -26,7 +26,7 @@ import * as Misskey from 'misskey-js';
 import MkUserCardMini from '@features/users/frontend/components/MkUserCardMini.vue';
 import * as os from '@features/ui/frontend/os.js';
 import { useLowresTime } from '@features/ui/frontend/shared/use-lowres-time.js';
-import { userPage, acct } from '@features/users/frontend/filters/user.js';
+import { userPage, acct } from '@features/users/frontend/shared/user.js';
 
 const props = defineProps<{
 	item: Misskey.entities.UsersGetFollowingUsersByBirthdayResponse[number];

@@ -225,7 +225,7 @@ import MkFileListForAdmin from '@features/drive/frontend/components/MkFileListFo
 import MkInfo from '@features/ui/frontend/components/MkInfo.vue';
 import * as os from '@features/ui/frontend/os.js';
 import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
-import { acct } from '@features/users/frontend/filters/user.js';
+import { acct } from '@features/users/frontend/shared/user.js';
 import { definePage } from '@features/navigation/frontend/page.js';
 import { interpolateLocaleParameters } from '@features/runtime/frontend/interpolate-locale-parameters.js';
 import { useMkSelect } from '@features/ui/frontend/composables/use-mkselect.js';

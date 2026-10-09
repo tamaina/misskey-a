@@ -294,7 +294,7 @@ describe('next bounded SFC-local locale migration', () => {
 			'@features/users/frontend/components/MkUserCardMini.vue': { default: Vue.defineComponent({ setup: (_props, { slots }) => () => Vue.h('div', slots.sub?.()) }) },
 			'@features/ui/frontend/os.js': { post },
 			'@features/ui/frontend/shared/use-lowres-time.js': { useLowresTime: () => now },
-			'@features/users/frontend/filters/user.js': { userPage: () => '/user', acct: () => 'birthday@example.test' },
+			'@features/users/frontend/shared/user.js': { userPage: () => '/user', acct: () => 'birthday@example.test' },
 		});
 		const mounted = await mountLocalized(language, file, component, { item });
 		try {

@@ -31,8 +31,8 @@ for (const viewer of ['anonymous', 'other', 'moderator'] as const) {
 		if (viewer === 'moderator') f.roles.isModerator.mockResolvedValue(true);
 		const principal = viewer === 'anonymous' ? null : { id: `${viewer}123` };
 		const native = await f.service.pack(f.user, principal, { schema: 'UserDetailed', ...f.hints });
-		const wire = toPackedUserDetailed(Object.assign(native, { outerSentinel: 'drop', email: 'never-expose', securityKeysList: [] }));
-		for (const key of ['outerSentinel', 'email', 'emailVerified', 'securityKeysList', 'unreadAnnouncements', 'policies']) expect(wire).not.toHaveProperty(key);
+		const wire = toPackedUserDetailed(Object.assign(native, { outerSentinel: 'drop', email: 'never-expose', securityKeysList: [], followApprovalLocalSeconds: 43200, followApprovalRemoteSeconds: 86400 }));
+		for (const key of ['outerSentinel', 'email', 'emailVerified', 'securityKeysList', 'unreadAnnouncements', 'policies', 'followApprovalLocalSeconds', 'followApprovalRemoteSeconds']) expect(wire).not.toHaveProperty(key);
 		expect(wire.followersCount).toBe(viewer === 'moderator' ? 3 : 0);
 		expect(wire.followingCount).toBe(viewer === 'moderator' ? 4 : 0);
 		expect(wire.moderationNote).toBe(viewer === 'moderator' ? 'moderator-only' : undefined);
@@ -44,6 +44,8 @@ for (const viewer of ['anonymous', 'other', 'moderator'] as const) {
 for (const appToken of [false, true]) {
 	test(`i ${appToken ? 'app token' : 'native session'} preserves self fields, date conversion, and secret gating without an output validator`, async () => {
 		const f = createUserSerializationFixture();
+		f.profile.followApprovalLocalSeconds = 43200;
+		f.profile.followApprovalRemoteSeconds = 86400;
 		const actor = mockDeep<MiLocalUser>({ id: f.user.id, isSuspended: false, movedToUri: null });
 		const profiles = mockDeep<IDependencies['userProfilesRepository']>();
 		f.profile.user = f.user;
@@ -59,6 +61,8 @@ for (const appToken of [false, true]) {
 			expect(wire.followersCount).toBe(3);
 			expect(wire.followingCount).toBe(4);
 			expect(wire.followedMessage).toBe('followers-only');
+			expect(wire.followApprovalLocalSeconds).toBe(43200);
+			expect(wire.followApprovalRemoteSeconds).toBe(86400);
 			expect(wire.unreadAnnouncements[0].updatedAt).toBe(timestamp.toISOString());
 			expect(wire.unreadAnnouncements[0]).not.toHaveProperty('user');
 			if (appToken) {

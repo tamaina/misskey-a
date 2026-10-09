@@ -208,6 +208,7 @@ test('inactive reverse and moved-account relations cannot auto-approve a locked 
 		userEntityService: { isLocalUser: (user: { host: string | null }) => user.host === null, isRemoteUser: (user: { host: string | null }) => user.host !== null },
 		userBlockingService: { checkBlocked: async () => false },
 		userProfilesRepository: { findOneByOrFail: async () => ({ autoAcceptFollowed: true }) },
+		idService: { parse: () => ({ date: Date.UTC(2020, 0, 1) }) },
 		followingsRepository: { exists },
 		accountMoveService: { validateAlsoKnownAs: async (_: unknown, predicate: (old: { id: string }, moved: { id: string }) => Promise<boolean>) => predicate({ id: 'old' }, { id: 'alias' }) },
 		createFollowRequest, insertFollowingDoc, deliverAccept: vi.fn(),

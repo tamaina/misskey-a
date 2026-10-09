@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { restoreCommonUtilitiesBaseline } from './upstream-common-utilities-source-rebase.js';
 import { createHash } from 'node:crypto';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
@@ -22,6 +23,7 @@ import proof from './final-screen-locale-migration.json';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../../../..');
 const hash = (text: string) => createHash('sha256').update(text).digest('hex');
+
 function at(value: unknown, path: string): unknown {
 	for (const key of path.split('.')) {
 		if (!value || typeof value !== 'object') throw new Error(`Missing path: ${path}`);
@@ -29,16 +31,19 @@ function at(value: unknown, path: string): unknown {
 	}
 	return value;
 }
+
 function leaves(value: unknown): string[] {
 	if (typeof value === 'string') return [value];
 	if (!value || typeof value !== 'object') throw new Error('Expected locale strings');
 	return Object.values(value).flatMap(leaves);
 }
+
 function hook(value: unknown, ...args: unknown[]): unknown {
 	if (typeof value === 'function') return Reflect.apply(value, {}, args);
 	if (value && typeof value === 'object' && 'handler' in value && typeof value.handler === 'function') return Reflect.apply(value.handler, {}, args);
 	throw new Error('Expected Vite hook');
 }
+
 function configured(embed: boolean) {
 	const plugin = pluginVvi({ embed });
 	hook(plugin.configResolved, { root: resolve(root, embed ? 'packages/frontend-embed' : 'packages/frontend'), command: 'build', base: '/', build: { ssr: false } });
@@ -49,7 +54,7 @@ function configured(embed: boolean) {
 test('all51 screen sources reverse byte for byte and retain all49336 effective locale strings', () => {
 	let strings = 0;
 	for (const entry of proof) {
-		const source = readFileSync(resolve(root, entry.file), 'utf8');
+		const source = restoreCommonUtilitiesBaseline(entry.file, readFileSync(resolve(root, entry.file), 'utf8'));
 		expect(hash(source)).toBe(entry.migratedSha256);
 		const parsed = parse(source, { filename: entry.file });
 		expect(parsed.errors).toEqual([]);

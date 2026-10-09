@@ -10,20 +10,52 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<SearchText>{{ $locale.sfc.settingsPrivacyBanner }}</SearchText>
 		</MkFeatureBanner>
 
-		<SearchMarker :keywords="['follow', 'lock']">
-			<MkSwitch v-model="isLocked" @update:modelValue="save()">
-				<template #label><SearchLabel>{{ $locale.sfc.makeFollowManuallyApprove }}</SearchLabel></template>
-				<template #caption><SearchText>{{ $locale.sfc.lockedAccountInfo }}</SearchText></template>
-			</MkSwitch>
-		</SearchMarker>
+		<FormSection first>
+			<template #label><SearchLabel>{{ $locale.sfc.followApprovalGroupTitle }}</SearchLabel></template>
+			<div class="_gaps_m">
+				<SearchMarker :keywords="['follow', 'lock']">
+					<MkSwitch v-model="isLocked" @update:modelValue="save()">
+						<template #label><SearchLabel>{{ $locale.sfc.makeFollowManuallyApprove }}</SearchLabel></template>
+						<template #caption><SearchText>{{ $locale.sfc.lockedAccountInfo }}</SearchText></template>
+					</MkSwitch>
+				</SearchMarker>
 
-		<MkDisableSection :disabled="!isLocked">
-			<SearchMarker :keywords="['follow', 'auto', 'accept']">
-				<MkSwitch v-model="autoAcceptFollowed" @update:modelValue="save()">
-					<template #label><SearchLabel>{{ $locale.sfc.autoAcceptFollowed }}</SearchLabel></template>
-				</MkSwitch>
-			</SearchMarker>
-		</MkDisableSection>
+				<SearchMarker :keywords="['follow', 'request', 'approval', 'age']">
+					<FormSlot>
+						<template #label><SearchLabel>{{ $locale.sfc.followApprovalTitle }}</SearchLabel></template>
+						<div class="_gaps_m">
+							<div><SearchText>{{ $locale.sfc.followApprovalDescription }}</SearchText></div>
+							<MkInfo v-if="isLocked"><SearchText>{{ $locale.sfc.followApprovalInactiveDescription }}</SearchText></MkInfo>
+							<MkDisableSection :disabled="isLocked">
+								<div class="_gaps_m">
+									<div v-for="setting in followApprovalSettings" :key="setting.key" class="_gaps_s">
+										<MkSelect v-model="setting.mode" :items="followApprovalModes" @update:modelValue="saveFollowApproval(setting)">
+											<template #label><SearchLabel>{{ setting.label }}</SearchLabel></template>
+											<template #caption><SearchText>{{ setting.caption }}</SearchText></template>
+										</MkSelect>
+										<MkInput v-if="setting.mode === 'custom'" v-model="setting.amount" type="number" :min="1 / FOLLOW_APPROVAL_UNIT_SECONDS[setting.unit]" :max="FOLLOW_APPROVAL_MAX_SECONDS / FOLLOW_APPROVAL_UNIT_SECONDS[setting.unit]" step="any" @update:modelValue="scheduleFollowApprovalSave(setting)">
+											<template #label>{{ $locale.sfc.followApprovalPeriod }}</template>
+											<template #suffix>{{ setting.unit === 'day' ? $locale.sfc.timeDay : $locale.sfc.timeHour }}</template>
+											<template v-if="followApprovalPeriodToSeconds(setting.amount, setting.unit) == null" #caption>{{ $locale.sfc.followApprovalInvalidPeriod }}</template>
+										</MkInput>
+										<MkSelect v-if="setting.mode === 'custom'" v-model="setting.unit" :items="followApprovalUnits" @update:modelValue="saveFollowApproval(setting)">
+											<template #label>{{ $locale.sfc.followApprovalUnit }}</template>
+										</MkSelect>
+									</div>
+								</div>
+							</MkDisableSection>
+						</div>
+					</FormSlot>
+				</SearchMarker>
+
+				<SearchMarker :keywords="['follow', 'auto', 'accept']">
+					<MkSwitch v-model="autoAcceptFollowed" @update:modelValue="save()">
+						<template #label><SearchLabel>{{ $locale.sfc.autoAcceptFollowed }}</SearchLabel></template>
+						<template #caption><SearchText>{{ $locale.sfc.followApprovalAutoAcceptDescription }}</SearchText></template>
+					</MkSwitch>
+				</SearchMarker>
+			</div>
+		</FormSection>
 
 		<SearchMarker :keywords="['reaction', 'public']">
 			<MkSwitch v-model="publicReactions" @update:modelValue="save()">
@@ -212,7 +244,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { ref, computed, watch } from 'vue';
+import { ref, computed, watch, onBeforeUnmount } from 'vue';
+import type { FollowApprovalPeriodUnit } from '@features/users/frontend/utility/follow-approval.js';
+import { FOLLOW_APPROVAL_MAX_SECONDS, FOLLOW_APPROVAL_UNIT_SECONDS, followApprovalPeriodFromSeconds, followApprovalPeriodToSeconds } from '@features/users/frontend/utility/follow-approval.js';
 import type { MkSelectItem } from '@features/ui/frontend/components/MkSelect.vue';
 import MkSwitch from '@features/ui/frontend/components/MkSwitch.vue';
 import MkSelect from '@features/ui/frontend/components/MkSelect.vue';
@@ -234,6 +268,75 @@ const $i = ensureSignin();
 
 const isLocked = ref($i.isLocked);
 const autoAcceptFollowed = ref($i.autoAcceptFollowed);
+
+type FollowApprovalSetting = {
+	key: 'followApprovalLocalSeconds' | 'followApprovalRemoteSeconds';
+	mode: 'default' | 'disabled' | 'custom';
+	amount: number | null;
+	unit: FollowApprovalPeriodUnit;
+	label: string;
+	caption: string;
+};
+
+const followApprovalSettings = ref<FollowApprovalSetting[]>([
+	{
+		key: 'followApprovalLocalSeconds',
+		mode: $i.followApprovalLocalSeconds == null ? 'default' : $i.followApprovalLocalSeconds === 0 ? 'disabled' : 'custom',
+		...followApprovalPeriodFromSeconds($i.followApprovalLocalSeconds || 7 * 86400),
+		get label() { return $locale.value.sfc.followApprovalLocal; },
+		get caption() { return $locale.value.sfc.followApprovalLocalDescription; },
+	},
+	{
+		key: 'followApprovalRemoteSeconds',
+		mode: $i.followApprovalRemoteSeconds == null ? 'default' : $i.followApprovalRemoteSeconds === 0 ? 'disabled' : 'custom',
+		...followApprovalPeriodFromSeconds($i.followApprovalRemoteSeconds || 7 * 86400),
+		get label() { return $locale.value.sfc.followApprovalRemote; },
+		get caption() { return $locale.value.sfc.followApprovalRemoteDescription; },
+	},
+]);
+
+const followApprovalModes = computed(() => [
+	{ label: $locale.value.sfc.followApprovalUseDefault, value: 'default' },
+	{ label: $locale.value.sfc.disabled, value: 'disabled' },
+	{ label: $locale.value.sfc.followApprovalCustom, value: 'custom' },
+]);
+
+const followApprovalUnits = computed(() => [
+	{ label: $locale.value.sfc.timeHour, value: 'hour' },
+	{ label: $locale.value.sfc.timeDay, value: 'day' },
+]);
+
+const followApprovalSaveTimers = new Map<FollowApprovalSetting['key'], number>();
+
+function scheduleFollowApprovalSave(setting: FollowApprovalSetting) {
+	window.clearTimeout(followApprovalSaveTimers.get(setting.key));
+	followApprovalSaveTimers.set(setting.key, window.setTimeout(() => saveFollowApproval(setting), 1000));
+}
+
+onBeforeUnmount(() => {
+	for (const setting of followApprovalSettings.value) {
+		if (followApprovalSaveTimers.has(setting.key)) saveFollowApproval(setting);
+	}
+});
+
+function saveFollowApproval(setting: FollowApprovalSetting) {
+	window.clearTimeout(followApprovalSaveTimers.get(setting.key));
+	followApprovalSaveTimers.delete(setting.key);
+	const seconds = followApprovalPeriodToSeconds(setting.amount, setting.unit);
+	if (setting.mode === 'custom' && seconds == null) {
+		return;
+	}
+	misskeyApi('i/update', {
+		[setting.key]: setting.mode === 'default' ? null : setting.mode === 'disabled' ? 0 : seconds,
+	}).catch(err => {
+		os.alert({
+			type: 'error',
+			title: $locale.value.sfc.error,
+			text: err.code === 'RATE_LIMIT_EXCEEDED' ? $locale.value.sfc.cannotPerformTemporaryDescription : err.message,
+		});
+	});
+}
+
 const noCrawle = ref($i.noCrawle);
 const preventAiLearning = ref($i.preventAiLearning);
 const isExplorable = ref($i.isExplorable);
@@ -479,7 +582,26 @@ definePage(() => ({
 	"oneMonth": "شهر",
 	"threeMonths": "3 months",
 	"oneYear": "1 year",
-	"acknowledgeNotesAndEnable": "Turn on after understanding the precautions."
+	"acknowledgeNotesAndEnable": "Turn on after understanding the precautions.",
+	"followApprovalGroupTitle": "フォロー承認",
+	"followApprovalInactiveDescription": "すべてのフォローが承認制になるため、期間による設定は適用されません。フォローの承認制を解除すると、以下の設定が再び適用されます。",
+	"followApprovalTitle": "新しいアカウントからのフォローを承認制にする",
+	"followApprovalAutoAcceptDescription": "フォローを承認制にしている場合や、新しいアカウントからのフォローを保留する場合にも、あなたがフォローしている相手は自動承認します。",
+	"followApprovalDescription": "指定した期間が経過していない相手からのフォローを、フォローリクエストとして保留します。既存のフォロワーには影響しません。フォローしている相手の自動承認が有効な場合、その相手は自動承認されます。",
+	"followApprovalLocal": "ローカルユーザーからのフォロー",
+	"followApprovalLocalDescription": "このサーバーでのアカウント作成からの期間で判定します。",
+	"followApprovalRemote": "リモートユーザーからのフォロー",
+	"followApprovalRemoteDescription": "相手のサーバーでの作成日時ではなく、このサーバーが初めてそのアカウントを認識してからの期間で判定します。",
+	"followApprovalUseDefault": "既定値を使う（現在は無効）",
+	"followApprovalCustom": "期間を指定する",
+	"followApprovalPeriod": "承認が必要な期間",
+	"followApprovalUnit": "単位",
+	"followApprovalInvalidPeriod": "期間が正しくありません。1秒以上の期間を、指定できる範囲内で入力してください。",
+	"disabled": "معطّل",
+	"timeHour": "سا",
+	"timeDay": "ي",
+	"error": "خطأ",
+	"cannotPerformTemporaryDescription": "This action cannot be performed temporarily due to exceeding the execution limit. Please wait for a while and then try again."
 }
 </locale>
 
@@ -535,7 +657,26 @@ definePage(() => ({
 	"oneMonth": "Un mes",
 	"threeMonths": "3 mesos",
 	"oneYear": "1 any",
-	"acknowledgeNotesAndEnable": "Activa'l després de comprendre els possibles perills."
+	"acknowledgeNotesAndEnable": "Activa'l després de comprendre els possibles perills.",
+	"followApprovalGroupTitle": "フォロー承認",
+	"followApprovalInactiveDescription": "すべてのフォローが承認制になるため、期間による設定は適用されません。フォローの承認制を解除すると、以下の設定が再び適用されます。",
+	"followApprovalTitle": "新しいアカウントからのフォローを承認制にする",
+	"followApprovalAutoAcceptDescription": "フォローを承認制にしている場合や、新しいアカウントからのフォローを保留する場合にも、あなたがフォローしている相手は自動承認します。",
+	"followApprovalDescription": "指定した期間が経過していない相手からのフォローを、フォローリクエストとして保留します。既存のフォロワーには影響しません。フォローしている相手の自動承認が有効な場合、その相手は自動承認されます。",
+	"followApprovalLocal": "ローカルユーザーからのフォロー",
+	"followApprovalLocalDescription": "このサーバーでのアカウント作成からの期間で判定します。",
+	"followApprovalRemote": "リモートユーザーからのフォロー",
+	"followApprovalRemoteDescription": "相手のサーバーでの作成日時ではなく、このサーバーが初めてそのアカウントを認識してからの期間で判定します。",
+	"followApprovalUseDefault": "既定値を使う（現在は無効）",
+	"followApprovalCustom": "期間を指定する",
+	"followApprovalPeriod": "承認が必要な期間",
+	"followApprovalUnit": "単位",
+	"followApprovalInvalidPeriod": "期間が正しくありません。1秒以上の期間を、指定できる範囲内で入力してください。",
+	"disabled": "Desactivat",
+	"timeHour": "Hor(a)(es)",
+	"timeDay": "Di(a)(es)",
+	"error": "Error",
+	"cannotPerformTemporaryDescription": "Aquesta acció no es pot dur a terme temporalment per arribar al seu límit d'execució. Pots esperar una mica i tornar-ho a intentar."
 }
 </locale>
 
@@ -591,7 +732,26 @@ definePage(() => ({
 	"oneMonth": "1 měsíc",
 	"threeMonths": "3 měsíce",
 	"oneYear": "1 rok",
-	"acknowledgeNotesAndEnable": "Turn on after understanding the precautions."
+	"acknowledgeNotesAndEnable": "Turn on after understanding the precautions.",
+	"followApprovalGroupTitle": "フォロー承認",
+	"followApprovalInactiveDescription": "すべてのフォローが承認制になるため、期間による設定は適用されません。フォローの承認制を解除すると、以下の設定が再び適用されます。",
+	"followApprovalTitle": "新しいアカウントからのフォローを承認制にする",
+	"followApprovalAutoAcceptDescription": "フォローを承認制にしている場合や、新しいアカウントからのフォローを保留する場合にも、あなたがフォローしている相手は自動承認します。",
+	"followApprovalDescription": "指定した期間が経過していない相手からのフォローを、フォローリクエストとして保留します。既存のフォロワーには影響しません。フォローしている相手の自動承認が有効な場合、その相手は自動承認されます。",
+	"followApprovalLocal": "ローカルユーザーからのフォロー",
+	"followApprovalLocalDescription": "このサーバーでのアカウント作成からの期間で判定します。",
+	"followApprovalRemote": "リモートユーザーからのフォロー",
+	"followApprovalRemoteDescription": "相手のサーバーでの作成日時ではなく、このサーバーが初めてそのアカウントを認識してからの期間で判定します。",
+	"followApprovalUseDefault": "既定値を使う（現在は無効）",
+	"followApprovalCustom": "期間を指定する",
+	"followApprovalPeriod": "承認が必要な期間",
+	"followApprovalUnit": "単位",
+	"followApprovalInvalidPeriod": "期間が正しくありません。1秒以上の期間を、指定できる範囲内で入力してください。",
+	"disabled": "Vypnuto",
+	"timeHour": "Hodin",
+	"timeDay": "Dnů",
+	"error": "Chyba",
+	"cannotPerformTemporaryDescription": "Tuto akci nelze dočasně provést z důvodu překročení limitu provedení. Chvíli počkejte a zkuste to znovu."
 }
 </locale>
 
@@ -647,7 +807,26 @@ definePage(() => ({
 	"oneMonth": "One month",
 	"threeMonths": "3 months",
 	"oneYear": "1 year",
-	"acknowledgeNotesAndEnable": "Turn on after understanding the precautions."
+	"acknowledgeNotesAndEnable": "Turn on after understanding the precautions.",
+	"followApprovalGroupTitle": "フォロー承認",
+	"followApprovalInactiveDescription": "すべてのフォローが承認制になるため、期間による設定は適用されません。フォローの承認制を解除すると、以下の設定が再び適用されます。",
+	"followApprovalTitle": "新しいアカウントからのフォローを承認制にする",
+	"followApprovalAutoAcceptDescription": "フォローを承認制にしている場合や、新しいアカウントからのフォローを保留する場合にも、あなたがフォローしている相手は自動承認します。",
+	"followApprovalDescription": "指定した期間が経過していない相手からのフォローを、フォローリクエストとして保留します。既存のフォロワーには影響しません。フォローしている相手の自動承認が有効な場合、その相手は自動承認されます。",
+	"followApprovalLocal": "ローカルユーザーからのフォロー",
+	"followApprovalLocalDescription": "このサーバーでのアカウント作成からの期間で判定します。",
+	"followApprovalRemote": "リモートユーザーからのフォロー",
+	"followApprovalRemoteDescription": "相手のサーバーでの作成日時ではなく、このサーバーが初めてそのアカウントを認識してからの期間で判定します。",
+	"followApprovalUseDefault": "既定値を使う（現在は無効）",
+	"followApprovalCustom": "期間を指定する",
+	"followApprovalPeriod": "承認が必要な期間",
+	"followApprovalUnit": "単位",
+	"followApprovalInvalidPeriod": "期間が正しくありません。1秒以上の期間を、指定できる範囲内で入力してください。",
+	"disabled": "Disabled",
+	"timeHour": "Hour(s)",
+	"timeDay": "Day(s)",
+	"error": "Error",
+	"cannotPerformTemporaryDescription": "This action cannot be performed temporarily due to exceeding the execution limit. Please wait for a while and then try again."
 }
 </locale>
 
@@ -703,7 +882,26 @@ definePage(() => ({
 	"oneMonth": "1 Monat",
 	"threeMonths": "3 Monate",
 	"oneYear": "1 Jahr",
-	"acknowledgeNotesAndEnable": "Schalten Sie dies erst ein, wenn Sie die Vorsichtsmaßnahmen verstanden haben."
+	"acknowledgeNotesAndEnable": "Schalten Sie dies erst ein, wenn Sie die Vorsichtsmaßnahmen verstanden haben.",
+	"followApprovalGroupTitle": "フォロー承認",
+	"followApprovalInactiveDescription": "すべてのフォローが承認制になるため、期間による設定は適用されません。フォローの承認制を解除すると、以下の設定が再び適用されます。",
+	"followApprovalTitle": "新しいアカウントからのフォローを承認制にする",
+	"followApprovalAutoAcceptDescription": "フォローを承認制にしている場合や、新しいアカウントからのフォローを保留する場合にも、あなたがフォローしている相手は自動承認します。",
+	"followApprovalDescription": "指定した期間が経過していない相手からのフォローを、フォローリクエストとして保留します。既存のフォロワーには影響しません。フォローしている相手の自動承認が有効な場合、その相手は自動承認されます。",
+	"followApprovalLocal": "ローカルユーザーからのフォロー",
+	"followApprovalLocalDescription": "このサーバーでのアカウント作成からの期間で判定します。",
+	"followApprovalRemote": "リモートユーザーからのフォロー",
+	"followApprovalRemoteDescription": "相手のサーバーでの作成日時ではなく、このサーバーが初めてそのアカウントを認識してからの期間で判定します。",
+	"followApprovalUseDefault": "既定値を使う（現在は無効）",
+	"followApprovalCustom": "期間を指定する",
+	"followApprovalPeriod": "承認が必要な期間",
+	"followApprovalUnit": "単位",
+	"followApprovalInvalidPeriod": "期間が正しくありません。1秒以上の期間を、指定できる範囲内で入力してください。",
+	"disabled": "Deaktiviert",
+	"timeHour": "Stunde(n)",
+	"timeDay": "Tag(en)",
+	"error": "Fehler",
+	"cannotPerformTemporaryDescription": "Diese Aktion ist wegen des Überschreitenes des Ausführungslimits temporär nicht verfügbar. Bitte versuche es nach einiger Zeit erneut."
 }
 </locale>
 
@@ -759,7 +957,26 @@ definePage(() => ({
 	"oneMonth": "One month",
 	"threeMonths": "3 months",
 	"oneYear": "1 year",
-	"acknowledgeNotesAndEnable": "Turn on after understanding the precautions."
+	"acknowledgeNotesAndEnable": "Turn on after understanding the precautions.",
+	"followApprovalGroupTitle": "フォロー承認",
+	"followApprovalInactiveDescription": "すべてのフォローが承認制になるため、期間による設定は適用されません。フォローの承認制を解除すると、以下の設定が再び適用されます。",
+	"followApprovalTitle": "新しいアカウントからのフォローを承認制にする",
+	"followApprovalAutoAcceptDescription": "フォローを承認制にしている場合や、新しいアカウントからのフォローを保留する場合にも、あなたがフォローしている相手は自動承認します。",
+	"followApprovalDescription": "指定した期間が経過していない相手からのフォローを、フォローリクエストとして保留します。既存のフォロワーには影響しません。フォローしている相手の自動承認が有効な場合、その相手は自動承認されます。",
+	"followApprovalLocal": "ローカルユーザーからのフォロー",
+	"followApprovalLocalDescription": "このサーバーでのアカウント作成からの期間で判定します。",
+	"followApprovalRemote": "リモートユーザーからのフォロー",
+	"followApprovalRemoteDescription": "相手のサーバーでの作成日時ではなく、このサーバーが初めてそのアカウントを認識してからの期間で判定します。",
+	"followApprovalUseDefault": "既定値を使う（現在は無効）",
+	"followApprovalCustom": "期間を指定する",
+	"followApprovalPeriod": "承認が必要な期間",
+	"followApprovalUnit": "単位",
+	"followApprovalInvalidPeriod": "期間が正しくありません。1秒以上の期間を、指定できる範囲内で入力してください。",
+	"disabled": "Disabled",
+	"timeHour": "Hour(s)",
+	"timeDay": "Day(s)",
+	"error": "Error",
+	"cannotPerformTemporaryDescription": "This action cannot be performed temporarily due to exceeding the execution limit. Please wait for a while and then try again."
 }
 </locale>
 
@@ -815,7 +1032,26 @@ definePage(() => ({
 	"oneMonth": "1 mes",
 	"threeMonths": "Tres meses",
 	"oneYear": "Un año",
-	"acknowledgeNotesAndEnable": "Activar después de comprender las precauciones"
+	"acknowledgeNotesAndEnable": "Activar después de comprender las precauciones",
+	"followApprovalGroupTitle": "フォロー承認",
+	"followApprovalInactiveDescription": "すべてのフォローが承認制になるため、期間による設定は適用されません。フォローの承認制を解除すると、以下の設定が再び適用されます。",
+	"followApprovalTitle": "新しいアカウントからのフォローを承認制にする",
+	"followApprovalAutoAcceptDescription": "フォローを承認制にしている場合や、新しいアカウントからのフォローを保留する場合にも、あなたがフォローしている相手は自動承認します。",
+	"followApprovalDescription": "指定した期間が経過していない相手からのフォローを、フォローリクエストとして保留します。既存のフォロワーには影響しません。フォローしている相手の自動承認が有効な場合、その相手は自動承認されます。",
+	"followApprovalLocal": "ローカルユーザーからのフォロー",
+	"followApprovalLocalDescription": "このサーバーでのアカウント作成からの期間で判定します。",
+	"followApprovalRemote": "リモートユーザーからのフォロー",
+	"followApprovalRemoteDescription": "相手のサーバーでの作成日時ではなく、このサーバーが初めてそのアカウントを認識してからの期間で判定します。",
+	"followApprovalUseDefault": "既定値を使う（現在は無効）",
+	"followApprovalCustom": "期間を指定する",
+	"followApprovalPeriod": "承認が必要な期間",
+	"followApprovalUnit": "単位",
+	"followApprovalInvalidPeriod": "期間が正しくありません。1秒以上の期間を、指定できる範囲内で入力してください。",
+	"disabled": "Desactivado",
+	"timeHour": "Horas",
+	"timeDay": "Días",
+	"error": "Error",
+	"cannotPerformTemporaryDescription": "Esta acción no se puede realizar porque se excedió el límite de ejecución. Espera un poco y prueba de nuevo."
 }
 </locale>
 
@@ -871,7 +1107,26 @@ definePage(() => ({
 	"oneMonth": "Un mois",
 	"threeMonths": "3 mois",
 	"oneYear": "1 an",
-	"acknowledgeNotesAndEnable": "Turn on after understanding the precautions."
+	"acknowledgeNotesAndEnable": "Turn on after understanding the precautions.",
+	"followApprovalGroupTitle": "フォロー承認",
+	"followApprovalInactiveDescription": "すべてのフォローが承認制になるため、期間による設定は適用されません。フォローの承認制を解除すると、以下の設定が再び適用されます。",
+	"followApprovalTitle": "新しいアカウントからのフォローを承認制にする",
+	"followApprovalAutoAcceptDescription": "フォローを承認制にしている場合や、新しいアカウントからのフォローを保留する場合にも、あなたがフォローしている相手は自動承認します。",
+	"followApprovalDescription": "指定した期間が経過していない相手からのフォローを、フォローリクエストとして保留します。既存のフォロワーには影響しません。フォローしている相手の自動承認が有効な場合、その相手は自動承認されます。",
+	"followApprovalLocal": "ローカルユーザーからのフォロー",
+	"followApprovalLocalDescription": "このサーバーでのアカウント作成からの期間で判定します。",
+	"followApprovalRemote": "リモートユーザーからのフォロー",
+	"followApprovalRemoteDescription": "相手のサーバーでの作成日時ではなく、このサーバーが初めてそのアカウントを認識してからの期間で判定します。",
+	"followApprovalUseDefault": "既定値を使う（現在は無効）",
+	"followApprovalCustom": "期間を指定する",
+	"followApprovalPeriod": "承認が必要な期間",
+	"followApprovalUnit": "単位",
+	"followApprovalInvalidPeriod": "期間が正しくありません。1秒以上の期間を、指定できる範囲内で入力してください。",
+	"disabled": "Désactivé",
+	"timeHour": "h",
+	"timeDay": "j",
+	"error": "Erreur",
+	"cannotPerformTemporaryDescription": "Temporairement indisponible puisque le nombre d'opérations dépasse la limite. Veuillez patienter un peu, puis réessayer."
 }
 </locale>
 
@@ -927,7 +1182,26 @@ definePage(() => ({
 	"oneMonth": "satu bulan",
 	"threeMonths": "3 bulan",
 	"oneYear": "1 tahun",
-	"acknowledgeNotesAndEnable": "Aktifkan setelah memahami catatan penting."
+	"acknowledgeNotesAndEnable": "Aktifkan setelah memahami catatan penting.",
+	"followApprovalGroupTitle": "フォロー承認",
+	"followApprovalInactiveDescription": "すべてのフォローが承認制になるため、期間による設定は適用されません。フォローの承認制を解除すると、以下の設定が再び適用されます。",
+	"followApprovalTitle": "新しいアカウントからのフォローを承認制にする",
+	"followApprovalAutoAcceptDescription": "フォローを承認制にしている場合や、新しいアカウントからのフォローを保留する場合にも、あなたがフォローしている相手は自動承認します。",
+	"followApprovalDescription": "指定した期間が経過していない相手からのフォローを、フォローリクエストとして保留します。既存のフォロワーには影響しません。フォローしている相手の自動承認が有効な場合、その相手は自動承認されます。",
+	"followApprovalLocal": "ローカルユーザーからのフォロー",
+	"followApprovalLocalDescription": "このサーバーでのアカウント作成からの期間で判定します。",
+	"followApprovalRemote": "リモートユーザーからのフォロー",
+	"followApprovalRemoteDescription": "相手のサーバーでの作成日時ではなく、このサーバーが初めてそのアカウントを認識してからの期間で判定します。",
+	"followApprovalUseDefault": "既定値を使う（現在は無効）",
+	"followApprovalCustom": "期間を指定する",
+	"followApprovalPeriod": "承認が必要な期間",
+	"followApprovalUnit": "単位",
+	"followApprovalInvalidPeriod": "期間が正しくありません。1秒以上の期間を、指定できる範囲内で入力してください。",
+	"disabled": "Nonaktif",
+	"timeHour": "jam",
+	"timeDay": "hari",
+	"error": "Galat",
+	"cannotPerformTemporaryDescription": "Aksi ini tidak dapat dilakukan sementara karena melewati batas eksekusi. Mohon tunggu sejenak dan coba lagi."
 }
 </locale>
 
@@ -983,7 +1257,26 @@ definePage(() => ({
 	"oneMonth": "Un mese",
 	"threeMonths": "3 mesi",
 	"oneYear": "1 anno",
-	"acknowledgeNotesAndEnable": "Attivare dopo averne compreso il comportamento."
+	"acknowledgeNotesAndEnable": "Attivare dopo averne compreso il comportamento.",
+	"followApprovalGroupTitle": "フォロー承認",
+	"followApprovalInactiveDescription": "すべてのフォローが承認制になるため、期間による設定は適用されません。フォローの承認制を解除すると、以下の設定が再び適用されます。",
+	"followApprovalTitle": "新しいアカウントからのフォローを承認制にする",
+	"followApprovalAutoAcceptDescription": "フォローを承認制にしている場合や、新しいアカウントからのフォローを保留する場合にも、あなたがフォローしている相手は自動承認します。",
+	"followApprovalDescription": "指定した期間が経過していない相手からのフォローを、フォローリクエストとして保留します。既存のフォロワーには影響しません。フォローしている相手の自動承認が有効な場合、その相手は自動承認されます。",
+	"followApprovalLocal": "ローカルユーザーからのフォロー",
+	"followApprovalLocalDescription": "このサーバーでのアカウント作成からの期間で判定します。",
+	"followApprovalRemote": "リモートユーザーからのフォロー",
+	"followApprovalRemoteDescription": "相手のサーバーでの作成日時ではなく、このサーバーが初めてそのアカウントを認識してからの期間で判定します。",
+	"followApprovalUseDefault": "既定値を使う（現在は無効）",
+	"followApprovalCustom": "期間を指定する",
+	"followApprovalPeriod": "承認が必要な期間",
+	"followApprovalUnit": "単位",
+	"followApprovalInvalidPeriod": "期間が正しくありません。1秒以上の期間を、指定できる範囲内で入力してください。",
+	"disabled": "Inattivo",
+	"timeHour": "ore",
+	"timeDay": "giorni",
+	"error": "Errore",
+	"cannotPerformTemporaryDescription": "L'attività non può essere svolta, poiché si è raggiunto il limite di esecuzioni possibili. Per favore, riprova più tardi."
 }
 </locale>
 
@@ -1039,7 +1332,26 @@ definePage(() => ({
 	"oneMonth": "1ヶ月",
 	"threeMonths": "3ヶ月",
 	"oneYear": "1年",
-	"acknowledgeNotesAndEnable": "注意事項を理解した上でオンにします。"
+	"acknowledgeNotesAndEnable": "注意事項を理解した上でオンにします。",
+	"followApprovalGroupTitle": "フォロー承認",
+	"followApprovalInactiveDescription": "すべてのフォローが承認制になるため、期間による設定は適用されません。フォローの承認制を解除すると、以下の設定が再び適用されます。",
+	"followApprovalTitle": "新しいアカウントからのフォローを承認制にする",
+	"followApprovalAutoAcceptDescription": "フォローを承認制にしている場合や、新しいアカウントからのフォローを保留する場合にも、あなたがフォローしている相手は自動承認します。",
+	"followApprovalDescription": "指定した期間が経過していない相手からのフォローを、フォローリクエストとして保留します。既存のフォロワーには影響しません。フォローしている相手の自動承認が有効な場合、その相手は自動承認されます。",
+	"followApprovalLocal": "ローカルユーザーからのフォロー",
+	"followApprovalLocalDescription": "このサーバーでのアカウント作成からの期間で判定します。",
+	"followApprovalRemote": "リモートユーザーからのフォロー",
+	"followApprovalRemoteDescription": "相手のサーバーでの作成日時ではなく、このサーバーが初めてそのアカウントを認識してからの期間で判定します。",
+	"followApprovalUseDefault": "既定値を使う（現在は無効）",
+	"followApprovalCustom": "期間を指定する",
+	"followApprovalPeriod": "承認が必要な期間",
+	"followApprovalUnit": "単位",
+	"followApprovalInvalidPeriod": "期間が正しくありません。1秒以上の期間を、指定できる範囲内で入力してください。",
+	"disabled": "無効",
+	"timeHour": "時間",
+	"timeDay": "日",
+	"error": "エラー",
+	"cannotPerformTemporaryDescription": "操作回数が制限を超過するため一時的に利用できません。しばらく時間を置いてから再度お試しください。"
 }
 </locale>
 
@@ -1095,7 +1407,26 @@ definePage(() => ({
 	"oneMonth": "1ヶ月",
 	"threeMonths": "3ヶ月",
 	"oneYear": "1年",
-	"acknowledgeNotesAndEnable": "注意事項をわかった上でオンにする。"
+	"acknowledgeNotesAndEnable": "注意事項をわかった上でオンにする。",
+	"followApprovalGroupTitle": "フォロー承認",
+	"followApprovalInactiveDescription": "すべてのフォローが承認制になるため、期間による設定は適用されません。フォローの承認制を解除すると、以下の設定が再び適用されます。",
+	"followApprovalTitle": "新しいアカウントからのフォローを承認制にする",
+	"followApprovalAutoAcceptDescription": "フォローを承認制にしている場合や、新しいアカウントからのフォローを保留する場合にも、あなたがフォローしている相手は自動承認します。",
+	"followApprovalDescription": "指定した期間が経過していない相手からのフォローを、フォローリクエストとして保留します。既存のフォロワーには影響しません。フォローしている相手の自動承認が有効な場合、その相手は自動承認されます。",
+	"followApprovalLocal": "ローカルユーザーからのフォロー",
+	"followApprovalLocalDescription": "このサーバーでのアカウント作成からの期間で判定します。",
+	"followApprovalRemote": "リモートユーザーからのフォロー",
+	"followApprovalRemoteDescription": "相手のサーバーでの作成日時ではなく、このサーバーが初めてそのアカウントを認識してからの期間で判定します。",
+	"followApprovalUseDefault": "既定値を使う（現在は無効）",
+	"followApprovalCustom": "期間を指定する",
+	"followApprovalPeriod": "承認が必要な期間",
+	"followApprovalUnit": "単位",
+	"followApprovalInvalidPeriod": "期間が正しくありません。1秒以上の期間を、指定できる範囲内で入力してください。",
+	"disabled": "無効",
+	"timeHour": "時間",
+	"timeDay": "日",
+	"error": "おかしなったで",
+	"cannotPerformTemporaryDescription": "操作し過ぎてちょっと今は使えへんくしとるで。ちょっと待ってからもっかいやってや。"
 }
 </locale>
 
@@ -1151,7 +1482,26 @@ definePage(() => ({
 	"oneMonth": "One month",
 	"threeMonths": "3 months",
 	"oneYear": "1 year",
-	"acknowledgeNotesAndEnable": "Turn on after understanding the precautions."
+	"acknowledgeNotesAndEnable": "Turn on after understanding the precautions.",
+	"followApprovalGroupTitle": "フォロー承認",
+	"followApprovalInactiveDescription": "すべてのフォローが承認制になるため、期間による設定は適用されません。フォローの承認制を解除すると、以下の設定が再び適用されます。",
+	"followApprovalTitle": "新しいアカウントからのフォローを承認制にする",
+	"followApprovalAutoAcceptDescription": "フォローを承認制にしている場合や、新しいアカウントからのフォローを保留する場合にも、あなたがフォローしている相手は自動承認します。",
+	"followApprovalDescription": "指定した期間が経過していない相手からのフォローを、フォローリクエストとして保留します。既存のフォロワーには影響しません。フォローしている相手の自動承認が有効な場合、その相手は自動承認されます。",
+	"followApprovalLocal": "ローカルユーザーからのフォロー",
+	"followApprovalLocalDescription": "このサーバーでのアカウント作成からの期間で判定します。",
+	"followApprovalRemote": "リモートユーザーからのフォロー",
+	"followApprovalRemoteDescription": "相手のサーバーでの作成日時ではなく、このサーバーが初めてそのアカウントを認識してからの期間で判定します。",
+	"followApprovalUseDefault": "既定値を使う（現在は無効）",
+	"followApprovalCustom": "期間を指定する",
+	"followApprovalPeriod": "承認が必要な期間",
+	"followApprovalUnit": "単位",
+	"followApprovalInvalidPeriod": "期間が正しくありません。1秒以上の期間を、指定できる範囲内で入力してください。",
+	"disabled": "Disabled",
+	"timeHour": "Hour(s)",
+	"timeDay": "Day(s)",
+	"error": "Error",
+	"cannotPerformTemporaryDescription": "This action cannot be performed temporarily due to exceeding the execution limit. Please wait for a while and then try again."
 }
 </locale>
 
@@ -1207,7 +1557,26 @@ definePage(() => ({
 	"oneMonth": "One month",
 	"threeMonths": "3 months",
 	"oneYear": "1 year",
-	"acknowledgeNotesAndEnable": "Turn on after understanding the precautions."
+	"acknowledgeNotesAndEnable": "Turn on after understanding the precautions.",
+	"followApprovalGroupTitle": "フォロー承認",
+	"followApprovalInactiveDescription": "すべてのフォローが承認制になるため、期間による設定は適用されません。フォローの承認制を解除すると、以下の設定が再び適用されます。",
+	"followApprovalTitle": "新しいアカウントからのフォローを承認制にする",
+	"followApprovalAutoAcceptDescription": "フォローを承認制にしている場合や、新しいアカウントからのフォローを保留する場合にも、あなたがフォローしている相手は自動承認します。",
+	"followApprovalDescription": "指定した期間が経過していない相手からのフォローを、フォローリクエストとして保留します。既存のフォロワーには影響しません。フォローしている相手の自動承認が有効な場合、その相手は自動承認されます。",
+	"followApprovalLocal": "ローカルユーザーからのフォロー",
+	"followApprovalLocalDescription": "このサーバーでのアカウント作成からの期間で判定します。",
+	"followApprovalRemote": "リモートユーザーからのフォロー",
+	"followApprovalRemoteDescription": "相手のサーバーでの作成日時ではなく、このサーバーが初めてそのアカウントを認識してからの期間で判定します。",
+	"followApprovalUseDefault": "既定値を使う（現在は無効）",
+	"followApprovalCustom": "期間を指定する",
+	"followApprovalPeriod": "承認が必要な期間",
+	"followApprovalUnit": "単位",
+	"followApprovalInvalidPeriod": "期間が正しくありません。1秒以上の期間を、指定できる範囲内で入力してください。",
+	"disabled": "Disabled",
+	"timeHour": "Hour(s)",
+	"timeDay": "Day(s)",
+	"error": "Error",
+	"cannotPerformTemporaryDescription": "This action cannot be performed temporarily due to exceeding the execution limit. Please wait for a while and then try again."
 }
 </locale>
 
@@ -1263,7 +1632,26 @@ definePage(() => ({
 	"oneMonth": "1개월",
 	"threeMonths": "3개월",
 	"oneYear": "1년",
-	"acknowledgeNotesAndEnable": "활성화 하기 전에 주의 사항을 확인했습니다."
+	"acknowledgeNotesAndEnable": "활성화 하기 전에 주의 사항을 확인했습니다.",
+	"followApprovalGroupTitle": "フォロー承認",
+	"followApprovalInactiveDescription": "すべてのフォローが承認制になるため、期間による設定は適用されません。フォローの承認制を解除すると、以下の設定が再び適用されます。",
+	"followApprovalTitle": "新しいアカウントからのフォローを承認制にする",
+	"followApprovalAutoAcceptDescription": "フォローを承認制にしている場合や、新しいアカウントからのフォローを保留する場合にも、あなたがフォローしている相手は自動承認します。",
+	"followApprovalDescription": "指定した期間が経過していない相手からのフォローを、フォローリクエストとして保留します。既存のフォロワーには影響しません。フォローしている相手の自動承認が有効な場合、その相手は自動承認されます。",
+	"followApprovalLocal": "ローカルユーザーからのフォロー",
+	"followApprovalLocalDescription": "このサーバーでのアカウント作成からの期間で判定します。",
+	"followApprovalRemote": "リモートユーザーからのフォロー",
+	"followApprovalRemoteDescription": "相手のサーバーでの作成日時ではなく、このサーバーが初めてそのアカウントを認識してからの期間で判定します。",
+	"followApprovalUseDefault": "既定値を使う（現在は無効）",
+	"followApprovalCustom": "期間を指定する",
+	"followApprovalPeriod": "承認が必要な期間",
+	"followApprovalUnit": "単位",
+	"followApprovalInvalidPeriod": "期間が正しくありません。1秒以上の期間を、指定できる範囲内で入力してください。",
+	"disabled": "비활성화",
+	"timeHour": "시간",
+	"timeDay": "일",
+	"error": "오류",
+	"cannotPerformTemporaryDescription": "조작 횟수 제한을 초과하여 일시적으로 사용이 불가합니다. 잠시 후 다시 시도해 주세요."
 }
 </locale>
 
@@ -1319,7 +1707,26 @@ definePage(() => ({
 	"oneMonth": "One month",
 	"threeMonths": "3 maanden",
 	"oneYear": "1 jaar",
-	"acknowledgeNotesAndEnable": "Turn on after understanding the precautions."
+	"acknowledgeNotesAndEnable": "Turn on after understanding the precautions.",
+	"followApprovalGroupTitle": "フォロー承認",
+	"followApprovalInactiveDescription": "すべてのフォローが承認制になるため、期間による設定は適用されません。フォローの承認制を解除すると、以下の設定が再び適用されます。",
+	"followApprovalTitle": "新しいアカウントからのフォローを承認制にする",
+	"followApprovalAutoAcceptDescription": "フォローを承認制にしている場合や、新しいアカウントからのフォローを保留する場合にも、あなたがフォローしている相手は自動承認します。",
+	"followApprovalDescription": "指定した期間が経過していない相手からのフォローを、フォローリクエストとして保留します。既存のフォロワーには影響しません。フォローしている相手の自動承認が有効な場合、その相手は自動承認されます。",
+	"followApprovalLocal": "ローカルユーザーからのフォロー",
+	"followApprovalLocalDescription": "このサーバーでのアカウント作成からの期間で判定します。",
+	"followApprovalRemote": "リモートユーザーからのフォロー",
+	"followApprovalRemoteDescription": "相手のサーバーでの作成日時ではなく、このサーバーが初めてそのアカウントを認識してからの期間で判定します。",
+	"followApprovalUseDefault": "既定値を使う（現在は無効）",
+	"followApprovalCustom": "期間を指定する",
+	"followApprovalPeriod": "承認が必要な期間",
+	"followApprovalUnit": "単位",
+	"followApprovalInvalidPeriod": "期間が正しくありません。1秒以上の期間を、指定できる範囲内で入力してください。",
+	"disabled": "Uitgeschakeld",
+	"timeHour": "Hour(s)",
+	"timeDay": "Day(s)",
+	"error": "Fout",
+	"cannotPerformTemporaryDescription": "This action cannot be performed temporarily due to exceeding the execution limit. Please wait for a while and then try again."
 }
 </locale>
 
@@ -1375,7 +1782,26 @@ definePage(() => ({
 	"oneMonth": "1 måned",
 	"threeMonths": "3 months",
 	"oneYear": "1 year",
-	"acknowledgeNotesAndEnable": "Turn on after understanding the precautions."
+	"acknowledgeNotesAndEnable": "Turn on after understanding the precautions.",
+	"followApprovalGroupTitle": "フォロー承認",
+	"followApprovalInactiveDescription": "すべてのフォローが承認制になるため、期間による設定は適用されません。フォローの承認制を解除すると、以下の設定が再び適用されます。",
+	"followApprovalTitle": "新しいアカウントからのフォローを承認制にする",
+	"followApprovalAutoAcceptDescription": "フォローを承認制にしている場合や、新しいアカウントからのフォローを保留する場合にも、あなたがフォローしている相手は自動承認します。",
+	"followApprovalDescription": "指定した期間が経過していない相手からのフォローを、フォローリクエストとして保留します。既存のフォロワーには影響しません。フォローしている相手の自動承認が有効な場合、その相手は自動承認されます。",
+	"followApprovalLocal": "ローカルユーザーからのフォロー",
+	"followApprovalLocalDescription": "このサーバーでのアカウント作成からの期間で判定します。",
+	"followApprovalRemote": "リモートユーザーからのフォロー",
+	"followApprovalRemoteDescription": "相手のサーバーでの作成日時ではなく、このサーバーが初めてそのアカウントを認識してからの期間で判定します。",
+	"followApprovalUseDefault": "既定値を使う（現在は無効）",
+	"followApprovalCustom": "期間を指定する",
+	"followApprovalPeriod": "承認が必要な期間",
+	"followApprovalUnit": "単位",
+	"followApprovalInvalidPeriod": "期間が正しくありません。1秒以上の期間を、指定できる範囲内で入力してください。",
+	"disabled": "Disabled",
+	"timeHour": "Timer",
+	"timeDay": "Dager",
+	"error": "Feil",
+	"cannotPerformTemporaryDescription": "This action cannot be performed temporarily due to exceeding the execution limit. Please wait for a while and then try again."
 }
 </locale>
 
@@ -1431,7 +1857,26 @@ definePage(() => ({
 	"oneMonth": "jeden miesiąc",
 	"threeMonths": "3 miesiące",
 	"oneYear": "Rok",
-	"acknowledgeNotesAndEnable": "Turn on after understanding the precautions."
+	"acknowledgeNotesAndEnable": "Turn on after understanding the precautions.",
+	"followApprovalGroupTitle": "フォロー承認",
+	"followApprovalInactiveDescription": "すべてのフォローが承認制になるため、期間による設定は適用されません。フォローの承認制を解除すると、以下の設定が再び適用されます。",
+	"followApprovalTitle": "新しいアカウントからのフォローを承認制にする",
+	"followApprovalAutoAcceptDescription": "フォローを承認制にしている場合や、新しいアカウントからのフォローを保留する場合にも、あなたがフォローしている相手は自動承認します。",
+	"followApprovalDescription": "指定した期間が経過していない相手からのフォローを、フォローリクエストとして保留します。既存のフォロワーには影響しません。フォローしている相手の自動承認が有効な場合、その相手は自動承認されます。",
+	"followApprovalLocal": "ローカルユーザーからのフォロー",
+	"followApprovalLocalDescription": "このサーバーでのアカウント作成からの期間で判定します。",
+	"followApprovalRemote": "リモートユーザーからのフォロー",
+	"followApprovalRemoteDescription": "相手のサーバーでの作成日時ではなく、このサーバーが初めてそのアカウントを認識してからの期間で判定します。",
+	"followApprovalUseDefault": "既定値を使う（現在は無効）",
+	"followApprovalCustom": "期間を指定する",
+	"followApprovalPeriod": "承認が必要な期間",
+	"followApprovalUnit": "単位",
+	"followApprovalInvalidPeriod": "期間が正しくありません。1秒以上の期間を、指定できる範囲内で入力してください。",
+	"disabled": "Wyłączono",
+	"timeHour": "godz.",
+	"timeDay": "dzień",
+	"error": "Błąd",
+	"cannotPerformTemporaryDescription": "Ta akcja nie może zostać wykonana, z powodu przekroczenia limitu wykonań. Prosimy poczekać chwilę i spróbować ponownie"
 }
 </locale>
 
@@ -1487,7 +1932,26 @@ definePage(() => ({
 	"oneMonth": "1 mês",
 	"threeMonths": "3 meses",
 	"oneYear": "1 ano",
-	"acknowledgeNotesAndEnable": "Ative após compreender as precauções."
+	"acknowledgeNotesAndEnable": "Ative após compreender as precauções.",
+	"followApprovalGroupTitle": "フォロー承認",
+	"followApprovalInactiveDescription": "すべてのフォローが承認制になるため、期間による設定は適用されません。フォローの承認制を解除すると、以下の設定が再び適用されます。",
+	"followApprovalTitle": "新しいアカウントからのフォローを承認制にする",
+	"followApprovalAutoAcceptDescription": "フォローを承認制にしている場合や、新しいアカウントからのフォローを保留する場合にも、あなたがフォローしている相手は自動承認します。",
+	"followApprovalDescription": "指定した期間が経過していない相手からのフォローを、フォローリクエストとして保留します。既存のフォロワーには影響しません。フォローしている相手の自動承認が有効な場合、その相手は自動承認されます。",
+	"followApprovalLocal": "ローカルユーザーからのフォロー",
+	"followApprovalLocalDescription": "このサーバーでのアカウント作成からの期間で判定します。",
+	"followApprovalRemote": "リモートユーザーからのフォロー",
+	"followApprovalRemoteDescription": "相手のサーバーでの作成日時ではなく、このサーバーが初めてそのアカウントを認識してからの期間で判定します。",
+	"followApprovalUseDefault": "既定値を使う（現在は無効）",
+	"followApprovalCustom": "期間を指定する",
+	"followApprovalPeriod": "承認が必要な期間",
+	"followApprovalUnit": "単位",
+	"followApprovalInvalidPeriod": "期間が正しくありません。1秒以上の期間を、指定できる範囲内で入力してください。",
+	"disabled": "Desativado",
+	"timeHour": "Hora(s)",
+	"timeDay": "Dia(s)",
+	"error": "Erro",
+	"cannotPerformTemporaryDescription": "Esta ação não pôde ser concluída devido ao excesso de pedidos em sucessão. Tente novamente em alguns momentos."
 }
 </locale>
 
@@ -1543,7 +2007,26 @@ definePage(() => ({
 	"oneMonth": "1 месяц",
 	"threeMonths": "3 месяца",
 	"oneYear": "1 год",
-	"acknowledgeNotesAndEnable": "Включайте только после понимания мер предосторожности"
+	"acknowledgeNotesAndEnable": "Включайте только после понимания мер предосторожности",
+	"followApprovalGroupTitle": "フォロー承認",
+	"followApprovalInactiveDescription": "すべてのフォローが承認制になるため、期間による設定は適用されません。フォローの承認制を解除すると、以下の設定が再び適用されます。",
+	"followApprovalTitle": "新しいアカウントからのフォローを承認制にする",
+	"followApprovalAutoAcceptDescription": "フォローを承認制にしている場合や、新しいアカウントからのフォローを保留する場合にも、あなたがフォローしている相手は自動承認します。",
+	"followApprovalDescription": "指定した期間が経過していない相手からのフォローを、フォローリクエストとして保留します。既存のフォロワーには影響しません。フォローしている相手の自動承認が有効な場合、その相手は自動承認されます。",
+	"followApprovalLocal": "ローカルユーザーからのフォロー",
+	"followApprovalLocalDescription": "このサーバーでのアカウント作成からの期間で判定します。",
+	"followApprovalRemote": "リモートユーザーからのフォロー",
+	"followApprovalRemoteDescription": "相手のサーバーでの作成日時ではなく、このサーバーが初めてそのアカウントを認識してからの期間で判定します。",
+	"followApprovalUseDefault": "既定値を使う（現在は無効）",
+	"followApprovalCustom": "期間を指定する",
+	"followApprovalPeriod": "承認が必要な期間",
+	"followApprovalUnit": "単位",
+	"followApprovalInvalidPeriod": "期間が正しくありません。1秒以上の期間を、指定できる範囲内で入力してください。",
+	"disabled": "Откл.",
+	"timeHour": "ч",
+	"timeDay": "сут",
+	"error": "Ошибка",
+	"cannotPerformTemporaryDescription": "Это действие временно невозможно выполнить из-за превышения лимита выполнения."
 }
 </locale>
 
@@ -1599,7 +2082,26 @@ definePage(() => ({
 	"oneMonth": "1 mesiac",
 	"threeMonths": "3 months",
 	"oneYear": "1 year",
-	"acknowledgeNotesAndEnable": "Turn on after understanding the precautions."
+	"acknowledgeNotesAndEnable": "Turn on after understanding the precautions.",
+	"followApprovalGroupTitle": "フォロー承認",
+	"followApprovalInactiveDescription": "すべてのフォローが承認制になるため、期間による設定は適用されません。フォローの承認制を解除すると、以下の設定が再び適用されます。",
+	"followApprovalTitle": "新しいアカウントからのフォローを承認制にする",
+	"followApprovalAutoAcceptDescription": "フォローを承認制にしている場合や、新しいアカウントからのフォローを保留する場合にも、あなたがフォローしている相手は自動承認します。",
+	"followApprovalDescription": "指定した期間が経過していない相手からのフォローを、フォローリクエストとして保留します。既存のフォロワーには影響しません。フォローしている相手の自動承認が有効な場合、その相手は自動承認されます。",
+	"followApprovalLocal": "ローカルユーザーからのフォロー",
+	"followApprovalLocalDescription": "このサーバーでのアカウント作成からの期間で判定します。",
+	"followApprovalRemote": "リモートユーザーからのフォロー",
+	"followApprovalRemoteDescription": "相手のサーバーでの作成日時ではなく、このサーバーが初めてそのアカウントを認識してからの期間で判定します。",
+	"followApprovalUseDefault": "既定値を使う（現在は無効）",
+	"followApprovalCustom": "期間を指定する",
+	"followApprovalPeriod": "承認が必要な期間",
+	"followApprovalUnit": "単位",
+	"followApprovalInvalidPeriod": "期間が正しくありません。1秒以上の期間を、指定できる範囲内で入力してください。",
+	"disabled": "Vypnuté",
+	"timeHour": "hod",
+	"timeDay": "dní",
+	"error": "Chyba",
+	"cannotPerformTemporaryDescription": "This action cannot be performed temporarily due to exceeding the execution limit. Please wait for a while and then try again."
 }
 </locale>
 
@@ -1655,7 +2157,26 @@ definePage(() => ({
 	"oneMonth": "หนึ่งเดือน",
 	"threeMonths": "3 เดือน",
 	"oneYear": "1 ปี",
-	"acknowledgeNotesAndEnable": "เปิดใช้งานหลังจากที่เข้าใจข้อควรระวังแล้ว"
+	"acknowledgeNotesAndEnable": "เปิดใช้งานหลังจากที่เข้าใจข้อควรระวังแล้ว",
+	"followApprovalGroupTitle": "フォロー承認",
+	"followApprovalInactiveDescription": "すべてのフォローが承認制になるため、期間による設定は適用されません。フォローの承認制を解除すると、以下の設定が再び適用されます。",
+	"followApprovalTitle": "新しいアカウントからのフォローを承認制にする",
+	"followApprovalAutoAcceptDescription": "フォローを承認制にしている場合や、新しいアカウントからのフォローを保留する場合にも、あなたがフォローしている相手は自動承認します。",
+	"followApprovalDescription": "指定した期間が経過していない相手からのフォローを、フォローリクエストとして保留します。既存のフォロワーには影響しません。フォローしている相手の自動承認が有効な場合、その相手は自動承認されます。",
+	"followApprovalLocal": "ローカルユーザーからのフォロー",
+	"followApprovalLocalDescription": "このサーバーでのアカウント作成からの期間で判定します。",
+	"followApprovalRemote": "リモートユーザーからのフォロー",
+	"followApprovalRemoteDescription": "相手のサーバーでの作成日時ではなく、このサーバーが初めてそのアカウントを認識してからの期間で判定します。",
+	"followApprovalUseDefault": "既定値を使う（現在は無効）",
+	"followApprovalCustom": "期間を指定する",
+	"followApprovalPeriod": "承認が必要な期間",
+	"followApprovalUnit": "単位",
+	"followApprovalInvalidPeriod": "期間が正しくありません。1秒以上の期間を、指定できる範囲内で入力してください。",
+	"disabled": "ปิดการใช้งาน",
+	"timeHour": "ชั่วโมง",
+	"timeDay": "วัน",
+	"error": "ผิดพลาด!",
+	"cannotPerformTemporaryDescription": "ไม่สามารถดําเนินการได้ชั่วคราว เนื่องจากเกินขีดจํากัดการดําเนินการ กรุณารอสักครู่แล้วลองใหม่อีกครั้ง"
 }
 </locale>
 
@@ -1711,7 +2232,26 @@ definePage(() => ({
 	"oneMonth": "1 ay",
 	"threeMonths": "3 ay",
 	"oneYear": "1 yıl",
-	"acknowledgeNotesAndEnable": "Önlemleri anladıktan sonra açın."
+	"acknowledgeNotesAndEnable": "Önlemleri anladıktan sonra açın.",
+	"followApprovalGroupTitle": "フォロー承認",
+	"followApprovalInactiveDescription": "すべてのフォローが承認制になるため、期間による設定は適用されません。フォローの承認制を解除すると、以下の設定が再び適用されます。",
+	"followApprovalTitle": "新しいアカウントからのフォローを承認制にする",
+	"followApprovalAutoAcceptDescription": "フォローを承認制にしている場合や、新しいアカウントからのフォローを保留する場合にも、あなたがフォローしている相手は自動承認します。",
+	"followApprovalDescription": "指定した期間が経過していない相手からのフォローを、フォローリクエストとして保留します。既存のフォロワーには影響しません。フォローしている相手の自動承認が有効な場合、その相手は自動承認されます。",
+	"followApprovalLocal": "ローカルユーザーからのフォロー",
+	"followApprovalLocalDescription": "このサーバーでのアカウント作成からの期間で判定します。",
+	"followApprovalRemote": "リモートユーザーからのフォロー",
+	"followApprovalRemoteDescription": "相手のサーバーでの作成日時ではなく、このサーバーが初めてそのアカウントを認識してからの期間で判定します。",
+	"followApprovalUseDefault": "既定値を使う（現在は無効）",
+	"followApprovalCustom": "期間を指定する",
+	"followApprovalPeriod": "承認が必要な期間",
+	"followApprovalUnit": "単位",
+	"followApprovalInvalidPeriod": "期間が正しくありません。1秒以上の期間を、指定できる範囲内で入力してください。",
+	"disabled": "Devre Dışı",
+	"timeHour": "Saat(ler)",
+	"timeDay": "Gün(ler)",
+	"error": "Hata",
+	"cannotPerformTemporaryDescription": "Bu işlem, yürütme sınırını aştığı için geçici olarak gerçekleştirilememekte. Lütfen bir süre bekle ve tekrar dene."
 }
 </locale>
 
@@ -1767,7 +2307,26 @@ definePage(() => ({
 	"oneMonth": "One month",
 	"threeMonths": "3 months",
 	"oneYear": "1 year",
-	"acknowledgeNotesAndEnable": "Turn on after understanding the precautions."
+	"acknowledgeNotesAndEnable": "Turn on after understanding the precautions.",
+	"followApprovalGroupTitle": "フォロー承認",
+	"followApprovalInactiveDescription": "すべてのフォローが承認制になるため、期間による設定は適用されません。フォローの承認制を解除すると、以下の設定が再び適用されます。",
+	"followApprovalTitle": "新しいアカウントからのフォローを承認制にする",
+	"followApprovalAutoAcceptDescription": "フォローを承認制にしている場合や、新しいアカウントからのフォローを保留する場合にも、あなたがフォローしている相手は自動承認します。",
+	"followApprovalDescription": "指定した期間が経過していない相手からのフォローを、フォローリクエストとして保留します。既存のフォロワーには影響しません。フォローしている相手の自動承認が有効な場合、その相手は自動承認されます。",
+	"followApprovalLocal": "ローカルユーザーからのフォロー",
+	"followApprovalLocalDescription": "このサーバーでのアカウント作成からの期間で判定します。",
+	"followApprovalRemote": "リモートユーザーからのフォロー",
+	"followApprovalRemoteDescription": "相手のサーバーでの作成日時ではなく、このサーバーが初めてそのアカウントを認識してからの期間で判定します。",
+	"followApprovalUseDefault": "既定値を使う（現在は無効）",
+	"followApprovalCustom": "期間を指定する",
+	"followApprovalPeriod": "承認が必要な期間",
+	"followApprovalUnit": "単位",
+	"followApprovalInvalidPeriod": "期間が正しくありません。1秒以上の期間を、指定できる範囲内で入力してください。",
+	"disabled": "Disabled",
+	"timeHour": "Hour(s)",
+	"timeDay": "Day(s)",
+	"error": "Error",
+	"cannotPerformTemporaryDescription": "This action cannot be performed temporarily due to exceeding the execution limit. Please wait for a while and then try again."
 }
 </locale>
 
@@ -1823,7 +2382,26 @@ definePage(() => ({
 	"oneMonth": "1 місяць",
 	"threeMonths": "3 months",
 	"oneYear": "1 рік",
-	"acknowledgeNotesAndEnable": "Ввімкніть після зрозуміння попереджень."
+	"acknowledgeNotesAndEnable": "Ввімкніть після зрозуміння попереджень.",
+	"followApprovalGroupTitle": "フォロー承認",
+	"followApprovalInactiveDescription": "すべてのフォローが承認制になるため、期間による設定は適用されません。フォローの承認制を解除すると、以下の設定が再び適用されます。",
+	"followApprovalTitle": "新しいアカウントからのフォローを承認制にする",
+	"followApprovalAutoAcceptDescription": "フォローを承認制にしている場合や、新しいアカウントからのフォローを保留する場合にも、あなたがフォローしている相手は自動承認します。",
+	"followApprovalDescription": "指定した期間が経過していない相手からのフォローを、フォローリクエストとして保留します。既存のフォロワーには影響しません。フォローしている相手の自動承認が有効な場合、その相手は自動承認されます。",
+	"followApprovalLocal": "ローカルユーザーからのフォロー",
+	"followApprovalLocalDescription": "このサーバーでのアカウント作成からの期間で判定します。",
+	"followApprovalRemote": "リモートユーザーからのフォロー",
+	"followApprovalRemoteDescription": "相手のサーバーでの作成日時ではなく、このサーバーが初めてそのアカウントを認識してからの期間で判定します。",
+	"followApprovalUseDefault": "既定値を使う（現在は無効）",
+	"followApprovalCustom": "期間を指定する",
+	"followApprovalPeriod": "承認が必要な期間",
+	"followApprovalUnit": "単位",
+	"followApprovalInvalidPeriod": "期間が正しくありません。1秒以上の期間を、指定できる範囲内で入力してください。",
+	"disabled": "Вимкнено",
+	"timeHour": "г",
+	"timeDay": "д",
+	"error": "Помилка",
+	"cannotPerformTemporaryDescription": "Цю дію тимчасово неможливо виконати через перевищення ліміту виконання. Будь ласка, зачекайте трохи й спробуйте ще раз."
 }
 </locale>
 
@@ -1879,7 +2457,26 @@ definePage(() => ({
 	"oneMonth": "1 tháng",
 	"threeMonths": "3 tháng",
 	"oneYear": "1 năm",
-	"acknowledgeNotesAndEnable": "Turn on after understanding the precautions."
+	"acknowledgeNotesAndEnable": "Turn on after understanding the precautions.",
+	"followApprovalGroupTitle": "フォロー承認",
+	"followApprovalInactiveDescription": "すべてのフォローが承認制になるため、期間による設定は適用されません。フォローの承認制を解除すると、以下の設定が再び適用されます。",
+	"followApprovalTitle": "新しいアカウントからのフォローを承認制にする",
+	"followApprovalAutoAcceptDescription": "フォローを承認制にしている場合や、新しいアカウントからのフォローを保留する場合にも、あなたがフォローしている相手は自動承認します。",
+	"followApprovalDescription": "指定した期間が経過していない相手からのフォローを、フォローリクエストとして保留します。既存のフォロワーには影響しません。フォローしている相手の自動承認が有効な場合、その相手は自動承認されます。",
+	"followApprovalLocal": "ローカルユーザーからのフォロー",
+	"followApprovalLocalDescription": "このサーバーでのアカウント作成からの期間で判定します。",
+	"followApprovalRemote": "リモートユーザーからのフォロー",
+	"followApprovalRemoteDescription": "相手のサーバーでの作成日時ではなく、このサーバーが初めてそのアカウントを認識してからの期間で判定します。",
+	"followApprovalUseDefault": "既定値を使う（現在は無効）",
+	"followApprovalCustom": "期間を指定する",
+	"followApprovalPeriod": "承認が必要な期間",
+	"followApprovalUnit": "単位",
+	"followApprovalInvalidPeriod": "期間が正しくありません。1秒以上の期間を、指定できる範囲内で入力してください。",
+	"disabled": "Đã tắt",
+	"timeHour": "giờ",
+	"timeDay": "ngày",
+	"error": "Lỗi",
+	"cannotPerformTemporaryDescription": "Tạm thời không sử dụng được vì lần số điều kiện quá giới hạn. Thử lại sau mọt lát nữa."
 }
 </locale>
 
@@ -1935,7 +2532,26 @@ definePage(() => ({
 	"oneMonth": "1个月",
 	"threeMonths": "3个月",
 	"oneYear": "1 年",
-	"acknowledgeNotesAndEnable": "理解注意事项后再开启。"
+	"acknowledgeNotesAndEnable": "理解注意事项后再开启。",
+	"followApprovalGroupTitle": "フォロー承認",
+	"followApprovalInactiveDescription": "すべてのフォローが承認制になるため、期間による設定は適用されません。フォローの承認制を解除すると、以下の設定が再び適用されます。",
+	"followApprovalTitle": "新しいアカウントからのフォローを承認制にする",
+	"followApprovalAutoAcceptDescription": "フォローを承認制にしている場合や、新しいアカウントからのフォローを保留する場合にも、あなたがフォローしている相手は自動承認します。",
+	"followApprovalDescription": "指定した期間が経過していない相手からのフォローを、フォローリクエストとして保留します。既存のフォロワーには影響しません。フォローしている相手の自動承認が有効な場合、その相手は自動承認されます。",
+	"followApprovalLocal": "ローカルユーザーからのフォロー",
+	"followApprovalLocalDescription": "このサーバーでのアカウント作成からの期間で判定します。",
+	"followApprovalRemote": "リモートユーザーからのフォロー",
+	"followApprovalRemoteDescription": "相手のサーバーでの作成日時ではなく、このサーバーが初めてそのアカウントを認識してからの期間で判定します。",
+	"followApprovalUseDefault": "既定値を使う（現在は無効）",
+	"followApprovalCustom": "期間を指定する",
+	"followApprovalPeriod": "承認が必要な期間",
+	"followApprovalUnit": "単位",
+	"followApprovalInvalidPeriod": "期間が正しくありません。1秒以上の期間を、指定できる範囲内で入力してください。",
+	"disabled": "已禁用 ",
+	"timeHour": "小时",
+	"timeDay": "天",
+	"error": "错误",
+	"cannotPerformTemporaryDescription": "因操作过于频繁，暂时不可用，请稍后再试。"
 }
 </locale>
 
@@ -1991,6 +2607,25 @@ definePage(() => ({
 	"oneMonth": "一個月",
 	"threeMonths": "3 個月",
 	"oneYear": "1 年",
-	"acknowledgeNotesAndEnable": "了解注意事項後再開啟。"
+	"acknowledgeNotesAndEnable": "了解注意事項後再開啟。",
+	"followApprovalGroupTitle": "フォロー承認",
+	"followApprovalInactiveDescription": "すべてのフォローが承認制になるため、期間による設定は適用されません。フォローの承認制を解除すると、以下の設定が再び適用されます。",
+	"followApprovalTitle": "新しいアカウントからのフォローを承認制にする",
+	"followApprovalAutoAcceptDescription": "フォローを承認制にしている場合や、新しいアカウントからのフォローを保留する場合にも、あなたがフォローしている相手は自動承認します。",
+	"followApprovalDescription": "指定した期間が経過していない相手からのフォローを、フォローリクエストとして保留します。既存のフォロワーには影響しません。フォローしている相手の自動承認が有効な場合、その相手は自動承認されます。",
+	"followApprovalLocal": "ローカルユーザーからのフォロー",
+	"followApprovalLocalDescription": "このサーバーでのアカウント作成からの期間で判定します。",
+	"followApprovalRemote": "リモートユーザーからのフォロー",
+	"followApprovalRemoteDescription": "相手のサーバーでの作成日時ではなく、このサーバーが初めてそのアカウントを認識してからの期間で判定します。",
+	"followApprovalUseDefault": "既定値を使う（現在は無効）",
+	"followApprovalCustom": "期間を指定する",
+	"followApprovalPeriod": "承認が必要な期間",
+	"followApprovalUnit": "単位",
+	"followApprovalInvalidPeriod": "期間が正しくありません。1秒以上の期間を、指定できる範囲内で入力してください。",
+	"disabled": "已停用",
+	"timeHour": "小時",
+	"timeDay": "日",
+	"error": "錯誤",
+	"cannotPerformTemporaryDescription": "由於超過操作次數限制，因此暫時無法進行。請稍後再嘗試。"
 }
 </locale>

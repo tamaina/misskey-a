@@ -48,10 +48,10 @@ import * as Misskey from 'misskey-js';
 import MkNoteHeader from '@features/notes/frontend/components/MkNoteHeader.vue';
 import MkSubNoteContent from '@features/notes/frontend/components/MkSubNoteContent.vue';
 import MkCwButton from '@features/notes/frontend/components/MkCwButton.vue';
-import { notePage } from '@features/notes/frontend/filters/note.js';
+import { notePage } from '@features/notes/frontend/shared/note.js';
 import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 import { $i } from '@features/auth/frontend/i.js';
-import { userPage } from '@features/users/frontend/filters/user.js';
+import { userPage } from '@features/users/frontend/shared/user.js';
 import { checkWordMute } from '@features/relationships/frontend/utility/check-word-mute.js';
 
 const props = withDefaults(defineProps<{
