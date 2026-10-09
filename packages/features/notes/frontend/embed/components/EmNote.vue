@@ -123,7 +123,7 @@ import EmA from '@features/navigation/frontend/embed/components/EmA.vue';
 import EmAvatar from '@features/users/frontend/embed/components/EmAvatar.vue';
 import EmUserName from '@features/users/frontend/embed/components/EmUserName.vue';
 import EmTime from '@features/ui/frontend/embed/components/EmTime.vue';
-import { userPage } from '@features/web/frontend/embed/utils.js';
+import { userPage } from '@features/users/frontend/shared/user.js';
 import { copyLocaleDictionary } from '@features/runtime/frontend/copy-locale-dictionary.js';
 
 function getAppearNote(note: Misskey.entities.Note) {

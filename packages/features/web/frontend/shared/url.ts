@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { toUnicode as decodePunycode } from 'punycode.js';
+
 /* objを検査して
  * 1. 配列に何も入っていない時はクエリを付けない
  * 2. プロパティがundefinedの時はクエリを付けない
@@ -50,4 +52,25 @@ export function maybeMakeRelative(urlStr: string, baseStr: string): string {
 	} catch {
 		return '';
 	}
+}
+
+export function safeURIDecode(str: string): string {
+	try {
+		return decodeURIComponent(str);
+	} catch {
+		return str;
+	}
+}
+
+export function parseUrlForDisplay(urlStr: string) {
+	const url = new URL(urlStr);
+	if (!['http:', 'https:'].includes(url.protocol)) throw new Error('invalid url');
+	return {
+		schema: url.protocol,
+		hostname: decodePunycode(url.hostname),
+		port: url.port,
+		pathname: safeURIDecode(url.pathname),
+		query: safeURIDecode(url.search),
+		hash: safeURIDecode(url.hash),
+	};
 }

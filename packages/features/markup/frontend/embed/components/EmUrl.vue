@@ -25,18 +25,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import { ref } from 'vue';
-import { toUnicode as decodePunycode } from 'punycode.js';
 import EmA from '@features/navigation/frontend/embed/components/EmA.vue';
 import { url as local } from '@features/boot/frontend/shared/config.js';
-import { maybeMakeRelative } from '@features/web/frontend/shared/url.js';
-
-function safeURIDecode(str: string): string {
-	try {
-		return decodeURIComponent(str);
-	} catch {
-		return str;
-	}
-}
+import { maybeMakeRelative, parseUrlForDisplay } from '@features/web/frontend/shared/url.js';
 
 const props = withDefaults(defineProps<{
 	url: string;
@@ -48,16 +39,9 @@ const props = withDefaults(defineProps<{
 
 const maybeRelativeUrl = maybeMakeRelative(props.url, local);
 const self = maybeRelativeUrl !== props.url;
-const url = new URL(props.url);
-if (!['http:', 'https:'].includes(url.protocol)) throw new Error('invalid url');
+const { schema, hostname, port, pathname, query, hash } = parseUrlForDisplay(props.url);
 const el = ref();
 
-const schema = url.protocol;
-const hostname = decodePunycode(url.hostname);
-const port = url.port;
-const pathname = safeURIDecode(url.pathname);
-const query = safeURIDecode(url.search);
-const hash = safeURIDecode(url.hash);
 const attr = self ? 'to' : 'href';
 const target = self ? null : '_blank';
 </script>

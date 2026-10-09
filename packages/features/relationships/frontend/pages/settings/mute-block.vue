@@ -178,7 +178,7 @@ import XEmojiMute from '@features/relationships/frontend/pages/settings/mute-blo
 import XInstanceMute from '@features/relationships/frontend/pages/settings/mute-block.instance-mute.vue';
 import XWordMute from '@features/relationships/frontend/pages/settings/mute-block.word-mute.vue';
 import MkPagination from '@features/ui/frontend/components/MkPagination.vue';
-import { userPage } from '@features/users/frontend/filters/user.js';
+import { userPage } from '@features/users/frontend/shared/user.js';
 import { definePage } from '@features/navigation/frontend/page.js';
 import MkUserCardMini from '@features/users/frontend/components/MkUserCardMini.vue';
 import * as os from '@features/ui/frontend/os.js';

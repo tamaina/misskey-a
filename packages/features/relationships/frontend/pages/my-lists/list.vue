@@ -59,7 +59,7 @@ import * as os from '@features/ui/frontend/os.js';
 import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 import { definePage } from '@features/navigation/frontend/page.js';
 import { interpolateLocaleParameters } from '@features/runtime/frontend/interpolate-locale-parameters.js';
-import { userPage } from '@features/users/frontend/filters/user.js';
+import { userPage } from '@features/users/frontend/shared/user.js';
 import MkUserCardMini from '@features/users/frontend/components/MkUserCardMini.vue';
 import MkSwitch from '@features/ui/frontend/components/MkSwitch.vue';
 import MkFolder from '@features/ui/frontend/components/MkFolder.vue';

@@ -154,7 +154,7 @@ import { deepClone } from '@features/runtime/frontend/utility/clone.js';
 import { $i } from '@features/auth/frontend/i.js';
 import { interpolateLocaleParameters } from '@features/runtime/frontend/interpolate-locale-parameters.js';
 import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
-import { userPage } from '@features/users/frontend/filters/user.js';
+import { userPage } from '@features/users/frontend/shared/user.js';
 import * as sound from '@features/preferences/frontend/utility/sound.js';
 import * as os from '@features/ui/frontend/os.js';
 import { confetti } from '@features/ui/frontend/utility/confetti.js';
