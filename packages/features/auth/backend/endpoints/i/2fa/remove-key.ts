@@ -12,8 +12,8 @@ import { DI } from '@/di-symbols.js';
 import { apiError } from '@features/api/backend/transport/orpc-error.js';
 import { UserAuthService } from '../../../services/UserAuthService.js';
 
-import * as v from 'valibot';
-import { emptyObjectI2faRemoveKeyInput } from '../../../auth.schema.js';
+import type * as v from 'valibot';
+import type { I2faRemoveKeyContract } from '../../../api.contract.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 
 export const meta = {
@@ -44,7 +44,7 @@ export class I2faRemoveKeyOperation {
 		private globalEventService: GlobalEventService,
 	) {}
 
-	async execute(ps: v.InferOutput<typeof emptyObjectI2faRemoveKeyInput>, me: MiLocalUser) {
+	async execute(ps: v.InferOutput<NonNullable<typeof I2faRemoveKeyContract['~orpc']['inputSchema']>>, me: MiLocalUser) {
 		const token = ps.token;
 		const profile = await this.userProfilesRepository.findOneByOrFail({ userId: me.id });
 

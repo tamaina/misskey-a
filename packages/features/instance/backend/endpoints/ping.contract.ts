@@ -8,9 +8,8 @@ import * as v from 'valibot';
 import { commonErrors } from '../../../api/backend/transport/errors.schema.js';
 import { objectInput } from './input.schema.js';
 
-export const pingInput = v.optional(objectInput({}), {});
-export const pingContract = oc.$meta<{ requestName: 'ping'; allowGet: boolean; cacheSec?: number }>({ requestName: 'ping', allowGet: false })
+export const pingContract = oc.$meta({ requestName: 'ping', allowGet: false } as const)
 	.route({ method: 'POST', path: '/ping', operationId: 'post___ping', tags: ['meta'] })
 	.errors({ ...commonErrors })
-	.input(pingInput)
+	.input(v.optional(objectInput({}), {}))
 	.output(v.strictObject({ pong: v.pipe(v.number(), v.finite()) }));

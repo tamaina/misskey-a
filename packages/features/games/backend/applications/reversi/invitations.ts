@@ -9,8 +9,8 @@ import { UserEntityService } from '@features/users/backend/serializers/UserEntit
 import { ReversiService } from '../../services/ReversiService.js';
 
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
-import type * as v from 'valibot';
-import { reversiInvitationsInput } from '../../endpoints/reversi/invitations.contract.js';
+import type { InferSchemaOutput } from '@orpc/contract';
+import { type reversiInvitationsContract } from '../../endpoints/reversi/invitations.contract.js';
 
 @Injectable()
 export class ReversiInvitationsApplicationService {
@@ -19,7 +19,7 @@ export class ReversiInvitationsApplicationService {
 		private reversiService: ReversiService,
 	) {}
 
-	async execute(ps: v.InferOutput<typeof reversiInvitationsInput>, me: MiLocalUser) {
+	async execute(ps: InferSchemaOutput<NonNullable<(typeof reversiInvitationsContract)['~orpc']['inputSchema']>>, me: MiLocalUser) {
 		const invitations = await this.reversiService.getInvitations(me);
 
 		return await this.userEntityService.packMany(invitations, me);

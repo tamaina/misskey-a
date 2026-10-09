@@ -10,8 +10,8 @@ import { DI } from '@/di-symbols.js';
 import { FlashService } from '../../services/FlashService.js';
 
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
-import type * as v from 'valibot';
-import { flashMyLikesInput } from '../../endpoints/flash/my-likes.contract.js';
+import type { InferSchemaOutput } from '@orpc/contract';
+import { type flashMyLikesContract } from '../../endpoints/flash/my-likes.contract.js';
 
 @Injectable()
 export class FlashMyLikesApplicationService {
@@ -20,7 +20,7 @@ export class FlashMyLikesApplicationService {
 		private flashService: FlashService,
 	) {}
 
-	async execute(ps: v.InferOutput<typeof flashMyLikesInput>, me: MiLocalUser) {
+	async execute(ps: InferSchemaOutput<NonNullable<(typeof flashMyLikesContract)['~orpc']['inputSchema']>>, me: MiLocalUser) {
 		const likes = await this.flashService.myLikes(me.id, {
 			sinceId: ps.sinceId,
 			untilId: ps.untilId,

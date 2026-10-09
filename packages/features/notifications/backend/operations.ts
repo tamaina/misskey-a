@@ -3,30 +3,30 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import type * as v from 'valibot';
+import type { InferSchemaOutput } from '@orpc/contract';
 import type { ApiActor, ApiContext, ApiToken } from '../../api/backend/transport/context.js';
-import type { listInput, listOutput } from './endpoints/i/notifications.contract.js';
-import type { groupedInput, groupedOutput } from './endpoints/i/notifications-grouped.contract.js';
-import type { createInput, createOutput } from './endpoints/notifications/create.contract.js';
-import type { flushInput, flushOutput } from './endpoints/notifications/flush.contract.js';
-import type { markAllAsReadInput, markAllAsReadOutput } from './endpoints/notifications/mark-all-as-read.contract.js';
-import type { testNotificationInput, testNotificationOutput } from './endpoints/notifications/test-notification.contract.js';
-import type { registerInput, registerOutput } from './endpoints/sw/register.contract.js';
-import type { showRegistrationInput, showRegistrationOutput } from './endpoints/sw/show-registration.contract.js';
-import type { unregisterInput, unregisterOutput } from './endpoints/sw/unregister.contract.js';
-import type { updateRegistrationInput, updateRegistrationOutput } from './endpoints/sw/update-registration.contract.js';
+import type { listContract } from './endpoints/i/notifications.contract.js';
+import type { groupedContract } from './endpoints/i/notifications-grouped.contract.js';
+import type { createContract } from './endpoints/notifications/create.contract.js';
+import type { flushContract } from './endpoints/notifications/flush.contract.js';
+import type { markAllAsReadContract } from './endpoints/notifications/mark-all-as-read.contract.js';
+import type { testNotificationContract } from './endpoints/notifications/test-notification.contract.js';
+import type { registerContract } from './endpoints/sw/register.contract.js';
+import type { showRegistrationContract } from './endpoints/sw/show-registration.contract.js';
+import type { unregisterContract } from './endpoints/sw/unregister.contract.js';
+import type { updateRegistrationContract } from './endpoints/sw/update-registration.contract.js';
 
 export interface NotificationsOperations<Actor extends ApiActor> {
-	list(input: v.InferOutput<typeof listInput>, principal: Actor): Promise<v.InferOutput<typeof listOutput>>;
-	grouped(input: v.InferOutput<typeof groupedInput>, principal: Actor): Promise<v.InferOutput<typeof groupedOutput>>;
-	create(input: v.InferOutput<typeof createInput>, principal: Actor, token: ApiToken | null): Promise<v.InferOutput<typeof createOutput>>;
-	flush(input: v.InferOutput<typeof flushInput>, principal: Actor): Promise<v.InferOutput<typeof flushOutput>>;
-	markAllAsRead(input: v.InferOutput<typeof markAllAsReadInput>, principal: Actor): Promise<v.InferOutput<typeof markAllAsReadOutput>>;
-	testNotification(input: v.InferOutput<typeof testNotificationInput>, principal: Actor): Promise<v.InferOutput<typeof testNotificationOutput>>;
-	register(input: v.InferOutput<typeof registerInput>, principal: Actor): Promise<v.InferOutput<typeof registerOutput>>;
-	showRegistration(input: v.InferOutput<typeof showRegistrationInput>, principal: Actor): Promise<v.InferOutput<typeof showRegistrationOutput>>;
-	unregister(input: v.InferOutput<typeof unregisterInput>, principal: Actor | null): Promise<v.InferOutput<typeof unregisterOutput>>;
-	updateRegistration(input: v.InferOutput<typeof updateRegistrationInput>, principal: Actor): Promise<v.InferOutput<typeof updateRegistrationOutput>>;
+	list(input: InferSchemaOutput<NonNullable<typeof listContract['~orpc']['inputSchema']>>, principal: Actor): Promise<InferSchemaOutput<NonNullable<typeof listContract['~orpc']['outputSchema']>>>;
+	grouped(input: InferSchemaOutput<NonNullable<typeof groupedContract['~orpc']['inputSchema']>>, principal: Actor): Promise<InferSchemaOutput<NonNullable<typeof groupedContract['~orpc']['outputSchema']>>>;
+	create(input: InferSchemaOutput<NonNullable<typeof createContract['~orpc']['inputSchema']>>, principal: Actor, token: ApiToken | null): Promise<InferSchemaOutput<NonNullable<typeof createContract['~orpc']['outputSchema']>>>;
+	flush(input: InferSchemaOutput<NonNullable<typeof flushContract['~orpc']['inputSchema']>>, principal: Actor): Promise<InferSchemaOutput<NonNullable<typeof flushContract['~orpc']['outputSchema']>>>;
+	markAllAsRead(input: InferSchemaOutput<NonNullable<typeof markAllAsReadContract['~orpc']['inputSchema']>>, principal: Actor): Promise<InferSchemaOutput<NonNullable<typeof markAllAsReadContract['~orpc']['outputSchema']>>>;
+	testNotification(input: InferSchemaOutput<NonNullable<typeof testNotificationContract['~orpc']['inputSchema']>>, principal: Actor): Promise<InferSchemaOutput<NonNullable<typeof testNotificationContract['~orpc']['outputSchema']>>>;
+	register(input: InferSchemaOutput<NonNullable<typeof registerContract['~orpc']['inputSchema']>>, principal: Actor): Promise<InferSchemaOutput<NonNullable<typeof registerContract['~orpc']['outputSchema']>>>;
+	showRegistration(input: InferSchemaOutput<NonNullable<typeof showRegistrationContract['~orpc']['inputSchema']>>, principal: Actor): Promise<InferSchemaOutput<NonNullable<typeof showRegistrationContract['~orpc']['outputSchema']>>>;
+	unregister(input: InferSchemaOutput<NonNullable<typeof unregisterContract['~orpc']['inputSchema']>>, principal: Actor | null): Promise<InferSchemaOutput<NonNullable<typeof unregisterContract['~orpc']['outputSchema']>>>;
+	updateRegistration(input: InferSchemaOutput<NonNullable<typeof updateRegistrationContract['~orpc']['inputSchema']>>, principal: Actor): Promise<InferSchemaOutput<NonNullable<typeof updateRegistrationContract['~orpc']['outputSchema']>>>;
 }
 export type NotificationsContext<Actor extends ApiActor> = ApiContext<Actor> & {
 	operations: { notifications: NotificationsOperations<Actor> };

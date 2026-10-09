@@ -13,7 +13,8 @@ import { MetaService } from '../../../instance/backend/services/MetaService.js';
 import { GlobalEventService } from '../../../runtime/backend/services/GlobalEventService.js';
 import type { MiUser } from '../../../users/backend/models/User.js';
 import * as v from 'valibot';
-import { resetDbInput, resetDbOutput } from './reset-db.contract.js';
+import type { ResetDbInput, ResetDbOutput } from './reset-db.contract.js';
+import { resetDbContract } from './reset-db.contract.js';
 
 @Injectable()
 export class ResetDbApplicationService {
@@ -29,7 +30,7 @@ export class ResetDbApplicationService {
 		private globalEventService: GlobalEventService,
 	) {}
 
-	public async execute(_ps: v.InferOutput<typeof resetDbInput>, _me: MiUser | null): Promise<v.InferOutput<typeof resetDbOutput>> {
+	public async execute(_ps: ResetDbInput, _me: MiUser | null): Promise<ResetDbOutput> {
 		const result = await (async () => {
 			if (process.env.NODE_ENV !== 'test') throw new Error('NODE_ENV is not a test');
 
@@ -48,6 +49,6 @@ export class ResetDbApplicationService {
 
 			await new Promise(resolve => setTimeout(resolve, 1000));
 		})();
-		return v.parse(resetDbOutput, result);
+		return v.parse(resetDbContract['~orpc'].outputSchema!, result);
 	}
 }

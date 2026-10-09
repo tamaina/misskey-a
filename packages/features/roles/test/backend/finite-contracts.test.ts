@@ -11,7 +11,7 @@ import Fastify from 'fastify';
 import { OpenAPIHandler } from '@orpc/openapi/fastify';
 import { registerPilotHttp } from '../../../api/backend/transport/pilot-http.js';
 import { nullSuccessToNoContent } from '../../../api/backend/transport/no-content.js';
-import { rolesInputs } from '../../backend/api.schema.js';
+import { rolesContract } from '../../backend/api.contract.js';
 import { roleCondFormulaSchema, rolePoliciesSchema, rolePolicySettingsSchema } from '../../backend/role.schema.js';
 import { createRolesOperations, type RolesDependencies } from '../../backend/api.operations.js';
 import { createRolesRouter, type RolesContext } from '../../backend/api.router.js';
@@ -25,6 +25,11 @@ import { roleSchema } from '../../backend/role.schema.js';
 import { DEFAULT_POLICIES } from '../../backend/services/RoleService.js';
 import { normalizeError, misskeyErrorBody } from '../../../api/backend/transport/orpc-error.js';
 import { packedRoleSchema as notificationRoleSchema } from '../../../notifications/backend/notification-related.schema.js';
+
+function requiredSchema<S extends v.GenericSchema>(schema: S | undefined): S {
+	if (schema === undefined) throw new Error('Missing native schema');
+	return schema;
+}
 
 const actor: ApiActor = { id: 'actor123', isSuspended: false, movedToUri: null };
 const role = (membersEditable: boolean) => mockDeep<MiRole>({ id: 'role123', canEditMembersByModerator: membersEditable });
@@ -43,13 +48,13 @@ test('recursive role formulas validate every branch and reject undeclared fields
 });
 
 test('native role defaults and nullable updates are concrete; policies retain fractional rate limit factors', () => {
-	expect(v.parse(rolesInputs.rolesNotes, { roleId: 'role123', future: true })).toEqual({ roleId: 'role123', limit: 10 });
-	expect(v.parse(rolesInputs.adminRolesUpdate, { roleId: 'role123', color: null, iconUrl: null, displayOrder: 0.5, future: true }))
+	expect(v.parse(requiredSchema(rolesContract.rolesNotes['~orpc'].inputSchema), { roleId: 'role123', future: true })).toEqual({ roleId: 'role123', limit: 10 });
+	expect(v.parse(requiredSchema(rolesContract.adminRolesUpdate['~orpc'].inputSchema), { roleId: 'role123', color: null, iconUrl: null, displayOrder: 0.5, future: true }))
 		.toEqual({ roleId: 'role123', color: null, iconUrl: null, displayOrder: 0.5 });
 	expect(v.parse(rolePoliciesSchema, { ...DEFAULT_POLICIES, rateLimitFactor: 0.5 }).rateLimitFactor).toBe(0.5);
 	expect(v.safeParse(rolePoliciesSchema, { ...DEFAULT_POLICIES, rateLimitFactor: Infinity }).success).toBe(false);
 	for (const bad of [[], { roleId: 'bad-id' }, { roleId: 'role123', limit: 0 }, { roleId: 'role123', limit: 101 }]) {
-		expect(v.safeParse(rolesInputs.rolesUsers, bad).success).toBe(false);
+		expect(v.safeParse(requiredSchema(rolesContract.rolesUsers['~orpc'].inputSchema), bad).success).toBe(false);
 	}
 });
 
@@ -129,13 +134,13 @@ test('role formula/settings inputs preserve original object-only acceptance, inc
 		isPublic: true, isModerator: false, isAdministrator: false, asBadge: false,
 		canEditMembersByModerator: false, displayOrder: 0.5, policies,
 	};
-	expect(v.parse(rolesInputs.adminRolesCreate, request)).toEqual({ ...request, isExplorable: false });
-	expect(v.parse(rolesInputs.adminRolesUpdate, { roleId: 'role123', condFormula: formula, policies }))
+	expect(v.parse(requiredSchema(rolesContract.adminRolesCreate['~orpc'].inputSchema), request)).toEqual({ ...request, isExplorable: false });
+	expect(v.parse(requiredSchema(rolesContract.adminRolesUpdate['~orpc'].inputSchema), { roleId: 'role123', condFormula: formula, policies }))
 		.toEqual({ roleId: 'role123', condFormula: formula, policies });
-	expect(v.parse(rolesInputs.adminRolesUpdateDefaultPolicies, { policies })).toEqual({ policies });
+	expect(v.parse(requiredSchema(rolesContract.adminRolesUpdateDefaultPolicies['~orpc'].inputSchema), { policies })).toEqual({ policies });
 	for (const value of [null, [], 'object', 1]) {
-		expect(v.safeParse(rolesInputs.adminRolesCreate, { ...request, condFormula: value }).success).toBe(false);
-		expect(v.safeParse(rolesInputs.adminRolesCreate, { ...request, policies: value }).success).toBe(false);
+		expect(v.safeParse(requiredSchema(rolesContract.adminRolesCreate['~orpc'].inputSchema), { ...request, condFormula: value }).success).toBe(false);
+		expect(v.safeParse(requiredSchema(rolesContract.adminRolesCreate['~orpc'].inputSchema), { ...request, policies: value }).success).toBe(false);
 	}
 	// Stored malformed domain payloads retain their write acceptance; explicit output DTOs reject them.
 	expect(v.safeParse(roleCondFormulaSchema, formula).success).toBe(false);
@@ -180,7 +185,7 @@ test('legacy empty formulas survive manual and conditional create/list/show/upda
 		operations: { roles: createRolesOperations(deps) },
 	};
 	const client = createRouterClient(createRolesRouter<ApiActor>(), { context });
-	const request = v.parse(rolesInputs.adminRolesCreate, {
+	const request = v.parse(requiredSchema(rolesContract.adminRolesCreate['~orpc'].inputSchema), {
 		name: 'Role', description: '', color: null, iconUrl: null, target: 'manual', condFormula: {},
 		isPublic: true, isModerator: false, isAdministrator: false, asBadge: false,
 		canEditMembersByModerator: false, displayOrder: 0, policies: {},
@@ -189,7 +194,7 @@ test('legacy empty formulas survive manual and conditional create/list/show/upda
 	expect((await client.adminRolesList({}))[0].condFormula).toEqual({});
 	expect((await client.adminRolesShow({ roleId: legacy.id })).condFormula).toEqual({});
 	expect((await client.rolesShow({ roleId: legacy.id })).condFormula).toEqual({});
-	await client.adminRolesUpdate(v.parse(rolesInputs.adminRolesUpdate, { roleId: legacy.id, name: 'Renamed', condFormula: {} }));
+	await client.adminRolesUpdate(v.parse(requiredSchema(rolesContract.adminRolesUpdate['~orpc'].inputSchema), { roleId: legacy.id, name: 'Renamed', condFormula: {} }));
 	expect(deps.roleService.update).toHaveBeenCalledWith(legacy, expect.objectContaining({ name: 'Renamed', condFormula: {} }), actor);
 	const conditional = Object.assign(new MiRole(), legacy, { target: 'conditional', condFormula: {} });
 	deps.rolesRepository.find.mockResolvedValue([conditional]);
@@ -200,10 +205,10 @@ test('legacy empty formulas survive manual and conditional create/list/show/upda
 	expect((await client.adminRolesList({}))[0].condFormula).toEqual({});
 	expect((await client.adminRolesShow({ roleId: conditional.id })).condFormula).toEqual({});
 	expect((await client.rolesShow({ roleId: conditional.id })).condFormula).toEqual({});
-	await client.adminRolesUpdate(v.parse(rolesInputs.adminRolesUpdate, { roleId: conditional.id, target: 'conditional', condFormula: {} }));
+	await client.adminRolesUpdate(v.parse(requiredSchema(rolesContract.adminRolesUpdate['~orpc'].inputSchema), { roleId: conditional.id, target: 'conditional', condFormula: {} }));
 	expect(deps.roleService.update).toHaveBeenLastCalledWith(conditional, expect.objectContaining({ target: 'conditional', condFormula: {} }), actor);
 	// Object-only input still writes nonempty malformed formulas before the output boundary rejects them.
-	const malformedFormulas: v.InferOutput<typeof rolesInputs.adminRolesCreate>['condFormula'][] = [
+	const malformedFormulas: v.InferOutput<NonNullable<typeof rolesContract.adminRolesCreate['~orpc']['inputSchema']>>['condFormula'][] = [
 		{ type: 'isLocal' }, { id: 'unknown', type: 'unknown' }, { future: true },
 	];
 	for (const formula of malformedFormulas) {

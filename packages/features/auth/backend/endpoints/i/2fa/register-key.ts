@@ -12,8 +12,8 @@ import { WebAuthnService } from '../../../services/WebAuthnService.js';
 import { apiError } from '@features/api/backend/transport/orpc-error.js';
 import { UserAuthService } from '../../../services/UserAuthService.js';
 
-import * as v from 'valibot';
-import { inlineI2faRegisterKeyInput } from '../../../auth.schema.js';
+import type * as v from 'valibot';
+import type { I2faRegisterKeyContract } from '../../../api.contract.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 
 export const meta = {
@@ -52,7 +52,7 @@ export class I2faRegisterKeyOperation {
 		private userAuthService: UserAuthService,
 	) {}
 
-	async execute(ps: v.InferOutput<typeof inlineI2faRegisterKeyInput>, me: MiLocalUser) {
+	async execute(ps: v.InferOutput<NonNullable<typeof I2faRegisterKeyContract['~orpc']['inputSchema']>>, me: MiLocalUser) {
 		const token = ps.token;
 		const profile = await this.userProfilesRepository.findOne({
 			where: {

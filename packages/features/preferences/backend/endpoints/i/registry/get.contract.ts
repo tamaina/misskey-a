@@ -9,11 +9,8 @@ import { objectInput } from '../../../../../api/backend/transport/input.schema.j
 import { apiErrorData, commonErrors } from '../../../../../api/backend/transport/errors.schema.js';
 import { registryScope, registryDomain, registryJsonValue } from './registry.schema.js';
 
-export const registryGetInput = objectInput({ key: v.string(), scope: registryScope, domain: registryDomain });
-export const registryGetOutput = registryJsonValue;
-
 const requestName = 'i/registry/get';
-export const registryGetContract = oc.$meta<{ requestName: typeof requestName }>({ requestName })
+export const registryGetContract = oc.$meta({ requestName: requestName } as const)
 	.route({ method: 'POST', path: `/${requestName}`, operationId: 'post___i___registry___get', tags: ['account'], spec: current => ({ ...current, security: [{ bearerAuth: [] }] }) })
 	.errors({ ...commonErrors, NO_SUCH_KEY: { status: 400, data: apiErrorData } })
-	.input(registryGetInput).output(registryGetOutput);
+	.input(objectInput({ key: v.string(), scope: registryScope, domain: registryDomain })).output(registryJsonValue);

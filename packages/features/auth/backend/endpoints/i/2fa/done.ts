@@ -12,8 +12,8 @@ import { GlobalEventService } from '@features/runtime/backend/services/GlobalEve
 import { DI } from '@/di-symbols.js';
 import { UserAuthService } from "../../../services/UserAuthService.js";
 
-import * as v from 'valibot';
-import { inlineI2faDoneInput } from '../../../auth.schema.js';
+import type * as v from 'valibot';
+import type { I2faDoneContract } from '../../../api.contract.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 
 export const meta = {
@@ -33,7 +33,7 @@ export class I2faDoneOperation {
 		private globalEventService: GlobalEventService,
 	) {}
 
-	async execute(ps: v.InferOutput<typeof inlineI2faDoneInput>, me: MiLocalUser) {
+	async execute(ps: v.InferOutput<NonNullable<typeof I2faDoneContract['~orpc']['inputSchema']>>, me: MiLocalUser) {
 		const token = ps.token.replace(/\s/g, '');
 
 		const profile = await this.userProfilesRepository.findOneByOrFail({ userId: me.id });

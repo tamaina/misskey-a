@@ -8,7 +8,8 @@ import { Inject, Injectable } from '@nestjs/common';
 import type { DeliverQueue } from '../../../../../boot/backend/assembly/QueueModule.js';
 import type { MiUser } from '../../../../../users/backend/models/User.js';
 import * as v from 'valibot';
-import { adminQueueDeliverDelayedInput, adminQueueDeliverDelayedOutput } from './deliver-delayed.contract.js';
+import type { AdminQueueDeliverDelayedInput, AdminQueueDeliverDelayedOutput } from './deliver-delayed.contract.js';
+import { adminQueueDeliverDelayedContract } from './deliver-delayed.contract.js';
 
 @Injectable()
 export class AdminQueueDeliverDelayedApplicationService {
@@ -16,7 +17,7 @@ export class AdminQueueDeliverDelayedApplicationService {
 		@Inject('queue:deliver') public deliverQueue: DeliverQueue,
 	) {}
 
-	public async execute(_ps: v.InferOutput<typeof adminQueueDeliverDelayedInput>, _me: MiUser): Promise<v.InferOutput<typeof adminQueueDeliverDelayedOutput>> {
+	public async execute(_ps: AdminQueueDeliverDelayedInput, _me: MiUser): Promise<AdminQueueDeliverDelayedOutput> {
 		const result = await (async () => {
 			const jobs = await this.deliverQueue.getJobs(['delayed']);
 
@@ -31,6 +32,6 @@ export class AdminQueueDeliverDelayedApplicationService {
 
 			return res;
 		})();
-		return v.parse(adminQueueDeliverDelayedOutput, result);
+		return v.parse(adminQueueDeliverDelayedContract['~orpc'].outputSchema!, result);
 	}
 }

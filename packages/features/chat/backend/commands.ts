@@ -3,17 +3,17 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { chatMessagesDeleteInput, chatMessagesDeleteErrors } from './endpoints/chat/messages/delete.contract.js';
-import { chatMessagesReactInput, chatMessagesReactErrors } from './endpoints/chat/messages/react.contract.js';
-import { chatMessagesUnreactInput, chatMessagesUnreactErrors } from './endpoints/chat/messages/unreact.contract.js';
-import { chatRoomsDeleteInput, chatRoomsDeleteErrors } from './endpoints/chat/rooms/delete.contract.js';
-import { chatRoomsJoinInput, chatRoomsJoinErrors } from './endpoints/chat/rooms/join.contract.js';
-import { chatRoomsLeaveInput, chatRoomsLeaveErrors } from './endpoints/chat/rooms/leave.contract.js';
-import { chatRoomsMuteInput, chatRoomsMuteErrors } from './endpoints/chat/rooms/mute.contract.js';
-import { chatRoomsInvitationsIgnoreInput, chatRoomsInvitationsIgnoreErrors } from './endpoints/chat/rooms/invitations/ignore.contract.js';
-import { chatReadAllInput, chatReadAllErrors } from './endpoints/chat/read-all.contract.js';
+import type { InferSchemaOutput } from '@orpc/contract';
+import { chatMessagesDeleteErrors, type chatMessagesDeleteContract } from './endpoints/chat/messages/delete.contract.js';
+import { chatMessagesReactErrors, type chatMessagesReactContract } from './endpoints/chat/messages/react.contract.js';
+import { chatMessagesUnreactErrors, type chatMessagesUnreactContract } from './endpoints/chat/messages/unreact.contract.js';
+import { chatRoomsDeleteErrors, type chatRoomsDeleteContract } from './endpoints/chat/rooms/delete.contract.js';
+import { chatRoomsJoinErrors, type chatRoomsJoinContract } from './endpoints/chat/rooms/join.contract.js';
+import { chatRoomsLeaveErrors, type chatRoomsLeaveContract } from './endpoints/chat/rooms/leave.contract.js';
+import { chatRoomsMuteErrors, type chatRoomsMuteContract } from './endpoints/chat/rooms/mute.contract.js';
+import { chatRoomsInvitationsIgnoreErrors, type chatRoomsInvitationsIgnoreContract } from './endpoints/chat/rooms/invitations/ignore.contract.js';
+import { chatReadAllErrors, type chatReadAllContract } from './endpoints/chat/read-all.contract.js';
 import type { ErrorDefinition } from '../../api/backend/transport/orpc-error.js';
-import type * as v from 'valibot';
 
 export interface ChatCommandsContext<Actor extends { id: string }> {
 	actor: Actor;
@@ -40,14 +40,14 @@ export interface ChatCommandsDependencies<Room, Message, Actor extends { id: str
 
 export function createChatCommandOperations<Room, Message, Actor extends { id: string }>(deps: ChatCommandsDependencies<Room, Message, Actor>) {
 	return {
-		async chatMessagesDelete(input: v.InferOutput<typeof chatMessagesDeleteInput>, actor: Actor): Promise<void> {
+		async chatMessagesDelete(input: InferSchemaOutput<NonNullable<typeof chatMessagesDeleteContract['~orpc']['inputSchema']>>, actor: Actor): Promise<void> {
 			await deps.checkChatAvailability(actor.id, 'write');
 
 			const message = await deps.findMyMessageById(actor.id, input.messageId);
 			if (message == null) throw deps.createError(chatMessagesDeleteErrors.noSuchMessage);
 			await deps.deleteMessage(message);
 		},
-		async chatMessagesReact(input: v.InferOutput<typeof chatMessagesReactInput>, actor: Actor): Promise<void> {
+		async chatMessagesReact(input: InferSchemaOutput<NonNullable<typeof chatMessagesReactContract['~orpc']['inputSchema']>>, actor: Actor): Promise<void> {
 			await deps.checkChatAvailability(actor.id, 'write');
 
 			try {
@@ -59,7 +59,7 @@ export function createChatCommandOperations<Room, Message, Actor extends { id: s
 				throw error;
 			}
 		},
-		async chatMessagesUnreact(input: v.InferOutput<typeof chatMessagesUnreactInput>, actor: Actor): Promise<void> {
+		async chatMessagesUnreact(input: InferSchemaOutput<NonNullable<typeof chatMessagesUnreactContract['~orpc']['inputSchema']>>, actor: Actor): Promise<void> {
 			await deps.checkChatAvailability(actor.id, 'write');
 
 			try {
@@ -71,7 +71,7 @@ export function createChatCommandOperations<Room, Message, Actor extends { id: s
 				throw error;
 			}
 		},
-		async chatRoomsDelete(input: v.InferOutput<typeof chatRoomsDeleteInput>, actor: Actor): Promise<void> {
+		async chatRoomsDelete(input: InferSchemaOutput<NonNullable<typeof chatRoomsDeleteContract['~orpc']['inputSchema']>>, actor: Actor): Promise<void> {
 			await deps.checkChatAvailability(actor.id, 'write');
 
 			const room = await deps.findRoomById(input.roomId);
@@ -81,23 +81,23 @@ export function createChatCommandOperations<Room, Message, Actor extends { id: s
 
 			await deps.deleteRoom(room, actor);
 		},
-		async chatRoomsJoin(input: v.InferOutput<typeof chatRoomsJoinInput>, actor: Actor): Promise<void> {
+		async chatRoomsJoin(input: InferSchemaOutput<NonNullable<typeof chatRoomsJoinContract['~orpc']['inputSchema']>>, actor: Actor): Promise<void> {
 			await deps.checkChatAvailability(actor.id, 'write');
 			await deps.joinToRoom(actor.id, input.roomId);
 		},
-		async chatRoomsLeave(input: v.InferOutput<typeof chatRoomsLeaveInput>, actor: Actor): Promise<void> {
+		async chatRoomsLeave(input: InferSchemaOutput<NonNullable<typeof chatRoomsLeaveContract['~orpc']['inputSchema']>>, actor: Actor): Promise<void> {
 			await deps.checkChatAvailability(actor.id, 'write');
 			await deps.leaveRoom(actor.id, input.roomId);
 		},
-		async chatRoomsMute(input: v.InferOutput<typeof chatRoomsMuteInput>, actor: Actor): Promise<void> {
+		async chatRoomsMute(input: InferSchemaOutput<NonNullable<typeof chatRoomsMuteContract['~orpc']['inputSchema']>>, actor: Actor): Promise<void> {
 			await deps.checkChatAvailability(actor.id, 'write');
 			await deps.muteRoom(actor.id, input.roomId, input.mute);
 		},
-		async chatRoomsInvitationsIgnore(input: v.InferOutput<typeof chatRoomsInvitationsIgnoreInput>, actor: Actor): Promise<void> {
+		async chatRoomsInvitationsIgnore(input: InferSchemaOutput<NonNullable<typeof chatRoomsInvitationsIgnoreContract['~orpc']['inputSchema']>>, actor: Actor): Promise<void> {
 			await deps.checkChatAvailability(actor.id, 'write');
 			await deps.ignoreRoomInvitation(actor.id, input.roomId);
 		},
-		async chatReadAll(input: v.InferOutput<typeof chatReadAllInput>, actor: Actor): Promise<void> {
+		async chatReadAll(input: InferSchemaOutput<NonNullable<typeof chatReadAllContract['~orpc']['inputSchema']>>, actor: Actor): Promise<void> {
 			await deps.checkChatAvailability(actor.id, 'read');
 			await deps.readAllChatMessages(actor.id);
 		},

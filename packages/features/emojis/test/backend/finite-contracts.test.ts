@@ -6,7 +6,7 @@
 import { expect, test } from 'vitest';
 import * as v from 'valibot';
 import { mockDeep } from 'vitest-mock-extended';
-import { emojiSimpleResult, emojiDetailedResult, emojisResult } from '../../backend/api.schema.js';
+import { emojiSimpleResult, emojiDetailedResult } from '../../backend/api.schema.js';
 
 import { EmojiEntityService } from '../../backend/serializers/EmojiEntityService.js';
 
@@ -22,6 +22,7 @@ import type { MiDriveFile } from '@features/drive/backend/models/DriveFile.js';
 
 function requiredSchema<S extends v.GenericSchema>(schema: S | undefined): S { if (schema === undefined) throw new Error('Missing native schema'); return schema; }
 
+const emojisResult = requiredSchema(nativeContract1.emojis['~orpc'].outputSchema);
 const packedEmojiDetailedAdminSchema = packedSchemas.EmojiDetailedAdmin;
 const inlineAdminEmojiCopyInput = requiredSchema(nativeContract1.copy['~orpc'].inputSchema);
 const inlineAdminEmojiCopyOutput = requiredSchema(nativeContract2.copy['~orpc'].outputSchema);

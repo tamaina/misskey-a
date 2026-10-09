@@ -10,18 +10,6 @@ import { commonErrors, apiErrorData } from '../../../../api/backend/transport/er
 import { packedChannelSchema } from '../../channel.schema.js';
 import { objectInput, misskeyId, jsonString } from '../../request.schema.js';
 
-export const channelsUpdateInput = objectInput({
-	"channelId": misskeyId,
-	"name": v.exactOptional(jsonString({ "minLength": 1, "maxLength": 128 })),
-	"description": v.exactOptional(v.nullable(jsonString({ "maxLength": 2048 }))),
-	"bannerId": v.exactOptional(v.nullable(misskeyId)),
-	"isArchived": v.exactOptional(v.nullable(v.boolean())),
-	"pinnedNoteIds": v.exactOptional(v.array(misskeyId)),
-	"color": v.exactOptional(jsonString({ "minLength": 1, "maxLength": 16 })),
-	"isSensitive": v.exactOptional(v.nullable(v.boolean())),
-	"allowRenoteToExternal": v.exactOptional(v.nullable(v.boolean())),
-});
-export const channelsUpdateOutput = packedChannelSchema;
 export const channelsUpdateErrors = {
 		noSuchChannel: {
 			message: 'No such channel.',
@@ -43,7 +31,17 @@ export const channelsUpdateErrors = {
 	} as const;
 export const channelsUpdatePolicy = { name: 'channels/update', requireCredential: true, kind: 'write:channels' } as const;
 const security: OpenAPI.SecurityRequirementObject[] = [{ bearerAuth: [] }];
-export const channelsUpdateContract = oc.$meta<{ requestName: 'channels/update' }>({ requestName: 'channels/update' })
+export const channelsUpdateContract = oc.$meta({ requestName: 'channels/update' } as const)
 	.route({ method: 'POST', path: '/channels/update', operationId: 'post___channels___update', tags: ['channels'], spec: current => ({ ...current, security }) })
 	.errors({ ...commonErrors, NO_SUCH_CHANNEL: { status: 400, data: apiErrorData }, ACCESS_DENIED: { status: 400, data: apiErrorData }, NO_SUCH_FILE: { status: 400, data: apiErrorData } })
-	.input(channelsUpdateInput).output(channelsUpdateOutput);
+	.input(objectInput({
+		"channelId": misskeyId,
+		"name": v.exactOptional(jsonString({ "minLength": 1, "maxLength": 128 })),
+		"description": v.exactOptional(v.nullable(jsonString({ "maxLength": 2048 }))),
+		"bannerId": v.exactOptional(v.nullable(misskeyId)),
+		"isArchived": v.exactOptional(v.nullable(v.boolean())),
+		"pinnedNoteIds": v.exactOptional(v.array(misskeyId)),
+		"color": v.exactOptional(jsonString({ "minLength": 1, "maxLength": 16 })),
+		"isSensitive": v.exactOptional(v.nullable(v.boolean())),
+		"allowRenoteToExternal": v.exactOptional(v.nullable(v.boolean())),
+	})).output(packedChannelSchema);

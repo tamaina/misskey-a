@@ -6,12 +6,8 @@
 import { oc } from '@orpc/contract';
 import * as v from 'valibot';
 import { commonErrors, apiErrorData } from '../../../../api/backend/transport/errors.schema.js';
-import { objectInput, misskeyId, description } from '../../users.input.schema.js';
+import { objectInput, misskeyId } from '../../users.input.schema.js';
 
-export const voidUsersUpdateMemoInput = objectInput({
-	'userId': misskeyId,
-	'memo': v.pipe(v.nullable(v.string()), v.metadata({ 'description': 'A personal memo for the target user. If null or empty, delete the memo.' })),
-});
 export const usersUpdateMemoErrors = {
 	noSuchUser: {
 		message: 'No such user.',
@@ -19,6 +15,9 @@ export const usersUpdateMemoErrors = {
 		id: '6fef56f3-e765-4957-88e5-c6f65329b8a5',
 	},
 } as const;
-export const usersUpdateMemoContract = oc.$meta<{ requestName: 'users/update-memo' }>({ requestName: 'users/update-memo' })
+export const usersUpdateMemoContract = oc.$meta({ requestName: 'users/update-memo' } as const)
 	.route({ method: 'POST', path: '/users/update-memo', operationId: 'post___users___update-memo', tags: ['account'], spec: current => ({ ...current, security: [{ bearerAuth: [] }] }), successStatus: 204 })
-	.errors({ ...commonErrors, NO_SUCH_USER: { status: 400, data: apiErrorData } }).input(voidUsersUpdateMemoInput).output(v.void());
+	.errors({ ...commonErrors, NO_SUCH_USER: { status: 400, data: apiErrorData } }).input(objectInput({
+	'userId': misskeyId,
+	'memo': v.pipe(v.nullable(v.string()), v.metadata({ 'description': 'A personal memo for the target user. If null or empty, delete the memo.' })),
+})).output(v.void());

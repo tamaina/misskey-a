@@ -11,8 +11,8 @@ import type { ReversiGamesRepository } from '@features/persistence/backend/repos
 import { QueryService } from '@features/notes/backend/services/QueryService.js';
 
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
-import type * as v from 'valibot';
-import { reversiGamesInput } from '../../endpoints/reversi/games.contract.js';
+import type { InferSchemaOutput } from '@orpc/contract';
+import { type reversiGamesContract } from '../../endpoints/reversi/games.contract.js';
 
 @Injectable()
 export class ReversiGamesApplicationService {
@@ -24,7 +24,7 @@ export class ReversiGamesApplicationService {
 		private queryService: QueryService,
 	) {}
 
-	async execute(ps: v.InferOutput<typeof reversiGamesInput>, me: MiLocalUser | null) {
+	async execute(ps: InferSchemaOutput<NonNullable<(typeof reversiGamesContract)['~orpc']['inputSchema']>>, me: MiLocalUser | null) {
 		const query = this.queryService.makePaginationQuery(this.reversiGamesRepository.createQueryBuilder('game'), ps.sinceId, ps.untilId, ps.sinceDate, ps.untilDate)
 			.innerJoinAndSelect('game.user1', 'user1')
 			.innerJoinAndSelect('game.user2', 'user2');

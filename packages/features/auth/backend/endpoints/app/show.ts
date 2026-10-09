@@ -10,8 +10,8 @@ import { AppEntityService } from '../../serializers/AppEntityService.js';
 import { DI } from '@/di-symbols.js';
 import { apiError } from '@features/api/backend/transport/orpc-error.js';
 
-import * as v from 'valibot';
-import { packedAppShowInput } from '../../auth.schema.js';
+import type * as v from 'valibot';
+import type { AppShowContract } from '../../api.contract.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 import type { ApiToken } from '@features/api/backend/transport/context.js';
 
@@ -36,7 +36,7 @@ export class AppShowOperation {
 		private appEntityService: AppEntityService,
 	) {}
 
-	async execute(ps: v.InferOutput<typeof packedAppShowInput>, user: MiLocalUser | null, token: ApiToken | null) {
+	async execute(ps: v.InferOutput<NonNullable<typeof AppShowContract['~orpc']['inputSchema']>>, user: MiLocalUser | null, token: ApiToken | null) {
 		const isSecure = user != null && token == null;
 
 		// Lookup app

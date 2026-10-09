@@ -9,10 +9,6 @@ import { commonErrors, apiErrorData } from '../../../../api/backend/transport/er
 import { objectInput } from '../../../../api/backend/transport/input.schema.js';
 const misskeyId = v.pipe(v.string(), v.regex(/^[a-zA-Z0-9]+$/));
 
-export const pagesLikeInput = objectInput({
-	"pageId": misskeyId,
-});
-export const pagesLikeOutput = v.void();
 export const pagesLikeErrors = {
 	noSuchPage: { message: 'No such page.', code: 'NO_SUCH_PAGE', id: 'cc98a8a2-0dc3-4123-b198-62c71df18ed3' },
 	yourPage: { message: 'You cannot like your page.', code: 'YOUR_PAGE', id: '28800466-e6db-40f2-8fae-bf9e82aa92b8' },
@@ -20,8 +16,10 @@ export const pagesLikeErrors = {
 } as const;
 
 const requestName = 'pages/like';
-export const pagesLikeContract = oc.$meta<{ requestName: typeof requestName }>({ requestName })
+export const pagesLikeContract = oc.$meta({ requestName: requestName } as const)
 	.route({ method: 'POST', path: `/${requestName}`, operationId: 'post___' + requestName.replaceAll('/', '___'), tags: ['pages'], spec: current => ({ ...current, security: [{ bearerAuth: [] }] }), successStatus: 204, })
 	.errors({ ...commonErrors, NO_SUCH_PAGE: { status: 400, data: apiErrorData }, YOUR_PAGE: { status: 400, data: apiErrorData }, ALREADY_LIKED: { status: 400, data: apiErrorData } })
-	.input(pagesLikeInput)
-	.output(pagesLikeOutput);
+	.input(objectInput({
+		"pageId": misskeyId,
+	}))
+	.output(v.void());

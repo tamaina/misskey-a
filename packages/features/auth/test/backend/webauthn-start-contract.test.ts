@@ -10,7 +10,7 @@ import { MiUserSecurityKey } from '../../backend/models/UserSecurityKey.js';
 import { mockDeep } from 'vitest-mock-extended';
 import { WebAuthnService } from '../../backend/services/WebAuthnService.js';
 import { I2faRegisterKeyOperation } from '../../backend/endpoints/i/2fa/register-key.js';
-import { inlineI2faRegisterKeyOutput, inlineI2faRegisterKeyInput } from '../../backend/auth.schema.js';
+import { I2faRegisterKeyContract } from '../../backend/api.contract.js';
 import { toWebAuthnRegistrationOptions } from '../../backend/webauthn.schema.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 
@@ -28,14 +28,14 @@ function service(withKey: boolean, withTransports = true) {
 test.each([false, true])('real registration producer keeps challenge storage and finite default options: key=%s', async withKey => {
 	const h = service(withKey);
 	const result = await h.producer.initiateRegistration('user123', 'fixture');
-	expect(v.parse(inlineI2faRegisterKeyOutput, JSON.parse(JSON.stringify(result)))).toEqual(result);
+	expect(v.parse(requiredSchema(I2faRegisterKeyContract['~orpc'].outputSchema), JSON.parse(JSON.stringify(result)))).toEqual(result);
 	expect(result).toMatchObject({ rp: { name: 'Fixture', id: 'example.com' }, user: { id: 'dXNlcjEyMw', name: 'fixture', displayName: '' }, timeout: 60000, attestation: 'none', authenticatorSelection: { residentKey: 'required', requireResidentKey: true, userVerification: 'preferred' }, extensions: { credProps: true }, hints: [] });
 	expect(result.excludeCredentials).toEqual(withKey ? [{ id: 'AQID', type: 'public-key', transports: ['usb'] }] : []);
 	expect(h.keys.findBy).toHaveBeenCalledWith({ userId: 'user123' });
 	expect(h.redis.setex).toHaveBeenCalledWith('webauthn:registrationChallenge:user123', 90, result.challenge);
-	for (const bad of [{ ...result, future: true }, { ...result, challenge: 7 }, { ...result, rp: { ...result.rp, future: true } }, { ...result, extensions: { credProps: true, future: true } }, { ...result, pubKeyCredParams: [{ type: 'invalid', alg: -7 }] }]) expect(v.safeParse(inlineI2faRegisterKeyOutput, bad).success).toBe(false);
+	for (const bad of [{ ...result, future: true }, { ...result, challenge: 7 }, { ...result, rp: { ...result.rp, future: true } }, { ...result, extensions: { credProps: true, future: true } }, { ...result, pubKeyCredParams: [{ type: 'invalid', alg: -7 }] }]) expect(v.safeParse(requiredSchema(I2faRegisterKeyContract['~orpc'].outputSchema), bad).success).toBe(false);
 	const { challenge: _challenge, ...missing } = result;
-	expect(v.safeParse(inlineI2faRegisterKeyOutput, missing).success).toBe(false);
+	expect(v.safeParse(requiredSchema(I2faRegisterKeyContract['~orpc'].outputSchema), missing).success).toBe(false);
 });
 
 test('real start endpoint retains password/2FA guards and forwards unparsed producer identity', async () => {
@@ -52,19 +52,24 @@ test('real start endpoint retains password/2FA guards and forwards unparsed prod
 	expect(auth.twoFactorAuthenticate).toHaveBeenCalledWith(profile, 'totp');
 	const raw = { ...await service(false).producer.initiateRegistration(me.id, 'fixture'), future: true };
 	producer.initiateRegistration.mockResolvedValue(raw);
-	expect(await endpoint.execute(v.parse(inlineI2faRegisterKeyInput, { password: 'password', token: 'totp', future: true }), me)).toBe(raw);
+	expect(await endpoint.execute(v.parse(requiredSchema(I2faRegisterKeyContract['~orpc'].inputSchema), { password: 'password', token: 'totp', future: true }), me)).toBe(raw);
 	expect(producer.initiateRegistration).toHaveBeenCalledWith(me.id, me.id, undefined);
-	expect(v.safeParse(inlineI2faRegisterKeyOutput, raw).success).toBe(false);
+	expect(v.safeParse(requiredSchema(I2faRegisterKeyContract['~orpc'].outputSchema), raw).success).toBe(false);
 	profiles.findOne.mockResolvedValue(null);
 	await expect(endpoint.execute({ password: 'wrong' }, me)).rejects.toMatchObject({ code: 'USER_NOT_FOUND' });
-	expect(v.safeParse(inlineI2faRegisterKeyInput, {}).success).toBe(false);
+	expect(v.safeParse(requiredSchema(I2faRegisterKeyContract['~orpc'].inputSchema), {}).success).toBe(false);
 });
 
 // The dependency emits transports: undefined for existing keys without transports.
 test('native optional undefined is forwarded while JSON wire omits it', async () => {
 	const result = await service(true, false).producer.initiateRegistration('user123', 'fixture');
 	expect(result.excludeCredentials?.[0]).toHaveProperty('transports', undefined);
-	expect(v.safeParse(inlineI2faRegisterKeyOutput, result).success).toBe(false);
+	expect(v.safeParse(requiredSchema(I2faRegisterKeyContract['~orpc'].outputSchema), result).success).toBe(false);
 	const wire = toWebAuthnRegistrationOptions(result);
-	expect(v.parse(inlineI2faRegisterKeyOutput, wire)).toEqual(wire);
+	expect(v.parse(requiredSchema(I2faRegisterKeyContract['~orpc'].outputSchema), wire)).toEqual(wire);
 });
+
+function requiredSchema<Schema>(schema: Schema | undefined): Schema {
+	if (schema === undefined) throw new Error('Contract must declare its schema');
+	return schema;
+}

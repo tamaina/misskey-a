@@ -6,6 +6,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import bcrypt from 'bcryptjs';
 import { IsNull, LessThanOrEqual } from 'typeorm';
+import type { FindOptionsWhere } from 'typeorm';
 import { CaptchaService } from '@features/auth/backend/services/CaptchaService.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { SignupService } from '@features/auth/backend/services/SignupService.js';
@@ -20,7 +21,6 @@ import { sessionField, sessionText, sessionErrorMessage, type AuthSessionBody, t
 import { L_CHARS, secureRndstr } from '../utility/secure-rndstr.js';
 import { SigninService } from './SigninService.js';
 import type { RegistrationTicketsRepository, UsedUsernamesRepository, UserPendingsRepository, UserProfilesRepository, UsersRepository, MiRegistrationTicket, MiMeta } from '@features/persistence/backend/repositories/models.js';
-import type { FindOptionsWhere } from 'typeorm';
 
 const invitationCodeMailTimeoutMs = 1000 * 60 * 30;
 

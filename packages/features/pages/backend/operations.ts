@@ -3,32 +3,32 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import type * as v from 'valibot';
+import type { InferSchemaOutput } from '@orpc/contract';
 import type { ApiActor, ApiContext } from '../../api/backend/transport/context.js';
-import type { iPageLikesInput, iPageLikesOutput } from './endpoints/i/page-likes.contract.js';
-import type { iPagesInput, iPagesOutput } from './endpoints/i/pages.contract.js';
-import type { pagePushInput, pagePushOutput } from './endpoints/page-push.contract.js';
-import type { pagesCreateInput, pagesCreateOutput } from './endpoints/pages/create.contract.js';
-import type { pagesDeleteInput, pagesDeleteOutput } from './endpoints/pages/delete.contract.js';
-import type { pagesFeaturedInput, pagesFeaturedOutput } from './endpoints/pages/featured.contract.js';
-import type { pagesLikeInput, pagesLikeOutput } from './endpoints/pages/like.contract.js';
-import type { pagesShowInput, pagesShowOutput } from './endpoints/pages/show.contract.js';
-import type { pagesUnlikeInput, pagesUnlikeOutput } from './endpoints/pages/unlike.contract.js';
-import type { pagesUpdateInput, pagesUpdateOutput } from './endpoints/pages/update.contract.js';
-import type { usersPagesInput, usersPagesOutput } from './endpoints/users/pages.contract.js';
+import type { iPageLikesContract } from './endpoints/i/page-likes.contract.js';
+import type { iPagesContract } from './endpoints/i/pages.contract.js';
+import type { pagePushContract } from './endpoints/page-push.contract.js';
+import type { pagesCreateContract } from './endpoints/pages/create.contract.js';
+import type { pagesDeleteContract } from './endpoints/pages/delete.contract.js';
+import type { pagesFeaturedContract } from './endpoints/pages/featured.contract.js';
+import type { pagesLikeContract } from './endpoints/pages/like.contract.js';
+import type { pagesShowContract } from './endpoints/pages/show.contract.js';
+import type { pagesUnlikeContract } from './endpoints/pages/unlike.contract.js';
+import type { pagesUpdateContract } from './endpoints/pages/update.contract.js';
+import type { usersPagesContract } from './endpoints/users/pages.contract.js';
 
 export interface PagesOperations<Actor extends ApiActor> {
-	iPageLikes(input: v.InferOutput<typeof iPageLikesInput>, actor: Actor): Promise<v.InferOutput<typeof iPageLikesOutput>>;
-	iPages(input: v.InferOutput<typeof iPagesInput>, actor: Actor): Promise<v.InferOutput<typeof iPagesOutput>>;
-	pagePush(input: v.InferOutput<typeof pagePushInput>, actor: Actor): Promise<v.InferOutput<typeof pagePushOutput>>;
-	pagesCreate(input: v.InferOutput<typeof pagesCreateInput>, actor: Actor): Promise<v.InferOutput<typeof pagesCreateOutput>>;
-	pagesDelete(input: v.InferOutput<typeof pagesDeleteInput>, actor: Actor): Promise<v.InferOutput<typeof pagesDeleteOutput>>;
-	pagesFeatured(input: v.InferOutput<typeof pagesFeaturedInput>, actor: Actor | null): Promise<v.InferOutput<typeof pagesFeaturedOutput>>;
-	pagesLike(input: v.InferOutput<typeof pagesLikeInput>, actor: Actor): Promise<v.InferOutput<typeof pagesLikeOutput>>;
-	pagesShow(input: v.InferOutput<typeof pagesShowInput>, actor: Actor | null): Promise<v.InferOutput<typeof pagesShowOutput>>;
-	pagesUnlike(input: v.InferOutput<typeof pagesUnlikeInput>, actor: Actor): Promise<v.InferOutput<typeof pagesUnlikeOutput>>;
-	pagesUpdate(input: v.InferOutput<typeof pagesUpdateInput>, actor: Actor): Promise<v.InferOutput<typeof pagesUpdateOutput>>;
-	usersPages(input: v.InferOutput<typeof usersPagesInput>, actor: Actor | null): Promise<v.InferOutput<typeof usersPagesOutput>>;
+	iPageLikes(input: InferSchemaOutput<NonNullable<(typeof iPageLikesContract)['~orpc']['inputSchema']>>, actor: Actor): Promise<InferSchemaOutput<NonNullable<(typeof iPageLikesContract)['~orpc']['outputSchema']>>>;
+	iPages(input: InferSchemaOutput<NonNullable<(typeof iPagesContract)['~orpc']['inputSchema']>>, actor: Actor): Promise<InferSchemaOutput<NonNullable<(typeof iPagesContract)['~orpc']['outputSchema']>>>;
+	pagePush(input: InferSchemaOutput<NonNullable<(typeof pagePushContract)['~orpc']['inputSchema']>>, actor: Actor): Promise<InferSchemaOutput<NonNullable<(typeof pagePushContract)['~orpc']['outputSchema']>>>;
+	pagesCreate(input: InferSchemaOutput<NonNullable<(typeof pagesCreateContract)['~orpc']['inputSchema']>>, actor: Actor): Promise<InferSchemaOutput<NonNullable<(typeof pagesCreateContract)['~orpc']['outputSchema']>>>;
+	pagesDelete(input: InferSchemaOutput<NonNullable<(typeof pagesDeleteContract)['~orpc']['inputSchema']>>, actor: Actor): Promise<InferSchemaOutput<NonNullable<(typeof pagesDeleteContract)['~orpc']['outputSchema']>>>;
+	pagesFeatured(input: InferSchemaOutput<NonNullable<(typeof pagesFeaturedContract)['~orpc']['inputSchema']>>, actor: Actor | null): Promise<InferSchemaOutput<NonNullable<(typeof pagesFeaturedContract)['~orpc']['outputSchema']>>>;
+	pagesLike(input: InferSchemaOutput<NonNullable<(typeof pagesLikeContract)['~orpc']['inputSchema']>>, actor: Actor): Promise<InferSchemaOutput<NonNullable<(typeof pagesLikeContract)['~orpc']['outputSchema']>>>;
+	pagesShow(input: InferSchemaOutput<NonNullable<(typeof pagesShowContract)['~orpc']['inputSchema']>>, actor: Actor | null): Promise<InferSchemaOutput<NonNullable<(typeof pagesShowContract)['~orpc']['outputSchema']>>>;
+	pagesUnlike(input: InferSchemaOutput<NonNullable<(typeof pagesUnlikeContract)['~orpc']['inputSchema']>>, actor: Actor): Promise<InferSchemaOutput<NonNullable<(typeof pagesUnlikeContract)['~orpc']['outputSchema']>>>;
+	pagesUpdate(input: InferSchemaOutput<NonNullable<(typeof pagesUpdateContract)['~orpc']['inputSchema']>>, actor: Actor): Promise<InferSchemaOutput<NonNullable<(typeof pagesUpdateContract)['~orpc']['outputSchema']>>>;
+	usersPages(input: InferSchemaOutput<NonNullable<(typeof usersPagesContract)['~orpc']['inputSchema']>>, actor: Actor | null): Promise<InferSchemaOutput<NonNullable<(typeof usersPagesContract)['~orpc']['outputSchema']>>>;
 }
 export type PagesContext<Actor extends ApiActor> = ApiContext<Actor> & { operations: { pages: PagesOperations<Actor> } };
 export type PagesApplications<Actor extends ApiActor> = { [K in keyof PagesOperations<Actor>]: { execute: PagesOperations<Actor>[K] } };

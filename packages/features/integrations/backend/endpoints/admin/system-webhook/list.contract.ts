@@ -10,15 +10,13 @@ import { commonErrors } from '../../../../../api/backend/transport/errors.schema
 import { systemWebhookEventTypes } from '../../../webhook-events.schema.js';
 import { systemWebhookSchema } from '../../../webhook.schema.js';
 
-export const adminSystemWebhookListInput = objectInput({
-	"isActive": v.exactOptional(v.boolean()),
-	"on": v.exactOptional(v.array(v.picklist(systemWebhookEventTypes))),
-});
-export const adminSystemWebhookListOutput = v.array(systemWebhookSchema);
 export const adminSystemWebhookListErrors = {} as const;
 
 const requestName = 'admin/system-webhook/list';
-export const adminSystemWebhookListContract = oc.$meta<{ requestName: typeof requestName }>({ requestName })
+export const adminSystemWebhookListContract = oc.$meta({ requestName: requestName } as const)
 	.route({ method: 'POST', path: `/${requestName}`, operationId: 'post___' + requestName.replaceAll('/', '___'), tags: ['admin', 'system-webhook'], spec: current => ({ ...current, security: [{ bearerAuth: [] }] }) })
 	.errors({ ...commonErrors })
-	.input(adminSystemWebhookListInput).output(adminSystemWebhookListOutput);
+	.input(objectInput({
+	"isActive": v.exactOptional(v.boolean()),
+	"on": v.exactOptional(v.array(v.picklist(systemWebhookEventTypes))),
+})).output(v.array(systemWebhookSchema));

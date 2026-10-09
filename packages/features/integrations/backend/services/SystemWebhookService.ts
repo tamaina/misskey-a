@@ -4,6 +4,7 @@
  */
 
 import { Inject, Injectable } from '@nestjs/common';
+import type { OnApplicationShutdown } from '@nestjs/common';
 import * as Redis from 'ioredis';
 import type { MiUser, SystemWebhooksRepository } from '@features/persistence/backend/repositories/models.js';
 import { DI } from '@/di-symbols.js';
@@ -18,7 +19,6 @@ import { Logger } from '@features/runtime/backend/logging/logger.js';
 import { Packed } from '@features/index/backend/packed.schema.js';
 import { AbuseReportResolveType } from '@features/moderation/backend/models/AbuseUserReport.js';
 import { ModeratorInactivityRemainingTime } from '@features/moderation/backend/jobs/CheckModeratorsActivityProcessorService.js';
-import type { OnApplicationShutdown } from '@nestjs/common';
 
 export type AbuseReportPayload = {
 	id: string;

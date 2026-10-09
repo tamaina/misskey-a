@@ -4,6 +4,7 @@
  */
 
 import { Inject, Injectable } from '@nestjs/common';
+import type { OnApplicationShutdown } from '@nestjs/common';
 import * as Redis from 'ioredis';
 import { MiUser, type WebhooksRepository } from '@features/persistence/backend/repositories/models.js';
 import { MiWebhook, WebhookEventTypes } from '../models/Webhook.js';
@@ -12,7 +13,6 @@ import { bindThis } from '@features/runtime/backend/decorators.js';
 import { GlobalEvents } from '@features/runtime/backend/services/GlobalEventService.js';
 import type { Packed } from '@features/index/backend/packed.schema.js';
 import { QueueService } from '@features/runtime/backend/services/QueueService.js';
-import type { OnApplicationShutdown } from '@nestjs/common';
 
 export type UserWebhookPayload<T extends WebhookEventTypes> =
 	T extends 'note' | 'reply' | 'renote' | 'mention' ? {

@@ -8,30 +8,41 @@ import * as v from 'valibot';
 import { commonErrors } from '../../../../api/backend/transport/errors.schema.js';
 import { chartInput } from './chart-input.schema.js';
 
-export const chartDriveOutput = v.strictObject({
-	local: v.strictObject({
-		incCount: v.array(v.pipe(v.number(), v.finite())),
-		incSize: v.array(v.pipe(v.number(), v.finite())),
-		decCount: v.array(v.pipe(v.number(), v.finite())),
-		decSize: v.array(v.pipe(v.number(), v.finite())),
-	}),
-	remote: v.strictObject({
-		incCount: v.array(v.pipe(v.number(), v.finite())),
-		incSize: v.array(v.pipe(v.number(), v.finite())),
-		decCount: v.array(v.pipe(v.number(), v.finite())),
-		decSize: v.array(v.pipe(v.number(), v.finite())),
-	}),
-});
-
 const requestName = 'charts/drive';
-export const chartDriveContract = oc.$meta<{ requestName: typeof requestName; allowGet: true; cacheSec: number }>({ requestName, allowGet: true, cacheSec: 3600 })
+export const chartDriveContract = oc.$meta({ requestName: requestName, allowGet: true, cacheSec: 3600 } as const)
 	.route({ method: 'POST', path: `/${requestName}`, operationId: 'post___' + requestName.replaceAll('/', '___'), tags: ['charts', 'drive'] })
 	.errors(commonErrors)
 	.input(chartInput)
-	.output(chartDriveOutput);
+	.output(v.strictObject({
+		local: v.strictObject({
+			incCount: v.array(v.pipe(v.number(), v.finite())),
+			incSize: v.array(v.pipe(v.number(), v.finite())),
+			decCount: v.array(v.pipe(v.number(), v.finite())),
+			decSize: v.array(v.pipe(v.number(), v.finite())),
+		}),
+		remote: v.strictObject({
+			incCount: v.array(v.pipe(v.number(), v.finite())),
+			incSize: v.array(v.pipe(v.number(), v.finite())),
+			decCount: v.array(v.pipe(v.number(), v.finite())),
+			decSize: v.array(v.pipe(v.number(), v.finite())),
+		}),
+	}));
 
-export const chartDriveGetContract = oc.$meta<{ allowGet: true; cacheSec: number }>({ allowGet: true, cacheSec: 3600 })
+export const chartDriveGetContract = oc.$meta({ allowGet: true, cacheSec: 3600 } as const)
 	.route({ method: 'GET', path: `/${requestName}`, operationId: 'get___' + requestName.replaceAll('/', '___'), tags: ['charts', 'drive'] })
 	.errors(commonErrors)
 	.input(chartInput)
-	.output(chartDriveOutput);
+	.output(v.strictObject({
+		local: v.strictObject({
+			incCount: v.array(v.pipe(v.number(), v.finite())),
+			incSize: v.array(v.pipe(v.number(), v.finite())),
+			decCount: v.array(v.pipe(v.number(), v.finite())),
+			decSize: v.array(v.pipe(v.number(), v.finite())),
+		}),
+		remote: v.strictObject({
+			incCount: v.array(v.pipe(v.number(), v.finite())),
+			incSize: v.array(v.pipe(v.number(), v.finite())),
+			decCount: v.array(v.pipe(v.number(), v.finite())),
+			decSize: v.array(v.pipe(v.number(), v.finite())),
+		}),
+	}));

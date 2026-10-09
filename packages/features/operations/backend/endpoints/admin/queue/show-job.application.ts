@@ -7,7 +7,8 @@ import { Injectable } from '@nestjs/common';
 import { QueueService } from '../../../../../runtime/backend/services/QueueService.js';
 import type { MiUser } from '../../../../../users/backend/models/User.js';
 import * as v from 'valibot';
-import { adminQueueShowJobInput, adminQueueShowJobOutput } from './show-job.contract.js';
+import type { AdminQueueShowJobInput, AdminQueueShowJobOutput } from './show-job.contract.js';
+import { adminQueueShowJobContract } from './show-job.contract.js';
 
 @Injectable()
 export class AdminQueueShowJobApplicationService {
@@ -15,10 +16,10 @@ export class AdminQueueShowJobApplicationService {
 		private queueService: QueueService,
 	) {}
 
-	public async execute(ps: v.InferOutput<typeof adminQueueShowJobInput>, _me: MiUser): Promise<v.InferOutput<typeof adminQueueShowJobOutput>> {
+	public async execute(ps: AdminQueueShowJobInput, _me: MiUser): Promise<AdminQueueShowJobOutput> {
 		const result = await (async () => {
 			return this.queueService.queueGetJob(ps.queue, ps.jobId);
 		})();
-		return v.parse(adminQueueShowJobOutput, result);
+		return v.parse(adminQueueShowJobContract['~orpc'].outputSchema!, result);
 	}
 }

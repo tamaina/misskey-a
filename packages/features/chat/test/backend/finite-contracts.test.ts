@@ -7,10 +7,10 @@ import { expect, test } from 'vitest';
 import * as v from 'valibot';
 import { mockDeep } from 'vitest-mock-extended';
 import { packedChatMessageSchema, packedChatMessageLiteSchema, packedChatMessageLiteFor1on1Schema, packedChatMessageLiteForRoomSchema, packedChatRoomSchema, packedChatRoomInvitationSchema, packedChatRoomMembershipSchema } from '../../backend/chat.schema.js';
-import { chatHistoryInput as packedChatHistoryInput, chatHistoryOutput as packedChatHistoryOutput } from '../../backend/endpoints/chat/history.contract.js';
-import { chatMessagesCreateToUserInput as packedChatMessagesCreateToUserInput } from '../../backend/endpoints/chat/messages/create-to-user.contract.js';
-import { chatReadAllInput } from '../../backend/endpoints/chat/read-all.contract.js';
-import { chatRoomsMuteInput } from '../../backend/endpoints/chat/rooms/mute.contract.js';
+import { chatHistoryContract } from '../../backend/endpoints/chat/history.contract.js';
+import { chatMessagesCreateToUserContract } from '../../backend/endpoints/chat/messages/create-to-user.contract.js';
+import { chatReadAllContract } from '../../backend/endpoints/chat/read-all.contract.js';
+import { chatRoomsMuteContract } from '../../backend/endpoints/chat/rooms/mute.contract.js';
 import { chatRoomsJoinErrors } from '../../backend/endpoints/chat/rooms/join.contract.js';
 import { ChatEntityService } from '../../backend/serializers/ChatEntityService.js';
 import { ChatHistoryOperation as HistoryEndpoint } from '../../backend/endpoints/chat/history.js';
@@ -111,19 +111,24 @@ test.each([false, true])('actual history handler adds its read state for room=%s
 	chats.getRoomReadStateMap.mockResolvedValue({ [room.id]: true });
 	chats.getUserReadStateMap.mockResolvedValue({ other123: true });
 	const endpoint = new HistoryEndpoint(entities, chats);
-	const result = await endpoint.execute(v.parse(packedChatHistoryInput, { room: roomHistory }), mockDeep<MiLocalUser>({ id: user.id }));
-	expect(v.parse(packedChatHistoryOutput, result)[0].isRead).toBe(true);
+	const result = await endpoint.execute(v.parse(requiredSchema(chatHistoryContract['~orpc'].inputSchema), { room: roomHistory }), mockDeep<MiLocalUser>({ id: user.id }));
+	expect(v.parse(requiredSchema(chatHistoryContract['~orpc'].outputSchema), result)[0].isRead).toBe(true);
 });
 
 test('native chat inputs strip transport fields, keep defaults and validate closed producer responses', async () => {
-	expect(v.parse(packedChatHistoryInput, { future: true })).toEqual({ limit: 10, room: false });
-	expect(v.parse(packedChatMessagesCreateToUserInput, { toUserId: 'user123', text: null, future: true })).toEqual({ toUserId: 'user123', text: null });
-	for (const input of [{}, { toUserId: 7 }, { toUserId: 'user123', text: 7 }]) expect(v.safeParse(packedChatMessagesCreateToUserInput, input).success).toBe(false);
-	for (const input of [[], null, 7]) expect(v.safeParse(chatReadAllInput, input).success).toBe(false);
-	expect(v.parse(chatRoomsMuteInput, { roomId: 'room123', mute: true, future: true })).toEqual({ roomId: 'room123', mute: true });
+	expect(v.parse(requiredSchema(chatHistoryContract['~orpc'].inputSchema), { future: true })).toEqual({ limit: 10, room: false });
+	expect(v.parse(requiredSchema(chatMessagesCreateToUserContract['~orpc'].inputSchema), { toUserId: 'user123', text: null, future: true })).toEqual({ toUserId: 'user123', text: null });
+	for (const input of [{}, { toUserId: 7 }, { toUserId: 'user123', text: 7 }]) expect(v.safeParse(requiredSchema(chatMessagesCreateToUserContract['~orpc'].inputSchema), input).success).toBe(false);
+	for (const input of [[], null, 7]) expect(v.safeParse(requiredSchema(chatReadAllContract['~orpc'].inputSchema), input).success).toBe(false);
+	expect(v.parse(requiredSchema(chatRoomsMuteContract['~orpc'].inputSchema), { roomId: 'room123', mute: true, future: true })).toEqual({ roomId: 'room123', mute: true });
 	expect(chatRoomsJoinErrors.noSuchRoom.id).toBe('84416476-5ce8-4a2c-b568-9569f1b10733');
 	const { service, message } = fixture();
 	const response = [{ ...await service.packMessageDetailed(message), future: true }];
-	expect(v.safeParse(packedChatHistoryOutput, response).success).toBe(false);
-	expect(v.safeParse(packedChatHistoryInput, { limit: 0 }).success).toBe(false);
+	expect(v.safeParse(requiredSchema(chatHistoryContract['~orpc'].outputSchema), response).success).toBe(false);
+	expect(v.safeParse(requiredSchema(chatHistoryContract['~orpc'].inputSchema), { limit: 0 }).success).toBe(false);
 });
+
+function requiredSchema<Schema>(schema: Schema | undefined): Schema {
+	if (schema === undefined) throw new Error('Missing endpoint contract schema');
+	return schema;
+}

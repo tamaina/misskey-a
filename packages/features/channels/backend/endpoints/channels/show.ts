@@ -6,11 +6,12 @@
 import { implement } from '@orpc/server';
 import { Inject, Injectable } from '@nestjs/common';
 import * as v from 'valibot';
+import { packedChannelSchema } from '../../channel.schema.js';
 import { DI } from '@/di-symbols.js';
 import { authentication, apiPolicy } from '../../../../api/backend/transport/middleware.js';
 import { ChannelEntityService } from '../../serializers/ChannelEntityService.js';
 import { apiError } from '../../../../api/backend/transport/orpc-error.js';
-import { channelsShowContract, channelsShowPolicy, channelsShowInput, channelsShowOutput, channelsShowErrors } from './show.contract.js';
+import { channelsShowContract, channelsShowPolicy, channelsShowErrors } from './show.contract.js';
 import type { ApiActor } from '../../../../api/backend/transport/context.js';
 import type { ChannelsApiContext } from '../../operations.js';
 
@@ -33,11 +34,11 @@ export class ChannelsShowOperation {
 
 		private channelEntityService: ChannelEntityService,
 	) {}
-	async execute(ps: v.InferOutput<typeof channelsShowInput>, me: MiLocalUser | null): Promise<v.InferOutput<typeof channelsShowOutput>> {
-		return v.parse(channelsShowOutput, await this.run(ps, me));
+	async execute(ps: v.InferOutput<NonNullable<typeof channelsShowContract['~orpc']['inputSchema']>>, me: MiLocalUser | null): Promise<v.InferOutput<NonNullable<typeof channelsShowContract['~orpc']['outputSchema']>>> {
+		return v.parse(packedChannelSchema, await this.run(ps, me));
 	}
 
-	private async run(ps: v.InferOutput<typeof channelsShowInput>, me: MiLocalUser | null) {
+	private async run(ps: v.InferOutput<NonNullable<typeof channelsShowContract['~orpc']['inputSchema']>>, me: MiLocalUser | null) {
 		const channel = await this.channelsRepository.findOneBy({
 			id: ps.channelId,
 		});

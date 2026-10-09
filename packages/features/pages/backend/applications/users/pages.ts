@@ -11,8 +11,8 @@ import type { PagesRepository } from '@features/persistence/backend/repositories
 import { DI } from '@/di-symbols.js';
 
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
-import type * as v from 'valibot';
-import { usersPagesInput } from '../../endpoints/users/pages.contract.js';
+import type { InferSchemaOutput } from '@orpc/contract';
+import { type usersPagesContract } from '../../endpoints/users/pages.contract.js';
 
 @Injectable()
 export class UsersPagesApplicationService {
@@ -24,7 +24,7 @@ export class UsersPagesApplicationService {
 		private queryService: QueryService,
 	) {}
 
-	async execute(ps: v.InferOutput<typeof usersPagesInput>, me: MiLocalUser | null) {
+	async execute(ps: InferSchemaOutput<NonNullable<(typeof usersPagesContract)['~orpc']['inputSchema']>>, me: MiLocalUser | null) {
 		const query = this.queryService.makePaginationQuery(this.pagesRepository.createQueryBuilder('page'), ps.sinceId, ps.untilId, ps.sinceDate, ps.untilDate)
 			.andWhere('page.userId = :userId', { userId: ps.userId })
 			.andWhere('page.visibility = \'public\'');

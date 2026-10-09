@@ -3,11 +3,12 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import type { InferSchemaInput, InferSchemaOutput } from '@orpc/contract';
 import { expect, expectTypeOf, test } from 'vitest';
 import * as v from 'valibot';
 import { mockDeep } from 'vitest-mock-extended';
 import { createProcedureClient } from '@orpc/server';
-import { notesStateContract, notesStateInput as inlineNotesStateInput, notesStateOutput as inlineNotesStateOutput } from '../../backend/endpoints/notes/state.contract.js';
+import { notesStateContract } from '../../backend/endpoints/notes/state.contract.js';
 import { NotesStateOperation, createNotesStateProcedure } from '../../backend/endpoints/notes/state.js';
 import type { NotesApiContext } from '../../backend/operations.js';
 import type { NotesRepository, NoteThreadMutingsRepository, NoteFavoritesRepository } from '@features/persistence/backend/repositories/models.js';
@@ -18,18 +19,18 @@ const input = { noteId: 'abc123' };
 const output = { isFavorited: true, isMutedThread: false };
 
 test('native input and output infer their complete explicit properties', () => {
-	expectTypeOf<v.InferInput<typeof inlineNotesStateInput>>().toEqualTypeOf<{ noteId: string } & object>();
-	expectTypeOf<v.InferOutput<typeof inlineNotesStateInput>>().toEqualTypeOf<{ noteId: string }>();
-	expectTypeOf<v.InferInput<typeof inlineNotesStateOutput>>().toEqualTypeOf<{ isFavorited: boolean; isMutedThread: boolean }>();
-	expectTypeOf<v.InferOutput<typeof inlineNotesStateOutput>>().toEqualTypeOf<{ isFavorited: boolean; isMutedThread: boolean }>();
-	expect(v.parse(inlineNotesStateInput, input)).toEqual(input);
+	expectTypeOf<InferSchemaInput<NonNullable<typeof notesStateContract['~orpc']['inputSchema']>>>().toEqualTypeOf<{ noteId: string } & object>();
+	expectTypeOf<InferSchemaOutput<NonNullable<typeof notesStateContract['~orpc']['inputSchema']>>>().toEqualTypeOf<{ noteId: string }>();
+	expectTypeOf<InferSchemaInput<NonNullable<typeof notesStateContract['~orpc']['outputSchema']>>>().toEqualTypeOf<{ isFavorited: boolean; isMutedThread: boolean }>();
+	expectTypeOf<InferSchemaOutput<NonNullable<typeof notesStateContract['~orpc']['outputSchema']>>>().toEqualTypeOf<{ isFavorited: boolean; isMutedThread: boolean }>();
+	expect(v.parse(requiredSchema(notesStateContract['~orpc'].inputSchema), input)).toEqual(input);
 	for (const value of [{}, { noteId: 42 }, { noteId: 'bad-id' }]) {
-		expect(v.safeParse(inlineNotesStateInput, value).success).toBe(false);
+		expect(v.safeParse(requiredSchema(notesStateContract['~orpc'].inputSchema), value).success).toBe(false);
 	}
-	expect(v.parse(inlineNotesStateInput, { ...input, i: 'transport', future: true })).toEqual(input);
-	expect(v.parse(inlineNotesStateOutput, output)).toEqual(output);
+	expect(v.parse(requiredSchema(notesStateContract['~orpc'].inputSchema), { ...input, i: 'transport', future: true })).toEqual(input);
+	expect(v.parse(requiredSchema(notesStateContract['~orpc'].outputSchema), output)).toEqual(output);
 	for (const value of [{ isFavorited: true }, { ...output, isMutedThread: 1 }, { ...output, future: true }]) {
-		expect(v.safeParse(inlineNotesStateOutput, value).success).toBe(false);
+		expect(v.safeParse(requiredSchema(notesStateContract['~orpc'].outputSchema), value).success).toBe(false);
 	}
 });
 
@@ -42,8 +43,6 @@ test('native procedure strips transport fields and keeps authenticated actor sep
 	const client = createProcedureClient(createNotesStateProcedure<MiLocalUser>(), { context });
 	expect(await client(params)).toEqual(output);
 	expect(context.operations.notes.notesState).toHaveBeenCalledWith(input, user);
-	expect(notesStateContract['~orpc'].inputSchema).toBe(inlineNotesStateInput);
-	expect(notesStateContract['~orpc'].outputSchema).toBe(inlineNotesStateOutput);
 });
 
 test('native procedure requires authentication and validates the operation response', async () => {
@@ -76,8 +75,13 @@ test.each([
 	const result = await endpoint.execute(input, user);
 	expectTypeOf(result).toEqualTypeOf<{ isFavorited: boolean; isMutedThread: boolean }>();
 	expect(result).toEqual({ isFavorited: favorite !== 0, isMutedThread: muting !== 0 });
-	expect(v.parse(inlineNotesStateOutput, result)).toEqual(result);
+	expect(v.parse(requiredSchema(notesStateContract['~orpc'].outputSchema), result)).toEqual(result);
 	expect(notes.findOneByOrFail).toHaveBeenCalledWith({ id: input.noteId });
 	expect(favorites.count).toHaveBeenCalledWith({ where: { userId: user.id, noteId: note.id }, take: 1 });
 	expect(mutings.count).toHaveBeenCalledWith({ where: { userId: user.id, threadId: threadId ?? note.id }, take: 1 });
 });
+
+function requiredSchema<Schema>(schema: Schema | undefined): Schema {
+	if (schema === undefined) throw new Error('Missing endpoint contract schema');
+	return schema;
+}

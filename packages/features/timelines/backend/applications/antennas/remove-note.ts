@@ -8,7 +8,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { apiError } from '@features/api/backend/transport/orpc-error.js';
 import { DI } from '@/di-symbols.js';
 import { FanoutTimelineService } from '../../services/FanoutTimelineService.js';
-import { antennasRemoveNoteInput, antennasRemoveNoteErrors } from '../../endpoints/antennas/remove-note.contract.js';
+import { type antennasRemoveNoteContract, antennasRemoveNoteErrors } from '../../endpoints/antennas/remove-note.contract.js';
 import type { AntennasRepository } from '@features/persistence/backend/repositories/models.js';
 
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
@@ -23,7 +23,7 @@ export class AntennasRemoveNoteApplicationService {
 		private fanoutTimelineService: FanoutTimelineService,
 	) {}
 
-	async execute(ps: v.InferOutput<typeof antennasRemoveNoteInput>, me: MiLocalUser) {
+	async execute(ps: v.InferOutput<NonNullable<typeof antennasRemoveNoteContract['~orpc']['inputSchema']>>, me: MiLocalUser) {
 		const antenna = await this.antennasRepository.findOneBy({
 			id: ps.antennaId,
 			userId: me.id,

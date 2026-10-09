@@ -10,15 +10,6 @@ import { commonErrors, apiErrorData } from '../../../../../../api/backend/transp
 import { packedChatRoomInvitationSchema } from '../../../../chat.schema.js';
 import { objectInput, misskeyId } from '../../../../request.schema.js';
 
-export const chatRoomsInvitationsOutboxInput = objectInput({
-	"roomId": misskeyId,
-	"limit": v.optional(v.pipe(v.pipe(v.pipe(v.number(), v.finite()), v.integer()), v.minValue(1), v.maxValue(100)), 30),
-	"sinceId": v.exactOptional(misskeyId),
-	"untilId": v.exactOptional(misskeyId),
-	"sinceDate": v.exactOptional(v.pipe(v.pipe(v.number(), v.finite()), v.integer())),
-	"untilDate": v.exactOptional(v.pipe(v.pipe(v.number(), v.finite()), v.integer())),
-});
-export const chatRoomsInvitationsOutboxOutput = v.array(packedChatRoomInvitationSchema);
 export const chatRoomsInvitationsOutboxErrors = {
 		noSuchRoom: {
 			message: 'No such room.',
@@ -28,7 +19,14 @@ export const chatRoomsInvitationsOutboxErrors = {
 	} as const;
 export const chatRoomsInvitationsOutboxPolicy = { name: 'chat/rooms/invitations/outbox', requireCredential: true, kind: 'read:chat' } as const;
 const security: OpenAPI.SecurityRequirementObject[] = [{ bearerAuth: [] }];
-export const chatRoomsInvitationsOutboxContract = oc.$meta<{ requestName: 'chat/rooms/invitations/outbox' }>({ requestName: 'chat/rooms/invitations/outbox' })
+export const chatRoomsInvitationsOutboxContract = oc.$meta({ requestName: 'chat/rooms/invitations/outbox' } as const)
 	.route({ method: 'POST', path: '/chat/rooms/invitations/outbox', operationId: 'post___chat___rooms___invitations___outbox', tags: ['chat'], spec: current => ({ ...current, security }) })
 	.errors({ ...commonErrors, NO_SUCH_ROOM: { status: 400, data: apiErrorData } })
-	.input(chatRoomsInvitationsOutboxInput).output(chatRoomsInvitationsOutboxOutput);
+	.input(objectInput({
+	"roomId": misskeyId,
+	"limit": v.optional(v.pipe(v.pipe(v.pipe(v.number(), v.finite()), v.integer()), v.minValue(1), v.maxValue(100)), 30),
+	"sinceId": v.exactOptional(misskeyId),
+	"untilId": v.exactOptional(misskeyId),
+	"sinceDate": v.exactOptional(v.pipe(v.pipe(v.number(), v.finite()), v.integer())),
+	"untilDate": v.exactOptional(v.pipe(v.pipe(v.number(), v.finite()), v.integer())),
+})).output(v.array(packedChatRoomInvitationSchema));

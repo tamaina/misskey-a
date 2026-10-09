@@ -10,30 +10,6 @@ import { packedNoteDraftSchema } from '../../../note-aux.schema.js';
 import { objectInput, misskeyId, jsonNumber, jsonString, uniqueStringArray, MAX_NOTE_TEXT_LENGTH } from '../../../request.schema.js';
 import type { OpenAPI } from '@orpc/contract';
 
-export const notesDraftsCreateInput = objectInput({
-	visibility: v.optional(v.picklist(['public', 'home', 'followers', 'specified']), 'public'),
-	visibleUserIds: v.exactOptional(uniqueStringArray(misskeyId)),
-	cw: v.exactOptional(v.nullable(jsonString({ minLength: 1, maxLength: 100 }))),
-	hashtag: v.exactOptional(v.nullable(jsonString({ maxLength: 200 }))),
-	localOnly: v.optional(v.boolean(), false),
-	reactionAcceptance: v.optional(v.pipe(v.nullable(v.picklist(['likeOnly', 'likeOnlyForRemote', 'nonSensitiveOnly', 'nonSensitiveOnlyForLocalLikeOnlyForRemote'])), v.metadata({ enum: [null, 'likeOnly', 'likeOnlyForRemote', 'nonSensitiveOnly', 'nonSensitiveOnlyForLocalLikeOnlyForRemote'] })), null),
-	replyId: v.exactOptional(v.nullable(misskeyId)),
-	renoteId: v.exactOptional(v.nullable(misskeyId)),
-	channelId: v.exactOptional(v.nullable(misskeyId)),
-	text: v.exactOptional(v.nullable(jsonString({ minLength: 0, maxLength: MAX_NOTE_TEXT_LENGTH }))),
-	fileIds: v.exactOptional(v.pipe(uniqueStringArray(misskeyId), v.minLength(0), v.maxLength(16))),
-	poll: v.exactOptional(v.nullable(objectInput({
-		choices: v.pipe(uniqueStringArray(jsonString({ minLength: 1, maxLength: 50 })), v.minLength(0), v.maxLength(10)),
-		multiple: v.exactOptional(v.boolean()),
-		expiresAt: v.exactOptional(v.nullable(v.pipe(jsonNumber, v.integer()))),
-		expiredAfter: v.exactOptional(v.nullable(v.pipe(jsonNumber, v.integer(), v.minValue(1)))),
-	}))),
-	scheduledAt: v.exactOptional(v.nullable(v.pipe(jsonNumber, v.integer()))),
-	isActuallyScheduled: v.optional(v.boolean(), false),
-});
-export const notesDraftsCreateOutput = v.strictObject({
-	createdDraft: packedNoteDraftSchema,
-});
 export const notesDraftsCreateErrors = {
 	noSuchRenoteTarget: {
 		message: 'No such renote target.',
@@ -154,7 +130,29 @@ export const notesDraftsCreatePolicy = { name: 'notes/drafts/create', requireCre
 	max: 300,
 } } as const;
 const security: OpenAPI.SecurityRequirementObject[] = [{ bearerAuth: [] }];
-export const notesDraftsCreateContract = oc.$meta<{ requestName: 'notes/drafts/create' }>({ requestName: 'notes/drafts/create' })
+export const notesDraftsCreateContract = oc.$meta({ requestName: 'notes/drafts/create' } as const)
 	.route({ method: 'POST', path: '/notes/drafts/create', operationId: 'post___notes___drafts___create', tags: ['notes', 'drafts'], spec: current => ({ ...current, security }) })
 	.errors({ ...commonErrors, NO_SUCH_RENOTE_TARGET: { status: 400, data: apiErrorData }, CANNOT_RENOTE_TO_A_PURE_RENOTE: { status: 400, data: apiErrorData }, CANNOT_RENOTE_DUE_TO_VISIBILITY: { status: 400, data: apiErrorData }, NO_SUCH_REPLY_TARGET: { status: 400, data: apiErrorData }, CANNOT_REPLY_TO_AN_INVISIBLE_NOTE: { status: 400, data: apiErrorData }, CANNOT_REPLY_TO_A_PURE_RENOTE: { status: 400, data: apiErrorData }, CANNOT_REPLY_TO_SPECIFIED_VISIBILITY_NOTE_WITH_EXTENDED_VISIBILITY: { status: 400, data: apiErrorData }, CANNOT_CREATE_ALREADY_EXPIRED_POLL: { status: 400, data: apiErrorData }, NO_SUCH_CHANNEL: { status: 400, data: apiErrorData }, YOU_HAVE_BEEN_BLOCKED: { status: 400, data: apiErrorData }, NO_SUCH_FILE: { status: 400, data: apiErrorData }, CANNOT_RENOTE_OUTSIDE_OF_CHANNEL: { status: 400, data: apiErrorData }, CONTAINS_PROHIBITED_WORDS: { status: 400, data: apiErrorData }, CONTAINS_TOO_MANY_MENTIONS: { status: 400, data: apiErrorData }, TOO_MANY_DRAFTS: { status: 400, data: apiErrorData }, TOO_MANY_SCHEDULED_NOTES: { status: 400, data: apiErrorData }, CANNOT_RENOTE_TO_EXTERNAL: { status: 400, data: apiErrorData }, SCHEDULED_AT_REQUIRED: { status: 400, data: apiErrorData }, SCHEDULED_AT_MUST_BE_IN_FUTURE: { status: 400, data: apiErrorData } })
-	.input(notesDraftsCreateInput).output(notesDraftsCreateOutput);
+	.input(objectInput({
+	visibility: v.optional(v.picklist(['public', 'home', 'followers', 'specified']), 'public'),
+	visibleUserIds: v.exactOptional(uniqueStringArray(misskeyId)),
+	cw: v.exactOptional(v.nullable(jsonString({ minLength: 1, maxLength: 100 }))),
+	hashtag: v.exactOptional(v.nullable(jsonString({ maxLength: 200 }))),
+	localOnly: v.optional(v.boolean(), false),
+	reactionAcceptance: v.optional(v.pipe(v.nullable(v.picklist(['likeOnly', 'likeOnlyForRemote', 'nonSensitiveOnly', 'nonSensitiveOnlyForLocalLikeOnlyForRemote'])), v.metadata({ enum: [null, 'likeOnly', 'likeOnlyForRemote', 'nonSensitiveOnly', 'nonSensitiveOnlyForLocalLikeOnlyForRemote'] })), null),
+	replyId: v.exactOptional(v.nullable(misskeyId)),
+	renoteId: v.exactOptional(v.nullable(misskeyId)),
+	channelId: v.exactOptional(v.nullable(misskeyId)),
+	text: v.exactOptional(v.nullable(jsonString({ minLength: 0, maxLength: MAX_NOTE_TEXT_LENGTH }))),
+	fileIds: v.exactOptional(v.pipe(uniqueStringArray(misskeyId), v.minLength(0), v.maxLength(16))),
+	poll: v.exactOptional(v.nullable(objectInput({
+		choices: v.pipe(uniqueStringArray(jsonString({ minLength: 1, maxLength: 50 })), v.minLength(0), v.maxLength(10)),
+		multiple: v.exactOptional(v.boolean()),
+		expiresAt: v.exactOptional(v.nullable(v.pipe(jsonNumber, v.integer()))),
+		expiredAfter: v.exactOptional(v.nullable(v.pipe(jsonNumber, v.integer(), v.minValue(1)))),
+	}))),
+	scheduledAt: v.exactOptional(v.nullable(v.pipe(jsonNumber, v.integer()))),
+	isActuallyScheduled: v.optional(v.boolean(), false),
+})).output(v.strictObject({
+	createdDraft: packedNoteDraftSchema,
+}));

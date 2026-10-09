@@ -12,7 +12,7 @@ import { apiError } from '@features/api/backend/transport/orpc-error.js';
 import { DI } from '@/di-symbols.js';
 import { AntennaEntityService } from '../../serializers/AntennaEntityService.js';
 
-import { antennasCreateInput, antennasCreateErrors } from '../../endpoints/antennas/create.contract.js';
+import { type antennasCreateContract, antennasCreateErrors } from '../../endpoints/antennas/create.contract.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 import type * as v from 'valibot';
 import type { UserListsRepository, AntennasRepository } from '@features/persistence/backend/repositories/models.js';
@@ -32,7 +32,7 @@ export class AntennasCreateApplicationService {
 		private globalEventService: GlobalEventService,
 	) {}
 
-	async execute(ps: v.InferOutput<typeof antennasCreateInput>, me: MiLocalUser) {
+	async execute(ps: v.InferOutput<NonNullable<typeof antennasCreateContract['~orpc']['inputSchema']>>, me: MiLocalUser) {
 		if (ps.keywords.flat().every(x => x === '') && ps.excludeKeywords.flat().every(x => x === '')) {
 			throw apiError(antennasCreateErrors.emptyKeyword);
 		}

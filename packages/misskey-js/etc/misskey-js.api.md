@@ -7,7 +7,6 @@
 import type { AnyContractProcedure } from '@orpc/contract';
 import { ArraySchema } from 'valibot';
 import type { AuthenticationResponseJSON } from '@simplewebauthn/browser';
-import { BlobSchema } from 'valibot';
 import { BooleanSchema } from 'valibot';
 import { CheckAction } from 'valibot';
 import { ContractProcedureBuilderWithInputOutput } from '@orpc/contract';
@@ -38,6 +37,7 @@ import { NullableSchema } from 'valibot';
 import { NullSchema } from 'valibot';
 import { NumberSchema } from 'valibot';
 import { ObjectSchema } from 'valibot';
+import { ObjectWithRestSchema } from 'valibot';
 import { OptionalSchema } from 'valibot';
 import { Options } from 'reconnecting-websocket';
 import { PicklistSchema } from 'valibot';

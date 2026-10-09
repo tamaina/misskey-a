@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import type { InferSchemaOutput } from '@orpc/contract';
 import { URLSearchParams } from 'node:url';
 import { implement } from '@orpc/server';
 import { Inject, Injectable } from '@nestjs/common';
@@ -16,7 +17,7 @@ import { authentication, apiPolicy, requirePrincipal } from '../../../../api/bac
 import { NoteEntityService } from '../../serializers/NoteEntityService.js';
 import { apiError } from '../../../../api/backend/transport/orpc-error.js';
 import { readErrorId } from '../../request.schema.js';
-import { notesTranslateContract, notesTranslatePolicy, notesTranslateInput, notesTranslateOutput, notesTranslateErrors } from './translate.contract.js';
+import { notesTranslateContract, notesTranslatePolicy, notesTranslateErrors } from './translate.contract.js';
 import type { NotesApiContext } from '../../operations.js';
 import type { MiLocalUser } from '../../../../users/backend/models/User.js';
 import type { ApiActor } from '../../../../api/backend/transport/context.js';
@@ -40,11 +41,11 @@ export class NotesTranslateOperation {
 		private httpRequestService: HttpRequestService,
 		private roleService: RoleService,
 	) {}
-	async execute(ps: v.InferOutput<typeof notesTranslateInput>, me: MiLocalUser): Promise<v.InferOutput<typeof notesTranslateOutput>> {
-		return v.parse(notesTranslateOutput, await this.run(ps, me));
+	async execute(ps: InferSchemaOutput<NonNullable<typeof notesTranslateContract['~orpc']['inputSchema']>>, me: MiLocalUser): Promise<InferSchemaOutput<NonNullable<typeof notesTranslateContract['~orpc']['outputSchema']>>> {
+		return v.parse(requiredSchema(notesTranslateContract['~orpc'].outputSchema), await this.run(ps, me));
 	}
 
-	private async run(ps: v.InferOutput<typeof notesTranslateInput>, me: MiLocalUser) {
+	private async run(ps: InferSchemaOutput<NonNullable<typeof notesTranslateContract['~orpc']['inputSchema']>>, me: MiLocalUser) {
 		const policies = await this.roleService.getUserPolicies(me.id);
 		if (!policies.canUseTranslator) {
 			throw apiError(notesTranslateErrors.unavailable);
@@ -104,4 +105,9 @@ export class NotesTranslateOperation {
 			text: json.translations[0].text,
 		};
 	}
+}
+
+function requiredSchema<Schema>(schema: Schema | undefined): Schema {
+	if (schema === undefined) throw new Error('Missing endpoint contract schema');
+	return schema;
 }

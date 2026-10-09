@@ -3,41 +3,69 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import type { OpenAPI } from '@orpc/contract';
 import { oc } from '@orpc/contract';
 import * as v from 'valibot';
 import { apiErrorData, commonErrors } from '../../api/backend/transport/errors.schema.js';
-import * as s from './api.schema.js';
-import type { OpenAPI } from '@orpc/contract';
+import { objectInput } from '../../api/backend/transport/input.schema.js';
+import { announcementOutput } from './api.schema.js';
+const date = v.pipe(v.string(), v.metadata({ format: 'date-time' }));
+const id = v.pipe(v.string(), v.regex(/^[a-zA-Z0-9]+$/));
+const nonempty = v.pipe(v.string(), v.minLength(1));
+const pagination = {
+	limit: v.optional(v.pipe(v.number(), v.integer(), v.minValue(1), v.maxValue(100)), 10),
+	sinceId: v.exactOptional(id), untilId: v.exactOptional(id),
+	sinceDate: v.exactOptional(v.pipe(v.number(), v.integer())),
+	untilDate: v.exactOptional(v.pipe(v.number(), v.integer())),
+};
+const icon = v.picklist(['info', 'warning', 'error', 'success']);
+const display = v.picklist(['normal', 'banner', 'dialog']);
 
 const publicSecurity: OpenAPI.SecurityRequirementObject[] = [{}, { bearerAuth: [] }];
 
 export const announcementsContract = {
-	create: oc.$meta<{ requestName: 'admin/announcements/create' }>({ requestName: 'admin/announcements/create' })
+	create: oc.$meta({ requestName: 'admin/announcements/create' } as const)
 		.route({ method: 'POST', path: '/admin/announcements/create', operationId: 'post___admin___announcements___create', tags: ['admin'], spec: current => ({ ...current, security: [{ bearerAuth: [] }] }) })
 		.errors({ ...commonErrors })
-		.input(s.announcementCreateInput).output(s.announcementOutput),
-	delete: oc.$meta<{ requestName: 'admin/announcements/delete' }>({ requestName: 'admin/announcements/delete' })
+		.input(objectInput({
+			title: nonempty, text: nonempty, imageUrl: v.nullable(v.string()),
+			icon: v.optional(icon, 'info'), display: v.optional(display, 'normal'),
+			forExistingUsers: v.optional(v.boolean(), false), silence: v.optional(v.boolean(), false),
+			needConfirmationToRead: v.optional(v.boolean(), false), userId: v.optional(v.nullable(id), null),
+		})).output(announcementOutput),
+	delete: oc.$meta({ requestName: 'admin/announcements/delete' } as const)
 		.route({ method: 'POST', path: '/admin/announcements/delete', operationId: 'post___admin___announcements___delete', tags: ['admin'], spec: current => ({ ...current, security: [{ bearerAuth: [] }] }), successStatus: 204 })
 		.errors({ ...commonErrors, NO_SUCH_ANNOUNCEMENT: { status: 400, data: apiErrorData } })
-		.input(s.announcementDeleteInput).output(v.void()),
-	adminList: oc.$meta<{ requestName: 'admin/announcements/list' }>({ requestName: 'admin/announcements/list' })
+		.input(objectInput({ id })).output(v.void()),
+	adminList: oc.$meta({ requestName: 'admin/announcements/list' } as const)
 		.route({ method: 'POST', path: '/admin/announcements/list', operationId: 'post___admin___announcements___list', tags: ['admin'], spec: current => ({ ...current, security: [{ bearerAuth: [] }] }) })
 		.errors({ ...commonErrors })
-		.input(s.announcementAdminListInput).output(v.array(s.announcementAdminOutput)),
-	update: oc.$meta<{ requestName: 'admin/announcements/update' }>({ requestName: 'admin/announcements/update' })
+		.input(objectInput({
+			...pagination, userId: v.exactOptional(v.nullable(id)), status: v.optional(v.picklist(['all', 'active', 'archived']), 'active'),
+		})).output(v.array(v.strictObject({
+	id: v.string(), createdAt: date, updatedAt: v.nullable(date), title: v.string(), text: v.string(),
+	imageUrl: v.nullable(v.string()), icon, display, isActive: v.boolean(), forExistingUsers: v.boolean(),
+	silence: v.boolean(), needConfirmationToRead: v.boolean(), userId: v.nullable(v.string()), reads: v.number(),
+}))),
+	update: oc.$meta({ requestName: 'admin/announcements/update' } as const)
 		.route({ method: 'POST', path: '/admin/announcements/update', operationId: 'post___admin___announcements___update', tags: ['admin'], spec: current => ({ ...current, security: [{ bearerAuth: [] }] }), successStatus: 204 })
 		.errors({ ...commonErrors, NO_SUCH_ANNOUNCEMENT: { status: 400, data: apiErrorData } })
-		.input(s.announcementUpdateInput).output(v.void()),
-	list: oc.$meta<{ requestName: 'announcements' }>({ requestName: 'announcements' })
+		.input(objectInput({
+			id, title: v.exactOptional(nonempty), text: v.exactOptional(nonempty),
+			imageUrl: v.exactOptional(v.nullable(v.string())), icon: v.exactOptional(icon), display: v.exactOptional(display),
+			forExistingUsers: v.exactOptional(v.boolean()), silence: v.exactOptional(v.boolean()),
+			needConfirmationToRead: v.exactOptional(v.boolean()), isActive: v.exactOptional(v.boolean()),
+		})).output(v.void()),
+	list: oc.$meta({ requestName: 'announcements' } as const)
 		.route({ method: 'POST', path: '/announcements', operationId: 'post___announcements', tags: ['meta'], spec: current => ({ ...current, security: publicSecurity }) })
 		.errors({ ...commonErrors })
-		.input(s.announcementListInput).output(v.array(s.announcementOutput)),
-	show: oc.$meta<{ requestName: 'announcements/show' }>({ requestName: 'announcements/show' })
+		.input(objectInput({ ...pagination, isActive: v.optional(v.boolean(), true) })).output(v.array(announcementOutput)),
+	show: oc.$meta({ requestName: 'announcements/show' } as const)
 		.route({ method: 'POST', path: '/announcements/show', operationId: 'post___announcements___show', tags: ['meta'], spec: current => ({ ...current, security: publicSecurity }) })
 		.errors({ ...commonErrors, NO_SUCH_ANNOUNCEMENT: { status: 400, data: apiErrorData } })
-		.input(s.announcementReadInput).output(s.announcementOutput),
-	read: oc.$meta<{ requestName: 'i/read-announcement' }>({ requestName: 'i/read-announcement' })
+		.input(objectInput({ announcementId: id })).output(announcementOutput),
+	read: oc.$meta({ requestName: 'i/read-announcement' } as const)
 		.route({ method: 'POST', path: '/i/read-announcement', operationId: 'post___i___read-announcement', tags: ['account'], spec: current => ({ ...current, security: [{ bearerAuth: [] }] }), successStatus: 204 })
 		.errors({ ...commonErrors })
-		.input(s.announcementReadInput).output(v.void()),
+		.input(objectInput({ announcementId: id })).output(v.void()),
 };

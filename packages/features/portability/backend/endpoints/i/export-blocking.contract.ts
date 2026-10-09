@@ -8,8 +8,9 @@ import * as v from 'valibot';
 import { commonErrors } from '../../../../api/backend/transport/errors.schema.js';
 import { objectInput } from '../../../../api/backend/transport/input.schema.js';
 
-export const iExportBlockingInput = v.optional(objectInput({}), {});
 export const iExportBlockingErrors = {} as const;
-export const iExportBlockingContract = oc.$meta<{ requestName: 'i/export-blocking' }>({ requestName: 'i/export-blocking' })
+export const iExportBlockingContract = oc.$meta({ requestName: 'i/export-blocking' } as const)
 	.route({ method: 'POST', path: '/i/export-blocking', operationId: 'post___i___export-blocking', successStatus: 204, spec: current => ({ ...current, security: [{ bearerAuth: [] }] }) })
-	.errors({ ...commonErrors }).input(iExportBlockingInput).output(v.void());
+	.errors({ ...commonErrors }).input(v.optional(objectInput({}), {})).output(v.void());
+
+export type IExportBlockingInput = v.InferOutput<NonNullable<typeof iExportBlockingContract['~orpc']['inputSchema']>>;

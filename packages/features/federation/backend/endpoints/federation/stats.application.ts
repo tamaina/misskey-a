@@ -11,7 +11,8 @@ import { InstanceEntityService } from '../../../../instance/backend/serializers/
 import { DI } from '@/di-symbols.js';
 import type { MiUser } from '../../../../users/backend/models/User.js';
 import * as v from 'valibot';
-import { federationStatsInput, federationStatsOutput } from './stats.contract.js';
+import type { FederationStatsInput, FederationStatsOutput } from './stats.contract.js';
+import { federationStatsContract } from './stats.contract.js';
 
 @Injectable()
 export class FederationStatsApplicationService {
@@ -25,7 +26,7 @@ export class FederationStatsApplicationService {
 		private instanceEntityService: InstanceEntityService,
 	) {}
 
-	public async execute(ps: v.InferOutput<typeof federationStatsInput>, me: MiUser | null): Promise<v.InferOutput<typeof federationStatsOutput>> {
+	public async execute(ps: FederationStatsInput, me: MiUser | null): Promise<FederationStatsOutput> {
 		const result = await (async () => {
 			const [topSubInstances, topPubInstances, allSubCount, allPubCount] = await Promise.all([
 				this.getTopInstances('followeeHost', 'followersCount', ps.limit),
@@ -66,7 +67,7 @@ export class FederationStatsApplicationService {
 				otherFollowingCount: Math.max(0, allPubCount - gotPubCount),
 			});
 		})();
-		return v.parse(federationStatsOutput, result);
+		return v.parse(federationStatsContract['~orpc'].outputSchema!, result);
 	}
 
 	private async getTopInstances(hostColumn: 'followeeHost' | 'followerHost', countColumn: 'followersCount' | 'followingCount', limit: number) {

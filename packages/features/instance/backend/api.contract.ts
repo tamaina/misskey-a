@@ -3,22 +3,21 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { adCreateContract, adCreateInput } from './endpoints/admin/ad/create.contract.js';
-import { adDeleteContract, adDeleteInput } from './endpoints/admin/ad/delete.contract.js';
-import { adListContract, adListInput } from './endpoints/admin/ad/list.contract.js';
-import { adUpdateContract, adUpdateInput } from './endpoints/admin/ad/update.contract.js';
-import { adminMetaContract, adminMetaInput } from './endpoints/admin/meta.contract.js';
-import { adminServerInfoContract, adminServerInfoInput } from './endpoints/admin/server-info.contract.js';
-import { updateMetaContract, updateMetaInput } from './endpoints/admin/update-meta.contract.js';
-import { endpointContract, endpointInput } from './endpoints/endpoint.contract.js';
-import { endpointsContract, endpointsInput } from './endpoints/endpoints.contract.js';
-import { onlineUsersCountContract, onlineUsersCountGetContract, onlineUsersCountInput } from './endpoints/get-online-users-count.contract.js';
-import { metaContract, metaInput } from './endpoints/meta.contract.js';
-import { pingContract, pingInput } from './endpoints/ping.contract.js';
-import { pinnedUsersContract, pinnedUsersInput } from './endpoints/pinned-users.contract.js';
+import { adCreateContract } from './endpoints/admin/ad/create.contract.js';
+import { adDeleteContract } from './endpoints/admin/ad/delete.contract.js';
+import { adListContract } from './endpoints/admin/ad/list.contract.js';
+import { adUpdateContract } from './endpoints/admin/ad/update.contract.js';
+import { adminMetaContract } from './endpoints/admin/meta.contract.js';
+import { adminServerInfoContract } from './endpoints/admin/server-info.contract.js';
+import { updateMetaContract } from './endpoints/admin/update-meta.contract.js';
+import { endpointContract } from './endpoints/endpoint.contract.js';
+import { endpointsContract } from './endpoints/endpoints.contract.js';
+import { onlineUsersCountContract, onlineUsersCountGetContract } from './endpoints/get-online-users-count.contract.js';
+import { metaContract } from './endpoints/meta.contract.js';
+import { pingContract } from './endpoints/ping.contract.js';
+import { pinnedUsersContract } from './endpoints/pinned-users.contract.js';
 import { instancePilotContract } from './endpoints/server-info.contract.js';
-import type { InferContractRouterInputs, InferContractRouterOutputs } from '@orpc/contract';
-import type * as v from 'valibot';
+import type { InferContractRouterInputs, InferContractRouterOutputs, InferSchemaOutput } from '@orpc/contract';
 
 export const instanceApiContract = {
 	...instancePilotContract,
@@ -42,18 +41,5 @@ export type InstanceApiInputs = InferContractRouterInputs<typeof instanceApiCont
 export type InstanceApiOutputs = InferContractRouterOutputs<typeof instanceApiContract>;
 
 export type InstanceApiParameters = {
-	adCreate: v.InferOutput<typeof adCreateInput>;
-	adDelete: v.InferOutput<typeof adDeleteInput>;
-	adList: v.InferOutput<typeof adListInput>;
-	adUpdate: v.InferOutput<typeof adUpdateInput>;
-	adminMeta: v.InferOutput<typeof adminMetaInput>;
-	adminServerInfo: v.InferOutput<typeof adminServerInfoInput>;
-	updateMeta: v.InferOutput<typeof updateMetaInput>;
-	endpoint: v.InferOutput<typeof endpointInput>;
-	endpoints: v.InferOutput<typeof endpointsInput>;
-	onlineUsersCount: v.InferOutput<typeof onlineUsersCountInput>;
-	onlineUsersCountGet: v.InferOutput<typeof onlineUsersCountInput>;
-	meta: v.InferOutput<typeof metaInput>;
-	ping: v.InferOutput<typeof pingInput>;
-	pinnedUsers: v.InferOutput<typeof pinnedUsersInput>;
+	[Name in keyof typeof instanceApiContract]: InferSchemaOutput<NonNullable<(typeof instanceApiContract)[Name]['~orpc']['inputSchema']>>;
 };

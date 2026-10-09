@@ -8,14 +8,15 @@ import * as v from 'valibot';
 import { objectInput } from '../../../../../api/backend/transport/input.schema.js';
 import { commonErrors } from '../../../../../api/backend/transport/errors.schema.js';
 
-export const adminFederationDeleteAllFilesInput = objectInput({
-	"host": v.string(),
-});
-export const adminFederationDeleteAllFilesOutput = v.void();
 export const adminFederationDeleteAllFilesErrors = {} as const;
 
 const requestName = 'admin/federation/delete-all-files';
-export const adminFederationDeleteAllFilesContract = oc.$meta<{ requestName: typeof requestName }>({ requestName })
+export const adminFederationDeleteAllFilesContract = oc.$meta({ requestName: requestName } as const)
 	.route({ method: 'POST', path: `/${requestName}`, operationId: 'post___' + requestName.replaceAll('/', '___'), tags: ['admin'], spec: current => ({ ...current, security: [{ bearerAuth: [] }] }) })
 	.errors({ ...commonErrors })
-	.input(adminFederationDeleteAllFilesInput).output(adminFederationDeleteAllFilesOutput);
+	.input(objectInput({
+		"host": v.string(),
+	})).output(v.void());
+
+export type AdminFederationDeleteAllFilesInput = v.InferOutput<NonNullable<typeof adminFederationDeleteAllFilesContract['~orpc']['inputSchema']>>;
+export type AdminFederationDeleteAllFilesOutput = v.InferOutput<NonNullable<typeof adminFederationDeleteAllFilesContract['~orpc']['outputSchema']>>;

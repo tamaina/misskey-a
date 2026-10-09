@@ -9,22 +9,24 @@ import { objectInput } from '../../../api/backend/transport/input.schema.js';
 import { commonErrors } from '../../../api/backend/transport/errors.schema.js';
 
 const finiteNumber = v.pipe(v.number(), v.finite());
-export const retentionInput = v.optional(objectInput({}), {});
-export const retentionOutput = v.array(v.strictObject({
-	createdAt: v.pipe(v.string(), v.metadata({ format: 'date-time' })),
-	users: finiteNumber,
-	data: v.record(v.string(), finiteNumber),
-}));
 
 const requestName = 'retention';
-export const retentionContract = oc.$meta<{ requestName: typeof requestName; allowGet: true; cacheSec: number }>({ requestName, allowGet: true, cacheSec: 3600 })
+export const retentionContract = oc.$meta({ requestName: requestName, allowGet: true, cacheSec: 3600 } as const)
 	.route({ method: 'POST', path: `/${requestName}`, operationId: 'post___' + requestName, tags: ['users'] })
 	.errors(commonErrors)
-	.input(retentionInput)
-	.output(retentionOutput);
+	.input(v.optional(objectInput({}), {}))
+	.output(v.array(v.strictObject({
+		createdAt: v.pipe(v.string(), v.metadata({ format: 'date-time' })),
+		users: finiteNumber,
+		data: v.record(v.string(), finiteNumber),
+	})));
 
-export const retentionGetContract = oc.$meta<{ allowGet: true; cacheSec: number }>({ allowGet: true, cacheSec: 3600 })
+export const retentionGetContract = oc.$meta({ allowGet: true, cacheSec: 3600 } as const)
 	.route({ method: 'GET', path: `/${requestName}`, operationId: 'get___' + requestName.replaceAll('/', '___'), tags: ['users'] })
 	.errors(commonErrors)
-	.input(retentionInput)
-	.output(retentionOutput);
+	.input(v.optional(objectInput({}), {}))
+	.output(v.array(v.strictObject({
+		createdAt: v.pipe(v.string(), v.metadata({ format: 'date-time' })),
+		users: finiteNumber,
+		data: v.record(v.string(), finiteNumber),
+	})));

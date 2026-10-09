@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import type { InferSchemaOutput } from '@orpc/contract';
 import { implement } from '@orpc/server';
 import { Injectable } from '@nestjs/common';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
@@ -12,7 +13,7 @@ import { authentication, apiPolicy, requirePrincipal } from '../../../../api/bac
 import { apiError } from '../../../../api/backend/transport/orpc-error.js';
 import { readErrorId } from '../../request.schema.js';
 import { toPackedUserDetailed } from '../../../../users/backend/user.schema.js';
-import { iUnpinContract, iUnpinPolicy, iUnpinInput, iUnpinOutput, iUnpinErrors } from './unpin.contract.js';
+import { iUnpinContract, iUnpinPolicy, iUnpinErrors } from './unpin.contract.js';
 import type { MiLocalUser } from '../../../../users/backend/models/User.js';
 import type { NotesApiContext } from '../../operations.js';
 import type { ApiActor } from '../../../../api/backend/transport/context.js';
@@ -31,11 +32,11 @@ export class IUnpinOperation {
 		private userEntityService: UserEntityService,
 		private notePiningService: NotePiningService,
 	) {}
-	async execute(ps: v.InferOutput<typeof iUnpinInput>, me: MiLocalUser): Promise<v.InferOutput<typeof iUnpinOutput>> {
-		return v.parse(iUnpinOutput, toPackedUserDetailed(await this.run(ps, me)));
+	async execute(ps: InferSchemaOutput<NonNullable<typeof iUnpinContract['~orpc']['inputSchema']>>, me: MiLocalUser): Promise<InferSchemaOutput<NonNullable<typeof iUnpinContract['~orpc']['outputSchema']>>> {
+		return v.parse(requiredSchema(iUnpinContract['~orpc'].outputSchema), toPackedUserDetailed(await this.run(ps, me)));
 	}
 
-	private async run(ps: v.InferOutput<typeof iUnpinInput>, me: MiLocalUser) {
+	private async run(ps: InferSchemaOutput<NonNullable<typeof iUnpinContract['~orpc']['inputSchema']>>, me: MiLocalUser) {
 		await this.notePiningService.removePinned(me, ps.noteId).catch((err: unknown) => {
 			if (readErrorId(err) === 'b302d4cf-c050-400a-bbb3-be208681f40c') throw apiError(iUnpinErrors.noSuchNote);
 			throw err;
@@ -43,4 +44,9 @@ export class IUnpinOperation {
 
 		return await this.userEntityService.packSelf(me.id);
 	}
+}
+
+function requiredSchema<Schema>(schema: Schema | undefined): Schema {
+	if (schema === undefined) throw new Error('Missing endpoint contract schema');
+	return schema;
 }

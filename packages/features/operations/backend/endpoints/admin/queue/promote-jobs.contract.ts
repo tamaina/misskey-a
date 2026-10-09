@@ -9,12 +9,13 @@ import { objectInput } from '../../../../../api/backend/transport/input.schema.j
 import { commonErrors } from '../../../../../api/backend/transport/errors.schema.js';
 import { QUEUE_TYPES } from '../../../queue.schema.js';
 
-export const adminQueuePromoteJobsInput = objectInput({ queue: v.picklist(QUEUE_TYPES) });
-export const adminQueuePromoteJobsOutput = v.void();
 export const adminQueuePromoteJobsErrors = {} as const;
 
 const requestName = 'admin/queue/promote-jobs';
-export const adminQueuePromoteJobsContract = oc.$meta<{ requestName: typeof requestName }>({ requestName })
+export const adminQueuePromoteJobsContract = oc.$meta({ requestName: requestName } as const)
 	.route({ method: 'POST', path: `/${requestName}`, operationId: 'post___' + requestName.replaceAll('/', '___'), tags: ['admin'], spec: current => ({ ...current, security: [{ bearerAuth: [] }] }) })
 	.errors({ ...commonErrors })
-	.input(adminQueuePromoteJobsInput).output(adminQueuePromoteJobsOutput);
+	.input(objectInput({ queue: v.picklist(QUEUE_TYPES) })).output(v.void());
+
+export type AdminQueuePromoteJobsInput = v.InferOutput<NonNullable<typeof adminQueuePromoteJobsContract['~orpc']['inputSchema']>>;
+export type AdminQueuePromoteJobsOutput = v.InferOutput<NonNullable<typeof adminQueuePromoteJobsContract['~orpc']['outputSchema']>>;

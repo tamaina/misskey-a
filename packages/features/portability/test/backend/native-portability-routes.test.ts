@@ -8,9 +8,9 @@ import * as v from 'valibot';
 import { mockDeep } from 'vitest-mock-extended';
 import { createProcedureClient } from '@orpc/server';
 import { createPortabilityOperations, type PortabilityDependencies } from '../../backend/operations.js';
-import { iExportFollowingInput } from '../../backend/endpoints/i/export-following.contract.js';
-import { iImportAntennasInput } from '../../backend/endpoints/i/import-antennas.contract.js';
-import { iImportFollowingInput } from '../../backend/endpoints/i/import-following.contract.js';
+import { iExportFollowingContract } from '../../backend/endpoints/i/export-following.contract.js';
+import { iImportAntennasContract } from '../../backend/endpoints/i/import-antennas.contract.js';
+import { iImportFollowingContract } from '../../backend/endpoints/i/import-following.contract.js';
 import { createIImportFollowingProcedure } from '../../backend/endpoints/i/import-following.js';
 import { importedAntennaSchema, parseAntennaArtifact } from '../../backend/antenna-artifact.schema.js';
 import type { ApiActor, ApiServices } from '@features/api/backend/transport/context.js';
@@ -31,14 +31,16 @@ function fixture() {
 
 test('native export preserves defaults and accepts the queue without awaiting completion', async () => {
 	const { dependencies, operations } = fixture();
-	expect(await operations['i/export-following'](v.parse(iExportFollowingInput, {}), actor)).toBeUndefined();
+	expect(await operations['i/export-following'](v.parse(iExportFollowingContract['~orpc'].inputSchema!, {}), actor)).toBeUndefined();
 	expect(dependencies.createExportFollowingJob).toHaveBeenCalledWith({ id: 'owner1' }, false, false);
 });
 
 test('antenna JSON queues before domain validation and retains reserved JSON business keys', async () => {
 	const { dependencies, operations } = fixture();
 	dependencies.downloadTextFile.mockResolvedValue('[{"id":"unvalidated","__proto__":{"retained":true}}]');
-	await operations['i/import-antennas'](v.parse(iImportAntennasInput, { fileId: 'file1' }), actor);
+	const schema = iImportAntennasContract['~orpc'].inputSchema;
+	if (schema === undefined) throw new Error('Missing native import-antennas input schema');
+	await operations['i/import-antennas'](v.parse(schema, { fileId: 'file1' }), actor);
 	const artifact = parseAntennaArtifact('[{"id":"unvalidated","__proto__":{"retained":true}}]');
 	expect(dependencies.createImportAntennasJob).toHaveBeenCalledWith(actor, artifact);
 	expect(v.safeParse(importedAntennaSchema, { id: 'unvalidated' }).success).toBe(false);
@@ -47,7 +49,7 @@ test('antenna JSON queues before domain validation and retains reserved JSON bus
 test('import limits retain normal 64KiB and account-move 32MiB boundaries', async () => {
 	const { dependencies, operations } = fixture();
 	dependencies.findOwnedFile.mockResolvedValue({ id: 'file1', size: 65537, url: 'https://example.test/file' });
-	const input = v.parse(iImportFollowingInput, { fileId: 'file1' });
+	const input = v.parse(iImportFollowingContract['~orpc'].inputSchema!, { fileId: 'file1' });
 	await expect(operations['i/import-following'](input, actor)).rejects.toMatchObject({ code: 'TOO_BIG_FILE', data: { id: 'dee9d4ed-ad07-43ed-8b34-b2856398bc60' } });
 	expect(dependencies.createImportFollowingJob).not.toHaveBeenCalled();
 	dependencies.isMovingDuringGracePeriod.mockResolvedValue(true);

@@ -10,12 +10,10 @@ import { commonErrors } from '../../../../api/backend/transport/errors.schema.js
 import { packedChannelSchema } from '../../channel.schema.js';
 import { objectInput } from '../../request.schema.js';
 
-export const channelsFeaturedInput = objectInput({});
-export const channelsFeaturedOutput = v.array(packedChannelSchema);
 export const channelsFeaturedErrors = {} as const;
 export const channelsFeaturedPolicy = { name: 'channels/featured', requireCredential: false } as const;
 const security: OpenAPI.SecurityRequirementObject[] = [{}, { bearerAuth: [] }];
-export const channelsFeaturedContract = oc.$meta<{ requestName: 'channels/featured' }>({ requestName: 'channels/featured' })
+export const channelsFeaturedContract = oc.$meta({ requestName: 'channels/featured' } as const)
 	.route({ method: 'POST', path: '/channels/featured', operationId: 'post___channels___featured', tags: ['channels'], spec: current => ({ ...current, security }) })
 	.errors({ ...commonErrors })
-	.input(channelsFeaturedInput).output(channelsFeaturedOutput);
+	.input(objectInput({})).output(v.array(packedChannelSchema));

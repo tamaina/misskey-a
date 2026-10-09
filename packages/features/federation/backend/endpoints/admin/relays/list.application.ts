@@ -7,7 +7,8 @@ import { Injectable } from '@nestjs/common';
 import { RelayService } from '../../../services/RelayService.js';
 import type { MiUser } from '../../../../../users/backend/models/User.js';
 import * as v from 'valibot';
-import { adminRelaysListInput, adminRelaysListOutput } from './list.contract.js';
+import type { AdminRelaysListInput, AdminRelaysListOutput } from './list.contract.js';
+import { adminRelaysListContract } from './list.contract.js';
 
 @Injectable()
 export class AdminRelaysListApplicationService {
@@ -15,10 +16,10 @@ export class AdminRelaysListApplicationService {
 		private relayService: RelayService,
 	) {}
 
-	public async execute(_ps: v.InferOutput<typeof adminRelaysListInput>, _me: MiUser): Promise<v.InferOutput<typeof adminRelaysListOutput>> {
+	public async execute(_ps: AdminRelaysListInput, _me: MiUser): Promise<AdminRelaysListOutput> {
 		const result = await (async () => {
 			return await this.relayService.listRelay();
 		})();
-		return v.parse(adminRelaysListOutput, result);
+		return v.parse(adminRelaysListContract['~orpc'].outputSchema!, result);
 	}
 }

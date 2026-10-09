@@ -10,12 +10,11 @@ import { objectInput } from '../../../../../api/backend/transport/input.schema.j
 
 import { misskeyId, uniqueStrings } from '../../../../../users/backend/users.input.schema.js';
 
-export const driveFilesMoveBulkInput = objectInput({
-	"fileIds": v.pipe(uniqueStrings(misskeyId), v.minLength(1), v.maxLength(100)),
-	"folderId": v.exactOptional(v.nullable(misskeyId)),
-});
 export const driveFilesMoveBulkErrors = {
 	} as const;
-export const driveFilesMoveBulkContract = oc.$meta<{ requestName: 'drive/files/move-bulk' }>({ requestName: 'drive/files/move-bulk' })
+export const driveFilesMoveBulkContract = oc.$meta({ requestName: 'drive/files/move-bulk' } as const)
 	.route({ method: 'POST', path: '/drive/files/move-bulk', operationId: 'post___drive___files___move-bulk', tags: ['drive'], spec: current => ({ ...current, security: [{ bearerAuth: [] }] }), successStatus: 204 })
-	.errors({ ...commonErrors }).input(driveFilesMoveBulkInput).output(v.void());
+	.errors({ ...commonErrors }).input(objectInput({
+		"fileIds": v.pipe(uniqueStrings(misskeyId), v.minLength(1), v.maxLength(100)),
+		"folderId": v.exactOptional(v.nullable(misskeyId)),
+	})).output(v.void());

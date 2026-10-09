@@ -8,10 +8,24 @@ import { mockDeep } from 'vitest-mock-extended';
 import { call } from '@orpc/server';
 import * as v from 'valibot';
 import { createRelationshipsRouter, type RelationshipsContext, type RelationshipsOperations } from '../../backend/endpoints/relationships.js';
-import { relationshipsContract, packedBlockingListInput, allOfUsersFollowersInput, unionUsersRelationInput } from '../../backend/endpoints/relationships.contract.js';
-import { birthdaySelectorSchema, readBirthdayDate } from '../../backend/endpoints/birthday.schema.js';
+import { relationshipsContract } from '../../backend/endpoints/relationships.contract.js';
+import { readBirthdayDate } from '../../backend/endpoints/birthday.schema.js';
 import { packedUserRelationSchema } from '../../backend/endpoints/relationships.schema.js';
 import type { ApiActor, ApiServices } from '../../../api/backend/transport/context.js';
+
+function requiredSchema<S extends v.GenericSchema>(schema: S | undefined): S {
+	if (schema === undefined) throw new Error('Missing native schema');
+	return schema;
+}
+
+const packedBlockingListInput = requiredSchema(relationshipsContract['blocking/list']['~orpc'].inputSchema);
+const allOfUsersFollowersInput = requiredSchema(relationshipsContract['users/followers']['~orpc'].inputSchema);
+const unionUsersRelationInput = requiredSchema(relationshipsContract['users/relation']['~orpc'].inputSchema);
+const birthdayInput = requiredSchema(relationshipsContract['users/get-following-users-by-birthday']['~orpc'].inputSchema);
+
+function parseBirthday(value: unknown) { return v.parse(birthdayInput, { birthday: value }).birthday; }
+
+function validBirthday(value: unknown) { return v.safeParse(birthdayInput, { birthday: value }).success; }
 
 const actor: ApiActor = { id: 'actor123', isSuspended: false, movedToUri: null };
 
@@ -63,10 +77,10 @@ test('public list lookups accept anonymous viewers and closed outputs reject dri
 });
 
 test('birthday remains exclusive while inactive JSON range keys retain consumer failure behavior', () => {
-	expect(v.parse(birthdaySelectorSchema, { month: 1, day: 2 })).toEqual({ month: 1, day: 2 });
-	expect(v.parse(birthdaySelectorSchema, { begin: { month: 12, day: 31 }, end: { month: 1, day: 1 } })).toEqual({ begin: { month: 12, day: 31 }, end: { month: 1, day: 1 } });
-	expect(v.safeParse(birthdaySelectorSchema, { month: 1, day: 2, begin: { month: 2, day: 3 }, end: { month: 4, day: 5 } }).success).toBe(false);
-	const inactive = v.parse(birthdaySelectorSchema, { month: 1, day: 2, begin: 'malformed', end: null });
+	expect(parseBirthday({ month: 1, day: 2 })).toEqual({ month: 1, day: 2 });
+	expect(parseBirthday({ begin: { month: 12, day: 31 }, end: { month: 1, day: 1 } })).toEqual({ begin: { month: 12, day: 31 }, end: { month: 1, day: 1 } });
+	expect(validBirthday({ month: 1, day: 2, begin: { month: 2, day: 3 }, end: { month: 4, day: 5 } })).toBe(false);
+	const inactive = parseBirthday({ month: 1, day: 2, begin: 'malformed', end: null });
 	expect(inactive).toEqual({ month: 1, day: 2, begin: 'malformed', end: null });
 	if ('begin' in inactive) expect(() => readBirthdayDate(inactive.begin)).toThrow(TypeError);
 });

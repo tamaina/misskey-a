@@ -9,7 +9,7 @@ import { apiError } from '../../../../../api/backend/transport/orpc-error.js';
 import { SystemWebhookService } from '../../../services/SystemWebhookService.js';
 import type { MiUser } from '../../../../../users/backend/models/User.js';
 import * as v from 'valibot';
-import { adminSystemWebhookShowInput, adminSystemWebhookShowOutput, adminSystemWebhookShowErrors } from './show.contract.js';
+import { adminSystemWebhookShowErrors, adminSystemWebhookShowContract } from './show.contract.js';
 
 @Injectable()
 export class AdminSystemWebhookShowApplicationService {
@@ -18,7 +18,7 @@ export class AdminSystemWebhookShowApplicationService {
 		private systemWebhookEntityService: SystemWebhookEntityService,
 	) {}
 
-	public async execute(ps: v.InferOutput<typeof adminSystemWebhookShowInput>, _me: MiUser): Promise<v.InferOutput<typeof adminSystemWebhookShowOutput>> {
+	public async execute(ps: v.InferOutput<NonNullable<typeof adminSystemWebhookShowContract['~orpc']['inputSchema']>>, _me: MiUser): Promise<v.InferOutput<NonNullable<typeof adminSystemWebhookShowContract['~orpc']['outputSchema']>>> {
 		const result = await (async () => {
 			const webhooks = await this.systemWebhookService.fetchSystemWebhooks({ ids: [ps.id] });
 			if (webhooks.length === 0) {
@@ -27,6 +27,11 @@ export class AdminSystemWebhookShowApplicationService {
 
 			return this.systemWebhookEntityService.pack(webhooks[0]);
 		})();
-		return v.parse(adminSystemWebhookShowOutput, result);
+		return v.parse(requiredSchema(adminSystemWebhookShowContract['~orpc'].outputSchema), result);
 	}
+}
+
+function requiredSchema<Schema>(schema: Schema | undefined): Schema {
+	if (schema === undefined) throw new Error('Contract must declare its schema');
+	return schema;
 }

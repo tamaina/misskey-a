@@ -9,8 +9,6 @@ import * as v from 'valibot';
 import { commonErrors, apiErrorData } from '../../../../api/backend/transport/errors.schema.js';
 import { objectInput, misskeyId } from '../../request.schema.js';
 
-export const channelsUnfavoriteInput = objectInput({ channelId: misskeyId });
-export const channelsUnfavoriteOutput = v.void();
 export const channelsUnfavoriteErrors = {
 		noSuchChannel: {
 			message: 'No such channel.',
@@ -20,7 +18,7 @@ export const channelsUnfavoriteErrors = {
 	} as const;
 export const channelsUnfavoritePolicy = { name: 'channels/unfavorite', requireCredential: true, prohibitMoved: true, kind: 'write:channels' } as const;
 const security: OpenAPI.SecurityRequirementObject[] = [{ bearerAuth: [] }];
-export const channelsUnfavoriteContract = oc.$meta<{ requestName: 'channels/unfavorite' }>({ requestName: 'channels/unfavorite' })
+export const channelsUnfavoriteContract = oc.$meta({ requestName: 'channels/unfavorite' } as const)
 	.route({ method: 'POST', path: '/channels/unfavorite', operationId: 'post___channels___unfavorite', tags: ['channels'], spec: current => ({ ...current, security }), successStatus: 204 })
 	.errors({ ...commonErrors, NO_SUCH_CHANNEL: { status: 400, data: apiErrorData } })
-	.input(channelsUnfavoriteInput).output(channelsUnfavoriteOutput);
+	.input(objectInput({ channelId: misskeyId })).output(v.void());

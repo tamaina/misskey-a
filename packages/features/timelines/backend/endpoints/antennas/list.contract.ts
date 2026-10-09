@@ -9,12 +9,9 @@ import { commonErrors } from '../../../../api/backend/transport/errors.schema.js
 import { objectInput } from '../../../../api/backend/transport/input.schema.js';
 import { packedAntennaSchema } from '../../antenna.schema.js';
 
-export const antennasListInput = objectInput({});
-export const antennasListOutput = v.array(packedAntennaSchema);
-
 const requestName = 'antennas/list';
-export const antennasListContract = oc.$meta<{ requestName: typeof requestName }>({ requestName })
+export const antennasListContract = oc.$meta({ requestName: requestName } as const)
 	.route({ method: 'POST', path: `/${requestName}`, operationId: 'post___' + requestName.replaceAll('/', '___'), tags: ['antennas', 'account'], spec: current => ({ ...current, security: [{ bearerAuth: [] }] }) })
 	.errors(commonErrors)
-	.input(antennasListInput)
-	.output(antennasListOutput);
+	.input(objectInput({}))
+	.output(v.array(packedAntennaSchema));

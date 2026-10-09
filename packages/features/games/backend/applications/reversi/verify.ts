@@ -10,8 +10,8 @@ import { ReversiGameEntityService } from '../../serializers/ReversiGameEntitySer
 import { apiError } from '@features/api/backend/transport/orpc-error.js';
 
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
-import type * as v from 'valibot';
-import { reversiVerifyInput, reversiVerifyErrors } from '../../endpoints/reversi/verify.contract.js';
+import type { InferSchemaOutput } from '@orpc/contract';
+import { type reversiVerifyContract, reversiVerifyErrors } from '../../endpoints/reversi/verify.contract.js';
 
 @Injectable()
 export class ReversiVerifyApplicationService {
@@ -20,7 +20,7 @@ export class ReversiVerifyApplicationService {
 		private reversiGameEntityService: ReversiGameEntityService,
 	) {}
 
-	async execute(ps: v.InferOutput<typeof reversiVerifyInput>, me: MiLocalUser | null) {
+	async execute(ps: InferSchemaOutput<NonNullable<(typeof reversiVerifyContract)['~orpc']['inputSchema']>>, me: MiLocalUser | null) {
 		const game = await this.reversiService.checkCrc(ps.gameId, ps.crc32);
 		if (game) {
 			return {

@@ -3,32 +3,32 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import type * as v from 'valibot';
+import type { InferSchemaOutput } from '@orpc/contract';
 import type { ApiActor, ApiContext } from '../../api/backend/transport/context.js';
-import type { flashCreateInput, flashCreateOutput } from './endpoints/flash/create.contract.js';
-import type { flashDeleteInput, flashDeleteOutput } from './endpoints/flash/delete.contract.js';
-import type { flashFeaturedInput, flashFeaturedOutput } from './endpoints/flash/featured.contract.js';
-import type { flashLikeInput, flashLikeOutput } from './endpoints/flash/like.contract.js';
-import type { flashMyInput, flashMyOutput } from './endpoints/flash/my.contract.js';
-import type { flashMyLikesInput, flashMyLikesOutput } from './endpoints/flash/my-likes.contract.js';
-import type { flashShowInput, flashShowOutput } from './endpoints/flash/show.contract.js';
-import type { flashUnlikeInput, flashUnlikeOutput } from './endpoints/flash/unlike.contract.js';
-import type { flashUpdateInput, flashUpdateOutput } from './endpoints/flash/update.contract.js';
-import type { flashSearchInput, flashSearchOutput } from './endpoints/flash/search.contract.js';
-import type { usersFlashsInput, usersFlashsOutput } from './endpoints/users/flashs.contract.js';
+import type { flashCreateContract } from './endpoints/flash/create.contract.js';
+import type { flashDeleteContract } from './endpoints/flash/delete.contract.js';
+import type { flashFeaturedContract } from './endpoints/flash/featured.contract.js';
+import type { flashLikeContract } from './endpoints/flash/like.contract.js';
+import type { flashMyContract } from './endpoints/flash/my.contract.js';
+import type { flashMyLikesContract } from './endpoints/flash/my-likes.contract.js';
+import type { flashShowContract } from './endpoints/flash/show.contract.js';
+import type { flashUnlikeContract } from './endpoints/flash/unlike.contract.js';
+import type { flashUpdateContract } from './endpoints/flash/update.contract.js';
+import type { flashSearchContract } from './endpoints/flash/search.contract.js';
+import type { usersFlashsContract } from './endpoints/users/flashs.contract.js';
 
 export interface PlayOperations<Actor extends ApiActor> {
-	flashCreate(input: v.InferOutput<typeof flashCreateInput>, actor: Actor): Promise<v.InferOutput<typeof flashCreateOutput>>;
-	flashDelete(input: v.InferOutput<typeof flashDeleteInput>, actor: Actor): Promise<v.InferOutput<typeof flashDeleteOutput>>;
-	flashFeatured(input: v.InferOutput<typeof flashFeaturedInput>, actor: Actor | null): Promise<v.InferOutput<typeof flashFeaturedOutput>>;
-	flashLike(input: v.InferOutput<typeof flashLikeInput>, actor: Actor): Promise<v.InferOutput<typeof flashLikeOutput>>;
-	flashMy(input: v.InferOutput<typeof flashMyInput>, actor: Actor): Promise<v.InferOutput<typeof flashMyOutput>>;
-	flashMyLikes(input: v.InferOutput<typeof flashMyLikesInput>, actor: Actor): Promise<v.InferOutput<typeof flashMyLikesOutput>>;
-	flashShow(input: v.InferOutput<typeof flashShowInput>, actor: Actor | null): Promise<v.InferOutput<typeof flashShowOutput>>;
-	flashUnlike(input: v.InferOutput<typeof flashUnlikeInput>, actor: Actor): Promise<v.InferOutput<typeof flashUnlikeOutput>>;
-	flashUpdate(input: v.InferOutput<typeof flashUpdateInput>, actor: Actor): Promise<v.InferOutput<typeof flashUpdateOutput>>;
-	flashSearch(input: v.InferOutput<typeof flashSearchInput>, actor: Actor | null): Promise<v.InferOutput<typeof flashSearchOutput>>;
-	usersFlashs(input: v.InferOutput<typeof usersFlashsInput>, actor: Actor | null): Promise<v.InferOutput<typeof usersFlashsOutput>>;
+	flashCreate(input: InferSchemaOutput<NonNullable<(typeof flashCreateContract)['~orpc']['inputSchema']>>, actor: Actor): Promise<InferSchemaOutput<NonNullable<(typeof flashCreateContract)['~orpc']['outputSchema']>>>;
+	flashDelete(input: InferSchemaOutput<NonNullable<(typeof flashDeleteContract)['~orpc']['inputSchema']>>, actor: Actor): Promise<InferSchemaOutput<NonNullable<(typeof flashDeleteContract)['~orpc']['outputSchema']>>>;
+	flashFeatured(input: InferSchemaOutput<NonNullable<(typeof flashFeaturedContract)['~orpc']['inputSchema']>>, actor: Actor | null): Promise<InferSchemaOutput<NonNullable<(typeof flashFeaturedContract)['~orpc']['outputSchema']>>>;
+	flashLike(input: InferSchemaOutput<NonNullable<(typeof flashLikeContract)['~orpc']['inputSchema']>>, actor: Actor): Promise<InferSchemaOutput<NonNullable<(typeof flashLikeContract)['~orpc']['outputSchema']>>>;
+	flashMy(input: InferSchemaOutput<NonNullable<(typeof flashMyContract)['~orpc']['inputSchema']>>, actor: Actor): Promise<InferSchemaOutput<NonNullable<(typeof flashMyContract)['~orpc']['outputSchema']>>>;
+	flashMyLikes(input: InferSchemaOutput<NonNullable<(typeof flashMyLikesContract)['~orpc']['inputSchema']>>, actor: Actor): Promise<InferSchemaOutput<NonNullable<(typeof flashMyLikesContract)['~orpc']['outputSchema']>>>;
+	flashShow(input: InferSchemaOutput<NonNullable<(typeof flashShowContract)['~orpc']['inputSchema']>>, actor: Actor | null): Promise<InferSchemaOutput<NonNullable<(typeof flashShowContract)['~orpc']['outputSchema']>>>;
+	flashUnlike(input: InferSchemaOutput<NonNullable<(typeof flashUnlikeContract)['~orpc']['inputSchema']>>, actor: Actor): Promise<InferSchemaOutput<NonNullable<(typeof flashUnlikeContract)['~orpc']['outputSchema']>>>;
+	flashUpdate(input: InferSchemaOutput<NonNullable<(typeof flashUpdateContract)['~orpc']['inputSchema']>>, actor: Actor): Promise<InferSchemaOutput<NonNullable<(typeof flashUpdateContract)['~orpc']['outputSchema']>>>;
+	flashSearch(input: InferSchemaOutput<NonNullable<(typeof flashSearchContract)['~orpc']['inputSchema']>>, actor: Actor | null): Promise<InferSchemaOutput<NonNullable<(typeof flashSearchContract)['~orpc']['outputSchema']>>>;
+	usersFlashs(input: InferSchemaOutput<NonNullable<(typeof usersFlashsContract)['~orpc']['inputSchema']>>, actor: Actor | null): Promise<InferSchemaOutput<NonNullable<(typeof usersFlashsContract)['~orpc']['outputSchema']>>>;
 }
 export type PlayContext<Actor extends ApiActor> = ApiContext<Actor> & { operations: { play: PlayOperations<Actor> } };
 export type PlayApplications<Actor extends ApiActor> = { [K in keyof PlayOperations<Actor>]: { execute: PlayOperations<Actor>[K] } };

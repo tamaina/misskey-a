@@ -6,10 +6,11 @@
 import { implement } from '@orpc/server';
 import { Inject, Injectable } from '@nestjs/common';
 import * as v from 'valibot';
+import { packedChannelSchema } from '../../channel.schema.js';
 import { DI } from '@/di-symbols.js';
 import { authentication, apiPolicy, requirePrincipal } from '../../../../api/backend/transport/middleware.js';
 import { ChannelEntityService } from '../../serializers/ChannelEntityService.js';
-import { channelsMyFavoritesContract, channelsMyFavoritesPolicy, channelsMyFavoritesInput, channelsMyFavoritesOutput, channelsMyFavoritesErrors } from './my-favorites.contract.js';
+import { channelsMyFavoritesContract, channelsMyFavoritesPolicy, channelsMyFavoritesErrors } from './my-favorites.contract.js';
 import type { ApiActor } from '../../../../api/backend/transport/context.js';
 import type { ChannelsApiContext } from '../../operations.js';
 
@@ -33,11 +34,11 @@ export class ChannelsMyFavoritesOperation {
 
 		private channelEntityService: ChannelEntityService,
 	) {}
-	async execute(ps: v.InferOutput<typeof channelsMyFavoritesInput>, me: MiLocalUser): Promise<v.InferOutput<typeof channelsMyFavoritesOutput>> {
-		return v.parse(channelsMyFavoritesOutput, await this.run(ps, me));
+	async execute(ps: v.InferOutput<NonNullable<typeof channelsMyFavoritesContract['~orpc']['inputSchema']>>, me: MiLocalUser): Promise<v.InferOutput<NonNullable<typeof channelsMyFavoritesContract['~orpc']['outputSchema']>>> {
+		return v.parse(v.array(packedChannelSchema), await this.run(ps, me));
 	}
 
-	private async run(ps: v.InferOutput<typeof channelsMyFavoritesInput>, me: MiLocalUser) {
+	private async run(ps: v.InferOutput<NonNullable<typeof channelsMyFavoritesContract['~orpc']['inputSchema']>>, me: MiLocalUser) {
 		const query = this.channelFavoritesRepository.createQueryBuilder('favorite')
 			.andWhere('favorite.userId = :meId', { meId: me.id })
 			.leftJoinAndSelect('favorite.channel', 'channel');

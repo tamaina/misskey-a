@@ -9,10 +9,6 @@ import { packedMeDetailedSchema } from '../../../../users/backend/user.schema.js
 import { objectInput, misskeyId } from '../../request.schema.js';
 import type { OpenAPI } from '@orpc/contract';
 
-export const iPinInput = objectInput({
-	'noteId': misskeyId,
-});
-export const iPinOutput = packedMeDetailedSchema;
 export const iPinErrors = {
 	noSuchNote: {
 		message: 'No such note.',
@@ -34,7 +30,9 @@ export const iPinErrors = {
 } as const;
 export const iPinPolicy = { name: 'i/pin', requireCredential: true, prohibitMoved: true, kind: 'write:account' } as const;
 const security: OpenAPI.SecurityRequirementObject[] = [{ bearerAuth: [] }];
-export const iPinContract = oc.$meta<{ requestName: 'i/pin' }>({ requestName: 'i/pin' })
+export const iPinContract = oc.$meta({ requestName: 'i/pin' } as const)
 	.route({ method: 'POST', path: '/i/pin', operationId: 'post___i___pin', tags: ['account', 'notes'], spec: current => ({ ...current, security }) })
 	.errors({ ...commonErrors, NO_SUCH_NOTE: { status: 400, data: apiErrorData }, PIN_LIMIT_EXCEEDED: { status: 400, data: apiErrorData }, ALREADY_PINNED: { status: 400, data: apiErrorData } })
-	.input(iPinInput).output(iPinOutput);
+	.input(objectInput({
+	'noteId': misskeyId,
+})).output(packedMeDetailedSchema);

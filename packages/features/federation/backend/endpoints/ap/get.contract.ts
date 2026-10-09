@@ -9,15 +9,16 @@ import { objectInput } from '../../../../api/backend/transport/input.schema.js';
 import { commonErrors } from '../../../../api/backend/transport/errors.schema.js';
 import { packedJsonObjectSchema } from '../../../../users/backend/json-value.schema.js';
 
-export const apGetInput = objectInput({
-	"uri": v.string(),
-});
-export const apGetOutput = packedJsonObjectSchema;
 export const apGetErrors = {
 	} as const;
 
 const requestName = 'ap/get';
-export const apGetContract = oc.$meta<{ requestName: typeof requestName }>({ requestName })
+export const apGetContract = oc.$meta({ requestName: requestName } as const)
 	.route({ method: 'POST', path: `/${requestName}`, operationId: 'post___' + requestName.replaceAll('/', '___'), tags: ['federation'], spec: current => ({ ...current, security: [{ bearerAuth: [] }] }) })
 	.errors({ ...commonErrors })
-	.input(apGetInput).output(apGetOutput);
+	.input(objectInput({
+		"uri": v.string(),
+	})).output(packedJsonObjectSchema);
+
+export type ApGetInput = v.InferOutput<NonNullable<typeof apGetContract['~orpc']['inputSchema']>>;
+export type ApGetOutput = v.InferOutput<NonNullable<typeof apGetContract['~orpc']['outputSchema']>>;

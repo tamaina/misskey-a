@@ -10,7 +10,7 @@ import { fileURLToPath } from 'node:url';
 import { dirname } from 'node:path';
 import { describe, test, expect } from 'vitest';
 import * as valibot from 'valibot';
-import { notesCreateInput } from '@features/notes/backend/endpoints/notes/create.contract.js';
+import { notesCreateContract } from '@features/notes/backend/endpoints/notes/create.contract.js';
 
 const _filename = fileURLToPath(import.meta.url);
 const _dirname = dirname(_filename);
@@ -20,7 +20,7 @@ const INVALID = false;
 
 describe('api:notes/create', () => {
 	describe('validation', () => {
-		const v = (input: unknown) => valibot.safeParse(notesCreateInput, input).success;
+		const v = (input: unknown) => valibot.safeParse(requiredSchema(notesCreateContract['~orpc'].inputSchema), input).success;
 		const tooLong = readFile(_dirname + '/../../../../../test/resources/misskey.svg', 'utf-8');
 
 		test('reject empty', () => {
@@ -271,3 +271,8 @@ describe('api:notes/create', () => {
 		});
 	});
 });
+
+function requiredSchema<Schema>(schema: Schema | undefined): Schema {
+	if (schema === undefined) throw new Error('Missing endpoint contract schema');
+	return schema;
+}

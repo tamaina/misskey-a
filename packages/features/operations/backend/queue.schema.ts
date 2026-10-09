@@ -52,21 +52,3 @@ export const queueJobSchema = v.strictObject({
  progress: packedJsonValueSchema, attempts: finiteNumber, delay: finiteNumber,
  failedReason: string, stacktrace: v.array(v.string()), returnValue: packedOptionalJsonValueSchema, isFailed: v.boolean(),
 });
-
-const tableStatSchema = v.strictObject({ count: finiteNumber, size: finiteNumber });
-type TableStat = v.InferOutput<typeof tableStatSchema>;
-// Catalog names are dynamic business keys; restore reserved names after record parsing.
-export const tableStatsSchema: v.GenericSchema<Record<string, TableStat>> = v.lazy(input => {
- const shape = v.record(v.string(), tableStatSchema);
- if (input === undefined) return shape;
- if (input === null || typeof input !== 'object' || Array.isArray(input)) return v.never();
- const prototype = Object.getPrototypeOf(input);
- if (prototype !== Object.prototype && prototype !== null) return v.never();
- for (const key of Object.keys(input)) {
-  if (!v.safeParse(tableStatSchema, Object.getOwnPropertyDescriptor(input, key)?.value).success) return v.never();
- }
- return v.pipe(shape, v.transform(() => Object.fromEntries(Object.keys(input).map((key): [string, TableStat] => [key, v.parse(tableStatSchema, Object.getOwnPropertyDescriptor(input, key)?.value)]))));
-});
-export const tableStatsRowsSchema = v.array(v.strictObject({
- table: v.string(), count: v.union([v.string(), finiteNumber]), size: v.union([v.string(), finiteNumber]),
-}));

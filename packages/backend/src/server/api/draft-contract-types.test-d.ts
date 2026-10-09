@@ -3,29 +3,30 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import type { InferSchemaInput, InferSchemaOutput } from '@orpc/contract';
 import type * as v from 'valibot';
 import type { InferContractRouterInputs, InferContractRouterOutputs } from '@orpc/contract';
 import type { notesApiContract } from '@features/notes/backend/api.contract.js';
 import type { NotesOperations } from '@features/notes/backend/operations.js';
 import type { ApiActor } from '@features/api/backend/transport/context.js';
 import type { packedNoteDraftSchema } from '@features/notes/backend/note-aux.schema.js';
-import type { notesDraftsCreateContract, notesDraftsCreateInput } from '@features/notes/backend/endpoints/notes/drafts/create.contract.js';
-import type { notesDraftsUpdateContract, notesDraftsUpdateInput } from '@features/notes/backend/endpoints/notes/drafts/update.contract.js';
+import type { notesDraftsCreateContract } from '@features/notes/backend/endpoints/notes/drafts/create.contract.js';
+import type { notesDraftsUpdateContract } from '@features/notes/backend/endpoints/notes/drafts/update.contract.js';
 
 type Equal<A, B> = (<T>() => T extends A ? 1 : 2) extends (<T>() => T extends B ? 1 : 2) ? true : false;
 type Assert<T extends true> = T;
 type Flatten<T> = { [K in keyof T]: T[K] };
 type CreateRequest = InferContractRouterInputs<typeof notesDraftsCreateContract>;
 type UpdateRequest = InferContractRouterInputs<typeof notesDraftsUpdateContract>;
-type CreateHandler = v.InferOutput<typeof notesDraftsCreateInput>;
-type UpdateHandler = v.InferOutput<typeof notesDraftsUpdateInput>;
+type CreateHandler = InferSchemaOutput<NonNullable<typeof notesDraftsCreateContract['~orpc']['inputSchema']>>;
+type UpdateHandler = InferSchemaOutput<NonNullable<typeof notesDraftsUpdateContract['~orpc']['inputSchema']>>;
 type Reaction = null | 'likeOnly' | 'likeOnlyForRemote' | 'nonSensitiveOnly' | 'nonSensitiveOnlyForLocalLikeOnlyForRemote';
 type Visibility = 'public' | 'home' | 'followers' | 'specified';
 
 type Draft = v.InferOutput<typeof packedNoteDraftSchema>;
 type NativeKeys = Assert<Equal<Extract<keyof typeof notesApiContract, `notesDrafts${string}`>, 'notesDraftsCreate' | 'notesDraftsUpdate' | 'notesDraftsList' | 'notesDraftsDelete' | 'notesDraftsCount'>>;
-type CreateContractInput = Assert<Equal<CreateRequest, v.InferInput<typeof notesDraftsCreateInput>>>;
-type UpdateContractInput = Assert<Equal<UpdateRequest, v.InferInput<typeof notesDraftsUpdateInput>>>;
+type CreateContractInput = Assert<Equal<CreateRequest, InferSchemaInput<NonNullable<typeof notesDraftsCreateContract['~orpc']['inputSchema']>>>>;
+type UpdateContractInput = Assert<Equal<UpdateRequest, InferSchemaInput<NonNullable<typeof notesDraftsUpdateContract['~orpc']['inputSchema']>>>>;
 type CreateContractOutput = Assert<Equal<InferContractRouterOutputs<typeof notesApiContract>['notesDraftsCreate'], InferContractRouterOutputs<typeof notesDraftsCreateContract>>>;
 type UpdateContractOutput = Assert<Equal<InferContractRouterOutputs<typeof notesApiContract>['notesDraftsUpdate'], InferContractRouterOutputs<typeof notesDraftsUpdateContract>>>;
 type CreateResponse = Assert<Equal<Flatten<InferContractRouterOutputs<typeof notesDraftsCreateContract>>, { createdDraft: Draft }>>;

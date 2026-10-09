@@ -16,7 +16,7 @@ import { DI } from '@/di-symbols.js';
 import { FanoutTimelineName } from '../../services/FanoutTimelineService.js';
 import { FanoutTimelineEndpointService } from '../../services/FanoutTimelineEndpointService.js';
 
-import { usersNotesInput, usersNotesErrors } from '../../endpoints/users/notes.contract.js';
+import { type usersNotesContract, usersNotesErrors } from '../../endpoints/users/notes.contract.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 import type * as v from 'valibot';
 import type { MiMeta, NotesRepository } from '@features/persistence/backend/repositories/models.js';
@@ -37,7 +37,7 @@ export class UsersNotesApplicationService {
 		private channelMutingService: ChannelMutingService,
 	) {}
 
-	async execute(ps: v.InferOutput<typeof usersNotesInput>, me: MiLocalUser | null) {
+	async execute(ps: v.InferOutput<NonNullable<typeof usersNotesContract['~orpc']['inputSchema']>>, me: MiLocalUser | null) {
 		const untilId = ps.untilId ?? (ps.untilDate ? this.idService.gen(ps.untilDate!) : null);
 		const sinceId = ps.sinceId ?? (ps.sinceDate ? this.idService.gen(ps.sinceDate!) : null);
 		const isSelf = me && (me.id === ps.userId);

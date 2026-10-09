@@ -11,8 +11,8 @@ import { RoleService } from '@features/roles/backend/services/RoleService.js';
 import { DI } from '@/di-symbols.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 
-import * as v from 'valibot';
-import { inlineInviteLimitInput } from '../../auth.schema.js';
+import type * as v from 'valibot';
+import type { InviteLimitContract } from '../../api.contract.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 
 export const meta = {
@@ -33,7 +33,7 @@ export class InviteLimitOperation {
 		private idService: IdService,
 	) {}
 
-	async execute(ps: v.InferOutput<typeof inlineInviteLimitInput>, me: MiLocalUser) {
+	async execute(ps: v.InferOutput<NonNullable<typeof InviteLimitContract['~orpc']['inputSchema']>>, me: MiLocalUser) {
 		const policies = await this.roleService.getUserPolicies(me.id);
 
 		const count = policies.inviteLimit ? await this.registrationTicketsRepository.countBy({

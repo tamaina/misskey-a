@@ -11,8 +11,8 @@ import { GlobalEventService } from '@features/runtime/backend/services/GlobalEve
 import { DI } from '@/di-symbols.js';
 import { apiError } from '@features/api/backend/transport/orpc-error.js';
 
-import * as v from 'valibot';
-import { voidI2faPasswordLessInput } from '../../../auth.schema.js';
+import type * as v from 'valibot';
+import type { I2faPasswordLessContract } from '../../../api.contract.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 
 export const meta = {
@@ -42,7 +42,7 @@ export class I2faPasswordLessOperation {
 		private globalEventService: GlobalEventService,
 	) {}
 
-	async execute(ps: v.InferOutput<typeof voidI2faPasswordLessInput>, me: MiLocalUser) {
+	async execute(ps: v.InferOutput<NonNullable<typeof I2faPasswordLessContract['~orpc']['inputSchema']>>, me: MiLocalUser) {
 		if (ps.value === true) {
 			// セキュリティキーがなければパスワードレスを有効にはできない
 			const keyCount = await this.userSecurityKeysRepository.count({

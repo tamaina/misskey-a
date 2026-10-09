@@ -9,12 +9,10 @@ import { objectInput } from '../../../../../api/backend/transport/input.schema.j
 import { commonErrors, apiErrorData } from '../../../../../api/backend/transport/errors.schema.js';
 import { misskeyId } from '../../../input.schema.js';
 
-export const iWebhooksDeleteInput = objectInput({ webhookId: misskeyId });
-export const iWebhooksDeleteOutput = v.void();
 export const iWebhooksDeleteErrors = { noSuchWebhook: { message: 'No such webhook.', code: 'NO_SUCH_WEBHOOK', id: 'bae73e5a-5522-4965-ae19-3a8688e71d82' } } as const;
 
 const requestName = 'i/webhooks/delete';
-export const iWebhooksDeleteContract = oc.$meta<{ requestName: typeof requestName }>({ requestName })
+export const iWebhooksDeleteContract = oc.$meta({ requestName: requestName } as const)
 	.route({ method: 'POST', path: `/${requestName}`, operationId: 'post___' + requestName.replaceAll('/', '___'), tags: ['webhooks'], spec: current => ({ ...current, security: [{ bearerAuth: [] }] }) })
 	.errors({ ...commonErrors, NO_SUCH_WEBHOOK: { status: 400, data: apiErrorData } })
-	.input(iWebhooksDeleteInput).output(iWebhooksDeleteOutput);
+	.input(objectInput({ webhookId: misskeyId })).output(v.void());

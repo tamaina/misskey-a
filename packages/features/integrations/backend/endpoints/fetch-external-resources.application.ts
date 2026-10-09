@@ -9,7 +9,7 @@ import { HttpRequestService } from '../../../runtime/backend/services/HttpReques
 import { apiError } from '../../../api/backend/transport/orpc-error.js';
 import type { MiUser } from '../../../users/backend/models/User.js';
 import * as v from 'valibot';
-import { fetchExternalResourcesInput, fetchExternalResourcesOutput, fetchExternalResourcesErrors } from './fetch-external-resources.contract.js';
+import { fetchExternalResourcesErrors, fetchExternalResourcesContract } from './fetch-external-resources.contract.js';
 
 @Injectable()
 export class FetchExternalResourcesApplicationService {
@@ -17,7 +17,7 @@ export class FetchExternalResourcesApplicationService {
 		private httpRequestService: HttpRequestService,
 	) {}
 
-	public async execute(ps: v.InferOutput<typeof fetchExternalResourcesInput>, _me: MiUser): Promise<v.InferOutput<typeof fetchExternalResourcesOutput>> {
+	public async execute(ps: v.InferOutput<NonNullable<typeof fetchExternalResourcesContract['~orpc']['inputSchema']>>, _me: MiUser): Promise<v.InferOutput<NonNullable<typeof fetchExternalResourcesContract['~orpc']['outputSchema']>>> {
 		const result = await (async () => {
 			const raw = await this.httpRequestService.getJson<unknown>(ps.url);
 			// Preserve the existing falsey-field error; malformed producer types remain server failures.
@@ -39,6 +39,11 @@ export class FetchExternalResourcesApplicationService {
 				data: res.data,
 			};
 		})();
-		return v.parse(fetchExternalResourcesOutput, result);
+		return v.parse(requiredSchema(fetchExternalResourcesContract['~orpc'].outputSchema), result);
 	}
+}
+
+function requiredSchema<Schema>(schema: Schema | undefined): Schema {
+	if (schema === undefined) throw new Error('Contract must declare its schema');
+	return schema;
 }

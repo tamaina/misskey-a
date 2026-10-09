@@ -13,8 +13,7 @@ import { registerPilotHttp } from '@features/api/backend/transport/pilot-http.js
 import * as v from 'valibot';
 import bcrypt from 'bcryptjs';
 import { createAuthRouter, type AuthContext, type AuthOperations } from '../../backend/api.router.js';
-import { authContract } from '../../backend/api.contract.js';
-import { selectorIRevokeTokenInput, emptyAdminCaptchaCurrentInput, inlineI2faKeyDoneInput } from '../../backend/auth.schema.js';
+import { authContract, AdminCaptchaCurrentContract, I2faKeyDoneContract, IRevokeTokenContract } from '../../backend/api.contract.js';
 import { IRevokeTokenOperation, type TokenRevocationRepository } from '../../backend/endpoints/i/revoke-token.js';
 import { I2faKeyDoneOperation } from '../../backend/endpoints/i/2fa/key-done.js';
 import { WebAuthnService } from '../../backend/services/WebAuthnService.js';
@@ -43,7 +42,7 @@ test('all 39 native auth routes retain secure policy enforcement', async () => {
 	expect(h.operations['i/change-password']).not.toHaveBeenCalled();
 	h.services.authenticate.mockResolvedValue([null, null]);
 	await expect(call(h.router['i/2fa/key-done'], { password: 'password', name: '', credential: null }, { context: h.context })).rejects.toMatchObject({ code: 'ACCESS_DENIED' });
-	for (const value of [undefined, null, 5, true, ['ignored'], { ignored: { future: true } }]) expect(v.safeParse(emptyAdminCaptchaCurrentInput, value).success).toBe(true);
+	for (const value of [undefined, null, 5, true, ['ignored'], { ignored: { future: true } }]) expect(v.safeParse(requiredSchema(AdminCaptchaCurrentContract['~orpc'].inputSchema), value).success).toBe(true);
 });
 
 test('malformed HTTP inputs fail authentication and secure-token policy before input validation', async () => {
@@ -78,7 +77,7 @@ test('token revocation preserves manual credentials, own-token restriction and c
 	const me = mockDeep<MiLocalUser>({ id: actor.id });
 	await expect(operation.execute({ token: null }, null, null)).rejects.toMatchObject({ code: 'CREDENTIAL_REQUIRED', data: { id: '6f1f0d3a-3d5b-4b1f-9c3e-2a6d1e5b8c47' } });
 	repository.findOneBy.mockResolvedValue(null);
-	const competing = v.parse(selectorIRevokeTokenInput, { token: 'secret', tokenId: { legacy: true } });
+	const competing = v.parse(requiredSchema(IRevokeTokenContract['~orpc'].inputSchema), { token: 'secret', tokenId: { legacy: true } });
 	await operation.execute(competing, me, null);
 	expect(repository.findOneBy).toHaveBeenCalledWith({ id: { legacy: true }, userId: me.id });
 	repository.findOneBy.mockResolvedValue(mockDeep<MiAccessToken>({ id: 'target123' }));
@@ -96,7 +95,7 @@ test('malformed registration credentials retain password and stored challenge or
 	const operation = new I2faKeyDoneOperation(profiles, mockDeep(), domain, auth, mockDeep(), mockDeep());
 	const me = mockDeep<MiLocalUser>({ id: actor.id });
 	profiles.findOneByOrFail.mockResolvedValue(mockDeep<NonNullable<Awaited<ReturnType<ConstructorParameters<typeof I2faKeyDoneOperation>[0]['findOneByOrFail']>>>>({ userId: me.id, password: bcrypt.hashSync('password', 4), twoFactorEnabled: true }));
-	const input = v.parse(inlineI2faKeyDoneInput, { password: 'wrong', token: 'totp', name: 'Key', credential: {} });
+	const input = v.parse(requiredSchema(I2faKeyDoneContract['~orpc'].inputSchema), { password: 'wrong', token: 'totp', name: 'Key', credential: {} });
 	await expect(operation.execute(input, me)).rejects.toMatchObject({ code: 'INCORRECT_PASSWORD' });
 	expect(redis.get).not.toHaveBeenCalled();
 	redis.get.mockResolvedValue(null);
@@ -107,3 +106,8 @@ test('malformed registration credentials retain password and stored challenge or
 	await expect(operation.execute({ ...input, password: 'password' }, me)).rejects.toMatchObject({ id: '5c1446f8-8ca7-4d31-9f39-656afe9c5d87' });
 	expect(redis.del).toHaveBeenCalledWith(`webauthn:registrationChallenge:${me.id}`);
 });
+
+function requiredSchema<Schema>(schema: Schema | undefined): Schema {
+	if (schema === undefined) throw new Error('Contract must declare its schema');
+	return schema;
+}

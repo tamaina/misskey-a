@@ -8,7 +8,7 @@ import type { WebhooksRepository } from '../../../../../persistence/backend/repo
 import { DI } from '@/di-symbols.js';
 import type { MiUser } from '../../../../../users/backend/models/User.js';
 import * as v from 'valibot';
-import { iWebhooksListInput, iWebhooksListOutput } from './list.contract.js';
+import { iWebhooksListContract } from './list.contract.js';
 
 @Injectable()
 export class IWebhooksListApplicationService {
@@ -17,7 +17,7 @@ export class IWebhooksListApplicationService {
 		private webhooksRepository: WebhooksRepository,
 	) {}
 
-	public async execute(_ps: v.InferOutput<typeof iWebhooksListInput>, me: MiUser): Promise<v.InferOutput<typeof iWebhooksListOutput>> {
+	public async execute(_ps: v.InferOutput<NonNullable<typeof iWebhooksListContract['~orpc']['inputSchema']>>, me: MiUser): Promise<v.InferOutput<NonNullable<typeof iWebhooksListContract['~orpc']['outputSchema']>>> {
 		const result = await (async () => {
 			const webhooks = await this.webhooksRepository.findBy({
 				userId: me.id,
@@ -35,6 +35,11 @@ export class IWebhooksListApplicationService {
 				latestStatus: webhook.latestStatus,
 			}));
 		})();
-		return v.parse(iWebhooksListOutput, result);
+		return v.parse(requiredSchema(iWebhooksListContract['~orpc'].outputSchema), result);
 	}
+}
+
+function requiredSchema<Schema>(schema: Schema | undefined): Schema {
+	if (schema === undefined) throw new Error('Contract must declare its schema');
+	return schema;
 }

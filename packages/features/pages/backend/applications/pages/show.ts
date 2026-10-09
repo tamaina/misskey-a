@@ -13,8 +13,8 @@ import { DI } from '@/di-symbols.js';
 import { apiError } from '@features/api/backend/transport/orpc-error.js';
 
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
-import type * as v from 'valibot';
-import { pagesShowInput, pagesShowErrors } from '../../endpoints/pages/show.contract.js';
+import type { InferSchemaOutput } from '@orpc/contract';
+import { type pagesShowContract, pagesShowErrors } from '../../endpoints/pages/show.contract.js';
 
 /** Legacy competing selectors pass their original JSON pageId directly to TypeORM. */
 export interface PagesSelectorRepository {
@@ -33,7 +33,7 @@ export class PagesShowApplicationService {
 		private pageEntityService: PageEntityService,
 	) {}
 
-	async execute(ps: v.InferOutput<typeof pagesShowInput>, me: MiLocalUser | null) {
+	async execute(ps: InferSchemaOutput<NonNullable<(typeof pagesShowContract)['~orpc']['inputSchema']>>, me: MiLocalUser | null) {
 		let page: MiPage | null = null;
 
 		if ('pageId' in ps) {

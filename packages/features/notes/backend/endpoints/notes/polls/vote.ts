@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import type { InferSchemaOutput } from '@orpc/contract';
 import { implement } from '@orpc/server';
 import { Inject, Injectable } from '@nestjs/common';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
@@ -18,7 +19,7 @@ import { PollService } from '../../../services/PollService.js';
 import { authentication, apiPolicy, requirePrincipal } from '../../../../../api/backend/transport/middleware.js';
 import { apiError } from '../../../../../api/backend/transport/orpc-error.js';
 import { readErrorId } from '../../../request.schema.js';
-import { notesPollsVoteContract, notesPollsVotePolicy, notesPollsVoteInput, notesPollsVoteOutput, notesPollsVoteErrors } from './vote.contract.js';
+import { notesPollsVoteContract, notesPollsVotePolicy, notesPollsVoteErrors } from './vote.contract.js';
 import type { MiLocalUser } from '../../../../../users/backend/models/User.js';
 import type { UsersRepository, PollsRepository, PollVotesRepository } from '@features/persistence/backend/repositories/models.js';
 import type { NotesApiContext } from '../../../operations.js';
@@ -53,11 +54,11 @@ export class NotesPollsVoteOperation {
 		private userBlockingService: UserBlockingService,
 		private noteEntityService: NoteEntityService,
 	) {}
-	async execute(ps: v.InferOutput<typeof notesPollsVoteInput>, me: MiLocalUser): Promise<v.InferOutput<typeof notesPollsVoteOutput>> {
-		return v.parse(notesPollsVoteOutput, await this.run(ps, me));
+	async execute(ps: InferSchemaOutput<NonNullable<typeof notesPollsVoteContract['~orpc']['inputSchema']>>, me: MiLocalUser): Promise<InferSchemaOutput<NonNullable<typeof notesPollsVoteContract['~orpc']['outputSchema']>>> {
+		return v.parse(requiredSchema(notesPollsVoteContract['~orpc'].outputSchema), await this.run(ps, me));
 	}
 
-	private async run(ps: v.InferOutput<typeof notesPollsVoteInput>, me: MiLocalUser) {
+	private async run(ps: InferSchemaOutput<NonNullable<typeof notesPollsVoteContract['~orpc']['inputSchema']>>, me: MiLocalUser) {
 		const createdAt = new Date();
 
 		// Get votee
@@ -138,4 +139,9 @@ export class NotesPollsVoteOperation {
 		// リモートフォロワーにUpdate配信
 		this.pollService.deliverQuestionUpdate(note.id);
 	}
+}
+
+function requiredSchema<Schema>(schema: Schema | undefined): Schema {
+	if (schema === undefined) throw new Error('Missing endpoint contract schema');
+	return schema;
 }

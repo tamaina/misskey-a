@@ -12,8 +12,8 @@ import { IdentifiableError } from '@features/runtime/backend/errors/identifiable
 import { apiError } from '@features/api/backend/transport/orpc-error.js';
 
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
-import type * as v from 'valibot';
-import { pagesCreateInput, pagesCreateErrors } from '../../endpoints/pages/create.contract.js';
+import type { InferSchemaOutput } from '@orpc/contract';
+import { type pagesCreateContract, pagesCreateErrors } from '../../endpoints/pages/create.contract.js';
 
 @Injectable()
 export class PagesCreateApplicationService {
@@ -28,7 +28,7 @@ export class PagesCreateApplicationService {
 		private pageEntityService: PageEntityService,
 	) {}
 
-	async execute(ps: v.InferOutput<typeof pagesCreateInput>, me: MiLocalUser) {
+	async execute(ps: InferSchemaOutput<NonNullable<(typeof pagesCreateContract)['~orpc']['inputSchema']>>, me: MiLocalUser) {
 		let eyeCatchingImage: MiDriveFile | null = null;
 		if (ps.eyeCatchingImageId != null) {
 			eyeCatchingImage = await this.driveFilesRepository.findOneBy({

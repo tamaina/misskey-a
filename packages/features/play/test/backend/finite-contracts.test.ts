@@ -7,16 +7,27 @@ import { expect, test } from 'vitest';
 import * as v from 'valibot';
 import { mockDeep } from 'vitest-mock-extended';
 import { packedFlashSchema } from '../../backend/flash.schema.js';
-import { flashCreateInput as packedFlashCreateInput } from '../../backend/endpoints/flash/create.contract.js';
-import { flashFeaturedInput as packedFlashFeaturedInput } from '../../backend/endpoints/flash/featured.contract.js';
+import { flashCreateContract } from '../../backend/endpoints/flash/create.contract.js';
+import { flashFeaturedContract } from '../../backend/endpoints/flash/featured.contract.js';
 import { flashFeaturedContract as packedFlashFeaturedDefinition } from '../../backend/endpoints/flash/featured.contract.js';
-import { flashFeaturedOutput as packedFlashFeaturedOutput } from '../../backend/endpoints/flash/featured.contract.js';
-import { flashMyLikesOutput as packedFlashMyLikesOutput } from '../../backend/endpoints/flash/my-likes.contract.js';
-import { flashUpdateInput as voidFlashUpdateInput } from '../../backend/endpoints/flash/update.contract.js';
+
+import { flashMyLikesContract } from '../../backend/endpoints/flash/my-likes.contract.js';
+import { flashUpdateContract } from '../../backend/endpoints/flash/update.contract.js';
 import { FlashEntityService } from '../../backend/serializers/FlashEntityService.js';
 import { FlashLikeEntityService } from '../../backend/serializers/FlashLikeEntityService.js';
 import type { MiFlash } from '../../backend/models/Flash.js';
 import type { MiFlashLike } from '../../backend/models/FlashLike.js';
+
+function requiredSchema<T>(schema: T | undefined): T {
+	if (schema === undefined) throw new Error('Expected contract schema');
+	return schema;
+}
+
+const packedFlashCreateInput = requiredSchema(flashCreateContract['~orpc'].inputSchema);
+const packedFlashFeaturedInput = requiredSchema(flashFeaturedContract['~orpc'].inputSchema);
+const packedFlashFeaturedOutput = requiredSchema(flashFeaturedContract['~orpc'].outputSchema);
+const packedFlashMyLikesOutput = requiredSchema(flashMyLikesContract['~orpc'].outputSchema);
+const voidFlashUpdateInput = requiredSchema(flashUpdateContract['~orpc'].inputSchema);
 
 const date = new Date('2026-01-01T00:00:00Z');
 const user = { id: 'user123', name: null, username: 'alice', host: null, avatarUrl: 'https://example/avatar', avatarBlurhash: null, avatarDecorations: [], emojis: {}, onlineStatus: 'unknown' as const };

@@ -9,8 +9,6 @@ import { commonErrors, apiErrorData } from '../../../../../api/backend/transport
 import { objectInput, misskeyId } from '../../../request.schema.js';
 import type { OpenAPI } from '@orpc/contract';
 
-export const notesThreadMutingDeleteInput = objectInput({ noteId: misskeyId });
-export const notesThreadMutingDeleteOutput = v.void();
 export const notesThreadMutingDeleteErrors = {
 	noSuchNote: {
 		message: 'No such note.',
@@ -20,7 +18,7 @@ export const notesThreadMutingDeleteErrors = {
 } as const;
 export const notesThreadMutingDeletePolicy = { name: 'notes/thread-muting/delete', requireCredential: true, kind: 'write:account' } as const;
 const security: OpenAPI.SecurityRequirementObject[] = [{ bearerAuth: [] }];
-export const notesThreadMutingDeleteContract = oc.$meta<{ requestName: 'notes/thread-muting/delete' }>({ requestName: 'notes/thread-muting/delete' })
+export const notesThreadMutingDeleteContract = oc.$meta({ requestName: 'notes/thread-muting/delete' } as const)
 	.route({ method: 'POST', path: '/notes/thread-muting/delete', operationId: 'post___notes___thread-muting___delete', tags: ['notes'], spec: current => ({ ...current, security }), successStatus: 204 })
 	.errors({ ...commonErrors, NO_SUCH_NOTE: { status: 400, data: apiErrorData } })
-	.input(notesThreadMutingDeleteInput).output(notesThreadMutingDeleteOutput);
+	.input(objectInput({ noteId: misskeyId })).output(v.void());

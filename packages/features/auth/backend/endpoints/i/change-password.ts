@@ -10,8 +10,8 @@ import type { UserProfilesRepository } from '@features/persistence/backend/repos
 import { DI } from '@/di-symbols.js';
 import { UserAuthService } from '../../services/UserAuthService.js';
 
-import * as v from 'valibot';
-import { voidIChangePasswordInput } from '../../auth.schema.js';
+import type * as v from 'valibot';
+import type { IChangePasswordContract } from '../../api.contract.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 
 export const meta = {
@@ -29,7 +29,7 @@ export class IChangePasswordOperation {
 		private userAuthService: UserAuthService,
 	) {}
 
-	async execute(ps: v.InferOutput<typeof voidIChangePasswordInput>, me: MiLocalUser) {
+	async execute(ps: v.InferOutput<NonNullable<typeof IChangePasswordContract['~orpc']['inputSchema']>>, me: MiLocalUser) {
 		const token = ps.token;
 		const profile = await this.userProfilesRepository.findOneByOrFail({ userId: me.id });
 

@@ -7,11 +7,12 @@ import { implement } from '@orpc/server';
 import { Inject, Injectable } from '@nestjs/common';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 import * as v from 'valibot';
+import { packedChannelSchema } from '../../channel.schema.js';
 import { DI } from '@/di-symbols.js';
 import { authentication, apiPolicy, requirePrincipal } from '../../../../api/backend/transport/middleware.js';
 import { ChannelEntityService } from '../../serializers/ChannelEntityService.js';
 import { apiError } from '../../../../api/backend/transport/orpc-error.js';
-import { channelsCreateContract, channelsCreatePolicy, channelsCreateInput, channelsCreateOutput, channelsCreateErrors } from './create.contract.js';
+import { channelsCreateContract, channelsCreatePolicy, channelsCreateErrors } from './create.contract.js';
 import type { ApiActor } from '../../../../api/backend/transport/context.js';
 import type { ChannelsApiContext } from '../../operations.js';
 
@@ -39,11 +40,11 @@ export class ChannelsCreateOperation {
 		private idService: IdService,
 		private channelEntityService: ChannelEntityService,
 	) {}
-	async execute(ps: v.InferOutput<typeof channelsCreateInput>, me: MiLocalUser): Promise<v.InferOutput<typeof channelsCreateOutput>> {
-		return v.parse(channelsCreateOutput, await this.run(ps, me));
+	async execute(ps: v.InferOutput<NonNullable<typeof channelsCreateContract['~orpc']['inputSchema']>>, me: MiLocalUser): Promise<v.InferOutput<NonNullable<typeof channelsCreateContract['~orpc']['outputSchema']>>> {
+		return v.parse(packedChannelSchema, await this.run(ps, me));
 	}
 
-	private async run(ps: v.InferOutput<typeof channelsCreateInput>, me: MiLocalUser) {
+	private async run(ps: v.InferOutput<NonNullable<typeof channelsCreateContract['~orpc']['inputSchema']>>, me: MiLocalUser) {
 		let banner = null;
 		if (ps.bannerId != null) {
 			banner = await this.driveFilesRepository.findOneBy({

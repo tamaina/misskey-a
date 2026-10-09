@@ -10,8 +10,11 @@ import { commonErrors } from '../../../../api/backend/transport/errors.schema.js
 import { packedMetaClientOptionsSchema } from '../meta.schema.js';
 import { wireJson } from '../wire-json.schema.js';
 
-export const adminMetaInput = v.optional(objectInput({}), {});
-export const adminMetaOutput = v.strictObject({
+export const adminMetaContract = oc.$meta({ requestName: 'admin/meta', allowGet: false } as const)
+	.route({ method: 'POST', path: '/admin/meta', operationId: 'post___admin___meta', tags: ['meta'] })
+	.errors({ ...commonErrors })
+	.input(v.optional(objectInput({}), {}))
+	.output(v.strictObject({
 	'cacheRemoteFiles': v.boolean(),
 	'cacheRemoteSensitiveFiles': v.boolean(),
 	'emailRequiredForSignup': v.boolean(),
@@ -151,10 +154,4 @@ export const adminMetaOutput = v.strictObject({
 	'remoteNotesCleaningExpiryDaysForEachNotes': v.pipe(v.number(), v.finite()),
 	'remoteNotesCleaningMaxProcessingDurationInMinutes': v.pipe(v.number(), v.finite()),
 	'showRoleBadgesOfRemoteUsers': v.boolean(),
-});
-
-export const adminMetaContract = oc.$meta<{ requestName: 'admin/meta'; allowGet: boolean; cacheSec?: number }>({ requestName: 'admin/meta', allowGet: false })
-	.route({ method: 'POST', path: '/admin/meta', operationId: 'post___admin___meta', tags: ['meta'] })
-	.errors({ ...commonErrors })
-	.input(adminMetaInput)
-	.output(adminMetaOutput);
+}));

@@ -10,15 +10,6 @@ import {
 	generateRegistrationOptions, verifyAuthenticationResponse,
 	verifyRegistrationResponse,
 } from '@simplewebauthn/server';
-import { AttestationFormat, isoCBOR, isoUint8Array } from '@simplewebauthn/server/helpers';
-import { bindThis } from '@features/runtime/backend/decorators.js';
-import { MiUser } from '@features/persistence/backend/repositories/models.js';
-import { IdentifiableError } from '@features/runtime/backend/errors/identifiable-error.js';
-import type { Config } from '@/config.js';
-import { webAuthnRegistrationResponseSchema, webAuthnAuthenticationResponseSchema, webAuthnTransportSchema } from '../webauthn.schema.js';
-import type { MiMeta, UserSecurityKeysRepository } from '@features/persistence/backend/repositories/models.js';
-import type { PackedJsonValue } from '@features/users/backend/json-value.schema.js';
-import type * as Redis from 'ioredis';
 import type {
 	AuthenticationResponseJSON,
 	AuthenticatorTransportFuture,
@@ -27,6 +18,15 @@ import type {
 	PublicKeyCredentialRequestOptionsJSON,
 	RegistrationResponseJSON,
 } from '@simplewebauthn/server';
+import { AttestationFormat, isoCBOR, isoUint8Array } from '@simplewebauthn/server/helpers';
+import { bindThis } from '@features/runtime/backend/decorators.js';
+import { MiUser } from '@features/persistence/backend/repositories/models.js';
+import type { MiMeta, UserSecurityKeysRepository } from '@features/persistence/backend/repositories/models.js';
+import { IdentifiableError } from '@features/runtime/backend/errors/identifiable-error.js';
+import type { Config } from '@/config.js';
+import { webAuthnRegistrationResponseSchema, webAuthnAuthenticationResponseSchema, webAuthnTransportSchema } from '../webauthn.schema.js';
+import type { PackedJsonValue } from '@features/users/backend/json-value.schema.js';
+import type * as Redis from 'ioredis';
 
 export class WebAuthnService {
 	constructor(

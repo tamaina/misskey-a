@@ -11,8 +11,8 @@ import { apiError } from '@features/api/backend/transport/orpc-error.js';
 import { GetterService } from '@features/api/backend/transport/GetterService.js';
 
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
-import type * as v from 'valibot';
-import { reversiMatchInput, reversiMatchErrors } from '../../endpoints/reversi/match.contract.js';
+import type { InferSchemaOutput } from '@orpc/contract';
+import { type reversiMatchContract, reversiMatchErrors } from '../../endpoints/reversi/match.contract.js';
 
 @Injectable()
 export class ReversiMatchApplicationService {
@@ -22,7 +22,7 @@ export class ReversiMatchApplicationService {
 		private reversiGameEntityService: ReversiGameEntityService,
 	) {}
 
-	async execute(ps: v.InferOutput<typeof reversiMatchInput>, me: MiLocalUser) {
+	async execute(ps: InferSchemaOutput<NonNullable<(typeof reversiMatchContract)['~orpc']['inputSchema']>>, me: MiLocalUser) {
 		if (ps.userId === me.id) throw apiError(reversiMatchErrors.isYourself);
 
 		const target = ps.userId ? await this.getterService.getUser(ps.userId).catch((err: unknown) => {

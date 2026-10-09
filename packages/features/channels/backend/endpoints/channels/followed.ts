@@ -7,10 +7,11 @@ import { implement } from '@orpc/server';
 import { Inject, Injectable } from '@nestjs/common';
 import { QueryService } from '@features/notes/backend/services/QueryService.js';
 import * as v from 'valibot';
+import { packedChannelSchema } from '../../channel.schema.js';
 import { DI } from '@/di-symbols.js';
 import { authentication, apiPolicy, requirePrincipal } from '../../../../api/backend/transport/middleware.js';
 import { ChannelEntityService } from '../../serializers/ChannelEntityService.js';
-import { channelsFollowedContract, channelsFollowedPolicy, channelsFollowedInput, channelsFollowedOutput, channelsFollowedErrors } from './followed.contract.js';
+import { channelsFollowedContract, channelsFollowedPolicy, channelsFollowedErrors } from './followed.contract.js';
 import type { ApiActor } from '../../../../api/backend/transport/context.js';
 import type { ChannelsApiContext } from '../../operations.js';
 
@@ -35,11 +36,11 @@ export class ChannelsFollowedOperation {
 		private channelEntityService: ChannelEntityService,
 		private queryService: QueryService,
 	) {}
-	async execute(ps: v.InferOutput<typeof channelsFollowedInput>, me: MiLocalUser): Promise<v.InferOutput<typeof channelsFollowedOutput>> {
-		return v.parse(channelsFollowedOutput, await this.run(ps, me));
+	async execute(ps: v.InferOutput<NonNullable<typeof channelsFollowedContract['~orpc']['inputSchema']>>, me: MiLocalUser): Promise<v.InferOutput<NonNullable<typeof channelsFollowedContract['~orpc']['outputSchema']>>> {
+		return v.parse(v.array(packedChannelSchema), await this.run(ps, me));
 	}
 
-	private async run(ps: v.InferOutput<typeof channelsFollowedInput>, me: MiLocalUser) {
+	private async run(ps: v.InferOutput<NonNullable<typeof channelsFollowedContract['~orpc']['inputSchema']>>, me: MiLocalUser) {
 		const query = this.queryService
 			.makePaginationQuery(
 				this.channelFollowingsRepository.createQueryBuilder(),

@@ -11,8 +11,8 @@ import { DI } from '@/di-symbols.js';
 import { FlashEntityService } from '../../serializers/FlashEntityService.js';
 
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
-import type * as v from 'valibot';
-import { flashCreateInput } from '../../endpoints/flash/create.contract.js';
+import type { InferSchemaOutput } from '@orpc/contract';
+import { type flashCreateContract } from '../../endpoints/flash/create.contract.js';
 
 @Injectable()
 export class FlashCreateApplicationService {
@@ -24,7 +24,7 @@ export class FlashCreateApplicationService {
 		private idService: IdService,
 	) {}
 
-	async execute(ps: v.InferOutput<typeof flashCreateInput>, me: MiLocalUser) {
+	async execute(ps: InferSchemaOutput<NonNullable<(typeof flashCreateContract)['~orpc']['inputSchema']>>, me: MiLocalUser) {
 		const flash = await this.flashsRepository.insertOne({
 			id: this.idService.gen(),
 			userId: me.id,

@@ -9,10 +9,8 @@ import { commonErrors } from '../../../api/backend/transport/errors.schema.js';
 import { packedUserDetailedSchema } from '../../../users/backend/user.schema.js';
 import { objectInput } from './input.schema.js';
 
-export const pinnedUsersInput = v.optional(objectInput({}), {});
-export const pinnedUsersOutput = v.array(packedUserDetailedSchema);
-export const pinnedUsersContract = oc.$meta<{ requestName: 'pinned-users'; allowGet: boolean; cacheSec?: number }>({ requestName: 'pinned-users', allowGet: false })
+export const pinnedUsersContract = oc.$meta({ requestName: 'pinned-users', allowGet: false } as const)
 	.route({ method: 'POST', path: '/pinned-users', operationId: 'post___pinned-users', tags: ['users'] })
 	.errors({ ...commonErrors })
-	.input(pinnedUsersInput)
-	.output(pinnedUsersOutput);
+	.input(v.optional(objectInput({}), {}))
+	.output(v.array(packedUserDetailedSchema));

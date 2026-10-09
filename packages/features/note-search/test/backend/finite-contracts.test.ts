@@ -6,8 +6,16 @@
 import { expect, test } from 'vitest';
 import * as v from 'valibot';
 import { mockDeep } from 'vitest-mock-extended';
-import { notesSearchInput as packedNotesSearchInput, notesSearchOutput as packedNotesSearchOutput } from '../../backend/endpoints/notes/search.contract.js';
+import { notesSearchContract } from '../../backend/endpoints/notes/search.contract.js';
 import { NotesSearchApplicationService as Search } from '../../backend/applications/notes/search.js';
+
+function requiredSchema<S extends v.GenericSchema>(schema: S | undefined): S {
+	if (schema === undefined) throw new Error('Missing native contract schema');
+	return schema;
+}
+
+const packedNotesSearchInput = requiredSchema(notesSearchContract['~orpc'].inputSchema);
+const packedNotesSearchOutput = requiredSchema(notesSearchContract['~orpc'].outputSchema);
 
 const user = { id: 'user123', name: null, username: 'alice', host: null, avatarUrl: 'https://example/avatar', avatarBlurhash: null, avatarDecorations: [], emojis: {}, onlineStatus: 'unknown' as const };
 const note = { id: 'note123', createdAt: '2026-01-01T00:00:00Z', text: null, userId: user.id, user, visibility: 'public' as const, reactionAcceptance: null, reactionEmojis: {}, reactions: {}, reactionCount: 0, renoteCount: 0, repliesCount: 0 };

@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import type { InferSchemaOutput } from '@orpc/contract';
 import { implement } from '@orpc/server';
 import { Inject, Injectable } from '@nestjs/common';
 import { CacheService } from '@features/users/backend/services/CacheService.js';
@@ -15,7 +16,7 @@ import { NoteReactionEntityService } from '../../serializers/NoteReactionEntityS
 import { QueryService } from '../../services/QueryService.js';
 import { authentication, apiPolicy } from '../../../../api/backend/transport/middleware.js';
 import { apiError } from '../../../../api/backend/transport/orpc-error.js';
-import { usersReactionsContract, usersReactionsPolicy, usersReactionsInput, usersReactionsOutput, usersReactionsErrors } from './reactions.contract.js';
+import { usersReactionsContract, usersReactionsPolicy, usersReactionsErrors } from './reactions.contract.js';
 import type { MiLocalUser } from '../../../../users/backend/models/User.js';
 import type { UserProfilesRepository, NoteReactionsRepository } from '@features/persistence/backend/repositories/models.js';
 import type { NotesApiContext } from '../../operations.js';
@@ -43,11 +44,11 @@ export class UsersReactionsOperation {
 		private queryService: QueryService,
 		private roleService: RoleService,
 	) {}
-	async execute(ps: v.InferOutput<typeof usersReactionsInput>, me: MiLocalUser | null): Promise<v.InferOutput<typeof usersReactionsOutput>> {
-		return v.parse(usersReactionsOutput, await this.run(ps, me));
+	async execute(ps: InferSchemaOutput<NonNullable<typeof usersReactionsContract['~orpc']['inputSchema']>>, me: MiLocalUser | null): Promise<InferSchemaOutput<NonNullable<typeof usersReactionsContract['~orpc']['outputSchema']>>> {
+		return v.parse(requiredSchema(usersReactionsContract['~orpc'].outputSchema), await this.run(ps, me));
 	}
 
-	private async run(ps: v.InferOutput<typeof usersReactionsInput>, me: MiLocalUser | null) {
+	private async run(ps: InferSchemaOutput<NonNullable<typeof usersReactionsContract['~orpc']['inputSchema']>>, me: MiLocalUser | null) {
 		const userIdsWhoBlockingMe = me ? await this.cacheService.userBlockedCache.fetch(me.id) : new Set<string>();
 		const iAmModerator = me ? await this.roleService.isModerator(me) : false; // Moderators can see reactions of all users
 		if (!iAmModerator) {
@@ -95,4 +96,9 @@ export class UsersReactionsOperation {
 
 		return await this.noteReactionEntityService.packManyWithNote(reactions, me);
 	}
+}
+
+function requiredSchema<Schema>(schema: Schema | undefined): Schema {
+	if (schema === undefined) throw new Error('Missing endpoint contract schema');
+	return schema;
 }

@@ -4,31 +4,14 @@
  */
 
 import { apiError, internalError } from '../../api/backend/transport/orpc-error.js';
-import type { InferContractRouterOutputs } from '@orpc/contract';
-import type * as v from 'valibot';
+import type { InferContractRouterOutputs, InferSchemaOutput } from '@orpc/contract';
 import type { ApiActor, ApiContext, ApiToken } from '../../api/backend/transport/context.js';
 import type { preferencesContract } from './api.contract.js';
-import type { registryGetInput } from './endpoints/i/registry/get.contract.js';
-import type { registryGetAllInput } from './endpoints/i/registry/get-all.contract.js';
-import type { registryGetDetailInput } from './endpoints/i/registry/get-detail.contract.js';
-import type { registryKeysInput } from './endpoints/i/registry/keys.contract.js';
-import type { registryKeysWithTypeInput } from './endpoints/i/registry/keys-with-type.contract.js';
-import type { registryRemoveInput } from './endpoints/i/registry/remove.contract.js';
-import type { registryScopesWithDomainInput } from './endpoints/i/registry/scopes-with-domain.contract.js';
-import type { registrySetInput } from './endpoints/i/registry/set.contract.js';
-import type { RegistryJsonValue, RegistryValueType } from './endpoints/i/registry/registry.schema.js';
+import type { RegistryJsonValue } from './endpoints/i/registry/registry.schema.js';
 
-type Inputs = {
-	get: v.InferOutput<typeof registryGetInput>;
-	getAll: v.InferOutput<typeof registryGetAllInput>;
-	getDetail: v.InferOutput<typeof registryGetDetailInput>;
-	keys: v.InferOutput<typeof registryKeysInput>;
-	keysWithType: v.InferOutput<typeof registryKeysWithTypeInput>;
-	remove: v.InferOutput<typeof registryRemoveInput>;
-	scopesWithDomain: v.InferOutput<typeof registryScopesWithDomainInput>;
-	set: v.InferOutput<typeof registrySetInput>;
-};
+type Inputs = { [K in keyof typeof preferencesContract]: InferSchemaOutput<NonNullable<(typeof preferencesContract)[K]['~orpc']['inputSchema']>> };
 type Outputs = InferContractRouterOutputs<typeof preferencesContract>;
+type RegistryValueType = Outputs['keysWithType'][string];
 
 export type PreferencesOperations<Actor extends ApiActor> = {
 	[K in keyof Inputs]: (input: Inputs[K], principal: Actor, token: ApiToken | null) => Promise<Outputs[K]>;

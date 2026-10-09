@@ -9,12 +9,13 @@ import { objectInput } from '../../../../../api/backend/transport/input.schema.j
 import { commonErrors } from '../../../../../api/backend/transport/errors.schema.js';
 import { finiteNumber } from '../../../queue.schema.js';
 
-export const adminQueueDeliverDelayedInput = objectInput({});
-export const adminQueueDeliverDelayedOutput = v.array(v.tuple([v.string(), finiteNumber]));
 export const adminQueueDeliverDelayedErrors = {} as const;
 
 const requestName = 'admin/queue/deliver-delayed';
-export const adminQueueDeliverDelayedContract = oc.$meta<{ requestName: typeof requestName }>({ requestName })
+export const adminQueueDeliverDelayedContract = oc.$meta({ requestName: requestName } as const)
 	.route({ method: 'POST', path: `/${requestName}`, operationId: 'post___' + requestName.replaceAll('/', '___'), tags: ['admin'], spec: current => ({ ...current, security: [{ bearerAuth: [] }] }) })
 	.errors({ ...commonErrors })
-	.input(adminQueueDeliverDelayedInput).output(adminQueueDeliverDelayedOutput);
+	.input(objectInput({})).output(v.array(v.tuple([v.string(), finiteNumber])));
+
+export type AdminQueueDeliverDelayedInput = v.InferOutput<NonNullable<typeof adminQueueDeliverDelayedContract['~orpc']['inputSchema']>>;
+export type AdminQueueDeliverDelayedOutput = v.InferOutput<NonNullable<typeof adminQueueDeliverDelayedContract['~orpc']['outputSchema']>>;

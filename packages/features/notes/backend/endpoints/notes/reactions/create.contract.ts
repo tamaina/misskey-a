@@ -9,8 +9,6 @@ import { commonErrors, apiErrorData } from '../../../../../api/backend/transport
 import { objectInput, misskeyId } from '../../../request.schema.js';
 import type { OpenAPI } from '@orpc/contract';
 
-export const notesReactionsCreateInput = objectInput({ noteId: misskeyId, reaction: v.string() });
-export const notesReactionsCreateOutput = v.void();
 export const notesReactionsCreateErrors = {
 	noSuchNote: {
 		message: 'No such note.',
@@ -35,7 +33,7 @@ export const notesReactionsCreateErrors = {
 } as const;
 export const notesReactionsCreatePolicy = { name: 'notes/reactions/create', requireCredential: true, prohibitMoved: true, kind: 'write:reactions' } as const;
 const security: OpenAPI.SecurityRequirementObject[] = [{ bearerAuth: [] }];
-export const notesReactionsCreateContract = oc.$meta<{ requestName: 'notes/reactions/create' }>({ requestName: 'notes/reactions/create' })
+export const notesReactionsCreateContract = oc.$meta({ requestName: 'notes/reactions/create' } as const)
 	.route({ method: 'POST', path: '/notes/reactions/create', operationId: 'post___notes___reactions___create', tags: ['reactions', 'notes'], spec: current => ({ ...current, security }), successStatus: 204 })
 	.errors({ ...commonErrors, NO_SUCH_NOTE: { status: 400, data: apiErrorData }, ALREADY_REACTED: { status: 400, data: apiErrorData }, YOU_HAVE_BEEN_BLOCKED: { status: 400, data: apiErrorData }, CANNOT_REACT_TO_RENOTE: { status: 400, data: apiErrorData } })
-	.input(notesReactionsCreateInput).output(notesReactionsCreateOutput);
+	.input(objectInput({ noteId: misskeyId, reaction: v.string() })).output(v.void());

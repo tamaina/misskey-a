@@ -12,7 +12,7 @@ import { AppEntityService } from '../../serializers/AppEntityService.js';
 import { DI } from '@/di-symbols.js';
 
 import * as v from 'valibot';
-import { uniqueAppCreateInput } from '../../auth.schema.js';
+import type { AppCreateContract } from '../../api.contract.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 
 export const meta = {
@@ -31,7 +31,7 @@ export class AppCreateOperation {
 		private idService: IdService,
 	) {}
 
-	async execute(ps: v.InferOutput<typeof uniqueAppCreateInput>, me: MiLocalUser | null) {
+	async execute(ps: v.InferOutput<NonNullable<typeof AppCreateContract['~orpc']['inputSchema']>>, me: MiLocalUser | null) {
 		// Generate secret
 		const secret = secureRndstr(32);
 

@@ -13,7 +13,14 @@ import * as v from 'valibot';
 import { createFlashUpdateProcedure } from '@features/play/backend/endpoints/flash/update.js';
 import { FlashUpdateApplicationService } from '@features/play/backend/applications/flash/update.js';
 import type { PlayContext } from '@features/play/backend/operations.js';
-import { flashUpdateInput, flashUpdateErrors } from '@features/play/backend/endpoints/flash/update.contract.js';
+import { flashUpdateContract, flashUpdateErrors } from '@features/play/backend/endpoints/flash/update.contract.js';
+
+function requiredSchema<T>(schema: T | undefined): T {
+	if (schema === undefined) throw new Error('Expected contract input schema');
+	return schema;
+}
+
+const flashUpdateInput = requiredSchema(flashUpdateContract['~orpc'].inputSchema);
 
 function setup() {
 	const flash = mockDeep<MiFlash>({ id: 'flash1', userId: 'user1' });

@@ -3,13 +3,13 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import type { InferOutput } from 'valibot';
+import type { InferSchemaOutput } from '@orpc/contract';
 import type { ApiActor } from '@features/api/backend/transport/context.js';
-import type { adminShowUserInput, adminShowUserOutput } from '@features/moderation/backend/api.schema.js';
+import type { moderationContract } from '@features/moderation/backend/api.contract.js';
 import type { ModerationOperations } from '@features/moderation/backend/api.operations.js';
 
-type Documented = InferOutput<typeof adminShowUserOutput>;
-type Input = InferOutput<typeof adminShowUserInput>;
+type Documented = InferSchemaOutput<NonNullable<typeof moderationContract.adminShowUser['~orpc']['outputSchema']>>;
+type Input = InferSchemaOutput<NonNullable<typeof moderationContract.adminShowUser['~orpc']['inputSchema']>>;
 declare const actor: ApiActor;
 declare const operations: ModerationOperations<ApiActor>;
 const input: Input = { userId: 'user123' };

@@ -9,8 +9,8 @@ import type { AccessTokensRepository } from '@features/persistence/backend/repos
 import { DI } from '@/di-symbols.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 
-import * as v from 'valibot';
-import { inlineIAppsInput } from '../../auth.schema.js';
+import type * as v from 'valibot';
+import type { IAppsContract } from '../../api.contract.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 
 export const meta = {
@@ -28,7 +28,7 @@ export class IAppsOperation {
 		private idService: IdService,
 	) {}
 
-	async execute(ps: v.InferOutput<typeof inlineIAppsInput>, me: MiLocalUser) {
+	async execute(ps: v.InferOutput<NonNullable<typeof IAppsContract['~orpc']['inputSchema']>>, me: MiLocalUser) {
 		const query = this.accessTokensRepository.createQueryBuilder('token')
 			.where('token.userId = :userId', { userId: me.id })
 			.leftJoinAndSelect('token.app', 'app');

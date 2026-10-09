@@ -11,8 +11,8 @@ import { PageLikeEntityService } from '../../serializers/PageLikeEntityService.j
 import { DI } from '@/di-symbols.js';
 
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
-import type * as v from 'valibot';
-import { iPageLikesInput } from '../../endpoints/i/page-likes.contract.js';
+import type { InferSchemaOutput } from '@orpc/contract';
+import { type iPageLikesContract } from '../../endpoints/i/page-likes.contract.js';
 
 @Injectable()
 export class IPageLikesApplicationService {
@@ -24,7 +24,7 @@ export class IPageLikesApplicationService {
 		private queryService: QueryService,
 	) {}
 
-	async execute(ps: v.InferOutput<typeof iPageLikesInput>, me: MiLocalUser) {
+	async execute(ps: InferSchemaOutput<NonNullable<(typeof iPageLikesContract)['~orpc']['inputSchema']>>, me: MiLocalUser) {
 		const query = this.queryService.makePaginationQuery(this.pageLikesRepository.createQueryBuilder('like'), ps.sinceId, ps.untilId, ps.sinceDate, ps.untilDate)
 			.andWhere('like.userId = :meId', { meId: me.id })
 			.leftJoinAndSelect('like.page', 'page');

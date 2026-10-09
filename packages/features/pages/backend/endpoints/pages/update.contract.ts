@@ -8,23 +8,9 @@ import * as v from 'valibot';
 import { commonErrors, apiErrorData } from '../../../../api/backend/transport/errors.schema.js';
 import { packedJsonObjectSchema } from '../../../../users/backend/json-value.schema.js';
 import { objectInput } from '../../../../api/backend/transport/input.schema.js';
-import { pageNameSchema } from '../../page-name.schema.js';
+import { jsonString } from '../../../../api/backend/transport/string.schema.js';
 const misskeyId = v.pipe(v.string(), v.regex(/^[a-zA-Z0-9]+$/));
 
-export const pagesUpdateInput = objectInput({
-	"pageId": misskeyId,
-	"title": v.exactOptional(v.string()),
-	"name": v.exactOptional(pageNameSchema),
-	"summary": v.exactOptional(v.nullable(v.string())),
-	"content": v.exactOptional(v.array(packedJsonObjectSchema)),
-	"variables": v.exactOptional(v.array(packedJsonObjectSchema)),
-	"script": v.exactOptional(v.string()),
-	"eyeCatchingImageId": v.exactOptional(v.nullable(misskeyId)),
-	"font": v.exactOptional(v.picklist(["serif", "sans-serif"])),
-	"alignCenter": v.exactOptional(v.boolean()),
-	"hideTitleWhenPinned": v.exactOptional(v.boolean()),
-});
-export const pagesUpdateOutput = v.void();
 export const pagesUpdateErrors = {
 	noSuchPage: { message: 'No such page.', code: 'NO_SUCH_PAGE', id: '21149b9e-3616-4778-9592-c4ce89f5a864' },
 	accessDenied: { message: 'Access denied.', code: 'ACCESS_DENIED', id: '3c15cd52-3b4b-4274-967d-6456fc4f792b' },
@@ -33,8 +19,23 @@ export const pagesUpdateErrors = {
 } as const;
 
 const requestName = 'pages/update';
-export const pagesUpdateContract = oc.$meta<{ requestName: typeof requestName }>({ requestName })
+export const pagesUpdateContract = oc.$meta({ requestName: requestName } as const)
 	.route({ method: 'POST', path: `/${requestName}`, operationId: 'post___' + requestName.replaceAll('/', '___'), tags: ['pages'], spec: current => ({ ...current, security: [{ bearerAuth: [] }] }), successStatus: 204, })
 	.errors({ ...commonErrors, NO_SUCH_PAGE: { status: 400, data: apiErrorData }, ACCESS_DENIED: { status: 400, data: apiErrorData }, NO_SUCH_FILE: { status: 400, data: apiErrorData }, NAME_ALREADY_EXISTS: { status: 400, data: apiErrorData } })
-	.input(pagesUpdateInput)
-	.output(pagesUpdateOutput);
+	.input(objectInput({
+		"pageId": misskeyId,
+		"title": v.exactOptional(v.string()),
+		"name": v.exactOptional(jsonString({
+			minLength: 1,
+			pattern: /^[^\s:\/?#\[\]@!$&'()*+,;=\\%\x00-\x20]{1,256}$/.source,
+		})),
+		"summary": v.exactOptional(v.nullable(v.string())),
+		"content": v.exactOptional(v.array(packedJsonObjectSchema)),
+		"variables": v.exactOptional(v.array(packedJsonObjectSchema)),
+		"script": v.exactOptional(v.string()),
+		"eyeCatchingImageId": v.exactOptional(v.nullable(misskeyId)),
+		"font": v.exactOptional(v.picklist(["serif", "sans-serif"])),
+		"alignCenter": v.exactOptional(v.boolean()),
+		"hideTitleWhenPinned": v.exactOptional(v.boolean()),
+	}))
+	.output(v.void());

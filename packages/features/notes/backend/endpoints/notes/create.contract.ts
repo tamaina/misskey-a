@@ -10,31 +10,6 @@ import { packedNoteSchema } from '../../note.schema.js';
 import { objectInput, misskeyId, jsonNumber, jsonString, uniqueStringArray, MAX_NOTE_TEXT_LENGTH } from '../../request.schema.js';
 import type { OpenAPI } from '@orpc/contract';
 
-export const notesCreateInput = v.pipe(objectInput({
-	visibility: v.optional(v.picklist(['public', 'home', 'followers', 'specified']), 'public'),
-	visibleUserIds: v.exactOptional(uniqueStringArray(misskeyId)),
-	cw: v.exactOptional(v.nullable(jsonString({ minLength: 1, maxLength: 100 }))),
-	localOnly: v.optional(v.boolean(), false),
-	reactionAcceptance: v.optional(v.pipe(v.nullable(v.picklist(['likeOnly', 'likeOnlyForRemote', 'nonSensitiveOnly', 'nonSensitiveOnlyForLocalLikeOnlyForRemote'])), v.metadata({ enum: [null, 'likeOnly', 'likeOnlyForRemote', 'nonSensitiveOnly', 'nonSensitiveOnlyForLocalLikeOnlyForRemote'] })), null),
-	noExtractMentions: v.optional(v.boolean(), false),
-	noExtractHashtags: v.optional(v.boolean(), false),
-	noExtractEmojis: v.optional(v.boolean(), false),
-	replyId: v.exactOptional(v.nullable(misskeyId)),
-	renoteId: v.exactOptional(v.nullable(misskeyId)),
-	channelId: v.exactOptional(v.nullable(misskeyId)),
-	text: v.exactOptional(v.nullable(jsonString({ minLength: 1, maxLength: MAX_NOTE_TEXT_LENGTH }))),
-	fileIds: v.exactOptional(v.pipe(uniqueStringArray(misskeyId), v.minLength(1), v.maxLength(16))),
-	mediaIds: v.exactOptional(v.pipe(uniqueStringArray(misskeyId), v.minLength(1), v.maxLength(16))),
-	poll: v.exactOptional(v.nullable(objectInput({
-		choices: v.pipe(uniqueStringArray(jsonString({ minLength: 1, maxLength: 50 })), v.minLength(2), v.maxLength(10)),
-		multiple: v.exactOptional(v.boolean()),
-		expiresAt: v.exactOptional(v.nullable(v.pipe(jsonNumber, v.integer()))),
-		expiredAfter: v.exactOptional(v.nullable(v.pipe(jsonNumber, v.integer(), v.minValue(1)))),
-	}))),
-}), v.check(value => value.renoteId != null || value.fileIds != null || value.mediaIds != null || value.poll != null || (typeof value.text === 'string' && /[^\s]+/.test(value.text)), 'Text or an attachment is required'));
-export const notesCreateOutput = v.strictObject({
-	createdNote: packedNoteSchema,
-});
 export const notesCreateErrors = {
 	noSuchRenoteTarget: {
 		message: 'No such renote target.',
@@ -125,7 +100,30 @@ export const notesCreatePolicy = { name: 'notes/create', requireCredential: true
 	max: 300,
 } } as const;
 const security: OpenAPI.SecurityRequirementObject[] = [{ bearerAuth: [] }];
-export const notesCreateContract = oc.$meta<{ requestName: 'notes/create' }>({ requestName: 'notes/create' })
+export const notesCreateContract = oc.$meta({ requestName: 'notes/create' } as const)
 	.route({ method: 'POST', path: '/notes/create', operationId: 'post___notes___create', tags: ['notes'], spec: current => ({ ...current, security }) })
 	.errors({ ...commonErrors, NO_SUCH_RENOTE_TARGET: { status: 400, data: apiErrorData }, CANNOT_RENOTE_TO_A_PURE_RENOTE: { status: 400, data: apiErrorData }, CANNOT_RENOTE_DUE_TO_VISIBILITY: { status: 400, data: apiErrorData }, NO_SUCH_REPLY_TARGET: { status: 400, data: apiErrorData }, CANNOT_REPLY_TO_AN_INVISIBLE_NOTE: { status: 400, data: apiErrorData }, CANNOT_REPLY_TO_A_PURE_RENOTE: { status: 400, data: apiErrorData }, CANNOT_REPLY_TO_SPECIFIED_VISIBILITY_NOTE_WITH_EXTENDED_VISIBILITY: { status: 400, data: apiErrorData }, CANNOT_CREATE_ALREADY_EXPIRED_POLL: { status: 400, data: apiErrorData }, NO_SUCH_CHANNEL: { status: 400, data: apiErrorData }, YOU_HAVE_BEEN_BLOCKED: { status: 400, data: apiErrorData }, NO_SUCH_FILE: { status: 400, data: apiErrorData }, CANNOT_RENOTE_OUTSIDE_OF_CHANNEL: { status: 400, data: apiErrorData }, CONTAINS_PROHIBITED_WORDS: { status: 400, data: apiErrorData }, CONTAINS_TOO_MANY_MENTIONS: { status: 400, data: apiErrorData } })
-	.input(notesCreateInput).output(notesCreateOutput);
+	.input(v.pipe(objectInput({
+	visibility: v.optional(v.picklist(['public', 'home', 'followers', 'specified']), 'public'),
+	visibleUserIds: v.exactOptional(uniqueStringArray(misskeyId)),
+	cw: v.exactOptional(v.nullable(jsonString({ minLength: 1, maxLength: 100 }))),
+	localOnly: v.optional(v.boolean(), false),
+	reactionAcceptance: v.optional(v.pipe(v.nullable(v.picklist(['likeOnly', 'likeOnlyForRemote', 'nonSensitiveOnly', 'nonSensitiveOnlyForLocalLikeOnlyForRemote'])), v.metadata({ enum: [null, 'likeOnly', 'likeOnlyForRemote', 'nonSensitiveOnly', 'nonSensitiveOnlyForLocalLikeOnlyForRemote'] })), null),
+	noExtractMentions: v.optional(v.boolean(), false),
+	noExtractHashtags: v.optional(v.boolean(), false),
+	noExtractEmojis: v.optional(v.boolean(), false),
+	replyId: v.exactOptional(v.nullable(misskeyId)),
+	renoteId: v.exactOptional(v.nullable(misskeyId)),
+	channelId: v.exactOptional(v.nullable(misskeyId)),
+	text: v.exactOptional(v.nullable(jsonString({ minLength: 1, maxLength: MAX_NOTE_TEXT_LENGTH }))),
+	fileIds: v.exactOptional(v.pipe(uniqueStringArray(misskeyId), v.minLength(1), v.maxLength(16))),
+	mediaIds: v.exactOptional(v.pipe(uniqueStringArray(misskeyId), v.minLength(1), v.maxLength(16))),
+	poll: v.exactOptional(v.nullable(objectInput({
+		choices: v.pipe(uniqueStringArray(jsonString({ minLength: 1, maxLength: 50 })), v.minLength(2), v.maxLength(10)),
+		multiple: v.exactOptional(v.boolean()),
+		expiresAt: v.exactOptional(v.nullable(v.pipe(jsonNumber, v.integer()))),
+		expiredAfter: v.exactOptional(v.nullable(v.pipe(jsonNumber, v.integer(), v.minValue(1)))),
+	}))),
+}), v.check(value => value.renoteId != null || value.fileIds != null || value.mediaIds != null || value.poll != null || (typeof value.text === 'string' && /[^\s]+/.test(value.text)), 'Text or an attachment is required'))).output(v.strictObject({
+	createdNote: packedNoteSchema,
+}));

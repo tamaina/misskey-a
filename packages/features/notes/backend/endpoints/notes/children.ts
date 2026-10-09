@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import type { InferSchemaOutput } from '@orpc/contract';
 import { implement } from '@orpc/server';
 import { Brackets } from 'typeorm';
 import { Inject, Injectable } from '@nestjs/common';
@@ -11,7 +12,7 @@ import { DI } from '@/di-symbols.js';
 import { authentication, apiPolicy } from '../../../../api/backend/transport/middleware.js';
 import { QueryService } from '../../services/QueryService.js';
 import { NoteEntityService } from '../../serializers/NoteEntityService.js';
-import { notesChildrenContract, notesChildrenPolicy, notesChildrenInput, notesChildrenOutput } from './children.contract.js';
+import { notesChildrenContract, notesChildrenPolicy } from './children.contract.js';
 import type { ApiActor } from '../../../../api/backend/transport/context.js';
 import type { NotesApiContext } from '../../operations.js';
 import type { NotesRepository } from '@features/persistence/backend/repositories/models.js';
@@ -33,11 +34,11 @@ export class NotesChildrenOperation {
 		private noteEntityService: NoteEntityService,
 		private queryService: QueryService,
 	) {}
-	async execute(ps: v.InferOutput<typeof notesChildrenInput>, me: MiLocalUser | null): Promise<v.InferOutput<typeof notesChildrenOutput>> {
-		return v.parse(notesChildrenOutput, await this.run(ps, me));
+	async execute(ps: InferSchemaOutput<NonNullable<typeof notesChildrenContract['~orpc']['inputSchema']>>, me: MiLocalUser | null): Promise<InferSchemaOutput<NonNullable<typeof notesChildrenContract['~orpc']['outputSchema']>>> {
+		return v.parse(requiredSchema(notesChildrenContract['~orpc'].outputSchema), await this.run(ps, me));
 	}
 
-	private async run(ps: v.InferOutput<typeof notesChildrenInput>, me: MiLocalUser | null) {
+	private async run(ps: InferSchemaOutput<NonNullable<typeof notesChildrenContract['~orpc']['inputSchema']>>, me: MiLocalUser | null) {
 		const query = this.queryService.makePaginationQuery(this.notesRepository.createQueryBuilder('note'), ps.sinceId, ps.untilId, ps.sinceDate, ps.untilDate)
 			.andWhere(new Brackets(qb => {
 				qb
@@ -66,4 +67,9 @@ export class NotesChildrenOperation {
 
 		return await this.noteEntityService.packMany(notes, me);
 	}
+}
+
+function requiredSchema<Schema>(schema: Schema | undefined): Schema {
+	if (schema === undefined) throw new Error('Missing endpoint contract schema');
+	return schema;
 }

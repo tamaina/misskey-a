@@ -8,10 +8,9 @@ import * as v from 'valibot';
 import { commonErrors } from '../../../../../api/backend/transport/errors.schema.js';
 import { objectInput } from '../../../../../api/backend/transport/input.schema.js';
 
-export const driveFilesCheckExistenceInput = objectInput({
-	"md5": v.string(),
-});
 export const driveFilesCheckExistenceErrors = {} as const;
-export const driveFilesCheckExistenceContract = oc.$meta<{ requestName: 'drive/files/check-existence' }>({ requestName: 'drive/files/check-existence' })
+export const driveFilesCheckExistenceContract = oc.$meta({ requestName: 'drive/files/check-existence' } as const)
 	.route({ method: 'POST', path: '/drive/files/check-existence', operationId: 'post___drive___files___check-existence', tags: ['drive'], description: 'Check if a given file exists.', spec: current => ({ ...current, security: [{ bearerAuth: [] }] }) })
-	.errors({ ...commonErrors }).input(driveFilesCheckExistenceInput).output(v.boolean());
+	.errors({ ...commonErrors }).input(objectInput({
+		"md5": v.string(),
+	})).output(v.boolean());

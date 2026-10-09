@@ -10,10 +10,6 @@ import { commonErrors, apiErrorData } from '../../../../../api/backend/transport
 import { misskeyId } from '../../../input.schema.js';
 import { systemWebhookSchema } from '../../../webhook.schema.js';
 
-export const adminSystemWebhookShowInput = objectInput({
-	"id": misskeyId,
-});
-export const adminSystemWebhookShowOutput = systemWebhookSchema;
 export const adminSystemWebhookShowErrors = {
 		noSuchSystemWebhook: {
 			message: 'No such SystemWebhook.',
@@ -25,7 +21,9 @@ export const adminSystemWebhookShowErrors = {
 	} as const;
 
 const requestName = 'admin/system-webhook/show';
-export const adminSystemWebhookShowContract = oc.$meta<{ requestName: typeof requestName }>({ requestName })
+export const adminSystemWebhookShowContract = oc.$meta({ requestName: requestName } as const)
 	.route({ method: 'POST', path: `/${requestName}`, operationId: 'post___' + requestName.replaceAll('/', '___'), tags: ['admin', 'system-webhook'], spec: current => ({ ...current, security: [{ bearerAuth: [] }] }) })
 	.errors({ ...commonErrors, NO_SUCH_SYSTEM_WEBHOOK: { status: 404, data: apiErrorData } })
-	.input(adminSystemWebhookShowInput).output(adminSystemWebhookShowOutput);
+	.input(objectInput({
+	"id": misskeyId,
+})).output(systemWebhookSchema);

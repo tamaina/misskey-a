@@ -11,7 +11,7 @@ import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { apiError } from '@features/api/backend/transport/orpc-error.js';
 import { SearchService } from '../../services/SearchService.js';
 
-import { notesSearchInput, notesSearchErrors } from '../../endpoints/notes/search.contract.js';
+import { type notesSearchContract, notesSearchErrors } from '../../endpoints/notes/search.contract.js';
 import type * as v from 'valibot';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 
@@ -24,7 +24,7 @@ export class NotesSearchApplicationService {
 		private idService: IdService,
 	) {}
 
-	async execute(ps: v.InferOutput<typeof notesSearchInput>, me: MiLocalUser | null) {
+	async execute(ps: v.InferOutput<NonNullable<typeof notesSearchContract['~orpc']['inputSchema']>>, me: MiLocalUser | null) {
 		const untilId = ps.untilId ?? (ps.untilDate ? this.idService.gen(ps.untilDate!) : undefined);
 		const sinceId = ps.sinceId ?? (ps.sinceDate ? this.idService.gen(ps.sinceDate!) : undefined);
 

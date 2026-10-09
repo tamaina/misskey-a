@@ -11,16 +11,15 @@ import type { IQueueBackend, Queue } from 'bullmq';
 import type { DataSource } from 'typeorm';
 import type { MiLocalUser } from '../../../users/backend/models/User.js';
 import { QueueService } from '../../../runtime/backend/services/QueueService.js';
-import { QUEUE_TYPES } from '../../backend/queue.schema.js';
-import { queueCounterSchema as packedQueueCountSchema, queueMetricsSchema as packedQueueMetricsSchema, queueJobSchema as packedQueueJobSchema } from '../../backend/queue.schema.js';
-import { adminQueuePauseInput, adminQueuePauseInput as queueInput } from '../../backend/endpoints/admin/queue/pause.contract.js';
-import { adminQueueClearInput } from '../../backend/endpoints/admin/queue/clear.contract.js';
-import { adminQueueRetryJobInput } from '../../backend/endpoints/admin/queue/retry-job.contract.js';
-import { adminQueueQueuesOutput as referenceAdminQueueQueuesOutput } from '../../backend/endpoints/admin/queue/queues.contract.js';
-import { adminQueueQueueStatsOutput as referenceAdminQueueQueueStatsOutput } from '../../backend/endpoints/admin/queue/queue-stats.contract.js';
-import { adminGetTableStatsOutput as inlineAdminGetTableStatsOutput } from '../../backend/endpoints/admin/get-table-stats.contract.js';
-import { adminGetIndexStatsOutput as inlineAdminGetIndexStatsOutput } from '../../backend/endpoints/admin/get-index-stats.contract.js';
-import { adminQueueStatsOutput as queueStatsOutput } from '../../backend/endpoints/admin/queue/stats.contract.js';
+import { QUEUE_TYPES, queueCounterSchema as packedQueueCountSchema, queueMetricsSchema as packedQueueMetricsSchema, queueJobSchema as packedQueueJobSchema } from '../../backend/queue.schema.js';
+import { adminQueuePauseContract } from '../../backend/endpoints/admin/queue/pause.contract.js';
+import { adminQueueClearContract } from '../../backend/endpoints/admin/queue/clear.contract.js';
+import { adminQueueRetryJobContract } from '../../backend/endpoints/admin/queue/retry-job.contract.js';
+import { adminQueueQueuesContract } from '../../backend/endpoints/admin/queue/queues.contract.js';
+import { adminQueueQueueStatsContract } from '../../backend/endpoints/admin/queue/queue-stats.contract.js';
+import { adminGetTableStatsContract } from '../../backend/endpoints/admin/get-table-stats.contract.js';
+import { adminGetIndexStatsContract } from '../../backend/endpoints/admin/get-index-stats.contract.js';
+import { adminQueueStatsContract } from '../../backend/endpoints/admin/queue/stats.contract.js';
 import { AdminQueueStatsApplicationService as AggregateStats } from '../../backend/endpoints/admin/queue/stats.application.js';
 import { AdminGetTableStatsApplicationService as TableStats } from '../../backend/endpoints/admin/get-table-stats.application.js';
 import { AdminGetIndexStatsApplicationService as IndexStats } from '../../backend/endpoints/admin/get-index-stats.application.js';
@@ -63,10 +62,10 @@ test('actual queue service envelopes preserve dynamic count names and finite met
 	const receiver = { getQueue: () => queue };
 	const rows = await Reflect.apply(QueueService.prototype.queueGetQueues, receiver, []);
 	expect(rows).toHaveLength(QUEUE_TYPES.length);
-	expect(v.parse(referenceAdminQueueQueuesOutput, rows)).toEqual(rows);
-	for (const invalid of [{ ...rows[0], future: true }, { ...rows[0], metrics: { ...rows[0].metrics, future: true } }, { ...rows[0], counts: { custom: 'bad' } }]) expect(v.safeParse(referenceAdminQueueQueuesOutput, [invalid]).success).toBe(false);
+	expect(v.parse(adminQueueQueuesContract['~orpc'].outputSchema!, rows)).toEqual(rows);
+	for (const invalid of [{ ...rows[0], future: true }, { ...rows[0], metrics: { ...rows[0].metrics, future: true } }, { ...rows[0], counts: { custom: 'bad' } }]) expect(v.safeParse(adminQueueQueuesContract['~orpc'].outputSchema!, [invalid]).success).toBe(false);
 	const result = await Reflect.apply(QueueService.prototype.queueGetQueue, receiver, ['system']);
-	rejectsFields(referenceAdminQueueQueueStatsOutput, result);
+	rejectsFields(adminQueueQueueStatsContract['~orpc'].outputSchema!, result);
 	for (const path of [['metrics'], ['metrics', 'completed'], ['metrics', 'completed', 'meta'], ['db'], ['db', 'memory'], ['db', 'clients']]) {
 		for (const mutation of ['extra', 'missing', 'wrong']) {
 			const invalid = structuredClone(result);
@@ -80,7 +79,7 @@ test('actual queue service envelopes preserve dynamic count names and finite met
 			if (mutation === 'extra') branch.future = true;
 			else if (mutation === 'missing') delete branch[first];
 			else branch[first] = typeof branch[first] === 'string' ? 1 : 'wrong';
-			expect(v.safeParse(referenceAdminQueueQueueStatsOutput, invalid).success, `${path.join('.')}:${mutation}`).toBe(false);
+			expect(v.safeParse(adminQueueQueueStatsContract['~orpc'].outputSchema!, invalid).success, `${path.join('.')}:${mutation}`).toBe(false);
 		}
 	}
 	expect(result.counts.prioritized).toBe(7);
@@ -91,18 +90,18 @@ test('finite queue counts, metrics, aggregate wrappers and table record values r
 	rejectsFields(packedQueueCountSchema, counts);
 	rejectsFields(packedQueueMetricsSchema, metrics);
 	const stats = { deliver: counts, inbox: counts, db: counts, objectStorage: counts };
-	rejectsFields(queueStatsOutput, stats);
-	for (const value of [{ ...counts, future: true }, { ...counts, waiting: undefined }, { ...counts, waiting: 'bad' }]) expect(v.safeParse(queueStatsOutput, { ...stats, deliver: value }).success).toBe(false);
-	expect(v.parse(inlineAdminGetTableStatsOutput, { custom_table: { count: 2, size: 1024 } })).toEqual({ custom_table: { count: 2, size: 1024 } });
-	for (const value of [{ count: 2, size: 1024, future: true }, { count: 2 }, { count: 'bad', size: 1024 }]) expect(v.safeParse(inlineAdminGetTableStatsOutput, { custom_table: value }).success).toBe(false);
+	rejectsFields(adminQueueStatsContract['~orpc'].outputSchema!, stats);
+	for (const value of [{ ...counts, future: true }, { ...counts, waiting: undefined }, { ...counts, waiting: 'bad' }]) expect(v.safeParse(adminQueueStatsContract['~orpc'].outputSchema!, { ...stats, deliver: value }).success).toBe(false);
+	expect(v.parse(adminGetTableStatsContract['~orpc'].outputSchema!, { custom_table: { count: 2, size: 1024 } })).toEqual({ custom_table: { count: 2, size: 1024 } });
+	for (const value of [{ count: 2, size: 1024, future: true }, { count: 2 }, { count: 'bad', size: 1024 }]) expect(v.safeParse(adminGetTableStatsContract['~orpc'].outputSchema!, { custom_table: value }).success).toBe(false);
 });
 
 test('native queue requests strip extras and reject invalid selectors', () => {
- for (const schema of [adminQueuePauseInput, adminQueueClearInput, adminQueueRetryJobInput]) {
+ for (const schema of [adminQueuePauseContract['~orpc'].inputSchema!, adminQueueClearContract['~orpc'].inputSchema!, adminQueueRetryJobContract['~orpc'].inputSchema!]) {
   expect(v.parse(schema, { queue: 'system', state: '*', jobId: 'job1', future: true })).not.toHaveProperty('future');
   for (const input of [{}, { queue: 'unsupported' }, { queue: 1 }]) expect(v.safeParse(schema, input).success).toBe(false);
  }
- expect(v.safeParse(queueInput, []).success).toBe(false);
+ expect(v.safeParse(adminQueuePauseContract['~orpc'].inputSchema!, []).success).toBe(false);
 });
 
 test('finite pg_indexes wire schema preserves all five SELECT-star columns and nullable source paths', async () => {
@@ -110,12 +109,12 @@ test('finite pg_indexes wire schema preserves all five SELECT-star columns and n
 	const db = mockDeep<DataSource>();
 	db.query.mockResolvedValue(rows);
 	const result = await new IndexStats(db).execute({}, mockDeep<MiLocalUser>());
-	expect(v.parse(inlineAdminGetIndexStatsOutput, result)).toEqual(rows);
+	expect(v.parse(adminGetIndexStatsContract['~orpc'].outputSchema!, result)).toEqual(rows);
 	expect(db.query).toHaveBeenCalledWith('SELECT * FROM pg_indexes;');
 	expect(result[0]).toEqual(rows[0]);
 	for (const field of ['schemaname', 'tablespace', 'indexdef'] as const) {
 		const nullable = [{ ...rows[0], [field]: null }];
-		expect(v.parse(inlineAdminGetIndexStatsOutput, nullable)).toEqual(nullable);
+		expect(v.parse(adminGetIndexStatsContract['~orpc'].outputSchema!, nullable)).toEqual(nullable);
 	}
 	for (const value of [
 		{ ...rows[0], future: true },
@@ -124,11 +123,11 @@ test('finite pg_indexes wire schema preserves all five SELECT-star columns and n
 		{ ...rows[0], indexdef: 7 },
 		{ ...rows[0], tablename: null },
 		{ ...rows[0], indexname: null },
-	]) expect(v.safeParse(inlineAdminGetIndexStatsOutput, [value]).success).toBe(false);
+	]) expect(v.safeParse(adminGetIndexStatsContract['~orpc'].outputSchema!, [value]).success).toBe(false);
 	for (const field of ['schemaname', 'tablename', 'indexname', 'tablespace', 'indexdef'] as const) {
 		const missing: Record<string, string | null> = { ...rows[0] };
 		delete missing[field];
-		expect(v.safeParse(inlineAdminGetIndexStatsOutput, [missing]).success).toBe(false);
+		expect(v.safeParse(adminGetIndexStatsContract['~orpc'].outputSchema!, [missing]).success).toBe(false);
 	}
 	const extended = [{ ...rows[0], future: true }];
  db.query.mockResolvedValue(extended);
@@ -168,10 +167,10 @@ test('installed Bull default counts and metrics agree with actual aggregate/tabl
 	const storage = mockDeep<Parameters[6]>();
 	for (const queue of [deliver, inbox, dbQueue, storage]) queue.getJobCounts.mockResolvedValue(produced);
 	const result = await new AggregateStats(mockDeep(), mockDeep(), mockDeep(), deliver, inbox, dbQueue, storage, mockDeep(), mockDeep()).execute({}, mockDeep<MiLocalUser>());
-	expect(v.parse(queueStatsOutput, result)).toEqual({ deliver: produced, inbox: produced, db: produced, objectStorage: produced });
+	expect(v.parse(adminQueueStatsContract['~orpc'].outputSchema!, result)).toEqual({ deliver: produced, inbox: produced, db: produced, objectStorage: produced });
 	for (const queue of [deliver, inbox, dbQueue, storage]) expect(queue.getJobCounts).toHaveBeenCalledWith();
 	const db = mockDeep<DataSource>();
 	db.query.mockResolvedValue([{ table: 'custom_table', count: '3', size: '1024' }]);
 	const tables = await new TableStats(db).execute({}, mockDeep<MiLocalUser>());
-	expect(v.parse(inlineAdminGetTableStatsOutput, tables)).toEqual({ custom_table: { count: 3, size: 1024 } });
+	expect(v.parse(adminGetTableStatsContract['~orpc'].outputSchema!, tables)).toEqual({ custom_table: { count: 3, size: 1024 } });
 });

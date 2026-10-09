@@ -11,7 +11,8 @@ import { DI } from '@/di-symbols.js';
 import { sqlLikeEscape } from '../../../../persistence/backend/utility/sql-like-escape.js';
 import type { MiUser } from '../../../../users/backend/models/User.js';
 import * as v from 'valibot';
-import { federationInstancesInput, federationInstancesOutput } from './instances.contract.js';
+import type { FederationInstancesInput, FederationInstancesOutput } from './instances.contract.js';
+import { federationInstancesContract } from './instances.contract.js';
 
 @Injectable()
 export class FederationInstancesApplicationService {
@@ -23,7 +24,7 @@ export class FederationInstancesApplicationService {
 		private metaService: MetaService,
 	) {}
 
-	public async execute(ps: v.InferOutput<typeof federationInstancesInput>, me: MiUser | null): Promise<v.InferOutput<typeof federationInstancesOutput>> {
+	public async execute(ps: FederationInstancesInput, me: MiUser | null): Promise<FederationInstancesOutput> {
 		const result = await (async () => {
 			const query = this.instancesRepository.createQueryBuilder('instance');
 
@@ -120,6 +121,6 @@ export class FederationInstancesApplicationService {
 
 			return await this.instanceEntityService.packMany(instances, me);
 		})();
-		return v.parse(federationInstancesOutput, result);
+		return v.parse(federationInstancesContract['~orpc'].outputSchema!, result);
 	}
 }

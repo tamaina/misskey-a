@@ -9,7 +9,8 @@ import { RelayService } from '../../../services/RelayService.js';
 import { apiError } from '../../../../../api/backend/transport/orpc-error.js';
 import type { MiUser } from '../../../../../users/backend/models/User.js';
 import * as v from 'valibot';
-import { adminRelaysAddInput, adminRelaysAddOutput, adminRelaysAddErrors } from './add.contract.js';
+import type { AdminRelaysAddInput, AdminRelaysAddOutput } from './add.contract.js';
+import { adminRelaysAddContract, adminRelaysAddErrors } from './add.contract.js';
 
 @Injectable()
 export class AdminRelaysAddApplicationService {
@@ -17,7 +18,7 @@ export class AdminRelaysAddApplicationService {
 		private relayService: RelayService,
 	) {}
 
-	public async execute(ps: v.InferOutput<typeof adminRelaysAddInput>, _me: MiUser): Promise<v.InferOutput<typeof adminRelaysAddOutput>> {
+	public async execute(ps: AdminRelaysAddInput, _me: MiUser): Promise<AdminRelaysAddOutput> {
 		const result = await (async () => {
 			try {
 				if (new URL(ps.inbox).protocol !== 'https:') throw new Error('https only');
@@ -27,6 +28,6 @@ export class AdminRelaysAddApplicationService {
 
 			return await this.relayService.addRelay(ps.inbox);
 		})();
-		return v.parse(adminRelaysAddOutput, result);
+		return v.parse(adminRelaysAddContract['~orpc'].outputSchema!, result);
 	}
 }

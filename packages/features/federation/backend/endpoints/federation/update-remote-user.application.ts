@@ -8,7 +8,8 @@ import { ApPersonService } from '../../services/ApPersonService.js';
 import { GetterService } from '../../../../api/backend/transport/GetterService.js';
 import type { MiUser } from '../../../../users/backend/models/User.js';
 import * as v from 'valibot';
-import { federationUpdateRemoteUserInput, federationUpdateRemoteUserOutput } from './update-remote-user.contract.js';
+import type { FederationUpdateRemoteUserInput, FederationUpdateRemoteUserOutput } from './update-remote-user.contract.js';
+import { federationUpdateRemoteUserContract } from './update-remote-user.contract.js';
 
 @Injectable()
 export class FederationUpdateRemoteUserApplicationService {
@@ -17,12 +18,12 @@ export class FederationUpdateRemoteUserApplicationService {
 		private apPersonService: ApPersonService,
 	) {}
 
-	public async execute(ps: v.InferOutput<typeof federationUpdateRemoteUserInput>, _me: MiUser): Promise<v.InferOutput<typeof federationUpdateRemoteUserOutput>> {
+	public async execute(ps: FederationUpdateRemoteUserInput, _me: MiUser): Promise<FederationUpdateRemoteUserOutput> {
 		const result = await (async () => {
 			const user = await this.getterService.getRemoteUser(ps.userId);
 
 			await this.apPersonService.updatePerson(user.uri!);
 		})();
-		return v.parse(federationUpdateRemoteUserOutput, result);
+		return v.parse(federationUpdateRemoteUserContract['~orpc'].outputSchema!, result);
 	}
 }

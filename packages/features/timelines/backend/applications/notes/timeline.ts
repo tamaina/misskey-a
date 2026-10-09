@@ -17,7 +17,7 @@ import { ChannelFollowingService } from '@features/channels/backend/services/Cha
 import { DI } from '@/di-symbols.js';
 import { FanoutTimelineEndpointService } from '../../services/FanoutTimelineEndpointService.js';
 
-import { notesTimelineInput } from '../../endpoints/notes/timeline.contract.js';
+import type { notesTimelineContract } from '../../endpoints/notes/timeline.contract.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 import type * as v from 'valibot';
 import type { NotesRepository, MiMeta } from '@features/persistence/backend/repositories/models.js';
@@ -42,7 +42,7 @@ export class NotesTimelineApplicationService {
 		private queryService: QueryService,
 	) {}
 
-	async execute(ps: v.InferOutput<typeof notesTimelineInput>, me: MiLocalUser) {
+	async execute(ps: v.InferOutput<NonNullable<typeof notesTimelineContract['~orpc']['inputSchema']>>, me: MiLocalUser) {
 		const untilId = ps.untilId ?? (ps.untilDate ? this.idService.gen(ps.untilDate!) : null);
 		const sinceId = ps.sinceId ?? (ps.sinceDate ? this.idService.gen(ps.sinceDate!) : null);
 

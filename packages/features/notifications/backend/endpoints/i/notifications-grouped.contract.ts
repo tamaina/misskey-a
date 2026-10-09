@@ -9,11 +9,9 @@ import { commonErrors } from '../../../../api/backend/transport/errors.schema.js
 import { packedNotificationSchema } from '../../notification.schema.js';
 import { notificationListInput } from './notification-input.schema.js';
 
-export const groupedInput = notificationListInput;
-export const groupedOutput = v.array(packedNotificationSchema);
 const requestName = 'i/notifications-grouped';
-export const groupedContract = oc.$meta<{ requestName: typeof requestName }>({ requestName })
+export const groupedContract = oc.$meta({ requestName: requestName } as const)
 	.route({ method: 'POST', path: `/${requestName}`, operationId: 'post___' + requestName.replaceAll('/', '___'), tags: ['account', 'notifications'], spec: current => ({ ...current, security: [{ bearerAuth: [] }] }) })
 	.errors(commonErrors)
-	.input(groupedInput)
-	.output(groupedOutput);
+	.input(notificationListInput)
+	.output(v.array(packedNotificationSchema));

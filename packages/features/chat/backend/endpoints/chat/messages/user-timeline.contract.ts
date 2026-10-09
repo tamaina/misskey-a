@@ -10,15 +10,6 @@ import { commonErrors, apiErrorData } from '../../../../../api/backend/transport
 import { packedChatMessageLiteFor1on1Schema } from '../../../chat.schema.js';
 import { objectInput, misskeyId } from '../../../request.schema.js';
 
-export const chatMessagesUserTimelineInput = objectInput({
-	"limit": v.optional(v.pipe(v.pipe(v.pipe(v.number(), v.finite()), v.integer()), v.minValue(1), v.maxValue(100)), 10),
-	"sinceId": v.exactOptional(misskeyId),
-	"untilId": v.exactOptional(misskeyId),
-	"sinceDate": v.exactOptional(v.pipe(v.pipe(v.number(), v.finite()), v.integer())),
-	"untilDate": v.exactOptional(v.pipe(v.pipe(v.number(), v.finite()), v.integer())),
-	"userId": misskeyId,
-});
-export const chatMessagesUserTimelineOutput = v.array(packedChatMessageLiteFor1on1Schema);
 export const chatMessagesUserTimelineErrors = {
 		noSuchUser: {
 			message: 'No such user.',
@@ -28,7 +19,14 @@ export const chatMessagesUserTimelineErrors = {
 	} as const;
 export const chatMessagesUserTimelinePolicy = { name: 'chat/messages/user-timeline', requireCredential: true, kind: 'read:chat' } as const;
 const security: OpenAPI.SecurityRequirementObject[] = [{ bearerAuth: [] }];
-export const chatMessagesUserTimelineContract = oc.$meta<{ requestName: 'chat/messages/user-timeline' }>({ requestName: 'chat/messages/user-timeline' })
+export const chatMessagesUserTimelineContract = oc.$meta({ requestName: 'chat/messages/user-timeline' } as const)
 	.route({ method: 'POST', path: '/chat/messages/user-timeline', operationId: 'post___chat___messages___user-timeline', tags: ['chat'], spec: current => ({ ...current, security }) })
 	.errors({ ...commonErrors, NO_SUCH_USER: { status: 400, data: apiErrorData } })
-	.input(chatMessagesUserTimelineInput).output(chatMessagesUserTimelineOutput);
+	.input(objectInput({
+	"limit": v.optional(v.pipe(v.pipe(v.pipe(v.number(), v.finite()), v.integer()), v.minValue(1), v.maxValue(100)), 10),
+	"sinceId": v.exactOptional(misskeyId),
+	"untilId": v.exactOptional(misskeyId),
+	"sinceDate": v.exactOptional(v.pipe(v.pipe(v.number(), v.finite()), v.integer())),
+	"untilDate": v.exactOptional(v.pipe(v.pipe(v.number(), v.finite()), v.integer())),
+	"userId": misskeyId,
+})).output(v.array(packedChatMessageLiteFor1on1Schema));

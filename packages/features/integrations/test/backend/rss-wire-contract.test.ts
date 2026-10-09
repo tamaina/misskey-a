@@ -8,7 +8,7 @@ import * as v from 'valibot';
 import Parser from 'rss-parser';
 import { Response } from 'node-fetch';
 import { mockDeep } from 'vitest-mock-extended';
-import { fetchRssInput, fetchRssOutput as inlineFetchRssOutput } from '../../backend/endpoints/fetch-rss.contract.js';
+import { fetchRssContract } from '../../backend/endpoints/fetch-rss.contract.js';
 import { FetchRssApplicationService as FetchRssEndpoint } from '../../backend/endpoints/fetch-rss.application.js';
 import type { HttpRequestService } from '@features/runtime/backend/services/HttpRequestService.js';
 
@@ -26,17 +26,17 @@ const richRss = `<rss version="2.0" xmlns:itunes="http://www.itunes.com/dtds/pod
 test('real RSS wire retains string XML attributes, known extra fields and explicit XML subtrees', async () => {
 	const raw = await new Parser().parseString(richRss);
 	const wire: unknown = JSON.parse(JSON.stringify(raw));
-	expect(v.parse(inlineFetchRssOutput, wire)).toEqual(wire);
+	expect(v.parse(requiredSchema(fetchRssContract['~orpc'].outputSchema), wire)).toEqual(wire);
 	expect(raw.items[0].enclosure).toMatchObject({ length: '123', extension: 'retained' });
 	expect(raw).toHaveProperty('ttl', '60');
 	expect(raw).toHaveProperty('image.width', '32');
-	expect(v.safeParse(inlineFetchRssOutput, { ...raw, future: true }).success).toBe(false);
-	expect(v.safeParse(inlineFetchRssOutput, { ...raw, items: [{ ...raw.items[0], future: true }] }).success).toBe(false);
-	expect(v.safeParse(inlineFetchRssOutput, { ...raw, items: [{ ...raw.items[0], enclosure: { url: 'url', length: 123 } }] }).success).toBe(false);
-	expect(v.safeParse(inlineFetchRssOutput, { ...raw, items: [{ ...raw.items[0], enclosure: { extension: {} } }] }).success).toBe(false);
-	expect(v.safeParse(inlineFetchRssOutput, { items: [], skipHours: new Date() }).success).toBe(false);
-	expect(v.safeParse(inlineFetchRssOutput, { items: [], title: new Date() }).success).toBe(false);
-	expect(v.safeParse(inlineFetchRssOutput, { items: [], title: { callback: () => undefined } }).success).toBe(false);
+	expect(v.safeParse(requiredSchema(fetchRssContract['~orpc'].outputSchema), { ...raw, future: true }).success).toBe(false);
+	expect(v.safeParse(requiredSchema(fetchRssContract['~orpc'].outputSchema), { ...raw, items: [{ ...raw.items[0], future: true }] }).success).toBe(false);
+	expect(v.safeParse(requiredSchema(fetchRssContract['~orpc'].outputSchema), { ...raw, items: [{ ...raw.items[0], enclosure: { url: 'url', length: 123 } }] }).success).toBe(false);
+	expect(v.safeParse(requiredSchema(fetchRssContract['~orpc'].outputSchema), { ...raw, items: [{ ...raw.items[0], enclosure: { extension: {} } }] }).success).toBe(false);
+	expect(v.safeParse(requiredSchema(fetchRssContract['~orpc'].outputSchema), { items: [], skipHours: new Date() }).success).toBe(false);
+	expect(v.safeParse(requiredSchema(fetchRssContract['~orpc'].outputSchema), { items: [], title: new Date() }).success).toBe(false);
+	expect(v.safeParse(requiredSchema(fetchRssContract['~orpc'].outputSchema), { items: [], title: { callback: () => undefined } }).success).toBe(false);
 });
 
 test.each([
@@ -47,7 +47,7 @@ test.each([
 ])('real Atom/RSS 1/RSS 0.9 payloads fit the finite wire model', async xml => {
 	const raw = await new Parser().parseString(xml);
 	const wire: unknown = JSON.parse(JSON.stringify(raw));
-	expect(v.parse(inlineFetchRssOutput, wire)).toEqual(wire);
+	expect(v.parse(requiredSchema(fetchRssContract['~orpc'].outputSchema), wire)).toEqual(wire);
 });
 
 test('actual RSS HTTP handler keeps XML output, URL normalization, limits and documented errors', async () => {
@@ -57,13 +57,18 @@ test('actual RSS HTTP handler keeps XML output, URL normalization, limits and do
 	Object.defineProperty(response, 'url', { value: 'https://example.com/feed' });
 	http.send.mockResolvedValue(response);
 	const endpoint = new FetchRssEndpoint(http);
-	const raw = await endpoint.execute(v.parse(fetchRssInput, { url: 'https://example.com/feed#fragment', future: true }), null);
+	const raw = await endpoint.execute(v.parse(requiredSchema(fetchRssContract['~orpc'].inputSchema), { url: 'https://example.com/feed#fragment', future: true }), null);
 	expect(raw.items[0].enclosure).toHaveProperty('length', '123');
-	expect(v.parse(inlineFetchRssOutput, JSON.parse(JSON.stringify(raw)))).toEqual(raw);
+	expect(v.parse(requiredSchema(fetchRssContract['~orpc'].outputSchema), JSON.parse(JSON.stringify(raw)))).toEqual(raw);
 	expect(http.send).toHaveBeenCalledWith('https://example.com/feed', { method: 'GET', headers: { Accept: 'application/rss+xml, */*' }, timeout: 5000, size: 1024 * 1024 });
 	await expect(endpoint.execute({ url: 'file:///tmp/feed' }, null)).rejects.toMatchObject({ code: 'INVALID_URL' });
-	expect(v.safeParse(fetchRssInput, {}).success).toBe(false);
+	expect(v.safeParse(requiredSchema(fetchRssContract['~orpc'].inputSchema), {}).success).toBe(false);
 	http.send.mockRejectedValue(new Error('network'));
 	await expect(endpoint.execute({ url: 'https://example.com/failure' }, null)).rejects.toMatchObject({ code: 'FETCH_RSS_FAILED' });
-	expect(v.parse(fetchRssInput, { url: 'https://example.com/feed', future: true })).toEqual({ url: 'https://example.com/feed' });
+	expect(v.parse(requiredSchema(fetchRssContract['~orpc'].inputSchema), { url: 'https://example.com/feed', future: true })).toEqual({ url: 'https://example.com/feed' });
 });
+
+function requiredSchema<Schema>(schema: Schema | undefined): Schema {
+	if (schema === undefined) throw new Error('Contract must declare its schema');
+	return schema;
+}

@@ -14,8 +14,8 @@ import { IdentifiableError } from '@features/runtime/backend/errors/identifiable
 import { PageService } from '../../services/PageService.js';
 
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
-import type * as v from 'valibot';
-import { pagesDeleteInput, pagesDeleteErrors } from '../../endpoints/pages/delete.contract.js';
+import type { InferSchemaOutput } from '@orpc/contract';
+import { type pagesDeleteContract, pagesDeleteErrors } from '../../endpoints/pages/delete.contract.js';
 
 @Injectable()
 export class PagesDeleteApplicationService {
@@ -23,7 +23,7 @@ export class PagesDeleteApplicationService {
 		private pageService: PageService,
 	) {}
 
-	async execute(ps: v.InferOutput<typeof pagesDeleteInput>, me: MiLocalUser) {
+	async execute(ps: InferSchemaOutput<NonNullable<(typeof pagesDeleteContract)['~orpc']['inputSchema']>>, me: MiLocalUser) {
 		try {
 			await this.pageService.delete(me, ps.pageId);
 		} catch (err) {

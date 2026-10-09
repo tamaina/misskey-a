@@ -11,11 +11,6 @@ import { jsonString } from '../../../../../api/backend/transport/string.schema.j
 import { misskeyId } from '../../../../../users/backend/users.input.schema.js';
 import { packedDriveFolderSchema } from '../../../../../notes/backend/drive.schema.js';
 
-export const driveFoldersUpdateInput = objectInput({
-	"folderId": misskeyId,
-	"name": v.exactOptional(jsonString({ "maxLength": 200 })),
-	"parentId": v.exactOptional(v.nullable(misskeyId)),
-});
 export const driveFoldersUpdateErrors = {
 		noSuchFolder: {
 			message: 'No such folder.',
@@ -35,6 +30,10 @@ export const driveFoldersUpdateErrors = {
 			id: 'dbeb024837894013aed44279f9199740',
 		},
 	} as const;
-export const driveFoldersUpdateContract = oc.$meta<{ requestName: 'drive/folders/update' }>({ requestName: 'drive/folders/update' })
+export const driveFoldersUpdateContract = oc.$meta({ requestName: 'drive/folders/update' } as const)
 	.route({ method: 'POST', path: '/drive/folders/update', operationId: 'post___drive___folders___update', tags: ['drive'], spec: current => ({ ...current, security: [{ bearerAuth: [] }] }) })
-	.errors({ ...commonErrors, NO_SUCH_FOLDER: { status: 400, data: apiErrorData }, NO_SUCH_PARENT_FOLDER: { status: 400, data: apiErrorData }, RECURSIVE_NESTING: { status: 400, data: apiErrorData } }).input(driveFoldersUpdateInput).output(packedDriveFolderSchema);
+	.errors({ ...commonErrors, NO_SUCH_FOLDER: { status: 400, data: apiErrorData }, NO_SUCH_PARENT_FOLDER: { status: 400, data: apiErrorData }, RECURSIVE_NESTING: { status: 400, data: apiErrorData } }).input(objectInput({
+		"folderId": misskeyId,
+		"name": v.exactOptional(jsonString({ "maxLength": 200 })),
+		"parentId": v.exactOptional(v.nullable(misskeyId)),
+	})).output(packedDriveFolderSchema);

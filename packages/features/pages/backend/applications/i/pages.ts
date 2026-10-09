@@ -11,8 +11,8 @@ import { PageEntityService } from '../../serializers/PageEntityService.js';
 import { DI } from '@/di-symbols.js';
 
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
-import type * as v from 'valibot';
-import { iPagesInput } from '../../endpoints/i/pages.contract.js';
+import type { InferSchemaOutput } from '@orpc/contract';
+import { type iPagesContract } from '../../endpoints/i/pages.contract.js';
 
 @Injectable()
 export class IPagesApplicationService {
@@ -24,7 +24,7 @@ export class IPagesApplicationService {
 		private queryService: QueryService,
 	) {}
 
-	async execute(ps: v.InferOutput<typeof iPagesInput>, me: MiLocalUser) {
+	async execute(ps: InferSchemaOutput<NonNullable<(typeof iPagesContract)['~orpc']['inputSchema']>>, me: MiLocalUser) {
 		const query = this.queryService.makePaginationQuery(this.pagesRepository.createQueryBuilder('page'), ps.sinceId, ps.untilId, ps.sinceDate, ps.untilDate)
 			.andWhere('page.userId = :meId', { meId: me.id });
 

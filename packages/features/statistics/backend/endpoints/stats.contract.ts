@@ -9,21 +9,19 @@ import { objectInput } from '../../../api/backend/transport/input.schema.js';
 import { commonErrors } from '../../../api/backend/transport/errors.schema.js';
 
 const finiteNumber = v.pipe(v.number(), v.finite());
-export const statsInput = v.optional(objectInput({}), {});
-export const statsOutput = v.strictObject({
-	notesCount: finiteNumber,
-	originalNotesCount: finiteNumber,
-	usersCount: finiteNumber,
-	originalUsersCount: finiteNumber,
-	reactionsCount: finiteNumber,
-	instances: finiteNumber,
-	driveUsageLocal: finiteNumber,
-	driveUsageRemote: finiteNumber,
-});
 
 const requestName = 'stats';
-export const statsContract = oc.$meta<{ requestName: typeof requestName }>({ requestName })
+export const statsContract = oc.$meta({ requestName: requestName } as const)
 	.route({ method: 'POST', path: `/${requestName}`, operationId: 'post___' + requestName, tags: ['meta'] })
 	.errors(commonErrors)
-	.input(statsInput)
-	.output(statsOutput);
+	.input(v.optional(objectInput({}), {}))
+	.output(v.strictObject({
+		notesCount: finiteNumber,
+		originalNotesCount: finiteNumber,
+		usersCount: finiteNumber,
+		originalUsersCount: finiteNumber,
+		reactionsCount: finiteNumber,
+		instances: finiteNumber,
+		driveUsageLocal: finiteNumber,
+		driveUsageRemote: finiteNumber,
+	}));

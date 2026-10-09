@@ -7,27 +7,9 @@ import type { InferContractRouterOutputs } from '@orpc/contract';
 import type { ApiActor, ApiContext } from '../../api/backend/transport/context.js';
 import type { statisticsContract } from './endpoints/statistics.contract.js';
 import type * as v from 'valibot';
-import type { chartInput, instanceChartInput, userChartInput } from './endpoints/charts/chart-input.schema.js';
-import type { retentionInput } from './endpoints/retention.contract.js';
-import type { statsInput } from './endpoints/stats.contract.js';
 
-type ChartInput = v.InferOutput<typeof chartInput>;
-type UserChartInput = v.InferOutput<typeof userChartInput>;
 type Inputs = {
-	activeUsers: ChartInput;
-	apRequest: ChartInput;
-	drive: ChartInput;
-	federation: ChartInput;
-	instance: v.InferOutput<typeof instanceChartInput>;
-	notes: ChartInput;
-	userDrive: UserChartInput;
-	userFollowing: UserChartInput;
-	userNotes: UserChartInput;
-	userPv: UserChartInput;
-	userReactions: UserChartInput;
-	users: ChartInput;
-	retention: v.InferOutput<typeof retentionInput>;
-	stats: v.InferOutput<typeof statsInput>;
+	[K in Exclude<keyof typeof statisticsContract, `${string}Get`>]: v.InferOutput<NonNullable<typeof statisticsContract[K]['~orpc']['inputSchema']>>;
 };
 type Outputs = InferContractRouterOutputs<typeof statisticsContract>;
 

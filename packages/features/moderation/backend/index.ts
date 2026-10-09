@@ -7,4 +7,4 @@ export { createModerationOperations, ModerationApplicationService } from './api.
 export type { ModerationOperations, ModerationApiDependencies } from './api.operations.js';
 export { moderationContract } from './api.contract.js';
 export { createModerationRouter } from './api.router.js';
-export { moderationInputs, moderationOutputs } from './api.schema.js';
+export { abuseReportNotificationRecipientSchema } from './api.schema.js';

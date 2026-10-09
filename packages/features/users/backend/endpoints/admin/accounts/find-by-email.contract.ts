@@ -8,9 +8,6 @@ import * as v from 'valibot';
 import { commonErrors, apiErrorData } from '../../../../../api/backend/transport/errors.schema.js';
 import { objectInput } from '../../../users.input.schema.js';
 import { packedUserDetailedNotMeSchema } from '../../../user.schema.js';
-export const packedAdminAccountsFindByEmailInput = objectInput({
-	'email': v.string(),
-});
 export const adminAccountsFindByEmailErrors = {
 	userNotFound: {
 		message: 'No such user who has the email address.',
@@ -18,6 +15,8 @@ export const adminAccountsFindByEmailErrors = {
 		id: 'cb865949-8af5-4062-a88c-ef55e8786d1d',
 	},
 } as const;
-export const adminAccountsFindByEmailContract = oc.$meta<{ requestName: 'admin/accounts/find-by-email' }>({ requestName: 'admin/accounts/find-by-email' })
+export const adminAccountsFindByEmailContract = oc.$meta({ requestName: 'admin/accounts/find-by-email' } as const)
 	.route({ method: 'POST', path: '/admin/accounts/find-by-email', operationId: 'post___admin___accounts___find-by-email', tags: ['admin'], spec: current => ({ ...current, security: [{ bearerAuth: [] }] }) })
-	.errors({ ...commonErrors, USER_NOT_FOUND: { status: 400, data: apiErrorData } }).input(packedAdminAccountsFindByEmailInput).output(packedUserDetailedNotMeSchema);
+	.errors({ ...commonErrors, USER_NOT_FOUND: { status: 400, data: apiErrorData } }).input(objectInput({
+	'email': v.string(),
+})).output(packedUserDetailedNotMeSchema);

@@ -9,7 +9,10 @@ import { objectInput } from '../../input.schema.js';
 import { commonErrors } from '../../../../../api/backend/transport/errors.schema.js';
 import { packedAdSchema } from '../../meta.schema.js';
 
-export const adCreateInput = objectInput({
+export const adCreateContract = oc.$meta({ requestName: 'admin/ad/create', allowGet: false } as const)
+	.route({ method: 'POST', path: '/admin/ad/create', operationId: 'post___admin___ad___create', tags: ['admin'] })
+	.errors({ ...commonErrors })
+	.input(objectInput({
 	'url': v.pipe(v.string(), v.minLength(1)),
 	'memo': v.string(),
 	'place': v.string(),
@@ -20,10 +23,5 @@ export const adCreateInput = objectInput({
 	'imageUrl': v.pipe(v.string(), v.minLength(1)),
 	'dayOfWeek': v.pipe(v.pipe(v.number(), v.finite()), v.integer()),
 	'isSensitive': v.exactOptional(v.boolean()),
-});
-
-export const adCreateContract = oc.$meta<{ requestName: 'admin/ad/create'; allowGet: boolean; cacheSec?: number }>({ requestName: 'admin/ad/create', allowGet: false })
-	.route({ method: 'POST', path: '/admin/ad/create', operationId: 'post___admin___ad___create', tags: ['admin'] })
-	.errors({ ...commonErrors })
-	.input(adCreateInput)
+}))
 	.output(packedAdSchema);

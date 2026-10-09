@@ -11,8 +11,8 @@ import { DI } from '@/di-symbols.js';
 import { apiError } from '@features/api/backend/transport/orpc-error.js';
 
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
-import type * as v from 'valibot';
-import { bubbleGameRegisterInput, bubbleGameRegisterErrors } from '../../endpoints/bubble-game/register.contract.js';
+import type { InferSchemaOutput } from '@orpc/contract';
+import { type bubbleGameRegisterContract, bubbleGameRegisterErrors } from '../../endpoints/bubble-game/register.contract.js';
 
 @Injectable()
 export class BubbleGameRegisterApplicationService {
@@ -23,7 +23,7 @@ export class BubbleGameRegisterApplicationService {
 		private idService: IdService,
 	) {}
 
-	async execute(ps: v.InferOutput<typeof bubbleGameRegisterInput>, me: MiLocalUser) {
+	async execute(ps: InferSchemaOutput<NonNullable<(typeof bubbleGameRegisterContract)['~orpc']['inputSchema']>>, me: MiLocalUser) {
 		const seedDate = new Date(parseInt(ps.seed, 10));
 		const now = new Date();
 

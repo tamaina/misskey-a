@@ -10,12 +10,6 @@ import { packedNoteSchema } from '../../note.schema.js';
 import { objectInput, misskeyId } from '../../request.schema.js';
 import type { OpenAPI } from '@orpc/contract';
 
-export const notesConversationInput = objectInput({
-	'noteId': misskeyId,
-	'limit': v.optional(v.pipe(v.pipe(v.pipe(v.number(), v.finite()), v.integer()), v.minValue(1), v.maxValue(100)), 10),
-	'offset': v.optional(v.pipe(v.pipe(v.number(), v.finite()), v.integer()), 0),
-});
-export const notesConversationOutput = v.array(packedNoteSchema);
 export const notesConversationErrors = {
 	noSuchNote: {
 		message: 'No such note.',
@@ -25,7 +19,11 @@ export const notesConversationErrors = {
 } as const;
 export const notesConversationPolicy = { name: 'notes/conversation', requireCredential: false } as const;
 const security: OpenAPI.SecurityRequirementObject[] = [{}, { bearerAuth: [] }];
-export const notesConversationContract = oc.$meta<{ requestName: 'notes/conversation' }>({ requestName: 'notes/conversation' })
+export const notesConversationContract = oc.$meta({ requestName: 'notes/conversation' } as const)
 	.route({ method: 'POST', path: '/notes/conversation', operationId: 'post___notes___conversation', tags: ['notes'], spec: current => ({ ...current, security }) })
 	.errors({ ...commonErrors, NO_SUCH_NOTE: { status: 400, data: apiErrorData } })
-	.input(notesConversationInput).output(notesConversationOutput);
+	.input(objectInput({
+	'noteId': misskeyId,
+	'limit': v.optional(v.pipe(v.pipe(v.pipe(v.number(), v.finite()), v.integer()), v.minValue(1), v.maxValue(100)), 10),
+	'offset': v.optional(v.pipe(v.pipe(v.number(), v.finite()), v.integer()), 0),
+})).output(v.array(packedNoteSchema));

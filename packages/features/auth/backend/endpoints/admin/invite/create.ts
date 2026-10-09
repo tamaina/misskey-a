@@ -13,8 +13,8 @@ import { generateInviteCode } from '../../../utility/generate-invite-code.js';
 import { ModerationLogService } from '@features/moderation/backend/services/ModerationLogService.js';
 import { apiError } from '@features/api/backend/transport/orpc-error.js';
 
-import * as v from 'valibot';
-import { packedAdminInviteCreateInput } from '../../../auth.schema.js';
+import type * as v from 'valibot';
+import type { AdminInviteCreateContract } from '../../../api.contract.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 
 export const meta = {
@@ -44,7 +44,7 @@ export class AdminInviteCreateOperation {
 		private moderationLogService: ModerationLogService,
 	) {}
 
-	async execute(ps: v.InferOutput<typeof packedAdminInviteCreateInput>, me: MiLocalUser) {
+	async execute(ps: v.InferOutput<NonNullable<typeof AdminInviteCreateContract['~orpc']['inputSchema']>>, me: MiLocalUser) {
 		if (ps.expiresAt && isNaN(Date.parse(ps.expiresAt))) {
 			throw apiError(meta.errors.invalidDateTime);
 		}

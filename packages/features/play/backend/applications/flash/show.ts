@@ -11,8 +11,8 @@ import { DI } from '@/di-symbols.js';
 import { apiError } from '@features/api/backend/transport/orpc-error.js';
 
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
-import type * as v from 'valibot';
-import { flashShowInput, flashShowErrors } from '../../endpoints/flash/show.contract.js';
+import type { InferSchemaOutput } from '@orpc/contract';
+import { type flashShowContract, flashShowErrors } from '../../endpoints/flash/show.contract.js';
 
 @Injectable()
 export class FlashShowApplicationService {
@@ -23,7 +23,7 @@ export class FlashShowApplicationService {
 		private flashEntityService: FlashEntityService,
 	) {}
 
-	async execute(ps: v.InferOutput<typeof flashShowInput>, me: MiLocalUser | null) {
+	async execute(ps: InferSchemaOutput<NonNullable<(typeof flashShowContract)['~orpc']['inputSchema']>>, me: MiLocalUser | null) {
 		const flash = await this.flashsRepository.findOneBy({ id: ps.flashId });
 
 		if (flash == null) {

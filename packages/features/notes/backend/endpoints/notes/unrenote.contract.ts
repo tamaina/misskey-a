@@ -9,8 +9,6 @@ import { commonErrors, apiErrorData } from '../../../../api/backend/transport/er
 import { objectInput, misskeyId } from '../../request.schema.js';
 import type { OpenAPI } from '@orpc/contract';
 
-export const notesUnrenoteInput = objectInput({ noteId: misskeyId });
-export const notesUnrenoteOutput = v.void();
 export const notesUnrenoteErrors = {
 	noSuchNote: {
 		message: 'No such note.',
@@ -20,7 +18,7 @@ export const notesUnrenoteErrors = {
 } as const;
 export const notesUnrenotePolicy = { name: 'notes/unrenote', requireCredential: true, kind: 'write:notes', limit: { duration: 3600000, max: 300, minInterval: 1000 } } as const;
 const security: OpenAPI.SecurityRequirementObject[] = [{ bearerAuth: [] }];
-export const notesUnrenoteContract = oc.$meta<{ requestName: 'notes/unrenote' }>({ requestName: 'notes/unrenote' })
+export const notesUnrenoteContract = oc.$meta({ requestName: 'notes/unrenote' } as const)
 	.route({ method: 'POST', path: '/notes/unrenote', operationId: 'post___notes___unrenote', tags: ['notes'], spec: current => ({ ...current, security }), successStatus: 204 })
 	.errors({ ...commonErrors, NO_SUCH_NOTE: { status: 400, data: apiErrorData } })
-	.input(notesUnrenoteInput).output(notesUnrenoteOutput);
+	.input(objectInput({ noteId: misskeyId })).output(v.void());

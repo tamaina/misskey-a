@@ -10,7 +10,7 @@ import { QueryService } from '@features/notes/backend/services/QueryService.js';
 import { NoteEntityService } from '@features/notes/backend/serializers/NoteEntityService.js';
 import { DI } from '@/di-symbols.js';
 
-import { notesMentionsInput } from '../../endpoints/notes/mentions.contract.js';
+import type { notesMentionsContract } from '../../endpoints/notes/mentions.contract.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 import type * as v from 'valibot';
 import type { NotesRepository, FollowingsRepository } from '@features/persistence/backend/repositories/models.js';
@@ -28,7 +28,7 @@ export class NotesMentionsApplicationService {
 		private queryService: QueryService,
 	) {}
 
-	async execute(ps: v.InferOutput<typeof notesMentionsInput>, me: MiLocalUser) {
+	async execute(ps: v.InferOutput<NonNullable<typeof notesMentionsContract['~orpc']['inputSchema']>>, me: MiLocalUser) {
 		const followingQuery = this.followingsRepository.createQueryBuilder('following')
 			.select('following.followeeId')
 			.where('following.followerId = :followerId', { followerId: me.id });

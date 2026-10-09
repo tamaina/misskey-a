@@ -3,13 +3,14 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import type { InferSchemaOutput } from '@orpc/contract';
 import { expect, expectTypeOf, test, vi } from 'vitest';
 import * as v from 'valibot';
 import { mockDeep } from 'vitest-mock-extended';
 import { ModuleRef } from '@nestjs/core';
-import { notesDraftsCountInput as countInput, notesDraftsCountOutput as countOutput } from '../../backend/endpoints/notes/drafts/count.contract.js';
-import { notesShowPartialBulkInput as partialInput, notesShowPartialBulkOutput as partialOutput } from '../../backend/endpoints/notes/show-partial-bulk.contract.js';
-import { notesTranslateInput as translateInput, notesTranslateOutput as translateOutput } from '../../backend/endpoints/notes/translate.contract.js';
+import { notesDraftsCountContract } from '../../backend/endpoints/notes/drafts/count.contract.js';
+import { notesShowPartialBulkContract } from '../../backend/endpoints/notes/show-partial-bulk.contract.js';
+import { notesTranslateContract } from '../../backend/endpoints/notes/translate.contract.js';
 import { NotesDraftsCountOperation as CountOperation } from '../../backend/endpoints/notes/drafts/count.js';
 import { NotesShowPartialBulkOperation as PartialOperation } from '../../backend/endpoints/notes/show-partial-bulk.js';
 import { NotesTranslateOperation as TranslateOperation } from '../../backend/endpoints/notes/translate.js';
@@ -34,29 +35,29 @@ const item = { id: 'note123', reactions: { '🔥': 1 }, reactionEmojis: { 'remot
 const translation = { sourceLang: 'JA', text: 'hello' };
 
 test('native finite schemas retain explicit fields, required properties and optional root', () => {
-	expectTypeOf<v.InferOutput<typeof partialInput>>().toEqualTypeOf<{ noteIds: string[] }>();
-	expectTypeOf<v.InferOutput<typeof translateInput>>().toEqualTypeOf<{ noteId: string; targetLang: string }>();
-	expectTypeOf<v.InferOutput<typeof partialOutput>>().toEqualTypeOf<{ id: string; reactions: Record<string, number>; reactionEmojis: Record<string, string> }[]>();
-	expectTypeOf<v.InferOutput<typeof translateOutput>>().toEqualTypeOf<{ sourceLang: string; text: string } | undefined>();
-	expect(v.parse(countInput, { i: 'transport', future: true })).toEqual({});
-	expect(v.parse(countOutput, 7)).toBe(7);
-	for (const value of [undefined, '7', {}]) expect(v.safeParse(countOutput, value).success).toBe(false);
-	expect(v.parse(partialInput, { noteIds: ['note123'], future: true })).toEqual({ noteIds: ['note123'] });
-	for (const value of [{}, { noteIds: [] }, { noteIds: ['bad-id'] }, { noteIds: [7] }, { noteIds: Array(101).fill('note123') }]) expect(v.safeParse(partialInput, value).success).toBe(false);
-	expect(v.parse(partialOutput, [item])).toEqual([item]);
-	for (const value of [[{ id: 'note123', reactions: {} }], [{ ...item, id: 7 }], [{ ...item, reactions: { x: 'bad' } }], [{ ...item, reactionEmojis: { x: 7 } }], [{ ...item, future: true }]]) expect(v.safeParse(partialOutput, value).success).toBe(false);
-	expect(v.parse(translateInput, { noteId: 'note123', targetLang: 'en-US', future: true })).toEqual({ noteId: 'note123', targetLang: 'en-US' });
-	for (const value of [{ noteId: 'note123' }, { noteId: 'note123', targetLang: 7 }, { noteId: null, targetLang: 'en' }]) expect(v.safeParse(translateInput, value).success).toBe(false);
-	expect(v.parse(translateOutput, undefined)).toBeUndefined();
-	expect(v.parse(translateOutput, translation)).toEqual(translation);
-	for (const value of [null, { sourceLang: 'JA' }, { ...translation, text: 7 }, { ...translation, sourceLang: null }, { ...translation, future: true }]) expect(v.safeParse(translateOutput, value).success).toBe(false);
+	expectTypeOf<InferSchemaOutput<NonNullable<typeof notesShowPartialBulkContract['~orpc']['inputSchema']>>>().toEqualTypeOf<{ noteIds: string[] }>();
+	expectTypeOf<InferSchemaOutput<NonNullable<typeof notesTranslateContract['~orpc']['inputSchema']>>>().toEqualTypeOf<{ noteId: string; targetLang: string }>();
+	expectTypeOf<InferSchemaOutput<NonNullable<typeof notesShowPartialBulkContract['~orpc']['outputSchema']>>>().toEqualTypeOf<{ id: string; reactions: Record<string, number>; reactionEmojis: Record<string, string> }[]>();
+	expectTypeOf<InferSchemaOutput<NonNullable<typeof notesTranslateContract['~orpc']['outputSchema']>>>().toEqualTypeOf<{ sourceLang: string; text: string } | undefined>();
+	expect(v.parse(requiredSchema(notesDraftsCountContract['~orpc'].inputSchema), { i: 'transport', future: true })).toEqual({});
+	expect(v.parse(requiredSchema(notesDraftsCountContract['~orpc'].outputSchema), 7)).toBe(7);
+	for (const value of [undefined, '7', {}]) expect(v.safeParse(requiredSchema(notesDraftsCountContract['~orpc'].outputSchema), value).success).toBe(false);
+	expect(v.parse(requiredSchema(notesShowPartialBulkContract['~orpc'].inputSchema), { noteIds: ['note123'], future: true })).toEqual({ noteIds: ['note123'] });
+	for (const value of [{}, { noteIds: [] }, { noteIds: ['bad-id'] }, { noteIds: [7] }, { noteIds: Array(101).fill('note123') }]) expect(v.safeParse(requiredSchema(notesShowPartialBulkContract['~orpc'].inputSchema), value).success).toBe(false);
+	expect(v.parse(requiredSchema(notesShowPartialBulkContract['~orpc'].outputSchema), [item])).toEqual([item]);
+	for (const value of [[{ id: 'note123', reactions: {} }], [{ ...item, id: 7 }], [{ ...item, reactions: { x: 'bad' } }], [{ ...item, reactionEmojis: { x: 7 } }], [{ ...item, future: true }]]) expect(v.safeParse(requiredSchema(notesShowPartialBulkContract['~orpc'].outputSchema), value).success).toBe(false);
+	expect(v.parse(requiredSchema(notesTranslateContract['~orpc'].inputSchema), { noteId: 'note123', targetLang: 'en-US', future: true })).toEqual({ noteId: 'note123', targetLang: 'en-US' });
+	for (const value of [{ noteId: 'note123' }, { noteId: 'note123', targetLang: 7 }, { noteId: null, targetLang: 'en' }]) expect(v.safeParse(requiredSchema(notesTranslateContract['~orpc'].inputSchema), value).success).toBe(false);
+	expect(v.parse(requiredSchema(notesTranslateContract['~orpc'].outputSchema), undefined)).toBeUndefined();
+	expect(v.parse(requiredSchema(notesTranslateContract['~orpc'].outputSchema), translation)).toEqual(translation);
+	for (const value of [null, { sourceLang: 'JA' }, { ...translation, text: 7 }, { ...translation, sourceLang: null }, { ...translation, future: true }]) expect(v.safeParse(requiredSchema(notesTranslateContract['~orpc'].outputSchema), value).success).toBe(false);
 });
 
 test('native output validation rejects undocumented producer fields and non-finite counts', () => {
-	expect(v.safeParse(countOutput, Infinity).success).toBe(false);
-	expect(v.safeParse(countOutput, NaN).success).toBe(false);
-	expect(v.safeParse(partialOutput, [{ ...item, future: true }]).success).toBe(false);
-	expect(v.safeParse(translateOutput, { ...translation, future: true }).success).toBe(false);
+	expect(v.safeParse(requiredSchema(notesDraftsCountContract['~orpc'].outputSchema), Infinity).success).toBe(false);
+	expect(v.safeParse(requiredSchema(notesDraftsCountContract['~orpc'].outputSchema), NaN).success).toBe(false);
+	expect(v.safeParse(requiredSchema(notesShowPartialBulkContract['~orpc'].outputSchema), [{ ...item, future: true }]).success).toBe(false);
+	expect(v.safeParse(requiredSchema(notesTranslateContract['~orpc'].outputSchema), { ...translation, future: true }).success).toBe(false);
 });
 
 test('draft count handler retains author filtering and scalar response', async () => {
@@ -67,7 +68,7 @@ test('draft count handler retains author filtering and scalar response', async (
 	query.getCount.mockResolvedValue(7);
 	const user = mockDeep<MiLocalUser>({ id: 'user123' });
 	const endpoint = new CountOperation(repository);
-	expect(await endpoint.execute(v.parse(countInput, { i: 'transport' }), user)).toBe(7);
+	expect(await endpoint.execute(v.parse(requiredSchema(notesDraftsCountContract['~orpc'].inputSchema), { i: 'transport' }), user)).toBe(7);
 	expect(query.where).toHaveBeenCalledWith('drafts.userId = :meId', { meId: user.id });
 });
 
@@ -92,7 +93,7 @@ test.each([false, true])('real partial serializer emits exactly the documented f
 	const endpoint = new PartialOperation(serializer);
 	const result = await endpoint.execute({ noteIds: [visible.id, hidden.id] }, null);
 	expect(result).toEqual([item]);
-	expect(v.parse(partialOutput, result)).toEqual(result);
+	expect(v.parse(requiredSchema(notesShowPartialBulkContract['~orpc'].outputSchema), result)).toEqual(result);
 	expect(Object.keys(result[0])).toEqual(['id', 'reactions', 'reactionEmojis']);
 	expect(serializer.isVisibleForMe).toHaveBeenCalledTimes(2);
 	expect(buffering.mergeReactions).toHaveBeenCalledWith(item.reactions, enableReactionsBuffering ? { '🔥': 1 } : {});
@@ -116,7 +117,7 @@ test.each([false, true])('translate handler projects provider response and retai
 	const endpoint = new TranslateOperation(settings, notes, getter, http, roles);
 	const result = await endpoint.execute({ noteId: note.id, targetLang: 'en-US' }, user);
 	expect(result).toEqual(translation);
-	expect(v.parse(translateOutput, result)).toEqual(result);
+	expect(v.parse(requiredSchema(notesTranslateContract['~orpc'].outputSchema), result)).toEqual(result);
 	expect(Object.keys(result!)).toEqual(['sourceLang', 'text']);
 	expect(http.send.mock.calls[0][0]).toBe(deeplIsPro ? 'https://api.deepl.com/v2/translate' : 'https://api-free.deepl.com/v2/translate');
 	expect(new URLSearchParams(String(http.send.mock.calls[0][1]?.body)).get('target_lang')).toBe('en');
@@ -179,3 +180,8 @@ test.each([false, true])('real Note serializer preserves native undefined and JS
 	expect(v.safeParse(packedNoteSchema, missing).success).toBe(false);
 	expect(v.safeParse(packedNoteSchema, { ...raw, future: true }).success).toBe(false);
 });
+
+function requiredSchema<Schema>(schema: Schema | undefined): Schema {
+	if (schema === undefined) throw new Error('Missing endpoint contract schema');
+	return schema;
+}

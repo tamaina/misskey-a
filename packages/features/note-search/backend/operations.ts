@@ -5,10 +5,10 @@
 
 import type * as v from 'valibot';
 import type { ApiActor, ApiContext } from '../../api/backend/transport/context.js';
-import type { notesSearchInput, notesSearchOutput } from './endpoints/notes/search.contract.js';
+import type { notesSearchContract } from './endpoints/notes/search.contract.js';
 
 export interface NoteSearchOperations<Actor extends ApiActor> {
-	notesSearch(input: v.InferOutput<typeof notesSearchInput>, actor: Actor | null): Promise<v.InferOutput<typeof notesSearchOutput>>;
+	notesSearch(input: v.InferOutput<NonNullable<typeof notesSearchContract['~orpc']['inputSchema']>>, actor: Actor | null): Promise<v.InferOutput<NonNullable<typeof notesSearchContract['~orpc']['outputSchema']>>>;
 }
 export type NoteSearchContext<Actor extends ApiActor> = ApiContext<Actor> & {
 	operations: { noteSearch: NoteSearchOperations<Actor> };

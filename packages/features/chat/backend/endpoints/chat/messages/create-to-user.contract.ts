@@ -10,12 +10,6 @@ import { commonErrors, apiErrorData } from '../../../../../api/backend/transport
 import { packedChatMessageLiteFor1on1Schema } from '../../../chat.schema.js';
 import { objectInput, misskeyId, jsonString } from '../../../request.schema.js';
 
-export const chatMessagesCreateToUserInput = objectInput({
-	"text": v.exactOptional(v.nullable(jsonString({ "maxLength": 2000 }))),
-	"fileId": v.exactOptional(misskeyId),
-	"toUserId": misskeyId,
-});
-export const chatMessagesCreateToUserOutput = packedChatMessageLiteFor1on1Schema;
 export const chatMessagesCreateToUserErrors = {
 		recipientIsYourself: {
 			message: 'You can not send a message to yourself.',
@@ -52,7 +46,11 @@ export const chatMessagesCreateToUserPolicy = { name: 'chat/messages/create-to-u
 		max: 500,
 	} } as const;
 const security: OpenAPI.SecurityRequirementObject[] = [{ bearerAuth: [] }];
-export const chatMessagesCreateToUserContract = oc.$meta<{ requestName: 'chat/messages/create-to-user' }>({ requestName: 'chat/messages/create-to-user' })
+export const chatMessagesCreateToUserContract = oc.$meta({ requestName: 'chat/messages/create-to-user' } as const)
 	.route({ method: 'POST', path: '/chat/messages/create-to-user', operationId: 'post___chat___messages___create-to-user', tags: ['chat'], spec: current => ({ ...current, security }) })
 	.errors({ ...commonErrors, RECIPIENT_IS_YOURSELF: { status: 400, data: apiErrorData }, NO_SUCH_USER: { status: 400, data: apiErrorData }, NO_SUCH_FILE: { status: 400, data: apiErrorData }, CONTENT_REQUIRED: { status: 400, data: apiErrorData }, YOU_HAVE_BEEN_BLOCKED: { status: 400, data: apiErrorData } })
-	.input(chatMessagesCreateToUserInput).output(chatMessagesCreateToUserOutput);
+	.input(objectInput({
+	"text": v.exactOptional(v.nullable(jsonString({ "maxLength": 2000 }))),
+	"fileId": v.exactOptional(misskeyId),
+	"toUserId": misskeyId,
+})).output(packedChatMessageLiteFor1on1Schema);

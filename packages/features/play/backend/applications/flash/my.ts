@@ -11,8 +11,8 @@ import { FlashEntityService } from '../../serializers/FlashEntityService.js';
 import { DI } from '@/di-symbols.js';
 
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
-import type * as v from 'valibot';
-import { flashMyInput } from '../../endpoints/flash/my.contract.js';
+import type { InferSchemaOutput } from '@orpc/contract';
+import { type flashMyContract } from '../../endpoints/flash/my.contract.js';
 
 @Injectable()
 export class FlashMyApplicationService {
@@ -24,7 +24,7 @@ export class FlashMyApplicationService {
 		private queryService: QueryService,
 	) {}
 
-	async execute(ps: v.InferOutput<typeof flashMyInput>, me: MiLocalUser) {
+	async execute(ps: InferSchemaOutput<NonNullable<(typeof flashMyContract)['~orpc']['inputSchema']>>, me: MiLocalUser) {
 		const query = this.queryService.makePaginationQuery(this.flashsRepository.createQueryBuilder('flash'), ps.sinceId, ps.untilId, ps.sinceDate, ps.untilDate)
 			.andWhere('flash.userId = :meId', { meId: me.id });
 

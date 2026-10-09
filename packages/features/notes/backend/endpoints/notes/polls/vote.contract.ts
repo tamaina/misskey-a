@@ -9,11 +9,6 @@ import { commonErrors, apiErrorData } from '../../../../../api/backend/transport
 import { objectInput, misskeyId } from '../../../request.schema.js';
 import type { OpenAPI } from '@orpc/contract';
 
-export const notesPollsVoteInput = objectInput({
-	'noteId': misskeyId,
-	'choice': v.pipe(v.pipe(v.number(), v.finite()), v.integer()),
-});
-export const notesPollsVoteOutput = v.void();
 export const notesPollsVoteErrors = {
 	noSuchNote: {
 		message: 'No such note.',
@@ -53,7 +48,10 @@ export const notesPollsVoteErrors = {
 } as const;
 export const notesPollsVotePolicy = { name: 'notes/polls/vote', requireCredential: true, prohibitMoved: true, kind: 'write:votes' } as const;
 const security: OpenAPI.SecurityRequirementObject[] = [{ bearerAuth: [] }];
-export const notesPollsVoteContract = oc.$meta<{ requestName: 'notes/polls/vote' }>({ requestName: 'notes/polls/vote' })
+export const notesPollsVoteContract = oc.$meta({ requestName: 'notes/polls/vote' } as const)
 	.route({ method: 'POST', path: '/notes/polls/vote', operationId: 'post___notes___polls___vote', tags: ['notes'], spec: current => ({ ...current, security }), successStatus: 204 })
 	.errors({ ...commonErrors, NO_SUCH_NOTE: { status: 400, data: apiErrorData }, NO_POLL: { status: 400, data: apiErrorData }, INVALID_CHOICE: { status: 400, data: apiErrorData }, ALREADY_VOTED: { status: 400, data: apiErrorData }, ALREADY_EXPIRED: { status: 400, data: apiErrorData }, YOU_HAVE_BEEN_BLOCKED: { status: 400, data: apiErrorData } })
-	.input(notesPollsVoteInput).output(notesPollsVoteOutput);
+	.input(objectInput({
+	'noteId': misskeyId,
+	'choice': v.pipe(v.pipe(v.number(), v.finite()), v.integer()),
+})).output(v.void());

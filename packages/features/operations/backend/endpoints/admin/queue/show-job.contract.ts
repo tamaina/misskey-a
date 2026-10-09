@@ -7,18 +7,18 @@ import { oc } from '@orpc/contract';
 import * as v from 'valibot';
 import { objectInput } from '../../../../../api/backend/transport/input.schema.js';
 import { commonErrors } from '../../../../../api/backend/transport/errors.schema.js';
-import { QUEUE_TYPES } from '../../../queue.schema.js';
-import { queueJobSchema } from '../../../queue.schema.js';
+import { QUEUE_TYPES, queueJobSchema } from '../../../queue.schema.js';
 
-export const adminQueueShowJobInput = objectInput({
-	"queue": v.picklist(QUEUE_TYPES),
-	"jobId": v.string(),
-});
-export const adminQueueShowJobOutput = queueJobSchema;
 export const adminQueueShowJobErrors = {} as const;
 
 const requestName = 'admin/queue/show-job';
-export const adminQueueShowJobContract = oc.$meta<{ requestName: typeof requestName }>({ requestName })
+export const adminQueueShowJobContract = oc.$meta({ requestName: requestName } as const)
 	.route({ method: 'POST', path: `/${requestName}`, operationId: 'post___' + requestName.replaceAll('/', '___'), tags: ['admin'], spec: current => ({ ...current, security: [{ bearerAuth: [] }] }) })
 	.errors({ ...commonErrors })
-	.input(adminQueueShowJobInput).output(adminQueueShowJobOutput);
+	.input(objectInput({
+		"queue": v.picklist(QUEUE_TYPES),
+		"jobId": v.string(),
+	})).output(queueJobSchema);
+
+export type AdminQueueShowJobInput = v.InferOutput<NonNullable<typeof adminQueueShowJobContract['~orpc']['inputSchema']>>;
+export type AdminQueueShowJobOutput = v.InferOutput<NonNullable<typeof adminQueueShowJobContract['~orpc']['outputSchema']>>;

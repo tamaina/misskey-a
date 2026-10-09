@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import type { InferSchemaOutput } from '@orpc/contract';
 import { implement } from '@orpc/server';
 import { Inject, Injectable } from '@nestjs/common';
 import { GetterService } from '@features/api/backend/transport/GetterService.js';
@@ -12,7 +13,7 @@ import { authentication, apiPolicy } from '../../../../api/backend/transport/mid
 import { NoteEntityService } from '../../serializers/NoteEntityService.js';
 import { apiError } from '../../../../api/backend/transport/orpc-error.js';
 import { readErrorId } from '../../request.schema.js';
-import { notesConversationContract, notesConversationPolicy, notesConversationInput, notesConversationOutput, notesConversationErrors } from './conversation.contract.js';
+import { notesConversationContract, notesConversationPolicy, notesConversationErrors } from './conversation.contract.js';
 import type { ApiActor } from '../../../../api/backend/transport/context.js';
 import type { NotesApiContext } from '../../operations.js';
 import type { MiNote } from '../../models/Note.js';
@@ -38,11 +39,11 @@ export class NotesConversationOperation {
 		private noteEntityService: NoteEntityService,
 		private getterService: GetterService,
 	) {}
-	async execute(ps: v.InferOutput<typeof notesConversationInput>, me: MiLocalUser | null): Promise<v.InferOutput<typeof notesConversationOutput>> {
-		return v.parse(notesConversationOutput, await this.run(ps, me));
+	async execute(ps: InferSchemaOutput<NonNullable<typeof notesConversationContract['~orpc']['inputSchema']>>, me: MiLocalUser | null): Promise<InferSchemaOutput<NonNullable<typeof notesConversationContract['~orpc']['outputSchema']>>> {
+		return v.parse(requiredSchema(notesConversationContract['~orpc'].outputSchema), await this.run(ps, me));
 	}
 
-	private async run(ps: v.InferOutput<typeof notesConversationInput>, me: MiLocalUser | null) {
+	private async run(ps: InferSchemaOutput<NonNullable<typeof notesConversationContract['~orpc']['inputSchema']>>, me: MiLocalUser | null) {
 		if (me == null && this.serverSettings.ugcVisibilityForVisitor === 'none') return [];
 
 		const note = await this.getterService.getNote(ps.noteId).catch((err: unknown) => {
@@ -77,4 +78,9 @@ export class NotesConversationOperation {
 
 		return await this.noteEntityService.packMany(conversation, me);
 	}
+}
+
+function requiredSchema<Schema>(schema: Schema | undefined): Schema {
+	if (schema === undefined) throw new Error('Missing endpoint contract schema');
+	return schema;
 }

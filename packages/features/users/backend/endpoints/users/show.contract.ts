@@ -8,18 +8,13 @@ import * as v from 'valibot';
 import { commonErrors, apiErrorData } from '../../../../api/backend/transport/errors.schema.js';
 import { objectInput, misskeyId, uniqueStrings } from '../../users.input.schema.js';
 import { packedUserDetailedSchema } from '../../user.schema.js';
+// Every branch retains all competing selectors; the operation preserves baseline lookup priority.
 const userSelectors = {
 	userId: v.exactOptional(misskeyId),
 	userIds: v.exactOptional(uniqueStrings(misskeyId)),
 	username: v.exactOptional(v.string()),
 	host: v.optional(v.nullable(v.string())),
 };
-// Every branch retains all competing selectors; the operation preserves baseline lookup priority.
-export const usersShowInput = v.union([
-	objectInput({ ...userSelectors, userIds: uniqueStrings(misskeyId) }),
-	objectInput({ ...userSelectors, userId: misskeyId }),
-	objectInput({ ...userSelectors, username: v.string() }),
-]);
 export const usersShowErrors = {
 	failedToResolveRemoteUser: {
 		message: 'Failed to resolve remote user.',
@@ -35,6 +30,10 @@ export const usersShowErrors = {
 		status: 404,
 	},
 } as const;
-export const usersShowContract = oc.$meta<{ requestName: 'users/show' }>({ requestName: 'users/show' })
+export const usersShowContract = oc.$meta({ requestName: 'users/show' } as const)
 	.route({ method: 'POST', path: '/users/show', operationId: 'post___users___show', tags: ['users'], description: 'Show the properties of a user.' })
-	.errors({ ...commonErrors, FAILED_TO_RESOLVE_REMOTE_USER: { status: 500, data: apiErrorData }, NO_SUCH_USER: { status: 404, data: apiErrorData } }).input(usersShowInput).output(v.union([packedUserDetailedSchema, v.array(packedUserDetailedSchema)]));
+	.errors({ ...commonErrors, FAILED_TO_RESOLVE_REMOTE_USER: { status: 500, data: apiErrorData }, NO_SUCH_USER: { status: 404, data: apiErrorData } }).input(v.union([
+	objectInput({ ...userSelectors, userIds: uniqueStrings(misskeyId) }),
+	objectInput({ ...userSelectors, userId: misskeyId }),
+	objectInput({ ...userSelectors, username: v.string() }),
+])).output(v.union([packedUserDetailedSchema, v.array(packedUserDetailedSchema)]));

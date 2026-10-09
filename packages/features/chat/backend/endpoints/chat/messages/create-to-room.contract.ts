@@ -10,12 +10,6 @@ import { commonErrors, apiErrorData } from '../../../../../api/backend/transport
 import { packedChatMessageLiteForRoomSchema } from '../../../chat.schema.js';
 import { objectInput, misskeyId, jsonString } from '../../../request.schema.js';
 
-export const chatMessagesCreateToRoomInput = objectInput({
-	"text": v.exactOptional(v.nullable(jsonString({ "maxLength": 2000 }))),
-	"fileId": v.exactOptional(misskeyId),
-	"toRoomId": misskeyId,
-});
-export const chatMessagesCreateToRoomOutput = packedChatMessageLiteForRoomSchema;
 export const chatMessagesCreateToRoomErrors = {
 		noSuchRoom: {
 			message: 'No such room.',
@@ -40,7 +34,11 @@ export const chatMessagesCreateToRoomPolicy = { name: 'chat/messages/create-to-r
 		max: 500,
 	} } as const;
 const security: OpenAPI.SecurityRequirementObject[] = [{ bearerAuth: [] }];
-export const chatMessagesCreateToRoomContract = oc.$meta<{ requestName: 'chat/messages/create-to-room' }>({ requestName: 'chat/messages/create-to-room' })
+export const chatMessagesCreateToRoomContract = oc.$meta({ requestName: 'chat/messages/create-to-room' } as const)
 	.route({ method: 'POST', path: '/chat/messages/create-to-room', operationId: 'post___chat___messages___create-to-room', tags: ['chat'], spec: current => ({ ...current, security }) })
 	.errors({ ...commonErrors, NO_SUCH_ROOM: { status: 400, data: apiErrorData }, NO_SUCH_FILE: { status: 400, data: apiErrorData }, CONTENT_REQUIRED: { status: 400, data: apiErrorData } })
-	.input(chatMessagesCreateToRoomInput).output(chatMessagesCreateToRoomOutput);
+	.input(objectInput({
+	"text": v.exactOptional(v.nullable(jsonString({ "maxLength": 2000 }))),
+	"fileId": v.exactOptional(misskeyId),
+	"toRoomId": misskeyId,
+})).output(packedChatMessageLiteForRoomSchema);

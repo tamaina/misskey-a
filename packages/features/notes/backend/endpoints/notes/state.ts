@@ -3,12 +3,13 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import type { InferSchemaOutput } from '@orpc/contract';
 import { implement } from '@orpc/server';
 import { Inject, Injectable } from '@nestjs/common';
 import * as v from 'valibot';
 import { DI } from '@/di-symbols.js';
 import { authentication, apiPolicy, requirePrincipal } from '../../../../api/backend/transport/middleware.js';
-import { notesStateContract, notesStatePolicy, notesStateInput, notesStateOutput } from './state.contract.js';
+import { notesStateContract, notesStatePolicy } from './state.contract.js';
 import type { ApiActor } from '../../../../api/backend/transport/context.js';
 import type { NotesApiContext } from '../../operations.js';
 import type { NotesRepository, NoteThreadMutingsRepository, NoteFavoritesRepository } from '@features/persistence/backend/repositories/models.js';
@@ -34,11 +35,11 @@ export class NotesStateOperation {
 		@Inject(DI.noteFavoritesRepository)
 		private noteFavoritesRepository: NoteFavoritesRepository,
 	) {}
-	async execute(ps: v.InferOutput<typeof notesStateInput>, me: MiLocalUser): Promise<v.InferOutput<typeof notesStateOutput>> {
-		return v.parse(notesStateOutput, await this.run(ps, me));
+	async execute(ps: InferSchemaOutput<NonNullable<typeof notesStateContract['~orpc']['inputSchema']>>, me: MiLocalUser): Promise<InferSchemaOutput<NonNullable<typeof notesStateContract['~orpc']['outputSchema']>>> {
+		return v.parse(requiredSchema(notesStateContract['~orpc'].outputSchema), await this.run(ps, me));
 	}
 
-	private async run(ps: v.InferOutput<typeof notesStateInput>, me: MiLocalUser) {
+	private async run(ps: InferSchemaOutput<NonNullable<typeof notesStateContract['~orpc']['inputSchema']>>, me: MiLocalUser) {
 		const note = await this.notesRepository.findOneByOrFail({ id: ps.noteId });
 
 		const [favorite, threadMuting] = await Promise.all([
@@ -63,4 +64,9 @@ export class NotesStateOperation {
 			isMutedThread: threadMuting !== 0,
 		};
 	}
+}
+
+function requiredSchema<Schema>(schema: Schema | undefined): Schema {
+	if (schema === undefined) throw new Error('Missing endpoint contract schema');
+	return schema;
 }

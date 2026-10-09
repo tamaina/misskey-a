@@ -10,8 +10,8 @@ import { ReversiGameEntityService } from '../../serializers/ReversiGameEntitySer
 import { apiError } from '@features/api/backend/transport/orpc-error.js';
 
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
-import type * as v from 'valibot';
-import { reversiShowGameInput, reversiShowGameErrors } from '../../endpoints/reversi/show-game.contract.js';
+import type { InferSchemaOutput } from '@orpc/contract';
+import { type reversiShowGameContract, reversiShowGameErrors } from '../../endpoints/reversi/show-game.contract.js';
 
 @Injectable()
 export class ReversiShowGameApplicationService {
@@ -20,7 +20,7 @@ export class ReversiShowGameApplicationService {
 		private reversiGameEntityService: ReversiGameEntityService,
 	) {}
 
-	async execute(ps: v.InferOutput<typeof reversiShowGameInput>, me: MiLocalUser | null) {
+	async execute(ps: InferSchemaOutput<NonNullable<(typeof reversiShowGameContract)['~orpc']['inputSchema']>>, me: MiLocalUser | null) {
 		const game = await this.reversiService.get(ps.gameId);
 
 		if (game == null) {

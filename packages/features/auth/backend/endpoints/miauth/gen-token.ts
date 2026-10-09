@@ -10,8 +10,8 @@ import { NotificationService } from '@features/notifications/backend/services/No
 import { secureRndstr } from '../../utility/secure-rndstr.js';
 import { DI } from '@/di-symbols.js';
 
-import * as v from 'valibot';
-import { uniqueMiauthGenTokenInput } from '../../auth.schema.js';
+import type * as v from 'valibot';
+import type { MiauthGenTokenContract } from '../../api.contract.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 
 export const meta = {
@@ -32,7 +32,7 @@ export class MiauthGenTokenOperation {
 		private notificationService: NotificationService,
 	) {}
 
-	async execute(ps: v.InferOutput<typeof uniqueMiauthGenTokenInput>, me: MiLocalUser) {
+	async execute(ps: v.InferOutput<NonNullable<typeof MiauthGenTokenContract['~orpc']['inputSchema']>>, me: MiLocalUser) {
 		// Generate access token
 		const accessToken = secureRndstr(32);
 

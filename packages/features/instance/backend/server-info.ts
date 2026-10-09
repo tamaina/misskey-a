@@ -4,11 +4,11 @@
  */
 
 import type * as v from 'valibot';
-import type { serverInfoOutput } from './endpoints/server-info.contract.js';
+import type { serverInfoContract } from './endpoints/server-info.contract.js';
 
 export function createServerInfoService(deps: {
 	enabled(): boolean;
-	read(): Promise<v.InferOutput<typeof serverInfoOutput>>;
+	read(): Promise<v.InferOutput<NonNullable<typeof serverInfoContract['~orpc']['outputSchema']>>>;
 }) {
 	return async () => {
 		if (!deps.enabled()) return {

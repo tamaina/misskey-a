@@ -7,8 +7,7 @@ import { expect, test } from 'vitest';
 import * as v from 'valibot';
 import { mockDeep } from 'vitest-mock-extended';
 import { packedFollowingSchema, packedBlockingSchema, packedMutingSchema, packedRenoteMutingSchema, packedUserListSchema } from '../../backend/endpoints/relationships.schema.js';
-import { compositionUsersListsShowOutput } from '../../backend/endpoints/relationships.contract.js';
-import { packedFollowingRequestsListInput, packedFollowingRequestsListOutput, packedUsersListsGetMembershipsOutput } from '../../backend/endpoints/relationships.contract.js';
+import { UsersListsShowContract, FollowingRequestsListContract, UsersListsGetMembershipsContract, UsersRelationContract } from '../../backend/endpoints/relationships.contract.js';
 import { FollowingEntityService } from '../../backend/serializers/FollowingEntityService.js';
 import { BlockingEntityService } from '../../backend/serializers/BlockingEntityService.js';
 import { MutingEntityService } from '../../backend/serializers/MutingEntityService.js';
@@ -17,7 +16,6 @@ import { FollowRequestEntityService } from '../../backend/serializers/FollowRequ
 import { UserListEntityService } from '../../backend/serializers/UserListEntityService.js';
 import { UsersListsShowOperation as ListShow } from '../../backend/endpoints/users/lists/show.js';
 import { packedUserRelationSchema as unionUsersRelationModel } from '../../backend/endpoints/relationships.schema.js';
-import { unionUsersRelationOutput } from '../../backend/endpoints/relationships.contract.js';
 import { UsersRelationOperation as Relation } from '../../backend/endpoints/users/relation.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 import type { MiFollowing } from '../../backend/models/Following.js';
@@ -27,6 +25,17 @@ import type { MiRenoteMuting } from '../../backend/models/RenoteMuting.js';
 import type { MiFollowRequest } from '../../backend/models/FollowRequest.js';
 import type { MiUserList } from '../../backend/models/UserList.js';
 import type { MiUserListMembership } from '../../backend/models/UserListMembership.js';
+
+function requiredSchema<S extends v.GenericSchema>(schema: S | undefined): S {
+	if (schema === undefined) throw new Error('Missing native schema');
+	return schema;
+}
+
+const compositionUsersListsShowOutput = requiredSchema(UsersListsShowContract['~orpc'].outputSchema);
+const packedFollowingRequestsListInput = requiredSchema(FollowingRequestsListContract['~orpc'].inputSchema);
+const packedFollowingRequestsListOutput = requiredSchema(FollowingRequestsListContract['~orpc'].outputSchema);
+const packedUsersListsGetMembershipsOutput = requiredSchema(UsersListsGetMembershipsContract['~orpc'].outputSchema);
+const unionUsersRelationOutput = requiredSchema(UsersRelationContract['~orpc'].outputSchema);
 
 const date = new Date('2026-01-01T00:00:00Z');
 

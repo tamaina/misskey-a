@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import type { InferSchemaOutput } from '@orpc/contract';
 import { implement } from '@orpc/server';
 import { Inject, Injectable } from '@nestjs/common';
 import * as v from 'valibot';
@@ -10,7 +11,7 @@ import { DI } from '@/di-symbols.js';
 import { authentication, apiPolicy, requirePrincipal } from '../../../../../api/backend/transport/middleware.js';
 import { QueryService } from '../../../services/QueryService.js';
 import { NoteDraftEntityService } from '../../../serializers/NoteDraftEntityService.js';
-import { notesDraftsListContract, notesDraftsListPolicy, notesDraftsListInput, notesDraftsListOutput } from './list.contract.js';
+import { notesDraftsListContract, notesDraftsListPolicy } from './list.contract.js';
 import type { ApiActor } from '../../../../../api/backend/transport/context.js';
 import type { NotesApiContext } from '../../../operations.js';
 import type { MiNoteDraft, NoteDraftsRepository } from '@features/persistence/backend/repositories/models.js';
@@ -33,11 +34,11 @@ export class NotesDraftsListOperation {
 		private queryService: QueryService,
 		private noteDraftEntityService: NoteDraftEntityService,
 	) {}
-	async execute(ps: v.InferOutput<typeof notesDraftsListInput>, me: MiLocalUser): Promise<v.InferOutput<typeof notesDraftsListOutput>> {
-		return v.parse(notesDraftsListOutput, await this.run(ps, me));
+	async execute(ps: InferSchemaOutput<NonNullable<typeof notesDraftsListContract['~orpc']['inputSchema']>>, me: MiLocalUser): Promise<InferSchemaOutput<NonNullable<typeof notesDraftsListContract['~orpc']['outputSchema']>>> {
+		return v.parse(requiredSchema(notesDraftsListContract['~orpc'].outputSchema), await this.run(ps, me));
 	}
 
-	private async run(ps: v.InferOutput<typeof notesDraftsListInput>, me: MiLocalUser) {
+	private async run(ps: InferSchemaOutput<NonNullable<typeof notesDraftsListContract['~orpc']['inputSchema']>>, me: MiLocalUser) {
 		const query = this.queryService.makePaginationQuery<MiNoteDraft>(this.noteDraftsRepository.createQueryBuilder('drafts'), ps.sinceId, ps.untilId, ps.sinceDate, ps.untilDate)
 			.andWhere('drafts.userId = :meId', { meId: me.id });
 
@@ -53,4 +54,9 @@ export class NotesDraftsListOperation {
 
 		return await this.noteDraftEntityService.packMany(drafts, me);
 	}
+}
+
+function requiredSchema<Schema>(schema: Schema | undefined): Schema {
+	if (schema === undefined) throw new Error('Missing endpoint contract schema');
+	return schema;
 }

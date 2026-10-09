@@ -8,19 +8,31 @@ import * as v from 'valibot';
 import { mockDeep } from 'vitest-mock-extended';
 import { packedReversiGameDetailedSchema } from '../../backend/reversi.schema.js';
 import { packedReversiGameLiteSchema } from '../../backend/reversi.schema.js';
-import { reversiMatchInput as packedReversiMatchInput } from '../../backend/endpoints/reversi/match.contract.js';
-import { reversiMatchOutput as packedReversiMatchOutput } from '../../backend/endpoints/reversi/match.contract.js';
+import { reversiMatchContract } from '../../backend/endpoints/reversi/match.contract.js';
+
 import { reversiMatchContract as packedReversiMatchDefinition } from '../../backend/endpoints/reversi/match.contract.js';
-import { reversiVerifyOutput as packedReversiVerifyOutput } from '../../backend/endpoints/reversi/verify.contract.js';
-import { bubbleGameRankingOutput as packedBubbleGameRankingOutput } from '../../backend/endpoints/bubble-game/ranking.contract.js';
-import { bubbleGameRegisterInput as voidBubbleGameRegisterInput } from '../../backend/endpoints/bubble-game/register.contract.js';
-import { reversiInvitationsInput as emptyReversiInvitationsInput } from '../../backend/endpoints/reversi/invitations.contract.js';
+import { reversiVerifyContract } from '../../backend/endpoints/reversi/verify.contract.js';
+import { bubbleGameRankingContract } from '../../backend/endpoints/bubble-game/ranking.contract.js';
+import { bubbleGameRegisterContract } from '../../backend/endpoints/bubble-game/register.contract.js';
+import { reversiInvitationsContract } from '../../backend/endpoints/reversi/invitations.contract.js';
 import { ReversiGameEntityService } from '../../backend/serializers/ReversiGameEntityService.js';
 import { BubbleGameRankingApplicationService as RankingEndpoint } from '../../backend/applications/bubble-game/ranking.js';
 import { ReversiVerifyApplicationService as VerifyEndpoint } from '../../backend/applications/reversi/verify.js';
 import { MiReversiGame } from '../../backend/models/ReversiGame.js';
 import type { MiBubbleGameRecord } from '../../backend/models/BubbleGameRecord.js';
 import type { MiUser } from '@features/users/backend/models/User.js';
+const packedBubbleGameRankingOutput = requiredSchema(bubbleGameRankingContract['~orpc'].outputSchema);
+
+function requiredSchema<T>(schema: T | undefined): T {
+	if (schema === undefined) throw new Error('Expected contract schema');
+	return schema;
+}
+
+const packedReversiMatchInput = requiredSchema(reversiMatchContract['~orpc'].inputSchema);
+const packedReversiMatchOutput = requiredSchema(reversiMatchContract['~orpc'].outputSchema);
+const packedReversiVerifyOutput = requiredSchema(reversiVerifyContract['~orpc'].outputSchema);
+const voidBubbleGameRegisterInput = requiredSchema(bubbleGameRegisterContract['~orpc'].inputSchema);
+const emptyReversiInvitationsInput = requiredSchema(reversiInvitationsContract['~orpc'].inputSchema);
 
 const date = new Date('2026-01-01T00:00:00Z');
 const user = { id: 'user123', name: null, username: 'alice', host: null, avatarUrl: 'https://example/avatar', avatarBlurhash: null, avatarDecorations: [], emojis: {}, onlineStatus: 'unknown' as const };

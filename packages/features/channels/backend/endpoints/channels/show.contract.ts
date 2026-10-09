@@ -10,10 +10,6 @@ import { commonErrors, apiErrorData } from '../../../../api/backend/transport/er
 import { packedChannelSchema } from '../../channel.schema.js';
 import { objectInput, misskeyId } from '../../request.schema.js';
 
-export const channelsShowInput = objectInput({
-	"channelId": misskeyId,
-});
-export const channelsShowOutput = packedChannelSchema;
 export const channelsShowErrors = {
 		noSuchChannel: {
 			message: 'No such channel.',
@@ -23,7 +19,9 @@ export const channelsShowErrors = {
 	} as const;
 export const channelsShowPolicy = { name: 'channels/show', requireCredential: false } as const;
 const security: OpenAPI.SecurityRequirementObject[] = [{}, { bearerAuth: [] }];
-export const channelsShowContract = oc.$meta<{ requestName: 'channels/show' }>({ requestName: 'channels/show' })
+export const channelsShowContract = oc.$meta({ requestName: 'channels/show' } as const)
 	.route({ method: 'POST', path: '/channels/show', operationId: 'post___channels___show', tags: ['channels'], spec: current => ({ ...current, security }) })
 	.errors({ ...commonErrors, NO_SUCH_CHANNEL: { status: 400, data: apiErrorData } })
-	.input(channelsShowInput).output(channelsShowOutput);
+	.input(objectInput({
+		"channelId": misskeyId,
+	})).output(packedChannelSchema);

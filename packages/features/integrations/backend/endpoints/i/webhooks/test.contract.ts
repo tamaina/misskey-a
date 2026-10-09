@@ -10,15 +10,6 @@ import { commonErrors, apiErrorData } from '../../../../../api/backend/transport
 import { misskeyId } from '../../../input.schema.js';
 import { webhookEventTypes } from '../../../webhook-events.schema.js';
 
-export const iWebhooksTestInput = objectInput({
-	"webhookId": misskeyId,
-	"type": v.picklist(webhookEventTypes),
-	"override": v.exactOptional(v.pipe(objectInput({
-		"url": v.exactOptional(v.string()),
-		"secret": v.exactOptional(v.string()),
-	}), v.metadata({ "required": undefined }))),
-});
-export const iWebhooksTestOutput = v.void();
 export const iWebhooksTestErrors = {
 		noSuchWebhook: {
 			message: 'No such webhook.',
@@ -28,7 +19,14 @@ export const iWebhooksTestErrors = {
 	} as const;
 
 const requestName = 'i/webhooks/test';
-export const iWebhooksTestContract = oc.$meta<{ requestName: typeof requestName }>({ requestName })
+export const iWebhooksTestContract = oc.$meta({ requestName: requestName } as const)
 	.route({ method: 'POST', path: `/${requestName}`, operationId: 'post___' + requestName.replaceAll('/', '___'), tags: ['webhooks'], spec: current => ({ ...current, security: [{ bearerAuth: [] }] }) })
 	.errors({ ...commonErrors, NO_SUCH_WEBHOOK: { status: 400, data: apiErrorData } })
-	.input(iWebhooksTestInput).output(iWebhooksTestOutput);
+	.input(objectInput({
+	"webhookId": misskeyId,
+	"type": v.picklist(webhookEventTypes),
+	"override": v.exactOptional(v.pipe(objectInput({
+		"url": v.exactOptional(v.string()),
+		"secret": v.exactOptional(v.string()),
+	}), v.metadata({ "required": undefined }))),
+})).output(v.void());

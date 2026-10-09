@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import type { InferSchemaOutput } from '@orpc/contract';
 import { implement } from '@orpc/server';
 import { Inject, Injectable } from '@nestjs/common';
 import { GetterService } from '@features/api/backend/transport/GetterService.js';
@@ -10,7 +11,7 @@ import * as v from 'valibot';
 import { DI } from '@/di-symbols.js';
 import { authentication, apiPolicy, requirePrincipal } from '../../../../../api/backend/transport/middleware.js';
 import { apiError } from '../../../../../api/backend/transport/orpc-error.js';
-import { adminPromoCreateContract, adminPromoCreatePolicy, adminPromoCreateInput, adminPromoCreateOutput, adminPromoCreateErrors } from './create.contract.js';
+import { adminPromoCreateContract, adminPromoCreatePolicy, adminPromoCreateErrors } from './create.contract.js';
 import type { ApiActor } from '../../../../../api/backend/transport/context.js';
 import type { NotesApiContext } from '../../../operations.js';
 import type { PromoNotesRepository } from '@features/persistence/backend/repositories/models.js';
@@ -32,11 +33,11 @@ export class AdminPromoCreateOperation {
 
 		private getterService: GetterService,
 	) {}
-	async execute(ps: v.InferOutput<typeof adminPromoCreateInput>, me: MiLocalUser): Promise<v.InferOutput<typeof adminPromoCreateOutput>> {
-		return v.parse(adminPromoCreateOutput, await this.run(ps, me));
+	async execute(ps: InferSchemaOutput<NonNullable<typeof adminPromoCreateContract['~orpc']['inputSchema']>>, me: MiLocalUser): Promise<InferSchemaOutput<NonNullable<typeof adminPromoCreateContract['~orpc']['outputSchema']>>> {
+		return v.parse(requiredSchema(adminPromoCreateContract['~orpc'].outputSchema), await this.run(ps, me));
 	}
 
-	private async run(ps: v.InferOutput<typeof adminPromoCreateInput>, _me: MiLocalUser) {
+	private async run(ps: InferSchemaOutput<NonNullable<typeof adminPromoCreateContract['~orpc']['inputSchema']>>, _me: MiLocalUser) {
 		const note = await this.getterService.getNote(ps.noteId).catch(e => {
 			if (e.id === '9725d0ce-ba28-4dde-95a7-2cbb2c15de24') throw apiError(adminPromoCreateErrors.noSuchNote);
 			throw e;
@@ -54,4 +55,9 @@ export class AdminPromoCreateOperation {
 			userId: note.userId,
 		});
 	}
+}
+
+function requiredSchema<Schema>(schema: Schema | undefined): Schema {
+	if (schema === undefined) throw new Error('Missing endpoint contract schema');
+	return schema;
 }

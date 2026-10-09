@@ -11,7 +11,7 @@ import type { ContractEndpoints } from '../built/contract.types.js';
 import type { Endpoints } from '../built/api.types.js';
 import type { I2faRegisterKeyResponse, FetchRssResponse } from '../built/entities.js';
 import type { webAuthnRegistrationOptionsSchema } from '../built/contracts/auth/backend/webauthn.schema.js';
-import type { rssFeedSchema } from '../built/contracts/integrations/backend/rss.schema.js';
+import type { fetchRssContract } from '../built/contracts/integrations/backend/endpoints/fetch-rss.contract.js';
 import type { PackedJsonValue } from '../built/contracts/users/backend/json-value.schema.js';
 type JsonObject = { [key: string]: PackedJsonValue };
 
@@ -20,7 +20,7 @@ type Assert<T extends true> = T;
 type Routes = 'i/2fa/register-key' | 'fetch-rss';
 type Outputs = {
 	'i/2fa/register-key': v.InferOutput<typeof webAuthnRegistrationOptionsSchema>;
-	'fetch-rss': v.InferOutput<typeof rssFeedSchema>;
+	'fetch-rss': InferContractRouterOutputs<typeof fetchRssContract>;
 };
 type NativeContracts = { 'i/2fa/register-key': typeof authContract['i/2fa/register-key']; 'fetch-rss': typeof integrationsContract['fetchRss'] };
 export type NativeParity = Assert<Equal<{ [K in Routes]: Equal<InferContractRouterOutputs<NativeContracts[K]>, Outputs[K]> }[Routes], true>>;

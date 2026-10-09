@@ -7,12 +7,12 @@ import { Inject, Injectable } from '@nestjs/common';
 import { RoleService } from '@features/roles/backend/services/RoleService.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import { apiError } from '@features/api/backend/transport/orpc-error.js';
-import * as v from 'valibot';
+import type * as v from 'valibot';
 import { DI } from '@/di-symbols.js';
 import type { Config } from '@/config.js';
 
 import { SignupService } from '../../../services/SignupService.js';
-import { compositionAdminAccountsCreateInput } from '../../../auth.schema.js';
+import type { AdminAccountsCreateContract } from '../../../api.contract.js';
 import type { MiMeta, UsersRepository } from '@features/persistence/backend/repositories/models.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 import type { ApiToken } from '@features/api/backend/transport/context.js';
@@ -52,7 +52,7 @@ export class AdminAccountsCreateOperation {
 		private roleService: RoleService,
 	) {}
 
-	async execute(ps: v.InferOutput<typeof compositionAdminAccountsCreateInput>, _me: MiLocalUser | null, token: ApiToken | null) {
+	async execute(ps: v.InferOutput<NonNullable<typeof AdminAccountsCreateContract['~orpc']['inputSchema']>>, _me: MiLocalUser | null, token: ApiToken | null) {
 		const me = _me ? await this.usersRepository.findOneByOrFail({ id: _me.id }) : null;
 
 		if (this.serverSettings.rootUserId == null && me == null && token == null) {

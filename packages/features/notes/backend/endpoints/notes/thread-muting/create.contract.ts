@@ -9,8 +9,6 @@ import { commonErrors, apiErrorData } from '../../../../../api/backend/transport
 import { objectInput, misskeyId } from '../../../request.schema.js';
 import type { OpenAPI } from '@orpc/contract';
 
-export const notesThreadMutingCreateInput = objectInput({ noteId: misskeyId });
-export const notesThreadMutingCreateOutput = v.void();
 export const notesThreadMutingCreateErrors = {
 	noSuchNote: {
 		message: 'No such note.',
@@ -25,7 +23,7 @@ export const notesThreadMutingCreateErrors = {
 } as const;
 export const notesThreadMutingCreatePolicy = { name: 'notes/thread-muting/create', requireCredential: true, kind: 'write:account', limit: { duration: 3600000, max: 10 } } as const;
 const security: OpenAPI.SecurityRequirementObject[] = [{ bearerAuth: [] }];
-export const notesThreadMutingCreateContract = oc.$meta<{ requestName: 'notes/thread-muting/create' }>({ requestName: 'notes/thread-muting/create' })
+export const notesThreadMutingCreateContract = oc.$meta({ requestName: 'notes/thread-muting/create' } as const)
 	.route({ method: 'POST', path: '/notes/thread-muting/create', operationId: 'post___notes___thread-muting___create', tags: ['notes'], spec: current => ({ ...current, security }), successStatus: 204 })
 	.errors({ ...commonErrors, NO_SUCH_NOTE: { status: 400, data: apiErrorData }, ALREADY_MUTING: { status: 400, data: apiErrorData } })
-	.input(notesThreadMutingCreateInput).output(notesThreadMutingCreateOutput);
+	.input(objectInput({ noteId: misskeyId })).output(v.void());

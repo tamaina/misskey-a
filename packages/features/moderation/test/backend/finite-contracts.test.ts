@@ -6,7 +6,7 @@
 import { expect, test } from 'vitest';
 import * as v from 'valibot';
 import { mockDeep } from 'vitest-mock-extended';
-import { moderationInputs, moderationOutputs } from '../../backend/api.schema.js';
+import { moderationContract } from '../../backend/api.contract.js';
 import { createModerationOperations, type ModerationApiDependencies } from '../../backend/api.operations.js';
 import type { ApiActor } from '../../../api/backend/transport/context.js';
 import type { MiSignin } from '../../../auth/backend/models/Signin.js';
@@ -14,14 +14,19 @@ import type { RolePolicies } from '../../../roles/backend/services/RoleService.j
 import type { MiUser, MiLocalUser } from '../../../users/backend/models/User.js';
 import type { MiUserProfile } from '../../../users/backend/models/UserProfile.js';
 
+function requiredSchema<S extends v.GenericSchema>(schema: S | undefined): S {
+	if (schema === undefined) throw new Error('Missing native schema');
+	return schema;
+}
+
 const actor: ApiActor = { id: 'actor123', isSuspended: false, movedToUri: null };
 
 test('native moderation schemas materialize defaults and preserve nullable report resolution', () => {
-	expect(v.parse(moderationInputs.adminAbuseUserReports, { future: true }))
+	expect(v.parse(requiredSchema(moderationContract.adminAbuseUserReports['~orpc'].inputSchema), { future: true }))
 		.toEqual({ limit: 10, state: null, reporterOrigin: 'combined', targetUserOrigin: 'combined' });
-	expect(v.parse(moderationInputs.adminResolveAbuseUserReport, { reportId: 'report123', resolvedAs: null, future: true }))
+	expect(v.parse(requiredSchema(moderationContract.adminResolveAbuseUserReport['~orpc'].inputSchema), { reportId: 'report123', resolvedAs: null, future: true }))
 		.toEqual({ reportId: 'report123', resolvedAs: null });
-	expect(v.safeParse(moderationInputs.adminGetUserIps, { userId: 'bad-id' }).success).toBe(false);
+	expect(v.safeParse(requiredSchema(moderationContract.adminGetUserIps['~orpc'].inputSchema), { userId: 'bad-id' }).success).toBe(false);
 });
 
 test('IP records preserve selected dates and the response envelope rejects undeclared fields', async () => {
@@ -29,9 +34,9 @@ test('IP records preserve selected dates and the response envelope rejects undec
 	const date = new Date('2026-10-09T00:00:00Z');
 	deps.userIpsRepository.find.mockResolvedValue([{ id: 'ip123', userId: 'user123', ip: '127.0.0.1', createdAt: date }]);
 	const result = await createModerationOperations(deps).adminGetUserIps({ userId: 'user123' }, actor);
-	expect(v.parse(moderationOutputs.adminGetUserIps, result)).toEqual([{ ip: '127.0.0.1', createdAt: date.toISOString() }]);
+	expect(v.parse(requiredSchema(moderationContract.adminGetUserIps['~orpc'].outputSchema), result)).toEqual([{ ip: '127.0.0.1', createdAt: date.toISOString() }]);
 	expect(deps.userIpsRepository.find).toHaveBeenCalledWith({ where: { userId: 'user123' }, order: { id: 'DESC' }, take: 30 });
-	expect(v.safeParse(moderationOutputs.adminGetUserIps, [{ ...result[0], future: true }]).success).toBe(false);
+	expect(v.safeParse(requiredSchema(moderationContract.adminGetUserIps['~orpc'].outputSchema), [{ ...result[0], future: true }]).success).toBe(false);
 });
 
 test('email recipients require a verified email before writes; webhook recipients require their correlated ID', async () => {
@@ -110,7 +115,7 @@ test('admin account details preserve actual raw signin wire fields without inven
 	deps.roleEntityService.packMany.mockResolvedValue([]);
 	deps.signinsRepository.findBy.mockResolvedValue([mockDeep<MiSignin>({ id: 'signin123', userId: 'user123', ip: '127.0.0.1', headers: { 'user-agent': 'fixture' }, success: false })]);
 	const result = await createModerationOperations(deps).adminShowUser({ userId: 'user123' }, actor);
-	expect(v.parse(moderationOutputs.adminShowUser.entries.signins, result.signins)).toEqual([
+	expect(v.parse(requiredSchema(moderationContract.adminShowUser['~orpc'].outputSchema).entries.signins, result.signins)).toEqual([
 		{ id: 'signin123', userId: 'user123', ip: '127.0.0.1', headers: { 'user-agent': 'fixture' }, success: false },
 	]);
 	expect(result.signins[0]).not.toHaveProperty('createdAt');

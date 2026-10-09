@@ -1,15 +1,14 @@
-import type * as v from 'valibot';
 import type { ContractEndpoints } from '../src/contract.types.js';
 import type { Packed } from '../built/contracts/index/backend/packed.schema.js';
-import type { notesCreateInput } from '../built/contracts/notes/backend/endpoints/notes/create.contract.js';
-import type { InferContractRouterOutputs } from '@orpc/contract';
+import type { notesCreateContract } from '../built/contracts/notes/backend/endpoints/notes/create.contract.js';
+import type { InferContractRouterOutputs, InferSchemaOutput } from '@orpc/contract';
 import type { notesApiContract } from '../built/contracts/notes/backend/api.contract.js';
 
 type Equal<A, B> = (<T>() => T extends A ? 1 : 2) extends (<T>() => T extends B ? 1 : 2) ? true : false;
 type Assert<T extends true> = T;
 type Flatten<T> = { [K in keyof T]: T[K] };
 type Request = ContractEndpoints['notes/create']['req'];
-type Handler = v.InferOutput<typeof notesCreateInput>;
+type Handler = InferSchemaOutput<NonNullable<typeof notesCreateContract['~orpc']['inputSchema']>>;
 type Reaction = null | 'likeOnly' | 'likeOnlyForRemote' | 'nonSensitiveOnly' | 'nonSensitiveOnlyForLocalLikeOnlyForRemote';
 type Visibility = 'public' | 'home' | 'followers' | 'specified';
 

@@ -9,7 +9,8 @@ import { DI } from '@/di-symbols.js';
 import { QueueService } from '../../../../../runtime/backend/services/QueueService.js';
 import type { MiUser } from '../../../../../users/backend/models/User.js';
 import * as v from 'valibot';
-import { adminFederationRemoveAllFollowingInput, adminFederationRemoveAllFollowingOutput } from './remove-all-following.contract.js';
+import type { AdminFederationRemoveAllFollowingInput, AdminFederationRemoveAllFollowingOutput } from './remove-all-following.contract.js';
+import { adminFederationRemoveAllFollowingContract } from './remove-all-following.contract.js';
 
 @Injectable()
 export class AdminFederationRemoveAllFollowingApplicationService {
@@ -23,7 +24,7 @@ export class AdminFederationRemoveAllFollowingApplicationService {
 		private queueService: QueueService,
 	) {}
 
-	public async execute(ps: v.InferOutput<typeof adminFederationRemoveAllFollowingInput>, _me: MiUser): Promise<v.InferOutput<typeof adminFederationRemoveAllFollowingOutput>> {
+	public async execute(ps: AdminFederationRemoveAllFollowingInput, _me: MiUser): Promise<AdminFederationRemoveAllFollowingOutput> {
 		const result = await (async () => {
 			const followings = await this.followingsRepository.findBy({
 				followerHost: ps.host,
@@ -36,6 +37,6 @@ export class AdminFederationRemoveAllFollowingApplicationService {
 
 			this.queueService.createUnfollowJob(pairs.map(p => ({ from: p[0], to: p[1], silent: true })));
 		})();
-		return v.parse(adminFederationRemoveAllFollowingOutput, result);
+		return v.parse(adminFederationRemoveAllFollowingContract['~orpc'].outputSchema!, result);
 	}
 }

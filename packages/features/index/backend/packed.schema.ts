@@ -74,7 +74,7 @@ import {
 } from '../../integrations/backend/webhook.schema.js';
 
 import {
-	adminAbuseReportNotificationRecipientCreateOutput as packedAbuseReportNotificationRecipientSchema,
+	abuseReportNotificationRecipientSchema as packedAbuseReportNotificationRecipientSchema,
 } from '../../moderation/backend/api.schema.js';
 
 import {

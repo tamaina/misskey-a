@@ -8,14 +8,15 @@ import * as v from 'valibot';
 import { objectInput } from '../../../../../api/backend/transport/input.schema.js';
 import { commonErrors } from '../../../../../api/backend/transport/errors.schema.js';
 
-export const adminFederationRemoveAllFollowingInput = objectInput({
-	"host": v.string(),
-});
-export const adminFederationRemoveAllFollowingOutput = v.void();
 export const adminFederationRemoveAllFollowingErrors = {} as const;
 
 const requestName = 'admin/federation/remove-all-following';
-export const adminFederationRemoveAllFollowingContract = oc.$meta<{ requestName: typeof requestName }>({ requestName })
+export const adminFederationRemoveAllFollowingContract = oc.$meta({ requestName: requestName } as const)
 	.route({ method: 'POST', path: `/${requestName}`, operationId: 'post___' + requestName.replaceAll('/', '___'), tags: ['admin'], spec: current => ({ ...current, security: [{ bearerAuth: [] }] }) })
 	.errors({ ...commonErrors })
-	.input(adminFederationRemoveAllFollowingInput).output(adminFederationRemoveAllFollowingOutput);
+	.input(objectInput({
+		"host": v.string(),
+	})).output(v.void());
+
+export type AdminFederationRemoveAllFollowingInput = v.InferOutput<NonNullable<typeof adminFederationRemoveAllFollowingContract['~orpc']['inputSchema']>>;
+export type AdminFederationRemoveAllFollowingOutput = v.InferOutput<NonNullable<typeof adminFederationRemoveAllFollowingContract['~orpc']['outputSchema']>>;

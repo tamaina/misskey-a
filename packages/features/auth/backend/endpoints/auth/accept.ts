@@ -12,8 +12,8 @@ import { secureRndstr } from '../../utility/secure-rndstr.js';
 import { DI } from '@/di-symbols.js';
 import { apiError } from '@features/api/backend/transport/orpc-error.js';
 
-import * as v from 'valibot';
-import { voidAuthAcceptInput } from '../../auth.schema.js';
+import type * as v from 'valibot';
+import type { AuthAcceptContract } from '../../api.contract.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 
 export const meta = {
@@ -47,7 +47,7 @@ export class AuthAcceptOperation {
 		private idService: IdService,
 	) {}
 
-	async execute(ps: v.InferOutput<typeof voidAuthAcceptInput>, me: MiLocalUser) {
+	async execute(ps: v.InferOutput<NonNullable<typeof AuthAcceptContract['~orpc']['inputSchema']>>, me: MiLocalUser) {
 		// Fetch token
 		const session = await this.authSessionsRepository
 			.findOneBy({ token: ps.token });

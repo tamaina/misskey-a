@@ -9,12 +9,13 @@ import { objectInput } from '../../../../../api/backend/transport/input.schema.j
 import { commonErrors } from '../../../../../api/backend/transport/errors.schema.js';
 import { queueCounterSchema } from '../../../queue.schema.js';
 
-export const adminQueueStatsInput = objectInput({});
-export const adminQueueStatsOutput = v.strictObject({ deliver: queueCounterSchema, inbox: queueCounterSchema, db: queueCounterSchema, objectStorage: queueCounterSchema });
 export const adminQueueStatsErrors = {} as const;
 
 const requestName = 'admin/queue/stats';
-export const adminQueueStatsContract = oc.$meta<{ requestName: typeof requestName }>({ requestName })
+export const adminQueueStatsContract = oc.$meta({ requestName: requestName } as const)
 	.route({ method: 'POST', path: `/${requestName}`, operationId: 'post___' + requestName.replaceAll('/', '___'), tags: ['admin'], spec: current => ({ ...current, security: [{ bearerAuth: [] }] }) })
 	.errors({ ...commonErrors })
-	.input(adminQueueStatsInput).output(adminQueueStatsOutput);
+	.input(objectInput({})).output(v.strictObject({ deliver: queueCounterSchema, inbox: queueCounterSchema, db: queueCounterSchema, objectStorage: queueCounterSchema }));
+
+export type AdminQueueStatsInput = v.InferOutput<NonNullable<typeof adminQueueStatsContract['~orpc']['inputSchema']>>;
+export type AdminQueueStatsOutput = v.InferOutput<NonNullable<typeof adminQueueStatsContract['~orpc']['outputSchema']>>;

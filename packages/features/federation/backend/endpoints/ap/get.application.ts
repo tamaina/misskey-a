@@ -6,7 +6,8 @@
 import { Injectable } from '@nestjs/common';
 import * as v from 'valibot';
 import { ApResolverService } from '../../services/ApResolverService.js';
-import { apGetInput, apGetOutput } from './get.contract.js';
+import type { ApGetInput, ApGetOutput } from './get.contract.js';
+import { apGetContract } from './get.contract.js';
 import type { MiUser } from '../../../../users/backend/models/User.js';
 import type { PackedJsonValue } from '../../../../users/backend/json-value.schema.js';
 
@@ -38,12 +39,12 @@ export class ApGetApplicationService {
 		private apResolverService: ApResolverService,
 	) {}
 
-	public async execute(ps: v.InferOutput<typeof apGetInput>, _me: MiUser): Promise<v.InferOutput<typeof apGetOutput>> {
+	public async execute(ps: ApGetInput, _me: MiUser): Promise<ApGetOutput> {
 		const result = await (async () => {
 			const resolver = await this.apResolverService.createResolver();
 			const object = await resolver.resolve(ps.uri);
 			return protocolJsonValue(object, new WeakSet());
 		})();
-		return v.parse(apGetOutput, result);
+		return v.parse(apGetContract['~orpc'].outputSchema!, result);
 	}
 }

@@ -3,28 +3,28 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import type * as v from 'valibot';
+import type { InferSchemaOutput } from '@orpc/contract';
 import type { ApiActor, ApiContext } from '../../api/backend/transport/context.js';
-import type { bubbleGameRankingInput, bubbleGameRankingOutput } from './endpoints/bubble-game/ranking.contract.js';
-import type { bubbleGameRegisterInput, bubbleGameRegisterOutput } from './endpoints/bubble-game/register.contract.js';
-import type { reversiCancelMatchInput, reversiCancelMatchOutput } from './endpoints/reversi/cancel-match.contract.js';
-import type { reversiGamesInput, reversiGamesOutput } from './endpoints/reversi/games.contract.js';
-import type { reversiInvitationsInput, reversiInvitationsOutput } from './endpoints/reversi/invitations.contract.js';
-import type { reversiMatchInput, reversiMatchOutput } from './endpoints/reversi/match.contract.js';
-import type { reversiShowGameInput, reversiShowGameOutput } from './endpoints/reversi/show-game.contract.js';
-import type { reversiSurrenderInput, reversiSurrenderOutput } from './endpoints/reversi/surrender.contract.js';
-import type { reversiVerifyInput, reversiVerifyOutput } from './endpoints/reversi/verify.contract.js';
+import type { bubbleGameRankingContract } from './endpoints/bubble-game/ranking.contract.js';
+import type { bubbleGameRegisterContract } from './endpoints/bubble-game/register.contract.js';
+import type { reversiCancelMatchContract } from './endpoints/reversi/cancel-match.contract.js';
+import type { reversiGamesContract } from './endpoints/reversi/games.contract.js';
+import type { reversiInvitationsContract } from './endpoints/reversi/invitations.contract.js';
+import type { reversiMatchContract } from './endpoints/reversi/match.contract.js';
+import type { reversiShowGameContract } from './endpoints/reversi/show-game.contract.js';
+import type { reversiSurrenderContract } from './endpoints/reversi/surrender.contract.js';
+import type { reversiVerifyContract } from './endpoints/reversi/verify.contract.js';
 
 export interface GamesOperations<Actor extends ApiActor> {
-	bubbleGameRanking(input: v.InferOutput<typeof bubbleGameRankingInput>, actor: Actor | null): Promise<v.InferOutput<typeof bubbleGameRankingOutput>>;
-	bubbleGameRegister(input: v.InferOutput<typeof bubbleGameRegisterInput>, actor: Actor): Promise<v.InferOutput<typeof bubbleGameRegisterOutput>>;
-	reversiCancelMatch(input: v.InferOutput<typeof reversiCancelMatchInput>, actor: Actor): Promise<v.InferOutput<typeof reversiCancelMatchOutput>>;
-	reversiGames(input: v.InferOutput<typeof reversiGamesInput>, actor: Actor | null): Promise<v.InferOutput<typeof reversiGamesOutput>>;
-	reversiInvitations(input: v.InferOutput<typeof reversiInvitationsInput>, actor: Actor): Promise<v.InferOutput<typeof reversiInvitationsOutput>>;
-	reversiMatch(input: v.InferOutput<typeof reversiMatchInput>, actor: Actor): Promise<v.InferOutput<typeof reversiMatchOutput>>;
-	reversiShowGame(input: v.InferOutput<typeof reversiShowGameInput>, actor: Actor | null): Promise<v.InferOutput<typeof reversiShowGameOutput>>;
-	reversiSurrender(input: v.InferOutput<typeof reversiSurrenderInput>, actor: Actor): Promise<v.InferOutput<typeof reversiSurrenderOutput>>;
-	reversiVerify(input: v.InferOutput<typeof reversiVerifyInput>, actor: Actor | null): Promise<v.InferOutput<typeof reversiVerifyOutput>>;
+	bubbleGameRanking(input: InferSchemaOutput<NonNullable<(typeof bubbleGameRankingContract)['~orpc']['inputSchema']>>, actor: Actor | null): Promise<InferSchemaOutput<NonNullable<(typeof bubbleGameRankingContract)['~orpc']['outputSchema']>>>;
+	bubbleGameRegister(input: InferSchemaOutput<NonNullable<(typeof bubbleGameRegisterContract)['~orpc']['inputSchema']>>, actor: Actor): Promise<InferSchemaOutput<NonNullable<(typeof bubbleGameRegisterContract)['~orpc']['outputSchema']>>>;
+	reversiCancelMatch(input: InferSchemaOutput<NonNullable<(typeof reversiCancelMatchContract)['~orpc']['inputSchema']>>, actor: Actor): Promise<InferSchemaOutput<NonNullable<(typeof reversiCancelMatchContract)['~orpc']['outputSchema']>>>;
+	reversiGames(input: InferSchemaOutput<NonNullable<(typeof reversiGamesContract)['~orpc']['inputSchema']>>, actor: Actor | null): Promise<InferSchemaOutput<NonNullable<(typeof reversiGamesContract)['~orpc']['outputSchema']>>>;
+	reversiInvitations(input: InferSchemaOutput<NonNullable<(typeof reversiInvitationsContract)['~orpc']['inputSchema']>>, actor: Actor): Promise<InferSchemaOutput<NonNullable<(typeof reversiInvitationsContract)['~orpc']['outputSchema']>>>;
+	reversiMatch(input: InferSchemaOutput<NonNullable<(typeof reversiMatchContract)['~orpc']['inputSchema']>>, actor: Actor): Promise<InferSchemaOutput<NonNullable<(typeof reversiMatchContract)['~orpc']['outputSchema']>>>;
+	reversiShowGame(input: InferSchemaOutput<NonNullable<(typeof reversiShowGameContract)['~orpc']['inputSchema']>>, actor: Actor | null): Promise<InferSchemaOutput<NonNullable<(typeof reversiShowGameContract)['~orpc']['outputSchema']>>>;
+	reversiSurrender(input: InferSchemaOutput<NonNullable<(typeof reversiSurrenderContract)['~orpc']['inputSchema']>>, actor: Actor): Promise<InferSchemaOutput<NonNullable<(typeof reversiSurrenderContract)['~orpc']['outputSchema']>>>;
+	reversiVerify(input: InferSchemaOutput<NonNullable<(typeof reversiVerifyContract)['~orpc']['inputSchema']>>, actor: Actor | null): Promise<InferSchemaOutput<NonNullable<(typeof reversiVerifyContract)['~orpc']['outputSchema']>>>;
 }
 export type GamesContext<Actor extends ApiActor> = ApiContext<Actor> & { operations: { games: GamesOperations<Actor> } };
 export type GamesApplications<Actor extends ApiActor> = { [K in keyof GamesOperations<Actor>]: { execute: GamesOperations<Actor>[K] } };

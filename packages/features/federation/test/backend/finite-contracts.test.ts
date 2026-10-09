@@ -7,12 +7,12 @@ import { expect, test } from 'vitest';
 import * as v from 'valibot';
 import { mockDeep } from 'vitest-mock-extended';
 import { federationInstanceSchema as packedFederationInstanceSchema } from '../../backend/federation.schema.js';
-import { federationInstancesInput as packedFederationInstancesInput } from '../../backend/endpoints/federation/instances.contract.js';
-import { federationStatsInput, federationStatsOutput as packedFederationStatsOutput } from '../../backend/endpoints/federation/stats.contract.js';
-import { adminRelaysAddOutput as inlineAdminRelaysAddOutput } from '../../backend/endpoints/admin/relays/add.contract.js';
-import { adminRelaysListOutput as inlineAdminRelaysListOutput } from '../../backend/endpoints/admin/relays/list.contract.js';
-import { apGetOutput as inlineApGetOutput } from '../../backend/endpoints/ap/get.contract.js';
-import { adminFederationUpdateInstanceInput as voidAdminFederationUpdateInstanceInput } from '../../backend/endpoints/admin/federation/update-instance.contract.js';
+import { federationInstancesContract } from '../../backend/endpoints/federation/instances.contract.js';
+import { federationStatsContract } from '../../backend/endpoints/federation/stats.contract.js';
+import { adminRelaysAddContract } from '../../backend/endpoints/admin/relays/add.contract.js';
+import { adminRelaysListContract } from '../../backend/endpoints/admin/relays/list.contract.js';
+import { apGetContract } from '../../backend/endpoints/ap/get.contract.js';
+import { adminFederationUpdateInstanceContract } from '../../backend/endpoints/admin/federation/update-instance.contract.js';
 import { InstanceEntityService } from '../../../instance/backend/serializers/InstanceEntityService.js';
 import type { MiLocalUser } from '../../../users/backend/models/User.js';
 import type { MiInstance } from '../../backend/models/Instance.js';
@@ -64,29 +64,29 @@ test('actual relay list fields remain finite and metadata does not supply missin
 	const service = mockDeep<RelayService>();
 	service.listRelay.mockResolvedValue([relay]);
 	const result = await new ListRelays(service).execute({}, mockDeep<MiLocalUser>());
-	expect(v.parse(inlineAdminRelaysListOutput, result)).toEqual([relay]);
+	expect(v.parse(adminRelaysListContract['~orpc'].outputSchema!, result)).toEqual([relay]);
 	for (const invalid of [{ ...relay, future: true }, { id: relay.id, inbox: relay.inbox }, { ...relay, status: 'bad' }]) {
-		expect(v.safeParse(inlineAdminRelaysAddOutput, invalid).success).toBe(false);
-		expect(v.safeParse(inlineAdminRelaysListOutput, [invalid]).success).toBe(false);
+		expect(v.safeParse(adminRelaysAddContract['~orpc'].outputSchema!, invalid).success).toBe(false);
+		expect(v.safeParse(adminRelaysListContract['~orpc'].outputSchema!, [invalid]).success).toBe(false);
 	}
 });
 
 test('native finite inputs strip extras and preserve defaults, nulls and invalid input checks', () => {
-	expect(v.parse(packedFederationInstancesInput, { host: null, future: true })).toEqual({ host: null, limit: 30, offset: 0 });
-	expect(v.parse(voidAdminFederationUpdateInstanceInput, { host: 'remote.test', future: true })).toEqual({ host: 'remote.test' });
-	for (const input of [{}, { host: 1 }, { host: 'remote.test', moderationNote: null }]) expect(v.safeParse(voidAdminFederationUpdateInstanceInput, input).success).toBe(false);
-	for (const input of [{ limit: 0 }, { offset: 'bad' }, { sort: 'bad' }]) expect(v.safeParse(packedFederationInstancesInput, input).success).toBe(false);
+	expect(v.parse(federationInstancesContract['~orpc'].inputSchema!, { host: null, future: true })).toEqual({ host: null, limit: 30, offset: 0 });
+	expect(v.parse(adminFederationUpdateInstanceContract['~orpc'].inputSchema!, { host: 'remote.test', future: true })).toEqual({ host: 'remote.test' });
+	for (const input of [{}, { host: 1 }, { host: 'remote.test', moderationNote: null }]) expect(v.safeParse(adminFederationUpdateInstanceContract['~orpc'].inputSchema!, input).success).toBe(false);
+	for (const input of [{ limit: 0 }, { offset: 'bad' }, { sort: 'bad' }]) expect(v.safeParse(federationInstancesContract['~orpc'].inputSchema!, input).success).toBe(false);
 	const stats = { topSubInstances: [], otherFollowersCount: 2, topPubInstances: [], otherFollowingCount: 3 };
-	expect(v.parse(packedFederationStatsOutput, stats)).toEqual(stats);
-	for (const invalid of [{ ...stats, future: true }, { ...stats, otherFollowersCount: undefined }, { ...stats, topPubInstances: 'bad' }]) expect(v.safeParse(packedFederationStatsOutput, invalid).success).toBe(false);
+	expect(v.parse(federationStatsContract['~orpc'].outputSchema!, stats)).toEqual(stats);
+	for (const invalid of [{ ...stats, future: true }, { ...stats, otherFollowersCount: undefined }, { ...stats, topPubInstances: 'bad' }]) expect(v.safeParse(federationStatsContract['~orpc'].outputSchema!, invalid).success).toBe(false);
 });
 
 test('native defaults and genuine ActivityPub extensions preserve JSON keys', () => {
- expect(v.parse(federationStatsInput, { future: true })).toEqual({ limit: 10 });
- expect(v.safeParse(federationStatsInput, { limit: 0 }).success).toBe(false);
+ expect(v.parse(federationStatsContract['~orpc'].inputSchema!, { future: true })).toEqual({ limit: 10 });
+ expect(v.safeParse(federationStatsContract['~orpc'].inputSchema!, { limit: 0 }).success).toBe(false);
  const activity: unknown = JSON.parse('{"@context":["https://www.w3.org/ns/activitystreams"],"type":"Person","__proto__":{"nested":true},"constructor":null}');
- expect(v.parse(inlineApGetOutput, activity)).toEqual(activity);
- for (const bad of [new Date(), new Map(), { extension: undefined }, { extension: () => 1 }]) expect(v.safeParse(inlineApGetOutput, bad).success).toBe(false);
+ expect(v.parse(apGetContract['~orpc'].outputSchema!, activity)).toEqual(activity);
+ for (const bad of [new Date(), new Map(), { extension: undefined }, { extension: () => 1 }]) expect(v.safeParse(apGetContract['~orpc'].outputSchema!, bad).success).toBe(false);
 });
 
 test('local AP renderer optional fields retain JSON wire omissions without admitting native objects', async () => {

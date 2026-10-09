@@ -3,9 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import type * as v from 'valibot';
-import type { serverInfoOutput } from '../../../instance/backend/endpoints/server-info.contract.js';
-import type { DriveCreateInput, DriveCreateOutput } from '../../../drive/backend/endpoints/drive/files/create.schema.js';
+import type { ServerInfoOutput } from '../../../instance/backend/endpoints/server-info.contract.js';
+import type { DriveCreateInput, DriveCreateOutput } from '../../../drive/backend/endpoints/drive/files/create.contract.js';
 import type { ORPCError } from '@orpc/server';
 
 export interface ApiActor {
@@ -30,7 +29,7 @@ export interface ApiServices<Actor extends ApiActor> {
 	limitActor(actor: Actor | null, ip: string): string | null;
 	rateLimitFactor(actor: Actor): Promise<number>;
 	limit(limit: RateLimit, actor: string, factor: number): Promise<{ info: Record<string, unknown> } | null>;
-	serverInfo(): Promise<v.InferOutput<typeof serverInfoOutput>>;
+	serverInfo(): Promise<ServerInfoOutput>;
 	deleteNote(noteId: string, actor: Actor): Promise<void>;
 	createFile(input: DriveCreateInput, actor: Actor, upload: UploadResource,
 		request: { ip: string; headers: Record<string, string | string[] | undefined> }): Promise<DriveCreateOutput>;

@@ -9,10 +9,6 @@ import { packedMeDetailedSchema } from '../../../../users/backend/user.schema.js
 import { objectInput, misskeyId } from '../../request.schema.js';
 import type { OpenAPI } from '@orpc/contract';
 
-export const iUnpinInput = objectInput({
-	'noteId': misskeyId,
-});
-export const iUnpinOutput = packedMeDetailedSchema;
 export const iUnpinErrors = {
 	noSuchNote: {
 		message: 'No such note.',
@@ -22,7 +18,9 @@ export const iUnpinErrors = {
 } as const;
 export const iUnpinPolicy = { name: 'i/unpin', requireCredential: true, kind: 'write:account' } as const;
 const security: OpenAPI.SecurityRequirementObject[] = [{ bearerAuth: [] }];
-export const iUnpinContract = oc.$meta<{ requestName: 'i/unpin' }>({ requestName: 'i/unpin' })
+export const iUnpinContract = oc.$meta({ requestName: 'i/unpin' } as const)
 	.route({ method: 'POST', path: '/i/unpin', operationId: 'post___i___unpin', tags: ['account', 'notes'], spec: current => ({ ...current, security }) })
 	.errors({ ...commonErrors, NO_SUCH_NOTE: { status: 400, data: apiErrorData } })
-	.input(iUnpinInput).output(iUnpinOutput);
+	.input(objectInput({
+	'noteId': misskeyId,
+})).output(packedMeDetailedSchema);

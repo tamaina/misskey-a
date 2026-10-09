@@ -10,12 +10,6 @@ import { commonErrors, apiErrorData } from '../../../../../api/backend/transport
 import { packedChatRoomSchema } from '../../../chat.schema.js';
 import { objectInput, misskeyId, jsonString } from '../../../request.schema.js';
 
-export const chatRoomsUpdateInput = objectInput({
-	"roomId": misskeyId,
-	"name": v.exactOptional(jsonString({ "maxLength": 256 })),
-	"description": v.exactOptional(jsonString({ "maxLength": 1024 })),
-});
-export const chatRoomsUpdateOutput = packedChatRoomSchema;
 export const chatRoomsUpdateErrors = {
 		noSuchRoom: {
 			message: 'No such room.',
@@ -25,7 +19,11 @@ export const chatRoomsUpdateErrors = {
 	} as const;
 export const chatRoomsUpdatePolicy = { name: 'chat/rooms/update', requireCredential: true, kind: 'write:chat' } as const;
 const security: OpenAPI.SecurityRequirementObject[] = [{ bearerAuth: [] }];
-export const chatRoomsUpdateContract = oc.$meta<{ requestName: 'chat/rooms/update' }>({ requestName: 'chat/rooms/update' })
+export const chatRoomsUpdateContract = oc.$meta({ requestName: 'chat/rooms/update' } as const)
 	.route({ method: 'POST', path: '/chat/rooms/update', operationId: 'post___chat___rooms___update', tags: ['chat'], spec: current => ({ ...current, security }) })
 	.errors({ ...commonErrors, NO_SUCH_ROOM: { status: 400, data: apiErrorData } })
-	.input(chatRoomsUpdateInput).output(chatRoomsUpdateOutput);
+	.input(objectInput({
+	"roomId": misskeyId,
+	"name": v.exactOptional(jsonString({ "maxLength": 256 })),
+	"description": v.exactOptional(jsonString({ "maxLength": 1024 })),
+})).output(packedChatRoomSchema);

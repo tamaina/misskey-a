@@ -11,8 +11,8 @@ import type { FlashsRepository } from '@features/persistence/backend/repositorie
 import { DI } from '@/di-symbols.js';
 
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
-import type * as v from 'valibot';
-import { usersFlashsInput } from '../../endpoints/users/flashs.contract.js';
+import type { InferSchemaOutput } from '@orpc/contract';
+import { type usersFlashsContract } from '../../endpoints/users/flashs.contract.js';
 
 @Injectable()
 export class UsersFlashsApplicationService {
@@ -24,7 +24,7 @@ export class UsersFlashsApplicationService {
 		private queryService: QueryService,
 	) {}
 
-	async execute(ps: v.InferOutput<typeof usersFlashsInput>, me: MiLocalUser | null) {
+	async execute(ps: InferSchemaOutput<NonNullable<(typeof usersFlashsContract)['~orpc']['inputSchema']>>, me: MiLocalUser | null) {
 		const query = this.queryService.makePaginationQuery(this.flashsRepository.createQueryBuilder('flash'), ps.sinceId, ps.untilId, ps.sinceDate, ps.untilDate)
 			.andWhere('flash.userId = :userId', { userId: ps.userId })
 			.andWhere('flash.visibility = \'public\'');

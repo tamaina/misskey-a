@@ -13,7 +13,7 @@ import { RoleService } from '@features/roles/backend/services/RoleService.js';
 import { apiError } from '@features/api/backend/transport/orpc-error.js';
 import { DI } from '@/di-symbols.js';
 
-import { notesGlobalTimelineInput, notesGlobalTimelineErrors } from '../../endpoints/notes/global-timeline.contract.js';
+import { type notesGlobalTimelineContract, notesGlobalTimelineErrors } from '../../endpoints/notes/global-timeline.contract.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 import type * as v from 'valibot';
 import type { NotesRepository } from '@features/persistence/backend/repositories/models.js';
@@ -30,7 +30,7 @@ export class NotesGlobalTimelineApplicationService {
 		private activeUsersChart: ActiveUsersChart,
 	) {}
 
-	async execute(ps: v.InferOutput<typeof notesGlobalTimelineInput>, me: MiLocalUser | null) {
+	async execute(ps: v.InferOutput<NonNullable<typeof notesGlobalTimelineContract['~orpc']['inputSchema']>>, me: MiLocalUser | null) {
 		const policies = await this.roleService.getUserPolicies(me ? me.id : null);
 		if (!policies.gtlAvailable) {
 			throw apiError(notesGlobalTimelineErrors.gtlDisabled);

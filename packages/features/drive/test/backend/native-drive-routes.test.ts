@@ -7,12 +7,13 @@ import { expect, test } from 'vitest';
 import * as v from 'valibot';
 import { mockDeep } from 'vitest-mock-extended';
 import { DriveFilesShowOperation } from '../../backend/endpoints/drive/files/show.js';
-import { adminDriveShowFileInput } from '../../backend/endpoints/admin/drive/show-file.contract.js';
-import { driveFilesShowInput } from '../../backend/endpoints/drive/files/show.contract.js';
-import { driveFoldersCreateInput } from '../../backend/endpoints/drive/folders/create.contract.js';
-import { driveFilesUploadFromUrlInput } from '../../backend/endpoints/drive/files/upload-from-url.contract.js';
+import { adminDriveShowFileContract } from '../../backend/endpoints/admin/drive/show-file.contract.js';
+import { driveFilesShowContract } from '../../backend/endpoints/drive/files/show.contract.js';
+import { driveFoldersCreateContract } from '../../backend/endpoints/drive/folders/create.contract.js';
+import { driveFilesUploadFromUrlContract } from '../../backend/endpoints/drive/files/upload-from-url.contract.js';
 import { DriveFilesUploadFromUrlOperation } from '../../backend/endpoints/drive/files/upload-from-url.js';
-import { toRequestHeaders, requestHeadersSchema } from '../../backend/management.schema.js';
+import { toRequestHeaders } from '../../backend/management.schema.js';
+import { packedJsonObjectSchema } from '@features/users/backend/json-value.schema.js';
 import type { MiDriveFile } from '../../backend/models/DriveFile.js';
 import type { DriveFileEntityService } from '../../backend/serializers/DriveFileEntityService.js';
 import type { DriveService } from '../../backend/services/DriveService.js';
@@ -20,6 +21,16 @@ import type { GlobalEventService } from '@features/runtime/backend/services/Glob
 import type { RoleService } from '@features/roles/backend/services/RoleService.js';
 import type { DriveFileSelectorRepository } from '../../backend/selector.repository.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
+
+function requiredSchema<S extends v.GenericSchema>(schema: S | undefined): S {
+	if (schema === undefined) throw new Error('Missing native contract schema');
+	return schema;
+}
+
+const adminDriveShowFileInput = requiredSchema(adminDriveShowFileContract['~orpc'].inputSchema);
+const driveFilesShowInput = requiredSchema(driveFilesShowContract['~orpc'].inputSchema);
+const driveFoldersCreateInput = requiredSchema(driveFoldersCreateContract['~orpc'].inputSchema);
+const driveFilesUploadFromUrlInput = requiredSchema(driveFilesUploadFromUrlContract['~orpc'].inputSchema);
 
 test('drive file selectors retain both fields and owner checks permit only owners or moderators', async () => {
 	const input = v.parse(driveFilesShowInput, { fileId: 'file1', url: 'https://example.test/file' });
@@ -87,7 +98,7 @@ test('admin stored header JSON retains reserved keys and omits absent header val
 	const headers: Record<string, string | string[] | undefined> = { absent: undefined, accept: ['image/png'] };
 	Object.defineProperty(headers, '__proto__', { value: 'header', enumerable: true });
 	const packed = toRequestHeaders(headers);
-	expect(v.parse(requestHeadersSchema, packed)).toEqual(packed);
+	expect(v.parse(packedJsonObjectSchema, packed)).toEqual(packed);
 	expect(packed).toHaveProperty('__proto__', 'header');
 	expect(packed).not.toHaveProperty('absent');
 });

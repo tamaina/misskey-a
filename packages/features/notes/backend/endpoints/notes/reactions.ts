@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import type { InferSchemaOutput } from '@orpc/contract';
 import { implement } from '@orpc/server';
 import { Inject, Injectable } from '@nestjs/common';
 import { GetterService } from '@features/api/backend/transport/GetterService.js';
@@ -14,7 +15,7 @@ import { NoteEntityService } from '../../serializers/NoteEntityService.js';
 import { QueryService } from '../../services/QueryService.js';
 import { apiError } from '../../../../api/backend/transport/orpc-error.js';
 import { readErrorId } from '../../request.schema.js';
-import { notesReactionsContract, notesReactionsPolicy, notesReactionsInput, notesReactionsOutput, notesReactionsErrors } from './reactions.contract.js';
+import { notesReactionsContract, notesReactionsPolicy, notesReactionsErrors } from './reactions.contract.js';
 import type { ApiActor } from '../../../../api/backend/transport/context.js';
 import type { NotesApiContext } from '../../operations.js';
 import type { NoteReactionsRepository } from '@features/persistence/backend/repositories/models.js';
@@ -38,11 +39,11 @@ export class NotesReactionsOperation {
 		private queryService: QueryService,
 		private getterService: GetterService,
 	) {}
-	async execute(ps: v.InferOutput<typeof notesReactionsInput>, me: MiLocalUser | null): Promise<v.InferOutput<typeof notesReactionsOutput>> {
-		return v.parse(notesReactionsOutput, await this.run(ps, me));
+	async execute(ps: InferSchemaOutput<NonNullable<typeof notesReactionsContract['~orpc']['inputSchema']>>, me: MiLocalUser | null): Promise<InferSchemaOutput<NonNullable<typeof notesReactionsContract['~orpc']['outputSchema']>>> {
+		return v.parse(requiredSchema(notesReactionsContract['~orpc'].outputSchema), await this.run(ps, me));
 	}
 
-	private async run(ps: v.InferOutput<typeof notesReactionsInput>, me: MiLocalUser | null) {
+	private async run(ps: InferSchemaOutput<NonNullable<typeof notesReactionsContract['~orpc']['inputSchema']>>, me: MiLocalUser | null) {
 		const note = await this.getterService.getNote(ps.noteId).catch((err: unknown) => {
 			if (readErrorId(err) === '9725d0ce-ba28-4dde-95a7-2cbb2c15de24') throw apiError(notesReactionsErrors.noSuchNote);
 			throw err;
@@ -69,4 +70,9 @@ export class NotesReactionsOperation {
 
 		return await this.noteReactionEntityService.packMany(reactions, me);
 	}
+}
+
+function requiredSchema<Schema>(schema: Schema | undefined): Schema {
+	if (schema === undefined) throw new Error('Missing endpoint contract schema');
+	return schema;
 }

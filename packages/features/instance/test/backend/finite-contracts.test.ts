@@ -8,12 +8,12 @@ import * as v from 'valibot';
 import { mockDeep } from 'vitest-mock-extended';
 import type { Config } from '@/config.js';
 import { endpointContract } from '../../backend/endpoints/endpoint.contract.js';
-import { serverInfoOutput as serverInfoResult } from '../../backend/endpoints/server-info.contract.js';
+import { serverInfoContract } from '../../backend/endpoints/server-info.contract.js';
 import { pingContract } from '../../backend/endpoints/ping.contract.js';
-import { onlineUsersCountOutput as onlineUsersCountResult } from '../../backend/endpoints/get-online-users-count.contract.js';
-import { adminServerInfoOutput as inlineAdminServerInfoOutput } from '../../backend/endpoints/admin/server-info.contract.js';
+import { onlineUsersCountContract } from '../../backend/endpoints/get-online-users-count.contract.js';
+import { adminServerInfoContract } from '../../backend/endpoints/admin/server-info.contract.js';
 
-import { adminMetaOutput as referenceAdminMetaOutput } from '../../backend/endpoints/admin/meta.contract.js';
+import { adminMetaContract } from '../../backend/endpoints/admin/meta.contract.js';
 
 import { MiMeta } from '../../backend/models/Meta.js';
 import { MetaEntityService } from '../../backend/serializers/MetaEntityService.js';
@@ -227,9 +227,9 @@ test('actual instance producers cover disabled/enabled metrics, endpoint null an
 	for (const enabled of [false, true]) {
 		const read = vi.fn(async () => metrics);
 		const result = await createServerInfo({ enabled: () => enabled, read })({});
-		rejectsDrift(serverInfoResult, result);
+		rejectsDrift(requiredSchema(serverInfoContract['~orpc'].outputSchema), result);
 		expect(read).toHaveBeenCalledTimes(enabled ? 1 : 0);
-		rejectsNested(serverInfoResult, result, [['cpu'], ['mem'], ['fs']]);
+		rejectsNested(requiredSchema(serverInfoContract['~orpc'].outputSchema), result, [['cpu'], ['mem'], ['fs']]);
 	}
 	const endpoint = createEndpoint(async () => [{ name: 'sample', properties: { count: { type: 'number' }, fallback: {} } }]);
 	expect(await endpoint({ endpoint: 'missing' })).toBeNull();
@@ -238,7 +238,7 @@ test('actual instance producers cover disabled/enabled metrics, endpoint null an
 	expect(v.safeParse(endpointResult, { ...described, future: true }).success).toBe(false);
 	for (const param of [{ name: 'x', type: 'String', future: true }, { name: 'x' }, { name: 'x', type: 1 }]) expect(v.safeParse(endpointResult, { params: [param] }).success).toBe(false);
 	rejectsDrift(pingResult, await createPing(() => 42)({}));
-	rejectsDrift(onlineUsersCountResult, await createGetOnlineUsersCount({ countSince: async () => 3, thresholdMs: 100 }, () => 42)({}));
+	rejectsDrift(requiredSchema(onlineUsersCountContract['~orpc'].outputSchema), await createGetOnlineUsersCount({ countSince: async () => 3, thresholdMs: 100 }, () => 42)({}));
 });
 
 test('actual admin machine producer includes optional Redis version and finite nested metrics', async () => {
@@ -248,9 +248,9 @@ test('actual admin machine producer includes optional Redis version and finite n
 	for (const info of ['redis_version:7.2.0\r\n', 'no version']) {
 		redis.info.mockResolvedValue(info);
 		const result = await operations({ db, redisClient: redis }).adminServerInfo({}, mockDeep<MiLocalUser>());
-		rejectsDrift(inlineAdminServerInfoOutput, result, ['redis']);
+		rejectsDrift(requiredSchema(adminServerInfoContract['~orpc'].outputSchema), result, ['redis']);
 		expect(result.redis).toBe(info.startsWith('redis_version:') ? '7.2.0' : undefined);
-		rejectsNested(inlineAdminServerInfoOutput, result, [['cpu'], ['mem'], ['fs'], ['net']]);
+		rejectsNested(requiredSchema(adminServerInfoContract['~orpc'].outputSchema), result, [['cpu'], ['mem'], ['fs'], ['net']]);
 	}
 });
 
@@ -261,7 +261,7 @@ test('actual admin metadata and public metadata preserve nullable images, client
 	const system = mockDeep<SystemAccountService>();
 	system.fetch.mockResolvedValue(mockDeep<MiLocalUser>({ id: 'proxy1', username: 'proxy', host: null, uri: null }));
 	const result = await operations({ config, metaService: service, systemAccountService: system }).adminMeta({}, mockDeep<MiLocalUser>());
-	rejectsDrift(referenceAdminMetaOutput, result, ['policies', 'silencedHosts', 'bannedEmailDomains']);
+	rejectsDrift(requiredSchema(adminMetaContract['~orpc'].outputSchema), result, ['policies', 'silencedHosts', 'bannedEmailDomains']);
 	expect(result.langs).toEqual([]);
 	expect(result.logoImageUrl).toBeNull();
 	expect(result.policies).toHaveProperty('customPolicy', { enabled: true });
@@ -294,14 +294,14 @@ test('actual admin metadata and public metadata preserve nullable images, client
 	expect(v.safeParse(packedMetaDetailedSchema, { ...detailed, features: { ...detailed.features, future: true } }).success).toBe(false);
 	for (const features of [{ ...detailed.features, registration: undefined }, { ...detailed.features, registration: 'bad' }]) expect(v.safeParse(packedMetaDetailedSchema, { ...detailed, features }).success).toBe(false);
 	expect(v.parse(packedMetaLiteSchema, lite).clientOptions).toHaveProperty('extension', { enabled: true });
-	expect(v.parse(referenceAdminMetaOutput, result).clientOptions).toHaveProperty('extension', { enabled: true });
+	expect(v.parse(requiredSchema(adminMetaContract['~orpc'].outputSchema), result).clientOptions).toHaveProperty('extension', { enabled: true });
 	expect(v.safeParse(packedMetaLiteSchema, { ...lite, clientOptions: { ...lite.clientOptions, showTimelineForVisitor: 'bad' } }).success).toBe(false);
 	rejectsDrift(packedMetaLiteSchema, lite);
 	rejectsDrift(packedMetaDetailedSchema, detailed, ['features']);
 	expect(v.safeParse(packedMetaLiteSchema, detailed).success).toBe(false);
 	for (const invalid of [new Date(), () => 1, Infinity, undefined]) {
 		expect(v.safeParse(packedMetaLiteSchema, { ...lite, clientOptions: { ...lite.clientOptions, extension: invalid } }).success).toBe(false);
-		expect(v.safeParse(referenceAdminMetaOutput, { ...result, policies: { extension: invalid } }).success).toBe(false);
+		expect(v.safeParse(requiredSchema(adminMetaContract['~orpc'].outputSchema), { ...result, policies: { extension: invalid } }).success).toBe(false);
 	}
 	config.sentryForFrontend = {
 		options: { dsn: 'https://sentry.test/1', tracesSampleRate: 0.5, beforeSend: event => event },

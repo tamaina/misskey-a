@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import type { InferSchemaOutput } from '@orpc/contract';
 import { implement } from '@orpc/server';
 import { Brackets, In } from 'typeorm';
 import { Inject, Injectable } from '@nestjs/common';
@@ -10,7 +11,7 @@ import * as v from 'valibot';
 import { DI } from '@/di-symbols.js';
 import { authentication, apiPolicy, requirePrincipal } from '../../../../../api/backend/transport/middleware.js';
 import { NoteEntityService } from '../../../serializers/NoteEntityService.js';
-import { notesPollsRecommendationContract, notesPollsRecommendationPolicy, notesPollsRecommendationInput, notesPollsRecommendationOutput } from './recommendation.contract.js';
+import { notesPollsRecommendationContract, notesPollsRecommendationPolicy } from './recommendation.contract.js';
 import type { ApiActor } from '../../../../../api/backend/transport/context.js';
 import type { NotesApiContext } from '../../../operations.js';
 import type { NotesRepository, MutingsRepository, PollsRepository, PollVotesRepository } from '@features/persistence/backend/repositories/models.js';
@@ -41,11 +42,11 @@ export class NotesPollsRecommendationOperation {
 
 		private noteEntityService: NoteEntityService,
 	) {}
-	async execute(ps: v.InferOutput<typeof notesPollsRecommendationInput>, me: MiLocalUser): Promise<v.InferOutput<typeof notesPollsRecommendationOutput>> {
-		return v.parse(notesPollsRecommendationOutput, await this.run(ps, me));
+	async execute(ps: InferSchemaOutput<NonNullable<typeof notesPollsRecommendationContract['~orpc']['inputSchema']>>, me: MiLocalUser): Promise<InferSchemaOutput<NonNullable<typeof notesPollsRecommendationContract['~orpc']['outputSchema']>>> {
+		return v.parse(requiredSchema(notesPollsRecommendationContract['~orpc'].outputSchema), await this.run(ps, me));
 	}
 
-	private async run(ps: v.InferOutput<typeof notesPollsRecommendationInput>, me: MiLocalUser) {
+	private async run(ps: InferSchemaOutput<NonNullable<typeof notesPollsRecommendationContract['~orpc']['inputSchema']>>, me: MiLocalUser) {
 		const query = this.pollsRepository.createQueryBuilder('poll')
 			.where('poll.userHost IS NULL')
 			.andWhere('poll.userId != :meId', { meId: me.id })
@@ -105,4 +106,9 @@ export class NotesPollsRecommendationOperation {
 			detail: true,
 		});
 	}
+}
+
+function requiredSchema<Schema>(schema: Schema | undefined): Schema {
+	if (schema === undefined) throw new Error('Missing endpoint contract schema');
+	return schema;
 }

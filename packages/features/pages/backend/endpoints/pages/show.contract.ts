@@ -15,24 +15,23 @@ const misskeyId = v.pipe(v.string(), v.regex(/^[a-zA-Z0-9]+$/));
 export type PagesShowSelector =
 	| { pageId: string }
 	| { name: string; username: string; pageId?: PackedJsonValue };
-export const pagesShowInput: v.GenericSchema<PagesShowSelector, PagesShowSelector> = v.union([
-	objectInput({
-		pageId: misskeyId,
-	}),
-	objectInput({
-		name: v.string(),
-		username: v.string(),
-		pageId: v.exactOptional(packedJsonValueSchema),
-	}),
-]);
-export const pagesShowOutput = packedPageSchema;
+
 export const pagesShowErrors = {
 	noSuchPage: { message: 'No such page.', code: 'NO_SUCH_PAGE', id: '222120c0-3ead-4528-811b-b96f233388d7' },
 } as const;
 
 const requestName = 'pages/show';
-export const pagesShowContract = oc.$meta<{ requestName: typeof requestName }>({ requestName })
+export const pagesShowContract = oc.$meta({ requestName: requestName } as const)
 	.route({ method: 'POST', path: `/${requestName}`, operationId: 'post___' + requestName.replaceAll('/', '___'), tags: ['pages'], })
 	.errors({ ...commonErrors, NO_SUCH_PAGE: { status: 400, data: apiErrorData } })
-	.input(pagesShowInput)
-	.output(pagesShowOutput);
+	.input<v.GenericSchema<PagesShowSelector, PagesShowSelector>>(v.union([
+		objectInput({
+			pageId: misskeyId,
+		}),
+		objectInput({
+			name: v.string(),
+			username: v.string(),
+			pageId: v.exactOptional(packedJsonValueSchema),
+		}),
+	]))
+	.output(packedPageSchema);

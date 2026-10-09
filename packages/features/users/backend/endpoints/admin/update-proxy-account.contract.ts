@@ -8,10 +8,9 @@ import * as v from 'valibot';
 import { commonErrors } from '../../../../api/backend/transport/errors.schema.js';
 import { objectInput, description } from '../../users.input.schema.js';
 import { packedMeDetailedSchema } from '../../user.schema.js';
-export const portableAdminUpdateProxyAccountInput = v.pipe(objectInput({
-	'description': v.exactOptional(v.nullable(description)),
-}), v.metadata({ 'required': undefined }));
 export const adminUpdateProxyAccountErrors = {} as const;
-export const adminUpdateProxyAccountContract = oc.$meta<{ requestName: 'admin/update-proxy-account' }>({ requestName: 'admin/update-proxy-account' })
+export const adminUpdateProxyAccountContract = oc.$meta({ requestName: 'admin/update-proxy-account' } as const)
 	.route({ method: 'POST', path: '/admin/update-proxy-account', operationId: 'post___admin___update-proxy-account', tags: ['admin'], spec: current => ({ ...current, security: [{ bearerAuth: [] }] }) })
-	.errors({ ...commonErrors }).input(portableAdminUpdateProxyAccountInput).output(packedMeDetailedSchema);
+	.errors({ ...commonErrors }).input(v.pipe(objectInput({
+	'description': v.exactOptional(v.nullable(description)),
+}), v.metadata({ 'required': undefined }))).output(packedMeDetailedSchema);

@@ -5,36 +5,36 @@
 
 import type * as v from 'valibot';
 import type { ApiActor, ApiContext } from '../../api/backend/transport/context.js';
-import type { antennasCreateInput, antennasCreateOutput } from './endpoints/antennas/create.contract.js';
-import type { antennasDeleteInput, antennasDeleteOutput } from './endpoints/antennas/delete.contract.js';
-import type { antennasListInput, antennasListOutput } from './endpoints/antennas/list.contract.js';
-import type { antennasNotesInput, antennasNotesOutput } from './endpoints/antennas/notes.contract.js';
-import type { antennasRemoveNoteInput, antennasRemoveNoteOutput } from './endpoints/antennas/remove-note.contract.js';
-import type { antennasShowInput, antennasShowOutput } from './endpoints/antennas/show.contract.js';
-import type { antennasUpdateInput, antennasUpdateOutput } from './endpoints/antennas/update.contract.js';
-import type { notesGlobalTimelineInput, notesGlobalTimelineOutput } from './endpoints/notes/global-timeline.contract.js';
-import type { notesHybridTimelineInput, notesHybridTimelineOutput } from './endpoints/notes/hybrid-timeline.contract.js';
-import type { notesLocalTimelineInput, notesLocalTimelineOutput } from './endpoints/notes/local-timeline.contract.js';
-import type { notesMentionsInput, notesMentionsOutput } from './endpoints/notes/mentions.contract.js';
-import type { notesTimelineInput, notesTimelineOutput } from './endpoints/notes/timeline.contract.js';
-import type { notesUserListTimelineInput, notesUserListTimelineOutput } from './endpoints/notes/user-list-timeline.contract.js';
-import type { usersNotesInput, usersNotesOutput } from './endpoints/users/notes.contract.js';
+import type { antennasCreateContract } from './endpoints/antennas/create.contract.js';
+import type { antennasDeleteContract } from './endpoints/antennas/delete.contract.js';
+import type { antennasListContract } from './endpoints/antennas/list.contract.js';
+import type { antennasNotesContract } from './endpoints/antennas/notes.contract.js';
+import type { antennasRemoveNoteContract } from './endpoints/antennas/remove-note.contract.js';
+import type { antennasShowContract } from './endpoints/antennas/show.contract.js';
+import type { antennasUpdateContract } from './endpoints/antennas/update.contract.js';
+import type { notesGlobalTimelineContract } from './endpoints/notes/global-timeline.contract.js';
+import type { notesHybridTimelineContract } from './endpoints/notes/hybrid-timeline.contract.js';
+import type { notesLocalTimelineContract } from './endpoints/notes/local-timeline.contract.js';
+import type { notesMentionsContract } from './endpoints/notes/mentions.contract.js';
+import type { notesTimelineContract } from './endpoints/notes/timeline.contract.js';
+import type { notesUserListTimelineContract } from './endpoints/notes/user-list-timeline.contract.js';
+import type { usersNotesContract } from './endpoints/users/notes.contract.js';
 
 export interface TimelinesOperations<Actor extends ApiActor> {
-	antennasCreate(input: v.InferOutput<typeof antennasCreateInput>, actor: Actor): Promise<v.InferOutput<typeof antennasCreateOutput>>;
-	antennasDelete(input: v.InferOutput<typeof antennasDeleteInput>, actor: Actor): Promise<v.InferOutput<typeof antennasDeleteOutput>>;
-	antennasList(input: v.InferOutput<typeof antennasListInput>, actor: Actor): Promise<v.InferOutput<typeof antennasListOutput>>;
-	antennasNotes(input: v.InferOutput<typeof antennasNotesInput>, actor: Actor): Promise<v.InferOutput<typeof antennasNotesOutput>>;
-	antennasRemoveNote(input: v.InferOutput<typeof antennasRemoveNoteInput>, actor: Actor): Promise<v.InferOutput<typeof antennasRemoveNoteOutput>>;
-	antennasShow(input: v.InferOutput<typeof antennasShowInput>, actor: Actor): Promise<v.InferOutput<typeof antennasShowOutput>>;
-	antennasUpdate(input: v.InferOutput<typeof antennasUpdateInput>, actor: Actor): Promise<v.InferOutput<typeof antennasUpdateOutput>>;
-	notesGlobalTimeline(input: v.InferOutput<typeof notesGlobalTimelineInput>, actor: Actor | null): Promise<v.InferOutput<typeof notesGlobalTimelineOutput>>;
-	notesHybridTimeline(input: v.InferOutput<typeof notesHybridTimelineInput>, actor: Actor): Promise<v.InferOutput<typeof notesHybridTimelineOutput>>;
-	notesLocalTimeline(input: v.InferOutput<typeof notesLocalTimelineInput>, actor: Actor | null): Promise<v.InferOutput<typeof notesLocalTimelineOutput>>;
-	notesMentions(input: v.InferOutput<typeof notesMentionsInput>, actor: Actor): Promise<v.InferOutput<typeof notesMentionsOutput>>;
-	notesTimeline(input: v.InferOutput<typeof notesTimelineInput>, actor: Actor): Promise<v.InferOutput<typeof notesTimelineOutput>>;
-	notesUserListTimeline(input: v.InferOutput<typeof notesUserListTimelineInput>, actor: Actor): Promise<v.InferOutput<typeof notesUserListTimelineOutput>>;
-	usersNotes(input: v.InferOutput<typeof usersNotesInput>, actor: Actor | null): Promise<v.InferOutput<typeof usersNotesOutput>>;
+	antennasCreate(input: v.InferOutput<NonNullable<typeof antennasCreateContract['~orpc']['inputSchema']>>, actor: Actor): Promise<v.InferOutput<NonNullable<typeof antennasCreateContract['~orpc']['outputSchema']>>>;
+	antennasDelete(input: v.InferOutput<NonNullable<typeof antennasDeleteContract['~orpc']['inputSchema']>>, actor: Actor): Promise<v.InferOutput<NonNullable<typeof antennasDeleteContract['~orpc']['outputSchema']>>>;
+	antennasList(input: v.InferOutput<NonNullable<typeof antennasListContract['~orpc']['inputSchema']>>, actor: Actor): Promise<v.InferOutput<NonNullable<typeof antennasListContract['~orpc']['outputSchema']>>>;
+	antennasNotes(input: v.InferOutput<NonNullable<typeof antennasNotesContract['~orpc']['inputSchema']>>, actor: Actor): Promise<v.InferOutput<NonNullable<typeof antennasNotesContract['~orpc']['outputSchema']>>>;
+	antennasRemoveNote(input: v.InferOutput<NonNullable<typeof antennasRemoveNoteContract['~orpc']['inputSchema']>>, actor: Actor): Promise<v.InferOutput<NonNullable<typeof antennasRemoveNoteContract['~orpc']['outputSchema']>>>;
+	antennasShow(input: v.InferOutput<NonNullable<typeof antennasShowContract['~orpc']['inputSchema']>>, actor: Actor): Promise<v.InferOutput<NonNullable<typeof antennasShowContract['~orpc']['outputSchema']>>>;
+	antennasUpdate(input: v.InferOutput<NonNullable<typeof antennasUpdateContract['~orpc']['inputSchema']>>, actor: Actor): Promise<v.InferOutput<NonNullable<typeof antennasUpdateContract['~orpc']['outputSchema']>>>;
+	notesGlobalTimeline(input: v.InferOutput<NonNullable<typeof notesGlobalTimelineContract['~orpc']['inputSchema']>>, actor: Actor | null): Promise<v.InferOutput<NonNullable<typeof notesGlobalTimelineContract['~orpc']['outputSchema']>>>;
+	notesHybridTimeline(input: v.InferOutput<NonNullable<typeof notesHybridTimelineContract['~orpc']['inputSchema']>>, actor: Actor): Promise<v.InferOutput<NonNullable<typeof notesHybridTimelineContract['~orpc']['outputSchema']>>>;
+	notesLocalTimeline(input: v.InferOutput<NonNullable<typeof notesLocalTimelineContract['~orpc']['inputSchema']>>, actor: Actor | null): Promise<v.InferOutput<NonNullable<typeof notesLocalTimelineContract['~orpc']['outputSchema']>>>;
+	notesMentions(input: v.InferOutput<NonNullable<typeof notesMentionsContract['~orpc']['inputSchema']>>, actor: Actor): Promise<v.InferOutput<NonNullable<typeof notesMentionsContract['~orpc']['outputSchema']>>>;
+	notesTimeline(input: v.InferOutput<NonNullable<typeof notesTimelineContract['~orpc']['inputSchema']>>, actor: Actor): Promise<v.InferOutput<NonNullable<typeof notesTimelineContract['~orpc']['outputSchema']>>>;
+	notesUserListTimeline(input: v.InferOutput<NonNullable<typeof notesUserListTimelineContract['~orpc']['inputSchema']>>, actor: Actor): Promise<v.InferOutput<NonNullable<typeof notesUserListTimelineContract['~orpc']['outputSchema']>>>;
+	usersNotes(input: v.InferOutput<NonNullable<typeof usersNotesContract['~orpc']['inputSchema']>>, actor: Actor | null): Promise<v.InferOutput<NonNullable<typeof usersNotesContract['~orpc']['outputSchema']>>>;
 }
 export type TimelinesContext<Actor extends ApiActor> = ApiContext<Actor> & {
 	operations: { timelines: TimelinesOperations<Actor> };

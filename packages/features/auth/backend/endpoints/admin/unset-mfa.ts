@@ -14,8 +14,8 @@ import { DI } from '@/di-symbols.js';
 import { RoleService } from '@features/roles/backend/services/RoleService.js';
 import { ModerationLogService } from '@features/moderation/backend/services/ModerationLogService.js';
 
-import * as v from 'valibot';
-import { voidAdminUnsetMfaInput } from '../../auth.schema.js';
+import type * as v from 'valibot';
+import type { AdminUnsetMfaContract } from '../../api.contract.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 
 export const meta = {
@@ -52,7 +52,7 @@ export class AdminUnsetMfaOperation {
 		private moderationLogService: ModerationLogService,
 	) {}
 
-	async execute(ps: v.InferOutput<typeof voidAdminUnsetMfaInput>, me: MiLocalUser) {
+	async execute(ps: v.InferOutput<NonNullable<typeof AdminUnsetMfaContract['~orpc']['inputSchema']>>, me: MiLocalUser) {
 		const user = await this.usersRepository.findOneBy({ id: ps.userId });
 
 		if (user == null) {

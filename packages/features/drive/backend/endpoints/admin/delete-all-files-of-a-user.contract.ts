@@ -10,10 +10,9 @@ import { objectInput } from '../../../../api/backend/transport/input.schema.js';
 
 import { misskeyId } from '../../../../users/backend/users.input.schema.js';
 
-export const adminDeleteAllFilesOfAUserInput = objectInput({
-	"userId": misskeyId,
-});
 export const adminDeleteAllFilesOfAUserErrors = {} as const;
-export const adminDeleteAllFilesOfAUserContract = oc.$meta<{ requestName: 'admin/delete-all-files-of-a-user' }>({ requestName: 'admin/delete-all-files-of-a-user' })
+export const adminDeleteAllFilesOfAUserContract = oc.$meta({ requestName: 'admin/delete-all-files-of-a-user' } as const)
 	.route({ method: 'POST', path: '/admin/delete-all-files-of-a-user', operationId: 'post___admin___delete-all-files-of-a-user', tags: ['admin'], spec: current => ({ ...current, security: [{ bearerAuth: [] }] }), successStatus: 204 })
-	.errors({ ...commonErrors }).input(adminDeleteAllFilesOfAUserInput).output(v.void());
+	.errors({ ...commonErrors }).input(objectInput({
+		"userId": misskeyId,
+	})).output(v.void());

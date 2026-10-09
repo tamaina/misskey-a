@@ -11,7 +11,8 @@ import { FederatedInstanceService } from '../../../services/FederatedInstanceSer
 import { ModerationLogService } from '../../../../../moderation/backend/services/ModerationLogService.js';
 import type { MiUser } from '../../../../../users/backend/models/User.js';
 import * as v from 'valibot';
-import { adminFederationUpdateInstanceInput, adminFederationUpdateInstanceOutput } from './update-instance.contract.js';
+import type { AdminFederationUpdateInstanceInput, AdminFederationUpdateInstanceOutput } from './update-instance.contract.js';
+import { adminFederationUpdateInstanceContract } from './update-instance.contract.js';
 
 @Injectable()
 export class AdminFederationUpdateInstanceApplicationService {
@@ -24,7 +25,7 @@ export class AdminFederationUpdateInstanceApplicationService {
 		private moderationLogService: ModerationLogService,
 	) {}
 
-	public async execute(ps: v.InferOutput<typeof adminFederationUpdateInstanceInput>, me: MiUser): Promise<v.InferOutput<typeof adminFederationUpdateInstanceOutput>> {
+	public async execute(ps: AdminFederationUpdateInstanceInput, me: MiUser): Promise<AdminFederationUpdateInstanceOutput> {
 		const result = await (async () => {
 			const instance = await this.instancesRepository.findOneBy({ host: this.utilityService.toPuny(ps.host) });
 
@@ -67,6 +68,6 @@ export class AdminFederationUpdateInstanceApplicationService {
 				});
 			}
 		})();
-		return v.parse(adminFederationUpdateInstanceOutput, result);
+		return v.parse(adminFederationUpdateInstanceContract['~orpc'].outputSchema!, result);
 	}
 }

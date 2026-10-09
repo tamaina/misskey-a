@@ -9,14 +9,6 @@ import { commonErrors, apiErrorData } from '../../../../api/backend/transport/er
 import { objectInput, misskeyId } from '../../request.schema.js';
 import type { OpenAPI } from '@orpc/contract';
 
-export const notesTranslateInput = objectInput({
-	'noteId': misskeyId,
-	'targetLang': v.string(),
-});
-export const notesTranslateOutput = v.optional(v.strictObject({
-	'sourceLang': v.string(),
-	'text': v.string(),
-}));
 export const notesTranslateErrors = {
 	unavailable: {
 		message: 'Translate of notes unavailable.',
@@ -36,7 +28,13 @@ export const notesTranslateErrors = {
 } as const;
 export const notesTranslatePolicy = { name: 'notes/translate', requireCredential: true, kind: 'read:account' } as const;
 const security: OpenAPI.SecurityRequirementObject[] = [{ bearerAuth: [] }];
-export const notesTranslateContract = oc.$meta<{ requestName: 'notes/translate' }>({ requestName: 'notes/translate' })
+export const notesTranslateContract = oc.$meta({ requestName: 'notes/translate' } as const)
 	.route({ method: 'POST', path: '/notes/translate', operationId: 'post___notes___translate', tags: ['notes'], spec: current => ({ ...current, security }) })
 	.errors({ ...commonErrors, UNAVAILABLE: { status: 400, data: apiErrorData }, NO_SUCH_NOTE: { status: 400, data: apiErrorData }, CANNOT_TRANSLATE_INVISIBLE_NOTE: { status: 400, data: apiErrorData } })
-	.input(notesTranslateInput).output(notesTranslateOutput);
+	.input(objectInput({
+	'noteId': misskeyId,
+	'targetLang': v.string(),
+})).output(v.optional(v.strictObject({
+	'sourceLang': v.string(),
+	'text': v.string(),
+})));

@@ -6,10 +6,11 @@
 import { implement } from '@orpc/server';
 import { Injectable } from '@nestjs/common';
 import * as v from 'valibot';
+import { packedChannelSchema } from '../../../channel.schema.js';
 import { authentication, apiPolicy, requirePrincipal } from '../../../../../api/backend/transport/middleware.js';
 import { ChannelMutingService } from '../../../services/ChannelMutingService.js';
 import { ChannelEntityService } from '../../../serializers/ChannelEntityService.js';
-import { channelsMuteListContract, channelsMuteListPolicy, channelsMuteListInput, channelsMuteListOutput, channelsMuteListErrors } from './list.contract.js';
+import { channelsMuteListContract, channelsMuteListPolicy, channelsMuteListErrors } from './list.contract.js';
 import type { ApiActor } from '../../../../../api/backend/transport/context.js';
 import type { ChannelsApiContext } from '../../../operations.js';
 
@@ -29,11 +30,11 @@ export class ChannelsMuteListOperation {
 		private channelMutingService: ChannelMutingService,
 		private channelEntityService: ChannelEntityService,
 	) {}
-	async execute(ps: v.InferOutput<typeof channelsMuteListInput>, me: MiLocalUser): Promise<v.InferOutput<typeof channelsMuteListOutput>> {
-		return v.parse(channelsMuteListOutput, await this.run(ps, me));
+	async execute(ps: v.InferOutput<NonNullable<typeof channelsMuteListContract['~orpc']['inputSchema']>>, me: MiLocalUser): Promise<v.InferOutput<NonNullable<typeof channelsMuteListContract['~orpc']['outputSchema']>>> {
+		return v.parse(v.array(packedChannelSchema), await this.run(ps, me));
 	}
 
-	private async run(ps: v.InferOutput<typeof channelsMuteListInput>, me: MiLocalUser) {
+	private async run(ps: v.InferOutput<NonNullable<typeof channelsMuteListContract['~orpc']['inputSchema']>>, me: MiLocalUser) {
 		const mutings = await this.channelMutingService.list({
 			requestUserId: me.id,
 		});

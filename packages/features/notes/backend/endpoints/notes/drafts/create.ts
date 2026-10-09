@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import type { InferSchemaOutput } from '@orpc/contract';
 import { implement } from '@orpc/server';
 import { Injectable } from '@nestjs/common';
 import { IdentifiableError } from '@features/runtime/backend/errors/identifiable-error.js';
@@ -12,7 +13,7 @@ import { NoteDraftService } from '../../../services/NoteDraftService.js';
 import { authentication, apiPolicy, requirePrincipal } from '../../../../../api/backend/transport/middleware.js';
 import { apiError } from '../../../../../api/backend/transport/orpc-error.js';
 import { readErrorId } from '../../../request.schema.js';
-import { notesDraftsCreateContract, notesDraftsCreatePolicy, notesDraftsCreateInput, notesDraftsCreateOutput, notesDraftsCreateErrors } from './create.contract.js';
+import { notesDraftsCreateContract, notesDraftsCreatePolicy, notesDraftsCreateErrors } from './create.contract.js';
 import type { MiLocalUser } from '../../../../../users/backend/models/User.js';
 import type { NotesApiContext } from '../../../operations.js';
 import type { ApiActor } from '../../../../../api/backend/transport/context.js';
@@ -31,11 +32,11 @@ export class NotesDraftsCreateOperation {
 		private noteDraftService: NoteDraftService,
 		private noteDraftEntityService: NoteDraftEntityService,
 	) {}
-	async execute(ps: v.InferOutput<typeof notesDraftsCreateInput>, me: MiLocalUser): Promise<v.InferOutput<typeof notesDraftsCreateOutput>> {
-		return v.parse(notesDraftsCreateOutput, await this.run(ps, me));
+	async execute(ps: InferSchemaOutput<NonNullable<typeof notesDraftsCreateContract['~orpc']['inputSchema']>>, me: MiLocalUser): Promise<InferSchemaOutput<NonNullable<typeof notesDraftsCreateContract['~orpc']['outputSchema']>>> {
+		return v.parse(requiredSchema(notesDraftsCreateContract['~orpc'].outputSchema), await this.run(ps, me));
 	}
 
-	private async run(ps: v.InferOutput<typeof notesDraftsCreateInput>, me: MiLocalUser) {
+	private async run(ps: InferSchemaOutput<NonNullable<typeof notesDraftsCreateContract['~orpc']['inputSchema']>>, me: MiLocalUser) {
 		const draft = await this.noteDraftService.create(me, {
 			fileIds: ps.fileIds ?? [],
 			pollChoices: ps.poll?.choices ?? [],
@@ -103,4 +104,9 @@ export class NotesDraftsCreateOperation {
 			createdDraft,
 		};
 	}
+}
+
+function requiredSchema<Schema>(schema: Schema | undefined): Schema {
+	if (schema === undefined) throw new Error('Missing endpoint contract schema');
+	return schema;
 }

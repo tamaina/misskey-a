@@ -6,12 +6,20 @@
 import { expect, test } from 'vitest';
 import * as v from 'valibot';
 import { mockDeep } from 'vitest-mock-extended';
-import { registryScopesWithDomainInput as input, registryScopesWithDomainOutput as output } from '../../backend/endpoints/i/registry/scopes-with-domain.contract.js';
-import { registryGetDetailOutput as detailOutput } from '../../backend/endpoints/i/registry/get-detail.contract.js';
-import { registryKeysInput as keysInput } from '../../backend/endpoints/i/registry/keys.contract.js';
+import { preferencesContract } from '../../backend/api.contract.js';
 import { MiRegistryItem } from '../../backend/models/RegistryItem.js';
 import { RegistryApiService } from '../../backend/services/RegistryApiService.js';
 import type { RegistryItemsRepository } from '@features/persistence/backend/repositories/models.js';
+
+function requiredSchema<S extends v.GenericSchema>(schema: S | undefined): S {
+	if (schema === undefined) throw new Error('Missing native schema');
+	return schema;
+}
+
+const input = requiredSchema(preferencesContract.scopesWithDomain['~orpc'].inputSchema);
+const output = requiredSchema(preferencesContract.scopesWithDomain['~orpc'].outputSchema);
+const detailOutput = requiredSchema(preferencesContract.getDetail['~orpc'].outputSchema);
+const keysInput = requiredSchema(preferencesContract.keys['~orpc'].inputSchema);
 
 const item = { domain: null, scopes: [['client']] };
 

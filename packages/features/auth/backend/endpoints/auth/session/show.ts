@@ -10,8 +10,8 @@ import { AuthSessionEntityService } from '../../../serializers/AuthSessionEntity
 import { DI } from '@/di-symbols.js';
 import { apiError } from '@features/api/backend/transport/orpc-error.js';
 
-import * as v from 'valibot';
-import { packedAuthSessionShowInput } from '../../../auth.schema.js';
+import type * as v from 'valibot';
+import type { AuthSessionShowContract } from '../../../api.contract.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 
 export const meta = {
@@ -37,7 +37,7 @@ export class AuthSessionShowOperation {
 		private authSessionEntityService: AuthSessionEntityService,
 	) {}
 
-	async execute(ps: v.InferOutput<typeof packedAuthSessionShowInput>, me: MiLocalUser | null) {
+	async execute(ps: v.InferOutput<NonNullable<typeof AuthSessionShowContract['~orpc']['inputSchema']>>, me: MiLocalUser | null) {
 		// Lookup session
 		const session = await this.authSessionsRepository.findOneBy({
 			token: ps.token,

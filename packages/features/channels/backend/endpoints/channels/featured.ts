@@ -6,10 +6,11 @@
 import { implement } from '@orpc/server';
 import { Inject, Injectable } from '@nestjs/common';
 import * as v from 'valibot';
+import { packedChannelSchema } from '../../channel.schema.js';
 import { DI } from '@/di-symbols.js';
 import { authentication, apiPolicy } from '../../../../api/backend/transport/middleware.js';
 import { ChannelEntityService } from '../../serializers/ChannelEntityService.js';
-import { channelsFeaturedContract, channelsFeaturedPolicy, channelsFeaturedInput, channelsFeaturedOutput, channelsFeaturedErrors } from './featured.contract.js';
+import { channelsFeaturedContract, channelsFeaturedPolicy, channelsFeaturedErrors } from './featured.contract.js';
 import type { ApiActor } from '../../../../api/backend/transport/context.js';
 import type { ChannelsApiContext } from '../../operations.js';
 
@@ -32,11 +33,11 @@ export class ChannelsFeaturedOperation {
 
 		private channelEntityService: ChannelEntityService,
 	) {}
-	async execute(ps: v.InferOutput<typeof channelsFeaturedInput>, me: MiLocalUser | null): Promise<v.InferOutput<typeof channelsFeaturedOutput>> {
-		return v.parse(channelsFeaturedOutput, await this.run(ps, me));
+	async execute(ps: v.InferOutput<NonNullable<typeof channelsFeaturedContract['~orpc']['inputSchema']>>, me: MiLocalUser | null): Promise<v.InferOutput<NonNullable<typeof channelsFeaturedContract['~orpc']['outputSchema']>>> {
+		return v.parse(v.array(packedChannelSchema), await this.run(ps, me));
 	}
 
-	private async run(ps: v.InferOutput<typeof channelsFeaturedInput>, me: MiLocalUser | null) {
+	private async run(ps: v.InferOutput<NonNullable<typeof channelsFeaturedContract['~orpc']['inputSchema']>>, me: MiLocalUser | null) {
 		const query = this.channelsRepository.createQueryBuilder('channel')
 			.where('channel.lastNotedAt IS NOT NULL')
 			.andWhere('channel.isArchived = FALSE')

@@ -9,8 +9,6 @@ import * as v from 'valibot';
 import { commonErrors, apiErrorData } from '../../../../../../api/backend/transport/errors.schema.js';
 import { objectInput, misskeyId } from '../../../../request.schema.js';
 
-export const chatRoomsInvitationsIgnoreInput = objectInput({ roomId: misskeyId });
-export const chatRoomsInvitationsIgnoreOutput = v.void();
 export const chatRoomsInvitationsIgnoreErrors = {
 		noSuchRoom: {
 			message: 'No such room.',
@@ -20,7 +18,7 @@ export const chatRoomsInvitationsIgnoreErrors = {
 	} as const;
 export const chatRoomsInvitationsIgnorePolicy = { name: 'chat/rooms/invitations/ignore', requireCredential: true, kind: 'write:chat' } as const;
 const security: OpenAPI.SecurityRequirementObject[] = [{ bearerAuth: [] }];
-export const chatRoomsInvitationsIgnoreContract = oc.$meta<{ requestName: 'chat/rooms/invitations/ignore' }>({ requestName: 'chat/rooms/invitations/ignore' })
+export const chatRoomsInvitationsIgnoreContract = oc.$meta({ requestName: 'chat/rooms/invitations/ignore' } as const)
 	.route({ method: 'POST', path: '/chat/rooms/invitations/ignore', operationId: 'post___chat___rooms___invitations___ignore', tags: ['chat'], spec: current => ({ ...current, security }), successStatus: 204 })
 	.errors({ ...commonErrors, NO_SUCH_ROOM: { status: 400, data: apiErrorData } })
-	.input(chatRoomsInvitationsIgnoreInput).output(chatRoomsInvitationsIgnoreOutput);
+	.input(objectInput({ roomId: misskeyId })).output(v.void());

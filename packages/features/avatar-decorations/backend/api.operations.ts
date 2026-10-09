@@ -3,13 +3,11 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import type { InferContractRouterOutputs } from '@orpc/contract';
 import type { ApiActor } from '../../api/backend/transport/context.js';
 import type { IdService } from '../../runtime/backend/services/IdService.js';
 import type { MiAvatarDecoration } from './models/AvatarDecoration.js';
 import type { avatarDecorationsContract } from './api.contract.js';
-import type * as v from 'valibot';
-import type * as schemas from './api.schema.js';
+import type { InferSchemaOutput, InferContractRouterOutputs } from '@orpc/contract';
 
 export interface AvatarDecorationUpdateValues {
 	name: string | undefined;
@@ -19,13 +17,7 @@ export interface AvatarDecorationUpdateValues {
 	category: string | null | undefined;
 }
 
-type Inputs = {
-	create: v.InferOutput<typeof schemas.avatarDecorationCreateInput>;
-	delete: v.InferOutput<typeof schemas.avatarDecorationDeleteInput>;
-	list: v.InferOutput<typeof schemas.avatarDecorationListInput>;
-	update: v.InferOutput<typeof schemas.avatarDecorationUpdateInput>;
-	get: v.InferOutput<typeof schemas.avatarDecorationsInput>;
-};
+type Inputs = { [K in keyof typeof avatarDecorationsContract]: InferSchemaOutput<NonNullable<(typeof avatarDecorationsContract)[K]['~orpc']['inputSchema']>> };
 type Outputs = InferContractRouterOutputs<typeof avatarDecorationsContract>;
 export interface AvatarDecorationsOperations<Actor extends ApiActor> {
 	create(input: Inputs['create'], actor: Actor): Promise<Outputs['create']>;

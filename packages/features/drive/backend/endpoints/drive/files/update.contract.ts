@@ -11,13 +11,6 @@ import { jsonString } from '../../../../../api/backend/transport/string.schema.j
 import { misskeyId } from '../../../../../users/backend/users.input.schema.js';
 import { packedDriveFileSchema } from '../../../../../notes/backend/drive.schema.js';
 
-export const driveFilesUpdateInput = objectInput({
-	"fileId": misskeyId,
-	"folderId": v.exactOptional(v.nullable(misskeyId)),
-	"name": v.exactOptional(v.string()),
-	"isSensitive": v.exactOptional(v.boolean()),
-	"comment": v.exactOptional(v.nullable(jsonString({ "maxLength": 512 }))),
-});
 export const driveFilesUpdateErrors = {
 		invalidFileName: {
 			message: 'Invalid file name.',
@@ -49,6 +42,12 @@ export const driveFilesUpdateErrors = {
 			id: '7f59dccb-f465-75ab-5cf4-3ce44e3282f7',
 		},
 	} as const;
-export const driveFilesUpdateContract = oc.$meta<{ requestName: 'drive/files/update' }>({ requestName: 'drive/files/update' })
+export const driveFilesUpdateContract = oc.$meta({ requestName: 'drive/files/update' } as const)
 	.route({ method: 'POST', path: '/drive/files/update', operationId: 'post___drive___files___update', tags: ['drive'], description: 'Update the properties of a drive file.', spec: current => ({ ...current, security: [{ bearerAuth: [] }] }) })
-	.errors({ ...commonErrors, INVALID_FILE_NAME: { status: 400, data: apiErrorData }, NO_SUCH_FILE: { status: 400, data: apiErrorData }, ACCESS_DENIED: { status: 400, data: apiErrorData }, NO_SUCH_FOLDER: { status: 400, data: apiErrorData }, RESTRICTED_BY_ROLE: { status: 400, data: apiErrorData } }).input(driveFilesUpdateInput).output(packedDriveFileSchema);
+	.errors({ ...commonErrors, INVALID_FILE_NAME: { status: 400, data: apiErrorData }, NO_SUCH_FILE: { status: 400, data: apiErrorData }, ACCESS_DENIED: { status: 400, data: apiErrorData }, NO_SUCH_FOLDER: { status: 400, data: apiErrorData }, RESTRICTED_BY_ROLE: { status: 400, data: apiErrorData } }).input(objectInput({
+		"fileId": misskeyId,
+		"folderId": v.exactOptional(v.nullable(misskeyId)),
+		"name": v.exactOptional(v.string()),
+		"isSensitive": v.exactOptional(v.boolean()),
+		"comment": v.exactOptional(v.nullable(jsonString({ "maxLength": 512 }))),
+	})).output(packedDriveFileSchema);

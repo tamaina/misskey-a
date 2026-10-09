@@ -9,8 +9,6 @@ import * as v from 'valibot';
 import { commonErrors, apiErrorData } from '../../../../api/backend/transport/errors.schema.js';
 import { objectInput, misskeyId } from '../../request.schema.js';
 
-export const channelsUnfollowInput = objectInput({ channelId: misskeyId });
-export const channelsUnfollowOutput = v.void();
 export const channelsUnfollowErrors = {
 		noSuchChannel: {
 			message: 'No such channel.',
@@ -20,7 +18,7 @@ export const channelsUnfollowErrors = {
 	} as const;
 export const channelsUnfollowPolicy = { name: 'channels/unfollow', requireCredential: true, prohibitMoved: true, kind: 'write:channels' } as const;
 const security: OpenAPI.SecurityRequirementObject[] = [{ bearerAuth: [] }];
-export const channelsUnfollowContract = oc.$meta<{ requestName: 'channels/unfollow' }>({ requestName: 'channels/unfollow' })
+export const channelsUnfollowContract = oc.$meta({ requestName: 'channels/unfollow' } as const)
 	.route({ method: 'POST', path: '/channels/unfollow', operationId: 'post___channels___unfollow', tags: ['channels'], spec: current => ({ ...current, security }), successStatus: 204 })
 	.errors({ ...commonErrors, NO_SUCH_CHANNEL: { status: 400, data: apiErrorData } })
-	.input(channelsUnfollowInput).output(channelsUnfollowOutput);
+	.input(objectInput({ channelId: misskeyId })).output(v.void());

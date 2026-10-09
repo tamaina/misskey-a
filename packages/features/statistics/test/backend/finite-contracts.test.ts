@@ -23,15 +23,11 @@ const chartEndpointDefinitions = {
 	'charts/users': { output: statisticsContract.users['~orpc'].outputSchema },
 };
 import * as descriptors from '../../shared/chart-descriptors.js';
-
 import Chart from '../../backend/charts/core.js';
-import { statsOutput as statsResult } from '../../backend/endpoints/stats.contract.js';
+import { statsContract } from '../../backend/endpoints/stats.contract.js';
 import { createStatisticsOperations } from '../../backend/operations.js';
 import { createStats } from '../../backend/index.js';
-
-import { packedSchemas } from '../../../index/backend/packed.schema.js';
-import { retentionContract as nativeContract1 } from '../../backend/endpoints/retention.contract.js';
-import { retentionContract as nativeContract2 } from '../../backend/endpoints/retention.contract.js';
+import { retentionContract as nativeContract1, retentionContract as nativeContract2 } from '../../backend/endpoints/retention.contract.js';
 import type { RetentionAggregationsRepository } from '@features/persistence/backend/repositories/models.js';
 import type { MiRetentionAggregation } from '../../backend/models/RetentionAggregation.js';
 import type { ChartMetricDescriptor } from '../../shared/chart-descriptors.js';
@@ -107,8 +103,8 @@ test('stats empty input retains its non-array JSON-object guard and missing-body
 test('actual statistics and retention producers produce declared fields', async () => {
 	const stats = createStats({ readNotes: async () => ({ local: 2, remote: 3 }), readUsers: async () => ({ local: 4, remote: 5 }), countReactions: async () => 6, countInstances: async () => 7 });
 	const result = await stats({});
-	expect(v.parse(statsResult, result)).toEqual({ notesCount: 5, originalNotesCount: 2, usersCount: 9, originalUsersCount: 4, reactionsCount: 6, instances: 7, driveUsageLocal: 0, driveUsageRemote: 0 });
-	expect(v.safeParse(statsResult, { ...result, future: true }).success).toBe(false);
+	expect(v.parse(statsContract['~orpc'].outputSchema!, result)).toEqual({ notesCount: 5, originalNotesCount: 2, usersCount: 9, originalUsersCount: 4, reactionsCount: 6, instances: 7, driveUsageLocal: 0, driveUsageRemote: 0 });
+	expect(v.safeParse(statsContract['~orpc'].outputSchema!, { ...result, future: true }).success).toBe(false);
 	const repository = mockDeep<RetentionAggregationsRepository>();
 	repository.find.mockResolvedValue([mockDeep<MiRetentionAggregation>({ createdAt: new Date(item.createdAt), usersCount: item.users, data: item.data })]);
 	expect(v.parse(remainingRetentionOutput, await createStatisticsOperations({ ...mockDeep<Parameters<typeof createStatisticsOperations>[0]>(), readRetention: () => repository.find() }).retention({}, null))).toEqual([item]);

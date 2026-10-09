@@ -8,8 +8,8 @@ import { Injectable } from '@nestjs/common';
 import { ReversiService } from '../../services/ReversiService.js';
 
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
-import type * as v from 'valibot';
-import { reversiCancelMatchInput } from '../../endpoints/reversi/cancel-match.contract.js';
+import type { InferSchemaOutput } from '@orpc/contract';
+import { type reversiCancelMatchContract } from '../../endpoints/reversi/cancel-match.contract.js';
 
 @Injectable()
 export class ReversiCancelMatchApplicationService {
@@ -17,7 +17,7 @@ export class ReversiCancelMatchApplicationService {
 		private reversiService: ReversiService,
 	) {}
 
-	async execute(ps: v.InferOutput<typeof reversiCancelMatchInput>, me: MiLocalUser) {
+	async execute(ps: InferSchemaOutput<NonNullable<(typeof reversiCancelMatchContract)['~orpc']['inputSchema']>>, me: MiLocalUser) {
 		if (ps.userId) {
 			await this.reversiService.matchSpecificUserCancel(me, ps.userId);
 			return;

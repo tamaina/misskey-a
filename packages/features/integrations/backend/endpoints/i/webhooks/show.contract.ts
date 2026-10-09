@@ -10,10 +10,6 @@ import { commonErrors, apiErrorData } from '../../../../../api/backend/transport
 import { misskeyId } from '../../../input.schema.js';
 import { userWebhookSchema } from '../../../webhook.schema.js';
 
-export const iWebhooksShowInput = objectInput({
-	"webhookId": misskeyId,
-});
-export const iWebhooksShowOutput = userWebhookSchema;
 export const iWebhooksShowErrors = {
 		noSuchWebhook: {
 			message: 'No such webhook.',
@@ -23,7 +19,9 @@ export const iWebhooksShowErrors = {
 	} as const;
 
 const requestName = 'i/webhooks/show';
-export const iWebhooksShowContract = oc.$meta<{ requestName: typeof requestName }>({ requestName })
+export const iWebhooksShowContract = oc.$meta({ requestName: requestName } as const)
 	.route({ method: 'POST', path: `/${requestName}`, operationId: 'post___' + requestName.replaceAll('/', '___'), tags: ['webhooks'], spec: current => ({ ...current, security: [{ bearerAuth: [] }] }) })
 	.errors({ ...commonErrors, NO_SUCH_WEBHOOK: { status: 400, data: apiErrorData } })
-	.input(iWebhooksShowInput).output(iWebhooksShowOutput);
+	.input(objectInput({
+	"webhookId": misskeyId,
+})).output(userWebhookSchema);

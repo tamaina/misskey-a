@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import type { InferSchemaOutput } from '@orpc/contract';
 import { implement } from '@orpc/server';
 import { Inject, Injectable } from '@nestjs/common';
 import { GetterService } from '@features/api/backend/transport/GetterService.js';
@@ -13,7 +14,7 @@ import { QueryService } from '../../services/QueryService.js';
 import { NoteEntityService } from '../../serializers/NoteEntityService.js';
 import { apiError } from '../../../../api/backend/transport/orpc-error.js';
 import { readErrorId } from '../../request.schema.js';
-import { notesRenotesContract, notesRenotesPolicy, notesRenotesInput, notesRenotesOutput, notesRenotesErrors } from './renotes.contract.js';
+import { notesRenotesContract, notesRenotesPolicy, notesRenotesErrors } from './renotes.contract.js';
 import type { ApiActor } from '../../../../api/backend/transport/context.js';
 import type { NotesApiContext } from '../../operations.js';
 import type { NotesRepository } from '@features/persistence/backend/repositories/models.js';
@@ -36,11 +37,11 @@ export class NotesRenotesOperation {
 		private queryService: QueryService,
 		private getterService: GetterService,
 	) {}
-	async execute(ps: v.InferOutput<typeof notesRenotesInput>, me: MiLocalUser | null): Promise<v.InferOutput<typeof notesRenotesOutput>> {
-		return v.parse(notesRenotesOutput, await this.run(ps, me));
+	async execute(ps: InferSchemaOutput<NonNullable<typeof notesRenotesContract['~orpc']['inputSchema']>>, me: MiLocalUser | null): Promise<InferSchemaOutput<NonNullable<typeof notesRenotesContract['~orpc']['outputSchema']>>> {
+		return v.parse(requiredSchema(notesRenotesContract['~orpc'].outputSchema), await this.run(ps, me));
 	}
 
-	private async run(ps: v.InferOutput<typeof notesRenotesInput>, me: MiLocalUser | null) {
+	private async run(ps: InferSchemaOutput<NonNullable<typeof notesRenotesContract['~orpc']['inputSchema']>>, me: MiLocalUser | null) {
 		const note = await this.getterService.getNote(ps.noteId).catch((err: unknown) => {
 			if (readErrorId(err) === '9725d0ce-ba28-4dde-95a7-2cbb2c15de24') throw apiError(notesRenotesErrors.noSuchNote);
 			throw err;
@@ -61,4 +62,9 @@ export class NotesRenotesOperation {
 
 		return await this.noteEntityService.packMany(renotes, me);
 	}
+}
+
+function requiredSchema<Schema>(schema: Schema | undefined): Schema {
+	if (schema === undefined) throw new Error('Missing endpoint contract schema');
+	return schema;
 }

@@ -3,21 +3,22 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import type { InferSchemaOutput } from '@orpc/contract';
 import { expect, expectTypeOf, test } from 'vitest';
 import * as v from 'valibot';
 import { mockDeep } from 'vitest-mock-extended';
 import { ModuleRef } from '@nestjs/core';
 import { EntityNotFoundError } from 'typeorm';
 import { notesApiContract } from '../../backend/api.contract.js';
-import { notesInput as packedNotesInput } from '../../backend/endpoints/notes.contract.js';
-import { notesConversationInput as packedNotesConversationInput } from '../../backend/endpoints/notes/conversation.contract.js';
-import { notesDraftsListInput as packedNotesDraftsListInput } from '../../backend/endpoints/notes/drafts/list.contract.js';
-import { notesPollsRecommendationInput as packedNotesPollsRecommendationInput } from '../../backend/endpoints/notes/polls/recommendation.contract.js';
-import { notesReactionsInput as packedNotesReactionsInput } from '../../backend/endpoints/notes/reactions.contract.js';
-import { notesReactionsDeleteInput } from '../../backend/endpoints/notes/reactions/delete.contract.js';
-import { notesCreateInput, notesCreateOutput } from '../../backend/endpoints/notes/create.contract.js';
-import { notesDraftsCreateInput, notesDraftsCreateOutput } from '../../backend/endpoints/notes/drafts/create.contract.js';
-import { notesDraftsUpdateInput, notesDraftsUpdateOutput } from '../../backend/endpoints/notes/drafts/update.contract.js';
+import { notesContract } from '../../backend/endpoints/notes.contract.js';
+import { notesConversationContract } from '../../backend/endpoints/notes/conversation.contract.js';
+import { notesDraftsListContract } from '../../backend/endpoints/notes/drafts/list.contract.js';
+import { notesPollsRecommendationContract } from '../../backend/endpoints/notes/polls/recommendation.contract.js';
+import { notesReactionsContract } from '../../backend/endpoints/notes/reactions.contract.js';
+import { notesReactionsDeleteContract } from '../../backend/endpoints/notes/reactions/delete.contract.js';
+import { notesCreateContract } from '../../backend/endpoints/notes/create.contract.js';
+import { notesDraftsCreateContract } from '../../backend/endpoints/notes/drafts/create.contract.js';
+import { notesDraftsUpdateContract } from '../../backend/endpoints/notes/drafts/update.contract.js';
 import { packedNoteDraftSchema, packedNoteReactionSchema, packedNoteReactionWithNoteSchema } from '../../backend/note-aux.schema.js';
 import { NoteDraftEntityService } from '../../backend/serializers/NoteDraftEntityService.js';
 import { NoteReactionEntityService } from '../../backend/serializers/NoteReactionEntityService.js';
@@ -90,16 +91,16 @@ test('all 28 migrated inputs strip transport keys, reject arrays and retain nati
 		expect(v.safeParse(input, []).success).toBe(false);
 		expect(v.safeParse(input, Object.assign([], fields)).success).toBe(false);
 	}
-	expect(v.safeParse(notesReactionsDeleteInput, {}).success).toBe(false);
-	expect(v.safeParse(notesReactionsDeleteInput, { noteId: 'bad-id' }).success).toBe(false);
-	expect(v.parse(packedNotesInput, {})).toEqual({ local: false, limit: 10 });
-	expect(v.parse(packedNotesConversationInput, { noteId: note.id })).toEqual({ noteId: note.id, limit: 10, offset: 0 });
-	expect(v.parse(packedNotesDraftsListInput, { scheduled: null })).toEqual({ limit: 30, scheduled: null });
-	expect(v.parse(packedNotesPollsRecommendationInput, {})).toEqual({ limit: 10, offset: 0, excludeChannels: false });
-	expect(v.parse(packedNotesReactionsInput, { noteId: note.id, type: null })).toEqual({ noteId: note.id, limit: 10, type: null });
-	for (const limit of [0, 101, 1.5, '10', null]) expect(v.safeParse(packedNotesInput, { limit }).success).toBe(false);
-	expect(v.safeParse(packedNotesInput, { reply: undefined }).success).toBe(false);
-	expectTypeOf<v.InferOutput<typeof notesReactionsDeleteInput>>().toEqualTypeOf<{ noteId: string }>();
+	expect(v.safeParse(requiredSchema(notesReactionsDeleteContract['~orpc'].inputSchema), {}).success).toBe(false);
+	expect(v.safeParse(requiredSchema(notesReactionsDeleteContract['~orpc'].inputSchema), { noteId: 'bad-id' }).success).toBe(false);
+	expect(v.parse(requiredSchema(notesContract['~orpc'].inputSchema), {})).toEqual({ local: false, limit: 10 });
+	expect(v.parse(requiredSchema(notesConversationContract['~orpc'].inputSchema), { noteId: note.id })).toEqual({ noteId: note.id, limit: 10, offset: 0 });
+	expect(v.parse(requiredSchema(notesDraftsListContract['~orpc'].inputSchema), { scheduled: null })).toEqual({ limit: 30, scheduled: null });
+	expect(v.parse(requiredSchema(notesPollsRecommendationContract['~orpc'].inputSchema), {})).toEqual({ limit: 10, offset: 0, excludeChannels: false });
+	expect(v.parse(requiredSchema(notesReactionsContract['~orpc'].inputSchema), { noteId: note.id, type: null })).toEqual({ noteId: note.id, limit: 10, type: null });
+	for (const limit of [0, 101, 1.5, '10', null]) expect(v.safeParse(requiredSchema(notesContract['~orpc'].inputSchema), { limit }).success).toBe(false);
+	expect(v.safeParse(requiredSchema(notesContract['~orpc'].inputSchema), { reply: undefined }).success).toBe(false);
+	expectTypeOf<InferSchemaOutput<NonNullable<typeof notesReactionsDeleteContract['~orpc']['inputSchema']>>>().toEqualTypeOf<{ noteId: string }>();
 	expectTypeOf<v.InferOutput<typeof packedNoteReactionSchema>>().toEqualTypeOf<{ id: string; createdAt: string; user: Packed<'UserLite'>; type: string }>();
 });
 
@@ -198,16 +199,21 @@ test('actual create and draft handlers emit the three closed envelopes', async (
 	const model = mockDeep<MiNote>({ id: note.id });
 	create.fetchAndCreate.mockResolvedValue(model); notes.pack.mockResolvedValue(note);
 	const me = mockDeep<MiLocalUser>({ id: user.id });
-	const created = await new CreateOperation(notes, create).execute(v.parse(notesCreateInput, { text: 'hello' }), me);
-	const createdDraft = await new DraftCreateOperation(drafts, draftSerializer).execute(v.parse(notesDraftsCreateInput, {}), me);
-	const updatedDraft = await new DraftUpdateOperation(drafts, draftSerializer).execute(v.parse(notesDraftsUpdateInput, { draftId: draft.id }), me);
+	const created = await new CreateOperation(notes, create).execute(v.parse(requiredSchema(notesCreateContract['~orpc'].inputSchema), { text: 'hello' }), me);
+	const createdDraft = await new DraftCreateOperation(drafts, draftSerializer).execute(v.parse(requiredSchema(notesDraftsCreateContract['~orpc'].inputSchema), {}), me);
+	const updatedDraft = await new DraftUpdateOperation(drafts, draftSerializer).execute(v.parse(requiredSchema(notesDraftsUpdateContract['~orpc'].inputSchema), { draftId: draft.id }), me);
 	expect(created).toEqual({ createdNote: note });
 	expect(createdDraft).toEqual({ createdDraft: packedDraft });
 	expect(updatedDraft).toEqual({ updatedDraft: packedDraft });
-	for (const [schema, result] of [[notesCreateOutput, created], [notesDraftsCreateOutput, createdDraft], [notesDraftsUpdateOutput, updatedDraft]] as const) {
+	for (const [schema, result] of [[requiredSchema(notesCreateContract['~orpc'].outputSchema), created], [requiredSchema(notesDraftsCreateContract['~orpc'].outputSchema), createdDraft], [requiredSchema(notesDraftsUpdateContract['~orpc'].outputSchema), updatedDraft]] as const) {
 		expect(v.parse(schema, result)).toEqual(result);
 		for (const invalid of [{}, { ...result, future: true }, { createdNote: 7 }, { createdDraft: 7 }, { updatedDraft: 7 }]) expect(v.safeParse(schema, invalid).success).toBe(false);
 	}
 	expect(notes.pack).toHaveBeenCalledWith(model, me);
 	expect(draftSerializer.pack).toHaveBeenCalledWith(draft, me);
 });
+
+function requiredSchema<Schema>(schema: Schema | undefined): Schema {
+	if (schema === undefined) throw new Error('Missing endpoint contract schema');
+	return schema;
+}

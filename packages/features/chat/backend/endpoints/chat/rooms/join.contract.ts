@@ -9,8 +9,6 @@ import * as v from 'valibot';
 import { commonErrors, apiErrorData } from '../../../../../api/backend/transport/errors.schema.js';
 import { objectInput, misskeyId } from '../../../request.schema.js';
 
-export const chatRoomsJoinInput = objectInput({ roomId: misskeyId });
-export const chatRoomsJoinOutput = v.void();
 export const chatRoomsJoinErrors = {
 		noSuchRoom: {
 			message: 'No such room.',
@@ -20,7 +18,7 @@ export const chatRoomsJoinErrors = {
 	} as const;
 export const chatRoomsJoinPolicy = { name: 'chat/rooms/join', requireCredential: true, kind: 'write:chat' } as const;
 const security: OpenAPI.SecurityRequirementObject[] = [{ bearerAuth: [] }];
-export const chatRoomsJoinContract = oc.$meta<{ requestName: 'chat/rooms/join' }>({ requestName: 'chat/rooms/join' })
+export const chatRoomsJoinContract = oc.$meta({ requestName: 'chat/rooms/join' } as const)
 	.route({ method: 'POST', path: '/chat/rooms/join', operationId: 'post___chat___rooms___join', tags: ['chat'], spec: current => ({ ...current, security }), successStatus: 204 })
 	.errors({ ...commonErrors, NO_SUCH_ROOM: { status: 400, data: apiErrorData } })
-	.input(chatRoomsJoinInput).output(chatRoomsJoinOutput);
+	.input(objectInput({ roomId: misskeyId })).output(v.void());

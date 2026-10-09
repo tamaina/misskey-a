@@ -8,14 +8,6 @@ import * as v from 'valibot';
 import { objectInput } from '../../../../../api/backend/transport/input.schema.js';
 import { commonErrors, apiErrorData } from '../../../../../api/backend/transport/errors.schema.js';
 
-export const adminRelaysAddInput = objectInput({
-	"inbox": v.string(),
-});
-export const adminRelaysAddOutput = v.strictObject({
-	"id": v.pipe(v.string(), v.metadata({ "format": "id" })),
-	"inbox": v.pipe(v.string(), v.metadata({ "format": "url" })),
-	"status": v.pipe(v.picklist(["requesting", "accepted", "rejected"]), v.metadata({ "default": "requesting" })),
-});
 export const adminRelaysAddErrors = {
 		invalidUrl: {
 			message: 'Invalid URL',
@@ -25,7 +17,16 @@ export const adminRelaysAddErrors = {
 	} as const;
 
 const requestName = 'admin/relays/add';
-export const adminRelaysAddContract = oc.$meta<{ requestName: typeof requestName }>({ requestName })
+export const adminRelaysAddContract = oc.$meta({ requestName: requestName } as const)
 	.route({ method: 'POST', path: `/${requestName}`, operationId: 'post___' + requestName.replaceAll('/', '___'), tags: ['admin'], spec: current => ({ ...current, security: [{ bearerAuth: [] }] }) })
 	.errors({ ...commonErrors, INVALID_URL: { status: 400, data: apiErrorData } })
-	.input(adminRelaysAddInput).output(adminRelaysAddOutput);
+	.input(objectInput({
+		"inbox": v.string(),
+	})).output(v.strictObject({
+		"id": v.pipe(v.string(), v.metadata({ "format": "id" })),
+		"inbox": v.pipe(v.string(), v.metadata({ "format": "url" })),
+		"status": v.pipe(v.picklist(["requesting", "accepted", "rejected"]), v.metadata({ "default": "requesting" })),
+	}));
+
+export type AdminRelaysAddInput = v.InferOutput<NonNullable<typeof adminRelaysAddContract['~orpc']['inputSchema']>>;
+export type AdminRelaysAddOutput = v.InferOutput<NonNullable<typeof adminRelaysAddContract['~orpc']['outputSchema']>>;

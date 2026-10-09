@@ -9,18 +9,16 @@ import { commonErrors, apiErrorData } from '../../../../api/backend/transport/er
 import { objectInput } from '../../../../api/backend/transport/input.schema.js';
 const misskeyId = v.pipe(v.string(), v.regex(/^[a-zA-Z0-9]+$/));
 
-export const flashUnlikeInput = objectInput({
-	"flashId": misskeyId,
-});
-export const flashUnlikeOutput = v.void();
 export const flashUnlikeErrors = {
 	noSuchFlash: { message: 'No such flash.', code: 'NO_SUCH_FLASH', id: 'afe8424a-a69e-432d-a5f2-2f0740c62410' },
 	notLiked: { message: 'You have not liked that flash.', code: 'NOT_LIKED', id: '755f25a7-9871-4f65-9f34-51eaad9ae0ac' },
 } as const;
 
 const requestName = 'flash/unlike';
-export const flashUnlikeContract = oc.$meta<{ requestName: typeof requestName }>({ requestName })
+export const flashUnlikeContract = oc.$meta({ requestName: requestName } as const)
 	.route({ method: 'POST', path: `/${requestName}`, operationId: 'post___' + requestName.replaceAll('/', '___'), tags: ['flash'], spec: current => ({ ...current, security: [{ bearerAuth: [] }] }), successStatus: 204, })
 	.errors({ ...commonErrors, NO_SUCH_FLASH: { status: 400, data: apiErrorData }, NOT_LIKED: { status: 400, data: apiErrorData } })
-	.input(flashUnlikeInput)
-	.output(flashUnlikeOutput);
+	.input(objectInput({
+		"flashId": misskeyId,
+	}))
+	.output(v.void());

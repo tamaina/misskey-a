@@ -8,7 +8,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
 import { apiError } from '@features/api/backend/transport/orpc-error.js';
 import { DI } from '@/di-symbols.js';
-import { antennasDeleteInput, antennasDeleteErrors } from '../../endpoints/antennas/delete.contract.js';
+import { type antennasDeleteContract, antennasDeleteErrors } from '../../endpoints/antennas/delete.contract.js';
 import type { AntennasRepository } from '@features/persistence/backend/repositories/models.js';
 
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
@@ -23,7 +23,7 @@ export class AntennasDeleteApplicationService {
 		private globalEventService: GlobalEventService,
 	) {}
 
-	async execute(ps: v.InferOutput<typeof antennasDeleteInput>, me: MiLocalUser) {
+	async execute(ps: v.InferOutput<NonNullable<typeof antennasDeleteContract['~orpc']['inputSchema']>>, me: MiLocalUser) {
 		const antenna = await this.antennasRepository.findOneBy({
 			id: ps.antennaId,
 			userId: me.id,

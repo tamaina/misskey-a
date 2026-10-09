@@ -9,8 +9,6 @@ import { commonErrors, apiErrorData } from '../../../../api/backend/transport/er
 import { objectInput, misskeyId } from '../../request.schema.js';
 import type { OpenAPI } from '@orpc/contract';
 
-export const promoReadInput = objectInput({ noteId: misskeyId });
-export const promoReadOutput = v.void();
 export const promoReadErrors = {
 	noSuchNote: {
 		message: 'No such note.',
@@ -20,7 +18,7 @@ export const promoReadErrors = {
 } as const;
 export const promoReadPolicy = { name: 'promo/read', requireCredential: true, kind: 'write:account' } as const;
 const security: OpenAPI.SecurityRequirementObject[] = [{ bearerAuth: [] }];
-export const promoReadContract = oc.$meta<{ requestName: 'promo/read' }>({ requestName: 'promo/read' })
+export const promoReadContract = oc.$meta({ requestName: 'promo/read' } as const)
 	.route({ method: 'POST', path: '/promo/read', operationId: 'post___promo___read', tags: ['notes'], spec: current => ({ ...current, security }), successStatus: 204 })
 	.errors({ ...commonErrors, NO_SUCH_NOTE: { status: 400, data: apiErrorData } })
-	.input(promoReadInput).output(promoReadOutput);
+	.input(objectInput({ noteId: misskeyId })).output(v.void());

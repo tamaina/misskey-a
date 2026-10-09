@@ -11,10 +11,11 @@ import { QueryService } from '@features/notes/backend/services/QueryService.js';
 import { sqlLikeEscape } from '@features/persistence/backend/utility/sql-like-escape.js';
 
 import * as v from 'valibot';
+import { packedChannelSchema } from '../../channel.schema.js';
 import { DI } from '@/di-symbols.js';
 import { ChannelEntityService } from '../../serializers/ChannelEntityService.js';
 import { authentication, apiPolicy } from '../../../../api/backend/transport/middleware.js';
-import { channelsSearchContract, channelsSearchPolicy, channelsSearchInput, channelsSearchOutput, channelsSearchErrors } from './search.contract.js';
+import { channelsSearchContract, channelsSearchPolicy, channelsSearchErrors } from './search.contract.js';
 import type { ChannelsRepository } from '@features/persistence/backend/repositories/models.js';
 import type { ChannelsApiContext } from '../../operations.js';
 import type { ApiActor } from '../../../../api/backend/transport/context.js';
@@ -36,11 +37,11 @@ export class ChannelsSearchOperation {
 		private channelEntityService: ChannelEntityService,
 		private queryService: QueryService,
 	) {}
-	async execute(ps: v.InferOutput<typeof channelsSearchInput>, me: MiLocalUser | null): Promise<v.InferOutput<typeof channelsSearchOutput>> {
-		return v.parse(channelsSearchOutput, await this.run(ps, me));
+	async execute(ps: v.InferOutput<NonNullable<typeof channelsSearchContract['~orpc']['inputSchema']>>, me: MiLocalUser | null): Promise<v.InferOutput<NonNullable<typeof channelsSearchContract['~orpc']['outputSchema']>>> {
+		return v.parse(v.array(packedChannelSchema), await this.run(ps, me));
 	}
 
-	private async run(ps: v.InferOutput<typeof channelsSearchInput>, me: MiLocalUser | null) {
+	private async run(ps: v.InferOutput<NonNullable<typeof channelsSearchContract['~orpc']['inputSchema']>>, me: MiLocalUser | null) {
 		const query = this.queryService.makePaginationQuery(this.channelsRepository.createQueryBuilder('channel'), ps.sinceId, ps.untilId, ps.sinceDate, ps.untilDate)
 			.andWhere('channel.isArchived = FALSE');
 

@@ -8,8 +8,8 @@ import { Inject, Injectable } from '@nestjs/common';
 import type { MiMeta, UsedUsernamesRepository, UsersRepository } from '@features/persistence/backend/repositories/models.js';
 import { DI } from '@/di-symbols.js';
 
-import * as v from 'valibot';
-import { remainingUsernameAvailableInput } from '../../auth.schema.js';
+import type * as v from 'valibot';
+import type { UsernameAvailableContract } from '../../api.contract.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 
 export const meta = {
@@ -31,7 +31,7 @@ export class UsernameAvailableOperation {
 		private usedUsernamesRepository: UsedUsernamesRepository,
 	) {}
 
-	async execute(ps: v.InferOutput<typeof remainingUsernameAvailableInput>, me: MiLocalUser | null) {
+	async execute(ps: v.InferOutput<NonNullable<typeof UsernameAvailableContract['~orpc']['inputSchema']>>, me: MiLocalUser | null) {
 		const exist = await this.usersRepository.countBy({
 			host: IsNull(),
 			usernameLower: ps.username.toLowerCase(),

@@ -3,44 +3,43 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import type * as v from 'valibot';
 import type { ApiActor, ApiContext } from '../../api/backend/transport/context.js';
-import type { adminGetIndexStatsInput, adminGetIndexStatsOutput } from './endpoints/admin/get-index-stats.contract.js';
-import type { adminGetTableStatsInput, adminGetTableStatsOutput } from './endpoints/admin/get-table-stats.contract.js';
-import type { adminQueueClearInput, adminQueueClearOutput } from './endpoints/admin/queue/clear.contract.js';
-import type { adminQueueDeliverDelayedInput, adminQueueDeliverDelayedOutput } from './endpoints/admin/queue/deliver-delayed.contract.js';
-import type { adminQueueInboxDelayedInput, adminQueueInboxDelayedOutput } from './endpoints/admin/queue/inbox-delayed.contract.js';
-import type { adminQueueJobsInput, adminQueueJobsOutput } from './endpoints/admin/queue/jobs.contract.js';
-import type { adminQueuePauseInput, adminQueuePauseOutput } from './endpoints/admin/queue/pause.contract.js';
-import type { adminQueuePromoteJobsInput, adminQueuePromoteJobsOutput } from './endpoints/admin/queue/promote-jobs.contract.js';
-import type { adminQueueQueueStatsInput, adminQueueQueueStatsOutput } from './endpoints/admin/queue/queue-stats.contract.js';
-import type { adminQueueQueuesInput, adminQueueQueuesOutput } from './endpoints/admin/queue/queues.contract.js';
-import type { adminQueueRemoveJobInput, adminQueueRemoveJobOutput } from './endpoints/admin/queue/remove-job.contract.js';
-import type { adminQueueResumeInput, adminQueueResumeOutput } from './endpoints/admin/queue/resume.contract.js';
-import type { adminQueueRetryJobInput, adminQueueRetryJobOutput } from './endpoints/admin/queue/retry-job.contract.js';
-import type { adminQueueShowJobLogsInput, adminQueueShowJobLogsOutput } from './endpoints/admin/queue/show-job-logs.contract.js';
-import type { adminQueueShowJobInput, adminQueueShowJobOutput } from './endpoints/admin/queue/show-job.contract.js';
-import type { adminQueueStatsInput, adminQueueStatsOutput } from './endpoints/admin/queue/stats.contract.js';
-import type { resetDbInput, resetDbOutput } from './endpoints/reset-db.contract.js';
+import type { AdminGetIndexStatsInput, AdminGetIndexStatsOutput } from './endpoints/admin/get-index-stats.contract.js';
+import type { AdminGetTableStatsInput, AdminGetTableStatsOutput } from './endpoints/admin/get-table-stats.contract.js';
+import type { AdminQueueClearInput, AdminQueueClearOutput } from './endpoints/admin/queue/clear.contract.js';
+import type { AdminQueueDeliverDelayedInput, AdminQueueDeliverDelayedOutput } from './endpoints/admin/queue/deliver-delayed.contract.js';
+import type { AdminQueueInboxDelayedInput, AdminQueueInboxDelayedOutput } from './endpoints/admin/queue/inbox-delayed.contract.js';
+import type { AdminQueueJobsInput, AdminQueueJobsOutput } from './endpoints/admin/queue/jobs.contract.js';
+import type { AdminQueuePauseInput, AdminQueuePauseOutput } from './endpoints/admin/queue/pause.contract.js';
+import type { AdminQueuePromoteJobsInput, AdminQueuePromoteJobsOutput } from './endpoints/admin/queue/promote-jobs.contract.js';
+import type { AdminQueueQueueStatsInput, AdminQueueQueueStatsOutput } from './endpoints/admin/queue/queue-stats.contract.js';
+import type { AdminQueueQueuesInput, AdminQueueQueuesOutput } from './endpoints/admin/queue/queues.contract.js';
+import type { AdminQueueRemoveJobInput, AdminQueueRemoveJobOutput } from './endpoints/admin/queue/remove-job.contract.js';
+import type { AdminQueueResumeInput, AdminQueueResumeOutput } from './endpoints/admin/queue/resume.contract.js';
+import type { AdminQueueRetryJobInput, AdminQueueRetryJobOutput } from './endpoints/admin/queue/retry-job.contract.js';
+import type { AdminQueueShowJobLogsInput, AdminQueueShowJobLogsOutput } from './endpoints/admin/queue/show-job-logs.contract.js';
+import type { AdminQueueShowJobInput, AdminQueueShowJobOutput } from './endpoints/admin/queue/show-job.contract.js';
+import type { AdminQueueStatsInput, AdminQueueStatsOutput } from './endpoints/admin/queue/stats.contract.js';
+import type { ResetDbInput, ResetDbOutput } from './endpoints/reset-db.contract.js';
 
 export interface OperationsApiOperations<Actor extends ApiActor> {
-	adminGetIndexStats(input: v.InferOutput<typeof adminGetIndexStatsInput>, actor: Actor): Promise<v.InferOutput<typeof adminGetIndexStatsOutput>>;
-	adminGetTableStats(input: v.InferOutput<typeof adminGetTableStatsInput>, actor: Actor): Promise<v.InferOutput<typeof adminGetTableStatsOutput>>;
-	adminQueueClear(input: v.InferOutput<typeof adminQueueClearInput>, actor: Actor): Promise<v.InferOutput<typeof adminQueueClearOutput>>;
-	adminQueueDeliverDelayed(input: v.InferOutput<typeof adminQueueDeliverDelayedInput>, actor: Actor): Promise<v.InferOutput<typeof adminQueueDeliverDelayedOutput>>;
-	adminQueueInboxDelayed(input: v.InferOutput<typeof adminQueueInboxDelayedInput>, actor: Actor): Promise<v.InferOutput<typeof adminQueueInboxDelayedOutput>>;
-	adminQueueJobs(input: v.InferOutput<typeof adminQueueJobsInput>, actor: Actor): Promise<v.InferOutput<typeof adminQueueJobsOutput>>;
-	adminQueuePause(input: v.InferOutput<typeof adminQueuePauseInput>, actor: Actor): Promise<v.InferOutput<typeof adminQueuePauseOutput>>;
-	adminQueuePromoteJobs(input: v.InferOutput<typeof adminQueuePromoteJobsInput>, actor: Actor): Promise<v.InferOutput<typeof adminQueuePromoteJobsOutput>>;
-	adminQueueQueueStats(input: v.InferOutput<typeof adminQueueQueueStatsInput>, actor: Actor): Promise<v.InferOutput<typeof adminQueueQueueStatsOutput>>;
-	adminQueueQueues(input: v.InferOutput<typeof adminQueueQueuesInput>, actor: Actor): Promise<v.InferOutput<typeof adminQueueQueuesOutput>>;
-	adminQueueRemoveJob(input: v.InferOutput<typeof adminQueueRemoveJobInput>, actor: Actor): Promise<v.InferOutput<typeof adminQueueRemoveJobOutput>>;
-	adminQueueResume(input: v.InferOutput<typeof adminQueueResumeInput>, actor: Actor): Promise<v.InferOutput<typeof adminQueueResumeOutput>>;
-	adminQueueRetryJob(input: v.InferOutput<typeof adminQueueRetryJobInput>, actor: Actor): Promise<v.InferOutput<typeof adminQueueRetryJobOutput>>;
-	adminQueueShowJobLogs(input: v.InferOutput<typeof adminQueueShowJobLogsInput>, actor: Actor): Promise<v.InferOutput<typeof adminQueueShowJobLogsOutput>>;
-	adminQueueShowJob(input: v.InferOutput<typeof adminQueueShowJobInput>, actor: Actor): Promise<v.InferOutput<typeof adminQueueShowJobOutput>>;
-	adminQueueStats(input: v.InferOutput<typeof adminQueueStatsInput>, actor: Actor): Promise<v.InferOutput<typeof adminQueueStatsOutput>>;
-	resetDb(input: v.InferOutput<typeof resetDbInput>, actor: Actor | null): Promise<v.InferOutput<typeof resetDbOutput>>;
+	adminGetIndexStats(input: AdminGetIndexStatsInput, actor: Actor): Promise<AdminGetIndexStatsOutput>;
+	adminGetTableStats(input: AdminGetTableStatsInput, actor: Actor): Promise<AdminGetTableStatsOutput>;
+	adminQueueClear(input: AdminQueueClearInput, actor: Actor): Promise<AdminQueueClearOutput>;
+	adminQueueDeliverDelayed(input: AdminQueueDeliverDelayedInput, actor: Actor): Promise<AdminQueueDeliverDelayedOutput>;
+	adminQueueInboxDelayed(input: AdminQueueInboxDelayedInput, actor: Actor): Promise<AdminQueueInboxDelayedOutput>;
+	adminQueueJobs(input: AdminQueueJobsInput, actor: Actor): Promise<AdminQueueJobsOutput>;
+	adminQueuePause(input: AdminQueuePauseInput, actor: Actor): Promise<AdminQueuePauseOutput>;
+	adminQueuePromoteJobs(input: AdminQueuePromoteJobsInput, actor: Actor): Promise<AdminQueuePromoteJobsOutput>;
+	adminQueueQueueStats(input: AdminQueueQueueStatsInput, actor: Actor): Promise<AdminQueueQueueStatsOutput>;
+	adminQueueQueues(input: AdminQueueQueuesInput, actor: Actor): Promise<AdminQueueQueuesOutput>;
+	adminQueueRemoveJob(input: AdminQueueRemoveJobInput, actor: Actor): Promise<AdminQueueRemoveJobOutput>;
+	adminQueueResume(input: AdminQueueResumeInput, actor: Actor): Promise<AdminQueueResumeOutput>;
+	adminQueueRetryJob(input: AdminQueueRetryJobInput, actor: Actor): Promise<AdminQueueRetryJobOutput>;
+	adminQueueShowJobLogs(input: AdminQueueShowJobLogsInput, actor: Actor): Promise<AdminQueueShowJobLogsOutput>;
+	adminQueueShowJob(input: AdminQueueShowJobInput, actor: Actor): Promise<AdminQueueShowJobOutput>;
+	adminQueueStats(input: AdminQueueStatsInput, actor: Actor): Promise<AdminQueueStatsOutput>;
+	resetDb(input: ResetDbInput, actor: Actor | null): Promise<ResetDbOutput>;
 }
 export type OperationsApiContext<Actor extends ApiActor> = ApiContext<Actor> & { operations: { operations: OperationsApiOperations<Actor> } };
 export type OperationsApplications<Actor extends ApiActor> = { [K in keyof OperationsApiOperations<Actor>]: { execute: OperationsApiOperations<Actor>[K] } };

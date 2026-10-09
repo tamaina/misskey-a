@@ -7,7 +7,7 @@ import { Injectable } from '@nestjs/common';
 import { Brackets } from 'typeorm';
 import { apiError } from '../../api/backend/transport/orpc-error.js';
 import { sqlLikeEscape } from '../../persistence/backend/utility/sql-like-escape.js';
-import type * as v from 'valibot';
+import type { InferSchemaOutput, InferContractRouterOutputs } from '@orpc/contract';
 import type { ApiActor } from '../../api/backend/transport/context.js';
 import type { QueryService } from '../../notes/backend/services/QueryService.js';
 import type { IdService } from '../../runtime/backend/services/IdService.js';
@@ -16,9 +16,9 @@ import type { ModerationLogService } from '../../moderation/backend/services/Mod
 import type { MiUser } from '../../users/backend/models/User.js';
 import type { MiRole } from '../../roles/backend/models/Role.js';
 import { rolesErrors } from './api.errors.js';
-import type { rolesInputs, rolesOutputs } from './api.schema.js';
-type Inputs = { [K in keyof typeof rolesInputs]: v.InferOutput<typeof rolesInputs[K]> };
-type Outputs = { [K in keyof typeof rolesOutputs]: v.InferOutput<typeof rolesOutputs[K]> };
+import type { rolesContract } from './api.contract.js';
+type Inputs = { [K in keyof typeof rolesContract]: InferSchemaOutput<NonNullable<(typeof rolesContract)[K]['~orpc']['inputSchema']>> };
+type Outputs = InferContractRouterOutputs<typeof rolesContract>;
 export interface RolesOperations<Actor extends ApiActor> {
 	adminRolesAssign(input: Inputs['adminRolesAssign'], actor: Actor): Promise<Outputs['adminRolesAssign']>;
 	adminRolesCreate(input: Inputs['adminRolesCreate'], actor: Actor): Promise<Outputs['adminRolesCreate']>;

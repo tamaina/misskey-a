@@ -9,8 +9,6 @@ import * as v from 'valibot';
 import { commonErrors, apiErrorData } from '../../../../../api/backend/transport/errors.schema.js';
 import { objectInput, misskeyId } from '../../../request.schema.js';
 
-export const chatRoomsMuteInput = objectInput({ roomId: misskeyId, mute: v.boolean() });
-export const chatRoomsMuteOutput = v.void();
 export const chatRoomsMuteErrors = {
 		noSuchRoom: {
 			message: 'No such room.',
@@ -20,7 +18,7 @@ export const chatRoomsMuteErrors = {
 	} as const;
 export const chatRoomsMutePolicy = { name: 'chat/rooms/mute', requireCredential: true, kind: 'write:chat' } as const;
 const security: OpenAPI.SecurityRequirementObject[] = [{ bearerAuth: [] }];
-export const chatRoomsMuteContract = oc.$meta<{ requestName: 'chat/rooms/mute' }>({ requestName: 'chat/rooms/mute' })
+export const chatRoomsMuteContract = oc.$meta({ requestName: 'chat/rooms/mute' } as const)
 	.route({ method: 'POST', path: '/chat/rooms/mute', operationId: 'post___chat___rooms___mute', tags: ['chat'], spec: current => ({ ...current, security }), successStatus: 204 })
 	.errors({ ...commonErrors, NO_SUCH_ROOM: { status: 400, data: apiErrorData } })
-	.input(chatRoomsMuteInput).output(chatRoomsMuteOutput);
+	.input(objectInput({ roomId: misskeyId, mute: v.boolean() })).output(v.void());

@@ -9,11 +9,11 @@ import * as v from 'valibot';
 import { mockDeep } from 'vitest-mock-extended';
 import Parser from 'rss-parser';
 import { systemWebhookSchema as packedSystemWebhookSchema, userWebhookSchema as packedUserWebhookSchema } from '../../backend/webhook.schema.js';
-import { iWebhooksCreateInput as constantIWebhooksCreateInput, iWebhooksCreateOutput as constantIWebhooksCreateOutput } from '../../backend/endpoints/i/webhooks/create.contract.js';
-import { iWebhooksTestInput as constantIWebhooksTestInput } from '../../backend/endpoints/i/webhooks/test.contract.js';
-import { fetchExternalResourcesInput as inlineFetchExternalResourcesInput, fetchExternalResourcesOutput as inlineFetchExternalResourcesOutput } from '../../backend/endpoints/fetch-external-resources.contract.js';
-import { fetchRssOutput as inlineFetchRssOutput } from '../../backend/endpoints/fetch-rss.contract.js';
-import { iWebhooksUpdateInput } from '../../backend/endpoints/i/webhooks/update.contract.js';
+import { iWebhooksCreateContract } from '../../backend/endpoints/i/webhooks/create.contract.js';
+import { iWebhooksTestContract } from '../../backend/endpoints/i/webhooks/test.contract.js';
+import { fetchExternalResourcesContract } from '../../backend/endpoints/fetch-external-resources.contract.js';
+import { fetchRssContract } from '../../backend/endpoints/fetch-rss.contract.js';
+import { iWebhooksUpdateContract } from '../../backend/endpoints/i/webhooks/update.contract.js';
 import { SystemWebhookEntityService } from '../../backend/serializers/SystemWebhookEntityService.js';
 import { IWebhooksCreateApplicationService as CreateEndpoint } from '../../backend/endpoints/i/webhooks/create.application.js';
 import { IWebhooksListApplicationService as ListEndpoint } from '../../backend/endpoints/i/webhooks/list.application.js';
@@ -55,8 +55,8 @@ test('real user webhook create/list/show handlers retain defaults, timestamps, o
 	repository.insertOne.mockResolvedValue({ ...webhook, user: null });
 	repository.findBy.mockResolvedValue([{ ...webhook, user: null }]);
 	repository.findOneBy.mockResolvedValue({ ...webhook, user: null });
-	const created = await new CreateEndpoint(repository, ids, mockDeep(), roles).execute(v.parse(constantIWebhooksCreateInput, params), me);
-	checkFinite(constantIWebhooksCreateOutput, created);
+	const created = await new CreateEndpoint(repository, ids, mockDeep(), roles).execute(v.parse(requiredSchema(iWebhooksCreateContract['~orpc'].inputSchema), params), me);
+	checkFinite(requiredSchema(iWebhooksCreateContract['~orpc'].outputSchema), created);
 	expect(created.secret).toBe('');
 	const listed = await new ListEndpoint(repository).execute({}, me);
 	checkFinite(packedUserWebhookSchema, listed[0]);
@@ -76,23 +76,28 @@ test('real external resource handler retains hash verification and only its fini
 	const endpoint = new ResourcesEndpoint(http);
 	const hash = createHash('sha512').update(data.replace(/\r\n/g, '\n')).digest('hex');
 	const result = await endpoint.execute({ url: 'https://example.com/resource', hash }, me);
-	expect(v.parse(inlineFetchExternalResourcesOutput, result)).toEqual({ type: 'fixture', data });
-	expect(v.safeParse(inlineFetchExternalResourcesOutput, { ...result, future: true }).success).toBe(false);
+	expect(v.parse(requiredSchema(fetchExternalResourcesContract['~orpc'].outputSchema), result)).toEqual({ type: 'fixture', data });
+	expect(v.safeParse(requiredSchema(fetchExternalResourcesContract['~orpc'].outputSchema), { ...result, future: true }).success).toBe(false);
 	await expect(endpoint.execute({ url: 'https://example.com/resource', hash: 'wrong' }, me)).rejects.toMatchObject({ code: 'EXT_RESOURCE_HASH_DIDNT_MATCH' });
 });
 
 test('native webhook and resource inputs strip extras, preserve defaults and reject missing/wrong fields', () => {
-	expectTypeOf<v.InferOutput<typeof inlineFetchExternalResourcesOutput>>().toEqualTypeOf<{ type: string; data: string }>();
-	expect(v.parse(constantIWebhooksCreateInput, { ...params, future: true })).toEqual({ ...params, secret: '' });
-	expect(v.parse(iWebhooksUpdateInput, { webhookId: webhook.id, future: true })).toEqual({ webhookId: webhook.id });
-	expect(v.parse(constantIWebhooksTestInput, { webhookId: webhook.id, type: 'note', override: { url: 'url', future: true }, future: true })).toEqual({ webhookId: webhook.id, type: 'note', override: { url: 'url' } });
-	for (const bad of [{}, { ...params, on: ['invalid'] }, { ...params, name: 7 }, { ...params, secret: null }]) expect(v.safeParse(constantIWebhooksCreateInput, bad).success).toBe(false);
-	for (const bad of [{}, { url: 'url', hash: 7 }]) expect(v.safeParse(inlineFetchExternalResourcesInput, bad).success).toBe(false);
-	for (const bad of [{ type: 'fixture' }, { type: 7, data: '' }, { type: 'fixture', data: null }]) expect(v.safeParse(inlineFetchExternalResourcesOutput, bad).success).toBe(false);
+	expectTypeOf<v.InferOutput<NonNullable<typeof fetchExternalResourcesContract['~orpc']['outputSchema']>>>().toEqualTypeOf<{ type: string; data: string }>();
+	expect(v.parse(requiredSchema(iWebhooksCreateContract['~orpc'].inputSchema), { ...params, future: true })).toEqual({ ...params, secret: '' });
+	expect(v.parse(requiredSchema(iWebhooksUpdateContract['~orpc'].inputSchema), { webhookId: webhook.id, future: true })).toEqual({ webhookId: webhook.id });
+	expect(v.parse(requiredSchema(iWebhooksTestContract['~orpc'].inputSchema), { webhookId: webhook.id, type: 'note', override: { url: 'url', future: true }, future: true })).toEqual({ webhookId: webhook.id, type: 'note', override: { url: 'url' } });
+	for (const bad of [{}, { ...params, on: ['invalid'] }, { ...params, name: 7 }, { ...params, secret: null }]) expect(v.safeParse(requiredSchema(iWebhooksCreateContract['~orpc'].inputSchema), bad).success).toBe(false);
+	for (const bad of [{}, { url: 'url', hash: 7 }]) expect(v.safeParse(requiredSchema(fetchExternalResourcesContract['~orpc'].inputSchema), bad).success).toBe(false);
+	for (const bad of [{ type: 'fixture' }, { type: 7, data: '' }, { type: 'fixture', data: null }]) expect(v.safeParse(requiredSchema(fetchExternalResourcesContract['~orpc'].outputSchema), bad).success).toBe(false);
 });
 
 test('RSS parser extension fields remain a separate dynamic producer boundary', async () => {
 	const feed = await new Parser().parseString('<rss version="2.0"><channel><title>Fixture</title><language>ja</language><generator>fixture</generator><item><title>Entry</title><comments>https://example.com/comments</comments></item></channel></rss>');
 	expect(feed).toHaveProperty('language', 'ja');
-	expect(v.parse(inlineFetchRssOutput, feed)).toEqual(feed);
+	expect(v.parse(requiredSchema(fetchRssContract['~orpc'].outputSchema), feed)).toEqual(feed);
 });
+
+function requiredSchema<Schema>(schema: Schema | undefined): Schema {
+	if (schema === undefined) throw new Error('Contract must declare its schema');
+	return schema;
+}

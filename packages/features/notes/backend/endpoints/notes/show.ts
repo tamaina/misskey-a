@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import type { InferSchemaOutput } from '@orpc/contract';
 import { implement } from '@orpc/server';
 import { Inject, Injectable } from '@nestjs/common';
 import { GetterService } from '@features/api/backend/transport/GetterService.js';
@@ -13,7 +14,7 @@ import { NoteEntityService } from '../../serializers/NoteEntityService.js';
 import { authentication, apiPolicy } from '../../../../api/backend/transport/middleware.js';
 import { apiError } from '../../../../api/backend/transport/orpc-error.js';
 import { readErrorId } from '../../request.schema.js';
-import { notesShowContract, notesShowPolicy, notesShowInput, notesShowOutput, notesShowErrors } from './show.contract.js';
+import { notesShowContract, notesShowPolicy, notesShowErrors } from './show.contract.js';
 import type { MiLocalUser } from '../../../../users/backend/models/User.js';
 import type { NotesApiContext } from '../../operations.js';
 import type { ApiActor } from '../../../../api/backend/transport/context.js';
@@ -34,11 +35,11 @@ export class NotesShowOperation {
 		private noteEntityService: NoteEntityService,
 		private getterService: GetterService,
 	) {}
-	async execute(ps: v.InferOutput<typeof notesShowInput>, me: MiLocalUser | null): Promise<v.InferOutput<typeof notesShowOutput>> {
-		return v.parse(notesShowOutput, await this.run(ps, me));
+	async execute(ps: InferSchemaOutput<NonNullable<typeof notesShowContract['~orpc']['inputSchema']>>, me: MiLocalUser | null): Promise<InferSchemaOutput<NonNullable<typeof notesShowContract['~orpc']['outputSchema']>>> {
+		return v.parse(requiredSchema(notesShowContract['~orpc'].outputSchema), await this.run(ps, me));
 	}
 
-	private async run(ps: v.InferOutput<typeof notesShowInput>, me: MiLocalUser | null) {
+	private async run(ps: InferSchemaOutput<NonNullable<typeof notesShowContract['~orpc']['inputSchema']>>, me: MiLocalUser | null) {
 		const note = await this.getterService.getNoteWithRelations(ps.noteId).catch((err: unknown) => {
 			if (readErrorId(err) === '9725d0ce-ba28-4dde-95a7-2cbb2c15de24') throw apiError(notesShowErrors.noSuchNote);
 			throw err;
@@ -60,4 +61,9 @@ export class NotesShowOperation {
 			detail: true,
 		});
 	}
+}
+
+function requiredSchema<Schema>(schema: Schema | undefined): Schema {
+	if (schema === undefined) throw new Error('Missing endpoint contract schema');
+	return schema;
 }

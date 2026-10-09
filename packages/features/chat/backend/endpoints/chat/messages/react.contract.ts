@@ -9,8 +9,6 @@ import * as v from 'valibot';
 import { commonErrors, apiErrorData } from '../../../../../api/backend/transport/errors.schema.js';
 import { objectInput, misskeyId } from '../../../request.schema.js';
 
-export const chatMessagesReactInput = objectInput({ messageId: misskeyId, reaction: v.string() });
-export const chatMessagesReactOutput = v.void();
 export const chatMessagesReactErrors = {
 		noSuchMessage: {
 			message: 'No such message.',
@@ -20,7 +18,7 @@ export const chatMessagesReactErrors = {
 	} as const;
 export const chatMessagesReactPolicy = { name: 'chat/messages/react', requireCredential: true, kind: 'write:chat' } as const;
 const security: OpenAPI.SecurityRequirementObject[] = [{ bearerAuth: [] }];
-export const chatMessagesReactContract = oc.$meta<{ requestName: 'chat/messages/react' }>({ requestName: 'chat/messages/react' })
+export const chatMessagesReactContract = oc.$meta({ requestName: 'chat/messages/react' } as const)
 	.route({ method: 'POST', path: '/chat/messages/react', operationId: 'post___chat___messages___react', tags: ['chat'], spec: current => ({ ...current, security }), successStatus: 204 })
 	.errors({ ...commonErrors, NO_SUCH_MESSAGE: { status: 400, data: apiErrorData } })
-	.input(chatMessagesReactInput).output(chatMessagesReactOutput);
+	.input(objectInput({ messageId: misskeyId, reaction: v.string() })).output(v.void());

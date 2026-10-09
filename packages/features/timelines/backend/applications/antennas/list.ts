@@ -7,7 +7,7 @@ import { Inject, Injectable } from '@nestjs/common';
 
 import { DI } from '@/di-symbols.js';
 import { AntennaEntityService } from '../../serializers/AntennaEntityService.js';
-import { antennasListInput } from '../../endpoints/antennas/list.contract.js';
+import type { antennasListContract } from '../../endpoints/antennas/list.contract.js';
 import type { AntennasRepository } from '@features/persistence/backend/repositories/models.js';
 
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
@@ -22,7 +22,7 @@ export class AntennasListApplicationService {
 		private antennaEntityService: AntennaEntityService,
 	) {}
 
-	async execute(ps: v.InferOutput<typeof antennasListInput>, me: MiLocalUser) {
+	async execute(ps: v.InferOutput<NonNullable<typeof antennasListContract['~orpc']['inputSchema']>>, me: MiLocalUser) {
 		const antennas = await this.antennasRepository.findBy({
 			userId: me.id,
 		});

@@ -5,15 +5,13 @@
 
 import { Brackets, EntityNotFoundError } from 'typeorm';
 import { apiError } from '../../api/backend/transport/orpc-error.js';
-import type { InferContractRouterOutputs } from '@orpc/contract';
 import type { ApiActor } from '../../api/backend/transport/context.js';
 import type { AnnouncementsRepository, AnnouncementReadsRepository } from '../../persistence/backend/repositories/models.js';
 import type { QueryService } from '../../notes/backend/services/QueryService.js';
 import type { IdService } from '../../runtime/backend/services/IdService.js';
 import type { MiAnnouncement } from './models/Announcement.js';
 import type { announcementsContract } from './api.contract.js';
-import type * as v from 'valibot';
-import type * as schemas from './api.schema.js';
+import type { InferSchemaOutput, InferContractRouterOutputs } from '@orpc/contract';
 
 export interface AnnouncementUpdateValues {
 	updatedAt: Date;
@@ -28,15 +26,7 @@ export interface AnnouncementUpdateValues {
 	isActive: boolean | undefined;
 }
 
-type Inputs = {
-	create: v.InferOutput<typeof schemas.announcementCreateInput>;
-	delete: v.InferOutput<typeof schemas.announcementDeleteInput>;
-	adminList: v.InferOutput<typeof schemas.announcementAdminListInput>;
-	update: v.InferOutput<typeof schemas.announcementUpdateInput>;
-	list: v.InferOutput<typeof schemas.announcementListInput>;
-	show: v.InferOutput<typeof schemas.announcementReadInput>;
-	read: v.InferOutput<typeof schemas.announcementReadInput>;
-};
+type Inputs = { [K in keyof typeof announcementsContract]: InferSchemaOutput<NonNullable<(typeof announcementsContract)[K]['~orpc']['inputSchema']>> };
 type Outputs = InferContractRouterOutputs<typeof announcementsContract>;
 export interface AnnouncementsOperations<Actor extends ApiActor> {
 	create(input: Inputs['create'], actor: Actor): Promise<Outputs['create']>;

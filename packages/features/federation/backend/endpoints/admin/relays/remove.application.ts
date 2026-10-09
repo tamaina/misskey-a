@@ -7,7 +7,8 @@ import { Injectable } from '@nestjs/common';
 import { RelayService } from '../../../services/RelayService.js';
 import type { MiUser } from '../../../../../users/backend/models/User.js';
 import * as v from 'valibot';
-import { adminRelaysRemoveInput, adminRelaysRemoveOutput } from './remove.contract.js';
+import type { AdminRelaysRemoveInput, AdminRelaysRemoveOutput } from './remove.contract.js';
+import { adminRelaysRemoveContract } from './remove.contract.js';
 
 @Injectable()
 export class AdminRelaysRemoveApplicationService {
@@ -15,10 +16,10 @@ export class AdminRelaysRemoveApplicationService {
 		private relayService: RelayService,
 	) {}
 
-	public async execute(ps: v.InferOutput<typeof adminRelaysRemoveInput>, _me: MiUser): Promise<v.InferOutput<typeof adminRelaysRemoveOutput>> {
+	public async execute(ps: AdminRelaysRemoveInput, _me: MiUser): Promise<AdminRelaysRemoveOutput> {
 		const result = await (async () => {
 			return await this.relayService.removeRelay(ps.inbox);
 		})();
-		return v.parse(adminRelaysRemoveOutput, result);
+		return v.parse(adminRelaysRemoveContract['~orpc'].outputSchema!, result);
 	}
 }

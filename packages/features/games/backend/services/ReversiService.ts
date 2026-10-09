@@ -9,9 +9,7 @@ import { ModuleRef } from '@nestjs/core';
 import { reversiUpdateKeys } from 'misskey-js';
 import * as Reversi from 'misskey-reversi';
 import { type DeleteResult, type FindOperator, LessThan, MoreThan } from 'typeorm';
-import type {
-	MiReversiGame,
-} from '@features/persistence/backend/repositories/models.js';
+import type { MiReversiGame } from '@features/persistence/backend/repositories/models.js';
 import type { MiUser } from '@features/users/backend/models/User.js';
 import { DI } from '@/di-symbols.js';
 import { bindThis } from '@features/runtime/backend/decorators.js';

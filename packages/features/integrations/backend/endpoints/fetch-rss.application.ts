@@ -9,7 +9,7 @@ import { HttpRequestService } from '../../../runtime/backend/services/HttpReques
 import { apiError } from '../../../api/backend/transport/orpc-error.js';
 import type { MiUser } from '../../../users/backend/models/User.js';
 import * as v from 'valibot';
-import { fetchRssInput, fetchRssOutput, fetchRssErrors } from './fetch-rss.contract.js';
+import { fetchRssErrors, fetchRssContract } from './fetch-rss.contract.js';
 
 const MAX_URL_LENGTH = 8192;
 const MAX_RESPONSE_SIZE = 1024 * 1024;
@@ -17,13 +17,13 @@ const MAX_CONCURRENT_REQUESTS = 32;
 
 @Injectable()
 export class FetchRssApplicationService {
-	private readonly inFlightRequests = new Map<string, Promise<v.InferOutput<typeof fetchRssOutput>>>();
+	private readonly inFlightRequests = new Map<string, Promise<v.InferOutput<NonNullable<typeof fetchRssContract['~orpc']['outputSchema']>>>>();
 	private activeRequestCount = 0;
 	constructor(
 		private httpRequestService: HttpRequestService,
 	) {}
 
-	public async execute(ps: v.InferOutput<typeof fetchRssInput>, _me: MiUser | null): Promise<v.InferOutput<typeof fetchRssOutput>> {
+	public async execute(ps: v.InferOutput<NonNullable<typeof fetchRssContract['~orpc']['inputSchema']>>, _me: MiUser | null): Promise<v.InferOutput<NonNullable<typeof fetchRssContract['~orpc']['outputSchema']>>> {
 		const result = await (async () => {
 			const url = this.normalizeUrl(ps.url);
 			const inFlightRequest = this.inFlightRequests.get(url);
@@ -48,7 +48,7 @@ export class FetchRssApplicationService {
 
 			return await request;
 		})();
-		return v.parse(fetchRssOutput, result);
+		return v.parse(requiredSchema(fetchRssContract['~orpc'].outputSchema), result);
 	}
 
 	private normalizeUrl(input: string): string {
@@ -75,7 +75,7 @@ export class FetchRssApplicationService {
 		return url.href;
 	}
 
-	private async fetchRss(url: string): Promise<v.InferOutput<typeof fetchRssOutput>> {
+	private async fetchRss(url: string): Promise<v.InferOutput<NonNullable<typeof fetchRssContract['~orpc']['outputSchema']>>> {
 		const res = await this.httpRequestService.send(url, {
 			method: 'GET',
 			headers: {
@@ -97,6 +97,11 @@ export class FetchRssApplicationService {
 			},
 		});
 
-		return v.parse(fetchRssOutput, await rssParser.parseString(text));
+		return v.parse(requiredSchema(fetchRssContract['~orpc'].outputSchema), await rssParser.parseString(text));
 	}
+}
+
+function requiredSchema<Schema>(schema: Schema | undefined): Schema {
+	if (schema === undefined) throw new Error('Contract must declare its schema');
+	return schema;
 }

@@ -11,8 +11,8 @@ import { GlobalEventService } from '@features/runtime/backend/services/GlobalEve
 import { DI } from '@/di-symbols.js';
 import { apiError } from '@features/api/backend/transport/orpc-error.js';
 
-import * as v from 'valibot';
-import { emptyObjectI2faUpdateKeyInput } from '../../../auth.schema.js';
+import type * as v from 'valibot';
+import type { I2faUpdateKeyContract } from '../../../api.contract.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 
 export const meta = {
@@ -45,7 +45,7 @@ export class I2faUpdateKeyOperation {
 		private globalEventService: GlobalEventService,
 	) {}
 
-	async execute(ps: v.InferOutput<typeof emptyObjectI2faUpdateKeyInput>, me: MiLocalUser) {
+	async execute(ps: v.InferOutput<NonNullable<typeof I2faUpdateKeyContract['~orpc']['inputSchema']>>, me: MiLocalUser) {
 		const key = await this.userSecurityKeysRepository.findOneBy({
 			id: ps.credentialId,
 		});

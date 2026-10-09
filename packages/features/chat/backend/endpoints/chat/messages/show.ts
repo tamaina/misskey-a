@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import type { InferSchemaOutput } from '@orpc/contract';
 import { implement } from '@orpc/server';
 import { Inject, Injectable } from '@nestjs/common';
 
@@ -15,7 +16,7 @@ import { ChatEntityService } from '../../../serializers/ChatEntityService.js';
 import { ChatService } from '../../../services/ChatService.js';
 import { authentication, apiPolicy, requirePrincipal } from '../../../../../api/backend/transport/middleware.js';
 import { apiError } from '../../../../../api/backend/transport/orpc-error.js';
-import { chatMessagesShowContract, chatMessagesShowPolicy, chatMessagesShowInput, chatMessagesShowOutput, chatMessagesShowErrors } from './show.contract.js';
+import { chatMessagesShowContract, chatMessagesShowPolicy, chatMessagesShowErrors } from './show.contract.js';
 import type { MiLocalUser } from '../../../../../users/backend/models/User.js';
 import type { ChatApiContext } from '../../../operations.js';
 import type { ApiActor } from '../../../../../api/backend/transport/context.js';
@@ -35,11 +36,11 @@ export class ChatMessagesShowOperation {
 		private roleService: RoleService,
 		private chatEntityService: ChatEntityService,
 	) {}
-	async execute(ps: v.InferOutput<typeof chatMessagesShowInput>, me: MiLocalUser): Promise<v.InferOutput<typeof chatMessagesShowOutput>> {
-		return v.parse(chatMessagesShowOutput, await this.run(ps, me));
+	async execute(ps: InferSchemaOutput<NonNullable<typeof chatMessagesShowContract['~orpc']['inputSchema']>>, me: MiLocalUser): Promise<InferSchemaOutput<NonNullable<typeof chatMessagesShowContract['~orpc']['outputSchema']>>> {
+		return v.parse(requiredSchema(chatMessagesShowContract['~orpc'].outputSchema), await this.run(ps, me));
 	}
 
-	private async run(ps: v.InferOutput<typeof chatMessagesShowInput>, me: MiLocalUser) {
+	private async run(ps: InferSchemaOutput<NonNullable<typeof chatMessagesShowContract['~orpc']['inputSchema']>>, me: MiLocalUser) {
 		await this.chatService.checkChatAvailability(me.id, 'read');
 
 		const message = await this.chatService.findMessageById(ps.messageId);
@@ -51,4 +52,9 @@ export class ChatMessagesShowOperation {
 		}
 		return this.chatEntityService.packMessageDetailed(message, me);
 	}
+}
+
+function requiredSchema<Schema>(schema: Schema | undefined): Schema {
+	if (schema === undefined) throw new Error('Missing endpoint contract schema');
+	return schema;
 }

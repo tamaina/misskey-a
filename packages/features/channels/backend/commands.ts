@@ -3,12 +3,12 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { channelsFavoriteInput, channelsFavoriteErrors } from './endpoints/channels/favorite.contract.js';
-import { channelsFollowInput, channelsFollowErrors } from './endpoints/channels/follow.contract.js';
-import { channelsUnfavoriteInput, channelsUnfavoriteErrors } from './endpoints/channels/unfavorite.contract.js';
-import { channelsUnfollowInput, channelsUnfollowErrors } from './endpoints/channels/unfollow.contract.js';
-import { channelsMuteCreateInput, channelsMuteCreateErrors } from './endpoints/channels/mute/create.contract.js';
-import { channelsMuteDeleteInput, channelsMuteDeleteErrors } from './endpoints/channels/mute/delete.contract.js';
+import { type channelsFavoriteContract, channelsFavoriteErrors } from './endpoints/channels/favorite.contract.js';
+import { type channelsFollowContract, channelsFollowErrors } from './endpoints/channels/follow.contract.js';
+import { type channelsUnfavoriteContract, channelsUnfavoriteErrors } from './endpoints/channels/unfavorite.contract.js';
+import { type channelsUnfollowContract, channelsUnfollowErrors } from './endpoints/channels/unfollow.contract.js';
+import { type channelsMuteCreateContract, channelsMuteCreateErrors } from './endpoints/channels/mute/create.contract.js';
+import { type channelsMuteDeleteContract, channelsMuteDeleteErrors } from './endpoints/channels/mute/delete.contract.js';
 import type { ErrorDefinition } from '../../api/backend/transport/orpc-error.js';
 import type * as v from 'valibot';
 
@@ -34,7 +34,7 @@ export interface ChannelCommandsDependencies<Channel extends { id: string }, Act
 
 export function createChannelCommandOperations<Channel extends { id: string }, Actor extends { id: string }>(deps: ChannelCommandsDependencies<Channel, Actor>) {
 	return {
-		async channelsFavorite(input: v.InferOutput<typeof channelsFavoriteInput>, actor: Actor): Promise<void> {
+		async channelsFavorite(input: v.InferOutput<NonNullable<typeof channelsFavoriteContract['~orpc']['inputSchema']>>, actor: Actor): Promise<void> {
 			const channel = await deps.findById(input.channelId);
 			if (channel == null) throw deps.createError(channelsFavoriteErrors.noSuchChannel);
 
@@ -44,7 +44,7 @@ export function createChannelCommandOperations<Channel extends { id: string }, A
 				channelId: channel.id,
 			});
 		},
-		async channelsFollow(input: v.InferOutput<typeof channelsFollowInput>, actor: Actor): Promise<void> {
+		async channelsFollow(input: v.InferOutput<NonNullable<typeof channelsFollowContract['~orpc']['inputSchema']>>, actor: Actor): Promise<void> {
 			const channel = await deps.findById(input.channelId);
 			if (channel == null) throw deps.createError(channelsFollowErrors.noSuchChannel);
 
@@ -57,17 +57,17 @@ export function createChannelCommandOperations<Channel extends { id: string }, A
 				throw error;
 			}
 		},
-		async channelsUnfavorite(input: v.InferOutput<typeof channelsUnfavoriteInput>, actor: Actor): Promise<void> {
+		async channelsUnfavorite(input: v.InferOutput<NonNullable<typeof channelsUnfavoriteContract['~orpc']['inputSchema']>>, actor: Actor): Promise<void> {
 			const channel = await deps.findById(input.channelId);
 			if (channel == null) throw deps.createError(channelsUnfavoriteErrors.noSuchChannel);
 			await deps.deleteFavorite(actor.id, channel.id);
 		},
-		async channelsUnfollow(input: v.InferOutput<typeof channelsUnfollowInput>, actor: Actor): Promise<void> {
+		async channelsUnfollow(input: v.InferOutput<NonNullable<typeof channelsUnfollowContract['~orpc']['inputSchema']>>, actor: Actor): Promise<void> {
 			const channel = await deps.findById(input.channelId);
 			if (channel == null) throw deps.createError(channelsUnfollowErrors.noSuchChannel);
 			await deps.unfollow(actor, channel);
 		},
-		async channelsMuteCreate(input: v.InferOutput<typeof channelsMuteCreateInput>, actor: Actor): Promise<void> {
+		async channelsMuteCreate(input: v.InferOutput<NonNullable<typeof channelsMuteCreateContract['~orpc']['inputSchema']>>, actor: Actor): Promise<void> {
 			const channel = await deps.findById(input.channelId);
 			if (channel == null) throw deps.createError(channelsMuteCreateErrors.noSuchChannel);
 
@@ -85,7 +85,7 @@ export function createChannelCommandOperations<Channel extends { id: string }, A
 				expiresAt: input.expiresAt ? new Date(input.expiresAt) : null,
 			});
 		},
-		async channelsMuteDelete(input: v.InferOutput<typeof channelsMuteDeleteInput>, actor: Actor): Promise<void> {
+		async channelsMuteDelete(input: v.InferOutput<NonNullable<typeof channelsMuteDeleteContract['~orpc']['inputSchema']>>, actor: Actor): Promise<void> {
 			const channel = await deps.findById(input.channelId);
 			if (channel == null) throw deps.createError(channelsMuteDeleteErrors.noSuchChannel);
 

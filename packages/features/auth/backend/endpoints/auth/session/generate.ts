@@ -12,8 +12,8 @@ import type { Config } from '@/config.js';
 import { DI } from '@/di-symbols.js';
 import { apiError } from '@features/api/backend/transport/orpc-error.js';
 
-import * as v from 'valibot';
-import { inlineAuthSessionGenerateInput } from '../../../auth.schema.js';
+import type * as v from 'valibot';
+import type { AuthSessionGenerateContract } from '../../../api.contract.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 
 export const meta = {
@@ -45,7 +45,7 @@ export class AuthSessionGenerateOperation {
 		private idService: IdService,
 	) {}
 
-	async execute(ps: v.InferOutput<typeof inlineAuthSessionGenerateInput>, me: MiLocalUser | null) {
+	async execute(ps: v.InferOutput<NonNullable<typeof AuthSessionGenerateContract['~orpc']['inputSchema']>>, me: MiLocalUser | null) {
 		// Lookup app
 		const app = await this.appsRepository.findOneBy({
 			secret: ps.appSecret,

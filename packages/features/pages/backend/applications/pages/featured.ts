@@ -10,8 +10,8 @@ import { PageEntityService } from '../../serializers/PageEntityService.js';
 import { DI } from '@/di-symbols.js';
 
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
-import type * as v from 'valibot';
-import { pagesFeaturedInput } from '../../endpoints/pages/featured.contract.js';
+import type { InferSchemaOutput } from '@orpc/contract';
+import { type pagesFeaturedContract } from '../../endpoints/pages/featured.contract.js';
 
 @Injectable()
 export class PagesFeaturedApplicationService {
@@ -22,7 +22,7 @@ export class PagesFeaturedApplicationService {
 		private pageEntityService: PageEntityService,
 	) {}
 
-	async execute(ps: v.InferOutput<typeof pagesFeaturedInput>, me: MiLocalUser | null) {
+	async execute(ps: InferSchemaOutput<NonNullable<(typeof pagesFeaturedContract)['~orpc']['inputSchema']>>, me: MiLocalUser | null) {
 		const query = this.pagesRepository.createQueryBuilder('page')
 			.where('page.visibility = \'public\'')
 			.andWhere('page.likedCount > 0')

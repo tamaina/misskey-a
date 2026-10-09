@@ -9,8 +9,8 @@ import type { AppsRepository } from '@features/persistence/backend/repositories/
 import { AppEntityService } from '../../serializers/AppEntityService.js';
 import { DI } from '@/di-symbols.js';
 
-import * as v from 'valibot';
-import { packedMyAppsInput } from '../../auth.schema.js';
+import type * as v from 'valibot';
+import type { MyAppsContract } from '../../api.contract.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 
 export const meta = {
@@ -29,7 +29,7 @@ export class MyAppsOperation {
 		private appEntityService: AppEntityService,
 	) {}
 
-	async execute(ps: v.InferOutput<typeof packedMyAppsInput>, me: MiLocalUser) {
+	async execute(ps: v.InferOutput<NonNullable<typeof MyAppsContract['~orpc']['inputSchema']>>, me: MiLocalUser) {
 		const query = {
 			userId: me.id,
 		};

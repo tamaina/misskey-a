@@ -7,7 +7,8 @@ import { Inject, Injectable } from '@nestjs/common';
 import type { DbQueue, DeliverQueue, EndedPollNotificationQueue, PostScheduledNoteQueue, InboxQueue, ObjectStorageQueue, SystemQueue, UserWebhookDeliverQueue, SystemWebhookDeliverQueue } from '../../../../../boot/backend/assembly/QueueModule.js';
 import type { MiUser } from '../../../../../users/backend/models/User.js';
 import * as v from 'valibot';
-import { adminQueueStatsInput, adminQueueStatsOutput } from './stats.contract.js';
+import type { AdminQueueStatsInput, AdminQueueStatsOutput } from './stats.contract.js';
+import { adminQueueStatsContract } from './stats.contract.js';
 
 @Injectable()
 export class AdminQueueStatsApplicationService {
@@ -23,7 +24,7 @@ export class AdminQueueStatsApplicationService {
 		@Inject('queue:systemWebhookDeliver') public systemWebhookDeliverQueue: SystemWebhookDeliverQueue,
 	) {}
 
-	public async execute(_ps: v.InferOutput<typeof adminQueueStatsInput>, _me: MiUser): Promise<v.InferOutput<typeof adminQueueStatsOutput>> {
+	public async execute(_ps: AdminQueueStatsInput, _me: MiUser): Promise<AdminQueueStatsOutput> {
 		const result = await (async () => {
 			const deliverJobCounts = await this.deliverQueue.getJobCounts();
 			const inboxJobCounts = await this.inboxQueue.getJobCounts();
@@ -37,6 +38,6 @@ export class AdminQueueStatsApplicationService {
 				objectStorage: objectStorageJobCounts,
 			};
 		})();
-		return v.parse(adminQueueStatsOutput, result);
+		return v.parse(adminQueueStatsContract['~orpc'].outputSchema!, result);
 	}
 }

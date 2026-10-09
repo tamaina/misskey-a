@@ -10,8 +10,8 @@ import { DI } from '@/di-symbols.js';
 import { FlashService } from '../../services/FlashService.js';
 
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
-import type * as v from 'valibot';
-import { flashSearchInput } from '../../endpoints/flash/search.contract.js';
+import type { InferSchemaOutput } from '@orpc/contract';
+import { type flashSearchContract } from '../../endpoints/flash/search.contract.js';
 
 @Injectable()
 export class FlashSearchApplicationService {
@@ -20,7 +20,7 @@ export class FlashSearchApplicationService {
 		private flashEntityService: FlashEntityService,
 	) {}
 
-	async execute(ps: v.InferOutput<typeof flashSearchInput>, me: MiLocalUser | null) {
+	async execute(ps: InferSchemaOutput<NonNullable<(typeof flashSearchContract)['~orpc']['inputSchema']>>, me: MiLocalUser | null) {
 		const result = await this.flashService.search(ps.query, {
 			sinceId: ps.sinceId,
 			untilId: ps.untilId,

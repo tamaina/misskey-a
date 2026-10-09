@@ -14,8 +14,8 @@ import { DI } from '@/di-symbols.js';
 import { EmailService } from '@features/email/backend/services/EmailService.js';
 import { L_CHARS, secureRndstr } from '../utility/secure-rndstr.js';
 
-import * as v from 'valibot';
-import { voidRequestResetPasswordInput } from '../auth.schema.js';
+import type * as v from 'valibot';
+import type { RequestResetPasswordContract } from '../api.contract.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 
 export const meta = {
@@ -54,7 +54,7 @@ export class RequestResetPasswordOperation {
 		private emailService: EmailService,
 	) {}
 
-	async execute(ps: v.InferOutput<typeof voidRequestResetPasswordInput>, me: MiLocalUser | null) {
+	async execute(ps: v.InferOutput<NonNullable<typeof RequestResetPasswordContract['~orpc']['inputSchema']>>, me: MiLocalUser | null) {
 		const user = await this.usersRepository.findOneBy({
 			usernameLower: ps.username.toLowerCase(),
 			host: IsNull(),

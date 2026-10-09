@@ -9,7 +9,10 @@ import { objectInput, objectInputWithRest } from '../input.schema.js';
 import { wireJson } from '../wire-json.schema.js';
 import { commonErrors } from '../../../../api/backend/transport/errors.schema.js';
 
-export const updateMetaInput = objectInput({
+export const updateMetaContract = oc.$meta({ requestName: 'admin/update-meta', allowGet: false } as const)
+	.route({ method: 'POST', path: '/admin/update-meta', operationId: 'post___admin___update-meta', tags: ['admin'], successStatus: 204 })
+	.errors({ ...commonErrors })
+	.input(objectInput({
 	'disableRegistration': v.exactOptional(v.nullable(v.boolean())),
 	'pinnedUsers': v.exactOptional(v.nullable(v.array(v.string()))),
 	'hiddenTags': v.exactOptional(v.nullable(v.array(v.string()))),
@@ -148,10 +151,5 @@ export const updateMetaInput = objectInput({
 	'remoteNotesCleaningExpiryDaysForEachNotes': v.exactOptional(v.pipe(v.pipe(v.number(), v.finite()), v.finite())),
 	'remoteNotesCleaningMaxProcessingDurationInMinutes': v.exactOptional(v.pipe(v.pipe(v.number(), v.finite()), v.finite())),
 	'showRoleBadgesOfRemoteUsers': v.exactOptional(v.boolean()),
-});
-
-export const updateMetaContract = oc.$meta<{ requestName: 'admin/update-meta'; allowGet: boolean; cacheSec?: number }>({ requestName: 'admin/update-meta', allowGet: false })
-	.route({ method: 'POST', path: '/admin/update-meta', operationId: 'post___admin___update-meta', tags: ['admin'], successStatus: 204 })
-	.errors({ ...commonErrors })
-	.input(updateMetaInput)
+}))
 	.output(v.void());

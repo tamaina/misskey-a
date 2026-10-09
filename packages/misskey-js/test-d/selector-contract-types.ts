@@ -4,20 +4,20 @@
  */
 import type * as v from 'valibot';
 import { expectAssignable, expectNotAssignable } from 'tsd';
-import type { adminDriveShowFileInput, adminDriveShowFileContract } from '../built/contracts/drive/backend/endpoints/admin/drive/show-file.contract.js';
-import type { driveFilesShowInput } from '../built/contracts/drive/backend/endpoints/drive/files/show.contract.js';
-import type { selectorIRevokeTokenInput } from '../built/contracts/auth/backend/auth.schema.js';
-import type { pagesShowInput } from '../built/contracts/pages/backend/endpoints/pages/show.contract.js';
+import type { adminDriveShowFileContract } from '../built/contracts/drive/backend/endpoints/admin/drive/show-file.contract.js';
+import type { driveFilesShowContract } from '../built/contracts/drive/backend/endpoints/drive/files/show.contract.js';
+import type { IRevokeTokenContract } from '../built/contracts/auth/backend/api.contract.js';
+import type { pagesShowContract } from '../built/contracts/pages/backend/endpoints/pages/show.contract.js';
 import type { InferContractRouterOutputs } from '@orpc/contract';
 import type { PackedJsonValue } from '../built/contracts/users/backend/json-value.schema.js';
 import type { ContractEndpoints } from '../built/contract.types.js';
 
 type Equal<A, B> = (<T>() => T extends A ? 1 : 2) extends (<T>() => T extends B ? 1 : 2) ? true : false;
 type Assert<T extends true> = T;
-type Admin = v.InferInput<typeof adminDriveShowFileInput>;
-type File = v.InferInput<typeof driveFilesShowInput>;
-type Token = v.InferInput<typeof selectorIRevokeTokenInput>;
-type Page = v.InferInput<typeof pagesShowInput>;
+type Admin = v.InferInput<NonNullable<typeof adminDriveShowFileContract['~orpc']['inputSchema']>>;
+type File = v.InferInput<NonNullable<typeof driveFilesShowContract['~orpc']['inputSchema']>>;
+type Token = v.InferInput<NonNullable<typeof IRevokeTokenContract['~orpc']['inputSchema']>>;
+type Page = v.InferInput<NonNullable<(typeof pagesShowContract)['~orpc']['inputSchema']>>;
 export type Cases = [
  Assert<Equal<ContractEndpoints['admin/drive/show-file']['req'], Admin>>,
  Assert<Equal<ContractEndpoints['drive/files/show']['req'], File>>,

@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import type { InferSchemaOutput } from '@orpc/contract';
 import { implement } from '@orpc/server';
 import { Inject, Injectable } from '@nestjs/common';
 import * as v from 'valibot';
@@ -11,7 +12,7 @@ import { authentication, apiPolicy, requirePrincipal } from '../../../../../../a
 import { ChatService } from '../../../../services/ChatService.js';
 import { ChatEntityService } from '../../../../serializers/ChatEntityService.js';
 import { apiError } from '../../../../../../api/backend/transport/orpc-error.js';
-import { chatRoomsInvitationsCreateContract, chatRoomsInvitationsCreatePolicy, chatRoomsInvitationsCreateInput, chatRoomsInvitationsCreateOutput, chatRoomsInvitationsCreateErrors } from './create.contract.js';
+import { chatRoomsInvitationsCreateContract, chatRoomsInvitationsCreatePolicy, chatRoomsInvitationsCreateErrors } from './create.contract.js';
 import type { ApiActor } from '../../../../../../api/backend/transport/context.js';
 import type { ChatApiContext } from '../../../../operations.js';
 
@@ -31,11 +32,11 @@ export class ChatRoomsInvitationsCreateOperation {
 		private chatService: ChatService,
 		private chatEntityService: ChatEntityService,
 	) {}
-	async execute(ps: v.InferOutput<typeof chatRoomsInvitationsCreateInput>, me: MiLocalUser): Promise<v.InferOutput<typeof chatRoomsInvitationsCreateOutput>> {
-		return v.parse(chatRoomsInvitationsCreateOutput, await this.run(ps, me));
+	async execute(ps: InferSchemaOutput<NonNullable<typeof chatRoomsInvitationsCreateContract['~orpc']['inputSchema']>>, me: MiLocalUser): Promise<InferSchemaOutput<NonNullable<typeof chatRoomsInvitationsCreateContract['~orpc']['outputSchema']>>> {
+		return v.parse(requiredSchema(chatRoomsInvitationsCreateContract['~orpc'].outputSchema), await this.run(ps, me));
 	}
 
-	private async run(ps: v.InferOutput<typeof chatRoomsInvitationsCreateInput>, me: MiLocalUser) {
+	private async run(ps: InferSchemaOutput<NonNullable<typeof chatRoomsInvitationsCreateContract['~orpc']['inputSchema']>>, me: MiLocalUser) {
 		await this.chatService.checkChatAvailability(me.id, 'write');
 
 		const room = await this.chatService.findMyRoomById(me.id, ps.roomId);
@@ -45,4 +46,9 @@ export class ChatRoomsInvitationsCreateOperation {
 		const invitation = await this.chatService.createRoomInvitation(me.id, room.id, ps.userId);
 		return await this.chatEntityService.packRoomInvitation(invitation, me);
 	}
+}
+
+function requiredSchema<Schema>(schema: Schema | undefined): Schema {
+	if (schema === undefined) throw new Error('Missing endpoint contract schema');
+	return schema;
 }

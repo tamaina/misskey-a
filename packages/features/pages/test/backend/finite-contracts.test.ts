@@ -12,22 +12,40 @@ import { MiPage } from '../../backend/models/Page.js';
 import { PageLikeEntityService } from '../../backend/serializers/PageLikeEntityService.js';
 import { PageEntityService } from '../../backend/serializers/PageEntityService.js';
 import { PagesShowApplicationService } from '../../backend/applications/pages/show.js';
-import { iPageLikesInput as packedIPageLikesInput } from '../../backend/endpoints/i/page-likes.contract.js';
-import { iPageLikesOutput as packedIPageLikesOutput } from '../../backend/endpoints/i/page-likes.contract.js';
-import { iPagesInput as packedIPagesInput } from '../../backend/endpoints/i/pages.contract.js';
-import { pagesFeaturedInput as packedPagesFeaturedInput } from '../../backend/endpoints/pages/featured.contract.js';
-import { usersPagesInput as packedUsersPagesInput } from '../../backend/endpoints/users/pages.contract.js';
-import { pagePushInput as voidPagePushInput } from '../../backend/endpoints/page-push.contract.js';
-import { pagesDeleteInput as voidPagesDeleteInput } from '../../backend/endpoints/pages/delete.contract.js';
-import { pagesLikeInput as voidPagesLikeInput } from '../../backend/endpoints/pages/like.contract.js';
-import { pagesUnlikeInput as voidPagesUnlikeInput } from '../../backend/endpoints/pages/unlike.contract.js';
-import { pagesCreateInput as portablePagesCreateInput } from '../../backend/endpoints/pages/create.contract.js';
-import { pagesUpdateInput as portablePagesUpdateInput } from '../../backend/endpoints/pages/update.contract.js';
-import { pagesShowInput as selectorPagesShowInput } from '../../backend/endpoints/pages/show.contract.js';
+import { iPageLikesContract } from '../../backend/endpoints/i/page-likes.contract.js';
+
+import { iPagesContract } from '../../backend/endpoints/i/pages.contract.js';
+import { pagesFeaturedContract } from '../../backend/endpoints/pages/featured.contract.js';
+import { usersPagesContract } from '../../backend/endpoints/users/pages.contract.js';
+import { pagePushContract } from '../../backend/endpoints/page-push.contract.js';
+import { pagesDeleteContract } from '../../backend/endpoints/pages/delete.contract.js';
+import { pagesLikeContract } from '../../backend/endpoints/pages/like.contract.js';
+import { pagesUnlikeContract } from '../../backend/endpoints/pages/unlike.contract.js';
+import { pagesCreateContract } from '../../backend/endpoints/pages/create.contract.js';
+import { pagesUpdateContract } from '../../backend/endpoints/pages/update.contract.js';
+import { pagesShowContract } from '../../backend/endpoints/pages/show.contract.js';
 import type { MiPageLike } from '../../backend/models/PageLike.js';
 import type { MiDriveFile } from '@features/drive/backend/models/DriveFile.js';
 import type { packedDriveFileSchema } from '@features/notes/backend/drive.schema.js';
 import type { PackedUserLite } from '@features/users/backend/user.schema.js';
+const voidPagePushInput = requiredSchema(pagePushContract['~orpc'].inputSchema);
+const selectorPagesShowInput = requiredSchema(pagesShowContract['~orpc'].inputSchema);
+
+function requiredSchema<T>(schema: T | undefined): T {
+	if (schema === undefined) throw new Error('Expected contract schema');
+	return schema;
+}
+
+const packedIPageLikesInput = requiredSchema(iPageLikesContract['~orpc'].inputSchema);
+const packedIPageLikesOutput = requiredSchema(iPageLikesContract['~orpc'].outputSchema);
+const packedIPagesInput = requiredSchema(iPagesContract['~orpc'].inputSchema);
+const packedPagesFeaturedInput = requiredSchema(pagesFeaturedContract['~orpc'].inputSchema);
+const packedUsersPagesInput = requiredSchema(usersPagesContract['~orpc'].inputSchema);
+const voidPagesDeleteInput = requiredSchema(pagesDeleteContract['~orpc'].inputSchema);
+const voidPagesLikeInput = requiredSchema(pagesLikeContract['~orpc'].inputSchema);
+const voidPagesUnlikeInput = requiredSchema(pagesUnlikeContract['~orpc'].inputSchema);
+const portablePagesCreateInput = requiredSchema(pagesCreateContract['~orpc'].inputSchema);
+const portablePagesUpdateInput = requiredSchema(pagesUpdateContract['~orpc'].inputSchema);
 
 const date = new Date('2026-01-01T00:00:00Z');
 const user: PackedUserLite = { id: 'user123', name: null, username: 'alice', host: null, avatarUrl: 'https://example/avatar', avatarBlurhash: null, avatarDecorations: [], emojis: {}, onlineStatus: 'unknown' };

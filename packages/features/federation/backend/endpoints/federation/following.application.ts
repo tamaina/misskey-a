@@ -11,7 +11,8 @@ import { RoleService } from '../../../../roles/backend/services/RoleService.js';
 import { DI } from '@/di-symbols.js';
 import type { MiUser } from '../../../../users/backend/models/User.js';
 import * as v from 'valibot';
-import { federationFollowingInput, federationFollowingOutput } from './following.contract.js';
+import type { FederationFollowingInput, FederationFollowingOutput } from './following.contract.js';
+import { federationFollowingContract } from './following.contract.js';
 
 @Injectable()
 export class FederationFollowingApplicationService {
@@ -24,7 +25,7 @@ export class FederationFollowingApplicationService {
 		private roleService: RoleService,
 	) {}
 
-	public async execute(ps: v.InferOutput<typeof federationFollowingInput>, me: MiUser | null): Promise<v.InferOutput<typeof federationFollowingOutput>> {
+	public async execute(ps: FederationFollowingInput, me: MiUser | null): Promise<FederationFollowingOutput> {
 		const result = await (async () => {
 			const query = this.queryService.makePaginationQuery(this.followingsRepository.createQueryBuilder('following'), ps.sinceId, ps.untilId, ps.sinceDate, ps.untilDate)
 				.andWhere('following.followerHost = :host', { host: ps.host })
@@ -40,6 +41,6 @@ export class FederationFollowingApplicationService {
 
 			return await this.followingEntityService.packMany(followings, me, { populateFollowee: true });
 		})();
-		return v.parse(federationFollowingOutput, result);
+		return v.parse(federationFollowingContract['~orpc'].outputSchema!, result);
 	}
 }

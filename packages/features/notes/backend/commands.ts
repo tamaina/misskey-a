@@ -3,16 +3,16 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import type { InferSchemaOutput } from '@orpc/contract';
 import { readErrorId } from './request.schema.js';
-import { notesDraftsDeleteInput, notesDraftsDeleteErrors } from './endpoints/notes/drafts/delete.contract.js';
-import { notesReactionsCreateInput, notesReactionsCreateErrors } from './endpoints/notes/reactions/create.contract.js';
-import { notesReactionsDeleteInput, notesReactionsDeleteErrors } from './endpoints/notes/reactions/delete.contract.js';
-import { notesThreadMutingCreateInput, notesThreadMutingCreateErrors } from './endpoints/notes/thread-muting/create.contract.js';
-import { notesThreadMutingDeleteInput, notesThreadMutingDeleteErrors } from './endpoints/notes/thread-muting/delete.contract.js';
-import { notesUnrenoteInput, notesUnrenoteErrors } from './endpoints/notes/unrenote.contract.js';
-import { promoReadInput, promoReadErrors } from './endpoints/promo/read.contract.js';
+import { notesDraftsDeleteErrors, type notesDraftsDeleteContract } from './endpoints/notes/drafts/delete.contract.js';
+import { notesReactionsCreateErrors, type notesReactionsCreateContract } from './endpoints/notes/reactions/create.contract.js';
+import { notesReactionsDeleteErrors, type notesReactionsDeleteContract } from './endpoints/notes/reactions/delete.contract.js';
+import { notesThreadMutingCreateErrors, type notesThreadMutingCreateContract } from './endpoints/notes/thread-muting/create.contract.js';
+import { notesThreadMutingDeleteErrors, type notesThreadMutingDeleteContract } from './endpoints/notes/thread-muting/delete.contract.js';
+import { notesUnrenoteErrors, type notesUnrenoteContract } from './endpoints/notes/unrenote.contract.js';
+import { promoReadErrors, type promoReadContract } from './endpoints/promo/read.contract.js';
 import type { ErrorDefinition } from '../../api/backend/transport/orpc-error.js';
-import type * as v from 'valibot';
 
 export interface NotesCommandActor {
 	id: string;
@@ -87,7 +87,7 @@ export function createNotesCommandOperations<
 		}
 	};
 	return {
-		async notesDraftsDelete(input: v.InferOutput<typeof notesDraftsDeleteInput>, actor: Actor): Promise<void> {
+		async notesDraftsDelete(input: InferSchemaOutput<NonNullable<typeof notesDraftsDeleteContract['~orpc']['inputSchema']>>, actor: Actor): Promise<void> {
 			const draft = await deps.getDraft(actor, input.draftId);
 			if (draft == null) throw deps.createError(notesDraftsDeleteErrors.noSuchNoteDraft);
 
@@ -97,7 +97,7 @@ export function createNotesCommandOperations<
 
 			await deps.deleteDraft(actor, draft.id);
 		},
-		async notesReactionsCreate(input: v.InferOutput<typeof notesReactionsCreateInput>, actor: Actor): Promise<void> {
+		async notesReactionsCreate(input: InferSchemaOutput<NonNullable<typeof notesReactionsCreateContract['~orpc']['inputSchema']>>, actor: Actor): Promise<void> {
 			const note = await getNote(input.noteId, notesReactionsCreateErrors.noSuchNote);
 			try {
 				await deps.createReaction(actor, note, input.reaction);
@@ -115,7 +115,7 @@ export function createNotesCommandOperations<
 				throw error;
 			}
 		},
-		async notesReactionsDelete(input: v.InferOutput<typeof notesReactionsDeleteInput>, actor: Actor): Promise<void> {
+		async notesReactionsDelete(input: InferSchemaOutput<NonNullable<typeof notesReactionsDeleteContract['~orpc']['inputSchema']>>, actor: Actor): Promise<void> {
 			const note = await getNote(input.noteId, notesReactionsDeleteErrors.noSuchNote);
 			try {
 				await deps.deleteReaction(actor, note);
@@ -126,7 +126,7 @@ export function createNotesCommandOperations<
 				throw error;
 			}
 		},
-		async notesThreadMutingCreate(input: v.InferOutput<typeof notesThreadMutingCreateInput>, actor: Actor): Promise<void> {
+		async notesThreadMutingCreate(input: InferSchemaOutput<NonNullable<typeof notesThreadMutingCreateContract['~orpc']['inputSchema']>>, actor: Actor): Promise<void> {
 			const note = await getNote(input.noteId, notesThreadMutingCreateErrors.noSuchNote);
 			const threadId = note.threadId ?? note.id;
 
@@ -136,11 +136,11 @@ export function createNotesCommandOperations<
 
 			await deps.insertThreadMute(deps.newId(), threadId, actor.id);
 		},
-		async notesThreadMutingDelete(input: v.InferOutput<typeof notesThreadMutingDeleteInput>, actor: Actor): Promise<void> {
+		async notesThreadMutingDelete(input: InferSchemaOutput<NonNullable<typeof notesThreadMutingDeleteContract['~orpc']['inputSchema']>>, actor: Actor): Promise<void> {
 			const note = await getNote(input.noteId, notesThreadMutingDeleteErrors.noSuchNote);
 			await deps.deleteThreadMute(note.threadId ?? note.id, actor.id);
 		},
-		async notesUnrenote(input: v.InferOutput<typeof notesUnrenoteInput>, actor: Actor): Promise<void> {
+		async notesUnrenote(input: InferSchemaOutput<NonNullable<typeof notesUnrenoteContract['~orpc']['inputSchema']>>, actor: Actor): Promise<void> {
 			const note = await getNote(input.noteId, notesUnrenoteErrors.noSuchNote);
 			const renotes = await deps.findRenotesByUserAndRenote(actor.id, note.id);
 
@@ -150,7 +150,7 @@ export function createNotesCommandOperations<
 				deps.deleteNote(author, renote);
 			}
 		},
-		async promoRead(input: v.InferOutput<typeof promoReadInput>, actor: Actor): Promise<void> {
+		async promoRead(input: InferSchemaOutput<NonNullable<typeof promoReadContract['~orpc']['inputSchema']>>, actor: Actor): Promise<void> {
 			const note = await getNote(input.noteId, promoReadErrors.noSuchNote);
 
 			if (await deps.promoReadExists(note.id, actor.id)) return;

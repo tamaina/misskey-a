@@ -10,12 +10,20 @@ import { createProcedureClient } from '@orpc/server';
 import { createNotesTimelineProcedure } from '../../backend/endpoints/notes/timeline.js';
 import { antennaName } from '../../backend/endpoints/input.schema.js';
 import { packedAntennaSchema } from '../../backend/antenna.schema.js';
-import { notesTimelineInput as packedNotesTimelineInput, notesTimelineOutput as packedNotesTimelineOutput } from '../../backend/endpoints/notes/timeline.contract.js';
+import { notesTimelineContract } from '../../backend/endpoints/notes/timeline.contract.js';
 import { AntennaEntityService } from '../../backend/serializers/AntennaEntityService.js';
 import { NotesGlobalTimelineApplicationService as GlobalTimeline } from '../../backend/applications/notes/global-timeline.js';
 import type { TimelinesContext } from '../../backend/operations.js';
 import type { ApiActor, ApiServices } from '../../../api/backend/transport/context.js';
 import type { MiAntenna } from '../../backend/models/Antenna.js';
+
+function requiredSchema<S extends v.GenericSchema>(schema: S | undefined): S {
+	if (schema === undefined) throw new Error('Missing native contract schema');
+	return schema;
+}
+
+const packedNotesTimelineInput = requiredSchema(notesTimelineContract['~orpc'].inputSchema);
+const packedNotesTimelineOutput = requiredSchema(notesTimelineContract['~orpc'].outputSchema);
 
 const date = new Date('2026-01-01T00:00:00Z');
 

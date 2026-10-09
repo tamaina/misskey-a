@@ -10,8 +10,8 @@ import { InviteCodeEntityService } from '../../serializers/InviteCodeEntityServi
 import { QueryService } from '@features/notes/backend/services/QueryService.js';
 import { DI } from '@/di-symbols.js';
 
-import * as v from 'valibot';
-import { packedInviteListInput } from '../../auth.schema.js';
+import type * as v from 'valibot';
+import type { InviteListContract } from '../../api.contract.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 
 export const meta = {
@@ -32,7 +32,7 @@ export class InviteListOperation {
 		private queryService: QueryService,
 	) {}
 
-	async execute(ps: v.InferOutput<typeof packedInviteListInput>, me: MiLocalUser) {
+	async execute(ps: v.InferOutput<NonNullable<typeof InviteListContract['~orpc']['inputSchema']>>, me: MiLocalUser) {
 		const query = this.queryService.makePaginationQuery(this.registrationTicketsRepository.createQueryBuilder('ticket'), ps.sinceId, ps.untilId, ps.sinceDate, ps.untilDate)
 			.andWhere('ticket.createdById = :meId', { meId: me.id })
 			.leftJoinAndSelect('ticket.createdBy', 'createdBy')

@@ -9,12 +9,10 @@ import { objectInput } from '../../../../../api/backend/transport/input.schema.j
 import { commonErrors } from '../../../../../api/backend/transport/errors.schema.js';
 import { userWebhookSchema } from '../../../webhook.schema.js';
 
-export const iWebhooksListInput = objectInput({});
-export const iWebhooksListOutput = v.array(userWebhookSchema);
 export const iWebhooksListErrors = {} as const;
 
 const requestName = 'i/webhooks/list';
-export const iWebhooksListContract = oc.$meta<{ requestName: typeof requestName }>({ requestName })
+export const iWebhooksListContract = oc.$meta({ requestName: requestName } as const)
 	.route({ method: 'POST', path: `/${requestName}`, operationId: 'post___' + requestName.replaceAll('/', '___'), tags: ['webhooks', 'account'], spec: current => ({ ...current, security: [{ bearerAuth: [] }] }) })
 	.errors({ ...commonErrors })
-	.input(iWebhooksListInput).output(iWebhooksListOutput);
+	.input(objectInput({})).output(v.array(userWebhookSchema));

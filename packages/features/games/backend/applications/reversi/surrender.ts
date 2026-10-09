@@ -9,8 +9,8 @@ import { ReversiService } from '../../services/ReversiService.js';
 import { apiError } from '@features/api/backend/transport/orpc-error.js';
 
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
-import type * as v from 'valibot';
-import { reversiSurrenderInput, reversiSurrenderErrors } from '../../endpoints/reversi/surrender.contract.js';
+import type { InferSchemaOutput } from '@orpc/contract';
+import { type reversiSurrenderContract, reversiSurrenderErrors } from '../../endpoints/reversi/surrender.contract.js';
 
 @Injectable()
 export class ReversiSurrenderApplicationService {
@@ -18,7 +18,7 @@ export class ReversiSurrenderApplicationService {
 		private reversiService: ReversiService,
 	) {}
 
-	async execute(ps: v.InferOutput<typeof reversiSurrenderInput>, me: MiLocalUser) {
+	async execute(ps: InferSchemaOutput<NonNullable<(typeof reversiSurrenderContract)['~orpc']['inputSchema']>>, me: MiLocalUser) {
 		const game = await this.reversiService.get(ps.gameId);
 
 		if (game == null) {

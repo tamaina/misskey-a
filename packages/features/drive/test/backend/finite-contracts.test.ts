@@ -7,7 +7,7 @@ import { expect, test } from 'vitest';
 import * as v from 'valibot';
 import { mockDeep } from 'vitest-mock-extended';
 import { packedDriveFileSchema, packedDriveFolderSchema } from '../../../notes/backend/drive.schema.js';
-import { driveFilesInput } from '../../backend/endpoints/drive/files.contract.js';
+import { driveFilesContract } from '../../backend/endpoints/drive/files.contract.js';
 import { adminDriveShowFileContract } from '../../backend/endpoints/admin/drive/show-file.contract.js';
 import { DriveFileEntityService } from '../../backend/serializers/DriveFileEntityService.js';
 import { DriveFolderEntityService } from '../../backend/serializers/DriveFolderEntityService.js';
@@ -15,6 +15,13 @@ import { AdminDriveShowFileOperation as AdminShowFile } from '../../backend/endp
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 import type { MiDriveFile } from '../../backend/models/DriveFile.js';
 import type { MiDriveFolder } from '../../backend/models/DriveFolder.js';
+
+function requiredSchema<S extends v.GenericSchema>(schema: S | undefined): S {
+	if (schema === undefined) throw new Error('Missing native contract schema');
+	return schema;
+}
+
+const driveFilesInput = requiredSchema(driveFilesContract['~orpc'].inputSchema);
 
 const date = new Date('2026-01-01T00:00:00Z');
 

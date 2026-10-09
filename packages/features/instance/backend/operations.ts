@@ -6,14 +6,15 @@
 import * as os from 'node:os';
 import * as v from 'valibot';
 import { IsNull } from 'typeorm';
+import type { DataSource } from 'typeorm';
 import type { Config } from '@/config.js';
 import * as Acct from '../../federation/backend/utility/acct.js';
 import { loadSystemInformation } from '../../statistics/backend/runtime-dependencies/systeminformation.js';
 import { DEFAULT_POLICIES } from '../../roles/backend/services/RoleService.js';
 import { apiError } from '../../api/backend/transport/orpc-error.js';
 import { toPackedUserDetailed } from '../../users/backend/user.schema.js';
-import { metaOutput } from './endpoints/meta.contract.js';
-import { adminMetaOutput } from './endpoints/admin/meta.contract.js';
+import { metaContract } from './endpoints/meta.contract.js';
+import { adminMetaContract } from './endpoints/admin/meta.contract.js';
 import type { ApiActor, ApiContext } from '../../api/backend/transport/context.js';
 import type { InstanceApiParameters, InstanceApiOutputs } from './api.contract.js';
 import type { AdsRepository, UsersRepository } from '../../persistence/backend/repositories/models.js';
@@ -25,7 +26,6 @@ import type { MetaService } from './services/MetaService.js';
 import type { MetaEntityService } from './serializers/MetaEntityService.js';
 import type { SystemAccountService } from '../../users/backend/services/SystemAccountService.js';
 import type { UserEntityService } from '../../users/backend/serializers/UserEntityService.js';
-import type { DataSource } from 'typeorm';
 import type { Redis } from 'ioredis';
 import type { ReadEndpoints } from './index.js';
 import type { OnlineUsersCountDependencies } from './get-online-users-count.js';
@@ -179,7 +179,7 @@ export function createInstanceOperations<Actor extends ApiActor>(deps: InstanceO
 
 			const proxy = await deps.systemAccountService.fetch('proxy');
 
-			return v.parse(adminMetaOutput, {
+			return v.parse(requiredSchema(adminMetaContract['~orpc'].outputSchema), {
 				maintainerName: instance.maintainerName,
 				maintainerEmail: instance.maintainerEmail,
 				version: deps.config.version,
@@ -923,7 +923,7 @@ export function createInstanceOperations<Actor extends ApiActor>(deps: InstanceO
 		async onlineUsersCount() { return { count: await deps.getOnlineUsersCount.countSince(new Date(now() - deps.getOnlineUsersCount.thresholdMs)) }; },
 		async meta(input) {
 			const packed = input.detail ? await deps.metaEntityService.packDetailed() : await deps.metaEntityService.pack();
-			return v.parse(metaOutput, wireValue(packed));
+			return v.parse(requiredSchema(metaContract['~orpc'].outputSchema), wireValue(packed));
 		},
 		async ping() { return { pong: now() }; },
 		async pinnedUsers(_ps, me) {
@@ -935,4 +935,9 @@ export function createInstanceOperations<Actor extends ApiActor>(deps: InstanceO
 			return (await deps.userEntityService.packMany(users.filter(x => x != null), me, { schema: 'UserDetailed' })).map(toPackedUserDetailed);
 		},
 	};
+}
+
+function requiredSchema<Schema>(schema: Schema | undefined): Schema {
+	if (schema === undefined) throw new Error('Contract must declare its schema');
+	return schema;
 }

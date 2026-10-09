@@ -10,8 +10,8 @@ import type { AccessTokensRepository } from '@features/persistence/backend/repos
 import { AppEntityService } from '../../serializers/AppEntityService.js';
 import { DI } from '@/di-symbols.js';
 
-import * as v from 'valibot';
-import { inlineIAuthorizedAppsInput } from '../../auth.schema.js';
+import type * as v from 'valibot';
+import type { IAuthorizedAppsContract } from '../../api.contract.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 
 export const meta = {
@@ -29,7 +29,7 @@ export class IAuthorizedAppsOperation {
 		private appEntityService: AppEntityService,
 	) {}
 
-	async execute(ps: v.InferOutput<typeof inlineIAuthorizedAppsInput>, me: MiLocalUser) {
+	async execute(ps: v.InferOutput<NonNullable<typeof IAuthorizedAppsContract['~orpc']['inputSchema']>>, me: MiLocalUser) {
 		// Get tokens
 		const tokens = await this.accessTokensRepository.find({
 			where: {

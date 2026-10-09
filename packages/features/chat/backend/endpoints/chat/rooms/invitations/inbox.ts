@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import type { InferSchemaOutput } from '@orpc/contract';
 import { implement } from '@orpc/server';
 import { Inject, Injectable } from '@nestjs/common';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
@@ -11,7 +12,7 @@ import { DI } from '@/di-symbols.js';
 import { authentication, apiPolicy, requirePrincipal } from '../../../../../../api/backend/transport/middleware.js';
 import { ChatService } from '../../../../services/ChatService.js';
 import { ChatEntityService } from '../../../../serializers/ChatEntityService.js';
-import { chatRoomsInvitationsInboxContract, chatRoomsInvitationsInboxPolicy, chatRoomsInvitationsInboxInput, chatRoomsInvitationsInboxOutput, chatRoomsInvitationsInboxErrors } from './inbox.contract.js';
+import { chatRoomsInvitationsInboxContract, chatRoomsInvitationsInboxPolicy, chatRoomsInvitationsInboxErrors } from './inbox.contract.js';
 import type { ApiActor } from '../../../../../../api/backend/transport/context.js';
 import type { ChatApiContext } from '../../../../operations.js';
 
@@ -32,11 +33,11 @@ export class ChatRoomsInvitationsInboxOperation {
 		private chatService: ChatService,
 		private idService: IdService,
 	) {}
-	async execute(ps: v.InferOutput<typeof chatRoomsInvitationsInboxInput>, me: MiLocalUser): Promise<v.InferOutput<typeof chatRoomsInvitationsInboxOutput>> {
-		return v.parse(chatRoomsInvitationsInboxOutput, await this.run(ps, me));
+	async execute(ps: InferSchemaOutput<NonNullable<typeof chatRoomsInvitationsInboxContract['~orpc']['inputSchema']>>, me: MiLocalUser): Promise<InferSchemaOutput<NonNullable<typeof chatRoomsInvitationsInboxContract['~orpc']['outputSchema']>>> {
+		return v.parse(requiredSchema(chatRoomsInvitationsInboxContract['~orpc'].outputSchema), await this.run(ps, me));
 	}
 
-	private async run(ps: v.InferOutput<typeof chatRoomsInvitationsInboxInput>, me: MiLocalUser) {
+	private async run(ps: InferSchemaOutput<NonNullable<typeof chatRoomsInvitationsInboxContract['~orpc']['inputSchema']>>, me: MiLocalUser) {
 		const untilId = ps.untilId ?? (ps.untilDate ? this.idService.gen(ps.untilDate!) : null);
 		const sinceId = ps.sinceId ?? (ps.sinceDate ? this.idService.gen(ps.sinceDate!) : null);
 
@@ -45,4 +46,9 @@ export class ChatRoomsInvitationsInboxOperation {
 		const invitations = await this.chatService.getReceivedRoomInvitationsWithPagination(me.id, ps.limit, sinceId, untilId);
 		return this.chatEntityService.packRoomInvitations(invitations, me);
 	}
+}
+
+function requiredSchema<Schema>(schema: Schema | undefined): Schema {
+	if (schema === undefined) throw new Error('Missing endpoint contract schema');
+	return schema;
 }

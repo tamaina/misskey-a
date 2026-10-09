@@ -9,12 +9,13 @@ import { objectInput } from '../../../../../api/backend/transport/input.schema.j
 import { commonErrors } from '../../../../../api/backend/transport/errors.schema.js';
 import { QUEUE_TYPES } from '../../../queue.schema.js';
 
-export const adminQueueRetryJobInput = objectInput({ queue: v.picklist(QUEUE_TYPES), jobId: v.string() });
-export const adminQueueRetryJobOutput = v.void();
 export const adminQueueRetryJobErrors = {} as const;
 
 const requestName = 'admin/queue/retry-job';
-export const adminQueueRetryJobContract = oc.$meta<{ requestName: typeof requestName }>({ requestName })
+export const adminQueueRetryJobContract = oc.$meta({ requestName: requestName } as const)
 	.route({ method: 'POST', path: `/${requestName}`, operationId: 'post___' + requestName.replaceAll('/', '___'), tags: ['admin'], spec: current => ({ ...current, security: [{ bearerAuth: [] }] }) })
 	.errors({ ...commonErrors })
-	.input(adminQueueRetryJobInput).output(adminQueueRetryJobOutput);
+	.input(objectInput({ queue: v.picklist(QUEUE_TYPES), jobId: v.string() })).output(v.void());
+
+export type AdminQueueRetryJobInput = v.InferOutput<NonNullable<typeof adminQueueRetryJobContract['~orpc']['inputSchema']>>;
+export type AdminQueueRetryJobOutput = v.InferOutput<NonNullable<typeof adminQueueRetryJobContract['~orpc']['outputSchema']>>;

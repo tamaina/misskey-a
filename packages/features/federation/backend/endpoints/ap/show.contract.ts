@@ -10,10 +10,6 @@ import { commonErrors, apiErrorData } from '../../../../api/backend/transport/er
 import { packedUserDetailedNotMeSchema } from '../../../../users/backend/user.schema.js';
 import { packedNoteSchema } from '../../../../notes/backend/note.schema.js';
 
-export const apShowInput = objectInput({
-	uri: v.string(),
-});
-export const apShowOutput = v.variant('type', [v.strictObject({ type: v.literal('User'), object: packedUserDetailedNotMeSchema }), v.strictObject({ type: v.literal('Note'), object: packedNoteSchema })]);
 export const apShowErrors = {
 		federationNotAllowed: {
 			message: 'Federation for this host is not allowed.',
@@ -43,7 +39,12 @@ export const apShowErrors = {
 	} as const;
 
 const requestName = 'ap/show';
-export const apShowContract = oc.$meta<{ requestName: typeof requestName }>({ requestName })
+export const apShowContract = oc.$meta({ requestName: requestName } as const)
 	.route({ method: 'POST', path: `/${requestName}`, operationId: 'post___' + requestName.replaceAll('/', '___'), tags: ['federation'], spec: current => ({ ...current, security: [{ bearerAuth: [] }] }) })
 	.errors({ ...commonErrors, FEDERATION_NOT_ALLOWED: { status: 400, data: apiErrorData }, URI_INVALID: { status: 400, data: apiErrorData }, REQUEST_FAILED: { status: 400, data: apiErrorData }, RESPONSE_INVALID: { status: 400, data: apiErrorData }, NO_SUCH_OBJECT: { status: 400, data: apiErrorData } })
-	.input(apShowInput).output(apShowOutput);
+	.input(objectInput({
+		uri: v.string(),
+	})).output(v.variant('type', [v.strictObject({ type: v.literal('User'), object: packedUserDetailedNotMeSchema }), v.strictObject({ type: v.literal('Note'), object: packedNoteSchema })]));
+
+export type ApShowInput = v.InferOutput<NonNullable<typeof apShowContract['~orpc']['inputSchema']>>;
+export type ApShowOutput = v.InferOutput<NonNullable<typeof apShowContract['~orpc']['outputSchema']>>;

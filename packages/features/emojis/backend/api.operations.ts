@@ -7,9 +7,7 @@ import { IsNull } from 'typeorm';
 import { apiError, internalError } from '../../api/backend/transport/orpc-error.js';
 import { FILE_TYPE_IMAGE } from '../../drive/backend/file-types.js';
 import { sqlLikeEscape } from '../../persistence/backend/utility/sql-like-escape.js';
-import type * as v from 'valibot';
-import type * as schemas from './api.schema.js';
-import type { InferContractRouterOutputs } from '@orpc/contract';
+import type { InferContractRouterOutputs, InferSchemaOutput } from '@orpc/contract';
 import type { emojisContract } from './api.contract.js';
 import type { ApiActor } from '../../api/backend/transport/context.js';
 import type { EmojisRepository, DriveFilesRepository } from '../../persistence/backend/repositories/models.js';
@@ -23,25 +21,7 @@ import type { UtilityService } from '../../federation/backend/services/UtilitySe
 import type { IdService } from '../../runtime/backend/services/IdService.js';
 import type { QueueService } from '../../runtime/backend/services/QueueService.js';
 
-type Inputs = {
-	add: v.InferOutput<typeof schemas.packedAdminEmojiAddInput>;
-	addAliasesBulk: v.InferOutput<typeof schemas.emojiAliasesBulkInput>;
-	copy: v.InferOutput<typeof schemas.inlineAdminEmojiCopyInput>;
-	delete: v.InferOutput<typeof schemas.voidAdminEmojiDeleteInput>;
-	deleteBulk: v.InferOutput<typeof schemas.voidAdminEmojiDeleteBulkInput>;
-	importZip: v.InferOutput<typeof schemas.voidAdminEmojiImportZipInput>;
-	list: v.InferOutput<typeof schemas.packedAdminEmojiListInput>;
-	listRemote: v.InferOutput<typeof schemas.packedAdminEmojiListRemoteInput>;
-	removeAliasesBulk: v.InferOutput<typeof schemas.emojiAliasesBulkInput>;
-	setAliasesBulk: v.InferOutput<typeof schemas.emojiAliasesBulkInput>;
-	setCategoryBulk: v.InferOutput<typeof schemas.emojiCategoryBulkInput>;
-	setLicenseBulk: v.InferOutput<typeof schemas.emojiLicenseBulkInput>;
-	update: v.InferOutput<typeof schemas.emojiUpdateInput>;
-	emoji: v.InferOutput<typeof schemas.emojiInput>;
-	emojis: v.InferOutput<typeof schemas.emojisInput>;
-	exportCustomEmojis: v.InferOutput<typeof schemas.voidExportCustomEmojisInput>;
-	v2List: v.InferOutput<typeof schemas.portableV2AdminEmojiListInput>;
-};
+type Inputs = { [K in keyof typeof emojisContract]: InferSchemaOutput<NonNullable<(typeof emojisContract)[K]['~orpc']['inputSchema']>> };
 type Outputs = InferContractRouterOutputs<typeof emojisContract>;
 
 export interface EmojisOperations<Actor extends ApiActor> {

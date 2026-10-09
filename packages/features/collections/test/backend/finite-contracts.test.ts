@@ -3,11 +3,13 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { collectionsContract } from '../../backend/api.contract.js';
+
 import { expect, test } from 'vitest';
 import * as v from 'valibot';
 import { mockDeep } from 'vitest-mock-extended';
 import { createRouterClient } from '@orpc/server';
-import { packedClipSchema, packedNoteFavoriteSchema, packedGalleryPostSchema, packedClipsCreateInput, packedClipsListInput, collectionsOutputs, uniqueGalleryPostsCreateInput } from '../../backend/api.schema.js';
+import { packedClipSchema, packedNoteFavoriteSchema, packedGalleryPostSchema } from '../../backend/api.schema.js';
 import { createApiRouter } from '../../../index/backend/api.router.js';
 import { normalizeError } from '../../../api/backend/transport/orpc-error.js';
 
@@ -22,7 +24,16 @@ import type { MiGalleryPost } from '../../backend/models/GalleryPost.js';
 import type { MiGalleryLike } from '../../backend/models/GalleryLike.js';
 import type { MiNoteFavorite } from '../../backend/models/NoteFavorite.js';
 
-const packedIGalleryLikesOutput = collectionsOutputs.iGalleryLikes;
+function requiredSchema<T>(schema: T | undefined): T {
+	if (schema === undefined) throw new Error('Expected contract schema');
+	return schema;
+}
+
+const packedClipsCreateInput = requiredSchema(collectionsContract.clipsCreate['~orpc'].inputSchema);
+const packedClipsListInput = requiredSchema(collectionsContract.clipsList['~orpc'].inputSchema);
+const uniqueGalleryPostsCreateInput = requiredSchema(collectionsContract.galleryPostsCreate['~orpc'].inputSchema);
+
+const packedIGalleryLikesOutput = requiredSchema(collectionsContract.iGalleryLikes['~orpc'].outputSchema);
 const date = new Date('2026-01-01T00:00:00Z');
 const user = { id: 'user123', name: null, username: 'alice', host: null, avatarUrl: 'https://example/avatar', avatarBlurhash: null, avatarDecorations: [], emojis: {}, onlineStatus: 'unknown' as const };
 const note = { id: 'note123', createdAt: date.toISOString(), text: null, userId: user.id, user, visibility: 'public' as const, reactionAcceptance: null, reactionEmojis: {}, reactions: {}, reactionCount: 0, renoteCount: 0, repliesCount: 0 };

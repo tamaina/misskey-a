@@ -7,10 +7,10 @@ import { expect, expectTypeOf, test } from 'vitest';
 import * as v from 'valibot';
 import { mockDeep } from 'vitest-mock-extended';
 import { channelsApiContract } from '../../backend/api.contract.js';
-import { channelsCreateInput as createInput } from '../../backend/endpoints/channels/create.contract.js';
-import { channelsUpdateInput as updateInput } from '../../backend/endpoints/channels/update.contract.js';
-import { channelsTimelineInput as timelineInput } from '../../backend/endpoints/channels/timeline.contract.js';
-import { channelsShowInput, channelsShowOutput as showOutput } from '../../backend/endpoints/channels/show.contract.js';
+import { channelsCreateContract } from '../../backend/endpoints/channels/create.contract.js';
+import { channelsUpdateContract } from '../../backend/endpoints/channels/update.contract.js';
+import { channelsTimelineContract } from '../../backend/endpoints/channels/timeline.contract.js';
+import { channelsShowContract } from '../../backend/endpoints/channels/show.contract.js';
 
 import { packedChannelSchema } from '../../backend/channel.schema.js';
 import { ChannelEntityService } from '../../backend/serializers/ChannelEntityService.js';
@@ -21,6 +21,12 @@ import type { ChannelsRepository, ChannelFollowingsRepository, ChannelFavoritesR
 import type { IdService } from '@features/runtime/backend/services/IdService.js';
 import type { NoteEntityService } from '@features/notes/backend/serializers/NoteEntityService.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
+
+const createInput = requiredSchema(channelsCreateContract['~orpc'].inputSchema);
+const updateInput = requiredSchema(channelsUpdateContract['~orpc'].inputSchema);
+const timelineInput = requiredSchema(channelsTimelineContract['~orpc'].inputSchema);
+const channelsShowInput = requiredSchema(channelsShowContract['~orpc'].inputSchema);
+const showOutput = requiredSchema(channelsShowContract['~orpc'].outputSchema);
 
 function requiredSchema<S extends v.GenericSchema>(schema: S | undefined): S {
 	if (schema === undefined) throw new Error('Missing native schema');

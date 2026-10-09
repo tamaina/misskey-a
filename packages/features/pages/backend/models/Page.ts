@@ -9,8 +9,6 @@ import { id } from '@features/persistence/backend/models/util/id.js';
 import { MiUser } from '@features/users/backend/models/User.js';
 import { MiDriveFile } from '@features/drive/backend/models/DriveFile.js';
 
-export { pageNameSchema } from '../page-name.schema.js';
-
 @Entity('page')
 @Index(['userId', 'name'], { unique: true })
 export class MiPage {

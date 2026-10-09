@@ -9,10 +9,6 @@ import { packedNoteSchema } from '../../note.schema.js';
 import { objectInput, misskeyId } from '../../request.schema.js';
 import type { OpenAPI } from '@orpc/contract';
 
-export const notesShowInput = objectInput({
-	'noteId': misskeyId,
-});
-export const notesShowOutput = packedNoteSchema;
 export const notesShowErrors = {
 	noSuchNote: {
 		message: 'No such note.',
@@ -34,7 +30,9 @@ export const notesShowErrors = {
 } as const;
 export const notesShowPolicy = { name: 'notes/show', requireCredential: false } as const;
 const security: OpenAPI.SecurityRequirementObject[] = [{}, { bearerAuth: [] }];
-export const notesShowContract = oc.$meta<{ requestName: 'notes/show' }>({ requestName: 'notes/show' })
+export const notesShowContract = oc.$meta({ requestName: 'notes/show' } as const)
 	.route({ method: 'POST', path: '/notes/show', operationId: 'post___notes___show', tags: ['notes'], spec: current => ({ ...current, security }) })
 	.errors({ ...commonErrors, NO_SUCH_NOTE: { status: 400, data: apiErrorData }, CONTENT_RESTRICTED_BY_USER: { status: 400, data: apiErrorData }, CONTENT_RESTRICTED_BY_SERVER: { status: 400, data: apiErrorData } })
-	.input(notesShowInput).output(notesShowOutput);
+	.input(objectInput({
+	'noteId': misskeyId,
+})).output(packedNoteSchema);

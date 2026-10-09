@@ -10,9 +10,6 @@ import { objectInput } from '../../../../../api/backend/transport/input.schema.j
 
 import { misskeyId } from '../../../../../users/backend/users.input.schema.js';
 
-export const driveFoldersDeleteInput = objectInput({
-	"folderId": misskeyId,
-});
 export const driveFoldersDeleteErrors = {
 		noSuchFolder: {
 			message: 'No such folder.',
@@ -26,6 +23,8 @@ export const driveFoldersDeleteErrors = {
 			id: 'b0fc8a17-963c-405d-bfbc-859a487295e1',
 		},
 	} as const;
-export const driveFoldersDeleteContract = oc.$meta<{ requestName: 'drive/folders/delete' }>({ requestName: 'drive/folders/delete' })
+export const driveFoldersDeleteContract = oc.$meta({ requestName: 'drive/folders/delete' } as const)
 	.route({ method: 'POST', path: '/drive/folders/delete', operationId: 'post___drive___folders___delete', tags: ['drive'], spec: current => ({ ...current, security: [{ bearerAuth: [] }] }), successStatus: 204 })
-	.errors({ ...commonErrors, NO_SUCH_FOLDER: { status: 400, data: apiErrorData }, HAS_CHILD_FILES_OR_FOLDERS: { status: 400, data: apiErrorData } }).input(driveFoldersDeleteInput).output(v.void());
+	.errors({ ...commonErrors, NO_SUCH_FOLDER: { status: 400, data: apiErrorData }, HAS_CHILD_FILES_OR_FOLDERS: { status: 400, data: apiErrorData } }).input(objectInput({
+		"folderId": misskeyId,
+	})).output(v.void());

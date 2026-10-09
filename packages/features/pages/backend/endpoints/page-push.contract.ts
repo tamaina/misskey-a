@@ -11,19 +11,18 @@ import { packedJsonValueSchema, type PackedJsonValue } from '../../../users/back
 const misskeyId = v.pipe(v.string(), v.regex(/^[a-zA-Z0-9]+$/));
 
 export interface PagePushInput { pageId: string; event: string; var?: PackedJsonValue }
-export const pagePushInput: v.GenericSchema<PagePushInput, PagePushInput> = objectInput({
-	"pageId": misskeyId,
-	"event": v.string(),
-	"var": v.exactOptional(packedJsonValueSchema),
-});
-export const pagePushOutput = v.void();
+
 export const pagePushErrors = {
 	noSuchPage: { message: 'No such page.', code: 'NO_SUCH_PAGE', id: '4a13ad31-6729-46b4-b9af-e86b265c2e74' },
 } as const;
 
 const requestName = 'page-push';
-export const pagePushContract = oc.$meta<{ requestName: typeof requestName }>({ requestName })
+export const pagePushContract = oc.$meta({ requestName: requestName } as const)
 	.route({ method: 'POST', path: `/${requestName}`, operationId: 'post___' + requestName.replaceAll('/', '___'), tags: [], spec: current => ({ ...current, security: [{ bearerAuth: [] }] }), successStatus: 204, })
 	.errors({ ...commonErrors, NO_SUCH_PAGE: { status: 400, data: apiErrorData } })
-	.input(pagePushInput)
-	.output(pagePushOutput);
+	.input<v.GenericSchema<PagePushInput, PagePushInput>>(objectInput({
+		"pageId": misskeyId,
+		"event": v.string(),
+		"var": v.exactOptional(packedJsonValueSchema),
+	}))
+	.output(v.void());

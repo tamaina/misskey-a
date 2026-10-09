@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import type { InferSchemaOutput } from '@orpc/contract';
 import { implement } from '@orpc/server';
 import { Inject, Injectable } from '@nestjs/common';
 import * as v from 'valibot';
@@ -10,7 +11,7 @@ import { DI } from '@/di-symbols.js';
 import { authentication, apiPolicy, requirePrincipal } from '../../../../api/backend/transport/middleware.js';
 import { ChatService } from '../../services/ChatService.js';
 import { ChatEntityService } from '../../serializers/ChatEntityService.js';
-import { chatHistoryContract, chatHistoryPolicy, chatHistoryInput, chatHistoryOutput, chatHistoryErrors } from './history.contract.js';
+import { chatHistoryContract, chatHistoryPolicy, chatHistoryErrors } from './history.contract.js';
 import type { ApiActor } from '../../../../api/backend/transport/context.js';
 import type { ChatApiContext } from '../../operations.js';
 
@@ -30,11 +31,11 @@ export class ChatHistoryOperation {
 		private chatEntityService: ChatEntityService,
 		private chatService: ChatService,
 	) {}
-	async execute(ps: v.InferOutput<typeof chatHistoryInput>, me: MiLocalUser): Promise<v.InferOutput<typeof chatHistoryOutput>> {
-		return v.parse(chatHistoryOutput, await this.run(ps, me));
+	async execute(ps: InferSchemaOutput<NonNullable<typeof chatHistoryContract['~orpc']['inputSchema']>>, me: MiLocalUser): Promise<InferSchemaOutput<NonNullable<typeof chatHistoryContract['~orpc']['outputSchema']>>> {
+		return v.parse(requiredSchema(chatHistoryContract['~orpc'].outputSchema), await this.run(ps, me));
 	}
 
-	private async run(ps: v.InferOutput<typeof chatHistoryInput>, me: MiLocalUser) {
+	private async run(ps: InferSchemaOutput<NonNullable<typeof chatHistoryContract['~orpc']['inputSchema']>>, me: MiLocalUser) {
 		await this.chatService.checkChatAvailability(me.id, 'read');
 
 		const history = ps.room ? await this.chatService.roomHistory(me.id, ps.limit) : await this.chatService.userHistory(me.id, ps.limit);
@@ -60,4 +61,9 @@ export class ChatHistoryOperation {
 
 		return packedMessages;
 	}
+}
+
+function requiredSchema<Schema>(schema: Schema | undefined): Schema {
+	if (schema === undefined) throw new Error('Missing endpoint contract schema');
+	return schema;
 }

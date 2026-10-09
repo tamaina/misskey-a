@@ -11,8 +11,8 @@ import { DI } from '@/di-symbols.js';
 import { apiError } from '@features/api/backend/transport/orpc-error.js';
 
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
-import type * as v from 'valibot';
-import { flashLikeInput, flashLikeErrors } from '../../endpoints/flash/like.contract.js';
+import type { InferSchemaOutput } from '@orpc/contract';
+import { type flashLikeContract, flashLikeErrors } from '../../endpoints/flash/like.contract.js';
 
 @Injectable()
 export class FlashLikeApplicationService {
@@ -26,7 +26,7 @@ export class FlashLikeApplicationService {
 		private idService: IdService,
 	) {}
 
-	async execute(ps: v.InferOutput<typeof flashLikeInput>, me: MiLocalUser) {
+	async execute(ps: InferSchemaOutput<NonNullable<(typeof flashLikeContract)['~orpc']['inputSchema']>>, me: MiLocalUser) {
 		const flash = await this.flashsRepository.findOneBy({ id: ps.flashId });
 		if (flash == null) {
 			throw apiError(flashLikeErrors.noSuchFlash);

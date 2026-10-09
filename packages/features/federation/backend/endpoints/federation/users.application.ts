@@ -10,7 +10,8 @@ import { UserEntityService } from '../../../../users/backend/serializers/UserEnt
 import { DI } from '@/di-symbols.js';
 import type { MiUser } from '../../../../users/backend/models/User.js';
 import * as v from 'valibot';
-import { federationUsersInput, federationUsersOutput } from './users.contract.js';
+import type { FederationUsersInput, FederationUsersOutput } from './users.contract.js';
+import { federationUsersContract } from './users.contract.js';
 
 @Injectable()
 export class FederationUsersApplicationService {
@@ -22,7 +23,7 @@ export class FederationUsersApplicationService {
 		private queryService: QueryService,
 	) {}
 
-	public async execute(ps: v.InferOutput<typeof federationUsersInput>, me: MiUser | null): Promise<v.InferOutput<typeof federationUsersOutput>> {
+	public async execute(ps: FederationUsersInput, me: MiUser | null): Promise<FederationUsersOutput> {
 		const result = await (async () => {
 			const query = this.queryService.makePaginationQuery(this.usersRepository.createQueryBuilder('user'), ps.sinceId, ps.untilId, ps.sinceDate, ps.untilDate)
 				.andWhere('user.host = :host', { host: ps.host });
@@ -33,6 +34,6 @@ export class FederationUsersApplicationService {
 
 			return await this.userEntityService.packMany(users, me, { schema: 'UserDetailedNotMe' });
 		})();
-		return v.parse(federationUsersOutput, result);
+		return v.parse(federationUsersContract['~orpc'].outputSchema!, result);
 	}
 }

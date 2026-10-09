@@ -11,8 +11,8 @@ import { DI } from '@/di-symbols.js';
 import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
 import { apiError } from '@features/api/backend/transport/orpc-error.js';
 
-import * as v from 'valibot';
-import { voidVerifyEmailInput } from '../auth.schema.js';
+import type * as v from 'valibot';
+import type { VerifyEmailContract } from '../api.contract.js';
 
 export const meta = {
 	requireCredential: false,
@@ -38,7 +38,7 @@ export class VerifyEmailOperation {
 		private globalEventService: GlobalEventService,
 	) {}
 
-	async execute(ps: v.InferOutput<typeof voidVerifyEmailInput>) {
+	async execute(ps: v.InferOutput<NonNullable<typeof VerifyEmailContract['~orpc']['inputSchema']>>) {
 		const profile = await this.userProfilesRepository.findOneBy({
 			emailVerifyCode: ps.code,
 		});

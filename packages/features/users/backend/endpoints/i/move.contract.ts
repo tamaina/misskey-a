@@ -8,9 +8,6 @@ import * as v from 'valibot';
 import { commonErrors, apiErrorData } from '../../../../api/backend/transport/errors.schema.js';
 import { objectInput } from '../../users.input.schema.js';
 import { packedMeDetailedSchema } from '../../user.schema.js';
-export const inlineIMoveInput = objectInput({
-	'moveToAccount': v.string(),
-});
 export const iMoveErrors = {
 	destinationAccountForbids: {
 		message:
@@ -44,6 +41,8 @@ export const iMoveErrors = {
 		id: 'b234a14e-9ebe-4581-8000-074b3c215962',
 	},
 } as const;
-export const iMoveContract = oc.$meta<{ requestName: 'i/move' }>({ requestName: 'i/move' })
+export const iMoveContract = oc.$meta({ requestName: 'i/move' } as const)
 	.route({ method: 'POST', path: '/i/move', operationId: 'post___i___move', tags: ['users'], spec: current => ({ ...current, security: [{ bearerAuth: [] }] }) })
-	.errors({ ...commonErrors, DESTINATION_ACCOUNT_FORBIDS: { status: 400, data: apiErrorData }, NOT_ROOT_FORBIDDEN: { status: 400, data: apiErrorData }, NO_SUCH_USER: { status: 400, data: apiErrorData }, URI_NULL: { status: 400, data: apiErrorData }, ALREADY_MOVED: { status: 400, data: apiErrorData } }).input(inlineIMoveInput).output(packedMeDetailedSchema);
+	.errors({ ...commonErrors, DESTINATION_ACCOUNT_FORBIDS: { status: 400, data: apiErrorData }, NOT_ROOT_FORBIDDEN: { status: 400, data: apiErrorData }, NO_SUCH_USER: { status: 400, data: apiErrorData }, URI_NULL: { status: 400, data: apiErrorData }, ALREADY_MOVED: { status: 400, data: apiErrorData } }).input(objectInput({
+	'moveToAccount': v.string(),
+})).output(packedMeDetailedSchema);

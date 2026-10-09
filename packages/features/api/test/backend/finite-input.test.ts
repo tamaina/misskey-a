@@ -5,11 +5,15 @@
 
 import * as v from 'valibot';
 import { expect, expectTypeOf, test } from 'vitest';
-import { testInput as inlineTestInput, testOutput as inlineTestOutput } from '../../backend/endpoints/test.contract.js';
+import { testContract } from '../../backend/endpoints/test.contract.js';
 import { createProcedureClient } from '@orpc/server';
 import { mockDeep } from 'vitest-mock-extended';
 import type { ApiContext } from '../../backend/transport/context.js';
 import { createTestProcedure } from '../../backend/endpoints/test.js';
+
+const inlineTestInput = testContract['~orpc'].inputSchema;
+const inlineTestOutput = testContract['~orpc'].outputSchema;
+if (!inlineTestInput || !inlineTestOutput) throw new Error('test contract must declare its schemas');
 
 test('native test input exposes five declared fields and strips extensions without mutating the request', () => {
 	expectTypeOf<keyof v.InferInput<typeof inlineTestInput>>().toEqualTypeOf<'required' | 'string' | 'default' | 'nullableDefault' | 'id'>();

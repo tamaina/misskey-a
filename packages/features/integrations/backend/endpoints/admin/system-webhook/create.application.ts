@@ -8,7 +8,7 @@ import { SystemWebhookEntityService } from '../../../serializers/SystemWebhookEn
 import { SystemWebhookService } from '../../../services/SystemWebhookService.js';
 import type { MiUser } from '../../../../../users/backend/models/User.js';
 import * as v from 'valibot';
-import { adminSystemWebhookCreateInput, adminSystemWebhookCreateOutput } from './create.contract.js';
+import { adminSystemWebhookCreateContract } from './create.contract.js';
 
 @Injectable()
 export class AdminSystemWebhookCreateApplicationService {
@@ -17,7 +17,7 @@ export class AdminSystemWebhookCreateApplicationService {
 		private systemWebhookEntityService: SystemWebhookEntityService,
 	) {}
 
-	public async execute(ps: v.InferOutput<typeof adminSystemWebhookCreateInput>, me: MiUser): Promise<v.InferOutput<typeof adminSystemWebhookCreateOutput>> {
+	public async execute(ps: v.InferOutput<NonNullable<typeof adminSystemWebhookCreateContract['~orpc']['inputSchema']>>, me: MiUser): Promise<v.InferOutput<NonNullable<typeof adminSystemWebhookCreateContract['~orpc']['outputSchema']>>> {
 		const result = await (async () => {
 			const result = await this.systemWebhookService.createSystemWebhook(
 				{
@@ -32,6 +32,11 @@ export class AdminSystemWebhookCreateApplicationService {
 
 			return this.systemWebhookEntityService.pack(result);
 		})();
-		return v.parse(adminSystemWebhookCreateOutput, result);
+		return v.parse(requiredSchema(adminSystemWebhookCreateContract['~orpc'].outputSchema), result);
 	}
+}
+
+function requiredSchema<Schema>(schema: Schema | undefined): Schema {
+	if (schema === undefined) throw new Error('Contract must declare its schema');
+	return schema;
 }

@@ -7,13 +7,10 @@ import { oc } from '@orpc/contract';
 import * as v from 'valibot';
 import { objectInput } from '../../../../api/backend/transport/input.schema.js';
 import { commonErrors } from '../../../../api/backend/transport/errors.schema.js';
-const emptyInput = v.optional(v.lazy(input => Array.isArray(input) ? v.never() : objectInput({})), {});
 
-export const flushInput = emptyInput;
-export const flushOutput = v.void();
 const requestName = 'notifications/flush';
-export const flushContract = oc.$meta<{ requestName: typeof requestName }>({ requestName })
+export const flushContract = oc.$meta({ requestName: requestName } as const)
 	.route({ method: 'POST', path: `/${requestName}`, operationId: 'post___' + requestName.replaceAll('/', '___'), tags: ['notifications', 'account'], spec: current => ({ ...current, security: [{ bearerAuth: [] }] }), successStatus: 204 })
 	.errors(commonErrors)
-	.input(flushInput)
-	.output(flushOutput);
+	.input(v.optional(v.lazy(input => Array.isArray(input) ? v.never() : objectInput({})), {}))
+	.output(v.void());

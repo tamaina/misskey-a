@@ -8,8 +8,7 @@ import * as v from 'valibot';
 import { commonErrors } from '../../../../../api/backend/transport/errors.schema.js';
 import { objectInput } from '../../../../../api/backend/transport/input.schema.js';
 
-export const adminDriveCleanupInput = objectInput({});
 export const adminDriveCleanupErrors = {} as const;
-export const adminDriveCleanupContract = oc.$meta<{ requestName: 'admin/drive/cleanup' }>({ requestName: 'admin/drive/cleanup' })
+export const adminDriveCleanupContract = oc.$meta({ requestName: 'admin/drive/cleanup' } as const)
 	.route({ method: 'POST', path: '/admin/drive/cleanup', operationId: 'post___admin___drive___cleanup', tags: ['admin'], spec: current => ({ ...current, security: [{ bearerAuth: [] }] }), successStatus: 204 })
-	.errors({ ...commonErrors }).input(adminDriveCleanupInput).output(v.void());
+	.errors({ ...commonErrors }).input(objectInput({})).output(v.void());

@@ -3,12 +3,11 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { announcementsContract } from '../../backend/api.contract.js';
+
 import { expect, expectTypeOf, test } from 'vitest';
 import * as v from 'valibot';
 import { mockDeep } from 'vitest-mock-extended';
-
-import { announcementUpdateInput, announcementDeleteInput, announcementReadInput } from '../../backend/api.schema.js';
-const announcementCommandInputs = { 'admin/announcements/update': announcementUpdateInput, 'admin/announcements/delete': announcementDeleteInput, 'i/read-announcement': announcementReadInput };
 
 import { AnnouncementEntityService } from '../../backend/serializers/AnnouncementEntityService.js';
 import { AnnouncementService } from '../../backend/services/AnnouncementService.js';
@@ -28,6 +27,10 @@ import type { QueryService } from '@features/notes/backend/services/QueryService
 import type { IdService } from '@features/runtime/backend/services/IdService.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 import type { AnnouncementsRepository, AnnouncementReadsRepository } from '@features/persistence/backend/repositories/models.js';
+const announcementUpdateInput = requiredSchema(announcementsContract.update['~orpc'].inputSchema);
+const announcementDeleteInput = requiredSchema(announcementsContract.delete['~orpc'].inputSchema);
+const announcementReadInput = requiredSchema(announcementsContract.read['~orpc'].inputSchema);
+const announcementCommandInputs = { 'admin/announcements/update': announcementUpdateInput, 'admin/announcements/delete': announcementDeleteInput, 'i/read-announcement': announcementReadInput };
 
 function requiredSchema<S extends v.GenericSchema>(schema: S | undefined): S { if (schema === undefined) throw new Error('Missing native schema'); return schema; }
 

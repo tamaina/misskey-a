@@ -8,7 +8,8 @@ import { DataSource } from 'typeorm';
 import { DI } from '@/di-symbols.js';
 import type { MiUser } from '../../../../users/backend/models/User.js';
 import * as v from 'valibot';
-import { adminGetIndexStatsInput, adminGetIndexStatsOutput } from './get-index-stats.contract.js';
+import type { AdminGetIndexStatsInput, AdminGetIndexStatsOutput } from './get-index-stats.contract.js';
+import { adminGetIndexStatsContract } from './get-index-stats.contract.js';
 
 @Injectable()
 export class AdminGetIndexStatsApplicationService {
@@ -17,12 +18,12 @@ export class AdminGetIndexStatsApplicationService {
 		private db: DataSource,
 	) {}
 
-	public async execute(_ps: v.InferOutput<typeof adminGetIndexStatsInput>, _me: MiUser): Promise<v.InferOutput<typeof adminGetIndexStatsOutput>> {
+	public async execute(_ps: AdminGetIndexStatsInput, _me: MiUser): Promise<AdminGetIndexStatsOutput> {
 		const result = await (async () => {
 			const stats = await this.db.query<unknown>('SELECT * FROM pg_indexes;');
 
 			return stats;
 		})();
-		return v.parse(adminGetIndexStatsOutput, result);
+		return v.parse(adminGetIndexStatsContract['~orpc'].outputSchema!, result);
 	}
 }

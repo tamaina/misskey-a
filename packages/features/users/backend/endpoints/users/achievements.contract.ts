@@ -8,10 +8,9 @@ import * as v from 'valibot';
 import { commonErrors } from '../../../../api/backend/transport/errors.schema.js';
 import { objectInput, misskeyId } from '../../users.input.schema.js';
 import { packedAchievementSchema } from '../../user.schema.js';
-export const referenceUsersAchievementsInput = objectInput({
-	'userId': misskeyId,
-});
 export const usersAchievementsErrors = {} as const;
-export const usersAchievementsContract = oc.$meta<{ requestName: 'users/achievements' }>({ requestName: 'users/achievements' })
+export const usersAchievementsContract = oc.$meta({ requestName: 'users/achievements' } as const)
 	.route({ method: 'POST', path: '/users/achievements', operationId: 'post___users___achievements' })
-	.errors({ ...commonErrors }).input(referenceUsersAchievementsInput).output(v.array(packedAchievementSchema));
+	.errors({ ...commonErrors }).input(objectInput({
+	'userId': misskeyId,
+})).output(v.array(packedAchievementSchema));

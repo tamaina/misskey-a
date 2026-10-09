@@ -9,23 +9,21 @@ import { commonErrors, apiErrorData } from '../../../../api/backend/transport/er
 import { objectInput } from '../../../../api/backend/transport/input.schema.js';
 const misskeyId = v.pipe(v.string(), v.regex(/^[a-zA-Z0-9]+$/));
 
-export const flashUpdateInput = objectInput({
-	"flashId": misskeyId,
-	"title": v.exactOptional(v.string()),
-	"summary": v.exactOptional(v.string()),
-	"script": v.exactOptional(v.string()),
-	"permissions": v.exactOptional(v.array(v.string())),
-	"visibility": v.exactOptional(v.picklist(["public", "private"])),
-});
-export const flashUpdateOutput = v.void();
 export const flashUpdateErrors = {
 	noSuchFlash: { message: 'No such flash.', code: 'NO_SUCH_FLASH', id: '611e13d2-309e-419a-a5e4-e0422da39b02' },
 	accessDenied: { message: 'Access denied.', code: 'ACCESS_DENIED', id: '08e60c88-5948-478e-a132-02ec701d67b2' },
 } as const;
 
 const requestName = 'flash/update';
-export const flashUpdateContract = oc.$meta<{ requestName: typeof requestName }>({ requestName })
+export const flashUpdateContract = oc.$meta({ requestName: requestName } as const)
 	.route({ method: 'POST', path: `/${requestName}`, operationId: 'post___' + requestName.replaceAll('/', '___'), tags: ['flash'], spec: current => ({ ...current, security: [{ bearerAuth: [] }] }), successStatus: 204, })
 	.errors({ ...commonErrors, NO_SUCH_FLASH: { status: 400, data: apiErrorData }, ACCESS_DENIED: { status: 400, data: apiErrorData } })
-	.input(flashUpdateInput)
-	.output(flashUpdateOutput);
+	.input(objectInput({
+		"flashId": misskeyId,
+		"title": v.exactOptional(v.string()),
+		"summary": v.exactOptional(v.string()),
+		"script": v.exactOptional(v.string()),
+		"permissions": v.exactOptional(v.array(v.string())),
+		"visibility": v.exactOptional(v.picklist(["public", "private"])),
+	}))
+	.output(v.void());

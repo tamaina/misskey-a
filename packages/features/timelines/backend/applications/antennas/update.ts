@@ -9,7 +9,7 @@ import { GlobalEventService } from '@features/runtime/backend/services/GlobalEve
 import { apiError } from '@features/api/backend/transport/orpc-error.js';
 import { DI } from '@/di-symbols.js';
 import { AntennaEntityService } from '../../serializers/AntennaEntityService.js';
-import { antennasUpdateInput, antennasUpdateErrors } from '../../endpoints/antennas/update.contract.js';
+import { type antennasUpdateContract, antennasUpdateErrors } from '../../endpoints/antennas/update.contract.js';
 import type { AntennasRepository, UserListsRepository } from '@features/persistence/backend/repositories/models.js';
 
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
@@ -28,7 +28,7 @@ export class AntennasUpdateApplicationService {
 		private globalEventService: GlobalEventService,
 	) {}
 
-	async execute(ps: v.InferOutput<typeof antennasUpdateInput>, me: MiLocalUser) {
+	async execute(ps: v.InferOutput<NonNullable<typeof antennasUpdateContract['~orpc']['inputSchema']>>, me: MiLocalUser) {
 		if (ps.keywords && ps.excludeKeywords) {
 			if (ps.keywords.flat().every(x => x === '') && ps.excludeKeywords.flat().every(x => x === '')) {
 				throw apiError(antennasUpdateErrors.emptyKeyword);

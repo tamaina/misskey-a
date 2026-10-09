@@ -11,8 +11,8 @@ import { IdentifiableError } from '@features/runtime/backend/errors/identifiable
 import { PageService } from '../../services/PageService.js';
 
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
-import type * as v from 'valibot';
-import { pagesUpdateInput, pagesUpdateErrors } from '../../endpoints/pages/update.contract.js';
+import type { InferSchemaOutput } from '@orpc/contract';
+import { type pagesUpdateContract, pagesUpdateErrors } from '../../endpoints/pages/update.contract.js';
 
 @Injectable()
 export class PagesUpdateApplicationService {
@@ -23,7 +23,7 @@ export class PagesUpdateApplicationService {
 		private pageService: PageService,
 	) {}
 
-	async execute(ps: v.InferOutput<typeof pagesUpdateInput>, me: MiLocalUser) {
+	async execute(ps: InferSchemaOutput<NonNullable<(typeof pagesUpdateContract)['~orpc']['inputSchema']>>, me: MiLocalUser) {
 		try {
 			let eyeCatchingImage: MiDriveFile | null | undefined | string = ps.eyeCatchingImageId;
 			if (eyeCatchingImage != null) {

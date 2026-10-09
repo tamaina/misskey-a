@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import type { InferSchemaOutput } from '@orpc/contract';
 import { implement } from '@orpc/server';
 import { Inject, Injectable } from '@nestjs/common';
 
@@ -16,7 +17,7 @@ import { ChatService } from '../../../services/ChatService.js';
 import { authentication, apiPolicy, requirePrincipal } from '../../../../../api/backend/transport/middleware.js';
 import { apiError } from '../../../../../api/backend/transport/orpc-error.js';
 import { readErrorId } from '../../../request.schema.js';
-import { chatMessagesUserTimelineContract, chatMessagesUserTimelinePolicy, chatMessagesUserTimelineInput, chatMessagesUserTimelineOutput, chatMessagesUserTimelineErrors } from './user-timeline.contract.js';
+import { chatMessagesUserTimelineContract, chatMessagesUserTimelinePolicy, chatMessagesUserTimelineErrors } from './user-timeline.contract.js';
 import type { MiLocalUser } from '../../../../../users/backend/models/User.js';
 import type { ChatApiContext } from '../../../operations.js';
 import type { ApiActor } from '../../../../../api/backend/transport/context.js';
@@ -37,11 +38,11 @@ export class ChatMessagesUserTimelineOperation {
 		private getterService: GetterService,
 		private idService: IdService,
 	) {}
-	async execute(ps: v.InferOutput<typeof chatMessagesUserTimelineInput>, me: MiLocalUser): Promise<v.InferOutput<typeof chatMessagesUserTimelineOutput>> {
-		return v.parse(chatMessagesUserTimelineOutput, await this.run(ps, me));
+	async execute(ps: InferSchemaOutput<NonNullable<typeof chatMessagesUserTimelineContract['~orpc']['inputSchema']>>, me: MiLocalUser): Promise<InferSchemaOutput<NonNullable<typeof chatMessagesUserTimelineContract['~orpc']['outputSchema']>>> {
+		return v.parse(requiredSchema(chatMessagesUserTimelineContract['~orpc'].outputSchema), await this.run(ps, me));
 	}
 
-	private async run(ps: v.InferOutput<typeof chatMessagesUserTimelineInput>, me: MiLocalUser) {
+	private async run(ps: InferSchemaOutput<NonNullable<typeof chatMessagesUserTimelineContract['~orpc']['inputSchema']>>, me: MiLocalUser) {
 		const untilId = ps.untilId ?? (ps.untilDate ? this.idService.gen(ps.untilDate!) : null);
 		const sinceId = ps.sinceId ?? (ps.sinceDate ? this.idService.gen(ps.sinceDate!) : null);
 
@@ -58,4 +59,9 @@ export class ChatMessagesUserTimelineOperation {
 
 		return await this.chatEntityService.packMessagesLiteFor1on1(messages);
 	}
+}
+
+function requiredSchema<Schema>(schema: Schema | undefined): Schema {
+	if (schema === undefined) throw new Error('Missing endpoint contract schema');
+	return schema;
 }

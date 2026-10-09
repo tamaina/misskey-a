@@ -8,7 +8,7 @@ import { WebhookTestService } from '../../../services/WebhookTestService.js';
 import { apiError } from '../../../../../api/backend/transport/orpc-error.js';
 import type { MiUser } from '../../../../../users/backend/models/User.js';
 import * as v from 'valibot';
-import { iWebhooksTestInput, iWebhooksTestOutput, iWebhooksTestErrors } from './test.contract.js';
+import { iWebhooksTestErrors, iWebhooksTestContract } from './test.contract.js';
 
 @Injectable()
 export class IWebhooksTestApplicationService {
@@ -16,7 +16,7 @@ export class IWebhooksTestApplicationService {
 		private webhookTestService: WebhookTestService,
 	) {}
 
-	public async execute(ps: v.InferOutput<typeof iWebhooksTestInput>, me: MiUser): Promise<v.InferOutput<typeof iWebhooksTestOutput>> {
+	public async execute(ps: v.InferOutput<NonNullable<typeof iWebhooksTestContract['~orpc']['inputSchema']>>, me: MiUser): Promise<v.InferOutput<NonNullable<typeof iWebhooksTestContract['~orpc']['outputSchema']>>> {
 		const result = await (async () => {
 			try {
 				await this.webhookTestService.testUserWebhook({
@@ -31,6 +31,11 @@ export class IWebhooksTestApplicationService {
 				throw e;
 			}
 		})();
-		return v.parse(iWebhooksTestOutput, result);
+		return v.parse(requiredSchema(iWebhooksTestContract['~orpc'].outputSchema), result);
 	}
+}
+
+function requiredSchema<Schema>(schema: Schema | undefined): Schema {
+	if (schema === undefined) throw new Error('Contract must declare its schema');
+	return schema;
 }

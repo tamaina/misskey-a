@@ -9,12 +9,13 @@ import { objectInput } from '../../../../../api/backend/transport/input.schema.j
 import { commonErrors } from '../../../../../api/backend/transport/errors.schema.js';
 import { QUEUE_TYPES } from '../../../queue.schema.js';
 
-export const adminQueueResumeInput = objectInput({ queue: v.picklist(QUEUE_TYPES) });
-export const adminQueueResumeOutput = v.void();
 export const adminQueueResumeErrors = {} as const;
 
 const requestName = 'admin/queue/resume';
-export const adminQueueResumeContract = oc.$meta<{ requestName: typeof requestName }>({ requestName })
+export const adminQueueResumeContract = oc.$meta({ requestName: requestName } as const)
 	.route({ method: 'POST', path: `/${requestName}`, operationId: 'post___' + requestName.replaceAll('/', '___'), tags: ['admin'], spec: current => ({ ...current, security: [{ bearerAuth: [] }] }) })
 	.errors({ ...commonErrors })
-	.input(adminQueueResumeInput).output(adminQueueResumeOutput);
+	.input(objectInput({ queue: v.picklist(QUEUE_TYPES) })).output(v.void());
+
+export type AdminQueueResumeInput = v.InferOutput<NonNullable<typeof adminQueueResumeContract['~orpc']['inputSchema']>>;
+export type AdminQueueResumeOutput = v.InferOutput<NonNullable<typeof adminQueueResumeContract['~orpc']['outputSchema']>>;

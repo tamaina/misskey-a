@@ -11,14 +11,6 @@ import { objectInput } from '../../../../../api/backend/transport/input.schema.j
 import { misskeyId } from '../../../../../users/backend/users.input.schema.js';
 import { packedNoteSchema } from '../../../../../notes/backend/note.schema.js';
 
-export const driveFilesAttachedNotesInput = objectInput({
-	"sinceId": v.exactOptional(misskeyId),
-	"untilId": v.exactOptional(misskeyId),
-	"sinceDate": v.exactOptional(v.pipe(v.number(), v.integer())),
-	"untilDate": v.exactOptional(v.pipe(v.number(), v.integer())),
-	"limit": v.optional(v.pipe(v.pipe(v.number(), v.integer()), v.minValue(1), v.maxValue(100)), 10),
-	"fileId": misskeyId,
-});
 export const driveFilesAttachedNotesErrors = {
 		noSuchFile: {
 			message: 'No such file.',
@@ -26,6 +18,13 @@ export const driveFilesAttachedNotesErrors = {
 			id: 'c118ece3-2e4b-4296-99d1-51756e32d232',
 		},
 	} as const;
-export const driveFilesAttachedNotesContract = oc.$meta<{ requestName: 'drive/files/attached-notes' }>({ requestName: 'drive/files/attached-notes' })
+export const driveFilesAttachedNotesContract = oc.$meta({ requestName: 'drive/files/attached-notes' } as const)
 	.route({ method: 'POST', path: '/drive/files/attached-notes', operationId: 'post___drive___files___attached-notes', tags: ['drive', 'notes'], description: 'Find the notes to which the given file is attached.', spec: current => ({ ...current, security: [{ bearerAuth: [] }] }) })
-	.errors({ ...commonErrors, NO_SUCH_FILE: { status: 400, data: apiErrorData } }).input(driveFilesAttachedNotesInput).output(v.array(packedNoteSchema));
+	.errors({ ...commonErrors, NO_SUCH_FILE: { status: 400, data: apiErrorData } }).input(objectInput({
+		"sinceId": v.exactOptional(misskeyId),
+		"untilId": v.exactOptional(misskeyId),
+		"sinceDate": v.exactOptional(v.pipe(v.number(), v.integer())),
+		"untilDate": v.exactOptional(v.pipe(v.number(), v.integer())),
+		"limit": v.optional(v.pipe(v.pipe(v.number(), v.integer()), v.minValue(1), v.maxValue(100)), 10),
+		"fileId": misskeyId,
+	})).output(v.array(packedNoteSchema));

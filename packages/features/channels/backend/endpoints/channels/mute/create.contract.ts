@@ -9,8 +9,6 @@ import * as v from 'valibot';
 import { commonErrors, apiErrorData } from '../../../../../api/backend/transport/errors.schema.js';
 import { objectInput, misskeyId } from '../../../request.schema.js';
 
-export const channelsMuteCreateInput = objectInput({ channelId: misskeyId, expiresAt: v.pipe(v.exactOptional(v.nullable(v.pipe(v.number(), v.finite(), v.integer()))), v.metadata({ description: 'A Unix Epoch timestamp that must lie in the future. `null` means an indefinite mute.' })) });
-export const channelsMuteCreateOutput = v.void();
 export const channelsMuteCreateErrors = {
 		noSuchChannel: {
 			message: 'No such Channel.',
@@ -30,7 +28,7 @@ export const channelsMuteCreateErrors = {
 	} as const;
 export const channelsMuteCreatePolicy = { name: 'channels/mute/create', requireCredential: true, prohibitMoved: true, kind: 'write:channels' } as const;
 const security: OpenAPI.SecurityRequirementObject[] = [{ bearerAuth: [] }];
-export const channelsMuteCreateContract = oc.$meta<{ requestName: 'channels/mute/create' }>({ requestName: 'channels/mute/create' })
+export const channelsMuteCreateContract = oc.$meta({ requestName: 'channels/mute/create' } as const)
 	.route({ method: 'POST', path: '/channels/mute/create', operationId: 'post___channels___mute___create', tags: ['channels', 'mute'], spec: current => ({ ...current, security }), successStatus: 204 })
 	.errors({ ...commonErrors, NO_SUCH_CHANNEL: { status: 400, data: apiErrorData }, ALREADY_MUTING_CHANNEL: { status: 400, data: apiErrorData }, EXPIRES_AT_IS_PAST: { status: 400, data: apiErrorData } })
-	.input(channelsMuteCreateInput).output(channelsMuteCreateOutput);
+	.input(objectInput({ channelId: misskeyId, expiresAt: v.pipe(v.exactOptional(v.nullable(v.pipe(v.number(), v.finite(), v.integer()))), v.metadata({ description: 'A Unix Epoch timestamp that must lie in the future. `null` means an indefinite mute.' })) })).output(v.void());

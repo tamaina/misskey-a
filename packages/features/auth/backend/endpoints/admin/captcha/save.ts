@@ -7,8 +7,8 @@ import { Injectable } from '@nestjs/common';
 import { captchaErrorCodes, CaptchaService } from '../../../services/CaptchaService.js';
 import { apiError } from '@features/api/backend/transport/orpc-error.js';
 
-import * as v from 'valibot';
-import { portableAdminCaptchaSaveInput } from '../../../auth.schema.js';
+import type * as v from 'valibot';
+import type { AdminCaptchaSaveContract } from '../../../api.contract.js';
 
 export const meta = {
 	tags: ['admin', 'captcha'],
@@ -65,7 +65,7 @@ export class AdminCaptchaSaveOperation {
 		private captchaService: CaptchaService,
 	) {}
 
-	async execute(ps: v.InferOutput<typeof portableAdminCaptchaSaveInput>) {
+	async execute(ps: v.InferOutput<NonNullable<typeof AdminCaptchaSaveContract['~orpc']['inputSchema']>>) {
 		const result = await this.captchaService.save(ps.provider, {
 			sitekey: ps.sitekey,
 			secret: ps.secret,

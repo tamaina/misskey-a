@@ -10,8 +10,8 @@ import { RoleService } from '@features/roles/backend/services/RoleService.js';
 import { DI } from '@/di-symbols.js';
 import { apiError } from '@features/api/backend/transport/orpc-error.js';
 
-import * as v from 'valibot';
-import { voidInviteDeleteInput } from '../../auth.schema.js';
+import type * as v from 'valibot';
+import type { InviteDeleteContract } from '../../api.contract.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 
 export const meta = {
@@ -51,7 +51,7 @@ export class InviteDeleteOperation {
 		private roleService: RoleService,
 	) {}
 
-	async execute(ps: v.InferOutput<typeof voidInviteDeleteInput>, me: MiLocalUser) {
+	async execute(ps: v.InferOutput<NonNullable<typeof InviteDeleteContract['~orpc']['inputSchema']>>, me: MiLocalUser) {
 		const ticket = await this.registrationTicketsRepository.findOneBy({ id: ps.inviteId });
 		const isModerator = await this.roleService.isModerator(me);
 

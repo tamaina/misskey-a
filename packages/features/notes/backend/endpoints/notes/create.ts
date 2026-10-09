@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import type { InferSchemaOutput } from '@orpc/contract';
 import { implement } from '@orpc/server';
 import { Injectable } from '@nestjs/common';
 import { IdentifiableError } from '@features/runtime/backend/errors/identifiable-error.js';
@@ -12,7 +13,7 @@ import { NoteEntityService } from '../../serializers/NoteEntityService.js';
 import { authentication, apiPolicy, requirePrincipal } from '../../../../api/backend/transport/middleware.js';
 import { apiError } from '../../../../api/backend/transport/orpc-error.js';
 import { readErrorId } from '../../request.schema.js';
-import { notesCreateContract, notesCreatePolicy, notesCreateInput, notesCreateOutput, notesCreateErrors } from './create.contract.js';
+import { notesCreateContract, notesCreatePolicy, notesCreateErrors } from './create.contract.js';
 import type { MiLocalUser } from '../../../../users/backend/models/User.js';
 import type { NotesApiContext } from '../../operations.js';
 import type { ApiActor } from '../../../../api/backend/transport/context.js';
@@ -31,11 +32,11 @@ export class NotesCreateOperation {
 		private noteEntityService: NoteEntityService,
 		private noteCreateService: NoteCreateService,
 	) {}
-	async execute(ps: v.InferOutput<typeof notesCreateInput>, me: MiLocalUser): Promise<v.InferOutput<typeof notesCreateOutput>> {
-		return v.parse(notesCreateOutput, await this.run(ps, me));
+	async execute(ps: InferSchemaOutput<NonNullable<typeof notesCreateContract['~orpc']['inputSchema']>>, me: MiLocalUser): Promise<InferSchemaOutput<NonNullable<typeof notesCreateContract['~orpc']['outputSchema']>>> {
+		return v.parse(requiredSchema(notesCreateContract['~orpc'].outputSchema), await this.run(ps, me));
 	}
 
-	private async run(ps: v.InferOutput<typeof notesCreateInput>, me: MiLocalUser) {
+	private async run(ps: InferSchemaOutput<NonNullable<typeof notesCreateContract['~orpc']['inputSchema']>>, me: MiLocalUser) {
 		try {
 			const note = await this.noteCreateService.fetchAndCreate(me, {
 				createdAt: new Date(),
@@ -104,4 +105,9 @@ export class NotesCreateOperation {
 			throw err;
 		}
 	}
+}
+
+function requiredSchema<Schema>(schema: Schema | undefined): Schema {
+	if (schema === undefined) throw new Error('Missing endpoint contract schema');
+	return schema;
 }

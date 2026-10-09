@@ -14,8 +14,8 @@ import { DI } from '@/di-symbols.js';
 import { generateInviteCode } from '../../utility/generate-invite-code.js';
 import { apiError } from '@features/api/backend/transport/orpc-error.js';
 
-import * as v from 'valibot';
-import { packedInviteCreateInput } from '../../auth.schema.js';
+import type * as v from 'valibot';
+import type { InviteCreateContract } from '../../api.contract.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 
 export const meta = {
@@ -45,7 +45,7 @@ export class InviteCreateOperation {
 		private roleService: RoleService,
 	) {}
 
-	async execute(ps: v.InferOutput<typeof packedInviteCreateInput>, me: MiLocalUser) {
+	async execute(ps: v.InferOutput<NonNullable<typeof InviteCreateContract['~orpc']['inputSchema']>>, me: MiLocalUser) {
 		const policies = await this.roleService.getUserPolicies(me.id);
 
 		if (policies.inviteLimit) {

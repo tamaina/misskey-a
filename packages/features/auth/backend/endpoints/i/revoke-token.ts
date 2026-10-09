@@ -8,8 +8,8 @@ import type { MiAccessToken } from '../../models/AccessToken.js';
 import { DI } from '@/di-symbols.js';
 import { apiError } from '@features/api/backend/transport/orpc-error.js';
 
-import * as v from 'valibot';
-import { selectorIRevokeTokenInput } from '../../auth.schema.js';
+import type * as v from 'valibot';
+import type { IRevokeTokenContract } from '../../api.contract.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 import type { ApiToken } from '@features/api/backend/transport/context.js';
 
@@ -54,7 +54,7 @@ export class IRevokeTokenOperation {
 		private accessTokensRepository: TokenRevocationRepository,
 	) {}
 
-	async execute(ps: v.InferOutput<typeof selectorIRevokeTokenInput>, me: MiLocalUser | null, token: ApiToken | null) {
+	async execute(ps: v.InferOutput<NonNullable<typeof IRevokeTokenContract['~orpc']['inputSchema']>>, me: MiLocalUser | null, token: ApiToken | null) {
 		if (me == null) {
 			throw apiError(meta.errors.credentialRequired);
 		}

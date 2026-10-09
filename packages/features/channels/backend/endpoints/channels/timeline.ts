@@ -14,11 +14,12 @@ import { FanoutTimelineEndpointService } from '@features/timelines/backend/servi
 import { Brackets } from 'typeorm';
 
 import * as v from 'valibot';
+import { packedNoteSchema } from '../../../../notes/backend/note.schema.js';
 import { DI } from '@/di-symbols.js';
 import { ChannelMutingService } from '../../services/ChannelMutingService.js';
 import { authentication, apiPolicy } from '../../../../api/backend/transport/middleware.js';
 import { apiError } from '../../../../api/backend/transport/orpc-error.js';
-import { channelsTimelineContract, channelsTimelinePolicy, channelsTimelineInput, channelsTimelineOutput, channelsTimelineErrors } from './timeline.contract.js';
+import { channelsTimelineContract, channelsTimelinePolicy, channelsTimelineErrors } from './timeline.contract.js';
 import type { MiLocalUser } from '../../../../users/backend/models/User.js';
 import type { ChannelsRepository, MiMeta, NotesRepository } from '@features/persistence/backend/repositories/models.js';
 import type { ChannelsApiContext } from '../../operations.js';
@@ -50,11 +51,11 @@ export class ChannelsTimelineOperation {
 		private activeUsersChart: ActiveUsersChart,
 		private channelMutingService: ChannelMutingService,
 	) {}
-	async execute(ps: v.InferOutput<typeof channelsTimelineInput>, me: MiLocalUser | null): Promise<v.InferOutput<typeof channelsTimelineOutput>> {
-		return v.parse(channelsTimelineOutput, await this.run(ps, me));
+	async execute(ps: v.InferOutput<NonNullable<typeof channelsTimelineContract['~orpc']['inputSchema']>>, me: MiLocalUser | null): Promise<v.InferOutput<NonNullable<typeof channelsTimelineContract['~orpc']['outputSchema']>>> {
+		return v.parse(v.array(packedNoteSchema), await this.run(ps, me));
 	}
 
-	private async run(ps: v.InferOutput<typeof channelsTimelineInput>, me: MiLocalUser | null) {
+	private async run(ps: v.InferOutput<NonNullable<typeof channelsTimelineContract['~orpc']['inputSchema']>>, me: MiLocalUser | null) {
 		const untilId = ps.untilId ?? (ps.untilDate ? this.idService.gen(ps.untilDate!) : null);
 		const sinceId = ps.sinceId ?? (ps.sinceDate ? this.idService.gen(ps.sinceDate!) : null);
 

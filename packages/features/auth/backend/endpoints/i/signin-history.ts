@@ -10,8 +10,8 @@ import { QueryService } from '@features/notes/backend/services/QueryService.js';
 import { SigninEntityService } from '../../serializers/SigninEntityService.js';
 import { DI } from '@/di-symbols.js';
 
-import * as v from 'valibot';
-import { packedISigninHistoryInput } from '../../auth.schema.js';
+import type * as v from 'valibot';
+import type { ISigninHistoryContract } from '../../api.contract.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 
 export const meta = {
@@ -29,7 +29,7 @@ export class ISigninHistoryOperation {
 		private queryService: QueryService,
 	) {}
 
-	async execute(ps: v.InferOutput<typeof packedISigninHistoryInput>, me: MiLocalUser) {
+	async execute(ps: v.InferOutput<NonNullable<typeof ISigninHistoryContract['~orpc']['inputSchema']>>, me: MiLocalUser) {
 		const query = this.queryService.makePaginationQuery(this.signinsRepository.createQueryBuilder('signin'), ps.sinceId, ps.untilId, ps.sinceDate, ps.untilDate)
 			.andWhere('signin.userId = :meId', { meId: me.id });
 

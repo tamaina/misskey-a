@@ -10,7 +10,8 @@ import { UtilityService } from '../../../services/UtilityService.js';
 import { DI } from '@/di-symbols.js';
 import type { MiUser } from '../../../../../users/backend/models/User.js';
 import * as v from 'valibot';
-import { adminFederationRefreshRemoteInstanceMetadataInput, adminFederationRefreshRemoteInstanceMetadataOutput } from './refresh-remote-instance-metadata.contract.js';
+import type { AdminFederationRefreshRemoteInstanceMetadataInput, AdminFederationRefreshRemoteInstanceMetadataOutput } from './refresh-remote-instance-metadata.contract.js';
+import { adminFederationRefreshRemoteInstanceMetadataContract } from './refresh-remote-instance-metadata.contract.js';
 
 @Injectable()
 export class AdminFederationRefreshRemoteInstanceMetadataApplicationService {
@@ -22,7 +23,7 @@ export class AdminFederationRefreshRemoteInstanceMetadataApplicationService {
 		private fetchInstanceMetadataService: FetchInstanceMetadataService,
 	) {}
 
-	public async execute(ps: v.InferOutput<typeof adminFederationRefreshRemoteInstanceMetadataInput>, _me: MiUser): Promise<v.InferOutput<typeof adminFederationRefreshRemoteInstanceMetadataOutput>> {
+	public async execute(ps: AdminFederationRefreshRemoteInstanceMetadataInput, _me: MiUser): Promise<AdminFederationRefreshRemoteInstanceMetadataOutput> {
 		const result = await (async () => {
 			const instance = await this.instancesRepository.findOneBy({ host: this.utilityService.toPuny(ps.host) });
 
@@ -32,6 +33,6 @@ export class AdminFederationRefreshRemoteInstanceMetadataApplicationService {
 
 			this.fetchInstanceMetadataService.fetchInstanceMetadata(instance, true);
 		})();
-		return v.parse(adminFederationRefreshRemoteInstanceMetadataOutput, result);
+		return v.parse(adminFederationRefreshRemoteInstanceMetadataContract['~orpc'].outputSchema!, result);
 	}
 }

@@ -11,8 +11,8 @@ import { DI } from '@/di-symbols.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
-import type * as v from 'valibot';
-import { bubbleGameRankingInput } from '../../endpoints/bubble-game/ranking.contract.js';
+import type { InferSchemaOutput } from '@orpc/contract';
+import { type bubbleGameRankingContract } from '../../endpoints/bubble-game/ranking.contract.js';
 
 @Injectable()
 export class BubbleGameRankingApplicationService {
@@ -23,7 +23,7 @@ export class BubbleGameRankingApplicationService {
 		private userEntityService: UserEntityService,
 	) {}
 
-	async execute(ps: v.InferOutput<typeof bubbleGameRankingInput>, me: MiLocalUser | null) {
+	async execute(ps: InferSchemaOutput<NonNullable<(typeof bubbleGameRankingContract)['~orpc']['inputSchema']>>, me: MiLocalUser | null) {
 		const records = await this.bubbleGameRecordsRepository.find({
 			where: {
 				gameMode: ps.gameMode,

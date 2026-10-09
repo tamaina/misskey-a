@@ -11,8 +11,8 @@ import { generateNativeUserToken } from '../../utility/token.js';
 import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
 import { DI } from '@/di-symbols.js';
 
-import * as v from 'valibot';
-import { voidIRegenerateTokenInput } from '../../auth.schema.js';
+import type * as v from 'valibot';
+import type { IRegenerateTokenContract } from '../../api.contract.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 
 export const meta = {
@@ -33,7 +33,7 @@ export class IRegenerateTokenOperation {
 		private globalEventService: GlobalEventService,
 	) {}
 
-	async execute(ps: v.InferOutput<typeof voidIRegenerateTokenInput>, me: MiLocalUser) {
+	async execute(ps: v.InferOutput<NonNullable<typeof IRegenerateTokenContract['~orpc']['inputSchema']>>, me: MiLocalUser) {
 		const freshUser = await this.usersRepository.findOneByOrFail({ id: me.id });
 		const oldToken = freshUser.token!;
 

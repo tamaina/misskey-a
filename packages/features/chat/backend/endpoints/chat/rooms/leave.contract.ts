@@ -9,8 +9,6 @@ import * as v from 'valibot';
 import { commonErrors, apiErrorData } from '../../../../../api/backend/transport/errors.schema.js';
 import { objectInput, misskeyId } from '../../../request.schema.js';
 
-export const chatRoomsLeaveInput = objectInput({ roomId: misskeyId });
-export const chatRoomsLeaveOutput = v.void();
 export const chatRoomsLeaveErrors = {
 		noSuchRoom: {
 			message: 'No such room.',
@@ -20,7 +18,7 @@ export const chatRoomsLeaveErrors = {
 	} as const;
 export const chatRoomsLeavePolicy = { name: 'chat/rooms/leave', requireCredential: true, kind: 'write:chat' } as const;
 const security: OpenAPI.SecurityRequirementObject[] = [{ bearerAuth: [] }];
-export const chatRoomsLeaveContract = oc.$meta<{ requestName: 'chat/rooms/leave' }>({ requestName: 'chat/rooms/leave' })
+export const chatRoomsLeaveContract = oc.$meta({ requestName: 'chat/rooms/leave' } as const)
 	.route({ method: 'POST', path: '/chat/rooms/leave', operationId: 'post___chat___rooms___leave', tags: ['chat'], spec: current => ({ ...current, security }), successStatus: 204 })
 	.errors({ ...commonErrors, NO_SUCH_ROOM: { status: 400, data: apiErrorData } })
-	.input(chatRoomsLeaveInput).output(chatRoomsLeaveOutput);
+	.input(objectInput({ roomId: misskeyId })).output(v.void());

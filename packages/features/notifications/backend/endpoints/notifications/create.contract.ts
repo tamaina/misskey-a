@@ -8,11 +8,9 @@ import * as v from 'valibot';
 import { objectInput } from '../../../../api/backend/transport/input.schema.js';
 import { commonErrors } from '../../../../api/backend/transport/errors.schema.js';
 
-export const createInput = objectInput({ body: v.string(), header: v.exactOptional(v.nullable(v.string())), icon: v.exactOptional(v.nullable(v.string())) });
-export const createOutput = v.void();
 const requestName = 'notifications/create';
-export const createContract = oc.$meta<{ requestName: typeof requestName }>({ requestName })
+export const createContract = oc.$meta({ requestName: requestName } as const)
 	.route({ method: 'POST', path: `/${requestName}`, operationId: 'post___' + requestName.replaceAll('/', '___'), tags: ['notifications'], spec: current => ({ ...current, security: [{ bearerAuth: [] }] }), successStatus: 204 })
 	.errors(commonErrors)
-	.input(createInput)
-	.output(createOutput);
+	.input(objectInput({ body: v.string(), header: v.exactOptional(v.nullable(v.string())), icon: v.exactOptional(v.nullable(v.string())) }))
+	.output(v.void());

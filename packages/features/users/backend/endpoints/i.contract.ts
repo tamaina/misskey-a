@@ -4,11 +4,9 @@
  */
 
 import { oc } from '@orpc/contract';
-import * as v from 'valibot';
 import { commonErrors, apiErrorData } from '../../../api/backend/transport/errors.schema.js';
 import { objectInput } from '../users.input.schema.js';
 import { packedMeDetailedSchema } from '../user.schema.js';
-export const packedIInput = objectInput({});
 export const iErrors = {
 	userIsDeleted: {
 		message: 'User is deleted.',
@@ -17,6 +15,6 @@ export const iErrors = {
 		kind: 'permission',
 	},
 } as const;
-export const iContract = oc.$meta<{ requestName: 'i' }>({ requestName: 'i' })
+export const iContract = oc.$meta({ requestName: 'i' } as const)
 	.route({ method: 'POST', path: '/i', operationId: 'post___i', tags: ['account'], spec: current => ({ ...current, security: [{ bearerAuth: [] }] }) })
-	.errors({ ...commonErrors, USER_IS_DELETED: { status: 403, data: apiErrorData } }).input(packedIInput).output(packedMeDetailedSchema);
+	.errors({ ...commonErrors, USER_IS_DELETED: { status: 403, data: apiErrorData } }).input(objectInput({})).output(packedMeDetailedSchema);

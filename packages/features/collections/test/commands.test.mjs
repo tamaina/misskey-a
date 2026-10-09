@@ -6,11 +6,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createRouterClient } from '@orpc/server';
-import {
-	createCollectionsOperations,
-	createCollectionsRouter,
-	ClipService,
-} from '../../../backend/built/features/collections/backend.js';
+import { createCollectionsOperations, createCollectionsRouter, ClipService } from '../../../backend/built/features/collections/backend.js';
 
 const routeMethods = { 'clips/delete': 'clipsDelete', 'clips/add-note': 'clipsAddNote', 'clips/remove-note': 'clipsRemoveNote' };
 const collectionsErrors = {

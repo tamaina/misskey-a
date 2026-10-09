@@ -10,21 +10,6 @@ import { objectInput } from '../../../../api/backend/transport/input.schema.js';
 import { misskeyId, antennaName } from '../input.schema.js';
 import { packedAntennaSchema } from '../../antenna.schema.js';
 
-export const antennasCreateInput = objectInput({
-	'name': antennaName,
-	'src': v.picklist(['home', 'all', 'users', 'list', 'users_blacklist']),
-	'userListId': v.exactOptional(v.nullable(misskeyId)),
-	'keywords': v.array(v.array(v.string())),
-	'excludeKeywords': v.array(v.array(v.string())),
-	'users': v.array(v.string()),
-	'caseSensitive': v.boolean(),
-	'localOnly': v.exactOptional(v.boolean()),
-	'excludeBots': v.exactOptional(v.boolean()),
-	'withReplies': v.boolean(),
-	'withFile': v.boolean(),
-	'excludeNotesInSensitiveChannel': v.exactOptional(v.boolean()),
-});
-export const antennasCreateOutput = packedAntennaSchema;
 export const antennasCreateErrors = {
 	noSuchUserList: { message: 'No such user list.', code: 'NO_SUCH_USER_LIST', id: '95063e93-a283-4b8b-9aa5-bcdb8df69a7f' },
 	tooManyAntennas: { message: 'You cannot create antenna any more.', code: 'TOO_MANY_ANTENNAS', id: 'faf47050-e8b5-438c-913c-db2b1576fde4' },
@@ -32,8 +17,21 @@ export const antennasCreateErrors = {
 } as const;
 
 const requestName = 'antennas/create';
-export const antennasCreateContract = oc.$meta<{ requestName: typeof requestName }>({ requestName })
+export const antennasCreateContract = oc.$meta({ requestName: requestName } as const)
 	.route({ method: 'POST', path: `/${requestName}`, operationId: 'post___' + requestName.replaceAll('/', '___'), tags: ['antennas'], spec: current => ({ ...current, security: [{ bearerAuth: [] }] }) })
 	.errors({ ...commonErrors, NO_SUCH_USER_LIST: { status: 400, data: apiErrorData }, TOO_MANY_ANTENNAS: { status: 400, data: apiErrorData }, EMPTY_KEYWORD: { status: 400, data: apiErrorData } })
-	.input(antennasCreateInput)
-	.output(antennasCreateOutput);
+	.input(objectInput({
+		'name': antennaName,
+		'src': v.picklist(['home', 'all', 'users', 'list', 'users_blacklist']),
+		'userListId': v.exactOptional(v.nullable(misskeyId)),
+		'keywords': v.array(v.array(v.string())),
+		'excludeKeywords': v.array(v.array(v.string())),
+		'users': v.array(v.string()),
+		'caseSensitive': v.boolean(),
+		'localOnly': v.exactOptional(v.boolean()),
+		'excludeBots': v.exactOptional(v.boolean()),
+		'withReplies': v.boolean(),
+		'withFile': v.boolean(),
+		'excludeNotesInSensitiveChannel': v.exactOptional(v.boolean()),
+	}))
+	.output(packedAntennaSchema);

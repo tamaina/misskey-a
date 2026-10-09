@@ -9,8 +9,6 @@ import * as v from 'valibot';
 import { commonErrors, apiErrorData } from '../../../../../api/backend/transport/errors.schema.js';
 import { objectInput, misskeyId } from '../../../request.schema.js';
 
-export const chatMessagesUnreactInput = objectInput({ messageId: misskeyId, reaction: v.string() });
-export const chatMessagesUnreactOutput = v.void();
 export const chatMessagesUnreactErrors = {
 		noSuchMessage: {
 			message: 'No such message.',
@@ -20,7 +18,7 @@ export const chatMessagesUnreactErrors = {
 	} as const;
 export const chatMessagesUnreactPolicy = { name: 'chat/messages/unreact', requireCredential: true, kind: 'write:chat' } as const;
 const security: OpenAPI.SecurityRequirementObject[] = [{ bearerAuth: [] }];
-export const chatMessagesUnreactContract = oc.$meta<{ requestName: 'chat/messages/unreact' }>({ requestName: 'chat/messages/unreact' })
+export const chatMessagesUnreactContract = oc.$meta({ requestName: 'chat/messages/unreact' } as const)
 	.route({ method: 'POST', path: '/chat/messages/unreact', operationId: 'post___chat___messages___unreact', tags: ['chat'], spec: current => ({ ...current, security }), successStatus: 204 })
 	.errors({ ...commonErrors, NO_SUCH_MESSAGE: { status: 400, data: apiErrorData } })
-	.input(chatMessagesUnreactInput).output(chatMessagesUnreactOutput);
+	.input(objectInput({ messageId: misskeyId, reaction: v.string() })).output(v.void());

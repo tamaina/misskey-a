@@ -8,9 +8,8 @@ import * as v from 'valibot';
 import { commonErrors } from '../../../api/backend/transport/errors.schema.js';
 import { objectInput } from './input.schema.js';
 
-export const endpointInput = objectInput({ endpoint: v.string() });
-export const endpointContract = oc.$meta<{ requestName: 'endpoint'; allowGet: boolean; cacheSec?: number }>({ requestName: 'endpoint', allowGet: false })
+export const endpointContract = oc.$meta({ requestName: 'endpoint', allowGet: false } as const)
 	.route({ method: 'POST', path: '/endpoint', operationId: 'post___endpoint', tags: ['meta'] })
 	.errors({ ...commonErrors })
-	.input(endpointInput)
+	.input(objectInput({ endpoint: v.string() }))
 	.output(v.nullable(v.strictObject({ params: v.array(v.strictObject({ name: v.string(), type: v.string() })) })));

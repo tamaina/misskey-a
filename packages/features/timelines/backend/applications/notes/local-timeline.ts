@@ -16,7 +16,7 @@ import { apiError } from '@features/api/backend/transport/orpc-error.js';
 import { DI } from '@/di-symbols.js';
 import { FanoutTimelineEndpointService } from '../../services/FanoutTimelineEndpointService.js';
 
-import { notesLocalTimelineInput, notesLocalTimelineErrors } from '../../endpoints/notes/local-timeline.contract.js';
+import { type notesLocalTimelineContract, notesLocalTimelineErrors } from '../../endpoints/notes/local-timeline.contract.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 import type * as v from 'valibot';
 import type { MiMeta, NotesRepository } from '@features/persistence/backend/repositories/models.js';
@@ -39,7 +39,7 @@ export class NotesLocalTimelineApplicationService {
 		private channelMutingService: ChannelMutingService,
 	) {}
 
-	async execute(ps: v.InferOutput<typeof notesLocalTimelineInput>, me: MiLocalUser | null) {
+	async execute(ps: v.InferOutput<NonNullable<typeof notesLocalTimelineContract['~orpc']['inputSchema']>>, me: MiLocalUser | null) {
 		const untilId = ps.untilId ?? (ps.untilDate ? this.idService.gen(ps.untilDate!) : null);
 		const sinceId = ps.sinceId ?? (ps.sinceDate ? this.idService.gen(ps.sinceDate!) : null);
 

@@ -8,8 +8,9 @@ import * as v from 'valibot';
 import { commonErrors } from '../../../../api/backend/transport/errors.schema.js';
 import { objectInput } from '../../../../api/backend/transport/input.schema.js';
 
-export const iExportFavoritesInput = v.optional(objectInput({}), {});
 export const iExportFavoritesErrors = {} as const;
-export const iExportFavoritesContract = oc.$meta<{ requestName: 'i/export-favorites' }>({ requestName: 'i/export-favorites' })
+export const iExportFavoritesContract = oc.$meta({ requestName: 'i/export-favorites' } as const)
 	.route({ method: 'POST', path: '/i/export-favorites', operationId: 'post___i___export-favorites', successStatus: 204, spec: current => ({ ...current, security: [{ bearerAuth: [] }] }) })
-	.errors({ ...commonErrors }).input(iExportFavoritesInput).output(v.void());
+	.errors({ ...commonErrors }).input(v.optional(objectInput({}), {})).output(v.void());
+
+export type IExportFavoritesInput = v.InferOutput<NonNullable<typeof iExportFavoritesContract['~orpc']['inputSchema']>>;

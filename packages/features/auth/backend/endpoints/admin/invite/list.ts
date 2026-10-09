@@ -9,8 +9,8 @@ import type { RegistrationTicketsRepository } from '@features/persistence/backen
 import { InviteCodeEntityService } from '../../../serializers/InviteCodeEntityService.js';
 import { DI } from '@/di-symbols.js';
 
-import * as v from 'valibot';
-import { packedAdminInviteListInput } from '../../../auth.schema.js';
+import type * as v from 'valibot';
+import type { AdminInviteListContract } from '../../../api.contract.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 
 export const meta = {
@@ -30,7 +30,7 @@ export class AdminInviteListOperation {
 		private inviteCodeEntityService: InviteCodeEntityService,
 	) {}
 
-	async execute(ps: v.InferOutput<typeof packedAdminInviteListInput>, me: MiLocalUser) {
+	async execute(ps: v.InferOutput<NonNullable<typeof AdminInviteListContract['~orpc']['inputSchema']>>, me: MiLocalUser) {
 		const query = this.registrationTicketsRepository.createQueryBuilder('ticket')
 			.leftJoinAndSelect('ticket.createdBy', 'createdBy')
 			.leftJoinAndSelect('ticket.usedBy', 'usedBy');

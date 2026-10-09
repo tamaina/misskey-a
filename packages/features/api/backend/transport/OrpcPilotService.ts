@@ -125,9 +125,9 @@ import { DriveManagementApplicationService } from '@features/drive/backend/manag
 import { PortabilityApplicationService } from '@features/portability/backend/api.application.js';
 import { AuthApplicationService } from '@features/auth/backend/api.application.js';
 import { createModerationOperations } from '@features/moderation/backend/api.operations.js';
-import { moderationOutputs } from '@features/moderation/backend/api.schema.js';
+import { moderationContract } from '@features/moderation/backend/api.contract.js';
 import { createRolesOperations } from '@features/roles/backend/api.operations.js';
-import { rolesOutputs } from '@features/roles/backend/api.schema.js';
+import { rolesContract } from '@features/roles/backend/api.contract.js';
 import { RoleEntityService } from '@features/roles/backend/serializers/RoleEntityService.js';
 import { AbuseUserReportEntityService } from '@features/moderation/backend/serializers/AbuseUserReportEntityService.js';
 import { AbuseReportNotificationRecipientEntityService } from '@features/moderation/backend/serializers/AbuseReportNotificationRecipientEntityService.js';
@@ -147,7 +147,7 @@ import { RelationshipsApplicationService } from '@features/relationships/backend
 import { createTimelinesOperations } from '@features/timelines/backend/operations.js';
 import { createNoteSearchOperations } from '@features/note-search/backend/operations.js';
 import { createCollectionsOperations } from '@features/collections/backend/api.operations.js';
-import { collectionsOutputs } from '@features/collections/backend/api.schema.js';
+import { collectionsContract } from '@features/collections/backend/api.contract.js';
 import { AdminPromoCreateOperation } from '@features/notes/backend/endpoints/admin/promo/create.js';
 import { IPinOperation } from '@features/notes/backend/endpoints/i/pin.js';
 import { IUnpinOperation } from '@features/notes/backend/endpoints/i/unpin.js';
@@ -277,6 +277,11 @@ import type { MiMeta, UsersRepository } from '@features/persistence/backend/repo
 import type { UploadResource } from './context.js';
 import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 
+function requiredSchema<T>(schema: T | undefined): T {
+	if (schema === undefined) throw new Error('Contract must declare an output schema');
+	return schema;
+}
+
 /** DI composition only; applications and native procedures own behavior. */
 @Injectable()
 export class OrpcPilotService {
@@ -373,9 +378,9 @@ export class OrpcPilotService {
 					moderationLogsRepository: moduleRef.get<ModerationLogsRepository>(DI.moderationLogsRepository, { strict: false }),
 					queryService, idService, roleService: roles, roleEntityService,
 					userEntityService: { packMany: async (rows, actor, options) => (await userEntityService.packMany(rows, actor, options)).map(toPackedUserDetailed) },
-					abuseReportNotificationRecipientEntityService: { pack: async row => v.parse(moderationOutputs.adminAbuseReportNotificationRecipientShow, await recipientEntityService.pack(row)), packMany: async rows => v.parse(moderationOutputs.adminAbuseReportNotificationRecipientList, await recipientEntityService.packMany(rows)) },
-					abuseUserReportEntityService: { packMany: async rows => v.parse(moderationOutputs.adminAbuseUserReports, await reportEntityService.packMany(rows)) },
-					moderationLogEntityService: { packMany: async rows => v.parse(moderationOutputs.adminShowModerationLogs, await logEntityService.packMany(rows)) },
+					abuseReportNotificationRecipientEntityService: { pack: async row => v.parse(requiredSchema(moderationContract.adminAbuseReportNotificationRecipientShow['~orpc'].outputSchema), await recipientEntityService.pack(row)), packMany: async rows => v.parse(requiredSchema(moderationContract.adminAbuseReportNotificationRecipientList['~orpc'].outputSchema), await recipientEntityService.packMany(rows)) },
+					abuseUserReportEntityService: { packMany: async rows => v.parse(requiredSchema(moderationContract.adminAbuseUserReports['~orpc'].outputSchema), await reportEntityService.packMany(rows)) },
+					moderationLogEntityService: { packMany: async rows => v.parse(requiredSchema(moderationContract.adminShowModerationLogs['~orpc'].outputSchema), await logEntityService.packMany(rows)) },
 					abuseReportNotificationService: moduleRef.get(AbuseReportNotificationService, { strict: false }),
 					abuseReportService: moduleRef.get(AbuseReportService, { strict: false }),
 					getterService: getter, userSuspendService: moduleRef.get(UserSuspendService, { strict: false }), moderationLogService,
@@ -387,7 +392,7 @@ export class OrpcPilotService {
 					notesRepository: moduleRef.get<NotesRepository>(DI.notesRepository, { strict: false }),
 					queryService, idService, roleService: roles, roleEntityService,
 					userEntityService: { pack: async (row, actor, options) => toPackedUserDetailed(await userEntityService.pack(row, actor, options)), packMany: async (rows, actor, options) => (await userEntityService.packMany(rows, actor, options)).map(toPackedUserDetailed) },
-					noteEntityService: { packMany: async (rows, actor) => v.parse(rolesOutputs.rolesNotes, await noteEntityService.packMany(rows, actor)) },
+					noteEntityService: { packMany: async (rows, actor) => v.parse(requiredSchema(rolesContract.rolesNotes['~orpc'].outputSchema), await noteEntityService.packMany(rows, actor)) },
 					metaService, globalEventService: moduleRef.get(GlobalEventService, { strict: false }), moderationLogService,
 					fanoutTimelineService: moduleRef.get(FanoutTimelineService, { strict: false }), channelMutingService: moduleRef.get(ChannelMutingService, { strict: false }),
 				}),
@@ -580,11 +585,11 @@ export class OrpcPilotService {
 					galleryPostsRepository: moduleRef.get<GalleryPostsRepository>(DI.galleryPostsRepository, { strict: false }),
 					galleryLikesRepository: moduleRef.get<GalleryLikesRepository>(DI.galleryLikesRepository, { strict: false }),
 					driveFilesRepository: driveFiles, usersRepository: users, clipService,
-					clipEntityService: { pack: async (row, actor) => v.parse(collectionsOutputs.clipsShow, await clipEntityService.pack(row, actor)), packMany: async (rows, actor) => v.parse(collectionsOutputs.clipsList, await clipEntityService.packMany(rows, actor)) },
-					noteEntityService: { packMany: async (rows, actor) => v.parse(collectionsOutputs.clipsNotes, await noteEntityService.packMany(rows, actor)), isVisibleForMe: (note, actorId) => noteEntityService.isVisibleForMe(note, actorId) },
-					noteFavoriteEntityService: { packMany: async (rows, actor) => v.parse(collectionsOutputs.iFavorites, await noteFavoriteEntityService.packMany(rows, actor)) },
-					galleryPostEntityService: { pack: async (row, actor) => v.parse(collectionsOutputs.galleryPostsShow, await galleryPostEntityService.pack(row, actor)), packMany: async (rows, actor) => v.parse(collectionsOutputs.galleryPosts, await galleryPostEntityService.packMany(rows, actor)) },
-					galleryLikeEntityService: { packMany: async (rows, actor) => v.parse(collectionsOutputs.iGalleryLikes, await galleryLikeEntityService.packMany(rows, actor)) },
+					clipEntityService: { pack: async (row, actor) => v.parse(requiredSchema(collectionsContract.clipsShow['~orpc'].outputSchema), await clipEntityService.pack(row, actor)), packMany: async (rows, actor) => v.parse(requiredSchema(collectionsContract.clipsList['~orpc'].outputSchema), await clipEntityService.packMany(rows, actor)) },
+					noteEntityService: { packMany: async (rows, actor) => v.parse(requiredSchema(collectionsContract.clipsNotes['~orpc'].outputSchema), await noteEntityService.packMany(rows, actor)), isVisibleForMe: (note, actorId) => noteEntityService.isVisibleForMe(note, actorId) },
+					noteFavoriteEntityService: { packMany: async (rows, actor) => v.parse(requiredSchema(collectionsContract.iFavorites['~orpc'].outputSchema), await noteFavoriteEntityService.packMany(rows, actor)) },
+					galleryPostEntityService: { pack: async (row, actor) => v.parse(requiredSchema(collectionsContract.galleryPostsShow['~orpc'].outputSchema), await galleryPostEntityService.pack(row, actor)), packMany: async (rows, actor) => v.parse(requiredSchema(collectionsContract.galleryPosts['~orpc'].outputSchema), await galleryPostEntityService.packMany(rows, actor)) },
+					galleryLikeEntityService: { packMany: async (rows, actor) => v.parse(requiredSchema(collectionsContract.iGalleryLikes['~orpc'].outputSchema), await galleryLikeEntityService.packMany(rows, actor)) },
 					queryService, getterService: getter, idService, roleService: roles, moderationLogService, achievementService, featuredService,
 				}),
 				instance: createInstanceOperations<MiLocalUser>({ adsRepository: ads, usersRepository: users,

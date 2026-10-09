@@ -10,15 +10,6 @@ import { packedNoteReactionWithNoteSchema } from '../../note-aux.schema.js';
 import { objectInput, misskeyId } from '../../request.schema.js';
 import type { OpenAPI } from '@orpc/contract';
 
-export const usersReactionsInput = objectInput({
-	'userId': misskeyId,
-	'limit': v.optional(v.pipe(v.pipe(v.pipe(v.number(), v.finite()), v.integer()), v.minValue(1), v.maxValue(100)), 10),
-	'sinceId': v.exactOptional(misskeyId),
-	'untilId': v.exactOptional(misskeyId),
-	'sinceDate': v.exactOptional(v.pipe(v.pipe(v.number(), v.finite()), v.integer())),
-	'untilDate': v.exactOptional(v.pipe(v.pipe(v.number(), v.finite()), v.integer())),
-});
-export const usersReactionsOutput = v.array(packedNoteReactionWithNoteSchema);
 export const usersReactionsErrors = {
 	reactionsNotPublic: {
 		message: 'Reactions of the user is not public.',
@@ -33,7 +24,14 @@ export const usersReactionsErrors = {
 } as const;
 export const usersReactionsPolicy = { name: 'users/reactions', requireCredential: false } as const;
 const security: OpenAPI.SecurityRequirementObject[] = [{}, { bearerAuth: [] }];
-export const usersReactionsContract = oc.$meta<{ requestName: 'users/reactions' }>({ requestName: 'users/reactions' })
+export const usersReactionsContract = oc.$meta({ requestName: 'users/reactions' } as const)
 	.route({ method: 'POST', path: '/users/reactions', operationId: 'post___users___reactions', tags: ['users', 'reactions'], spec: current => ({ ...current, security }) })
 	.errors({ ...commonErrors, REACTIONS_NOT_PUBLIC: { status: 400, data: apiErrorData }, IS_REMOTE_USER: { status: 400, data: apiErrorData } })
-	.input(usersReactionsInput).output(usersReactionsOutput);
+	.input(objectInput({
+	'userId': misskeyId,
+	'limit': v.optional(v.pipe(v.pipe(v.pipe(v.number(), v.finite()), v.integer()), v.minValue(1), v.maxValue(100)), 10),
+	'sinceId': v.exactOptional(misskeyId),
+	'untilId': v.exactOptional(misskeyId),
+	'sinceDate': v.exactOptional(v.pipe(v.pipe(v.number(), v.finite()), v.integer())),
+	'untilDate': v.exactOptional(v.pipe(v.pipe(v.number(), v.finite()), v.integer())),
+})).output(v.array(packedNoteReactionWithNoteSchema));

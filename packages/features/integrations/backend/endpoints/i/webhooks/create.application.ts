@@ -12,7 +12,7 @@ import { RoleService } from '../../../../../roles/backend/services/RoleService.j
 import { apiError } from '../../../../../api/backend/transport/orpc-error.js';
 import type { MiUser } from '../../../../../users/backend/models/User.js';
 import * as v from 'valibot';
-import { iWebhooksCreateInput, iWebhooksCreateOutput, iWebhooksCreateErrors } from './create.contract.js';
+import { iWebhooksCreateErrors, iWebhooksCreateContract } from './create.contract.js';
 
 @Injectable()
 export class IWebhooksCreateApplicationService {
@@ -25,7 +25,7 @@ export class IWebhooksCreateApplicationService {
 		private roleService: RoleService,
 	) {}
 
-	public async execute(ps: v.InferOutput<typeof iWebhooksCreateInput>, me: MiUser): Promise<v.InferOutput<typeof iWebhooksCreateOutput>> {
+	public async execute(ps: v.InferOutput<NonNullable<typeof iWebhooksCreateContract['~orpc']['inputSchema']>>, me: MiUser): Promise<v.InferOutput<NonNullable<typeof iWebhooksCreateContract['~orpc']['outputSchema']>>> {
 		const result = await (async () => {
 			const currentWebhooksCount = await this.webhooksRepository.countBy({
 				userId: me.id,
@@ -57,6 +57,11 @@ export class IWebhooksCreateApplicationService {
 				latestStatus: webhook.latestStatus,
 			};
 		})();
-		return v.parse(iWebhooksCreateOutput, result);
+		return v.parse(requiredSchema(iWebhooksCreateContract['~orpc'].outputSchema), result);
 	}
+}
+
+function requiredSchema<Schema>(schema: Schema | undefined): Schema {
+	if (schema === undefined) throw new Error('Contract must declare its schema');
+	return schema;
 }

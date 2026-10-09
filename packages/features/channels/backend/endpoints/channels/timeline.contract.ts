@@ -10,16 +10,6 @@ import { commonErrors, apiErrorData } from '../../../../api/backend/transport/er
 import { packedNoteSchema } from '../../../../notes/backend/note.schema.js';
 import { objectInput, misskeyId } from '../../request.schema.js';
 
-export const channelsTimelineInput = objectInput({
-	"channelId": misskeyId,
-	"limit": v.optional(v.pipe(v.pipe(v.pipe(v.number(), v.finite()), v.integer()), v.minValue(1), v.maxValue(100)), 10),
-	"sinceId": v.exactOptional(misskeyId),
-	"untilId": v.exactOptional(misskeyId),
-	"sinceDate": v.exactOptional(v.pipe(v.pipe(v.number(), v.finite()), v.integer())),
-	"untilDate": v.exactOptional(v.pipe(v.pipe(v.number(), v.finite()), v.integer())),
-	"allowPartial": v.optional(v.boolean(), false),
-});
-export const channelsTimelineOutput = v.array(packedNoteSchema);
 export const channelsTimelineErrors = {
 		noSuchChannel: {
 			message: 'No such channel.',
@@ -29,7 +19,15 @@ export const channelsTimelineErrors = {
 	} as const;
 export const channelsTimelinePolicy = { name: 'channels/timeline', requireCredential: false } as const;
 const security: OpenAPI.SecurityRequirementObject[] = [{}, { bearerAuth: [] }];
-export const channelsTimelineContract = oc.$meta<{ requestName: 'channels/timeline' }>({ requestName: 'channels/timeline' })
+export const channelsTimelineContract = oc.$meta({ requestName: 'channels/timeline' } as const)
 	.route({ method: 'POST', path: '/channels/timeline', operationId: 'post___channels___timeline', tags: ['notes', 'channels'], spec: current => ({ ...current, security }) })
 	.errors({ ...commonErrors, NO_SUCH_CHANNEL: { status: 400, data: apiErrorData } })
-	.input(channelsTimelineInput).output(channelsTimelineOutput);
+	.input(objectInput({
+		"channelId": misskeyId,
+		"limit": v.optional(v.pipe(v.pipe(v.pipe(v.number(), v.finite()), v.integer()), v.minValue(1), v.maxValue(100)), 10),
+		"sinceId": v.exactOptional(misskeyId),
+		"untilId": v.exactOptional(misskeyId),
+		"sinceDate": v.exactOptional(v.pipe(v.pipe(v.number(), v.finite()), v.integer())),
+		"untilDate": v.exactOptional(v.pipe(v.pipe(v.number(), v.finite()), v.integer())),
+		"allowPartial": v.optional(v.boolean(), false),
+	})).output(v.array(packedNoteSchema));

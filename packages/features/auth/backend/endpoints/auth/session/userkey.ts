@@ -10,8 +10,8 @@ import { UserEntityService } from '@features/users/backend/serializers/UserEntit
 import { DI } from '@/di-symbols.js';
 import { apiError } from '@features/api/backend/transport/orpc-error.js';
 
-import * as v from 'valibot';
-import { packedAuthSessionUserkeyInput } from '../../../auth.schema.js';
+import type * as v from 'valibot';
+import type { AuthSessionUserkeyContract } from '../../../api.contract.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 
 export const meta = {
@@ -55,7 +55,7 @@ export class AuthSessionUserkeyOperation {
 		private userEntityService: UserEntityService,
 	) {}
 
-	async execute(ps: v.InferOutput<typeof packedAuthSessionUserkeyInput>, me: MiLocalUser | null) {
+	async execute(ps: v.InferOutput<NonNullable<typeof AuthSessionUserkeyContract['~orpc']['inputSchema']>>, me: MiLocalUser | null) {
 		// Lookup app
 		const app = await this.appsRepository.findOneBy({
 			secret: ps.appSecret,

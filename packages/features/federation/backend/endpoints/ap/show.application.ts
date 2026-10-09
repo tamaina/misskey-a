@@ -19,7 +19,8 @@ import { IdentifiableError } from '../../../../runtime/backend/errors/identifiab
 import { FetchAllowSoftFailMask } from '../../protocol/misc/check-against-url.js';
 import { apiError } from '../../../../api/backend/transport/orpc-error.js';
 import * as v from 'valibot';
-import { apShowInput, apShowOutput, apShowErrors } from './show.contract.js';
+import type { ApShowInput, ApShowOutput } from './show.contract.js';
+import { apShowContract, apShowErrors } from './show.contract.js';
 
 @Injectable()
 export class ApShowApplicationService {
@@ -33,7 +34,7 @@ export class ApShowApplicationService {
 		private apNoteService: ApNoteService,
 	) {}
 
-	public async execute(ps: v.InferOutput<typeof apShowInput>, me: MiUser): Promise<v.InferOutput<typeof apShowOutput>> {
+	public async execute(ps: ApShowInput, me: MiUser): Promise<ApShowOutput> {
 		const result = await (async () => {
 			const object = await this.fetchAny(ps.uri, me);
 			if (object) {
@@ -42,14 +43,14 @@ export class ApShowApplicationService {
 				throw apiError(apShowErrors.noSuchObject);
 			}
 		})();
-		return v.parse(apShowOutput, result);
+		return v.parse(apShowContract['~orpc'].outputSchema!, result);
 	}
 
 	/***
 	 * URIからUserかNoteを解決する
 	 */
 	@bindThis
-	private async fetchAny(uri: string, me: MiUser | null | undefined): Promise<v.InferOutput<typeof apShowOutput> | null> {
+	private async fetchAny(uri: string, me: MiUser | null | undefined): Promise<ApShowOutput | null> {
 		if (!this.utilityService.isFederationAllowedUri(uri)) {
 			throw apiError(apShowErrors.federationNotAllowed);
 		}
@@ -119,7 +120,7 @@ export class ApShowApplicationService {
 	}
 
 	@bindThis
-	private async mergePack(me: MiUser | null | undefined, user: MiUser | null | undefined, note: MiNote | null | undefined): Promise<v.InferOutput<typeof apShowOutput> | null> {
+	private async mergePack(me: MiUser | null | undefined, user: MiUser | null | undefined, note: MiNote | null | undefined): Promise<ApShowOutput | null> {
 		if (user != null) {
 			return {
 				type: 'User',

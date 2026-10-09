@@ -11,28 +11,26 @@ import { packedNoteSchema } from '../../../../notes/backend/note.schema.js';
 
 const misskeyId = v.pipe(v.string(), v.regex(/^[a-zA-Z0-9]+$/));
 
-export const notesSearchInput = objectInput({
-	'query': v.string(),
-	'rangeStartAt': v.exactOptional(v.nullable(v.pipe(v.number(), v.integer()))),
-	'rangeEndAt': v.exactOptional(v.nullable(v.pipe(v.number(), v.integer()))),
-	'sinceId': v.exactOptional(misskeyId),
-	'untilId': v.exactOptional(misskeyId),
-	'sinceDate': v.exactOptional(v.pipe(v.number(), v.integer())),
-	'untilDate': v.exactOptional(v.pipe(v.number(), v.integer())),
-	'limit': v.optional(v.pipe(v.pipe(v.number(), v.integer()), v.minValue(1), v.maxValue(100)), 10),
-	'offset': v.optional(v.pipe(v.number(), v.integer()), 0),
-	'host': v.exactOptional(v.pipe(v.string(), v.metadata({ 'description': 'The local host is represented with `.`.' }))),
-	'userId': v.optional(v.nullable(misskeyId), null),
-	'channelId': v.optional(v.nullable(misskeyId), null),
-});
-export const notesSearchOutput = v.array(packedNoteSchema);
 export const notesSearchErrors = {
 	unavailable: { message: 'Search of notes unavailable.', code: 'UNAVAILABLE', id: '0b44998d-77aa-4427-80d0-d2c9b8523011' },
 } as const;
 
 const requestName = 'notes/search';
-export const notesSearchContract = oc.$meta<{ requestName: typeof requestName }>({ requestName })
+export const notesSearchContract = oc.$meta({ requestName: requestName } as const)
 	.route({ method: 'POST', path: `/${requestName}`, operationId: 'post___' + requestName.replaceAll('/', '___'), tags: ['notes'] })
 	.errors({ ...commonErrors, UNAVAILABLE: { status: 400, data: apiErrorData } })
-	.input(notesSearchInput)
-	.output(notesSearchOutput);
+	.input(objectInput({
+		'query': v.string(),
+		'rangeStartAt': v.exactOptional(v.nullable(v.pipe(v.number(), v.integer()))),
+		'rangeEndAt': v.exactOptional(v.nullable(v.pipe(v.number(), v.integer()))),
+		'sinceId': v.exactOptional(misskeyId),
+		'untilId': v.exactOptional(misskeyId),
+		'sinceDate': v.exactOptional(v.pipe(v.number(), v.integer())),
+		'untilDate': v.exactOptional(v.pipe(v.number(), v.integer())),
+		'limit': v.optional(v.pipe(v.pipe(v.number(), v.integer()), v.minValue(1), v.maxValue(100)), 10),
+		'offset': v.optional(v.pipe(v.number(), v.integer()), 0),
+		'host': v.exactOptional(v.pipe(v.string(), v.metadata({ 'description': 'The local host is represented with `.`.' }))),
+		'userId': v.optional(v.nullable(misskeyId), null),
+		'channelId': v.optional(v.nullable(misskeyId), null),
+	}))
+	.output(v.array(packedNoteSchema));

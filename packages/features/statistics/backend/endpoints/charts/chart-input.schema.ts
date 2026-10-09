@@ -13,6 +13,5 @@ export const chartInputEntries = {
 } as const;
 
 export const chartInput = objectInput(chartInputEntries);
-export const instanceChartInput = objectInput({ ...chartInputEntries, host: v.string() });
 export const userChartInput = objectInput({ ...chartInputEntries, userId: v.pipe(v.string(), v.regex(/^[a-zA-Z0-9]+$/)) });
 

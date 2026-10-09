@@ -11,9 +11,9 @@ import { sqlLikeEscape } from '../../persistence/backend/utility/sql-like-escape
 import { collectionsErrors } from './api.errors.js';
 import { MiGalleryPost } from './models/GalleryPost.js';
 import { ClipService } from './services/ClipService.js';
-import type * as v from 'valibot';
+import type { InferSchemaOutput, InferContractRouterOutputs } from '@orpc/contract';
 import type { ApiActor } from '../../api/backend/transport/context.js';
-import type { collectionsInputs, collectionsOutputs } from './api.schema.js';
+import type { collectionsContract } from './api.contract.js';
 import type { ClipsRepository, ClipNotesRepository, ClipFavoritesRepository, NotesRepository, NoteFavoritesRepository, GalleryPostsRepository, GalleryLikesRepository, DriveFilesRepository, UsersRepository, MiClip, MiNote, MiNoteFavorite, MiGalleryLike } from '../../persistence/backend/repositories/models.js';
 import type { MiDriveFile } from '../../drive/backend/models/DriveFile.js';
 import type { QueryService } from '../../notes/backend/services/QueryService.js';
@@ -24,8 +24,8 @@ import type { ModerationLogService } from '../../moderation/backend/services/Mod
 import type { AchievementService } from '../../users/backend/services/AchievementService.js';
 import type { FeaturedService } from '../../discovery/backend/services/FeaturedService.js';
 
-type Inputs = { [K in keyof typeof collectionsInputs]: v.InferOutput<typeof collectionsInputs[K]> };
-type Outputs = { [K in keyof typeof collectionsOutputs]: v.InferOutput<typeof collectionsOutputs[K]> };
+type Inputs = { [K in keyof typeof collectionsContract]: InferSchemaOutput<NonNullable<(typeof collectionsContract)[K]['~orpc']['inputSchema']>> };
+type Outputs = InferContractRouterOutputs<typeof collectionsContract>;
 
 export interface CollectionsOperations<Actor extends ApiActor> {
 	clipsAddNote(input: Inputs['clipsAddNote'], actor: Actor): Promise<Outputs['clipsAddNote']>;

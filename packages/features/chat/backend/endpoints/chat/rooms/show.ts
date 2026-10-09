@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import type { InferSchemaOutput } from '@orpc/contract';
 import { implement } from '@orpc/server';
 import { Inject, Injectable } from '@nestjs/common';
 import * as v from 'valibot';
@@ -11,7 +12,7 @@ import { authentication, apiPolicy, requirePrincipal } from '../../../../../api/
 import { ChatService } from '../../../services/ChatService.js';
 import { ChatEntityService } from '../../../serializers/ChatEntityService.js';
 import { apiError } from '../../../../../api/backend/transport/orpc-error.js';
-import { chatRoomsShowContract, chatRoomsShowPolicy, chatRoomsShowInput, chatRoomsShowOutput, chatRoomsShowErrors } from './show.contract.js';
+import { chatRoomsShowContract, chatRoomsShowPolicy, chatRoomsShowErrors } from './show.contract.js';
 import type { ApiActor } from '../../../../../api/backend/transport/context.js';
 import type { ChatApiContext } from '../../../operations.js';
 
@@ -31,11 +32,11 @@ export class ChatRoomsShowOperation {
 		private chatService: ChatService,
 		private chatEntityService: ChatEntityService,
 	) {}
-	async execute(ps: v.InferOutput<typeof chatRoomsShowInput>, me: MiLocalUser): Promise<v.InferOutput<typeof chatRoomsShowOutput>> {
-		return v.parse(chatRoomsShowOutput, await this.run(ps, me));
+	async execute(ps: InferSchemaOutput<NonNullable<typeof chatRoomsShowContract['~orpc']['inputSchema']>>, me: MiLocalUser): Promise<InferSchemaOutput<NonNullable<typeof chatRoomsShowContract['~orpc']['outputSchema']>>> {
+		return v.parse(requiredSchema(chatRoomsShowContract['~orpc'].outputSchema), await this.run(ps, me));
 	}
 
-	private async run(ps: v.InferOutput<typeof chatRoomsShowInput>, me: MiLocalUser) {
+	private async run(ps: InferSchemaOutput<NonNullable<typeof chatRoomsShowContract['~orpc']['inputSchema']>>, me: MiLocalUser) {
 		await this.chatService.checkChatAvailability(me.id, 'read');
 
 		const room = await this.chatService.findRoomById(ps.roomId);
@@ -49,4 +50,9 @@ export class ChatRoomsShowOperation {
 
 		return this.chatEntityService.packRoom(room, me);
 	}
+}
+
+function requiredSchema<Schema>(schema: Schema | undefined): Schema {
+	if (schema === undefined) throw new Error('Missing endpoint contract schema');
+	return schema;
 }
