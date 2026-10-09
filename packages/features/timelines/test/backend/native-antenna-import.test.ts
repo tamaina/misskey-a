@@ -25,7 +25,7 @@ test('queued antenna JSON is validated per item and later valid entries still im
 	antennas.insertOne.mockResolvedValue(mockDeep<MiAntenna>({ id: 'new1' }));
 	const processor = new ImportAntennasProcessorService(antennas, logs, ids, events);
 	const valid = { name: '😀'.repeat(100), src: 'all', userListAccts: null, keywords: [['word']], excludeKeywords: [], users: ['alice'], caseSensitive: false, withReplies: true, withFile: false };
-	const job = mockDeep<Bull.Job<DBAntennaImportJobData>>({ data: { user: { id: 'owner1' }, antenna: [{ name: 'invalid' }, valid] } });
+	const job: Pick<Bull.Job<DBAntennaImportJobData>, 'data'> = { data: { user: { id: 'owner1' }, antenna: [{ name: 'invalid' }, valid] } };
 	await processor.process(job);
 	expect(logger.warn).toHaveBeenCalledWith('Validation Failed');
 	expect(antennas.insertOne).toHaveBeenCalledTimes(1);

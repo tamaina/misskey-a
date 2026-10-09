@@ -18,7 +18,16 @@ import { imageCommentLength } from '../../../../drive/backend/endpoints/drive/fi
 /** JSON Schema exists only as generated external documentation, never request validation. */
 export async function genPilotOpenapiSpec(config: { version: string; apiUrl: string }) {
 	const converter = new experimental_ValibotToJsonSchemaConverter({
+		// OpenAPI 3.1 uses the 2020-12 tuple syntax, including positional prefixItems.
+		target: 'draft-2020-12',
 		overrideAction: ({ valibotAction, jsonSchema }) => {
+			// Older descriptive metadata cannot add the OpenAPI 3.0 nullable keyword.
+			// Native Valibot types already describe these non-null fields exactly.
+			if (valibotAction.type === 'metadata' && jsonSchema.nullable === false) {
+				const schema = { ...jsonSchema };
+				delete schema.nullable;
+				return schema;
+			}
 			if (valibotAction === galleryFileIdsUnique) return { ...jsonSchema, uniqueItems: true };
 			if (valibotAction === imageCommentLength) return { ...jsonSchema, maxLength: 512 };
 			// Native code-point actions retain AJV's Unicode semantics; the converter

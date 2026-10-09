@@ -32,7 +32,7 @@ export class ImportAntennasProcessorService {
 	}
 
 	@bindThis
-	public async process(job: Bull.Job<DBAntennaImportJobData>): Promise<void> {
+	public async process(job: Pick<Bull.Job<DBAntennaImportJobData>, 'data'>): Promise<void> {
 		const now = new Date();
 		try {
 			// Non-array JSON remains queued, then fails at the same asynchronous processing stage.

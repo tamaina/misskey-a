@@ -18,7 +18,7 @@ const input = { noteId: 'abc123' };
 const output = { isFavorited: true, isMutedThread: false };
 
 test('native input and output infer their complete explicit properties', () => {
-	expectTypeOf<v.InferInput<typeof inlineNotesStateInput>>().toEqualTypeOf<{ noteId: string }>();
+	expectTypeOf<v.InferInput<typeof inlineNotesStateInput>>().toEqualTypeOf<{ noteId: string } & object>();
 	expectTypeOf<v.InferOutput<typeof inlineNotesStateInput>>().toEqualTypeOf<{ noteId: string }>();
 	expectTypeOf<v.InferInput<typeof inlineNotesStateOutput>>().toEqualTypeOf<{ isFavorited: boolean; isMutedThread: boolean }>();
 	expectTypeOf<v.InferOutput<typeof inlineNotesStateOutput>>().toEqualTypeOf<{ isFavorited: boolean; isMutedThread: boolean }>();

@@ -5,9 +5,14 @@
 
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 import { HttpRequestService } from '@features/runtime/backend/services/HttpRequestService.js';
-import { FetchRssEndpoint, meta } from '@features/integrations/backend/endpoints/fetch-rss.js';
-import { ApiError } from '@features/api/backend/transport/error.js';
-import type { Mocked } from 'vitest';
+import { FetchRssApplicationService } from '@features/integrations/backend/endpoints/fetch-rss.application.js';
+import { fetchRssErrors } from '@features/integrations/backend/endpoints/fetch-rss.contract.js';
+import { createFetchRssProcedure } from '@features/integrations/backend/endpoints/fetch-rss.js';
+import type { IntegrationsOperations } from '@features/integrations/backend/operations.js';
+import type { ApiServices, ApiActor } from '@features/api/backend/transport/context.js';
+import { call } from '@orpc/server';
+import { mockDeep } from 'vitest-mock-extended';
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
 import type { Response } from 'node-fetch';
 
 const rssParserMocks = vi.hoisted(() => ({
@@ -40,35 +45,31 @@ function deferred<T>() {
 }
 
 function response(url: string, text = RSS): Response {
-	return {
-		url,
-		text: vi.fn().mockResolvedValue(text),
-	} as unknown as Response;
+	const result = mockDeep<Response>({ url });
+	result.text.mockResolvedValue(text);
+	return result;
 }
 
 describe('fetch-rss endpoint', () => {
-	let httpRequestService: Mocked<HttpRequestService>;
-	let endpoint: FetchRssEndpoint;
+	let httpRequestService: ReturnType<typeof mockDeep<HttpRequestService>>;
+	let endpoint: FetchRssApplicationService;
 
 	beforeEach(() => {
 		rssParserMocks.constructor.mockReset();
 		rssParserMocks.parseString.mockReset();
 		rssParserMocks.parseString.mockResolvedValue({ items: [] });
-		httpRequestService = {
-			send: vi.fn(),
-		} as unknown as Mocked<HttpRequestService>;
-		endpoint = new FetchRssEndpoint(httpRequestService);
+		httpRequestService = mockDeep<HttpRequestService>();
+		endpoint = new FetchRssApplicationService(httpRequestService);
 	});
 
 	async function exec(url: string) {
-		return await endpoint.exec({ url }, null, null);
+		return await endpoint.execute({ url }, null);
 	}
 
 	async function expectApiError(promise: Promise<unknown>, code: string, status: number) {
 		await expect(promise).rejects.toMatchObject({
 			code,
-			httpStatusCode: status,
-			info: undefined,
+			status,
 		});
 	}
 
@@ -177,16 +178,22 @@ describe('fetch-rss endpoint', () => {
 		expect(httpRequestService.send).toHaveBeenCalledTimes(33);
 	});
 
-	test('has the expected rate limit metadata', () => {
-		expect(meta.limit).toEqual({
-			duration: 60 * 1000,
-			max: 300,
-		});
+	test('native middleware applies the expected rate limit', async () => {
+		const services = mockDeep<ApiServices<ApiActor>>();
+		services.authenticate.mockResolvedValue([null, null]);
+		services.limitActor.mockReturnValue('ip-hash');
+		services.limit.mockResolvedValue(null);
+		const operations = mockDeep<IntegrationsOperations<ApiActor>>();
+		operations.fetchRss.mockResolvedValue({ items: [] });
+		await call(createFetchRssProcedure<ApiActor>(), { url: 'https://example.com/feed.xml' }, { context: {
+			services, operations: { integrations: operations }, credential: null, ip: '127.0.0.1', headers: {},
+		} });
+		expect(services.limit).toHaveBeenCalledWith({ key: 'fetch-rss', duration: 60 * 1000, max: 300 }, 'ip-hash', 1);
 	});
 
 	test('uses only the declared structured API errors', () => {
-		expect(new ApiError(meta.errors.invalidUrl)).toMatchObject({ code: 'INVALID_URL', httpStatusCode: 400 });
-		expect(new ApiError(meta.errors.fetchRssFailed)).toMatchObject({ code: 'FETCH_RSS_FAILED', httpStatusCode: 422 });
-		expect(new ApiError(meta.errors.fetchRssUnavailable)).toMatchObject({ code: 'FETCH_RSS_UNAVAILABLE', httpStatusCode: 503 });
+		expect(apiError(fetchRssErrors.invalidUrl)).toMatchObject({ code: 'INVALID_URL', status: 400 });
+		expect(apiError(fetchRssErrors.fetchRssFailed)).toMatchObject({ code: 'FETCH_RSS_FAILED', status: 422 });
+		expect(apiError(fetchRssErrors.fetchRssUnavailable)).toMatchObject({ code: 'FETCH_RSS_UNAVAILABLE', status: 503 });
 	});
 });

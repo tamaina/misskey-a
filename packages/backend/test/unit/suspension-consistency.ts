@@ -12,9 +12,9 @@ import { GlobalModule } from '@features/boot/backend/assembly/GlobalModule.js';
 import { DI } from '@/di-symbols.js';
 import { UserSuspendService } from '@features/moderation/backend/services/UserSuspendService.js';
 import { UserFollowingService } from '@features/relationships/backend/services/UserFollowingService.js';
-import type { InstanceEntityService } from '@features/instance/backend/serializers/InstanceEntityService.js';
+import { InstanceEntityService } from '@features/instance/backend/serializers/InstanceEntityService.js';
 import type { FollowingsRepository, InstancesRepository, MiUser, UsersRepository } from '@features/persistence/backend/repositories/models.js';
-import { EndpointImplementation as FederationStats } from '@features/federation/backend/endpoints/federation/stats.js';
+import { FederationStatsApplicationService as FederationStats } from '@features/federation/backend/endpoints/federation/stats.application.js';
 import { secureRndstr } from '@features/auth/backend/utility/secure-rndstr.js';
 import { FollowingIsFollowerSuspended1791310067731 as SuspensionSchemaMigration } from '../../migration/1791310067731-FollowingIsFollowerSuspended.js';
 import { FollowingIsFollowerSuspendedCopySuspendedState1791310067732 as SuspensionBackfillMigration } from '../../migration/1791310067732-FollowingIsFollowerSuspendedCopySuspendedState.js';
@@ -135,9 +135,9 @@ describe('suspension consistency', () => {
 				await suspension.suspend(b, b);
 			}
 		}
-		const packer = { packMany: async (values: unknown[]) => values } as unknown as InstanceEntityService;
+		const packer = new InstanceEntityService(app.get(DI.meta), { isModerator: async () => false }, { isBlockedHost: () => false, isDeliverSuspendedSoftware: () => undefined, isMediaSilencedHost: () => false, isSilencedHost: () => false });
 		const endpoint = new FederationStats(instances, followings, packer);
-		const result = await endpoint.exec({ limit: 1 }, null, null);
+		const result = await endpoint.execute({ limit: 1 }, null);
 		expect(result.topSubInstances[0]).toMatchObject({ host: hosts[0], followersCount: 2 });
 		expect(result.topPubInstances[0]).toMatchObject({ host: hosts[0], followingCount: 1 });
 		expect(result.otherFollowersCount).toBe(1);
@@ -145,9 +145,9 @@ describe('suspension consistency', () => {
 	});
 
 	test('statistics handle no relationships', async () => {
-		const packer = { packMany: async (values: unknown[]) => values } as unknown as InstanceEntityService;
+		const packer = new InstanceEntityService(app.get(DI.meta), { isModerator: async () => false }, { isBlockedHost: () => false, isDeliverSuspendedSoftware: () => undefined, isMediaSilencedHost: () => false, isSilencedHost: () => false });
 		const endpoint = new FederationStats(instances, followings, packer);
-		expect(await endpoint.exec({ limit: 1 }, null, null)).toEqual({
+		expect(await endpoint.execute({ limit: 1 }, null)).toEqual({
 			topSubInstances: [], topPubInstances: [], otherFollowersCount: 0, otherFollowingCount: 0,
 		});
 	});

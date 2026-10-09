@@ -7,11 +7,10 @@ import { expect, test } from 'vitest';
 import * as v from 'valibot';
 import { mockDeep } from 'vitest-mock-extended';
 import { avatarDecorationsContract } from '../../backend/api.contract.js';
-const avatarDecorationResult = avatarDecorationsContract.get['~orpc'].outputSchema;
+const avatarDecorationResult = requiredSchema(avatarDecorationsContract.get['~orpc'].outputSchema);
 import { AvatarDecorationService } from '../../backend/services/AvatarDecorationService.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { MiAvatarDecoration } from '../../backend/models/AvatarDecoration.js';
-import { createAvatarDecorations } from '../../backend/index.js';
 
 import { packedSchemas } from '../../../index/backend/packed.schema.js';
 import { avatarDecorationsContract as nativeContract1 } from '../../backend/api.contract.js';
@@ -42,7 +41,7 @@ test('avatar inputs strip extras and finite outputs reject extras, omissions and
 });
 
 test('public empty avatar input retains its non-array JSON-object guard and missing-body default', () => {
-	const schema = avatarDecorationsContract.get['~orpc'].inputSchema!;
+	const schema = requiredSchema(avatarDecorationsContract.get['~orpc'].inputSchema);
 	expect(v.parse(schema, undefined)).toEqual({});
 	const request = { future: true };
 	expect(v.parse(schema, request)).toEqual({});

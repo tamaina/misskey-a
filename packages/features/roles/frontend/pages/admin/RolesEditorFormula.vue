@@ -66,11 +66,12 @@ import MkInput from '@features/ui/frontend/components/MkInput.vue';
 import MkSelect from '@features/ui/frontend/components/MkSelect.vue';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import MkDraggable from '@features/ui/frontend/components/MkDraggable.vue';
-import { deepClone } from '@features/runtime/frontend/utility/clone.js';
+import { initializeRoleFormula } from './role-formula-editor.js';
+import type { EditableRoleFormula } from './role-formula-editor.js';
 import { rolesCache } from '@features/runtime/frontend/cache.js';
 
 const emit = defineEmits<{
-	(ev: 'update:modelValue', value: Misskey.entities.Role['condFormula']): void;
+	(ev: 'update:modelValue', value: EditableRoleFormula): void;
 	(ev: 'remove'): void;
 }>();
 
@@ -80,13 +81,13 @@ const props = defineProps<{
 	dragStartCallback?: (ev: DragEvent) => void;
 }>();
 
-const v = ref(deepClone(props.modelValue));
+const v = ref<EditableRoleFormula>(initializeRoleFormula(props.modelValue, genId));
 
 const roles = await rolesCache.fetch();
 
 watch(() => props.modelValue, () => {
 	if (JSON.stringify(props.modelValue) === JSON.stringify(v.value)) return;
-	v.value = deepClone(props.modelValue);
+	v.value = initializeRoleFormula(props.modelValue, genId);
 }, { deep: true });
 
 watch(v, () => {
@@ -124,7 +125,7 @@ type DistributiveOmit<T, K extends KeyOfUnion<T>> = T extends T
 const typeModelForMkSelect = computed<GetMkSelectValueTypesFromDef<typeof typeDef>>({
 	get: () => v.value.type,
 	set: (t) => {
-		let newValue: DistributiveOmit<Misskey.entities.Role['condFormula'], 'id'>;
+		let newValue: DistributiveOmit<EditableRoleFormula, 'id'>;
 		switch (t) {
 			case 'and': newValue = { type: 'and', values: [] }; break;
 			case 'or': newValue = { type: 'or', values: [] }; break;
@@ -151,7 +152,7 @@ function addChildValue() {
 	v.value.values.push({ id: genId(), type: 'isRemote' });
 }
 
-function childValuesItemUpdated(item: Misskey.entities.Role['condFormula']) {
+function childValuesItemUpdated(item: EditableRoleFormula) {
 	if (v.value.type !== 'and' && v.value.type !== 'or') return;
 	const i = v.value.values.findIndex(_item => _item.id === item.id);
 	v.value.values[i] = item;

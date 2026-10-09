@@ -57,7 +57,7 @@ export function registerPilotHttp<Actor extends ApiActor, Context extends ApiCon
 	}, async (request, reply) => {
 		if ((route.acceptedMethods !== undefined && !route.acceptedMethods.includes(request.method)) || (request.method === 'GET' && !route.allowGet)) return reply.code(405).send();
 		const run = async (upload?: UploadResource) => {
-			const context = options.context(request, reply, route.name, upload);
+			const context = { ...options.context(request, reply, route.name, upload), httpMethod: request.method };
 			if (route.cacheSec !== undefined && !context.credential) reply.header('Cache-Control', `public, max-age=${route.cacheSec}`);
 			// Legacy Fastify routes accept non-GET verbs with POST semantics. Keep that
 			// boundary behavior without adding aliases to the public contract/router.

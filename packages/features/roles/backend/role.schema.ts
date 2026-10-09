@@ -47,12 +47,24 @@ export type RolePolicySetting = {
 export const rolePolicySettingsSchema: v.GenericSchema<Record<string, RolePolicySetting>> = v.record(v.string(), v.strictObject({
 	useDefault: v.optional(v.boolean()), priority: v.optional(finite), value: packedOptionalJsonValueSchema,
 }));
-export const roleSchema = v.strictObject({
+const roleFieldsSchema = v.strictObject({
 	...packedRoleLiteSchema.entries,
-	createdAt: v.string(), updatedAt: v.string(), target: v.picklist(['manual', 'conditional']),
-	condFormula: roleCondFormulaSchema, isPublic: v.boolean(), isExplorable: v.boolean(), asBadge: v.boolean(),
+	createdAt: v.string(), updatedAt: v.string(),
+	isPublic: v.boolean(), isExplorable: v.boolean(), asBadge: v.boolean(),
 	preserveAssignmentOnMoveAccount: v.boolean(), canEditMembersByModerator: v.boolean(),
 	policies: rolePolicySettingsSchema, usersCount: v.pipe(finite, v.integer()),
+});
+// The migration initialized formulas with {}; conditional evaluation treats it as false.
+// Preserve that exact stored default while keeping nonempty formulas fully validated.
+export const emptyRoleFormulaSchema: v.GenericSchema<Record<string, never>> = v.strictObject({});
+export type RoleDto = v.InferOutput<typeof roleFieldsSchema> & {
+	target: 'manual' | 'conditional';
+	condFormula: RoleFormula | Record<string, never>;
+};
+export const roleSchema: v.GenericSchema<RoleDto> = v.strictObject({
+	...roleFieldsSchema.entries,
+	target: v.picklist(['manual', 'conditional']),
+	condFormula: v.union([roleCondFormulaSchema, emptyRoleFormulaSchema]),
 });
 export const packedRoleSchema = roleSchema;
 export const packedRoleCondFormulaValueSchema = roleCondFormulaSchema;

@@ -1220,6 +1220,7 @@ export type paths = {
         post: operations['users___lists___create-from-public'];
     };
     '/users/lists/delete': {
+        /** @description Delete an existing list of users. */
         post: operations['users___lists___delete'];
     };
     '/users/lists/favorite': {
@@ -1232,9 +1233,11 @@ export type paths = {
         post: operations['users___lists___list'];
     };
     '/users/lists/pull': {
+        /** @description Remove a user from a list. */
         post: operations['users___lists___pull'];
     };
     '/users/lists/push': {
+        /** @description Add a user to an existing list. */
         post: operations['users___lists___push'];
     };
     '/users/lists/show': {
@@ -4355,9 +4358,6 @@ export type components = {
             displayOrder: number;
             createdAt: string;
             updatedAt: string;
-            /** @enum {string} */
-            target: 'manual' | 'conditional';
-            condFormula: components['schemas']['OrpcDefinition188'];
             isPublic: boolean;
             isExplorable: boolean;
             asBadge: boolean;
@@ -4367,10 +4367,13 @@ export type components = {
                 [key: string]: {
                     useDefault?: boolean;
                     priority?: number;
-                    value?: components['schemas']['OrpcDefinition189'];
+                    value?: components['schemas']['OrpcDefinition188'];
                 };
             };
             usersCount: number;
+            /** @enum {string} */
+            target: 'manual' | 'conditional';
+            condFormula: components['schemas']['OrpcDefinition189'] | Record<string, never>;
         };
         RolePolicies: {
             gtlAvailable: boolean;
@@ -7605,7 +7608,7 @@ export type components = {
             updatedAt: string;
             /** @enum {string} */
             target: 'manual' | 'conditional';
-            condFormula: components['schemas']['OrpcDefinition81'];
+            condFormula: components['schemas']['OrpcDefinition81'] | Record<string, never>;
             /** @example false */
             isPublic: boolean;
             /** @example false */
@@ -10807,21 +10810,22 @@ export type components = {
             type: 'notesMoreThanOrEq';
             value: number;
         };
-        OrpcDefinition188: {
+        OrpcDefinition188: ContractJsonValue;
+        OrpcDefinition189: {
             id: string;
             /** @constant */
             type: 'and';
-            values: components['schemas']['OrpcDefinition188'][];
+            values: components['schemas']['OrpcDefinition189'][];
         } | {
             id: string;
             /** @constant */
             type: 'or';
-            values: components['schemas']['OrpcDefinition188'][];
+            values: components['schemas']['OrpcDefinition189'][];
         } | {
             id: string;
             /** @constant */
             type: 'not';
-            value: components['schemas']['OrpcDefinition188'];
+            value: components['schemas']['OrpcDefinition189'];
         } | {
             id: string;
             /** @constant */
@@ -10896,7 +10900,6 @@ export type components = {
             type: 'notesMoreThanOrEq';
             value: number;
         };
-        OrpcDefinition189: ContractJsonValue;
         OrpcDefinition190: {
             /**
              * Format: id
@@ -20442,21 +20445,22 @@ export type components = {
             [key: string]: components['schemas']['OrpcDefinition500'];
         };
         OrpcDefinition500: ContractJsonValue;
-        OrpcDefinition501: {
+        OrpcDefinition501: ContractJsonValue;
+        OrpcDefinition502: {
             id: string;
             /** @constant */
             type: 'and';
-            values: components['schemas']['OrpcDefinition501'][];
+            values: components['schemas']['OrpcDefinition502'][];
         } | {
             id: string;
             /** @constant */
             type: 'or';
-            values: components['schemas']['OrpcDefinition501'][];
+            values: components['schemas']['OrpcDefinition502'][];
         } | {
             id: string;
             /** @constant */
             type: 'not';
-            value: components['schemas']['OrpcDefinition501'];
+            value: components['schemas']['OrpcDefinition502'];
         } | {
             id: string;
             /** @constant */
@@ -20531,22 +20535,22 @@ export type components = {
             type: 'notesMoreThanOrEq';
             value: number;
         };
-        OrpcDefinition502: ContractJsonValue;
-        OrpcDefinition503: {
+        OrpcDefinition503: ContractJsonValue;
+        OrpcDefinition504: {
             id: string;
             /** @constant */
             type: 'and';
-            values: components['schemas']['OrpcDefinition503'][];
+            values: components['schemas']['OrpcDefinition504'][];
         } | {
             id: string;
             /** @constant */
             type: 'or';
-            values: components['schemas']['OrpcDefinition503'][];
+            values: components['schemas']['OrpcDefinition504'][];
         } | {
             id: string;
             /** @constant */
             type: 'not';
-            value: components['schemas']['OrpcDefinition503'];
+            value: components['schemas']['OrpcDefinition504'];
         } | {
             id: string;
             /** @constant */
@@ -20621,22 +20625,22 @@ export type components = {
             type: 'notesMoreThanOrEq';
             value: number;
         };
-        OrpcDefinition504: ContractJsonValue;
-        OrpcDefinition505: {
+        OrpcDefinition505: ContractJsonValue;
+        OrpcDefinition506: {
             id: string;
             /** @constant */
             type: 'and';
-            values: components['schemas']['OrpcDefinition505'][];
+            values: components['schemas']['OrpcDefinition506'][];
         } | {
             id: string;
             /** @constant */
             type: 'or';
-            values: components['schemas']['OrpcDefinition505'][];
+            values: components['schemas']['OrpcDefinition506'][];
         } | {
             id: string;
             /** @constant */
             type: 'not';
-            value: components['schemas']['OrpcDefinition505'];
+            value: components['schemas']['OrpcDefinition506'];
         } | {
             id: string;
             /** @constant */
@@ -20711,7 +20715,6 @@ export type components = {
             type: 'notesMoreThanOrEq';
             value: number;
         };
-        OrpcDefinition506: ContractJsonValue;
         OrpcDefinition507: {
             [key: string]: components['schemas']['OrpcDefinition508'];
         };
@@ -21049,21 +21052,22 @@ export type components = {
             scheduledNoteLimit: number;
             watermarkAvailable: boolean;
         };
-        OrpcDefinition523: {
+        OrpcDefinition523: ContractJsonValue;
+        OrpcDefinition524: {
             id: string;
             /** @constant */
             type: 'and';
-            values: components['schemas']['OrpcDefinition523'][];
+            values: components['schemas']['OrpcDefinition524'][];
         } | {
             id: string;
             /** @constant */
             type: 'or';
-            values: components['schemas']['OrpcDefinition523'][];
+            values: components['schemas']['OrpcDefinition524'][];
         } | {
             id: string;
             /** @constant */
             type: 'not';
-            value: components['schemas']['OrpcDefinition523'];
+            value: components['schemas']['OrpcDefinition524'];
         } | {
             id: string;
             /** @constant */
@@ -21138,7 +21142,6 @@ export type components = {
             type: 'notesMoreThanOrEq';
             value: number;
         };
-        OrpcDefinition524: ContractJsonValue;
         OrpcDefinition525: {
             /**
              * Format: id
@@ -21337,21 +21340,22 @@ export type components = {
             reply?: components['schemas']['OrpcDefinition528'] | null;
             renote?: components['schemas']['OrpcDefinition528'] | null;
         };
-        OrpcDefinition529: {
+        OrpcDefinition529: ContractJsonValue;
+        OrpcDefinition530: {
             id: string;
             /** @constant */
             type: 'and';
-            values: components['schemas']['OrpcDefinition529'][];
+            values: components['schemas']['OrpcDefinition530'][];
         } | {
             id: string;
             /** @constant */
             type: 'or';
-            values: components['schemas']['OrpcDefinition529'][];
+            values: components['schemas']['OrpcDefinition530'][];
         } | {
             id: string;
             /** @constant */
             type: 'not';
-            value: components['schemas']['OrpcDefinition529'];
+            value: components['schemas']['OrpcDefinition530'];
         } | {
             id: string;
             /** @constant */
@@ -21426,7 +21430,6 @@ export type components = {
             type: 'notesMoreThanOrEq';
             value: number;
         };
-        OrpcDefinition530: ContractJsonValue;
         OrpcDefinition531: {
             /**
              * Format: id
@@ -25066,7 +25069,7 @@ export type components = {
             updatedAt: string;
             /** @enum {string} */
             target: 'manual' | 'conditional';
-            condFormula: components['schemas']['OrpcDefinition653'];
+            condFormula: components['schemas']['OrpcDefinition653'] | Record<string, never>;
             /** @example false */
             isPublic: boolean;
             /** @example false */
@@ -25435,7 +25438,7 @@ export type components = {
             updatedAt: string;
             /** @enum {string} */
             target: 'manual' | 'conditional';
-            condFormula: components['schemas']['OrpcDefinition672'];
+            condFormula: components['schemas']['OrpcDefinition672'] | Record<string, never>;
             /** @example false */
             isPublic: boolean;
             /** @example false */
@@ -76207,7 +76210,7 @@ export interface operations {
                             hmacCreateSecret?: boolean;
                             minPinLength?: boolean;
                         };
-                        attestationFormats?: string[];
+                        attestationFormats?: ('fido-u2f' | 'packed' | 'android-safetynet' | 'android-key' | 'tpm' | 'apple' | 'none')[];
                         hints?: ('security-key' | 'client-device' | 'hybrid')[];
                     };
                 };
@@ -83404,9 +83407,6 @@ export interface operations {
                             displayOrder: number;
                             createdAt: string;
                             updatedAt: string;
-                            /** @enum {string} */
-                            target: 'manual' | 'conditional';
-                            condFormula: components['schemas']['OrpcDefinition486'];
                             isPublic: boolean;
                             isExplorable: boolean;
                             asBadge: boolean;
@@ -83420,6 +83420,9 @@ export interface operations {
                                 };
                             };
                             usersCount: number;
+                            /** @enum {string} */
+                            target: 'manual' | 'conditional';
+                            condFormula: components['schemas']['OrpcDefinition486'] | Record<string, never>;
                         }[];
                         roleAssigns: {
                             createdAt: string;
@@ -85660,9 +85663,6 @@ export interface operations {
                         displayOrder: number;
                         createdAt: string;
                         updatedAt: string;
-                        /** @enum {string} */
-                        target: 'manual' | 'conditional';
-                        condFormula: components['schemas']['OrpcDefinition501'];
                         isPublic: boolean;
                         isExplorable: boolean;
                         asBadge: boolean;
@@ -85672,10 +85672,13 @@ export interface operations {
                             [key: string]: {
                                 useDefault?: boolean;
                                 priority?: number;
-                                value?: components['schemas']['OrpcDefinition502'];
+                                value?: components['schemas']['OrpcDefinition501'];
                             };
                         };
                         usersCount: number;
+                        /** @enum {string} */
+                        target: 'manual' | 'conditional';
+                        condFormula: components['schemas']['OrpcDefinition502'] | Record<string, never>;
                     };
                 };
             };
@@ -86053,9 +86056,6 @@ export interface operations {
                         displayOrder: number;
                         createdAt: string;
                         updatedAt: string;
-                        /** @enum {string} */
-                        target: 'manual' | 'conditional';
-                        condFormula: components['schemas']['OrpcDefinition503'];
                         isPublic: boolean;
                         isExplorable: boolean;
                         asBadge: boolean;
@@ -86065,10 +86065,13 @@ export interface operations {
                             [key: string]: {
                                 useDefault?: boolean;
                                 priority?: number;
-                                value?: components['schemas']['OrpcDefinition504'];
+                                value?: components['schemas']['OrpcDefinition503'];
                             };
                         };
                         usersCount: number;
+                        /** @enum {string} */
+                        target: 'manual' | 'conditional';
+                        condFormula: components['schemas']['OrpcDefinition504'] | Record<string, never>;
                     }[];
                 };
             };
@@ -86266,9 +86269,6 @@ export interface operations {
                         displayOrder: number;
                         createdAt: string;
                         updatedAt: string;
-                        /** @enum {string} */
-                        target: 'manual' | 'conditional';
-                        condFormula: components['schemas']['OrpcDefinition505'];
                         isPublic: boolean;
                         isExplorable: boolean;
                         asBadge: boolean;
@@ -86278,10 +86278,13 @@ export interface operations {
                             [key: string]: {
                                 useDefault?: boolean;
                                 priority?: number;
-                                value?: components['schemas']['OrpcDefinition506'];
+                                value?: components['schemas']['OrpcDefinition505'];
                             };
                         };
                         usersCount: number;
+                        /** @enum {string} */
+                        target: 'manual' | 'conditional';
+                        condFormula: components['schemas']['OrpcDefinition506'] | Record<string, never>;
                     };
                 };
             };
@@ -87599,9 +87602,6 @@ export interface operations {
                         displayOrder: number;
                         createdAt: string;
                         updatedAt: string;
-                        /** @enum {string} */
-                        target: 'manual' | 'conditional';
-                        condFormula: components['schemas']['OrpcDefinition523'];
                         isPublic: boolean;
                         isExplorable: boolean;
                         asBadge: boolean;
@@ -87611,10 +87611,13 @@ export interface operations {
                             [key: string]: {
                                 useDefault?: boolean;
                                 priority?: number;
-                                value?: components['schemas']['OrpcDefinition524'];
+                                value?: components['schemas']['OrpcDefinition523'];
                             };
                         };
                         usersCount: number;
+                        /** @enum {string} */
+                        target: 'manual' | 'conditional';
+                        condFormula: components['schemas']['OrpcDefinition524'] | Record<string, never>;
                     }[];
                 };
             };
@@ -88089,9 +88092,6 @@ export interface operations {
                         displayOrder: number;
                         createdAt: string;
                         updatedAt: string;
-                        /** @enum {string} */
-                        target: 'manual' | 'conditional';
-                        condFormula: components['schemas']['OrpcDefinition529'];
                         isPublic: boolean;
                         isExplorable: boolean;
                         asBadge: boolean;
@@ -88101,10 +88101,13 @@ export interface operations {
                             [key: string]: {
                                 useDefault?: boolean;
                                 priority?: number;
-                                value?: components['schemas']['OrpcDefinition530'];
+                                value?: components['schemas']['OrpcDefinition529'];
                             };
                         };
                         usersCount: number;
+                        /** @enum {string} */
+                        target: 'manual' | 'conditional';
+                        condFormula: components['schemas']['OrpcDefinition530'] | Record<string, never>;
                     };
                 };
             };

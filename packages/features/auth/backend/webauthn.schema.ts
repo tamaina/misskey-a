@@ -26,7 +26,7 @@ export const webAuthnRegistrationOptionsSchema = v.strictObject({
 		userVerification: v.exactOptional(v.picklist(['discouraged', 'preferred', 'required'])),
 	})),
 	extensions: v.exactOptional(v.strictObject({ appid: v.exactOptional(v.string()), credProps: v.exactOptional(v.boolean()), hmacCreateSecret: v.exactOptional(v.boolean()), minPinLength: v.exactOptional(v.boolean()) })),
-	attestationFormats: v.exactOptional(v.array(v.string())),
+	attestationFormats: v.exactOptional(v.array(v.picklist(['fido-u2f', 'packed', 'android-safetynet', 'android-key', 'tpm', 'apple', 'none']))),
 	hints: v.exactOptional(v.array(v.picklist(['security-key', 'client-device', 'hybrid']))),
 });
 export type WebAuthnRegistrationOptions = v.InferOutput<typeof webAuthnRegistrationOptionsSchema>;
@@ -48,7 +48,7 @@ const nativeRegistrationOptionsSchema = v.strictObject({
 		userVerification: v.optional(v.picklist(['discouraged', 'preferred', 'required'])),
 	})),
 	extensions: v.optional(v.strictObject({ appid: v.optional(v.string()), credProps: v.optional(v.boolean()), hmacCreateSecret: v.optional(v.boolean()), minPinLength: v.optional(v.boolean()) })),
-	attestationFormats: v.optional(v.array(v.string())),
+	attestationFormats: v.optional(v.array(v.picklist(['fido-u2f', 'packed', 'android-safetynet', 'android-key', 'tpm', 'apple', 'none']))),
 	hints: v.optional(v.array(v.picklist(['security-key', 'client-device', 'hybrid']))),
 });
 

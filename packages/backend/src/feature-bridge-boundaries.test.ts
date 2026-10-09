@@ -18,7 +18,6 @@ const featureRoot = path.resolve(repositoryRoot, 'packages/features');
 const endpointRegistryPath = path.resolve(featureRoot, 'index/backend/endpoint-list.ts');
 const expectedRouteOrder = JSON.parse(readFileSync(path.resolve(testDirectory, '../test/fixtures/backend-api-registry-order.json'), 'utf8')) as string[];
 const nativeRoutes = new Set(requestRoutes(pilotContract).map(route => route.name));
-const legacyRouteOrder = expectedRouteOrder.filter(route => !nativeRoutes.has(route));
 const removedBridgePaths = JSON.parse(readFileSync(path.resolve(testDirectory, '../test/fixtures/backend-feature-bridge-removal.json'), 'utf8')) as string[];
 const removedBridgeStems = new Set(removedBridgePaths.map(bridgePath => path.resolve(repositoryRoot, bridgePath).replace(/\.tsx?$/, '')));
 
@@ -79,24 +78,9 @@ function resolveExistingModule(importer: string, specifier: string): string | nu
 	return candidates.find(candidate => existsSync(candidate)) ?? null;
 }
 
-// The canonical composition registry is not a one-to-one compatibility forwarder.
-// Recognize its exact namespace contract, never a general barrel/path exemption.
-function isCanonicalEndpointRegistry(file: string, ast: ts.SourceFile): boolean {
-	return path.resolve(file) === endpointRegistryPath
-		&& ast.statements.length === legacyRouteOrder.length
-		&& ast.statements.every((statement, index) => ts.isExportDeclaration(statement)
-			&& !statement.isTypeOnly
-			&& statement.moduleSpecifier != null
-			&& ts.isStringLiteralLike(statement.moduleSpecifier)
-			&& statement.exportClause != null
-			&& ts.isNamespaceExport(statement.exportClause)
-			&& statement.exportClause.name.text === legacyRouteOrder[index]);
-}
-
 function isFeatureReexportBridge(file: string, source = readFileSync(file, 'utf8')): boolean {
 	const kind = file.endsWith('.tsx') ? ts.ScriptKind.TSX : ts.ScriptKind.TS;
 	const ast = ts.createSourceFile(file, source, ts.ScriptTarget.Latest, true, kind);
-	if (isCanonicalEndpointRegistry(file, ast)) return false;
 	if (ast.statements.length === 0 || !ast.statements.every(statement => ts.isExportDeclaration(statement) && statement.moduleSpecifier && ts.isStringLiteralLike(statement.moduleSpecifier))) return false;
 	return ast.statements.every(statement => {
 		if (!ts.isExportDeclaration(statement) || !statement.moduleSpecifier || !ts.isStringLiteralLike(statement.moduleSpecifier)) return false;
@@ -127,26 +111,32 @@ test('backend source has no export-only forwarders into feature modules', () => 
 	expect(bridges).toEqual([]);
 });
 
-test('only the complete ordered legacy index namespace registry is a composition exception', () => {
-	const source = readFileSync(endpointRegistryPath, 'utf8');
-	const parse = (text: string) => ts.createSourceFile(endpointRegistryPath, text, ts.ScriptTarget.Latest, true);
-	const ast = parse(source);
-	expect(isCanonicalEndpointRegistry(endpointRegistryPath, ast)).toBe(true);
-	expect(isCanonicalEndpointRegistry(path.join(backendSourceRoot, 'barrel.ts'), ast)).toBe(false);
+test('native feature composition owns every published route without a legacy registry exception', () => {
+	expect(existsSync(endpointRegistryPath)).toBe(false);
+	expect(existsSync(path.join(featureRoot, 'boot/backend/assembly/EndpointsModule.ts'))).toBe(false);
+	expect(expectedRouteOrder.filter(route => !nativeRoutes.has(route))).toEqual([]);
 
-	expect([...legacyRouteOrder, ...nativeRoutes].sort()).toEqual([...expectedRouteOrder].sort());
-	const namespaceExports = legacyRouteOrder.map(route => `export * as '${route}' from './owner.js';`);
-	const invalidSources = [
-		namespaceExports.slice(1).join('\n'),
-		[...namespaceExports].reverse().join('\n'),
-		[namespaceExports[0], ...namespaceExports.slice(0, -1)].join('\n'),
-		source.replace('export * as', 'export type * as'),
-		`export { default } from './owner.js';\n${namespaceExports.slice(1).join('\n')}`,
-		`${source}\nconst extra = true;`,
-	];
-	for (const invalidSource of invalidSources) {
-		expect(isCanonicalEndpointRegistry(endpointRegistryPath, parse(invalidSource))).toBe(false);
+	const contractPath = path.join(featureRoot, 'index/backend/api.contract.ts');
+	const routerPath = path.join(featureRoot, 'index/backend/api.router.ts');
+	for (const compositionPath of [contractPath, routerPath]) {
+		expect(isFeatureReexportBridge(compositionPath)).toBe(false);
+		const references = moduleReferences(compositionPath);
+		expect(references.length).toBeGreaterThan(0);
+		for (const reference of references) {
+			if (compositionPath === routerPath && reference.specifier === '@orpc/server') continue;
+			const target = resolveExistingModule(compositionPath, reference.specifier);
+			expect(target, reference.specifier).not.toBeNull();
+			expect(target?.startsWith(`${featureRoot}${path.sep}`), reference.specifier).toBe(true);
+			if (compositionPath === contractPath) {
+				// The portable root composes feature contracts, never application implementations.
+				expect(target, reference.specifier).toMatch(/\/backend\/.*\.contract\.ts$/);
+			}
+		}
 	}
+
+	// Retiring the registry also retires its special exemption for namespace barrels.
+	expect(isFeatureReexportBridge(endpointRegistryPath,
+		"export * as instance from '../../instance/backend/api.contract.js';")).toBe(true);
 });
 
 test('feature leaf aliases cannot hide export-only bridges', () => {

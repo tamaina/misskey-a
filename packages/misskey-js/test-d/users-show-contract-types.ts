@@ -1,6 +1,6 @@
 // Compile-only fixture; never execute it.
 import type { APIClient } from '../src/api.js';
-import type { Endpoints } from '../src/api.types.js';
+import type { Endpoints, SwitchCaseResponseType } from '../src/api.types.js';
 import type { ContractEndpoints } from '../src/contract.types.js';
 import type { UsersShowRequest } from '../src/autogen/entities.js';
 import type { UserDetailed } from '../src/autogen/models.js';
@@ -17,6 +17,8 @@ export type SdkNoAny = Assert<Equal<IsAny<Request>, false>>;
 export type SdkRequestFromNative = Assert<Equal<Endpoints['users/show']['req'], Request>>;
 export type ExistingDeclaredRequest = Assert<Equal<Request, UsersShowRequest>>;
 export type OptionalHostUndefined = Assert<Equal<undefined extends Required<Request>['host'] ? true : false, true>>;
+export type UncertainSelectorResponse = Assert<Equal<SwitchCaseResponseType<'users/show', Request>, UserDetailed | UserDetailed[]>>;
+export type ScalarSelectorUnionResponse = Assert<Equal<SwitchCaseResponseType<'users/show', { userId: string } | { username: string; host?: string | null }>, UserDetailed>>;
 export type NativeInactiveIds = Assert<Equal<InferContractRouterInputs<typeof usersShowContract>['userIds'], string[] | undefined>>;
 
 export async function requestAndResponseFixtures(client: APIClient): Promise<void> {

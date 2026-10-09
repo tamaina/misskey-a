@@ -18,3 +18,10 @@ test('serialized dates retain their established string representation', () => {
 	expectTypeOf<Serialized<{ at: Date; nullableAt: Date | null }>>()
 		.toEqualTypeOf<{ at: string; nullableAt: string | null }>();
 });
+
+test('serialization preserves exact empty role formulas and their notification output union', () => {
+	expectTypeOf<Serialized<Record<string, never>>>().toEqualTypeOf<Record<string, never>>();
+	expectTypeOf<Serialized<{ condFormula: Record<string, never> | { id: string; type: 'isLocal' } }>>()
+		.toEqualTypeOf<{ condFormula: Record<string, never> | { id: string; type: 'isLocal' } }>();
+	expectTypeOf<Serialized<Packed<'Notification'>>>().toMatchTypeOf<Packed<'Notification'>>();
+});

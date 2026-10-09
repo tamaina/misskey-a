@@ -15,7 +15,7 @@ export function createCollectionsRouter<Actor extends ApiActor>() {
 	return api.router({
 		clipsAddNote: api.clipsAddNote.use(apiPolicy<Actor>({ name: 'clips/add-note', requireCredential: true, prohibitMoved: true, kind: 'write:account', limit: { duration: 3600000, max: 20 } })).use(requirePrincipal<Actor>())
 			.handler(({ input, context }) => context.operations.collections.clipsAddNote(input, context.principal)),
-		clipsCreate: api.clipsCreate.use(apiPolicy<Actor>({ name: 'clips/create', requireCredential: true, prohibitMoved: true, kind: 'write:account' })).use(requirePrincipal<Actor>()).use(decodeScalarInput<Actor>({ isPublic: 'boolean' }))
+		clipsCreate: api.clipsCreate.use(apiPolicy<Actor>({ name: 'clips/create', requireCredential: true, prohibitMoved: true, kind: 'write:account' })).use(requirePrincipal<Actor>())
 			.handler(({ input, context }) => context.operations.collections.clipsCreate(input, context.principal)),
 		clipsDelete: api.clipsDelete.use(apiPolicy<Actor>({ name: 'clips/delete', requireCredential: true, kind: 'write:account' })).use(requirePrincipal<Actor>())
 			.handler(({ input, context }) => context.operations.collections.clipsDelete(input, context.principal)),
@@ -33,7 +33,7 @@ export function createCollectionsRouter<Actor extends ApiActor>() {
 			.handler(({ input, context }) => context.operations.collections.clipsShow(input, context.principal)),
 		clipsUnfavorite: api.clipsUnfavorite.use(apiPolicy<Actor>({ name: 'clips/unfavorite', requireCredential: true, prohibitMoved: true, kind: 'write:clip-favorite' })).use(requirePrincipal<Actor>())
 			.handler(({ input, context }) => context.operations.collections.clipsUnfavorite(input, context.principal)),
-		clipsUpdate: api.clipsUpdate.use(apiPolicy<Actor>({ name: 'clips/update', requireCredential: true, prohibitMoved: true, kind: 'write:account' })).use(requirePrincipal<Actor>()).use(decodeScalarInput<Actor>({ isPublic: 'boolean' }))
+		clipsUpdate: api.clipsUpdate.use(apiPolicy<Actor>({ name: 'clips/update', requireCredential: true, prohibitMoved: true, kind: 'write:account' })).use(requirePrincipal<Actor>())
 			.handler(({ input, context }) => context.operations.collections.clipsUpdate(input, context.principal)),
 		galleryFeatured: api.galleryFeatured.use(apiPolicy<Actor>({ name: 'gallery/featured' })).use(decodeScalarInput<Actor>({ limit: 'integer' }))
 			.handler(({ input, context }) => context.operations.collections.galleryFeatured(input, context.principal)),

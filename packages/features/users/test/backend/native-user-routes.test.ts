@@ -5,7 +5,7 @@
 
 import { expect, test } from 'vitest';
 import * as v from 'valibot';
-import { mockDeep } from 'vitest-mock-extended';
+import { mock, mockDeep } from 'vitest-mock-extended';
 import { packedMeDetailedOnlySchema } from '../../backend/user.schema.js';
 import { IOperation } from '../../backend/endpoints/i.js';
 import { UsersShowOperation } from '../../backend/endpoints/users/show.js';
@@ -13,7 +13,7 @@ import { usersShowInput } from '../../backend/endpoints/users/show.contract.js';
 import { iUpdateInput } from '../../backend/endpoints/i/update.contract.js';
 import { packedUsersInput } from '../../backend/endpoints/users.contract.js';
 import type { MiLocalUser, MiRemoteUser } from '../../backend/models/User.js';
-import type { MiUserProfile } from '../../backend/models/UserProfile.js';
+import { MiUserProfile } from '../../backend/models/UserProfile.js';
 import type { UserEntityService } from '../../backend/serializers/UserEntityService.js';
 import type { NativeMeDetailed } from '../../backend/serializers/native-user.js';
 import type { UsersRepository, UserProfilesRepository, MiMeta } from '@features/persistence/backend/repositories/models.js';
@@ -59,8 +59,8 @@ test('i includes self secrets only for a native session', async () => {
 	const profiles = mockDeep<UserProfilesRepository>();
 	const serializer = mockDeep<UserEntityService>();
 	const actor = mockDeep<MiLocalUser>({ id: 'local1', host: null, uri: null });
-	profiles.findOne.mockResolvedValue(mockDeep<MiUserProfile>({ user: actor, loggedInDates: [] }));
-	serializer.packSelf.mockResolvedValue(mockDeep<NativeMeDetailed>());
+	profiles.findOne.mockResolvedValue(new MiUserProfile({ user: actor, loggedInDates: [] }));
+	serializer.packSelf.mockResolvedValue(mock<NativeMeDetailed>({}));
 	const operation = new IOperation(profiles, serializer);
 	await operation.execute({}, actor, { id: 'app1', permission: ['read:account'] }, '127.0.0.1');
 	expect(serializer.packSelf).toHaveBeenLastCalledWith(actor, expect.objectContaining({ includeSecrets: false }));

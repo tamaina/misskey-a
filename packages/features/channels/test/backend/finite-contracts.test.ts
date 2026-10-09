@@ -22,25 +22,30 @@ import type { IdService } from '@features/runtime/backend/services/IdService.js'
 import type { NoteEntityService } from '@features/notes/backend/serializers/NoteEntityService.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 
+function requiredSchema<S extends v.GenericSchema>(schema: S | undefined): S {
+	if (schema === undefined) throw new Error('Missing native schema');
+	return schema;
+}
+
 const packedEndpointDefinitions = {
-	'channels/create': { input: channelsApiContract.channelsCreate['~orpc'].inputSchema, output: channelsApiContract.channelsCreate['~orpc'].outputSchema },
-	'channels/featured': { input: channelsApiContract.channelsFeatured['~orpc'].inputSchema, output: channelsApiContract.channelsFeatured['~orpc'].outputSchema },
-	'channels/followed': { input: channelsApiContract.channelsFollowed['~orpc'].inputSchema, output: channelsApiContract.channelsFollowed['~orpc'].outputSchema },
-	'channels/my-favorites': { input: channelsApiContract.channelsMyFavorites['~orpc'].inputSchema, output: channelsApiContract.channelsMyFavorites['~orpc'].outputSchema },
-	'channels/owned': { input: channelsApiContract.channelsOwned['~orpc'].inputSchema, output: channelsApiContract.channelsOwned['~orpc'].outputSchema },
-	'channels/search': { input: channelsApiContract.channelsSearch['~orpc'].inputSchema, output: channelsApiContract.channelsSearch['~orpc'].outputSchema },
-	'channels/show': { input: channelsApiContract.channelsShow['~orpc'].inputSchema, output: channelsApiContract.channelsShow['~orpc'].outputSchema },
-	'channels/timeline': { input: channelsApiContract.channelsTimeline['~orpc'].inputSchema, output: channelsApiContract.channelsTimeline['~orpc'].outputSchema },
-	'channels/update': { input: channelsApiContract.channelsUpdate['~orpc'].inputSchema, output: channelsApiContract.channelsUpdate['~orpc'].outputSchema },
-	'channels/mute/list': { input: channelsApiContract.channelsMuteList['~orpc'].inputSchema, output: channelsApiContract.channelsMuteList['~orpc'].outputSchema },
+	'channels/create': { input: requiredSchema(channelsApiContract.channelsCreate['~orpc'].inputSchema), output: requiredSchema(channelsApiContract.channelsCreate['~orpc'].outputSchema) },
+	'channels/featured': { input: requiredSchema(channelsApiContract.channelsFeatured['~orpc'].inputSchema), output: requiredSchema(channelsApiContract.channelsFeatured['~orpc'].outputSchema) },
+	'channels/followed': { input: requiredSchema(channelsApiContract.channelsFollowed['~orpc'].inputSchema), output: requiredSchema(channelsApiContract.channelsFollowed['~orpc'].outputSchema) },
+	'channels/my-favorites': { input: requiredSchema(channelsApiContract.channelsMyFavorites['~orpc'].inputSchema), output: requiredSchema(channelsApiContract.channelsMyFavorites['~orpc'].outputSchema) },
+	'channels/owned': { input: requiredSchema(channelsApiContract.channelsOwned['~orpc'].inputSchema), output: requiredSchema(channelsApiContract.channelsOwned['~orpc'].outputSchema) },
+	'channels/search': { input: requiredSchema(channelsApiContract.channelsSearch['~orpc'].inputSchema), output: requiredSchema(channelsApiContract.channelsSearch['~orpc'].outputSchema) },
+	'channels/show': { input: requiredSchema(channelsApiContract.channelsShow['~orpc'].inputSchema), output: requiredSchema(channelsApiContract.channelsShow['~orpc'].outputSchema) },
+	'channels/timeline': { input: requiredSchema(channelsApiContract.channelsTimeline['~orpc'].inputSchema), output: requiredSchema(channelsApiContract.channelsTimeline['~orpc'].outputSchema) },
+	'channels/update': { input: requiredSchema(channelsApiContract.channelsUpdate['~orpc'].inputSchema), output: requiredSchema(channelsApiContract.channelsUpdate['~orpc'].outputSchema) },
+	'channels/mute/list': { input: requiredSchema(channelsApiContract.channelsMuteList['~orpc'].inputSchema), output: requiredSchema(channelsApiContract.channelsMuteList['~orpc'].outputSchema) },
 };
 const channelInputs = {
-	'channels/favorite': channelsApiContract.channelsFavorite['~orpc'].inputSchema,
-	'channels/follow': channelsApiContract.channelsFollow['~orpc'].inputSchema,
-	'channels/unfavorite': channelsApiContract.channelsUnfavorite['~orpc'].inputSchema,
-	'channels/unfollow': channelsApiContract.channelsUnfollow['~orpc'].inputSchema,
-	'channels/mute/create': channelsApiContract.channelsMuteCreate['~orpc'].inputSchema,
-	'channels/mute/delete': channelsApiContract.channelsMuteDelete['~orpc'].inputSchema,
+	'channels/favorite': requiredSchema(channelsApiContract.channelsFavorite['~orpc'].inputSchema),
+	'channels/follow': requiredSchema(channelsApiContract.channelsFollow['~orpc'].inputSchema),
+	'channels/unfavorite': requiredSchema(channelsApiContract.channelsUnfavorite['~orpc'].inputSchema),
+	'channels/unfollow': requiredSchema(channelsApiContract.channelsUnfollow['~orpc'].inputSchema),
+	'channels/mute/create': requiredSchema(channelsApiContract.channelsMuteCreate['~orpc'].inputSchema),
+	'channels/mute/delete': requiredSchema(channelsApiContract.channelsMuteDelete['~orpc'].inputSchema),
 };
 
 const date = new Date('2026-01-01T00:00:00.000Z');

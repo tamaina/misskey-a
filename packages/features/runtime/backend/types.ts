@@ -357,22 +357,25 @@ export type ModerationLogPayloads = {
 
 export type Serialized<T> = {
 	[K in keyof T]:
-	// Preserve legacy any fields; unknown values have crossed the JSON boundary.
-	0 extends (1 & T[K])
-		? T[K]
-		: unknown extends T[K]
-			? JsonValue
-			: T[K] extends Date
-		? string
-		: T[K] extends (Date | null)
-			? (string | null)
-			: T[K] extends Record<string, any>
-				? Serialized<T[K]>
-				: T[K] extends (Record<string, any> | null)
-					? (Serialized<T[K]> | null)
-					: T[K] extends (Record<string, any> | undefined)
-						? (Serialized<T[K]> | undefined)
-						: T[K];
+	// Empty JSON objects use never-valued indexes; never must not become a date string.
+	[T[K]] extends [never]
+		? never
+		// Preserve legacy any fields; unknown values have crossed the JSON boundary.
+		: 0 extends (1 & T[K])
+			? T[K]
+			: unknown extends T[K]
+				? JsonValue
+				: T[K] extends Date
+					? string
+					: T[K] extends (Date | null)
+						? (string | null)
+						: T[K] extends Record<string, any>
+							? Serialized<T[K]>
+							: T[K] extends (Record<string, any> | null)
+								? (Serialized<T[K]> | null)
+								: T[K] extends (Record<string, any> | undefined)
+									? (Serialized<T[K]> | undefined)
+									: T[K];
 };
 
 export type FilterUnionByProperty<

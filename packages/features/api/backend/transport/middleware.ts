@@ -102,9 +102,10 @@ export function requirePrincipal<Actor extends ApiActor>() {
 	});
 }
 
-/** Decode only declared primitive query/multipart fields, after authorization. */
+/** Decode declared GET query primitives after authorization; JSON POST values stay strict. */
 export function decodeScalarInput<Actor extends ApiActor>(fields: Readonly<Record<string, 'number' | 'integer' | 'boolean'>>) {
-	return os.$context<AuthenticatedContext<Actor>>().middleware(({ next }, input) => {
+	return os.$context<AuthenticatedContext<Actor>>().middleware(({ next, context, procedure }, input) => {
+		if ((context.httpMethod ?? procedure['~orpc'].route.method) !== 'GET') return next();
 		if (!isInputRecord(input)) return next();
 		for (const [key, type] of Object.entries(fields)) {
 			if (typeof input[key] !== 'string') continue;

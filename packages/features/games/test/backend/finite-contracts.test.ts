@@ -18,7 +18,7 @@ import { reversiInvitationsInput as emptyReversiInvitationsInput } from '../../b
 import { ReversiGameEntityService } from '../../backend/serializers/ReversiGameEntityService.js';
 import { BubbleGameRankingApplicationService as RankingEndpoint } from '../../backend/applications/bubble-game/ranking.js';
 import { ReversiVerifyApplicationService as VerifyEndpoint } from '../../backend/applications/reversi/verify.js';
-import type { MiReversiGame } from '../../backend/models/ReversiGame.js';
+import { MiReversiGame } from '../../backend/models/ReversiGame.js';
 import type { MiBubbleGameRecord } from '../../backend/models/BubbleGameRecord.js';
 import type { MiUser } from '@features/users/backend/models/User.js';
 
@@ -40,7 +40,7 @@ function fixture() {
 	const ids = mockDeep<ConstructorParameters<typeof ReversiGameEntityService>[2]>();
 	ids.parse.mockReturnValue({ date });
 	const service = new ReversiGameEntityService(mockDeep(), users, ids);
-	const game: MiReversiGame = mockDeep<MiReversiGame>({ id: 'game123', startedAt: null, endedAt: null, isStarted: false, isEnded: false, form1: null, form2: null, user1Ready: false, user2Ready: false, user1Id: user.id, user2Id: 'other123', user1: null, user2: null, winnerId: null, surrenderedUserId: null, timeoutUserId: null, black: null, bw: 'invalid', noIrregularRules: false, isLlotheo: false, canPutEverywhere: false, loopedBoard: false, timeLimitForEachTurn: 90, logs: [], map: ['--------'] });
+	const game: MiReversiGame = Object.assign(new MiReversiGame(), { id: 'game123', startedAt: null, endedAt: null, isStarted: false, isEnded: false, form1: null, form2: null, user1Ready: false, user2Ready: false, user1Id: user.id, user2Id: 'other123', user1: null, user2: null, winnerId: null, surrenderedUserId: null, timeoutUserId: null, black: null, bw: 'invalid', noIrregularRules: false, isLlotheo: false, canPutEverywhere: false, loopedBoard: false, timeLimitForEachTurn: 90, logs: [], map: ['--------'], crc32: null });
 	return { service, game };
 }
 

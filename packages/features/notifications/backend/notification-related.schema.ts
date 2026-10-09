@@ -5,6 +5,7 @@
 
 import * as v from 'valibot';
 import { packedUserLiteSchema } from '../../users/backend/user.schema.js';
+import { emptyRoleFormulaSchema } from '../../roles/backend/role.schema.js';
 import { packedJsonValueSchema as jsonValueSchema, type PackedJsonValue } from '../../users/backend/json-value.schema.js';
 
 export type PackedRolePolicyOverride = {
@@ -22,7 +23,7 @@ const roleDetailSchema = v.strictObject({
 	'createdAt': v.pipe(v.string(), v.metadata({ 'format': 'date-time' })),
 	'updatedAt': v.pipe(v.string(), v.metadata({ 'format': 'date-time' })),
 	'target': v.picklist(['manual', 'conditional']),
-	'condFormula': v.lazy(() => packedRoleCondFormulaValueSchema),
+	'condFormula': v.union([v.lazy(() => packedRoleCondFormulaValueSchema), emptyRoleFormulaSchema]),
 	'isPublic': v.pipe(v.boolean(), v.metadata({ 'example': false })),
 	'isExplorable': v.pipe(v.boolean(), v.metadata({ 'example': false })),
 	'asBadge': v.pipe(v.boolean(), v.metadata({ 'example': false })),

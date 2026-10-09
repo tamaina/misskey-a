@@ -175,6 +175,33 @@ declare module '../api.js' {
     ): Promise<SwitchCaseResponseType<E, P>>;
 
     /**
+     * Delete an existing list of users.
+     */
+    request<E extends 'users/lists/delete', P extends Endpoints[E]['req']>(
+      endpoint: E,
+      params: P,
+      credential?: string | null,
+    ): Promise<SwitchCaseResponseType<E, P>>;
+
+    /**
+     * Remove a user from a list.
+     */
+    request<E extends 'users/lists/pull', P extends Endpoints[E]['req']>(
+      endpoint: E,
+      params: P,
+      credential?: string | null,
+    ): Promise<SwitchCaseResponseType<E, P>>;
+
+    /**
+     * Add a user to an existing list.
+     */
+    request<E extends 'users/lists/push', P extends Endpoints[E]['req']>(
+      endpoint: E,
+      params: P,
+      credential?: string | null,
+    ): Promise<SwitchCaseResponseType<E, P>>;
+
+    /**
      * Upload a new drive file. Requires write:drive permission.
      */
     request<E extends 'drive/files/create', P extends Endpoints[E]['req']>(

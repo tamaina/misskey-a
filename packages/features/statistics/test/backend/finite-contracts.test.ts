@@ -55,6 +55,7 @@ test('all twelve explicit chart schemas agree with actual chart nesting and clos
 	const names = ['activeUsers', 'apRequest', 'drive', 'federation', 'instance', 'notes', 'perUserDrive', 'perUserFollowing', 'perUserNotes', 'perUserPv', 'perUserReactions', 'users'] as const;
 	for (const [index, definition] of Object.values(chartEndpointDefinitions).entries()) {
 		const descriptor = descriptors[`${names[index]}ChartDescriptor`];
+		const output = requiredSchema(definition.output);
 		const result: Record<string, unknown> = {};
 		const raw: Record<string, number[]> = {};
 		for (const path of Object.keys(descriptor)) {
@@ -71,7 +72,7 @@ test('all twelve explicit chart schemas agree with actual chart nesting and clos
 		chart.getChartRaw.mockResolvedValue(raw);
 		const produced = await Reflect.apply(Chart.prototype.getChart, chart, ['day', 2, null]);
 		expect(produced).toEqual(result);
-		expect(v.parse(definition.output, produced)).toEqual(result);
+		expect(v.parse(output, produced)).toEqual(result);
 
 		function checkBranches(branch: Record<string, unknown>, path: string[] = []) {
 			branchCount++;
@@ -83,7 +84,7 @@ test('all twelve explicit chart schemas agree with actual chart nesting and clos
 				if (mutation === 'extra') target.future = [];
 				else if (mutation === 'missing') delete target[firstKey];
 				else target[firstKey] = 'bad';
-				expect(v.safeParse(definition.output, invalid).success, `${names[index]}:${path.join('.') || '<root>'}:${mutation}`).toBe(false);
+				expect(v.safeParse(output, invalid).success, `${names[index]}:${path.join('.') || '<root>'}:${mutation}`).toBe(false);
 			}
 			for (const [key, child] of Object.entries(branch)) {
 				if (!Array.isArray(child)) checkBranches(child as Record<string, unknown>, [...path, key]);

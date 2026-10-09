@@ -1,14 +1,31 @@
 import { vi, describe, test, expect } from 'vitest';
 import { APIClient, isAPIError } from '../src/api.js';
 
+async function requestBody(request: Request): Promise<Record<string, unknown>> {
+	const body: unknown = await request.clone().json();
+	if (body === null || typeof body !== 'object' || Array.isArray(body)) throw new Error('Expected a JSON object request');
+	return { ...body };
+}
+
+async function expectJsonRequest(input: Parameters<typeof fetch>[0], init: Parameters<typeof fetch>[1], url: string, body: Record<string, unknown>) {
+	const request = new Request(input instanceof Request ? input.clone() : input, init);
+	expect(request.url).toBe(url);
+	expect(request.method).toBe('POST');
+	expect(request.headers.get('content-type')).toBe('application/json');
+	expect(request.credentials).toBe('omit');
+	expect(request.cache).toBe('no-cache');
+	expect(await requestBody(request)).toEqual(body);
+}
+
 describe('API', () => {
 	test('success', async () => {
 		const fetchMock = vi
 			.spyOn(globalThis, 'fetch')
 			.mockImplementation(async (url, options) => {
-				if (url === 'https://misskey.test/api/i' && options?.method === 'POST') {
-					if (options.body) {
-						const body = JSON.parse(options.body as string);
+				const request = new Request(url instanceof Request ? url.clone() : url, options);
+				if (request.url === 'https://misskey.test/api/i' && request.method === 'POST') {
+					if (request.body) {
+						const body = await requestBody(request);
 						if (body.i === 'TOKEN') {
 							return new Response(JSON.stringify({ id: 'foo' }), { status: 200 });
 						}
@@ -31,19 +48,8 @@ describe('API', () => {
 			id: 'foo'
 		});
 
-		fetch('https://misskey.test/api/i', {
-			method: 'POST',
-		})
-
-		expect(fetchMock).toHaveBeenCalledWith('https://misskey.test/api/i', {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-			},
-			credentials: 'omit',
-			cache: 'no-cache',
-			body: JSON.stringify({ i: 'TOKEN' }),
-		});
+		expect(fetchMock).toHaveBeenCalledTimes(1);
+		await expectJsonRequest(fetchMock.mock.calls[0][0], fetchMock.mock.calls[0][1], 'https://misskey.test/api/i', { i: 'TOKEN' });
 
 		fetchMock.mockRestore();
 	});
@@ -52,9 +58,10 @@ describe('API', () => {
 		const fetchMock = vi
 			.spyOn(globalThis, 'fetch')
 			.mockImplementation(async (url, options) => {
-				if (url === 'https://misskey.test/api/notes/show' && options?.method === 'POST') {
-					if (options.body) {
-						const body = JSON.parse(options.body as string);
+				const request = new Request(url instanceof Request ? url.clone() : url, options);
+				if (request.url === 'https://misskey.test/api/notes/show' && request.method === 'POST') {
+					if (request.body) {
+						const body = await requestBody(request);
 						if (body.i === 'TOKEN' && body.noteId === 'aaaaa') {
 							return new Response(JSON.stringify({ id: 'foo' }), { status: 200 });
 						}
@@ -75,15 +82,8 @@ describe('API', () => {
 			id: 'foo'
 		});
 
-		expect(fetchMock).toHaveBeenCalledWith('https://misskey.test/api/notes/show', {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-			},
-			credentials: 'omit',
-			cache: 'no-cache',
-			body: JSON.stringify({ noteId: 'aaaaa', i: 'TOKEN' }),
-		});
+		expect(fetchMock).toHaveBeenCalledTimes(1);
+		await expectJsonRequest(fetchMock.mock.calls[0][0], fetchMock.mock.calls[0][1], 'https://misskey.test/api/notes/show', { noteId: 'aaaaa', i: 'TOKEN' });
 
 		fetchMock.mockRestore();
 	});
@@ -92,9 +92,10 @@ describe('API', () => {
 		const fetchMock = vi
 			.spyOn(globalThis, 'fetch')
 			.mockImplementation(async (url, options) => {
-				if (url === 'https://misskey.test/api/drive/files/create' && options?.method === 'POST') {
-					if (options.body instanceof FormData) {
-						const file = options.body.get('file');
+				const request = new Request(url instanceof Request ? url.clone() : url, options);
+				if (request.url === 'https://misskey.test/api/drive/files/create' && request.method === 'POST') {
+					if (request.headers.get('content-type')?.startsWith('multipart/form-data')) {
+						const file = (await request.clone().formData()).get('file');
 						if (file instanceof File && file.name === 'foo.txt') {
 							return new Response(JSON.stringify({ id: 'foo' }), { status: 200 });
 						}
@@ -138,7 +139,8 @@ describe('API', () => {
 		const fetchMock = vi
 			.spyOn(globalThis, 'fetch')
 			.mockImplementation(async (url, options) => {
-				if (url === 'https://misskey.test/api/reset-password' && options?.method === 'POST') {
+				const request = new Request(url instanceof Request ? url.clone() : url, options);
+				if (request.url === 'https://misskey.test/api/reset-password' && request.method === 'POST') {
 					return new Response(null, { status: 204 });
 				}
 				return new Response(null, { status: 404 });
@@ -153,15 +155,8 @@ describe('API', () => {
 
 		expect(res).toEqual(null);
 
-		expect(fetchMock).toHaveBeenCalledWith('https://misskey.test/api/reset-password', {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-			},
-			credentials: 'omit',
-			cache: 'no-cache',
-			body: JSON.stringify({ token: 'aaa', password: 'aaa', i: 'TOKEN' }),
-		});
+		expect(fetchMock).toHaveBeenCalledTimes(1);
+		await expectJsonRequest(fetchMock.mock.calls[0][0], fetchMock.mock.calls[0][1], 'https://misskey.test/api/reset-password', { token: 'aaa', password: 'aaa', i: 'TOKEN' });
 
 		fetchMock.mockRestore();
 	});
@@ -170,9 +165,10 @@ describe('API', () => {
 		const fetchMock = vi
 			.spyOn(globalThis, 'fetch')
 			.mockImplementation(async (url, options) => {
-				if (url === 'https://misskey.test/api/i' && options?.method === 'POST') {
-					if (options.body) {
-						const body = JSON.parse(options.body as string);
+				const request = new Request(url instanceof Request ? url.clone() : url, options);
+				if (request.url === 'https://misskey.test/api/i' && request.method === 'POST') {
+					if (request.body) {
+						const body = await requestBody(request);
 						if (typeof body.i === 'string') {
 							return new Response(JSON.stringify({ id: 'foo' }), { status: 200 });
 						} else {
@@ -198,7 +194,8 @@ describe('API', () => {
 
 			await cli.request('i', {}, null);
 		} catch (e) {
-			expect(isAPIError(e)).toEqual(true);
+			if (e === null || typeof e !== 'object') throw e;
+			expect(isAPIError({ ...e })).toEqual(true);
 		} finally {
 			fetchMock.mockRestore();
 		}
@@ -225,9 +222,10 @@ describe('API', () => {
 			});
 
 			await cli.request('i');
-		} catch (e: any) {
-			expect(isAPIError(e)).toEqual(true);
-			expect(e.id).toEqual('5d37dbcb-891e-41ca-a3d6-e690c97775ac');
+		} catch (e: unknown) {
+			if (e === null || typeof e !== 'object') throw e;
+			expect(isAPIError({ ...e })).toEqual(true);
+			expect(e).toMatchObject({ id: '5d37dbcb-891e-41ca-a3d6-e690c97775ac' });
 		} finally {
 			fetchMock.mockRestore();
 		}
@@ -248,7 +246,8 @@ describe('API', () => {
 
 			await cli.request('i');
 		} catch (e) {
-			expect(isAPIError(e)).toEqual(false);
+			if (e === null || typeof e !== 'object') throw e;
+			expect(isAPIError({ ...e })).toEqual(false);
 		} finally {
 			fetchMock.mockRestore();
 		}
@@ -269,7 +268,8 @@ describe('API', () => {
 
 			await cli.request('i');
 		} catch (e) {
-			expect(isAPIError(e)).toEqual(false);
+			if (e === null || typeof e !== 'object') throw e;
+			expect(isAPIError({ ...e })).toEqual(false);
 		} finally {
 			fetchMock.mockRestore();
 		}

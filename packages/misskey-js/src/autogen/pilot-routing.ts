@@ -21183,6 +21183,7 @@ export default {
 					"method": "POST",
 					"path": "/users/lists/delete",
 					"operationId": "post___users___lists___delete",
+					"description": "Delete an existing list of users.",
 					"tags": [
 						"lists"
 					]
@@ -21392,6 +21393,7 @@ export default {
 					"method": "POST",
 					"path": "/users/lists/pull",
 					"operationId": "post___users___lists___pull",
+					"description": "Remove a user from a list.",
 					"tags": [
 						"lists",
 						"users"
@@ -21455,6 +21457,7 @@ export default {
 					"method": "POST",
 					"path": "/users/lists/push",
 					"operationId": "post___users___lists___push",
+					"description": "Add a user to an existing list.",
 					"tags": [
 						"lists",
 						"users"

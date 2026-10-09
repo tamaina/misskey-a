@@ -67,7 +67,10 @@ export class APIClient {
 	): Promise<SwitchCaseResponseType<E, P>>;
 	public request(endpoint: keyof Endpoints, params: unknown = {}, credential?: string | null): Promise<unknown> {
 		const path = this.pilot.path(endpoint);
-		if (path) return this.pilot.request(path, params, credential).catch((error: unknown) => {
+		// The legacy facade treated non-record params as an empty request object.
+		// Direct oRPC calls retain the contract's finite JSON input domain.
+		const requestParams = params !== null && typeof params === 'object' && !Array.isArray(params) ? params : {};
+		if (path) return this.pilot.request(path, requestParams, credential).catch((error: unknown) => {
 			if (error instanceof ApiWireFailure) {
 				// Preserve the existing SDK's plain, symbol-tagged APIError rejection value.
 				// eslint-disable-next-line no-throw-literal

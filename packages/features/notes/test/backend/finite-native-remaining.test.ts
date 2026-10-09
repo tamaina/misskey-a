@@ -83,6 +83,7 @@ test('all 28 migrated inputs strip transport keys, reject arrays and retain nati
 	expect(inputs).toHaveLength(28);
 	const fields = { noteIds: ['note123'], noteId: 'note123', draftId: 'draft123', userId: 'user123', reaction: '❤️', choice: -1, expiresAt: -1, text: 'hello', targetLang: 'en', future: true, i: 'transport' };
 	for (const input of inputs) {
+		if (input === undefined) throw new Error('Migrated note contract must declare an input schema');
 		const parsed = v.parse(input, fields);
 		expect(parsed).not.toHaveProperty('future');
 		expect(parsed).not.toHaveProperty('i');

@@ -35,10 +35,10 @@ test('all 39 native auth routes retain policy-before-input validation', async ()
 	expect(Object.keys(authContract)).toHaveLength(39);
 	const h = harness();
 	h.services.authenticate.mockResolvedValue([actor, { permission: ['write:account'] }]);
-	await expect(call(h.router['i/change-password'], {}, { context: h.context })).rejects.toMatchObject({ code: 'ACCESS_DENIED', data: { id: '56f35758-7dd5-468b-8439-5d6fb8ec9b8e' } });
+	await expect(call(h.router['i/change-password'], { currentPassword: 'old', newPassword: 'new' }, { context: h.context })).rejects.toMatchObject({ code: 'ACCESS_DENIED', data: { id: '56f35758-7dd5-468b-8439-5d6fb8ec9b8e' } });
 	expect(h.operations['i/change-password']).not.toHaveBeenCalled();
 	h.services.authenticate.mockResolvedValue([null, null]);
-	await expect(call(h.router['i/2fa/key-done'], {}, { context: h.context })).rejects.toMatchObject({ code: 'ACCESS_DENIED' });
+	await expect(call(h.router['i/2fa/key-done'], { password: 'password', name: '', credential: null }, { context: h.context })).rejects.toMatchObject({ code: 'ACCESS_DENIED' });
 	for (const value of [undefined, null, 5, true, ['ignored'], { ignored: { future: true } }]) expect(v.safeParse(emptyAdminCaptchaCurrentInput, value).success).toBe(true);
 });
 

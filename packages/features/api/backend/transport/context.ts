@@ -42,6 +42,8 @@ export interface ApiContext<Actor extends ApiActor = ApiActor> {
 	credential: string | null | undefined;
 	ip: string;
 	headers: Record<string, string | string[] | undefined>;
+	/** Actual HTTP method before compatibility routing adapts a GET alias. */
+	httpMethod?: string;
 	upload?: UploadResource;
 	response?: { header(name: string, value: string): void };
 	mapError?: (error: unknown) => ORPCError<string, unknown>;

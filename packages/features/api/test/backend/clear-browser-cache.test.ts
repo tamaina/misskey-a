@@ -4,6 +4,7 @@
  */
 
 import Fastify from 'fastify';
+import { request as httpRequest } from 'node:http';
 import { OpenAPIHandler } from '@orpc/openapi/fastify';
 import { expect, test } from 'vitest';
 import { mockDeep } from 'vitest-mock-extended';
@@ -40,12 +41,32 @@ test('cache clearing uses native GET/POST procedures with the exact header and e
 		}
 		const text = await app.inject({ method: 'POST', url: '/api/clear-browser-cache', headers: { 'content-type': 'text/plain' }, payload: 'ignored input' });
 		expect(text.statusCode).toBe(204);
-		for (const method of ['PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS', 'TRACE'] as const) {
+		for (const method of ['PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'] as const) {
 			const response = await app.inject({ method, url: '/api/clear-browser-cache' });
 			expect(response.statusCode).toBe(405);
 			expect(response.body).toBe('');
 			expect(response.headers['clear-site-data']).toBeUndefined();
 		}
+		// Fetch and the typed injection client prohibit TRACE; send its real HTTP method over a socket.
+		const origin = await app.listen({ host: '127.0.0.1', port: 0 });
+		await new Promise<void>((resolve, reject) => {
+			const request = httpRequest(new URL('/api/clear-browser-cache', origin), { method: 'TRACE' }, response => {
+				let body = '';
+				response.setEncoding('utf8');
+				response.on('data', (chunk: string) => { body += chunk; });
+				response.on('end', () => {
+					try {
+						expect(response.statusCode).toBe(405);
+						expect(body).toBe('');
+						expect(response.headers['clear-site-data']).toBeUndefined();
+						resolve();
+					} catch (error) { reject(error); }
+				});
+				response.on('error', reject);
+			});
+			request.on('error', reject);
+			request.end();
+		});
 		expect(context.services.authenticate).not.toHaveBeenCalled();
 	} finally { await app.close(); }
 });

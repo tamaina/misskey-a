@@ -1562,7 +1562,7 @@ export type Endpoints = Overwrite<ContractEndpoints, {
                 $cases: [
                 [
                     {
-                    userIds?: string[];
+                    userIds: string[];
                 },
                 UserDetailed[]
                 ]
@@ -2233,7 +2233,7 @@ declare namespace entities {
         UsersAchievementsRequest,
         UsersAchievementsResponse,
         UsersShowRequest,
-        UsersShowResponse,
+        UsersShowResponse_2 as UsersShowResponse,
         UsersUpdateMemoRequest,
         AntennasCreateRequest,
         AntennasCreateResponse,
@@ -7951,12 +7951,13 @@ export type StreamEvents = {
     _disconnected_: void;
 } & BroadcastEvents;
 
+// Warning: (ae-forgotten-export) The symbol "UsersShowResponse" needs to be exported by the entry point index.d.ts
 // Warning: (ae-forgotten-export) The symbol "SwitchCase" needs to be exported by the entry point index.d.ts
 // Warning: (ae-forgotten-export) The symbol "IsCaseMatched" needs to be exported by the entry point index.d.ts
 // Warning: (ae-forgotten-export) The symbol "GetCaseResult" needs to be exported by the entry point index.d.ts
 //
 // @public (undocumented)
-type SwitchCaseResponseType<E extends keyof Endpoints, P extends Endpoints[E]['req']> = Endpoints[E]['res'] extends SwitchCase ? IsCaseMatched<E, P, 0> extends true ? GetCaseResult<E, P, 0> : IsCaseMatched<E, P, 1> extends true ? GetCaseResult<E, P, 1> : IsCaseMatched<E, P, 2> extends true ? GetCaseResult<E, P, 2> : IsCaseMatched<E, P, 3> extends true ? GetCaseResult<E, P, 3> : IsCaseMatched<E, P, 4> extends true ? GetCaseResult<E, P, 4> : IsCaseMatched<E, P, 5> extends true ? GetCaseResult<E, P, 5> : IsCaseMatched<E, P, 6> extends true ? GetCaseResult<E, P, 6> : IsCaseMatched<E, P, 7> extends true ? GetCaseResult<E, P, 7> : IsCaseMatched<E, P, 8> extends true ? GetCaseResult<E, P, 8> : IsCaseMatched<E, P, 9> extends true ? GetCaseResult<E, P, 9> : Endpoints[E]['res']['$switch']['$default'] : Endpoints[E]['res'];
+type SwitchCaseResponseType<E extends keyof Endpoints, P extends Endpoints[E]['req']> = [E] extends ['users/show'] ? UsersShowResponse<P> : Endpoints[E]['res'] extends SwitchCase ? IsCaseMatched<E, P, 0> extends true ? GetCaseResult<E, P, 0> : IsCaseMatched<E, P, 1> extends true ? GetCaseResult<E, P, 1> : IsCaseMatched<E, P, 2> extends true ? GetCaseResult<E, P, 2> : IsCaseMatched<E, P, 3> extends true ? GetCaseResult<E, P, 3> : IsCaseMatched<E, P, 4> extends true ? GetCaseResult<E, P, 4> : IsCaseMatched<E, P, 5> extends true ? GetCaseResult<E, P, 5> : IsCaseMatched<E, P, 6> extends true ? GetCaseResult<E, P, 6> : IsCaseMatched<E, P, 7> extends true ? GetCaseResult<E, P, 7> : IsCaseMatched<E, P, 8> extends true ? GetCaseResult<E, P, 8> : IsCaseMatched<E, P, 9> extends true ? GetCaseResult<E, P, 9> : Endpoints[E]['res']['$switch']['$default'] : Endpoints[E]['res'];
 
 // @public (undocumented)
 type SwRegisterRequest = ContractRequest<'sw/register'>;
@@ -8178,7 +8179,7 @@ type UsersSearchResponse = ContractResponse<'users/search'>;
 type UsersShowRequest = ContractRequest<'users/show'>;
 
 // @public (undocumented)
-type UsersShowResponse = ContractResponse<'users/show'>;
+type UsersShowResponse_2 = ContractResponse<'users/show'>;
 
 // @public (undocumented)
 type UsersUpdateMemoRequest = ContractRequest<'users/update-memo'>;

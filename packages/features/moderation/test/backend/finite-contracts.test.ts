@@ -11,7 +11,7 @@ import { createModerationOperations, type ModerationApiDependencies } from '../.
 import type { ApiActor } from '../../../api/backend/transport/context.js';
 import type { MiSignin } from '../../../auth/backend/models/Signin.js';
 import type { RolePolicies } from '../../../roles/backend/services/RoleService.js';
-import type { MiUser } from '../../../users/backend/models/User.js';
+import type { MiUser, MiLocalUser } from '../../../users/backend/models/User.js';
 import type { MiUserProfile } from '../../../users/backend/models/UserProfile.js';
 
 const actor: ApiActor = { id: 'actor123', isSuspended: false, movedToUri: null };
@@ -68,9 +68,9 @@ test('moderator targets cannot be suspended and non-administrators cannot inspec
 test('reporting yourself or an administrator never submits a report; missing reports keep their original error', async () => {
 	const deps = mockDeep<ModerationApiDependencies<ApiActor>>();
 	const operations = createModerationOperations(deps);
-	deps.getterService.getUser.mockResolvedValue(mockDeep<MiUser>({ id: actor.id }));
+	deps.getterService.getUser.mockResolvedValue(mockDeep<MiLocalUser>({ id: actor.id }));
 	await expect(operations.usersReportAbuse({ userId: actor.id, comment: 'report' }, actor)).rejects.toMatchObject({ code: 'CANNOT_REPORT_YOURSELF' });
-	deps.getterService.getUser.mockResolvedValue(mockDeep<MiUser>({ id: 'user123' }));
+	deps.getterService.getUser.mockResolvedValue(mockDeep<MiLocalUser>({ id: 'user123' }));
 	deps.roleService.isAdministrator.mockResolvedValue(true);
 	await expect(operations.usersReportAbuse({ userId: 'user123', comment: 'report' }, actor)).rejects.toMatchObject({ code: 'CANNOT_REPORT_THE_ADMIN' });
 	expect(deps.abuseReportService.report).not.toHaveBeenCalled();

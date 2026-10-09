@@ -7,11 +7,15 @@ import { expect, test } from 'vitest';
 import * as v from 'valibot';
 import { mockDeep } from 'vitest-mock-extended';
 import { createRouterClient } from '@orpc/server';
+import Fastify from 'fastify';
+import { OpenAPIHandler } from '@orpc/openapi/fastify';
+import { registerPilotHttp } from '../../../api/backend/transport/pilot-http.js';
+import { nullSuccessToNoContent } from '../../../api/backend/transport/no-content.js';
 import { rolesInputs } from '../../backend/api.schema.js';
 import { roleCondFormulaSchema, rolePoliciesSchema, rolePolicySettingsSchema } from '../../backend/role.schema.js';
 import { createRolesOperations, type RolesDependencies } from '../../backend/api.operations.js';
 import { createRolesRouter, type RolesContext } from '../../backend/api.router.js';
-import type { ApiActor } from '../../../api/backend/transport/context.js';
+import type { ApiActor, ApiAuthorization, ApiContext } from '../../../api/backend/transport/context.js';
 import type { MiUser } from '../../../users/backend/models/User.js';
 import { MiRole } from '../../backend/models/Role.js';
 import { RoleEntityService } from '../../backend/serializers/RoleEntityService.js';
@@ -19,6 +23,8 @@ import type { RolesRepository, RoleAssignmentsRepository } from '../../../persis
 import type { IdService } from '../../../runtime/backend/services/IdService.js';
 import { roleSchema } from '../../backend/role.schema.js';
 import { DEFAULT_POLICIES } from '../../backend/services/RoleService.js';
+import { normalizeError, misskeyErrorBody } from '../../../api/backend/transport/orpc-error.js';
+import { packedRoleSchema as notificationRoleSchema } from '../../../notifications/backend/notification-related.schema.js';
 
 const actor: ApiActor = { id: 'actor123', isSuspended: false, movedToUri: null };
 const role = (membersEditable: boolean) => mockDeep<MiRole>({ id: 'role123', canEditMembersByModerator: membersEditable });
@@ -81,7 +87,11 @@ test('moderator credential requirement runs before malformed input; root bypasse
 	await expect(client.adminRolesUsers({ roleId: 'bad-id' })).rejects.toMatchObject({ code: 'CREDENTIAL_REQUIRED' });
 	expect(context.operations.roles.adminRolesUsers).not.toHaveBeenCalled();
 	context.services.authenticate.mockResolvedValue([actor, null]);
-	context.authorization = { rootUserId: () => actor.id, roles: async () => [], policyAllowed: async () => false };
+	const authorization = mockDeep<ApiAuthorization<ApiActor>>();
+	authorization.rootUserId.mockReturnValue(actor.id);
+	authorization.roles.mockResolvedValue([]);
+	authorization.policyAllowed.mockResolvedValue(false);
+	context.authorization = authorization;
 	context.operations.roles.adminRolesDelete.mockResolvedValue(undefined);
 	await client.adminRolesDelete({ roleId: 'role123' });
 	expect(context.operations.roles.adminRolesDelete).toHaveBeenCalledWith({ roleId: 'role123' }, actor);
@@ -131,19 +141,105 @@ test('role formula/settings inputs preserve original object-only acceptance, inc
 	expect(v.safeParse(roleCondFormulaSchema, formula).success).toBe(false);
 });
 
-test('malformed finite role JSON is written before its explicit output boundary rejects the stored domain shape', async () => {
+test('legacy empty formulas survive manual and conditional create/list/show/update; nonempty malformed output still rejects', async () => {
+	const date = new Date('2026-10-09T00:00:00Z');
+	const legacy = Object.assign(new MiRole(), {
+		id: 'role123', updatedAt: date, name: 'Role', description: '', color: null, iconUrl: null,
+		target: 'manual', condFormula: {}, isPublic: true, isAdministrator: false, isModerator: false,
+		isExplorable: true, asBadge: false, preserveAssignmentOnMoveAccount: false,
+		canEditMembersByModerator: false, displayOrder: 0, policies: {},
+	});
+	const assignments = mockDeep<RoleAssignmentsRepository>();
+	const query = mockDeep<ReturnType<RoleAssignmentsRepository['createQueryBuilder']>>();
+	assignments.createQueryBuilder.mockReturnValue(query);
+	query.where.mockReturnValue(query);
+	query.andWhere.mockReturnValue(query);
+	query.getCount.mockResolvedValue(0);
+	const ids = mockDeep<IdService>();
+	ids.parse.mockReturnValue(mockDeep<ReturnType<IdService['parse']>>({ date }));
+	const serializer = new RoleEntityService(mockDeep<RolesRepository>(), assignments, ids);
+	const packed = await serializer.pack(legacy, actor);
+	expect(v.parse(roleSchema, packed).condFormula).toEqual({});
+	expect(v.parse(notificationRoleSchema, packed).condFormula).toEqual({});
+	expect(v.parse(roleSchema, { ...packed, target: 'conditional' }).condFormula).toEqual({});
+	expect(v.parse(notificationRoleSchema, { ...packed, target: 'conditional' }).condFormula).toEqual({});
+	expect(v.safeParse(roleSchema, { ...packed, condFormula: { future: true } }).success).toBe(false);
+	expect(v.safeParse(notificationRoleSchema, { ...packed, condFormula: { future: true } }).success).toBe(false);
 	const deps = mockDeep<RolesDependencies<ApiActor>>();
+	deps.rolesRepository.find.mockResolvedValue([legacy]);
+	deps.rolesRepository.findOneBy.mockResolvedValue(legacy);
+	deps.roleService.create.mockResolvedValue(legacy);
+	deps.roleEntityService.pack.mockImplementation((row, principal) => serializer.pack(row, principal));
+	deps.roleEntityService.packMany.mockImplementation((rows, principal) => serializer.packMany(rows, principal));
+	const apiContext = mockDeep<ApiContext<ApiActor>>();
+	apiContext.services.authenticate.mockResolvedValue([actor, null]);
+	const context: RolesContext<ApiActor> = {
+		...apiContext,
+		mapError: normalizeError,
+		authorization: { rootUserId: () => actor.id, roles: async () => [], policyAllowed: async () => false },
+		operations: { roles: createRolesOperations(deps) },
+	};
+	const client = createRouterClient(createRolesRouter<ApiActor>(), { context });
 	const request = v.parse(rolesInputs.adminRolesCreate, {
 		name: 'Role', description: '', color: null, iconUrl: null, target: 'manual', condFormula: {},
 		isPublic: true, isModerator: false, isAdministrator: false, asBadge: false,
 		canEditMembersByModerator: false, displayOrder: 0, policies: {},
 	});
-	const stored = role(false);
-	deps.roleService.create.mockResolvedValue(stored);
-	deps.roleEntityService.pack.mockRejectedValue(new Error('stored role formula is invalid'));
-	await expect(createRolesOperations(deps).adminRolesCreate(request, actor)).rejects.toThrow('stored role formula is invalid');
-	expect(deps.roleService.create).toHaveBeenCalledWith(request, actor);
-	expect(deps.roleEntityService.pack).toHaveBeenCalledWith(stored, actor);
+	expect((await client.adminRolesCreate(request)).condFormula).toEqual({});
+	expect((await client.adminRolesList({}))[0].condFormula).toEqual({});
+	expect((await client.adminRolesShow({ roleId: legacy.id })).condFormula).toEqual({});
+	expect((await client.rolesShow({ roleId: legacy.id })).condFormula).toEqual({});
+	await client.adminRolesUpdate(v.parse(rolesInputs.adminRolesUpdate, { roleId: legacy.id, name: 'Renamed', condFormula: {} }));
+	expect(deps.roleService.update).toHaveBeenCalledWith(legacy, expect.objectContaining({ name: 'Renamed', condFormula: {} }), actor);
+	const conditional = Object.assign(new MiRole(), legacy, { target: 'conditional', condFormula: {} });
+	deps.rolesRepository.find.mockResolvedValue([conditional]);
+	deps.rolesRepository.findOneBy.mockResolvedValue(conditional);
+	deps.roleService.create.mockResolvedValue(conditional);
+	expect((await client.adminRolesCreate({ ...request, target: 'conditional' })).condFormula).toEqual({});
+	expect(deps.roleService.create).toHaveBeenLastCalledWith({ ...request, target: 'conditional' }, actor);
+	expect((await client.adminRolesList({}))[0].condFormula).toEqual({});
+	expect((await client.adminRolesShow({ roleId: conditional.id })).condFormula).toEqual({});
+	expect((await client.rolesShow({ roleId: conditional.id })).condFormula).toEqual({});
+	await client.adminRolesUpdate(v.parse(rolesInputs.adminRolesUpdate, { roleId: conditional.id, target: 'conditional', condFormula: {} }));
+	expect(deps.roleService.update).toHaveBeenLastCalledWith(conditional, expect.objectContaining({ target: 'conditional', condFormula: {} }), actor);
+	// Object-only input still writes nonempty malformed formulas before the output boundary rejects them.
+	const malformedFormulas: v.InferOutput<typeof rolesInputs.adminRolesCreate>['condFormula'][] = [
+		{ type: 'isLocal' }, { id: 'unknown', type: 'unknown' }, { future: true },
+	];
+	for (const formula of malformedFormulas) {
+		const malformed = Object.assign(new MiRole(), conditional, { condFormula: formula });
+		deps.roleService.create.mockResolvedValue(malformed);
+		await expect(client.adminRolesCreate({ ...request, target: 'conditional', condFormula: formula }))
+			.rejects.toMatchObject({ code: 'INTERNAL_SERVER_ERROR' });
+		expect(deps.roleService.create).toHaveBeenLastCalledWith({ ...request, target: 'conditional', condFormula: formula }, actor);
+		expect(deps.roleEntityService.pack).toHaveBeenLastCalledWith(malformed, actor);
+	}
+	// Exercise the production HTTP adapter so create output and void assignment mapping are both checked.
+	deps.roleService.create.mockResolvedValue(legacy);
+	deps.rolesRepository.findOneBy.mockResolvedValue(legacy);
+	deps.roleService.isAdministrator.mockResolvedValue(true);
+	deps.usersRepository.findOneBy.mockResolvedValue(mockDeep<MiUser>({ id: 'user123' }));
+	const app = Fastify();
+	const handler = new OpenAPIHandler(createRolesRouter<ApiActor>(), {
+		customErrorResponseBodyEncoder: misskeyErrorBody,
+		interceptors: [nullSuccessToNoContent()],
+	});
+	await app.register(async api => registerPilotHttp(api, handler, {
+		maxFileSize: 1024, context: () => context, runSpan: (_name, run) => run(),
+	}), { prefix: '/api' });
+	try {
+		const created = await app.inject({ method: 'POST', url: '/api/admin/roles/create', payload: request });
+		expect(created.statusCode).toBe(200);
+		expect(v.parse(roleSchema, created.json())).toMatchObject({ id: legacy.id, condFormula: {}, policies: {
+			canPublicNote: { useDefault: true, priority: 0, value: true },
+		} });
+		const assigned = await app.inject({ method: 'POST', url: '/api/admin/roles/assign', payload: { roleId: legacy.id, userId: 'user123' } });
+		expect(assigned.statusCode).toBe(204);
+		expect(assigned.body).toBe('');
+		expect(deps.roleService.assign).toHaveBeenLastCalledWith('user123', legacy.id, null, actor);
+	} finally {
+		await app.close();
+	}
 });
 
 test('sparse stored policy settings stay sparse and known undefined fields disappear at the wire boundary', async () => {

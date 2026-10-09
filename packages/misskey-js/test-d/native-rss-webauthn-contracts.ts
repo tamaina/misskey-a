@@ -27,11 +27,10 @@ export type NativeParity = Assert<Equal<{ [K in Routes]: Equal<InferContractRout
 export type PublishedParity = Assert<Equal<{ [K in Routes]: Equal<ContractEndpoints[K]['res'], Outputs[K]> }[Routes], true>>;
 export type SdkParity = Assert<Equal<{ [K in Routes]: Equal<Endpoints[K]['res'], Outputs[K]> }[Routes], true>>;
 export type RegistrationAlias = Assert<Equal<I2faRegisterKeyResponse, Outputs['i/2fa/register-key']>>;
-// The producer's optional attestation format names are wire strings, permitting
-// new registered formats. The browser library declares its currently known names.
-export type BrowserCompatible = Assert<Omit<I2faRegisterKeyResponse, 'attestationFormats'> extends Omit<PublicKeyCredentialCreationOptionsJSON, 'attestationFormats'> ? true : false>;
-export type AttestationFormatsAreWireStrings = Assert<Equal<I2faRegisterKeyResponse['attestationFormats'], string[] | undefined>>;
-export type BrowserFormatsAccepted = Assert<NonNullable<PublicKeyCredentialCreationOptionsJSON['attestationFormats']> extends NonNullable<I2faRegisterKeyResponse['attestationFormats']> ? true : false>;
+export type BrowserCompatible = Assert<I2faRegisterKeyResponse extends PublicKeyCredentialCreationOptionsJSON ? true : false>;
+export type AttestationFormatsMatchBrowser = Assert<Equal<I2faRegisterKeyResponse['attestationFormats'], PublicKeyCredentialCreationOptionsJSON['attestationFormats']>>;
+// @ts-expect-error Only formats emitted by the installed WebAuthn producer are supported.
+const unsupportedAttestationFormat: NonNullable<I2faRegisterKeyResponse['attestationFormats']>[number] = 'future-format';
 export type RssAlias = Assert<Equal<FetchRssResponse, Outputs['fetch-rss']>>;
 export type EnclosureLengthIsXmlString = Assert<Equal<NonNullable<FetchRssResponse['items'][number]['enclosure']>['length'], string | undefined>>;
 // Object-with-rest inference retains an empty object intersection; verify the exact domain both ways.
