@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 import bcrypt from 'bcryptjs';
 import { type UserAuthService } from '@features/auth/backend/services/UserAuthService.js';
 import { type DeleteAccountService } from '../../services/DeleteAccountService.js';
@@ -12,9 +13,8 @@ import type { UsersInputs } from '../../api.definition.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 import type { UsersRepository, UserProfilesRepository } from '@features/persistence/backend/repositories/models.js';
 import { iDeleteAccountContract } from './delete-account.contract.js';
-import { implement } from '@orpc/server';
-import { authentication, apiPolicy, requirePrincipal } from '@features/api/backend/transport/middleware.js';
-import type { ApiContext } from '@features/api/backend/transport/context.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+
 export interface IDeleteAccountDependencies {
 	usersRepository: UsersRepository;
 	userProfilesRepository: UserProfilesRepository;
@@ -51,6 +51,6 @@ export function createIDeleteAccountProcedure(deps: IDeleteAccountDependencies) 
 		await deps.deleteAccountService.deleteAccount(me);
 	}
 
-	return implement(iDeleteAccountContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>().use(authentication<MiLocalUser>()).use(apiPolicy<MiLocalUser>({ name: iDeleteAccountContract['~orpc'].meta.requestName, requireCredential: true, secure: true })).use(requirePrincipal<MiLocalUser>())
+	return createApiProcedure<MiLocalUser>()(iDeleteAccountContract).use(requirePrincipal<MiLocalUser>())
 		.handler(async ({ input, context }) => await execute(input, context.principal, context.token, context.ip));
 }

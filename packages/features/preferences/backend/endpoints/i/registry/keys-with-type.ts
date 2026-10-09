@@ -3,10 +3,10 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { implement } from '@orpc/server';
-import { authentication, apiPolicy, requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
 import { registryKeysWithTypeContract } from './keys-with-type.contract.js';
-import type { ApiActor, ApiContext } from '@features/api/backend/transport/context.js';
+import type { ApiActor } from '@features/api/backend/transport/context.js';
 import type { PreferencesDependencies } from '../../../api.implementation.js';
 import { registryTenant } from './registry.helpers.js';
 import type { RegistryJsonValue } from './registry.schema.js';
@@ -22,9 +22,7 @@ function valueType(value: RegistryJsonValue): RegistryValueType {
 }
 
 export function createRegistryKeysWithTypeProcedure<Actor extends ApiActor>(deps: PreferencesDependencies) {
-	return implement(registryKeysWithTypeContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>()
-		.use(authentication<Actor>())
-		.use(apiPolicy<Actor>({ name: 'i/registry/keys-with-type', requireCredential: true, kind: 'read:account' }))
+	return createApiProcedure<Actor>()(registryKeysWithTypeContract)
 		.use(requirePrincipal<Actor>())
 		.handler(async ({ input, context }) => {
 			const principal = context.principal;

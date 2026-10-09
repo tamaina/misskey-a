@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import type { Meta } from '@orpc/contract';
+import type { ApiProcedureMetadata } from '../../../../../api/backend/transport/policy.types.js';
 import { oc } from '@orpc/contract';
 import * as v from 'valibot';
 import { objectInput } from '../../../../../api/backend/transport/input.schema.js';
@@ -12,8 +14,12 @@ import { registryScope, registryDomain } from './registry.schema.js';
 const registryType = v.picklist(['null', 'array', 'number', 'string', 'boolean', 'object']);
 
 const requestName = 'i/registry/keys-with-type';
-export const registryKeysWithTypeContract = oc.$meta({ requestName: requestName } as const)
-	.route({ method: 'POST', path: `/${requestName}`, operationId: 'post___i___registry___keys-with-type', tags: ['account'], spec: current => ({ ...current, security: [{ bearerAuth: [] }] }) })
+export const registryKeysWithTypeContract = oc.$meta({
+	requestName: requestName,
+	requireCredential: true,
+	kind: 'read:account',
+} as const satisfies Meta & ApiProcedureMetadata)
+	.route({ method: 'POST', path: `/${requestName}`, tags: ['account'], spec: current => ({ ...current, security: [{ bearerAuth: [] }] }) })
 	.errors(commonErrors)
 	.input(objectInput({ scope: registryScope, domain: registryDomain })).output(v.lazy(input => {
 		if (input !== null && typeof input === 'object') {

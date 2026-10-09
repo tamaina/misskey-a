@@ -2,23 +2,22 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-
 import * as v from 'valibot';
-import { packedOptionalJsonValueSchema, packedJsonValueSchema, businessJsonObjectWithRest, type PackedJsonValue } from './json-value.schema.js';
-
-export type NotificationReceiveRule = (
-	{ type: 'all' | 'following' | 'follower' | 'mutualFollow' | 'followingOrFollower' | 'never' }
-	| { type: 'list'; userListId: string }
-) & { [key: string]: PackedJsonValue };
-export type NotificationSettingName =
-	| 'note' | 'follow' | 'mention' | 'reply' | 'renote' | 'quote' | 'reaction' | 'pollEnded'
-	| 'scheduledNotePosted' | 'scheduledNotePostFailed' | 'receiveFollowRequest' | 'followRequestAccepted'
-	| 'roleAssigned' | 'chatRoomInvitationReceived' | 'achievementEarned' | 'app' | 'test'
-	| 'login' | 'createToken' | 'exportCompleted';
+import { packedOptionalJsonValueSchema, packedJsonValueSchema, businessJsonObjectWithRest, type PackedJsonValue, toPackedJsonValue } from './json-value.schema.js';
+export type NotificationReceiveRule = ({
+	type: 'all' | 'following' | 'follower' | 'mutualFollow' | 'followingOrFollower' | 'never';
+} | {
+	type: 'list';
+	userListId: string;
+}) & {
+	[key: string]: PackedJsonValue;
+};
+export type NotificationSettingName = 'note' | 'follow' | 'mention' | 'reply' | 'renote' | 'quote' | 'reaction' | 'pollEnded' | 'scheduledNotePosted' | 'scheduledNotePostFailed' | 'receiveFollowRequest' | 'followRequestAccepted' | 'roleAssigned' | 'chatRoomInvitationReceived' | 'achievementEarned' | 'app' | 'test' | 'login' | 'createToken' | 'exportCompleted';
 export type NotificationSettings = {
 	[Name in NotificationSettingName]?: NotificationReceiveRule | undefined;
-} & { [key: string]: PackedJsonValue | undefined };
-
+} & {
+	[key: string]: PackedJsonValue | undefined;
+};
 export const notificationReceiveRule: v.GenericSchema<NotificationReceiveRule, NotificationReceiveRule> = v.union([
 	businessJsonObjectWithRest({
 		type: v.picklist(['all', 'following', 'follower', 'mutualFollow', 'followingOrFollower', 'never']),
@@ -50,15 +49,21 @@ const notificationRuleEntries = {
 	createToken: v.optional(notificationReceiveRule),
 	exportCompleted: v.optional(notificationReceiveRule),
 };
-export const notificationSettings: v.GenericSchema<NotificationSettings, NotificationSettings> = v.pipe(
-	businessJsonObjectWithRest(notificationRuleEntries, packedOptionalJsonValueSchema),
-	v.check(settings => Object.keys(settings).every(key => Object.hasOwn(notificationRuleEntries, key) || settings[key] !== undefined), 'Notification extension values must be JSON'),
-	v.transform(settings => {
-		for (const key of Object.keys(settings)) {
-			if (settings[key] === undefined) delete settings[key];
+export const notificationSettings: v.GenericSchema<NotificationSettings, NotificationSettings> = v.pipe(businessJsonObjectWithRest(notificationRuleEntries, packedOptionalJsonValueSchema), v.check(settings => Object.keys(settings).every(key => Object.hasOwn(notificationRuleEntries, key) || settings[key] !== undefined), 'Notification extension values must be JSON'), v.transform(settings => {
+	for (const key of Object.keys(settings)) {
+		if (settings[key] === undefined) delete settings[key];
+	}
+	return settings;
+}), v.metadata({ required: undefined }), v.metadata({ nullable: false }));
+/** Keep the JSON business keys while omitting declared optional undefined settings. */
+export function toPackedNotificationSettings(settings: NotificationSettings): NotificationSettings {
+	const result: NotificationSettings = {};
+	for (const [key, value] of Object.entries(settings)) {
+		if (value === undefined) {
+			if (!Object.hasOwn(notificationRuleEntries, key)) throw new TypeError('Notification extension values must be JSON');
+			continue;
 		}
-		return settings;
-	}),
-	v.metadata({ required: undefined }),
-	v.metadata({ nullable: false }),
-);
+		Object.defineProperty(result, key, { value: toPackedJsonValue(value), enumerable: true, writable: true, configurable: true });
+	}
+	return result;
+}

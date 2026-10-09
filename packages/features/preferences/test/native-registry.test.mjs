@@ -179,3 +179,12 @@ test('registry persistence binds JSON and null separately for insert and update'
 		}
 	}
 });
+
+test('scope envelopes project storage-only fields while keeping scope order and null domains', async () => {
+	const stored = [{ domain: null, scopes: [['first', 'second'], []], storageOnly: true }];
+	const { client } = fixture({ overrides: { getAllScopeAndDomains: async () => stored } });
+	const wire = await client.scopesWithDomain({});
+	assert.deepEqual(wire, [{ domain: null, scopes: [['first', 'second'], []] }]);
+	assert.notEqual(wire[0].scopes, stored[0].scopes);
+	assert.notEqual(wire[0].scopes[0], stored[0].scopes[0]);
+});

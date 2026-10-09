@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 import { In, IsNull } from 'typeorm';
 import { type RemoteUserResolveService } from '@features/federation/backend/services/RemoteUserResolveService.js';
 import { type PerUserPvChart } from '@features/statistics/backend/charts/per-user-pv.js';
@@ -18,9 +19,7 @@ import type { UsersInputs } from '../../api.definition.js';
 import type { ApiToken } from '@features/api/backend/transport/context.js';
 import type { FindOptionsWhere } from 'typeorm';
 import { usersShowContract } from './show.contract.js';
-import { implement } from '@orpc/server';
-import { authentication, apiPolicy } from '@features/api/backend/transport/middleware.js';
-import type { ApiContext } from '@features/api/backend/transport/context.js';
+
 import { toPackedUserDetailed } from '@features/users/backend/user.schema.js';
 export interface UsersShowDependencies {
 	serverSettings: MiMeta;
@@ -119,6 +118,6 @@ export function createUsersShowProcedure(deps: UsersShowDependencies) {
 		return Array.isArray(value) ? value.map(user => toPackedUserDetailed(user)) : toPackedUserDetailed(value);
 	}
 
-	return implement(usersShowContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>().use(authentication<MiLocalUser>()).use(apiPolicy<MiLocalUser>({ name: usersShowContract['~orpc'].meta.requestName }))
+	return createApiProcedure<MiLocalUser>()(usersShowContract)
 		.handler(async ({ input, context }) => await packShow(input, context));
 }

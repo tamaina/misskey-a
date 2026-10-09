@@ -3,14 +3,19 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import type { Meta } from '@orpc/contract';
+import type { ApiProcedureMetadata } from '../../../api/backend/transport/policy.types.js';
 import { oc } from '@orpc/contract';
 import * as v from 'valibot';
 import { commonErrors } from '../../../api/backend/transport/errors.schema.js';
 import { objectInput } from '../users.input.schema.js';
 import { packedUserDetailedSchema } from '../user.schema.js';
 export const usersErrors = {} as const;
-export const usersContract = oc.$meta({ requestName: 'users' } as const)
-	.route({ method: 'POST', path: '/users', operationId: 'post___users', tags: ['users'] })
+export const usersContract = oc.$meta({
+	requestName: 'users',
+	requireCredential: false,
+} as const satisfies Meta & ApiProcedureMetadata)
+	.route({ method: 'POST', path: '/users', tags: ['users'] })
 	.errors({ ...commonErrors }).input(objectInput({
 	'limit': v.optional(v.pipe(v.pipe(v.number(), v.integer()), v.minValue(1), v.maxValue(100)), 10),
 	'offset': v.optional(v.pipe(v.number(), v.integer()), 0),

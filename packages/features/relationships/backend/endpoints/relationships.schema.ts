@@ -2,14 +2,9 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-
 import * as v from 'valibot';
-import { toPackedUserDetailed, type UserDetailedWireInput } from '../../../users/backend/user.schema.js';
-import {
-	packedUserDetailedSchema,
-	packedUserDetailedSchema as __ref_UserDetailedNotMe,
-} from '../../../users/backend/user.schema.js';
-
+import { toPackedUserDetailed, toPackedUserLite, type PackedUserLite, type UserDetailedWireInput } from '../../../users/backend/user.schema.js';
+import { packedUserDetailedSchema, packedUserDetailedSchema as __ref_UserDetailedNotMe, } from '../../../users/backend/user.schema.js';
 export const packedBlockingSchema = v.strictObject({
 	'id': v.pipe(v.string(), v.metadata({ 'format': 'id', 'example': 'xxxxxxxxxx' })),
 	'createdAt': v.pipe(v.string(), v.metadata({ 'format': 'date-time' })),
@@ -44,7 +39,6 @@ export const packedUserListSchema = v.strictObject({
 	'userIds': v.optional(v.array(v.pipe(v.string(), v.metadata({ 'format': 'id' })))),
 	'isPublic': v.boolean(),
 });
-
 // getRelation returns this selected persistence row as part of its public JSON result.
 export const packedRelationFollowingSchema = v.strictObject({
 	id: v.string(), followeeId: v.string(), followerId: v.string(),
@@ -59,7 +53,6 @@ export const packedUserRelationSchema = v.strictObject({
 	hasPendingFollowRequestFromYou: v.boolean(), hasPendingFollowRequestToYou: v.boolean(),
 	isBlocking: v.boolean(), isBlocked: v.boolean(), isMuted: v.boolean(), isRenoteMuted: v.boolean(),
 });
-
 type FollowingWireInput = Omit<v.InferOutput<typeof packedFollowingSchema>, 'followee' | 'follower'> & {
 	followee?: UserDetailedWireInput | undefined;
 	follower?: UserDetailedWireInput | undefined;
@@ -74,7 +67,10 @@ export function toPackedFollowing(following: FollowingWireInput): v.InferOutput<
 export function toPackedUserRelation(relation: v.InferOutput<typeof packedUserRelationSchema>): v.InferOutput<typeof packedUserRelationSchema> {
 	const following = relation.following;
 	return {
-		...relation,
+		id: relation.id, isFollowing: relation.isFollowing, isFollowed: relation.isFollowed,
+		hasPendingFollowRequestFromYou: relation.hasPendingFollowRequestFromYou,
+		hasPendingFollowRequestToYou: relation.hasPendingFollowRequestToYou,
+		isBlocking: relation.isBlocking, isBlocked: relation.isBlocked, isMuted: relation.isMuted, isRenoteMuted: relation.isRenoteMuted,
 		following: following === null ? null : {
 			id: following.id, followeeId: following.followeeId, followerId: following.followerId,
 			isFollowerHibernated: following.isFollowerHibernated, isFollowerSuspended: following.isFollowerSuspended,
@@ -83,4 +79,39 @@ export function toPackedUserRelation(relation: v.InferOutput<typeof packedUserRe
 			followeeHost: following.followeeHost, followeeInbox: following.followeeInbox, followeeSharedInbox: following.followeeSharedInbox,
 		},
 	};
+}
+export function toPackedBlocking(row: Omit<v.InferOutput<typeof packedBlockingSchema>, 'blockee'> & {
+	blockee: UserDetailedWireInput;
+}): v.InferOutput<typeof packedBlockingSchema> {
+	return { id: row.id, createdAt: row.createdAt, blockeeId: row.blockeeId, blockee: toPackedUserDetailed(row.blockee) };
+}
+export function toPackedMuting(row: Omit<v.InferOutput<typeof packedMutingSchema>, 'mutee'> & {
+	mutee: UserDetailedWireInput;
+}): v.InferOutput<typeof packedMutingSchema> {
+	return { id: row.id, createdAt: row.createdAt, expiresAt: row.expiresAt, muteeId: row.muteeId, mutee: toPackedUserDetailed(row.mutee) };
+}
+export function toPackedRenoteMuting(row: Omit<v.InferOutput<typeof packedRenoteMutingSchema>, 'mutee'> & {
+	mutee: UserDetailedWireInput;
+}): v.InferOutput<typeof packedRenoteMutingSchema> {
+	return { id: row.id, createdAt: row.createdAt, muteeId: row.muteeId, mutee: toPackedUserDetailed(row.mutee) };
+}
+export function toPackedUserList(row: v.InferOutput<typeof packedUserListSchema>): v.InferOutput<typeof packedUserListSchema> {
+	return { id: row.id, createdAt: row.createdAt, name: row.name, isPublic: row.isPublic,
+		...(row.userIds === undefined ? {} : { userIds: [...row.userIds] }) };
+}
+export function toPackedFollowRequest(row: {
+	id: string;
+	follower: PackedUserLite;
+	followee: PackedUserLite;
+}) {
+	return { id: row.id, follower: toPackedUserLite(row.follower), followee: toPackedUserLite(row.followee) };
+}
+export function toPackedUserListMembership(row: {
+	id: string;
+	createdAt: string;
+	userId: string;
+	user: PackedUserLite;
+	withReplies: boolean;
+}) {
+	return { id: row.id, createdAt: row.createdAt, userId: row.userId, user: toPackedUserLite(row.user), withReplies: row.withReplies };
 }

@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import type { Meta } from '@orpc/contract';
+import type { ApiProcedureMetadata } from '../../../../api/backend/transport/policy.types.js';
 import { oc } from '@orpc/contract';
 import * as v from 'valibot';
 import { commonErrors, apiErrorData } from '../../../../api/backend/transport/errors.schema.js';
@@ -30,8 +32,11 @@ export const usersShowErrors = {
 		status: 404,
 	},
 } as const;
-export const usersShowContract = oc.$meta({ requestName: 'users/show' } as const)
-	.route({ method: 'POST', path: '/users/show', operationId: 'post___users___show', tags: ['users'], description: 'Show the properties of a user.' })
+export const usersShowContract = oc.$meta({
+	requestName: 'users/show',
+	requireCredential: false,
+} as const satisfies Meta & ApiProcedureMetadata)
+	.route({ method: 'POST', path: '/users/show', tags: ['users'], description: 'Show the properties of a user.' })
 	.errors({ ...commonErrors, FAILED_TO_RESOLVE_REMOTE_USER: { status: 500, data: apiErrorData }, NO_SUCH_USER: { status: 404, data: apiErrorData } }).input(v.union([
 	objectInput({ ...userSelectors, userIds: uniqueStrings(misskeyId) }),
 	objectInput({ ...userSelectors, userId: misskeyId }),

@@ -2,6 +2,7 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 import { type IdService } from '@features/runtime/backend/services/IdService.js';
 import { type GetterService } from '@features/api/backend/transport/GetterService.js';
 import { apiError } from '@features/api/backend/transport/orpc-error.js';
@@ -12,9 +13,8 @@ import type { MiLocalUser } from '@features/users/backend/models/User.js';
 
 import type { UserMemoRepository } from '@features/persistence/backend/repositories/models.js';
 import { usersUpdateMemoContract } from './update-memo.contract.js';
-import { implement } from '@orpc/server';
-import { authentication, apiPolicy, requirePrincipal } from '@features/api/backend/transport/middleware.js';
-import type { ApiContext } from '@features/api/backend/transport/context.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+
 export interface UsersUpdateMemoDependencies {
 	userMemosRepository: UserMemoRepository;
 	getterService: GetterService;
@@ -59,6 +59,6 @@ export function createUsersUpdateMemoProcedure(deps: UsersUpdateMemoDependencies
 		}
 	}
 
-	return implement(usersUpdateMemoContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>().use(authentication<MiLocalUser>()).use(apiPolicy<MiLocalUser>({ name: usersUpdateMemoContract['~orpc'].meta.requestName, requireCredential: true, kind: 'write:account' })).use(requirePrincipal<MiLocalUser>())
+	return createApiProcedure<MiLocalUser>()(usersUpdateMemoContract).use(requirePrincipal<MiLocalUser>())
 		.handler(async ({ input, context }) => await execute(input, context.principal, context.token, context.ip));
 }

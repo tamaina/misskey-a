@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 import RE2 from 're2';
 import * as mfm from 'mfm-js';
 import * as htmlParser from 'node-html-parser';
@@ -66,9 +67,8 @@ export type UserProfileUpdateRepository = Omit<UserProfilesRepository, 'update'>
 	update(userId: string, patch: UserProfileUpdatePatch): Promise<import('typeorm').UpdateResult>;
 };
 import { iUpdateContract } from './update.contract.js';
-import { implement } from '@orpc/server';
-import { authentication, apiPolicy, requirePrincipal } from '@features/api/backend/transport/middleware.js';
-import type { ApiContext } from '@features/api/backend/transport/context.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+
 import { toPackedUserDetailed } from '@features/users/backend/user.schema.js';
 export interface IUpdateDependencies {
 	config: Config;
@@ -417,12 +417,7 @@ export function createIUpdateProcedure(deps: IUpdateDependencies) {
 		}
 	}
 
-	return implement(iUpdateContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>().use(authentication<MiLocalUser>()).use(apiPolicy<MiLocalUser>({
-		name: iUpdateContract['~orpc'].meta.requestName, requireCredential: true, kind: 'write:account', limit: {
-			duration: 3600000,
-			max: 20,
-		}
-	})).use(requirePrincipal<MiLocalUser>())
+	return createApiProcedure<MiLocalUser>()(iUpdateContract).use(requirePrincipal<MiLocalUser>())
 		.handler(async ({ input, context }) => toPackedUserDetailed(await execute(input, context.principal, context.token, context.ip)));
 }
 

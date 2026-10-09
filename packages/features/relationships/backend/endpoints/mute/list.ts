@@ -2,15 +2,15 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-import { implement } from '@orpc/server';
-import type { ApiContext } from '@features/api/backend/transport/context.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
-import { authentication, apiPolicy, requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
 import { relationshipsContract } from '../relationships.contract.js';
 import type { RelationshipsDependencies } from '../../api.implementation.js';
-import { toPackedUserDetailed } from '@features/users/backend/user.schema.js';
+import { toPackedMuting } from '../relationships.schema.js';
 export function createMuteListProcedure<Actor extends MiLocalUser>(deps: Pick<RelationshipsDependencies, 'queryService' | 'mutingsRepository' | 'mutingEntityService'>) {
-	return implement(relationshipsContract["mute/list"], { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>().use(authentication<Actor>()).use(apiPolicy<Actor>({ name: 'mute/list', requireCredential: true, kind: 'read:mutes' })).use(requirePrincipal<Actor>())
+	return createApiProcedure<Actor>()(relationshipsContract["mute/list"]).use(requirePrincipal<Actor>())
 		.handler(async ({ input, context }) => {
 			const ps = input;
 			const me = context.principal;
@@ -20,6 +20,6 @@ export function createMuteListProcedure<Actor extends MiLocalUser>(deps: Pick<Re
 			const mutings = await query
 				.limit(ps.limit)
 				.getMany();
-			return (await deps.mutingEntityService.packMany(mutings, me)).map(row => ({ ...row, mutee: toPackedUserDetailed(row.mutee) }));
+			return (await deps.mutingEntityService.packMany(mutings, me)).map(toPackedMuting);
 		});
 }

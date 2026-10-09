@@ -3,19 +3,16 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { implement } from '@orpc/server';
-import { authentication, apiPolicy, requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
 import { registryScopesWithDomainContract } from './scopes-with-domain.contract.js';
-import type { ApiActor, ApiContext } from '@features/api/backend/transport/context.js';
+import type { ApiActor } from '@features/api/backend/transport/context.js';
 import type { PreferencesDependencies } from '../../../api.implementation.js';
 export function createRegistryScopesWithDomainProcedure<Actor extends ApiActor>(deps: PreferencesDependencies) {
-	return implement(registryScopesWithDomainContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>()
-		.use(authentication<Actor>())
-		.use(apiPolicy<Actor>({ name: 'i/registry/scopes-with-domain', requireCredential: true, secure: true }))
+	return createApiProcedure<Actor>()(registryScopesWithDomainContract)
 		.use(requirePrincipal<Actor>())
-		.handler(async ({ input, context }) => {
+		.handler(async ({ context }) => {
 			const principal = context.principal;
-			const token = context.token;
-			return deps.registry.getAllScopeAndDomains(principal.id);
+			return (await deps.registry.getAllScopeAndDomains(principal.id)).map(item => ({ domain: item.domain, scopes: item.scopes.map(scope => [...scope]) }));
 		});
 }

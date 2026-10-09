@@ -2,6 +2,7 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 import { apiError } from '@features/api/backend/transport/orpc-error.js';
 import { type UserEntityService } from '../../../serializers/UserEntityService.js';
 import { adminAccountsFindByEmailErrors } from './find-by-email.contract.js';
@@ -11,9 +12,8 @@ import type { MiLocalUser } from '@features/users/backend/models/User.js';
 
 import type { UserProfilesRepository } from '@features/persistence/backend/repositories/models.js';
 import { adminAccountsFindByEmailContract } from './find-by-email.contract.js';
-import { implement } from '@orpc/server';
-import { authentication, apiPolicy, requirePrincipal } from '@features/api/backend/transport/middleware.js';
-import type { ApiContext } from '@features/api/backend/transport/context.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+
 import { toPackedUserDetailed } from '@features/users/backend/user.schema.js';
 export interface AdminAccountsFindByEmailDependencies {
 	userProfilesRepository: UserProfilesRepository;
@@ -37,6 +37,6 @@ export function createAdminAccountsFindByEmailProcedure(deps: AdminAccountsFindB
 		return res;
 	}
 
-	return implement(adminAccountsFindByEmailContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>().use(authentication<MiLocalUser>()).use(apiPolicy<MiLocalUser>({ name: adminAccountsFindByEmailContract['~orpc'].meta.requestName, requireCredential: true, requireAdmin: true, kind: 'read:admin:account' })).use(requirePrincipal<MiLocalUser>())
+	return createApiProcedure<MiLocalUser>()(adminAccountsFindByEmailContract).use(requirePrincipal<MiLocalUser>())
 		.handler(async ({ input, context }) => toPackedUserDetailed(await execute(input, context.principal, context.token, context.ip)));
 }

@@ -2,23 +2,18 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-import { implement } from '@orpc/server';
-import type { ApiContext } from '@features/api/backend/transport/context.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
-import { authentication, apiPolicy, requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
 import { relationshipsContract } from '../relationships.contract.js';
 import type { RelationshipsDependencies } from '../../api.implementation.js';
-import ms from 'ms';
+
 import { apiError } from '@features/api/backend/transport/orpc-error.js';
 import { relationshipsErrors } from '../relationships.errors.js';
 import { toPackedUserDetailed } from '@features/users/backend/user.schema.js';
 export function createBlockingDeleteProcedure<Actor extends MiLocalUser>(deps: Pick<RelationshipsDependencies, 'usersRepository' | 'getterService' | 'blockingsRepository' | 'userBlockingService' | 'userEntityService'>) {
-	return implement(relationshipsContract["blocking/delete"], { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>().use(authentication<Actor>()).use(apiPolicy<Actor>({
-		name: 'blocking/delete', requireCredential: true, kind: 'write:blocks', limit: {
-			duration: ms('1hour'),
-			max: 100,
-		}
-	})).use(requirePrincipal<Actor>())
+	return createApiProcedure<Actor>()(relationshipsContract["blocking/delete"]).use(requirePrincipal<Actor>())
 		.handler(async ({ input, context }) => {
 			const ps = input;
 			const me = context.principal;

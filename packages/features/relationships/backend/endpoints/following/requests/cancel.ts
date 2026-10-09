@@ -2,17 +2,18 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-import { implement } from '@orpc/server';
-import type { ApiContext } from '@features/api/backend/transport/context.js';
+import { toPackedUserLite } from '@features/users/backend/user.schema.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
-import { authentication, apiPolicy, requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
 import { relationshipsContract } from '../../relationships.contract.js';
 import type { RelationshipsDependencies } from '../../../api.implementation.js';
 import { IdentifiableError } from '@features/runtime/backend/errors/identifiable-error.js';
 import { apiError } from '@features/api/backend/transport/orpc-error.js';
 import { relationshipsErrors } from '../../relationships.errors.js';
 export function createFollowingRequestsCancelProcedure<Actor extends MiLocalUser>(deps: Pick<RelationshipsDependencies, 'getterService' | 'userFollowingService' | 'userEntityService'>) {
-	return implement(relationshipsContract["following/requests/cancel"], { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>().use(authentication<Actor>()).use(apiPolicy<Actor>({ name: 'following/requests/cancel', requireCredential: true, kind: 'write:following' })).use(requirePrincipal<Actor>())
+	return createApiProcedure<Actor>()(relationshipsContract["following/requests/cancel"]).use(requirePrincipal<Actor>())
 		.handler(async ({ input, context }) => {
 			const ps = input;
 			const me = context.principal;
@@ -31,6 +32,6 @@ export function createFollowingRequestsCancelProcedure<Actor extends MiLocalUser
 				throw err;
 			}
 
-			return await deps.userEntityService.pack(followee.id, me);
+			return toPackedUserLite(await deps.userEntityService.pack(followee.id, me));
 		});
 }

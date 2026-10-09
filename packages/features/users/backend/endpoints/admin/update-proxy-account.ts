@@ -2,6 +2,7 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 import { type ModerationLogService } from '@features/moderation/backend/services/ModerationLogService.js';
 import { type UserEntityService } from '../../serializers/UserEntityService.js';
 import { type SystemAccountService } from '../../services/SystemAccountService.js';
@@ -10,9 +11,8 @@ import type { UsersInputs } from '../../api.definition.js';
 
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 import { adminUpdateProxyAccountContract } from './update-proxy-account.contract.js';
-import { implement } from '@orpc/server';
-import { authentication, apiPolicy, requirePrincipal } from '@features/api/backend/transport/middleware.js';
-import type { ApiContext } from '@features/api/backend/transport/context.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+
 import { toPackedUserDetailed } from '@features/users/backend/user.schema.js';
 export interface AdminUpdateProxyAccountDependencies {
 	userEntityService: UserEntityService;
@@ -37,6 +37,6 @@ export function createAdminUpdateProxyAccountProcedure(deps: AdminUpdateProxyAcc
 		return updated;
 	}
 
-	return implement(adminUpdateProxyAccountContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>().use(authentication<MiLocalUser>()).use(apiPolicy<MiLocalUser>({ name: adminUpdateProxyAccountContract['~orpc'].meta.requestName, requireCredential: true, requireModerator: true, kind: 'write:admin:account' })).use(requirePrincipal<MiLocalUser>())
+	return createApiProcedure<MiLocalUser>()(adminUpdateProxyAccountContract).use(requirePrincipal<MiLocalUser>())
 		.handler(async ({ input, context }) => toPackedUserDetailed(await execute(input, context.principal, context.token, context.ip)));
 }

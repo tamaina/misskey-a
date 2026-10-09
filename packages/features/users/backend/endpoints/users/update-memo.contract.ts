@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import type { Meta } from '@orpc/contract';
+import type { ApiProcedureMetadata } from '../../../../api/backend/transport/policy.types.js';
 import { oc } from '@orpc/contract';
 import * as v from 'valibot';
 import { commonErrors, apiErrorData } from '../../../../api/backend/transport/errors.schema.js';
@@ -15,8 +17,12 @@ export const usersUpdateMemoErrors = {
 		id: '6fef56f3-e765-4957-88e5-c6f65329b8a5',
 	},
 } as const;
-export const usersUpdateMemoContract = oc.$meta({ requestName: 'users/update-memo' } as const)
-	.route({ method: 'POST', path: '/users/update-memo', operationId: 'post___users___update-memo', tags: ['account'], spec: current => ({ ...current, security: [{ bearerAuth: [] }] }), successStatus: 204 })
+export const usersUpdateMemoContract = oc.$meta({
+	requestName: 'users/update-memo',
+	requireCredential: true,
+	kind: 'write:account',
+} as const satisfies Meta & ApiProcedureMetadata)
+	.route({ method: 'POST', path: '/users/update-memo', tags: ['account'], spec: current => ({ ...current, security: [{ bearerAuth: [] }] }), successStatus: 204 })
 	.errors({ ...commonErrors, NO_SUCH_USER: { status: 400, data: apiErrorData } }).input(objectInput({
 	'userId': misskeyId,
 	'memo': v.pipe(v.nullable(v.string()), v.metadata({ 'description': 'A personal memo for the target user. If null or empty, delete the memo.' })),

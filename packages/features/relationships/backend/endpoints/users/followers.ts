@@ -2,10 +2,10 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-import { implement } from '@orpc/server';
-import type { ApiContext } from '@features/api/backend/transport/context.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
-import { authentication, apiPolicy } from '@features/api/backend/transport/middleware.js';
+
 import { relationshipsContract } from '../relationships.contract.js';
 import type { RelationshipsDependencies } from '../../api.implementation.js';
 import { IsNull } from 'typeorm';
@@ -13,7 +13,7 @@ import { apiError } from '@features/api/backend/transport/orpc-error.js';
 import { relationshipsErrors } from '../relationships.errors.js';
 import { toPackedFollowing } from '../relationships.schema.js';
 export function createUsersFollowersProcedure<Actor extends MiLocalUser>(deps: Pick<RelationshipsDependencies, 'usersRepository' | 'utilityService' | 'userProfilesRepository' | 'roleService' | 'followingsRepository' | 'queryService' | 'followingEntityService'>) {
-	return implement(relationshipsContract["users/followers"], { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>().use(authentication<Actor>()).use(apiPolicy<Actor>({ name: 'users/followers', requireCredential: false }))
+	return createApiProcedure<Actor>()(relationshipsContract["users/followers"])
 		.handler(async ({ input, context }) => {
 			const ps = input;
 			const me = context.principal;

@@ -2,15 +2,15 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-import { implement } from '@orpc/server';
-import type { ApiContext } from '@features/api/backend/transport/context.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
-import { authentication, apiPolicy, requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
 import { relationshipsContract } from '../relationships.contract.js';
 import type { RelationshipsDependencies } from '../../api.implementation.js';
-import { toPackedUserDetailed } from '@features/users/backend/user.schema.js';
+import { toPackedRenoteMuting } from '../relationships.schema.js';
 export function createRenoteMuteListProcedure<Actor extends MiLocalUser>(deps: Pick<RelationshipsDependencies, 'queryService' | 'renoteMutingsRepository' | 'renoteMutingEntityService'>) {
-	return implement(relationshipsContract["renote-mute/list"], { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>().use(authentication<Actor>()).use(apiPolicy<Actor>({ name: 'renote-mute/list', requireCredential: true, kind: 'read:mutes' })).use(requirePrincipal<Actor>())
+	return createApiProcedure<Actor>()(relationshipsContract["renote-mute/list"]).use(requirePrincipal<Actor>())
 		.handler(async ({ input, context }) => {
 			const ps = input;
 			const me = context.principal;
@@ -20,6 +20,6 @@ export function createRenoteMuteListProcedure<Actor extends MiLocalUser>(deps: P
 			const mutings = await query
 				.limit(ps.limit)
 				.getMany();
-			return (await deps.renoteMutingEntityService.packMany(mutings, me)).map(row => ({ ...row, mutee: toPackedUserDetailed(row.mutee) }));
+			return (await deps.renoteMutingEntityService.packMany(mutings, me)).map(toPackedRenoteMuting);
 		});
 }

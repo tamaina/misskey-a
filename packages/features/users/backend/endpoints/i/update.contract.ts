@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import type { Meta } from '@orpc/contract';
+import type { ApiProcedureMetadata } from '../../../../api/backend/transport/policy.types.js';
 import { oc } from '@orpc/contract';
 import * as v from 'valibot';
 import { commonErrors, apiErrorData } from '../../../../api/backend/transport/errors.schema.js';
@@ -85,8 +87,16 @@ export const iUpdateErrors = {
 		status: 422,
 	},
 } as const;
-export const iUpdateContract = oc.$meta({ requestName: 'i/update' } as const)
-	.route({ method: 'POST', path: '/i/update', operationId: 'post___i___update', tags: ['account'], spec: current => ({ ...current, security: [{ bearerAuth: [] }] }) })
+export const iUpdateContract = oc.$meta({
+	requestName: 'i/update',
+	requireCredential: true,
+	kind: 'write:account',
+	limit: {
+			duration: 3600000,
+			max: 20,
+		},
+} as const satisfies Meta & ApiProcedureMetadata)
+	.route({ method: 'POST', path: '/i/update', tags: ['account'], spec: current => ({ ...current, security: [{ bearerAuth: [] }] }) })
 	.errors({ ...commonErrors, NO_SUCH_AVATAR: { status: 400, data: apiErrorData }, NO_SUCH_BANNER: { status: 400, data: apiErrorData }, AVATAR_NOT_AN_IMAGE: { status: 400, data: apiErrorData }, BANNER_NOT_AN_IMAGE: { status: 400, data: apiErrorData }, NO_SUCH_PAGE: { status: 400, data: apiErrorData }, INVALID_REGEXP: { status: 400, data: apiErrorData }, TOO_MANY_MUTED_WORDS: { status: 400, data: apiErrorData }, NO_SUCH_USER: { status: 400, data: apiErrorData }, URI_NULL: { status: 400, data: apiErrorData }, FORBIDDEN_TO_SET_YOURSELF: { status: 400, data: apiErrorData }, RESTRICTED_BY_ROLE: { status: 400, data: apiErrorData }, YOUR_NAME_CONTAINS_PROHIBITED_WORDS: { status: 422, data: apiErrorData } }).input(v.pipe(objectInput({
 	name: v.optional(v.nullable(v.pipe(v.string(), v.minCodePoints(1), v.maxCodePoints(50)))),
 	description: v.optional(v.nullable(description)),

@@ -2,6 +2,7 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 import { type QueryService } from '@features/notes/backend/services/QueryService.js';
 import { type UserEntityService } from '../serializers/UserEntityService.js';
 import type { ApiToken } from '@features/api/backend/transport/context.js';
@@ -10,9 +11,7 @@ import type { UsersInputs } from '../api.definition.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 import type { UsersRepository } from '@features/persistence/backend/repositories/models.js';
 import { usersContract } from './users.contract.js';
-import { implement } from '@orpc/server';
-import { authentication, apiPolicy } from '@features/api/backend/transport/middleware.js';
-import type { ApiContext } from '@features/api/backend/transport/context.js';
+
 import { toPackedUserDetailed } from '@features/users/backend/user.schema.js';
 export interface UsersDependencies {
 	usersRepository: UsersRepository;
@@ -59,6 +58,6 @@ export function createUsersProcedure(deps: UsersDependencies) {
 		return await deps.userEntityService.packMany(users, me, { schema: 'UserDetailed' });
 	}
 
-	return implement(usersContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>().use(authentication<MiLocalUser>()).use(apiPolicy<MiLocalUser>({ name: usersContract['~orpc'].meta.requestName }))
+	return createApiProcedure<MiLocalUser>()(usersContract)
 		.handler(async ({ input, context }) => (await execute(input, context.principal, context.token, context.ip)).map(user => toPackedUserDetailed(user)));
 }

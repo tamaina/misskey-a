@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import type { Meta } from '@orpc/contract';
+import type { ApiProcedureMetadata } from '../../../../api/backend/transport/policy.types.js';
 import { oc } from '@orpc/contract';
 import * as v from 'valibot';
 import { commonErrors, apiErrorData } from '../../../../api/backend/transport/errors.schema.js';
@@ -41,8 +43,17 @@ export const iMoveErrors = {
 		id: 'b234a14e-9ebe-4581-8000-074b3c215962',
 	},
 } as const;
-export const iMoveContract = oc.$meta({ requestName: 'i/move' } as const)
-	.route({ method: 'POST', path: '/i/move', operationId: 'post___i___move', tags: ['users'], spec: current => ({ ...current, security: [{ bearerAuth: [] }] }) })
+export const iMoveContract = oc.$meta({
+	requestName: 'i/move',
+	requireCredential: true,
+	secure: true,
+	prohibitMoved: true,
+	limit: {
+			duration: 86400000,
+			max: 5,
+		},
+} as const satisfies Meta & ApiProcedureMetadata)
+	.route({ method: 'POST', path: '/i/move', tags: ['users'], spec: current => ({ ...current, security: [{ bearerAuth: [] }] }) })
 	.errors({ ...commonErrors, DESTINATION_ACCOUNT_FORBIDS: { status: 400, data: apiErrorData }, NOT_ROOT_FORBIDDEN: { status: 400, data: apiErrorData }, NO_SUCH_USER: { status: 400, data: apiErrorData }, URI_NULL: { status: 400, data: apiErrorData }, ALREADY_MOVED: { status: 400, data: apiErrorData } }).input(objectInput({
 	'moveToAccount': v.string(),
 })).output(packedMeDetailedSchema);

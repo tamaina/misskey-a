@@ -3,17 +3,16 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { implement } from '@orpc/server';
-import { authentication, apiPolicy, requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import { toPackedJsonValue } from '@features/users/backend/json-value.schema.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
 import { registryGetAllContract } from './get-all.contract.js';
-import type { ApiActor, ApiContext } from '@features/api/backend/transport/context.js';
+import type { ApiActor } from '@features/api/backend/transport/context.js';
 import type { PreferencesDependencies } from '../../../api.implementation.js';
 import { registryTenant } from './registry.helpers.js';
 import type { RegistryJsonValue } from './registry.schema.js';
 export function createRegistryGetAllProcedure<Actor extends ApiActor>(deps: PreferencesDependencies) {
-	return implement(registryGetAllContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>()
-		.use(authentication<Actor>())
-		.use(apiPolicy<Actor>({ name: 'i/registry/get-all', requireCredential: true, kind: 'read:account' }))
+	return createApiProcedure<Actor>()(registryGetAllContract)
 		.use(requirePrincipal<Actor>())
 		.handler(async ({ input, context }) => {
 			const principal = context.principal;
@@ -22,6 +21,6 @@ export function createRegistryGetAllProcedure<Actor extends ApiActor>(deps: Pref
 			return Object.fromEntries(items.map((item): [
 				string,
 				RegistryJsonValue
-			] => [item.key, item.value]));
+			] => [item.key, toPackedJsonValue(item.value)]));
 		});
 }

@@ -2,17 +2,18 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-import { implement } from '@orpc/server';
-import type { ApiContext } from '@features/api/backend/transport/context.js';
+import { toPackedUserLite } from '@features/users/backend/user.schema.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
-import { authentication, apiPolicy, requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
 import { relationshipsContract } from '../relationships.contract.js';
 import type { RelationshipsDependencies } from '../../api.implementation.js';
 import { Brackets } from 'typeorm';
 import { readBirthdayDate } from '../birthday.schema.js';
 import type { RelationshipsOutputs } from '../relationships.contract.js';
 export function createUsersGetFollowingUsersByBirthdayProcedure<Actor extends MiLocalUser>(deps: Pick<RelationshipsDependencies, 'followingsRepository' | 'userProfilesRepository' | 'userEntityService'>) {
-	return implement(relationshipsContract["users/get-following-users-by-birthday"], { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>().use(authentication<Actor>()).use(apiPolicy<Actor>({ name: 'users/get-following-users-by-birthday', requireCredential: true, kind: 'read:account' })).use(requirePrincipal<Actor>())
+	return createApiProcedure<Actor>()(relationshipsContract["users/get-following-users-by-birthday"]).use(requirePrincipal<Actor>())
 		.handler(async ({ input, context }) => {
 			const ps = input;
 			const me = context.principal;
@@ -52,7 +53,7 @@ export function createUsersGetFollowingUsersByBirthdayProcedure<Actor extends Mi
 					birthday_date: number;
 					user_id: string;
 				}>();
-			const users = new Map<string, RelationshipsOutputs['users/get-following-users-by-birthday'][number]['user']>((await deps.userEntityService.packMany(birthdayUsers.map(u => u.user_id), me, { schema: 'UserLite' })).map(u => [u.id, u]));
+			const users = new Map<string, RelationshipsOutputs['users/get-following-users-by-birthday'][number]['user']>((await deps.userEntityService.packMany(birthdayUsers.map(u => u.user_id), me, { schema: 'UserLite' })).map(u => [u.id, toPackedUserLite(u)]));
 			return birthdayUsers
 				.map(item => {
 					const birthday = new Date();

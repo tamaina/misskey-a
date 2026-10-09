@@ -2,6 +2,7 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 import { apiError } from '@features/api/backend/transport/orpc-error.js';
 import { type RemoteUserResolveService } from '@features/federation/backend/services/RemoteUserResolveService.js';
 import { type ApiLoggerService } from '@features/api/backend/transport/ApiLoggerService.js';
@@ -16,9 +17,8 @@ import { iMoveErrors } from './move.contract.js';
 import type { UsersInputs } from '../../api.definition.js';
 import type { ApiToken } from '@features/api/backend/transport/context.js';
 import { iMoveContract } from './move.contract.js';
-import { implement } from '@orpc/server';
-import { authentication, apiPolicy, requirePrincipal } from '@features/api/backend/transport/middleware.js';
-import type { ApiContext } from '@features/api/backend/transport/context.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+
 import { toPackedUserDetailed } from '@features/users/backend/user.schema.js';
 export interface IMoveDependencies {
 	serverSettings: MiMeta;
@@ -71,11 +71,6 @@ export function createIMoveProcedure(deps: IMoveDependencies) {
 		return await deps.accountMoveService.moveFromLocal(me, moveTo);
 	}
 
-	return implement(iMoveContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>().use(authentication<MiLocalUser>()).use(apiPolicy<MiLocalUser>({
-		name: iMoveContract['~orpc'].meta.requestName, requireCredential: true, secure: true, prohibitMoved: true, limit: {
-			duration: 86400000,
-			max: 5,
-		}
-	})).use(requirePrincipal<MiLocalUser>())
+	return createApiProcedure<MiLocalUser>()(iMoveContract).use(requirePrincipal<MiLocalUser>())
 		.handler(async ({ input, context }) => toPackedUserDetailed(await execute(input, context.principal, context.token, context.ip)));
 }
