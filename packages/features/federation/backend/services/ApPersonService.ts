@@ -37,6 +37,7 @@ import { bindThis } from '@features/runtime/backend/decorators.js';
 import { RoleService } from '@features/roles/backend/services/RoleService.js';
 import { DriveFileEntityService } from '@features/drive/backend/serializers/DriveFileEntityService.js';
 import type { AccountMoveService } from '@features/users/backend/services/AccountMoveService.js';
+import type { UserSuspendService } from '@features/moderation/backend/services/UserSuspendService.js';
 import { checkHttps } from '../utility/check-https.js';
 import { getApId, getApType, getOneApHrefNullable, isActor, isCollection, isCollectionOrOrderedCollection, isPropertyValue } from '../protocol/type.js';
 import { extractApHashtags } from '../protocol/models/tag.js';
@@ -74,6 +75,7 @@ export class ApPersonService implements OnModuleInit {
 	private instanceChart: InstanceChart;
 	private apLoggerService: ApLoggerService;
 	private accountMoveService: AccountMoveService;
+	private userSuspendService: UserSuspendService;
 	private logger: Logger;
 
 	constructor(
@@ -126,6 +128,7 @@ export class ApPersonService implements OnModuleInit {
 		this.instanceChart = this.moduleRef.get('InstanceChart');
 		this.apLoggerService = this.moduleRef.get('ApLoggerService');
 		this.accountMoveService = this.moduleRef.get('AccountMoveService');
+		this.userSuspendService = this.moduleRef.get('UserSuspendService');
 		this.logger = this.apLoggerService.logger;
 	}
 
@@ -393,6 +396,7 @@ export class ApPersonService implements OnModuleInit {
 					makeNotesFollowersOnlyBefore: (person as any).makeNotesFollowersOnlyBefore ?? null,
 					makeNotesHiddenBefore: (person as any).makeNotesHiddenBefore ?? null,
 					emojis,
+					isRemoteSuspended: person.suspended === true,
 				})) as MiRemoteUser;
 
 				let _description: string | null = null;
@@ -598,6 +602,15 @@ export class ApPersonService implements OnModuleInit {
 			return 'skip';
 		}
 
+		if (person.suspended === true) {
+			this.logger.info(`Remote User Suspended: acct=${exist.username}@${exist.host} id=${exist.id} uri=${exist.uri}`);
+			await this.userSuspendService.suspendFromRemote({ id: exist.id, host: exist.host });
+		}
+		if (person.suspended === false) {
+			this.logger.info(`Remote User Unsuspended: acct=${exist.username}@${exist.host} id=${exist.id} uri=${exist.uri}`);
+			await this.userSuspendService.unsuspendFromRemote({ id: exist.id, host: exist.host });
+		}
+
 		if (person.publicKey) {
 			await this.userPublickeysRepository.update({ userId: exist.id }, {
 				keyId: person.publicKey.id,
@@ -637,7 +650,8 @@ export class ApPersonService implements OnModuleInit {
 
 		await this.updateFeatured(exist.id, resolver).catch(err => this.logger.error(err));
 
-		const updated = { ...exist, ...updates };
+		const updated = await this.usersRepository.findOneByOrFail({ id: exist.id });
+		if (!this.userEntityService.isRemoteUser(updated)) return 'skip';
 
 		this.cacheService.uriPersonCache.set(uri, updated);
 
