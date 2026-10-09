@@ -57,7 +57,7 @@ async function read(page: Page, id: string | null, accountId: string) {
 test('shared drafts remain isolated across requests and accounts', async ({ page, context }) => {
 	await page.goto(origin);
 	await page.evaluate(async () => {
-		await navigator.serviceWorker.register('/sw.js', { type: 'module' });
+		await navigator.serviceWorker.register('/sw.js', { type: 'classic' });
 		await navigator.serviceWorker.ready;
 		if (!navigator.serviceWorker.controller) await new Promise<void>(done => navigator.serviceWorker.addEventListener('controllerchange', () => done(), { once: true }));
 	});
@@ -198,7 +198,7 @@ test('clear serializes with an already-started claim without restoring the recor
 test('a stopped service worker restarts for another share and retains the previous draft', async ({ page, context }) => {
 	await page.goto(origin);
 	await page.evaluate(async () => {
-		await navigator.serviceWorker.register('/sw.js', { type: 'module' });
+		await navigator.serviceWorker.register('/sw.js', { type: 'classic' });
 		await navigator.serviceWorker.ready;
 		if (!navigator.serviceWorker.controller) await new Promise<void>(done => navigator.serviceWorker.addEventListener('controllerchange', () => done(), { once: true }));
 	});
