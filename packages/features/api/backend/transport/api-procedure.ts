@@ -8,7 +8,7 @@ import { implement } from '@orpc/server';
 import type { ApiActor, ApiContext } from './context.js';
 import { authentication, apiPolicy } from './middleware.js';
 import type { ApiPolicy } from './middleware.js';
-import type { ApiProcedureMetadata } from './policy.schema.js';
+import type { ApiProcedureMetadata } from './policy.types.js';
 
 /** Return the native builder so middleware and handler inference remain oRPC-owned. */
 export function createApiProcedure<Actor extends ApiActor>() {

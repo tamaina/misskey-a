@@ -8,7 +8,7 @@ import { oc } from '@orpc/contract';
 import * as v from 'valibot';
 import { commonErrors } from '../../api/backend/transport/errors.schema.js';
 import { objectInput } from '../../api/backend/transport/input.schema.js';
-import type { ApiProcedureMetadata } from '../../api/backend/transport/policy.schema.js';
+import type { ApiProcedureMetadata } from '../../api/backend/transport/policy.types.js';
 const id = v.pipe(v.string(), v.regex(/^[a-zA-Z0-9]+$/));
 const nonempty = v.pipe(v.string(), v.minLength(1));
 const date = v.pipe(v.string(), v.metadata({ format: 'date-time' }));
@@ -26,7 +26,12 @@ const decorationFields = {
 const publicSecurity: OpenAPI.SecurityRequirementObject[] = [{}, { bearerAuth: [] }];
 
 export const avatarDecorationsContract = {
-	create: oc.$meta({ requestName: 'admin/avatar-decorations/create', requireCredential: true, requiredRolePolicy: 'canManageAvatarDecorations', kind: 'write:admin:avatar-decorations' } as const satisfies ApiProcedureMetadata)
+	create: oc.$meta({
+		requestName: 'admin/avatar-decorations/create',
+		requireCredential: true,
+		requiredRolePolicy: 'canManageAvatarDecorations',
+		kind: 'write:admin:avatar-decorations',
+	} as const satisfies ApiProcedureMetadata)
 		.route({ method: 'POST', path: '/admin/avatar-decorations/create', operationId: 'post___admin___avatar-decorations___create', tags: ['admin'], spec: current => ({ ...current, security: [{ bearerAuth: [] }] }) })
 		.errors({ ...commonErrors })
 		.input(objectInput({
@@ -36,17 +41,32 @@ export const avatarDecorationsContract = {
 		})).output(v.strictObject({
 	...decorationFields, createdAt: date, updatedAt: v.nullable(date), category: v.nullable(v.string()),
 })),
-	delete: oc.$meta({ requestName: 'admin/avatar-decorations/delete', requireCredential: true, requiredRolePolicy: 'canManageAvatarDecorations', kind: 'write:admin:avatar-decorations' } as const satisfies ApiProcedureMetadata)
+	delete: oc.$meta({
+		requestName: 'admin/avatar-decorations/delete',
+		requireCredential: true,
+		requiredRolePolicy: 'canManageAvatarDecorations',
+		kind: 'write:admin:avatar-decorations',
+	} as const satisfies ApiProcedureMetadata)
 		.route({ method: 'POST', path: '/admin/avatar-decorations/delete', operationId: 'post___admin___avatar-decorations___delete', tags: ['admin'], spec: current => ({ ...current, security: [{ bearerAuth: [] }] }), successStatus: 204 })
 		.errors({ ...commonErrors })
 		.input(objectInput({ id })).output(v.void()),
-	list: oc.$meta({ requestName: 'admin/avatar-decorations/list', requireCredential: true, requiredRolePolicy: 'canManageAvatarDecorations', kind: 'read:admin:avatar-decorations' } as const satisfies ApiProcedureMetadata)
+	list: oc.$meta({
+		requestName: 'admin/avatar-decorations/list',
+		requireCredential: true,
+		requiredRolePolicy: 'canManageAvatarDecorations',
+		kind: 'read:admin:avatar-decorations',
+	} as const satisfies ApiProcedureMetadata)
 		.route({ method: 'POST', path: '/admin/avatar-decorations/list', operationId: 'post___admin___avatar-decorations___list', tags: ['admin'], spec: current => ({ ...current, security: [{ bearerAuth: [] }] }) })
 		.errors({ ...commonErrors })
 		.input(objectInput({ ...pagination, userId: v.exactOptional(v.nullable(id)) })).output(v.array(v.strictObject({
 			...decorationFields, createdAt: date, updatedAt: v.nullable(date), category: v.exactOptional(v.nullable(v.string())),
 		}))),
-	update: oc.$meta({ requestName: 'admin/avatar-decorations/update', requireCredential: true, requiredRolePolicy: 'canManageAvatarDecorations', kind: 'write:admin:avatar-decorations' } as const satisfies ApiProcedureMetadata)
+	update: oc.$meta({
+		requestName: 'admin/avatar-decorations/update',
+		requireCredential: true,
+		requiredRolePolicy: 'canManageAvatarDecorations',
+		kind: 'write:admin:avatar-decorations',
+	} as const satisfies ApiProcedureMetadata)
 		.route({ method: 'POST', path: '/admin/avatar-decorations/update', operationId: 'post___admin___avatar-decorations___update', tags: ['admin'], spec: current => ({ ...current, security: [{ bearerAuth: [] }] }), successStatus: 204 })
 		.errors({ ...commonErrors })
 		.input(objectInput({
@@ -54,7 +74,10 @@ export const avatarDecorationsContract = {
 			roleIdsThatCanBeUsedThisDecoration: v.exactOptional(v.array(v.string())),
 			category: v.exactOptional(v.nullable(v.string())),
 		})).output(v.void()),
-	get: oc.$meta({ requestName: 'get-avatar-decorations', requireCredential: false } as const satisfies ApiProcedureMetadata)
+	get: oc.$meta({
+		requestName: 'get-avatar-decorations',
+		requireCredential: false,
+	} as const satisfies ApiProcedureMetadata)
 		.route({ method: 'POST', path: '/get-avatar-decorations', operationId: 'post___get-avatar-decorations', tags: ['users'], spec: current => ({ ...current, security: publicSecurity }) })
 		.errors({ ...commonErrors })
 		.input(v.optional(objectInput({}), {})).output(v.array(v.strictObject({

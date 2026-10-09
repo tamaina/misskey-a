@@ -5,9 +5,12 @@ import ts from 'typescript';
 
 export function checkPortableContracts(features) {
 	features = path.resolve(features) + path.sep;
-	// Package-owned SDK runtime helper is portable alongside the colocated schema graph.
-	const portableHelpers = new Set([path.join(features, 'api/shared/api-routing.ts')]);
-	const roots = [...fs.globSync('**/*.{contract,schema}.ts', { cwd: features }), ...fs.globSync('**/api.definition.ts', { cwd: features }), 'api/shared/api-routing.ts'];
+	// Package-owned SDK helper and policy declarations are portable alongside the colocated schema graph.
+	const portableHelpers = new Set([
+		path.join(features, 'api/shared/api-routing.ts'),
+		path.join(features, 'api/backend/transport/policy.types.ts'),
+	]);
+	const roots = [...fs.globSync('**/*.{contract,schema}.ts', { cwd: features }), ...fs.globSync('**/api.definition.ts', { cwd: features }), ...fs.globSync('api/backend/transport/policy.types.ts', { cwd: features }), 'api/shared/api-routing.ts'];
 	const visited = new Set();
 	const errors = [];
 

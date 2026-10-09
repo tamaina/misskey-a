@@ -30,6 +30,20 @@ test('package import boundary rejects server imports, type-only escapes and dyna
 		assert.ok(checkPortableContracts(features).errors.length > 0);
 		await writeFile(join(features, 'api.definition.ts'), "export { dto } from './dto.schema.js';");
 		assert.deepEqual(checkPortableContracts(features).errors, []);
+		await mkdir(join(features, 'api/backend/transport'), { recursive: true });
+		await writeFile(join(features, 'api/backend/transport/policy.types.ts'), "import type { InferOutput } from 'valibot'; import type { dto } from '../../../dto.schema.js'; export type Dto = InferOutput<typeof dto>;");
+		await writeFile(join(features, 'api.definition.ts'), "import type { Dto } from './api/backend/transport/policy.types.js'; export type Input = Dto;");
+		assert.deepEqual(checkPortableContracts(features).errors, []);
+		await writeFile(join(features, 'api.definition.ts'), "import type { Dto } from './arbitrary.types.js';");
+		await writeFile(join(features, 'arbitrary.types.ts'), "export type Dto = string;");
+		assert.ok(checkPortableContracts(features).errors.length > 0);
+		await writeFile(join(features, 'api.definition.ts'), "import type { Dto } from './api/backend/transport/policy.types.js'; export type Input = Dto;");
+		await writeFile(join(features, 'api/backend/transport/policy.types.ts'), "import type { User } from '@nestjs/common';");
+		assert.ok(checkPortableContracts(features).errors.length > 0);
+		await writeFile(join(features, 'api/backend/transport/policy.types.ts'), "type Entity = import('typeorm').Entity;");
+		assert.ok(checkPortableContracts(features).errors.length > 0);
+		await writeFile(join(features, 'api/backend/transport/policy.types.ts'), "export type Dto = string;");
+		assert.deepEqual(checkPortableContracts(features).errors, []);
 		await writeFile(join(features, 'api/shared/api-routing.ts'), "import fs from 'node:fs';");
 		assert.ok(checkPortableContracts(features).errors.length > 0);
 	} finally { await rm(features, { recursive: true, force: true }); }

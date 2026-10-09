@@ -8,7 +8,7 @@ import { createRouterClient } from '@orpc/server';
 import * as v from 'valibot';
 import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 import type { ApiActor, ApiContext } from '@features/api/backend/transport/context.js';
-import type { ApiProcedureMetadata } from '@features/api/backend/transport/policy.schema.js';
+import type { ApiProcedureMetadata } from '@features/api/backend/transport/policy.types.js';
 import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
 
 export function apiProcedureInference(context: ApiContext<ApiActor>) {
