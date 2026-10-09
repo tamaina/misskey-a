@@ -24,6 +24,11 @@ test('package import boundary rejects server imports, type-only escapes and dyna
 			assert.ok(checkPortableContracts(features).errors.length > 0, source);
 		}
 		await writeFile(join(features, 'test.contract.ts'), "export { dto } from './dto.schema.js';");
+		await writeFile(join(features, 'api.definition.ts'), "export { dto } from './dto.schema.js';");
+		assert.deepEqual(checkPortableContracts(features).errors, []);
+		await writeFile(join(features, 'api.definition.ts'), "import type { User } from '@nestjs/common';");
+		assert.ok(checkPortableContracts(features).errors.length > 0);
+		await writeFile(join(features, 'api.definition.ts'), "export { dto } from './dto.schema.js';");
 		assert.deepEqual(checkPortableContracts(features).errors, []);
 		await writeFile(join(features, 'api/shared/api-routing.ts'), "import fs from 'node:fs';");
 		assert.ok(checkPortableContracts(features).errors.length > 0);

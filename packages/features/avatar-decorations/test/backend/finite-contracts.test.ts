@@ -6,17 +6,17 @@
 import { expect, test } from 'vitest';
 import * as v from 'valibot';
 import { mockDeep } from 'vitest-mock-extended';
-import { avatarDecorationsContract } from '../../backend/api.contract.js';
+import { avatarDecorationsContract } from '../../backend/api.definition.js';
 const avatarDecorationResult = requiredSchema(avatarDecorationsContract.get['~orpc'].outputSchema);
 import { AvatarDecorationService } from '../../backend/services/AvatarDecorationService.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { MiAvatarDecoration } from '../../backend/models/AvatarDecoration.js';
 
 import { packedSchemas } from '../../../index/backend/packed.schema.js';
-import { avatarDecorationsContract as nativeContract1 } from '../../backend/api.contract.js';
-import { avatarDecorationsContract as nativeContract2 } from '../../backend/api.contract.js';
-import { avatarDecorationsContract as nativeContract3 } from '../../backend/api.contract.js';
-import { avatarDecorationsContract as nativeContract4 } from '../../backend/api.contract.js';
+import { avatarDecorationsContract as nativeContract1 } from '../../backend/api.definition.js';
+import { avatarDecorationsContract as nativeContract2 } from '../../backend/api.definition.js';
+import { avatarDecorationsContract as nativeContract3 } from '../../backend/api.definition.js';
+import { avatarDecorationsContract as nativeContract4 } from '../../backend/api.definition.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 
 function requiredSchema<S extends v.GenericSchema>(schema: S | undefined): S { if (schema === undefined) throw new Error('Missing native schema'); return schema; }

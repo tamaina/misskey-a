@@ -23,7 +23,7 @@ import { InstanceApiProvider } from '../../instance/backend/api.provider.js';
 import { StatisticsApiProvider } from '../../statistics/backend/api.provider.js';
 import { DiscoveryApiProvider } from '../../discovery/backend/api.provider.js';
 import { AnnouncementsApiProvider } from '../../announcements/backend/api.provider.js';
-import { AvatarDecorationsApiProvider } from '../../avatar-decorations/backend/api.provider.js';
+import { AvatarDecorationsApiProvider } from '../../avatar-decorations/backend/api.implementation.js';
 import { PreferencesApiProvider } from '../../preferences/backend/api.provider.js';
 import { EmojisApiProvider } from '../../emojis/backend/api.provider.js';
 import { NotificationsApiProvider } from '../../notifications/backend/api.provider.js';

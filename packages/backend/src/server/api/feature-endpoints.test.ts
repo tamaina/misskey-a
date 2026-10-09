@@ -12,8 +12,8 @@ import type { EndpointDescriptor, InstanceApiDependencies } from '@features/inst
 import { createInstanceRouter } from '@features/instance/backend/api.router.js';
 import { createStatsProcedure } from '@features/statistics/backend/endpoints/stats.js';
 import { statsContract } from '@features/statistics/backend/endpoints/stats.contract.js';
-import { createAvatarDecorationsRouter } from '@features/avatar-decorations/backend/api.router.js';
-import type { AvatarDecorationsDependencies } from '@features/avatar-decorations/backend/api.dependencies.js';
+import { createAvatarDecorationsRouter } from '@features/avatar-decorations/backend/api.implementation.js';
+import type { AvatarDecorationsDependencies } from '@features/avatar-decorations/backend/api.implementation.js';
 import { createEmojisRouter } from '@features/emojis/backend/api.router.js';
 import type { EmojisDependencies } from '@features/emojis/backend/api.dependencies.js';
 import type { MiAvatarDecoration, MiEmoji } from '@features/persistence/backend/repositories/models.js';

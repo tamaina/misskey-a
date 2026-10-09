@@ -7,7 +7,7 @@ export function checkPortableContracts(features) {
 	features = path.resolve(features) + path.sep;
 	// Package-owned SDK runtime helper is portable alongside the colocated schema graph.
 	const portableHelpers = new Set([path.join(features, 'api/shared/api-routing.ts')]);
-	const roots = [...fs.globSync('**/*.{contract,schema}.ts', { cwd: features }), 'api/shared/api-routing.ts'];
+	const roots = [...fs.globSync('**/*.{contract,schema}.ts', { cwd: features }), ...fs.globSync('**/api.definition.ts', { cwd: features }), 'api/shared/api-routing.ts'];
 	const visited = new Set();
 	const errors = [];
 
@@ -21,7 +21,7 @@ export function checkPortableContracts(features) {
 				return;
 			}
 			const resolved = path.resolve(path.dirname(file), specifier.replace(/\.js$/, '.ts'));
-			if (!resolved.startsWith(features) || (!/\.(contract|schema)\.ts$/.test(resolved) && !portableHelpers.has(resolved))) {
+			if (!resolved.startsWith(features) || (!/(?:\.(contract|schema)|[/\\]api\.definition)\.ts$/.test(resolved) && !portableHelpers.has(resolved))) {
 				errors.push(`${file}: imports implementation or undeclared portable module ${specifier}`);
 				return;
 			}

@@ -5,8 +5,8 @@
 import { implement } from '@orpc/server';
 import { authentication, apiPolicy } from '../../../api/backend/transport/middleware.js';
 import type { ApiActor, ApiContext } from '../../../api/backend/transport/context.js';
-import { avatarDecorationsContract } from '../api.contract.js';
-import type { AvatarDecorationsDependencies } from '../api.dependencies.js';
+import { avatarDecorationsContract } from '../api.definition.js';
+import type { AvatarDecorationsDependencies } from '../api.implementation.js';
 export interface GetAvatarDecorationsDependencies<Actor extends ApiActor> {
 	avatarDecorationService: Pick<AvatarDecorationsDependencies<Actor>['avatarDecorationService'], 'getAll'>;
 	readRoles: AvatarDecorationsDependencies<Actor>['readRoles'];

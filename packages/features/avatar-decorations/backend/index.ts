@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-export { avatarDecorationsContract } from './api.contract.js';
-export { createAvatarDecorationsRouter } from './api.router.js';
-export { AvatarDecorationsApiProvider } from './api.provider.js';
-export type { AvatarDecorationsDependencies, AvatarDecorationUpdateValues } from './api.dependencies.js';
+export { avatarDecorationsContract } from './api.definition.js';
+export { createAvatarDecorationsRouter, AvatarDecorationsApiProvider } from './api.implementation.js';
+export type { AvatarDecorationsDependencies, AvatarDecorationUpdateValues } from './api.implementation.js';

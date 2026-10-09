@@ -27,7 +27,7 @@ import type { InstanceApiProvider } from '../../instance/backend/api.provider.js
 import type { StatisticsApiProvider } from '../../statistics/backend/api.provider.js';
 import type { DiscoveryApiProvider } from '../../discovery/backend/api.provider.js';
 import type { AnnouncementsApiProvider } from '../../announcements/backend/api.provider.js';
-import type { AvatarDecorationsApiProvider } from '../../avatar-decorations/backend/api.provider.js';
+import type { AvatarDecorationsApiProvider } from '../../avatar-decorations/backend/api.implementation.js';
 import type { PreferencesApiProvider } from '../../preferences/backend/api.provider.js';
 import type { EmojisApiProvider } from '../../emojis/backend/api.provider.js';
 import type { NotificationsApiProvider } from '../../notifications/backend/api.provider.js';

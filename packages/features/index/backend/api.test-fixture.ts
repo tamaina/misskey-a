@@ -23,7 +23,7 @@ import { createInstanceRouter } from '../../instance/backend/api.router.js';
 import { createStatisticsRouter } from '../../statistics/backend/router.js';
 import { createDiscoveryRouter } from '../../discovery/backend/endpoints/discovery.js';
 import { createAnnouncementsRouter } from '../../announcements/backend/api.router.js';
-import { createAvatarDecorationsRouter } from '../../avatar-decorations/backend/api.router.js';
+import { createAvatarDecorationsRouter } from '../../avatar-decorations/backend/api.implementation.js';
 import { createPreferencesRouter } from '../../preferences/backend/router.js';
 import { createEmojisRouter } from '../../emojis/backend/api.router.js';
 import { createNotificationsRouter } from '../../notifications/backend/router.js';
