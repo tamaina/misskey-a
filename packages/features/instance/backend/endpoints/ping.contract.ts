@@ -5,8 +5,8 @@
 
 import { oc } from '@orpc/contract';
 import * as v from 'valibot';
-import { objectInput } from './input.schema.js';
 import { commonErrors } from '../../../api/backend/transport/errors.schema.js';
+import { objectInput } from './input.schema.js';
 
 export const pingInput = v.optional(objectInput({}), {});
 export const pingContract = oc.$meta<{ requestName: 'ping'; allowGet: boolean; cacheSec?: number }>({ requestName: 'ping', allowGet: false })

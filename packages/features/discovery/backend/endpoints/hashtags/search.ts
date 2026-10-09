@@ -3,13 +3,13 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { Inject, Injectable } from '@nestjs/common';
+import { sqlLikeEscape } from '@features/persistence/backend/utility/sql-like-escape.js';
+import { DI } from '@/di-symbols.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 import type { DiscoveryInputs } from '../discovery.contract.js';
-import { Inject, Injectable } from '@nestjs/common';
 
 import type { HashtagsRepository } from '@features/persistence/backend/repositories/models.js';
-import { DI } from '@/di-symbols.js';
-import { sqlLikeEscape } from '@features/persistence/backend/utility/sql-like-escape.js';
 
 @Injectable()
 export class HashtagsSearchOperation {

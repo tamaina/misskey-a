@@ -3,9 +3,9 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { apiError, internalError } from '../../api/backend/transport/orpc-error.js';
 import type { DriveCreateInput, DriveCreateOutput } from './endpoints/drive/files/create.schema.js';
 import type { UploadResource } from '../../api/backend/transport/context.js';
-import { apiError, internalError } from '../../api/backend/transport/orpc-error.js';
 
 export interface CreateFileDependencies<Actor, File> {
 	validateFileName(name: string): boolean;

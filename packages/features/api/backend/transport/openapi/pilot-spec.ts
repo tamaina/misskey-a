@@ -8,13 +8,24 @@ import { experimental_ValibotToJsonSchemaConverter } from '@orpc/valibot';
 import { pilotContract } from '../../../../index/backend/api.contract.js';
 import { rawObjectInputGuard } from '../input.schema.js';
 import { apiErrorInfoObject } from '../errors.schema.js';
+import { requestRoutes, nullableResponsePaths } from '../../../shared/api-routing.js';
+import { galleryFileIdsUnique } from '../../../../collections/backend/api.schema.js';
 import { imageCommentLength } from '../../../../drive/backend/endpoints/drive/files/create.schema.js';
 
 /** JSON Schema exists only as generated external documentation, never request validation. */
 export async function genPilotOpenapiSpec(config: { version: string; apiUrl: string }) {
 	const converter = new experimental_ValibotToJsonSchemaConverter({
-		overrideAction: ({ valibotAction, jsonSchema }) => valibotAction === imageCommentLength
-			? { ...jsonSchema, maxLength: 512 } : undefined,
+		overrideAction: ({ valibotAction, jsonSchema }) => {
+			if (valibotAction === galleryFileIdsUnique) return { ...jsonSchema, uniqueItems: true };
+			if (valibotAction === imageCommentLength) return { ...jsonSchema, maxLength: 512 };
+			// Native code-point actions retain AJV's Unicode semantics; the converter
+			// emits the standard external string length keywords without schema registries.
+			if ('requirement' in valibotAction && typeof valibotAction.requirement === 'number') {
+				if (valibotAction.type === 'min_code_points') return { ...jsonSchema, minLength: valibotAction.requirement };
+				if (valibotAction.type === 'max_code_points') return { ...jsonSchema, maxLength: valibotAction.requirement };
+			}
+			return undefined;
+		},
 		overrideSchema: ({ valibotSchema, jsonSchema }) => {
 			// This raw-object proof adds no fields; the first branch contains the
 			// externally documented object properties and constraints.
@@ -36,11 +47,17 @@ export async function genPilotOpenapiSpec(config: { version: string; apiUrl: str
 				error: { anyOf: errors.map(([code, _message, _required, dataSchema]) => {
 					const data = typeof dataSchema === 'boolean' ? {} : dataSchema;
 					return { ...data, type: 'object', required: ['code', 'message', ...data.required ?? []],
-						properties: { ...data.properties, code: { const: code }, message: { type: 'string' } } };
+														properties: { ...data.properties, code: { const: code }, message: { type: 'string' } } };
 				}) },
 			},
 		},
 	});
+	const nullable = new Set((await nullableResponsePaths(pilotContract)).map(path => JSON.stringify(path)));
+	for (const route of requestRoutes(pilotContract)) {
+		if (!nullable.has(JSON.stringify(route.path))) continue;
+		const operation = spec.paths?.[route.httpPath]?.post;
+		if (operation) operation.responses['204'] = { description: 'Empty result' };
+	}
 	// Valibot emits schema-local #/$defs references. Embedding those schemas in
 	// an OpenAPI document requires document-absolute pointers for external tools.
 	rebaseExternalSchemaRefs(spec);

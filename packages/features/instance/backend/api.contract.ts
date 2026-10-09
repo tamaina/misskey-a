@@ -3,8 +3,6 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import type * as v from 'valibot';
-import type { InferContractRouterInputs, InferContractRouterOutputs } from '@orpc/contract';
 import { adCreateContract, adCreateInput } from './endpoints/admin/ad/create.contract.js';
 import { adDeleteContract, adDeleteInput } from './endpoints/admin/ad/delete.contract.js';
 import { adListContract, adListInput } from './endpoints/admin/ad/list.contract.js';
@@ -19,6 +17,8 @@ import { metaContract, metaInput } from './endpoints/meta.contract.js';
 import { pingContract, pingInput } from './endpoints/ping.contract.js';
 import { pinnedUsersContract, pinnedUsersInput } from './endpoints/pinned-users.contract.js';
 import { instancePilotContract } from './endpoints/server-info.contract.js';
+import type { InferContractRouterInputs, InferContractRouterOutputs } from '@orpc/contract';
+import type * as v from 'valibot';
 
 export const instanceApiContract = {
 	...instancePilotContract,

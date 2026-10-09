@@ -3,47 +3,33 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { packedFollowingRequestsSentDefinition, packedFollowingRequestsSentInput, packedFollowingRequestsSentOutput } from '../../../../contract/packed-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
-
 import { QueryService } from '@features/notes/backend/services/QueryService.js';
-import type { FollowRequestsRepository } from '@features/persistence/backend/repositories/models.js';
-import { FollowRequestEntityService } from '../../../serializers/FollowRequestEntityService.js';
 import { DI } from '@/di-symbols.js';
+import { FollowRequestEntityService } from '../../../serializers/FollowRequestEntityService.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+import type { RelationshipsInputs } from '../../relationships.contract.js';
 
-const contractProjection = projectEndpointContract(packedFollowingRequestsSentDefinition);
-
-export const meta = {
-	tags: ['following', 'account'],
-
-	requireCredential: true,
-
-	kind: 'read:following',
-
-	res: contractProjection.response,
-} as const;
-
-export const paramDef = contractProjection.input;
+import type { FollowRequestsRepository } from '@features/persistence/backend/repositories/models.js';
 
 @Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedFollowingRequestsSentInput, typeof packedFollowingRequestsSentOutput> {
+export class FollowingRequestsSentOperation {
 	constructor(
 		@Inject(DI.followRequestsRepository)
 		private followRequestsRepository: FollowRequestsRepository,
 
 		private followRequestEntityService: FollowRequestEntityService,
 		private queryService: QueryService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			const query = this.queryService.makePaginationQuery(this.followRequestsRepository.createQueryBuilder('request'), ps.sinceId, ps.untilId, ps.sinceDate, ps.untilDate)
-				.andWhere('request.followerId = :meId', { meId: me.id });
+	) {}
 
-			const requests = await query
-				.limit(ps.limit)
-				.getMany();
+	async execute(ps: RelationshipsInputs['following/requests/sent'], me: MiLocalUser) {
+		const query = this.queryService.makePaginationQuery(this.followRequestsRepository.createQueryBuilder('request'), ps.sinceId, ps.untilId, ps.sinceDate, ps.untilDate)
+			.andWhere('request.followerId = :meId', { meId: me.id });
 
-			return await this.followRequestEntityService.packMany(requests, me);
-		});
+		const requests = await query
+			.limit(ps.limit)
+			.getMany();
+
+		return await this.followRequestEntityService.packMany(requests, me);
 	}
 }

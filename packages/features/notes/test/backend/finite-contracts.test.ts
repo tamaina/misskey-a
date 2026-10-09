@@ -7,20 +7,19 @@ import { expect, expectTypeOf, test, vi } from 'vitest';
 import * as v from 'valibot';
 import { mockDeep } from 'vitest-mock-extended';
 import { ModuleRef } from '@nestjs/core';
-import { inlineNotesDraftsCountDefinition as countDefinition, inlineNotesDraftsCountInput as countInput, inlineNotesDraftsCountOutput as countOutput, inlineNotesShowPartialBulkDefinition as partialDefinition, inlineNotesShowPartialBulkInput as partialInput, inlineNotesShowPartialBulkOutput as partialOutput, inlineNotesTranslateDefinition as translateDefinition, inlineNotesTranslateInput as translateInput, inlineNotesTranslateOutput as translateOutput } from '../../contract/endpoint-definitions.js';
-import { EndpointImplementation as CountEndpoint } from '../../backend/endpoints/notes/drafts/count.js';
-import { EndpointImplementation as PartialEndpoint } from '../../backend/endpoints/notes/show-partial-bulk.js';
-import { EndpointImplementation as TranslateEndpoint } from '../../backend/endpoints/notes/translate.js';
+import { notesDraftsCountInput as countInput, notesDraftsCountOutput as countOutput } from '../../backend/endpoints/notes/drafts/count.contract.js';
+import { notesShowPartialBulkInput as partialInput, notesShowPartialBulkOutput as partialOutput } from '../../backend/endpoints/notes/show-partial-bulk.contract.js';
+import { notesTranslateInput as translateInput, notesTranslateOutput as translateOutput } from '../../backend/endpoints/notes/translate.contract.js';
+import { NotesDraftsCountOperation as CountOperation } from '../../backend/endpoints/notes/drafts/count.js';
+import { NotesShowPartialBulkOperation as PartialOperation } from '../../backend/endpoints/notes/show-partial-bulk.js';
+import { NotesTranslateOperation as TranslateOperation } from '../../backend/endpoints/notes/translate.js';
 import { NoteEntityService } from '../../backend/serializers/NoteEntityService.js';
+import { MiNote } from '../../backend/models/Note.js';
+import { packedNoteSchema } from '../../backend/note.schema.js';
 import type { ReactionService } from '../../backend/services/ReactionService.js';
 import type { ReactionsBufferingService } from '../../backend/services/ReactionsBufferingService.js';
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { toLegacyJsonSchema } from '@features/api/backend/index.js';
 import type { NotesRepository, NoteDraftsRepository, MiMeta } from '@features/persistence/backend/repositories/models.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
-import { MiNote } from '../../backend/models/Note.js';
-import { packedNoteSchema } from '../../contract/packed.js';
-import { packedNotesShowDefinition } from '../../contract/packed-endpoint-definitions.js';
 import type { IdService } from '@features/runtime/backend/services/IdService.js';
 import type { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import type { DriveFileEntityService } from '@features/drive/backend/serializers/DriveFileEntityService.js';
@@ -53,31 +52,11 @@ test('native finite schemas retain explicit fields, required properties and opti
 	for (const value of [null, { sourceLang: 'JA' }, { ...translation, text: 7 }, { ...translation, sourceLang: null }, { ...translation, future: true }]) expect(v.safeParse(translateOutput, value).success).toBe(false);
 });
 
-test('JSON projection retains original open inputs, limits and optionality; finite output objects are closed', () => {
-	expect(projectEndpointContract(countDefinition).input).toEqual({ type: 'object', properties: {}, required: [] });
-	expect(projectEndpointContract(partialDefinition).input).toEqual({ type: 'object', properties: { noteIds: { type: 'array', items: { type: 'string', format: 'misskey:id' }, minItems: 1, maxItems: 100 } }, required: ['noteIds'] });
-	expect(projectEndpointContract(translateDefinition).input).toEqual({ type: 'object', properties: { noteId: { type: 'string', format: 'misskey:id' }, targetLang: { type: 'string' } }, required: ['noteId', 'targetLang'] });
-	const partialJson = toLegacyJsonSchema(partialOutput, { target: 'openapi-3.0', typeMode: 'output' });
-	expect(partialJson).toMatchObject({ type: 'array', items: { type: 'object', additionalProperties: false, required: ['id', 'reactions', 'reactionEmojis'] } });
-	expect(projectEndpointContract(translateDefinition).response).toMatchObject({ optional: true, additionalProperties: false });
-});
-
-test('legacy HTTP accepts original extra input keys and returns extra output keys without parsing', async () => {
-	const countParams = { i: 'transport', future: true };
-	const partialParams = { noteIds: ['note123'], i: 'transport', future: true };
-	const translateParams = { noteId: 'note123', targetLang: 'en', i: 'transport', future: true };
-	const partialResponse = [{ ...item, future: true }];
-	const translateResponse = { ...translation, future: true };
-	const count = new ContractEndpoint({}, projectEndpointContract(countDefinition), async ps => { expect(ps).toBe(countParams); return 7; });
-	const partial = new ContractEndpoint({}, projectEndpointContract(partialDefinition), async ps => { expect(ps).toBe(partialParams); return partialResponse; });
-	const translate = new ContractEndpoint({}, projectEndpointContract(translateDefinition), async ps => { expect(ps).toBe(translateParams); return translateResponse; });
-	expect(await count.exec(countParams, null, null)).toBe(7);
-	expect(await partial.exec(partialParams, null, null)).toBe(partialResponse);
-	expect(await translate.exec(translateParams, null, null)).toBe(translateResponse);
-	expect(v.safeParse(partialOutput, partialResponse).success).toBe(false);
-	expect(v.safeParse(translateOutput, translateResponse).success).toBe(false);
-	await expect(partial.exec({ noteIds: [] }, null, null)).rejects.toMatchObject({ code: 'INVALID_PARAM', id: '3d81ceae-475f-4600-b2a8-2bc116157532', info: { param: '#/properties/noteIds/minItems' } });
-	await expect(translate.exec({ noteId: 'note123' }, null, null)).rejects.toMatchObject({ code: 'INVALID_PARAM', info: { param: '#/required' } });
+test('native output validation rejects undocumented producer fields and non-finite counts', () => {
+	expect(v.safeParse(countOutput, Infinity).success).toBe(false);
+	expect(v.safeParse(countOutput, NaN).success).toBe(false);
+	expect(v.safeParse(partialOutput, [{ ...item, future: true }]).success).toBe(false);
+	expect(v.safeParse(translateOutput, { ...translation, future: true }).success).toBe(false);
 });
 
 test('draft count handler retains author filtering and scalar response', async () => {
@@ -87,8 +66,8 @@ test('draft count handler retains author filtering and scalar response', async (
 	query.where.mockReturnValue(query);
 	query.getCount.mockResolvedValue(7);
 	const user = mockDeep<MiLocalUser>({ id: 'user123' });
-	const endpoint = new CountEndpoint(repository);
-	expect(await endpoint.exec({ i: 'transport' }, user, null)).toBe(7);
+	const endpoint = new CountOperation(repository);
+	expect(await endpoint.execute(v.parse(countInput, { i: 'transport' }), user)).toBe(7);
 	expect(query.where).toHaveBeenCalledWith('drafts.userId = :meId', { meId: user.id });
 });
 
@@ -110,8 +89,8 @@ test.each([false, true])('real partial serializer emits exactly the documented f
 	buffering.mergeReactions.mockReturnValue(item.reactions);
 	reaction.convertLegacyReactions.mockReturnValue(item.reactions);
 	emoji.populateEmojis.mockResolvedValue(item.reactionEmojis);
-	const endpoint = new PartialEndpoint(serializer);
-	const result = await endpoint.exec({ noteIds: [visible.id, hidden.id] }, null, null);
+	const endpoint = new PartialOperation(serializer);
+	const result = await endpoint.execute({ noteIds: [visible.id, hidden.id] }, null);
 	expect(result).toEqual([item]);
 	expect(v.parse(partialOutput, result)).toEqual(result);
 	expect(Object.keys(result[0])).toEqual(['id', 'reactions', 'reactionEmojis']);
@@ -134,15 +113,15 @@ test.each([false, true])('translate handler projects provider response and retai
 	const response = mockDeep<Awaited<ReturnType<HttpRequestService['send']>>>();
 	response.json.mockResolvedValue({ translations: [{ detected_source_language: 'JA', text: 'hello', providerExtra: true }], providerExtra: true });
 	http.send.mockResolvedValue(response);
-	const endpoint = new TranslateEndpoint(settings, notes, getter, http, roles);
-	const result = await endpoint.exec({ noteId: note.id, targetLang: 'en-US' }, user, null);
+	const endpoint = new TranslateOperation(settings, notes, getter, http, roles);
+	const result = await endpoint.execute({ noteId: note.id, targetLang: 'en-US' }, user);
 	expect(result).toEqual(translation);
 	expect(v.parse(translateOutput, result)).toEqual(result);
 	expect(Object.keys(result!)).toEqual(['sourceLang', 'text']);
 	expect(http.send.mock.calls[0][0]).toBe(deeplIsPro ? 'https://api.deepl.com/v2/translate' : 'https://api-free.deepl.com/v2/translate');
 	expect(new URLSearchParams(String(http.send.mock.calls[0][1]?.body)).get('target_lang')).toBe('en');
 	note.text = ' ';
-	expect(await endpoint.exec({ noteId: note.id, targetLang: 'en-US' }, user, null)).toBeUndefined();
+	expect(await endpoint.execute({ noteId: note.id, targetLang: 'en-US' }, user)).toBeUndefined();
 	expect(http.send).toHaveBeenCalledTimes(1);
 });
 
@@ -198,9 +177,5 @@ test.each([false, true])('real Note serializer preserves native undefined and JS
 	for (const invalid of [{ ...wire, future: true }, { ...wire, id: 7 }, { ...wire, channel: { ...wire.channel, future: true } }]) expect(v.safeParse(packedNoteSchema, invalid).success).toBe(false);
 	const { id: _id, ...missing } = wire;
 	expect(v.safeParse(packedNoteSchema, missing).success).toBe(false);
-	const params = { noteId: note.id, future: true };
-	const response = { ...raw, future: true };
-	const endpoint = new ContractEndpoint({}, projectEndpointContract(packedNotesShowDefinition), async input => { expect(input).toBe(params); return response; });
-	expect(await endpoint.exec(params, null, null)).toBe(response);
-	expect(v.safeParse(packedNoteSchema, response).success).toBe(false);
+	expect(v.safeParse(packedNoteSchema, { ...raw, future: true }).success).toBe(false);
 });

@@ -13,7 +13,7 @@ export const testNotificationInput = emptyInput;
 export const testNotificationOutput = v.void();
 const requestName = 'notifications/test-notification';
 export const testNotificationContract = oc.$meta<{ requestName: typeof requestName }>({ requestName })
-	.route({ method: 'POST', path: `/${requestName}`, operationId: 'post___' + requestName.replaceAll('/', '___'), tags: ['notifications'], spec: current => ({ ...current, security: [{ bearerAuth: [] }] }), successStatus: 204, })
+	.route({ method: 'POST', path: `/${requestName}`, operationId: 'post___' + requestName.replaceAll('/', '___'), tags: ['notifications'], spec: current => ({ ...current, security: [{ bearerAuth: [] }] }), successStatus: 204 })
 	.errors(commonErrors)
 	.input(testNotificationInput)
 	.output(testNotificationOutput);

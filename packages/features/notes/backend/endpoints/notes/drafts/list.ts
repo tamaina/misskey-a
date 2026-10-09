@@ -3,58 +3,54 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { packedNotesDraftsListDefinition, packedNotesDraftsListInput, packedNotesDraftsListOutput } from '../../../../contract/packed-endpoint-definitions.js';
+import { implement } from '@orpc/server';
 import { Inject, Injectable } from '@nestjs/common';
-
-import type { MiNoteDraft, NoteDraftsRepository } from '@features/persistence/backend/repositories/models.js';
+import * as v from 'valibot';
 import { DI } from '@/di-symbols.js';
+import { authentication, apiPolicy, requirePrincipal } from '../../../../../api/backend/transport/middleware.js';
 import { QueryService } from '../../../services/QueryService.js';
 import { NoteDraftEntityService } from '../../../serializers/NoteDraftEntityService.js';
+import { notesDraftsListContract, notesDraftsListPolicy, notesDraftsListInput, notesDraftsListOutput } from './list.contract.js';
+import type { ApiActor } from '../../../../../api/backend/transport/context.js';
+import type { NotesApiContext } from '../../../operations.js';
+import type { MiNoteDraft, NoteDraftsRepository } from '@features/persistence/backend/repositories/models.js';
+import type { MiLocalUser } from '../../../../../users/backend/models/User.js';
 
-const contractProjection = projectEndpointContract(packedNotesDraftsListDefinition);
-
-export const meta = {
-	tags: ['notes', 'drafts'],
-
-	requireCredential: true,
-
-	prohibitMoved: true,
-
-	kind: 'read:account',
-
-	res: contractProjection.response,
-
-	errors: {
-	},
-} as const;
-
-export const paramDef = contractProjection.input;
+export function createNotesDraftsListProcedure<Actor extends ApiActor>() {
+	return implement(notesDraftsListContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<NotesApiContext<Actor>>()
+		.use(authentication<Actor>())
+		.use(apiPolicy<Actor>(notesDraftsListPolicy))
+		.use(requirePrincipal<Actor>())
+		.handler(({ input, context }) => context.operations.notes.notesDraftsList(input, context.principal));
+}
 
 @Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedNotesDraftsListInput, typeof packedNotesDraftsListOutput> {
+export class NotesDraftsListOperation {
 	constructor(
 		@Inject(DI.noteDraftsRepository)
 		private noteDraftsRepository: NoteDraftsRepository,
 
 		private queryService: QueryService,
 		private noteDraftEntityService: NoteDraftEntityService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			const query = this.queryService.makePaginationQuery<MiNoteDraft>(this.noteDraftsRepository.createQueryBuilder('drafts'), ps.sinceId, ps.untilId, ps.sinceDate, ps.untilDate)
-				.andWhere('drafts.userId = :meId', { meId: me.id });
+	) {}
+	async execute(ps: v.InferOutput<typeof notesDraftsListInput>, me: MiLocalUser): Promise<v.InferOutput<typeof notesDraftsListOutput>> {
+		return v.parse(notesDraftsListOutput, await this.run(ps, me));
+	}
 
-			if (ps.scheduled === true) {
-				query.andWhere('drafts.isActuallyScheduled = true');
-			} else if (ps.scheduled === false) {
-				query.andWhere('drafts.isActuallyScheduled = false');
-			}
+	private async run(ps: v.InferOutput<typeof notesDraftsListInput>, me: MiLocalUser) {
+		const query = this.queryService.makePaginationQuery<MiNoteDraft>(this.noteDraftsRepository.createQueryBuilder('drafts'), ps.sinceId, ps.untilId, ps.sinceDate, ps.untilDate)
+			.andWhere('drafts.userId = :meId', { meId: me.id });
 
-			const drafts = await query
-				.limit(ps.limit)
-				.getMany();
+		if (ps.scheduled === true) {
+			query.andWhere('drafts.isActuallyScheduled = true');
+		} else if (ps.scheduled === false) {
+			query.andWhere('drafts.isActuallyScheduled = false');
+		}
 
-			return await this.noteDraftEntityService.packMany(drafts, me);
-		});
+		const drafts = await query
+			.limit(ps.limit)
+			.getMany();
+
+		return await this.noteDraftEntityService.packMany(drafts, me);
 	}
 }

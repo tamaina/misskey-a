@@ -5,9 +5,9 @@
 
 import { implement } from '@orpc/server';
 import { authentication, apiPolicy, requirePrincipal } from '../../../../api/backend/transport/middleware.js';
+import { createContract } from './create.contract.js';
 import type { ApiActor } from '../../../../api/backend/transport/context.js';
 import type { NotificationsContext } from '../../operations.js';
-import { createContract } from './create.contract.js';
 
 export function createCreateProcedure<Actor extends ApiActor>() {
 	return implement(createContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<NotificationsContext<Actor>>()

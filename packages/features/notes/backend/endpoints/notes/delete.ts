@@ -4,9 +4,9 @@
  */
 
 import { implement } from '@orpc/server';
+import { authentication, apiPolicy, requirePrincipal } from '../../../../api/backend/transport/middleware.js';
 import { notesPilotContract } from './delete.contract.js';
 import type { ApiActor, ApiContext } from '../../../../api/backend/transport/context.js';
-import { authentication, apiPolicy, requirePrincipal } from '../../../../api/backend/transport/middleware.js';
 
 export function createDeleteProcedure<Actor extends ApiActor>() {
 	const notes = implement(notesPilotContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>()

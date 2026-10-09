@@ -2,12 +2,12 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-import { serverInfoContract, serverInfoOutput } from '../backend/endpoints/server-info.contract.js';
 import { oc } from '@orpc/contract';
 import * as v from 'valibot';
+import { serverInfoContract, serverInfoOutput } from '../backend/endpoints/server-info.contract.js';
+import { objectParams } from '../../api/contract/index.js';
 import type { InferContractRouterInputs, InferContractRouterOutputs } from '@orpc/contract';
 
-import { objectParams } from '../../api/contract/index.js';
 export { objectParams };
 
 export const pingResult = v.strictObject({ pong: v.number() });

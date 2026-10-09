@@ -4,9 +4,7 @@
  */
 
 import { Injectable } from '@nestjs/common';
-import type { MiLocalUser } from '@features/users/backend/models/User.js';
 import { toPackedUser, toPackedUserDetailed } from '../../../users/backend/user.schema.js';
-import type { DiscoveryOperations } from './discovery.js';
 import { HashtagsListOperation } from './hashtags/list.js';
 import { HashtagsSearchOperation } from './hashtags/search.js';
 import { HashtagsShowOperation } from './hashtags/show.js';
@@ -19,22 +17,24 @@ import { UsersGetFrequentlyRepliedUsersOperation } from './users/get-frequently-
 import { UsersRecommendationOperation } from './users/recommendation.js';
 import { UsersSearchOperation } from './users/search.js';
 import { UsersSearchByUsernameAndHostOperation } from './users/search-by-username-and-host.js';
+import type { DiscoveryOperations } from './discovery.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
 
 @Injectable()
 export class DiscoveryApplicationService implements DiscoveryOperations<MiLocalUser> {
 	constructor(
-	private readonly hashtagsList: HashtagsListOperation,
-	private readonly hashtagsSearch: HashtagsSearchOperation,
-	private readonly hashtagsShow: HashtagsShowOperation,
-	private readonly hashtagsTrend: HashtagsTrendOperation,
-	private readonly hashtagsUsers: HashtagsUsersOperation,
-	private readonly notesFeatured: NotesFeaturedOperation,
-	private readonly notesSearchByTag: NotesSearchByTagOperation,
-	private readonly usersFeaturedNotes: UsersFeaturedNotesOperation,
-	private readonly usersGetFrequentlyRepliedUsers: UsersGetFrequentlyRepliedUsersOperation,
-	private readonly usersRecommendation: UsersRecommendationOperation,
-	private readonly usersSearch: UsersSearchOperation,
-	private readonly usersSearchByUsernameAndHost: UsersSearchByUsernameAndHostOperation,
+		private readonly hashtagsList: HashtagsListOperation,
+		private readonly hashtagsSearch: HashtagsSearchOperation,
+		private readonly hashtagsShow: HashtagsShowOperation,
+		private readonly hashtagsTrend: HashtagsTrendOperation,
+		private readonly hashtagsUsers: HashtagsUsersOperation,
+		private readonly notesFeatured: NotesFeaturedOperation,
+		private readonly notesSearchByTag: NotesSearchByTagOperation,
+		private readonly usersFeaturedNotes: UsersFeaturedNotesOperation,
+		private readonly usersGetFrequentlyRepliedUsers: UsersGetFrequentlyRepliedUsersOperation,
+		private readonly usersRecommendation: UsersRecommendationOperation,
+		private readonly usersSearch: UsersSearchOperation,
+		private readonly usersSearchByUsernameAndHost: UsersSearchByUsernameAndHostOperation,
 	) {}
 	'hashtags/list': DiscoveryOperations<MiLocalUser>['hashtags/list'] = (input, actor) => this.hashtagsList.execute(input, actor);
 	'hashtags/search': DiscoveryOperations<MiLocalUser>['hashtags/search'] = (input, actor) => this.hashtagsSearch.execute(input, actor);

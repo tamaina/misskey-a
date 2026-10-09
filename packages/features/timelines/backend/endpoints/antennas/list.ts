@@ -3,42 +3,16 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { packedAntennasListDefinition, packedAntennasListInput, packedAntennasListOutput } from '../../../contract/packed-endpoint-definitions.js';
-import { Inject, Injectable } from '@nestjs/common';
+import { implement } from '@orpc/server';
+import { authentication, apiPolicy, requirePrincipal } from '../../../../api/backend/transport/middleware.js';
+import { antennasListContract } from './list.contract.js';
+import type { ApiActor } from '../../../../api/backend/transport/context.js';
+import type { TimelinesContext } from '../../operations.js';
 
-import type { AntennasRepository } from '@features/persistence/backend/repositories/models.js';
-import { AntennaEntityService } from '../../serializers/AntennaEntityService.js';
-import { DI } from '@/di-symbols.js';
-
-const contractProjection = projectEndpointContract(packedAntennasListDefinition);
-
-export const meta = {
-	tags: ['antennas', 'account'],
-
-	requireCredential: true,
-
-	kind: 'read:account',
-
-	res: contractProjection.response,
-} as const;
-
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedAntennasListInput, typeof packedAntennasListOutput> {
-	constructor(
-		@Inject(DI.antennasRepository)
-		private antennasRepository: AntennasRepository,
-
-		private antennaEntityService: AntennaEntityService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			const antennas = await this.antennasRepository.findBy({
-				userId: me.id,
-			});
-
-			return await Promise.all(antennas.map(x => this.antennaEntityService.pack(x)));
-		});
-	}
+export function createAntennasListProcedure<Actor extends ApiActor>() {
+	return implement(antennasListContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<TimelinesContext<Actor>>()
+		.use(authentication<Actor>())
+		.use(apiPolicy<Actor>({ name: 'antennas/list', requireCredential: true, kind: 'read:account' }))
+		.use(requirePrincipal<Actor>())
+		.handler(({ input, context }) => context.operations.timelines.antennasList(input, context.principal));
 }

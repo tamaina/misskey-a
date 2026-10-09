@@ -3,95 +3,59 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { voidMuteCreateDefinition, voidMuteCreateInput, voidMuteCreateOutput } from '../../../contract/void-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
 import ms from 'ms';
 
-import type { MutingsRepository } from '@features/persistence/backend/repositories/models.js';
-import { DI } from '@/di-symbols.js';
 import { GetterService } from '@features/api/backend/transport/GetterService.js';
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
+import { DI } from '@/di-symbols.js';
 import { UserMutingService } from '../../services/UserMutingService.js';
-import { ApiError } from '@features/api/backend/transport/error.js';
 
-const contractProjection = projectEndpointContract(voidMuteCreateDefinition);
-
-export const meta = {
-	tags: ['account'],
-
-	requireCredential: true,
-	prohibitMoved: true,
-
-	kind: 'write:mutes',
-
-	limit: {
-		duration: ms('1hour'),
-		max: 20,
-	},
-
-	errors: {
-		noSuchUser: {
-			message: 'No such user.',
-			code: 'NO_SUCH_USER',
-			id: '6fef56f3-e765-4957-88e5-c6f65329b8a5',
-		},
-
-		muteeIsYourself: {
-			message: 'Mutee is yourself.',
-			code: 'MUTEE_IS_YOURSELF',
-			id: 'a4619cb2-5f23-484b-9301-94c903074e10',
-		},
-
-		alreadyMuting: {
-			message: 'You are already muting that user.',
-			code: 'ALREADY_MUTING',
-			id: '7e7359cb-160c-4956-b08f-4d1c653cd007',
-		},
-	},
-} as const;
-
-export const paramDef = contractProjection.input;
+import { relationshipsErrors } from '../relationships.errors.js';
+import type { MutingsRepository } from '@features/persistence/backend/repositories/models.js';
+import type { RelationshipsInputs } from '../relationships.contract.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
 
 @Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof voidMuteCreateInput, typeof voidMuteCreateOutput> {
+export class MuteCreateOperation {
 	constructor(
 		@Inject(DI.mutingsRepository)
 		private mutingsRepository: MutingsRepository,
 
 		private getterService: GetterService,
 		private userMutingService: UserMutingService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			const muter = me;
+	) {}
 
-			// 自分自身
-			if (me.id === ps.userId) {
-				throw new ApiError(meta.errors.muteeIsYourself);
-			}
+	async execute(ps: RelationshipsInputs['mute/create'], me: MiLocalUser) {
+		const muter = me;
 
-			// Get mutee
-			const mutee = await this.getterService.getUser(ps.userId).catch(err => {
-				if (err.id === '15348ddd-432d-49c2-8a5a-8069753becff') throw new ApiError(meta.errors.noSuchUser);
-				throw err;
-			});
+		// 自分自身
+		if (me.id === ps.userId) {
+			throw apiError(relationshipsErrors['mute/create'].muteeIsYourself);
+		}
 
-			// Check if already muting
-			const exist = await this.mutingsRepository.exists({
-				where: {
-					muterId: muter.id,
-					muteeId: mutee.id,
-				},
-			});
-
-			if (exist) {
-				throw new ApiError(meta.errors.alreadyMuting);
-			}
-
-			if (ps.expiresAt && ps.expiresAt <= Date.now()) {
-				return;
-			}
-
-			await this.userMutingService.mute(muter, mutee, ps.expiresAt ? new Date(ps.expiresAt) : null);
+		// Get mutee
+		const mutee = await this.getterService.getUser(ps.userId).catch(err => {
+			if (err.id === '15348ddd-432d-49c2-8a5a-8069753becff') throw apiError(relationshipsErrors['mute/create'].noSuchUser);
+			throw err;
 		});
+
+		// Check if already muting
+		const exist = await this.mutingsRepository.exists({
+			where: {
+				muterId: muter.id,
+				muteeId: mutee.id,
+			},
+		});
+
+		if (exist) {
+			throw apiError(relationshipsErrors['mute/create'].alreadyMuting);
+		}
+
+		if (ps.expiresAt && ps.expiresAt <= Date.now()) {
+			return;
+		}
+
+		await this.userMutingService.mute(muter, mutee, ps.expiresAt ? new Date(ps.expiresAt) : null);
 	}
 }

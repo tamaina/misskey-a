@@ -4,8 +4,6 @@
  */
 
 import { implement } from '@orpc/server';
-import type { ApiActor } from '../../api/backend/transport/context.js';
-import type { StatisticsContext } from './operations.js';
 import { statisticsContract } from './endpoints/statistics.contract.js';
 import { createActiveUsersProcedure, createActiveUsersGetProcedure } from './endpoints/charts/active-users.js';
 import { createApRequestProcedure, createApRequestGetProcedure } from './endpoints/charts/ap-request.js';
@@ -21,6 +19,8 @@ import { createPerUserReactionsProcedure, createPerUserReactionsGetProcedure } f
 import { createUsersProcedure, createUsersGetProcedure } from './endpoints/charts/users.js';
 import { createRetentionProcedure, createRetentionGetProcedure } from './endpoints/retention.js';
 import { createStatsProcedure } from './endpoints/stats.js';
+import type { StatisticsContext } from './operations.js';
+import type { ApiActor } from '../../api/backend/transport/context.js';
 
 export function createStatisticsRouter<Actor extends ApiActor>() {
 	return implement(statisticsContract).$context<StatisticsContext<Actor>>().router({

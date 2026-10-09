@@ -3,20 +3,16 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { legacyNotesCommandSchemas } from '../../../commands.js';
-import { notesCommandErrors, notesCommandsContract } from '../../../../contract/index.js';
-import type { Schema } from '@features/api/backend/utility/json-schema.js';
-import { createContractTransportEndpoint } from '@features/api/backend/transport/contract-transport-endpoint.js';
-import { defineFeatureEndpoint } from '@features/api/backend/transport/feature-endpoint.js';
+import { implement } from '@orpc/server';
+import { authentication, apiPolicy, requirePrincipal } from '../../../../../api/backend/transport/middleware.js';
+import { notesThreadMutingDeleteContract, notesThreadMutingDeletePolicy } from './delete.contract.js';
+import type { ApiActor } from '../../../../../api/backend/transport/context.js';
+import type { NotesApiContext } from '../../../operations.js';
 
-export const meta = {
-	tags: ['notes'],
-	requireCredential: true,
-	kind: 'write:account',
-	errors: notesCommandErrors['notes/thread-muting/delete'],
-} as const;
-
-export const paramDef = legacyNotesCommandSchemas['notes/thread-muting/delete'].input as Schema;
-
-export const { feature, createEndpoint } = defineFeatureEndpoint('notesCommands', commands =>
-	createContractTransportEndpoint(meta, paramDef, notesCommandsContract['notes/thread-muting/delete'], async (params, user) => commands['notes/thread-muting/delete'](params, { context: { actor: user } })));
+export function createNotesThreadMutingDeleteProcedure<Actor extends ApiActor>() {
+	return implement(notesThreadMutingDeleteContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<NotesApiContext<Actor>>()
+		.use(authentication<Actor>())
+		.use(apiPolicy<Actor>(notesThreadMutingDeletePolicy))
+		.use(requirePrincipal<Actor>())
+		.handler(({ input, context }) => context.operations.notes.notesThreadMutingDelete(input, context.principal));
+}

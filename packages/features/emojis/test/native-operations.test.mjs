@@ -5,8 +5,8 @@
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { createRouterClient } from '@orpc/server';
 import { createRequire } from 'node:module';
+import { createRouterClient } from '@orpc/server';
 const backendRequire = createRequire(new URL('../../../backend/package.json', import.meta.url));
 const { OpenAPIHandler } = await import(backendRequire.resolve('@orpc/openapi/fetch'));
 import { createApiRouter, createEmojisOperations } from '../../../backend/built/features/api/pilot.js';

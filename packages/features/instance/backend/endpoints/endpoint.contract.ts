@@ -5,8 +5,8 @@
 
 import { oc } from '@orpc/contract';
 import * as v from 'valibot';
-import { objectInput } from './input.schema.js';
 import { commonErrors } from '../../../api/backend/transport/errors.schema.js';
+import { objectInput } from './input.schema.js';
 
 export const endpointInput = objectInput({ endpoint: v.string() });
 export const endpointContract = oc.$meta<{ requestName: 'endpoint'; allowGet: boolean; cacheSec?: number }>({ requestName: 'endpoint', allowGet: false })

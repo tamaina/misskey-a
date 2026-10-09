@@ -16,14 +16,29 @@ import { UsersGetFrequentlyRepliedUsersOperation } from '@features/discovery/bac
 import { UsersRecommendationOperation } from '@features/discovery/backend/endpoints/users/recommendation.js';
 import { UsersSearchOperation } from '@features/discovery/backend/endpoints/users/search.js';
 import { UsersSearchByUsernameAndHostOperation } from '@features/discovery/backend/endpoints/users/search-by-username-and-host.js';
+import { notesOperationProviders } from '@features/notes/backend/operations.js';
+import { timelinesApplicationProviders } from '@features/timelines/backend/application-providers.js';
+import { noteSearchApplicationProviders } from '@features/note-search/backend/application-providers.js';
+import { relationshipsProviders } from '@features/relationships/backend/endpoints/relationships.providers.js';
+import { AdminAccountsDeleteOperation } from '@features/users/backend/endpoints/admin/accounts/delete.js';
+import { AdminAccountsFindByEmailOperation } from '@features/users/backend/endpoints/admin/accounts/find-by-email.js';
+import { AdminDeleteAccountOperation } from '@features/users/backend/endpoints/admin/delete-account.js';
+import { AdminUpdateProxyAccountOperation } from '@features/users/backend/endpoints/admin/update-proxy-account.js';
+import { IOperation } from '@features/users/backend/endpoints/i.js';
+import { IClaimAchievementOperation } from '@features/users/backend/endpoints/i/claim-achievement.js';
+import { IDeleteAccountOperation } from '@features/users/backend/endpoints/i/delete-account.js';
+import { IMoveOperation } from '@features/users/backend/endpoints/i/move.js';
+import { IUpdateOperation } from '@features/users/backend/endpoints/i/update.js';
+import { UsersOperation } from '@features/users/backend/endpoints/users.js';
+import { UsersAchievementsOperation } from '@features/users/backend/endpoints/users/achievements.js';
+import { UsersShowOperation } from '@features/users/backend/endpoints/users/show.js';
+import { UsersUpdateMemoOperation } from '@features/users/backend/endpoints/users/update-memo.js';
+import { UsersApplicationService } from '@features/users/backend/api.application.js';
 import { Module } from '@nestjs/common';
-import { EndpointsModule } from './EndpointsModule.js';
-import { CoreModule } from './CoreModule.js';
 import { ApiCallService } from '@features/api/backend/transport/ApiCallService.js';
 import { FileServerService } from '@features/drive/backend/http/FileServerService.js';
 import { HealthServerService } from '@features/operations/backend/http/HealthServerService.js';
 import { NodeinfoServerService } from '@features/instance/backend/http/NodeinfoServerService.js';
-import { ServerService } from './ServerService.mjs';
 import { WellKnownServerService } from '@features/federation/backend/http/WellKnownServerService.js';
 import { GetterService } from '@features/api/backend/transport/GetterService.js';
 import { ActivityPubServerService } from '@features/federation/backend/http/ActivityPubServerService.js';
@@ -65,6 +80,9 @@ import { ReversiChannel } from '@features/games/backend/stream/reversi.js';
 import { ReversiGameChannel } from '@features/games/backend/stream/reversi-game.js';
 import { NoteStreamingHidingService } from '@features/api/backend/transport/stream/NoteStreamingHidingService.js';
 import { SigninWithPasskeyApiService } from '@features/auth/backend/transport/SigninWithPasskeyApiService.js';
+import { ServerService } from './ServerService.mjs';
+import { CoreModule } from './CoreModule.js';
+import { EndpointsModule } from './EndpointsModule.js';
 
 @Module({
 	imports: [
@@ -89,6 +107,24 @@ import { SigninWithPasskeyApiService } from '@features/auth/backend/transport/Si
 		ApiLoggerService,
 		ApiServerService,
 		OrpcPilotService,
+		...notesOperationProviders,
+		...timelinesApplicationProviders,
+		...noteSearchApplicationProviders,
+		...relationshipsProviders,
+		AdminAccountsDeleteOperation,
+		AdminAccountsFindByEmailOperation,
+		AdminDeleteAccountOperation,
+		AdminUpdateProxyAccountOperation,
+		IOperation,
+		IClaimAchievementOperation,
+		IDeleteAccountOperation,
+		IMoveOperation,
+		IUpdateOperation,
+		UsersOperation,
+		UsersAchievementsOperation,
+		UsersShowOperation,
+		UsersUpdateMemoOperation,
+		UsersApplicationService,
 		DiscoveryApplicationService,
 		HashtagsListOperation,
 		HashtagsSearchOperation,

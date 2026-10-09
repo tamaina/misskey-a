@@ -5,9 +5,9 @@
 
 import { implement } from '@orpc/server';
 import { authentication, apiPolicy, requirePrincipal } from '../../../../api/backend/transport/middleware.js';
+import { registerContract } from './register.contract.js';
 import type { ApiActor } from '../../../../api/backend/transport/context.js';
 import type { NotificationsContext } from '../../operations.js';
-import { registerContract } from './register.contract.js';
 
 export function createRegisterProcedure<Actor extends ApiActor>() {
 	return implement(registerContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<NotificationsContext<Actor>>()

@@ -3,17 +3,17 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import type { MiLocalUser } from '@features/users/backend/models/User.js';
-import type { DiscoveryInputs } from '../discovery.contract.js';
 import { Inject, Injectable } from '@nestjs/common';
-import type { NotesRepository } from '@features/persistence/backend/repositories/models.js';
 
 import { NoteEntityService } from '@features/notes/backend/serializers/NoteEntityService.js';
-import { DI } from '@/di-symbols.js';
-import { FeaturedService } from '../../services/FeaturedService.js';
 import { CacheService } from '@features/users/backend/services/CacheService.js';
 import { isUserRelated } from '@features/relationships/backend/utility/is-user-related.js';
 import { QueryService } from '@features/notes/backend/services/QueryService.js';
+import { DI } from '@/di-symbols.js';
+import { FeaturedService } from '../../services/FeaturedService.js';
+import type { NotesRepository } from '@features/persistence/backend/repositories/models.js';
+import type { DiscoveryInputs } from '../discovery.contract.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
 
 @Injectable()
 export class UsersFeaturedNotesOperation {

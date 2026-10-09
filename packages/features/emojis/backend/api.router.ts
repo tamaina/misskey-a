@@ -4,9 +4,9 @@
  */
 
 import { implement } from '@orpc/server';
-import type { ApiActor, ApiContext } from '../../api/backend/transport/context.js';
 import { authentication, apiPolicy, requirePrincipal } from '../../api/backend/transport/middleware.js';
 import { emojisContract } from './api.contract.js';
+import type { ApiActor, ApiContext } from '../../api/backend/transport/context.js';
 import type { EmojisOperations } from './api.operations.js';
 
 export type EmojisContext<Actor extends ApiActor> = ApiContext<Actor> & { operations: { emojis: EmojisOperations<Actor> } };

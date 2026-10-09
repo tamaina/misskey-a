@@ -5,9 +5,9 @@
 
 import { implement } from '@orpc/server';
 import { authentication, apiPolicy } from '../../../../api/backend/transport/middleware.js';
+import { unregisterContract } from './unregister.contract.js';
 import type { ApiActor } from '../../../../api/backend/transport/context.js';
 import type { NotificationsContext } from '../../operations.js';
-import { unregisterContract } from './unregister.contract.js';
 
 export function createUnregisterProcedure<Actor extends ApiActor>() {
 	return implement(unregisterContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<NotificationsContext<Actor>>()

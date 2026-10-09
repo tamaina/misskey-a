@@ -3,42 +3,32 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { packedNotesReactionsDefinition, packedNotesReactionsInput, packedNotesReactionsOutput } from '../../../contract/packed-endpoint-definitions.js';
+import { implement } from '@orpc/server';
 import { Inject, Injectable } from '@nestjs/common';
-import { Brackets, type FindOptionsWhere } from 'typeorm';
-import type { NoteReactionsRepository } from '@features/persistence/backend/repositories/models.js';
-import type { MiNoteReaction } from '../../models/NoteReaction.js';
-
+import { GetterService } from '@features/api/backend/transport/GetterService.js';
+import * as v from 'valibot';
+import { DI } from '@/di-symbols.js';
+import { authentication, apiPolicy } from '../../../../api/backend/transport/middleware.js';
 import { NoteReactionEntityService } from '../../serializers/NoteReactionEntityService.js';
 import { NoteEntityService } from '../../serializers/NoteEntityService.js';
-import { DI } from '@/di-symbols.js';
 import { QueryService } from '../../services/QueryService.js';
-import { GetterService } from '@features/api/backend/transport/GetterService.js';
-import { ApiError } from '@features/api/backend/transport/error.js';
+import { apiError } from '../../../../api/backend/transport/orpc-error.js';
+import { readErrorId } from '../../request.schema.js';
+import { notesReactionsContract, notesReactionsPolicy, notesReactionsInput, notesReactionsOutput, notesReactionsErrors } from './reactions.contract.js';
+import type { ApiActor } from '../../../../api/backend/transport/context.js';
+import type { NotesApiContext } from '../../operations.js';
+import type { NoteReactionsRepository } from '@features/persistence/backend/repositories/models.js';
+import type { MiLocalUser } from '../../../../users/backend/models/User.js';
 
-const contractProjection = projectEndpointContract(packedNotesReactionsDefinition);
-
-export const meta = {
-	tags: ['notes', 'reactions'],
-
-	requireCredential: false,
-
-	res: contractProjection.response,
-
-	errors: {
-		noSuchNote: {
-			message: 'No such note.',
-			code: 'NO_SUCH_NOTE',
-			id: '263fff3d-d0e1-4af4-bea7-8408059b451a',
-		},
-	},
-} as const;
-
-export const paramDef = contractProjection.input;
+export function createNotesReactionsProcedure<Actor extends ApiActor>() {
+	return implement(notesReactionsContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<NotesApiContext<Actor>>()
+		.use(authentication<Actor>())
+		.use(apiPolicy<Actor>(notesReactionsPolicy))
+		.handler(({ input, context }) => context.operations.notes.notesReactions(input, context.principal));
+}
 
 @Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedNotesReactionsInput, typeof packedNotesReactionsOutput> {
+export class NotesReactionsOperation {
 	constructor(
 		@Inject(DI.noteReactionsRepository)
 		private noteReactionsRepository: NoteReactionsRepository,
@@ -47,33 +37,36 @@ export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof
 		private noteEntityService: NoteEntityService,
 		private queryService: QueryService,
 		private getterService: GetterService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			const note = await this.getterService.getNote(ps.noteId).catch(err => {
-				if (err.id === '9725d0ce-ba28-4dde-95a7-2cbb2c15de24') throw new ApiError(meta.errors.noSuchNote);
-				throw err;
-			});
+	) {}
+	async execute(ps: v.InferOutput<typeof notesReactionsInput>, me: MiLocalUser | null): Promise<v.InferOutput<typeof notesReactionsOutput>> {
+		return v.parse(notesReactionsOutput, await this.run(ps, me));
+	}
 
-			if (!await this.noteEntityService.isVisibleForMe(note, me ? me.id : null)) {
-				throw new ApiError(meta.errors.noSuchNote);
-			}
-
-			const query = this.queryService.makePaginationQuery(this.noteReactionsRepository.createQueryBuilder('reaction'), ps.sinceId, ps.untilId, ps.sinceDate, ps.untilDate)
-				.andWhere('reaction.noteId = :noteId', { noteId: note.id })
-				.leftJoinAndSelect('reaction.user', 'user')
-				.leftJoinAndSelect('reaction.note', 'note');
-
-			if (ps.type) {
-				// ローカルリアクションはホスト名が . とされているが
-				// DB 上ではそうではないので、必要に応じて変換
-				const suffix = '@.:';
-				const type = ps.type.endsWith(suffix) ? ps.type.slice(0, ps.type.length - suffix.length) + ':' : ps.type;
-				query.andWhere('reaction.reaction = :type', { type });
-			}
-
-			const reactions = await query.limit(ps.limit).getMany();
-
-			return await this.noteReactionEntityService.packMany(reactions, me);
+	private async run(ps: v.InferOutput<typeof notesReactionsInput>, me: MiLocalUser | null) {
+		const note = await this.getterService.getNote(ps.noteId).catch((err: unknown) => {
+			if (readErrorId(err) === '9725d0ce-ba28-4dde-95a7-2cbb2c15de24') throw apiError(notesReactionsErrors.noSuchNote);
+			throw err;
 		});
+
+		if (!await this.noteEntityService.isVisibleForMe(note, me ? me.id : null)) {
+			throw apiError(notesReactionsErrors.noSuchNote);
+		}
+
+		const query = this.queryService.makePaginationQuery(this.noteReactionsRepository.createQueryBuilder('reaction'), ps.sinceId, ps.untilId, ps.sinceDate, ps.untilDate)
+			.andWhere('reaction.noteId = :noteId', { noteId: note.id })
+			.leftJoinAndSelect('reaction.user', 'user')
+			.leftJoinAndSelect('reaction.note', 'note');
+
+		if (ps.type) {
+			// ローカルリアクションはホスト名が . とされているが
+			// DB 上ではそうではないので、必要に応じて変換
+			const suffix = '@.:';
+			const type = ps.type.endsWith(suffix) ? ps.type.slice(0, ps.type.length - suffix.length) + ':' : ps.type;
+			query.andWhere('reaction.reaction = :type', { type });
+		}
+
+		const reactions = await query.limit(ps.limit).getMany();
+
+		return await this.noteReactionEntityService.packMany(reactions, me);
 	}
 }

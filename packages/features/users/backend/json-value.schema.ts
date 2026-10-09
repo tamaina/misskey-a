@@ -64,3 +64,29 @@ export function toPackedJsonObject(input: unknown): { [key: string]: PackedJsonV
 	}
 	return Object.fromEntries(Object.keys(input).map(key => [key, toPackedJsonValue(Object.getOwnPropertyDescriptor(input, key)?.value)]));
 }
+
+/** Preserve original finite JSON extensions, including keys skipped by object parsers. */
+export function businessJsonObjectWithRest<const Entries extends v.ObjectEntries, const Rest extends v.GenericSchema>(entries: Entries, rest: Rest) {
+	const fields = v.objectWithRest(entries, rest);
+	return v.lazy(input => {
+		if (input === undefined) return fields;
+		if (input === null || typeof input !== 'object' || Array.isArray(input) || isNonJsonObject(input)) return v.never();
+		for (const key of Object.keys(input)) {
+			const value = Object.getOwnPropertyDescriptor(input, key)?.value;
+			// Explicit undefined is supported only for declared optional fields; their schema verifies optionality.
+			if (Object.hasOwn(entries, key) && value === undefined) continue;
+			if (!isJsonTree(value)) return v.never();
+		}
+		return v.pipe(fields, v.transform(parsed => {
+			const extensions: { [key: string]: PackedJsonValue } = {};
+			for (const key of Object.keys(input)) {
+				if (Object.hasOwn(entries, key)) continue;
+				Object.defineProperty(extensions, key, {
+					value: toPackedJsonValue(Object.getOwnPropertyDescriptor(input, key)?.value),
+					enumerable: true, configurable: true, writable: true,
+				});
+			}
+			return { ...parsed, ...extensions };
+		}));
+	});
+}

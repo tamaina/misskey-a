@@ -5,9 +5,9 @@
 
 import { implement } from '@orpc/server';
 import { authentication, apiPolicy, decodeScalarInput } from '../../../../api/backend/transport/middleware.js';
+import { chartFederationContract, chartFederationGetContract } from './federation.contract.js';
 import type { ApiActor } from '../../../../api/backend/transport/context.js';
 import type { StatisticsContext } from '../../operations.js';
-import { chartFederationContract, chartFederationGetContract } from './federation.contract.js';
 
 export function createFederationProcedure<Actor extends ApiActor>() {
 	return implement(chartFederationContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<StatisticsContext<Actor>>()

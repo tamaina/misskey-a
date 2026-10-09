@@ -3,10 +3,10 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import type { MiLocalUser } from '@features/users/backend/models/User.js';
-import type { DiscoveryInputs } from '../discovery.contract.js';
 import { Injectable } from '@nestjs/common';
 import { UserSearchService } from '../../services/UserSearchService.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+import type { DiscoveryInputs } from '../discovery.contract.js';
 
 @Injectable()
 export class UsersSearchByUsernameAndHostOperation {

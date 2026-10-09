@@ -3,22 +3,16 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { legacyNotesCommandSchemas } from '../../../commands.js';
-import { notesCommandErrors, notesCommandsContract } from '../../../../contract/index.js';
-import type { Schema } from '@features/api/backend/utility/json-schema.js';
-import ms from 'ms';
-import { createContractTransportEndpoint } from '@features/api/backend/transport/contract-transport-endpoint.js';
-import { defineFeatureEndpoint } from '@features/api/backend/transport/feature-endpoint.js';
+import { implement } from '@orpc/server';
+import { authentication, apiPolicy, requirePrincipal } from '../../../../../api/backend/transport/middleware.js';
+import { notesReactionsDeleteContract, notesReactionsDeletePolicy } from './delete.contract.js';
+import type { ApiActor } from '../../../../../api/backend/transport/context.js';
+import type { NotesApiContext } from '../../../operations.js';
 
-export const meta = {
-	tags: ['reactions', 'notes'],
-	requireCredential: true,
-	kind: 'write:reactions',
-	limit: { duration: ms('1hour'), max: 60, minInterval: ms('3sec') },
-	errors: notesCommandErrors['notes/reactions/delete'],
-} as const;
-
-export const paramDef = legacyNotesCommandSchemas['notes/reactions/delete'].input as Schema;
-
-export const { feature, createEndpoint } = defineFeatureEndpoint('notesCommands', commands =>
-	createContractTransportEndpoint(meta, paramDef, notesCommandsContract['notes/reactions/delete'], async (params, user) => commands['notes/reactions/delete'](params, { context: { actor: user } })));
+export function createNotesReactionsDeleteProcedure<Actor extends ApiActor>() {
+	return implement(notesReactionsDeleteContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<NotesApiContext<Actor>>()
+		.use(authentication<Actor>())
+		.use(apiPolicy<Actor>(notesReactionsDeletePolicy))
+		.use(requirePrincipal<Actor>())
+		.handler(({ input, context }) => context.operations.notes.notesReactionsDelete(input, context.principal));
+}

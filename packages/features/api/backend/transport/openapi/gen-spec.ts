@@ -3,9 +3,9 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { genPilotOpenapiSpec } from './pilot-spec.js';
-import type { Config } from '@/config.js';
 import { endpoints, IEndpoint } from '@features/index/backend/endpoints.js';
+import type { Config } from '@/config.js';
+import { genPilotOpenapiSpec } from './pilot-spec.js';
 import { errors as basicErrors } from './errors.js';
 import { getSchemas, convertSchemaToOpenApiSchema } from './schemas.js';
 

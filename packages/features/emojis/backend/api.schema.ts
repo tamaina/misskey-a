@@ -34,70 +34,70 @@ export const emojiInput = objectInput({ name: v.string() });
 export const emojisInput = v.optional(objectInput({}), {});
 export const emojisResult = v.strictObject({ emojis: v.array(emojiSimpleResult) });
 export const packedEmojiDetailedAdminSchema = v.strictObject({
-	"id": v.pipe(v.string(), v.metadata({ "format": "id" })),
-	"updatedAt": v.pipe(v.nullable(v.string()), v.metadata({ "format": "date-time" })),
-	"name": v.string(),
-	"host": v.pipe(v.nullable(v.string()), v.metadata({ "description": "The local host is represented with `null`." })),
-	"publicUrl": v.string(),
-	"originalUrl": v.string(),
-	"uri": v.nullable(v.string()),
-	"type": v.nullable(v.string()),
-	"aliases": v.array(v.pipe(v.string(), v.metadata({ "format": "id" }))),
-	"category": v.nullable(v.string()),
-	"license": v.nullable(v.string()),
-	"localOnly": v.boolean(),
-	"isSensitive": v.boolean(),
-	"roleIdsThatCanBeUsedThisEmojiAsReaction": v.array(v.strictObject({
-	"id": v.pipe(v.string(), v.metadata({ "format": "misskey:id" })),
-	"name": v.string()
-}))
+	'id': v.pipe(v.string(), v.metadata({ 'format': 'id' })),
+	'updatedAt': v.pipe(v.nullable(v.string()), v.metadata({ 'format': 'date-time' })),
+	'name': v.string(),
+	'host': v.pipe(v.nullable(v.string()), v.metadata({ 'description': 'The local host is represented with `null`.' })),
+	'publicUrl': v.string(),
+	'originalUrl': v.string(),
+	'uri': v.nullable(v.string()),
+	'type': v.nullable(v.string()),
+	'aliases': v.array(v.pipe(v.string(), v.metadata({ 'format': 'id' }))),
+	'category': v.nullable(v.string()),
+	'license': v.nullable(v.string()),
+	'localOnly': v.boolean(),
+	'isSensitive': v.boolean(),
+	'roleIdsThatCanBeUsedThisEmojiAsReaction': v.array(v.strictObject({
+		'id': v.pipe(v.string(), v.metadata({ 'format': 'misskey:id' })),
+		'name': v.string(),
+	})),
 });
 
 export const packedAdminEmojiAddInput = objectInput({
-	"name": v.pipe(v.string(), v.regex(new RegExp("^[a-zA-Z0-9_]+$"))),
-	"fileId": misskeyId,
-	"category": v.exactOptional(v.pipe(v.nullable(v.string()), v.metadata({ "description": "Use `null` to reset the category." }))),
-	"aliases": v.exactOptional(v.array(v.string())),
-	"license": v.exactOptional(v.nullable(v.string())),
-	"isSensitive": v.exactOptional(v.boolean()),
-	"localOnly": v.exactOptional(v.boolean()),
-	"roleIdsThatCanBeUsedThisEmojiAsReaction": v.exactOptional(v.array(v.string())),
+	'name': v.pipe(v.string(), v.regex(new RegExp('^[a-zA-Z0-9_]+$'))),
+	'fileId': misskeyId,
+	'category': v.exactOptional(v.pipe(v.nullable(v.string()), v.metadata({ 'description': 'Use `null` to reset the category.' }))),
+	'aliases': v.exactOptional(v.array(v.string())),
+	'license': v.exactOptional(v.nullable(v.string())),
+	'isSensitive': v.exactOptional(v.boolean()),
+	'localOnly': v.exactOptional(v.boolean()),
+	'roleIdsThatCanBeUsedThisEmojiAsReaction': v.exactOptional(v.array(v.string())),
 });
 
 export const packedAdminEmojiListInput = objectInput({
-	"query": v.optional(v.nullable(v.string()), null),
-	"limit": v.optional(v.pipe(v.pipe(v.number(), v.integer()), v.minValue(1), v.maxValue(100)), 10),
-	"sinceId": v.exactOptional(misskeyId),
-	"untilId": v.exactOptional(misskeyId),
-	"sinceDate": v.exactOptional(v.pipe(v.number(), v.integer())),
-	"untilDate": v.exactOptional(v.pipe(v.number(), v.integer())),
+	'query': v.optional(v.nullable(v.string()), null),
+	'limit': v.optional(v.pipe(v.pipe(v.number(), v.integer()), v.minValue(1), v.maxValue(100)), 10),
+	'sinceId': v.exactOptional(misskeyId),
+	'untilId': v.exactOptional(misskeyId),
+	'sinceDate': v.exactOptional(v.pipe(v.number(), v.integer())),
+	'untilDate': v.exactOptional(v.pipe(v.number(), v.integer())),
 });
 
 export const packedAdminEmojiListRemoteInput = objectInput({
-	"query": v.optional(v.nullable(v.string()), null),
-	"host": v.optional(v.pipe(v.nullable(v.string()), v.metadata({ "description": "Use `null` to represent the local host." })), null),
-	"limit": v.optional(v.pipe(v.pipe(v.number(), v.integer()), v.minValue(1), v.maxValue(100)), 10),
-	"sinceId": v.exactOptional(misskeyId),
-	"untilId": v.exactOptional(misskeyId),
-	"sinceDate": v.exactOptional(v.pipe(v.number(), v.integer())),
-	"untilDate": v.exactOptional(v.pipe(v.number(), v.integer())),
+	'query': v.optional(v.nullable(v.string()), null),
+	'host': v.optional(v.pipe(v.nullable(v.string()), v.metadata({ 'description': 'Use `null` to represent the local host.' })), null),
+	'limit': v.optional(v.pipe(v.pipe(v.number(), v.integer()), v.minValue(1), v.maxValue(100)), 10),
+	'sinceId': v.exactOptional(misskeyId),
+	'untilId': v.exactOptional(misskeyId),
+	'sinceDate': v.exactOptional(v.pipe(v.number(), v.integer())),
+	'untilDate': v.exactOptional(v.pipe(v.number(), v.integer())),
 });
 
 export const voidAdminEmojiDeleteInput = objectInput({
-	"id": misskeyId,
+	'id': misskeyId,
 });
 
 export const voidAdminEmojiDeleteBulkInput = objectInput({
-	"ids": v.array(misskeyId),
+	'ids': v.array(misskeyId),
 });
 
 export const voidAdminEmojiImportZipInput = objectInput({
-	"fileId": misskeyId,
+	'fileId': misskeyId,
 });
 
 export const voidExportCustomEmojisInput = objectInput({});
 export const inlineAdminEmojiCopyInput = objectInput({
-	"emojiId": misskeyId,
+	'emojiId': misskeyId,
 });
 
 const ids = v.array(misskeyId);
@@ -151,30 +151,30 @@ export const fetchEmojisSortKeys = [
 ] as const;
 
 export const portableV2AdminEmojiListInput = objectInput({
-	"query": v.exactOptional(v.pipe(v.nullable(objectInput({
-		"updatedAtFrom": v.exactOptional(v.string()),
-		"updatedAtTo": v.exactOptional(v.string()),
-		"name": v.exactOptional(v.string()),
-		"host": v.exactOptional(v.string()),
-		"uri": v.exactOptional(v.string()),
-		"publicUrl": v.exactOptional(v.string()),
-		"originalUrl": v.exactOptional(v.string()),
-		"type": v.exactOptional(v.string()),
-		"aliases": v.exactOptional(v.string()),
-		"category": v.exactOptional(v.string()),
-		"license": v.exactOptional(v.string()),
-		"isSensitive": v.exactOptional(v.boolean()),
-		"localOnly": v.exactOptional(v.boolean()),
-		"hostType": v.optional(v.picklist(fetchEmojisHostTypes), "all"),
-		"roleIds": v.exactOptional(v.array(misskeyId)),
-	})), v.metadata({ "required": undefined }))),
-	"sinceId": v.exactOptional(misskeyId),
-	"untilId": v.exactOptional(misskeyId),
-	"sinceDate": v.exactOptional(v.pipe(v.number(), v.integer())),
-	"untilDate": v.exactOptional(v.pipe(v.number(), v.integer())),
-	"limit": v.optional(v.pipe(v.number(), v.integer(), v.minValue(1), v.maxValue(100)), 10),
-	"page": v.exactOptional(v.pipe(v.number(), v.integer())),
-	"sortKeys": v.optional(v.array(v.picklist(fetchEmojisSortKeys)), ["-id"]),
+	'query': v.exactOptional(v.pipe(v.nullable(objectInput({
+		'updatedAtFrom': v.exactOptional(v.string()),
+		'updatedAtTo': v.exactOptional(v.string()),
+		'name': v.exactOptional(v.string()),
+		'host': v.exactOptional(v.string()),
+		'uri': v.exactOptional(v.string()),
+		'publicUrl': v.exactOptional(v.string()),
+		'originalUrl': v.exactOptional(v.string()),
+		'type': v.exactOptional(v.string()),
+		'aliases': v.exactOptional(v.string()),
+		'category': v.exactOptional(v.string()),
+		'license': v.exactOptional(v.string()),
+		'isSensitive': v.exactOptional(v.boolean()),
+		'localOnly': v.exactOptional(v.boolean()),
+		'hostType': v.optional(v.picklist(fetchEmojisHostTypes), 'all'),
+		'roleIds': v.exactOptional(v.array(misskeyId)),
+	})), v.metadata({ 'required': undefined }))),
+	'sinceId': v.exactOptional(misskeyId),
+	'untilId': v.exactOptional(misskeyId),
+	'sinceDate': v.exactOptional(v.pipe(v.number(), v.integer())),
+	'untilDate': v.exactOptional(v.pipe(v.number(), v.integer())),
+	'limit': v.optional(v.pipe(v.number(), v.integer(), v.minValue(1), v.maxValue(100)), 10),
+	'page': v.exactOptional(v.pipe(v.number(), v.integer())),
+	'sortKeys': v.optional(v.array(v.picklist(fetchEmojisSortKeys)), ['-id']),
 });
 
 export const v2EmojiListOutput = v.strictObject({ emojis: v.array(packedEmojiDetailedAdminSchema), count: v.pipe(v.number(), v.integer()), allCount: v.pipe(v.number(), v.integer()), allPages: v.pipe(v.number(), v.integer()) });

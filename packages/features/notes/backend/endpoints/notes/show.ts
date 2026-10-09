@@ -3,78 +3,61 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { packedNotesShowDefinition, packedNotesShowInput, packedNotesShowOutput } from '../../../contract/packed-endpoint-definitions.js';
+import { implement } from '@orpc/server';
 import { Inject, Injectable } from '@nestjs/common';
-
-import { NoteEntityService } from '../../serializers/NoteEntityService.js';
 import { GetterService } from '@features/api/backend/transport/GetterService.js';
-import { DI } from '@/di-symbols.js';
 import { MiMeta } from '@features/instance/backend/models/Meta.js';
-import { ApiError } from '@features/api/backend/transport/error.js';
+import * as v from 'valibot';
+import { DI } from '@/di-symbols.js';
+import { NoteEntityService } from '../../serializers/NoteEntityService.js';
+import { authentication, apiPolicy } from '../../../../api/backend/transport/middleware.js';
+import { apiError } from '../../../../api/backend/transport/orpc-error.js';
+import { readErrorId } from '../../request.schema.js';
+import { notesShowContract, notesShowPolicy, notesShowInput, notesShowOutput, notesShowErrors } from './show.contract.js';
+import type { MiLocalUser } from '../../../../users/backend/models/User.js';
+import type { NotesApiContext } from '../../operations.js';
+import type { ApiActor } from '../../../../api/backend/transport/context.js';
 
-const contractProjection = projectEndpointContract(packedNotesShowDefinition);
-
-export const meta = {
-	tags: ['notes'],
-
-	requireCredential: false,
-
-	res: contractProjection.response,
-
-	errors: {
-		noSuchNote: {
-			message: 'No such note.',
-			code: 'NO_SUCH_NOTE',
-			id: '24fcbfc6-2e37-42b6-8388-c29b3861a08d',
-		},
-
-		contentRestrictedByUser: {
-			message: 'Content restricted by user. Please sign in to view.',
-			code: 'CONTENT_RESTRICTED_BY_USER',
-			id: 'fbcc002d-37d9-4944-a6b0-d9e29f2d33ab',
-		},
-
-		contentRestrictedByServer: {
-			message: 'Content restricted by server settings. Please sign in to view.',
-			code: 'CONTENT_RESTRICTED_BY_SERVER',
-			id: '145f88d2-b03d-4087-8143-a78928883c4b',
-		},
-	},
-} as const;
-
-export const paramDef = contractProjection.input;
+export function createNotesShowProcedure<Actor extends ApiActor>() {
+	return implement(notesShowContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<NotesApiContext<Actor>>()
+		.use(authentication<Actor>())
+		.use(apiPolicy<Actor>(notesShowPolicy))
+		.handler(({ input, context }) => context.operations.notes.notesShow(input, context.principal));
+}
 
 @Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedNotesShowInput, typeof packedNotesShowOutput> {
+export class NotesShowOperation {
 	constructor(
 		@Inject(DI.meta)
 		private serverSettings: MiMeta,
 
 		private noteEntityService: NoteEntityService,
 		private getterService: GetterService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			const note = await this.getterService.getNoteWithRelations(ps.noteId).catch(err => {
-				if (err.id === '9725d0ce-ba28-4dde-95a7-2cbb2c15de24') throw new ApiError(meta.errors.noSuchNote);
-				throw err;
-			});
+	) {}
+	async execute(ps: v.InferOutput<typeof notesShowInput>, me: MiLocalUser | null): Promise<v.InferOutput<typeof notesShowOutput>> {
+		return v.parse(notesShowOutput, await this.run(ps, me));
+	}
 
-			if (note.user!.requireSigninToViewContents && me == null) {
-				throw new ApiError(meta.errors.contentRestrictedByUser);
-			}
+	private async run(ps: v.InferOutput<typeof notesShowInput>, me: MiLocalUser | null) {
+		const note = await this.getterService.getNoteWithRelations(ps.noteId).catch((err: unknown) => {
+			if (readErrorId(err) === '9725d0ce-ba28-4dde-95a7-2cbb2c15de24') throw apiError(notesShowErrors.noSuchNote);
+			throw err;
+		});
 
-			if (this.serverSettings.ugcVisibilityForVisitor === 'none' && me == null) {
-				throw new ApiError(meta.errors.contentRestrictedByServer);
-			}
+		if (note.user!.requireSigninToViewContents && me == null) {
+			throw apiError(notesShowErrors.contentRestrictedByUser);
+		}
 
-			if (this.serverSettings.ugcVisibilityForVisitor === 'local' && note.userHost != null && me == null) {
-				throw new ApiError(meta.errors.contentRestrictedByServer);
-			}
+		if (this.serverSettings.ugcVisibilityForVisitor === 'none' && me == null) {
+			throw apiError(notesShowErrors.contentRestrictedByServer);
+		}
 
-			return await this.noteEntityService.pack(note, me, {
-				detail: true,
-			});
+		if (this.serverSettings.ugcVisibilityForVisitor === 'local' && note.userHost != null && me == null) {
+			throw apiError(notesShowErrors.contentRestrictedByServer);
+		}
+
+		return await this.noteEntityService.pack(note, me, {
+			detail: true,
 		});
 	}
 }

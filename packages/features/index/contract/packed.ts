@@ -293,5 +293,41 @@ type PackedSchemaOutput<Schema> = Schema extends {
 
 export type Packed<K extends keyof typeof packedSchemas> = PackedSchemaOutput<(typeof packedSchemas)[K]>;
 
-/** Canonical SDK model types, inferred directly from the feature schemas. */
-export type PackedModels = { [Name in keyof typeof packedSchemas]: Packed<Name> };
+import type { packedUserLiteSchema as nativeUserLiteSchema } from '../../users/backend/user.schema.js';
+import type { packedUserDetailedNotMeOnlySchema as nativeUserDetailedNotMeOnlySchema } from '../../users/backend/user.schema.js';
+import type { packedMeDetailedOnlySchema as nativeMeDetailedOnlySchema } from '../../users/backend/user.schema.js';
+import type { packedUserDetailedNotMeSchema as nativeUserDetailedNotMeSchema } from '../../users/backend/user.schema.js';
+import type { packedMeDetailedSchema as nativeMeDetailedSchema } from '../../users/backend/user.schema.js';
+import type { packedUserDetailedSchema as nativeUserDetailedSchema } from '../../users/backend/user.schema.js';
+import type { packedUserSchema as nativeUserSchema } from '../../users/backend/user.schema.js';
+import type { packedAchievementSchema as nativeAchievementSchema } from '../../users/backend/user.schema.js';
+import type { packedAchievementNameSchema as nativeAchievementNameSchema } from '../../users/backend/user.schema.js';
+import type { packedFollowingSchema as nativeFollowingSchema } from '../../relationships/backend/endpoints/relationships.schema.js';
+import type { packedBlockingSchema as nativeBlockingSchema } from '../../relationships/backend/endpoints/relationships.schema.js';
+import type { packedMutingSchema as nativeMutingSchema } from '../../relationships/backend/endpoints/relationships.schema.js';
+import type { packedRenoteMutingSchema as nativeRenoteMutingSchema } from '../../relationships/backend/endpoints/relationships.schema.js';
+import type { packedUserListSchema as nativeUserListSchema } from '../../relationships/backend/endpoints/relationships.schema.js';
+
+import type { packedMetaLiteSchema as nativeMetaLiteSchema, packedMetaDetailedSchema as nativeMetaDetailedSchema } from '../../instance/backend/endpoints/meta.schema.js';
+
+type NativePackedModels = {
+	MetaLite: PackedSchemaOutput<typeof nativeMetaLiteSchema>;
+	MetaDetailed: PackedSchemaOutput<typeof nativeMetaDetailedSchema>;
+	UserLite: PackedSchemaOutput<typeof nativeUserLiteSchema>;
+	UserDetailedNotMeOnly: PackedSchemaOutput<typeof nativeUserDetailedNotMeOnlySchema>;
+	MeDetailedOnly: PackedSchemaOutput<typeof nativeMeDetailedOnlySchema>;
+	UserDetailedNotMe: PackedSchemaOutput<typeof nativeUserDetailedNotMeSchema>;
+	MeDetailed: PackedSchemaOutput<typeof nativeMeDetailedSchema>;
+	UserDetailed: PackedSchemaOutput<typeof nativeUserDetailedSchema>;
+	User: PackedSchemaOutput<typeof nativeUserSchema>;
+	Achievement: PackedSchemaOutput<typeof nativeAchievementSchema>;
+	AchievementName: PackedSchemaOutput<typeof nativeAchievementNameSchema>;
+	Following: PackedSchemaOutput<typeof nativeFollowingSchema>;
+	Blocking: PackedSchemaOutput<typeof nativeBlockingSchema>;
+	Muting: PackedSchemaOutput<typeof nativeMutingSchema>;
+	RenoteMuting: PackedSchemaOutput<typeof nativeRenoteMutingSchema>;
+	UserList: PackedSchemaOutput<typeof nativeUserListSchema>;
+};
+
+/** Canonical SDK model types, inferred directly from migrated feature schemas. */
+export type PackedModels = Omit<{ [Name in keyof typeof packedSchemas]: Packed<Name> }, keyof NativePackedModels> & NativePackedModels;

@@ -3,10 +3,10 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { apiError, internalError } from '../../api/backend/transport/orpc-error.js';
 import type { InferContractRouterOutputs } from '@orpc/contract';
 import type * as v from 'valibot';
 import type { ApiActor, ApiContext, ApiToken } from '../../api/backend/transport/context.js';
-import { apiError, internalError } from '../../api/backend/transport/orpc-error.js';
 import type { preferencesContract } from './api.contract.js';
 import type { registryGetInput } from './endpoints/i/registry/get.contract.js';
 import type { registryGetAllInput } from './endpoints/i/registry/get-all.contract.js';

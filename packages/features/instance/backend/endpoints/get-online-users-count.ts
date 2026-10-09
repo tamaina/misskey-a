@@ -4,9 +4,9 @@
  */
 
 import { implement } from '@orpc/server';
+import { authentication, apiPolicy } from '../../../api/backend/transport/middleware.js';
 import { onlineUsersCountContract, onlineUsersCountGetContract } from './get-online-users-count.contract.js';
 import type { ApiActor } from '../../../api/backend/transport/context.js';
-import { authentication, apiPolicy } from '../../../api/backend/transport/middleware.js';
 import type { InstanceApiContext } from '../operations.js';
 
 export function createOnlineUsersCountProcedure<Actor extends ApiActor>() {

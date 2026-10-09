@@ -3,46 +3,21 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { packedUsersListsCreateDefinition, packedUsersListsCreateInput, packedUsersListsCreateOutput } from '../../../../contract/packed-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
-import type { UserListsRepository } from '@features/persistence/backend/repositories/models.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
-import type { MiUserList } from '../../../models/UserList.js';
 
-import { UserListEntityService } from '../../../serializers/UserListEntityService.js';
-import { DI } from '@/di-symbols.js';
-import { ApiError } from '@features/api/backend/transport/error.js';
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
 import { RoleService } from '@features/roles/backend/services/RoleService.js';
+import { DI } from '@/di-symbols.js';
+import { UserListEntityService } from '../../../serializers/UserListEntityService.js';
 
-const contractProjection = projectEndpointContract(packedUsersListsCreateDefinition);
-
-export const meta = {
-	tags: ['lists'],
-
-	requireCredential: true,
-
-	prohibitMoved: true,
-
-	kind: 'write:account',
-
-	description: 'Create a new list of users.',
-
-	res: contractProjection.response,
-
-	errors: {
-		tooManyUserLists: {
-			message: 'You cannot create user list any more.',
-			code: 'TOO_MANY_USERLISTS',
-			id: '0cf21a28-7715-4f39-a20d-777bfdb8d138',
-		},
-	},
-} as const;
-
-export const paramDef = contractProjection.input;
+import { relationshipsErrors } from '../../relationships.errors.js';
+import type { UserListsRepository } from '@features/persistence/backend/repositories/models.js';
+import type { RelationshipsInputs } from '../../relationships.contract.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
 
 @Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedUsersListsCreateInput, typeof packedUsersListsCreateOutput> {
+export class UsersListsCreateOperation {
 	constructor(
 		@Inject(DI.userListsRepository)
 		private userListsRepository: UserListsRepository,
@@ -50,22 +25,22 @@ export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof
 		private userListEntityService: UserListEntityService,
 		private idService: IdService,
 		private roleService: RoleService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			const currentCount = await this.userListsRepository.countBy({
-				userId: me.id,
-			});
-			if (currentCount >= (await this.roleService.getUserPolicies(me.id)).userListLimit) {
-				throw new ApiError(meta.errors.tooManyUserLists);
-			}
+	) {}
 
-			const userList = await this.userListsRepository.insertOne({
-				id: this.idService.gen(),
-				userId: me.id,
-				name: ps.name,
-			} as MiUserList);
-
-			return await this.userListEntityService.pack(userList);
+	async execute(ps: RelationshipsInputs['users/lists/create'], me: MiLocalUser) {
+		const currentCount = await this.userListsRepository.countBy({
+			userId: me.id,
 		});
+		if (currentCount >= (await this.roleService.getUserPolicies(me.id)).userListLimit) {
+			throw apiError(relationshipsErrors['users/lists/create'].tooManyUserLists);
+		}
+
+		const userList = await this.userListsRepository.insertOne({
+			id: this.idService.gen(),
+			userId: me.id,
+			name: ps.name,
+		});
+
+		return await this.userListEntityService.pack(userList);
 	}
 }

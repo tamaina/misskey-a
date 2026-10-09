@@ -3,12 +3,12 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import type { MiLocalUser } from '@features/users/backend/models/User.js';
-import type { DiscoveryInputs } from '../discovery.contract.js';
 import { Injectable } from '@nestjs/common';
 
 import { FeaturedService } from '../../services/FeaturedService.js';
 import { HashtagService } from '../../services/HashtagService.js';
+import type { DiscoveryInputs } from '../discovery.contract.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
 
 @Injectable()
 export class HashtagsTrendOperation {

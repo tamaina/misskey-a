@@ -12,7 +12,7 @@ export const unregisterInput = objectInput({ endpoint: v.string(), auth: v.strin
 export const unregisterOutput = v.void();
 const requestName = 'sw/unregister';
 export const unregisterContract = oc.$meta<{ requestName: typeof requestName }>({ requestName })
-	.route({ method: 'POST', path: `/${requestName}`, operationId: 'post___' + requestName.replaceAll('/', '___'), tags: ['account'], description: 'Unregister from receiving push notifications.', successStatus: 204, })
+	.route({ method: 'POST', path: `/${requestName}`, operationId: 'post___' + requestName.replaceAll('/', '___'), tags: ['account'], description: 'Unregister from receiving push notifications.', successStatus: 204 })
 	.errors(commonErrors)
 	.input(unregisterInput)
 	.output(unregisterOutput);

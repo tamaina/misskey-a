@@ -3,59 +3,22 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { packedBlockingCreateDefinition, packedBlockingCreateInput, packedBlockingCreateOutput } from '../../../contract/packed-endpoint-definitions.js';
 import ms from 'ms';
 import { Inject, Injectable } from '@nestjs/common';
 
-import type { UsersRepository, BlockingsRepository } from '@features/persistence/backend/repositories/models.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
-import { UserBlockingService } from '../../services/UserBlockingService.js';
-import { DI } from '@/di-symbols.js';
 import { GetterService } from '@features/api/backend/transport/GetterService.js';
-import { ApiError } from '@features/api/backend/transport/error.js';
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
+import { DI } from '@/di-symbols.js';
+import { UserBlockingService } from '../../services/UserBlockingService.js';
 
-const contractProjection = projectEndpointContract(packedBlockingCreateDefinition);
-
-export const meta = {
-	tags: ['account'],
-
-	limit: {
-		duration: ms('1hour'),
-		max: 20,
-	},
-
-	requireCredential: true,
-
-	kind: 'write:blocks',
-
-	errors: {
-		noSuchUser: {
-			message: 'No such user.',
-			code: 'NO_SUCH_USER',
-			id: '7cc4f851-e2f1-4621-9633-ec9e1d00c01e',
-		},
-
-		blockeeIsYourself: {
-			message: 'Blockee is yourself.',
-			code: 'BLOCKEE_IS_YOURSELF',
-			id: '88b19138-f28d-42c0-8499-6a31bbd0fdc6',
-		},
-
-		alreadyBlocking: {
-			message: 'You are already blocking that user.',
-			code: 'ALREADY_BLOCKING',
-			id: '787fed64-acb9-464a-82eb-afbd745b9614',
-		},
-	},
-
-	res: contractProjection.response,
-} as const;
-
-export const paramDef = contractProjection.input;
+import { relationshipsErrors } from '../relationships.errors.js';
+import type { UsersRepository, BlockingsRepository } from '@features/persistence/backend/repositories/models.js';
+import type { RelationshipsInputs } from '../relationships.contract.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
 
 @Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedBlockingCreateInput, typeof packedBlockingCreateOutput> {
+export class BlockingCreateOperation {
 	constructor(
 		@Inject(DI.usersRepository)
 		private usersRepository: UsersRepository,
@@ -66,38 +29,38 @@ export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof
 		private userEntityService: UserEntityService,
 		private getterService: GetterService,
 		private userBlockingService: UserBlockingService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			const blocker = await this.usersRepository.findOneByOrFail({ id: me.id });
+	) {}
 
-			// 自分自身
-			if (me.id === ps.userId) {
-				throw new ApiError(meta.errors.blockeeIsYourself);
-			}
+	async execute(ps: RelationshipsInputs['blocking/create'], me: MiLocalUser) {
+		const blocker = await this.usersRepository.findOneByOrFail({ id: me.id });
 
-			// Get blockee
-			const blockee = await this.getterService.getUser(ps.userId).catch(err => {
-				if (err.id === '15348ddd-432d-49c2-8a5a-8069753becff') throw new ApiError(meta.errors.noSuchUser);
-				throw err;
-			});
+		// 自分自身
+		if (me.id === ps.userId) {
+			throw apiError(relationshipsErrors['blocking/create'].blockeeIsYourself);
+		}
 
-			// Check if already blocking
-			const exist = await this.blockingsRepository.exists({
-				where: {
-					blockerId: blocker.id,
-					blockeeId: blockee.id,
-				},
-			});
+		// Get blockee
+		const blockee = await this.getterService.getUser(ps.userId).catch(err => {
+			if (err.id === '15348ddd-432d-49c2-8a5a-8069753becff') throw apiError(relationshipsErrors['blocking/create'].noSuchUser);
+			throw err;
+		});
 
-			if (exist) {
-				throw new ApiError(meta.errors.alreadyBlocking);
-			}
+		// Check if already blocking
+		const exist = await this.blockingsRepository.exists({
+			where: {
+				blockerId: blocker.id,
+				blockeeId: blockee.id,
+			},
+		});
 
-			await this.userBlockingService.block(blocker, blockee);
+		if (exist) {
+			throw apiError(relationshipsErrors['blocking/create'].alreadyBlocking);
+		}
 
-			return await this.userEntityService.pack(blockee.id, blocker, {
-				schema: 'UserDetailedNotMe',
-			});
+		await this.userBlockingService.block(blocker, blockee);
+
+		return await this.userEntityService.pack(blockee.id, blocker, {
+			schema: 'UserDetailedNotMe',
 		});
 	}
 }

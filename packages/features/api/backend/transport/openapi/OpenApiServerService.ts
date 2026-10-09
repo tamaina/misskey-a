@@ -4,9 +4,9 @@
  */
 
 import { Inject, Injectable } from '@nestjs/common';
+import { bindThis } from '@features/runtime/backend/decorators.js';
 import type { Config } from '@/config.js';
 import { DI } from '@/di-symbols.js';
-import { bindThis } from '@features/runtime/backend/decorators.js';
 import { genCompatibleOpenapiSpec } from './gen-spec.js';
 import { ApiDocPage } from './api-doc.js';
 import type { FastifyInstance, FastifyPluginOptions } from 'fastify';

@@ -3,81 +3,27 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { NativeContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { inlineIMoveDefinition, inlineIMoveInput, inlineIMoveOutput } from '../../../contract/endpoint-definitions.js';
-import { nativeMeDetailedSchema } from '@features/users/backend/serializers/native-user.js';
 import { Inject, Injectable } from '@nestjs/common';
-import ms from 'ms';
 
-import { ApiError } from '@features/api/backend/transport/error.js';
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
 
-import { MiLocalUser, MiRemoteUser } from '../../models/User.js';
-
-import { AccountMoveService } from '../../services/AccountMoveService.js';
 import { RemoteUserResolveService } from '@features/federation/backend/services/RemoteUserResolveService.js';
 import { ApiLoggerService } from '@features/api/backend/transport/ApiLoggerService.js';
 import { GetterService } from '@features/api/backend/transport/GetterService.js';
 import { ApPersonService } from '@features/federation/backend/services/ApPersonService.js';
-import { UserEntityService } from '../../serializers/UserEntityService.js';
 
 import * as Acct from '@features/federation/backend/utility/acct.js';
-import { DI } from '@/di-symbols.js';
 import { MiMeta } from '@features/persistence/backend/repositories/models.js';
-
-const contractProjection = projectEndpointContract(inlineIMoveDefinition);
-
-export const meta = {
-	tags: ['users'],
-
-	secure: true,
-	requireCredential: true,
-	prohibitMoved: true,
-	limit: {
-		duration: ms('1day'),
-		max: 5,
-	},
-
-	errors: {
-		destinationAccountForbids: {
-			message:
-				'Destination account doesn\'t have proper \'Known As\' alias, or has already moved.',
-			code: 'DESTINATION_ACCOUNT_FORBIDS',
-			id: 'b5c90186-4ab0-49c8-9bba-a1f766282ba4',
-		},
-		rootForbidden: {
-			message: 'The root can\'t migrate.',
-			code: 'NOT_ROOT_FORBIDDEN',
-			id: '4362e8dc-731f-4ad8-a694-be2a88922a24',
-		},
-		noSuchUser: {
-			message: 'No such user.',
-			code: 'NO_SUCH_USER',
-			id: 'fcd2eef9-a9b2-4c4f-8624-038099e90aa5',
-		},
-		uriNull: {
-			message: 'User ActivityPup URI is null.',
-			code: 'URI_NULL',
-			id: 'bf326f31-d430-4f97-9933-5d61e4d48a23',
-		},
-		localUriNull: {
-			message: 'Local User ActivityPup URI is null.',
-			code: 'URI_NULL',
-			id: '95ba11b9-90e8-43a5-ba16-7acc1ab32e71',
-		},
-		alreadyMoved: {
-			message: 'Account was already moved to another account.',
-			code: 'ALREADY_MOVED',
-			id: 'b234a14e-9ebe-4581-8000-074b3c215962',
-		},
-	},
-
-	res: contractProjection.response,
-} as const;
-
-export const paramDef = contractProjection.input;
+import { DI } from '@/di-symbols.js';
+import { UserEntityService } from '../../serializers/UserEntityService.js';
+import { AccountMoveService } from '../../services/AccountMoveService.js';
+import { MiLocalUser } from '../../models/User.js';
+import { iMoveErrors } from './move.contract.js';
+import type { UsersInputs } from '../../api.contract.js';
+import type { ApiToken } from '@features/api/backend/transport/context.js';
 
 @Injectable()
-export class EndpointImplementation extends NativeContractEndpoint<typeof meta, typeof inlineIMoveInput, typeof inlineIMoveOutput, typeof nativeMeDetailedSchema> {
+export class IMoveOperation {
 	constructor(
 		@Inject(DI.meta)
 		private serverSettings: MiMeta,
@@ -89,45 +35,46 @@ export class EndpointImplementation extends NativeContractEndpoint<typeof meta, 
 		private apPersonService: ApPersonService,
 		private userEntityService: UserEntityService,
 	) {
-		super(meta, contractProjection, nativeMeDetailedSchema, async (ps, me) => {
-			// check parameter
-			if (!ps.moveToAccount) throw new ApiError(meta.errors.noSuchUser);
-			// abort if user is the root
-			if (this.serverSettings.rootUserId === me.id) throw new ApiError(meta.errors.rootForbidden);
-			// abort if user has already moved
-			if (me.movedToUri) throw new ApiError(meta.errors.alreadyMoved);
+	}
 
-			// parse user's input into the destination account
-			const { username, host } = Acct.parse(ps.moveToAccount);
-			// retrieve the destination account
-			let moveTo = await this.remoteUserResolveService.resolveUser(username, host).catch((e) => {
-				this.apiLoggerService.logger.warn(`failed to resolve remote user: ${e}`);
-				throw new ApiError(meta.errors.noSuchUser);
-			});
-			const destination = await this.getterService.getUser(moveTo.id) as MiLocalUser | MiRemoteUser;
-			const newUri = this.userEntityService.getUserUri(destination);
+	async execute(ps: UsersInputs['i/move'], me: MiLocalUser, _token: ApiToken | null, _ip: string) {
+		// check parameter
+		if (!ps.moveToAccount) throw apiError(iMoveErrors.noSuchUser);
+		// abort if user is the root
+		if (this.serverSettings.rootUserId === me.id) throw apiError(iMoveErrors.rootForbidden);
+		// abort if user has already moved
+		if (me.movedToUri) throw apiError(iMoveErrors.alreadyMoved);
 
-			// update local db
-			await this.apPersonService.updatePerson(newUri);
-			// retrieve updated user
-			moveTo = await this.apPersonService.resolvePerson(newUri);
+		// parse user's input into the destination account
+		const { username, host } = Acct.parse(ps.moveToAccount);
+		// retrieve the destination account
+		let moveTo = await this.remoteUserResolveService.resolveUser(username, host).catch((e) => {
+			this.apiLoggerService.logger.warn(`failed to resolve remote user: ${e}`);
+			throw apiError(iMoveErrors.noSuchUser);
+		});
+		const destination = await this.getterService.getUser(moveTo.id);
+		const newUri = this.userEntityService.getUserUri(destination);
 
-			// make sure that the user has indicated the old account as an alias
-			const fromUrl = this.userEntityService.genLocalUserUri(me.id);
-			let allowed = false;
-			if (moveTo.alsoKnownAs) {
-				for (const knownAs of moveTo.alsoKnownAs) {
-					if (knownAs.includes(fromUrl)) {
-						allowed = true;
-						break;
-					}
+		// update local db
+		await this.apPersonService.updatePerson(newUri);
+		// retrieve updated user
+		moveTo = await this.apPersonService.resolvePerson(newUri);
+
+		// make sure that the user has indicated the old account as an alias
+		const fromUrl = this.userEntityService.genLocalUserUri(me.id);
+		let allowed = false;
+		if (moveTo.alsoKnownAs) {
+			for (const knownAs of moveTo.alsoKnownAs) {
+				if (knownAs.includes(fromUrl)) {
+					allowed = true;
+					break;
 				}
 			}
+		}
 
-			// abort if unintended
-			if (!allowed || moveTo.movedToUri) throw new ApiError(meta.errors.destinationAccountForbids);
+		// abort if unintended
+		if (!allowed || moveTo.movedToUri) throw apiError(iMoveErrors.destinationAccountForbids);
 
-			return await this.accountMoveService.moveFromLocal(me, moveTo);
-		});
+		return await this.accountMoveService.moveFromLocal(me, moveTo);
 	}
 }

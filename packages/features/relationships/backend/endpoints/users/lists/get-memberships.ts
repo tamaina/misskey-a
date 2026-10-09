@@ -3,40 +3,20 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { packedUsersListsGetMembershipsDefinition, packedUsersListsGetMembershipsInput, packedUsersListsGetMembershipsOutput } from '../../../../contract/packed-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
-import type { UserListsRepository, UserListFavoritesRepository, UserListMembershipsRepository } from '@features/persistence/backend/repositories/models.js';
 
-import { UserListEntityService } from '../../../serializers/UserListEntityService.js';
-import { DI } from '@/di-symbols.js';
 import { QueryService } from '@features/notes/backend/services/QueryService.js';
-import { ApiError } from '@features/api/backend/transport/error.js';
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
+import { DI } from '@/di-symbols.js';
+import { UserListEntityService } from '../../../serializers/UserListEntityService.js';
 
-const contractProjection = projectEndpointContract(packedUsersListsGetMembershipsDefinition);
+import { relationshipsErrors } from '../../relationships.errors.js';
+import type { UserListsRepository, UserListMembershipsRepository } from '@features/persistence/backend/repositories/models.js';
+import type { RelationshipsInputs } from '../../relationships.contract.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
 
-export const meta = {
-	tags: ['lists', 'account'],
-
-	requireCredential: false,
-
-	kind: 'read:account',
-
-	errors: {
-		noSuchList: {
-			message: 'No such list.',
-			code: 'NO_SUCH_LIST',
-			id: '7bc05c21-1d7a-41ae-88f1-66820f4dc686',
-		},
-	},
-
-	res: contractProjection.response,
-} as const;
-
-export const paramDef = contractProjection.input;
-
-@Injectable() // eslint-disable-next-line import/no-default-export
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedUsersListsGetMembershipsInput, typeof packedUsersListsGetMembershipsOutput> {
+@Injectable()
+export class UsersListsGetMembershipsOperation {
 	constructor(
 		@Inject(DI.userListsRepository)
 		private userListsRepository: UserListsRepository,
@@ -46,30 +26,30 @@ export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof
 
 		private userListEntityService: UserListEntityService,
 		private queryService: QueryService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			// Fetch the list
-			const userList = await this.userListsRepository.findOneBy(!ps.forPublic && me !== null ? {
-				id: ps.listId,
-				userId: me.id,
-			} : {
-				id: ps.listId,
-				isPublic: true,
-			});
+	) {}
 
-			if (userList == null) {
-				throw new ApiError(meta.errors.noSuchList);
-			}
-
-			const query = this.queryService.makePaginationQuery(this.userListMembershipsRepository.createQueryBuilder('membership'), ps.sinceId, ps.untilId, ps.sinceDate, ps.untilDate)
-				.andWhere('membership.userListId = :userListId', { userListId: userList.id })
-				.innerJoinAndSelect('membership.user', 'user');
-
-			const memberships = await query
-				.limit(ps.limit)
-				.getMany();
-
-			return this.userListEntityService.packMembershipsMany(memberships);
+	async execute(ps: RelationshipsInputs['users/lists/get-memberships'], me: MiLocalUser | null) {
+		// Fetch the list
+		const userList = await this.userListsRepository.findOneBy(!ps.forPublic && me !== null ? {
+			id: ps.listId,
+			userId: me.id,
+		} : {
+			id: ps.listId,
+			isPublic: true,
 		});
+
+		if (userList == null) {
+			throw apiError(relationshipsErrors['users/lists/get-memberships'].noSuchList);
+		}
+
+		const query = this.queryService.makePaginationQuery(this.userListMembershipsRepository.createQueryBuilder('membership'), ps.sinceId, ps.untilId, ps.sinceDate, ps.untilDate)
+			.andWhere('membership.userListId = :userListId', { userListId: userList.id })
+			.innerJoinAndSelect('membership.user', 'user');
+
+		const memberships = await query
+			.limit(ps.limit)
+			.getMany();
+
+		return this.userListEntityService.packMembershipsMany(memberships);
 	}
 }

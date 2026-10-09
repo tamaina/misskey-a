@@ -3,58 +3,38 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { NativeContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { packedFollowingListDefinition, packedFollowingListInput, packedFollowingListOutput } from '../../../contract/packed-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
-import { FollowingEntityService } from '../../serializers/FollowingEntityService.js';
-import type { FollowingsRepository } from '@features/persistence/backend/repositories/models.js';
-
 import { QueryService } from '@features/notes/backend/services/QueryService.js';
 import { DI } from '@/di-symbols.js';
-
-import * as v from 'valibot';
-import { nativeFollowingSchema } from '@features/relationships/backend/serializers/FollowingEntityService.js';
-
-export const nativeOutputSchema = v.array(nativeFollowingSchema);
-
-const contractProjection = projectEndpointContract(packedFollowingListDefinition);
-
-export const meta = {
-	tags: ['users'],
-
-	requireCredential: true,
-	kind: 'read:following',
-	description: 'List of following users',
-
-	res: contractProjection.response,
-} as const;
-
-export const paramDef = contractProjection.input;
+import { FollowingEntityService } from '../../serializers/FollowingEntityService.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+import type { RelationshipsInputs } from '../relationships.contract.js';
+import type { FollowingsRepository } from '@features/persistence/backend/repositories/models.js';
 
 @Injectable()
-export class EndpointImplementation extends NativeContractEndpoint<typeof meta, typeof packedFollowingListInput, typeof packedFollowingListOutput, typeof nativeOutputSchema> {
+export class FollowingListOperation {
 	constructor(
 		@Inject(DI.followingsRepository)
 		private followingsRepository: FollowingsRepository,
 
 		private followingEntityService: FollowingEntityService,
 		private queryService: QueryService,
-	) {
-		super(meta, contractProjection, nativeOutputSchema, async (ps, me) => {
-			const query = this.queryService.makePaginationQuery(this.followingsRepository.createQueryBuilder('following'), ps.sinceId, ps.untilId, ps.sinceDate, ps.untilDate)
-				.andWhere('following.followerId = :userId', { userId: me.id });
+	) {}
 
-			if (ps.notification) {
-				query.andWhere('following.notify IS NOT NULL');
-			}
+	async execute(ps: RelationshipsInputs['following/list'], me: MiLocalUser) {
+		const query = this.queryService.makePaginationQuery(this.followingsRepository.createQueryBuilder('following'), ps.sinceId, ps.untilId, ps.sinceDate, ps.untilDate)
+			.andWhere('following.followerId = :userId', { userId: me.id });
 
-			query.innerJoinAndSelect('following.followee', 'followee');
+		if (ps.notification) {
+			query.andWhere('following.notify IS NOT NULL');
+		}
 
-			const followings = await query
-				.limit(ps.limit)
-				.getMany();
+		query.innerJoinAndSelect('following.followee', 'followee');
 
-			return await this.followingEntityService.packMany(followings, me, { populateFollowee: true });
-		});
+		const followings = await query
+			.limit(ps.limit)
+			.getMany();
+
+		return await this.followingEntityService.packMany(followings, me, { populateFollowee: true });
 	}
 }

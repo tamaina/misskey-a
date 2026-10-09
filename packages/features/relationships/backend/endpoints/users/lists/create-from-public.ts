@@ -3,69 +3,23 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { packedUsersListsCreateFromPublicDefinition, packedUsersListsCreateFromPublicInput, packedUsersListsCreateFromPublicOutput } from '../../../../contract/packed-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
-import type { UserListsRepository, UserListMembershipsRepository, BlockingsRepository } from '@features/persistence/backend/repositories/models.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
-import type { MiUserList } from '../../../models/UserList.js';
 
 import { GetterService } from '@features/api/backend/transport/GetterService.js';
-import { UserListEntityService } from '../../../serializers/UserListEntityService.js';
-import { DI } from '@/di-symbols.js';
-import { ApiError } from '@features/api/backend/transport/error.js';
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
 import { RoleService } from '@features/roles/backend/services/RoleService.js';
+import { DI } from '@/di-symbols.js';
+import { UserListEntityService } from '../../../serializers/UserListEntityService.js';
 import { UserListService } from '../../../services/UserListService.js';
 
-const contractProjection = projectEndpointContract(packedUsersListsCreateFromPublicDefinition);
-
-export const meta = {
-	requireCredential: true,
-	prohibitMoved: true,
-	kind: 'write:account',
-	res: contractProjection.response,
-
-	errors: {
-		tooManyUserLists: {
-			message: 'You cannot create user list any more.',
-			code: 'TOO_MANY_USERLISTS',
-			id: 'e9c105b2-c595-47de-97fb-7f7c2c33e92f',
-		},
-		noSuchList: {
-			message: 'No such list.',
-			code: 'NO_SUCH_LIST',
-			id: '9292f798-6175-4f7d-93f4-b6742279667d',
-		},
-		noSuchUser: {
-			message: 'No such user.',
-			code: 'NO_SUCH_USER',
-			id: '13c457db-a8cb-4d88-b70a-211ceeeabb5f',
-		},
-
-		alreadyAdded: {
-			message: 'That user has already been added to that list.',
-			code: 'ALREADY_ADDED',
-			id: 'c3ad6fdb-692b-47ee-a455-7bd12c7af615',
-		},
-
-		youHaveBeenBlocked: {
-			message: 'You cannot push this user because you have been blocked by this user.',
-			code: 'YOU_HAVE_BEEN_BLOCKED',
-			id: 'a2497f2a-2389-439c-8626-5298540530f4',
-		},
-
-		tooManyUsers: {
-			message: 'You can not push users any more.',
-			code: 'TOO_MANY_USERS',
-			id: '1845ea77-38d1-426e-8e4e-8b83b24f5bd7',
-		},
-	},
-} as const;
-
-export const paramDef = contractProjection.input;
+import { relationshipsErrors } from '../../relationships.errors.js';
+import type { UserListsRepository, UserListMembershipsRepository, BlockingsRepository } from '@features/persistence/backend/repositories/models.js';
+import type { RelationshipsInputs } from '../../relationships.contract.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
 
 @Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedUsersListsCreateFromPublicInput, typeof packedUsersListsCreateFromPublicOutput> {
+export class UsersListsCreateFromPublicOperation {
 	constructor(
 		@Inject(DI.userListsRepository)
 		private userListsRepository: UserListsRepository,
@@ -81,71 +35,71 @@ export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof
 		private idService: IdService,
 		private getterService: GetterService,
 		private roleService: RoleService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			const listExist = await this.userListsRepository.exists({
-				where: {
-					id: ps.listId,
-					isPublic: true,
-				},
+	) {}
+
+	async execute(ps: RelationshipsInputs['users/lists/create-from-public'], me: MiLocalUser) {
+		const listExist = await this.userListsRepository.exists({
+			where: {
+				id: ps.listId,
+				isPublic: true,
+			},
+		});
+		if (!listExist) throw apiError(relationshipsErrors['users/lists/create-from-public'].noSuchList);
+		const currentCount = await this.userListsRepository.countBy({
+			userId: me.id,
+		});
+		if (currentCount >= (await this.roleService.getUserPolicies(me.id)).userListLimit) {
+			throw apiError(relationshipsErrors['users/lists/create-from-public'].tooManyUserLists);
+		}
+
+		const userList = await this.userListsRepository.insertOne({
+			id: this.idService.gen(),
+			userId: me.id,
+			name: ps.name,
+		});
+
+		const users = (await this.userListMembershipsRepository.findBy({
+			userListId: ps.listId,
+		})).map(x => x.userId);
+
+		for (const user of users) {
+			const currentUser = await this.getterService.getUser(user).catch(err => {
+				if (err.id === '15348ddd-432d-49c2-8a5a-8069753becff') throw apiError(relationshipsErrors['users/lists/create-from-public'].noSuchUser);
+				throw err;
 			});
-			if (!listExist) throw new ApiError(meta.errors.noSuchList);
-			const currentCount = await this.userListsRepository.countBy({
-				userId: me.id,
-			});
-			if (currentCount >= (await this.roleService.getUserPolicies(me.id)).userListLimit) {
-				throw new ApiError(meta.errors.tooManyUserLists);
-			}
 
-			const userList = await this.userListsRepository.insertOne({
-				id: this.idService.gen(),
-				userId: me.id,
-				name: ps.name,
-			} as MiUserList);
-
-			const users = (await this.userListMembershipsRepository.findBy({
-				userListId: ps.listId,
-			})).map(x => x.userId);
-
-			for (const user of users) {
-				const currentUser = await this.getterService.getUser(user).catch(err => {
-					if (err.id === '15348ddd-432d-49c2-8a5a-8069753becff') throw new ApiError(meta.errors.noSuchUser);
-					throw err;
-				});
-
-				if (currentUser.id !== me.id) {
-					const blockExist = await this.blockingsRepository.exists({
-						where: {
-							blockerId: currentUser.id,
-							blockeeId: me.id,
-						},
-					});
-					if (blockExist) {
-						throw new ApiError(meta.errors.youHaveBeenBlocked);
-					}
-				}
-
-				const exist = await this.userListMembershipsRepository.exists({
+			if (currentUser.id !== me.id) {
+				const blockExist = await this.blockingsRepository.exists({
 					where: {
-						userListId: userList.id,
-						userId: currentUser.id,
+						blockerId: currentUser.id,
+						blockeeId: me.id,
 					},
 				});
-
-				if (exist) {
-					throw new ApiError(meta.errors.alreadyAdded);
-				}
-
-				try {
-					await this.userListService.addMember(currentUser, userList, me);
-				} catch (err) {
-					if (err instanceof UserListService.TooManyUsersError) {
-						throw new ApiError(meta.errors.tooManyUsers);
-					}
-					throw err;
+				if (blockExist) {
+					throw apiError(relationshipsErrors['users/lists/create-from-public'].youHaveBeenBlocked);
 				}
 			}
-			return await this.userListEntityService.pack(userList);
-		});
+
+			const exist = await this.userListMembershipsRepository.exists({
+				where: {
+					userListId: userList.id,
+					userId: currentUser.id,
+				},
+			});
+
+			if (exist) {
+				throw apiError(relationshipsErrors['users/lists/create-from-public'].alreadyAdded);
+			}
+
+			try {
+				await this.userListService.addMember(currentUser, userList, me);
+			} catch (err) {
+				if (err instanceof UserListService.TooManyUsersError) {
+					throw apiError(relationshipsErrors['users/lists/create-from-public'].tooManyUsers);
+				}
+				throw err;
+			}
+		}
+		return await this.userListEntityService.pack(userList);
 	}
 }

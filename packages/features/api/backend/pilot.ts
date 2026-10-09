@@ -24,3 +24,8 @@ export { createNotificationsOperations } from '../../notifications/backend/appli
 export { authentication, apiPolicy, requirePrincipal } from './transport/middleware.js';
 export { apiError, normalizeError } from './transport/orpc-error.js';
 export { RegistryApiService } from '../../preferences/backend/services/RegistryApiService.js';
+export { nullSuccessToNoContent } from './transport/no-content.js';
+
+export { createCollectionsOperations } from '../../collections/backend/api.operations.js';
+export { createNotesOperations } from '../../notes/backend/operations.js';
+export { createNotesCommandOperations } from '../../notes/backend/commands.js';

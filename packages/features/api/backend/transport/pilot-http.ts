@@ -3,10 +3,10 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import type { OpenAPIHandler } from '@orpc/openapi/fastify';
 import { pilotContract } from '../../../index/backend/api.contract.js';
 import { requestRoutes } from '../../shared/api-routing.js';
 import { withStagedUpload, UploadRequestError } from './multipart.js';
+import type { OpenAPIHandler } from '@orpc/openapi/fastify';
 import type { ApiActor, ApiContext, UploadResource } from './context.js';
 import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 

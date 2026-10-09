@@ -5,8 +5,8 @@
 
 import { implement } from '@orpc/server';
 import { authentication, apiPolicy, requirePrincipal } from '../../api/backend/transport/middleware.js';
-import type { ApiActor, ApiContext } from '../../api/backend/transport/context.js';
 import { announcementsContract } from './api.contract.js';
+import type { ApiActor, ApiContext } from '../../api/backend/transport/context.js';
 import type { AnnouncementsOperations } from './api.operations.js';
 
 export type AnnouncementsContext<Actor extends ApiActor> = ApiContext<Actor> & {

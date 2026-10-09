@@ -302,7 +302,7 @@ test('native public defaults, GET scalar decoding and output validation execute 
 	const side = { total: [], inc: [], dec: [], diffs: { normal: [], reply: [], renote: [], withFile: [] } };
 	context.operations = { statistics: {
 		stats: async () => ({ notesCount: 0, originalNotesCount: 0, usersCount: 0, originalUsersCount: 0,
-			reactionsCount: 0, instances: 0, driveUsageLocal: 0, driveUsageRemote: 0 }),
+																								reactionsCount: 0, instances: 0, driveUsageLocal: 0, driveUsageRemote: 0 }),
 		notes: async input => { parsed = input; return { local: side, remote: side }; },
 	} };
 	assert.equal((await client.statistics.stats(undefined)).notesCount, 0);

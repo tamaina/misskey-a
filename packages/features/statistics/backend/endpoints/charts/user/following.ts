@@ -5,9 +5,9 @@
 
 import { implement } from '@orpc/server';
 import { authentication, apiPolicy, decodeScalarInput } from '../../../../../api/backend/transport/middleware.js';
+import { chartPerUserFollowingContract, chartPerUserFollowingGetContract } from './following.contract.js';
 import type { ApiActor } from '../../../../../api/backend/transport/context.js';
 import type { StatisticsContext } from '../../../operations.js';
-import { chartPerUserFollowingContract, chartPerUserFollowingGetContract } from './following.contract.js';
 
 export function createPerUserFollowingProcedure<Actor extends ApiActor>() {
 	return implement(chartPerUserFollowingContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<StatisticsContext<Actor>>()

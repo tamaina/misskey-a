@@ -3,50 +3,44 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { NativeContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { packedIUnpinDefinition, packedIUnpinInput, packedIUnpinOutput } from '../../../contract/packed-endpoint-definitions.js';
-import { nativeMeDetailedSchema } from '@features/users/backend/serializers/native-user.js';
+import { implement } from '@orpc/server';
 import { Injectable } from '@nestjs/common';
-
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
+import * as v from 'valibot';
 import { NotePiningService } from '../../services/NotePiningService.js';
-import { ApiError } from '@features/api/backend/transport/error.js';
+import { authentication, apiPolicy, requirePrincipal } from '../../../../api/backend/transport/middleware.js';
+import { apiError } from '../../../../api/backend/transport/orpc-error.js';
+import { readErrorId } from '../../request.schema.js';
+import { toPackedUserDetailed } from '../../../../users/backend/user.schema.js';
+import { iUnpinContract, iUnpinPolicy, iUnpinInput, iUnpinOutput, iUnpinErrors } from './unpin.contract.js';
+import type { MiLocalUser } from '../../../../users/backend/models/User.js';
+import type { NotesApiContext } from '../../operations.js';
+import type { ApiActor } from '../../../../api/backend/transport/context.js';
 
-const contractProjection = projectEndpointContract(packedIUnpinDefinition);
-
-export const meta = {
-	tags: ['account', 'notes'],
-
-	requireCredential: true,
-
-	kind: 'write:account',
-
-	errors: {
-		noSuchNote: {
-			message: 'No such note.',
-			code: 'NO_SUCH_NOTE',
-			id: '454170ce-9d63-4a43-9da1-ea10afe81e21',
-		},
-	},
-
-	res: contractProjection.response,
-} as const;
-
-export const paramDef = contractProjection.input;
+export function createIUnpinProcedure<Actor extends ApiActor>() {
+	return implement(iUnpinContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<NotesApiContext<Actor>>()
+		.use(authentication<Actor>())
+		.use(apiPolicy<Actor>(iUnpinPolicy))
+		.use(requirePrincipal<Actor>())
+		.handler(({ input, context }) => context.operations.notes.iUnpin(input, context.principal));
+}
 
 @Injectable()
-export class EndpointImplementation extends NativeContractEndpoint<typeof meta, typeof packedIUnpinInput, typeof packedIUnpinOutput, typeof nativeMeDetailedSchema> {
+export class IUnpinOperation {
 	constructor(
 		private userEntityService: UserEntityService,
 		private notePiningService: NotePiningService,
-	) {
-		super(meta, contractProjection, nativeMeDetailedSchema, async (ps, me) => {
-			await this.notePiningService.removePinned(me, ps.noteId).catch(err => {
-				if (err.id === 'b302d4cf-c050-400a-bbb3-be208681f40c') throw new ApiError(meta.errors.noSuchNote);
-				throw err;
-			});
+	) {}
+	async execute(ps: v.InferOutput<typeof iUnpinInput>, me: MiLocalUser): Promise<v.InferOutput<typeof iUnpinOutput>> {
+		return v.parse(iUnpinOutput, toPackedUserDetailed(await this.run(ps, me)));
+	}
 
-			return await this.userEntityService.packSelf(me.id);
+	private async run(ps: v.InferOutput<typeof iUnpinInput>, me: MiLocalUser) {
+		await this.notePiningService.removePinned(me, ps.noteId).catch((err: unknown) => {
+			if (readErrorId(err) === 'b302d4cf-c050-400a-bbb3-be208681f40c') throw apiError(iUnpinErrors.noSuchNote);
+			throw err;
 		});
+
+		return await this.userEntityService.packSelf(me.id);
 	}
 }

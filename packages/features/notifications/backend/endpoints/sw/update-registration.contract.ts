@@ -12,7 +12,7 @@ export const updateRegistrationInput = objectInput({ endpoint: v.string(), sendR
 export const updateRegistrationOutput = v.strictObject({ userId: v.string(), endpoint: v.string(), sendReadMessage: v.boolean() });
 const requestName = 'sw/update-registration';
 export const updateRegistrationContract = oc.$meta<{ requestName: typeof requestName }>({ requestName })
-	.route({ method: 'POST', path: `/${requestName}`, operationId: 'post___' + requestName.replaceAll('/', '___'), tags: ['account'], description: 'Update push notification registration.', spec: current => ({ ...current, security: [{ bearerAuth: [] }] }), })
+	.route({ method: 'POST', path: `/${requestName}`, operationId: 'post___' + requestName.replaceAll('/', '___'), tags: ['account'], description: 'Update push notification registration.', spec: current => ({ ...current, security: [{ bearerAuth: [] }] }) })
 	.errors({ ...commonErrors, NO_SUCH_REGISTRATION: { status: 400, data: apiErrorData } })
 	.input(updateRegistrationInput)
 	.output(updateRegistrationOutput);

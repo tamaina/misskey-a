@@ -3,30 +3,29 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { packedNotesPollsRecommendationDefinition, packedNotesPollsRecommendationInput, packedNotesPollsRecommendationOutput } from '../../../../contract/packed-endpoint-definitions.js';
+import { implement } from '@orpc/server';
 import { Brackets, In } from 'typeorm';
 import { Inject, Injectable } from '@nestjs/common';
-import type { NotesRepository, MutingsRepository, PollsRepository, PollVotesRepository } from '@features/persistence/backend/repositories/models.js';
-
-import { NoteEntityService } from '../../../serializers/NoteEntityService.js';
+import * as v from 'valibot';
 import { DI } from '@/di-symbols.js';
+import { authentication, apiPolicy, requirePrincipal } from '../../../../../api/backend/transport/middleware.js';
+import { NoteEntityService } from '../../../serializers/NoteEntityService.js';
+import { notesPollsRecommendationContract, notesPollsRecommendationPolicy, notesPollsRecommendationInput, notesPollsRecommendationOutput } from './recommendation.contract.js';
+import type { ApiActor } from '../../../../../api/backend/transport/context.js';
+import type { NotesApiContext } from '../../../operations.js';
+import type { NotesRepository, MutingsRepository, PollsRepository, PollVotesRepository } from '@features/persistence/backend/repositories/models.js';
+import type { MiLocalUser } from '../../../../../users/backend/models/User.js';
 
-const contractProjection = projectEndpointContract(packedNotesPollsRecommendationDefinition);
-
-export const meta = {
-	tags: ['notes'],
-
-	requireCredential: true,
-	kind: 'read:account',
-
-	res: contractProjection.response,
-} as const;
-
-export const paramDef = contractProjection.input;
+export function createNotesPollsRecommendationProcedure<Actor extends ApiActor>() {
+	return implement(notesPollsRecommendationContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<NotesApiContext<Actor>>()
+		.use(authentication<Actor>())
+		.use(apiPolicy<Actor>(notesPollsRecommendationPolicy))
+		.use(requirePrincipal<Actor>())
+		.handler(({ input, context }) => context.operations.notes.notesPollsRecommendation(input, context.principal));
+}
 
 @Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedNotesPollsRecommendationInput, typeof packedNotesPollsRecommendationOutput> {
+export class NotesPollsRecommendationOperation {
 	constructor(
 		@Inject(DI.notesRepository)
 		private notesRepository: NotesRepository,
@@ -41,66 +40,69 @@ export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof
 		private mutingsRepository: MutingsRepository,
 
 		private noteEntityService: NoteEntityService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			const query = this.pollsRepository.createQueryBuilder('poll')
-				.where('poll.userHost IS NULL')
-				.andWhere('poll.userId != :meId', { meId: me.id })
-				.andWhere('poll.noteVisibility = \'public\'')
-				.andWhere(new Brackets(qb => {
-					qb
-						.where('poll.expiresAt IS NULL')
-						.orWhere('poll.expiresAt > :now', { now: new Date() });
-				}));
+	) {}
+	async execute(ps: v.InferOutput<typeof notesPollsRecommendationInput>, me: MiLocalUser): Promise<v.InferOutput<typeof notesPollsRecommendationOutput>> {
+		return v.parse(notesPollsRecommendationOutput, await this.run(ps, me));
+	}
 
-			//#region exclude arleady voted polls
-			const votedQuery = this.pollVotesRepository.createQueryBuilder('vote')
-				.select('vote.noteId')
-				.where('vote.userId = :meId', { meId: me.id });
+	private async run(ps: v.InferOutput<typeof notesPollsRecommendationInput>, me: MiLocalUser) {
+		const query = this.pollsRepository.createQueryBuilder('poll')
+			.where('poll.userHost IS NULL')
+			.andWhere('poll.userId != :meId', { meId: me.id })
+			.andWhere('poll.noteVisibility = \'public\'')
+			.andWhere(new Brackets(qb => {
+				qb
+					.where('poll.expiresAt IS NULL')
+					.orWhere('poll.expiresAt > :now', { now: new Date() });
+			}));
 
-			query
-				.andWhere(`poll.noteId NOT IN (${ votedQuery.getQuery() })`);
+		//#region exclude arleady voted polls
+		const votedQuery = this.pollVotesRepository.createQueryBuilder('vote')
+			.select('vote.noteId')
+			.where('vote.userId = :meId', { meId: me.id });
 
-			query.setParameters(votedQuery.getParameters());
-			//#endregion
+		query
+			.andWhere(`poll.noteId NOT IN (${ votedQuery.getQuery() })`);
 
-			//#region mute
-			const mutingQuery = this.mutingsRepository.createQueryBuilder('muting')
-				.select('muting.muteeId')
-				.where('muting.muterId = :muterId', { muterId: me.id });
+		query.setParameters(votedQuery.getParameters());
+		//#endregion
 
-			query
-				.andWhere(`poll.userId NOT IN (${ mutingQuery.getQuery() })`);
+		//#region mute
+		const mutingQuery = this.mutingsRepository.createQueryBuilder('muting')
+			.select('muting.muteeId')
+			.where('muting.muterId = :muterId', { muterId: me.id });
 
-			query.setParameters(mutingQuery.getParameters());
-			//#endregion
+		query
+			.andWhere(`poll.userId NOT IN (${ mutingQuery.getQuery() })`);
 
-			//#region exclude channels
-			if (ps.excludeChannels) {
-				query.andWhere('poll.channelId IS NULL');
-			}
-			//#endregion
+		query.setParameters(mutingQuery.getParameters());
+		//#endregion
 
-			const polls = await query
-				.orderBy('poll.noteId', 'DESC')
-				.limit(ps.limit)
-				.offset(ps.offset)
-				.getMany();
+		//#region exclude channels
+		if (ps.excludeChannels) {
+			query.andWhere('poll.channelId IS NULL');
+		}
+		//#endregion
 
-			if (polls.length === 0) return [];
+		const polls = await query
+			.orderBy('poll.noteId', 'DESC')
+			.limit(ps.limit)
+			.offset(ps.offset)
+			.getMany();
 
-			const notes = await this.notesRepository.find({
-				where: {
-					id: In(polls.map(poll => poll.noteId)),
-				},
-				order: {
-					id: 'DESC',
-				},
-			});
+		if (polls.length === 0) return [];
 
-			return await this.noteEntityService.packMany(notes, me, {
-				detail: true,
-			});
+		const notes = await this.notesRepository.find({
+			where: {
+				id: In(polls.map(poll => poll.noteId)),
+			},
+			order: {
+				id: 'DESC',
+			},
+		});
+
+		return await this.noteEntityService.packMany(notes, me, {
+			detail: true,
 		});
 	}
 }

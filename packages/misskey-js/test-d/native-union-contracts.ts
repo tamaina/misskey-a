@@ -3,7 +3,8 @@ import type { ContractEndpoints } from '../src/contract.types.js';
 import type { MetaRequest, MetaResponse, UsersRelationRequest, UsersRelationResponse } from '../src/autogen/entities.js';
 import type * as v from 'valibot';
 import type { metaContract } from '../built/contracts/instance/backend/endpoints/meta.contract.js';
-import type { UnionEndpoints as RelationshipUnionEndpoints } from '../built/contracts/relationships/contract/union-endpoint-definitions.js';
+import type { InferContractRouterInputs, InferContractRouterOutputs } from '@orpc/contract';
+import type { UsersRelationContract } from '../built/contracts/relationships/backend/endpoints/relationships.contract.js';
 
 type Equal<A, B> = (<T>() => T extends A ? 1 : 2) extends (<T>() => T extends B ? 1 : 2) ? true : false;
 type Assert<T extends true> = T;
@@ -13,9 +14,10 @@ type A1 = Assert<Equal<Endpoints['meta']['req'], v.InferInput<NonNullable<typeof
 type A2 = Assert<Equal<MetaRequest, Endpoints['meta']['req']>>;
 type A3 = Assert<Equal<MetaResponse, v.InferOutput<NonNullable<typeof metaContract['~orpc']['outputSchema']>>>>;
 type A4 = Assert<Equal<ContractEndpoints['meta']['res'], MetaResponse>>;
-type A5 = Assert<Equal<UsersRelationRequest, { userId: string | string[] }>>;
+type A5 = Assert<Equal<UsersRelationRequest, InferContractRouterInputs<typeof UsersRelationContract>>>;
+type RelationFields = Assert<Equal<{ [K in keyof UsersRelationRequest]: UsersRelationRequest[K] }, { userId: string | string[] }>>;
 type A6 = Assert<Equal<Endpoints['users/relation']['req'], UsersRelationRequest>>;
-type A7 = Assert<Equal<UsersRelationResponse, RelationshipUnionEndpoints['users/relation']['res']>>;
+type A7 = Assert<Equal<UsersRelationResponse, InferContractRouterOutputs<typeof UsersRelationContract>>>;
 type A8 = Assert<Equal<Endpoints['users/relation']['res'], UsersRelationResponse>>;
 type A9 = Assert<Equal<'future' extends keyof MetaRequest ? true : false, false>>;
 type A10 = Assert<Equal<'future' extends keyof UsersRelationRequest ? true : false, false>>;
@@ -34,5 +36,5 @@ const numericMeta: MetaRequest = { detail: 0 };
 const missingRelation: UsersRelationRequest = {};
 // @ts-expect-error SDK relation arrays contain strings.
 const numericRelation: UsersRelationRequest = { userId: [1] };
-// @ts-expect-error SDK request fields deliberately omit the opaque native index.
+// @ts-expect-error SDK request fields expose only the declared selector.
 const opaqueRelation: UsersRelationRequest = { userId: 'Ab12', future: true };

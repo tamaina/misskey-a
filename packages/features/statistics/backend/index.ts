@@ -21,8 +21,8 @@ export function createStats(deps: StatsDependencies) {
 		const users = await deps.readUsers();
 		const [reactionsCount, instances] = await Promise.all([deps.countReactions(), deps.countInstances()]);
 		return { notesCount: notes.local + notes.remote, originalNotesCount: notes.local,
-			usersCount: users.local + users.remote, originalUsersCount: users.local,
-			reactionsCount, instances, driveUsageLocal: 0, driveUsageRemote: 0 };
+											usersCount: users.local + users.remote, originalUsersCount: users.local,
+											reactionsCount, instances, driveUsageLocal: 0, driveUsageRemote: 0 };
 	}));
 }
 

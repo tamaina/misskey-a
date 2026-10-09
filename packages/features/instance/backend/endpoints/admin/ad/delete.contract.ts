@@ -9,7 +9,7 @@ import { objectInput } from '../../input.schema.js';
 import { commonErrors, apiErrorData } from '../../../../../api/backend/transport/errors.schema.js';
 
 export const adDeleteInput = objectInput({
-	"id": v.pipe(v.string(), v.regex(/^[a-zA-Z0-9]+$/)),
+	'id': v.pipe(v.string(), v.regex(/^[a-zA-Z0-9]+$/)),
 });
 
 export const adDeleteContract = oc.$meta<{ requestName: 'admin/ad/delete'; allowGet: boolean; cacheSec?: number }>({ requestName: 'admin/ad/delete', allowGet: false })

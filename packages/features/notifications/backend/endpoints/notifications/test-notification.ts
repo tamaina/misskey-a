@@ -5,9 +5,9 @@
 
 import { implement } from '@orpc/server';
 import { authentication, apiPolicy, requirePrincipal } from '../../../../api/backend/transport/middleware.js';
+import { testNotificationContract } from './test-notification.contract.js';
 import type { ApiActor } from '../../../../api/backend/transport/context.js';
 import type { NotificationsContext } from '../../operations.js';
-import { testNotificationContract } from './test-notification.contract.js';
 
 export function createTestNotificationProcedure<Actor extends ApiActor>() {
 	return implement(testNotificationContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<NotificationsContext<Actor>>()

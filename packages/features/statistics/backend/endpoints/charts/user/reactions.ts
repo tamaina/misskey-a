@@ -5,9 +5,9 @@
 
 import { implement } from '@orpc/server';
 import { authentication, apiPolicy, decodeScalarInput } from '../../../../../api/backend/transport/middleware.js';
+import { chartPerUserReactionsContract, chartPerUserReactionsGetContract } from './reactions.contract.js';
 import type { ApiActor } from '../../../../../api/backend/transport/context.js';
 import type { StatisticsContext } from '../../../operations.js';
-import { chartPerUserReactionsContract, chartPerUserReactionsGetContract } from './reactions.contract.js';
 
 export function createPerUserReactionsProcedure<Actor extends ApiActor>() {
 	return implement(chartPerUserReactionsContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<StatisticsContext<Actor>>()

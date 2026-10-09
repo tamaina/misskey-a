@@ -3,56 +3,16 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { voidAntennasDeleteDefinition, voidAntennasDeleteInput, voidAntennasDeleteOutput } from '../../../contract/void-endpoint-definitions.js';
-import { Inject, Injectable } from '@nestjs/common';
+import { implement } from '@orpc/server';
+import { authentication, apiPolicy, requirePrincipal } from '../../../../api/backend/transport/middleware.js';
+import { antennasDeleteContract } from './delete.contract.js';
+import type { ApiActor } from '../../../../api/backend/transport/context.js';
+import type { TimelinesContext } from '../../operations.js';
 
-import type { AntennasRepository } from '@features/persistence/backend/repositories/models.js';
-import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
-import { DI } from '@/di-symbols.js';
-import { ApiError } from '@features/api/backend/transport/error.js';
-
-const contractProjection = projectEndpointContract(voidAntennasDeleteDefinition);
-
-export const meta = {
-	tags: ['antennas'],
-
-	requireCredential: true,
-
-	kind: 'write:account',
-
-	errors: {
-		noSuchAntenna: {
-			message: 'No such antenna.',
-			code: 'NO_SUCH_ANTENNA',
-			id: 'b34dcf9d-348f-44bb-99d0-6c9314cfe2df',
-		},
-	},
-} as const;
-
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof voidAntennasDeleteInput, typeof voidAntennasDeleteOutput> {
-	constructor(
-		@Inject(DI.antennasRepository)
-		private antennasRepository: AntennasRepository,
-
-		private globalEventService: GlobalEventService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			const antenna = await this.antennasRepository.findOneBy({
-				id: ps.antennaId,
-				userId: me.id,
-			});
-
-			if (antenna == null) {
-				throw new ApiError(meta.errors.noSuchAntenna);
-			}
-
-			await this.antennasRepository.delete(antenna.id);
-
-			this.globalEventService.publishInternalEvent('antennaDeleted', antenna);
-		});
-	}
+export function createAntennasDeleteProcedure<Actor extends ApiActor>() {
+	return implement(antennasDeleteContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<TimelinesContext<Actor>>()
+		.use(authentication<Actor>())
+		.use(apiPolicy<Actor>({ name: 'antennas/delete', requireCredential: true, kind: 'write:account' }))
+		.use(requirePrincipal<Actor>())
+		.handler(({ input, context }) => context.operations.timelines.antennasDelete(input, context.principal));
 }

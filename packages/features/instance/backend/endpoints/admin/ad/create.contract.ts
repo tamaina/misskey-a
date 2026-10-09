@@ -10,16 +10,16 @@ import { commonErrors } from '../../../../../api/backend/transport/errors.schema
 import { packedAdSchema } from '../../meta.schema.js';
 
 export const adCreateInput = objectInput({
-	"url": v.pipe(v.string(), v.minLength(1)),
-	"memo": v.string(),
-	"place": v.string(),
-	"priority": v.string(),
-	"ratio": v.pipe(v.pipe(v.number(), v.finite()), v.integer()),
-	"expiresAt": v.pipe(v.pipe(v.number(), v.finite()), v.integer()),
-	"startsAt": v.pipe(v.pipe(v.number(), v.finite()), v.integer()),
-	"imageUrl": v.pipe(v.string(), v.minLength(1)),
-	"dayOfWeek": v.pipe(v.pipe(v.number(), v.finite()), v.integer()),
-	"isSensitive": v.exactOptional(v.boolean()),
+	'url': v.pipe(v.string(), v.minLength(1)),
+	'memo': v.string(),
+	'place': v.string(),
+	'priority': v.string(),
+	'ratio': v.pipe(v.pipe(v.number(), v.finite()), v.integer()),
+	'expiresAt': v.pipe(v.pipe(v.number(), v.finite()), v.integer()),
+	'startsAt': v.pipe(v.pipe(v.number(), v.finite()), v.integer()),
+	'imageUrl': v.pipe(v.string(), v.minLength(1)),
+	'dayOfWeek': v.pipe(v.pipe(v.number(), v.finite()), v.integer()),
+	'isSensitive': v.exactOptional(v.boolean()),
 });
 
 export const adCreateContract = oc.$meta<{ requestName: 'admin/ad/create'; allowGet: boolean; cacheSec?: number }>({ requestName: 'admin/ad/create', allowGet: false })

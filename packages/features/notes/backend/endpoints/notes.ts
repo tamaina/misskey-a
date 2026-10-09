@@ -3,74 +3,78 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { packedNotesDefinition, packedNotesInput, packedNotesOutput } from '../../contract/packed-endpoint-definitions.js';
+import { implement } from '@orpc/server';
 import { Inject, Injectable } from '@nestjs/common';
-import type { NotesRepository } from '@features/persistence/backend/repositories/models.js';
-
+import * as v from 'valibot';
+import { DI } from '@/di-symbols.js';
+import { authentication, apiPolicy } from '../../../api/backend/transport/middleware.js';
 import { QueryService } from '../services/QueryService.js';
 import { NoteEntityService } from '../serializers/NoteEntityService.js';
-import { DI } from '@/di-symbols.js';
+import { notesContract, notesPolicy, notesInput, notesOutput } from './notes.contract.js';
+import type { ApiActor } from '../../../api/backend/transport/context.js';
+import type { NotesApiContext } from '../operations.js';
+import type { NotesRepository } from '@features/persistence/backend/repositories/models.js';
+import type { MiLocalUser } from '../../../users/backend/models/User.js';
 
-const contractProjection = projectEndpointContract(packedNotesDefinition);
-
-export const meta = {
-	tags: ['notes'],
-
-	res: contractProjection.response,
-} as const;
-
-export const paramDef = contractProjection.input;
+export function createNotesProcedure<Actor extends ApiActor>() {
+	return implement(notesContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<NotesApiContext<Actor>>()
+		.use(authentication<Actor>())
+		.use(apiPolicy<Actor>(notesPolicy))
+		.handler(({ input, context }) => context.operations.notes.notes(input, context.principal));
+}
 
 @Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedNotesInput, typeof packedNotesOutput> {
+export class NotesOperation {
 	constructor(
 		@Inject(DI.notesRepository)
 		private notesRepository: NotesRepository,
 
 		private noteEntityService: NoteEntityService,
 		private queryService: QueryService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			const query = this.queryService.makePaginationQuery(this.notesRepository.createQueryBuilder('note'), ps.sinceId, ps.untilId, ps.sinceDate, ps.untilDate)
-				.andWhere('note.visibility = \'public\'')
-				.andWhere('note.localOnly = FALSE')
-				.innerJoinAndSelect('note.user', 'user')
-				.leftJoinAndSelect('note.reply', 'reply')
-				.leftJoinAndSelect('note.renote', 'renote')
-				.leftJoinAndSelect('reply.user', 'replyUser')
-				.leftJoinAndSelect('renote.user', 'renoteUser');
+	) {}
+	async execute(ps: v.InferOutput<typeof notesInput>, me: MiLocalUser | null): Promise<v.InferOutput<typeof notesOutput>> {
+		return v.parse(notesOutput, await this.run(ps, me));
+	}
 
-			if (ps.local) {
-				query.andWhere('note.userHost IS NULL');
-			}
+	private async run(ps: v.InferOutput<typeof notesInput>, me: MiLocalUser | null) {
+		const query = this.queryService.makePaginationQuery(this.notesRepository.createQueryBuilder('note'), ps.sinceId, ps.untilId, ps.sinceDate, ps.untilDate)
+			.andWhere('note.visibility = \'public\'')
+			.andWhere('note.localOnly = FALSE')
+			.innerJoinAndSelect('note.user', 'user')
+			.leftJoinAndSelect('note.reply', 'reply')
+			.leftJoinAndSelect('note.renote', 'renote')
+			.leftJoinAndSelect('reply.user', 'replyUser')
+			.leftJoinAndSelect('renote.user', 'renoteUser');
 
-			if (me == null) this.queryService.generateUgcVisibilityQueryForVisitor(query);
+		if (ps.local) {
+			query.andWhere('note.userHost IS NULL');
+		}
 
-			if (ps.reply !== undefined) {
-				query.andWhere(ps.reply ? 'note.replyId IS NOT NULL' : 'note.replyId IS NULL');
-			}
+		if (me == null) this.queryService.generateUgcVisibilityQueryForVisitor(query);
 
-			if (ps.renote !== undefined) {
-				query.andWhere(ps.renote ? 'note.renoteId IS NOT NULL' : 'note.renoteId IS NULL');
-			}
+		if (ps.reply !== undefined) {
+			query.andWhere(ps.reply ? 'note.replyId IS NOT NULL' : 'note.replyId IS NULL');
+		}
 
-			if (ps.withFiles !== undefined) {
-				query.andWhere(ps.withFiles ? 'note.fileIds != \'{}\'' : 'note.fileIds = \'{}\'');
-			}
+		if (ps.renote !== undefined) {
+			query.andWhere(ps.renote ? 'note.renoteId IS NOT NULL' : 'note.renoteId IS NULL');
+		}
 
-			if (ps.poll !== undefined) {
-				query.andWhere(ps.poll ? 'note.hasPoll = TRUE' : 'note.hasPoll = FALSE');
-			}
+		if (ps.withFiles !== undefined) {
+			query.andWhere(ps.withFiles ? 'note.fileIds != \'{}\'' : 'note.fileIds = \'{}\'');
+		}
 
-			// TODO
-			//if (bot != undefined) {
-			//	query.isBot = bot;
-			//}
+		if (ps.poll !== undefined) {
+			query.andWhere(ps.poll ? 'note.hasPoll = TRUE' : 'note.hasPoll = FALSE');
+		}
 
-			const notes = await query.limit(ps.limit).getMany();
+		// TODO
+		//if (bot != undefined) {
+		//	query.isBot = bot;
+		//}
 
-			return await this.noteEntityService.packMany(notes);
-		});
+		const notes = await query.limit(ps.limit).getMany();
+
+		return await this.noteEntityService.packMany(notes);
 	}
 }

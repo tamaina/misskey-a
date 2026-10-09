@@ -3,28 +3,21 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { constantIClaimAchievementDefinition, constantIClaimAchievementInput, constantIClaimAchievementOutput } from '../../../contract/source-constant-endpoint-definitions.js';
 import { Injectable } from '@nestjs/common';
 import { AchievementService } from '../../services/AchievementService.js';
+import type { ApiToken } from '@features/api/backend/transport/context.js';
+import type { UsersInputs } from '../../api.contract.js';
 
-const contractProjection = projectEndpointContract(constantIClaimAchievementDefinition);
-
-export const meta = {
-	requireCredential: true,
-	prohibitMoved: true,
-	kind: 'write:account',
-} as const;
-
-export const paramDef = contractProjection.input;
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
 
 @Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof constantIClaimAchievementInput, typeof constantIClaimAchievementOutput> {
+export class IClaimAchievementOperation {
 	constructor(
 		private achievementService: AchievementService,
 	) {
-		super(meta, contractProjection, async (ps, me) => {
-			await this.achievementService.create(me.id, ps.name);
-		});
+	}
+
+	async execute(ps: UsersInputs['i/claim-achievement'], me: MiLocalUser, _token: ApiToken | null, _ip: string) {
+		await this.achievementService.create(me.id, ps.name);
 	}
 }

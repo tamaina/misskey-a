@@ -5,9 +5,9 @@
 
 import { implement } from '@orpc/server';
 import { authentication, apiPolicy, requirePrincipal } from '../../../../../api/backend/transport/middleware.js';
+import { registryGetDetailContract } from './get-detail.contract.js';
 import type { ApiActor } from '../../../../../api/backend/transport/context.js';
 import type { PreferencesContext } from '../../../operations.js';
-import { registryGetDetailContract } from './get-detail.contract.js';
 
 export function createRegistryGetDetailProcedure<Actor extends ApiActor>() {
 	return implement(registryGetDetailContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<PreferencesContext<Actor>>()

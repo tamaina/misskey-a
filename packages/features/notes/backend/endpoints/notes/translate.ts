@@ -3,52 +3,34 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { inlineNotesTranslateDefinition, inlineNotesTranslateInput, inlineNotesTranslateOutput } from '../../../contract/endpoint-definitions.js';
 import { URLSearchParams } from 'node:url';
+import { implement } from '@orpc/server';
 import { Inject, Injectable } from '@nestjs/common';
-
-import { NoteEntityService } from '../../serializers/NoteEntityService.js';
 import { HttpRequestService } from '@features/runtime/backend/services/HttpRequestService.js';
 import { GetterService } from '@features/api/backend/transport/GetterService.js';
 import { RoleService } from '@features/roles/backend/services/RoleService.js';
 import { MiMeta } from '@features/persistence/backend/repositories/models.js';
+import * as v from 'valibot';
 import { DI } from '@/di-symbols.js';
-import { ApiError } from '@features/api/backend/transport/error.js';
+import { authentication, apiPolicy, requirePrincipal } from '../../../../api/backend/transport/middleware.js';
+import { NoteEntityService } from '../../serializers/NoteEntityService.js';
+import { apiError } from '../../../../api/backend/transport/orpc-error.js';
+import { readErrorId } from '../../request.schema.js';
+import { notesTranslateContract, notesTranslatePolicy, notesTranslateInput, notesTranslateOutput, notesTranslateErrors } from './translate.contract.js';
+import type { NotesApiContext } from '../../operations.js';
+import type { MiLocalUser } from '../../../../users/backend/models/User.js';
+import type { ApiActor } from '../../../../api/backend/transport/context.js';
 
-const contractProjection = projectEndpointContract(inlineNotesTranslateDefinition);
-
-export const meta = {
-	tags: ['notes'],
-
-	requireCredential: true,
-	kind: 'read:account',
-
-	res: contractProjection.response,
-
-	errors: {
-		unavailable: {
-			message: 'Translate of notes unavailable.',
-			code: 'UNAVAILABLE',
-			id: '50a70314-2d8a-431b-b433-efa5cc56444c',
-		},
-		noSuchNote: {
-			message: 'No such note.',
-			code: 'NO_SUCH_NOTE',
-			id: 'bea9b03f-36e0-49c5-a4db-627a029f8971',
-		},
-		cannotTranslateInvisibleNote: {
-			message: 'Cannot translate invisible note.',
-			code: 'CANNOT_TRANSLATE_INVISIBLE_NOTE',
-			id: 'ea29f2ca-c368-43b3-aaf1-5ac3e74bbe5d',
-		},
-	},
-} as const;
-
-export const paramDef = contractProjection.input;
+export function createNotesTranslateProcedure<Actor extends ApiActor>() {
+	return implement(notesTranslateContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<NotesApiContext<Actor>>()
+		.use(authentication<Actor>())
+		.use(apiPolicy<Actor>(notesTranslatePolicy))
+		.use(requirePrincipal<Actor>())
+		.handler(({ input, context }) => context.operations.notes.notesTranslate(input, context.principal));
+}
 
 @Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof inlineNotesTranslateInput, typeof inlineNotesTranslateOutput> {
+export class NotesTranslateOperation {
 	constructor(
 		@Inject(DI.meta)
 		private serverSettings: MiMeta,
@@ -57,71 +39,69 @@ export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof
 		private getterService: GetterService,
 		private httpRequestService: HttpRequestService,
 		private roleService: RoleService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			const policies = await this.roleService.getUserPolicies(me.id);
-			if (!policies.canUseTranslator) {
-				throw new ApiError(meta.errors.unavailable);
-			}
+	) {}
+	async execute(ps: v.InferOutput<typeof notesTranslateInput>, me: MiLocalUser): Promise<v.InferOutput<typeof notesTranslateOutput>> {
+		return v.parse(notesTranslateOutput, await this.run(ps, me));
+	}
 
-			const note = await this.getterService.getNote(ps.noteId).catch(err => {
-				if (err.id === '9725d0ce-ba28-4dde-95a7-2cbb2c15de24') throw new ApiError(meta.errors.noSuchNote);
-				throw err;
-			});
+	private async run(ps: v.InferOutput<typeof notesTranslateInput>, me: MiLocalUser) {
+		const policies = await this.roleService.getUserPolicies(me.id);
+		if (!policies.canUseTranslator) {
+			throw apiError(notesTranslateErrors.unavailable);
+		}
 
-			if (!(await this.noteEntityService.isVisibleForMe(note, me.id))) {
-				throw new ApiError(meta.errors.cannotTranslateInvisibleNote);
-			}
-
-			// makeNotesHiddenBefore などで中身が隠されるノート
-			const packedNote = await this.noteEntityService.pack(note, me);
-			if (packedNote.isHidden) {
-				throw new ApiError(meta.errors.cannotTranslateInvisibleNote);
-			}
-
-			let text = note.text ?? '';
-			if (note.cw != null) {
-				text = `${note.cw}\n-----\n${text}`;
-			}
-
-			if (text.trim() === '') {
-				return;
-			}
-
-			if (this.serverSettings.deeplAuthKey == null) {
-				throw new ApiError(meta.errors.unavailable);
-			}
-
-			let targetLang = ps.targetLang;
-			if (targetLang.includes('-')) targetLang = targetLang.split('-')[0];
-
-			const params = new URLSearchParams();
-			params.append('text', text);
-			params.append('target_lang', targetLang);
-
-			const endpoint = this.serverSettings.deeplIsPro ? 'https://api.deepl.com/v2/translate' : 'https://api-free.deepl.com/v2/translate';
-
-			const res = await this.httpRequestService.send(endpoint, {
-				method: 'POST',
-				headers: {
-					'Authorization': `DeepL-Auth-Key ${this.serverSettings.deeplAuthKey}`,
-					'Content-Type': 'application/x-www-form-urlencoded',
-					Accept: 'application/json, */*',
-				},
-				body: params.toString(),
-			});
-
-			const json = (await res.json()) as {
-				translations: {
-					detected_source_language: string;
-					text: string;
-				}[];
-			};
-
-			return {
-				sourceLang: json.translations[0].detected_source_language,
-				text: json.translations[0].text,
-			};
+		const note = await this.getterService.getNote(ps.noteId).catch((err: unknown) => {
+			if (readErrorId(err) === '9725d0ce-ba28-4dde-95a7-2cbb2c15de24') throw apiError(notesTranslateErrors.noSuchNote);
+			throw err;
 		});
+
+		if (!(await this.noteEntityService.isVisibleForMe(note, me.id))) {
+			throw apiError(notesTranslateErrors.cannotTranslateInvisibleNote);
+		}
+
+		// makeNotesHiddenBefore などで中身が隠されるノート
+		const packedNote = await this.noteEntityService.pack(note, me);
+		if (packedNote.isHidden) {
+			throw apiError(notesTranslateErrors.cannotTranslateInvisibleNote);
+		}
+
+		let text = note.text ?? '';
+		if (note.cw != null) {
+			text = `${note.cw}\n-----\n${text}`;
+		}
+
+		if (text.trim() === '') {
+			return;
+		}
+
+		if (this.serverSettings.deeplAuthKey == null) {
+			throw apiError(notesTranslateErrors.unavailable);
+		}
+
+		let targetLang = ps.targetLang;
+		if (targetLang.includes('-')) targetLang = targetLang.split('-')[0];
+
+		const params = new URLSearchParams();
+		params.append('text', text);
+		params.append('target_lang', targetLang);
+
+		const endpoint = this.serverSettings.deeplIsPro ? 'https://api.deepl.com/v2/translate' : 'https://api-free.deepl.com/v2/translate';
+
+		const res = await this.httpRequestService.send(endpoint, {
+			method: 'POST',
+			headers: {
+				'Authorization': `DeepL-Auth-Key ${this.serverSettings.deeplAuthKey}`,
+				'Content-Type': 'application/x-www-form-urlencoded',
+				Accept: 'application/json, */*',
+			},
+			body: params.toString(),
+		});
+
+		const json = v.parse(v.object({ translations: v.pipe(v.array(v.object({ detected_source_language: v.string(), text: v.string() })), v.minLength(1)) }), await res.json());
+
+		return {
+			sourceLang: json.translations[0].detected_source_language,
+			text: json.translations[0].text,
+		};
 	}
 }

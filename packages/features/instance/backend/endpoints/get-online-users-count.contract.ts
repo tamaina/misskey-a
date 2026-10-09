@@ -5,8 +5,8 @@
 
 import { oc } from '@orpc/contract';
 import * as v from 'valibot';
-import { objectInput } from './input.schema.js';
 import { commonErrors } from '../../../api/backend/transport/errors.schema.js';
+import { objectInput } from './input.schema.js';
 
 export const onlineUsersCountInput = v.optional(objectInput({}), {});
 export const onlineUsersCountOutput = v.strictObject({ count: v.pipe(v.number(), v.finite()) });

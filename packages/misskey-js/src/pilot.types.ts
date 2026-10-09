@@ -13,5 +13,5 @@ type RequestContracts = {
 type Inputs = InferContractRouterInputs<RequestContracts>;
 type Outputs = InferContractRouterOutputs<RequestContracts>;
 export type PilotEndpoints = {
-	[K in keyof RequestContracts]: { req: Inputs[K]; res: Outputs[K] extends void ? null : Outputs[K] };
+	[K in keyof RequestContracts]: { req: Inputs[K]; res: Outputs[K] extends void ? null : undefined extends Outputs[K] ? Exclude<Outputs[K], undefined> | null : Outputs[K] };
 };

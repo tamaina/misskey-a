@@ -15,7 +15,7 @@ import multipart from '@fastify/multipart';
 import { safe, isDefinedError } from '@orpc/server';
 import { OpenAPIHandler } from '@orpc/openapi/fastify';
 import { APIClient } from '../../misskey-js/built/api.js';
-import { createApiRouter, createDeleteNote, registerPilotHttp, bodyCredential, misskeyErrorBody, genPilotOpenapiSpec, getPilotEndpointDescriptors } from '../built/features/api/pilot.js';
+import { createApiRouter, createDeleteNote, registerPilotHttp, bodyCredential, misskeyErrorBody, genPilotOpenapiSpec, getPilotEndpointDescriptors, nullSuccessToNoContent, createNotificationsOperations } from '../built/features/api/pilot.js';
 
 const actor = { id: 'alice', isSuspended: false, movedToUri: null };
 const chartSection = { total: [1], inc: [1], dec: [0], diffs: { normal: [1], reply: [0], renote: [0], withFile: [0] } };
@@ -25,10 +25,10 @@ const output = { id: 'file1', createdAt: '2026-10-08T00:00:00.000Z', name: 'file
 	md5: 'hash', size: 5, isSensitive: false, blurhash: null, properties: {}, url: 'https://example.com/file',
 	thumbnailUrl: null, comment: null, folderId: null, folder: null, userId: null, user: null };
 
-async function fixture(t, overrides = {}) {
+async function fixture(t, overrides = {}, operationOverrides = {}) {
 	const events = [];
 	const app = Fastify();
-	const handler = new OpenAPIHandler(createApiRouter(), { customErrorResponseBodyEncoder: misskeyErrorBody });
+	const handler = new OpenAPIHandler(createApiRouter(), { customErrorResponseBodyEncoder: misskeyErrorBody, interceptors: [nullSuccessToNoContent()] });
 	await app.register(async api => {
 		await api.register(multipart, { limits: { fileSize: 1024, files: 1 } });
 		registerPilotHttp(api, handler, {
@@ -36,15 +36,16 @@ async function fixture(t, overrides = {}) {
 			context: (request, _reply, _name, upload) => ({
 				credential: bodyCredential(request), ip: request.ip, headers: request.headers, upload,
 				operations: {
-					instance: { ping: async () => ({ pong: 123 }), onlineUsersCount: async () => ({ count: 7 }) },
+					instance: { ping: async () => ({ pong: 123 }), onlineUsersCount: async () => ({ count: 7 }), endpoint: async input => input.endpoint === 'ping' ? { params: [] } : null },
 					emojis: { emojis: async () => ({ emojis: [] }) },
 					statistics: { notes: async input => { events.push(['chart', input]); return chartOutput; } },
-					notifications: { flush: async () => { events.push(['flush']); } },
+					notifications: { flush: async () => { events.push(['flush']); }, showRegistration: async input => input.endpoint === 'found' ? { userId: actor.id, endpoint: 'found', sendReadMessage: false } : null },
+					...operationOverrides,
 				},
 				services: {
 					authenticate: async credential => {
 						events.push(['credential', credential]);
-						return credential ? [actor, { permission: credential === 'restricted' ? [] : ['write:notes', 'write:drive', 'write:notifications'] }] : [null, null];
+						return credential ? [actor, credential === 'session' ? null : { permission: credential === 'restricted' ? [] : ['write:notes', 'write:drive', 'write:notifications'] }] : [null, null];
 					},
 					logIp: () => {}, limitActor: principal => principal?.id ?? 'ip',
 					rateLimitFactor: async () => 1, limit: async () => null,
@@ -152,8 +153,8 @@ test('malformed multipart requests keep the bare client-error boundary', async t
 
 test('public native introspection comes from the contract and keeps staged paths private', async () => {
 	const descriptors = await getPilotEndpointDescriptors();
-	assert.equal(descriptors.length, 89);
-	assert.equal(new Set(descriptors.map(item => item.name)).size, 89);
+	assert.equal(descriptors.length, 209);
+	assert.equal(new Set(descriptors.map(item => item.name)).size, 209);
 	assert.deepEqual(descriptors.find(item => item.name === 'notes/delete').properties, { noteId: { type: 'string' } });
 	assert.equal('file' in descriptors.find(item => item.name === 'drive/files/create').properties, false);
 	assert.equal(JSON.stringify(descriptors).includes('path'), false);
@@ -386,4 +387,85 @@ test('external generated references resolve after component hoisting and GET sch
 	visit(spec);
 	assert.ok(references > 0);
 	assert.ok(spec.paths['/charts/notes'].get.parameters.some(parameter => parameter.name === 'limit'));
+});
+
+
+test('nullable success becomes empty204 after validation while nonnull results retain JSON200', async t => {
+	const { app, client } = await fixture(t);
+	for (const [name, absent, present, expected] of [
+		['endpoint', { endpoint: 'unknown-name' }, { endpoint: 'ping' }, { params: [] }],
+		['sw/show-registration', { endpoint: 'absent' }, { endpoint: 'found' }, { userId: actor.id, endpoint: 'found', sendReadMessage: false }],
+	]) {
+		const empty = await app.inject({ method: 'POST', url: `/api/${name}`, payload: { ...absent, i: 'session' } });
+		assert.equal(empty.statusCode, 204);
+		assert.equal(empty.body, '');
+		assert.equal(await client.request(name, absent, 'session'), null);
+		const populated = await app.inject({ method: 'POST', url: `/api/${name}`, payload: { ...present, i: 'session' } });
+		assert.equal(populated.statusCode, 200);
+		assert.deepEqual(populated.json(), expected);
+		assert.deepEqual(await client.request(name, present, 'session'), expected);
+	}
+	assert.equal(await client.orpc.instance.endpoint({ endpoint: 'unknown-name' }), null);
+	const invalid = await fixture(t, {}, { instance: { endpoint: async () => ({ params: 'invalid' }) } });
+	const rejected = await invalid.app.inject({ method: 'POST', url: '/api/endpoint', payload: { endpoint: 'x' } });
+	assert.equal(rejected.statusCode, 500);
+	assert.equal(rejected.json().error.code, 'INTERNAL_ERROR');
+});
+
+test('push registration reads live settings for both new and existing subscriptions', async t => {
+	const settings = { swPublicKey: null };
+	let existing = null;
+	const operations = createNotificationsOperations({
+		generateId: () => 'subscription1', getSwPublicKey: () => settings.swPublicKey,
+		isValidEndpoint: () => true,
+		findSubscription: async () => existing,
+		insertSubscription: async record => { existing = record; },
+		refreshSubscriptionCache: () => {},
+	});
+	const { app, client } = await fixture(t, {}, { notifications: operations });
+	const payload = { endpoint: 'https://push.example.test', auth: 'auth', publickey: 'client-key' };
+	assert.equal((await client.request('sw/register', payload, 'session')).key, null);
+	settings.swPublicKey = 'hot-updated-key';
+	const found = await app.inject({ method: 'POST', url: '/api/sw/register', payload: { ...payload, i: 'session' } });
+	assert.equal(found.statusCode, 200);
+	assert.equal(found.json().state, 'already-subscribed');
+	assert.equal(found.json().key, 'hot-updated-key');
+	existing = null;
+	assert.equal((await client.request('sw/register', payload, 'session')).key, 'hot-updated-key');
+});
+
+test('expanded native cohorts round-trip defaults, public actors and protected void commands', async t => {
+	const seen = [];
+	const record = (name, output) => async (input, principal, token, ip) => {
+		seen.push({ name, input, principal, token, ip });
+		return output;
+	};
+	const { app, client } = await fixture(t, {}, {
+		notes: { notesDraftsCount: record('drafts', 3), notesTranslate: record('translate', undefined) },
+		timelines: { notesGlobalTimeline: record('timeline', []) },
+		noteSearch: { notesSearch: record('search', []) },
+		users: { 'users/achievements': record('achievements', []) },
+		relationships: { 'following/update-all': record('following', undefined) },
+		collections: { galleryPosts: record('gallery', []) },
+	});
+	for (const [name, input, expected] of [
+		['notes/translate', { noteId: 'note1', targetLang: 'en' }, null],
+		['notes/drafts/count', {}, 3], ['notes/global-timeline', {}, []],
+		['notes/search', { query: '😀' }, []], ['users/achievements', { userId: 'bob' }, []],
+		['following/update-all', { withReplies: false }, null], ['gallery/posts', {}, []],
+	]) assert.deepEqual(await client.request(name, { ...input, extra: 'stripped' }, 'session'), expected);
+	assert.deepEqual(seen.find(item => item.name === 'timeline').input, { withFiles: false, withRenotes: true, limit: 10 });
+	assert.deepEqual(seen.find(item => item.name === 'search').input, { query: '😀', limit: 10, offset: 0, userId: null, channelId: null });
+	assert.deepEqual(seen.find(item => item.name === 'gallery').input, { limit: 10 });
+	const anonymous = await app.inject({ method: 'POST', url: '/api/users/achievements', payload: { userId: 'bob' } });
+	assert.equal(anonymous.statusCode, 200);
+	assert.equal(seen.at(-1).principal, null);
+	assert.equal(seen.at(-1).token, null);
+	assert.equal(typeof seen.at(-1).ip, 'string');
+	const denied = await app.inject({ method: 'POST', url: '/api/following/update-all', payload: { i: 'restricted' } });
+	assert.equal(denied.statusCode, 403);
+	assert.equal(denied.json().error.code, 'PERMISSION_DENIED');
+	await assert.rejects(client.request('notes/global-timeline', { limit: 101 }), error => error.code === 'INVALID_PARAM');
+	const invalid = await fixture(t, {}, { notes: { notesDraftsCount: async () => Infinity } });
+	assert.equal((await invalid.app.inject({ method: 'POST', url: '/api/notes/drafts/count', payload: { i: 'session' } })).statusCode, 500);
 });

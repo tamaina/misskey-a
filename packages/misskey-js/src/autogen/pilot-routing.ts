@@ -5287,6 +5287,6405 @@ export default {
 					"successStatus": 204
 				}
 			}
+		},
+		"adminPromoCreate": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"NO_SUCH_NOTE": {
+						"status": 400
+					},
+					"ALREADY_PROMOTED": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "admin/promo/create"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/admin/promo/create",
+					"operationId": "post___admin___promo___create",
+					"tags": [
+						"admin"
+					],
+					"successStatus": 204
+				}
+			}
+		},
+		"iPin": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"NO_SUCH_NOTE": {
+						"status": 400
+					},
+					"PIN_LIMIT_EXCEEDED": {
+						"status": 400
+					},
+					"ALREADY_PINNED": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "i/pin"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/i/pin",
+					"operationId": "post___i___pin",
+					"tags": [
+						"account",
+						"notes"
+					]
+				}
+			}
+		},
+		"iUnpin": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"NO_SUCH_NOTE": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "i/unpin"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/i/unpin",
+					"operationId": "post___i___unpin",
+					"tags": [
+						"account",
+						"notes"
+					]
+				}
+			}
+		},
+		"notes": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					}
+				},
+				"meta": {
+					"requestName": "notes"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/notes",
+					"operationId": "post___notes",
+					"tags": [
+						"notes"
+					]
+				}
+			}
+		},
+		"notesChildren": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					}
+				},
+				"meta": {
+					"requestName": "notes/children"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/notes/children",
+					"operationId": "post___notes___children",
+					"tags": [
+						"notes"
+					]
+				}
+			}
+		},
+		"notesConversation": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"NO_SUCH_NOTE": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "notes/conversation"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/notes/conversation",
+					"operationId": "post___notes___conversation",
+					"tags": [
+						"notes"
+					]
+				}
+			}
+		},
+		"notesCreate": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"NO_SUCH_RENOTE_TARGET": {
+						"status": 400
+					},
+					"CANNOT_RENOTE_TO_A_PURE_RENOTE": {
+						"status": 400
+					},
+					"CANNOT_RENOTE_DUE_TO_VISIBILITY": {
+						"status": 400
+					},
+					"NO_SUCH_REPLY_TARGET": {
+						"status": 400
+					},
+					"CANNOT_REPLY_TO_AN_INVISIBLE_NOTE": {
+						"status": 400
+					},
+					"CANNOT_REPLY_TO_A_PURE_RENOTE": {
+						"status": 400
+					},
+					"CANNOT_REPLY_TO_SPECIFIED_VISIBILITY_NOTE_WITH_EXTENDED_VISIBILITY": {
+						"status": 400
+					},
+					"CANNOT_CREATE_ALREADY_EXPIRED_POLL": {
+						"status": 400
+					},
+					"NO_SUCH_CHANNEL": {
+						"status": 400
+					},
+					"YOU_HAVE_BEEN_BLOCKED": {
+						"status": 400
+					},
+					"NO_SUCH_FILE": {
+						"status": 400
+					},
+					"CANNOT_RENOTE_OUTSIDE_OF_CHANNEL": {
+						"status": 400
+					},
+					"CONTAINS_PROHIBITED_WORDS": {
+						"status": 400
+					},
+					"CONTAINS_TOO_MANY_MENTIONS": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "notes/create"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/notes/create",
+					"operationId": "post___notes___create",
+					"tags": [
+						"notes"
+					]
+				}
+			}
+		},
+		"notesDraftsList": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					}
+				},
+				"meta": {
+					"requestName": "notes/drafts/list"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/notes/drafts/list",
+					"operationId": "post___notes___drafts___list",
+					"tags": [
+						"notes",
+						"drafts"
+					]
+				}
+			}
+		},
+		"notesDraftsCreate": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"NO_SUCH_RENOTE_TARGET": {
+						"status": 400
+					},
+					"CANNOT_RENOTE_TO_A_PURE_RENOTE": {
+						"status": 400
+					},
+					"CANNOT_RENOTE_DUE_TO_VISIBILITY": {
+						"status": 400
+					},
+					"NO_SUCH_REPLY_TARGET": {
+						"status": 400
+					},
+					"CANNOT_REPLY_TO_AN_INVISIBLE_NOTE": {
+						"status": 400
+					},
+					"CANNOT_REPLY_TO_A_PURE_RENOTE": {
+						"status": 400
+					},
+					"CANNOT_REPLY_TO_SPECIFIED_VISIBILITY_NOTE_WITH_EXTENDED_VISIBILITY": {
+						"status": 400
+					},
+					"CANNOT_CREATE_ALREADY_EXPIRED_POLL": {
+						"status": 400
+					},
+					"NO_SUCH_CHANNEL": {
+						"status": 400
+					},
+					"YOU_HAVE_BEEN_BLOCKED": {
+						"status": 400
+					},
+					"NO_SUCH_FILE": {
+						"status": 400
+					},
+					"CANNOT_RENOTE_OUTSIDE_OF_CHANNEL": {
+						"status": 400
+					},
+					"CONTAINS_PROHIBITED_WORDS": {
+						"status": 400
+					},
+					"CONTAINS_TOO_MANY_MENTIONS": {
+						"status": 400
+					},
+					"TOO_MANY_DRAFTS": {
+						"status": 400
+					},
+					"TOO_MANY_SCHEDULED_NOTES": {
+						"status": 400
+					},
+					"CANNOT_RENOTE_TO_EXTERNAL": {
+						"status": 400
+					},
+					"SCHEDULED_AT_REQUIRED": {
+						"status": 400
+					},
+					"SCHEDULED_AT_MUST_BE_IN_FUTURE": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "notes/drafts/create"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/notes/drafts/create",
+					"operationId": "post___notes___drafts___create",
+					"tags": [
+						"notes",
+						"drafts"
+					]
+				}
+			}
+		},
+		"notesDraftsDelete": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"NO_SUCH_NOTE_DRAFT": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "notes/drafts/delete"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/notes/drafts/delete",
+					"operationId": "post___notes___drafts___delete",
+					"tags": [
+						"notes",
+						"drafts"
+					],
+					"successStatus": 204
+				}
+			}
+		},
+		"notesDraftsUpdate": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"NO_SUCH_RENOTE_TARGET": {
+						"status": 400
+					},
+					"CANNOT_RENOTE_TO_A_PURE_RENOTE": {
+						"status": 400
+					},
+					"CANNOT_RENOTE_DUE_TO_VISIBILITY": {
+						"status": 400
+					},
+					"NO_SUCH_REPLY_TARGET": {
+						"status": 400
+					},
+					"CANNOT_REPLY_TO_AN_INVISIBLE_NOTE": {
+						"status": 400
+					},
+					"CANNOT_REPLY_TO_A_PURE_RENOTE": {
+						"status": 400
+					},
+					"CANNOT_REPLY_TO_SPECIFIED_NOTE_WITH_EXTENDED_VISIBILITY": {
+						"status": 400
+					},
+					"CANNOT_CREATE_ALREADY_EXPIRED_POLL": {
+						"status": 400
+					},
+					"NO_SUCH_CHANNEL": {
+						"status": 400
+					},
+					"YOU_HAVE_BEEN_BLOCKED": {
+						"status": 400
+					},
+					"NO_SUCH_FILE": {
+						"status": 400
+					},
+					"CANNOT_RENOTE_OUTSIDE_OF_CHANNEL": {
+						"status": 400
+					},
+					"CONTAINS_PROHIBITED_WORDS": {
+						"status": 400
+					},
+					"CONTAINS_TOO_MANY_MENTIONS": {
+						"status": 400
+					},
+					"NO_SUCH_NOTE_DRAFT": {
+						"status": 400
+					},
+					"NO_SUCH_RENOTE": {
+						"status": 400
+					},
+					"CANNOT_RENOTE": {
+						"status": 400
+					},
+					"CANNOT_RENOTE_TO_EXTERNAL": {
+						"status": 400
+					},
+					"NO_SUCH_REPLY": {
+						"status": 400
+					},
+					"CANNOT_REPLY_TO_SPECIFIED_VISIBILITY_NOTE_WITH_EXTENDED_VISIBILITY": {
+						"status": 400
+					},
+					"TOO_MANY_SCHEDULED_NOTES": {
+						"status": 400
+					},
+					"SCHEDULED_AT_REQUIRED": {
+						"status": 400
+					},
+					"SCHEDULED_AT_MUST_BE_IN_FUTURE": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "notes/drafts/update"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/notes/drafts/update",
+					"operationId": "post___notes___drafts___update",
+					"tags": [
+						"notes",
+						"drafts"
+					]
+				}
+			}
+		},
+		"notesDraftsCount": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					}
+				},
+				"meta": {
+					"requestName": "notes/drafts/count"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/notes/drafts/count",
+					"operationId": "post___notes___drafts___count",
+					"tags": [
+						"notes",
+						"drafts"
+					]
+				}
+			}
+		},
+		"notesPollsRecommendation": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					}
+				},
+				"meta": {
+					"requestName": "notes/polls/recommendation"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/notes/polls/recommendation",
+					"operationId": "post___notes___polls___recommendation",
+					"tags": [
+						"notes"
+					]
+				}
+			}
+		},
+		"notesPollsVote": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"NO_SUCH_NOTE": {
+						"status": 400
+					},
+					"NO_POLL": {
+						"status": 400
+					},
+					"INVALID_CHOICE": {
+						"status": 400
+					},
+					"ALREADY_VOTED": {
+						"status": 400
+					},
+					"ALREADY_EXPIRED": {
+						"status": 400
+					},
+					"YOU_HAVE_BEEN_BLOCKED": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "notes/polls/vote"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/notes/polls/vote",
+					"operationId": "post___notes___polls___vote",
+					"tags": [
+						"notes"
+					],
+					"successStatus": 204
+				}
+			}
+		},
+		"notesReactions": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"NO_SUCH_NOTE": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "notes/reactions"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/notes/reactions",
+					"operationId": "post___notes___reactions",
+					"tags": [
+						"notes",
+						"reactions"
+					]
+				}
+			}
+		},
+		"notesReactionsCreate": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"NO_SUCH_NOTE": {
+						"status": 400
+					},
+					"ALREADY_REACTED": {
+						"status": 400
+					},
+					"YOU_HAVE_BEEN_BLOCKED": {
+						"status": 400
+					},
+					"CANNOT_REACT_TO_RENOTE": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "notes/reactions/create"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/notes/reactions/create",
+					"operationId": "post___notes___reactions___create",
+					"tags": [
+						"reactions",
+						"notes"
+					],
+					"successStatus": 204
+				}
+			}
+		},
+		"notesReactionsDelete": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"NO_SUCH_NOTE": {
+						"status": 400
+					},
+					"NOT_REACTED": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "notes/reactions/delete"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/notes/reactions/delete",
+					"operationId": "post___notes___reactions___delete",
+					"tags": [
+						"reactions",
+						"notes"
+					],
+					"successStatus": 204
+				}
+			}
+		},
+		"notesRenotes": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"NO_SUCH_NOTE": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "notes/renotes"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/notes/renotes",
+					"operationId": "post___notes___renotes",
+					"tags": [
+						"notes"
+					]
+				}
+			}
+		},
+		"notesReplies": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					}
+				},
+				"meta": {
+					"requestName": "notes/replies"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/notes/replies",
+					"operationId": "post___notes___replies",
+					"tags": [
+						"notes"
+					]
+				}
+			}
+		},
+		"notesShow": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"NO_SUCH_NOTE": {
+						"status": 400
+					},
+					"CONTENT_RESTRICTED_BY_USER": {
+						"status": 400
+					},
+					"CONTENT_RESTRICTED_BY_SERVER": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "notes/show"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/notes/show",
+					"operationId": "post___notes___show",
+					"tags": [
+						"notes"
+					]
+				}
+			}
+		},
+		"notesShowPartialBulk": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					}
+				},
+				"meta": {
+					"requestName": "notes/show-partial-bulk"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/notes/show-partial-bulk",
+					"operationId": "post___notes___show-partial-bulk",
+					"tags": [
+						"notes"
+					]
+				}
+			}
+		},
+		"notesState": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					}
+				},
+				"meta": {
+					"requestName": "notes/state"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/notes/state",
+					"operationId": "post___notes___state",
+					"tags": [
+						"notes"
+					]
+				}
+			}
+		},
+		"notesThreadMutingCreate": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"NO_SUCH_NOTE": {
+						"status": 400
+					},
+					"ALREADY_MUTING": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "notes/thread-muting/create"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/notes/thread-muting/create",
+					"operationId": "post___notes___thread-muting___create",
+					"tags": [
+						"notes"
+					],
+					"successStatus": 204
+				}
+			}
+		},
+		"notesThreadMutingDelete": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"NO_SUCH_NOTE": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "notes/thread-muting/delete"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/notes/thread-muting/delete",
+					"operationId": "post___notes___thread-muting___delete",
+					"tags": [
+						"notes"
+					],
+					"successStatus": 204
+				}
+			}
+		},
+		"notesTranslate": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"UNAVAILABLE": {
+						"status": 400
+					},
+					"NO_SUCH_NOTE": {
+						"status": 400
+					},
+					"CANNOT_TRANSLATE_INVISIBLE_NOTE": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "notes/translate"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/notes/translate",
+					"operationId": "post___notes___translate",
+					"tags": [
+						"notes"
+					]
+				}
+			}
+		},
+		"notesUnrenote": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"NO_SUCH_NOTE": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "notes/unrenote"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/notes/unrenote",
+					"operationId": "post___notes___unrenote",
+					"tags": [
+						"notes"
+					],
+					"successStatus": 204
+				}
+			}
+		},
+		"promoRead": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"NO_SUCH_NOTE": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "promo/read"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/promo/read",
+					"operationId": "post___promo___read",
+					"tags": [
+						"notes"
+					],
+					"successStatus": 204
+				}
+			}
+		},
+		"usersReactions": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"REACTIONS_NOT_PUBLIC": {
+						"status": 400
+					},
+					"IS_REMOTE_USER": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "users/reactions"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/users/reactions",
+					"operationId": "post___users___reactions",
+					"tags": [
+						"users",
+						"reactions"
+					]
+				}
+			}
+		}
+	},
+	"users": {
+		"admin/accounts/delete": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					}
+				},
+				"meta": {
+					"requestName": "admin/accounts/delete"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/admin/accounts/delete",
+					"operationId": "post___admin___accounts___delete",
+					"tags": [
+						"admin"
+					],
+					"successStatus": 204
+				}
+			}
+		},
+		"admin/accounts/find-by-email": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"USER_NOT_FOUND": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "admin/accounts/find-by-email"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/admin/accounts/find-by-email",
+					"operationId": "post___admin___accounts___find-by-email",
+					"tags": [
+						"admin"
+					]
+				}
+			}
+		},
+		"admin/delete-account": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					}
+				},
+				"meta": {
+					"requestName": "admin/delete-account"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/admin/delete-account",
+					"operationId": "post___admin___delete-account",
+					"tags": [
+						"admin"
+					],
+					"successStatus": 204
+				}
+			}
+		},
+		"admin/update-proxy-account": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					}
+				},
+				"meta": {
+					"requestName": "admin/update-proxy-account"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/admin/update-proxy-account",
+					"operationId": "post___admin___update-proxy-account",
+					"tags": [
+						"admin"
+					]
+				}
+			}
+		},
+		"i": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"USER_IS_DELETED": {
+						"status": 403
+					}
+				},
+				"meta": {
+					"requestName": "i"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/i",
+					"operationId": "post___i",
+					"tags": [
+						"account"
+					]
+				}
+			}
+		},
+		"i/claim-achievement": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					}
+				},
+				"meta": {
+					"requestName": "i/claim-achievement"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/i/claim-achievement",
+					"operationId": "post___i___claim-achievement",
+					"successStatus": 204
+				}
+			}
+		},
+		"i/delete-account": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					}
+				},
+				"meta": {
+					"requestName": "i/delete-account"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/i/delete-account",
+					"operationId": "post___i___delete-account",
+					"successStatus": 204
+				}
+			}
+		},
+		"i/move": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"DESTINATION_ACCOUNT_FORBIDS": {
+						"status": 400
+					},
+					"NOT_ROOT_FORBIDDEN": {
+						"status": 400
+					},
+					"NO_SUCH_USER": {
+						"status": 400
+					},
+					"URI_NULL": {
+						"status": 400
+					},
+					"ALREADY_MOVED": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "i/move"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/i/move",
+					"operationId": "post___i___move",
+					"tags": [
+						"users"
+					]
+				}
+			}
+		},
+		"i/update": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"NO_SUCH_AVATAR": {
+						"status": 400
+					},
+					"NO_SUCH_BANNER": {
+						"status": 400
+					},
+					"AVATAR_NOT_AN_IMAGE": {
+						"status": 400
+					},
+					"BANNER_NOT_AN_IMAGE": {
+						"status": 400
+					},
+					"NO_SUCH_PAGE": {
+						"status": 400
+					},
+					"INVALID_REGEXP": {
+						"status": 400
+					},
+					"TOO_MANY_MUTED_WORDS": {
+						"status": 400
+					},
+					"NO_SUCH_USER": {
+						"status": 400
+					},
+					"URI_NULL": {
+						"status": 400
+					},
+					"FORBIDDEN_TO_SET_YOURSELF": {
+						"status": 400
+					},
+					"RESTRICTED_BY_ROLE": {
+						"status": 400
+					},
+					"YOUR_NAME_CONTAINS_PROHIBITED_WORDS": {
+						"status": 422
+					}
+				},
+				"meta": {
+					"requestName": "i/update"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/i/update",
+					"operationId": "post___i___update",
+					"tags": [
+						"account"
+					]
+				}
+			}
+		},
+		"users": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					}
+				},
+				"meta": {
+					"requestName": "users"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/users",
+					"operationId": "post___users",
+					"tags": [
+						"users"
+					]
+				}
+			}
+		},
+		"users/achievements": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					}
+				},
+				"meta": {
+					"requestName": "users/achievements"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/users/achievements",
+					"operationId": "post___users___achievements"
+				}
+			}
+		},
+		"users/show": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"FAILED_TO_RESOLVE_REMOTE_USER": {
+						"status": 500
+					},
+					"NO_SUCH_USER": {
+						"status": 404
+					}
+				},
+				"meta": {
+					"requestName": "users/show"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/users/show",
+					"operationId": "post___users___show",
+					"tags": [
+						"users"
+					],
+					"description": "Show the properties of a user."
+				}
+			}
+		},
+		"users/update-memo": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"NO_SUCH_USER": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "users/update-memo"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/users/update-memo",
+					"operationId": "post___users___update-memo",
+					"tags": [
+						"account"
+					],
+					"successStatus": 204
+				}
+			}
+		}
+	},
+	"timelines": {
+		"antennasCreate": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"NO_SUCH_USER_LIST": {
+						"status": 400
+					},
+					"TOO_MANY_ANTENNAS": {
+						"status": 400
+					},
+					"EMPTY_KEYWORD": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "antennas/create"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/antennas/create",
+					"operationId": "post___antennas___create",
+					"tags": [
+						"antennas"
+					]
+				}
+			}
+		},
+		"antennasDelete": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"NO_SUCH_ANTENNA": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "antennas/delete"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/antennas/delete",
+					"operationId": "post___antennas___delete",
+					"tags": [
+						"antennas"
+					],
+					"successStatus": 204
+				}
+			}
+		},
+		"antennasList": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					}
+				},
+				"meta": {
+					"requestName": "antennas/list"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/antennas/list",
+					"operationId": "post___antennas___list",
+					"tags": [
+						"antennas",
+						"account"
+					]
+				}
+			}
+		},
+		"antennasNotes": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"NO_SUCH_ANTENNA": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "antennas/notes"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/antennas/notes",
+					"operationId": "post___antennas___notes",
+					"tags": [
+						"antennas",
+						"account",
+						"notes"
+					]
+				}
+			}
+		},
+		"antennasRemoveNote": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"NO_SUCH_ANTENNA": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "antennas/remove-note"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/antennas/remove-note",
+					"operationId": "post___antennas___remove-note",
+					"tags": [
+						"antennas",
+						"account",
+						"notes"
+					],
+					"successStatus": 204
+				}
+			}
+		},
+		"antennasShow": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"NO_SUCH_ANTENNA": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "antennas/show"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/antennas/show",
+					"operationId": "post___antennas___show",
+					"tags": [
+						"antennas",
+						"account"
+					]
+				}
+			}
+		},
+		"antennasUpdate": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"NO_SUCH_ANTENNA": {
+						"status": 400
+					},
+					"NO_SUCH_USER_LIST": {
+						"status": 400
+					},
+					"EMPTY_KEYWORD": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "antennas/update"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/antennas/update",
+					"operationId": "post___antennas___update",
+					"tags": [
+						"antennas"
+					]
+				}
+			}
+		},
+		"notesGlobalTimeline": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"GTL_DISABLED": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "notes/global-timeline"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/notes/global-timeline",
+					"operationId": "post___notes___global-timeline",
+					"tags": [
+						"notes"
+					]
+				}
+			}
+		},
+		"notesHybridTimeline": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"STL_DISABLED": {
+						"status": 400
+					},
+					"BOTH_WITH_REPLIES_AND_WITH_FILES": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "notes/hybrid-timeline"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/notes/hybrid-timeline",
+					"operationId": "post___notes___hybrid-timeline",
+					"tags": [
+						"notes"
+					]
+				}
+			}
+		},
+		"notesLocalTimeline": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"LTL_DISABLED": {
+						"status": 400
+					},
+					"BOTH_WITH_REPLIES_AND_WITH_FILES": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "notes/local-timeline"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/notes/local-timeline",
+					"operationId": "post___notes___local-timeline",
+					"tags": [
+						"notes"
+					]
+				}
+			}
+		},
+		"notesMentions": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					}
+				},
+				"meta": {
+					"requestName": "notes/mentions"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/notes/mentions",
+					"operationId": "post___notes___mentions",
+					"tags": [
+						"notes"
+					]
+				}
+			}
+		},
+		"notesTimeline": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					}
+				},
+				"meta": {
+					"requestName": "notes/timeline"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/notes/timeline",
+					"operationId": "post___notes___timeline",
+					"tags": [
+						"notes"
+					]
+				}
+			}
+		},
+		"notesUserListTimeline": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"NO_SUCH_LIST": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "notes/user-list-timeline"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/notes/user-list-timeline",
+					"operationId": "post___notes___user-list-timeline",
+					"tags": [
+						"notes",
+						"lists"
+					]
+				}
+			}
+		},
+		"usersNotes": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"NO_SUCH_USER": {
+						"status": 400
+					},
+					"BOTH_WITH_REPLIES_AND_WITH_FILES": {
+						"status": 400
+					},
+					"SIGNIN_REQUIRED": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "users/notes"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/users/notes",
+					"operationId": "post___users___notes",
+					"tags": [
+						"users",
+						"notes"
+					]
+				}
+			}
+		}
+	},
+	"noteSearch": {
+		"notesSearch": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"UNAVAILABLE": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "notes/search"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/notes/search",
+					"operationId": "post___notes___search",
+					"tags": [
+						"notes"
+					]
+				}
+			}
+		}
+	},
+	"relationships": {
+		"blocking/create": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"NO_SUCH_USER": {
+						"status": 400
+					},
+					"BLOCKEE_IS_YOURSELF": {
+						"status": 400
+					},
+					"ALREADY_BLOCKING": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "blocking/create"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/blocking/create",
+					"operationId": "post___blocking___create",
+					"tags": [
+						"account"
+					]
+				}
+			}
+		},
+		"blocking/delete": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"NO_SUCH_USER": {
+						"status": 400
+					},
+					"BLOCKEE_IS_YOURSELF": {
+						"status": 400
+					},
+					"NOT_BLOCKING": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "blocking/delete"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/blocking/delete",
+					"operationId": "post___blocking___delete",
+					"tags": [
+						"account"
+					]
+				}
+			}
+		},
+		"blocking/list": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					}
+				},
+				"meta": {
+					"requestName": "blocking/list"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/blocking/list",
+					"operationId": "post___blocking___list",
+					"tags": [
+						"account"
+					]
+				}
+			}
+		},
+		"following/create": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"NO_SUCH_USER": {
+						"status": 400
+					},
+					"FOLLOWEE_IS_YOURSELF": {
+						"status": 400
+					},
+					"ALREADY_FOLLOWING": {
+						"status": 400
+					},
+					"BLOCKING": {
+						"status": 400
+					},
+					"BLOCKED": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "following/create"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/following/create",
+					"operationId": "post___following___create",
+					"tags": [
+						"following",
+						"users"
+					]
+				}
+			}
+		},
+		"following/delete": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"NO_SUCH_USER": {
+						"status": 400
+					},
+					"FOLLOWEE_IS_YOURSELF": {
+						"status": 400
+					},
+					"NOT_FOLLOWING": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "following/delete"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/following/delete",
+					"operationId": "post___following___delete",
+					"tags": [
+						"following",
+						"users"
+					]
+				}
+			}
+		},
+		"following/invalidate": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"NO_SUCH_USER": {
+						"status": 400
+					},
+					"FOLLOWER_IS_YOURSELF": {
+						"status": 400
+					},
+					"NOT_FOLLOWING": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "following/invalidate"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/following/invalidate",
+					"operationId": "post___following___invalidate",
+					"tags": [
+						"following",
+						"users"
+					]
+				}
+			}
+		},
+		"following/list": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					}
+				},
+				"meta": {
+					"requestName": "following/list"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/following/list",
+					"operationId": "post___following___list",
+					"tags": [
+						"users"
+					]
+				}
+			}
+		},
+		"following/requests/accept": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"NO_SUCH_USER": {
+						"status": 400
+					},
+					"NO_FOLLOW_REQUEST": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "following/requests/accept"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/following/requests/accept",
+					"operationId": "post___following___requests___accept",
+					"tags": [
+						"following",
+						"account"
+					]
+				}
+			}
+		},
+		"following/requests/cancel": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"NO_SUCH_USER": {
+						"status": 400
+					},
+					"FOLLOW_REQUEST_NOT_FOUND": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "following/requests/cancel"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/following/requests/cancel",
+					"operationId": "post___following___requests___cancel",
+					"tags": [
+						"following",
+						"account"
+					]
+				}
+			}
+		},
+		"following/requests/list": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					}
+				},
+				"meta": {
+					"requestName": "following/requests/list"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/following/requests/list",
+					"operationId": "post___following___requests___list",
+					"tags": [
+						"following",
+						"account"
+					]
+				}
+			}
+		},
+		"following/requests/reject": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"NO_SUCH_USER": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "following/requests/reject"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/following/requests/reject",
+					"operationId": "post___following___requests___reject",
+					"tags": [
+						"following",
+						"account"
+					]
+				}
+			}
+		},
+		"following/requests/sent": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					}
+				},
+				"meta": {
+					"requestName": "following/requests/sent"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/following/requests/sent",
+					"operationId": "post___following___requests___sent",
+					"tags": [
+						"following",
+						"account"
+					]
+				}
+			}
+		},
+		"following/update": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"NO_SUCH_USER": {
+						"status": 400
+					},
+					"FOLLOWEE_IS_YOURSELF": {
+						"status": 400
+					},
+					"NOT_FOLLOWING": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "following/update"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/following/update",
+					"operationId": "post___following___update",
+					"tags": [
+						"following",
+						"users"
+					]
+				}
+			}
+		},
+		"following/update-all": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					}
+				},
+				"meta": {
+					"requestName": "following/update-all"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/following/update-all",
+					"operationId": "post___following___update-all",
+					"tags": [
+						"following",
+						"users"
+					]
+				}
+			}
+		},
+		"mute/create": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"NO_SUCH_USER": {
+						"status": 400
+					},
+					"MUTEE_IS_YOURSELF": {
+						"status": 400
+					},
+					"ALREADY_MUTING": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "mute/create"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/mute/create",
+					"operationId": "post___mute___create",
+					"tags": [
+						"account"
+					]
+				}
+			}
+		},
+		"mute/delete": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"NO_SUCH_USER": {
+						"status": 400
+					},
+					"MUTEE_IS_YOURSELF": {
+						"status": 400
+					},
+					"NOT_MUTING": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "mute/delete"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/mute/delete",
+					"operationId": "post___mute___delete",
+					"tags": [
+						"account"
+					]
+				}
+			}
+		},
+		"mute/list": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					}
+				},
+				"meta": {
+					"requestName": "mute/list"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/mute/list",
+					"operationId": "post___mute___list",
+					"tags": [
+						"account"
+					]
+				}
+			}
+		},
+		"renote-mute/create": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"NO_SUCH_USER": {
+						"status": 400
+					},
+					"MUTEE_IS_YOURSELF": {
+						"status": 400
+					},
+					"ALREADY_MUTING": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "renote-mute/create"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/renote-mute/create",
+					"operationId": "post___renote-mute___create",
+					"tags": [
+						"account"
+					]
+				}
+			}
+		},
+		"renote-mute/delete": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"NO_SUCH_USER": {
+						"status": 400
+					},
+					"MUTEE_IS_YOURSELF": {
+						"status": 400
+					},
+					"NOT_MUTING": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "renote-mute/delete"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/renote-mute/delete",
+					"operationId": "post___renote-mute___delete",
+					"tags": [
+						"account"
+					]
+				}
+			}
+		},
+		"renote-mute/list": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					}
+				},
+				"meta": {
+					"requestName": "renote-mute/list"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/renote-mute/list",
+					"operationId": "post___renote-mute___list",
+					"tags": [
+						"account"
+					]
+				}
+			}
+		},
+		"users/followers": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"NO_SUCH_USER": {
+						"status": 400
+					},
+					"FORBIDDEN": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "users/followers"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/users/followers",
+					"operationId": "post___users___followers",
+					"tags": [
+						"users"
+					]
+				}
+			}
+		},
+		"users/following": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"NO_SUCH_USER": {
+						"status": 400
+					},
+					"FORBIDDEN": {
+						"status": 400
+					},
+					"BIRTHDAY_DATE_FORMAT_INVALID": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "users/following"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/users/following",
+					"operationId": "post___users___following",
+					"tags": [
+						"users"
+					]
+				}
+			}
+		},
+		"users/get-following-users-by-birthday": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					}
+				},
+				"meta": {
+					"requestName": "users/get-following-users-by-birthday"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/users/get-following-users-by-birthday",
+					"operationId": "post___users___get-following-users-by-birthday",
+					"tags": [
+						"users"
+					]
+				}
+			}
+		},
+		"users/lists/create": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"TOO_MANY_USERLISTS": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "users/lists/create"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/users/lists/create",
+					"operationId": "post___users___lists___create",
+					"tags": [
+						"lists"
+					]
+				}
+			}
+		},
+		"users/lists/create-from-public": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"TOO_MANY_USERLISTS": {
+						"status": 400
+					},
+					"NO_SUCH_LIST": {
+						"status": 400
+					},
+					"NO_SUCH_USER": {
+						"status": 400
+					},
+					"ALREADY_ADDED": {
+						"status": 400
+					},
+					"YOU_HAVE_BEEN_BLOCKED": {
+						"status": 400
+					},
+					"TOO_MANY_USERS": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "users/lists/create-from-public"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/users/lists/create-from-public",
+					"operationId": "post___users___lists___create-from-public",
+					"tags": []
+				}
+			}
+		},
+		"users/lists/delete": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"NO_SUCH_LIST": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "users/lists/delete"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/users/lists/delete",
+					"operationId": "post___users___lists___delete",
+					"tags": [
+						"lists"
+					]
+				}
+			}
+		},
+		"users/lists/favorite": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"NO_SUCH_USER_LIST": {
+						"status": 400
+					},
+					"ALREADY_FAVORITED": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "users/lists/favorite"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/users/lists/favorite",
+					"operationId": "post___users___lists___favorite",
+					"tags": []
+				}
+			}
+		},
+		"users/lists/get-memberships": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"NO_SUCH_LIST": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "users/lists/get-memberships"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/users/lists/get-memberships",
+					"operationId": "post___users___lists___get-memberships",
+					"tags": [
+						"lists",
+						"account"
+					]
+				}
+			}
+		},
+		"users/lists/list": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"NO_SUCH_USER": {
+						"status": 400
+					},
+					"REMOTE_USER_NOT_ALLOWED": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "users/lists/list"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/users/lists/list",
+					"operationId": "post___users___lists___list",
+					"tags": [
+						"lists",
+						"account"
+					]
+				}
+			}
+		},
+		"users/lists/pull": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"NO_SUCH_LIST": {
+						"status": 400
+					},
+					"NO_SUCH_USER": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "users/lists/pull"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/users/lists/pull",
+					"operationId": "post___users___lists___pull",
+					"tags": [
+						"lists",
+						"users"
+					]
+				}
+			}
+		},
+		"users/lists/push": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"NO_SUCH_LIST": {
+						"status": 400
+					},
+					"NO_SUCH_USER": {
+						"status": 400
+					},
+					"ALREADY_ADDED": {
+						"status": 400
+					},
+					"YOU_HAVE_BEEN_BLOCKED": {
+						"status": 400
+					},
+					"TOO_MANY_USERS": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "users/lists/push"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/users/lists/push",
+					"operationId": "post___users___lists___push",
+					"tags": [
+						"lists",
+						"users"
+					]
+				}
+			}
+		},
+		"users/lists/show": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"NO_SUCH_LIST": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "users/lists/show"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/users/lists/show",
+					"operationId": "post___users___lists___show",
+					"tags": [
+						"lists",
+						"account"
+					]
+				}
+			}
+		},
+		"users/lists/unfavorite": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"NO_SUCH_USER_LIST": {
+						"status": 400
+					},
+					"ALREADY_FAVORITED": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "users/lists/unfavorite"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/users/lists/unfavorite",
+					"operationId": "post___users___lists___unfavorite",
+					"tags": []
+				}
+			}
+		},
+		"users/lists/update": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"NO_SUCH_LIST": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "users/lists/update"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/users/lists/update",
+					"operationId": "post___users___lists___update",
+					"tags": [
+						"lists"
+					]
+				}
+			}
+		},
+		"users/lists/update-membership": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"NO_SUCH_LIST": {
+						"status": 400
+					},
+					"NO_SUCH_USER": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "users/lists/update-membership"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/users/lists/update-membership",
+					"operationId": "post___users___lists___update-membership",
+					"tags": [
+						"lists",
+						"users"
+					]
+				}
+			}
+		},
+		"users/relation": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					}
+				},
+				"meta": {
+					"requestName": "users/relation"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/users/relation",
+					"operationId": "post___users___relation",
+					"tags": [
+						"users"
+					]
+				}
+			}
+		}
+	},
+	"collections": {
+		"clipsAddNote": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"NO_SUCH_CLIP": {
+						"status": 400
+					},
+					"NO_SUCH_NOTE": {
+						"status": 400
+					},
+					"ALREADY_CLIPPED": {
+						"status": 400
+					},
+					"TOO_MANY_CLIP_NOTES": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "clips/add-note"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/clips/add-note",
+					"operationId": "post___clips___add-note",
+					"tags": [
+						"account",
+						"notes",
+						"clips"
+					],
+					"successStatus": 204
+				}
+			}
+		},
+		"clipsCreate": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"TOO_MANY_CLIPS": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "clips/create"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/clips/create",
+					"operationId": "post___clips___create",
+					"tags": [
+						"clips"
+					]
+				}
+			}
+		},
+		"clipsDelete": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"NO_SUCH_CLIP": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "clips/delete"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/clips/delete",
+					"operationId": "post___clips___delete",
+					"tags": [
+						"clips"
+					],
+					"successStatus": 204
+				}
+			}
+		},
+		"clipsFavorite": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"NO_SUCH_CLIP": {
+						"status": 400
+					},
+					"ALREADY_FAVORITED": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "clips/favorite"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/clips/favorite",
+					"operationId": "post___clips___favorite",
+					"tags": [
+						"clip"
+					],
+					"successStatus": 204
+				}
+			}
+		},
+		"clipsList": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					}
+				},
+				"meta": {
+					"requestName": "clips/list"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/clips/list",
+					"operationId": "post___clips___list",
+					"tags": [
+						"clips",
+						"account"
+					]
+				}
+			}
+		},
+		"clipsMyFavorites": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					}
+				},
+				"meta": {
+					"requestName": "clips/my-favorites"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/clips/my-favorites",
+					"operationId": "post___clips___my-favorites",
+					"tags": [
+						"account",
+						"clip"
+					]
+				}
+			}
+		},
+		"clipsNotes": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"NO_SUCH_CLIP": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "clips/notes"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/clips/notes",
+					"operationId": "post___clips___notes",
+					"tags": [
+						"account",
+						"notes",
+						"clips"
+					]
+				}
+			}
+		},
+		"clipsRemoveNote": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"NO_SUCH_CLIP": {
+						"status": 400
+					},
+					"NO_SUCH_NOTE": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "clips/remove-note"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/clips/remove-note",
+					"operationId": "post___clips___remove-note",
+					"tags": [
+						"account",
+						"notes",
+						"clips"
+					],
+					"successStatus": 204
+				}
+			}
+		},
+		"clipsShow": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"NO_SUCH_CLIP": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "clips/show"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/clips/show",
+					"operationId": "post___clips___show",
+					"tags": [
+						"clips",
+						"account"
+					]
+				}
+			}
+		},
+		"clipsUnfavorite": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"NO_SUCH_CLIP": {
+						"status": 400
+					},
+					"NOT_FAVORITED": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "clips/unfavorite"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/clips/unfavorite",
+					"operationId": "post___clips___unfavorite",
+					"tags": [
+						"clip"
+					],
+					"successStatus": 204
+				}
+			}
+		},
+		"clipsUpdate": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"NO_SUCH_CLIP": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "clips/update"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/clips/update",
+					"operationId": "post___clips___update",
+					"tags": [
+						"clips"
+					]
+				}
+			}
+		},
+		"galleryFeatured": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					}
+				},
+				"meta": {
+					"requestName": "gallery/featured"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/gallery/featured",
+					"operationId": "post___gallery___featured",
+					"tags": [
+						"gallery"
+					]
+				}
+			}
+		},
+		"galleryPopular": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					}
+				},
+				"meta": {
+					"requestName": "gallery/popular"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/gallery/popular",
+					"operationId": "post___gallery___popular",
+					"tags": [
+						"gallery"
+					]
+				}
+			}
+		},
+		"galleryPosts": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					}
+				},
+				"meta": {
+					"requestName": "gallery/posts"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/gallery/posts",
+					"operationId": "post___gallery___posts",
+					"tags": [
+						"gallery"
+					]
+				}
+			}
+		},
+		"galleryPostsCreate": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					}
+				},
+				"meta": {
+					"requestName": "gallery/posts/create"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/gallery/posts/create",
+					"operationId": "post___gallery___posts___create",
+					"tags": [
+						"gallery"
+					]
+				}
+			}
+		},
+		"galleryPostsDelete": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"NO_SUCH_POST": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "gallery/posts/delete"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/gallery/posts/delete",
+					"operationId": "post___gallery___posts___delete",
+					"tags": [
+						"gallery"
+					],
+					"successStatus": 204
+				}
+			}
+		},
+		"galleryPostsLike": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"NO_SUCH_POST": {
+						"status": 400
+					},
+					"YOUR_POST": {
+						"status": 400
+					},
+					"ALREADY_LIKED": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "gallery/posts/like"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/gallery/posts/like",
+					"operationId": "post___gallery___posts___like",
+					"tags": [
+						"gallery"
+					],
+					"successStatus": 204
+				}
+			}
+		},
+		"galleryPostsShow": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"NO_SUCH_POST": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "gallery/posts/show"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/gallery/posts/show",
+					"operationId": "post___gallery___posts___show",
+					"tags": [
+						"gallery"
+					]
+				}
+			}
+		},
+		"galleryPostsUnlike": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"NO_SUCH_POST": {
+						"status": 400
+					},
+					"NOT_LIKED": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "gallery/posts/unlike"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/gallery/posts/unlike",
+					"operationId": "post___gallery___posts___unlike",
+					"tags": [
+						"gallery"
+					],
+					"successStatus": 204
+				}
+			}
+		},
+		"galleryPostsUpdate": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					}
+				},
+				"meta": {
+					"requestName": "gallery/posts/update"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/gallery/posts/update",
+					"operationId": "post___gallery___posts___update",
+					"tags": [
+						"gallery"
+					]
+				}
+			}
+		},
+		"iFavorites": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					}
+				},
+				"meta": {
+					"requestName": "i/favorites"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/i/favorites",
+					"operationId": "post___i___favorites",
+					"tags": [
+						"account",
+						"notes",
+						"favorites"
+					]
+				}
+			}
+		},
+		"iGalleryLikes": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					}
+				},
+				"meta": {
+					"requestName": "i/gallery/likes"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/i/gallery/likes",
+					"operationId": "post___i___gallery___likes",
+					"tags": [
+						"account",
+						"gallery"
+					]
+				}
+			}
+		},
+		"iGalleryPosts": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					}
+				},
+				"meta": {
+					"requestName": "i/gallery/posts"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/i/gallery/posts",
+					"operationId": "post___i___gallery___posts",
+					"tags": [
+						"account",
+						"gallery"
+					]
+				}
+			}
+		},
+		"notesClips": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"NO_SUCH_NOTE": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "notes/clips"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/notes/clips",
+					"operationId": "post___notes___clips",
+					"tags": [
+						"clips",
+						"notes"
+					]
+				}
+			}
+		},
+		"notesFavoritesCreate": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"NO_SUCH_NOTE": {
+						"status": 400
+					},
+					"ALREADY_FAVORITED": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "notes/favorites/create"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/notes/favorites/create",
+					"operationId": "post___notes___favorites___create",
+					"tags": [
+						"notes",
+						"favorites"
+					],
+					"successStatus": 204
+				}
+			}
+		},
+		"notesFavoritesDelete": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"NO_SUCH_NOTE": {
+						"status": 400
+					},
+					"NOT_FAVORITED": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "notes/favorites/delete"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/notes/favorites/delete",
+					"operationId": "post___notes___favorites___delete",
+					"tags": [
+						"notes",
+						"favorites"
+					],
+					"successStatus": 204
+				}
+			}
+		},
+		"usersClips": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					}
+				},
+				"meta": {
+					"requestName": "users/clips"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/users/clips",
+					"operationId": "post___users___clips",
+					"tags": [
+						"users",
+						"clips"
+					]
+				}
+			}
+		},
+		"usersGalleryPosts": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					}
+				},
+				"meta": {
+					"requestName": "users/gallery/posts"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/users/gallery/posts",
+					"operationId": "post___users___gallery___posts",
+					"tags": [
+						"users",
+						"gallery"
+					]
+				}
+			}
 		}
 	},
 	"drive": {
@@ -5361,3 +11760,18 @@ export default {
 		}
 	}
 } satisfies AnyContractRouter;
+
+export const nullableResponses: readonly (readonly string[])[] = [
+	[
+		"instance",
+		"endpoint"
+	],
+	[
+		"preferences",
+		"get"
+	],
+	[
+		"notifications",
+		"showRegistration"
+	]
+];

@@ -7,18 +7,18 @@ import { Inject, Injectable } from '@nestjs/common';
 import cors from '@fastify/cors';
 import multipart from '@fastify/multipart';
 import { ModuleRef } from '@nestjs/core';
-import type { AuthenticationResponseJSON } from '@simplewebauthn/server';
-import type { Config } from '@/config.js';
-import type { InstancesRepository, AccessTokensRepository } from '@features/persistence/backend/repositories/models.js';
-import { DI } from '@/di-symbols.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import { bindThis } from '@features/runtime/backend/decorators.js';
 import { endpoints } from '@features/index/backend/endpoints.js';
-import { ApiCallService } from './ApiCallService.js';
-import { OrpcPilotService } from './OrpcPilotService.js';
 import { SignupApiService } from '@features/auth/backend/transport/SignupApiService.js';
 import { SigninApiService } from '@features/auth/backend/transport/SigninApiService.js';
 import { SigninWithPasskeyApiService } from '@features/auth/backend/transport/SigninWithPasskeyApiService.js';
+import { DI } from '@/di-symbols.js';
+import type { Config } from '@/config.js';
+import { OrpcPilotService } from './OrpcPilotService.js';
+import { ApiCallService } from './ApiCallService.js';
+import type { InstancesRepository, AccessTokensRepository } from '@features/persistence/backend/repositories/models.js';
+import type { AuthenticationResponseJSON } from '@simplewebauthn/server';
 import type { FastifyInstance, FastifyPluginOptions } from 'fastify';
 
 @Injectable()

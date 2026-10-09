@@ -3,11 +3,11 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import type { ApiActor, ApiToken } from '../../api/backend/transport/context.js';
 import { apiError } from '../../api/backend/transport/orpc-error.js';
+import { notificationTypes } from './notification-types.schema.js';
+import type { ApiActor, ApiToken } from '../../api/backend/transport/context.js';
 import type { NotificationsOperations } from './operations.js';
 import type { NotificationDto } from './notification.schema.js';
-import { notificationTypes } from './notification-types.schema.js';
 import type { MiNotification, MiGroupedNotification } from './models/Notification.js';
 
 export interface AppNotificationData {
@@ -44,7 +44,7 @@ export interface NotificationsApplicationDependencies extends NotificationsComma
 	}): Promise<MiNotification[]>;
 	packMany(records: MiNotification[], userId: string): Promise<NotificationDto[]>;
 	packGroupedMany(records: MiGroupedNotification[], userId: string): Promise<NotificationDto[]>;
-	swPublicKey: string | null;
+	getSwPublicKey(): string | null;
 	isValidEndpoint(endpoint: string): boolean;
 	findSubscription(query: SubscriptionQuery): Promise<SubscriptionRecord | null>;
 	findSubscriptions(query: SubscriptionQuery): Promise<SubscriptionRecord[]>;
@@ -97,8 +97,8 @@ export class NotificationsApplicationService<Actor extends ApiActor> implements 
 					previous.id = record.id;
 				} else {
 					grouped[grouped.length - 1] = { type: 'reaction:grouped', id: record.id,
-						createdAt: previous.createdAt, noteId: previous.noteId,
-						reactions: [{ userId: previous.notifierId, reaction: previous.reaction }, { userId: record.notifierId, reaction: record.reaction }] };
+																																					createdAt: previous.createdAt, noteId: previous.noteId,
+																																					reactions: [{ userId: previous.notifierId, reaction: previous.reaction }, { userId: record.notifierId, reaction: record.reaction }] };
 				}
 				continue;
 			}
@@ -110,7 +110,7 @@ export class NotificationsApplicationService<Actor extends ApiActor> implements 
 					previous.id = record.id;
 				} else if (previous.type === 'renote') {
 					grouped[grouped.length - 1] = { type: 'renote:grouped', id: record.id,
-						createdAt: record.createdAt, noteId: previous.noteId, userIds: [previous.notifierId, record.notifierId] };
+																																					createdAt: record.createdAt, noteId: previous.noteId, userIds: [previous.notifierId, record.notifierId] };
 				}
 				continue;
 			}
@@ -138,10 +138,10 @@ export class NotificationsApplicationService<Actor extends ApiActor> implements 
 	async register(input: Parameters<NotificationsOperations<Actor>['register']>[0], actor: Actor) {
 		if (!this.deps.isValidEndpoint(input.endpoint)) throw apiError({ code: 'INVALID_ENDPOINT', message: 'Invalid push endpoint.', id: '4432adbe-17c0-4f9f-b43c-9ceb2f8910fe' });
 		const existing = await this.deps.findSubscription({ userId: actor.id, endpoint: input.endpoint, auth: input.auth, publickey: input.publickey });
-		if (existing) return { state: 'already-subscribed' as const, key: this.deps.swPublicKey, userId: actor.id, endpoint: existing.endpoint, sendReadMessage: existing.sendReadMessage };
+		if (existing) return { state: 'already-subscribed' as const, key: this.deps.getSwPublicKey(), userId: actor.id, endpoint: existing.endpoint, sendReadMessage: existing.sendReadMessage };
 		await this.deps.insertSubscription({ id: this.deps.generateId(), userId: actor.id, ...input });
 		this.deps.refreshSubscriptionCache(actor.id);
-		return { state: 'subscribed' as const, key: this.deps.swPublicKey, userId: actor.id, endpoint: input.endpoint, sendReadMessage: input.sendReadMessage };
+		return { state: 'subscribed' as const, key: this.deps.getSwPublicKey(), userId: actor.id, endpoint: input.endpoint, sendReadMessage: input.sendReadMessage };
 	}
 	async showRegistration(input: Parameters<NotificationsOperations<Actor>['showRegistration']>[0], actor: Actor) {
 		const record = await this.deps.findSubscription({ userId: actor.id, endpoint: input.endpoint });

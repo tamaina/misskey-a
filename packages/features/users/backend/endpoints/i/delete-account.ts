@@ -3,28 +3,19 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { voidIDeleteAccountDefinition, voidIDeleteAccountInput, voidIDeleteAccountOutput } from '../../../contract/void-endpoint-definitions.js';
 import bcrypt from 'bcryptjs';
 import { Inject, Injectable } from '@nestjs/common';
+import { UserAuthService } from '@features/auth/backend/services/UserAuthService.js';
+import { DI } from '@/di-symbols.js';
+import { DeleteAccountService } from '../../services/DeleteAccountService.js';
+import type { ApiToken } from '@features/api/backend/transport/context.js';
+import type { UsersInputs } from '../../api.contract.js';
+
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
 import type { UsersRepository, UserProfilesRepository } from '@features/persistence/backend/repositories/models.js';
 
-import { DeleteAccountService } from '../../services/DeleteAccountService.js';
-import { DI } from '@/di-symbols.js';
-import { UserAuthService } from '@features/auth/backend/services/UserAuthService.js';
-
-const contractProjection = projectEndpointContract(voidIDeleteAccountDefinition);
-
-export const meta = {
-	requireCredential: true,
-
-	secure: true,
-} as const;
-
-export const paramDef = contractProjection.input;
-
 @Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof voidIDeleteAccountInput, typeof voidIDeleteAccountOutput> {
+export class IDeleteAccountOperation {
 	constructor(
 		@Inject(DI.usersRepository)
 		private usersRepository: UsersRepository,
@@ -35,33 +26,34 @@ export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof
 		private userAuthService: UserAuthService,
 		private deleteAccountService: DeleteAccountService,
 	) {
-		super(meta, contractProjection, async (ps, me) => {
-			const token = ps.token;
-			const profile = await this.userProfilesRepository.findOneByOrFail({ userId: me.id });
+	}
 
-			if (profile.twoFactorEnabled) {
-				if (token == null) {
-					throw new Error('authentication failed');
-				}
+	async execute(ps: UsersInputs['i/delete-account'], me: MiLocalUser, _apiToken: ApiToken | null, _ip: string) {
+		const token = ps.token;
+		const profile = await this.userProfilesRepository.findOneByOrFail({ userId: me.id });
 
-				try {
-					await this.userAuthService.twoFactorAuthenticate(profile, token);
-				} catch (_) {
-					throw new Error('authentication failed');
-				}
+		if (profile.twoFactorEnabled) {
+			if (token == null) {
+				throw new Error('authentication failed');
 			}
 
-			const userDetailed = await this.usersRepository.findOneByOrFail({ id: me.id });
-			if (userDetailed.isDeleted) {
-				return;
+			try {
+				await this.userAuthService.twoFactorAuthenticate(profile, token);
+			} catch (_) {
+				throw new Error('authentication failed');
 			}
+		}
 
-			const passwordMatched = await bcrypt.compare(ps.password, profile.password!);
-			if (!passwordMatched) {
-				throw new Error('incorrect password');
-			}
+		const userDetailed = await this.usersRepository.findOneByOrFail({ id: me.id });
+		if (userDetailed.isDeleted) {
+			return;
+		}
 
-			await this.deleteAccountService.deleteAccount(me);
-		});
+		const passwordMatched = await bcrypt.compare(ps.password, profile.password!);
+		if (!passwordMatched) {
+			throw new Error('incorrect password');
+		}
+
+		await this.deleteAccountService.deleteAccount(me);
 	}
 }

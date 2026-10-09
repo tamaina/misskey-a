@@ -26,7 +26,7 @@ export function requestRoutes(router: unknown): RequestRoute[] {
 			const cacheSec = meta.cacheSec;
 			if (cacheSec !== undefined && (typeof cacheSec !== 'number' || !Number.isFinite(cacheSec) || cacheSec < 0)) throw new Error('Invalid API cache metadata');
 			routes.push({ name, path, httpPath: route.path, allowGet, multipart: meta.multipart === true,
-				...(typeof cacheSec === 'number' ? { cacheSec } : {}) });
+																	...(typeof cacheSec === 'number' ? { cacheSec } : {}) });
 		} else if (node !== null && typeof node === 'object' && !Array.isArray(node)) {
 			for (const [key, child] of Object.entries(node)) visit(child, [...path, key]);
 		} else {
@@ -36,4 +36,26 @@ export function requestRoutes(router: unknown): RequestRoute[] {
 
 	visit(router, []);
 	return routes;
+}
+
+/** Derive nullable logical responses for the legacy204 wire boundary from real output schemas. */
+export async function nullableResponsePaths(router: unknown): Promise<string[][]> {
+	const paths: string[][] = [];
+
+	async function visit(node: unknown, path: string[]) {
+		if (isContractProcedure(node)) {
+			const schema = node['~orpc'].outputSchema;
+			if (schema !== undefined) {
+				const result = await schema['~standard'].validate(null);
+				if (!result.issues) paths.push(path);
+			}
+		} else if (node !== null && typeof node === 'object' && !Array.isArray(node)) {
+			for (const [key, child] of Object.entries(node)) await visit(child, [...path, key]);
+		} else {
+			throw new Error('Invalid contract routing node');
+		}
+	}
+
+	await visit(router, []);
+	return paths;
 }

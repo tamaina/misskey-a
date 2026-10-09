@@ -13,8 +13,26 @@ import type { EmojisOperations } from '../../emojis/backend/api.operations.js';
 import type { NotificationsOperations } from '../../notifications/backend/operations.js';
 import type { PreferencesOperations } from '../../preferences/backend/operations.js';
 
+import type { NotesOperations } from '../../notes/backend/operations.js';
+
+import type { UsersOperations } from '../../users/backend/api.router.js';
+
+import type { TimelinesOperations } from '../../timelines/backend/operations.js';
+
+import type { NoteSearchOperations } from '../../note-search/backend/operations.js';
+
+import type { RelationshipsOperations } from '../../relationships/backend/endpoints/relationships.js';
+
+import type { CollectionsOperations } from '../../collections/backend/api.operations.js';
+
 export type ApiExecutionContext<Actor extends ApiActor> = ApiContext<Actor> & {
 	operations: {
+		notes: NotesOperations<Actor>;
+		users: UsersOperations<Actor>;
+		timelines: TimelinesOperations<Actor>;
+		noteSearch: NoteSearchOperations<Actor>;
+		relationships: RelationshipsOperations<Actor>;
+		collections: CollectionsOperations<Actor>;
 		instance: InstanceOperations<Actor>;
 		statistics: StatisticsOperations<Actor>;
 		discovery: DiscoveryOperations<Actor>;

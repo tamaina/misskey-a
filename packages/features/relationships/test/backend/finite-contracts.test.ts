@@ -6,19 +6,19 @@
 import { expect, test } from 'vitest';
 import * as v from 'valibot';
 import { mockDeep } from 'vitest-mock-extended';
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { packedFollowingSchema, packedBlockingSchema, packedMutingSchema, packedRenoteMutingSchema, packedUserListSchema } from '../../contract/packed.js';
-import { compositionUsersListsShowOutput } from '../../contract/output-composition-endpoint-definitions.js';
-import { packedFollowingRequestsListInput, packedFollowingRequestsListDefinition, packedFollowingRequestsListOutput, packedUsersListsGetMembershipsOutput } from '../../contract/packed-endpoint-definitions.js';
+import { packedFollowingSchema, packedBlockingSchema, packedMutingSchema, packedRenoteMutingSchema, packedUserListSchema } from '../../backend/endpoints/relationships.schema.js';
+import { compositionUsersListsShowOutput } from '../../backend/endpoints/relationships.contract.js';
+import { packedFollowingRequestsListInput, packedFollowingRequestsListOutput, packedUsersListsGetMembershipsOutput } from '../../backend/endpoints/relationships.contract.js';
 import { FollowingEntityService } from '../../backend/serializers/FollowingEntityService.js';
 import { BlockingEntityService } from '../../backend/serializers/BlockingEntityService.js';
 import { MutingEntityService } from '../../backend/serializers/MutingEntityService.js';
 import { RenoteMutingEntityService } from '../../backend/serializers/RenoteMutingEntityService.js';
 import { FollowRequestEntityService } from '../../backend/serializers/FollowRequestEntityService.js';
 import { UserListEntityService } from '../../backend/serializers/UserListEntityService.js';
-import { EndpointImplementation as ListShow } from '../../backend/endpoints/users/lists/show.js';
-import { unionUsersRelationModel, unionUsersRelationOutput } from '../../contract/union-endpoint-definitions.js';
-import { EndpointImplementation as Relation } from '../../backend/endpoints/users/relation.js';
+import { UsersListsShowOperation as ListShow } from '../../backend/endpoints/users/lists/show.js';
+import { packedUserRelationSchema as unionUsersRelationModel } from '../../backend/endpoints/relationships.schema.js';
+import { unionUsersRelationOutput } from '../../backend/endpoints/relationships.contract.js';
+import { UsersRelationOperation as Relation } from '../../backend/endpoints/users/relation.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 import type { MiFollowing } from '../../backend/models/Following.js';
 import type { MiBlocking } from '../../backend/models/Blocking.js';
@@ -97,23 +97,17 @@ test.each([false, true])('actual list serializer and show handler validate flatt
 	lists.findOneBy.mockResolvedValue(list);
 	const serializer = new UserListEntityService(lists, memberships, mockDeep(), ids);
 	checkClosed(packedUserListSchema, await serializer.pack(list), 'name', { isPublic: 1 });
-	const output = await new ListShow(lists, favorites, serializer).exec({ listId: list.id, forPublic }, null, null);
+	const output = await new ListShow(lists, favorites, serializer).execute({ listId: list.id, forPublic }, null);
 	checkClosed(compositionUsersListsShowOutput, output, 'name', { likedCount: '4' });
 	expect(output.likedCount).toBe(forPublic ? 4 : undefined);
 	expect(output.isLiked).toBe(forPublic ? false : undefined);
 });
 
-test('native relationships inputs strip extras; HTTP keeps AJV errors, unknown keys and unparsed responses', async () => {
+test('native relationships inputs project known fields and reject malformed pagination/response values', () => {
 	expect(v.parse(packedFollowingRequestsListInput, { future: true })).toEqual({ limit: 10 });
-	for (const value of [{ limit: 0 }, { limit: '10' }, { sinceId: '-' }]) expect(v.safeParse(packedFollowingRequestsListInput, value).success).toBe(false);
-	const projection = projectEndpointContract(packedFollowingRequestsListDefinition);
-	const params = { future: true };
+	for (const value of [null, [], { limit: 0 }, { limit: '10' }, { sinceId: '-' }]) expect(v.safeParse(packedFollowingRequestsListInput, value).success).toBe(false);
 	const response = [{ id: 'request123', follower: user, followee: user, future: true }];
-	const endpoint = new ContractEndpoint({}, projection, async ps => { expect(ps).toBe(params); return response; });
-	expect(await endpoint.exec(params, null, null)).toBe(response);
-	expect(params).toEqual({ future: true, limit: 10 });
 	expect(v.safeParse(packedFollowingRequestsListOutput, response).success).toBe(false);
-	await expect(endpoint.exec({ limit: 0 }, null, null)).rejects.toMatchObject({ code: 'INVALID_PARAM', info: { param: '#/properties/limit/minimum' } });
 });
 
 test('actual relation handler preserves the single-id array branch and producer following field', async () => {
@@ -121,7 +115,7 @@ test('actual relation handler preserves the single-id array branch and producer 
 	const relation = { id: user.id, following: null, isFollowing: false, hasPendingFollowRequestFromYou: false, hasPendingFollowRequestToYou: false, isFollowed: false, isBlocking: false, isBlocked: false, isMuted: false, isRenoteMuted: false };
 	users.getRelation.mockResolvedValue(relation);
 	const endpoint = new Relation(users);
-	const output = await endpoint.exec({ userId: user.id }, mockDeep<MiLocalUser>({ id: 'viewer123' }), null);
+	const output = await endpoint.execute({ userId: user.id }, mockDeep<MiLocalUser>({ id: 'viewer123' }));
 	expect(output).toEqual([relation]);
 	expect(v.parse(unionUsersRelationOutput, output)).toEqual([relation]);
 	expect(v.parse(unionUsersRelationModel, relation)).toHaveProperty('following', null);

@@ -3,50 +3,32 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { voidFollowingUpdateAllDefinition, voidFollowingUpdateAllInput, voidFollowingUpdateAllOutput } from '../../../contract/void-endpoint-definitions.js';
 import ms from 'ms';
 import { Inject, Injectable } from '@nestjs/common';
 
-import type { FollowingsRepository } from '@features/persistence/backend/repositories/models.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
-import { UserFollowingService } from '../../services/UserFollowingService.js';
-import { DI } from '@/di-symbols.js';
 import { GetterService } from '@features/api/backend/transport/GetterService.js';
-import { ApiError } from '@features/api/backend/transport/error.js';
-
-const contractProjection = projectEndpointContract(voidFollowingUpdateAllDefinition);
-
-export const meta = {
-	tags: ['following', 'users'],
-
-	limit: {
-		duration: ms('1hour'),
-		max: 10,
-	},
-
-	requireCredential: true,
-
-	kind: 'write:following',
-} as const;
-
-export const paramDef = contractProjection.input;
+import { DI } from '@/di-symbols.js';
+import { UserFollowingService } from '../../services/UserFollowingService.js';
+import type { FollowingsRepository } from '@features/persistence/backend/repositories/models.js';
+import type { RelationshipsInputs } from '../relationships.contract.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
 
 @Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof voidFollowingUpdateAllInput, typeof voidFollowingUpdateAllOutput> {
+export class FollowingUpdateAllOperation {
 	constructor(
 		@Inject(DI.followingsRepository)
 		private followingsRepository: FollowingsRepository,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			await this.followingsRepository.update({
-				followerId: me.id,
-			}, {
-				notify: ps.notify != null ? (ps.notify === 'none' ? null : ps.notify) : undefined,
-				withReplies: ps.withReplies != null ? ps.withReplies : undefined,
-			});
+	) {}
 
-			return;
+	async execute(ps: RelationshipsInputs['following/update-all'], me: MiLocalUser) {
+		await this.followingsRepository.update({
+			followerId: me.id,
+		}, {
+			notify: ps.notify != null ? (ps.notify === 'none' ? null : ps.notify) : undefined,
+			withReplies: ps.withReplies != null ? ps.withReplies : undefined,
 		});
+
+		return;
 	}
 }

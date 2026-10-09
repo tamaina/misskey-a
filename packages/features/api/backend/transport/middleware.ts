@@ -4,8 +4,8 @@
  */
 
 import { os } from '@orpc/server';
-import type { ApiActor, ApiContext, ApiToken, RateLimit } from './context.js';
 import { apiError, internalError } from './orpc-error.js';
+import type { ApiActor, ApiContext, ApiToken, RateLimit } from './context.js';
 
 export function authentication<Actor extends ApiActor>() {
 	return os.$context<ApiContext<Actor>>().middleware(async ({ context, next }) => {
@@ -91,7 +91,7 @@ export function apiPolicy<Actor extends ApiActor>(policy: ApiPolicy) {
 
 function credentialRequired() {
 	return apiError({ code: 'CREDENTIAL_REQUIRED', message: 'Credential required.',
-		id: '1384574d-a912-4b81-8601-c7b1c4085df1', status: 401 });
+																			id: '1384574d-a912-4b81-8601-c7b1c4085df1', status: 401 });
 }
 
 /** Explicit runtime proof keeps handlers' authenticated principal type honest. */

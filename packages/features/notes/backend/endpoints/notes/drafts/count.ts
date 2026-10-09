@@ -3,44 +3,40 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { inlineNotesDraftsCountDefinition, inlineNotesDraftsCountInput, inlineNotesDraftsCountOutput } from '../../../../contract/endpoint-definitions.js';
+import { implement } from '@orpc/server';
 import { Inject, Injectable } from '@nestjs/common';
-
-import type { NoteDraftsRepository } from '@features/persistence/backend/repositories/models.js';
+import * as v from 'valibot';
 import { DI } from '@/di-symbols.js';
+import { authentication, apiPolicy, requirePrincipal } from '../../../../../api/backend/transport/middleware.js';
+import { notesDraftsCountContract, notesDraftsCountPolicy, notesDraftsCountInput, notesDraftsCountOutput } from './count.contract.js';
+import type { ApiActor } from '../../../../../api/backend/transport/context.js';
+import type { NotesApiContext } from '../../../operations.js';
+import type { NoteDraftsRepository } from '@features/persistence/backend/repositories/models.js';
+import type { MiLocalUser } from '../../../../../users/backend/models/User.js';
 
-const contractProjection = projectEndpointContract(inlineNotesDraftsCountDefinition);
-
-export const meta = {
-	tags: ['notes', 'drafts'],
-
-	requireCredential: true,
-
-	prohibitMoved: true,
-
-	kind: 'read:account',
-
-	res: contractProjection.response,
-
-	errors: {
-	},
-} as const;
-
-export const paramDef = contractProjection.input;
+export function createNotesDraftsCountProcedure<Actor extends ApiActor>() {
+	return implement(notesDraftsCountContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<NotesApiContext<Actor>>()
+		.use(authentication<Actor>())
+		.use(apiPolicy<Actor>(notesDraftsCountPolicy))
+		.use(requirePrincipal<Actor>())
+		.handler(({ input, context }) => context.operations.notes.notesDraftsCount(input, context.principal));
+}
 
 @Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof inlineNotesDraftsCountInput, typeof inlineNotesDraftsCountOutput> {
+export class NotesDraftsCountOperation {
 	constructor(
 		@Inject(DI.noteDraftsRepository)
 		private noteDraftsRepository: NoteDraftsRepository,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			const count = await this.noteDraftsRepository.createQueryBuilder('drafts')
-				.where('drafts.userId = :meId', { meId: me.id })
-				.getCount();
+	) {}
+	async execute(ps: v.InferOutput<typeof notesDraftsCountInput>, me: MiLocalUser): Promise<v.InferOutput<typeof notesDraftsCountOutput>> {
+		return v.parse(notesDraftsCountOutput, await this.run(ps, me));
+	}
 
-			return count;
-		});
+	private async run(_ps: v.InferOutput<typeof notesDraftsCountInput>, me: MiLocalUser) {
+		const count = await this.noteDraftsRepository.createQueryBuilder('drafts')
+			.where('drafts.userId = :meId', { meId: me.id })
+			.getCount();
+
+		return count;
 	}
 }

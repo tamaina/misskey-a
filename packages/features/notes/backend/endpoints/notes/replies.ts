@@ -3,51 +3,53 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { packedNotesRepliesDefinition, packedNotesRepliesInput, packedNotesRepliesOutput } from '../../../contract/packed-endpoint-definitions.js';
+import { implement } from '@orpc/server';
 import { Inject, Injectable } from '@nestjs/common';
-import type { NotesRepository } from '@features/persistence/backend/repositories/models.js';
-
+import * as v from 'valibot';
+import { DI } from '@/di-symbols.js';
+import { authentication, apiPolicy } from '../../../../api/backend/transport/middleware.js';
 import { QueryService } from '../../services/QueryService.js';
 import { NoteEntityService } from '../../serializers/NoteEntityService.js';
-import { DI } from '@/di-symbols.js';
+import { notesRepliesContract, notesRepliesPolicy, notesRepliesInput, notesRepliesOutput } from './replies.contract.js';
+import type { ApiActor } from '../../../../api/backend/transport/context.js';
+import type { NotesApiContext } from '../../operations.js';
+import type { NotesRepository } from '@features/persistence/backend/repositories/models.js';
+import type { MiLocalUser } from '../../../../users/backend/models/User.js';
 
-const contractProjection = projectEndpointContract(packedNotesRepliesDefinition);
-
-export const meta = {
-	tags: ['notes'],
-
-	requireCredential: false,
-
-	res: contractProjection.response,
-} as const;
-
-export const paramDef = contractProjection.input;
+export function createNotesRepliesProcedure<Actor extends ApiActor>() {
+	return implement(notesRepliesContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<NotesApiContext<Actor>>()
+		.use(authentication<Actor>())
+		.use(apiPolicy<Actor>(notesRepliesPolicy))
+		.handler(({ input, context }) => context.operations.notes.notesReplies(input, context.principal));
+}
 
 @Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedNotesRepliesInput, typeof packedNotesRepliesOutput> {
+export class NotesRepliesOperation {
 	constructor(
 		@Inject(DI.notesRepository)
 		private notesRepository: NotesRepository,
 
 		private noteEntityService: NoteEntityService,
 		private queryService: QueryService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			const query = this.queryService.makePaginationQuery(this.notesRepository.createQueryBuilder('note'), ps.sinceId, ps.untilId, ps.sinceDate, ps.untilDate)
-				.andWhere('note.replyId = :replyId', { replyId: ps.noteId })
-				.innerJoinAndSelect('note.user', 'user')
-				.leftJoinAndSelect('note.reply', 'reply')
-				.leftJoinAndSelect('note.renote', 'renote')
-				.leftJoinAndSelect('reply.user', 'replyUser')
-				.leftJoinAndSelect('renote.user', 'renoteUser');
+	) {}
+	async execute(ps: v.InferOutput<typeof notesRepliesInput>, me: MiLocalUser | null): Promise<v.InferOutput<typeof notesRepliesOutput>> {
+		return v.parse(notesRepliesOutput, await this.run(ps, me));
+	}
 
-			this.queryService.generateVisibilityQuery(query, me);
-			this.queryService.generateBaseNoteFilteringQuery(query, me);
+	private async run(ps: v.InferOutput<typeof notesRepliesInput>, me: MiLocalUser | null) {
+		const query = this.queryService.makePaginationQuery(this.notesRepository.createQueryBuilder('note'), ps.sinceId, ps.untilId, ps.sinceDate, ps.untilDate)
+			.andWhere('note.replyId = :replyId', { replyId: ps.noteId })
+			.innerJoinAndSelect('note.user', 'user')
+			.leftJoinAndSelect('note.reply', 'reply')
+			.leftJoinAndSelect('note.renote', 'renote')
+			.leftJoinAndSelect('reply.user', 'replyUser')
+			.leftJoinAndSelect('renote.user', 'renoteUser');
 
-			const timeline = await query.limit(ps.limit).getMany();
+		this.queryService.generateVisibilityQuery(query, me);
+		this.queryService.generateBaseNoteFilteringQuery(query, me);
 
-			return await this.noteEntityService.packMany(timeline, me);
-		});
+		const timeline = await query.limit(ps.limit).getMany();
+
+		return await this.noteEntityService.packMany(timeline, me);
 	}
 }

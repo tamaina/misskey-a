@@ -7,9 +7,9 @@ import { pingContract } from './endpoints/ping.contract.js';
 import { endpointsContract } from './endpoints/endpoints.contract.js';
 import { endpointContract } from './endpoints/endpoint.contract.js';
 import { serverInfoContract } from './endpoints/server-info.contract.js';
-import type { InstanceEndpoints } from '../contract/index.js';
 import { createServerInfoService } from './server-info.js';
 import { createGetOnlineUsersCount } from './get-online-users-count.js';
+import type { InstanceEndpoints } from '../contract/index.js';
 import type { OnlineUsersCountDependencies } from './get-online-users-count.js';
 
 /** The clock is a narrow dependency and can be replaced without a container. */

@@ -3,20 +3,16 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { legacyNotesCommandSchemas } from '../../commands.js';
-import { notesCommandErrors, notesCommandsContract } from '../../../contract/index.js';
-import type { Schema } from '@features/api/backend/utility/json-schema.js';
-import { createContractTransportEndpoint } from '@features/api/backend/transport/contract-transport-endpoint.js';
-import { defineFeatureEndpoint } from '@features/api/backend/transport/feature-endpoint.js';
+import { implement } from '@orpc/server';
+import { authentication, apiPolicy, requirePrincipal } from '../../../../api/backend/transport/middleware.js';
+import { promoReadContract, promoReadPolicy } from './read.contract.js';
+import type { ApiActor } from '../../../../api/backend/transport/context.js';
+import type { NotesApiContext } from '../../operations.js';
 
-export const meta = {
-	tags: ['notes'],
-	requireCredential: true,
-	kind: 'write:account',
-	errors: notesCommandErrors['promo/read'],
-} as const;
-
-export const paramDef = legacyNotesCommandSchemas['promo/read'].input as Schema;
-
-export const { feature, createEndpoint } = defineFeatureEndpoint('notesCommands', commands =>
-	createContractTransportEndpoint(meta, paramDef, notesCommandsContract['promo/read'], async (params, user) => commands['promo/read'](params, { context: { actor: user } })));
+export function createPromoReadProcedure<Actor extends ApiActor>() {
+	return implement(promoReadContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<NotesApiContext<Actor>>()
+		.use(authentication<Actor>())
+		.use(apiPolicy<Actor>(promoReadPolicy))
+		.use(requirePrincipal<Actor>())
+		.handler(({ input, context }) => context.operations.notes.promoRead(input, context.principal));
+}

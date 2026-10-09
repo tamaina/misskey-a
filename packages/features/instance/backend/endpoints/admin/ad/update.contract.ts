@@ -9,17 +9,17 @@ import { objectInput } from '../../input.schema.js';
 import { commonErrors, apiErrorData } from '../../../../../api/backend/transport/errors.schema.js';
 
 export const adUpdateInput = objectInput({
-	"id": v.pipe(v.string(), v.regex(/^[a-zA-Z0-9]+$/)),
-	"memo": v.exactOptional(v.string()),
-	"url": v.exactOptional(v.pipe(v.string(), v.minLength(1))),
-	"imageUrl": v.exactOptional(v.pipe(v.string(), v.minLength(1))),
-	"place": v.exactOptional(v.string()),
-	"priority": v.exactOptional(v.string()),
-	"ratio": v.exactOptional(v.pipe(v.pipe(v.number(), v.finite()), v.integer())),
-	"expiresAt": v.exactOptional(v.pipe(v.pipe(v.number(), v.finite()), v.integer())),
-	"startsAt": v.exactOptional(v.pipe(v.pipe(v.number(), v.finite()), v.integer())),
-	"dayOfWeek": v.exactOptional(v.pipe(v.pipe(v.number(), v.finite()), v.integer())),
-	"isSensitive": v.exactOptional(v.boolean()),
+	'id': v.pipe(v.string(), v.regex(/^[a-zA-Z0-9]+$/)),
+	'memo': v.exactOptional(v.string()),
+	'url': v.exactOptional(v.pipe(v.string(), v.minLength(1))),
+	'imageUrl': v.exactOptional(v.pipe(v.string(), v.minLength(1))),
+	'place': v.exactOptional(v.string()),
+	'priority': v.exactOptional(v.string()),
+	'ratio': v.exactOptional(v.pipe(v.pipe(v.number(), v.finite()), v.integer())),
+	'expiresAt': v.exactOptional(v.pipe(v.pipe(v.number(), v.finite()), v.integer())),
+	'startsAt': v.exactOptional(v.pipe(v.pipe(v.number(), v.finite()), v.integer())),
+	'dayOfWeek': v.exactOptional(v.pipe(v.pipe(v.number(), v.finite()), v.integer())),
+	'isSensitive': v.exactOptional(v.boolean()),
 });
 
 export const adUpdateContract = oc.$meta<{ requestName: 'admin/ad/update'; allowGet: boolean; cacheSec?: number }>({ requestName: 'admin/ad/update', allowGet: false })

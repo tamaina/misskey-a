@@ -7,58 +7,58 @@ import { oc, type InferContractRouterOutputs } from '@orpc/contract';
 import * as v from 'valibot';
 import { objectInput } from '../../../api/backend/transport/input.schema.js';
 import { apiErrorData, commonErrors } from '../../../api/backend/transport/errors.schema.js';
-import { packedHashtagSchema } from './hashtag.schema.js';
 import { packedUserSchema, packedUserDetailedSchema } from '../../../users/backend/user.schema.js';
 import { packedNoteSchema } from '../../../notes/backend/note.schema.js';
+import { packedHashtagSchema } from './hashtag.schema.js';
 const misskeyId = v.pipe(v.string(), v.regex(/^[a-zA-Z0-9]+$/));
 
 export const packedHashtagsListInput = objectInput({
-	"limit": v.optional(v.pipe(v.pipe(v.number(), v.integer()), v.minValue(1), v.maxValue(100)), 10),
-	"attachedToUserOnly": v.optional(v.boolean(), false),
-	"attachedToLocalUserOnly": v.optional(v.boolean(), false),
-	"attachedToRemoteUserOnly": v.optional(v.boolean(), false),
-	"sort": v.picklist(["+mentionedUsers", "-mentionedUsers", "+mentionedLocalUsers", "-mentionedLocalUsers", "+mentionedRemoteUsers", "-mentionedRemoteUsers", "+attachedUsers", "-attachedUsers", "+attachedLocalUsers", "-attachedLocalUsers", "+attachedRemoteUsers", "-attachedRemoteUsers"]),
+	'limit': v.optional(v.pipe(v.pipe(v.number(), v.integer()), v.minValue(1), v.maxValue(100)), 10),
+	'attachedToUserOnly': v.optional(v.boolean(), false),
+	'attachedToLocalUserOnly': v.optional(v.boolean(), false),
+	'attachedToRemoteUserOnly': v.optional(v.boolean(), false),
+	'sort': v.picklist(['+mentionedUsers', '-mentionedUsers', '+mentionedLocalUsers', '-mentionedLocalUsers', '+mentionedRemoteUsers', '-mentionedRemoteUsers', '+attachedUsers', '-attachedUsers', '+attachedLocalUsers', '-attachedLocalUsers', '+attachedRemoteUsers', '-attachedRemoteUsers']),
 });
 export const packedHashtagsShowInput = objectInput({
-	"tag": v.string(),
+	'tag': v.string(),
 });
 export const packedHashtagsUsersInput = objectInput({
-	"tag": v.string(),
-	"limit": v.optional(v.pipe(v.pipe(v.number(), v.integer()), v.minValue(1), v.maxValue(100)), 10),
-	"offset": v.optional(v.pipe(v.number(), v.integer()), 0),
-	"sort": v.picklist(["+follower", "-follower", "+createdAt", "-createdAt", "+updatedAt", "-updatedAt"]),
-	"state": v.optional(v.picklist(["all", "alive"]), "all"),
-	"origin": v.optional(v.picklist(["combined", "local", "remote"]), "local"),
+	'tag': v.string(),
+	'limit': v.optional(v.pipe(v.pipe(v.number(), v.integer()), v.minValue(1), v.maxValue(100)), 10),
+	'offset': v.optional(v.pipe(v.number(), v.integer()), 0),
+	'sort': v.picklist(['+follower', '-follower', '+createdAt', '-createdAt', '+updatedAt', '-updatedAt']),
+	'state': v.optional(v.picklist(['all', 'alive']), 'all'),
+	'origin': v.optional(v.picklist(['combined', 'local', 'remote']), 'local'),
 });
 export const packedNotesFeaturedInput = objectInput({
-	"limit": v.optional(v.pipe(v.pipe(v.number(), v.integer()), v.minValue(1), v.maxValue(100)), 10),
-	"untilId": v.exactOptional(misskeyId),
-	"channelId": v.exactOptional(v.nullable(misskeyId)),
+	'limit': v.optional(v.pipe(v.pipe(v.number(), v.integer()), v.minValue(1), v.maxValue(100)), 10),
+	'untilId': v.exactOptional(misskeyId),
+	'channelId': v.exactOptional(v.nullable(misskeyId)),
 });
 export const packedUsersFeaturedNotesInput = objectInput({
-	"limit": v.optional(v.pipe(v.pipe(v.number(), v.integer()), v.minValue(1), v.maxValue(100)), 10),
-	"untilId": v.exactOptional(misskeyId),
-	"userId": misskeyId,
+	'limit': v.optional(v.pipe(v.pipe(v.number(), v.integer()), v.minValue(1), v.maxValue(100)), 10),
+	'untilId': v.exactOptional(misskeyId),
+	'userId': misskeyId,
 });
 export const packedUsersGetFrequentlyRepliedUsersInput = objectInput({
-	"userId": misskeyId,
-	"limit": v.optional(v.pipe(v.pipe(v.number(), v.integer()), v.minValue(1), v.maxValue(100)), 10),
+	'userId': misskeyId,
+	'limit': v.optional(v.pipe(v.pipe(v.number(), v.integer()), v.minValue(1), v.maxValue(100)), 10),
 });
 export const packedUsersRecommendationInput = objectInput({
-	"limit": v.optional(v.pipe(v.pipe(v.number(), v.integer()), v.minValue(1), v.maxValue(100)), 10),
-	"offset": v.optional(v.pipe(v.number(), v.integer()), 0),
+	'limit': v.optional(v.pipe(v.pipe(v.number(), v.integer()), v.minValue(1), v.maxValue(100)), 10),
+	'offset': v.optional(v.pipe(v.number(), v.integer()), 0),
 });
 export const packedUsersSearchInput = objectInput({
-	"query": v.string(),
-	"offset": v.optional(v.pipe(v.number(), v.integer()), 0),
-	"limit": v.optional(v.pipe(v.pipe(v.number(), v.integer()), v.minValue(1), v.maxValue(100)), 10),
-	"origin": v.optional(v.picklist(["local", "remote", "combined"]), "combined"),
-	"detail": v.optional(v.boolean(), true),
+	'query': v.string(),
+	'offset': v.optional(v.pipe(v.number(), v.integer()), 0),
+	'limit': v.optional(v.pipe(v.pipe(v.number(), v.integer()), v.minValue(1), v.maxValue(100)), 10),
+	'origin': v.optional(v.picklist(['local', 'remote', 'combined']), 'combined'),
+	'detail': v.optional(v.boolean(), true),
 });
 export const inlineHashtagsSearchInput = objectInput({
-	"limit": v.optional(v.pipe(v.pipe(v.number(), v.integer()), v.minValue(1), v.maxValue(100)), 10),
-	"query": v.string(),
-	"offset": v.optional(v.pipe(v.number(), v.integer()), 0),
+	'limit': v.optional(v.pipe(v.pipe(v.number(), v.integer()), v.minValue(1), v.maxValue(100)), 10),
+	'query': v.string(),
+	'offset': v.optional(v.pipe(v.number(), v.integer()), 0),
 });
 export const inlineHashtagsTrendInput = v.optional(objectInput({}), {});
 const searchTagCommon = {

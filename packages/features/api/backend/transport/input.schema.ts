@@ -6,8 +6,7 @@
 import * as v from 'valibot';
 
 export const rawObjectInputGuard = v.pipe(
-	v.unknown(),
-	v.check(value => value !== null && typeof value === 'object' && !Array.isArray(value)
+	v.custom<object>(value => value !== null && typeof value === 'object' && !Array.isArray(value)
 		&& (Object.getPrototypeOf(value) === Object.prototype || Object.getPrototypeOf(value) === null), 'Expected an object'),
 	v.transform(() => ({})),
 );

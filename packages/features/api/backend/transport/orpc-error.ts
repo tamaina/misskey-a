@@ -37,13 +37,13 @@ export const internalError = {
 export function normalizeError(error: unknown): ORPCError<string, unknown> {
 	if (error instanceof ApiError) {
 		const data = v.safeParse(apiErrorData, { id: error.id, kind: error.kind,
-			...(error.info == null ? {} : { info: error.info }) });
+																																											...(error.info == null ? {} : { info: error.info }) });
 		if (data.success) return apiError({ code: error.code, message: error.message,
-			id: data.output.id, kind: data.output.kind, status: error.httpStatusCode }, data.output.info);
+																																						id: data.output.id, kind: data.output.kind, status: error.httpStatusCode }, data.output.info);
 	}
 	if (error instanceof ORPCError) {
 		if (error.code === 'BAD_REQUEST') return apiError({ code: 'INVALID_PARAM', message: 'Invalid param.',
-			id: '3d81ceae-475f-4600-b2a8-2bc116157532' }, { reason: error.message });
+																																																						id: '3d81ceae-475f-4600-b2a8-2bc116157532' }, { reason: error.message });
 		if (v.safeParse(apiErrorData, error.data).success) return error;
 	}
 	return apiError(internalError);

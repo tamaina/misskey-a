@@ -134,7 +134,7 @@ test('chat, collection, emoji administration and notification commands derive fr
 	expectType<void>(await cli.request('chat/read-all'));
 	expectType<void>(await cli.request('chat/rooms/mute', { roomId: 'room1', mute: true }));
 	expectType<void>(await cli.request('chat/messages/react', { messageId: 'message1', reaction: '👍' }));
-	expectType<void>(await cli.request('clips/add-note', { clipId: 'clip1', noteId: 'note1' }));
+	expectType<null>(await cli.request('clips/add-note', { clipId: 'clip1', noteId: 'note1' }));
 	expectType<null>(await cli.request('admin/emoji/set-category-bulk', { ids: [], category: null }));
 	expectType<null>(await cli.request('admin/emoji/add-aliases-bulk', { ids: ['emoji1'], aliases: [] }));
 	expectType<null>(await cli.request('notifications/create', { body: 'hello', header: null }));
@@ -152,8 +152,8 @@ test('chat, collection, emoji administration and notification commands derive fr
 
 test('list, announcement, decoration and webhook commands derive from contracts', async () => {
 	const cli = new Misskey.api.APIClient({ origin: 'https://misskey.test' });
-	expectType<void>(await cli.request('users/lists/update-membership', { listId: 'list1', userId: 'user1', withReplies: false }));
-	expectType<void>(await cli.request('users/lists/favorite', { listId: 'list1' }));
+	expectType<null>(await cli.request('users/lists/update-membership', { listId: 'list1', userId: 'user1', withReplies: false }));
+	expectType<null>(await cli.request('users/lists/favorite', { listId: 'list1' }));
 	expectType<null>(await cli.request('admin/avatar-decorations/update', { id: 'decoration1', category: null }));
 	expectType<null>(await cli.request('admin/announcements/update', { id: 'announcement1', imageUrl: null, icon: 'info' }));
 	expectType<null>(await cli.request('i/read-announcement', { announcementId: 'announcement1' }));
@@ -174,8 +174,8 @@ test('channel interactions and clip favorites derive from contracts', async () =
 	expectType<void>(await cli.request('channels/unfavorite', { channelId: 'channel1' }));
 	expectType<void>(await cli.request('channels/mute/create', { channelId: 'channel1', expiresAt: null }));
 	expectType<void>(await cli.request('channels/mute/create', { channelId: 'channel1', expiresAt: 1234 }));
-	expectType<void>(await cli.request('clips/favorite', { clipId: 'clip1' }));
-	expectType<void>(await cli.request('clips/unfavorite', { clipId: 'clip1' }));
+	expectType<null>(await cli.request('clips/favorite', { clipId: 'clip1' }));
+	expectType<null>(await cli.request('clips/unfavorite', { clipId: 'clip1' }));
 	// @ts-expect-error channel id is required
 	cli.request('channels/follow', {});
 	// @ts-expect-error expiry remains a number or null

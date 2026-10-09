@@ -5,7 +5,7 @@ import { requestRoutes } from '#api-routing';
 import { apiErrorData } from '#pilot-error-data';
 import { OpenAPILink } from '@orpc/openapi-client/fetch';
 import type { pilotContract } from '#pilot-contract';
-import routing from './autogen/pilot-routing.js';
+import routing, { nullableResponses } from './autogen/pilot-routing.js';
 import { fetchPilotResponse, jsonPilotResponse } from './orpc-fetch.js';
 import type { FetchLike } from './api.js';
 
@@ -16,6 +16,7 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 	return value !== null && typeof value === 'object' && !Array.isArray(value);
 }
 
+const nullablePaths = new Set(nullableResponses.map(path => JSON.stringify(path)));
 const paths = new Map(requestRoutes(routing).map(route => [route.name, route.path]));
 
 export interface PilotTransport {
@@ -34,13 +35,15 @@ export function createPilotClient(options: {
 		url: () => `${options.origin()}/api`,
 		interceptors: [async ({ next, ...call }) => {
 			try {
-				return await next({
+				const output = await next({
 					...call,
 					input: isRecord(call.input) || call.input === undefined ? {
 						...call.input,
 						i: call.context.credential === undefined ? options.credential() : call.context.credential,
 					} : call.input,
 				});
+				//204 carries no body. Restore logical null only where the contract accepts null.
+				return output === undefined && nullablePaths.has(JSON.stringify(call.path)) ? null : output;
 			} catch (error) {
 				if (!(error instanceof ORPCError)) throw error;
 				// Never trust a remote defined flag, even for standard oRPC proxy errors.

@@ -3,12 +3,12 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { notesDeleteContract, notesDeleteInput } from '../backend/endpoints/notes/delete.contract.js';
 import { oc } from '@orpc/contract';
-import type { InferContractRouterInputs, InferContractRouterOutputs } from '@orpc/contract';
 import * as v from 'valibot';
-import type { ApiErrorDefinition } from '../../api/contract/index.js';
+import { notesDeleteContract, notesDeleteInput } from '../backend/endpoints/notes/delete.contract.js';
 import { jsonString, misskeyId } from '../../api/contract/index.js';
+import type { InferContractRouterInputs, InferContractRouterOutputs } from '@orpc/contract';
+import type { ApiErrorDefinition } from '../../api/contract/index.js';
 
 /** Inputs for the existing void-returning note commands being served through oRPC. */
 export const notesCommandInputs = {

@@ -3,22 +3,16 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { legacyNotesCommandSchemas } from '../../commands.js';
-import { notesCommandErrors, notesCommandsContract } from '../../../contract/index.js';
-import type { Schema } from '@features/api/backend/utility/json-schema.js';
-import ms from 'ms';
-import { createContractTransportEndpoint } from '@features/api/backend/transport/contract-transport-endpoint.js';
-import { defineFeatureEndpoint } from '@features/api/backend/transport/feature-endpoint.js';
+import { implement } from '@orpc/server';
+import { authentication, apiPolicy, requirePrincipal } from '../../../../api/backend/transport/middleware.js';
+import { notesUnrenoteContract, notesUnrenotePolicy } from './unrenote.contract.js';
+import type { ApiActor } from '../../../../api/backend/transport/context.js';
+import type { NotesApiContext } from '../../operations.js';
 
-export const meta = {
-	tags: ['notes'],
-	requireCredential: true,
-	kind: 'write:notes',
-	limit: { duration: ms('1hour'), max: 300, minInterval: ms('1sec') },
-	errors: notesCommandErrors['notes/unrenote'],
-} as const;
-
-export const paramDef = legacyNotesCommandSchemas['notes/unrenote'].input as Schema;
-
-export const { feature, createEndpoint } = defineFeatureEndpoint('notesCommands', commands =>
-	createContractTransportEndpoint(meta, paramDef, notesCommandsContract['notes/unrenote'], async (params, user) => commands['notes/unrenote'](params, { context: { actor: user } })));
+export function createNotesUnrenoteProcedure<Actor extends ApiActor>() {
+	return implement(notesUnrenoteContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<NotesApiContext<Actor>>()
+		.use(authentication<Actor>())
+		.use(apiPolicy<Actor>(notesUnrenotePolicy))
+		.use(requirePrincipal<Actor>())
+		.handler(({ input, context }) => context.operations.notes.notesUnrenote(input, context.principal));
+}

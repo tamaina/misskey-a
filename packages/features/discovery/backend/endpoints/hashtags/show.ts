@@ -3,23 +3,23 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import type { MiLocalUser } from '@features/users/backend/models/User.js';
-import type { DiscoveryInputs } from '../discovery.contract.js';
 import { Inject, Injectable } from '@nestjs/common';
-
-import type { HashtagsRepository } from '@features/persistence/backend/repositories/models.js';
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
+import { DI } from '@/di-symbols.js';
 import { normalizeForSearch } from '../../utility/normalize-for-search.js';
 import { HashtagEntityService } from '../../serializers/HashtagEntityService.js';
-import { DI } from '@/di-symbols.js';
-import { apiError } from '@features/api/backend/transport/orpc-error.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+import type { DiscoveryInputs } from '../discovery.contract.js';
+
+import type { HashtagsRepository } from '@features/persistence/backend/repositories/models.js';
 
 const errors = {
-		noSuchHashtag: {
+	noSuchHashtag: {
 		message: 'No such hashtag.',
 		code: 'NO_SUCH_HASHTAG',
 		id: '110ee688-193e-4a3a-9ecf-c167b2e6981e',
-		},
-	} as const;
+	},
+} as const;
 
 @Injectable()
 export class HashtagsShowOperation {

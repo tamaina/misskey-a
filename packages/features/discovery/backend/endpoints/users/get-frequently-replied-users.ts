@@ -3,25 +3,25 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import type { MiLocalUser } from '@features/users/backend/models/User.js';
-import type { DiscoveryInputs } from '../discovery.contract.js';
 import { Inject, Injectable } from '@nestjs/common';
 import { maximum } from '@features/runtime/backend/data/array.js';
-import type { NotesRepository } from '@features/persistence/backend/repositories/models.js';
 
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import { QueryService } from '@features/notes/backend/services/QueryService.js';
-import { DI } from '@/di-symbols.js';
 import { GetterService } from '@features/api/backend/transport/GetterService.js';
 import { apiError } from '@features/api/backend/transport/orpc-error.js';
+import { DI } from '@/di-symbols.js';
+import type { NotesRepository } from '@features/persistence/backend/repositories/models.js';
+import type { DiscoveryInputs } from '../discovery.contract.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
 
 const errors = {
-		noSuchUser: {
+	noSuchUser: {
 		message: 'No such user.',
 		code: 'NO_SUCH_USER',
 		id: 'e6965129-7b2a-40a4-bae2-cd84cd434822',
-		},
-	} as const;
+	},
+} as const;
 
 @Injectable()
 export class UsersGetFrequentlyRepliedUsersOperation {

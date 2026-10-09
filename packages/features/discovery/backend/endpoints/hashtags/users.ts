@@ -3,15 +3,15 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import type { MiLocalUser } from '@features/users/backend/models/User.js';
-import type { DiscoveryInputs } from '../discovery.contract.js';
 import { Inject, Injectable } from '@nestjs/common';
 
-import type { UsersRepository } from '@features/persistence/backend/repositories/models.js';
-import { safeForSql } from "@features/persistence/backend/utility/safe-for-sql.js";
-import { normalizeForSearch } from '../../utility/normalize-for-search.js';
+import { safeForSql } from '@features/persistence/backend/utility/safe-for-sql.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import { DI } from '@/di-symbols.js';
+import { normalizeForSearch } from '../../utility/normalize-for-search.js';
+import type { UsersRepository } from '@features/persistence/backend/repositories/models.js';
+import type { DiscoveryInputs } from '../discovery.contract.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
 
 @Injectable()
 export class HashtagsUsersOperation {

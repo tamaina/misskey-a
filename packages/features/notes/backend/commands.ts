@@ -3,10 +3,16 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import type { JsonSchema } from '@valibot/to-json-schema';
-import type { ApiErrorDefinition } from '@features/api/contract/index.js';
-import { toLegacyJsonSchema, featureProcedure } from '@features/api/backend/index.js';
-import { notesCommandErrors, notesCommandInputs, notesCommandsContract } from '../contract/index.js';
+import { readErrorId } from './request.schema.js';
+import { notesDraftsDeleteInput, notesDraftsDeleteErrors } from './endpoints/notes/drafts/delete.contract.js';
+import { notesReactionsCreateInput, notesReactionsCreateErrors } from './endpoints/notes/reactions/create.contract.js';
+import { notesReactionsDeleteInput, notesReactionsDeleteErrors } from './endpoints/notes/reactions/delete.contract.js';
+import { notesThreadMutingCreateInput, notesThreadMutingCreateErrors } from './endpoints/notes/thread-muting/create.contract.js';
+import { notesThreadMutingDeleteInput, notesThreadMutingDeleteErrors } from './endpoints/notes/thread-muting/delete.contract.js';
+import { notesUnrenoteInput, notesUnrenoteErrors } from './endpoints/notes/unrenote.contract.js';
+import { promoReadInput, promoReadErrors } from './endpoints/promo/read.contract.js';
+import type { ErrorDefinition } from '../../api/backend/transport/orpc-error.js';
+import type * as v from 'valibot';
 
 export interface NotesCommandActor {
 	id: string;
@@ -62,112 +68,80 @@ export interface NotesCommandsDependencies<
 	insertPromoRead(id: string, noteId: string, userId: string): Promise<unknown>;
 
 	newId(): string;
-	createError(definition: ApiErrorDefinition): Error;
-}
-
-function requireActor<Actor extends NotesCommandActor>(context: NotesCommandContext<Actor> | null | undefined): Actor {
-	if (context?.actor == null || typeof context.actor.id !== 'string' || context.actor.id.length === 0) {
-		throw new Error('An authenticated note actor is required');
-	}
-
-	return context.actor;
-}
-
-function readErrorId(error: unknown): unknown {
-	// Preserve the old direct `.id` check, including its behavior for malformed nullish rejections.
-	return (error as { id?: unknown }).id;
-}
-
-function mapError<Actor extends NotesCommandActor, Note extends NotesCommandNote, Draft extends NotesCommandDraft, Author extends NotesCommandAuthor>(
-	deps: NotesCommandsDependencies<Actor, Note, Draft, Author>,
-	error: unknown,
-	errorId: string,
-	definition: ApiErrorDefinition,
-): never {
-	if (readErrorId(error) === errorId) throw deps.createError(definition);
-	throw error;
+	createError(definition: ErrorDefinition): Error;
 }
 
 const getterNoteNotFoundId = '9725d0ce-ba28-4dde-95a7-2cbb2c15de24';
 
-/** Create the note write commands using only typed service ports and a trusted authenticated actor. */
-export function createNotesCommands<
+/** Direct application operations; no API transport or legacy endpoint is invoked. */
+export function createNotesCommandOperations<
 	Actor extends NotesCommandActor,
 	Note extends NotesCommandNote,
 	Draft extends NotesCommandDraft,
 	Author extends NotesCommandAuthor,
 >(deps: NotesCommandsDependencies<Actor, Note, Draft, Author>) {
-	const bind = featureProcedure<NotesCommandContext<Actor>>();
-	const getNote = async (noteId: string, errorDefinition: ApiErrorDefinition): Promise<Note> => {
-		try {
-			return await deps.getNote(noteId);
-		} catch (error) {
-			mapError(deps, error, getterNoteNotFoundId, errorDefinition);
+	const getNote = async (noteId: string, errorDefinition: ErrorDefinition): Promise<Note> => {
+		try { return await deps.getNote(noteId); } catch (error) {
+			if (readErrorId(error) === getterNoteNotFoundId) throw deps.createError(errorDefinition);
+			throw error;
 		}
 	};
-
 	return {
-		'notes/drafts/delete': bind(notesCommandsContract['notes/drafts/delete'], async ({ input, context }) => {
-			const actor = requireActor(context);
+		async notesDraftsDelete(input: v.InferOutput<typeof notesDraftsDeleteInput>, actor: Actor): Promise<void> {
 			const draft = await deps.getDraft(actor, input.draftId);
-			if (draft == null) throw deps.createError(notesCommandErrors['notes/drafts/delete'].noSuchNoteDraft);
+			if (draft == null) throw deps.createError(notesDraftsDeleteErrors.noSuchNoteDraft);
 
 			if (draft.userId !== actor.id) {
-				throw deps.createError(notesCommandErrors['notes/drafts/delete'].accessDenied);
+				throw deps.createError(notesDraftsDeleteErrors.accessDenied);
 			}
 
 			await deps.deleteDraft(actor, draft.id);
-		}),
-		'notes/reactions/create': bind(notesCommandsContract['notes/reactions/create'], async ({ input, context }) => {
-			const actor = requireActor(context);
-			const note = await getNote(input.noteId, notesCommandErrors['notes/reactions/create'].noSuchNote);
+		},
+		async notesReactionsCreate(input: v.InferOutput<typeof notesReactionsCreateInput>, actor: Actor): Promise<void> {
+			const note = await getNote(input.noteId, notesReactionsCreateErrors.noSuchNote);
 			try {
 				await deps.createReaction(actor, note, input.reaction);
 			} catch (error) {
 				const errorId = readErrorId(error);
 				if (errorId === '51c42bb4-931a-456b-bff7-e5a8a70dd298') {
-					throw deps.createError(notesCommandErrors['notes/reactions/create'].alreadyReacted);
+					throw deps.createError(notesReactionsCreateErrors.alreadyReacted);
 				}
 				if (errorId === 'e70412a4-7197-4726-8e74-f3e0deb92aa7') {
-					throw deps.createError(notesCommandErrors['notes/reactions/create'].youHaveBeenBlocked);
+					throw deps.createError(notesReactionsCreateErrors.youHaveBeenBlocked);
 				}
 				if (errorId === '12c35529-3c79-4327-b1cc-e2cf63a71925') {
-					throw deps.createError(notesCommandErrors['notes/reactions/create'].cannotReactToRenote);
+					throw deps.createError(notesReactionsCreateErrors.cannotReactToRenote);
 				}
 				throw error;
 			}
-		}),
-		'notes/reactions/delete': bind(notesCommandsContract['notes/reactions/delete'], async ({ input, context }) => {
-			const actor = requireActor(context);
-			const note = await getNote(input.noteId, notesCommandErrors['notes/reactions/delete'].noSuchNote);
+		},
+		async notesReactionsDelete(input: v.InferOutput<typeof notesReactionsDeleteInput>, actor: Actor): Promise<void> {
+			const note = await getNote(input.noteId, notesReactionsDeleteErrors.noSuchNote);
 			try {
 				await deps.deleteReaction(actor, note);
 			} catch (error) {
 				if (readErrorId(error) === '60527ec9-b4cb-4a88-a6bd-32d3ad26817d') {
-					throw deps.createError(notesCommandErrors['notes/reactions/delete'].notReacted);
+					throw deps.createError(notesReactionsDeleteErrors.notReacted);
 				}
 				throw error;
 			}
-		}),
-		'notes/thread-muting/create': bind(notesCommandsContract['notes/thread-muting/create'], async ({ input, context }) => {
-			const actor = requireActor(context);
-			const note = await getNote(input.noteId, notesCommandErrors['notes/thread-muting/create'].noSuchNote);
+		},
+		async notesThreadMutingCreate(input: v.InferOutput<typeof notesThreadMutingCreateInput>, actor: Actor): Promise<void> {
+			const note = await getNote(input.noteId, notesThreadMutingCreateErrors.noSuchNote);
 			const threadId = note.threadId ?? note.id;
 
 			if (await deps.threadMuteExists(threadId, actor.id)) {
-				throw deps.createError(notesCommandErrors['notes/thread-muting/create'].alreadyMuting);
+				throw deps.createError(notesThreadMutingCreateErrors.alreadyMuting);
 			}
 
 			await deps.insertThreadMute(deps.newId(), threadId, actor.id);
-		}),
-		'notes/thread-muting/delete': bind(notesCommandsContract['notes/thread-muting/delete'], async ({ input, context }) => {
-			const actor = requireActor(context);
-			const note = await getNote(input.noteId, notesCommandErrors['notes/thread-muting/delete'].noSuchNote);
+		},
+		async notesThreadMutingDelete(input: v.InferOutput<typeof notesThreadMutingDeleteInput>, actor: Actor): Promise<void> {
+			const note = await getNote(input.noteId, notesThreadMutingDeleteErrors.noSuchNote);
 			await deps.deleteThreadMute(note.threadId ?? note.id, actor.id);
-		}),
-		'notes/unrenote': bind(notesCommandsContract['notes/unrenote'], async ({ input, context }) => {
-			const actor = requireActor(context);
-			const note = await getNote(input.noteId, notesCommandErrors['notes/unrenote'].noSuchNote);
+		},
+		async notesUnrenote(input: v.InferOutput<typeof notesUnrenoteInput>, actor: Actor): Promise<void> {
+			const note = await getNote(input.noteId, notesUnrenoteErrors.noSuchNote);
 			const renotes = await deps.findRenotesByUserAndRenote(actor.id, note.id);
 
 			for (const renote of renotes) {
@@ -175,31 +149,17 @@ export function createNotesCommands<
 				// This was deliberately fire-and-forget in the legacy handler.
 				deps.deleteNote(author, renote);
 			}
-		}),
-		'promo/read': bind(notesCommandsContract['promo/read'], async ({ input, context }) => {
-			const actor = requireActor(context);
-			const note = await getNote(input.noteId, notesCommandErrors['promo/read'].noSuchNote);
+		},
+		async promoRead(input: v.InferOutput<typeof promoReadInput>, actor: Actor): Promise<void> {
+			const note = await getNote(input.noteId, promoReadErrors.noSuchNote);
 
 			if (await deps.promoReadExists(note.id, actor.id)) return;
 
 			await deps.insertPromoRead(deps.newId(), note.id, actor.id);
-		}),
+		},
 	};
 }
 
-export type NotesCommandsFeature<
-	Actor extends NotesCommandActor,
-	Note extends NotesCommandNote,
-	Draft extends NotesCommandDraft,
-	Author extends NotesCommandAuthor,
-> = ReturnType<typeof createNotesCommands<Actor, Note, Draft, Author>>;
-
-export const legacyNotesCommandSchemas: Record<Exclude<keyof typeof notesCommandInputs, 'notes/delete'>, { input: JsonSchema }> = {
-	'notes/drafts/delete': { input: toLegacyJsonSchema(notesCommandInputs['notes/drafts/delete'], { target: 'openapi-3.0' }) },
-	'notes/reactions/create': { input: toLegacyJsonSchema(notesCommandInputs['notes/reactions/create'], { target: 'openapi-3.0' }) },
-	'notes/reactions/delete': { input: toLegacyJsonSchema(notesCommandInputs['notes/reactions/delete'], { target: 'openapi-3.0' }) },
-	'notes/thread-muting/create': { input: toLegacyJsonSchema(notesCommandInputs['notes/thread-muting/create'], { target: 'openapi-3.0' }) },
-	'notes/thread-muting/delete': { input: toLegacyJsonSchema(notesCommandInputs['notes/thread-muting/delete'], { target: 'openapi-3.0' }) },
-	'notes/unrenote': { input: toLegacyJsonSchema(notesCommandInputs['notes/unrenote'], { target: 'openapi-3.0' }) },
-	'promo/read': { input: toLegacyJsonSchema(notesCommandInputs['promo/read'], { target: 'openapi-3.0' }) },
-};
+export type NotesCommandOperations<Actor extends NotesCommandActor, Note extends NotesCommandNote, Draft extends NotesCommandDraft, Author extends NotesCommandAuthor> = ReturnType<typeof createNotesCommandOperations<Actor, Note, Draft, Author>>;
+export const createNotesCommands = createNotesCommandOperations;
+export type NotesCommandsFeature<Actor extends NotesCommandActor, Note extends NotesCommandNote, Draft extends NotesCommandDraft, Author extends NotesCommandAuthor> = NotesCommandOperations<Actor, Note, Draft, Author>;

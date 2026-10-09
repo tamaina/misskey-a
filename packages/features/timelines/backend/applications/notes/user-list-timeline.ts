@@ -1,0 +1,206 @@
+/*
+ * SPDX-FileCopyrightText: syuilo and misskey-project
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
+
+import { Inject, Injectable } from '@nestjs/common';
+import { Brackets } from 'typeorm';
+
+import { NoteEntityService } from '@features/notes/backend/serializers/NoteEntityService.js';
+import { ActiveUsersChart } from '@features/statistics/backend/charts/active-users.js';
+import { IdService } from '@features/runtime/backend/services/IdService.js';
+import { QueryService } from '@features/notes/backend/services/QueryService.js';
+import { ChannelMutingService } from '@features/channels/backend/services/ChannelMutingService.js';
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
+import { DI } from '@/di-symbols.js';
+import { FanoutTimelineEndpointService } from '../../services/FanoutTimelineEndpointService.js';
+
+import { notesUserListTimelineInput, notesUserListTimelineErrors } from '../../endpoints/notes/user-list-timeline.contract.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+import type * as v from 'valibot';
+import type { MiMeta, MiUserList, NotesRepository, UserListMembershipsRepository, UserListsRepository } from '@features/persistence/backend/repositories/models.js';
+
+@Injectable()
+export class NotesUserListTimelineApplicationService {
+	constructor(
+		@Inject(DI.meta)
+		private serverSettings: MiMeta,
+
+		@Inject(DI.notesRepository)
+		private notesRepository: NotesRepository,
+
+		@Inject(DI.userListsRepository)
+		private userListsRepository: UserListsRepository,
+
+		@Inject(DI.userListMembershipsRepository)
+		private userListMembershipsRepository: UserListMembershipsRepository,
+
+		private noteEntityService: NoteEntityService,
+		private activeUsersChart: ActiveUsersChart,
+		private idService: IdService,
+		private fanoutTimelineEndpointService: FanoutTimelineEndpointService,
+		private queryService: QueryService,
+		private channelMutingService: ChannelMutingService,
+	) {}
+
+	async execute(ps: v.InferOutput<typeof notesUserListTimelineInput>, me: MiLocalUser) {
+		const untilId = ps.untilId ?? (ps.untilDate ? this.idService.gen(ps.untilDate!) : null);
+		const sinceId = ps.sinceId ?? (ps.sinceDate ? this.idService.gen(ps.sinceDate!) : null);
+
+		const list = await this.userListsRepository.findOneBy({
+			id: ps.listId,
+			userId: me.id,
+		});
+
+		if (list == null) {
+			throw apiError(notesUserListTimelineErrors.noSuchList);
+		}
+
+		if (!this.serverSettings.enableFanoutTimeline) {
+			const timeline = await this.getFromDb(list, {
+				untilId,
+				sinceId,
+				limit: ps.limit,
+				includeMyRenotes: ps.includeMyRenotes,
+				includeRenotedMyNotes: ps.includeRenotedMyNotes,
+				includeLocalRenotes: ps.includeLocalRenotes,
+				withFiles: ps.withFiles,
+				withRenotes: ps.withRenotes,
+			}, me);
+
+			this.activeUsersChart.read(me);
+
+			return await this.noteEntityService.packMany(timeline, me);
+		}
+
+		const timeline = await this.fanoutTimelineEndpointService.timeline({
+			untilId,
+			sinceId,
+			limit: ps.limit,
+			allowPartial: ps.allowPartial,
+			me,
+			useDbFallback: this.serverSettings.enableFanoutTimelineDbFallback,
+			redisTimelines: ps.withFiles ? [`userListTimelineWithFiles:${list.id}`] : [`userListTimeline:${list.id}`],
+			alwaysIncludeMyNotes: true,
+			excludePureRenotes: !ps.withRenotes,
+			dbFallback: async (untilId, sinceId, limit) => await this.getFromDb(list, {
+				untilId,
+				sinceId,
+				limit,
+				includeMyRenotes: ps.includeMyRenotes,
+				includeRenotedMyNotes: ps.includeRenotedMyNotes,
+				includeLocalRenotes: ps.includeLocalRenotes,
+				withFiles: ps.withFiles,
+				withRenotes: ps.withRenotes,
+			}, me),
+		});
+
+		this.activeUsersChart.read(me);
+
+		return timeline;
+	}
+
+	private async getFromDb(list: MiUserList, ps: {
+		untilId: string | null,
+		sinceId: string | null,
+		limit: number,
+		includeMyRenotes: boolean,
+		includeRenotedMyNotes: boolean,
+		includeLocalRenotes: boolean,
+		withFiles: boolean,
+		withRenotes: boolean,
+	}, me: MiLocalUser) {
+		//#region Construct query
+		const query = this.queryService.makePaginationQuery(this.notesRepository.createQueryBuilder('note'), ps.sinceId, ps.untilId)
+			.innerJoin(this.userListMembershipsRepository.metadata.targetName, 'userListMemberships', 'userListMemberships.userId = note.userId')
+			.innerJoinAndSelect('note.user', 'user')
+			.leftJoinAndSelect('note.reply', 'reply')
+			.leftJoinAndSelect('note.renote', 'renote')
+			.leftJoinAndSelect('reply.user', 'replyUser')
+			.leftJoinAndSelect('renote.user', 'renoteUser')
+			.andWhere('userListMemberships.userListId = :userListId', { userListId: list.id })
+			.andWhere('note.channelId IS NULL') // チャンネルノートではない
+			.andWhere(new Brackets(qb => {
+				qb
+					.where('note.replyId IS NULL') // 返信ではない
+					.orWhere(new Brackets(qb => {
+						qb // 返信だけど投稿者自身への返信
+							.where('note.replyId IS NOT NULL')
+							.andWhere('note.replyUserId = note.userId');
+					}))
+					.orWhere(new Brackets(qb => {
+						qb // 返信だけど自分宛ての返信
+							.where('note.replyId IS NOT NULL')
+							.andWhere('note.replyUserId = :meId', { meId: me.id });
+					}))
+					.orWhere(new Brackets(qb => {
+						qb // 返信だけどwithRepliesがtrueの場合
+							.where('note.replyId IS NOT NULL')
+							.andWhere('userListMemberships.withReplies = true');
+					}));
+			}));
+
+		this.queryService.generateVisibilityQuery(query, me);
+		this.queryService.generateBaseNoteFilteringQuery(query, me);
+		this.queryService.generateMutedUserRenotesQueryForNotes(query, me);
+
+		// -- ミュートされたチャンネルのリノート対策
+		const mutedChannelIds = await this.channelMutingService
+			.list({ requestUserId: me.id }, { idOnly: true })
+			.then(x => x.map(x => x.id));
+		if (mutedChannelIds.length > 0) {
+			query.andWhere(new Brackets(qb => {
+				qb.orWhere('note.renoteChannelId IS NULL')
+					.orWhere('note.renoteChannelId NOT IN (:...mutedChannelIds)', { mutedChannelIds });
+			}));
+		}
+
+		if (ps.includeMyRenotes === false) {
+			query.andWhere(new Brackets(qb => {
+				qb.orWhere('note.userId != :meId', { meId: me.id });
+				qb.orWhere('note.renoteId IS NULL');
+				qb.orWhere('note.text IS NOT NULL');
+				qb.orWhere('note.fileIds != \'{}\'');
+				qb.orWhere('0 < (SELECT COUNT(*) FROM poll WHERE poll."noteId" = note.id)');
+			}));
+		}
+
+		if (ps.includeRenotedMyNotes === false) {
+			query.andWhere(new Brackets(qb => {
+				qb.orWhere('note.renoteUserId != :meId', { meId: me.id });
+				qb.orWhere('note.renoteId IS NULL');
+				qb.orWhere('note.text IS NOT NULL');
+				qb.orWhere('note.fileIds != \'{}\'');
+				qb.orWhere('0 < (SELECT COUNT(*) FROM poll WHERE poll."noteId" = note.id)');
+			}));
+		}
+
+		if (ps.includeLocalRenotes === false) {
+			query.andWhere(new Brackets(qb => {
+				qb.orWhere('note.renoteUserHost IS NOT NULL');
+				qb.orWhere('note.renoteId IS NULL');
+				qb.orWhere('note.text IS NOT NULL');
+				qb.orWhere('note.fileIds != \'{}\'');
+				qb.orWhere('0 < (SELECT COUNT(*) FROM poll WHERE poll."noteId" = note.id)');
+			}));
+		}
+
+		if (ps.withRenotes === false) {
+			query.andWhere(new Brackets(qb => {
+				qb.orWhere('note.renoteId IS NULL');
+				qb.orWhere(new Brackets(qb => {
+					qb.orWhere('note.text IS NOT NULL');
+					qb.orWhere('note.fileIds != \'{}\'');
+					qb.orWhere('0 < (SELECT COUNT(*) FROM poll WHERE poll."noteId" = note.id)');
+				}));
+			}));
+		}
+
+		if (ps.withFiles) {
+			query.andWhere('note.fileIds != \'{}\'');
+		}
+		//#endregion
+
+		return await query.limit(ps.limit).getMany();
+	}
+}

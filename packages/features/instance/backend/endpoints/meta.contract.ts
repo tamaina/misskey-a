@@ -5,8 +5,8 @@
 
 import { oc } from '@orpc/contract';
 import * as v from 'valibot';
-import { objectInput } from './input.schema.js';
 import { commonErrors } from '../../../api/backend/transport/errors.schema.js';
+import { objectInput } from './input.schema.js';
 import { packedMetaDetailedSchema, packedMetaLiteSchema } from './meta.schema.js';
 
 export const metaInput = v.optional(objectInput({ detail: v.optional(v.boolean(), true) }), {});

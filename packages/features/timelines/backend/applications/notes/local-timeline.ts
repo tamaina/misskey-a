@@ -1,0 +1,153 @@
+/*
+ * SPDX-FileCopyrightText: syuilo and misskey-project
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
+
+import { Brackets } from 'typeorm';
+import { Inject, Injectable } from '@nestjs/common';
+
+import { NoteEntityService } from '@features/notes/backend/serializers/NoteEntityService.js';
+import { ActiveUsersChart } from '@features/statistics/backend/charts/active-users.js';
+import { RoleService } from '@features/roles/backend/services/RoleService.js';
+import { IdService } from '@features/runtime/backend/services/IdService.js';
+import { QueryService } from '@features/notes/backend/services/QueryService.js';
+import { ChannelMutingService } from '@features/channels/backend/services/ChannelMutingService.js';
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
+import { DI } from '@/di-symbols.js';
+import { FanoutTimelineEndpointService } from '../../services/FanoutTimelineEndpointService.js';
+
+import { notesLocalTimelineInput, notesLocalTimelineErrors } from '../../endpoints/notes/local-timeline.contract.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+import type * as v from 'valibot';
+import type { MiMeta, NotesRepository } from '@features/persistence/backend/repositories/models.js';
+
+@Injectable()
+export class NotesLocalTimelineApplicationService {
+	constructor(
+		@Inject(DI.meta)
+		private serverSettings: MiMeta,
+
+		@Inject(DI.notesRepository)
+		private notesRepository: NotesRepository,
+
+		private noteEntityService: NoteEntityService,
+		private roleService: RoleService,
+		private activeUsersChart: ActiveUsersChart,
+		private idService: IdService,
+		private fanoutTimelineEndpointService: FanoutTimelineEndpointService,
+		private queryService: QueryService,
+		private channelMutingService: ChannelMutingService,
+	) {}
+
+	async execute(ps: v.InferOutput<typeof notesLocalTimelineInput>, me: MiLocalUser | null) {
+		const untilId = ps.untilId ?? (ps.untilDate ? this.idService.gen(ps.untilDate!) : null);
+		const sinceId = ps.sinceId ?? (ps.sinceDate ? this.idService.gen(ps.sinceDate!) : null);
+
+		const policies = await this.roleService.getUserPolicies(me ? me.id : null);
+		if (!policies.ltlAvailable) {
+			throw apiError(notesLocalTimelineErrors.ltlDisabled);
+		}
+
+		if (ps.withReplies && ps.withFiles) throw apiError(notesLocalTimelineErrors.bothWithRepliesAndWithFiles);
+
+		if (!this.serverSettings.enableFanoutTimeline) {
+			const timeline = await this.getFromDb({
+				untilId,
+				sinceId,
+				limit: ps.limit,
+				withFiles: ps.withFiles,
+				withReplies: ps.withReplies,
+			}, me);
+
+			process.nextTick(() => {
+				if (me) {
+					this.activeUsersChart.read(me);
+				}
+			});
+
+			return await this.noteEntityService.packMany(timeline, me);
+		}
+
+		const timeline = await this.fanoutTimelineEndpointService.timeline({
+			untilId,
+			sinceId,
+			limit: ps.limit,
+			allowPartial: ps.allowPartial,
+			me,
+			useDbFallback: this.serverSettings.enableFanoutTimelineDbFallback,
+			redisTimelines:
+				ps.withFiles ? ['localTimelineWithFiles']
+				: ps.withReplies ? ['localTimeline', 'localTimelineWithReplies']
+				: me ? ['localTimeline', `localTimelineWithReplyTo:${me.id}`]
+				: ['localTimeline'],
+			alwaysIncludeMyNotes: true,
+			excludePureRenotes: !ps.withRenotes,
+			dbFallback: async (untilId, sinceId, limit) => await this.getFromDb({
+				untilId,
+				sinceId,
+				limit,
+				withFiles: ps.withFiles,
+				withReplies: ps.withReplies,
+			}, me),
+		});
+
+		process.nextTick(() => {
+			if (me) {
+				this.activeUsersChart.read(me);
+			}
+		});
+
+		return timeline;
+	}
+
+	private async getFromDb(ps: {
+		sinceId: string | null,
+		untilId: string | null,
+		limit: number,
+		withFiles: boolean,
+		withReplies: boolean,
+	}, me: MiLocalUser | null) {
+		const query = this.queryService.makePaginationQuery(this.notesRepository.createQueryBuilder('note'),
+			ps.sinceId, ps.untilId)
+			.andWhere('(note.visibility = \'public\') AND (note.userHost IS NULL) AND (note.channelId IS NULL)')
+			.innerJoinAndSelect('note.user', 'user')
+			.leftJoinAndSelect('note.reply', 'reply')
+			.leftJoinAndSelect('note.renote', 'renote')
+			.leftJoinAndSelect('reply.user', 'replyUser')
+			.leftJoinAndSelect('renote.user', 'renoteUser');
+
+		this.queryService.generateVisibilityQuery(query, me);
+		this.queryService.generateBaseNoteFilteringQuery(query, me);
+		if (me) {
+			this.queryService.generateMutedUserRenotesQueryForNotes(query, me);
+
+			const mutedChannelIds = await this.channelMutingService
+				.list({ requestUserId: me.id }, { idOnly: true })
+				.then(x => x.map(x => x.id));
+			if (mutedChannelIds.length > 0) {
+				query.andWhere(new Brackets(qb => {
+					qb.orWhere('note.renoteChannelId IS NULL')
+						.orWhere('note.renoteChannelId NOT IN (:...mutedChannelIds)', { mutedChannelIds });
+				}));
+			}
+		}
+
+		if (ps.withFiles) {
+			query.andWhere('note.fileIds != \'{}\'');
+		}
+
+		if (!ps.withReplies) {
+			query.andWhere(new Brackets(qb => {
+				qb
+					.where('note.replyId IS NULL') // 返信ではない
+					.orWhere(new Brackets(qb => {
+						qb // 返信だけど投稿者自身への返信
+							.where('note.replyId IS NOT NULL')
+							.andWhere('note.replyUserId = note.userId');
+					}));
+			}));
+		}
+
+		return await query.limit(ps.limit).getMany();
+	}
+}

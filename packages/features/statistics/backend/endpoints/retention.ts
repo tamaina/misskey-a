@@ -5,9 +5,9 @@
 
 import { implement } from '@orpc/server';
 import { authentication, apiPolicy } from '../../../api/backend/transport/middleware.js';
+import { retentionContract, retentionGetContract } from './retention.contract.js';
 import type { ApiActor } from '../../../api/backend/transport/context.js';
 import type { StatisticsContext } from '../operations.js';
-import { retentionContract, retentionGetContract } from './retention.contract.js';
 
 export function createRetentionProcedure<Actor extends ApiActor>() {
 	return implement(retentionContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<StatisticsContext<Actor>>()

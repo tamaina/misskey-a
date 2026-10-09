@@ -1,0 +1,26 @@
+/*
+ * SPDX-FileCopyrightText: syuilo and misskey-project
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
+
+import { oc } from '@orpc/contract';
+import * as v from 'valibot';
+import { commonErrors, apiErrorData } from '../../../../../api/backend/transport/errors.schema.js';
+import { objectInput, misskeyId } from '../../../request.schema.js';
+import type { OpenAPI } from '@orpc/contract';
+
+export const notesThreadMutingDeleteInput = objectInput({ noteId: misskeyId });
+export const notesThreadMutingDeleteOutput = v.void();
+export const notesThreadMutingDeleteErrors = {
+	noSuchNote: {
+		message: 'No such note.',
+		code: 'NO_SUCH_NOTE',
+		id: 'bddd57ac-ceb3-b29d-4334-86ea5fae481a',
+	},
+} as const;
+export const notesThreadMutingDeletePolicy = { name: 'notes/thread-muting/delete', requireCredential: true, kind: 'write:account' } as const;
+const security: OpenAPI.SecurityRequirementObject[] = [{ bearerAuth: [] }];
+export const notesThreadMutingDeleteContract = oc.$meta<{ requestName: 'notes/thread-muting/delete' }>({ requestName: 'notes/thread-muting/delete' })
+	.route({ method: 'POST', path: '/notes/thread-muting/delete', operationId: 'post___notes___thread-muting___delete', tags: ['notes'], spec: current => ({ ...current, security }), successStatus: 204 })
+	.errors({ ...commonErrors, NO_SUCH_NOTE: { status: 400, data: apiErrorData } })
+	.input(notesThreadMutingDeleteInput).output(notesThreadMutingDeleteOutput);

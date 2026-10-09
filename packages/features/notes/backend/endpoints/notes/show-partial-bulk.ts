@@ -3,36 +3,34 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { inlineNotesShowPartialBulkDefinition, inlineNotesShowPartialBulkInput, inlineNotesShowPartialBulkOutput } from '../../../contract/endpoint-definitions.js';
+import { implement } from '@orpc/server';
 import { Injectable } from '@nestjs/common';
-
-import { NoteEntityService } from '../../serializers/NoteEntityService.js';
 import { GetterService } from '@features/api/backend/transport/GetterService.js';
-import { ApiError } from '@features/api/backend/transport/error.js';
+import * as v from 'valibot';
+import { authentication, apiPolicy } from '../../../../api/backend/transport/middleware.js';
+import { NoteEntityService } from '../../serializers/NoteEntityService.js';
+import { notesShowPartialBulkContract, notesShowPartialBulkPolicy, notesShowPartialBulkInput, notesShowPartialBulkOutput } from './show-partial-bulk.contract.js';
+import type { ApiActor } from '../../../../api/backend/transport/context.js';
+import type { NotesApiContext } from '../../operations.js';
+import type { MiLocalUser } from '../../../../users/backend/models/User.js';
 
-const contractProjection = projectEndpointContract(inlineNotesShowPartialBulkDefinition);
-
-export const meta = {
-	tags: ['notes'],
-
-	requireCredential: false,
-
-	res: contractProjection.response,
-
-	errors: {
-	},
-} as const;
-
-export const paramDef = contractProjection.input;
+export function createNotesShowPartialBulkProcedure<Actor extends ApiActor>() {
+	return implement(notesShowPartialBulkContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<NotesApiContext<Actor>>()
+		.use(authentication<Actor>())
+		.use(apiPolicy<Actor>(notesShowPartialBulkPolicy))
+		.handler(({ input, context }) => context.operations.notes.notesShowPartialBulk(input, context.principal));
+}
 
 @Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof inlineNotesShowPartialBulkInput, typeof inlineNotesShowPartialBulkOutput> {
+export class NotesShowPartialBulkOperation {
 	constructor(
 		private noteEntityService: NoteEntityService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			return await this.noteEntityService.fetchDiffs(ps.noteIds, me?.id ?? null);
-		});
+	) {}
+	async execute(ps: v.InferOutput<typeof notesShowPartialBulkInput>, me: MiLocalUser | null): Promise<v.InferOutput<typeof notesShowPartialBulkOutput>> {
+		return v.parse(notesShowPartialBulkOutput, await this.run(ps, me));
+	}
+
+	private async run(ps: v.InferOutput<typeof notesShowPartialBulkInput>, me: MiLocalUser | null) {
+		return await this.noteEntityService.fetchDiffs(ps.noteIds, me?.id ?? null);
 	}
 }

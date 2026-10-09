@@ -13,7 +13,7 @@ export const flushInput = emptyInput;
 export const flushOutput = v.void();
 const requestName = 'notifications/flush';
 export const flushContract = oc.$meta<{ requestName: typeof requestName }>({ requestName })
-	.route({ method: 'POST', path: `/${requestName}`, operationId: 'post___' + requestName.replaceAll('/', '___'), tags: ['notifications', 'account'], spec: current => ({ ...current, security: [{ bearerAuth: [] }] }), successStatus: 204, })
+	.route({ method: 'POST', path: `/${requestName}`, operationId: 'post___' + requestName.replaceAll('/', '___'), tags: ['notifications', 'account'], spec: current => ({ ...current, security: [{ bearerAuth: [] }] }), successStatus: 204 })
 	.errors(commonErrors)
 	.input(flushInput)
 	.output(flushOutput);

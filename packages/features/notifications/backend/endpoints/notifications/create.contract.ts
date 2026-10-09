@@ -12,7 +12,7 @@ export const createInput = objectInput({ body: v.string(), header: v.exactOption
 export const createOutput = v.void();
 const requestName = 'notifications/create';
 export const createContract = oc.$meta<{ requestName: typeof requestName }>({ requestName })
-	.route({ method: 'POST', path: `/${requestName}`, operationId: 'post___' + requestName.replaceAll('/', '___'), tags: ['notifications'], spec: current => ({ ...current, security: [{ bearerAuth: [] }] }), successStatus: 204, })
+	.route({ method: 'POST', path: `/${requestName}`, operationId: 'post___' + requestName.replaceAll('/', '___'), tags: ['notifications'], spec: current => ({ ...current, security: [{ bearerAuth: [] }] }), successStatus: 204 })
 	.errors(commonErrors)
 	.input(createInput)
 	.output(createOutput);

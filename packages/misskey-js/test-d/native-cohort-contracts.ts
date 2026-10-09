@@ -16,3 +16,7 @@ expectAssignable<Promise<void>>(client.orpc.notifications.flush());
 expectAssignable<Promise<{ pong: number }>>(client.orpc.instance.ping());
 client.request('charts/notes', { span: 'day' });
 client.request('i/registry/set', { key: 'theme', value: { constructor: [null, true, 1] } });
+
+expectType<Promise<{ sourceLang: string; text: string } | null>>(client.request('notes/translate', { noteId: 'note1', targetLang: 'en' }));
+expectType<{ sourceLang: string; text: string } | undefined>(await client.orpc.notes.notesTranslate({ noteId: 'note1', targetLang: 'en' }));
+expectType<{ params: { name: string; type: string; }[] } | null>(await client.orpc.instance.endpoint({ endpoint: 'unknown' }));

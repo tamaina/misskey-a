@@ -4,9 +4,9 @@
  */
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import * as v from 'valibot';
 import { createPing } from '../../../backend/built/features/instance/backend.js';
 import { instanceApiContract as instanceContract } from '../../../misskey-js/built/contracts/instance/backend/api.contract.js';
-import * as v from 'valibot';
 
 test('implementation uses the contract and an injectable clock', async () => {
 	const ping = createPing(() => 123);

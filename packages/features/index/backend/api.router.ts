@@ -4,7 +4,6 @@
  */
 
 import { implement } from '@orpc/server';
-import { pilotContract } from './api.contract.js';
 import { createInstanceRouter } from '../../instance/backend/api.router.js';
 import { createNotesRouter } from '../../notes/backend/api.router.js';
 import { createDriveRouter } from '../../drive/backend/api.router.js';
@@ -15,9 +14,20 @@ import { createAvatarDecorationsRouter } from '../../avatar-decorations/backend/
 import { createEmojisRouter } from '../../emojis/backend/api.router.js';
 import { createNotificationsRouter } from '../../notifications/backend/router.js';
 import { createPreferencesRouter } from '../../preferences/backend/router.js';
-import type { ApiExecutionContext } from './api.context.js';
-import type { ApiActor } from '../../api/backend/transport/context.js';
 import { normalizeError } from '../../api/backend/transport/orpc-error.js';
+
+import { createUsersRouter } from '../../users/backend/api.router.js';
+
+import { createTimelinesRouter } from '../../timelines/backend/router.js';
+
+import { createNoteSearchRouter } from '../../note-search/backend/router.js';
+
+import { createRelationshipsRouter } from '../../relationships/backend/endpoints/relationships.js';
+
+import { createCollectionsRouter } from '../../collections/backend/api.router.js';
+import { pilotContract } from './api.contract.js';
+import type { ApiActor } from '../../api/backend/transport/context.js';
+import type { ApiExecutionContext } from './api.context.js';
 
 export function createApiRouter<Actor extends ApiActor>() {
 	const api = implement(pilotContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiExecutionContext<Actor>>()
@@ -34,6 +44,11 @@ export function createApiRouter<Actor extends ApiActor>() {
 		emojis: createEmojisRouter<Actor>(),
 		notifications: createNotificationsRouter<Actor>(),
 		notes: createNotesRouter<Actor>(),
+		users: createUsersRouter<Actor>(),
+		timelines: createTimelinesRouter<Actor>(),
+		noteSearch: createNoteSearchRouter<Actor>(),
+		relationships: createRelationshipsRouter<Actor>(),
+		collections: createCollectionsRouter<Actor>(),
 		drive: createDriveRouter<Actor>(),
 	});
 }

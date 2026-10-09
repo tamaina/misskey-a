@@ -4,10 +4,10 @@
  */
 
 import { oc } from '@orpc/contract';
-import type { OpenAPI } from '@orpc/contract';
 import * as v from 'valibot';
 import { commonErrors } from '../../api/backend/transport/errors.schema.js';
 import * as s from './api.schema.js';
+import type { OpenAPI } from '@orpc/contract';
 
 const publicSecurity: OpenAPI.SecurityRequirementObject[] = [{}, { bearerAuth: [] }];
 

@@ -3,59 +3,41 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { packedAdminAccountsFindByEmailDefinition, packedAdminAccountsFindByEmailInput, packedAdminAccountsFindByEmailOutput } from '../../../../contract/packed-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
-
-import type { UserProfilesRepository } from '@features/persistence/backend/repositories/models.js';
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
 import { DI } from '@/di-symbols.js';
 import { UserEntityService } from '../../../serializers/UserEntityService.js';
-import { ApiError } from '@features/api/backend/transport/error.js';
+import { adminAccountsFindByEmailErrors } from './find-by-email.contract.js';
+import type { ApiToken } from '@features/api/backend/transport/context.js';
+import type { UsersInputs } from '../../../api.contract.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
 
-const contractProjection = projectEndpointContract(packedAdminAccountsFindByEmailDefinition);
-
-export const meta = {
-	tags: ['admin'],
-
-	requireCredential: true,
-	requireAdmin: true,
-	kind: 'read:admin:account',
-
-	errors: {
-		userNotFound: {
-			message: 'No such user who has the email address.',
-			code: 'USER_NOT_FOUND',
-			id: 'cb865949-8af5-4062-a88c-ef55e8786d1d',
-		},
-	},
-	res: contractProjection.response,
-} as const;
-
-export const paramDef = contractProjection.input;
+import type { UserProfilesRepository } from '@features/persistence/backend/repositories/models.js';
 
 @Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedAdminAccountsFindByEmailInput, typeof packedAdminAccountsFindByEmailOutput> {
+export class AdminAccountsFindByEmailOperation {
 	constructor(
 		@Inject(DI.userProfilesRepository)
 		private userProfilesRepository: UserProfilesRepository,
 
 		private userEntityService: UserEntityService,
 	) {
-		super(meta, contractProjection, async (ps, me) => {
-			const profile = await this.userProfilesRepository.findOne({
-				where: { email: ps.email },
-				relations: { user: true },
-			});
+	}
 
-			if (profile == null) {
-				throw new ApiError(meta.errors.userNotFound);
-			}
-
-			const res = await this.userEntityService.pack(profile.user!, null, {
-				schema: 'UserDetailedNotMe',
-			});
-
-			return res;
+	async execute(ps: UsersInputs['admin/accounts/find-by-email'], _me: MiLocalUser, _token: ApiToken | null, _ip: string) {
+		const profile = await this.userProfilesRepository.findOne({
+			where: { email: ps.email },
+			relations: { user: true },
 		});
+
+		if (profile == null || profile.user === null) {
+			throw apiError(adminAccountsFindByEmailErrors.userNotFound);
+		}
+
+		const res = await this.userEntityService.pack(profile.user, null, {
+			schema: 'UserDetailedNotMe',
+		});
+
+		return res;
 	}
 }

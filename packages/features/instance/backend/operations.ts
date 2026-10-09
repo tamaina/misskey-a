@@ -3,7 +3,17 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import * as os from 'node:os';
 import * as v from 'valibot';
+import { IsNull } from 'typeorm';
+import type { Config } from '@/config.js';
+import * as Acct from '../../federation/backend/utility/acct.js';
+import { loadSystemInformation } from '../../statistics/backend/runtime-dependencies/systeminformation.js';
+import { DEFAULT_POLICIES } from '../../roles/backend/services/RoleService.js';
+import { apiError } from '../../api/backend/transport/orpc-error.js';
+import { toPackedUserDetailed } from '../../users/backend/user.schema.js';
+import { metaOutput } from './endpoints/meta.contract.js';
+import { adminMetaOutput } from './endpoints/admin/meta.contract.js';
 import type { ApiActor, ApiContext } from '../../api/backend/transport/context.js';
 import type { InstanceApiParameters, InstanceApiOutputs } from './api.contract.js';
 import type { AdsRepository, UsersRepository } from '../../persistence/backend/repositories/models.js';
@@ -15,18 +25,8 @@ import type { MetaService } from './services/MetaService.js';
 import type { MetaEntityService } from './serializers/MetaEntityService.js';
 import type { SystemAccountService } from '../../users/backend/services/SystemAccountService.js';
 import type { UserEntityService } from '../../users/backend/serializers/UserEntityService.js';
-import type { Config } from '@/config.js';
 import type { DataSource } from 'typeorm';
 import type { Redis } from 'ioredis';
-import { IsNull } from 'typeorm';
-import * as os from 'node:os';
-import * as Acct from '../../federation/backend/utility/acct.js';
-import { loadSystemInformation } from '../../statistics/backend/runtime-dependencies/systeminformation.js';
-import { DEFAULT_POLICIES } from '../../roles/backend/services/RoleService.js';
-import { apiError } from '../../api/backend/transport/orpc-error.js';
-import { metaOutput } from './endpoints/meta.contract.js';
-import { toPackedUserDetailed } from '../../users/backend/user.schema.js';
-import { adminMetaOutput } from './endpoints/admin/meta.contract.js';
 import type { ReadEndpoints } from './index.js';
 import type { OnlineUsersCountDependencies } from './get-online-users-count.js';
 

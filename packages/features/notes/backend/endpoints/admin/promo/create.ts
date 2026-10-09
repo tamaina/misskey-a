@@ -3,66 +3,55 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { voidAdminPromoCreateDefinition, voidAdminPromoCreateInput, voidAdminPromoCreateOutput } from '../../../../contract/void-endpoint-definitions.js';
+import { implement } from '@orpc/server';
 import { Inject, Injectable } from '@nestjs/common';
-
-import type { PromoNotesRepository } from '@features/persistence/backend/repositories/models.js';
 import { GetterService } from '@features/api/backend/transport/GetterService.js';
+import * as v from 'valibot';
 import { DI } from '@/di-symbols.js';
-import { ApiError } from '@features/api/backend/transport/error.js';
+import { authentication, apiPolicy, requirePrincipal } from '../../../../../api/backend/transport/middleware.js';
+import { apiError } from '../../../../../api/backend/transport/orpc-error.js';
+import { adminPromoCreateContract, adminPromoCreatePolicy, adminPromoCreateInput, adminPromoCreateOutput, adminPromoCreateErrors } from './create.contract.js';
+import type { ApiActor } from '../../../../../api/backend/transport/context.js';
+import type { NotesApiContext } from '../../../operations.js';
+import type { PromoNotesRepository } from '@features/persistence/backend/repositories/models.js';
+import type { MiLocalUser } from '../../../../../users/backend/models/User.js';
 
-const contractProjection = projectEndpointContract(voidAdminPromoCreateDefinition);
-
-export const meta = {
-	tags: ['admin'],
-
-	requireCredential: true,
-	requireModerator: true,
-	kind: 'write:admin:promo',
-
-	errors: {
-		noSuchNote: {
-			message: 'No such note.',
-			code: 'NO_SUCH_NOTE',
-			id: 'ee449fbe-af2a-453b-9cae-cf2fe7c895fc',
-		},
-
-		alreadyPromoted: {
-			message: 'The note has already promoted.',
-			code: 'ALREADY_PROMOTED',
-			id: 'ae427aa2-7a41-484f-a18c-2c1104051604',
-		},
-	},
-} as const;
-
-export const paramDef = contractProjection.input;
+export function createAdminPromoCreateProcedure<Actor extends ApiActor>() {
+	return implement(adminPromoCreateContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<NotesApiContext<Actor>>()
+		.use(authentication<Actor>())
+		.use(apiPolicy<Actor>(adminPromoCreatePolicy))
+		.use(requirePrincipal<Actor>())
+		.handler(({ input, context }) => context.operations.notes.adminPromoCreate(input, context.principal));
+}
 
 @Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof voidAdminPromoCreateInput, typeof voidAdminPromoCreateOutput> {
+export class AdminPromoCreateOperation {
 	constructor(
 		@Inject(DI.promoNotesRepository)
 		private promoNotesRepository: PromoNotesRepository,
 
 		private getterService: GetterService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			const note = await this.getterService.getNote(ps.noteId).catch(e => {
-				if (e.id === '9725d0ce-ba28-4dde-95a7-2cbb2c15de24') throw new ApiError(meta.errors.noSuchNote);
-				throw e;
-			});
+	) {}
+	async execute(ps: v.InferOutput<typeof adminPromoCreateInput>, me: MiLocalUser): Promise<v.InferOutput<typeof adminPromoCreateOutput>> {
+		return v.parse(adminPromoCreateOutput, await this.run(ps, me));
+	}
 
-			const exist = await this.promoNotesRepository.exists({ where: { noteId: note.id } });
+	private async run(ps: v.InferOutput<typeof adminPromoCreateInput>, _me: MiLocalUser) {
+		const note = await this.getterService.getNote(ps.noteId).catch(e => {
+			if (e.id === '9725d0ce-ba28-4dde-95a7-2cbb2c15de24') throw apiError(adminPromoCreateErrors.noSuchNote);
+			throw e;
+		});
 
-			if (exist) {
-				throw new ApiError(meta.errors.alreadyPromoted);
-			}
+		const exist = await this.promoNotesRepository.exists({ where: { noteId: note.id } });
 
-			await this.promoNotesRepository.insert({
-				noteId: note.id,
-				expiresAt: new Date(ps.expiresAt),
-				userId: note.userId,
-			});
+		if (exist) {
+			throw apiError(adminPromoCreateErrors.alreadyPromoted);
+		}
+
+		await this.promoNotesRepository.insert({
+			noteId: note.id,
+			expiresAt: new Date(ps.expiresAt),
+			userId: note.userId,
 		});
 	}
 }

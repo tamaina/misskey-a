@@ -10,16 +10,16 @@ import { defineEndpointContract } from '@features/api/contract/definition.js';
 import { defineMultipartEndpointContract, getMultipartEndpointContractRegistration } from '@features/api/contract/multipart-endpoint.js';
 import { jsonObject } from '@features/api/contract/json-object.js';
 import { toLegacyJsonSchema } from '@features/api/backend/index.js';
-import { driveFilesCreateDefinition, driveFilesCreateInput, driveFilesCreateWireInput, driveFilesCreateOutput } from '../../../test/fixtures/multipart-drive-create-contract-definition.js';
 import { DB_MAX_IMAGE_COMMENT_LENGTH } from '@features/drive/contract/image-comment-limit.js';
-import { EndpointImplementation as Upload, meta as uploadMeta, paramDef } from '../../../test/fixtures/multipart-drive-create-contract.js';
-import { EndpointImplementation as LegacyUpload, meta as legacyMeta, paramDef as legacyParams } from '../../../test/fixtures/multipart-drive-create-original.js';
 import { IdentifiableError } from '@features/runtime/backend/errors/identifiable-error.js';
-import type { Config } from '@/config.js';
 import { Endpoint } from '@features/api/backend/transport/endpoint-base.js';
 import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
 import { genOpenapiSpec } from '@features/api/backend/transport/openapi/gen-spec.js';
 import { endpoints as documentedEndpoints } from '@features/index/backend/endpoints.js';
+import type { Config } from '@/config.js';
+import { EndpointImplementation as LegacyUpload, meta as legacyMeta, paramDef as legacyParams } from '../../../test/fixtures/multipart-drive-create-original.js';
+import { EndpointImplementation as Upload, meta as uploadMeta, paramDef } from '../../../test/fixtures/multipart-drive-create-contract.js';
+import { driveFilesCreateDefinition, driveFilesCreateInput, driveFilesCreateWireInput, driveFilesCreateOutput } from '../../../test/fixtures/multipart-drive-create-contract-definition.js';
 
 vi.mock('@features/index/backend/endpoints.js', () => ({ endpoints: [] }));
 vi.mock('node:fs', async () => ({
