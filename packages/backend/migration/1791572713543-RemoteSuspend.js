@@ -13,6 +13,8 @@ export class RemoteSuspend1791572713543 {
     }
 
     async down(queryRunner) {
+        // The remaining local flag becomes the sole suspension authority again.
+        await queryRunner.query(`UPDATE "following" AS f SET "isFollowerSuspended" = u."isSuspended" FROM "user" AS u WHERE f."followerId" = u.id AND f."isFollowerSuspended" IS DISTINCT FROM u."isSuspended"`);
         await queryRunner.query(`COMMENT ON COLUMN "user"."isSuspended" IS 'Whether the User is suspended.'`);
         await queryRunner.query(`ALTER TABLE "user" DROP COLUMN "isRemoteSuspended"`);
     }

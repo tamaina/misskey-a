@@ -243,11 +243,12 @@ describe('suspension consistency', () => {
 			await runner.release();
 		}
 	});
-	test('remote suspension migration preserves local holds and following rows across down/up', async () => {
+	test.each([[false, false], [true, false], [false, true], [true, true]])('remote suspension migration preserves local hold=%s after removing remote hold=%s across down/up', async (localHeld, remoteHeld) => {
 		const actor = await user();
 		const target = await user(null);
 		await follow(actor, target);
-		await suspension.suspend(actor, actor);
+		if (localHeld) await suspension.suspend(actor, actor);
+		if (remoteHeld) await suspension.suspendFromRemote(remoteActor(actor));
 		const original = await followings.findOneByOrFail({ followerId: actor.id });
 		const runner = users.manager.connection.createQueryRunner();
 		await runner.connect();
@@ -256,9 +257,10 @@ describe('suspension consistency', () => {
 			const migration = new RemoteSuspensionMigration();
 			await migration.down(runner);
 			expect(await runner.query(`SELECT column_name FROM information_schema.columns WHERE table_schema = 'public' AND table_name = 'user' AND column_name = 'isRemoteSuspended'`)).toHaveLength(0);
+			expect(await runner.query('SELECT id, "isFollowerSuspended" FROM "following" WHERE "followerId" = $1', [actor.id])).toEqual([{ id: original.id, isFollowerSuspended: localHeld }]);
 			await migration.up(runner);
-			expect(await runner.query('SELECT "isSuspended", "isRemoteSuspended" FROM "user" WHERE id = $1', [actor.id])).toEqual([{ isSuspended: true, isRemoteSuspended: false }]);
-			expect(await runner.query('SELECT "isFollowerSuspended" FROM "following" WHERE id = $1', [original.id])).toEqual([{ isFollowerSuspended: true }]);
+			expect(await runner.query('SELECT "isSuspended", "isRemoteSuspended" FROM "user" WHERE id = $1', [actor.id])).toEqual([{ isSuspended: localHeld, isRemoteSuspended: false }]);
+			expect(await runner.query('SELECT "isFollowerSuspended" FROM "following" WHERE id = $1', [original.id])).toEqual([{ isFollowerSuspended: localHeld }]);
 			await runner.commitTransaction();
 			const pending = await users.manager.connection.driver.createSchemaBuilder().log();
 			expect(pending.upQueries).toEqual([]);
