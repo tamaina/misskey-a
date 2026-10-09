@@ -6,7 +6,7 @@ import { build } from 'esbuild';
 test('browser SDK bundles only routing metadata and the portable error DTO', async () => {
 	const bundle = await build({ entryPoints: [fileURLToPath(new URL('../built/api.js', import.meta.url))],
 		bundle: true, platform: 'browser', format: 'esm', write: false, metafile: true });
-	const inputs = Object.keys(bundle.metafile.inputs);
+	const inputs = Object.keys(bundle.metafile.inputs).map(path => `/${path.replaceAll('\\', '/')}`);
 	const contracts = inputs.filter(path => path.includes('/built/contracts/'));
 	assert.deepEqual(contracts.map(path => path.split('/built/contracts/')[1]).sort(),
 		['api/backend/transport/errors.schema.js', 'api/shared/api-routing.js']);

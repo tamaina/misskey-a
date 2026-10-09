@@ -3,21 +3,16 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { notificationsContract } from '../../../contract/index.js';
-import { legacyNotificationsSchemas } from '@features/notifications/backend';
-import type { Schema } from '@features/api/backend/utility/json-schema.js';
-import { createContractTransportEndpoint } from '@features/api/backend/transport/contract-transport-endpoint.js';
-import { defineFeatureEndpoint } from '@features/api/backend/transport/feature-endpoint.js';
+import { implement } from '@orpc/server';
+import { authentication, apiPolicy, requirePrincipal } from '../../../../api/backend/transport/middleware.js';
+import type { ApiActor } from '../../../../api/backend/transport/context.js';
+import type { NotificationsContext } from '../../operations.js';
+import { flushContract } from './flush.contract.js';
 
-export const meta = {
-	tags: ['notifications', 'account'],
-
-	requireCredential: true,
-
-	kind: 'write:notifications',
-} as const;
-
-export const paramDef = legacyNotificationsSchemas['notifications/flush'].input as Schema;
-
-export const { feature, createEndpoint } = defineFeatureEndpoint('notifications', notifications => createContractTransportEndpoint(meta, paramDef, notificationsContract['notifications/flush'], async (params, user) =>
-	notifications['notifications/flush'](params, { context: { actor: { id: user.id }, token: null } })));
+export function createFlushProcedure<Actor extends ApiActor>() {
+	return implement(flushContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<NotificationsContext<Actor>>()
+		.use(authentication<Actor>())
+		.use(apiPolicy<Actor>({ name: 'notifications/flush', requireCredential: true, kind: 'write:notifications' }))
+		.use(requirePrincipal<Actor>())
+		.handler(({ input, context }) => context.operations.notifications.flush(input, context.principal));
+}

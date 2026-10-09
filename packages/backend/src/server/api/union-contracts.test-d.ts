@@ -5,8 +5,10 @@
 
 import type * as v from 'valibot';
 import type { Packed } from '@features/index/contract/packed.js';
-import type { NativeMetaLite, NativeMetaDetailed } from '@features/instance/backend/serializers/native-meta.js';
-import type { EndpointImplementation as MetaEndpoint } from '@features/instance/backend/endpoints/meta.js';
+import type { InstanceOperations } from '@features/instance/backend/operations.js';
+import type { ApiActor } from '@features/api/backend/transport/context.js';
+import type { metaContract } from '@features/instance/backend/endpoints/meta.contract.js';
+import type { InferSchemaOutput } from '@orpc/contract';
 import type { EndpointImplementation as RelationEndpoint } from '@features/relationships/backend/endpoints/users/relation.js';
 import type { unionMetaInput, UnionEndpoints as InstanceUnionEndpoints } from '@features/instance/contract/union-endpoint-definitions.js';
 import type { unionUsersRelationInput, unionUsersRelationModel, UnionEndpoints as RelationshipUnionEndpoints } from '@features/relationships/contract/union-endpoint-definitions.js';
@@ -28,7 +30,7 @@ type A4 = Assert<Equal<RelationInput['userId'], string | string[]>>;
 type A5 = Assert<Equal<RelationInput['future'], unknown>>;
 type A6 = Assert<Equal<MetaResponse, Packed<'MetaLite'> | Packed<'MetaDetailed'>>>;
 type A7 = Assert<Equal<RelationResponse, Relation | Relation[]>>;
-type A8 = Assert<Equal<Awaited<ReturnType<MetaEndpoint['exec']>>, NativeMetaLite | NativeMetaDetailed>>;
+type A8 = Assert<Equal<Awaited<ReturnType<InstanceOperations<ApiActor>['meta']>>, InferSchemaOutput<NonNullable<typeof metaContract['~orpc']['outputSchema']>>>>;
 type A9 = Assert<Equal<Awaited<ReturnType<RelationEndpoint['exec']>>, RelationResponse>>;
 type A10 = Assert<Equal<IsAny<MetaResponse>, false>>;
 type A11 = Assert<Equal<IsAny<RelationResponse>, false>>;

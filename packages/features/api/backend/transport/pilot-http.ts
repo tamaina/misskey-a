@@ -23,11 +23,11 @@ export function bodyCredential(request: FastifyRequest): string | null | undefin
 	throw new UploadRequestError(400, 'Invalid credential representation');
 }
 
-export function registerPilotHttp<Actor extends ApiActor>(
-	fastify: FastifyInstance, handler: OpenAPIHandler<ApiContext<Actor>>,
+export function registerPilotHttp<Actor extends ApiActor, Context extends ApiContext<Actor> = ApiContext<Actor>>(
+	fastify: FastifyInstance, handler: OpenAPIHandler<Context>,
 	options: {
 		maxFileSize: number;
-		context(request: FastifyRequest, reply: FastifyReply, name: string, upload?: UploadResource): ApiContext<Actor>;
+		context(request: FastifyRequest, reply: FastifyReply, name: string, upload?: UploadResource): Context;
 		runSpan<T>(name: string, run: () => T): T;
 	},
 ) {
@@ -36,10 +36,10 @@ export function registerPilotHttp<Actor extends ApiActor>(
 		bodyLimit: jsonBodyLimit,
 		onRequest: async (request, reply) => {
 			const reject = (status: number) => reply.header('Connection', 'close').code(status).send();
-			if (request.method === 'GET' && route.name !== 'server-info') return reject(405);
+			if (request.method === 'GET' && !route.allowGet) return reject(405);
 			// HEAD/TRACE bypass Fastify parsers: inspect the header before parser side effects.
 			const mediaType = request.headers['content-type']?.split(';', 1)[0]?.trim().toLowerCase();
-			if (route.name !== 'drive/files/create' && mediaType !== undefined
+			if (!route.multipart && mediaType !== undefined
 				&& mediaType !== 'application/json' && !/^application\/[^/]+\+json$/.test(mediaType)) return reject(415);
 			// Preserve bodyless semantics. Never normalize a framed bodyless request into
 			// an unbounded reader; reject framing, including chunked/unknown-size bodies.
@@ -55,10 +55,10 @@ export function registerPilotHttp<Actor extends ApiActor>(
 			return payload;
 		},
 	}, async (request, reply) => {
-		if (request.method === 'GET' && route.name !== 'server-info') return reply.code(405).send();
+		if (request.method === 'GET' && !route.allowGet) return reply.code(405).send();
 		const run = async (upload?: UploadResource) => {
 			const context = options.context(request, reply, route.name, upload);
-			if (request.method === 'GET' && !context.credential) reply.header('Cache-Control', 'public, max-age=60');
+			if (route.cacheSec !== undefined && !context.credential) reply.header('Cache-Control', `public, max-age=${route.cacheSec}`);
 			// Legacy Fastify routes accept non-GET verbs with POST semantics. Keep that
 			// boundary behavior without adding aliases to the public contract/router.
 			const raw = new Proxy(request.raw, {
@@ -77,7 +77,7 @@ export function registerPilotHttp<Actor extends ApiActor>(
 			await options.runSpan('API: ' + route.name, () => handler.handle(adapted, reply, { prefix: '/api', context }));
 		};
 		try {
-			if (route.name === 'drive/files/create') await withStagedUpload(request, { maxFileSize: options.maxFileSize }, async (body, upload, cleanup) => {
+			if (route.multipart) await withStagedUpload(request, { maxFileSize: options.maxFileSize }, async (body, upload, cleanup) => {
 				uploadCleanups.set(request, cleanup);
 				request.body = body;
 				await run(upload);

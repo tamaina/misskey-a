@@ -3,31 +3,23 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { chartUsersDefinition, chartInput, chartUsersOutput } from '../../../contract/chart-endpoint-definitions.js';
-import { Injectable } from '@nestjs/common';
-import { UsersChart } from '../../charts/users.js';
+import { implement } from '@orpc/server';
+import { authentication, apiPolicy, decodeScalarInput } from '../../../../api/backend/transport/middleware.js';
+import type { ApiActor } from '../../../../api/backend/transport/context.js';
+import type { StatisticsContext } from '../../operations.js';
+import { chartUsersContract, chartUsersGetContract } from './users.contract.js';
 
-const contractProjection = projectEndpointContract(chartUsersDefinition);
+export function createUsersProcedure<Actor extends ApiActor>() {
+	return implement(chartUsersContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<StatisticsContext<Actor>>()
+		.use(authentication<Actor>())
+		.use(apiPolicy<Actor>({ name: 'charts/users' }))
+		.handler(({ input, context }) => context.operations.statistics.users(input, context.principal));
+}
 
-export const meta = {
-	tags: ['charts', 'users'],
-
-	res: contractProjection.response,
-
-	allowGet: true,
-	cacheSec: 60 * 60,
-} as const;
-
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof chartInput, typeof chartUsersOutput> {
-	constructor(
-		private usersChart: UsersChart,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			return await this.usersChart.getChart(ps.span, ps.limit, ps.offset ? new Date(ps.offset) : null);
-		});
-	}
+export function createUsersGetProcedure<Actor extends ApiActor>() {
+	return implement(chartUsersGetContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<StatisticsContext<Actor>>()
+		.use(authentication<Actor>())
+		.use(apiPolicy<Actor>({ name: 'charts/users' }))
+		.use(decodeScalarInput<Actor>({ limit: 'integer', offset: 'integer' }))
+		.handler(({ input, context }) => context.operations.statistics.users(input, context.principal));
 }

@@ -226,7 +226,7 @@ test('premature removal/mutation rejects native File reads without leaking stage
 
 test('contract alias validation rejects wrong paths/methods and duplicate names', () => {
 	const leaf = { '~orpc': { errorMap: {}, meta: { requestName: 'notes/delete' }, route: { method: 'POST', path: '/notes/delete' } } };
-	assert.deepEqual(requestRoutes({ notes: { delete: leaf } }), [{ name: 'notes/delete', path: ['notes', 'delete'], httpPath: '/notes/delete' }]);
+	assert.deepEqual(requestRoutes({ notes: { delete: leaf } }), [{ name: 'notes/delete', path: ['notes', 'delete'], httpPath: '/notes/delete', allowGet: false, multipart: false }]);
 	assert.throws(() => requestRoutes({ first: leaf, second: leaf }), /Duplicate/);
 	assert.throws(() => requestRoutes({ bad: { '~orpc': { ...leaf['~orpc'], route: { method: 'GET', path: '/notes/delete' } } } }), /method\/path/);
 	assert.throws(() => requestRoutes({ bad: { '~orpc': { ...leaf['~orpc'], route: { method: 'POST', path: '/wrong' } } } }), /method\/path/);
@@ -281,4 +281,36 @@ test('already-aborted and staging-init aborts never start the multipart iterator
 			assert.deepEqual(await readdir(directory), []);
 		}
 	} finally { await rm(directory, { recursive: true, force: true }); }
+});
+
+test('native moderation checks precede malformed fields and preserve root bypass', async () => {
+	const unauthenticated = fixture({ authenticate: async () => [null, null] });
+	await assert.rejects(unauthenticated.client.instance.adCreate({}), error => error.code === 'CREDENTIAL_REQUIRED');
+	const denied = fixture();
+	denied.context.authorization = { rootUserId: () => null, roles: async () => [], policyAllowed: async () => false };
+	await assert.rejects(denied.client.instance.adCreate({}), error => error.code === 'ROLE_PERMISSION_DENIED'
+		&& error.data.id === 'd33d5333-db36-423d-a8f9-1a2b9549da41');
+	let rolesRead = false;
+	denied.context.authorization = { rootUserId: () => actor.id, roles: async () => { rolesRead = true; return []; }, policyAllowed: async () => false };
+	await assert.rejects(denied.client.instance.adCreate({}), error => error.code === 'INVALID_PARAM');
+	assert.equal(rolesRead, false);
+});
+
+test('native public defaults, GET scalar decoding and output validation execute directly', async () => {
+	const { client, context } = fixture({ authenticate: async () => [null, null] });
+	let parsed;
+	const side = { total: [], inc: [], dec: [], diffs: { normal: [], reply: [], renote: [], withFile: [] } };
+	context.operations = { statistics: {
+		stats: async () => ({ notesCount: 0, originalNotesCount: 0, usersCount: 0, originalUsersCount: 0,
+			reactionsCount: 0, instances: 0, driveUsageLocal: 0, driveUsageRemote: 0 }),
+		notes: async input => { parsed = input; return { local: side, remote: side }; },
+	} };
+	assert.equal((await client.statistics.stats(undefined)).notesCount, 0);
+	await assert.rejects(client.statistics.stats([]), error => error.code === 'INVALID_PARAM');
+	await client.statistics.notesGet({ span: 'day', limit: '2', offset: 'null', extra: true });
+	assert.deepEqual(parsed, { span: 'day', limit: 2, offset: null });
+	for (const limit of ['01', '+1', '0x10']) await assert.rejects(client.statistics.notesGet({ span: 'day', limit }),
+		error => error.code === 'INVALID_PARAM' && error.data.id === '0b5f1631-7c1a-41a6-b399-cce335f34d85');
+	context.operations.statistics.stats = async () => ({ secret: true });
+	await assert.rejects(client.statistics.stats({}), error => error.code === 'INTERNAL_ERROR');
 });

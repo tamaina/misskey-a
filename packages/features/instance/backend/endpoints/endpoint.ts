@@ -3,18 +3,15 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { instanceContract } from '../../contract/index.js';
-import { legacyEndpointSchemas } from '@features/instance/backend';
-import type { Schema } from '@features/api/backend/utility/json-schema.js';
-import { createContractTransportEndpoint } from '@features/api/backend/transport/contract-transport-endpoint.js';
-import { defineFeatureEndpoint } from '@features/api/backend/transport/feature-endpoint.js';
+import { implement } from '@orpc/server';
+import { endpointContract } from './endpoint.contract.js';
+import type { ApiActor } from '../../../api/backend/transport/context.js';
+import { authentication, apiPolicy } from '../../../api/backend/transport/middleware.js';
+import type { InstanceApiContext } from '../operations.js';
 
-export const meta = {
-	tags: ['meta'],
-	requireCredential: false,
-	res: legacyEndpointSchemas.output as Schema,
-} as const;
-
-export const paramDef = legacyEndpointSchemas.input as Schema;
-
-export const { feature, createEndpoint } = defineFeatureEndpoint('instance', instance => createContractTransportEndpoint(meta, paramDef, instanceContract['endpoint'], async params => instance.endpoint(params)));
+export function createEndpointProcedure<Actor extends ApiActor>() {
+	return implement(endpointContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<InstanceApiContext<Actor>>()
+		.use(authentication<Actor>())
+		.use(apiPolicy<Actor>({ name: 'endpoint' }))
+		.handler(({ input, context }) => context.operations.instance.endpoint(input));
+}

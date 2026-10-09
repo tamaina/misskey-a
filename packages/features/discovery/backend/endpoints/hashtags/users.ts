@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { NativeContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { packedHashtagsUsersDefinition, packedHashtagsUsersInput, packedHashtagsUsersOutput } from '../../../contract/packed-endpoint-definitions.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+import type { DiscoveryInputs } from '../discovery.contract.js';
 import { Inject, Injectable } from '@nestjs/common';
 
 import type { UsersRepository } from '@features/persistence/backend/repositories/models.js';
@@ -13,64 +13,48 @@ import { normalizeForSearch } from '../../utility/normalize-for-search.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import { DI } from '@/di-symbols.js';
 
-import * as v from 'valibot';
-import { nativeUserDetailedSchema } from '@features/users/backend/serializers/native-user.js';
-
-export const nativeOutputSchema = v.array(nativeUserDetailedSchema);
-
-const contractProjection = projectEndpointContract(packedHashtagsUsersDefinition);
-
-export const meta = {
-	requireCredential: false,
-
-	tags: ['hashtags', 'users'],
-
-	res: contractProjection.response,
-} as const;
-
-export const paramDef = contractProjection.input;
-
 @Injectable()
-export class EndpointImplementation extends NativeContractEndpoint<typeof meta, typeof packedHashtagsUsersInput, typeof packedHashtagsUsersOutput, typeof nativeOutputSchema> {
+export class HashtagsUsersOperation {
 	constructor(
 		@Inject(DI.usersRepository)
 		private usersRepository: UsersRepository,
 
 		private userEntityService: UserEntityService,
 	) {
-		super(meta, contractProjection, nativeOutputSchema, async (ps, me) => {
-			if (!safeForSql(normalizeForSearch(ps.tag))) throw new Error('Injection');
-			const query = this.usersRepository.createQueryBuilder('user')
-				.where(':tag <@ user.tags', { tag: [normalizeForSearch(ps.tag)] })
-				.andWhere('user.isSuspended = FALSE');
+	}
 
-			const recent = new Date(Date.now() - (1000 * 60 * 60 * 24 * 5));
+	async execute(ps: DiscoveryInputs['hashtags/users'], me: MiLocalUser | null) {
+		if (!safeForSql(normalizeForSearch(ps.tag))) throw new Error('Injection');
+		const query = this.usersRepository.createQueryBuilder('user')
+			.where(':tag <@ user.tags', { tag: [normalizeForSearch(ps.tag)] })
+			.andWhere('user.isSuspended = FALSE');
 
-			if (ps.state === 'alive') {
-				query.andWhere('user.updatedAt > :date', { date: recent });
-			}
+		const recent = new Date(Date.now() - (1000 * 60 * 60 * 24 * 5));
 
-			if (ps.origin === 'local') {
-				query.andWhere('user.host IS NULL');
-			} else if (ps.origin === 'remote') {
-				query.andWhere('user.host IS NOT NULL');
-			}
+		if (ps.state === 'alive') {
+			query.andWhere('user.updatedAt > :date', { date: recent });
+		}
 
-			switch (ps.sort) {
-				case '+follower': query.orderBy('user.followersCount', 'DESC'); break;
-				case '-follower': query.orderBy('user.followersCount', 'ASC'); break;
-				case '+createdAt': query.orderBy('user.id', 'DESC'); break;
-				case '-createdAt': query.orderBy('user.id', 'ASC'); break;
-				case '+updatedAt': query.orderBy('user.updatedAt', 'DESC'); break;
-				case '-updatedAt': query.orderBy('user.updatedAt', 'ASC'); break;
-			}
+		if (ps.origin === 'local') {
+			query.andWhere('user.host IS NULL');
+		} else if (ps.origin === 'remote') {
+			query.andWhere('user.host IS NOT NULL');
+		}
 
-			const users = await query
-				.limit(ps.limit)
-				.offset(ps.offset)
-				.getMany();
+		switch (ps.sort) {
+			case '+follower': query.orderBy('user.followersCount', 'DESC'); break;
+			case '-follower': query.orderBy('user.followersCount', 'ASC'); break;
+			case '+createdAt': query.orderBy('user.id', 'DESC'); break;
+			case '-createdAt': query.orderBy('user.id', 'ASC'); break;
+			case '+updatedAt': query.orderBy('user.updatedAt', 'DESC'); break;
+			case '-updatedAt': query.orderBy('user.updatedAt', 'ASC'); break;
+		}
 
-			return await this.userEntityService.packMany(users, me, { schema: 'UserDetailed' });
-		});
+		const users = await query
+			.limit(ps.limit)
+			.offset(ps.offset)
+			.getMany();
+
+		return await this.userEntityService.packMany(users, me, { schema: 'UserDetailed' });
 	}
 }

@@ -14,7 +14,13 @@ export interface ApiActor {
 	movedToUri: string | null;
 }
 
-export interface ApiToken { permission: readonly string[] }
+export interface ApiAuthorization<Actor extends ApiActor> {
+	rootUserId(): string | null;
+	roles(actor: Actor): Promise<readonly { isModerator: boolean; isAdministrator: boolean }[]>;
+	policyAllowed(actor: Actor, key: string): Promise<boolean>;
+}
+
+export interface ApiToken { id?: string; name?: string | null; iconUrl?: string | null; permission: readonly string[] }
 export interface UploadResource { path: string; name: string | null; file: File }
 export interface RateLimit { key: string; duration: number; max: number; minInterval?: number }
 
@@ -32,6 +38,7 @@ export interface ApiServices<Actor extends ApiActor> {
 
 export interface ApiContext<Actor extends ApiActor = ApiActor> {
 	services: ApiServices<Actor>;
+	authorization?: ApiAuthorization<Actor>;
 	credential: string | null | undefined;
 	ip: string;
 	headers: Record<string, string | string[] | undefined>;

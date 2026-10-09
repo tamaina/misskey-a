@@ -3,31 +3,23 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { chartApRequestDefinition, chartInput, chartApRequestOutput } from '../../../contract/chart-endpoint-definitions.js';
-import { Injectable } from '@nestjs/common';
-import { ApRequestChart } from '../../charts/ap-request.js';
+import { implement } from '@orpc/server';
+import { authentication, apiPolicy, decodeScalarInput } from '../../../../api/backend/transport/middleware.js';
+import type { ApiActor } from '../../../../api/backend/transport/context.js';
+import type { StatisticsContext } from '../../operations.js';
+import { chartApRequestContract, chartApRequestGetContract } from './ap-request.contract.js';
 
-const contractProjection = projectEndpointContract(chartApRequestDefinition);
+export function createApRequestProcedure<Actor extends ApiActor>() {
+	return implement(chartApRequestContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<StatisticsContext<Actor>>()
+		.use(authentication<Actor>())
+		.use(apiPolicy<Actor>({ name: 'charts/ap-request' }))
+		.handler(({ input, context }) => context.operations.statistics.apRequest(input, context.principal));
+}
 
-export const meta = {
-	tags: ['charts'],
-
-	res: contractProjection.response,
-
-	allowGet: true,
-	cacheSec: 60 * 60,
-} as const;
-
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof chartInput, typeof chartApRequestOutput> {
-	constructor(
-		private apRequestChart: ApRequestChart,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			return await this.apRequestChart.getChart(ps.span, ps.limit, ps.offset ? new Date(ps.offset) : null);
-		});
-	}
+export function createApRequestGetProcedure<Actor extends ApiActor>() {
+	return implement(chartApRequestGetContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<StatisticsContext<Actor>>()
+		.use(authentication<Actor>())
+		.use(apiPolicy<Actor>({ name: 'charts/ap-request' }))
+		.use(decodeScalarInput<Actor>({ limit: 'integer', offset: 'integer' }))
+		.handler(({ input, context }) => context.operations.statistics.apRequest(input, context.principal));
 }

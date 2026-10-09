@@ -3,31 +3,23 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { chartDriveDefinition, chartInput, chartDriveOutput } from '../../../contract/chart-endpoint-definitions.js';
-import { Injectable } from '@nestjs/common';
-import { DriveChart } from '../../charts/drive.js';
+import { implement } from '@orpc/server';
+import { authentication, apiPolicy, decodeScalarInput } from '../../../../api/backend/transport/middleware.js';
+import type { ApiActor } from '../../../../api/backend/transport/context.js';
+import type { StatisticsContext } from '../../operations.js';
+import { chartDriveContract, chartDriveGetContract } from './drive.contract.js';
 
-const contractProjection = projectEndpointContract(chartDriveDefinition);
+export function createDriveProcedure<Actor extends ApiActor>() {
+	return implement(chartDriveContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<StatisticsContext<Actor>>()
+		.use(authentication<Actor>())
+		.use(apiPolicy<Actor>({ name: 'charts/drive' }))
+		.handler(({ input, context }) => context.operations.statistics.drive(input, context.principal));
+}
 
-export const meta = {
-	tags: ['charts', 'drive'],
-
-	res: contractProjection.response,
-
-	allowGet: true,
-	cacheSec: 60 * 60,
-} as const;
-
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof chartInput, typeof chartDriveOutput> {
-	constructor(
-		private driveChart: DriveChart,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			return await this.driveChart.getChart(ps.span, ps.limit, ps.offset ? new Date(ps.offset) : null);
-		});
-	}
+export function createDriveGetProcedure<Actor extends ApiActor>() {
+	return implement(chartDriveGetContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<StatisticsContext<Actor>>()
+		.use(authentication<Actor>())
+		.use(apiPolicy<Actor>({ name: 'charts/drive' }))
+		.use(decodeScalarInput<Actor>({ limit: 'integer', offset: 'integer' }))
+		.handler(({ input, context }) => context.operations.statistics.drive(input, context.principal));
 }

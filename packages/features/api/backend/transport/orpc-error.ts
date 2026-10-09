@@ -5,6 +5,7 @@
 
 import { ORPCError } from '@orpc/server';
 import * as v from 'valibot';
+import { ApiError } from './error.js';
 import { apiErrorData } from './errors.schema.js';
 
 export type ErrorData = v.InferOutput<typeof apiErrorData>;
@@ -34,6 +35,12 @@ export const internalError = {
 } as const;
 
 export function normalizeError(error: unknown): ORPCError<string, unknown> {
+	if (error instanceof ApiError) {
+		const data = v.safeParse(apiErrorData, { id: error.id, kind: error.kind,
+			...(error.info == null ? {} : { info: error.info }) });
+		if (data.success) return apiError({ code: error.code, message: error.message,
+			id: data.output.id, kind: data.output.kind, status: error.httpStatusCode }, data.output.info);
+	}
 	if (error instanceof ORPCError) {
 		if (error.code === 'BAD_REQUEST') return apiError({ code: 'INVALID_PARAM', message: 'Invalid param.',
 			id: '3d81ceae-475f-4600-b2a8-2bc116157532' }, { reason: error.message });

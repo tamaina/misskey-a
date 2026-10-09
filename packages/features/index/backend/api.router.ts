@@ -8,16 +8,31 @@ import { pilotContract } from './api.contract.js';
 import { createInstanceRouter } from '../../instance/backend/api.router.js';
 import { createNotesRouter } from '../../notes/backend/api.router.js';
 import { createDriveRouter } from '../../drive/backend/api.router.js';
-import type { ApiActor, ApiContext } from '../../api/backend/transport/context.js';
+import { createStatisticsRouter } from '../../statistics/backend/router.js';
+import { createDiscoveryRouter } from '../../discovery/backend/endpoints/discovery.js';
+import { createAnnouncementsRouter } from '../../announcements/backend/api.router.js';
+import { createAvatarDecorationsRouter } from '../../avatar-decorations/backend/api.router.js';
+import { createEmojisRouter } from '../../emojis/backend/api.router.js';
+import { createNotificationsRouter } from '../../notifications/backend/router.js';
+import { createPreferencesRouter } from '../../preferences/backend/router.js';
+import type { ApiExecutionContext } from './api.context.js';
+import type { ApiActor } from '../../api/backend/transport/context.js';
 import { normalizeError } from '../../api/backend/transport/orpc-error.js';
 
 export function createApiRouter<Actor extends ApiActor>() {
-	const api = implement(pilotContract).$context<ApiContext<Actor>>()
+	const api = implement(pilotContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiExecutionContext<Actor>>()
 		.use(async ({ context, next }) => {
 			try { return await next(); } catch (error) { throw context.mapError ? context.mapError(error) : normalizeError(error); }
 		});
 	return api.router({
 		instance: createInstanceRouter<Actor>(),
+		statistics: createStatisticsRouter<Actor>(),
+		discovery: createDiscoveryRouter<Actor>(),
+		announcements: createAnnouncementsRouter<Actor>(),
+		avatarDecorations: createAvatarDecorationsRouter<Actor>(),
+		preferences: createPreferencesRouter<Actor>(),
+		emojis: createEmojisRouter<Actor>(),
+		notifications: createNotificationsRouter<Actor>(),
 		notes: createNotesRouter<Actor>(),
 		drive: createDriveRouter<Actor>(),
 	});

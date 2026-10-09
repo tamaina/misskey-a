@@ -3,31 +3,23 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { chartInstanceDefinition, instanceChartInput, chartInstanceOutput } from '../../../contract/chart-endpoint-definitions.js';
-import { Injectable } from '@nestjs/common';
-import { InstanceChart } from '../../charts/instance.js';
+import { implement } from '@orpc/server';
+import { authentication, apiPolicy, decodeScalarInput } from '../../../../api/backend/transport/middleware.js';
+import type { ApiActor } from '../../../../api/backend/transport/context.js';
+import type { StatisticsContext } from '../../operations.js';
+import { chartInstanceContract, chartInstanceGetContract } from './instance.contract.js';
 
-const contractProjection = projectEndpointContract(chartInstanceDefinition);
+export function createInstanceProcedure<Actor extends ApiActor>() {
+	return implement(chartInstanceContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<StatisticsContext<Actor>>()
+		.use(authentication<Actor>())
+		.use(apiPolicy<Actor>({ name: 'charts/instance' }))
+		.handler(({ input, context }) => context.operations.statistics.instance(input, context.principal));
+}
 
-export const meta = {
-	tags: ['charts'],
-
-	res: contractProjection.response,
-
-	allowGet: true,
-	cacheSec: 60 * 60,
-} as const;
-
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof instanceChartInput, typeof chartInstanceOutput> {
-	constructor(
-		private instanceChart: InstanceChart,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			return await this.instanceChart.getChart(ps.span, ps.limit, ps.offset ? new Date(ps.offset) : null, ps.host);
-		});
-	}
+export function createInstanceGetProcedure<Actor extends ApiActor>() {
+	return implement(chartInstanceGetContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<StatisticsContext<Actor>>()
+		.use(authentication<Actor>())
+		.use(apiPolicy<Actor>({ name: 'charts/instance' }))
+		.use(decodeScalarInput<Actor>({ limit: 'integer', offset: 'integer' }))
+		.handler(({ input, context }) => context.operations.statistics.instance(input, context.principal));
 }

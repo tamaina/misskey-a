@@ -49,7 +49,7 @@ export class APIClient {
 			? fetch(request, { ...init, credentials: 'omit', cache: 'no-cache' }) : undefined,
 	});
 	/** Native nested oRPC client; legacy request names remain available below. */
-	public readonly orpc = this.pilot.client;
+	public readonly orpc: import('./pilot-client.js').PilotClient = this.pilot.client;
 
 	constructor(opts: {
 		origin: APIClient['origin'];

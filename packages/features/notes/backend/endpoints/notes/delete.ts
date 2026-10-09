@@ -6,13 +6,14 @@
 import { implement } from '@orpc/server';
 import { notesPilotContract } from './delete.contract.js';
 import type { ApiActor, ApiContext } from '../../../../api/backend/transport/context.js';
-import { authentication, writePolicy } from '../../../../api/backend/transport/middleware.js';
+import { authentication, apiPolicy, requirePrincipal } from '../../../../api/backend/transport/middleware.js';
 
 export function createDeleteProcedure<Actor extends ApiActor>() {
-	const notes = implement(notesPilotContract).$context<ApiContext<Actor>>()
+	const notes = implement(notesPilotContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>()
 		.use(authentication<Actor>())
-		.use(writePolicy<Actor>('write:notes', {
+		.use(apiPolicy<Actor>({ name: 'notes/delete', requireCredential: true, kind: 'write:notes', limit: {
 			key: 'notes/delete', duration: 3600000, max: 300, minInterval: 1000,
-		}));
+		} }))
+		.use(requirePrincipal<Actor>());
 	return notes.delete.handler(({ input, context }) => context.services.deleteNote(input.noteId, context.principal));
 }

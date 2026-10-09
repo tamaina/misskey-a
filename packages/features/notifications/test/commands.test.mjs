@@ -5,7 +5,9 @@
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { createNotifications, legacyNotificationsSchemas } from '../../../backend/built/features/notifications/backend.js';
+import * as v from 'valibot';
+import { notificationsContract } from '../../../misskey-js/built/contracts/notifications/backend/endpoints/notifications.contract.js';
+import { createNotifications } from '../../../backend/built/features/notifications/backend.js';
 
 function createDeps(overrides = {}) {
 	const calls = [];
@@ -23,24 +25,14 @@ function invoke(feature, command, input = {}, context = { actor: { id: 'user1' }
 	return feature[command](input, { context });
 }
 
-test('legacy notification request schemas preserve required and nullable optional inputs', () => {
-	assert.deepEqual(legacyNotificationsSchemas['notifications/create'].input, {
-		type: 'object',
-		properties: {
-			body: { type: 'string' },
-			header: { type: 'string', nullable: true },
-			icon: { type: 'string', nullable: true },
-		},
-		required: ['body'],
-	});
-	for (const command of [
-		'notifications/flush',
-		'notifications/mark-all-as-read',
-		'notifications/test-notification',
-	]) {
-		assert.deepEqual(legacyNotificationsSchemas[command].input, {
-			type: 'object', properties: {}, additionalProperties: true,
-		});
+test('native notification inputs preserve required and nullable optional fields', () => {
+	const create = notificationsContract.create['~orpc'].inputSchema;
+	assert.deepEqual(v.parse(create, { body: 'hello', header: null, icon: null, extra: true }), { body: 'hello', header: null, icon: null });
+	assert.equal(v.safeParse(create, {}).success, false);
+	for (const key of ['flush', 'markAllAsRead', 'testNotification']) {
+		const input = notificationsContract[key]['~orpc'].inputSchema;
+		assert.deepEqual(v.parse(input, { extra: true }), {});
+		assert.equal(v.safeParse(input, []).success, false);
 	}
 });
 

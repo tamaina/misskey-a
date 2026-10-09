@@ -24,7 +24,7 @@ async function generateBaseTypes(
 	}
 	lines.push('');
 	if (Object.hasOwn(openApiDocs.components?.schemas ?? {}, 'JsonValue')) {
-		lines.push("import type { JsonValue as ContractJsonValue } from '#feature-contracts/api';");
+		lines.push("import type { PackedJsonValue as ContractJsonValue } from '#native-json-value';");
 	}
 
 	// NOTE: Align `operationId` of GET and POST to avoid duplication of type definitions
@@ -50,7 +50,7 @@ async function generateBaseTypes(
 		transform(schemaObject, options) {
 			// Recursive unions through components['schemas'][Name] hit TS2502.
 			// Reference the single public wire alias instead of generating a second model.
-			if (options.path === '#/components/schemas/JsonValue') {
+			if (options.path === '#/components/schemas/JsonValue' || isRecursiveJsonValue(schemaObject, options.path)) {
 				return ts.factory.createTypeReferenceNode('ContractJsonValue');
 			}
 			if ('format' in schemaObject && schemaObject.format === 'binary') {
@@ -262,7 +262,7 @@ async function generateApiClientJSDoc(
 
 		endpointOutputLine.push(
 			'    /**',
-			`     * ${endpoint.description.split('\n').join('\n     * ')}`,
+			endpoint.description.split('\n').map(line => `     * ${line}`.trimEnd()).join('\n'),
 			'     */',
 			`    request<E extends '${endpoint.path}', P extends Endpoints[E][\'req\']>(`,
 			'      endpoint: E,',
@@ -431,3 +431,21 @@ async function main() {
 }
 
 main();
+
+/** Recursive JSON aliases stay owned by the portable wire schema, including generated names. */
+function isRecursiveJsonValue(schema: OpenAPIV3_1.SchemaObject, reference: string): boolean {
+	const variants = schema.anyOf;
+	if (!variants || variants.length !== 6) return false;
+	const primitiveTypes = new Set(['null', 'boolean', 'number', 'string']);
+	let array = false;
+	let object = false;
+	for (const variant of variants) {
+		if ('$ref' in variant) return false;
+		if (typeof variant.type === 'string' && primitiveTypes.delete(variant.type)) continue;
+		if (variant.type === 'array' && variant.items && !Array.isArray(variant.items) && '$ref' in variant.items && variant.items.$ref === reference) { array = true; continue; }
+		if (variant.type === 'object' && variant.additionalProperties && typeof variant.additionalProperties === 'object'
+			&& '$ref' in variant.additionalProperties && variant.additionalProperties.$ref === reference) { object = true; continue; }
+		return false;
+	}
+	return primitiveTypes.size === 0 && array && object;
+}

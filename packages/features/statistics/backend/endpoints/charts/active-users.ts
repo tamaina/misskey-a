@@ -3,31 +3,23 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { chartActiveUsersDefinition, chartInput, chartActiveUsersOutput } from '../../../contract/chart-endpoint-definitions.js';
-import { Injectable } from '@nestjs/common';
-import { ActiveUsersChart } from '../../charts/active-users.js';
+import { implement } from '@orpc/server';
+import { authentication, apiPolicy, decodeScalarInput } from '../../../../api/backend/transport/middleware.js';
+import type { ApiActor } from '../../../../api/backend/transport/context.js';
+import type { StatisticsContext } from '../../operations.js';
+import { chartActiveUsersContract, chartActiveUsersGetContract } from './active-users.contract.js';
 
-const contractProjection = projectEndpointContract(chartActiveUsersDefinition);
+export function createActiveUsersProcedure<Actor extends ApiActor>() {
+	return implement(chartActiveUsersContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<StatisticsContext<Actor>>()
+		.use(authentication<Actor>())
+		.use(apiPolicy<Actor>({ name: 'charts/active-users' }))
+		.handler(({ input, context }) => context.operations.statistics.activeUsers(input, context.principal));
+}
 
-export const meta = {
-	tags: ['charts', 'users'],
-
-	res: contractProjection.response,
-
-	allowGet: true,
-	cacheSec: 60 * 60,
-} as const;
-
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof chartInput, typeof chartActiveUsersOutput> {
-	constructor(
-		private activeUsersChart: ActiveUsersChart,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			return await this.activeUsersChart.getChart(ps.span, ps.limit, ps.offset ? new Date(ps.offset) : null);
-		});
-	}
+export function createActiveUsersGetProcedure<Actor extends ApiActor>() {
+	return implement(chartActiveUsersGetContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<StatisticsContext<Actor>>()
+		.use(authentication<Actor>())
+		.use(apiPolicy<Actor>({ name: 'charts/active-users' }))
+		.use(decodeScalarInput<Actor>({ limit: 'integer', offset: 'integer' }))
+		.handler(({ input, context }) => context.operations.statistics.activeUsers(input, context.principal));
 }

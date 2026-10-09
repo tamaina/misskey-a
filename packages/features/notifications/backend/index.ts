@@ -4,9 +4,10 @@
  */
 
 import { createProcedureClient, implement } from '@orpc/server';
-import type { JsonSchema } from '@valibot/to-json-schema';
-import { notificationsContract, notificationsInputs } from '../contract/index.js';
-import { toLegacyJsonSchema } from '@features/api/backend/index.js';
+import { createContract } from './endpoints/notifications/create.contract.js';
+import { flushContract } from './endpoints/notifications/flush.contract.js';
+import { markAllAsReadContract } from './endpoints/notifications/mark-all-as-read.contract.js';
+import { testNotificationContract } from './endpoints/notifications/test-notification.contract.js';
 
 export interface NotificationsActor {
 	id: string;
@@ -18,7 +19,7 @@ export interface NotificationsToken {
 	iconUrl: string | null;
 }
 
-export interface NotificationsContext {
+export interface NotificationsCommandContext {
 	actor: NotificationsActor;
 	token: NotificationsToken | null;
 }
@@ -31,13 +32,13 @@ export interface AppNotificationData {
 }
 
 export interface NotificationsDependencies {
-	createAppNotification(userId: string, data: AppNotificationData): unknown;
-	createTestNotification(userId: string): unknown;
-	flushAllNotifications(userId: string): unknown;
-	readAllNotification(userId: string, markRead: true): unknown;
+	createAppNotification(userId: string, data: AppNotificationData): void;
+	createTestNotification(userId: string): void;
+	flushAllNotifications(userId: string): void | Promise<void>;
+	readAllNotification(userId: string, markRead: true): void | Promise<void>;
 }
 
-function requireActor(context: NotificationsContext | null | undefined): NotificationsActor {
+function requireActor(context: NotificationsCommandContext | null | undefined): NotificationsActor {
 	if (context?.actor == null || typeof context.actor.id !== 'string' || context.actor.id.length === 0) {
 		throw new Error('A trusted notifications actor is required');
 	}
@@ -47,11 +48,11 @@ function requireActor(context: NotificationsContext | null | undefined): Notific
 
 /** Create notification commands using only the actor and token provided by trusted transport context. */
 export function createNotifications(deps: NotificationsDependencies) {
-	const clientContext = (context: NotificationsContext) => context;
+	const clientContext = (context: NotificationsCommandContext) => context;
 
 	return {
-		'notifications/create': createProcedureClient(implement(notificationsContract['notifications/create'])
-			.$context<NotificationsContext>()
+		'notifications/create': createProcedureClient(implement(createContract)
+			.$context<NotificationsCommandContext>()
 			.handler(({ input, context }) => {
 				const actor = requireActor(context);
 				const token = context.token ?? null;
@@ -62,20 +63,20 @@ export function createNotifications(deps: NotificationsDependencies) {
 					customIcon: input.icon ?? token?.iconUrl ?? null,
 				});
 			}), { context: clientContext }),
-		'notifications/flush': createProcedureClient(implement(notificationsContract['notifications/flush'])
-			.$context<NotificationsContext>()
+		'notifications/flush': createProcedureClient(implement(flushContract)
+			.$context<NotificationsCommandContext>()
 			.handler(({ context }) => {
 				const actor = requireActor(context);
 				deps.flushAllNotifications(actor.id);
 			}), { context: clientContext }),
-		'notifications/mark-all-as-read': createProcedureClient(implement(notificationsContract['notifications/mark-all-as-read'])
-			.$context<NotificationsContext>()
+		'notifications/mark-all-as-read': createProcedureClient(implement(markAllAsReadContract)
+			.$context<NotificationsCommandContext>()
 			.handler(({ context }) => {
 				const actor = requireActor(context);
 				deps.readAllNotification(actor.id, true);
 			}), { context: clientContext }),
-		'notifications/test-notification': createProcedureClient(implement(notificationsContract['notifications/test-notification'])
-			.$context<NotificationsContext>()
+		'notifications/test-notification': createProcedureClient(implement(testNotificationContract)
+			.$context<NotificationsCommandContext>()
 			.handler(({ context }) => {
 				const actor = requireActor(context);
 				deps.createTestNotification(actor.id);
@@ -85,9 +86,10 @@ export function createNotifications(deps: NotificationsDependencies) {
 
 export type NotificationsFeature = ReturnType<typeof createNotifications>;
 
-export const legacyNotificationsSchemas: Record<keyof typeof notificationsInputs, { input: JsonSchema }> = {
-	'notifications/create': { input: toLegacyJsonSchema(notificationsInputs['notifications/create'], { target: 'openapi-3.0' }) },
-	'notifications/flush': { input: toLegacyJsonSchema(notificationsInputs['notifications/flush'], { target: 'openapi-3.0' }) },
-	'notifications/mark-all-as-read': { input: toLegacyJsonSchema(notificationsInputs['notifications/mark-all-as-read'], { target: 'openapi-3.0' }) },
-	'notifications/test-notification': { input: toLegacyJsonSchema(notificationsInputs['notifications/test-notification'], { target: 'openapi-3.0' }) },
-};
+export { notificationsContract } from './endpoints/notifications.contract.js';
+export { createNotificationsRouter } from './router.js';
+export { createNotificationsOperations, NotificationsApplicationService } from './application.js';
+export type { NotificationsApplicationDependencies, NotificationsCommandDependencies, SubscriptionRecord, SubscriptionQuery } from './application.js';
+export type { NotificationsContext, NotificationsOperations } from './operations.js';
+export { packedNotificationSchema } from './notification.schema.js';
+export type { NotificationDto } from './notification.schema.js';

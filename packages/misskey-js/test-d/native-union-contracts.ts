@@ -1,16 +1,17 @@
 import type { Endpoints } from '../src/api.types.js';
 import type { ContractEndpoints } from '../src/contract.types.js';
 import type { MetaRequest, MetaResponse, UsersRelationRequest, UsersRelationResponse } from '../src/autogen/entities.js';
-import type { UnionEndpoints as InstanceUnionEndpoints } from '../built/contracts/instance/contract/union-endpoint-definitions.js';
+import type * as v from 'valibot';
+import type { metaContract } from '../built/contracts/instance/backend/endpoints/meta.contract.js';
 import type { UnionEndpoints as RelationshipUnionEndpoints } from '../built/contracts/relationships/contract/union-endpoint-definitions.js';
 
 type Equal<A, B> = (<T>() => T extends A ? 1 : 2) extends (<T>() => T extends B ? 1 : 2) ? true : false;
 type Assert<T extends true> = T;
 type IsAny<T> = 0 extends 1 & T ? true : false;
 
-type A1 = Assert<Equal<Endpoints['meta']['req'], { detail?: boolean | undefined }>>;
+type A1 = Assert<Equal<Endpoints['meta']['req'], v.InferInput<NonNullable<typeof metaContract['~orpc']['inputSchema']>>>>;
 type A2 = Assert<Equal<MetaRequest, Endpoints['meta']['req']>>;
-type A3 = Assert<Equal<MetaResponse, InstanceUnionEndpoints['meta']['res']>>;
+type A3 = Assert<Equal<MetaResponse, v.InferOutput<NonNullable<typeof metaContract['~orpc']['outputSchema']>>>>;
 type A4 = Assert<Equal<ContractEndpoints['meta']['res'], MetaResponse>>;
 type A5 = Assert<Equal<UsersRelationRequest, { userId: string | string[] }>>;
 type A6 = Assert<Equal<Endpoints['users/relation']['req'], UsersRelationRequest>>;

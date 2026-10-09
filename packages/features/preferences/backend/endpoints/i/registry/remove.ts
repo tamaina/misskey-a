@@ -3,38 +3,16 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { remainingIRegistryRemoveDefinition, remainingIRegistryRemoveInput, remainingIRegistryRemoveOutput } from '../../../../contract/remaining-inline-endpoint-definitions.js';
-import { Inject, Injectable } from '@nestjs/common';
-import type { RegistryItemsRepository } from '@features/persistence/backend/repositories/models.js';
-import { DI } from '@/di-symbols.js';
-import { RegistryApiService } from '../../../services/RegistryApiService.js';
-import { ApiError } from '@features/api/backend/transport/error.js';
+import { implement } from '@orpc/server';
+import { authentication, apiPolicy, requirePrincipal } from '../../../../../api/backend/transport/middleware.js';
+import type { ApiActor } from '../../../../../api/backend/transport/context.js';
+import type { PreferencesContext } from '../../../operations.js';
+import { registryRemoveContract } from './remove.contract.js';
 
-const contractProjection = projectEndpointContract(remainingIRegistryRemoveDefinition);
-
-export const meta = {
-	requireCredential: true,
-	kind: 'write:account',
-
-	errors: {
-		noSuchKey: {
-			message: 'No such key.',
-			code: 'NO_SUCH_KEY',
-			id: '1fac4e8a-a6cd-4e39-a4a5-3a7e11f1b019',
-		},
-	},
-} as const;
-
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof remainingIRegistryRemoveInput, typeof remainingIRegistryRemoveOutput> {
-	constructor(
-		private registryApiService: RegistryApiService,
-	) {
-		super(meta, contractProjection, async (ps, me, accessToken) => {
-			await this.registryApiService.remove(me.id, accessToken != null ? accessToken.id : (ps.domain ?? null), ps.scope, ps.key);
-		});
-	}
+export function createRegistryRemoveProcedure<Actor extends ApiActor>() {
+	return implement(registryRemoveContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<PreferencesContext<Actor>>()
+		.use(authentication<Actor>())
+		.use(apiPolicy<Actor>({ name: 'i/registry/remove', requireCredential: true, kind: 'write:account' }))
+		.use(requirePrincipal<Actor>())
+		.handler(({ input, context }) => context.operations.preferences.remove(input, context.principal, context.token));
 }

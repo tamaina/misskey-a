@@ -18,12 +18,18 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 
 const paths = new Map(requestRoutes(routing).map(route => [route.name, route.path]));
 
+export interface PilotTransport {
+	client: PilotClient;
+	path(name: string): readonly string[] | undefined;
+	request(path: readonly string[], input: unknown, credential: string | null | undefined): Promise<unknown>;
+}
+
 export function createPilotClient(options: {
 	origin(): string;
 	credential(): string | null | undefined;
 	fetch(): FetchLike;
 	nativeFetch(request: Request, init: { redirect?: RequestRedirect }): Promise<Response> | undefined;
-}) {
+}): PilotTransport {
 	const link = new OpenAPILink<PilotClientContext>(routing, {
 		url: () => `${options.origin()}/api`,
 		interceptors: [async ({ next, ...call }) => {

@@ -3,21 +3,16 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { notificationsContract } from '../../../contract/index.js';
-import { legacyNotificationsSchemas } from '@features/notifications/backend';
-import type { Schema } from '@features/api/backend/utility/json-schema.js';
-import { createContractTransportEndpoint } from '@features/api/backend/transport/contract-transport-endpoint.js';
-import { defineFeatureEndpoint } from '@features/api/backend/transport/feature-endpoint.js';
+import { implement } from '@orpc/server';
+import { authentication, apiPolicy, requirePrincipal } from '../../../../api/backend/transport/middleware.js';
+import type { ApiActor } from '../../../../api/backend/transport/context.js';
+import type { NotificationsContext } from '../../operations.js';
+import { markAllAsReadContract } from './mark-all-as-read.contract.js';
 
-export const meta = {
-	tags: ['notifications', 'account'],
-
-	requireCredential: true,
-
-	kind: 'write:notifications',
-} as const;
-
-export const paramDef = legacyNotificationsSchemas['notifications/mark-all-as-read'].input as Schema;
-
-export const { feature, createEndpoint } = defineFeatureEndpoint('notifications', notifications => createContractTransportEndpoint(meta, paramDef, notificationsContract['notifications/mark-all-as-read'], async (params, user) =>
-	notifications['notifications/mark-all-as-read'](params, { context: { actor: { id: user.id }, token: null } })));
+export function createMarkAllAsReadProcedure<Actor extends ApiActor>() {
+	return implement(markAllAsReadContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<NotificationsContext<Actor>>()
+		.use(authentication<Actor>())
+		.use(apiPolicy<Actor>({ name: 'notifications/mark-all-as-read', requireCredential: true, kind: 'write:notifications' }))
+		.use(requirePrincipal<Actor>())
+		.handler(({ input, context }) => context.operations.notifications.markAllAsRead(input, context.principal));
+}

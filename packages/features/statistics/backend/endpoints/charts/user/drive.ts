@@ -3,31 +3,23 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { chartPerUserDriveDefinition, userChartInput, chartPerUserDriveOutput } from '../../../../contract/chart-endpoint-definitions.js';
-import { Injectable } from '@nestjs/common';
-import { PerUserDriveChart } from '../../../charts/per-user-drive.js';
+import { implement } from '@orpc/server';
+import { authentication, apiPolicy, decodeScalarInput } from '../../../../../api/backend/transport/middleware.js';
+import type { ApiActor } from '../../../../../api/backend/transport/context.js';
+import type { StatisticsContext } from '../../../operations.js';
+import { chartPerUserDriveContract, chartPerUserDriveGetContract } from './drive.contract.js';
 
-const contractProjection = projectEndpointContract(chartPerUserDriveDefinition);
+export function createPerUserDriveProcedure<Actor extends ApiActor>() {
+	return implement(chartPerUserDriveContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<StatisticsContext<Actor>>()
+		.use(authentication<Actor>())
+		.use(apiPolicy<Actor>({ name: 'charts/user/drive' }))
+		.handler(({ input, context }) => context.operations.statistics.userDrive(input, context.principal));
+}
 
-export const meta = {
-	tags: ['charts', 'drive', 'users'],
-
-	res: contractProjection.response,
-
-	allowGet: true,
-	cacheSec: 60 * 60,
-} as const;
-
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof userChartInput, typeof chartPerUserDriveOutput> {
-	constructor(
-		private perUserDriveChart: PerUserDriveChart,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			return await this.perUserDriveChart.getChart(ps.span, ps.limit, ps.offset ? new Date(ps.offset) : null, ps.userId);
-		});
-	}
+export function createPerUserDriveGetProcedure<Actor extends ApiActor>() {
+	return implement(chartPerUserDriveGetContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<StatisticsContext<Actor>>()
+		.use(authentication<Actor>())
+		.use(apiPolicy<Actor>({ name: 'charts/user/drive' }))
+		.use(decodeScalarInput<Actor>({ limit: 'integer', offset: 'integer' }))
+		.handler(({ input, context }) => context.operations.statistics.userDrive(input, context.principal));
 }

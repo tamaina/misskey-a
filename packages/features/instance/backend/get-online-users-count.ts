@@ -4,7 +4,7 @@
  */
 
 import { createProcedureClient, implement } from '@orpc/server';
-import { instanceContract } from '../contract/index.js';
+import { onlineUsersCountContract } from './endpoints/get-online-users-count.contract.js';
 
 export interface OnlineUsersCountDependencies {
 	countSince(cutoff: Date): Promise<number>;
@@ -13,7 +13,7 @@ export interface OnlineUsersCountDependencies {
 
 /** Count users active after a fresh, injectable time cutoff for each request. */
 export function createGetOnlineUsersCount(deps: OnlineUsersCountDependencies, now: () => number = Date.now) {
-	return createProcedureClient(implement(instanceContract['get-online-users-count']).handler(async () => ({
+	return createProcedureClient(implement(onlineUsersCountContract).handler(async () => ({
 		count: await deps.countSince(new Date(now() - deps.thresholdMs)),
 	})));
 }

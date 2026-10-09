@@ -3,30 +3,16 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { inlineIRegistryScopesWithDomainDefinition, inlineIRegistryScopesWithDomainInput, inlineIRegistryScopesWithDomainOutput } from '../../../../contract/endpoint-definitions.js';
-import { Inject, Injectable } from '@nestjs/common';
+import { implement } from '@orpc/server';
+import { authentication, apiPolicy, requirePrincipal } from '../../../../../api/backend/transport/middleware.js';
+import type { ApiActor } from '../../../../../api/backend/transport/context.js';
+import type { PreferencesContext } from '../../../operations.js';
+import { registryScopesWithDomainContract } from './scopes-with-domain.contract.js';
 
-import { RegistryApiService } from '../../../services/RegistryApiService.js';
-
-const contractProjection = projectEndpointContract(inlineIRegistryScopesWithDomainDefinition);
-
-export const meta = {
-	requireCredential: true,
-	secure: true,
-
-	res: contractProjection.response
-} as const;
-
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof inlineIRegistryScopesWithDomainInput, typeof inlineIRegistryScopesWithDomainOutput> {
-	constructor(
-		private registryApiService: RegistryApiService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			return await this.registryApiService.getAllScopeAndDomains(me.id);
-		});
-	}
+export function createRegistryScopesWithDomainProcedure<Actor extends ApiActor>() {
+	return implement(registryScopesWithDomainContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<PreferencesContext<Actor>>()
+		.use(authentication<Actor>())
+		.use(apiPolicy<Actor>({ name: 'i/registry/scopes-with-domain', requireCredential: true, secure: true }))
+		.use(requirePrincipal<Actor>())
+		.handler(({ input, context }) => context.operations.preferences.scopesWithDomain(input, context.principal, context.token));
 }

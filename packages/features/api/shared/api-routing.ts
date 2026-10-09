@@ -5,7 +5,7 @@
 
 import { isContractProcedure } from '@orpc/contract';
 
-export interface RequestRoute { name: string; path: readonly string[]; httpPath: string }
+export interface RequestRoute { name: string; path: readonly string[]; httpPath: string; allowGet: boolean; cacheSec?: number; multipart: boolean }
 
 /** Validate the compatibility aliases in a contract or its minified representation. */
 export function requestRoutes(router: unknown): RequestRoute[] {
@@ -22,7 +22,11 @@ export function requestRoutes(router: unknown): RequestRoute[] {
 			}
 			if (names.has(name)) throw new Error(`Duplicate APIClient alias: ${name}`);
 			names.add(name);
-			routes.push({ name, path, httpPath: route.path });
+			const allowGet = meta.allowGet === true;
+			const cacheSec = meta.cacheSec;
+			if (cacheSec !== undefined && (typeof cacheSec !== 'number' || !Number.isFinite(cacheSec) || cacheSec < 0)) throw new Error('Invalid API cache metadata');
+			routes.push({ name, path, httpPath: route.path, allowGet, multipart: meta.multipart === true,
+				...(typeof cacheSec === 'number' ? { cacheSec } : {}) });
 		} else if (node !== null && typeof node === 'object' && !Array.isArray(node)) {
 			for (const [key, child] of Object.entries(node)) visit(child, [...path, key]);
 		} else {

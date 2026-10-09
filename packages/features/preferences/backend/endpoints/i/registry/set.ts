@@ -3,27 +3,16 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { remainingIRegistrySetDefinition, remainingIRegistrySetInput, remainingIRegistrySetOutput } from '../../../../contract/remaining-inline-endpoint-definitions.js';
-import { Inject, Injectable } from '@nestjs/common';
-import { RegistryApiService } from '../../../services/RegistryApiService.js';
+import { implement } from '@orpc/server';
+import { authentication, apiPolicy, requirePrincipal } from '../../../../../api/backend/transport/middleware.js';
+import type { ApiActor } from '../../../../../api/backend/transport/context.js';
+import type { PreferencesContext } from '../../../operations.js';
+import { registrySetContract } from './set.contract.js';
 
-const contractProjection = projectEndpointContract(remainingIRegistrySetDefinition);
-
-export const meta = {
-	requireCredential: true,
-	kind: 'write:account',
-} as const;
-
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof remainingIRegistrySetInput, typeof remainingIRegistrySetOutput> {
-	constructor(
-		private registryApiService: RegistryApiService,
-	) {
-		super(meta, contractProjection, async (ps, me, accessToken) => {
-			await this.registryApiService.set(me.id, accessToken ? accessToken.id : (ps.domain ?? null), ps.scope, ps.key, ps.value);
-		});
-	}
+export function createRegistrySetProcedure<Actor extends ApiActor>() {
+	return implement(registrySetContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<PreferencesContext<Actor>>()
+		.use(authentication<Actor>())
+		.use(apiPolicy<Actor>({ name: 'i/registry/set', requireCredential: true, kind: 'write:account' }))
+		.use(requirePrincipal<Actor>())
+		.handler(({ input, context }) => context.operations.preferences.set(input, context.principal, context.token));
 }

@@ -3,31 +3,23 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { chartPerUserPvDefinition, userChartInput, chartPerUserPvOutput } from '../../../../contract/chart-endpoint-definitions.js';
-import { Injectable } from '@nestjs/common';
-import { PerUserPvChart } from '../../../charts/per-user-pv.js';
+import { implement } from '@orpc/server';
+import { authentication, apiPolicy, decodeScalarInput } from '../../../../../api/backend/transport/middleware.js';
+import type { ApiActor } from '../../../../../api/backend/transport/context.js';
+import type { StatisticsContext } from '../../../operations.js';
+import { chartPerUserPvContract, chartPerUserPvGetContract } from './pv.contract.js';
 
-const contractProjection = projectEndpointContract(chartPerUserPvDefinition);
+export function createPerUserPvProcedure<Actor extends ApiActor>() {
+	return implement(chartPerUserPvContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<StatisticsContext<Actor>>()
+		.use(authentication<Actor>())
+		.use(apiPolicy<Actor>({ name: 'charts/user/pv' }))
+		.handler(({ input, context }) => context.operations.statistics.userPv(input, context.principal));
+}
 
-export const meta = {
-	tags: ['charts', 'users'],
-
-	res: contractProjection.response,
-
-	allowGet: true,
-	cacheSec: 60 * 60,
-} as const;
-
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof userChartInput, typeof chartPerUserPvOutput> {
-	constructor(
-		private perUserPvChart: PerUserPvChart,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			return await this.perUserPvChart.getChart(ps.span, ps.limit, ps.offset ? new Date(ps.offset) : null, ps.userId);
-		});
-	}
+export function createPerUserPvGetProcedure<Actor extends ApiActor>() {
+	return implement(chartPerUserPvGetContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<StatisticsContext<Actor>>()
+		.use(authentication<Actor>())
+		.use(apiPolicy<Actor>({ name: 'charts/user/pv' }))
+		.use(decodeScalarInput<Actor>({ limit: 'integer', offset: 'integer' }))
+		.handler(({ input, context }) => context.operations.statistics.userPv(input, context.principal));
 }

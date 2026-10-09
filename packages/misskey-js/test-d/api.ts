@@ -135,9 +135,9 @@ test('chat, collection, emoji administration and notification commands derive fr
 	expectType<void>(await cli.request('chat/rooms/mute', { roomId: 'room1', mute: true }));
 	expectType<void>(await cli.request('chat/messages/react', { messageId: 'message1', reaction: '👍' }));
 	expectType<void>(await cli.request('clips/add-note', { clipId: 'clip1', noteId: 'note1' }));
-	expectType<void>(await cli.request('admin/emoji/set-category-bulk', { ids: [], category: null }));
-	expectType<void>(await cli.request('admin/emoji/add-aliases-bulk', { ids: ['emoji1'], aliases: [] }));
-	expectType<void>(await cli.request('notifications/create', { body: 'hello', header: null }));
+	expectType<null>(await cli.request('admin/emoji/set-category-bulk', { ids: [], category: null }));
+	expectType<null>(await cli.request('admin/emoji/add-aliases-bulk', { ids: ['emoji1'], aliases: [] }));
+	expectType<null>(await cli.request('notifications/create', { body: 'hello', header: null }));
 	// @ts-expect-error room identifiers remain strings
 	cli.request('chat/rooms/join', { roomId: 1 });
 	// @ts-expect-error mute is a required boolean
@@ -154,9 +154,9 @@ test('list, announcement, decoration and webhook commands derive from contracts'
 	const cli = new Misskey.api.APIClient({ origin: 'https://misskey.test' });
 	expectType<void>(await cli.request('users/lists/update-membership', { listId: 'list1', userId: 'user1', withReplies: false }));
 	expectType<void>(await cli.request('users/lists/favorite', { listId: 'list1' }));
-	expectType<void>(await cli.request('admin/avatar-decorations/update', { id: 'decoration1', category: null }));
-	expectType<void>(await cli.request('admin/announcements/update', { id: 'announcement1', imageUrl: null, icon: 'info' }));
-	expectType<void>(await cli.request('i/read-announcement', { announcementId: 'announcement1' }));
+	expectType<null>(await cli.request('admin/avatar-decorations/update', { id: 'decoration1', category: null }));
+	expectType<null>(await cli.request('admin/announcements/update', { id: 'announcement1', imageUrl: null, icon: 'info' }));
+	expectType<null>(await cli.request('i/read-announcement', { announcementId: 'announcement1' }));
 	expectType<void>(await cli.request('i/webhooks/update', { webhookId: 'hook1', secret: null, on: ['note'] }));
 	// @ts-expect-error membership user is required
 	cli.request('users/lists/update-membership', { listId: 'list1' });

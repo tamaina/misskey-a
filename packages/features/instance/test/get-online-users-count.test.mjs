@@ -4,7 +4,9 @@
  */
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { createGetOnlineUsersCount, legacyOnlineUsersCountSchemas } from '../../../backend/built/features/instance/backend.js';
+import * as v from 'valibot';
+import { instanceApiContract } from '../../../misskey-js/built/contracts/instance/backend/api.contract.js';
+import { createGetOnlineUsersCount } from '../../../backend/built/features/instance/backend.js';
 
 test('construction and invalid input do not read the online count or clock', async () => {
 	let clockCalls = 0;
@@ -36,7 +38,9 @@ test('count failures and invalid handler outputs propagate', async () => {
 	await assert.rejects(createGetOnlineUsersCount({ thresholdMs: 1, countSince: async () => 'invalid' }, () => 100)({}));
 });
 
-test('legacy schema preserves a required numeric count', () => {
-	assert.deepEqual(legacyOnlineUsersCountSchemas.output.required, ['count']);
-	assert.equal(legacyOnlineUsersCountSchemas.output.properties.count.type, 'number');
+test('native contract preserves a finite numeric count', () => {
+	const output = instanceApiContract.onlineUsersCount['~orpc'].outputSchema;
+	assert.equal(v.safeParse(output, { count: 7 }).success, true);
+	assert.equal(v.safeParse(output, { count: '7' }).success, false);
+	assert.equal(v.safeParse(output, { count: Infinity }).success, false);
 });

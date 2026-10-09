@@ -5,23 +5,34 @@
 ```ts
 
 import type { AnyContractProcedure } from '@orpc/contract';
+import { ArraySchema } from 'valibot';
 import type { AuthenticationResponseJSON } from '@simplewebauthn/browser';
 import { BlobSchema } from 'valibot';
 import { BooleanSchema } from 'valibot';
 import { CheckAction } from 'valibot';
 import { ContractProcedureBuilderWithInputOutput } from '@orpc/contract';
-import { ContractProcedureClient } from '@orpc/contract';
 import type { ContractRouterClient } from '@orpc/contract';
 import { CustomSchema } from 'valibot';
 import { EventEmitter } from 'eventemitter3';
+import { ExactOptionalSchema } from 'valibot';
 import { FiniteAction } from 'valibot';
+import { GenericSchema } from 'valibot';
 import type { InferContractRouterInputs } from '@orpc/contract';
 import type { InferContractRouterOutputs } from '@orpc/contract';
+import { IntegerAction } from 'valibot';
+import { IntersectSchema } from 'valibot';
+import { LazySchema } from 'valibot';
+import { MaxValueAction } from 'valibot';
 import { MergedErrorMap } from '@orpc/contract';
+import { MetadataAction } from 'valibot';
+import { MinLengthAction } from 'valibot';
+import { MinValueAction } from 'valibot';
+import { NeverSchema } from 'valibot';
 import { NullableSchema } from 'valibot';
 import { NullSchema } from 'valibot';
 import { NumberSchema } from 'valibot';
 import { ObjectSchema } from 'valibot';
+import { ObjectWithRestSchema } from 'valibot';
 import { OptionalSchema } from 'valibot';
 import { Options } from 'reconnecting-websocket';
 import { PicklistSchema } from 'valibot';
@@ -33,8 +44,11 @@ import type { RegistrationResponseJSON } from '@simplewebauthn/browser';
 import { SchemaWithPipe } from 'valibot';
 import { StrictObjectSchema } from 'valibot';
 import { StringSchema } from 'valibot';
+import { TransformAction } from 'valibot';
+import { UnionSchema } from 'valibot';
 import { UnknownSchema } from 'valibot';
 import * as v from 'valibot';
+import { VariantSchema } from 'valibot';
 import { VoidSchema } from 'valibot';
 
 // Warning: (ae-forgotten-export) The symbol "ContractModel" needs to be exported by the entry point index.d.ts
@@ -288,6 +302,9 @@ type AdminInviteListRequest = ContractRequest<'admin/invite/list', operations['a
 type AdminInviteListResponse = ContractResponse<'admin/invite/list', operations['admin___invite___list']['responses']['200']['content']['application/json']>;
 
 // @public (undocumented)
+type AdminMetaRequest = ContractRequest<'admin/meta', operations['admin___meta']['requestBody']['content']['application/json']>;
+
+// @public (undocumented)
 type AdminMetaResponse = ContractResponse<'admin/meta', operations['admin___meta']['responses']['200']['content']['application/json']>;
 
 // @public (undocumented)
@@ -406,6 +423,9 @@ type AdminRolesUsersResponse = ContractResponse<'admin/roles/users', operations[
 
 // @public (undocumented)
 type AdminSendEmailRequest = ContractRequest<'admin/send-email', operations['admin___send-email']['requestBody']['content']['application/json']>;
+
+// @public (undocumented)
+type AdminServerInfoRequest = ContractRequest<'admin/server-info', operations['admin___server-info']['requestBody']['content']['application/json']>;
 
 // @public (undocumented)
 type AdminServerInfoResponse = ContractResponse<'admin/server-info', operations['admin___server-info']['responses']['200']['content']['application/json']>;
@@ -575,401 +595,7 @@ class APIClient {
     // (undocumented)
     origin: string;
     // (undocumented)
-    readonly orpc: {
-        instance: {
-            serverInfo: ContractProcedureClient<PilotClientContext, OptionalSchema<SchemaWithPipe<readonly [CustomSchema<object, undefined>, ObjectSchema<    {}, undefined>]>, {}>, StrictObjectSchema<    {
-            readonly machine: StringSchema<undefined>;
-            readonly cpu: StrictObjectSchema<    {
-            readonly model: StringSchema<undefined>;
-            readonly cores: SchemaWithPipe<readonly [NumberSchema<undefined>, FiniteAction<number, undefined>]>;
-            }, undefined>;
-            readonly mem: StrictObjectSchema<    {
-            readonly total: SchemaWithPipe<readonly [NumberSchema<undefined>, FiniteAction<number, undefined>]>;
-            }, undefined>;
-            readonly fs: StrictObjectSchema<    {
-            readonly total: SchemaWithPipe<readonly [NumberSchema<undefined>, FiniteAction<number, undefined>]>;
-            readonly used: SchemaWithPipe<readonly [NumberSchema<undefined>, FiniteAction<number, undefined>]>;
-            }, undefined>;
-            }, undefined>, MergedErrorMap<Record<never, never>, {
-            readonly AUTHENTICATION_FAILED: {
-            readonly status: 401;
-            readonly data: ObjectSchema<    {
-            readonly id: StringSchema<undefined>;
-            readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
-            readonly info: OptionalSchema<SchemaWithPipe<readonly [CustomSchema<Record<string, unknown>, undefined>, RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>]>, undefined>;
-            }, undefined>;
-            };
-            readonly CREDENTIAL_REQUIRED: {
-            readonly status: 401;
-            readonly data: ObjectSchema<    {
-            readonly id: StringSchema<undefined>;
-            readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
-            readonly info: OptionalSchema<SchemaWithPipe<readonly [CustomSchema<Record<string, unknown>, undefined>, RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>]>, undefined>;
-            }, undefined>;
-            };
-            readonly YOUR_ACCOUNT_SUSPENDED: {
-            readonly status: 403;
-            readonly data: ObjectSchema<    {
-            readonly id: StringSchema<undefined>;
-            readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
-            readonly info: OptionalSchema<SchemaWithPipe<readonly [CustomSchema<Record<string, unknown>, undefined>, RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>]>, undefined>;
-            }, undefined>;
-            };
-            readonly YOUR_ACCOUNT_MOVED: {
-            readonly status: 403;
-            readonly data: ObjectSchema<    {
-            readonly id: StringSchema<undefined>;
-            readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
-            readonly info: OptionalSchema<SchemaWithPipe<readonly [CustomSchema<Record<string, unknown>, undefined>, RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>]>, undefined>;
-            }, undefined>;
-            };
-            readonly PERMISSION_DENIED: {
-            readonly status: 403;
-            readonly data: ObjectSchema<    {
-            readonly id: StringSchema<undefined>;
-            readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
-            readonly info: OptionalSchema<SchemaWithPipe<readonly [CustomSchema<Record<string, unknown>, undefined>, RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>]>, undefined>;
-            }, undefined>;
-            };
-            readonly RATE_LIMIT_EXCEEDED: {
-            readonly status: 429;
-            readonly data: ObjectSchema<    {
-            readonly id: StringSchema<undefined>;
-            readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
-            readonly info: OptionalSchema<SchemaWithPipe<readonly [CustomSchema<Record<string, unknown>, undefined>, RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>]>, undefined>;
-            }, undefined>;
-            };
-            readonly INVALID_PARAM: {
-            readonly status: 400;
-            readonly data: ObjectSchema<    {
-            readonly id: StringSchema<undefined>;
-            readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
-            readonly info: OptionalSchema<SchemaWithPipe<readonly [CustomSchema<Record<string, unknown>, undefined>, RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>]>, undefined>;
-            }, undefined>;
-            };
-            readonly INTERNAL_ERROR: {
-            readonly status: 500;
-            readonly data: ObjectSchema<    {
-            readonly id: StringSchema<undefined>;
-            readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
-            readonly info: OptionalSchema<SchemaWithPipe<readonly [CustomSchema<Record<string, unknown>, undefined>, RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>]>, undefined>;
-            }, undefined>;
-            };
-            }>>;
-            serverInfoGet: ContractProcedureClient<PilotClientContext, OptionalSchema<SchemaWithPipe<readonly [CustomSchema<object, undefined>, ObjectSchema<    {}, undefined>]>, {}>, StrictObjectSchema<    {
-            readonly machine: StringSchema<undefined>;
-            readonly cpu: StrictObjectSchema<    {
-            readonly model: StringSchema<undefined>;
-            readonly cores: SchemaWithPipe<readonly [NumberSchema<undefined>, FiniteAction<number, undefined>]>;
-            }, undefined>;
-            readonly mem: StrictObjectSchema<    {
-            readonly total: SchemaWithPipe<readonly [NumberSchema<undefined>, FiniteAction<number, undefined>]>;
-            }, undefined>;
-            readonly fs: StrictObjectSchema<    {
-            readonly total: SchemaWithPipe<readonly [NumberSchema<undefined>, FiniteAction<number, undefined>]>;
-            readonly used: SchemaWithPipe<readonly [NumberSchema<undefined>, FiniteAction<number, undefined>]>;
-            }, undefined>;
-            }, undefined>, MergedErrorMap<Record<never, never>, {
-            readonly AUTHENTICATION_FAILED: {
-            readonly status: 401;
-            readonly data: ObjectSchema<    {
-            readonly id: StringSchema<undefined>;
-            readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
-            readonly info: OptionalSchema<SchemaWithPipe<readonly [CustomSchema<Record<string, unknown>, undefined>, RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>]>, undefined>;
-            }, undefined>;
-            };
-            readonly CREDENTIAL_REQUIRED: {
-            readonly status: 401;
-            readonly data: ObjectSchema<    {
-            readonly id: StringSchema<undefined>;
-            readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
-            readonly info: OptionalSchema<SchemaWithPipe<readonly [CustomSchema<Record<string, unknown>, undefined>, RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>]>, undefined>;
-            }, undefined>;
-            };
-            readonly YOUR_ACCOUNT_SUSPENDED: {
-            readonly status: 403;
-            readonly data: ObjectSchema<    {
-            readonly id: StringSchema<undefined>;
-            readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
-            readonly info: OptionalSchema<SchemaWithPipe<readonly [CustomSchema<Record<string, unknown>, undefined>, RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>]>, undefined>;
-            }, undefined>;
-            };
-            readonly YOUR_ACCOUNT_MOVED: {
-            readonly status: 403;
-            readonly data: ObjectSchema<    {
-            readonly id: StringSchema<undefined>;
-            readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
-            readonly info: OptionalSchema<SchemaWithPipe<readonly [CustomSchema<Record<string, unknown>, undefined>, RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>]>, undefined>;
-            }, undefined>;
-            };
-            readonly PERMISSION_DENIED: {
-            readonly status: 403;
-            readonly data: ObjectSchema<    {
-            readonly id: StringSchema<undefined>;
-            readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
-            readonly info: OptionalSchema<SchemaWithPipe<readonly [CustomSchema<Record<string, unknown>, undefined>, RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>]>, undefined>;
-            }, undefined>;
-            };
-            readonly RATE_LIMIT_EXCEEDED: {
-            readonly status: 429;
-            readonly data: ObjectSchema<    {
-            readonly id: StringSchema<undefined>;
-            readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
-            readonly info: OptionalSchema<SchemaWithPipe<readonly [CustomSchema<Record<string, unknown>, undefined>, RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>]>, undefined>;
-            }, undefined>;
-            };
-            readonly INVALID_PARAM: {
-            readonly status: 400;
-            readonly data: ObjectSchema<    {
-            readonly id: StringSchema<undefined>;
-            readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
-            readonly info: OptionalSchema<SchemaWithPipe<readonly [CustomSchema<Record<string, unknown>, undefined>, RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>]>, undefined>;
-            }, undefined>;
-            };
-            readonly INTERNAL_ERROR: {
-            readonly status: 500;
-            readonly data: ObjectSchema<    {
-            readonly id: StringSchema<undefined>;
-            readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
-            readonly info: OptionalSchema<SchemaWithPipe<readonly [CustomSchema<Record<string, unknown>, undefined>, RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>]>, undefined>;
-            }, undefined>;
-            };
-            }>>;
-        };
-        notes: {
-            delete: ContractProcedureClient<PilotClientContext, ObjectSchema<    {
-            readonly noteId: SchemaWithPipe<readonly [StringSchema<undefined>, RegexAction<string, undefined>]>;
-            }, undefined>, VoidSchema<undefined>, MergedErrorMap<Record<never, never>, {
-            AUTHENTICATION_FAILED: {
-            readonly status: 401;
-            readonly data: ObjectSchema<    {
-            readonly id: StringSchema<undefined>;
-            readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
-            readonly info: OptionalSchema<SchemaWithPipe<readonly [CustomSchema<Record<string, unknown>, undefined>, RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>]>, undefined>;
-            }, undefined>;
-            };
-            CREDENTIAL_REQUIRED: {
-            readonly status: 401;
-            readonly data: ObjectSchema<    {
-            readonly id: StringSchema<undefined>;
-            readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
-            readonly info: OptionalSchema<SchemaWithPipe<readonly [CustomSchema<Record<string, unknown>, undefined>, RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>]>, undefined>;
-            }, undefined>;
-            };
-            YOUR_ACCOUNT_SUSPENDED: {
-            readonly status: 403;
-            readonly data: ObjectSchema<    {
-            readonly id: StringSchema<undefined>;
-            readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
-            readonly info: OptionalSchema<SchemaWithPipe<readonly [CustomSchema<Record<string, unknown>, undefined>, RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>]>, undefined>;
-            }, undefined>;
-            };
-            YOUR_ACCOUNT_MOVED: {
-            readonly status: 403;
-            readonly data: ObjectSchema<    {
-            readonly id: StringSchema<undefined>;
-            readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
-            readonly info: OptionalSchema<SchemaWithPipe<readonly [CustomSchema<Record<string, unknown>, undefined>, RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>]>, undefined>;
-            }, undefined>;
-            };
-            PERMISSION_DENIED: {
-            readonly status: 403;
-            readonly data: ObjectSchema<    {
-            readonly id: StringSchema<undefined>;
-            readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
-            readonly info: OptionalSchema<SchemaWithPipe<readonly [CustomSchema<Record<string, unknown>, undefined>, RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>]>, undefined>;
-            }, undefined>;
-            };
-            RATE_LIMIT_EXCEEDED: {
-            readonly status: 429;
-            readonly data: ObjectSchema<    {
-            readonly id: StringSchema<undefined>;
-            readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
-            readonly info: OptionalSchema<SchemaWithPipe<readonly [CustomSchema<Record<string, unknown>, undefined>, RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>]>, undefined>;
-            }, undefined>;
-            };
-            INVALID_PARAM: {
-            readonly status: 400;
-            readonly data: ObjectSchema<    {
-            readonly id: StringSchema<undefined>;
-            readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
-            readonly info: OptionalSchema<SchemaWithPipe<readonly [CustomSchema<Record<string, unknown>, undefined>, RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>]>, undefined>;
-            }, undefined>;
-            };
-            INTERNAL_ERROR: {
-            readonly status: 500;
-            readonly data: ObjectSchema<    {
-            readonly id: StringSchema<undefined>;
-            readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
-            readonly info: OptionalSchema<SchemaWithPipe<readonly [CustomSchema<Record<string, unknown>, undefined>, RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>]>, undefined>;
-            }, undefined>;
-            };
-            NO_SUCH_NOTE: {
-            status: number;
-            data: ObjectSchema<    {
-            readonly id: StringSchema<undefined>;
-            readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
-            readonly info: OptionalSchema<SchemaWithPipe<readonly [CustomSchema<Record<string, unknown>, undefined>, RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>]>, undefined>;
-            }, undefined>;
-            };
-            ACCESS_DENIED: {
-            status: number;
-            data: ObjectSchema<    {
-            readonly id: StringSchema<undefined>;
-            readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
-            readonly info: OptionalSchema<SchemaWithPipe<readonly [CustomSchema<Record<string, unknown>, undefined>, RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>]>, undefined>;
-            }, undefined>;
-            };
-            }>>;
-        };
-        drive: {
-            files: {
-                create: ContractProcedureClient<PilotClientContext, ObjectSchema<    {
-                readonly folderId: OptionalSchema<NullableSchema<SchemaWithPipe<readonly [StringSchema<undefined>, RegexAction<string, undefined>]>, undefined>, null>;
-                readonly name: OptionalSchema<NullableSchema<StringSchema<undefined>, undefined>, null>;
-                readonly comment: OptionalSchema<NullableSchema<SchemaWithPipe<readonly [StringSchema<undefined>, CheckAction<string, "Expected at most 512 Unicode code points">]>, undefined>, null>;
-                readonly isSensitive: OptionalSchema<BooleanSchema<undefined>, false>;
-                readonly force: OptionalSchema<BooleanSchema<undefined>, false>;
-                readonly file: BlobSchema<undefined>;
-                }, undefined>, StrictObjectSchema<    {
-                readonly id: StringSchema<undefined>;
-                readonly createdAt: StringSchema<undefined>;
-                readonly name: StringSchema<undefined>;
-                readonly type: StringSchema<undefined>;
-                readonly md5: StringSchema<undefined>;
-                readonly size: SchemaWithPipe<readonly [NumberSchema<undefined>, FiniteAction<number, undefined>]>;
-                readonly isSensitive: BooleanSchema<undefined>;
-                readonly blurhash: NullableSchema<StringSchema<undefined>, undefined>;
-                readonly properties: StrictObjectSchema<    {
-                readonly width: OptionalSchema<SchemaWithPipe<readonly [NumberSchema<undefined>, FiniteAction<number, undefined>]>, undefined>;
-                readonly height: OptionalSchema<SchemaWithPipe<readonly [NumberSchema<undefined>, FiniteAction<number, undefined>]>, undefined>;
-                readonly orientation: OptionalSchema<SchemaWithPipe<readonly [NumberSchema<undefined>, FiniteAction<number, undefined>]>, undefined>;
-                readonly avgColor: OptionalSchema<StringSchema<undefined>, undefined>;
-                }, undefined>;
-                readonly url: StringSchema<undefined>;
-                readonly thumbnailUrl: NullableSchema<StringSchema<undefined>, undefined>;
-                readonly comment: NullableSchema<StringSchema<undefined>, undefined>;
-                readonly folderId: NullableSchema<StringSchema<undefined>, undefined>;
-                readonly folder: NullSchema<undefined>;
-                readonly userId: NullSchema<undefined>;
-                readonly user: NullSchema<undefined>;
-                }, undefined>, MergedErrorMap<Record<never, never>, {
-                AUTHENTICATION_FAILED: {
-                readonly status: 401;
-                readonly data: ObjectSchema<    {
-                readonly id: StringSchema<undefined>;
-                readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
-                readonly info: OptionalSchema<SchemaWithPipe<readonly [CustomSchema<Record<string, unknown>, undefined>, RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>]>, undefined>;
-                }, undefined>;
-                };
-                CREDENTIAL_REQUIRED: {
-                readonly status: 401;
-                readonly data: ObjectSchema<    {
-                readonly id: StringSchema<undefined>;
-                readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
-                readonly info: OptionalSchema<SchemaWithPipe<readonly [CustomSchema<Record<string, unknown>, undefined>, RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>]>, undefined>;
-                }, undefined>;
-                };
-                YOUR_ACCOUNT_SUSPENDED: {
-                readonly status: 403;
-                readonly data: ObjectSchema<    {
-                readonly id: StringSchema<undefined>;
-                readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
-                readonly info: OptionalSchema<SchemaWithPipe<readonly [CustomSchema<Record<string, unknown>, undefined>, RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>]>, undefined>;
-                }, undefined>;
-                };
-                YOUR_ACCOUNT_MOVED: {
-                readonly status: 403;
-                readonly data: ObjectSchema<    {
-                readonly id: StringSchema<undefined>;
-                readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
-                readonly info: OptionalSchema<SchemaWithPipe<readonly [CustomSchema<Record<string, unknown>, undefined>, RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>]>, undefined>;
-                }, undefined>;
-                };
-                PERMISSION_DENIED: {
-                readonly status: 403;
-                readonly data: ObjectSchema<    {
-                readonly id: StringSchema<undefined>;
-                readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
-                readonly info: OptionalSchema<SchemaWithPipe<readonly [CustomSchema<Record<string, unknown>, undefined>, RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>]>, undefined>;
-                }, undefined>;
-                };
-                RATE_LIMIT_EXCEEDED: {
-                readonly status: 429;
-                readonly data: ObjectSchema<    {
-                readonly id: StringSchema<undefined>;
-                readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
-                readonly info: OptionalSchema<SchemaWithPipe<readonly [CustomSchema<Record<string, unknown>, undefined>, RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>]>, undefined>;
-                }, undefined>;
-                };
-                INVALID_PARAM: {
-                readonly status: 400;
-                readonly data: ObjectSchema<    {
-                readonly id: StringSchema<undefined>;
-                readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
-                readonly info: OptionalSchema<SchemaWithPipe<readonly [CustomSchema<Record<string, unknown>, undefined>, RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>]>, undefined>;
-                }, undefined>;
-                };
-                INTERNAL_ERROR: {
-                readonly status: 500;
-                readonly data: ObjectSchema<    {
-                readonly id: StringSchema<undefined>;
-                readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
-                readonly info: OptionalSchema<SchemaWithPipe<readonly [CustomSchema<Record<string, unknown>, undefined>, RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>]>, undefined>;
-                }, undefined>;
-                };
-                FILE_REQUIRED: {
-                status: number;
-                data: ObjectSchema<    {
-                readonly id: StringSchema<undefined>;
-                readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
-                readonly info: OptionalSchema<SchemaWithPipe<readonly [CustomSchema<Record<string, unknown>, undefined>, RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>]>, undefined>;
-                }, undefined>;
-                };
-                INVALID_FILE_NAME: {
-                status: number;
-                data: ObjectSchema<    {
-                readonly id: StringSchema<undefined>;
-                readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
-                readonly info: OptionalSchema<SchemaWithPipe<readonly [CustomSchema<Record<string, unknown>, undefined>, RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>]>, undefined>;
-                }, undefined>;
-                };
-                INAPPROPRIATE: {
-                status: number;
-                data: ObjectSchema<    {
-                readonly id: StringSchema<undefined>;
-                readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
-                readonly info: OptionalSchema<SchemaWithPipe<readonly [CustomSchema<Record<string, unknown>, undefined>, RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>]>, undefined>;
-                }, undefined>;
-                };
-                NO_FREE_SPACE: {
-                status: number;
-                data: ObjectSchema<    {
-                readonly id: StringSchema<undefined>;
-                readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
-                readonly info: OptionalSchema<SchemaWithPipe<readonly [CustomSchema<Record<string, unknown>, undefined>, RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>]>, undefined>;
-                }, undefined>;
-                };
-                MAX_FILE_SIZE_EXCEEDED: {
-                status: number;
-                data: ObjectSchema<    {
-                readonly id: StringSchema<undefined>;
-                readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
-                readonly info: OptionalSchema<SchemaWithPipe<readonly [CustomSchema<Record<string, unknown>, undefined>, RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>]>, undefined>;
-                }, undefined>;
-                };
-                UNALLOWED_FILE_TYPE: {
-                status: number;
-                data: ObjectSchema<    {
-                readonly id: StringSchema<undefined>;
-                readonly kind: PicklistSchema<["client", "permission", "server"], undefined>;
-                readonly info: OptionalSchema<SchemaWithPipe<readonly [CustomSchema<Record<string, unknown>, undefined>, RecordSchema<StringSchema<undefined>, UnknownSchema, undefined>]>, undefined>;
-                }, undefined>;
-                };
-                }>>;
-            };
-        };
-    };
+    readonly orpc: PilotClient;
     // (undocumented)
     request<E extends keyof Endpoints, P extends Endpoints[E]['req']>(endpoint: E, params?: P, credential?: string | null): Promise<SwitchCaseResponseType<E, P>>;
 }
@@ -1843,6 +1469,9 @@ type EmojiResponse = ContractResponse<'emoji', operations['emoji']['responses'][
 type EmojiSimple = ContractModel<'EmojiSimple'>;
 
 // @public (undocumented)
+type EmojisRequest = ContractRequest<'emojis', operations['emojis']['requestBody']['content']['application/json']>;
+
+// @public (undocumented)
 type EmojisResponse = ContractResponse<'emojis', operations['emojis']['responses']['200']['content']['application/json']>;
 
 // @public (undocumented)
@@ -1933,6 +1562,9 @@ export type Endpoints = Overwrite<Overwrite<Endpoints_2, ContractEndpoints>, {
 }>;
 
 // @public (undocumented)
+type EndpointsRequest = ContractRequest<'endpoints', operations['endpoints']['requestBody']['content']['application/json']>;
+
+// @public (undocumented)
 type EndpointsResponse = ContractResponse<'endpoints', operations['endpoints']['responses']['200']['content']['application/json']>;
 
 declare namespace entities {
@@ -1979,24 +1611,6 @@ declare namespace entities {
         AdminAccountsDeleteRequest,
         AdminAccountsFindByEmailRequest,
         AdminAccountsFindByEmailResponse,
-        AdminAdCreateRequest,
-        AdminAdCreateResponse,
-        AdminAdDeleteRequest,
-        AdminAdListRequest,
-        AdminAdListResponse,
-        AdminAdUpdateRequest,
-        AdminAnnouncementsCreateRequest,
-        AdminAnnouncementsCreateResponse,
-        AdminAnnouncementsDeleteRequest,
-        AdminAnnouncementsListRequest,
-        AdminAnnouncementsListResponse,
-        AdminAnnouncementsUpdateRequest,
-        AdminAvatarDecorationsCreateRequest,
-        AdminAvatarDecorationsCreateResponse,
-        AdminAvatarDecorationsDeleteRequest,
-        AdminAvatarDecorationsListRequest,
-        AdminAvatarDecorationsListResponse,
-        AdminAvatarDecorationsUpdateRequest,
         AdminCaptchaCurrentResponse,
         AdminCaptchaSaveRequest,
         AdminDeleteAccountRequest,
@@ -2005,23 +1619,6 @@ declare namespace entities {
         AdminDriveFilesResponse,
         AdminDriveShowFileRequest,
         AdminDriveShowFileResponse,
-        AdminEmojiAddRequest,
-        AdminEmojiAddResponse,
-        AdminEmojiAddAliasesBulkRequest,
-        AdminEmojiCopyRequest,
-        AdminEmojiCopyResponse,
-        AdminEmojiDeleteRequest,
-        AdminEmojiDeleteBulkRequest,
-        AdminEmojiImportZipRequest,
-        AdminEmojiListRequest,
-        AdminEmojiListResponse,
-        AdminEmojiListRemoteRequest,
-        AdminEmojiListRemoteResponse,
-        AdminEmojiRemoveAliasesBulkRequest,
-        AdminEmojiSetAliasesBulkRequest,
-        AdminEmojiSetCategoryBulkRequest,
-        AdminEmojiSetLicenseBulkRequest,
-        AdminEmojiUpdateRequest,
         AdminFederationDeleteAllFilesRequest,
         AdminFederationRefreshRemoteInstanceMetadataRequest,
         AdminFederationRemoveAllFollowingRequest,
@@ -2035,7 +1632,6 @@ declare namespace entities {
         AdminInviteCreateResponse,
         AdminInviteListRequest,
         AdminInviteListResponse,
-        AdminMetaResponse,
         AdminPromoCreateRequest,
         AdminQueueClearRequest,
         AdminQueueDeliverDelayedResponse,
@@ -2075,7 +1671,6 @@ declare namespace entities {
         AdminRolesUsersRequest,
         AdminRolesUsersResponse,
         AdminSendEmailRequest,
-        AdminServerInfoResponse,
         AdminShowModerationLogsRequest,
         AdminShowModerationLogsResponse,
         AdminShowUserRequest,
@@ -2098,14 +1693,9 @@ declare namespace entities {
         AdminUnsetUserBannerRequest,
         AdminUnsuspendUserRequest,
         AdminUpdateAbuseUserReportRequest,
-        AdminUpdateMetaRequest,
         AdminUpdateProxyAccountRequest,
         AdminUpdateProxyAccountResponse,
         AdminUpdateUserNoteRequest,
-        AnnouncementsRequest,
-        AnnouncementsResponse,
-        AnnouncementsShowRequest,
-        AnnouncementsShowResponse,
         AntennasCreateRequest,
         AntennasCreateResponse,
         AntennasDeleteRequest,
@@ -2164,30 +1754,6 @@ declare namespace entities {
         ChannelsUnfollowRequest,
         ChannelsUpdateRequest,
         ChannelsUpdateResponse,
-        ChartsActiveUsersRequest,
-        ChartsActiveUsersResponse,
-        ChartsApRequestRequest,
-        ChartsApRequestResponse,
-        ChartsDriveRequest,
-        ChartsDriveResponse,
-        ChartsFederationRequest,
-        ChartsFederationResponse,
-        ChartsInstanceRequest,
-        ChartsInstanceResponse,
-        ChartsNotesRequest,
-        ChartsNotesResponse,
-        ChartsUserDriveRequest,
-        ChartsUserDriveResponse,
-        ChartsUserFollowingRequest,
-        ChartsUserFollowingResponse,
-        ChartsUserNotesRequest,
-        ChartsUserNotesResponse,
-        ChartsUserPvRequest,
-        ChartsUserPvResponse,
-        ChartsUserReactionsRequest,
-        ChartsUserReactionsResponse,
-        ChartsUsersRequest,
-        ChartsUsersResponse,
         ChatHistoryRequest,
         ChatHistoryResponse,
         ChatMessagesCreateToRoomRequest,
@@ -2279,12 +1845,6 @@ declare namespace entities {
         DriveStreamResponse,
         EmailAddressAvailableRequest,
         EmailAddressAvailableResponse,
-        EmojiRequest,
-        EmojiResponse,
-        EmojisResponse,
-        EndpointRequest,
-        EndpointResponse,
-        EndpointsResponse,
         FederationFollowersRequest,
         FederationFollowersResponse,
         FederationFollowingRequest,
@@ -2351,17 +1911,6 @@ declare namespace entities {
         GalleryPostsUnlikeRequest,
         GalleryPostsUpdateRequest,
         GalleryPostsUpdateResponse,
-        GetAvatarDecorationsResponse,
-        GetOnlineUsersCountResponse,
-        HashtagsListRequest,
-        HashtagsListResponse,
-        HashtagsSearchRequest,
-        HashtagsSearchResponse,
-        HashtagsShowRequest,
-        HashtagsShowResponse,
-        HashtagsTrendResponse,
-        HashtagsUsersRequest,
-        HashtagsUsersResponse,
         IResponse,
         I2faDoneRequest,
         I2faDoneResponse,
@@ -2395,31 +1944,13 @@ declare namespace entities {
         IImportUserListsRequest,
         IMoveRequest,
         IMoveResponse,
-        INotificationsRequest,
-        INotificationsResponse,
-        INotificationsGroupedRequest,
-        INotificationsGroupedResponse,
         IPageLikesRequest,
         IPageLikesResponse,
         IPagesRequest,
         IPagesResponse,
         IPinRequest,
         IPinResponse,
-        IReadAnnouncementRequest,
         IRegenerateTokenRequest,
-        IRegistryGetRequest,
-        IRegistryGetResponse,
-        IRegistryGetAllRequest,
-        IRegistryGetAllResponse,
-        IRegistryGetDetailRequest,
-        IRegistryGetDetailResponse,
-        IRegistryKeysRequest,
-        IRegistryKeysResponse,
-        IRegistryKeysWithTypeRequest,
-        IRegistryKeysWithTypeResponse,
-        IRegistryRemoveRequest,
-        IRegistryScopesWithDomainResponse,
-        IRegistrySetRequest,
         IRevokeTokenRequest,
         ISigninHistoryRequest,
         ISigninHistoryResponse,
@@ -2442,8 +1973,6 @@ declare namespace entities {
         InviteLimitResponse,
         InviteListRequest,
         InviteListResponse,
-        MetaRequest,
-        MetaResponse,
         MiauthGenTokenRequest,
         MiauthGenTokenResponse,
         MuteCreateRequest,
@@ -2472,8 +2001,6 @@ declare namespace entities {
         NotesDraftsUpdateResponse,
         NotesFavoritesCreateRequest,
         NotesFavoritesDeleteRequest,
-        NotesFeaturedRequest,
-        NotesFeaturedResponse,
         NotesGlobalTimelineRequest,
         NotesGlobalTimelineResponse,
         NotesHybridTimelineRequest,
@@ -2495,8 +2022,6 @@ declare namespace entities {
         NotesRepliesResponse,
         NotesSearchRequest,
         NotesSearchResponse,
-        NotesSearchByTagRequest,
-        NotesSearchByTagResponse,
         NotesShowRequest,
         NotesShowResponse,
         NotesShowPartialBulkRequest,
@@ -2512,7 +2037,6 @@ declare namespace entities {
         NotesUnrenoteRequest,
         NotesUserListTimelineRequest,
         NotesUserListTimelineResponse,
-        NotificationsCreateRequest,
         PagePushRequest,
         PagesCreateRequest,
         PagesCreateResponse,
@@ -2523,8 +2047,6 @@ declare namespace entities {
         PagesShowResponse,
         PagesUnlikeRequest,
         PagesUpdateRequest,
-        PingResponse,
-        PinnedUsersResponse,
         PromoReadRequest,
         RenoteMuteCreateRequest,
         RenoteMuteDeleteRequest,
@@ -2532,7 +2054,6 @@ declare namespace entities {
         RenoteMuteListResponse,
         RequestResetPasswordRequest,
         ResetPasswordRequest,
-        RetentionResponse,
         ReversiCancelMatchRequest,
         ReversiGamesRequest,
         ReversiGamesResponse,
@@ -2551,14 +2072,6 @@ declare namespace entities {
         RolesShowResponse,
         RolesUsersRequest,
         RolesUsersResponse,
-        StatsResponse,
-        SwRegisterRequest,
-        SwRegisterResponse,
-        SwShowRegistrationRequest,
-        SwShowRegistrationResponse,
-        SwUnregisterRequest,
-        SwUpdateRegistrationRequest,
-        SwUpdateRegistrationResponse,
         TestRequest,
         TestResponse,
         UsernameAvailableRequest,
@@ -2569,8 +2082,6 @@ declare namespace entities {
         UsersAchievementsResponse,
         UsersClipsRequest,
         UsersClipsResponse,
-        UsersFeaturedNotesRequest,
-        UsersFeaturedNotesResponse,
         UsersFlashsRequest,
         UsersFlashsResponse,
         UsersFollowersRequest,
@@ -2581,8 +2092,6 @@ declare namespace entities {
         UsersGalleryPostsResponse,
         UsersGetFollowingUsersByBirthdayRequest,
         UsersGetFollowingUsersByBirthdayResponse,
-        UsersGetFrequentlyRepliedUsersRequest,
-        UsersGetFrequentlyRepliedUsersResponse,
         UsersListsCreateRequest,
         UsersListsCreateResponse,
         UsersListsCreateFromPublicRequest,
@@ -2607,23 +2116,162 @@ declare namespace entities {
         UsersPagesResponse,
         UsersReactionsRequest,
         UsersReactionsResponse,
-        UsersRecommendationRequest,
-        UsersRecommendationResponse,
         UsersRelationRequest,
         UsersRelationResponse,
         UsersReportAbuseRequest,
+        UsersShowRequest,
+        UsersShowResponse,
+        UsersUpdateMemoRequest,
+        VerifyEmailRequest,
+        ServerInfoRequest,
+        ServerInfoResponse,
+        AdminAdCreateRequest,
+        AdminAdCreateResponse,
+        AdminAdDeleteRequest,
+        AdminAdListRequest,
+        AdminAdListResponse,
+        AdminAdUpdateRequest,
+        AdminMetaRequest,
+        AdminMetaResponse,
+        AdminServerInfoRequest,
+        AdminServerInfoResponse,
+        AdminUpdateMetaRequest,
+        EndpointRequest,
+        EndpointResponse,
+        EndpointsRequest,
+        EndpointsResponse,
+        GetOnlineUsersCountRequest,
+        GetOnlineUsersCountResponse,
+        MetaRequest,
+        MetaResponse,
+        PingRequest,
+        PingResponse,
+        PinnedUsersRequest,
+        PinnedUsersResponse,
+        ChartsActiveUsersRequest,
+        ChartsActiveUsersResponse,
+        ChartsApRequestRequest,
+        ChartsApRequestResponse,
+        ChartsDriveRequest,
+        ChartsDriveResponse,
+        ChartsFederationRequest,
+        ChartsFederationResponse,
+        ChartsInstanceRequest,
+        ChartsInstanceResponse,
+        ChartsNotesRequest,
+        ChartsNotesResponse,
+        ChartsUserDriveRequest,
+        ChartsUserDriveResponse,
+        ChartsUserFollowingRequest,
+        ChartsUserFollowingResponse,
+        ChartsUserNotesRequest,
+        ChartsUserNotesResponse,
+        ChartsUserPvRequest,
+        ChartsUserPvResponse,
+        ChartsUserReactionsRequest,
+        ChartsUserReactionsResponse,
+        ChartsUsersRequest,
+        ChartsUsersResponse,
+        RetentionRequest,
+        RetentionResponse,
+        StatsRequest,
+        StatsResponse,
+        HashtagsListRequest,
+        HashtagsListResponse,
+        HashtagsSearchRequest,
+        HashtagsSearchResponse,
+        HashtagsShowRequest,
+        HashtagsShowResponse,
+        HashtagsTrendRequest,
+        HashtagsTrendResponse,
+        HashtagsUsersRequest,
+        HashtagsUsersResponse,
+        NotesFeaturedRequest,
+        NotesFeaturedResponse,
+        NotesSearchByTagRequest,
+        NotesSearchByTagResponse,
+        UsersFeaturedNotesRequest,
+        UsersFeaturedNotesResponse,
+        UsersGetFrequentlyRepliedUsersRequest,
+        UsersGetFrequentlyRepliedUsersResponse,
+        UsersRecommendationRequest,
+        UsersRecommendationResponse,
         UsersSearchRequest,
         UsersSearchResponse,
         UsersSearchByUsernameAndHostRequest,
         UsersSearchByUsernameAndHostResponse,
-        UsersShowRequest,
-        UsersShowResponse,
-        UsersUpdateMemoRequest,
+        AdminAnnouncementsCreateRequest,
+        AdminAnnouncementsCreateResponse,
+        AdminAnnouncementsDeleteRequest,
+        AdminAnnouncementsListRequest,
+        AdminAnnouncementsListResponse,
+        AdminAnnouncementsUpdateRequest,
+        AnnouncementsRequest,
+        AnnouncementsResponse,
+        AnnouncementsShowRequest,
+        AnnouncementsShowResponse,
+        IReadAnnouncementRequest,
+        AdminAvatarDecorationsCreateRequest,
+        AdminAvatarDecorationsCreateResponse,
+        AdminAvatarDecorationsDeleteRequest,
+        AdminAvatarDecorationsListRequest,
+        AdminAvatarDecorationsListResponse,
+        AdminAvatarDecorationsUpdateRequest,
+        GetAvatarDecorationsRequest,
+        GetAvatarDecorationsResponse,
+        IRegistryGetRequest,
+        IRegistryGetResponse,
+        IRegistryGetAllRequest,
+        IRegistryGetAllResponse,
+        IRegistryGetDetailRequest,
+        IRegistryGetDetailResponse,
+        IRegistryKeysRequest,
+        IRegistryKeysResponse,
+        IRegistryKeysWithTypeRequest,
+        IRegistryKeysWithTypeResponse,
+        IRegistryRemoveRequest,
+        IRegistryScopesWithDomainRequest,
+        IRegistryScopesWithDomainResponse,
+        IRegistrySetRequest,
+        AdminEmojiAddRequest,
+        AdminEmojiAddResponse,
+        AdminEmojiAddAliasesBulkRequest,
+        AdminEmojiCopyRequest,
+        AdminEmojiCopyResponse,
+        AdminEmojiDeleteRequest,
+        AdminEmojiDeleteBulkRequest,
+        AdminEmojiImportZipRequest,
+        AdminEmojiListRequest,
+        AdminEmojiListResponse,
+        AdminEmojiListRemoteRequest,
+        AdminEmojiListRemoteResponse,
+        AdminEmojiRemoveAliasesBulkRequest,
+        AdminEmojiSetAliasesBulkRequest,
+        AdminEmojiSetCategoryBulkRequest,
+        AdminEmojiSetLicenseBulkRequest,
+        AdminEmojiUpdateRequest,
+        EmojiRequest,
+        EmojiResponse,
+        EmojisRequest,
+        EmojisResponse,
+        ExportCustomEmojisRequest,
         V2AdminEmojiListRequest,
         V2AdminEmojiListResponse,
-        VerifyEmailRequest,
-        ServerInfoRequest,
-        ServerInfoResponse,
+        INotificationsRequest,
+        INotificationsResponse,
+        INotificationsGroupedRequest,
+        INotificationsGroupedResponse,
+        NotificationsCreateRequest,
+        NotificationsFlushRequest,
+        NotificationsMarkAllAsReadRequest,
+        NotificationsTestNotificationRequest,
+        SwRegisterRequest,
+        SwRegisterResponse,
+        SwShowRegistrationRequest,
+        SwShowRegistrationResponse,
+        SwUnregisterRequest,
+        SwUpdateRegistrationRequest,
+        SwUpdateRegistrationResponse,
         NotesDeleteRequest,
         DriveFilesCreateRequest,
         DriveFilesCreateResponse,
@@ -2697,13 +2345,142 @@ declare namespace entities {
         ChatMessageLiteForRoom,
         ChatRoom,
         ChatRoomInvitation,
-        ChatRoomMembership
+        ChatRoomMembership,
+        OrpcDefinition1,
+        OrpcDefinition2,
+        OrpcDefinition3,
+        OrpcDefinition4,
+        OrpcDefinition5,
+        OrpcDefinition6,
+        OrpcDefinition7,
+        OrpcDefinition8,
+        OrpcDefinition9,
+        OrpcDefinition10,
+        OrpcDefinition11,
+        OrpcDefinition12,
+        OrpcDefinition13,
+        OrpcDefinition14,
+        OrpcDefinition15,
+        OrpcDefinition16,
+        OrpcDefinition17,
+        OrpcDefinition18,
+        OrpcDefinition19,
+        OrpcDefinition20,
+        OrpcDefinition21,
+        OrpcDefinition22,
+        OrpcDefinition23,
+        OrpcDefinition24,
+        OrpcDefinition25,
+        OrpcDefinition26,
+        OrpcDefinition27,
+        OrpcDefinition28,
+        OrpcDefinition29,
+        OrpcDefinition30,
+        OrpcDefinition31,
+        OrpcDefinition32,
+        OrpcDefinition33,
+        OrpcDefinition34,
+        OrpcDefinition35,
+        OrpcDefinition36,
+        OrpcDefinition37,
+        OrpcDefinition38,
+        OrpcDefinition39,
+        OrpcDefinition40,
+        OrpcDefinition41,
+        OrpcDefinition42,
+        OrpcDefinition43,
+        OrpcDefinition44,
+        OrpcDefinition45,
+        OrpcDefinition46,
+        OrpcDefinition47,
+        OrpcDefinition48,
+        OrpcDefinition49,
+        OrpcDefinition50,
+        OrpcDefinition51,
+        OrpcDefinition52,
+        OrpcDefinition53,
+        OrpcDefinition54,
+        OrpcDefinition55,
+        OrpcDefinition56,
+        OrpcDefinition57,
+        OrpcDefinition58,
+        OrpcDefinition59,
+        OrpcDefinition60,
+        OrpcDefinition61,
+        OrpcDefinition62,
+        OrpcDefinition63,
+        OrpcDefinition64,
+        OrpcDefinition65,
+        OrpcDefinition66,
+        OrpcDefinition67,
+        OrpcDefinition68,
+        OrpcDefinition69,
+        OrpcDefinition70,
+        OrpcDefinition71,
+        OrpcDefinition72,
+        OrpcDefinition73,
+        OrpcDefinition74,
+        OrpcDefinition75,
+        OrpcDefinition76,
+        OrpcDefinition77,
+        OrpcDefinition78,
+        OrpcDefinition79,
+        OrpcDefinition80,
+        OrpcDefinition81,
+        OrpcDefinition82,
+        OrpcDefinition83,
+        OrpcDefinition84,
+        OrpcDefinition85,
+        OrpcDefinition86,
+        OrpcDefinition87,
+        OrpcDefinition88,
+        OrpcDefinition89,
+        OrpcDefinition90,
+        OrpcDefinition91,
+        OrpcDefinition92,
+        OrpcDefinition93,
+        OrpcDefinition94,
+        OrpcDefinition95,
+        OrpcDefinition96,
+        OrpcDefinition97,
+        OrpcDefinition98,
+        OrpcDefinition99,
+        OrpcDefinition100,
+        OrpcDefinition101,
+        OrpcDefinition102,
+        OrpcDefinition103,
+        OrpcDefinition104,
+        OrpcDefinition105,
+        OrpcDefinition106,
+        OrpcDefinition107,
+        OrpcDefinition108,
+        OrpcDefinition109,
+        OrpcDefinition110,
+        OrpcDefinition111,
+        OrpcDefinition112,
+        OrpcDefinition113,
+        OrpcDefinition114,
+        OrpcDefinition115,
+        OrpcDefinition116,
+        OrpcDefinition117,
+        OrpcDefinition118,
+        OrpcDefinition119,
+        OrpcDefinition120,
+        OrpcDefinition121,
+        OrpcDefinition122,
+        OrpcDefinition123,
+        OrpcDefinition124,
+        OrpcDefinition125,
+        OrpcDefinition126
     }
 }
 export { entities }
 
 // @public (undocumented)
 type Error_2 = ContractModel<'Error'>;
+
+// @public (undocumented)
+type ExportCustomEmojisRequest = ContractRequest<'export-custom-emojis', operations['export-custom-emojis']['requestBody']['content']['application/json']>;
 
 // @public (undocumented)
 type FederationFollowersRequest = ContractRequest<'federation/followers', operations['federation___followers']['requestBody']['content']['application/json']>;
@@ -2937,7 +2714,13 @@ type GalleryPostsUpdateRequest = ContractRequest<'gallery/posts/update', operati
 type GalleryPostsUpdateResponse = ContractResponse<'gallery/posts/update', operations['gallery___posts___update']['responses']['200']['content']['application/json']>;
 
 // @public (undocumented)
+type GetAvatarDecorationsRequest = ContractRequest<'get-avatar-decorations', operations['get-avatar-decorations']['requestBody']['content']['application/json']>;
+
+// @public (undocumented)
 type GetAvatarDecorationsResponse = ContractResponse<'get-avatar-decorations', operations['get-avatar-decorations']['responses']['200']['content']['application/json']>;
+
+// @public (undocumented)
+type GetOnlineUsersCountRequest = ContractRequest<'get-online-users-count', operations['get-online-users-count']['requestBody']['content']['application/json']>;
 
 // @public (undocumented)
 type GetOnlineUsersCountResponse = ContractResponse<'get-online-users-count', operations['get-online-users-count']['responses']['200']['content']['application/json']>;
@@ -2962,6 +2745,9 @@ type HashtagsShowRequest = ContractRequest<'hashtags/show', operations['hashtags
 
 // @public (undocumented)
 type HashtagsShowResponse = ContractResponse<'hashtags/show', operations['hashtags___show']['responses']['200']['content']['application/json']>;
+
+// @public (undocumented)
+type HashtagsTrendRequest = ContractRequest<'hashtags/trend', operations['hashtags___trend']['requestBody']['content']['application/json']>;
 
 // @public (undocumented)
 type HashtagsTrendResponse = ContractResponse<'hashtags/trend', operations['hashtags___trend']['responses']['200']['content']['application/json']>;
@@ -3183,6 +2969,9 @@ type IRegistryKeysWithTypeResponse = ContractResponse<'i/registry/keys-with-type
 
 // @public (undocumented)
 type IRegistryRemoveRequest = ContractRequest<'i/registry/remove', operations['i___registry___remove']['requestBody']['content']['application/json']>;
+
+// @public (undocumented)
+type IRegistryScopesWithDomainRequest = ContractRequest<'i/registry/scopes-with-domain', operations['i___registry___scopes-with-domain']['requestBody']['content']['application/json']>;
 
 // @public (undocumented)
 type IRegistryScopesWithDomainResponse = ContractResponse<'i/registry/scopes-with-domain', operations['i___registry___scopes-with-domain']['responses']['200']['content']['application/json']>;
@@ -3574,10 +3363,397 @@ type Notification_2 = ContractModel<'Notification'>;
 type NotificationsCreateRequest = ContractRequest<'notifications/create', operations['notifications___create']['requestBody']['content']['application/json']>;
 
 // @public (undocumented)
+type NotificationsFlushRequest = ContractRequest<'notifications/flush', operations['notifications___flush']['requestBody']['content']['application/json']>;
+
+// @public (undocumented)
+type NotificationsMarkAllAsReadRequest = ContractRequest<'notifications/mark-all-as-read', operations['notifications___mark-all-as-read']['requestBody']['content']['application/json']>;
+
+// @public (undocumented)
+type NotificationsTestNotificationRequest = ContractRequest<'notifications/test-notification', operations['notifications___test-notification']['requestBody']['content']['application/json']>;
+
+// @public (undocumented)
 export const notificationTypes: readonly ["note", "follow", "mention", "reply", "renote", "quote", "reaction", "pollEnded", "scheduledNotePosted", "scheduledNotePostFailed", "receiveFollowRequest", "followRequestAccepted", "app", "roleAssigned", "chatRoomInvitationReceived", "achievementEarned", "exportCompleted", "test", "login", "createToken"];
 
 // @public (undocumented)
 export function nyaize(text: string): string;
+
+// @public (undocumented)
+type OrpcDefinition1 = ContractModel<'OrpcDefinition1'>;
+
+// @public (undocumented)
+type OrpcDefinition10 = ContractModel<'OrpcDefinition10'>;
+
+// @public (undocumented)
+type OrpcDefinition100 = ContractModel<'OrpcDefinition100'>;
+
+// @public (undocumented)
+type OrpcDefinition101 = ContractModel<'OrpcDefinition101'>;
+
+// @public (undocumented)
+type OrpcDefinition102 = ContractModel<'OrpcDefinition102'>;
+
+// @public (undocumented)
+type OrpcDefinition103 = ContractModel<'OrpcDefinition103'>;
+
+// @public (undocumented)
+type OrpcDefinition104 = ContractModel<'OrpcDefinition104'>;
+
+// @public (undocumented)
+type OrpcDefinition105 = ContractModel<'OrpcDefinition105'>;
+
+// @public (undocumented)
+type OrpcDefinition106 = ContractModel<'OrpcDefinition106'>;
+
+// @public (undocumented)
+type OrpcDefinition107 = ContractModel<'OrpcDefinition107'>;
+
+// @public (undocumented)
+type OrpcDefinition108 = ContractModel<'OrpcDefinition108'>;
+
+// @public (undocumented)
+type OrpcDefinition109 = ContractModel<'OrpcDefinition109'>;
+
+// @public (undocumented)
+type OrpcDefinition11 = ContractModel<'OrpcDefinition11'>;
+
+// @public (undocumented)
+type OrpcDefinition110 = ContractModel<'OrpcDefinition110'>;
+
+// @public (undocumented)
+type OrpcDefinition111 = ContractModel<'OrpcDefinition111'>;
+
+// @public (undocumented)
+type OrpcDefinition112 = ContractModel<'OrpcDefinition112'>;
+
+// @public (undocumented)
+type OrpcDefinition113 = ContractModel<'OrpcDefinition113'>;
+
+// @public (undocumented)
+type OrpcDefinition114 = ContractModel<'OrpcDefinition114'>;
+
+// @public (undocumented)
+type OrpcDefinition115 = ContractModel<'OrpcDefinition115'>;
+
+// @public (undocumented)
+type OrpcDefinition116 = ContractModel<'OrpcDefinition116'>;
+
+// @public (undocumented)
+type OrpcDefinition117 = ContractModel<'OrpcDefinition117'>;
+
+// @public (undocumented)
+type OrpcDefinition118 = ContractModel<'OrpcDefinition118'>;
+
+// @public (undocumented)
+type OrpcDefinition119 = ContractModel<'OrpcDefinition119'>;
+
+// @public (undocumented)
+type OrpcDefinition12 = ContractModel<'OrpcDefinition12'>;
+
+// @public (undocumented)
+type OrpcDefinition120 = ContractModel<'OrpcDefinition120'>;
+
+// @public (undocumented)
+type OrpcDefinition121 = ContractModel<'OrpcDefinition121'>;
+
+// @public (undocumented)
+type OrpcDefinition122 = ContractModel<'OrpcDefinition122'>;
+
+// @public (undocumented)
+type OrpcDefinition123 = ContractModel<'OrpcDefinition123'>;
+
+// @public (undocumented)
+type OrpcDefinition124 = ContractModel<'OrpcDefinition124'>;
+
+// @public (undocumented)
+type OrpcDefinition125 = ContractModel<'OrpcDefinition125'>;
+
+// @public (undocumented)
+type OrpcDefinition126 = ContractModel<'OrpcDefinition126'>;
+
+// @public (undocumented)
+type OrpcDefinition13 = ContractModel<'OrpcDefinition13'>;
+
+// @public (undocumented)
+type OrpcDefinition14 = ContractModel<'OrpcDefinition14'>;
+
+// @public (undocumented)
+type OrpcDefinition15 = ContractModel<'OrpcDefinition15'>;
+
+// @public (undocumented)
+type OrpcDefinition16 = ContractModel<'OrpcDefinition16'>;
+
+// @public (undocumented)
+type OrpcDefinition17 = ContractModel<'OrpcDefinition17'>;
+
+// @public (undocumented)
+type OrpcDefinition18 = ContractModel<'OrpcDefinition18'>;
+
+// @public (undocumented)
+type OrpcDefinition19 = ContractModel<'OrpcDefinition19'>;
+
+// @public (undocumented)
+type OrpcDefinition2 = ContractModel<'OrpcDefinition2'>;
+
+// @public (undocumented)
+type OrpcDefinition20 = ContractModel<'OrpcDefinition20'>;
+
+// @public (undocumented)
+type OrpcDefinition21 = ContractModel<'OrpcDefinition21'>;
+
+// @public (undocumented)
+type OrpcDefinition22 = ContractModel<'OrpcDefinition22'>;
+
+// @public (undocumented)
+type OrpcDefinition23 = ContractModel<'OrpcDefinition23'>;
+
+// @public (undocumented)
+type OrpcDefinition24 = ContractModel<'OrpcDefinition24'>;
+
+// @public (undocumented)
+type OrpcDefinition25 = ContractModel<'OrpcDefinition25'>;
+
+// @public (undocumented)
+type OrpcDefinition26 = ContractModel<'OrpcDefinition26'>;
+
+// @public (undocumented)
+type OrpcDefinition27 = ContractModel<'OrpcDefinition27'>;
+
+// @public (undocumented)
+type OrpcDefinition28 = ContractModel<'OrpcDefinition28'>;
+
+// @public (undocumented)
+type OrpcDefinition29 = ContractModel<'OrpcDefinition29'>;
+
+// @public (undocumented)
+type OrpcDefinition3 = ContractModel<'OrpcDefinition3'>;
+
+// @public (undocumented)
+type OrpcDefinition30 = ContractModel<'OrpcDefinition30'>;
+
+// @public (undocumented)
+type OrpcDefinition31 = ContractModel<'OrpcDefinition31'>;
+
+// @public (undocumented)
+type OrpcDefinition32 = ContractModel<'OrpcDefinition32'>;
+
+// @public (undocumented)
+type OrpcDefinition33 = ContractModel<'OrpcDefinition33'>;
+
+// @public (undocumented)
+type OrpcDefinition34 = ContractModel<'OrpcDefinition34'>;
+
+// @public (undocumented)
+type OrpcDefinition35 = ContractModel<'OrpcDefinition35'>;
+
+// @public (undocumented)
+type OrpcDefinition36 = ContractModel<'OrpcDefinition36'>;
+
+// @public (undocumented)
+type OrpcDefinition37 = ContractModel<'OrpcDefinition37'>;
+
+// @public (undocumented)
+type OrpcDefinition38 = ContractModel<'OrpcDefinition38'>;
+
+// @public (undocumented)
+type OrpcDefinition39 = ContractModel<'OrpcDefinition39'>;
+
+// @public (undocumented)
+type OrpcDefinition4 = ContractModel<'OrpcDefinition4'>;
+
+// @public (undocumented)
+type OrpcDefinition40 = ContractModel<'OrpcDefinition40'>;
+
+// @public (undocumented)
+type OrpcDefinition41 = ContractModel<'OrpcDefinition41'>;
+
+// @public (undocumented)
+type OrpcDefinition42 = ContractModel<'OrpcDefinition42'>;
+
+// @public (undocumented)
+type OrpcDefinition43 = ContractModel<'OrpcDefinition43'>;
+
+// @public (undocumented)
+type OrpcDefinition44 = ContractModel<'OrpcDefinition44'>;
+
+// @public (undocumented)
+type OrpcDefinition45 = ContractModel<'OrpcDefinition45'>;
+
+// @public (undocumented)
+type OrpcDefinition46 = ContractModel<'OrpcDefinition46'>;
+
+// @public (undocumented)
+type OrpcDefinition47 = ContractModel<'OrpcDefinition47'>;
+
+// @public (undocumented)
+type OrpcDefinition48 = ContractModel<'OrpcDefinition48'>;
+
+// @public (undocumented)
+type OrpcDefinition49 = ContractModel<'OrpcDefinition49'>;
+
+// @public (undocumented)
+type OrpcDefinition5 = ContractModel<'OrpcDefinition5'>;
+
+// @public (undocumented)
+type OrpcDefinition50 = ContractModel<'OrpcDefinition50'>;
+
+// @public (undocumented)
+type OrpcDefinition51 = ContractModel<'OrpcDefinition51'>;
+
+// @public (undocumented)
+type OrpcDefinition52 = ContractModel<'OrpcDefinition52'>;
+
+// @public (undocumented)
+type OrpcDefinition53 = ContractModel<'OrpcDefinition53'>;
+
+// @public (undocumented)
+type OrpcDefinition54 = ContractModel<'OrpcDefinition54'>;
+
+// @public (undocumented)
+type OrpcDefinition55 = ContractModel<'OrpcDefinition55'>;
+
+// @public (undocumented)
+type OrpcDefinition56 = ContractModel<'OrpcDefinition56'>;
+
+// @public (undocumented)
+type OrpcDefinition57 = ContractModel<'OrpcDefinition57'>;
+
+// @public (undocumented)
+type OrpcDefinition58 = ContractModel<'OrpcDefinition58'>;
+
+// @public (undocumented)
+type OrpcDefinition59 = ContractModel<'OrpcDefinition59'>;
+
+// @public (undocumented)
+type OrpcDefinition6 = ContractModel<'OrpcDefinition6'>;
+
+// @public (undocumented)
+type OrpcDefinition60 = ContractModel<'OrpcDefinition60'>;
+
+// @public (undocumented)
+type OrpcDefinition61 = ContractModel<'OrpcDefinition61'>;
+
+// @public (undocumented)
+type OrpcDefinition62 = ContractModel<'OrpcDefinition62'>;
+
+// @public (undocumented)
+type OrpcDefinition63 = ContractModel<'OrpcDefinition63'>;
+
+// @public (undocumented)
+type OrpcDefinition64 = ContractModel<'OrpcDefinition64'>;
+
+// @public (undocumented)
+type OrpcDefinition65 = ContractModel<'OrpcDefinition65'>;
+
+// @public (undocumented)
+type OrpcDefinition66 = ContractModel<'OrpcDefinition66'>;
+
+// @public (undocumented)
+type OrpcDefinition67 = ContractModel<'OrpcDefinition67'>;
+
+// @public (undocumented)
+type OrpcDefinition68 = ContractModel<'OrpcDefinition68'>;
+
+// @public (undocumented)
+type OrpcDefinition69 = ContractModel<'OrpcDefinition69'>;
+
+// @public (undocumented)
+type OrpcDefinition7 = ContractModel<'OrpcDefinition7'>;
+
+// @public (undocumented)
+type OrpcDefinition70 = ContractModel<'OrpcDefinition70'>;
+
+// @public (undocumented)
+type OrpcDefinition71 = ContractModel<'OrpcDefinition71'>;
+
+// @public (undocumented)
+type OrpcDefinition72 = ContractModel<'OrpcDefinition72'>;
+
+// @public (undocumented)
+type OrpcDefinition73 = ContractModel<'OrpcDefinition73'>;
+
+// @public (undocumented)
+type OrpcDefinition74 = ContractModel<'OrpcDefinition74'>;
+
+// @public (undocumented)
+type OrpcDefinition75 = ContractModel<'OrpcDefinition75'>;
+
+// @public (undocumented)
+type OrpcDefinition76 = ContractModel<'OrpcDefinition76'>;
+
+// @public (undocumented)
+type OrpcDefinition77 = ContractModel<'OrpcDefinition77'>;
+
+// @public (undocumented)
+type OrpcDefinition78 = ContractModel<'OrpcDefinition78'>;
+
+// @public (undocumented)
+type OrpcDefinition79 = ContractModel<'OrpcDefinition79'>;
+
+// @public (undocumented)
+type OrpcDefinition8 = ContractModel<'OrpcDefinition8'>;
+
+// @public (undocumented)
+type OrpcDefinition80 = ContractModel<'OrpcDefinition80'>;
+
+// @public (undocumented)
+type OrpcDefinition81 = ContractModel<'OrpcDefinition81'>;
+
+// @public (undocumented)
+type OrpcDefinition82 = ContractModel<'OrpcDefinition82'>;
+
+// @public (undocumented)
+type OrpcDefinition83 = ContractModel<'OrpcDefinition83'>;
+
+// @public (undocumented)
+type OrpcDefinition84 = ContractModel<'OrpcDefinition84'>;
+
+// @public (undocumented)
+type OrpcDefinition85 = ContractModel<'OrpcDefinition85'>;
+
+// @public (undocumented)
+type OrpcDefinition86 = ContractModel<'OrpcDefinition86'>;
+
+// @public (undocumented)
+type OrpcDefinition87 = ContractModel<'OrpcDefinition87'>;
+
+// @public (undocumented)
+type OrpcDefinition88 = ContractModel<'OrpcDefinition88'>;
+
+// @public (undocumented)
+type OrpcDefinition89 = ContractModel<'OrpcDefinition89'>;
+
+// @public (undocumented)
+type OrpcDefinition9 = ContractModel<'OrpcDefinition9'>;
+
+// @public (undocumented)
+type OrpcDefinition90 = ContractModel<'OrpcDefinition90'>;
+
+// @public (undocumented)
+type OrpcDefinition91 = ContractModel<'OrpcDefinition91'>;
+
+// @public (undocumented)
+type OrpcDefinition92 = ContractModel<'OrpcDefinition92'>;
+
+// @public (undocumented)
+type OrpcDefinition93 = ContractModel<'OrpcDefinition93'>;
+
+// @public (undocumented)
+type OrpcDefinition94 = ContractModel<'OrpcDefinition94'>;
+
+// @public (undocumented)
+type OrpcDefinition95 = ContractModel<'OrpcDefinition95'>;
+
+// @public (undocumented)
+type OrpcDefinition96 = ContractModel<'OrpcDefinition96'>;
+
+// @public (undocumented)
+type OrpcDefinition97 = ContractModel<'OrpcDefinition97'>;
+
+// @public (undocumented)
+type OrpcDefinition98 = ContractModel<'OrpcDefinition98'>;
+
+// @public (undocumented)
+type OrpcDefinition99 = ContractModel<'OrpcDefinition99'>;
 
 // @public (undocumented)
 type Page = ContractModel<'Page'>;
@@ -3651,7 +3827,13 @@ export interface PilotClientContext {
 }
 
 // @public (undocumented)
+type PingRequest = ContractRequest<'ping', operations['ping']['requestBody']['content']['application/json']>;
+
+// @public (undocumented)
 type PingResponse = ContractResponse<'ping', operations['ping']['responses']['200']['content']['application/json']>;
+
+// @public (undocumented)
+type PinnedUsersRequest = ContractRequest<'pinned-users', operations['pinned-users']['requestBody']['content']['application/json']>;
 
 // @public (undocumented)
 type PinnedUsersResponse = ContractResponse<'pinned-users', operations['pinned-users']['responses']['200']['content']['application/json']>;
@@ -3720,6 +3902,9 @@ type RequestResetPasswordRequest = ContractRequest<'request-reset-password', ope
 
 // @public (undocumented)
 type ResetPasswordRequest = ContractRequest<'reset-password', operations['reset-password']['requestBody']['content']['application/json']>;
+
+// @public (undocumented)
+type RetentionRequest = ContractRequest<'retention', operations['retention']['requestBody']['content']['application/json']>;
 
 // @public (undocumented)
 type RetentionResponse = ContractResponse<'retention', operations['retention']['responses']['200']['content']['application/json']>;
@@ -3927,6 +4112,9 @@ type SignupRequest = {
 type SignupResponse = MeDetailed & {
     token: string;
 };
+
+// @public (undocumented)
+type StatsRequest = ContractRequest<'stats', operations['stats']['requestBody']['content']['application/json']>;
 
 // @public (undocumented)
 type StatsResponse = ContractResponse<'stats', operations['stats']['responses']['200']['content']['application/json']>;

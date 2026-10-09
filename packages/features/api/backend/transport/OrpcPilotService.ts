@@ -3,6 +3,55 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import * as v from 'valibot';
+import { In } from 'typeorm';
+import type { EmojisRepository, DriveFilesRepository, SwSubscriptionsRepository } from '@features/persistence/backend/repositories/models.js';
+import { CustomEmojiService } from '@features/emojis/backend/services/CustomEmojiService.js';
+import { EmojiEntityService } from '@features/emojis/backend/serializers/EmojiEntityService.js';
+import { UtilityService } from '@features/federation/backend/services/UtilityService.js';
+import { QueueService } from '@features/runtime/backend/services/QueueService.js';
+import { NotificationService } from '@features/notifications/backend/services/NotificationService.js';
+import { NotificationEntityService } from '@features/notifications/backend/serializers/NotificationEntityService.js';
+import { PushNotificationService } from '@features/notifications/backend/services/PushNotificationService.js';
+import { createEmojisOperations } from '@features/emojis/backend/api.operations.js';
+import { createNotificationsOperations } from '@features/notifications/backend/application.js';
+import { packedNotificationSchema } from '@features/notifications/backend/notification.schema.js';
+import { MoreThan } from 'typeorm';
+import type { DataSource } from 'typeorm';
+import type { Redis } from 'ioredis';
+import type { AdsRepository, AnnouncementsRepository, AnnouncementReadsRepository, RetentionAggregationsRepository, NoteReactionsRepository, InstancesRepository } from '@features/persistence/backend/repositories/models.js';
+import { IdService } from '@features/runtime/backend/services/IdService.js';
+import { QueryService } from '@features/notes/backend/services/QueryService.js';
+import { ModerationLogService } from '@features/moderation/backend/services/ModerationLogService.js';
+import { MetaService } from '@features/instance/backend/services/MetaService.js';
+import { MetaEntityService } from '@features/instance/backend/serializers/MetaEntityService.js';
+import { SystemAccountService } from '@features/users/backend/services/SystemAccountService.js';
+import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
+import { AnnouncementEntityService } from '@features/announcements/backend/serializers/AnnouncementEntityService.js';
+import { AnnouncementService } from '@features/announcements/backend/services/AnnouncementService.js';
+import { AvatarDecorationService } from '@features/avatar-decorations/backend/services/AvatarDecorationService.js';
+import { RegistryApiService } from '@features/preferences/backend/services/RegistryApiService.js';
+import { DiscoveryApplicationService } from '@features/discovery/backend/endpoints/discovery.application.js';
+import { createInstanceOperations } from '@features/instance/backend/operations.js';
+import { createStatisticsOperations } from '@features/statistics/backend/operations.js';
+import { createAnnouncementsOperations } from '@features/announcements/backend/api.operations.js';
+import { createAvatarDecorationsOperations } from '@features/avatar-decorations/backend/api.operations.js';
+import { createPreferencesOperations } from '@features/preferences/backend/operations.js';
+import { USER_ONLINE_THRESHOLD } from '@features/users/backend/presence-constants.js';
+import { getPilotEndpointDescriptors } from './openapi/pilot-spec.js';
+import type { ApiExecutionContext } from '@features/index/backend/api.context.js';
+import ActiveUsersChart from '@features/statistics/backend/charts/active-users.js';
+import ApRequestChart from '@features/statistics/backend/charts/ap-request.js';
+import DriveChart from '@features/statistics/backend/charts/drive.js';
+import FederationChart from '@features/statistics/backend/charts/federation.js';
+import InstanceChart from '@features/statistics/backend/charts/instance.js';
+import NotesChart from '@features/statistics/backend/charts/notes.js';
+import PerUserDriveChart from '@features/statistics/backend/charts/per-user-drive.js';
+import PerUserFollowingChart from '@features/statistics/backend/charts/per-user-following.js';
+import PerUserNotesChart from '@features/statistics/backend/charts/per-user-notes.js';
+import PerUserPvChart from '@features/statistics/backend/charts/per-user-pv.js';
+import PerUserReactionsChart from '@features/statistics/backend/charts/per-user-reactions.js';
+import UsersChart from '@features/statistics/backend/charts/users.js';
 import { Inject, Injectable } from '@nestjs/common';
 import { OpenAPIHandler } from '@orpc/openapi/fastify';
 import { randomUUID } from 'node:crypto';
@@ -31,7 +80,7 @@ import { ApiLoggerService } from './ApiLoggerService.js';
 import { ApiCallService } from './ApiCallService.js';
 import { apiError, internalError, normalizeError, misskeyErrorBody } from './orpc-error.js';
 import { bodyCredential, registerPilotHttp } from './pilot-http.js';
-import type { ApiContext, UploadResource } from './context.js';
+import type { UploadResource } from './context.js';
 import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 
 /** DI composition only; applications and native procedures own behavior. */
@@ -42,6 +91,7 @@ export class OrpcPilotService {
 	private readonly serverInfo;
 	private readonly deleteNote;
 	private readonly createFile;
+	private readonly operations: ApiExecutionContext<MiLocalUser>['operations'];
 
 	constructor(
 		@Inject(DI.config) private readonly config: Config,
@@ -57,7 +107,94 @@ export class OrpcPilotService {
 		deletion: NoteDeleteService,
 		drive: DriveService,
 		files: DriveFileEntityService,
+		@Inject(DI.adsRepository) ads: AdsRepository,
+		@Inject(DI.announcementsRepository) announcements: AnnouncementsRepository,
+		@Inject(DI.announcementReadsRepository) announcementReads: AnnouncementReadsRepository,
+		@Inject(DI.retentionAggregationsRepository) retention: RetentionAggregationsRepository,
+		@Inject(DI.noteReactionsRepository) reactions: NoteReactionsRepository,
+		@Inject(DI.instancesRepository) instances: InstancesRepository,
+		@Inject(DI.db) db: DataSource,
+		@Inject(DI.redis) redis: Redis,
+		idService: IdService,
+		queryService: QueryService,
+		moderationLogService: ModerationLogService,
+		metaService: MetaService,
+		metaEntityService: MetaEntityService,
+		systemAccountService: SystemAccountService,
+		userEntityService: UserEntityService,
+		announcementEntityService: AnnouncementEntityService,
+		announcementService: AnnouncementService,
+		avatarDecorationService: AvatarDecorationService,
+		registry: RegistryApiService,
+		discovery: DiscoveryApplicationService,
+		@Inject(DI.emojisRepository) emojis: EmojisRepository,
+		@Inject(DI.driveFilesRepository) driveFiles: DriveFilesRepository,
+		@Inject(DI.swSubscriptionsRepository) subscriptions: SwSubscriptionsRepository,
+		customEmojiService: CustomEmojiService,
+		emojiEntityService: EmojiEntityService,
+		utilityService: UtilityService,
+		queueService: QueueService,
+		notificationService: NotificationService,
+		notificationEntityService: NotificationEntityService,
+		pushNotificationService: PushNotificationService,
+		activeUsers: ActiveUsersChart,
+		apRequest: ApRequestChart,
+		driveChart: DriveChart,
+		federation: FederationChart,
+		instance: InstanceChart,
+		notes: NotesChart,
+		userDrive: PerUserDriveChart,
+		userFollowing: PerUserFollowingChart,
+		userNotes: PerUserNotesChart,
+		userPv: PerUserPvChart,
+		userReactions: PerUserReactionsChart,
+		usersChart: UsersChart,
+
 	) {
+		this.operations = {
+			instance: createInstanceOperations<MiLocalUser>({ adsRepository: ads, usersRepository: users,
+				serverSettings: settings, config, idService, queryService, moderationLogService, metaService,
+				metaEntityService, systemAccountService, userEntityService, db, redisClient: redis,
+				getOnlineUsersCount: { thresholdMs: USER_ONLINE_THRESHOLD, countSince: cutoff => users.countBy({ lastActiveDate: MoreThan(cutoff) }) },
+				readEndpoints: async () => {
+					const { endpoints } = await import('@features/index/backend/endpoints.js');
+					const legacy = endpoints.map(endpoint => ({ name: endpoint.name,
+						properties: Object.fromEntries(Object.entries(endpoint.params.properties ?? {}).map(([name, value]) => [name, typeof value.type === 'string' ? { type: value.type } : {}])) }));
+					return [...legacy, ...await getPilotEndpointDescriptors()].sort((a, b) => a.name.localeCompare(b.name));
+				},
+			}),
+			statistics: createStatisticsOperations<MiLocalUser>({ charts: { activeUsers, apRequest, drive: driveChart,
+				federation, instance, notes, userDrive, userFollowing, userNotes, userPv, userReactions, users: usersChart },
+				readRetention: options => retention.find(options),
+				readNotes: async () => { const chart = await notes.getChart('hour', 1, null); return { local: chart.local.total[0], remote: chart.remote.total[0] }; },
+				readUsers: async () => { const chart = await usersChart.getChart('hour', 1, null); return { local: chart.local.total[0], remote: chart.remote.total[0] }; },
+				countReactions: () => reactions.count({ cache: 3600000 }), countInstances: () => instances.count({ cache: 3600000 }),
+			}),
+			discovery,
+			emojis: createEmojisOperations<MiLocalUser>({ emojisRepository: emojis, driveFilesRepository: driveFiles,
+				customEmojiService, emojiEntityService, driveService: drive, queryService, utilityService, idService, queueService }),
+			notifications: createNotificationsOperations<MiLocalUser>({
+				generateId: timestamp => idService.gen(timestamp),
+				getNotifications: (userId, options) => notificationService.getNotifications(userId, options),
+				packMany: async (records, userId) => v.parse(v.array(packedNotificationSchema), await notificationEntityService.packMany(records, userId)),
+				packGroupedMany: async (records, userId) => v.parse(v.array(packedNotificationSchema), await notificationEntityService.packGroupedMany(records, userId)),
+				createAppNotification: (userId, data) => notificationService.createNotification(userId, 'app', data),
+				createTestNotification: userId => notificationService.createNotification(userId, 'test', {}),
+				flushAllNotifications: userId => notificationService.flushAllNotifications(userId),
+				readAllNotification: (userId, force) => notificationService.readAllNotification(userId, force),
+				swPublicKey: settings.swPublicKey, isValidEndpoint: endpoint => pushNotificationService.isValidEndpoint(endpoint),
+				findSubscription: query => subscriptions.findOneBy(query), findSubscriptions: query => subscriptions.findBy(query),
+				insertSubscription: async record => { await subscriptions.insert(record); },
+				updateSubscription: async (id, update) => { await subscriptions.update(id, update); },
+				deleteSubscriptions: async ids => { await subscriptions.delete({ id: In(ids) }); },
+				refreshSubscriptionCache: userId => pushNotificationService.refreshCache(userId),
+			}),
+			announcements: createAnnouncementsOperations<MiLocalUser>({ announcementsRepository: announcements,
+				announcementReadsRepository: announcementReads, queryService, idService, announcementEntityService, announcementService }),
+			avatarDecorations: createAvatarDecorationsOperations<MiLocalUser>({ avatarDecorationService, idService, readRoles: () => roles.getRoles() }),
+			preferences: createPreferencesOperations<MiLocalUser>({ registry }),
+		};
+
 		this.serverInfo = createServerInfoService({
 			enabled: () => settings.enableServerMachineStats,
 			read: async () => {
@@ -77,9 +214,18 @@ export class OrpcPilotService {
 			} });
 	}
 
-	private context(request: FastifyRequest, reply: FastifyReply, name: string, upload?: UploadResource): ApiContext<MiLocalUser> {
+	private context(request: FastifyRequest, reply: FastifyReply, name: string, upload?: UploadResource): ApiExecutionContext<MiLocalUser> {
 		const credential = bodyCredential(request);
 		return {
+			authorization: {
+				rootUserId: () => this.settings.rootUserId,
+				roles: actor => this.roles.getUserRoles(actor.id),
+				policyAllowed: async (actor, key) => {
+					const policies = await this.roles.getUserPolicies(actor.id);
+					return Boolean(Object.entries(policies).find(([name]) => name === key)?.[1]);
+				},
+			},
+			operations: this.operations,
 			credential, ip: request.ip, headers: request.headers, ...(upload === undefined ? {} : { upload }),
 			services: {
 				authenticate: async token => {

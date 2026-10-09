@@ -17,6 +17,8 @@ export const apiErrorData = v.object({
 });
 
 export const commonErrors = {
+	ACCESS_DENIED: { status: 400, data: apiErrorData },
+	ROLE_PERMISSION_DENIED: { status: 403, data: apiErrorData },
 	AUTHENTICATION_FAILED: { status: 401, data: apiErrorData },
 	CREDENTIAL_REQUIRED: { status: 401, data: apiErrorData },
 	YOUR_ACCOUNT_SUSPENDED: { status: 403, data: apiErrorData },

@@ -6,7 +6,7 @@
 import { OpenAPIGenerator } from '@orpc/openapi';
 import { experimental_ValibotToJsonSchemaConverter } from '@orpc/valibot';
 import { pilotContract } from '../../../../index/backend/api.contract.js';
-import { serverInfoObjectInput } from '../../../../instance/backend/endpoints/server-info.contract.js';
+import { rawObjectInputGuard } from '../input.schema.js';
 import { apiErrorInfoObject } from '../errors.schema.js';
 import { imageCommentLength } from '../../../../drive/backend/endpoints/drive/files/create.schema.js';
 
@@ -15,9 +15,18 @@ export async function genPilotOpenapiSpec(config: { version: string; apiUrl: str
 	const converter = new experimental_ValibotToJsonSchemaConverter({
 		overrideAction: ({ valibotAction, jsonSchema }) => valibotAction === imageCommentLength
 			? { ...jsonSchema, maxLength: 512 } : undefined,
-		overrideSchema: ({ valibotSchema }) => valibotSchema.type === 'blob'
-			? { type: 'string', format: 'binary', contentMediaType: 'application/octet-stream' }
-			: valibotSchema === serverInfoObjectInput || valibotSchema === apiErrorInfoObject ? { type: 'object' } : undefined,
+		overrideSchema: ({ valibotSchema, jsonSchema }) => {
+			// This raw-object proof adds no fields; the first branch contains the
+			// externally documented object properties and constraints.
+			if (valibotSchema.type === 'intersect' && 'options' in valibotSchema
+				&& Array.isArray(valibotSchema.options) && valibotSchema.options[1] === rawObjectInputGuard) {
+				const fields = jsonSchema.allOf?.[0];
+				if (fields && typeof fields === 'object') return { ...jsonSchema, ...fields, allOf: jsonSchema.allOf };
+			}
+			if (valibotSchema.type === 'blob') return { type: 'string', format: 'binary', contentMediaType: 'application/octet-stream' };
+			if (valibotSchema === apiErrorInfoObject) return { type: 'object' };
+			return undefined;
+		},
 	});
 	const spec = await new OpenAPIGenerator({ schemaConverters: [converter] }).generate(pilotContract, {
 		info: { version: config.version, title: 'Misskey API' }, servers: [{ url: config.apiUrl }],
@@ -32,6 +41,10 @@ export async function genPilotOpenapiSpec(config: { version: string; apiUrl: str
 			},
 		},
 	});
+	// Valibot emits schema-local #/$defs references. Embedding those schemas in
+	// an OpenAPI document requires document-absolute pointers for external tools.
+	rebaseExternalSchemaRefs(spec);
+	hoistExternalDefinitions(spec);
 	// A File cannot be supplied as JSON. Keep only the converter-generated multipart body.
 	for (const item of Object.values(spec.paths ?? {})) {
 		const operation = item?.post;
@@ -46,15 +59,85 @@ export async function genPilotOpenapiSpec(config: { version: string; apiUrl: str
 /** The old public introspection endpoint reads generated external input descriptions. */
 export async function getPilotEndpointDescriptors() {
 	const spec = await genPilotOpenapiSpec({ version: 'introspection', apiUrl: '/api' });
+	type ExternalSchema = NonNullable<NonNullable<typeof spec.components>['schemas']>[string];
+
+	function resolveSchema(schema: ExternalSchema): ExternalSchema {
+		const seen = new Set<string>();
+		while ('$ref' in schema && typeof schema.$ref === 'string' && schema.$ref.startsWith('#/components/schemas/')) {
+			if (seen.has(schema.$ref)) break;
+			seen.add(schema.$ref);
+			const key = schema.$ref.slice('#/components/schemas/'.length).replaceAll('~1', '/').replaceAll('~0', '~');
+			const target = spec.components?.schemas?.[key];
+			if (!target) break;
+			schema = target;
+		}
+		return schema;
+	}
+
 	return Object.entries(spec.paths ?? {}).flatMap(([path, item]) => {
 		const body = item?.post?.requestBody;
 		if (!body || '$ref' in body) return [];
-		const schema = Object.values(body.content)[0]?.schema;
-		if (!schema || '$ref' in schema) return [];
+		const bodySchema = Object.values(body.content)[0]?.schema;
+		if (!bodySchema) return [];
+		const schema = resolveSchema(bodySchema);
+		if ('$ref' in schema) return [];
 		const properties = Object.fromEntries(Object.entries(schema.properties ?? {}).flatMap(([name, property]) => {
-			if ('$ref' in property || property.format === 'binary') return [];
-			return [[name, typeof property.type === 'string' ? { type: property.type } : {}]];
+			const resolved = resolveSchema(property);
+			if ('$ref' in resolved || resolved.format === 'binary') return [];
+			return [[name, typeof resolved.type === 'string' ? { type: resolved.type } : {}]];
 		}));
 		return [{ name: path.slice(1), properties }];
 	});
+}
+
+/** Adapt generated external references only; application validation never reads JSON Schema. */
+function rebaseExternalSchemaRefs(document: unknown) {
+	const escape = (key: string) => key.replaceAll('~', '~0').replaceAll('/', '~1');
+
+	function visit(value: unknown, path: string, scope?: string) {
+		if (value === null || typeof value !== 'object') return;
+		if (Array.isArray(value)) { value.forEach((child, index) => visit(child, `${path}/${index}`, scope)); return; }
+		const localScope = '$defs' in value ? path : scope;
+		if ('$ref' in value && typeof value.$ref === 'string' && value.$ref.startsWith('#/$defs/') && localScope !== undefined) {
+			value.$ref = `#${localScope}${value.$ref.slice(1)}`;
+		}
+		for (const [key, child] of Object.entries(value)) visit(child, `${path}/${escape(key)}`, localScope);
+	}
+
+	visit(document, '');
+}
+
+/** OpenAPI generators consume named components rather than schema-local $defs. */
+function hoistExternalDefinitions(document: { components?: { schemas?: Record<string, unknown> } }) {
+	document.components ??= {};
+	const schemas = document.components.schemas ??= {};
+	const references = new Map<string, string>();
+	let count = 0;
+	const escape = (key: string) => key.replaceAll('~', '~0').replaceAll('/', '~1');
+
+	function collect(value: unknown, path: string) {
+		if (value === null || typeof value !== 'object') return;
+		if (Array.isArray(value)) { value.forEach((child, index) => collect(child, `${path}/${index}`)); return; }
+		if ('$defs' in value && value.$defs !== null && typeof value.$defs === 'object' && !Array.isArray(value.$defs)) {
+			for (const [key, definition] of Object.entries(value.$defs)) {
+				const name = `OrpcDefinition${++count}`;
+				references.set(`#${path}/$defs/${escape(key)}`, `#/components/schemas/${name}`);
+				schemas[name] = definition;
+				collect(definition, `${path}/$defs/${escape(key)}`);
+			}
+			delete value.$defs;
+		}
+		for (const [key, child] of Object.entries(value)) collect(child, `${path}/${escape(key)}`);
+	}
+
+	collect(document, '');
+
+	function rewrite(value: unknown) {
+		if (value === null || typeof value !== 'object') return;
+		if (Array.isArray(value)) { value.forEach(rewrite); return; }
+		if ('$ref' in value && typeof value.$ref === 'string') value.$ref = references.get(value.$ref) ?? value.$ref;
+		Object.values(value).forEach(rewrite);
+	}
+
+	rewrite(document);
 }

@@ -3,50 +3,16 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { inlineSwShowRegistrationDefinition, inlineSwShowRegistrationInput, inlineSwShowRegistrationOutput } from '../../../contract/endpoint-definitions.js';
-import { Inject, Injectable } from '@nestjs/common';
-import type { SwSubscriptionsRepository } from '@features/persistence/backend/repositories/models.js';
+import { implement } from '@orpc/server';
+import { authentication, apiPolicy, requirePrincipal } from '../../../../api/backend/transport/middleware.js';
+import type { ApiActor } from '../../../../api/backend/transport/context.js';
+import type { NotificationsContext } from '../../operations.js';
+import { showRegistrationContract } from './show-registration.contract.js';
 
-import { DI } from '@/di-symbols.js';
-
-const contractProjection = projectEndpointContract(inlineSwShowRegistrationDefinition);
-
-export const meta = {
-	tags: ['account'],
-
-	requireCredential: true,
-	secure: true,
-
-	description: 'Check push notification registration exists.',
-
-	res: contractProjection.response,
-} as const;
-
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof inlineSwShowRegistrationInput, typeof inlineSwShowRegistrationOutput> {
-	constructor(
-		@Inject(DI.swSubscriptionsRepository)
-		private swSubscriptionsRepository: SwSubscriptionsRepository,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			// if already subscribed
-			const exist = await this.swSubscriptionsRepository.findOneBy({
-				userId: me.id,
-				endpoint: ps.endpoint,
-			});
-
-			if (exist != null) {
-				return {
-					userId: exist.userId,
-					endpoint: exist.endpoint,
-					sendReadMessage: exist.sendReadMessage,
-				};
-			}
-
-			return null;
-		});
-	}
+export function createShowRegistrationProcedure<Actor extends ApiActor>() {
+	return implement(showRegistrationContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<NotificationsContext<Actor>>()
+		.use(authentication<Actor>())
+		.use(apiPolicy<Actor>({ name: 'sw/show-registration', requireCredential: true, secure: true }))
+		.use(requirePrincipal<Actor>())
+		.handler(({ input, context }) => context.operations.notifications.showRegistration(input, context.principal));
 }

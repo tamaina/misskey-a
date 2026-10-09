@@ -8,7 +8,7 @@ import { apiErrorData, commonErrors } from '../../../../../api/backend/transport
 import { driveCreateWireInput, driveCreateOutput } from './create.schema.js';
 
 const requestName = 'drive/files/create';
-const base = oc.$meta<{ requestName: typeof requestName }>({ requestName })
+const base = oc.$meta<{ requestName: typeof requestName; multipart: true }>({ requestName, multipart: true })
 	.route({ method: 'POST', path: `/${requestName}`, operationId: 'post___' + requestName.replaceAll('/', '___'), tags: ['drive'], description: 'Upload a new drive file. Requires write:drive permission.', spec: current => ({ ...current, security: [{ bearerAuth: [] }] }) })
 	.errors({
 		...commonErrors,

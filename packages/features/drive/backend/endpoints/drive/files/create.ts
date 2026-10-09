@@ -6,7 +6,7 @@
 import { implement } from '@orpc/server';
 import { drivePilotContract } from './create.contract.js';
 import type { ApiActor, ApiContext } from '../../../../../api/backend/transport/context.js';
-import { authentication, writePolicy } from '../../../../../api/backend/transport/middleware.js';
+import { authentication, apiPolicy, requirePrincipal } from '../../../../../api/backend/transport/middleware.js';
 import { apiError } from '../../../../../api/backend/transport/orpc-error.js';
 
 function isRecord(input: unknown): input is Record<string, unknown> {
@@ -14,11 +14,12 @@ function isRecord(input: unknown): input is Record<string, unknown> {
 }
 
 export function createDriveFileProcedure<Actor extends ApiActor>() {
-	const drive = implement(drivePilotContract).$context<ApiContext<Actor>>()
+	const drive = implement(drivePilotContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>()
 		.use(authentication<Actor>())
-		.use(writePolicy<Actor>('write:drive', {
+		.use(apiPolicy<Actor>({ name: 'drive/files/create', requireCredential: true, kind: 'write:drive', limit: {
 			key: 'drive/files/create', duration: 3600000, max: 120,
-		}, true))
+		}, prohibitMoved: true }))
+		.use(requirePrincipal<Actor>())
 		.use(async ({ context, next }) => {
 			if (!context.upload) throw apiError({
 				code: 'FILE_REQUIRED', message: 'File required.', id: '4267801e-70d1-416a-b011-4ee502885d8b',

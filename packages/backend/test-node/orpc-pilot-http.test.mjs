@@ -18,6 +18,8 @@ import { APIClient } from '../../misskey-js/built/api.js';
 import { createApiRouter, createDeleteNote, registerPilotHttp, bodyCredential, misskeyErrorBody, genPilotOpenapiSpec, getPilotEndpointDescriptors } from '../built/features/api/pilot.js';
 
 const actor = { id: 'alice', isSuspended: false, movedToUri: null };
+const chartSection = { total: [1], inc: [1], dec: [0], diffs: { normal: [1], reply: [0], renote: [0], withFile: [0] } };
+const chartOutput = { local: chartSection, remote: chartSection };
 const stats = { machine: '?', cpu: { model: '?', cores: 0 }, mem: { total: 0 }, fs: { total: 0, used: 0 } };
 const output = { id: 'file1', createdAt: '2026-10-08T00:00:00.000Z', name: 'file.txt', type: 'text/plain',
 	md5: 'hash', size: 5, isSensitive: false, blurhash: null, properties: {}, url: 'https://example.com/file',
@@ -33,10 +35,16 @@ async function fixture(t, overrides = {}) {
 			maxFileSize: 1024, runSpan: (_name, run) => run(),
 			context: (request, _reply, _name, upload) => ({
 				credential: bodyCredential(request), ip: request.ip, headers: request.headers, upload,
+				operations: {
+					instance: { ping: async () => ({ pong: 123 }), onlineUsersCount: async () => ({ count: 7 }) },
+					emojis: { emojis: async () => ({ emojis: [] }) },
+					statistics: { notes: async input => { events.push(['chart', input]); return chartOutput; } },
+					notifications: { flush: async () => { events.push(['flush']); } },
+				},
 				services: {
 					authenticate: async credential => {
 						events.push(['credential', credential]);
-						return credential ? [actor, { permission: credential === 'restricted' ? [] : ['write:notes', 'write:drive'] }] : [null, null];
+						return credential ? [actor, { permission: credential === 'restricted' ? [] : ['write:notes', 'write:drive', 'write:notifications'] }] : [null, null];
 					},
 					logIp: () => {}, limitActor: principal => principal?.id ?? 'ip',
 					rateLimitFactor: async () => 1, limit: async () => null,
@@ -127,7 +135,7 @@ test('official external specification describes multipart, Unicode bound, finite
 	assert.equal(input.properties.file.contentMediaType, 'application/octet-stream');
 	assert.deepEqual(upload.security, [{ bearerAuth: [] }]);
 	assert.equal(upload.responses['200'].content['application/json'].schema.additionalProperties, false);
-	assert.equal(upload.responses['400'].content['application/json'].schema.properties.error.anyOf[0].properties.code.const, 'INVALID_PARAM');
+	assert.ok(upload.responses['400'].content['application/json'].schema.properties.error.anyOf.some(error => error.properties.code.const === 'INVALID_PARAM'));
 	assert.deepEqual(spec.paths['/notes/delete'].post.responses['204'].content, {});
 });
 
@@ -144,7 +152,8 @@ test('malformed multipart requests keep the bare client-error boundary', async t
 
 test('public native introspection comes from the contract and keeps staged paths private', async () => {
 	const descriptors = await getPilotEndpointDescriptors();
-	assert.deepEqual(descriptors.map(item => item.name).sort(), ['drive/files/create', 'notes/delete', 'server-info']);
+	assert.equal(descriptors.length, 89);
+	assert.equal(new Set(descriptors.map(item => item.name)).size, 89);
 	assert.deepEqual(descriptors.find(item => item.name === 'notes/delete').properties, { noteId: { type: 'string' } });
 	assert.equal('file' in descriptors.find(item => item.name === 'drive/files/create').properties, false);
 	assert.equal(JSON.stringify(descriptors).includes('path'), false);
@@ -335,4 +344,46 @@ test('defined error data is validated and normalized by the shared portable cont
 	assert.equal(result.isDefined, true);
 	assert.equal(isDefinedError(result.error), true);
 	assert.deepEqual(result.error.data, { id: 'contract-error', kind: 'client', info: { remaining: 0 } });
+});
+
+
+test('cohort SDK facade, direct client and public GET aliases use the native router', async t => {
+	const { app, client, events } = await fixture(t);
+	assert.deepEqual(await client.request('ping', {}), { pong: 123 });
+	assert.deepEqual(await client.orpc.instance.ping(), { pong: 123 });
+	for (const [url, expected] of [['get-online-users-count', { count: 7 }], ['emojis', { emojis: [] }]]) {
+		const response = await app.inject({ method: 'GET', url: `/api/${url}` });
+		assert.equal(response.statusCode, 200);
+		assert.deepEqual(response.json(), expected);
+	}
+	assert.deepEqual(await client.request('charts/notes', { span: 'day' }), chartOutput);
+	const chart = await app.inject({ method: 'GET', url: '/api/charts/notes?span=day&limit=2&offset=null&unused=true' });
+	assert.equal(chart.statusCode, 200);
+	assert.deepEqual(events.filter(event => event[0] === 'chart').at(-1)[1], { span: 'day', limit: 2, offset: null });
+	assert.equal(chart.headers['cache-control'], 'public, max-age=3600');
+	const bad = await app.inject({ method: 'GET', url: '/api/charts/notes?span=day&limit=01' });
+	assert.equal(bad.statusCode, 400);
+	assert.equal(bad.json().error.id, '0b5f1631-7c1a-41a6-b399-cce335f34d85');
+	assert.equal(await client.request('notifications/flush', {}), null);
+	assert.equal(await client.orpc.notifications.flush(), undefined);
+	assert.equal(events.filter(event => event[0] === 'flush').length, 2);
+});
+
+test('external generated references resolve after component hoisting and GET schemas retain fields', async () => {
+	const spec = await genPilotOpenapiSpec({ version: 'cohort', apiUrl: 'https://example.com/api' });
+	let references = 0;
+	function visit(value) {
+		if (!value || typeof value !== 'object') return;
+		assert.equal('$defs' in value, false);
+		assert.equal('optional' in value, false);
+		if (typeof value.$ref === 'string' && value.$ref.startsWith('#/')) {
+			const resolved = value.$ref.slice(2).split('/').reduce((object, key) => object?.[key.replaceAll('~1', '/').replaceAll('~0', '~')], spec);
+			assert.notEqual(resolved, undefined, value.$ref);
+			references++;
+		}
+		for (const child of Object.values(value)) visit(child);
+	}
+	visit(spec);
+	assert.ok(references > 0);
+	assert.ok(spec.paths['/charts/notes'].get.parameters.some(parameter => parameter.name === 'limit'));
 });

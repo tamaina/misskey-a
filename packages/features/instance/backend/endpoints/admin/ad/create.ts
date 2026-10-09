@@ -3,70 +3,16 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { packedAdminAdCreateDefinition, packedAdminAdCreateInput, packedAdminAdCreateOutput } from '../../../../contract/packed-endpoint-definitions.js';
-import { Inject, Injectable } from '@nestjs/common';
+import { implement } from '@orpc/server';
+import { adCreateContract } from './create.contract.js';
+import type { ApiActor } from '../../../../../api/backend/transport/context.js';
+import { authentication, apiPolicy, requirePrincipal } from '../../../../../api/backend/transport/middleware.js';
+import type { InstanceApiContext } from '../../../operations.js';
 
-import type { AdsRepository } from '@features/persistence/backend/repositories/models.js';
-import { IdService } from '@features/runtime/backend/services/IdService.js';
-import { DI } from '@/di-symbols.js';
-import { ModerationLogService } from '@features/moderation/backend/services/ModerationLogService.js';
-
-const contractProjection = projectEndpointContract(packedAdminAdCreateDefinition);
-
-export const meta = {
-	tags: ['admin'],
-
-	requireCredential: true,
-	requireModerator: true,
-	kind: 'write:admin:ad',
-	res: contractProjection.response,
-} as const;
-
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedAdminAdCreateInput, typeof packedAdminAdCreateOutput> {
-	constructor(
-		@Inject(DI.adsRepository)
-		private adsRepository: AdsRepository,
-
-		private idService: IdService,
-		private moderationLogService: ModerationLogService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			const ad = await this.adsRepository.insertOne({
-				id: this.idService.gen(),
-				expiresAt: new Date(ps.expiresAt),
-				startsAt: new Date(ps.startsAt),
-				dayOfWeek: ps.dayOfWeek,
-				isSensitive: ps.isSensitive,
-				url: ps.url,
-				imageUrl: ps.imageUrl,
-				priority: ps.priority,
-				ratio: ps.ratio,
-				place: ps.place,
-				memo: ps.memo,
-			});
-
-			this.moderationLogService.log(me, 'createAd', {
-				adId: ad.id,
-				ad: ad,
-			});
-
-			return {
-				id: ad.id,
-				expiresAt: ad.expiresAt.toISOString(),
-				startsAt: ad.startsAt.toISOString(),
-				dayOfWeek: ad.dayOfWeek,
-				isSensitive: ad.isSensitive,
-				url: ad.url,
-				imageUrl: ad.imageUrl,
-				priority: ad.priority,
-				ratio: ad.ratio,
-				place: ad.place,
-				memo: ad.memo,
-			};
-		});
-	}
+export function createAdCreateProcedure<Actor extends ApiActor>() {
+	return implement(adCreateContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<InstanceApiContext<Actor>>()
+		.use(authentication<Actor>())
+		.use(apiPolicy<Actor>({ name: 'admin/ad/create', requireCredential: true, requireModerator: true, kind: 'write:admin:ad' }))
+		.use(requirePrincipal<Actor>())
+		.handler(({ input, context }) => context.operations.instance.adCreate(input, context.principal));
 }

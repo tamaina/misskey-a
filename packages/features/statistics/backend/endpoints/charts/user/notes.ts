@@ -3,31 +3,23 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { chartPerUserNotesDefinition, userChartInput, chartPerUserNotesOutput } from '../../../../contract/chart-endpoint-definitions.js';
-import { Injectable } from '@nestjs/common';
-import { PerUserNotesChart } from '../../../charts/per-user-notes.js';
+import { implement } from '@orpc/server';
+import { authentication, apiPolicy, decodeScalarInput } from '../../../../../api/backend/transport/middleware.js';
+import type { ApiActor } from '../../../../../api/backend/transport/context.js';
+import type { StatisticsContext } from '../../../operations.js';
+import { chartPerUserNotesContract, chartPerUserNotesGetContract } from './notes.contract.js';
 
-const contractProjection = projectEndpointContract(chartPerUserNotesDefinition);
+export function createPerUserNotesProcedure<Actor extends ApiActor>() {
+	return implement(chartPerUserNotesContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<StatisticsContext<Actor>>()
+		.use(authentication<Actor>())
+		.use(apiPolicy<Actor>({ name: 'charts/user/notes' }))
+		.handler(({ input, context }) => context.operations.statistics.userNotes(input, context.principal));
+}
 
-export const meta = {
-	tags: ['charts', 'users', 'notes'],
-
-	res: contractProjection.response,
-
-	allowGet: true,
-	cacheSec: 60 * 60,
-} as const;
-
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof userChartInput, typeof chartPerUserNotesOutput> {
-	constructor(
-		private perUserNotesChart: PerUserNotesChart,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			return await this.perUserNotesChart.getChart(ps.span, ps.limit, ps.offset ? new Date(ps.offset) : null, ps.userId);
-		});
-	}
+export function createPerUserNotesGetProcedure<Actor extends ApiActor>() {
+	return implement(chartPerUserNotesGetContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<StatisticsContext<Actor>>()
+		.use(authentication<Actor>())
+		.use(apiPolicy<Actor>({ name: 'charts/user/notes' }))
+		.use(decodeScalarInput<Actor>({ limit: 'integer', offset: 'integer' }))
+		.handler(({ input, context }) => context.operations.statistics.userNotes(input, context.principal));
 }

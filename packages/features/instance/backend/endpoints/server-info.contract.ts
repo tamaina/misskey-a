@@ -5,13 +5,13 @@
 
 import { oc } from '@orpc/contract';
 import * as v from 'valibot';
+import { objectInput } from '../../../api/backend/transport/input.schema.js';
 
 import { commonErrors } from '../../../api/backend/transport/errors.schema.js';
 
 const finiteNumber = v.pipe(v.number(), v.finite());
 /** Empty object inputs still reject arrays; an absent POST body retains the legacy default. */
-export const serverInfoObjectInput = v.custom<object>(value => value !== null && typeof value === 'object' && !Array.isArray(value));
-const serverInfoInput = v.optional(v.pipe(serverInfoObjectInput, v.object({})), {});
+const serverInfoInput = v.optional(objectInput({}), {});
 
 export const serverInfoOutput = v.strictObject({
 	machine: v.string(),
@@ -21,7 +21,7 @@ export const serverInfoOutput = v.strictObject({
 });
 
 const requestName = 'server-info';
-export const serverInfoContract = oc.$meta<{ requestName: typeof requestName }>({ requestName })
+export const serverInfoContract = oc.$meta<{ requestName: typeof requestName; allowGet: true; cacheSec: number }>({ requestName, allowGet: true, cacheSec: 60 })
 	.route({ method: 'POST', path: `/${requestName}`, operationId: 'post___' + requestName.replaceAll('/', '___'), tags: ['meta'] })
 	.errors(commonErrors)
 	.input(serverInfoInput)

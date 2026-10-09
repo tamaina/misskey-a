@@ -17,24 +17,6 @@ import type {
 	AdminAccountsDeleteRequest,
 	AdminAccountsFindByEmailRequest,
 	AdminAccountsFindByEmailResponse,
-	AdminAdCreateRequest,
-	AdminAdCreateResponse,
-	AdminAdDeleteRequest,
-	AdminAdListRequest,
-	AdminAdListResponse,
-	AdminAdUpdateRequest,
-	AdminAnnouncementsCreateRequest,
-	AdminAnnouncementsCreateResponse,
-	AdminAnnouncementsDeleteRequest,
-	AdminAnnouncementsListRequest,
-	AdminAnnouncementsListResponse,
-	AdminAnnouncementsUpdateRequest,
-	AdminAvatarDecorationsCreateRequest,
-	AdminAvatarDecorationsCreateResponse,
-	AdminAvatarDecorationsDeleteRequest,
-	AdminAvatarDecorationsListRequest,
-	AdminAvatarDecorationsListResponse,
-	AdminAvatarDecorationsUpdateRequest,
 	AdminCaptchaCurrentResponse,
 	AdminCaptchaSaveRequest,
 	AdminDeleteAccountRequest,
@@ -43,23 +25,6 @@ import type {
 	AdminDriveFilesResponse,
 	AdminDriveShowFileRequest,
 	AdminDriveShowFileResponse,
-	AdminEmojiAddRequest,
-	AdminEmojiAddResponse,
-	AdminEmojiAddAliasesBulkRequest,
-	AdminEmojiCopyRequest,
-	AdminEmojiCopyResponse,
-	AdminEmojiDeleteRequest,
-	AdminEmojiDeleteBulkRequest,
-	AdminEmojiImportZipRequest,
-	AdminEmojiListRequest,
-	AdminEmojiListResponse,
-	AdminEmojiListRemoteRequest,
-	AdminEmojiListRemoteResponse,
-	AdminEmojiRemoveAliasesBulkRequest,
-	AdminEmojiSetAliasesBulkRequest,
-	AdminEmojiSetCategoryBulkRequest,
-	AdminEmojiSetLicenseBulkRequest,
-	AdminEmojiUpdateRequest,
 	AdminFederationDeleteAllFilesRequest,
 	AdminFederationRefreshRemoteInstanceMetadataRequest,
 	AdminFederationRemoveAllFollowingRequest,
@@ -73,7 +38,6 @@ import type {
 	AdminInviteCreateResponse,
 	AdminInviteListRequest,
 	AdminInviteListResponse,
-	AdminMetaResponse,
 	AdminPromoCreateRequest,
 	AdminQueueClearRequest,
 	AdminQueueDeliverDelayedResponse,
@@ -113,7 +77,6 @@ import type {
 	AdminRolesUsersRequest,
 	AdminRolesUsersResponse,
 	AdminSendEmailRequest,
-	AdminServerInfoResponse,
 	AdminShowModerationLogsRequest,
 	AdminShowModerationLogsResponse,
 	AdminShowUserRequest,
@@ -136,14 +99,9 @@ import type {
 	AdminUnsetUserBannerRequest,
 	AdminUnsuspendUserRequest,
 	AdminUpdateAbuseUserReportRequest,
-	AdminUpdateMetaRequest,
 	AdminUpdateProxyAccountRequest,
 	AdminUpdateProxyAccountResponse,
 	AdminUpdateUserNoteRequest,
-	AnnouncementsRequest,
-	AnnouncementsResponse,
-	AnnouncementsShowRequest,
-	AnnouncementsShowResponse,
 	AntennasCreateRequest,
 	AntennasCreateResponse,
 	AntennasDeleteRequest,
@@ -202,30 +160,6 @@ import type {
 	ChannelsUnfollowRequest,
 	ChannelsUpdateRequest,
 	ChannelsUpdateResponse,
-	ChartsActiveUsersRequest,
-	ChartsActiveUsersResponse,
-	ChartsApRequestRequest,
-	ChartsApRequestResponse,
-	ChartsDriveRequest,
-	ChartsDriveResponse,
-	ChartsFederationRequest,
-	ChartsFederationResponse,
-	ChartsInstanceRequest,
-	ChartsInstanceResponse,
-	ChartsNotesRequest,
-	ChartsNotesResponse,
-	ChartsUserDriveRequest,
-	ChartsUserDriveResponse,
-	ChartsUserFollowingRequest,
-	ChartsUserFollowingResponse,
-	ChartsUserNotesRequest,
-	ChartsUserNotesResponse,
-	ChartsUserPvRequest,
-	ChartsUserPvResponse,
-	ChartsUserReactionsRequest,
-	ChartsUserReactionsResponse,
-	ChartsUsersRequest,
-	ChartsUsersResponse,
 	ChatHistoryRequest,
 	ChatHistoryResponse,
 	ChatMessagesCreateToRoomRequest,
@@ -317,12 +251,6 @@ import type {
 	DriveStreamResponse,
 	EmailAddressAvailableRequest,
 	EmailAddressAvailableResponse,
-	EmojiRequest,
-	EmojiResponse,
-	EmojisResponse,
-	EndpointRequest,
-	EndpointResponse,
-	EndpointsResponse,
 	FederationFollowersRequest,
 	FederationFollowersResponse,
 	FederationFollowingRequest,
@@ -389,17 +317,6 @@ import type {
 	GalleryPostsUnlikeRequest,
 	GalleryPostsUpdateRequest,
 	GalleryPostsUpdateResponse,
-	GetAvatarDecorationsResponse,
-	GetOnlineUsersCountResponse,
-	HashtagsListRequest,
-	HashtagsListResponse,
-	HashtagsSearchRequest,
-	HashtagsSearchResponse,
-	HashtagsShowRequest,
-	HashtagsShowResponse,
-	HashtagsTrendResponse,
-	HashtagsUsersRequest,
-	HashtagsUsersResponse,
 	IResponse,
 	I2faDoneRequest,
 	I2faDoneResponse,
@@ -434,31 +351,13 @@ import type {
 	IImportUserListsRequest,
 	IMoveRequest,
 	IMoveResponse,
-	INotificationsRequest,
-	INotificationsResponse,
-	INotificationsGroupedRequest,
-	INotificationsGroupedResponse,
 	IPageLikesRequest,
 	IPageLikesResponse,
 	IPagesRequest,
 	IPagesResponse,
 	IPinRequest,
 	IPinResponse,
-	IReadAnnouncementRequest,
 	IRegenerateTokenRequest,
-	IRegistryGetRequest,
-	IRegistryGetResponse,
-	IRegistryGetAllRequest,
-	IRegistryGetAllResponse,
-	IRegistryGetDetailRequest,
-	IRegistryGetDetailResponse,
-	IRegistryKeysRequest,
-	IRegistryKeysResponse,
-	IRegistryKeysWithTypeRequest,
-	IRegistryKeysWithTypeResponse,
-	IRegistryRemoveRequest,
-	IRegistryScopesWithDomainResponse,
-	IRegistrySetRequest,
 	IRevokeTokenRequest,
 	ISigninHistoryRequest,
 	ISigninHistoryResponse,
@@ -481,8 +380,6 @@ import type {
 	InviteLimitResponse,
 	InviteListRequest,
 	InviteListResponse,
-	MetaRequest,
-	MetaResponse,
 	MiauthGenTokenRequest,
 	MiauthGenTokenResponse,
 	MuteCreateRequest,
@@ -511,8 +408,6 @@ import type {
 	NotesDraftsUpdateResponse,
 	NotesFavoritesCreateRequest,
 	NotesFavoritesDeleteRequest,
-	NotesFeaturedRequest,
-	NotesFeaturedResponse,
 	NotesGlobalTimelineRequest,
 	NotesGlobalTimelineResponse,
 	NotesHybridTimelineRequest,
@@ -534,8 +429,6 @@ import type {
 	NotesRepliesResponse,
 	NotesSearchRequest,
 	NotesSearchResponse,
-	NotesSearchByTagRequest,
-	NotesSearchByTagResponse,
 	NotesShowRequest,
 	NotesShowResponse,
 	NotesShowPartialBulkRequest,
@@ -551,7 +444,6 @@ import type {
 	NotesUnrenoteRequest,
 	NotesUserListTimelineRequest,
 	NotesUserListTimelineResponse,
-	NotificationsCreateRequest,
 	PagePushRequest,
 	PagesCreateRequest,
 	PagesCreateResponse,
@@ -562,8 +454,6 @@ import type {
 	PagesShowResponse,
 	PagesUnlikeRequest,
 	PagesUpdateRequest,
-	PingResponse,
-	PinnedUsersResponse,
 	PromoReadRequest,
 	RenoteMuteCreateRequest,
 	RenoteMuteDeleteRequest,
@@ -571,7 +461,6 @@ import type {
 	RenoteMuteListResponse,
 	RequestResetPasswordRequest,
 	ResetPasswordRequest,
-	RetentionResponse,
 	ReversiCancelMatchRequest,
 	ReversiGamesRequest,
 	ReversiGamesResponse,
@@ -590,14 +479,6 @@ import type {
 	RolesShowResponse,
 	RolesUsersRequest,
 	RolesUsersResponse,
-	StatsResponse,
-	SwRegisterRequest,
-	SwRegisterResponse,
-	SwShowRegistrationRequest,
-	SwShowRegistrationResponse,
-	SwUnregisterRequest,
-	SwUpdateRegistrationRequest,
-	SwUpdateRegistrationResponse,
 	TestRequest,
 	TestResponse,
 	UsernameAvailableRequest,
@@ -608,8 +489,6 @@ import type {
 	UsersAchievementsResponse,
 	UsersClipsRequest,
 	UsersClipsResponse,
-	UsersFeaturedNotesRequest,
-	UsersFeaturedNotesResponse,
 	UsersFlashsRequest,
 	UsersFlashsResponse,
 	UsersFollowersRequest,
@@ -620,8 +499,6 @@ import type {
 	UsersGalleryPostsResponse,
 	UsersGetFollowingUsersByBirthdayRequest,
 	UsersGetFollowingUsersByBirthdayResponse,
-	UsersGetFrequentlyRepliedUsersRequest,
-	UsersGetFrequentlyRepliedUsersResponse,
 	UsersListsCreateRequest,
 	UsersListsCreateResponse,
 	UsersListsCreateFromPublicRequest,
@@ -646,23 +523,162 @@ import type {
 	UsersPagesResponse,
 	UsersReactionsRequest,
 	UsersReactionsResponse,
-	UsersRecommendationRequest,
-	UsersRecommendationResponse,
 	UsersRelationRequest,
 	UsersRelationResponse,
 	UsersReportAbuseRequest,
+	UsersShowRequest,
+	UsersShowResponse,
+	UsersUpdateMemoRequest,
+	VerifyEmailRequest,
+	ServerInfoRequest,
+	ServerInfoResponse,
+	AdminAdCreateRequest,
+	AdminAdCreateResponse,
+	AdminAdDeleteRequest,
+	AdminAdListRequest,
+	AdminAdListResponse,
+	AdminAdUpdateRequest,
+	AdminMetaRequest,
+	AdminMetaResponse,
+	AdminServerInfoRequest,
+	AdminServerInfoResponse,
+	AdminUpdateMetaRequest,
+	EndpointRequest,
+	EndpointResponse,
+	EndpointsRequest,
+	EndpointsResponse,
+	GetOnlineUsersCountRequest,
+	GetOnlineUsersCountResponse,
+	MetaRequest,
+	MetaResponse,
+	PingRequest,
+	PingResponse,
+	PinnedUsersRequest,
+	PinnedUsersResponse,
+	ChartsActiveUsersRequest,
+	ChartsActiveUsersResponse,
+	ChartsApRequestRequest,
+	ChartsApRequestResponse,
+	ChartsDriveRequest,
+	ChartsDriveResponse,
+	ChartsFederationRequest,
+	ChartsFederationResponse,
+	ChartsInstanceRequest,
+	ChartsInstanceResponse,
+	ChartsNotesRequest,
+	ChartsNotesResponse,
+	ChartsUserDriveRequest,
+	ChartsUserDriveResponse,
+	ChartsUserFollowingRequest,
+	ChartsUserFollowingResponse,
+	ChartsUserNotesRequest,
+	ChartsUserNotesResponse,
+	ChartsUserPvRequest,
+	ChartsUserPvResponse,
+	ChartsUserReactionsRequest,
+	ChartsUserReactionsResponse,
+	ChartsUsersRequest,
+	ChartsUsersResponse,
+	RetentionRequest,
+	RetentionResponse,
+	StatsRequest,
+	StatsResponse,
+	HashtagsListRequest,
+	HashtagsListResponse,
+	HashtagsSearchRequest,
+	HashtagsSearchResponse,
+	HashtagsShowRequest,
+	HashtagsShowResponse,
+	HashtagsTrendRequest,
+	HashtagsTrendResponse,
+	HashtagsUsersRequest,
+	HashtagsUsersResponse,
+	NotesFeaturedRequest,
+	NotesFeaturedResponse,
+	NotesSearchByTagRequest,
+	NotesSearchByTagResponse,
+	UsersFeaturedNotesRequest,
+	UsersFeaturedNotesResponse,
+	UsersGetFrequentlyRepliedUsersRequest,
+	UsersGetFrequentlyRepliedUsersResponse,
+	UsersRecommendationRequest,
+	UsersRecommendationResponse,
 	UsersSearchRequest,
 	UsersSearchResponse,
 	UsersSearchByUsernameAndHostRequest,
 	UsersSearchByUsernameAndHostResponse,
-	UsersShowRequest,
-	UsersShowResponse,
-	UsersUpdateMemoRequest,
+	AdminAnnouncementsCreateRequest,
+	AdminAnnouncementsCreateResponse,
+	AdminAnnouncementsDeleteRequest,
+	AdminAnnouncementsListRequest,
+	AdminAnnouncementsListResponse,
+	AdminAnnouncementsUpdateRequest,
+	AnnouncementsRequest,
+	AnnouncementsResponse,
+	AnnouncementsShowRequest,
+	AnnouncementsShowResponse,
+	IReadAnnouncementRequest,
+	AdminAvatarDecorationsCreateRequest,
+	AdminAvatarDecorationsCreateResponse,
+	AdminAvatarDecorationsDeleteRequest,
+	AdminAvatarDecorationsListRequest,
+	AdminAvatarDecorationsListResponse,
+	AdminAvatarDecorationsUpdateRequest,
+	GetAvatarDecorationsRequest,
+	GetAvatarDecorationsResponse,
+	IRegistryGetRequest,
+	IRegistryGetResponse,
+	IRegistryGetAllRequest,
+	IRegistryGetAllResponse,
+	IRegistryGetDetailRequest,
+	IRegistryGetDetailResponse,
+	IRegistryKeysRequest,
+	IRegistryKeysResponse,
+	IRegistryKeysWithTypeRequest,
+	IRegistryKeysWithTypeResponse,
+	IRegistryRemoveRequest,
+	IRegistryScopesWithDomainRequest,
+	IRegistryScopesWithDomainResponse,
+	IRegistrySetRequest,
+	AdminEmojiAddRequest,
+	AdminEmojiAddResponse,
+	AdminEmojiAddAliasesBulkRequest,
+	AdminEmojiCopyRequest,
+	AdminEmojiCopyResponse,
+	AdminEmojiDeleteRequest,
+	AdminEmojiDeleteBulkRequest,
+	AdminEmojiImportZipRequest,
+	AdminEmojiListRequest,
+	AdminEmojiListResponse,
+	AdminEmojiListRemoteRequest,
+	AdminEmojiListRemoteResponse,
+	AdminEmojiRemoveAliasesBulkRequest,
+	AdminEmojiSetAliasesBulkRequest,
+	AdminEmojiSetCategoryBulkRequest,
+	AdminEmojiSetLicenseBulkRequest,
+	AdminEmojiUpdateRequest,
+	EmojiRequest,
+	EmojiResponse,
+	EmojisRequest,
+	EmojisResponse,
+	ExportCustomEmojisRequest,
 	V2AdminEmojiListRequest,
 	V2AdminEmojiListResponse,
-	VerifyEmailRequest,
-	ServerInfoRequest,
-	ServerInfoResponse,
+	INotificationsRequest,
+	INotificationsResponse,
+	INotificationsGroupedRequest,
+	INotificationsGroupedResponse,
+	NotificationsCreateRequest,
+	NotificationsFlushRequest,
+	NotificationsMarkAllAsReadRequest,
+	NotificationsTestNotificationRequest,
+	SwRegisterRequest,
+	SwRegisterResponse,
+	SwShowRegistrationRequest,
+	SwShowRegistrationResponse,
+	SwUnregisterRequest,
+	SwUpdateRegistrationRequest,
+	SwUpdateRegistrationResponse,
 	NotesDeleteRequest,
 	DriveFilesCreateRequest,
 	DriveFilesCreateResponse,
@@ -678,18 +694,6 @@ export type Endpoints = {
 	'admin/accounts/create': { req: AdminAccountsCreateRequest; res: AdminAccountsCreateResponse };
 	'admin/accounts/delete': { req: AdminAccountsDeleteRequest; res: EmptyResponse };
 	'admin/accounts/find-by-email': { req: AdminAccountsFindByEmailRequest; res: AdminAccountsFindByEmailResponse };
-	'admin/ad/create': { req: AdminAdCreateRequest; res: AdminAdCreateResponse };
-	'admin/ad/delete': { req: AdminAdDeleteRequest; res: EmptyResponse };
-	'admin/ad/list': { req: AdminAdListRequest; res: AdminAdListResponse };
-	'admin/ad/update': { req: AdminAdUpdateRequest; res: EmptyResponse };
-	'admin/announcements/create': { req: AdminAnnouncementsCreateRequest; res: AdminAnnouncementsCreateResponse };
-	'admin/announcements/delete': { req: AdminAnnouncementsDeleteRequest; res: EmptyResponse };
-	'admin/announcements/list': { req: AdminAnnouncementsListRequest; res: AdminAnnouncementsListResponse };
-	'admin/announcements/update': { req: AdminAnnouncementsUpdateRequest; res: EmptyResponse };
-	'admin/avatar-decorations/create': { req: AdminAvatarDecorationsCreateRequest; res: AdminAvatarDecorationsCreateResponse };
-	'admin/avatar-decorations/delete': { req: AdminAvatarDecorationsDeleteRequest; res: EmptyResponse };
-	'admin/avatar-decorations/list': { req: AdminAvatarDecorationsListRequest; res: AdminAvatarDecorationsListResponse };
-	'admin/avatar-decorations/update': { req: AdminAvatarDecorationsUpdateRequest; res: EmptyResponse };
 	'admin/captcha/current': { req: EmptyRequest; res: AdminCaptchaCurrentResponse };
 	'admin/captcha/save': { req: AdminCaptchaSaveRequest; res: EmptyResponse };
 	'admin/delete-account': { req: AdminDeleteAccountRequest; res: EmptyResponse };
@@ -698,19 +702,6 @@ export type Endpoints = {
 	'admin/drive/cleanup': { req: EmptyRequest; res: EmptyResponse };
 	'admin/drive/files': { req: AdminDriveFilesRequest; res: AdminDriveFilesResponse };
 	'admin/drive/show-file': { req: AdminDriveShowFileRequest; res: AdminDriveShowFileResponse };
-	'admin/emoji/add': { req: AdminEmojiAddRequest; res: AdminEmojiAddResponse };
-	'admin/emoji/add-aliases-bulk': { req: AdminEmojiAddAliasesBulkRequest; res: EmptyResponse };
-	'admin/emoji/copy': { req: AdminEmojiCopyRequest; res: AdminEmojiCopyResponse };
-	'admin/emoji/delete': { req: AdminEmojiDeleteRequest; res: EmptyResponse };
-	'admin/emoji/delete-bulk': { req: AdminEmojiDeleteBulkRequest; res: EmptyResponse };
-	'admin/emoji/import-zip': { req: AdminEmojiImportZipRequest; res: EmptyResponse };
-	'admin/emoji/list': { req: AdminEmojiListRequest; res: AdminEmojiListResponse };
-	'admin/emoji/list-remote': { req: AdminEmojiListRemoteRequest; res: AdminEmojiListRemoteResponse };
-	'admin/emoji/remove-aliases-bulk': { req: AdminEmojiRemoveAliasesBulkRequest; res: EmptyResponse };
-	'admin/emoji/set-aliases-bulk': { req: AdminEmojiSetAliasesBulkRequest; res: EmptyResponse };
-	'admin/emoji/set-category-bulk': { req: AdminEmojiSetCategoryBulkRequest; res: EmptyResponse };
-	'admin/emoji/set-license-bulk': { req: AdminEmojiSetLicenseBulkRequest; res: EmptyResponse };
-	'admin/emoji/update': { req: AdminEmojiUpdateRequest; res: EmptyResponse };
 	'admin/federation/delete-all-files': { req: AdminFederationDeleteAllFilesRequest; res: EmptyResponse };
 	'admin/federation/refresh-remote-instance-metadata': { req: AdminFederationRefreshRemoteInstanceMetadataRequest; res: EmptyResponse };
 	'admin/federation/remove-all-following': { req: AdminFederationRemoveAllFollowingRequest; res: EmptyResponse };
@@ -721,7 +712,6 @@ export type Endpoints = {
 	'admin/get-user-ips': { req: AdminGetUserIpsRequest; res: AdminGetUserIpsResponse };
 	'admin/invite/create': { req: AdminInviteCreateRequest; res: AdminInviteCreateResponse };
 	'admin/invite/list': { req: AdminInviteListRequest; res: AdminInviteListResponse };
-	'admin/meta': { req: EmptyRequest; res: AdminMetaResponse };
 	'admin/promo/create': { req: AdminPromoCreateRequest; res: EmptyResponse };
 	'admin/queue/clear': { req: AdminQueueClearRequest; res: EmptyResponse };
 	'admin/queue/deliver-delayed': { req: EmptyRequest; res: AdminQueueDeliverDelayedResponse };
@@ -752,7 +742,6 @@ export type Endpoints = {
 	'admin/roles/update-default-policies': { req: AdminRolesUpdateDefaultPoliciesRequest; res: EmptyResponse };
 	'admin/roles/users': { req: AdminRolesUsersRequest; res: AdminRolesUsersResponse };
 	'admin/send-email': { req: AdminSendEmailRequest; res: EmptyResponse };
-	'admin/server-info': { req: EmptyRequest; res: AdminServerInfoResponse };
 	'admin/show-moderation-logs': { req: AdminShowModerationLogsRequest; res: AdminShowModerationLogsResponse };
 	'admin/show-user': { req: AdminShowUserRequest; res: AdminShowUserResponse };
 	'admin/show-users': { req: AdminShowUsersRequest; res: AdminShowUsersResponse };
@@ -768,11 +757,8 @@ export type Endpoints = {
 	'admin/unset-user-banner': { req: AdminUnsetUserBannerRequest; res: EmptyResponse };
 	'admin/unsuspend-user': { req: AdminUnsuspendUserRequest; res: EmptyResponse };
 	'admin/update-abuse-user-report': { req: AdminUpdateAbuseUserReportRequest; res: EmptyResponse };
-	'admin/update-meta': { req: AdminUpdateMetaRequest; res: EmptyResponse };
 	'admin/update-proxy-account': { req: AdminUpdateProxyAccountRequest; res: AdminUpdateProxyAccountResponse };
 	'admin/update-user-note': { req: AdminUpdateUserNoteRequest; res: EmptyResponse };
-	'announcements': { req: AnnouncementsRequest; res: AnnouncementsResponse };
-	'announcements/show': { req: AnnouncementsShowRequest; res: AnnouncementsShowResponse };
 	'antennas/create': { req: AntennasCreateRequest; res: AntennasCreateResponse };
 	'antennas/delete': { req: AntennasDeleteRequest; res: EmptyResponse };
 	'antennas/list': { req: EmptyRequest; res: AntennasListResponse };
@@ -809,18 +795,6 @@ export type Endpoints = {
 	'channels/unfavorite': { req: ChannelsUnfavoriteRequest; res: EmptyResponse };
 	'channels/unfollow': { req: ChannelsUnfollowRequest; res: EmptyResponse };
 	'channels/update': { req: ChannelsUpdateRequest; res: ChannelsUpdateResponse };
-	'charts/active-users': { req: ChartsActiveUsersRequest; res: ChartsActiveUsersResponse };
-	'charts/ap-request': { req: ChartsApRequestRequest; res: ChartsApRequestResponse };
-	'charts/drive': { req: ChartsDriveRequest; res: ChartsDriveResponse };
-	'charts/federation': { req: ChartsFederationRequest; res: ChartsFederationResponse };
-	'charts/instance': { req: ChartsInstanceRequest; res: ChartsInstanceResponse };
-	'charts/notes': { req: ChartsNotesRequest; res: ChartsNotesResponse };
-	'charts/user/drive': { req: ChartsUserDriveRequest; res: ChartsUserDriveResponse };
-	'charts/user/following': { req: ChartsUserFollowingRequest; res: ChartsUserFollowingResponse };
-	'charts/user/notes': { req: ChartsUserNotesRequest; res: ChartsUserNotesResponse };
-	'charts/user/pv': { req: ChartsUserPvRequest; res: ChartsUserPvResponse };
-	'charts/user/reactions': { req: ChartsUserReactionsRequest; res: ChartsUserReactionsResponse };
-	'charts/users': { req: ChartsUsersRequest; res: ChartsUsersResponse };
 	'chat/history': { req: ChatHistoryRequest; res: ChatHistoryResponse };
 	'chat/messages/create-to-room': { req: ChatMessagesCreateToRoomRequest; res: ChatMessagesCreateToRoomResponse };
 	'chat/messages/create-to-user': { req: ChatMessagesCreateToUserRequest; res: ChatMessagesCreateToUserResponse };
@@ -877,11 +851,6 @@ export type Endpoints = {
 	'drive/folders/update': { req: DriveFoldersUpdateRequest; res: DriveFoldersUpdateResponse };
 	'drive/stream': { req: DriveStreamRequest; res: DriveStreamResponse };
 	'email-address/available': { req: EmailAddressAvailableRequest; res: EmailAddressAvailableResponse };
-	'emoji': { req: EmojiRequest; res: EmojiResponse };
-	'emojis': { req: EmptyRequest; res: EmojisResponse };
-	'endpoint': { req: EndpointRequest; res: EndpointResponse };
-	'endpoints': { req: EmptyRequest; res: EndpointsResponse };
-	'export-custom-emojis': { req: EmptyRequest; res: EmptyResponse };
 	'federation/followers': { req: FederationFollowersRequest; res: FederationFollowersResponse };
 	'federation/following': { req: FederationFollowingRequest; res: FederationFollowingResponse };
 	'federation/instances': { req: FederationInstancesRequest; res: FederationInstancesResponse };
@@ -921,13 +890,6 @@ export type Endpoints = {
 	'gallery/posts/show': { req: GalleryPostsShowRequest; res: GalleryPostsShowResponse };
 	'gallery/posts/unlike': { req: GalleryPostsUnlikeRequest; res: EmptyResponse };
 	'gallery/posts/update': { req: GalleryPostsUpdateRequest; res: GalleryPostsUpdateResponse };
-	'get-avatar-decorations': { req: EmptyRequest; res: GetAvatarDecorationsResponse };
-	'get-online-users-count': { req: EmptyRequest; res: GetOnlineUsersCountResponse };
-	'hashtags/list': { req: HashtagsListRequest; res: HashtagsListResponse };
-	'hashtags/search': { req: HashtagsSearchRequest; res: HashtagsSearchResponse };
-	'hashtags/show': { req: HashtagsShowRequest; res: HashtagsShowResponse };
-	'hashtags/trend': { req: EmptyRequest; res: HashtagsTrendResponse };
-	'hashtags/users': { req: HashtagsUsersRequest; res: HashtagsUsersResponse };
 	'i': { req: EmptyRequest; res: IResponse };
 	'i/2fa/done': { req: I2faDoneRequest; res: I2faDoneResponse };
 	'i/2fa/key-done': { req: I2faKeyDoneRequest; res: I2faKeyDoneResponse };
@@ -959,21 +921,10 @@ export type Endpoints = {
 	'i/import-muting': { req: IImportMutingRequest; res: EmptyResponse };
 	'i/import-user-lists': { req: IImportUserListsRequest; res: EmptyResponse };
 	'i/move': { req: IMoveRequest; res: IMoveResponse };
-	'i/notifications': { req: INotificationsRequest; res: INotificationsResponse };
-	'i/notifications-grouped': { req: INotificationsGroupedRequest; res: INotificationsGroupedResponse };
 	'i/page-likes': { req: IPageLikesRequest; res: IPageLikesResponse };
 	'i/pages': { req: IPagesRequest; res: IPagesResponse };
 	'i/pin': { req: IPinRequest; res: IPinResponse };
-	'i/read-announcement': { req: IReadAnnouncementRequest; res: EmptyResponse };
 	'i/regenerate-token': { req: IRegenerateTokenRequest; res: EmptyResponse };
-	'i/registry/get': { req: IRegistryGetRequest; res: IRegistryGetResponse };
-	'i/registry/get-all': { req: IRegistryGetAllRequest; res: IRegistryGetAllResponse };
-	'i/registry/get-detail': { req: IRegistryGetDetailRequest; res: IRegistryGetDetailResponse };
-	'i/registry/keys': { req: IRegistryKeysRequest; res: IRegistryKeysResponse };
-	'i/registry/keys-with-type': { req: IRegistryKeysWithTypeRequest; res: IRegistryKeysWithTypeResponse };
-	'i/registry/remove': { req: IRegistryRemoveRequest; res: EmptyResponse };
-	'i/registry/scopes-with-domain': { req: EmptyRequest; res: IRegistryScopesWithDomainResponse };
-	'i/registry/set': { req: IRegistrySetRequest; res: EmptyResponse };
 	'i/revoke-token': { req: IRevokeTokenRequest; res: EmptyResponse };
 	'i/signin-history': { req: ISigninHistoryRequest; res: ISigninHistoryResponse };
 	'i/unpin': { req: IUnpinRequest; res: IUnpinResponse };
@@ -989,7 +940,6 @@ export type Endpoints = {
 	'invite/delete': { req: InviteDeleteRequest; res: EmptyResponse };
 	'invite/limit': { req: EmptyRequest; res: InviteLimitResponse };
 	'invite/list': { req: InviteListRequest; res: InviteListResponse };
-	'meta': { req: MetaRequest; res: MetaResponse };
 	'miauth/gen-token': { req: MiauthGenTokenRequest; res: MiauthGenTokenResponse };
 	'mute/create': { req: MuteCreateRequest; res: EmptyResponse };
 	'mute/delete': { req: MuteDeleteRequest; res: EmptyResponse };
@@ -1007,7 +957,6 @@ export type Endpoints = {
 	'notes/drafts/update': { req: NotesDraftsUpdateRequest; res: NotesDraftsUpdateResponse };
 	'notes/favorites/create': { req: NotesFavoritesCreateRequest; res: EmptyResponse };
 	'notes/favorites/delete': { req: NotesFavoritesDeleteRequest; res: EmptyResponse };
-	'notes/featured': { req: NotesFeaturedRequest; res: NotesFeaturedResponse };
 	'notes/global-timeline': { req: NotesGlobalTimelineRequest; res: NotesGlobalTimelineResponse };
 	'notes/hybrid-timeline': { req: NotesHybridTimelineRequest; res: NotesHybridTimelineResponse };
 	'notes/local-timeline': { req: NotesLocalTimelineRequest; res: NotesLocalTimelineResponse };
@@ -1020,7 +969,6 @@ export type Endpoints = {
 	'notes/renotes': { req: NotesRenotesRequest; res: NotesRenotesResponse };
 	'notes/replies': { req: NotesRepliesRequest; res: NotesRepliesResponse };
 	'notes/search': { req: NotesSearchRequest; res: NotesSearchResponse };
-	'notes/search-by-tag': { req: NotesSearchByTagRequest; res: NotesSearchByTagResponse };
 	'notes/show': { req: NotesShowRequest; res: NotesShowResponse };
 	'notes/show-partial-bulk': { req: NotesShowPartialBulkRequest; res: NotesShowPartialBulkResponse };
 	'notes/state': { req: NotesStateRequest; res: NotesStateResponse };
@@ -1030,10 +978,6 @@ export type Endpoints = {
 	'notes/translate': { req: NotesTranslateRequest; res: NotesTranslateResponse };
 	'notes/unrenote': { req: NotesUnrenoteRequest; res: EmptyResponse };
 	'notes/user-list-timeline': { req: NotesUserListTimelineRequest; res: NotesUserListTimelineResponse };
-	'notifications/create': { req: NotificationsCreateRequest; res: EmptyResponse };
-	'notifications/flush': { req: EmptyRequest; res: EmptyResponse };
-	'notifications/mark-all-as-read': { req: EmptyRequest; res: EmptyResponse };
-	'notifications/test-notification': { req: EmptyRequest; res: EmptyResponse };
 	'page-push': { req: PagePushRequest; res: EmptyResponse };
 	'pages/create': { req: PagesCreateRequest; res: PagesCreateResponse };
 	'pages/delete': { req: PagesDeleteRequest; res: EmptyResponse };
@@ -1042,8 +986,6 @@ export type Endpoints = {
 	'pages/show': { req: PagesShowRequest; res: PagesShowResponse };
 	'pages/unlike': { req: PagesUnlikeRequest; res: EmptyResponse };
 	'pages/update': { req: PagesUpdateRequest; res: EmptyResponse };
-	'ping': { req: EmptyRequest; res: PingResponse };
-	'pinned-users': { req: EmptyRequest; res: PinnedUsersResponse };
 	'promo/read': { req: PromoReadRequest; res: EmptyResponse };
 	'renote-mute/create': { req: RenoteMuteCreateRequest; res: EmptyResponse };
 	'renote-mute/delete': { req: RenoteMuteDeleteRequest; res: EmptyResponse };
@@ -1051,7 +993,6 @@ export type Endpoints = {
 	'request-reset-password': { req: RequestResetPasswordRequest; res: EmptyResponse };
 	'reset-db': { req: EmptyRequest; res: EmptyResponse };
 	'reset-password': { req: ResetPasswordRequest; res: EmptyResponse };
-	'retention': { req: EmptyRequest; res: RetentionResponse };
 	'reversi/cancel-match': { req: ReversiCancelMatchRequest; res: EmptyResponse };
 	'reversi/games': { req: ReversiGamesRequest; res: ReversiGamesResponse };
 	'reversi/invitations': { req: EmptyRequest; res: ReversiInvitationsResponse };
@@ -1063,23 +1004,16 @@ export type Endpoints = {
 	'roles/notes': { req: RolesNotesRequest; res: RolesNotesResponse };
 	'roles/show': { req: RolesShowRequest; res: RolesShowResponse };
 	'roles/users': { req: RolesUsersRequest; res: RolesUsersResponse };
-	'stats': { req: EmptyRequest; res: StatsResponse };
-	'sw/register': { req: SwRegisterRequest; res: SwRegisterResponse };
-	'sw/show-registration': { req: SwShowRegistrationRequest; res: SwShowRegistrationResponse };
-	'sw/unregister': { req: SwUnregisterRequest; res: EmptyResponse };
-	'sw/update-registration': { req: SwUpdateRegistrationRequest; res: SwUpdateRegistrationResponse };
 	'test': { req: TestRequest; res: TestResponse };
 	'username/available': { req: UsernameAvailableRequest; res: UsernameAvailableResponse };
 	'users': { req: UsersRequest; res: UsersResponse };
 	'users/achievements': { req: UsersAchievementsRequest; res: UsersAchievementsResponse };
 	'users/clips': { req: UsersClipsRequest; res: UsersClipsResponse };
-	'users/featured-notes': { req: UsersFeaturedNotesRequest; res: UsersFeaturedNotesResponse };
 	'users/flashs': { req: UsersFlashsRequest; res: UsersFlashsResponse };
 	'users/followers': { req: UsersFollowersRequest; res: UsersFollowersResponse };
 	'users/following': { req: UsersFollowingRequest; res: UsersFollowingResponse };
 	'users/gallery/posts': { req: UsersGalleryPostsRequest; res: UsersGalleryPostsResponse };
 	'users/get-following-users-by-birthday': { req: UsersGetFollowingUsersByBirthdayRequest; res: UsersGetFollowingUsersByBirthdayResponse };
-	'users/get-frequently-replied-users': { req: UsersGetFrequentlyRepliedUsersRequest; res: UsersGetFrequentlyRepliedUsersResponse };
 	'users/lists/create': { req: UsersListsCreateRequest; res: UsersListsCreateResponse };
 	'users/lists/create-from-public': { req: UsersListsCreateFromPublicRequest; res: UsersListsCreateFromPublicResponse };
 	'users/lists/delete': { req: UsersListsDeleteRequest; res: EmptyResponse };
@@ -1095,16 +1029,98 @@ export type Endpoints = {
 	'users/notes': { req: UsersNotesRequest; res: UsersNotesResponse };
 	'users/pages': { req: UsersPagesRequest; res: UsersPagesResponse };
 	'users/reactions': { req: UsersReactionsRequest; res: UsersReactionsResponse };
-	'users/recommendation': { req: UsersRecommendationRequest; res: UsersRecommendationResponse };
 	'users/relation': { req: UsersRelationRequest; res: UsersRelationResponse };
 	'users/report-abuse': { req: UsersReportAbuseRequest; res: EmptyResponse };
-	'users/search': { req: UsersSearchRequest; res: UsersSearchResponse };
-	'users/search-by-username-and-host': { req: UsersSearchByUsernameAndHostRequest; res: UsersSearchByUsernameAndHostResponse };
 	'users/show': { req: UsersShowRequest; res: UsersShowResponse };
 	'users/update-memo': { req: UsersUpdateMemoRequest; res: EmptyResponse };
-	'v2/admin/emoji/list': { req: V2AdminEmojiListRequest; res: V2AdminEmojiListResponse };
 	'verify-email': { req: VerifyEmailRequest; res: EmptyResponse };
 	'server-info': { req: ServerInfoRequest; res: ServerInfoResponse };
+	'admin/ad/create': { req: AdminAdCreateRequest; res: AdminAdCreateResponse };
+	'admin/ad/delete': { req: AdminAdDeleteRequest; res: EmptyResponse };
+	'admin/ad/list': { req: AdminAdListRequest; res: AdminAdListResponse };
+	'admin/ad/update': { req: AdminAdUpdateRequest; res: EmptyResponse };
+	'admin/meta': { req: AdminMetaRequest; res: AdminMetaResponse };
+	'admin/server-info': { req: AdminServerInfoRequest; res: AdminServerInfoResponse };
+	'admin/update-meta': { req: AdminUpdateMetaRequest; res: EmptyResponse };
+	'endpoint': { req: EndpointRequest; res: EndpointResponse };
+	'endpoints': { req: EndpointsRequest; res: EndpointsResponse };
+	'get-online-users-count': { req: GetOnlineUsersCountRequest; res: GetOnlineUsersCountResponse };
+	'meta': { req: MetaRequest; res: MetaResponse };
+	'ping': { req: PingRequest; res: PingResponse };
+	'pinned-users': { req: PinnedUsersRequest; res: PinnedUsersResponse };
+	'charts/active-users': { req: ChartsActiveUsersRequest; res: ChartsActiveUsersResponse };
+	'charts/ap-request': { req: ChartsApRequestRequest; res: ChartsApRequestResponse };
+	'charts/drive': { req: ChartsDriveRequest; res: ChartsDriveResponse };
+	'charts/federation': { req: ChartsFederationRequest; res: ChartsFederationResponse };
+	'charts/instance': { req: ChartsInstanceRequest; res: ChartsInstanceResponse };
+	'charts/notes': { req: ChartsNotesRequest; res: ChartsNotesResponse };
+	'charts/user/drive': { req: ChartsUserDriveRequest; res: ChartsUserDriveResponse };
+	'charts/user/following': { req: ChartsUserFollowingRequest; res: ChartsUserFollowingResponse };
+	'charts/user/notes': { req: ChartsUserNotesRequest; res: ChartsUserNotesResponse };
+	'charts/user/pv': { req: ChartsUserPvRequest; res: ChartsUserPvResponse };
+	'charts/user/reactions': { req: ChartsUserReactionsRequest; res: ChartsUserReactionsResponse };
+	'charts/users': { req: ChartsUsersRequest; res: ChartsUsersResponse };
+	'retention': { req: RetentionRequest; res: RetentionResponse };
+	'stats': { req: StatsRequest; res: StatsResponse };
+	'hashtags/list': { req: HashtagsListRequest; res: HashtagsListResponse };
+	'hashtags/search': { req: HashtagsSearchRequest; res: HashtagsSearchResponse };
+	'hashtags/show': { req: HashtagsShowRequest; res: HashtagsShowResponse };
+	'hashtags/trend': { req: HashtagsTrendRequest; res: HashtagsTrendResponse };
+	'hashtags/users': { req: HashtagsUsersRequest; res: HashtagsUsersResponse };
+	'notes/featured': { req: NotesFeaturedRequest; res: NotesFeaturedResponse };
+	'notes/search-by-tag': { req: NotesSearchByTagRequest; res: NotesSearchByTagResponse };
+	'users/featured-notes': { req: UsersFeaturedNotesRequest; res: UsersFeaturedNotesResponse };
+	'users/get-frequently-replied-users': { req: UsersGetFrequentlyRepliedUsersRequest; res: UsersGetFrequentlyRepliedUsersResponse };
+	'users/recommendation': { req: UsersRecommendationRequest; res: UsersRecommendationResponse };
+	'users/search': { req: UsersSearchRequest; res: UsersSearchResponse };
+	'users/search-by-username-and-host': { req: UsersSearchByUsernameAndHostRequest; res: UsersSearchByUsernameAndHostResponse };
+	'admin/announcements/create': { req: AdminAnnouncementsCreateRequest; res: AdminAnnouncementsCreateResponse };
+	'admin/announcements/delete': { req: AdminAnnouncementsDeleteRequest; res: EmptyResponse };
+	'admin/announcements/list': { req: AdminAnnouncementsListRequest; res: AdminAnnouncementsListResponse };
+	'admin/announcements/update': { req: AdminAnnouncementsUpdateRequest; res: EmptyResponse };
+	'announcements': { req: AnnouncementsRequest; res: AnnouncementsResponse };
+	'announcements/show': { req: AnnouncementsShowRequest; res: AnnouncementsShowResponse };
+	'i/read-announcement': { req: IReadAnnouncementRequest; res: EmptyResponse };
+	'admin/avatar-decorations/create': { req: AdminAvatarDecorationsCreateRequest; res: AdminAvatarDecorationsCreateResponse };
+	'admin/avatar-decorations/delete': { req: AdminAvatarDecorationsDeleteRequest; res: EmptyResponse };
+	'admin/avatar-decorations/list': { req: AdminAvatarDecorationsListRequest; res: AdminAvatarDecorationsListResponse };
+	'admin/avatar-decorations/update': { req: AdminAvatarDecorationsUpdateRequest; res: EmptyResponse };
+	'get-avatar-decorations': { req: GetAvatarDecorationsRequest; res: GetAvatarDecorationsResponse };
+	'i/registry/get': { req: IRegistryGetRequest; res: IRegistryGetResponse };
+	'i/registry/get-all': { req: IRegistryGetAllRequest; res: IRegistryGetAllResponse };
+	'i/registry/get-detail': { req: IRegistryGetDetailRequest; res: IRegistryGetDetailResponse };
+	'i/registry/keys': { req: IRegistryKeysRequest; res: IRegistryKeysResponse };
+	'i/registry/keys-with-type': { req: IRegistryKeysWithTypeRequest; res: IRegistryKeysWithTypeResponse };
+	'i/registry/remove': { req: IRegistryRemoveRequest; res: EmptyResponse };
+	'i/registry/scopes-with-domain': { req: IRegistryScopesWithDomainRequest; res: IRegistryScopesWithDomainResponse };
+	'i/registry/set': { req: IRegistrySetRequest; res: EmptyResponse };
+	'admin/emoji/add': { req: AdminEmojiAddRequest; res: AdminEmojiAddResponse };
+	'admin/emoji/add-aliases-bulk': { req: AdminEmojiAddAliasesBulkRequest; res: EmptyResponse };
+	'admin/emoji/copy': { req: AdminEmojiCopyRequest; res: AdminEmojiCopyResponse };
+	'admin/emoji/delete': { req: AdminEmojiDeleteRequest; res: EmptyResponse };
+	'admin/emoji/delete-bulk': { req: AdminEmojiDeleteBulkRequest; res: EmptyResponse };
+	'admin/emoji/import-zip': { req: AdminEmojiImportZipRequest; res: EmptyResponse };
+	'admin/emoji/list': { req: AdminEmojiListRequest; res: AdminEmojiListResponse };
+	'admin/emoji/list-remote': { req: AdminEmojiListRemoteRequest; res: AdminEmojiListRemoteResponse };
+	'admin/emoji/remove-aliases-bulk': { req: AdminEmojiRemoveAliasesBulkRequest; res: EmptyResponse };
+	'admin/emoji/set-aliases-bulk': { req: AdminEmojiSetAliasesBulkRequest; res: EmptyResponse };
+	'admin/emoji/set-category-bulk': { req: AdminEmojiSetCategoryBulkRequest; res: EmptyResponse };
+	'admin/emoji/set-license-bulk': { req: AdminEmojiSetLicenseBulkRequest; res: EmptyResponse };
+	'admin/emoji/update': { req: AdminEmojiUpdateRequest; res: EmptyResponse };
+	'emoji': { req: EmojiRequest; res: EmojiResponse };
+	'emojis': { req: EmojisRequest; res: EmojisResponse };
+	'export-custom-emojis': { req: ExportCustomEmojisRequest; res: EmptyResponse };
+	'v2/admin/emoji/list': { req: V2AdminEmojiListRequest; res: V2AdminEmojiListResponse };
+	'i/notifications': { req: INotificationsRequest; res: INotificationsResponse };
+	'i/notifications-grouped': { req: INotificationsGroupedRequest; res: INotificationsGroupedResponse };
+	'notifications/create': { req: NotificationsCreateRequest; res: EmptyResponse };
+	'notifications/flush': { req: NotificationsFlushRequest; res: EmptyResponse };
+	'notifications/mark-all-as-read': { req: NotificationsMarkAllAsReadRequest; res: EmptyResponse };
+	'notifications/test-notification': { req: NotificationsTestNotificationRequest; res: EmptyResponse };
+	'sw/register': { req: SwRegisterRequest; res: SwRegisterResponse };
+	'sw/show-registration': { req: SwShowRegistrationRequest; res: SwShowRegistrationResponse };
+	'sw/unregister': { req: SwUnregisterRequest; res: EmptyResponse };
+	'sw/update-registration': { req: SwUpdateRegistrationRequest; res: SwUpdateRegistrationResponse };
 	'notes/delete': { req: NotesDeleteRequest; res: EmptyResponse };
 	'drive/files/create': { req: DriveFilesCreateRequest; res: DriveFilesCreateResponse };
 };

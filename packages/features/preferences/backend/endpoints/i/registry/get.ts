@@ -3,44 +3,16 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { remainingIRegistryGetDefinition, remainingIRegistryGetInput, remainingIRegistryGetOutput } from '../../../../contract/remaining-inline-endpoint-definitions.js';
-import { Inject, Injectable } from '@nestjs/common';
-import { RegistryApiService } from '../../../services/RegistryApiService.js';
-import { ApiError } from '@features/api/backend/transport/error.js';
+import { implement } from '@orpc/server';
+import { authentication, apiPolicy, requirePrincipal } from '../../../../../api/backend/transport/middleware.js';
+import type { ApiActor } from '../../../../../api/backend/transport/context.js';
+import type { PreferencesContext } from '../../../operations.js';
+import { registryGetContract } from './get.contract.js';
 
-const contractProjection = projectEndpointContract(remainingIRegistryGetDefinition);
-
-export const meta = {
-	requireCredential: true,
-	kind: 'read:account',
-
-	errors: {
-		noSuchKey: {
-			message: 'No such key.',
-			code: 'NO_SUCH_KEY',
-			id: 'ac3ed68a-62f0-422b-a7bc-d5e09e8f6a6a',
-		},
-	},
-
-	res: contractProjection.response
-} as const;
-
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof remainingIRegistryGetInput, typeof remainingIRegistryGetOutput> {
-	constructor(
-		private registryApiService: RegistryApiService,
-	) {
-		super(meta, contractProjection, async (ps, me, accessToken) => {
-			const item = await this.registryApiService.getItem(me.id, accessToken != null ? accessToken.id : (ps.domain ?? null), ps.scope, ps.key);
-
-			if (item == null) {
-				throw new ApiError(meta.errors.noSuchKey);
-			}
-
-			return item.value;
-		});
-	}
+export function createRegistryGetProcedure<Actor extends ApiActor>() {
+	return implement(registryGetContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<PreferencesContext<Actor>>()
+		.use(authentication<Actor>())
+		.use(apiPolicy<Actor>({ name: 'i/registry/get', requireCredential: true, kind: 'read:account' }))
+		.use(requirePrincipal<Actor>())
+		.handler(({ input, context }) => context.operations.preferences.get(input, context.principal, context.token));
 }

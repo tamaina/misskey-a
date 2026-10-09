@@ -3,6 +3,19 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { DiscoveryApplicationService } from '@features/discovery/backend/endpoints/discovery.application.js';
+import { HashtagsListOperation } from '@features/discovery/backend/endpoints/hashtags/list.js';
+import { HashtagsSearchOperation } from '@features/discovery/backend/endpoints/hashtags/search.js';
+import { HashtagsShowOperation } from '@features/discovery/backend/endpoints/hashtags/show.js';
+import { HashtagsTrendOperation } from '@features/discovery/backend/endpoints/hashtags/trend.js';
+import { HashtagsUsersOperation } from '@features/discovery/backend/endpoints/hashtags/users.js';
+import { NotesFeaturedOperation } from '@features/discovery/backend/endpoints/notes/featured.js';
+import { NotesSearchByTagOperation } from '@features/discovery/backend/endpoints/notes/search-by-tag.js';
+import { UsersFeaturedNotesOperation } from '@features/discovery/backend/endpoints/users/featured-notes.js';
+import { UsersGetFrequentlyRepliedUsersOperation } from '@features/discovery/backend/endpoints/users/get-frequently-replied-users.js';
+import { UsersRecommendationOperation } from '@features/discovery/backend/endpoints/users/recommendation.js';
+import { UsersSearchOperation } from '@features/discovery/backend/endpoints/users/search.js';
+import { UsersSearchByUsernameAndHostOperation } from '@features/discovery/backend/endpoints/users/search-by-username-and-host.js';
 import { Module } from '@nestjs/common';
 import { EndpointsModule } from './EndpointsModule.js';
 import { CoreModule } from './CoreModule.js';
@@ -76,6 +89,20 @@ import { SigninWithPasskeyApiService } from '@features/auth/backend/transport/Si
 		ApiLoggerService,
 		ApiServerService,
 		OrpcPilotService,
+		DiscoveryApplicationService,
+		HashtagsListOperation,
+		HashtagsSearchOperation,
+		HashtagsShowOperation,
+		HashtagsTrendOperation,
+		HashtagsUsersOperation,
+		NotesFeaturedOperation,
+		NotesSearchByTagOperation,
+		UsersFeaturedNotesOperation,
+		UsersGetFrequentlyRepliedUsersOperation,
+		UsersRecommendationOperation,
+		UsersSearchOperation,
+		UsersSearchByUsernameAndHostOperation,
+
 		AuthenticateService,
 		RateLimiterService,
 		SigninApiService,

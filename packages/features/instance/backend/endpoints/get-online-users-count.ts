@@ -3,21 +3,22 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { instanceContract } from '../../contract/index.js';
-import { legacyOnlineUsersCountSchemas } from '@features/instance/backend';
-import type { Schema } from '@features/api/backend/utility/json-schema.js';
-import { createContractTransportEndpoint } from '@features/api/backend/transport/contract-transport-endpoint.js';
-import { defineFeatureEndpoint } from '@features/api/backend/transport/feature-endpoint.js';
+import { implement } from '@orpc/server';
+import { onlineUsersCountContract, onlineUsersCountGetContract } from './get-online-users-count.contract.js';
+import type { ApiActor } from '../../../api/backend/transport/context.js';
+import { authentication, apiPolicy } from '../../../api/backend/transport/middleware.js';
+import type { InstanceApiContext } from '../operations.js';
 
-export const meta = {
-	tags: ['meta'],
+export function createOnlineUsersCountProcedure<Actor extends ApiActor>() {
+	return implement(onlineUsersCountContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<InstanceApiContext<Actor>>()
+		.use(authentication<Actor>())
+		.use(apiPolicy<Actor>({ name: 'get-online-users-count' }))
+		.handler(({ input, context }) => context.operations.instance.onlineUsersCount(input));
+}
 
-	requireCredential: false,
-	allowGet: true,
-	cacheSec: 60 * 1,
-	res: legacyOnlineUsersCountSchemas.output as Schema,
-} as const;
-
-export const paramDef = legacyOnlineUsersCountSchemas.input as Schema;
-
-export const { feature, createEndpoint } = defineFeatureEndpoint('instance', instance => createContractTransportEndpoint(meta, paramDef, instanceContract['get-online-users-count'], async params => instance['get-online-users-count'](params)));
+export function createOnlineUsersCountGetProcedure<Actor extends ApiActor>() {
+	return implement(onlineUsersCountGetContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<InstanceApiContext<Actor>>()
+		.use(authentication<Actor>())
+		.use(apiPolicy<Actor>({ name: 'get-online-users-count' }))
+		.handler(({ input, context }) => context.operations.instance.onlineUsersCount(input));
+}

@@ -3,37 +3,16 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { remainingIRegistryGetAllDefinition, remainingIRegistryGetAllInput, remainingIRegistryGetAllOutput } from '../../../../contract/remaining-inline-endpoint-definitions.js';
-import { Inject, Injectable } from '@nestjs/common';
-import { RegistryApiService } from '../../../services/RegistryApiService.js';
+import { implement } from '@orpc/server';
+import { authentication, apiPolicy, requirePrincipal } from '../../../../../api/backend/transport/middleware.js';
+import type { ApiActor } from '../../../../../api/backend/transport/context.js';
+import type { PreferencesContext } from '../../../operations.js';
+import { registryGetAllContract } from './get-all.contract.js';
 
-const contractProjection = projectEndpointContract(remainingIRegistryGetAllDefinition);
-
-export const meta = {
-	requireCredential: true,
-	kind: 'read:account',
-
-	res: contractProjection.response,
-} as const;
-
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof remainingIRegistryGetAllInput, typeof remainingIRegistryGetAllOutput> {
-	constructor(
-		private registryApiService: RegistryApiService,
-	) {
-		super(meta, contractProjection, async (ps, me, accessToken) => {
-			const items = await this.registryApiService.getAllItemsOfScope(me.id, accessToken != null ? accessToken.id : (ps.domain ?? null), ps.scope);
-
-			const res = {} as Record<string, any>;
-
-			for (const item of items) {
-				res[item.key] = item.value;
-			}
-
-			return res;
-		});
-	}
+export function createRegistryGetAllProcedure<Actor extends ApiActor>() {
+	return implement(registryGetAllContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<PreferencesContext<Actor>>()
+		.use(authentication<Actor>())
+		.use(apiPolicy<Actor>({ name: 'i/registry/get-all', requireCredential: true, kind: 'read:account' }))
+		.use(requirePrincipal<Actor>())
+		.handler(({ input, context }) => context.operations.preferences.getAll(input, context.principal, context.token));
 }

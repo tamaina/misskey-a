@@ -4,8 +4,9 @@
  */
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { createPing, legacyPingSchemas } from '../../../backend/built/features/instance/backend.js';
-import { instanceContract } from '../../../misskey-js/built/contracts/instance/contract/index.js';
+import { createPing } from '../../../backend/built/features/instance/backend.js';
+import { instanceApiContract as instanceContract } from '../../../misskey-js/built/contracts/instance/backend/api.contract.js';
+import * as v from 'valibot';
 
 test('implementation uses the contract and an injectable clock', async () => {
 	const ping = createPing(() => 123);
@@ -27,11 +28,10 @@ test('contract rejects invalid handler output', async () => {
 	await assert.rejects(createPing(() => 'invalid')({}));
 });
 
-test('legacy schema is derived from the same input and output schemas', () => {
-	assert.equal(legacyPingSchemas.input.type, 'object');
-	assert.equal(legacyPingSchemas.output.type, 'object');
-	assert.equal(legacyPingSchemas.output.properties.pong.type, 'number');
-	assert.deepEqual(legacyPingSchemas.output.required, ['pong']);
+test('native contract exposes the same path and validates finite output', () => {
 	assert.equal(instanceContract.ping['~orpc'].route.method, 'POST');
 	assert.equal(instanceContract.ping['~orpc'].route.path, '/ping');
+	assert.equal(v.safeParse(instanceContract.ping['~orpc'].outputSchema, { pong: 1 }).success, true);
+	assert.equal(v.safeParse(instanceContract.ping['~orpc'].outputSchema, { pong: Infinity }).success, false);
+	assert.equal(v.safeParse(instanceContract.ping['~orpc'].outputSchema, { pong: 1, secret: true }).success, false);
 });
