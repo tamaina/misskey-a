@@ -44,23 +44,10 @@ The Committers may:
 @syuilo reserves the Final Decision rights including whether the project will implement feature and how to implement, these rights are not always exercised.
 
 ## Well-known branches
-- **`main`** branch is tracking the latest release and used for production purposes.
+- **`master`** branch is tracking the latest release and used for production purposes.
 - **`develop`** branch is where we work for the next release.
 	- When you create a PR, basically target it to this branch.
 - **`l10n_develop`** branch is reserved for localization management.
-
-## Releases
-
-Use **Release Manager [Dispatch]** (`.github/workflows/release-with-dispatch.yml`) on `develop`.
-Following the [v2 installation guide](https://github.com/misskey-dev/release-manager-actions/blob/v2/README.md), this repository includes dispatch, changelog-sync and ready-for-review workflows. `STABLE_BRANCH`, `PACKAGE_JSONS_TO_REWRITE` and `INDENT` are specified in those workflows as `main`, `package.json` and `tab`; no repository variables are needed for this path. The optional external App is disabled.
-
-Before enabling releases, maintainers must create `develop` from the adopted `main`, make it the default branch, and configure required review/check rules on `main`. Merge commits and Actions PR creation must be allowed. This workflow does not change those settings.
-
-Run with `merge=false` and `start-rc=false` to prepare a draft `develop` → `main` release PR and an alpha release. The README's `release-with-ready.yml` creates a beta prerelease when the release PR is marked ready (the current v2 template uses beta despite its older RC label). Obtain an independent reviewer approval; subsequent dispatch runs create beta/RC releases. Run with `merge=true` only after approval and every HEAD check succeeds. Bot authors cannot approve their own release PR; `reviewDecision` must be `APPROVED` under the configured review rules.
-
-The existing v2 action uses `GITHUB_TOKEN` to push version/changelog commits to `develop` and tags, create releases, and merge into `main`. Strict PR-only protection on `develop` blocks those pushes; do not add a bypass to make it work. Approval and status checks are handled by the upstream merge action, which invokes `--admin` even on the standard token path. No additional bypass is configured here. Its version push, tag, release and merge are separate operations: a later failure can leave partial release state. Review the upstream action and branch policy compatibility before running it.
-
-All reported checks must succeed, including optional checks: skipped or neutral checks block v2. Fork-disabled Storybook/Docker jobs and other conditional CI jobs need separate reconciliation before production use. Under the [GITHUB_TOKEN event rules](https://docs.github.com/en/actions/concepts/security/github_token), bot-created PR `opened`, `synchronize` and `reopened` events create workflow runs requiring approval by a user with write access. Approving those workflow runs is separate from approving the release PR. Push and release events created by `GITHUB_TOKEN` do not start downstream workflows. Docker/npm publication remains restricted to the upstream repository until fork image/package names and destinations are separately reviewed.
 
 ## Creating a PR
 Thank you for your PR! Before creating a PR, please check the following:

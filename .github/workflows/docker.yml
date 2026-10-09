@@ -18,8 +18,6 @@ env:
 jobs:
   # see https://docs.docker.com/build/ci/github-actions/multi-platform/#distribute-build-across-multiple-runners
   build:
-    # Fork publication needs a separately reviewed image destination.
-    if: github.repository == 'misskey-dev/misskey'
     name: Build
     runs-on: ubuntu-latest
     strategy:
@@ -74,7 +72,6 @@ jobs:
           retention-days: 1
 
   merge:
-    if: github.repository == 'misskey-dev/misskey'
     runs-on: ubuntu-latest
     needs:
       - build

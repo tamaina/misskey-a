@@ -30,39 +30,20 @@ permissions:
   issues: write
   pull-requests: write
 
-concurrency:
-  group: release-manager
-  cancel-in-progress: false
-
 jobs:
   get-pr:
-    permissions:
-      contents: read
-      pull-requests: read
     runs-on: ubuntu-latest
     outputs:
       pr_number: ${{ steps.get_pr.outputs.pr_number }}
     steps:
-      - name: Find develop to main release PR
+      - uses: actions/checkout@v7
+      # headが$GITHUB_REF_NAME, baseが$STABLE_BRANCHかつopenのPRを1つ取得
+      - name: Get PRs
+        run: |
+          echo "pr_number=$(gh pr list --limit 1 --search "head:$GITHUB_REF_NAME base:$STABLE_BRANCH is:open" --json number  --jq '.[] | .number')" >> $GITHUB_OUTPUT
         id: get_pr
-        uses: actions/github-script@v9
         env:
-          MERGE: ${{ inputs.merge }}
-          START_RC: ${{ inputs.start-rc }}
-        with:
-          script: |
-            if (context.ref !== 'refs/heads/develop') {
-              throw new Error('Run Release Manager on develop.');
-            }
-            const { owner, repo } = context.repo;
-            const prs = (await github.paginate(github.rest.pulls.list, {
-              owner, repo, state: 'open', base: 'main', head: `${owner}:develop`,
-            })).filter(pr => pr.head.repo?.full_name === `${owner}/${repo}`);
-            if (prs.length > 1) throw new Error('More than one develop -> main release PR exists.');
-            if (!prs.length && (process.env.MERGE === 'true' || process.env.START_RC === 'true')) {
-              throw new Error('No release PR exists. First run with merge=false and start-rc=false.');
-            }
-            core.setOutput('pr_number', prs[0]?.number ?? '');
+          STABLE_BRANCH: ${{ vars.STABLE_BRANCH }}
 
   merge:
     uses: misskey-dev/release-manager-actions/.github/workflows/merge.yml@v2
@@ -71,7 +52,7 @@ jobs:
     with:
       pr_number: ${{ needs.get-pr.outputs.pr_number }}
       user: 'github-actions[bot]'
-      package_jsons_to_rewrite: 'package.json'
+      package_jsons_to_rewrite: ${{ vars.PACKAGE_JSONS_TO_REWRITE }}
       # Text to prepend to the changelog
       # The first line must be `## Unreleased`
       changes_template: |
@@ -86,8 +67,11 @@ jobs:
         ### Server
         -
 
-      use_external_app_to_release: false
-      indent: 'tab'
+      use_external_app_to_release: true
+      indent: ${{ vars.INDENT }}
+    secrets:
+      RELEASE_APP_ID: ${{ secrets.RELEASE_APP_ID }}
+      RELEASE_APP_PRIVATE_KEY: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
 
   create-prerelease:
     uses: misskey-dev/release-manager-actions/.github/workflows/create-prerelease.yml@v2
@@ -96,13 +80,16 @@ jobs:
     with:
       pr_number: ${{ needs.get-pr.outputs.pr_number }}
       user: 'github-actions[bot]'
-      package_jsons_to_rewrite: 'package.json'
-      use_external_app_to_release: false
-      indent: 'tab'
+      package_jsons_to_rewrite: ${{ vars.PACKAGE_JSONS_TO_REWRITE }}
+      use_external_app_to_release: true
+      indent: ${{ vars.INDENT }}
       draft_prerelease_channel: alpha
       ready_start_prerelease_channel: beta
       prerelease_channel: ${{ inputs.start-rc && 'rc' || '' }}
       reset_number_on_channel_change: true
+    secrets:
+      RELEASE_APP_ID: ${{ secrets.RELEASE_APP_ID }}
+      RELEASE_APP_PRIVATE_KEY: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
 
   create-target:
     uses: misskey-dev/release-manager-actions/.github/workflows/create-target.yml@v2
@@ -139,8 +126,11 @@ jobs:
       #  } else {
       #    return `${major}.${minor}.${Number(patch) + 1}`;
       #  }
-      package_jsons_to_rewrite: 'package.json'
-      use_external_app_to_release: false
-      indent: 'tab'
-      stable_branch: main
+      package_jsons_to_rewrite: ${{ vars.PACKAGE_JSONS_TO_REWRITE }}
+      use_external_app_to_release: true
+      indent: ${{ vars.INDENT }}
+      stable_branch: ${{ vars.STABLE_BRANCH }}
       draft_prerelease_channel: alpha
+    secrets:
+      RELEASE_APP_ID: ${{ secrets.RELEASE_APP_ID }}
+      RELEASE_APP_PRIVATE_KEY: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}

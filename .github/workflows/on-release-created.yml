@@ -8,8 +8,6 @@ on:
 
 jobs:
   publish-misskey-js:
-    # Fork publication needs a separately reviewed package name and destination.
-    if: github.repository == 'misskey-dev/misskey'
     name: Publish misskey-js
     runs-on: ubuntu-latest
 
