@@ -35,6 +35,8 @@
 
 ### Git / リポジトリ操作
 
+- リリースは必ず既存の Release Manager Action (`.github/workflows/release-with-dispatch.yml`) を使用する。
+
 4. **`git push --force` / `--force-with-lease` を `main` / `develop` / `master` にしない** (他人の作業を消す可能性)
 5. **`git commit --no-verify` で hook をスキップしない**
 6. **マージ済 / プッシュ済コミットを `git commit --amend` で書き換えない** (履歴の整合性が壊れる)

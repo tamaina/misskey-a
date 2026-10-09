@@ -77,18 +77,18 @@ describe('remaining20 formatter locale migration', () => {
 		expect(checked).toBe(12628);
 	}, 30000);
 
-	test('transforms every real SFC with the installed VVI plugin and Vue compiler', () => {
+	test('transforms every real SFC with the installed VVI plugin and Vue compiler', async () => {
 		const plugin = pluginVvi();
 		const hook = (value: unknown, ...args: unknown[]): unknown => {
 			if (typeof value === 'function') return Reflect.apply(value, {}, args);
 			if (value && typeof value === 'object' && 'handler' in value && typeof value.handler === 'function') return Reflect.apply(value.handler, {}, args);
 			throw new Error('Expected plugin hook');
 		};
-		hook(plugin.configResolved, { root: resolve(root, 'packages/frontend'), command: 'build', base: '/' });
+		hook(plugin.configResolved, { root: resolve(root, 'packages/frontend'), command: 'build', base: '/', build: { ssr: false } });
 		hook(plugin.buildStart);
 		for (const entry of migrationInputs) {
 			const file = resolve(root, entry.file);
-			const transformed = hook(plugin.transform, readFileSync(file, 'utf8'), file) as { code: string };
+			const transformed = await hook(plugin.transform, readFileSync(file, 'utf8'), file) as { code: string };
 			expect(transformed.code).toContain('createComponentLocale');
 			const parsed = parse(transformed.code, { filename: file });
 			expect(parsed.errors).toEqual([]);
