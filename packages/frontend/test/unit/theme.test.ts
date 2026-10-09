@@ -105,7 +105,7 @@ describe('ThemeManager', () => {
 		const { themeManager } = await loadThemeModule();
 		const changed = vi.fn();
 		themeManager.on('themeChanged', changed);
-		vi.spyOn(console, 'error').mockImplementation(() => {});
+		const error = vi.spyOn(console, 'error').mockImplementation(() => {});
 		Object.defineProperty(document, 'startViewTransition', {
 			configurable: true,
 			value: (update: () => Promise<void>) => {
@@ -123,6 +123,54 @@ describe('ThemeManager', () => {
 		assert.strictEqual(document.documentElement.classList.contains('_themeChanging_'), false);
 		assert.strictEqual(document.documentElement.dataset.colorScheme, 'light');
 		assert.strictEqual(document.documentElement.style.getPropertyValue('--MI_THEME-accent'), themeManager.currentCompiledTheme?.accent);
+		assert.strictEqual(window.localStorage.getItem('themeId'), primaryTheme.id);
+		assert.strictEqual(error.mock.calls.length, outcome === 'rejected' || outcome === 'thrown' ? 1 : 0);
+	});
+
+	test('keeps the transition marker until finished and emits themeChanged after the DOM update', async () => {
+		const { themeManager } = await loadThemeModule();
+		const changing = vi.fn();
+		const changed = vi.fn();
+		themeManager.on('themeChanging', changing);
+		themeManager.on('themeChanged', changed);
+		let finish!: () => void;
+		const finished = new Promise<void>(resolve => { finish = resolve; });
+		Object.defineProperty(document, 'startViewTransition', {
+			configurable: true,
+			value: (update: () => Promise<void>) => {
+				const done = Promise.resolve().then(update);
+				return { ready: Promise.resolve(), updateCallbackDone: done, finished };
+			},
+		});
+		themeManager.updateTheme(primaryTheme);
+		await vi.waitFor(() => assert.strictEqual(changing.mock.calls.length, 1));
+		assert.strictEqual(changed.mock.calls.length, 0);
+		assert.strictEqual(document.documentElement.classList.contains('_themeChanging_'), true);
+		assert.strictEqual(document.documentElement.dataset.colorScheme, 'light');
+		finish();
+		await vi.waitFor(() => assert.strictEqual(changed.mock.calls.length, 1));
+		assert.strictEqual(document.documentElement.classList.contains('_themeChanging_'), false);
+	});
+
+	test('a rejected update callback retries the DOM update and cleans up', async () => {
+		const { themeManager } = await loadThemeModule();
+		const changed = vi.fn();
+		themeManager.on('themeChanged', changed);
+		themeManager.once('themeChanging', () => { throw new Error('update callback failed'); });
+		const error = vi.spyOn(console, 'error').mockImplementation(() => {});
+		Object.defineProperty(document, 'startViewTransition', {
+			configurable: true,
+			value: (update: () => Promise<void>) => {
+				const done = Promise.resolve().then(update);
+				return { ready: Promise.reject(new Error('update failed')), updateCallbackDone: done, finished: done.then(() => {}) };
+			},
+		});
+		themeManager.updateTheme(primaryTheme);
+		await vi.waitFor(() => assert.strictEqual(changed.mock.calls.length, 1));
+		assert.strictEqual(error.mock.calls.length, 1);
+		assert.strictEqual(document.documentElement.classList.contains('_themeChanging_'), false);
+		assert.strictEqual(document.documentElement.style.getPropertyValue('--MI_THEME-accent'), themeManager.currentCompiledTheme?.accent);
+		assert.strictEqual(document.head.querySelector('meta[name="theme-color"]')?.getAttribute('content'), themeManager.currentCompiledTheme?.htmlThemeColor);
 	});
 
 	test('通常テーマ適用後のプレビューは現在テーマのみを切り替え、キャッシュは保持する', async () => {
