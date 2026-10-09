@@ -32,13 +32,13 @@ for (const mode of ['production', 'e2e']) {
 					resolveId(id) { return id === entry ? entry : undefined; },
 					load(id) {
 						if (id !== entry) return undefined;
-						return "import { verifyChallenge } from 'pkce-challenge'; import { oc } from '@orpc/contract'; import { WebSocket } from 'ws'; import Limiter from 'ratelimiter'; export async function probe() { return [typeof verifyChallenge, typeof (await import('deep-email-validator')).validate, typeof oc, typeof WebSocket, typeof Limiter]; }";
+						return "import { verifyChallenge } from 'pkce-challenge'; import { oc } from '@orpc/contract'; import { WebSocket } from 'ws'; import Limiter from 'ratelimiter'; import Link from 'http-link-header'; import * as nestedProperty from 'nested-property'; export async function probe() { return [typeof verifyChallenge, typeof (await import('deep-email-validator')).validate, typeof oc, typeof WebSocket, typeof Limiter, Link.parse('<https://example.test>; rel=next').rel('next')[0].uri, nestedProperty.has({ nested: { value: 1 } }, 'nested.value')]; }";
 					},
 				}],
 			});
 			await bundle.write({ ...output, dir: directory, entryFileNames: 'probe.mjs', chunkFileNames: '[name]-[hash].mjs' });
 			const { probe } = await import(pathToFileURL(join(directory, 'probe.mjs')).href);
-			assert.deepEqual(await probe(), ['function', 'function', 'object', 'function', 'function']);
+			assert.deepEqual(await probe(), ['function', 'function', 'object', 'function', 'function', 'https://example.test', true]);
 		} finally {
 			await bundle?.close();
 			await rm(directory, { recursive: true, force: true });
