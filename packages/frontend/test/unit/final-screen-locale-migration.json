@@ -3160,9 +3160,9 @@
 	},
 	{
 		"file": "packages/features/navigation/frontend/ui/deck/column.vue",
-		"originalSha256": "5ce39657515839b05b46ed2585a87e179e7973291e2d0573597c95be724f808e",
-		"migratedSha256": "9d6f1141806031c0133c21993671da168035df75a090e764571356d2daa18aa0",
-		"bodyLength": 11596,
+		"originalSha256": "41508f810877a87c8511c5cb3e469b03a65dc1bfff69b7041ea55e137640833b",
+		"migratedSha256": "d6de9766bff07a065f80cb323e11c468de17b0d3180df05cc97e8b5c154fd14b",
+		"bodyLength": 11821,
 		"strings": 728,
 		"edits": [
 			{
