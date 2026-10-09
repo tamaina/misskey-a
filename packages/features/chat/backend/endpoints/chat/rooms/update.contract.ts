@@ -3,6 +3,9 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import type { Meta } from '@orpc/contract';
+import type { ApiProcedureMetadata } from '../../../../../api/backend/transport/policy.types.js';
+
 import { oc } from '@orpc/contract';
 import type { OpenAPI } from '@orpc/contract';
 import * as v from 'valibot';
@@ -17,10 +20,14 @@ export const chatRoomsUpdateErrors = {
 			id: 'fcdb0f92-bda6-47f9-bd05-343e0e020932',
 		},
 	} as const;
-export const chatRoomsUpdatePolicy = { name: 'chat/rooms/update', requireCredential: true, kind: 'write:chat' } as const;
+
 const security: OpenAPI.SecurityRequirementObject[] = [{ bearerAuth: [] }];
-export const chatRoomsUpdateContract = oc.$meta({ requestName: 'chat/rooms/update' } as const)
-	.route({ method: 'POST', path: '/chat/rooms/update', operationId: 'post___chat___rooms___update', tags: ['chat'], spec: current => ({ ...current, security }) })
+export const chatRoomsUpdateContract = oc.$meta({
+	requestName: 'chat/rooms/update',
+	requireCredential: true,
+	kind: 'write:chat',
+} as const satisfies Meta & ApiProcedureMetadata)
+	.route({ method: 'POST', path: '/chat/rooms/update', tags: ['chat'], spec: current => ({ ...current, security }) })
 	.errors({ ...commonErrors, NO_SUCH_ROOM: { status: 400, data: apiErrorData } })
 	.input(objectInput({
 	"roomId": misskeyId,

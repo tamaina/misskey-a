@@ -3,22 +3,21 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { implement } from '@orpc/server';
-import { channelsMuteDeleteContract, channelsMuteDeletePolicy, channelsMuteDeleteErrors } from './delete.contract.js';
-import { authentication, apiPolicy, requirePrincipal } from '../../../../../api/backend/transport/middleware.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+
+import { channelsMuteDeleteContract, channelsMuteDeleteErrors } from './delete.contract.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
 import { apiError } from '@features/api/backend/transport/orpc-error.js';
-import type { ApiContext } from '@features/api/backend/transport/context.js';
+
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 import type { ChannelsRepository } from '@features/persistence/backend/repositories/models.js';
-import { ChannelMutingService } from '@features/channels/backend/services/ChannelMutingService.js';
+import { type ChannelMutingService } from '@features/channels/backend/services/ChannelMutingService.js';
 export interface ChannelsMuteDeleteDependencies {
 	channelsRepository: ChannelsRepository;
 	channelMutingService: ChannelMutingService;
 }
 export function createChannelsMuteDeleteProcedure<Actor extends MiLocalUser>(deps: ChannelsMuteDeleteDependencies) {
-	return implement(channelsMuteDeleteContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>()
-		.use(authentication<Actor>())
-		.use(apiPolicy<Actor>(channelsMuteDeletePolicy))
+	return createApiProcedure<Actor>()(channelsMuteDeleteContract)
 		.use(requirePrincipal<Actor>())
 		.handler(async ({ input, context }) => {
 			const actor = context.principal;

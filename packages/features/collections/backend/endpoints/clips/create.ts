@@ -2,9 +2,11 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-import { implement } from '@orpc/server';
-import { authentication, apiPolicy, requirePrincipal } from '@features/api/backend/transport/middleware.js';
-import type { ApiActor, ApiContext } from '@features/api/backend/transport/context.js';
+
+import { toPackedClip } from '../../api.dto.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import type { ApiActor } from '@features/api/backend/transport/context.js';
 import { collectionsContract } from '../../api.definition.js';
 import type { CollectionsDependencies } from '../../api.implementation.js';
 import { apiError } from '@features/api/backend/transport/orpc-error.js';
@@ -16,8 +18,7 @@ export interface ClipsCreateDependencies<Actor extends ApiActor> {
 	clipEntityService: Pick<CollectionsDependencies<Actor>['clipEntityService'], 'pack'>;
 }
 export function createClipsCreateProcedure<Actor extends ApiActor>(deps: ClipsCreateDependencies<Actor>) {
-	return implement(collectionsContract.clipsCreate, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>()
-		.use(authentication<Actor>()).use(apiPolicy<Actor>({ name: collectionsContract.clipsCreate['~orpc'].meta.requestName, requireCredential: true, prohibitMoved: true, kind: 'write:account' })).use(requirePrincipal<Actor>())
+	return createApiProcedure<Actor>()(collectionsContract.clipsCreate).use(requirePrincipal<Actor>())
 		.handler(async ({ input: ps, context }) => {
 			const me = context.principal;
 			let clip: MiClip;
@@ -31,6 +32,6 @@ export function createClipsCreateProcedure<Actor extends ApiActor>(deps: ClipsCr
 				}
 				throw e;
 			}
-			return await deps.clipEntityService.pack(clip, me);
+			return toPackedClip(await deps.clipEntityService.pack(clip, me));
 		});
 }

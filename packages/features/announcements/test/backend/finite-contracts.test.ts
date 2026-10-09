@@ -5,7 +5,7 @@
 
 import { announcementsContract } from '../../backend/api.definition.js';
 
-import { expect, expectTypeOf, test } from 'vitest';
+import { expect, expectTypeOf, test, vi } from 'vitest';
 import * as v from 'valibot';
 import { mockDeep } from 'vitest-mock-extended';
 
@@ -172,4 +172,22 @@ test('native credential policy precedes input validation and domain calls', asyn
 	await expect(client.update({ id: '' })).rejects.toMatchObject({ code: 'CREDENTIAL_REQUIRED' });
 	expect(dependencies.announcementsRepository.findOneBy).not.toHaveBeenCalled();
 	expect(dependencies.announcementService.update).not.toHaveBeenCalled();
+});
+
+test('native public announcement selects wire fields without invoking output validation', async () => {
+	const { dependencies, client } = nativeFixture(null);
+	const { serializer } = fixture();
+	const row = mockDeep<MiAnnouncement>({ id: 'announcement123', updatedAt: null, title: 'Public', text: 'Text', imageUrl: null, icon: 'info', display: 'normal', userId: null, needConfirmationToRead: false, silence: false });
+	const publicValue = await serializer.pack(row);
+	const extended = { ...publicValue, privateTargetingData: 'secret' };
+	dependencies.announcementService.getAnnouncement.mockResolvedValue(extended);
+	const output = announcementsContract.show['~orpc'].outputSchema;
+	if (output === undefined) throw new Error('Missing announcement output');
+	const validate = vi.spyOn(output, '~run');
+	try {
+		const response = await client.show({ announcementId: row.id });
+		expect(response).toEqual(publicValue);
+		expect(response).not.toHaveProperty('privateTargetingData');
+		expect(validate).not.toHaveBeenCalled();
+	} finally { validate.mockRestore(); }
 });

@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { expect, expectTypeOf, test } from 'vitest';
+import { expect, expectTypeOf, test, vi } from 'vitest';
 import * as v from 'valibot';
 import { mockDeep } from 'vitest-mock-extended';
 import { channelsApiContract } from '../../backend/api.definition.js';
@@ -12,6 +12,8 @@ import { channelsUpdateContract } from '../../backend/endpoints/channels/update.
 import { channelsTimelineContract } from '../../backend/endpoints/channels/timeline.contract.js';
 import { channelsShowContract } from '../../backend/endpoints/channels/show.contract.js';
 
+import { packedNoteSchema } from '@features/notes/backend/note.schema.js';
+import { packedUserLiteSchema } from '@features/users/backend/user.schema.js';
 import { packedChannelSchema } from '../../backend/channel.schema.js';
 import { ChannelEntityService } from '../../backend/serializers/ChannelEntityService.js';
 import { createChannelsShowProcedure } from '../../backend/endpoints/channels/show.js';
@@ -168,4 +170,42 @@ test('detailed Channel validates finite Notes/UserLite and dynamic reactions wit
 	expect((await serializer.pack(channel, null, true)).pinnedNotes).toEqual([note]);
 	expect(v.safeParse(packedChannelSchema, { ...result, pinnedNotes: [{ ...baseNote, reactions: { x: 'bad' } }] }).success).toBe(false);
 	expect(v.safeParse(packedChannelSchema, { ...result, pinnedNotes: [{ ...baseNote, user: { ...baseNote.user, username: undefined } }] }).success).toBe(false);
+});
+
+test('native channel output selects public channel, pinned note and user fields without output validation', async () => {
+	const { channels, serializer } = fixture();
+	channels.findOneBy.mockResolvedValue(channel);
+	const publicUser: Packed<'Note'>['user'] = {
+		id: 'author123', name: null, username: 'author', host: null,
+		avatarUrl: 'https://example.test/avatar.png', avatarBlurhash: null,
+		avatarDecorations: [], emojis: {}, onlineStatus: 'unknown',
+	};
+	const publicNote: Packed<'Note'> = {
+		id: 'pinned123', createdAt: date.toISOString(), text: 'Pinned', userId: publicUser.id,
+		user: publicUser, visibility: 'public', reactionAcceptance: null,
+		reactionEmojis: { ':remote@host:': 'https://host/emoji.png' }, reactions: { '🔥': 1 },
+		reactionCount: 1, renoteCount: 0, repliesCount: 0,
+	};
+	const packed = { ...await serializer.pack(channel, null, true), pinnedNotes: [publicNote] };
+	const extended = {
+		...packed, privateChannelData: 'secret',
+		pinnedNotes: [{ ...publicNote, privateNoteData: 'secret', user: { ...publicUser, privateUserData: 'secret' } }],
+	};
+	const pack = vi.spyOn(serializer, 'pack').mockResolvedValue(extended);
+	const services = mockDeep<ApiServices<MiLocalUser>>();
+	services.authenticate.mockResolvedValue([null, null]);
+	const endpoint = createProcedureClient(createChannelsShowProcedure<MiLocalUser>({ channelsRepository: channels, channelEntityService: serializer }), { context: { services, credential: null, ip: '127.0.0.1', headers: {} } });
+	const validate = vi.spyOn(showOutput, '~run');
+	const noteValidate = vi.spyOn(packedNoteSchema, '~run');
+	const userValidate = vi.spyOn(packedUserLiteSchema, '~run');
+	try {
+		const result = await endpoint({ channelId: channel.id });
+		expect(result).toEqual(packed);
+		expect(result).not.toHaveProperty('privateChannelData');
+		expect(result.pinnedNotes?.[0]).not.toHaveProperty('privateNoteData');
+		expect(result.pinnedNotes?.[0].user).not.toHaveProperty('privateUserData');
+		expect(validate).not.toHaveBeenCalled();
+		expect(noteValidate).not.toHaveBeenCalled();
+		expect(userValidate).not.toHaveBeenCalled();
+	} finally { validate.mockRestore(); noteValidate.mockRestore(); userValidate.mockRestore(); pack.mockRestore(); }
 });

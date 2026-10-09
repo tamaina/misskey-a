@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import * as v from 'valibot';
 import type { MiGalleryPost } from './models/GalleryPost.js';
 import { ClipService } from './services/ClipService.js';
 import type { InferContractRouterOutputs } from '@orpc/contract';
@@ -128,11 +127,6 @@ export function createCollectionsRouter<Actor extends ApiActor>(deps: Collection
 
 type Router = ReturnType<typeof createCollectionsRouter<MiLocalUser>>;
 
-function requiredSchema<S extends v.GenericSchema>(schema: S | undefined): S {
-	if (schema === undefined) throw new Error('Missing collections output schema');
-	return schema;
-}
-
 @Injectable()
 export class CollectionsApiProvider {
 	private router: Router | undefined;
@@ -156,19 +150,19 @@ export class CollectionsApiProvider {
 			usersRepository: this.moduleRef.get<UsersRepository>(DI.usersRepository, { strict: false }),
 			clipService: this.moduleRef.get(ClipService, { strict: false }),
 			clipEntityService: {
-				pack: async (row, actor) => v.parse(requiredSchema(collectionsContract.clipsShow['~orpc'].outputSchema), await clips.pack(row, actor)),
-				packMany: async (rows, actor) => v.parse(requiredSchema(collectionsContract.clipsList['~orpc'].outputSchema), await clips.packMany(rows, actor)),
+				pack: async (row, actor) => await clips.pack(row, actor),
+				packMany: async (rows, actor) => await clips.packMany(rows, actor),
 			},
 			noteEntityService: {
-				packMany: async (rows, actor) => v.parse(requiredSchema(collectionsContract.clipsNotes['~orpc'].outputSchema), await notes.packMany(rows, actor)),
+				packMany: async (rows, actor) => await notes.packMany(rows, actor),
 				isVisibleForMe: (note, actorId) => notes.isVisibleForMe(note, actorId),
 			},
-			noteFavoriteEntityService: { packMany: async (rows, actor) => v.parse(requiredSchema(collectionsContract.iFavorites['~orpc'].outputSchema), await favorites.packMany(rows, actor)) },
+			noteFavoriteEntityService: { packMany: async (rows, actor) => await favorites.packMany(rows, actor) },
 			galleryPostEntityService: {
-				pack: async (row, actor) => v.parse(requiredSchema(collectionsContract.galleryPostsShow['~orpc'].outputSchema), await gallery.pack(row, actor)),
-				packMany: async (rows, actor) => v.parse(requiredSchema(collectionsContract.galleryPosts['~orpc'].outputSchema), await gallery.packMany(rows, actor)),
+				pack: async (row, actor) => await gallery.pack(row, actor),
+				packMany: async (rows, actor) => await gallery.packMany(rows, actor),
 			},
-			galleryLikeEntityService: { packMany: async (rows, actor) => v.parse(requiredSchema(collectionsContract.iGalleryLikes['~orpc'].outputSchema), await likes.packMany(rows, actor)) },
+			galleryLikeEntityService: { packMany: async (rows, actor) => await likes.packMany(rows, actor) },
 			queryService: this.moduleRef.get(QueryService, { strict: false }),
 			getterService: this.moduleRef.get(GetterService, { strict: false }),
 			idService: this.moduleRef.get(IdService, { strict: false }),

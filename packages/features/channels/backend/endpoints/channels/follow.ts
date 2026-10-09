@@ -3,23 +3,22 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { implement } from '@orpc/server';
-import { channelsFollowContract, channelsFollowPolicy, channelsFollowErrors } from './follow.contract.js';
-import { authentication, apiPolicy, requirePrincipal } from '../../../../api/backend/transport/middleware.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+
+import { channelsFollowContract, channelsFollowErrors } from './follow.contract.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
 import { apiError } from '@features/api/backend/transport/orpc-error.js';
-import type { ApiContext } from '@features/api/backend/transport/context.js';
+
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 import type { ChannelsRepository } from '@features/persistence/backend/repositories/models.js';
-import { ChannelFollowingService } from '@features/channels/backend/services/ChannelFollowingService.js';
+import { type ChannelFollowingService } from '@features/channels/backend/services/ChannelFollowingService.js';
 import { IdentifiableError } from '@features/runtime/backend/errors/identifiable-error.js';
 export interface ChannelsFollowDependencies {
 	channelsRepository: ChannelsRepository;
 	channelFollowingService: ChannelFollowingService;
 }
 export function createChannelsFollowProcedure<Actor extends MiLocalUser>(deps: ChannelsFollowDependencies) {
-	return implement(channelsFollowContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>()
-		.use(authentication<Actor>())
-		.use(apiPolicy<Actor>(channelsFollowPolicy))
+	return createApiProcedure<Actor>()(channelsFollowContract)
 		.use(requirePrincipal<Actor>())
 		.handler(async ({ input, context }) => {
 			const actor = context.principal;

@@ -2,9 +2,10 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-import { implement } from '@orpc/server';
-import { authentication, apiPolicy, requirePrincipal } from '@features/api/backend/transport/middleware.js';
-import type { ApiActor, ApiContext } from '@features/api/backend/transport/context.js';
+
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import type { ApiActor } from '@features/api/backend/transport/context.js';
 import { collectionsContract } from '../../api.definition.js';
 import type { CollectionsDependencies } from '../../api.implementation.js';
 import { apiError } from '@features/api/backend/transport/orpc-error.js';
@@ -14,8 +15,7 @@ export interface ClipsRemoveNoteDependencies<Actor extends ApiActor> {
 	clipService: Pick<CollectionsDependencies<Actor>['clipService'], 'removeNote'>;
 }
 export function createClipsRemoveNoteProcedure<Actor extends ApiActor>(deps: ClipsRemoveNoteDependencies<Actor>) {
-	return implement(collectionsContract.clipsRemoveNote, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>()
-		.use(authentication<Actor>()).use(apiPolicy<Actor>({ name: collectionsContract.clipsRemoveNote['~orpc'].meta.requestName, requireCredential: true, prohibitMoved: true, kind: 'write:account' })).use(requirePrincipal<Actor>())
+	return createApiProcedure<Actor>()(collectionsContract.clipsRemoveNote).use(requirePrincipal<Actor>())
 		.handler(async ({ input: ps, context }) => {
 			const me = context.principal;
 			try { await deps.clipService.removeNote(me, ps.clipId, ps.noteId); } catch (error) {

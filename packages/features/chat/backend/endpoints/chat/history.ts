@@ -3,22 +3,24 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { toPackedChatMessage } from '../../api.dto.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+
 import type { InferSchemaOutput } from '@orpc/contract';
-import { implement } from '@orpc/server';
-import * as v from 'valibot';
-import { authentication, apiPolicy, requirePrincipal } from '../../../../api/backend/transport/middleware.js';
+
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
 import { type ChatService } from '../../services/ChatService.js';
 import { type ChatEntityService } from '../../serializers/ChatEntityService.js';
-import { chatHistoryContract, chatHistoryPolicy } from './history.contract.js';
-import type { MiLocalUser } from '../../../../users/backend/models/User.js';
-import type { ApiContext } from '@features/api/backend/transport/context.js';
+import { chatHistoryContract } from './history.contract.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+
 export interface ChatHistoryDependencies {
 	chatEntityService: ChatEntityService;
 	chatService: ChatService;
 }
 export function createChatHistoryProcedure(deps: ChatHistoryDependencies) {
 	async function execute(ps: InferSchemaOutput<NonNullable<typeof chatHistoryContract['~orpc']['inputSchema']>>, me: MiLocalUser): Promise<InferSchemaOutput<NonNullable<typeof chatHistoryContract['~orpc']['outputSchema']>>> {
-		return v.parse(requiredSchema(chatHistoryContract['~orpc'].outputSchema), await run(ps, me));
+		return (await run(ps, me)).map(toPackedChatMessage);
 	}
 
 	async function run(ps: InferSchemaOutput<NonNullable<typeof chatHistoryContract['~orpc']['inputSchema']>>, me: MiLocalUser) {
@@ -48,14 +50,7 @@ export function createChatHistoryProcedure(deps: ChatHistoryDependencies) {
 		return packedMessages;
 	}
 
-	return implement(chatHistoryContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>()
-		.use(authentication<MiLocalUser>())
-		.use(apiPolicy<MiLocalUser>(chatHistoryPolicy))
+	return createApiProcedure<MiLocalUser>()(chatHistoryContract)
 		.use(requirePrincipal<MiLocalUser>())
 		.handler(({ input, context }) => execute(input, context.principal));
-}
-
-function requiredSchema<Schema>(schema: Schema | undefined): Schema {
-	if (schema === undefined) throw new Error('Missing endpoint contract schema');
-	return schema;
 }

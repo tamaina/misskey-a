@@ -2,9 +2,10 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-import { implement } from '@orpc/server';
-import { authentication, apiPolicy } from '@features/api/backend/transport/middleware.js';
-import type { ApiActor, ApiContext } from '@features/api/backend/transport/context.js';
+
+import { toPackedClip } from '../../api.dto.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import type { ApiActor } from '@features/api/backend/transport/context.js';
 import { collectionsContract } from '../../api.definition.js';
 import type { CollectionsDependencies } from '../../api.implementation.js';
 import { In } from 'typeorm';
@@ -17,8 +18,7 @@ export interface NotesClipsDependencies<Actor extends ApiActor> {
 	clipEntityService: Pick<CollectionsDependencies<Actor>['clipEntityService'], 'packMany'>;
 }
 export function createNotesClipsProcedure<Actor extends ApiActor>(deps: NotesClipsDependencies<Actor>) {
-	return implement(collectionsContract.notesClips, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>()
-		.use(authentication<Actor>()).use(apiPolicy<Actor>({ name: collectionsContract.notesClips['~orpc'].meta.requestName }))
+	return createApiProcedure<Actor>()(collectionsContract.notesClips)
 		.handler(async ({ input: ps, context }) => {
 			const me = context.principal;
 			const note = await deps.getterService.getNote(ps.noteId).catch(err => {
@@ -32,6 +32,6 @@ export function createNotesClipsProcedure<Actor extends ApiActor>(deps: NotesCli
 				id: In(clipNotes.map(x => x.clipId)),
 				isPublic: true,
 			});
-			return await deps.clipEntityService.packMany(clips, me);
+			return (await deps.clipEntityService.packMany(clips, me)).map(toPackedClip);
 		});
 }

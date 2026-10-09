@@ -2,9 +2,11 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-import { implement } from '@orpc/server';
-import { authentication, apiPolicy, requirePrincipal, decodeScalarInput } from '@features/api/backend/transport/middleware.js';
-import type { ApiActor, ApiContext } from '@features/api/backend/transport/context.js';
+
+import { toPackedNoteFavorite } from '../../api.dto.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import { requirePrincipal, decodeScalarInput } from '@features/api/backend/transport/middleware.js';
+import type { ApiActor } from '@features/api/backend/transport/context.js';
 import { collectionsContract } from '../../api.definition.js';
 import type { CollectionsDependencies } from '../../api.implementation.js';
 export interface IFavoritesDependencies<Actor extends ApiActor> {
@@ -13,8 +15,7 @@ export interface IFavoritesDependencies<Actor extends ApiActor> {
 	noteFavoriteEntityService: Pick<CollectionsDependencies<Actor>['noteFavoriteEntityService'], 'packMany'>;
 }
 export function createIFavoritesProcedure<Actor extends ApiActor>(deps: IFavoritesDependencies<Actor>) {
-	return implement(collectionsContract.iFavorites, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>()
-		.use(authentication<Actor>()).use(apiPolicy<Actor>({ name: collectionsContract.iFavorites['~orpc'].meta.requestName, requireCredential: true, kind: 'read:favorites' })).use(requirePrincipal<Actor>()).use(decodeScalarInput<Actor>({ limit: 'integer', sinceDate: 'integer', untilDate: 'integer' }))
+	return createApiProcedure<Actor>()(collectionsContract.iFavorites).use(requirePrincipal<Actor>()).use(decodeScalarInput<Actor>({ limit: 'integer', sinceDate: 'integer', untilDate: 'integer' }))
 		.handler(async ({ input: ps, context }) => {
 			const me = context.principal;
 			const query = deps.queryService.makePaginationQuery(deps.noteFavoritesRepository.createQueryBuilder('favorite'), ps.sinceId, ps.untilId, ps.sinceDate, ps.untilDate)
@@ -23,6 +24,6 @@ export function createIFavoritesProcedure<Actor extends ApiActor>(deps: IFavorit
 			const favorites = await query
 				.limit(ps.limit)
 				.getMany();
-			return await deps.noteFavoriteEntityService.packMany(favorites, me);
+			return (await deps.noteFavoriteEntityService.packMany(favorites, me)).map(toPackedNoteFavorite);
 		});
 }

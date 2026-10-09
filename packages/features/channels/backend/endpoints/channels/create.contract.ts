@@ -3,6 +3,9 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import type { Meta } from '@orpc/contract';
+import type { ApiProcedureMetadata } from '../../../../api/backend/transport/policy.types.js';
+
 import { oc } from '@orpc/contract';
 import type { OpenAPI } from '@orpc/contract';
 import * as v from 'valibot';
@@ -17,13 +20,20 @@ export const channelsCreateErrors = {
 			id: 'cd1e9f3e-5a12-4ab4-96f6-5d0a2cc32050',
 		},
 	} as const;
-export const channelsCreatePolicy = { name: 'channels/create', requireCredential: true, prohibitMoved: true, requiredRolePolicy: 'canCreateChannel', kind: 'write:channels', limit: {
+
+const security: OpenAPI.SecurityRequirementObject[] = [{ bearerAuth: [] }];
+export const channelsCreateContract = oc.$meta({
+	requestName: 'channels/create',
+	requireCredential: true,
+	prohibitMoved: true,
+	requiredRolePolicy: 'canCreateChannel',
+	kind: 'write:channels',
+	limit: {
 		duration: 3600000,
 		max: 10,
-	} } as const;
-const security: OpenAPI.SecurityRequirementObject[] = [{ bearerAuth: [] }];
-export const channelsCreateContract = oc.$meta({ requestName: 'channels/create' } as const)
-	.route({ method: 'POST', path: '/channels/create', operationId: 'post___channels___create', tags: ['channels'], spec: current => ({ ...current, security }) })
+	},
+} as const satisfies Meta & ApiProcedureMetadata)
+	.route({ method: 'POST', path: '/channels/create', tags: ['channels'], spec: current => ({ ...current, security }) })
 	.errors({ ...commonErrors, NO_SUCH_FILE: { status: 400, data: apiErrorData } })
 	.input(objectInput({
 		"name": jsonString({ "minLength": 1, "maxLength": 128 }),

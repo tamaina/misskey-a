@@ -3,11 +3,12 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { implement } from '@orpc/server';
-import { chatMessagesDeleteContract, chatMessagesDeletePolicy } from './delete.contract.js';
-import { authentication, apiPolicy, requirePrincipal } from '../../../../../api/backend/transport/middleware.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+
+import { chatMessagesDeleteContract } from './delete.contract.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
-import type { ApiContext } from '@features/api/backend/transport/context.js';
+
 import type { InferSchemaOutput } from '@orpc/contract';
 import { apiError } from '@features/api/backend/transport/orpc-error.js';
 import { type ChatService } from '@features/chat/backend/services/ChatService.js';
@@ -23,9 +24,7 @@ export function createChatMessagesDeleteProcedure(deps: ChatMessagesDeleteDepend
 		await deps.chatService.deleteMessage(message);
 	}
 
-	return implement(chatMessagesDeleteContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>()
-		.use(authentication<MiLocalUser>())
-		.use(apiPolicy<MiLocalUser>(chatMessagesDeletePolicy))
+	return createApiProcedure<MiLocalUser>()(chatMessagesDeleteContract)
 		.use(requirePrincipal<MiLocalUser>())
 		.handler(({ input, context }) => execute(input, context.principal));
 }

@@ -3,6 +3,9 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import type { Meta } from '@orpc/contract';
+import type { ApiProcedureMetadata } from '../../../../../api/backend/transport/policy.types.js';
+
 import { oc } from '@orpc/contract';
 import type { OpenAPI } from '@orpc/contract';
 import * as v from 'valibot';
@@ -26,9 +29,14 @@ export const channelsMuteCreateErrors = {
 			id: '42b32236-df2c-a45f-fdbf-def67268f749',
 		},
 	} as const;
-export const channelsMuteCreatePolicy = { name: 'channels/mute/create', requireCredential: true, prohibitMoved: true, kind: 'write:channels' } as const;
+
 const security: OpenAPI.SecurityRequirementObject[] = [{ bearerAuth: [] }];
-export const channelsMuteCreateContract = oc.$meta({ requestName: 'channels/mute/create' } as const)
-	.route({ method: 'POST', path: '/channels/mute/create', operationId: 'post___channels___mute___create', tags: ['channels', 'mute'], spec: current => ({ ...current, security }), successStatus: 204 })
+export const channelsMuteCreateContract = oc.$meta({
+	requestName: 'channels/mute/create',
+	requireCredential: true,
+	prohibitMoved: true,
+	kind: 'write:channels',
+} as const satisfies Meta & ApiProcedureMetadata)
+	.route({ method: 'POST', path: '/channels/mute/create', tags: ['channels', 'mute'], spec: current => ({ ...current, security }), successStatus: 204 })
 	.errors({ ...commonErrors, NO_SUCH_CHANNEL: { status: 400, data: apiErrorData }, ALREADY_MUTING_CHANNEL: { status: 400, data: apiErrorData }, EXPIRES_AT_IS_PAST: { status: 400, data: apiErrorData } })
 	.input(objectInput({ channelId: misskeyId, expiresAt: v.pipe(v.exactOptional(v.nullable(v.pipe(v.number(), v.finite(), v.integer()))), v.metadata({ description: 'A Unix Epoch timestamp that must lie in the future. `null` means an indefinite mute.' })) })).output(v.void());

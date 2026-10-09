@@ -3,6 +3,9 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import type { Meta } from '@orpc/contract';
+import type { ApiProcedureMetadata } from '../../../../../api/backend/transport/policy.types.js';
+
 import { oc } from '@orpc/contract';
 import type { OpenAPI } from '@orpc/contract';
 import * as v from 'valibot';
@@ -21,9 +24,14 @@ export const channelsMuteDeleteErrors = {
 			id: '14d55962-6ea8-d990-1333-d6bef78dc2ab',
 		},
 	} as const;
-export const channelsMuteDeletePolicy = { name: 'channels/mute/delete', requireCredential: true, prohibitMoved: true, kind: 'write:channels' } as const;
+
 const security: OpenAPI.SecurityRequirementObject[] = [{ bearerAuth: [] }];
-export const channelsMuteDeleteContract = oc.$meta({ requestName: 'channels/mute/delete' } as const)
-	.route({ method: 'POST', path: '/channels/mute/delete', operationId: 'post___channels___mute___delete', tags: ['channels', 'mute'], spec: current => ({ ...current, security }), successStatus: 204 })
+export const channelsMuteDeleteContract = oc.$meta({
+	requestName: 'channels/mute/delete',
+	requireCredential: true,
+	prohibitMoved: true,
+	kind: 'write:channels',
+} as const satisfies Meta & ApiProcedureMetadata)
+	.route({ method: 'POST', path: '/channels/mute/delete', tags: ['channels', 'mute'], spec: current => ({ ...current, security }), successStatus: 204 })
 	.errors({ ...commonErrors, NO_SUCH_CHANNEL: { status: 400, data: apiErrorData }, NOT_MUTING_CHANNEL: { status: 400, data: apiErrorData } })
 	.input(objectInput({ channelId: misskeyId })).output(v.void());

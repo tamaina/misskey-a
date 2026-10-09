@@ -3,6 +3,9 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import type { Meta } from '@orpc/contract';
+import type { ApiProcedureMetadata } from '../../../../../api/backend/transport/policy.types.js';
+
 import { oc } from '@orpc/contract';
 import type { OpenAPI } from '@orpc/contract';
 import * as v from 'valibot';
@@ -29,13 +32,19 @@ export const chatMessagesCreateToRoomErrors = {
 			id: '340517b7-6d04-42c0-bac1-37ee804e3594',
 		},
 	} as const;
-export const chatMessagesCreateToRoomPolicy = { name: 'chat/messages/create-to-room', requireCredential: true, prohibitMoved: true, kind: 'write:chat', limit: {
+
+const security: OpenAPI.SecurityRequirementObject[] = [{ bearerAuth: [] }];
+export const chatMessagesCreateToRoomContract = oc.$meta({
+	requestName: 'chat/messages/create-to-room',
+	requireCredential: true,
+	prohibitMoved: true,
+	kind: 'write:chat',
+	limit: {
 		duration: 3600000,
 		max: 500,
-	} } as const;
-const security: OpenAPI.SecurityRequirementObject[] = [{ bearerAuth: [] }];
-export const chatMessagesCreateToRoomContract = oc.$meta({ requestName: 'chat/messages/create-to-room' } as const)
-	.route({ method: 'POST', path: '/chat/messages/create-to-room', operationId: 'post___chat___messages___create-to-room', tags: ['chat'], spec: current => ({ ...current, security }) })
+	},
+} as const satisfies Meta & ApiProcedureMetadata)
+	.route({ method: 'POST', path: '/chat/messages/create-to-room', tags: ['chat'], spec: current => ({ ...current, security }) })
 	.errors({ ...commonErrors, NO_SUCH_ROOM: { status: 400, data: apiErrorData }, NO_SUCH_FILE: { status: 400, data: apiErrorData }, CONTENT_REQUIRED: { status: 400, data: apiErrorData } })
 	.input(objectInput({
 	"text": v.exactOptional(v.nullable(jsonString({ "maxLength": 2000 }))),

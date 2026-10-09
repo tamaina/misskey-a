@@ -2,9 +2,11 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-import { implement } from '@orpc/server';
-import { authentication, apiPolicy, requirePrincipal } from '@features/api/backend/transport/middleware.js';
-import type { ApiActor, ApiContext } from '@features/api/backend/transport/context.js';
+
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import type { ApiActor } from '@features/api/backend/transport/context.js';
 import { announcementsContract } from '../../../api.definition.js';
 import type { AnnouncementsDependencies } from '../../../api.implementation.js';
 import { apiError } from '@features/api/backend/transport/orpc-error.js';
@@ -13,9 +15,7 @@ export interface AnnouncementDeleteDependencies<Actor extends ApiActor> {
 	announcementService: Pick<AnnouncementsDependencies<Actor>['announcementService'], 'delete'>;
 }
 export function createAnnouncementDeleteProcedure<Actor extends ApiActor>(deps: AnnouncementDeleteDependencies<Actor>) {
-	return implement(announcementsContract.delete, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>()
-		.use(authentication<Actor>())
-		.use(apiPolicy<Actor>({ name: announcementsContract.delete['~orpc'].meta.requestName, requireCredential: true, requireModerator: true, kind: 'write:admin:announcements' }))
+	return createApiProcedure<Actor>()(announcementsContract.delete)
 		.use(requirePrincipal<Actor>())
 		.handler(async ({ input, context }) => {
 			const actor = context.principal;

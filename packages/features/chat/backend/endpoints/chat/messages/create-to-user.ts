@@ -3,18 +3,21 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { toPackedChatMessageLiteFor1on1 } from '../../../api.dto.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+
 import type { InferSchemaOutput } from '@orpc/contract';
-import { implement } from '@orpc/server';
+
 import { type GetterService } from '@features/api/backend/transport/GetterService.js';
-import * as v from 'valibot';
-import { authentication, apiPolicy, requirePrincipal } from '../../../../../api/backend/transport/middleware.js';
+
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
 import { type ChatService } from '../../../services/ChatService.js';
-import { apiError } from '../../../../../api/backend/transport/orpc-error.js';
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
 import { readErrorId } from '../../../request.schema.js';
-import { chatMessagesCreateToUserContract, chatMessagesCreateToUserPolicy, chatMessagesCreateToUserErrors } from './create-to-user.contract.js';
+import { chatMessagesCreateToUserContract, chatMessagesCreateToUserErrors } from './create-to-user.contract.js';
 import type { DriveFilesRepository } from '@features/persistence/backend/repositories/models.js';
-import type { MiLocalUser } from '../../../../../users/backend/models/User.js';
-import type { ApiContext } from '@features/api/backend/transport/context.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+
 export interface ChatMessagesCreateToUserDependencies {
 	driveFilesRepository: DriveFilesRepository;
 	getterService: GetterService;
@@ -22,7 +25,7 @@ export interface ChatMessagesCreateToUserDependencies {
 }
 export function createChatMessagesCreateToUserProcedure(deps: ChatMessagesCreateToUserDependencies) {
 	async function execute(ps: InferSchemaOutput<NonNullable<typeof chatMessagesCreateToUserContract['~orpc']['inputSchema']>>, me: MiLocalUser): Promise<InferSchemaOutput<NonNullable<typeof chatMessagesCreateToUserContract['~orpc']['outputSchema']>>> {
-		return v.parse(requiredSchema(chatMessagesCreateToUserContract['~orpc'].outputSchema), await run(ps, me));
+		return toPackedChatMessageLiteFor1on1(await run(ps, me));
 	}
 
 	async function run(ps: InferSchemaOutput<NonNullable<typeof chatMessagesCreateToUserContract['~orpc']['inputSchema']>>, me: MiLocalUser) {
@@ -61,14 +64,7 @@ export function createChatMessagesCreateToUserProcedure(deps: ChatMessagesCreate
 		});
 	}
 
-	return implement(chatMessagesCreateToUserContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>()
-		.use(authentication<MiLocalUser>())
-		.use(apiPolicy<MiLocalUser>(chatMessagesCreateToUserPolicy))
+	return createApiProcedure<MiLocalUser>()(chatMessagesCreateToUserContract)
 		.use(requirePrincipal<MiLocalUser>())
 		.handler(({ input, context }) => execute(input, context.principal));
-}
-
-function requiredSchema<Schema>(schema: Schema | undefined): Schema {
-	if (schema === undefined) throw new Error('Missing endpoint contract schema');
-	return schema;
 }

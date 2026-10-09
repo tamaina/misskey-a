@@ -3,23 +3,25 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { toPackedChatMessage } from '../../../api.dto.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+
 import type { InferSchemaOutput } from '@orpc/contract';
-import { implement } from '@orpc/server';
-import * as v from 'valibot';
-import { authentication, apiPolicy, requirePrincipal } from '../../../../../api/backend/transport/middleware.js';
+
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
 import { type ChatService } from '../../../services/ChatService.js';
 import { type ChatEntityService } from '../../../serializers/ChatEntityService.js';
-import { apiError } from '../../../../../api/backend/transport/orpc-error.js';
-import { chatMessagesSearchContract, chatMessagesSearchPolicy, chatMessagesSearchErrors } from './search.contract.js';
-import type { MiLocalUser } from '../../../../../users/backend/models/User.js';
-import type { ApiContext } from '@features/api/backend/transport/context.js';
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
+import { chatMessagesSearchContract, chatMessagesSearchErrors } from './search.contract.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+
 export interface ChatMessagesSearchDependencies {
 	chatEntityService: ChatEntityService;
 	chatService: ChatService;
 }
 export function createChatMessagesSearchProcedure(deps: ChatMessagesSearchDependencies) {
 	async function execute(ps: InferSchemaOutput<NonNullable<typeof chatMessagesSearchContract['~orpc']['inputSchema']>>, me: MiLocalUser): Promise<InferSchemaOutput<NonNullable<typeof chatMessagesSearchContract['~orpc']['outputSchema']>>> {
-		return v.parse(requiredSchema(chatMessagesSearchContract['~orpc'].outputSchema), await run(ps, me));
+		return (await run(ps, me)).map(toPackedChatMessage);
 	}
 
 	async function run(ps: InferSchemaOutput<NonNullable<typeof chatMessagesSearchContract['~orpc']['inputSchema']>>, me: MiLocalUser) {
@@ -44,14 +46,7 @@ export function createChatMessagesSearchProcedure(deps: ChatMessagesSearchDepend
 		return await deps.chatEntityService.packMessagesDetailed(messages, me);
 	}
 
-	return implement(chatMessagesSearchContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>()
-		.use(authentication<MiLocalUser>())
-		.use(apiPolicy<MiLocalUser>(chatMessagesSearchPolicy))
+	return createApiProcedure<MiLocalUser>()(chatMessagesSearchContract)
 		.use(requirePrincipal<MiLocalUser>())
 		.handler(({ input, context }) => execute(input, context.principal));
-}
-
-function requiredSchema<Schema>(schema: Schema | undefined): Schema {
-	if (schema === undefined) throw new Error('Missing endpoint contract schema');
-	return schema;
 }

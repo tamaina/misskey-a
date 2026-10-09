@@ -3,26 +3,25 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { implement } from '@orpc/server';
-import { QueryService } from '@features/notes/backend/services/QueryService.js';
-import * as v from 'valibot';
-import { packedChannelSchema } from '../../channel.schema.js';
-import { authentication, apiPolicy, requirePrincipal } from '../../../../api/backend/transport/middleware.js';
-import { ChannelEntityService } from '../../serializers/ChannelEntityService.js';
-import { channelsFollowedContract, channelsFollowedPolicy } from './followed.contract.js';
+import { toPackedChannel } from '../../api.dto.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+
+import { type QueryService } from '@features/notes/backend/services/QueryService.js';
+
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import { type ChannelEntityService } from '../../serializers/ChannelEntityService.js';
+import { channelsFollowedContract } from './followed.contract.js';
 import type { ChannelFollowingsRepository } from '@features/persistence/backend/repositories/models.js';
 
-import type { MiLocalUser } from '../../../../users/backend/models/User.js';
-import type { ApiContext } from '@features/api/backend/transport/context.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+
 export interface ChannelsFollowedDependencies {
 	channelFollowingsRepository: ChannelFollowingsRepository;
 	channelEntityService: ChannelEntityService;
 	queryService: QueryService;
 }
 export function createChannelsFollowedProcedure<Actor extends MiLocalUser>(deps: ChannelsFollowedDependencies) {
-	return implement(channelsFollowedContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>()
-		.use(authentication<Actor>())
-		.use(apiPolicy<Actor>(channelsFollowedPolicy))
+	return createApiProcedure<Actor>()(channelsFollowedContract)
 		.use(requirePrincipal<Actor>())
 		.handler(async ({ input, context }) => {
 			const ps = input;
@@ -41,6 +40,6 @@ export function createChannelsFollowedProcedure<Actor extends MiLocalUser>(deps:
 			const followings = await query
 				.limit(ps.limit)
 				.getMany();
-			return v.parse(v.array(packedChannelSchema), await Promise.all(followings.map(x => deps.channelEntityService.pack(x.followeeId, me))));
+			return (await Promise.all(followings.map(x => deps.channelEntityService.pack(x.followeeId, me)))).map(toPackedChannel);
 		});
 }

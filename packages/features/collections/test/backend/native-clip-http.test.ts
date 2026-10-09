@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { expect, test } from 'vitest';
+import { expect, test, vi } from 'vitest';
 import { mockDeep } from 'vitest-mock-extended';
 import Fastify from 'fastify';
 import { createRouterClient } from '@orpc/server';
@@ -13,6 +13,7 @@ import type { MiLocalUser } from '@features/users/backend/models/User.js';
 import type { MiNote } from '@features/notes/backend/models/Note.js';
 import { OpenAPIHandler } from '@orpc/openapi/fastify';
 import type * as v from 'valibot';
+import { collectionsContract } from '../../backend/api.definition.js';
 import { createCollectionsRouter } from '../../backend/api.implementation.js';
 import type { ApiContext } from '@features/api/backend/transport/context.js';
 import type { SelectQueryBuilder } from 'typeorm';
@@ -108,4 +109,29 @@ test('native transport decodes GET query numbers while POST JSON and canonical d
 		await expect(client.collections.clipsList({ limit: '3' })).rejects.toMatchObject({ code: 'BAD_REQUEST' });
 		expect(dependencies.queryService.makePaginationQuery).not.toHaveBeenCalled();
 	} finally { await app.close(); }
+});
+
+test('native clip HTTP strips outer and nested secrets with no output-validator calls', async () => {
+	const services = mockDeep<ApiServices<MiLocalUser>>();
+	services.authenticate.mockResolvedValue([actor, null]);
+	const dependencies = mockDeep<CollectionsDependencies<MiLocalUser>>();
+	dependencies.clipService.create.mockResolvedValue(mockDeep<MiClip>({ id: clip.id }));
+	const extended = { ...clip, internalClipData: 'secret', user: { ...clip.user, privateUserData: 'secret' } };
+	dependencies.clipEntityService.pack.mockResolvedValue(extended);
+	const context: ApiContext<MiLocalUser> = { services, credential: 'native', ip: '127.0.0.1', headers: {} };
+	const handler = new OpenAPIHandler(createCollectionsRouter(dependencies));
+	const app = Fastify();
+	app.post('/api/clips/create', async (request, reply) => {
+		await handler.handle(request, reply, { prefix: '/api', context });
+	});
+	const output = collectionsContract.clipsCreate['~orpc'].outputSchema;
+	if (output === undefined) throw new Error('Missing clip output');
+	const validate = vi.spyOn(output, '~run');
+	try {
+		const response = await app.inject({ method: 'POST', url: '/api/clips/create', payload: { name: 'clip' } });
+		expect(response.statusCode).toBe(200);
+		expect(response.json()).toEqual(clip);
+		expect(response.body).not.toContain('secret');
+		expect(validate).not.toHaveBeenCalled();
+	} finally { validate.mockRestore(); await app.close(); }
 });

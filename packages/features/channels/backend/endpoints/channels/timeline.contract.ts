@@ -3,6 +3,9 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import type { Meta } from '@orpc/contract';
+import type { ApiProcedureMetadata } from '../../../../api/backend/transport/policy.types.js';
+
 import { oc } from '@orpc/contract';
 import type { OpenAPI } from '@orpc/contract';
 import * as v from 'valibot';
@@ -17,10 +20,13 @@ export const channelsTimelineErrors = {
 			id: '4d0eeeba-a02c-4c3c-9966-ef60d38d2e7f',
 		},
 	} as const;
-export const channelsTimelinePolicy = { name: 'channels/timeline', requireCredential: false } as const;
+
 const security: OpenAPI.SecurityRequirementObject[] = [{}, { bearerAuth: [] }];
-export const channelsTimelineContract = oc.$meta({ requestName: 'channels/timeline' } as const)
-	.route({ method: 'POST', path: '/channels/timeline', operationId: 'post___channels___timeline', tags: ['notes', 'channels'], spec: current => ({ ...current, security }) })
+export const channelsTimelineContract = oc.$meta({
+	requestName: 'channels/timeline',
+	requireCredential: false,
+} as const satisfies Meta & ApiProcedureMetadata)
+	.route({ method: 'POST', path: '/channels/timeline', tags: ['notes', 'channels'], spec: current => ({ ...current, security }) })
 	.errors({ ...commonErrors, NO_SUCH_CHANNEL: { status: 400, data: apiErrorData } })
 	.input(objectInput({
 		"channelId": misskeyId,

@@ -3,6 +3,9 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import type { Meta } from '@orpc/contract';
+import type { ApiProcedureMetadata } from '../../../../../../api/backend/transport/policy.types.js';
+
 import { oc } from '@orpc/contract';
 import type { OpenAPI } from '@orpc/contract';
 import * as v from 'valibot';
@@ -17,10 +20,14 @@ export const chatRoomsInvitationsOutboxErrors = {
 			id: 'a3c6b309-9717-4316-ae94-a69b53437237',
 		},
 	} as const;
-export const chatRoomsInvitationsOutboxPolicy = { name: 'chat/rooms/invitations/outbox', requireCredential: true, kind: 'read:chat' } as const;
+
 const security: OpenAPI.SecurityRequirementObject[] = [{ bearerAuth: [] }];
-export const chatRoomsInvitationsOutboxContract = oc.$meta({ requestName: 'chat/rooms/invitations/outbox' } as const)
-	.route({ method: 'POST', path: '/chat/rooms/invitations/outbox', operationId: 'post___chat___rooms___invitations___outbox', tags: ['chat'], spec: current => ({ ...current, security }) })
+export const chatRoomsInvitationsOutboxContract = oc.$meta({
+	requestName: 'chat/rooms/invitations/outbox',
+	requireCredential: true,
+	kind: 'read:chat',
+} as const satisfies Meta & ApiProcedureMetadata)
+	.route({ method: 'POST', path: '/chat/rooms/invitations/outbox', tags: ['chat'], spec: current => ({ ...current, security }) })
 	.errors({ ...commonErrors, NO_SUCH_ROOM: { status: 400, data: apiErrorData } })
 	.input(objectInput({
 	"roomId": misskeyId,

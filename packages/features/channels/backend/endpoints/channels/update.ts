@@ -3,18 +3,19 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { implement } from '@orpc/server';
-import { RoleService } from '@features/roles/backend/services/RoleService.js';
-import * as v from 'valibot';
-import { packedChannelSchema } from '../../channel.schema.js';
-import { authentication, apiPolicy, requirePrincipal } from '../../../../api/backend/transport/middleware.js';
-import { ChannelEntityService } from '../../serializers/ChannelEntityService.js';
-import { apiError } from '../../../../api/backend/transport/orpc-error.js';
-import { channelsUpdateContract, channelsUpdatePolicy, channelsUpdateErrors } from './update.contract.js';
+import { toPackedChannel } from '../../api.dto.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+
+import { type RoleService } from '@features/roles/backend/services/RoleService.js';
+
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import { type ChannelEntityService } from '../../serializers/ChannelEntityService.js';
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
+import { channelsUpdateContract, channelsUpdateErrors } from './update.contract.js';
 import type { DriveFilesRepository, ChannelsRepository } from '@features/persistence/backend/repositories/models.js';
 
-import type { MiLocalUser } from '../../../../users/backend/models/User.js';
-import type { ApiContext } from '@features/api/backend/transport/context.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+
 export interface ChannelsUpdateDependencies {
 	channelsRepository: ChannelsRepository;
 	driveFilesRepository: DriveFilesRepository;
@@ -22,9 +23,7 @@ export interface ChannelsUpdateDependencies {
 	roleService: RoleService;
 }
 export function createChannelsUpdateProcedure<Actor extends MiLocalUser>(deps: ChannelsUpdateDependencies) {
-	return implement(channelsUpdateContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>()
-		.use(authentication<Actor>())
-		.use(apiPolicy<Actor>(channelsUpdatePolicy))
+	return createApiProcedure<Actor>()(channelsUpdateContract)
 		.use(requirePrincipal<Actor>())
 		.handler(async ({ input, context }) => {
 			const ps = input;
@@ -67,6 +66,6 @@ export function createChannelsUpdateProcedure<Actor extends MiLocalUser>(deps: C
 				...(typeof ps.isSensitive === 'boolean' ? { isSensitive: ps.isSensitive } : {}),
 				...(typeof ps.allowRenoteToExternal === 'boolean' ? { allowRenoteToExternal: ps.allowRenoteToExternal } : {}),
 			});
-			return v.parse(packedChannelSchema, await deps.channelEntityService.pack(channel.id, me));
+			return toPackedChannel(await deps.channelEntityService.pack(channel.id, me));
 		});
 }

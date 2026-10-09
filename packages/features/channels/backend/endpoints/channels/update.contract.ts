@@ -3,6 +3,9 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import type { Meta } from '@orpc/contract';
+import type { ApiProcedureMetadata } from '../../../../api/backend/transport/policy.types.js';
+
 import { oc } from '@orpc/contract';
 import type { OpenAPI } from '@orpc/contract';
 import * as v from 'valibot';
@@ -29,10 +32,14 @@ export const channelsUpdateErrors = {
 			id: 'e86c14a4-0da2-4032-8df3-e737a04c7f3b',
 		},
 	} as const;
-export const channelsUpdatePolicy = { name: 'channels/update', requireCredential: true, kind: 'write:channels' } as const;
+
 const security: OpenAPI.SecurityRequirementObject[] = [{ bearerAuth: [] }];
-export const channelsUpdateContract = oc.$meta({ requestName: 'channels/update' } as const)
-	.route({ method: 'POST', path: '/channels/update', operationId: 'post___channels___update', tags: ['channels'], spec: current => ({ ...current, security }) })
+export const channelsUpdateContract = oc.$meta({
+	requestName: 'channels/update',
+	requireCredential: true,
+	kind: 'write:channels',
+} as const satisfies Meta & ApiProcedureMetadata)
+	.route({ method: 'POST', path: '/channels/update', tags: ['channels'], spec: current => ({ ...current, security }) })
 	.errors({ ...commonErrors, NO_SUCH_CHANNEL: { status: 400, data: apiErrorData }, ACCESS_DENIED: { status: 400, data: apiErrorData }, NO_SUCH_FILE: { status: 400, data: apiErrorData } })
 	.input(objectInput({
 		"channelId": misskeyId,

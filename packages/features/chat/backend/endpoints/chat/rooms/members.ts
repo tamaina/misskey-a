@@ -3,17 +3,20 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { toPackedChatRoomMembership } from '../../../api.dto.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+
 import type { InferSchemaOutput } from '@orpc/contract';
-import { implement } from '@orpc/server';
+
 import { type IdService } from '@features/runtime/backend/services/IdService.js';
-import * as v from 'valibot';
-import { authentication, apiPolicy, requirePrincipal } from '../../../../../api/backend/transport/middleware.js';
+
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
 import { type ChatService } from '../../../services/ChatService.js';
 import { type ChatEntityService } from '../../../serializers/ChatEntityService.js';
-import { apiError } from '../../../../../api/backend/transport/orpc-error.js';
-import { chatRoomsMembersContract, chatRoomsMembersPolicy, chatRoomsMembersErrors } from './members.contract.js';
-import type { MiLocalUser } from '../../../../../users/backend/models/User.js';
-import type { ApiContext } from '@features/api/backend/transport/context.js';
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
+import { chatRoomsMembersContract, chatRoomsMembersErrors } from './members.contract.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+
 export interface ChatRoomsMembersDependencies {
 	chatService: ChatService;
 	chatEntityService: ChatEntityService;
@@ -21,7 +24,7 @@ export interface ChatRoomsMembersDependencies {
 }
 export function createChatRoomsMembersProcedure(deps: ChatRoomsMembersDependencies) {
 	async function execute(ps: InferSchemaOutput<NonNullable<typeof chatRoomsMembersContract['~orpc']['inputSchema']>>, me: MiLocalUser): Promise<InferSchemaOutput<NonNullable<typeof chatRoomsMembersContract['~orpc']['outputSchema']>>> {
-		return v.parse(requiredSchema(chatRoomsMembersContract['~orpc'].outputSchema), await run(ps, me));
+		return (await run(ps, me)).map(toPackedChatRoomMembership);
 	}
 
 	async function run(ps: InferSchemaOutput<NonNullable<typeof chatRoomsMembersContract['~orpc']['inputSchema']>>, me: MiLocalUser) {
@@ -47,14 +50,7 @@ export function createChatRoomsMembersProcedure(deps: ChatRoomsMembersDependenci
 		});
 	}
 
-	return implement(chatRoomsMembersContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>()
-		.use(authentication<MiLocalUser>())
-		.use(apiPolicy<MiLocalUser>(chatRoomsMembersPolicy))
+	return createApiProcedure<MiLocalUser>()(chatRoomsMembersContract)
 		.use(requirePrincipal<MiLocalUser>())
 		.handler(({ input, context }) => execute(input, context.principal));
-}
-
-function requiredSchema<Schema>(schema: Schema | undefined): Schema {
-	if (schema === undefined) throw new Error('Missing endpoint contract schema');
-	return schema;
 }

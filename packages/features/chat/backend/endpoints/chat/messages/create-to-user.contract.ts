@@ -3,6 +3,9 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import type { Meta } from '@orpc/contract';
+import type { ApiProcedureMetadata } from '../../../../../api/backend/transport/policy.types.js';
+
 import { oc } from '@orpc/contract';
 import type { OpenAPI } from '@orpc/contract';
 import * as v from 'valibot';
@@ -41,13 +44,19 @@ export const chatMessagesCreateToUserErrors = {
 			id: 'c15a5199-7422-4968-941a-2a462c478f7d',
 		},
 	} as const;
-export const chatMessagesCreateToUserPolicy = { name: 'chat/messages/create-to-user', requireCredential: true, prohibitMoved: true, kind: 'write:chat', limit: {
+
+const security: OpenAPI.SecurityRequirementObject[] = [{ bearerAuth: [] }];
+export const chatMessagesCreateToUserContract = oc.$meta({
+	requestName: 'chat/messages/create-to-user',
+	requireCredential: true,
+	prohibitMoved: true,
+	kind: 'write:chat',
+	limit: {
 		duration: 3600000,
 		max: 500,
-	} } as const;
-const security: OpenAPI.SecurityRequirementObject[] = [{ bearerAuth: [] }];
-export const chatMessagesCreateToUserContract = oc.$meta({ requestName: 'chat/messages/create-to-user' } as const)
-	.route({ method: 'POST', path: '/chat/messages/create-to-user', operationId: 'post___chat___messages___create-to-user', tags: ['chat'], spec: current => ({ ...current, security }) })
+	},
+} as const satisfies Meta & ApiProcedureMetadata)
+	.route({ method: 'POST', path: '/chat/messages/create-to-user', tags: ['chat'], spec: current => ({ ...current, security }) })
 	.errors({ ...commonErrors, RECIPIENT_IS_YOURSELF: { status: 400, data: apiErrorData }, NO_SUCH_USER: { status: 400, data: apiErrorData }, NO_SUCH_FILE: { status: 400, data: apiErrorData }, CONTENT_REQUIRED: { status: 400, data: apiErrorData }, YOU_HAVE_BEEN_BLOCKED: { status: 400, data: apiErrorData } })
 	.input(objectInput({
 	"text": v.exactOptional(v.nullable(jsonString({ "maxLength": 2000 }))),

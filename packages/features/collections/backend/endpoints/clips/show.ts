@@ -2,9 +2,10 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-import { implement } from '@orpc/server';
-import { authentication, apiPolicy } from '@features/api/backend/transport/middleware.js';
-import type { ApiActor, ApiContext } from '@features/api/backend/transport/context.js';
+
+import { toPackedClip } from '../../api.dto.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import type { ApiActor } from '@features/api/backend/transport/context.js';
 import { collectionsContract } from '../../api.definition.js';
 import type { CollectionsDependencies } from '../../api.implementation.js';
 import { apiError } from '@features/api/backend/transport/orpc-error.js';
@@ -14,8 +15,7 @@ export interface ClipsShowDependencies<Actor extends ApiActor> {
 	clipEntityService: Pick<CollectionsDependencies<Actor>['clipEntityService'], 'pack'>;
 }
 export function createClipsShowProcedure<Actor extends ApiActor>(deps: ClipsShowDependencies<Actor>) {
-	return implement(collectionsContract.clipsShow, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>()
-		.use(authentication<Actor>()).use(apiPolicy<Actor>({ name: collectionsContract.clipsShow['~orpc'].meta.requestName, kind: 'read:account' }))
+	return createApiProcedure<Actor>()(collectionsContract.clipsShow)
 		.handler(async ({ input: ps, context }) => {
 			const me = context.principal;
 			// Fetch the clip
@@ -28,6 +28,6 @@ export function createClipsShowProcedure<Actor extends ApiActor>(deps: ClipsShow
 			if (!clip.isPublic && (me == null || (clip.userId !== me.id))) {
 				throw apiError(collectionsErrors.clipsShow.noSuchClip);
 			}
-			return await deps.clipEntityService.pack(clip, me);
+			return toPackedClip(await deps.clipEntityService.pack(clip, me));
 		});
 }

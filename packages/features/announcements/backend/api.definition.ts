@@ -3,6 +3,9 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import type { Meta } from '@orpc/contract';
+import type { ApiProcedureMetadata } from '../../api/backend/transport/policy.types.js';
+
 import * as v from 'valibot';
 import type { OpenAPI } from '@orpc/contract';
 import { oc } from '@orpc/contract';
@@ -42,8 +45,13 @@ const apiContractDisplay = v.picklist(['normal', 'banner', 'dialog']);
 const publicSecurity: OpenAPI.SecurityRequirementObject[] = [{}, { bearerAuth: [] }];
 
 export const announcementsContract = {
-	create: oc.$meta({ requestName: 'admin/announcements/create' } as const)
-		.route({ method: 'POST', path: '/admin/announcements/create', operationId: 'post___admin___announcements___create', tags: ['admin'], spec: current => ({ ...current, security: [{ bearerAuth: [] }] }) })
+	create: oc.$meta({
+		requestName: 'admin/announcements/create',
+		requireCredential: true,
+		requireModerator: true,
+		kind: 'write:admin:announcements',
+	} as const satisfies Meta & ApiProcedureMetadata)
+		.route({ method: 'POST', path: '/admin/announcements/create', tags: ['admin'], spec: current => ({ ...current, security: [{ bearerAuth: [] }] }) })
 		.errors({ ...commonErrors })
 		.input(objectInput({
 			title: nonempty, text: nonempty, imageUrl: v.nullable(v.string()),
@@ -51,12 +59,22 @@ export const announcementsContract = {
 			forExistingUsers: v.optional(v.boolean(), false), silence: v.optional(v.boolean(), false),
 			needConfirmationToRead: v.optional(v.boolean(), false), userId: v.optional(v.nullable(id), null),
 		})).output(announcementOutput),
-	delete: oc.$meta({ requestName: 'admin/announcements/delete' } as const)
-		.route({ method: 'POST', path: '/admin/announcements/delete', operationId: 'post___admin___announcements___delete', tags: ['admin'], spec: current => ({ ...current, security: [{ bearerAuth: [] }] }), successStatus: 204 })
+	delete: oc.$meta({
+		requestName: 'admin/announcements/delete',
+		requireCredential: true,
+		requireModerator: true,
+		kind: 'write:admin:announcements',
+	} as const satisfies Meta & ApiProcedureMetadata)
+		.route({ method: 'POST', path: '/admin/announcements/delete', tags: ['admin'], spec: current => ({ ...current, security: [{ bearerAuth: [] }] }), successStatus: 204 })
 		.errors({ ...commonErrors, NO_SUCH_ANNOUNCEMENT: { status: 400, data: apiErrorData } })
 		.input(objectInput({ id })).output(v.void()),
-	adminList: oc.$meta({ requestName: 'admin/announcements/list' } as const)
-		.route({ method: 'POST', path: '/admin/announcements/list', operationId: 'post___admin___announcements___list', tags: ['admin'], spec: current => ({ ...current, security: [{ bearerAuth: [] }] }) })
+	adminList: oc.$meta({
+		requestName: 'admin/announcements/list',
+		requireCredential: true,
+		requireModerator: true,
+		kind: 'read:admin:announcements',
+	} as const satisfies Meta & ApiProcedureMetadata)
+		.route({ method: 'POST', path: '/admin/announcements/list', tags: ['admin'], spec: current => ({ ...current, security: [{ bearerAuth: [] }] }) })
 		.errors({ ...commonErrors })
 		.input(objectInput({
 			...pagination, userId: v.exactOptional(v.nullable(id)), status: v.optional(v.picklist(['all', 'active', 'archived']), 'active'),
@@ -65,8 +83,13 @@ export const announcementsContract = {
 	imageUrl: v.nullable(v.string()), icon: apiContractIcon, display: apiContractDisplay, isActive: v.boolean(), forExistingUsers: v.boolean(),
 	silence: v.boolean(), needConfirmationToRead: v.boolean(), userId: v.nullable(v.string()), reads: v.number(),
 }))),
-	update: oc.$meta({ requestName: 'admin/announcements/update' } as const)
-		.route({ method: 'POST', path: '/admin/announcements/update', operationId: 'post___admin___announcements___update', tags: ['admin'], spec: current => ({ ...current, security: [{ bearerAuth: [] }] }), successStatus: 204 })
+	update: oc.$meta({
+		requestName: 'admin/announcements/update',
+		requireCredential: true,
+		requireModerator: true,
+		kind: 'write:admin:announcements',
+	} as const satisfies Meta & ApiProcedureMetadata)
+		.route({ method: 'POST', path: '/admin/announcements/update', tags: ['admin'], spec: current => ({ ...current, security: [{ bearerAuth: [] }] }), successStatus: 204 })
 		.errors({ ...commonErrors, NO_SUCH_ANNOUNCEMENT: { status: 400, data: apiErrorData } })
 		.input(objectInput({
 			id, title: v.exactOptional(nonempty), text: v.exactOptional(nonempty),
@@ -74,16 +97,26 @@ export const announcementsContract = {
 			forExistingUsers: v.exactOptional(v.boolean()), silence: v.exactOptional(v.boolean()),
 			needConfirmationToRead: v.exactOptional(v.boolean()), isActive: v.exactOptional(v.boolean()),
 		})).output(v.void()),
-	list: oc.$meta({ requestName: 'announcements' } as const)
-		.route({ method: 'POST', path: '/announcements', operationId: 'post___announcements', tags: ['meta'], spec: current => ({ ...current, security: publicSecurity }) })
+	list: oc.$meta({
+		requestName: 'announcements',
+		requireCredential: false,
+	} as const satisfies Meta & ApiProcedureMetadata)
+		.route({ method: 'POST', path: '/announcements', tags: ['meta'], spec: current => ({ ...current, security: publicSecurity }) })
 		.errors({ ...commonErrors })
 		.input(objectInput({ ...pagination, isActive: v.optional(v.boolean(), true) })).output(v.array(announcementOutput)),
-	show: oc.$meta({ requestName: 'announcements/show' } as const)
-		.route({ method: 'POST', path: '/announcements/show', operationId: 'post___announcements___show', tags: ['meta'], spec: current => ({ ...current, security: publicSecurity }) })
+	show: oc.$meta({
+		requestName: 'announcements/show',
+		requireCredential: false,
+	} as const satisfies Meta & ApiProcedureMetadata)
+		.route({ method: 'POST', path: '/announcements/show', tags: ['meta'], spec: current => ({ ...current, security: publicSecurity }) })
 		.errors({ ...commonErrors, NO_SUCH_ANNOUNCEMENT: { status: 400, data: apiErrorData } })
 		.input(objectInput({ announcementId: id })).output(announcementOutput),
-	read: oc.$meta({ requestName: 'i/read-announcement' } as const)
-		.route({ method: 'POST', path: '/i/read-announcement', operationId: 'post___i___read-announcement', tags: ['account'], spec: current => ({ ...current, security: [{ bearerAuth: [] }] }), successStatus: 204 })
+	read: oc.$meta({
+		requestName: 'i/read-announcement',
+		requireCredential: true,
+		kind: 'write:account',
+	} as const satisfies Meta & ApiProcedureMetadata)
+		.route({ method: 'POST', path: '/i/read-announcement', tags: ['account'], spec: current => ({ ...current, security: [{ bearerAuth: [] }] }), successStatus: 204 })
 		.errors({ ...commonErrors })
 		.input(objectInput({ announcementId: id })).output(v.void()),
 };

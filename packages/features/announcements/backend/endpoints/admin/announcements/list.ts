@@ -2,9 +2,11 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-import { implement } from '@orpc/server';
-import { authentication, apiPolicy, requirePrincipal } from '@features/api/backend/transport/middleware.js';
-import type { ApiActor, ApiContext } from '@features/api/backend/transport/context.js';
+
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import type { ApiActor } from '@features/api/backend/transport/context.js';
 import { announcementsContract } from '../../../api.definition.js';
 import type { AnnouncementsDependencies } from '../../../api.implementation.js';
 import type { InferContractRouterOutputs } from '@orpc/contract';
@@ -15,9 +17,7 @@ export interface AnnouncementAdminListDependencies<Actor extends ApiActor> {
 	idService: AnnouncementsDependencies<Actor>['idService'];
 }
 export function createAnnouncementAdminListProcedure<Actor extends ApiActor>(deps: AnnouncementAdminListDependencies<Actor>) {
-	return implement(announcementsContract.adminList, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>()
-		.use(authentication<Actor>())
-		.use(apiPolicy<Actor>({ name: announcementsContract.adminList['~orpc'].meta.requestName, requireCredential: true, requireModerator: true, kind: 'read:admin:announcements' }))
+	return createApiProcedure<Actor>()(announcementsContract.adminList)
 		.use(requirePrincipal<Actor>())
 		.handler(async ({ input }) => {
 			const query = deps.queryService.makePaginationQuery(deps.announcementsRepository.createQueryBuilder('announcement'), input.sinceId, input.untilId, input.sinceDate, input.untilDate);

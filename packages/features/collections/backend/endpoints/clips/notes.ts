@@ -2,9 +2,11 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-import { implement } from '@orpc/server';
-import { authentication, apiPolicy, decodeScalarInput } from '@features/api/backend/transport/middleware.js';
-import type { ApiActor, ApiContext } from '@features/api/backend/transport/context.js';
+
+import { toPackedNote } from '@features/notes/backend/note.schema.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import { decodeScalarInput } from '@features/api/backend/transport/middleware.js';
+import type { ApiActor } from '@features/api/backend/transport/context.js';
 import { collectionsContract } from '../../api.definition.js';
 import type { CollectionsDependencies } from '../../api.implementation.js';
 import { Brackets } from 'typeorm';
@@ -19,8 +21,7 @@ export interface ClipsNotesDependencies<Actor extends ApiActor> {
 	noteEntityService: Pick<CollectionsDependencies<Actor>['noteEntityService'], 'packMany'>;
 }
 export function createClipsNotesProcedure<Actor extends ApiActor>(deps: ClipsNotesDependencies<Actor>) {
-	return implement(collectionsContract.clipsNotes, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>()
-		.use(authentication<Actor>()).use(apiPolicy<Actor>({ name: collectionsContract.clipsNotes['~orpc'].meta.requestName, kind: 'read:account' })).use(decodeScalarInput<Actor>({ limit: 'integer', sinceDate: 'integer', untilDate: 'integer' }))
+	return createApiProcedure<Actor>()(collectionsContract.clipsNotes).use(decodeScalarInput<Actor>({ limit: 'integer', sinceDate: 'integer', untilDate: 'integer' }))
 		.handler(async ({ input: ps, context }) => {
 			const me = context.principal;
 			const clip = await deps.clipsRepository.findOneBy({
@@ -60,6 +61,6 @@ export function createClipsNotesProcedure<Actor extends ApiActor>(deps: ClipsNot
 			const notes = await query
 				.limit(ps.limit)
 				.getMany();
-			return await deps.noteEntityService.packMany(notes, me);
+			return (await deps.noteEntityService.packMany(notes, me)).map(toPackedNote);
 		});
 }

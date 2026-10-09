@@ -3,29 +3,27 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { implement } from '@orpc/server';
+import { toPackedChannel } from '../../api.dto.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+
 import { Brackets } from 'typeorm';
 
-import { QueryService } from '@features/notes/backend/services/QueryService.js';
+import { type QueryService } from '@features/notes/backend/services/QueryService.js';
 import { sqlLikeEscape } from '@features/persistence/backend/utility/sql-like-escape.js';
 
-import * as v from 'valibot';
-import { packedChannelSchema } from '../../channel.schema.js';
-import { ChannelEntityService } from '../../serializers/ChannelEntityService.js';
-import { authentication, apiPolicy } from '../../../../api/backend/transport/middleware.js';
-import { channelsSearchContract, channelsSearchPolicy } from './search.contract.js';
+import { type ChannelEntityService } from '../../serializers/ChannelEntityService.js';
+
+import { channelsSearchContract } from './search.contract.js';
 import type { ChannelsRepository } from '@features/persistence/backend/repositories/models.js';
-import type { MiLocalUser } from '../../../../users/backend/models/User.js';
-import type { ApiContext } from '@features/api/backend/transport/context.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+
 export interface ChannelsSearchDependencies {
 	channelsRepository: ChannelsRepository;
 	channelEntityService: ChannelEntityService;
 	queryService: QueryService;
 }
 export function createChannelsSearchProcedure<Actor extends MiLocalUser>(deps: ChannelsSearchDependencies) {
-	return implement(channelsSearchContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>()
-		.use(authentication<Actor>())
-		.use(apiPolicy<Actor>(channelsSearchPolicy))
+	return createApiProcedure<Actor>()(channelsSearchContract)
 		.handler(async ({ input, context }) => {
 			const ps = input;
 			const me = context.principal;
@@ -47,6 +45,6 @@ export function createChannelsSearchProcedure<Actor extends MiLocalUser>(deps: C
 			const channels = await query
 				.limit(ps.limit)
 				.getMany();
-			return v.parse(v.array(packedChannelSchema), await Promise.all(channels.map(x => deps.channelEntityService.pack(x, me))));
+			return (await Promise.all(channels.map(x => deps.channelEntityService.pack(x, me)))).map(toPackedChannel);
 		});
 }

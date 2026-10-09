@@ -109,7 +109,7 @@ test('actual favorite wrapper closes its own fields while preserving the nested 
 	expect(notes.pack).toHaveBeenCalledWith(note.id, user);
 });
 
-test('native finite inputs strip extras, enforce constraints, and retain defaults; operations and responses are validated', async () => {
+test('native finite inputs strip extras, enforce constraints, and retain defaults; inputs validate and public responses are selected', async () => {
 	expect(v.parse(packedClipsCreateInput, { name: 'saved', future: true })).toEqual({ name: 'saved', isPublic: false });
 	for (const value of [{}, { name: '' }, { name: 7 }, { name: 'saved', isPublic: null }]) expect(v.safeParse(packedClipsCreateInput, value).success).toBe(false);
 	expect(v.parse(uniqueGalleryPostsCreateInput, { title: 'gallery', fileIds: ['file123'], future: true })).toEqual({ title: 'gallery', fileIds: ['file123'], isSensitive: false });
@@ -132,7 +132,9 @@ test('native finite inputs strip extras, enforce constraints, and retain default
 	services.authenticate.mockResolvedValue([actor, null]);
 	dependencies.clipEntityService.packMany.mockResolvedValue(response);
 	const client = createRouterClient(createCollectionsRouter(dependencies), { context });
-	await expect(client.clipsList(params)).rejects.toMatchObject({ code: 'INTERNAL_SERVER_ERROR' });
+	const projected = await client.clipsList(params);
+	expect(projected).toEqual([nativeResponse]);
+	expect(projected[0]).not.toHaveProperty('future');
 	expect(dependencies.clipEntityService.packMany).toHaveBeenCalledWith([], actor);
 	expect(query.limit).toHaveBeenCalledWith(10);
 	expect(params).toEqual({ future: true, limit: 10 });

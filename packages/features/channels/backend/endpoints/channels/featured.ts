@@ -3,24 +3,21 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { implement } from '@orpc/server';
-import * as v from 'valibot';
-import { packedChannelSchema } from '../../channel.schema.js';
-import { authentication, apiPolicy } from '../../../../api/backend/transport/middleware.js';
-import { ChannelEntityService } from '../../serializers/ChannelEntityService.js';
-import { channelsFeaturedContract, channelsFeaturedPolicy } from './featured.contract.js';
+import { toPackedChannel } from '../../api.dto.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+
+import { type ChannelEntityService } from '../../serializers/ChannelEntityService.js';
+import { channelsFeaturedContract } from './featured.contract.js';
 import type { ChannelsRepository } from '@features/persistence/backend/repositories/models.js';
 
-import type { MiLocalUser } from '../../../../users/backend/models/User.js';
-import type { ApiContext } from '@features/api/backend/transport/context.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+
 export interface ChannelsFeaturedDependencies {
 	channelsRepository: ChannelsRepository;
 	channelEntityService: ChannelEntityService;
 }
 export function createChannelsFeaturedProcedure<Actor extends MiLocalUser>(deps: ChannelsFeaturedDependencies) {
-	return implement(channelsFeaturedContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>()
-		.use(authentication<Actor>())
-		.use(apiPolicy<Actor>(channelsFeaturedPolicy))
+	return createApiProcedure<Actor>()(channelsFeaturedContract)
 		.handler(async ({ input, context }) => {
 			const me = context.principal;
 			const query = deps.channelsRepository.createQueryBuilder('channel')
@@ -29,6 +26,6 @@ export function createChannelsFeaturedProcedure<Actor extends MiLocalUser>(deps:
 				.orderBy('channel.lastNotedAt', 'DESC');
 
 			const channels = await query.limit(10).getMany();
-			return v.parse(v.array(packedChannelSchema), await Promise.all(channels.map(x => deps.channelEntityService.pack(x, me))));
+			return (await Promise.all(channels.map(x => deps.channelEntityService.pack(x, me)))).map(toPackedChannel);
 		});
 }

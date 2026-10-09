@@ -2,9 +2,11 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-import { implement } from '@orpc/server';
-import { authentication, apiPolicy, requirePrincipal, decodeScalarInput } from '@features/api/backend/transport/middleware.js';
-import type { ApiActor, ApiContext } from '@features/api/backend/transport/context.js';
+
+import { toPackedGalleryPost } from '../../../api.dto.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import { requirePrincipal, decodeScalarInput } from '@features/api/backend/transport/middleware.js';
+import type { ApiActor } from '@features/api/backend/transport/context.js';
 import { collectionsContract } from '../../../api.definition.js';
 import type { CollectionsDependencies } from '../../../api.implementation.js';
 import { MiGalleryPost } from '../../../models/GalleryPost.js';
@@ -15,8 +17,7 @@ export interface GalleryPostsCreateDependencies<Actor extends ApiActor> {
 	galleryPostEntityService: Pick<CollectionsDependencies<Actor>['galleryPostEntityService'], 'pack'>;
 }
 export function createGalleryPostsCreateProcedure<Actor extends ApiActor>(deps: GalleryPostsCreateDependencies<Actor>) {
-	return implement(collectionsContract.galleryPostsCreate, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>()
-		.use(authentication<Actor>()).use(apiPolicy<Actor>({ name: collectionsContract.galleryPostsCreate['~orpc'].meta.requestName, requireCredential: true, prohibitMoved: true, kind: 'write:gallery', limit: { duration: 3600000, max: 20 } })).use(requirePrincipal<Actor>()).use(decodeScalarInput<Actor>({ isSensitive: 'boolean' }))
+	return createApiProcedure<Actor>()(collectionsContract.galleryPostsCreate).use(requirePrincipal<Actor>()).use(decodeScalarInput<Actor>({ isSensitive: 'boolean' }))
 		.handler(async ({ input: ps, context }) => {
 			const me = context.principal;
 			const files = (await Promise.all(ps.fileIds.map(fileId =>
@@ -37,6 +38,6 @@ export function createGalleryPostsCreateProcedure<Actor extends ApiActor>(deps: 
 				isSensitive: ps.isSensitive,
 				fileIds: files.map(file => file.id),
 			}));
-			return await deps.galleryPostEntityService.pack(post, me);
+			return toPackedGalleryPost(await deps.galleryPostEntityService.pack(post, me));
 		});
 }

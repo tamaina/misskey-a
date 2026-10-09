@@ -3,24 +3,22 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { implement } from '@orpc/server';
-import * as v from 'valibot';
-import { packedChannelSchema } from '../../channel.schema.js';
-import { authentication, apiPolicy, requirePrincipal } from '../../../../api/backend/transport/middleware.js';
-import { ChannelEntityService } from '../../serializers/ChannelEntityService.js';
-import { channelsMyFavoritesContract, channelsMyFavoritesPolicy } from './my-favorites.contract.js';
+import { toPackedChannel } from '../../api.dto.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import { type ChannelEntityService } from '../../serializers/ChannelEntityService.js';
+import { channelsMyFavoritesContract } from './my-favorites.contract.js';
 import type { ChannelFavoritesRepository } from '@features/persistence/backend/repositories/models.js';
 
-import type { MiLocalUser } from '../../../../users/backend/models/User.js';
-import type { ApiContext } from '@features/api/backend/transport/context.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+
 export interface ChannelsMyFavoritesDependencies {
 	channelFavoritesRepository: ChannelFavoritesRepository;
 	channelEntityService: ChannelEntityService;
 }
 export function createChannelsMyFavoritesProcedure<Actor extends MiLocalUser>(deps: ChannelsMyFavoritesDependencies) {
-	return implement(channelsMyFavoritesContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>()
-		.use(authentication<Actor>())
-		.use(apiPolicy<Actor>(channelsMyFavoritesPolicy))
+	return createApiProcedure<Actor>()(channelsMyFavoritesContract)
 		.use(requirePrincipal<Actor>())
 		.handler(async ({ input, context }) => {
 			const me = context.principal;
@@ -30,6 +28,6 @@ export function createChannelsMyFavoritesProcedure<Actor extends MiLocalUser>(de
 
 			const favorites = await query
 				.getMany();
-			return v.parse(v.array(packedChannelSchema), await Promise.all(favorites.map(x => deps.channelEntityService.pack(x.channel!, me))));
+			return (await Promise.all(favorites.map(x => deps.channelEntityService.pack(x.channel!, me)))).map(toPackedChannel);
 		});
 }

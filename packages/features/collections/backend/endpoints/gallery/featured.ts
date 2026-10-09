@@ -2,9 +2,11 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-import { implement } from '@orpc/server';
-import { authentication, apiPolicy, decodeScalarInput } from '@features/api/backend/transport/middleware.js';
-import type { ApiActor, ApiContext } from '@features/api/backend/transport/context.js';
+
+import { toPackedGalleryPost } from '../../api.dto.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import { decodeScalarInput } from '@features/api/backend/transport/middleware.js';
+import type { ApiActor } from '@features/api/backend/transport/context.js';
 import { collectionsContract } from '../../api.definition.js';
 import type { CollectionsDependencies } from '../../api.implementation.js';
 export interface GalleryFeaturedDependencies<Actor extends ApiActor> {
@@ -16,8 +18,7 @@ export function createGalleryFeaturedProcedure<Actor extends ApiActor>(deps: Gal
 	// Shared by all requests through this composed endpoint.
 	let galleryPostsRankingCache: string[] = [];
 	let galleryPostsRankingCacheLastFetchedAt = 0;
-	return implement(collectionsContract.galleryFeatured, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>()
-		.use(authentication<Actor>()).use(apiPolicy<Actor>({ name: collectionsContract.galleryFeatured['~orpc'].meta.requestName })).use(decodeScalarInput<Actor>({ limit: 'integer' }))
+	return createApiProcedure<Actor>()(collectionsContract.galleryFeatured).use(decodeScalarInput<Actor>({ limit: 'integer' }))
 		.handler(async ({ input: ps, context }) => {
 			const me = context.principal;
 			let postIds: string[];
@@ -40,6 +41,6 @@ export function createGalleryFeaturedProcedure<Actor extends ApiActor>(deps: Gal
 			const query = deps.galleryPostsRepository.createQueryBuilder('post')
 				.where('post.id IN (:...postIds)', { postIds: postIds });
 			const posts = await query.getMany();
-			return await deps.galleryPostEntityService.packMany(posts, me);
+			return (await deps.galleryPostEntityService.packMany(posts, me)).map(toPackedGalleryPost);
 		});
 }

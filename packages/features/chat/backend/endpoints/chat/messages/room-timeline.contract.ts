@@ -3,6 +3,9 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import type { Meta } from '@orpc/contract';
+import type { ApiProcedureMetadata } from '../../../../../api/backend/transport/policy.types.js';
+
 import { oc } from '@orpc/contract';
 import type { OpenAPI } from '@orpc/contract';
 import * as v from 'valibot';
@@ -17,10 +20,14 @@ export const chatMessagesRoomTimelineErrors = {
 			id: 'c4d9f88c-9270-4632-b032-6ed8cee36f7f',
 		},
 	} as const;
-export const chatMessagesRoomTimelinePolicy = { name: 'chat/messages/room-timeline', requireCredential: true, kind: 'read:chat' } as const;
+
 const security: OpenAPI.SecurityRequirementObject[] = [{ bearerAuth: [] }];
-export const chatMessagesRoomTimelineContract = oc.$meta({ requestName: 'chat/messages/room-timeline' } as const)
-	.route({ method: 'POST', path: '/chat/messages/room-timeline', operationId: 'post___chat___messages___room-timeline', tags: ['chat'], spec: current => ({ ...current, security }) })
+export const chatMessagesRoomTimelineContract = oc.$meta({
+	requestName: 'chat/messages/room-timeline',
+	requireCredential: true,
+	kind: 'read:chat',
+} as const satisfies Meta & ApiProcedureMetadata)
+	.route({ method: 'POST', path: '/chat/messages/room-timeline', tags: ['chat'], spec: current => ({ ...current, security }) })
 	.errors({ ...commonErrors, NO_SUCH_ROOM: { status: 400, data: apiErrorData } })
 	.input(objectInput({
 	"limit": v.optional(v.pipe(v.pipe(v.pipe(v.number(), v.finite()), v.integer()), v.minValue(1), v.maxValue(100)), 10),

@@ -3,6 +3,9 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import type { Meta } from '@orpc/contract';
+import type { ApiProcedureMetadata } from '../../../../api/backend/transport/policy.types.js';
+
 import { oc } from '@orpc/contract';
 import type { OpenAPI } from '@orpc/contract';
 import * as v from 'valibot';
@@ -11,10 +14,14 @@ import { packedChannelSchema } from '../../channel.schema.js';
 import { objectInput, misskeyId } from '../../request.schema.js';
 
 export const channelsFollowedErrors = {} as const;
-export const channelsFollowedPolicy = { name: 'channels/followed', requireCredential: true, kind: 'read:channels' } as const;
+
 const security: OpenAPI.SecurityRequirementObject[] = [{ bearerAuth: [] }];
-export const channelsFollowedContract = oc.$meta({ requestName: 'channels/followed' } as const)
-	.route({ method: 'POST', path: '/channels/followed', operationId: 'post___channels___followed', tags: ['channels', 'account'], spec: current => ({ ...current, security }) })
+export const channelsFollowedContract = oc.$meta({
+	requestName: 'channels/followed',
+	requireCredential: true,
+	kind: 'read:channels',
+} as const satisfies Meta & ApiProcedureMetadata)
+	.route({ method: 'POST', path: '/channels/followed', tags: ['channels', 'account'], spec: current => ({ ...current, security }) })
 	.errors({ ...commonErrors })
 	.input(objectInput({
 		"sinceId": v.exactOptional(misskeyId),
