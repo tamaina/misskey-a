@@ -3,4 +3,4 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-/// <reference path="../../frontend-shared/@types/global.d.ts" />
+import '../../frontend-shared/@types/global.js';
