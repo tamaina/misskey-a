@@ -30,14 +30,14 @@ const driveMessages = ownerMessages(proof.owners.drive.dictionary);
 const navbarMessages = ownerMessages(proof.owners.navigation.dictionary);
 const transformedOwners = new Map<string, string>();
 
-function ownerScript(filename: string): string {
+async function ownerScript(filename: string): Promise<string> {
 	const cached = transformedOwners.get(filename);
 	if (cached !== undefined) return cached;
 
 	const plugin = pluginVvi();
-	hook(plugin.configResolved, { root: resolve(root, 'packages/frontend'), command: 'serve', base: '/' });
+	hook(plugin.configResolved, { root: resolve(root, 'packages/frontend'), command: 'serve', base: '/', build: { ssr: false } });
 	hook(plugin.buildStart);
-	const transformed = hook(plugin.transform, readFileSync(filename, 'utf8'), filename);
+	const transformed = await hook(plugin.transform, readFileSync(filename, 'utf8'), filename);
 	if (!transformed || typeof transformed !== 'object' || !('code' in transformed) || typeof transformed.code !== 'string') throw new Error('Expected transformed owner SFC');
 	const script = compileScript(parse(transformed.code, { filename }).descriptor, { id: filename }).content;
 	transformedOwners.set(filename, script);
@@ -81,7 +81,9 @@ function evaluate(source: string, filename: string, legacy?: I18n<typeof locales
 		if (specifier.endsWith('/config.js')) return { ui: null };
 		if (specifier.startsWith('./') && specifier.endsWith('.vue')) {
 			const dependency = resolve(dirname(filename), specifier);
-			return evaluate(ownerScript(dependency), dependency).exports;
+			const script = transformedOwners.get(dependency);
+			if (script === undefined) throw new Error('Owner must be transformed before synchronous module evaluation');
+			return evaluate(script, dependency).exports;
 		}
 		if (specifier.startsWith('./') && /locale(?:-host)?\.js$/.test(specifier)) {
 			const dependency = resolve(dirname(filename), specifier.replace(/\.js$/, '.ts'));
@@ -107,7 +109,7 @@ function generated(language: string, embed = false): LocaleBundle {
 	let plugin = generatedPlugins.get(embed);
 	if (!plugin) {
 		plugin = pluginVvi({ embed });
-		hook(plugin.configResolved, { root: resolve(root, embed ? 'packages/frontend-embed' : 'packages/frontend'), command: 'build', base: '/' });
+		hook(plugin.configResolved, { root: resolve(root, embed ? 'packages/frontend-embed' : 'packages/frontend'), command: 'build', base: '/', build: { ssr: false } });
 		hook(plugin.buildStart);
 		generatedPlugins.set(embed, plugin);
 	}
@@ -149,6 +151,8 @@ test.each(languages)('actual generated owner modules and all 19 eager consumers 
 		const raw = useLocale(owner.host).value.sfc;
 		for (const path of owner.keys) expect(Buffer.from(atPath(raw, path))).toEqual(Buffer.from(atPath(locales[language], path)));
 	}
+	// Async SFC transforms must finish before the synchronous CommonJS require shim.
+	for (const owner of Object.values(proof.owners)) await ownerScript(resolve(root, owner.dictionary));
 	const captured = proof.files.map(file => {
 		const filename = resolve(root, file.file);
 		const current = evaluate(readFileSync(filename, 'utf8'), filename);
@@ -178,6 +182,7 @@ test('activation gate delays actual owner access until its payload is successful
 	let loaded = false;
 	let evaluated = false;
 	const payload = generated('ja-JP');
+	for (const owner of Object.values(proof.owners)) await ownerScript(resolve(root, owner.dictionary));
 	const started = startComponentLocales('ja-JP', () => createInternationalization({ primaryLocale: 'ja-JP', loaders: { 'ja-JP': async () => { await blocked; loaded = true; return payload; } } }), runtime => {
 		expect(loaded).toBe(true);
 		setActiveInternationalization(runtime);

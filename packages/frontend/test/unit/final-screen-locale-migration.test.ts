@@ -41,7 +41,7 @@ function hook(value: unknown, ...args: unknown[]): unknown {
 }
 function configured(embed: boolean) {
 	const plugin = pluginVvi({ embed });
-	hook(plugin.configResolved, { root: resolve(root, embed ? 'packages/frontend-embed' : 'packages/frontend'), command: 'build', base: '/' });
+	hook(plugin.configResolved, { root: resolve(root, embed ? 'packages/frontend-embed' : 'packages/frontend'), command: 'build', base: '/', build: { ssr: false } });
 	hook(plugin.buildStart);
 	return plugin;
 }
@@ -72,11 +72,11 @@ test('all51 screen sources reverse byte for byte and retain all49336 effective l
 	expect(strings).toBe(49336);
 }, 30000);
 
-test('installed VVI and Vue compile every actual main and embed component', () => {
+test('installed VVI and Vue compile every actual main and embed component', async () => {
 	const plugins = [configured(false), configured(true)];
 	for (const entry of proof) {
 		const file = resolve(root, entry.file);
-		const transformed = hook(plugins[Number(entry.file.includes('/embed/'))].transform, readFileSync(file, 'utf8'), file);
+		const transformed = await hook(plugins[Number(entry.file.includes('/embed/'))].transform, readFileSync(file, 'utf8'), file);
 		if (!transformed || typeof transformed !== 'object' || !('code' in transformed) || typeof transformed.code !== 'string') throw new Error('Expected transformed SFC');
 		expect(transformed.code).toContain('createComponentLocale');
 		const parsed = parse(transformed.code, { filename: file });

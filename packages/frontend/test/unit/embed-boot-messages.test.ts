@@ -43,7 +43,7 @@ test('embed dictionary keeps exactly the 504 effective strings and preserves boo
 
 test.each(languages)('VVI embed boot messages match legacy text and formatter bytes in %s', async language => {
 	const plugin = pluginVvi({ embed: true });
-	hook(plugin.configResolved, { root: resolve(root, 'packages/frontend-embed'), command: 'build', base: '/' });
+	hook(plugin.configResolved, { root: resolve(root, 'packages/frontend-embed'), command: 'build', base: '/', build: { ssr: false } });
 	hook(plugin.buildStart);
 	const source = hook(plugin.load, `\0virtual:vite-vue-internationalization/locale/${language}`);
 	if (typeof source !== 'string') throw new Error('Expected a generated locale loader');

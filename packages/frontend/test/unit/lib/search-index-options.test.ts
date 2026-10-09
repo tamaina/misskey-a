@@ -43,7 +43,7 @@ test('search markers preserve SFC locale references for the public VVI runtime',
 	if (typeof configureVvi !== 'function' || !transformVvi || typeof transformVvi === 'function') {
 		throw new Error('Expected VVI config and transform hooks');
 	}
-	await configureVvi.call({} as never, { root: resolve('.'), command: 'build', base: '/vite/' } as never);
+	await configureVvi.call({} as never, { root: resolve('.'), command: 'build', base: '/vite/', build: { ssr: false } } as never);
 	const transformed = await transformVvi.handler.call({} as never, serverRulesSource, serverRulesFile);
 	const transformedCode = typeof transformed === 'string' ? transformed : transformed?.code?.toString() ?? serverRulesSource;
 	expect(transformedCode).not.toContain('<locale');

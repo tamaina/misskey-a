@@ -1502,7 +1502,7 @@ function legacyFormat(language: string, keyPath: string, values: Record<string, 
 // the real VVI computed refs/localizers intact.
 const compiledSources = new Map<string, string>();
 
-function compileSource(file: string): string {
+async function compileSource(file: string): Promise<string> {
 	const cached = compiledSources.get(file);
 	if (cached) return cached;
 	const filename = resolve(repoRoot, file);
@@ -1511,9 +1511,8 @@ function compileSource(file: string): string {
 	const configure = plugin.configResolved;
 	const transform = plugin.transform;
 	if (typeof configure !== 'function' || !transform || typeof transform === 'function') throw new Error('Expected VVI hooks');
-	configure.call({} as never, { root: resolve(repoRoot, 'packages/frontend'), command: 'serve', base: '/' } as never);
-	const transformed = transform.handler.call({} as never, source, filename);
-	if (transformed instanceof Promise) throw new Error('Expected a synchronous SFC transform');
+	configure.call({} as never, { root: resolve(repoRoot, 'packages/frontend'), command: 'serve', base: '/', build: { ssr: false } } as never);
+	const transformed = await transform.handler.call({} as never, source, filename);
 	const transformedSource = typeof transformed === 'string' ? transformed : transformed?.code?.toString() ?? source;
 	const { descriptor, errors } = parse(transformedSource, { filename });
 	expect(errors).toEqual([]);
@@ -1527,8 +1526,8 @@ function compileSource(file: string): string {
 	return output.outputText;
 }
 
-function compileComponent(file: string, dependencies: Record<string, unknown> = {}): Component {
-	const output = compileSource(file);
+async function compileComponent(file: string, dependencies: Record<string, unknown> = {}): Promise<Component> {
+	const output = await compileSource(file);
 	const exports: { default?: Component } = {};
 	runInNewContext(output, {
 		exports,
@@ -1581,8 +1580,8 @@ async function mountLocalized(language: string, file: string, component: Compone
 }
 
 describe('expanded literal SFC-local locale migration', () => {
-	test.each(migrations)('$file compiles with actual VVI-injected computed refs and template bindings', ({ file }) => {
-		expect(compileSource(file)).toContain('virtual:vite-vue-internationalization');
+	test.each(migrations)('$file compiles with actual VVI-injected computed refs and template bindings', async ({ file }) => {
+		expect(await compileSource(file)).toContain('virtual:vite-vue-internationalization');
 	});
 
 	test.each(migrations)('$file preserves every translation, placeholder, occurrence and source boundary', migration => {
@@ -1641,7 +1640,7 @@ describe('expanded literal SFC-local locale migration', () => {
 		const file = 'packages/features/collections/frontend/pages/gallery/edit.vue';
 		let metadata: ComputedRef<{ title: string }> | undefined;
 		const api = vi.fn();
-		const component = compileComponent(file, {
+		const component = await compileComponent(file, {
 			'@features/collections/frontend/pages/gallery/edit.root.vue': { default: slotContainer },
 			'@features/api/frontend/utility/misskey-api.js': { misskeyApi: api },
 			'@features/navigation/frontend/page.js': { definePage: (getter: () => { title: string }) => { metadata = Vue.computed(getter); } },
@@ -1670,7 +1669,7 @@ describe('expanded literal SFC-local locale migration', () => {
 		const validate = vi.fn().mockResolvedValueOnce(false).mockResolvedValueOnce(true).mockResolvedValueOnce(true);
 		const update = vi.fn();
 		const api = vi.fn();
-		const component = compileComponent(file, {
+		const component = await compileComponent(file, {
 			'@features/ui/frontend/components/MkButton.vue': { default: slotButton },
 			'@features/drive/frontend/utility/drive.js': { selectFile: select },
 			'@features/api/frontend/utility/misskey-api.js': { misskeyApi: api },
@@ -1712,7 +1711,7 @@ describe('expanded literal SFC-local locale migration', () => {
 		const save = vi.fn();
 		const discard = vi.fn(() => { modified.value = false; });
 		const form = { modified, modifiedCount, save, discard };
-		const component = compileComponent(file, { '@features/ui/frontend/components/MkButton.vue': { default: slotButton } });
+		const component = await compileComponent(file, { '@features/ui/frontend/components/MkButton.vue': { default: slotButton } });
 		const parent = Vue.defineComponent({ setup: () => () => Vue.h(component, { form, canSaving: canSaving.value }) });
 		const mounted = await mountLocalized(language, file, parent);
 		try {
@@ -1751,7 +1750,7 @@ describe('expanded literal SFC-local locale migration', () => {
 				onInput: (event: Event) => emit('update:modelValue', (event.target as HTMLTextAreaElement).value),
 			}),
 		});
-		const component = compileComponent(file, {
+		const component = await compileComponent(file, {
 			'@features/markup/frontend/components/MkCodeEditor.vue': { default: editor },
 			'@features/ui/frontend/components/MkInfo.vue': { default: slotContainer },
 			'@features/boot/frontend/shared/config.js': { isSafeMode: true },

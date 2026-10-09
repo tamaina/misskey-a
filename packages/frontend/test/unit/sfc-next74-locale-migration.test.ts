@@ -142,7 +142,7 @@ function getBlocks(file: string): Map<string, Record<string, string>> {
 
 const compiledSources = new Map<string, string>();
 
-function compileSource(file: string): string {
+async function compileSource(file: string): Promise<string> {
 	const cached = compiledSources.get(file);
 	if (cached) return cached;
 	const filename = resolve(repoRoot, file);
@@ -151,9 +151,8 @@ function compileSource(file: string): string {
 	const configure = plugin.configResolved;
 	const transform = plugin.transform;
 	if (typeof configure !== 'function' || !transform || typeof transform === 'function') throw new Error('Expected VVI hooks');
-	configure.call({} as never, { root: resolve(repoRoot, 'packages/frontend'), command: 'serve', base: '/' } as never);
-	const transformed = transform.handler.call({} as never, source, filename);
-	if (transformed instanceof Promise) throw new Error('Expected synchronous SFC transform');
+	configure.call({} as never, { root: resolve(repoRoot, 'packages/frontend'), command: 'serve', base: '/', build: { ssr: false } } as never);
+	const transformed = await transform.handler.call({} as never, source, filename);
 	const transformedSource = typeof transformed === 'string' ? transformed : transformed?.code?.toString() ?? source;
 	expect(transformedSource).not.toContain('<locale locale=');
 	const { descriptor, errors } = parse(transformedSource, { filename });
@@ -168,9 +167,9 @@ function compileSource(file: string): string {
 	return output.outputText;
 }
 
-function compileComponent(file: string, dependencies: Record<string, unknown>): Component {
+async function compileComponent(file: string, dependencies: Record<string, unknown>): Promise<Component> {
 	const exports: { default?: Component } = {};
-	runInNewContext(compileSource(file), {
+	runInNewContext(await compileSource(file), {
 		exports,
 		require(specifier: string) {
 			if (specifier === 'vue') return Vue;
@@ -204,7 +203,7 @@ describe('next74 static raw-label ownership', () => {
 		expect(languages).toHaveLength(28);
 	});
 
-	test.each(migrations)('$file preserves all languages and reconstructs the original complete source', migration => {
+	test.each(migrations)('$file preserves all languages and reconstructs the original complete source', async migration => {
 		const source = restoreRssContractBaseline(migration.file, readFileSync(resolve(repoRoot, migration.file), 'utf8'));
 		const blocks = getBlocks(migration.file);
 		expect([...blocks.keys()]).toEqual([...languages]);
@@ -247,7 +246,7 @@ describe('next74 static raw-label ownership', () => {
 		expect(createHash('sha256').update(reversed).digest('hex')).toBe(migration.sha256);
 		// The real repository wrapper, installed VVI transform and Vue compiler
 		// must accept the unchanged template/script/styles and static numeric key.
-		expect(compileSource(migration.file)).toContain('virtual:vite-vue-internationalization');
+		expect(await compileSource(migration.file)).toContain('virtual:vite-vue-internationalization');
 	});
 
 	test.each(languages)('actual VVI plugin loaders resolve all 74 raw dictionaries in %s', async language => {
@@ -276,7 +275,7 @@ describe('next74 static raw-label ownership', () => {
 			]),
 		});
 		const button = Vue.defineComponent({ setup: (_props, { slots }) => () => Vue.h('button', slots.default?.()) });
-		const component = compileComponent(file, {
+		const component = await compileComponent(file, {
 			'@features/ui/frontend/components/MkInput.vue': { default: input },
 			'@features/ui/frontend/components/MkButton.vue': { default: button },
 		});
