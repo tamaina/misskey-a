@@ -15,7 +15,7 @@ function isNonJsonObject(input: unknown): boolean {
 }
 
 /** Validate the original tree, including record-parser reserved keys, before recursive parsing. */
-function isJsonTree(input: unknown, active: WeakSet<object> = new WeakSet()): boolean {
+function isJsonTree(input: unknown, active: WeakSet<object> = new WeakSet()): input is PackedJsonValue {
 	if (input === null || typeof input === 'string' || typeof input === 'boolean') return true;
 	if (typeof input === 'number') return Number.isFinite(input);
 	if (typeof input !== 'object' || isNonJsonObject(input) || active.has(input)) return false;
@@ -63,17 +63,26 @@ export function toPackedRecord<Value>(input: Readonly<Record<string, Value>>): R
 /** Materialize genuine stored JSON; Object.fromEntries preserves reserved names as own data keys. */
 export function toPackedJsonValue(input: unknown): PackedJsonValue {
 	if (!isJsonTree(input)) throw new TypeError('Stored JSON must contain only acyclic JSON values');
+	return materializeJsonValue(input);
+}
+
+/** The boundary has already checked the complete tree; copy each value once. */
+function materializeJsonValue(input: PackedJsonValue): PackedJsonValue {
 	if (input === null || typeof input === 'string' || typeof input === 'boolean') return input;
 	if (typeof input === 'number') return input;
-	if (Array.isArray(input)) return input.map((value: unknown) => toPackedJsonValue(value));
-	return toPackedJsonObject(input);
+	if (Array.isArray(input)) return input.map(materializeJsonValue);
+	return materializeJsonObject(input);
+}
+
+function materializeJsonObject(input: { [key: string]: PackedJsonValue }): { [key: string]: PackedJsonValue } {
+	return Object.fromEntries(Object.keys(input).map((key): [string, PackedJsonValue] => [key, materializeJsonValue(input[key])]));
 }
 
 export function toPackedJsonObject(input: unknown): { [key: string]: PackedJsonValue } {
-	if (input === null || typeof input !== 'object' || Array.isArray(input) || !isJsonTree(input)) {
+	if (!isJsonTree(input) || input === null || typeof input !== 'object' || Array.isArray(input)) {
 		throw new TypeError('Stored JSON must contain only acyclic JSON values');
 	}
-	return Object.fromEntries(Object.keys(input).map((key): [string, PackedJsonValue] => [key, toPackedJsonValue(Object.getOwnPropertyDescriptor(input, key)?.value)]));
+	return materializeJsonObject(input);
 }
 
 /** Preserve original finite JSON extensions, including keys skipped by object parsers. */
