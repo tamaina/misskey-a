@@ -130,16 +130,15 @@ function legacyFormat(language: string, keyPath: string, values: Record<string, 
 // Compile the actual migrated component through the installed VVI transform and
 // Vue compiler. Inject only its external collaborators, leaving setup/render and
 // the real VVI computed refs/localizers intact.
-function compileSource(file: string): string {
+async function compileSource(file: string): Promise<string> {
 	const filename = resolve(repoRoot, file);
 	const source = readFileSync(filename, 'utf8');
 	const plugin = pluginVvi();
 	const configure = plugin.configResolved;
 	const transform = plugin.transform;
 	if (typeof configure !== 'function' || !transform || typeof transform === 'function') throw new Error('Expected VVI hooks');
-	configure.call({} as never, { root: resolve(repoRoot, 'packages/frontend'), command: 'serve', base: '/' } as never);
-	const transformed = transform.handler.call({} as never, source, filename);
-	if (transformed instanceof Promise) throw new Error('Expected a synchronous SFC transform');
+	configure.call({} as never, { root: resolve(repoRoot, 'packages/frontend'), command: 'serve', base: '/', build: { ssr: false } } as never);
+	const transformed = await transform.handler.call({} as never, source, filename);
 	const transformedSource = typeof transformed === 'string' ? transformed : transformed?.code?.toString() ?? source;
 	const { descriptor, errors } = parse(transformedSource, { filename });
 	expect(errors).toEqual([]);
@@ -152,8 +151,8 @@ function compileSource(file: string): string {
 	return output.outputText;
 }
 
-function compileComponent(file: string, dependencies: Record<string, unknown> = {}): Component {
-	const output = compileSource(file);
+async function compileComponent(file: string, dependencies: Record<string, unknown> = {}): Promise<Component> {
+	const output = await compileSource(file);
 	const exports: { default?: Component } = {};
 	runInNewContext(output, {
 		exports,
@@ -205,8 +204,8 @@ async function mountLocalized(language: string, file: string, component: Compone
 }
 
 describe('script and parameterized SFC-local locales', () => {
-	test.each(migrations)('$file compiles with injected script and template locale bindings', ({ file }) => {
-		expect(compileSource(file)).toContain('virtual:vite-vue-internationalization');
+	test.each(migrations)('$file compiles with injected script and template locale bindings', async ({ file }) => {
+		expect(await compileSource(file)).toContain('virtual:vite-vue-internationalization');
 	});
 
 	test.each(migrations)('$file keeps every effective translation and placeholder set', ({ file, keyPaths, references }) => {
@@ -258,7 +257,7 @@ describe('script and parameterized SFC-local locales', () => {
 		const linkFile = 'packages/features/navigation/frontend/components/global/MkA.vue';
 		for (const language of ['ja-JP', 'en-US']) {
 			let metadata: ComputedRef<{ title: string }> | undefined;
-			const drive = compileComponent(driveFile, {
+			const drive = await compileComponent(driveFile, {
 				'@features/drive/frontend/components/MkDrive.vue': { default: Vue.defineComponent({
 					setup: (_props, { emit }) => () => Vue.h('div', [
 						Vue.h('button', { onClick: () => emit('cd', { name: 'Current folder' }) }, 'folder'),
@@ -282,7 +281,7 @@ describe('script and parameterized SFC-local locales', () => {
 			const contextMenu = vi.fn();
 			const copy = vi.fn();
 			const destination = Vue.ref('/before');
-			const link = compileComponent(linkFile, {
+			const link = await compileComponent(linkFile, {
 				'@features/boot/frontend/shared/config.js': { url: 'https://example.test' },
 				'@features/ui/frontend/os.js': { contextMenu, pageWindow: vi.fn() },
 				'@features/ui/frontend/utility/copy-to-clipboard.js': { copyToClipboard: copy },
@@ -308,7 +307,7 @@ describe('script and parameterized SFC-local locales', () => {
 		const file = 'packages/features/collections/frontend/components/MkClipPreview.vue';
 		const account = Vue.reactive({ policies: { noteEachClipsLimit: 10 } });
 		const clip = Vue.reactive({ id: 'clip', name: 'Clip', notesCount: 7 });
-		const component = compileComponent(file, {
+		const component = await compileComponent(file, {
 			'@features/auth/frontend/i.js': { $i: account },
 			'@features/ui/frontend/filters/number.js': { default: String },
 		});
@@ -331,7 +330,7 @@ describe('script and parameterized SFC-local locales', () => {
 		const closeModal = vi.fn();
 		const updateAccount = vi.fn();
 		const announcement = Vue.reactive({ id: 'announcement', title: 'Before', text: 'Body', icon: 'info', needConfirmationToRead: true });
-		const component = compileComponent(file, {
+		const component = await compileComponent(file, {
 			'@features/ui/frontend/os.js': { confirm: confirmation },
 			'@features/api/frontend/utility/misskey-api.js': { misskeyApi: api },
 			'@features/ui/frontend/components/MkModal.vue': { default: Vue.defineComponent({
@@ -367,9 +366,9 @@ describe('script and parameterized SFC-local locales', () => {
 
 	test.each(['ja-JP', 'en-US'])('compiled channel keeps rich n slots and read-indicator behavior in %s', async language => {
 		const file = 'packages/features/channels/frontend/components/MkChannelPreview.vue';
-		const renderer = compileComponent('packages/features/ui/frontend/components/global/I18n.vue');
+		const renderer = await compileComponent('packages/features/ui/frontend/components/global/I18n.vue');
 		const channel = Vue.reactive({ id: 'channel', name: 'Channel', usersCount: 2, notesCount: 3, lastNotedAt: '2026-10-01T00:00:00.000Z', isFollowing: true });
-		const component = compileComponent(file, {
+		const component = await compileComponent(file, {
 			'@features/auth/frontend/i.js': { $i: null },
 			'@features/preferences/frontend/local-storage.js': { miLocalStorage: { getItemAsJson: () => null } },
 		});
