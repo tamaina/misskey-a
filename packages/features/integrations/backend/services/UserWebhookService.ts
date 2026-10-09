@@ -4,15 +4,15 @@
  */
 
 import { Inject, Injectable } from '@nestjs/common';
-import * as Redis from 'ioredis';
-import { MiUser, type WebhooksRepository } from '@/models/_.js';
-import { MiWebhook, WebhookEventTypes } from '@/models/Webhook.js';
-import { DI } from '@/di-symbols.js';
-import { bindThis } from '@/decorators.js';
-import { GlobalEvents } from '@/core/GlobalEventService.js';
-import type { Packed } from '@/misc/json-schema.js';
-import { QueueService } from '@/core/QueueService.js';
 import type { OnApplicationShutdown } from '@nestjs/common';
+import * as Redis from 'ioredis';
+import { MiUser, type WebhooksRepository } from '@features/persistence/backend/repositories/models.js';
+import { MiWebhook, WebhookEventTypes } from '../models/Webhook.js';
+import { DI } from '@/di-symbols.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
+import { GlobalEvents } from '@features/runtime/backend/services/GlobalEventService.js';
+import type { Packed } from '@features/index/backend/packed.schema.js';
+import { QueueService } from '@features/runtime/backend/services/QueueService.js';
 
 export type UserWebhookPayload<T extends WebhookEventTypes> =
 	T extends 'note' | 'reply' | 'renote' | 'mention' ? {

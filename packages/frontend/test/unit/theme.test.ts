@@ -4,11 +4,11 @@
  */
 
 import { afterEach, assert, beforeEach, describe, test, vi } from 'vitest';
-import type { Theme } from '@@/js/theme.js';
-import lightTheme from '@@/themes/_light.json5';
-import darkTheme from '@@/themes/_dark.json5';
+import type { Theme } from '@features/preferences/frontend/shared/theme.js';
+import lightTheme from '@features/preferences/frontend/themes/_light.json5';
+import darkTheme from '@features/preferences/frontend/themes/_dark.json5';
 
-vi.mock('@/i18n.js', () => ({
+vi.mock('@features/runtime/frontend/i18n.js', () => ({
 	i18n: {
 		ts: {
 			_theme: {
@@ -20,7 +20,7 @@ vi.mock('@/i18n.js', () => ({
 	updateI18n: vi.fn(),
 }));
 
-vi.mock('@/os.js', () => ({
+vi.mock('@features/ui/frontend/os.js', () => ({
 	alert: vi.fn(),
 }));
 
@@ -75,7 +75,7 @@ const replacementTheme = createTheme('dark', {
 
 const loadThemeModule = async () => {
 	vi.resetModules();
-	return await import('@/theme.js');
+	return await import('@features/preferences/frontend/theme.js');
 };
 
 const resetDocument = () => {

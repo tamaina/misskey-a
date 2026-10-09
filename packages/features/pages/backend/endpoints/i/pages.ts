@@ -2,62 +2,32 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
+import { toPackedPage } from '@features/users/backend/page.schema.js';
 
-import { Inject, Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
-import type { PagesRepository } from '@/models/_.js';
-import { QueryService } from '@/core/QueryService.js';
-import { PageEntityService } from '@/core/entities/PageEntityService.js';
-import { DI } from '@/di-symbols.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 
-export const meta = {
-	tags: ['account', 'pages'],
+import { requirePrincipal } from '../../../../api/backend/transport/middleware.js';
 
-	requireCredential: true,
-
-	kind: 'read:pages',
-
-	res: {
-		type: 'array',
-		optional: false, nullable: false,
-		items: {
-			type: 'object',
-			optional: false, nullable: false,
-			ref: 'Page',
-		},
-	},
-} as const;
-
-export const paramDef = {
-	type: 'object',
-	properties: {
-		limit: { type: 'integer', minimum: 1, maximum: 100, default: 10 },
-		sinceId: { type: 'string', format: 'misskey:id' },
-		untilId: { type: 'string', format: 'misskey:id' },
-		sinceDate: { type: 'integer' },
-		untilDate: { type: 'integer' },
-	},
-	required: [],
-} as const;
-
-@Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
-	constructor(
-		@Inject(DI.pagesRepository)
-		private pagesRepository: PagesRepository,
-
-		private pageEntityService: PageEntityService,
-		private queryService: QueryService,
-	) {
-		super(meta, paramDef, async (ps, me) => {
-			const query = this.queryService.makePaginationQuery(this.pagesRepository.createQueryBuilder('page'), ps.sinceId, ps.untilId, ps.sinceDate, ps.untilDate)
+import { iPagesContract } from './pages.contract.js';
+import type { PagesRepository } from '@features/persistence/backend/repositories/models.js';
+import type { QueryService } from '@features/notes/backend/services/QueryService.js';
+import type { PageEntityService } from '../../serializers/PageEntityService.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+export interface IPagesDependencies {
+	pagesRepository: Pick<PagesRepository, 'createQueryBuilder'>;
+	pageEntityService: Pick<PageEntityService, 'packMany'>;
+	queryService: Pick<QueryService, 'makePaginationQuery'>;
+}
+export function createIPagesProcedure(deps: IPagesDependencies) {
+	return createApiProcedure<MiLocalUser>()(iPagesContract)
+		.use(requirePrincipal<MiLocalUser>())
+		.handler(async ({ input: ps, context }) => {
+			const me = context.principal;
+			const query = deps.queryService.makePaginationQuery(deps.pagesRepository.createQueryBuilder('page'), ps.sinceId, ps.untilId, ps.sinceDate, ps.untilDate)
 				.andWhere('page.userId = :meId', { meId: me.id });
-
 			const pages = await query
 				.limit(ps.limit)
 				.getMany();
-
-			return await this.pageEntityService.packMany(pages);
+			return (await deps.pageEntityService.packMany(pages)).map(toPackedPage);
 		});
-	}
 }

@@ -7,43 +7,43 @@ import { randomUUID } from 'node:crypto';
 import * as fs from 'node:fs';
 import { Inject, Injectable } from '@nestjs/common';
 import sharp from 'sharp';
-import type { Sharp } from 'sharp';
 import { sharpBmp } from '@misskey-dev/sharp-read-bmp';
 import { In, IsNull } from 'typeorm';
 import { DeleteObjectCommandInput, PutObjectCommandInput, NoSuchKey } from '@aws-sdk/client-s3';
-import { DI } from '@/di-symbols.js';
-import type { DriveFilesRepository, UsersRepository, DriveFoldersRepository, UserProfilesRepository, MiMeta } from '@/models/_.js';
+import { Logger } from '@features/runtime/backend/logging/logger.js';
+import { IdService } from '@features/runtime/backend/services/IdService.js';
+import { isDuplicateKeyValueError } from '@features/persistence/backend/utility/is-duplicate-key-value-error.js';
+import { FILE_TYPE_BROWSERSAFE } from '@features/drive/backend/file-types.js';
+import { IdentifiableError } from '@features/runtime/backend/errors/identifiable-error.js';
+import { contentDisposition } from '@features/drive/backend/utility/content-disposition.js';
+import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
+import { VideoProcessingService } from '@features/drive/backend/services/VideoProcessingService.js';
+import { ImageProcessingService } from '@features/drive/backend/services/ImageProcessingService.js';
+import { QueueService } from '@features/runtime/backend/services/QueueService.js';
+import { createTemp } from '@features/runtime/backend/io/create-temp.js';
+import { DriveChart } from '@features/statistics/backend/charts/drive.js';
+import { PerUserDriveChart } from '@features/statistics/backend/charts/per-user-drive.js';
+import { InstanceChart } from '@features/statistics/backend/charts/instance.js';
+import { DownloadService } from '@features/runtime/backend/services/DownloadService.js';
+import { S3Service } from '@features/runtime/backend/services/S3Service.js';
+import { InternalStorageService } from '@features/runtime/backend/services/InternalStorageService.js';
+import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
+import { FileInfoService } from '@features/drive/backend/services/FileInfoService.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
+import { RoleService } from '@features/roles/backend/services/RoleService.js';
+import { correctFilename } from '@features/drive/backend/utility/correct-filename.js';
+import { isMimeImage } from '@features/drive/backend/utility/is-mime-image.js';
+import { ModerationLogService } from '@features/moderation/backend/services/ModerationLogService.js';
+import { UtilityService } from '@features/federation/backend/services/UtilityService.js';
 import type { Config } from '@/config.js';
-import Logger from '@/logger.js';
-import type { MiRemoteUser, MiUser } from '@/models/User.js';
-import { MiDriveFile } from '@/models/DriveFile.js';
-import { IdService } from '@/core/IdService.js';
-import { isDuplicateKeyValueError } from '@/misc/is-duplicate-key-value-error.js';
-import { FILE_TYPE_BROWSERSAFE } from '@/const.js';
-import { IdentifiableError } from '@/misc/identifiable-error.js';
-import { contentDisposition } from '@/misc/content-disposition.js';
-import { GlobalEventService } from '@/core/GlobalEventService.js';
-import { VideoProcessingService } from '@/core/VideoProcessingService.js';
-import { ImageProcessingService } from '@/core/ImageProcessingService.js';
-import type { IImage } from '@/core/ImageProcessingService.js';
-import { QueueService } from '@/core/QueueService.js';
-import type { MiDriveFolder } from '@/models/DriveFolder.js';
-import { createTemp } from '@/misc/create-temp.js';
-import DriveChart from '@/core/chart/charts/drive.js';
-import PerUserDriveChart from '@/core/chart/charts/per-user-drive.js';
-import InstanceChart from '@/core/chart/charts/instance.js';
-import { DownloadService } from '@/core/DownloadService.js';
-import { S3Service } from '@/core/S3Service.js';
-import { InternalStorageService } from '@/core/InternalStorageService.js';
-import { DriveFileEntityService } from '@/core/entities/DriveFileEntityService.js';
-import { UserEntityService } from '@/core/entities/UserEntityService.js';
-import { FileInfoService } from '@/core/FileInfoService.js';
-import { bindThis } from '@/decorators.js';
-import { RoleService } from '@/core/RoleService.js';
-import { correctFilename } from '@/misc/correct-filename.js';
-import { isMimeImage } from '@/misc/is-mime-image.js';
-import { ModerationLogService } from '@/core/ModerationLogService.js';
-import { UtilityService } from '@/core/UtilityService.js';
+import { DI } from '@/di-symbols.js';
+import { DriveFileEntityService } from '../serializers/DriveFileEntityService.js';
+import { MiDriveFile } from '../models/DriveFile.js';
+import type { MiDriveFolder } from '../models/DriveFolder.js';
+import type { IImage } from '@features/drive/backend/services/ImageProcessingService.js';
+import type { MiRemoteUser, MiUser } from '@features/users/backend/models/User.js';
+import type { DriveFilesRepository, UsersRepository, DriveFoldersRepository, UserProfilesRepository, MiMeta } from '@features/persistence/backend/repositories/models.js';
+import type { Sharp } from 'sharp';
 
 type AddFileArgs = {
 	/** User who wish to add file */
@@ -70,7 +70,7 @@ type AddFileArgs = {
 	ext?: string | null;
 
 	requestIp?: string | null;
-	requestHeaders?: Record<string, string> | null;
+	requestHeaders?: Record<string, string | string[] | undefined> | null;
 };
 
 type UploadFromUrlArgs = {
@@ -83,7 +83,7 @@ type UploadFromUrlArgs = {
 	isLink?: boolean;
 	comment?: string | null;
 	requestIp?: string | null;
-	requestHeaders?: Record<string, string> | null;
+	requestHeaders?: Record<string, string | string[] | undefined> | null;
 };
 
 @Injectable()

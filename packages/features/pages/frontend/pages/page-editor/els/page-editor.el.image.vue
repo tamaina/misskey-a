@@ -25,7 +25,7 @@ import { onMounted, ref } from 'vue';
 import * as Misskey from 'misskey-js';
 import XContainer from '@features/pages/frontend/pages/page-editor/page-editor.container.vue';
 import MkDriveFileThumbnail from '@features/drive/frontend/components/MkDriveFileThumbnail.vue';
-import { misskeyApi } from '@/utility/misskey-api.js';
+import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 import { chooseDriveFile } from '@features/drive/frontend/utility/drive.js';
 
 const props = defineProps<{

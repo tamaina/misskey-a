@@ -3,35 +3,18 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 import { randomUUID } from 'node:crypto';
-import { Inject, Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
-import type { AppsRepository, AuthSessionsRepository } from '@/models/_.js';
-import { IdService } from '@/core/IdService.js';
+import type { AppsRepository, AuthSessionsRepository } from '@features/persistence/backend/repositories/models.js';
+import { IdService } from '@features/runtime/backend/services/IdService.js';
 import type { Config } from '@/config.js';
-import { DI } from '@/di-symbols.js';
-import { ApiError } from '@/server/api/error.js';
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
+
+import { AuthSessionGenerateContract } from '../../../api.definition.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
 
 export const meta = {
 	tags: ['auth'],
-
-	requireCredential: false,
-
-	res: {
-		type: 'object',
-		optional: false, nullable: false,
-		properties: {
-			token: {
-				type: 'string',
-				optional: false, nullable: false,
-			},
-			url: {
-				type: 'string',
-				optional: false, nullable: false,
-				format: 'url',
-			},
-		},
-	},
 
 	errors: {
 		noSuchApp: {
@@ -41,53 +24,40 @@ export const meta = {
 		},
 	},
 } as const;
-
-export const paramDef = {
-	type: 'object',
-	properties: {
-		appSecret: { type: 'string' },
-	},
-	required: ['appSecret'],
-} as const;
-
-@Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
-	constructor(
-		@Inject(DI.config)
-		private config: Config,
-
-		@Inject(DI.appsRepository)
-		private appsRepository: AppsRepository,
-
-		@Inject(DI.authSessionsRepository)
-		private authSessionsRepository: AuthSessionsRepository,
-
-		private idService: IdService,
-	) {
-		super(meta, paramDef, async (ps, me) => {
+export interface AuthSessionGenerateDependencies {
+	config: Config;
+	appsRepository: AppsRepository;
+	authSessionsRepository: AuthSessionsRepository;
+	idService: Pick<IdService, 'gen'>;
+}
+export function createAuthSessionGenerateProcedure(deps: AuthSessionGenerateDependencies) {
+	return createApiProcedure<MiLocalUser>()(AuthSessionGenerateContract).handler(async ({ input, context }) => {
+		const ps = input;
+		const result = await (async () => {
 			// Lookup app
-			const app = await this.appsRepository.findOneBy({
+			const app = await deps.appsRepository.findOneBy({
 				secret: ps.appSecret,
 			});
 
 			if (app == null) {
-				throw new ApiError(meta.errors.noSuchApp);
+				throw apiError(meta.errors.noSuchApp);
 			}
 
 			// Generate token
 			const token = randomUUID();
 
 			// Create session token document
-			const doc = await this.authSessionsRepository.insertOne({
-				id: this.idService.gen(),
+			const doc = await deps.authSessionsRepository.insertOne({
+				id: deps.idService.gen(),
 				appId: app.id,
 				token: token,
 			});
 
 			return {
 				token: doc.token,
-				url: `${this.config.authUrl}/${doc.token}`,
+				url: `${deps.config.authUrl}/${doc.token}`,
 			};
-		});
-	}
+		})();
+		return result;
+	});
 }

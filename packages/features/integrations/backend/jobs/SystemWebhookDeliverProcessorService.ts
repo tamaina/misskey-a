@@ -6,14 +6,14 @@
 import { Inject, Injectable } from '@nestjs/common';
 import * as Bull from 'bullmq';
 import { DI } from '@/di-symbols.js';
-import type { SystemWebhooksRepository } from '@/models/_.js';
+import type { SystemWebhooksRepository } from '@features/persistence/backend/repositories/models.js';
 import type { Config } from '@/config.js';
-import type Logger from '@/logger.js';
-import { HttpRequestService } from '@/core/HttpRequestService.js';
-import { StatusError } from '@/misc/status-error.js';
-import { bindThis } from '@/decorators.js';
-import { QueueLoggerService } from '@/queue/QueueLoggerService.js';
-import { SystemWebhookDeliverJobData } from '@/queue/types.js';
+import type { Logger } from '@features/runtime/backend/logging/logger.js';
+import { HttpRequestService } from '@features/runtime/backend/services/HttpRequestService.js';
+import { StatusError } from '@features/runtime/backend/http/status-error.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
+import { QueueLoggerService } from '@features/runtime/backend/queue/QueueLoggerService.js';
+import { SystemWebhookDeliverJobData } from '@features/runtime/backend/queue/types.js';
 
 @Injectable()
 export class SystemWebhookDeliverProcessorService {

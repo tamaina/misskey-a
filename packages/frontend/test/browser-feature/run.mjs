@@ -24,10 +24,10 @@ try {
 		resolve: {
 			dedupe: ['vue', 'vite-vue-internationalization'],
 			alias: [
-				...['@/page.js', '@/instance.js', '@/preferences.js'].map(find => ({ find, replacement: resolve(fixture, 'adapters.js') })),
+				...['@features/navigation/frontend/page.js', '@features/instance/frontend/instance.js', '@features/preferences/frontend/preferences.js'].map(find => ({ find, replacement: resolve(fixture, 'adapters.js') })),
 				{ find: '@features/auth/frontend/utility/please-login.js', replacement: resolve(fixture, 'adapters.js') },
 				{ find: '@features/ui/frontend/components/MkButton.vue', replacement: resolve(fixture, 'Button.vue') },
-				...['@/custom-emojis.js', '@/i.js', '@/os.js', '@/utility/misskey-api.js'].map(find => ({ find, replacement: resolve(fixture, 'emoji-adapters.js') })),
+				...['@features/emojis/frontend/custom-emojis.js', '@features/auth/frontend/i.js', '@features/ui/frontend/os.js', '@features/api/frontend/utility/misskey-api.js'].map(find => ({ find, replacement: resolve(fixture, 'emoji-adapters.js') })),
 				{ find: '@features/ui/frontend/utility/copy-to-clipboard.js', replacement: resolve(fixture, 'emoji-adapters.js') },
 				{ find: '@features/ui/frontend/components/MkInput.vue', replacement: resolve(fixture, 'EmojiInput.vue') },
 				{ find: '@features/ui/frontend/components/MkFoldableSection.vue', replacement: resolve(fixture, 'EmojiSection.vue') },

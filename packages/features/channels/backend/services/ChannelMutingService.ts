@@ -7,11 +7,11 @@ import { Inject, Injectable } from '@nestjs/common';
 import * as Redis from 'ioredis';
 import { Brackets, In } from 'typeorm';
 import { DI } from '@/di-symbols.js';
-import type { ChannelMutingRepository, ChannelsRepository, MiChannel, MiChannelMuting, MiUser } from '@/models/_.js';
-import { IdService } from '@/core/IdService.js';
-import { GlobalEvents, GlobalEventService } from '@/core/GlobalEventService.js';
-import { bindThis } from '@/decorators.js';
-import { RedisKVCache } from '@/misc/cache.js';
+import type { ChannelMutingRepository, ChannelsRepository, MiChannel, MiChannelMuting, MiUser } from '@features/persistence/backend/repositories/models.js';
+import { IdService } from '@features/runtime/backend/services/IdService.js';
+import { GlobalEvents, GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
+import { RedisKVCache } from '@features/runtime/backend/cache/cache.js';
 
 @Injectable()
 export class ChannelMutingService {

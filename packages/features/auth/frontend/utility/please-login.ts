@@ -3,10 +3,10 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { $i } from '@/i.js';
-import { instance } from '@/instance.js';
-import { i18n } from '@/i18n.js';
-import { popupAsyncWithDialog } from '@/os.js';
+import { $i } from '@features/auth/frontend/i.js';
+import { instance } from '@features/instance/frontend/instance.js';
+import FeatureLocaleMessages from '@features/auth/frontend/ts-messages.vue';
+import { popupAsyncWithDialog } from '@features/ui/frontend/os.js';
 
 export type OpenOnRemoteOptions = {
 	/**
@@ -60,7 +60,7 @@ export async function pleaseLogin(opts: {
 
 	const { dispose } = await popupAsyncWithDialog(import('@features/auth/frontend/components/MkSigninDialog.vue').then(x => x.default), {
 		autoSet: true,
-		message: opts.message ?? (_openOnRemote ? i18n.ts.signinOrContinueOnRemote : i18n.ts.signinRequired),
+		message: opts.message ?? (_openOnRemote ? FeatureLocaleMessages.$locale.signinOrContinueOnRemote : FeatureLocaleMessages.$locale.signinRequired),
 		openOnRemote: _openOnRemote,
 	}, {
 		cancelled: () => {

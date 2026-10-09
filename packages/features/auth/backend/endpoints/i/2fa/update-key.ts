@@ -2,20 +2,18 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import type { UserSecurityKeysRepository } from '@features/persistence/backend/repositories/models.js';
+import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
+import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
 
-import bcrypt from 'bcryptjs';
-import { Inject, Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
-import type { UserSecurityKeysRepository } from '@/models/_.js';
-import { UserEntityService } from '@/core/entities/UserEntityService.js';
-import { GlobalEventService } from '@/core/GlobalEventService.js';
-import { DI } from '@/di-symbols.js';
-import { ApiError } from '@/server/api/error.js';
+import { I2faUpdateKeyContract } from '../../../api.definition.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
 
 export const meta = {
-	requireCredential: true,
-
-	secure: true,
 
 	errors: {
 		noSuchKey: {
@@ -31,49 +29,39 @@ export const meta = {
 		},
 	},
 } as const;
-
-export const paramDef = {
-	type: 'object',
-	properties: {
-		name: { type: 'string', minLength: 1, maxLength: 30 },
-		credentialId: { type: 'string' },
-	},
-	required: ['name', 'credentialId'],
-} as const;
-
-@Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
-	constructor(
-		@Inject(DI.userSecurityKeysRepository)
-		private userSecurityKeysRepository: UserSecurityKeysRepository,
-
-		private userEntityService: UserEntityService,
-		private globalEventService: GlobalEventService,
-	) {
-		super(meta, paramDef, async (ps, me) => {
-			const key = await this.userSecurityKeysRepository.findOneBy({
+export interface I2faUpdateKeyDependencies {
+	userSecurityKeysRepository: UserSecurityKeysRepository;
+	userEntityService: Pick<UserEntityService, 'packSelf'>;
+	globalEventService: Pick<GlobalEventService, 'publishMainStream'>;
+}
+export function createI2faUpdateKeyProcedure(deps: I2faUpdateKeyDependencies) {
+	return createApiProcedure<MiLocalUser>()(I2faUpdateKeyContract).use(requirePrincipal<MiLocalUser>()).handler(async ({ input, context }) => {
+		const ps = input;
+		const me = context.principal;
+		const result = await (async () => {
+			const key = await deps.userSecurityKeysRepository.findOneBy({
 				id: ps.credentialId,
 			});
 
 			if (key == null) {
-				throw new ApiError(meta.errors.noSuchKey);
+				throw apiError(meta.errors.noSuchKey);
 			}
 
 			if (key.userId !== me.id) {
-				throw new ApiError(meta.errors.accessDenied);
+				throw apiError(meta.errors.accessDenied);
 			}
 
-			await this.userSecurityKeysRepository.update(key.id, {
+			await deps.userSecurityKeysRepository.update(key.id, {
 				name: ps.name,
 			});
 
 			// Publish meUpdated event
-			this.globalEventService.publishMainStream(me.id, 'meUpdated', await this.userEntityService.pack(me.id, me, {
-				schema: 'MeDetailed',
+			deps.globalEventService.publishMainStream(me.id, 'meUpdated', await deps.userEntityService.packSelf(me.id, {
 				includeSecrets: true,
 			}));
 
 			return {};
-		});
-	}
+		})();
+		return result;
+	});
 }

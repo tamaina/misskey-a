@@ -5,6 +5,11 @@ on:
     branches: [main]
     paths:
       - packages/frontend/**
+      - packages/frontend-embed/**
+      - packages/frontend-shared/**
+      - packages/frontend-builder/**
+      - packages/sw/**
+      - packages/icons-subsetter/**
       - packages/features/**
       - packages/misskey-js/**
       - pnpm-lock.yaml
@@ -12,6 +17,11 @@ on:
   pull_request:
     paths:
       - packages/frontend/**
+      - packages/frontend-embed/**
+      - packages/frontend-shared/**
+      - packages/frontend-builder/**
+      - packages/sw/**
+      - packages/icons-subsetter/**
       - packages/features/**
       - packages/misskey-js/**
       - pnpm-lock.yaml
@@ -35,6 +45,15 @@ jobs:
       - run: pnpm build-pre
       - run: cp .github/misskey/test.yml .config/test.yml
       - run: pnpm --filter frontend... -r build
+      # Reuse frontend...'s common dependency builds for the other browser hosts.
+      - run: pnpm --filter frontend-shared typecheck
+      - run: pnpm --filter frontend-embed typecheck
+        env:
+          NODE_OPTIONS: --max-old-space-size=4096
+      - run: pnpm --filter frontend-embed exec tsc --noEmit -p src/workers/tsconfig.json
+      - run: pnpm --filter frontend-embed build
+      - run: pnpm --filter sw typecheck
+      - run: pnpm --filter sw build
       - run: pnpm --filter frontend exec vue-tsc --noEmit
         env:
           NODE_OPTIONS: --max-old-space-size=4096

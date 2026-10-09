@@ -4,16 +4,16 @@
  */
 
 import { Inject, Injectable } from '@nestjs/common';
+import type { OnApplicationShutdown } from '@nestjs/common';
 import { DataSource } from 'typeorm';
 import * as Redis from 'ioredis';
 import { DI } from '@/di-symbols.js';
-import { MiMeta } from '@/models/Meta.js';
-import { updateInstanceMeta } from '@/models/update-instance-meta.js';
-import { GlobalEventService } from '@/core/GlobalEventService.js';
-import { bindThis } from '@/decorators.js';
-import type { GlobalEvents } from '@/core/GlobalEventService.js';
-import { FeaturedService } from '@/core/FeaturedService.js';
-import type { OnApplicationShutdown } from '@nestjs/common';
+import { MiMeta } from '../models/Meta.js';
+import { updateInstanceMeta } from '../models/update-instance-meta.js';
+import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
+import type { GlobalEvents } from '@features/runtime/backend/services/GlobalEventService.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
+import { FeaturedService } from '@features/discovery/backend/services/FeaturedService.js';
 
 @Injectable()
 export class MetaService implements OnApplicationShutdown {

@@ -7,37 +7,38 @@ import { ref } from 'vue';
 import type { Ref } from 'vue';
 import * as mfm from 'mfm-js';
 import * as Misskey from 'misskey-js';
-import { isLink } from '@@/js/is-link.js';
-import { shouldCollapsed } from '@@/js/collapsed.js';
-import { host } from '@@/js/config.js';
+import { isLink } from '@features/ui/frontend/shared/is-link.js';
+import { shouldCollapsed } from '@features/notes/frontend/shared/collapsed.js';
+import { host } from '@features/boot/frontend/shared/config.js';
 import { pleaseLogin } from '@features/auth/frontend/utility/please-login.js';
 import type { OpenOnRemoteOptions } from '@features/auth/frontend/utility/please-login.js';
-import { checkWordMute } from '@/utility/check-word-mute.js';
-import { misskeyApi } from '@/utility/misskey-api.js';
-import * as sound from '@/utility/sound.js';
-import * as os from '@/os.js';
+import { checkWordMute } from '@features/relationships/frontend/utility/check-word-mute.js';
+import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
+import * as sound from '@features/preferences/frontend/utility/sound.js';
+import * as os from '@features/ui/frontend/os.js';
 import { reactionPicker } from '@features/notes/frontend/utility/reaction-picker.js';
 import { extractUrlFromMfm } from '@features/markup/frontend/utility/extract-url-from-mfm.js';
 import { getNoteClipMenu, getNoteMenu, getRenoteMenu, getAbuseNoteMenu, getCopyNoteLinkMenu } from '@features/notes/frontend/utility/get-note-menu.js';
 import { noteEvents, useNoteCapture } from '@features/notes/frontend/composables/use-note-capture.js';
-import { deepClone } from '@/utility/clone.js';
+import { deepClone } from '@features/runtime/frontend/utility/clone.js';
 import { useTooltip } from '@features/ui/frontend/composables/use-tooltip.js';
 import { claimAchievement } from '@features/users/frontend/utility/achievements.js';
 import { showMovedDialog } from '@features/users/frontend/utility/show-moved-dialog.js';
 import { getAppearNote } from '@features/notes/frontend/utility/get-appear-note.js';
-import { prefer } from '@/preferences.js';
-import { getPluginHandlers } from '@/plugin.js';
-import { $i } from '@/i.js';
-import { i18n } from '@/i18n.js';
-import { globalEvents, useGlobalEvent } from '@/events.js';
+import { prefer } from '@features/preferences/frontend/preferences.js';
+import { getPluginHandlers } from '@features/integrations/frontend/plugin.js';
+import { $i } from '@features/auth/frontend/i.js';
+import FeatureLocaleMessages from '@features/notes/frontend/ts-messages.vue';
+import { interpolateLocaleParameters } from '@features/runtime/frontend/interpolate-locale-parameters.js';
+import { globalEvents, useGlobalEvent } from '@features/runtime/frontend/events.js';
 import MkUsersTooltip from '@features/users/frontend/components/MkUsersTooltip.vue';
 import MkReactionsViewerDetails from '@features/notes/frontend/components/MkReactionsViewer.details.vue';
 import MkRippleEffect from '@features/ui/frontend/components/MkRippleEffect.vue';
-import { notePage } from '@features/notes/frontend/filters/note.js';
-import type { DI as DIType } from '@/di.js';
-import type { ExtractInjectedType } from '@/types/misc.js';
-import type { MenuItem } from '@/types/menu.js';
-import type { WordMuteResult } from '@/utility/check-word-mute.js';
+import { notePage } from '@features/notes/frontend/shared/note.js';
+import type { DI as DIType } from '@features/ui/frontend/di.js';
+import type { ExtractInjectedType } from '@features/ui/frontend/types/misc.js';
+import type { MenuItem } from '@features/navigation/frontend/types/menu.js';
+import type { WordMuteResult } from '@features/relationships/frontend/utility/check-word-mute.js';
 
 export interface UseNoteProps {
 	note: Misskey.entities.Note;
@@ -275,7 +276,7 @@ export function useNote(
 				if (prefer.s.confirmOnReact) {
 					const confirm = await os.confirm({
 						type: 'question',
-						text: i18n.tsx.reactAreYouSure({ emoji: reaction.replace('@.', '') }),
+						text: interpolateLocaleParameters(FeatureLocaleMessages.$locale.reactAreYouSure, { emoji: reaction.replace('@.', '') }),
 					});
 					if (confirm.canceled) return;
 				}
@@ -381,7 +382,7 @@ export function useNote(
 		if (!isLoggedIn) return;
 
 		const getUnrenote = () => ({
-			text: i18n.ts.unrenote,
+			text: FeatureLocaleMessages.$locale.unrenote,
 			icon: 'ti ti-trash',
 			danger: true,
 			action: () => {
@@ -391,7 +392,7 @@ export function useNote(
 
 		const menuItems: MenuItem[] = [{
 			type: 'link',
-			text: i18n.ts.renoteDetails,
+			text: FeatureLocaleMessages.$locale.renoteDetails,
 			icon: 'ti ti-info-circle',
 			to: notePage(rawNote),
 		}];
@@ -399,20 +400,20 @@ export function useNote(
 		if (props.note.channelId != null && (inChannel == null || props.note.channelId !== inChannel.value)) {
 			menuItems.push({
 				type: 'link',
-				text: i18n.ts.viewRenotedChannel,
+				text: FeatureLocaleMessages.$locale.viewRenotedChannel,
 				icon: 'ti ti-device-tv',
 				to: `/channels/${props.note.channelId}`,
 			});
 		}
 
-		menuItems.push(getCopyNoteLinkMenu(rawNote, i18n.ts.copyLinkRenote));
+		menuItems.push(getCopyNoteLinkMenu(rawNote, FeatureLocaleMessages.$locale.copyLinkRenote));
 		menuItems.push({ type: 'divider' });
 
 		if (isMyRenote) {
 			menuItems.push(getUnrenote());
 			os.popupMenu(menuItems, els.renoteTime?.value);
 		} else {
-			menuItems.push(getAbuseNoteMenu(rawNote, i18n.ts.reportAbuseRenote));
+			menuItems.push(getAbuseNoteMenu(rawNote, FeatureLocaleMessages.$locale.reportAbuseRenote));
 			if ($i?.isModerator || $i?.isAdmin) {
 				menuItems.push(getUnrenote());
 			}

@@ -8,22 +8,22 @@ import { Inject, Injectable } from '@nestjs/common';
 import { MoreThan } from 'typeorm';
 import { format as dateFormat } from 'date-fns';
 import { DI } from '@/di-symbols.js';
-import type { NotesRepository, PollsRepository, UsersRepository } from '@/models/_.js';
-import type Logger from '@/logger.js';
-import { DriveService } from '@/core/DriveService.js';
-import { createTemp } from '@/misc/create-temp.js';
-import type { MiPoll } from '@/models/Poll.js';
-import type { MiNote } from '@/models/Note.js';
-import { bindThis } from '@/decorators.js';
-import { DriveFileEntityService } from '@/core/entities/DriveFileEntityService.js';
-import { Packed } from '@/misc/json-schema.js';
-import { IdService } from '@/core/IdService.js';
-import { NotificationService } from '@/core/NotificationService.js';
-import { JsonArrayStream } from '@/misc/JsonArrayStream.js';
-import { FileWriterStream } from '@/misc/FileWriterStream.js';
-import { QueueLoggerService } from '@/queue/QueueLoggerService.js';
+import type { NotesRepository, PollsRepository, UsersRepository } from '@features/persistence/backend/repositories/models.js';
+import type { Logger } from '@features/runtime/backend/logging/logger.js';
+import { DriveService } from '@features/drive/backend/services/DriveService.js';
+import { createTemp } from '@features/runtime/backend/io/create-temp.js';
+import type { MiPoll } from '../models/Poll.js';
+import type { MiNote } from '../models/Note.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
+import { DriveFileEntityService } from '@features/drive/backend/serializers/DriveFileEntityService.js';
+import { Packed } from '@features/index/backend/packed.schema.js';
+import { IdService } from '@features/runtime/backend/services/IdService.js';
+import { NotificationService } from '@features/notifications/backend/services/NotificationService.js';
+import { JsonArrayStream } from '@features/runtime/backend/io/JsonArrayStream.js';
+import { FileWriterStream } from '@features/runtime/backend/io/FileWriterStream.js';
+import { QueueLoggerService } from '@features/runtime/backend/queue/QueueLoggerService.js';
 import type * as Bull from 'bullmq';
-import type { DbJobDataWithUser } from '@/queue/types.js';
+import type { DbJobDataWithUser } from '@features/runtime/backend/queue/types.js';
 
 class NoteStream extends ReadableStream<Record<string, unknown>> {
 	constructor(

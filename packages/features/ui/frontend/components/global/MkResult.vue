@@ -21,8 +21,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import {} from 'vue';
-import { instance } from '@/instance.js';
-import { prefer } from '@/preferences.js';
+import { instance } from '@features/instance/frontend/instance.js';
+import { prefer } from '@features/preferences/frontend/preferences.js';
 
 const props = defineProps<{
 	type: 'empty' | 'notFound' | 'error';

@@ -7,9 +7,9 @@ import * as assert from 'assert';
 import { beforeAll, describe, test } from 'vitest';
 import { Test } from '@nestjs/testing';
 
-import { CoreModule } from '@/core/CoreModule.js';
-import { ReactionService } from '@/core/ReactionService.js';
-import { GlobalModule } from '@/GlobalModule.js';
+import { CoreModule } from '@features/boot/backend/assembly/CoreModule.js';
+import { ReactionService } from '@features/notes/backend/services/ReactionService.js';
+import { GlobalModule } from '@features/boot/backend/assembly/GlobalModule.js';
 
 describe('ReactionService', () => {
 	let reactionService: ReactionService;

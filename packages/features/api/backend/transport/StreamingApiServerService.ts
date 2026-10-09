@@ -1,0 +1,207 @@
+/*
+ * SPDX-FileCopyrightText: syuilo and misskey-project
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
+
+import { EventEmitter } from 'events';
+import type { Duplex } from 'node:stream';
+import { Inject, Injectable } from '@nestjs/common';
+import * as Redis from 'ioredis';
+import * as WebSocket from 'ws';
+import { DI } from '@/di-symbols.js';
+import type { MiAccessToken } from '@features/persistence/backend/repositories/models.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
+import { MiLocalUser } from '@features/users/backend/models/User.js';
+import { UserService } from '@features/users/backend/services/UserService.js';
+import { AuthenticateService, AuthenticationError } from '@features/auth/backend/transport/AuthenticateService.js';
+import MainStreamConnection, { ConnectionRequest } from './stream/Connection.js';
+import type * as http from 'node:http';
+import { ContextIdFactory, ModuleRef } from '@nestjs/core';
+
+@Injectable()
+export class StreamingApiServerService {
+	#wss: WebSocket.WebSocketServer | undefined;
+	#stopping = false;
+	#detaching: Promise<void> | undefined;
+	#upgrades = new Set<Promise<void>>();
+	#stopUpgrades: (() => void) | undefined;
+	#stopRedis: (() => void) | undefined;
+	#connections = new Map<WebSocket.WebSocket, number>();
+	#cleanConnectionsIntervalId: NodeJS.Timeout | null = null;
+
+	constructor(
+		@Inject(DI.redisForSub)
+		private redisForSub: Redis.Redis,
+
+		private moduleRef: ModuleRef,
+		private authenticateService: AuthenticateService,
+		private usersService: UserService,
+	) {
+	}
+
+	@bindThis
+	public attach(server: http.Server): void {
+		const wss = this.#wss = new WebSocket.WebSocketServer({
+			noServer: true,
+		});
+
+		const upgrade = async (request: http.IncomingMessage, socket: Duplex, head: Buffer) => {
+			if (this.#stopping) { socket.destroy(); return; }
+			if (request.url == null) {
+				socket.write('HTTP/1.1 400 Bad Request\r\n\r\n');
+				socket.destroy();
+				return;
+			}
+
+			const q = new URL(request.url, `http://${request.headers.host}`).searchParams;
+
+			let user: MiLocalUser | null = null;
+			let app: MiAccessToken | null = null;
+
+			// https://datatracker.ietf.org/doc/html/rfc6750.html#section-2.1
+			// Note that the standard WHATWG WebSocket API does not support setting any headers,
+			// but non-browser apps may still be able to set it.
+			const token = request.headers.authorization?.startsWith('Bearer ')
+				? request.headers.authorization.slice(7)
+				: q.get('i');
+
+			try {
+				[user, app] = await this.authenticateService.authenticate(token);
+
+				if (app !== null && !app.permission.some(p => p === 'read:account')) {
+					throw new AuthenticationError('Your app does not have necessary permissions to use websocket API.');
+				}
+			} catch (e) {
+				if (e instanceof AuthenticationError) {
+					socket.write([
+						'HTTP/1.1 401 Unauthorized',
+						'WWW-Authenticate: Bearer realm="Misskey", error="invalid_token", error_description="Failed to authenticate"',
+					].join('\r\n') + '\r\n\r\n');
+				} else {
+					socket.write('HTTP/1.1 500 Internal Server Error\r\n\r\n');
+				}
+				socket.destroy();
+				return;
+			}
+
+			if (this.#stopping) { socket.destroy(); return; }
+
+			if (user?.isSuspended) {
+				socket.write('HTTP/1.1 403 Forbidden\r\n\r\n');
+				socket.destroy();
+				return;
+			}
+
+			const contextId = ContextIdFactory.create();
+			this.moduleRef.registerRequestByContextId<ConnectionRequest>({
+				user,
+				token: app,
+			}, contextId);
+			const stream = await this.moduleRef.create(MainStreamConnection, contextId);
+
+			await stream.init();
+			if (this.#stopping) { stream.dispose(); socket.destroy(); return; }
+
+			wss.handleUpgrade(request, socket, head, (ws) => {
+				wss.emit('connection', ws, request, {
+					stream, user, app,
+				});
+			});
+		};
+		const onUpgrade = (request: http.IncomingMessage, socket: Duplex, head: Buffer) => {
+			const task = upgrade(request, socket, head);
+			this.#upgrades.add(task);
+			void task.then(() => this.#upgrades.delete(task), error => {
+				this.#upgrades.delete(task);
+				socket.destroy();
+				console.error('WebSocket upgrade failed:', error);
+			});
+		};
+		server.on('upgrade', onUpgrade);
+		this.#stopUpgrades = () => server.off('upgrade', onUpgrade);
+
+		const globalEv = new EventEmitter();
+
+		const onGlobalMessage = (_: string, data: string) => {
+			const parsed = JSON.parse(data);
+			globalEv.emit('message', parsed);
+		};
+		this.redisForSub.on('message', onGlobalMessage);
+		this.#stopRedis = () => this.redisForSub.off('message', onGlobalMessage);
+
+		wss.on('connection', async (connection: WebSocket.WebSocket, request: http.IncomingMessage, ctx: {
+			stream: MainStreamConnection,
+			user: MiLocalUser | null;
+			app: MiAccessToken | null
+		}) => {
+			const { stream, user } = ctx;
+
+			const ev = new EventEmitter();
+
+			function onRedisMessage(data: any): void {
+				ev.emit(data.channel, data.message);
+			}
+
+			globalEv.on('message', onRedisMessage);
+
+			await stream.listen(ev, connection);
+
+			this.#connections.set(connection, Date.now());
+
+			const userUpdateIntervalId = user ? setInterval(() => {
+				this.usersService.updateLastActiveDate(user);
+			}, 1000 * 60 * 5) : null;
+			if (user) {
+				this.usersService.updateLastActiveDate(user);
+			}
+
+			connection.once('close', () => {
+				ev.removeAllListeners();
+				stream.dispose();
+				globalEv.off('message', onRedisMessage);
+				this.#connections.delete(connection);
+				if (userUpdateIntervalId) clearInterval(userUpdateIntervalId);
+			});
+
+			connection.on('pong', () => {
+				this.#connections.set(connection, Date.now());
+			});
+		});
+
+		// 一定期間通信が無いコネクションは実際には切断されている可能性があるため定期的にterminateする
+		this.#cleanConnectionsIntervalId = setInterval(() => {
+			const now = Date.now();
+			for (const [connection, lastActive] of this.#connections.entries()) {
+				if (now - lastActive > 1000 * 60 * 2) {
+					connection.terminate();
+					this.#connections.delete(connection);
+				} else {
+					connection.ping();
+				}
+			}
+		}, 1000 * 60);
+	}
+
+	@bindThis
+	public detach(): Promise<void> {
+		return this.#detaching ??= (async () => {
+			this.#stopping = true;
+			this.#stopUpgrades?.();
+			if (this.#cleanConnectionsIntervalId) clearInterval(this.#cleanConnectionsIntervalId);
+			this.#cleanConnectionsIntervalId = null;
+			// Authentication/context initialization must finish before infrastructure closes.
+			await Promise.allSettled([...this.#upgrades]);
+			const wss = this.#wss;
+			if (!wss) return;
+			const closed = new Promise<void>(resolve => wss.close(() => resolve()));
+			for (const connection of wss.clients) connection.close(1001, 'Server shutting down');
+			const timer = setTimeout(() => {
+				for (const connection of wss.clients) connection.terminate();
+			}, 1000);
+			try { await closed; } finally {
+				clearTimeout(timer);
+				this.#stopRedis?.();
+			}
+		})();
+	}
+}

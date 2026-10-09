@@ -3,23 +3,19 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Inject, Injectable } from '@nestjs/common';
-import { DI } from '@/di-symbols.js';
-import type { FollowRequestsRepository } from '@/models/_.js';
-import type { } from '@/models/Blocking.js';
-import type { MiUser } from '@/models/User.js';
-import type { MiFollowRequest } from '@/models/FollowRequest.js';
-import { bindThis } from '@/decorators.js';
-import type { Packed } from '@/misc/json-schema.js';
-import { UserEntityService } from '@/core/entities/UserEntityService.js';
+import type { FollowRequestsRepository } from '@features/persistence/backend/repositories/models.js';
+import type { } from '../models/Blocking.js';
+import type { MiUser } from '@features/users/backend/models/User.js';
+import type { MiFollowRequest } from '../models/FollowRequest.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
+import type { Packed } from '@features/index/backend/packed.schema.js';
+import type { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 
-@Injectable()
 export class FollowRequestEntityService {
 	constructor(
-		@Inject(DI.followRequestsRepository)
 		private followRequestsRepository: FollowRequestsRepository,
 
-		private userEntityService: UserEntityService,
+		private userEntityService: Pick<UserEntityService, 'pack' | 'packMany'>,
 	) {
 	}
 

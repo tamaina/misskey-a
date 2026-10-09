@@ -19,7 +19,7 @@ import fs from 'node:fs';
 import JSON5 from 'json5';
 import { RolldownMagicString } from 'rolldown';
 import type { TransformResult } from 'rolldown';
-import path from 'node:path'
+import path from 'node:path';
 import { hash, toBase62 } from '../vite.config';
 import { minimatch } from 'minimatch';
 import {
@@ -50,6 +50,7 @@ export type Options = {
 	modulesToHmrOnUpdate: string[],
 	fileVirtualModulePrefix?: string,
 	fileVirtualModuleSuffix?: string,
+	componentLocaleRoot?: string,
 	verbose?: boolean,
 };
 
@@ -152,7 +153,11 @@ function findEndOfStartTagAttributes(node: ElementNode): number {
  * TypeScriptコード生成
  */
 function generateJavaScriptCode(resolvedRootMarkers: SearchIndexItem[]): string {
-	return `import { i18n } from '@/i18n.js';\n`
+	const componentLocaleImport = JSON.stringify(resolvedRootMarkers).includes('${createComponentLocale(')
+		? `import { createComponentLocale } from 'vite-vue-internationalization/runtime';\n`
+		: '';
+	return componentLocaleImport
+		+ `import { i18n } from '@features/runtime/frontend/i18n.js';\n`
 		+ `export const searchIndexes = ${customStringify(resolvedRootMarkers)};\n`;
 }
 
@@ -174,28 +179,28 @@ function customStringify(obj: unknown): string {
 /**
  * 要素のノードの中身のテキストを抽出する
  */
-function extractElementText(node: ElementNode, id: string): string | null {
-	return extractElementTextChecked(node, node.tag, id);
+function extractElementText(node: ElementNode, id: string, componentLocaleModuleId?: string): string | null {
+	return extractElementTextChecked(node, node.tag, id, componentLocaleModuleId);
 }
 
-function extractElementTextChecked(node: ElementNode, processingNodeName: string, id: string): string | null {
+function extractElementTextChecked(node: ElementNode, processingNodeName: string, id: string, componentLocaleModuleId?: string): string | null {
 	const result: string[] = [];
 	for (const child of node.children) {
-		const text = extractElementText2Inner(child, processingNodeName, id);
+		const text = extractElementText2Inner(child, processingNodeName, id, componentLocaleModuleId);
 		if (text == null) return null;
 		result.push(text);
 	}
 	return result.join('');
 }
 
-function extractElementText2Inner(node: TemplateChildNode, processingNodeName: string, id: string): string | null {
+function extractElementText2Inner(node: TemplateChildNode, processingNodeName: string, id: string, componentLocaleModuleId?: string): string | null {
 	if (node.type === NodeTypes.COMPOUND_EXPRESSION) throw new Error("Unexpected COMPOUND_EXPRESSION");
 
 	switch (node.type) {
 		case NodeTypes.INTERPOLATION: {
 			const expr = node.content;
 			if (expr.type === NodeTypes.COMPOUND_EXPRESSION) throw new Error(`Unexpected COMPOUND_EXPRESSION`);
-			const exprResult = evalExpression(expr.content);
+			const exprResult = evalExpression(expr.content, componentLocaleModuleId);
 			if (typeof exprResult !== 'string') {
 				logger.error(`Result of interpolation node is not string at line ${id}:${node.loc.start.line}`);
 				return null;
@@ -204,7 +209,7 @@ function extractElementText2Inner(node: TemplateChildNode, processingNodeName: s
 		}
 		case NodeTypes.ELEMENT:
 			if (node.tagType === ElementTypes.ELEMENT) {
-				return extractElementTextChecked(node, processingNodeName, id);
+				return extractElementTextChecked(node, processingNodeName, id, componentLocaleModuleId);
 			} else {
 				logger.error(`Unexpected ${node.tag} extracting text of ${processingNodeName} ${id}:${node.loc.start.line}`);
 				return null;
@@ -230,7 +235,7 @@ function extractElementText2Inner(node: TemplateChildNode, processingNodeName: s
 /**
  * SearchLabel/SearchText/SearchIconを探して抽出する関数
  */
-function extractSugarTags(nodes: TemplateChildNode[], id: string): { label: string | null; texts: string[]; icon: string | null; } {
+function extractSugarTags(nodes: TemplateChildNode[], id: string, componentLocaleModuleId?: string): { label: string | null; texts: string[]; icon: string | null; } {
 	let label: string | null | undefined = undefined;
 	let icon: string | null | undefined = undefined;
 	const texts: string[] = [];
@@ -247,10 +252,10 @@ function extractSugarTags(nodes: TemplateChildNode[], id: string): { label: stri
 					break; // 2つ目のSearchLabelは無視
 				}
 
-				label = extractElementText(node, id);
+				label = extractElementText(node, id, componentLocaleModuleId);
 				return;
 			case 'SearchText':
-				const content = extractElementText(node, id);
+				const content = extractElementText(node, id, componentLocaleModuleId);
 				if (content) {
 					texts.push(content);
 				}
@@ -271,7 +276,7 @@ function extractSugarTags(nodes: TemplateChildNode[], id: string): { label: stri
 					logger.error(`SearchIcon must have a child element at ${id}:${node.loc.start.line}`);
 					return;
 				}
-				icon = getStringProp(findAttribute(iconNode.props, 'class'), id);
+				icon = getStringProp(findAttribute(iconNode.props, 'class'), id, componentLocaleModuleId);
 				return;
 		}
 
@@ -283,7 +288,7 @@ function extractSugarTags(nodes: TemplateChildNode[], id: string): { label: stri
 	return { label: label ?? null, texts, icon: icon ?? null };
 }
 
-function getStringProp(attr: AttributeNode | DirectiveNode | null, id: string): string | null {
+function getStringProp(attr: AttributeNode | DirectiveNode | null, id: string, componentLocaleModuleId?: string): string | null {
 	switch (attr?.type) {
 		case null:
 		case undefined:
@@ -293,7 +298,7 @@ function getStringProp(attr: AttributeNode | DirectiveNode | null, id: string): 
 		case NodeTypes.DIRECTIVE:
 			if (attr.exp == null) return null;
 			if (attr.exp.type === NodeTypes.COMPOUND_EXPRESSION) throw new Error('Unexpected COMPOUND_EXPRESSION');
-			const value = evalExpression(attr.exp.content ?? '');
+			const value = evalExpression(attr.exp.content ?? '', componentLocaleModuleId);
 			if (typeof value !== 'string') {
 				logger.error(`Expected string value, got ${typeof value} at ${id}:${attr.loc.start.line}`);
 				return null;
@@ -302,7 +307,7 @@ function getStringProp(attr: AttributeNode | DirectiveNode | null, id: string): 
 	}
 }
 
-function getStringArrayProp(attr: AttributeNode | DirectiveNode | null, id: string): string[] | null {
+function getStringArrayProp(attr: AttributeNode | DirectiveNode | null, id: string, componentLocaleModuleId?: string): string[] | null {
 	switch (attr?.type) {
 		case null:
 		case undefined:
@@ -313,7 +318,7 @@ function getStringArrayProp(attr: AttributeNode | DirectiveNode | null, id: stri
 		case NodeTypes.DIRECTIVE:
 			if (attr.exp == null) return null;
 			if (attr.exp.type === NodeTypes.COMPOUND_EXPRESSION) throw new Error('Unexpected COMPOUND_EXPRESSION');
-			const value = evalExpression(attr.exp.content ?? '');
+			const value = evalExpression(attr.exp.content ?? '', componentLocaleModuleId);
 			if (!Array.isArray(value) || !value.every(x => typeof x === 'string')) {
 				logger.error(`Expected string array value, got ${typeof value} at ${id}:${attr.loc.start.line}`);
 				return null;
@@ -325,6 +330,7 @@ function getStringArrayProp(attr: AttributeNode | DirectiveNode | null, id: stri
 function extractUsageInfoFromTemplateAst(
 	templateAst: RootNode | undefined,
 	id: string,
+	componentLocaleModuleId?: string,
 ): SearchIndexItem[] {
 	const allMarkers: SearchIndexItem[] = [];
 	const markerMap = new Map<string, SearchIndexItem>();
@@ -356,12 +362,12 @@ function extractUsageInfoFromTemplateAst(
 		};
 
 		// バインドプロパティを取得
-		const path = getStringProp(findAttribute(node.props, 'path'), id);
-		const icon = getStringProp(findAttribute(node.props, 'icon'), id);
-		const label = getStringProp(findAttribute(node.props, 'label'), id);
-		const inlining = getStringArrayProp(findAttribute(node.props, 'inlining'), id);
-		const keywords = getStringArrayProp(findAttribute(node.props, 'keywords'), id);
-		const texts = getStringArrayProp(findAttribute(node.props, 'texts'), id);
+		const path = getStringProp(findAttribute(node.props, 'path'), id, componentLocaleModuleId);
+		const icon = getStringProp(findAttribute(node.props, 'icon'), id, componentLocaleModuleId);
+		const label = getStringProp(findAttribute(node.props, 'label'), id, componentLocaleModuleId);
+		const inlining = getStringArrayProp(findAttribute(node.props, 'inlining'), id, componentLocaleModuleId);
+		const keywords = getStringArrayProp(findAttribute(node.props, 'keywords'), id, componentLocaleModuleId);
+		const texts = getStringArrayProp(findAttribute(node.props, 'texts'), id, componentLocaleModuleId);
 
 		if (path) markerInfo.path = path;
 		if (icon) markerInfo.icon = icon;
@@ -377,7 +383,7 @@ function extractUsageInfoFromTemplateAst(
 
 		// SearchLabelとSearchTextを抽出 (AST全体を探索)
 		{
-			const extracted = extractSugarTags(node.children, id);
+			const extracted = extractSugarTags(node.children, id, componentLocaleModuleId);
 			if (extracted.label && markerInfo.label) logger.warn(`Duplicate label found for ${markerId} at ${id}:${node.loc.start.line}`);
 			if (extracted.icon && markerInfo.icon) logger.warn(`Duplicate icon found for ${markerId} at ${id}:${node.loc.start.line}`);
 			markerInfo.label = extracted.label ?? markerInfo.label ?? '';
@@ -406,8 +412,18 @@ function extractUsageInfoFromTemplateAst(
  * expr を実行します。
  * i18n はそのアクセスを保持するために propertyAccessProxy を使用しています。
  */
-function evalExpression(expr: string): unknown {
-	const rarResult = Function('i18n', `return ${expr}`)(i18nProxy);
+function evalExpression(expr: string, componentLocaleModuleId?: string): unknown {
+	const escapedModuleId = componentLocaleModuleId
+		?.replaceAll('\\', '\\\\')
+		.replaceAll("'", "\\'")
+		.replaceAll('\n', '\\n')
+		.replaceAll('\r', '\\r')
+		.replaceAll('\u2028', '\\u2028')
+		.replaceAll('\u2029', '\\u2029');
+	const localComponentLocale = componentLocaleModuleId == null
+		? undefined
+		: { sfc: propertyAccessProxy([`createComponentLocale('${escapedModuleId}')`]) };
+	const rarResult = Function('i18n', '$locale', `return ${expr}`)(i18nProxy, localComponentLocale);
 	// JSON.stringify を一回通すことで、 AccessProxy を文字列に変換する
 	// Walk してもいいんだけど横着してJSON.stringifyしてる。ビルド時にしか通らないのであんまりパフォーマンス気にする必要ないんで
 	return JSON.parse(JSON.stringify(rarResult));
@@ -461,7 +477,7 @@ function propertyAccessProxy(path: string[]): AccessProxy {
 
 const i18nProxy = propertyAccessProxy(['i18n']);
 
-export function collectFileMarkers(id: string, code: string | RolldownMagicString | undefined): SearchIndexItem[] {
+export function collectFileMarkers(id: string, code: string | RolldownMagicString | undefined, componentLocaleRoot: string): SearchIndexItem[] {
 	try {
 		let codeStr: string;
 		if (typeof code === 'string') {
@@ -481,7 +497,11 @@ export function collectFileMarkers(id: string, code: string | RolldownMagicStrin
 			return []; // エラーが発生したファイルはスキップ
 		}
 
-		return extractUsageInfoFromTemplateAst(descriptor.template?.ast, id);
+		// This is a lazy proxy; passing it for every SFC avoids depending on
+		// whether VVI has already stripped the file's <locale> custom blocks.
+		const componentLocaleModuleId = `/${normalizePath(path.relative(componentLocaleRoot, id.split('?', 1)[0]))}`;
+
+		return extractUsageInfoFromTemplateAst(descriptor.template?.ast, id, componentLocaleModuleId);
 	} catch (error) {
 		let _error = error instanceof Error ? error : new Error(String(error));
 		logger.error(`Error analyzing file ${id}:`, { error: _error });
@@ -744,11 +764,12 @@ export function pluginCreateSearchIndexVirtualModule(options: Options, asigner: 
 
 			const searchIndexFilePath = parseSearchIndexFileId(id);
 			if (searchIndexFilePath != null) {
+				if (!options.componentLocaleRoot) throw new Error('componentLocaleRoot is required to build the SFC search index');
 				// call load to update the index file when the file is changed
 				this.addWatchFile(searchIndexFilePath);
 
 				const code = await asigner.getOrLoad(searchIndexFilePath);
-				return generateJavaScriptCode(collectFileMarkers(searchIndexFilePath, code));
+				return generateJavaScriptCode(collectFileMarkers(searchIndexFilePath, code, options.componentLocaleRoot));
 			}
 			return null;
 		},

@@ -2,108 +2,51 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
+import { toPackedUserLite } from '@features/users/backend/user.schema.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 
-import ms from '@/runtime-dependencies/ms.js';
-import { Inject, Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
-import type { FollowingsRepository } from '@/models/_.js';
-import { UserEntityService } from '@/core/entities/UserEntityService.js';
-import { UserFollowingService } from '@/core/UserFollowingService.js';
-import { DI } from '@/di-symbols.js';
-import { GetterService } from '@/server/api/GetterService.js';
-import { ApiError } from '@/server/api/error.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import { relationshipsContract } from '../relationships.contract.js';
+import type { RelationshipsDependencies } from '../../api.implementation.js';
 
-export const meta = {
-	tags: ['following', 'users'],
-
-	limit: {
-		duration: ms('1hour'),
-		max: 100,
-	},
-
-	requireCredential: true,
-
-	kind: 'write:following',
-
-	errors: {
-		noSuchUser: {
-			message: 'No such user.',
-			code: 'NO_SUCH_USER',
-			id: '14318698-f67e-492a-99da-5353a5ac52be',
-		},
-
-		followeeIsYourself: {
-			message: 'Followee is yourself.',
-			code: 'FOLLOWEE_IS_YOURSELF',
-			id: '4c4cbaf9-962a-463b-8418-a5e365dbf2eb',
-		},
-
-		notFollowing: {
-			message: 'You are not following that user.',
-			code: 'NOT_FOLLOWING',
-			id: 'b8dc75cf-1cb5-46c9-b14b-5f1ffbd782c9',
-		},
-	},
-
-	res: {
-		type: 'object',
-		optional: false, nullable: false,
-		ref: 'UserLite',
-	},
-} as const;
-
-export const paramDef = {
-	type: 'object',
-	properties: {
-		userId: { type: 'string', format: 'misskey:id' },
-		notify: { type: 'string', enum: ['normal', 'none'] },
-		withReplies: { type: 'boolean' },
-	},
-	required: ['userId'],
-} as const;
-
-@Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
-	constructor(
-		@Inject(DI.followingsRepository)
-		private followingsRepository: FollowingsRepository,
-
-		private userEntityService: UserEntityService,
-		private getterService: GetterService,
-		private userFollowingService: UserFollowingService,
-	) {
-		super(meta, paramDef, async (ps, me) => {
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
+import { relationshipsErrors } from '../relationships.errors.js';
+export function createFollowingUpdateProcedure<Actor extends MiLocalUser>(deps: Pick<RelationshipsDependencies, 'getterService' | 'followingsRepository' | 'userEntityService'>) {
+	return createApiProcedure<Actor>()(relationshipsContract["following/update"]).use(requirePrincipal<Actor>())
+		.handler(async ({ input, context }) => {
+			const ps = input;
+			const me = context.principal;
 			const follower = me;
 
 			// Check if the follower is yourself
 			if (me.id === ps.userId) {
-				throw new ApiError(meta.errors.followeeIsYourself);
+				throw apiError(relationshipsErrors['following/update'].followeeIsYourself);
 			}
 
 			// Get followee
-			const followee = await this.getterService.getUser(ps.userId).catch(err => {
-				if (err.id === '15348ddd-432d-49c2-8a5a-8069753becff') throw new ApiError(meta.errors.noSuchUser);
+			const followee = await deps.getterService.getUser(ps.userId).catch(err => {
+				if (err.id === '15348ddd-432d-49c2-8a5a-8069753becff') throw apiError(relationshipsErrors['following/update'].noSuchUser);
 				throw err;
 			});
 
 			// Check not following
-			const exist = await this.followingsRepository.findOneBy({
+			const exist = await deps.followingsRepository.findOneBy({
 				followerId: follower.id,
 				followeeId: followee.id,
 			});
 
 			if (exist == null) {
-				throw new ApiError(meta.errors.notFollowing);
+				throw apiError(relationshipsErrors['following/update'].notFollowing);
 			}
 
-			await this.followingsRepository.update({
+			await deps.followingsRepository.update({
 				id: exist.id,
 			}, {
 				notify: ps.notify != null ? (ps.notify === 'none' ? null : ps.notify) : undefined,
 				withReplies: ps.withReplies != null ? ps.withReplies : undefined,
 			});
 
-			return await this.userEntityService.pack(follower.id, me);
+			return toPackedUserLite(await deps.userEntityService.pack(follower.id, me));
 		});
-	}
 }

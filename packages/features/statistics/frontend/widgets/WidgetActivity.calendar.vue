@@ -35,7 +35,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { deepClone } from '@/utility/clone.js';
+import { deepClone } from '@features/runtime/frontend/utility/clone.js';
 
 const props = defineProps<{
 	activity: {

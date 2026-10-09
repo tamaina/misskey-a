@@ -4,8 +4,8 @@
  */
 
 import _confetti from 'canvas-confetti';
-import * as os from '@/os.js';
-import { prefer } from '@/preferences.js';
+import * as os from '@features/ui/frontend/os.js';
+import { prefer } from '@features/preferences/frontend/preferences.js';
 
 export function confetti(options: { duration?: number; } = {}) {
 	if (!prefer.s.animation) return;

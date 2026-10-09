@@ -3,28 +3,25 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Inject, Injectable } from '@nestjs/common';
 import { Brackets } from 'typeorm';
-import { DI } from '@/di-symbols.js';
-import type { RoleAssignmentsRepository, RolesRepository } from '@/models/_.js';
-import { awaitAll } from '@/misc/prelude/await-all.js';
-import type { MiUser } from '@/models/User.js';
-import type { MiRole } from '@/models/Role.js';
-import { bindThis } from '@/decorators.js';
-import { DEFAULT_POLICIES } from '@/core/RoleService.js';
-import { IdService } from '@/core/IdService.js';
-import { Packed } from '@/misc/json-schema.js';
+import type { RoleAssignmentsRepository, RolesRepository } from '@features/persistence/backend/repositories/models.js';
+import { awaitAll } from '@features/runtime/backend/async/await-all.js';
+import type { MiUser } from '@features/users/backend/models/User.js';
+import type { MiRole } from '../models/Role.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
+import { DEFAULT_POLICIES } from '../services/RoleService.js';
+import type { IdService } from '@features/runtime/backend/services/IdService.js';
+import type * as v from 'valibot';
+import type { roleSchema } from '../role.schema.js';
+import { toPackedJsonValue } from '../../../users/backend/json-value.schema.js';
 
-@Injectable()
 export class RoleEntityService {
 	constructor(
-		@Inject(DI.rolesRepository)
 		private rolesRepository: RolesRepository,
 
-		@Inject(DI.roleAssignmentsRepository)
 		private roleAssignmentsRepository: RoleAssignmentsRepository,
 
-		private idService: IdService,
+		private idService: Pick<IdService, 'parse'>,
 	) {
 	}
 
@@ -32,7 +29,7 @@ export class RoleEntityService {
 	public async pack(
 		src: MiRole['id'] | MiRole,
 		me?: { id: MiUser['id'] } | null | undefined,
-	): Promise<Packed<'Role'>> {
+	): Promise<v.InferOutput<typeof roleSchema>> {
 		const role = typeof src === 'object' ? src : await this.rolesRepository.findOneByOrFail({ id: src });
 
 		const assignedCount = await this.roleAssignmentsRepository.createQueryBuilder('assign')
@@ -71,14 +68,22 @@ export class RoleEntityService {
 			preserveAssignmentOnMoveAccount: role.preserveAssignmentOnMoveAccount,
 			canEditMembersByModerator: role.canEditMembersByModerator,
 			displayOrder: role.displayOrder,
-			policies: policies,
+			policies: Object.fromEntries(Object.entries(policies).map(([name, policy]) => {
+				const { useDefault, priority, value, ...extensions } = policy;
+				return [name, {
+					...extensions,
+					...(useDefault === undefined ? {} : { useDefault }),
+					...(priority === undefined ? {} : { priority }),
+					...(value === undefined ? {} : { value: toPackedJsonValue(value) }),
+				}];
+			})),
 			usersCount: assignedCount,
 		});
 	}
 
 	@bindThis
 	public packMany(
-		roles: any[],
+		roles: MiRole[],
 		me: { id: MiUser['id'] },
 	) {
 		return Promise.all(roles.map(x => this.pack(x, me)));

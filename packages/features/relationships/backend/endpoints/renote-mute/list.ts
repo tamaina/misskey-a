@@ -2,62 +2,24 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 
-import { Inject, Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
-import type { RenoteMutingsRepository } from '@/models/_.js';
-import { QueryService } from '@/core/QueryService.js';
-import { RenoteMutingEntityService } from '@/core/entities/RenoteMutingEntityService.js';
-import { DI } from '@/di-symbols.js';
-
-export const meta = {
-	tags: ['account'],
-
-	requireCredential: true,
-
-	kind: 'read:mutes',
-
-	res: {
-		type: 'array',
-		optional: false, nullable: false,
-		items: {
-			type: 'object',
-			optional: false, nullable: false,
-			ref: 'RenoteMuting',
-		},
-	},
-} as const;
-
-export const paramDef = {
-	type: 'object',
-	properties: {
-		limit: { type: 'integer', minimum: 1, maximum: 100, default: 30 },
-		sinceId: { type: 'string', format: 'misskey:id' },
-		untilId: { type: 'string', format: 'misskey:id' },
-		sinceDate: { type: 'integer' },
-		untilDate: { type: 'integer' },
-	},
-	required: [],
-} as const;
-
-@Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
-	constructor(
-		@Inject(DI.renoteMutingsRepository)
-		private renoteMutingsRepository: RenoteMutingsRepository,
-
-		private renoteMutingEntityService: RenoteMutingEntityService,
-		private queryService: QueryService,
-	) {
-		super(meta, paramDef, async (ps, me) => {
-			const query = this.queryService.makePaginationQuery(this.renoteMutingsRepository.createQueryBuilder('muting'), ps.sinceId, ps.untilId, ps.sinceDate, ps.untilDate)
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import { relationshipsContract } from '../relationships.contract.js';
+import type { RelationshipsDependencies } from '../../api.implementation.js';
+import { toPackedRenoteMuting } from '../relationships.schema.js';
+export function createRenoteMuteListProcedure<Actor extends MiLocalUser>(deps: Pick<RelationshipsDependencies, 'queryService' | 'renoteMutingsRepository' | 'renoteMutingEntityService'>) {
+	return createApiProcedure<Actor>()(relationshipsContract["renote-mute/list"]).use(requirePrincipal<Actor>())
+		.handler(async ({ input, context }) => {
+			const ps = input;
+			const me = context.principal;
+			const query = deps.queryService.makePaginationQuery(deps.renoteMutingsRepository.createQueryBuilder('muting'), ps.sinceId, ps.untilId, ps.sinceDate, ps.untilDate)
 				.andWhere('muting.muterId = :meId', { meId: me.id });
 
 			const mutings = await query
 				.limit(ps.limit)
 				.getMany();
-
-			return await this.renoteMutingEntityService.packMany(mutings, me);
+			return (await deps.renoteMutingEntityService.packMany(mutings, me)).map(toPackedRenoteMuting);
 		});
-	}
 }

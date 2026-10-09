@@ -44,7 +44,7 @@ fetchMocker.mockIf(/^\/assets\/locales\/.*\.json$/, async () => {
 	};
 });
 
-const { updateI18n } = await import('@/i18n.js');
+const { updateI18n } = await import('@features/runtime/frontend/i18n.js');
 updateI18n(locales['en-US']);
 
 export const preferState: Record<string, unknown> = {
@@ -69,7 +69,7 @@ for (const key in preferState) {
 }
 
 // XXX: store somehow becomes undefined in vitest?
-vi.mock('@/preferences.js', () => {
+vi.mock('@features/preferences/frontend/preferences.js', () => {
 
 	return {
 		prefer: {

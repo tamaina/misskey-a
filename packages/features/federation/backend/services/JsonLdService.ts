@@ -7,13 +7,13 @@ import * as crypto from 'node:crypto';
 import { promisify } from 'node:util';
 import { Injectable } from '@nestjs/common';
 import { RsaKeyPair } from 'slacc';
-import { HttpRequestService } from '@/core/HttpRequestService.js';
-import { bindThis } from '@/decorators.js';
-import { IdentifiableError } from '@/misc/identifiable-error.js';
-import { CONTEXT, PRELOADED_CONTEXTS } from '@/core/activitypub/misc/contexts.js';
-import { validateContentTypeSetAsJsonLD } from '@/core/activitypub/misc/validator.js';
-import { loadJsonLd } from '@/runtime-dependencies/jsonld.js';
-import type { JsonLdDocument } from '@/runtime-dependencies/jsonld.js';
+import { HttpRequestService } from '@features/runtime/backend/services/HttpRequestService.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
+import { IdentifiableError } from '@features/runtime/backend/errors/identifiable-error.js';
+import { CONTEXT, PRELOADED_CONTEXTS } from '../protocol/misc/contexts.js';
+import { validateContentTypeSetAsJsonLD } from '../protocol/misc/validator.js';
+import { loadJsonLd } from '../runtime-dependencies/jsonld.js';
+import type { JsonLdDocument } from '../runtime-dependencies/jsonld.js';
 import type { JsonLd as JsonLdObject, RemoteDocument } from 'jsonld/jsonld-spec.js';
 
 // RsaSignature2017 implementation is based on https://github.com/transmute-industries/RsaSignature2017

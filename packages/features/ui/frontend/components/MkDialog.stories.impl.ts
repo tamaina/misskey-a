@@ -6,7 +6,8 @@
 import { action } from 'storybook/actions';
 import { expect, userEvent, waitFor, within } from '@storybook/test';
 import type { StoryObj } from '@storybook/vue3';
-import { i18n } from '@/i18n.js';
+import FeatureLocaleMessages from '@features/ui/frontend/ts-messages.vue';
+import { interpolateLocaleParameters } from '@features/runtime/frontend/interpolate-locale-parameters.js';
 import MkDialog from '@features/ui/frontend/components/MkDialog.vue';
 const Base = {
 	render(args) {
@@ -88,17 +89,17 @@ export const DialogWithActions = {
 	...Question,
 	args: {
 		...Question.args,
-		text: i18n.ts.areYouSure,
+		text: FeatureLocaleMessages.$locale.areYouSure,
 		actions: [
 			{
-				text: i18n.ts.yes,
+				text: FeatureLocaleMessages.$locale.yes,
 				primary: true,
 				callback() {
 					action('YES')();
 				},
 			},
 			{
-				text: i18n.ts.no,
+				text: FeatureLocaleMessages.$locale.no,
 				callback() {
 					action('NO')();
 				},
@@ -110,10 +111,10 @@ export const DialogWithDangerActions = {
 	...Warning,
 	args: {
 		...Warning.args,
-		text: i18n.ts.resetAreYouSure,
+		text: FeatureLocaleMessages.$locale.resetAreYouSure,
 		actions: [
 			{
-				text: i18n.ts.yes,
+				text: FeatureLocaleMessages.$locale.yes,
 				danger: true,
 				primary: true,
 				callback() {
@@ -121,7 +122,7 @@ export const DialogWithDangerActions = {
 				},
 			},
 			{
-				text: i18n.ts.no,
+				text: FeatureLocaleMessages.$locale.no,
 				callback() {
 					action('NO')();
 				},
@@ -136,7 +137,7 @@ export const DialogWithInput = {
 		title: 'Hello, world!',
 		text: undefined,
 		input: {
-			placeholder: i18n.ts.inputMessageHere,
+			placeholder: FeatureLocaleMessages.$locale.inputMessageHere,
 			type: 'text',
 			default: null,
 			minLength: 2,
@@ -145,14 +146,14 @@ export const DialogWithInput = {
 	},
 	async play({ canvasElement }) {
 		const canvas = within(canvasElement);
-		await expect(canvasElement).toHaveTextContent(i18n.tsx._dialog.charactersBelow({ current: 0, min: 2 }));
-		const okButton = canvas.getByRole('button', { name: i18n.ts.ok });
+		await expect(canvasElement).toHaveTextContent(interpolateLocaleParameters(FeatureLocaleMessages.$locale._dialog.charactersBelow, { current: 0, min: 2 }));
+		const okButton = canvas.getByRole('button', { name: FeatureLocaleMessages.$locale.ok });
 		await expect(okButton).toBeDisabled();
 		const input = canvas.getByRole<HTMLInputElement>('combobox');
 		await waitFor(() => userEvent.hover(input));
 		await waitFor(() => userEvent.click(input));
 		await waitFor(() => userEvent.type(input, 'M'));
-		await expect(canvasElement).toHaveTextContent(i18n.tsx._dialog.charactersBelow({ current: 1, min: 2 }));
+		await expect(canvasElement).toHaveTextContent(interpolateLocaleParameters(FeatureLocaleMessages.$locale._dialog.charactersBelow, { current: 1, min: 2 }));
 		await waitFor(() => userEvent.type(input, 'i'));
 		await expect(okButton).toBeEnabled();
 	},

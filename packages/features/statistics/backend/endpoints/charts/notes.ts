@@ -3,38 +3,22 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Injectable } from '@nestjs/common';
-import { getJsonSchema } from '@/core/chart/core.js';
-import { Endpoint } from '@/server/api/endpoint-base.js';
-import NotesChart from '@/core/chart/charts/notes.js';
-import { schema } from '@/core/chart/charts/entities/notes.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 
-export const meta = {
-	tags: ['charts', 'notes'],
+import { decodeScalarInput } from '@features/api/backend/transport/middleware.js';
+import { chartNotesContract, chartNotesGetContract } from './notes.contract.js';
+import type { ApiActor } from '@features/api/backend/transport/context.js';
+import type { StatisticsDependencies } from '../../api.implementation.js';
+export function createNotesProcedure<Actor extends ApiActor>(deps: StatisticsDependencies['charts']['notes']) {
+	return createApiProcedure<Actor>()(chartNotesContract)
+		.handler(async ({ input }) => projectChart(await deps.getChart(input.span, input.limit, input.offset ? new Date(input.offset) : null)));
+}
+export function createNotesGetProcedure<Actor extends ApiActor>(deps: StatisticsDependencies['charts']['notes']) {
+	return createApiProcedure<Actor>()(chartNotesGetContract)
+		.use(decodeScalarInput<Actor>({ limit: 'integer', offset: 'integer' }))
+		.handler(async ({ input }) => projectChart(await deps.getChart(input.span, input.limit, input.offset ? new Date(input.offset) : null)));
+}
 
-	res: getJsonSchema(schema),
-
-	allowGet: true,
-	cacheSec: 60 * 60,
-} as const;
-
-export const paramDef = {
-	type: 'object',
-	properties: {
-		span: { type: 'string', enum: ['day', 'hour'] },
-		limit: { type: 'integer', minimum: 1, maximum: 500, default: 30 },
-		offset: { type: 'integer', nullable: true, default: null },
-	},
-	required: ['span'],
-} as const;
-
-@Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
-	constructor(
-		private notesChart: NotesChart,
-	) {
-		super(meta, paramDef, async (ps, me) => {
-			return await this.notesChart.getChart(ps.span, ps.limit, ps.offset ? new Date(ps.offset) : null);
-		});
-	}
+function projectChart(value: Awaited<ReturnType<StatisticsDependencies['charts']['notes']['getChart']>>) {
+	return { local: { total: value.local.total.map(item => item), inc: value.local.inc.map(item => item), dec: value.local.dec.map(item => item), diffs: { normal: value.local.diffs.normal.map(item => item), reply: value.local.diffs.reply.map(item => item), renote: value.local.diffs.renote.map(item => item), withFile: value.local.diffs.withFile.map(item => item) } }, remote: { total: value.remote.total.map(item => item), inc: value.remote.inc.map(item => item), dec: value.remote.dec.map(item => item), diffs: { normal: value.remote.diffs.normal.map(item => item), reply: value.remote.diffs.reply.map(item => item), renote: value.remote.diffs.renote.map(item => item), withFile: value.remote.diffs.withFile.map(item => item) } } };
 }

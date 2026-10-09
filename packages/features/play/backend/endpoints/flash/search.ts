@@ -2,58 +2,29 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
+import { toPackedFlash } from '../../flash.schema.js';
 
-import { Inject, Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
-import { FlashEntityService } from '@/core/entities/FlashEntityService.js';
-import { DI } from '@/di-symbols.js';
-import { FlashService } from '@/core/FlashService.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 
-export const meta = {
-	tags: ['flash'],
-
-	requireCredential: false,
-
-	res: {
-		type: 'array',
-		optional: false, nullable: false,
-		items: {
-			type: 'object',
-			optional: false, nullable: false,
-			ref: 'Flash',
-		},
-	},
-} as const;
-
-export const paramDef = {
-	type: 'object',
-	properties: {
-		query: { type: 'string', minLength: 1, maxLength: 100 },
-		sinceId: { type: 'string', format: 'misskey:id' },
-		untilId: { type: 'string', format: 'misskey:id' },
-		sinceDate: { type: 'integer' },
-		untilDate: { type: 'integer' },
-		limit: { type: 'integer', minimum: 1, maximum: 100, default: 5 },
-	},
-	required: ['query'],
-} as const;
-
-@Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
-	constructor(
-		private flashService: FlashService,
-		private flashEntityService: FlashEntityService,
-	) {
-		super(meta, paramDef, async (ps, me) => {
-			const result = await this.flashService.search(ps.query, {
+import { flashSearchContract } from './search.contract.js';
+import type { FlashEntityService } from '../../serializers/FlashEntityService.js';
+import type { FlashService } from '../../services/FlashService.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+export interface FlashSearchDependencies {
+	flashService: Pick<FlashService, 'search'>;
+	flashEntityService: Pick<FlashEntityService, 'packMany'>;
+}
+export function createFlashSearchProcedure(deps: FlashSearchDependencies) {
+	return createApiProcedure<MiLocalUser>()(flashSearchContract)
+		.handler(async ({ input: ps, context }) => {
+			const me = context.principal;
+			const result = await deps.flashService.search(ps.query, {
 				sinceId: ps.sinceId,
 				untilId: ps.untilId,
 				sinceDate: ps.sinceDate,
 				untilDate: ps.untilDate,
 				limit: ps.limit,
 			});
-
-			return await this.flashEntityService.packMany(result, me);
+			return (await deps.flashEntityService.packMany(result, me)).map(toPackedFlash);
 		});
-	}
 }

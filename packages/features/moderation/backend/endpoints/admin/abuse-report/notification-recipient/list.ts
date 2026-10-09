@@ -2,54 +2,18 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-
-import { Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
-import {
-	AbuseReportNotificationRecipientEntityService,
-} from '@/core/entities/AbuseReportNotificationRecipientEntityService.js';
-import { AbuseReportNotificationService } from '@/core/AbuseReportNotificationService.js';
-
-export const meta = {
-	tags: ['admin', 'abuse-report', 'notification-recipient'],
-
-	requireCredential: true,
-	requireModerator: true,
-	secure: true,
-	kind: 'read:admin:abuse-report:notification-recipient',
-
-	res: {
-		type: 'array',
-		items: {
-			type: 'object',
-			ref: 'AbuseReportNotificationRecipient',
-		},
-	},
-} as const;
-
-export const paramDef = {
-	type: 'object',
-	properties: {
-		method: {
-			type: 'array',
-			items: {
-				type: 'string',
-				enum: ['email', 'webhook'],
-			},
-		},
-	},
-	required: [],
-} as const;
-
-@Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
-	constructor(
-		private abuseReportNotificationService: AbuseReportNotificationService,
-		private abuseReportNotificationRecipientEntityService: AbuseReportNotificationRecipientEntityService,
-	) {
-		super(meta, paramDef, async (ps) => {
-			const recipients = await this.abuseReportNotificationService.fetchRecipients({ method: ps.method });
-			return this.abuseReportNotificationRecipientEntityService.packMany(recipients);
+import { toRecipientWire } from '../../../../public-wire.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import type { ApiActor } from '@features/api/backend/transport/context.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import { moderationContract } from '../../../../api.definition.js';
+import type { ModerationApiDependencies } from '../../../../api.implementation.js';
+export function createAdminAbuseReportNotificationRecipientListProcedure<Actor extends ApiActor>(deps: Pick<ModerationApiDependencies<Actor>, 'abuseReportNotificationService' | 'abuseReportNotificationRecipientEntityService'>) {
+	return createApiProcedure<Actor>()(moderationContract.adminAbuseReportNotificationRecipientList).use(requirePrincipal<Actor>())
+		.handler(async ({ input, context }) => {
+			const ps = input;
+			const me = context.principal;
+			const recipients = await deps.abuseReportNotificationService.fetchRecipients({ method: ps.method });
+			return (await deps.abuseReportNotificationRecipientEntityService.packMany(recipients)).map(toRecipientWire);
 		});
-	}
 }

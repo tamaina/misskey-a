@@ -59,7 +59,7 @@ describe('[シナリオ] ユーザ通報', () => {
 		return res.body;
 	}
 
-	async function createAbuseReport(args?: Partial<entities.UsersReportAbuseRequest>, credential?: UserToken): Promise<entities.EmptyResponse> {
+	async function createAbuseReport(args?: Partial<entities.UsersReportAbuseRequest>, credential?: UserToken): Promise<void> {
 		const res = await api(
 			'users/report-abuse',
 			{
@@ -69,10 +69,11 @@ describe('[シナリオ] ユーザ通報', () => {
 			},
 			credential ?? admin,
 		);
-		return res.body;
+		expect(res.status).toBe(204);
+		expect(res.body).toBeNull();
 	}
 
-	async function resolveAbuseReport(args?: Partial<entities.AdminResolveAbuseUserReportRequest>, credential?: UserToken): Promise<entities.EmptyResponse> {
+	async function resolveAbuseReport(args?: Partial<entities.AdminResolveAbuseUserReportRequest>, credential?: UserToken): Promise<void> {
 		const res = await api(
 			'admin/resolve-abuse-user-report',
 			{
@@ -81,7 +82,8 @@ describe('[シナリオ] ユーザ通報', () => {
 			},
 			credential ?? admin,
 		);
-		return res.body;
+		expect(res.status).toBe(204);
+		expect(res.body).toBeNull();
 	}
 
 	// -------------------------------------------------------------------------------------------

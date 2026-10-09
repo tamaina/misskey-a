@@ -7,19 +7,19 @@ import { Inject, Injectable } from '@nestjs/common';
 import { ModuleRef } from '@nestjs/core';
 import { In } from 'typeorm';
 import { DI } from '@/di-symbols.js';
-import type { FollowRequestsRepository, NotesRepository, MiUser, UsersRepository } from '@/models/_.js';
-import { awaitAll } from '@/misc/prelude/await-all.js';
-import type { MiGroupedNotification, MiNotification } from '@/models/Notification.js';
-import type { MiNote } from '@/models/Note.js';
-import type { Packed } from '@/misc/json-schema.js';
-import { bindThis } from '@/decorators.js';
-import { FilterUnionByProperty, groupedNotificationTypes } from '@/types.js';
-import { CacheService } from '@/core/CacheService.js';
-import { RoleEntityService } from '@/core/entities/RoleEntityService.js';
-import { ChatEntityService } from '@/core/entities/ChatEntityService.js';
+import type { FollowRequestsRepository, NotesRepository, MiUser, UsersRepository } from '@features/persistence/backend/repositories/models.js';
+import { awaitAll } from '@features/runtime/backend/async/await-all.js';
+import type { MiGroupedNotification, MiNotification } from '../models/Notification.js';
+import type { MiNote } from '@features/notes/backend/models/Note.js';
+import type { Packed } from '@features/index/backend/packed.schema.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
+import { FilterUnionByProperty, groupedNotificationTypes } from '@features/runtime/backend/types.js';
+import { CacheService } from '@features/users/backend/services/CacheService.js';
+import { RoleEntityService } from '@features/roles/backend/serializers/RoleEntityService.js';
+import { ChatEntityService } from '@features/chat/backend/serializers/ChatEntityService.js';
 import type { OnModuleInit } from '@nestjs/common';
-import type { UserEntityService } from '@/core/entities/UserEntityService.js';
-import type { NoteEntityService } from '@/core/entities/NoteEntityService.js';
+import type { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
+import type { NoteEntityService } from '@features/notes/backend/serializers/NoteEntityService.js';
 
 const NOTE_REQUIRED_NOTIFICATION_TYPES = new Set([
 	'note',
@@ -102,30 +102,44 @@ export class NotificationEntityService implements OnModuleInit {
 		// if the user has been deleted, don't show this notification
 		if (needsUser && !userIfNeed) return null;
 
+		const packedBase = {
+			id: notification.id,
+			createdAt: new Date(notification.createdAt).toISOString(),
+		};
+		const packedCommon = {
+			...packedBase,
+			// Every notifier-bearing branch supplies its narrowed notifierId below.
+			userId: undefined,
+			...(userIfNeed != null ? { user: userIfNeed } : {}),
+			...(noteIfNeed != null ? { note: noteIfNeed } : {}),
+		};
+
 		//#region Grouped notifications
 		if (notification.type === 'reaction:grouped') {
+			if (noteIfNeed == null) return null;
 			const reactions = (await Promise.all(notification.reactions.map(async reaction => {
 				const user = hint?.packedUsers != null
-					? hint.packedUsers.get(reaction.userId)!
+					? hint.packedUsers.get(reaction.userId)
 					: await this.userEntityService.pack(reaction.userId, { id: meId });
+				if (user == null) return null;
 				return {
 					user,
 					reaction: reaction.reaction,
 				};
-			}))).filter(r => r.user != null);
+			}))).filter(r => r != null);
 			// if all users have been deleted, don't show this notification
 			if (reactions.length === 0) {
 				return null;
 			}
 
 			return await awaitAll({
-				id: notification.id,
-				createdAt: new Date(notification.createdAt).toISOString(),
+				...packedBase,
 				type: notification.type,
 				note: noteIfNeed,
 				reactions,
 			});
 		} else if (notification.type === 'renote:grouped') {
+			if (noteIfNeed == null) return null;
 			const users = (await Promise.all(notification.userIds.map(userId => {
 				const packedUser = hint?.packedUsers != null ? hint.packedUsers.get(userId) : null;
 				if (packedUser) {
@@ -140,67 +154,130 @@ export class NotificationEntityService implements OnModuleInit {
 			}
 
 			return await awaitAll({
-				id: notification.id,
-				createdAt: new Date(notification.createdAt).toISOString(),
+				...packedBase,
 				type: notification.type,
 				note: noteIfNeed,
 				users,
 			});
 		}
 		//#endregion
-
-		const needsRole = notification.type === 'roleAssigned';
-		const role = needsRole ? await this.roleEntityService.pack(notification.roleId) : undefined;
-		// if the role has been deleted, don't show this notification
-		if (needsRole && !role) {
-			return null;
+		switch (notification.type) {
+			case 'note':
+			case 'mention':
+			case 'reply':
+			case 'renote':
+			case 'quote':
+			case 'reaction':
+			case 'pollEnded':
+			case 'scheduledNotePosted': {
+				if (noteIfNeed == null) return null;
+				if (notification.type === 'scheduledNotePosted') {
+					return await awaitAll({
+						...packedCommon,
+						type: 'scheduledNotePosted' as const,
+						note: noteIfNeed,
+					});
+				}
+				if (userIfNeed == null) return null;
+				if (notification.type === 'reaction') {
+					return await awaitAll({
+						...packedCommon,
+						type: 'reaction' as const,
+						user: userIfNeed,
+						userId: notification.notifierId,
+						note: noteIfNeed,
+						reaction: notification.reaction,
+					});
+				}
+				return await awaitAll({
+					...packedCommon,
+					type: notification.type,
+					user: userIfNeed,
+					userId: notification.notifierId,
+					note: noteIfNeed,
+				});
+			}
+			case 'scheduledNotePostFailed':
+				return await awaitAll({
+					...packedCommon,
+					type: 'scheduledNotePostFailed' as const,
+				});
+			case 'follow':
+			case 'receiveFollowRequest': {
+				if (userIfNeed == null) return null;
+				return await awaitAll({
+					...packedCommon,
+					type: notification.type,
+					user: userIfNeed,
+					userId: notification.notifierId,
+				});
+			}
+			case 'followRequestAccepted': {
+				if (userIfNeed == null) return null;
+				return await awaitAll({
+					...packedCommon,
+					type: 'followRequestAccepted' as const,
+					user: userIfNeed,
+					userId: notification.notifierId,
+					message: notification.message,
+				});
+			}
+			case 'roleAssigned': {
+				const role = await this.roleEntityService.pack(notification.roleId);
+				if (role == null) return null;
+				return await awaitAll({
+					...packedCommon,
+					type: 'roleAssigned' as const,
+					role,
+				});
+			}
+			case 'chatRoomInvitationReceived': {
+				if (userIfNeed == null) return null;
+				const invitation = await this.chatEntityService.packRoomInvitation(notification.invitationId, { id: meId }).catch(() => null);
+				if (invitation == null) return null;
+				return await awaitAll({
+					...packedCommon,
+					type: 'chatRoomInvitationReceived' as const,
+					user: userIfNeed,
+					userId: notification.notifierId,
+					invitation,
+				});
+			}
+			case 'achievementEarned':
+				return await awaitAll({
+					...packedCommon,
+					type: 'achievementEarned' as const,
+					achievement: notification.achievement,
+				});
+			case 'exportCompleted':
+				return await awaitAll({
+					...packedCommon,
+					type: 'exportCompleted' as const,
+					exportedEntity: notification.exportedEntity,
+					fileId: notification.fileId,
+				});
+			case 'app':
+				return await awaitAll({
+					...packedCommon,
+					type: 'app' as const,
+					body: notification.customBody,
+					header: notification.customHeader,
+					icon: notification.customIcon,
+				});
+			case 'login':
+			case 'createToken':
+			case 'test':
+				return await awaitAll({
+					...packedCommon,
+					type: notification.type,
+				});
 		}
-
-		const needsChatRoomInvitation = notification.type === 'chatRoomInvitationReceived';
-		const chatRoomInvitation = needsChatRoomInvitation ? await this.chatEntityService.packRoomInvitation(notification.invitationId, { id: meId }).catch(() => null) : undefined;
-		// if the invitation has been deleted, don't show this notification
-		if (needsChatRoomInvitation && !chatRoomInvitation) {
-			return null;
-		}
-
-		return await awaitAll({
-			id: notification.id,
-			createdAt: new Date(notification.createdAt).toISOString(),
-			type: notification.type,
-			userId: 'notifierId' in notification ? notification.notifierId : undefined,
-			...(userIfNeed != null ? { user: userIfNeed } : {}),
-			...(noteIfNeed != null ? { note: noteIfNeed } : {}),
-			...(notification.type === 'reaction' ? {
-				reaction: notification.reaction,
-			} : {}),
-			...(notification.type === 'roleAssigned' ? {
-				role: role,
-			} : {}),
-			...(notification.type === 'chatRoomInvitationReceived' ? {
-				invitation: chatRoomInvitation,
-			} : {}),
-			...(notification.type === 'followRequestAccepted' ? {
-				message: notification.message,
-			} : {}),
-			...(notification.type === 'achievementEarned' ? {
-				achievement: notification.achievement,
-			} : {}),
-			...(notification.type === 'exportCompleted' ? {
-				exportedEntity: notification.exportedEntity,
-				fileId: notification.fileId,
-			} : {}),
-			...(notification.type === 'app' ? {
-				body: notification.customBody,
-				header: notification.customHeader,
-				icon: notification.customIcon,
-			} : {}),
-		});
 	}
 
 	async #packManyInternal <T extends MiNotification | MiGroupedNotification>	(
 		notifications: T[],
 		meId: MiUser['id'],
-	): Promise<T[]> {
+	): Promise<Packed<'Notification'>[]> {
 		if (notifications.length === 0) return [];
 
 		let validNotifications = notifications;
@@ -257,7 +334,7 @@ export class NotificationEntityService implements OnModuleInit {
 			);
 		});
 
-		return (await Promise.all(packPromises)).filter(x => x != null);
+		return (await Promise.all(packPromises)).filter((x): x is Packed<'Notification'> => x != null);
 	}
 
 	@bindThis
@@ -280,7 +357,7 @@ export class NotificationEntityService implements OnModuleInit {
 	public async packMany(
 		notifications: MiNotification[],
 		meId: MiUser['id'],
-	): Promise<MiNotification[]> {
+	): Promise<Packed<'Notification'>[]> {
 		return await this.#packManyInternal(notifications, meId);
 	}
 
@@ -288,7 +365,7 @@ export class NotificationEntityService implements OnModuleInit {
 	public async packGroupedMany(
 		notifications: MiGroupedNotification[],
 		meId: MiUser['id'],
-	): Promise<MiGroupedNotification[]> {
+	): Promise<Packed<'Notification'>[]> {
 		return await this.#packManyInternal(notifications, meId);
 	}
 

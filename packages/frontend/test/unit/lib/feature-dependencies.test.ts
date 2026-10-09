@@ -35,7 +35,7 @@ test('does not force host versions on transitive package imports', async () => {
 	expect(resolver).not.toHaveBeenCalled();
 });
 
-test.each(['./child.vue', '/asset.png', '@/store.js', '@@/locale.js', '@features/ui/frontend', 'node:crypto', 'virtual:locales', 'https://example.test/module.js', '\0virtual'])('leaves non-package specifier %s to existing resolvers', async source => {
+test.each(['./child.vue', '/asset.png', '@features/preferences/frontend/store.js', '@@/locale.js', '@features/ui/frontend', 'node:crypto', 'virtual:locales', 'https://example.test/module.js', '\0virtual'])('leaves non-package specifier %s to existing resolvers', async source => {
 	const { run, resolver } = setup();
 	expect(await run(source, `${features}/ui/frontend/example.ts`)).toBeNull();
 	expect(resolver).not.toHaveBeenCalled();

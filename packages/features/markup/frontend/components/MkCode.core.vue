@@ -19,7 +19,7 @@ import { computed, ref, watch } from 'vue';
 import { bundledLanguagesInfo } from 'shiki/langs';
 import type { BundledLanguage } from 'shiki/langs';
 import { getHighlighter, getTheme } from '@features/markup/frontend/utility/code-highlighter.js';
-import { store } from '@/store.js';
+import { store } from '@features/preferences/frontend/store.js';
 
 const props = withDefaults(defineProps<{
 	code: string;

@@ -6,7 +6,7 @@
 import type { AdditionalStyle } from '@features/ui/frontend/components/grid/grid.js';
 import type { GridCell } from '@features/ui/frontend/components/grid/cell.js';
 import type { GridColumn } from '@features/ui/frontend/components/grid/column.js';
-import type { MenuItem } from '@/types/menu.js';
+import type { MenuItem } from '@features/navigation/frontend/types/menu.js';
 import type { GridContext } from '@features/ui/frontend/components/grid/grid-event.js';
 
 export const defaultGridRowSetting: Required<GridRowSetting> = {

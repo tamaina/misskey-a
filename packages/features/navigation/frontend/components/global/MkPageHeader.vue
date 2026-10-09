@@ -41,8 +41,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts">
-import type { PageHeaderItem } from '@/types/page-header.js';
-import type { PageMetadata } from '@/page.js';
+import type { PageHeaderItem } from '@features/navigation/frontend/types/page-header.js';
+import type { PageMetadata } from '@features/navigation/frontend/page.js';
 import type { Tab } from '@features/navigation/frontend/components/global/MkPageHeader.tabs.vue';
 
 export type PageHeaderProps = {
@@ -59,13 +59,13 @@ export type PageHeaderProps = {
 
 <script lang="ts" setup>
 import { onMounted, onUnmounted, ref, inject, useTemplateRef, computed } from 'vue';
-import { scrollToTop } from '@@/js/scroll.js';
+import { scrollToTop } from '@features/ui/frontend/shared/scroll.js';
 import XTabs from '@features/navigation/frontend/components/global/MkPageHeader.tabs.vue';
-import { getAccountMenu } from '@/accounts.js';
+import { getAccountMenu } from '@features/auth/frontend/accounts.js';
 import { deviceKind } from '@features/ui/frontend/utility/device-kind.js';
-import { $i } from '@/i.js';
-import { DI } from '@/di.js';
-import * as os from '@/os.js';
+import { $i } from '@features/auth/frontend/i.js';
+import { DI } from '@features/ui/frontend/di.js';
+import * as os from '@features/ui/frontend/os.js';
 
 const props = withDefaults(defineProps<PageHeaderProps>(), {
 	tabs: () => ([] as Tab[]),

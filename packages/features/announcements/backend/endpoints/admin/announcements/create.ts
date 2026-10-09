@@ -3,90 +3,23 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
-import { AnnouncementService } from '@/core/AnnouncementService.js';
+import { toPackedAnnouncement } from '../../../api.dto.js';
 
-export const meta = {
-	tags: ['admin'],
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 
-	requireCredential: true,
-	requireModerator: true,
-	kind: 'write:admin:announcements',
-
-	res: {
-		type: 'object',
-		optional: false, nullable: false,
-		properties: {
-			id: {
-				type: 'string',
-				optional: false, nullable: false,
-				format: 'id',
-				example: 'xxxxxxxxxx',
-			},
-			createdAt: {
-				type: 'string',
-				optional: false, nullable: false,
-				format: 'date-time',
-			},
-			updatedAt: {
-				type: 'string',
-				optional: false, nullable: true,
-				format: 'date-time',
-			},
-			title: {
-				type: 'string',
-				optional: false, nullable: false,
-			},
-			text: {
-				type: 'string',
-				optional: false, nullable: false,
-			},
-			imageUrl: {
-				type: 'string',
-				optional: false, nullable: true,
-			},
-		},
-	},
-} as const;
-
-export const paramDef = {
-	type: 'object',
-	properties: {
-		title: { type: 'string', minLength: 1 },
-		text: { type: 'string', minLength: 1 },
-		imageUrl: { type: 'string', nullable: true, minLength: 0 },
-		icon: { type: 'string', enum: ['info', 'warning', 'error', 'success'], default: 'info' },
-		display: { type: 'string', enum: ['normal', 'banner', 'dialog'], default: 'normal' },
-		forExistingUsers: { type: 'boolean', default: false },
-		silence: { type: 'boolean', default: false },
-		needConfirmationToRead: { type: 'boolean', default: false },
-		userId: { type: 'string', format: 'misskey:id', nullable: true, default: null },
-	},
-	required: ['title', 'text', 'imageUrl'],
-} as const;
-
-@Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
-	constructor(
-		private announcementService: AnnouncementService,
-	) {
-		super(meta, paramDef, async (ps, me) => {
-			const { packed } = await this.announcementService.create({
-				updatedAt: null,
-				title: ps.title,
-				text: ps.text,
-				/* eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing -- 空の文字列の場合、nullを渡すようにするため */
-				imageUrl: ps.imageUrl || null,
-				icon: ps.icon,
-				display: ps.display,
-				forExistingUsers: ps.forExistingUsers,
-				silence: ps.silence,
-				needConfirmationToRead: ps.needConfirmationToRead,
-				userId: ps.userId,
-			}, me);
-
-			return packed;
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import type { ApiActor } from '@features/api/backend/transport/context.js';
+import { announcementsContract } from '../../../api.definition.js';
+import type { AnnouncementsDependencies } from '../../../api.implementation.js';
+export interface AnnouncementCreateDependencies<Actor extends ApiActor> {
+	announcementService: Pick<AnnouncementsDependencies<Actor>['announcementService'], 'create'>;
+}
+export function createAnnouncementCreateProcedure<Actor extends ApiActor>(deps: AnnouncementCreateDependencies<Actor>) {
+	return createApiProcedure<Actor>()(announcementsContract.create)
+		.use(requirePrincipal<Actor>())
+		.handler(async ({ input, context }) => {
+			const actor = context.principal;
+			const { packed } = await deps.announcementService.create({ ...input, updatedAt: null, imageUrl: input.imageUrl || null }, actor);
+			return toPackedAnnouncement(packed);
 		});
-	}
 }

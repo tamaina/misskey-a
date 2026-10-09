@@ -35,6 +35,8 @@ allowBuilds:
   pnpm: true
 minimumReleaseAge: 10080 # delay 7days to mitigate supply-chain attack
 minimumReleaseAgeExclude:
+  # Owner-approved VVI 1.1.5 release; exact-version exception only.
+  - vite-vue-internationalization@1.1.5
   - '@misskey-dev/*'
   - '@syuilo/aiscript'
   - buraha

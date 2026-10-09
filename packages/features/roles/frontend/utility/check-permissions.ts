@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { instance } from '@/instance.js';
-import { $i } from '@/i.js';
+import { instance } from '@features/instance/frontend/instance.js';
+import { $i } from '@features/auth/frontend/i.js';
 
 export const notesSearchAvailable = (
 	// FIXME: instance.policies would be null in Vitest

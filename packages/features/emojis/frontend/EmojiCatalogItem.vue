@@ -14,13 +14,13 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import type { EmojiSimple } from '../contract/index.js';
-import type { MenuItem } from '@/types/menu.js';
-import * as os from '@/os.js';
-import { misskeyApiGet } from '@/utility/misskey-api.js';
+import type { EmojiSimple } from '../backend/api.definition.js';
+import type { MenuItem } from '@features/navigation/frontend/types/menu.js';
+import * as os from '@features/ui/frontend/os.js';
+import { misskeyApiGet } from '@features/api/frontend/utility/misskey-api.js';
 import { copyToClipboard } from '@features/ui/frontend/utility/copy-to-clipboard.js';
 import MkCustomEmojiDetailedDialog from '@features/emojis/frontend/components/MkCustomEmojiDetailedDialog.vue';
-import { $i } from '@/i.js';
+import { $i } from '@features/auth/frontend/i.js';
 
 const props = defineProps<{
 	emoji: EmojiSimple;

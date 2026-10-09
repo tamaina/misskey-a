@@ -24,8 +24,32 @@
 		"useDefineForClassFields": true,
 		"verbatimModuleSyntax": true,
 		"paths": {
-			"@/*": ["./src/*"],
-			"@@/*": ["../frontend-shared/*"]
+			"vite-vue-internationalization/runtime": ["./node_modules/vite-vue-internationalization/dist/runtime.d.ts"],
+			"@/*": [
+				"./src/*"
+			],
+			"shiki/themes": [
+				"./node_modules/shiki/dist/themes.d.mts"
+			],
+			"@@/*": [
+				"../frontend-shared/*"
+			],
+			"@features/*": [
+				"../features/*/index.ts",
+				"../features/*"
+			],
+			"vue": [
+				"./node_modules/vue"
+			],
+			"misskey-js": [
+				"./node_modules/misskey-js"
+			],
+			"i18n": [
+				"./node_modules/i18n"
+			],
+			"shiki/*": [
+				"./node_modules/shiki/dist/*"
+			]
 		},
 		"typeRoots": [
 			"./@types",
@@ -43,13 +67,20 @@
 		],
 		"jsx": "preserve"
 	},
+	"vueCompilerOptions": {
+		"plugins": [{ "name": "vite-vue-internationalization/volar", "primaryLocale": "ja-JP" }]
+	},
 	"compileOnSave": false,
 	"include": [
 		"./src/**/*.ts",
 		"./src/**/*.vue",
-		"./@types/**/*.ts"
+		"./@types/**/*.ts",
+		"../features/*/frontend/embed/**/*.ts",
+		"../features/*/frontend/embed/**/*.vue",
+		"../frontend-shared/@types/global.d.ts"
 	],
 	"exclude": [
-		".storybook/**/*"
+		".storybook/**/*",
+		"../features/*/frontend/embed/workers/**/*.ts"
 	]
 }

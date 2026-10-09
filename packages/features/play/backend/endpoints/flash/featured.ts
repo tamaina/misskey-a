@@ -2,51 +2,26 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
+import { toPackedFlash } from '../../flash.schema.js';
 
-import { Inject, Injectable } from '@nestjs/common';
-import type { FlashsRepository } from '@/models/_.js';
-import { Endpoint } from '@/server/api/endpoint-base.js';
-import { FlashEntityService } from '@/core/entities/FlashEntityService.js';
-import { DI } from '@/di-symbols.js';
-import { FlashService } from '@/core/FlashService.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 
-export const meta = {
-	tags: ['flash'],
-
-	requireCredential: false,
-
-	res: {
-		type: 'array',
-		optional: false, nullable: false,
-		items: {
-			type: 'object',
-			optional: false, nullable: false,
-			ref: 'Flash',
-		},
-	},
-} as const;
-
-export const paramDef = {
-	type: 'object',
-	properties: {
-		offset: { type: 'integer', minimum: 0, default: 0 },
-		limit: { type: 'integer', minimum: 1, maximum: 100, default: 10 },
-	},
-	required: [],
-} as const;
-
-@Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
-	constructor(
-		private flashService: FlashService,
-		private flashEntityService: FlashEntityService,
-	) {
-		super(meta, paramDef, async (ps, me) => {
-			const result = await this.flashService.featured({
+import { flashFeaturedContract } from './featured.contract.js';
+import type { FlashEntityService } from '../../serializers/FlashEntityService.js';
+import type { FlashService } from '../../services/FlashService.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+export interface FlashFeaturedDependencies {
+	flashService: Pick<FlashService, 'featured'>;
+	flashEntityService: Pick<FlashEntityService, 'packMany'>;
+}
+export function createFlashFeaturedProcedure(deps: FlashFeaturedDependencies) {
+	return createApiProcedure<MiLocalUser>()(flashFeaturedContract)
+		.handler(async ({ input: ps, context }) => {
+			const me = context.principal;
+			const result = await deps.flashService.featured({
 				offset: ps.offset,
 				limit: ps.limit,
 			});
-			return await this.flashEntityService.packMany(result, me);
+			return (await deps.flashEntityService.packMany(result, me)).map(toPackedFlash);
 		});
-	}
 }

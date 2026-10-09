@@ -138,7 +138,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<div class="_spacer">
 					<MkInput
 						v-model="searchQuery"
-						:placeholder="i18n.ts.search"
+						:placeholder="$locale.sfc.search"
 						type="search"
 						style="margin-bottom: 16px;"
 					>
@@ -171,16 +171,15 @@ SPDX-License-Identifier: AGPL-3.0-only
 import { ref, computed, watch } from 'vue';
 import * as Misskey from 'misskey-js';
 import { debounce } from 'throttle-debounce';
-import { useInterval } from '@@/js/use-interval.js';
+import { useInterval } from '@features/ui/frontend/shared/use-interval.js';
 import XChart from '@features/operations/frontend/pages/admin/job-queue.chart.vue';
 import XJob from '@features/operations/frontend/pages/admin/job-queue.job.vue';
-import * as os from '@/os.js';
-import { i18n } from '@/i18n.js';
-import { definePage } from '@/page.js';
+import * as os from '@features/ui/frontend/os.js';
+import { definePage } from '@features/navigation/frontend/page.js';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
-import { misskeyApi } from '@/utility/misskey-api.js';
+import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 import MkTabs from '@features/ui/frontend/components/MkTabs.vue';
-import MkFolder from '@/components/MkFolder.vue';
+import MkFolder from '@features/ui/frontend/components/MkFolder.vue';
 import MkKeyValue from '@features/ui/frontend/components/MkKeyValue.vue';
 import MkTl from '@features/ui/frontend/components/MkTl.vue';
 import kmg from '@features/ui/frontend/filters/kmg.js';
@@ -263,7 +262,7 @@ async function clearQueue() {
 
 	const { canceled } = await os.confirm({
 		type: 'warning',
-		title: i18n.ts.areYouSure,
+		title: $locale.value.sfc.areYouSure,
 	});
 	if (canceled) return;
 
@@ -278,7 +277,7 @@ async function promoteAllJobs() {
 
 	const { canceled } = await os.confirm({
 		type: 'warning',
-		title: i18n.ts.areYouSure,
+		title: $locale.value.sfc.areYouSure,
 	});
 	if (canceled) return;
 
@@ -293,7 +292,7 @@ async function pauseQueue() {
 
 	const { canceled } = await os.confirm({
 		type: 'warning',
-		title: i18n.ts.areYouSure,
+		title: $locale.value.sfc.areYouSure,
 	});
 	if (canceled) return;
 
@@ -317,7 +316,7 @@ async function removeJobs() {
 
 	const { canceled } = await os.confirm({
 		type: 'warning',
-		title: i18n.ts.areYouSure,
+		title: $locale.value.sfc.areYouSure,
 	});
 	if (canceled) return;
 
@@ -344,7 +343,7 @@ const headerTabs = computed<{
 	icon?: string;
 }[]>(() => [{
 	key: '-',
-	title: i18n.ts.jobQueue,
+	title: $locale.value.sfc.jobQueue,
 	icon: 'ti ti-list-check',
 }, ...Misskey.queueTypes.map((q) => ({
 	key: q,
@@ -352,7 +351,7 @@ const headerTabs = computed<{
 }))]);
 
 definePage(() => ({
-	title: i18n.ts.jobQueue,
+	title: $locale.value.sfc.jobQueue,
 	icon: 'ti ti-clock-play',
 	needWideArea: true,
 }));
@@ -380,3 +379,227 @@ definePage(() => ({
 	margin: 6px 0;
 }
 </style>
+
+<locale locale="ar-SA" lang="json">
+{
+	"search": "البحث",
+	"areYouSure": "Are you sure?",
+	"jobQueue": "قائمة الانتظار"
+}
+</locale>
+
+<locale locale="ca-ES" lang="json">
+{
+	"search": "Cercar",
+	"areYouSure": "Estàs segur?",
+	"jobQueue": "Cua de feines"
+}
+</locale>
+
+<locale locale="cs-CZ" lang="json">
+{
+	"search": "Vyhledávání",
+	"areYouSure": "Jste si jistí?",
+	"jobQueue": "Fronta úloh"
+}
+</locale>
+
+<locale locale="da-DK" lang="json">
+{
+	"search": "Search",
+	"areYouSure": "Are you sure?",
+	"jobQueue": "Job Queue"
+}
+</locale>
+
+<locale locale="de-DE" lang="json">
+{
+	"search": "Suchen",
+	"areYouSure": "Bist du sicher?",
+	"jobQueue": "Job-Warteschlange"
+}
+</locale>
+
+<locale locale="en-US" lang="json">
+{
+	"search": "Search",
+	"areYouSure": "Are you sure?",
+	"jobQueue": "Job Queue"
+}
+</locale>
+
+<locale locale="es-ES" lang="json">
+{
+	"search": "Buscar",
+	"areYouSure": "¿Estás conforme?",
+	"jobQueue": "Cola de trabajos"
+}
+</locale>
+
+<locale locale="fr-FR" lang="json">
+{
+	"search": "Rechercher",
+	"areYouSure": "Êtes-vous sûr·e ?",
+	"jobQueue": "File d’attente"
+}
+</locale>
+
+<locale locale="id-ID" lang="json">
+{
+	"search": "Cari",
+	"areYouSure": "Apakah kamu yakin?",
+	"jobQueue": "Antrian kerja"
+}
+</locale>
+
+<locale locale="it-IT" lang="json">
+{
+	"search": "Cerca",
+	"areYouSure": "Confermi?",
+	"jobQueue": "Coda di lavoro"
+}
+</locale>
+
+<locale locale="ja-JP" lang="json">
+{
+	"search": "検索",
+	"areYouSure": "よろしいですか？",
+	"jobQueue": "ジョブキュー"
+}
+</locale>
+
+<locale locale="ja-KS" lang="json">
+{
+	"search": "探す",
+	"areYouSure": "いいん？",
+	"jobQueue": "ジョブキュー"
+}
+</locale>
+
+<locale locale="kab-KAB" lang="json">
+{
+	"search": "Nadi",
+	"areYouSure": "Are you sure?",
+	"jobQueue": "Job Queue"
+}
+</locale>
+
+<locale locale="kn-IN" lang="json">
+{
+	"search": "ಹುಡುಕು",
+	"areYouSure": "Are you sure?",
+	"jobQueue": "Job Queue"
+}
+</locale>
+
+<locale locale="ko-KR" lang="json">
+{
+	"search": "검색",
+	"areYouSure": "계속 진행하시겠습니까?",
+	"jobQueue": "작업 대기열"
+}
+</locale>
+
+<locale locale="nl-NL" lang="json">
+{
+	"search": "Zoeken",
+	"areYouSure": "Weet je het zeker?",
+	"jobQueue": "Job Queue"
+}
+</locale>
+
+<locale locale="no-NO" lang="json">
+{
+	"search": "Søk",
+	"areYouSure": "Are you sure?",
+	"jobQueue": "Job Queue"
+}
+</locale>
+
+<locale locale="pl-PL" lang="json">
+{
+	"search": "Szukaj",
+	"areYouSure": "Na pewno?",
+	"jobQueue": "Kolejka zadań"
+}
+</locale>
+
+<locale locale="pt-PT" lang="json">
+{
+	"search": "Pesquisar",
+	"areYouSure": "Tem certeza?",
+	"jobQueue": "Fila de tarefas"
+}
+</locale>
+
+<locale locale="ru-RU" lang="json">
+{
+	"search": "Поиск",
+	"areYouSure": "Вы уверены?",
+	"jobQueue": "Очередь заданий"
+}
+</locale>
+
+<locale locale="sk-SK" lang="json">
+{
+	"search": "Hľadať",
+	"areYouSure": "Are you sure?",
+	"jobQueue": "Fronta úloh"
+}
+</locale>
+
+<locale locale="th-TH" lang="json">
+{
+	"search": "ค้นหา",
+	"areYouSure": "แน่ใจแล้วใช่ไหมคะ?",
+	"jobQueue": "คิวงาน"
+}
+</locale>
+
+<locale locale="tr-TR" lang="json">
+{
+	"search": "Ara",
+	"areYouSure": "Emin misin?",
+	"jobQueue": "İşlem sırası"
+}
+</locale>
+
+<locale locale="ug-CN" lang="json">
+{
+	"search": "ئىزدەش",
+	"areYouSure": "Are you sure?",
+	"jobQueue": "Job Queue"
+}
+</locale>
+
+<locale locale="uk-UA" lang="json">
+{
+	"search": "Пошук",
+	"areYouSure": "Ви впевнені?",
+	"jobQueue": "Черга завдань"
+}
+</locale>
+
+<locale locale="vi-VN" lang="json">
+{
+	"search": "Tìm kiếm",
+	"areYouSure": "Bạn chắc chứ?",
+	"jobQueue": "Công việc chờ xử lý"
+}
+</locale>
+
+<locale locale="zh-CN" lang="json">
+{
+	"search": "搜索",
+	"areYouSure": "你确定吗？",
+	"jobQueue": "作业队列"
+}
+</locale>
+
+<locale locale="zh-TW" lang="json">
+{
+	"search": "搜尋",
+	"areYouSure": "是否確定？",
+	"jobQueue": "工作佇列"
+}
+</locale>

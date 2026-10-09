@@ -4,7 +4,7 @@
  */
 
 import { describe, expect, test } from 'vitest';
-import { contentDisposition } from '@/misc/content-disposition.js';
+import { contentDisposition } from '@features/drive/backend/utility/content-disposition.js';
 
 describe('misc:content-disposition', () => {
 	test('inline', () => {

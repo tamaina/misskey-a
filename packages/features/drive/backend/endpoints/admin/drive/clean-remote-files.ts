@@ -3,31 +3,22 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
-import { QueueService } from '@/core/QueueService.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+import { QueueService } from '@features/runtime/backend/services/QueueService.js';
+import { driveManagementContract } from '../../../api.definition.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
 
-export const meta = {
-	tags: ['admin'],
-
-	requireCredential: true,
-	requireModerator: true,
-	kind: 'write:admin:drive',
-} as const;
-
-export const paramDef = {
-	type: 'object',
-	properties: {},
-	required: [],
-} as const;
-
-@Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
-	constructor(
-		private queueService: QueueService,
-	) {
-		super(meta, paramDef, async (ps, me) => {
-			this.queueService.createCleanRemoteFilesJob();
+export interface AdminDriveCleanRemoteFilesDependencies {
+	queueService: Pick<QueueService, 'createCleanRemoteFilesJob'>;
+}
+export function createAdminDriveCleanRemoteFilesProcedure(deps: AdminDriveCleanRemoteFilesDependencies) {
+	return createApiProcedure<MiLocalUser>()(driveManagementContract['admin/drive/clean-remote-files']).use(requirePrincipal<MiLocalUser>())
+		.handler(async ({ input, context }) => {
+			const _ps = input;
+			const _me = context.principal;
+			const _ip = context.ip;
+			const _headers = context.headers;
+			deps.queueService.createCleanRemoteFilesJob();
 		});
-	}
 }

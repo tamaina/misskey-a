@@ -5,13 +5,13 @@
 
 import { errors, utils, values } from '@syuilo/aiscript';
 import * as Misskey from 'misskey-js';
-import { url, lang } from '@@/js/config.js';
+import { url, lang } from '@features/boot/frontend/shared/config.js';
 import { assertStringAndIsIn } from '@features/play/frontend/services/aiscript/common.js';
-import * as os from '@/os.js';
-import { misskeyApi } from '@/utility/misskey-api.js';
-import { $i } from '@/i.js';
-import { miLocalStorage } from '@/local-storage.js';
-import { customEmojis } from '@/custom-emojis.js';
+import * as os from '@features/ui/frontend/os.js';
+import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
+import { $i } from '@features/auth/frontend/i.js';
+import { miLocalStorage } from '@features/preferences/frontend/local-storage.js';
+import { customEmojis } from '@features/emojis/frontend/custom-emojis.js';
 
 const DIALOG_TYPES = [
 	'error',

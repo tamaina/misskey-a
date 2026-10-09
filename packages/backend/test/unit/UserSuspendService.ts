@@ -11,22 +11,22 @@ import type { Mocked } from 'vitest';
 import { Test } from '@nestjs/testing';
 import { setTimeout } from 'node:timers/promises';
 import type { TestingModule } from '@nestjs/testing';
-import { GlobalModule } from '@/GlobalModule.js';
-import { UserSuspendService } from '@/core/UserSuspendService.js';
+import { GlobalModule } from '@features/boot/backend/assembly/GlobalModule.js';
+import { UserSuspendService } from '@features/moderation/backend/services/UserSuspendService.js';
 import {
 	MiFollowing,
 	MiUser,
 	FollowingsRepository,
 	FollowRequestsRepository,
 	UsersRepository,
-} from '@/models/_.js';
+} from '@features/persistence/backend/repositories/models.js';
 import { DI } from '@/di-symbols.js';
-import { UserEntityService } from '@/core/entities/UserEntityService.js';
-import { QueueService } from '@/core/QueueService.js';
-import { GlobalEventService } from '@/core/GlobalEventService.js';
-import { ApRendererService } from '@/core/activitypub/ApRendererService.js';
-import { ModerationLogService } from '@/core/ModerationLogService.js';
-import { secureRndstr } from '@/misc/secure-rndstr.js';
+import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
+import { QueueService } from '@features/runtime/backend/services/QueueService.js';
+import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
+import { ApRendererService } from '@features/federation/backend/services/ApRendererService.js';
+import { ModerationLogService } from '@features/moderation/backend/services/ModerationLogService.js';
+import { secureRndstr } from '@features/auth/backend/utility/secure-rndstr.js';
 import { randomString } from '../utils.js';
 
 function genHost() {

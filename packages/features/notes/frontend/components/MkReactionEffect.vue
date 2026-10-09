@@ -13,7 +13,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import { onMounted, ref } from 'vue';
-import * as os from '@/os.js';
+import * as os from '@features/ui/frontend/os.js';
 import MkReactionIcon from '@features/notes/frontend/components/MkReactionIcon.vue';
 
 const props = withDefaults(defineProps<{

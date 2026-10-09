@@ -8,16 +8,16 @@ import { Inject, Injectable } from '@nestjs/common';
 import { MoreThan } from 'typeorm';
 import { format as dateFormat } from 'date-fns';
 import { DI } from '@/di-symbols.js';
-import type { UsersRepository, BlockingsRepository, MiBlocking } from '@/models/_.js';
-import type Logger from '@/logger.js';
-import { DriveService } from '@/core/DriveService.js';
-import { createTemp } from '@/misc/create-temp.js';
-import { UtilityService } from '@/core/UtilityService.js';
-import { NotificationService } from '@/core/NotificationService.js';
-import { bindThis } from '@/decorators.js';
-import { QueueLoggerService } from '@/queue/QueueLoggerService.js';
+import type { UsersRepository, BlockingsRepository, MiBlocking } from '@features/persistence/backend/repositories/models.js';
+import type { Logger } from '@features/runtime/backend/logging/logger.js';
+import { DriveService } from '@features/drive/backend/services/DriveService.js';
+import { createTemp } from '@features/runtime/backend/io/create-temp.js';
+import { UtilityService } from '@features/federation/backend/services/UtilityService.js';
+import { NotificationService } from '@features/notifications/backend/services/NotificationService.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
+import { QueueLoggerService } from '@features/runtime/backend/queue/QueueLoggerService.js';
 import type * as Bull from 'bullmq';
-import type { DbJobDataWithUser } from '@/queue/types.js';
+import type { DbJobDataWithUser } from '@features/runtime/backend/queue/types.js';
 
 @Injectable()
 export class ExportBlockingProcessorService {

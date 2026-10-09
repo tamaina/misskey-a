@@ -3,42 +3,25 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Injectable } from '@nestjs/common';
-import ms from '@/runtime-dependencies/ms.js';
-import { Endpoint } from '@/server/api/endpoint-base.js';
-import { ApPersonService } from '@/core/activitypub/models/ApPersonService.js';
-import { GetterService } from '@/server/api/GetterService.js';
-
-export const meta = {
-	tags: ['federation'],
-
-	requireCredential: true,
-	kind: 'read:account',
-
-	limit: {
-		duration: ms('1hour'),
-		max: 30,
-	},
-} as const;
-
-export const paramDef = {
-	type: 'object',
-	properties: {
-		userId: { type: 'string', format: 'misskey:id' },
-	},
-	required: ['userId'],
-} as const;
-
-@Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
-	constructor(
-		private getterService: GetterService,
-		private apPersonService: ApPersonService,
-	) {
-		super(meta, paramDef, async (ps) => {
-			const user = await this.getterService.getRemoteUser(ps.userId);
-
-			await this.apPersonService.updatePerson(user.uri!);
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import { requirePrincipal } from '../../../../api/backend/transport/middleware.js';
+import type { ApiActor } from '../../../../api/backend/transport/context.js';
+import { federationUpdateRemoteUserContract } from './update-remote-user.contract.js';
+import type { ApPersonService } from '../../services/ApPersonService.js';
+import type { GetterService } from '../../../../api/backend/transport/GetterService.js';
+export interface FederationUpdateRemoteUserDependencies {
+	getterService: Pick<GetterService, 'getRemoteUser'>;
+	apPersonService: Pick<ApPersonService, 'updatePerson'>;
+}
+export function createFederationUpdateRemoteUserProcedure<Actor extends ApiActor>(deps: FederationUpdateRemoteUserDependencies) {
+	return createApiProcedure<Actor>()(federationUpdateRemoteUserContract)
+		.use(requirePrincipal<Actor>())
+		.handler(async ({ input }) => {
+			const ps = input;
+			const result = await (async () => {
+				const user = await deps.getterService.getRemoteUser(ps.userId);
+				await deps.apPersonService.updatePerson(user.uri!);
+			})();
+			return result;
 		});
-	}
 }

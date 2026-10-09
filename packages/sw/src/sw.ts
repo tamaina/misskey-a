@@ -7,7 +7,7 @@ import { get } from 'idb-keyval';
 import * as Misskey from 'misskey-js';
 import { FETCH_TIMEOUT_MS } from '@/const.js';
 import type { PushNotificationDataMap } from '@/types.js';
-import type { I18n } from '@@/js/i18n.js';
+import type { I18n } from '@features/runtime/frontend/shared/i18n.js';
 import type { Locale } from 'i18n';
 import { createEmptyNotification, createNotification } from '@/scripts/create-notification.js';
 import { swLang } from '@/scripts/lang.js';
@@ -145,7 +145,7 @@ globalThis.addEventListener('notificationclick', (ev: ServiceWorkerGlobalScopeEv
 			case 'notification':
 				switch (action) {
 					case 'follow':
-						if ('userId' in data.body) await swos.api('following/create', loginId, { userId: data.body.userId });
+						if ('userId' in data.body && typeof data.body.userId === 'string') await swos.api('following/create', loginId, { userId: data.body.userId });
 						break;
 					case 'showUser':
 						if ('user' in data.body) client = await swos.openUser(Misskey.acct.toString(data.body.user), loginId);

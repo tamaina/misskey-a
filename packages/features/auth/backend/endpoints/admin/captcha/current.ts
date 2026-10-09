@@ -2,69 +2,31 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import { CaptchaService } from '../../../services/CaptchaService.js';
+import { AdminCaptchaCurrentContract } from '../../../api.definition.js';
 
-import { Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
-import { CaptchaService, supportedCaptchaProviders } from '@/core/CaptchaService.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
 
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
 export const meta = {
 	tags: ['admin', 'captcha'],
 
-	requireCredential: true,
-	requireAdmin: true,
-
 	// 実態はmetaの取得であるため
-	kind: 'read:admin:meta',
 
-	res: {
-		type: 'object',
-		properties: {
-			provider: {
-				type: 'string',
-				enum: supportedCaptchaProviders,
-			},
-			hcaptcha: {
-				type: 'object',
-				properties: {
-					siteKey: { type: 'string', nullable: true },
-					secretKey: { type: 'string', nullable: true },
-				},
-			},
-			mcaptcha: {
-				type: 'object',
-				properties: {
-					siteKey: { type: 'string', nullable: true },
-					secretKey: { type: 'string', nullable: true },
-					instanceUrl: { type: 'string', nullable: true },
-				},
-			},
-			recaptcha: {
-				type: 'object',
-				properties: {
-					siteKey: { type: 'string', nullable: true },
-					secretKey: { type: 'string', nullable: true },
-				},
-			},
-			turnstile: {
-				type: 'object',
-				properties: {
-					siteKey: { type: 'string', nullable: true },
-					secretKey: { type: 'string', nullable: true },
-				},
-			},
-		},
-	},
 } as const;
-
-export const paramDef = {} as const;
-
-@Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
-	constructor(
-		private captchaService: CaptchaService,
-	) {
-		super(meta, paramDef, async () => {
-			return this.captchaService.get();
-		});
-	}
+export interface AdminCaptchaCurrentDependencies {
+	captchaService: Pick<CaptchaService, 'get'>;
+}
+export function createAdminCaptchaCurrentProcedure(deps: AdminCaptchaCurrentDependencies) {
+	return createApiProcedure<MiLocalUser>()(AdminCaptchaCurrentContract).use(requirePrincipal<MiLocalUser>()).handler(async ({ input, context }) => {
+		const result = await (async () => {
+			return deps.captchaService.get();
+		})();
+		return { provider: result.provider,
+			hcaptcha: { siteKey: result.hcaptcha.siteKey, secretKey: result.hcaptcha.secretKey },
+			mcaptcha: { siteKey: result.mcaptcha.siteKey, secretKey: result.mcaptcha.secretKey, instanceUrl: result.mcaptcha.instanceUrl },
+			recaptcha: { siteKey: result.recaptcha.siteKey, secretKey: result.recaptcha.secretKey },
+			turnstile: { siteKey: result.turnstile.siteKey, secretKey: result.turnstile.secretKey } };
+	});
 }

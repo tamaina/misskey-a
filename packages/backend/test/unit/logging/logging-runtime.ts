@@ -4,9 +4,9 @@
  */
 
 import { afterEach, describe, expect, test, vi } from 'vitest';
-import { JsonConsoleBackend } from '@/logging/JsonConsoleBackend.js';
-import { logManager, configureLogging } from '@/logging/logging-runtime.js';
-import { PrettyConsoleBackend } from '@/logging/PrettyConsoleBackend.js';
+import { JsonConsoleBackend } from '@features/runtime/backend/logging/JsonConsoleBackend.js';
+import { logManager, configureLogging } from '@features/runtime/backend/logging/logging-runtime.js';
+import { PrettyConsoleBackend } from '@features/runtime/backend/logging/PrettyConsoleBackend.js';
 
 describe('logging-runtime', () => {
 	afterEach(() => {

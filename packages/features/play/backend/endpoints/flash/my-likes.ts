@@ -2,62 +2,26 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
+import { toPackedFlash } from '../../flash.schema.js';
 
-import { Inject, Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
-import { FlashLikeEntityService } from '@/core/entities/FlashLikeEntityService.js';
-import { DI } from '@/di-symbols.js';
-import { FlashService } from '@/core/FlashService.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 
-export const meta = {
-	tags: ['account', 'flash'],
+import { requirePrincipal } from '../../../../api/backend/transport/middleware.js';
 
-	requireCredential: true,
-
-	kind: 'read:flash-likes',
-
-	res: {
-		type: 'array',
-		optional: false, nullable: false,
-		items: {
-			type: 'object',
-			properties: {
-				id: {
-					type: 'string',
-					optional: false, nullable: false,
-					format: 'id',
-				},
-				flash: {
-					type: 'object',
-					optional: false, nullable: false,
-					ref: 'Flash',
-				},
-			},
-		},
-	},
-} as const;
-
-export const paramDef = {
-	type: 'object',
-	properties: {
-		limit: { type: 'integer', minimum: 1, maximum: 100, default: 10 },
-		sinceId: { type: 'string', format: 'misskey:id' },
-		untilId: { type: 'string', format: 'misskey:id' },
-		sinceDate: { type: 'integer' },
-		untilDate: { type: 'integer' },
-		search: { type: 'string', minLength: 1, maxLength: 100, nullable: true },
-	},
-	required: [],
-} as const;
-
-@Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
-	constructor(
-		private flashLikeEntityService: FlashLikeEntityService,
-		private flashService: FlashService,
-	) {
-		super(meta, paramDef, async (ps, me) => {
-			const likes = await this.flashService.myLikes(me.id, {
+import { flashMyLikesContract } from './my-likes.contract.js';
+import type { FlashLikeEntityService } from '../../serializers/FlashLikeEntityService.js';
+import type { FlashService } from '../../services/FlashService.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+export interface FlashMyLikesDependencies {
+	flashLikeEntityService: Pick<FlashLikeEntityService, 'packMany'>;
+	flashService: Pick<FlashService, 'myLikes'>;
+}
+export function createFlashMyLikesProcedure(deps: FlashMyLikesDependencies) {
+	return createApiProcedure<MiLocalUser>()(flashMyLikesContract)
+		.use(requirePrincipal<MiLocalUser>())
+		.handler(async ({ input: ps, context }) => {
+			const me = context.principal;
+			const likes = await deps.flashService.myLikes(me.id, {
 				sinceId: ps.sinceId,
 				untilId: ps.untilId,
 				sinceDate: ps.sinceDate,
@@ -65,8 +29,6 @@ export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDe
 				limit: ps.limit,
 				search: ps.search,
 			});
-
-			return this.flashLikeEntityService.packMany(likes, me);
+			return (await deps.flashLikeEntityService.packMany(likes, me)).map(like => ({ id: like.id, flash: toPackedFlash(like.flash) }));
 		});
-	}
 }

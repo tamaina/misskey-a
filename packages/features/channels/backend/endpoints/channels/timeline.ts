@@ -3,120 +3,42 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Inject, Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
-import type { ChannelsRepository, MiMeta, NotesRepository } from '@/models/_.js';
-import { QueryService } from '@/core/QueryService.js';
-import { NoteEntityService } from '@/core/entities/NoteEntityService.js';
-import ActiveUsersChart from '@/core/chart/charts/active-users.js';
-import { DI } from '@/di-symbols.js';
-import { IdService } from '@/core/IdService.js';
-import { FanoutTimelineEndpointService } from '@/core/FanoutTimelineEndpointService.js';
-import { MiLocalUser } from '@/models/User.js';
-import { ChannelMutingService } from '@/core/ChannelMutingService.js';
-import { ApiError } from '@/server/api/error.js';
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
+import { channelsTimelineContract, channelsTimelineErrors } from './timeline.contract.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+import type { ChannelsRepository, MiMeta, NotesRepository } from '@features/persistence/backend/repositories/models.js';
+import { toPackedNote } from '@features/notes/backend/note.schema.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+
+import { type QueryService } from '@features/notes/backend/services/QueryService.js';
+import { type NoteEntityService } from '@features/notes/backend/serializers/NoteEntityService.js';
+import { type ActiveUsersChart } from '@features/statistics/backend/charts/active-users.js';
+import { type IdService } from '@features/runtime/backend/services/IdService.js';
+import { type FanoutTimelineEndpointService } from '@features/timelines/backend/services/FanoutTimelineEndpointService.js';
 import { Brackets } from 'typeorm';
 
-export const meta = {
-	tags: ['notes', 'channels'],
+import { type ChannelMutingService } from '../../services/ChannelMutingService.js';
 
-	requireCredential: false,
-
-	res: {
-		type: 'array',
-		optional: false, nullable: false,
-		items: {
-			type: 'object',
-			optional: false, nullable: false,
-			ref: 'Note',
-		},
-	},
-
-	errors: {
-		noSuchChannel: {
-			message: 'No such channel.',
-			code: 'NO_SUCH_CHANNEL',
-			id: '4d0eeeba-a02c-4c3c-9966-ef60d38d2e7f',
-		},
-	},
-} as const;
-
-export const paramDef = {
-	type: 'object',
-	properties: {
-		channelId: { type: 'string', format: 'misskey:id' },
-		limit: { type: 'integer', minimum: 1, maximum: 100, default: 10 },
-		sinceId: { type: 'string', format: 'misskey:id' },
-		untilId: { type: 'string', format: 'misskey:id' },
-		sinceDate: { type: 'integer' },
-		untilDate: { type: 'integer' },
-		allowPartial: { type: 'boolean', default: false }, // true is recommended but for compatibility false by default
-	},
-	required: ['channelId'],
-} as const;
-
-@Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
-	constructor(
-		@Inject(DI.meta)
-		private serverSettings: MiMeta,
-
-		@Inject(DI.notesRepository)
-		private notesRepository: NotesRepository,
-
-		@Inject(DI.channelsRepository)
-		private channelsRepository: ChannelsRepository,
-
-		private idService: IdService,
-		private noteEntityService: NoteEntityService,
-		private queryService: QueryService,
-		private fanoutTimelineEndpointService: FanoutTimelineEndpointService,
-		private activeUsersChart: ActiveUsersChart,
-		private channelMutingService: ChannelMutingService,
-	) {
-		super(meta, paramDef, async (ps, me) => {
-			const untilId = ps.untilId ?? (ps.untilDate ? this.idService.gen(ps.untilDate!) : null);
-			const sinceId = ps.sinceId ?? (ps.sinceDate ? this.idService.gen(ps.sinceDate!) : null);
-
-			const channel = await this.channelsRepository.findOneBy({
-				id: ps.channelId,
-			});
-
-			if (channel == null) {
-				throw new ApiError(meta.errors.noSuchChannel);
-			}
-
-			if (me) this.activeUsersChart.read(me);
-
-			if (!this.serverSettings.enableFanoutTimeline) {
-				return await this.noteEntityService.packMany(await this.getFromDb({ untilId, sinceId, limit: ps.limit, channelId: channel.id }, me), me);
-			}
-
-			return await this.fanoutTimelineEndpointService.timeline({
-				untilId,
-				sinceId,
-				limit: ps.limit,
-				allowPartial: ps.allowPartial,
-				me,
-				useDbFallback: true,
-				redisTimelines: [`channelTimeline:${channel.id}`],
-				excludePureRenotes: false,
-				ignoreAuthorChannelFromMute: true,
-				dbFallback: async (untilId, sinceId, limit) => {
-					return await this.getFromDb({ untilId, sinceId, limit, channelId: channel.id }, me);
-				},
-			});
-		});
-	}
-
-	private async getFromDb(ps: {
+export interface ChannelsTimelineDependencies {
+	serverSettings: MiMeta;
+	notesRepository: NotesRepository;
+	channelsRepository: ChannelsRepository;
+	idService: IdService;
+	noteEntityService: NoteEntityService;
+	queryService: QueryService;
+	fanoutTimelineEndpointService: FanoutTimelineEndpointService;
+	activeUsersChart: ActiveUsersChart;
+	channelMutingService: ChannelMutingService;
+}
+export function createChannelsTimelineProcedure<Actor extends MiLocalUser>(deps: ChannelsTimelineDependencies) {
+	async function getFromDb(ps: {
 		untilId: string | null,
 		sinceId: string | null,
 		limit: number,
 		channelId: string
 	}, me: MiLocalUser | null) {
 		//#region fallback to database
-		const query = this.queryService.makePaginationQuery(this.notesRepository.createQueryBuilder('note'), ps.sinceId, ps.untilId)
+		const query = deps.queryService.makePaginationQuery(deps.notesRepository.createQueryBuilder('note'), ps.sinceId, ps.untilId)
 			.andWhere('note.channelId = :channelId', { channelId: ps.channelId })
 			.innerJoinAndSelect('note.user', 'user')
 			.leftJoinAndSelect('note.reply', 'reply')
@@ -125,11 +47,11 @@ export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDe
 			.leftJoinAndSelect('renote.user', 'renoteUser')
 			.leftJoinAndSelect('note.channel', 'channel');
 
-		this.queryService.generateBaseNoteFilteringQuery(query, me);
-		if (me == null) this.queryService.generateUgcVisibilityQueryForVisitor(query);
+		deps.queryService.generateBaseNoteFilteringQuery(query, me);
+		if (me == null) deps.queryService.generateUgcVisibilityQueryForVisitor(query);
 
 		if (me) {
-			const mutingChannelIds = await this.channelMutingService
+			const mutingChannelIds = await deps.channelMutingService
 				.list({ requestUserId: me.id }, { idOnly: true })
 				.then(x => x.map(x => x.id).filter(x => x !== ps.channelId));
 			if (mutingChannelIds.length > 0) {
@@ -144,4 +66,36 @@ export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDe
 
 		return await query.limit(ps.limit).getMany();
 	}
+
+	return createApiProcedure<Actor>()(channelsTimelineContract)
+		.handler(async ({ input, context }) => {
+			const ps = input;
+			const me = context.principal;
+			const untilId = ps.untilId ?? (ps.untilDate ? deps.idService.gen(ps.untilDate!) : null);
+			const sinceId = ps.sinceId ?? (ps.sinceDate ? deps.idService.gen(ps.sinceDate!) : null);
+			const channel = await deps.channelsRepository.findOneBy({
+				id: ps.channelId,
+			});
+			if (channel == null) {
+				throw apiError(channelsTimelineErrors.noSuchChannel);
+			}
+			if (me) deps.activeUsersChart.read(me);
+			if (!deps.serverSettings.enableFanoutTimeline) {
+				return (await deps.noteEntityService.packMany(await getFromDb({ untilId, sinceId, limit: ps.limit, channelId: channel.id }, me), me)).map(toPackedNote);
+			}
+			return (await deps.fanoutTimelineEndpointService.timeline({
+				untilId,
+				sinceId,
+				limit: ps.limit,
+				allowPartial: ps.allowPartial,
+				me,
+				useDbFallback: true,
+				redisTimelines: [`channelTimeline:${channel.id}`],
+				excludePureRenotes: false,
+				ignoreAuthorChannelFromMute: true,
+				dbFallback: async (untilId, sinceId, limit) => {
+					return await getFromDb({ untilId, sinceId, limit, channelId: channel.id }, me);
+				},
+			})).map(toPackedNote);
+		});
 }

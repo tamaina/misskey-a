@@ -8,7 +8,7 @@ import { ref } from 'vue';
 import * as Misskey from 'misskey-js';
 import { assertStringAndIsIn } from '@features/play/frontend/services/aiscript/common.js';
 import type { Ref } from 'vue';
-import { genId } from '@/utility/id.js';
+import { genId } from '@features/runtime/frontend/utility/id.js';
 
 const ALIGNS = ['left', 'center', 'right'] as const;
 const FONTS = ['serif', 'sans-serif', 'monospace'] as const;

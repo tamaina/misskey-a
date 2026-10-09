@@ -44,7 +44,7 @@ import type { MkPaginationOptions } from '../../../ui/frontend/components/MkPagi
 import type { IPaginator } from '@features/ui/frontend/utility/paginator.js';
 import MkNote from '@features/notes/frontend/components/MkNote.vue';
 import MkPagination from '../../../ui/frontend/components/MkPagination.vue';
-import { useGlobalEvent } from '@/events.js';
+import { useGlobalEvent } from '@features/runtime/frontend/events.js';
 import { isSeparatorNeeded, getSeparatorInfo } from '@features/timelines/frontend/utility/timeline-date-separate.js';
 
 const props = withDefaults(defineProps<MkPaginationOptions & {

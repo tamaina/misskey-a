@@ -7,17 +7,18 @@ import * as fs from 'node:fs';
 import { Inject, Injectable } from '@nestjs/common';
 import { IsNull } from 'typeorm';
 import { format as dateFormat } from 'date-fns';
-import { mime, ZipArchive } from '@/queue/archive-dependencies.js';
+import { ZipArchive } from 'archiver';
+import mime from 'mime-types';
 import { DI } from '@/di-symbols.js';
-import type { EmojisRepository, UsersRepository } from '@/models/_.js';
+import type { EmojisRepository, UsersRepository } from '@features/persistence/backend/repositories/models.js';
 import type { Config } from '@/config.js';
-import type Logger from '@/logger.js';
-import { DriveService } from '@/core/DriveService.js';
-import { createTemp, createTempDir } from '@/misc/create-temp.js';
-import { DownloadService } from '@/core/DownloadService.js';
-import { NotificationService } from '@/core/NotificationService.js';
-import { bindThis } from '@/decorators.js';
-import { QueueLoggerService } from '@/queue/QueueLoggerService.js';
+import type { Logger } from '@features/runtime/backend/logging/logger.js';
+import { DriveService } from '@features/drive/backend/services/DriveService.js';
+import { createTemp, createTempDir } from '@features/runtime/backend/io/create-temp.js';
+import { DownloadService } from '@features/runtime/backend/services/DownloadService.js';
+import { NotificationService } from '@features/notifications/backend/services/NotificationService.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
+import { QueueLoggerService } from '@features/runtime/backend/queue/QueueLoggerService.js';
 import type * as Bull from 'bullmq';
 
 @Injectable()

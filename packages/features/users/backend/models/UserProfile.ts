@@ -4,11 +4,11 @@
  */
 
 import { Entity, Column, Index, OneToOne, JoinColumn, PrimaryColumn } from 'typeorm';
-import { obsoleteNotificationTypes, followingVisibilities, followersVisibilities, notificationTypes } from '@/types.js';
-import { id } from '@/models/util/id.js';
+import { obsoleteNotificationTypes, followingVisibilities, followersVisibilities, notificationTypes } from '@features/runtime/backend/types.js';
+import { id } from '@features/persistence/backend/models/util/id.js';
 import { MiUser } from './User.js';
-import { MiPage } from '@/models/Page.js';
-import { MiUserList } from '@/models/UserList.js';
+import { MiPage } from '@features/pages/backend/models/Page.js';
+import { MiUserList } from '@features/relationships/backend/models/UserList.js';
 
 // TODO: このテーブルで管理している情報すべてレジストリで管理するようにしても良いかも
 //       ただ、「emailVerified が true なユーザーを find する」のようなクエリは書けなくなるからウーン
@@ -172,6 +172,12 @@ export class MiUserProfile {
 		default: false,
 	})
 	public autoAcceptFollowed: boolean;
+
+	@Column('integer', { nullable: true })
+	public followApprovalLocalSeconds: number | null;
+
+	@Column('integer', { nullable: true })
+	public followApprovalRemoteSeconds: number | null;
 
 	@Column('boolean', {
 		default: false,

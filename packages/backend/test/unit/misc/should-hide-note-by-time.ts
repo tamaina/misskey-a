@@ -5,7 +5,7 @@
 
 import { describe, expect, test, beforeEach, afterEach } from 'vitest';
 import * as lolex from '@sinonjs/fake-timers';
-import { shouldHideNoteByTime } from '@/misc/should-hide-note-by-time.js';
+import { shouldHideNoteByTime } from '@features/notes/backend/utility/should-hide-note-by-time.js';
 
 describe('misc:should-hide-note-by-time', () => {
 	let clock: lolex.Clock;

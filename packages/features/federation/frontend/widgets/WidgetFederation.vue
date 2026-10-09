@@ -6,7 +6,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 <template>
 <MkContainer :showHeader="widgetProps.showHeader" data-testid="mkw-federation" class="mkw-federation">
 	<template #icon><i class="ti ti-whirl"></i></template>
-	<template #header>{{ i18n.ts._widgets.federation }}</template>
+	<template #header>{{ $locale.sfc.federation }}</template>
 
 	<div class="wbrkwalb">
 		<MkLoading v-if="fetching"/>
@@ -27,23 +27,22 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script lang="ts" setup>
 import { ref } from 'vue';
 import * as Misskey from 'misskey-js';
-import { useInterval } from '@@/js/use-interval.js';
-import { useWidgetPropsManager } from '../../../../frontend/src/widgets/widget.js';
-import type { WidgetComponentEmits, WidgetComponentExpose, WidgetComponentProps } from '../../../../frontend/src/widgets/widget.js';
+import { useInterval } from '@features/ui/frontend/shared/use-interval.js';
+import { useWidgetPropsManager } from '../../../ui/frontend/widgets/widget.js';
+import type { WidgetComponentEmits, WidgetComponentExpose, WidgetComponentProps } from '../../../ui/frontend/widgets/widget.js';
 import type { FormWithDefault, GetFormResultType } from '@features/ui/frontend/utility/form.js';
 import MkContainer from '@features/ui/frontend/components/MkContainer.vue';
 import MkMiniChart from '@features/statistics/frontend/components/MkMiniChart.vue';
-import { misskeyApi, misskeyApiGet } from '@/utility/misskey-api.js';
-import { i18n } from '@/i18n.js';
-import { getProxiedImageUrlNullable } from '@/utility/media-proxy.js';
-import { prefer } from '@/preferences.js';
+import { misskeyApi, misskeyApiGet } from '@features/api/frontend/utility/misskey-api.js';
+import { getProxiedImageUrlNullable } from '@features/drive/frontend/utility/media-proxy.js';
+import { prefer } from '@features/preferences/frontend/preferences.js';
 
 const name = 'federation';
 
 const widgetPropsDef = {
 	showHeader: {
 		type: 'boolean',
-		label: i18n.ts._widgetOptions.showHeader,
+		label: $locale.value.sfc.showHeader,
 		default: true,
 	},
 } satisfies FormWithDefault;
@@ -152,3 +151,199 @@ defineExpose<WidgetComponentExpose>({
 	}
 }
 </style>
+
+<locale locale="ar-SA" lang="json">
+{
+	"federation": "الفديرالية",
+	"showHeader": "Show header"
+}
+</locale>
+
+<locale locale="ca-ES" lang="json">
+{
+	"federation": "Federació",
+	"showHeader": "Mostrar la capçalera"
+}
+</locale>
+
+<locale locale="cs-CZ" lang="json">
+{
+	"federation": "Federace",
+	"showHeader": "Show header"
+}
+</locale>
+
+<locale locale="da-DK" lang="json">
+{
+	"federation": "Federation",
+	"showHeader": "Show header"
+}
+</locale>
+
+<locale locale="de-DE" lang="json">
+{
+	"federation": "Föderation",
+	"showHeader": "Kopfzeile anzeigen"
+}
+</locale>
+
+<locale locale="en-US" lang="json">
+{
+	"federation": "Federation",
+	"showHeader": "Show header"
+}
+</locale>
+
+<locale locale="es-ES" lang="json">
+{
+	"federation": "Federación",
+	"showHeader": "Mostrar encabezados"
+}
+</locale>
+
+<locale locale="fr-FR" lang="json">
+{
+	"federation": "Fédération",
+	"showHeader": "Show header"
+}
+</locale>
+
+<locale locale="id-ID" lang="json">
+{
+	"federation": "Federasi",
+	"showHeader": "Show header"
+}
+</locale>
+
+<locale locale="it-IT" lang="json">
+{
+	"federation": "Federazione",
+	"showHeader": "Mostra la testata"
+}
+</locale>
+
+<locale locale="ja-JP" lang="json">
+{
+	"federation": "連合",
+	"showHeader": "ヘッダーを表示"
+}
+</locale>
+
+<locale locale="ja-KS" lang="json">
+{
+	"federation": "連合",
+	"showHeader": "ヘッダー出す"
+}
+</locale>
+
+<locale locale="kab-KAB" lang="json">
+{
+	"federation": "Federation",
+	"showHeader": "Show header"
+}
+</locale>
+
+<locale locale="kn-IN" lang="json">
+{
+	"federation": "Federation",
+	"showHeader": "Show header"
+}
+</locale>
+
+<locale locale="ko-KR" lang="json">
+{
+	"federation": "연합",
+	"showHeader": "해더를 표시"
+}
+</locale>
+
+<locale locale="nl-NL" lang="json">
+{
+	"federation": "Federatie",
+	"showHeader": "Show header"
+}
+</locale>
+
+<locale locale="no-NO" lang="json">
+{
+	"federation": "Føderasjon",
+	"showHeader": "Show header"
+}
+</locale>
+
+<locale locale="pl-PL" lang="json">
+{
+	"federation": "Federacja",
+	"showHeader": "Show header"
+}
+</locale>
+
+<locale locale="pt-PT" lang="json">
+{
+	"federation": "Federação",
+	"showHeader": "Exibir cabeçalho"
+}
+</locale>
+
+<locale locale="ru-RU" lang="json">
+{
+	"federation": "Федерация",
+	"showHeader": "Show header"
+}
+</locale>
+
+<locale locale="sk-SK" lang="json">
+{
+	"federation": "Federácia",
+	"showHeader": "Show header"
+}
+</locale>
+
+<locale locale="th-TH" lang="json">
+{
+	"federation": "สหพันธ์",
+	"showHeader": "แสดงส่วนหัว"
+}
+</locale>
+
+<locale locale="tr-TR" lang="json">
+{
+	"federation": "Federasyon",
+	"showHeader": "Başlığı göster"
+}
+</locale>
+
+<locale locale="ug-CN" lang="json">
+{
+	"federation": "Federation",
+	"showHeader": "Show header"
+}
+</locale>
+
+<locale locale="uk-UA" lang="json">
+{
+	"federation": "Федіверс",
+	"showHeader": "Show header"
+}
+</locale>
+
+<locale locale="vi-VN" lang="json">
+{
+	"federation": "Liên hợp",
+	"showHeader": "Show header"
+}
+</locale>
+
+<locale locale="zh-CN" lang="json">
+{
+	"federation": "联邦",
+	"showHeader": "显示标题"
+}
+</locale>
+
+<locale locale="zh-TW" lang="json">
+{
+	"federation": "聯邦宇宙",
+	"showHeader": "檢視標頭 "
+}
+</locale>

@@ -9,7 +9,10 @@
 		"removeComments": false
 	},
 	"include": [
-		"../features/*/contract/**/*.ts"
+		"../features/api/shared/api-routing.ts",
+		"../features/**/*.contract.ts",
+		"../features/**/api.definition.ts",
+		"../features/**/*.schema.ts"
 	],
 	"exclude": []
 }

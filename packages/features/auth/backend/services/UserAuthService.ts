@@ -3,24 +3,18 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Inject, Injectable } from '@nestjs/common';
-import * as Redis from 'ioredis';
-import * as OTPAuth from 'otpauth';
 import { createHash } from 'node:crypto';
-import { DI } from '@/di-symbols.js';
-import type { MiUserProfile, UserProfilesRepository, UsersRepository } from '@/models/_.js';
-import { bindThis } from '@/decorators.js';
+import * as OTPAuth from 'otpauth';
+import type { MiUserProfile, UserProfilesRepository, UsersRepository } from '@features/persistence/backend/repositories/models.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
+import type * as Redis from 'ioredis';
 
-@Injectable()
 export class UserAuthService {
 	constructor(
-		@Inject(DI.redis)
 		private redisClient: Redis.Redis,
 
-		@Inject(DI.usersRepository)
 		private usersRepository: UsersRepository,
 
-		@Inject(DI.userProfilesRepository)
 		private userProfilesRepository: UserProfilesRepository,
 	) {
 	}

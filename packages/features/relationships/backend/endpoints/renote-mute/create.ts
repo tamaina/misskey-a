@@ -2,95 +2,24 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 
-import { Inject, Injectable } from '@nestjs/common';
-import ms from '@/runtime-dependencies/ms.js';
-import { Endpoint } from '@/server/api/endpoint-base.js';
-import { DI } from '@/di-symbols.js';
-import { GetterService } from '@/server/api/GetterService.js';
-import { ApiError } from '@/server/api/error.js';
-import { UserRenoteMutingService } from "@/core/UserRenoteMutingService.js";
-import type { RenoteMutingsRepository } from '@/models/_.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import { relationshipsContract } from '../relationships.contract.js';
+import type { RelationshipsDependencies } from '../../api.implementation.js';
 
-export const meta = {
-	tags: ['account'],
-
-	requireCredential: true,
-	prohibitMoved: true,
-
-	kind: 'write:mutes',
-
-	limit: {
-		duration: ms('1hour'),
-		max: 20,
-	},
-
-	errors: {
-		noSuchUser: {
-			message: 'No such user.',
-			code: 'NO_SUCH_USER',
-			id: '5e0a5dff-1e94-4202-87ae-4d9c89eb2271',
-		},
-
-		muteeIsYourself: {
-			message: 'Mutee is yourself.',
-			code: 'MUTEE_IS_YOURSELF',
-			id: '37285718-52f7-4aef-b7de-c38b8e8a8420',
-		},
-
-		alreadyMuting: {
-			message: 'You are already muting that user.',
-			code: 'ALREADY_MUTING',
-			id: 'ccfecbe4-1f1c-4fc2-8a3d-c3ffee61cb7b',
-		},
-	},
-} as const;
-
-export const paramDef = {
-	type: 'object',
-	properties: {
-		userId: { type: 'string', format: 'misskey:id' },
-	},
-	required: ['userId'],
-} as const;
-
-@Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
-	constructor(
-		@Inject(DI.renoteMutingsRepository)
-		private renoteMutingsRepository: RenoteMutingsRepository,
-
-		private getterService: GetterService,
-		private userRenoteMutingService: UserRenoteMutingService,
-	) {
-		super(meta, paramDef, async (ps, me) => {
-			const muter = me;
-
-			// 自分自身
-			if (me.id === ps.userId) {
-				throw new ApiError(meta.errors.muteeIsYourself);
-			}
-
-			// Get mutee
-			const mutee = await this.getterService.getUser(ps.userId).catch(err => {
-				if (err.id === '15348ddd-432d-49c2-8a5a-8069753becff') throw new ApiError(meta.errors.noSuchUser);
-				throw err;
-			});
-
-			// Check if already muting
-			const exist = await this.renoteMutingsRepository.exists({
-				where: {
-					muterId: muter.id,
-					muteeId: mutee.id,
-				},
-			});
-
-			if (exist === true) {
-				throw new ApiError(meta.errors.alreadyMuting);
-			}
-
-			// Create mute
-			await this.userRenoteMutingService.mute(muter, mutee);
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
+import { relationshipsErrors } from '../relationships.errors.js';
+import { getRelationshipUser } from '../relationship-errors.js';
+export function createRenoteMuteCreateProcedure<Actor extends MiLocalUser>(deps: Pick<RelationshipsDependencies, 'getterService' | 'renoteMutingsRepository' | 'userRenoteMutingService'>) {
+	return createApiProcedure<Actor>()(relationshipsContract["renote-mute/create"]).use(requirePrincipal<Actor>())
+		.handler(async ({ input, context }) => {
+			const actor = context.principal;
+			const errors = relationshipsErrors['renote-mute/create'];
+			if (actor.id === input.userId) throw apiError(errors.muteeIsYourself);
+			const mutee = await getRelationshipUser(deps.getterService, input.userId, errors.noSuchUser);
+			if (await deps.renoteMutingsRepository.exists({ where: { muterId: actor.id, muteeId: mutee.id } })) throw apiError(errors.alreadyMuting);
+			await deps.userRenoteMutingService.mute(actor, mutee);
 		});
-	}
 }

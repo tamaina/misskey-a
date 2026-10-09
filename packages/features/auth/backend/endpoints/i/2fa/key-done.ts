@@ -3,21 +3,21 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 import bcrypt from 'bcryptjs';
-import { Inject, Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
-import { UserEntityService } from '@/core/entities/UserEntityService.js';
-import { DI } from '@/di-symbols.js';
-import { GlobalEventService } from '@/core/GlobalEventService.js';
-import type { UserProfilesRepository, UserSecurityKeysRepository } from '@/models/_.js';
-import { WebAuthnService } from '@/core/WebAuthnService.js';
-import { ApiError } from '@/server/api/error.js';
-import { UserAuthService } from '@/core/UserAuthService.js';
+import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
+import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
+import type { UserProfilesRepository, UserSecurityKeysRepository } from '@features/persistence/backend/repositories/models.js';
+import { WebAuthnService } from '../../../services/WebAuthnService.js';
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
+import { UserAuthService } from '../../../services/UserAuthService.js';
+
+import { I2faKeyDoneContract } from '../../../api.definition.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
 
 export const meta = {
-	requireCredential: true,
-
-	secure: true,
 
 	errors: {
 		incorrectPassword: {
@@ -32,47 +32,22 @@ export const meta = {
 			id: '798d6847-b1ed-4f9c-b1f9-163c42655995',
 		},
 	},
-
-	res: {
-		type: 'object',
-		nullable: false,
-		optional: false,
-		properties: {
-			id: { type: 'string' },
-			name: { type: 'string' },
-		},
-	},
 } as const;
-
-export const paramDef = {
-	type: 'object',
-	properties: {
-		password: { type: 'string' },
-		token: { type: 'string', nullable: true },
-		name: { type: 'string', minLength: 1, maxLength: 30 },
-		credential: { type: 'object' },
-	},
-	required: ['password', 'name', 'credential'],
-} as const;
-
-// eslint-disable-next-line import/no-default-export
-@Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
-	constructor(
-		@Inject(DI.userProfilesRepository)
-		private userProfilesRepository: UserProfilesRepository,
-
-		@Inject(DI.userSecurityKeysRepository)
-		private userSecurityKeysRepository: UserSecurityKeysRepository,
-
-		private webAuthnService: WebAuthnService,
-		private userAuthService: UserAuthService,
-		private userEntityService: UserEntityService,
-		private globalEventService: GlobalEventService,
-	) {
-		super(meta, paramDef, async (ps, me) => {
+export interface I2faKeyDoneDependencies {
+	userProfilesRepository: UserProfilesRepository;
+	userSecurityKeysRepository: UserSecurityKeysRepository;
+	webAuthnService: Pick<WebAuthnService, 'verifyRegistration'>;
+	userAuthService: Pick<UserAuthService, 'twoFactorAuthenticate'>;
+	userEntityService: Pick<UserEntityService, 'packSelf'>;
+	globalEventService: Pick<GlobalEventService, 'publishMainStream'>;
+}
+export function createI2faKeyDoneProcedure(deps: I2faKeyDoneDependencies) {
+	return createApiProcedure<MiLocalUser>()(I2faKeyDoneContract).use(requirePrincipal<MiLocalUser>()).handler(async ({ input, context }) => {
+		const ps = input;
+		const me = context.principal;
+		const result = await (async () => {
 			const token = ps.token;
-			const profile = await this.userProfilesRepository.findOneByOrFail({ userId: me.id });
+			const profile = await deps.userProfilesRepository.findOneByOrFail({ userId: me.id });
 
 			if (profile.twoFactorEnabled) {
 				if (token == null) {
@@ -80,7 +55,7 @@ export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDe
 				}
 
 				try {
-					await this.userAuthService.twoFactorAuthenticate(profile, token);
+					await deps.userAuthService.twoFactorAuthenticate(profile, token);
 				} catch (_) {
 					throw new Error('authentication failed');
 				}
@@ -88,17 +63,17 @@ export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDe
 
 			const passwordMatched = await bcrypt.compare(ps.password, profile.password ?? '');
 			if (!passwordMatched) {
-				throw new ApiError(meta.errors.incorrectPassword);
+				throw apiError(meta.errors.incorrectPassword);
 			}
 
 			if (!profile.twoFactorEnabled) {
-				throw new ApiError(meta.errors.twoFactorNotEnabled);
+				throw apiError(meta.errors.twoFactorNotEnabled);
 			}
 
-			const keyInfo = await this.webAuthnService.verifyRegistration(me.id, ps.credential);
+			const keyInfo = await deps.webAuthnService.verifyRegistration(me.id, ps.credential);
 			const keyId = keyInfo.credentialID;
 
-			await this.userSecurityKeysRepository.insert({
+			await deps.userSecurityKeysRepository.insert({
 				id: keyId,
 				userId: me.id,
 				name: ps.name,
@@ -110,8 +85,7 @@ export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDe
 			});
 
 			// Publish meUpdated event
-			this.globalEventService.publishMainStream(me.id, 'meUpdated', await this.userEntityService.pack(me.id, me, {
-				schema: 'MeDetailed',
+			deps.globalEventService.publishMainStream(me.id, 'meUpdated', await deps.userEntityService.packSelf(me.id, {
 				includeSecrets: true,
 			}));
 
@@ -119,6 +93,7 @@ export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDe
 				id: keyId,
 				name: ps.name,
 			};
-		});
-	}
+		})();
+		return result;
+	});
 }

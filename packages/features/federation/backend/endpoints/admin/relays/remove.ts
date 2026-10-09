@@ -3,33 +3,22 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
-import { RelayService } from '@/core/RelayService.js';
-
-export const meta = {
-	tags: ['admin'],
-
-	requireCredential: true,
-	requireModerator: true,
-	kind: 'write:admin:relays',
-} as const;
-
-export const paramDef = {
-	type: 'object',
-	properties: {
-		inbox: { type: 'string' },
-	},
-	required: ['inbox'],
-} as const;
-
-@Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
-	constructor(
-		private relayService: RelayService,
-	) {
-		super(meta, paramDef, async (ps, me) => {
-			return await this.relayService.removeRelay(ps.inbox);
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import { requirePrincipal } from '../../../../../api/backend/transport/middleware.js';
+import type { ApiActor } from '../../../../../api/backend/transport/context.js';
+import { adminRelaysRemoveContract } from './remove.contract.js';
+import type { RelayService } from '../../../services/RelayService.js';
+export interface AdminRelaysRemoveDependencies {
+	relayService: Pick<RelayService, 'removeRelay'>;
+}
+export function createAdminRelaysRemoveProcedure<Actor extends ApiActor>(deps: AdminRelaysRemoveDependencies) {
+	return createApiProcedure<Actor>()(adminRelaysRemoveContract)
+		.use(requirePrincipal<Actor>())
+		.handler(async ({ input }) => {
+			const ps = input;
+			const result = await (async () => {
+				return await deps.relayService.removeRelay(ps.inbox);
+			})();
+			return result;
 		});
-	}
 }

@@ -4,7 +4,7 @@
  */
 
 import { Entity, Index, Column, PrimaryColumn } from 'typeorm';
-import { id } from '@/models/util/id.js';
+import { id } from '@features/persistence/backend/models/util/id.js';
 
 @Entity('ad')
 export class MiAd {

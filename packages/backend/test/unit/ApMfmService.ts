@@ -7,9 +7,9 @@ import * as assert from 'assert';
 import { describe, test, beforeAll } from 'vitest';
 import { Test } from '@nestjs/testing';
 
-import { CoreModule } from '@/core/CoreModule.js';
-import { ApMfmService } from '@/core/activitypub/ApMfmService.js';
-import { GlobalModule } from '@/GlobalModule.js';
+import { CoreModule } from '@features/boot/backend/assembly/CoreModule.js';
+import { ApMfmService } from '@features/federation/backend/services/ApMfmService.js';
+import { GlobalModule } from '@features/boot/backend/assembly/GlobalModule.js';
 
 describe('ApMfmService', () => {
 	let apMfmService: ApMfmService;

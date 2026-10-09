@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+export type InternationalizationInstance = ReturnType<typeof import('virtual:vite-vue-internationalization').createInternationalization>;
+
 export interface ComponentLocales {
 	readonly ready: Promise<unknown>;
 	loadLocale(locale: string): Promise<unknown>;

@@ -3,66 +3,35 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Inject, Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
-import type { MiClip } from '@/models/_.js';
-import { ClipEntityService } from '@/core/entities/ClipEntityService.js';
-import { ApiError } from '@/server/api/error.js';
-import { ClipService } from '@/core/ClipService.js';
-
-export const meta = {
-	tags: ['clips'],
-
-	requireCredential: true,
-
-	prohibitMoved: true,
-
-	kind: 'write:account',
-
-	res: {
-		type: 'object',
-		optional: false, nullable: false,
-		ref: 'Clip',
-	},
-
-	errors: {
-		tooManyClips: {
-			message: 'You cannot create clip any more.',
-			code: 'TOO_MANY_CLIPS',
-			id: '920f7c2d-6208-4b76-8082-e632020f5883',
-		},
-	},
-} as const;
-
-export const paramDef = {
-	type: 'object',
-	properties: {
-		name: { type: 'string', minLength: 1, maxLength: 100 },
-		isPublic: { type: 'boolean', default: false },
-		description: { type: 'string', nullable: true, maxLength: 2048 },
-	},
-	required: ['name'],
-} as const;
-
-@Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
-	constructor(
-		private clipEntityService: ClipEntityService,
-		private clipService: ClipService,
-	) {
-		super(meta, paramDef, async (ps, me) => {
+import { toPackedClip } from '../../api.dto.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import type { ApiActor } from '@features/api/backend/transport/context.js';
+import { collectionsContract } from '../../api.definition.js';
+import type { CollectionsDependencies } from '../../api.implementation.js';
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
+import { collectionsErrors } from '../../api.errors.js';
+import { ClipService } from '../../services/ClipService.js';
+import type { MiClip } from '@features/persistence/backend/repositories/models.js';
+export interface ClipsCreateDependencies<Actor extends ApiActor> {
+	clipService: Pick<CollectionsDependencies<Actor>['clipService'], 'create'>;
+	clipEntityService: Pick<CollectionsDependencies<Actor>['clipEntityService'], 'pack'>;
+}
+export function createClipsCreateProcedure<Actor extends ApiActor>(deps: ClipsCreateDependencies<Actor>) {
+	return createApiProcedure<Actor>()(collectionsContract.clipsCreate).use(requirePrincipal<Actor>())
+		.handler(async ({ input: ps, context }) => {
+			const me = context.principal;
 			let clip: MiClip;
 			try {
 				// 空文字列をnullにしたいので??は使わない
 				// eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-				clip = await this.clipService.create(me, ps.name, ps.isPublic, ps.description || null);
+				clip = await deps.clipService.create(me, ps.name, ps.isPublic, ps.description || null);
 			} catch (e) {
 				if (e instanceof ClipService.TooManyClipsError) {
-					throw new ApiError(meta.errors.tooManyClips);
+					throw apiError(collectionsErrors.clipsCreate.tooManyClips);
 				}
 				throw e;
 			}
-			return await this.clipEntityService.pack(clip, me);
+			return toPackedClip(await deps.clipEntityService.pack(clip, me));
 		});
-	}
 }

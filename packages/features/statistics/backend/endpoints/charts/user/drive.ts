@@ -3,39 +3,22 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Injectable } from '@nestjs/common';
-import { getJsonSchema } from '@/core/chart/core.js';
-import { Endpoint } from '@/server/api/endpoint-base.js';
-import PerUserDriveChart from '@/core/chart/charts/per-user-drive.js';
-import { schema } from '@/core/chart/charts/entities/per-user-drive.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 
-export const meta = {
-	tags: ['charts', 'drive', 'users'],
+import { decodeScalarInput } from '@features/api/backend/transport/middleware.js';
+import { chartPerUserDriveContract, chartPerUserDriveGetContract } from './drive.contract.js';
+import type { ApiActor } from '@features/api/backend/transport/context.js';
+import type { StatisticsDependencies } from '../../../api.implementation.js';
+export function createPerUserDriveProcedure<Actor extends ApiActor>(deps: StatisticsDependencies['charts']['userDrive']) {
+	return createApiProcedure<Actor>()(chartPerUserDriveContract)
+		.handler(async ({ input }) => projectChart(await deps.getChart(input.span, input.limit, input.offset ? new Date(input.offset) : null, input.userId)));
+}
+export function createPerUserDriveGetProcedure<Actor extends ApiActor>(deps: StatisticsDependencies['charts']['userDrive']) {
+	return createApiProcedure<Actor>()(chartPerUserDriveGetContract)
+		.use(decodeScalarInput<Actor>({ limit: 'integer', offset: 'integer' }))
+		.handler(async ({ input }) => projectChart(await deps.getChart(input.span, input.limit, input.offset ? new Date(input.offset) : null, input.userId)));
+}
 
-	res: getJsonSchema(schema),
-
-	allowGet: true,
-	cacheSec: 60 * 60,
-} as const;
-
-export const paramDef = {
-	type: 'object',
-	properties: {
-		span: { type: 'string', enum: ['day', 'hour'] },
-		limit: { type: 'integer', minimum: 1, maximum: 500, default: 30 },
-		offset: { type: 'integer', nullable: true, default: null },
-		userId: { type: 'string', format: 'misskey:id' },
-	},
-	required: ['span', 'userId'],
-} as const;
-
-@Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
-	constructor(
-		private perUserDriveChart: PerUserDriveChart,
-	) {
-		super(meta, paramDef, async (ps, me) => {
-			return await this.perUserDriveChart.getChart(ps.span, ps.limit, ps.offset ? new Date(ps.offset) : null, ps.userId);
-		});
-	}
+function projectChart(value: Awaited<ReturnType<StatisticsDependencies['charts']['userDrive']['getChart']>>) {
+	return { totalCount: value.totalCount.map(item => item), totalSize: value.totalSize.map(item => item), incCount: value.incCount.map(item => item), incSize: value.incSize.map(item => item), decCount: value.decCount.map(item => item), decSize: value.decSize.map(item => item) };
 }

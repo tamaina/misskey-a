@@ -33,8 +33,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 		><code :class="$style.codeBlockFallbackCode">{{ code }}</code></pre>
 		<button v-else :class="$style.codePlaceholderRoot" @click="show = true">
 			<div :class="$style.codePlaceholderContainer">
-				<div><i class="ti ti-code"></i> {{ i18n.ts.code }}</div>
-				<div>{{ i18n.ts.clickToShow }}</div>
+				<div><i class="ti ti-code"></i> {{ $locale.sfc.code }}</div>
+				<div>{{ $locale.sfc.clickToShow }}</div>
 			</div>
 		</button>
 	</Suspense>
@@ -43,9 +43,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import { defineAsyncComponent, ref } from 'vue';
-import { i18n } from '@/i18n.js';
 import { copyToClipboard } from '@features/ui/frontend/utility/copy-to-clipboard.js';
-import { prefer } from '@/preferences.js';
+import { prefer } from '@features/preferences/frontend/preferences.js';
 
 const props = withDefaults(defineProps<{
 	code: string;
@@ -129,3 +128,199 @@ function copy() {
 	font-size: 0.8em;
 }
 </style>
+
+<locale locale="ar-SA" lang="json">
+{
+  "code": "Code",
+  "clickToShow": "اضغط للعرض"
+}
+</locale>
+
+<locale locale="ca-ES" lang="json">
+{
+  "code": "Codi",
+  "clickToShow": "Fes clic per mostrar"
+}
+</locale>
+
+<locale locale="cs-CZ" lang="json">
+{
+  "code": "Code",
+  "clickToShow": "Klikněte pro zobrazení"
+}
+</locale>
+
+<locale locale="da-DK" lang="json">
+{
+  "code": "Code",
+  "clickToShow": "Click to show"
+}
+</locale>
+
+<locale locale="de-DE" lang="json">
+{
+  "code": "Code",
+  "clickToShow": "Zum Anzeigen anklicken"
+}
+</locale>
+
+<locale locale="en-US" lang="json">
+{
+  "code": "Code",
+  "clickToShow": "Click to show"
+}
+</locale>
+
+<locale locale="es-ES" lang="json">
+{
+  "code": "Código",
+  "clickToShow": "Haz clic para verlo"
+}
+</locale>
+
+<locale locale="fr-FR" lang="json">
+{
+  "code": "Code",
+  "clickToShow": "Cliquer pour afficher"
+}
+</locale>
+
+<locale locale="id-ID" lang="json">
+{
+  "code": "Kode",
+  "clickToShow": "Klik untuk melihat"
+}
+</locale>
+
+<locale locale="it-IT" lang="json">
+{
+  "code": "Codice",
+  "clickToShow": "Media nascosto, cliccare solo se si intende vedere"
+}
+</locale>
+
+<locale locale="ja-JP" lang="json">
+{
+  "code": "コード",
+  "clickToShow": "クリックして表示"
+}
+</locale>
+
+<locale locale="ja-KS" lang="json">
+{
+  "code": "コード",
+  "clickToShow": "押したら見えるで"
+}
+</locale>
+
+<locale locale="kab-KAB" lang="json">
+{
+  "code": "Code",
+  "clickToShow": "Click to show"
+}
+</locale>
+
+<locale locale="kn-IN" lang="json">
+{
+  "code": "Code",
+  "clickToShow": "Click to show"
+}
+</locale>
+
+<locale locale="ko-KR" lang="json">
+{
+  "code": "문자열",
+  "clickToShow": "클릭하여 보기"
+}
+</locale>
+
+<locale locale="nl-NL" lang="json">
+{
+  "code": "Code",
+  "clickToShow": "Klik om te bekijken"
+}
+</locale>
+
+<locale locale="no-NO" lang="json">
+{
+  "code": "Code",
+  "clickToShow": "Klikk for å vise"
+}
+</locale>
+
+<locale locale="pl-PL" lang="json">
+{
+  "code": "Code",
+  "clickToShow": "Kliknij, aby wyświetlić"
+}
+</locale>
+
+<locale locale="pt-PT" lang="json">
+{
+  "code": "Código",
+  "clickToShow": "Clique para ver"
+}
+</locale>
+
+<locale locale="ru-RU" lang="json">
+{
+  "code": "Код",
+  "clickToShow": "Нажмите для просмотра"
+}
+</locale>
+
+<locale locale="sk-SK" lang="json">
+{
+  "code": "Code",
+  "clickToShow": "Kliknutím zobrazíte"
+}
+</locale>
+
+<locale locale="th-TH" lang="json">
+{
+  "code": "โค้ด",
+  "clickToShow": "คลิกเพื่อแสดง"
+}
+</locale>
+
+<locale locale="tr-TR" lang="json">
+{
+  "code": "Kod",
+  "clickToShow": "Göstermek için tıklayın"
+}
+</locale>
+
+<locale locale="ug-CN" lang="json">
+{
+  "code": "Code",
+  "clickToShow": "Click to show"
+}
+</locale>
+
+<locale locale="uk-UA" lang="json">
+{
+  "code": "Код",
+  "clickToShow": "Натисніть для перегляду"
+}
+</locale>
+
+<locale locale="vi-VN" lang="json">
+{
+  "code": "Code",
+  "clickToShow": "Nhấn để xem"
+}
+</locale>
+
+<locale locale="zh-CN" lang="json">
+{
+  "code": "代码",
+  "clickToShow": "点击以显示"
+}
+</locale>
+
+<locale locale="zh-TW" lang="json">
+{
+  "code": "程式碼",
+  "clickToShow": "點擊查看"
+}
+</locale>

@@ -24,21 +24,20 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<MkAcct :class="$style.messageHeaderUsername" :user="item.other!"/>
 				<MkTime :time="item.message.createdAt" :class="$style.messageHeaderTime"/>
 			</header>
-			<div :class="$style.messageBodyText"><span v-if="item.isMe" :class="$style.youSaid">{{ i18n.ts.you }}:</span>{{ item.message.text }}</div>
+			<div :class="$style.messageBodyText"><span v-if="item.isMe" :class="$style.youSaid">{{ $locale.sfc.you }}:</span>{{ item.message.text }}</div>
 		</div>
 	</MkA>
 </div>
-<MkResult v-if="!initializing && history.length == 0" type="empty" :text="i18n.ts._chat.noHistory"/>
+<MkResult v-if="!initializing && history.length == 0" type="empty" :text="$locale.sfc.noHistory"/>
 <MkLoading v-if="initializing"/>
 </template>
 
 <script lang="ts" setup>
 import { onActivated, onDeactivated, onMounted, ref } from 'vue';
 import * as Misskey from 'misskey-js';
-import { useInterval } from '@@/js/use-interval.js';
-import { misskeyApi } from '@/utility/misskey-api.js';
-import { i18n } from '@/i18n.js';
-import { ensureSignin } from '@/i.js';
+import { useInterval } from '@features/ui/frontend/shared/use-interval.js';
+import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
+import { ensureSignin } from '@features/auth/frontend/i.js';
 
 const $i = ensureSignin();
 
@@ -204,3 +203,199 @@ onMounted(() => {
 	margin-right: 0.5em;
 }
 </style>
+
+<locale locale="ar-SA" lang="json">
+{
+  "you": "أنت",
+  "noHistory": "السجل فارغ"
+}
+</locale>
+
+<locale locale="ca-ES" lang="json">
+{
+  "you": "Tu",
+  "noHistory": "No hi ha un registre previ"
+}
+</locale>
+
+<locale locale="cs-CZ" lang="json">
+{
+  "you": "Vy",
+  "noHistory": "Žádná historie"
+}
+</locale>
+
+<locale locale="da-DK" lang="json">
+{
+  "you": "You",
+  "noHistory": "No history available"
+}
+</locale>
+
+<locale locale="de-DE" lang="json">
+{
+  "you": "Du",
+  "noHistory": "Kein Verlauf gefunden"
+}
+</locale>
+
+<locale locale="en-US" lang="json">
+{
+  "you": "You",
+  "noHistory": "No history available"
+}
+</locale>
+
+<locale locale="es-ES" lang="json">
+{
+  "you": "Tú",
+  "noHistory": "No hay datos en el historial"
+}
+</locale>
+
+<locale locale="fr-FR" lang="json">
+{
+  "you": "Vous",
+  "noHistory": "Pas d'historique"
+}
+</locale>
+
+<locale locale="id-ID" lang="json">
+{
+  "you": "Kamu",
+  "noHistory": "Tidak ada riwayat"
+}
+</locale>
+
+<locale locale="it-IT" lang="json">
+{
+  "you": "Tu",
+  "noHistory": "Nessuna cronologia"
+}
+</locale>
+
+<locale locale="ja-JP" lang="json">
+{
+  "you": "あなた",
+  "noHistory": "履歴はありません"
+}
+</locale>
+
+<locale locale="ja-KS" lang="json">
+{
+  "you": "あんた",
+  "noHistory": "履歴はないわ。"
+}
+</locale>
+
+<locale locale="kab-KAB" lang="json">
+{
+  "you": "Kečči·mmi",
+  "noHistory": "No history available"
+}
+</locale>
+
+<locale locale="kn-IN" lang="json">
+{
+  "you": "You",
+  "noHistory": "No history available"
+}
+</locale>
+
+<locale locale="ko-KR" lang="json">
+{
+  "you": "나",
+  "noHistory": "기록이 없습니다"
+}
+</locale>
+
+<locale locale="nl-NL" lang="json">
+{
+  "you": "Jij",
+  "noHistory": "Geen geschiedenis gevonden"
+}
+</locale>
+
+<locale locale="no-NO" lang="json">
+{
+  "you": "Du",
+  "noHistory": "No history available"
+}
+</locale>
+
+<locale locale="pl-PL" lang="json">
+{
+  "you": "Ty",
+  "noHistory": "Brak historii"
+}
+</locale>
+
+<locale locale="pt-PT" lang="json">
+{
+  "you": "Você",
+  "noHistory": "Ainda não há histórico"
+}
+</locale>
+
+<locale locale="ru-RU" lang="json">
+{
+  "you": "Вы",
+  "noHistory": "История пока пуста"
+}
+</locale>
+
+<locale locale="sk-SK" lang="json">
+{
+  "you": "Vy",
+  "noHistory": "Žiadna história"
+}
+</locale>
+
+<locale locale="th-TH" lang="json">
+{
+  "you": "คุณ",
+  "noHistory": "ไม่มีประวัติ"
+}
+</locale>
+
+<locale locale="tr-TR" lang="json">
+{
+  "you": "Sen",
+  "noHistory": "Geçmiş bilgisi mevcut değil"
+}
+</locale>
+
+<locale locale="ug-CN" lang="json">
+{
+  "you": "You",
+  "noHistory": "No history available"
+}
+</locale>
+
+<locale locale="uk-UA" lang="json">
+{
+  "you": "Ви",
+  "noHistory": "Історія порожня"
+}
+</locale>
+
+<locale locale="vi-VN" lang="json">
+{
+  "you": "Bạn",
+  "noHistory": "Không có dữ liệu"
+}
+</locale>
+
+<locale locale="zh-CN" lang="json">
+{
+  "you": "您",
+  "noHistory": "没有历史记录"
+}
+</locale>
+
+<locale locale="zh-TW" lang="json">
+{
+  "you": "您",
+  "noHistory": "沒有歷史紀錄"
+}
+</locale>

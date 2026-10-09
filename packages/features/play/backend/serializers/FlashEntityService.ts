@@ -3,25 +3,21 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Inject, Injectable } from '@nestjs/common';
-import { DI } from '@/di-symbols.js';
-import type { FlashLikesRepository, FlashsRepository } from '@/models/_.js';
-import type { Packed } from '@/misc/json-schema.js';
-import type { MiUser } from '@/models/User.js';
-import type { MiFlash } from '@/models/Flash.js';
-import { bindThis } from '@/decorators.js';
-import { IdService } from '@/core/IdService.js';
-import { UserEntityService } from '@/core/entities/UserEntityService.js';
+import type { FlashLikesRepository, FlashsRepository } from '@features/persistence/backend/repositories/models.js';
+import type { PackedUserLite } from '@features/users/backend/user.schema.js';
+import type { PackedFlash } from '../flash.schema.js';
+import type { MiUser } from '@features/users/backend/models/User.js';
+import type { MiFlash } from '../models/Flash.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
+import type { IdService } from '@features/runtime/backend/services/IdService.js';
+import type { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 
-@Injectable()
 export class FlashEntityService {
 	constructor(
-		@Inject(DI.flashsRepository)
 		private flashsRepository: FlashsRepository,
-		@Inject(DI.flashLikesRepository)
 		private flashLikesRepository: FlashLikesRepository,
-		private userEntityService: UserEntityService,
-		private idService: IdService,
+		private userEntityService: Pick<UserEntityService, 'pack' | 'packMany'>,
+		private idService: Pick<IdService, 'parse'>,
 	) {
 	}
 
@@ -30,10 +26,10 @@ export class FlashEntityService {
 		src: MiFlash['id'] | MiFlash,
 		me?: { id: MiUser['id'] } | null | undefined,
 		hint?: {
-			packedUser?: Packed<'UserLite'>,
+			packedUser?: PackedUserLite,
 			likedFlashIds?: MiFlash['id'][],
 		},
-	): Promise<Packed<'Flash'>> {
+	): Promise<PackedFlash> {
 		const meId = me ? me.id : null;
 		const flash = typeof src === 'object' ? src : await this.flashsRepository.findOneByOrFail({ id: src });
 

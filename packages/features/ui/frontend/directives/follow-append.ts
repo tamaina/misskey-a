@@ -4,7 +4,7 @@
  */
 
 import type { Directive } from 'vue';
-import { getScrollContainer, getScrollPosition } from '@@/js/scroll.js';
+import { getScrollContainer, getScrollPosition } from '@features/ui/frontend/shared/scroll.js';
 
 const states = new WeakMap<HTMLElement, {
 	observer: ResizeObserver;

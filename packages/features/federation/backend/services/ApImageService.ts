@@ -5,18 +5,18 @@
 
 import { Inject, Injectable } from '@nestjs/common';
 import { DI } from '@/di-symbols.js';
-import type { DriveFilesRepository, MiMeta } from '@/models/_.js';
-import type { MiRemoteUser } from '@/models/User.js';
-import type { MiDriveFile } from '@/models/DriveFile.js';
-import { truncate } from '@/misc/truncate.js';
-import { DB_MAX_IMAGE_COMMENT_LENGTH } from '@/const.js';
-import { DriveService } from '@/core/DriveService.js';
-import type Logger from '@/logger.js';
-import { bindThis } from '@/decorators.js';
-import { checkHttps } from '@/misc/check-https.js';
+import type { DriveFilesRepository, MiMeta } from '@features/persistence/backend/repositories/models.js';
+import type { MiRemoteUser } from '@features/users/backend/models/User.js';
+import type { MiDriveFile } from '@features/drive/backend/models/DriveFile.js';
+import { truncate } from '@features/runtime/backend/formatting/truncate.js';
+import { DB_MAX_IMAGE_COMMENT_LENGTH } from '@features/drive/backend/image-comment-limit.js';
+import { DriveService } from '@features/drive/backend/services/DriveService.js';
+import type { Logger } from '@features/runtime/backend/logging/logger.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
+import { checkHttps } from '../utility/check-https.js';
 import { ApResolverService } from './ApResolverService.js';
 import { ApLoggerService } from './ApLoggerService.js';
-import { isDocument, type IObject } from '@/core/activitypub/type.js';
+import { isDocument, type IObject } from '../protocol/type.js';
 
 @Injectable()
 export class ApImageService {

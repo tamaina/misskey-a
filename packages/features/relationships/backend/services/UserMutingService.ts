@@ -5,12 +5,12 @@
 
 import { Inject, Injectable } from '@nestjs/common';
 import { In } from 'typeorm';
-import type { MutingsRepository, MiMuting } from '@/models/_.js';
-import { IdService } from '@/core/IdService.js';
-import type { MiUser } from '@/models/User.js';
+import type { MutingsRepository, MiMuting } from '@features/persistence/backend/repositories/models.js';
+import { IdService } from '@features/runtime/backend/services/IdService.js';
+import type { MiUser } from '@features/users/backend/models/User.js';
 import { DI } from '@/di-symbols.js';
-import { bindThis } from '@/decorators.js';
-import { CacheService } from '@/core/CacheService.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
+import { CacheService } from '@features/users/backend/services/CacheService.js';
 
 @Injectable()
 export class UserMutingService {

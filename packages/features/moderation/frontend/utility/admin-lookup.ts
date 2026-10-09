@@ -1,0 +1,77 @@
+/*
+ * SPDX-FileCopyrightText: syuilo and misskey-project
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
+
+import * as Misskey from 'misskey-js';
+import FeatureLocaleMessages from '@features/moderation/frontend/ts-messages.vue';
+import * as os from '@features/ui/frontend/os.js';
+import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
+
+export async function lookupUser() {
+	const { canceled, result } = await os.inputText({
+		title: FeatureLocaleMessages.$locale.usernameOrUserId,
+	});
+	if (canceled || result == null) return;
+
+	const show = (user: Misskey.entities.UserDetailed) => {
+		os.pageWindow(`/admin/user/${user.id}`);
+	};
+
+	const usernamePromise = misskeyApi('users/show', Misskey.acct.parse(result));
+	const idPromise = misskeyApi('users/show', { userId: result });
+	let _notFound = false;
+	const notFound = () => {
+		if (_notFound) {
+			os.alert({
+				type: 'error',
+				text: FeatureLocaleMessages.$locale.noSuchUser,
+			});
+		} else {
+			_notFound = true;
+		}
+	};
+	usernamePromise.then(show).catch(err => {
+		if (err.code === 'NO_SUCH_USER') {
+			notFound();
+		}
+	});
+	idPromise.then(show).catch(_ => {
+		notFound();
+	});
+}
+
+export async function lookupUserByEmail() {
+	const { canceled, result } = await os.inputText({
+		title: FeatureLocaleMessages.$locale.emailAddress,
+		type: 'email',
+	});
+	if (canceled || result == null) return;
+
+	os.apiWithDialog('admin/accounts/find-by-email', { email: result }, undefined, {
+		'cb865949-8af5-4062-a88c-ef55e8786d1d': {
+			text: FeatureLocaleMessages.$locale.noSuchUser,
+		},
+	}).then(user => {
+		os.pageWindow(`/admin/user/${user.id}`);
+	}, () => undefined);
+}
+
+export async function lookupFile() {
+	const { canceled, result: q } = await os.inputText({
+		title: FeatureLocaleMessages.$locale.fileIdOrUrl,
+		minLength: 1,
+	});
+	if (canceled) return;
+
+	misskeyApi('admin/drive/show-file', q.startsWith('http://') || q.startsWith('https://') ? { url: q.trim() } : { fileId: q.trim() }).then(file => {
+		os.pageWindow(`/admin/file/${file.id}`);
+	}).catch(err => {
+		if (err.code === 'NO_SUCH_FILE') {
+			os.alert({
+				type: 'error',
+				text: FeatureLocaleMessages.$locale.notFound,
+			});
+		}
+	});
+}

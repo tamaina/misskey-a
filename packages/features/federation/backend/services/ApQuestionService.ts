@@ -5,18 +5,18 @@
 
 import { Inject, Injectable } from '@nestjs/common';
 import { DI } from '@/di-symbols.js';
-import type { UsersRepository, NotesRepository, PollsRepository } from '@/models/_.js';
+import type { UsersRepository, NotesRepository, PollsRepository } from '@features/persistence/backend/repositories/models.js';
 import type { Config } from '@/config.js';
-import type { IPoll } from '@/models/Poll.js';
-import type { MiRemoteUser } from '@/models/User.js';
-import type Logger from '@/logger.js';
-import { bindThis } from '@/decorators.js';
-import { getOneApId, isQuestion } from '@/core/activitypub/type.js';
-import { UtilityService } from '@/core/UtilityService.js';
+import type { IPoll } from '@features/notes/backend/models/Poll.js';
+import type { MiRemoteUser } from '@features/users/backend/models/User.js';
+import type { Logger } from '@features/runtime/backend/logging/logger.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
+import { getOneApId, isQuestion } from '../protocol/type.js';
+import { UtilityService } from './UtilityService.js';
 import { ApLoggerService } from './ApLoggerService.js';
 import { ApResolverService } from './ApResolverService.js';
 import type { Resolver } from './ApResolverService.js';
-import type { IObject } from '@/core/activitypub/type.js';
+import type { IObject } from '../protocol/type.js';
 
 @Injectable()
 export class ApQuestionService {

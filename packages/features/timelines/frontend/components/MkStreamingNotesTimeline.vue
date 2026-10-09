@@ -10,14 +10,14 @@ SPDX-License-Identifier: AGPL-3.0-only
 	<MkError v-else-if="paginator.error.value" @retry="paginator.init()"/>
 
 	<div v-else-if="paginator.items.value.length === 0" key="_empty_">
-		<slot name="empty"><MkResult type="empty" :text="i18n.ts.noNotes"/></slot>
+		<slot name="empty"><MkResult type="empty" :text="$locale.sfc.noNotes"/></slot>
 	</div>
 
 	<div v-else ref="rootEl">
 		<div v-if="paginator.queuedAheadItemsCount.value > 0" :class="$style.new">
 			<div :class="$style.newBg1"></div>
 			<div :class="$style.newBg2"></div>
-			<button class="_button" :class="$style.newButton" @click="releaseQueue()"><i class="ti ti-circle-arrow-up"></i> {{ i18n.ts.newNote }}</button>
+			<button class="_button" :class="$style.newButton" @click="releaseQueue()"><i class="ti ti-circle-arrow-up"></i> {{ $locale.sfc.newNote }}</button>
 		</div>
 		<component
 			:is="prefer.s.animation ? TransitionGroup : 'div'"
@@ -48,7 +48,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			</template>
 		</component>
 		<button v-show="paginator.canFetchOlder.value" key="_more_" v-appear="prefer.s.enableInfiniteScroll ? paginator.fetchOlder : null" :disabled="paginator.fetchingOlder.value" class="_button" :class="$style.more" @click="paginator.fetchOlder">
-			<div v-if="!paginator.fetchingOlder.value">{{ i18n.ts.loadMore }}</div>
+			<div v-if="!paginator.fetchingOlder.value">{{ $locale.sfc.loadMore }}</div>
 			<MkLoading v-else :inline="true"/>
 		</button>
 	</div>
@@ -58,24 +58,23 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script lang="ts" setup>
 import { computed, watch, onUnmounted, provide, useTemplateRef, TransitionGroup, onMounted, shallowRef, ref, markRaw } from 'vue';
 import * as Misskey from 'misskey-js';
-import { useInterval } from '@@/js/use-interval.js';
-import { useDocumentVisibility } from '@@/js/use-document-visibility.js';
-import { getScrollContainer, scrollToTop } from '@@/js/scroll.js';
-import type { BasicTimelineType } from '@/timelines.js';
+import { useInterval } from '@features/ui/frontend/shared/use-interval.js';
+import { useDocumentVisibility } from '@features/ui/frontend/shared/use-document-visibility.js';
+import { getScrollContainer, scrollToTop } from '@features/ui/frontend/shared/scroll.js';
+import type { BasicTimelineType } from '@features/timelines/frontend/timelines.js';
 import type { SoundStore } from '@features/preferences/frontend/state/def.js';
 import type { IPaginator, MisskeyEntity } from '@features/ui/frontend/utility/paginator.js';
 import MkPullToRefresh from '@features/ui/frontend/components/MkPullToRefresh.vue';
-import { useStream } from '@/stream.js';
-import * as sound from '@/utility/sound.js';
-import { $i } from '@/i.js';
-import { instance } from '@/instance.js';
-import { prefer } from '@/preferences.js';
-import { store } from '@/store.js';
+import { useStream } from '@features/api/frontend/stream.js';
+import * as sound from '@features/preferences/frontend/utility/sound.js';
+import { $i } from '@features/auth/frontend/i.js';
+import { instance } from '@features/instance/frontend/instance.js';
+import { prefer } from '@features/preferences/frontend/preferences.js';
+import { store } from '@features/preferences/frontend/store.js';
 import MkNote from '@features/notes/frontend/components/MkNote.vue';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
-import { i18n } from '@/i18n.js';
-import { DI } from '@/di.js';
-import { globalEvents, useGlobalEvent } from '@/events.js';
+import { DI } from '@features/ui/frontend/di.js';
+import { globalEvents, useGlobalEvent } from '@features/runtime/frontend/events.js';
 import { isSeparatorNeeded, getSeparatorInfo } from '@features/timelines/frontend/utility/timeline-date-separate.js';
 import { Paginator } from '@features/ui/frontend/utility/paginator.js';
 
@@ -575,3 +574,227 @@ defineExpose({
 	background: var(--MI_THEME-panel);
 }
 </style>
+
+<locale locale="ar-SA" lang="json">
+{
+  "noNotes": "لم يُعثر على أية ملاحظات",
+  "newNote": "New Note",
+  "loadMore": "عرض المزيد"
+}
+</locale>
+
+<locale locale="ca-ES" lang="json">
+{
+  "noNotes": "Cap nota",
+  "newNote": "Notes noves",
+  "loadMore": "Carregar més"
+}
+</locale>
+
+<locale locale="cs-CZ" lang="json">
+{
+  "noNotes": "Žádné poznámky",
+  "newNote": "Nová poznámka",
+  "loadMore": "Zobrazit více"
+}
+</locale>
+
+<locale locale="da-DK" lang="json">
+{
+  "noNotes": "No notes",
+  "newNote": "New Note",
+  "loadMore": "Load more"
+}
+</locale>
+
+<locale locale="de-DE" lang="json">
+{
+  "noNotes": "Keine Notizen gefunden",
+  "newNote": "Neue Notiz",
+  "loadMore": "Mehr laden"
+}
+</locale>
+
+<locale locale="en-US" lang="json">
+{
+  "noNotes": "No notes",
+  "newNote": "New Note",
+  "loadMore": "Load more"
+}
+</locale>
+
+<locale locale="es-ES" lang="json">
+{
+  "noNotes": "No hay notas",
+  "newNote": "Nuevas notas",
+  "loadMore": "Ver más"
+}
+</locale>
+
+<locale locale="fr-FR" lang="json">
+{
+  "noNotes": "Aucune note",
+  "newNote": "New Note",
+  "loadMore": "Afficher plus …"
+}
+</locale>
+
+<locale locale="id-ID" lang="json">
+{
+  "noNotes": "Belum ada catatan",
+  "newNote": "Note baru",
+  "loadMore": "Selebihnya"
+}
+</locale>
+
+<locale locale="it-IT" lang="json">
+{
+  "noNotes": "Nessuna nota!",
+  "newNote": "Nuove Note",
+  "loadMore": "Mostra di più"
+}
+</locale>
+
+<locale locale="ja-JP" lang="json">
+{
+  "noNotes": "ノートはありません",
+  "newNote": "新しいノート",
+  "loadMore": "もっと見る"
+}
+</locale>
+
+<locale locale="ja-KS" lang="json">
+{
+  "noNotes": "ノートはあらへん",
+  "newNote": "新しいノートがあるで",
+  "loadMore": "まだまだあるで！"
+}
+</locale>
+
+<locale locale="kab-KAB" lang="json">
+{
+  "noNotes": "No notes",
+  "newNote": "New Note",
+  "loadMore": "Wali ugar"
+}
+</locale>
+
+<locale locale="kn-IN" lang="json">
+{
+  "noNotes": "ಟಿಪ್ಪಣಿಗಳಿಲ್ಲ",
+  "newNote": "New Note",
+  "loadMore": "ಇನ್ನಷ್ಟು ನೋಡು"
+}
+</locale>
+
+<locale locale="ko-KR" lang="json">
+{
+  "noNotes": "노트가 없습니다",
+  "newNote": "새로운 노트",
+  "loadMore": "더 보기"
+}
+</locale>
+
+<locale locale="nl-NL" lang="json">
+{
+  "noNotes": "Geen notities",
+  "newNote": "New Note",
+  "loadMore": "Laad meer"
+}
+</locale>
+
+<locale locale="no-NO" lang="json">
+{
+  "noNotes": "Ingen Notes",
+  "newNote": "New Note",
+  "loadMore": "Vis mer"
+}
+</locale>
+
+<locale locale="pl-PL" lang="json">
+{
+  "noNotes": "Brak wpisów",
+  "newNote": "New Note",
+  "loadMore": "Załaduj więcej"
+}
+</locale>
+
+<locale locale="pt-PT" lang="json">
+{
+  "noNotes": "Sem notas",
+  "newNote": "Nova Nota",
+  "loadMore": "Carregar mais"
+}
+</locale>
+
+<locale locale="ru-RU" lang="json">
+{
+  "noNotes": "Нет ни одной заметки",
+  "newNote": "Новая заметка",
+  "loadMore": "Загрузить ещё"
+}
+</locale>
+
+<locale locale="sk-SK" lang="json">
+{
+  "noNotes": "Žiadne poznámky",
+  "newNote": "New Note",
+  "loadMore": "Zobraziť viac"
+}
+</locale>
+
+<locale locale="th-TH" lang="json">
+{
+  "noNotes": "ไม่มีโน้ต",
+  "newNote": "โน้ตใหม่",
+  "loadMore": "แสดงเพิ่มเติม"
+}
+</locale>
+
+<locale locale="tr-TR" lang="json">
+{
+  "noNotes": "Not yok",
+  "newNote": "Yeni Not",
+  "loadMore": "Daha fazla yükle"
+}
+</locale>
+
+<locale locale="ug-CN" lang="json">
+{
+  "noNotes": "No notes",
+  "newNote": "New Note",
+  "loadMore": "Load more"
+}
+</locale>
+
+<locale locale="uk-UA" lang="json">
+{
+  "noNotes": "Немає нотаток",
+  "newNote": "Нова нотатка",
+  "loadMore": "Показати більше"
+}
+</locale>
+
+<locale locale="vi-VN" lang="json">
+{
+  "noNotes": "Chưa có bài viết nào.",
+  "newNote": "Ghi chú mới",
+  "loadMore": "Tải thêm"
+}
+</locale>
+
+<locale locale="zh-CN" lang="json">
+{
+  "noNotes": "没有帖子",
+  "newNote": "新帖子",
+  "loadMore": "查看更多"
+}
+</locale>
+
+<locale locale="zh-TW" lang="json">
+{
+  "noNotes": "無貼文",
+  "newNote": "新的貼文",
+  "loadMore": "載入更多"
+}
+</locale>

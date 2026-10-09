@@ -16,8 +16,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 import { onMounted, onUnmounted, useTemplateRef, ref } from 'vue';
 import { Chart } from 'chart.js';
 import gradient from 'chartjs-plugin-gradient';
-import { misskeyApi } from '@/utility/misskey-api.js';
-import { store } from '@/store.js';
+import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
+import { store } from '@features/preferences/frontend/store.js';
 import { useChartTooltip } from '@features/statistics/frontend/composables/use-chart-tooltip.js';
 import { chartVLine } from '@features/statistics/frontend/utility/chart-vline.js';
 import { initChart } from '@features/statistics/frontend/utility/init-chart.js';

@@ -226,9 +226,15 @@ importers:
       '@orpc/contract':
         specifier: 1.15.4
         version: 1.15.4(@opentelemetry/api@1.9.1)
+      '@orpc/openapi':
+        specifier: 1.15.4
+        version: 1.15.4(@opentelemetry/api@1.9.1)(fastify@5.12.5)(ws@8.21.3(bufferutil@4.1.0)(utf-8-validate@6.0.6))
       '@orpc/server':
         specifier: 1.15.4
         version: 1.15.4(@opentelemetry/api@1.9.1)(fastify@5.12.5)(ws@8.21.3(bufferutil@4.1.0)(utf-8-validate@6.0.6))
+      '@orpc/valibot':
+        specifier: 1.15.4
+        version: 1.15.4(@opentelemetry/api@1.9.1)(@orpc/contract@1.15.4(@opentelemetry/api@1.9.1))(@orpc/server@1.15.4(@opentelemetry/api@1.9.1)(fastify@5.12.5)(ws@8.21.3(bufferutil@4.1.0)(utf-8-validate@6.0.6)))(fastify@5.12.5)(valibot@1.5.0(@typescript/typescript6@6.0.2))(ws@8.21.3(bufferutil@4.1.0)(utf-8-validate@6.0.6))
       '@oxc-project/runtime':
         specifier: 0.147.0
         version: 0.147.0
@@ -256,9 +262,6 @@ importers:
       accepts:
         specifier: 1.3.8
         version: 1.3.8
-      ajv:
-        specifier: 8.20.0
-        version: 8.20.0
       archiver:
         specifier: 8.0.0
         version: 8.0.0
@@ -799,8 +802,8 @@ importers:
         specifier: 1.16.0
         version: 1.16.0(vue@3.5.42(typescript@6.0.3))
       vite-vue-internationalization:
-        specifier: 1.1.3
-        version: 1.1.3(@oxc-project/types@0.147.0)(@vue/language-core@3.3.11)(oxc-parser@0.127.0)(vite@8.2.2(@types/node@26.4.0)(esbuild@0.28.2)(sass-embedded@1.103.1)(sass@1.103.1)(terser@5.48.0)(tsx@4.23.13)(yaml@2.9.1))(vue@3.5.42(typescript@6.0.3))
+        specifier: 1.1.5
+        version: 1.1.5(@oxc-project/types@0.147.0)(@vue/language-core@3.3.11)(oxc-parser@0.127.0)(vite@8.2.2(@types/node@26.4.0)(esbuild@0.28.2)(sass-embedded@1.103.1)(sass@1.103.1)(terser@5.48.0)(tsx@4.23.13)(yaml@2.9.1))(vue@3.5.42(typescript@6.0.3))
       vue:
         specifier: 3.5.42
         version: 3.5.42(typescript@6.0.3)
@@ -1094,6 +1097,9 @@ importers:
       uuid:
         specifier: 14.0.2
         version: 14.0.2
+      vite-vue-internationalization:
+        specifier: 1.1.5
+        version: 1.1.5(@oxc-project/types@0.147.0)(@vue/language-core@3.3.11)(oxc-parser@0.127.0)(vite@8.2.2(@types/node@26.4.0)(esbuild@0.28.2)(sass-embedded@1.103.1)(sass@1.103.1)(terser@5.48.0)(tsx@4.23.13)(yaml@2.9.1))(vue@3.5.42(typescript@6.0.3))
       vue:
         specifier: 3.5.42
         version: 3.5.42(typescript@6.0.3)
@@ -1191,6 +1197,9 @@ importers:
       misskey-js:
         specifier: workspace:*
         version: link:../misskey-js
+      punycode.js:
+        specifier: 2.3.1
+        version: 2.3.1
       shiki:
         specifier: 4.4.3
         version: 4.4.3
@@ -1204,6 +1213,9 @@ importers:
       '@types/node':
         specifier: 26.4.0
         version: 26.4.0
+      '@types/punycode.js':
+        specifier: npm:@types/punycode@2.1.4
+        version: '@types/punycode@2.1.4'
       '@types/tinycolor2':
         specifier: 1.4.6
         version: 1.4.6
@@ -1318,7 +1330,13 @@ importers:
 
   packages/misskey-js:
     dependencies:
+      '@orpc/client':
+        specifier: 1.15.4
+        version: 1.15.4(@opentelemetry/api@1.9.1)
       '@orpc/contract':
+        specifier: 1.15.4
+        version: 1.15.4(@opentelemetry/api@1.9.1)
+      '@orpc/openapi-client':
         specifier: 1.15.4
         version: 1.15.4(@opentelemetry/api@1.9.1)
       '@simplewebauthn/browser':
@@ -2593,6 +2611,12 @@ packages:
   '@orpc/interop@1.15.4':
     resolution: {integrity: sha512-ZCTNPenr1clZ2RBCJxsCsvS3eS8MJIDSx/LH1AIAKj9RjvfOXI/BnjHmgD4jUEIa6FcG+c2LV/1IXVJpC6NoTw==}
 
+  '@orpc/openapi-client@1.15.4':
+    resolution: {integrity: sha512-z+8gRUp9bhVuA2tFlzJDCaUbLV/whZec25fmYb0VtP2N6iPfY0d7hYZvX47F/WrcuwaLCTqkbVAzK8Xb2cKF/w==}
+
+  '@orpc/openapi@1.15.4':
+    resolution: {integrity: sha512-+J2skkYlqcB7O9nUJ9rhV1IvisimIwxyn21nAWP/jvSg5PN/klqSO2r6XkxiAaCukw/QE5BFMbN8c0ZdLrMEnw==}
+
   '@orpc/server@1.15.4':
     resolution: {integrity: sha512-Ccs2Pdwql2XRtk7bzkiZohoYuUVNcffydbswhz75rdepCQt0HmKosfVhsqjAqCKDDB7c84ct7Q7c5Z/xQak7pQ==}
     peerDependencies:
@@ -2634,6 +2658,13 @@ packages:
 
   '@orpc/standard-server@1.15.4':
     resolution: {integrity: sha512-woaFpUJavYPiqRQ0Eh716jOHRZ7o84mPpmEPS79bBUJNDilGEj2OBSjbHV2ez4FYdVnEnlbg+rYy7sX3PwwENA==}
+
+  '@orpc/valibot@1.15.4':
+    resolution: {integrity: sha512-EbnPNJQgzNiI9zDcNZZKm20pC1zxZfG6YKhZWq5g+s424K5OvZTu1dAq7BM4iAdkjtLAJ2CUxR0Is25vnuUbag==}
+    peerDependencies:
+      '@orpc/contract': 1.15.4
+      '@orpc/server': 1.15.4
+      valibot: '>=1.0.0'
 
   '@oxc-parser/binding-android-arm-eabi@0.127.0':
     resolution: {integrity: sha512-0LC7ye4hvqbIKxAzThzvswgHLFu2AURKzYLeSVvLdu2TBOYWQDmHnTqPLeA597BcUCxiLqLsS4CJ5uoI5WYWCQ==}
@@ -6442,6 +6473,9 @@ packages:
   json-schema-traverse@1.0.0:
     resolution: {integrity: sha512-NM8/P9n3XjXhIZn1lLhkFaACTOURQXjWhV4BA/RnOv8xvgqtqpAX9IO4mRQxSx1Rlo4tqzeqb0sOlruaOy3dug==}
 
+  json-schema-typed@8.0.2:
+    resolution: {integrity: sha512-fQhoXdcvc3V28x7C7BMs4P5+kNlgUURe2jmUT1T//oBRMDrqy1QPelJimwZGo7Hg9VPV3EQV5Bnq4hbFy2vetA==}
+
   json-schema@0.4.0:
     resolution: {integrity: sha512-es94M3nTIfsEPisRafak+HDLfHXnKBhV3vU5eqPcS3flIWqcxJWgXHXiey3YrpaNsanY5ei1VoYEbOzijuq9BA==}
 
@@ -7882,6 +7916,9 @@ packages:
     engines: {node: '>=18.0.0', npm: '>=8.0.0'}
     hasBin: true
 
+  rou3@0.7.12:
+    resolution: {integrity: sha512-iFE4hLDuloSWcD7mjdCDhx2bKcIsYbtOTpfH5MHHLSKMOUyjqQXTeZVa289uuwEGEKFoE/BAPbhaU4B774nceg==}
+
   router@2.2.0:
     resolution: {integrity: sha512-nLTrUKm2UyiL7rlhapu/Zl45FwNgkZGaCpZbIHajDYgwlJCOzLSk+cIPAnsEqV955GjILJnKbdQC1nVPz+gAYQ==}
     engines: {node: '>= 18'}
@@ -9007,8 +9044,8 @@ packages:
   vite-plugin-turbosnap@1.0.3:
     resolution: {integrity: sha512-p4D8CFVhZS412SyQX125qxyzOgIFouwOcvjZWk6bQbNPR1wtaEzFT6jZxAjf1dejlGqa6fqHcuCvQea6EWUkUA==}
 
-  vite-vue-internationalization@1.1.3:
-    resolution: {integrity: sha512-tsI33uvfe6AHuT2r0MfU/CFQPwesUtCotY9HnTcS8yr8nC/I8d2Q0K96k4pzCj0G/UvgXq3Hw/kjLFBpe0Ga7g==}
+  vite-vue-internationalization@1.1.5:
+    resolution: {integrity: sha512-779T5hPUYA8iUpGUB6uVs6mpNlyTMOafK54ogHrGguh9IDa+fL0eBK8pIiRNNMjy0JsH1IAf6TaEL7sBjsvaRg==}
     engines: {node: ^20.19.0 || >=22.12.0}
     peerDependencies:
       '@vue/language-core': ^3.3.0
@@ -10612,6 +10649,32 @@ snapshots:
 
   '@orpc/interop@1.15.4': {}
 
+  '@orpc/openapi-client@1.15.4(@opentelemetry/api@1.9.1)':
+    dependencies:
+      '@orpc/client': 1.15.4(@opentelemetry/api@1.9.1)
+      '@orpc/contract': 1.15.4(@opentelemetry/api@1.9.1)
+      '@orpc/shared': 1.15.4(@opentelemetry/api@1.9.1)
+      '@orpc/standard-server': 1.15.4(@opentelemetry/api@1.9.1)
+    transitivePeerDependencies:
+      - '@opentelemetry/api'
+
+  '@orpc/openapi@1.15.4(@opentelemetry/api@1.9.1)(fastify@5.12.5)(ws@8.21.3(bufferutil@4.1.0)(utf-8-validate@6.0.6))':
+    dependencies:
+      '@orpc/client': 1.15.4(@opentelemetry/api@1.9.1)
+      '@orpc/contract': 1.15.4(@opentelemetry/api@1.9.1)
+      '@orpc/interop': 1.15.4
+      '@orpc/openapi-client': 1.15.4(@opentelemetry/api@1.9.1)
+      '@orpc/server': 1.15.4(@opentelemetry/api@1.9.1)(fastify@5.12.5)(ws@8.21.3(bufferutil@4.1.0)(utf-8-validate@6.0.6))
+      '@orpc/shared': 1.15.4(@opentelemetry/api@1.9.1)
+      '@orpc/standard-server': 1.15.4(@opentelemetry/api@1.9.1)
+      json-schema-typed: 8.0.2
+      rou3: 0.7.12
+    transitivePeerDependencies:
+      - '@opentelemetry/api'
+      - crossws
+      - fastify
+      - ws
+
   '@orpc/server@1.15.4(@opentelemetry/api@1.9.1)(fastify@5.12.5)(ws@8.21.3(bufferutil@4.1.0)(utf-8-validate@6.0.6))':
     dependencies:
       '@orpc/client': 1.15.4(@opentelemetry/api@1.9.1)
@@ -10684,6 +10747,19 @@ snapshots:
       '@orpc/shared': 1.15.4(@opentelemetry/api@1.9.1)
     transitivePeerDependencies:
       - '@opentelemetry/api'
+
+  '@orpc/valibot@1.15.4(@opentelemetry/api@1.9.1)(@orpc/contract@1.15.4(@opentelemetry/api@1.9.1))(@orpc/server@1.15.4(@opentelemetry/api@1.9.1)(fastify@5.12.5)(ws@8.21.3(bufferutil@4.1.0)(utf-8-validate@6.0.6)))(fastify@5.12.5)(valibot@1.5.0(@typescript/typescript6@6.0.2))(ws@8.21.3(bufferutil@4.1.0)(utf-8-validate@6.0.6))':
+    dependencies:
+      '@orpc/contract': 1.15.4(@opentelemetry/api@1.9.1)
+      '@orpc/openapi': 1.15.4(@opentelemetry/api@1.9.1)(fastify@5.12.5)(ws@8.21.3(bufferutil@4.1.0)(utf-8-validate@6.0.6))
+      '@orpc/server': 1.15.4(@opentelemetry/api@1.9.1)(fastify@5.12.5)(ws@8.21.3(bufferutil@4.1.0)(utf-8-validate@6.0.6))
+      '@valibot/to-json-schema': 1.8.0(valibot@1.5.0(@typescript/typescript6@6.0.2))
+      valibot: 1.5.0(@typescript/typescript6@6.0.2)
+    transitivePeerDependencies:
+      - '@opentelemetry/api'
+      - crossws
+      - fastify
+      - ws
 
   '@oxc-parser/binding-android-arm-eabi@0.127.0':
     optional: true
@@ -12419,9 +12495,9 @@ snapshots:
       obug: 2.1.1
       std-env: 4.1.0
       tinyrainbow: 3.1.0
-      vitest: 4.1.11(@opentelemetry/api@1.9.1)(@types/node@26.4.0)(@vitest/browser-playwright@4.1.11)(@vitest/coverage-v8@4.1.11)(happy-dom@20.12.0(bufferutil@4.1.0)(utf-8-validate@6.0.6))(msw@2.15.0(@types/node@26.4.0)(typescript@6.0.3))(vite@8.2.2(@types/node@26.4.0)(esbuild@0.28.2)(sass-embedded@1.103.1)(sass@1.103.1)(terser@5.48.0)(tsx@4.23.13)(yaml@2.9.1))
+      vitest: 4.1.11(@opentelemetry/api@1.9.1)(@types/node@26.4.0)(@vitest/browser-playwright@4.1.11)(@vitest/coverage-v8@4.1.11)(happy-dom@20.12.0(bufferutil@4.1.0)(utf-8-validate@6.0.6))(msw@2.15.0(@types/node@26.4.0)(typescript@6.0.2))(vite@8.2.2(@types/node@26.4.0)(esbuild@0.28.2)(sass-embedded@1.103.1)(sass@1.103.1)(terser@5.48.0)(tsx@4.23.13)(yaml@2.9.1))
     optionalDependencies:
-      '@vitest/browser': 4.1.11(bufferutil@4.1.0)(msw@2.15.0(@types/node@26.4.0)(typescript@6.0.3))(utf-8-validate@6.0.6)(vite@8.2.2(@types/node@26.4.0)(esbuild@0.28.2)(sass-embedded@1.103.1)(sass@1.103.1)(terser@5.48.0)(tsx@4.23.13)(yaml@2.9.1))(vitest@4.1.11)
+      '@vitest/browser': 4.1.11(bufferutil@4.1.0)(msw@2.15.0(@types/node@26.4.0)(typescript@6.0.2))(utf-8-validate@6.0.6)(vite@8.2.2(@types/node@26.4.0)(esbuild@0.28.2)(sass-embedded@1.103.1)(sass@1.103.1)(terser@5.48.0)(tsx@4.23.13)(yaml@2.9.1))(vitest@4.1.11)
 
   '@vitest/expect@2.0.5':
     dependencies:
@@ -15120,6 +15196,8 @@ snapshots:
 
   json-schema-traverse@1.0.0: {}
 
+  json-schema-typed@8.0.2: {}
+
   json-schema@0.4.0: {}
 
   json-stable-stringify-without-jsonify@1.0.1: {}
@@ -16945,6 +17023,8 @@ snapshots:
       '@rollup/rollup-win32-x64-msvc': 4.63.1
       fsevents: 2.3.3
 
+  rou3@0.7.12: {}
+
   router@2.2.0(supports-color@10.2.2):
     dependencies:
       debug: 4.4.3(supports-color@10.2.2)
@@ -18063,7 +18143,7 @@ snapshots:
 
   vite-plugin-turbosnap@1.0.3: {}
 
-  vite-vue-internationalization@1.1.3(@oxc-project/types@0.147.0)(@vue/language-core@3.3.11)(oxc-parser@0.127.0)(vite@8.2.2(@types/node@26.4.0)(esbuild@0.28.2)(sass-embedded@1.103.1)(sass@1.103.1)(terser@5.48.0)(tsx@4.23.13)(yaml@2.9.1))(vue@3.5.42(typescript@6.0.3)):
+  vite-vue-internationalization@1.1.5(@oxc-project/types@0.147.0)(@vue/language-core@3.3.11)(oxc-parser@0.127.0)(vite@8.2.2(@types/node@26.4.0)(esbuild@0.28.2)(sass-embedded@1.103.1)(sass@1.103.1)(terser@5.48.0)(tsx@4.23.13)(yaml@2.9.1))(vue@3.5.42(typescript@6.0.3)):
     dependencies:
       '@formatjs/icu-messageformat-parser': 3.5.20
       '@vue/compiler-sfc': 3.5.42

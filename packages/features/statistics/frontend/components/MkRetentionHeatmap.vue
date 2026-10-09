@@ -15,8 +15,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script lang="ts" setup>
 import { onMounted, onUnmounted, nextTick, useTemplateRef, ref } from 'vue';
 import { Chart } from 'chart.js';
-import { misskeyApi } from '@/utility/misskey-api.js';
-import { store } from '@/store.js';
+import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
+import { store } from '@features/preferences/frontend/store.js';
 import { useChartTooltip } from '@features/statistics/frontend/composables/use-chart-tooltip.js';
 import { alpha } from '@features/ui/frontend/utility/color.js';
 import { initChart } from '@features/statistics/frontend/utility/init-chart.js';

@@ -2,23 +2,23 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
+import { toPackedInviteCode } from '../../../auth.schema.js';
 
-import { Inject, Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
-import type { RegistrationTicketsRepository } from '@/models/_.js';
-import { InviteCodeEntityService } from '@/core/entities/InviteCodeEntityService.js';
-import { IdService } from '@/core/IdService.js';
-import { DI } from '@/di-symbols.js';
-import { generateInviteCode } from '@/misc/generate-invite-code.js';
-import { ModerationLogService } from '@/core/ModerationLogService.js';
-import { ApiError } from '@/server/api/error.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import type { RegistrationTicketsRepository } from '@features/persistence/backend/repositories/models.js';
+import { InviteCodeEntityService } from '../../../serializers/InviteCodeEntityService.js';
+import { IdService } from '@features/runtime/backend/services/IdService.js';
+import { generateInviteCode } from '../../../utility/generate-invite-code.js';
+import { ModerationLogService } from '@features/moderation/backend/services/ModerationLogService.js';
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
+
+import { AdminInviteCreateContract } from '../../../api.definition.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
 
 export const meta = {
 	tags: ['admin'],
-
-	requireCredential: true,
-	requireModerator: true,
-	kind: 'write:admin:invite-codes',
 
 	errors: {
 		invalidDateTime: {
@@ -27,47 +27,27 @@ export const meta = {
 			id: 'f1380b15-3760-4c6c-a1db-5c3aaf1cbd49',
 		},
 	},
-
-	res: {
-		type: 'array',
-		optional: false, nullable: false,
-		items: {
-			type: 'object',
-			optional: false, nullable: false,
-			ref: 'InviteCode',
-		},
-	},
 } as const;
-
-export const paramDef = {
-	type: 'object',
-	properties: {
-		count: { type: 'integer', minimum: 1, maximum: 100, default: 1 },
-		expiresAt: { type: 'string', nullable: true },
-	},
-	required: [],
-} as const;
-
-@Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
-	constructor(
-		@Inject(DI.registrationTicketsRepository)
-		private registrationTicketsRepository: RegistrationTicketsRepository,
-
-		private inviteCodeEntityService: InviteCodeEntityService,
-		private idService: IdService,
-		private moderationLogService: ModerationLogService,
-	) {
-		super(meta, paramDef, async (ps, me) => {
+export interface AdminInviteCreateDependencies {
+	registrationTicketsRepository: RegistrationTicketsRepository;
+	inviteCodeEntityService: Pick<InviteCodeEntityService, 'packMany'>;
+	idService: Pick<IdService, 'gen'>;
+	moderationLogService: Pick<ModerationLogService, 'log'>;
+}
+export function createAdminInviteCreateProcedure(deps: AdminInviteCreateDependencies) {
+	return createApiProcedure<MiLocalUser>()(AdminInviteCreateContract).use(requirePrincipal<MiLocalUser>()).handler(async ({ input, context }) => {
+		const ps = input;
+		const me = context.principal;
+		const result = await (async () => {
 			if (ps.expiresAt && isNaN(Date.parse(ps.expiresAt))) {
-				throw new ApiError(meta.errors.invalidDateTime);
+				throw apiError(meta.errors.invalidDateTime);
 			}
 
 			const ticketsPromises = [];
 
 			for (let i = 0; i < ps.count; i++) {
-				ticketsPromises.push(this.registrationTicketsRepository.insertOne({
-					id: this.idService.gen(),
+				ticketsPromises.push(deps.registrationTicketsRepository.insertOne({
+					id: deps.idService.gen(),
 					createdBy: me,
 					createdById: me.id,
 					expiresAt: ps.expiresAt ? new Date(ps.expiresAt) : null,
@@ -77,11 +57,12 @@ export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDe
 
 			const tickets = await Promise.all(ticketsPromises);
 
-			this.moderationLogService.log(me, 'createInvitation', {
+			deps.moderationLogService.log(me, 'createInvitation', {
 				invitations: tickets,
 			});
 
-			return await this.inviteCodeEntityService.packMany(tickets, me);
-		});
-	}
+			return await deps.inviteCodeEntityService.packMany(tickets, me);
+		})();
+		return result.map(toPackedInviteCode);
+	});
 }

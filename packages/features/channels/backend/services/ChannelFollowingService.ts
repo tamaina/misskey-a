@@ -6,15 +6,15 @@
 import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
 import * as Redis from 'ioredis';
 import { DI } from '@/di-symbols.js';
-import type { ChannelFollowingsRepository, ChannelsRepository, MiUser } from '@/models/_.js';
-import { MiChannel } from '@/models/_.js';
-import { IdService } from '@/core/IdService.js';
-import { GlobalEvents, GlobalEventService } from '@/core/GlobalEventService.js';
-import { bindThis } from '@/decorators.js';
-import type { MiLocalUser } from '@/models/User.js';
-import { RedisKVCache } from '@/misc/cache.js';
-import { IdentifiableError } from '@/misc/identifiable-error.js';
-import { isDuplicateKeyValueError } from '@/misc/is-duplicate-key-value-error.js';
+import type { ChannelFollowingsRepository, ChannelsRepository, MiUser } from '@features/persistence/backend/repositories/models.js';
+import { MiChannel } from '@features/persistence/backend/repositories/models.js';
+import { IdService } from '@features/runtime/backend/services/IdService.js';
+import { GlobalEvents, GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+import { RedisKVCache } from '@features/runtime/backend/cache/cache.js';
+import { IdentifiableError } from '@features/runtime/backend/errors/identifiable-error.js';
+import { isDuplicateKeyValueError } from '@features/persistence/backend/utility/is-duplicate-key-value-error.js';
 
 @Injectable()
 export class ChannelFollowingService implements OnModuleInit {

@@ -4,7 +4,7 @@
  */
 
 import { describe, expect, it } from 'vitest';
-import { checkWordMute } from '@/misc/check-word-mute.js';
+import { checkWordMute } from '@features/relationships/backend/utility/check-word-mute.js';
 
 describe(checkWordMute, () => {
 	describe('Slacc boost mode', () => {

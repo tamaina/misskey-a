@@ -40,7 +40,7 @@ import * as Misskey from 'misskey-js';
 import { useTemplateRef } from 'vue';
 import MkModal from '@features/ui/frontend/components/MkModal.vue';
 import MkEmojiPicker from '@features/emojis/frontend/components/MkEmojiPicker.vue';
-import { prefer } from '@/preferences.js';
+import { prefer } from '@features/preferences/frontend/preferences.js';
 
 const props = withDefaults(defineProps<{
 	manualShowing?: boolean | null;

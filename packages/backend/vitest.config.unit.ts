@@ -7,7 +7,7 @@ export default mergeConfig(
 		test: {
 			globalSetup: './test/setup.unit.ts',
 			environment: './test/environment.unit.ts',
-			include: ['test/unit/**/*.ts', 'src/**/*.test.ts'],
+			include: ['test/unit/**/*.ts', 'src/**/*.test.ts', '../features/*/test/backend/**/*.test.ts'],
 		},
 	}),
 );

@@ -3,60 +3,26 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Inject, Injectable } from '@nestjs/common';
-import type { RolesRepository } from '@/models/_.js';
-import { Endpoint } from '@/server/api/endpoint-base.js';
-import { DI } from '@/di-symbols.js';
-import { RoleEntityService } from '@/core/entities/RoleEntityService.js';
-import { ApiError } from '@/server/api/error.js';
+import { toRoleDto } from '../../role.schema.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import type { ApiActor } from '@features/api/backend/transport/context.js';
 
-export const meta = {
-	tags: ['role', 'users'],
-
-	requireCredential: false,
-
-	errors: {
-		noSuchRole: {
-			message: 'No such role.',
-			code: 'NO_SUCH_ROLE',
-			id: 'de5502bf-009a-4639-86c1-fec349e46dcb',
-		},
-	},
-
-	res: {
-		type: 'object',
-		optional: false, nullable: false,
-		ref: 'Role',
-	},
-} as const;
-
-export const paramDef = {
-	type: 'object',
-	properties: {
-		roleId: { type: 'string', format: 'misskey:id' },
-	},
-	required: ['roleId'],
-} as const;
-
-@Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
-	constructor(
-		@Inject(DI.rolesRepository)
-		private rolesRepository: RolesRepository,
-
-		private roleEntityService: RoleEntityService,
-	) {
-		super(meta, paramDef, async (ps, me) => {
-			const role = await this.rolesRepository.findOneBy({
+import { rolesContract } from '../../api.definition.js';
+import type { RolesDependencies } from '../../api.implementation.js';
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
+import { rolesErrors } from '../../api.errors.js';
+export function createRolesShowProcedure<Actor extends ApiActor>(deps: Pick<RolesDependencies<Actor>, 'rolesRepository' | 'roleEntityService'>) {
+	return createApiProcedure<Actor>()(rolesContract.rolesShow)
+		.handler(async ({ input, context }) => {
+			const ps = input;
+			const me = context.principal;
+			const role = await deps.rolesRepository.findOneBy({
 				id: ps.roleId,
 				isPublic: true,
 			});
-
 			if (role == null) {
-				throw new ApiError(meta.errors.noSuchRole);
+				throw apiError(rolesErrors.rolesShow.noSuchRole);
 			}
-
-			return await this.roleEntityService.pack(role, me);
+			return toRoleDto(await deps.roleEntityService.pack(role, me));
 		});
-	}
 }

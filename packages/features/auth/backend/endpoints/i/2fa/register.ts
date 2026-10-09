@@ -3,21 +3,21 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 import bcrypt from 'bcryptjs';
 import * as OTPAuth from 'otpauth';
-import * as QRCode from '@/runtime-dependencies/qrcode.js';
-import { Inject, Injectable } from '@nestjs/common';
-import type { UserProfilesRepository } from '@/models/_.js';
-import { Endpoint } from '@/server/api/endpoint-base.js';
-import { DI } from '@/di-symbols.js';
+import * as QRCode from 'qrcode';
+import type { UserProfilesRepository } from '@features/persistence/backend/repositories/models.js';
 import type { Config } from '@/config.js';
-import { ApiError } from '@/server/api/error.js';
-import { UserAuthService } from '@/core/UserAuthService.js';
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
+import { UserAuthService } from '../../../services/UserAuthService.js';
+
+import { I2faRegisterContract } from '../../../api.definition.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
 
 export const meta = {
-	requireCredential: true,
-
-	secure: true,
 
 	errors: {
 		incorrectPassword: {
@@ -26,44 +26,19 @@ export const meta = {
 			id: '78d6c839-20c9-4c66-b90a-fc0542168b48',
 		},
 	},
-
-	res: {
-		type: 'object',
-		nullable: false,
-		optional: false,
-		properties: {
-			qr: { type: 'string' },
-			url: { type: 'string' },
-			secret: { type: 'string' },
-			label: { type: 'string' },
-			issuer: { type: 'string' },
-		},
-	},
 } as const;
-
-export const paramDef = {
-	type: 'object',
-	properties: {
-		password: { type: 'string' },
-		token: { type: 'string', nullable: true },
-	},
-	required: ['password'],
-} as const;
-
-@Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
-	constructor(
-		@Inject(DI.config)
-		private config: Config,
-
-		@Inject(DI.userProfilesRepository)
-		private userProfilesRepository: UserProfilesRepository,
-
-		private userAuthService: UserAuthService,
-	) {
-		super(meta, paramDef, async (ps, me) => {
+export interface I2faRegisterDependencies {
+	config: Config;
+	userProfilesRepository: UserProfilesRepository;
+	userAuthService: Pick<UserAuthService, 'twoFactorAuthenticate'>;
+}
+export function createI2faRegisterProcedure(deps: I2faRegisterDependencies) {
+	return createApiProcedure<MiLocalUser>()(I2faRegisterContract).use(requirePrincipal<MiLocalUser>()).handler(async ({ input, context }) => {
+		const ps = input;
+		const me = context.principal;
+		const result = await (async () => {
 			const token = ps.token;
-			const profile = await this.userProfilesRepository.findOneByOrFail({ userId: me.id });
+			const profile = await deps.userProfilesRepository.findOneByOrFail({ userId: me.id });
 
 			if (profile.twoFactorEnabled) {
 				if (token == null) {
@@ -71,7 +46,7 @@ export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDe
 				}
 
 				try {
-					await this.userAuthService.twoFactorAuthenticate(profile, token);
+					await deps.userAuthService.twoFactorAuthenticate(profile, token);
 				} catch (_) {
 					throw new Error('authentication failed');
 				}
@@ -79,13 +54,13 @@ export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDe
 
 			const passwordMatched = await bcrypt.compare(ps.password, profile.password ?? '');
 			if (!passwordMatched) {
-				throw new ApiError(meta.errors.incorrectPassword);
+				throw apiError(meta.errors.incorrectPassword);
 			}
 
 			// Generate user's secret key
 			const secret = new OTPAuth.Secret();
 
-			await this.userProfilesRepository.update(me.id, {
+			await deps.userProfilesRepository.update(me.id, {
 				twoFactorTempSecret: secret.base32,
 			});
 
@@ -94,7 +69,7 @@ export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDe
 				secret,
 				digits: 6,
 				label: me.username,
-				issuer: this.config.host,
+				issuer: deps.config.host,
 			});
 			const url = totp.toString();
 			const qr = await QRCode.toDataURL(url);
@@ -104,8 +79,9 @@ export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDe
 				url,
 				secret: secret.base32,
 				label: me.username,
-				issuer: this.config.host,
+				issuer: deps.config.host,
 			};
-		});
-	}
+		})();
+		return result;
+	});
 }

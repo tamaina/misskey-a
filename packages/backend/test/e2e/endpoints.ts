@@ -12,7 +12,7 @@ import { describe, beforeAll, test, expect, vi } from 'vitest';
 import { Blob } from 'node-fetch';
 import { api, castAsError, initTestDb, post, role, signup, simpleGet, uploadFile } from '../utils.js';
 import type * as misskey from 'misskey-js';
-import { MiUser } from '@/models/_.js';
+import { MiUser } from '@features/persistence/backend/repositories/models.js';
 
 const waitForPushToTlOptions = { timeout: 3000, interval: 25 };
 

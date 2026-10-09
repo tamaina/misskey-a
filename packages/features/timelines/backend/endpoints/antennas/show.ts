@@ -3,63 +3,35 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Inject, Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
-import type { AntennasRepository } from '@/models/_.js';
-import { AntennaEntityService } from '@/core/entities/AntennaEntityService.js';
-import { DI } from '@/di-symbols.js';
-import { ApiError } from '@/server/api/error.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import { toPackedAntenna } from '@features/timelines/backend/antenna.schema.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import { antennasShowContract, antennasShowErrors } from './show.contract.js';
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
+import { AntennaEntityService } from '../../serializers/AntennaEntityService.js';
+import type { AntennasRepository } from '@features/persistence/backend/repositories/models.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
 
-export const meta = {
-	tags: ['antennas', 'account'],
-
-	requireCredential: true,
-
-	kind: 'read:account',
-
-	errors: {
-		noSuchAntenna: {
-			message: 'No such antenna.',
-			code: 'NO_SUCH_ANTENNA',
-			id: 'c06569fb-b025-4f23-b22d-1fcd20d2816b',
-		},
-	},
-
-	res: {
-		type: 'object',
-		optional: false, nullable: false,
-		ref: 'Antenna',
-	},
-} as const;
-
-export const paramDef = {
-	type: 'object',
-	properties: {
-		antennaId: { type: 'string', format: 'misskey:id' },
-	},
-	required: ['antennaId'],
-} as const;
-
-@Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
-	constructor(
-		@Inject(DI.antennasRepository)
-		private antennasRepository: AntennasRepository,
-
-		private antennaEntityService: AntennaEntityService,
-	) {
-		super(meta, paramDef, async (ps, me) => {
-			// Fetch the antenna
-			const antenna = await this.antennasRepository.findOneBy({
-				id: ps.antennaId,
-				userId: me.id,
-			});
-
-			if (antenna == null) {
-				throw new ApiError(meta.errors.noSuchAntenna);
-			}
-
-			return await this.antennaEntityService.pack(antenna);
+export interface AntennasShowDependencies {
+	antennasRepository: AntennasRepository;
+	antennaEntityService: AntennaEntityService;
+}
+export function createAntennasShowProcedure<Actor extends MiLocalUser>(deps: AntennasShowDependencies) {
+	return createApiProcedure<Actor>()(antennasShowContract).use(requirePrincipal<Actor>())
+		.handler(async ({ input, context }) => {
+			const result = await (async () => {
+				const ps = input;
+				const me = context.principal;
+				// Fetch the antenna
+				const antenna = await deps.antennasRepository.findOneBy({
+					id: ps.antennaId,
+					userId: me.id,
+				});
+				if (antenna == null) {
+					throw apiError(antennasShowErrors.noSuchAntenna);
+				}
+				return await deps.antennaEntityService.pack(antenna);
+			})();
+			return toPackedAntenna(result);
 		});
-	}
 }

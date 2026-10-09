@@ -55,7 +55,7 @@ const TARGET_DIRECTORIES = [
 	'scripts',
 ];
 
-const TARGET_EXTENSIONS = new Set(['.cjs', '.html', '.js', '.mjs', '.scss', '.ts', '.vue']);
+const TARGET_EXTENSIONS = new Set(['.cjs', '.html', '.js', '.mjs', '.scss', '.ts', '.mts', '.vue']);
 const EXCLUDED_CONFIG_EXTENSIONS = new Set(['.cjs', '.js', '.mjs', '.ts']);
 const HTML_COMMENT_EXTENSIONS = new Set(['.vue', '.html']);
 

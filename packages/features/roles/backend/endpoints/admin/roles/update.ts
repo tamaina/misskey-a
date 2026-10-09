@@ -2,72 +2,23 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-
-import { Inject, Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
-import type { RolesRepository } from '@/models/_.js';
-import { DI } from '@/di-symbols.js';
-import { ApiError } from '@/server/api/error.js';
-import { RoleService } from '@/core/RoleService.js';
-
-export const meta = {
-	tags: ['admin', 'role'],
-
-	requireCredential: true,
-	requireAdmin: true,
-	kind: 'write:admin:roles',
-
-	errors: {
-		noSuchRole: {
-			message: 'No such role.',
-			code: 'NO_SUCH_ROLE',
-			id: 'cd23ef55-09ad-428a-ac61-95a45e124b32',
-		},
-	},
-} as const;
-
-export const paramDef = {
-	type: 'object',
-	properties: {
-		roleId: { type: 'string', format: 'misskey:id' },
-		name: { type: 'string' },
-		description: { type: 'string' },
-		color: { type: 'string', nullable: true },
-		iconUrl: { type: 'string', nullable: true },
-		target: { type: 'string', enum: ['manual', 'conditional'] },
-		condFormula: { type: 'object' },
-		isPublic: { type: 'boolean' },
-		isModerator: { type: 'boolean' },
-		isAdministrator: { type: 'boolean' },
-		isExplorable: { type: 'boolean' },
-		asBadge: { type: 'boolean' },
-		preserveAssignmentOnMoveAccount: { type: 'boolean' },
-		canEditMembersByModerator: { type: 'boolean' },
-		displayOrder: { type: 'number' },
-		policies: {
-			type: 'object',
-		},
-	},
-	required: [
-		'roleId',
-	],
-} as const;
-
-@Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
-	constructor(
-		@Inject(DI.rolesRepository)
-		private rolesRepository: RolesRepository,
-
-		private roleService: RoleService,
-	) {
-		super(meta, paramDef, async (ps, me) => {
-			const role = await this.rolesRepository.findOneBy({ id: ps.roleId });
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import type { ApiActor } from '@features/api/backend/transport/context.js';
+import { requirePrincipal, decodeScalarInput } from '@features/api/backend/transport/middleware.js';
+import { rolesContract } from '../../../api.definition.js';
+import type { RolesDependencies } from '../../../api.implementation.js';
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
+import { rolesErrors } from '../../../api.errors.js';
+export function createAdminRolesUpdateProcedure<Actor extends ApiActor>(deps: Pick<RolesDependencies<Actor>, 'rolesRepository' | 'roleService'>) {
+	return createApiProcedure<Actor>()(rolesContract.adminRolesUpdate).use(requirePrincipal<Actor>()).use(decodeScalarInput<Actor>({ isPublic: 'boolean', isModerator: 'boolean', isAdministrator: 'boolean', isExplorable: 'boolean', asBadge: 'boolean', preserveAssignmentOnMoveAccount: 'boolean', canEditMembersByModerator: 'boolean', displayOrder: 'number' }))
+		.handler(async ({ input, context }) => {
+			const ps = input;
+			const me = context.principal;
+			const role = await deps.rolesRepository.findOneBy({ id: ps.roleId });
 			if (role == null) {
-				throw new ApiError(meta.errors.noSuchRole);
+				throw apiError(rolesErrors.adminRolesUpdate.noSuchRole);
 			}
-
-			await this.roleService.update(role, {
+			await deps.roleService.update(role, {
 				name: ps.name,
 				description: ps.description,
 				color: ps.color,
@@ -85,5 +36,4 @@ export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDe
 				policies: ps.policies,
 			}, me);
 		});
-	}
 }

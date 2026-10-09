@@ -3,61 +3,40 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Inject, Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
-import { DI } from '@/di-symbols.js';
-import { ChatService } from '@/core/ChatService.js';
-import { ChatEntityService } from '@/core/entities/ChatEntityService.js';
-import { ApiError } from '@/server/api/error.js';
-import { IdService } from '@/core/IdService.js';
+import { toPackedChatRoomInvitation } from '../../../../api.dto.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 
-export const meta = {
-	tags: ['chat'],
+import type { InferSchemaOutput } from '@orpc/contract';
 
-	requireCredential: true,
+import { type IdService } from '@features/runtime/backend/services/IdService.js';
 
-	kind: 'read:chat',
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import { type ChatService } from '../../../../services/ChatService.js';
+import { type ChatEntityService } from '../../../../serializers/ChatEntityService.js';
+import { chatRoomsInvitationsInboxContract } from './inbox.contract.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
 
-	res: {
-		type: 'array',
-		optional: false, nullable: false,
-		items: {
-			type: 'object',
-			optional: false, nullable: false,
-			ref: 'ChatRoomInvitation',
-		},
-	},
-
-	errors: {
-	},
-} as const;
-
-export const paramDef = {
-	type: 'object',
-	properties: {
-		limit: { type: 'integer', minimum: 1, maximum: 100, default: 30 },
-		sinceId: { type: 'string', format: 'misskey:id' },
-		untilId: { type: 'string', format: 'misskey:id' },
-		sinceDate: { type: 'integer' },
-		untilDate: { type: 'integer' },
-	},
-} as const;
-
-@Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
-	constructor(
-		private chatEntityService: ChatEntityService,
-		private chatService: ChatService,
-		private idService: IdService,
-	) {
-		super(meta, paramDef, async (ps, me) => {
-			const untilId = ps.untilId ?? (ps.untilDate ? this.idService.gen(ps.untilDate!) : null);
-			const sinceId = ps.sinceId ?? (ps.sinceDate ? this.idService.gen(ps.sinceDate!) : null);
-
-			await this.chatService.checkChatAvailability(me.id, 'read');
-
-			const invitations = await this.chatService.getReceivedRoomInvitationsWithPagination(me.id, ps.limit, sinceId, untilId);
-			return this.chatEntityService.packRoomInvitations(invitations, me);
-		});
+export interface ChatRoomsInvitationsInboxDependencies {
+	chatEntityService: ChatEntityService;
+	chatService: ChatService;
+	idService: IdService;
+}
+export function createChatRoomsInvitationsInboxProcedure(deps: ChatRoomsInvitationsInboxDependencies) {
+	async function execute(ps: InferSchemaOutput<NonNullable<typeof chatRoomsInvitationsInboxContract['~orpc']['inputSchema']>>, me: MiLocalUser): Promise<InferSchemaOutput<NonNullable<typeof chatRoomsInvitationsInboxContract['~orpc']['outputSchema']>>> {
+		return (await run(ps, me)).map(toPackedChatRoomInvitation);
 	}
+
+	async function run(ps: InferSchemaOutput<NonNullable<typeof chatRoomsInvitationsInboxContract['~orpc']['inputSchema']>>, me: MiLocalUser) {
+		const untilId = ps.untilId ?? (ps.untilDate ? deps.idService.gen(ps.untilDate!) : null);
+		const sinceId = ps.sinceId ?? (ps.sinceDate ? deps.idService.gen(ps.sinceDate!) : null);
+
+		await deps.chatService.checkChatAvailability(me.id, 'read');
+
+		const invitations = await deps.chatService.getReceivedRoomInvitationsWithPagination(me.id, ps.limit, sinceId, untilId);
+		return deps.chatEntityService.packRoomInvitations(invitations, me);
+	}
+
+	return createApiProcedure<MiLocalUser>()(chatRoomsInvitationsInboxContract)
+		.use(requirePrincipal<MiLocalUser>())
+		.handler(({ input, context }) => execute(input, context.principal));
 }
