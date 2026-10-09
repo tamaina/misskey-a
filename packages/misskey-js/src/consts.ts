@@ -1,4 +1,4 @@
-import type { operations } from './autogen/types.js';
+import type { ContractEndpoints } from './contract.types.js';
 import type {
 	AbuseReportNotificationRecipient,
 	Ad,
@@ -271,7 +271,7 @@ type AvatarDecoration = {
 
 type ReceivedAbuseReport = {
 	reportId: AbuseReportNotificationRecipient['id'];
-	report: operations['admin___abuse-user-reports']['responses'][200]['content']['application/json'];
+	report: ContractEndpoints['admin/abuse-user-reports']['res'];
 	forwarded: boolean;
 };
 

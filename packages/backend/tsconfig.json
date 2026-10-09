@@ -52,7 +52,6 @@
 		"../features/*/backend/**/*.ts",
 		"../features/*/backend/**/*.tsx",
 		"../features/*/backend/**/*.mts",
-		"../features/*/contract/**/*.ts",
 		"../features/*/shared/**/*.ts"
 	],
 	"exclude": [

@@ -3,34 +3,24 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { notificationsContract } from '../../../contract/index.js';
-import { legacyNotificationsSchemas } from '@features/notifications/backend';
-import type { Schema } from '@features/api/backend/utility/json-schema.js';
-import { createContractTransportEndpoint } from '@features/api/backend/transport/contract-transport-endpoint.js';
-import { defineFeatureEndpoint } from '@features/api/backend/transport/feature-endpoint.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 
-export const meta = {
-	tags: ['notifications'],
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import { createContract } from './create.contract.js';
 
-	requireCredential: true,
-
-	kind: 'write:notifications',
-
-	limit: {
-		duration: 1000 * 60,
-		max: 10,
-	},
-
-	errors: {
-	},
-} as const;
-
-export const paramDef = legacyNotificationsSchemas['notifications/create'].input as Schema;
-
-export const { feature, createEndpoint } = defineFeatureEndpoint('notifications', notifications => createContractTransportEndpoint(meta, paramDef, notificationsContract['notifications/create'], async (params, user, token) =>
-	notifications['notifications/create'](params, {
-		context: {
-			actor: { id: user.id },
-			token: token == null ? null : { id: token.id, name: token.name, iconUrl: token.iconUrl },
-		},
-	})));
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+import type { NotificationsDependencies } from '@features/notifications/backend/api.implementation.js';
+export type CreateDependencies = Pick<NotificationsDependencies, 'createAppNotification'>;
+export function createCreateProcedure(deps: CreateDependencies) {
+	return createApiProcedure<MiLocalUser>()(createContract)
+		.use(requirePrincipal<MiLocalUser>())
+		.handler(async ({ input, context }) => {
+			const actor = context.principal;
+			const token = context.token;
+			deps.createAppNotification(actor.id, {
+				appAccessTokenId: token?.id ?? null, customBody: input.body,
+				customHeader: input.header ?? token?.name ?? null,
+				customIcon: input.icon ?? token?.iconUrl ?? null,
+			});
+		});
+}

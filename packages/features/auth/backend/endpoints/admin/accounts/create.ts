@@ -2,24 +2,19 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-
-import { NativeContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { compositionAdminAccountsCreateDefinition, compositionAdminAccountsCreateInput, compositionAdminAccountsCreateOutput } from '../../../../contract/output-composition-endpoint-definitions.js';
-import { Inject, Injectable } from '@nestjs/common';
-import type { MiMeta, UsersRepository } from '@features/persistence/backend/repositories/models.js';
-import { SignupService } from '../../../services/SignupService.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 import { RoleService } from '@features/roles/backend/services/RoleService.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
-import { DI } from '@/di-symbols.js';
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
+
 import type { Config } from '@/config.js';
-import { ApiError } from '@features/api/backend/transport/error.js';
-import * as v from 'valibot';
-import { nativeMeDetailedSchema } from '@features/users/backend/serializers/native-user.js';
 
-const nativeOutputSchema = v.strictObject({ ...nativeMeDetailedSchema.entries, token: v.string() });
+import { SignupService } from '../../../services/SignupService.js';
+import { AdminAccountsCreateContract } from '../../../api.definition.js';
+import type { MiMeta, UsersRepository } from '@features/persistence/backend/repositories/models.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
 
-const contractProjection = projectEndpointContract(compositionAdminAccountsCreateDefinition);
-
+import { toPackedUserDetailed } from '@features/users/backend/user.schema.js';
 export const meta = {
 	tags: ['admin'],
 
@@ -36,59 +31,52 @@ export const meta = {
 			id: '97147c55-1ae1-4f6f-91d6-e1c3e0e76d62',
 		},
 	},
-
-	res: contractProjection.response,
 } as const;
+export interface AdminAccountsCreateDependencies {
+	config: Config;
+	serverSettings: MiMeta;
+	usersRepository: UsersRepository;
+	userEntityService: Pick<UserEntityService, 'packSelf'>;
+	signupService: Pick<SignupService, 'signup'>;
+	roleService: Pick<RoleService, 'isAdministrator'>;
+}
+export function createAdminAccountsCreateProcedure(deps: AdminAccountsCreateDependencies) {
+	return createApiProcedure<MiLocalUser>()(AdminAccountsCreateContract).handler(async ({ input, context }) => {
+		const ps = input;
+		const _me = context.principal;
+		const token = context.token;
+		const result = await (async () => {
+			const me = _me ? await deps.usersRepository.findOneByOrFail({ id: _me.id }) : null;
 
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export class EndpointImplementation extends NativeContractEndpoint<typeof meta, typeof compositionAdminAccountsCreateInput, typeof compositionAdminAccountsCreateOutput, typeof nativeOutputSchema> {
-	constructor(
-		@Inject(DI.config)
-		private config: Config,
-
-		@Inject(DI.meta)
-		private serverSettings: MiMeta,
-
-		@Inject(DI.usersRepository)
-		private usersRepository: UsersRepository,
-
-		private userEntityService: UserEntityService,
-		private signupService: SignupService,
-		private roleService: RoleService,
-	) {
-		super(meta, contractProjection, nativeOutputSchema, async (ps, _me, token) => {
-			const me = _me ? await this.usersRepository.findOneByOrFail({ id: _me.id }) : null;
-
-			if (this.serverSettings.rootUserId == null && me == null && token == null) {
+			if (deps.serverSettings.rootUserId == null && me == null && token == null) {
 				// 初回セットアップの場合
-				if (this.config.setupPassword != null) {
+				if (deps.config.setupPassword != null) {
 					// 初期パスワードが設定されている場合
-					if (ps.setupPassword !== this.config.setupPassword) {
+					if (ps.setupPassword !== deps.config.setupPassword) {
 						// 初期パスワードが違う場合
-						throw new ApiError(meta.errors.wrongInitialPassword);
+						throw apiError(meta.errors.wrongInitialPassword);
 					}
 				} else if (ps.setupPassword != null && ps.setupPassword.trim() !== '') {
 					// 初期パスワードが設定されていないのに初期パスワードが入力された場合
-					throw new ApiError(meta.errors.wrongInitialPassword);
+					throw apiError(meta.errors.wrongInitialPassword);
 				}
-			} else if (token !== null || !(await this.roleService.isAdministrator(me))) {
+			} else if (token !== null || !(await deps.roleService.isAdministrator(me))) {
 				// 初回セットアップではなく、管理者でない場合 or 外部トークンを使用している場合
-				throw new ApiError(meta.errors.accessDenied);
+				throw apiError(meta.errors.accessDenied);
 			}
 
-			const { account, secret } = await this.signupService.signup({
+			const { account, secret } = await deps.signupService.signup({
 				username: ps.username,
 				password: ps.password,
 				ignorePreservedUsernames: true,
 			});
 
-			const res = await this.userEntityService.packSelf(account, {
+			const res = await deps.userEntityService.packSelf(account, {
 				includeSecrets: true,
 			});
 
 			return { ...res, token: secret };
-		});
-	}
+		})();
+		return { ...toPackedUserDetailed(result), token: result.token };
+	});
 }

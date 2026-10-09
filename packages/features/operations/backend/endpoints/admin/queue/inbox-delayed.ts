@@ -3,44 +3,29 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { delayedTupleAdminQueueInboxDelayedDefinition, delayedTupleAdminQueueInboxDelayedInput, delayedTupleAdminQueueInboxDelayedOutput } from '../../../../contract/delayed-tuple-endpoint-definitions.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import type { ApiActor } from '@features/api/backend/transport/context.js';
+import { adminQueueInboxDelayedContract } from './inbox-delayed.contract.js';
 import { URL } from 'node:url';
-import { Inject, Injectable } from '@nestjs/common';
-import type { InboxQueue } from '@features/boot/backend/assembly/QueueModule.js';
-
-const contractProjection = projectEndpointContract(delayedTupleAdminQueueInboxDelayedDefinition);
-
-export const meta = {
-	tags: ['admin'],
-
-	requireCredential: true,
-	requireModerator: true,
-	kind: 'read:admin:queue',
-
-	res: contractProjection.response,
-} as const;
-
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof delayedTupleAdminQueueInboxDelayedInput, typeof delayedTupleAdminQueueInboxDelayedOutput> {
-	constructor(
-		@Inject('queue:inbox') public inboxQueue: InboxQueue,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			const jobs = await this.inboxQueue.getJobs(['delayed']);
-
-			const counts = new Map<string, number>();
-
-			for (const job of jobs) {
-				const host = new URL(job.data.signature.keyId).host;
-				counts.set(host, (counts.get(host) ?? 0) + 1);
-			}
-
-			const res = [...counts.entries()].sort((a, b) => b[1] - a[1]);
-
-			return res;
+import type { InboxQueue } from '../../../../../boot/backend/assembly/QueueModule.js';
+export interface AdminQueueInboxDelayedDependencies {
+	inboxQueue: Pick<InboxQueue, 'getJobs'>;
+}
+export function createAdminQueueInboxDelayedProcedure<Actor extends ApiActor>(deps: AdminQueueInboxDelayedDependencies) {
+	return createApiProcedure<Actor>()(adminQueueInboxDelayedContract)
+		.use(requirePrincipal<Actor>())
+		.handler(async () => {
+			const result = await (async () => {
+				const jobs = await deps.inboxQueue.getJobs(['delayed']);
+				const counts = new Map<string, number>();
+				for (const job of jobs) {
+					const host = new URL(job.data.signature.keyId).host;
+					counts.set(host, (counts.get(host) ?? 0) + 1);
+				}
+				const res = [...counts.entries()].sort((a, b) => b[1] - a[1]);
+				return res;
+			})();
+			return result;
 		});
-	}
 }

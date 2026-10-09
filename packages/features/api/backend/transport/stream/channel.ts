@@ -9,7 +9,7 @@ import { isUserRelated } from '@features/relationships/backend/utility/is-user-r
 import { isQuotePacked, isRenotePacked } from '@features/notes/backend/utility/is-renote.js';
 import { isChannelRelated } from '@features/channels/backend/utility/is-channel-related.js';
 import type { Awaitable } from '@features/runtime/backend/types.js';
-import type { Packed } from '@features/index/contract/packed.js';
+import type { Packed } from '@features/index/backend/packed.schema.js';
 import type { JsonObject, JsonValue } from '@features/runtime/backend/formatting/json-value.js';
 import type { Connection } from './Connection.js';
 

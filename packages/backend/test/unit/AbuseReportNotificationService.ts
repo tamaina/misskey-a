@@ -85,7 +85,7 @@ describe('AbuseReportNotificationService', () => {
 			.then(x => systemWebhooksRepository.findOneByOrFail(x.identifiers[0]));
 	}
 
-	async function createRecipient(data: Partial<MiAbuseReportNotificationRecipient> = {}) {
+	async function createRecipient(data: Partial<Pick<MiAbuseReportNotificationRecipient, 'id' | 'isActive' | 'updatedAt' | 'name' | 'method' | 'userId' | 'systemWebhookId'>> = {}) {
 		return abuseReportNotificationRecipientRepository
 			.insert({
 				id: idService.gen(),

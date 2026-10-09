@@ -2,57 +2,35 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-
-import { Inject, Injectable } from '@nestjs/common';
-import type { UsersRepository, SigninsRepository, UserProfilesRepository } from '@features/persistence/backend/repositories/models.js';
-import { LegacyAdminUserProducerEndpoint, legacyAdminShowUserMeta, legacyAdminShowUserParamDef } from '../../legacy-admin-user-producer-endpoint.js';
-import { DI } from '@/di-symbols.js';
-import { RoleService } from '@features/roles/backend/services/RoleService.js';
-import { RoleEntityService } from '@features/roles/backend/serializers/RoleEntityService.js';
-import { IdService } from '@features/runtime/backend/services/IdService.js';
-
-export const meta = legacyAdminShowUserMeta;
-export const paramDef = legacyAdminShowUserParamDef;
-
-@Injectable()
-export class EndpointImplementation extends LegacyAdminUserProducerEndpoint {
-	constructor(
-		@Inject(DI.usersRepository)
-		private usersRepository: UsersRepository,
-
-		@Inject(DI.userProfilesRepository)
-		private userProfilesRepository: UserProfilesRepository,
-
-		@Inject(DI.signinsRepository)
-		private signinsRepository: SigninsRepository,
-
-		private roleService: RoleService,
-		private roleEntityService: RoleEntityService,
-		private idService: IdService,
-	) {
-		super(async (ps, me) => {
+import { toPackedNotificationSettings } from '@features/users/backend/notification-settings.schema.js';
+import { toRoleDto } from '@features/roles/backend/role.schema.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import type { ApiActor } from '@features/api/backend/transport/context.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import { moderationContract } from '../../api.definition.js';
+import type { ModerationApiDependencies } from '../../api.implementation.js';
+import { toPackedJsonObject } from '@features/users/backend/json-value.schema.js';
+export function createAdminShowUserProcedure<Actor extends ApiActor>(deps: Pick<ModerationApiDependencies<Actor>, 'usersRepository' | 'userProfilesRepository' | 'roleService' | 'signinsRepository' | 'roleEntityService' | 'idService'>) {
+	return createApiProcedure<Actor>()(moderationContract.adminShowUser).use(requirePrincipal<Actor>())
+		.handler(async ({ input, context }) => {
+			const ps = input;
+			const me = context.principal;
 			const [user, profile] = await Promise.all([
-				this.usersRepository.findOneBy({ id: ps.userId }),
-				this.userProfilesRepository.findOneBy({ userId: ps.userId }),
+				deps.usersRepository.findOneBy({ id: ps.userId }),
+				deps.userProfilesRepository.findOneBy({ userId: ps.userId }),
 			]);
-
 			if (user == null || profile == null) {
 				throw new Error('user not found');
 			}
-
-			const isModerator = await this.roleService.isModerator(user);
-			const isSilenced = !(await this.roleService.getUserPolicies(user.id)).canPublicNote;
-
-			const _me = await this.usersRepository.findOneByOrFail({ id: me.id });
-			if (!await this.roleService.isAdministrator(_me) && await this.roleService.isAdministrator(user)) {
+			const isModerator = await deps.roleService.isModerator(user);
+			const isSilenced = !(await deps.roleService.getUserPolicies(user.id)).canPublicNote;
+			const _me = await deps.usersRepository.findOneByOrFail({ id: me.id });
+			if (!await deps.roleService.isAdministrator(_me) && await deps.roleService.isAdministrator(user)) {
 				throw new Error('cannot show info of admin');
 			}
-
-			const signins = await this.signinsRepository.findBy({ userId: user.id });
-
-			const roleAssigns = await this.roleService.getUserAssigns(user.id);
-			const roles = await this.roleService.getUserRoles(user.id);
-
+			const signins = await deps.signinsRepository.findBy({ userId: user.id });
+			const roleAssigns = await deps.roleService.getUserAssigns(user.id);
+			const roles = await deps.roleService.getUserRoles(user.id);
 			return {
 				email: profile.email,
 				emailVerified: profile.emailVerified,
@@ -67,22 +45,21 @@ export class EndpointImplementation extends LegacyAdminUserProducerEndpoint {
 				receiveAnnouncementEmail: profile.receiveAnnouncementEmail,
 				mutedWords: profile.mutedWords,
 				mutedInstances: profile.mutedInstances,
-				notificationRecieveConfig: profile.notificationRecieveConfig,
+				notificationRecieveConfig: toPackedNotificationSettings(profile.notificationRecieveConfig),
 				isModerator: isModerator,
 				isSilenced: isSilenced,
 				isSuspended: user.isSuspended,
 				isHibernated: user.isHibernated,
 				lastActiveDate: user.lastActiveDate ? user.lastActiveDate.toISOString() : null,
 				moderationNote: profile.moderationNote ?? '',
-				signins,
-				policies: await this.roleService.getUserPolicies(user.id),
-				roles: await this.roleEntityService.packMany(roles, me),
+				signins: signins.map(({ id, userId, ip, headers, success }) => ({ id, userId, ip, headers: toPackedJsonObject(headers), success })),
+				policies: await deps.roleService.getUserPolicies(user.id),
+				roles: (await deps.roleEntityService.packMany(roles, me)).map(toRoleDto),
 				roleAssigns: roleAssigns.map(a => ({
-					createdAt: this.idService.parse(a.id).date.toISOString(),
+					createdAt: deps.idService.parse(a.id).date.toISOString(),
 					expiresAt: a.expiresAt ? a.expiresAt.toISOString() : null,
 					roleId: a.roleId,
 				})),
 			};
 		});
-	}
 }

@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import type { Antenna } from '@features/portability/backend/endpoints/i/import-antennas.js';
+import type { AntennaArtifact } from '@features/portability/backend/antenna-artifact.schema.js';
 import type { MiDriveFile } from '@features/drive/backend/models/DriveFile.js';
 import type { MiNote } from '@features/notes/backend/models/Note.js';
 import type { SystemWebhookEventType } from '@features/integrations/backend/models/SystemWebhook.js';
@@ -90,7 +90,7 @@ export type DbUserImportJobData = {
 
 export type DBAntennaImportJobData = {
 	user: ThinUser,
-	antenna: Antenna
+	antenna: AntennaArtifact
 };
 
 export type DbUserImportToDbJobData = {

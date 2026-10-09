@@ -3,68 +3,35 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { uniqueGalleryPostsUpdateDefinition, uniqueGalleryPostsUpdateInput, uniqueGalleryPostsUpdateOutput } from '../../../../contract/unique-string-endpoint-definitions.js';
-import ms from 'ms';
-import { Inject, Injectable } from '@nestjs/common';
-import type { DriveFilesRepository, GalleryPostsRepository } from '@features/persistence/backend/repositories/models.js';
+import { toPackedGalleryPost } from '../../../api.dto.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import { requirePrincipal, decodeScalarInput } from '@features/api/backend/transport/middleware.js';
+import type { ApiActor } from '@features/api/backend/transport/context.js';
+import { collectionsContract } from '../../../api.definition.js';
+import type { CollectionsDependencies } from '../../../api.implementation.js';
 import type { MiDriveFile } from '@features/drive/backend/models/DriveFile.js';
-import { GalleryPostEntityService } from '../../../serializers/GalleryPostEntityService.js';
-import { DI } from '@/di-symbols.js';
-
-const contractProjection = projectEndpointContract(uniqueGalleryPostsUpdateDefinition);
-
-export const meta = {
-	tags: ['gallery'],
-
-	requireCredential: true,
-
-	prohibitMoved: true,
-
-	kind: 'write:gallery',
-
-	limit: {
-		duration: ms('1hour'),
-		max: 300,
-	},
-
-	res: contractProjection.response,
-
-	errors: {
-
-	},
-} as const;
-
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof uniqueGalleryPostsUpdateInput, typeof uniqueGalleryPostsUpdateOutput> {
-	constructor(
-		@Inject(DI.galleryPostsRepository)
-		private galleryPostsRepository: GalleryPostsRepository,
-
-		@Inject(DI.driveFilesRepository)
-		private driveFilesRepository: DriveFilesRepository,
-
-		private galleryPostEntityService: GalleryPostEntityService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
+export interface GalleryPostsUpdateDependencies<Actor extends ApiActor> {
+	driveFilesRepository: Pick<CollectionsDependencies<Actor>['driveFilesRepository'], 'findOneBy'>;
+	galleryPostsRepository: Pick<CollectionsDependencies<Actor>['galleryPostsRepository'], 'findOneByOrFail' | 'update'>;
+	galleryPostEntityService: Pick<CollectionsDependencies<Actor>['galleryPostEntityService'], 'pack'>;
+}
+export function createGalleryPostsUpdateProcedure<Actor extends ApiActor>(deps: GalleryPostsUpdateDependencies<Actor>) {
+	return createApiProcedure<Actor>()(collectionsContract.galleryPostsUpdate).use(requirePrincipal<Actor>()).use(decodeScalarInput<Actor>({ isSensitive: 'boolean' }))
+		.handler(async ({ input: ps, context }) => {
+			const me = context.principal;
 			let files: Array<MiDriveFile> | undefined;
-
 			if (ps.fileIds) {
 				files = (await Promise.all(ps.fileIds.map(fileId =>
-					this.driveFilesRepository.findOneBy({
+					deps.driveFilesRepository.findOneBy({
 						id: fileId,
 						userId: me.id,
 					}),
 				))).filter(x => x != null);
-
 				if (files.length === 0) {
 					throw new Error();
 				}
 			}
-
-			await this.galleryPostsRepository.update({
+			await deps.galleryPostsRepository.update({
 				id: ps.postId,
 				userId: me.id,
 			}, {
@@ -74,10 +41,7 @@ export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof
 				isSensitive: ps.isSensitive,
 				fileIds: files ? files.map(file => file.id) : undefined,
 			});
-
-			const post = await this.galleryPostsRepository.findOneByOrFail({ id: ps.postId });
-
-			return await this.galleryPostEntityService.pack(post, me);
+			const post = await deps.galleryPostsRepository.findOneByOrFail({ id: ps.postId });
+			return toPackedGalleryPost(await deps.galleryPostEntityService.pack(post, me));
 		});
-	}
 }

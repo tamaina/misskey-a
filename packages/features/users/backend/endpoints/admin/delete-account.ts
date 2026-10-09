@@ -2,42 +2,30 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import { type DeleteAccountService } from '../../services/DeleteAccountService.js';
+import type { ApiToken } from '@features/api/backend/transport/context.js';
+import type { UsersInputs } from '../../api.definition.js';
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { voidAdminDeleteAccountDefinition, voidAdminDeleteAccountInput, voidAdminDeleteAccountOutput } from '../../../contract/void-endpoint-definitions.js';
-import { Inject, Injectable } from '@nestjs/common';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
 import type { UsersRepository } from '@features/persistence/backend/repositories/models.js';
+import { adminDeleteAccountContract } from './delete-account.contract.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
 
-import { DeleteAccountService } from '../../services/DeleteAccountService.js';
-import { DI } from '@/di-symbols.js';
+export interface AdminDeleteAccountDependencies {
+	usersRepository: UsersRepository;
+	deleteAccountService: DeleteAccountService;
+}
+export function createAdminDeleteAccountProcedure(deps: AdminDeleteAccountDependencies) {
+	async function execute(ps: UsersInputs['admin/delete-account'], me: MiLocalUser, _token: ApiToken | null, _ip: string) {
+		const user = await deps.usersRepository.findOneByOrFail({ id: ps.userId });
+		if (user.isDeleted) {
+			return;
+		}
 
-const contractProjection = projectEndpointContract(voidAdminDeleteAccountDefinition);
-
-export const meta = {
-	tags: ['admin'],
-
-	requireCredential: true,
-	requireAdmin: true,
-	kind: 'write:admin:delete-account',
-} as const;
-
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof voidAdminDeleteAccountInput, typeof voidAdminDeleteAccountOutput> {
-	constructor(
-		@Inject(DI.usersRepository)
-		private usersRepository: UsersRepository,
-
-		private deleteAccountService: DeleteAccountService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			const user = await this.usersRepository.findOneByOrFail({ id: ps.userId });
-			if (user.isDeleted) {
-				return;
-			}
-
-			await this.deleteAccountService.deleteAccount(user, me);
-		});
+		await deps.deleteAccountService.deleteAccount(user, me);
 	}
+
+	return createApiProcedure<MiLocalUser>()(adminDeleteAccountContract).use(requirePrincipal<MiLocalUser>())
+		.handler(async ({ input, context }) => await execute(input, context.principal, context.token, context.ip));
 }

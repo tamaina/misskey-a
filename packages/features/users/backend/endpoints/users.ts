@@ -2,79 +2,62 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import { type QueryService } from '@features/notes/backend/services/QueryService.js';
+import { type UserEntityService } from '../serializers/UserEntityService.js';
+import type { ApiToken } from '@features/api/backend/transport/context.js';
+import type { UsersInputs } from '../api.definition.js';
 
-import { NativeContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { packedUsersDefinition, packedUsersInput, packedUsersOutput } from '../../contract/packed-endpoint-definitions.js';
-import { Inject, Injectable } from '@nestjs/common';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
 import type { UsersRepository } from '@features/persistence/backend/repositories/models.js';
+import { usersContract } from './users.contract.js';
 
-import { QueryService } from '@features/notes/backend/services/QueryService.js';
-import { UserEntityService } from '../serializers/UserEntityService.js';
-import { DI } from '@/di-symbols.js';
+import { toPackedUserDetailed } from '@features/users/backend/user.schema.js';
+export interface UsersDependencies {
+	usersRepository: UsersRepository;
+	userEntityService: UserEntityService;
+	queryService: QueryService;
+}
+export function createUsersProcedure(deps: UsersDependencies) {
+	async function execute(ps: UsersInputs['users'], me: MiLocalUser | null, _token: ApiToken | null, _ip: string) {
+		const query = deps.usersRepository.createQueryBuilder('user')
+			.where('user.isExplorable = TRUE')
+			.andWhere('user.isSuspended = FALSE');
 
-import * as v from 'valibot';
-import { nativeUserDetailedSchema } from '@features/users/backend/serializers/native-user.js';
+		switch (ps.state) {
+			case 'alive': query.andWhere('user.updatedAt > :date', { date: new Date(Date.now() - 1000 * 60 * 60 * 24 * 5) }); break;
+		}
 
-export const nativeOutputSchema = v.array(nativeUserDetailedSchema);
+		switch (ps.origin) {
+			case 'local': query.andWhere('user.host IS NULL'); break;
+			case 'remote': query.andWhere('user.host IS NOT NULL'); break;
+		}
 
-const contractProjection = projectEndpointContract(packedUsersDefinition);
+		if (ps.hostname) {
+			query.andWhere('user.host = :hostname', { hostname: ps.hostname.toLowerCase() });
+		}
 
-export const meta = {
-	tags: ['users'],
+		switch (ps.sort) {
+			case '+follower': query.orderBy('user.followersCount', 'DESC'); break;
+			case '-follower': query.orderBy('user.followersCount', 'ASC'); break;
+			case '+createdAt': query.orderBy('user.id', 'DESC'); break;
+			case '-createdAt': query.orderBy('user.id', 'ASC'); break;
+			case '+updatedAt': query.andWhere('user.updatedAt IS NOT NULL').orderBy('user.updatedAt', 'DESC'); break;
+			case '-updatedAt': query.andWhere('user.updatedAt IS NOT NULL').orderBy('user.updatedAt', 'ASC'); break;
+			default: query.orderBy('user.id', 'ASC'); break;
+		}
 
-	requireCredential: false,
+		if (me) deps.queryService.generateMutedUserQueryForUsers(query, me);
+		if (me) deps.queryService.generateBlockQueryForUsers(query, me);
 
-	res: contractProjection.response,
-} as const;
+		query.limit(ps.limit);
+		query.offset(ps.offset);
 
-export const paramDef = contractProjection.input;
+		const users = await query.getMany();
 
-@Injectable()
-export class EndpointImplementation extends NativeContractEndpoint<typeof meta, typeof packedUsersInput, typeof packedUsersOutput, typeof nativeOutputSchema> {
-	constructor(
-		@Inject(DI.usersRepository)
-		private usersRepository: UsersRepository,
-
-		private userEntityService: UserEntityService,
-		private queryService: QueryService,
-	) {
-		super(meta, contractProjection, nativeOutputSchema, async (ps, me) => {
-			const query = this.usersRepository.createQueryBuilder('user')
-				.where('user.isExplorable = TRUE')
-				.andWhere('user.isSuspended = FALSE');
-
-			switch (ps.state) {
-				case 'alive': query.andWhere('user.updatedAt > :date', { date: new Date(Date.now() - 1000 * 60 * 60 * 24 * 5) }); break;
-			}
-
-			switch (ps.origin) {
-				case 'local': query.andWhere('user.host IS NULL'); break;
-				case 'remote': query.andWhere('user.host IS NOT NULL'); break;
-			}
-
-			if (ps.hostname) {
-				query.andWhere('user.host = :hostname', { hostname: ps.hostname.toLowerCase() });
-			}
-
-			switch (ps.sort) {
-				case '+follower': query.orderBy('user.followersCount', 'DESC'); break;
-				case '-follower': query.orderBy('user.followersCount', 'ASC'); break;
-				case '+createdAt': query.orderBy('user.id', 'DESC'); break;
-				case '-createdAt': query.orderBy('user.id', 'ASC'); break;
-				case '+updatedAt': query.andWhere('user.updatedAt IS NOT NULL').orderBy('user.updatedAt', 'DESC'); break;
-				case '-updatedAt': query.andWhere('user.updatedAt IS NOT NULL').orderBy('user.updatedAt', 'ASC'); break;
-				default: query.orderBy('user.id', 'ASC'); break;
-			}
-
-			if (me) this.queryService.generateMutedUserQueryForUsers(query, me);
-			if (me) this.queryService.generateBlockQueryForUsers(query, me);
-
-			query.limit(ps.limit);
-			query.offset(ps.offset);
-
-			const users = await query.getMany();
-
-			return await this.userEntityService.packMany(users, me, { schema: 'UserDetailed' });
-		});
+		return await deps.userEntityService.packMany(users, me, { schema: 'UserDetailed' });
 	}
+
+	return createApiProcedure<MiLocalUser>()(usersContract)
+		.handler(async ({ input, context }) => (await execute(input, context.principal, context.token, context.ip)).map(user => toPackedUserDetailed(user)));
 }

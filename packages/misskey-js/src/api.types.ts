@@ -1,11 +1,9 @@
 import type { ContractEndpoints } from './contract.types.js';
-import { Endpoints as Gen } from './autogen/endpoint.js';
 import { UserDetailed } from './autogen/models.js';
 import {
 	AdminRolesCreateRequest,
 	AdminRolesCreateResponse,
 	EmptyRequest,
-	EmptyResponse,
 	I2faRegisterKeyRequest,
 	I2faKeyDoneResponse,
 } from './autogen/entities.js';
@@ -51,8 +49,15 @@ type GetCaseResult<E extends keyof Endpoints, P extends Endpoints[E]['req'], C e
 		? StrictExtract<Endpoints[E]['res']['$switch']['$cases'][C], [P, any]>[1]
 		: never;
 
+/** Required list selectors win; a request that may contain them has both response shapes. */
+type UsersShowResponse<P> = P extends { userIds: string[] }
+	? UserDetailed[]
+	: P extends { userIds?: infer Ids }
+		? string[] extends Ids ? UserDetailed | UserDetailed[] : UserDetailed
+		: UserDetailed;
+
 /* eslint-disable @stylistic/indent */
-export type SwitchCaseResponseType<E extends keyof Endpoints, P extends Endpoints[E]['req']> = Endpoints[E]['res'] extends SwitchCase
+export type SwitchCaseResponseType<E extends keyof Endpoints, P extends Endpoints[E]['req']> = [E] extends ['users/show'] ? UsersShowResponse<P> : Endpoints[E]['res'] extends SwitchCase
 	? IsCaseMatched<E, P, 0> extends true ? GetCaseResult<E, P, 0> :
 		IsCaseMatched<E, P, 1> extends true ? GetCaseResult<E, P, 1> :
 			IsCaseMatched<E, P, 2> extends true ? GetCaseResult<E, P, 2> :
@@ -67,7 +72,7 @@ export type SwitchCaseResponseType<E extends keyof Endpoints, P extends Endpoint
 /* eslint-enable @stylistic/indent */
 
 export type Endpoints = Overwrite<
-	Overwrite<Gen, ContractEndpoints>,
+	ContractEndpoints,
 	{
 		'users/show': {
 			req: ContractEndpoints['users/show']['req'];
@@ -75,7 +80,7 @@ export type Endpoints = Overwrite<
 				$switch: {
 					$cases: [[
 						{
-							userIds?: string[];
+							userIds: string[];
 						}, UserDetailed[],
 					]];
 					$default: UserDetailed;
@@ -127,7 +132,7 @@ export type Endpoints = Overwrite<
 		},
 		'clear-browser-cache': {
 			req: EmptyRequest;
-			res: EmptyResponse;
+			res: null;
 		},
 	}
 >;

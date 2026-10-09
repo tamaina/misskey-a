@@ -1,23 +1,25 @@
 // Compile-only fixture; never execute it.
 import type { APIClient } from '../src/api.js';
-import type { Endpoints } from '../src/api.types.js';
+import type { Endpoints, SwitchCaseResponseType } from '../src/api.types.js';
 import type { ContractEndpoints } from '../src/contract.types.js';
 import type { UsersShowRequest } from '../src/autogen/entities.js';
 import type { UserDetailed } from '../src/autogen/models.js';
-import type { UsersShowEndpoints } from '../built/contracts/users/contract/show-endpoint-definition.js';
+import type { InferContractRouterInputs, InferContractRouterOutputs } from '@orpc/contract';
+import type { usersShowContract } from '../built/contracts/users/backend/endpoints/users/show.contract.js';
 
 type Assert<T extends true> = T;
 type Equal<A, B> = (<T>() => T extends A ? 1 : 2) extends (<T>() => T extends B ? 1 : 2) ? true : false;
 type IsAny<T> = 0 extends (1 & T) ? true : false;
-type AddUndefined<T> = T extends object ? { [K in keyof T]: {} extends Pick<T, K> ? T[K] | undefined : T[K] } : T;
 type Request = ContractEndpoints['users/show']['req'];
-export type NativeNoAny = Assert<Equal<IsAny<UsersShowEndpoints['users/show']['req']>, false>>;
-export type NativeResponseNoAny = Assert<Equal<IsAny<UsersShowEndpoints['users/show']['res']>, false>>;
+export type NativeNoAny = Assert<Equal<IsAny<InferContractRouterInputs<typeof usersShowContract>>, false>>;
+export type NativeResponseNoAny = Assert<Equal<IsAny<InferContractRouterOutputs<typeof usersShowContract>>, false>>;
 export type SdkNoAny = Assert<Equal<IsAny<Request>, false>>;
 export type SdkRequestFromNative = Assert<Equal<Endpoints['users/show']['req'], Request>>;
-export type ExistingDeclaredRequest = Assert<Equal<Request, AddUndefined<UsersShowRequest>>>;
+export type ExistingDeclaredRequest = Assert<Equal<Request, UsersShowRequest>>;
 export type OptionalHostUndefined = Assert<Equal<undefined extends Required<Request>['host'] ? true : false, true>>;
-export type NativeInactiveIds = Assert<Equal<UsersShowEndpoints['users/show']['req']['userIds'], unknown>>;
+export type UncertainSelectorResponse = Assert<Equal<SwitchCaseResponseType<'users/show', Request>, UserDetailed | UserDetailed[]>>;
+export type ScalarSelectorUnionResponse = Assert<Equal<SwitchCaseResponseType<'users/show', { userId: string } | { username: string; host?: string | null }>, UserDetailed>>;
+export type NativeInactiveIds = Assert<Equal<InferContractRouterInputs<typeof usersShowContract>['userIds'], string[] | undefined>>;
 
 export async function requestAndResponseFixtures(client: APIClient): Promise<void> {
 	const id: Request = { userId: 'a', host: undefined };

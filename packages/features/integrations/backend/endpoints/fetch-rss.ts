@@ -2,123 +2,47 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-
-import { projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { inlineFetchRssDefinition } from '../../contract/endpoint-definitions.js';
 import Parser from 'rss-parser';
-import { LegacyRssParserProducerEndpoint } from '../legacy-rss-parser-producer-endpoint.js';
-import type { LegacyRssParserProducerEndpointOutput } from '../legacy-rss-parser-producer-endpoint.js';
-import { Injectable } from '@nestjs/common';
-
-import { HttpRequestService } from '@features/runtime/backend/services/HttpRequestService.js';
-import { ApiError } from '@features/api/backend/transport/error.js';
+import { HttpRequestService } from '../../../runtime/backend/services/HttpRequestService.js';
+import { apiError } from '../../../api/backend/transport/orpc-error.js';
+import type { MiLocalUser } from '../../../users/backend/models/User.js';
+import * as v from 'valibot';
+import { fetchRssErrors, fetchRssContract } from './fetch-rss.contract.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 
 const MAX_URL_LENGTH = 8192;
 const MAX_RESPONSE_SIZE = 1024 * 1024;
 const MAX_CONCURRENT_REQUESTS = 32;
+export interface FetchRssDependencies {
+	httpRequestService: Pick<HttpRequestService, 'send'>;
+}
+export function createFetchRssProcedure(deps: FetchRssDependencies) {
+	const inFlightRequests = new Map<string, Promise<v.InferOutput<NonNullable<typeof fetchRssContract['~orpc']['outputSchema']>>>>();
+	let activeRequestCount = 0;
 
-const contractProjection = projectEndpointContract(inlineFetchRssDefinition);
-
-export const meta = {
-	tags: ['meta'],
-
-	requireCredential: false,
-	allowGet: true,
-	cacheSec: 60 * 3,
-
-	limit: {
-		duration: 60 * 1000,
-		max: 300,
-	},
-
-	errors: {
-		invalidUrl: {
-			message: 'Invalid URL.',
-			code: 'INVALID_URL',
-			id: '89b7ee05-ccfc-4bdd-9b13-61172fd1e06c',
-			httpStatusCode: 400,
-		},
-		fetchRssFailed: {
-			message: 'Failed to fetch RSS.',
-			code: 'FETCH_RSS_FAILED',
-			id: '8db5d3d8-31d7-452f-b0cc-ca3b8925de12',
-			kind: 'server',
-			httpStatusCode: 422,
-		},
-		fetchRssUnavailable: {
-			message: 'RSS fetching is temporarily unavailable.',
-			code: 'FETCH_RSS_UNAVAILABLE',
-			id: '91e6ff44-c63f-4725-9ad0-b7a40d7f7655',
-			kind: 'server',
-			httpStatusCode: 503,
-		},
-	},
-
-	res: contractProjection.response,
-} as const;
-
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export default class FetchRssEndpoint extends LegacyRssParserProducerEndpoint<typeof meta> { // eslint-disable-line import/no-default-export
-	private readonly inFlightRequests = new Map<string, Promise<LegacyRssParserProducerEndpointOutput>>();
-	private activeRequestCount = 0;
-
-	constructor(
-		private httpRequestService: HttpRequestService,
-	) {
-		super(meta, contractProjection, async (ps) => {
-			const url = this.normalizeUrl(ps.url);
-			const inFlightRequest = this.inFlightRequests.get(url);
-			if (inFlightRequest != null) {
-				return await inFlightRequest;
-			}
-
-			if (this.activeRequestCount >= MAX_CONCURRENT_REQUESTS) {
-				throw new ApiError(meta.errors.fetchRssUnavailable);
-			}
-
-			this.activeRequestCount++;
-			const request = this.fetchRss(url)
-				.catch(() => {
-					throw new ApiError(meta.errors.fetchRssFailed);
-				})
-				.finally(() => {
-					this.inFlightRequests.delete(url);
-					this.activeRequestCount--;
-				});
-			this.inFlightRequests.set(url, request);
-
-			return await request;
-		});
-	}
-
-	private normalizeUrl(input: string): string {
+	function normalizeUrl(input: string): string {
 		if (input.length === 0 || input.length > MAX_URL_LENGTH) {
-			throw new ApiError(meta.errors.invalidUrl);
+			throw apiError(fetchRssErrors.invalidUrl);
 		}
-
 		let url: URL;
 		try {
 			url = new URL(input);
 		} catch {
-			throw new ApiError(meta.errors.invalidUrl);
+			throw apiError(fetchRssErrors.invalidUrl);
 		}
-
 		if (
 			(url.protocol !== 'http:' && url.protocol !== 'https:') ||
 			url.username !== '' ||
 			url.password !== ''
 		) {
-			throw new ApiError(meta.errors.invalidUrl);
+			throw apiError(fetchRssErrors.invalidUrl);
 		}
-
 		url.hash = '';
 		return url.href;
 	}
 
-	private async fetchRss(url: string): Promise<LegacyRssParserProducerEndpointOutput> {
-		const res = await this.httpRequestService.send(url, {
+	async function fetchRss(url: string): Promise<v.InferOutput<NonNullable<typeof fetchRssContract['~orpc']['outputSchema']>>> {
+		const res = await deps.httpRequestService.send(url, {
 			method: 'GET',
 			headers: {
 				Accept: 'application/rss+xml, */*',
@@ -126,21 +50,48 @@ export default class FetchRssEndpoint extends LegacyRssParserProducerEndpoint<ty
 			timeout: 5000,
 			size: MAX_RESPONSE_SIZE,
 		});
-
 		const finalUrl = new URL(res.url);
 		if (finalUrl.protocol !== 'http:' && finalUrl.protocol !== 'https:') {
 			throw new Error('Invalid final URL protocol');
 		}
-
 		const text = await res.text();
 		const rssParser = new Parser({
 			xml2js: {
 				async: true,
 			},
 		});
-
-		return await rssParser.parseString(text);
+		return v.parse(requiredSchema(fetchRssContract['~orpc'].outputSchema), await rssParser.parseString(text));
 	}
+
+	return createApiProcedure<MiLocalUser>()(fetchRssContract)
+		.handler(async ({ input, context }) => {
+			const ps = input;
+			const result = await (async () => {
+				const url = normalizeUrl(ps.url);
+				const inFlightRequest = inFlightRequests.get(url);
+				if (inFlightRequest != null) {
+					return await inFlightRequest;
+				}
+				if (activeRequestCount >= MAX_CONCURRENT_REQUESTS) {
+					throw apiError(fetchRssErrors.fetchRssUnavailable);
+				}
+				activeRequestCount++;
+				const request = fetchRss(url)
+					.catch(() => {
+						throw apiError(fetchRssErrors.fetchRssFailed);
+					})
+					.finally(() => {
+						inFlightRequests.delete(url);
+						activeRequestCount--;
+					});
+				inFlightRequests.set(url, request);
+				return await request;
+			})();
+			return result;
+		});
 }
 
-export { FetchRssEndpoint };
+function requiredSchema<Schema>(schema: Schema | undefined): Schema {
+	if (schema === undefined) throw new Error('Contract must declare its schema');
+	return schema;
+}

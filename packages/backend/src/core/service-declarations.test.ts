@@ -27,7 +27,8 @@ import { collectionServices } from '@features/collections/backend/services.js';
 import { roleServices } from '@features/roles/backend/services.js';
 import { emojiServices } from '@features/emojis/backend/services.js';
 import { galleryServices } from '@features/collections/backend/services/gallery.js';
-import { pageServices } from '@features/pages/backend/services.js';
+import { pageFactoryProviders } from '@features/pages/backend/services.js';
+import { PageEntityService } from '@features/pages/backend/serializers/PageEntityService.js';
 import { mediaServices } from '@features/drive/backend/services/media.js';
 import { markupServices } from '@features/markup/backend/services.js';
 import { preferencesServices } from '@features/preferences/backend/services.js';
@@ -70,7 +71,7 @@ describe('typed feature declaration proof', () => {
 		const baseline = JSON.parse(readFileSync(new URL('../../test/fixtures/feature-constructor-wiring.json', import.meta.url), 'utf8')) as {
 			features: Record<string, Record<string, ({ port: string } | { service: string })[]>>;
 		};
-		for (const [name, feature] of [['auth', authServices], ['authSecurity', authSecurityServices], ['integrations', integrationServices], ['channels', channelServices], ['timelines', timelineServices], ['games', gameServices], ['drive', driveServices], ['relationships', relationshipServices], ['discovery', discoveryServices], ['userSearch', userSearchServices], ['ranking', rankingServices], ['announcements', announcementServices], ['instance', instanceServices], ['chat', chatServices], ['play', playServices], ['moderation', moderationServices], ['moderationLogging', moderationLoggingServices], ['collections', collectionServices], ['roles', roleServices], ['emojis', emojiServices], ['collectionGallery', galleryServices], ['pages', pageServices], ['driveMedia', mediaServices], ['markup', markupServices], ['preferences', preferencesServices]] as const) {
+		for (const [name, feature] of [['auth', authServices], ['authSecurity', authSecurityServices], ['integrations', integrationServices], ['channels', channelServices], ['timelines', timelineServices], ['games', gameServices], ['drive', driveServices], ['relationships', relationshipServices], ['discovery', discoveryServices], ['userSearch', userSearchServices], ['ranking', rankingServices], ['announcements', announcementServices], ['instance', instanceServices], ['chat', chatServices], ['play', playServices], ['moderation', moderationServices], ['moderationLogging', moderationLoggingServices], ['collections', collectionServices], ['roles', roleServices], ['emojis', emojiServices], ['collectionGallery', galleryServices], ['driveMedia', mediaServices], ['markup', markupServices], ['preferences', preferencesServices]] as const) {
 			const entries: [string, ServiceDefinition][] = Object.entries(feature.definitions);
 			for (const [key, definition] of entries) {
 				const expected = baseline.features[name][key];
@@ -92,9 +93,32 @@ describe('typed feature declaration proof', () => {
 
 	test('Nest translates all typed external service ports to the original class targets', () => {
 		const targets = { httpRequestService: HttpRequestService, loggerService: LoggerService, idService: IdService, globalEventService: GlobalEventService, moderationLogService: ModerationLogService, userEntityService: UserEntityService, noteEntityService: NoteEntityService, roleService: RoleService, driveFileEntityService: DriveFileEntityService, queryService: QueryService, utilityService: UtilityService, systemAccountService: SystemAccountService, systemWebhookEntityService: SystemWebhookEntityService };
-		for (const [name, feature] of [['auth', authServices], ['authSecurity', authSecurityServices], ['integrations', integrationServices], ['channels', channelServices], ['timelines', timelineServices], ['games', gameServices], ['drive', driveServices], ['relationships', relationshipServices], ['discovery', discoveryServices], ['userSearch', userSearchServices], ['ranking', rankingServices], ['announcements', announcementServices], ['instance', instanceServices], ['chat', chatServices], ['play', playServices], ['moderation', moderationServices], ['moderationLogging', moderationLoggingServices], ['collections', collectionServices], ['roles', roleServices], ['emojis', emojiServices], ['collectionGallery', galleryServices], ['pages', pageServices], ['driveMedia', mediaServices], ['markup', markupServices], ['preferences', preferencesServices]] as const) {
+		for (const [name, feature] of [['auth', authServices], ['authSecurity', authSecurityServices], ['integrations', integrationServices], ['channels', channelServices], ['timelines', timelineServices], ['games', gameServices], ['drive', driveServices], ['relationships', relationshipServices], ['discovery', discoveryServices], ['userSearch', userSearchServices], ['ranking', rankingServices], ['announcements', announcementServices], ['instance', instanceServices], ['chat', chatServices], ['play', playServices], ['moderation', moderationServices], ['moderationLogging', moderationLoggingServices], ['collections', collectionServices], ['roles', roleServices], ['emojis', emojiServices], ['collectionGallery', galleryServices], ['driveMedia', mediaServices], ['markup', markupServices], ['preferences', preferencesServices]] as const) {
 			const factory = featureServiceGroups[name].providers.find((provider): provider is FactoryProvider => typeof provider === 'object' && 'useFactory' in provider && typeof provider.provide === 'symbol');
 			expect(factory?.inject).toEqual(feature.ports.map(port => port.name in targets ? targets[port.name as keyof typeof targets] : port.name === 'redisClient' ? DI.redis : DI[port.name as keyof typeof DI]));
+		}
+	});
+
+	test('ordinary Page factories preserve the published constructor argument order', () => {
+		const baseline = JSON.parse(readFileSync(new URL('../../test/fixtures/feature-constructor-wiring.json', import.meta.url), 'utf8')) as {
+			features: Record<string, Record<string, ({ port: string } | { service: string })[]>>;
+		};
+		const tokens = {
+			db: DI.db, pagesRepository: DI.pagesRepository, pageLikesRepository: DI.pageLikesRepository,
+			driveFilesRepository: DI.driveFilesRepository, notesRepository: DI.notesRepository, usersRepository: DI.usersRepository,
+			userEntityService: UserEntityService, driveFileEntityService: DriveFileEntityService,
+			idService: IdService, roleService: RoleService, moderationLogService: ModerationLogService,
+		};
+		for (const provider of pageFactoryProviders) {
+			const constructor = provider.provide;
+			if (typeof constructor !== 'function') throw new Error('Missing Page constructor');
+			const expected = baseline.features.pages[constructor.name].map(dependency => {
+				if ('service' in dependency) return PageEntityService;
+				const entry = Object.entries(tokens).find(([name]) => name === dependency.port);
+				if (!entry) throw new Error(`Missing Page dependency ${dependency.port}`);
+				return entry[1];
+			});
+			expect(provider.inject).toEqual(expected);
 		}
 	});
 

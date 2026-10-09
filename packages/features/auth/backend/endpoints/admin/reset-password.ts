@@ -2,27 +2,22 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { inlineAdminResetPasswordDefinition, inlineAdminResetPasswordInput, inlineAdminResetPasswordOutput } from '../../../contract/endpoint-definitions.js';
-import { Inject, Injectable } from '@nestjs/common';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 import bcrypt from 'bcryptjs';
 
-import { ApiError } from '@features/api/backend/transport/error.js';
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
 import type { UsersRepository, UserProfilesRepository, MiMeta } from '@features/persistence/backend/repositories/models.js';
-import { DI } from '@/di-symbols.js';
 import { secureRndstr } from '../../utility/secure-rndstr.js';
 import { RoleService } from '@features/roles/backend/services/RoleService.js';
 import { ModerationLogService } from '@features/moderation/backend/services/ModerationLogService.js';
 
-const contractProjection = projectEndpointContract(inlineAdminResetPasswordDefinition);
+import { AdminResetPasswordContract } from '../../api.definition.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
 
 export const meta = {
 	tags: ['admin'],
-
-	requireCredential: true,
-	requireModerator: true,
-	kind: 'write:admin:reset-password',
 
 	errors: {
 		noSuchUser: {
@@ -36,36 +31,27 @@ export const meta = {
 			id: 'cda8f8ce-89a6-4f92-8055-33bbe0c1464d',
 		},
 	},
-
-	res: contractProjection.response,
 } as const;
-
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof inlineAdminResetPasswordInput, typeof inlineAdminResetPasswordOutput> {
-	constructor(
-		@Inject(DI.meta)
-		private serverSettings: MiMeta,
-
-		@Inject(DI.usersRepository)
-		private usersRepository: UsersRepository,
-
-		@Inject(DI.userProfilesRepository)
-		private userProfilesRepository: UserProfilesRepository,
-
-		private roleService: RoleService,
-		private moderationLogService: ModerationLogService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			const user = await this.usersRepository.findOneBy({ id: ps.userId });
+export interface AdminResetPasswordDependencies {
+	serverSettings: MiMeta;
+	usersRepository: UsersRepository;
+	userProfilesRepository: UserProfilesRepository;
+	roleService: Pick<RoleService, 'isAdministrator'>;
+	moderationLogService: Pick<ModerationLogService, 'log'>;
+}
+export function createAdminResetPasswordProcedure(deps: AdminResetPasswordDependencies) {
+	return createApiProcedure<MiLocalUser>()(AdminResetPasswordContract).use(requirePrincipal<MiLocalUser>()).handler(async ({ input, context }) => {
+		const ps = input;
+		const me = context.principal;
+		const result = await (async () => {
+			const user = await deps.usersRepository.findOneBy({ id: ps.userId });
 
 			if (user == null) {
-				throw new ApiError(meta.errors.noSuchUser);
+				throw apiError(meta.errors.noSuchUser);
 			}
 
-			if (await this.roleService.isAdministrator(user) && me.id !== user.id) {
-				throw new ApiError(meta.errors.accessDenied);
+			if (await deps.roleService.isAdministrator(user) && me.id !== user.id) {
+				throw apiError(meta.errors.accessDenied);
 			}
 
 			const passwd = secureRndstr(8);
@@ -73,13 +59,13 @@ export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof
 			// Generate hash of password
 			const hash = bcrypt.hashSync(passwd);
 
-			await this.userProfilesRepository.update({
+			await deps.userProfilesRepository.update({
 				userId: user.id,
 			}, {
 				password: hash,
 			});
 
-			this.moderationLogService.log(me, 'resetPassword', {
+			deps.moderationLogService.log(me, 'resetPassword', {
 				userId: user.id,
 				userUsername: user.username,
 				userHost: user.host,
@@ -88,6 +74,7 @@ export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof
 			return {
 				password: passwd,
 			};
-		});
-	}
+		})();
+		return result;
+	});
 }

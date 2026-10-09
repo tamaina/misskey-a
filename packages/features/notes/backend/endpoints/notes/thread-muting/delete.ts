@@ -3,20 +3,19 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { legacyNotesCommandSchemas } from '../../../commands.js';
-import { notesCommandErrors, notesCommandsContract } from '../../../../contract/index.js';
-import type { Schema } from '@features/api/backend/utility/json-schema.js';
-import { createContractTransportEndpoint } from '@features/api/backend/transport/contract-transport-endpoint.js';
-import { defineFeatureEndpoint } from '@features/api/backend/transport/feature-endpoint.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import { notesThreadMutingDeleteContract, notesThreadMutingDeleteErrors } from './delete.contract.js';
 
-export const meta = {
-	tags: ['notes'],
-	requireCredential: true,
-	kind: 'write:account',
-	errors: notesCommandErrors['notes/thread-muting/delete'],
-} as const;
-
-export const paramDef = legacyNotesCommandSchemas['notes/thread-muting/delete'].input as Schema;
-
-export const { feature, createEndpoint } = defineFeatureEndpoint('notesCommands', commands =>
-	createContractTransportEndpoint(meta, paramDef, notesCommandsContract['notes/thread-muting/delete'], async (params, user) => commands['notes/thread-muting/delete'](params, { context: { actor: user } })));
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+import type { NotesCommandDependencies } from '../../../command.dependencies.js';
+import { getCommandNote } from '../../../get-command-note.js';
+import { readErrorId } from '../../../request.schema.js';
+export function createNotesThreadMutingDeleteProcedure(deps: NotesCommandDependencies) {
+	return createApiProcedure<MiLocalUser>()(notesThreadMutingDeleteContract).use(requirePrincipal<MiLocalUser>())
+		.handler(async ({ input, context }) => {
+			const actor = context.principal;
+			const note = await getCommandNote(deps, input.noteId, notesThreadMutingDeleteErrors.noSuchNote);
+			await deps.deleteThreadMute(note.threadId ?? note.id, actor.id);
+		});
+}

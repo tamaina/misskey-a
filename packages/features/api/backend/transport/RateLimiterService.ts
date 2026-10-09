@@ -10,7 +10,7 @@ import { DI } from '@/di-symbols.js';
 import type { Logger } from '@features/runtime/backend/logging/logger.js';
 import { LoggerService } from '@features/runtime/backend/services/LoggerService.js';
 import { bindThis } from '@features/runtime/backend/decorators.js';
-import type { IEndpointMeta } from '@features/index/backend/endpoints.js';
+export interface ApiRateLimit { key: string; duration?: number; max?: number; minInterval?: number }
 
 type RateLimitInfo = {
 	code: 'BRIEF_REQUEST_INTERVAL',
@@ -51,7 +51,7 @@ export class RateLimiterService {
 	}
 
 	@bindThis
-	public async limit(limitation: IEndpointMeta['limit'] & { key: NonNullable<string> }, actor: string, factor = 1): Promise<RateLimitInfo | null> {
+	public async limit(limitation: ApiRateLimit, actor: string, factor = 1): Promise<RateLimitInfo | null> {
 		if (this.disabled) {
 			return null;
 		}

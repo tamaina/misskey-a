@@ -5,124 +5,223 @@
 
 import { expect, test } from 'vitest';
 import * as v from 'valibot';
-import { packedSchemas } from '@features/index/contract/packed.js';
-import * as schema0 from '@features/announcements/contract/packed.js';
-import * as schema1 from '@features/auth/contract/packed.js';
-import * as schema2 from '@features/auth/contract/packed.js';
-import * as schema3 from '@features/auth/contract/packed.js';
-import * as schema4 from '@features/channels/contract/packed.js';
-import * as schema5 from '@features/chat/contract/packed.js';
-import * as schema6 from '@features/chat/contract/packed.js';
-import * as schema7 from '@features/chat/contract/packed.js';
-import * as schema8 from '@features/chat/contract/packed.js';
-import * as schema9 from '@features/collections/contract/packed.js';
-import * as schema10 from '@features/collections/contract/packed.js';
-import * as schema11 from '@features/discovery/contract/packed.js';
-import * as schema12 from '@features/drive/contract/packed.js';
-import * as schema13 from '@features/drive/contract/packed.js';
-import * as schema14 from '@features/emojis/contract/packed.js';
-import * as schema15 from '@features/federation/contract/packed.js';
-import * as schema16 from '@features/collections/contract/gallery/packed.js';
-import * as schema17 from '@features/games/contract/packed.js';
-import * as schema18 from '@features/instance/contract/packed.js';
-import * as schema19 from '@features/instance/contract/packed.js';
-import * as schema20 from '@features/integrations/contract/packed.js';
-import * as schema21 from '@features/integrations/contract/packed.js';
-import * as schema22 from '@features/moderation/contract/packed.js';
-import * as schema23 from '@features/notes/contract/packed.js';
-import * as schema24 from '@features/notes/contract/packed.js';
-import * as schema25 from '@features/notes/contract/packed.js';
-import * as schema26 from '@features/notifications/contract/packed.js';
-import * as schema27 from '@features/operations/contract/packed.js';
-import * as schema28 from '@features/pages/contract/packed.js';
-import * as schema29 from '@features/play/contract/packed.js';
-import * as schema30 from '@features/relationships/contract/packed.js';
-import * as schema31 from '@features/relationships/contract/packed.js';
-import * as schema32 from '@features/relationships/contract/packed.js';
-import * as schema33 from '@features/relationships/contract/packed.js';
-import * as schema34 from '@features/relationships/contract/packed.js';
-import * as schema35 from '@features/roles/contract/packed.js';
-import * as schema36 from '@features/timelines/contract/packed.js';
-import * as schema37 from '@features/users/contract/packed.js';
-import * as schema38 from '@features/users/contract/packed.js';
+import { packedSchemas } from '@features/index/backend/packed.schema.js';
+import {
+	packedAnnouncementSchema,
+} from '@features/users/backend/user-related.schema.js';
 
-const canonicalSchemas: Array<readonly [keyof typeof packedSchemas, unknown]> = [
-	['UserLite', schema38.packedUserLiteSchema],
-	['UserDetailedNotMeOnly', schema38.packedUserDetailedNotMeOnlySchema],
-	['MeDetailedOnly', schema38.packedMeDetailedOnlySchema],
-	['UserDetailedNotMe', schema38.packedUserDetailedNotMeSchema],
-	['MeDetailed', schema38.packedMeDetailedSchema],
-	['UserDetailed', schema38.packedUserDetailedSchema],
-	['User', schema38.packedUserSchema],
-	['UserList', schema34.packedUserListSchema],
-	['Achievement', schema37.packedAchievementSchema],
-	['AchievementName', schema37.packedAchievementNameSchema],
-	['Ad', schema18.packedAdSchema],
-	['Announcement', schema0.packedAnnouncementSchema],
-	['App', schema1.packedAppSchema],
-	['Note', schema25.packedNoteSchema],
-	['NoteDraft', schema23.packedNoteDraftSchema],
-	['NoteReaction', schema24.packedNoteReactionSchema],
-	['NoteReactionWithNote', schema24.packedNoteReactionWithNoteSchema],
-	['NoteFavorite', schema10.packedNoteFavoriteSchema],
-	['Notification', schema26.packedNotificationSchema],
-	['DriveFile', schema12.packedDriveFileSchema],
-	['DriveFolder', schema13.packedDriveFolderSchema],
-	['Following', schema31.packedFollowingSchema],
-	['Muting', schema32.packedMutingSchema],
-	['RenoteMuting', schema33.packedRenoteMutingSchema],
-	['Blocking', schema30.packedBlockingSchema],
-	['Hashtag', schema11.packedHashtagSchema],
-	['InviteCode', schema2.packedInviteCodeSchema],
-	['Page', schema28.packedPageSchema],
-	['PageBlock', schema28.packedPageBlockSchema],
-	['Channel', schema4.packedChannelSchema],
-	['QueueCount', schema27.packedQueueCountSchema],
-	['QueueMetrics', schema27.packedQueueMetricsSchema],
-	['QueueJob', schema27.packedQueueJobSchema],
-	['Antenna', schema36.packedAntennaSchema],
-	['Clip', schema9.packedClipSchema],
-	['FederationInstance', schema15.packedFederationInstanceSchema],
-	['GalleryPost', schema16.packedGalleryPostSchema],
-	['EmojiSimple', schema14.packedEmojiSimpleSchema],
-	['EmojiDetailed', schema14.packedEmojiDetailedSchema],
-	['EmojiDetailedAdmin', schema14.packedEmojiDetailedAdminSchema],
-	['Flash', schema29.packedFlashSchema],
-	['Signin', schema3.packedSigninSchema],
-	['RoleCondFormulaLogics', schema35.packedRoleCondFormulaLogicsSchema],
-	['RoleCondFormulaValueNot', schema35.packedRoleCondFormulaValueNot],
-	['RoleCondFormulaValueIsLocalOrRemote', schema35.packedRoleCondFormulaValueIsLocalOrRemoteSchema],
-	['RoleCondFormulaValueUserSettingBooleanSchema', schema35.packedRoleCondFormulaValueUserSettingBooleanSchema],
-	['RoleCondFormulaValueAssignedRole', schema35.packedRoleCondFormulaValueAssignedRoleSchema],
-	['RoleCondFormulaValueCreated', schema35.packedRoleCondFormulaValueCreatedSchema],
-	['RoleCondFormulaFollowersOrFollowingOrNotes', schema35.packedRoleCondFormulaFollowersOrFollowingOrNotesSchema],
-	['RoleCondFormulaValue', schema35.packedRoleCondFormulaValueSchema],
-	['RoleLite', schema35.packedRoleLiteSchema],
-	['Role', schema35.packedRoleSchema],
-	['RolePolicies', schema35.packedRolePoliciesSchema],
-	['ReversiGameLite', schema17.packedReversiGameLiteSchema],
-	['ReversiGameDetailed', schema17.packedReversiGameDetailedSchema],
-	['MetaLite', schema19.packedMetaLiteSchema],
-	['MetaDetailedOnly', schema19.packedMetaDetailedOnlySchema],
-	['MetaDetailed', schema19.packedMetaDetailedSchema],
-	['MetaClientOptions', schema19.packedMetaClientOptionsSchema],
-	['UserWebhook', schema21.packedUserWebhookSchema],
-	['SystemWebhook', schema20.packedSystemWebhookSchema],
-	['AbuseReportNotificationRecipient', schema22.packedAbuseReportNotificationRecipientSchema],
-	['ChatMessage', schema5.packedChatMessageSchema],
-	['ChatMessageLite', schema5.packedChatMessageLiteSchema],
-	['ChatMessageLiteFor1on1', schema5.packedChatMessageLiteFor1on1Schema],
-	['ChatMessageLiteForRoom', schema5.packedChatMessageLiteForRoomSchema],
-	['ChatRoom', schema8.packedChatRoomSchema],
-	['ChatRoomInvitation', schema6.packedChatRoomInvitationSchema],
-	['ChatRoomMembership', schema7.packedChatRoomMembershipSchema],
+import {
+	packedAppSchema,
+	packedInviteCodeSchema,
+	packedSigninSchema,
+} from '@features/auth/backend/auth.schema.js';
+
+import {
+	packedChannelSchema,
+} from '@features/channels/backend/channel.schema.js';
+
+import {
+	packedChatMessageSchema,
+	packedChatMessageLiteSchema,
+	packedChatMessageLiteFor1on1Schema,
+	packedChatMessageLiteForRoomSchema,
+	packedChatRoomSchema,
+	packedChatRoomInvitationSchema,
+	packedChatRoomMembershipSchema,
+} from '@features/chat/backend/chat.schema.js';
+
+import {
+	packedNoteFavoriteSchema,
+	packedClipSchema,
+} from '@features/collections/backend/api.definition.js';
+
+import {
+	packedHashtagSchema,
+} from '@features/discovery/backend/endpoints/hashtag.schema.js';
+
+import {
+	packedDriveFileSchema,
+	packedDriveFolderSchema,
+} from '@features/notes/backend/drive.schema.js';
+
+import {
+	emojiSimpleResult as packedEmojiSimpleSchema,
+	emojiDetailedResult as packedEmojiDetailedSchema,
+	packedEmojiDetailedAdminSchema,
+} from '@features/emojis/backend/api.definition.js';
+
+import {
+	federationInstanceSchema as packedFederationInstanceSchema,
+} from '@features/federation/backend/federation.schema.js';
+
+import {
+	packedGalleryPostSchema,
+} from '@features/collections/backend/api.definition.js';
+
+import {
+	packedReversiGameLiteSchema,
+	packedReversiGameDetailedSchema,
+} from '@features/games/backend/reversi.schema.js';
+
+import {
+	packedAdSchema,
+	packedMetaLiteSchema,
+	packedMetaDetailedOnlySchema,
+	packedMetaDetailedSchema,
+	packedMetaClientOptionsSchema,
+} from '@features/instance/backend/endpoints/meta.schema.js';
+
+import {
+	userWebhookSchema as packedUserWebhookSchema,
+	systemWebhookSchema as packedSystemWebhookSchema,
+} from '@features/integrations/backend/webhook.schema.js';
+
+import {
+	abuseReportNotificationRecipientSchema as packedAbuseReportNotificationRecipientSchema,
+} from '@features/moderation/backend/api.definition.js';
+
+import {
+	packedNoteSchema,
+	packedNoteDraftSchema,
+	packedNoteReactionSchema,
+	packedNoteReactionWithNoteSchema,
+} from '@features/notes/backend/note.schema.js';
+
+import {
+	packedNotificationSchema,
+} from '@features/notifications/backend/notification.schema.js';
+
+import {
+	queueCounterSchema as packedQueueCountSchema,
+	queueMetricsSchema as packedQueueMetricsSchema,
+	queueJobSchema as packedQueueJobSchema,
+} from '@features/operations/backend/queue.schema.js';
+
+import {
+	packedPageSchema,
+} from '@features/users/backend/page.schema.js';
+
+import {
+	packedFlashSchema,
+} from '@features/play/backend/flash.schema.js';
+
+import {
+	packedUserListSchema,
+	packedFollowingSchema,
+	packedMutingSchema,
+	packedRenoteMutingSchema,
+	packedBlockingSchema,
+} from '@features/relationships/backend/endpoints/relationships.schema.js';
+
+import {
+	packedRoleCondFormulaLogicsSchema,
+	packedRoleCondFormulaValueNot,
+	packedRoleCondFormulaValueIsLocalOrRemoteSchema,
+	packedRoleCondFormulaValueUserSettingBooleanSchema,
+	packedRoleCondFormulaValueAssignedRoleSchema,
+	packedRoleCondFormulaValueCreatedSchema,
+	packedRoleCondFormulaFollowersOrFollowingOrNotesSchema,
+	packedRoleLiteSchema,
+	packedRolePoliciesSchema,
+} from '@features/notifications/backend/notification-related.schema.js';
+
+import {
+	packedAntennaSchema,
+} from '@features/timelines/backend/antenna.schema.js';
+
+import {
+	packedUserLiteSchema,
+	packedUserDetailedNotMeOnlySchema,
+	packedMeDetailedOnlySchema,
+	packedUserDetailedNotMeSchema,
+	packedMeDetailedSchema,
+	packedUserDetailedSchema,
+	packedUserSchema,
+	packedAchievementSchema,
+	packedAchievementNameSchema,
+} from '@features/users/backend/user.schema.js';
+
+import { packedPageBlockSchema } from '@features/pages/backend/page-block.schema.js';
+
+import { packedRoleSchema, packedRoleCondFormulaValueSchema } from '@features/roles/backend/role.schema.js';
+
+const nativeDtoBindings: Array<readonly [keyof typeof packedSchemas, unknown]> = [
+	['UserLite', packedUserLiteSchema],
+	['UserDetailedNotMeOnly', packedUserDetailedNotMeOnlySchema],
+	['MeDetailedOnly', packedMeDetailedOnlySchema],
+	['UserDetailedNotMe', packedUserDetailedNotMeSchema],
+	['MeDetailed', packedMeDetailedSchema],
+	['UserDetailed', packedUserDetailedSchema],
+	['User', packedUserSchema],
+	['UserList', packedUserListSchema],
+	['Achievement', packedAchievementSchema],
+	['AchievementName', packedAchievementNameSchema],
+	['Ad', packedAdSchema],
+	['Announcement', packedAnnouncementSchema],
+	['App', packedAppSchema],
+	['Note', packedNoteSchema],
+	['NoteDraft', packedNoteDraftSchema],
+	['NoteReaction', packedNoteReactionSchema],
+	['NoteReactionWithNote', packedNoteReactionWithNoteSchema],
+	['NoteFavorite', packedNoteFavoriteSchema],
+	['Notification', packedNotificationSchema],
+	['DriveFile', packedDriveFileSchema],
+	['DriveFolder', packedDriveFolderSchema],
+	['Following', packedFollowingSchema],
+	['Muting', packedMutingSchema],
+	['RenoteMuting', packedRenoteMutingSchema],
+	['Blocking', packedBlockingSchema],
+	['Hashtag', packedHashtagSchema],
+	['InviteCode', packedInviteCodeSchema],
+	['Page', packedPageSchema],
+	['PageBlock', packedPageBlockSchema],
+	['Channel', packedChannelSchema],
+	['QueueCount', packedQueueCountSchema],
+	['QueueMetrics', packedQueueMetricsSchema],
+	['QueueJob', packedQueueJobSchema],
+	['Antenna', packedAntennaSchema],
+	['Clip', packedClipSchema],
+	['FederationInstance', packedFederationInstanceSchema],
+	['GalleryPost', packedGalleryPostSchema],
+	['EmojiSimple', packedEmojiSimpleSchema],
+	['EmojiDetailed', packedEmojiDetailedSchema],
+	['EmojiDetailedAdmin', packedEmojiDetailedAdminSchema],
+	['Flash', packedFlashSchema],
+	['Signin', packedSigninSchema],
+	['RoleCondFormulaLogics', packedRoleCondFormulaLogicsSchema],
+	['RoleCondFormulaValueNot', packedRoleCondFormulaValueNot],
+	['RoleCondFormulaValueIsLocalOrRemote', packedRoleCondFormulaValueIsLocalOrRemoteSchema],
+	['RoleCondFormulaValueUserSettingBooleanSchema', packedRoleCondFormulaValueUserSettingBooleanSchema],
+	['RoleCondFormulaValueAssignedRole', packedRoleCondFormulaValueAssignedRoleSchema],
+	['RoleCondFormulaValueCreated', packedRoleCondFormulaValueCreatedSchema],
+	['RoleCondFormulaFollowersOrFollowingOrNotes', packedRoleCondFormulaFollowersOrFollowingOrNotesSchema],
+	['RoleCondFormulaValue', packedRoleCondFormulaValueSchema],
+	['RoleLite', packedRoleLiteSchema],
+	['Role', packedRoleSchema],
+	['RolePolicies', packedRolePoliciesSchema],
+	['ReversiGameLite', packedReversiGameLiteSchema],
+	['ReversiGameDetailed', packedReversiGameDetailedSchema],
+	['MetaLite', packedMetaLiteSchema],
+	['MetaDetailedOnly', packedMetaDetailedOnlySchema],
+	['MetaDetailed', packedMetaDetailedSchema],
+	['MetaClientOptions', packedMetaClientOptionsSchema],
+	['UserWebhook', packedUserWebhookSchema],
+	['SystemWebhook', packedSystemWebhookSchema],
+	['AbuseReportNotificationRecipient', packedAbuseReportNotificationRecipientSchema],
+	['ChatMessage', packedChatMessageSchema],
+	['ChatMessageLite', packedChatMessageLiteSchema],
+	['ChatMessageLiteFor1on1', packedChatMessageLiteFor1on1Schema],
+	['ChatMessageLiteForRoom', packedChatMessageLiteForRoomSchema],
+	['ChatRoom', packedChatRoomSchema],
+	['ChatRoomInvitation', packedChatRoomInvitationSchema],
+	['ChatRoomMembership', packedChatRoomMembershipSchema],
 ];
 
-for (const [name, canonicalSchema] of canonicalSchemas) {
-	test(`${name} packed schema uses its canonical feature definition`, () => {
-		expect(packedSchemas[name]).toBe(canonicalSchema);
-	});
-}
+test('all 69 packed models bind directly to their native feature DTO', () => {
+	expect(nativeDtoBindings).toHaveLength(69);
+	expect(Object.keys(packedSchemas).sort()).toEqual(nativeDtoBindings.map(([name]) => name).sort());
+	for (const [name, schema] of nativeDtoBindings) expect(packedSchemas[name], name).toBe(schema);
+});
 
 test('packed schemas parse recursive notes and validate referenced users', () => {
 	const user = {
@@ -158,7 +257,7 @@ test('packed schemas parse recursive notes and validate referenced users', () =>
 	expect(v.safeParse(packedSchemas.Note, { ...note, user: { ...user, username: 1 } }).success).toBe(false);
 });
 
-test('legacy dynamic page blocks and opaque fields survive packing', () => {
+test('historical page program blocks preserve their JSON extension fields', () => {
 	const block = {
 		id: 'legacy-if', type: 'if', expression: 'old-variable',
 		children: [{ id: 'legacy-input', type: 'textInput', default: 'preserved' }],
@@ -167,7 +266,7 @@ test('legacy dynamic page blocks and opaque fields survive packing', () => {
 	expect(v.safeParse(packedSchemas.PageBlock, { id: 's', type: 'section' }).success).toBe(false);
 });
 
-test('queue progress accepts Bull values and results remain opaque', () => {
+test('queue progress and results retain genuine JSON values', () => {
 	const job = {
 		id: 'job', name: 'job', data: { nested: true }, opts: { attempts: 2 },
 		timestamp: 0, progress: 0, attempts: 0, delay: 0, failedReason: '',
@@ -181,7 +280,7 @@ test('queue progress accepts Bull values and results remain opaque', () => {
 	}
 });
 
-test('page content preserves opaque historical blocks without pretending they are typed blocks', () => {
+test('page content retains historical and extension-defined JSON objects', () => {
 	const content = [{ type: 'extension-block', pluginData: { old: true } }, {}];
 	expect(v.parse(packedSchemas.Page.entries.content, content)).toEqual(content);
 	expect(v.safeParse(packedSchemas.Page.entries.content, [42]).success).toBe(false);

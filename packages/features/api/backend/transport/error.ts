@@ -3,7 +3,11 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import type { ApiErrorDefinition } from '@features/api/contract';
+import type { ErrorDefinition } from './orpc-error.js';
+
+export interface ApiErrorDefinition extends Omit<ErrorDefinition, 'status'> {
+	httpStatusCode?: number;
+}
 
 export class ApiError extends Error {
 	public message: string;

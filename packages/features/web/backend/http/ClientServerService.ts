@@ -109,7 +109,7 @@ export class ClientServerService {
 		private flashsRepository: FlashsRepository,
 
 		@Inject(DI.reversiGamesRepository)
-		private reversiGamesRepository: ReversiGamesRepository,
+		private reversiGamesRepository: { findOneBy(where: { id: string }): Promise<import('../../../games/backend/models/ReversiGame.js').MiReversiGame | null> },
 
 		@Inject(DI.announcementsRepository)
 		private announcementsRepository: AnnouncementsRepository,

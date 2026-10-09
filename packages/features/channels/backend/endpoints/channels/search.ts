@@ -3,59 +3,48 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { packedChannelsSearchDefinition, packedChannelsSearchInput, packedChannelsSearchOutput } from '../../../contract/packed-endpoint-definitions.js';
-import { Inject, Injectable } from '@nestjs/common';
+import { toPackedChannel } from '../../api.dto.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+
 import { Brackets } from 'typeorm';
 
-import { QueryService } from '@features/notes/backend/services/QueryService.js';
-import type { ChannelsRepository } from '@features/persistence/backend/repositories/models.js';
-import { ChannelEntityService } from '../../serializers/ChannelEntityService.js';
-import { DI } from '@/di-symbols.js';
+import { type QueryService } from '@features/notes/backend/services/QueryService.js';
 import { sqlLikeEscape } from '@features/persistence/backend/utility/sql-like-escape.js';
 
-const contractProjection = projectEndpointContract(packedChannelsSearchDefinition);
+import { type ChannelEntityService } from '../../serializers/ChannelEntityService.js';
 
-export const meta = {
-	tags: ['channels'],
+import { channelsSearchContract } from './search.contract.js';
+import type { ChannelsRepository } from '@features/persistence/backend/repositories/models.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
 
-	requireCredential: false,
-
-	res: contractProjection.response,
-} as const;
-
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedChannelsSearchInput, typeof packedChannelsSearchOutput> {
-	constructor(
-		@Inject(DI.channelsRepository)
-		private channelsRepository: ChannelsRepository,
-
-		private channelEntityService: ChannelEntityService,
-		private queryService: QueryService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			const query = this.queryService.makePaginationQuery(this.channelsRepository.createQueryBuilder('channel'), ps.sinceId, ps.untilId, ps.sinceDate, ps.untilDate)
+export interface ChannelsSearchDependencies {
+	channelsRepository: ChannelsRepository;
+	channelEntityService: ChannelEntityService;
+	queryService: QueryService;
+}
+export function createChannelsSearchProcedure<Actor extends MiLocalUser>(deps: ChannelsSearchDependencies) {
+	return createApiProcedure<Actor>()(channelsSearchContract)
+		.handler(async ({ input, context }) => {
+			const ps = input;
+			const me = context.principal;
+			const query = deps.queryService.makePaginationQuery(deps.channelsRepository.createQueryBuilder('channel'), ps.sinceId, ps.untilId, ps.sinceDate, ps.untilDate)
 				.andWhere('channel.isArchived = FALSE');
 
 			if (ps.query !== '') {
 				if (ps.type === 'nameAndDescription') {
 					query.andWhere(new Brackets(qb => {
 						qb
-							.where('channel.name ILIKE :q', { q: `%${ sqlLikeEscape(ps.query) }%` })
-							.orWhere('channel.description ILIKE :q', { q: `%${ sqlLikeEscape(ps.query) }%` });
+							.where('channel.name ILIKE :q', { q: `%${sqlLikeEscape(ps.query)}%` })
+							.orWhere('channel.description ILIKE :q', { q: `%${sqlLikeEscape(ps.query)}%` });
 					}));
 				} else {
-					query.andWhere('channel.name ILIKE :q', { q: `%${ sqlLikeEscape(ps.query) }%` });
+					query.andWhere('channel.name ILIKE :q', { q: `%${sqlLikeEscape(ps.query)}%` });
 				}
 			}
 
 			const channels = await query
 				.limit(ps.limit)
 				.getMany();
-
-			return await Promise.all(channels.map(x => this.channelEntityService.pack(x, me)));
+			return (await Promise.all(channels.map(x => deps.channelEntityService.pack(x, me)))).map(toPackedChannel);
 		});
-	}
 }

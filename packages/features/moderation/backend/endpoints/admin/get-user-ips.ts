@@ -2,47 +2,24 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { inlineAdminGetUserIpsDefinition, inlineAdminGetUserIpsInput, inlineAdminGetUserIpsOutput } from '../../../contract/endpoint-definitions.js';
-import { Inject, Injectable } from '@nestjs/common';
-import type { UserIpsRepository } from '@features/persistence/backend/repositories/models.js';
-
-import { DI } from '@/di-symbols.js';
-import { IdService } from '@features/runtime/backend/services/IdService.js';
-
-const contractProjection = projectEndpointContract(inlineAdminGetUserIpsDefinition);
-
-export const meta = {
-	tags: ['admin'],
-
-	requireCredential: true,
-	requireAdmin: true,
-	kind: 'read:admin:user-ips',
-	res: contractProjection.response,
-} as const;
-
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof inlineAdminGetUserIpsInput, typeof inlineAdminGetUserIpsOutput> {
-	constructor(
-		@Inject(DI.userIpsRepository)
-		private userIpsRepository: UserIpsRepository,
-
-		private idService: IdService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			const ips = await this.userIpsRepository.find({
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import type { ApiActor } from '@features/api/backend/transport/context.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import { moderationContract } from '../../api.definition.js';
+import type { ModerationApiDependencies } from '../../api.implementation.js';
+export function createAdminGetUserIpsProcedure<Actor extends ApiActor>(deps: Pick<ModerationApiDependencies<Actor>, 'userIpsRepository'>) {
+	return createApiProcedure<Actor>()(moderationContract.adminGetUserIps).use(requirePrincipal<Actor>())
+		.handler(async ({ input, context }) => {
+			const ps = input;
+			const me = context.principal;
+			const ips = await deps.userIpsRepository.find({
 				where: { userId: ps.userId },
 				order: { id: 'DESC' },
 				take: 30,
 			});
-
 			return ips.map(x => ({
 				ip: x.ip,
 				createdAt: x.createdAt.toISOString(),
 			}));
 		});
-	}
 }

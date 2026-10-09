@@ -3,22 +3,26 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { legacyNotesCommandSchemas } from '../../../commands.js';
-import { notesCommandErrors, notesCommandsContract } from '../../../../contract/index.js';
-import type { Schema } from '@features/api/backend/utility/json-schema.js';
-import ms from 'ms';
-import { createContractTransportEndpoint } from '@features/api/backend/transport/contract-transport-endpoint.js';
-import { defineFeatureEndpoint } from '@features/api/backend/transport/feature-endpoint.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import { notesReactionsDeleteContract, notesReactionsDeleteErrors } from './delete.contract.js';
 
-export const meta = {
-	tags: ['reactions', 'notes'],
-	requireCredential: true,
-	kind: 'write:reactions',
-	limit: { duration: ms('1hour'), max: 60, minInterval: ms('3sec') },
-	errors: notesCommandErrors['notes/reactions/delete'],
-} as const;
-
-export const paramDef = legacyNotesCommandSchemas['notes/reactions/delete'].input as Schema;
-
-export const { feature, createEndpoint } = defineFeatureEndpoint('notesCommands', commands =>
-	createContractTransportEndpoint(meta, paramDef, notesCommandsContract['notes/reactions/delete'], async (params, user) => commands['notes/reactions/delete'](params, { context: { actor: user } })));
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+import type { NotesCommandDependencies } from '../../../command.dependencies.js';
+import { getCommandNote } from '../../../get-command-note.js';
+import { readErrorId } from '../../../request.schema.js';
+export function createNotesReactionsDeleteProcedure(deps: NotesCommandDependencies) {
+	return createApiProcedure<MiLocalUser>()(notesReactionsDeleteContract).use(requirePrincipal<MiLocalUser>())
+		.handler(async ({ input, context }) => {
+			const actor = context.principal;
+			const note = await getCommandNote(deps, input.noteId, notesReactionsDeleteErrors.noSuchNote);
+			try {
+				await deps.deleteReaction(actor, note);
+			} catch (error) {
+				if (readErrorId(error) === '60527ec9-b4cb-4a88-a6bd-32d3ad26817d') {
+					throw deps.createError(notesReactionsDeleteErrors.notReacted);
+				}
+				throw error;
+			}
+		});
+}

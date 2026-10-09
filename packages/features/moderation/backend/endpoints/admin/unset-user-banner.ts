@@ -2,18 +2,21 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-
-import { moderationCommandsContract } from '../../../contract/index.js';
-import { moderationCommandMeta, legacyModerationCommandSchemas } from '../../index.js';
-import type { Schema } from '@features/api/backend/utility/json-schema.js';
-import { createContractTransportEndpoint } from '@features/api/backend/transport/contract-transport-endpoint.js';
-import { defineFeatureEndpoint } from '@features/api/backend/transport/feature-endpoint.js';
-
-export const meta = moderationCommandMeta['admin/unset-user-banner'];
-const paramDefFromFeature = legacyModerationCommandSchemas['admin/unset-user-banner'].input;
-
-export const paramDef = paramDefFromFeature as Schema;
-const route = 'admin/unset-user-banner' as const;
-export const { feature, createEndpoint } = defineFeatureEndpoint('moderationCommands', commands => createContractTransportEndpoint(meta, paramDefFromFeature as Schema, moderationCommandsContract['admin/unset-user-banner'], async (params, user) => commands[route](params, {
-	context: { actor: user },
-})));
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import type { ApiActor } from '@features/api/backend/transport/context.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import { moderationContract } from '../../api.definition.js';
+import type { ModerationApiDependencies } from '../../api.implementation.js';
+export function createAdminUnsetUserBannerProcedure<Actor extends ApiActor>(deps: Pick<ModerationApiDependencies<Actor>, 'usersRepository' | 'moderationLogService'>) {
+	return createApiProcedure<Actor>()(moderationContract.adminUnsetUserBanner).use(requirePrincipal<Actor>())
+		.handler(async ({ input, context }) => {
+			const ps = input;
+			const me = context.principal;
+			const user = await deps.usersRepository.findOneBy({ id: ps.userId });
+			if (user == null) throw new Error('user not found');
+			const fileId = user.bannerId;
+			if (fileId == null) return;
+			await deps.usersRepository.update(user.id, { banner: null, bannerId: null, bannerUrl: null, bannerBlurhash: null });
+			void deps.moderationLogService.log(me, 'unsetUserBanner', { userId: user.id, userUsername: user.username, userHost: user.host, fileId });
+		});
+}

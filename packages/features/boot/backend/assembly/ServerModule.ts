@@ -2,25 +2,20 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-
 import { Module } from '@nestjs/common';
-import { EndpointsModule } from './EndpointsModule.js';
-import { CoreModule } from './CoreModule.js';
-import { ApiCallService } from '@features/api/backend/transport/ApiCallService.js';
+import { ApiIpLoggingService } from '@features/api/backend/transport/ApiIpLoggingService.js';
 import { FileServerService } from '@features/drive/backend/http/FileServerService.js';
 import { HealthServerService } from '@features/operations/backend/http/HealthServerService.js';
 import { NodeinfoServerService } from '@features/instance/backend/http/NodeinfoServerService.js';
-import { ServerService } from './ServerService.mjs';
 import { WellKnownServerService } from '@features/federation/backend/http/WellKnownServerService.js';
 import { GetterService } from '@features/api/backend/transport/GetterService.js';
 import { ActivityPubServerService } from '@features/federation/backend/http/ActivityPubServerService.js';
 import { ApiLoggerService } from '@features/api/backend/transport/ApiLoggerService.js';
 import { ApiServerService } from '@features/api/backend/transport/ApiServerService.js';
+import { OrpcPilotService } from '@features/api/backend/transport/OrpcPilotService.js';
 import { AuthenticateService } from '@features/auth/backend/transport/AuthenticateService.js';
 import { RateLimiterService } from '@features/api/backend/transport/RateLimiterService.js';
-import { SigninApiService } from '@features/auth/backend/transport/SigninApiService.js';
 import { SigninService } from '@features/auth/backend/transport/SigninService.js';
-import { SignupApiService } from '@features/auth/backend/transport/SignupApiService.js';
 import { StreamingApiServerService } from '@features/api/backend/transport/StreamingApiServerService.js';
 import { OpenApiServerService } from '@features/api/backend/transport/openapi/OpenApiServerService.js';
 import { ClientServerService } from '@features/web/backend/http/ClientServerService.js';
@@ -50,14 +45,18 @@ import { ChatRoomChannel } from '@features/chat/backend/stream/chat-room.js';
 import { ReversiChannel } from '@features/games/backend/stream/reversi.js';
 import { ReversiGameChannel } from '@features/games/backend/stream/reversi-game.js';
 import { NoteStreamingHidingService } from '@features/api/backend/transport/stream/NoteStreamingHidingService.js';
-import { SigninWithPasskeyApiService } from '@features/auth/backend/transport/SigninWithPasskeyApiService.js';
+import { ServerService } from './ServerService.mjs';
+import { CoreModule } from './CoreModule.js';
+import { sessionProviders } from '@features/auth/backend/session.providers.js';
+import { featureProviders } from '@features/index/backend/feature-providers.js';
 
 @Module({
 	imports: [
-		EndpointsModule,
 		CoreModule,
 	],
 	providers: [
+		...featureProviders,
+		...sessionProviders,
 		ClientServerService,
 		ClientLoggerService,
 		HtmlTemplateService,
@@ -71,15 +70,13 @@ import { SigninWithPasskeyApiService } from '@features/auth/backend/transport/Si
 		WellKnownServerService,
 		GetterService,
 		MainStreamConnection,
-		ApiCallService,
+		ApiIpLoggingService,
 		ApiLoggerService,
 		ApiServerService,
+		OrpcPilotService,
 		AuthenticateService,
 		RateLimiterService,
-		SigninApiService,
-		SigninWithPasskeyApiService,
 		SigninService,
-		SignupApiService,
 		StreamingApiServerService,
 		MainChannel,
 		AdminChannel,
@@ -107,4 +104,4 @@ import { SigninWithPasskeyApiService } from '@features/auth/backend/transport/Si
 		ServerService,
 	],
 })
-export class ServerModule {}
+export class ServerModule { }

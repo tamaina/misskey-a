@@ -2,46 +2,19 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 
-import { NativeContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { packedFollowingListDefinition, packedFollowingListInput, packedFollowingListOutput } from '../../../contract/packed-endpoint-definitions.js';
-import { Inject, Injectable } from '@nestjs/common';
-import { FollowingEntityService } from '../../serializers/FollowingEntityService.js';
-import type { FollowingsRepository } from '@features/persistence/backend/repositories/models.js';
-
-import { QueryService } from '@features/notes/backend/services/QueryService.js';
-import { DI } from '@/di-symbols.js';
-
-import * as v from 'valibot';
-import { nativeFollowingSchema } from '@features/relationships/backend/serializers/FollowingEntityService.js';
-
-export const nativeOutputSchema = v.array(nativeFollowingSchema);
-
-const contractProjection = projectEndpointContract(packedFollowingListDefinition);
-
-export const meta = {
-	tags: ['users'],
-
-	requireCredential: true,
-	kind: 'read:following',
-	description: 'List of following users',
-
-	res: contractProjection.response,
-} as const;
-
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export class EndpointImplementation extends NativeContractEndpoint<typeof meta, typeof packedFollowingListInput, typeof packedFollowingListOutput, typeof nativeOutputSchema> {
-	constructor(
-		@Inject(DI.followingsRepository)
-		private followingsRepository: FollowingsRepository,
-
-		private followingEntityService: FollowingEntityService,
-		private queryService: QueryService,
-	) {
-		super(meta, contractProjection, nativeOutputSchema, async (ps, me) => {
-			const query = this.queryService.makePaginationQuery(this.followingsRepository.createQueryBuilder('following'), ps.sinceId, ps.untilId, ps.sinceDate, ps.untilDate)
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import { relationshipsContract } from '../relationships.contract.js';
+import type { RelationshipsDependencies } from '../../api.implementation.js';
+import { toPackedFollowing } from '../relationships.schema.js';
+export function createFollowingListProcedure<Actor extends MiLocalUser>(deps: Pick<RelationshipsDependencies, 'queryService' | 'followingsRepository' | 'followingEntityService'>) {
+	return createApiProcedure<Actor>()(relationshipsContract["following/list"]).use(requirePrincipal<Actor>())
+		.handler(async ({ input, context }) => {
+			const ps = input;
+			const me = context.principal;
+			const query = deps.queryService.makePaginationQuery(deps.followingsRepository.createQueryBuilder('following'), ps.sinceId, ps.untilId, ps.sinceDate, ps.untilDate)
 				.andWhere('following.followerId = :userId', { userId: me.id });
 
 			if (ps.notification) {
@@ -53,8 +26,6 @@ export class EndpointImplementation extends NativeContractEndpoint<typeof meta, 
 			const followings = await query
 				.limit(ps.limit)
 				.getMany();
-
-			return await this.followingEntityService.packMany(followings, me, { populateFollowee: true });
+			return (await deps.followingEntityService.packMany(followings, me, { populateFollowee: true })).map(toPackedFollowing);
 		});
-	}
 }

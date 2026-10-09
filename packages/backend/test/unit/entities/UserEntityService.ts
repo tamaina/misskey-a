@@ -67,7 +67,7 @@ describe('UserEntityService', () => {
 		let mutingRepository: MutingsRepository;
 		let renoteMutingsRepository: RenoteMutingsRepository;
 
-		async function createUser(userData: Partial<MiUser> = {}, profileData: Partial<MiUserProfile> = {}) {
+		async function createUser(userData: Partial<MiUser> = {}, profileData: Partial<Pick<MiUserProfile, 'birthday' | 'achievements'>> = {}) {
 			const un = secureRndstr(16);
 			const user = await usersRepository
 				.insert({

@@ -3,59 +3,46 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { packedChatRoomsInvitationsOutboxDefinition, packedChatRoomsInvitationsOutboxInput, packedChatRoomsInvitationsOutboxOutput } from '../../../../../contract/packed-endpoint-definitions.js';
-import { Inject, Injectable } from '@nestjs/common';
-import ms from 'ms';
+import { toPackedChatRoomInvitation } from '../../../../api.dto.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 
-import { DI } from '@/di-symbols.js';
-import { ApiError } from '@features/api/backend/transport/error.js';
-import { ChatService } from '../../../../services/ChatService.js';
-import { ChatEntityService } from '../../../../serializers/ChatEntityService.js';
-import { IdService } from '@features/runtime/backend/services/IdService.js';
+import type { InferSchemaOutput } from '@orpc/contract';
 
-const contractProjection = projectEndpointContract(packedChatRoomsInvitationsOutboxDefinition);
+import { type IdService } from '@features/runtime/backend/services/IdService.js';
 
-export const meta = {
-	tags: ['chat'],
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import { type ChatService } from '../../../../services/ChatService.js';
+import { type ChatEntityService } from '../../../../serializers/ChatEntityService.js';
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
+import { chatRoomsInvitationsOutboxContract, chatRoomsInvitationsOutboxErrors } from './outbox.contract.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
 
-	requireCredential: true,
-
-	kind: 'read:chat',
-
-	res: contractProjection.response,
-
-	errors: {
-		noSuchRoom: {
-			message: 'No such room.',
-			code: 'NO_SUCH_ROOM',
-			id: 'a3c6b309-9717-4316-ae94-a69b53437237',
-		},
-	},
-} as const;
-
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedChatRoomsInvitationsOutboxInput, typeof packedChatRoomsInvitationsOutboxOutput> {
-	constructor(
-		private chatService: ChatService,
-		private chatEntityService: ChatEntityService,
-		private idService: IdService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			const untilId = ps.untilId ?? (ps.untilDate ? this.idService.gen(ps.untilDate!) : null);
-			const sinceId = ps.sinceId ?? (ps.sinceDate ? this.idService.gen(ps.sinceDate!) : null);
-
-			await this.chatService.checkChatAvailability(me.id, 'read');
-
-			const room = await this.chatService.findMyRoomById(me.id, ps.roomId);
-			if (room == null) {
-				throw new ApiError(meta.errors.noSuchRoom);
-			}
-
-			const invitations = await this.chatService.getSentRoomInvitationsWithPagination(ps.roomId, ps.limit, sinceId, untilId);
-			return this.chatEntityService.packRoomInvitations(invitations, me);
-		});
+export interface ChatRoomsInvitationsOutboxDependencies {
+	chatService: ChatService;
+	chatEntityService: ChatEntityService;
+	idService: IdService;
+}
+export function createChatRoomsInvitationsOutboxProcedure(deps: ChatRoomsInvitationsOutboxDependencies) {
+	async function execute(ps: InferSchemaOutput<NonNullable<typeof chatRoomsInvitationsOutboxContract['~orpc']['inputSchema']>>, me: MiLocalUser): Promise<InferSchemaOutput<NonNullable<typeof chatRoomsInvitationsOutboxContract['~orpc']['outputSchema']>>> {
+		return (await run(ps, me)).map(toPackedChatRoomInvitation);
 	}
+
+	async function run(ps: InferSchemaOutput<NonNullable<typeof chatRoomsInvitationsOutboxContract['~orpc']['inputSchema']>>, me: MiLocalUser) {
+		const untilId = ps.untilId ?? (ps.untilDate ? deps.idService.gen(ps.untilDate!) : null);
+		const sinceId = ps.sinceId ?? (ps.sinceDate ? deps.idService.gen(ps.sinceDate!) : null);
+
+		await deps.chatService.checkChatAvailability(me.id, 'read');
+
+		const room = await deps.chatService.findMyRoomById(me.id, ps.roomId);
+		if (room == null) {
+			throw apiError(chatRoomsInvitationsOutboxErrors.noSuchRoom);
+		}
+
+		const invitations = await deps.chatService.getSentRoomInvitationsWithPagination(ps.roomId, ps.limit, sinceId, untilId);
+		return deps.chatEntityService.packRoomInvitations(invitations, me);
+	}
+
+	return createApiProcedure<MiLocalUser>()(chatRoomsInvitationsOutboxContract)
+		.use(requirePrincipal<MiLocalUser>())
+		.handler(({ input, context }) => execute(input, context.principal));
 }

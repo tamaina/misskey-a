@@ -3,91 +3,34 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { inlineAdminEmojiCopyDefinition, inlineAdminEmojiCopyInput, inlineAdminEmojiCopyOutput } from '../../../../contract/endpoint-definitions.js';
-import { Inject, Injectable } from '@nestjs/common';
-
-import type { EmojisRepository } from '@features/persistence/backend/repositories/models.js';
+import { toEmojiDetailed } from '../../../emoji-output.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import type { ApiActor } from '@features/api/backend/transport/context.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import { emojisContract } from '../../../api.definition.js';
+import type { EmojisDependencies } from '../../../api.implementation.js';
+import { apiError, internalError } from '@features/api/backend/transport/orpc-error.js';
 import type { MiDriveFile } from '@features/drive/backend/models/DriveFile.js';
-import { DI } from '@/di-symbols.js';
-import { DriveService } from '@features/drive/backend/services/DriveService.js';
-import { CustomEmojiService } from '../../../services/CustomEmojiService.js';
-import { EmojiEntityService } from '../../../serializers/EmojiEntityService.js';
-import { ApiError } from '@features/api/backend/transport/error.js';
-
-const contractProjection = projectEndpointContract(inlineAdminEmojiCopyDefinition);
-
-export const meta = {
-	tags: ['admin'],
-
-	requireCredential: true,
-	requiredRolePolicy: 'canManageCustomEmojis',
-	kind: 'write:admin:emoji',
-
-	errors: {
-		noSuchEmoji: {
-			message: 'No such emoji.',
-			code: 'NO_SUCH_EMOJI',
-			id: 'e2785b66-dca3-4087-9cac-b93c541cc425',
-		},
-		duplicateName: {
-			message: 'Duplicate name.',
-			code: 'DUPLICATE_NAME',
-			id: 'f7a3462c-4e6e-4069-8421-b9bd4f4c3975',
-		},
-	},
-
-	res: contractProjection.response,
-} as const;
-
-export const paramDef = contractProjection.input;
-
-// TODO: ロジックをサービスに切り出す
-
-@Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof inlineAdminEmojiCopyInput, typeof inlineAdminEmojiCopyOutput> {
-	constructor(
-		@Inject(DI.emojisRepository)
-		private emojisRepository: EmojisRepository,
-		private emojiEntityService: EmojiEntityService,
-		private customEmojiService: CustomEmojiService,
-		private driveService: DriveService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			const emoji = await this.emojisRepository.findOneBy({ id: ps.emojiId });
-			if (emoji == null) {
-				throw new ApiError(meta.errors.noSuchEmoji);
-			}
-
-			let driveFile: MiDriveFile;
-
+export function createCopyProcedure<Actor extends ApiActor>(deps: Pick<EmojisDependencies<Actor>, 'emojisRepository' | 'driveService' | 'customEmojiService' | 'emojiEntityService'>) {
+	return createApiProcedure<Actor>()(emojisContract.copy).use(requirePrincipal<Actor>())
+		.handler(async ({ input, context }) => {
+			const actor = context.principal;
+			const fail = (code: string, message: string, id: string) => apiError({ code, message, id });
+			const emoji = await deps.emojisRepository.findOneBy({ id: input.emojiId });
+			if (emoji === null) throw fail('NO_SUCH_EMOJI', 'No such emoji.', 'e2785b66-dca3-4087-9cac-b93c541cc425');
+			let file: MiDriveFile;
 			try {
-				// Create file
-				driveFile = await this.driveService.uploadFromUrl({ url: emoji.originalUrl, user: null, force: true });
-			} catch (_) {
-				// TODO: need to return Drive Error
-				throw new ApiError();
+				file = await deps.driveService.uploadFromUrl({ url: emoji.originalUrl, user: null, force: true });
+			} catch {
+				throw apiError(internalError);
 			}
-
-			// Duplication Check
-			const isDuplicate = await this.customEmojiService.checkDuplicate(emoji.name);
-			if (isDuplicate) throw new ApiError(meta.errors.duplicateName);
-
-			const addedEmoji = await this.customEmojiService.add({
-				originalUrl: driveFile.url,
-				publicUrl: driveFile.webpublicUrl ?? driveFile.url,
-				fileType: driveFile.webpublicType ?? driveFile.type,
-				name: emoji.name,
-				category: emoji.category,
-				aliases: emoji.aliases,
-				host: null,
-				license: emoji.license,
-				isSensitive: emoji.isSensitive,
-				localOnly: emoji.localOnly,
+			if (await deps.customEmojiService.checkDuplicate(emoji.name)) throw fail('DUPLICATE_NAME', 'Duplicate name.', 'f7a3462c-4e6e-4069-8421-b9bd4f4c3975');
+			const added = await deps.customEmojiService.add({
+				originalUrl: file.url, publicUrl: file.webpublicUrl ?? file.url, fileType: file.webpublicType ?? file.type,
+				name: emoji.name, category: emoji.category, aliases: emoji.aliases, host: null,
+				license: emoji.license, isSensitive: emoji.isSensitive, localOnly: emoji.localOnly,
 				roleIdsThatCanBeUsedThisEmojiAsReaction: emoji.roleIdsThatCanBeUsedThisEmojiAsReaction,
-			}, me);
-
-			return this.emojiEntityService.packDetailed(addedEmoji);
+			}, actor);
+			return toEmojiDetailed(await deps.emojiEntityService.packDetailed(added));
 		});
-	}
 }

@@ -4,16 +4,58 @@
 
 ```ts
 
+import type { AnyContractProcedure } from '@orpc/contract';
+import { ArraySchema } from 'valibot';
 import type { AuthenticationResponseJSON } from '@simplewebauthn/browser';
+import { BooleanSchema } from 'valibot';
+import { CheckAction } from 'valibot';
 import { ContractProcedureBuilderWithInputOutput } from '@orpc/contract';
+import type { ContractRouterClient } from '@orpc/contract';
+import { CustomIssue } from 'valibot';
+import { CustomSchema } from 'valibot';
+import { ErrorMessage } from 'valibot';
 import { EventEmitter } from 'eventemitter3';
+import { ExactOptionalSchema } from 'valibot';
+import { FiniteAction } from 'valibot';
+import { GenericSchema } from 'valibot';
 import type { InferContractRouterInputs } from '@orpc/contract';
 import type { InferContractRouterOutputs } from '@orpc/contract';
+import { IntegerAction } from 'valibot';
+import { IntersectSchema } from 'valibot';
+import { LazySchema } from 'valibot';
+import { LiteralSchema } from 'valibot';
+import { MaxCodePointsAction } from 'valibot';
+import { MaxLengthAction } from 'valibot';
+import { MaxValueAction } from 'valibot';
+import { MergedErrorMap } from '@orpc/contract';
+import { MetadataAction } from 'valibot';
+import { MinCodePointsAction } from 'valibot';
+import { MinLengthAction } from 'valibot';
+import { MinValueAction } from 'valibot';
+import { NeverSchema } from 'valibot';
+import { NullableSchema } from 'valibot';
+import { NullSchema } from 'valibot';
+import { NumberSchema } from 'valibot';
+import { ObjectSchema } from 'valibot';
+import { ObjectWithRestSchema } from 'valibot';
+import { OptionalSchema } from 'valibot';
 import { Options } from 'reconnecting-websocket';
+import { PicklistSchema } from 'valibot';
 import type { PublicKeyCredentialRequestOptionsJSON as PublicKeyCredentialRequestOptionsJSON_2 } from '@simplewebauthn/browser';
 import _ReconnectingWebSocket from 'reconnecting-websocket';
+import { RecordSchema } from 'valibot';
+import { RegexAction } from 'valibot';
 import type { RegistrationResponseJSON } from '@simplewebauthn/browser';
+import { SchemaWithPipe } from 'valibot';
+import { StrictObjectSchema } from 'valibot';
+import { StringSchema } from 'valibot';
+import { TransformAction } from 'valibot';
+import { TupleSchema } from 'valibot';
+import { UnionSchema } from 'valibot';
+import { UnknownSchema } from 'valibot';
 import * as v from 'valibot';
+import { VariantSchema } from 'valibot';
+import { VoidSchema } from 'valibot';
 
 // Warning: (ae-forgotten-export) The symbol "ContractModel" needs to be exported by the entry point index.d.ts
 //
@@ -45,426 +87,464 @@ type AchievementName = ContractModel<'AchievementName'>;
 type Ad = ContractModel<'Ad'>;
 
 // Warning: (ae-forgotten-export) The symbol "ContractRequest" needs to be exported by the entry point index.d.ts
-// Warning: (ae-forgotten-export) The symbol "operations" needs to be exported by the entry point index.d.ts
 //
 // @public (undocumented)
-type AdminAbuseReportNotificationRecipientCreateRequest = ContractRequest<'admin/abuse-report/notification-recipient/create', operations['admin___abuse-report___notification-recipient___create']['requestBody']['content']['application/json']>;
+type AdminAbuseReportNotificationRecipientCreateRequest = ContractRequest<'admin/abuse-report/notification-recipient/create'>;
 
 // Warning: (ae-forgotten-export) The symbol "ContractResponse" needs to be exported by the entry point index.d.ts
 //
 // @public (undocumented)
-type AdminAbuseReportNotificationRecipientCreateResponse = ContractResponse<'admin/abuse-report/notification-recipient/create', operations['admin___abuse-report___notification-recipient___create']['responses']['200']['content']['application/json']>;
+type AdminAbuseReportNotificationRecipientCreateResponse = ContractResponse<'admin/abuse-report/notification-recipient/create'>;
 
 // @public (undocumented)
-type AdminAbuseReportNotificationRecipientDeleteRequest = ContractRequest<'admin/abuse-report/notification-recipient/delete', operations['admin___abuse-report___notification-recipient___delete']['requestBody']['content']['application/json']>;
+type AdminAbuseReportNotificationRecipientDeleteRequest = ContractRequest<'admin/abuse-report/notification-recipient/delete'>;
 
 // @public (undocumented)
-type AdminAbuseReportNotificationRecipientListRequest = ContractRequest<'admin/abuse-report/notification-recipient/list', operations['admin___abuse-report___notification-recipient___list']['requestBody']['content']['application/json']>;
+type AdminAbuseReportNotificationRecipientListRequest = ContractRequest<'admin/abuse-report/notification-recipient/list'>;
 
 // @public (undocumented)
-type AdminAbuseReportNotificationRecipientListResponse = ContractResponse<'admin/abuse-report/notification-recipient/list', operations['admin___abuse-report___notification-recipient___list']['responses']['200']['content']['application/json']>;
+type AdminAbuseReportNotificationRecipientListResponse = ContractResponse<'admin/abuse-report/notification-recipient/list'>;
 
 // @public (undocumented)
-type AdminAbuseReportNotificationRecipientShowRequest = ContractRequest<'admin/abuse-report/notification-recipient/show', operations['admin___abuse-report___notification-recipient___show']['requestBody']['content']['application/json']>;
+type AdminAbuseReportNotificationRecipientShowRequest = ContractRequest<'admin/abuse-report/notification-recipient/show'>;
 
 // @public (undocumented)
-type AdminAbuseReportNotificationRecipientShowResponse = ContractResponse<'admin/abuse-report/notification-recipient/show', operations['admin___abuse-report___notification-recipient___show']['responses']['200']['content']['application/json']>;
+type AdminAbuseReportNotificationRecipientShowResponse = ContractResponse<'admin/abuse-report/notification-recipient/show'>;
 
 // @public (undocumented)
-type AdminAbuseReportNotificationRecipientUpdateRequest = ContractRequest<'admin/abuse-report/notification-recipient/update', operations['admin___abuse-report___notification-recipient___update']['requestBody']['content']['application/json']>;
+type AdminAbuseReportNotificationRecipientUpdateRequest = ContractRequest<'admin/abuse-report/notification-recipient/update'>;
 
 // @public (undocumented)
-type AdminAbuseReportNotificationRecipientUpdateResponse = ContractResponse<'admin/abuse-report/notification-recipient/update', operations['admin___abuse-report___notification-recipient___update']['responses']['200']['content']['application/json']>;
+type AdminAbuseReportNotificationRecipientUpdateResponse = ContractResponse<'admin/abuse-report/notification-recipient/update'>;
 
 // @public (undocumented)
-type AdminAbuseUserReportsRequest = ContractRequest<'admin/abuse-user-reports', operations['admin___abuse-user-reports']['requestBody']['content']['application/json']>;
+type AdminAbuseUserReportsRequest = ContractRequest<'admin/abuse-user-reports'>;
 
 // @public (undocumented)
-type AdminAbuseUserReportsResponse = ContractResponse<'admin/abuse-user-reports', operations['admin___abuse-user-reports']['responses']['200']['content']['application/json']>;
+type AdminAbuseUserReportsResponse = ContractResponse<'admin/abuse-user-reports'>;
 
 // @public (undocumented)
-type AdminAccountsCreateRequest = ContractRequest<'admin/accounts/create', operations['admin___accounts___create']['requestBody']['content']['application/json']>;
+type AdminAccountsCreateRequest = ContractRequest<'admin/accounts/create'>;
 
 // @public (undocumented)
-type AdminAccountsCreateResponse = ContractResponse<'admin/accounts/create', operations['admin___accounts___create']['responses']['200']['content']['application/json']>;
+type AdminAccountsCreateResponse = ContractResponse<'admin/accounts/create'>;
 
 // @public (undocumented)
-type AdminAccountsDeleteRequest = ContractRequest<'admin/accounts/delete', operations['admin___accounts___delete']['requestBody']['content']['application/json']>;
+type AdminAccountsDeleteRequest = ContractRequest<'admin/accounts/delete'>;
 
 // @public (undocumented)
-type AdminAccountsFindByEmailRequest = ContractRequest<'admin/accounts/find-by-email', operations['admin___accounts___find-by-email']['requestBody']['content']['application/json']>;
+type AdminAccountsFindByEmailRequest = ContractRequest<'admin/accounts/find-by-email'>;
 
 // @public (undocumented)
-type AdminAccountsFindByEmailResponse = ContractResponse<'admin/accounts/find-by-email', operations['admin___accounts___find-by-email']['responses']['200']['content']['application/json']>;
+type AdminAccountsFindByEmailResponse = ContractResponse<'admin/accounts/find-by-email'>;
 
 // @public (undocumented)
-type AdminAdCreateRequest = ContractRequest<'admin/ad/create', operations['admin___ad___create']['requestBody']['content']['application/json']>;
+type AdminAdCreateRequest = ContractRequest<'admin/ad/create'>;
 
 // @public (undocumented)
-type AdminAdCreateResponse = ContractResponse<'admin/ad/create', operations['admin___ad___create']['responses']['200']['content']['application/json']>;
+type AdminAdCreateResponse = ContractResponse<'admin/ad/create'>;
 
 // @public (undocumented)
-type AdminAdDeleteRequest = ContractRequest<'admin/ad/delete', operations['admin___ad___delete']['requestBody']['content']['application/json']>;
+type AdminAdDeleteRequest = ContractRequest<'admin/ad/delete'>;
 
 // @public (undocumented)
-type AdminAdListRequest = ContractRequest<'admin/ad/list', operations['admin___ad___list']['requestBody']['content']['application/json']>;
+type AdminAdListRequest = ContractRequest<'admin/ad/list'>;
 
 // @public (undocumented)
-type AdminAdListResponse = ContractResponse<'admin/ad/list', operations['admin___ad___list']['responses']['200']['content']['application/json']>;
+type AdminAdListResponse = ContractResponse<'admin/ad/list'>;
 
 // @public (undocumented)
-type AdminAdUpdateRequest = ContractRequest<'admin/ad/update', operations['admin___ad___update']['requestBody']['content']['application/json']>;
+type AdminAdUpdateRequest = ContractRequest<'admin/ad/update'>;
 
 // @public (undocumented)
-type AdminAnnouncementsCreateRequest = ContractRequest<'admin/announcements/create', operations['admin___announcements___create']['requestBody']['content']['application/json']>;
+type AdminAnnouncementsCreateRequest = ContractRequest<'admin/announcements/create'>;
 
 // @public (undocumented)
-type AdminAnnouncementsCreateResponse = ContractResponse<'admin/announcements/create', operations['admin___announcements___create']['responses']['200']['content']['application/json']>;
+type AdminAnnouncementsCreateResponse = ContractResponse<'admin/announcements/create'>;
 
 // @public (undocumented)
-type AdminAnnouncementsDeleteRequest = ContractRequest<'admin/announcements/delete', operations['admin___announcements___delete']['requestBody']['content']['application/json']>;
+type AdminAnnouncementsDeleteRequest = ContractRequest<'admin/announcements/delete'>;
 
 // @public (undocumented)
-type AdminAnnouncementsListRequest = ContractRequest<'admin/announcements/list', operations['admin___announcements___list']['requestBody']['content']['application/json']>;
+type AdminAnnouncementsListRequest = ContractRequest<'admin/announcements/list'>;
 
 // @public (undocumented)
-type AdminAnnouncementsListResponse = ContractResponse<'admin/announcements/list', operations['admin___announcements___list']['responses']['200']['content']['application/json']>;
+type AdminAnnouncementsListResponse = ContractResponse<'admin/announcements/list'>;
 
 // @public (undocumented)
-type AdminAnnouncementsUpdateRequest = ContractRequest<'admin/announcements/update', operations['admin___announcements___update']['requestBody']['content']['application/json']>;
+type AdminAnnouncementsUpdateRequest = ContractRequest<'admin/announcements/update'>;
 
 // @public (undocumented)
-type AdminAvatarDecorationsCreateRequest = ContractRequest<'admin/avatar-decorations/create', operations['admin___avatar-decorations___create']['requestBody']['content']['application/json']>;
+type AdminAvatarDecorationsCreateRequest = ContractRequest<'admin/avatar-decorations/create'>;
 
 // @public (undocumented)
-type AdminAvatarDecorationsCreateResponse = ContractResponse<'admin/avatar-decorations/create', operations['admin___avatar-decorations___create']['responses']['200']['content']['application/json']>;
+type AdminAvatarDecorationsCreateResponse = ContractResponse<'admin/avatar-decorations/create'>;
 
 // @public (undocumented)
-type AdminAvatarDecorationsDeleteRequest = ContractRequest<'admin/avatar-decorations/delete', operations['admin___avatar-decorations___delete']['requestBody']['content']['application/json']>;
+type AdminAvatarDecorationsDeleteRequest = ContractRequest<'admin/avatar-decorations/delete'>;
 
 // @public (undocumented)
-type AdminAvatarDecorationsListRequest = ContractRequest<'admin/avatar-decorations/list', operations['admin___avatar-decorations___list']['requestBody']['content']['application/json']>;
+type AdminAvatarDecorationsListRequest = ContractRequest<'admin/avatar-decorations/list'>;
 
 // @public (undocumented)
-type AdminAvatarDecorationsListResponse = ContractResponse<'admin/avatar-decorations/list', operations['admin___avatar-decorations___list']['responses']['200']['content']['application/json']>;
+type AdminAvatarDecorationsListResponse = ContractResponse<'admin/avatar-decorations/list'>;
 
 // @public (undocumented)
-type AdminAvatarDecorationsUpdateRequest = ContractRequest<'admin/avatar-decorations/update', operations['admin___avatar-decorations___update']['requestBody']['content']['application/json']>;
+type AdminAvatarDecorationsUpdateRequest = ContractRequest<'admin/avatar-decorations/update'>;
 
 // @public (undocumented)
-type AdminCaptchaCurrentResponse = ContractResponse<'admin/captcha/current', operations['admin___captcha___current']['responses']['200']['content']['application/json']>;
+type AdminCaptchaCurrentRequest = ContractRequest<'admin/captcha/current'>;
 
 // @public (undocumented)
-type AdminCaptchaSaveRequest = ContractRequest<'admin/captcha/save', operations['admin___captcha___save']['requestBody']['content']['application/json']>;
+type AdminCaptchaCurrentResponse = ContractResponse<'admin/captcha/current'>;
 
 // @public (undocumented)
-type AdminDeleteAccountRequest = ContractRequest<'admin/delete-account', operations['admin___delete-account']['requestBody']['content']['application/json']>;
+type AdminCaptchaSaveRequest = ContractRequest<'admin/captcha/save'>;
 
 // @public (undocumented)
-type AdminDeleteAllFilesOfAUserRequest = ContractRequest<'admin/delete-all-files-of-a-user', operations['admin___delete-all-files-of-a-user']['requestBody']['content']['application/json']>;
+type AdminDeleteAccountRequest = ContractRequest<'admin/delete-account'>;
 
 // @public (undocumented)
-type AdminDriveFilesRequest = ContractRequest<'admin/drive/files', operations['admin___drive___files']['requestBody']['content']['application/json']>;
+type AdminDeleteAllFilesOfAUserRequest = ContractRequest<'admin/delete-all-files-of-a-user'>;
 
 // @public (undocumented)
-type AdminDriveFilesResponse = ContractResponse<'admin/drive/files', operations['admin___drive___files']['responses']['200']['content']['application/json']>;
+type AdminDriveCleanRemoteFilesRequest = ContractRequest<'admin/drive/clean-remote-files'>;
 
 // @public (undocumented)
-type AdminDriveShowFileRequest = ContractRequest<'admin/drive/show-file', operations['admin___drive___show-file']['requestBody']['content']['application/json']>;
+type AdminDriveCleanupRequest = ContractRequest<'admin/drive/cleanup'>;
 
 // @public (undocumented)
-type AdminDriveShowFileResponse = ContractResponse<'admin/drive/show-file', operations['admin___drive___show-file']['responses']['200']['content']['application/json']>;
+type AdminDriveFilesRequest = ContractRequest<'admin/drive/files'>;
 
 // @public (undocumented)
-type AdminEmojiAddAliasesBulkRequest = ContractRequest<'admin/emoji/add-aliases-bulk', operations['admin___emoji___add-aliases-bulk']['requestBody']['content']['application/json']>;
+type AdminDriveFilesResponse = ContractResponse<'admin/drive/files'>;
 
 // @public (undocumented)
-type AdminEmojiAddRequest = ContractRequest<'admin/emoji/add', operations['admin___emoji___add']['requestBody']['content']['application/json']>;
+type AdminDriveShowFileRequest = ContractRequest<'admin/drive/show-file'>;
 
 // @public (undocumented)
-type AdminEmojiAddResponse = ContractResponse<'admin/emoji/add', operations['admin___emoji___add']['responses']['200']['content']['application/json']>;
+type AdminDriveShowFileResponse = ContractResponse<'admin/drive/show-file'>;
 
 // @public (undocumented)
-type AdminEmojiCopyRequest = ContractRequest<'admin/emoji/copy', operations['admin___emoji___copy']['requestBody']['content']['application/json']>;
+type AdminEmojiAddAliasesBulkRequest = ContractRequest<'admin/emoji/add-aliases-bulk'>;
 
 // @public (undocumented)
-type AdminEmojiCopyResponse = ContractResponse<'admin/emoji/copy', operations['admin___emoji___copy']['responses']['200']['content']['application/json']>;
+type AdminEmojiAddRequest = ContractRequest<'admin/emoji/add'>;
 
 // @public (undocumented)
-type AdminEmojiDeleteBulkRequest = ContractRequest<'admin/emoji/delete-bulk', operations['admin___emoji___delete-bulk']['requestBody']['content']['application/json']>;
+type AdminEmojiAddResponse = ContractResponse<'admin/emoji/add'>;
 
 // @public (undocumented)
-type AdminEmojiDeleteRequest = ContractRequest<'admin/emoji/delete', operations['admin___emoji___delete']['requestBody']['content']['application/json']>;
+type AdminEmojiCopyRequest = ContractRequest<'admin/emoji/copy'>;
 
 // @public (undocumented)
-type AdminEmojiImportZipRequest = ContractRequest<'admin/emoji/import-zip', operations['admin___emoji___import-zip']['requestBody']['content']['application/json']>;
+type AdminEmojiCopyResponse = ContractResponse<'admin/emoji/copy'>;
 
 // @public (undocumented)
-type AdminEmojiListRemoteRequest = ContractRequest<'admin/emoji/list-remote', operations['admin___emoji___list-remote']['requestBody']['content']['application/json']>;
+type AdminEmojiDeleteBulkRequest = ContractRequest<'admin/emoji/delete-bulk'>;
 
 // @public (undocumented)
-type AdminEmojiListRemoteResponse = ContractResponse<'admin/emoji/list-remote', operations['admin___emoji___list-remote']['responses']['200']['content']['application/json']>;
+type AdminEmojiDeleteRequest = ContractRequest<'admin/emoji/delete'>;
 
 // @public (undocumented)
-type AdminEmojiListRequest = ContractRequest<'admin/emoji/list', operations['admin___emoji___list']['requestBody']['content']['application/json']>;
+type AdminEmojiImportZipRequest = ContractRequest<'admin/emoji/import-zip'>;
 
 // @public (undocumented)
-type AdminEmojiListResponse = ContractResponse<'admin/emoji/list', operations['admin___emoji___list']['responses']['200']['content']['application/json']>;
+type AdminEmojiListRemoteRequest = ContractRequest<'admin/emoji/list-remote'>;
 
 // @public (undocumented)
-type AdminEmojiRemoveAliasesBulkRequest = ContractRequest<'admin/emoji/remove-aliases-bulk', operations['admin___emoji___remove-aliases-bulk']['requestBody']['content']['application/json']>;
+type AdminEmojiListRemoteResponse = ContractResponse<'admin/emoji/list-remote'>;
 
 // @public (undocumented)
-type AdminEmojiSetAliasesBulkRequest = ContractRequest<'admin/emoji/set-aliases-bulk', operations['admin___emoji___set-aliases-bulk']['requestBody']['content']['application/json']>;
+type AdminEmojiListRequest = ContractRequest<'admin/emoji/list'>;
 
 // @public (undocumented)
-type AdminEmojiSetCategoryBulkRequest = ContractRequest<'admin/emoji/set-category-bulk', operations['admin___emoji___set-category-bulk']['requestBody']['content']['application/json']>;
+type AdminEmojiListResponse = ContractResponse<'admin/emoji/list'>;
 
 // @public (undocumented)
-type AdminEmojiSetLicenseBulkRequest = ContractRequest<'admin/emoji/set-license-bulk', operations['admin___emoji___set-license-bulk']['requestBody']['content']['application/json']>;
+type AdminEmojiRemoveAliasesBulkRequest = ContractRequest<'admin/emoji/remove-aliases-bulk'>;
 
 // @public (undocumented)
-type AdminEmojiUpdateRequest = ContractRequest<'admin/emoji/update', operations['admin___emoji___update']['requestBody']['content']['application/json']>;
+type AdminEmojiSetAliasesBulkRequest = ContractRequest<'admin/emoji/set-aliases-bulk'>;
 
 // @public (undocumented)
-type AdminFederationDeleteAllFilesRequest = ContractRequest<'admin/federation/delete-all-files', operations['admin___federation___delete-all-files']['requestBody']['content']['application/json']>;
+type AdminEmojiSetCategoryBulkRequest = ContractRequest<'admin/emoji/set-category-bulk'>;
 
 // @public (undocumented)
-type AdminFederationRefreshRemoteInstanceMetadataRequest = ContractRequest<'admin/federation/refresh-remote-instance-metadata', operations['admin___federation___refresh-remote-instance-metadata']['requestBody']['content']['application/json']>;
+type AdminEmojiSetLicenseBulkRequest = ContractRequest<'admin/emoji/set-license-bulk'>;
 
 // @public (undocumented)
-type AdminFederationRemoveAllFollowingRequest = ContractRequest<'admin/federation/remove-all-following', operations['admin___federation___remove-all-following']['requestBody']['content']['application/json']>;
+type AdminEmojiUpdateRequest = ContractRequest<'admin/emoji/update'>;
 
 // @public (undocumented)
-type AdminFederationUpdateInstanceRequest = ContractRequest<'admin/federation/update-instance', operations['admin___federation___update-instance']['requestBody']['content']['application/json']>;
+type AdminFederationDeleteAllFilesRequest = ContractRequest<'admin/federation/delete-all-files'>;
 
 // @public (undocumented)
-type AdminForwardAbuseUserReportRequest = ContractRequest<'admin/forward-abuse-user-report', operations['admin___forward-abuse-user-report']['requestBody']['content']['application/json']>;
+type AdminFederationRefreshRemoteInstanceMetadataRequest = ContractRequest<'admin/federation/refresh-remote-instance-metadata'>;
 
 // @public (undocumented)
-type AdminGetIndexStatsResponse = ContractResponse<'admin/get-index-stats', operations['admin___get-index-stats']['responses']['200']['content']['application/json']>;
+type AdminFederationRemoveAllFollowingRequest = ContractRequest<'admin/federation/remove-all-following'>;
 
 // @public (undocumented)
-type AdminGetTableStatsResponse = ContractResponse<'admin/get-table-stats', operations['admin___get-table-stats']['responses']['200']['content']['application/json']>;
+type AdminFederationUpdateInstanceRequest = ContractRequest<'admin/federation/update-instance'>;
 
 // @public (undocumented)
-type AdminGetUserIpsRequest = ContractRequest<'admin/get-user-ips', operations['admin___get-user-ips']['requestBody']['content']['application/json']>;
+type AdminForwardAbuseUserReportRequest = ContractRequest<'admin/forward-abuse-user-report'>;
 
 // @public (undocumented)
-type AdminGetUserIpsResponse = ContractResponse<'admin/get-user-ips', operations['admin___get-user-ips']['responses']['200']['content']['application/json']>;
+type AdminGetIndexStatsRequest = ContractRequest<'admin/get-index-stats'>;
 
 // @public (undocumented)
-type AdminInviteCreateRequest = ContractRequest<'admin/invite/create', operations['admin___invite___create']['requestBody']['content']['application/json']>;
+type AdminGetIndexStatsResponse = ContractResponse<'admin/get-index-stats'>;
 
 // @public (undocumented)
-type AdminInviteCreateResponse = ContractResponse<'admin/invite/create', operations['admin___invite___create']['responses']['200']['content']['application/json']>;
+type AdminGetTableStatsRequest = ContractRequest<'admin/get-table-stats'>;
 
 // @public (undocumented)
-type AdminInviteListRequest = ContractRequest<'admin/invite/list', operations['admin___invite___list']['requestBody']['content']['application/json']>;
+type AdminGetTableStatsResponse = ContractResponse<'admin/get-table-stats'>;
 
 // @public (undocumented)
-type AdminInviteListResponse = ContractResponse<'admin/invite/list', operations['admin___invite___list']['responses']['200']['content']['application/json']>;
+type AdminGetUserIpsRequest = ContractRequest<'admin/get-user-ips'>;
 
 // @public (undocumented)
-type AdminMetaResponse = ContractResponse<'admin/meta', operations['admin___meta']['responses']['200']['content']['application/json']>;
+type AdminGetUserIpsResponse = ContractResponse<'admin/get-user-ips'>;
 
 // @public (undocumented)
-type AdminPromoCreateRequest = ContractRequest<'admin/promo/create', operations['admin___promo___create']['requestBody']['content']['application/json']>;
+type AdminInviteCreateRequest = ContractRequest<'admin/invite/create'>;
 
 // @public (undocumented)
-type AdminQueueClearRequest = ContractRequest<'admin/queue/clear', operations['admin___queue___clear']['requestBody']['content']['application/json']>;
+type AdminInviteCreateResponse = ContractResponse<'admin/invite/create'>;
 
 // @public (undocumented)
-type AdminQueueDeliverDelayedResponse = ContractResponse<'admin/queue/deliver-delayed', operations['admin___queue___deliver-delayed']['responses']['200']['content']['application/json']>;
+type AdminInviteListRequest = ContractRequest<'admin/invite/list'>;
 
 // @public (undocumented)
-type AdminQueueInboxDelayedResponse = ContractResponse<'admin/queue/inbox-delayed', operations['admin___queue___inbox-delayed']['responses']['200']['content']['application/json']>;
+type AdminInviteListResponse = ContractResponse<'admin/invite/list'>;
 
 // @public (undocumented)
-type AdminQueueJobsRequest = ContractRequest<'admin/queue/jobs', operations['admin___queue___jobs']['requestBody']['content']['application/json']>;
+type AdminMetaRequest = ContractRequest<'admin/meta'>;
 
 // @public (undocumented)
-type AdminQueueJobsResponse = ContractResponse<'admin/queue/jobs', operations['admin___queue___jobs']['responses']['200']['content']['application/json']>;
+type AdminMetaResponse = ContractResponse<'admin/meta'>;
 
 // @public (undocumented)
-type AdminQueuePauseRequest = ContractRequest<'admin/queue/pause', operations['admin___queue___pause']['requestBody']['content']['application/json']>;
+type AdminPromoCreateRequest = ContractRequest<'admin/promo/create'>;
 
 // @public (undocumented)
-type AdminQueuePromoteJobsRequest = ContractRequest<'admin/queue/promote-jobs', operations['admin___queue___promote-jobs']['requestBody']['content']['application/json']>;
+type AdminQueueClearRequest = ContractRequest<'admin/queue/clear'>;
 
 // @public (undocumented)
-type AdminQueueQueuesResponse = ContractResponse<'admin/queue/queues', operations['admin___queue___queues']['responses']['200']['content']['application/json']>;
+type AdminQueueDeliverDelayedRequest = ContractRequest<'admin/queue/deliver-delayed'>;
 
 // @public (undocumented)
-type AdminQueueQueueStatsRequest = ContractRequest<'admin/queue/queue-stats', operations['admin___queue___queue-stats']['requestBody']['content']['application/json']>;
+type AdminQueueDeliverDelayedResponse = ContractResponse<'admin/queue/deliver-delayed'>;
 
 // @public (undocumented)
-type AdminQueueQueueStatsResponse = ContractResponse<'admin/queue/queue-stats', operations['admin___queue___queue-stats']['responses']['200']['content']['application/json']>;
+type AdminQueueInboxDelayedRequest = ContractRequest<'admin/queue/inbox-delayed'>;
 
 // @public (undocumented)
-type AdminQueueRemoveJobRequest = ContractRequest<'admin/queue/remove-job', operations['admin___queue___remove-job']['requestBody']['content']['application/json']>;
+type AdminQueueInboxDelayedResponse = ContractResponse<'admin/queue/inbox-delayed'>;
 
 // @public (undocumented)
-type AdminQueueResumeRequest = ContractRequest<'admin/queue/resume', operations['admin___queue___resume']['requestBody']['content']['application/json']>;
+type AdminQueueJobsRequest = ContractRequest<'admin/queue/jobs'>;
 
 // @public (undocumented)
-type AdminQueueRetryJobRequest = ContractRequest<'admin/queue/retry-job', operations['admin___queue___retry-job']['requestBody']['content']['application/json']>;
+type AdminQueueJobsResponse = ContractResponse<'admin/queue/jobs'>;
 
 // @public (undocumented)
-type AdminQueueShowJobLogsRequest = ContractRequest<'admin/queue/show-job-logs', operations['admin___queue___show-job-logs']['requestBody']['content']['application/json']>;
+type AdminQueuePauseRequest = ContractRequest<'admin/queue/pause'>;
 
 // @public (undocumented)
-type AdminQueueShowJobLogsResponse = ContractResponse<'admin/queue/show-job-logs', operations['admin___queue___show-job-logs']['responses']['200']['content']['application/json']>;
+type AdminQueuePromoteJobsRequest = ContractRequest<'admin/queue/promote-jobs'>;
 
 // @public (undocumented)
-type AdminQueueShowJobRequest = ContractRequest<'admin/queue/show-job', operations['admin___queue___show-job']['requestBody']['content']['application/json']>;
+type AdminQueueQueuesRequest = ContractRequest<'admin/queue/queues'>;
 
 // @public (undocumented)
-type AdminQueueShowJobResponse = ContractResponse<'admin/queue/show-job', operations['admin___queue___show-job']['responses']['200']['content']['application/json']>;
+type AdminQueueQueuesResponse = ContractResponse<'admin/queue/queues'>;
 
 // @public (undocumented)
-type AdminQueueStatsResponse = ContractResponse<'admin/queue/stats', operations['admin___queue___stats']['responses']['200']['content']['application/json']>;
+type AdminQueueQueueStatsRequest = ContractRequest<'admin/queue/queue-stats'>;
 
 // @public (undocumented)
-type AdminRelaysAddRequest = ContractRequest<'admin/relays/add', operations['admin___relays___add']['requestBody']['content']['application/json']>;
+type AdminQueueQueueStatsResponse = ContractResponse<'admin/queue/queue-stats'>;
 
 // @public (undocumented)
-type AdminRelaysAddResponse = ContractResponse<'admin/relays/add', operations['admin___relays___add']['responses']['200']['content']['application/json']>;
+type AdminQueueRemoveJobRequest = ContractRequest<'admin/queue/remove-job'>;
 
 // @public (undocumented)
-type AdminRelaysListResponse = ContractResponse<'admin/relays/list', operations['admin___relays___list']['responses']['200']['content']['application/json']>;
+type AdminQueueResumeRequest = ContractRequest<'admin/queue/resume'>;
 
 // @public (undocumented)
-type AdminRelaysRemoveRequest = ContractRequest<'admin/relays/remove', operations['admin___relays___remove']['requestBody']['content']['application/json']>;
+type AdminQueueRetryJobRequest = ContractRequest<'admin/queue/retry-job'>;
 
 // @public (undocumented)
-type AdminResetPasswordRequest = ContractRequest<'admin/reset-password', operations['admin___reset-password']['requestBody']['content']['application/json']>;
+type AdminQueueShowJobLogsRequest = ContractRequest<'admin/queue/show-job-logs'>;
 
 // @public (undocumented)
-type AdminResetPasswordResponse = ContractResponse<'admin/reset-password', operations['admin___reset-password']['responses']['200']['content']['application/json']>;
+type AdminQueueShowJobLogsResponse = ContractResponse<'admin/queue/show-job-logs'>;
 
 // @public (undocumented)
-type AdminResolveAbuseUserReportRequest = ContractRequest<'admin/resolve-abuse-user-report', operations['admin___resolve-abuse-user-report']['requestBody']['content']['application/json']>;
+type AdminQueueShowJobRequest = ContractRequest<'admin/queue/show-job'>;
 
 // @public (undocumented)
-type AdminRolesAssignRequest = ContractRequest<'admin/roles/assign', operations['admin___roles___assign']['requestBody']['content']['application/json']>;
+type AdminQueueShowJobResponse = ContractResponse<'admin/queue/show-job'>;
 
 // @public (undocumented)
-type AdminRolesCreateRequest = ContractRequest<'admin/roles/create', operations['admin___roles___create']['requestBody']['content']['application/json']>;
+type AdminQueueStatsRequest = ContractRequest<'admin/queue/stats'>;
 
 // @public (undocumented)
-type AdminRolesCreateResponse = ContractResponse<'admin/roles/create', operations['admin___roles___create']['responses']['200']['content']['application/json']>;
+type AdminQueueStatsResponse = ContractResponse<'admin/queue/stats'>;
 
 // @public (undocumented)
-type AdminRolesDeleteRequest = ContractRequest<'admin/roles/delete', operations['admin___roles___delete']['requestBody']['content']['application/json']>;
+type AdminRelaysAddRequest = ContractRequest<'admin/relays/add'>;
 
 // @public (undocumented)
-type AdminRolesListResponse = ContractResponse<'admin/roles/list', operations['admin___roles___list']['responses']['200']['content']['application/json']>;
+type AdminRelaysAddResponse = ContractResponse<'admin/relays/add'>;
 
 // @public (undocumented)
-type AdminRolesShowRequest = ContractRequest<'admin/roles/show', operations['admin___roles___show']['requestBody']['content']['application/json']>;
+type AdminRelaysListRequest = ContractRequest<'admin/relays/list'>;
 
 // @public (undocumented)
-type AdminRolesShowResponse = ContractResponse<'admin/roles/show', operations['admin___roles___show']['responses']['200']['content']['application/json']>;
+type AdminRelaysListResponse = ContractResponse<'admin/relays/list'>;
 
 // @public (undocumented)
-type AdminRolesUnassignRequest = ContractRequest<'admin/roles/unassign', operations['admin___roles___unassign']['requestBody']['content']['application/json']>;
+type AdminRelaysRemoveRequest = ContractRequest<'admin/relays/remove'>;
 
 // @public (undocumented)
-type AdminRolesUpdateDefaultPoliciesRequest = ContractRequest<'admin/roles/update-default-policies', operations['admin___roles___update-default-policies']['requestBody']['content']['application/json']>;
+type AdminResetPasswordRequest = ContractRequest<'admin/reset-password'>;
 
 // @public (undocumented)
-type AdminRolesUpdateRequest = ContractRequest<'admin/roles/update', operations['admin___roles___update']['requestBody']['content']['application/json']>;
+type AdminResetPasswordResponse = ContractResponse<'admin/reset-password'>;
 
 // @public (undocumented)
-type AdminRolesUsersRequest = ContractRequest<'admin/roles/users', operations['admin___roles___users']['requestBody']['content']['application/json']>;
+type AdminResolveAbuseUserReportRequest = ContractRequest<'admin/resolve-abuse-user-report'>;
 
 // @public (undocumented)
-type AdminRolesUsersResponse = ContractResponse<'admin/roles/users', operations['admin___roles___users']['responses']['200']['content']['application/json']>;
+type AdminRolesAssignRequest = ContractRequest<'admin/roles/assign'>;
 
 // @public (undocumented)
-type AdminSendEmailRequest = ContractRequest<'admin/send-email', operations['admin___send-email']['requestBody']['content']['application/json']>;
+type AdminRolesCreateRequest = ContractRequest<'admin/roles/create'>;
 
 // @public (undocumented)
-type AdminServerInfoResponse = ContractResponse<'admin/server-info', operations['admin___server-info']['responses']['200']['content']['application/json']>;
+type AdminRolesCreateResponse = ContractResponse<'admin/roles/create'>;
 
 // @public (undocumented)
-type AdminShowModerationLogsRequest = ContractRequest<'admin/show-moderation-logs', operations['admin___show-moderation-logs']['requestBody']['content']['application/json']>;
+type AdminRolesDeleteRequest = ContractRequest<'admin/roles/delete'>;
 
 // @public (undocumented)
-type AdminShowModerationLogsResponse = ContractResponse<'admin/show-moderation-logs', operations['admin___show-moderation-logs']['responses']['200']['content']['application/json']>;
+type AdminRolesListRequest = ContractRequest<'admin/roles/list'>;
 
 // @public (undocumented)
-type AdminShowUserRequest = ContractRequest<'admin/show-user', operations['admin___show-user']['requestBody']['content']['application/json']>;
+type AdminRolesListResponse = ContractResponse<'admin/roles/list'>;
 
 // @public (undocumented)
-type AdminShowUserResponse = ContractResponse<'admin/show-user', operations['admin___show-user']['responses']['200']['content']['application/json']>;
+type AdminRolesShowRequest = ContractRequest<'admin/roles/show'>;
 
 // @public (undocumented)
-type AdminShowUsersRequest = ContractRequest<'admin/show-users', operations['admin___show-users']['requestBody']['content']['application/json']>;
+type AdminRolesShowResponse = ContractResponse<'admin/roles/show'>;
 
 // @public (undocumented)
-type AdminShowUsersResponse = ContractResponse<'admin/show-users', operations['admin___show-users']['responses']['200']['content']['application/json']>;
+type AdminRolesUnassignRequest = ContractRequest<'admin/roles/unassign'>;
 
 // @public (undocumented)
-type AdminSuspendUserRequest = ContractRequest<'admin/suspend-user', operations['admin___suspend-user']['requestBody']['content']['application/json']>;
+type AdminRolesUpdateDefaultPoliciesRequest = ContractRequest<'admin/roles/update-default-policies'>;
 
 // @public (undocumented)
-type AdminSystemWebhookCreateRequest = ContractRequest<'admin/system-webhook/create', operations['admin___system-webhook___create']['requestBody']['content']['application/json']>;
+type AdminRolesUpdateRequest = ContractRequest<'admin/roles/update'>;
 
 // @public (undocumented)
-type AdminSystemWebhookCreateResponse = ContractResponse<'admin/system-webhook/create', operations['admin___system-webhook___create']['responses']['200']['content']['application/json']>;
+type AdminRolesUsersRequest = ContractRequest<'admin/roles/users'>;
 
 // @public (undocumented)
-type AdminSystemWebhookDeleteRequest = ContractRequest<'admin/system-webhook/delete', operations['admin___system-webhook___delete']['requestBody']['content']['application/json']>;
+type AdminRolesUsersResponse = ContractResponse<'admin/roles/users'>;
 
 // @public (undocumented)
-type AdminSystemWebhookListRequest = ContractRequest<'admin/system-webhook/list', operations['admin___system-webhook___list']['requestBody']['content']['application/json']>;
+type AdminSendEmailRequest = ContractRequest<'admin/send-email'>;
 
 // @public (undocumented)
-type AdminSystemWebhookListResponse = ContractResponse<'admin/system-webhook/list', operations['admin___system-webhook___list']['responses']['200']['content']['application/json']>;
+type AdminServerInfoRequest = ContractRequest<'admin/server-info'>;
 
 // @public (undocumented)
-type AdminSystemWebhookShowRequest = ContractRequest<'admin/system-webhook/show', operations['admin___system-webhook___show']['requestBody']['content']['application/json']>;
+type AdminServerInfoResponse = ContractResponse<'admin/server-info'>;
 
 // @public (undocumented)
-type AdminSystemWebhookShowResponse = ContractResponse<'admin/system-webhook/show', operations['admin___system-webhook___show']['responses']['200']['content']['application/json']>;
+type AdminShowModerationLogsRequest = ContractRequest<'admin/show-moderation-logs'>;
 
 // @public (undocumented)
-type AdminSystemWebhookTestRequest = ContractRequest<'admin/system-webhook/test', operations['admin___system-webhook___test']['requestBody']['content']['application/json']>;
+type AdminShowModerationLogsResponse = ContractResponse<'admin/show-moderation-logs'>;
 
 // @public (undocumented)
-type AdminSystemWebhookUpdateRequest = ContractRequest<'admin/system-webhook/update', operations['admin___system-webhook___update']['requestBody']['content']['application/json']>;
+type AdminShowUserRequest = ContractRequest<'admin/show-user'>;
 
 // @public (undocumented)
-type AdminSystemWebhookUpdateResponse = ContractResponse<'admin/system-webhook/update', operations['admin___system-webhook___update']['responses']['200']['content']['application/json']>;
+type AdminShowUserResponse = ContractResponse<'admin/show-user'>;
 
 // @public (undocumented)
-type AdminUnsetMfaRequest = ContractRequest<'admin/unset-mfa', operations['admin___unset-mfa']['requestBody']['content']['application/json']>;
+type AdminShowUsersRequest = ContractRequest<'admin/show-users'>;
 
 // @public (undocumented)
-type AdminUnsetUserAvatarRequest = ContractRequest<'admin/unset-user-avatar', operations['admin___unset-user-avatar']['requestBody']['content']['application/json']>;
+type AdminShowUsersResponse = ContractResponse<'admin/show-users'>;
 
 // @public (undocumented)
-type AdminUnsetUserBannerRequest = ContractRequest<'admin/unset-user-banner', operations['admin___unset-user-banner']['requestBody']['content']['application/json']>;
+type AdminSuspendUserRequest = ContractRequest<'admin/suspend-user'>;
 
 // @public (undocumented)
-type AdminUnsuspendUserRequest = ContractRequest<'admin/unsuspend-user', operations['admin___unsuspend-user']['requestBody']['content']['application/json']>;
+type AdminSystemWebhookCreateRequest = ContractRequest<'admin/system-webhook/create'>;
 
 // @public (undocumented)
-type AdminUpdateAbuseUserReportRequest = ContractRequest<'admin/update-abuse-user-report', operations['admin___update-abuse-user-report']['requestBody']['content']['application/json']>;
+type AdminSystemWebhookCreateResponse = ContractResponse<'admin/system-webhook/create'>;
 
 // @public (undocumented)
-type AdminUpdateMetaRequest = ContractRequest<'admin/update-meta', operations['admin___update-meta']['requestBody']['content']['application/json']>;
+type AdminSystemWebhookDeleteRequest = ContractRequest<'admin/system-webhook/delete'>;
 
 // @public (undocumented)
-type AdminUpdateProxyAccountRequest = ContractRequest<'admin/update-proxy-account', operations['admin___update-proxy-account']['requestBody']['content']['application/json']>;
+type AdminSystemWebhookListRequest = ContractRequest<'admin/system-webhook/list'>;
 
 // @public (undocumented)
-type AdminUpdateProxyAccountResponse = ContractResponse<'admin/update-proxy-account', operations['admin___update-proxy-account']['responses']['200']['content']['application/json']>;
+type AdminSystemWebhookListResponse = ContractResponse<'admin/system-webhook/list'>;
 
 // @public (undocumented)
-type AdminUpdateUserNoteRequest = ContractRequest<'admin/update-user-note', operations['admin___update-user-note']['requestBody']['content']['application/json']>;
+type AdminSystemWebhookShowRequest = ContractRequest<'admin/system-webhook/show'>;
+
+// @public (undocumented)
+type AdminSystemWebhookShowResponse = ContractResponse<'admin/system-webhook/show'>;
+
+// @public (undocumented)
+type AdminSystemWebhookTestRequest = ContractRequest<'admin/system-webhook/test'>;
+
+// @public (undocumented)
+type AdminSystemWebhookUpdateRequest = ContractRequest<'admin/system-webhook/update'>;
+
+// @public (undocumented)
+type AdminSystemWebhookUpdateResponse = ContractResponse<'admin/system-webhook/update'>;
+
+// @public (undocumented)
+type AdminUnsetMfaRequest = ContractRequest<'admin/unset-mfa'>;
+
+// @public (undocumented)
+type AdminUnsetUserAvatarRequest = ContractRequest<'admin/unset-user-avatar'>;
+
+// @public (undocumented)
+type AdminUnsetUserBannerRequest = ContractRequest<'admin/unset-user-banner'>;
+
+// @public (undocumented)
+type AdminUnsuspendUserRequest = ContractRequest<'admin/unsuspend-user'>;
+
+// @public (undocumented)
+type AdminUpdateAbuseUserReportRequest = ContractRequest<'admin/update-abuse-user-report'>;
+
+// @public (undocumented)
+type AdminUpdateMetaRequest = ContractRequest<'admin/update-meta'>;
+
+// @public (undocumented)
+type AdminUpdateProxyAccountRequest = ContractRequest<'admin/update-proxy-account'>;
+
+// @public (undocumented)
+type AdminUpdateProxyAccountResponse = ContractResponse<'admin/update-proxy-account'>;
+
+// @public (undocumented)
+type AdminUpdateUserNoteRequest = ContractRequest<'admin/update-user-note'>;
 
 // @public (undocumented)
 type Announcement = ContractModel<'Announcement'>;
@@ -475,58 +555,61 @@ type AnnouncementCreated = {
 };
 
 // @public (undocumented)
-type AnnouncementsRequest = ContractRequest<'announcements', operations['announcements']['requestBody']['content']['application/json']>;
+type AnnouncementsRequest = ContractRequest<'announcements'>;
 
 // @public (undocumented)
-type AnnouncementsResponse = ContractResponse<'announcements', operations['announcements']['responses']['200']['content']['application/json']>;
+type AnnouncementsResponse = ContractResponse<'announcements'>;
 
 // @public (undocumented)
-type AnnouncementsShowRequest = ContractRequest<'announcements/show', operations['announcements___show']['requestBody']['content']['application/json']>;
+type AnnouncementsShowRequest = ContractRequest<'announcements/show'>;
 
 // @public (undocumented)
-type AnnouncementsShowResponse = ContractResponse<'announcements/show', operations['announcements___show']['responses']['200']['content']['application/json']>;
+type AnnouncementsShowResponse = ContractResponse<'announcements/show'>;
 
 // @public (undocumented)
 type Antenna = ContractModel<'Antenna'>;
 
 // @public (undocumented)
-type AntennasCreateRequest = ContractRequest<'antennas/create', operations['antennas___create']['requestBody']['content']['application/json']>;
+type AntennasCreateRequest = ContractRequest<'antennas/create'>;
 
 // @public (undocumented)
-type AntennasCreateResponse = ContractResponse<'antennas/create', operations['antennas___create']['responses']['200']['content']['application/json']>;
+type AntennasCreateResponse = ContractResponse<'antennas/create'>;
 
 // @public (undocumented)
-type AntennasDeleteRequest = ContractRequest<'antennas/delete', operations['antennas___delete']['requestBody']['content']['application/json']>;
+type AntennasDeleteRequest = ContractRequest<'antennas/delete'>;
 
 // @public (undocumented)
-type AntennasListResponse = ContractResponse<'antennas/list', operations['antennas___list']['responses']['200']['content']['application/json']>;
+type AntennasListRequest = ContractRequest<'antennas/list'>;
 
 // @public (undocumented)
-type AntennasNotesRequest = ContractRequest<'antennas/notes', operations['antennas___notes']['requestBody']['content']['application/json']>;
+type AntennasListResponse = ContractResponse<'antennas/list'>;
 
 // @public (undocumented)
-type AntennasNotesResponse = ContractResponse<'antennas/notes', operations['antennas___notes']['responses']['200']['content']['application/json']>;
+type AntennasNotesRequest = ContractRequest<'antennas/notes'>;
 
 // @public (undocumented)
-type AntennasRemoveNoteRequest = ContractRequest<'antennas/remove-note', operations['antennas___remove-note']['requestBody']['content']['application/json']>;
+type AntennasNotesResponse = ContractResponse<'antennas/notes'>;
 
 // @public (undocumented)
-type AntennasShowRequest = ContractRequest<'antennas/show', operations['antennas___show']['requestBody']['content']['application/json']>;
+type AntennasRemoveNoteRequest = ContractRequest<'antennas/remove-note'>;
 
 // @public (undocumented)
-type AntennasShowResponse = ContractResponse<'antennas/show', operations['antennas___show']['responses']['200']['content']['application/json']>;
+type AntennasShowRequest = ContractRequest<'antennas/show'>;
 
 // @public (undocumented)
-type AntennasUpdateRequest = ContractRequest<'antennas/update', operations['antennas___update']['requestBody']['content']['application/json']>;
+type AntennasShowResponse = ContractResponse<'antennas/show'>;
 
 // @public (undocumented)
-type AntennasUpdateResponse = ContractResponse<'antennas/update', operations['antennas___update']['responses']['200']['content']['application/json']>;
+type AntennasUpdateRequest = ContractRequest<'antennas/update'>;
 
 // @public (undocumented)
-type ApGetRequest = ContractRequest<'ap/get', operations['ap___get']['requestBody']['content']['application/json']>;
+type AntennasUpdateResponse = ContractResponse<'antennas/update'>;
 
 // @public (undocumented)
-type ApGetResponse = ContractResponse<'ap/get', operations['ap___get']['responses']['200']['content']['application/json']>;
+type ApGetRequest = ContractRequest<'ap/get'>;
+
+// @public (undocumented)
+type ApGetResponse = ContractResponse<'ap/get'>;
 
 declare namespace api {
     export {
@@ -552,6 +635,10 @@ class APIClient {
     fetch: FetchLike;
     // (undocumented)
     origin: string;
+    // (undocumented)
+    readonly orpc: PilotClient;
+    // (undocumented)
+    request<E extends keyof Endpoints, P extends Endpoints[E]['req']>(endpoint: E, params?: P, credential?: string | null): Promise<SwitchCaseResponseType<E, P>>;
 }
 
 // @public (undocumented)
@@ -560,80 +647,80 @@ type APIError = {
     code: string;
     message: string;
     kind: 'client' | 'server';
-    info: Record<string, any>;
+    info: Record<string, unknown>;
 };
 
 // @public (undocumented)
 type App = ContractModel<'App'>;
 
 // @public (undocumented)
-type AppCreateRequest = ContractRequest<'app/create', operations['app___create']['requestBody']['content']['application/json']>;
+type AppCreateRequest = ContractRequest<'app/create'>;
 
 // @public (undocumented)
-type AppCreateResponse = ContractResponse<'app/create', operations['app___create']['responses']['200']['content']['application/json']>;
+type AppCreateResponse = ContractResponse<'app/create'>;
 
 // @public (undocumented)
-type AppShowRequest = ContractRequest<'app/show', operations['app___show']['requestBody']['content']['application/json']>;
+type AppShowRequest = ContractRequest<'app/show'>;
 
 // @public (undocumented)
-type AppShowResponse = ContractResponse<'app/show', operations['app___show']['responses']['200']['content']['application/json']>;
+type AppShowResponse = ContractResponse<'app/show'>;
 
 // @public (undocumented)
-type ApShowRequest = ContractRequest<'ap/show', operations['ap___show']['requestBody']['content']['application/json']>;
+type ApShowRequest = ContractRequest<'ap/show'>;
 
 // @public (undocumented)
-type ApShowResponse = ContractResponse<'ap/show', operations['ap___show']['responses']['200']['content']['application/json']>;
+type ApShowResponse = ContractResponse<'ap/show'>;
 
 // @public (undocumented)
-type AuthAcceptRequest = ContractRequest<'auth/accept', operations['auth___accept']['requestBody']['content']['application/json']>;
+type AuthAcceptRequest = ContractRequest<'auth/accept'>;
 
 // @public (undocumented)
-type AuthSessionGenerateRequest = ContractRequest<'auth/session/generate', operations['auth___session___generate']['requestBody']['content']['application/json']>;
+type AuthSessionGenerateRequest = ContractRequest<'auth/session/generate'>;
 
 // @public (undocumented)
-type AuthSessionGenerateResponse = ContractResponse<'auth/session/generate', operations['auth___session___generate']['responses']['200']['content']['application/json']>;
+type AuthSessionGenerateResponse = ContractResponse<'auth/session/generate'>;
 
 // @public (undocumented)
-type AuthSessionShowRequest = ContractRequest<'auth/session/show', operations['auth___session___show']['requestBody']['content']['application/json']>;
+type AuthSessionShowRequest = ContractRequest<'auth/session/show'>;
 
 // @public (undocumented)
-type AuthSessionShowResponse = ContractResponse<'auth/session/show', operations['auth___session___show']['responses']['200']['content']['application/json']>;
+type AuthSessionShowResponse = ContractResponse<'auth/session/show'>;
 
 // @public (undocumented)
-type AuthSessionUserkeyRequest = ContractRequest<'auth/session/userkey', operations['auth___session___userkey']['requestBody']['content']['application/json']>;
+type AuthSessionUserkeyRequest = ContractRequest<'auth/session/userkey'>;
 
 // @public (undocumented)
-type AuthSessionUserkeyResponse = ContractResponse<'auth/session/userkey', operations['auth___session___userkey']['responses']['200']['content']['application/json']>;
+type AuthSessionUserkeyResponse = ContractResponse<'auth/session/userkey'>;
 
 // @public (undocumented)
 type Blocking = ContractModel<'Blocking'>;
 
 // @public (undocumented)
-type BlockingCreateRequest = ContractRequest<'blocking/create', operations['blocking___create']['requestBody']['content']['application/json']>;
+type BlockingCreateRequest = ContractRequest<'blocking/create'>;
 
 // @public (undocumented)
-type BlockingCreateResponse = ContractResponse<'blocking/create', operations['blocking___create']['responses']['200']['content']['application/json']>;
+type BlockingCreateResponse = ContractResponse<'blocking/create'>;
 
 // @public (undocumented)
-type BlockingDeleteRequest = ContractRequest<'blocking/delete', operations['blocking___delete']['requestBody']['content']['application/json']>;
+type BlockingDeleteRequest = ContractRequest<'blocking/delete'>;
 
 // @public (undocumented)
-type BlockingDeleteResponse = ContractResponse<'blocking/delete', operations['blocking___delete']['responses']['200']['content']['application/json']>;
+type BlockingDeleteResponse = ContractResponse<'blocking/delete'>;
 
 // @public (undocumented)
-type BlockingListRequest = ContractRequest<'blocking/list', operations['blocking___list']['requestBody']['content']['application/json']>;
+type BlockingListRequest = ContractRequest<'blocking/list'>;
 
 // @public (undocumented)
-type BlockingListResponse = ContractResponse<'blocking/list', operations['blocking___list']['responses']['200']['content']['application/json']>;
+type BlockingListResponse = ContractResponse<'blocking/list'>;
 
 // @public (undocumented)
-type BubbleGameRankingRequest = ContractRequest<'bubble-game/ranking', operations['bubble-game___ranking']['requestBody']['content']['application/json']>;
+type BubbleGameRankingRequest = ContractRequest<'bubble-game/ranking'>;
 
 // @public (undocumented)
-type BubbleGameRankingResponse = ContractResponse<'bubble-game/ranking', operations['bubble-game___ranking']['responses']['200']['content']['application/json']>;
+type BubbleGameRankingResponse = ContractResponse<'bubble-game/ranking'>;
 
 // @public (undocumented)
-type BubbleGameRegisterRequest = ContractRequest<'bubble-game/register', operations['bubble-game___register']['requestBody']['content']['application/json']>;
+type BubbleGameRegisterRequest = ContractRequest<'bubble-game/register'>;
 
 // @public (undocumented)
 type Channel = ContractModel<'Channel'>;
@@ -945,151 +1032,160 @@ export type Channels = {
 };
 
 // @public (undocumented)
-type ChannelsCreateRequest = ContractRequest<'channels/create', operations['channels___create']['requestBody']['content']['application/json']>;
+type ChannelsCreateRequest = ContractRequest<'channels/create'>;
 
 // @public (undocumented)
-type ChannelsCreateResponse = ContractResponse<'channels/create', operations['channels___create']['responses']['200']['content']['application/json']>;
+type ChannelsCreateResponse = ContractResponse<'channels/create'>;
 
 // @public (undocumented)
-type ChannelsFavoriteRequest = ContractRequest<'channels/favorite', operations['channels___favorite']['requestBody']['content']['application/json']>;
+type ChannelsFavoriteRequest = ContractRequest<'channels/favorite'>;
 
 // @public (undocumented)
-type ChannelsFeaturedResponse = ContractResponse<'channels/featured', operations['channels___featured']['responses']['200']['content']['application/json']>;
+type ChannelsFeaturedRequest = ContractRequest<'channels/featured'>;
 
 // @public (undocumented)
-type ChannelsFollowedRequest = ContractRequest<'channels/followed', operations['channels___followed']['requestBody']['content']['application/json']>;
+type ChannelsFeaturedResponse = ContractResponse<'channels/featured'>;
 
 // @public (undocumented)
-type ChannelsFollowedResponse = ContractResponse<'channels/followed', operations['channels___followed']['responses']['200']['content']['application/json']>;
+type ChannelsFollowedRequest = ContractRequest<'channels/followed'>;
 
 // @public (undocumented)
-type ChannelsFollowRequest = ContractRequest<'channels/follow', operations['channels___follow']['requestBody']['content']['application/json']>;
+type ChannelsFollowedResponse = ContractResponse<'channels/followed'>;
 
 // @public (undocumented)
-type ChannelsMuteCreateRequest = ContractRequest<'channels/mute/create', operations['channels___mute___create']['requestBody']['content']['application/json']>;
+type ChannelsFollowRequest = ContractRequest<'channels/follow'>;
 
 // @public (undocumented)
-type ChannelsMuteDeleteRequest = ContractRequest<'channels/mute/delete', operations['channels___mute___delete']['requestBody']['content']['application/json']>;
+type ChannelsMuteCreateRequest = ContractRequest<'channels/mute/create'>;
 
 // @public (undocumented)
-type ChannelsMuteListResponse = ContractResponse<'channels/mute/list', operations['channels___mute___list']['responses']['200']['content']['application/json']>;
+type ChannelsMuteDeleteRequest = ContractRequest<'channels/mute/delete'>;
 
 // @public (undocumented)
-type ChannelsMyFavoritesResponse = ContractResponse<'channels/my-favorites', operations['channels___my-favorites']['responses']['200']['content']['application/json']>;
+type ChannelsMuteListRequest = ContractRequest<'channels/mute/list'>;
 
 // @public (undocumented)
-type ChannelsOwnedRequest = ContractRequest<'channels/owned', operations['channels___owned']['requestBody']['content']['application/json']>;
+type ChannelsMuteListResponse = ContractResponse<'channels/mute/list'>;
 
 // @public (undocumented)
-type ChannelsOwnedResponse = ContractResponse<'channels/owned', operations['channels___owned']['responses']['200']['content']['application/json']>;
+type ChannelsMyFavoritesRequest = ContractRequest<'channels/my-favorites'>;
 
 // @public (undocumented)
-type ChannelsSearchRequest = ContractRequest<'channels/search', operations['channels___search']['requestBody']['content']['application/json']>;
+type ChannelsMyFavoritesResponse = ContractResponse<'channels/my-favorites'>;
 
 // @public (undocumented)
-type ChannelsSearchResponse = ContractResponse<'channels/search', operations['channels___search']['responses']['200']['content']['application/json']>;
+type ChannelsOwnedRequest = ContractRequest<'channels/owned'>;
 
 // @public (undocumented)
-type ChannelsShowRequest = ContractRequest<'channels/show', operations['channels___show']['requestBody']['content']['application/json']>;
+type ChannelsOwnedResponse = ContractResponse<'channels/owned'>;
 
 // @public (undocumented)
-type ChannelsShowResponse = ContractResponse<'channels/show', operations['channels___show']['responses']['200']['content']['application/json']>;
+type ChannelsSearchRequest = ContractRequest<'channels/search'>;
 
 // @public (undocumented)
-type ChannelsTimelineRequest = ContractRequest<'channels/timeline', operations['channels___timeline']['requestBody']['content']['application/json']>;
+type ChannelsSearchResponse = ContractResponse<'channels/search'>;
 
 // @public (undocumented)
-type ChannelsTimelineResponse = ContractResponse<'channels/timeline', operations['channels___timeline']['responses']['200']['content']['application/json']>;
+type ChannelsShowRequest = ContractRequest<'channels/show'>;
 
 // @public (undocumented)
-type ChannelsUnfavoriteRequest = ContractRequest<'channels/unfavorite', operations['channels___unfavorite']['requestBody']['content']['application/json']>;
+type ChannelsShowResponse = ContractResponse<'channels/show'>;
 
 // @public (undocumented)
-type ChannelsUnfollowRequest = ContractRequest<'channels/unfollow', operations['channels___unfollow']['requestBody']['content']['application/json']>;
+type ChannelsTimelineRequest = ContractRequest<'channels/timeline'>;
 
 // @public (undocumented)
-type ChannelsUpdateRequest = ContractRequest<'channels/update', operations['channels___update']['requestBody']['content']['application/json']>;
+type ChannelsTimelineResponse = ContractResponse<'channels/timeline'>;
 
 // @public (undocumented)
-type ChannelsUpdateResponse = ContractResponse<'channels/update', operations['channels___update']['responses']['200']['content']['application/json']>;
+type ChannelsUnfavoriteRequest = ContractRequest<'channels/unfavorite'>;
 
 // @public (undocumented)
-type ChartsActiveUsersRequest = ContractRequest<'charts/active-users', operations['charts___active-users']['requestBody']['content']['application/json']>;
+type ChannelsUnfollowRequest = ContractRequest<'channels/unfollow'>;
 
 // @public (undocumented)
-type ChartsActiveUsersResponse = ContractResponse<'charts/active-users', operations['charts___active-users']['responses']['200']['content']['application/json']>;
+type ChannelsUpdateRequest = ContractRequest<'channels/update'>;
 
 // @public (undocumented)
-type ChartsApRequestRequest = ContractRequest<'charts/ap-request', operations['charts___ap-request']['requestBody']['content']['application/json']>;
+type ChannelsUpdateResponse = ContractResponse<'channels/update'>;
 
 // @public (undocumented)
-type ChartsApRequestResponse = ContractResponse<'charts/ap-request', operations['charts___ap-request']['responses']['200']['content']['application/json']>;
+type ChartsActiveUsersRequest = ContractRequest<'charts/active-users'>;
 
 // @public (undocumented)
-type ChartsDriveRequest = ContractRequest<'charts/drive', operations['charts___drive']['requestBody']['content']['application/json']>;
+type ChartsActiveUsersResponse = ContractResponse<'charts/active-users'>;
 
 // @public (undocumented)
-type ChartsDriveResponse = ContractResponse<'charts/drive', operations['charts___drive']['responses']['200']['content']['application/json']>;
+type ChartsApRequestRequest = ContractRequest<'charts/ap-request'>;
 
 // @public (undocumented)
-type ChartsFederationRequest = ContractRequest<'charts/federation', operations['charts___federation']['requestBody']['content']['application/json']>;
+type ChartsApRequestResponse = ContractResponse<'charts/ap-request'>;
 
 // @public (undocumented)
-type ChartsFederationResponse = ContractResponse<'charts/federation', operations['charts___federation']['responses']['200']['content']['application/json']>;
+type ChartsDriveRequest = ContractRequest<'charts/drive'>;
 
 // @public (undocumented)
-type ChartsInstanceRequest = ContractRequest<'charts/instance', operations['charts___instance']['requestBody']['content']['application/json']>;
+type ChartsDriveResponse = ContractResponse<'charts/drive'>;
 
 // @public (undocumented)
-type ChartsInstanceResponse = ContractResponse<'charts/instance', operations['charts___instance']['responses']['200']['content']['application/json']>;
+type ChartsFederationRequest = ContractRequest<'charts/federation'>;
 
 // @public (undocumented)
-type ChartsNotesRequest = ContractRequest<'charts/notes', operations['charts___notes']['requestBody']['content']['application/json']>;
+type ChartsFederationResponse = ContractResponse<'charts/federation'>;
 
 // @public (undocumented)
-type ChartsNotesResponse = ContractResponse<'charts/notes', operations['charts___notes']['responses']['200']['content']['application/json']>;
+type ChartsInstanceRequest = ContractRequest<'charts/instance'>;
 
 // @public (undocumented)
-type ChartsUserDriveRequest = ContractRequest<'charts/user/drive', operations['charts___user___drive']['requestBody']['content']['application/json']>;
+type ChartsInstanceResponse = ContractResponse<'charts/instance'>;
 
 // @public (undocumented)
-type ChartsUserDriveResponse = ContractResponse<'charts/user/drive', operations['charts___user___drive']['responses']['200']['content']['application/json']>;
+type ChartsNotesRequest = ContractRequest<'charts/notes'>;
 
 // @public (undocumented)
-type ChartsUserFollowingRequest = ContractRequest<'charts/user/following', operations['charts___user___following']['requestBody']['content']['application/json']>;
+type ChartsNotesResponse = ContractResponse<'charts/notes'>;
 
 // @public (undocumented)
-type ChartsUserFollowingResponse = ContractResponse<'charts/user/following', operations['charts___user___following']['responses']['200']['content']['application/json']>;
+type ChartsUserDriveRequest = ContractRequest<'charts/user/drive'>;
 
 // @public (undocumented)
-type ChartsUserNotesRequest = ContractRequest<'charts/user/notes', operations['charts___user___notes']['requestBody']['content']['application/json']>;
+type ChartsUserDriveResponse = ContractResponse<'charts/user/drive'>;
 
 // @public (undocumented)
-type ChartsUserNotesResponse = ContractResponse<'charts/user/notes', operations['charts___user___notes']['responses']['200']['content']['application/json']>;
+type ChartsUserFollowingRequest = ContractRequest<'charts/user/following'>;
 
 // @public (undocumented)
-type ChartsUserPvRequest = ContractRequest<'charts/user/pv', operations['charts___user___pv']['requestBody']['content']['application/json']>;
+type ChartsUserFollowingResponse = ContractResponse<'charts/user/following'>;
 
 // @public (undocumented)
-type ChartsUserPvResponse = ContractResponse<'charts/user/pv', operations['charts___user___pv']['responses']['200']['content']['application/json']>;
+type ChartsUserNotesRequest = ContractRequest<'charts/user/notes'>;
 
 // @public (undocumented)
-type ChartsUserReactionsRequest = ContractRequest<'charts/user/reactions', operations['charts___user___reactions']['requestBody']['content']['application/json']>;
+type ChartsUserNotesResponse = ContractResponse<'charts/user/notes'>;
 
 // @public (undocumented)
-type ChartsUserReactionsResponse = ContractResponse<'charts/user/reactions', operations['charts___user___reactions']['responses']['200']['content']['application/json']>;
+type ChartsUserPvRequest = ContractRequest<'charts/user/pv'>;
 
 // @public (undocumented)
-type ChartsUsersRequest = ContractRequest<'charts/users', operations['charts___users']['requestBody']['content']['application/json']>;
+type ChartsUserPvResponse = ContractResponse<'charts/user/pv'>;
 
 // @public (undocumented)
-type ChartsUsersResponse = ContractResponse<'charts/users', operations['charts___users']['responses']['200']['content']['application/json']>;
+type ChartsUserReactionsRequest = ContractRequest<'charts/user/reactions'>;
 
 // @public (undocumented)
-type ChatHistoryRequest = ContractRequest<'chat/history', operations['chat___history']['requestBody']['content']['application/json']>;
+type ChartsUserReactionsResponse = ContractResponse<'charts/user/reactions'>;
 
 // @public (undocumented)
-type ChatHistoryResponse = ContractResponse<'chat/history', operations['chat___history']['responses']['200']['content']['application/json']>;
+type ChartsUsersRequest = ContractRequest<'charts/users'>;
+
+// @public (undocumented)
+type ChartsUsersResponse = ContractResponse<'charts/users'>;
+
+// @public (undocumented)
+type ChatHistoryRequest = ContractRequest<'chat/history'>;
+
+// @public (undocumented)
+type ChatHistoryResponse = ContractResponse<'chat/history'>;
 
 // @public (undocumented)
 type ChatMessage = ContractModel<'ChatMessage'>;
@@ -1104,49 +1200,52 @@ type ChatMessageLiteFor1on1 = ContractModel<'ChatMessageLiteFor1on1'>;
 type ChatMessageLiteForRoom = ContractModel<'ChatMessageLiteForRoom'>;
 
 // @public (undocumented)
-type ChatMessagesCreateToRoomRequest = ContractRequest<'chat/messages/create-to-room', operations['chat___messages___create-to-room']['requestBody']['content']['application/json']>;
+type ChatMessagesCreateToRoomRequest = ContractRequest<'chat/messages/create-to-room'>;
 
 // @public (undocumented)
-type ChatMessagesCreateToRoomResponse = ContractResponse<'chat/messages/create-to-room', operations['chat___messages___create-to-room']['responses']['200']['content']['application/json']>;
+type ChatMessagesCreateToRoomResponse = ContractResponse<'chat/messages/create-to-room'>;
 
 // @public (undocumented)
-type ChatMessagesCreateToUserRequest = ContractRequest<'chat/messages/create-to-user', operations['chat___messages___create-to-user']['requestBody']['content']['application/json']>;
+type ChatMessagesCreateToUserRequest = ContractRequest<'chat/messages/create-to-user'>;
 
 // @public (undocumented)
-type ChatMessagesCreateToUserResponse = ContractResponse<'chat/messages/create-to-user', operations['chat___messages___create-to-user']['responses']['200']['content']['application/json']>;
+type ChatMessagesCreateToUserResponse = ContractResponse<'chat/messages/create-to-user'>;
 
 // @public (undocumented)
-type ChatMessagesDeleteRequest = ContractRequest<'chat/messages/delete', operations['chat___messages___delete']['requestBody']['content']['application/json']>;
+type ChatMessagesDeleteRequest = ContractRequest<'chat/messages/delete'>;
 
 // @public (undocumented)
-type ChatMessagesReactRequest = ContractRequest<'chat/messages/react', operations['chat___messages___react']['requestBody']['content']['application/json']>;
+type ChatMessagesReactRequest = ContractRequest<'chat/messages/react'>;
 
 // @public (undocumented)
-type ChatMessagesRoomTimelineRequest = ContractRequest<'chat/messages/room-timeline', operations['chat___messages___room-timeline']['requestBody']['content']['application/json']>;
+type ChatMessagesRoomTimelineRequest = ContractRequest<'chat/messages/room-timeline'>;
 
 // @public (undocumented)
-type ChatMessagesRoomTimelineResponse = ContractResponse<'chat/messages/room-timeline', operations['chat___messages___room-timeline']['responses']['200']['content']['application/json']>;
+type ChatMessagesRoomTimelineResponse = ContractResponse<'chat/messages/room-timeline'>;
 
 // @public (undocumented)
-type ChatMessagesSearchRequest = ContractRequest<'chat/messages/search', operations['chat___messages___search']['requestBody']['content']['application/json']>;
+type ChatMessagesSearchRequest = ContractRequest<'chat/messages/search'>;
 
 // @public (undocumented)
-type ChatMessagesSearchResponse = ContractResponse<'chat/messages/search', operations['chat___messages___search']['responses']['200']['content']['application/json']>;
+type ChatMessagesSearchResponse = ContractResponse<'chat/messages/search'>;
 
 // @public (undocumented)
-type ChatMessagesShowRequest = ContractRequest<'chat/messages/show', operations['chat___messages___show']['requestBody']['content']['application/json']>;
+type ChatMessagesShowRequest = ContractRequest<'chat/messages/show'>;
 
 // @public (undocumented)
-type ChatMessagesShowResponse = ContractResponse<'chat/messages/show', operations['chat___messages___show']['responses']['200']['content']['application/json']>;
+type ChatMessagesShowResponse = ContractResponse<'chat/messages/show'>;
 
 // @public (undocumented)
-type ChatMessagesUnreactRequest = ContractRequest<'chat/messages/unreact', operations['chat___messages___unreact']['requestBody']['content']['application/json']>;
+type ChatMessagesUnreactRequest = ContractRequest<'chat/messages/unreact'>;
 
 // @public (undocumented)
-type ChatMessagesUserTimelineRequest = ContractRequest<'chat/messages/user-timeline', operations['chat___messages___user-timeline']['requestBody']['content']['application/json']>;
+type ChatMessagesUserTimelineRequest = ContractRequest<'chat/messages/user-timeline'>;
 
 // @public (undocumented)
-type ChatMessagesUserTimelineResponse = ContractResponse<'chat/messages/user-timeline', operations['chat___messages___user-timeline']['responses']['200']['content']['application/json']>;
+type ChatMessagesUserTimelineResponse = ContractResponse<'chat/messages/user-timeline'>;
+
+// @public (undocumented)
+type ChatReadAllRequest = ContractRequest<'chat/read-all'>;
 
 // @public (undocumented)
 type ChatRoom = ContractModel<'ChatRoom'>;
@@ -1158,124 +1257,127 @@ type ChatRoomInvitation = ContractModel<'ChatRoomInvitation'>;
 type ChatRoomMembership = ContractModel<'ChatRoomMembership'>;
 
 // @public (undocumented)
-type ChatRoomsCreateRequest = ContractRequest<'chat/rooms/create', operations['chat___rooms___create']['requestBody']['content']['application/json']>;
+type ChatRoomsCreateRequest = ContractRequest<'chat/rooms/create'>;
 
 // @public (undocumented)
-type ChatRoomsCreateResponse = ContractResponse<'chat/rooms/create', operations['chat___rooms___create']['responses']['200']['content']['application/json']>;
+type ChatRoomsCreateResponse = ContractResponse<'chat/rooms/create'>;
 
 // @public (undocumented)
-type ChatRoomsDeleteRequest = ContractRequest<'chat/rooms/delete', operations['chat___rooms___delete']['requestBody']['content']['application/json']>;
+type ChatRoomsDeleteRequest = ContractRequest<'chat/rooms/delete'>;
 
 // @public (undocumented)
-type ChatRoomsInvitationsCreateRequest = ContractRequest<'chat/rooms/invitations/create', operations['chat___rooms___invitations___create']['requestBody']['content']['application/json']>;
+type ChatRoomsInvitationsCreateRequest = ContractRequest<'chat/rooms/invitations/create'>;
 
 // @public (undocumented)
-type ChatRoomsInvitationsCreateResponse = ContractResponse<'chat/rooms/invitations/create', operations['chat___rooms___invitations___create']['responses']['200']['content']['application/json']>;
+type ChatRoomsInvitationsCreateResponse = ContractResponse<'chat/rooms/invitations/create'>;
 
 // @public (undocumented)
-type ChatRoomsInvitationsIgnoreRequest = ContractRequest<'chat/rooms/invitations/ignore', operations['chat___rooms___invitations___ignore']['requestBody']['content']['application/json']>;
+type ChatRoomsInvitationsIgnoreRequest = ContractRequest<'chat/rooms/invitations/ignore'>;
 
 // @public (undocumented)
-type ChatRoomsInvitationsInboxRequest = ContractRequest<'chat/rooms/invitations/inbox', operations['chat___rooms___invitations___inbox']['requestBody']['content']['application/json']>;
+type ChatRoomsInvitationsInboxRequest = ContractRequest<'chat/rooms/invitations/inbox'>;
 
 // @public (undocumented)
-type ChatRoomsInvitationsInboxResponse = ContractResponse<'chat/rooms/invitations/inbox', operations['chat___rooms___invitations___inbox']['responses']['200']['content']['application/json']>;
+type ChatRoomsInvitationsInboxResponse = ContractResponse<'chat/rooms/invitations/inbox'>;
 
 // @public (undocumented)
-type ChatRoomsInvitationsOutboxRequest = ContractRequest<'chat/rooms/invitations/outbox', operations['chat___rooms___invitations___outbox']['requestBody']['content']['application/json']>;
+type ChatRoomsInvitationsOutboxRequest = ContractRequest<'chat/rooms/invitations/outbox'>;
 
 // @public (undocumented)
-type ChatRoomsInvitationsOutboxResponse = ContractResponse<'chat/rooms/invitations/outbox', operations['chat___rooms___invitations___outbox']['responses']['200']['content']['application/json']>;
+type ChatRoomsInvitationsOutboxResponse = ContractResponse<'chat/rooms/invitations/outbox'>;
 
 // @public (undocumented)
-type ChatRoomsJoiningRequest = ContractRequest<'chat/rooms/joining', operations['chat___rooms___joining']['requestBody']['content']['application/json']>;
+type ChatRoomsJoiningRequest = ContractRequest<'chat/rooms/joining'>;
 
 // @public (undocumented)
-type ChatRoomsJoiningResponse = ContractResponse<'chat/rooms/joining', operations['chat___rooms___joining']['responses']['200']['content']['application/json']>;
+type ChatRoomsJoiningResponse = ContractResponse<'chat/rooms/joining'>;
 
 // @public (undocumented)
-type ChatRoomsJoinRequest = ContractRequest<'chat/rooms/join', operations['chat___rooms___join']['requestBody']['content']['application/json']>;
+type ChatRoomsJoinRequest = ContractRequest<'chat/rooms/join'>;
 
 // @public (undocumented)
-type ChatRoomsLeaveRequest = ContractRequest<'chat/rooms/leave', operations['chat___rooms___leave']['requestBody']['content']['application/json']>;
+type ChatRoomsLeaveRequest = ContractRequest<'chat/rooms/leave'>;
 
 // @public (undocumented)
-type ChatRoomsMembersRequest = ContractRequest<'chat/rooms/members', operations['chat___rooms___members']['requestBody']['content']['application/json']>;
+type ChatRoomsMembersRequest = ContractRequest<'chat/rooms/members'>;
 
 // @public (undocumented)
-type ChatRoomsMembersResponse = ContractResponse<'chat/rooms/members', operations['chat___rooms___members']['responses']['200']['content']['application/json']>;
+type ChatRoomsMembersResponse = ContractResponse<'chat/rooms/members'>;
 
 // @public (undocumented)
-type ChatRoomsMuteRequest = ContractRequest<'chat/rooms/mute', operations['chat___rooms___mute']['requestBody']['content']['application/json']>;
+type ChatRoomsMuteRequest = ContractRequest<'chat/rooms/mute'>;
 
 // @public (undocumented)
-type ChatRoomsOwnedRequest = ContractRequest<'chat/rooms/owned', operations['chat___rooms___owned']['requestBody']['content']['application/json']>;
+type ChatRoomsOwnedRequest = ContractRequest<'chat/rooms/owned'>;
 
 // @public (undocumented)
-type ChatRoomsOwnedResponse = ContractResponse<'chat/rooms/owned', operations['chat___rooms___owned']['responses']['200']['content']['application/json']>;
+type ChatRoomsOwnedResponse = ContractResponse<'chat/rooms/owned'>;
 
 // @public (undocumented)
-type ChatRoomsShowRequest = ContractRequest<'chat/rooms/show', operations['chat___rooms___show']['requestBody']['content']['application/json']>;
+type ChatRoomsShowRequest = ContractRequest<'chat/rooms/show'>;
 
 // @public (undocumented)
-type ChatRoomsShowResponse = ContractResponse<'chat/rooms/show', operations['chat___rooms___show']['responses']['200']['content']['application/json']>;
+type ChatRoomsShowResponse = ContractResponse<'chat/rooms/show'>;
 
 // @public (undocumented)
-type ChatRoomsUpdateRequest = ContractRequest<'chat/rooms/update', operations['chat___rooms___update']['requestBody']['content']['application/json']>;
+type ChatRoomsUpdateRequest = ContractRequest<'chat/rooms/update'>;
 
 // @public (undocumented)
-type ChatRoomsUpdateResponse = ContractResponse<'chat/rooms/update', operations['chat___rooms___update']['responses']['200']['content']['application/json']>;
+type ChatRoomsUpdateResponse = ContractResponse<'chat/rooms/update'>;
 
 // @public (undocumented)
 type Clip = ContractModel<'Clip'>;
 
 // @public (undocumented)
-type ClipsAddNoteRequest = ContractRequest<'clips/add-note', operations['clips___add-note']['requestBody']['content']['application/json']>;
+type ClipsAddNoteRequest = ContractRequest<'clips/add-note'>;
 
 // @public (undocumented)
-type ClipsCreateRequest = ContractRequest<'clips/create', operations['clips___create']['requestBody']['content']['application/json']>;
+type ClipsCreateRequest = ContractRequest<'clips/create'>;
 
 // @public (undocumented)
-type ClipsCreateResponse = ContractResponse<'clips/create', operations['clips___create']['responses']['200']['content']['application/json']>;
+type ClipsCreateResponse = ContractResponse<'clips/create'>;
 
 // @public (undocumented)
-type ClipsDeleteRequest = ContractRequest<'clips/delete', operations['clips___delete']['requestBody']['content']['application/json']>;
+type ClipsDeleteRequest = ContractRequest<'clips/delete'>;
 
 // @public (undocumented)
-type ClipsFavoriteRequest = ContractRequest<'clips/favorite', operations['clips___favorite']['requestBody']['content']['application/json']>;
+type ClipsFavoriteRequest = ContractRequest<'clips/favorite'>;
 
 // @public (undocumented)
-type ClipsListRequest = ContractRequest<'clips/list', operations['clips___list']['requestBody']['content']['application/json']>;
+type ClipsListRequest = ContractRequest<'clips/list'>;
 
 // @public (undocumented)
-type ClipsListResponse = ContractResponse<'clips/list', operations['clips___list']['responses']['200']['content']['application/json']>;
+type ClipsListResponse = ContractResponse<'clips/list'>;
 
 // @public (undocumented)
-type ClipsMyFavoritesResponse = ContractResponse<'clips/my-favorites', operations['clips___my-favorites']['responses']['200']['content']['application/json']>;
+type ClipsMyFavoritesRequest = ContractRequest<'clips/my-favorites'>;
 
 // @public (undocumented)
-type ClipsNotesRequest = ContractRequest<'clips/notes', operations['clips___notes']['requestBody']['content']['application/json']>;
+type ClipsMyFavoritesResponse = ContractResponse<'clips/my-favorites'>;
 
 // @public (undocumented)
-type ClipsNotesResponse = ContractResponse<'clips/notes', operations['clips___notes']['responses']['200']['content']['application/json']>;
+type ClipsNotesRequest = ContractRequest<'clips/notes'>;
 
 // @public (undocumented)
-type ClipsRemoveNoteRequest = ContractRequest<'clips/remove-note', operations['clips___remove-note']['requestBody']['content']['application/json']>;
+type ClipsNotesResponse = ContractResponse<'clips/notes'>;
 
 // @public (undocumented)
-type ClipsShowRequest = ContractRequest<'clips/show', operations['clips___show']['requestBody']['content']['application/json']>;
+type ClipsRemoveNoteRequest = ContractRequest<'clips/remove-note'>;
 
 // @public (undocumented)
-type ClipsShowResponse = ContractResponse<'clips/show', operations['clips___show']['responses']['200']['content']['application/json']>;
+type ClipsShowRequest = ContractRequest<'clips/show'>;
 
 // @public (undocumented)
-type ClipsUnfavoriteRequest = ContractRequest<'clips/unfavorite', operations['clips___unfavorite']['requestBody']['content']['application/json']>;
+type ClipsShowResponse = ContractResponse<'clips/show'>;
 
 // @public (undocumented)
-type ClipsUpdateRequest = ContractRequest<'clips/update', operations['clips___update']['requestBody']['content']['application/json']>;
+type ClipsUnfavoriteRequest = ContractRequest<'clips/unfavorite'>;
 
 // @public (undocumented)
-type ClipsUpdateResponse = ContractResponse<'clips/update', operations['clips___update']['responses']['200']['content']['application/json']>;
+type ClipsUpdateRequest = ContractRequest<'clips/update'>;
+
+// @public (undocumented)
+type ClipsUpdateResponse = ContractResponse<'clips/update'>;
 
 // @public (undocumented)
 type DateString = string;
@@ -1284,118 +1386,121 @@ type DateString = string;
 type DriveFile = ContractModel<'DriveFile'>;
 
 // @public (undocumented)
-type DriveFilesAttachedChatMessagesRequest = ContractRequest<'drive/files/attached-chat-messages', operations['drive___files___attached-chat-messages']['requestBody']['content']['application/json']>;
+type DriveFilesAttachedChatMessagesRequest = ContractRequest<'drive/files/attached-chat-messages'>;
 
 // @public (undocumented)
-type DriveFilesAttachedChatMessagesResponse = ContractResponse<'drive/files/attached-chat-messages', operations['drive___files___attached-chat-messages']['responses']['200']['content']['application/json']>;
+type DriveFilesAttachedChatMessagesResponse = ContractResponse<'drive/files/attached-chat-messages'>;
 
 // @public (undocumented)
-type DriveFilesAttachedNotesRequest = ContractRequest<'drive/files/attached-notes', operations['drive___files___attached-notes']['requestBody']['content']['application/json']>;
+type DriveFilesAttachedNotesRequest = ContractRequest<'drive/files/attached-notes'>;
 
 // @public (undocumented)
-type DriveFilesAttachedNotesResponse = ContractResponse<'drive/files/attached-notes', operations['drive___files___attached-notes']['responses']['200']['content']['application/json']>;
+type DriveFilesAttachedNotesResponse = ContractResponse<'drive/files/attached-notes'>;
 
 // @public (undocumented)
-type DriveFilesCheckExistenceRequest = ContractRequest<'drive/files/check-existence', operations['drive___files___check-existence']['requestBody']['content']['application/json']>;
+type DriveFilesCheckExistenceRequest = ContractRequest<'drive/files/check-existence'>;
 
 // @public (undocumented)
-type DriveFilesCheckExistenceResponse = ContractResponse<'drive/files/check-existence', operations['drive___files___check-existence']['responses']['200']['content']['application/json']>;
+type DriveFilesCheckExistenceResponse = ContractResponse<'drive/files/check-existence'>;
 
 // @public (undocumented)
-type DriveFilesCreateRequest = ContractRequest<'drive/files/create', operations['drive___files___create']['requestBody']['content']['multipart/form-data']>;
+type DriveFilesCreateRequest = ContractRequest<'drive/files/create'>;
 
 // @public (undocumented)
-type DriveFilesCreateResponse = ContractResponse<'drive/files/create', operations['drive___files___create']['responses']['200']['content']['application/json']>;
+type DriveFilesCreateResponse = ContractResponse<'drive/files/create'>;
 
 // @public (undocumented)
-type DriveFilesDeleteRequest = ContractRequest<'drive/files/delete', operations['drive___files___delete']['requestBody']['content']['application/json']>;
+type DriveFilesDeleteRequest = ContractRequest<'drive/files/delete'>;
 
 // @public (undocumented)
-type DriveFilesFindByHashRequest = ContractRequest<'drive/files/find-by-hash', operations['drive___files___find-by-hash']['requestBody']['content']['application/json']>;
+type DriveFilesFindByHashRequest = ContractRequest<'drive/files/find-by-hash'>;
 
 // @public (undocumented)
-type DriveFilesFindByHashResponse = ContractResponse<'drive/files/find-by-hash', operations['drive___files___find-by-hash']['responses']['200']['content']['application/json']>;
+type DriveFilesFindByHashResponse = ContractResponse<'drive/files/find-by-hash'>;
 
 // @public (undocumented)
-type DriveFilesFindRequest = ContractRequest<'drive/files/find', operations['drive___files___find']['requestBody']['content']['application/json']>;
+type DriveFilesFindRequest = ContractRequest<'drive/files/find'>;
 
 // @public (undocumented)
-type DriveFilesFindResponse = ContractResponse<'drive/files/find', operations['drive___files___find']['responses']['200']['content']['application/json']>;
+type DriveFilesFindResponse = ContractResponse<'drive/files/find'>;
 
 // @public (undocumented)
-type DriveFilesMoveBulkRequest = ContractRequest<'drive/files/move-bulk', operations['drive___files___move-bulk']['requestBody']['content']['application/json']>;
+type DriveFilesMoveBulkRequest = ContractRequest<'drive/files/move-bulk'>;
 
 // @public (undocumented)
-type DriveFilesRequest = ContractRequest<'drive/files', operations['drive___files']['requestBody']['content']['application/json']>;
+type DriveFilesRequest = ContractRequest<'drive/files'>;
 
 // @public (undocumented)
-type DriveFilesResponse = ContractResponse<'drive/files', operations['drive___files']['responses']['200']['content']['application/json']>;
+type DriveFilesResponse = ContractResponse<'drive/files'>;
 
 // @public (undocumented)
-type DriveFilesShowRequest = ContractRequest<'drive/files/show', operations['drive___files___show']['requestBody']['content']['application/json']>;
+type DriveFilesShowRequest = ContractRequest<'drive/files/show'>;
 
 // @public (undocumented)
-type DriveFilesShowResponse = ContractResponse<'drive/files/show', operations['drive___files___show']['responses']['200']['content']['application/json']>;
+type DriveFilesShowResponse = ContractResponse<'drive/files/show'>;
 
 // @public (undocumented)
-type DriveFilesUpdateRequest = ContractRequest<'drive/files/update', operations['drive___files___update']['requestBody']['content']['application/json']>;
+type DriveFilesUpdateRequest = ContractRequest<'drive/files/update'>;
 
 // @public (undocumented)
-type DriveFilesUpdateResponse = ContractResponse<'drive/files/update', operations['drive___files___update']['responses']['200']['content']['application/json']>;
+type DriveFilesUpdateResponse = ContractResponse<'drive/files/update'>;
 
 // @public (undocumented)
-type DriveFilesUploadFromUrlRequest = ContractRequest<'drive/files/upload-from-url', operations['drive___files___upload-from-url']['requestBody']['content']['application/json']>;
+type DriveFilesUploadFromUrlRequest = ContractRequest<'drive/files/upload-from-url'>;
 
 // @public (undocumented)
 type DriveFolder = ContractModel<'DriveFolder'>;
 
 // @public (undocumented)
-type DriveFoldersCreateRequest = ContractRequest<'drive/folders/create', operations['drive___folders___create']['requestBody']['content']['application/json']>;
+type DriveFoldersCreateRequest = ContractRequest<'drive/folders/create'>;
 
 // @public (undocumented)
-type DriveFoldersCreateResponse = ContractResponse<'drive/folders/create', operations['drive___folders___create']['responses']['200']['content']['application/json']>;
+type DriveFoldersCreateResponse = ContractResponse<'drive/folders/create'>;
 
 // @public (undocumented)
-type DriveFoldersDeleteRequest = ContractRequest<'drive/folders/delete', operations['drive___folders___delete']['requestBody']['content']['application/json']>;
+type DriveFoldersDeleteRequest = ContractRequest<'drive/folders/delete'>;
 
 // @public (undocumented)
-type DriveFoldersFindRequest = ContractRequest<'drive/folders/find', operations['drive___folders___find']['requestBody']['content']['application/json']>;
+type DriveFoldersFindRequest = ContractRequest<'drive/folders/find'>;
 
 // @public (undocumented)
-type DriveFoldersFindResponse = ContractResponse<'drive/folders/find', operations['drive___folders___find']['responses']['200']['content']['application/json']>;
+type DriveFoldersFindResponse = ContractResponse<'drive/folders/find'>;
 
 // @public (undocumented)
-type DriveFoldersRequest = ContractRequest<'drive/folders', operations['drive___folders']['requestBody']['content']['application/json']>;
+type DriveFoldersRequest = ContractRequest<'drive/folders'>;
 
 // @public (undocumented)
-type DriveFoldersResponse = ContractResponse<'drive/folders', operations['drive___folders']['responses']['200']['content']['application/json']>;
+type DriveFoldersResponse = ContractResponse<'drive/folders'>;
 
 // @public (undocumented)
-type DriveFoldersShowRequest = ContractRequest<'drive/folders/show', operations['drive___folders___show']['requestBody']['content']['application/json']>;
+type DriveFoldersShowRequest = ContractRequest<'drive/folders/show'>;
 
 // @public (undocumented)
-type DriveFoldersShowResponse = ContractResponse<'drive/folders/show', operations['drive___folders___show']['responses']['200']['content']['application/json']>;
+type DriveFoldersShowResponse = ContractResponse<'drive/folders/show'>;
 
 // @public (undocumented)
-type DriveFoldersUpdateRequest = ContractRequest<'drive/folders/update', operations['drive___folders___update']['requestBody']['content']['application/json']>;
+type DriveFoldersUpdateRequest = ContractRequest<'drive/folders/update'>;
 
 // @public (undocumented)
-type DriveFoldersUpdateResponse = ContractResponse<'drive/folders/update', operations['drive___folders___update']['responses']['200']['content']['application/json']>;
+type DriveFoldersUpdateResponse = ContractResponse<'drive/folders/update'>;
 
 // @public (undocumented)
-type DriveResponse = ContractResponse<'drive', operations['drive']['responses']['200']['content']['application/json']>;
+type DriveRequest = ContractRequest<'drive'>;
 
 // @public (undocumented)
-type DriveStreamRequest = ContractRequest<'drive/stream', operations['drive___stream']['requestBody']['content']['application/json']>;
+type DriveResponse = ContractResponse<'drive'>;
 
 // @public (undocumented)
-type DriveStreamResponse = ContractResponse<'drive/stream', operations['drive___stream']['responses']['200']['content']['application/json']>;
+type DriveStreamRequest = ContractRequest<'drive/stream'>;
 
 // @public (undocumented)
-type EmailAddressAvailableRequest = ContractRequest<'email-address/available', operations['email-address___available']['requestBody']['content']['application/json']>;
+type DriveStreamResponse = ContractResponse<'drive/stream'>;
 
 // @public (undocumented)
-type EmailAddressAvailableResponse = ContractResponse<'email-address/available', operations['email-address___available']['responses']['200']['content']['application/json']>;
+type EmailAddressAvailableRequest = ContractRequest<'email-address/available'>;
+
+// @public (undocumented)
+type EmailAddressAvailableResponse = ContractResponse<'email-address/available'>;
 
 // @public (undocumented)
 type EmojiAdded = {
@@ -1414,16 +1519,19 @@ type EmojiDetailed = ContractModel<'EmojiDetailed'>;
 type EmojiDetailedAdmin = ContractModel<'EmojiDetailedAdmin'>;
 
 // @public (undocumented)
-type EmojiRequest = ContractRequest<'emoji', operations['emoji']['requestBody']['content']['application/json']>;
+type EmojiRequest = ContractRequest<'emoji'>;
 
 // @public (undocumented)
-type EmojiResponse = ContractResponse<'emoji', operations['emoji']['responses']['200']['content']['application/json']>;
+type EmojiResponse = ContractResponse<'emoji'>;
 
 // @public (undocumented)
 type EmojiSimple = ContractModel<'EmojiSimple'>;
 
 // @public (undocumented)
-type EmojisResponse = ContractResponse<'emojis', operations['emojis']['responses']['200']['content']['application/json']>;
+type EmojisRequest = ContractRequest<'emojis'>;
+
+// @public (undocumented)
+type EmojisResponse = ContractResponse<'emojis'>;
 
 // @public (undocumented)
 type EmojiUpdated = {
@@ -1437,17 +1545,16 @@ type EmptyRequest = Record<string, unknown> | undefined;
 type EmptyResponse = Record<string, unknown> | undefined;
 
 // @public (undocumented)
-type EndpointRequest = ContractRequest<'endpoint', operations['endpoint']['requestBody']['content']['application/json']>;
+type EndpointRequest = ContractRequest<'endpoint'>;
 
 // @public (undocumented)
-type EndpointResponse = ContractResponse<'endpoint', operations['endpoint']['responses']['200']['content']['application/json']>;
+type EndpointResponse = ContractResponse<'endpoint'>;
 
 // Warning: (ae-forgotten-export) The symbol "Overwrite" needs to be exported by the entry point index.d.ts
-// Warning: (ae-forgotten-export) The symbol "Endpoints_2" needs to be exported by the entry point index.d.ts
 // Warning: (ae-forgotten-export) The symbol "ContractEndpoints" needs to be exported by the entry point index.d.ts
 //
 // @public (undocumented)
-export type Endpoints = Overwrite<Overwrite<Endpoints_2, ContractEndpoints>, {
+export type Endpoints = Overwrite<ContractEndpoints, {
     'users/show': {
         req: ContractEndpoints['users/show']['req'];
         res: {
@@ -1455,7 +1562,7 @@ export type Endpoints = Overwrite<Overwrite<Endpoints_2, ContractEndpoints>, {
                 $cases: [
                 [
                     {
-                    userIds?: string[];
+                    userIds: string[];
                 },
                 UserDetailed[]
                 ]
@@ -1497,7 +1604,7 @@ export type Endpoints = Overwrite<Overwrite<Endpoints_2, ContractEndpoints>, {
         res: I2faRegisterKeyResponse;
     };
     'i/2fa/key-done': {
-        req: I2faKeyDoneRequest_2;
+        req: I2faKeyDoneRequest;
         res: I2faKeyDoneResponse;
     };
     'admin/roles/create': {
@@ -1508,12 +1615,15 @@ export type Endpoints = Overwrite<Overwrite<Endpoints_2, ContractEndpoints>, {
     };
     'clear-browser-cache': {
         req: EmptyRequest;
-        res: EmptyResponse;
+        res: null;
     };
 }>;
 
 // @public (undocumented)
-type EndpointsResponse = ContractResponse<'endpoints', operations['endpoints']['responses']['200']['content']['application/json']>;
+type EndpointsRequest = ContractRequest<'endpoints'>;
+
+// @public (undocumented)
+type EndpointsResponse = ContractResponse<'endpoints'>;
 
 declare namespace entities {
     export {
@@ -1539,198 +1649,60 @@ declare namespace entities {
         SigninWithPasskeyRequest,
         SigninWithPasskeyInitResponse,
         SigninWithPasskeyResponse,
-        I2faKeyDoneRequest_2 as I2faKeyDoneRequest,
+        I2faKeyDoneRequest,
         PartialRolePolicyOverride,
         EmptyRequest,
         EmptyResponse,
-        AdminAbuseReportNotificationRecipientCreateRequest,
-        AdminAbuseReportNotificationRecipientCreateResponse,
-        AdminAbuseReportNotificationRecipientDeleteRequest,
-        AdminAbuseReportNotificationRecipientListRequest,
-        AdminAbuseReportNotificationRecipientListResponse,
-        AdminAbuseReportNotificationRecipientShowRequest,
-        AdminAbuseReportNotificationRecipientShowResponse,
-        AdminAbuseReportNotificationRecipientUpdateRequest,
-        AdminAbuseReportNotificationRecipientUpdateResponse,
-        AdminAbuseUserReportsRequest,
-        AdminAbuseUserReportsResponse,
-        AdminAccountsCreateRequest,
-        AdminAccountsCreateResponse,
-        AdminAccountsDeleteRequest,
-        AdminAccountsFindByEmailRequest,
-        AdminAccountsFindByEmailResponse,
-        AdminAdCreateRequest,
-        AdminAdCreateResponse,
-        AdminAdDeleteRequest,
-        AdminAdListRequest,
-        AdminAdListResponse,
-        AdminAdUpdateRequest,
-        AdminAnnouncementsCreateRequest,
-        AdminAnnouncementsCreateResponse,
-        AdminAnnouncementsDeleteRequest,
-        AdminAnnouncementsListRequest,
-        AdminAnnouncementsListResponse,
-        AdminAnnouncementsUpdateRequest,
-        AdminAvatarDecorationsCreateRequest,
-        AdminAvatarDecorationsCreateResponse,
-        AdminAvatarDecorationsDeleteRequest,
-        AdminAvatarDecorationsListRequest,
-        AdminAvatarDecorationsListResponse,
-        AdminAvatarDecorationsUpdateRequest,
-        AdminCaptchaCurrentResponse,
-        AdminCaptchaSaveRequest,
-        AdminDeleteAccountRequest,
-        AdminDeleteAllFilesOfAUserRequest,
-        AdminDriveFilesRequest,
-        AdminDriveFilesResponse,
-        AdminDriveShowFileRequest,
-        AdminDriveShowFileResponse,
-        AdminEmojiAddRequest,
-        AdminEmojiAddResponse,
-        AdminEmojiAddAliasesBulkRequest,
-        AdminEmojiCopyRequest,
-        AdminEmojiCopyResponse,
-        AdminEmojiDeleteRequest,
-        AdminEmojiDeleteBulkRequest,
-        AdminEmojiImportZipRequest,
-        AdminEmojiListRequest,
-        AdminEmojiListResponse,
-        AdminEmojiListRemoteRequest,
-        AdminEmojiListRemoteResponse,
-        AdminEmojiRemoveAliasesBulkRequest,
-        AdminEmojiSetAliasesBulkRequest,
-        AdminEmojiSetCategoryBulkRequest,
-        AdminEmojiSetLicenseBulkRequest,
-        AdminEmojiUpdateRequest,
-        AdminFederationDeleteAllFilesRequest,
-        AdminFederationRefreshRemoteInstanceMetadataRequest,
-        AdminFederationRemoveAllFollowingRequest,
-        AdminFederationUpdateInstanceRequest,
-        AdminForwardAbuseUserReportRequest,
-        AdminGetIndexStatsResponse,
-        AdminGetTableStatsResponse,
-        AdminGetUserIpsRequest,
-        AdminGetUserIpsResponse,
-        AdminInviteCreateRequest,
-        AdminInviteCreateResponse,
-        AdminInviteListRequest,
-        AdminInviteListResponse,
-        AdminMetaResponse,
-        AdminPromoCreateRequest,
-        AdminQueueClearRequest,
-        AdminQueueDeliverDelayedResponse,
-        AdminQueueInboxDelayedResponse,
-        AdminQueueJobsRequest,
-        AdminQueueJobsResponse,
-        AdminQueuePauseRequest,
-        AdminQueuePromoteJobsRequest,
-        AdminQueueQueueStatsRequest,
-        AdminQueueQueueStatsResponse,
-        AdminQueueQueuesResponse,
-        AdminQueueRemoveJobRequest,
-        AdminQueueResumeRequest,
-        AdminQueueRetryJobRequest,
-        AdminQueueShowJobRequest,
-        AdminQueueShowJobResponse,
-        AdminQueueShowJobLogsRequest,
-        AdminQueueShowJobLogsResponse,
-        AdminQueueStatsResponse,
-        AdminRelaysAddRequest,
-        AdminRelaysAddResponse,
-        AdminRelaysListResponse,
-        AdminRelaysRemoveRequest,
-        AdminResetPasswordRequest,
-        AdminResetPasswordResponse,
-        AdminResolveAbuseUserReportRequest,
-        AdminRolesAssignRequest,
-        AdminRolesCreateRequest,
-        AdminRolesCreateResponse,
-        AdminRolesDeleteRequest,
-        AdminRolesListResponse,
-        AdminRolesShowRequest,
-        AdminRolesShowResponse,
-        AdminRolesUnassignRequest,
-        AdminRolesUpdateRequest,
-        AdminRolesUpdateDefaultPoliciesRequest,
-        AdminRolesUsersRequest,
-        AdminRolesUsersResponse,
-        AdminSendEmailRequest,
-        AdminServerInfoResponse,
-        AdminShowModerationLogsRequest,
-        AdminShowModerationLogsResponse,
-        AdminShowUserRequest,
-        AdminShowUserResponse,
-        AdminShowUsersRequest,
-        AdminShowUsersResponse,
-        AdminSuspendUserRequest,
-        AdminSystemWebhookCreateRequest,
-        AdminSystemWebhookCreateResponse,
-        AdminSystemWebhookDeleteRequest,
-        AdminSystemWebhookListRequest,
-        AdminSystemWebhookListResponse,
-        AdminSystemWebhookShowRequest,
-        AdminSystemWebhookShowResponse,
-        AdminSystemWebhookTestRequest,
-        AdminSystemWebhookUpdateRequest,
-        AdminSystemWebhookUpdateResponse,
-        AdminUnsetMfaRequest,
-        AdminUnsetUserAvatarRequest,
-        AdminUnsetUserBannerRequest,
-        AdminUnsuspendUserRequest,
-        AdminUpdateAbuseUserReportRequest,
-        AdminUpdateMetaRequest,
-        AdminUpdateProxyAccountRequest,
-        AdminUpdateProxyAccountResponse,
-        AdminUpdateUserNoteRequest,
-        AnnouncementsRequest,
-        AnnouncementsResponse,
-        AnnouncementsShowRequest,
-        AnnouncementsShowResponse,
-        AntennasCreateRequest,
-        AntennasCreateResponse,
-        AntennasDeleteRequest,
-        AntennasListResponse,
-        AntennasNotesRequest,
-        AntennasNotesResponse,
-        AntennasRemoveNoteRequest,
-        AntennasShowRequest,
-        AntennasShowResponse,
-        AntennasUpdateRequest,
-        AntennasUpdateResponse,
-        ApGetRequest,
-        ApGetResponse,
-        ApShowRequest,
-        ApShowResponse,
-        AppCreateRequest,
-        AppCreateResponse,
-        AppShowRequest,
-        AppShowResponse,
-        AuthAcceptRequest,
-        AuthSessionGenerateRequest,
-        AuthSessionGenerateResponse,
-        AuthSessionShowRequest,
-        AuthSessionShowResponse,
-        AuthSessionUserkeyRequest,
-        AuthSessionUserkeyResponse,
-        BlockingCreateRequest,
-        BlockingCreateResponse,
-        BlockingDeleteRequest,
-        BlockingDeleteResponse,
-        BlockingListRequest,
-        BlockingListResponse,
-        BubbleGameRankingRequest,
-        BubbleGameRankingResponse,
-        BubbleGameRegisterRequest,
+        ChatMessagesCreateToUserRequest,
+        ChatMessagesCreateToUserResponse,
+        ChatMessagesCreateToRoomRequest,
+        ChatMessagesCreateToRoomResponse,
+        ChatMessagesDeleteRequest,
+        ChatMessagesShowRequest,
+        ChatMessagesShowResponse,
+        ChatMessagesReactRequest,
+        ChatMessagesUnreactRequest,
+        ChatMessagesUserTimelineRequest,
+        ChatMessagesUserTimelineResponse,
+        ChatMessagesRoomTimelineRequest,
+        ChatMessagesRoomTimelineResponse,
+        ChatMessagesSearchRequest,
+        ChatMessagesSearchResponse,
+        ChatRoomsCreateRequest,
+        ChatRoomsCreateResponse,
+        ChatRoomsDeleteRequest,
+        ChatRoomsJoinRequest,
+        ChatRoomsLeaveRequest,
+        ChatRoomsMuteRequest,
+        ChatRoomsShowRequest,
+        ChatRoomsShowResponse,
+        ChatRoomsOwnedRequest,
+        ChatRoomsOwnedResponse,
+        ChatRoomsJoiningRequest,
+        ChatRoomsJoiningResponse,
+        ChatRoomsUpdateRequest,
+        ChatRoomsUpdateResponse,
+        ChatRoomsMembersRequest,
+        ChatRoomsMembersResponse,
+        ChatRoomsInvitationsCreateRequest,
+        ChatRoomsInvitationsCreateResponse,
+        ChatRoomsInvitationsIgnoreRequest,
+        ChatRoomsInvitationsInboxRequest,
+        ChatRoomsInvitationsInboxResponse,
+        ChatRoomsInvitationsOutboxRequest,
+        ChatRoomsInvitationsOutboxResponse,
+        ChatHistoryRequest,
+        ChatHistoryResponse,
+        ChatReadAllRequest,
         ChannelsCreateRequest,
         ChannelsCreateResponse,
         ChannelsFavoriteRequest,
+        ChannelsFeaturedRequest,
         ChannelsFeaturedResponse,
         ChannelsFollowRequest,
         ChannelsFollowedRequest,
         ChannelsFollowedResponse,
-        ChannelsMuteCreateRequest,
-        ChannelsMuteDeleteRequest,
-        ChannelsMuteListResponse,
+        ChannelsMyFavoritesRequest,
         ChannelsMyFavoritesResponse,
         ChannelsOwnedRequest,
         ChannelsOwnedResponse,
@@ -1744,6 +1716,332 @@ declare namespace entities {
         ChannelsUnfollowRequest,
         ChannelsUpdateRequest,
         ChannelsUpdateResponse,
+        ChannelsMuteCreateRequest,
+        ChannelsMuteDeleteRequest,
+        ChannelsMuteListRequest,
+        ChannelsMuteListResponse,
+        IPageLikesRequest,
+        IPageLikesResponse,
+        IPagesRequest,
+        IPagesResponse,
+        PagePushRequest,
+        PagesCreateRequest,
+        PagesCreateResponse,
+        PagesDeleteRequest,
+        PagesFeaturedRequest,
+        PagesFeaturedResponse,
+        PagesLikeRequest,
+        PagesShowRequest,
+        PagesShowResponse,
+        PagesUnlikeRequest,
+        PagesUpdateRequest,
+        UsersPagesRequest,
+        UsersPagesResponse,
+        FlashCreateRequest,
+        FlashCreateResponse,
+        FlashDeleteRequest,
+        FlashFeaturedRequest,
+        FlashFeaturedResponse,
+        FlashLikeRequest,
+        FlashMyRequest,
+        FlashMyResponse,
+        FlashMyLikesRequest,
+        FlashMyLikesResponse,
+        FlashShowRequest,
+        FlashShowResponse,
+        FlashUnlikeRequest,
+        FlashUpdateRequest,
+        FlashSearchRequest,
+        FlashSearchResponse,
+        UsersFlashsRequest,
+        UsersFlashsResponse,
+        BubbleGameRankingRequest,
+        BubbleGameRankingResponse,
+        BubbleGameRegisterRequest,
+        ReversiCancelMatchRequest,
+        ReversiGamesRequest,
+        ReversiGamesResponse,
+        ReversiInvitationsRequest,
+        ReversiInvitationsResponse,
+        ReversiMatchRequest,
+        ReversiMatchResponse,
+        ReversiShowGameRequest,
+        ReversiShowGameResponse,
+        ReversiSurrenderRequest,
+        ReversiVerifyRequest,
+        ReversiVerifyResponse,
+        AdminFederationDeleteAllFilesRequest,
+        AdminFederationRefreshRemoteInstanceMetadataRequest,
+        AdminFederationRemoveAllFollowingRequest,
+        AdminFederationUpdateInstanceRequest,
+        AdminRelaysAddRequest,
+        AdminRelaysAddResponse,
+        AdminRelaysListRequest,
+        AdminRelaysListResponse,
+        AdminRelaysRemoveRequest,
+        ApGetRequest,
+        ApGetResponse,
+        ApShowRequest,
+        ApShowResponse,
+        FederationFollowersRequest,
+        FederationFollowersResponse,
+        FederationFollowingRequest,
+        FederationFollowingResponse,
+        FederationInstancesRequest,
+        FederationInstancesResponse,
+        FederationShowInstanceRequest,
+        FederationShowInstanceResponse,
+        FederationStatsRequest,
+        FederationStatsResponse,
+        FederationUpdateRemoteUserRequest,
+        FederationUsersRequest,
+        FederationUsersResponse,
+        AdminGetIndexStatsRequest,
+        AdminGetIndexStatsResponse,
+        AdminGetTableStatsRequest,
+        AdminGetTableStatsResponse,
+        AdminQueueClearRequest,
+        AdminQueueDeliverDelayedRequest,
+        AdminQueueDeliverDelayedResponse,
+        AdminQueueInboxDelayedRequest,
+        AdminQueueInboxDelayedResponse,
+        AdminQueueJobsRequest,
+        AdminQueueJobsResponse,
+        AdminQueuePauseRequest,
+        AdminQueuePromoteJobsRequest,
+        AdminQueueQueueStatsRequest,
+        AdminQueueQueueStatsResponse,
+        AdminQueueQueuesRequest,
+        AdminQueueQueuesResponse,
+        AdminQueueRemoveJobRequest,
+        AdminQueueResumeRequest,
+        AdminQueueRetryJobRequest,
+        AdminQueueShowJobLogsRequest,
+        AdminQueueShowJobLogsResponse,
+        AdminQueueShowJobRequest,
+        AdminQueueShowJobResponse,
+        AdminQueueStatsRequest,
+        AdminQueueStatsResponse,
+        ResetDbRequest,
+        AdminSendEmailRequest,
+        AdminSystemWebhookCreateRequest,
+        AdminSystemWebhookCreateResponse,
+        AdminSystemWebhookDeleteRequest,
+        AdminSystemWebhookListRequest,
+        AdminSystemWebhookListResponse,
+        AdminSystemWebhookShowRequest,
+        AdminSystemWebhookShowResponse,
+        AdminSystemWebhookTestRequest,
+        AdminSystemWebhookUpdateRequest,
+        AdminSystemWebhookUpdateResponse,
+        FetchExternalResourcesRequest,
+        FetchExternalResourcesResponse,
+        FetchRssRequest,
+        FetchRssResponse,
+        IWebhooksCreateRequest,
+        IWebhooksCreateResponse,
+        IWebhooksDeleteRequest,
+        IWebhooksListRequest,
+        IWebhooksListResponse,
+        IWebhooksShowRequest,
+        IWebhooksShowResponse,
+        IWebhooksTestRequest,
+        IWebhooksUpdateRequest,
+        TestRequest,
+        TestResponse,
+        AdminDeleteAllFilesOfAUserRequest,
+        AdminDriveCleanRemoteFilesRequest,
+        AdminDriveCleanupRequest,
+        AdminDriveFilesRequest,
+        AdminDriveFilesResponse,
+        AdminDriveShowFileRequest,
+        AdminDriveShowFileResponse,
+        DriveRequest,
+        DriveResponse,
+        DriveFilesRequest,
+        DriveFilesResponse,
+        DriveFilesAttachedNotesRequest,
+        DriveFilesAttachedNotesResponse,
+        DriveFilesAttachedChatMessagesRequest,
+        DriveFilesAttachedChatMessagesResponse,
+        DriveFilesCheckExistenceRequest,
+        DriveFilesCheckExistenceResponse,
+        DriveFilesDeleteRequest,
+        DriveFilesFindRequest,
+        DriveFilesFindResponse,
+        DriveFilesFindByHashRequest,
+        DriveFilesFindByHashResponse,
+        DriveFilesShowRequest,
+        DriveFilesShowResponse,
+        DriveFilesUpdateRequest,
+        DriveFilesUpdateResponse,
+        DriveFilesMoveBulkRequest,
+        DriveFilesUploadFromUrlRequest,
+        DriveFoldersRequest,
+        DriveFoldersResponse,
+        DriveFoldersCreateRequest,
+        DriveFoldersCreateResponse,
+        DriveFoldersDeleteRequest,
+        DriveFoldersFindRequest,
+        DriveFoldersFindResponse,
+        DriveFoldersShowRequest,
+        DriveFoldersShowResponse,
+        DriveFoldersUpdateRequest,
+        DriveFoldersUpdateResponse,
+        DriveStreamRequest,
+        DriveStreamResponse,
+        IExportAntennasRequest,
+        IExportBlockingRequest,
+        IExportClipsRequest,
+        IExportFavoritesRequest,
+        IExportFollowingRequest,
+        IExportMuteRequest,
+        IExportNotesRequest,
+        IExportUserListsRequest,
+        IImportAntennasRequest,
+        IImportBlockingRequest,
+        IImportFollowingRequest,
+        IImportMutingRequest,
+        IImportUserListsRequest,
+        AdminAccountsCreateRequest,
+        AdminAccountsCreateResponse,
+        AdminCaptchaCurrentRequest,
+        AdminCaptchaCurrentResponse,
+        AdminCaptchaSaveRequest,
+        AdminInviteCreateRequest,
+        AdminInviteCreateResponse,
+        AdminInviteListRequest,
+        AdminInviteListResponse,
+        AdminResetPasswordRequest,
+        AdminResetPasswordResponse,
+        AdminUnsetMfaRequest,
+        AppCreateRequest,
+        AppCreateResponse,
+        AppShowRequest,
+        AppShowResponse,
+        AuthAcceptRequest,
+        AuthSessionGenerateRequest,
+        AuthSessionGenerateResponse,
+        AuthSessionShowRequest,
+        AuthSessionShowResponse,
+        AuthSessionUserkeyRequest,
+        AuthSessionUserkeyResponse,
+        EmailAddressAvailableRequest,
+        EmailAddressAvailableResponse,
+        I2faDoneRequest,
+        I2faDoneResponse,
+        I2faKeyDoneResponse,
+        I2faPasswordLessRequest,
+        I2faRegisterRequest,
+        I2faRegisterResponse,
+        I2faRegisterKeyRequest,
+        I2faRegisterKeyResponse,
+        I2faRemoveKeyRequest,
+        I2faRemoveKeyResponse,
+        I2faUnregisterRequest,
+        I2faUpdateKeyRequest,
+        I2faUpdateKeyResponse,
+        IAppsRequest,
+        IAppsResponse,
+        IAuthorizedAppsRequest,
+        IAuthorizedAppsResponse,
+        IChangePasswordRequest,
+        IRegenerateTokenRequest,
+        IRevokeTokenRequest,
+        ISigninHistoryRequest,
+        ISigninHistoryResponse,
+        IUpdateEmailRequest,
+        IUpdateEmailResponse,
+        InviteCreateRequest,
+        InviteCreateResponse,
+        InviteDeleteRequest,
+        InviteLimitRequest,
+        InviteLimitResponse,
+        InviteListRequest,
+        InviteListResponse,
+        MiauthGenTokenRequest,
+        MiauthGenTokenResponse,
+        MyAppsRequest,
+        MyAppsResponse,
+        RequestResetPasswordRequest,
+        ResetPasswordRequest,
+        UsernameAvailableRequest,
+        UsernameAvailableResponse,
+        VerifyEmailRequest,
+        AdminAbuseReportNotificationRecipientCreateRequest,
+        AdminAbuseReportNotificationRecipientCreateResponse,
+        AdminAbuseReportNotificationRecipientDeleteRequest,
+        AdminAbuseReportNotificationRecipientListRequest,
+        AdminAbuseReportNotificationRecipientListResponse,
+        AdminAbuseReportNotificationRecipientShowRequest,
+        AdminAbuseReportNotificationRecipientShowResponse,
+        AdminAbuseReportNotificationRecipientUpdateRequest,
+        AdminAbuseReportNotificationRecipientUpdateResponse,
+        AdminAbuseUserReportsRequest,
+        AdminAbuseUserReportsResponse,
+        AdminForwardAbuseUserReportRequest,
+        AdminGetUserIpsRequest,
+        AdminGetUserIpsResponse,
+        AdminResolveAbuseUserReportRequest,
+        AdminShowModerationLogsRequest,
+        AdminShowModerationLogsResponse,
+        AdminShowUserRequest,
+        AdminShowUserResponse,
+        AdminShowUsersRequest,
+        AdminShowUsersResponse,
+        AdminSuspendUserRequest,
+        AdminUnsetUserAvatarRequest,
+        AdminUnsetUserBannerRequest,
+        AdminUnsuspendUserRequest,
+        AdminUpdateAbuseUserReportRequest,
+        AdminUpdateUserNoteRequest,
+        UsersReportAbuseRequest,
+        AdminRolesAssignRequest,
+        AdminRolesCreateRequest,
+        AdminRolesCreateResponse,
+        AdminRolesDeleteRequest,
+        AdminRolesListRequest,
+        AdminRolesListResponse,
+        AdminRolesShowRequest,
+        AdminRolesShowResponse,
+        AdminRolesUnassignRequest,
+        AdminRolesUpdateRequest,
+        AdminRolesUpdateDefaultPoliciesRequest,
+        AdminRolesUsersRequest,
+        AdminRolesUsersResponse,
+        RolesListRequest,
+        RolesListResponse,
+        RolesNotesRequest,
+        RolesNotesResponse,
+        RolesShowRequest,
+        RolesShowResponse,
+        RolesUsersRequest,
+        RolesUsersResponse,
+        ServerInfoRequest,
+        ServerInfoResponse,
+        AdminAdCreateRequest,
+        AdminAdCreateResponse,
+        AdminAdDeleteRequest,
+        AdminAdListRequest,
+        AdminAdListResponse,
+        AdminAdUpdateRequest,
+        AdminMetaRequest,
+        AdminMetaResponse,
+        AdminServerInfoRequest,
+        AdminServerInfoResponse,
+        AdminUpdateMetaRequest,
+        EndpointRequest,
+        EndpointResponse,
+        EndpointsRequest,
+        EndpointsResponse,
+        GetOnlineUsersCountRequest,
+        GetOnlineUsersCountResponse,
+        MetaRequest,
+        MetaResponse,
+        PingRequest,
+        PingResponse,
+        PinnedUsersRequest,
+        PinnedUsersResponse,
         ChartsActiveUsersRequest,
         ChartsActiveUsersResponse,
         ChartsApRequestRequest,
@@ -1768,138 +2066,209 @@ declare namespace entities {
         ChartsUserReactionsResponse,
         ChartsUsersRequest,
         ChartsUsersResponse,
-        ChatHistoryRequest,
-        ChatHistoryResponse,
-        ChatMessagesCreateToRoomRequest,
-        ChatMessagesCreateToRoomResponse,
-        ChatMessagesCreateToUserRequest,
-        ChatMessagesCreateToUserResponse,
-        ChatMessagesDeleteRequest,
-        ChatMessagesReactRequest,
-        ChatMessagesRoomTimelineRequest,
-        ChatMessagesRoomTimelineResponse,
-        ChatMessagesSearchRequest,
-        ChatMessagesSearchResponse,
-        ChatMessagesShowRequest,
-        ChatMessagesShowResponse,
-        ChatMessagesUnreactRequest,
-        ChatMessagesUserTimelineRequest,
-        ChatMessagesUserTimelineResponse,
-        ChatRoomsCreateRequest,
-        ChatRoomsCreateResponse,
-        ChatRoomsDeleteRequest,
-        ChatRoomsInvitationsCreateRequest,
-        ChatRoomsInvitationsCreateResponse,
-        ChatRoomsInvitationsIgnoreRequest,
-        ChatRoomsInvitationsInboxRequest,
-        ChatRoomsInvitationsInboxResponse,
-        ChatRoomsInvitationsOutboxRequest,
-        ChatRoomsInvitationsOutboxResponse,
-        ChatRoomsJoinRequest,
-        ChatRoomsJoiningRequest,
-        ChatRoomsJoiningResponse,
-        ChatRoomsLeaveRequest,
-        ChatRoomsMembersRequest,
-        ChatRoomsMembersResponse,
-        ChatRoomsMuteRequest,
-        ChatRoomsOwnedRequest,
-        ChatRoomsOwnedResponse,
-        ChatRoomsShowRequest,
-        ChatRoomsShowResponse,
-        ChatRoomsUpdateRequest,
-        ChatRoomsUpdateResponse,
-        ClipsAddNoteRequest,
-        ClipsCreateRequest,
-        ClipsCreateResponse,
-        ClipsDeleteRequest,
-        ClipsFavoriteRequest,
-        ClipsListRequest,
-        ClipsListResponse,
-        ClipsMyFavoritesResponse,
-        ClipsNotesRequest,
-        ClipsNotesResponse,
-        ClipsRemoveNoteRequest,
-        ClipsShowRequest,
-        ClipsShowResponse,
-        ClipsUnfavoriteRequest,
-        ClipsUpdateRequest,
-        ClipsUpdateResponse,
-        DriveResponse,
-        DriveFilesRequest,
-        DriveFilesResponse,
-        DriveFilesAttachedChatMessagesRequest,
-        DriveFilesAttachedChatMessagesResponse,
-        DriveFilesAttachedNotesRequest,
-        DriveFilesAttachedNotesResponse,
-        DriveFilesCheckExistenceRequest,
-        DriveFilesCheckExistenceResponse,
-        DriveFilesCreateRequest,
-        DriveFilesCreateResponse,
-        DriveFilesDeleteRequest,
-        DriveFilesFindRequest,
-        DriveFilesFindResponse,
-        DriveFilesFindByHashRequest,
-        DriveFilesFindByHashResponse,
-        DriveFilesMoveBulkRequest,
-        DriveFilesShowRequest,
-        DriveFilesShowResponse,
-        DriveFilesUpdateRequest,
-        DriveFilesUpdateResponse,
-        DriveFilesUploadFromUrlRequest,
-        DriveFoldersRequest,
-        DriveFoldersResponse,
-        DriveFoldersCreateRequest,
-        DriveFoldersCreateResponse,
-        DriveFoldersDeleteRequest,
-        DriveFoldersFindRequest,
-        DriveFoldersFindResponse,
-        DriveFoldersShowRequest,
-        DriveFoldersShowResponse,
-        DriveFoldersUpdateRequest,
-        DriveFoldersUpdateResponse,
-        DriveStreamRequest,
-        DriveStreamResponse,
-        EmailAddressAvailableRequest,
-        EmailAddressAvailableResponse,
+        RetentionRequest,
+        RetentionResponse,
+        StatsRequest,
+        StatsResponse,
+        HashtagsListRequest,
+        HashtagsListResponse,
+        HashtagsSearchRequest,
+        HashtagsSearchResponse,
+        HashtagsShowRequest,
+        HashtagsShowResponse,
+        HashtagsTrendRequest,
+        HashtagsTrendResponse,
+        HashtagsUsersRequest,
+        HashtagsUsersResponse,
+        NotesFeaturedRequest,
+        NotesFeaturedResponse,
+        NotesSearchByTagRequest,
+        NotesSearchByTagResponse,
+        UsersFeaturedNotesRequest,
+        UsersFeaturedNotesResponse,
+        UsersGetFrequentlyRepliedUsersRequest,
+        UsersGetFrequentlyRepliedUsersResponse,
+        UsersRecommendationRequest,
+        UsersRecommendationResponse,
+        UsersSearchRequest,
+        UsersSearchResponse,
+        UsersSearchByUsernameAndHostRequest,
+        UsersSearchByUsernameAndHostResponse,
+        AdminAnnouncementsCreateRequest,
+        AdminAnnouncementsCreateResponse,
+        AdminAnnouncementsDeleteRequest,
+        AdminAnnouncementsListRequest,
+        AdminAnnouncementsListResponse,
+        AdminAnnouncementsUpdateRequest,
+        AnnouncementsRequest,
+        AnnouncementsResponse,
+        AnnouncementsShowRequest,
+        AnnouncementsShowResponse,
+        IReadAnnouncementRequest,
+        AdminAvatarDecorationsCreateRequest,
+        AdminAvatarDecorationsCreateResponse,
+        AdminAvatarDecorationsDeleteRequest,
+        AdminAvatarDecorationsListRequest,
+        AdminAvatarDecorationsListResponse,
+        AdminAvatarDecorationsUpdateRequest,
+        GetAvatarDecorationsRequest,
+        GetAvatarDecorationsResponse,
+        IRegistryGetRequest,
+        IRegistryGetResponse,
+        IRegistryGetAllRequest,
+        IRegistryGetAllResponse,
+        IRegistryGetDetailRequest,
+        IRegistryGetDetailResponse,
+        IRegistryKeysRequest,
+        IRegistryKeysResponse,
+        IRegistryKeysWithTypeRequest,
+        IRegistryKeysWithTypeResponse,
+        IRegistryRemoveRequest,
+        IRegistryScopesWithDomainRequest,
+        IRegistryScopesWithDomainResponse,
+        IRegistrySetRequest,
+        AdminEmojiAddRequest,
+        AdminEmojiAddResponse,
+        AdminEmojiAddAliasesBulkRequest,
+        AdminEmojiCopyRequest,
+        AdminEmojiCopyResponse,
+        AdminEmojiDeleteRequest,
+        AdminEmojiDeleteBulkRequest,
+        AdminEmojiImportZipRequest,
+        AdminEmojiListRequest,
+        AdminEmojiListResponse,
+        AdminEmojiListRemoteRequest,
+        AdminEmojiListRemoteResponse,
+        AdminEmojiRemoveAliasesBulkRequest,
+        AdminEmojiSetAliasesBulkRequest,
+        AdminEmojiSetCategoryBulkRequest,
+        AdminEmojiSetLicenseBulkRequest,
+        AdminEmojiUpdateRequest,
         EmojiRequest,
         EmojiResponse,
+        EmojisRequest,
         EmojisResponse,
-        EndpointRequest,
-        EndpointResponse,
-        EndpointsResponse,
-        FederationFollowersRequest,
-        FederationFollowersResponse,
-        FederationFollowingRequest,
-        FederationFollowingResponse,
-        FederationInstancesRequest,
-        FederationInstancesResponse,
-        FederationShowInstanceRequest,
-        FederationShowInstanceResponse,
-        FederationStatsRequest,
-        FederationStatsResponse,
-        FederationUpdateRemoteUserRequest,
-        FederationUsersRequest,
-        FederationUsersResponse,
-        FetchExternalResourcesRequest,
-        FetchExternalResourcesResponse,
-        FetchRssRequest,
-        FetchRssResponse,
-        FlashCreateRequest,
-        FlashCreateResponse,
-        FlashDeleteRequest,
-        FlashFeaturedRequest,
-        FlashFeaturedResponse,
-        FlashLikeRequest,
-        FlashMyRequest,
-        FlashMyResponse,
-        FlashMyLikesRequest,
-        FlashMyLikesResponse,
-        FlashSearchRequest,
-        FlashSearchResponse,
-        FlashShowRequest,
-        FlashShowResponse,
-        FlashUnlikeRequest,
-        FlashUpdateRequest,
+        ExportCustomEmojisRequest,
+        V2AdminEmojiListRequest,
+        V2AdminEmojiListResponse,
+        INotificationsRequest,
+        INotificationsResponse,
+        INotificationsGroupedRequest,
+        INotificationsGroupedResponse,
+        NotificationsCreateRequest,
+        NotificationsFlushRequest,
+        NotificationsMarkAllAsReadRequest,
+        NotificationsTestNotificationRequest,
+        SwRegisterRequest,
+        SwRegisterResponse,
+        SwShowRegistrationRequest,
+        SwShowRegistrationResponse,
+        SwUnregisterRequest,
+        SwUpdateRegistrationRequest,
+        SwUpdateRegistrationResponse,
+        NotesDeleteRequest,
+        AdminPromoCreateRequest,
+        IPinRequest,
+        IPinResponse,
+        IUnpinRequest,
+        IUnpinResponse,
+        NotesRequest,
+        NotesResponse,
+        NotesChildrenRequest,
+        NotesChildrenResponse,
+        NotesConversationRequest,
+        NotesConversationResponse,
+        NotesCreateRequest,
+        NotesCreateResponse,
+        NotesDraftsListRequest,
+        NotesDraftsListResponse,
+        NotesDraftsCreateRequest,
+        NotesDraftsCreateResponse,
+        NotesDraftsDeleteRequest,
+        NotesDraftsUpdateRequest,
+        NotesDraftsUpdateResponse,
+        NotesDraftsCountRequest,
+        NotesDraftsCountResponse,
+        NotesPollsRecommendationRequest,
+        NotesPollsRecommendationResponse,
+        NotesPollsVoteRequest,
+        NotesReactionsRequest,
+        NotesReactionsResponse,
+        NotesReactionsCreateRequest,
+        NotesReactionsDeleteRequest,
+        NotesRenotesRequest,
+        NotesRenotesResponse,
+        NotesRepliesRequest,
+        NotesRepliesResponse,
+        NotesShowRequest,
+        NotesShowResponse,
+        NotesShowPartialBulkRequest,
+        NotesShowPartialBulkResponse,
+        NotesStateRequest,
+        NotesStateResponse,
+        NotesThreadMutingCreateRequest,
+        NotesThreadMutingDeleteRequest,
+        NotesTranslateRequest,
+        NotesTranslateResponse,
+        NotesUnrenoteRequest,
+        PromoReadRequest,
+        UsersReactionsRequest,
+        UsersReactionsResponse,
+        AdminAccountsDeleteRequest,
+        AdminAccountsFindByEmailRequest,
+        AdminAccountsFindByEmailResponse,
+        AdminDeleteAccountRequest,
+        AdminUpdateProxyAccountRequest,
+        AdminUpdateProxyAccountResponse,
+        IRequest,
+        IResponse,
+        IClaimAchievementRequest,
+        IDeleteAccountRequest,
+        IMoveRequest,
+        IMoveResponse,
+        IUpdateRequest,
+        IUpdateResponse,
+        UsersRequest,
+        UsersResponse,
+        UsersAchievementsRequest,
+        UsersAchievementsResponse,
+        UsersShowRequest,
+        UsersShowResponse_2 as UsersShowResponse,
+        UsersUpdateMemoRequest,
+        AntennasCreateRequest,
+        AntennasCreateResponse,
+        AntennasDeleteRequest,
+        AntennasListRequest,
+        AntennasListResponse,
+        AntennasNotesRequest,
+        AntennasNotesResponse,
+        AntennasRemoveNoteRequest,
+        AntennasShowRequest,
+        AntennasShowResponse,
+        AntennasUpdateRequest,
+        AntennasUpdateResponse,
+        NotesGlobalTimelineRequest,
+        NotesGlobalTimelineResponse,
+        NotesHybridTimelineRequest,
+        NotesHybridTimelineResponse,
+        NotesLocalTimelineRequest,
+        NotesLocalTimelineResponse,
+        NotesMentionsRequest,
+        NotesMentionsResponse,
+        NotesTimelineRequest,
+        NotesTimelineResponse,
+        NotesUserListTimelineRequest,
+        NotesUserListTimelineResponse,
+        UsersNotesRequest,
+        UsersNotesResponse,
+        NotesSearchRequest,
+        NotesSearchResponse,
+        BlockingCreateRequest,
+        BlockingCreateResponse,
+        BlockingDeleteRequest,
+        BlockingDeleteResponse,
+        BlockingListRequest,
+        BlockingListResponse,
         FollowingCreateRequest,
         FollowingCreateResponse,
         FollowingDeleteRequest,
@@ -1919,254 +2288,20 @@ declare namespace entities {
         FollowingUpdateRequest,
         FollowingUpdateResponse,
         FollowingUpdateAllRequest,
-        GalleryFeaturedRequest,
-        GalleryFeaturedResponse,
-        GalleryPopularResponse,
-        GalleryPostsRequest,
-        GalleryPostsResponse,
-        GalleryPostsCreateRequest,
-        GalleryPostsCreateResponse,
-        GalleryPostsDeleteRequest,
-        GalleryPostsLikeRequest,
-        GalleryPostsShowRequest,
-        GalleryPostsShowResponse,
-        GalleryPostsUnlikeRequest,
-        GalleryPostsUpdateRequest,
-        GalleryPostsUpdateResponse,
-        GetAvatarDecorationsResponse,
-        GetOnlineUsersCountResponse,
-        HashtagsListRequest,
-        HashtagsListResponse,
-        HashtagsSearchRequest,
-        HashtagsSearchResponse,
-        HashtagsShowRequest,
-        HashtagsShowResponse,
-        HashtagsTrendResponse,
-        HashtagsUsersRequest,
-        HashtagsUsersResponse,
-        IResponse,
-        I2faDoneRequest,
-        I2faDoneResponse,
-        I2faKeyDoneResponse,
-        I2faPasswordLessRequest,
-        I2faRegisterRequest,
-        I2faRegisterResponse,
-        I2faRegisterKeyRequest,
-        I2faRegisterKeyResponse,
-        I2faRemoveKeyRequest,
-        I2faUnregisterRequest,
-        I2faUpdateKeyRequest,
-        IAppsRequest,
-        IAppsResponse,
-        IAuthorizedAppsRequest,
-        IAuthorizedAppsResponse,
-        IChangePasswordRequest,
-        IClaimAchievementRequest,
-        IDeleteAccountRequest,
-        IExportFollowingRequest,
-        IFavoritesRequest,
-        IFavoritesResponse,
-        IGalleryLikesRequest,
-        IGalleryLikesResponse,
-        IGalleryPostsRequest,
-        IGalleryPostsResponse,
-        IImportAntennasRequest,
-        IImportBlockingRequest,
-        IImportFollowingRequest,
-        IImportMutingRequest,
-        IImportUserListsRequest,
-        IMoveRequest,
-        IMoveResponse,
-        INotificationsRequest,
-        INotificationsResponse,
-        INotificationsGroupedRequest,
-        INotificationsGroupedResponse,
-        IPageLikesRequest,
-        IPageLikesResponse,
-        IPagesRequest,
-        IPagesResponse,
-        IPinRequest,
-        IPinResponse,
-        IReadAnnouncementRequest,
-        IRegenerateTokenRequest,
-        IRegistryGetRequest,
-        IRegistryGetResponse,
-        IRegistryGetAllRequest,
-        IRegistryGetAllResponse,
-        IRegistryGetDetailRequest,
-        IRegistryGetDetailResponse,
-        IRegistryKeysRequest,
-        IRegistryKeysResponse,
-        IRegistryKeysWithTypeRequest,
-        IRegistryKeysWithTypeResponse,
-        IRegistryRemoveRequest,
-        IRegistryScopesWithDomainResponse,
-        IRegistrySetRequest,
-        IRevokeTokenRequest,
-        ISigninHistoryRequest,
-        ISigninHistoryResponse,
-        IUnpinRequest,
-        IUnpinResponse,
-        IUpdateRequest,
-        IUpdateResponse,
-        IUpdateEmailRequest,
-        IUpdateEmailResponse,
-        IWebhooksCreateRequest,
-        IWebhooksCreateResponse,
-        IWebhooksDeleteRequest,
-        IWebhooksListResponse,
-        IWebhooksShowRequest,
-        IWebhooksShowResponse,
-        IWebhooksTestRequest,
-        IWebhooksUpdateRequest,
-        InviteCreateResponse,
-        InviteDeleteRequest,
-        InviteLimitResponse,
-        InviteListRequest,
-        InviteListResponse,
-        MetaRequest,
-        MetaResponse,
-        MiauthGenTokenRequest,
-        MiauthGenTokenResponse,
         MuteCreateRequest,
         MuteDeleteRequest,
         MuteListRequest,
         MuteListResponse,
-        MyAppsRequest,
-        MyAppsResponse,
-        NotesRequest,
-        NotesResponse,
-        NotesChildrenRequest,
-        NotesChildrenResponse,
-        NotesClipsRequest,
-        NotesClipsResponse,
-        NotesConversationRequest,
-        NotesConversationResponse,
-        NotesCreateRequest,
-        NotesCreateResponse,
-        NotesDeleteRequest,
-        NotesDraftsCountResponse,
-        NotesDraftsCreateRequest,
-        NotesDraftsCreateResponse,
-        NotesDraftsDeleteRequest,
-        NotesDraftsListRequest,
-        NotesDraftsListResponse,
-        NotesDraftsUpdateRequest,
-        NotesDraftsUpdateResponse,
-        NotesFavoritesCreateRequest,
-        NotesFavoritesDeleteRequest,
-        NotesFeaturedRequest,
-        NotesFeaturedResponse,
-        NotesGlobalTimelineRequest,
-        NotesGlobalTimelineResponse,
-        NotesHybridTimelineRequest,
-        NotesHybridTimelineResponse,
-        NotesLocalTimelineRequest,
-        NotesLocalTimelineResponse,
-        NotesMentionsRequest,
-        NotesMentionsResponse,
-        NotesPollsRecommendationRequest,
-        NotesPollsRecommendationResponse,
-        NotesPollsVoteRequest,
-        NotesReactionsRequest,
-        NotesReactionsResponse,
-        NotesReactionsCreateRequest,
-        NotesReactionsDeleteRequest,
-        NotesRenotesRequest,
-        NotesRenotesResponse,
-        NotesRepliesRequest,
-        NotesRepliesResponse,
-        NotesSearchRequest,
-        NotesSearchResponse,
-        NotesSearchByTagRequest,
-        NotesSearchByTagResponse,
-        NotesShowRequest,
-        NotesShowResponse,
-        NotesShowPartialBulkRequest,
-        NotesShowPartialBulkResponse,
-        NotesStateRequest,
-        NotesStateResponse,
-        NotesThreadMutingCreateRequest,
-        NotesThreadMutingDeleteRequest,
-        NotesTimelineRequest,
-        NotesTimelineResponse,
-        NotesTranslateRequest,
-        NotesTranslateResponse,
-        NotesUnrenoteRequest,
-        NotesUserListTimelineRequest,
-        NotesUserListTimelineResponse,
-        NotificationsCreateRequest,
-        PagePushRequest,
-        PagesCreateRequest,
-        PagesCreateResponse,
-        PagesDeleteRequest,
-        PagesFeaturedResponse,
-        PagesLikeRequest,
-        PagesShowRequest,
-        PagesShowResponse,
-        PagesUnlikeRequest,
-        PagesUpdateRequest,
-        PingResponse,
-        PinnedUsersResponse,
-        PromoReadRequest,
         RenoteMuteCreateRequest,
         RenoteMuteDeleteRequest,
         RenoteMuteListRequest,
         RenoteMuteListResponse,
-        RequestResetPasswordRequest,
-        ResetPasswordRequest,
-        RetentionResponse,
-        ReversiCancelMatchRequest,
-        ReversiGamesRequest,
-        ReversiGamesResponse,
-        ReversiInvitationsResponse,
-        ReversiMatchRequest,
-        ReversiMatchResponse,
-        ReversiShowGameRequest,
-        ReversiShowGameResponse,
-        ReversiSurrenderRequest,
-        ReversiVerifyRequest,
-        ReversiVerifyResponse,
-        RolesListResponse,
-        RolesNotesRequest,
-        RolesNotesResponse,
-        RolesShowRequest,
-        RolesShowResponse,
-        RolesUsersRequest,
-        RolesUsersResponse,
-        ServerInfoResponse,
-        StatsResponse,
-        SwRegisterRequest,
-        SwRegisterResponse,
-        SwShowRegistrationRequest,
-        SwShowRegistrationResponse,
-        SwUnregisterRequest,
-        SwUpdateRegistrationRequest,
-        SwUpdateRegistrationResponse,
-        TestRequest,
-        TestResponse,
-        UsernameAvailableRequest,
-        UsernameAvailableResponse,
-        UsersRequest,
-        UsersResponse,
-        UsersAchievementsRequest,
-        UsersAchievementsResponse,
-        UsersClipsRequest,
-        UsersClipsResponse,
-        UsersFeaturedNotesRequest,
-        UsersFeaturedNotesResponse,
-        UsersFlashsRequest,
-        UsersFlashsResponse,
         UsersFollowersRequest,
         UsersFollowersResponse,
         UsersFollowingRequest,
         UsersFollowingResponse,
-        UsersGalleryPostsRequest,
-        UsersGalleryPostsResponse,
         UsersGetFollowingUsersByBirthdayRequest,
         UsersGetFollowingUsersByBirthdayResponse,
-        UsersGetFrequentlyRepliedUsersRequest,
-        UsersGetFrequentlyRepliedUsersResponse,
         UsersListsCreateRequest,
         UsersListsCreateResponse,
         UsersListsCreateFromPublicRequest,
@@ -2185,29 +2320,56 @@ declare namespace entities {
         UsersListsUpdateRequest,
         UsersListsUpdateResponse,
         UsersListsUpdateMembershipRequest,
-        UsersNotesRequest,
-        UsersNotesResponse,
-        UsersPagesRequest,
-        UsersPagesResponse,
-        UsersReactionsRequest,
-        UsersReactionsResponse,
-        UsersRecommendationRequest,
-        UsersRecommendationResponse,
         UsersRelationRequest,
         UsersRelationResponse,
-        UsersReportAbuseRequest,
-        UsersSearchRequest,
-        UsersSearchResponse,
-        UsersSearchByUsernameAndHostRequest,
-        UsersSearchByUsernameAndHostResponse,
-        UsersShowRequest,
-        UsersShowResponse,
-        UsersUpdateMemoRequest,
-        V2AdminEmojiListRequest,
-        V2AdminEmojiListResponse,
-        VerifyEmailRequest,
-        Error_2 as Error,
-        JsonValue_2 as JsonValue,
+        ClipsAddNoteRequest,
+        ClipsCreateRequest,
+        ClipsCreateResponse,
+        ClipsDeleteRequest,
+        ClipsFavoriteRequest,
+        ClipsListRequest,
+        ClipsListResponse,
+        ClipsMyFavoritesRequest,
+        ClipsMyFavoritesResponse,
+        ClipsNotesRequest,
+        ClipsNotesResponse,
+        ClipsRemoveNoteRequest,
+        ClipsShowRequest,
+        ClipsShowResponse,
+        ClipsUnfavoriteRequest,
+        ClipsUpdateRequest,
+        ClipsUpdateResponse,
+        GalleryFeaturedRequest,
+        GalleryFeaturedResponse,
+        GalleryPopularRequest,
+        GalleryPopularResponse,
+        GalleryPostsRequest,
+        GalleryPostsResponse,
+        GalleryPostsCreateRequest,
+        GalleryPostsCreateResponse,
+        GalleryPostsDeleteRequest,
+        GalleryPostsLikeRequest,
+        GalleryPostsShowRequest,
+        GalleryPostsShowResponse,
+        GalleryPostsUnlikeRequest,
+        GalleryPostsUpdateRequest,
+        GalleryPostsUpdateResponse,
+        IFavoritesRequest,
+        IFavoritesResponse,
+        IGalleryLikesRequest,
+        IGalleryLikesResponse,
+        IGalleryPostsRequest,
+        IGalleryPostsResponse,
+        NotesClipsRequest,
+        NotesClipsResponse,
+        NotesFavoritesCreateRequest,
+        NotesFavoritesDeleteRequest,
+        UsersClipsRequest,
+        UsersClipsResponse,
+        UsersGalleryPostsRequest,
+        UsersGalleryPostsResponse,
+        DriveFilesCreateRequest,
+        DriveFilesCreateResponse,
         UserLite,
         UserDetailedNotMeOnly,
         MeDetailedOnly,
@@ -2276,61 +2438,1099 @@ declare namespace entities {
         ChatMessageLiteForRoom,
         ChatRoom,
         ChatRoomInvitation,
-        ChatRoomMembership
+        ChatRoomMembership,
+        JsonValue,
+        OrpcDefinition1,
+        OrpcDefinition2,
+        OrpcDefinition3,
+        OrpcDefinition4,
+        OrpcDefinition5,
+        OrpcDefinition6,
+        OrpcDefinition7,
+        OrpcDefinition8,
+        OrpcDefinition9,
+        OrpcDefinition10,
+        OrpcDefinition11,
+        OrpcDefinition12,
+        OrpcDefinition13,
+        OrpcDefinition14,
+        OrpcDefinition15,
+        OrpcDefinition16,
+        OrpcDefinition17,
+        OrpcDefinition18,
+        OrpcDefinition19,
+        OrpcDefinition20,
+        OrpcDefinition21,
+        OrpcDefinition22,
+        OrpcDefinition23,
+        OrpcDefinition24,
+        OrpcDefinition25,
+        OrpcDefinition26,
+        OrpcDefinition27,
+        OrpcDefinition28,
+        OrpcDefinition29,
+        OrpcDefinition30,
+        OrpcDefinition31,
+        OrpcDefinition32,
+        OrpcDefinition33,
+        OrpcDefinition34,
+        OrpcDefinition35,
+        OrpcDefinition36,
+        OrpcDefinition37,
+        OrpcDefinition38,
+        OrpcDefinition39,
+        OrpcDefinition40,
+        OrpcDefinition41,
+        OrpcDefinition42,
+        OrpcDefinition43,
+        OrpcDefinition44,
+        OrpcDefinition45,
+        OrpcDefinition46,
+        OrpcDefinition47,
+        OrpcDefinition48,
+        OrpcDefinition49,
+        OrpcDefinition50,
+        OrpcDefinition51,
+        OrpcDefinition52,
+        OrpcDefinition53,
+        OrpcDefinition54,
+        OrpcDefinition55,
+        OrpcDefinition56,
+        OrpcDefinition57,
+        OrpcDefinition58,
+        OrpcDefinition59,
+        OrpcDefinition60,
+        OrpcDefinition61,
+        OrpcDefinition62,
+        OrpcDefinition63,
+        OrpcDefinition64,
+        OrpcDefinition65,
+        OrpcDefinition66,
+        OrpcDefinition67,
+        OrpcDefinition68,
+        OrpcDefinition69,
+        OrpcDefinition70,
+        OrpcDefinition71,
+        OrpcDefinition72,
+        OrpcDefinition73,
+        OrpcDefinition74,
+        OrpcDefinition75,
+        OrpcDefinition76,
+        OrpcDefinition77,
+        OrpcDefinition78,
+        OrpcDefinition79,
+        OrpcDefinition80,
+        OrpcDefinition81,
+        OrpcDefinition82,
+        OrpcDefinition83,
+        OrpcDefinition84,
+        OrpcDefinition85,
+        OrpcDefinition86,
+        OrpcDefinition87,
+        OrpcDefinition88,
+        OrpcDefinition89,
+        OrpcDefinition90,
+        OrpcDefinition91,
+        OrpcDefinition92,
+        OrpcDefinition93,
+        OrpcDefinition94,
+        OrpcDefinition95,
+        OrpcDefinition96,
+        OrpcDefinition97,
+        OrpcDefinition98,
+        OrpcDefinition99,
+        OrpcDefinition100,
+        OrpcDefinition101,
+        OrpcDefinition102,
+        OrpcDefinition103,
+        OrpcDefinition104,
+        OrpcDefinition105,
+        OrpcDefinition106,
+        OrpcDefinition107,
+        OrpcDefinition108,
+        OrpcDefinition109,
+        OrpcDefinition110,
+        OrpcDefinition111,
+        OrpcDefinition112,
+        OrpcDefinition113,
+        OrpcDefinition114,
+        OrpcDefinition115,
+        OrpcDefinition116,
+        OrpcDefinition117,
+        OrpcDefinition118,
+        OrpcDefinition119,
+        OrpcDefinition120,
+        OrpcDefinition121,
+        OrpcDefinition122,
+        OrpcDefinition123,
+        OrpcDefinition124,
+        OrpcDefinition125,
+        OrpcDefinition126,
+        OrpcDefinition127,
+        OrpcDefinition128,
+        OrpcDefinition129,
+        OrpcDefinition130,
+        OrpcDefinition131,
+        OrpcDefinition132,
+        OrpcDefinition133,
+        OrpcDefinition134,
+        OrpcDefinition135,
+        OrpcDefinition136,
+        OrpcDefinition137,
+        OrpcDefinition138,
+        OrpcDefinition139,
+        OrpcDefinition140,
+        OrpcDefinition141,
+        OrpcDefinition142,
+        OrpcDefinition143,
+        OrpcDefinition144,
+        OrpcDefinition145,
+        OrpcDefinition146,
+        OrpcDefinition147,
+        OrpcDefinition148,
+        OrpcDefinition149,
+        OrpcDefinition150,
+        OrpcDefinition151,
+        OrpcDefinition152,
+        OrpcDefinition153,
+        OrpcDefinition154,
+        OrpcDefinition155,
+        OrpcDefinition156,
+        OrpcDefinition157,
+        OrpcDefinition158,
+        OrpcDefinition159,
+        OrpcDefinition160,
+        OrpcDefinition161,
+        OrpcDefinition162,
+        OrpcDefinition163,
+        OrpcDefinition164,
+        OrpcDefinition165,
+        OrpcDefinition166,
+        OrpcDefinition167,
+        OrpcDefinition168,
+        OrpcDefinition169,
+        OrpcDefinition170,
+        OrpcDefinition171,
+        OrpcDefinition172,
+        OrpcDefinition173,
+        OrpcDefinition174,
+        OrpcDefinition175,
+        OrpcDefinition176,
+        OrpcDefinition177,
+        OrpcDefinition178,
+        OrpcDefinition179,
+        OrpcDefinition180,
+        OrpcDefinition181,
+        OrpcDefinition182,
+        OrpcDefinition183,
+        OrpcDefinition184,
+        OrpcDefinition185,
+        OrpcDefinition186,
+        OrpcDefinition187,
+        OrpcDefinition188,
+        OrpcDefinition189,
+        OrpcDefinition190,
+        OrpcDefinition191,
+        OrpcDefinition192,
+        OrpcDefinition193,
+        OrpcDefinition194,
+        OrpcDefinition195,
+        OrpcDefinition196,
+        OrpcDefinition197,
+        OrpcDefinition198,
+        OrpcDefinition199,
+        OrpcDefinition200,
+        OrpcDefinition201,
+        OrpcDefinition202,
+        OrpcDefinition203,
+        OrpcDefinition204,
+        OrpcDefinition205,
+        OrpcDefinition206,
+        OrpcDefinition207,
+        OrpcDefinition208,
+        OrpcDefinition209,
+        OrpcDefinition210,
+        OrpcDefinition211,
+        OrpcDefinition212,
+        OrpcDefinition213,
+        OrpcDefinition214,
+        OrpcDefinition215,
+        OrpcDefinition216,
+        OrpcDefinition217,
+        OrpcDefinition218,
+        OrpcDefinition219,
+        OrpcDefinition220,
+        OrpcDefinition221,
+        OrpcDefinition222,
+        OrpcDefinition223,
+        OrpcDefinition224,
+        OrpcDefinition225,
+        OrpcDefinition226,
+        OrpcDefinition227,
+        OrpcDefinition228,
+        OrpcDefinition229,
+        OrpcDefinition230,
+        OrpcDefinition231,
+        OrpcDefinition232,
+        OrpcDefinition233,
+        OrpcDefinition234,
+        OrpcDefinition235,
+        OrpcDefinition236,
+        OrpcDefinition237,
+        OrpcDefinition238,
+        OrpcDefinition239,
+        OrpcDefinition240,
+        OrpcDefinition241,
+        OrpcDefinition242,
+        OrpcDefinition243,
+        OrpcDefinition244,
+        OrpcDefinition245,
+        OrpcDefinition246,
+        OrpcDefinition247,
+        OrpcDefinition248,
+        OrpcDefinition249,
+        OrpcDefinition250,
+        OrpcDefinition251,
+        OrpcDefinition252,
+        OrpcDefinition253,
+        OrpcDefinition254,
+        OrpcDefinition255,
+        OrpcDefinition256,
+        OrpcDefinition257,
+        OrpcDefinition258,
+        OrpcDefinition259,
+        OrpcDefinition260,
+        OrpcDefinition261,
+        OrpcDefinition262,
+        OrpcDefinition263,
+        OrpcDefinition264,
+        OrpcDefinition265,
+        OrpcDefinition266,
+        OrpcDefinition267,
+        OrpcDefinition268,
+        OrpcDefinition269,
+        OrpcDefinition270,
+        OrpcDefinition271,
+        OrpcDefinition272,
+        OrpcDefinition273,
+        OrpcDefinition274,
+        OrpcDefinition275,
+        OrpcDefinition276,
+        OrpcDefinition277,
+        OrpcDefinition278,
+        OrpcDefinition279,
+        OrpcDefinition280,
+        OrpcDefinition281,
+        OrpcDefinition282,
+        OrpcDefinition283,
+        OrpcDefinition284,
+        OrpcDefinition285,
+        OrpcDefinition286,
+        OrpcDefinition287,
+        OrpcDefinition288,
+        OrpcDefinition289,
+        OrpcDefinition290,
+        OrpcDefinition291,
+        OrpcDefinition292,
+        OrpcDefinition293,
+        OrpcDefinition294,
+        OrpcDefinition295,
+        OrpcDefinition296,
+        OrpcDefinition297,
+        OrpcDefinition298,
+        OrpcDefinition299,
+        OrpcDefinition300,
+        OrpcDefinition301,
+        OrpcDefinition302,
+        OrpcDefinition303,
+        OrpcDefinition304,
+        OrpcDefinition305,
+        OrpcDefinition306,
+        OrpcDefinition307,
+        OrpcDefinition308,
+        OrpcDefinition309,
+        OrpcDefinition310,
+        OrpcDefinition311,
+        OrpcDefinition312,
+        OrpcDefinition313,
+        OrpcDefinition314,
+        OrpcDefinition315,
+        OrpcDefinition316,
+        OrpcDefinition317,
+        OrpcDefinition318,
+        OrpcDefinition319,
+        OrpcDefinition320,
+        OrpcDefinition321,
+        OrpcDefinition322,
+        OrpcDefinition323,
+        OrpcDefinition324,
+        OrpcDefinition325,
+        OrpcDefinition326,
+        OrpcDefinition327,
+        OrpcDefinition328,
+        OrpcDefinition329,
+        OrpcDefinition330,
+        OrpcDefinition331,
+        OrpcDefinition332,
+        OrpcDefinition333,
+        OrpcDefinition334,
+        OrpcDefinition335,
+        OrpcDefinition336,
+        OrpcDefinition337,
+        OrpcDefinition338,
+        OrpcDefinition339,
+        OrpcDefinition340,
+        OrpcDefinition341,
+        OrpcDefinition342,
+        OrpcDefinition343,
+        OrpcDefinition344,
+        OrpcDefinition345,
+        OrpcDefinition346,
+        OrpcDefinition347,
+        OrpcDefinition348,
+        OrpcDefinition349,
+        OrpcDefinition350,
+        OrpcDefinition351,
+        OrpcDefinition352,
+        OrpcDefinition353,
+        OrpcDefinition354,
+        OrpcDefinition355,
+        OrpcDefinition356,
+        OrpcDefinition357,
+        OrpcDefinition358,
+        OrpcDefinition359,
+        OrpcDefinition360,
+        OrpcDefinition361,
+        OrpcDefinition362,
+        OrpcDefinition363,
+        OrpcDefinition364,
+        OrpcDefinition365,
+        OrpcDefinition366,
+        OrpcDefinition367,
+        OrpcDefinition368,
+        OrpcDefinition369,
+        OrpcDefinition370,
+        OrpcDefinition371,
+        OrpcDefinition372,
+        OrpcDefinition373,
+        OrpcDefinition374,
+        OrpcDefinition375,
+        OrpcDefinition376,
+        OrpcDefinition377,
+        OrpcDefinition378,
+        OrpcDefinition379,
+        OrpcDefinition380,
+        OrpcDefinition381,
+        OrpcDefinition382,
+        OrpcDefinition383,
+        OrpcDefinition384,
+        OrpcDefinition385,
+        OrpcDefinition386,
+        OrpcDefinition387,
+        OrpcDefinition388,
+        OrpcDefinition389,
+        OrpcDefinition390,
+        OrpcDefinition391,
+        OrpcDefinition392,
+        OrpcDefinition393,
+        OrpcDefinition394,
+        OrpcDefinition395,
+        OrpcDefinition396,
+        OrpcDefinition397,
+        OrpcDefinition398,
+        OrpcDefinition399,
+        OrpcDefinition400,
+        OrpcDefinition401,
+        OrpcDefinition402,
+        OrpcDefinition403,
+        OrpcDefinition404,
+        OrpcDefinition405,
+        OrpcDefinition406,
+        OrpcDefinition407,
+        OrpcDefinition408,
+        OrpcDefinition409,
+        OrpcDefinition410,
+        OrpcDefinition411,
+        OrpcDefinition412,
+        OrpcDefinition413,
+        OrpcDefinition414,
+        OrpcDefinition415,
+        OrpcDefinition416,
+        OrpcDefinition417,
+        OrpcDefinition418,
+        OrpcDefinition419,
+        OrpcDefinition420,
+        OrpcDefinition421,
+        OrpcDefinition422,
+        OrpcDefinition423,
+        OrpcDefinition424,
+        OrpcDefinition425,
+        OrpcDefinition426,
+        OrpcDefinition427,
+        OrpcDefinition428,
+        OrpcDefinition429,
+        OrpcDefinition430,
+        OrpcDefinition431,
+        OrpcDefinition432,
+        OrpcDefinition433,
+        OrpcDefinition434,
+        OrpcDefinition435,
+        OrpcDefinition436,
+        OrpcDefinition437,
+        OrpcDefinition438,
+        OrpcDefinition439,
+        OrpcDefinition440,
+        OrpcDefinition441,
+        OrpcDefinition442,
+        OrpcDefinition443,
+        OrpcDefinition444,
+        OrpcDefinition445,
+        OrpcDefinition446,
+        OrpcDefinition447,
+        OrpcDefinition448,
+        OrpcDefinition449,
+        OrpcDefinition450,
+        OrpcDefinition451,
+        OrpcDefinition452,
+        OrpcDefinition453,
+        OrpcDefinition454,
+        OrpcDefinition455,
+        OrpcDefinition456,
+        OrpcDefinition457,
+        OrpcDefinition458,
+        OrpcDefinition459,
+        OrpcDefinition460,
+        OrpcDefinition461,
+        OrpcDefinition462,
+        OrpcDefinition463,
+        OrpcDefinition464,
+        OrpcDefinition465,
+        OrpcDefinition466,
+        OrpcDefinition467,
+        OrpcDefinition468,
+        OrpcDefinition469,
+        OrpcDefinition470,
+        OrpcDefinition471,
+        OrpcDefinition472,
+        OrpcDefinition473,
+        OrpcDefinition474,
+        OrpcDefinition475,
+        OrpcDefinition476,
+        OrpcDefinition477,
+        OrpcDefinition478,
+        OrpcDefinition479,
+        OrpcDefinition480,
+        OrpcDefinition481,
+        OrpcDefinition482,
+        OrpcDefinition483,
+        OrpcDefinition484,
+        OrpcDefinition485,
+        OrpcDefinition486,
+        OrpcDefinition487,
+        OrpcDefinition488,
+        OrpcDefinition489,
+        OrpcDefinition490,
+        OrpcDefinition491,
+        OrpcDefinition492,
+        OrpcDefinition493,
+        OrpcDefinition494,
+        OrpcDefinition495,
+        OrpcDefinition496,
+        OrpcDefinition497,
+        OrpcDefinition498,
+        OrpcDefinition499,
+        OrpcDefinition500,
+        OrpcDefinition501,
+        OrpcDefinition502,
+        OrpcDefinition503,
+        OrpcDefinition504,
+        OrpcDefinition505,
+        OrpcDefinition506,
+        OrpcDefinition507,
+        OrpcDefinition508,
+        OrpcDefinition509,
+        OrpcDefinition510,
+        OrpcDefinition511,
+        OrpcDefinition512,
+        OrpcDefinition513,
+        OrpcDefinition514,
+        OrpcDefinition515,
+        OrpcDefinition516,
+        OrpcDefinition517,
+        OrpcDefinition518,
+        OrpcDefinition519,
+        OrpcDefinition520,
+        OrpcDefinition521,
+        OrpcDefinition522,
+        OrpcDefinition523,
+        OrpcDefinition524,
+        OrpcDefinition525,
+        OrpcDefinition526,
+        OrpcDefinition527,
+        OrpcDefinition528,
+        OrpcDefinition529,
+        OrpcDefinition530,
+        OrpcDefinition531,
+        OrpcDefinition532,
+        OrpcDefinition533,
+        OrpcDefinition534,
+        OrpcDefinition535,
+        OrpcDefinition536,
+        OrpcDefinition537,
+        OrpcDefinition538,
+        OrpcDefinition539,
+        OrpcDefinition540,
+        OrpcDefinition541,
+        OrpcDefinition542,
+        OrpcDefinition543,
+        OrpcDefinition544,
+        OrpcDefinition545,
+        OrpcDefinition546,
+        OrpcDefinition547,
+        OrpcDefinition548,
+        OrpcDefinition549,
+        OrpcDefinition550,
+        OrpcDefinition551,
+        OrpcDefinition552,
+        OrpcDefinition553,
+        OrpcDefinition554,
+        OrpcDefinition555,
+        OrpcDefinition556,
+        OrpcDefinition557,
+        OrpcDefinition558,
+        OrpcDefinition559,
+        OrpcDefinition560,
+        OrpcDefinition561,
+        OrpcDefinition562,
+        OrpcDefinition563,
+        OrpcDefinition564,
+        OrpcDefinition565,
+        OrpcDefinition566,
+        OrpcDefinition567,
+        OrpcDefinition568,
+        OrpcDefinition569,
+        OrpcDefinition570,
+        OrpcDefinition571,
+        OrpcDefinition572,
+        OrpcDefinition573,
+        OrpcDefinition574,
+        OrpcDefinition575,
+        OrpcDefinition576,
+        OrpcDefinition577,
+        OrpcDefinition578,
+        OrpcDefinition579,
+        OrpcDefinition580,
+        OrpcDefinition581,
+        OrpcDefinition582,
+        OrpcDefinition583,
+        OrpcDefinition584,
+        OrpcDefinition585,
+        OrpcDefinition586,
+        OrpcDefinition587,
+        OrpcDefinition588,
+        OrpcDefinition589,
+        OrpcDefinition590,
+        OrpcDefinition591,
+        OrpcDefinition592,
+        OrpcDefinition593,
+        OrpcDefinition594,
+        OrpcDefinition595,
+        OrpcDefinition596,
+        OrpcDefinition597,
+        OrpcDefinition598,
+        OrpcDefinition599,
+        OrpcDefinition600,
+        OrpcDefinition601,
+        OrpcDefinition602,
+        OrpcDefinition603,
+        OrpcDefinition604,
+        OrpcDefinition605,
+        OrpcDefinition606,
+        OrpcDefinition607,
+        OrpcDefinition608,
+        OrpcDefinition609,
+        OrpcDefinition610,
+        OrpcDefinition611,
+        OrpcDefinition612,
+        OrpcDefinition613,
+        OrpcDefinition614,
+        OrpcDefinition615,
+        OrpcDefinition616,
+        OrpcDefinition617,
+        OrpcDefinition618,
+        OrpcDefinition619,
+        OrpcDefinition620,
+        OrpcDefinition621,
+        OrpcDefinition622,
+        OrpcDefinition623,
+        OrpcDefinition624,
+        OrpcDefinition625,
+        OrpcDefinition626,
+        OrpcDefinition627,
+        OrpcDefinition628,
+        OrpcDefinition629,
+        OrpcDefinition630,
+        OrpcDefinition631,
+        OrpcDefinition632,
+        OrpcDefinition633,
+        OrpcDefinition634,
+        OrpcDefinition635,
+        OrpcDefinition636,
+        OrpcDefinition637,
+        OrpcDefinition638,
+        OrpcDefinition639,
+        OrpcDefinition640,
+        OrpcDefinition641,
+        OrpcDefinition642,
+        OrpcDefinition643,
+        OrpcDefinition644,
+        OrpcDefinition645,
+        OrpcDefinition646,
+        OrpcDefinition647,
+        OrpcDefinition648,
+        OrpcDefinition649,
+        OrpcDefinition650,
+        OrpcDefinition651,
+        OrpcDefinition652,
+        OrpcDefinition653,
+        OrpcDefinition654,
+        OrpcDefinition655,
+        OrpcDefinition656,
+        OrpcDefinition657,
+        OrpcDefinition658,
+        OrpcDefinition659,
+        OrpcDefinition660,
+        OrpcDefinition661,
+        OrpcDefinition662,
+        OrpcDefinition663,
+        OrpcDefinition664,
+        OrpcDefinition665,
+        OrpcDefinition666,
+        OrpcDefinition667,
+        OrpcDefinition668,
+        OrpcDefinition669,
+        OrpcDefinition670,
+        OrpcDefinition671,
+        OrpcDefinition672,
+        OrpcDefinition673,
+        OrpcDefinition674,
+        OrpcDefinition675,
+        OrpcDefinition676,
+        OrpcDefinition677,
+        OrpcDefinition678,
+        OrpcDefinition679,
+        OrpcDefinition680,
+        OrpcDefinition681,
+        OrpcDefinition682,
+        OrpcDefinition683,
+        OrpcDefinition684,
+        OrpcDefinition685,
+        OrpcDefinition686,
+        OrpcDefinition687,
+        OrpcDefinition688,
+        OrpcDefinition689,
+        OrpcDefinition690,
+        OrpcDefinition691,
+        OrpcDefinition692,
+        OrpcDefinition693,
+        OrpcDefinition694,
+        OrpcDefinition695,
+        OrpcDefinition696,
+        OrpcDefinition697,
+        OrpcDefinition698,
+        OrpcDefinition699,
+        OrpcDefinition700,
+        OrpcDefinition701,
+        OrpcDefinition702,
+        OrpcDefinition703,
+        OrpcDefinition704,
+        OrpcDefinition705,
+        OrpcDefinition706,
+        OrpcDefinition707,
+        OrpcDefinition708,
+        OrpcDefinition709,
+        OrpcDefinition710,
+        OrpcDefinition711,
+        OrpcDefinition712,
+        OrpcDefinition713,
+        OrpcDefinition714,
+        OrpcDefinition715,
+        OrpcDefinition716,
+        OrpcDefinition717,
+        OrpcDefinition718,
+        OrpcDefinition719,
+        OrpcDefinition720,
+        OrpcDefinition721,
+        OrpcDefinition722,
+        OrpcDefinition723,
+        OrpcDefinition724,
+        OrpcDefinition725,
+        OrpcDefinition726,
+        OrpcDefinition727,
+        OrpcDefinition728,
+        OrpcDefinition729,
+        OrpcDefinition730,
+        OrpcDefinition731,
+        OrpcDefinition732,
+        OrpcDefinition733,
+        OrpcDefinition734,
+        OrpcDefinition735,
+        OrpcDefinition736,
+        OrpcDefinition737,
+        OrpcDefinition738,
+        OrpcDefinition739,
+        OrpcDefinition740,
+        OrpcDefinition741,
+        OrpcDefinition742,
+        OrpcDefinition743,
+        OrpcDefinition744,
+        OrpcDefinition745,
+        OrpcDefinition746,
+        OrpcDefinition747,
+        OrpcDefinition748,
+        OrpcDefinition749,
+        OrpcDefinition750,
+        OrpcDefinition751,
+        OrpcDefinition752,
+        OrpcDefinition753,
+        OrpcDefinition754,
+        OrpcDefinition755,
+        OrpcDefinition756,
+        OrpcDefinition757,
+        OrpcDefinition758,
+        OrpcDefinition759,
+        OrpcDefinition760,
+        OrpcDefinition761,
+        OrpcDefinition762,
+        OrpcDefinition763,
+        OrpcDefinition764,
+        OrpcDefinition765,
+        OrpcDefinition766,
+        OrpcDefinition767,
+        OrpcDefinition768,
+        OrpcDefinition769,
+        OrpcDefinition770,
+        OrpcDefinition771,
+        OrpcDefinition772,
+        OrpcDefinition773,
+        OrpcDefinition774,
+        OrpcDefinition775,
+        OrpcDefinition776,
+        OrpcDefinition777,
+        OrpcDefinition778,
+        OrpcDefinition779,
+        OrpcDefinition780,
+        OrpcDefinition781,
+        OrpcDefinition782,
+        OrpcDefinition783,
+        OrpcDefinition784,
+        OrpcDefinition785,
+        OrpcDefinition786,
+        OrpcDefinition787,
+        OrpcDefinition788,
+        OrpcDefinition789,
+        OrpcDefinition790,
+        OrpcDefinition791,
+        OrpcDefinition792,
+        OrpcDefinition793,
+        OrpcDefinition794,
+        OrpcDefinition795,
+        OrpcDefinition796,
+        OrpcDefinition797,
+        OrpcDefinition798,
+        OrpcDefinition799,
+        OrpcDefinition800,
+        OrpcDefinition801,
+        OrpcDefinition802,
+        OrpcDefinition803,
+        OrpcDefinition804,
+        OrpcDefinition805,
+        OrpcDefinition806,
+        OrpcDefinition807,
+        OrpcDefinition808,
+        OrpcDefinition809,
+        OrpcDefinition810,
+        OrpcDefinition811,
+        OrpcDefinition812,
+        OrpcDefinition813,
+        OrpcDefinition814,
+        OrpcDefinition815,
+        OrpcDefinition816,
+        OrpcDefinition817,
+        OrpcDefinition818,
+        OrpcDefinition819,
+        OrpcDefinition820,
+        OrpcDefinition821,
+        OrpcDefinition822,
+        OrpcDefinition823,
+        OrpcDefinition824,
+        OrpcDefinition825,
+        OrpcDefinition826,
+        OrpcDefinition827,
+        OrpcDefinition828,
+        OrpcDefinition829,
+        OrpcDefinition830,
+        OrpcDefinition831,
+        OrpcDefinition832,
+        OrpcDefinition833,
+        OrpcDefinition834,
+        OrpcDefinition835,
+        OrpcDefinition836,
+        OrpcDefinition837,
+        OrpcDefinition838,
+        OrpcDefinition839,
+        OrpcDefinition840,
+        OrpcDefinition841,
+        OrpcDefinition842,
+        OrpcDefinition843,
+        OrpcDefinition844,
+        OrpcDefinition845,
+        OrpcDefinition846,
+        OrpcDefinition847,
+        OrpcDefinition848,
+        OrpcDefinition849,
+        OrpcDefinition850,
+        OrpcDefinition851,
+        OrpcDefinition852,
+        OrpcDefinition853,
+        OrpcDefinition854,
+        OrpcDefinition855,
+        OrpcDefinition856,
+        OrpcDefinition857,
+        OrpcDefinition858,
+        OrpcDefinition859,
+        OrpcDefinition860,
+        OrpcDefinition861,
+        OrpcDefinition862,
+        OrpcDefinition863,
+        OrpcDefinition864,
+        OrpcDefinition865,
+        OrpcDefinition866,
+        OrpcDefinition867,
+        OrpcDefinition868,
+        OrpcDefinition869,
+        OrpcDefinition870,
+        OrpcDefinition871,
+        OrpcDefinition872,
+        OrpcDefinition873,
+        OrpcDefinition874,
+        OrpcDefinition875,
+        OrpcDefinition876,
+        OrpcDefinition877,
+        OrpcDefinition878,
+        OrpcDefinition879,
+        OrpcDefinition880,
+        OrpcDefinition881,
+        OrpcDefinition882,
+        OrpcDefinition883,
+        OrpcDefinition884,
+        OrpcDefinition885,
+        OrpcDefinition886,
+        OrpcDefinition887,
+        OrpcDefinition888,
+        OrpcDefinition889,
+        OrpcDefinition890,
+        OrpcDefinition891,
+        OrpcDefinition892,
+        OrpcDefinition893,
+        OrpcDefinition894,
+        OrpcDefinition895,
+        OrpcDefinition896,
+        OrpcDefinition897,
+        OrpcDefinition898,
+        OrpcDefinition899,
+        OrpcDefinition900,
+        OrpcDefinition901,
+        OrpcDefinition902,
+        OrpcDefinition903,
+        OrpcDefinition904,
+        OrpcDefinition905,
+        OrpcDefinition906,
+        OrpcDefinition907,
+        OrpcDefinition908,
+        OrpcDefinition909,
+        OrpcDefinition910,
+        OrpcDefinition911,
+        OrpcDefinition912,
+        OrpcDefinition913,
+        OrpcDefinition914,
+        OrpcDefinition915,
+        OrpcDefinition916,
+        OrpcDefinition917,
+        OrpcDefinition918,
+        OrpcDefinition919,
+        OrpcDefinition920,
+        OrpcDefinition921,
+        OrpcDefinition922,
+        OrpcDefinition923,
+        OrpcDefinition924,
+        OrpcDefinition925,
+        OrpcDefinition926,
+        OrpcDefinition927,
+        OrpcDefinition928,
+        OrpcDefinition929,
+        OrpcDefinition930,
+        OrpcDefinition931,
+        OrpcDefinition932,
+        OrpcDefinition933,
+        OrpcDefinition934,
+        OrpcDefinition935,
+        OrpcDefinition936,
+        OrpcDefinition937,
+        OrpcDefinition938,
+        OrpcDefinition939,
+        OrpcDefinition940,
+        OrpcDefinition941,
+        OrpcDefinition942,
+        OrpcDefinition943,
+        OrpcDefinition944,
+        OrpcDefinition945,
+        OrpcDefinition946,
+        OrpcDefinition947,
+        OrpcDefinition948,
+        OrpcDefinition949,
+        OrpcDefinition950,
+        OrpcDefinition951,
+        OrpcDefinition952,
+        OrpcDefinition953,
+        OrpcDefinition954,
+        OrpcDefinition955,
+        OrpcDefinition956,
+        OrpcDefinition957,
+        OrpcDefinition958,
+        OrpcDefinition959,
+        OrpcDefinition960,
+        OrpcDefinition961,
+        OrpcDefinition962,
+        OrpcDefinition963,
+        OrpcDefinition964,
+        OrpcDefinition965,
+        OrpcDefinition966,
+        OrpcDefinition967,
+        OrpcDefinition968,
+        OrpcDefinition969,
+        OrpcDefinition970,
+        OrpcDefinition971,
+        OrpcDefinition972,
+        OrpcDefinition973,
+        OrpcDefinition974,
+        OrpcDefinition975,
+        OrpcDefinition976,
+        OrpcDefinition977,
+        OrpcDefinition978,
+        OrpcDefinition979,
+        OrpcDefinition980,
+        OrpcDefinition981,
+        OrpcDefinition982,
+        OrpcDefinition983,
+        OrpcDefinition984,
+        OrpcDefinition985,
+        OrpcDefinition986,
+        OrpcDefinition987,
+        OrpcDefinition988,
+        OrpcDefinition989,
+        OrpcDefinition990,
+        OrpcDefinition991,
+        OrpcDefinition992,
+        OrpcDefinition993,
+        OrpcDefinition994,
+        OrpcDefinition995,
+        OrpcDefinition996,
+        OrpcDefinition997,
+        OrpcDefinition998,
+        OrpcDefinition999,
+        OrpcDefinition1000,
+        OrpcDefinition1001,
+        OrpcDefinition1002,
+        OrpcDefinition1003,
+        OrpcDefinition1004,
+        OrpcDefinition1005,
+        OrpcDefinition1006,
+        OrpcDefinition1007,
+        OrpcDefinition1008,
+        OrpcDefinition1009,
+        OrpcDefinition1010,
+        OrpcDefinition1011,
+        OrpcDefinition1012,
+        OrpcDefinition1013,
+        OrpcDefinition1014,
+        OrpcDefinition1015,
+        OrpcDefinition1016,
+        OrpcDefinition1017,
+        OrpcDefinition1018,
+        OrpcDefinition1019,
+        OrpcDefinition1020,
+        OrpcDefinition1021,
+        OrpcDefinition1022,
+        OrpcDefinition1023,
+        OrpcDefinition1024,
+        OrpcDefinition1025,
+        OrpcDefinition1026,
+        OrpcDefinition1027,
+        OrpcDefinition1028,
+        OrpcDefinition1029,
+        OrpcDefinition1030,
+        OrpcDefinition1031,
+        OrpcDefinition1032,
+        OrpcDefinition1033,
+        OrpcDefinition1034,
+        OrpcDefinition1035,
+        OrpcDefinition1036,
+        OrpcDefinition1037
     }
 }
 export { entities }
 
 // @public (undocumented)
-type Error_2 = ContractModel<'Error'>;
+type ExportCustomEmojisRequest = ContractRequest<'export-custom-emojis'>;
 
 // @public (undocumented)
-type FederationFollowersRequest = ContractRequest<'federation/followers', operations['federation___followers']['requestBody']['content']['application/json']>;
+type FederationFollowersRequest = ContractRequest<'federation/followers'>;
 
 // @public (undocumented)
-type FederationFollowersResponse = ContractResponse<'federation/followers', operations['federation___followers']['responses']['200']['content']['application/json']>;
+type FederationFollowersResponse = ContractResponse<'federation/followers'>;
 
 // @public (undocumented)
-type FederationFollowingRequest = ContractRequest<'federation/following', operations['federation___following']['requestBody']['content']['application/json']>;
+type FederationFollowingRequest = ContractRequest<'federation/following'>;
 
 // @public (undocumented)
-type FederationFollowingResponse = ContractResponse<'federation/following', operations['federation___following']['responses']['200']['content']['application/json']>;
+type FederationFollowingResponse = ContractResponse<'federation/following'>;
 
 // @public (undocumented)
 type FederationInstance = ContractModel<'FederationInstance'>;
 
 // @public (undocumented)
-type FederationInstancesRequest = ContractRequest<'federation/instances', operations['federation___instances']['requestBody']['content']['application/json']>;
+type FederationInstancesRequest = ContractRequest<'federation/instances'>;
 
 // @public (undocumented)
-type FederationInstancesResponse = ContractResponse<'federation/instances', operations['federation___instances']['responses']['200']['content']['application/json']>;
+type FederationInstancesResponse = ContractResponse<'federation/instances'>;
 
 // @public (undocumented)
-type FederationShowInstanceRequest = ContractRequest<'federation/show-instance', operations['federation___show-instance']['requestBody']['content']['application/json']>;
+type FederationShowInstanceRequest = ContractRequest<'federation/show-instance'>;
 
 // @public (undocumented)
-type FederationShowInstanceResponse = ContractResponse<'federation/show-instance', operations['federation___show-instance']['responses']['200']['content']['application/json']>;
+type FederationShowInstanceResponse = ContractResponse<'federation/show-instance'>;
 
 // @public (undocumented)
-type FederationStatsRequest = ContractRequest<'federation/stats', operations['federation___stats']['requestBody']['content']['application/json']>;
+type FederationStatsRequest = ContractRequest<'federation/stats'>;
 
 // @public (undocumented)
-type FederationStatsResponse = ContractResponse<'federation/stats', operations['federation___stats']['responses']['200']['content']['application/json']>;
+type FederationStatsResponse = ContractResponse<'federation/stats'>;
 
 // @public (undocumented)
-type FederationUpdateRemoteUserRequest = ContractRequest<'federation/update-remote-user', operations['federation___update-remote-user']['requestBody']['content']['application/json']>;
+type FederationUpdateRemoteUserRequest = ContractRequest<'federation/update-remote-user'>;
 
 // @public (undocumented)
-type FederationUsersRequest = ContractRequest<'federation/users', operations['federation___users']['requestBody']['content']['application/json']>;
+type FederationUsersRequest = ContractRequest<'federation/users'>;
 
 // @public (undocumented)
-type FederationUsersResponse = ContractResponse<'federation/users', operations['federation___users']['responses']['200']['content']['application/json']>;
+type FederationUsersResponse = ContractResponse<'federation/users'>;
 
 // @public (undocumented)
-type FetchExternalResourcesRequest = ContractRequest<'fetch-external-resources', operations['fetch-external-resources']['requestBody']['content']['application/json']>;
+type FetchExternalResourcesRequest = ContractRequest<'fetch-external-resources'>;
 
 // @public (undocumented)
-type FetchExternalResourcesResponse = ContractResponse<'fetch-external-resources', operations['fetch-external-resources']['responses']['200']['content']['application/json']>;
+type FetchExternalResourcesResponse = ContractResponse<'fetch-external-resources'>;
 
 // @public (undocumented)
 type FetchLike = (input: string, init?: {
@@ -2338,70 +3538,71 @@ type FetchLike = (input: string, init?: {
     body?: Blob | FormData | string;
     credentials?: RequestCredentials;
     cache?: RequestCache;
+    signal?: AbortSignal;
     headers: {
         [key in string]: string;
     };
 }) => Promise<{
     status: number;
-    json(): Promise<any>;
+    json(): Promise<unknown>;
 }>;
 
 // @public (undocumented)
-type FetchRssRequest = ContractRequest<'fetch-rss', operations['fetch-rss']['requestBody']['content']['application/json']>;
+type FetchRssRequest = ContractRequest<'fetch-rss'>;
 
 // @public (undocumented)
-type FetchRssResponse = ContractResponse<'fetch-rss', operations['fetch-rss']['responses']['200']['content']['application/json']>;
+type FetchRssResponse = ContractResponse<'fetch-rss'>;
 
 // @public (undocumented)
 type Flash = ContractModel<'Flash'>;
 
 // @public (undocumented)
-type FlashCreateRequest = ContractRequest<'flash/create', operations['flash___create']['requestBody']['content']['application/json']>;
+type FlashCreateRequest = ContractRequest<'flash/create'>;
 
 // @public (undocumented)
-type FlashCreateResponse = ContractResponse<'flash/create', operations['flash___create']['responses']['200']['content']['application/json']>;
+type FlashCreateResponse = ContractResponse<'flash/create'>;
 
 // @public (undocumented)
-type FlashDeleteRequest = ContractRequest<'flash/delete', operations['flash___delete']['requestBody']['content']['application/json']>;
+type FlashDeleteRequest = ContractRequest<'flash/delete'>;
 
 // @public (undocumented)
-type FlashFeaturedRequest = ContractRequest<'flash/featured', operations['flash___featured']['requestBody']['content']['application/json']>;
+type FlashFeaturedRequest = ContractRequest<'flash/featured'>;
 
 // @public (undocumented)
-type FlashFeaturedResponse = ContractResponse<'flash/featured', operations['flash___featured']['responses']['200']['content']['application/json']>;
+type FlashFeaturedResponse = ContractResponse<'flash/featured'>;
 
 // @public (undocumented)
-type FlashLikeRequest = ContractRequest<'flash/like', operations['flash___like']['requestBody']['content']['application/json']>;
+type FlashLikeRequest = ContractRequest<'flash/like'>;
 
 // @public (undocumented)
-type FlashMyLikesRequest = ContractRequest<'flash/my-likes', operations['flash___my-likes']['requestBody']['content']['application/json']>;
+type FlashMyLikesRequest = ContractRequest<'flash/my-likes'>;
 
 // @public (undocumented)
-type FlashMyLikesResponse = ContractResponse<'flash/my-likes', operations['flash___my-likes']['responses']['200']['content']['application/json']>;
+type FlashMyLikesResponse = ContractResponse<'flash/my-likes'>;
 
 // @public (undocumented)
-type FlashMyRequest = ContractRequest<'flash/my', operations['flash___my']['requestBody']['content']['application/json']>;
+type FlashMyRequest = ContractRequest<'flash/my'>;
 
 // @public (undocumented)
-type FlashMyResponse = ContractResponse<'flash/my', operations['flash___my']['responses']['200']['content']['application/json']>;
+type FlashMyResponse = ContractResponse<'flash/my'>;
 
 // @public (undocumented)
-type FlashSearchRequest = ContractRequest<'flash/search', operations['flash___search']['requestBody']['content']['application/json']>;
+type FlashSearchRequest = ContractRequest<'flash/search'>;
 
 // @public (undocumented)
-type FlashSearchResponse = ContractResponse<'flash/search', operations['flash___search']['responses']['200']['content']['application/json']>;
+type FlashSearchResponse = ContractResponse<'flash/search'>;
 
 // @public (undocumented)
-type FlashShowRequest = ContractRequest<'flash/show', operations['flash___show']['requestBody']['content']['application/json']>;
+type FlashShowRequest = ContractRequest<'flash/show'>;
 
 // @public (undocumented)
-type FlashShowResponse = ContractResponse<'flash/show', operations['flash___show']['responses']['200']['content']['application/json']>;
+type FlashShowResponse = ContractResponse<'flash/show'>;
 
 // @public (undocumented)
-type FlashUnlikeRequest = ContractRequest<'flash/unlike', operations['flash___unlike']['requestBody']['content']['application/json']>;
+type FlashUnlikeRequest = ContractRequest<'flash/unlike'>;
 
 // @public (undocumented)
-type FlashUpdateRequest = ContractRequest<'flash/update', operations['flash___update']['requestBody']['content']['application/json']>;
+type FlashUpdateRequest = ContractRequest<'flash/update'>;
 
 // @public (undocumented)
 export const followersVisibilities: readonly ["public", "followers", "private"];
@@ -2410,154 +3611,166 @@ export const followersVisibilities: readonly ["public", "followers", "private"];
 type Following = ContractModel<'Following'>;
 
 // @public (undocumented)
-type FollowingCreateRequest = ContractRequest<'following/create', operations['following___create']['requestBody']['content']['application/json']>;
+type FollowingCreateRequest = ContractRequest<'following/create'>;
 
 // @public (undocumented)
-type FollowingCreateResponse = ContractResponse<'following/create', operations['following___create']['responses']['200']['content']['application/json']>;
+type FollowingCreateResponse = ContractResponse<'following/create'>;
 
 // @public (undocumented)
-type FollowingDeleteRequest = ContractRequest<'following/delete', operations['following___delete']['requestBody']['content']['application/json']>;
+type FollowingDeleteRequest = ContractRequest<'following/delete'>;
 
 // @public (undocumented)
-type FollowingDeleteResponse = ContractResponse<'following/delete', operations['following___delete']['responses']['200']['content']['application/json']>;
+type FollowingDeleteResponse = ContractResponse<'following/delete'>;
 
 // @public (undocumented)
-type FollowingInvalidateRequest = ContractRequest<'following/invalidate', operations['following___invalidate']['requestBody']['content']['application/json']>;
+type FollowingInvalidateRequest = ContractRequest<'following/invalidate'>;
 
 // @public (undocumented)
-type FollowingInvalidateResponse = ContractResponse<'following/invalidate', operations['following___invalidate']['responses']['200']['content']['application/json']>;
+type FollowingInvalidateResponse = ContractResponse<'following/invalidate'>;
 
 // @public (undocumented)
-type FollowingListRequest = ContractRequest<'following/list', operations['following___list']['requestBody']['content']['application/json']>;
+type FollowingListRequest = ContractRequest<'following/list'>;
 
 // @public (undocumented)
-type FollowingListResponse = ContractResponse<'following/list', operations['following___list']['responses']['200']['content']['application/json']>;
+type FollowingListResponse = ContractResponse<'following/list'>;
 
 // @public (undocumented)
-type FollowingRequestsAcceptRequest = ContractRequest<'following/requests/accept', operations['following___requests___accept']['requestBody']['content']['application/json']>;
+type FollowingRequestsAcceptRequest = ContractRequest<'following/requests/accept'>;
 
 // @public (undocumented)
-type FollowingRequestsCancelRequest = ContractRequest<'following/requests/cancel', operations['following___requests___cancel']['requestBody']['content']['application/json']>;
+type FollowingRequestsCancelRequest = ContractRequest<'following/requests/cancel'>;
 
 // @public (undocumented)
-type FollowingRequestsCancelResponse = ContractResponse<'following/requests/cancel', operations['following___requests___cancel']['responses']['200']['content']['application/json']>;
+type FollowingRequestsCancelResponse = ContractResponse<'following/requests/cancel'>;
 
 // @public (undocumented)
-type FollowingRequestsListRequest = ContractRequest<'following/requests/list', operations['following___requests___list']['requestBody']['content']['application/json']>;
+type FollowingRequestsListRequest = ContractRequest<'following/requests/list'>;
 
 // @public (undocumented)
-type FollowingRequestsListResponse = ContractResponse<'following/requests/list', operations['following___requests___list']['responses']['200']['content']['application/json']>;
+type FollowingRequestsListResponse = ContractResponse<'following/requests/list'>;
 
 // @public (undocumented)
-type FollowingRequestsRejectRequest = ContractRequest<'following/requests/reject', operations['following___requests___reject']['requestBody']['content']['application/json']>;
+type FollowingRequestsRejectRequest = ContractRequest<'following/requests/reject'>;
 
 // @public (undocumented)
-type FollowingRequestsSentRequest = ContractRequest<'following/requests/sent', operations['following___requests___sent']['requestBody']['content']['application/json']>;
+type FollowingRequestsSentRequest = ContractRequest<'following/requests/sent'>;
 
 // @public (undocumented)
-type FollowingRequestsSentResponse = ContractResponse<'following/requests/sent', operations['following___requests___sent']['responses']['200']['content']['application/json']>;
+type FollowingRequestsSentResponse = ContractResponse<'following/requests/sent'>;
 
 // @public (undocumented)
-type FollowingUpdateAllRequest = ContractRequest<'following/update-all', operations['following___update-all']['requestBody']['content']['application/json']>;
+type FollowingUpdateAllRequest = ContractRequest<'following/update-all'>;
 
 // @public (undocumented)
-type FollowingUpdateRequest = ContractRequest<'following/update', operations['following___update']['requestBody']['content']['application/json']>;
+type FollowingUpdateRequest = ContractRequest<'following/update'>;
 
 // @public (undocumented)
-type FollowingUpdateResponse = ContractResponse<'following/update', operations['following___update']['responses']['200']['content']['application/json']>;
+type FollowingUpdateResponse = ContractResponse<'following/update'>;
 
 // @public (undocumented)
 export const followingVisibilities: readonly ["public", "followers", "private"];
 
 // @public (undocumented)
-type GalleryFeaturedRequest = ContractRequest<'gallery/featured', operations['gallery___featured']['requestBody']['content']['application/json']>;
+type GalleryFeaturedRequest = ContractRequest<'gallery/featured'>;
 
 // @public (undocumented)
-type GalleryFeaturedResponse = ContractResponse<'gallery/featured', operations['gallery___featured']['responses']['200']['content']['application/json']>;
+type GalleryFeaturedResponse = ContractResponse<'gallery/featured'>;
 
 // @public (undocumented)
-type GalleryPopularResponse = ContractResponse<'gallery/popular', operations['gallery___popular']['responses']['200']['content']['application/json']>;
+type GalleryPopularRequest = ContractRequest<'gallery/popular'>;
+
+// @public (undocumented)
+type GalleryPopularResponse = ContractResponse<'gallery/popular'>;
 
 // @public (undocumented)
 type GalleryPost = ContractModel<'GalleryPost'>;
 
 // @public (undocumented)
-type GalleryPostsCreateRequest = ContractRequest<'gallery/posts/create', operations['gallery___posts___create']['requestBody']['content']['application/json']>;
+type GalleryPostsCreateRequest = ContractRequest<'gallery/posts/create'>;
 
 // @public (undocumented)
-type GalleryPostsCreateResponse = ContractResponse<'gallery/posts/create', operations['gallery___posts___create']['responses']['200']['content']['application/json']>;
+type GalleryPostsCreateResponse = ContractResponse<'gallery/posts/create'>;
 
 // @public (undocumented)
-type GalleryPostsDeleteRequest = ContractRequest<'gallery/posts/delete', operations['gallery___posts___delete']['requestBody']['content']['application/json']>;
+type GalleryPostsDeleteRequest = ContractRequest<'gallery/posts/delete'>;
 
 // @public (undocumented)
-type GalleryPostsLikeRequest = ContractRequest<'gallery/posts/like', operations['gallery___posts___like']['requestBody']['content']['application/json']>;
+type GalleryPostsLikeRequest = ContractRequest<'gallery/posts/like'>;
 
 // @public (undocumented)
-type GalleryPostsRequest = ContractRequest<'gallery/posts', operations['gallery___posts']['requestBody']['content']['application/json']>;
+type GalleryPostsRequest = ContractRequest<'gallery/posts'>;
 
 // @public (undocumented)
-type GalleryPostsResponse = ContractResponse<'gallery/posts', operations['gallery___posts']['responses']['200']['content']['application/json']>;
+type GalleryPostsResponse = ContractResponse<'gallery/posts'>;
 
 // @public (undocumented)
-type GalleryPostsShowRequest = ContractRequest<'gallery/posts/show', operations['gallery___posts___show']['requestBody']['content']['application/json']>;
+type GalleryPostsShowRequest = ContractRequest<'gallery/posts/show'>;
 
 // @public (undocumented)
-type GalleryPostsShowResponse = ContractResponse<'gallery/posts/show', operations['gallery___posts___show']['responses']['200']['content']['application/json']>;
+type GalleryPostsShowResponse = ContractResponse<'gallery/posts/show'>;
 
 // @public (undocumented)
-type GalleryPostsUnlikeRequest = ContractRequest<'gallery/posts/unlike', operations['gallery___posts___unlike']['requestBody']['content']['application/json']>;
+type GalleryPostsUnlikeRequest = ContractRequest<'gallery/posts/unlike'>;
 
 // @public (undocumented)
-type GalleryPostsUpdateRequest = ContractRequest<'gallery/posts/update', operations['gallery___posts___update']['requestBody']['content']['application/json']>;
+type GalleryPostsUpdateRequest = ContractRequest<'gallery/posts/update'>;
 
 // @public (undocumented)
-type GalleryPostsUpdateResponse = ContractResponse<'gallery/posts/update', operations['gallery___posts___update']['responses']['200']['content']['application/json']>;
+type GalleryPostsUpdateResponse = ContractResponse<'gallery/posts/update'>;
 
 // @public (undocumented)
-type GetAvatarDecorationsResponse = ContractResponse<'get-avatar-decorations', operations['get-avatar-decorations']['responses']['200']['content']['application/json']>;
+type GetAvatarDecorationsRequest = ContractRequest<'get-avatar-decorations'>;
 
 // @public (undocumented)
-type GetOnlineUsersCountResponse = ContractResponse<'get-online-users-count', operations['get-online-users-count']['responses']['200']['content']['application/json']>;
+type GetAvatarDecorationsResponse = ContractResponse<'get-avatar-decorations'>;
+
+// @public (undocumented)
+type GetOnlineUsersCountRequest = ContractRequest<'get-online-users-count'>;
+
+// @public (undocumented)
+type GetOnlineUsersCountResponse = ContractResponse<'get-online-users-count'>;
 
 // @public (undocumented)
 type Hashtag = ContractModel<'Hashtag'>;
 
 // @public (undocumented)
-type HashtagsListRequest = ContractRequest<'hashtags/list', operations['hashtags___list']['requestBody']['content']['application/json']>;
+type HashtagsListRequest = ContractRequest<'hashtags/list'>;
 
 // @public (undocumented)
-type HashtagsListResponse = ContractResponse<'hashtags/list', operations['hashtags___list']['responses']['200']['content']['application/json']>;
+type HashtagsListResponse = ContractResponse<'hashtags/list'>;
 
 // @public (undocumented)
-type HashtagsSearchRequest = ContractRequest<'hashtags/search', operations['hashtags___search']['requestBody']['content']['application/json']>;
+type HashtagsSearchRequest = ContractRequest<'hashtags/search'>;
 
 // @public (undocumented)
-type HashtagsSearchResponse = ContractResponse<'hashtags/search', operations['hashtags___search']['responses']['200']['content']['application/json']>;
+type HashtagsSearchResponse = ContractResponse<'hashtags/search'>;
 
 // @public (undocumented)
-type HashtagsShowRequest = ContractRequest<'hashtags/show', operations['hashtags___show']['requestBody']['content']['application/json']>;
+type HashtagsShowRequest = ContractRequest<'hashtags/show'>;
 
 // @public (undocumented)
-type HashtagsShowResponse = ContractResponse<'hashtags/show', operations['hashtags___show']['responses']['200']['content']['application/json']>;
+type HashtagsShowResponse = ContractResponse<'hashtags/show'>;
 
 // @public (undocumented)
-type HashtagsTrendResponse = ContractResponse<'hashtags/trend', operations['hashtags___trend']['responses']['200']['content']['application/json']>;
+type HashtagsTrendRequest = ContractRequest<'hashtags/trend'>;
 
 // @public (undocumented)
-type HashtagsUsersRequest = ContractRequest<'hashtags/users', operations['hashtags___users']['requestBody']['content']['application/json']>;
+type HashtagsTrendResponse = ContractResponse<'hashtags/trend'>;
 
 // @public (undocumented)
-type HashtagsUsersResponse = ContractResponse<'hashtags/users', operations['hashtags___users']['responses']['200']['content']['application/json']>;
+type HashtagsUsersRequest = ContractRequest<'hashtags/users'>;
 
 // @public (undocumented)
-type I2faDoneRequest = ContractRequest<'i/2fa/done', operations['i___2fa___done']['requestBody']['content']['application/json']>;
+type HashtagsUsersResponse = ContractResponse<'hashtags/users'>;
 
 // @public (undocumented)
-type I2faDoneResponse = ContractResponse<'i/2fa/done', operations['i___2fa___done']['responses']['200']['content']['application/json']>;
+type I2faDoneRequest = ContractRequest<'i/2fa/done'>;
 
 // @public (undocumented)
-type I2faKeyDoneRequest_2 = {
+type I2faDoneResponse = ContractResponse<'i/2fa/done'>;
+
+// @public (undocumented)
+type I2faKeyDoneRequest = {
     password: string;
     token?: string | null;
     name: string;
@@ -2565,46 +3778,52 @@ type I2faKeyDoneRequest_2 = {
 };
 
 // @public (undocumented)
-type I2faKeyDoneResponse = ContractResponse<'i/2fa/key-done', operations['i___2fa___key-done']['responses']['200']['content']['application/json']>;
+type I2faKeyDoneResponse = ContractResponse<'i/2fa/key-done'>;
 
 // @public (undocumented)
-type I2faPasswordLessRequest = ContractRequest<'i/2fa/password-less', operations['i___2fa___password-less']['requestBody']['content']['application/json']>;
+type I2faPasswordLessRequest = ContractRequest<'i/2fa/password-less'>;
 
 // @public (undocumented)
-type I2faRegisterKeyRequest = ContractRequest<'i/2fa/register-key', operations['i___2fa___register-key']['requestBody']['content']['application/json']>;
+type I2faRegisterKeyRequest = ContractRequest<'i/2fa/register-key'>;
 
 // @public (undocumented)
-type I2faRegisterKeyResponse = ContractResponse<'i/2fa/register-key', operations['i___2fa___register-key']['responses']['200']['content']['application/json']>;
+type I2faRegisterKeyResponse = ContractResponse<'i/2fa/register-key'>;
 
 // @public (undocumented)
-type I2faRegisterRequest = ContractRequest<'i/2fa/register', operations['i___2fa___register']['requestBody']['content']['application/json']>;
+type I2faRegisterRequest = ContractRequest<'i/2fa/register'>;
 
 // @public (undocumented)
-type I2faRegisterResponse = ContractResponse<'i/2fa/register', operations['i___2fa___register']['responses']['200']['content']['application/json']>;
+type I2faRegisterResponse = ContractResponse<'i/2fa/register'>;
 
 // @public (undocumented)
-type I2faRemoveKeyRequest = ContractRequest<'i/2fa/remove-key', operations['i___2fa___remove-key']['requestBody']['content']['application/json']>;
+type I2faRemoveKeyRequest = ContractRequest<'i/2fa/remove-key'>;
 
 // @public (undocumented)
-type I2faUnregisterRequest = ContractRequest<'i/2fa/unregister', operations['i___2fa___unregister']['requestBody']['content']['application/json']>;
+type I2faRemoveKeyResponse = ContractResponse<'i/2fa/remove-key'>;
 
 // @public (undocumented)
-type I2faUpdateKeyRequest = ContractRequest<'i/2fa/update-key', operations['i___2fa___update-key']['requestBody']['content']['application/json']>;
+type I2faUnregisterRequest = ContractRequest<'i/2fa/unregister'>;
 
 // @public (undocumented)
-type IAppsRequest = ContractRequest<'i/apps', operations['i___apps']['requestBody']['content']['application/json']>;
+type I2faUpdateKeyRequest = ContractRequest<'i/2fa/update-key'>;
 
 // @public (undocumented)
-type IAppsResponse = ContractResponse<'i/apps', operations['i___apps']['responses']['200']['content']['application/json']>;
+type I2faUpdateKeyResponse = ContractResponse<'i/2fa/update-key'>;
 
 // @public (undocumented)
-type IAuthorizedAppsRequest = ContractRequest<'i/authorized-apps', operations['i___authorized-apps']['requestBody']['content']['application/json']>;
+type IAppsRequest = ContractRequest<'i/apps'>;
 
 // @public (undocumented)
-type IAuthorizedAppsResponse = ContractResponse<'i/authorized-apps', operations['i___authorized-apps']['responses']['200']['content']['application/json']>;
+type IAppsResponse = ContractResponse<'i/apps'>;
 
 // @public (undocumented)
-type IChangePasswordRequest = ContractRequest<'i/change-password', operations['i___change-password']['requestBody']['content']['application/json']>;
+type IAuthorizedAppsRequest = ContractRequest<'i/authorized-apps'>;
+
+// @public (undocumented)
+type IAuthorizedAppsResponse = ContractResponse<'i/authorized-apps'>;
+
+// @public (undocumented)
+type IChangePasswordRequest = ContractRequest<'i/change-password'>;
 
 // @public (undocumented)
 export interface IChannelConnection<Channel extends AnyOf<Channels> = AnyOf<Channels>> extends EventEmitter<Channel['events']> {
@@ -2625,163 +3844,196 @@ export interface IChannelConnection<Channel extends AnyOf<Channels> = AnyOf<Chan
 }
 
 // @public (undocumented)
-type IClaimAchievementRequest = ContractRequest<'i/claim-achievement', operations['i___claim-achievement']['requestBody']['content']['application/json']>;
+type IClaimAchievementRequest = ContractRequest<'i/claim-achievement'>;
 
 // @public (undocumented)
 type ID = string;
 
 // @public (undocumented)
-type IDeleteAccountRequest = ContractRequest<'i/delete-account', operations['i___delete-account']['requestBody']['content']['application/json']>;
+type IDeleteAccountRequest = ContractRequest<'i/delete-account'>;
 
 // @public (undocumented)
-type IExportFollowingRequest = ContractRequest<'i/export-following', operations['i___export-following']['requestBody']['content']['application/json']>;
+type IExportAntennasRequest = ContractRequest<'i/export-antennas'>;
 
 // @public (undocumented)
-type IFavoritesRequest = ContractRequest<'i/favorites', operations['i___favorites']['requestBody']['content']['application/json']>;
+type IExportBlockingRequest = ContractRequest<'i/export-blocking'>;
 
 // @public (undocumented)
-type IFavoritesResponse = ContractResponse<'i/favorites', operations['i___favorites']['responses']['200']['content']['application/json']>;
+type IExportClipsRequest = ContractRequest<'i/export-clips'>;
 
 // @public (undocumented)
-type IGalleryLikesRequest = ContractRequest<'i/gallery/likes', operations['i___gallery___likes']['requestBody']['content']['application/json']>;
+type IExportFavoritesRequest = ContractRequest<'i/export-favorites'>;
 
 // @public (undocumented)
-type IGalleryLikesResponse = ContractResponse<'i/gallery/likes', operations['i___gallery___likes']['responses']['200']['content']['application/json']>;
+type IExportFollowingRequest = ContractRequest<'i/export-following'>;
 
 // @public (undocumented)
-type IGalleryPostsRequest = ContractRequest<'i/gallery/posts', operations['i___gallery___posts']['requestBody']['content']['application/json']>;
+type IExportMuteRequest = ContractRequest<'i/export-mute'>;
 
 // @public (undocumented)
-type IGalleryPostsResponse = ContractResponse<'i/gallery/posts', operations['i___gallery___posts']['responses']['200']['content']['application/json']>;
+type IExportNotesRequest = ContractRequest<'i/export-notes'>;
 
 // @public (undocumented)
-type IImportAntennasRequest = ContractRequest<'i/import-antennas', operations['i___import-antennas']['requestBody']['content']['application/json']>;
+type IExportUserListsRequest = ContractRequest<'i/export-user-lists'>;
 
 // @public (undocumented)
-type IImportBlockingRequest = ContractRequest<'i/import-blocking', operations['i___import-blocking']['requestBody']['content']['application/json']>;
+type IFavoritesRequest = ContractRequest<'i/favorites'>;
 
 // @public (undocumented)
-type IImportFollowingRequest = ContractRequest<'i/import-following', operations['i___import-following']['requestBody']['content']['application/json']>;
+type IFavoritesResponse = ContractResponse<'i/favorites'>;
 
 // @public (undocumented)
-type IImportMutingRequest = ContractRequest<'i/import-muting', operations['i___import-muting']['requestBody']['content']['application/json']>;
+type IGalleryLikesRequest = ContractRequest<'i/gallery/likes'>;
 
 // @public (undocumented)
-type IImportUserListsRequest = ContractRequest<'i/import-user-lists', operations['i___import-user-lists']['requestBody']['content']['application/json']>;
+type IGalleryLikesResponse = ContractResponse<'i/gallery/likes'>;
 
 // @public (undocumented)
-type IMoveRequest = ContractRequest<'i/move', operations['i___move']['requestBody']['content']['application/json']>;
+type IGalleryPostsRequest = ContractRequest<'i/gallery/posts'>;
 
 // @public (undocumented)
-type IMoveResponse = ContractResponse<'i/move', operations['i___move']['responses']['200']['content']['application/json']>;
+type IGalleryPostsResponse = ContractResponse<'i/gallery/posts'>;
 
 // @public (undocumented)
-type INotificationsGroupedRequest = ContractRequest<'i/notifications-grouped', operations['i___notifications-grouped']['requestBody']['content']['application/json']>;
+type IImportAntennasRequest = ContractRequest<'i/import-antennas'>;
 
 // @public (undocumented)
-type INotificationsGroupedResponse = ContractResponse<'i/notifications-grouped', operations['i___notifications-grouped']['responses']['200']['content']['application/json']>;
+type IImportBlockingRequest = ContractRequest<'i/import-blocking'>;
 
 // @public (undocumented)
-type INotificationsRequest = ContractRequest<'i/notifications', operations['i___notifications']['requestBody']['content']['application/json']>;
+type IImportFollowingRequest = ContractRequest<'i/import-following'>;
 
 // @public (undocumented)
-type INotificationsResponse = ContractResponse<'i/notifications', operations['i___notifications']['responses']['200']['content']['application/json']>;
+type IImportMutingRequest = ContractRequest<'i/import-muting'>;
+
+// @public (undocumented)
+type IImportUserListsRequest = ContractRequest<'i/import-user-lists'>;
+
+// @public (undocumented)
+type IMoveRequest = ContractRequest<'i/move'>;
+
+// @public (undocumented)
+type IMoveResponse = ContractResponse<'i/move'>;
+
+// @public (undocumented)
+type INotificationsGroupedRequest = ContractRequest<'i/notifications-grouped'>;
+
+// @public (undocumented)
+type INotificationsGroupedResponse = ContractResponse<'i/notifications-grouped'>;
+
+// @public (undocumented)
+type INotificationsRequest = ContractRequest<'i/notifications'>;
+
+// @public (undocumented)
+type INotificationsResponse = ContractResponse<'i/notifications'>;
 
 // @public (undocumented)
 type InviteCode = ContractModel<'InviteCode'>;
 
 // @public (undocumented)
-type InviteCreateResponse = ContractResponse<'invite/create', operations['invite___create']['responses']['200']['content']['application/json']>;
+type InviteCreateRequest = ContractRequest<'invite/create'>;
 
 // @public (undocumented)
-type InviteDeleteRequest = ContractRequest<'invite/delete', operations['invite___delete']['requestBody']['content']['application/json']>;
+type InviteCreateResponse = ContractResponse<'invite/create'>;
 
 // @public (undocumented)
-type InviteLimitResponse = ContractResponse<'invite/limit', operations['invite___limit']['responses']['200']['content']['application/json']>;
+type InviteDeleteRequest = ContractRequest<'invite/delete'>;
 
 // @public (undocumented)
-type InviteListRequest = ContractRequest<'invite/list', operations['invite___list']['requestBody']['content']['application/json']>;
+type InviteLimitRequest = ContractRequest<'invite/limit'>;
 
 // @public (undocumented)
-type InviteListResponse = ContractResponse<'invite/list', operations['invite___list']['responses']['200']['content']['application/json']>;
+type InviteLimitResponse = ContractResponse<'invite/limit'>;
 
 // @public (undocumented)
-type IPageLikesRequest = ContractRequest<'i/page-likes', operations['i___page-likes']['requestBody']['content']['application/json']>;
+type InviteListRequest = ContractRequest<'invite/list'>;
 
 // @public (undocumented)
-type IPageLikesResponse = ContractResponse<'i/page-likes', operations['i___page-likes']['responses']['200']['content']['application/json']>;
+type InviteListResponse = ContractResponse<'invite/list'>;
 
 // @public (undocumented)
-type IPagesRequest = ContractRequest<'i/pages', operations['i___pages']['requestBody']['content']['application/json']>;
+type IPageLikesRequest = ContractRequest<'i/page-likes'>;
 
 // @public (undocumented)
-type IPagesResponse = ContractResponse<'i/pages', operations['i___pages']['responses']['200']['content']['application/json']>;
+type IPageLikesResponse = ContractResponse<'i/page-likes'>;
 
 // @public (undocumented)
-type IPinRequest = ContractRequest<'i/pin', operations['i___pin']['requestBody']['content']['application/json']>;
+type IPagesRequest = ContractRequest<'i/pages'>;
 
 // @public (undocumented)
-type IPinResponse = ContractResponse<'i/pin', operations['i___pin']['responses']['200']['content']['application/json']>;
+type IPagesResponse = ContractResponse<'i/pages'>;
 
 // @public (undocumented)
-type IReadAnnouncementRequest = ContractRequest<'i/read-announcement', operations['i___read-announcement']['requestBody']['content']['application/json']>;
+type IPinRequest = ContractRequest<'i/pin'>;
 
 // @public (undocumented)
-type IRegenerateTokenRequest = ContractRequest<'i/regenerate-token', operations['i___regenerate-token']['requestBody']['content']['application/json']>;
+type IPinResponse = ContractResponse<'i/pin'>;
 
 // @public (undocumented)
-type IRegistryGetAllRequest = ContractRequest<'i/registry/get-all', operations['i___registry___get-all']['requestBody']['content']['application/json']>;
+type IReadAnnouncementRequest = ContractRequest<'i/read-announcement'>;
 
 // @public (undocumented)
-type IRegistryGetAllResponse = ContractResponse<'i/registry/get-all', operations['i___registry___get-all']['responses']['200']['content']['application/json']>;
+type IRegenerateTokenRequest = ContractRequest<'i/regenerate-token'>;
 
 // @public (undocumented)
-type IRegistryGetDetailRequest = ContractRequest<'i/registry/get-detail', operations['i___registry___get-detail']['requestBody']['content']['application/json']>;
+type IRegistryGetAllRequest = ContractRequest<'i/registry/get-all'>;
 
 // @public (undocumented)
-type IRegistryGetDetailResponse = ContractResponse<'i/registry/get-detail', operations['i___registry___get-detail']['responses']['200']['content']['application/json']>;
+type IRegistryGetAllResponse = ContractResponse<'i/registry/get-all'>;
 
 // @public (undocumented)
-type IRegistryGetRequest = ContractRequest<'i/registry/get', operations['i___registry___get']['requestBody']['content']['application/json']>;
+type IRegistryGetDetailRequest = ContractRequest<'i/registry/get-detail'>;
 
 // @public (undocumented)
-type IRegistryGetResponse = ContractResponse<'i/registry/get', operations['i___registry___get']['responses']['200']['content']['application/json']>;
+type IRegistryGetDetailResponse = ContractResponse<'i/registry/get-detail'>;
 
 // @public (undocumented)
-type IRegistryKeysRequest = ContractRequest<'i/registry/keys', operations['i___registry___keys']['requestBody']['content']['application/json']>;
+type IRegistryGetRequest = ContractRequest<'i/registry/get'>;
 
 // @public (undocumented)
-type IRegistryKeysResponse = ContractResponse<'i/registry/keys', operations['i___registry___keys']['responses']['200']['content']['application/json']>;
+type IRegistryGetResponse = ContractResponse<'i/registry/get'>;
 
 // @public (undocumented)
-type IRegistryKeysWithTypeRequest = ContractRequest<'i/registry/keys-with-type', operations['i___registry___keys-with-type']['requestBody']['content']['application/json']>;
+type IRegistryKeysRequest = ContractRequest<'i/registry/keys'>;
 
 // @public (undocumented)
-type IRegistryKeysWithTypeResponse = ContractResponse<'i/registry/keys-with-type', operations['i___registry___keys-with-type']['responses']['200']['content']['application/json']>;
+type IRegistryKeysResponse = ContractResponse<'i/registry/keys'>;
 
 // @public (undocumented)
-type IRegistryRemoveRequest = ContractRequest<'i/registry/remove', operations['i___registry___remove']['requestBody']['content']['application/json']>;
+type IRegistryKeysWithTypeRequest = ContractRequest<'i/registry/keys-with-type'>;
 
 // @public (undocumented)
-type IRegistryScopesWithDomainResponse = ContractResponse<'i/registry/scopes-with-domain', operations['i___registry___scopes-with-domain']['responses']['200']['content']['application/json']>;
+type IRegistryKeysWithTypeResponse = ContractResponse<'i/registry/keys-with-type'>;
 
 // @public (undocumented)
-type IRegistrySetRequest = ContractRequest<'i/registry/set', operations['i___registry___set']['requestBody']['content']['application/json']>;
+type IRegistryRemoveRequest = ContractRequest<'i/registry/remove'>;
 
 // @public (undocumented)
-type IResponse = ContractResponse<'i', operations['i']['responses']['200']['content']['application/json']>;
+type IRegistryScopesWithDomainRequest = ContractRequest<'i/registry/scopes-with-domain'>;
 
 // @public (undocumented)
-type IRevokeTokenRequest = ContractRequest<'i/revoke-token', operations['i___revoke-token']['requestBody']['content']['application/json']>;
+type IRegistryScopesWithDomainResponse = ContractResponse<'i/registry/scopes-with-domain'>;
+
+// @public (undocumented)
+type IRegistrySetRequest = ContractRequest<'i/registry/set'>;
+
+// @public (undocumented)
+type IRequest = ContractRequest<'i'>;
+
+// @public (undocumented)
+type IResponse = ContractResponse<'i'>;
+
+// @public (undocumented)
+type IRevokeTokenRequest = ContractRequest<'i/revoke-token'>;
 
 // @public (undocumented)
 function isAPIError(reason: Record<PropertyKey, unknown>): reason is APIError;
 
 // @public (undocumented)
-type ISigninHistoryRequest = ContractRequest<'i/signin-history', operations['i___signin-history']['requestBody']['content']['application/json']>;
+type ISigninHistoryRequest = ContractRequest<'i/signin-history'>;
 
 // @public (undocumented)
-type ISigninHistoryResponse = ContractResponse<'i/signin-history', operations['i___signin-history']['responses']['200']['content']['application/json']>;
+type ISigninHistoryResponse = ContractResponse<'i/signin-history'>;
 
 // @public (undocumented)
 function isPureRenote(note: Note): note is PureRenote;
@@ -2821,49 +4073,52 @@ export interface IStream extends EventEmitter<StreamEvents> {
 }
 
 // @public (undocumented)
-type IUnpinRequest = ContractRequest<'i/unpin', operations['i___unpin']['requestBody']['content']['application/json']>;
+type IUnpinRequest = ContractRequest<'i/unpin'>;
 
 // @public (undocumented)
-type IUnpinResponse = ContractResponse<'i/unpin', operations['i___unpin']['responses']['200']['content']['application/json']>;
+type IUnpinResponse = ContractResponse<'i/unpin'>;
 
 // @public (undocumented)
-type IUpdateEmailRequest = ContractRequest<'i/update-email', operations['i___update-email']['requestBody']['content']['application/json']>;
+type IUpdateEmailRequest = ContractRequest<'i/update-email'>;
 
 // @public (undocumented)
-type IUpdateEmailResponse = ContractResponse<'i/update-email', operations['i___update-email']['responses']['200']['content']['application/json']>;
+type IUpdateEmailResponse = ContractResponse<'i/update-email'>;
 
 // @public (undocumented)
-type IUpdateRequest = ContractRequest<'i/update', operations['i___update']['requestBody']['content']['application/json']>;
+type IUpdateRequest = ContractRequest<'i/update'>;
 
 // @public (undocumented)
-type IUpdateResponse = ContractResponse<'i/update', operations['i___update']['responses']['200']['content']['application/json']>;
+type IUpdateResponse = ContractResponse<'i/update'>;
 
 // @public (undocumented)
-type IWebhooksCreateRequest = ContractRequest<'i/webhooks/create', operations['i___webhooks___create']['requestBody']['content']['application/json']>;
+type IWebhooksCreateRequest = ContractRequest<'i/webhooks/create'>;
 
 // @public (undocumented)
-type IWebhooksCreateResponse = ContractResponse<'i/webhooks/create', operations['i___webhooks___create']['responses']['200']['content']['application/json']>;
+type IWebhooksCreateResponse = ContractResponse<'i/webhooks/create'>;
 
 // @public (undocumented)
-type IWebhooksDeleteRequest = ContractRequest<'i/webhooks/delete', operations['i___webhooks___delete']['requestBody']['content']['application/json']>;
+type IWebhooksDeleteRequest = ContractRequest<'i/webhooks/delete'>;
 
 // @public (undocumented)
-type IWebhooksListResponse = ContractResponse<'i/webhooks/list', operations['i___webhooks___list']['responses']['200']['content']['application/json']>;
+type IWebhooksListRequest = ContractRequest<'i/webhooks/list'>;
 
 // @public (undocumented)
-type IWebhooksShowRequest = ContractRequest<'i/webhooks/show', operations['i___webhooks___show']['requestBody']['content']['application/json']>;
+type IWebhooksListResponse = ContractResponse<'i/webhooks/list'>;
 
 // @public (undocumented)
-type IWebhooksShowResponse = ContractResponse<'i/webhooks/show', operations['i___webhooks___show']['responses']['200']['content']['application/json']>;
+type IWebhooksShowRequest = ContractRequest<'i/webhooks/show'>;
 
 // @public (undocumented)
-type IWebhooksTestRequest = ContractRequest<'i/webhooks/test', operations['i___webhooks___test']['requestBody']['content']['application/json']>;
+type IWebhooksShowResponse = ContractResponse<'i/webhooks/show'>;
 
 // @public (undocumented)
-type IWebhooksUpdateRequest = ContractRequest<'i/webhooks/update', operations['i___webhooks___update']['requestBody']['content']['application/json']>;
+type IWebhooksTestRequest = ContractRequest<'i/webhooks/test'>;
 
 // @public (undocumented)
-type JsonValue_2 = ContractModel<'JsonValue'>;
+type IWebhooksUpdateRequest = ContractRequest<'i/webhooks/update'>;
+
+// @public (undocumented)
+type JsonValue = ContractModel<'JsonValue'>;
 
 // @public (undocumented)
 type MeDetailed = ContractModel<'MeDetailed'>;
@@ -2884,16 +4139,16 @@ type MetaDetailedOnly = ContractModel<'MetaDetailedOnly'>;
 type MetaLite = ContractModel<'MetaLite'>;
 
 // @public (undocumented)
-type MetaRequest = ContractRequest<'meta', operations['meta']['requestBody']['content']['application/json']>;
+type MetaRequest = ContractRequest<'meta'>;
 
 // @public (undocumented)
-type MetaResponse = ContractResponse<'meta', operations['meta']['responses']['200']['content']['application/json']>;
+type MetaResponse = ContractResponse<'meta'>;
 
 // @public (undocumented)
-type MiauthGenTokenRequest = ContractRequest<'miauth/gen-token', operations['miauth___gen-token']['requestBody']['content']['application/json']>;
+type MiauthGenTokenRequest = ContractRequest<'miauth/gen-token'>;
 
 // @public (undocumented)
-type MiauthGenTokenResponse = ContractResponse<'miauth/gen-token', operations['miauth___gen-token']['responses']['200']['content']['application/json']>;
+type MiauthGenTokenResponse = ContractResponse<'miauth/gen-token'>;
 
 // Warning: (ae-forgotten-export) The symbol "ModerationLogPayloads" needs to be exported by the entry point index.d.ts
 //
@@ -2914,28 +4169,28 @@ type ModerationLog = {
 export const moderationLogTypes: readonly ["updateServerSettings", "suspend", "unsuspend", "updateUserNote", "addCustomEmoji", "updateCustomEmoji", "deleteCustomEmoji", "assignRole", "unassignRole", "createRole", "updateRole", "deleteRole", "clearQueue", "promoteQueue", "deleteDriveFile", "deleteNote", "createGlobalAnnouncement", "createUserAnnouncement", "updateGlobalAnnouncement", "updateUserAnnouncement", "deleteGlobalAnnouncement", "deleteUserAnnouncement", "resetPassword", "suspendRemoteInstance", "unsuspendRemoteInstance", "updateRemoteInstanceNote", "markSensitiveDriveFile", "unmarkSensitiveDriveFile", "resolveAbuseReport", "forwardAbuseReport", "updateAbuseReportNote", "createInvitation", "createAd", "updateAd", "deleteAd", "createAvatarDecoration", "updateAvatarDecoration", "deleteAvatarDecoration", "unsetMfa", "unsetUserAvatar", "unsetUserBanner", "createSystemWebhook", "updateSystemWebhook", "deleteSystemWebhook", "createAbuseReportNotificationRecipient", "updateAbuseReportNotificationRecipient", "deleteAbuseReportNotificationRecipient", "deleteAccount", "deletePage", "deleteFlash", "deleteGalleryPost", "deleteChatRoom", "updateProxyAccountDescription"];
 
 // @public (undocumented)
-type MuteCreateRequest = ContractRequest<'mute/create', operations['mute___create']['requestBody']['content']['application/json']>;
+type MuteCreateRequest = ContractRequest<'mute/create'>;
 
 // @public (undocumented)
-type MuteDeleteRequest = ContractRequest<'mute/delete', operations['mute___delete']['requestBody']['content']['application/json']>;
+type MuteDeleteRequest = ContractRequest<'mute/delete'>;
 
 // @public (undocumented)
 export const mutedNoteReasons: readonly ["word", "manual", "spam", "other"];
 
 // @public (undocumented)
-type MuteListRequest = ContractRequest<'mute/list', operations['mute___list']['requestBody']['content']['application/json']>;
+type MuteListRequest = ContractRequest<'mute/list'>;
 
 // @public (undocumented)
-type MuteListResponse = ContractResponse<'mute/list', operations['mute___list']['responses']['200']['content']['application/json']>;
+type MuteListResponse = ContractResponse<'mute/list'>;
 
 // @public (undocumented)
 type Muting = ContractModel<'Muting'>;
 
 // @public (undocumented)
-type MyAppsRequest = ContractRequest<'my/apps', operations['my___apps']['requestBody']['content']['application/json']>;
+type MyAppsRequest = ContractRequest<'my/apps'>;
 
 // @public (undocumented)
-type MyAppsResponse = ContractResponse<'my/apps', operations['my___apps']['responses']['200']['content']['application/json']>;
+type MyAppsResponse = ContractResponse<'my/apps'>;
 
 // @public (undocumented)
 type Note = ContractModel<'Note'>;
@@ -2960,187 +4215,190 @@ type NoteReaction = ContractModel<'NoteReaction'>;
 type NoteReactionWithNote = ContractModel<'NoteReactionWithNote'>;
 
 // @public (undocumented)
-type NotesChildrenRequest = ContractRequest<'notes/children', operations['notes___children']['requestBody']['content']['application/json']>;
+type NotesChildrenRequest = ContractRequest<'notes/children'>;
 
 // @public (undocumented)
-type NotesChildrenResponse = ContractResponse<'notes/children', operations['notes___children']['responses']['200']['content']['application/json']>;
+type NotesChildrenResponse = ContractResponse<'notes/children'>;
 
 // @public (undocumented)
-type NotesClipsRequest = ContractRequest<'notes/clips', operations['notes___clips']['requestBody']['content']['application/json']>;
+type NotesClipsRequest = ContractRequest<'notes/clips'>;
 
 // @public (undocumented)
-type NotesClipsResponse = ContractResponse<'notes/clips', operations['notes___clips']['responses']['200']['content']['application/json']>;
+type NotesClipsResponse = ContractResponse<'notes/clips'>;
 
 // @public (undocumented)
-type NotesConversationRequest = ContractRequest<'notes/conversation', operations['notes___conversation']['requestBody']['content']['application/json']>;
+type NotesConversationRequest = ContractRequest<'notes/conversation'>;
 
 // @public (undocumented)
-type NotesConversationResponse = ContractResponse<'notes/conversation', operations['notes___conversation']['responses']['200']['content']['application/json']>;
+type NotesConversationResponse = ContractResponse<'notes/conversation'>;
 
 // @public (undocumented)
-type NotesCreateRequest = ContractRequest<'notes/create', operations['notes___create']['requestBody']['content']['application/json']>;
+type NotesCreateRequest = ContractRequest<'notes/create'>;
 
 // @public (undocumented)
-type NotesCreateResponse = ContractResponse<'notes/create', operations['notes___create']['responses']['200']['content']['application/json']>;
+type NotesCreateResponse = ContractResponse<'notes/create'>;
 
 // @public (undocumented)
-type NotesDeleteRequest = ContractRequest<'notes/delete', operations['notes___delete']['requestBody']['content']['application/json']>;
+type NotesDeleteRequest = ContractRequest<'notes/delete'>;
 
 // @public (undocumented)
-type NotesDraftsCountResponse = ContractResponse<'notes/drafts/count', operations['notes___drafts___count']['responses']['200']['content']['application/json']>;
+type NotesDraftsCountRequest = ContractRequest<'notes/drafts/count'>;
 
 // @public (undocumented)
-type NotesDraftsCreateRequest = ContractRequest<'notes/drafts/create', operations['notes___drafts___create']['requestBody']['content']['application/json']>;
+type NotesDraftsCountResponse = ContractResponse<'notes/drafts/count'>;
 
 // @public (undocumented)
-type NotesDraftsCreateResponse = ContractResponse<'notes/drafts/create', operations['notes___drafts___create']['responses']['200']['content']['application/json']>;
+type NotesDraftsCreateRequest = ContractRequest<'notes/drafts/create'>;
 
 // @public (undocumented)
-type NotesDraftsDeleteRequest = ContractRequest<'notes/drafts/delete', operations['notes___drafts___delete']['requestBody']['content']['application/json']>;
+type NotesDraftsCreateResponse = ContractResponse<'notes/drafts/create'>;
 
 // @public (undocumented)
-type NotesDraftsListRequest = ContractRequest<'notes/drafts/list', operations['notes___drafts___list']['requestBody']['content']['application/json']>;
+type NotesDraftsDeleteRequest = ContractRequest<'notes/drafts/delete'>;
 
 // @public (undocumented)
-type NotesDraftsListResponse = ContractResponse<'notes/drafts/list', operations['notes___drafts___list']['responses']['200']['content']['application/json']>;
+type NotesDraftsListRequest = ContractRequest<'notes/drafts/list'>;
 
 // @public (undocumented)
-type NotesDraftsUpdateRequest = ContractRequest<'notes/drafts/update', operations['notes___drafts___update']['requestBody']['content']['application/json']>;
+type NotesDraftsListResponse = ContractResponse<'notes/drafts/list'>;
 
 // @public (undocumented)
-type NotesDraftsUpdateResponse = ContractResponse<'notes/drafts/update', operations['notes___drafts___update']['responses']['200']['content']['application/json']>;
+type NotesDraftsUpdateRequest = ContractRequest<'notes/drafts/update'>;
 
 // @public (undocumented)
-type NotesFavoritesCreateRequest = ContractRequest<'notes/favorites/create', operations['notes___favorites___create']['requestBody']['content']['application/json']>;
+type NotesDraftsUpdateResponse = ContractResponse<'notes/drafts/update'>;
 
 // @public (undocumented)
-type NotesFavoritesDeleteRequest = ContractRequest<'notes/favorites/delete', operations['notes___favorites___delete']['requestBody']['content']['application/json']>;
+type NotesFavoritesCreateRequest = ContractRequest<'notes/favorites/create'>;
 
 // @public (undocumented)
-type NotesFeaturedRequest = ContractRequest<'notes/featured', operations['notes___featured']['requestBody']['content']['application/json']>;
+type NotesFavoritesDeleteRequest = ContractRequest<'notes/favorites/delete'>;
 
 // @public (undocumented)
-type NotesFeaturedResponse = ContractResponse<'notes/featured', operations['notes___featured']['responses']['200']['content']['application/json']>;
+type NotesFeaturedRequest = ContractRequest<'notes/featured'>;
 
 // @public (undocumented)
-type NotesGlobalTimelineRequest = ContractRequest<'notes/global-timeline', operations['notes___global-timeline']['requestBody']['content']['application/json']>;
+type NotesFeaturedResponse = ContractResponse<'notes/featured'>;
 
 // @public (undocumented)
-type NotesGlobalTimelineResponse = ContractResponse<'notes/global-timeline', operations['notes___global-timeline']['responses']['200']['content']['application/json']>;
+type NotesGlobalTimelineRequest = ContractRequest<'notes/global-timeline'>;
 
 // @public (undocumented)
-type NotesHybridTimelineRequest = ContractRequest<'notes/hybrid-timeline', operations['notes___hybrid-timeline']['requestBody']['content']['application/json']>;
+type NotesGlobalTimelineResponse = ContractResponse<'notes/global-timeline'>;
 
 // @public (undocumented)
-type NotesHybridTimelineResponse = ContractResponse<'notes/hybrid-timeline', operations['notes___hybrid-timeline']['responses']['200']['content']['application/json']>;
+type NotesHybridTimelineRequest = ContractRequest<'notes/hybrid-timeline'>;
 
 // @public (undocumented)
-type NotesLocalTimelineRequest = ContractRequest<'notes/local-timeline', operations['notes___local-timeline']['requestBody']['content']['application/json']>;
+type NotesHybridTimelineResponse = ContractResponse<'notes/hybrid-timeline'>;
 
 // @public (undocumented)
-type NotesLocalTimelineResponse = ContractResponse<'notes/local-timeline', operations['notes___local-timeline']['responses']['200']['content']['application/json']>;
+type NotesLocalTimelineRequest = ContractRequest<'notes/local-timeline'>;
 
 // @public (undocumented)
-type NotesMentionsRequest = ContractRequest<'notes/mentions', operations['notes___mentions']['requestBody']['content']['application/json']>;
+type NotesLocalTimelineResponse = ContractResponse<'notes/local-timeline'>;
 
 // @public (undocumented)
-type NotesMentionsResponse = ContractResponse<'notes/mentions', operations['notes___mentions']['responses']['200']['content']['application/json']>;
+type NotesMentionsRequest = ContractRequest<'notes/mentions'>;
 
 // @public (undocumented)
-type NotesPollsRecommendationRequest = ContractRequest<'notes/polls/recommendation', operations['notes___polls___recommendation']['requestBody']['content']['application/json']>;
+type NotesMentionsResponse = ContractResponse<'notes/mentions'>;
 
 // @public (undocumented)
-type NotesPollsRecommendationResponse = ContractResponse<'notes/polls/recommendation', operations['notes___polls___recommendation']['responses']['200']['content']['application/json']>;
+type NotesPollsRecommendationRequest = ContractRequest<'notes/polls/recommendation'>;
 
 // @public (undocumented)
-type NotesPollsVoteRequest = ContractRequest<'notes/polls/vote', operations['notes___polls___vote']['requestBody']['content']['application/json']>;
+type NotesPollsRecommendationResponse = ContractResponse<'notes/polls/recommendation'>;
 
 // @public (undocumented)
-type NotesReactionsCreateRequest = ContractRequest<'notes/reactions/create', operations['notes___reactions___create']['requestBody']['content']['application/json']>;
+type NotesPollsVoteRequest = ContractRequest<'notes/polls/vote'>;
 
 // @public (undocumented)
-type NotesReactionsDeleteRequest = ContractRequest<'notes/reactions/delete', operations['notes___reactions___delete']['requestBody']['content']['application/json']>;
+type NotesReactionsCreateRequest = ContractRequest<'notes/reactions/create'>;
 
 // @public (undocumented)
-type NotesReactionsRequest = ContractRequest<'notes/reactions', operations['notes___reactions']['requestBody']['content']['application/json']>;
+type NotesReactionsDeleteRequest = ContractRequest<'notes/reactions/delete'>;
 
 // @public (undocumented)
-type NotesReactionsResponse = ContractResponse<'notes/reactions', operations['notes___reactions']['responses']['200']['content']['application/json']>;
+type NotesReactionsRequest = ContractRequest<'notes/reactions'>;
 
 // @public (undocumented)
-type NotesRenotesRequest = ContractRequest<'notes/renotes', operations['notes___renotes']['requestBody']['content']['application/json']>;
+type NotesReactionsResponse = ContractResponse<'notes/reactions'>;
 
 // @public (undocumented)
-type NotesRenotesResponse = ContractResponse<'notes/renotes', operations['notes___renotes']['responses']['200']['content']['application/json']>;
+type NotesRenotesRequest = ContractRequest<'notes/renotes'>;
 
 // @public (undocumented)
-type NotesRepliesRequest = ContractRequest<'notes/replies', operations['notes___replies']['requestBody']['content']['application/json']>;
+type NotesRenotesResponse = ContractResponse<'notes/renotes'>;
 
 // @public (undocumented)
-type NotesRepliesResponse = ContractResponse<'notes/replies', operations['notes___replies']['responses']['200']['content']['application/json']>;
+type NotesRepliesRequest = ContractRequest<'notes/replies'>;
 
 // @public (undocumented)
-type NotesRequest = ContractRequest<'notes', operations['notes']['requestBody']['content']['application/json']>;
+type NotesRepliesResponse = ContractResponse<'notes/replies'>;
 
 // @public (undocumented)
-type NotesResponse = ContractResponse<'notes', operations['notes']['responses']['200']['content']['application/json']>;
+type NotesRequest = ContractRequest<'notes'>;
 
 // @public (undocumented)
-type NotesSearchByTagRequest = ContractRequest<'notes/search-by-tag', operations['notes___search-by-tag']['requestBody']['content']['application/json']>;
+type NotesResponse = ContractResponse<'notes'>;
 
 // @public (undocumented)
-type NotesSearchByTagResponse = ContractResponse<'notes/search-by-tag', operations['notes___search-by-tag']['responses']['200']['content']['application/json']>;
+type NotesSearchByTagRequest = ContractRequest<'notes/search-by-tag'>;
 
 // @public (undocumented)
-type NotesSearchRequest = ContractRequest<'notes/search', operations['notes___search']['requestBody']['content']['application/json']>;
+type NotesSearchByTagResponse = ContractResponse<'notes/search-by-tag'>;
 
 // @public (undocumented)
-type NotesSearchResponse = ContractResponse<'notes/search', operations['notes___search']['responses']['200']['content']['application/json']>;
+type NotesSearchRequest = ContractRequest<'notes/search'>;
 
 // @public (undocumented)
-type NotesShowPartialBulkRequest = ContractRequest<'notes/show-partial-bulk', operations['notes___show-partial-bulk']['requestBody']['content']['application/json']>;
+type NotesSearchResponse = ContractResponse<'notes/search'>;
 
 // @public (undocumented)
-type NotesShowPartialBulkResponse = ContractResponse<'notes/show-partial-bulk', operations['notes___show-partial-bulk']['responses']['200']['content']['application/json']>;
+type NotesShowPartialBulkRequest = ContractRequest<'notes/show-partial-bulk'>;
 
 // @public (undocumented)
-type NotesShowRequest = ContractRequest<'notes/show', operations['notes___show']['requestBody']['content']['application/json']>;
+type NotesShowPartialBulkResponse = ContractResponse<'notes/show-partial-bulk'>;
 
 // @public (undocumented)
-type NotesShowResponse = ContractResponse<'notes/show', operations['notes___show']['responses']['200']['content']['application/json']>;
+type NotesShowRequest = ContractRequest<'notes/show'>;
 
 // @public (undocumented)
-type NotesStateRequest = ContractRequest<'notes/state', operations['notes___state']['requestBody']['content']['application/json']>;
+type NotesShowResponse = ContractResponse<'notes/show'>;
 
 // @public (undocumented)
-type NotesStateResponse = ContractResponse<'notes/state', operations['notes___state']['responses']['200']['content']['application/json']>;
+type NotesStateRequest = ContractRequest<'notes/state'>;
 
 // @public (undocumented)
-type NotesThreadMutingCreateRequest = ContractRequest<'notes/thread-muting/create', operations['notes___thread-muting___create']['requestBody']['content']['application/json']>;
+type NotesStateResponse = ContractResponse<'notes/state'>;
 
 // @public (undocumented)
-type NotesThreadMutingDeleteRequest = ContractRequest<'notes/thread-muting/delete', operations['notes___thread-muting___delete']['requestBody']['content']['application/json']>;
+type NotesThreadMutingCreateRequest = ContractRequest<'notes/thread-muting/create'>;
 
 // @public (undocumented)
-type NotesTimelineRequest = ContractRequest<'notes/timeline', operations['notes___timeline']['requestBody']['content']['application/json']>;
+type NotesThreadMutingDeleteRequest = ContractRequest<'notes/thread-muting/delete'>;
 
 // @public (undocumented)
-type NotesTimelineResponse = ContractResponse<'notes/timeline', operations['notes___timeline']['responses']['200']['content']['application/json']>;
+type NotesTimelineRequest = ContractRequest<'notes/timeline'>;
 
 // @public (undocumented)
-type NotesTranslateRequest = ContractRequest<'notes/translate', operations['notes___translate']['requestBody']['content']['application/json']>;
+type NotesTimelineResponse = ContractResponse<'notes/timeline'>;
 
 // @public (undocumented)
-type NotesTranslateResponse = ContractResponse<'notes/translate', operations['notes___translate']['responses']['200']['content']['application/json']>;
+type NotesTranslateRequest = ContractRequest<'notes/translate'>;
 
 // @public (undocumented)
-type NotesUnrenoteRequest = ContractRequest<'notes/unrenote', operations['notes___unrenote']['requestBody']['content']['application/json']>;
+type NotesTranslateResponse = ContractResponse<'notes/translate'>;
 
 // @public (undocumented)
-type NotesUserListTimelineRequest = ContractRequest<'notes/user-list-timeline', operations['notes___user-list-timeline']['requestBody']['content']['application/json']>;
+type NotesUnrenoteRequest = ContractRequest<'notes/unrenote'>;
 
 // @public (undocumented)
-type NotesUserListTimelineResponse = ContractResponse<'notes/user-list-timeline', operations['notes___user-list-timeline']['responses']['200']['content']['application/json']>;
+type NotesUserListTimelineRequest = ContractRequest<'notes/user-list-timeline'>;
+
+// @public (undocumented)
+type NotesUserListTimelineResponse = ContractResponse<'notes/user-list-timeline'>;
 
 // @public (undocumented)
 export const noteVisibilities: readonly ["public", "home", "followers", "specified"];
@@ -3149,13 +4407,3133 @@ export const noteVisibilities: readonly ["public", "home", "followers", "specifi
 type Notification_2 = ContractModel<'Notification'>;
 
 // @public (undocumented)
-type NotificationsCreateRequest = ContractRequest<'notifications/create', operations['notifications___create']['requestBody']['content']['application/json']>;
+type NotificationsCreateRequest = ContractRequest<'notifications/create'>;
+
+// @public (undocumented)
+type NotificationsFlushRequest = ContractRequest<'notifications/flush'>;
+
+// @public (undocumented)
+type NotificationsMarkAllAsReadRequest = ContractRequest<'notifications/mark-all-as-read'>;
+
+// @public (undocumented)
+type NotificationsTestNotificationRequest = ContractRequest<'notifications/test-notification'>;
 
 // @public (undocumented)
 export const notificationTypes: readonly ["note", "follow", "mention", "reply", "renote", "quote", "reaction", "pollEnded", "scheduledNotePosted", "scheduledNotePostFailed", "receiveFollowRequest", "followRequestAccepted", "app", "roleAssigned", "chatRoomInvitationReceived", "achievementEarned", "exportCompleted", "test", "login", "createToken"];
 
 // @public (undocumented)
 export function nyaize(text: string): string;
+
+// @public (undocumented)
+type OrpcDefinition1 = ContractModel<'OrpcDefinition1'>;
+
+// @public (undocumented)
+type OrpcDefinition10 = ContractModel<'OrpcDefinition10'>;
+
+// @public (undocumented)
+type OrpcDefinition100 = ContractModel<'OrpcDefinition100'>;
+
+// @public (undocumented)
+type OrpcDefinition1000 = ContractModel<'OrpcDefinition1000'>;
+
+// @public (undocumented)
+type OrpcDefinition1001 = ContractModel<'OrpcDefinition1001'>;
+
+// @public (undocumented)
+type OrpcDefinition1002 = ContractModel<'OrpcDefinition1002'>;
+
+// @public (undocumented)
+type OrpcDefinition1003 = ContractModel<'OrpcDefinition1003'>;
+
+// @public (undocumented)
+type OrpcDefinition1004 = ContractModel<'OrpcDefinition1004'>;
+
+// @public (undocumented)
+type OrpcDefinition1005 = ContractModel<'OrpcDefinition1005'>;
+
+// @public (undocumented)
+type OrpcDefinition1006 = ContractModel<'OrpcDefinition1006'>;
+
+// @public (undocumented)
+type OrpcDefinition1007 = ContractModel<'OrpcDefinition1007'>;
+
+// @public (undocumented)
+type OrpcDefinition1008 = ContractModel<'OrpcDefinition1008'>;
+
+// @public (undocumented)
+type OrpcDefinition1009 = ContractModel<'OrpcDefinition1009'>;
+
+// @public (undocumented)
+type OrpcDefinition101 = ContractModel<'OrpcDefinition101'>;
+
+// @public (undocumented)
+type OrpcDefinition1010 = ContractModel<'OrpcDefinition1010'>;
+
+// @public (undocumented)
+type OrpcDefinition1011 = ContractModel<'OrpcDefinition1011'>;
+
+// @public (undocumented)
+type OrpcDefinition1012 = ContractModel<'OrpcDefinition1012'>;
+
+// @public (undocumented)
+type OrpcDefinition1013 = ContractModel<'OrpcDefinition1013'>;
+
+// @public (undocumented)
+type OrpcDefinition1014 = ContractModel<'OrpcDefinition1014'>;
+
+// @public (undocumented)
+type OrpcDefinition1015 = ContractModel<'OrpcDefinition1015'>;
+
+// @public (undocumented)
+type OrpcDefinition1016 = ContractModel<'OrpcDefinition1016'>;
+
+// @public (undocumented)
+type OrpcDefinition1017 = ContractModel<'OrpcDefinition1017'>;
+
+// @public (undocumented)
+type OrpcDefinition1018 = ContractModel<'OrpcDefinition1018'>;
+
+// @public (undocumented)
+type OrpcDefinition1019 = ContractModel<'OrpcDefinition1019'>;
+
+// @public (undocumented)
+type OrpcDefinition102 = ContractModel<'OrpcDefinition102'>;
+
+// @public (undocumented)
+type OrpcDefinition1020 = ContractModel<'OrpcDefinition1020'>;
+
+// @public (undocumented)
+type OrpcDefinition1021 = ContractModel<'OrpcDefinition1021'>;
+
+// @public (undocumented)
+type OrpcDefinition1022 = ContractModel<'OrpcDefinition1022'>;
+
+// @public (undocumented)
+type OrpcDefinition1023 = ContractModel<'OrpcDefinition1023'>;
+
+// @public (undocumented)
+type OrpcDefinition1024 = ContractModel<'OrpcDefinition1024'>;
+
+// @public (undocumented)
+type OrpcDefinition1025 = ContractModel<'OrpcDefinition1025'>;
+
+// @public (undocumented)
+type OrpcDefinition1026 = ContractModel<'OrpcDefinition1026'>;
+
+// @public (undocumented)
+type OrpcDefinition1027 = ContractModel<'OrpcDefinition1027'>;
+
+// @public (undocumented)
+type OrpcDefinition1028 = ContractModel<'OrpcDefinition1028'>;
+
+// @public (undocumented)
+type OrpcDefinition1029 = ContractModel<'OrpcDefinition1029'>;
+
+// @public (undocumented)
+type OrpcDefinition103 = ContractModel<'OrpcDefinition103'>;
+
+// @public (undocumented)
+type OrpcDefinition1030 = ContractModel<'OrpcDefinition1030'>;
+
+// @public (undocumented)
+type OrpcDefinition1031 = ContractModel<'OrpcDefinition1031'>;
+
+// @public (undocumented)
+type OrpcDefinition1032 = ContractModel<'OrpcDefinition1032'>;
+
+// @public (undocumented)
+type OrpcDefinition1033 = ContractModel<'OrpcDefinition1033'>;
+
+// @public (undocumented)
+type OrpcDefinition1034 = ContractModel<'OrpcDefinition1034'>;
+
+// @public (undocumented)
+type OrpcDefinition1035 = ContractModel<'OrpcDefinition1035'>;
+
+// @public (undocumented)
+type OrpcDefinition1036 = ContractModel<'OrpcDefinition1036'>;
+
+// @public (undocumented)
+type OrpcDefinition1037 = ContractModel<'OrpcDefinition1037'>;
+
+// @public (undocumented)
+type OrpcDefinition104 = ContractModel<'OrpcDefinition104'>;
+
+// @public (undocumented)
+type OrpcDefinition105 = ContractModel<'OrpcDefinition105'>;
+
+// @public (undocumented)
+type OrpcDefinition106 = ContractModel<'OrpcDefinition106'>;
+
+// @public (undocumented)
+type OrpcDefinition107 = ContractModel<'OrpcDefinition107'>;
+
+// @public (undocumented)
+type OrpcDefinition108 = ContractModel<'OrpcDefinition108'>;
+
+// @public (undocumented)
+type OrpcDefinition109 = ContractModel<'OrpcDefinition109'>;
+
+// @public (undocumented)
+type OrpcDefinition11 = ContractModel<'OrpcDefinition11'>;
+
+// @public (undocumented)
+type OrpcDefinition110 = ContractModel<'OrpcDefinition110'>;
+
+// @public (undocumented)
+type OrpcDefinition111 = ContractModel<'OrpcDefinition111'>;
+
+// @public (undocumented)
+type OrpcDefinition112 = ContractModel<'OrpcDefinition112'>;
+
+// @public (undocumented)
+type OrpcDefinition113 = ContractModel<'OrpcDefinition113'>;
+
+// @public (undocumented)
+type OrpcDefinition114 = ContractModel<'OrpcDefinition114'>;
+
+// @public (undocumented)
+type OrpcDefinition115 = ContractModel<'OrpcDefinition115'>;
+
+// @public (undocumented)
+type OrpcDefinition116 = ContractModel<'OrpcDefinition116'>;
+
+// @public (undocumented)
+type OrpcDefinition117 = ContractModel<'OrpcDefinition117'>;
+
+// @public (undocumented)
+type OrpcDefinition118 = ContractModel<'OrpcDefinition118'>;
+
+// @public (undocumented)
+type OrpcDefinition119 = ContractModel<'OrpcDefinition119'>;
+
+// @public (undocumented)
+type OrpcDefinition12 = ContractModel<'OrpcDefinition12'>;
+
+// @public (undocumented)
+type OrpcDefinition120 = ContractModel<'OrpcDefinition120'>;
+
+// @public (undocumented)
+type OrpcDefinition121 = ContractModel<'OrpcDefinition121'>;
+
+// @public (undocumented)
+type OrpcDefinition122 = ContractModel<'OrpcDefinition122'>;
+
+// @public (undocumented)
+type OrpcDefinition123 = ContractModel<'OrpcDefinition123'>;
+
+// @public (undocumented)
+type OrpcDefinition124 = ContractModel<'OrpcDefinition124'>;
+
+// @public (undocumented)
+type OrpcDefinition125 = ContractModel<'OrpcDefinition125'>;
+
+// @public (undocumented)
+type OrpcDefinition126 = ContractModel<'OrpcDefinition126'>;
+
+// @public (undocumented)
+type OrpcDefinition127 = ContractModel<'OrpcDefinition127'>;
+
+// @public (undocumented)
+type OrpcDefinition128 = ContractModel<'OrpcDefinition128'>;
+
+// @public (undocumented)
+type OrpcDefinition129 = ContractModel<'OrpcDefinition129'>;
+
+// @public (undocumented)
+type OrpcDefinition13 = ContractModel<'OrpcDefinition13'>;
+
+// @public (undocumented)
+type OrpcDefinition130 = ContractModel<'OrpcDefinition130'>;
+
+// @public (undocumented)
+type OrpcDefinition131 = ContractModel<'OrpcDefinition131'>;
+
+// @public (undocumented)
+type OrpcDefinition132 = ContractModel<'OrpcDefinition132'>;
+
+// @public (undocumented)
+type OrpcDefinition133 = ContractModel<'OrpcDefinition133'>;
+
+// @public (undocumented)
+type OrpcDefinition134 = ContractModel<'OrpcDefinition134'>;
+
+// @public (undocumented)
+type OrpcDefinition135 = ContractModel<'OrpcDefinition135'>;
+
+// @public (undocumented)
+type OrpcDefinition136 = ContractModel<'OrpcDefinition136'>;
+
+// @public (undocumented)
+type OrpcDefinition137 = ContractModel<'OrpcDefinition137'>;
+
+// @public (undocumented)
+type OrpcDefinition138 = ContractModel<'OrpcDefinition138'>;
+
+// @public (undocumented)
+type OrpcDefinition139 = ContractModel<'OrpcDefinition139'>;
+
+// @public (undocumented)
+type OrpcDefinition14 = ContractModel<'OrpcDefinition14'>;
+
+// @public (undocumented)
+type OrpcDefinition140 = ContractModel<'OrpcDefinition140'>;
+
+// @public (undocumented)
+type OrpcDefinition141 = ContractModel<'OrpcDefinition141'>;
+
+// @public (undocumented)
+type OrpcDefinition142 = ContractModel<'OrpcDefinition142'>;
+
+// @public (undocumented)
+type OrpcDefinition143 = ContractModel<'OrpcDefinition143'>;
+
+// @public (undocumented)
+type OrpcDefinition144 = ContractModel<'OrpcDefinition144'>;
+
+// @public (undocumented)
+type OrpcDefinition145 = ContractModel<'OrpcDefinition145'>;
+
+// @public (undocumented)
+type OrpcDefinition146 = ContractModel<'OrpcDefinition146'>;
+
+// @public (undocumented)
+type OrpcDefinition147 = ContractModel<'OrpcDefinition147'>;
+
+// @public (undocumented)
+type OrpcDefinition148 = ContractModel<'OrpcDefinition148'>;
+
+// @public (undocumented)
+type OrpcDefinition149 = ContractModel<'OrpcDefinition149'>;
+
+// @public (undocumented)
+type OrpcDefinition15 = ContractModel<'OrpcDefinition15'>;
+
+// @public (undocumented)
+type OrpcDefinition150 = ContractModel<'OrpcDefinition150'>;
+
+// @public (undocumented)
+type OrpcDefinition151 = ContractModel<'OrpcDefinition151'>;
+
+// @public (undocumented)
+type OrpcDefinition152 = ContractModel<'OrpcDefinition152'>;
+
+// @public (undocumented)
+type OrpcDefinition153 = ContractModel<'OrpcDefinition153'>;
+
+// @public (undocumented)
+type OrpcDefinition154 = ContractModel<'OrpcDefinition154'>;
+
+// @public (undocumented)
+type OrpcDefinition155 = ContractModel<'OrpcDefinition155'>;
+
+// @public (undocumented)
+type OrpcDefinition156 = ContractModel<'OrpcDefinition156'>;
+
+// @public (undocumented)
+type OrpcDefinition157 = ContractModel<'OrpcDefinition157'>;
+
+// @public (undocumented)
+type OrpcDefinition158 = ContractModel<'OrpcDefinition158'>;
+
+// @public (undocumented)
+type OrpcDefinition159 = ContractModel<'OrpcDefinition159'>;
+
+// @public (undocumented)
+type OrpcDefinition16 = ContractModel<'OrpcDefinition16'>;
+
+// @public (undocumented)
+type OrpcDefinition160 = ContractModel<'OrpcDefinition160'>;
+
+// @public (undocumented)
+type OrpcDefinition161 = ContractModel<'OrpcDefinition161'>;
+
+// @public (undocumented)
+type OrpcDefinition162 = ContractModel<'OrpcDefinition162'>;
+
+// @public (undocumented)
+type OrpcDefinition163 = ContractModel<'OrpcDefinition163'>;
+
+// @public (undocumented)
+type OrpcDefinition164 = ContractModel<'OrpcDefinition164'>;
+
+// @public (undocumented)
+type OrpcDefinition165 = ContractModel<'OrpcDefinition165'>;
+
+// @public (undocumented)
+type OrpcDefinition166 = ContractModel<'OrpcDefinition166'>;
+
+// @public (undocumented)
+type OrpcDefinition167 = ContractModel<'OrpcDefinition167'>;
+
+// @public (undocumented)
+type OrpcDefinition168 = ContractModel<'OrpcDefinition168'>;
+
+// @public (undocumented)
+type OrpcDefinition169 = ContractModel<'OrpcDefinition169'>;
+
+// @public (undocumented)
+type OrpcDefinition17 = ContractModel<'OrpcDefinition17'>;
+
+// @public (undocumented)
+type OrpcDefinition170 = ContractModel<'OrpcDefinition170'>;
+
+// @public (undocumented)
+type OrpcDefinition171 = ContractModel<'OrpcDefinition171'>;
+
+// @public (undocumented)
+type OrpcDefinition172 = ContractModel<'OrpcDefinition172'>;
+
+// @public (undocumented)
+type OrpcDefinition173 = ContractModel<'OrpcDefinition173'>;
+
+// @public (undocumented)
+type OrpcDefinition174 = ContractModel<'OrpcDefinition174'>;
+
+// @public (undocumented)
+type OrpcDefinition175 = ContractModel<'OrpcDefinition175'>;
+
+// @public (undocumented)
+type OrpcDefinition176 = ContractModel<'OrpcDefinition176'>;
+
+// @public (undocumented)
+type OrpcDefinition177 = ContractModel<'OrpcDefinition177'>;
+
+// @public (undocumented)
+type OrpcDefinition178 = ContractModel<'OrpcDefinition178'>;
+
+// @public (undocumented)
+type OrpcDefinition179 = ContractModel<'OrpcDefinition179'>;
+
+// @public (undocumented)
+type OrpcDefinition18 = ContractModel<'OrpcDefinition18'>;
+
+// @public (undocumented)
+type OrpcDefinition180 = ContractModel<'OrpcDefinition180'>;
+
+// @public (undocumented)
+type OrpcDefinition181 = ContractModel<'OrpcDefinition181'>;
+
+// @public (undocumented)
+type OrpcDefinition182 = ContractModel<'OrpcDefinition182'>;
+
+// @public (undocumented)
+type OrpcDefinition183 = ContractModel<'OrpcDefinition183'>;
+
+// @public (undocumented)
+type OrpcDefinition184 = ContractModel<'OrpcDefinition184'>;
+
+// @public (undocumented)
+type OrpcDefinition185 = ContractModel<'OrpcDefinition185'>;
+
+// @public (undocumented)
+type OrpcDefinition186 = ContractModel<'OrpcDefinition186'>;
+
+// @public (undocumented)
+type OrpcDefinition187 = ContractModel<'OrpcDefinition187'>;
+
+// @public (undocumented)
+type OrpcDefinition188 = ContractModel<'OrpcDefinition188'>;
+
+// @public (undocumented)
+type OrpcDefinition189 = ContractModel<'OrpcDefinition189'>;
+
+// @public (undocumented)
+type OrpcDefinition19 = ContractModel<'OrpcDefinition19'>;
+
+// @public (undocumented)
+type OrpcDefinition190 = ContractModel<'OrpcDefinition190'>;
+
+// @public (undocumented)
+type OrpcDefinition191 = ContractModel<'OrpcDefinition191'>;
+
+// @public (undocumented)
+type OrpcDefinition192 = ContractModel<'OrpcDefinition192'>;
+
+// @public (undocumented)
+type OrpcDefinition193 = ContractModel<'OrpcDefinition193'>;
+
+// @public (undocumented)
+type OrpcDefinition194 = ContractModel<'OrpcDefinition194'>;
+
+// @public (undocumented)
+type OrpcDefinition195 = ContractModel<'OrpcDefinition195'>;
+
+// @public (undocumented)
+type OrpcDefinition196 = ContractModel<'OrpcDefinition196'>;
+
+// @public (undocumented)
+type OrpcDefinition197 = ContractModel<'OrpcDefinition197'>;
+
+// @public (undocumented)
+type OrpcDefinition198 = ContractModel<'OrpcDefinition198'>;
+
+// @public (undocumented)
+type OrpcDefinition199 = ContractModel<'OrpcDefinition199'>;
+
+// @public (undocumented)
+type OrpcDefinition2 = ContractModel<'OrpcDefinition2'>;
+
+// @public (undocumented)
+type OrpcDefinition20 = ContractModel<'OrpcDefinition20'>;
+
+// @public (undocumented)
+type OrpcDefinition200 = ContractModel<'OrpcDefinition200'>;
+
+// @public (undocumented)
+type OrpcDefinition201 = ContractModel<'OrpcDefinition201'>;
+
+// @public (undocumented)
+type OrpcDefinition202 = ContractModel<'OrpcDefinition202'>;
+
+// @public (undocumented)
+type OrpcDefinition203 = ContractModel<'OrpcDefinition203'>;
+
+// @public (undocumented)
+type OrpcDefinition204 = ContractModel<'OrpcDefinition204'>;
+
+// @public (undocumented)
+type OrpcDefinition205 = ContractModel<'OrpcDefinition205'>;
+
+// @public (undocumented)
+type OrpcDefinition206 = ContractModel<'OrpcDefinition206'>;
+
+// @public (undocumented)
+type OrpcDefinition207 = ContractModel<'OrpcDefinition207'>;
+
+// @public (undocumented)
+type OrpcDefinition208 = ContractModel<'OrpcDefinition208'>;
+
+// @public (undocumented)
+type OrpcDefinition209 = ContractModel<'OrpcDefinition209'>;
+
+// @public (undocumented)
+type OrpcDefinition21 = ContractModel<'OrpcDefinition21'>;
+
+// @public (undocumented)
+type OrpcDefinition210 = ContractModel<'OrpcDefinition210'>;
+
+// @public (undocumented)
+type OrpcDefinition211 = ContractModel<'OrpcDefinition211'>;
+
+// @public (undocumented)
+type OrpcDefinition212 = ContractModel<'OrpcDefinition212'>;
+
+// @public (undocumented)
+type OrpcDefinition213 = ContractModel<'OrpcDefinition213'>;
+
+// @public (undocumented)
+type OrpcDefinition214 = ContractModel<'OrpcDefinition214'>;
+
+// @public (undocumented)
+type OrpcDefinition215 = ContractModel<'OrpcDefinition215'>;
+
+// @public (undocumented)
+type OrpcDefinition216 = ContractModel<'OrpcDefinition216'>;
+
+// @public (undocumented)
+type OrpcDefinition217 = ContractModel<'OrpcDefinition217'>;
+
+// @public (undocumented)
+type OrpcDefinition218 = ContractModel<'OrpcDefinition218'>;
+
+// @public (undocumented)
+type OrpcDefinition219 = ContractModel<'OrpcDefinition219'>;
+
+// @public (undocumented)
+type OrpcDefinition22 = ContractModel<'OrpcDefinition22'>;
+
+// @public (undocumented)
+type OrpcDefinition220 = ContractModel<'OrpcDefinition220'>;
+
+// @public (undocumented)
+type OrpcDefinition221 = ContractModel<'OrpcDefinition221'>;
+
+// @public (undocumented)
+type OrpcDefinition222 = ContractModel<'OrpcDefinition222'>;
+
+// @public (undocumented)
+type OrpcDefinition223 = ContractModel<'OrpcDefinition223'>;
+
+// @public (undocumented)
+type OrpcDefinition224 = ContractModel<'OrpcDefinition224'>;
+
+// @public (undocumented)
+type OrpcDefinition225 = ContractModel<'OrpcDefinition225'>;
+
+// @public (undocumented)
+type OrpcDefinition226 = ContractModel<'OrpcDefinition226'>;
+
+// @public (undocumented)
+type OrpcDefinition227 = ContractModel<'OrpcDefinition227'>;
+
+// @public (undocumented)
+type OrpcDefinition228 = ContractModel<'OrpcDefinition228'>;
+
+// @public (undocumented)
+type OrpcDefinition229 = ContractModel<'OrpcDefinition229'>;
+
+// @public (undocumented)
+type OrpcDefinition23 = ContractModel<'OrpcDefinition23'>;
+
+// @public (undocumented)
+type OrpcDefinition230 = ContractModel<'OrpcDefinition230'>;
+
+// @public (undocumented)
+type OrpcDefinition231 = ContractModel<'OrpcDefinition231'>;
+
+// @public (undocumented)
+type OrpcDefinition232 = ContractModel<'OrpcDefinition232'>;
+
+// @public (undocumented)
+type OrpcDefinition233 = ContractModel<'OrpcDefinition233'>;
+
+// @public (undocumented)
+type OrpcDefinition234 = ContractModel<'OrpcDefinition234'>;
+
+// @public (undocumented)
+type OrpcDefinition235 = ContractModel<'OrpcDefinition235'>;
+
+// @public (undocumented)
+type OrpcDefinition236 = ContractModel<'OrpcDefinition236'>;
+
+// @public (undocumented)
+type OrpcDefinition237 = ContractModel<'OrpcDefinition237'>;
+
+// @public (undocumented)
+type OrpcDefinition238 = ContractModel<'OrpcDefinition238'>;
+
+// @public (undocumented)
+type OrpcDefinition239 = ContractModel<'OrpcDefinition239'>;
+
+// @public (undocumented)
+type OrpcDefinition24 = ContractModel<'OrpcDefinition24'>;
+
+// @public (undocumented)
+type OrpcDefinition240 = ContractModel<'OrpcDefinition240'>;
+
+// @public (undocumented)
+type OrpcDefinition241 = ContractModel<'OrpcDefinition241'>;
+
+// @public (undocumented)
+type OrpcDefinition242 = ContractModel<'OrpcDefinition242'>;
+
+// @public (undocumented)
+type OrpcDefinition243 = ContractModel<'OrpcDefinition243'>;
+
+// @public (undocumented)
+type OrpcDefinition244 = ContractModel<'OrpcDefinition244'>;
+
+// @public (undocumented)
+type OrpcDefinition245 = ContractModel<'OrpcDefinition245'>;
+
+// @public (undocumented)
+type OrpcDefinition246 = ContractModel<'OrpcDefinition246'>;
+
+// @public (undocumented)
+type OrpcDefinition247 = ContractModel<'OrpcDefinition247'>;
+
+// @public (undocumented)
+type OrpcDefinition248 = ContractModel<'OrpcDefinition248'>;
+
+// @public (undocumented)
+type OrpcDefinition249 = ContractModel<'OrpcDefinition249'>;
+
+// @public (undocumented)
+type OrpcDefinition25 = ContractModel<'OrpcDefinition25'>;
+
+// @public (undocumented)
+type OrpcDefinition250 = ContractModel<'OrpcDefinition250'>;
+
+// @public (undocumented)
+type OrpcDefinition251 = ContractModel<'OrpcDefinition251'>;
+
+// @public (undocumented)
+type OrpcDefinition252 = ContractModel<'OrpcDefinition252'>;
+
+// @public (undocumented)
+type OrpcDefinition253 = ContractModel<'OrpcDefinition253'>;
+
+// @public (undocumented)
+type OrpcDefinition254 = ContractModel<'OrpcDefinition254'>;
+
+// @public (undocumented)
+type OrpcDefinition255 = ContractModel<'OrpcDefinition255'>;
+
+// @public (undocumented)
+type OrpcDefinition256 = ContractModel<'OrpcDefinition256'>;
+
+// @public (undocumented)
+type OrpcDefinition257 = ContractModel<'OrpcDefinition257'>;
+
+// @public (undocumented)
+type OrpcDefinition258 = ContractModel<'OrpcDefinition258'>;
+
+// @public (undocumented)
+type OrpcDefinition259 = ContractModel<'OrpcDefinition259'>;
+
+// @public (undocumented)
+type OrpcDefinition26 = ContractModel<'OrpcDefinition26'>;
+
+// @public (undocumented)
+type OrpcDefinition260 = ContractModel<'OrpcDefinition260'>;
+
+// @public (undocumented)
+type OrpcDefinition261 = ContractModel<'OrpcDefinition261'>;
+
+// @public (undocumented)
+type OrpcDefinition262 = ContractModel<'OrpcDefinition262'>;
+
+// @public (undocumented)
+type OrpcDefinition263 = ContractModel<'OrpcDefinition263'>;
+
+// @public (undocumented)
+type OrpcDefinition264 = ContractModel<'OrpcDefinition264'>;
+
+// @public (undocumented)
+type OrpcDefinition265 = ContractModel<'OrpcDefinition265'>;
+
+// @public (undocumented)
+type OrpcDefinition266 = ContractModel<'OrpcDefinition266'>;
+
+// @public (undocumented)
+type OrpcDefinition267 = ContractModel<'OrpcDefinition267'>;
+
+// @public (undocumented)
+type OrpcDefinition268 = ContractModel<'OrpcDefinition268'>;
+
+// @public (undocumented)
+type OrpcDefinition269 = ContractModel<'OrpcDefinition269'>;
+
+// @public (undocumented)
+type OrpcDefinition27 = ContractModel<'OrpcDefinition27'>;
+
+// @public (undocumented)
+type OrpcDefinition270 = ContractModel<'OrpcDefinition270'>;
+
+// @public (undocumented)
+type OrpcDefinition271 = ContractModel<'OrpcDefinition271'>;
+
+// @public (undocumented)
+type OrpcDefinition272 = ContractModel<'OrpcDefinition272'>;
+
+// @public (undocumented)
+type OrpcDefinition273 = ContractModel<'OrpcDefinition273'>;
+
+// @public (undocumented)
+type OrpcDefinition274 = ContractModel<'OrpcDefinition274'>;
+
+// @public (undocumented)
+type OrpcDefinition275 = ContractModel<'OrpcDefinition275'>;
+
+// @public (undocumented)
+type OrpcDefinition276 = ContractModel<'OrpcDefinition276'>;
+
+// @public (undocumented)
+type OrpcDefinition277 = ContractModel<'OrpcDefinition277'>;
+
+// @public (undocumented)
+type OrpcDefinition278 = ContractModel<'OrpcDefinition278'>;
+
+// @public (undocumented)
+type OrpcDefinition279 = ContractModel<'OrpcDefinition279'>;
+
+// @public (undocumented)
+type OrpcDefinition28 = ContractModel<'OrpcDefinition28'>;
+
+// @public (undocumented)
+type OrpcDefinition280 = ContractModel<'OrpcDefinition280'>;
+
+// @public (undocumented)
+type OrpcDefinition281 = ContractModel<'OrpcDefinition281'>;
+
+// @public (undocumented)
+type OrpcDefinition282 = ContractModel<'OrpcDefinition282'>;
+
+// @public (undocumented)
+type OrpcDefinition283 = ContractModel<'OrpcDefinition283'>;
+
+// @public (undocumented)
+type OrpcDefinition284 = ContractModel<'OrpcDefinition284'>;
+
+// @public (undocumented)
+type OrpcDefinition285 = ContractModel<'OrpcDefinition285'>;
+
+// @public (undocumented)
+type OrpcDefinition286 = ContractModel<'OrpcDefinition286'>;
+
+// @public (undocumented)
+type OrpcDefinition287 = ContractModel<'OrpcDefinition287'>;
+
+// @public (undocumented)
+type OrpcDefinition288 = ContractModel<'OrpcDefinition288'>;
+
+// @public (undocumented)
+type OrpcDefinition289 = ContractModel<'OrpcDefinition289'>;
+
+// @public (undocumented)
+type OrpcDefinition29 = ContractModel<'OrpcDefinition29'>;
+
+// @public (undocumented)
+type OrpcDefinition290 = ContractModel<'OrpcDefinition290'>;
+
+// @public (undocumented)
+type OrpcDefinition291 = ContractModel<'OrpcDefinition291'>;
+
+// @public (undocumented)
+type OrpcDefinition292 = ContractModel<'OrpcDefinition292'>;
+
+// @public (undocumented)
+type OrpcDefinition293 = ContractModel<'OrpcDefinition293'>;
+
+// @public (undocumented)
+type OrpcDefinition294 = ContractModel<'OrpcDefinition294'>;
+
+// @public (undocumented)
+type OrpcDefinition295 = ContractModel<'OrpcDefinition295'>;
+
+// @public (undocumented)
+type OrpcDefinition296 = ContractModel<'OrpcDefinition296'>;
+
+// @public (undocumented)
+type OrpcDefinition297 = ContractModel<'OrpcDefinition297'>;
+
+// @public (undocumented)
+type OrpcDefinition298 = ContractModel<'OrpcDefinition298'>;
+
+// @public (undocumented)
+type OrpcDefinition299 = ContractModel<'OrpcDefinition299'>;
+
+// @public (undocumented)
+type OrpcDefinition3 = ContractModel<'OrpcDefinition3'>;
+
+// @public (undocumented)
+type OrpcDefinition30 = ContractModel<'OrpcDefinition30'>;
+
+// @public (undocumented)
+type OrpcDefinition300 = ContractModel<'OrpcDefinition300'>;
+
+// @public (undocumented)
+type OrpcDefinition301 = ContractModel<'OrpcDefinition301'>;
+
+// @public (undocumented)
+type OrpcDefinition302 = ContractModel<'OrpcDefinition302'>;
+
+// @public (undocumented)
+type OrpcDefinition303 = ContractModel<'OrpcDefinition303'>;
+
+// @public (undocumented)
+type OrpcDefinition304 = ContractModel<'OrpcDefinition304'>;
+
+// @public (undocumented)
+type OrpcDefinition305 = ContractModel<'OrpcDefinition305'>;
+
+// @public (undocumented)
+type OrpcDefinition306 = ContractModel<'OrpcDefinition306'>;
+
+// @public (undocumented)
+type OrpcDefinition307 = ContractModel<'OrpcDefinition307'>;
+
+// @public (undocumented)
+type OrpcDefinition308 = ContractModel<'OrpcDefinition308'>;
+
+// @public (undocumented)
+type OrpcDefinition309 = ContractModel<'OrpcDefinition309'>;
+
+// @public (undocumented)
+type OrpcDefinition31 = ContractModel<'OrpcDefinition31'>;
+
+// @public (undocumented)
+type OrpcDefinition310 = ContractModel<'OrpcDefinition310'>;
+
+// @public (undocumented)
+type OrpcDefinition311 = ContractModel<'OrpcDefinition311'>;
+
+// @public (undocumented)
+type OrpcDefinition312 = ContractModel<'OrpcDefinition312'>;
+
+// @public (undocumented)
+type OrpcDefinition313 = ContractModel<'OrpcDefinition313'>;
+
+// @public (undocumented)
+type OrpcDefinition314 = ContractModel<'OrpcDefinition314'>;
+
+// @public (undocumented)
+type OrpcDefinition315 = ContractModel<'OrpcDefinition315'>;
+
+// @public (undocumented)
+type OrpcDefinition316 = ContractModel<'OrpcDefinition316'>;
+
+// @public (undocumented)
+type OrpcDefinition317 = ContractModel<'OrpcDefinition317'>;
+
+// @public (undocumented)
+type OrpcDefinition318 = ContractModel<'OrpcDefinition318'>;
+
+// @public (undocumented)
+type OrpcDefinition319 = ContractModel<'OrpcDefinition319'>;
+
+// @public (undocumented)
+type OrpcDefinition32 = ContractModel<'OrpcDefinition32'>;
+
+// @public (undocumented)
+type OrpcDefinition320 = ContractModel<'OrpcDefinition320'>;
+
+// @public (undocumented)
+type OrpcDefinition321 = ContractModel<'OrpcDefinition321'>;
+
+// @public (undocumented)
+type OrpcDefinition322 = ContractModel<'OrpcDefinition322'>;
+
+// @public (undocumented)
+type OrpcDefinition323 = ContractModel<'OrpcDefinition323'>;
+
+// @public (undocumented)
+type OrpcDefinition324 = ContractModel<'OrpcDefinition324'>;
+
+// @public (undocumented)
+type OrpcDefinition325 = ContractModel<'OrpcDefinition325'>;
+
+// @public (undocumented)
+type OrpcDefinition326 = ContractModel<'OrpcDefinition326'>;
+
+// @public (undocumented)
+type OrpcDefinition327 = ContractModel<'OrpcDefinition327'>;
+
+// @public (undocumented)
+type OrpcDefinition328 = ContractModel<'OrpcDefinition328'>;
+
+// @public (undocumented)
+type OrpcDefinition329 = ContractModel<'OrpcDefinition329'>;
+
+// @public (undocumented)
+type OrpcDefinition33 = ContractModel<'OrpcDefinition33'>;
+
+// @public (undocumented)
+type OrpcDefinition330 = ContractModel<'OrpcDefinition330'>;
+
+// @public (undocumented)
+type OrpcDefinition331 = ContractModel<'OrpcDefinition331'>;
+
+// @public (undocumented)
+type OrpcDefinition332 = ContractModel<'OrpcDefinition332'>;
+
+// @public (undocumented)
+type OrpcDefinition333 = ContractModel<'OrpcDefinition333'>;
+
+// @public (undocumented)
+type OrpcDefinition334 = ContractModel<'OrpcDefinition334'>;
+
+// @public (undocumented)
+type OrpcDefinition335 = ContractModel<'OrpcDefinition335'>;
+
+// @public (undocumented)
+type OrpcDefinition336 = ContractModel<'OrpcDefinition336'>;
+
+// @public (undocumented)
+type OrpcDefinition337 = ContractModel<'OrpcDefinition337'>;
+
+// @public (undocumented)
+type OrpcDefinition338 = ContractModel<'OrpcDefinition338'>;
+
+// @public (undocumented)
+type OrpcDefinition339 = ContractModel<'OrpcDefinition339'>;
+
+// @public (undocumented)
+type OrpcDefinition34 = ContractModel<'OrpcDefinition34'>;
+
+// @public (undocumented)
+type OrpcDefinition340 = ContractModel<'OrpcDefinition340'>;
+
+// @public (undocumented)
+type OrpcDefinition341 = ContractModel<'OrpcDefinition341'>;
+
+// @public (undocumented)
+type OrpcDefinition342 = ContractModel<'OrpcDefinition342'>;
+
+// @public (undocumented)
+type OrpcDefinition343 = ContractModel<'OrpcDefinition343'>;
+
+// @public (undocumented)
+type OrpcDefinition344 = ContractModel<'OrpcDefinition344'>;
+
+// @public (undocumented)
+type OrpcDefinition345 = ContractModel<'OrpcDefinition345'>;
+
+// @public (undocumented)
+type OrpcDefinition346 = ContractModel<'OrpcDefinition346'>;
+
+// @public (undocumented)
+type OrpcDefinition347 = ContractModel<'OrpcDefinition347'>;
+
+// @public (undocumented)
+type OrpcDefinition348 = ContractModel<'OrpcDefinition348'>;
+
+// @public (undocumented)
+type OrpcDefinition349 = ContractModel<'OrpcDefinition349'>;
+
+// @public (undocumented)
+type OrpcDefinition35 = ContractModel<'OrpcDefinition35'>;
+
+// @public (undocumented)
+type OrpcDefinition350 = ContractModel<'OrpcDefinition350'>;
+
+// @public (undocumented)
+type OrpcDefinition351 = ContractModel<'OrpcDefinition351'>;
+
+// @public (undocumented)
+type OrpcDefinition352 = ContractModel<'OrpcDefinition352'>;
+
+// @public (undocumented)
+type OrpcDefinition353 = ContractModel<'OrpcDefinition353'>;
+
+// @public (undocumented)
+type OrpcDefinition354 = ContractModel<'OrpcDefinition354'>;
+
+// @public (undocumented)
+type OrpcDefinition355 = ContractModel<'OrpcDefinition355'>;
+
+// @public (undocumented)
+type OrpcDefinition356 = ContractModel<'OrpcDefinition356'>;
+
+// @public (undocumented)
+type OrpcDefinition357 = ContractModel<'OrpcDefinition357'>;
+
+// @public (undocumented)
+type OrpcDefinition358 = ContractModel<'OrpcDefinition358'>;
+
+// @public (undocumented)
+type OrpcDefinition359 = ContractModel<'OrpcDefinition359'>;
+
+// @public (undocumented)
+type OrpcDefinition36 = ContractModel<'OrpcDefinition36'>;
+
+// @public (undocumented)
+type OrpcDefinition360 = ContractModel<'OrpcDefinition360'>;
+
+// @public (undocumented)
+type OrpcDefinition361 = ContractModel<'OrpcDefinition361'>;
+
+// @public (undocumented)
+type OrpcDefinition362 = ContractModel<'OrpcDefinition362'>;
+
+// @public (undocumented)
+type OrpcDefinition363 = ContractModel<'OrpcDefinition363'>;
+
+// @public (undocumented)
+type OrpcDefinition364 = ContractModel<'OrpcDefinition364'>;
+
+// @public (undocumented)
+type OrpcDefinition365 = ContractModel<'OrpcDefinition365'>;
+
+// @public (undocumented)
+type OrpcDefinition366 = ContractModel<'OrpcDefinition366'>;
+
+// @public (undocumented)
+type OrpcDefinition367 = ContractModel<'OrpcDefinition367'>;
+
+// @public (undocumented)
+type OrpcDefinition368 = ContractModel<'OrpcDefinition368'>;
+
+// @public (undocumented)
+type OrpcDefinition369 = ContractModel<'OrpcDefinition369'>;
+
+// @public (undocumented)
+type OrpcDefinition37 = ContractModel<'OrpcDefinition37'>;
+
+// @public (undocumented)
+type OrpcDefinition370 = ContractModel<'OrpcDefinition370'>;
+
+// @public (undocumented)
+type OrpcDefinition371 = ContractModel<'OrpcDefinition371'>;
+
+// @public (undocumented)
+type OrpcDefinition372 = ContractModel<'OrpcDefinition372'>;
+
+// @public (undocumented)
+type OrpcDefinition373 = ContractModel<'OrpcDefinition373'>;
+
+// @public (undocumented)
+type OrpcDefinition374 = ContractModel<'OrpcDefinition374'>;
+
+// @public (undocumented)
+type OrpcDefinition375 = ContractModel<'OrpcDefinition375'>;
+
+// @public (undocumented)
+type OrpcDefinition376 = ContractModel<'OrpcDefinition376'>;
+
+// @public (undocumented)
+type OrpcDefinition377 = ContractModel<'OrpcDefinition377'>;
+
+// @public (undocumented)
+type OrpcDefinition378 = ContractModel<'OrpcDefinition378'>;
+
+// @public (undocumented)
+type OrpcDefinition379 = ContractModel<'OrpcDefinition379'>;
+
+// @public (undocumented)
+type OrpcDefinition38 = ContractModel<'OrpcDefinition38'>;
+
+// @public (undocumented)
+type OrpcDefinition380 = ContractModel<'OrpcDefinition380'>;
+
+// @public (undocumented)
+type OrpcDefinition381 = ContractModel<'OrpcDefinition381'>;
+
+// @public (undocumented)
+type OrpcDefinition382 = ContractModel<'OrpcDefinition382'>;
+
+// @public (undocumented)
+type OrpcDefinition383 = ContractModel<'OrpcDefinition383'>;
+
+// @public (undocumented)
+type OrpcDefinition384 = ContractModel<'OrpcDefinition384'>;
+
+// @public (undocumented)
+type OrpcDefinition385 = ContractModel<'OrpcDefinition385'>;
+
+// @public (undocumented)
+type OrpcDefinition386 = ContractModel<'OrpcDefinition386'>;
+
+// @public (undocumented)
+type OrpcDefinition387 = ContractModel<'OrpcDefinition387'>;
+
+// @public (undocumented)
+type OrpcDefinition388 = ContractModel<'OrpcDefinition388'>;
+
+// @public (undocumented)
+type OrpcDefinition389 = ContractModel<'OrpcDefinition389'>;
+
+// @public (undocumented)
+type OrpcDefinition39 = ContractModel<'OrpcDefinition39'>;
+
+// @public (undocumented)
+type OrpcDefinition390 = ContractModel<'OrpcDefinition390'>;
+
+// @public (undocumented)
+type OrpcDefinition391 = ContractModel<'OrpcDefinition391'>;
+
+// @public (undocumented)
+type OrpcDefinition392 = ContractModel<'OrpcDefinition392'>;
+
+// @public (undocumented)
+type OrpcDefinition393 = ContractModel<'OrpcDefinition393'>;
+
+// @public (undocumented)
+type OrpcDefinition394 = ContractModel<'OrpcDefinition394'>;
+
+// @public (undocumented)
+type OrpcDefinition395 = ContractModel<'OrpcDefinition395'>;
+
+// @public (undocumented)
+type OrpcDefinition396 = ContractModel<'OrpcDefinition396'>;
+
+// @public (undocumented)
+type OrpcDefinition397 = ContractModel<'OrpcDefinition397'>;
+
+// @public (undocumented)
+type OrpcDefinition398 = ContractModel<'OrpcDefinition398'>;
+
+// @public (undocumented)
+type OrpcDefinition399 = ContractModel<'OrpcDefinition399'>;
+
+// @public (undocumented)
+type OrpcDefinition4 = ContractModel<'OrpcDefinition4'>;
+
+// @public (undocumented)
+type OrpcDefinition40 = ContractModel<'OrpcDefinition40'>;
+
+// @public (undocumented)
+type OrpcDefinition400 = ContractModel<'OrpcDefinition400'>;
+
+// @public (undocumented)
+type OrpcDefinition401 = ContractModel<'OrpcDefinition401'>;
+
+// @public (undocumented)
+type OrpcDefinition402 = ContractModel<'OrpcDefinition402'>;
+
+// @public (undocumented)
+type OrpcDefinition403 = ContractModel<'OrpcDefinition403'>;
+
+// @public (undocumented)
+type OrpcDefinition404 = ContractModel<'OrpcDefinition404'>;
+
+// @public (undocumented)
+type OrpcDefinition405 = ContractModel<'OrpcDefinition405'>;
+
+// @public (undocumented)
+type OrpcDefinition406 = ContractModel<'OrpcDefinition406'>;
+
+// @public (undocumented)
+type OrpcDefinition407 = ContractModel<'OrpcDefinition407'>;
+
+// @public (undocumented)
+type OrpcDefinition408 = ContractModel<'OrpcDefinition408'>;
+
+// @public (undocumented)
+type OrpcDefinition409 = ContractModel<'OrpcDefinition409'>;
+
+// @public (undocumented)
+type OrpcDefinition41 = ContractModel<'OrpcDefinition41'>;
+
+// @public (undocumented)
+type OrpcDefinition410 = ContractModel<'OrpcDefinition410'>;
+
+// @public (undocumented)
+type OrpcDefinition411 = ContractModel<'OrpcDefinition411'>;
+
+// @public (undocumented)
+type OrpcDefinition412 = ContractModel<'OrpcDefinition412'>;
+
+// @public (undocumented)
+type OrpcDefinition413 = ContractModel<'OrpcDefinition413'>;
+
+// @public (undocumented)
+type OrpcDefinition414 = ContractModel<'OrpcDefinition414'>;
+
+// @public (undocumented)
+type OrpcDefinition415 = ContractModel<'OrpcDefinition415'>;
+
+// @public (undocumented)
+type OrpcDefinition416 = ContractModel<'OrpcDefinition416'>;
+
+// @public (undocumented)
+type OrpcDefinition417 = ContractModel<'OrpcDefinition417'>;
+
+// @public (undocumented)
+type OrpcDefinition418 = ContractModel<'OrpcDefinition418'>;
+
+// @public (undocumented)
+type OrpcDefinition419 = ContractModel<'OrpcDefinition419'>;
+
+// @public (undocumented)
+type OrpcDefinition42 = ContractModel<'OrpcDefinition42'>;
+
+// @public (undocumented)
+type OrpcDefinition420 = ContractModel<'OrpcDefinition420'>;
+
+// @public (undocumented)
+type OrpcDefinition421 = ContractModel<'OrpcDefinition421'>;
+
+// @public (undocumented)
+type OrpcDefinition422 = ContractModel<'OrpcDefinition422'>;
+
+// @public (undocumented)
+type OrpcDefinition423 = ContractModel<'OrpcDefinition423'>;
+
+// @public (undocumented)
+type OrpcDefinition424 = ContractModel<'OrpcDefinition424'>;
+
+// @public (undocumented)
+type OrpcDefinition425 = ContractModel<'OrpcDefinition425'>;
+
+// @public (undocumented)
+type OrpcDefinition426 = ContractModel<'OrpcDefinition426'>;
+
+// @public (undocumented)
+type OrpcDefinition427 = ContractModel<'OrpcDefinition427'>;
+
+// @public (undocumented)
+type OrpcDefinition428 = ContractModel<'OrpcDefinition428'>;
+
+// @public (undocumented)
+type OrpcDefinition429 = ContractModel<'OrpcDefinition429'>;
+
+// @public (undocumented)
+type OrpcDefinition43 = ContractModel<'OrpcDefinition43'>;
+
+// @public (undocumented)
+type OrpcDefinition430 = ContractModel<'OrpcDefinition430'>;
+
+// @public (undocumented)
+type OrpcDefinition431 = ContractModel<'OrpcDefinition431'>;
+
+// @public (undocumented)
+type OrpcDefinition432 = ContractModel<'OrpcDefinition432'>;
+
+// @public (undocumented)
+type OrpcDefinition433 = ContractModel<'OrpcDefinition433'>;
+
+// @public (undocumented)
+type OrpcDefinition434 = ContractModel<'OrpcDefinition434'>;
+
+// @public (undocumented)
+type OrpcDefinition435 = ContractModel<'OrpcDefinition435'>;
+
+// @public (undocumented)
+type OrpcDefinition436 = ContractModel<'OrpcDefinition436'>;
+
+// @public (undocumented)
+type OrpcDefinition437 = ContractModel<'OrpcDefinition437'>;
+
+// @public (undocumented)
+type OrpcDefinition438 = ContractModel<'OrpcDefinition438'>;
+
+// @public (undocumented)
+type OrpcDefinition439 = ContractModel<'OrpcDefinition439'>;
+
+// @public (undocumented)
+type OrpcDefinition44 = ContractModel<'OrpcDefinition44'>;
+
+// @public (undocumented)
+type OrpcDefinition440 = ContractModel<'OrpcDefinition440'>;
+
+// @public (undocumented)
+type OrpcDefinition441 = ContractModel<'OrpcDefinition441'>;
+
+// @public (undocumented)
+type OrpcDefinition442 = ContractModel<'OrpcDefinition442'>;
+
+// @public (undocumented)
+type OrpcDefinition443 = ContractModel<'OrpcDefinition443'>;
+
+// @public (undocumented)
+type OrpcDefinition444 = ContractModel<'OrpcDefinition444'>;
+
+// @public (undocumented)
+type OrpcDefinition445 = ContractModel<'OrpcDefinition445'>;
+
+// @public (undocumented)
+type OrpcDefinition446 = ContractModel<'OrpcDefinition446'>;
+
+// @public (undocumented)
+type OrpcDefinition447 = ContractModel<'OrpcDefinition447'>;
+
+// @public (undocumented)
+type OrpcDefinition448 = ContractModel<'OrpcDefinition448'>;
+
+// @public (undocumented)
+type OrpcDefinition449 = ContractModel<'OrpcDefinition449'>;
+
+// @public (undocumented)
+type OrpcDefinition45 = ContractModel<'OrpcDefinition45'>;
+
+// @public (undocumented)
+type OrpcDefinition450 = ContractModel<'OrpcDefinition450'>;
+
+// @public (undocumented)
+type OrpcDefinition451 = ContractModel<'OrpcDefinition451'>;
+
+// @public (undocumented)
+type OrpcDefinition452 = ContractModel<'OrpcDefinition452'>;
+
+// @public (undocumented)
+type OrpcDefinition453 = ContractModel<'OrpcDefinition453'>;
+
+// @public (undocumented)
+type OrpcDefinition454 = ContractModel<'OrpcDefinition454'>;
+
+// @public (undocumented)
+type OrpcDefinition455 = ContractModel<'OrpcDefinition455'>;
+
+// @public (undocumented)
+type OrpcDefinition456 = ContractModel<'OrpcDefinition456'>;
+
+// @public (undocumented)
+type OrpcDefinition457 = ContractModel<'OrpcDefinition457'>;
+
+// @public (undocumented)
+type OrpcDefinition458 = ContractModel<'OrpcDefinition458'>;
+
+// @public (undocumented)
+type OrpcDefinition459 = ContractModel<'OrpcDefinition459'>;
+
+// @public (undocumented)
+type OrpcDefinition46 = ContractModel<'OrpcDefinition46'>;
+
+// @public (undocumented)
+type OrpcDefinition460 = ContractModel<'OrpcDefinition460'>;
+
+// @public (undocumented)
+type OrpcDefinition461 = ContractModel<'OrpcDefinition461'>;
+
+// @public (undocumented)
+type OrpcDefinition462 = ContractModel<'OrpcDefinition462'>;
+
+// @public (undocumented)
+type OrpcDefinition463 = ContractModel<'OrpcDefinition463'>;
+
+// @public (undocumented)
+type OrpcDefinition464 = ContractModel<'OrpcDefinition464'>;
+
+// @public (undocumented)
+type OrpcDefinition465 = ContractModel<'OrpcDefinition465'>;
+
+// @public (undocumented)
+type OrpcDefinition466 = ContractModel<'OrpcDefinition466'>;
+
+// @public (undocumented)
+type OrpcDefinition467 = ContractModel<'OrpcDefinition467'>;
+
+// @public (undocumented)
+type OrpcDefinition468 = ContractModel<'OrpcDefinition468'>;
+
+// @public (undocumented)
+type OrpcDefinition469 = ContractModel<'OrpcDefinition469'>;
+
+// @public (undocumented)
+type OrpcDefinition47 = ContractModel<'OrpcDefinition47'>;
+
+// @public (undocumented)
+type OrpcDefinition470 = ContractModel<'OrpcDefinition470'>;
+
+// @public (undocumented)
+type OrpcDefinition471 = ContractModel<'OrpcDefinition471'>;
+
+// @public (undocumented)
+type OrpcDefinition472 = ContractModel<'OrpcDefinition472'>;
+
+// @public (undocumented)
+type OrpcDefinition473 = ContractModel<'OrpcDefinition473'>;
+
+// @public (undocumented)
+type OrpcDefinition474 = ContractModel<'OrpcDefinition474'>;
+
+// @public (undocumented)
+type OrpcDefinition475 = ContractModel<'OrpcDefinition475'>;
+
+// @public (undocumented)
+type OrpcDefinition476 = ContractModel<'OrpcDefinition476'>;
+
+// @public (undocumented)
+type OrpcDefinition477 = ContractModel<'OrpcDefinition477'>;
+
+// @public (undocumented)
+type OrpcDefinition478 = ContractModel<'OrpcDefinition478'>;
+
+// @public (undocumented)
+type OrpcDefinition479 = ContractModel<'OrpcDefinition479'>;
+
+// @public (undocumented)
+type OrpcDefinition48 = ContractModel<'OrpcDefinition48'>;
+
+// @public (undocumented)
+type OrpcDefinition480 = ContractModel<'OrpcDefinition480'>;
+
+// @public (undocumented)
+type OrpcDefinition481 = ContractModel<'OrpcDefinition481'>;
+
+// @public (undocumented)
+type OrpcDefinition482 = ContractModel<'OrpcDefinition482'>;
+
+// @public (undocumented)
+type OrpcDefinition483 = ContractModel<'OrpcDefinition483'>;
+
+// @public (undocumented)
+type OrpcDefinition484 = ContractModel<'OrpcDefinition484'>;
+
+// @public (undocumented)
+type OrpcDefinition485 = ContractModel<'OrpcDefinition485'>;
+
+// @public (undocumented)
+type OrpcDefinition486 = ContractModel<'OrpcDefinition486'>;
+
+// @public (undocumented)
+type OrpcDefinition487 = ContractModel<'OrpcDefinition487'>;
+
+// @public (undocumented)
+type OrpcDefinition488 = ContractModel<'OrpcDefinition488'>;
+
+// @public (undocumented)
+type OrpcDefinition489 = ContractModel<'OrpcDefinition489'>;
+
+// @public (undocumented)
+type OrpcDefinition49 = ContractModel<'OrpcDefinition49'>;
+
+// @public (undocumented)
+type OrpcDefinition490 = ContractModel<'OrpcDefinition490'>;
+
+// @public (undocumented)
+type OrpcDefinition491 = ContractModel<'OrpcDefinition491'>;
+
+// @public (undocumented)
+type OrpcDefinition492 = ContractModel<'OrpcDefinition492'>;
+
+// @public (undocumented)
+type OrpcDefinition493 = ContractModel<'OrpcDefinition493'>;
+
+// @public (undocumented)
+type OrpcDefinition494 = ContractModel<'OrpcDefinition494'>;
+
+// @public (undocumented)
+type OrpcDefinition495 = ContractModel<'OrpcDefinition495'>;
+
+// @public (undocumented)
+type OrpcDefinition496 = ContractModel<'OrpcDefinition496'>;
+
+// @public (undocumented)
+type OrpcDefinition497 = ContractModel<'OrpcDefinition497'>;
+
+// @public (undocumented)
+type OrpcDefinition498 = ContractModel<'OrpcDefinition498'>;
+
+// @public (undocumented)
+type OrpcDefinition499 = ContractModel<'OrpcDefinition499'>;
+
+// @public (undocumented)
+type OrpcDefinition5 = ContractModel<'OrpcDefinition5'>;
+
+// @public (undocumented)
+type OrpcDefinition50 = ContractModel<'OrpcDefinition50'>;
+
+// @public (undocumented)
+type OrpcDefinition500 = ContractModel<'OrpcDefinition500'>;
+
+// @public (undocumented)
+type OrpcDefinition501 = ContractModel<'OrpcDefinition501'>;
+
+// @public (undocumented)
+type OrpcDefinition502 = ContractModel<'OrpcDefinition502'>;
+
+// @public (undocumented)
+type OrpcDefinition503 = ContractModel<'OrpcDefinition503'>;
+
+// @public (undocumented)
+type OrpcDefinition504 = ContractModel<'OrpcDefinition504'>;
+
+// @public (undocumented)
+type OrpcDefinition505 = ContractModel<'OrpcDefinition505'>;
+
+// @public (undocumented)
+type OrpcDefinition506 = ContractModel<'OrpcDefinition506'>;
+
+// @public (undocumented)
+type OrpcDefinition507 = ContractModel<'OrpcDefinition507'>;
+
+// @public (undocumented)
+type OrpcDefinition508 = ContractModel<'OrpcDefinition508'>;
+
+// @public (undocumented)
+type OrpcDefinition509 = ContractModel<'OrpcDefinition509'>;
+
+// @public (undocumented)
+type OrpcDefinition51 = ContractModel<'OrpcDefinition51'>;
+
+// @public (undocumented)
+type OrpcDefinition510 = ContractModel<'OrpcDefinition510'>;
+
+// @public (undocumented)
+type OrpcDefinition511 = ContractModel<'OrpcDefinition511'>;
+
+// @public (undocumented)
+type OrpcDefinition512 = ContractModel<'OrpcDefinition512'>;
+
+// @public (undocumented)
+type OrpcDefinition513 = ContractModel<'OrpcDefinition513'>;
+
+// @public (undocumented)
+type OrpcDefinition514 = ContractModel<'OrpcDefinition514'>;
+
+// @public (undocumented)
+type OrpcDefinition515 = ContractModel<'OrpcDefinition515'>;
+
+// @public (undocumented)
+type OrpcDefinition516 = ContractModel<'OrpcDefinition516'>;
+
+// @public (undocumented)
+type OrpcDefinition517 = ContractModel<'OrpcDefinition517'>;
+
+// @public (undocumented)
+type OrpcDefinition518 = ContractModel<'OrpcDefinition518'>;
+
+// @public (undocumented)
+type OrpcDefinition519 = ContractModel<'OrpcDefinition519'>;
+
+// @public (undocumented)
+type OrpcDefinition52 = ContractModel<'OrpcDefinition52'>;
+
+// @public (undocumented)
+type OrpcDefinition520 = ContractModel<'OrpcDefinition520'>;
+
+// @public (undocumented)
+type OrpcDefinition521 = ContractModel<'OrpcDefinition521'>;
+
+// @public (undocumented)
+type OrpcDefinition522 = ContractModel<'OrpcDefinition522'>;
+
+// @public (undocumented)
+type OrpcDefinition523 = ContractModel<'OrpcDefinition523'>;
+
+// @public (undocumented)
+type OrpcDefinition524 = ContractModel<'OrpcDefinition524'>;
+
+// @public (undocumented)
+type OrpcDefinition525 = ContractModel<'OrpcDefinition525'>;
+
+// @public (undocumented)
+type OrpcDefinition526 = ContractModel<'OrpcDefinition526'>;
+
+// @public (undocumented)
+type OrpcDefinition527 = ContractModel<'OrpcDefinition527'>;
+
+// @public (undocumented)
+type OrpcDefinition528 = ContractModel<'OrpcDefinition528'>;
+
+// @public (undocumented)
+type OrpcDefinition529 = ContractModel<'OrpcDefinition529'>;
+
+// @public (undocumented)
+type OrpcDefinition53 = ContractModel<'OrpcDefinition53'>;
+
+// @public (undocumented)
+type OrpcDefinition530 = ContractModel<'OrpcDefinition530'>;
+
+// @public (undocumented)
+type OrpcDefinition531 = ContractModel<'OrpcDefinition531'>;
+
+// @public (undocumented)
+type OrpcDefinition532 = ContractModel<'OrpcDefinition532'>;
+
+// @public (undocumented)
+type OrpcDefinition533 = ContractModel<'OrpcDefinition533'>;
+
+// @public (undocumented)
+type OrpcDefinition534 = ContractModel<'OrpcDefinition534'>;
+
+// @public (undocumented)
+type OrpcDefinition535 = ContractModel<'OrpcDefinition535'>;
+
+// @public (undocumented)
+type OrpcDefinition536 = ContractModel<'OrpcDefinition536'>;
+
+// @public (undocumented)
+type OrpcDefinition537 = ContractModel<'OrpcDefinition537'>;
+
+// @public (undocumented)
+type OrpcDefinition538 = ContractModel<'OrpcDefinition538'>;
+
+// @public (undocumented)
+type OrpcDefinition539 = ContractModel<'OrpcDefinition539'>;
+
+// @public (undocumented)
+type OrpcDefinition54 = ContractModel<'OrpcDefinition54'>;
+
+// @public (undocumented)
+type OrpcDefinition540 = ContractModel<'OrpcDefinition540'>;
+
+// @public (undocumented)
+type OrpcDefinition541 = ContractModel<'OrpcDefinition541'>;
+
+// @public (undocumented)
+type OrpcDefinition542 = ContractModel<'OrpcDefinition542'>;
+
+// @public (undocumented)
+type OrpcDefinition543 = ContractModel<'OrpcDefinition543'>;
+
+// @public (undocumented)
+type OrpcDefinition544 = ContractModel<'OrpcDefinition544'>;
+
+// @public (undocumented)
+type OrpcDefinition545 = ContractModel<'OrpcDefinition545'>;
+
+// @public (undocumented)
+type OrpcDefinition546 = ContractModel<'OrpcDefinition546'>;
+
+// @public (undocumented)
+type OrpcDefinition547 = ContractModel<'OrpcDefinition547'>;
+
+// @public (undocumented)
+type OrpcDefinition548 = ContractModel<'OrpcDefinition548'>;
+
+// @public (undocumented)
+type OrpcDefinition549 = ContractModel<'OrpcDefinition549'>;
+
+// @public (undocumented)
+type OrpcDefinition55 = ContractModel<'OrpcDefinition55'>;
+
+// @public (undocumented)
+type OrpcDefinition550 = ContractModel<'OrpcDefinition550'>;
+
+// @public (undocumented)
+type OrpcDefinition551 = ContractModel<'OrpcDefinition551'>;
+
+// @public (undocumented)
+type OrpcDefinition552 = ContractModel<'OrpcDefinition552'>;
+
+// @public (undocumented)
+type OrpcDefinition553 = ContractModel<'OrpcDefinition553'>;
+
+// @public (undocumented)
+type OrpcDefinition554 = ContractModel<'OrpcDefinition554'>;
+
+// @public (undocumented)
+type OrpcDefinition555 = ContractModel<'OrpcDefinition555'>;
+
+// @public (undocumented)
+type OrpcDefinition556 = ContractModel<'OrpcDefinition556'>;
+
+// @public (undocumented)
+type OrpcDefinition557 = ContractModel<'OrpcDefinition557'>;
+
+// @public (undocumented)
+type OrpcDefinition558 = ContractModel<'OrpcDefinition558'>;
+
+// @public (undocumented)
+type OrpcDefinition559 = ContractModel<'OrpcDefinition559'>;
+
+// @public (undocumented)
+type OrpcDefinition56 = ContractModel<'OrpcDefinition56'>;
+
+// @public (undocumented)
+type OrpcDefinition560 = ContractModel<'OrpcDefinition560'>;
+
+// @public (undocumented)
+type OrpcDefinition561 = ContractModel<'OrpcDefinition561'>;
+
+// @public (undocumented)
+type OrpcDefinition562 = ContractModel<'OrpcDefinition562'>;
+
+// @public (undocumented)
+type OrpcDefinition563 = ContractModel<'OrpcDefinition563'>;
+
+// @public (undocumented)
+type OrpcDefinition564 = ContractModel<'OrpcDefinition564'>;
+
+// @public (undocumented)
+type OrpcDefinition565 = ContractModel<'OrpcDefinition565'>;
+
+// @public (undocumented)
+type OrpcDefinition566 = ContractModel<'OrpcDefinition566'>;
+
+// @public (undocumented)
+type OrpcDefinition567 = ContractModel<'OrpcDefinition567'>;
+
+// @public (undocumented)
+type OrpcDefinition568 = ContractModel<'OrpcDefinition568'>;
+
+// @public (undocumented)
+type OrpcDefinition569 = ContractModel<'OrpcDefinition569'>;
+
+// @public (undocumented)
+type OrpcDefinition57 = ContractModel<'OrpcDefinition57'>;
+
+// @public (undocumented)
+type OrpcDefinition570 = ContractModel<'OrpcDefinition570'>;
+
+// @public (undocumented)
+type OrpcDefinition571 = ContractModel<'OrpcDefinition571'>;
+
+// @public (undocumented)
+type OrpcDefinition572 = ContractModel<'OrpcDefinition572'>;
+
+// @public (undocumented)
+type OrpcDefinition573 = ContractModel<'OrpcDefinition573'>;
+
+// @public (undocumented)
+type OrpcDefinition574 = ContractModel<'OrpcDefinition574'>;
+
+// @public (undocumented)
+type OrpcDefinition575 = ContractModel<'OrpcDefinition575'>;
+
+// @public (undocumented)
+type OrpcDefinition576 = ContractModel<'OrpcDefinition576'>;
+
+// @public (undocumented)
+type OrpcDefinition577 = ContractModel<'OrpcDefinition577'>;
+
+// @public (undocumented)
+type OrpcDefinition578 = ContractModel<'OrpcDefinition578'>;
+
+// @public (undocumented)
+type OrpcDefinition579 = ContractModel<'OrpcDefinition579'>;
+
+// @public (undocumented)
+type OrpcDefinition58 = ContractModel<'OrpcDefinition58'>;
+
+// @public (undocumented)
+type OrpcDefinition580 = ContractModel<'OrpcDefinition580'>;
+
+// @public (undocumented)
+type OrpcDefinition581 = ContractModel<'OrpcDefinition581'>;
+
+// @public (undocumented)
+type OrpcDefinition582 = ContractModel<'OrpcDefinition582'>;
+
+// @public (undocumented)
+type OrpcDefinition583 = ContractModel<'OrpcDefinition583'>;
+
+// @public (undocumented)
+type OrpcDefinition584 = ContractModel<'OrpcDefinition584'>;
+
+// @public (undocumented)
+type OrpcDefinition585 = ContractModel<'OrpcDefinition585'>;
+
+// @public (undocumented)
+type OrpcDefinition586 = ContractModel<'OrpcDefinition586'>;
+
+// @public (undocumented)
+type OrpcDefinition587 = ContractModel<'OrpcDefinition587'>;
+
+// @public (undocumented)
+type OrpcDefinition588 = ContractModel<'OrpcDefinition588'>;
+
+// @public (undocumented)
+type OrpcDefinition589 = ContractModel<'OrpcDefinition589'>;
+
+// @public (undocumented)
+type OrpcDefinition59 = ContractModel<'OrpcDefinition59'>;
+
+// @public (undocumented)
+type OrpcDefinition590 = ContractModel<'OrpcDefinition590'>;
+
+// @public (undocumented)
+type OrpcDefinition591 = ContractModel<'OrpcDefinition591'>;
+
+// @public (undocumented)
+type OrpcDefinition592 = ContractModel<'OrpcDefinition592'>;
+
+// @public (undocumented)
+type OrpcDefinition593 = ContractModel<'OrpcDefinition593'>;
+
+// @public (undocumented)
+type OrpcDefinition594 = ContractModel<'OrpcDefinition594'>;
+
+// @public (undocumented)
+type OrpcDefinition595 = ContractModel<'OrpcDefinition595'>;
+
+// @public (undocumented)
+type OrpcDefinition596 = ContractModel<'OrpcDefinition596'>;
+
+// @public (undocumented)
+type OrpcDefinition597 = ContractModel<'OrpcDefinition597'>;
+
+// @public (undocumented)
+type OrpcDefinition598 = ContractModel<'OrpcDefinition598'>;
+
+// @public (undocumented)
+type OrpcDefinition599 = ContractModel<'OrpcDefinition599'>;
+
+// @public (undocumented)
+type OrpcDefinition6 = ContractModel<'OrpcDefinition6'>;
+
+// @public (undocumented)
+type OrpcDefinition60 = ContractModel<'OrpcDefinition60'>;
+
+// @public (undocumented)
+type OrpcDefinition600 = ContractModel<'OrpcDefinition600'>;
+
+// @public (undocumented)
+type OrpcDefinition601 = ContractModel<'OrpcDefinition601'>;
+
+// @public (undocumented)
+type OrpcDefinition602 = ContractModel<'OrpcDefinition602'>;
+
+// @public (undocumented)
+type OrpcDefinition603 = ContractModel<'OrpcDefinition603'>;
+
+// @public (undocumented)
+type OrpcDefinition604 = ContractModel<'OrpcDefinition604'>;
+
+// @public (undocumented)
+type OrpcDefinition605 = ContractModel<'OrpcDefinition605'>;
+
+// @public (undocumented)
+type OrpcDefinition606 = ContractModel<'OrpcDefinition606'>;
+
+// @public (undocumented)
+type OrpcDefinition607 = ContractModel<'OrpcDefinition607'>;
+
+// @public (undocumented)
+type OrpcDefinition608 = ContractModel<'OrpcDefinition608'>;
+
+// @public (undocumented)
+type OrpcDefinition609 = ContractModel<'OrpcDefinition609'>;
+
+// @public (undocumented)
+type OrpcDefinition61 = ContractModel<'OrpcDefinition61'>;
+
+// @public (undocumented)
+type OrpcDefinition610 = ContractModel<'OrpcDefinition610'>;
+
+// @public (undocumented)
+type OrpcDefinition611 = ContractModel<'OrpcDefinition611'>;
+
+// @public (undocumented)
+type OrpcDefinition612 = ContractModel<'OrpcDefinition612'>;
+
+// @public (undocumented)
+type OrpcDefinition613 = ContractModel<'OrpcDefinition613'>;
+
+// @public (undocumented)
+type OrpcDefinition614 = ContractModel<'OrpcDefinition614'>;
+
+// @public (undocumented)
+type OrpcDefinition615 = ContractModel<'OrpcDefinition615'>;
+
+// @public (undocumented)
+type OrpcDefinition616 = ContractModel<'OrpcDefinition616'>;
+
+// @public (undocumented)
+type OrpcDefinition617 = ContractModel<'OrpcDefinition617'>;
+
+// @public (undocumented)
+type OrpcDefinition618 = ContractModel<'OrpcDefinition618'>;
+
+// @public (undocumented)
+type OrpcDefinition619 = ContractModel<'OrpcDefinition619'>;
+
+// @public (undocumented)
+type OrpcDefinition62 = ContractModel<'OrpcDefinition62'>;
+
+// @public (undocumented)
+type OrpcDefinition620 = ContractModel<'OrpcDefinition620'>;
+
+// @public (undocumented)
+type OrpcDefinition621 = ContractModel<'OrpcDefinition621'>;
+
+// @public (undocumented)
+type OrpcDefinition622 = ContractModel<'OrpcDefinition622'>;
+
+// @public (undocumented)
+type OrpcDefinition623 = ContractModel<'OrpcDefinition623'>;
+
+// @public (undocumented)
+type OrpcDefinition624 = ContractModel<'OrpcDefinition624'>;
+
+// @public (undocumented)
+type OrpcDefinition625 = ContractModel<'OrpcDefinition625'>;
+
+// @public (undocumented)
+type OrpcDefinition626 = ContractModel<'OrpcDefinition626'>;
+
+// @public (undocumented)
+type OrpcDefinition627 = ContractModel<'OrpcDefinition627'>;
+
+// @public (undocumented)
+type OrpcDefinition628 = ContractModel<'OrpcDefinition628'>;
+
+// @public (undocumented)
+type OrpcDefinition629 = ContractModel<'OrpcDefinition629'>;
+
+// @public (undocumented)
+type OrpcDefinition63 = ContractModel<'OrpcDefinition63'>;
+
+// @public (undocumented)
+type OrpcDefinition630 = ContractModel<'OrpcDefinition630'>;
+
+// @public (undocumented)
+type OrpcDefinition631 = ContractModel<'OrpcDefinition631'>;
+
+// @public (undocumented)
+type OrpcDefinition632 = ContractModel<'OrpcDefinition632'>;
+
+// @public (undocumented)
+type OrpcDefinition633 = ContractModel<'OrpcDefinition633'>;
+
+// @public (undocumented)
+type OrpcDefinition634 = ContractModel<'OrpcDefinition634'>;
+
+// @public (undocumented)
+type OrpcDefinition635 = ContractModel<'OrpcDefinition635'>;
+
+// @public (undocumented)
+type OrpcDefinition636 = ContractModel<'OrpcDefinition636'>;
+
+// @public (undocumented)
+type OrpcDefinition637 = ContractModel<'OrpcDefinition637'>;
+
+// @public (undocumented)
+type OrpcDefinition638 = ContractModel<'OrpcDefinition638'>;
+
+// @public (undocumented)
+type OrpcDefinition639 = ContractModel<'OrpcDefinition639'>;
+
+// @public (undocumented)
+type OrpcDefinition64 = ContractModel<'OrpcDefinition64'>;
+
+// @public (undocumented)
+type OrpcDefinition640 = ContractModel<'OrpcDefinition640'>;
+
+// @public (undocumented)
+type OrpcDefinition641 = ContractModel<'OrpcDefinition641'>;
+
+// @public (undocumented)
+type OrpcDefinition642 = ContractModel<'OrpcDefinition642'>;
+
+// @public (undocumented)
+type OrpcDefinition643 = ContractModel<'OrpcDefinition643'>;
+
+// @public (undocumented)
+type OrpcDefinition644 = ContractModel<'OrpcDefinition644'>;
+
+// @public (undocumented)
+type OrpcDefinition645 = ContractModel<'OrpcDefinition645'>;
+
+// @public (undocumented)
+type OrpcDefinition646 = ContractModel<'OrpcDefinition646'>;
+
+// @public (undocumented)
+type OrpcDefinition647 = ContractModel<'OrpcDefinition647'>;
+
+// @public (undocumented)
+type OrpcDefinition648 = ContractModel<'OrpcDefinition648'>;
+
+// @public (undocumented)
+type OrpcDefinition649 = ContractModel<'OrpcDefinition649'>;
+
+// @public (undocumented)
+type OrpcDefinition65 = ContractModel<'OrpcDefinition65'>;
+
+// @public (undocumented)
+type OrpcDefinition650 = ContractModel<'OrpcDefinition650'>;
+
+// @public (undocumented)
+type OrpcDefinition651 = ContractModel<'OrpcDefinition651'>;
+
+// @public (undocumented)
+type OrpcDefinition652 = ContractModel<'OrpcDefinition652'>;
+
+// @public (undocumented)
+type OrpcDefinition653 = ContractModel<'OrpcDefinition653'>;
+
+// @public (undocumented)
+type OrpcDefinition654 = ContractModel<'OrpcDefinition654'>;
+
+// @public (undocumented)
+type OrpcDefinition655 = ContractModel<'OrpcDefinition655'>;
+
+// @public (undocumented)
+type OrpcDefinition656 = ContractModel<'OrpcDefinition656'>;
+
+// @public (undocumented)
+type OrpcDefinition657 = ContractModel<'OrpcDefinition657'>;
+
+// @public (undocumented)
+type OrpcDefinition658 = ContractModel<'OrpcDefinition658'>;
+
+// @public (undocumented)
+type OrpcDefinition659 = ContractModel<'OrpcDefinition659'>;
+
+// @public (undocumented)
+type OrpcDefinition66 = ContractModel<'OrpcDefinition66'>;
+
+// @public (undocumented)
+type OrpcDefinition660 = ContractModel<'OrpcDefinition660'>;
+
+// @public (undocumented)
+type OrpcDefinition661 = ContractModel<'OrpcDefinition661'>;
+
+// @public (undocumented)
+type OrpcDefinition662 = ContractModel<'OrpcDefinition662'>;
+
+// @public (undocumented)
+type OrpcDefinition663 = ContractModel<'OrpcDefinition663'>;
+
+// @public (undocumented)
+type OrpcDefinition664 = ContractModel<'OrpcDefinition664'>;
+
+// @public (undocumented)
+type OrpcDefinition665 = ContractModel<'OrpcDefinition665'>;
+
+// @public (undocumented)
+type OrpcDefinition666 = ContractModel<'OrpcDefinition666'>;
+
+// @public (undocumented)
+type OrpcDefinition667 = ContractModel<'OrpcDefinition667'>;
+
+// @public (undocumented)
+type OrpcDefinition668 = ContractModel<'OrpcDefinition668'>;
+
+// @public (undocumented)
+type OrpcDefinition669 = ContractModel<'OrpcDefinition669'>;
+
+// @public (undocumented)
+type OrpcDefinition67 = ContractModel<'OrpcDefinition67'>;
+
+// @public (undocumented)
+type OrpcDefinition670 = ContractModel<'OrpcDefinition670'>;
+
+// @public (undocumented)
+type OrpcDefinition671 = ContractModel<'OrpcDefinition671'>;
+
+// @public (undocumented)
+type OrpcDefinition672 = ContractModel<'OrpcDefinition672'>;
+
+// @public (undocumented)
+type OrpcDefinition673 = ContractModel<'OrpcDefinition673'>;
+
+// @public (undocumented)
+type OrpcDefinition674 = ContractModel<'OrpcDefinition674'>;
+
+// @public (undocumented)
+type OrpcDefinition675 = ContractModel<'OrpcDefinition675'>;
+
+// @public (undocumented)
+type OrpcDefinition676 = ContractModel<'OrpcDefinition676'>;
+
+// @public (undocumented)
+type OrpcDefinition677 = ContractModel<'OrpcDefinition677'>;
+
+// @public (undocumented)
+type OrpcDefinition678 = ContractModel<'OrpcDefinition678'>;
+
+// @public (undocumented)
+type OrpcDefinition679 = ContractModel<'OrpcDefinition679'>;
+
+// @public (undocumented)
+type OrpcDefinition68 = ContractModel<'OrpcDefinition68'>;
+
+// @public (undocumented)
+type OrpcDefinition680 = ContractModel<'OrpcDefinition680'>;
+
+// @public (undocumented)
+type OrpcDefinition681 = ContractModel<'OrpcDefinition681'>;
+
+// @public (undocumented)
+type OrpcDefinition682 = ContractModel<'OrpcDefinition682'>;
+
+// @public (undocumented)
+type OrpcDefinition683 = ContractModel<'OrpcDefinition683'>;
+
+// @public (undocumented)
+type OrpcDefinition684 = ContractModel<'OrpcDefinition684'>;
+
+// @public (undocumented)
+type OrpcDefinition685 = ContractModel<'OrpcDefinition685'>;
+
+// @public (undocumented)
+type OrpcDefinition686 = ContractModel<'OrpcDefinition686'>;
+
+// @public (undocumented)
+type OrpcDefinition687 = ContractModel<'OrpcDefinition687'>;
+
+// @public (undocumented)
+type OrpcDefinition688 = ContractModel<'OrpcDefinition688'>;
+
+// @public (undocumented)
+type OrpcDefinition689 = ContractModel<'OrpcDefinition689'>;
+
+// @public (undocumented)
+type OrpcDefinition69 = ContractModel<'OrpcDefinition69'>;
+
+// @public (undocumented)
+type OrpcDefinition690 = ContractModel<'OrpcDefinition690'>;
+
+// @public (undocumented)
+type OrpcDefinition691 = ContractModel<'OrpcDefinition691'>;
+
+// @public (undocumented)
+type OrpcDefinition692 = ContractModel<'OrpcDefinition692'>;
+
+// @public (undocumented)
+type OrpcDefinition693 = ContractModel<'OrpcDefinition693'>;
+
+// @public (undocumented)
+type OrpcDefinition694 = ContractModel<'OrpcDefinition694'>;
+
+// @public (undocumented)
+type OrpcDefinition695 = ContractModel<'OrpcDefinition695'>;
+
+// @public (undocumented)
+type OrpcDefinition696 = ContractModel<'OrpcDefinition696'>;
+
+// @public (undocumented)
+type OrpcDefinition697 = ContractModel<'OrpcDefinition697'>;
+
+// @public (undocumented)
+type OrpcDefinition698 = ContractModel<'OrpcDefinition698'>;
+
+// @public (undocumented)
+type OrpcDefinition699 = ContractModel<'OrpcDefinition699'>;
+
+// @public (undocumented)
+type OrpcDefinition7 = ContractModel<'OrpcDefinition7'>;
+
+// @public (undocumented)
+type OrpcDefinition70 = ContractModel<'OrpcDefinition70'>;
+
+// @public (undocumented)
+type OrpcDefinition700 = ContractModel<'OrpcDefinition700'>;
+
+// @public (undocumented)
+type OrpcDefinition701 = ContractModel<'OrpcDefinition701'>;
+
+// @public (undocumented)
+type OrpcDefinition702 = ContractModel<'OrpcDefinition702'>;
+
+// @public (undocumented)
+type OrpcDefinition703 = ContractModel<'OrpcDefinition703'>;
+
+// @public (undocumented)
+type OrpcDefinition704 = ContractModel<'OrpcDefinition704'>;
+
+// @public (undocumented)
+type OrpcDefinition705 = ContractModel<'OrpcDefinition705'>;
+
+// @public (undocumented)
+type OrpcDefinition706 = ContractModel<'OrpcDefinition706'>;
+
+// @public (undocumented)
+type OrpcDefinition707 = ContractModel<'OrpcDefinition707'>;
+
+// @public (undocumented)
+type OrpcDefinition708 = ContractModel<'OrpcDefinition708'>;
+
+// @public (undocumented)
+type OrpcDefinition709 = ContractModel<'OrpcDefinition709'>;
+
+// @public (undocumented)
+type OrpcDefinition71 = ContractModel<'OrpcDefinition71'>;
+
+// @public (undocumented)
+type OrpcDefinition710 = ContractModel<'OrpcDefinition710'>;
+
+// @public (undocumented)
+type OrpcDefinition711 = ContractModel<'OrpcDefinition711'>;
+
+// @public (undocumented)
+type OrpcDefinition712 = ContractModel<'OrpcDefinition712'>;
+
+// @public (undocumented)
+type OrpcDefinition713 = ContractModel<'OrpcDefinition713'>;
+
+// @public (undocumented)
+type OrpcDefinition714 = ContractModel<'OrpcDefinition714'>;
+
+// @public (undocumented)
+type OrpcDefinition715 = ContractModel<'OrpcDefinition715'>;
+
+// @public (undocumented)
+type OrpcDefinition716 = ContractModel<'OrpcDefinition716'>;
+
+// @public (undocumented)
+type OrpcDefinition717 = ContractModel<'OrpcDefinition717'>;
+
+// @public (undocumented)
+type OrpcDefinition718 = ContractModel<'OrpcDefinition718'>;
+
+// @public (undocumented)
+type OrpcDefinition719 = ContractModel<'OrpcDefinition719'>;
+
+// @public (undocumented)
+type OrpcDefinition72 = ContractModel<'OrpcDefinition72'>;
+
+// @public (undocumented)
+type OrpcDefinition720 = ContractModel<'OrpcDefinition720'>;
+
+// @public (undocumented)
+type OrpcDefinition721 = ContractModel<'OrpcDefinition721'>;
+
+// @public (undocumented)
+type OrpcDefinition722 = ContractModel<'OrpcDefinition722'>;
+
+// @public (undocumented)
+type OrpcDefinition723 = ContractModel<'OrpcDefinition723'>;
+
+// @public (undocumented)
+type OrpcDefinition724 = ContractModel<'OrpcDefinition724'>;
+
+// @public (undocumented)
+type OrpcDefinition725 = ContractModel<'OrpcDefinition725'>;
+
+// @public (undocumented)
+type OrpcDefinition726 = ContractModel<'OrpcDefinition726'>;
+
+// @public (undocumented)
+type OrpcDefinition727 = ContractModel<'OrpcDefinition727'>;
+
+// @public (undocumented)
+type OrpcDefinition728 = ContractModel<'OrpcDefinition728'>;
+
+// @public (undocumented)
+type OrpcDefinition729 = ContractModel<'OrpcDefinition729'>;
+
+// @public (undocumented)
+type OrpcDefinition73 = ContractModel<'OrpcDefinition73'>;
+
+// @public (undocumented)
+type OrpcDefinition730 = ContractModel<'OrpcDefinition730'>;
+
+// @public (undocumented)
+type OrpcDefinition731 = ContractModel<'OrpcDefinition731'>;
+
+// @public (undocumented)
+type OrpcDefinition732 = ContractModel<'OrpcDefinition732'>;
+
+// @public (undocumented)
+type OrpcDefinition733 = ContractModel<'OrpcDefinition733'>;
+
+// @public (undocumented)
+type OrpcDefinition734 = ContractModel<'OrpcDefinition734'>;
+
+// @public (undocumented)
+type OrpcDefinition735 = ContractModel<'OrpcDefinition735'>;
+
+// @public (undocumented)
+type OrpcDefinition736 = ContractModel<'OrpcDefinition736'>;
+
+// @public (undocumented)
+type OrpcDefinition737 = ContractModel<'OrpcDefinition737'>;
+
+// @public (undocumented)
+type OrpcDefinition738 = ContractModel<'OrpcDefinition738'>;
+
+// @public (undocumented)
+type OrpcDefinition739 = ContractModel<'OrpcDefinition739'>;
+
+// @public (undocumented)
+type OrpcDefinition74 = ContractModel<'OrpcDefinition74'>;
+
+// @public (undocumented)
+type OrpcDefinition740 = ContractModel<'OrpcDefinition740'>;
+
+// @public (undocumented)
+type OrpcDefinition741 = ContractModel<'OrpcDefinition741'>;
+
+// @public (undocumented)
+type OrpcDefinition742 = ContractModel<'OrpcDefinition742'>;
+
+// @public (undocumented)
+type OrpcDefinition743 = ContractModel<'OrpcDefinition743'>;
+
+// @public (undocumented)
+type OrpcDefinition744 = ContractModel<'OrpcDefinition744'>;
+
+// @public (undocumented)
+type OrpcDefinition745 = ContractModel<'OrpcDefinition745'>;
+
+// @public (undocumented)
+type OrpcDefinition746 = ContractModel<'OrpcDefinition746'>;
+
+// @public (undocumented)
+type OrpcDefinition747 = ContractModel<'OrpcDefinition747'>;
+
+// @public (undocumented)
+type OrpcDefinition748 = ContractModel<'OrpcDefinition748'>;
+
+// @public (undocumented)
+type OrpcDefinition749 = ContractModel<'OrpcDefinition749'>;
+
+// @public (undocumented)
+type OrpcDefinition75 = ContractModel<'OrpcDefinition75'>;
+
+// @public (undocumented)
+type OrpcDefinition750 = ContractModel<'OrpcDefinition750'>;
+
+// @public (undocumented)
+type OrpcDefinition751 = ContractModel<'OrpcDefinition751'>;
+
+// @public (undocumented)
+type OrpcDefinition752 = ContractModel<'OrpcDefinition752'>;
+
+// @public (undocumented)
+type OrpcDefinition753 = ContractModel<'OrpcDefinition753'>;
+
+// @public (undocumented)
+type OrpcDefinition754 = ContractModel<'OrpcDefinition754'>;
+
+// @public (undocumented)
+type OrpcDefinition755 = ContractModel<'OrpcDefinition755'>;
+
+// @public (undocumented)
+type OrpcDefinition756 = ContractModel<'OrpcDefinition756'>;
+
+// @public (undocumented)
+type OrpcDefinition757 = ContractModel<'OrpcDefinition757'>;
+
+// @public (undocumented)
+type OrpcDefinition758 = ContractModel<'OrpcDefinition758'>;
+
+// @public (undocumented)
+type OrpcDefinition759 = ContractModel<'OrpcDefinition759'>;
+
+// @public (undocumented)
+type OrpcDefinition76 = ContractModel<'OrpcDefinition76'>;
+
+// @public (undocumented)
+type OrpcDefinition760 = ContractModel<'OrpcDefinition760'>;
+
+// @public (undocumented)
+type OrpcDefinition761 = ContractModel<'OrpcDefinition761'>;
+
+// @public (undocumented)
+type OrpcDefinition762 = ContractModel<'OrpcDefinition762'>;
+
+// @public (undocumented)
+type OrpcDefinition763 = ContractModel<'OrpcDefinition763'>;
+
+// @public (undocumented)
+type OrpcDefinition764 = ContractModel<'OrpcDefinition764'>;
+
+// @public (undocumented)
+type OrpcDefinition765 = ContractModel<'OrpcDefinition765'>;
+
+// @public (undocumented)
+type OrpcDefinition766 = ContractModel<'OrpcDefinition766'>;
+
+// @public (undocumented)
+type OrpcDefinition767 = ContractModel<'OrpcDefinition767'>;
+
+// @public (undocumented)
+type OrpcDefinition768 = ContractModel<'OrpcDefinition768'>;
+
+// @public (undocumented)
+type OrpcDefinition769 = ContractModel<'OrpcDefinition769'>;
+
+// @public (undocumented)
+type OrpcDefinition77 = ContractModel<'OrpcDefinition77'>;
+
+// @public (undocumented)
+type OrpcDefinition770 = ContractModel<'OrpcDefinition770'>;
+
+// @public (undocumented)
+type OrpcDefinition771 = ContractModel<'OrpcDefinition771'>;
+
+// @public (undocumented)
+type OrpcDefinition772 = ContractModel<'OrpcDefinition772'>;
+
+// @public (undocumented)
+type OrpcDefinition773 = ContractModel<'OrpcDefinition773'>;
+
+// @public (undocumented)
+type OrpcDefinition774 = ContractModel<'OrpcDefinition774'>;
+
+// @public (undocumented)
+type OrpcDefinition775 = ContractModel<'OrpcDefinition775'>;
+
+// @public (undocumented)
+type OrpcDefinition776 = ContractModel<'OrpcDefinition776'>;
+
+// @public (undocumented)
+type OrpcDefinition777 = ContractModel<'OrpcDefinition777'>;
+
+// @public (undocumented)
+type OrpcDefinition778 = ContractModel<'OrpcDefinition778'>;
+
+// @public (undocumented)
+type OrpcDefinition779 = ContractModel<'OrpcDefinition779'>;
+
+// @public (undocumented)
+type OrpcDefinition78 = ContractModel<'OrpcDefinition78'>;
+
+// @public (undocumented)
+type OrpcDefinition780 = ContractModel<'OrpcDefinition780'>;
+
+// @public (undocumented)
+type OrpcDefinition781 = ContractModel<'OrpcDefinition781'>;
+
+// @public (undocumented)
+type OrpcDefinition782 = ContractModel<'OrpcDefinition782'>;
+
+// @public (undocumented)
+type OrpcDefinition783 = ContractModel<'OrpcDefinition783'>;
+
+// @public (undocumented)
+type OrpcDefinition784 = ContractModel<'OrpcDefinition784'>;
+
+// @public (undocumented)
+type OrpcDefinition785 = ContractModel<'OrpcDefinition785'>;
+
+// @public (undocumented)
+type OrpcDefinition786 = ContractModel<'OrpcDefinition786'>;
+
+// @public (undocumented)
+type OrpcDefinition787 = ContractModel<'OrpcDefinition787'>;
+
+// @public (undocumented)
+type OrpcDefinition788 = ContractModel<'OrpcDefinition788'>;
+
+// @public (undocumented)
+type OrpcDefinition789 = ContractModel<'OrpcDefinition789'>;
+
+// @public (undocumented)
+type OrpcDefinition79 = ContractModel<'OrpcDefinition79'>;
+
+// @public (undocumented)
+type OrpcDefinition790 = ContractModel<'OrpcDefinition790'>;
+
+// @public (undocumented)
+type OrpcDefinition791 = ContractModel<'OrpcDefinition791'>;
+
+// @public (undocumented)
+type OrpcDefinition792 = ContractModel<'OrpcDefinition792'>;
+
+// @public (undocumented)
+type OrpcDefinition793 = ContractModel<'OrpcDefinition793'>;
+
+// @public (undocumented)
+type OrpcDefinition794 = ContractModel<'OrpcDefinition794'>;
+
+// @public (undocumented)
+type OrpcDefinition795 = ContractModel<'OrpcDefinition795'>;
+
+// @public (undocumented)
+type OrpcDefinition796 = ContractModel<'OrpcDefinition796'>;
+
+// @public (undocumented)
+type OrpcDefinition797 = ContractModel<'OrpcDefinition797'>;
+
+// @public (undocumented)
+type OrpcDefinition798 = ContractModel<'OrpcDefinition798'>;
+
+// @public (undocumented)
+type OrpcDefinition799 = ContractModel<'OrpcDefinition799'>;
+
+// @public (undocumented)
+type OrpcDefinition8 = ContractModel<'OrpcDefinition8'>;
+
+// @public (undocumented)
+type OrpcDefinition80 = ContractModel<'OrpcDefinition80'>;
+
+// @public (undocumented)
+type OrpcDefinition800 = ContractModel<'OrpcDefinition800'>;
+
+// @public (undocumented)
+type OrpcDefinition801 = ContractModel<'OrpcDefinition801'>;
+
+// @public (undocumented)
+type OrpcDefinition802 = ContractModel<'OrpcDefinition802'>;
+
+// @public (undocumented)
+type OrpcDefinition803 = ContractModel<'OrpcDefinition803'>;
+
+// @public (undocumented)
+type OrpcDefinition804 = ContractModel<'OrpcDefinition804'>;
+
+// @public (undocumented)
+type OrpcDefinition805 = ContractModel<'OrpcDefinition805'>;
+
+// @public (undocumented)
+type OrpcDefinition806 = ContractModel<'OrpcDefinition806'>;
+
+// @public (undocumented)
+type OrpcDefinition807 = ContractModel<'OrpcDefinition807'>;
+
+// @public (undocumented)
+type OrpcDefinition808 = ContractModel<'OrpcDefinition808'>;
+
+// @public (undocumented)
+type OrpcDefinition809 = ContractModel<'OrpcDefinition809'>;
+
+// @public (undocumented)
+type OrpcDefinition81 = ContractModel<'OrpcDefinition81'>;
+
+// @public (undocumented)
+type OrpcDefinition810 = ContractModel<'OrpcDefinition810'>;
+
+// @public (undocumented)
+type OrpcDefinition811 = ContractModel<'OrpcDefinition811'>;
+
+// @public (undocumented)
+type OrpcDefinition812 = ContractModel<'OrpcDefinition812'>;
+
+// @public (undocumented)
+type OrpcDefinition813 = ContractModel<'OrpcDefinition813'>;
+
+// @public (undocumented)
+type OrpcDefinition814 = ContractModel<'OrpcDefinition814'>;
+
+// @public (undocumented)
+type OrpcDefinition815 = ContractModel<'OrpcDefinition815'>;
+
+// @public (undocumented)
+type OrpcDefinition816 = ContractModel<'OrpcDefinition816'>;
+
+// @public (undocumented)
+type OrpcDefinition817 = ContractModel<'OrpcDefinition817'>;
+
+// @public (undocumented)
+type OrpcDefinition818 = ContractModel<'OrpcDefinition818'>;
+
+// @public (undocumented)
+type OrpcDefinition819 = ContractModel<'OrpcDefinition819'>;
+
+// @public (undocumented)
+type OrpcDefinition82 = ContractModel<'OrpcDefinition82'>;
+
+// @public (undocumented)
+type OrpcDefinition820 = ContractModel<'OrpcDefinition820'>;
+
+// @public (undocumented)
+type OrpcDefinition821 = ContractModel<'OrpcDefinition821'>;
+
+// @public (undocumented)
+type OrpcDefinition822 = ContractModel<'OrpcDefinition822'>;
+
+// @public (undocumented)
+type OrpcDefinition823 = ContractModel<'OrpcDefinition823'>;
+
+// @public (undocumented)
+type OrpcDefinition824 = ContractModel<'OrpcDefinition824'>;
+
+// @public (undocumented)
+type OrpcDefinition825 = ContractModel<'OrpcDefinition825'>;
+
+// @public (undocumented)
+type OrpcDefinition826 = ContractModel<'OrpcDefinition826'>;
+
+// @public (undocumented)
+type OrpcDefinition827 = ContractModel<'OrpcDefinition827'>;
+
+// @public (undocumented)
+type OrpcDefinition828 = ContractModel<'OrpcDefinition828'>;
+
+// @public (undocumented)
+type OrpcDefinition829 = ContractModel<'OrpcDefinition829'>;
+
+// @public (undocumented)
+type OrpcDefinition83 = ContractModel<'OrpcDefinition83'>;
+
+// @public (undocumented)
+type OrpcDefinition830 = ContractModel<'OrpcDefinition830'>;
+
+// @public (undocumented)
+type OrpcDefinition831 = ContractModel<'OrpcDefinition831'>;
+
+// @public (undocumented)
+type OrpcDefinition832 = ContractModel<'OrpcDefinition832'>;
+
+// @public (undocumented)
+type OrpcDefinition833 = ContractModel<'OrpcDefinition833'>;
+
+// @public (undocumented)
+type OrpcDefinition834 = ContractModel<'OrpcDefinition834'>;
+
+// @public (undocumented)
+type OrpcDefinition835 = ContractModel<'OrpcDefinition835'>;
+
+// @public (undocumented)
+type OrpcDefinition836 = ContractModel<'OrpcDefinition836'>;
+
+// @public (undocumented)
+type OrpcDefinition837 = ContractModel<'OrpcDefinition837'>;
+
+// @public (undocumented)
+type OrpcDefinition838 = ContractModel<'OrpcDefinition838'>;
+
+// @public (undocumented)
+type OrpcDefinition839 = ContractModel<'OrpcDefinition839'>;
+
+// @public (undocumented)
+type OrpcDefinition84 = ContractModel<'OrpcDefinition84'>;
+
+// @public (undocumented)
+type OrpcDefinition840 = ContractModel<'OrpcDefinition840'>;
+
+// @public (undocumented)
+type OrpcDefinition841 = ContractModel<'OrpcDefinition841'>;
+
+// @public (undocumented)
+type OrpcDefinition842 = ContractModel<'OrpcDefinition842'>;
+
+// @public (undocumented)
+type OrpcDefinition843 = ContractModel<'OrpcDefinition843'>;
+
+// @public (undocumented)
+type OrpcDefinition844 = ContractModel<'OrpcDefinition844'>;
+
+// @public (undocumented)
+type OrpcDefinition845 = ContractModel<'OrpcDefinition845'>;
+
+// @public (undocumented)
+type OrpcDefinition846 = ContractModel<'OrpcDefinition846'>;
+
+// @public (undocumented)
+type OrpcDefinition847 = ContractModel<'OrpcDefinition847'>;
+
+// @public (undocumented)
+type OrpcDefinition848 = ContractModel<'OrpcDefinition848'>;
+
+// @public (undocumented)
+type OrpcDefinition849 = ContractModel<'OrpcDefinition849'>;
+
+// @public (undocumented)
+type OrpcDefinition85 = ContractModel<'OrpcDefinition85'>;
+
+// @public (undocumented)
+type OrpcDefinition850 = ContractModel<'OrpcDefinition850'>;
+
+// @public (undocumented)
+type OrpcDefinition851 = ContractModel<'OrpcDefinition851'>;
+
+// @public (undocumented)
+type OrpcDefinition852 = ContractModel<'OrpcDefinition852'>;
+
+// @public (undocumented)
+type OrpcDefinition853 = ContractModel<'OrpcDefinition853'>;
+
+// @public (undocumented)
+type OrpcDefinition854 = ContractModel<'OrpcDefinition854'>;
+
+// @public (undocumented)
+type OrpcDefinition855 = ContractModel<'OrpcDefinition855'>;
+
+// @public (undocumented)
+type OrpcDefinition856 = ContractModel<'OrpcDefinition856'>;
+
+// @public (undocumented)
+type OrpcDefinition857 = ContractModel<'OrpcDefinition857'>;
+
+// @public (undocumented)
+type OrpcDefinition858 = ContractModel<'OrpcDefinition858'>;
+
+// @public (undocumented)
+type OrpcDefinition859 = ContractModel<'OrpcDefinition859'>;
+
+// @public (undocumented)
+type OrpcDefinition86 = ContractModel<'OrpcDefinition86'>;
+
+// @public (undocumented)
+type OrpcDefinition860 = ContractModel<'OrpcDefinition860'>;
+
+// @public (undocumented)
+type OrpcDefinition861 = ContractModel<'OrpcDefinition861'>;
+
+// @public (undocumented)
+type OrpcDefinition862 = ContractModel<'OrpcDefinition862'>;
+
+// @public (undocumented)
+type OrpcDefinition863 = ContractModel<'OrpcDefinition863'>;
+
+// @public (undocumented)
+type OrpcDefinition864 = ContractModel<'OrpcDefinition864'>;
+
+// @public (undocumented)
+type OrpcDefinition865 = ContractModel<'OrpcDefinition865'>;
+
+// @public (undocumented)
+type OrpcDefinition866 = ContractModel<'OrpcDefinition866'>;
+
+// @public (undocumented)
+type OrpcDefinition867 = ContractModel<'OrpcDefinition867'>;
+
+// @public (undocumented)
+type OrpcDefinition868 = ContractModel<'OrpcDefinition868'>;
+
+// @public (undocumented)
+type OrpcDefinition869 = ContractModel<'OrpcDefinition869'>;
+
+// @public (undocumented)
+type OrpcDefinition87 = ContractModel<'OrpcDefinition87'>;
+
+// @public (undocumented)
+type OrpcDefinition870 = ContractModel<'OrpcDefinition870'>;
+
+// @public (undocumented)
+type OrpcDefinition871 = ContractModel<'OrpcDefinition871'>;
+
+// @public (undocumented)
+type OrpcDefinition872 = ContractModel<'OrpcDefinition872'>;
+
+// @public (undocumented)
+type OrpcDefinition873 = ContractModel<'OrpcDefinition873'>;
+
+// @public (undocumented)
+type OrpcDefinition874 = ContractModel<'OrpcDefinition874'>;
+
+// @public (undocumented)
+type OrpcDefinition875 = ContractModel<'OrpcDefinition875'>;
+
+// @public (undocumented)
+type OrpcDefinition876 = ContractModel<'OrpcDefinition876'>;
+
+// @public (undocumented)
+type OrpcDefinition877 = ContractModel<'OrpcDefinition877'>;
+
+// @public (undocumented)
+type OrpcDefinition878 = ContractModel<'OrpcDefinition878'>;
+
+// @public (undocumented)
+type OrpcDefinition879 = ContractModel<'OrpcDefinition879'>;
+
+// @public (undocumented)
+type OrpcDefinition88 = ContractModel<'OrpcDefinition88'>;
+
+// @public (undocumented)
+type OrpcDefinition880 = ContractModel<'OrpcDefinition880'>;
+
+// @public (undocumented)
+type OrpcDefinition881 = ContractModel<'OrpcDefinition881'>;
+
+// @public (undocumented)
+type OrpcDefinition882 = ContractModel<'OrpcDefinition882'>;
+
+// @public (undocumented)
+type OrpcDefinition883 = ContractModel<'OrpcDefinition883'>;
+
+// @public (undocumented)
+type OrpcDefinition884 = ContractModel<'OrpcDefinition884'>;
+
+// @public (undocumented)
+type OrpcDefinition885 = ContractModel<'OrpcDefinition885'>;
+
+// @public (undocumented)
+type OrpcDefinition886 = ContractModel<'OrpcDefinition886'>;
+
+// @public (undocumented)
+type OrpcDefinition887 = ContractModel<'OrpcDefinition887'>;
+
+// @public (undocumented)
+type OrpcDefinition888 = ContractModel<'OrpcDefinition888'>;
+
+// @public (undocumented)
+type OrpcDefinition889 = ContractModel<'OrpcDefinition889'>;
+
+// @public (undocumented)
+type OrpcDefinition89 = ContractModel<'OrpcDefinition89'>;
+
+// @public (undocumented)
+type OrpcDefinition890 = ContractModel<'OrpcDefinition890'>;
+
+// @public (undocumented)
+type OrpcDefinition891 = ContractModel<'OrpcDefinition891'>;
+
+// @public (undocumented)
+type OrpcDefinition892 = ContractModel<'OrpcDefinition892'>;
+
+// @public (undocumented)
+type OrpcDefinition893 = ContractModel<'OrpcDefinition893'>;
+
+// @public (undocumented)
+type OrpcDefinition894 = ContractModel<'OrpcDefinition894'>;
+
+// @public (undocumented)
+type OrpcDefinition895 = ContractModel<'OrpcDefinition895'>;
+
+// @public (undocumented)
+type OrpcDefinition896 = ContractModel<'OrpcDefinition896'>;
+
+// @public (undocumented)
+type OrpcDefinition897 = ContractModel<'OrpcDefinition897'>;
+
+// @public (undocumented)
+type OrpcDefinition898 = ContractModel<'OrpcDefinition898'>;
+
+// @public (undocumented)
+type OrpcDefinition899 = ContractModel<'OrpcDefinition899'>;
+
+// @public (undocumented)
+type OrpcDefinition9 = ContractModel<'OrpcDefinition9'>;
+
+// @public (undocumented)
+type OrpcDefinition90 = ContractModel<'OrpcDefinition90'>;
+
+// @public (undocumented)
+type OrpcDefinition900 = ContractModel<'OrpcDefinition900'>;
+
+// @public (undocumented)
+type OrpcDefinition901 = ContractModel<'OrpcDefinition901'>;
+
+// @public (undocumented)
+type OrpcDefinition902 = ContractModel<'OrpcDefinition902'>;
+
+// @public (undocumented)
+type OrpcDefinition903 = ContractModel<'OrpcDefinition903'>;
+
+// @public (undocumented)
+type OrpcDefinition904 = ContractModel<'OrpcDefinition904'>;
+
+// @public (undocumented)
+type OrpcDefinition905 = ContractModel<'OrpcDefinition905'>;
+
+// @public (undocumented)
+type OrpcDefinition906 = ContractModel<'OrpcDefinition906'>;
+
+// @public (undocumented)
+type OrpcDefinition907 = ContractModel<'OrpcDefinition907'>;
+
+// @public (undocumented)
+type OrpcDefinition908 = ContractModel<'OrpcDefinition908'>;
+
+// @public (undocumented)
+type OrpcDefinition909 = ContractModel<'OrpcDefinition909'>;
+
+// @public (undocumented)
+type OrpcDefinition91 = ContractModel<'OrpcDefinition91'>;
+
+// @public (undocumented)
+type OrpcDefinition910 = ContractModel<'OrpcDefinition910'>;
+
+// @public (undocumented)
+type OrpcDefinition911 = ContractModel<'OrpcDefinition911'>;
+
+// @public (undocumented)
+type OrpcDefinition912 = ContractModel<'OrpcDefinition912'>;
+
+// @public (undocumented)
+type OrpcDefinition913 = ContractModel<'OrpcDefinition913'>;
+
+// @public (undocumented)
+type OrpcDefinition914 = ContractModel<'OrpcDefinition914'>;
+
+// @public (undocumented)
+type OrpcDefinition915 = ContractModel<'OrpcDefinition915'>;
+
+// @public (undocumented)
+type OrpcDefinition916 = ContractModel<'OrpcDefinition916'>;
+
+// @public (undocumented)
+type OrpcDefinition917 = ContractModel<'OrpcDefinition917'>;
+
+// @public (undocumented)
+type OrpcDefinition918 = ContractModel<'OrpcDefinition918'>;
+
+// @public (undocumented)
+type OrpcDefinition919 = ContractModel<'OrpcDefinition919'>;
+
+// @public (undocumented)
+type OrpcDefinition92 = ContractModel<'OrpcDefinition92'>;
+
+// @public (undocumented)
+type OrpcDefinition920 = ContractModel<'OrpcDefinition920'>;
+
+// @public (undocumented)
+type OrpcDefinition921 = ContractModel<'OrpcDefinition921'>;
+
+// @public (undocumented)
+type OrpcDefinition922 = ContractModel<'OrpcDefinition922'>;
+
+// @public (undocumented)
+type OrpcDefinition923 = ContractModel<'OrpcDefinition923'>;
+
+// @public (undocumented)
+type OrpcDefinition924 = ContractModel<'OrpcDefinition924'>;
+
+// @public (undocumented)
+type OrpcDefinition925 = ContractModel<'OrpcDefinition925'>;
+
+// @public (undocumented)
+type OrpcDefinition926 = ContractModel<'OrpcDefinition926'>;
+
+// @public (undocumented)
+type OrpcDefinition927 = ContractModel<'OrpcDefinition927'>;
+
+// @public (undocumented)
+type OrpcDefinition928 = ContractModel<'OrpcDefinition928'>;
+
+// @public (undocumented)
+type OrpcDefinition929 = ContractModel<'OrpcDefinition929'>;
+
+// @public (undocumented)
+type OrpcDefinition93 = ContractModel<'OrpcDefinition93'>;
+
+// @public (undocumented)
+type OrpcDefinition930 = ContractModel<'OrpcDefinition930'>;
+
+// @public (undocumented)
+type OrpcDefinition931 = ContractModel<'OrpcDefinition931'>;
+
+// @public (undocumented)
+type OrpcDefinition932 = ContractModel<'OrpcDefinition932'>;
+
+// @public (undocumented)
+type OrpcDefinition933 = ContractModel<'OrpcDefinition933'>;
+
+// @public (undocumented)
+type OrpcDefinition934 = ContractModel<'OrpcDefinition934'>;
+
+// @public (undocumented)
+type OrpcDefinition935 = ContractModel<'OrpcDefinition935'>;
+
+// @public (undocumented)
+type OrpcDefinition936 = ContractModel<'OrpcDefinition936'>;
+
+// @public (undocumented)
+type OrpcDefinition937 = ContractModel<'OrpcDefinition937'>;
+
+// @public (undocumented)
+type OrpcDefinition938 = ContractModel<'OrpcDefinition938'>;
+
+// @public (undocumented)
+type OrpcDefinition939 = ContractModel<'OrpcDefinition939'>;
+
+// @public (undocumented)
+type OrpcDefinition94 = ContractModel<'OrpcDefinition94'>;
+
+// @public (undocumented)
+type OrpcDefinition940 = ContractModel<'OrpcDefinition940'>;
+
+// @public (undocumented)
+type OrpcDefinition941 = ContractModel<'OrpcDefinition941'>;
+
+// @public (undocumented)
+type OrpcDefinition942 = ContractModel<'OrpcDefinition942'>;
+
+// @public (undocumented)
+type OrpcDefinition943 = ContractModel<'OrpcDefinition943'>;
+
+// @public (undocumented)
+type OrpcDefinition944 = ContractModel<'OrpcDefinition944'>;
+
+// @public (undocumented)
+type OrpcDefinition945 = ContractModel<'OrpcDefinition945'>;
+
+// @public (undocumented)
+type OrpcDefinition946 = ContractModel<'OrpcDefinition946'>;
+
+// @public (undocumented)
+type OrpcDefinition947 = ContractModel<'OrpcDefinition947'>;
+
+// @public (undocumented)
+type OrpcDefinition948 = ContractModel<'OrpcDefinition948'>;
+
+// @public (undocumented)
+type OrpcDefinition949 = ContractModel<'OrpcDefinition949'>;
+
+// @public (undocumented)
+type OrpcDefinition95 = ContractModel<'OrpcDefinition95'>;
+
+// @public (undocumented)
+type OrpcDefinition950 = ContractModel<'OrpcDefinition950'>;
+
+// @public (undocumented)
+type OrpcDefinition951 = ContractModel<'OrpcDefinition951'>;
+
+// @public (undocumented)
+type OrpcDefinition952 = ContractModel<'OrpcDefinition952'>;
+
+// @public (undocumented)
+type OrpcDefinition953 = ContractModel<'OrpcDefinition953'>;
+
+// @public (undocumented)
+type OrpcDefinition954 = ContractModel<'OrpcDefinition954'>;
+
+// @public (undocumented)
+type OrpcDefinition955 = ContractModel<'OrpcDefinition955'>;
+
+// @public (undocumented)
+type OrpcDefinition956 = ContractModel<'OrpcDefinition956'>;
+
+// @public (undocumented)
+type OrpcDefinition957 = ContractModel<'OrpcDefinition957'>;
+
+// @public (undocumented)
+type OrpcDefinition958 = ContractModel<'OrpcDefinition958'>;
+
+// @public (undocumented)
+type OrpcDefinition959 = ContractModel<'OrpcDefinition959'>;
+
+// @public (undocumented)
+type OrpcDefinition96 = ContractModel<'OrpcDefinition96'>;
+
+// @public (undocumented)
+type OrpcDefinition960 = ContractModel<'OrpcDefinition960'>;
+
+// @public (undocumented)
+type OrpcDefinition961 = ContractModel<'OrpcDefinition961'>;
+
+// @public (undocumented)
+type OrpcDefinition962 = ContractModel<'OrpcDefinition962'>;
+
+// @public (undocumented)
+type OrpcDefinition963 = ContractModel<'OrpcDefinition963'>;
+
+// @public (undocumented)
+type OrpcDefinition964 = ContractModel<'OrpcDefinition964'>;
+
+// @public (undocumented)
+type OrpcDefinition965 = ContractModel<'OrpcDefinition965'>;
+
+// @public (undocumented)
+type OrpcDefinition966 = ContractModel<'OrpcDefinition966'>;
+
+// @public (undocumented)
+type OrpcDefinition967 = ContractModel<'OrpcDefinition967'>;
+
+// @public (undocumented)
+type OrpcDefinition968 = ContractModel<'OrpcDefinition968'>;
+
+// @public (undocumented)
+type OrpcDefinition969 = ContractModel<'OrpcDefinition969'>;
+
+// @public (undocumented)
+type OrpcDefinition97 = ContractModel<'OrpcDefinition97'>;
+
+// @public (undocumented)
+type OrpcDefinition970 = ContractModel<'OrpcDefinition970'>;
+
+// @public (undocumented)
+type OrpcDefinition971 = ContractModel<'OrpcDefinition971'>;
+
+// @public (undocumented)
+type OrpcDefinition972 = ContractModel<'OrpcDefinition972'>;
+
+// @public (undocumented)
+type OrpcDefinition973 = ContractModel<'OrpcDefinition973'>;
+
+// @public (undocumented)
+type OrpcDefinition974 = ContractModel<'OrpcDefinition974'>;
+
+// @public (undocumented)
+type OrpcDefinition975 = ContractModel<'OrpcDefinition975'>;
+
+// @public (undocumented)
+type OrpcDefinition976 = ContractModel<'OrpcDefinition976'>;
+
+// @public (undocumented)
+type OrpcDefinition977 = ContractModel<'OrpcDefinition977'>;
+
+// @public (undocumented)
+type OrpcDefinition978 = ContractModel<'OrpcDefinition978'>;
+
+// @public (undocumented)
+type OrpcDefinition979 = ContractModel<'OrpcDefinition979'>;
+
+// @public (undocumented)
+type OrpcDefinition98 = ContractModel<'OrpcDefinition98'>;
+
+// @public (undocumented)
+type OrpcDefinition980 = ContractModel<'OrpcDefinition980'>;
+
+// @public (undocumented)
+type OrpcDefinition981 = ContractModel<'OrpcDefinition981'>;
+
+// @public (undocumented)
+type OrpcDefinition982 = ContractModel<'OrpcDefinition982'>;
+
+// @public (undocumented)
+type OrpcDefinition983 = ContractModel<'OrpcDefinition983'>;
+
+// @public (undocumented)
+type OrpcDefinition984 = ContractModel<'OrpcDefinition984'>;
+
+// @public (undocumented)
+type OrpcDefinition985 = ContractModel<'OrpcDefinition985'>;
+
+// @public (undocumented)
+type OrpcDefinition986 = ContractModel<'OrpcDefinition986'>;
+
+// @public (undocumented)
+type OrpcDefinition987 = ContractModel<'OrpcDefinition987'>;
+
+// @public (undocumented)
+type OrpcDefinition988 = ContractModel<'OrpcDefinition988'>;
+
+// @public (undocumented)
+type OrpcDefinition989 = ContractModel<'OrpcDefinition989'>;
+
+// @public (undocumented)
+type OrpcDefinition99 = ContractModel<'OrpcDefinition99'>;
+
+// @public (undocumented)
+type OrpcDefinition990 = ContractModel<'OrpcDefinition990'>;
+
+// @public (undocumented)
+type OrpcDefinition991 = ContractModel<'OrpcDefinition991'>;
+
+// @public (undocumented)
+type OrpcDefinition992 = ContractModel<'OrpcDefinition992'>;
+
+// @public (undocumented)
+type OrpcDefinition993 = ContractModel<'OrpcDefinition993'>;
+
+// @public (undocumented)
+type OrpcDefinition994 = ContractModel<'OrpcDefinition994'>;
+
+// @public (undocumented)
+type OrpcDefinition995 = ContractModel<'OrpcDefinition995'>;
+
+// @public (undocumented)
+type OrpcDefinition996 = ContractModel<'OrpcDefinition996'>;
+
+// @public (undocumented)
+type OrpcDefinition997 = ContractModel<'OrpcDefinition997'>;
+
+// @public (undocumented)
+type OrpcDefinition998 = ContractModel<'OrpcDefinition998'>;
+
+// @public (undocumented)
+type OrpcDefinition999 = ContractModel<'OrpcDefinition999'>;
 
 // @public (undocumented)
 type Page = ContractModel<'Page'>;
@@ -3173,34 +7551,37 @@ type PageEvent = {
 };
 
 // @public (undocumented)
-type PagePushRequest = ContractRequest<'page-push', operations['page-push']['requestBody']['content']['application/json']>;
+type PagePushRequest = ContractRequest<'page-push'>;
 
 // @public (undocumented)
-type PagesCreateRequest = ContractRequest<'pages/create', operations['pages___create']['requestBody']['content']['application/json']>;
+type PagesCreateRequest = ContractRequest<'pages/create'>;
 
 // @public (undocumented)
-type PagesCreateResponse = ContractResponse<'pages/create', operations['pages___create']['responses']['200']['content']['application/json']>;
+type PagesCreateResponse = ContractResponse<'pages/create'>;
 
 // @public (undocumented)
-type PagesDeleteRequest = ContractRequest<'pages/delete', operations['pages___delete']['requestBody']['content']['application/json']>;
+type PagesDeleteRequest = ContractRequest<'pages/delete'>;
 
 // @public (undocumented)
-type PagesFeaturedResponse = ContractResponse<'pages/featured', operations['pages___featured']['responses']['200']['content']['application/json']>;
+type PagesFeaturedRequest = ContractRequest<'pages/featured'>;
 
 // @public (undocumented)
-type PagesLikeRequest = ContractRequest<'pages/like', operations['pages___like']['requestBody']['content']['application/json']>;
+type PagesFeaturedResponse = ContractResponse<'pages/featured'>;
 
 // @public (undocumented)
-type PagesShowRequest = ContractRequest<'pages/show', operations['pages___show']['requestBody']['content']['application/json']>;
+type PagesLikeRequest = ContractRequest<'pages/like'>;
 
 // @public (undocumented)
-type PagesShowResponse = ContractResponse<'pages/show', operations['pages___show']['responses']['200']['content']['application/json']>;
+type PagesShowRequest = ContractRequest<'pages/show'>;
 
 // @public (undocumented)
-type PagesUnlikeRequest = ContractRequest<'pages/unlike', operations['pages___unlike']['requestBody']['content']['application/json']>;
+type PagesShowResponse = ContractResponse<'pages/show'>;
 
 // @public (undocumented)
-type PagesUpdateRequest = ContractRequest<'pages/update', operations['pages___update']['requestBody']['content']['application/json']>;
+type PagesUnlikeRequest = ContractRequest<'pages/unlike'>;
+
+// @public (undocumented)
+type PagesUpdateRequest = ContractRequest<'pages/update'>;
 
 // @public (undocumented)
 function parse(_acct: string): Acct;
@@ -3217,14 +7598,31 @@ type PartialRolePolicyOverride = Partial<{
 // @public (undocumented)
 export const permissions: readonly ["read:account", "write:account", "read:blocks", "write:blocks", "read:drive", "write:drive", "read:favorites", "write:favorites", "read:following", "write:following", "read:messaging", "write:messaging", "read:mutes", "write:mutes", "write:notes", "read:notifications", "write:notifications", "read:reactions", "write:reactions", "write:votes", "read:pages", "write:pages", "write:page-likes", "read:page-likes", "read:user-groups", "write:user-groups", "read:channels", "write:channels", "read:gallery", "write:gallery", "read:gallery-likes", "write:gallery-likes", "read:flash", "write:flash", "read:flash-likes", "write:flash-likes", "read:admin:abuse-user-reports", "write:admin:delete-account", "write:admin:delete-all-files-of-a-user", "read:admin:index-stats", "read:admin:table-stats", "read:admin:user-ips", "read:admin:meta", "write:admin:reset-password", "write:admin:resolve-abuse-user-report", "write:admin:send-email", "read:admin:server-info", "read:admin:show-moderation-log", "read:admin:show-user", "write:admin:suspend-user", "write:admin:unset-mfa", "write:admin:unset-user-avatar", "write:admin:unset-user-banner", "write:admin:unsuspend-user", "write:admin:meta", "write:admin:user-note", "write:admin:roles", "read:admin:roles", "write:admin:relays", "read:admin:relays", "write:admin:invite-codes", "read:admin:invite-codes", "write:admin:announcements", "read:admin:announcements", "write:admin:avatar-decorations", "read:admin:avatar-decorations", "write:admin:federation", "write:admin:account", "read:admin:account", "write:admin:emoji", "read:admin:emoji", "write:admin:queue", "read:admin:queue", "write:admin:promo", "write:admin:drive", "read:admin:drive", "write:admin:ad", "read:admin:ad", "write:invite-codes", "read:invite-codes", "write:clip-favorite", "read:clip-favorite", "read:federation", "write:report-abuse", "write:chat", "read:chat"];
 
+// Warning: (ae-forgotten-export) The symbol "clientContract" needs to be exported by the entry point index.d.ts
+//
 // @public (undocumented)
-type PingResponse = ContractResponse<'ping', operations['ping']['responses']['200']['content']['application/json']>;
+export type PilotClient = ContractRouterClient<typeof clientContract, PilotClientContext>;
 
 // @public (undocumented)
-type PinnedUsersResponse = ContractResponse<'pinned-users', operations['pinned-users']['responses']['200']['content']['application/json']>;
+export interface PilotClientContext {
+    // (undocumented)
+    credential?: string | null | undefined;
+}
 
 // @public (undocumented)
-type PromoReadRequest = ContractRequest<'promo/read', operations['promo___read']['requestBody']['content']['application/json']>;
+type PingRequest = ContractRequest<'ping'>;
+
+// @public (undocumented)
+type PingResponse = ContractResponse<'ping'>;
+
+// @public (undocumented)
+type PinnedUsersRequest = ContractRequest<'pinned-users'>;
+
+// @public (undocumented)
+type PinnedUsersResponse = ContractResponse<'pinned-users'>;
+
+// @public (undocumented)
+type PromoReadRequest = ContractRequest<'promo/read'>;
 
 // Warning: (ae-forgotten-export) The symbol "AllNullRecord" needs to be exported by the entry point index.d.ts
 // Warning: (ae-forgotten-export) The symbol "AllNullOrOptionalRecord" needs to be exported by the entry point index.d.ts
@@ -3268,31 +7666,37 @@ type QueueStatsLog = QueueStats[];
 export const queueTypes: readonly ["system", "endedPollNotification", "postScheduledNote", "deliver", "inbox", "db", "relationship", "objectStorage", "userWebhookDeliver", "systemWebhookDeliver"];
 
 // @public (undocumented)
-type RenoteMuteCreateRequest = ContractRequest<'renote-mute/create', operations['renote-mute___create']['requestBody']['content']['application/json']>;
+type RenoteMuteCreateRequest = ContractRequest<'renote-mute/create'>;
 
 // @public (undocumented)
-type RenoteMuteDeleteRequest = ContractRequest<'renote-mute/delete', operations['renote-mute___delete']['requestBody']['content']['application/json']>;
+type RenoteMuteDeleteRequest = ContractRequest<'renote-mute/delete'>;
 
 // @public (undocumented)
-type RenoteMuteListRequest = ContractRequest<'renote-mute/list', operations['renote-mute___list']['requestBody']['content']['application/json']>;
+type RenoteMuteListRequest = ContractRequest<'renote-mute/list'>;
 
 // @public (undocumented)
-type RenoteMuteListResponse = ContractResponse<'renote-mute/list', operations['renote-mute___list']['responses']['200']['content']['application/json']>;
+type RenoteMuteListResponse = ContractResponse<'renote-mute/list'>;
 
 // @public (undocumented)
 type RenoteMuting = ContractModel<'RenoteMuting'>;
 
 // @public (undocumented)
-type RequestResetPasswordRequest = ContractRequest<'request-reset-password', operations['request-reset-password']['requestBody']['content']['application/json']>;
+type RequestResetPasswordRequest = ContractRequest<'request-reset-password'>;
 
 // @public (undocumented)
-type ResetPasswordRequest = ContractRequest<'reset-password', operations['reset-password']['requestBody']['content']['application/json']>;
+type ResetDbRequest = ContractRequest<'reset-db'>;
 
 // @public (undocumented)
-type RetentionResponse = ContractResponse<'retention', operations['retention']['responses']['200']['content']['application/json']>;
+type ResetPasswordRequest = ContractRequest<'reset-password'>;
 
 // @public (undocumented)
-type ReversiCancelMatchRequest = ContractRequest<'reversi/cancel-match', operations['reversi___cancel-match']['requestBody']['content']['application/json']>;
+type RetentionRequest = ContractRequest<'retention'>;
+
+// @public (undocumented)
+type RetentionResponse = ContractResponse<'retention'>;
+
+// @public (undocumented)
+type ReversiCancelMatchRequest = ContractRequest<'reversi/cancel-match'>;
 
 // @public (undocumented)
 type ReversiGameDetailed = ContractModel<'ReversiGameDetailed'>;
@@ -3301,37 +7705,40 @@ type ReversiGameDetailed = ContractModel<'ReversiGameDetailed'>;
 type ReversiGameLite = ContractModel<'ReversiGameLite'>;
 
 // @public (undocumented)
-type ReversiGamesRequest = ContractRequest<'reversi/games', operations['reversi___games']['requestBody']['content']['application/json']>;
+type ReversiGamesRequest = ContractRequest<'reversi/games'>;
 
 // @public (undocumented)
-type ReversiGamesResponse = ContractResponse<'reversi/games', operations['reversi___games']['responses']['200']['content']['application/json']>;
+type ReversiGamesResponse = ContractResponse<'reversi/games'>;
 
 // @public (undocumented)
-type ReversiInvitationsResponse = ContractResponse<'reversi/invitations', operations['reversi___invitations']['responses']['200']['content']['application/json']>;
+type ReversiInvitationsRequest = ContractRequest<'reversi/invitations'>;
 
 // @public (undocumented)
-type ReversiMatchRequest = ContractRequest<'reversi/match', operations['reversi___match']['requestBody']['content']['application/json']>;
+type ReversiInvitationsResponse = ContractResponse<'reversi/invitations'>;
 
 // @public (undocumented)
-type ReversiMatchResponse = ContractResponse<'reversi/match', operations['reversi___match']['responses']['200']['content']['application/json']>;
+type ReversiMatchRequest = ContractRequest<'reversi/match'>;
 
 // @public (undocumented)
-type ReversiShowGameRequest = ContractRequest<'reversi/show-game', operations['reversi___show-game']['requestBody']['content']['application/json']>;
+type ReversiMatchResponse = ContractResponse<'reversi/match'>;
 
 // @public (undocumented)
-type ReversiShowGameResponse = ContractResponse<'reversi/show-game', operations['reversi___show-game']['responses']['200']['content']['application/json']>;
+type ReversiShowGameRequest = ContractRequest<'reversi/show-game'>;
 
 // @public (undocumented)
-type ReversiSurrenderRequest = ContractRequest<'reversi/surrender', operations['reversi___surrender']['requestBody']['content']['application/json']>;
+type ReversiShowGameResponse = ContractResponse<'reversi/show-game'>;
+
+// @public (undocumented)
+type ReversiSurrenderRequest = ContractRequest<'reversi/surrender'>;
 
 // @public (undocumented)
 export const reversiUpdateKeys: ["map", "bw", "isLlotheo", "canPutEverywhere", "loopedBoard", "timeLimitForEachTurn"];
 
 // @public (undocumented)
-type ReversiVerifyRequest = ContractRequest<'reversi/verify', operations['reversi___verify']['requestBody']['content']['application/json']>;
+type ReversiVerifyRequest = ContractRequest<'reversi/verify'>;
 
 // @public (undocumented)
-type ReversiVerifyResponse = ContractResponse<'reversi/verify', operations['reversi___verify']['responses']['200']['content']['application/json']>;
+type ReversiVerifyResponse = ContractResponse<'reversi/verify'>;
 
 // @public (undocumented)
 type Role = ContractModel<'Role'>;
@@ -3370,28 +7777,34 @@ type RolePolicies = ContractModel<'RolePolicies'>;
 export const rolePolicies: readonly ["gtlAvailable", "ltlAvailable", "canPublicNote", "mentionLimit", "canInvite", "inviteLimit", "inviteLimitCycle", "inviteExpirationTime", "canManageCustomEmojis", "canManageAvatarDecorations", "canSearchNotes", "canSearchUsers", "canUseTranslator", "canHideAds", "canCreateChannel", "driveCapacityMb", "maxFileSizeMb", "alwaysMarkNsfw", "canUpdateBioMedia", "pinLimit", "antennaLimit", "wordMuteLimit", "webhookLimit", "clipLimit", "noteEachClipsLimit", "userListLimit", "userEachUserListsLimit", "rateLimitFactor", "avatarDecorationLimit", "canImportAntennas", "canImportBlocking", "canImportFollowing", "canImportMuting", "canImportUserLists", "chatAvailability", "uploadableFileTypes", "noteDraftLimit", "scheduledNoteLimit", "watermarkAvailable"];
 
 // @public (undocumented)
-type RolesListResponse = ContractResponse<'roles/list', operations['roles___list']['responses']['200']['content']['application/json']>;
+type RolesListRequest = ContractRequest<'roles/list'>;
 
 // @public (undocumented)
-type RolesNotesRequest = ContractRequest<'roles/notes', operations['roles___notes']['requestBody']['content']['application/json']>;
+type RolesListResponse = ContractResponse<'roles/list'>;
 
 // @public (undocumented)
-type RolesNotesResponse = ContractResponse<'roles/notes', operations['roles___notes']['responses']['200']['content']['application/json']>;
+type RolesNotesRequest = ContractRequest<'roles/notes'>;
 
 // @public (undocumented)
-type RolesShowRequest = ContractRequest<'roles/show', operations['roles___show']['requestBody']['content']['application/json']>;
+type RolesNotesResponse = ContractResponse<'roles/notes'>;
 
 // @public (undocumented)
-type RolesShowResponse = ContractResponse<'roles/show', operations['roles___show']['responses']['200']['content']['application/json']>;
+type RolesShowRequest = ContractRequest<'roles/show'>;
 
 // @public (undocumented)
-type RolesUsersRequest = ContractRequest<'roles/users', operations['roles___users']['requestBody']['content']['application/json']>;
+type RolesShowResponse = ContractResponse<'roles/show'>;
 
 // @public (undocumented)
-type RolesUsersResponse = ContractResponse<'roles/users', operations['roles___users']['responses']['200']['content']['application/json']>;
+type RolesUsersRequest = ContractRequest<'roles/users'>;
 
 // @public (undocumented)
-type ServerInfoResponse = ContractResponse<'server-info', operations['server-info']['responses']['200']['content']['application/json']>;
+type RolesUsersResponse = ContractResponse<'roles/users'>;
+
+// @public (undocumented)
+type ServerInfoRequest = ContractRequest<'server-info'>;
+
+// @public (undocumented)
+type ServerInfoResponse = ContractResponse<'server-info'>;
 
 // @public (undocumented)
 type ServerStats = {
@@ -3493,7 +7906,10 @@ type SignupResponse = MeDetailed & {
 };
 
 // @public (undocumented)
-type StatsResponse = ContractResponse<'stats', operations['stats']['responses']['200']['content']['application/json']>;
+type StatsRequest = ContractRequest<'stats'>;
+
+// @public (undocumented)
+type StatsResponse = ContractResponse<'stats'>;
 
 // @public (undocumented)
 export class Stream extends EventEmitter<StreamEvents> implements IStream {
@@ -3535,42 +7951,43 @@ export type StreamEvents = {
     _disconnected_: void;
 } & BroadcastEvents;
 
+// Warning: (ae-forgotten-export) The symbol "UsersShowResponse" needs to be exported by the entry point index.d.ts
 // Warning: (ae-forgotten-export) The symbol "SwitchCase" needs to be exported by the entry point index.d.ts
 // Warning: (ae-forgotten-export) The symbol "IsCaseMatched" needs to be exported by the entry point index.d.ts
 // Warning: (ae-forgotten-export) The symbol "GetCaseResult" needs to be exported by the entry point index.d.ts
 //
 // @public (undocumented)
-type SwitchCaseResponseType<E extends keyof Endpoints, P extends Endpoints[E]['req']> = Endpoints[E]['res'] extends SwitchCase ? IsCaseMatched<E, P, 0> extends true ? GetCaseResult<E, P, 0> : IsCaseMatched<E, P, 1> extends true ? GetCaseResult<E, P, 1> : IsCaseMatched<E, P, 2> extends true ? GetCaseResult<E, P, 2> : IsCaseMatched<E, P, 3> extends true ? GetCaseResult<E, P, 3> : IsCaseMatched<E, P, 4> extends true ? GetCaseResult<E, P, 4> : IsCaseMatched<E, P, 5> extends true ? GetCaseResult<E, P, 5> : IsCaseMatched<E, P, 6> extends true ? GetCaseResult<E, P, 6> : IsCaseMatched<E, P, 7> extends true ? GetCaseResult<E, P, 7> : IsCaseMatched<E, P, 8> extends true ? GetCaseResult<E, P, 8> : IsCaseMatched<E, P, 9> extends true ? GetCaseResult<E, P, 9> : Endpoints[E]['res']['$switch']['$default'] : Endpoints[E]['res'];
+type SwitchCaseResponseType<E extends keyof Endpoints, P extends Endpoints[E]['req']> = [E] extends ['users/show'] ? UsersShowResponse<P> : Endpoints[E]['res'] extends SwitchCase ? IsCaseMatched<E, P, 0> extends true ? GetCaseResult<E, P, 0> : IsCaseMatched<E, P, 1> extends true ? GetCaseResult<E, P, 1> : IsCaseMatched<E, P, 2> extends true ? GetCaseResult<E, P, 2> : IsCaseMatched<E, P, 3> extends true ? GetCaseResult<E, P, 3> : IsCaseMatched<E, P, 4> extends true ? GetCaseResult<E, P, 4> : IsCaseMatched<E, P, 5> extends true ? GetCaseResult<E, P, 5> : IsCaseMatched<E, P, 6> extends true ? GetCaseResult<E, P, 6> : IsCaseMatched<E, P, 7> extends true ? GetCaseResult<E, P, 7> : IsCaseMatched<E, P, 8> extends true ? GetCaseResult<E, P, 8> : IsCaseMatched<E, P, 9> extends true ? GetCaseResult<E, P, 9> : Endpoints[E]['res']['$switch']['$default'] : Endpoints[E]['res'];
 
 // @public (undocumented)
-type SwRegisterRequest = ContractRequest<'sw/register', operations['sw___register']['requestBody']['content']['application/json']>;
+type SwRegisterRequest = ContractRequest<'sw/register'>;
 
 // @public (undocumented)
-type SwRegisterResponse = ContractResponse<'sw/register', operations['sw___register']['responses']['200']['content']['application/json']>;
+type SwRegisterResponse = ContractResponse<'sw/register'>;
 
 // @public (undocumented)
-type SwShowRegistrationRequest = ContractRequest<'sw/show-registration', operations['sw___show-registration']['requestBody']['content']['application/json']>;
+type SwShowRegistrationRequest = ContractRequest<'sw/show-registration'>;
 
 // @public (undocumented)
-type SwShowRegistrationResponse = ContractResponse<'sw/show-registration', operations['sw___show-registration']['responses']['200']['content']['application/json']>;
+type SwShowRegistrationResponse = ContractResponse<'sw/show-registration'>;
 
 // @public (undocumented)
-type SwUnregisterRequest = ContractRequest<'sw/unregister', operations['sw___unregister']['requestBody']['content']['application/json']>;
+type SwUnregisterRequest = ContractRequest<'sw/unregister'>;
 
 // @public (undocumented)
-type SwUpdateRegistrationRequest = ContractRequest<'sw/update-registration', operations['sw___update-registration']['requestBody']['content']['application/json']>;
+type SwUpdateRegistrationRequest = ContractRequest<'sw/update-registration'>;
 
 // @public (undocumented)
-type SwUpdateRegistrationResponse = ContractResponse<'sw/update-registration', operations['sw___update-registration']['responses']['200']['content']['application/json']>;
+type SwUpdateRegistrationResponse = ContractResponse<'sw/update-registration'>;
 
 // @public (undocumented)
 type SystemWebhook = ContractModel<'SystemWebhook'>;
 
 // @public (undocumented)
-type TestRequest = ContractRequest<'test', operations['test']['requestBody']['content']['application/json']>;
+type TestRequest = ContractRequest<'test'>;
 
 // @public (undocumented)
-type TestResponse = ContractResponse<'test', operations['test']['responses']['200']['content']['application/json']>;
+type TestResponse = ContractResponse<'test'>;
 
 // @public (undocumented)
 function toString_2(acct: Acct): string;
@@ -3594,190 +8011,190 @@ type UserList = ContractModel<'UserList'>;
 type UserLite = ContractModel<'UserLite'>;
 
 // @public (undocumented)
-type UsernameAvailableRequest = ContractRequest<'username/available', operations['username___available']['requestBody']['content']['application/json']>;
+type UsernameAvailableRequest = ContractRequest<'username/available'>;
 
 // @public (undocumented)
-type UsernameAvailableResponse = ContractResponse<'username/available', operations['username___available']['responses']['200']['content']['application/json']>;
+type UsernameAvailableResponse = ContractResponse<'username/available'>;
 
 // @public (undocumented)
-type UsersAchievementsRequest = ContractRequest<'users/achievements', operations['users___achievements']['requestBody']['content']['application/json']>;
+type UsersAchievementsRequest = ContractRequest<'users/achievements'>;
 
 // @public (undocumented)
-type UsersAchievementsResponse = ContractResponse<'users/achievements', operations['users___achievements']['responses']['200']['content']['application/json']>;
+type UsersAchievementsResponse = ContractResponse<'users/achievements'>;
 
 // @public (undocumented)
-type UsersClipsRequest = ContractRequest<'users/clips', operations['users___clips']['requestBody']['content']['application/json']>;
+type UsersClipsRequest = ContractRequest<'users/clips'>;
 
 // @public (undocumented)
-type UsersClipsResponse = ContractResponse<'users/clips', operations['users___clips']['responses']['200']['content']['application/json']>;
+type UsersClipsResponse = ContractResponse<'users/clips'>;
 
 // @public (undocumented)
-type UsersFeaturedNotesRequest = ContractRequest<'users/featured-notes', operations['users___featured-notes']['requestBody']['content']['application/json']>;
+type UsersFeaturedNotesRequest = ContractRequest<'users/featured-notes'>;
 
 // @public (undocumented)
-type UsersFeaturedNotesResponse = ContractResponse<'users/featured-notes', operations['users___featured-notes']['responses']['200']['content']['application/json']>;
+type UsersFeaturedNotesResponse = ContractResponse<'users/featured-notes'>;
 
 // @public (undocumented)
-type UsersFlashsRequest = ContractRequest<'users/flashs', operations['users___flashs']['requestBody']['content']['application/json']>;
+type UsersFlashsRequest = ContractRequest<'users/flashs'>;
 
 // @public (undocumented)
-type UsersFlashsResponse = ContractResponse<'users/flashs', operations['users___flashs']['responses']['200']['content']['application/json']>;
+type UsersFlashsResponse = ContractResponse<'users/flashs'>;
 
 // @public (undocumented)
-type UsersFollowersRequest = ContractRequest<'users/followers', operations['users___followers']['requestBody']['content']['application/json']>;
+type UsersFollowersRequest = ContractRequest<'users/followers'>;
 
 // @public (undocumented)
-type UsersFollowersResponse = ContractResponse<'users/followers', operations['users___followers']['responses']['200']['content']['application/json']>;
+type UsersFollowersResponse = ContractResponse<'users/followers'>;
 
 // @public (undocumented)
-type UsersFollowingRequest = ContractRequest<'users/following', operations['users___following']['requestBody']['content']['application/json']>;
+type UsersFollowingRequest = ContractRequest<'users/following'>;
 
 // @public (undocumented)
-type UsersFollowingResponse = ContractResponse<'users/following', operations['users___following']['responses']['200']['content']['application/json']>;
+type UsersFollowingResponse = ContractResponse<'users/following'>;
 
 // @public (undocumented)
-type UsersGalleryPostsRequest = ContractRequest<'users/gallery/posts', operations['users___gallery___posts']['requestBody']['content']['application/json']>;
+type UsersGalleryPostsRequest = ContractRequest<'users/gallery/posts'>;
 
 // @public (undocumented)
-type UsersGalleryPostsResponse = ContractResponse<'users/gallery/posts', operations['users___gallery___posts']['responses']['200']['content']['application/json']>;
+type UsersGalleryPostsResponse = ContractResponse<'users/gallery/posts'>;
 
 // @public (undocumented)
-type UsersGetFollowingUsersByBirthdayRequest = ContractRequest<'users/get-following-users-by-birthday', operations['users___get-following-users-by-birthday']['requestBody']['content']['application/json']>;
+type UsersGetFollowingUsersByBirthdayRequest = ContractRequest<'users/get-following-users-by-birthday'>;
 
 // @public (undocumented)
-type UsersGetFollowingUsersByBirthdayResponse = ContractResponse<'users/get-following-users-by-birthday', operations['users___get-following-users-by-birthday']['responses']['200']['content']['application/json']>;
+type UsersGetFollowingUsersByBirthdayResponse = ContractResponse<'users/get-following-users-by-birthday'>;
 
 // @public (undocumented)
-type UsersGetFrequentlyRepliedUsersRequest = ContractRequest<'users/get-frequently-replied-users', operations['users___get-frequently-replied-users']['requestBody']['content']['application/json']>;
+type UsersGetFrequentlyRepliedUsersRequest = ContractRequest<'users/get-frequently-replied-users'>;
 
 // @public (undocumented)
-type UsersGetFrequentlyRepliedUsersResponse = ContractResponse<'users/get-frequently-replied-users', operations['users___get-frequently-replied-users']['responses']['200']['content']['application/json']>;
+type UsersGetFrequentlyRepliedUsersResponse = ContractResponse<'users/get-frequently-replied-users'>;
 
 // @public (undocumented)
-type UsersListsCreateFromPublicRequest = ContractRequest<'users/lists/create-from-public', operations['users___lists___create-from-public']['requestBody']['content']['application/json']>;
+type UsersListsCreateFromPublicRequest = ContractRequest<'users/lists/create-from-public'>;
 
 // @public (undocumented)
-type UsersListsCreateFromPublicResponse = ContractResponse<'users/lists/create-from-public', operations['users___lists___create-from-public']['responses']['200']['content']['application/json']>;
+type UsersListsCreateFromPublicResponse = ContractResponse<'users/lists/create-from-public'>;
 
 // @public (undocumented)
-type UsersListsCreateRequest = ContractRequest<'users/lists/create', operations['users___lists___create']['requestBody']['content']['application/json']>;
+type UsersListsCreateRequest = ContractRequest<'users/lists/create'>;
 
 // @public (undocumented)
-type UsersListsCreateResponse = ContractResponse<'users/lists/create', operations['users___lists___create']['responses']['200']['content']['application/json']>;
+type UsersListsCreateResponse = ContractResponse<'users/lists/create'>;
 
 // @public (undocumented)
-type UsersListsDeleteRequest = ContractRequest<'users/lists/delete', operations['users___lists___delete']['requestBody']['content']['application/json']>;
+type UsersListsDeleteRequest = ContractRequest<'users/lists/delete'>;
 
 // @public (undocumented)
-type UsersListsFavoriteRequest = ContractRequest<'users/lists/favorite', operations['users___lists___favorite']['requestBody']['content']['application/json']>;
+type UsersListsFavoriteRequest = ContractRequest<'users/lists/favorite'>;
 
 // @public (undocumented)
-type UsersListsGetMembershipsRequest = ContractRequest<'users/lists/get-memberships', operations['users___lists___get-memberships']['requestBody']['content']['application/json']>;
+type UsersListsGetMembershipsRequest = ContractRequest<'users/lists/get-memberships'>;
 
 // @public (undocumented)
-type UsersListsGetMembershipsResponse = ContractResponse<'users/lists/get-memberships', operations['users___lists___get-memberships']['responses']['200']['content']['application/json']>;
+type UsersListsGetMembershipsResponse = ContractResponse<'users/lists/get-memberships'>;
 
 // @public (undocumented)
-type UsersListsListRequest = ContractRequest<'users/lists/list', operations['users___lists___list']['requestBody']['content']['application/json']>;
+type UsersListsListRequest = ContractRequest<'users/lists/list'>;
 
 // @public (undocumented)
-type UsersListsListResponse = ContractResponse<'users/lists/list', operations['users___lists___list']['responses']['200']['content']['application/json']>;
+type UsersListsListResponse = ContractResponse<'users/lists/list'>;
 
 // @public (undocumented)
-type UsersListsPullRequest = ContractRequest<'users/lists/pull', operations['users___lists___pull']['requestBody']['content']['application/json']>;
+type UsersListsPullRequest = ContractRequest<'users/lists/pull'>;
 
 // @public (undocumented)
-type UsersListsPushRequest = ContractRequest<'users/lists/push', operations['users___lists___push']['requestBody']['content']['application/json']>;
+type UsersListsPushRequest = ContractRequest<'users/lists/push'>;
 
 // @public (undocumented)
-type UsersListsShowRequest = ContractRequest<'users/lists/show', operations['users___lists___show']['requestBody']['content']['application/json']>;
+type UsersListsShowRequest = ContractRequest<'users/lists/show'>;
 
 // @public (undocumented)
-type UsersListsShowResponse = ContractResponse<'users/lists/show', operations['users___lists___show']['responses']['200']['content']['application/json']>;
+type UsersListsShowResponse = ContractResponse<'users/lists/show'>;
 
 // @public (undocumented)
-type UsersListsUnfavoriteRequest = ContractRequest<'users/lists/unfavorite', operations['users___lists___unfavorite']['requestBody']['content']['application/json']>;
+type UsersListsUnfavoriteRequest = ContractRequest<'users/lists/unfavorite'>;
 
 // @public (undocumented)
-type UsersListsUpdateMembershipRequest = ContractRequest<'users/lists/update-membership', operations['users___lists___update-membership']['requestBody']['content']['application/json']>;
+type UsersListsUpdateMembershipRequest = ContractRequest<'users/lists/update-membership'>;
 
 // @public (undocumented)
-type UsersListsUpdateRequest = ContractRequest<'users/lists/update', operations['users___lists___update']['requestBody']['content']['application/json']>;
+type UsersListsUpdateRequest = ContractRequest<'users/lists/update'>;
 
 // @public (undocumented)
-type UsersListsUpdateResponse = ContractResponse<'users/lists/update', operations['users___lists___update']['responses']['200']['content']['application/json']>;
+type UsersListsUpdateResponse = ContractResponse<'users/lists/update'>;
 
 // @public (undocumented)
-type UsersNotesRequest = ContractRequest<'users/notes', operations['users___notes']['requestBody']['content']['application/json']>;
+type UsersNotesRequest = ContractRequest<'users/notes'>;
 
 // @public (undocumented)
-type UsersNotesResponse = ContractResponse<'users/notes', operations['users___notes']['responses']['200']['content']['application/json']>;
+type UsersNotesResponse = ContractResponse<'users/notes'>;
 
 // @public (undocumented)
-type UsersPagesRequest = ContractRequest<'users/pages', operations['users___pages']['requestBody']['content']['application/json']>;
+type UsersPagesRequest = ContractRequest<'users/pages'>;
 
 // @public (undocumented)
-type UsersPagesResponse = ContractResponse<'users/pages', operations['users___pages']['responses']['200']['content']['application/json']>;
+type UsersPagesResponse = ContractResponse<'users/pages'>;
 
 // @public (undocumented)
-type UsersReactionsRequest = ContractRequest<'users/reactions', operations['users___reactions']['requestBody']['content']['application/json']>;
+type UsersReactionsRequest = ContractRequest<'users/reactions'>;
 
 // @public (undocumented)
-type UsersReactionsResponse = ContractResponse<'users/reactions', operations['users___reactions']['responses']['200']['content']['application/json']>;
+type UsersReactionsResponse = ContractResponse<'users/reactions'>;
 
 // @public (undocumented)
-type UsersRecommendationRequest = ContractRequest<'users/recommendation', operations['users___recommendation']['requestBody']['content']['application/json']>;
+type UsersRecommendationRequest = ContractRequest<'users/recommendation'>;
 
 // @public (undocumented)
-type UsersRecommendationResponse = ContractResponse<'users/recommendation', operations['users___recommendation']['responses']['200']['content']['application/json']>;
+type UsersRecommendationResponse = ContractResponse<'users/recommendation'>;
 
 // @public (undocumented)
-type UsersRelationRequest = ContractRequest<'users/relation', operations['users___relation']['requestBody']['content']['application/json']>;
+type UsersRelationRequest = ContractRequest<'users/relation'>;
 
 // @public (undocumented)
-type UsersRelationResponse = ContractResponse<'users/relation', operations['users___relation']['responses']['200']['content']['application/json']>;
+type UsersRelationResponse = ContractResponse<'users/relation'>;
 
 // @public (undocumented)
-type UsersReportAbuseRequest = ContractRequest<'users/report-abuse', operations['users___report-abuse']['requestBody']['content']['application/json']>;
+type UsersReportAbuseRequest = ContractRequest<'users/report-abuse'>;
 
 // @public (undocumented)
-type UsersRequest = ContractRequest<'users', operations['users']['requestBody']['content']['application/json']>;
+type UsersRequest = ContractRequest<'users'>;
 
 // @public (undocumented)
-type UsersResponse = ContractResponse<'users', operations['users']['responses']['200']['content']['application/json']>;
+type UsersResponse = ContractResponse<'users'>;
 
 // @public (undocumented)
-type UsersSearchByUsernameAndHostRequest = ContractRequest<'users/search-by-username-and-host', operations['users___search-by-username-and-host']['requestBody']['content']['application/json']>;
+type UsersSearchByUsernameAndHostRequest = ContractRequest<'users/search-by-username-and-host'>;
 
 // @public (undocumented)
-type UsersSearchByUsernameAndHostResponse = ContractResponse<'users/search-by-username-and-host', operations['users___search-by-username-and-host']['responses']['200']['content']['application/json']>;
+type UsersSearchByUsernameAndHostResponse = ContractResponse<'users/search-by-username-and-host'>;
 
 // @public (undocumented)
-type UsersSearchRequest = ContractRequest<'users/search', operations['users___search']['requestBody']['content']['application/json']>;
+type UsersSearchRequest = ContractRequest<'users/search'>;
 
 // @public (undocumented)
-type UsersSearchResponse = ContractResponse<'users/search', operations['users___search']['responses']['200']['content']['application/json']>;
+type UsersSearchResponse = ContractResponse<'users/search'>;
 
 // @public (undocumented)
-type UsersShowRequest = ContractRequest<'users/show', operations['users___show']['requestBody']['content']['application/json']>;
+type UsersShowRequest = ContractRequest<'users/show'>;
 
 // @public (undocumented)
-type UsersShowResponse = ContractResponse<'users/show', operations['users___show']['responses']['200']['content']['application/json']>;
+type UsersShowResponse_2 = ContractResponse<'users/show'>;
 
 // @public (undocumented)
-type UsersUpdateMemoRequest = ContractRequest<'users/update-memo', operations['users___update-memo']['requestBody']['content']['application/json']>;
+type UsersUpdateMemoRequest = ContractRequest<'users/update-memo'>;
 
 // @public (undocumented)
 type UserWebhook = ContractModel<'UserWebhook'>;
 
 // @public (undocumented)
-type V2AdminEmojiListRequest = ContractRequest<'v2/admin/emoji/list', operations['v2___admin___emoji___list']['requestBody']['content']['application/json']>;
+type V2AdminEmojiListRequest = ContractRequest<'v2/admin/emoji/list'>;
 
 // @public (undocumented)
-type V2AdminEmojiListResponse = ContractResponse<'v2/admin/emoji/list', operations['v2___admin___emoji___list']['responses']['200']['content']['application/json']>;
+type V2AdminEmojiListResponse = ContractResponse<'v2/admin/emoji/list'>;
 
 // @public (undocumented)
-type VerifyEmailRequest = ContractRequest<'verify-email', operations['verify-email']['requestBody']['content']['application/json']>;
+type VerifyEmailRequest = ContractRequest<'verify-email'>;
 
 // Warnings were encountered during analysis:
 //

@@ -3,42 +3,25 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { packedReversiVerifyDefinition, packedReversiVerifyInput, packedReversiVerifyOutput } from '../../../contract/packed-endpoint-definitions.js';
-import { Injectable } from '@nestjs/common';
+import { toPackedReversiGameDetailed } from '../../reversi.schema.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 
-import { ReversiService } from '../../services/ReversiService.js';
-import { ReversiGameEntityService } from '../../serializers/ReversiGameEntityService.js';
-import { ApiError } from '@features/api/backend/transport/error.js';
-
-const contractProjection = projectEndpointContract(packedReversiVerifyDefinition);
-
-export const meta = {
-	errors: {
-		noSuchGame: {
-			message: 'No such game.',
-			code: 'NO_SUCH_GAME',
-			id: '8fb05624-b525-43dd-90f7-511852bdfeee',
-		},
-	},
-
-	res: contractProjection.response,
-} as const;
-
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedReversiVerifyInput, typeof packedReversiVerifyOutput> {
-	constructor(
-		private reversiService: ReversiService,
-		private reversiGameEntityService: ReversiGameEntityService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			const game = await this.reversiService.checkCrc(ps.gameId, ps.crc32);
+import { reversiVerifyContract } from './verify.contract.js';
+import type { ReversiService } from '../../services/ReversiService.js';
+import type { ReversiGameEntityService } from '../../serializers/ReversiGameEntityService.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+export interface ReversiVerifyDependencies {
+	reversiService: Pick<ReversiService, 'checkCrc'>;
+	reversiGameEntityService: Pick<ReversiGameEntityService, 'packDetail'>;
+}
+export function createReversiVerifyProcedure(deps: ReversiVerifyDependencies) {
+	return createApiProcedure<MiLocalUser>()(reversiVerifyContract)
+		.handler(async ({ input: ps }) => {
+			const game = await deps.reversiService.checkCrc(ps.gameId, ps.crc32);
 			if (game) {
 				return {
 					desynced: true,
-					game: await this.reversiGameEntityService.packDetail(game),
+					game: toPackedReversiGameDetailed(await deps.reversiGameEntityService.packDetail(game)),
 				};
 			} else {
 				return {
@@ -46,5 +29,4 @@ export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof
 				};
 			}
 		});
-	}
 }

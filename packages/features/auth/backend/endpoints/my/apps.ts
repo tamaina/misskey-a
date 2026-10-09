@@ -2,50 +2,42 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { packedMyAppsDefinition, packedMyAppsInput, packedMyAppsOutput } from '../../../contract/packed-endpoint-definitions.js';
-import { Inject, Injectable } from '@nestjs/common';
-
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 import type { AppsRepository } from '@features/persistence/backend/repositories/models.js';
 import { AppEntityService } from '../../serializers/AppEntityService.js';
-import { DI } from '@/di-symbols.js';
+import { toPackedApp } from '../../auth.schema.js';
+import { MyAppsContract } from '../../api.definition.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
 
-const contractProjection = projectEndpointContract(packedMyAppsDefinition);
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
 
 export const meta = {
 	tags: ['account', 'app'],
 
-	requireCredential: true,
-	kind: 'read:account',
-
-	res: contractProjection.response,
 } as const;
-
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedMyAppsInput, typeof packedMyAppsOutput> {
-	constructor(
-		@Inject(DI.appsRepository)
-		private appsRepository: AppsRepository,
-
-		private appEntityService: AppEntityService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
+export interface MyAppsDependencies {
+	appsRepository: AppsRepository;
+	appEntityService: Pick<AppEntityService, 'pack'>;
+}
+export function createMyAppsProcedure(deps: MyAppsDependencies) {
+	return createApiProcedure<MiLocalUser>()(MyAppsContract).use(requirePrincipal<MiLocalUser>()).handler(async ({ input, context }) => {
+		const ps = input;
+		const me = context.principal;
+		const result = await (async () => {
 			const query = {
 				userId: me.id,
 			};
 
-			const apps = await this.appsRepository.find({
+			const apps = await deps.appsRepository.find({
 				where: query,
 				take: ps.limit,
 				skip: ps.offset,
 			});
 
-			return await Promise.all(apps.map(app => this.appEntityService.pack(app, me, {
+			return await Promise.all(apps.map(app => deps.appEntityService.pack(app, me, {
 				detail: true,
 			})));
-		});
-	}
+		})();
+		return result.map(app => toPackedApp(app));
+	});
 }

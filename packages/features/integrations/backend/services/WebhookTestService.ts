@@ -8,7 +8,7 @@ import { MiAbuseUserReport, MiNote, MiUser, MiWebhook } from '@features/persiste
 import { bindThis } from '@features/runtime/backend/decorators.js';
 import { MiSystemWebhook, type SystemWebhookEventType } from '../models/SystemWebhook.js';
 import { type AbuseReportPayload, SystemWebhookPayload, SystemWebhookService } from './SystemWebhookService.js';
-import { type Packed } from '@features/index/contract/packed.js';
+import { type Packed } from '@features/index/backend/packed.schema.js';
 import { type WebhookEventTypes } from '../models/Webhook.js';
 import { CustomEmojiService } from '@features/emojis/backend/services/CustomEmojiService.js';
 import { type UserWebhookPayload, UserWebhookService } from './UserWebhookService.js';

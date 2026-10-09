@@ -2,8 +2,12 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-
-import { expect, test } from 'vitest';
+import { createProcedureClient } from '@orpc/server';
+import { OpenAPIHandler } from '@orpc/openapi/fetch';
+import { toQueueJob } from '../../backend/queue-wire.js';
+import { toPackedJsonValue } from '../../../users/backend/json-value.schema.js';
+import type { ApiContext, ApiServices, ApiAuthorization } from '../../../api/backend/transport/context.js';
+import { expect, test, vi } from 'vitest';
 import * as v from 'valibot';
 import { mockDeep } from 'vitest-mock-extended';
 import { QueueGetters } from 'bullmq';
@@ -11,17 +15,21 @@ import type { IQueueBackend, Queue } from 'bullmq';
 import type { DataSource } from 'typeorm';
 import type { MiLocalUser } from '../../../users/backend/models/User.js';
 import { QueueService } from '../../../runtime/backend/services/QueueService.js';
-import { QUEUE_TYPES } from '../../../runtime/shared/queue-types.js';
-import { packedQueueCountSchema, packedQueueMetricsSchema, packedQueueJobSchema } from '../../contract/packed.js';
-import { operationsInputs } from '../../contract/index.js';
-import { referenceAdminQueueQueuesOutput, referenceAdminQueueQueueStatsOutput, referenceAdminQueueQueueStatsDefinition } from '../../contract/reference-endpoint-definitions.js';
-import { inlineAdminGetTableStatsOutput, inlineAdminGetIndexStatsOutput } from '../../contract/endpoint-definitions.js';
-import { queueStatsOutput } from '../../contract/queue-stats-endpoint-definition.js';
-import { EndpointImplementation as AggregateStats } from '../../backend/endpoints/admin/queue/stats.js';
-import { EndpointImplementation as TableStats } from '../../backend/endpoints/admin/get-table-stats.js';
-import { EndpointImplementation as IndexStats } from '../../backend/endpoints/admin/get-index-stats.js';
-import { ContractEndpoint, projectEndpointContract } from '../../../api/backend/transport/contract-endpoint.js';
-
+import { QUEUE_TYPES, queueCounterSchema as packedQueueCountSchema, queueMetricsSchema as packedQueueMetricsSchema, queueJobSchema as packedQueueJobSchema } from '../../backend/queue.schema.js';
+import { adminQueuePauseContract } from '../../backend/endpoints/admin/queue/pause.contract.js';
+import { adminQueueClearContract } from '../../backend/endpoints/admin/queue/clear.contract.js';
+import { adminQueueRetryJobContract } from '../../backend/endpoints/admin/queue/retry-job.contract.js';
+import { adminQueueQueuesContract } from '../../backend/endpoints/admin/queue/queues.contract.js';
+import { adminQueueQueueStatsContract } from '../../backend/endpoints/admin/queue/queue-stats.contract.js';
+import { adminGetTableStatsContract } from '../../backend/endpoints/admin/get-table-stats.contract.js';
+import { adminGetIndexStatsContract } from '../../backend/endpoints/admin/get-index-stats.contract.js';
+import { adminQueueStatsContract } from '../../backend/endpoints/admin/queue/stats.contract.js';
+import { createAdminQueueShowJobProcedure } from '../../backend/endpoints/admin/queue/show-job.js';
+import { adminQueueShowJobContract } from '../../backend/endpoints/admin/queue/show-job.contract.js';
+import { createAdminQueueQueuesProcedure } from '../../backend/endpoints/admin/queue/queues.js';
+import { createAdminQueueStatsProcedure } from '../../backend/endpoints/admin/queue/stats.js';
+import { createAdminGetTableStatsProcedure } from '../../backend/endpoints/admin/get-table-stats.js';
+import { createAdminGetIndexStatsProcedure } from '../../backend/endpoints/admin/get-index-stats.js';
 const metrics = { meta: { count: 3, prevTS: 1, prevCount: 2 }, data: [1, 2], count: 3 };
 const counts = { waiting: 1, active: 2, completed: 3, failed: 4, delayed: 5 };
 const redisInfo = [
@@ -60,10 +68,10 @@ test('actual queue service envelopes preserve dynamic count names and finite met
 	const receiver = { getQueue: () => queue };
 	const rows = await Reflect.apply(QueueService.prototype.queueGetQueues, receiver, []);
 	expect(rows).toHaveLength(QUEUE_TYPES.length);
-	expect(v.parse(referenceAdminQueueQueuesOutput, rows)).toEqual(rows);
-	for (const invalid of [{ ...rows[0], future: true }, { ...rows[0], metrics: { ...rows[0].metrics, future: true } }, { ...rows[0], counts: { custom: 'bad' } }]) expect(v.safeParse(referenceAdminQueueQueuesOutput, [invalid]).success).toBe(false);
+	expect(v.parse(adminQueueQueuesContract['~orpc'].outputSchema!, rows)).toEqual(rows);
+	for (const invalid of [{ ...rows[0], future: true }, { ...rows[0], metrics: { ...rows[0].metrics, future: true } }, { ...rows[0], counts: { custom: 'bad' } }]) expect(v.safeParse(adminQueueQueuesContract['~orpc'].outputSchema!, [invalid]).success).toBe(false);
 	const result = await Reflect.apply(QueueService.prototype.queueGetQueue, receiver, ['system']);
-	rejectsFields(referenceAdminQueueQueueStatsOutput, result);
+	rejectsFields(adminQueueQueueStatsContract['~orpc'].outputSchema!, result);
 	for (const path of [['metrics'], ['metrics', 'completed'], ['metrics', 'completed', 'meta'], ['db'], ['db', 'memory'], ['db', 'clients']]) {
 		for (const mutation of ['extra', 'missing', 'wrong']) {
 			const invalid = structuredClone(result);
@@ -77,7 +85,7 @@ test('actual queue service envelopes preserve dynamic count names and finite met
 			if (mutation === 'extra') branch.future = true;
 			else if (mutation === 'missing') delete branch[first];
 			else branch[first] = typeof branch[first] === 'string' ? 1 : 'wrong';
-			expect(v.safeParse(referenceAdminQueueQueueStatsOutput, invalid).success, `${path.join('.')}:${mutation}`).toBe(false);
+			expect(v.safeParse(adminQueueQueueStatsContract['~orpc'].outputSchema!, invalid).success, `${path.join('.')}:${mutation}`).toBe(false);
 		}
 	}
 	expect(result.counts.prioritized).toBe(7);
@@ -88,37 +96,31 @@ test('finite queue counts, metrics, aggregate wrappers and table record values r
 	rejectsFields(packedQueueCountSchema, counts);
 	rejectsFields(packedQueueMetricsSchema, metrics);
 	const stats = { deliver: counts, inbox: counts, db: counts, objectStorage: counts };
-	rejectsFields(queueStatsOutput, stats);
-	for (const value of [{ ...counts, future: true }, { ...counts, waiting: undefined }, { ...counts, waiting: 'bad' }]) expect(v.safeParse(queueStatsOutput, { ...stats, deliver: value }).success).toBe(false);
-	expect(v.parse(inlineAdminGetTableStatsOutput, { custom_table: { count: 2, size: 1024 } })).toEqual({ custom_table: { count: 2, size: 1024 } });
-	for (const value of [{ count: 2, size: 1024, future: true }, { count: 2 }, { count: 'bad', size: 1024 }]) expect(v.safeParse(inlineAdminGetTableStatsOutput, { custom_table: value }).success).toBe(false);
+	rejectsFields(adminQueueStatsContract['~orpc'].outputSchema!, stats);
+	for (const value of [{ ...counts, future: true }, { ...counts, waiting: undefined }, { ...counts, waiting: 'bad' }]) expect(v.safeParse(adminQueueStatsContract['~orpc'].outputSchema!, { ...stats, deliver: value }).success).toBe(false);
+	expect(v.parse(adminGetTableStatsContract['~orpc'].outputSchema!, { custom_table: { count: 2, size: 1024 } })).toEqual({ custom_table: { count: 2, size: 1024 } });
+	for (const value of [{ count: 2, size: 1024, future: true }, { count: 2 }, { count: 'bad', size: 1024 }]) expect(v.safeParse(adminGetTableStatsContract['~orpc'].outputSchema!, { custom_table: value }).success).toBe(false);
 });
 
-test('native queue requests strip extras while HTTP retains the original request and unparsed output', async () => {
-	for (const schema of Object.values(operationsInputs)) {
-		const request = { queue: 'system', jobId: 'job1', state: '*', future: true };
-		expect(v.parse(schema, request)).not.toHaveProperty('future');
+test('native queue requests strip extras and reject invalid selectors', () => {
+	for (const schema of [adminQueuePauseContract['~orpc'].inputSchema!, adminQueueClearContract['~orpc'].inputSchema!, adminQueueRetryJobContract['~orpc'].inputSchema!]) {
+		expect(v.parse(schema, { queue: 'system', state: '*', jobId: 'job1', future: true })).not.toHaveProperty('future');
 		for (const input of [{}, { queue: 'unsupported' }, { queue: 1 }]) expect(v.safeParse(schema, input).success).toBe(false);
 	}
-	const request = { queue: 'system', future: true };
-	const response = { name: 'system' as const, qualifiedName: 'bull:system', counts, isPaused: false, metrics: { completed: metrics, failed: metrics }, db: { version: '7.2.0', mode: 'standalone' as const, runId: 'fixture', processId: '123', port: 6379, os: 'Linux', uptime: 9, memory: { total: 1024, used: 128, fragmentationRatio: 2, peak: 256 }, clients: { connected: 3, blocked: 1 } }, future: true };
-	const endpoint = new ContractEndpoint({}, projectEndpointContract(referenceAdminQueueQueueStatsDefinition), async ps => { expect(ps).toBe(request); return response; });
-	expect(await endpoint.exec(request, null, null)).toBe(response);
-	expect(request).toEqual({ queue: 'system', future: true });
-	await expect(endpoint.exec({ queue: 'unsupported' }, null, null)).rejects.toMatchObject({ code: 'INVALID_PARAM' });
+	expect(v.safeParse(adminQueuePauseContract['~orpc'].inputSchema!, []).success).toBe(false);
 });
 
 test('finite pg_indexes wire schema preserves all five SELECT-star columns and nullable source paths', async () => {
 	const rows = [{ schemaname: 'public', tablename: 'note', indexname: 'note_pkey', tablespace: null, indexdef: 'CREATE UNIQUE INDEX ...' }];
 	const db = mockDeep<DataSource>();
 	db.query.mockResolvedValue(rows);
-	const result = await new IndexStats(db).exec({}, mockDeep<MiLocalUser>(), null);
-	expect(v.parse(inlineAdminGetIndexStatsOutput, result)).toEqual(rows);
+	const result = await createProcedureClient(createAdminGetIndexStatsProcedure({ db }), { context: nativeContext() })({});
+	expect(v.parse(adminGetIndexStatsContract['~orpc'].outputSchema!, result)).toEqual(rows);
 	expect(db.query).toHaveBeenCalledWith('SELECT * FROM pg_indexes;');
-	expect(result[0]).toBe(rows[0]);
+	expect(result[0]).toEqual(rows[0]);
 	for (const field of ['schemaname', 'tablespace', 'indexdef'] as const) {
 		const nullable = [{ ...rows[0], [field]: null }];
-		expect(v.parse(inlineAdminGetIndexStatsOutput, nullable)).toEqual(nullable);
+		expect(v.parse(adminGetIndexStatsContract['~orpc'].outputSchema!, nullable)).toEqual(nullable);
 	}
 	for (const value of [
 		{ ...rows[0], future: true },
@@ -127,18 +129,19 @@ test('finite pg_indexes wire schema preserves all five SELECT-star columns and n
 		{ ...rows[0], indexdef: 7 },
 		{ ...rows[0], tablename: null },
 		{ ...rows[0], indexname: null },
-	]) expect(v.safeParse(inlineAdminGetIndexStatsOutput, [value]).success).toBe(false);
+	]) expect(v.safeParse(adminGetIndexStatsContract['~orpc'].outputSchema!, [value]).success).toBe(false);
 	for (const field of ['schemaname', 'tablename', 'indexname', 'tablespace', 'indexdef'] as const) {
 		const missing: Record<string, string | null> = { ...rows[0] };
 		delete missing[field];
-		expect(v.safeParse(inlineAdminGetIndexStatsOutput, [missing]).success).toBe(false);
+		expect(v.safeParse(adminGetIndexStatsContract['~orpc'].outputSchema!, [missing]).success).toBe(false);
 	}
 	const extended = [{ ...rows[0], future: true }];
 	db.query.mockResolvedValue(extended);
-	const unparsed = await new IndexStats(db).exec({}, mockDeep<MiLocalUser>(), null);
-	expect(unparsed[0]).toBe(extended[0]);
-	// The dynamic job schema stays a separate producer review boundary in this cohort.
-	expect(packedQueueJobSchema.type).toBe('loose_object');
+	expect(await createProcedureClient(createAdminGetIndexStatsProcedure({ db }), { context: nativeContext() })({})).toEqual(rows);
+	const json: unknown = JSON.parse('{"__proto__":{"note":true},"constructor":null}');
+	const job = { id: 'job1', name: 'deliver', data: json, opts: {}, timestamp: 1, progress: 0, attempts: 0, delay: 0, stacktrace: [], returnValue: json, isFailed: false };
+	expect(v.parse(packedQueueJobSchema, job)).toEqual(job);
+	for (const data of [new Map(), new Date(), { invalid: undefined }]) expect(v.safeParse(packedQueueJobSchema, { ...job, data }).success).toBe(false);
 });
 
 test('installed Bull default counts and metrics agree with actual aggregate/table producers', async () => {
@@ -163,17 +166,85 @@ test('installed Bull default counts and metrics agree with actual aggregate/tabl
 	backend.getMetrics.mockResolvedValue([[], [], 0]);
 	const emptyMetrics = await queue.getMetrics('completed');
 	expect(v.parse(packedQueueMetricsSchema, emptyMetrics)).toEqual({ meta: { count: 0, prevTS: 0, prevCount: 0 }, data: [], count: 0 });
-	type Parameters = ConstructorParameters<typeof AggregateStats>;
-	const deliver = mockDeep<Parameters[3]>();
-	const inbox = mockDeep<Parameters[4]>();
-	const dbQueue = mockDeep<Parameters[5]>();
-	const storage = mockDeep<Parameters[6]>();
+	type Dependencies = Parameters<typeof createAdminQueueStatsProcedure>[0];
+	const deliver = mockDeep<Dependencies['deliverQueue']>();
+	const inbox = mockDeep<Dependencies['inboxQueue']>();
+	const dbQueue = mockDeep<Dependencies['dbQueue']>();
+	const storage = mockDeep<Dependencies['objectStorageQueue']>();
 	for (const queue of [deliver, inbox, dbQueue, storage]) queue.getJobCounts.mockResolvedValue(produced);
-	const result = await new AggregateStats(mockDeep(), mockDeep(), mockDeep(), deliver, inbox, dbQueue, storage, mockDeep(), mockDeep()).exec({}, mockDeep<MiLocalUser>(), null);
-	expect(v.parse(queueStatsOutput, result)).toEqual({ deliver: produced, inbox: produced, db: produced, objectStorage: produced });
+	const result = await createProcedureClient(createAdminQueueStatsProcedure({ deliverQueue: deliver, inboxQueue: inbox, dbQueue, objectStorageQueue: storage }), { context: nativeContext() })({});
+	expect(v.parse(adminQueueStatsContract['~orpc'].outputSchema!, result)).toEqual({ deliver: produced, inbox: produced, db: produced, objectStorage: produced });
 	for (const queue of [deliver, inbox, dbQueue, storage]) expect(queue.getJobCounts).toHaveBeenCalledWith();
 	const db = mockDeep<DataSource>();
 	db.query.mockResolvedValue([{ table: 'custom_table', count: '3', size: '1024' }]);
-	const tables = await new TableStats(db).exec({}, mockDeep<MiLocalUser>(), null);
-	expect(v.parse(inlineAdminGetTableStatsOutput, tables)).toEqual({ custom_table: { count: 3, size: 1024 } });
+	const tables = await createProcedureClient(createAdminGetTableStatsProcedure({ db }), { context: nativeContext() })({});
+	expect(v.parse(adminGetTableStatsContract['~orpc'].outputSchema!, tables)).toEqual({ custom_table: { count: 3, size: 1024 } });
+});
+
+function nativeContext(): ApiContext<MiLocalUser> {
+	const actor = mockDeep<MiLocalUser>({ id: 'trusted-user', isSuspended: false, movedToUri: null });
+	const services = mockDeep<ApiServices<MiLocalUser>>();
+	services.authenticate.mockResolvedValue([actor, null]);
+	const authorization = mockDeep<ApiAuthorization<MiLocalUser>>();
+	authorization.rootUserId.mockReturnValue(actor.id);
+	return { services, authorization, credential: 'credential', ip: '127.0.0.1', headers: {} };
+}
+
+test('queue HTTP envelopes project outer and nested extras without output schema execution', async () => {
+	const queueService = mockDeep<Parameters<typeof createAdminQueueQueuesProcedure>[0]['queueService']>();
+	const producedCounts = { ...counts, internalMarker: 999 };
+	const producedMetrics = { ...metrics, internalMarker: 'metric', meta: { ...metrics.meta, internalMarker: 'meta' } };
+	const produced = { name: 'system', counts: producedCounts, isPaused: false, metrics: { completed: producedMetrics, failed: metrics }, internalMarker: 'outer' } satisfies Awaited<ReturnType<typeof queueService.queueGetQueues>>[number] & { internalMarker: string };
+	queueService.queueGetQueues.mockResolvedValue([produced]);
+	const outputRun = vi.spyOn(adminQueueQueuesContract['~orpc'].outputSchema!, '~run');
+	try {
+		const handler = new OpenAPIHandler({ queues: createAdminQueueQueuesProcedure({ queueService }) });
+		const response = await handler.handle(new Request('https://local.test/admin/queue/queues', { method: 'POST', headers: { 'content-type': 'application/json' }, body: '{}' }), { context: nativeContext() });
+		expect(response.response?.status).toBe(200);
+		const rows: unknown = await response.response?.json();
+		expect(rows).toEqual([{ name: 'system', counts, isPaused: false, metrics: { completed: metrics, failed: metrics } }]);
+		expect(outputRun).not.toHaveBeenCalled();
+	} finally { outputRun.mockRestore(); }
+});
+
+test('queue job HTTP closes nested options and preserves baseline oRPC reserved-key serialization', async () => {
+	const queueService = mockDeep<Parameters<typeof createAdminQueueShowJobProcedure>[0]['queueService']>();
+	const json = toPackedJsonValue(JSON.parse('{"constructor":{"__proto__":"retained"},"prototype":null}'));
+	const produced = {
+		id: 'job1', name: 'deliver', data: json, timestamp: 1, progress: json, attempts: 0, delay: 0,
+		stacktrace: [], returnValue: json, isFailed: false, internalMarker: 'outer',
+		opts: {
+			internalMarker: 'opts', backoff: { type: 'fixed', delay: 10, jitter: 0.5, internalMarker: 'backoff' },
+			parent: { id: 'parent1', queue: 'deliver', internalMarker: 'parent' },
+			removeOnComplete: { age: 60, count: 2, internalMarker: 'retention' },
+			deduplication: { id: 'dedup1', ttl: 50, internalMarker: 'deduplication' },
+			telemetry: { metadata: 'public', omitContext: true, internalMarker: 'telemetry' },
+			repeat: { pattern: '* * * * *', startDate: 1000, internalMarker: 'repeat' },
+		},
+	};
+	const before = JSON.stringify(produced);
+	const projected = toQueueJob(produced);
+	expect(projected.data).toEqual(json);
+	expect(projected.progress).toEqual(json);
+	expect(projected.returnValue).toEqual(json);
+	expect(JSON.stringify(produced)).toBe(before);
+	queueService.queueGetJob.mockResolvedValue(produced);
+	const outputRun = vi.spyOn(adminQueueShowJobContract['~orpc'].outputSchema!, '~run');
+	try {
+		const handler = new OpenAPIHandler({ job: createAdminQueueShowJobProcedure({ queueService }) });
+		const response = await handler.handle(new Request('https://local.test/admin/queue/show-job', { method: 'POST', headers: { 'content-type': 'application/json' }, body: '{"queue":"deliver","jobId":"job1"}' }), { context: nativeContext() });
+		expect(response.response?.status).toBe(200);
+		const wire: unknown = await response.response?.json();
+		// Baseline and current oRPC 1.15.4 serializers assign into {}, dropping own __proto__ keys.
+		// The DTO above preserves those JSON keys; constructor/prototype survive the existing transport.
+		const transportedJson = { constructor: {}, prototype: null };
+		expect(wire).toEqual({
+			id: 'job1', name: 'deliver', data: transportedJson, timestamp: 1, progress: transportedJson, attempts: 0, delay: 0,
+			stacktrace: [], returnValue: transportedJson, isFailed: false,
+			opts: { backoff: { type: 'fixed', delay: 10, jitter: 0.5 }, parent: { id: 'parent1', queue: 'deliver' },
+				removeOnComplete: { age: 60, count: 2 }, deduplication: { id: 'dedup1', ttl: 50 },
+				telemetry: { metadata: 'public', omitContext: true }, repeat: { pattern: '* * * * *', startDate: 1000 } },
+		});
+		expect(outputRun).not.toHaveBeenCalled();
+	} finally { outputRun.mockRestore(); }
 });

@@ -2,48 +2,25 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
+import { toPackedFollowRequest } from '../../relationships.schema.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { packedFollowingRequestsListDefinition, packedFollowingRequestsListInput, packedFollowingRequestsListOutput } from '../../../../contract/packed-endpoint-definitions.js';
-import { Inject, Injectable } from '@nestjs/common';
-
-import { QueryService } from '@features/notes/backend/services/QueryService.js';
-import type { FollowRequestsRepository } from '@features/persistence/backend/repositories/models.js';
-import { FollowRequestEntityService } from '../../../serializers/FollowRequestEntityService.js';
-import { DI } from '@/di-symbols.js';
-
-const contractProjection = projectEndpointContract(packedFollowingRequestsListDefinition);
-
-export const meta = {
-	tags: ['following', 'account'],
-
-	requireCredential: true,
-
-	kind: 'read:following',
-
-	res: contractProjection.response,
-} as const;
-
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedFollowingRequestsListInput, typeof packedFollowingRequestsListOutput> {
-	constructor(
-		@Inject(DI.followRequestsRepository)
-		private followRequestsRepository: FollowRequestsRepository,
-
-		private followRequestEntityService: FollowRequestEntityService,
-		private queryService: QueryService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			const query = this.queryService.makePaginationQuery(this.followRequestsRepository.createQueryBuilder('request'), ps.sinceId, ps.untilId, ps.sinceDate, ps.untilDate)
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import { relationshipsContract } from '../../relationships.contract.js';
+import type { RelationshipsDependencies } from '../../../api.implementation.js';
+export function createFollowingRequestsListProcedure<Actor extends MiLocalUser>(deps: Pick<RelationshipsDependencies, 'queryService' | 'followRequestsRepository' | 'followRequestEntityService'>) {
+	return createApiProcedure<Actor>()(relationshipsContract["following/requests/list"]).use(requirePrincipal<Actor>())
+		.handler(async ({ input, context }) => {
+			const ps = input;
+			const me = context.principal;
+			const query = deps.queryService.makePaginationQuery(deps.followRequestsRepository.createQueryBuilder('request'), ps.sinceId, ps.untilId, ps.sinceDate, ps.untilDate)
 				.andWhere('request.followeeId = :meId', { meId: me.id });
 
 			const requests = await query
 				.limit(ps.limit)
 				.getMany();
 
-			return await this.followRequestEntityService.packMany(requests, me);
+			return (await deps.followRequestEntityService.packMany(requests, me)).map(toPackedFollowRequest);
 		});
-	}
 }

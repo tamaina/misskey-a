@@ -3,21 +3,19 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { instanceContract } from '../../contract/index.js';
-import { legacyServerInfoSchemas } from '@features/instance/backend';
-import type { Schema } from '@features/api/backend/utility/json-schema.js';
-import { createContractTransportEndpoint } from '@features/api/backend/transport/contract-transport-endpoint.js';
-import { defineFeatureEndpoint } from '@features/api/backend/transport/feature-endpoint.js';
-
-export const meta = {
-	requireCredential: false,
-	allowGet: true,
-	cacheSec: 60 * 1,
-
-	tags: ['meta'],
-	res: legacyServerInfoSchemas.output as Schema,
-} as const;
-
-export const paramDef = legacyServerInfoSchemas.input as Schema;
-
-export const { feature, createEndpoint } = defineFeatureEndpoint('instance', instance => createContractTransportEndpoint(meta, paramDef, instanceContract['server-info'], async params => instance['server-info'](params)));
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import { serverInfoContract, serverInfoGetContract } from './server-info.contract.js';
+import { createServerInfoService } from '../server-info.js';
+import type { ServerInfoDependencies } from '../server-info.js';
+import type { ApiActor } from '../../../api/backend/transport/context.js';
+export function createInstanceRouter<Actor extends ApiActor>(deps: ServerInfoDependencies) {
+	const read = createServerInfoService(deps);
+	const project = async () => {
+		const info = await read();
+		return { machine: info.machine, cpu: { model: info.cpu.model, cores: info.cpu.cores }, mem: { total: info.mem.total }, fs: { total: info.fs.total, used: info.fs.used } };
+	};
+	return {
+		serverInfo: createApiProcedure<Actor>()(serverInfoContract).handler(project),
+		serverInfoGet: createApiProcedure<Actor>()(serverInfoGetContract).handler(project),
+	};
+}

@@ -3,20 +3,20 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { legacyNotesCommandSchemas } from '../../commands.js';
-import { notesCommandErrors, notesCommandsContract } from '../../../contract/index.js';
-import type { Schema } from '@features/api/backend/utility/json-schema.js';
-import { createContractTransportEndpoint } from '@features/api/backend/transport/contract-transport-endpoint.js';
-import { defineFeatureEndpoint } from '@features/api/backend/transport/feature-endpoint.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import { promoReadContract, promoReadErrors } from './read.contract.js';
 
-export const meta = {
-	tags: ['notes'],
-	requireCredential: true,
-	kind: 'write:account',
-	errors: notesCommandErrors['promo/read'],
-} as const;
-
-export const paramDef = legacyNotesCommandSchemas['promo/read'].input as Schema;
-
-export const { feature, createEndpoint } = defineFeatureEndpoint('notesCommands', commands =>
-	createContractTransportEndpoint(meta, paramDef, notesCommandsContract['promo/read'], async (params, user) => commands['promo/read'](params, { context: { actor: user } })));
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+import type { NotesCommandDependencies } from '../../command.dependencies.js';
+import { getCommandNote } from '../../get-command-note.js';
+import { readErrorId } from '../../request.schema.js';
+export function createPromoReadProcedure(deps: NotesCommandDependencies) {
+	return createApiProcedure<MiLocalUser>()(promoReadContract).use(requirePrincipal<MiLocalUser>())
+		.handler(async ({ input, context }) => {
+			const actor = context.principal;
+			const note = await getCommandNote(deps, input.noteId, promoReadErrors.noSuchNote);
+			if (await deps.promoReadExists(note.id, actor.id)) return;
+			await deps.insertPromoRead(deps.newId(), note.id, actor.id);
+		});
+}

@@ -122,16 +122,35 @@ function fetchAccount(token: string, id?: string, forceShowDialog?: boolean): Pr
 	});
 }
 
+/** Retain the trusted live account proxy behind the native DTO type. */
+function getCurrentAccountInfo(): Misskey.entities.MeDetailed | null {
+	if (!$i) return null;
+	const accounts: Record<string, Misskey.entities.MeDetailed> = {};
+	// Keep the trusted live proxy while avoiding a recursive Vue UnwrapRef
+	// comparison with the portable DTO's persisted JSON fields.
+	const account: unknown = $i;
+	Reflect.set(accounts, $i.id, account);
+	return accounts[$i.id];
+}
+
+function persistCurrentAccountInfo() {
+	if (!$i) return;
+	const accountInfos: Record<string, Misskey.entities.MeDetailed> = {};
+	for (const [key, value] of Object.entries(store.s.accountInfos)) Reflect.set(accountInfos, key, value);
+	Reflect.set(accountInfos, host + '/' + $i.id, getCurrentAccountInfo());
+	store.set('accountInfos', accountInfos);
+}
+
 export function updateCurrentAccount(accountData: Misskey.entities.MeDetailed) {
 	if (!$i) return;
 	const token = $i.token;
 	for (const key of Object.keys($i)) {
-		delete $i[key as keyof typeof $i];
+		Reflect.deleteProperty($i, key);
 	}
 	for (const [key, value] of Object.entries(accountData)) {
-		($i[key as keyof typeof accountData] as any) = value;
+		Reflect.set($i, key, value);
 	}
-	store.set('accountInfos', { ...store.s.accountInfos, [host + '/' + $i.id]: $i });
+	persistCurrentAccountInfo();
 	$i.token = token;
 	miLocalStorage.setItem('account', JSON.stringify($i));
 }
@@ -139,10 +158,10 @@ export function updateCurrentAccount(accountData: Misskey.entities.MeDetailed) {
 export function updateCurrentAccountPartial(accountData: Partial<Misskey.entities.MeDetailed>) {
 	if (!$i) return;
 	for (const [key, value] of Object.entries(accountData)) {
-		($i[key as keyof typeof accountData] as any) = value;
+		Reflect.set($i, key, value);
 	}
 
-	store.set('accountInfos', { ...store.s.accountInfos, [host + '/' + $i.id]: $i });
+	persistCurrentAccountInfo();
 
 	miLocalStorage.setItem('account', JSON.stringify($i));
 }
@@ -222,7 +241,7 @@ export async function getAccountMenu(opts: {
 
 	const callback = opts.onChoose;
 
-	function createItem(host: string, id: Misskey.entities.User['id'], username: Misskey.entities.User['username'], account: Misskey.entities.MeDetailed | null | undefined, token: string | null): MenuItem {
+	function createItem(host: string, id: Misskey.entities.User['id'], username: Misskey.entities.User['username'], account: Misskey.entities.UserLite | null | undefined, token: string | null, onChooseAccount?: () => void): MenuItem {
 		if (account) {
 			return {
 				type: 'user' as const,
@@ -230,7 +249,7 @@ export async function getAccountMenu(opts: {
 				active: opts.active != null ? opts.active === id : false,
 				action: async () => {
 					if (callback) {
-						callback(account);
+						onChooseAccount?.();
 					} else {
 						switchAccount(host, id);
 					}
@@ -283,7 +302,12 @@ export async function getAccountMenu(opts: {
 	const menuItems: MenuItem[] = [];
 
 	// TODO: $iのホストも比較したいけど通常null
-	const accountItems = (await getAccounts().then(accounts => accounts.filter(x => x.id !== me.id))).map(a => createItem(a.host, a.id, a.username, a.user, a.token));
+	const accountItems = (await getAccounts().then(accounts => accounts.filter(x => x.id !== me.id))).map(a => {
+		const account = a.user;
+		return createItem(a.host, a.id, a.username, account, a.token, account && callback ? () => callback(account) : undefined);
+	});
+	const currentAccount = callback ? getCurrentAccountInfo() : null;
+	const chooseCurrentAccount = currentAccount && callback ? () => callback(currentAccount) : undefined;
 
 	if (opts.withExtraOperation) {
 		menuItems.push({
@@ -296,7 +320,7 @@ export async function getAccountMenu(opts: {
 		});
 
 		if (opts.includeCurrentAccount) {
-			menuItems.push(createItem(host, $i.id, $i.username, $i, $i.token));
+			menuItems.push(createItem(host, $i.id, $i.username, $i, $i.token, chooseCurrentAccount));
 		}
 
 		menuItems.push(...accountItems);
@@ -332,7 +356,7 @@ export async function getAccountMenu(opts: {
 		});
 	} else {
 		if (opts.includeCurrentAccount) {
-			menuItems.push(createItem(host, $i.id, $i.username, $i, $i.token));
+			menuItems.push(createItem(host, $i.id, $i.username, $i, $i.token, chooseCurrentAccount));
 		}
 
 		menuItems.push(...accountItems);

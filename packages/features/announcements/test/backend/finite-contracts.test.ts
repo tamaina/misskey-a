@@ -3,24 +3,49 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { expect, expectTypeOf, test } from 'vitest';
+import { announcementsContract } from '../../backend/api.definition.js';
+
+import { expect, expectTypeOf, test, vi } from 'vitest';
 import * as v from 'valibot';
 import { mockDeep } from 'vitest-mock-extended';
-import { inlineAdminAnnouncementsCreateDefinition as createDefinition, inlineAdminAnnouncementsCreateInput as createInput, inlineAdminAnnouncementsCreateOutput as createOutput, inlineAdminAnnouncementsListInput as listInput, inlineAdminAnnouncementsListOutput as listOutput } from '../../contract/endpoint-definitions.js';
-import { announcementCommandInputs } from '../../contract/index.js';
-import { packedAnnouncementsInput, packedAnnouncementsOutput, packedAnnouncementsShowInput, packedAnnouncementsShowOutput } from '../../contract/packed-endpoint-definitions.js';
-import { packedAnnouncementSchema } from '../../contract/packed.js';
+
 import { AnnouncementEntityService } from '../../backend/serializers/AnnouncementEntityService.js';
-import { AnnouncementService } from '../../backend/services/AnnouncementService.js';
-import { EndpointImplementation as CreateEndpoint } from '../../backend/endpoints/admin/announcements/create.js';
-import { EndpointImplementation as ListEndpoint } from '../../backend/endpoints/admin/announcements/list.js';
+import { createRouterClient } from '@orpc/server';
+import { Brackets, EntityNotFoundError } from 'typeorm';
+import type { SelectQueryBuilder } from 'typeorm';
+import { createAnnouncementsRouter } from '../../backend/api.implementation.js';
+import type { AnnouncementsDependencies } from '../../backend/api.implementation.js';
+import type { ApiActor, ApiAuthorization, ApiContext, ApiServices } from '../../../api/backend/transport/context.js';
 import { MiAnnouncement } from '../../backend/models/Announcement.js';
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { toLegacyJsonSchema } from '@features/api/backend/index.js';
-import type { AnnouncementsRepository, AnnouncementReadsRepository } from '@features/persistence/backend/repositories/models.js';
-import type { MiLocalUser } from '@features/users/backend/models/User.js';
-import type { IdService } from '@features/runtime/backend/services/IdService.js';
+
+import { packedSchemas } from '../../../index/backend/packed.schema.js';
+import { announcementsContract as nativeContract2 } from '../../backend/api.definition.js';
+import { announcementsContract as nativeContract3 } from '../../backend/api.definition.js';
+import { announcementsContract as nativeContract4 } from '../../backend/api.definition.js';
+import { announcementsContract as nativeContract5 } from '../../backend/api.definition.js';
+import { announcementsContract as nativeContract6 } from '../../backend/api.definition.js';
+import { announcementsContract as nativeContract7 } from '../../backend/api.definition.js';
+import { announcementsContract as nativeContract8 } from '../../backend/api.definition.js';
+import { announcementsContract as nativeContract9 } from '../../backend/api.definition.js';
 import type { QueryService } from '@features/notes/backend/services/QueryService.js';
+import type { IdService } from '@features/runtime/backend/services/IdService.js';
+import type { AnnouncementsRepository, AnnouncementReadsRepository } from '@features/persistence/backend/repositories/models.js';
+const announcementUpdateInput = requiredSchema(announcementsContract.update['~orpc'].inputSchema);
+const announcementDeleteInput = requiredSchema(announcementsContract.delete['~orpc'].inputSchema);
+const announcementReadInput = requiredSchema(announcementsContract.read['~orpc'].inputSchema);
+const announcementCommandInputs = { 'admin/announcements/update': announcementUpdateInput, 'admin/announcements/delete': announcementDeleteInput, 'i/read-announcement': announcementReadInput };
+
+function requiredSchema<S extends v.GenericSchema>(schema: S | undefined): S { if (schema === undefined) throw new Error('Missing native schema'); return schema; }
+
+const createInput = requiredSchema(nativeContract2.create['~orpc'].inputSchema);
+const createOutput = requiredSchema(nativeContract3.create['~orpc'].outputSchema);
+const listInput = requiredSchema(nativeContract4.adminList['~orpc'].inputSchema);
+const listOutput = requiredSchema(nativeContract5.adminList['~orpc'].outputSchema);
+const packedAnnouncementsInput = requiredSchema(nativeContract6.list['~orpc'].inputSchema);
+const packedAnnouncementsOutput = requiredSchema(nativeContract7.list['~orpc'].outputSchema);
+const packedAnnouncementsShowInput = requiredSchema(nativeContract8.show['~orpc'].inputSchema);
+const packedAnnouncementsShowOutput = requiredSchema(nativeContract9.show['~orpc'].outputSchema);
+const packedAnnouncementSchema = packedSchemas.Announcement;
 
 const date = new Date('2026-01-01T00:00:00.000Z');
 
@@ -70,53 +95,99 @@ test.each([undefined, null, false, true])('real public serializer retains option
 	expect(v.safeParse(packedAnnouncementSchema, withoutRead).success).toBe(true);
 });
 
-test('authenticated serializer resolves read state and targeted forYou; creation handler uses full real serializer output', async () => {
-	const { announcements, reads, ids, serializer } = fixture();
-	const user = mockDeep<MiLocalUser>({ id: 'user123' });
-	reads.countBy.mockResolvedValue(1);
-	const targeted = await serializer.pack({ ...announcement(), userId: user.id }, user);
-	expect(targeted).toMatchObject({ isRead: true, forYou: true });
-	expect(v.parse(packedAnnouncementSchema, targeted)).toEqual(targeted);
-	expect(reads.countBy).toHaveBeenCalledWith({ announcementId: 'announcement123', userId: user.id });
-	announcements.insertOne.mockResolvedValue(announcement());
-	const service = new AnnouncementService(announcements, reads, mockDeep(), ids, mockDeep(), mockDeep(), serializer);
-	const endpoint = new CreateEndpoint(service);
-	const params = { title: 'Title', text: 'Text', imageUrl: '', i: 'transport', future: true };
-	const result = await endpoint.exec(params, user, null);
-	expect(v.parse(createOutput, result)).toEqual(result);
-	expect(result).toMatchObject({ icon: 'info', display: 'normal', needConfirmationToRead: false, silence: false, forYou: false });
-	expect(params).toMatchObject({ icon: 'info', display: 'normal', userId: null, future: true });
-	expect(announcements.insertOne).toHaveBeenCalledWith(expect.objectContaining({ imageUrl: null, icon: 'info', display: 'normal', forExistingUsers: false, userId: null }));
-});
-
-test('admin list handler emits its distinct finite raw shape and read count', async () => {
-	const { announcements, reads, ids } = fixture();
-	const pagination = mockDeep<QueryService>();
-	const query = mockDeep<ReturnType<AnnouncementsRepository['createQueryBuilder']>>();
-	pagination.makePaginationQuery.mockReturnValue(query);
+function nativeFixture(actor: ApiActor | null = { id: 'admin123', isSuspended: false, movedToUri: null }) {
+	const dependencies = mockDeep<AnnouncementsDependencies<ApiActor>>();
+	const services = mockDeep<ApiServices<ApiActor>>();
+	services.authenticate.mockResolvedValue([actor, null]);
+	const authorization = mockDeep<ApiAuthorization<ApiActor>>();
+	authorization.rootUserId.mockReturnValue(actor?.id ?? null);
+	const context: ApiContext<ApiActor> = { services, authorization, credential: actor ? 'credential' : null, ip: '127.0.0.1', headers: {} };
+	const query = mockDeep<SelectQueryBuilder<MiAnnouncement>>();
 	query.andWhere.mockReturnValue(query);
+	query.orWhere.mockReturnValue(query);
 	query.limit.mockReturnValue(query);
-	query.getMany.mockResolvedValue([announcement()]);
-	reads.countBy.mockResolvedValue(3);
-	const endpoint = new ListEndpoint(announcements, reads, pagination, ids);
-	const result = await endpoint.exec({}, mockDeep<MiLocalUser>({ id: 'user123' }), null);
-	expect(v.parse(listOutput, result)).toEqual(result);
-	expect(result[0]).toMatchObject({ reads: 3, userId: null, updatedAt: null, isActive: true });
-	expect(query.limit).toHaveBeenCalledWith(10);
-	for (const invalid of [{ ...result[0], reads: undefined }, { ...result[0], reads: '3' }, { ...result[0], future: true }]) expect(v.safeParse(listOutput, [invalid]).success).toBe(false);
+	dependencies.announcementsRepository.createQueryBuilder.mockReturnValue(query);
+	dependencies.queryService.makePaginationQuery.mockReturnValue(query);
+	dependencies.idService.parse.mockReturnValue({ date });
+	return { dependencies, query, actor, client: createRouterClient(createAnnouncementsRouter(dependencies), { context }) };
+}
+
+test('native create injects construction dependencies and materializes defaults before invoking the domain service', async () => {
+	const { dependencies, client, actor } = nativeFixture();
+	const packed = await fixture().serializer.pack(announcement());
+	dependencies.announcementService.create.mockResolvedValue({ packed });
+	expect(await client.create({ title: 'Title', text: 'Text', imageUrl: '' })).toEqual(packed);
+	expect(dependencies.announcementService.create).toHaveBeenCalledExactlyOnceWith({
+		title: 'Title', text: 'Text', imageUrl: null, updatedAt: null,
+		icon: 'info', display: 'normal', forExistingUsers: false, silence: false,
+		needConfirmationToRead: false, userId: null,
+	}, actor);
+});
+test('native admin list retains status/user filters and awaits read counts with ISO dates', async () => {
+	const { dependencies, query, client } = nativeFixture();
+	const row = announcement();
+	row.updatedAt = date;
+	query.getMany.mockResolvedValue([row]);
+	dependencies.announcementReadsRepository.countBy.mockResolvedValue(3);
+	const output = await client.adminList({ status: 'archived', userId: 'target123' });
+	expect(query.andWhere).toHaveBeenCalledWith('announcement.isActive = false');
+	expect(query.andWhere).toHaveBeenCalledWith('announcement.userId = :userId', { userId: 'target123' });
+	expect(query.limit).toHaveBeenCalledExactlyOnceWith(10);
+	expect(dependencies.announcementReadsRepository.countBy).toHaveBeenCalledExactlyOnceWith({ announcementId: row.id });
+	expect(output).toEqual([{
+		id: row.id, createdAt: date.toISOString(), updatedAt: date.toISOString(), title: row.title,
+		text: row.text, imageUrl: null, icon: 'info', display: 'normal', isActive: true,
+		forExistingUsers: false, silence: false, needConfirmationToRead: false, userId: null, reads: 3,
+	}]);
+	expect(v.parse(listOutput, output)).toEqual(output);
+});
+test.each([false, true])('native public list retains actor targeting and anonymous access (anonymous=%s)', async anonymous => {
+	const native = anonymous ? nativeFixture(null) : nativeFixture();
+	const { dependencies, query, client, actor } = native;
+	const rows = [announcement()];
+	const packed = [await fixture().serializer.pack(rows[0])];
+	query.getMany.mockResolvedValue(rows);
+	dependencies.announcementEntityService.packMany.mockResolvedValue(packed);
+	expect(await client.list({})).toEqual(packed);
+	expect(query.andWhere).toHaveBeenCalledWith('announcement.isActive = :isActive', { isActive: true });
+	const bracket = query.andWhere.mock.calls.map(([where]) => where).find(where => where instanceof Brackets);
+	expect(bracket).toBeInstanceOf(Brackets);
+	if (!(bracket instanceof Brackets)) throw new Error('Missing targeting predicate');
+	bracket.whereFactory(query);
+	expect(query.orWhere).toHaveBeenCalledWith('announcement.userId IS NULL');
+	if (actor) expect(query.orWhere).toHaveBeenCalledWith('announcement.userId = :meId', { meId: actor.id });
+	else expect(query.orWhere).toHaveBeenCalledTimes(1);
+	expect(dependencies.announcementEntityService.packMany).toHaveBeenCalledExactlyOnceWith(rows, actor);
+});
+test('native show translates missing entities with its route UUID and forwards the authenticated actor', async () => {
+	const { dependencies, client, actor } = nativeFixture(null);
+	dependencies.announcementService.getAnnouncement.mockRejectedValue(new EntityNotFoundError(MiAnnouncement, { id: 'missing123' }));
+	await expect(client.show({ announcementId: 'missing123' })).rejects.toMatchObject({
+		code: 'NO_SUCH_ANNOUNCEMENT', data: { id: 'b57b5e1d-4f49-404a-9edb-46b00268f121' },
+	});
+	expect(dependencies.announcementService.getAnnouncement).toHaveBeenCalledExactlyOnceWith('missing123', actor);
+});
+test('native credential policy precedes input validation and domain calls', async () => {
+	const { dependencies, client } = nativeFixture(null);
+	await expect(client.update({ id: '' })).rejects.toMatchObject({ code: 'CREDENTIAL_REQUIRED' });
+	expect(dependencies.announcementsRepository.findOneBy).not.toHaveBeenCalled();
+	expect(dependencies.announcementService.update).not.toHaveBeenCalled();
 });
 
-test('HTTP projection preserves open input, AJV defaults/errors and unparsed outputs', async () => {
+test('native public announcement selects wire fields without invoking output validation', async () => {
+	const { dependencies, client } = nativeFixture(null);
 	const { serializer } = fixture();
-	const result = { ...await serializer.pack(announcement()), future: true };
-	const projection = projectEndpointContract(createDefinition);
-	expect(projection.input).not.toHaveProperty('additionalProperties');
-	expect(projection.response).toMatchObject({ additionalProperties: false });
-	expect(toLegacyJsonSchema(packedAnnouncementSchema, { target: 'openapi-3.0', typeMode: 'output' })).toMatchObject({ additionalProperties: false });
-	const params = { title: 'Title', text: 'Text', imageUrl: null, i: 'transport', future: true };
-	const endpoint = new ContractEndpoint({}, projection, async ps => { expect(ps).toBe(params); return result; });
-	expect(await endpoint.exec(params, null, null)).toBe(result);
-	expect(params).toMatchObject({ icon: 'info', display: 'normal', future: true });
-	expect(v.safeParse(createOutput, result).success).toBe(false);
-	await expect(endpoint.exec({ title: 'Title', text: 'Text' }, null, null)).rejects.toMatchObject({ code: 'INVALID_PARAM', id: '3d81ceae-475f-4600-b2a8-2bc116157532', info: { param: '#/required' } });
+	const row = mockDeep<MiAnnouncement>({ id: 'announcement123', updatedAt: null, title: 'Public', text: 'Text', imageUrl: null, icon: 'info', display: 'normal', userId: null, needConfirmationToRead: false, silence: false });
+	const publicValue = await serializer.pack(row);
+	const extended = { ...publicValue, privateTargetingData: 'secret' };
+	dependencies.announcementService.getAnnouncement.mockResolvedValue(extended);
+	const output = announcementsContract.show['~orpc'].outputSchema;
+	if (output === undefined) throw new Error('Missing announcement output');
+	const validate = vi.spyOn(output, '~run');
+	try {
+		const response = await client.show({ announcementId: row.id });
+		expect(response).toEqual(publicValue);
+		expect(response).not.toHaveProperty('privateTargetingData');
+		expect(validate).not.toHaveBeenCalled();
+	} finally { validate.mockRestore(); }
 });

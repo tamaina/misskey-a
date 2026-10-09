@@ -2,58 +2,34 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { portableAdminSystemWebhookTestDefinition, portableAdminSystemWebhookTestInput, portableAdminSystemWebhookTestOutput } from '../../../../contract/portable-constant-endpoint-definitions.js';
-import { Injectable } from '@nestjs/common';
-import ms from 'ms';
 import { WebhookTestService } from '../../../services/WebhookTestService.js';
-import { ApiError } from '@features/api/backend/transport/error.js';
-
-const contractProjection = projectEndpointContract(portableAdminSystemWebhookTestDefinition);
-
-export const meta = {
-	tags: ['webhooks'],
-
-	requireCredential: true,
-	requireModerator: true,
-	secure: true,
-	kind: 'read:admin:system-webhook',
-
-	limit: {
-		duration: ms('15min'),
-		max: 60,
-	},
-
-	errors: {
-		noSuchWebhook: {
-			message: 'No such webhook.',
-			code: 'NO_SUCH_WEBHOOK',
-			id: '0c52149c-e913-18f8-5dc7-74870bfe0cf9',
-		},
-	},
-} as const;
-
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof portableAdminSystemWebhookTestInput, typeof portableAdminSystemWebhookTestOutput> {
-	constructor(
-		private webhookTestService: WebhookTestService,
-	) {
-		super(meta, contractProjection, async (ps) => {
-			try {
-				await this.webhookTestService.testSystemWebhook({
-					webhookId: ps.webhookId,
-					type: ps.type,
-					override: ps.override,
-				});
-			} catch (e) {
-				if (e instanceof WebhookTestService.NoSuchWebhookError) {
-					throw new ApiError(meta.errors.noSuchWebhook);
+import { apiError } from '../../../../../api/backend/transport/orpc-error.js';
+import type { MiLocalUser } from '../../../../../users/backend/models/User.js';
+import { adminSystemWebhookTestErrors, adminSystemWebhookTestContract } from './test.contract.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import { requirePrincipal } from '../../../../../api/backend/transport/middleware.js';
+export interface AdminSystemWebhookTestDependencies {
+	webhookTestService: Pick<WebhookTestService, 'testSystemWebhook'>;
+}
+export function createAdminSystemWebhookTestProcedure(deps: AdminSystemWebhookTestDependencies) {
+	return createApiProcedure<MiLocalUser>()(adminSystemWebhookTestContract)
+		.use(requirePrincipal<MiLocalUser>())
+		.handler(async ({ input, context }) => {
+			const ps = input;
+			const result = await (async () => {
+				try {
+					await deps.webhookTestService.testSystemWebhook({
+						webhookId: ps.webhookId,
+						type: ps.type,
+						override: ps.override,
+					});
+				} catch (e) {
+					if (e instanceof WebhookTestService.NoSuchWebhookError) {
+						throw apiError(adminSystemWebhookTestErrors.noSuchWebhook);
+					}
+					throw e;
 				}
-				throw e;
-			}
+			})();
+			return result;
 		});
-	}
 }

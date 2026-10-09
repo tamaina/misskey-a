@@ -4,15 +4,8 @@
  */
 
 import { Inject, Injectable } from '@nestjs/common';
-import { DI } from '@/di-symbols.js';
 import { bindThis } from '@features/runtime/backend/decorators.js';
-import type { MiUser } from '@features/users/backend/models/User.js';
-import type { MiNote } from '@features/notes/backend/models/Note.js';
-import type { MiMeta } from '@features/instance/backend/models/Meta.js';
-import { Packed } from '@features/index/contract/packed.js';
-import type { NotesRepository } from '@features/persistence/backend/repositories/models.js';
 import { NoteEntityService } from '@features/notes/backend/serializers/NoteEntityService.js';
-import { FanoutTimelineName, FanoutTimelineService } from './FanoutTimelineService.js';
 import { UtilityService } from '@features/federation/backend/services/UtilityService.js';
 import { isUserRelated } from '@features/relationships/backend/utility/is-user-related.js';
 import { isQuote, isRenote } from '@features/notes/backend/utility/is-renote.js';
@@ -21,6 +14,13 @@ import { isReply } from '@features/notes/backend/utility/is-reply.js';
 import { isInstanceMuted } from '@features/relationships/backend/utility/is-instance-muted.js';
 import { ChannelMutingService } from '@features/channels/backend/services/ChannelMutingService.js';
 import { isChannelRelated } from '@features/channels/backend/utility/is-channel-related.js';
+import { DI } from '@/di-symbols.js';
+import { FanoutTimelineName, FanoutTimelineService } from './FanoutTimelineService.js';
+import type { NotesRepository } from '@features/persistence/backend/repositories/models.js';
+import type { PackedNote } from "@features/notes/backend/note.schema.js";
+import type { MiMeta } from '@features/instance/backend/models/Meta.js';
+import type { MiNote } from '@features/notes/backend/models/Note.js';
+import type { MiUser } from '@features/users/backend/models/User.js';
 
 type NoteFilter = (note: MiNote) => boolean;
 
@@ -63,7 +63,7 @@ export class FanoutTimelineEndpointService {
 	}
 
 	@bindThis
-	async timeline(ps: TimelineOptions): Promise<Packed<'Note'>[]> {
+	async timeline(ps: TimelineOptions): Promise<PackedNote[]> {
 		return await this.noteEntityService.packMany(await this.getMiNotes(ps), ps.me);
 	}
 

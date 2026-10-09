@@ -3,22 +3,18 @@
  * SPDX-License-Identifier: MIT
  */
 import type * as v from 'valibot';
-import type { FeatureEndpoints, PackedModels } from '../built/contracts/index/contract/index.js';
+import type { InferContractRouterInputs, InferContractRouterOutputs } from '@orpc/contract';
+import type { usersContract } from '../built/contracts/users/backend/api.definition.js';
+import type { notesApiContract } from '../built/contracts/notes/backend/api.definition.js';
+import type { relationshipsContract } from '../built/contracts/relationships/backend/endpoints/relationships.contract.js';
+import type { PackedModels } from '../built/contracts/index/backend/packed.schema.js';
+import type { authContract } from '../built/contracts/auth/backend/api.definition.js';
+import type { federationContract } from '../built/contracts/federation/backend/api.definition.js';
 import type { ContractEndpoints } from '../built/contract.types.js';
 import type { Endpoints } from '../built/api.types.js';
 import type { UserLite, UserDetailedNotMe, MeDetailed, UserDetailed, User, Following } from '../built/autogen/models.js';
-import type { packedUserLiteSchema, packedUserDetailedNotMeSchema, packedMeDetailedSchema, packedUserDetailedSchema, packedUserSchema } from '../built/contracts/users/contract/packed.js';
-import type { packedFollowingSchema } from '../built/contracts/relationships/contract/packed.js';
-import type { packedEndpointDefinitions as definitions0 } from '../built/contracts/users/contract/packed-endpoint-definitions.js';
-import type { inlineEndpointDefinitions as definitions1 } from '../built/contracts/users/contract/endpoint-definitions.js';
-import type { usersShowDefinition as definitions2 } from '../built/contracts/users/contract/show-endpoint-definition.js';
-import type { iUpdateDefinition as definitions3 } from '../built/contracts/users/contract/user-update-endpoint-definitions.js';
-import type { outputCompositionEndpointDefinitions as definitions4 } from '../built/contracts/auth/contract/output-composition-endpoint-definitions.js';
-import type { packedEndpointDefinitions as definitions5 } from '../built/contracts/auth/contract/packed-endpoint-definitions.js';
-import type { packedEndpointDefinitions as definitions6 } from '../built/contracts/notes/contract/packed-endpoint-definitions.js';
-import type { packedEndpointDefinitions as definitions7 } from '../built/contracts/relationships/contract/packed-endpoint-definitions.js';
-import type { selectorCommonEndpointDefinitions as definitions8 } from '../built/contracts/relationships/contract/selector-common-endpoint-definitions.js';
-import type { outputCompositionEndpointDefinitions as definitions9 } from '../built/contracts/federation/contract/output-composition-endpoint-definitions.js';
+import type { packedUserLiteSchema, packedUserDetailedNotMeSchema, packedMeDetailedSchema, packedUserDetailedSchema, packedUserSchema } from '../built/contracts/users/backend/user.schema.js';
+import type { packedFollowingSchema } from '../built/contracts/relationships/backend/endpoints/relationships.schema.js';
 
 type Equal<A, B> = (<T>() => T extends A ? 1 : 2) extends (<T>() => T extends B ? 1 : 2) ? true : false;
 type Assert<T extends true> = T;
@@ -42,12 +38,29 @@ export type FollowingExact = Assert<Equal<Following, v.InferOutput<typeof packed
 export type FollowingRegistry = Assert<Equal<PackedModels['Following'], Following>>;
 export type FollowingNoAny = Assert<Equal<IsAny<Following>, false>>;
 
-type Definitions = typeof definitions0 & typeof definitions1 & { 'users/show': typeof definitions2 } & { 'i/update': typeof definitions3 } & typeof definitions4 & typeof definitions5 & typeof definitions6 & typeof definitions7 & typeof definitions8 & typeof definitions9;
-type Covered = Extract<keyof Definitions, 'i' | 'i/update' | 'i/move' | 'i/update-email' | 'i/pin' | 'i/unpin' | 'users' | 'users/show' | 'admin/accounts/find-by-email' | 'admin/accounts/create' | 'ap/show' | 'following/list' | 'users/followers' | 'users/following'>;
+type NativeContracts = {
+	'i': typeof usersContract['i'];
+	'i/update': typeof usersContract['i/update'];
+	'i/move': typeof usersContract['i/move'];
+	'users': typeof usersContract['users'];
+	'users/show': typeof usersContract['users/show'];
+	'i/update-email': typeof authContract['i/update-email'];
+	'admin/accounts/create': typeof authContract['admin/accounts/create'];
+	'ap/show': typeof federationContract['apShow'];
+	'admin/accounts/find-by-email': typeof usersContract['admin/accounts/find-by-email'];
+	'i/pin': typeof notesApiContract['iPin'];
+	'i/unpin': typeof notesApiContract['iUnpin'];
+	'following/list': typeof relationshipsContract['following/list'];
+	'users/followers': typeof relationshipsContract['users/followers'];
+	'users/following': typeof relationshipsContract['users/following'];
+};
+type Covered = keyof NativeContracts;
 export type Coverage = Assert<Equal<Covered, 'i' | 'i/update' | 'i/move' | 'i/update-email' | 'i/pin' | 'i/unpin' | 'users' | 'users/show' | 'admin/accounts/find-by-email' | 'admin/accounts/create' | 'ap/show' | 'following/list' | 'users/followers' | 'users/following'>>;
-export type NativeRequestParity = Assert<Equal<{ [K in Covered]: Equal<FeatureEndpoints[K]['req'], v.InferInput<Definitions[K]['input']>> }[Covered], true>>;
-export type NativeResponseParity = Assert<Equal<{ [K in Covered]: Equal<FeatureEndpoints[K]['res'], v.InferOutput<Definitions[K]['output']>> }[Covered], true>>;
-export type PublishedResponseParity = Assert<Equal<{ [K in Covered]: Equal<ContractEndpoints[K]['res'], v.InferOutput<Definitions[K]['output']>> }[Covered], true>>;
+type NativeRequest<K extends Covered> = InferContractRouterInputs<NativeContracts[K]>;
+type NativeResponse<K extends Covered> = InferContractRouterOutputs<NativeContracts[K]> extends void ? null : InferContractRouterOutputs<NativeContracts[K]>;
+export type NativeRequestParity = Assert<Equal<{ [K in Covered]: Equal<ContractEndpoints[K]['req'], NativeRequest<K>> }[Covered], true>>;
+export type NativeResponseParity = Assert<Equal<{ [K in Covered]: Equal<ContractEndpoints[K]['res'], NativeResponse<K>> }[Covered], true>>;
+export type PublishedResponseParity = Assert<Equal<{ [K in Covered]: Equal<ContractEndpoints[K]['res'], NativeResponse<K>> }[Covered], true>>;
 // users/show intentionally retains its documented SDK conditional-response adapter.
 export type FinalSdkResponseParity = Assert<Equal<{ [K in Exclude<Covered, 'users/show'>]: Equal<Endpoints[K]['res'], ContractEndpoints[K]['res']> }[Exclude<Covered, 'users/show'>], true>>;
 export type FinalSdkRequestParity = Assert<Equal<{ [K in Covered]: Equal<Endpoints[K]['req'], ContractEndpoints[K]['req']> }[Covered], true>>;

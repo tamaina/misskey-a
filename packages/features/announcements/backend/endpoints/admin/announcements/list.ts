@@ -3,83 +3,37 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { inlineAdminAnnouncementsListDefinition, inlineAdminAnnouncementsListInput, inlineAdminAnnouncementsListOutput } from '../../../../contract/endpoint-definitions.js';
-import { Inject, Injectable } from '@nestjs/common';
-import type { AnnouncementsRepository, AnnouncementReadsRepository } from '@features/persistence/backend/repositories/models.js';
-import type { MiAnnouncement } from '../../../models/Announcement.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 
-import { QueryService } from '@features/notes/backend/services/QueryService.js';
-import { DI } from '@/di-symbols.js';
-import { IdService } from '@features/runtime/backend/services/IdService.js';
-
-const contractProjection = projectEndpointContract(inlineAdminAnnouncementsListDefinition);
-
-export const meta = {
-	tags: ['admin'],
-
-	requireCredential: true,
-	requireModerator: true,
-	kind: 'read:admin:announcements',
-
-	res: contractProjection.response,
-} as const;
-
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof inlineAdminAnnouncementsListInput, typeof inlineAdminAnnouncementsListOutput> {
-	constructor(
-		@Inject(DI.announcementsRepository)
-		private announcementsRepository: AnnouncementsRepository,
-
-		@Inject(DI.announcementReadsRepository)
-		private announcementReadsRepository: AnnouncementReadsRepository,
-
-		private queryService: QueryService,
-		private idService: IdService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			const query = this.queryService.makePaginationQuery(this.announcementsRepository.createQueryBuilder('announcement'), ps.sinceId, ps.untilId, ps.sinceDate, ps.untilDate);
-
-			if (ps.status === 'archived') {
-				query.andWhere('announcement.isActive = false');
-			} else if (ps.status === 'active') {
-				query.andWhere('announcement.isActive = true');
-			}
-
-			if (ps.userId) {
-				query.andWhere('announcement.userId = :userId', { userId: ps.userId });
-			} else {
-				query.andWhere('announcement.userId IS NULL');
-			}
-
-			const announcements = await query.limit(ps.limit).getMany();
-
-			const reads = new Map<MiAnnouncement, number>();
-
-			for (const announcement of announcements) {
-				reads.set(announcement, await this.announcementReadsRepository.countBy({
-					announcementId: announcement.id,
-				}));
-			}
-
-			return announcements.map(announcement => ({
-				id: announcement.id,
-				createdAt: this.idService.parse(announcement.id).date.toISOString(),
-				updatedAt: announcement.updatedAt?.toISOString() ?? null,
-				title: announcement.title,
-				text: announcement.text,
-				imageUrl: announcement.imageUrl,
-				icon: announcement.icon,
-				display: announcement.display,
-				isActive: announcement.isActive,
-				forExistingUsers: announcement.forExistingUsers,
-				silence: announcement.silence,
-				needConfirmationToRead: announcement.needConfirmationToRead,
-				userId: announcement.userId,
-				reads: reads.get(announcement)!,
-			}));
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import type { ApiActor } from '@features/api/backend/transport/context.js';
+import { announcementsContract } from '../../../api.definition.js';
+import type { AnnouncementsDependencies } from '../../../api.implementation.js';
+import type { InferContractRouterOutputs } from '@orpc/contract';
+export interface AnnouncementAdminListDependencies<Actor extends ApiActor> {
+	announcementsRepository: Pick<AnnouncementsDependencies<Actor>['announcementsRepository'], 'createQueryBuilder'>;
+	announcementReadsRepository: AnnouncementsDependencies<Actor>['announcementReadsRepository'];
+	queryService: AnnouncementsDependencies<Actor>['queryService'];
+	idService: AnnouncementsDependencies<Actor>['idService'];
+}
+export function createAnnouncementAdminListProcedure<Actor extends ApiActor>(deps: AnnouncementAdminListDependencies<Actor>) {
+	return createApiProcedure<Actor>()(announcementsContract.adminList)
+		.use(requirePrincipal<Actor>())
+		.handler(async ({ input }) => {
+			const query = deps.queryService.makePaginationQuery(deps.announcementsRepository.createQueryBuilder('announcement'), input.sinceId, input.untilId, input.sinceDate, input.untilDate);
+			if (input.status === 'archived') query.andWhere('announcement.isActive = false');
+			else if (input.status === 'active') query.andWhere('announcement.isActive = true');
+			if (input.userId) query.andWhere('announcement.userId = :userId', { userId: input.userId });
+			else query.andWhere('announcement.userId IS NULL');
+			const rows = await query.limit(input.limit).getMany();
+			const result: InferContractRouterOutputs<typeof announcementsContract>['adminList'] = [];
+			for (const row of rows) result.push({
+				id: row.id, createdAt: deps.idService.parse(row.id).date.toISOString(), updatedAt: row.updatedAt?.toISOString() ?? null,
+				title: row.title, text: row.text, imageUrl: row.imageUrl, icon: row.icon, display: row.display,
+				isActive: row.isActive, forExistingUsers: row.forExistingUsers, silence: row.silence,
+				needConfirmationToRead: row.needConfirmationToRead, userId: row.userId,
+				reads: await deps.announcementReadsRepository.countBy({ announcementId: row.id }),
+			});
+			return result;
 		});
-	}
 }

@@ -2,45 +2,25 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { inlineNotesDraftsCountDefinition, inlineNotesDraftsCountInput, inlineNotesDraftsCountOutput } from '../../../../contract/endpoint-definitions.js';
-import { Inject, Injectable } from '@nestjs/common';
-
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import { notesDraftsCountContract } from './count.contract.js';
 import type { NoteDraftsRepository } from '@features/persistence/backend/repositories/models.js';
-import { DI } from '@/di-symbols.js';
+import type { MiLocalUser } from "@features/users/backend/models/User.js";
 
-const contractProjection = projectEndpointContract(inlineNotesDraftsCountDefinition);
+export interface NotesDraftsCountDependencies {
+	noteDraftsRepository: NoteDraftsRepository;
+}
+export function createNotesDraftsCountProcedure(deps: NotesDraftsCountDependencies) {
+	return createApiProcedure<MiLocalUser>()(notesDraftsCountContract).use(requirePrincipal<MiLocalUser>())
+		.handler(async ({ input, context }) => {
+			const _ps = input;
+			const me = context.principal;
 
-export const meta = {
-	tags: ['notes', 'drafts'],
+				const count = await deps.noteDraftsRepository.createQueryBuilder('drafts')
+					.where('drafts.userId = :meId', { meId: me.id })
+					.getCount();
 
-	requireCredential: true,
-
-	prohibitMoved: true,
-
-	kind: 'read:account',
-
-	res: contractProjection.response,
-
-	errors: {
-	},
-} as const;
-
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof inlineNotesDraftsCountInput, typeof inlineNotesDraftsCountOutput> {
-	constructor(
-		@Inject(DI.noteDraftsRepository)
-		private noteDraftsRepository: NoteDraftsRepository,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			const count = await this.noteDraftsRepository.createQueryBuilder('drafts')
-				.where('drafts.userId = :meId', { meId: me.id })
-				.getCount();
-
-			return count;
+				return count;
 		});
-	}
 }

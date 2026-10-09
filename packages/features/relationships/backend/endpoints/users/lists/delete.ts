@@ -2,28 +2,20 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 
-import { listContract } from '../../../../contract/lists.js';
-import { listErrors } from '@features/relationships/contract';
-import { legacyListSchemas } from '@features/relationships/backend';
-import type { Schema } from '@features/api/backend/utility/json-schema.js';
-import { createContractTransportEndpoint } from '@features/api/backend/transport/contract-transport-endpoint.js';
-import { defineFeatureEndpoint } from '@features/api/backend/transport/feature-endpoint.js';
-
-export const meta = {
-	tags: ['lists'],
-
-	requireCredential: true,
-
-	kind: 'write:account',
-
-	description: 'Delete an existing list of users.',
-
-	errors: listErrors['users/lists/delete'],
-} as const;
-
-export const paramDef = legacyListSchemas['users/lists/delete'].input as Schema;
-
-export const { feature, createEndpoint } = defineFeatureEndpoint('listCommands', commands => createContractTransportEndpoint(meta, paramDef, listContract['users/lists/delete'], async (params, user) => commands['users/lists/delete'](params, {
-	context: { actor: user },
-})));
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import { relationshipsContract } from '../../relationships.contract.js';
+import type { RelationshipsDependencies } from '../../../api.implementation.js';
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
+import { relationshipsErrors } from '../../relationships.errors.js';
+export function createUsersListsDeleteProcedure<Actor extends MiLocalUser>(deps: Pick<RelationshipsDependencies, 'userListsRepository'>) {
+	return createApiProcedure<Actor>()(relationshipsContract["users/lists/delete"]).use(requirePrincipal<Actor>())
+		.handler(async ({ input, context }) => {
+			const actor = context.principal;
+			const list = await deps.userListsRepository.findOneBy({ id: input.listId, userId: actor.id });
+			if (list == null) throw apiError(relationshipsErrors['users/lists/delete'].noSuchList);
+			await deps.userListsRepository.delete(list.id);
+		});
+}

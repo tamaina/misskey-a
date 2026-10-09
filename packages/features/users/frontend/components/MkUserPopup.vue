@@ -100,12 +100,11 @@ async function fetchUser() {
 		user.value = props.q;
 		error.value = false;
 	} else {
-		const query: Misskey.entities.UsersShowRequest = props.q.startsWith('@') ?
+		const query: { userId: string } | { username: string; host?: string | null } = props.q.startsWith('@') ?
 			Misskey.acct.parse(props.q.substring(1)) :
 			{ userId: props.q };
 
-		// @ts-expect-error payloadの引数側の型が正常に解決されない
-		misskeyApi('users/show', query).then(res => {
+		misskeyApi<void, 'users/show', typeof query>('users/show', query).then(res => {
 			if (!props.showing) return;
 			user.value = res;
 			error.value = false;

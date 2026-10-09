@@ -69,7 +69,8 @@ describe('[シナリオ] ユーザ通報', () => {
 			},
 			credential ?? admin,
 		);
-		return res.body;
+		expect(res.status).toBe(204);
+		expect(res.body).toBeNull();
 	}
 
 	async function resolveAbuseReport(args?: Partial<entities.AdminResolveAbuseUserReportRequest>, credential?: UserToken): Promise<void> {
@@ -81,7 +82,8 @@ describe('[シナリオ] ユーザ通報', () => {
 			},
 			credential ?? admin,
 		);
-		return res.body;
+		expect(res.status).toBe(204);
+		expect(res.body).toBeNull();
 	}
 
 	// -------------------------------------------------------------------------------------------

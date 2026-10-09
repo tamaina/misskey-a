@@ -7,7 +7,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { EntityNotFoundError, In } from 'typeorm';
 import { ModuleRef } from '@nestjs/core';
 import { DI } from '@/di-symbols.js';
-import type { Packed } from '@features/index/contract/packed.js';
+import type { Packed } from '@features/index/backend/packed.schema.js';
 import { awaitAll } from '@features/runtime/backend/async/await-all.js';
 import type { MiUser } from '@features/users/backend/models/User.js';
 import type { MiNote } from '../models/Note.js';

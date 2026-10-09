@@ -2,23 +2,18 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { voidI2faPasswordLessDefinition, voidI2faPasswordLessInput, voidI2faPasswordLessOutput } from '../../../../contract/void-endpoint-definitions.js';
-import { Inject, Injectable } from '@nestjs/common';
-
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import type { UserProfilesRepository, UserSecurityKeysRepository } from '@features/persistence/backend/repositories/models.js';
 import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
-import { DI } from '@/di-symbols.js';
-import { ApiError } from '@features/api/backend/transport/error.js';
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
 
-const contractProjection = projectEndpointContract(voidI2faPasswordLessDefinition);
+import { I2faPasswordLessContract } from '../../../api.definition.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
 
 export const meta = {
-	requireCredential: true,
-
-	secure: true,
 
 	errors: {
 		noKey: {
@@ -28,25 +23,20 @@ export const meta = {
 		},
 	},
 } as const;
-
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof voidI2faPasswordLessInput, typeof voidI2faPasswordLessOutput> {
-	constructor(
-		@Inject(DI.userProfilesRepository)
-		private userProfilesRepository: UserProfilesRepository,
-
-		@Inject(DI.userSecurityKeysRepository)
-		private userSecurityKeysRepository: UserSecurityKeysRepository,
-
-		private userEntityService: UserEntityService,
-		private globalEventService: GlobalEventService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
+export interface I2faPasswordLessDependencies {
+	userProfilesRepository: UserProfilesRepository;
+	userSecurityKeysRepository: UserSecurityKeysRepository;
+	userEntityService: Pick<UserEntityService, 'packSelf'>;
+	globalEventService: Pick<GlobalEventService, 'publishMainStream'>;
+}
+export function createI2faPasswordLessProcedure(deps: I2faPasswordLessDependencies) {
+	return createApiProcedure<MiLocalUser>()(I2faPasswordLessContract).use(requirePrincipal<MiLocalUser>()).handler(async ({ input, context }) => {
+		const ps = input;
+		const me = context.principal;
+		const result = await (async () => {
 			if (ps.value === true) {
 				// セキュリティキーがなければパスワードレスを有効にはできない
-				const keyCount = await this.userSecurityKeysRepository.count({
+				const keyCount = await deps.userSecurityKeysRepository.count({
 					where: {
 						userId: me.id,
 					},
@@ -58,22 +48,23 @@ export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof
 				});
 
 				if (keyCount === 0) {
-					await this.userProfilesRepository.update(me.id, {
+					await deps.userProfilesRepository.update(me.id, {
 						usePasswordLessLogin: false,
 					});
 
-					throw new ApiError(meta.errors.noKey);
+					throw apiError(meta.errors.noKey);
 				}
 			}
 
-			await this.userProfilesRepository.update(me.id, {
+			await deps.userProfilesRepository.update(me.id, {
 				usePasswordLessLogin: ps.value,
 			});
 
 			// Publish meUpdated event
-			this.globalEventService.publishMainStream(me.id, 'meUpdated', await this.userEntityService.packSelf(me.id, {
+			deps.globalEventService.publishMainStream(me.id, 'meUpdated', await deps.userEntityService.packSelf(me.id, {
 				includeSecrets: true,
 			}));
-		});
-	}
+		})();
+		return result;
+	});
 }

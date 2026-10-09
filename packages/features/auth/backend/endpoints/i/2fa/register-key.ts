@@ -3,24 +3,20 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { inlineI2faRegisterKeyDefinition } from '../../../../contract/endpoint-definitions.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 import bcrypt from 'bcryptjs';
-import { LegacyWebAuthnOptionsProducerEndpoint } from '../../../legacy-webauthn-options-producer-endpoint.js';
-import { Inject, Injectable } from '@nestjs/common';
-
 import type { UserProfilesRepository } from '@features/persistence/backend/repositories/models.js';
-import { DI } from '@/di-symbols.js';
 import { WebAuthnService } from '../../../services/WebAuthnService.js';
-import { ApiError } from '@features/api/backend/transport/error.js';
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
 import { UserAuthService } from '../../../services/UserAuthService.js';
 
-const contractProjection = projectEndpointContract(inlineI2faRegisterKeyDefinition);
+import { I2faRegisterKeyContract } from '../../../api.definition.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
 
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+
+import { toWebAuthnRegistrationOptions } from '../../../webauthn.schema.js';
 export const meta = {
-	requireCredential: true,
-
-	secure: true,
 
 	errors: {
 		userNotFound: {
@@ -41,25 +37,19 @@ export const meta = {
 			id: 'bf32b864-449b-47b8-974e-f9a5468546f1',
 		},
 	},
-
-	res: contractProjection.response,
 } as const;
-
-export const paramDef = contractProjection.input;
-
-// eslint-disable-next-line import/no-default-export
-@Injectable()
-export class EndpointImplementation extends LegacyWebAuthnOptionsProducerEndpoint<typeof meta> {
-	constructor(
-		@Inject(DI.userProfilesRepository)
-		private userProfilesRepository: UserProfilesRepository,
-
-		private webAuthnService: WebAuthnService,
-		private userAuthService: UserAuthService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
+export interface I2faRegisterKeyDependencies {
+	userProfilesRepository: UserProfilesRepository;
+	webAuthnService: Pick<WebAuthnService, 'initiateRegistration'>;
+	userAuthService: Pick<UserAuthService, 'twoFactorAuthenticate'>;
+}
+export function createI2faRegisterKeyProcedure(deps: I2faRegisterKeyDependencies) {
+	return createApiProcedure<MiLocalUser>()(I2faRegisterKeyContract).use(requirePrincipal<MiLocalUser>()).handler(async ({ input, context }) => {
+		const ps = input;
+		const me = context.principal;
+		const result = await (async () => {
 			const token = ps.token;
-			const profile = await this.userProfilesRepository.findOne({
+			const profile = await deps.userProfilesRepository.findOne({
 				where: {
 					userId: me.id,
 				},
@@ -67,7 +57,7 @@ export class EndpointImplementation extends LegacyWebAuthnOptionsProducerEndpoin
 			});
 
 			if (profile == null) {
-				throw new ApiError(meta.errors.userNotFound);
+				throw apiError(meta.errors.userNotFound);
 			}
 
 			if (profile.twoFactorEnabled) {
@@ -76,7 +66,7 @@ export class EndpointImplementation extends LegacyWebAuthnOptionsProducerEndpoin
 				}
 
 				try {
-					await this.userAuthService.twoFactorAuthenticate(profile, token);
+					await deps.userAuthService.twoFactorAuthenticate(profile, token);
 				} catch (_) {
 					throw new Error('authentication failed');
 				}
@@ -84,18 +74,19 @@ export class EndpointImplementation extends LegacyWebAuthnOptionsProducerEndpoin
 
 			const passwordMatched = await bcrypt.compare(ps.password, profile.password ?? '');
 			if (!passwordMatched) {
-				throw new ApiError(meta.errors.incorrectPassword);
+				throw apiError(meta.errors.incorrectPassword);
 			}
 
 			if (!profile.twoFactorEnabled) {
-				throw new ApiError(meta.errors.twoFactorNotEnabled);
+				throw apiError(meta.errors.twoFactorNotEnabled);
 			}
 
-			return await this.webAuthnService.initiateRegistration(
+			return await deps.webAuthnService.initiateRegistration(
 				me.id,
 				profile.user?.username ?? me.id,
 				profile.user?.name ?? undefined,
 			);
-		});
-	}
+		})();
+		return toWebAuthnRegistrationOptions(result);
+	});
 }

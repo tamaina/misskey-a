@@ -3,22 +3,24 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { chatContract } from '../../../../contract/index.js';
-import { chatErrors } from '@features/chat/contract';
-import { legacyChatSchemas } from '@features/chat/backend';
-import type { Schema } from '@features/api/backend/utility/json-schema.js';
-import { createContractTransportEndpoint } from '@features/api/backend/transport/contract-transport-endpoint.js';
-import { defineFeatureEndpoint } from '@features/api/backend/transport/feature-endpoint.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 
-export const meta = {
-	tags: ['chat'],
-	requireCredential: true,
-	kind: 'write:chat',
-	errors: chatErrors['chat/rooms/mute'],
-} as const;
+import { chatRoomsMuteContract } from './mute.contract.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
 
-export const paramDef = legacyChatSchemas['chat/rooms/mute'].input as Schema;
+import type { InferSchemaOutput } from '@orpc/contract';
+import { type ChatService } from '@features/chat/backend/services/ChatService.js';
+export interface ChatRoomsMuteDependencies {
+	chatService: Pick<ChatService, 'checkChatAvailability' | 'muteRoom'>;
+}
+export function createChatRoomsMuteProcedure(deps: ChatRoomsMuteDependencies) {
+	async function execute(input: InferSchemaOutput<NonNullable<typeof chatRoomsMuteContract['~orpc']['inputSchema']>>, actor: MiLocalUser): Promise<void> {
+		await deps.chatService.checkChatAvailability(actor.id, 'write');
+		await deps.chatService.muteRoom(actor.id, input.roomId, input.mute);
+	}
 
-export const { feature, createEndpoint } = defineFeatureEndpoint('chatCommands', commands => createContractTransportEndpoint(meta, paramDef, chatContract['chat/rooms/mute'], async (params, user) => commands['chat/rooms/mute'](params, {
-	context: { actor: user },
-})));
+	return createApiProcedure<MiLocalUser>()(chatRoomsMuteContract)
+		.use(requirePrincipal<MiLocalUser>())
+		.handler(({ input, context }) => execute(input, context.principal));
+}

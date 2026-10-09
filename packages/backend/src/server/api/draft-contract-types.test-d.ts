@@ -3,30 +3,35 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import type { InferSchemaInput, InferSchemaOutput } from '@orpc/contract';
 import type * as v from 'valibot';
 import type { InferContractRouterInputs, InferContractRouterOutputs } from '@orpc/contract';
-import type { ContractEndpoints } from '../../../../misskey-js/src/contract.types.js';
-import type { Packed } from '@features/index/contract/packed.js';
-import type { NativeNoteDraftEndpoints, noteDraftEndpointDefinitions, notesDraftsCreateDefinition, notesDraftsUpdateDefinition, notesDraftsCreateInput, notesDraftsUpdateInput } from '@features/notes/contract/draft-endpoint-definitions.js';
+import type { notesApiContract } from '@features/notes/backend/api.definition.js';
+import type { createNotesDraftsCreateProcedure } from '@features/notes/backend/endpoints/notes/drafts/create.js';
+import type { InferRouterOutputs } from '@orpc/server';
+import type { packedNoteDraftSchema } from '@features/notes/backend/note-aux.schema.js';
+import type { notesDraftsCreateContract } from '@features/notes/backend/endpoints/notes/drafts/create.contract.js';
+import type { notesDraftsUpdateContract } from '@features/notes/backend/endpoints/notes/drafts/update.contract.js';
 
 type Equal<A, B> = (<T>() => T extends A ? 1 : 2) extends (<T>() => T extends B ? 1 : 2) ? true : false;
 type Assert<T extends true> = T;
 type Flatten<T> = { [K in keyof T]: T[K] };
-type CreateRequest = ContractEndpoints['notes/drafts/create']['req'];
-type UpdateRequest = ContractEndpoints['notes/drafts/update']['req'];
-type CreateHandler = v.InferOutput<typeof notesDraftsCreateInput>;
-type UpdateHandler = v.InferOutput<typeof notesDraftsUpdateInput>;
+type CreateRequest = InferContractRouterInputs<typeof notesDraftsCreateContract>;
+type UpdateRequest = InferContractRouterInputs<typeof notesDraftsUpdateContract>;
+type CreateHandler = InferSchemaOutput<NonNullable<typeof notesDraftsCreateContract['~orpc']['inputSchema']>>;
+type UpdateHandler = InferSchemaOutput<NonNullable<typeof notesDraftsUpdateContract['~orpc']['inputSchema']>>;
 type Reaction = null | 'likeOnly' | 'likeOnlyForRemote' | 'nonSensitiveOnly' | 'nonSensitiveOnlyForLocalLikeOnlyForRemote';
 type Visibility = 'public' | 'home' | 'followers' | 'specified';
 
-type NativeKeys = Assert<Equal<keyof NativeNoteDraftEndpoints, keyof typeof noteDraftEndpointDefinitions>>;
-type CreateContractInput = Assert<Equal<NativeNoteDraftEndpoints['notes/drafts/create']['req'], InferContractRouterInputs<typeof notesDraftsCreateDefinition.contract>>>;
-type UpdateContractInput = Assert<Equal<NativeNoteDraftEndpoints['notes/drafts/update']['req'], InferContractRouterInputs<typeof notesDraftsUpdateDefinition.contract>>>;
-type CreateContractOutput = Assert<Equal<NativeNoteDraftEndpoints['notes/drafts/create']['res'], InferContractRouterOutputs<typeof notesDraftsCreateDefinition.contract>>>;
-type UpdateContractOutput = Assert<Equal<NativeNoteDraftEndpoints['notes/drafts/update']['res'], InferContractRouterOutputs<typeof notesDraftsUpdateDefinition.contract>>>;
-type CreateResponse = Assert<Equal<Flatten<ContractEndpoints['notes/drafts/create']['res']>, { createdDraft: Packed<'NoteDraft'> }>>;
-type UpdateResponse = Assert<Equal<Flatten<ContractEndpoints['notes/drafts/update']['res']>, { updatedDraft: Packed<'NoteDraft'> }>>;
-type NativeResponse = Assert<Equal<Flatten<NativeNoteDraftEndpoints['notes/drafts/create']['res']>, { createdDraft: Packed<'NoteDraft'> }>>;
+type Draft = v.InferOutput<typeof packedNoteDraftSchema>;
+type NativeKeys = Assert<Equal<Extract<keyof typeof notesApiContract, `notesDrafts${string}`>, 'notesDraftsCreate' | 'notesDraftsUpdate' | 'notesDraftsList' | 'notesDraftsDelete' | 'notesDraftsCount'>>;
+type CreateContractInput = Assert<Equal<CreateRequest, InferSchemaInput<NonNullable<typeof notesDraftsCreateContract['~orpc']['inputSchema']>>>>;
+type UpdateContractInput = Assert<Equal<UpdateRequest, InferSchemaInput<NonNullable<typeof notesDraftsUpdateContract['~orpc']['inputSchema']>>>>;
+type CreateContractOutput = Assert<Equal<InferContractRouterOutputs<typeof notesApiContract>['notesDraftsCreate'], InferContractRouterOutputs<typeof notesDraftsCreateContract>>>;
+type UpdateContractOutput = Assert<Equal<InferContractRouterOutputs<typeof notesApiContract>['notesDraftsUpdate'], InferContractRouterOutputs<typeof notesDraftsUpdateContract>>>;
+type CreateResponse = Assert<Equal<Flatten<InferContractRouterOutputs<typeof notesDraftsCreateContract>>, { createdDraft: Draft }>>;
+type UpdateResponse = Assert<Equal<Flatten<InferContractRouterOutputs<typeof notesDraftsUpdateContract>>, { updatedDraft: Draft }>>;
+type NativeResponse = Assert<Equal<InferRouterOutputs<ReturnType<typeof createNotesDraftsCreateProcedure>>, InferContractRouterOutputs<typeof notesDraftsCreateContract>>>;
 type RequestFields = Assert<Equal<keyof CreateRequest, 'visibility' | 'visibleUserIds' | 'cw' | 'hashtag' | 'localOnly' | 'reactionAcceptance' | 'replyId' | 'renoteId' | 'channelId' | 'text' | 'fileIds' | 'poll' | 'scheduledAt' | 'isActuallyScheduled'>>;
 type UpdateFields = Assert<Equal<keyof UpdateRequest, keyof CreateRequest | 'draftId'>>;
 type CreateDefaultInput = Assert<Equal<CreateRequest['visibility'], Visibility | undefined>>;
@@ -63,7 +68,7 @@ const invalidVisibility: CreateRequest = { visibility: 'private' };
 const invalidReaction: CreateRequest = { reactionAcceptance: 'unknown' };
 // @ts-expect-error JSON integer fields remain numeric, without coercion.
 const invalidSchedule: CreateRequest = { scheduledAt: '123' };
-// @ts-expect-error The SDK request omits the transport's unknown-key index signature.
+// @ts-expect-error Native requests expose only declared fields.
 const extraRequestField: CreateRequest = { future: true };
 void create; void update; void nullable; void emptyPoll; void duplicatesRemainStrings; void missingDraftId; void nullDraftId; void missingChoices; void invalidVisibility; void invalidReaction; void invalidSchedule; void extraRequestField;
 export type Cases = [NativeKeys, CreateContractInput, UpdateContractInput, CreateContractOutput, UpdateContractOutput, CreateResponse, UpdateResponse, NativeResponse, RequestFields, UpdateFields, CreateDefaultInput, CreateDefaultOutput, CreateBooleanInput, CreateBooleanOutput, CreateSchedulingOutput, CreateReactionInput, CreateReactionOutput, UpdateVisibility, UpdateReaction, DraftId, NullableText, NullableSchedule, PollChoices, PollMultiple, PollExpiry, OptionalFileIds];

@@ -27,10 +27,24 @@ import type { GlobalEvents } from '@features/runtime/backend/services/GlobalEven
 import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { ModerationLogService } from '@features/moderation/backend/services/ModerationLogService.js';
-import type { Packed } from '@features/index/contract/packed.js';
+import type { Packed } from '@features/index/backend/packed.schema.js';
 import { FanoutTimelineService } from '@features/timelines/backend/services/FanoutTimelineService.js';
 import { NotificationService } from '@features/notifications/backend/services/NotificationService.js';
 import type { OnApplicationShutdown, OnModuleInit } from '@nestjs/common';
+
+import type { PackedJsonValue } from '../../../users/backend/json-value.schema.js';
+
+/** JSON columns accept the original finite object payload without interpreting its domain shape. */
+export type RoleWriteValues = Omit<Partial<MiRole>, 'condFormula' | 'policies'> & {
+	condFormula?: { [key: string]: PackedJsonValue };
+	policies?: { [key: string]: PackedJsonValue };
+};
+
+/** Type the actual JSON-column write API while keeping the original repository calls. */
+export interface RoleStorage extends Pick<RolesRepository, 'findBy' | 'findOneBy' | 'findOneByOrFail' | 'delete'> {
+	insertOne(values: RoleWriteValues): Promise<MiRole>;
+	update(criteria: Parameters<RolesRepository['update']>[0], values: RoleWriteValues): ReturnType<RolesRepository['update']>;
+}
 
 // misskey-js の rolePolicies と同期すべし
 export type RolePolicies = {
@@ -151,7 +165,7 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 		private usersRepository: UsersRepository,
 
 		@Inject(DI.rolesRepository)
-		private rolesRepository: RolesRepository,
+		private rolesRepository: RoleStorage,
 
 		@Inject(DI.roleAssignmentsRepository)
 		private roleAssignmentsRepository: RoleAssignmentsRepository,
@@ -663,7 +677,7 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 	}
 
 	@bindThis
-	public async create(values: Partial<MiRole>, moderator?: MiUser): Promise<MiRole> {
+	public async create(values: RoleWriteValues, moderator?: MiUser): Promise<MiRole> {
 		const date = new Date();
 		const created = await this.rolesRepository.insertOne({
 			id: this.idService.gen(date.getTime()),
@@ -699,7 +713,7 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 	}
 
 	@bindThis
-	public async update(role: MiRole, params: Partial<MiRole>, moderator?: MiUser): Promise<void> {
+	public async update(role: MiRole, params: RoleWriteValues, moderator?: MiUser): Promise<void> {
 		const date = new Date();
 		await this.rolesRepository.update(role.id, {
 			updatedAt: date,

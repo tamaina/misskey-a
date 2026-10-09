@@ -2,54 +2,27 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
+import { toPackedUserLite } from '@features/users/backend/user.schema.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 
-import { Inject, Injectable } from '@nestjs/common';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import { relationshipsContract } from '../relationships.contract.js';
+import type { RelationshipsDependencies } from '../../api.implementation.js';
 import { Brackets } from 'typeorm';
-import { DI } from '@/di-symbols.js';
-import type {
-	FollowingsRepository,
-	UserProfilesRepository,
-} from '@features/persistence/backend/repositories/models.js';
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { birthdayUsersDefinition, birthdayUsersInput, birthdayUsersOutput } from '../../../contract/birthday-endpoint-definitions.js';
-import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
-import type * as v from 'valibot';
-
-const contractProjection = projectEndpointContract(birthdayUsersDefinition);
-
-export const meta = {
-	tags: ['users'],
-
-	requireCredential: true,
-	kind: 'read:account',
-
-	description: 'Retrieve users who have a birthday on the specified range.',
-
-	res: contractProjection.response,
-} as const;
-
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof birthdayUsersInput, typeof birthdayUsersOutput> {
-	constructor(
-		@Inject(DI.userProfilesRepository)
-		private userProfilesRepository: UserProfilesRepository,
-		@Inject(DI.followingsRepository)
-		private followingsRepository: FollowingsRepository,
-
-		private userEntityService: UserEntityService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			const query = this.followingsRepository
+import { readBirthdayDate } from '../birthday.schema.js';
+import type { RelationshipsOutputs } from '../relationships.contract.js';
+export function createUsersGetFollowingUsersByBirthdayProcedure<Actor extends MiLocalUser>(deps: Pick<RelationshipsDependencies, 'followingsRepository' | 'userProfilesRepository' | 'userEntityService'>) {
+	return createApiProcedure<Actor>()(relationshipsContract["users/get-following-users-by-birthday"]).use(requirePrincipal<Actor>())
+		.handler(async ({ input, context }) => {
+			const ps = input;
+			const me = context.principal;
+			const query = deps.followingsRepository
 				.createQueryBuilder('following')
 				.andWhere('following.followerId = :userId', { userId: me.id })
-				.innerJoin(this.userProfilesRepository.metadata.targetName, 'followeeProfile', 'followeeProfile.userId = following.followeeId');
-
-			// Legacy birthday consumer boundary: presence selects the branch, not validated membership.
-			// Retain the two baseline assertions and malformed inactive-extra TypeError behavior.
-			if (Object.hasOwn(ps.birthday, 'begin') && Object.hasOwn(ps.birthday, 'end')) {
-				const range = ps.birthday as { begin: { month: number; day: number }; end: { month: number; day: number }; };
+				.innerJoin(deps.userProfilesRepository.metadata.targetName, 'followeeProfile', 'followeeProfile.userId = following.followeeId');
+			if ('begin' in ps.birthday && 'end' in ps.birthday) {
+				const range = { begin: readBirthdayDate(ps.birthday.begin), end: readBirthdayDate(ps.birthday.end) };
 
 				// 誕生日は mmdd の形式の最大4桁の数字（例: 8月30日 → 830）でインデックスが効くようになっているので、その形式に変換
 				const begin = range.begin.month * 100 + range.begin.day;
@@ -65,7 +38,7 @@ export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof
 					}));
 				}
 			} else {
-				const { month, day } = ps.birthday as { month: number; day: number };
+				const { month, day } = readBirthdayDate(ps.birthday);
 				// なぜか get_birthday_date() = :birthday だとインデックスが効かないので、BETWEEN で対応
 				query.andWhere('get_birthday_date(followeeProfile.birthday) BETWEEN :birthday AND :birthday', { birthday: month * 100 + day });
 			}
@@ -76,16 +49,11 @@ export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof
 
 			const birthdayUsers = await query
 				.offset(ps.offset).limit(ps.limit)
-				.getRawMany<{ birthday_date: number; user_id: string }>();
-
-			const users = new Map<string, v.InferOutput<typeof birthdayUsersOutput>[number]['user']>((
-				await this.userEntityService.packMany(
-					birthdayUsers.map(u => u.user_id),
-					me,
-					{ schema: 'UserLite' },
-				)
-			).map(u => [u.id, u]));
-
+				.getRawMany<{
+					birthday_date: number;
+					user_id: string;
+				}>();
+			const users = new Map<string, RelationshipsOutputs['users/get-following-users-by-birthday'][number]['user']>((await deps.userEntityService.packMany(birthdayUsers.map(u => u.user_id), me, { schema: 'UserLite' })).map(u => [u.id, toPackedUserLite(u)]));
 			return birthdayUsers
 				.map(item => {
 					const birthday = new Date();
@@ -104,7 +72,6 @@ export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof
 						user: users.get(item.user_id),
 					};
 				})
-				.filter((item): item is v.InferOutput<typeof birthdayUsersOutput>[number] => item.user != null);
+				.filter((item): item is RelationshipsOutputs['users/get-following-users-by-birthday'][number] => item.user != null);
 		});
-	}
 }

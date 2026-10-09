@@ -2,33 +2,24 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import type { ApiToken } from '@features/api/backend/transport/context.js';
+import type { UsersInputs } from '../../api.definition.js';
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { referenceUsersAchievementsDefinition, referenceUsersAchievementsInput, referenceUsersAchievementsOutput } from '../../../contract/reference-endpoint-definitions.js';
-import { Inject, Injectable } from '@nestjs/common';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
 import type { UserProfilesRepository } from '@features/persistence/backend/repositories/models.js';
-import { DI } from '@/di-symbols.js';
+import { usersAchievementsContract } from './achievements.contract.js';
 
-const contractProjection = projectEndpointContract(referenceUsersAchievementsDefinition);
+export interface UsersAchievementsDependencies {
+	userProfilesRepository: UserProfilesRepository;
+}
+export function createUsersAchievementsProcedure(deps: UsersAchievementsDependencies) {
+	async function execute(ps: UsersInputs['users/achievements'], _me: MiLocalUser | null, _token: ApiToken | null, _ip: string) {
+		const profile = await deps.userProfilesRepository.findOneByOrFail({ userId: ps.userId });
 
-export const meta = {
-	requireCredential: false,
-
-	res: contractProjection.response,
-} as const;
-
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof referenceUsersAchievementsInput, typeof referenceUsersAchievementsOutput> {
-	constructor(
-		@Inject(DI.userProfilesRepository)
-		private userProfilesRepository: UserProfilesRepository,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			const profile = await this.userProfilesRepository.findOneByOrFail({ userId: ps.userId });
-
-			return profile.achievements;
-		});
+		return profile.achievements.map(achievement => ({ name: achievement.name, unlockedAt: achievement.unlockedAt }));
 	}
+
+	return createApiProcedure<MiLocalUser>()(usersAchievementsContract)
+		.handler(async ({ input, context }) => await execute(input, context.principal, context.token, context.ip));
 }

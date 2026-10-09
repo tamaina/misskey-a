@@ -5,7 +5,7 @@
 
 import type { Job, IQueueBackend } from 'bullmq';
 import type { InferOutput } from 'valibot';
-import type { packedQueueCountSchema } from '@features/operations/contract/packed.js';
+import type { queueCounterSchema } from '@features/operations/backend/queue.schema.js';
 
 /**
  * Trusted dependency declaration correction for BullMQ 6.3.2, not response validation.
@@ -16,6 +16,6 @@ import type { packedQueueCountSchema } from '@features/operations/contract/packe
  */
 declare module 'bullmq' {
 	interface QueueGetters<JobBase extends Job = Job, B extends IQueueBackend = IQueueBackend> {
-		getJobCounts(): Promise<InferOutput<typeof packedQueueCountSchema> & Record<string, number>>;
+		getJobCounts(): Promise<InferOutput<typeof queueCounterSchema> & Record<string, number>>;
 	}
 }

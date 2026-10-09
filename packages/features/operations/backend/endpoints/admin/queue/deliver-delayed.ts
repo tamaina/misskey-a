@@ -3,44 +3,29 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { delayedTupleAdminQueueDeliverDelayedDefinition, delayedTupleAdminQueueDeliverDelayedInput, delayedTupleAdminQueueDeliverDelayedOutput } from '../../../../contract/delayed-tuple-endpoint-definitions.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import type { ApiActor } from '@features/api/backend/transport/context.js';
+import { adminQueueDeliverDelayedContract } from './deliver-delayed.contract.js';
 import { URL } from 'node:url';
-import { Inject, Injectable } from '@nestjs/common';
-import type { DeliverQueue } from '@features/boot/backend/assembly/QueueModule.js';
-
-const contractProjection = projectEndpointContract(delayedTupleAdminQueueDeliverDelayedDefinition);
-
-export const meta = {
-	tags: ['admin'],
-
-	requireCredential: true,
-	requireModerator: true,
-	kind: 'read:admin:queue',
-
-	res: contractProjection.response,
-} as const;
-
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof delayedTupleAdminQueueDeliverDelayedInput, typeof delayedTupleAdminQueueDeliverDelayedOutput> {
-	constructor(
-		@Inject('queue:deliver') public deliverQueue: DeliverQueue,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			const jobs = await this.deliverQueue.getJobs(['delayed']);
-
-			const counts = new Map<string, number>();
-
-			for (const job of jobs) {
-				const host = new URL(job.data.to).host;
-				counts.set(host, (counts.get(host) ?? 0) + 1);
-			}
-
-			const res = [...counts.entries()].sort((a, b) => b[1] - a[1]);
-
-			return res;
+import type { DeliverQueue } from '../../../../../boot/backend/assembly/QueueModule.js';
+export interface AdminQueueDeliverDelayedDependencies {
+	deliverQueue: Pick<DeliverQueue, 'getJobs'>;
+}
+export function createAdminQueueDeliverDelayedProcedure<Actor extends ApiActor>(deps: AdminQueueDeliverDelayedDependencies) {
+	return createApiProcedure<Actor>()(adminQueueDeliverDelayedContract)
+		.use(requirePrincipal<Actor>())
+		.handler(async () => {
+			const result = await (async () => {
+				const jobs = await deps.deliverQueue.getJobs(['delayed']);
+				const counts = new Map<string, number>();
+				for (const job of jobs) {
+					const host = new URL(job.data.to).host;
+					counts.set(host, (counts.get(host) ?? 0) + 1);
+				}
+				const res = [...counts.entries()].sort((a, b) => b[1] - a[1]);
+				return res;
+			})();
+			return result;
 		});
-	}
 }

@@ -182,7 +182,7 @@ export class MiDriveFile {
 		default: {},
 		nullable: true,
 	})
-	public requestHeaders: Record<string, string> | null;
+	public requestHeaders: Record<string, string | string[] | undefined> | null;
 
 	@Column('varchar', {
 		length: 128, nullable: true,

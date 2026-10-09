@@ -3,101 +3,164 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { expect, expectTypeOf, test } from 'vitest';
+import { expect, test, vi } from 'vitest';
 import * as v from 'valibot';
+import { OpenAPIHandler } from '@orpc/openapi/fetch';
+import type { PackedUserLite } from '../../../users/backend/user.schema.js';
+import { createAdminAbuseReportNotificationRecipientShowProcedure } from '../../backend/endpoints/admin/abuse-report/notification-recipient/show.js';
+import { createRouterClient } from '@orpc/server';
+import { createModerationRouter } from '../../backend/api.implementation.js';
 import { mockDeep } from 'vitest-mock-extended';
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { packedAbuseReportNotificationRecipientSchema } from '../../contract/packed.js';
-import { inlineAdminGetUserIpsInput, inlineAdminGetUserIpsOutput, inlineAdminGetUserIpsDefinition } from '../../contract/endpoint-definitions.js';
-import { packedAdminAbuseUserReportsInput, packedAdminAbuseUserReportsOutput, packedAdminShowModerationLogsInput, packedAdminShowModerationLogsOutput, packedAdminAbuseReportNotificationRecipientCreateInput } from '../../contract/packed-endpoint-definitions.js';
-import { moderationCommandInputs } from '../../contract/index.js';
-import { adminShowUserOutput } from '../../contract/admin-user-endpoint-definition.js';
-import { AbuseReportNotificationRecipientEntityService } from '../../backend/serializers/AbuseReportNotificationRecipientEntityService.js';
-import { AbuseUserReportEntityService } from '../../backend/serializers/AbuseUserReportEntityService.js';
-import { ModerationLogEntityService } from '../../backend/serializers/ModerationLogEntityService.js';
-import { EndpointImplementation as IpsEndpoint } from '../../backend/endpoints/admin/get-user-ips.js';
-import type { MiAbuseReportNotificationRecipient, UserIpsRepository } from '@features/persistence/backend/repositories/models.js';
-import type { Packed } from '@features/index/contract/packed.js';
-import type { IdService } from '@features/runtime/backend/services/IdService.js';
-import type { MiLocalUser } from '@features/users/backend/models/User.js';
+import { moderationContract } from '../../backend/api.definition.js';
+import type { ModerationApiDependencies } from '../../backend/api.implementation.js';
+import type { ApiActor, ApiContext, ApiAuthorization } from '../../../api/backend/transport/context.js';
+import type { MiSignin } from '../../../auth/backend/models/Signin.js';
+import { DEFAULT_POLICIES } from '../../../roles/backend/services/RoleService.js';
+import type { RolePolicies } from '../../../roles/backend/services/RoleService.js';
+import type { MiUser, MiLocalUser } from '../../../users/backend/models/User.js';
+import type { MiUserProfile } from '../../../users/backend/models/UserProfile.js';
 
-const date = new Date('2026-10-07T00:00:00.000Z');
-const user = { id: 'user123', name: null, username: 'fixture', host: null, avatarUrl: 'https://example.com/avatar.png', avatarBlurhash: null, avatarDecorations: [], emojis: {}, onlineStatus: 'unknown' as const } satisfies Packed<'UserLite'>;
-const detailedUser = { ...user, url: null, uri: null, movedTo: null, alsoKnownAs: null, createdAt: date.toISOString(), updatedAt: null, lastFetchedAt: null, bannerUrl: null, bannerBlurhash: null, isLocked: false, isSilenced: false, isSuspended: false, description: null, location: null, birthday: null, lang: null, fields: [], verifiedLinks: [], followersCount: 0, followingCount: 0, notesCount: 0, pinnedNoteIds: [], pinnedNotes: [], pinnedPageId: null, pinnedPage: null, publicReactions: false, followingVisibility: 'public' as const, followersVisibility: 'public' as const, chatScope: 'everyone' as const, canChat: true, roles: [], memo: null } satisfies Packed<'UserDetailedNotMe'>;
-const webhook = { id: 'webhook123', isActive: true, updatedAt: date.toISOString(), latestSentAt: null, latestStatus: null, name: 'Fixture', on: ['abuseReport'] as ['abuseReport'], url: 'https://example.com/webhook', secret: '' } satisfies Packed<'SystemWebhook'>;
-
-function checkFinite(schema: v.GenericSchema, value: Record<string, unknown>) {
-	expect(v.parse(schema, value)).toEqual(value);
-	for (const bad of [{ ...value, future: true }, { ...value, id: 7 }, { ...value, id: null }]) expect(v.safeParse(schema, bad).success).toBe(false);
-	const { id: _id, ...missing } = value;
-	expect(v.safeParse(schema, missing).success).toBe(false);
+function requiredSchema<S extends v.GenericSchema>(schema: S | undefined): S {
+	if (schema === undefined) throw new Error('Missing native schema');
+	return schema;
 }
 
-test.each([[false, false], [true, false], [false, true], [true, true]])('real recipient serializer preserves conditional user/webhook fields: %s/%s', async (hasUser, hasWebhook) => {
-	const recipient = { id: 'recipient123', isActive: true, updatedAt: date, name: 'Fixture', method: hasWebhook ? 'webhook' : 'email', userId: hasUser ? user.id : null, user: null, userProfile: null, systemWebhookId: hasWebhook ? webhook.id : null, systemWebhook: null } satisfies MiAbuseReportNotificationRecipient;
-	const serializer = new AbuseReportNotificationRecipientEntityService(mockDeep(), mockDeep(), mockDeep());
-	const result = await serializer.pack(recipient, { users: new Map([[user.id, user]]), webhooks: new Map([[webhook.id, webhook]]) });
-	checkFinite(packedAbuseReportNotificationRecipientSchema, result);
-	expect(result.user).toEqual(hasUser ? user : undefined);
-	expect(result.systemWebhook).toEqual(hasWebhook ? webhook : undefined);
-	expect(Object.hasOwn(result, 'user')).toBe(true);
-	expect(v.parse(packedAbuseReportNotificationRecipientSchema, JSON.parse(JSON.stringify(result)))).toEqual(JSON.parse(JSON.stringify(result)));
-	for (const field of ['userId', 'systemWebhookId', 'user', 'systemWebhook']) expect(v.safeParse(packedAbuseReportNotificationRecipientSchema, { ...result, [field]: null }).success).toBe(false);
+const actor: ApiActor = { id: 'actor123', isSuspended: false, movedToUri: null };
+
+function createModerationClient(deps: ModerationApiDependencies<ApiActor>, principal: ApiActor | null = actor) {
+	const context = mockDeep<ApiContext<ApiActor>>();
+	context.services.authenticate.mockResolvedValue([principal, null]);
+	context.services.limit.mockResolvedValue(null);
+	context.services.rateLimitFactor.mockResolvedValue(1);
+	const authorization = mockDeep<ApiAuthorization<ApiActor>>();
+	authorization.rootUserId.mockReturnValue(actor.id);
+	authorization.roles.mockResolvedValue([]);
+	authorization.policyAllowed.mockResolvedValue(false);
+	context.authorization = authorization;
+	return createRouterClient(createModerationRouter<ApiActor>(deps), { context });
+}
+
+test('native moderation schemas materialize defaults and preserve nullable report resolution', () => {
+	expect(v.parse(requiredSchema(moderationContract.adminAbuseUserReports['~orpc'].inputSchema), { future: true }))
+		.toEqual({ limit: 10, state: null, reporterOrigin: 'combined', targetUserOrigin: 'combined' });
+	expect(v.parse(requiredSchema(moderationContract.adminResolveAbuseUserReport['~orpc'].inputSchema), { reportId: 'report123', resolvedAs: null, future: true }))
+		.toEqual({ reportId: 'report123', resolvedAs: null });
+	expect(v.safeParse(requiredSchema(moderationContract.adminGetUserIps['~orpc'].inputSchema), { userId: 'bad-id' }).success).toBe(false);
 });
 
-test('real moderation log serializer retains dynamic info in a finite outer model', async () => {
-	const ids = mockDeep<IdService>();
-	ids.parse.mockReturnValue({ date });
-	const packedUser = detailedUser;
-	const log = { id: 'log123', userId: user.id, user: null, type: 'fixture', info: { arbitrary: { action: true }, userId: user.id } };
-	const result = await new ModerationLogEntityService(mockDeep(), mockDeep(), ids).pack(log, { packedUser });
-	checkFinite(packedAdminShowModerationLogsOutput.item, result);
-	expect(result.info).toEqual(log.info);
+test('IP records preserve selected dates and the response envelope rejects undeclared fields', async () => {
+	const deps = mockDeep<ModerationApiDependencies<ApiActor>>();
+	const date = new Date('2026-10-09T00:00:00Z');
+	deps.userIpsRepository.find.mockResolvedValue([{ id: 'ip123', userId: 'user123', ip: '127.0.0.1', createdAt: date }]);
+	const result = await createModerationClient(deps).adminGetUserIps({ userId: 'user123' });
+	expect(v.parse(requiredSchema(moderationContract.adminGetUserIps['~orpc'].outputSchema), result)).toEqual([{ ip: '127.0.0.1', createdAt: date.toISOString() }]);
+	expect(deps.userIpsRepository.find).toHaveBeenCalledWith({ where: { userId: 'user123' }, order: { id: 'DESC' }, take: 30 });
+	expect(v.safeParse(requiredSchema(moderationContract.adminGetUserIps['~orpc'].outputSchema), [{ ...result[0], future: true }]).success).toBe(false);
 });
 
-test.each([null, 'accept', 'reject'] as const)('real abuse report serializer preserves nullable resolution and assignee: %s', async resolvedAs => {
-	const ids = mockDeep<IdService>();
-	ids.parse.mockReturnValue({ date });
-	const packedUser = detailedUser;
-	const report = { id: 'report123', targetUserId: user.id, targetUser: null, reporterId: user.id, reporter: null, assigneeId: resolvedAs ? user.id : null, assignee: null, resolved: resolvedAs !== null, forwarded: false, comment: 'fixture', moderationNote: '', resolvedAs, targetUserHost: null, reporterHost: null };
-	const result = await new AbuseUserReportEntityService(mockDeep(), mockDeep(), ids).pack(report, { packedReporter: packedUser, packedTargetUser: packedUser, packedAssignee: packedUser });
-	checkFinite(packedAdminAbuseUserReportsOutput.item, result);
-	expect(result.assignee).toEqual(resolvedAs ? packedUser : null);
+test('email recipients require a verified email before writes; webhook recipients require their correlated ID', async () => {
+	const deps = mockDeep<ModerationApiDependencies<ApiActor>>();
+	const operations = createModerationClient(deps);
+	deps.userProfilesRepository.findOneBy.mockResolvedValue(null);
+	await expect(operations.adminAbuseReportNotificationRecipientCreate({ isActive: true, name: 'Recipient', method: 'email' }))
+		.rejects.toMatchObject({ code: 'CORRELATION_CHECK_EMAIL' });
+	deps.userProfilesRepository.findOneBy.mockResolvedValue(mockDeep<MiUserProfile>({ email: 'user@example.test', emailVerified: false }));
+	await expect(operations.adminAbuseReportNotificationRecipientCreate({ isActive: true, name: 'Recipient', method: 'email', userId: 'user123' }))
+		.rejects.toMatchObject({ code: 'EMAIL_ADDRESS_NOT_SET' });
+	await expect(operations.adminAbuseReportNotificationRecipientUpdate({ id: 'recipient123', isActive: true, name: 'Recipient', method: 'webhook' }))
+		.rejects.toMatchObject({ code: 'CORRELATION_CHECK_WEBHOOK' });
+	expect(deps.abuseReportNotificationService.createRecipient).not.toHaveBeenCalled();
+	expect(deps.abuseReportNotificationService.updateRecipient).not.toHaveBeenCalled();
 });
 
-test('real IP handler produces finite dated records with existing admin auth metadata', async () => {
-	const repository = mockDeep<UserIpsRepository>();
-	repository.find.mockResolvedValue([{ id: 'ip123', userId: user.id, ip: '127.0.0.1', createdAt: date }]);
-	const endpoint = new IpsEndpoint(repository, mockDeep());
-	const result = await endpoint.exec({ userId: user.id }, mockDeep<MiLocalUser>({ id: user.id }), null);
-	expect(v.parse(inlineAdminGetUserIpsOutput, result)).toEqual([{ ip: '127.0.0.1', createdAt: date.toISOString() }]);
-	expect(v.safeParse(inlineAdminGetUserIpsOutput, [{ ...result[0], future: true }]).success).toBe(false);
-	for (const bad of [{ ip: 'ip' }, { ip: null, createdAt: date.toISOString() }, { ip: 'ip', createdAt: 7 }]) expect(v.safeParse(inlineAdminGetUserIpsOutput, [bad]).success).toBe(false);
+test('moderator targets cannot be suspended and non-administrators cannot inspect an administrator profile', async () => {
+	const deps = mockDeep<ModerationApiDependencies<ApiActor>>();
+	const target = mockDeep<MiUser>({ id: 'user123' });
+	deps.usersRepository.findOneBy.mockResolvedValue(target);
+	deps.roleService.isModerator.mockResolvedValue(true);
+	const operations = createModerationClient(deps);
+	await expect(operations.adminSuspendUser({ userId: target.id })).rejects.toThrow('cannot suspend moderator account');
+	expect(deps.userSuspendService.suspend).not.toHaveBeenCalled();
+	deps.userProfilesRepository.findOneBy.mockResolvedValue(mockDeep<MiUserProfile>());
+	deps.roleService.getUserPolicies.mockResolvedValue(mockDeep<RolePolicies>({ canPublicNote: true }));
+	deps.usersRepository.findOneByOrFail.mockResolvedValue(mockDeep<MiUser>({ id: actor.id }));
+	deps.roleService.isAdministrator.mockImplementation(async user => user?.id === target.id);
+	await expect(operations.adminShowUser({ userId: target.id })).rejects.toThrow('cannot show info of admin');
+	expect(deps.signinsRepository.findBy).not.toHaveBeenCalled();
 });
 
-test('native moderation input defaults and nullable optional semantics stay explicit', () => {
-	expectTypeOf<v.InferOutput<typeof inlineAdminGetUserIpsInput>>().toEqualTypeOf<{ userId: string }>();
-	expect(v.parse(inlineAdminGetUserIpsInput, { userId: user.id, future: true })).toEqual({ userId: user.id });
-	expect(v.parse(packedAdminAbuseUserReportsInput, { future: true })).toEqual({ limit: 10, state: null, reporterOrigin: 'combined', targetUserOrigin: 'combined' });
-	expect(v.parse(packedAdminShowModerationLogsInput, { future: true })).toEqual({ limit: 10 });
-	expect(v.parse(moderationCommandInputs['admin/resolve-abuse-user-report'], { reportId: 'report123', resolvedAs: null, future: true })).toEqual({ reportId: 'report123', resolvedAs: null });
-	for (const schema of Object.values(moderationCommandInputs)) {
-		expect(v.safeParse(schema, {}).success).toBe(false);
-		expect(v.safeParse(schema, { userId: 7, reportId: 7, id: 7 }).success).toBe(false);
-	}
-	expect(v.parse(packedAdminAbuseReportNotificationRecipientCreateInput, { name: 'Fixture', isActive: true, method: 'email', future: true })).toEqual({ name: 'Fixture', isActive: true, method: 'email' });
-	// Raw signins and private role/policy composition remain their explicit legacy producer boundary.
-	expect(adminShowUserOutput.type).toBe('loose_object');
+test('reporting yourself or an administrator never submits a report; missing reports keep their original error', async () => {
+	const deps = mockDeep<ModerationApiDependencies<ApiActor>>();
+	const operations = createModerationClient(deps);
+	deps.getterService.getUser.mockResolvedValue(mockDeep<MiLocalUser>({ id: actor.id }));
+	await expect(operations.usersReportAbuse({ userId: actor.id, comment: 'report' })).rejects.toMatchObject({ code: 'CANNOT_REPORT_YOURSELF' });
+	deps.getterService.getUser.mockResolvedValue(mockDeep<MiLocalUser>({ id: 'user123' }));
+	deps.roleService.isAdministrator.mockResolvedValue(true);
+	await expect(operations.usersReportAbuse({ userId: 'user123', comment: 'report' })).rejects.toMatchObject({ code: 'CANNOT_REPORT_THE_ADMIN' });
+	expect(deps.abuseReportService.report).not.toHaveBeenCalled();
+	deps.abuseUserReportsRepository.findOneBy.mockResolvedValue(null);
+	await expect(operations.adminResolveAbuseUserReport({ reportId: 'report123' }))
+		.rejects.toMatchObject({ code: 'NO_SUCH_ABUSE_REPORT', data: { id: 'ac3794dd-2ce4-d878-e546-73c60c06b398' } });
 });
 
-test('legacy IP HTTP accepts unknown keys, keeps raw responses and rejects invalid inputs', async () => {
-	const projection = projectEndpointContract(inlineAdminGetUserIpsDefinition);
-	const input = { userId: user.id, i: 'transport', future: true };
-	const raw = [{ ip: 'ip', createdAt: date.toISOString(), future: true }];
-	const endpoint = new ContractEndpoint({}, projection, async ps => { expect(ps).toBe(input); return raw; });
-	expect(await endpoint.exec(input, null, null)).toBe(raw);
-	expect(v.safeParse(inlineAdminGetUserIpsOutput, raw).success).toBe(false);
-	await expect(endpoint.exec({ userId: 7 }, null, null)).rejects.toMatchObject({ code: 'INVALID_PARAM' });
-	expect(projection.input.additionalProperties).toBeUndefined();
-	expect(projection.response?.items).toHaveProperty('additionalProperties', false);
+test('unsetting an absent avatar is a no-op; its audit write remains asynchronous after the primary update', async () => {
+	const deps = mockDeep<ModerationApiDependencies<ApiActor>>();
+	const operations = createModerationClient(deps);
+	deps.usersRepository.findOneBy.mockResolvedValue(mockDeep<MiUser>({ id: 'user123', avatarId: null }));
+	await operations.adminUnsetUserAvatar({ userId: 'user123' });
+	expect(deps.usersRepository.update).not.toHaveBeenCalled();
+	deps.usersRepository.findOneBy.mockResolvedValue(mockDeep<MiUser>({ id: 'user123', username: 'alice', host: null, avatarId: 'file123' }));
+	let release: () => void = () => { };
+	const pending = new Promise<void>(resolve => { release = resolve; });
+	deps.moderationLogService.log.mockReturnValue(pending);
+	try {
+		const completion = operations.adminUnsetUserAvatar({ userId: 'user123' }).then(() => 'completed');
+		expect(await Promise.race([completion, new Promise<string>(resolve => setImmediate(() => resolve('pending')))]))
+			.toBe('completed');
+		expect(deps.usersRepository.update).toHaveBeenCalledWith('user123', { avatar: null, avatarId: null, avatarUrl: null, avatarBlurhash: null });
+		expect(deps.moderationLogService.log).toHaveBeenCalledWith(actor, 'unsetUserAvatar', { userId: 'user123', userUsername: 'alice', userHost: null, fileId: 'file123' });
+	} finally { release(); }
+});
+
+test('admin account details preserve actual raw signin wire fields without inventing a createdAt field', async () => {
+	const deps = mockDeep<ModerationApiDependencies<ApiActor>>();
+	deps.usersRepository.findOneBy.mockResolvedValue(mockDeep<MiUser>({ id: 'user123', isSuspended: false, isHibernated: false, lastActiveDate: null }));
+	deps.usersRepository.findOneByOrFail.mockResolvedValue(mockDeep<MiUser>({ id: actor.id }));
+	deps.userProfilesRepository.findOneBy.mockResolvedValue(mockDeep<MiUserProfile>({ email: null, emailVerified: false, followedMessage: null, autoAcceptFollowed: false, noCrawle: false, preventAiLearning: false, alwaysMarkNsfw: false, autoSensitive: false, carefulBot: false, injectFeaturedNote: false, receiveAnnouncementEmail: false, mutedWords: [], mutedInstances: [], notificationRecieveConfig: {}, moderationNote: '' }));
+	deps.roleService.isAdministrator.mockResolvedValue(true);
+	deps.roleService.isModerator.mockResolvedValue(false);
+	deps.roleService.getUserPolicies.mockResolvedValue(DEFAULT_POLICIES);
+	deps.roleService.getUserAssigns.mockResolvedValue([]);
+	deps.roleService.getUserRoles.mockResolvedValue([]);
+	deps.roleEntityService.packMany.mockResolvedValue([]);
+	deps.signinsRepository.findBy.mockResolvedValue([mockDeep<MiSignin>({ id: 'signin123', userId: 'user123', ip: '127.0.0.1', headers: { 'user-agent': 'fixture' }, success: false })]);
+	const result = await createModerationClient(deps).adminShowUser({ userId: 'user123' });
+	expect(v.parse(requiredSchema(moderationContract.adminShowUser['~orpc'].outputSchema).entries.signins, result.signins)).toEqual([
+		{ id: 'signin123', userId: 'user123', ip: '127.0.0.1', headers: { 'user-agent': 'fixture' }, success: false },
+	]);
+	expect(result.signins[0]).not.toHaveProperty('createdAt');
+});
+
+test('moderation recipient HTTP projects nested users and webhooks without hiding authorized webhook secrets', async () => {
+	const deps = mockDeep<ModerationApiDependencies<ApiActor>>();
+	const user = { id: 'user123', name: null, username: 'fixture', host: null, avatarUrl: 'https://local.test/avatar', avatarBlurhash: null, avatarDecorations: [], emojis: {}, onlineStatus: 'unknown' } satisfies PackedUserLite;
+	const webhook = { id: 'webhook123', isActive: true, updatedAt: '2026-10-09T00:00:00.000Z', latestSentAt: null, latestStatus: null, name: 'Fixture', on: [], url: 'https://local.test/hook', secret: 'authorized-secret' };
+	const producedUser = { ...user, internalMarker: 'user' };
+	const producedWebhook = { ...webhook, internalMarker: 'webhook' };
+	const produced = { id: 'recipient123', isActive: true, updatedAt: webhook.updatedAt, name: 'Recipient', method: 'webhook', userId: user.id, user: producedUser, systemWebhookId: webhook.id, systemWebhook: producedWebhook, internalMarker: 'outer' } satisfies Awaited<ReturnType<typeof deps.abuseReportNotificationRecipientEntityService.pack>> & { internalMarker: string };
+	deps.abuseReportNotificationService.fetchRecipients.mockResolvedValue([mockDeep<Awaited<ReturnType<typeof deps.abuseReportNotificationService.fetchRecipients>>[number]>({ id: produced.id })]);
+	deps.abuseReportNotificationRecipientEntityService.pack.mockResolvedValue(produced);
+	const context = mockDeep<ApiContext<ApiActor>>({ credential: null, ip: '127.0.0.1', headers: {} });
+	context.services.authenticate.mockResolvedValue([actor, null]);
+	if (!context.authorization) throw new Error('Missing test authorization context');
+	context.authorization.rootUserId.mockReturnValue(actor.id);
+	const outputRun = vi.spyOn(requiredSchema(moderationContract.adminAbuseReportNotificationRecipientShow['~orpc'].outputSchema), '~run');
+	try {
+		const handler = new OpenAPIHandler({ recipient: createAdminAbuseReportNotificationRecipientShowProcedure<ApiActor>(deps) });
+		const response = await handler.handle(new Request('https://local.test/admin/abuse-report/notification-recipient/show', { method: 'POST', headers: { 'content-type': 'application/json' }, body: '{"id":"recipient123"}' }), { context });
+		expect(response.response?.status).toBe(200);
+		const wire: unknown = await response.response?.json();
+		expect(wire).toEqual({ id: produced.id, isActive: true, updatedAt: webhook.updatedAt, name: 'Recipient', method: 'webhook', userId: user.id, user, systemWebhookId: webhook.id, systemWebhook: webhook });
+		expect(outputRun).not.toHaveBeenCalled();
+	} finally { outputRun.mockRestore(); }
 });

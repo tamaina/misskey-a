@@ -3,24 +3,36 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { collectionsContract } from '../../backend/api.definition.js';
+
 import { expect, test } from 'vitest';
 import * as v from 'valibot';
 import { mockDeep } from 'vitest-mock-extended';
-import { packedClipSchema, packedNoteFavoriteSchema } from '../../contract/packed.js';
-import { packedGalleryPostSchema } from '../../contract/gallery/packed.js';
-import { packedClipsCreateInput, packedClipsListInput, packedClipsListDefinition } from '../../contract/packed-endpoint-definitions.js';
-import { packedIGalleryLikesOutput } from '../../contract/gallery/packed-endpoint-definitions.js';
-import { uniqueGalleryPostsCreateInput } from '../../contract/unique-string-endpoint-definitions.js';
+import { createRouterClient } from '@orpc/server';
+import { packedClipSchema, packedNoteFavoriteSchema, packedGalleryPostSchema } from '../../backend/api.definition.js';
+import { createCollectionsRouter } from '../../backend/api.implementation.js';
+import type { CollectionsDependencies } from '../../backend/api.implementation.js';
+import type { SelectQueryBuilder } from 'typeorm';
 import { ClipEntityService } from '../../backend/serializers/ClipEntityService.js';
 import { GalleryPostEntityService } from '../../backend/serializers/GalleryPostEntityService.js';
 import { GalleryLikeEntityService } from '../../backend/serializers/GalleryLikeEntityService.js';
 import { NoteFavoriteEntityService } from '../../backend/serializers/NoteFavoriteEntityService.js';
+import type { ApiActor, ApiContext, ApiServices } from '../../../api/backend/transport/context.js';
 import type { MiClip } from '../../backend/models/Clip.js';
 import type { MiGalleryPost } from '../../backend/models/GalleryPost.js';
 import type { MiGalleryLike } from '../../backend/models/GalleryLike.js';
 import type { MiNoteFavorite } from '../../backend/models/NoteFavorite.js';
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
 
+function requiredSchema<T>(schema: T | undefined): T {
+	if (schema === undefined) throw new Error('Expected contract schema');
+	return schema;
+}
+
+const packedClipsCreateInput = requiredSchema(collectionsContract.clipsCreate['~orpc'].inputSchema);
+const packedClipsListInput = requiredSchema(collectionsContract.clipsList['~orpc'].inputSchema);
+const uniqueGalleryPostsCreateInput = requiredSchema(collectionsContract.galleryPostsCreate['~orpc'].inputSchema);
+
+const packedIGalleryLikesOutput = requiredSchema(collectionsContract.iGalleryLikes['~orpc'].outputSchema);
 const date = new Date('2026-01-01T00:00:00Z');
 const user = { id: 'user123', name: null, username: 'alice', host: null, avatarUrl: 'https://example/avatar', avatarBlurhash: null, avatarDecorations: [], emojis: {}, onlineStatus: 'unknown' as const };
 const note = { id: 'note123', createdAt: date.toISOString(), text: null, userId: user.id, user, visibility: 'public' as const, reactionAcceptance: null, reactionEmojis: {}, reactions: {}, reactionCount: 0, renoteCount: 0, repliesCount: 0 };
@@ -75,7 +87,14 @@ test.each([false, true])('actual gallery producer and like wrapper preserve opti
 	expect(v.parse(packedGalleryPostSchema, await service.pack(post, me)).tags).toEqual(['tag']);
 	const likeService = new GalleryLikeEntityService(mockDeep(), service);
 	const like = await likeService.pack(mockDeep<MiGalleryLike>({ id: 'like123', post }), me);
-	expect(v.parse(packedIGalleryLikesOutput, [like])).toEqual([like]);
+	expect(v.parse(packedIGalleryLikesOutput, [like])).toEqual([{
+		id: 'like123',
+		post: {
+			id: 'post123', createdAt: date.toISOString(), updatedAt: date.toISOString(), userId: user.id, user,
+			title: 'gallery', description: null, fileIds: [], files: [], tags: ['tag'],
+			isSensitive: false, likedCount: 2, isLiked: authenticated ? true : undefined,
+		},
+	}]);
 	for (const value of [{ ...like, future: true }, { id: like.id }, { ...like, id: 7 }]) expect(v.safeParse(packedIGalleryLikesOutput, [value]).success).toBe(false);
 });
 
@@ -90,21 +109,38 @@ test('actual favorite wrapper closes its own fields while preserving the nested 
 	expect(notes.pack).toHaveBeenCalledWith(note.id, user);
 });
 
-test('native finite inputs strip extras, enforce constraints, and retain defaults; HTTP stays open and unparsed', async () => {
+test('native finite inputs strip extras, enforce constraints, and retain defaults; inputs validate and public responses are selected', async () => {
 	expect(v.parse(packedClipsCreateInput, { name: 'saved', future: true })).toEqual({ name: 'saved', isPublic: false });
 	for (const value of [{}, { name: '' }, { name: 7 }, { name: 'saved', isPublic: null }]) expect(v.safeParse(packedClipsCreateInput, value).success).toBe(false);
 	expect(v.parse(uniqueGalleryPostsCreateInput, { title: 'gallery', fileIds: ['file123'], future: true })).toEqual({ title: 'gallery', fileIds: ['file123'], isSensitive: false });
 	for (const fileIds of [[], ['file123', 'file123'], [7]]) expect(v.safeParse(uniqueGalleryPostsCreateInput, { title: 'gallery', fileIds }).success).toBe(false);
 	expect(v.parse(packedClipsListInput, { future: true })).toEqual({ limit: 10 });
-	const params = { future: true };
+	const params = { limit: 10, future: true };
 	const nativeResponse = { id: 'clip123', createdAt: date.toISOString(), lastClippedAt: null, userId: user.id, user, name: 'saved', description: null, isPublic: true, favoritedCount: 2 };
 	expect(v.safeParse(packedClipSchema, nativeResponse).success).toBe(true);
 	const response = [{ ...nativeResponse, future: true }];
-	const projection = projectEndpointContract(packedClipsListDefinition);
-	expect(projection.input).not.toHaveProperty('additionalProperties');
-	const endpoint = new ContractEndpoint({}, projection, async ps => { expect(ps).toBe(params); return response; });
-	expect(await endpoint.exec(params, null, null)).toBe(response);
-	expect(v.safeParse(packedClipSchema, response[0]).success).toBe(false);
+	const services = mockDeep<ApiServices<ApiActor>>();
+	const context: ApiContext<ApiActor> = { services, credential: 'native', headers: {}, ip: '127.0.0.1' };
+	const dependencies = mockDeep<CollectionsDependencies<ApiActor>>();
+	const query = mockDeep<SelectQueryBuilder<MiClip>>();
+	query.andWhere.mockReturnValue(query);
+	query.limit.mockReturnValue(query);
+	query.getMany.mockResolvedValue([]);
+	dependencies.clipsRepository.createQueryBuilder.mockReturnValue(query);
+	dependencies.queryService.makePaginationQuery.mockReturnValue(query);
+	const actor: ApiActor = { id: user.id, isSuspended: false, movedToUri: null };
+	services.authenticate.mockResolvedValue([actor, null]);
+	dependencies.clipEntityService.packMany.mockResolvedValue(response);
+	const client = createRouterClient(createCollectionsRouter(dependencies), { context });
+	const projected = await client.clipsList(params);
+	expect(projected).toEqual([nativeResponse]);
+	expect(projected[0]).not.toHaveProperty('future');
+	expect(dependencies.clipEntityService.packMany).toHaveBeenCalledWith([], actor);
+	expect(query.limit).toHaveBeenCalledWith(10);
 	expect(params).toEqual({ future: true, limit: 10 });
-	await expect(endpoint.exec({ limit: 0 }, null, null)).rejects.toMatchObject({ code: 'INVALID_PARAM', info: { param: '#/properties/limit/minimum' } });
+	dependencies.clipEntityService.packMany.mockResolvedValue([nativeResponse]);
+	expect(await client.clipsList({})).toEqual([nativeResponse]);
+	const calls = dependencies.clipEntityService.packMany.mock.calls.length;
+	await expect(client.clipsList({ limit: 0 })).rejects.toMatchObject({ code: 'BAD_REQUEST' });
+	expect(dependencies.clipEntityService.packMany.mock.calls).toHaveLength(calls);
 });

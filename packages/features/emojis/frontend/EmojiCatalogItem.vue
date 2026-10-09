@@ -14,7 +14,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import type { EmojiSimple } from '../contract/index.js';
+import type { EmojiSimple } from '../backend/api.definition.js';
 import type { MenuItem } from '@features/navigation/frontend/types/menu.js';
 import * as os from '@features/ui/frontend/os.js';
 import { misskeyApiGet } from '@features/api/frontend/utility/misskey-api.js';

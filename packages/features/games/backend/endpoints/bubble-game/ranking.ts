@@ -3,39 +3,22 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { packedBubbleGameRankingDefinition, packedBubbleGameRankingInput, packedBubbleGameRankingOutput } from '../../../contract/packed-endpoint-definitions.js';
-import { Inject, Injectable } from '@nestjs/common';
+import { toPackedUserLite } from '@features/users/backend/user.schema.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+
+import { bubbleGameRankingContract, bubbleGameRankingGetContract } from './ranking.contract.js';
 import { MoreThan } from 'typeorm';
-
 import type { BubbleGameRecordsRepository } from '@features/persistence/backend/repositories/models.js';
-import { DI } from '@/di-symbols.js';
-import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
-
-const contractProjection = projectEndpointContract(packedBubbleGameRankingDefinition);
-
-export const meta = {
-	allowGet: true,
-	cacheSec: 60,
-
-	errors: {
-	},
-
-	res: contractProjection.response,
-} as const;
-
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedBubbleGameRankingInput, typeof packedBubbleGameRankingOutput> {
-	constructor(
-		@Inject(DI.bubbleGameRecordsRepository)
-		private bubbleGameRecordsRepository: BubbleGameRecordsRepository,
-
-		private userEntityService: UserEntityService,
-	) {
-		super(meta, contractProjection, async (ps) => {
-			const records = await this.bubbleGameRecordsRepository.find({
+import type { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+export interface BubbleGameRankingDependencies {
+	bubbleGameRecordsRepository: Pick<BubbleGameRecordsRepository, 'find'>;
+	userEntityService: Pick<UserEntityService, 'packMany'>;
+}
+export function createBubbleGameRankingProcedure(deps: BubbleGameRankingDependencies) {
+	return createApiProcedure<MiLocalUser>()(bubbleGameRankingContract)
+		.handler(async ({ input: ps }) => {
+			const records = await deps.bubbleGameRecordsRepository.find({
 				where: {
 					gameMode: ps.gameMode,
 					seededAt: MoreThan(new Date(Date.now() - 1000 * 60 * 60 * 24 * 7)),
@@ -46,14 +29,33 @@ export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof
 				take: 10,
 				relations: { user: true },
 			});
-
-			const users = await this.userEntityService.packMany(records.map(r => r.user!), null);
-
+			const users = (await deps.userEntityService.packMany(records.map(r => r.user!), null)).map(toPackedUserLite);
 			return records.map(r => ({
 				id: r.id,
 				score: r.score,
 				user: users.find(u => u.id === r.user!.id),
 			}));
 		});
-	}
+}
+export function createBubbleGameRankingGetProcedure(deps: BubbleGameRankingDependencies) {
+	return createApiProcedure<MiLocalUser>()(bubbleGameRankingGetContract)
+		.handler(async ({ input: ps }) => {
+			const records = await deps.bubbleGameRecordsRepository.find({
+				where: {
+					gameMode: ps.gameMode,
+					seededAt: MoreThan(new Date(Date.now() - 1000 * 60 * 60 * 24 * 7)),
+				},
+				order: {
+					score: 'DESC',
+				},
+				take: 10,
+				relations: { user: true },
+			});
+			const users = (await deps.userEntityService.packMany(records.map(r => r.user!), null)).map(toPackedUserLite);
+			return records.map(r => ({
+				id: r.id,
+				score: r.score,
+				user: users.find(u => u.id === r.user!.id),
+			}));
+		});
 }

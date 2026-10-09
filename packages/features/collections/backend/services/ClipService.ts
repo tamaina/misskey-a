@@ -4,9 +4,9 @@
  */
 
 import { QueryFailedError } from 'typeorm';
-import type { ClipsRepository, MiNote, MiClip, ClipNotesRepository, NotesRepository } from '@features/persistence/backend/repositories/models.js';
 import { bindThis } from '@features/runtime/backend/decorators.js';
 import { isDuplicateKeyValueError } from '@features/persistence/backend/utility/is-duplicate-key-value-error.js';
+import type { ClipsRepository, MiNote, MiClip, ClipNotesRepository, NotesRepository } from '@features/persistence/backend/repositories/models.js';
 import type { RoleService } from '@features/roles/backend/services/RoleService.js';
 import type { IdService } from '@features/runtime/backend/services/IdService.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
@@ -31,7 +31,7 @@ export class ClipService {
 	}
 
 	@bindThis
-	public async create(me: MiLocalUser, name: string, isPublic: boolean, description: string | null): Promise<MiClip> {
+	public async create(me: Pick<MiLocalUser, 'id'>, name: string, isPublic: boolean, description: string | null): Promise<MiClip> {
 		const currentCount = await this.clipsRepository.countBy({
 			userId: me.id,
 		});
@@ -51,7 +51,7 @@ export class ClipService {
 	}
 
 	@bindThis
-	public async update(me: MiLocalUser, clipId: MiClip['id'], name: string | undefined, isPublic: boolean | undefined, description: string | null | undefined): Promise<void> {
+	public async update(me: Pick<MiLocalUser, 'id'>, clipId: MiClip['id'], name: string | undefined, isPublic: boolean | undefined, description: string | null | undefined): Promise<void> {
 		const clip = await this.clipsRepository.findOneBy({
 			id: clipId,
 			userId: me.id,

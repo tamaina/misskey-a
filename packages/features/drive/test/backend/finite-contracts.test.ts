@@ -5,17 +5,25 @@
 
 import { expect, test } from 'vitest';
 import * as v from 'valibot';
+import { createProcedureClient } from '@orpc/server';
+import type { ApiContext } from '@features/api/backend/transport/context.js';
 import { mockDeep } from 'vitest-mock-extended';
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { packedDriveFileSchema, packedDriveFolderSchema } from '../../contract/packed.js';
-import { listingDriveFilesInput, listingDriveFilesDefinition } from '../../contract/drive-listing-endpoint-definitions.js';
-import { selectorAdminDriveShowFileOutput } from '../../contract/selector-endpoint-definitions.js';
+import { packedDriveFileSchema, packedDriveFolderSchema } from '../../../notes/backend/drive.schema.js';
+import { driveFilesContract } from '../../backend/endpoints/drive/files.contract.js';
+import { adminDriveShowFileContract } from '../../backend/endpoints/admin/drive/show-file.contract.js';
 import { DriveFileEntityService } from '../../backend/serializers/DriveFileEntityService.js';
 import { DriveFolderEntityService } from '../../backend/serializers/DriveFolderEntityService.js';
-import { EndpointImplementation as AdminShowFile } from '../../backend/endpoints/admin/drive/show-file.js';
+import { createAdminDriveShowFileProcedure as AdminShowFile } from '../../backend/endpoints/admin/drive/show-file.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 import type { MiDriveFile } from '../../backend/models/DriveFile.js';
 import type { MiDriveFolder } from '../../backend/models/DriveFolder.js';
+
+function requiredSchema<S extends v.GenericSchema>(schema: S | undefined): S {
+	if (schema === undefined) throw new Error('Missing native contract schema');
+	return schema;
+}
+
+const driveFilesInput = requiredSchema(driveFilesContract['~orpc'].inputSchema);
 
 const date = new Date('2026-01-01T00:00:00Z');
 
@@ -68,32 +76,36 @@ test('actual folder producer validates basic, detail and recursive parent varian
 	}
 });
 
-test.each([false, true])('actual admin show-file producer includes nullable webpublicType and opaque headers: %s', async moderator => {
-	const files = mockDeep<ConstructorParameters<typeof AdminShowFile>[0]>();
-	const roles = mockDeep<ConstructorParameters<typeof AdminShowFile>[2]>();
-	const ids = mockDeep<ConstructorParameters<typeof AdminShowFile>[3]>();
+test.each([false, true])('actual admin show-file producer includes nullable webpublicType and finite header JSON: %s', async moderator => {
+	const files = mockDeep<Parameters<typeof AdminShowFile>[0]['driveFileSelectorRepository']>();
+	const roles = mockDeep<Parameters<typeof AdminShowFile>[0]['roleService']>();
+	const ids = mockDeep<Parameters<typeof AdminShowFile>[0]['idService']>();
 	ids.parse.mockReturnValue({ date });
 	roles.isModerator.mockResolvedValue(moderator);
 	const file = driveFile();
 	file.requestIp = '127.0.0.1';
 	file.requestHeaders = { 'x-custom': 'value' };
 	files.findOneBy.mockResolvedValue(file);
-	const endpoint = new AdminShowFile(files, mockDeep(), roles, ids);
-	const output = await endpoint.exec({ fileId: file.id }, mockDeep<MiLocalUser>({ id: 'viewer123' }), null);
-	checkClosed(selectorAdminDriveShowFileOutput, output, 'webpublicType', { webpublicType: 1 });
+	const endpoint = AdminShowFile({ driveFileSelectorRepository: files, usersRepository: mockDeep(), roleService: roles, idService: ids });
+	const output = await createProcedureClient(endpoint, { context: apiTestContext(mockDeep<MiLocalUser>({ id: 'viewer123' }), '127.0.0.1', {}) })({ fileId: file.id });
+	const schema = adminDriveShowFileContract['~orpc'].outputSchema;
+	if (schema === undefined) throw new Error('Missing native admin file output schema');
+	checkClosed(schema, output, 'webpublicType', { webpublicType: 1 });
 	expect(output.webpublicType).toBeNull();
 	expect(output.requestHeaders).toEqual(moderator ? file.requestHeaders : null);
 });
 
-test('finite drive input strips extras while HTTP retains unknown keys, defaults and response identity', async () => {
-	expect(v.parse(listingDriveFilesInput, { future: true })).toEqual({ limit: 10, folderId: null });
-	for (const value of [{ limit: 0 }, { limit: '10' }, { folderId: 1 }]) expect(v.safeParse(listingDriveFilesInput, value).success).toBe(false);
-	const projection = projectEndpointContract(listingDriveFilesDefinition);
-	expect(projection.input).not.toHaveProperty('additionalProperties');
-	const params = { future: true };
-	const response: v.InferOutput<typeof listingDriveFilesDefinition.output> = [];
-	const endpoint = new ContractEndpoint({}, projection, async ps => { expect(ps).toBe(params); return response; });
-	expect(await endpoint.exec(params, null, null)).toBe(response);
-	expect(params).toEqual({ future: true, limit: 10, folderId: null });
-	await expect(endpoint.exec({ limit: 0 }, null, null)).rejects.toMatchObject({ code: 'INVALID_PARAM', info: { param: '#/properties/limit/minimum' } });
+test('native drive input retains nullable filters, defaults and finite scalar validation', () => {
+	expect(v.parse(driveFilesInput, { future: true })).toEqual({ limit: 10, folderId: null });
+	for (const value of [{ limit: 0 }, { limit: '10' }, { folderId: 1 }]) expect(v.safeParse(driveFilesInput, value).success).toBe(false);
+	expect(v.parse(driveFilesInput, { sort: null, type: null })).toEqual({ limit: 10, folderId: null, sort: null, type: null });
 });
+
+function apiTestContext(actor: MiLocalUser | null, ip = '127.0.0.1', headers: Record<string, string | string[] | undefined> = {}): ApiContext<MiLocalUser> {
+	if (actor !== null) { actor.isSuspended = false; actor.movedToUri = null; }
+	const context = mockDeep<ApiContext<MiLocalUser>>({ credential: actor ? 'fixture' : null, ip, headers });
+	context.services.authenticate.mockResolvedValue([actor, null]);
+	context.services.limitActor.mockReturnValue(null);
+	context.authorization?.rootUserId.mockReturnValue(actor?.id ?? null);
+	return context;
+}

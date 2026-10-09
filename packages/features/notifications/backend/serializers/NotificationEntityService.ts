@@ -11,7 +11,7 @@ import type { FollowRequestsRepository, NotesRepository, MiUser, UsersRepository
 import { awaitAll } from '@features/runtime/backend/async/await-all.js';
 import type { MiGroupedNotification, MiNotification } from '../models/Notification.js';
 import type { MiNote } from '@features/notes/backend/models/Note.js';
-import type { Packed } from '@features/index/contract/packed.js';
+import type { Packed } from '@features/index/backend/packed.schema.js';
 import { bindThis } from '@features/runtime/backend/decorators.js';
 import { FilterUnionByProperty, groupedNotificationTypes } from '@features/runtime/backend/types.js';
 import { CacheService } from '@features/users/backend/services/CacheService.js';

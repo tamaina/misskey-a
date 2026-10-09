@@ -2,24 +2,16 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { packedAuthSessionUserkeyDefinition, packedAuthSessionUserkeyInput, packedAuthSessionUserkeyOutput } from '../../../../contract/packed-endpoint-definitions.js';
-import { Inject, Injectable } from '@nestjs/common';
-
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 import type { AppsRepository, AccessTokensRepository, AuthSessionsRepository } from '@features/persistence/backend/repositories/models.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
-import { DI } from '@/di-symbols.js';
-import { ApiError } from '@features/api/backend/transport/error.js';
-
-const contractProjection = projectEndpointContract(packedAuthSessionUserkeyDefinition);
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
+import { toPackedUserDetailed } from '@features/users/backend/user.schema.js';
+import { AuthSessionUserkeyContract } from '../../../api.definition.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
 
 export const meta = {
 	tags: ['auth'],
-
-	requireCredential: false,
-
-	res: contractProjection.response,
 
 	errors: {
 		noSuchApp: {
@@ -41,62 +33,55 @@ export const meta = {
 		},
 	},
 } as const;
-
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedAuthSessionUserkeyInput, typeof packedAuthSessionUserkeyOutput> {
-	constructor(
-		@Inject(DI.appsRepository)
-		private appsRepository: AppsRepository,
-
-		@Inject(DI.authSessionsRepository)
-		private authSessionsRepository: AuthSessionsRepository,
-
-		@Inject(DI.accessTokensRepository)
-		private accessTokensRepository: AccessTokensRepository,
-
-		private userEntityService: UserEntityService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
+export interface AuthSessionUserkeyDependencies {
+	appsRepository: AppsRepository;
+	authSessionsRepository: AuthSessionsRepository;
+	accessTokensRepository: AccessTokensRepository;
+	userEntityService: Pick<UserEntityService, 'pack'>;
+}
+export function createAuthSessionUserkeyProcedure(deps: AuthSessionUserkeyDependencies) {
+	return createApiProcedure<MiLocalUser>()(AuthSessionUserkeyContract).handler(async ({ input, context }) => {
+		const ps = input;
+		const result = await (async () => {
 			// Lookup app
-			const app = await this.appsRepository.findOneBy({
+			const app = await deps.appsRepository.findOneBy({
 				secret: ps.appSecret,
 			});
 
 			if (app == null) {
-				throw new ApiError(meta.errors.noSuchApp);
+				throw apiError(meta.errors.noSuchApp);
 			}
 
 			// Fetch token
-			const session = await this.authSessionsRepository.findOneBy({
+			const session = await deps.authSessionsRepository.findOneBy({
 				token: ps.token,
 				appId: app.id,
 			});
 
 			if (session == null) {
-				throw new ApiError(meta.errors.noSuchSession);
+				throw apiError(meta.errors.noSuchSession);
 			}
 
 			if (session.userId == null) {
-				throw new ApiError(meta.errors.pendingSession);
+				throw apiError(meta.errors.pendingSession);
 			}
 
 			// Lookup access token
-			const accessToken = await this.accessTokensRepository.findOneByOrFail({
+			const accessToken = await deps.accessTokensRepository.findOneByOrFail({
 				appId: app.id,
 				userId: session.userId,
 			});
 
 			// Delete session
-			this.authSessionsRepository.delete(session.id);
+			deps.authSessionsRepository.delete(session.id);
 
 			return {
 				accessToken: accessToken.token,
-				user: await this.userEntityService.pack(session.userId, null, {
+				user: await deps.userEntityService.pack(session.userId, null, {
 					schema: 'UserDetailedNotMe',
 				}),
 			};
-		});
-	}
+		})();
+		return { accessToken: result.accessToken, user: toPackedUserDetailed(result.user) };
+	});
 }

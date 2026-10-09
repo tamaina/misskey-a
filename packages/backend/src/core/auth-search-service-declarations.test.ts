@@ -44,16 +44,20 @@ function securityInputs() {
 	return inputs;
 }
 
-function authenticationResponse() {
-	return mockDeep<AuthenticationResponseJSON>({ id: 'credential-id' });
+function authenticationResponse(): AuthenticationResponseJSON {
+	return {
+		id: 'credential-id', rawId: 'credential-id', type: 'public-key',
+		response: { clientDataJSON: '', authenticatorData: '', signature: '' },
+		clientExtensionResults: {},
+	};
 }
 
 function storedKey() {
 	return new MiUserSecurityKey({ id: 'credential-id', userId: 'user', publicKey: Buffer.from([1, 2, 3]).toString('base64url'), counter: 4, transports: ['internal'] });
 }
 
-function verifiedAuthentication(verified = true) {
-	return mockDeep<Awaited<ReturnType<typeof verifyAuthenticationResponse>>>({ verified, authenticationInfo: { newCounter: 5, credentialDeviceType: 'singleDevice', credentialBackedUp: false } });
+function verifiedAuthentication(verified = true): Awaited<ReturnType<typeof verifyAuthenticationResponse>> {
+	return { verified, authenticationInfo: { credentialID: 'credential-id', newCounter: 5, userVerified: true, credentialDeviceType: 'singleDevice', credentialBackedUp: false, origin: 'https://example.test', rpID: 'example.test' } };
 }
 
 afterEach(() => {
@@ -199,7 +203,8 @@ describe('auth and search declaration boundaries', () => {
 		expect(await service.verifyAuthentication('user', response)).toBe(true);
 		expect(inputs.redisClient.getdel).toHaveBeenCalledWith('webauthn:authenticationChallenge:user');
 		expect(inputs.userSecurityKeysRepository.findOneBy).toHaveBeenCalledWith({ id: 'credential-id', userId: 'user' });
-		expect(verifyAuthenticationResponse).toHaveBeenCalledWith(expect.objectContaining({ response, expectedChallenge: 'authentication-challenge', expectedOrigin: 'https://example.test', expectedRPID: 'example.test', requireUserVerification: true }));
+		expect(verifyAuthenticationResponse).toHaveBeenCalledWith({ response, expectedChallenge: 'authentication-challenge', expectedOrigin: 'https://example.test', expectedRPID: 'example.test', credential: { id: 'credential-id', publicKey: Buffer.from([1, 2, 3]), counter: 4, transports: ['internal'] }, requireUserVerification: true });
+		expect(inputs.redisClient.getdel.mock.invocationCallOrder[0]).toBeLessThan(vi.mocked(verifyAuthenticationResponse).mock.invocationCallOrder[0]);
 		expect(inputs.userSecurityKeysRepository.update).toHaveBeenCalledWith({ id: 'credential-id', userId: 'user' }, { lastUsed: new Date(timestamp), counter: 5, credentialDeviceType: 'singleDevice', credentialBackedUp: false });
 		await expect(service.verifyAuthentication('user', response)).rejects.toThrow('challenge not found');
 		expect(verifyAuthenticationResponse).toHaveBeenCalledTimes(1);
@@ -216,6 +221,17 @@ describe('auth and search declaration boundaries', () => {
 		expect(inputs.userSecurityKeysRepository.findOneBy).toHaveBeenCalledWith({ id: 'credential-id' });
 		expect(await service.verifySignInWithPasskeyAuthentication('context', authenticationResponse())).toBeNull();
 		expect(inputs.userSecurityKeysRepository.update).toHaveBeenCalledTimes(1);
+	});
+
+	test('malformed passkey protocol consumes its challenge without invoking verification or updating the credential', async () => {
+		const inputs = securityInputs();
+		inputs.redisClient.getdel.mockResolvedValue('passkey-challenge');
+		inputs.userSecurityKeysRepository.findOneBy.mockResolvedValue(storedKey());
+		const service = authSecurityServices.create(inputs).WebAuthnService;
+		await expect(service.verifySignInWithPasskeyAuthentication('context', { id: 'credential-id' })).rejects.toMatchObject({ id: 'b18c89a7-5b5e-4cec-bb5b-0419f332d430' });
+		expect(inputs.redisClient.getdel).toHaveBeenCalledWith('webauthn:passkeyChallenge:context');
+		expect(verifyAuthenticationResponse).not.toHaveBeenCalled();
+		expect(inputs.userSecurityKeysRepository.update).not.toHaveBeenCalled();
 	});
 
 	test('search factory and direct constructor preserve ordered ID packing and borrowed serializer', async () => {

@@ -3,7 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-export { createListCommands, legacyListSchemas } from './commands.js';
-export type { ListCommandsContext, ListCommandsDependencies, ListCommandsFeature } from './commands.js';
-export { createRelationshipCommands, legacyRelationshipSchemas } from './relationship-commands.js';
-export type { RelationshipCommandsContext, RelationshipCommandsDependencies, RelationshipCommandsFeature } from './relationship-commands.js';
+export { relationshipsContract } from './endpoints/relationships.contract.js';
+export { createRelationshipsRouter } from './endpoints/relationships.js';
+export { UserListService } from './services/UserListService.js';
+export { RelationshipsApiProvider } from './api.implementation.js';
+export type { RelationshipsDependencies } from './api.implementation.js';

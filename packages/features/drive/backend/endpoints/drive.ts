@@ -3,42 +3,31 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { inlineDriveDefinition, inlineDriveInput, inlineDriveOutput } from '../../contract/endpoint-definitions.js';
-import { Injectable } from '@nestjs/common';
-
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
 import { DriveFileEntityService } from '../serializers/DriveFileEntityService.js';
 import { RoleService } from '@features/roles/backend/services/RoleService.js';
+import { driveManagementContract } from '../api.definition.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
 
-const contractProjection = projectEndpointContract(inlineDriveDefinition);
+export interface DriveDependencies {
+	driveFileEntityService: Pick<DriveFileEntityService, 'calcDriveUsageOf'>;
+	roleService: Pick<RoleService, 'getUserPolicies'>;
+}
+export function createDriveProcedure(deps: DriveDependencies) {
+	return createApiProcedure<MiLocalUser>()(driveManagementContract['drive']).use(requirePrincipal<MiLocalUser>())
+		.handler(async ({ input, context }) => {
+			const _ps = input;
+			const me = context.principal;
+			const _ip = context.ip;
+			const _headers = context.headers;
+			const usage = await deps.driveFileEntityService.calcDriveUsageOf(me.id);
 
-export const meta = {
-	tags: ['drive', 'account'],
-
-	requireCredential: true,
-
-	kind: 'read:drive',
-
-	res: contractProjection.response,
-} as const;
-
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof inlineDriveInput, typeof inlineDriveOutput> {
-	constructor(
-		private driveFileEntityService: DriveFileEntityService,
-		private roleService: RoleService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			const usage = await this.driveFileEntityService.calcDriveUsageOf(me.id);
-
-			const policies = await this.roleService.getUserPolicies(me.id);
+			const policies = await deps.roleService.getUserPolicies(me.id);
 
 			return {
 				capacity: 1024 * 1024 * policies.driveCapacityMb,
 				usage: usage,
 			};
 		});
-	}
 }
