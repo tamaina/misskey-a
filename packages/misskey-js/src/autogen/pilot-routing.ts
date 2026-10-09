@@ -13,12 +13,12 @@ export default {
 				"acceptedMethods": [
 					"GET",
 					"POST"
-				]
+				],
+				"requireCredential": false
 			},
 			"route": {
 				"method": "POST",
 				"path": "/clear-browser-cache",
-				"operationId": "post___clear_browser_cache",
 				"tags": [
 					"non-productive"
 				],
@@ -33,7 +33,6 @@ export default {
 			"route": {
 				"method": "GET",
 				"path": "/clear-browser-cache",
-				"operationId": "get___clear_browser_cache",
 				"tags": [
 					"non-productive"
 				],
@@ -92,12 +91,18 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "chat/messages/create-to-user"
+					"requestName": "chat/messages/create-to-user",
+					"requireCredential": true,
+					"prohibitMoved": true,
+					"kind": "write:chat",
+					"limit": {
+						"duration": 3600000,
+						"max": 500
+					}
 				},
 				"route": {
 					"method": "POST",
 					"path": "/chat/messages/create-to-user",
-					"operationId": "post___chat___messages___create-to-user",
 					"tags": [
 						"chat"
 					]
@@ -148,12 +153,18 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "chat/messages/create-to-room"
+					"requestName": "chat/messages/create-to-room",
+					"requireCredential": true,
+					"prohibitMoved": true,
+					"kind": "write:chat",
+					"limit": {
+						"duration": 3600000,
+						"max": 500
+					}
 				},
 				"route": {
 					"method": "POST",
 					"path": "/chat/messages/create-to-room",
-					"operationId": "post___chat___messages___create-to-room",
 					"tags": [
 						"chat"
 					]
@@ -198,12 +209,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "chat/messages/delete"
+					"requestName": "chat/messages/delete",
+					"requireCredential": true,
+					"kind": "write:chat"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/chat/messages/delete",
-					"operationId": "post___chat___messages___delete",
 					"tags": [
 						"chat"
 					],
@@ -249,12 +261,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "chat/messages/show"
+					"requestName": "chat/messages/show",
+					"requireCredential": true,
+					"kind": "read:chat"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/chat/messages/show",
-					"operationId": "post___chat___messages___show",
 					"tags": [
 						"chat"
 					]
@@ -299,12 +312,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "chat/messages/react"
+					"requestName": "chat/messages/react",
+					"requireCredential": true,
+					"kind": "write:chat"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/chat/messages/react",
-					"operationId": "post___chat___messages___react",
 					"tags": [
 						"chat"
 					],
@@ -350,12 +364,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "chat/messages/unreact"
+					"requestName": "chat/messages/unreact",
+					"requireCredential": true,
+					"kind": "write:chat"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/chat/messages/unreact",
-					"operationId": "post___chat___messages___unreact",
 					"tags": [
 						"chat"
 					],
@@ -401,12 +416,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "chat/messages/user-timeline"
+					"requestName": "chat/messages/user-timeline",
+					"requireCredential": true,
+					"kind": "read:chat"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/chat/messages/user-timeline",
-					"operationId": "post___chat___messages___user-timeline",
 					"tags": [
 						"chat"
 					]
@@ -451,12 +467,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "chat/messages/room-timeline"
+					"requestName": "chat/messages/room-timeline",
+					"requireCredential": true,
+					"kind": "read:chat"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/chat/messages/room-timeline",
-					"operationId": "post___chat___messages___room-timeline",
 					"tags": [
 						"chat"
 					]
@@ -501,12 +518,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "chat/messages/search"
+					"requestName": "chat/messages/search",
+					"requireCredential": true,
+					"kind": "read:chat"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/chat/messages/search",
-					"operationId": "post___chat___messages___search",
 					"tags": [
 						"chat"
 					]
@@ -548,12 +566,18 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "chat/rooms/create"
+					"requestName": "chat/rooms/create",
+					"requireCredential": true,
+					"prohibitMoved": true,
+					"kind": "write:chat",
+					"limit": {
+						"duration": 86400000,
+						"max": 10
+					}
 				},
 				"route": {
 					"method": "POST",
 					"path": "/chat/rooms/create",
-					"operationId": "post___chat___rooms___create",
 					"tags": [
 						"chat"
 					]
@@ -598,12 +622,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "chat/rooms/delete"
+					"requestName": "chat/rooms/delete",
+					"requireCredential": true,
+					"kind": "write:chat"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/chat/rooms/delete",
-					"operationId": "post___chat___rooms___delete",
 					"tags": [
 						"chat"
 					],
@@ -649,12 +674,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "chat/rooms/join"
+					"requestName": "chat/rooms/join",
+					"requireCredential": true,
+					"kind": "write:chat"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/chat/rooms/join",
-					"operationId": "post___chat___rooms___join",
 					"tags": [
 						"chat"
 					],
@@ -700,12 +726,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "chat/rooms/leave"
+					"requestName": "chat/rooms/leave",
+					"requireCredential": true,
+					"kind": "write:chat"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/chat/rooms/leave",
-					"operationId": "post___chat___rooms___leave",
 					"tags": [
 						"chat"
 					],
@@ -751,12 +778,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "chat/rooms/mute"
+					"requestName": "chat/rooms/mute",
+					"requireCredential": true,
+					"kind": "write:chat"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/chat/rooms/mute",
-					"operationId": "post___chat___rooms___mute",
 					"tags": [
 						"chat"
 					],
@@ -802,12 +830,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "chat/rooms/show"
+					"requestName": "chat/rooms/show",
+					"requireCredential": true,
+					"kind": "read:chat"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/chat/rooms/show",
-					"operationId": "post___chat___rooms___show",
 					"tags": [
 						"chat"
 					]
@@ -849,12 +878,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "chat/rooms/owned"
+					"requestName": "chat/rooms/owned",
+					"requireCredential": true,
+					"kind": "read:chat"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/chat/rooms/owned",
-					"operationId": "post___chat___rooms___owned",
 					"tags": [
 						"chat"
 					]
@@ -896,12 +926,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "chat/rooms/joining"
+					"requestName": "chat/rooms/joining",
+					"requireCredential": true,
+					"kind": "read:chat"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/chat/rooms/joining",
-					"operationId": "post___chat___rooms___joining",
 					"tags": [
 						"chat"
 					]
@@ -946,12 +977,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "chat/rooms/update"
+					"requestName": "chat/rooms/update",
+					"requireCredential": true,
+					"kind": "write:chat"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/chat/rooms/update",
-					"operationId": "post___chat___rooms___update",
 					"tags": [
 						"chat"
 					]
@@ -996,12 +1028,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "chat/rooms/members"
+					"requestName": "chat/rooms/members",
+					"requireCredential": true,
+					"kind": "write:chat"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/chat/rooms/members",
-					"operationId": "post___chat___rooms___members",
 					"tags": [
 						"chat"
 					]
@@ -1046,12 +1079,18 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "chat/rooms/invitations/create"
+					"requestName": "chat/rooms/invitations/create",
+					"requireCredential": true,
+					"prohibitMoved": true,
+					"kind": "write:chat",
+					"limit": {
+						"duration": 86400000,
+						"max": 50
+					}
 				},
 				"route": {
 					"method": "POST",
 					"path": "/chat/rooms/invitations/create",
-					"operationId": "post___chat___rooms___invitations___create",
 					"tags": [
 						"chat"
 					]
@@ -1096,12 +1135,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "chat/rooms/invitations/ignore"
+					"requestName": "chat/rooms/invitations/ignore",
+					"requireCredential": true,
+					"kind": "write:chat"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/chat/rooms/invitations/ignore",
-					"operationId": "post___chat___rooms___invitations___ignore",
 					"tags": [
 						"chat"
 					],
@@ -1144,12 +1184,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "chat/rooms/invitations/inbox"
+					"requestName": "chat/rooms/invitations/inbox",
+					"requireCredential": true,
+					"kind": "read:chat"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/chat/rooms/invitations/inbox",
-					"operationId": "post___chat___rooms___invitations___inbox",
 					"tags": [
 						"chat"
 					]
@@ -1194,12 +1235,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "chat/rooms/invitations/outbox"
+					"requestName": "chat/rooms/invitations/outbox",
+					"requireCredential": true,
+					"kind": "read:chat"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/chat/rooms/invitations/outbox",
-					"operationId": "post___chat___rooms___invitations___outbox",
 					"tags": [
 						"chat"
 					]
@@ -1241,12 +1283,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "chat/history"
+					"requestName": "chat/history",
+					"requireCredential": true,
+					"kind": "read:chat"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/chat/history",
-					"operationId": "post___chat___history",
 					"tags": [
 						"chat"
 					]
@@ -1288,12 +1331,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "chat/read-all"
+					"requestName": "chat/read-all",
+					"requireCredential": true,
+					"kind": "write:chat"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/chat/read-all",
-					"operationId": "post___chat___read-all",
 					"tags": [
 						"chat"
 					],
@@ -1341,12 +1385,19 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "channels/create"
+					"requestName": "channels/create",
+					"requireCredential": true,
+					"prohibitMoved": true,
+					"requiredRolePolicy": "canCreateChannel",
+					"kind": "write:channels",
+					"limit": {
+						"duration": 3600000,
+						"max": 10
+					}
 				},
 				"route": {
 					"method": "POST",
 					"path": "/channels/create",
-					"operationId": "post___channels___create",
 					"tags": [
 						"channels"
 					]
@@ -1391,12 +1442,14 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "channels/favorite"
+					"requestName": "channels/favorite",
+					"requireCredential": true,
+					"prohibitMoved": true,
+					"kind": "write:channels"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/channels/favorite",
-					"operationId": "post___channels___favorite",
 					"tags": [
 						"channels"
 					],
@@ -1439,12 +1492,12 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "channels/featured"
+					"requestName": "channels/featured",
+					"requireCredential": false
 				},
 				"route": {
 					"method": "POST",
 					"path": "/channels/featured",
-					"operationId": "post___channels___featured",
 					"tags": [
 						"channels"
 					]
@@ -1492,12 +1545,14 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "channels/follow"
+					"requestName": "channels/follow",
+					"requireCredential": true,
+					"prohibitMoved": true,
+					"kind": "write:channels"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/channels/follow",
-					"operationId": "post___channels___follow",
 					"tags": [
 						"channels"
 					],
@@ -1540,12 +1595,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "channels/followed"
+					"requestName": "channels/followed",
+					"requireCredential": true,
+					"kind": "read:channels"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/channels/followed",
-					"operationId": "post___channels___followed",
 					"tags": [
 						"channels",
 						"account"
@@ -1588,12 +1644,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "channels/my-favorites"
+					"requestName": "channels/my-favorites",
+					"requireCredential": true,
+					"kind": "read:channels"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/channels/my-favorites",
-					"operationId": "post___channels___my-favorites",
 					"tags": [
 						"channels",
 						"account"
@@ -1636,12 +1693,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "channels/owned"
+					"requestName": "channels/owned",
+					"requireCredential": true,
+					"kind": "read:channels"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/channels/owned",
-					"operationId": "post___channels___owned",
 					"tags": [
 						"channels",
 						"account"
@@ -1684,12 +1742,12 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "channels/search"
+					"requestName": "channels/search",
+					"requireCredential": false
 				},
 				"route": {
 					"method": "POST",
 					"path": "/channels/search",
-					"operationId": "post___channels___search",
 					"tags": [
 						"channels"
 					]
@@ -1734,12 +1792,12 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "channels/show"
+					"requestName": "channels/show",
+					"requireCredential": false
 				},
 				"route": {
 					"method": "POST",
 					"path": "/channels/show",
-					"operationId": "post___channels___show",
 					"tags": [
 						"channels"
 					]
@@ -1784,12 +1842,12 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "channels/timeline"
+					"requestName": "channels/timeline",
+					"requireCredential": false
 				},
 				"route": {
 					"method": "POST",
 					"path": "/channels/timeline",
-					"operationId": "post___channels___timeline",
 					"tags": [
 						"notes",
 						"channels"
@@ -1835,12 +1893,14 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "channels/unfavorite"
+					"requestName": "channels/unfavorite",
+					"requireCredential": true,
+					"prohibitMoved": true,
+					"kind": "write:channels"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/channels/unfavorite",
-					"operationId": "post___channels___unfavorite",
 					"tags": [
 						"channels"
 					],
@@ -1886,12 +1946,14 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "channels/unfollow"
+					"requestName": "channels/unfollow",
+					"requireCredential": true,
+					"prohibitMoved": true,
+					"kind": "write:channels"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/channels/unfollow",
-					"operationId": "post___channels___unfollow",
 					"tags": [
 						"channels"
 					],
@@ -1940,12 +2002,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "channels/update"
+					"requestName": "channels/update",
+					"requireCredential": true,
+					"kind": "write:channels"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/channels/update",
-					"operationId": "post___channels___update",
 					"tags": [
 						"channels"
 					]
@@ -1996,12 +2059,14 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "channels/mute/create"
+					"requestName": "channels/mute/create",
+					"requireCredential": true,
+					"prohibitMoved": true,
+					"kind": "write:channels"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/channels/mute/create",
-					"operationId": "post___channels___mute___create",
 					"tags": [
 						"channels",
 						"mute"
@@ -2051,12 +2116,14 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "channels/mute/delete"
+					"requestName": "channels/mute/delete",
+					"requireCredential": true,
+					"prohibitMoved": true,
+					"kind": "write:channels"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/channels/mute/delete",
-					"operationId": "post___channels___mute___delete",
 					"tags": [
 						"channels",
 						"mute"
@@ -2100,12 +2167,14 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "channels/mute/list"
+					"requestName": "channels/mute/list",
+					"requireCredential": true,
+					"prohibitMoved": true,
+					"kind": "read:channels"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/channels/mute/list",
-					"operationId": "post___channels___mute___list",
 					"tags": [
 						"channels",
 						"mute"
@@ -2150,12 +2219,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "i/page-likes"
+					"requestName": "i/page-likes",
+					"requireCredential": true,
+					"kind": "read:page-likes"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/i/page-likes",
-					"operationId": "post___i___page-likes",
 					"tags": [
 						"account",
 						"pages"
@@ -2198,12 +2268,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "i/pages"
+					"requestName": "i/pages",
+					"requireCredential": true,
+					"kind": "read:pages"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/i/pages",
-					"operationId": "post___i___pages",
 					"tags": [
 						"account",
 						"pages"
@@ -2249,12 +2320,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "page-push"
+					"requestName": "page-push",
+					"requireCredential": true,
+					"secure": true
 				},
 				"route": {
 					"method": "POST",
 					"path": "/page-push",
-					"operationId": "post___page-push",
 					"tags": [],
 					"successStatus": 204
 				}
@@ -2301,12 +2373,18 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "pages/create"
+					"requestName": "pages/create",
+					"requireCredential": true,
+					"kind": "write:pages",
+					"prohibitMoved": true,
+					"limit": {
+						"duration": 3600000,
+						"max": 10
+					}
 				},
 				"route": {
 					"method": "POST",
 					"path": "/pages/create",
-					"operationId": "post___pages___create",
 					"tags": [
 						"pages"
 					]
@@ -2351,12 +2429,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "pages/delete"
+					"requestName": "pages/delete",
+					"requireCredential": true,
+					"kind": "write:pages"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/pages/delete",
-					"operationId": "post___pages___delete",
 					"tags": [
 						"pages"
 					],
@@ -2399,12 +2478,12 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "pages/featured"
+					"requestName": "pages/featured",
+					"requireCredential": false
 				},
 				"route": {
 					"method": "POST",
 					"path": "/pages/featured",
-					"operationId": "post___pages___featured",
 					"tags": [
 						"pages"
 					]
@@ -2455,12 +2534,14 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "pages/like"
+					"requestName": "pages/like",
+					"requireCredential": true,
+					"kind": "write:page-likes",
+					"prohibitMoved": true
 				},
 				"route": {
 					"method": "POST",
 					"path": "/pages/like",
-					"operationId": "post___pages___like",
 					"tags": [
 						"pages"
 					],
@@ -2506,12 +2587,12 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "pages/show"
+					"requestName": "pages/show",
+					"requireCredential": false
 				},
 				"route": {
 					"method": "POST",
 					"path": "/pages/show",
-					"operationId": "post___pages___show",
 					"tags": [
 						"pages"
 					]
@@ -2559,12 +2640,14 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "pages/unlike"
+					"requestName": "pages/unlike",
+					"requireCredential": true,
+					"kind": "write:page-likes",
+					"prohibitMoved": true
 				},
 				"route": {
 					"method": "POST",
 					"path": "/pages/unlike",
-					"operationId": "post___pages___unlike",
 					"tags": [
 						"pages"
 					],
@@ -2616,12 +2699,18 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "pages/update"
+					"requestName": "pages/update",
+					"requireCredential": true,
+					"kind": "write:pages",
+					"prohibitMoved": true,
+					"limit": {
+						"duration": 3600000,
+						"max": 300
+					}
 				},
 				"route": {
 					"method": "POST",
 					"path": "/pages/update",
-					"operationId": "post___pages___update",
 					"tags": [
 						"pages"
 					],
@@ -2664,12 +2753,12 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "users/pages"
+					"requestName": "users/pages",
+					"requireCredential": false
 				},
 				"route": {
 					"method": "POST",
 					"path": "/users/pages",
-					"operationId": "post___users___pages",
 					"tags": [
 						"users",
 						"pages"
@@ -2714,12 +2803,18 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "flash/create"
+					"requestName": "flash/create",
+					"requireCredential": true,
+					"kind": "write:flash",
+					"prohibitMoved": true,
+					"limit": {
+						"duration": 3600000,
+						"max": 10
+					}
 				},
 				"route": {
 					"method": "POST",
 					"path": "/flash/create",
-					"operationId": "post___flash___create",
 					"tags": [
 						"flash"
 					]
@@ -2764,12 +2859,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "flash/delete"
+					"requestName": "flash/delete",
+					"requireCredential": true,
+					"kind": "write:flash"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/flash/delete",
-					"operationId": "post___flash___delete",
 					"tags": [
 						"flashs"
 					],
@@ -2812,12 +2908,12 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "flash/featured"
+					"requestName": "flash/featured",
+					"requireCredential": false
 				},
 				"route": {
 					"method": "POST",
 					"path": "/flash/featured",
-					"operationId": "post___flash___featured",
 					"tags": [
 						"flash"
 					]
@@ -2868,12 +2964,14 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "flash/like"
+					"requestName": "flash/like",
+					"requireCredential": true,
+					"kind": "write:flash-likes",
+					"prohibitMoved": true
 				},
 				"route": {
 					"method": "POST",
 					"path": "/flash/like",
-					"operationId": "post___flash___like",
 					"tags": [
 						"flash"
 					],
@@ -2916,12 +3014,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "flash/my"
+					"requestName": "flash/my",
+					"requireCredential": true,
+					"kind": "read:flash"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/flash/my",
-					"operationId": "post___flash___my",
 					"tags": [
 						"account",
 						"flash"
@@ -2964,12 +3063,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "flash/my-likes"
+					"requestName": "flash/my-likes",
+					"requireCredential": true,
+					"kind": "read:flash-likes"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/flash/my-likes",
-					"operationId": "post___flash___my-likes",
 					"tags": [
 						"account",
 						"flash"
@@ -3015,12 +3115,12 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "flash/show"
+					"requestName": "flash/show",
+					"requireCredential": false
 				},
 				"route": {
 					"method": "POST",
 					"path": "/flash/show",
-					"operationId": "post___flash___show",
 					"tags": [
 						"flashs"
 					]
@@ -3068,12 +3168,14 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "flash/unlike"
+					"requestName": "flash/unlike",
+					"requireCredential": true,
+					"kind": "write:flash-likes",
+					"prohibitMoved": true
 				},
 				"route": {
 					"method": "POST",
 					"path": "/flash/unlike",
-					"operationId": "post___flash___unlike",
 					"tags": [
 						"flash"
 					],
@@ -3119,12 +3221,18 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "flash/update"
+					"requestName": "flash/update",
+					"requireCredential": true,
+					"kind": "write:flash",
+					"prohibitMoved": true,
+					"limit": {
+						"duration": 3600000,
+						"max": 300
+					}
 				},
 				"route": {
 					"method": "POST",
 					"path": "/flash/update",
-					"operationId": "post___flash___update",
 					"tags": [
 						"flash"
 					],
@@ -3167,12 +3275,12 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "flash/search"
+					"requestName": "flash/search",
+					"requireCredential": false
 				},
 				"route": {
 					"method": "POST",
 					"path": "/flash/search",
-					"operationId": "post___flash___search",
 					"tags": [
 						"flash"
 					]
@@ -3214,12 +3322,12 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "users/flashs"
+					"requestName": "users/flashs",
+					"requireCredential": false
 				},
 				"route": {
 					"method": "POST",
 					"path": "/users/flashs",
-					"operationId": "post___users___flashs",
 					"tags": [
 						"users",
 						"flashs"
@@ -3266,12 +3374,12 @@ export default {
 				"meta": {
 					"requestName": "bubble-game/ranking",
 					"allowGet": true,
-					"cacheSec": 60
+					"cacheSec": 60,
+					"requireCredential": false
 				},
 				"route": {
 					"method": "POST",
 					"path": "/bubble-game/ranking",
-					"operationId": "post___bubble-game___ranking",
 					"tags": []
 				}
 			}
@@ -3317,7 +3425,6 @@ export default {
 				"route": {
 					"method": "GET",
 					"path": "/bubble-game/ranking",
-					"operationId": "get___bubble-game___ranking",
 					"tags": []
 				}
 			}
@@ -3360,12 +3467,18 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "bubble-game/register"
+					"requestName": "bubble-game/register",
+					"requireCredential": true,
+					"kind": "write:account",
+					"limit": {
+						"duration": 3600000,
+						"max": 120,
+						"minInterval": 30000
+					}
 				},
 				"route": {
 					"method": "POST",
 					"path": "/bubble-game/register",
-					"operationId": "post___bubble-game___register",
 					"tags": [],
 					"successStatus": 204
 				}
@@ -3406,12 +3519,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "reversi/cancel-match"
+					"requestName": "reversi/cancel-match",
+					"requireCredential": true,
+					"kind": "write:account"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/reversi/cancel-match",
-					"operationId": "post___reversi___cancel-match",
 					"tags": [],
 					"successStatus": 204
 				}
@@ -3452,12 +3566,12 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "reversi/games"
+					"requestName": "reversi/games",
+					"requireCredential": false
 				},
 				"route": {
 					"method": "POST",
 					"path": "/reversi/games",
-					"operationId": "post___reversi___games",
 					"tags": []
 				}
 			}
@@ -3497,12 +3611,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "reversi/invitations"
+					"requestName": "reversi/invitations",
+					"requireCredential": true,
+					"kind": "read:account"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/reversi/invitations",
-					"operationId": "post___reversi___invitations",
 					"tags": []
 				}
 			}
@@ -3548,12 +3663,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "reversi/match"
+					"requestName": "reversi/match",
+					"requireCredential": true,
+					"kind": "write:account"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/reversi/match",
-					"operationId": "post___reversi___match",
 					"tags": []
 				}
 			}
@@ -3596,12 +3712,12 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "reversi/show-game"
+					"requestName": "reversi/show-game",
+					"requireCredential": false
 				},
 				"route": {
 					"method": "POST",
 					"path": "/reversi/show-game",
-					"operationId": "post___reversi___show-game",
 					"tags": []
 				}
 			}
@@ -3647,12 +3763,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "reversi/surrender"
+					"requestName": "reversi/surrender",
+					"requireCredential": true,
+					"kind": "write:account"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/reversi/surrender",
-					"operationId": "post___reversi___surrender",
 					"tags": [],
 					"successStatus": 204
 				}
@@ -3696,12 +3813,12 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "reversi/verify"
+					"requestName": "reversi/verify",
+					"requireCredential": false
 				},
 				"route": {
 					"method": "POST",
 					"path": "/reversi/verify",
-					"operationId": "post___reversi___verify",
 					"tags": []
 				}
 			}
@@ -3743,12 +3860,14 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "admin/federation/delete-all-files"
+					"requestName": "admin/federation/delete-all-files",
+					"requireCredential": true,
+					"requireModerator": true,
+					"kind": "write:admin:federation"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/admin/federation/delete-all-files",
-					"operationId": "post___admin___federation___delete-all-files",
 					"tags": [
 						"admin"
 					]
@@ -3790,12 +3909,14 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "admin/federation/refresh-remote-instance-metadata"
+					"requestName": "admin/federation/refresh-remote-instance-metadata",
+					"requireCredential": true,
+					"requireModerator": true,
+					"kind": "write:admin:federation"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/admin/federation/refresh-remote-instance-metadata",
-					"operationId": "post___admin___federation___refresh-remote-instance-metadata",
 					"tags": [
 						"admin"
 					]
@@ -3837,12 +3958,14 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "admin/federation/remove-all-following"
+					"requestName": "admin/federation/remove-all-following",
+					"requireCredential": true,
+					"requireModerator": true,
+					"kind": "write:admin:federation"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/admin/federation/remove-all-following",
-					"operationId": "post___admin___federation___remove-all-following",
 					"tags": [
 						"admin"
 					]
@@ -3884,12 +4007,14 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "admin/federation/update-instance"
+					"requestName": "admin/federation/update-instance",
+					"requireCredential": true,
+					"requireModerator": true,
+					"kind": "write:admin:federation"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/admin/federation/update-instance",
-					"operationId": "post___admin___federation___update-instance",
 					"tags": [
 						"admin"
 					]
@@ -3934,12 +4059,14 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "admin/relays/add"
+					"requestName": "admin/relays/add",
+					"requireCredential": true,
+					"requireModerator": true,
+					"kind": "write:admin:relays"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/admin/relays/add",
-					"operationId": "post___admin___relays___add",
 					"tags": [
 						"admin"
 					]
@@ -3981,12 +4108,14 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "admin/relays/list"
+					"requestName": "admin/relays/list",
+					"requireCredential": true,
+					"requireModerator": true,
+					"kind": "read:admin:relays"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/admin/relays/list",
-					"operationId": "post___admin___relays___list",
 					"tags": [
 						"admin"
 					]
@@ -4028,12 +4157,14 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "admin/relays/remove"
+					"requestName": "admin/relays/remove",
+					"requireCredential": true,
+					"requireModerator": true,
+					"kind": "write:admin:relays"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/admin/relays/remove",
-					"operationId": "post___admin___relays___remove",
 					"tags": [
 						"admin"
 					]
@@ -4075,12 +4206,18 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "ap/get"
+					"requestName": "ap/get",
+					"requireCredential": true,
+					"requireAdmin": true,
+					"kind": "read:federation",
+					"limit": {
+						"duration": 3600000,
+						"max": 30
+					}
 				},
 				"route": {
 					"method": "POST",
 					"path": "/ap/get",
-					"operationId": "post___ap___get",
 					"tags": [
 						"federation"
 					]
@@ -4137,12 +4274,17 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "ap/show"
+					"requestName": "ap/show",
+					"requireCredential": true,
+					"kind": "read:account",
+					"limit": {
+						"duration": 3600000,
+						"max": 30
+					}
 				},
 				"route": {
 					"method": "POST",
 					"path": "/ap/show",
-					"operationId": "post___ap___show",
 					"tags": [
 						"federation"
 					]
@@ -4184,12 +4326,12 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "federation/followers"
+					"requestName": "federation/followers",
+					"requireCredential": false
 				},
 				"route": {
 					"method": "POST",
 					"path": "/federation/followers",
-					"operationId": "post___federation___followers",
 					"tags": [
 						"federation"
 					]
@@ -4231,12 +4373,12 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "federation/following"
+					"requestName": "federation/following",
+					"requireCredential": false
 				},
 				"route": {
 					"method": "POST",
 					"path": "/federation/following",
-					"operationId": "post___federation___following",
 					"tags": [
 						"federation"
 					]
@@ -4280,12 +4422,12 @@ export default {
 				"meta": {
 					"requestName": "federation/instances",
 					"allowGet": true,
-					"cacheSec": 3600
+					"cacheSec": 3600,
+					"requireCredential": false
 				},
 				"route": {
 					"method": "POST",
 					"path": "/federation/instances",
-					"operationId": "post___federation___instances",
 					"tags": [
 						"federation"
 					]
@@ -4327,12 +4469,12 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "federation/show-instance"
+					"requestName": "federation/show-instance",
+					"requireCredential": false
 				},
 				"route": {
 					"method": "POST",
 					"path": "/federation/show-instance",
-					"operationId": "post___federation___show-instance",
 					"tags": [
 						"federation"
 					]
@@ -4376,12 +4518,12 @@ export default {
 				"meta": {
 					"requestName": "federation/stats",
 					"allowGet": true,
-					"cacheSec": 3600
+					"cacheSec": 3600,
+					"requireCredential": false
 				},
 				"route": {
 					"method": "POST",
 					"path": "/federation/stats",
-					"operationId": "post___federation___stats",
 					"tags": [
 						"federation"
 					]
@@ -4423,12 +4565,17 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "federation/update-remote-user"
+					"requestName": "federation/update-remote-user",
+					"requireCredential": true,
+					"kind": "read:account",
+					"limit": {
+						"duration": 3600000,
+						"max": 30
+					}
 				},
 				"route": {
 					"method": "POST",
 					"path": "/federation/update-remote-user",
-					"operationId": "post___federation___update-remote-user",
 					"tags": [
 						"federation"
 					]
@@ -4470,12 +4617,12 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "federation/users"
+					"requestName": "federation/users",
+					"requireCredential": false
 				},
 				"route": {
 					"method": "POST",
 					"path": "/federation/users",
-					"operationId": "post___federation___users",
 					"tags": [
 						"federation"
 					]
@@ -4519,12 +4666,14 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "admin/get-index-stats"
+					"requestName": "admin/get-index-stats",
+					"requireCredential": true,
+					"requireAdmin": true,
+					"kind": "read:admin:index-stats"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/admin/get-index-stats",
-					"operationId": "post___admin___get-index-stats",
 					"tags": [
 						"admin"
 					]
@@ -4566,12 +4715,14 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "admin/get-table-stats"
+					"requestName": "admin/get-table-stats",
+					"requireCredential": true,
+					"requireAdmin": true,
+					"kind": "read:admin:table-stats"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/admin/get-table-stats",
-					"operationId": "post___admin___get-table-stats",
 					"tags": [
 						"admin"
 					]
@@ -4613,12 +4764,14 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "admin/queue/clear"
+					"requestName": "admin/queue/clear",
+					"requireCredential": true,
+					"requireModerator": true,
+					"kind": "write:admin:queue"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/admin/queue/clear",
-					"operationId": "post___admin___queue___clear",
 					"tags": [
 						"admin"
 					]
@@ -4660,12 +4813,14 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "admin/queue/deliver-delayed"
+					"requestName": "admin/queue/deliver-delayed",
+					"requireCredential": true,
+					"requireModerator": true,
+					"kind": "read:admin:queue"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/admin/queue/deliver-delayed",
-					"operationId": "post___admin___queue___deliver-delayed",
 					"tags": [
 						"admin"
 					]
@@ -4707,12 +4862,14 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "admin/queue/inbox-delayed"
+					"requestName": "admin/queue/inbox-delayed",
+					"requireCredential": true,
+					"requireModerator": true,
+					"kind": "read:admin:queue"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/admin/queue/inbox-delayed",
-					"operationId": "post___admin___queue___inbox-delayed",
 					"tags": [
 						"admin"
 					]
@@ -4754,12 +4911,14 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "admin/queue/jobs"
+					"requestName": "admin/queue/jobs",
+					"requireCredential": true,
+					"requireModerator": true,
+					"kind": "read:admin:queue"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/admin/queue/jobs",
-					"operationId": "post___admin___queue___jobs",
 					"tags": [
 						"admin"
 					]
@@ -4801,12 +4960,14 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "admin/queue/pause"
+					"requestName": "admin/queue/pause",
+					"requireCredential": true,
+					"requireModerator": true,
+					"kind": "write:admin:queue"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/admin/queue/pause",
-					"operationId": "post___admin___queue___pause",
 					"tags": [
 						"admin"
 					]
@@ -4848,12 +5009,14 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "admin/queue/promote-jobs"
+					"requestName": "admin/queue/promote-jobs",
+					"requireCredential": true,
+					"requireModerator": true,
+					"kind": "write:admin:queue"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/admin/queue/promote-jobs",
-					"operationId": "post___admin___queue___promote-jobs",
 					"tags": [
 						"admin"
 					]
@@ -4895,12 +5058,14 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "admin/queue/queue-stats"
+					"requestName": "admin/queue/queue-stats",
+					"requireCredential": true,
+					"requireModerator": true,
+					"kind": "read:admin:queue"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/admin/queue/queue-stats",
-					"operationId": "post___admin___queue___queue-stats",
 					"tags": [
 						"admin"
 					]
@@ -4942,12 +5107,14 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "admin/queue/queues"
+					"requestName": "admin/queue/queues",
+					"requireCredential": true,
+					"requireModerator": true,
+					"kind": "read:admin:queue"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/admin/queue/queues",
-					"operationId": "post___admin___queue___queues",
 					"tags": [
 						"admin"
 					]
@@ -4989,12 +5156,14 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "admin/queue/remove-job"
+					"requestName": "admin/queue/remove-job",
+					"requireCredential": true,
+					"requireModerator": true,
+					"kind": "write:admin:queue"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/admin/queue/remove-job",
-					"operationId": "post___admin___queue___remove-job",
 					"tags": [
 						"admin"
 					]
@@ -5036,12 +5205,14 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "admin/queue/resume"
+					"requestName": "admin/queue/resume",
+					"requireCredential": true,
+					"requireModerator": true,
+					"kind": "write:admin:queue"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/admin/queue/resume",
-					"operationId": "post___admin___queue___resume",
 					"tags": [
 						"admin"
 					]
@@ -5083,12 +5254,14 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "admin/queue/retry-job"
+					"requestName": "admin/queue/retry-job",
+					"requireCredential": true,
+					"requireModerator": true,
+					"kind": "write:admin:queue"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/admin/queue/retry-job",
-					"operationId": "post___admin___queue___retry-job",
 					"tags": [
 						"admin"
 					]
@@ -5130,12 +5303,14 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "admin/queue/show-job-logs"
+					"requestName": "admin/queue/show-job-logs",
+					"requireCredential": true,
+					"requireModerator": true,
+					"kind": "read:admin:queue"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/admin/queue/show-job-logs",
-					"operationId": "post___admin___queue___show-job-logs",
 					"tags": [
 						"admin"
 					]
@@ -5177,12 +5352,14 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "admin/queue/show-job"
+					"requestName": "admin/queue/show-job",
+					"requireCredential": true,
+					"requireModerator": true,
+					"kind": "read:admin:queue"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/admin/queue/show-job",
-					"operationId": "post___admin___queue___show-job",
 					"tags": [
 						"admin"
 					]
@@ -5224,12 +5401,14 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "admin/queue/stats"
+					"requestName": "admin/queue/stats",
+					"requireCredential": true,
+					"requireModerator": true,
+					"kind": "read:admin:queue"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/admin/queue/stats",
-					"operationId": "post___admin___queue___stats",
 					"tags": [
 						"admin"
 					]
@@ -5271,12 +5450,12 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "reset-db"
+					"requestName": "reset-db",
+					"requireCredential": false
 				},
 				"route": {
 					"method": "POST",
 					"path": "/reset-db",
-					"operationId": "post___reset-db",
 					"tags": [
 						"non-productive"
 					]
@@ -5320,12 +5499,14 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "admin/send-email"
+					"requestName": "admin/send-email",
+					"requireCredential": true,
+					"requireModerator": true,
+					"kind": "write:admin:send-email"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/admin/send-email",
-					"operationId": "post___admin___send-email",
 					"tags": [
 						"admin"
 					]
@@ -5367,12 +5548,15 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "admin/system-webhook/create"
+					"requestName": "admin/system-webhook/create",
+					"requireCredential": true,
+					"requireModerator": true,
+					"secure": true,
+					"kind": "write:admin:system-webhook"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/admin/system-webhook/create",
-					"operationId": "post___admin___system-webhook___create",
 					"tags": [
 						"admin",
 						"system-webhook"
@@ -5415,12 +5599,15 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "admin/system-webhook/delete"
+					"requestName": "admin/system-webhook/delete",
+					"requireCredential": true,
+					"requireModerator": true,
+					"secure": true,
+					"kind": "write:admin:system-webhook"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/admin/system-webhook/delete",
-					"operationId": "post___admin___system-webhook___delete",
 					"tags": [
 						"admin",
 						"system-webhook"
@@ -5463,12 +5650,15 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "admin/system-webhook/list"
+					"requestName": "admin/system-webhook/list",
+					"requireCredential": true,
+					"requireModerator": true,
+					"secure": true,
+					"kind": "write:admin:system-webhook"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/admin/system-webhook/list",
-					"operationId": "post___admin___system-webhook___list",
 					"tags": [
 						"admin",
 						"system-webhook"
@@ -5514,12 +5704,15 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "admin/system-webhook/show"
+					"requestName": "admin/system-webhook/show",
+					"requireCredential": true,
+					"requireModerator": true,
+					"secure": true,
+					"kind": "write:admin:system-webhook"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/admin/system-webhook/show",
-					"operationId": "post___admin___system-webhook___show",
 					"tags": [
 						"admin",
 						"system-webhook"
@@ -5565,12 +5758,19 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "admin/system-webhook/test"
+					"requestName": "admin/system-webhook/test",
+					"requireCredential": true,
+					"requireModerator": true,
+					"secure": true,
+					"kind": "read:admin:system-webhook",
+					"limit": {
+						"duration": 900000,
+						"max": 60
+					}
 				},
 				"route": {
 					"method": "POST",
 					"path": "/admin/system-webhook/test",
-					"operationId": "post___admin___system-webhook___test",
 					"tags": [
 						"webhooks"
 					]
@@ -5612,12 +5812,15 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "admin/system-webhook/update"
+					"requestName": "admin/system-webhook/update",
+					"requireCredential": true,
+					"requireModerator": true,
+					"secure": true,
+					"kind": "write:admin:system-webhook"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/admin/system-webhook/update",
-					"operationId": "post___admin___system-webhook___update",
 					"tags": [
 						"admin",
 						"system-webhook"
@@ -5666,12 +5869,17 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "fetch-external-resources"
+					"requestName": "fetch-external-resources",
+					"requireCredential": true,
+					"secure": true,
+					"limit": {
+						"duration": 3600000,
+						"max": 50
+					}
 				},
 				"route": {
 					"method": "POST",
 					"path": "/fetch-external-resources",
-					"operationId": "post___fetch-external-resources",
 					"tags": [
 						"meta"
 					]
@@ -5724,12 +5932,16 @@ export default {
 				"meta": {
 					"requestName": "fetch-rss",
 					"allowGet": true,
-					"cacheSec": 180
+					"cacheSec": 180,
+					"limit": {
+						"duration": 60000,
+						"max": 300
+					},
+					"requireCredential": false
 				},
 				"route": {
 					"method": "POST",
 					"path": "/fetch-rss",
-					"operationId": "post___fetch-rss",
 					"tags": [
 						"meta"
 					]
@@ -5774,12 +5986,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "i/webhooks/create"
+					"requestName": "i/webhooks/create",
+					"requireCredential": true,
+					"kind": "write:account"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/i/webhooks/create",
-					"operationId": "post___i___webhooks___create",
 					"tags": [
 						"webhooks"
 					]
@@ -5824,12 +6037,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "i/webhooks/delete"
+					"requestName": "i/webhooks/delete",
+					"requireCredential": true,
+					"kind": "write:account"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/i/webhooks/delete",
-					"operationId": "post___i___webhooks___delete",
 					"tags": [
 						"webhooks"
 					]
@@ -5871,12 +6085,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "i/webhooks/list"
+					"requestName": "i/webhooks/list",
+					"requireCredential": true,
+					"kind": "read:account"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/i/webhooks/list",
-					"operationId": "post___i___webhooks___list",
 					"tags": [
 						"webhooks",
 						"account"
@@ -5922,12 +6137,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "i/webhooks/show"
+					"requestName": "i/webhooks/show",
+					"requireCredential": true,
+					"kind": "read:account"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/i/webhooks/show",
-					"operationId": "post___i___webhooks___show",
 					"tags": [
 						"webhooks"
 					]
@@ -5972,12 +6188,18 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "i/webhooks/test"
+					"requestName": "i/webhooks/test",
+					"requireCredential": true,
+					"secure": true,
+					"kind": "read:account",
+					"limit": {
+						"duration": 900000,
+						"max": 60
+					}
 				},
 				"route": {
 					"method": "POST",
 					"path": "/i/webhooks/test",
-					"operationId": "post___i___webhooks___test",
 					"tags": [
 						"webhooks"
 					]
@@ -6022,12 +6244,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "i/webhooks/update"
+					"requestName": "i/webhooks/update",
+					"requireCredential": true,
+					"kind": "write:account"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/i/webhooks/update",
-					"operationId": "post___i___webhooks___update",
 					"tags": [
 						"webhooks"
 					]
@@ -6070,12 +6293,12 @@ export default {
 				}
 			},
 			"meta": {
-				"requestName": "test"
+				"requestName": "test",
+				"requireCredential": false
 			},
 			"route": {
 				"method": "POST",
 				"path": "/test",
-				"operationId": "post___test",
 				"tags": [
 					"non-productive"
 				],
@@ -6119,12 +6342,14 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "admin/delete-all-files-of-a-user"
+					"requestName": "admin/delete-all-files-of-a-user",
+					"requireCredential": true,
+					"requireAdmin": true,
+					"kind": "write:admin:delete-all-files-of-a-user"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/admin/delete-all-files-of-a-user",
-					"operationId": "post___admin___delete-all-files-of-a-user",
 					"tags": [
 						"admin"
 					],
@@ -6167,12 +6392,14 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "admin/drive/clean-remote-files"
+					"requestName": "admin/drive/clean-remote-files",
+					"requireCredential": true,
+					"requireModerator": true,
+					"kind": "write:admin:drive"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/admin/drive/clean-remote-files",
-					"operationId": "post___admin___drive___clean-remote-files",
 					"tags": [
 						"admin"
 					],
@@ -6215,12 +6442,14 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "admin/drive/cleanup"
+					"requestName": "admin/drive/cleanup",
+					"requireCredential": true,
+					"requireModerator": true,
+					"kind": "write:admin:drive"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/admin/drive/cleanup",
-					"operationId": "post___admin___drive___cleanup",
 					"tags": [
 						"admin"
 					],
@@ -6263,12 +6492,14 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "admin/drive/files"
+					"requestName": "admin/drive/files",
+					"requireCredential": true,
+					"requireModerator": true,
+					"kind": "read:admin:drive"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/admin/drive/files",
-					"operationId": "post___admin___drive___files",
 					"tags": [
 						"admin"
 					]
@@ -6313,12 +6544,14 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "admin/drive/show-file"
+					"requestName": "admin/drive/show-file",
+					"requireCredential": true,
+					"requireModerator": true,
+					"kind": "read:admin:drive"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/admin/drive/show-file",
-					"operationId": "post___admin___drive___show-file",
 					"tags": [
 						"admin"
 					]
@@ -6360,12 +6593,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "drive"
+					"requestName": "drive",
+					"requireCredential": true,
+					"kind": "read:drive"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/drive",
-					"operationId": "post___drive",
 					"tags": [
 						"drive",
 						"account"
@@ -6408,12 +6642,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "drive/files"
+					"requestName": "drive/files",
+					"requireCredential": true,
+					"kind": "read:drive"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/drive/files",
-					"operationId": "post___drive___files",
 					"tags": [
 						"drive"
 					]
@@ -6458,12 +6693,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "drive/files/attached-notes"
+					"requestName": "drive/files/attached-notes",
+					"requireCredential": true,
+					"kind": "read:drive"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/drive/files/attached-notes",
-					"operationId": "post___drive___files___attached-notes",
 					"tags": [
 						"drive",
 						"notes"
@@ -6510,12 +6746,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "drive/files/attached-chat-messages"
+					"requestName": "drive/files/attached-chat-messages",
+					"requireCredential": true,
+					"kind": "read:drive"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/drive/files/attached-chat-messages",
-					"operationId": "post___drive___files___attached-chat-messages",
 					"tags": [
 						"drive",
 						"chat"
@@ -6558,12 +6795,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "drive/files/check-existence"
+					"requestName": "drive/files/check-existence",
+					"requireCredential": true,
+					"kind": "read:drive"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/drive/files/check-existence",
-					"operationId": "post___drive___files___check-existence",
 					"tags": [
 						"drive"
 					],
@@ -6609,12 +6847,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "drive/files/delete"
+					"requestName": "drive/files/delete",
+					"requireCredential": true,
+					"kind": "write:drive"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/drive/files/delete",
-					"operationId": "post___drive___files___delete",
 					"tags": [
 						"drive"
 					],
@@ -6658,12 +6897,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "drive/files/find"
+					"requestName": "drive/files/find",
+					"requireCredential": true,
+					"kind": "read:drive"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/drive/files/find",
-					"operationId": "post___drive___files___find",
 					"tags": [
 						"drive"
 					],
@@ -6706,12 +6946,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "drive/files/find-by-hash"
+					"requestName": "drive/files/find-by-hash",
+					"requireCredential": true,
+					"kind": "read:drive"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/drive/files/find-by-hash",
-					"operationId": "post___drive___files___find-by-hash",
 					"tags": [
 						"drive"
 					],
@@ -6757,12 +6998,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "drive/files/show"
+					"requestName": "drive/files/show",
+					"requireCredential": true,
+					"kind": "read:drive"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/drive/files/show",
-					"operationId": "post___drive___files___show",
 					"tags": [
 						"drive"
 					],
@@ -6817,12 +7059,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "drive/files/update"
+					"requestName": "drive/files/update",
+					"requireCredential": true,
+					"kind": "write:drive"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/drive/files/update",
-					"operationId": "post___drive___files___update",
 					"tags": [
 						"drive"
 					],
@@ -6865,12 +7108,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "drive/files/move-bulk"
+					"requestName": "drive/files/move-bulk",
+					"requireCredential": true,
+					"kind": "write:drive"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/drive/files/move-bulk",
-					"operationId": "post___drive___files___move-bulk",
 					"tags": [
 						"drive"
 					],
@@ -6913,12 +7157,18 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "drive/files/upload-from-url"
+					"requestName": "drive/files/upload-from-url",
+					"requireCredential": true,
+					"prohibitMoved": true,
+					"kind": "write:drive",
+					"limit": {
+						"duration": 3600000,
+						"max": 60
+					}
 				},
 				"route": {
 					"method": "POST",
 					"path": "/drive/files/upload-from-url",
-					"operationId": "post___drive___files___upload-from-url",
 					"tags": [
 						"drive"
 					],
@@ -6962,12 +7212,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "drive/folders"
+					"requestName": "drive/folders",
+					"requireCredential": true,
+					"kind": "read:drive"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/drive/folders",
-					"operationId": "post___drive___folders",
 					"tags": [
 						"drive"
 					]
@@ -7012,12 +7263,17 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "drive/folders/create"
+					"requestName": "drive/folders/create",
+					"requireCredential": true,
+					"kind": "write:drive",
+					"limit": {
+						"duration": 3600000,
+						"max": 10
+					}
 				},
 				"route": {
 					"method": "POST",
 					"path": "/drive/folders/create",
-					"operationId": "post___drive___folders___create",
 					"tags": [
 						"drive"
 					]
@@ -7065,12 +7321,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "drive/folders/delete"
+					"requestName": "drive/folders/delete",
+					"requireCredential": true,
+					"kind": "write:drive"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/drive/folders/delete",
-					"operationId": "post___drive___folders___delete",
 					"tags": [
 						"drive"
 					],
@@ -7113,12 +7370,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "drive/folders/find"
+					"requestName": "drive/folders/find",
+					"requireCredential": true,
+					"kind": "read:drive"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/drive/folders/find",
-					"operationId": "post___drive___folders___find",
 					"tags": [
 						"drive"
 					]
@@ -7163,12 +7421,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "drive/folders/show"
+					"requestName": "drive/folders/show",
+					"requireCredential": true,
+					"kind": "read:drive"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/drive/folders/show",
-					"operationId": "post___drive___folders___show",
 					"tags": [
 						"drive"
 					]
@@ -7219,12 +7478,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "drive/folders/update"
+					"requestName": "drive/folders/update",
+					"requireCredential": true,
+					"kind": "write:drive"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/drive/folders/update",
-					"operationId": "post___drive___folders___update",
 					"tags": [
 						"drive"
 					]
@@ -7266,12 +7526,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "drive/stream"
+					"requestName": "drive/stream",
+					"requireCredential": true,
+					"kind": "read:drive"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/drive/stream",
-					"operationId": "post___drive___stream",
 					"tags": [
 						"drive"
 					]
@@ -7315,12 +7576,17 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "i/export-antennas"
+					"requestName": "i/export-antennas",
+					"requireCredential": true,
+					"secure": true,
+					"limit": {
+						"duration": 3600000,
+						"max": 1
+					}
 				},
 				"route": {
 					"method": "POST",
 					"path": "/i/export-antennas",
-					"operationId": "post___i___export-antennas",
 					"successStatus": 204
 				}
 			}
@@ -7360,12 +7626,17 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "i/export-blocking"
+					"requestName": "i/export-blocking",
+					"requireCredential": true,
+					"secure": true,
+					"limit": {
+						"duration": 3600000,
+						"max": 1
+					}
 				},
 				"route": {
 					"method": "POST",
 					"path": "/i/export-blocking",
-					"operationId": "post___i___export-blocking",
 					"successStatus": 204
 				}
 			}
@@ -7405,12 +7676,17 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "i/export-clips"
+					"requestName": "i/export-clips",
+					"requireCredential": true,
+					"secure": true,
+					"limit": {
+						"duration": 86400000,
+						"max": 1
+					}
 				},
 				"route": {
 					"method": "POST",
 					"path": "/i/export-clips",
-					"operationId": "post___i___export-clips",
 					"successStatus": 204
 				}
 			}
@@ -7450,12 +7726,17 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "i/export-favorites"
+					"requestName": "i/export-favorites",
+					"requireCredential": true,
+					"secure": true,
+					"limit": {
+						"duration": 86400000,
+						"max": 1
+					}
 				},
 				"route": {
 					"method": "POST",
 					"path": "/i/export-favorites",
-					"operationId": "post___i___export-favorites",
 					"successStatus": 204
 				}
 			}
@@ -7495,12 +7776,17 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "i/export-following"
+					"requestName": "i/export-following",
+					"requireCredential": true,
+					"secure": true,
+					"limit": {
+						"duration": 3600000,
+						"max": 1
+					}
 				},
 				"route": {
 					"method": "POST",
 					"path": "/i/export-following",
-					"operationId": "post___i___export-following",
 					"successStatus": 204
 				}
 			}
@@ -7540,12 +7826,17 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "i/export-mute"
+					"requestName": "i/export-mute",
+					"requireCredential": true,
+					"secure": true,
+					"limit": {
+						"duration": 3600000,
+						"max": 1
+					}
 				},
 				"route": {
 					"method": "POST",
 					"path": "/i/export-mute",
-					"operationId": "post___i___export-mute",
 					"successStatus": 204
 				}
 			}
@@ -7585,12 +7876,17 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "i/export-notes"
+					"requestName": "i/export-notes",
+					"requireCredential": true,
+					"secure": true,
+					"limit": {
+						"duration": 86400000,
+						"max": 1
+					}
 				},
 				"route": {
 					"method": "POST",
 					"path": "/i/export-notes",
-					"operationId": "post___i___export-notes",
 					"successStatus": 204
 				}
 			}
@@ -7630,12 +7926,17 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "i/export-user-lists"
+					"requestName": "i/export-user-lists",
+					"requireCredential": true,
+					"secure": true,
+					"limit": {
+						"duration": 60000,
+						"max": 1
+					}
 				},
 				"route": {
 					"method": "POST",
 					"path": "/i/export-user-lists",
-					"operationId": "post___i___export-user-lists",
 					"successStatus": 204
 				}
 			}
@@ -7687,12 +7988,19 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "i/import-antennas"
+					"requestName": "i/import-antennas",
+					"requireCredential": true,
+					"secure": true,
+					"limit": {
+						"duration": 3600000,
+						"max": 1
+					},
+					"prohibitMoved": true,
+					"requiredRolePolicy": "canImportAntennas"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/i/import-antennas",
-					"operationId": "post___i___import-antennas",
 					"successStatus": 204
 				}
 			}
@@ -7744,12 +8052,19 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "i/import-blocking"
+					"requestName": "i/import-blocking",
+					"requireCredential": true,
+					"secure": true,
+					"limit": {
+						"duration": 3600000,
+						"max": 1
+					},
+					"prohibitMoved": true,
+					"requiredRolePolicy": "canImportBlocking"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/i/import-blocking",
-					"operationId": "post___i___import-blocking",
 					"successStatus": 204
 				}
 			}
@@ -7801,12 +8116,19 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "i/import-following"
+					"requestName": "i/import-following",
+					"requireCredential": true,
+					"secure": true,
+					"limit": {
+						"duration": 3600000,
+						"max": 1
+					},
+					"prohibitMoved": true,
+					"requiredRolePolicy": "canImportFollowing"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/i/import-following",
-					"operationId": "post___i___import-following",
 					"successStatus": 204
 				}
 			}
@@ -7858,12 +8180,19 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "i/import-muting"
+					"requestName": "i/import-muting",
+					"requireCredential": true,
+					"secure": true,
+					"limit": {
+						"duration": 3600000,
+						"max": 1
+					},
+					"prohibitMoved": true,
+					"requiredRolePolicy": "canImportMuting"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/i/import-muting",
-					"operationId": "post___i___import-muting",
 					"successStatus": 204
 				}
 			}
@@ -7915,12 +8244,19 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "i/import-user-lists"
+					"requestName": "i/import-user-lists",
+					"requireCredential": true,
+					"secure": true,
+					"limit": {
+						"duration": 3600000,
+						"max": 1
+					},
+					"prohibitMoved": true,
+					"requiredRolePolicy": "canImportUserLists"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/i/import-user-lists",
-					"operationId": "post___i___import-user-lists",
 					"successStatus": 204
 				}
 			}
@@ -7965,12 +8301,12 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "admin/accounts/create"
+					"requestName": "admin/accounts/create",
+					"requireCredential": false
 				},
 				"route": {
 					"method": "POST",
 					"path": "/admin/accounts/create",
-					"operationId": "post___admin___accounts___create",
 					"tags": [
 						"admin"
 					]
@@ -8012,12 +8348,14 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "admin/captcha/current"
+					"requestName": "admin/captcha/current",
+					"requireCredential": true,
+					"requireAdmin": true,
+					"kind": "read:admin:meta"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/admin/captcha/current",
-					"operationId": "post___admin___captcha___current",
 					"tags": [
 						"admin",
 						"captcha"
@@ -8078,12 +8416,14 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "admin/captcha/save"
+					"requestName": "admin/captcha/save",
+					"requireCredential": true,
+					"requireAdmin": true,
+					"kind": "write:admin:meta"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/admin/captcha/save",
-					"operationId": "post___admin___captcha___save",
 					"tags": [
 						"admin",
 						"captcha"
@@ -8129,12 +8469,14 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "admin/invite/create"
+					"requestName": "admin/invite/create",
+					"requireCredential": true,
+					"requireModerator": true,
+					"kind": "write:admin:invite-codes"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/admin/invite/create",
-					"operationId": "post___admin___invite___create",
 					"tags": [
 						"admin"
 					]
@@ -8176,12 +8518,14 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "admin/invite/list"
+					"requestName": "admin/invite/list",
+					"requireCredential": true,
+					"requireModerator": true,
+					"kind": "read:admin:invite-codes"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/admin/invite/list",
-					"operationId": "post___admin___invite___list",
 					"tags": [
 						"admin"
 					]
@@ -8226,12 +8570,14 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "admin/reset-password"
+					"requestName": "admin/reset-password",
+					"requireCredential": true,
+					"requireModerator": true,
+					"kind": "write:admin:reset-password"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/admin/reset-password",
-					"operationId": "post___admin___reset-password",
 					"tags": [
 						"admin"
 					]
@@ -8276,12 +8622,14 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "admin/unset-mfa"
+					"requestName": "admin/unset-mfa",
+					"requireCredential": true,
+					"requireModerator": true,
+					"kind": "write:admin:unset-mfa"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/admin/unset-mfa",
-					"operationId": "post___admin___unset-mfa",
 					"tags": [
 						"admin"
 					]
@@ -8323,12 +8671,12 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "app/create"
+					"requestName": "app/create",
+					"requireCredential": false
 				},
 				"route": {
 					"method": "POST",
 					"path": "/app/create",
-					"operationId": "post___app___create",
 					"tags": [
 						"app"
 					]
@@ -8373,12 +8721,12 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "app/show"
+					"requestName": "app/show",
+					"requireCredential": false
 				},
 				"route": {
 					"method": "POST",
 					"path": "/app/show",
-					"operationId": "post___app___show",
 					"tags": [
 						"app"
 					]
@@ -8423,12 +8771,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "auth/accept"
+					"requestName": "auth/accept",
+					"requireCredential": true,
+					"secure": true
 				},
 				"route": {
 					"method": "POST",
 					"path": "/auth/accept",
-					"operationId": "post___auth___accept",
 					"tags": [
 						"auth"
 					]
@@ -8473,12 +8822,12 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "auth/session/generate"
+					"requestName": "auth/session/generate",
+					"requireCredential": false
 				},
 				"route": {
 					"method": "POST",
 					"path": "/auth/session/generate",
-					"operationId": "post___auth___session___generate",
 					"tags": [
 						"auth"
 					]
@@ -8523,12 +8872,12 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "auth/session/show"
+					"requestName": "auth/session/show",
+					"requireCredential": false
 				},
 				"route": {
 					"method": "POST",
 					"path": "/auth/session/show",
-					"operationId": "post___auth___session___show",
 					"tags": [
 						"auth"
 					]
@@ -8579,12 +8928,12 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "auth/session/userkey"
+					"requestName": "auth/session/userkey",
+					"requireCredential": false
 				},
 				"route": {
 					"method": "POST",
 					"path": "/auth/session/userkey",
-					"operationId": "post___auth___session___userkey",
 					"tags": [
 						"auth"
 					]
@@ -8626,12 +8975,12 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "email-address/available"
+					"requestName": "email-address/available",
+					"requireCredential": false
 				},
 				"route": {
 					"method": "POST",
 					"path": "/email-address/available",
-					"operationId": "post___email-address___available",
 					"tags": [
 						"users"
 					]
@@ -8673,12 +9022,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "i/2fa/done"
+					"requestName": "i/2fa/done",
+					"requireCredential": true,
+					"secure": true
 				},
 				"route": {
 					"method": "POST",
 					"path": "/i/2fa/done",
-					"operationId": "post___i___2fa___done",
 					"tags": []
 				}
 			}
@@ -8724,12 +9074,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "i/2fa/key-done"
+					"requestName": "i/2fa/key-done",
+					"requireCredential": true,
+					"secure": true
 				},
 				"route": {
 					"method": "POST",
 					"path": "/i/2fa/key-done",
-					"operationId": "post___i___2fa___key-done",
 					"tags": []
 				}
 			}
@@ -8772,12 +9123,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "i/2fa/password-less"
+					"requestName": "i/2fa/password-less",
+					"requireCredential": true,
+					"secure": true
 				},
 				"route": {
 					"method": "POST",
 					"path": "/i/2fa/password-less",
-					"operationId": "post___i___2fa___password-less",
 					"tags": []
 				}
 			}
@@ -8820,12 +9172,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "i/2fa/register"
+					"requestName": "i/2fa/register",
+					"requireCredential": true,
+					"secure": true
 				},
 				"route": {
 					"method": "POST",
 					"path": "/i/2fa/register",
-					"operationId": "post___i___2fa___register",
 					"tags": []
 				}
 			}
@@ -8874,12 +9227,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "i/2fa/register-key"
+					"requestName": "i/2fa/register-key",
+					"requireCredential": true,
+					"secure": true
 				},
 				"route": {
 					"method": "POST",
 					"path": "/i/2fa/register-key",
-					"operationId": "post___i___2fa___register-key",
 					"tags": []
 				}
 			}
@@ -8922,12 +9276,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "i/2fa/remove-key"
+					"requestName": "i/2fa/remove-key",
+					"requireCredential": true,
+					"secure": true
 				},
 				"route": {
 					"method": "POST",
 					"path": "/i/2fa/remove-key",
-					"operationId": "post___i___2fa___remove-key",
 					"tags": []
 				}
 			}
@@ -8970,12 +9325,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "i/2fa/unregister"
+					"requestName": "i/2fa/unregister",
+					"requireCredential": true,
+					"secure": true
 				},
 				"route": {
 					"method": "POST",
 					"path": "/i/2fa/unregister",
-					"operationId": "post___i___2fa___unregister",
 					"tags": []
 				}
 			}
@@ -9018,12 +9374,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "i/2fa/update-key"
+					"requestName": "i/2fa/update-key",
+					"requireCredential": true,
+					"secure": true
 				},
 				"route": {
 					"method": "POST",
 					"path": "/i/2fa/update-key",
-					"operationId": "post___i___2fa___update-key",
 					"tags": []
 				}
 			}
@@ -9063,12 +9420,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "i/apps"
+					"requestName": "i/apps",
+					"requireCredential": true,
+					"secure": true
 				},
 				"route": {
 					"method": "POST",
 					"path": "/i/apps",
-					"operationId": "post___i___apps",
 					"tags": []
 				}
 			}
@@ -9108,12 +9466,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "i/authorized-apps"
+					"requestName": "i/authorized-apps",
+					"requireCredential": true,
+					"secure": true
 				},
 				"route": {
 					"method": "POST",
 					"path": "/i/authorized-apps",
-					"operationId": "post___i___authorized-apps",
 					"tags": []
 				}
 			}
@@ -9153,12 +9512,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "i/change-password"
+					"requestName": "i/change-password",
+					"requireCredential": true,
+					"secure": true
 				},
 				"route": {
 					"method": "POST",
 					"path": "/i/change-password",
-					"operationId": "post___i___change-password",
 					"tags": []
 				}
 			}
@@ -9198,12 +9558,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "i/regenerate-token"
+					"requestName": "i/regenerate-token",
+					"requireCredential": true,
+					"secure": true
 				},
 				"route": {
 					"method": "POST",
 					"path": "/i/regenerate-token",
-					"operationId": "post___i___regenerate-token",
 					"tags": []
 				}
 			}
@@ -9243,12 +9604,12 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "i/revoke-token"
+					"requestName": "i/revoke-token",
+					"requireCredential": false
 				},
 				"route": {
 					"method": "POST",
 					"path": "/i/revoke-token",
-					"operationId": "post___i___revoke-token",
 					"tags": []
 				}
 			}
@@ -9288,12 +9649,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "i/signin-history"
+					"requestName": "i/signin-history",
+					"requireCredential": true,
+					"secure": true
 				},
 				"route": {
 					"method": "POST",
 					"path": "/i/signin-history",
-					"operationId": "post___i___signin-history",
 					"tags": []
 				}
 			}
@@ -9342,12 +9704,17 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "i/update-email"
+					"requestName": "i/update-email",
+					"requireCredential": true,
+					"secure": true,
+					"limit": {
+						"duration": 3600000,
+						"max": 3
+					}
 				},
 				"route": {
 					"method": "POST",
 					"path": "/i/update-email",
-					"operationId": "post___i___update-email",
 					"tags": []
 				}
 			}
@@ -9390,12 +9757,14 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "invite/create"
+					"requestName": "invite/create",
+					"requireCredential": true,
+					"kind": "write:invite-codes",
+					"requiredRolePolicy": "canInvite"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/invite/create",
-					"operationId": "post___invite___create",
 					"tags": [
 						"meta"
 					]
@@ -9443,12 +9812,14 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "invite/delete"
+					"requestName": "invite/delete",
+					"requireCredential": true,
+					"kind": "write:invite-codes",
+					"requiredRolePolicy": "canInvite"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/invite/delete",
-					"operationId": "post___invite___delete",
 					"tags": [
 						"meta"
 					]
@@ -9490,12 +9861,14 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "invite/limit"
+					"requestName": "invite/limit",
+					"requireCredential": true,
+					"kind": "read:invite-codes",
+					"requiredRolePolicy": "canInvite"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/invite/limit",
-					"operationId": "post___invite___limit",
 					"tags": [
 						"meta"
 					]
@@ -9537,12 +9910,14 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "invite/list"
+					"requestName": "invite/list",
+					"requireCredential": true,
+					"kind": "read:invite-codes",
+					"requiredRolePolicy": "canInvite"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/invite/list",
-					"operationId": "post___invite___list",
 					"tags": [
 						"meta"
 					]
@@ -9584,12 +9959,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "miauth/gen-token"
+					"requestName": "miauth/gen-token",
+					"requireCredential": true,
+					"secure": true
 				},
 				"route": {
 					"method": "POST",
 					"path": "/miauth/gen-token",
-					"operationId": "post___miauth___gen-token",
 					"tags": [
 						"auth"
 					]
@@ -9631,12 +10007,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "my/apps"
+					"requestName": "my/apps",
+					"requireCredential": true,
+					"kind": "read:account"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/my/apps",
-					"operationId": "post___my___apps",
 					"tags": [
 						"account",
 						"app"
@@ -9679,12 +10056,16 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "request-reset-password"
+					"requestName": "request-reset-password",
+					"limit": {
+						"duration": 3600000,
+						"max": 3
+					},
+					"requireCredential": false
 				},
 				"route": {
 					"method": "POST",
 					"path": "/request-reset-password",
-					"operationId": "post___request-reset-password",
 					"tags": [
 						"reset password"
 					]
@@ -9726,12 +10107,12 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "reset-password"
+					"requestName": "reset-password",
+					"requireCredential": false
 				},
 				"route": {
 					"method": "POST",
 					"path": "/reset-password",
-					"operationId": "post___reset-password",
 					"tags": [
 						"reset password"
 					]
@@ -9773,12 +10154,12 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "username/available"
+					"requestName": "username/available",
+					"requireCredential": false
 				},
 				"route": {
 					"method": "POST",
 					"path": "/username/available",
-					"operationId": "post___username___available",
 					"tags": [
 						"users"
 					]
@@ -9823,12 +10204,12 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "verify-email"
+					"requestName": "verify-email",
+					"requireCredential": false
 				},
 				"route": {
 					"method": "POST",
 					"path": "/verify-email",
-					"operationId": "post___verify-email",
 					"tags": [
 						"account"
 					]
@@ -9881,12 +10262,15 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "admin/abuse-report/notification-recipient/create"
+					"requestName": "admin/abuse-report/notification-recipient/create",
+					"requireCredential": true,
+					"requireModerator": true,
+					"secure": true,
+					"kind": "write:admin:abuse-report:notification-recipient"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/admin/abuse-report/notification-recipient/create",
-					"operationId": "post___admin___abuse-report___notification-recipient___create",
 					"tags": [
 						"admin",
 						"abuse-report",
@@ -9930,12 +10314,15 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "admin/abuse-report/notification-recipient/delete"
+					"requestName": "admin/abuse-report/notification-recipient/delete",
+					"requireCredential": true,
+					"requireModerator": true,
+					"secure": true,
+					"kind": "write:admin:abuse-report:notification-recipient"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/admin/abuse-report/notification-recipient/delete",
-					"operationId": "post___admin___abuse-report___notification-recipient___delete",
 					"tags": [
 						"admin",
 						"abuse-report",
@@ -9980,12 +10367,15 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "admin/abuse-report/notification-recipient/list"
+					"requestName": "admin/abuse-report/notification-recipient/list",
+					"requireCredential": true,
+					"requireModerator": true,
+					"secure": true,
+					"kind": "read:admin:abuse-report:notification-recipient"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/admin/abuse-report/notification-recipient/list",
-					"operationId": "post___admin___abuse-report___notification-recipient___list",
 					"tags": [
 						"admin",
 						"abuse-report",
@@ -10032,12 +10422,15 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "admin/abuse-report/notification-recipient/show"
+					"requestName": "admin/abuse-report/notification-recipient/show",
+					"requireCredential": true,
+					"requireModerator": true,
+					"secure": true,
+					"kind": "read:admin:abuse-report:notification-recipient"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/admin/abuse-report/notification-recipient/show",
-					"operationId": "post___admin___abuse-report___notification-recipient___show",
 					"tags": [
 						"admin",
 						"abuse-report",
@@ -10090,12 +10483,15 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "admin/abuse-report/notification-recipient/update"
+					"requestName": "admin/abuse-report/notification-recipient/update",
+					"requireCredential": true,
+					"requireModerator": true,
+					"secure": true,
+					"kind": "write:admin:abuse-report:notification-recipient"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/admin/abuse-report/notification-recipient/update",
-					"operationId": "post___admin___abuse-report___notification-recipient___update",
 					"tags": [
 						"admin",
 						"abuse-report",
@@ -10139,12 +10535,14 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "admin/abuse-user-reports"
+					"requestName": "admin/abuse-user-reports",
+					"requireCredential": true,
+					"requireModerator": true,
+					"kind": "read:admin:abuse-user-reports"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/admin/abuse-user-reports",
-					"operationId": "post___admin___abuse-user-reports",
 					"tags": [
 						"admin"
 					]
@@ -10189,12 +10587,14 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "admin/forward-abuse-user-report"
+					"requestName": "admin/forward-abuse-user-report",
+					"requireCredential": true,
+					"requireModerator": true,
+					"kind": "write:admin:resolve-abuse-user-report"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/admin/forward-abuse-user-report",
-					"operationId": "post___admin___forward-abuse-user-report",
 					"tags": [
 						"admin"
 					],
@@ -10237,12 +10637,14 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "admin/get-user-ips"
+					"requestName": "admin/get-user-ips",
+					"requireCredential": true,
+					"requireAdmin": true,
+					"kind": "read:admin:user-ips"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/admin/get-user-ips",
-					"operationId": "post___admin___get-user-ips",
 					"tags": [
 						"admin"
 					]
@@ -10287,12 +10689,14 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "admin/resolve-abuse-user-report"
+					"requestName": "admin/resolve-abuse-user-report",
+					"requireCredential": true,
+					"requireModerator": true,
+					"kind": "write:admin:resolve-abuse-user-report"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/admin/resolve-abuse-user-report",
-					"operationId": "post___admin___resolve-abuse-user-report",
 					"tags": [
 						"admin"
 					],
@@ -10335,12 +10739,14 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "admin/show-moderation-logs"
+					"requestName": "admin/show-moderation-logs",
+					"requireCredential": true,
+					"requireAdmin": true,
+					"kind": "read:admin:show-moderation-log"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/admin/show-moderation-logs",
-					"operationId": "post___admin___show-moderation-logs",
 					"tags": [
 						"admin"
 					]
@@ -10382,12 +10788,14 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "admin/show-user"
+					"requestName": "admin/show-user",
+					"requireCredential": true,
+					"requireModerator": true,
+					"kind": "read:admin:show-user"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/admin/show-user",
-					"operationId": "post___admin___show-user",
 					"tags": [
 						"admin"
 					]
@@ -10429,12 +10837,14 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "admin/show-users"
+					"requestName": "admin/show-users",
+					"requireCredential": true,
+					"requireModerator": true,
+					"kind": "read:admin:show-user"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/admin/show-users",
-					"operationId": "post___admin___show-users",
 					"tags": [
 						"admin"
 					]
@@ -10476,12 +10886,14 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "admin/suspend-user"
+					"requestName": "admin/suspend-user",
+					"requireCredential": true,
+					"requireModerator": true,
+					"kind": "write:admin:suspend-user"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/admin/suspend-user",
-					"operationId": "post___admin___suspend-user",
 					"tags": [
 						"admin"
 					],
@@ -10524,12 +10936,14 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "admin/unset-user-avatar"
+					"requestName": "admin/unset-user-avatar",
+					"requireCredential": true,
+					"requireModerator": true,
+					"kind": "write:admin:unset-user-avatar"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/admin/unset-user-avatar",
-					"operationId": "post___admin___unset-user-avatar",
 					"tags": [
 						"admin"
 					],
@@ -10572,12 +10986,14 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "admin/unset-user-banner"
+					"requestName": "admin/unset-user-banner",
+					"requireCredential": true,
+					"requireModerator": true,
+					"kind": "write:admin:unset-user-banner"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/admin/unset-user-banner",
-					"operationId": "post___admin___unset-user-banner",
 					"tags": [
 						"admin"
 					],
@@ -10620,12 +11036,14 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "admin/unsuspend-user"
+					"requestName": "admin/unsuspend-user",
+					"requireCredential": true,
+					"requireModerator": true,
+					"kind": "write:admin:unsuspend-user"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/admin/unsuspend-user",
-					"operationId": "post___admin___unsuspend-user",
 					"tags": [
 						"admin"
 					],
@@ -10671,12 +11089,14 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "admin/update-abuse-user-report"
+					"requestName": "admin/update-abuse-user-report",
+					"requireCredential": true,
+					"requireModerator": true,
+					"kind": "write:admin:resolve-abuse-user-report"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/admin/update-abuse-user-report",
-					"operationId": "post___admin___update-abuse-user-report",
 					"tags": [
 						"admin"
 					],
@@ -10719,12 +11139,14 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "admin/update-user-note"
+					"requestName": "admin/update-user-note",
+					"requireCredential": true,
+					"requireModerator": true,
+					"kind": "write:admin:user-note"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/admin/update-user-note",
-					"operationId": "post___admin___update-user-note",
 					"tags": [
 						"admin"
 					],
@@ -10776,12 +11198,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "users/report-abuse"
+					"requestName": "users/report-abuse",
+					"requireCredential": true,
+					"kind": "write:report-abuse"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/users/report-abuse",
-					"operationId": "post___users___report-abuse",
 					"tags": [
 						"users"
 					],
@@ -10832,12 +11255,14 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "admin/roles/assign"
+					"requestName": "admin/roles/assign",
+					"requireCredential": true,
+					"requireModerator": true,
+					"kind": "write:admin:roles"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/admin/roles/assign",
-					"operationId": "post___admin___roles___assign",
 					"tags": [
 						"admin",
 						"role"
@@ -10881,12 +11306,14 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "admin/roles/create"
+					"requestName": "admin/roles/create",
+					"requireCredential": true,
+					"requireAdmin": true,
+					"kind": "write:admin:roles"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/admin/roles/create",
-					"operationId": "post___admin___roles___create",
 					"tags": [
 						"admin",
 						"role"
@@ -10932,12 +11359,14 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "admin/roles/delete"
+					"requestName": "admin/roles/delete",
+					"requireCredential": true,
+					"requireAdmin": true,
+					"kind": "write:admin:roles"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/admin/roles/delete",
-					"operationId": "post___admin___roles___delete",
 					"tags": [
 						"admin",
 						"role"
@@ -10981,12 +11410,14 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "admin/roles/list"
+					"requestName": "admin/roles/list",
+					"requireCredential": true,
+					"requireModerator": true,
+					"kind": "read:admin:roles"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/admin/roles/list",
-					"operationId": "post___admin___roles___list",
 					"tags": [
 						"admin",
 						"role"
@@ -11032,12 +11463,14 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "admin/roles/show"
+					"requestName": "admin/roles/show",
+					"requireCredential": true,
+					"requireModerator": true,
+					"kind": "read:admin:roles"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/admin/roles/show",
-					"operationId": "post___admin___roles___show",
 					"tags": [
 						"admin",
 						"role"
@@ -11089,12 +11522,14 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "admin/roles/unassign"
+					"requestName": "admin/roles/unassign",
+					"requireCredential": true,
+					"requireModerator": true,
+					"kind": "write:admin:roles"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/admin/roles/unassign",
-					"operationId": "post___admin___roles___unassign",
 					"tags": [
 						"admin",
 						"role"
@@ -11141,12 +11576,14 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "admin/roles/update"
+					"requestName": "admin/roles/update",
+					"requireCredential": true,
+					"requireAdmin": true,
+					"kind": "write:admin:roles"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/admin/roles/update",
-					"operationId": "post___admin___roles___update",
 					"tags": [
 						"admin",
 						"role"
@@ -11190,12 +11627,14 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "admin/roles/update-default-policies"
+					"requestName": "admin/roles/update-default-policies",
+					"requireCredential": true,
+					"requireAdmin": true,
+					"kind": "write:admin:roles"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/admin/roles/update-default-policies",
-					"operationId": "post___admin___roles___update-default-policies",
 					"tags": [
 						"admin",
 						"role"
@@ -11242,12 +11681,14 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "admin/roles/users"
+					"requestName": "admin/roles/users",
+					"requireCredential": false,
+					"requireModerator": true,
+					"kind": "read:admin:roles"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/admin/roles/users",
-					"operationId": "post___admin___roles___users",
 					"tags": [
 						"admin",
 						"role",
@@ -11291,12 +11732,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "roles/list"
+					"requestName": "roles/list",
+					"requireCredential": true,
+					"kind": "read:account"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/roles/list",
-					"operationId": "post___roles___list",
 					"tags": [
 						"role"
 					]
@@ -11341,12 +11783,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "roles/notes"
+					"requestName": "roles/notes",
+					"requireCredential": true,
+					"kind": "read:account"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/roles/notes",
-					"operationId": "post___roles___notes",
 					"tags": [
 						"role",
 						"notes"
@@ -11392,12 +11835,12 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "roles/show"
+					"requestName": "roles/show",
+					"requireCredential": false
 				},
 				"route": {
 					"method": "POST",
 					"path": "/roles/show",
-					"operationId": "post___roles___show",
 					"tags": [
 						"role",
 						"users"
@@ -11443,12 +11886,12 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "roles/users"
+					"requestName": "roles/users",
+					"requireCredential": false
 				},
 				"route": {
 					"method": "POST",
 					"path": "/roles/users",
-					"operationId": "post___roles___users",
 					"tags": [
 						"role",
 						"users"
@@ -11500,7 +11943,6 @@ export default {
 				"route": {
 					"method": "POST",
 					"path": "/server-info",
-					"operationId": "post___server-info",
 					"tags": [
 						"meta"
 					]
@@ -11545,7 +11987,6 @@ export default {
 				"route": {
 					"method": "GET",
 					"path": "/server-info",
-					"operationId": "get___server-info",
 					"tags": [
 						"meta"
 					]
@@ -11588,12 +12029,14 @@ export default {
 				},
 				"meta": {
 					"requestName": "admin/ad/create",
-					"allowGet": false
+					"allowGet": false,
+					"requireCredential": true,
+					"requireModerator": true,
+					"kind": "write:admin:ad"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/admin/ad/create",
-					"operationId": "post___admin___ad___create",
 					"tags": [
 						"admin"
 					]
@@ -11639,12 +12082,14 @@ export default {
 				},
 				"meta": {
 					"requestName": "admin/ad/delete",
-					"allowGet": false
+					"allowGet": false,
+					"requireCredential": true,
+					"requireModerator": true,
+					"kind": "write:admin:ad"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/admin/ad/delete",
-					"operationId": "post___admin___ad___delete",
 					"tags": [
 						"admin"
 					],
@@ -11688,12 +12133,14 @@ export default {
 				},
 				"meta": {
 					"requestName": "admin/ad/list",
-					"allowGet": false
+					"allowGet": false,
+					"requireCredential": true,
+					"requireModerator": true,
+					"kind": "read:admin:ad"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/admin/ad/list",
-					"operationId": "post___admin___ad___list",
 					"tags": [
 						"admin"
 					]
@@ -11739,12 +12186,14 @@ export default {
 				},
 				"meta": {
 					"requestName": "admin/ad/update",
-					"allowGet": false
+					"allowGet": false,
+					"requireCredential": true,
+					"requireModerator": true,
+					"kind": "write:admin:ad"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/admin/ad/update",
-					"operationId": "post___admin___ad___update",
 					"tags": [
 						"admin"
 					],
@@ -11788,12 +12237,14 @@ export default {
 				},
 				"meta": {
 					"requestName": "admin/meta",
-					"allowGet": false
+					"allowGet": false,
+					"requireCredential": true,
+					"requireAdmin": true,
+					"kind": "read:admin:meta"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/admin/meta",
-					"operationId": "post___admin___meta",
 					"tags": [
 						"meta"
 					]
@@ -11836,12 +12287,14 @@ export default {
 				},
 				"meta": {
 					"requestName": "admin/server-info",
-					"allowGet": false
+					"allowGet": false,
+					"requireCredential": true,
+					"requireModerator": true,
+					"kind": "read:admin:server-info"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/admin/server-info",
-					"operationId": "post___admin___server-info",
 					"tags": [
 						"admin",
 						"meta"
@@ -11885,12 +12338,14 @@ export default {
 				},
 				"meta": {
 					"requestName": "admin/update-meta",
-					"allowGet": false
+					"allowGet": false,
+					"requireCredential": true,
+					"requireAdmin": true,
+					"kind": "write:admin:meta"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/admin/update-meta",
-					"operationId": "post___admin___update-meta",
 					"tags": [
 						"admin"
 					],
@@ -11934,12 +12389,12 @@ export default {
 				},
 				"meta": {
 					"requestName": "endpoint",
-					"allowGet": false
+					"allowGet": false,
+					"requireCredential": false
 				},
 				"route": {
 					"method": "POST",
 					"path": "/endpoint",
-					"operationId": "post___endpoint",
 					"tags": [
 						"meta"
 					]
@@ -11982,12 +12437,12 @@ export default {
 				},
 				"meta": {
 					"requestName": "endpoints",
-					"allowGet": false
+					"allowGet": false,
+					"requireCredential": false
 				},
 				"route": {
 					"method": "POST",
 					"path": "/endpoints",
-					"operationId": "post___endpoints",
 					"tags": [
 						"meta"
 					]
@@ -12031,12 +12486,12 @@ export default {
 				"meta": {
 					"requestName": "get-online-users-count",
 					"allowGet": true,
-					"cacheSec": 60
+					"cacheSec": 60,
+					"requireCredential": false
 				},
 				"route": {
 					"method": "POST",
 					"path": "/get-online-users-count",
-					"operationId": "post___get-online-users-count",
 					"tags": [
 						"meta"
 					]
@@ -12083,7 +12538,6 @@ export default {
 				"route": {
 					"method": "GET",
 					"path": "/get-online-users-count",
-					"operationId": "get___get-online-users-count",
 					"tags": [
 						"meta"
 					]
@@ -12126,12 +12580,12 @@ export default {
 				},
 				"meta": {
 					"requestName": "meta",
-					"allowGet": false
+					"allowGet": false,
+					"requireCredential": false
 				},
 				"route": {
 					"method": "POST",
 					"path": "/meta",
-					"operationId": "post___meta",
 					"tags": [
 						"meta"
 					]
@@ -12174,12 +12628,12 @@ export default {
 				},
 				"meta": {
 					"requestName": "ping",
-					"allowGet": false
+					"allowGet": false,
+					"requireCredential": false
 				},
 				"route": {
 					"method": "POST",
 					"path": "/ping",
-					"operationId": "post___ping",
 					"tags": [
 						"meta"
 					]
@@ -12222,12 +12676,12 @@ export default {
 				},
 				"meta": {
 					"requestName": "pinned-users",
-					"allowGet": false
+					"allowGet": false,
+					"requireCredential": false
 				},
 				"route": {
 					"method": "POST",
 					"path": "/pinned-users",
-					"operationId": "post___pinned-users",
 					"tags": [
 						"users"
 					]
@@ -12273,12 +12727,12 @@ export default {
 				"meta": {
 					"requestName": "charts/active-users",
 					"allowGet": true,
-					"cacheSec": 3600
+					"cacheSec": 3600,
+					"requireCredential": false
 				},
 				"route": {
 					"method": "POST",
 					"path": "/charts/active-users",
-					"operationId": "post___charts___active-users",
 					"tags": [
 						"charts",
 						"users"
@@ -12327,7 +12781,6 @@ export default {
 				"route": {
 					"method": "GET",
 					"path": "/charts/active-users",
-					"operationId": "get___charts___active-users",
 					"tags": [
 						"charts",
 						"users"
@@ -12372,12 +12825,12 @@ export default {
 				"meta": {
 					"requestName": "charts/ap-request",
 					"allowGet": true,
-					"cacheSec": 3600
+					"cacheSec": 3600,
+					"requireCredential": false
 				},
 				"route": {
 					"method": "POST",
 					"path": "/charts/ap-request",
-					"operationId": "post___charts___ap-request",
 					"tags": [
 						"charts"
 					]
@@ -12425,7 +12878,6 @@ export default {
 				"route": {
 					"method": "GET",
 					"path": "/charts/ap-request",
-					"operationId": "get___charts___ap-request",
 					"tags": [
 						"charts"
 					]
@@ -12469,12 +12921,12 @@ export default {
 				"meta": {
 					"requestName": "charts/drive",
 					"allowGet": true,
-					"cacheSec": 3600
+					"cacheSec": 3600,
+					"requireCredential": false
 				},
 				"route": {
 					"method": "POST",
 					"path": "/charts/drive",
-					"operationId": "post___charts___drive",
 					"tags": [
 						"charts",
 						"drive"
@@ -12523,7 +12975,6 @@ export default {
 				"route": {
 					"method": "GET",
 					"path": "/charts/drive",
-					"operationId": "get___charts___drive",
 					"tags": [
 						"charts",
 						"drive"
@@ -12568,12 +13019,12 @@ export default {
 				"meta": {
 					"requestName": "charts/federation",
 					"allowGet": true,
-					"cacheSec": 3600
+					"cacheSec": 3600,
+					"requireCredential": false
 				},
 				"route": {
 					"method": "POST",
 					"path": "/charts/federation",
-					"operationId": "post___charts___federation",
 					"tags": [
 						"charts"
 					]
@@ -12621,7 +13072,6 @@ export default {
 				"route": {
 					"method": "GET",
 					"path": "/charts/federation",
-					"operationId": "get___charts___federation",
 					"tags": [
 						"charts"
 					]
@@ -12665,12 +13115,12 @@ export default {
 				"meta": {
 					"requestName": "charts/instance",
 					"allowGet": true,
-					"cacheSec": 3600
+					"cacheSec": 3600,
+					"requireCredential": false
 				},
 				"route": {
 					"method": "POST",
 					"path": "/charts/instance",
-					"operationId": "post___charts___instance",
 					"tags": [
 						"charts"
 					]
@@ -12718,7 +13168,6 @@ export default {
 				"route": {
 					"method": "GET",
 					"path": "/charts/instance",
-					"operationId": "get___charts___instance",
 					"tags": [
 						"charts"
 					]
@@ -12762,12 +13211,12 @@ export default {
 				"meta": {
 					"requestName": "charts/notes",
 					"allowGet": true,
-					"cacheSec": 3600
+					"cacheSec": 3600,
+					"requireCredential": false
 				},
 				"route": {
 					"method": "POST",
 					"path": "/charts/notes",
-					"operationId": "post___charts___notes",
 					"tags": [
 						"charts",
 						"notes"
@@ -12816,7 +13265,6 @@ export default {
 				"route": {
 					"method": "GET",
 					"path": "/charts/notes",
-					"operationId": "get___charts___notes",
 					"tags": [
 						"charts",
 						"notes"
@@ -12861,12 +13309,12 @@ export default {
 				"meta": {
 					"requestName": "charts/user/drive",
 					"allowGet": true,
-					"cacheSec": 3600
+					"cacheSec": 3600,
+					"requireCredential": false
 				},
 				"route": {
 					"method": "POST",
 					"path": "/charts/user/drive",
-					"operationId": "post___charts___user___drive",
 					"tags": [
 						"charts",
 						"drive",
@@ -12916,7 +13364,6 @@ export default {
 				"route": {
 					"method": "GET",
 					"path": "/charts/user/drive",
-					"operationId": "get___charts___user___drive",
 					"tags": [
 						"charts",
 						"drive",
@@ -12962,12 +13409,12 @@ export default {
 				"meta": {
 					"requestName": "charts/user/following",
 					"allowGet": true,
-					"cacheSec": 3600
+					"cacheSec": 3600,
+					"requireCredential": false
 				},
 				"route": {
 					"method": "POST",
 					"path": "/charts/user/following",
-					"operationId": "post___charts___user___following",
 					"tags": [
 						"charts",
 						"users",
@@ -13017,7 +13464,6 @@ export default {
 				"route": {
 					"method": "GET",
 					"path": "/charts/user/following",
-					"operationId": "get___charts___user___following",
 					"tags": [
 						"charts",
 						"users",
@@ -13063,12 +13509,12 @@ export default {
 				"meta": {
 					"requestName": "charts/user/notes",
 					"allowGet": true,
-					"cacheSec": 3600
+					"cacheSec": 3600,
+					"requireCredential": false
 				},
 				"route": {
 					"method": "POST",
 					"path": "/charts/user/notes",
-					"operationId": "post___charts___user___notes",
 					"tags": [
 						"charts",
 						"users",
@@ -13118,7 +13564,6 @@ export default {
 				"route": {
 					"method": "GET",
 					"path": "/charts/user/notes",
-					"operationId": "get___charts___user___notes",
 					"tags": [
 						"charts",
 						"users",
@@ -13164,12 +13609,12 @@ export default {
 				"meta": {
 					"requestName": "charts/user/pv",
 					"allowGet": true,
-					"cacheSec": 3600
+					"cacheSec": 3600,
+					"requireCredential": false
 				},
 				"route": {
 					"method": "POST",
 					"path": "/charts/user/pv",
-					"operationId": "post___charts___user___pv",
 					"tags": [
 						"charts",
 						"users"
@@ -13218,7 +13663,6 @@ export default {
 				"route": {
 					"method": "GET",
 					"path": "/charts/user/pv",
-					"operationId": "get___charts___user___pv",
 					"tags": [
 						"charts",
 						"users"
@@ -13263,12 +13707,12 @@ export default {
 				"meta": {
 					"requestName": "charts/user/reactions",
 					"allowGet": true,
-					"cacheSec": 3600
+					"cacheSec": 3600,
+					"requireCredential": false
 				},
 				"route": {
 					"method": "POST",
 					"path": "/charts/user/reactions",
-					"operationId": "post___charts___user___reactions",
 					"tags": [
 						"charts",
 						"users",
@@ -13318,7 +13762,6 @@ export default {
 				"route": {
 					"method": "GET",
 					"path": "/charts/user/reactions",
-					"operationId": "get___charts___user___reactions",
 					"tags": [
 						"charts",
 						"users",
@@ -13364,12 +13807,12 @@ export default {
 				"meta": {
 					"requestName": "charts/users",
 					"allowGet": true,
-					"cacheSec": 3600
+					"cacheSec": 3600,
+					"requireCredential": false
 				},
 				"route": {
 					"method": "POST",
 					"path": "/charts/users",
-					"operationId": "post___charts___users",
 					"tags": [
 						"charts",
 						"users"
@@ -13418,7 +13861,6 @@ export default {
 				"route": {
 					"method": "GET",
 					"path": "/charts/users",
-					"operationId": "get___charts___users",
 					"tags": [
 						"charts",
 						"users"
@@ -13463,12 +13905,12 @@ export default {
 				"meta": {
 					"requestName": "retention",
 					"allowGet": true,
-					"cacheSec": 3600
+					"cacheSec": 3600,
+					"requireCredential": false
 				},
 				"route": {
 					"method": "POST",
 					"path": "/retention",
-					"operationId": "post___retention",
 					"tags": [
 						"users"
 					]
@@ -13516,7 +13958,6 @@ export default {
 				"route": {
 					"method": "GET",
 					"path": "/retention",
-					"operationId": "get___retention",
 					"tags": [
 						"users"
 					]
@@ -13558,12 +13999,12 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "stats"
+					"requestName": "stats",
+					"requireCredential": false
 				},
 				"route": {
 					"method": "POST",
 					"path": "/stats",
-					"operationId": "post___stats",
 					"tags": [
 						"meta"
 					]
@@ -13607,12 +14048,12 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "hashtags/list"
+					"requestName": "hashtags/list",
+					"requireCredential": false
 				},
 				"route": {
 					"method": "POST",
 					"path": "/hashtags/list",
-					"operationId": "post___hashtags___list",
 					"tags": [
 						"hashtags"
 					]
@@ -13654,12 +14095,12 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "hashtags/search"
+					"requestName": "hashtags/search",
+					"requireCredential": false
 				},
 				"route": {
 					"method": "POST",
 					"path": "/hashtags/search",
-					"operationId": "post___hashtags___search",
 					"tags": [
 						"hashtags"
 					]
@@ -13704,12 +14145,12 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "hashtags/show"
+					"requestName": "hashtags/show",
+					"requireCredential": false
 				},
 				"route": {
 					"method": "POST",
 					"path": "/hashtags/show",
-					"operationId": "post___hashtags___show",
 					"tags": [
 						"hashtags"
 					]
@@ -13753,12 +14194,12 @@ export default {
 				"meta": {
 					"requestName": "hashtags/trend",
 					"allowGet": true,
-					"cacheSec": 60
+					"cacheSec": 60,
+					"requireCredential": false
 				},
 				"route": {
 					"method": "POST",
 					"path": "/hashtags/trend",
-					"operationId": "post___hashtags___trend",
 					"tags": [
 						"hashtags"
 					]
@@ -13803,7 +14244,6 @@ export default {
 				"route": {
 					"method": "GET",
 					"path": "/hashtags/trend",
-					"operationId": "get___hashtags___trend",
 					"tags": [
 						"hashtags"
 					]
@@ -13845,12 +14285,12 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "hashtags/users"
+					"requestName": "hashtags/users",
+					"requireCredential": false
 				},
 				"route": {
 					"method": "POST",
 					"path": "/hashtags/users",
-					"operationId": "post___hashtags___users",
 					"tags": [
 						"hashtags",
 						"users"
@@ -13895,12 +14335,12 @@ export default {
 				"meta": {
 					"requestName": "notes/featured",
 					"allowGet": true,
-					"cacheSec": 3600
+					"cacheSec": 3600,
+					"requireCredential": false
 				},
 				"route": {
 					"method": "POST",
 					"path": "/notes/featured",
-					"operationId": "post___notes___featured",
 					"tags": [
 						"notes"
 					]
@@ -13945,7 +14385,6 @@ export default {
 				"route": {
 					"method": "GET",
 					"path": "/notes/featured",
-					"operationId": "get___notes___featured",
 					"tags": [
 						"notes"
 					]
@@ -13987,12 +14426,12 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "notes/search-by-tag"
+					"requestName": "notes/search-by-tag",
+					"requireCredential": false
 				},
 				"route": {
 					"method": "POST",
 					"path": "/notes/search-by-tag",
-					"operationId": "post___notes___search-by-tag",
 					"tags": [
 						"notes",
 						"hashtags"
@@ -14037,12 +14476,12 @@ export default {
 				"meta": {
 					"requestName": "users/featured-notes",
 					"allowGet": true,
-					"cacheSec": 3600
+					"cacheSec": 3600,
+					"requireCredential": false
 				},
 				"route": {
 					"method": "POST",
 					"path": "/users/featured-notes",
-					"operationId": "post___users___featured-notes",
 					"tags": [
 						"notes"
 					]
@@ -14087,7 +14526,6 @@ export default {
 				"route": {
 					"method": "GET",
 					"path": "/users/featured-notes",
-					"operationId": "get___users___featured-notes",
 					"tags": [
 						"notes"
 					]
@@ -14132,12 +14570,12 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "users/get-frequently-replied-users"
+					"requestName": "users/get-frequently-replied-users",
+					"requireCredential": false
 				},
 				"route": {
 					"method": "POST",
 					"path": "/users/get-frequently-replied-users",
-					"operationId": "post___users___get-frequently-replied-users",
 					"tags": [
 						"users"
 					],
@@ -14180,12 +14618,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "users/recommendation"
+					"requestName": "users/recommendation",
+					"requireCredential": true,
+					"kind": "read:account"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/users/recommendation",
-					"operationId": "post___users___recommendation",
 					"tags": [
 						"users"
 					],
@@ -14228,12 +14667,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "users/search"
+					"requestName": "users/search",
+					"requiredRolePolicy": "canSearchUsers",
+					"requireCredential": false
 				},
 				"route": {
 					"method": "POST",
 					"path": "/users/search",
-					"operationId": "post___users___search",
 					"tags": [
 						"users"
 					],
@@ -14276,12 +14716,12 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "users/search-by-username-and-host"
+					"requestName": "users/search-by-username-and-host",
+					"requireCredential": false
 				},
 				"route": {
 					"method": "POST",
 					"path": "/users/search-by-username-and-host",
-					"operationId": "post___users___search-by-username-and-host",
 					"tags": [
 						"users"
 					],
@@ -14326,12 +14766,14 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "admin/announcements/create"
+					"requestName": "admin/announcements/create",
+					"requireCredential": true,
+					"requireModerator": true,
+					"kind": "write:admin:announcements"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/admin/announcements/create",
-					"operationId": "post___admin___announcements___create",
 					"tags": [
 						"admin"
 					]
@@ -14376,12 +14818,14 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "admin/announcements/delete"
+					"requestName": "admin/announcements/delete",
+					"requireCredential": true,
+					"requireModerator": true,
+					"kind": "write:admin:announcements"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/admin/announcements/delete",
-					"operationId": "post___admin___announcements___delete",
 					"tags": [
 						"admin"
 					],
@@ -14424,12 +14868,14 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "admin/announcements/list"
+					"requestName": "admin/announcements/list",
+					"requireCredential": true,
+					"requireModerator": true,
+					"kind": "read:admin:announcements"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/admin/announcements/list",
-					"operationId": "post___admin___announcements___list",
 					"tags": [
 						"admin"
 					]
@@ -14474,12 +14920,14 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "admin/announcements/update"
+					"requestName": "admin/announcements/update",
+					"requireCredential": true,
+					"requireModerator": true,
+					"kind": "write:admin:announcements"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/admin/announcements/update",
-					"operationId": "post___admin___announcements___update",
 					"tags": [
 						"admin"
 					],
@@ -14522,12 +14970,12 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "announcements"
+					"requestName": "announcements",
+					"requireCredential": false
 				},
 				"route": {
 					"method": "POST",
 					"path": "/announcements",
-					"operationId": "post___announcements",
 					"tags": [
 						"meta"
 					]
@@ -14572,12 +15020,12 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "announcements/show"
+					"requestName": "announcements/show",
+					"requireCredential": false
 				},
 				"route": {
 					"method": "POST",
 					"path": "/announcements/show",
-					"operationId": "post___announcements___show",
 					"tags": [
 						"meta"
 					]
@@ -14619,12 +15067,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "i/read-announcement"
+					"requestName": "i/read-announcement",
+					"requireCredential": true,
+					"kind": "write:account"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/i/read-announcement",
-					"operationId": "post___i___read-announcement",
 					"tags": [
 						"account"
 					],
@@ -14677,7 +15126,6 @@ export default {
 				"route": {
 					"method": "POST",
 					"path": "/admin/avatar-decorations/create",
-					"operationId": "post___admin___avatar-decorations___create",
 					"tags": [
 						"admin"
 					]
@@ -14727,7 +15175,6 @@ export default {
 				"route": {
 					"method": "POST",
 					"path": "/admin/avatar-decorations/delete",
-					"operationId": "post___admin___avatar-decorations___delete",
 					"tags": [
 						"admin"
 					],
@@ -14778,7 +15225,6 @@ export default {
 				"route": {
 					"method": "POST",
 					"path": "/admin/avatar-decorations/list",
-					"operationId": "post___admin___avatar-decorations___list",
 					"tags": [
 						"admin"
 					]
@@ -14828,7 +15274,6 @@ export default {
 				"route": {
 					"method": "POST",
 					"path": "/admin/avatar-decorations/update",
-					"operationId": "post___admin___avatar-decorations___update",
 					"tags": [
 						"admin"
 					],
@@ -14877,7 +15322,6 @@ export default {
 				"route": {
 					"method": "POST",
 					"path": "/get-avatar-decorations",
-					"operationId": "post___get-avatar-decorations",
 					"tags": [
 						"users"
 					]
@@ -14924,12 +15368,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "i/registry/get"
+					"requestName": "i/registry/get",
+					"requireCredential": true,
+					"kind": "read:account"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/i/registry/get",
-					"operationId": "post___i___registry___get",
 					"tags": [
 						"account"
 					]
@@ -14971,12 +15416,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "i/registry/get-all"
+					"requestName": "i/registry/get-all",
+					"requireCredential": true,
+					"kind": "read:account"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/i/registry/get-all",
-					"operationId": "post___i___registry___get-all",
 					"tags": [
 						"account"
 					]
@@ -15021,12 +15467,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "i/registry/get-detail"
+					"requestName": "i/registry/get-detail",
+					"requireCredential": true,
+					"kind": "read:account"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/i/registry/get-detail",
-					"operationId": "post___i___registry___get-detail",
 					"tags": [
 						"account"
 					]
@@ -15068,12 +15515,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "i/registry/keys"
+					"requestName": "i/registry/keys",
+					"requireCredential": true,
+					"kind": "read:account"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/i/registry/keys",
-					"operationId": "post___i___registry___keys",
 					"tags": [
 						"account"
 					]
@@ -15115,12 +15563,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "i/registry/keys-with-type"
+					"requestName": "i/registry/keys-with-type",
+					"requireCredential": true,
+					"kind": "read:account"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/i/registry/keys-with-type",
-					"operationId": "post___i___registry___keys-with-type",
 					"tags": [
 						"account"
 					]
@@ -15165,12 +15614,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "i/registry/remove"
+					"requestName": "i/registry/remove",
+					"requireCredential": true,
+					"kind": "write:account"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/i/registry/remove",
-					"operationId": "post___i___registry___remove",
 					"tags": [
 						"account"
 					],
@@ -15213,12 +15663,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "i/registry/scopes-with-domain"
+					"requestName": "i/registry/scopes-with-domain",
+					"requireCredential": true,
+					"secure": true
 				},
 				"route": {
 					"method": "POST",
 					"path": "/i/registry/scopes-with-domain",
-					"operationId": "post___i___registry___scopes-with-domain",
 					"tags": [
 						"account"
 					]
@@ -15260,12 +15711,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "i/registry/set"
+					"requestName": "i/registry/set",
+					"requireCredential": true,
+					"kind": "write:account"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/i/registry/set",
-					"operationId": "post___i___registry___set",
 					"tags": [
 						"account"
 					],
@@ -15319,12 +15771,14 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "admin/emoji/add"
+					"requestName": "admin/emoji/add",
+					"requireCredential": true,
+					"requiredRolePolicy": "canManageCustomEmojis",
+					"kind": "write:admin:emoji"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/admin/emoji/add",
-					"operationId": "post___admin___emoji___add",
 					"tags": [
 						"admin"
 					]
@@ -15366,12 +15820,14 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "admin/emoji/add-aliases-bulk"
+					"requestName": "admin/emoji/add-aliases-bulk",
+					"requireCredential": true,
+					"requiredRolePolicy": "canManageCustomEmojis",
+					"kind": "write:admin:emoji"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/admin/emoji/add-aliases-bulk",
-					"operationId": "post___admin___emoji___add-aliases-bulk",
 					"tags": [
 						"admin"
 					],
@@ -15420,12 +15876,14 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "admin/emoji/copy"
+					"requestName": "admin/emoji/copy",
+					"requireCredential": true,
+					"requiredRolePolicy": "canManageCustomEmojis",
+					"kind": "write:admin:emoji"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/admin/emoji/copy",
-					"operationId": "post___admin___emoji___copy",
 					"tags": [
 						"admin"
 					]
@@ -15470,12 +15928,14 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "admin/emoji/delete"
+					"requestName": "admin/emoji/delete",
+					"requireCredential": true,
+					"requiredRolePolicy": "canManageCustomEmojis",
+					"kind": "write:admin:emoji"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/admin/emoji/delete",
-					"operationId": "post___admin___emoji___delete",
 					"tags": [
 						"admin"
 					],
@@ -15518,12 +15978,14 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "admin/emoji/delete-bulk"
+					"requestName": "admin/emoji/delete-bulk",
+					"requireCredential": true,
+					"requiredRolePolicy": "canManageCustomEmojis",
+					"kind": "write:admin:emoji"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/admin/emoji/delete-bulk",
-					"operationId": "post___admin___emoji___delete-bulk",
 					"tags": [
 						"admin"
 					],
@@ -15566,12 +16028,14 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "admin/emoji/import-zip"
+					"requestName": "admin/emoji/import-zip",
+					"requireCredential": true,
+					"requireAdmin": true,
+					"secure": true
 				},
 				"route": {
 					"method": "POST",
 					"path": "/admin/emoji/import-zip",
-					"operationId": "post___admin___emoji___import-zip",
 					"tags": [
 						"admin"
 					],
@@ -15614,12 +16078,14 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "admin/emoji/list"
+					"requestName": "admin/emoji/list",
+					"requireCredential": true,
+					"requiredRolePolicy": "canManageCustomEmojis",
+					"kind": "read:admin:emoji"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/admin/emoji/list",
-					"operationId": "post___admin___emoji___list",
 					"tags": [
 						"admin"
 					]
@@ -15661,12 +16127,14 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "admin/emoji/list-remote"
+					"requestName": "admin/emoji/list-remote",
+					"requireCredential": true,
+					"requiredRolePolicy": "canManageCustomEmojis",
+					"kind": "read:admin:emoji"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/admin/emoji/list-remote",
-					"operationId": "post___admin___emoji___list-remote",
 					"tags": [
 						"admin"
 					]
@@ -15708,12 +16176,14 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "admin/emoji/remove-aliases-bulk"
+					"requestName": "admin/emoji/remove-aliases-bulk",
+					"requireCredential": true,
+					"requiredRolePolicy": "canManageCustomEmojis",
+					"kind": "write:admin:emoji"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/admin/emoji/remove-aliases-bulk",
-					"operationId": "post___admin___emoji___remove-aliases-bulk",
 					"tags": [
 						"admin"
 					],
@@ -15756,12 +16226,14 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "admin/emoji/set-aliases-bulk"
+					"requestName": "admin/emoji/set-aliases-bulk",
+					"requireCredential": true,
+					"requiredRolePolicy": "canManageCustomEmojis",
+					"kind": "write:admin:emoji"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/admin/emoji/set-aliases-bulk",
-					"operationId": "post___admin___emoji___set-aliases-bulk",
 					"tags": [
 						"admin"
 					],
@@ -15804,12 +16276,14 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "admin/emoji/set-category-bulk"
+					"requestName": "admin/emoji/set-category-bulk",
+					"requireCredential": true,
+					"requiredRolePolicy": "canManageCustomEmojis",
+					"kind": "write:admin:emoji"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/admin/emoji/set-category-bulk",
-					"operationId": "post___admin___emoji___set-category-bulk",
 					"tags": [
 						"admin"
 					],
@@ -15852,12 +16326,14 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "admin/emoji/set-license-bulk"
+					"requestName": "admin/emoji/set-license-bulk",
+					"requireCredential": true,
+					"requiredRolePolicy": "canManageCustomEmojis",
+					"kind": "write:admin:emoji"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/admin/emoji/set-license-bulk",
-					"operationId": "post___admin___emoji___set-license-bulk",
 					"tags": [
 						"admin"
 					],
@@ -15909,12 +16385,14 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "admin/emoji/update"
+					"requestName": "admin/emoji/update",
+					"requireCredential": true,
+					"requiredRolePolicy": "canManageCustomEmojis",
+					"kind": "write:admin:emoji"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/admin/emoji/update",
-					"operationId": "post___admin___emoji___update",
 					"tags": [
 						"admin"
 					],
@@ -15959,12 +16437,12 @@ export default {
 				"meta": {
 					"requestName": "emoji",
 					"allowGet": true,
-					"cacheSec": 3600
+					"cacheSec": 3600,
+					"requireCredential": false
 				},
 				"route": {
 					"method": "POST",
 					"path": "/emoji",
-					"operationId": "post___emoji",
 					"tags": [
 						"meta"
 					]
@@ -16008,12 +16486,12 @@ export default {
 				"meta": {
 					"requestName": "emojis",
 					"allowGet": true,
-					"cacheSec": 3600
+					"cacheSec": 3600,
+					"requireCredential": false
 				},
 				"route": {
 					"method": "POST",
 					"path": "/emojis",
-					"operationId": "post___emojis",
 					"tags": [
 						"meta"
 					]
@@ -16061,7 +16539,6 @@ export default {
 				"route": {
 					"method": "GET",
 					"path": "/emoji",
-					"operationId": "get___emoji",
 					"tags": [
 						"meta"
 					]
@@ -16109,7 +16586,6 @@ export default {
 				"route": {
 					"method": "GET",
 					"path": "/emojis",
-					"operationId": "get___emojis",
 					"tags": [
 						"meta"
 					]
@@ -16151,12 +16627,17 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "export-custom-emojis"
+					"requestName": "export-custom-emojis",
+					"requireCredential": true,
+					"secure": true,
+					"limit": {
+						"duration": 3600000,
+						"max": 1
+					}
 				},
 				"route": {
 					"method": "POST",
 					"path": "/export-custom-emojis",
-					"operationId": "post___export-custom-emojis",
 					"tags": [
 						"admin"
 					],
@@ -16199,12 +16680,14 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "v2/admin/emoji/list"
+					"requestName": "v2/admin/emoji/list",
+					"requireCredential": true,
+					"requiredRolePolicy": "canManageCustomEmojis",
+					"kind": "read:admin:emoji"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/v2/admin/emoji/list",
-					"operationId": "post___v2___admin___emoji___list",
 					"tags": [
 						"admin"
 					]
@@ -16248,12 +16731,17 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "i/notifications"
+					"requestName": "i/notifications",
+					"requireCredential": true,
+					"kind": "read:notifications",
+					"limit": {
+						"duration": 30000,
+						"max": 30
+					}
 				},
 				"route": {
 					"method": "POST",
 					"path": "/i/notifications",
-					"operationId": "post___i___notifications",
 					"tags": [
 						"account",
 						"notifications"
@@ -16296,12 +16784,17 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "i/notifications-grouped"
+					"requestName": "i/notifications-grouped",
+					"requireCredential": true,
+					"kind": "read:notifications",
+					"limit": {
+						"duration": 30000,
+						"max": 30
+					}
 				},
 				"route": {
 					"method": "POST",
 					"path": "/i/notifications-grouped",
-					"operationId": "post___i___notifications-grouped",
 					"tags": [
 						"account",
 						"notifications"
@@ -16344,12 +16837,17 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "notifications/create"
+					"requestName": "notifications/create",
+					"requireCredential": true,
+					"kind": "write:notifications",
+					"limit": {
+						"duration": 60000,
+						"max": 10
+					}
 				},
 				"route": {
 					"method": "POST",
 					"path": "/notifications/create",
-					"operationId": "post___notifications___create",
 					"tags": [
 						"notifications"
 					],
@@ -16392,12 +16890,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "notifications/flush"
+					"requestName": "notifications/flush",
+					"requireCredential": true,
+					"kind": "write:notifications"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/notifications/flush",
-					"operationId": "post___notifications___flush",
 					"tags": [
 						"notifications",
 						"account"
@@ -16441,12 +16940,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "notifications/mark-all-as-read"
+					"requestName": "notifications/mark-all-as-read",
+					"requireCredential": true,
+					"kind": "write:notifications"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/notifications/mark-all-as-read",
-					"operationId": "post___notifications___mark-all-as-read",
 					"tags": [
 						"notifications",
 						"account"
@@ -16490,12 +16990,17 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "notifications/test-notification"
+					"requestName": "notifications/test-notification",
+					"requireCredential": true,
+					"kind": "write:notifications",
+					"limit": {
+						"duration": 60000,
+						"max": 10
+					}
 				},
 				"route": {
 					"method": "POST",
 					"path": "/notifications/test-notification",
-					"operationId": "post___notifications___test-notification",
 					"tags": [
 						"notifications"
 					],
@@ -16541,12 +17046,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "sw/register"
+					"requestName": "sw/register",
+					"requireCredential": true,
+					"secure": true
 				},
 				"route": {
 					"method": "POST",
 					"path": "/sw/register",
-					"operationId": "post___sw___register",
 					"tags": [
 						"account"
 					],
@@ -16589,12 +17095,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "sw/show-registration"
+					"requestName": "sw/show-registration",
+					"requireCredential": true,
+					"secure": true
 				},
 				"route": {
 					"method": "POST",
 					"path": "/sw/show-registration",
-					"operationId": "post___sw___show-registration",
 					"tags": [
 						"account"
 					],
@@ -16637,12 +17144,16 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "sw/unregister"
+					"requestName": "sw/unregister",
+					"limit": {
+						"duration": 3600000,
+						"max": 30
+					},
+					"requireCredential": false
 				},
 				"route": {
 					"method": "POST",
 					"path": "/sw/unregister",
-					"operationId": "post___sw___unregister",
 					"tags": [
 						"account"
 					],
@@ -16689,12 +17200,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "sw/update-registration"
+					"requestName": "sw/update-registration",
+					"requireCredential": true,
+					"secure": true
 				},
 				"route": {
 					"method": "POST",
 					"path": "/sw/update-registration",
-					"operationId": "post___sw___update-registration",
 					"tags": [
 						"account"
 					],
@@ -16742,12 +17254,19 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "notes/delete"
+					"requestName": "notes/delete",
+					"requireCredential": true,
+					"kind": "write:notes",
+					"limit": {
+						"key": "notes/delete",
+						"duration": 3600000,
+						"max": 300,
+						"minInterval": 1000
+					}
 				},
 				"route": {
 					"method": "POST",
 					"path": "/notes/delete",
-					"operationId": "post___notes___delete",
 					"tags": [
 						"notes"
 					],
@@ -16797,12 +17316,14 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "admin/promo/create"
+					"requestName": "admin/promo/create",
+					"requireCredential": true,
+					"requireModerator": true,
+					"kind": "write:admin:promo"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/admin/promo/create",
-					"operationId": "post___admin___promo___create",
 					"tags": [
 						"admin"
 					],
@@ -16854,12 +17375,14 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "i/pin"
+					"requestName": "i/pin",
+					"requireCredential": true,
+					"prohibitMoved": true,
+					"kind": "write:account"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/i/pin",
-					"operationId": "post___i___pin",
 					"tags": [
 						"account",
 						"notes"
@@ -16905,12 +17428,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "i/unpin"
+					"requestName": "i/unpin",
+					"requireCredential": true,
+					"kind": "write:account"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/i/unpin",
-					"operationId": "post___i___unpin",
 					"tags": [
 						"account",
 						"notes"
@@ -16953,12 +17477,12 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "notes"
+					"requestName": "notes",
+					"requireCredential": false
 				},
 				"route": {
 					"method": "POST",
 					"path": "/notes",
-					"operationId": "post___notes",
 					"tags": [
 						"notes"
 					]
@@ -17000,12 +17524,12 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "notes/children"
+					"requestName": "notes/children",
+					"requireCredential": false
 				},
 				"route": {
 					"method": "POST",
 					"path": "/notes/children",
-					"operationId": "post___notes___children",
 					"tags": [
 						"notes"
 					]
@@ -17050,12 +17574,12 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "notes/conversation"
+					"requestName": "notes/conversation",
+					"requireCredential": false
 				},
 				"route": {
 					"method": "POST",
 					"path": "/notes/conversation",
-					"operationId": "post___notes___conversation",
 					"tags": [
 						"notes"
 					]
@@ -17139,12 +17663,18 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "notes/create"
+					"requestName": "notes/create",
+					"requireCredential": true,
+					"prohibitMoved": true,
+					"kind": "write:notes",
+					"limit": {
+						"duration": 3600000,
+						"max": 300
+					}
 				},
 				"route": {
 					"method": "POST",
 					"path": "/notes/create",
-					"operationId": "post___notes___create",
 					"tags": [
 						"notes"
 					]
@@ -17186,12 +17716,14 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "notes/drafts/list"
+					"requestName": "notes/drafts/list",
+					"requireCredential": true,
+					"prohibitMoved": true,
+					"kind": "read:account"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/notes/drafts/list",
-					"operationId": "post___notes___drafts___list",
 					"tags": [
 						"notes",
 						"drafts"
@@ -17291,12 +17823,18 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "notes/drafts/create"
+					"requestName": "notes/drafts/create",
+					"requireCredential": true,
+					"prohibitMoved": true,
+					"kind": "write:account",
+					"limit": {
+						"duration": 3600000,
+						"max": 300
+					}
 				},
 				"route": {
 					"method": "POST",
 					"path": "/notes/drafts/create",
-					"operationId": "post___notes___drafts___create",
 					"tags": [
 						"notes",
 						"drafts"
@@ -17342,12 +17880,14 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "notes/drafts/delete"
+					"requestName": "notes/drafts/delete",
+					"requireCredential": true,
+					"prohibitMoved": true,
+					"kind": "write:account"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/notes/drafts/delete",
-					"operationId": "post___notes___drafts___delete",
 					"tags": [
 						"notes",
 						"drafts"
@@ -17460,12 +18000,18 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "notes/drafts/update"
+					"requestName": "notes/drafts/update",
+					"requireCredential": true,
+					"prohibitMoved": true,
+					"kind": "write:account",
+					"limit": {
+						"duration": 3600000,
+						"max": 300
+					}
 				},
 				"route": {
 					"method": "POST",
 					"path": "/notes/drafts/update",
-					"operationId": "post___notes___drafts___update",
 					"tags": [
 						"notes",
 						"drafts"
@@ -17508,12 +18054,14 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "notes/drafts/count"
+					"requestName": "notes/drafts/count",
+					"requireCredential": true,
+					"prohibitMoved": true,
+					"kind": "read:account"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/notes/drafts/count",
-					"operationId": "post___notes___drafts___count",
 					"tags": [
 						"notes",
 						"drafts"
@@ -17556,12 +18104,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "notes/polls/recommendation"
+					"requestName": "notes/polls/recommendation",
+					"requireCredential": true,
+					"kind": "read:account"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/notes/polls/recommendation",
-					"operationId": "post___notes___polls___recommendation",
 					"tags": [
 						"notes"
 					]
@@ -17621,12 +18170,14 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "notes/polls/vote"
+					"requestName": "notes/polls/vote",
+					"requireCredential": true,
+					"prohibitMoved": true,
+					"kind": "write:votes"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/notes/polls/vote",
-					"operationId": "post___notes___polls___vote",
 					"tags": [
 						"notes"
 					],
@@ -17672,12 +18223,12 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "notes/reactions"
+					"requestName": "notes/reactions",
+					"requireCredential": false
 				},
 				"route": {
 					"method": "POST",
 					"path": "/notes/reactions",
-					"operationId": "post___notes___reactions",
 					"tags": [
 						"notes",
 						"reactions"
@@ -17732,12 +18283,14 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "notes/reactions/create"
+					"requestName": "notes/reactions/create",
+					"requireCredential": true,
+					"prohibitMoved": true,
+					"kind": "write:reactions"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/notes/reactions/create",
-					"operationId": "post___notes___reactions___create",
 					"tags": [
 						"reactions",
 						"notes"
@@ -17787,12 +18340,18 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "notes/reactions/delete"
+					"requestName": "notes/reactions/delete",
+					"requireCredential": true,
+					"kind": "write:reactions",
+					"limit": {
+						"duration": 3600000,
+						"max": 60,
+						"minInterval": 3000
+					}
 				},
 				"route": {
 					"method": "POST",
 					"path": "/notes/reactions/delete",
-					"operationId": "post___notes___reactions___delete",
 					"tags": [
 						"reactions",
 						"notes"
@@ -17839,12 +18398,12 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "notes/renotes"
+					"requestName": "notes/renotes",
+					"requireCredential": false
 				},
 				"route": {
 					"method": "POST",
 					"path": "/notes/renotes",
-					"operationId": "post___notes___renotes",
 					"tags": [
 						"notes"
 					]
@@ -17886,12 +18445,12 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "notes/replies"
+					"requestName": "notes/replies",
+					"requireCredential": false
 				},
 				"route": {
 					"method": "POST",
 					"path": "/notes/replies",
-					"operationId": "post___notes___replies",
 					"tags": [
 						"notes"
 					]
@@ -17942,12 +18501,12 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "notes/show"
+					"requestName": "notes/show",
+					"requireCredential": false
 				},
 				"route": {
 					"method": "POST",
 					"path": "/notes/show",
-					"operationId": "post___notes___show",
 					"tags": [
 						"notes"
 					]
@@ -17989,12 +18548,12 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "notes/show-partial-bulk"
+					"requestName": "notes/show-partial-bulk",
+					"requireCredential": false
 				},
 				"route": {
 					"method": "POST",
 					"path": "/notes/show-partial-bulk",
-					"operationId": "post___notes___show-partial-bulk",
 					"tags": [
 						"notes"
 					]
@@ -18036,12 +18595,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "notes/state"
+					"requestName": "notes/state",
+					"requireCredential": true,
+					"kind": "read:account"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/notes/state",
-					"operationId": "post___notes___state",
 					"tags": [
 						"notes"
 					]
@@ -18089,12 +18649,17 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "notes/thread-muting/create"
+					"requestName": "notes/thread-muting/create",
+					"requireCredential": true,
+					"kind": "write:account",
+					"limit": {
+						"duration": 3600000,
+						"max": 10
+					}
 				},
 				"route": {
 					"method": "POST",
 					"path": "/notes/thread-muting/create",
-					"operationId": "post___notes___thread-muting___create",
 					"tags": [
 						"notes"
 					],
@@ -18140,12 +18705,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "notes/thread-muting/delete"
+					"requestName": "notes/thread-muting/delete",
+					"requireCredential": true,
+					"kind": "write:account"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/notes/thread-muting/delete",
-					"operationId": "post___notes___thread-muting___delete",
 					"tags": [
 						"notes"
 					],
@@ -18197,12 +18763,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "notes/translate"
+					"requestName": "notes/translate",
+					"requireCredential": true,
+					"kind": "read:account"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/notes/translate",
-					"operationId": "post___notes___translate",
 					"tags": [
 						"notes"
 					]
@@ -18247,12 +18814,18 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "notes/unrenote"
+					"requestName": "notes/unrenote",
+					"requireCredential": true,
+					"kind": "write:notes",
+					"limit": {
+						"duration": 3600000,
+						"max": 300,
+						"minInterval": 1000
+					}
 				},
 				"route": {
 					"method": "POST",
 					"path": "/notes/unrenote",
-					"operationId": "post___notes___unrenote",
 					"tags": [
 						"notes"
 					],
@@ -18298,12 +18871,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "promo/read"
+					"requestName": "promo/read",
+					"requireCredential": true,
+					"kind": "write:account"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/promo/read",
-					"operationId": "post___promo___read",
 					"tags": [
 						"notes"
 					],
@@ -18352,12 +18926,12 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "users/reactions"
+					"requestName": "users/reactions",
+					"requireCredential": false
 				},
 				"route": {
 					"method": "POST",
 					"path": "/users/reactions",
-					"operationId": "post___users___reactions",
 					"tags": [
 						"users",
 						"reactions"
@@ -18402,12 +18976,14 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "admin/accounts/delete"
+					"requestName": "admin/accounts/delete",
+					"requireCredential": true,
+					"requireAdmin": true,
+					"kind": "write:admin:account"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/admin/accounts/delete",
-					"operationId": "post___admin___accounts___delete",
 					"tags": [
 						"admin"
 					],
@@ -18453,12 +19029,14 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "admin/accounts/find-by-email"
+					"requestName": "admin/accounts/find-by-email",
+					"requireCredential": true,
+					"requireAdmin": true,
+					"kind": "read:admin:account"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/admin/accounts/find-by-email",
-					"operationId": "post___admin___accounts___find-by-email",
 					"tags": [
 						"admin"
 					]
@@ -18500,12 +19078,14 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "admin/delete-account"
+					"requestName": "admin/delete-account",
+					"requireCredential": true,
+					"requireAdmin": true,
+					"kind": "write:admin:delete-account"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/admin/delete-account",
-					"operationId": "post___admin___delete-account",
 					"tags": [
 						"admin"
 					],
@@ -18548,12 +19128,14 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "admin/update-proxy-account"
+					"requestName": "admin/update-proxy-account",
+					"requireCredential": true,
+					"requireModerator": true,
+					"kind": "write:admin:account"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/admin/update-proxy-account",
-					"operationId": "post___admin___update-proxy-account",
 					"tags": [
 						"admin"
 					]
@@ -18598,12 +19180,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "i"
+					"requestName": "i",
+					"requireCredential": true,
+					"kind": "read:account"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/i",
-					"operationId": "post___i",
 					"tags": [
 						"account"
 					]
@@ -18645,12 +19228,14 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "i/claim-achievement"
+					"requestName": "i/claim-achievement",
+					"requireCredential": true,
+					"prohibitMoved": true,
+					"kind": "write:account"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/i/claim-achievement",
-					"operationId": "post___i___claim-achievement",
 					"successStatus": 204
 				}
 			}
@@ -18690,12 +19275,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "i/delete-account"
+					"requestName": "i/delete-account",
+					"requireCredential": true,
+					"secure": true
 				},
 				"route": {
 					"method": "POST",
 					"path": "/i/delete-account",
-					"operationId": "post___i___delete-account",
 					"successStatus": 204
 				}
 			}
@@ -18750,12 +19336,18 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "i/move"
+					"requestName": "i/move",
+					"requireCredential": true,
+					"secure": true,
+					"prohibitMoved": true,
+					"limit": {
+						"duration": 86400000,
+						"max": 5
+					}
 				},
 				"route": {
 					"method": "POST",
 					"path": "/i/move",
-					"operationId": "post___i___move",
 					"tags": [
 						"users"
 					]
@@ -18833,12 +19425,17 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "i/update"
+					"requestName": "i/update",
+					"requireCredential": true,
+					"kind": "write:account",
+					"limit": {
+						"duration": 3600000,
+						"max": 20
+					}
 				},
 				"route": {
 					"method": "POST",
 					"path": "/i/update",
-					"operationId": "post___i___update",
 					"tags": [
 						"account"
 					]
@@ -18880,12 +19477,12 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "users"
+					"requestName": "users",
+					"requireCredential": false
 				},
 				"route": {
 					"method": "POST",
 					"path": "/users",
-					"operationId": "post___users",
 					"tags": [
 						"users"
 					]
@@ -18927,12 +19524,12 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "users/achievements"
+					"requestName": "users/achievements",
+					"requireCredential": false
 				},
 				"route": {
 					"method": "POST",
-					"path": "/users/achievements",
-					"operationId": "post___users___achievements"
+					"path": "/users/achievements"
 				}
 			}
 		},
@@ -18977,12 +19574,12 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "users/show"
+					"requestName": "users/show",
+					"requireCredential": false
 				},
 				"route": {
 					"method": "POST",
 					"path": "/users/show",
-					"operationId": "post___users___show",
 					"tags": [
 						"users"
 					],
@@ -19028,12 +19625,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "users/update-memo"
+					"requestName": "users/update-memo",
+					"requireCredential": true,
+					"kind": "write:account"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/users/update-memo",
-					"operationId": "post___users___update-memo",
 					"tags": [
 						"account"
 					],
@@ -19087,12 +19685,14 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "antennas/create"
+					"requestName": "antennas/create",
+					"requireCredential": true,
+					"kind": "write:account",
+					"prohibitMoved": true
 				},
 				"route": {
 					"method": "POST",
 					"path": "/antennas/create",
-					"operationId": "post___antennas___create",
 					"tags": [
 						"antennas"
 					]
@@ -19137,12 +19737,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "antennas/delete"
+					"requestName": "antennas/delete",
+					"requireCredential": true,
+					"kind": "write:account"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/antennas/delete",
-					"operationId": "post___antennas___delete",
 					"tags": [
 						"antennas"
 					],
@@ -19185,12 +19786,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "antennas/list"
+					"requestName": "antennas/list",
+					"requireCredential": true,
+					"kind": "read:account"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/antennas/list",
-					"operationId": "post___antennas___list",
 					"tags": [
 						"antennas",
 						"account"
@@ -19236,12 +19838,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "antennas/notes"
+					"requestName": "antennas/notes",
+					"requireCredential": true,
+					"kind": "read:account"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/antennas/notes",
-					"operationId": "post___antennas___notes",
 					"tags": [
 						"antennas",
 						"account",
@@ -19288,12 +19891,14 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "antennas/remove-note"
+					"requestName": "antennas/remove-note",
+					"requireCredential": true,
+					"kind": "write:account",
+					"prohibitMoved": true
 				},
 				"route": {
 					"method": "POST",
 					"path": "/antennas/remove-note",
-					"operationId": "post___antennas___remove-note",
 					"tags": [
 						"antennas",
 						"account",
@@ -19341,12 +19946,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "antennas/show"
+					"requestName": "antennas/show",
+					"requireCredential": true,
+					"kind": "read:account"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/antennas/show",
-					"operationId": "post___antennas___show",
 					"tags": [
 						"antennas",
 						"account"
@@ -19398,12 +20004,14 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "antennas/update"
+					"requestName": "antennas/update",
+					"requireCredential": true,
+					"kind": "write:account",
+					"prohibitMoved": true
 				},
 				"route": {
 					"method": "POST",
 					"path": "/antennas/update",
-					"operationId": "post___antennas___update",
 					"tags": [
 						"antennas"
 					]
@@ -19448,12 +20056,12 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "notes/global-timeline"
+					"requestName": "notes/global-timeline",
+					"requireCredential": false
 				},
 				"route": {
 					"method": "POST",
 					"path": "/notes/global-timeline",
-					"operationId": "post___notes___global-timeline",
 					"tags": [
 						"notes"
 					]
@@ -19501,12 +20109,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "notes/hybrid-timeline"
+					"requestName": "notes/hybrid-timeline",
+					"requireCredential": true,
+					"kind": "read:account"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/notes/hybrid-timeline",
-					"operationId": "post___notes___hybrid-timeline",
 					"tags": [
 						"notes"
 					]
@@ -19554,12 +20163,12 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "notes/local-timeline"
+					"requestName": "notes/local-timeline",
+					"requireCredential": false
 				},
 				"route": {
 					"method": "POST",
 					"path": "/notes/local-timeline",
-					"operationId": "post___notes___local-timeline",
 					"tags": [
 						"notes"
 					]
@@ -19601,12 +20210,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "notes/mentions"
+					"requestName": "notes/mentions",
+					"requireCredential": true,
+					"kind": "read:account"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/notes/mentions",
-					"operationId": "post___notes___mentions",
 					"tags": [
 						"notes"
 					]
@@ -19648,12 +20258,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "notes/timeline"
+					"requestName": "notes/timeline",
+					"requireCredential": true,
+					"kind": "read:account"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/notes/timeline",
-					"operationId": "post___notes___timeline",
 					"tags": [
 						"notes"
 					]
@@ -19698,12 +20309,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "notes/user-list-timeline"
+					"requestName": "notes/user-list-timeline",
+					"requireCredential": true,
+					"kind": "read:account"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/notes/user-list-timeline",
-					"operationId": "post___notes___user-list-timeline",
 					"tags": [
 						"notes",
 						"lists"
@@ -19755,12 +20367,12 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "users/notes"
+					"requestName": "users/notes",
+					"requireCredential": false
 				},
 				"route": {
 					"method": "POST",
 					"path": "/users/notes",
-					"operationId": "post___users___notes",
 					"tags": [
 						"users",
 						"notes"
@@ -19808,12 +20420,12 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "notes/search"
+					"requestName": "notes/search",
+					"requireCredential": false
 				},
 				"route": {
 					"method": "POST",
 					"path": "/notes/search",
-					"operationId": "post___notes___search",
 					"tags": [
 						"notes"
 					]
@@ -19866,12 +20478,17 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "blocking/create"
+					"requestName": "blocking/create",
+					"requireCredential": true,
+					"kind": "write:blocks",
+					"limit": {
+						"duration": 3600000,
+						"max": 20
+					}
 				},
 				"route": {
 					"method": "POST",
 					"path": "/blocking/create",
-					"operationId": "post___blocking___create",
 					"tags": [
 						"account"
 					]
@@ -19922,12 +20539,17 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "blocking/delete"
+					"requestName": "blocking/delete",
+					"requireCredential": true,
+					"kind": "write:blocks",
+					"limit": {
+						"duration": 3600000,
+						"max": 100
+					}
 				},
 				"route": {
 					"method": "POST",
 					"path": "/blocking/delete",
-					"operationId": "post___blocking___delete",
 					"tags": [
 						"account"
 					]
@@ -19969,12 +20591,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "blocking/list"
+					"requestName": "blocking/list",
+					"requireCredential": true,
+					"kind": "read:blocks"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/blocking/list",
-					"operationId": "post___blocking___list",
 					"tags": [
 						"account"
 					]
@@ -20031,12 +20654,18 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "following/create"
+					"requestName": "following/create",
+					"requireCredential": true,
+					"prohibitMoved": true,
+					"kind": "write:following",
+					"limit": {
+						"duration": 3600000,
+						"max": 100
+					}
 				},
 				"route": {
 					"method": "POST",
 					"path": "/following/create",
-					"operationId": "post___following___create",
 					"tags": [
 						"following",
 						"users"
@@ -20088,12 +20717,17 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "following/delete"
+					"requestName": "following/delete",
+					"requireCredential": true,
+					"kind": "write:following",
+					"limit": {
+						"duration": 3600000,
+						"max": 100
+					}
 				},
 				"route": {
 					"method": "POST",
 					"path": "/following/delete",
-					"operationId": "post___following___delete",
 					"tags": [
 						"following",
 						"users"
@@ -20145,12 +20779,17 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "following/invalidate"
+					"requestName": "following/invalidate",
+					"requireCredential": true,
+					"kind": "write:following",
+					"limit": {
+						"duration": 3600000,
+						"max": 100
+					}
 				},
 				"route": {
 					"method": "POST",
 					"path": "/following/invalidate",
-					"operationId": "post___following___invalidate",
 					"tags": [
 						"following",
 						"users"
@@ -20193,12 +20832,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "following/list"
+					"requestName": "following/list",
+					"requireCredential": true,
+					"kind": "read:following"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/following/list",
-					"operationId": "post___following___list",
 					"tags": [
 						"users"
 					]
@@ -20246,12 +20886,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "following/requests/accept"
+					"requestName": "following/requests/accept",
+					"requireCredential": true,
+					"kind": "write:following"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/following/requests/accept",
-					"operationId": "post___following___requests___accept",
 					"tags": [
 						"following",
 						"account"
@@ -20300,12 +20941,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "following/requests/cancel"
+					"requestName": "following/requests/cancel",
+					"requireCredential": true,
+					"kind": "write:following"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/following/requests/cancel",
-					"operationId": "post___following___requests___cancel",
 					"tags": [
 						"following",
 						"account"
@@ -20348,12 +20990,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "following/requests/list"
+					"requestName": "following/requests/list",
+					"requireCredential": true,
+					"kind": "read:following"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/following/requests/list",
-					"operationId": "post___following___requests___list",
 					"tags": [
 						"following",
 						"account"
@@ -20399,12 +21042,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "following/requests/reject"
+					"requestName": "following/requests/reject",
+					"requireCredential": true,
+					"kind": "write:following"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/following/requests/reject",
-					"operationId": "post___following___requests___reject",
 					"tags": [
 						"following",
 						"account"
@@ -20447,12 +21091,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "following/requests/sent"
+					"requestName": "following/requests/sent",
+					"requireCredential": true,
+					"kind": "read:following"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/following/requests/sent",
-					"operationId": "post___following___requests___sent",
 					"tags": [
 						"following",
 						"account"
@@ -20504,12 +21149,17 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "following/update"
+					"requestName": "following/update",
+					"requireCredential": true,
+					"kind": "write:following",
+					"limit": {
+						"duration": 3600000,
+						"max": 100
+					}
 				},
 				"route": {
 					"method": "POST",
 					"path": "/following/update",
-					"operationId": "post___following___update",
 					"tags": [
 						"following",
 						"users"
@@ -20552,12 +21202,17 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "following/update-all"
+					"requestName": "following/update-all",
+					"requireCredential": true,
+					"kind": "write:following",
+					"limit": {
+						"duration": 3600000,
+						"max": 10
+					}
 				},
 				"route": {
 					"method": "POST",
 					"path": "/following/update-all",
-					"operationId": "post___following___update-all",
 					"tags": [
 						"following",
 						"users"
@@ -20609,12 +21264,18 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "mute/create"
+					"requestName": "mute/create",
+					"requireCredential": true,
+					"prohibitMoved": true,
+					"kind": "write:mutes",
+					"limit": {
+						"duration": 3600000,
+						"max": 20
+					}
 				},
 				"route": {
 					"method": "POST",
 					"path": "/mute/create",
-					"operationId": "post___mute___create",
 					"tags": [
 						"account"
 					]
@@ -20665,12 +21326,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "mute/delete"
+					"requestName": "mute/delete",
+					"requireCredential": true,
+					"kind": "write:mutes"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/mute/delete",
-					"operationId": "post___mute___delete",
 					"tags": [
 						"account"
 					]
@@ -20712,12 +21374,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "mute/list"
+					"requestName": "mute/list",
+					"requireCredential": true,
+					"kind": "read:mutes"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/mute/list",
-					"operationId": "post___mute___list",
 					"tags": [
 						"account"
 					]
@@ -20768,12 +21431,18 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "renote-mute/create"
+					"requestName": "renote-mute/create",
+					"requireCredential": true,
+					"prohibitMoved": true,
+					"kind": "write:mutes",
+					"limit": {
+						"duration": 3600000,
+						"max": 20
+					}
 				},
 				"route": {
 					"method": "POST",
 					"path": "/renote-mute/create",
-					"operationId": "post___renote-mute___create",
 					"tags": [
 						"account"
 					]
@@ -20824,12 +21493,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "renote-mute/delete"
+					"requestName": "renote-mute/delete",
+					"requireCredential": true,
+					"kind": "write:mutes"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/renote-mute/delete",
-					"operationId": "post___renote-mute___delete",
 					"tags": [
 						"account"
 					]
@@ -20871,12 +21541,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "renote-mute/list"
+					"requestName": "renote-mute/list",
+					"requireCredential": true,
+					"kind": "read:mutes"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/renote-mute/list",
-					"operationId": "post___renote-mute___list",
 					"tags": [
 						"account"
 					]
@@ -20924,12 +21595,12 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "users/followers"
+					"requestName": "users/followers",
+					"requireCredential": false
 				},
 				"route": {
 					"method": "POST",
 					"path": "/users/followers",
-					"operationId": "post___users___followers",
 					"tags": [
 						"users"
 					]
@@ -20980,12 +21651,12 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "users/following"
+					"requestName": "users/following",
+					"requireCredential": false
 				},
 				"route": {
 					"method": "POST",
 					"path": "/users/following",
-					"operationId": "post___users___following",
 					"tags": [
 						"users"
 					]
@@ -21027,12 +21698,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "users/get-following-users-by-birthday"
+					"requestName": "users/get-following-users-by-birthday",
+					"requireCredential": true,
+					"kind": "read:account"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/users/get-following-users-by-birthday",
-					"operationId": "post___users___get-following-users-by-birthday",
 					"tags": [
 						"users"
 					]
@@ -21077,12 +21749,14 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "users/lists/create"
+					"requestName": "users/lists/create",
+					"requireCredential": true,
+					"prohibitMoved": true,
+					"kind": "write:account"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/users/lists/create",
-					"operationId": "post___users___lists___create",
 					"tags": [
 						"lists"
 					]
@@ -21142,12 +21816,14 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "users/lists/create-from-public"
+					"requestName": "users/lists/create-from-public",
+					"requireCredential": true,
+					"prohibitMoved": true,
+					"kind": "write:account"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/users/lists/create-from-public",
-					"operationId": "post___users___lists___create-from-public",
 					"tags": []
 				}
 			}
@@ -21190,12 +21866,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "users/lists/delete"
+					"requestName": "users/lists/delete",
+					"requireCredential": true,
+					"kind": "write:account"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/users/lists/delete",
-					"operationId": "post___users___lists___delete",
 					"description": "Delete an existing list of users.",
 					"tags": [
 						"lists"
@@ -21244,12 +21921,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "users/lists/favorite"
+					"requestName": "users/lists/favorite",
+					"requireCredential": true,
+					"kind": "write:account"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/users/lists/favorite",
-					"operationId": "post___users___lists___favorite",
 					"tags": []
 				}
 			}
@@ -21292,12 +21970,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "users/lists/get-memberships"
+					"requestName": "users/lists/get-memberships",
+					"requireCredential": false,
+					"kind": "read:account"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/users/lists/get-memberships",
-					"operationId": "post___users___lists___get-memberships",
 					"tags": [
 						"lists",
 						"account"
@@ -21346,12 +22025,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "users/lists/list"
+					"requestName": "users/lists/list",
+					"requireCredential": false,
+					"kind": "read:account"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/users/lists/list",
-					"operationId": "post___users___lists___list",
 					"tags": [
 						"lists",
 						"account"
@@ -21400,12 +22080,14 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "users/lists/pull"
+					"requestName": "users/lists/pull",
+					"requireCredential": true,
+					"prohibitMoved": true,
+					"kind": "write:account"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/users/lists/pull",
-					"operationId": "post___users___lists___pull",
 					"description": "Remove a user from a list.",
 					"tags": [
 						"lists",
@@ -21464,12 +22146,18 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "users/lists/push"
+					"requestName": "users/lists/push",
+					"requireCredential": true,
+					"prohibitMoved": true,
+					"kind": "write:account",
+					"limit": {
+						"duration": 3600000,
+						"max": 30
+					}
 				},
 				"route": {
 					"method": "POST",
 					"path": "/users/lists/push",
-					"operationId": "post___users___lists___push",
 					"description": "Add a user to an existing list.",
 					"tags": [
 						"lists",
@@ -21516,12 +22204,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "users/lists/show"
+					"requestName": "users/lists/show",
+					"requireCredential": false,
+					"kind": "read:account"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/users/lists/show",
-					"operationId": "post___users___lists___show",
 					"tags": [
 						"lists",
 						"account"
@@ -21570,12 +22259,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "users/lists/unfavorite"
+					"requestName": "users/lists/unfavorite",
+					"requireCredential": true,
+					"kind": "write:account"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/users/lists/unfavorite",
-					"operationId": "post___users___lists___unfavorite",
 					"tags": []
 				}
 			}
@@ -21618,12 +22308,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "users/lists/update"
+					"requestName": "users/lists/update",
+					"requireCredential": true,
+					"kind": "write:account"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/users/lists/update",
-					"operationId": "post___users___lists___update",
 					"tags": [
 						"lists"
 					]
@@ -21671,12 +22362,14 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "users/lists/update-membership"
+					"requestName": "users/lists/update-membership",
+					"requireCredential": true,
+					"prohibitMoved": true,
+					"kind": "write:account"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/users/lists/update-membership",
-					"operationId": "post___users___lists___update-membership",
 					"tags": [
 						"lists",
 						"users"
@@ -21719,12 +22412,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "users/relation"
+					"requestName": "users/relation",
+					"requireCredential": true,
+					"kind": "read:account"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/users/relation",
-					"operationId": "post___users___relation",
 					"tags": [
 						"users"
 					]
@@ -21780,12 +22474,18 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "clips/add-note"
+					"requestName": "clips/add-note",
+					"requireCredential": true,
+					"prohibitMoved": true,
+					"kind": "write:account",
+					"limit": {
+						"duration": 3600000,
+						"max": 20
+					}
 				},
 				"route": {
 					"method": "POST",
 					"path": "/clips/add-note",
-					"operationId": "post___clips___add-note",
 					"tags": [
 						"account",
 						"notes",
@@ -21833,12 +22533,14 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "clips/create"
+					"requestName": "clips/create",
+					"requireCredential": true,
+					"prohibitMoved": true,
+					"kind": "write:account"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/clips/create",
-					"operationId": "post___clips___create",
 					"tags": [
 						"clips"
 					]
@@ -21883,12 +22585,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "clips/delete"
+					"requestName": "clips/delete",
+					"requireCredential": true,
+					"kind": "write:account"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/clips/delete",
-					"operationId": "post___clips___delete",
 					"tags": [
 						"clips"
 					],
@@ -21937,12 +22640,14 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "clips/favorite"
+					"requestName": "clips/favorite",
+					"requireCredential": true,
+					"prohibitMoved": true,
+					"kind": "write:clip-favorite"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/clips/favorite",
-					"operationId": "post___clips___favorite",
 					"tags": [
 						"clip"
 					],
@@ -21985,12 +22690,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "clips/list"
+					"requestName": "clips/list",
+					"requireCredential": true,
+					"kind": "read:account"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/clips/list",
-					"operationId": "post___clips___list",
 					"tags": [
 						"clips",
 						"account"
@@ -22033,12 +22739,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "clips/my-favorites"
+					"requestName": "clips/my-favorites",
+					"requireCredential": true,
+					"kind": "read:clip-favorite"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/clips/my-favorites",
-					"operationId": "post___clips___my-favorites",
 					"tags": [
 						"account",
 						"clip"
@@ -22084,12 +22791,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "clips/notes"
+					"requestName": "clips/notes",
+					"requireCredential": false,
+					"kind": "read:account"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/clips/notes",
-					"operationId": "post___clips___notes",
 					"tags": [
 						"account",
 						"notes",
@@ -22139,12 +22847,14 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "clips/remove-note"
+					"requestName": "clips/remove-note",
+					"requireCredential": true,
+					"prohibitMoved": true,
+					"kind": "write:account"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/clips/remove-note",
-					"operationId": "post___clips___remove-note",
 					"tags": [
 						"account",
 						"notes",
@@ -22192,12 +22902,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "clips/show"
+					"requestName": "clips/show",
+					"requireCredential": false,
+					"kind": "read:account"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/clips/show",
-					"operationId": "post___clips___show",
 					"tags": [
 						"clips",
 						"account"
@@ -22246,12 +22957,14 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "clips/unfavorite"
+					"requestName": "clips/unfavorite",
+					"requireCredential": true,
+					"prohibitMoved": true,
+					"kind": "write:clip-favorite"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/clips/unfavorite",
-					"operationId": "post___clips___unfavorite",
 					"tags": [
 						"clip"
 					],
@@ -22297,12 +23010,14 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "clips/update"
+					"requestName": "clips/update",
+					"requireCredential": true,
+					"prohibitMoved": true,
+					"kind": "write:account"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/clips/update",
-					"operationId": "post___clips___update",
 					"tags": [
 						"clips"
 					]
@@ -22344,12 +23059,12 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "gallery/featured"
+					"requestName": "gallery/featured",
+					"requireCredential": false
 				},
 				"route": {
 					"method": "POST",
 					"path": "/gallery/featured",
-					"operationId": "post___gallery___featured",
 					"tags": [
 						"gallery"
 					]
@@ -22391,12 +23106,12 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "gallery/popular"
+					"requestName": "gallery/popular",
+					"requireCredential": false
 				},
 				"route": {
 					"method": "POST",
 					"path": "/gallery/popular",
-					"operationId": "post___gallery___popular",
 					"tags": [
 						"gallery"
 					]
@@ -22438,12 +23153,12 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "gallery/posts"
+					"requestName": "gallery/posts",
+					"requireCredential": false
 				},
 				"route": {
 					"method": "POST",
 					"path": "/gallery/posts",
-					"operationId": "post___gallery___posts",
 					"tags": [
 						"gallery"
 					]
@@ -22485,12 +23200,18 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "gallery/posts/create"
+					"requestName": "gallery/posts/create",
+					"requireCredential": true,
+					"prohibitMoved": true,
+					"kind": "write:gallery",
+					"limit": {
+						"duration": 3600000,
+						"max": 20
+					}
 				},
 				"route": {
 					"method": "POST",
 					"path": "/gallery/posts/create",
-					"operationId": "post___gallery___posts___create",
 					"tags": [
 						"gallery"
 					]
@@ -22535,12 +23256,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "gallery/posts/delete"
+					"requestName": "gallery/posts/delete",
+					"requireCredential": true,
+					"kind": "write:gallery"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/gallery/posts/delete",
-					"operationId": "post___gallery___posts___delete",
 					"tags": [
 						"gallery"
 					],
@@ -22592,12 +23314,14 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "gallery/posts/like"
+					"requestName": "gallery/posts/like",
+					"requireCredential": true,
+					"prohibitMoved": true,
+					"kind": "write:gallery-likes"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/gallery/posts/like",
-					"operationId": "post___gallery___posts___like",
 					"tags": [
 						"gallery"
 					],
@@ -22643,12 +23367,12 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "gallery/posts/show"
+					"requestName": "gallery/posts/show",
+					"requireCredential": false
 				},
 				"route": {
 					"method": "POST",
 					"path": "/gallery/posts/show",
-					"operationId": "post___gallery___posts___show",
 					"tags": [
 						"gallery"
 					]
@@ -22696,12 +23420,14 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "gallery/posts/unlike"
+					"requestName": "gallery/posts/unlike",
+					"requireCredential": true,
+					"prohibitMoved": true,
+					"kind": "write:gallery-likes"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/gallery/posts/unlike",
-					"operationId": "post___gallery___posts___unlike",
 					"tags": [
 						"gallery"
 					],
@@ -22744,12 +23470,18 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "gallery/posts/update"
+					"requestName": "gallery/posts/update",
+					"requireCredential": true,
+					"prohibitMoved": true,
+					"kind": "write:gallery",
+					"limit": {
+						"duration": 3600000,
+						"max": 300
+					}
 				},
 				"route": {
 					"method": "POST",
 					"path": "/gallery/posts/update",
-					"operationId": "post___gallery___posts___update",
 					"tags": [
 						"gallery"
 					]
@@ -22791,12 +23523,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "i/favorites"
+					"requestName": "i/favorites",
+					"requireCredential": true,
+					"kind": "read:favorites"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/i/favorites",
-					"operationId": "post___i___favorites",
 					"tags": [
 						"account",
 						"notes",
@@ -22840,12 +23573,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "i/gallery/likes"
+					"requestName": "i/gallery/likes",
+					"requireCredential": true,
+					"kind": "read:gallery-likes"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/i/gallery/likes",
-					"operationId": "post___i___gallery___likes",
 					"tags": [
 						"account",
 						"gallery"
@@ -22888,12 +23622,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "i/gallery/posts"
+					"requestName": "i/gallery/posts",
+					"requireCredential": true,
+					"kind": "read:gallery"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/i/gallery/posts",
-					"operationId": "post___i___gallery___posts",
 					"tags": [
 						"account",
 						"gallery"
@@ -22939,12 +23674,12 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "notes/clips"
+					"requestName": "notes/clips",
+					"requireCredential": false
 				},
 				"route": {
 					"method": "POST",
 					"path": "/notes/clips",
-					"operationId": "post___notes___clips",
 					"tags": [
 						"clips",
 						"notes"
@@ -22993,12 +23728,18 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "notes/favorites/create"
+					"requestName": "notes/favorites/create",
+					"requireCredential": true,
+					"prohibitMoved": true,
+					"kind": "write:favorites",
+					"limit": {
+						"duration": 3600000,
+						"max": 20
+					}
 				},
 				"route": {
 					"method": "POST",
 					"path": "/notes/favorites/create",
-					"operationId": "post___notes___favorites___create",
 					"tags": [
 						"notes",
 						"favorites"
@@ -23048,12 +23789,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "notes/favorites/delete"
+					"requestName": "notes/favorites/delete",
+					"requireCredential": true,
+					"kind": "write:favorites"
 				},
 				"route": {
 					"method": "POST",
 					"path": "/notes/favorites/delete",
-					"operationId": "post___notes___favorites___delete",
 					"tags": [
 						"notes",
 						"favorites"
@@ -23097,12 +23839,12 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "users/clips"
+					"requestName": "users/clips",
+					"requireCredential": false
 				},
 				"route": {
 					"method": "POST",
 					"path": "/users/clips",
-					"operationId": "post___users___clips",
 					"tags": [
 						"users",
 						"clips"
@@ -23145,12 +23887,12 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "users/gallery/posts"
+					"requestName": "users/gallery/posts",
+					"requireCredential": false
 				},
 				"route": {
 					"method": "POST",
 					"path": "/users/gallery/posts",
-					"operationId": "post___users___gallery___posts",
 					"tags": [
 						"users",
 						"gallery"
@@ -23215,12 +23957,19 @@ export default {
 					},
 					"meta": {
 						"requestName": "drive/files/create",
-						"multipart": true
+						"multipart": true,
+						"requireCredential": true,
+						"kind": "write:drive",
+						"limit": {
+							"key": "drive/files/create",
+							"duration": 3600000,
+							"max": 120
+						},
+						"prohibitMoved": true
 					},
 					"route": {
 						"method": "POST",
 						"path": "/drive/files/create",
-						"operationId": "post___drive___files___create",
 						"tags": [
 							"drive"
 						],
@@ -23242,15 +23991,15 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "signup"
+					"requestName": "signup",
+					"requireCredential": false
 				},
 				"route": {
 					"method": "POST",
 					"path": "/signup",
 					"tags": [
 						"auth"
-					],
-					"operationId": "post___signup"
+					]
 				}
 			}
 		},
@@ -23265,15 +24014,15 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "signup-pending"
+					"requestName": "signup-pending",
+					"requireCredential": false
 				},
 				"route": {
 					"method": "POST",
 					"path": "/signup-pending",
 					"tags": [
 						"auth"
-					],
-					"operationId": "post___signup_pending"
+					]
 				}
 			}
 		},
@@ -23288,15 +24037,15 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "signin-flow"
+					"requestName": "signin-flow",
+					"requireCredential": false
 				},
 				"route": {
 					"method": "POST",
 					"path": "/signin-flow",
 					"tags": [
 						"auth"
-					],
-					"operationId": "post___signin_flow"
+					]
 				}
 			}
 		},
@@ -23311,15 +24060,15 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "signin-with-passkey"
+					"requestName": "signin-with-passkey",
+					"requireCredential": false
 				},
 				"route": {
 					"method": "POST",
 					"path": "/signin-with-passkey",
 					"tags": [
 						"auth"
-					],
-					"operationId": "post___signin_with_passkey"
+					]
 				}
 			}
 		}

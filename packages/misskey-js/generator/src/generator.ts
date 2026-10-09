@@ -1,10 +1,11 @@
 import assert from 'assert';
+import { externalOperationName } from '../../../features/api/backend/transport/openapi/operation-ids.js';
 import { mkdir, readFile, writeFile } from 'fs/promises';
 import type { OpenAPIV3_1 } from 'openapi-types';
 import { toPascal } from 'ts-case-convert';
 import { parse } from '@readme/openapi-parser';
 import openapiTS, { astToString } from 'openapi-typescript';
-import type { OpenAPI3, OperationObject, PathItemObject } from 'openapi-typescript';
+import type { OpenAPI3 } from 'openapi-typescript';
 import ts from 'typescript';
 import { removeNeverPropertiesFromAST } from './ast-transformer.js';
 
@@ -27,19 +28,15 @@ async function generateBaseTypes(
 		lines.push("import type { PackedJsonValue as ContractJsonValue } from '#native-json-value';");
 	}
 
-	// NOTE: Align `operationId` of GET and POST to avoid duplication of type definitions
+	// The SDK request/response aliases come from contracts. This file supplies external schema models only.
 	const openApi = JSON.parse(await readFile(openApiJsonPath, 'utf8')) as OpenAPI3;
 	// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 	for (const [key, item] of Object.entries(openApi.paths!)) {
 		assert('post' in item);
+		// Retain the public deep-import operations type as generated compatibility output.
+		const post = { ...item.post, operationId: externalOperationName(key) };
 		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-		openApi.paths![key] = {
-			post: {
-				...item.post,
-				// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-				operationId: ((item as PathItemObject).post as OperationObject).operationId!.replaceAll('post___', ''),
-			},
-		};
+		openApi.paths![key] = { post };
 	}
 
 	const tsNullNode = ts.factory.createLiteralTypeNode(ts.factory.createNull());
@@ -117,8 +114,6 @@ async function generateEndpoints(
 
 	for (const operation of postPathItems) {
 		const path = operation._path_;
-		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-		const operationId = operation.operationId!.replaceAll('get___', '').replaceAll('post___', '');
 		const endpoint = new Endpoint(path);
 		endpoints.push(endpoint);
 
@@ -127,11 +122,10 @@ async function generateEndpoints(
 			const supportMediaTypes = Object.keys(reqContent);
 			if (supportMediaTypes.length > 0) {
 				// いまのところ複数のメディアタイプをとるエンドポイントは無いので決め打ちする
-				const req = new OperationTypeAlias(
-					operationId,
+				const req = new EndpointTypeAlias(
 					path,
 					supportMediaTypes[0],
-					OperationsAliasType.REQUEST,
+					EndpointAliasType.REQUEST,
 				);
 				endpoint.request = req;
 
@@ -148,11 +142,10 @@ async function generateEndpoints(
 			const supportMediaTypes = Object.keys(resContent);
 			if (supportMediaTypes.length > 0) {
 				// いまのところ複数のメディアタイプを返すエンドポイントは無いので決め打ちする
-				endpoint.response = new OperationTypeAlias(
-					operationId,
+				endpoint.response = new EndpointTypeAlias(
 					path,
 					supportMediaTypes[0],
-					OperationsAliasType.RESPONSE,
+					EndpointAliasType.RESPONSE,
 				);
 			}
 		}
@@ -167,8 +160,8 @@ async function generateEndpoints(
 	entitiesOutputLine.push("type ContractResponse<Route extends keyof ContractEndpoints> = ContractEndpoints[Route]['res'];");
 	entitiesOutputLine.push('');
 
-	entitiesOutputLine.push(new EmptyTypeAlias(OperationsAliasType.REQUEST).toLine());
-	entitiesOutputLine.push(new EmptyTypeAlias(OperationsAliasType.RESPONSE).toLine());
+	entitiesOutputLine.push(new EmptyTypeAlias(EndpointAliasType.REQUEST).toLine());
+	entitiesOutputLine.push(new EmptyTypeAlias(EndpointAliasType.RESPONSE).toLine());
 	entitiesOutputLine.push('');
 
 	const entities = endpoints
@@ -221,7 +214,6 @@ async function generateApiClientJSDoc(
 	warningsOutputPath: string,
 ) {
 	const endpoints: {
-		operationId: string;
 		path: string;
 		description: string;
 	}[] = [];
@@ -236,12 +228,8 @@ async function generateApiClientJSDoc(
 		.filter(filterUndefined);
 
 	for (const operation of postPathItems) {
-		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-		const operationId = operation.operationId!.replaceAll('get___', '').replaceAll('post___', '');
-
 		if (operation.description) {
 			endpoints.push({
-				operationId: operationId,
 				path: operation._path_,
 				description: operation.description,
 			});
@@ -307,32 +295,29 @@ function toImportPath(fileName: string, fromPath = '/built/autogen', toPath = ''
 	return fileName.replace(fromPath, toPath).replace('.ts', '.js');
 }
 
-enum OperationsAliasType {
+enum EndpointAliasType {
 	REQUEST = 'Request',
 	RESPONSE = 'Response'
 }
 
-interface IOperationTypeAlias {
-	readonly type: OperationsAliasType
+interface IEndpointTypeAlias {
+	readonly type: EndpointAliasType
 
 	generateName(): string
 
 	toLine(): string
 }
 
-class OperationTypeAlias implements IOperationTypeAlias {
-	public readonly operationId: string;
+class EndpointTypeAlias implements IEndpointTypeAlias {
 	public readonly path: string;
 	public readonly mediaType: string;
-	public readonly type: OperationsAliasType;
+	public readonly type: EndpointAliasType;
 
 	constructor(
-		operationId: string,
 		path: string,
 		mediaType: string,
-		type: OperationsAliasType,
+		type: EndpointAliasType,
 	) {
-		this.operationId = operationId;
 		this.path = path;
 		this.mediaType = mediaType;
 		this.type = type;
@@ -345,16 +330,16 @@ class OperationTypeAlias implements IOperationTypeAlias {
 
 	toLine(): string {
 		const name = this.generateName();
-		return (this.type === OperationsAliasType.REQUEST)
+		return (this.type === EndpointAliasType.REQUEST)
 			? `export type ${name} = ContractRequest<'${this.path.replace(/^\//, '')}'>;`
 			: `export type ${name} = ContractResponse<'${this.path.replace(/^\//, '')}'>;`;
 	}
 }
 
-class EmptyTypeAlias implements IOperationTypeAlias {
-	readonly type: OperationsAliasType;
+class EmptyTypeAlias implements IEndpointTypeAlias {
+	readonly type: EndpointAliasType;
 
-	constructor(type: OperationsAliasType) {
+	constructor(type: EndpointAliasType) {
 		this.type = type;
 	}
 
@@ -368,13 +353,13 @@ class EmptyTypeAlias implements IOperationTypeAlias {
 	}
 }
 
-const emptyRequest = new EmptyTypeAlias(OperationsAliasType.REQUEST);
-const emptyResponse = new EmptyTypeAlias(OperationsAliasType.RESPONSE);
+const emptyRequest = new EmptyTypeAlias(EndpointAliasType.REQUEST);
+const emptyResponse = new EmptyTypeAlias(EndpointAliasType.RESPONSE);
 
 class Endpoint {
 	public readonly path: string;
-	public request?: IOperationTypeAlias;
-	public response?: IOperationTypeAlias;
+	public request?: IEndpointTypeAlias;
+	public response?: IEndpointTypeAlias;
 
 	constructor(path: string) {
 		this.path = path;
@@ -392,9 +377,9 @@ class EndpointReqMediaType {
 	public readonly path: string;
 	public readonly mediaType: string;
 
-	constructor(path: string, request: OperationTypeAlias, mediaType?: undefined);
+	constructor(path: string, request: EndpointTypeAlias, mediaType?: undefined);
 	constructor(path: string, request: undefined, mediaType: string);
-	constructor(path: string, request: OperationTypeAlias | undefined, mediaType?: string) {
+	constructor(path: string, request: EndpointTypeAlias | undefined, mediaType?: string) {
 		this.path = path;
 		this.mediaType = mediaType ?? request?.mediaType ?? 'application/json';
 	}
