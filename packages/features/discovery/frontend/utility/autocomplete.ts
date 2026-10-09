@@ -8,7 +8,7 @@ import getCaretCoordinates from 'textarea-caret';
 import { toASCII } from 'punycode.js';
 import type { Ref } from 'vue';
 import type { CompleteInfo } from '@features/discovery/frontend/components/MkAutocomplete.vue';
-import { popup } from '@/os.js';
+import { popup } from '@features/ui/frontend/os.js';
 
 export type SuggestionType = 'user' | 'hashtag' | 'emoji' | 'mfmTag' | 'mfmParam';
 

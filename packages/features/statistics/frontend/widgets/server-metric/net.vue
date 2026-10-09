@@ -52,7 +52,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 import { onMounted, onBeforeUnmount, ref } from 'vue';
 import * as Misskey from 'misskey-js';
 import bytes from '@features/ui/frontend/filters/bytes.js';
-import { genId } from '@/utility/id.js';
+import { genId } from '@features/runtime/frontend/utility/id.js';
 
 const props = defineProps<{
 	connection: Misskey.IChannelConnection<Misskey.Channels['serverStats']>,

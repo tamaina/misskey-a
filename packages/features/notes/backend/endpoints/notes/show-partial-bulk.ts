@@ -2,65 +2,25 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
+import { toPackedRecord } from '../../../../users/backend/json-value.schema.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import { GetterService } from '@features/api/backend/transport/GetterService.js';
 
-import { Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
-import { NoteEntityService } from '@/core/entities/NoteEntityService.js';
-import { GetterService } from '@/server/api/GetterService.js';
-import { ApiError } from '@/server/api/error.js';
+import { NoteEntityService } from '../../serializers/NoteEntityService.js';
+import { notesShowPartialBulkContract } from './show-partial-bulk.contract.js';
+import type { MiLocalUser } from "@features/users/backend/models/User.js";
 
-export const meta = {
-	tags: ['notes'],
+export interface NotesShowPartialBulkDependencies {
+	noteEntityService: Pick<NoteEntityService, 'fetchDiffs'>;
+}
+export function createNotesShowPartialBulkProcedure(deps: NotesShowPartialBulkDependencies) {
+	return createApiProcedure<MiLocalUser>()(notesShowPartialBulkContract).handler(async ({ input, context }) => {
+			const result = await (async () => {
+				const ps = input;
+				const me = context.principal;
 
-	requireCredential: false,
-
-	res: {
-		type: 'array',
-		optional: false, nullable: false,
-		items: {
-			type: 'object',
-			properties: {
-				id: {
-					type: 'string',
-					optional: false, nullable: false,
-				},
-				reactions: {
-					type: 'object',
-					optional: false, nullable: false,
-					additionalProperties: {
-						type: 'number',
-					},
-				},
-				reactionEmojis: {
-					type: 'object',
-					optional: false, nullable: false,
-					additionalProperties: {
-						type: 'string',
-					},
-				},
-			},
-		},
-	},
-
-	errors: {
-	},
-} as const;
-
-export const paramDef = {
-	type: 'object',
-	properties: {
-		noteIds: { type: 'array', items: { type: 'string', format: 'misskey:id' }, maxItems: 100, minItems: 1 },
-	},
-	required: ['noteIds'],
-} as const;
-
-@Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
-	constructor(
-		private noteEntityService: NoteEntityService,
-	) {
-		super(meta, paramDef, async (ps, me) => {
-			return await this.noteEntityService.fetchDiffs(ps.noteIds, me?.id ?? null);
+					return await deps.noteEntityService.fetchDiffs(ps.noteIds, me?.id ?? null);
+			})();
+			return result.map(note => ({ id: note.id, reactions: toPackedRecord(note.reactions), reactionEmojis: toPackedRecord(note.reactionEmojis) }));
 		});
-	}
 }

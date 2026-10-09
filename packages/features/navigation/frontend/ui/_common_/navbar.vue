@@ -7,20 +7,20 @@ SPDX-License-Identifier: AGPL-3.0-only
 <div :class="[$style.root, { [$style.iconOnly]: iconOnly }]">
 	<div :class="$style.body">
 		<div :class="$style.top">
-			<button v-tooltip.noDelay.right="instance.name ?? i18n.ts.instance" class="_button" :class="$style.instance" @click="openInstanceMenu">
+			<button v-tooltip.noDelay.right="instance.name ?? $locale.sfc.instance" class="_button" :class="$style.instance" @click="openInstanceMenu">
 				<img :src="instance.iconUrl || '/favicon.ico'" alt="" :class="$style.instanceIcon" style="view-transition-name: navbar-serverIcon;"/>
 			</button>
-			<button v-if="!iconOnly" v-tooltip.noDelay.right="i18n.ts.realtimeMode" class="_button" :class="[$style.realtimeMode, store.r.realtimeMode.value ? $style.on : null]" @click="toggleRealtimeMode">
+			<button v-if="!iconOnly" v-tooltip.noDelay.right="$locale.sfc.realtimeMode" class="_button" :class="[$style.realtimeMode, store.r.realtimeMode.value ? $style.on : null]" @click="toggleRealtimeMode">
 				<i v-if="store.r.realtimeMode.value" class="ti ti-bolt ti-fw"></i>
 				<i v-else class="ti ti-bolt-off ti-fw"></i>
 			</button>
-			<button v-if="!iconOnly && showWidgetButton" v-tooltip.noDelay.right="i18n.ts.widgets" class="_button" :class="[$style.widget]" @click="() => emit('widgetButtonClick')">
+			<button v-if="!iconOnly && showWidgetButton" v-tooltip.noDelay.right="$locale.sfc.widgets" class="_button" :class="[$style.widget]" @click="() => emit('widgetButtonClick')">
 				<i class="ti ti-apps ti-fw"></i>
 			</button>
 		</div>
 		<div :class="$style.middle">
-			<MkA v-tooltip.noDelay.right="i18n.ts.timeline" :class="$style.item" :activeClass="$style.active" to="/" exact>
-				<i :class="$style.itemIcon" class="ti ti-home ti-fw" style="view-transition-name: navbar-homeIcon;"></i><span :class="$style.itemText">{{ i18n.ts.timeline }}</span>
+			<MkA v-tooltip.noDelay.right="$locale.sfc.timeline" :class="$style.item" :activeClass="$style.active" to="/" exact>
+				<i :class="$style.itemIcon" class="ti ti-home ti-fw" style="view-transition-name: navbar-homeIcon;"></i><span :class="$style.itemText">{{ $locale.sfc.timeline }}</span>
 			</MkA>
 			<template v-for="item in prefer.r.menu.value">
 				<div v-if="item === '-'" :class="$style.divider"></div>
@@ -42,29 +42,29 @@ SPDX-License-Identifier: AGPL-3.0-only
 				</component>
 			</template>
 			<div :class="$style.divider"></div>
-			<MkA v-if="$i != null && ($i.isAdmin || $i.isModerator)" v-tooltip.noDelay.right="i18n.ts.controlPanel" :class="$style.item" :activeClass="$style.active" to="/admin">
-				<i :class="$style.itemIcon" class="ti ti-dashboard ti-fw" style="view-transition-name: navbar-controlPanel;"></i><span :class="$style.itemText">{{ i18n.ts.controlPanel }}</span>
+			<MkA v-if="$i != null && ($i.isAdmin || $i.isModerator)" v-tooltip.noDelay.right="$locale.sfc.controlPanel" :class="$style.item" :activeClass="$style.active" to="/admin">
+				<i :class="$style.itemIcon" class="ti ti-dashboard ti-fw" style="view-transition-name: navbar-controlPanel;"></i><span :class="$style.itemText">{{ $locale.sfc.controlPanel }}</span>
 			</MkA>
 			<button class="_button" :class="$style.item" @click="more">
-				<i :class="$style.itemIcon" class="ti ti-grid-dots ti-fw" style="view-transition-name: navbar-more;"></i><span :class="$style.itemText">{{ i18n.ts.more }}</span>
+				<i :class="$style.itemIcon" class="ti ti-grid-dots ti-fw" style="view-transition-name: navbar-more;"></i><span :class="$style.itemText">{{ $locale.sfc.more }}</span>
 				<span v-if="otherMenuItemIndicated" :class="$style.itemIndicator" class="_blink"><i class="_indicatorCircle"></i></span>
 			</button>
-			<MkA v-tooltip.noDelay.right="i18n.ts.settings" :class="$style.item" :activeClass="$style.active" to="/settings">
-				<i :class="$style.itemIcon" class="ti ti-settings ti-fw" style="view-transition-name: navbar-settings;"></i><span :class="$style.itemText">{{ i18n.ts.settings }}</span>
+			<MkA v-tooltip.noDelay.right="$locale.sfc.settings" :class="$style.item" :activeClass="$style.active" to="/settings">
+				<i :class="$style.itemIcon" class="ti ti-settings ti-fw" style="view-transition-name: navbar-settings;"></i><span :class="$style.itemText">{{ $locale.sfc.settings }}</span>
 			</MkA>
 		</div>
 		<div :class="$style.bottom">
-			<button v-if="iconOnly && showWidgetButton" v-tooltip.noDelay.right="i18n.ts.widgets" class="_button" :class="[$style.widget]" @click="() => emit('widgetButtonClick')">
+			<button v-if="iconOnly && showWidgetButton" v-tooltip.noDelay.right="$locale.sfc.widgets" class="_button" :class="[$style.widget]" @click="() => emit('widgetButtonClick')">
 				<i class="ti ti-apps ti-fw"></i>
 			</button>
-			<button v-if="iconOnly" v-tooltip.noDelay.right="i18n.ts.realtimeMode" class="_button" :class="[$style.realtimeMode, store.r.realtimeMode.value ? $style.on : null]" @click="toggleRealtimeMode">
+			<button v-if="iconOnly" v-tooltip.noDelay.right="$locale.sfc.realtimeMode" class="_button" :class="[$style.realtimeMode, store.r.realtimeMode.value ? $style.on : null]" @click="toggleRealtimeMode">
 				<i v-if="store.r.realtimeMode.value" class="ti ti-bolt ti-fw"></i>
 				<i v-else class="ti ti-bolt-off ti-fw"></i>
 			</button>
-			<button v-tooltip.noDelay.right="i18n.ts.note" class="_button" :class="[$style.post]" data-testid="open-post-form" @click="() => { os.post(); }">
-				<i class="ti ti-pencil ti-fw" :class="$style.postIcon"></i><span :class="$style.postText">{{ i18n.ts.note }}</span>
+			<button v-tooltip.noDelay.right="$locale.sfc.note" class="_button" :class="[$style.post]" data-testid="open-post-form" @click="() => { os.post(); }">
+				<i class="ti ti-pencil ti-fw" :class="$style.postIcon"></i><span :class="$style.postText">{{ $locale.sfc.note }}</span>
 			</button>
-			<button v-if="$i != null" v-tooltip.noDelay.right="`${i18n.ts.account}: @${$i.username}`" class="_button" :class="[$style.account]" @click="openAccountMenu">
+			<button v-if="$i != null" v-tooltip.noDelay.right="`${$locale.sfc.account}: @${$i.username}`" class="_button" :class="[$style.account]" @click="openAccountMenu">
 				<MkAvatar :user="$i" :class="$style.avatar" style="view-transition-name: navbar-avatar;"/><MkAcct class="_nowrap" :class="$style.acct" :user="$i"/>
 			</button>
 		</div>
@@ -105,17 +105,16 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import { computed, defineAsyncComponent, ref, watch } from 'vue';
-import { openInstanceMenu } from '@/ui/_common_/common.js';
-import * as os from '@/os.js';
-import { navbarItemDef } from '@/navbar.js';
-import { store } from '@/store.js';
-import { i18n } from '@/i18n.js';
-import { instance } from '@/instance.js';
+import { openInstanceMenu } from '@features/navigation/frontend/ui/_common_/common.js';
+import * as os from '@features/ui/frontend/os.js';
+import { navbarItemDef } from '@features/navigation/frontend/navbar.js';
+import { store } from '@features/preferences/frontend/store.js';
+import { instance } from '@features/instance/frontend/instance.js';
 import { getHTMLElementOrNull } from '@features/ui/frontend/utility/get-dom-node-or-null.js';
-import { useRouter } from '@/router.js';
-import { prefer } from '@/preferences.js';
-import { getAccountMenu } from '@/accounts.js';
-import { $i } from '@/i.js';
+import { useRouter } from '@features/navigation/frontend/router.js';
+import { prefer } from '@features/preferences/frontend/preferences.js';
+import { getAccountMenu } from '@features/auth/frontend/accounts.js';
+import { $i } from '@features/auth/frontend/i.js';
 
 const router = useRouter();
 
@@ -164,9 +163,9 @@ function toggleIconOnly() {
 function toggleRealtimeMode(ev: PointerEvent) {
 	os.popupMenu([{
 		type: 'label',
-		text: i18n.ts.realtimeMode,
+		text: $locale.value.sfc.realtimeMode,
 	}, {
-		text: store.s.realtimeMode ? i18n.ts.turnItOff : i18n.ts.turnItOn,
+		text: store.s.realtimeMode ? $locale.value.sfc.turnItOff : $locale.value.sfc.turnItOn,
 		icon: store.s.realtimeMode ? 'ti ti-bolt-off' : 'ti ti-bolt',
 		action: () => {
 			store.set('realtimeMode', !store.s.realtimeMode);
@@ -838,3 +837,451 @@ function menuEdit() {
 	}
 }
 </style>
+
+<locale locale="ar-SA" lang="json">
+{
+	"realtimeMode": "Real-time mode",
+	"turnItOff": "Turn off",
+	"turnItOn": "Turn on",
+	"instance": "مثيل الخادم",
+	"widgets": "التطبيقات المُصغّرة",
+	"timeline": "الخيط الزمني",
+	"controlPanel": "لوحة التحكم",
+	"more": "المزيد!",
+	"settings": "الاعدادات",
+	"note": "ملاحظة",
+	"account": "الحسابات"
+}
+</locale>
+
+<locale locale="ca-ES" lang="json">
+{
+	"realtimeMode": "Mode en temps real",
+	"turnItOff": "Desactivar",
+	"turnItOn": "Activar",
+	"instance": "Instància ",
+	"widgets": "Ginys",
+	"timeline": "Línia de temps",
+	"controlPanel": "Tauler de control",
+	"more": "Més",
+	"settings": "Preferències",
+	"note": "Nota",
+	"account": "Compte"
+}
+</locale>
+
+<locale locale="cs-CZ" lang="json">
+{
+	"realtimeMode": "Real-time mode",
+	"turnItOff": "Turn off",
+	"turnItOn": "Turn on",
+	"instance": "Instance",
+	"widgets": "Widgety",
+	"timeline": "Časová osa",
+	"controlPanel": "Ovládací panel",
+	"more": "Více!",
+	"settings": "Nastavení",
+	"note": "Poznámka",
+	"account": "Účty"
+}
+</locale>
+
+<locale locale="da-DK" lang="json">
+{
+	"realtimeMode": "Real-time mode",
+	"turnItOff": "Turn off",
+	"turnItOn": "Turn on",
+	"instance": "Instance",
+	"widgets": "Widgets",
+	"timeline": "Timeline",
+	"controlPanel": "Control Panel",
+	"more": "More!",
+	"settings": "Settings",
+	"note": "Note",
+	"account": "Account"
+}
+</locale>
+
+<locale locale="de-DE" lang="json">
+{
+	"realtimeMode": "Echtzeit-Modus",
+	"turnItOff": "Ausschalten",
+	"turnItOn": "Einschalten",
+	"instance": "Instanz",
+	"widgets": "Widgets",
+	"timeline": "Chronik",
+	"controlPanel": "Systemsteuerung",
+	"more": "Mehr!",
+	"settings": "Einstellungen",
+	"note": "Notiz",
+	"account": "Benutzerkonto"
+}
+</locale>
+
+<locale locale="en-US" lang="json">
+{
+	"realtimeMode": "Real-time mode",
+	"turnItOff": "Turn off",
+	"turnItOn": "Turn on",
+	"instance": "Instance",
+	"widgets": "Widgets",
+	"timeline": "Timeline",
+	"controlPanel": "Control Panel",
+	"more": "More!",
+	"settings": "Settings",
+	"note": "Note",
+	"account": "Account"
+}
+</locale>
+
+<locale locale="es-ES" lang="json">
+{
+	"realtimeMode": "Modo en tiempo real",
+	"turnItOff": "Desactivar",
+	"turnItOn": "Activar",
+	"instance": "Instancia",
+	"widgets": "Widgets",
+	"timeline": "Línea de tiempo",
+	"controlPanel": "Panel de control",
+	"more": "¡Más!",
+	"settings": "Configuración",
+	"note": "Nota",
+	"account": "Cuentas"
+}
+</locale>
+
+<locale locale="fr-FR" lang="json">
+{
+	"realtimeMode": "Real-time mode",
+	"turnItOff": "Turn off",
+	"turnItOn": "Turn on",
+	"instance": "Instance",
+	"widgets": "Widgets",
+	"timeline": "Fil",
+	"controlPanel": "Panneau de configuration",
+	"more": "Plus !",
+	"settings": "Paramètres",
+	"note": "Note",
+	"account": "Comptes"
+}
+</locale>
+
+<locale locale="id-ID" lang="json">
+{
+	"realtimeMode": "Real-time mode",
+	"turnItOff": "Turn off",
+	"turnItOn": "Turn on",
+	"instance": "Server",
+	"widgets": "Widget",
+	"timeline": "Lini masa",
+	"controlPanel": "Panel kendali",
+	"more": "Lainnya",
+	"settings": "Pengaturan",
+	"note": "Catatan",
+	"account": "Akun"
+}
+</locale>
+
+<locale locale="it-IT" lang="json">
+{
+	"realtimeMode": "Modalità in tempo reale",
+	"turnItOff": "Disattivare",
+	"turnItOn": "Attivare",
+	"instance": "Istanza",
+	"widgets": "Riquadri",
+	"timeline": "Timeline",
+	"controlPanel": "Pannello di controllo",
+	"more": "Di più!",
+	"settings": "Impostazioni",
+	"note": "Nota",
+	"account": "Account"
+}
+</locale>
+
+<locale locale="ja-JP" lang="json">
+{
+	"realtimeMode": "リアルタイムモード",
+	"turnItOff": "オフにする",
+	"turnItOn": "オンにする",
+	"instance": "サーバー",
+	"widgets": "ウィジェット",
+	"timeline": "タイムライン",
+	"controlPanel": "コントロールパネル",
+	"more": "もっと！",
+	"settings": "設定",
+	"note": "ノート",
+	"account": "アカウント"
+}
+</locale>
+
+<locale locale="ja-KS" lang="json">
+{
+	"realtimeMode": "リアルタイムモード",
+	"turnItOff": "オフでええわ",
+	"turnItOn": "オンにしとこ",
+	"instance": "サーバー",
+	"widgets": "ウィジェット",
+	"timeline": "タイムライン",
+	"controlPanel": "コントロールパネル",
+	"more": "他のん",
+	"settings": "設定",
+	"note": "ノート",
+	"account": "アカウント"
+}
+</locale>
+
+<locale locale="kab-KAB" lang="json">
+{
+	"realtimeMode": "Real-time mode",
+	"turnItOff": "Turn off",
+	"turnItOn": "Turn on",
+	"instance": "Instance",
+	"widgets": "Widgets",
+	"timeline": "Timeline",
+	"controlPanel": "Control Panel",
+	"more": "More!",
+	"settings": "Iɣewwaṛen",
+	"note": "Note",
+	"account": "Imiḍan"
+}
+</locale>
+
+<locale locale="kn-IN" lang="json">
+{
+	"realtimeMode": "Real-time mode",
+	"turnItOff": "Turn off",
+	"turnItOn": "Turn on",
+	"instance": "ನಿದರ್ಶನ",
+	"widgets": "Widgets",
+	"timeline": "ಸಮಯಸಾಲು",
+	"controlPanel": "Control Panel",
+	"more": "More!",
+	"settings": "ಸಿದ್ಧತೆಗಳು",
+	"note": "Note",
+	"account": "Account"
+}
+</locale>
+
+<locale locale="ko-KR" lang="json">
+{
+	"realtimeMode": "실시간 모드",
+	"turnItOff": "끄기",
+	"turnItOn": "켜기",
+	"instance": "서버",
+	"widgets": "위젯",
+	"timeline": "타임라인",
+	"controlPanel": "제어판",
+	"more": "더 보기!",
+	"settings": "설정",
+	"note": "노트",
+	"account": "계정"
+}
+</locale>
+
+<locale locale="nl-NL" lang="json">
+{
+	"realtimeMode": "Real-time mode",
+	"turnItOff": "Turn off",
+	"turnItOn": "Turn on",
+	"instance": "Server",
+	"widgets": "Widgets",
+	"timeline": "Tijdlijn",
+	"controlPanel": "Controlepaneel",
+	"more": "Meer!",
+	"settings": "Instellingen",
+	"note": "Notitie",
+	"account": "Gebruikersaccounts"
+}
+</locale>
+
+<locale locale="no-NO" lang="json">
+{
+	"realtimeMode": "Real-time mode",
+	"turnItOff": "Turn off",
+	"turnItOn": "Turn on",
+	"instance": "Server",
+	"widgets": "Widgets",
+	"timeline": "Tidslinje",
+	"controlPanel": "Control Panel",
+	"more": "Mer!",
+	"settings": "Innstillinger",
+	"note": "Note",
+	"account": "Konto"
+}
+</locale>
+
+<locale locale="pl-PL" lang="json">
+{
+	"realtimeMode": "Real-time mode",
+	"turnItOff": "Turn off",
+	"turnItOn": "Turn on",
+	"instance": "Instancja",
+	"widgets": "Widżety",
+	"timeline": "Oś czasu",
+	"controlPanel": "Panel sterowania",
+	"more": "Więcej!",
+	"settings": "Ustawienia",
+	"note": "Utwórz wpis",
+	"account": "Konta"
+}
+</locale>
+
+<locale locale="pt-PT" lang="json">
+{
+	"realtimeMode": "Modo tempo-real",
+	"turnItOff": "Desativar",
+	"turnItOn": "Ativar",
+	"instance": "Instância",
+	"widgets": "Widgets",
+	"timeline": "Linha do tempo",
+	"controlPanel": "Painel de controle",
+	"more": "Mais!",
+	"settings": "Configurações",
+	"note": "Publicar",
+	"account": "Contas"
+}
+</locale>
+
+<locale locale="ru-RU" lang="json">
+{
+	"realtimeMode": "Режим реального времени",
+	"turnItOff": "Выключить",
+	"turnItOn": "Включить",
+	"instance": "Экземпляр",
+	"widgets": "Виджеты",
+	"timeline": "Лента",
+	"controlPanel": "Панель управления",
+	"more": "Ещё!",
+	"settings": "Настройки",
+	"note": "Заметка",
+	"account": "Учётные записи"
+}
+</locale>
+
+<locale locale="sk-SK" lang="json">
+{
+	"realtimeMode": "Real-time mode",
+	"turnItOff": "Turn off",
+	"turnItOn": "Turn on",
+	"instance": "Inštancia",
+	"widgets": "Widgety",
+	"timeline": "Časová os",
+	"controlPanel": "Ovládací panel",
+	"more": "Viac!",
+	"settings": "Nastavenia",
+	"note": "Poznámka",
+	"account": "Účty"
+}
+</locale>
+
+<locale locale="th-TH" lang="json">
+{
+	"realtimeMode": "โหมดเรียลไทม์",
+	"turnItOff": "ปิดใช้งาน",
+	"turnItOn": "เปิดใช้งาน",
+	"instance": "เซิร์ฟเวอร์",
+	"widgets": "วิดเจ็ต",
+	"timeline": "ไทม์ไลน์",
+	"controlPanel": "แผงควบคุม",
+	"more": "เพิ่มเติม!",
+	"settings": "การตั้งค่า",
+	"note": " โน้ต",
+	"account": "บัญชีผู้ใช้"
+}
+</locale>
+
+<locale locale="tr-TR" lang="json">
+{
+	"realtimeMode": "Gerçek zamanlı mod",
+	"turnItOff": "Kapat",
+	"turnItOn": "Aç",
+	"instance": "Sunucu",
+	"widgets": "Widget'lar",
+	"timeline": "Pano",
+	"controlPanel": "Kontrol Paneli",
+	"more": "Daha fazlası!",
+	"settings": "Ayarlar",
+	"note": "Not",
+	"account": "Hesap"
+}
+</locale>
+
+<locale locale="ug-CN" lang="json">
+{
+	"realtimeMode": "Real-time mode",
+	"turnItOff": "Turn off",
+	"turnItOn": "Turn on",
+	"instance": "Instance",
+	"widgets": "Widgets",
+	"timeline": "Timeline",
+	"controlPanel": "Control Panel",
+	"more": "More!",
+	"settings": "Settings",
+	"note": "Note",
+	"account": "Account"
+}
+</locale>
+
+<locale locale="uk-UA" lang="json">
+{
+	"realtimeMode": "Режим реального часу",
+	"turnItOff": "Вимкнути",
+	"turnItOn": "Увімкнути",
+	"instance": "Інстанс",
+	"widgets": "Віджети",
+	"timeline": "Стрічка",
+	"controlPanel": "Панель керування",
+	"more": "Бiльше!",
+	"settings": "Налаштування",
+	"note": "Запис",
+	"account": "Акаунти"
+}
+</locale>
+
+<locale locale="vi-VN" lang="json">
+{
+	"realtimeMode": "Real-time mode",
+	"turnItOff": "Turn off",
+	"turnItOn": "Turn on",
+	"instance": "Máy chủ",
+	"widgets": "Tiện ích",
+	"timeline": "Bảng tin",
+	"controlPanel": "Bảng điều khiển",
+	"more": "Thêm nữa!",
+	"settings": "Cài đặt",
+	"note": "Bài viết",
+	"account": "Tài khoản của bạn"
+}
+</locale>
+
+<locale locale="zh-CN" lang="json">
+{
+	"realtimeMode": "实时模式",
+	"turnItOff": "关闭",
+	"turnItOn": "开启",
+	"instance": "服务器",
+	"widgets": "小工具",
+	"timeline": "时间线",
+	"controlPanel": "控制面板",
+	"more": "更多！",
+	"settings": "设置",
+	"note": "发帖",
+	"account": "账户"
+}
+</locale>
+
+<locale locale="zh-TW" lang="json">
+{
+	"realtimeMode": "即時模式",
+	"turnItOff": "關閉",
+	"turnItOn": "開啟",
+	"instance": "伺服器",
+	"widgets": "小工具",
+	"timeline": "時間軸",
+	"controlPanel": "控制臺",
+	"more": "更多！",
+	"settings": "設定",
+	"note": "貼文",
+	"account": "帳戶"
+}
+</locale>

@@ -6,6 +6,8 @@
 import { FORCE_RE_RENDER, FORCE_REMOUNT } from '@storybook/core-events';
 import { addons } from '@storybook/preview-api';
 import { type Preview, setup } from '@storybook/vue3';
+import { createInternationalization, setActiveInternationalization } from 'virtual:vite-vue-internationalization';
+import { startComponentLocales } from '@features/boot/frontend/index.js';
 import isChromatic from 'chromatic/isChromatic';
 import { initialize, mswLoader } from 'msw-storybook-addon';
 import { userDetailed } from './fakes.js';
@@ -20,7 +22,7 @@ let moduleInitialized = false;
 let unobserve = () => {};
 let misskeyOS = null;
 
-function loadTheme(themeMaganer: typeof import('../src/theme')['themeManager']) {
+function loadTheme(themeMaganer: typeof import('../../features/preferences/frontend/theme')['themeManager']) {
 	unobserve();
 	const theme = themes[window.document.documentElement.dataset.misskeyTheme];
 	if (theme) {
@@ -60,31 +62,33 @@ initialize({
 	onUnhandledRequest,
 });
 initLocalStorage();
-queueMicrotask(() => {
-	Promise.all([
-		import('../src/components/index.js'),
-		import('../src/directives/index.js'),
-		import('../src/widgets/index.js'),
-		import('../src/theme.js'),
-		import('../src/preferences.js'),
-		import('../src/os.js'),
-	]).then(([{ default: components }, { default: directives }, { default: widgets }, { applyTheme }, { prefer }, os]) => {
-		setup((app) => {
-			moduleInitialized = true;
-			if (app[appInitialized]) {
-				return;
-			}
-			app[appInitialized] = true;
-			loadTheme(applyTheme);
-			components(app);
-			directives(app);
-			widgets(app);
-			misskeyOS = os;
-			if (isChromatic()) {
-				prefer.commit('animation', false);
-			}
-		});
-	});
+// Await locale activation before Storybook can finish evaluating this preview.
+// Story modules and initialization graphs can capture owner messages eagerly.
+const { lang } = await import('@features/boot/frontend/shared/config.js');
+const internationalization = await startComponentLocales(lang, createInternationalization, setActiveInternationalization);
+const [{ default: components }, { default: directives }, { default: widgets }, { themeManager }, { prefer }, os] = await Promise.all([
+	import('../../features/index/frontend/components.js'),
+	import('../../features/index/frontend/directives.js'),
+	import('../../features/index/frontend/widgets.js'),
+	import('../../features/preferences/frontend/theme.js'),
+	import('../../features/preferences/frontend/preferences.js'),
+	import('../../features/ui/frontend/os.js'),
+]);
+setup((app) => {
+	moduleInitialized = true;
+	if (app[appInitialized]) {
+		return;
+	}
+	app[appInitialized] = true;
+	app.use(internationalization);
+	loadTheme(themeManager);
+	components(app);
+	directives(app);
+	widgets(app);
+	misskeyOS = os;
+	if (isChromatic()) {
+		prefer.commit('animation', false);
+	}
 });
 
 const preview = {
@@ -97,13 +101,13 @@ const preview = {
 				const channel = addons.getChannel();
 				const resetIndexedDBPromise = globalThis.indexedDB?.databases
 					? indexedDB.databases().then((r) => {
-							for (var i = 0; i < r.length; i++) {
+							for (let i = 0; i < r.length; i++) {
 								indexedDB.deleteDatabase(r[i].name!);
 							}
 						}).catch(() => {})
 					: Promise.resolve();
-				const resetDefaultStorePromise = import('../src/store').then(({ store }) => {
-					// @ts-expect-error
+				const resetDefaultStorePromise = import('../../features/preferences/frontend/store').then(({ store }) => {
+					// @ts-expect-error -- Storybook deliberately invokes the private initializer to reset story state.
 					store.init();
 				}).catch(() => {});
 				Promise.all([resetIndexedDBPromise, resetDefaultStorePromise]).then(() => {

@@ -2,33 +2,23 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import { type AchievementService } from '../../services/AchievementService.js';
+import type { ApiToken } from '@features/api/backend/transport/context.js';
+import type { UsersInputs } from '../../api.definition.js';
 
-import { Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
-import { AchievementService } from '@/core/AchievementService.js';
-import { ACHIEVEMENT_TYPES } from '@/models/UserProfile.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+import { iClaimAchievementContract } from './claim-achievement.contract.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
 
-export const meta = {
-	requireCredential: true,
-	prohibitMoved: true,
-	kind: 'write:account',
-} as const;
-
-export const paramDef = {
-	type: 'object',
-	properties: {
-		name: { type: 'string', enum: ACHIEVEMENT_TYPES },
-	},
-	required: ['name'],
-} as const;
-
-@Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
-	constructor(
-		private achievementService: AchievementService,
-	) {
-		super(meta, paramDef, async (ps, me) => {
-			await this.achievementService.create(me.id, ps.name);
-		});
+export interface IClaimAchievementDependencies {
+	achievementService: AchievementService;
+}
+export function createIClaimAchievementProcedure(deps: IClaimAchievementDependencies) {
+	async function execute(ps: UsersInputs['i/claim-achievement'], me: MiLocalUser, _token: ApiToken | null, _ip: string) {
+		await deps.achievementService.create(me.id, ps.name);
 	}
+
+	return createApiProcedure<MiLocalUser>()(iClaimAchievementContract).use(requirePrincipal<MiLocalUser>())
+		.handler(async ({ input, context }) => await execute(input, context.principal, context.token, context.ip));
 }

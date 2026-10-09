@@ -3,34 +3,28 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Inject, Injectable } from '@nestjs/common';
 import { Brackets, EntityNotFoundError } from 'typeorm';
-import { DI } from '@/di-symbols.js';
-import type { MiUser } from '@/models/User.js';
-import type { AnnouncementReadsRepository, AnnouncementsRepository, MiAnnouncement, MiAnnouncementRead, UsersRepository } from '@/models/_.js';
-import { bindThis } from '@/decorators.js';
-import { Packed } from '@/misc/json-schema.js';
-import { IdService } from '@/core/IdService.js';
-import { AnnouncementEntityService } from '@/core/entities/AnnouncementEntityService.js';
-import { GlobalEventService } from '@/core/GlobalEventService.js';
-import { ModerationLogService } from '@/core/ModerationLogService.js';
+import type { MiUser } from '@features/users/backend/models/User.js';
+import type { AnnouncementReadsRepository, AnnouncementsRepository, MiAnnouncement, MiAnnouncementRead, UsersRepository } from '@features/persistence/backend/repositories/models.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
+import { Packed } from '@features/index/backend/packed.schema.js';
+import type { IdService } from '@features/runtime/backend/services/IdService.js';
+import type { AnnouncementEntityService } from '../serializers/AnnouncementEntityService.js';
+import type { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
+import type { ModerationLogService } from '@features/moderation/backend/services/ModerationLogService.js';
 
-@Injectable()
 export class AnnouncementService {
 	constructor(
-		@Inject(DI.announcementsRepository)
 		private announcementsRepository: AnnouncementsRepository,
 
-		@Inject(DI.announcementReadsRepository)
 		private announcementReadsRepository: AnnouncementReadsRepository,
 
-		@Inject(DI.usersRepository)
 		private usersRepository: UsersRepository,
 
-		private idService: IdService,
-		private globalEventService: GlobalEventService,
-		private moderationLogService: ModerationLogService,
-		private announcementEntityService: AnnouncementEntityService,
+		private idService: Pick<IdService, 'gen'>,
+		private globalEventService: Pick<GlobalEventService, 'publishBroadcastStream' | 'publishMainStream'>,
+		private moderationLogService: Pick<ModerationLogService, 'log'>,
+		private announcementEntityService: Pick<AnnouncementEntityService, 'pack'>,
 	) {
 	}
 

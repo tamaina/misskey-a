@@ -3,143 +3,72 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Inject, Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
-import { IdService } from '@/core/IdService.js';
-import type { UserListsRepository, AntennasRepository } from '@/models/_.js';
-import { GlobalEventService } from '@/core/GlobalEventService.js';
-import { AntennaEntityService } from '@/core/entities/AntennaEntityService.js';
-import { DI } from '@/di-symbols.js';
-import { RoleService } from '@/core/RoleService.js';
-import { ApiError } from '@/server/api/error.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import { toPackedAntenna } from '@features/timelines/backend/antenna.schema.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import { antennasCreateContract, antennasCreateErrors } from './create.contract.js';
+import { IdService } from '@features/runtime/backend/services/IdService.js';
+import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
+import { RoleService } from '@features/roles/backend/services/RoleService.js';
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
+import { AntennaEntityService } from '../../serializers/AntennaEntityService.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+import type { UserListsRepository, AntennasRepository } from '@features/persistence/backend/repositories/models.js';
 
-export const meta = {
-	tags: ['antennas'],
-
-	requireCredential: true,
-
-	prohibitMoved: true,
-
-	kind: 'write:account',
-
-	errors: {
-		noSuchUserList: {
-			message: 'No such user list.',
-			code: 'NO_SUCH_USER_LIST',
-			id: '95063e93-a283-4b8b-9aa5-bcdb8df69a7f',
-		},
-
-		tooManyAntennas: {
-			message: 'You cannot create antenna any more.',
-			code: 'TOO_MANY_ANTENNAS',
-			id: 'faf47050-e8b5-438c-913c-db2b1576fde4',
-		},
-
-		emptyKeyword: {
-			message: 'Either keywords or excludeKeywords is required.',
-			code: 'EMPTY_KEYWORD',
-			id: '53ee222e-1ddd-4f9a-92e5-9fb82ddb463a',
-		},
-	},
-
-	res: {
-		type: 'object',
-		optional: false, nullable: false,
-		ref: 'Antenna',
-	},
-} as const;
-
-export const paramDef = {
-	type: 'object',
-	properties: {
-		name: { type: 'string', minLength: 1, maxLength: 100 },
-		src: { type: 'string', enum: ['home', 'all', 'users', 'list', 'users_blacklist'] },
-		userListId: { type: 'string', format: 'misskey:id', nullable: true },
-		keywords: { type: 'array', items: {
-			type: 'array', items: {
-				type: 'string',
-			},
-		} },
-		excludeKeywords: { type: 'array', items: {
-			type: 'array', items: {
-				type: 'string',
-			},
-		} },
-		users: { type: 'array', items: {
-			type: 'string',
-		} },
-		caseSensitive: { type: 'boolean' },
-		localOnly: { type: 'boolean' },
-		excludeBots: { type: 'boolean' },
-		withReplies: { type: 'boolean' },
-		withFile: { type: 'boolean' },
-		excludeNotesInSensitiveChannel: { type: 'boolean' },
-	},
-	required: ['name', 'src', 'keywords', 'excludeKeywords', 'users', 'caseSensitive', 'withReplies', 'withFile'],
-} as const;
-
-@Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
-	constructor(
-		@Inject(DI.antennasRepository)
-		private antennasRepository: AntennasRepository,
-
-		@Inject(DI.userListsRepository)
-		private userListsRepository: UserListsRepository,
-
-		private antennaEntityService: AntennaEntityService,
-		private roleService: RoleService,
-		private idService: IdService,
-		private globalEventService: GlobalEventService,
-	) {
-		super(meta, paramDef, async (ps, me) => {
-			if (ps.keywords.flat().every(x => x === '') && ps.excludeKeywords.flat().every(x => x === '')) {
-				throw new ApiError(meta.errors.emptyKeyword);
-			}
-
-			const currentAntennasCount = await this.antennasRepository.countBy({
-				userId: me.id,
-			});
-			if (currentAntennasCount >= (await this.roleService.getUserPolicies(me.id)).antennaLimit) {
-				throw new ApiError(meta.errors.tooManyAntennas);
-			}
-
-			let userList;
-
-			if (ps.src === 'list' && ps.userListId) {
-				userList = await this.userListsRepository.findOneBy({
-					id: ps.userListId,
+export interface AntennasCreateDependencies {
+	antennasRepository: AntennasRepository;
+	userListsRepository: UserListsRepository;
+	antennaEntityService: AntennaEntityService;
+	roleService: RoleService;
+	idService: IdService;
+	globalEventService: GlobalEventService;
+}
+export function createAntennasCreateProcedure<Actor extends MiLocalUser>(deps: AntennasCreateDependencies) {
+	return createApiProcedure<Actor>()(antennasCreateContract).use(requirePrincipal<Actor>())
+		.handler(async ({ input, context }) => {
+			const result = await (async () => {
+				const ps = input;
+				const me = context.principal;
+				if (ps.keywords.flat().every(x => x === '') && ps.excludeKeywords.flat().every(x => x === '')) {
+					throw apiError(antennasCreateErrors.emptyKeyword);
+				}
+				const currentAntennasCount = await deps.antennasRepository.countBy({
 					userId: me.id,
 				});
-
-				if (userList == null) {
-					throw new ApiError(meta.errors.noSuchUserList);
+				if (currentAntennasCount >= (await deps.roleService.getUserPolicies(me.id)).antennaLimit) {
+					throw apiError(antennasCreateErrors.tooManyAntennas);
 				}
-			}
-
-			const now = new Date();
-
-			const antenna = await this.antennasRepository.insertOne({
-				id: this.idService.gen(now.getTime()),
-				lastUsedAt: now,
-				userId: me.id,
-				name: ps.name,
-				src: ps.src,
-				userListId: userList ? userList.id : null,
-				keywords: ps.keywords,
-				excludeKeywords: ps.excludeKeywords,
-				users: ps.users,
-				caseSensitive: ps.caseSensitive,
-				localOnly: ps.localOnly,
-				excludeBots: ps.excludeBots,
-				withReplies: ps.withReplies,
-				withFile: ps.withFile,
-				excludeNotesInSensitiveChannel: ps.excludeNotesInSensitiveChannel,
-			});
-
-			this.globalEventService.publishInternalEvent('antennaCreated', antenna);
-
-			return await this.antennaEntityService.pack(antenna);
+				let userList;
+				if (ps.src === 'list' && ps.userListId) {
+					userList = await deps.userListsRepository.findOneBy({
+						id: ps.userListId,
+						userId: me.id,
+					});
+					if (userList == null) {
+						throw apiError(antennasCreateErrors.noSuchUserList);
+					}
+				}
+				const now = new Date();
+				const antenna = await deps.antennasRepository.insertOne({
+					id: deps.idService.gen(now.getTime()),
+					lastUsedAt: now,
+					userId: me.id,
+					name: ps.name,
+					src: ps.src,
+					userListId: userList ? userList.id : null,
+					keywords: ps.keywords,
+					excludeKeywords: ps.excludeKeywords,
+					users: ps.users,
+					caseSensitive: ps.caseSensitive,
+					localOnly: ps.localOnly,
+					excludeBots: ps.excludeBots,
+					withReplies: ps.withReplies,
+					withFile: ps.withFile,
+					excludeNotesInSensitiveChannel: ps.excludeNotesInSensitiveChannel,
+				});
+				deps.globalEventService.publishInternalEvent('antennaCreated', antenna);
+				return await deps.antennaEntityService.pack(antenna);
+			})();
+			return toPackedAntenna(result);
 		});
-	}
 }

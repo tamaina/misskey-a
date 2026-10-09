@@ -4,12 +4,12 @@
  */
 
 import { Inject, Injectable } from '@nestjs/common';
-import type { UserProfilesRepository } from '@/models/_.js';
-import type { MiUser } from '@/models/User.js';
+import type { UserProfilesRepository } from '@features/persistence/backend/repositories/models.js';
+import type { MiUser } from '../models/User.js';
 import { DI } from '@/di-symbols.js';
-import { bindThis } from '@/decorators.js';
-import { NotificationService } from '@/core/NotificationService.js';
-import { ACHIEVEMENT_TYPES } from '@/models/UserProfile.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
+import { NotificationService } from '@features/notifications/backend/services/NotificationService.js';
+import { ACHIEVEMENT_TYPES } from '../models/UserProfile.js';
 
 @Injectable()
 export class AchievementService {

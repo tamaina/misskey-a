@@ -53,10 +53,10 @@ import * as Misskey from 'misskey-js';
 import XChart from '@features/operations/frontend/pages/admin/federation-job-queue.chart.chart.vue';
 import type { ApQueueDomain } from '@features/operations/frontend/pages/admin/federation-job-queue.vue';
 import number from '@features/ui/frontend/filters/number.js';
-import { misskeyApi } from '@/utility/misskey-api.js';
-import { useStream } from '@/stream.js';
-import MkFolder from '@/components/MkFolder.vue';
-import { genId } from '@/utility/id.js';
+import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
+import { useStream } from '@features/api/frontend/stream.js';
+import MkFolder from '@features/ui/frontend/components/MkFolder.vue';
+import { genId } from '@features/runtime/frontend/utility/id.js';
 
 const connection = markRaw(useStream().useChannel('queueStats'));
 

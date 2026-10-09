@@ -41,6 +41,7 @@
 	"include": [
 		"./**/*.ts",
 		"../src/**/*.test.ts",
-		"../src/@types/**/*.ts"
+		"../src/@types/**/*.ts",
+		"../../features/*/test/backend/**/*.ts"
 	]
 }

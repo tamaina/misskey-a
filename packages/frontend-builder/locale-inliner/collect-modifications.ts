@@ -112,7 +112,8 @@ export function collectModifications(sourceCode: string, fileName: string, fileL
 
 	// In case of substitution failure, we will preserve the import statement
 	// otherwise we will remove it.
-	let preserveI18nImport = false;
+	// A shared chunk may also export VVI owners or unrelated runtime helpers.
+	let preserveI18nImport = i18nImport.specifiers.length > 1;
 
 	const codeModifications: TextModification[] = [];
 
@@ -428,22 +429,12 @@ function findImportSpecifier(programNode: ESTree.Program, i18nFileName: string, 
 		return { type: 'no-specifiers', importNode };
 	}
 
-	if (importNode.specifiers.length !== 1) {
+	// Imports of other exports from a shared i18n chunk are not i18n uses.
+	if (importNode.specifiers.some(specifier => specifier.type !== 'ImportSpecifier' || specifier.imported.type !== 'Identifier')) {
 		return { type: 'unexpected-specifiers', importNode };
 	}
-	const i18nImportSpecifier = importNode.specifiers[0];
-	if (i18nImportSpecifier.type !== 'ImportSpecifier') {
-		return { type: 'unexpected-specifiers', importNode };
-	}
-
-	if (i18nImportSpecifier.imported.type !== 'Identifier') {
-		return { type: 'unexpected-specifiers', importNode };
-	}
-
-	const importingIdentifier = i18nImportSpecifier.imported.name;
-	if (importingIdentifier !== i18nSymbol) {
-		return { type: 'unexpected-specifiers', importNode };
-	}
+	const i18nImportSpecifier = importNode.specifiers.find(specifier => specifier.type === 'ImportSpecifier' && specifier.imported.type === 'Identifier' && specifier.imported.name === i18nSymbol);
+	if (!i18nImportSpecifier || i18nImportSpecifier.type !== 'ImportSpecifier') return { type: 'no-import' };
 	const localI18nIdentifier = i18nImportSpecifier.local.name;
 	return { type: 'specifier', localI18nIdentifier, importNode };
 }

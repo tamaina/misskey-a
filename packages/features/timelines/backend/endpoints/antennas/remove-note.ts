@@ -3,59 +3,30 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Inject, Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
-import type { AntennasRepository } from '@/models/_.js';
-import { FanoutTimelineService } from '@/core/FanoutTimelineService.js';
-import { DI } from '@/di-symbols.js';
-import { ApiError } from '@/server/api/error.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import { antennasRemoveNoteContract, antennasRemoveNoteErrors } from './remove-note.contract.js';
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
+import { FanoutTimelineService } from '../../services/FanoutTimelineService.js';
+import type { AntennasRepository } from '@features/persistence/backend/repositories/models.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
 
-export const meta = {
-	tags: ['antennas', 'account', 'notes'],
-
-	requireCredential: true,
-
-	prohibitMoved: true,
-
-	kind: 'write:account',
-
-	errors: {
-		noSuchAntenna: {
-			message: 'No such antenna.',
-			code: 'NO_SUCH_ANTENNA',
-			id: '850926e0-fd3b-49b6-b69a-b28a5dbd82fe',
-		},
-	},
-} as const;
-
-export const paramDef = {
-	type: 'object',
-	properties: {
-		antennaId: { type: 'string', format: 'misskey:id' },
-		noteId: { type: 'string', format: 'misskey:id' },
-	},
-	required: ['antennaId', 'noteId'],
-} as const;
-
-@Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
-	constructor(
-		@Inject(DI.antennasRepository)
-		private antennasRepository: AntennasRepository,
-
-		private fanoutTimelineService: FanoutTimelineService,
-	) {
-		super(meta, paramDef, async (ps, me) => {
-			const antenna = await this.antennasRepository.findOneBy({
+export interface AntennasRemoveNoteDependencies {
+	antennasRepository: AntennasRepository;
+	fanoutTimelineService: FanoutTimelineService;
+}
+export function createAntennasRemoveNoteProcedure<Actor extends MiLocalUser>(deps: AntennasRemoveNoteDependencies) {
+	return createApiProcedure<Actor>()(antennasRemoveNoteContract).use(requirePrincipal<Actor>())
+		.handler(async ({ input, context }) => {
+			const ps = input;
+			const me = context.principal;
+			const antenna = await deps.antennasRepository.findOneBy({
 				id: ps.antennaId,
 				userId: me.id,
 			});
-
 			if (antenna == null) {
-				throw new ApiError(meta.errors.noSuchAntenna);
+				throw apiError(antennasRemoveNoteErrors.noSuchAntenna);
 			}
-
-			await this.fanoutTimelineService.remove(`antennaTimeline:${antenna.id}`, ps.noteId);
+			await deps.fanoutTimelineService.remove(`antennaTimeline:${antenna.id}`, ps.noteId);
 		});
-	}
 }

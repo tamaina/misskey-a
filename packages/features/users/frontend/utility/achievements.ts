@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { misskeyApi } from '@/utility/misskey-api.js';
-import { $i } from '@/i.js';
+import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
+import { $i } from '@features/auth/frontend/i.js';
 
 export const ACHIEVEMENT_TYPES = [
 	'notes1',

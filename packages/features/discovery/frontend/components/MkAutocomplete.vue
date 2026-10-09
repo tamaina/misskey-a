@@ -47,19 +47,19 @@ SPDX-License-Identifier: AGPL-3.0-only
 import { markRaw, ref, useTemplateRef, computed, onUpdated, onMounted, onBeforeUnmount, nextTick, watch } from 'vue';
 import * as Misskey from 'misskey-js';
 import sanitizeHtml from 'sanitize-html';
-import { emojilist, getEmojiName } from '@@/js/emojilist.js';
-import { char2twemojiFilePath, char2fluentEmojiFilePath } from '@@/js/emoji-base.js';
-import { MFM_TAGS, MFM_PARAMS } from '@@/js/const.js';
+import { emojilist, getEmojiName } from '@features/emojis/frontend/shared/emojilist.js';
+import { char2twemojiFilePath, char2fluentEmojiFilePath } from '@features/emojis/frontend/shared/emoji-base.js';
+import { MFM_TAGS, MFM_PARAMS } from '@features/markup/frontend/shared/mfm-constants.js';
 import type { EmojiDef } from '@features/emojis/frontend/utility/search-emoji.js';
 import { elementContains } from '@features/ui/frontend/utility/element-contains.js';
-import { acct } from '@features/users/frontend/filters/user.js';
-import * as os from '@/os.js';
-import { misskeyApi } from '@/utility/misskey-api.js';
-import { store } from '@/store.js';
-import { miLocalStorage } from '@/local-storage.js';
-import { customEmojis } from '@/custom-emojis.js';
+import { acct } from '@features/users/frontend/shared/user.js';
+import * as os from '@features/ui/frontend/os.js';
+import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
+import { store } from '@features/preferences/frontend/store.js';
+import { miLocalStorage } from '@features/preferences/frontend/local-storage.js';
+import { customEmojis } from '@features/emojis/frontend/custom-emojis.js';
 import { searchEmoji, searchEmojiExact } from '@features/emojis/frontend/utility/search-emoji.js';
-import { prefer } from '@/preferences.js';
+import { prefer } from '@features/preferences/frontend/preferences.js';
 
 export type CompleteInfo = {
 	user: {

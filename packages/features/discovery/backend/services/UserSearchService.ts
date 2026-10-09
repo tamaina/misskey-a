@@ -3,36 +3,28 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Inject, Injectable } from '@nestjs/common';
 import { Brackets, SelectQueryBuilder } from 'typeorm';
-import { DI } from '@/di-symbols.js';
-import { type FollowingsRepository, MiUser, type MutingsRepository, type UserProfilesRepository, type UsersRepository } from '@/models/_.js';
-import { bindThis } from '@/decorators.js';
-import { sqlLikeEscape } from '@/misc/sql-like-escape.js';
+import { type FollowingsRepository, MiUser, type MutingsRepository, type UserProfilesRepository, type UsersRepository } from '@features/persistence/backend/repositories/models.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
+import { sqlLikeEscape } from '@features/persistence/backend/utility/sql-like-escape.js';
 import type { Config } from '@/config.js';
-import { UserEntityService } from '@/core/entities/UserEntityService.js';
-import { Packed } from '@/misc/json-schema.js';
+import type { NativeUser } from '@features/users/backend/serializers/native-user.js';
+import type { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 
 function defaultActiveThreshold() {
 	return new Date(Date.now() - 1000 * 60 * 60 * 24 * 30);
 }
 
-@Injectable()
 export class UserSearchService {
 	constructor(
-		@Inject(DI.config)
 		private config: Config,
 
-		@Inject(DI.usersRepository)
 		private usersRepository: UsersRepository,
 
-		@Inject(DI.userProfilesRepository)
 		private userProfilesRepository: UserProfilesRepository,
 
-		@Inject(DI.followingsRepository)
 		private followingsRepository: FollowingsRepository,
 
-		@Inject(DI.mutingsRepository)
 		private mutingsRepository: MutingsRepository,
 
 		private userEntityService: UserEntityService,
@@ -78,7 +70,7 @@ export class UserSearchService {
 			detail?: boolean,
 		},
 		me?: MiUser | null,
-	): Promise<Packed<'User'>[]> {
+	): Promise<NativeUser[]> {
 		const queries = me ? this.buildSearchUserQueries(me, params) : this.buildSearchUserNoLoginQueries(params);
 
 		let resultSet = new Set<MiUser['id']>();
@@ -97,7 +89,7 @@ export class UserSearchService {
 			}
 		}
 
-		return this.userEntityService.packMany<'UserLite' | 'UserDetailed'>(
+		return this.userEntityService.packMany(
 			[...resultSet].slice(0, limit),
 			me,
 			{ schema: opts?.detail ? 'UserDetailed' : 'UserLite' },

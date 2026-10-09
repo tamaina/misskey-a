@@ -2,75 +2,36 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
+import { toPackedUserLite } from '@features/users/backend/user.schema.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 
-import { Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
-import { IdentifiableError } from '@/misc/identifiable-error.js';
-import { UserEntityService } from '@/core/entities/UserEntityService.js';
-import { GetterService } from '@/server/api/GetterService.js';
-import { UserFollowingService } from '@/core/UserFollowingService.js';
-import { ApiError } from '@/server/api/error.js';
-
-export const meta = {
-	tags: ['following', 'account'],
-
-	requireCredential: true,
-
-	kind: 'write:following',
-
-	errors: {
-		noSuchUser: {
-			message: 'No such user.',
-			code: 'NO_SUCH_USER',
-			id: '4e68c551-fc4c-4e46-bb41-7d4a37bf9dab',
-		},
-
-		followRequestNotFound: {
-			message: 'Follow request not found.',
-			code: 'FOLLOW_REQUEST_NOT_FOUND',
-			id: '089b125b-d338-482a-9a09-e2622ac9f8d4',
-		},
-	},
-
-	res: {
-		type: 'object',
-		optional: false, nullable: false,
-		ref: 'UserLite',
-	},
-} as const;
-
-export const paramDef = {
-	type: 'object',
-	properties: {
-		userId: { type: 'string', format: 'misskey:id' },
-	},
-	required: ['userId'],
-} as const;
-
-@Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
-	constructor(
-		private userEntityService: UserEntityService,
-		private getterService: GetterService,
-		private userFollowingService: UserFollowingService,
-	) {
-		super(meta, paramDef, async (ps, me) => {
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import { relationshipsContract } from '../../relationships.contract.js';
+import type { RelationshipsDependencies } from '../../../api.implementation.js';
+import { IdentifiableError } from '@features/runtime/backend/errors/identifiable-error.js';
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
+import { relationshipsErrors } from '../../relationships.errors.js';
+export function createFollowingRequestsCancelProcedure<Actor extends MiLocalUser>(deps: Pick<RelationshipsDependencies, 'getterService' | 'userFollowingService' | 'userEntityService'>) {
+	return createApiProcedure<Actor>()(relationshipsContract["following/requests/cancel"]).use(requirePrincipal<Actor>())
+		.handler(async ({ input, context }) => {
+			const ps = input;
+			const me = context.principal;
 			// Fetch followee
-			const followee = await this.getterService.getUser(ps.userId).catch(err => {
-				if (err.id === '15348ddd-432d-49c2-8a5a-8069753becff') throw new ApiError(meta.errors.noSuchUser);
+			const followee = await deps.getterService.getUser(ps.userId).catch(err => {
+				if (err.id === '15348ddd-432d-49c2-8a5a-8069753becff') throw apiError(relationshipsErrors['following/requests/cancel'].noSuchUser);
 				throw err;
 			});
 
 			try {
-				await this.userFollowingService.cancelFollowRequest(followee, me);
+				await deps.userFollowingService.cancelFollowRequest(followee, me);
 			} catch (err) {
 				if (err instanceof IdentifiableError) {
-					if (err.id === '17447091-ce07-46dd-b331-c1fd4f15b1e7') throw new ApiError(meta.errors.followRequestNotFound);
+					if (err.id === '17447091-ce07-46dd-b331-c1fd4f15b1e7') throw apiError(relationshipsErrors['following/requests/cancel'].followRequestNotFound);
 				}
 				throw err;
 			}
 
-			return await this.userEntityService.pack(followee.id, me);
+			return toPackedUserLite(await deps.userEntityService.pack(followee.id, me));
 		});
-	}
 }

@@ -3,16 +3,16 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { MFM_TAGS } from '@@/js/const.js';
-import * as os from '@/os.js';
-import { i18n } from '@/i18n.js';
+import { MFM_TAGS } from '@features/markup/frontend/shared/mfm-constants.js';
+import * as os from '@features/ui/frontend/os.js';
+import FeatureLocaleMessages from '@features/markup/frontend/ts-messages.vue';
 
 /**
  * MFMの装飾のリストを表示する
  */
 export function mfmFunctionPicker(anchorElement: HTMLElement | EventTarget | null, onChosen: (tag: string) => void, onClosed?: () => void) {
 	os.popupMenu([{
-		text: i18n.ts.addMfmFunction,
+		text: FeatureLocaleMessages.$locale.addMfmFunction,
 		type: 'label',
 	}, ...MFM_TAGS.map(tag => ({
 		text: tag,

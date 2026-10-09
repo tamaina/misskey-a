@@ -9,7 +9,7 @@ import { loadNotFoundPage } from '@features/navigation/frontend';
 import { startComponentLocales } from '@features/boot/frontend';
 import MkResult from '@features/ui/frontend/components/global/MkResult.vue';
 import MkError from '@features/ui/frontend/components/global/MkError.vue';
-import MkGoogle from '@/components/MkGoogle.vue';
+import MkGoogle from '@features/integrations/frontend/components/MkGoogle.vue';
 
 try {
 	const locale = new URL(window.location.href).searchParams.get('locale') ?? 'en-US';

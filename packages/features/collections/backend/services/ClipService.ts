@@ -3,17 +3,14 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Inject, Injectable } from '@nestjs/common';
 import { QueryFailedError } from 'typeorm';
-import { DI } from '@/di-symbols.js';
-import type { ClipsRepository, MiNote, MiClip, ClipNotesRepository, NotesRepository } from '@/models/_.js';
-import { bindThis } from '@/decorators.js';
-import { isDuplicateKeyValueError } from '@/misc/is-duplicate-key-value-error.js';
-import { RoleService } from '@/core/RoleService.js';
-import { IdService } from '@/core/IdService.js';
-import type { MiLocalUser } from '@/models/User.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
+import { isDuplicateKeyValueError } from '@features/persistence/backend/utility/is-duplicate-key-value-error.js';
+import type { ClipsRepository, MiNote, MiClip, ClipNotesRepository, NotesRepository } from '@features/persistence/backend/repositories/models.js';
+import type { RoleService } from '@features/roles/backend/services/RoleService.js';
+import type { IdService } from '@features/runtime/backend/services/IdService.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
 
-@Injectable()
 export class ClipService {
 	public static NoSuchNoteError = class extends Error {};
 	public static NoSuchClipError = class extends Error {};
@@ -22,22 +19,19 @@ export class ClipService {
 	public static TooManyClipsError = class extends Error {};
 
 	constructor(
-		@Inject(DI.clipsRepository)
 		private clipsRepository: ClipsRepository,
 
-		@Inject(DI.clipNotesRepository)
 		private clipNotesRepository: ClipNotesRepository,
 
-		@Inject(DI.notesRepository)
 		private notesRepository: NotesRepository,
 
-		private roleService: RoleService,
-		private idService: IdService,
+		private roleService: Pick<RoleService, 'getUserPolicies'>,
+		private idService: Pick<IdService, 'gen'>,
 	) {
 	}
 
 	@bindThis
-	public async create(me: MiLocalUser, name: string, isPublic: boolean, description: string | null): Promise<MiClip> {
+	public async create(me: Pick<MiLocalUser, 'id'>, name: string, isPublic: boolean, description: string | null): Promise<MiClip> {
 		const currentCount = await this.clipsRepository.countBy({
 			userId: me.id,
 		});
@@ -57,7 +51,7 @@ export class ClipService {
 	}
 
 	@bindThis
-	public async update(me: MiLocalUser, clipId: MiClip['id'], name: string | undefined, isPublic: boolean | undefined, description: string | null | undefined): Promise<void> {
+	public async update(me: Pick<MiLocalUser, 'id'>, clipId: MiClip['id'], name: string | undefined, isPublic: boolean | undefined, description: string | null | undefined): Promise<void> {
 		const clip = await this.clipsRepository.findOneBy({
 			id: clipId,
 			userId: me.id,

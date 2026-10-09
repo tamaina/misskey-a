@@ -3,59 +3,24 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Inject, Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
-import { QueryService } from '@/core/QueryService.js';
-import type { ClipsRepository } from '@/models/_.js';
-import { ClipEntityService } from '@/core/entities/ClipEntityService.js';
-import { DI } from '@/di-symbols.js';
-
-export const meta = {
-	tags: ['clips', 'account'],
-
-	requireCredential: true,
-
-	kind: 'read:account',
-
-	res: {
-		type: 'array',
-		optional: false, nullable: false,
-		items: {
-			type: 'object',
-			optional: false, nullable: false,
-			ref: 'Clip',
-		},
-	},
-} as const;
-
-export const paramDef = {
-	type: 'object',
-	properties: {
-		limit: { type: 'integer', minimum: 1, maximum: 100, default: 10 },
-		sinceId: { type: 'string', format: 'misskey:id' },
-		untilId: { type: 'string', format: 'misskey:id' },
-		sinceDate: { type: 'integer' },
-		untilDate: { type: 'integer' },
-	},
-	required: [],
-} as const;
-
-@Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
-	constructor(
-		@Inject(DI.clipsRepository)
-		private clipsRepository: ClipsRepository,
-
-		private queryService: QueryService,
-		private clipEntityService: ClipEntityService,
-	) {
-		super(meta, paramDef, async (ps, me) => {
-			const query = this.queryService.makePaginationQuery(this.clipsRepository.createQueryBuilder('clip'), ps.sinceId, ps.untilId, ps.sinceDate, ps.untilDate)
+import { toPackedClip } from '../../api.dto.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import { requirePrincipal, decodeScalarInput } from '@features/api/backend/transport/middleware.js';
+import type { ApiActor } from '@features/api/backend/transport/context.js';
+import { collectionsContract } from '../../api.definition.js';
+import type { CollectionsDependencies } from '../../api.implementation.js';
+export interface ClipsListDependencies<Actor extends ApiActor> {
+	queryService: Pick<CollectionsDependencies<Actor>['queryService'], 'makePaginationQuery'>;
+	clipsRepository: Pick<CollectionsDependencies<Actor>['clipsRepository'], 'createQueryBuilder'>;
+	clipEntityService: Pick<CollectionsDependencies<Actor>['clipEntityService'], 'packMany'>;
+}
+export function createClipsListProcedure<Actor extends ApiActor>(deps: ClipsListDependencies<Actor>) {
+	return createApiProcedure<Actor>()(collectionsContract.clipsList).use(requirePrincipal<Actor>()).use(decodeScalarInput<Actor>({ limit: 'integer', sinceDate: 'integer', untilDate: 'integer' }))
+		.handler(async ({ input: ps, context }) => {
+			const me = context.principal;
+			const query = deps.queryService.makePaginationQuery(deps.clipsRepository.createQueryBuilder('clip'), ps.sinceId, ps.untilId, ps.sinceDate, ps.untilDate)
 				.andWhere('clip.userId = :userId', { userId: me.id });
-
 			const clips = await query.limit(ps.limit).getMany();
-
-			return await this.clipEntityService.packMany(clips, me);
+			return (await deps.clipEntityService.packMany(clips, me)).map(toPackedClip);
 		});
-	}
 }

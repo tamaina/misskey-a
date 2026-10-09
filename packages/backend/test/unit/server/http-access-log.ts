@@ -6,9 +6,9 @@
 import { Readable } from 'node:stream';
 import Fastify, { type FastifyInstance } from 'fastify';
 import { afterEach, describe, expect, test, vi } from 'vitest';
-import { LogManager } from '@/logging/LogManager.js';
-import type { AccessLogRecord, AccessLogStatusClass } from '@/logging/types.js';
-import { registerHttpAccessLog } from '@/server/http-access-log.js';
+import { LogManager } from '@features/runtime/backend/logging/LogManager.js';
+import type { AccessLogRecord, AccessLogStatusClass } from '@features/runtime/backend/logging/types.js';
+import { registerHttpAccessLog } from '@features/runtime/backend/http/http-access-log.js';
 
 type TestServer = {
 	readonly fastify: FastifyInstance;

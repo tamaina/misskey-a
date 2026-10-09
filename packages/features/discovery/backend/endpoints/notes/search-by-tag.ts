@@ -3,157 +3,89 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { toPackedNote } from '@features/notes/backend/note.schema.js';
 import { Brackets } from 'typeorm';
-import { Inject, Injectable } from '@nestjs/common';
-import type { NotesRepository } from '@/models/_.js';
-import { safeForSql } from '@/misc/safe-for-sql.js';
-import { normalizeForSearch } from '@/misc/normalize-for-search.js';
-import { Endpoint } from '@/server/api/endpoint-base.js';
-import { QueryService } from '@/core/QueryService.js';
-import { NoteEntityService } from '@/core/entities/NoteEntityService.js';
-import { DI } from '@/di-symbols.js';
+import { safeForSql } from '@features/persistence/backend/utility/safe-for-sql.js';
+import { QueryService } from '@features/notes/backend/services/QueryService.js';
+import { NoteEntityService } from '@features/notes/backend/serializers/NoteEntityService.js';
+import { normalizeForSearch } from '../../utility/normalize-for-search.js';
+import type { NotesRepository } from '@features/persistence/backend/repositories/models.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 
-export const meta = {
-	tags: ['notes', 'hashtags'],
+import type { ApiContext } from '@features/api/backend/transport/context.js';
+import { discoveryContract, type DiscoveryInputs } from '../discovery.contract.js';
+export interface NotesSearchByTagDependencies {
+	notesRepository: NotesRepository;
+	noteEntityService: NoteEntityService;
+	queryService: QueryService;
+}
+export function createNotesSearchByTagProcedure<Actor extends MiLocalUser>(deps: NotesSearchByTagDependencies) {
+	const handler = async ({ input: ps, context: { principal: me } }: { input: DiscoveryInputs['notes/search-by-tag']; context: ApiContext<Actor> & { principal: Actor | null } }) => {
+		const query = deps.queryService.makePaginationQuery(deps.notesRepository.createQueryBuilder('note'), ps.sinceId, ps.untilId, ps.sinceDate, ps.untilDate)
+			.innerJoinAndSelect('note.user', 'user')
+			.leftJoinAndSelect('note.reply', 'reply')
+			.leftJoinAndSelect('note.renote', 'renote')
+			.leftJoinAndSelect('reply.user', 'replyUser')
+			.leftJoinAndSelect('renote.user', 'renoteUser');
 
-	res: {
-		type: 'array',
-		optional: false, nullable: false,
-		items: {
-			type: 'object',
-			optional: false, nullable: false,
-			ref: 'Note',
-		},
-	},
-} as const;
+		deps.queryService.generateVisibilityQuery(query, me);
+		if (me == null) deps.queryService.generateUgcVisibilityQueryForVisitor(query);
+		deps.queryService.generateBaseNoteFilteringQuery(query, me);
 
-export const paramDef = {
-	allOf: [
-		{
-			anyOf: [
-				{
-					type: 'object',
-					properties: {
-						tag: { type: 'string', minLength: 1 },
-					},
-					required: ['tag'],
-				},
-				{
-					type: 'object',
-					properties: {
-						query: {
-							type: 'array',
-							description: 'The outer arrays are chained with OR, the inner arrays are chained with AND.',
-							items: {
-								type: 'array',
-								items: {
-									type: 'string',
-									minLength: 1,
-								},
-								minItems: 1,
-							},
-							minItems: 1,
-						},
-					},
-					required: ['query'],
-				},
-			],
-		},
-		{
-			type: 'object',
-			properties: {
-				reply: { type: 'boolean', nullable: true, default: null },
-				renote: { type: 'boolean', nullable: true, default: null },
-				withFiles: {
-					type: 'boolean',
-					default: false,
-					description: 'Only show notes that have attached files.',
-				},
-				poll: { type: 'boolean', nullable: true, default: null },
-				sinceId: { type: 'string', format: 'misskey:id' },
-				untilId: { type: 'string', format: 'misskey:id' },
-				sinceDate: { type: 'integer' },
-				untilDate: { type: 'integer' },
-				limit: { type: 'integer', minimum: 1, maximum: 100, default: 10 },
-			},
-		},
-	],
-} as const;
-
-@Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
-	constructor(
-		@Inject(DI.notesRepository)
-		private notesRepository: NotesRepository,
-
-		private noteEntityService: NoteEntityService,
-		private queryService: QueryService,
-	) {
-		super(meta, paramDef, async (ps, me) => {
-			const query = this.queryService.makePaginationQuery(this.notesRepository.createQueryBuilder('note'), ps.sinceId, ps.untilId, ps.sinceDate, ps.untilDate)
-				.innerJoinAndSelect('note.user', 'user')
-				.leftJoinAndSelect('note.reply', 'reply')
-				.leftJoinAndSelect('note.renote', 'renote')
-				.leftJoinAndSelect('reply.user', 'replyUser')
-				.leftJoinAndSelect('renote.user', 'renoteUser');
-
-			this.queryService.generateVisibilityQuery(query, me);
-			if (me == null) this.queryService.generateUgcVisibilityQueryForVisitor(query);
-			this.queryService.generateBaseNoteFilteringQuery(query, me);
-
-			try {
-				if ('tag' in ps) {
-					if (!safeForSql(normalizeForSearch(ps.tag))) throw new Error('Injection');
-					query.andWhere(':tag <@ note.tags', { tag: [normalizeForSearch(ps.tag)] });
-				} else {
-					query.andWhere(new Brackets(qb => {
-						for (const tags of ps.query) {
-							qb.orWhere(new Brackets(qb => {
-								for (const tag of tags) {
-									if (!safeForSql(normalizeForSearch(tag))) throw new Error('Injection');
-									qb.andWhere(':tag <@ note.tags', { tag: [normalizeForSearch(tag)] });
-								}
-							}));
-						}
-					}));
-				}
-			} catch (e) {
-				if (e === 'Injection') return [];
-				throw e;
+		try {
+			if ('tag' in ps) {
+				if (!safeForSql(normalizeForSearch(ps.tag))) throw new Error('Injection');
+				query.andWhere(':tag <@ note.tags', { tag: [normalizeForSearch(ps.tag)] });
+			} else {
+				query.andWhere(new Brackets(qb => {
+					for (const tags of ps.query) {
+						qb.orWhere(new Brackets(qb => {
+							for (const tag of tags) {
+								if (!safeForSql(normalizeForSearch(tag))) throw new Error('Injection');
+								qb.andWhere(':tag <@ note.tags', { tag: [normalizeForSearch(tag)] });
+							}
+						}));
+					}
+				}));
 			}
+		} catch (e) {
+			if (e === 'Injection') return [];
+			throw e;
+		}
 
-			if (ps.reply != null) {
-				if (ps.reply) {
-					query.andWhere('note.replyId IS NOT NULL');
-				} else {
-					query.andWhere('note.replyId IS NULL');
-				}
+		if (ps.reply != null) {
+			if (ps.reply) {
+				query.andWhere('note.replyId IS NOT NULL');
+			} else {
+				query.andWhere('note.replyId IS NULL');
 			}
+		}
 
-			if (ps.renote != null) {
-				if (ps.renote) {
-					query.andWhere('note.renoteId IS NOT NULL');
-				} else {
-					query.andWhere('note.renoteId IS NULL');
-				}
+		if (ps.renote != null) {
+			if (ps.renote) {
+				query.andWhere('note.renoteId IS NOT NULL');
+			} else {
+				query.andWhere('note.renoteId IS NULL');
 			}
+		}
 
-			if (ps.withFiles) {
-				query.andWhere('note.fileIds != \'{}\'');
+		if (ps.withFiles) {
+			query.andWhere('note.fileIds != \'{}\'');
+		}
+
+		if (ps.poll != null) {
+			if (ps.poll) {
+				query.andWhere('note.hasPoll = TRUE');
+			} else {
+				query.andWhere('note.hasPoll = FALSE');
 			}
+		}
 
-			if (ps.poll != null) {
-				if (ps.poll) {
-					query.andWhere('note.hasPoll = TRUE');
-				} else {
-					query.andWhere('note.hasPoll = FALSE');
-				}
-			}
+		// Search notes
+		const notes = await query.limit(ps.limit).getMany();
 
-			// Search notes
-			const notes = await query.limit(ps.limit).getMany();
-
-			return await this.noteEntityService.packMany(notes, me);
-		});
-	}
+		return (await deps.noteEntityService.packMany(notes, me)).map(toPackedNote);
+	};
+	return createApiProcedure<Actor>()(discoveryContract['notes/search-by-tag']).handler(handler);
 }

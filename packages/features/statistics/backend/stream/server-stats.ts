@@ -5,10 +5,10 @@
 
 import Xev from 'xev';
 import { Inject, Injectable, Scope } from '@nestjs/common';
-import { bindThis } from '@/decorators.js';
-import { isJsonObject } from '@/misc/json-value.js';
-import type { JsonObject, JsonValue } from '@/misc/json-value.js';
-import Channel, { type ChannelRequest } from '@/server/api/stream/channel.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
+import { isJsonObject } from '@features/runtime/backend/formatting/json-value.js';
+import type { JsonObject, JsonValue } from '@features/runtime/backend/formatting/json-value.js';
+import Channel, { type ChannelRequest } from '@features/api/backend/transport/stream/channel.js';
 import { REQUEST } from '@nestjs/core';
 
 const ev = new Xev();

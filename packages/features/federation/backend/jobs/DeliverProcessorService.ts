@@ -7,21 +7,21 @@ import { Inject, Injectable } from '@nestjs/common';
 import * as Bull from 'bullmq';
 import { Not } from 'typeorm';
 import { DI } from '@/di-symbols.js';
-import type { InstancesRepository, MiMeta } from '@/models/_.js';
-import type Logger from '@/logger.js';
-import { ApRequestService } from '@/core/activitypub/ApRequestService.js';
-import { FederatedInstanceService } from '@/core/FederatedInstanceService.js';
-import { FetchInstanceMetadataService } from '@/core/FetchInstanceMetadataService.js';
-import { MemorySingleCache } from '@/misc/cache.js';
-import type { MiInstance } from '@/models/Instance.js';
-import InstanceChart from '@/core/chart/charts/instance.js';
-import ApRequestChart from '@/core/chart/charts/ap-request.js';
-import FederationChart from '@/core/chart/charts/federation.js';
-import { StatusError } from '@/misc/status-error.js';
-import { UtilityService } from '@/core/UtilityService.js';
-import { bindThis } from '@/decorators.js';
-import { QueueLoggerService } from '@/queue/QueueLoggerService.js';
-import type { DeliverJobData } from '@/queue/types.js';
+import type { InstancesRepository, MiMeta } from '@features/persistence/backend/repositories/models.js';
+import type { Logger } from '@features/runtime/backend/logging/logger.js';
+import { ApRequestService } from '../services/ApRequestService.js';
+import { FederatedInstanceService } from '../services/FederatedInstanceService.js';
+import { FetchInstanceMetadataService } from '../services/FetchInstanceMetadataService.js';
+import { MemorySingleCache } from '@features/runtime/backend/cache/cache.js';
+import type { MiInstance } from '../models/Instance.js';
+import { InstanceChart } from '@features/statistics/backend/charts/instance.js';
+import { ApRequestChart } from '@features/statistics/backend/charts/ap-request.js';
+import { FederationChart } from '@features/statistics/backend/charts/federation.js';
+import { StatusError } from '@features/runtime/backend/http/status-error.js';
+import { UtilityService } from '../services/UtilityService.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
+import { QueueLoggerService } from '@features/runtime/backend/queue/QueueLoggerService.js';
+import type { DeliverJobData } from '@features/runtime/backend/queue/types.js';
 
 @Injectable()
 export class DeliverProcessorService {

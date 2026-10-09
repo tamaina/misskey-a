@@ -4,8 +4,8 @@
  */
 
 import { computed } from 'vue';
-import { normalizeCustomEmojiName } from '@@/js/emoji-name.js';
-import { prefer } from '@/preferences.js';
+import { normalizeCustomEmojiName } from '@features/emojis/frontend/shared/emoji-name.js';
+import { prefer } from '@features/preferences/frontend/preferences.js';
 
 // custom絵文字の情報からキーを作成する
 export function makeEmojiMuteKey(props: { name: string; host?: string | null }) {

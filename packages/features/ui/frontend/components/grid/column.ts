@@ -8,7 +8,7 @@ import type { GridCellValidator } from '@features/ui/frontend/components/grid/ce
 import type { Size, SizeStyle } from '@features/ui/frontend/components/grid/grid.js';
 import type { CellValue, GridCell } from '@features/ui/frontend/components/grid/cell.js';
 import type { GridRow } from '@features/ui/frontend/components/grid/row.js';
-import type { MenuItem } from '@/types/menu.js';
+import type { MenuItem } from '@features/navigation/frontend/types/menu.js';
 import type { GridContext } from '@features/ui/frontend/components/grid/grid-event.js';
 
 export type ColumnType = 'text' | 'number' | 'date' | 'boolean' | 'image' | 'hidden';

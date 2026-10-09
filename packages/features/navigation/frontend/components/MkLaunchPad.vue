@@ -29,9 +29,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script lang="ts" setup>
 import { useTemplateRef } from 'vue';
 import MkModal from '@features/ui/frontend/components/MkModal.vue';
-import { navbarItemDef } from '@/navbar.js';
+import { navbarItemDef } from '@features/navigation/frontend/navbar.js';
 import { deviceKind } from '@features/ui/frontend/utility/device-kind.js';
-import { prefer } from '@/preferences.js';
+import { prefer } from '@features/preferences/frontend/preferences.js';
 
 const props = withDefaults(defineProps<{
 	anchorElement?: HTMLElement | null;

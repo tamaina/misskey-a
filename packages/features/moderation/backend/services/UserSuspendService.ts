@@ -5,15 +5,15 @@
 
 import { Inject, Injectable } from '@nestjs/common';
 import { Not, IsNull } from 'typeorm';
-import type { FollowingsRepository, FollowRequestsRepository, UsersRepository } from '@/models/_.js';
-import type { MiUser } from '@/models/User.js';
-import { QueueService } from '@/core/QueueService.js';
-import { GlobalEventService } from '@/core/GlobalEventService.js';
+import type { FollowingsRepository, FollowRequestsRepository, UsersRepository } from '@features/persistence/backend/repositories/models.js';
+import type { MiUser } from '@features/users/backend/models/User.js';
+import { QueueService } from '@features/runtime/backend/services/QueueService.js';
+import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
 import { DI } from '@/di-symbols.js';
-import { ApRendererService } from '@/core/activitypub/ApRendererService.js';
-import { UserEntityService } from '@/core/entities/UserEntityService.js';
-import { bindThis } from '@/decorators.js';
-import { ModerationLogService } from '@/core/ModerationLogService.js';
+import { ApRendererService } from '@features/federation/backend/services/ApRendererService.js';
+import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
+import { ModerationLogService } from './ModerationLogService.js';
 
 @Injectable()
 export class UserSuspendService {

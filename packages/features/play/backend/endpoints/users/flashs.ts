@@ -2,62 +2,29 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
+import { toPackedFlash } from '../../flash.schema.js';
 
-import { Inject, Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
-import { QueryService } from '@/core/QueryService.js';
-import { FlashEntityService } from '@/core/entities/FlashEntityService.js';
-import type { FlashsRepository } from '@/models/_.js';
-import { DI } from '@/di-symbols.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 
-export const meta = {
-	tags: ['users', 'flashs'],
-
-	description: 'Show all flashs this user created.',
-
-	res: {
-		type: 'array',
-		optional: false, nullable: false,
-		items: {
-			type: 'object',
-			optional: false, nullable: false,
-			ref: 'Flash',
-		},
-	},
-} as const;
-
-export const paramDef = {
-	type: 'object',
-	properties: {
-		userId: { type: 'string', format: 'misskey:id' },
-		limit: { type: 'integer', minimum: 1, maximum: 100, default: 10 },
-		sinceId: { type: 'string', format: 'misskey:id' },
-		untilId: { type: 'string', format: 'misskey:id' },
-		sinceDate: { type: 'integer' },
-		untilDate: { type: 'integer' },
-	},
-	required: ['userId'],
-} as const;
-
-@Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
-	constructor(
-		@Inject(DI.flashsRepository)
-		private flashsRepository: FlashsRepository,
-
-		private flashEntityService: FlashEntityService,
-		private queryService: QueryService,
-	) {
-		super(meta, paramDef, async (ps, me) => {
-			const query = this.queryService.makePaginationQuery(this.flashsRepository.createQueryBuilder('flash'), ps.sinceId, ps.untilId, ps.sinceDate, ps.untilDate)
+import { usersFlashsContract } from './flashs.contract.js';
+import type { QueryService } from '@features/notes/backend/services/QueryService.js';
+import type { FlashEntityService } from '../../serializers/FlashEntityService.js';
+import type { FlashsRepository } from '@features/persistence/backend/repositories/models.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+export interface UsersFlashsDependencies {
+	flashsRepository: Pick<FlashsRepository, 'createQueryBuilder'>;
+	flashEntityService: Pick<FlashEntityService, 'packMany'>;
+	queryService: Pick<QueryService, 'makePaginationQuery'>;
+}
+export function createUsersFlashsProcedure(deps: UsersFlashsDependencies) {
+	return createApiProcedure<MiLocalUser>()(usersFlashsContract)
+		.handler(async ({ input: ps }) => {
+			const query = deps.queryService.makePaginationQuery(deps.flashsRepository.createQueryBuilder('flash'), ps.sinceId, ps.untilId, ps.sinceDate, ps.untilDate)
 				.andWhere('flash.userId = :userId', { userId: ps.userId })
 				.andWhere('flash.visibility = \'public\'');
-
 			const flashs = await query
 				.limit(ps.limit)
 				.getMany();
-
-			return await this.flashEntityService.packMany(flashs);
+			return (await deps.flashEntityService.packMany(flashs)).map(toPackedFlash);
 		});
-	}
 }

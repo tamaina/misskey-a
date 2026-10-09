@@ -1,0 +1,59 @@
+/*
+ * SPDX-FileCopyrightText: syuilo and misskey-project
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
+
+import FFmpeg from 'fluent-ffmpeg';
+import type { Config } from '@/config.js';
+import { createTempDir } from '@features/runtime/backend/io/create-temp.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
+import { appendQuery, query } from '@features/runtime/backend/formatting/url.js';
+import type { IImage } from './ImageProcessingService.js';
+import type { ImageProcessingService } from './ImageProcessingService.js';
+
+export class VideoProcessingService {
+	constructor(
+		private config: Config,
+
+		private imageProcessingService: ImageProcessingService,
+	) {
+	}
+
+	@bindThis
+	public async generateVideoThumbnail(source: string): Promise<IImage> {
+		const [dir, cleanup] = await createTempDir();
+
+		try {
+			await new Promise((res, rej) => {
+				FFmpeg({
+					source,
+				})
+					.on('end', res)
+					.on('error', rej)
+					.screenshot({
+						folder: dir,
+						filename: 'out.png',	// must have .png extension
+						count: 1,
+						timestamps: ['5%'],
+					});
+			});
+
+			return await this.imageProcessingService.convertToWebp(`${dir}/out.png`, 498, 422);
+		} finally {
+			cleanup();
+		}
+	}
+
+	@bindThis
+	public getExternalVideoThumbnailUrl(url: string): string | null {
+		if (this.config.videoThumbnailGenerator == null) return null;
+
+		return appendQuery(
+			`${this.config.videoThumbnailGenerator}/thumbnail.webp`,
+			query({
+				thumbnail: '1',
+				url,
+			}),
+		);
+	}
+}

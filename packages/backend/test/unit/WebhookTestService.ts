@@ -7,15 +7,15 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { beforeAll, afterAll, beforeEach, afterEach, test, expect, describe, vi } from 'vitest';
 import type { Mocked } from 'vitest';
-import { WebhookTestService } from '@/core/WebhookTestService.js';
-import { UserWebhookPayload, UserWebhookService } from '@/core/UserWebhookService.js';
-import { SystemWebhookService } from '@/core/SystemWebhookService.js';
-import { GlobalModule } from '@/GlobalModule.js';
-import { MiSystemWebhook, MiUser, MiWebhook, UserProfilesRepository, UsersRepository } from '@/models/_.js';
-import { IdService } from '@/core/IdService.js';
+import { WebhookTestService } from '@features/integrations/backend/services/WebhookTestService.js';
+import { UserWebhookPayload, UserWebhookService } from '@features/integrations/backend/services/UserWebhookService.js';
+import { SystemWebhookService } from '@features/integrations/backend/services/SystemWebhookService.js';
+import { GlobalModule } from '@features/boot/backend/assembly/GlobalModule.js';
+import { MiSystemWebhook, MiUser, MiWebhook, UserProfilesRepository, UsersRepository } from '@features/persistence/backend/repositories/models.js';
+import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { DI } from '@/di-symbols.js';
-import { QueueService } from '@/core/QueueService.js';
-import { CustomEmojiService } from '@/core/CustomEmojiService.js';
+import { QueueService } from '@features/runtime/backend/services/QueueService.js';
+import { CustomEmojiService } from '@features/emojis/backend/services/CustomEmojiService.js';
 
 describe('WebhookTestService', () => {
 	let app: TestingModule;

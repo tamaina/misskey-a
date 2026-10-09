@@ -7,7 +7,6 @@ process.env.NODE_ENV = 'test';
 
 import * as assert from 'assert';
 import { describe, beforeAll, test } from 'vitest';
-import { ReversiMatchResponse } from 'misskey-js/entities.js';
 import { api, signup } from '../utils.js';
 import type * as misskey from 'misskey-js';
 
@@ -27,7 +26,8 @@ describe('ReversiGame', () => {
 		const response2 = await api('reversi/match', { userId: alice.id }, bob);
 		assert.strictEqual(response2.status, 200);
 		assert.notStrictEqual(response2.body, null);
-		const body = response2.body as ReversiMatchResponse;
+		const body = response2.body;
+		assert.ok(body);
 		assert.strictEqual(body.user1.id, alice.id);
 		assert.strictEqual(body.user2.id, bob.id);
 	});

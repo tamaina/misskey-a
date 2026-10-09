@@ -54,16 +54,16 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import { ref } from 'vue';
-import { i18n } from '@/i18n.js';
-import { instance } from '@/instance.js';
-import { definePage } from '@/page.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
+import { instance } from '@features/instance/frontend/instance.js';
+import { definePage } from '@features/navigation/frontend/page.js';
 import MkKeyValue from '@features/ui/frontend/components/MkKeyValue.vue';
-import MkLink from '@/components/MkLink.vue';
+import MkLink from '@features/navigation/frontend/components/MkLink.vue';
 import MkSelect from '@features/ui/frontend/components/MkSelect.vue';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import { useMkSelect } from '@features/ui/frontend/composables/use-mkselect.js';
-import * as os from '@/os.js';
-import MkFolder from '@/components/MkFolder.vue';
+import * as os from '@features/ui/frontend/os.js';
+import MkFolder from '@features/ui/frontend/components/MkFolder.vue';
 
 const {
 	model: resultType,

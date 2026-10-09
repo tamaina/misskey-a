@@ -5,13 +5,13 @@
 
 import { Inject, Injectable, Scope } from '@nestjs/common';
 import { DI } from '@/di-symbols.js';
-import { bindThis } from '@/decorators.js';
-import type { GlobalEvents } from '@/core/GlobalEventService.js';
-import type { JsonObject } from '@/misc/json-value.js';
-import { ChatService } from '@/core/ChatService.js';
-import Channel, { type ChannelRequest } from '@/server/api/stream/channel.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
+import type { GlobalEvents } from '@features/runtime/backend/services/GlobalEventService.js';
+import type { JsonObject } from '@features/runtime/backend/formatting/json-value.js';
+import { ChatService } from '../services/ChatService.js';
+import Channel, { type ChannelRequest } from '@features/api/backend/transport/stream/channel.js';
 import { REQUEST } from '@nestjs/core';
-import type { ChatRoomsRepository } from '@/models/_.js';
+import type { ChatRoomsRepository } from '@features/persistence/backend/repositories/models.js';
 
 @Injectable({ scope: Scope.TRANSIENT })
 export class ChatRoomChannel extends Channel {

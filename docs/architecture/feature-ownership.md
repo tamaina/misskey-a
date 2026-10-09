@@ -30,10 +30,12 @@ The [file allocation table](feature-file-allocation.tsv) records 419 service, se
   `boot` assembles implementations and starts/stops them. Do not import another
   feature's private repository, service implementation or Vue internals.
 - `features/index/{contract,backend,frontend}` are separate composition entries for
-  the host packages. The contract entry exports types only; the backend entry
-  gathers factories and their API types; the frontend entry keeps page loaders
-  lazy. Domain implementations must not import these aggregation entries. There
-  is no mixed root barrel and no additional package or build configuration.
+  the host packages. `contract/index.ts` exports endpoint types; `contract/packed.ts`
+  is a deliberate host registry for the 69 packed Valibot schemas and transitional
+  `Packed<K>` / JSON Schema lookup. The registry composes definitions but does not
+  own them: the 23 `features/<feature>/contract/packed.ts` modules own the 69
+  model schemas. Backend gathers factories and API types; frontend keeps page
+  loaders lazy. There is no mixed root barrel or feature-local build configuration.
 - Temporary old-path reexports are allowed for mechanical placement migration,
   explicitly marked as compatibility bridges. A move alone is not DI conversion
   or contract-first completion.
@@ -51,6 +53,7 @@ The [file allocation table](feature-file-allocation.tsv) records 419 service, se
 | `navigation` | frontend route composition and navigation lifecycle | application router, not-found, shell navigation |
 | `ui` | domain-independent Vue primitives | button/input/select/dialog/form/layout primitives; no business state |
 | `auth` | Signup, UserAuth, WebAuthn, Captcha; auth-session/signin/app serializers | sign-in/up, passwords, MFA, tokens, OAuth/MiAuth and OAuth SSR page |
+| `share` | frontend-only share-surface composition; no separate API/backend behavior | `/share` form and QR profile sharing/read/show views; posts through notes-owned UI/API ports |
 | `users` | User, AccountUpdate, AccountMove, DeleteAccount, SystemAccount, Achievement; user serializers | profiles/account lifecycle, user pages; `user.tsx` |
 | `relationships` | UserFollowing, UserBlocking, UserMuting, UserRenoteMuting, UserList; corresponding serializers/jobs | follow/block/mute/lists and relationship UI |
 | `roles` | RoleService and RoleEntityService | role CRUD/policies/assignments, including admin role screens |
@@ -60,18 +63,17 @@ The [file allocation table](feature-file-allocation.tsv) records 419 service, se
 | `statistics` | chart management/logger, telemetry, queue/server stats, retention/chart jobs | charts/statistics, dashboard widgets |
 | `notes` | NoteCreate/Delete/Draft/Pining, Poll, Reaction, ReactionsBuffering; note serializers/jobs | notes/replies/renotes/reactions/polls, note UI; `note.tsx` |
 | `timelines` | FanoutTimeline, FanoutTimelineEndpoint, Antenna; antenna serializer | timeline/antenna queries, timeline UI; consumes note read/event ports |
-| `discovery` | Search, UserSearch, Hashtag, Featured; hashtag serializer | search/explore/trends/hashtags/featured views |
-| `drive` | DriveService, drive-file/folder serializers, file deletion/cleanup jobs | files/folders/uploads, drive browser and admin drive surfaces |
-| `media` | FileInfo, ImageProcessing, VideoProcessing, SensitiveMediaDetection | media transformation/detection ports and domain-independent media presentation |
+| `discovery` | UserSearch, Hashtag, Featured; hashtag serializer | shared search tabs, user/settings search, autocomplete, explore/trends/hashtags/featured views |
+| `note-search` | SearchService and notes/search contract/endpoint | note text search and SQL LIKE / Meilisearch indexing; note/user orchestration calls its index methods |
+| `drive` | DriveService, drive-file/folder serializers, file deletion/cleanup jobs; FileInfo, ImageProcessing, VideoProcessing, SensitiveMediaDetection | files/folders/uploads, drive browser/admin surfaces, media display, transformation/detection and browser workers |
 | `emojis` | CustomEmoji, EmojiEntityService, emoji import/export jobs and frontend state | public/admin emoji API, catalog/picker/manager/editor |
 | `avatar-decorations` | AvatarDecorationService | decoration catalog/manager/editor and admin routes |
 | `federation` | all ActivityPub services, FederatedInstance, FetchInstanceMetadata, Relay, RemoteUserResolve, Webfinger, UserKeypair; inbox/delivery jobs | AP/WebFinger/remote instances/relays; protocol renderers stay here |
 | `chat` | ChatService and ChatEntityService | rooms/messages/read state and chat Vue templates |
 | `notifications` | Notification, PushNotification, notification serializer | notifications and web-push subscriptions/settings |
 | `channels` | ChannelFollowing, ChannelMuting, ChannelEntityService | channel membership/content surfaces; `channel.tsx` |
-| `collections` | ClipService, clip/note-favorite serializers | clips/favorites/bookmarks; `clip.tsx` |
+| `collections` | ClipService, clip/note-favorite and gallery-post/like serializers | clips/favorites/bookmarks and gallery CRUD/likes/exploration; `clip.tsx`, `gallery-post.tsx` |
 | `pages` | PageService, Page/PageLike serializers | authored pages/editor/likes; `page.tsx` |
-| `gallery` | gallery-post/like serializers | gallery CRUD/likes/exploration; `gallery-post.tsx` |
 | `play` | FlashService, Flash/FlashLike serializers | Play/AiScript authoring and execution UI; `flash.tsx` |
 | `games` | ReversiService and game serializers | Reversi/bubble-game APIs/UI; `reversi-game.tsx` |
 | `announcements` | AnnouncementService and serializer | public/admin announcements/read state; `announcement.tsx` |
@@ -91,11 +93,10 @@ the implementations are now in the assigned feature directories.
 - `auth/backend/templates`: `oauth.tsx`.
 - `users/backend/templates`: `user.tsx`.
 - `notes/backend/templates`: `note.tsx`.
-- `collections/backend/templates`: `clip.tsx`.
+- `collections/backend/templates`: `clip.tsx`, `gallery-post.tsx`.
 - `channels/backend/templates`: `channel.tsx`.
 - `announcements/backend/templates`: `announcement.tsx`.
 - `pages/backend/templates`: `page.tsx`.
-- `gallery/backend/templates`: `gallery-post.tsx`.
 - `play/backend/templates`: `flash.tsx`.
 - `games/backend/templates`: `reversi-game.tsx`.
 
@@ -112,11 +113,14 @@ three-service QueueService/webhook cycle. Moving files does not remove these.
   reader rather than importing the whole mutable settings service.
 - `RoleService`: roles owns capability evaluation; API/domain consumers receive
   capability readers, with trusted request context kept outside request input.
-- `CacheService`: temporarily runtime-hosted; domain caches must be split to
-  users/roles/relationships rather than becoming a global feature service locator.
-- `QueryService`: split reusable SQL mechanics from domain visibility/filtering;
-  note/user access rules cannot be moved into a generic utility by filename.
-- `UtilityService`: classify methods before moving; not a blanket shared bucket.
+- `CacheService`: users owns the intact user-state cache service, including existing
+  relationship caches. Preserve its single subscription/invalidation/disposal lifecycle;
+  cross-domain consumers remain explicit during mechanical placement.
+- `QueryService`: notes owns the intact note visibility/filtering service. Existing
+  generic pagination and user/follow-list consumers retain its public methods;
+  semantic decomposition is a separate change.
+- `UtilityService`: federation owns the intact host/account/delivery-policy service.
+  Existing email-format and keyword-check consumers retain the same public methods.
 - `EmailService`: runtime delivery adapter plus feature-owned message bodies.
 - `QueueService`: runtime transport and boot registration. Processor ownership
   follows the data/protocol domain. Operations owns administrative control APIs.
@@ -165,18 +169,23 @@ with direct old-path bridges preserving provider identity. The three review-requ
 cleanup processors stay in place until their mixed responsibilities are resolved.
 Queue names, scheduling, retries and processor behavior are unchanged. All 37
 registered processor providers retain their constructor/injection metadata. Archive
-runtime dependencies resolve through the backend package's small queue adapter;
-feature directories do not acquire package manifests or build configuration.
+runtime dependencies resolve through the backend-owned TypeScript paths and the
+public-export resolvers used by both build modes and Vitest. Export-only dependency
+shims have been removed; the real jsonld and systeminformation lazy loaders remain
+feature implementations. Feature directories do not acquire package manifests or
+build configuration.
 
 The model placement checkpoint moves all 76 TypeORM entities plus the notification
 model types and instance-meta persistence helper to their owning `backend/models`.
-The [model allocation table](model-file-allocation.tsv) also records the 39 legacy
-JSON schemas awaiting their own contract migration. Host `models/_.ts`, repository
-provider composition and the shared ORM ID-column helper remain backend-owned.
-Direct legacy reexports preserve entity constructor identity; table names, columns,
-indexes, relations and migrations do not change. The User/DriveFile/DriveFolder
-cycle moves together. User/Role auxiliary exports stay with their existing files
-until a separate contract extraction, rather than changing public shape here.
+The [model allocation table](model-file-allocation.tsv) now maps the 39 removed
+packed JSON-schema source files to 23 feature `contract/packed.ts` modules (with a standalone PageBlock contract for frontend use) and all
+69 named packed models. The persistence feature owns the shared ORM ID-column
+helper, intact connection configuration and repository composition. Its repository
+registry preserves constructor identity; table names, columns, indexes, relations and
+migrations do not change. The User/DriveFile/DriveFolder cycle moves together.
+The user notification-receive input schema was split to
+`features/users/contract/notification-receive-config.ts` and remains part of the
+legacy endpoint-input migration rather than the packed-output registry.
 
 The service/page placement checkpoint moves 90 approved core services while the
 four split-required services remain host-owned. Package-export/type-resolution
@@ -184,8 +193,9 @@ adapters stay in the backend package; feature sources retain the same providers
 and business logic. This is placement, not conversion of every Nest service.
 
 The same checkpoint moves 237 approved page/companion files (231 Vue SFCs) into
-feature frontend directories. Dynamic routes remain lazy, and the 14 review/split
-page rows remain in the host until their ownership is resolved. Frontend build,
+feature frontend directories. Dynamic routes remain lazy. The final source-directory batch
+places the 14 held pages at their allocated targets without splitting business
+behavior; QR and `/share` surfaces are grouped under `share`. Frontend build,
 dependency resolution and Storybook generation remain package-owned; generated
 feature stories are ignored just like host stories. No feature package manifests,
 tsconfigs or lint configurations are introduced.
@@ -203,12 +213,23 @@ Generated story outputs remain package-owned and ignored. Imported prop types in
 feature SFCs use explicit relative paths where Vue's SFC compiler cannot discover
 the frontend package tsconfig; no feature-local configuration is introduced.
 
-It also places 39 legacy packed schemas, 17 domain streaming channel classes and
-seven ActivityPub protocol support files with direct compatibility reexports.
-Streaming scopes and request injection are unchanged; the main aggregate stream
-and generic transport remain host composition. The relocated schemas are still
-legacy JSON Schema, not completed contract-first conversions. Remaining endpoint
-implementations, DI boundaries and locale migration are tracked separately.
+It also placed the 39 packed schema files, 17 domain streaming channel classes
+and seven ActivityPub protocol support files beside their features. In the packed
+model contract checkpoint, those 39 JSON-schema files were removed and their 69
+named models moved into 23 authoritative feature `contract/packed.ts` modules and a standalone PageBlock contract.
+`features/index/contract/packed.ts` composes them for OpenAPI and `Packed<K>`
+inference. `resultObject` keeps runtime loose-object passthrough of unknown keys,
+while inferred types expose declared fields only. This adds neither global legacy
+endpoint output validation nor database normalization. The JSON-Schema-to-TypeScript payload interpreter and its endpoint generic
+defaults have been removed. `Schema` and inline `meta.res` projections remain
+metadata for the unchanged AJV transport and OpenAPI writer. Native contracts
+supply payload types; explicitly named legacy service/producer boundaries retain
+their documented unchecked assumptions. Opaque-schema compatibility and
+serializer/guard work stay with their respective API and feature owners; notification serialization and
+guards remain notifications-owned. Streaming scopes and request injection are
+unchanged; the main aggregate stream and generic transport remain host composition.
+Remaining endpoint implementations, DI boundaries and locale migration are
+tracked separately.
 
 Settings/admin search-index generation scans retained host pages and feature pages,
 including the feature-owned navigation indexes for HMR. Its regression test checks
@@ -232,3 +253,101 @@ active languages, including legacy English/primary-language fallbacks; global
 Crowdin YAML is untouched. A regression test verifies all 1,036 copied values,
 and the browser fixture exercises a migrated component across locale/reload cases.
 Dynamic, interpolated, multi-message and non-SFC localization remains separate.
+
+## Held file-server fallback asset defect
+
+The six versioned PNGs remain in `packages/backend/src/server/assets`.
+FileServerService instead resolves `packages/backend/src/server/file/assets/dummy.png`
+from `config.rootDir`; that directory is absent in a clean checkout and Rolldown
+does not copy these PNGs. The ordinary `/static-assets/` route uses
+`packages/backend/assets`, a different asset set.
+
+Baseline reproduction with the compiled backend and the isolated test configuration:
+start the server role with `MK_DISABLE_CLUSTERING=1 MK_ONLY_SERVER=1 MK_NO_DAEMONS=1`,
+then GET `/files/app-default.jpg`. The response is HTTP 500 with JSON `code: ENOENT`
+for the missing `src/server/file/assets/dummy.png`. The route declares image/jpeg
+but cannot read its PNG fallback. FileServerService unit tests create that missing
+directory temporarily and copy `test/resources/dummy-for-file-server-service.png`;
+that 6285-byte fixture is SHA256-identical to the versioned `server/assets/dummy.png`
+(`fe0f4c44a5e63ac228fafc6fa3aba1fbe88188dea73ca39d2f8c950f17f74d47`).
+
+Asset relocation and the missing-path repair need a separate behavior change.
+The mechanical placement cohorts neither repair the path nor remove these PNGs.
+
+## Remaining backend implementation ownership checkpoint
+
+The approved final 42 implementations now live in their feature backend directories:
+25 domain utilities, four statistics telemetry/server-metrics files, ten HTTP/file
+adapters and three cleanup jobs. Jobs use the existing `backend/jobs` convention.
+Bodies, DI identities, route/stream behavior and the explicit fallback asset path
+are preserved. The anonymous reaction helper uses `.mts` to retain its ESM default
+function without a package configuration or forwarding stub.
+
+`packages/backend/src` retains 86 files: `config.ts`, `env.ts`, `di-symbols.ts` and
+`global.d.ts`; ten package ambient/dependency declarations; 65 test sources (including
+five compile-time test files), one test fixture and the six held PNG assets.
+Package-owned launch, build, migration and central test configuration remain in
+backend. Cross-feature DI, entity identity, endpoint registry and HTTP/SDK parity
+tests remain package integration tests. Single-owner tests can move separately
+using that same central runner and type resolution.
+
+This completes the approved backend implementation placement, not the whole
+architecture migration. Remaining VVI work and legacy i18n/frontend-builder
+retirement are still separate work, as is the fallback asset defect above.
+
+### Proposed test placement by behavior owner
+
+The first bounded cohort has moved: five API contract/helper tests now live in
+`features/api/test/backend/`; frontend profile home, media image, emoji and URL
+preview tests live in their respective owners’ `test/frontend/` trees. Search
+service tests live in `features/note-search/test/backend/`. The remaining rows
+below are placement proposals. Classify tests by the behavior they
+verify, including both backend `src` and `test` trees and frontend package/colocated
+tests. A DB, Redis, Nest, HTTP or storage fixture does not itself make a test
+cross-feature. Single-owner tests can use `features/<owner>/test/backend/` with the existing backend-owned Vitest,
+TypeScript and lint configuration. Update those central include patterns and
+explicit CI file selections together; keep shared test helpers/fixtures
+package-owned unless their ownership is separately established. No per-feature
+package or tsconfig is needed.
+
+| Owner | First relocation candidates (paths relative to `packages/backend/`) |
+| --- | --- |
+| api | `src/server/api/{feature-id,json-object-contract,json-selector-and-common,result-object,unique-string-array}.test.ts` |
+| runtime | `src/misc/collapsed-queue.test.ts`, `src/types.test.ts`, `src/core/queue-service.pack-job-data.test.ts`; pure helper tests under `test/unit/misc/{zip,loader,id,ulid,cache}.ts` |
+| notes | `src/server/api/endpoints/notes/create.test.ts`, `test/unit/misc/{should-hide-note-by-time,is-renote}.ts`, `test/unit/queue/processors/CleanRemoteNotesProcessorService.ts` |
+| users | `src/server/api/endpoints/users/show.test.ts` |
+| notifications | `src/core/entities/notification-entity-service.test.ts` (its collaborating services are mocked) |
+| relationships | `test/unit/misc/check-word-mute.ts` |
+| drive | `test/unit/misc/correct-filename.ts`, `test/unit/misc/others.ts` (currently only content-disposition cases), `test/unit/server/FileServerService.ts` |
+| markup | `test/unit/extract-mentions.ts` |
+| statistics | `test/unit/telemetry-registry.ts`, `test/unit/core/telemetry/adapters/SentryTelemetryAdapter.ts` (mocked adapter/logging boundaries) |
+
+Keep actual cross-feature integrations in backend: Nest provider/alias resolution,
+entity/repository constructor identity, complete endpoint and packed registries,
+HTTP/OpenAPI/SDK parity across feature contracts, active-following reader policy,
+role/stream shutdown, and boot/build/host coordination. File-server behavior
+belongs to drive and remote-note cleanup belongs to notes even when their tests
+use real infrastructure. This includes
+the five cross-feature compile-time test files. The BullMQ package-version and
+declaration contract test also remains backend-owned. Existing E2E/federation,
+boot/maintenance integration tests and shared runner/config/fixtures remain
+package-owned. Test relocation must preserve every assertion and fixture.
+
+Frontend single-owner candidates use `features/<owner>/test/frontend/` under the
+existing frontend-owned runner, compiler and lint configuration:
+
+| Owner | Candidates relative to `packages/frontend/` |
+| --- | --- |
+| users | `test/unit/home.test.ts` (user profile home) |
+| drive | `test/unit/note.test.ts` (actually `MkMediaImage`), `test/unit/uploader-locale-migration.test.ts` |
+| emojis | `test/unit/emoji.test.ts` |
+| markup | `test/unit/url-preview.test.ts` |
+| ui | `test/unit/result-locale.test.ts` |
+
+Global Storybook provisioning, multi-owner localization parity/reversal, main/embed
+entrypoint and compiler/build isolation tests remain host-owned. Keep existing
+feature-colocated tests with their owner. The first bounded import/path-only
+cohort is the five API tests listed above plus frontend home, media image, emoji
+and URL preview tests. Update central discovery, coverage, TypeScript inclusion,
+dependency resolution and CI selectors together; preserve setup state, fixtures
+and all assertions. No feature-specific package or tsconfig is introduced.

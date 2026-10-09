@@ -2,81 +2,26 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
+import { toPackedUserList } from '../../relationships.schema.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 
-import { Inject, Injectable } from '@nestjs/common';
-import type { UserListsRepository, UserListFavoritesRepository } from '@/models/_.js';
-import { Endpoint } from '@/server/api/endpoint-base.js';
-import { UserListEntityService } from '@/core/entities/UserListEntityService.js';
-import { DI } from '@/di-symbols.js';
-import { ApiError } from '@/server/api/error.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
 
-export const meta = {
-	tags: ['lists', 'account'],
-
-	requireCredential: false,
-
-	kind: 'read:account',
-
-	description: 'Show the properties of a list.',
-
-	res: {
-		type: 'object',
-		optional: false, nullable: false,
-		allOf: [
-			{
-				type: 'object',
-				ref: 'UserList',
-			},
-			{
-				type: 'object',
-				optional: false, nullable: false,
-				properties: {
-					likedCount: {
-						type: 'number',
-						optional: true, nullable: false,
-					},
-					isLiked: {
-						type: 'boolean',
-						optional: true, nullable: false,
-					},
-				},
-			},
-		],
-	},
-
-	errors: {
-		noSuchList: {
-			message: 'No such list.',
-			code: 'NO_SUCH_LIST',
-			id: '7bc05c21-1d7a-41ae-88f1-66820f4dc686',
-		},
-	},
-} as const;
-
-export const paramDef = {
-	type: 'object',
-	properties: {
-		listId: { type: 'string', format: 'misskey:id' },
-		forPublic: { type: 'boolean', default: false },
-	},
-	required: ['listId'],
-} as const;
-
-@Injectable() // eslint-disable-next-line import/no-default-export
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
-	constructor(
-		@Inject(DI.userListsRepository)
-		private userListsRepository: UserListsRepository,
-
-		@Inject(DI.userListFavoritesRepository)
-		private userListFavoritesRepository: UserListFavoritesRepository,
-
-		private userListEntityService: UserListEntityService,
-	) {
-		super(meta, paramDef, async (ps, me) => {
-			const additionalProperties: Partial<{ likedCount: number, isLiked: boolean }> = {};
+import { relationshipsContract } from '../../relationships.contract.js';
+import type { RelationshipsDependencies } from '../../../api.implementation.js';
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
+import { relationshipsErrors } from '../../relationships.errors.js';
+export function createUsersListsShowProcedure<Actor extends MiLocalUser>(deps: Pick<RelationshipsDependencies, 'userListsRepository' | 'userListFavoritesRepository' | 'userListEntityService'>) {
+	return createApiProcedure<Actor>()(relationshipsContract["users/lists/show"])
+		.handler(async ({ input, context }) => {
+			const ps = input;
+			const me = context.principal;
+			const additionalProperties: Partial<{
+				likedCount: number;
+				isLiked: boolean;
+			}> = {};
 			// Fetch the list
-			const userList = await this.userListsRepository.findOneBy(!ps.forPublic && me !== null ? {
+			const userList = await deps.userListsRepository.findOneBy(!ps.forPublic && me !== null ? {
 				id: ps.listId,
 				userId: me.id,
 			} : {
@@ -85,15 +30,15 @@ export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDe
 			});
 
 			if (userList == null) {
-				throw new ApiError(meta.errors.noSuchList);
+				throw apiError(relationshipsErrors['users/lists/show'].noSuchList);
 			}
 
 			if (ps.forPublic && userList.isPublic) {
-				additionalProperties.likedCount = await this.userListFavoritesRepository.countBy({
+				additionalProperties.likedCount = await deps.userListFavoritesRepository.countBy({
 					userListId: ps.listId,
 				});
 				if (me !== null) {
-					additionalProperties.isLiked = await this.userListFavoritesRepository.exists({
+					additionalProperties.isLiked = await deps.userListFavoritesRepository.exists({
 						where: {
 							userId: me.id,
 							userListId: ps.listId,
@@ -104,9 +49,8 @@ export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDe
 				}
 			}
 			return {
-				...await this.userListEntityService.pack(userList),
+				...toPackedUserList(await deps.userListEntityService.pack(userList)),
 				...additionalProperties,
 			};
 		});
-	}
 }

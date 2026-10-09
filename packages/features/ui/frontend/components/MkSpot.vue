@@ -12,9 +12,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<div><b>{{ title }}</b></div>
 			<div>{{ description }}</div>
 			<div class="_buttons">
-				<MkButton v-if="hasPrev" small @click="prev"><i class="ti ti-arrow-left"></i> {{ i18n.ts.goBack }}</MkButton>
-				<MkButton v-if="hasNext" small primary @click="next">{{ i18n.ts.next }} <i class="ti ti-arrow-right"></i></MkButton>
-				<MkButton v-else small primary @click="next">{{ i18n.ts.done }} <i class="ti ti-check"></i></MkButton>
+				<MkButton v-if="hasPrev" small @click="prev"><i class="ti ti-arrow-left"></i> {{ $locale.sfc.goBack }}</MkButton>
+				<MkButton v-if="hasNext" small primary @click="next">{{ $locale.sfc.next }} <i class="ti ti-arrow-right"></i></MkButton>
+				<MkButton v-else small primary @click="next">{{ $locale.sfc.done }} <i class="ti ti-check"></i></MkButton>
 			</div>
 		</div>
 	</div>
@@ -24,9 +24,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script lang="ts" setup>
 import { nextTick, onMounted, onUnmounted, ref, useTemplateRef } from 'vue';
 import { calcPopupPosition } from '@features/ui/frontend/utility/popup-position.js';
-import * as os from '@/os.js';
+import * as os from '@features/ui/frontend/os.js';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
-import { i18n } from '@/i18n.js';
 
 const props = withDefaults(defineProps<{
 	title: string;
@@ -163,3 +162,227 @@ onUnmounted(() => {
 	}
 }
 </style>
+
+<locale locale="ar-SA" lang="json">
+{
+  "goBack": "رجوع",
+  "next": "التالية",
+  "done": "تمّ"
+}
+</locale>
+
+<locale locale="ca-ES" lang="json">
+{
+  "goBack": "Tornar",
+  "next": "Següent",
+  "done": "Fet"
+}
+</locale>
+
+<locale locale="cs-CZ" lang="json">
+{
+  "goBack": "Zpět",
+  "next": "Další",
+  "done": "Hotovo"
+}
+</locale>
+
+<locale locale="da-DK" lang="json">
+{
+  "goBack": "Back",
+  "next": "Next",
+  "done": "Done"
+}
+</locale>
+
+<locale locale="de-DE" lang="json">
+{
+  "goBack": "Zurück",
+  "next": "Weiter",
+  "done": "Fertig"
+}
+</locale>
+
+<locale locale="en-US" lang="json">
+{
+  "goBack": "Back",
+  "next": "Next",
+  "done": "Done"
+}
+</locale>
+
+<locale locale="es-ES" lang="json">
+{
+  "goBack": "Anterior",
+  "next": "Siguiente",
+  "done": "Hecho"
+}
+</locale>
+
+<locale locale="fr-FR" lang="json">
+{
+  "goBack": "Retour",
+  "next": "Suivant",
+  "done": "Terminé"
+}
+</locale>
+
+<locale locale="id-ID" lang="json">
+{
+  "goBack": "Kembali",
+  "next": "Selanjutnya",
+  "done": "Selesai"
+}
+</locale>
+
+<locale locale="it-IT" lang="json">
+{
+  "goBack": "Indietro",
+  "next": "Avanti",
+  "done": "Fine"
+}
+</locale>
+
+<locale locale="ja-JP" lang="json">
+{
+  "goBack": "戻る",
+  "next": "次",
+  "done": "完了"
+}
+</locale>
+
+<locale locale="ja-KS" lang="json">
+{
+  "goBack": "戻る",
+  "next": "次",
+  "done": "でけた"
+}
+</locale>
+
+<locale locale="kab-KAB" lang="json">
+{
+  "goBack": "Back",
+  "next": "Next",
+  "done": "Done"
+}
+</locale>
+
+<locale locale="kn-IN" lang="json">
+{
+  "goBack": "Back",
+  "next": "Next",
+  "done": "Done"
+}
+</locale>
+
+<locale locale="ko-KR" lang="json">
+{
+  "goBack": "뒤로",
+  "next": "다음",
+  "done": "완료"
+}
+</locale>
+
+<locale locale="nl-NL" lang="json">
+{
+  "goBack": "Terug",
+  "next": "Volgende",
+  "done": "Klaar"
+}
+</locale>
+
+<locale locale="no-NO" lang="json">
+{
+  "goBack": "Back",
+  "next": "Neste",
+  "done": "Ferdig"
+}
+</locale>
+
+<locale locale="pl-PL" lang="json">
+{
+  "goBack": "Wróć",
+  "next": "Dalej",
+  "done": "Gotowe"
+}
+</locale>
+
+<locale locale="pt-PT" lang="json">
+{
+  "goBack": "Voltar",
+  "next": "Seguinte",
+  "done": "Concluído"
+}
+</locale>
+
+<locale locale="ru-RU" lang="json">
+{
+  "goBack": "Выход",
+  "next": "Дальше",
+  "done": "Готово"
+}
+</locale>
+
+<locale locale="sk-SK" lang="json">
+{
+  "goBack": "Späť",
+  "next": "Ďalší",
+  "done": "Hotovo"
+}
+</locale>
+
+<locale locale="th-TH" lang="json">
+{
+  "goBack": "ย้อนกลับ",
+  "next": "ถัด\u200Bไป",
+  "done": "เสร็จสิ้น"
+}
+</locale>
+
+<locale locale="tr-TR" lang="json">
+{
+  "goBack": "Geri",
+  "next": "Sonraki",
+  "done": "Tamam"
+}
+</locale>
+
+<locale locale="ug-CN" lang="json">
+{
+  "goBack": "Back",
+  "next": "Next",
+  "done": "Done"
+}
+</locale>
+
+<locale locale="uk-UA" lang="json">
+{
+  "goBack": "Назад",
+  "next": "Далі",
+  "done": "Готово"
+}
+</locale>
+
+<locale locale="vi-VN" lang="json">
+{
+  "goBack": "Quay lại",
+  "next": "Kế tiếp",
+  "done": "Xong"
+}
+</locale>
+
+<locale locale="zh-CN" lang="json">
+{
+  "goBack": "返回",
+  "next": "下一个",
+  "done": "完成"
+}
+</locale>
+
+<locale locale="zh-TW" lang="json">
+{
+  "goBack": "返回",
+  "next": "下一步",
+  "done": "完成"
+}
+</locale>

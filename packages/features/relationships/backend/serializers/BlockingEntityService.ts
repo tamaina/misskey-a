@@ -3,25 +3,21 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Inject, Injectable } from '@nestjs/common';
-import { DI } from '@/di-symbols.js';
-import type { BlockingsRepository } from '@/models/_.js';
-import { awaitAll } from '@/misc/prelude/await-all.js';
-import type { Packed } from '@/misc/json-schema.js';
-import type { MiBlocking } from '@/models/Blocking.js';
-import type { MiUser } from '@/models/User.js';
-import { bindThis } from '@/decorators.js';
-import { IdService } from '@/core/IdService.js';
-import { UserEntityService } from '@/core/entities/UserEntityService.js';
+import type { BlockingsRepository } from '@features/persistence/backend/repositories/models.js';
+import { awaitAll } from '@features/runtime/backend/async/await-all.js';
+import type { Packed } from '@features/index/backend/packed.schema.js';
+import type { MiBlocking } from '../models/Blocking.js';
+import type { MiUser } from '@features/users/backend/models/User.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
+import type { IdService } from '@features/runtime/backend/services/IdService.js';
+import type { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 
-@Injectable()
 export class BlockingEntityService {
 	constructor(
-		@Inject(DI.blockingsRepository)
 		private blockingsRepository: BlockingsRepository,
 
-		private userEntityService: UserEntityService,
-		private idService: IdService,
+		private userEntityService: Pick<UserEntityService, 'pack' | 'packMany'>,
+		private idService: Pick<IdService, 'parse'>,
 	) {
 	}
 

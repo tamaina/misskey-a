@@ -1,0 +1,11 @@
+{
+	"extends": "../tsconfig.json",
+	"compilerOptions": {
+		"lib": ["esnext", "webworker"]
+	},
+	"include": [
+		"../../features/drive/frontend/workers/**/*.ts",
+		"../@types/**/*.d.ts"
+	],
+	"exclude": []
+}

@@ -4,7 +4,7 @@
  */
 
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
-import { MemoryKVCache, MemorySingleCache } from '@/misc/cache.js';
+import { MemoryKVCache, MemorySingleCache } from '@features/runtime/backend/cache/cache.js';
 
 describe('misc:MemoryKVCache', () => {
 	beforeEach(() => {

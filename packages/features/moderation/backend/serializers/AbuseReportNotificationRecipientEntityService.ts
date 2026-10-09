@@ -3,22 +3,18 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Inject, Injectable } from '@nestjs/common';
 import { In } from 'typeorm';
-import { DI } from '@/di-symbols.js';
-import type { AbuseReportNotificationRecipientRepository, MiAbuseReportNotificationRecipient } from '@/models/_.js';
-import { bindThis } from '@/decorators.js';
-import { UserEntityService } from '@/core/entities/UserEntityService.js';
-import { Packed } from '@/misc/json-schema.js';
-import { SystemWebhookEntityService } from '@/core/entities/SystemWebhookEntityService.js';
+import type { AbuseReportNotificationRecipientRepository, MiAbuseReportNotificationRecipient } from '@features/persistence/backend/repositories/models.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
+import type { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
+import { Packed } from '@features/index/backend/packed.schema.js';
+import type { SystemWebhookEntityService } from '@features/integrations/backend/serializers/SystemWebhookEntityService.js';
 
-@Injectable()
 export class AbuseReportNotificationRecipientEntityService {
 	constructor(
-		@Inject(DI.abuseReportNotificationRecipientRepository)
 		private abuseReportNotificationRecipientRepository: AbuseReportNotificationRecipientRepository,
-		private userEntityService: UserEntityService,
-		private systemWebhookEntityService: SystemWebhookEntityService,
+		private userEntityService: Pick<UserEntityService, 'pack' | 'packMany'>,
+		private systemWebhookEntityService: Pick<SystemWebhookEntityService, 'pack' | 'packMany'>,
 	) {
 	}
 
@@ -34,7 +30,7 @@ export class AbuseReportNotificationRecipientEntityService {
 			? src
 			: await this.abuseReportNotificationRecipientRepository.findOneByOrFail({ id: src });
 		const user = recipient.userId
-			? (opts?.users.get(recipient.userId) ?? await this.userEntityService.pack<'UserLite'>(recipient.userId))
+			? (opts?.users.get(recipient.userId) ?? await this.userEntityService.pack(recipient.userId))
 			: undefined;
 		const webhook = recipient.systemWebhookId
 			? (opts?.webhooks.get(recipient.systemWebhookId) ?? await this.systemWebhookEntityService.pack(recipient.systemWebhookId))

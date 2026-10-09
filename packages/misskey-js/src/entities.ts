@@ -13,7 +13,6 @@ import {
 import type {
 	AuthenticationResponseJSON,
 	RegistrationResponseJSON,
-	PublicKeyCredentialCreationOptionsJSON,
 	PublicKeyCredentialRequestOptionsJSON,
 } from '@simplewebauthn/browser';
 
@@ -177,8 +176,6 @@ export type SigninWithPasskeyInitResponse = {
 export type SigninWithPasskeyResponse = {
 	signinResponse: SigninFlowResponse & { finished: true };
 };
-
-export type I2faRegisterKeyResponse = PublicKeyCredentialCreationOptionsJSON;
 
 export type I2faKeyDoneRequest = {
 	password: string;

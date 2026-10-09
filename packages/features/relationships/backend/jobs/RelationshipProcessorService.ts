@@ -5,16 +5,16 @@
 
 import { Inject, Injectable } from '@nestjs/common';
 
-import { UserFollowingService } from '@/core/UserFollowingService.js';
-import { UserBlockingService } from '@/core/UserBlockingService.js';
-import { bindThis } from '@/decorators.js';
-import type Logger from '@/logger.js';
+import { UserFollowingService } from '../services/UserFollowingService.js';
+import { UserBlockingService } from '../services/UserBlockingService.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
+import type { Logger } from '@features/runtime/backend/logging/logger.js';
 
-import type { UsersRepository } from '@/models/_.js';
+import type { UsersRepository } from '@features/persistence/backend/repositories/models.js';
 import { DI } from '@/di-symbols.js';
-import { MiLocalUser, MiRemoteUser } from '@/models/User.js';
-import { RelationshipJobData } from '@/queue/types.js';
-import { QueueLoggerService } from '@/queue/QueueLoggerService.js';
+import { MiLocalUser, MiRemoteUser } from '@features/users/backend/models/User.js';
+import { RelationshipJobData } from '@features/runtime/backend/queue/types.js';
+import { QueueLoggerService } from '@features/runtime/backend/queue/QueueLoggerService.js';
 import type * as Bull from 'bullmq';
 
 @Injectable()

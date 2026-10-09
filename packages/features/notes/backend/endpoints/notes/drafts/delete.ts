@@ -3,59 +3,23 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
-import { NoteDraftService } from '@/core/NoteDraftService.js';
-import { ApiError } from '@/server/api/error.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import { notesDraftsDeleteContract, notesDraftsDeleteErrors } from './delete.contract.js';
 
-export const meta = {
-	tags: ['notes', 'drafts'],
-
-	requireCredential: true,
-
-	prohibitMoved: true,
-
-	kind: 'write:account',
-
-	errors: {
-		noSuchNoteDraft: {
-			message: 'No such note draft.',
-			code: 'NO_SUCH_NOTE_DRAFT',
-			id: '49cd6b9d-848e-41ee-b0b9-adaca711a6b1',
-		},
-
-		accessDenied: {
-			message: 'Access denied.',
-			code: 'ACCESS_DENIED',
-			id: '56f35758-7dd5-468b-8439-5d6fb8ec9b8e',
-		},
-	},
-} as const;
-
-export const paramDef = {
-	type: 'object',
-	properties: {
-		draftId: { type: 'string', nullable: false, format: 'misskey:id' },
-	},
-	required: ['draftId'],
-} as const;
-
-@Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
-	constructor(
-		private noteDraftService: NoteDraftService,
-	) {
-		super(meta, paramDef, async (ps, me) => {
-			const draft = await this.noteDraftService.get(me, ps.draftId);
-			if (draft == null) {
-				throw new ApiError(meta.errors.noSuchNoteDraft);
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+import type { NotesCommandDependencies } from '../../../command.dependencies.js';
+import { getCommandNote } from '../../../get-command-note.js';
+import { readErrorId } from '../../../request.schema.js';
+export function createNotesDraftsDeleteProcedure(deps: NotesCommandDependencies) {
+	return createApiProcedure<MiLocalUser>()(notesDraftsDeleteContract).use(requirePrincipal<MiLocalUser>())
+		.handler(async ({ input, context }) => {
+			const actor = context.principal;
+			const draft = await deps.getDraft(actor, input.draftId);
+			if (draft == null) throw deps.createError(notesDraftsDeleteErrors.noSuchNoteDraft);
+			if (draft.userId !== actor.id) {
+				throw deps.createError(notesDraftsDeleteErrors.accessDenied);
 			}
-
-			if (draft.userId !== me.id) {
-				throw new ApiError(meta.errors.accessDenied);
-			}
-
-			await this.noteDraftService.delete(me, draft.id);
+			await deps.deleteDraft(actor, draft.id);
 		});
-	}
 }

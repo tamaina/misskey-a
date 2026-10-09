@@ -28,7 +28,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import * as Misskey from 'misskey-js';
-import XPv from '@/pages/user/activity.pv.vue';
+import XPv from '@features/statistics/frontend/pages/user/activity.pv.vue';
 import XNotes from '@features/notes/frontend/pages/user/activity.notes.vue';
 import XFollowing from '@features/relationships/frontend/pages/user/activity.following.vue';
 import MkFoldableSection from '@features/ui/frontend/components/MkFoldableSection.vue';

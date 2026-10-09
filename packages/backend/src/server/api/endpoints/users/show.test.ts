@@ -6,15 +6,17 @@
 process.env.NODE_ENV = 'test';
 
 import { describe, test, expect } from 'vitest';
-import { getValidator } from '../../../../../test/prelude/get-api-validator.js';
-import { paramDef } from './show.js';
+import * as valibot from 'valibot';
+import { usersShowContract } from '@features/users/backend/endpoints/users/show.contract.js';
 
 const VALID = true;
 const INVALID = false;
 
 describe('api:users/show', () => {
 	describe('validation', () => {
-		const v = getValidator(paramDef);
+		const schema = usersShowContract['~orpc'].inputSchema;
+		if (schema === undefined) throw new Error('Missing users/show input schema');
+		const v = (input: unknown) => valibot.safeParse(schema, input).success;
 
 		test('Reject empty', () => expect(v({})).toBe(INVALID));
 		test('Reject host only', () => expect(v({ host: 'misskey.test' })).toBe(INVALID));

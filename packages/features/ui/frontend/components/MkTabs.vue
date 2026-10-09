@@ -59,8 +59,8 @@ export type Tab<K = string> = {
 
 <script lang="ts" setup generic="const T extends Tab">
 import { nextTick, onMounted, onUnmounted, useTemplateRef, watch } from 'vue';
-import { prefer } from '@/preferences.js';
-import { genId } from '@/utility/id.js';
+import { prefer } from '@features/preferences/frontend/preferences.js';
+import { genId } from '@features/runtime/frontend/utility/id.js';
 
 const cssAnchorSupported = CSS.supports('position-anchor', '--anchor-name');
 const tabAnchorName = `--${genId()}-currentTab`;

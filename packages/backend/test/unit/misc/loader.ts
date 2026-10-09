@@ -4,7 +4,7 @@
  */
 
 import { expect, describe, it } from 'vitest';
-import { DebounceLoader } from '@/misc/loader.js';
+import { DebounceLoader } from '@features/runtime/backend/async/loader.js';
 
 class Mock {
 	loadCountByKey = new Map<number, number>();

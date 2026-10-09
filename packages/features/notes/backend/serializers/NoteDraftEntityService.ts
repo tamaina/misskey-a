@@ -7,16 +7,16 @@ import { Inject, Injectable } from '@nestjs/common';
 import { ModuleRef } from '@nestjs/core';
 import { EntityNotFoundError } from 'typeorm';
 import { DI } from '@/di-symbols.js';
-import type { Packed } from '@/misc/json-schema.js';
-import { awaitAll } from '@/misc/prelude/await-all.js';
-import type { MiUser, MiNote, MiNoteDraft } from '@/models/_.js';
-import type { NoteDraftsRepository, ChannelsRepository } from '@/models/_.js';
-import { bindThis } from '@/decorators.js';
-import { DebounceLoader } from '@/misc/loader.js';
-import { IdService } from '@/core/IdService.js';
+import type { Packed } from '@features/index/backend/packed.schema.js';
+import { awaitAll } from '@features/runtime/backend/async/await-all.js';
+import type { MiUser, MiNote, MiNoteDraft } from '@features/persistence/backend/repositories/models.js';
+import type { NoteDraftsRepository, ChannelsRepository } from '@features/persistence/backend/repositories/models.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
+import { DebounceLoader } from '@features/runtime/backend/async/loader.js';
+import { IdService } from '@features/runtime/backend/services/IdService.js';
 import type { OnModuleInit } from '@nestjs/common';
-import type { UserEntityService } from '@/core/entities/UserEntityService.js';
-import type { DriveFileEntityService } from '@/core/entities/DriveFileEntityService.js';
+import type { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
+import type { DriveFileEntityService } from '@features/drive/backend/serializers/DriveFileEntityService.js';
 import type { NoteEntityService } from './NoteEntityService.js';
 
 @Injectable()

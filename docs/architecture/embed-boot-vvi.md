@@ -1,0 +1,11 @@
+# Embed boot VVI checkpoint
+
+Embed boot now reads the existing VVI runtime after the embed entry has awaited locale loading and activated that instance. The same supplied instance is installed on the Vue application. Theme selection, DI, readiness signaling, self-XSS console styles, link construction and boot-error storage stay unchanged.
+
+`packages/features/boot/frontend/embed/boot-messages.json` owns 18 effective strings per language: all 12 `_bootErrors` leaves, `reload`, and five `_selfXssPrevention` leaves. Its 28 language dictionaries contain 504 strings copied from the effective legacy dictionaries, including their existing fallback values and trailing whitespace. No locale YAML is edited.
+
+Static text uses `useLocale` so its bytes remain intact. Only `description3({ link })` uses `useLocalizer`. In particular, formatting static text would trim existing trailing spaces in ca-ES and es-ES boot messages. The main VVI global dictionary remains absent; the embed plugin receives the boot dictionary and retains all 28 locale loaders. Runtime dependency resolution is configured by the existing embed host tsconfig only.
+
+`embed-boot-messages.test.ts` verifies the dictionary fingerprint and effective legacy payload, reverses the translation-only source substitutions to the frozen original source, evaluates the actual plugin-generated locale loaders for all 28 languages, and compares raw strings and formatter results with two link values. `embed-boot.test.ts` runs real boot orchestration in ja-JP, en-US, fr-FR and pt-PT and checks stored errors, the installed runtime, DI, readiness and console message bytes. Existing entry tests cover waiting for locale loading before module evaluation, loader failures and activation order.
+
+This checkpoint retires seven legacy translation references in embed boot. It does not retire legacy i18n globally. A refreshed AST audit of tracked production feature frontend TypeScript files finds 19 files with 134 eager `i18n.ts`/`i18n.tsx` references: 18 image compositor files owned by drive and `navigation/frontend/navbar.ts`. Here eager means an access outside a function body; stories and tests are excluded. Deferred references and Vue templates are a separate inventory. Production VVI strategy changes still require the reviewed controlled benchmark tracked separately.

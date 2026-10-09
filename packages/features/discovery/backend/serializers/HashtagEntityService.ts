@@ -3,13 +3,11 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Injectable } from '@nestjs/common';
-import type { Packed } from '@/misc/json-schema.js';
-import type { } from '@/models/Blocking.js';
-import type { MiHashtag } from '@/models/Hashtag.js';
-import { bindThis } from '@/decorators.js';
+import type { Packed } from '@features/index/backend/packed.schema.js';
+import type { } from '@features/relationships/backend/models/Blocking.js';
+import type { MiHashtag } from '../models/Hashtag.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
 
-@Injectable()
 export class HashtagEntityService {
 	constructor(
 	) {

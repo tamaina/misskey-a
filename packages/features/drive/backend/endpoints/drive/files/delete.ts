@@ -3,69 +3,39 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Inject, Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
-import type { DriveFilesRepository } from '@/models/_.js';
-import { DriveService } from '@/core/DriveService.js';
-import { GlobalEventService } from '@/core/GlobalEventService.js';
-import { DI } from '@/di-symbols.js';
-import { RoleService } from '@/core/RoleService.js';
-import { ApiError } from '@/server/api/error.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+import { driveFilesDeleteErrors } from './delete.contract.js';
+import type { DriveFilesRepository } from '@features/persistence/backend/repositories/models.js';
+import { DriveService } from '../../../services/DriveService.js';
+import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
+import { RoleService } from '@features/roles/backend/services/RoleService.js';
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
+import { driveManagementContract } from '../../../api.definition.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
 
-export const meta = {
-	tags: ['drive'],
-
-	requireCredential: true,
-
-	kind: 'write:drive',
-
-	description: 'Delete an existing drive file.',
-
-	errors: {
-		noSuchFile: {
-			message: 'No such file.',
-			code: 'NO_SUCH_FILE',
-			id: '908939ec-e52b-4458-b395-1025195cea58',
-		},
-
-		accessDenied: {
-			message: 'Access denied.',
-			code: 'ACCESS_DENIED',
-			id: '5eb8d909-2540-4970-90b8-dd6f86088121',
-		},
-	},
-} as const;
-
-export const paramDef = {
-	type: 'object',
-	properties: {
-		fileId: { type: 'string', format: 'misskey:id' },
-	},
-	required: ['fileId'],
-} as const;
-
-@Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
-	constructor(
-		@Inject(DI.driveFilesRepository)
-		private driveFilesRepository: DriveFilesRepository,
-
-		private driveService: DriveService,
-		private roleService: RoleService,
-		private globalEventService: GlobalEventService,
-	) {
-		super(meta, paramDef, async (ps, me) => {
-			const file = await this.driveFilesRepository.findOneBy({ id: ps.fileId });
+export interface DriveFilesDeleteDependencies {
+	driveFilesRepository: DriveFilesRepository;
+	driveService: Pick<DriveService, 'deleteFile'>;
+	roleService: Pick<RoleService, 'isModerator'>;
+}
+export function createDriveFilesDeleteProcedure(deps: DriveFilesDeleteDependencies) {
+	return createApiProcedure<MiLocalUser>()(driveManagementContract['drive/files/delete']).use(requirePrincipal<MiLocalUser>())
+		.handler(async ({ input, context }) => {
+			const ps = input;
+			const me = context.principal;
+			const _ip = context.ip;
+			const _headers = context.headers;
+			const file = await deps.driveFilesRepository.findOneBy({ id: ps.fileId });
 
 			if (file == null) {
-				throw new ApiError(meta.errors.noSuchFile);
+				throw apiError(driveFilesDeleteErrors.noSuchFile);
 			}
 
-			if (!await this.roleService.isModerator(me) && (file.userId !== me.id)) {
-				throw new ApiError(meta.errors.accessDenied);
+			if (!await deps.roleService.isModerator(me) && (file.userId !== me.id)) {
+				throw apiError(driveFilesDeleteErrors.accessDenied);
 			}
 
-			await this.driveService.deleteFile(file, false, me);
+			await deps.driveService.deleteFile(file, false, me);
 		});
-	}
 }

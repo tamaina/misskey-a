@@ -4,7 +4,7 @@
  */
 
 import { describe, expect, test } from 'vitest';
-import { tryParseUrl } from '@@/js/url.js';
+import { tryParseUrl } from '@features/web/frontend/shared/url.js';
 
 describe('tryParseUrl', () => {
 	test('parses an absolute URL', () => {

@@ -4,10 +4,10 @@
  */
 
 import { Inject, Injectable, Scope } from '@nestjs/common';
-import { bindThis } from '@/decorators.js';
-import type { JsonObject } from '@/misc/json-value.js';
-import type { EventTypesToEventPayload, DriveEventTypes } from '@/core/GlobalEventService.js';
-import Channel, { type ChannelRequest } from '@/server/api/stream/channel.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
+import type { JsonObject } from '@features/runtime/backend/formatting/json-value.js';
+import type { EventTypesToEventPayload, DriveEventTypes } from '@features/runtime/backend/services/GlobalEventService.js';
+import Channel, { type ChannelRequest } from '@features/api/backend/transport/stream/channel.js';
 import { REQUEST } from '@nestjs/core';
 
 @Injectable({ scope: Scope.TRANSIENT })

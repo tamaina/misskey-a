@@ -3,40 +3,18 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Inject, Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
-import { RegistryApiService } from '@/core/RegistryApiService.js';
-
-export const meta = {
-	requireCredential: true,
-	kind: 'read:account',
-
-	res: {
-		type: 'array',
-		items: {
-			type: 'string',
-		},
-	},
-} as const;
-
-export const paramDef = {
-	type: 'object',
-	properties: {
-		scope: { type: 'array', default: [], items: {
-			type: 'string', pattern: /^[a-zA-Z0-9_]+$/.toString().slice(1, -1),
-		} },
-		domain: { type: 'string', nullable: true },
-	},
-	required: ['scope'],
-} as const;
-
-@Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
-	constructor(
-		private registryApiService: RegistryApiService,
-	) {
-		super(meta, paramDef, async (ps, me, accessToken) => {
-			return await this.registryApiService.getAllKeysOfScope(me.id, accessToken != null ? accessToken.id : (ps.domain ?? null), ps.scope);
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import { registryKeysContract } from './keys.contract.js';
+import type { ApiActor } from '@features/api/backend/transport/context.js';
+import type { PreferencesDependencies } from '../../../api.implementation.js';
+import { registryTenant } from './registry.helpers.js';
+export function createRegistryKeysProcedure<Actor extends ApiActor>(deps: PreferencesDependencies) {
+	return createApiProcedure<Actor>()(registryKeysContract)
+		.use(requirePrincipal<Actor>())
+		.handler(async ({ input, context }) => {
+			const principal = context.principal;
+			const token = context.token;
+			return deps.registry.getAllKeysOfScope(principal.id, registryTenant(input.domain, token), input.scope);
 		});
-	}
 }

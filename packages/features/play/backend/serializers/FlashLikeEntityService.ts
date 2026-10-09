@@ -3,22 +3,18 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Inject, Injectable } from '@nestjs/common';
-import { DI } from '@/di-symbols.js';
-import type { FlashLikesRepository } from '@/models/_.js';
-import type { } from '@/models/Blocking.js';
-import type { MiUser } from '@/models/User.js';
-import type { MiFlashLike } from '@/models/FlashLike.js';
-import { bindThis } from '@/decorators.js';
-import { FlashEntityService } from './FlashEntityService.js';
+import type { FlashLikesRepository } from '@features/persistence/backend/repositories/models.js';
+import type { } from '@features/relationships/backend/models/Blocking.js';
+import type { MiUser } from '@features/users/backend/models/User.js';
+import type { MiFlashLike } from '../models/FlashLike.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
+import type { FlashEntityService } from './FlashEntityService.js';
 
-@Injectable()
 export class FlashLikeEntityService {
 	constructor(
-		@Inject(DI.flashLikesRepository)
 		private flashLikesRepository: FlashLikesRepository,
 
-		private flashEntityService: FlashEntityService,
+		private flashEntityService: Pick<FlashEntityService, 'pack'>,
 	) {
 	}
 
@@ -37,7 +33,7 @@ export class FlashLikeEntityService {
 
 	@bindThis
 	public packMany(
-		likes: any[],
+		likes: MiFlashLike[],
 		me: { id: MiUser['id'] },
 	) {
 		return Promise.all(likes.map(x => this.pack(x, me)));

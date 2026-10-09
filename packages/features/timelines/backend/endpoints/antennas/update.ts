@@ -3,141 +3,70 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Inject, Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
-import type { AntennasRepository, UserListsRepository } from '@/models/_.js';
-import { GlobalEventService } from '@/core/GlobalEventService.js';
-import { AntennaEntityService } from '@/core/entities/AntennaEntityService.js';
-import { DI } from '@/di-symbols.js';
-import { ApiError } from '@/server/api/error.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import { toPackedAntenna } from '@features/timelines/backend/antenna.schema.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import { antennasUpdateContract, antennasUpdateErrors } from './update.contract.js';
+import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
+import { AntennaEntityService } from '../../serializers/AntennaEntityService.js';
+import type { AntennasRepository, UserListsRepository } from '@features/persistence/backend/repositories/models.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
 
-export const meta = {
-	tags: ['antennas'],
-
-	requireCredential: true,
-
-	prohibitMoved: true,
-
-	kind: 'write:account',
-
-	errors: {
-		noSuchAntenna: {
-			message: 'No such antenna.',
-			code: 'NO_SUCH_ANTENNA',
-			id: '10c673ac-8852-48eb-aa1f-f5b67f069290',
-		},
-
-		noSuchUserList: {
-			message: 'No such user list.',
-			code: 'NO_SUCH_USER_LIST',
-			id: '1c6b35c9-943e-48c2-81e4-2844989407f7',
-		},
-
-		emptyKeyword: {
-			message: 'Either keywords or excludeKeywords is required.',
-			code: 'EMPTY_KEYWORD',
-			id: '721aaff6-4e1b-4d88-8de6-877fae9f68c4',
-		},
-	},
-
-	res: {
-		type: 'object',
-		optional: false, nullable: false,
-		ref: 'Antenna',
-	},
-} as const;
-
-export const paramDef = {
-	type: 'object',
-	properties: {
-		antennaId: { type: 'string', format: 'misskey:id' },
-		name: { type: 'string', minLength: 1, maxLength: 100 },
-		src: { type: 'string', enum: ['home', 'all', 'users', 'list', 'users_blacklist'] },
-		userListId: { type: 'string', format: 'misskey:id', nullable: true },
-		keywords: { type: 'array', items: {
-			type: 'array', items: {
-				type: 'string',
-			},
-		} },
-		excludeKeywords: { type: 'array', items: {
-			type: 'array', items: {
-				type: 'string',
-			},
-		} },
-		users: { type: 'array', items: {
-			type: 'string',
-		} },
-		caseSensitive: { type: 'boolean' },
-		localOnly: { type: 'boolean' },
-		excludeBots: { type: 'boolean' },
-		withReplies: { type: 'boolean' },
-		withFile: { type: 'boolean' },
-		excludeNotesInSensitiveChannel: { type: 'boolean' },
-	},
-	required: ['antennaId'],
-} as const;
-
-@Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
-	constructor(
-		@Inject(DI.antennasRepository)
-		private antennasRepository: AntennasRepository,
-
-		@Inject(DI.userListsRepository)
-		private userListsRepository: UserListsRepository,
-
-		private antennaEntityService: AntennaEntityService,
-		private globalEventService: GlobalEventService,
-	) {
-		super(meta, paramDef, async (ps, me) => {
-			if (ps.keywords && ps.excludeKeywords) {
-				if (ps.keywords.flat().every(x => x === '') && ps.excludeKeywords.flat().every(x => x === '')) {
-					throw new ApiError(meta.errors.emptyKeyword);
+export interface AntennasUpdateDependencies {
+	antennasRepository: AntennasRepository;
+	userListsRepository: UserListsRepository;
+	antennaEntityService: AntennaEntityService;
+	globalEventService: GlobalEventService;
+}
+export function createAntennasUpdateProcedure<Actor extends MiLocalUser>(deps: AntennasUpdateDependencies) {
+	return createApiProcedure<Actor>()(antennasUpdateContract).use(requirePrincipal<Actor>())
+		.handler(async ({ input, context }) => {
+			const result = await (async () => {
+				const ps = input;
+				const me = context.principal;
+				if (ps.keywords && ps.excludeKeywords) {
+					if (ps.keywords.flat().every(x => x === '') && ps.excludeKeywords.flat().every(x => x === '')) {
+						throw apiError(antennasUpdateErrors.emptyKeyword);
+					}
 				}
-			}
-			// Fetch the antenna
-			const antenna = await this.antennasRepository.findOneBy({
-				id: ps.antennaId,
-				userId: me.id,
-			});
-
-			if (antenna == null) {
-				throw new ApiError(meta.errors.noSuchAntenna);
-			}
-
-			let userList;
-
-			if ((ps.src === 'list' || antenna.src === 'list') && ps.userListId) {
-				userList = await this.userListsRepository.findOneBy({
-					id: ps.userListId,
+				// Fetch the antenna
+				const antenna = await deps.antennasRepository.findOneBy({
+					id: ps.antennaId,
 					userId: me.id,
 				});
-
-				if (userList == null) {
-					throw new ApiError(meta.errors.noSuchUserList);
+				if (antenna == null) {
+					throw apiError(antennasUpdateErrors.noSuchAntenna);
 				}
-			}
-
-			await this.antennasRepository.update(antenna.id, {
-				name: ps.name,
-				src: ps.src,
-				userListId: ps.userListId !== undefined ? userList ? userList.id : null : undefined,
-				keywords: ps.keywords,
-				excludeKeywords: ps.excludeKeywords,
-				users: ps.users,
-				caseSensitive: ps.caseSensitive,
-				localOnly: ps.localOnly,
-				excludeBots: ps.excludeBots,
-				withReplies: ps.withReplies,
-				withFile: ps.withFile,
-				excludeNotesInSensitiveChannel: ps.excludeNotesInSensitiveChannel,
-				isActive: true,
-				lastUsedAt: new Date(),
-			});
-
-			this.globalEventService.publishInternalEvent('antennaUpdated', await this.antennasRepository.findOneByOrFail({ id: antenna.id }));
-
-			return await this.antennaEntityService.pack(antenna.id);
+				let userList;
+				if ((ps.src === 'list' || antenna.src === 'list') && ps.userListId) {
+					userList = await deps.userListsRepository.findOneBy({
+						id: ps.userListId,
+						userId: me.id,
+					});
+					if (userList == null) {
+						throw apiError(antennasUpdateErrors.noSuchUserList);
+					}
+				}
+				await deps.antennasRepository.update(antenna.id, {
+					name: ps.name,
+					src: ps.src,
+					userListId: ps.userListId !== undefined ? userList ? userList.id : null : undefined,
+					keywords: ps.keywords,
+					excludeKeywords: ps.excludeKeywords,
+					users: ps.users,
+					caseSensitive: ps.caseSensitive,
+					localOnly: ps.localOnly,
+					excludeBots: ps.excludeBots,
+					withReplies: ps.withReplies,
+					withFile: ps.withFile,
+					excludeNotesInSensitiveChannel: ps.excludeNotesInSensitiveChannel,
+					isActive: true,
+					lastUsedAt: new Date(),
+				});
+				deps.globalEventService.publishInternalEvent('antennaUpdated', await deps.antennasRepository.findOneByOrFail({ id: antenna.id }));
+				return await deps.antennaEntityService.pack(antenna.id);
+			})();
+			return toPackedAntenna(result);
 		});
-	}
 }

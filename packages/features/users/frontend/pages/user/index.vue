@@ -27,12 +27,11 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script lang="ts" setup>
 import { defineAsyncComponent, computed, watch, ref } from 'vue';
 import * as Misskey from 'misskey-js';
-import { acct as getAcct } from '@features/users/frontend/filters/user.js';
-import { misskeyApi } from '@/utility/misskey-api.js';
-import { definePage } from '@/page.js';
-import { i18n } from '@/i18n.js';
-import { $i } from '@/i.js';
-import { serverContext, assertServerContext } from '@/server-context.js';
+import { acct as getAcct } from '@features/users/frontend/shared/user.js';
+import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
+import { definePage } from '@features/navigation/frontend/page.js';
+import { $i } from '@features/auth/frontend/i.js';
+import { serverContext, assertServerContext } from '@features/runtime/frontend/server-context.js';
 
 const XHome = defineAsyncComponent(() => import('@features/users/frontend/pages/user/home.vue'));
 const XNotes = defineAsyncComponent(() => import('@features/notes/frontend/pages/user/notes.vue'));
@@ -44,7 +43,7 @@ const XClips = defineAsyncComponent(() => import('@features/collections/frontend
 const XLists = defineAsyncComponent(() => import('@features/relationships/frontend/pages/user/lists.vue'));
 const XPages = defineAsyncComponent(() => import('@features/pages/frontend/pages/user/pages.vue'));
 const XFlashs = defineAsyncComponent(() => import('@features/play/frontend/pages/user/flashs.vue'));
-const XGallery = defineAsyncComponent(() => import('@features/gallery/frontend/pages/user/gallery.vue'));
+const XGallery = defineAsyncComponent(() => import('@features/collections/frontend/pages/user/gallery.vue'));
 const XRaw = defineAsyncComponent(() => import('@features/users/frontend/pages/user/raw.vue'));
 
 // contextは非ログイン状態の情報しかないためログイン時は利用できない
@@ -100,39 +99,39 @@ const headerActions = computed(() => []);
 
 const headerTabs = computed(() => user.value ? [{
 	key: 'home',
-	title: i18n.ts.overview,
+	title: $locale.value.sfc.overview,
 	icon: 'ti ti-home',
 }, {
 	key: 'notes',
-	title: i18n.ts.notes,
+	title: $locale.value.sfc.notes,
 	icon: 'ti ti-pencil',
 }, {
 	key: 'files',
-	title: i18n.ts.files,
+	title: $locale.value.sfc.files,
 	icon: 'ti ti-photo',
 }, {
 	key: 'activity',
-	title: i18n.ts.activity,
+	title: $locale.value.sfc.activity,
 	icon: 'ti ti-chart-line',
 }, ...(user.value.host == null ? [{
 	key: 'achievements',
-	title: i18n.ts.achievements,
+	title: $locale.value.sfc.achievements,
 	icon: 'ti ti-medal',
 }] : []), ...($i && ($i.id === user.value.id || $i.isAdmin || $i.isModerator)) || user.value.publicReactions ? [{
 	key: 'reactions',
-	title: i18n.ts.reaction,
+	title: $locale.value.sfc.reaction,
 	icon: 'ti ti-mood-happy',
 }] : [], {
 	key: 'clips',
-	title: i18n.ts.clips,
+	title: $locale.value.sfc.clips,
 	icon: 'ti ti-paperclip',
 }, {
 	key: 'lists',
-	title: i18n.ts.lists,
+	title: $locale.value.sfc.lists,
 	icon: 'ti ti-list',
 }, {
 	key: 'pages',
-	title: i18n.ts.pages,
+	title: $locale.value.sfc.pages,
 	icon: 'ti ti-news',
 }, {
 	key: 'flashs',
@@ -140,7 +139,7 @@ const headerTabs = computed(() => user.value ? [{
 	icon: 'ti ti-player-play',
 }, {
 	key: 'gallery',
-	title: i18n.ts.gallery,
+	title: $locale.value.sfc.gallery,
 	icon: 'ti ti-icons',
 }, {
 	key: 'raw',
@@ -149,7 +148,7 @@ const headerTabs = computed(() => user.value ? [{
 }] : []);
 
 definePage(() => ({
-	title: i18n.ts.user,
+	title: $locale.value.sfc.user,
 	icon: 'ti ti-user',
 	...user.value ? {
 		title: user.value.name ? `${user.value.name} (@${user.value.username})` : `@${user.value.username}`,
@@ -163,3 +162,451 @@ definePage(() => ({
 	} : {},
 }));
 </script>
+
+<locale locale="ar-SA" lang="json">
+{
+	"overview": "ملخص عام",
+	"notes": "الملاحظات",
+	"files": "الملفات",
+	"activity": "النشاط",
+	"achievements": "الإنجازات",
+	"reaction": "التفاعلات",
+	"clips": "مشابك",
+	"lists": "القوائم",
+	"pages": "الصفحات",
+	"gallery": "المعرض",
+	"user": "المستخدمون"
+}
+</locale>
+
+<locale locale="ca-ES" lang="json">
+{
+	"overview": "Visió General",
+	"notes": "Notes",
+	"files": "Fitxers",
+	"activity": "Activitat",
+	"achievements": "Assoliments",
+	"reaction": "Reacció ",
+	"clips": "Retalls",
+	"lists": "Llistes",
+	"pages": "Pàgines",
+	"gallery": "Galeria",
+	"user": "Usuaris"
+}
+</locale>
+
+<locale locale="cs-CZ" lang="json">
+{
+	"overview": "Shrnutí",
+	"notes": "Poznámky",
+	"files": "Soubor(ů)",
+	"activity": "Aktivita",
+	"achievements": "Úspěchy",
+	"reaction": "Reakce",
+	"clips": "Oříznout",
+	"lists": "Seznamy",
+	"pages": "Stránky",
+	"gallery": "Galerie",
+	"user": "Uživatelé"
+}
+</locale>
+
+<locale locale="da-DK" lang="json">
+{
+	"overview": "Overview",
+	"notes": "Notes",
+	"files": "Files",
+	"activity": "Activity",
+	"achievements": "Achievements",
+	"reaction": "Reactions",
+	"clips": "Clips",
+	"lists": "Lists",
+	"pages": "Pages",
+	"gallery": "Gallery",
+	"user": "User"
+}
+</locale>
+
+<locale locale="de-DE" lang="json">
+{
+	"overview": "Übersicht",
+	"notes": "Notizen",
+	"files": "Dateien",
+	"activity": "Aktivität",
+	"achievements": "Errungenschaften",
+	"reaction": "Reaktionen",
+	"clips": "Clips",
+	"lists": "Listen",
+	"pages": "Seiten",
+	"gallery": "Galerie",
+	"user": "Benutzer"
+}
+</locale>
+
+<locale locale="en-US" lang="json">
+{
+	"overview": "Overview",
+	"notes": "Notes",
+	"files": "Files",
+	"activity": "Activity",
+	"achievements": "Achievements",
+	"reaction": "Reactions",
+	"clips": "Clips",
+	"lists": "Lists",
+	"pages": "Pages",
+	"gallery": "Gallery",
+	"user": "User"
+}
+</locale>
+
+<locale locale="es-ES" lang="json">
+{
+	"overview": "Resumen",
+	"notes": "Notas",
+	"files": "Archivos",
+	"activity": "Actividad",
+	"achievements": "Logros",
+	"reaction": "Reacción",
+	"clips": "Clip",
+	"lists": "Listas",
+	"pages": "Páginas",
+	"gallery": "Galería",
+	"user": "Usuarios"
+}
+</locale>
+
+<locale locale="fr-FR" lang="json">
+{
+	"overview": "Aperçu",
+	"notes": "Notes",
+	"files": "Fichiers",
+	"activity": "Activité",
+	"achievements": "Accomplissements",
+	"reaction": "Réactions",
+	"clips": "Clips",
+	"lists": "Listes",
+	"pages": "Pages",
+	"gallery": "Galerie",
+	"user": "Utilisateur·rice·s"
+}
+</locale>
+
+<locale locale="id-ID" lang="json">
+{
+	"overview": "Ikhtisar",
+	"notes": "Catatan",
+	"files": "Berkas",
+	"activity": "Aktivitas",
+	"achievements": "Pencapaian",
+	"reaction": "Reaksi",
+	"clips": "Klip",
+	"lists": "Daftar",
+	"pages": "Halaman",
+	"gallery": "Galeri",
+	"user": "Pengguna"
+}
+</locale>
+
+<locale locale="it-IT" lang="json">
+{
+	"overview": "Anteprima",
+	"notes": "Note",
+	"files": "Allegati",
+	"activity": "Attività",
+	"achievements": "Conquiste",
+	"reaction": "Reazioni",
+	"clips": "Clip",
+	"lists": "Liste",
+	"pages": "Pagine",
+	"gallery": "Gallerie",
+	"user": "Profilo"
+}
+</locale>
+
+<locale locale="ja-JP" lang="json">
+{
+	"overview": "概要",
+	"notes": "ノート",
+	"files": "ファイル",
+	"activity": "アクティビティ",
+	"achievements": "実績",
+	"reaction": "リアクション",
+	"clips": "クリップ",
+	"lists": "リスト",
+	"pages": "ページ",
+	"gallery": "ギャラリー",
+	"user": "ユーザー"
+}
+</locale>
+
+<locale locale="ja-KS" lang="json">
+{
+	"overview": "概要",
+	"notes": "ノート",
+	"files": "ファイル",
+	"activity": "アクティビティ",
+	"achievements": "実績",
+	"reaction": "ツッコミ",
+	"clips": "クリップ",
+	"lists": "リスト",
+	"pages": "ページ",
+	"gallery": "ギャラリー",
+	"user": "ユーザー"
+}
+</locale>
+
+<locale locale="kab-KAB" lang="json">
+{
+	"overview": "Overview",
+	"notes": "Notes",
+	"files": "Ifuyla",
+	"activity": "Activity",
+	"achievements": "Achievements",
+	"reaction": "Reactions",
+	"clips": "Clips",
+	"lists": "Tibdarin",
+	"pages": "Pages",
+	"gallery": "Gallery",
+	"user": "User"
+}
+</locale>
+
+<locale locale="kn-IN" lang="json">
+{
+	"overview": "Overview",
+	"notes": "Notes",
+	"files": "ಕಡತಗಳು",
+	"activity": "Activity",
+	"achievements": "Achievements",
+	"reaction": "Reactions",
+	"clips": "Clips",
+	"lists": "Lists",
+	"pages": "Pages",
+	"gallery": "Gallery",
+	"user": "ಬಳಕೆದಾರ"
+}
+</locale>
+
+<locale locale="ko-KR" lang="json">
+{
+	"overview": "요약",
+	"notes": "노트",
+	"files": "파일",
+	"activity": "활동",
+	"achievements": "도전 과제",
+	"reaction": "리액션",
+	"clips": "클립",
+	"lists": "리스트",
+	"pages": "페이지",
+	"gallery": "갤러리",
+	"user": "유저"
+}
+</locale>
+
+<locale locale="nl-NL" lang="json">
+{
+	"overview": "Overzicht",
+	"notes": "Notities",
+	"files": "Bestanden",
+	"activity": "Activiteit",
+	"achievements": "Achievements",
+	"reaction": "Reacties",
+	"clips": "Clips",
+	"lists": "Lijsten",
+	"pages": "Pagina's",
+	"gallery": "Galerij",
+	"user": "Gebruikers"
+}
+</locale>
+
+<locale locale="no-NO" lang="json">
+{
+	"overview": "Overview",
+	"notes": "Notes",
+	"files": "Filer",
+	"activity": "Aktivitet",
+	"achievements": "Prestasjoner",
+	"reaction": "Reaksjon",
+	"clips": "Clips",
+	"lists": "Lister",
+	"pages": "Sider",
+	"gallery": "Galleri",
+	"user": "Brukere"
+}
+</locale>
+
+<locale locale="pl-PL" lang="json">
+{
+	"overview": "Przegląd",
+	"notes": "Wpisy",
+	"files": "Pliki",
+	"activity": "Aktywność",
+	"achievements": "Osiągnięcia",
+	"reaction": "Reakcja",
+	"clips": "Klipy",
+	"lists": "Listy",
+	"pages": "Strony",
+	"gallery": "Galeria",
+	"user": "Użytkownicy"
+}
+</locale>
+
+<locale locale="pt-PT" lang="json">
+{
+	"overview": "Visão geral",
+	"notes": "Posts",
+	"files": "Arquivos",
+	"activity": "atividade",
+	"achievements": "Conquistas",
+	"reaction": "Reações",
+	"clips": "Clipe",
+	"lists": "Listas",
+	"pages": "Páginas",
+	"gallery": "Galeria",
+	"user": "Usuário"
+}
+</locale>
+
+<locale locale="ru-RU" lang="json">
+{
+	"overview": "Обзор",
+	"notes": "Заметки",
+	"files": "Файлы",
+	"activity": "Активность",
+	"achievements": "Достижения",
+	"reaction": "Реакции",
+	"clips": "Подборки",
+	"lists": "Списки",
+	"pages": "Страницы",
+	"gallery": "Галерея",
+	"user": "Пользователи"
+}
+</locale>
+
+<locale locale="sk-SK" lang="json">
+{
+	"overview": "Prehľad",
+	"notes": "Poznámky",
+	"files": "Súbor/y",
+	"activity": "Aktivita",
+	"achievements": "Achievements",
+	"reaction": "Reakcie",
+	"clips": "Klip",
+	"lists": "Zoznamy",
+	"pages": "Stránky",
+	"gallery": "Galéria",
+	"user": "Používatelia"
+}
+</locale>
+
+<locale locale="th-TH" lang="json">
+{
+	"overview": "ภาพรวม",
+	"notes": " โน้ต",
+	"files": "ไฟล์",
+	"activity": "กิจกรรม",
+	"achievements": "ความสำเร็จ",
+	"reaction": "รีแอคชั่น",
+	"clips": "คลิป",
+	"lists": "รายชื่อ",
+	"pages": "หน้าเพจ",
+	"gallery": "แกลเลอรี่",
+	"user": "ผู้ใช้"
+}
+</locale>
+
+<locale locale="tr-TR" lang="json">
+{
+	"overview": "Genel Bakış",
+	"notes": "Notlar",
+	"files": "Dosyalar",
+	"activity": "Etkinlik",
+	"achievements": "Başarılar",
+	"reaction": "Tepki",
+	"clips": "Klipler",
+	"lists": "Listeler",
+	"pages": "Sayfalar",
+	"gallery": "Galeri",
+	"user": "Kullanıcı"
+}
+</locale>
+
+<locale locale="ug-CN" lang="json">
+{
+	"overview": "Overview",
+	"notes": "Notes",
+	"files": "Files",
+	"activity": "Activity",
+	"achievements": "Achievements",
+	"reaction": "Reactions",
+	"clips": "Clips",
+	"lists": "Lists",
+	"pages": "Pages",
+	"gallery": "Gallery",
+	"user": "User"
+}
+</locale>
+
+<locale locale="uk-UA" lang="json">
+{
+	"overview": "Огляд",
+	"notes": "Записи",
+	"files": "Файли",
+	"activity": "Активність",
+	"achievements": "Досягнення",
+	"reaction": "Реакції",
+	"clips": "Добірки",
+	"lists": "Списки",
+	"pages": "Сторінки",
+	"gallery": "Галерея",
+	"user": "Користувачі"
+}
+</locale>
+
+<locale locale="vi-VN" lang="json">
+{
+	"overview": "Tổng quan",
+	"notes": "Bài Viết",
+	"files": "Tập tin",
+	"activity": "Hoạt động",
+	"achievements": "Thành tích",
+	"reaction": "Biểu cảm",
+	"clips": "Lưu bài viết",
+	"lists": "Danh sách",
+	"pages": "Trang",
+	"gallery": "Thư viện ảnh",
+	"user": "Người dùng"
+}
+</locale>
+
+<locale locale="zh-CN" lang="json">
+{
+	"overview": "概览",
+	"notes": "帖子",
+	"files": "文件",
+	"activity": "活动",
+	"achievements": "成就",
+	"reaction": "回应",
+	"clips": "便签",
+	"lists": "列表",
+	"pages": "页面",
+	"gallery": "相册",
+	"user": "用户"
+}
+</locale>
+
+<locale locale="zh-TW" lang="json">
+{
+	"overview": "概覽",
+	"notes": "貼文",
+	"files": "檔案",
+	"activity": "動態",
+	"achievements": "成就",
+	"reaction": "反應",
+	"clips": "摘錄",
+	"lists": "清單",
+	"pages": "頁面",
+	"gallery": "相簿",
+	"user": "使用者"
+}
+</locale>

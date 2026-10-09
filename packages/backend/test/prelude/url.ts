@@ -5,7 +5,7 @@
 
 import * as assert from 'assert';
 import { describe, test } from 'vitest';
-import { query } from '../../src/misc/prelude/url.js';
+import { query } from '@features/runtime/backend/formatting/url.js';
 
 describe('url', () => {
 	test('query', () => {

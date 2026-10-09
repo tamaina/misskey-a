@@ -4,19 +4,19 @@
  */
 
 import { beforeEach, describe, expect, test, vi } from 'vitest';
-import type { LogRecordInput } from '@/logging/types.js';
+import type { LogRecordInput } from '@features/runtime/backend/logging/types.js';
 
 const mocks = vi.hoisted(() => ({
 	write: vi.fn<(input: LogRecordInput) => void>(),
 }));
 
-vi.mock('@/logging/logging-runtime.js', () => ({
+vi.mock('@features/runtime/backend/logging/logging-runtime.js', () => ({
 	logManager: {
 		write: mocks.write,
 	},
 }));
 
-import Logger from '@/logger.js';
+import { Logger } from '@features/runtime/backend/logging/logger.js';
 
 describe('Logger', () => {
 	beforeEach(() => {

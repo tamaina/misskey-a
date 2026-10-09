@@ -64,7 +64,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts">
-import type { Awaitable } from '@/types/misc.js';
+import type { Awaitable } from '@features/ui/frontend/types/misc.js';
 
 export type SuperMenuDef = {
 	title?: string;
@@ -97,11 +97,11 @@ export type SuperMenuDef = {
 <script lang="ts" setup>
 import { useTemplateRef, ref, watch, nextTick, computed, onUnmounted } from 'vue';
 import { throttle } from 'throttle-debounce';
-import { getScrollContainer } from '@@/js/scroll.js';
+import { getScrollContainer } from '@features/ui/frontend/shared/scroll.js';
 import type { SearchIndexItem } from '@features/discovery/frontend/utility/inapp-search.js';
 import MkInput from '@features/ui/frontend/components/MkInput.vue';
-import { useRouter } from '@/router.js';
-import { initIntlString, compareStringIncludes } from '@/utility/intl-string.js';
+import { useRouter } from '@features/navigation/frontend/router.js';
+import { initIntlString, compareStringIncludes } from '@features/web/frontend/utility/intl-string.js';
 
 const props = defineProps<{
 	def: SuperMenuDef[];

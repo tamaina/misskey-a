@@ -24,13 +24,13 @@ const mocks = vi.hoisted(() => ({
 	copyToClipboard: vi.fn(),
 }));
 
-vi.mock('@/i.js', () => ({
+vi.mock('@features/auth/frontend/i.js', () => ({
 	get $i() {
 		return mocks.user;
 	},
 }));
 
-vi.mock('@/custom-emojis.js', async () => {
+vi.mock('@features/emojis/frontend/custom-emojis.js', async () => {
 	const { computed, shallowRef } = await import('vue');
 	return {
 		customEmojis: shallowRef([]),
@@ -83,13 +83,13 @@ vi.mock('@features/emojis/frontend/components/MkCustomEmojiDetailedDialog.vue', 
 	return { default: defineComponent({ render: () => null }) };
 });
 
-vi.mock('@/os.js', () => ({
+vi.mock('@features/ui/frontend/os.js', () => ({
 	popupMenu: mocks.popupMenu,
 	popup: mocks.popup,
 	popupAsyncWithDialog: mocks.popupAsyncWithDialog,
 }));
 
-vi.mock('@/utility/misskey-api.js', () => ({ misskeyApiGet: mocks.misskeyApiGet }));
+vi.mock('@features/api/frontend/utility/misskey-api.js', () => ({ misskeyApiGet: mocks.misskeyApiGet }));
 vi.mock('@features/ui/frontend/utility/copy-to-clipboard.js', () => ({ copyToClipboard: mocks.copyToClipboard }));
 
 let EmojiCatalog: Component;

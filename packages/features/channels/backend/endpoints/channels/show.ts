@@ -3,59 +3,32 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Inject, Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
-import type { ChannelsRepository } from '@/models/_.js';
-import { ChannelEntityService } from '@/core/entities/ChannelEntityService.js';
-import { DI } from '@/di-symbols.js';
-import { ApiError } from '@/server/api/error.js';
+import { toPackedChannel } from '../../api.dto.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 
-export const meta = {
-	tags: ['channels'],
+import { type ChannelEntityService } from '../../serializers/ChannelEntityService.js';
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
+import { channelsShowContract, channelsShowErrors } from './show.contract.js';
+import type { ChannelsRepository } from '@features/persistence/backend/repositories/models.js';
 
-	requireCredential: false,
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
 
-	res: {
-		type: 'object',
-		optional: false, nullable: false,
-		ref: 'Channel',
-	},
-
-	errors: {
-		noSuchChannel: {
-			message: 'No such channel.',
-			code: 'NO_SUCH_CHANNEL',
-			id: '6f6c314b-7486-4897-8966-c04a66a02923',
-		},
-	},
-} as const;
-
-export const paramDef = {
-	type: 'object',
-	properties: {
-		channelId: { type: 'string', format: 'misskey:id' },
-	},
-	required: ['channelId'],
-} as const;
-
-@Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
-	constructor(
-		@Inject(DI.channelsRepository)
-		private channelsRepository: ChannelsRepository,
-
-		private channelEntityService: ChannelEntityService,
-	) {
-		super(meta, paramDef, async (ps, me) => {
-			const channel = await this.channelsRepository.findOneBy({
+export interface ChannelsShowDependencies {
+	channelsRepository: ChannelsRepository;
+	channelEntityService: ChannelEntityService;
+}
+export function createChannelsShowProcedure<Actor extends MiLocalUser>(deps: ChannelsShowDependencies) {
+	return createApiProcedure<Actor>()(channelsShowContract)
+		.handler(async ({ input, context }) => {
+			const ps = input;
+			const me = context.principal;
+			const channel = await deps.channelsRepository.findOneBy({
 				id: ps.channelId,
 			});
 
 			if (channel == null) {
-				throw new ApiError(meta.errors.noSuchChannel);
+				throw apiError(channelsShowErrors.noSuchChannel);
 			}
-
-			return await this.channelEntityService.pack(channel, me, true);
+			return toPackedChannel(await deps.channelEntityService.pack(channel, me, true));
 		});
-	}
 }

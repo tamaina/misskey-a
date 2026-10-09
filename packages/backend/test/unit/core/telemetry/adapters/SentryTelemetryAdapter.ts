@@ -4,7 +4,7 @@
  */
 
 import { describe, expect, test, vi } from 'vitest';
-import { SentryTelemetryAdapter, buildSentryIntegrations, buildSentryNodeOptions } from '@/core/telemetry/adapters/SentryTelemetryAdapter.js';
+import { SentryTelemetryAdapter, buildSentryIntegrations, buildSentryNodeOptions } from '@features/statistics/backend/telemetry/adapters/SentryTelemetryAdapter.js';
 
 type TestIntegration = Parameters<ReturnType<typeof buildSentryIntegrations>>[0][number];
 

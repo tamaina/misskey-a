@@ -11,16 +11,16 @@ import type { Mocked } from 'vitest';
 import * as lolex from '@sinonjs/fake-timers';
 import { DataSource } from 'typeorm';
 import * as Redis from 'ioredis';
-import TestChart from '@/core/chart/charts/test.js';
-import TestGroupedChart from '@/core/chart/charts/test-grouped.js';
-import TestUniqueChart from '@/core/chart/charts/test-unique.js';
-import TestIntersectionChart from '@/core/chart/charts/test-intersection.js';
-import { entity as TestChartEntity } from '@/core/chart/charts/entities/test.js';
-import { entity as TestGroupedChartEntity } from '@/core/chart/charts/entities/test-grouped.js';
-import { entity as TestUniqueChartEntity } from '@/core/chart/charts/entities/test-unique.js';
-import { entity as TestIntersectionChartEntity } from '@/core/chart/charts/entities/test-intersection.js';
+import { TestChart } from '@features/statistics/backend/charts/test.js';
+import { TestGroupedChart } from '@features/statistics/backend/charts/test-grouped.js';
+import { TestUniqueChart } from '@features/statistics/backend/charts/test-unique.js';
+import { TestIntersectionChart } from '@features/statistics/backend/charts/test-intersection.js';
+import { entity as TestChartEntity } from '@features/statistics/backend/charts/definitions/test.js';
+import { entity as TestGroupedChartEntity } from '@features/statistics/backend/charts/definitions/test-grouped.js';
+import { entity as TestUniqueChartEntity } from '@features/statistics/backend/charts/definitions/test-unique.js';
+import { entity as TestIntersectionChartEntity } from '@features/statistics/backend/charts/definitions/test-intersection.js';
 import { loadConfig } from '@/config.js';
-import Logger from '@/logger.js';
+import { Logger } from '@features/runtime/backend/logging/logger.js';
 
 describe('Chart', () => {
 	const config = loadConfig();

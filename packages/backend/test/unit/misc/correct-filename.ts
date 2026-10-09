@@ -4,7 +4,7 @@
  */
 
 import { describe, expect, it, test } from 'vitest';
-import { correctFilename } from '@/misc/correct-filename.js';
+import { correctFilename } from '@features/drive/backend/utility/correct-filename.js';
 
 describe(correctFilename, () => {
 	it('no ext to null', () => {

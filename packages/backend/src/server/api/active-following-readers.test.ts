@@ -5,18 +5,18 @@
 
 import { expect, test, vi } from 'vitest';
 import { DataSource } from 'typeorm';
-import { entities } from '@/postgres.js';
-import { QueryService } from '@/core/QueryService.js';
-import { MiFollowing } from '@/models/Following.js';
-import { MiUserProfile } from '@/models/UserProfile.js';
-import { CacheService } from '@/core/CacheService.js';
-import { AccountMoveService } from '@/core/AccountMoveService.js';
-import { UserFollowingService } from '@/core/UserFollowingService.js';
-import type { MiUser } from '@/models/User.js';
-import { ActivityPubServerService } from '@/server/ActivityPubServerService.js';
-import { NoteEntityService } from '@/core/entities/NoteEntityService.js';
-import { UserEntityService } from '@/core/entities/UserEntityService.js';
-import { MiNote } from '@/models/Note.js';
+import { entities } from '@features/persistence/backend/postgres.js';
+import { QueryService } from '@features/notes/backend/services/QueryService.js';
+import { MiFollowing } from '@features/relationships/backend/models/Following.js';
+import { MiUserProfile } from '@features/users/backend/models/UserProfile.js';
+import { CacheService } from '@features/users/backend/services/CacheService.js';
+import { AccountMoveService } from '@features/users/backend/services/AccountMoveService.js';
+import { UserFollowingService } from '@features/relationships/backend/services/UserFollowingService.js';
+import type { MiUser } from '@features/users/backend/models/User.js';
+import { ActivityPubServerService } from '@features/federation/backend/http/ActivityPubServerService.js';
+import { NoteEntityService } from '@features/notes/backend/serializers/NoteEntityService.js';
+import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
+import { MiNote } from '@features/notes/backend/models/Note.js';
 
 function instance<T extends object>(prototype: T, dependencies: Record<string, unknown>): T {
 	const value = Object.create(prototype);
@@ -208,6 +208,7 @@ test('inactive reverse and moved-account relations cannot auto-approve a locked 
 		userEntityService: { isLocalUser: (user: { host: string | null }) => user.host === null, isRemoteUser: (user: { host: string | null }) => user.host !== null },
 		userBlockingService: { checkBlocked: async () => false },
 		userProfilesRepository: { findOneByOrFail: async () => ({ autoAcceptFollowed: true }) },
+		idService: { parse: () => ({ date: Date.UTC(2020, 0, 1) }) },
 		followingsRepository: { exists },
 		accountMoveService: { validateAlsoKnownAs: async (_: unknown, predicate: (old: { id: string }, moved: { id: string }) => Promise<boolean>) => predicate({ id: 'old' }, { id: 'alias' }) },
 		createFollowRequest, insertFollowingDoc, deliverAccept: vi.fn(),

@@ -4,24 +4,28 @@
  */
 
 import { generateKeyPair } from 'node:crypto';
+import * as v from 'valibot';
+import type { PackedJsonValue } from '@features/users/backend/json-value.schema.js';
+import { localUsernameSchema, passwordSchema } from '@features/users/backend/user-validation.schema.js';
+
 import { Inject, Injectable } from '@nestjs/common';
 import bcrypt from 'bcryptjs';
 import { DataSource, IsNull } from 'typeorm';
 import { DI } from '@/di-symbols.js';
-import type { MiMeta, UsedUsernamesRepository, UsersRepository } from '@/models/_.js';
-import { MiUser } from '@/models/User.js';
-import { MiUserProfile } from '@/models/UserProfile.js';
-import { IdService } from '@/core/IdService.js';
-import { MiUserKeypair } from '@/models/UserKeypair.js';
-import { MiUsedUsername } from '@/models/UsedUsername.js';
-import { generateNativeUserToken } from '@/misc/token.js';
-import { UserEntityService } from '@/core/entities/UserEntityService.js';
-import { bindThis } from '@/decorators.js';
-import UsersChart from '@/core/chart/charts/users.js';
-import { UtilityService } from '@/core/UtilityService.js';
-import { UserService } from '@/core/UserService.js';
-import { SystemAccountService } from '@/core/SystemAccountService.js';
-import { MetaService } from '@/core/MetaService.js';
+import type { MiMeta, UsedUsernamesRepository, UsersRepository } from '@features/persistence/backend/repositories/models.js';
+import { MiUser } from '@features/users/backend/models/User.js';
+import { MiUserProfile } from '@features/users/backend/models/UserProfile.js';
+import { IdService } from '@features/runtime/backend/services/IdService.js';
+import { MiUserKeypair } from '@features/federation/backend/models/UserKeypair.js';
+import { MiUsedUsername } from '@features/users/backend/models/UsedUsername.js';
+import { generateNativeUserToken } from '../utility/token.js';
+import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
+import { UsersChart } from '@features/statistics/backend/charts/users.js';
+import { UtilityService } from '@features/federation/backend/services/UtilityService.js';
+import { UserService } from '@features/users/backend/services/UserService.js';
+import { SystemAccountService } from '@features/users/backend/services/SystemAccountService.js';
+import { MetaService } from '@features/instance/backend/services/MetaService.js';
 
 @Injectable()
 export class SignupService {
@@ -38,7 +42,8 @@ export class SignupService {
 		@Inject(DI.usedUsernamesRepository)
 		private usedUsernamesRepository: UsedUsernamesRepository,
 
-		private utilityService: UtilityService,
+		@Inject(UtilityService)
+		private utilityService: Omit<UtilityService, 'toPunyNullable'> & { toPunyNullable(host: PackedJsonValue | undefined): string | null },
 		private userService: UserService,
 		private userEntityService: UserEntityService,
 		private idService: IdService,
@@ -50,19 +55,21 @@ export class SignupService {
 
 	@bindThis
 	public async signup(opts: {
-		username: MiUser['username'];
-		password?: string | null;
+		username: PackedJsonValue | undefined;
+		password?: PackedJsonValue;
 		passwordHash?: MiUserProfile['password'] | null;
-		host?: string | null;
+		host?: PackedJsonValue;
 		ignorePreservedUsernames?: boolean;
 	}) {
-		const { username, password, passwordHash, host } = opts;
+		const { password, passwordHash, host } = opts;
 		let hash = passwordHash;
 
 		// Validate username
-		if (!this.userEntityService.validateLocalUsername(username)) {
+		if (!this.userEntityService.validateLocalUsername(opts.username)) {
 			throw new Error('INVALID_USERNAME');
 		}
+
+		const username = v.parse(localUsernameSchema, opts.username);
 
 		if (password != null && passwordHash == null) {
 			// Validate password
@@ -72,7 +79,7 @@ export class SignupService {
 
 			// Generate hash of password
 			const salt = await bcrypt.genSalt(8);
-			hash = await bcrypt.hash(password, salt);
+			hash = await bcrypt.hash(v.parse(passwordSchema, password), salt);
 		}
 
 		// Generate secret

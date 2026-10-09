@@ -5,7 +5,7 @@
 
 import { throttle } from 'throttle-debounce';
 import type { Directive } from 'vue';
-import type { Awaitable } from '@/types/misc.js';
+import type { Awaitable } from '@features/ui/frontend/types/misc.js';
 
 const observers = new WeakMap<HTMLElement, IntersectionObserver>();
 

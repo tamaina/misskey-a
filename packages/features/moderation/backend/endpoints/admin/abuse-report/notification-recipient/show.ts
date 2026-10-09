@@ -2,63 +2,23 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-
-import { Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
-import {
-	AbuseReportNotificationRecipientEntityService,
-} from '@/core/entities/AbuseReportNotificationRecipientEntityService.js';
-import { AbuseReportNotificationService } from '@/core/AbuseReportNotificationService.js';
-import { ApiError } from '@/server/api/error.js';
-
-export const meta = {
-	tags: ['admin', 'abuse-report', 'notification-recipient'],
-
-	requireCredential: true,
-	requireModerator: true,
-	secure: true,
-	kind: 'read:admin:abuse-report:notification-recipient',
-
-	res: {
-		type: 'object',
-		ref: 'AbuseReportNotificationRecipient',
-	},
-
-	errors: {
-		noSuchRecipient: {
-			message: 'No such recipient.',
-			code: 'NO_SUCH_RECIPIENT',
-			id: '013de6a8-f757-04cb-4d73-cc2a7e3368e4',
-			kind: 'server',
-			httpStatusCode: 404,
-		},
-	},
-} as const;
-
-export const paramDef = {
-	type: 'object',
-	properties: {
-		id: {
-			type: 'string',
-			format: 'misskey:id',
-		},
-	},
-	required: ['id'],
-} as const;
-
-@Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
-	constructor(
-		private abuseReportNotificationService: AbuseReportNotificationService,
-		private abuseReportNotificationRecipientEntityService: AbuseReportNotificationRecipientEntityService,
-	) {
-		super(meta, paramDef, async (ps) => {
-			const recipients = await this.abuseReportNotificationService.fetchRecipients({ ids: [ps.id] });
+import { toRecipientWire } from '../../../../public-wire.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import type { ApiActor } from '@features/api/backend/transport/context.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import { moderationContract } from '../../../../api.definition.js';
+import type { ModerationApiDependencies } from '../../../../api.implementation.js';
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
+import { moderationErrors } from '../../../../api.errors.js';
+export function createAdminAbuseReportNotificationRecipientShowProcedure<Actor extends ApiActor>(deps: Pick<ModerationApiDependencies<Actor>, 'abuseReportNotificationService' | 'abuseReportNotificationRecipientEntityService'>) {
+	return createApiProcedure<Actor>()(moderationContract.adminAbuseReportNotificationRecipientShow).use(requirePrincipal<Actor>())
+		.handler(async ({ input, context }) => {
+			const ps = input;
+			const me = context.principal;
+			const recipients = await deps.abuseReportNotificationService.fetchRecipients({ ids: [ps.id] });
 			if (recipients.length === 0) {
-				throw new ApiError(meta.errors.noSuchRecipient);
+				throw apiError(moderationErrors.adminAbuseReportNotificationRecipientShow.noSuchRecipient);
 			}
-
-			return this.abuseReportNotificationRecipientEntityService.pack(recipients[0]);
+			return toRecipientWire(await deps.abuseReportNotificationRecipientEntityService.pack(recipients[0]));
 		});
-	}
 }

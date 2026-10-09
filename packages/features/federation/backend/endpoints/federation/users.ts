@@ -3,60 +3,32 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Inject, Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
-import type { UsersRepository } from '@/models/_.js';
-import { QueryService } from '@/core/QueryService.js';
-import { UserEntityService } from '@/core/entities/UserEntityService.js';
-import { DI } from '@/di-symbols.js';
+import { toPackedUserDetailed } from '@features/users/backend/user.schema.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 
-export const meta = {
-	tags: ['federation'],
-
-	requireCredential: false,
-
-	res: {
-		type: 'array',
-		optional: false, nullable: false,
-		items: {
-			type: 'object',
-			optional: false, nullable: false,
-			ref: 'UserDetailedNotMe',
-		},
-	},
-} as const;
-
-export const paramDef = {
-	type: 'object',
-	properties: {
-		host: { type: 'string' },
-		sinceId: { type: 'string', format: 'misskey:id' },
-		untilId: { type: 'string', format: 'misskey:id' },
-		sinceDate: { type: 'integer' },
-		untilDate: { type: 'integer' },
-		limit: { type: 'integer', minimum: 1, maximum: 100, default: 10 },
-	},
-	required: ['host'],
-} as const;
-
-@Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
-	constructor(
-		@Inject(DI.usersRepository)
-		private usersRepository: UsersRepository,
-
-		private userEntityService: UserEntityService,
-		private queryService: QueryService,
-	) {
-		super(meta, paramDef, async (ps, me) => {
-			const query = this.queryService.makePaginationQuery(this.usersRepository.createQueryBuilder('user'), ps.sinceId, ps.untilId, ps.sinceDate, ps.untilDate)
-				.andWhere('user.host = :host', { host: ps.host });
-
-			const users = await query
-				.limit(ps.limit)
-				.getMany();
-
-			return await this.userEntityService.packMany(users, me, { schema: 'UserDetailedNotMe' });
+import type { ApiActor } from '../../../../api/backend/transport/context.js';
+import { federationUsersContract } from './users.contract.js';
+import type { UsersRepository } from '../../../../persistence/backend/repositories/models.js';
+import type { QueryService } from '../../../../notes/backend/services/QueryService.js';
+import type { UserEntityService } from '../../../../users/backend/serializers/UserEntityService.js';
+export interface FederationUsersDependencies {
+	usersRepository: Pick<UsersRepository, 'createQueryBuilder'>;
+	userEntityService: Pick<UserEntityService, 'packMany'>;
+	queryService: Pick<QueryService, 'makePaginationQuery'>;
+}
+export function createFederationUsersProcedure<Actor extends ApiActor>(deps: FederationUsersDependencies) {
+	return createApiProcedure<Actor>()(federationUsersContract)
+		.handler(async ({ input, context }) => {
+			const ps = input;
+			const me = context.principal;
+			const result = await (async () => {
+				const query = deps.queryService.makePaginationQuery(deps.usersRepository.createQueryBuilder('user'), ps.sinceId, ps.untilId, ps.sinceDate, ps.untilDate)
+					.andWhere('user.host = :host', { host: ps.host });
+				const users = await query
+					.limit(ps.limit)
+					.getMany();
+				return (await deps.userEntityService.packMany(users, me, { schema: 'UserDetailedNotMe' })).map(toPackedUserDetailed);
+			})();
+			return result;
 		});
-	}
 }

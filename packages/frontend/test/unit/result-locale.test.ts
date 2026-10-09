@@ -9,7 +9,7 @@ import locales from 'i18n';
 import MkError from '@features/ui/frontend/components/global/MkError.vue';
 import MkResult from '@features/ui/frontend/components/global/MkResult.vue';
 
-vi.mock('@/instance.js', () => ({ instance: {} }));
+vi.mock('@features/instance/frontend/instance.js', () => ({ instance: {} }));
 
 describe('result component-owned translations', () => {
 	test.each(Object.keys(locales))('preserves existing text for %s', async lang => {

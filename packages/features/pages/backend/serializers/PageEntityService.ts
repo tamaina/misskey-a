@@ -3,35 +3,38 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Inject, Injectable } from '@nestjs/common';
-import { DI } from '@/di-symbols.js';
-import type { DriveFilesRepository, PagesRepository, PageLikesRepository } from '@/models/_.js';
-import { awaitAll } from '@/misc/prelude/await-all.js';
-import type { Packed } from '@/misc/json-schema.js';
-import type { } from '@/models/Blocking.js';
-import type { MiUser } from '@/models/User.js';
-import type { MiPage } from '@/models/Page.js';
-import type { MiDriveFile } from '@/models/DriveFile.js';
-import { bindThis } from '@/decorators.js';
-import { IdService } from '@/core/IdService.js';
-import { UserEntityService } from '@/core/entities/UserEntityService.js';
-import { DriveFileEntityService } from '@/core/entities/DriveFileEntityService.js';
+import type { DriveFilesRepository, PagesRepository, PageLikesRepository } from '@features/persistence/backend/repositories/models.js';
+import { awaitAll } from '@features/runtime/backend/async/await-all.js';
+import type { PackedJsonValue } from '@features/users/backend/json-value.schema.js';
+import type { PackedUserLite } from '@features/users/backend/user.schema.js';
+import type * as v from 'valibot';
+import type { packedPageSchema } from '@features/users/backend/page.schema.js';
+import type { } from '@features/relationships/backend/models/Blocking.js';
+import type { MiUser } from '@features/users/backend/models/User.js';
+import type { MiPage } from '../models/Page.js';
+import type { MiDriveFile } from '@features/drive/backend/models/DriveFile.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
+import type { IdService } from '@features/runtime/backend/services/IdService.js';
+import type { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
+import type { DriveFileEntityService } from '@features/drive/backend/serializers/DriveFileEntityService.js';
 
-@Injectable()
+/** Exact persisted fields used by serialization avoid recursively expanding JSON through ORM types. */
+export interface PagePackingRepository {
+ findOneByOrFail(where: { id: string }): Promise<MiPage>;
+ update(id: string, values: { content: MiPage['content'] }): Promise<unknown>;
+}
+
 export class PageEntityService {
 	constructor(
-		@Inject(DI.pagesRepository)
-		private pagesRepository: PagesRepository,
+		private pagesRepository: PagePackingRepository,
 
-		@Inject(DI.pageLikesRepository)
 		private pageLikesRepository: PageLikesRepository,
 
-		@Inject(DI.driveFilesRepository)
 		private driveFilesRepository: DriveFilesRepository,
 
-		private userEntityService: UserEntityService,
-		private driveFileEntityService: DriveFileEntityService,
-		private idService: IdService,
+		private userEntityService: Pick<UserEntityService, 'pack' | 'packMany'>,
+		private driveFileEntityService: Pick<DriveFileEntityService, 'pack' | 'packMany'>,
+		private idService: Pick<IdService, 'parse'>,
 	) {
 	}
 
@@ -40,22 +43,23 @@ export class PageEntityService {
 		src: MiPage['id'] | MiPage,
 		me?: { id: MiUser['id'] } | null | undefined,
 		hint?: {
-			packedUser?: Packed<'UserLite'>
+			packedUser?: PackedUserLite
 		},
-	): Promise<Packed<'Page'>> {
+	): Promise<v.InferOutput<typeof packedPageSchema>> {
 		const meId = me ? me.id : null;
 		const page = typeof src === 'object' ? src : await this.pagesRepository.findOneByOrFail({ id: src });
 
 		const attachedFiles: Promise<MiDriveFile | null>[] = [];
-		const collectFile = (xs: any[]) => {
+		const collectFile = (xs: PackedJsonValue[]) => {
 			for (const x of xs) {
-				if (x.type === 'image') {
+				if (x === null || typeof x !== 'object' || Array.isArray(x)) continue;
+				if (x.type === 'image' && typeof x.fileId === 'string') {
 					attachedFiles.push(this.driveFilesRepository.findOneBy({
 						id: x.fileId,
 						userId: page.userId,
 					}));
 				}
-				if (x.children) {
+				if (Array.isArray(x.children)) {
 					collectFile(x.children);
 				}
 			}
@@ -64,19 +68,24 @@ export class PageEntityService {
 
 		// 後方互換性のため
 		let migrated = false;
-		const migrate = (xs: any[]) => {
+		const migrate = (xs: PackedJsonValue[]) => {
 			for (const x of xs) {
+				if (x === null || typeof x !== 'object' || Array.isArray(x)) continue;
 				if (x.type === 'input') {
 					if (x.inputType === 'text') {
 						x.type = 'textInput';
 					}
 					if (x.inputType === 'number') {
 						x.type = 'numberInput';
-						if (x.default) x.default = parseInt(x.default, 10);
+						if (x.default) {
+							const parsed = parseInt(String(x.default), 10);
+							// JSON serialization historically emits null for a non-finite parsed default.
+							x.default = Number.isFinite(parsed) ? parsed : null;
+						}
 					}
 					migrated = true;
 				}
-				if (x.children) {
+				if (Array.isArray(x.children)) {
 					migrate(x.children);
 				}
 			}

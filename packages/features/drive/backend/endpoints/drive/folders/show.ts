@@ -3,65 +3,42 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Inject, Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
-import type { DriveFoldersRepository } from '@/models/_.js';
-import { DriveFolderEntityService } from '@/core/entities/DriveFolderEntityService.js';
-import { DI } from '@/di-symbols.js';
-import { ApiError } from '@/server/api/error.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+import { toPackedDriveFolder } from '@features/notes/backend/drive.schema.js';
+import { driveFoldersShowErrors } from './show.contract.js';
+import type { DriveFoldersRepository } from '@features/persistence/backend/repositories/models.js';
+import { DriveFolderEntityService } from '../../../serializers/DriveFolderEntityService.js';
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
+import { driveManagementContract } from '../../../api.definition.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
 
-export const meta = {
-	tags: ['drive'],
+export interface DriveFoldersShowDependencies {
+	driveFoldersRepository: DriveFoldersRepository;
+	driveFolderEntityService: Pick<DriveFolderEntityService, 'pack'>;
+}
+export function createDriveFoldersShowProcedure(deps: DriveFoldersShowDependencies) {
+	return createApiProcedure<MiLocalUser>()(driveManagementContract['drive/folders/show']).use(requirePrincipal<MiLocalUser>())
+		.handler(async ({ input, context }) => {
+			const result = await (async () => {
+				const ps = input;
+				const me = context.principal;
+				const _ip = context.ip;
+				const _headers = context.headers;
+				// Get folder
+				const folder = await deps.driveFoldersRepository.findOneBy({
+					id: ps.folderId,
+					userId: me.id,
+				});
 
-	requireCredential: true,
+				if (folder == null) {
+					throw apiError(driveFoldersShowErrors.noSuchFolder);
+				}
 
-	kind: 'read:drive',
-
-	res: {
-		type: 'object',
-		optional: false, nullable: false,
-		ref: 'DriveFolder',
-	},
-
-	errors: {
-		noSuchFolder: {
-			message: 'No such folder.',
-			code: 'NO_SUCH_FOLDER',
-			id: 'd74ab9eb-bb09-4bba-bf24-fb58f761e1e9',
-		},
-	},
-} as const;
-
-export const paramDef = {
-	type: 'object',
-	properties: {
-		folderId: { type: 'string', format: 'misskey:id' },
-	},
-	required: ['folderId'],
-} as const;
-
-@Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
-	constructor(
-		@Inject(DI.driveFoldersRepository)
-		private driveFoldersRepository: DriveFoldersRepository,
-
-		private driveFolderEntityService: DriveFolderEntityService,
-	) {
-		super(meta, paramDef, async (ps, me) => {
-			// Get folder
-			const folder = await this.driveFoldersRepository.findOneBy({
-				id: ps.folderId,
-				userId: me.id,
-			});
-
-			if (folder == null) {
-				throw new ApiError(meta.errors.noSuchFolder);
-			}
-
-			return await this.driveFolderEntityService.pack(folder, {
-				detail: true,
-			});
+				return await deps.driveFolderEntityService.pack(folder, {
+					detail: true,
+				});
+			})();
+			return toPackedDriveFolder(result);
 		});
-	}
 }

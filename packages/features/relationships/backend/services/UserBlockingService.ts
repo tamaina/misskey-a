@@ -5,21 +5,21 @@
 
 import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
 import { ModuleRef } from '@nestjs/core';
-import { IdService } from '@/core/IdService.js';
-import type { MiUser } from '@/models/User.js';
-import type { MiBlocking } from '@/models/Blocking.js';
-import { QueueService } from '@/core/QueueService.js';
-import { GlobalEventService } from '@/core/GlobalEventService.js';
+import { IdService } from '@features/runtime/backend/services/IdService.js';
+import type { MiUser } from '@features/users/backend/models/User.js';
+import type { MiBlocking } from '../models/Blocking.js';
+import { QueueService } from '@features/runtime/backend/services/QueueService.js';
+import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
 import { DI } from '@/di-symbols.js';
-import type { FollowRequestsRepository, BlockingsRepository, UserListsRepository, UserListMembershipsRepository } from '@/models/_.js';
-import Logger from '@/logger.js';
-import { UserEntityService } from '@/core/entities/UserEntityService.js';
-import { ApRendererService } from '@/core/activitypub/ApRendererService.js';
-import { LoggerService } from '@/core/LoggerService.js';
-import { UserWebhookService } from '@/core/UserWebhookService.js';
-import { bindThis } from '@/decorators.js';
-import { CacheService } from '@/core/CacheService.js';
-import { UserFollowingService } from '@/core/UserFollowingService.js';
+import type { FollowRequestsRepository, BlockingsRepository, UserListsRepository, UserListMembershipsRepository } from '@features/persistence/backend/repositories/models.js';
+import { Logger } from '@features/runtime/backend/logging/logger.js';
+import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
+import { ApRendererService } from '@features/federation/backend/services/ApRendererService.js';
+import { LoggerService } from '@features/runtime/backend/services/LoggerService.js';
+import { UserWebhookService } from '@features/integrations/backend/services/UserWebhookService.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
+import { CacheService } from '@features/users/backend/services/CacheService.js';
+import { UserFollowingService } from './UserFollowingService.js';
 
 @Injectable()
 export class UserBlockingService implements OnModuleInit {
@@ -108,9 +108,7 @@ export class UserBlockingService implements OnModuleInit {
 		});
 
 		if (this.userEntityService.isLocalUser(followee)) {
-			this.userEntityService.pack(followee, followee, {
-				schema: 'MeDetailed',
-			}).then(packed => this.globalEventService.publishMainStream(followee.id, 'meUpdated', packed));
+			this.userEntityService.packSelf(followee).then(packed => this.globalEventService.publishMainStream(followee.id, 'meUpdated', packed));
 		}
 
 		if (this.userEntityService.isLocalUser(follower) && !silent) {

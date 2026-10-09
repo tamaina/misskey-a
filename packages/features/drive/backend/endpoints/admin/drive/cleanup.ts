@@ -3,43 +3,31 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
 import { IsNull } from 'typeorm';
-import { Inject, Injectable } from '@nestjs/common';
-import { Endpoint } from '@/server/api/endpoint-base.js';
-import type { DriveFilesRepository } from '@/models/_.js';
-import { DriveService } from '@/core/DriveService.js';
-import { DI } from '@/di-symbols.js';
+import type { DriveFilesRepository } from '@features/persistence/backend/repositories/models.js';
+import { DriveService } from '../../../services/DriveService.js';
+import { driveManagementContract } from '../../../api.definition.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
 
-export const meta = {
-	tags: ['admin'],
-
-	requireCredential: true,
-	requireModerator: true,
-	kind: 'write:admin:drive',
-} as const;
-
-export const paramDef = {
-	type: 'object',
-	properties: {},
-	required: [],
-} as const;
-
-@Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
-	constructor(
-		@Inject(DI.driveFilesRepository)
-		private driveFilesRepository: DriveFilesRepository,
-
-		private driveService: DriveService,
-	) {
-		super(meta, paramDef, async (ps, me) => {
-			const files = await this.driveFilesRepository.findBy({
+export interface AdminDriveCleanupDependencies {
+	driveFilesRepository: DriveFilesRepository;
+	driveService: Pick<DriveService, 'deleteFile'>;
+}
+export function createAdminDriveCleanupProcedure(deps: AdminDriveCleanupDependencies) {
+	return createApiProcedure<MiLocalUser>()(driveManagementContract['admin/drive/cleanup']).use(requirePrincipal<MiLocalUser>())
+		.handler(async ({ input, context }) => {
+			const _ps = input;
+			const _me = context.principal;
+			const _ip = context.ip;
+			const _headers = context.headers;
+			const files = await deps.driveFilesRepository.findBy({
 				userId: IsNull(),
 			});
 
 			for (const file of files) {
-				this.driveService.deleteFile(file);
+				deps.driveService.deleteFile(file);
 			}
 		});
-	}
 }

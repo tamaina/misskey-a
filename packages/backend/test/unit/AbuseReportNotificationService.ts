@@ -7,7 +7,7 @@ import { describe, expect, beforeAll, afterAll, beforeEach, afterEach, test, vi 
 import type { Mocked } from 'vitest';
 import { Test, TestingModule } from '@nestjs/testing';
 import { randomString } from '../utils.js';
-import { AbuseReportNotificationService } from '@/core/AbuseReportNotificationService.js';
+import { AbuseReportNotificationService } from '@features/moderation/backend/services/AbuseReportNotificationService.js';
 import {
 	AbuseReportNotificationRecipientRepository,
 	MiAbuseReportNotificationRecipient,
@@ -17,18 +17,18 @@ import {
 	SystemWebhooksRepository,
 	UserProfilesRepository,
 	UsersRepository,
-} from '@/models/_.js';
+} from '@features/persistence/backend/repositories/models.js';
 import { DI } from '@/di-symbols.js';
-import { GlobalModule } from '@/GlobalModule.js';
-import { IdService } from '@/core/IdService.js';
-import { EmailService } from '@/core/EmailService.js';
-import { RoleService } from '@/core/RoleService.js';
-import { MetaService } from '@/core/MetaService.js';
-import { ModerationLogService } from '@/core/ModerationLogService.js';
-import { GlobalEventService } from '@/core/GlobalEventService.js';
-import { RecipientMethod } from '@/models/AbuseReportNotificationRecipient.js';
-import { SystemWebhookService } from '@/core/SystemWebhookService.js';
-import { UserEntityService } from '@/core/entities/UserEntityService.js';
+import { GlobalModule } from '@features/boot/backend/assembly/GlobalModule.js';
+import { IdService } from '@features/runtime/backend/services/IdService.js';
+import { EmailService } from '@features/email/backend/services/EmailService.js';
+import { RoleService } from '@features/roles/backend/services/RoleService.js';
+import { MetaService } from '@features/instance/backend/services/MetaService.js';
+import { ModerationLogService } from '@features/moderation/backend/services/ModerationLogService.js';
+import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
+import { RecipientMethod } from '@features/moderation/backend/models/AbuseReportNotificationRecipient.js';
+import { SystemWebhookService } from '@features/integrations/backend/services/SystemWebhookService.js';
+import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 
 process.env.NODE_ENV = 'test';
 
@@ -85,7 +85,7 @@ describe('AbuseReportNotificationService', () => {
 			.then(x => systemWebhooksRepository.findOneByOrFail(x.identifiers[0]));
 	}
 
-	async function createRecipient(data: Partial<MiAbuseReportNotificationRecipient> = {}) {
+	async function createRecipient(data: Partial<Pick<MiAbuseReportNotificationRecipient, 'id' | 'isActive' | 'updatedAt' | 'name' | 'method' | 'userId' | 'systemWebhookId'>> = {}) {
 		return abuseReportNotificationRecipientRepository
 			.insert({
 				id: idService.gen(),

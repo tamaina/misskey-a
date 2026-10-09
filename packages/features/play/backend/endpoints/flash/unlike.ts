@@ -3,72 +3,36 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Inject, Injectable } from '@nestjs/common';
-import type { FlashsRepository, FlashLikesRepository } from '@/models/_.js';
-import { Endpoint } from '@/server/api/endpoint-base.js';
-import { DI } from '@/di-symbols.js';
-import { ApiError } from '@/server/api/error.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 
-export const meta = {
-	tags: ['flash'],
+import { requirePrincipal } from '../../../../api/backend/transport/middleware.js';
 
-	requireCredential: true,
-
-	prohibitMoved: true,
-
-	kind: 'write:flash-likes',
-
-	errors: {
-		noSuchFlash: {
-			message: 'No such flash.',
-			code: 'NO_SUCH_FLASH',
-			id: 'afe8424a-a69e-432d-a5f2-2f0740c62410',
-		},
-
-		notLiked: {
-			message: 'You have not liked that flash.',
-			code: 'NOT_LIKED',
-			id: '755f25a7-9871-4f65-9f34-51eaad9ae0ac',
-		},
-	},
-} as const;
-
-export const paramDef = {
-	type: 'object',
-	properties: {
-		flashId: { type: 'string', format: 'misskey:id' },
-	},
-	required: ['flashId'],
-} as const;
-
-@Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
-	constructor(
-		@Inject(DI.flashsRepository)
-		private flashsRepository: FlashsRepository,
-
-		@Inject(DI.flashLikesRepository)
-		private flashLikesRepository: FlashLikesRepository,
-	) {
-		super(meta, paramDef, async (ps, me) => {
-			const flash = await this.flashsRepository.findOneBy({ id: ps.flashId });
+import { flashUnlikeContract, flashUnlikeErrors } from './unlike.contract.js';
+import type { FlashsRepository, FlashLikesRepository } from '@features/persistence/backend/repositories/models.js';
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+export interface FlashUnlikeDependencies {
+	flashsRepository: Pick<FlashsRepository, 'decrement' | 'findOneBy'>;
+	flashLikesRepository: Pick<FlashLikesRepository, 'delete' | 'findOneBy'>;
+}
+export function createFlashUnlikeProcedure(deps: FlashUnlikeDependencies) {
+	return createApiProcedure<MiLocalUser>()(flashUnlikeContract)
+		.use(requirePrincipal<MiLocalUser>())
+		.handler(async ({ input: ps, context }) => {
+			const me = context.principal;
+			const flash = await deps.flashsRepository.findOneBy({ id: ps.flashId });
 			if (flash == null) {
-				throw new ApiError(meta.errors.noSuchFlash);
+				throw apiError(flashUnlikeErrors.noSuchFlash);
 			}
-
-			const exist = await this.flashLikesRepository.findOneBy({
+			const exist = await deps.flashLikesRepository.findOneBy({
 				flashId: flash.id,
 				userId: me.id,
 			});
-
 			if (exist == null) {
-				throw new ApiError(meta.errors.notLiked);
+				throw apiError(flashUnlikeErrors.notLiked);
 			}
-
 			// Delete like
-			await this.flashLikesRepository.delete(exist.id);
-
-			this.flashsRepository.decrement({ id: flash.id }, 'likedCount', 1);
+			await deps.flashLikesRepository.delete(exist.id);
+			deps.flashsRepository.decrement({ id: flash.id }, 'likedCount', 1);
 		});
-	}
 }

@@ -1,0 +1,21 @@
+/*
+ * SPDX-FileCopyrightText: syuilo and misskey-project
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
+
+import { defineServices, service } from '@features/index/backend/service-definitions.js';
+import { ports } from '@features/index/backend/service-ports.js';
+import { AbuseReportNotificationRecipientEntityService } from './serializers/AbuseReportNotificationRecipientEntityService.js';
+import { AbuseUserReportEntityService } from './serializers/AbuseUserReportEntityService.js';
+import { ModerationLogEntityService } from './serializers/ModerationLogEntityService.js';
+import { ModerationLogService } from './services/ModerationLogService.js';
+
+export const moderationServices = defineServices({
+	AbuseReportNotificationRecipientEntityService: service(AbuseReportNotificationRecipientEntityService, [ports.abuseReportNotificationRecipientRepository, ports.userEntityService, ports.systemWebhookEntityService]),
+	AbuseUserReportEntityService: service(AbuseUserReportEntityService, [ports.abuseUserReportsRepository, ports.userEntityService, ports.idService]),
+	ModerationLogEntityService: service(ModerationLogEntityService, [ports.moderationLogsRepository, ports.userEntityService, ports.idService]),
+});
+
+export const moderationLoggingServices = defineServices({
+	ModerationLogService: service(ModerationLogService, [ports.moderationLogsRepository, ports.idService]),
+});

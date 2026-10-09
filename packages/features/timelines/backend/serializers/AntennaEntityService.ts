@@ -3,28 +3,24 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Inject, Injectable } from '@nestjs/common';
-import { DI } from '@/di-symbols.js';
-import type { AntennasRepository } from '@/models/_.js';
-import type { Packed } from '@/misc/json-schema.js';
-import type { MiAntenna } from '@/models/Antenna.js';
-import { bindThis } from '@/decorators.js';
-import { IdService } from '@/core/IdService.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
+import type { AntennasRepository } from '@features/persistence/backend/repositories/models.js';
+import type { PackedAntenna } from '../antenna.schema.js';
+import type { MiAntenna } from '../models/Antenna.js';
+import type { IdService } from '@features/runtime/backend/services/IdService.js';
 
-@Injectable()
 export class AntennaEntityService {
 	constructor(
-		@Inject(DI.antennasRepository)
 		private antennasRepository: AntennasRepository,
 
-		private idService: IdService,
+		private idService: Pick<IdService, 'parse'>,
 	) {
 	}
 
 	@bindThis
 	public async pack(
 		src: MiAntenna['id'] | MiAntenna,
-	): Promise<Packed<'Antenna'>> {
+	): Promise<PackedAntenna> {
 		const antenna = typeof src === 'object' ? src : await this.antennasRepository.findOneByOrFail({ id: src });
 
 		return {

@@ -8,12 +8,16 @@ import sharedConfig from '../shared/eslint.config.js';
 export default [
 	...sharedConfig,
 	{
-		files: ['src/**/*.vue'],
+		files: ['src/**/*.vue', '**/frontend/embed/**/*.vue'],
 		...pluginMisskey.configs.typescript,
 	},
 	...pluginVue.configs['flat/recommended'],
 	{
-		files: ['src/**/*.{ts,vue}'],
+		files: ['src/**/*.vue', '**/frontend/embed/**/*.vue'],
+		languageOptions: { globals: { $locale: 'readonly', $l: 'readonly' } },
+	},
+	{
+		files: ['src/**/*.{ts,vue}', '**/frontend/embed/**/*.{ts,vue}'],
 		languageOptions: {
 			globals: {
 				...Object.fromEntries(Object.entries(globals.node).map(([key]) => [key, 'off'])),
@@ -35,7 +39,7 @@ export default [
 			parserOptions: {
 				extraFileExtensions: ['.vue'],
 				parser: tsParser,
-				project: ['./tsconfig.json'],
+				project: ['./tsconfig.json', './src/workers/tsconfig.json'],
 				sourceType: 'module',
 				tsconfigRootDir: import.meta.dirname,
 			},

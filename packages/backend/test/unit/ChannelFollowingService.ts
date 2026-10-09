@@ -7,10 +7,10 @@
 
 import { afterEach, beforeEach, describe, expect, beforeAll, afterAll, test } from 'vitest';
 import { Test, TestingModule } from '@nestjs/testing';
-import { GlobalModule } from '@/GlobalModule.js';
-import { CoreModule } from '@/core/CoreModule.js';
-import { GlobalEventService } from '@/core/GlobalEventService.js';
-import { IdService } from '@/core/IdService.js';
+import { GlobalModule } from '@features/boot/backend/assembly/GlobalModule.js';
+import { CoreModule } from '@features/boot/backend/assembly/CoreModule.js';
+import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
+import { IdService } from '@features/runtime/backend/services/IdService.js';
 import {
 	type ChannelFollowingsRepository,
 	ChannelsRepository,
@@ -21,10 +21,10 @@ import {
 	MiUser,
 	UserProfilesRepository,
 	UsersRepository,
-} from '@/models/_.js';
+} from '@features/persistence/backend/repositories/models.js';
 import { DI } from '@/di-symbols.js';
-import { ChannelFollowingService } from "@/core/ChannelFollowingService.js";
-import { MiLocalUser } from "@/models/User.js";
+import { ChannelFollowingService } from "@features/channels/backend/services/ChannelFollowingService.js";
+import { MiLocalUser } from "@features/users/backend/models/User.js";
 
 describe('ChannelFollowingService', () => {
 	let app: TestingModule;

@@ -3,24 +3,20 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Inject, Injectable } from '@nestjs/common';
-import { DI } from '@/di-symbols.js';
-import type { NoteFavoritesRepository } from '@/models/_.js';
-import type { } from '@/models/Blocking.js';
-import type { MiUser } from '@/models/User.js';
-import type { MiNoteFavorite } from '@/models/NoteFavorite.js';
-import { bindThis } from '@/decorators.js';
-import { IdService } from '@/core/IdService.js';
-import { NoteEntityService } from '@/core/entities/NoteEntityService.js';
+import type { NoteFavoritesRepository } from '@features/persistence/backend/repositories/models.js';
+import type { } from '@features/relationships/backend/models/Blocking.js';
+import type { MiUser } from '@features/users/backend/models/User.js';
+import type { MiNoteFavorite } from '../models/NoteFavorite.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
+import type { IdService } from '@features/runtime/backend/services/IdService.js';
+import type { NoteEntityService } from '@features/notes/backend/serializers/NoteEntityService.js';
 
-@Injectable()
 export class NoteFavoriteEntityService {
 	constructor(
-		@Inject(DI.noteFavoritesRepository)
 		private noteFavoritesRepository: NoteFavoritesRepository,
 
-		private noteEntityService: NoteEntityService,
-		private idService: IdService,
+		private noteEntityService: Pick<NoteEntityService, 'pack'>,
+		private idService: Pick<IdService, 'parse'>,
 	) {
 	}
 

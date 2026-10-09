@@ -7,22 +7,22 @@ import { Inject, Injectable } from '@nestjs/common';
 import { EntityNotFoundError, In } from 'typeorm';
 import { ModuleRef } from '@nestjs/core';
 import { DI } from '@/di-symbols.js';
-import type { Packed } from '@/misc/json-schema.js';
-import { awaitAll } from '@/misc/prelude/await-all.js';
-import type { MiUser } from '@/models/User.js';
-import type { MiNote } from '@/models/Note.js';
-import type { UsersRepository, NotesRepository, FollowingsRepository, PollsRepository, PollVotesRepository, NoteReactionsRepository, ChannelsRepository, MiMeta } from '@/models/_.js';
-import { bindThis } from '@/decorators.js';
-import { DebounceLoader } from '@/misc/loader.js';
-import { IdService } from '@/core/IdService.js';
-import { shouldHideNoteByTime } from '@/misc/should-hide-note-by-time.js';
-import { ReactionsBufferingService } from '@/core/ReactionsBufferingService.js';
-import { CacheService } from '@/core/CacheService.js';
+import type { Packed } from '@features/index/backend/packed.schema.js';
+import { awaitAll } from '@features/runtime/backend/async/await-all.js';
+import type { MiUser } from '@features/users/backend/models/User.js';
+import type { MiNote } from '../models/Note.js';
+import type { UsersRepository, NotesRepository, FollowingsRepository, PollsRepository, PollVotesRepository, NoteReactionsRepository, ChannelsRepository, MiMeta } from '@features/persistence/backend/repositories/models.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
+import { DebounceLoader } from '@features/runtime/backend/async/loader.js';
+import { IdService } from '@features/runtime/backend/services/IdService.js';
+import { shouldHideNoteByTime } from '../utility/should-hide-note-by-time.js';
+import { ReactionsBufferingService } from '../services/ReactionsBufferingService.js';
+import { CacheService } from '@features/users/backend/services/CacheService.js';
 import type { OnModuleInit } from '@nestjs/common';
-import type { CustomEmojiService } from '@/core/CustomEmojiService.js';
-import type { ReactionService } from '@/core/ReactionService.js';
-import type { UserEntityService } from '@/core/entities/UserEntityService.js';
-import type { DriveFileEntityService } from '@/core/entities/DriveFileEntityService.js';
+import type { CustomEmojiService } from '@features/emojis/backend/services/CustomEmojiService.js';
+import type { ReactionService } from '../services/ReactionService.js';
+import type { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
+import type { DriveFileEntityService } from '@features/drive/backend/serializers/DriveFileEntityService.js';
 
 // is-renote.tsとよしなにリンク
 function isPureRenote(note: MiNote): note is MiNote & { renoteId: MiNote['id']; renote: MiNote } {

@@ -21,8 +21,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script lang="ts" setup>
 import { ref } from 'vue';
 import type { PREF_DEF } from '@features/preferences/frontend/state/def.js';
-import * as os from '@/os.js';
-import { prefer } from '@/preferences.js';
+import * as os from '@features/ui/frontend/os.js';
+import { prefer } from '@features/preferences/frontend/preferences.js';
 
 const props = withDefaults(defineProps<{
 	k: keyof typeof PREF_DEF;

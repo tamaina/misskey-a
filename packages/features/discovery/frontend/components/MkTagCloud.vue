@@ -16,7 +16,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import { onMounted, onBeforeUnmount, nextTick, ref, shallowRef, useTemplateRef } from 'vue';
-import { themeManager } from '@/theme.js';
+import { themeManager } from '@features/preferences/frontend/theme.js';
 import tinycolor from 'tinycolor2';
 import { TagCanvas } from '@misskey-dev/tagcanvas-es';
 

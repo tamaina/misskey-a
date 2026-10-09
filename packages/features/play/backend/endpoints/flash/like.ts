@@ -3,92 +3,48 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Inject, Injectable } from '@nestjs/common';
-import type { FlashsRepository, FlashLikesRepository } from '@/models/_.js';
-import { IdService } from '@/core/IdService.js';
-import { Endpoint } from '@/server/api/endpoint-base.js';
-import { DI } from '@/di-symbols.js';
-import { ApiError } from '@/server/api/error.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 
-export const meta = {
-	tags: ['flash'],
+import { requirePrincipal } from '../../../../api/backend/transport/middleware.js';
 
-	requireCredential: true,
-
-	prohibitMoved: true,
-
-	kind: 'write:flash-likes',
-
-	errors: {
-		noSuchFlash: {
-			message: 'No such flash.',
-			code: 'NO_SUCH_FLASH',
-			id: 'c07c1491-9161-4c5c-9d75-01906f911f73',
-		},
-
-		yourFlash: {
-			message: 'You cannot like your flash.',
-			code: 'YOUR_FLASH',
-			id: '3fd8a0e7-5955-4ba9-85bb-bf3e0c30e13b',
-		},
-
-		alreadyLiked: {
-			message: 'The flash has already been liked.',
-			code: 'ALREADY_LIKED',
-			id: '010065cf-ad43-40df-8067-abff9f4686e3',
-		},
-	},
-} as const;
-
-export const paramDef = {
-	type: 'object',
-	properties: {
-		flashId: { type: 'string', format: 'misskey:id' },
-	},
-	required: ['flashId'],
-} as const;
-
-@Injectable()
-export class EndpointImplementation extends Endpoint<typeof meta, typeof paramDef> {
-	constructor(
-		@Inject(DI.flashsRepository)
-		private flashsRepository: FlashsRepository,
-
-		@Inject(DI.flashLikesRepository)
-		private flashLikesRepository: FlashLikesRepository,
-
-		private idService: IdService,
-	) {
-		super(meta, paramDef, async (ps, me) => {
-			const flash = await this.flashsRepository.findOneBy({ id: ps.flashId });
+import { flashLikeContract, flashLikeErrors } from './like.contract.js';
+import type { FlashsRepository, FlashLikesRepository } from '@features/persistence/backend/repositories/models.js';
+import type { IdService } from '@features/runtime/backend/services/IdService.js';
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+export interface FlashLikeDependencies {
+	flashsRepository: Pick<FlashsRepository, 'findOneBy' | 'increment'>;
+	flashLikesRepository: Pick<FlashLikesRepository, 'exists' | 'insert'>;
+	idService: Pick<IdService, 'gen'>;
+}
+export function createFlashLikeProcedure(deps: FlashLikeDependencies) {
+	return createApiProcedure<MiLocalUser>()(flashLikeContract)
+		.use(requirePrincipal<MiLocalUser>())
+		.handler(async ({ input: ps, context }) => {
+			const me = context.principal;
+			const flash = await deps.flashsRepository.findOneBy({ id: ps.flashId });
 			if (flash == null) {
-				throw new ApiError(meta.errors.noSuchFlash);
+				throw apiError(flashLikeErrors.noSuchFlash);
 			}
-
 			if (flash.userId === me.id) {
-				throw new ApiError(meta.errors.yourFlash);
+				throw apiError(flashLikeErrors.yourFlash);
 			}
-
 			// if already liked
-			const exist = await this.flashLikesRepository.exists({
+			const exist = await deps.flashLikesRepository.exists({
 				where: {
 					flashId: flash.id,
 					userId: me.id,
 				},
 			});
-
 			if (exist) {
-				throw new ApiError(meta.errors.alreadyLiked);
+				throw apiError(flashLikeErrors.alreadyLiked);
 			}
-
 			// Create like
-			await this.flashLikesRepository.insert({
-				id: this.idService.gen(),
+			await deps.flashLikesRepository.insert({
+				id: deps.idService.gen(),
 				flashId: flash.id,
 				userId: me.id,
 			});
-
-			this.flashsRepository.increment({ id: flash.id }, 'likedCount', 1);
+			deps.flashsRepository.increment({ id: flash.id }, 'likedCount', 1);
 		});
-	}
 }

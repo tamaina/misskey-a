@@ -42,10 +42,10 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import { computed, ref, useTemplateRef, watch } from 'vue';
-import { $i } from '@/i.js';
-import * as os from '@/os.js';
-import { mainRouter } from '@/router.js';
-import { navbarItemDef } from '@/navbar.js';
+import { $i } from '@features/auth/frontend/i.js';
+import * as os from '@features/ui/frontend/os.js';
+import { mainRouter } from '@features/navigation/frontend/router.js';
+import { navbarItemDef } from '@features/navigation/frontend/navbar.js';
 
 const drawerMenuShowing = defineModel<boolean>('drawerMenuShowing');
 const widgetsShowing = defineModel<boolean>('widgetsShowing');

@@ -4,9 +4,9 @@
  */
 
 import { Injectable } from '@nestjs/common';
-import { bindThis } from '@/decorators.js';
-import { captureMessage, startSpan } from '@/core/telemetry/telemetry-registry.js';
-import type { TelemetryCaptureMessageOptions } from '@/core/telemetry/adapters/TelemetryAdapter.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
+import { captureMessage, startSpan } from '../telemetry/telemetry-registry.js';
+import type { TelemetryCaptureMessageOptions } from '../telemetry/adapters/TelemetryAdapter.js';
 
 @Injectable()
 export class TelemetryService {

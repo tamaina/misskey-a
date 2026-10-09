@@ -6,8 +6,8 @@
 import type { StoryObj } from '@storybook/vue3';
 import { HttpResponse, http } from 'msw';
 import search_ from '@features/discovery/frontend/pages/search.vue';
-import { userDetailed } from '@/../.storybook/fakes.js';
-import { commonHandlers } from '@/../.storybook/mocks.js';
+import { userDetailed } from '../../../../frontend/.storybook/fakes.js';
+import { commonHandlers } from '../../../../frontend/.storybook/mocks.js';
 
 const localUser = userDetailed('someuserid', 'miskist', null, 'Local Misskey User');
 

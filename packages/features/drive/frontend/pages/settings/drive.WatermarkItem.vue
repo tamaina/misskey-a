@@ -6,10 +6,10 @@ SPDX-License-Identifier: AGPL-3.0-only
 <template>
 <MkFolder :defaultOpen="false" :canPage="false">
 	<template #icon><i class="ti ti-pencil"></i></template>
-	<template #label>{{ i18n.ts.preset }}: {{ preset.name === '' ? '(' + i18n.ts.noName + ')' : preset.name }}</template>
+	<template #label>{{ $locale.sfc.preset }}: {{ preset.name === '' ? '(' + $locale.sfc.noName + ')' : preset.name }}</template>
 	<template #footer>
 		<div class="_buttons">
-			<MkButton @click="edit"><i class="ti ti-pencil"></i> {{ i18n.ts.edit }}</MkButton>
+			<MkButton @click="edit"><i class="ti ti-pencil"></i> {{ $locale.sfc.edit }}</MkButton>
 			<MkButton danger iconOnly style="margin-left: auto;" @click="del"><i class="ti ti-trash"></i></MkButton>
 		</div>
 	</template>
@@ -22,13 +22,12 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import { defineAsyncComponent, onMounted, onUnmounted, ref, useTemplateRef, watch } from 'vue';
-import type { WatermarkPreset } from '@/utility/watermark/WatermarkRenderer.js';
-import { WatermarkRenderer } from '@/utility/watermark/WatermarkRenderer.js';
+import type { WatermarkPreset } from '@features/drive/frontend/utility/watermark/WatermarkRenderer.js';
+import { WatermarkRenderer } from '@features/drive/frontend/utility/watermark/WatermarkRenderer.js';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
-import * as os from '@/os.js';
-import { i18n } from '@/i18n.js';
-import { deepClone } from '@/utility/clone.js';
-import MkFolder from '@/components/MkFolder.vue';
+import * as os from '@features/ui/frontend/os.js';
+import { deepClone } from '@features/runtime/frontend/utility/clone.js';
+import MkFolder from '@features/ui/frontend/components/MkFolder.vue';
 
 const props = defineProps<{
 	preset: WatermarkPreset;
@@ -40,7 +39,7 @@ const emit = defineEmits<{
 }>();
 
 async function edit() {
-	const { dispose } = os.popup(defineAsyncComponent(() => import('@features/media/frontend/components/MkWatermarkEditorDialog.vue')), {
+	const { dispose } = os.popup(defineAsyncComponent(() => import('@features/drive/frontend/components/MkWatermarkEditorDialog.vue')), {
 		presetEditMode: true,
 		preset: deepClone(props.preset),
 		layers: deepClone(props.preset.layers),
@@ -54,7 +53,7 @@ async function edit() {
 
 function del(ev: PointerEvent) {
 	os.popupMenu([{
-		text: i18n.ts.delete,
+		text: $locale.value.sfc.delete,
 		action: () => {
 			emit('del');
 		},
@@ -109,3 +108,255 @@ watch(() => props.preset, async () => {
 	object-fit: contain;
 }
 </style>
+
+<locale locale="ar-SA" lang="json">
+{
+	"preset": "إعدادات مسبقة",
+	"noName": "No name",
+	"edit": "التعديل",
+	"delete": "حذف"
+}
+</locale>
+
+<locale locale="ca-ES" lang="json">
+{
+	"preset": "Predefinit",
+	"noName": "No hi ha un nom disponible ",
+	"edit": "Editar",
+	"delete": "Elimina"
+}
+</locale>
+
+<locale locale="cs-CZ" lang="json">
+{
+	"preset": "Předvolba",
+	"noName": "No name",
+	"edit": "Upravit",
+	"delete": "Smazat"
+}
+</locale>
+
+<locale locale="da-DK" lang="json">
+{
+	"preset": "Preset",
+	"noName": "No name",
+	"edit": "Edit",
+	"delete": "Delete"
+}
+</locale>
+
+<locale locale="de-DE" lang="json">
+{
+	"preset": "Vorlage",
+	"noName": "Kein Name",
+	"edit": "Bearbeiten",
+	"delete": "Löschen"
+}
+</locale>
+
+<locale locale="en-US" lang="json">
+{
+	"preset": "Preset",
+	"noName": "No name",
+	"edit": "Edit",
+	"delete": "Delete"
+}
+</locale>
+
+<locale locale="es-ES" lang="json">
+{
+	"preset": "Predefinido",
+	"noName": "No hay nombre.",
+	"edit": "Editar",
+	"delete": "Borrar"
+}
+</locale>
+
+<locale locale="fr-FR" lang="json">
+{
+	"preset": "Préréglage",
+	"noName": "No name",
+	"edit": "Editer",
+	"delete": "Supprimer"
+}
+</locale>
+
+<locale locale="id-ID" lang="json">
+{
+	"preset": "Prasetel",
+	"noName": "Tidak ada nama",
+	"edit": "Sunting",
+	"delete": "Hapus"
+}
+</locale>
+
+<locale locale="it-IT" lang="json">
+{
+	"preset": "Preimpostato",
+	"noName": "Senza nome",
+	"edit": "Modifica",
+	"delete": "Elimina"
+}
+</locale>
+
+<locale locale="ja-JP" lang="json">
+{
+	"preset": "プリセット",
+	"noName": "名前はありません",
+	"edit": "編集",
+	"delete": "削除"
+}
+</locale>
+
+<locale locale="ja-KS" lang="json">
+{
+	"preset": "プリセット",
+	"noName": "名前はあらへんで",
+	"edit": "編集",
+	"delete": "ほかす"
+}
+</locale>
+
+<locale locale="kab-KAB" lang="json">
+{
+	"preset": "Preset",
+	"noName": "No name",
+	"edit": "Edit",
+	"delete": "Kkes"
+}
+</locale>
+
+<locale locale="kn-IN" lang="json">
+{
+	"preset": "Preset",
+	"noName": "No name",
+	"edit": "Edit",
+	"delete": "ಅಳಿಸು"
+}
+</locale>
+
+<locale locale="ko-KR" lang="json">
+{
+	"preset": "프리셋",
+	"noName": "이름이 없습니다.",
+	"edit": "편집",
+	"delete": "삭제"
+}
+</locale>
+
+<locale locale="nl-NL" lang="json">
+{
+	"preset": "Preset",
+	"noName": "No name",
+	"edit": "Bewerken",
+	"delete": "Verwijderen"
+}
+</locale>
+
+<locale locale="no-NO" lang="json">
+{
+	"preset": "Preset",
+	"noName": "No name",
+	"edit": "Rediger",
+	"delete": "Slett"
+}
+</locale>
+
+<locale locale="pl-PL" lang="json">
+{
+	"preset": "Konfiguracja",
+	"noName": "No name",
+	"edit": "Edytuj",
+	"delete": "Usuń"
+}
+</locale>
+
+<locale locale="pt-PT" lang="json">
+{
+	"preset": "Predefinições",
+	"noName": "Sem nome",
+	"edit": "Editar",
+	"delete": "Excluir"
+}
+</locale>
+
+<locale locale="ru-RU" lang="json">
+{
+	"preset": "Шаблоны",
+	"noName": "Имя не указано",
+	"edit": "Изменить",
+	"delete": "Удалить"
+}
+</locale>
+
+<locale locale="sk-SK" lang="json">
+{
+	"preset": "Preset",
+	"noName": "No name",
+	"edit": "Upraviť",
+	"delete": "Odstrániť"
+}
+</locale>
+
+<locale locale="th-TH" lang="json">
+{
+	"preset": "พรีเซ็ต",
+	"noName": "ไม่มีชื่อ",
+	"edit": "แก้ไข",
+	"delete": "ลบ"
+}
+</locale>
+
+<locale locale="tr-TR" lang="json">
+{
+	"preset": "Ön ayar",
+	"noName": "İsim yok",
+	"edit": "Düzenle",
+	"delete": "Sil"
+}
+</locale>
+
+<locale locale="ug-CN" lang="json">
+{
+	"preset": "Preset",
+	"noName": "No name",
+	"edit": "Edit",
+	"delete": "ئۆچۈرۈش"
+}
+</locale>
+
+<locale locale="uk-UA" lang="json">
+{
+	"preset": "Пресет",
+	"noName": "Ім'я не вказано",
+	"edit": "Редагувати",
+	"delete": "Видалити"
+}
+</locale>
+
+<locale locale="vi-VN" lang="json">
+{
+	"preset": "Mẫu thiết lập",
+	"noName": "No name",
+	"edit": "Sửa",
+	"delete": "Xóa"
+}
+</locale>
+
+<locale locale="zh-CN" lang="json">
+{
+	"preset": "预设值",
+	"noName": "未命名",
+	"edit": "编辑",
+	"delete": "删除"
+}
+</locale>
+
+<locale locale="zh-TW" lang="json">
+{
+	"preset": "預設值",
+	"noName": "沒有名稱",
+	"edit": "編輯",
+	"delete": "刪除"
+}
+</locale>
