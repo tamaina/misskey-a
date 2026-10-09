@@ -11,7 +11,7 @@ export interface AvatarDecorationDeleteDependencies<Actor extends ApiActor> {
 	avatarDecorationService: Pick<AvatarDecorationsDependencies<Actor>['avatarDecorationService'], 'delete'>;
 }
 export function createAvatarDecorationDeleteProcedure<Actor extends ApiActor>(deps: AvatarDecorationDeleteDependencies<Actor>) {
-	return implement(avatarDecorationsContract.delete, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>()
+	return implement(avatarDecorationsContract.delete, { initialInputValidationIndex: Number.POSITIVE_INFINITY, initialOutputValidationIndex: Number.NaN }).$context<ApiContext<Actor>>()
 		.use(authentication<Actor>()).use(apiPolicy<Actor>({ name: avatarDecorationsContract.delete['~orpc'].meta.requestName, requireCredential: true, requiredRolePolicy: 'canManageAvatarDecorations', kind: 'write:admin:avatar-decorations' })).use(requirePrincipal<Actor>())
 		.handler(async ({ input, context }) => {
 			const actor = context.principal;

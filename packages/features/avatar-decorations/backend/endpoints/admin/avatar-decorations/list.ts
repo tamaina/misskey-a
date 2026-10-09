@@ -12,7 +12,7 @@ export interface AvatarDecorationListDependencies<Actor extends ApiActor> {
 	idService: Pick<AvatarDecorationsDependencies<Actor>['idService'], 'parse'>;
 }
 export function createAvatarDecorationListProcedure<Actor extends ApiActor>(deps: AvatarDecorationListDependencies<Actor>) {
-	return implement(avatarDecorationsContract.list, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>()
+	return implement(avatarDecorationsContract.list, { initialInputValidationIndex: Number.POSITIVE_INFINITY, initialOutputValidationIndex: Number.NaN }).$context<ApiContext<Actor>>()
 		.use(authentication<Actor>()).use(apiPolicy<Actor>({ name: avatarDecorationsContract.list['~orpc'].meta.requestName, requireCredential: true, requiredRolePolicy: 'canManageAvatarDecorations', kind: 'read:admin:avatar-decorations' })).use(requirePrincipal<Actor>())
 		.handler(async () => {
 			return (await deps.avatarDecorationService.getAll(true)).map(row => ({

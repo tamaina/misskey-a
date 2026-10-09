@@ -12,7 +12,7 @@ export interface GetAvatarDecorationsDependencies<Actor extends ApiActor> {
 	readRoles: AvatarDecorationsDependencies<Actor>['readRoles'];
 }
 export function createGetAvatarDecorationsProcedure<Actor extends ApiActor>(deps: GetAvatarDecorationsDependencies<Actor>) {
-	return implement(avatarDecorationsContract.get, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>()
+	return implement(avatarDecorationsContract.get, { initialInputValidationIndex: Number.POSITIVE_INFINITY, initialOutputValidationIndex: Number.NaN }).$context<ApiContext<Actor>>()
 		.use(authentication<Actor>()).use(apiPolicy<Actor>({ name: avatarDecorationsContract.get['~orpc'].meta.requestName }))
 		.handler(async ({ context }) => {
 			const actor = context.principal;

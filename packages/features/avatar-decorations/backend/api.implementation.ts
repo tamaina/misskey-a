@@ -38,7 +38,8 @@ export interface AvatarDecorationsDependencies<Actor extends ApiActor> {
 }
 
 export function createAvatarDecorationsRouter<Actor extends ApiActor>(deps: AvatarDecorationsDependencies<Actor>) {
-	return implement(avatarDecorationsContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>().router({
+	// oRPC 1.x skips the output validation index when it is NaN; contracts remain typed.
+	return implement(avatarDecorationsContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY, initialOutputValidationIndex: Number.NaN }).$context<ApiContext<Actor>>().router({
 		create: createAvatarDecorationCreateProcedure(deps),
 		delete: createAvatarDecorationDeleteProcedure(deps),
 		list: createAvatarDecorationListProcedure(deps),
