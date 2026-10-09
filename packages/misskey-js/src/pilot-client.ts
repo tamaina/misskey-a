@@ -1,13 +1,20 @@
+import * as v from 'valibot';
+import { fastifyFailureSchema, sessionFailureSchema } from '#session-errors';
 import { createORPCClient, ORPCError } from '@orpc/client';
 import { getContractRouter, isContractProcedure, validateORPCError } from '@orpc/contract';
 import type { ContractRouterClient, ErrorMap } from '@orpc/contract';
 import { requestRoutes } from '#api-routing';
 import { apiErrorData } from '#pilot-error-data';
 import { OpenAPILink } from '@orpc/openapi-client/fetch';
-import type { pilotContract } from '#pilot-contract';
+import type { clientContract as pilotContract } from '#pilot-contract';
 import routing, { nullableResponses } from './autogen/pilot-routing.js';
 import { fetchPilotResponse, jsonPilotResponse } from './orpc-fetch.js';
 import type { FetchLike } from './api.js';
+
+/** Internal bridge from HTTP failures to the facade's historical plain rejection value. */
+export class ApiWireFailure extends Error {
+ constructor(public readonly payload: Record<string, unknown>) { super('API request failed'); }
+}
 
 export interface PilotClientContext { credential?: string | null | undefined }
 export type PilotClient = ContractRouterClient<typeof pilotContract, PilotClientContext>;
@@ -55,7 +62,7 @@ export function createPilotClient(options: {
 				// is checked by the official validator, including defaults and unknown keys.
 				const generatedErrors: ErrorMap = procedure['~orpc'].errorMap;
 				const errorMap = Object.fromEntries(Object.entries(generatedErrors)
-					.map(([code, definition]) => [code, { ...definition, data: apiErrorData }] satisfies [string, ErrorMap[string]]));
+					.map(([code, definition]) => [code, { ...definition, data: call.path[0] === 'authSessions' ? fastifyFailureSchema : apiErrorData }] satisfies [string, ErrorMap[string]]));
 				throw await validateORPCError(errorMap, normalized);
 			}
 		}],
@@ -65,7 +72,15 @@ export function createPilotClient(options: {
 			return native === undefined ? fetchPilotResponse(options.fetch(), request) : jsonPilotResponse(await native);
 		},
 		customErrorResponseBodyDecoder: (body, response) => {
-			if (!isRecord(body) || !isRecord(body.error)) return null;
+			if (!isRecord(body)) return null;
+			if (!isRecord(body.error)) {
+				const fastify = v.safeParse(fastifyFailureSchema, body);
+				return fastify.success ? new ORPCError(response.status >= 500 ? 'INTERNAL_SERVER_ERROR' : 'SESSION_HTTP_ERROR', { status: response.status, message: fastify.output.message, data: fastify.output }) : null;
+			}
+			const session = v.safeParse(sessionFailureSchema, body);
+			if (session.success && (typeof body.error.code !== 'string' || typeof body.error.message !== 'string')) {
+				return new ORPCError('SESSION_HTTP_ERROR', { status: response.status, data: { sessionError: session.output.error } });
+			}
 			const error = body.error;
 			if (typeof error.code !== 'string' || typeof error.message !== 'string') return null;
 			const { code, message, ...data } = error;
@@ -84,7 +99,12 @@ export function createPilotClient(options: {
 				if (error instanceof ORPCError && isRecord(error.data)) {
 					// Preserve the legacy plain APIError rejection value.
 					// eslint-disable-next-line no-throw-literal
-					throw { ...error.data, code: error.code, message: error.message };
+					if (isRecord(error.data.sessionError)) throw new ApiWireFailure(error.data.sessionError);
+					if (typeof error.data.error === 'string' && typeof error.data.statusCode === 'number') {
+						// The old facade spread Fastify's string error value into its plain APIError.
+						throw new ApiWireFailure(Object.fromEntries(Array.from(error.data.error, (character, index) => [String(index), character])));
+					}
+					throw new ApiWireFailure({ ...error.data, code: error.code, message: error.message });
 				}
 				throw error;
 			}

@@ -8,8 +8,8 @@ import * as v from 'valibot';
 import Parser from 'rss-parser';
 import { Response } from 'node-fetch';
 import { mockDeep } from 'vitest-mock-extended';
-import { inlineFetchRssOutput } from '../../contract/endpoint-definitions.js';
-import { FetchRssEndpoint, meta } from '../../backend/endpoints/fetch-rss.js';
+import { fetchRssInput, fetchRssOutput as inlineFetchRssOutput } from '../../backend/endpoints/fetch-rss.contract.js';
+import { FetchRssApplicationService as FetchRssEndpoint } from '../../backend/endpoints/fetch-rss.application.js';
 import type { HttpRequestService } from '@features/runtime/backend/services/HttpRequestService.js';
 
 const richRss = `<rss version="2.0" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd" xmlns:content="http://purl.org/rss/1.0/modules/content/"><channel>
@@ -57,13 +57,13 @@ test('actual RSS HTTP handler keeps XML output, URL normalization, limits and do
 	Object.defineProperty(response, 'url', { value: 'https://example.com/feed' });
 	http.send.mockResolvedValue(response);
 	const endpoint = new FetchRssEndpoint(http);
-	const raw = await endpoint.exec({ url: 'https://example.com/feed#fragment', future: true }, null, null);
+	const raw = await endpoint.execute(v.parse(fetchRssInput, { url: 'https://example.com/feed#fragment', future: true }), null);
 	expect(raw.items[0].enclosure).toHaveProperty('length', '123');
 	expect(v.parse(inlineFetchRssOutput, JSON.parse(JSON.stringify(raw)))).toEqual(raw);
 	expect(http.send).toHaveBeenCalledWith('https://example.com/feed', { method: 'GET', headers: { Accept: 'application/rss+xml, */*' }, timeout: 5000, size: 1024 * 1024 });
-	await expect(endpoint.exec({ url: 'file:///tmp/feed' }, null, null)).rejects.toMatchObject({ code: 'INVALID_URL' });
-	await expect(endpoint.exec({}, null, null)).rejects.toMatchObject({ code: 'INVALID_PARAM' });
+	await expect(endpoint.execute({ url: 'file:///tmp/feed' }, null)).rejects.toMatchObject({ code: 'INVALID_URL' });
+	expect(v.safeParse(fetchRssInput, {}).success).toBe(false);
 	http.send.mockRejectedValue(new Error('network'));
-	await expect(endpoint.exec({ url: 'https://example.com/failure' }, null, null)).rejects.toMatchObject({ code: 'FETCH_RSS_FAILED' });
-	expect(meta).toMatchObject({ requireCredential: false, allowGet: true, cacheSec: 180 });
+	await expect(endpoint.execute({ url: 'https://example.com/failure' }, null)).rejects.toMatchObject({ code: 'FETCH_RSS_FAILED' });
+	expect(v.parse(fetchRssInput, { url: 'https://example.com/feed', future: true })).toEqual({ url: 'https://example.com/feed' });
 });

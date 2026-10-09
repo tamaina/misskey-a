@@ -3,30 +3,13 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '../transport/contract-endpoint.js';
-import { inlineTestDefinition, inlineTestInput, inlineTestOutput } from '../../contract/endpoint-definitions.js';
-import { Injectable } from '@nestjs/common';
+import { implement } from '@orpc/server';
+import { authentication, apiPolicy } from '../transport/middleware.js';
+import type { ApiActor, ApiContext } from '../transport/context.js';
+import { testContract } from './test.contract.js';
 
-const contractProjection = projectEndpointContract(inlineTestDefinition);
-
-export const meta = {
-	tags: ['non-productive'],
-
-	description: 'Endpoint for testing input validation.',
-
-	requireCredential: false,
-
-	res: contractProjection.response,
-} as const;
-
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof inlineTestInput, typeof inlineTestOutput> {
-	constructor(
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			return ps;
-		});
-	}
+export function createTestProcedure<Actor extends ApiActor>() {
+ return implement(testContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<Actor>>()
+  .use(authentication<Actor>()).use(apiPolicy<Actor>({ name: 'test' }))
+  .handler(({ input }) => input);
 }

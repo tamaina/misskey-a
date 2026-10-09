@@ -3,31 +3,16 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { portabilityImportContract } from '../../../contract/imports.js';
-import ms from 'ms';
-import { portabilityImportErrors } from '@features/portability/contract';
-import { legacyPortabilityImportSchemas } from '@features/portability/backend';
-import type { Schema } from '@features/api/backend/utility/json-schema.js';
-import { createContractTransportEndpoint } from '@features/api/backend/transport/contract-transport-endpoint.js';
-import { defineFeatureEndpoint } from '@features/api/backend/transport/feature-endpoint.js';
+import { implement } from '@orpc/server';
+import { authentication, apiPolicy, requirePrincipal } from '../../../../api/backend/transport/middleware.js';
+import { iImportAntennasContract } from './import-antennas.contract.js';
+import type { ApiActor } from '../../../../api/backend/transport/context.js';
+import type { PortabilityContext } from '../../api.router.js';
 
-const featureMeta = {
-	secure: true,
-	requireCredential: true,
-	requiredRolePolicy: 'canImportAntennas',
-	prohibitMoved: true,
-	limit: { duration: ms('1hour'), max: 1 },
-	errors: portabilityImportErrors['i/import-antennas'],
-} as const;
+export function createIImportAntennasProcedure<Actor extends ApiActor>() {
+	return implement(iImportAntennasContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<PortabilityContext<Actor>>()
+		.use(authentication<Actor>()).use(apiPolicy<Actor>({ 'name': 'i/import-antennas', 'requireCredential': true, 'secure': true, 'limit': { 'duration': 3600000, 'max': 1 }, 'prohibitMoved': true, 'requiredRolePolicy': 'canImportAntennas' })).use(requirePrincipal<Actor>())
+		.handler(({ input, context }) => context.operations.portability['i/import-antennas'](input, context.principal));
+}
 
-const featureParamDef = legacyPortabilityImportSchemas['i/import-antennas'].input;
-
-export const meta = featureMeta;
-export const paramDef = featureParamDef as Schema;
-
-export const { feature, createEndpoint } = defineFeatureEndpoint('portabilityImportCommands', commands => createContractTransportEndpoint(meta, paramDef, portabilityImportContract['i/import-antennas'], async (params, user) => commands['i/import-antennas'](params, {
-	context: { actor: user },
-})));
-
-// QueueService uses this legacy endpoint type for the import queue payload.
-export type { Antenna } from '@features/portability/backend';
+export type { AntennaArtifact as Antenna } from '../../antenna-artifact.schema.js';

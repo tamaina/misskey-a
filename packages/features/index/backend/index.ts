@@ -3,92 +3,59 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import type { ChatCommandsFeature } from '@features/chat/backend/index.js';
-import type { CollectionCommandsFeature } from '@features/collections/backend/index.js';
-import type { EmojiAdministrationFeature, EmojisFeature } from '@features/emojis/backend/index.js';
-import type { NotificationsFeature } from '@features/notifications/backend/index.js';
-import type { OperationsFeature } from '@features/operations/backend/index.js';
-import type { PortabilityFeature } from '@features/portability/backend/index.js';
-import type { InstanceFeature } from '@features/instance/backend/index.js';
-import type { StatisticsFeature } from '@features/statistics/backend/index.js';
-import type { AvatarDecorationCommandsFeature, AvatarDecorationsFeature } from '@features/avatar-decorations/backend/index.js';
+// Native feature composition exports. Runtime handlers bind ordinary application ports.
+export { createNotesCommandOperations } from '@features/notes/backend/commands.js';
+export type { NotesCommandOperations, NotesCommandsDependencies } from '@features/notes/backend/commands.js';
+export { createChatCommandOperations } from '@features/chat/backend/commands.js';
+export type { ChatCommandOperations, ChatCommandsDependencies } from '@features/chat/backend/commands.js';
+export { createChannelCommandOperations } from '@features/channels/backend/commands.js';
+export type { ChannelCommandOperations, ChannelCommandsDependencies } from '@features/channels/backend/commands.js';
 
-export { createChatCommands } from '@features/chat/backend/index.js';
-export { createCollectionCommands } from '@features/collections/backend/index.js';
-export { createEmojiAdministration, createEmojis } from '@features/emojis/backend/index.js';
-export { createNotifications } from '@features/notifications/backend/index.js';
-export { createOperations } from '@features/operations/backend/index.js';
-export { createPortability } from '@features/portability/backend/index.js';
-export { createInstance } from '@features/instance/backend/index.js';
-export { createStatistics } from '@features/statistics/backend/index.js';
-export { createAvatarDecorationCommands, createAvatarDecorations } from '@features/avatar-decorations/backend/index.js';
-
-import type { AnnouncementCommandsFeature } from '@features/announcements/backend/index.js';
-import type { WebhookCommandsFeature } from '@features/integrations/backend/index.js';
-export { createAnnouncementCommands } from '@features/announcements/backend/index.js';
-export { createWebhookCommands } from '@features/integrations/backend/index.js';
-
-import type { ListCommandsFeature } from '@features/relationships/backend/index.js';
-export { createListCommands } from '@features/relationships/backend/index.js';
-
-import type { ChannelCommandsFeature } from '@features/channels/backend/index.js';
-import type { ClipFavoriteCommandsFeature } from '@features/collections/backend/index.js';
-export { createChannelCommands } from '@features/channels/backend/index.js';
-export { createClipFavoriteCommands } from '@features/collections/backend/index.js';
-
-import type { ModerationCommandsFeature, ModerationUser, ModerationUserProfile, ModerationAbuseReport } from '@features/moderation/backend/index.js';
-import type { NotesCommandsFeature, NotesCommandNote, NotesCommandDraft, NotesCommandAuthor } from '@features/notes/backend/index.js';
-import type { RelationshipCommandsFeature } from '@features/relationships/backend/index.js';
-import type { PortabilityImportFeature } from '@features/portability/backend/index.js';
-export { createModerationCommands } from '@features/moderation/backend/index.js';
-export { createNotesCommands } from '@features/notes/backend/index.js';
-export { createRelationshipCommands } from '@features/relationships/backend/index.js';
-export { createPortabilityImportCommands } from '@features/portability/backend/index.js';
-
-/** Domain models supplied by the backend composition root, never imported here. */
-export interface FeatureApiModels {
-	relationshipUser: { id: string };
-	moderationUser: ModerationUser;
-	moderationProfile: ModerationUserProfile;
-	moderationReport: ModerationAbuseReport;
-	note: NotesCommandNote;
-	noteDraft: NotesCommandDraft;
-	noteAuthor: NotesCommandAuthor;
-	muting: { id: string };
-	renoteMuting: { id: string };
-	driveFile: { id: string; size: number; url: string };
-	channel: { id: string };
-	clip: { id: string; userId: string; isPublic: boolean };
-	clipFavorite: { id: string };
-	room: unknown;
-	message: unknown;
-	actor: { id: string };
-	announcement: unknown;
-	webhook: { id: string };
-	list: { id: string };
-	user: { id: string };
-	favorite: { id: string };
-}
-
-export interface FeatureApis<Models extends FeatureApiModels> {
-	moderationCommands: ModerationCommandsFeature<Models['moderationUser'], Models['moderationProfile'], Models['moderationReport'], Models['actor']>;
-	notesCommands: NotesCommandsFeature<Models['actor'], Models['note'], Models['noteDraft'], Models['noteAuthor']>;
-	relationshipCommands: RelationshipCommandsFeature<Models['relationshipUser'], Models['actor'], Models['muting'], Models['renoteMuting']>;
-	portabilityImportCommands: PortabilityImportFeature<Models['actor'], Models['driveFile']>;
-	channelCommands: ChannelCommandsFeature<Models['channel'], Models['actor']>;
-	clipFavoriteCommands: ClipFavoriteCommandsFeature<Models['clip'], Models['clipFavorite']>;
-	listCommands: ListCommandsFeature<Models['list'], Models['user'], Models['actor'], Models['favorite']>;
-	avatarDecorationCommands: AvatarDecorationCommandsFeature<Models['actor']>;
-	announcementCommands: AnnouncementCommandsFeature<Models['announcement'], Models['actor']>;
-	webhookCommands: WebhookCommandsFeature<Models['webhook']>;
-	chatCommands: ChatCommandsFeature<Models['room'], Models['message'], Models['actor']>;
-	collectionCommands: CollectionCommandsFeature;
-	emojiAdministration: EmojiAdministrationFeature;
-	notifications: NotificationsFeature;
-	operations: OperationsFeature;
-	portability: PortabilityFeature;
-	instance: InstanceFeature;
-	statistics: StatisticsFeature;
-	avatarDecorations: AvatarDecorationsFeature;
-	emojis: EmojisFeature;
-}
+export { createNotesOperations, notesOperationProviders } from '@features/notes/backend/operations.js';
+export type { NotesOperations, NotesApiContext, NotesOperationDependencies } from '@features/notes/backend/operations.js';
+export { createChatOperations, chatOperationProviders } from '@features/chat/backend/operations.js';
+export type { ChatOperations, ChatApiContext, ChatOperationDependencies } from '@features/chat/backend/operations.js';
+export { createChannelsOperations, channelOperationProviders } from '@features/channels/backend/operations.js';
+export type { ChannelsOperations, ChannelsApiContext, ChannelsOperationDependencies } from '@features/channels/backend/operations.js';
+export { createInstanceOperations } from '@features/instance/backend/operations.js';
+export type { InstanceOperations, InstanceApiContext, InstanceOperationDependencies } from '@features/instance/backend/operations.js';
+export { createAnnouncementsOperations } from '@features/announcements/backend/api.operations.js';
+export type { AnnouncementsOperations, AnnouncementsDependencies } from '@features/announcements/backend/api.operations.js';
+export { createAvatarDecorationsOperations } from '@features/avatar-decorations/backend/api.operations.js';
+export type { AvatarDecorationsOperations, AvatarDecorationsDependencies } from '@features/avatar-decorations/backend/api.operations.js';
+export { createCollectionsOperations, CollectionsApplicationService } from '@features/collections/backend/api.operations.js';
+export type { CollectionsOperations, CollectionsDependencies } from '@features/collections/backend/api.operations.js';
+export { createEmojisOperations } from '@features/emojis/backend/api.operations.js';
+export type { EmojisOperations, EmojisDependencies } from '@features/emojis/backend/api.operations.js';
+export { createNotificationsOperations, NotificationsApplicationService } from '@features/notifications/backend/application.js';
+export type { NotificationsApplicationDependencies, NotificationsCommandDependencies } from '@features/notifications/backend/application.js';
+export { createStatisticsOperations } from '@features/statistics/backend/operations.js';
+export type { StatisticsOperations, StatisticsContext, StatisticsDependencies } from '@features/statistics/backend/operations.js';
+export { createTimelinesOperations } from '@features/timelines/backend/operations.js';
+export type { TimelinesOperations, TimelinesContext, TimelinesApplications } from '@features/timelines/backend/operations.js';
+export { createNoteSearchOperations } from '@features/note-search/backend/operations.js';
+export type { NoteSearchOperations, NoteSearchContext, NoteSearchApplications } from '@features/note-search/backend/operations.js';
+export { createFederationOperations } from '@features/federation/backend/operations.js';
+export type { FederationOperations, FederationContext, FederationApplications } from '@features/federation/backend/operations.js';
+export { createOperationsApiOperations } from '@features/operations/backend/operations.js';
+export type { OperationsApiOperations, OperationsApiContext, OperationsApplications } from '@features/operations/backend/operations.js';
+export { createIntegrationsOperations } from '@features/integrations/backend/operations.js';
+export type { IntegrationsOperations, IntegrationsContext, IntegrationsApplications } from '@features/integrations/backend/operations.js';
+export { createModerationOperations, ModerationApplicationService } from '@features/moderation/backend/api.operations.js';
+export type { ModerationOperations, ModerationApiDependencies } from '@features/moderation/backend/api.operations.js';
+export { createPortabilityOperations } from '@features/portability/backend/operations.js';
+export type { PortabilityDependencies } from '@features/portability/backend/operations.js';
+export { createPagesOperations } from '@features/pages/backend/operations.js';
+export type { PagesOperations, PagesContext, PagesApplications } from '@features/pages/backend/operations.js';
+export { createPlayOperations } from '@features/play/backend/operations.js';
+export type { PlayOperations, PlayContext, PlayApplications } from '@features/play/backend/operations.js';
+export { createGamesOperations } from '@features/games/backend/operations.js';
+export type { GamesOperations, GamesContext, GamesApplications } from '@features/games/backend/operations.js';
+export { UsersApplicationService } from '@features/users/backend/api.application.js';
+export type { UsersOperations, UsersContext } from '@features/users/backend/api.router.js';
+export { AuthApplicationService } from '@features/auth/backend/api.application.js';
+export type { AuthOperations, AuthContext } from '@features/auth/backend/api.router.js';
+export { RelationshipsApplicationService } from '@features/relationships/backend/endpoints/relationships.application.js';
+export { PortabilityApplicationService } from '@features/portability/backend/api.application.js';
+export type { PortabilityOperations, PortabilityContext } from '@features/portability/backend/api.router.js';
+export type { NotificationsOperations, NotificationsContext } from '@features/notifications/backend/operations.js';

@@ -83,7 +83,7 @@ type UploadFromUrlArgs = {
 	isLink?: boolean;
 	comment?: string | null;
 	requestIp?: string | null;
-	requestHeaders?: Record<string, string> | null;
+	requestHeaders?: Record<string, string | string[] | undefined> | null;
 };
 
 @Injectable()

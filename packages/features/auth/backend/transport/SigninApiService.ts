@@ -6,19 +6,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import bcrypt from 'bcryptjs';
 import { IsNull } from 'typeorm';
-import * as Misskey from 'misskey-js';
-import { DI } from '@/di-symbols.js';
-import type {
-	MiMeta,
-	SigninsRepository,
-	UserProfilesRepository,
-	UserSecurityKeysRepository,
-	UsersRepository,
-} from '@features/persistence/backend/repositories/models.js';
-import type { Logger } from '@features/runtime/backend/logging/logger.js';
-import type { Config } from '@/config.js';
-import { getIpHash } from '../utility/get-ip-hash.js';
-import type { MiLocalUser } from '@features/users/backend/models/User.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { bindThis } from '@features/runtime/backend/decorators.js';
 import { WebAuthnService } from '@features/auth/backend/services/WebAuthnService.js';
@@ -27,9 +14,21 @@ import { CaptchaService } from '@features/auth/backend/services/CaptchaService.j
 import { LoggerService } from '@features/runtime/backend/services/LoggerService.js';
 import { FastifyReplyError } from '@features/runtime/backend/http/fastify-reply-error.js';
 import { RateLimiterService } from '@features/api/backend/transport/RateLimiterService.js';
+import type { Config } from '@/config.js';
+import { DI } from '@/di-symbols.js';
+import { getIpHash } from '../utility/get-ip-hash.js';
+import { toWebAuthnAuthenticationOptions } from '../webauthn.schema.js';
+import { toSessionHeaders } from '../session.schema.js';
+import { sessionField, sessionText, sessionErrorMessage, type AuthSessionBody, type AuthSessionRequest, type AuthSessionEffects } from '../session.effects.js';
 import { SigninService } from './SigninService.js';
-import type { AuthenticationResponseJSON } from '@simplewebauthn/server';
-import type { FastifyReply, FastifyRequest } from 'fastify';
+import type { Logger } from '@features/runtime/backend/logging/logger.js';
+import type {
+	MiMeta,
+	UserProfilesRepository,
+	UserSecurityKeysRepository,
+	UsersRepository,
+} from '@features/persistence/backend/repositories/models.js';
+import type { SigninHistoryRepository } from '../session-signin-repository.js';
 
 @Injectable()
 export class SigninApiService {
@@ -52,7 +51,7 @@ export class SigninApiService {
 		private userSecurityKeysRepository: UserSecurityKeysRepository,
 
 		@Inject(DI.signinsRepository)
-		private signinsRepository: SigninsRepository,
+		private signinsRepository: SigninHistoryRepository,
 
 		private loggerService: LoggerService,
 		private idService: IdService,
@@ -67,28 +66,16 @@ export class SigninApiService {
 
 	@bindThis
 	public async signin(
-		request: FastifyRequest<{
-			Body: {
-				username: string;
-				password?: string;
-				token?: string;
-				credential?: AuthenticationResponseJSON;
-				'hcaptcha-response'?: string;
-				'g-recaptcha-response'?: string;
-				'turnstile-response'?: string;
-				'm-captcha-response'?: string;
-				'testcaptcha-response'?: string;
-			};
-		}>,
-		reply: FastifyReply,
+		body: AuthSessionBody,
+		request: AuthSessionRequest,
+		reply: AuthSessionEffects,
 	) {
 		reply.header('Access-Control-Allow-Origin', this.config.url);
 		reply.header('Access-Control-Allow-Credentials', 'true');
 
-		const body = request.body;
-		const username = body['username'];
-		const password = body['password'];
-		const token = body['token'];
+		const username = sessionField(body, 'username');
+		const password = sessionField(body, 'password');
+		const token = sessionField(body, 'token');
 
 		function error(status: number, error: { id: string }) {
 			reply.code(status);
@@ -127,7 +114,7 @@ export class SigninApiService {
 		const user = await this.usersRepository.findOneBy({
 			usernameLower: username.toLowerCase(),
 			host: IsNull(),
-		}) as MiLocalUser;
+		});
 
 		if (user == null) {
 			return error(404, {
@@ -150,12 +137,12 @@ export class SigninApiService {
 				return {
 					finished: false,
 					next: 'password',
-				} satisfies Misskey.entities.SigninFlowResponse;
+				};
 			} else {
 				return {
 					finished: false,
 					next: 'captcha',
-				} satisfies Misskey.entities.SigninFlowResponse;
+				};
 			}
 		}
 
@@ -173,7 +160,7 @@ export class SigninApiService {
 				id: this.idService.gen(),
 				userId: user.id,
 				ip: request.ip,
-				headers: request.headers as any,
+				headers: toSessionHeaders(request.headers),
 				success: false,
 			});
 
@@ -183,31 +170,31 @@ export class SigninApiService {
 		if (!profile.twoFactorEnabled) {
 			if (process.env.NODE_ENV !== 'test') {
 				if (this.meta.enableHcaptcha && this.meta.hcaptchaSecretKey) {
-					await this.captchaService.verifyHcaptcha(this.meta.hcaptchaSecretKey, body['hcaptcha-response']).catch(err => {
+					await this.captchaService.verifyHcaptcha(this.meta.hcaptchaSecretKey, sessionField(body, 'hcaptcha-response')).catch(err => {
 						throw new FastifyReplyError(400, err);
 					});
 				}
 
 				if (this.meta.enableMcaptcha && this.meta.mcaptchaSecretKey && this.meta.mcaptchaSitekey && this.meta.mcaptchaInstanceUrl) {
-					await this.captchaService.verifyMcaptcha(this.meta.mcaptchaSecretKey, this.meta.mcaptchaSitekey, this.meta.mcaptchaInstanceUrl, body['m-captcha-response']).catch(err => {
+					await this.captchaService.verifyMcaptcha(this.meta.mcaptchaSecretKey, this.meta.mcaptchaSitekey, this.meta.mcaptchaInstanceUrl, sessionField(body, 'm-captcha-response')).catch(err => {
 						throw new FastifyReplyError(400, err);
 					});
 				}
 
 				if (this.meta.enableRecaptcha && this.meta.recaptchaSecretKey) {
-					await this.captchaService.verifyRecaptcha(this.meta.recaptchaSecretKey, body['g-recaptcha-response']).catch(err => {
+					await this.captchaService.verifyRecaptcha(this.meta.recaptchaSecretKey, sessionField(body, 'g-recaptcha-response')).catch(err => {
 						throw new FastifyReplyError(400, err);
 					});
 				}
 
 				if (this.meta.enableTurnstile && this.meta.turnstileSecretKey) {
-					await this.captchaService.verifyTurnstile(this.meta.turnstileSecretKey, body['turnstile-response']).catch(err => {
+					await this.captchaService.verifyTurnstile(this.meta.turnstileSecretKey, sessionField(body, 'turnstile-response')).catch(err => {
 						throw new FastifyReplyError(400, err);
 					});
 				}
 
 				if (this.meta.enableTestcaptcha) {
-					await this.captchaService.verifyTestcaptcha(body['testcaptcha-response']).catch(err => {
+					await this.captchaService.verifyTestcaptcha(sessionField(body, 'testcaptcha-response')).catch(err => {
 						throw new FastifyReplyError(400, err);
 					});
 				}
@@ -238,14 +225,14 @@ export class SigninApiService {
 			}
 
 			return this.signinService.signin(request, reply, user);
-		} else if (body.credential) {
+		} else if (sessionField(body, 'credential')) {
 			if (!same && !profile.usePasswordLessLogin) {
 				return await fail(403, {
 					id: '932c904e-9460-45b7-9ce6-7ed33be7eb2c',
 				});
 			}
 
-			const authorized = await this.webAuthnService.verifyAuthentication(user.id, body.credential);
+			const authorized = await this.webAuthnService.verifyAuthentication(user.id, sessionField(body, 'credential'));
 
 			if (authorized) {
 				return this.signinService.signin(request, reply, user);
@@ -261,14 +248,14 @@ export class SigninApiService {
 				});
 			}
 
-			const authRequest = await this.webAuthnService.initiateAuthentication(user.id);
+			const authRequest = toWebAuthnAuthenticationOptions(await this.webAuthnService.initiateAuthentication(user.id));
 
 			reply.code(200);
 			return {
 				finished: false,
 				next: 'passkey',
 				authRequest,
-			} satisfies Misskey.entities.SigninFlowResponse;
+			};
 		} else {
 			if (!same || !profile.twoFactorEnabled) {
 				return await fail(403, {
@@ -279,7 +266,7 @@ export class SigninApiService {
 				return {
 					finished: false,
 					next: 'totp',
-				} satisfies Misskey.entities.SigninFlowResponse;
+				};
 			}
 		}
 		// never get here

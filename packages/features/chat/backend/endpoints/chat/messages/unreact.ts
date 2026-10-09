@@ -3,22 +3,16 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { chatContract } from '../../../../contract/index.js';
-import { chatErrors } from '@features/chat/contract';
-import { legacyChatSchemas } from '@features/chat/backend';
-import type { Schema } from '@features/api/backend/utility/json-schema.js';
-import { createContractTransportEndpoint } from '@features/api/backend/transport/contract-transport-endpoint.js';
-import { defineFeatureEndpoint } from '@features/api/backend/transport/feature-endpoint.js';
+import { implement } from '@orpc/server';
+import { chatMessagesUnreactContract, chatMessagesUnreactPolicy } from './unreact.contract.js';
+import type { ApiActor } from '../../../../../api/backend/transport/context.js';
+import { authentication, apiPolicy, requirePrincipal } from '../../../../../api/backend/transport/middleware.js';
+import type { ChatApiContext } from '../../../operations.js';
 
-export const meta = {
-	tags: ['chat'],
-	requireCredential: true,
-	kind: 'write:chat',
-	errors: chatErrors['chat/messages/unreact'],
-} as const;
-
-export const paramDef = legacyChatSchemas['chat/messages/unreact'].input as Schema;
-
-export const { feature, createEndpoint } = defineFeatureEndpoint('chatCommands', commands => createContractTransportEndpoint(meta, paramDef, chatContract['chat/messages/unreact'], async (params, user) => commands['chat/messages/unreact'](params, {
-	context: { actor: user },
-})));
+export function createChatMessagesUnreactProcedure<Actor extends ApiActor>() {
+	return implement(chatMessagesUnreactContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ChatApiContext<Actor>>()
+		.use(authentication<Actor>())
+		.use(apiPolicy<Actor>(chatMessagesUnreactPolicy))
+		.use(requirePrincipal<Actor>())
+		.handler(({ input, context }) => context.operations.chat.chatMessagesUnreact(input, context.principal));
+}

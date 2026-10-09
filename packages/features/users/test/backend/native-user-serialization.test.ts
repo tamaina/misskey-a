@@ -16,12 +16,12 @@ import type { IdService } from '@features/runtime/backend/services/IdService.js'
 import type { ChatService } from '@features/chat/backend/services/ChatService.js';
 import { FollowingEntityService, nativeFollowingSchema } from '@features/relationships/backend/serializers/FollowingEntityService.js';
 import { MiFollowing } from '@features/relationships/backend/models/Following.js';
-import { packedFollowingSchema } from '@features/relationships/contract/packed.js';
+import { packedFollowingSchema } from '@features/relationships/backend/endpoints/relationships.schema.js';
 import { UserEntityService, type UserRelation } from '../../backend/serializers/UserEntityService.js';
 import { nativeMeDetailedSchema, nativeUserDetailedSchema } from '../../backend/serializers/native-user.js';
 import { MiUser } from '../../backend/models/User.js';
 import { MiUserProfile } from '../../backend/models/UserProfile.js';
-import { packedMeDetailedSchema, packedUserDetailedNotMeSchema, packedUserDetailedSchema, packedUserLiteSchema } from '../../contract/packed.js';
+import { packedMeDetailedSchema, packedUserDetailedNotMeSchema, packedUserDetailedSchema, packedUserLiteSchema } from '../../backend/user.schema.js';
 
 const timestamp = new Date('2026-01-01T00:00:00Z');
 const announcement = new MiAnnouncement({ id: 'notice123', updatedAt: timestamp, text: 'notice', title: 'notice', imageUrl: null, icon: 'info', display: 'dialog', needConfirmationToRead: true, isActive: true, forExistingUsers: false, silence: false, userId: null });

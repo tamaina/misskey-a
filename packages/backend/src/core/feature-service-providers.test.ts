@@ -15,12 +15,12 @@ import { announcementServices } from '@features/announcements/backend/services.j
 import { ClipService } from '@features/collections/backend/services/ClipService.js';
 import { collectionServices } from '@features/collections/backend/services.js';
 import { galleryServices } from '@features/collections/backend/services/gallery.js';
-import { pageServices } from '@features/pages/backend/services.js';
+import { createPageEntityService, createPageLikeEntityService, createPageService, pageFactoryProviders } from '@features/pages/backend/services.js';
 import { playServices } from '@features/play/backend/services.js';
 import { LoggerService } from '@features/runtime/backend/services/LoggerService.js';
 import { CoreModule } from '@features/boot/backend/assembly/CoreModule.js';
 import { featureServiceExports, featureServiceGroups, featureServiceProviders } from '@features/index/backend/feature-service-providers.js';
-import type { Packed } from '@features/index/contract/packed.js';
+import type { Packed } from '@features/index/backend/packed.schema.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 import type { SelectQueryBuilder } from 'typeorm';
 import type { FactoryProvider, InjectionToken, Provider } from '@nestjs/common';
@@ -59,7 +59,7 @@ describe('feature service composition adapter', () => {
 	test('CoreModule installs and exports every canonical service and compatibility alias once', () => {
 		const providers = Reflect.getMetadata(MODULE_METADATA.PROVIDERS, CoreModule) as Provider[];
 		const exports = Reflect.getMetadata(MODULE_METADATA.EXPORTS, CoreModule) as (Provider | InjectionToken)[];
-		expect(factoryProviders).toHaveLength(25);
+		expect(factoryProviders).toHaveLength(24);
 		expect(classProviders).toHaveLength(49);
 		expect(featureServiceExports).toHaveLength(97);
 		for (const provider of featureServiceProviders) {
@@ -72,8 +72,9 @@ describe('feature service composition adapter', () => {
 
 	test('real Nest resolution shares one feature graph across class tokens, string aliases, and consumers', async () => {
 		const internalTokens = new Set(featureServiceProviders.map(providerToken));
-		const externalTokens = new Set((factoryProviders.flatMap(provider => provider.inject ?? []) as InjectionToken[]).filter(token => !internalTokens.has(token)));
-		const createSpies = factoryProviders.map(provider => vi.spyOn(provider, 'useFactory'));
+		const constructionFactories = [...factoryProviders, ...pageFactoryProviders];
+		const externalTokens = new Set((constructionFactories.flatMap(provider => provider.inject ?? []) as InjectionToken[]).filter(token => !internalTokens.has(token)));
+		const createSpies = constructionFactories.map(provider => vi.spyOn(provider, 'useFactory'));
 		const module = await Test.createTestingModule({
 			providers: [
 				...[...externalTokens].map(provide => ({ provide, useValue: provide === LoggerService ? { getLogger: vi.fn(() => ({ warn: vi.fn() })) } : {} })),
@@ -85,11 +86,13 @@ describe('feature service composition adapter', () => {
 			await module.init();
 			for (const provider of classProviders) {
 				const service = module.get(provider.provide);
-				const feature = module.get(provider.inject?.[0] as symbol) as Record<string, object>;
 				const name = (provider.provide as { name: string }).name;
 				expect(service).toBeInstanceOf(provider.provide);
 				expect(module.get(name)).toBe(service);
-				expect(feature[name]).toBe(service);
+				if (!pageFactoryProviders.some(pageProvider => pageProvider.provide === provider.provide)) {
+					const feature = module.get(provider.inject?.[0] as symbol) as Record<string, object>;
+					expect(feature[name]).toBe(service);
+				}
 				expect(Object.values(service).every(dependency => dependency !== undefined)).toBe(true);
 				expect(Reflect.getMetadata('design:paramtypes', provider.provide)).toBeUndefined();
 			}
@@ -104,8 +107,9 @@ describe('feature service composition adapter', () => {
 
 	test('selective local factory groups preserve strict ModuleRef aliases with complete dependencies', async () => {
 		const selectedProviders = [...featureServiceGroups.announcements.providers, ...featureServiceGroups.pages.providers, ...featureServiceGroups.emojis.providers];
-		const selectedFactories = selectedProviders.filter((provider): provider is FactoryProvider => typeof provider === 'object' && 'useFactory' in provider && typeof provider.provide === 'symbol');
-		const dependencies = new Set(selectedFactories.flatMap(provider => provider.inject ?? []) as InjectionToken[]);
+		const selectedFactories = selectedProviders.filter((provider): provider is FactoryProvider => typeof provider === 'object' && 'useFactory' in provider && (typeof provider.provide === 'symbol' || pageFactoryProviders.some(pageProvider => pageProvider.provide === provider.provide)));
+		const internalTokens = new Set(selectedProviders.map(providerToken));
+		const dependencies = new Set((selectedFactories.flatMap(provider => provider.inject ?? []) as InjectionToken[]).filter(token => !internalTokens.has(token)));
 		const createSpies = selectedFactories.map(provider => vi.spyOn(provider, 'useFactory'));
 		const module = await Test.createTestingModule({
 			providers: [
@@ -117,7 +121,7 @@ describe('feature service composition adapter', () => {
 		try {
 			await module.init();
 			const resolver = module.get<ModuleRef>('strict local resolver');
-			for (const name of ['AnnouncementService', 'PageEntityService', 'EmojiEntityService']) {
+			for (const name of ['AnnouncementService', 'PageEntityService', 'PageService', 'EmojiEntityService']) {
 				const provider = selectedProviders.find(candidate => typeof candidate === 'object' && typeof candidate.provide === 'function' && candidate.provide.name === name) as FactoryProvider;
 				expect(resolver.get(name)).toBe(module.get(provider.provide));
 			}
@@ -154,7 +158,13 @@ describe('feature service composition adapter', () => {
 		};
 		for (const [feature, paths] of Object.entries(groups)) {
 			for (const path of ['services', ...paths]) {
-				const source = readFileSync(new URL(`../../../features/${feature}/backend/${path}.ts`, import.meta.url), 'utf8');
+				let source = readFileSync(new URL(`../../../features/${feature}/backend/${path}.ts`, import.meta.url), 'utf8');
+				if (feature === 'pages' && path === 'services') {
+					// Composition may describe Nest providers; business constructors stay independent.
+					const typeImport = "import type { FactoryProvider, Provider } from '@nestjs/common';";
+					expect(source.match(/^import[^\n]*@nestjs[^\n]*$/gm)).toEqual([typeImport]);
+					source = source.replace(typeImport, '');
+				}
 				expect(source).not.toMatch(/@nestjs|@Inject\(|@Injectable\(|ModuleRef|onModuleInit|onApplicationBootstrap|onModuleDestroy|onApplicationShutdown/);
 			}
 		}
@@ -244,7 +254,8 @@ describe('annotation-free feature services preserve behavior', () => {
 	});
 
 	test('pages retain legacy content migration and delegate likes to the same serializer', async () => {
-		const deps = mockDeep<Inputs<typeof pageServices>>();
+		const args = mockDeep<Parameters<typeof createPageEntityService>>();
+		const deps = { pagesRepository: args[0], pageLikesRepository: args[1], driveFilesRepository: args[2], userEntityService: args[3], driveFileEntityService: args[4], idService: args[5] };
 		deps.idService.parse.mockReturnValue({ date });
 		deps.userEntityService.pack.mockResolvedValue(mockDeep<Packed<'UserLite'>>({ id: 'author' }));
 		deps.driveFileEntityService.packMany.mockResolvedValue([]);
@@ -257,14 +268,17 @@ describe('annotation-free feature services preserve behavior', () => {
 			visibility: 'public', visibleUserIds: [], likedCount: 0,
 		};
 		deps.pagesRepository.findOneByOrFail.mockResolvedValue(page);
-		const services = pageServices.create(deps);
+		const pageEntityService = createPageEntityService(deps.pagesRepository, deps.pageLikesRepository, deps.driveFilesRepository, deps.userEntityService, deps.driveFileEntityService, deps.idService);
+		const services = { PageEntityService: pageEntityService, PageLikeEntityService: createPageLikeEntityService(deps.pageLikesRepository, pageEntityService) };
 		const pack = vi.spyOn(services.PageEntityService, 'pack');
 		const like = await services.PageLikeEntityService.pack({ id: 'like', page: null, pageId: 'page' } as MiPageLike, { id: 'viewer' });
 		expect(pack).toHaveBeenCalledWith('page', { id: 'viewer' });
 		expect(like.page.content).toEqual([{ type: 'section', children: [{ type: 'numberInput', inputType: 'number', default: 12 }] }]);
 		expect(deps.pagesRepository.update).toHaveBeenCalledWith('page', { content: page.content });
 		expect(deps.pageLikesRepository.exists).toHaveBeenCalledWith({ where: { pageId: 'page', userId: 'viewer' } });
-		expect(services.PageService.collectReferencedNotes([{ type: 'note', note: 'one' }, { type: 'section', children: [{ type: 'note', note: 'one' }, { type: 'note', note: 'two' }] }])).toEqual(['one', 'two']);
+		const pageDependencies = mockDeep<Parameters<typeof createPageService>>();
+		const pageService = createPageService(pageDependencies[0], pageDependencies[1], pageDependencies[2], pageDependencies[3], pageDependencies[4], pageDependencies[5], pageDependencies[6]);
+		expect(pageService.collectReferencedNotes([{ type: 'note', note: 'one' }, { type: 'section', children: [{ type: 'note', note: 'one' }, { type: 'note', note: 'two' }] }])).toEqual(['one', 'two']);
 	});
 
 	test('play composes liked-flash packing and keeps featured query defaults', async () => {

@@ -181,14 +181,14 @@ export class SystemAccountService implements OnApplicationShutdown {
 	}): Promise<MiLocalUser> {
 		const user = await this.fetch(type);
 
-		const updates = {} as Partial<MiUser>;
+		const updates: { name?: MiUser['name'] } = {};
 		if (extra.name !== undefined) updates.name = extra.name;
 
 		if (Object.keys(updates).length > 0) {
 			await this.usersRepository.update(user.id, updates);
 		}
 
-		const profileUpdates = {} as Partial<MiUserProfile>;
+		const profileUpdates: { description?: MiUserProfile['description'] } = {};
 		if (extra.description !== undefined) profileUpdates.description = extra.description;
 
 		if (Object.keys(profileUpdates).length > 0) {

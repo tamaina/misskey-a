@@ -1,5 +1,5 @@
 import type { AnyContractProcedure, InferContractRouterInputs, InferContractRouterOutputs } from '@orpc/contract';
-import type { pilotContract } from '#pilot-contract';
+import type { clientContract as pilotContract } from '#pilot-contract';
 
 type Leaves<Router> = Router extends AnyContractProcedure ? Router : {
 	[K in keyof Router]: Leaves<Router[K]>;

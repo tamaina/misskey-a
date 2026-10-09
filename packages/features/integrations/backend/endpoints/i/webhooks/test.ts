@@ -3,56 +3,20 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { constantIWebhooksTestDefinition, constantIWebhooksTestInput, constantIWebhooksTestOutput } from '../../../../contract/source-constant-endpoint-definitions.js';
-import { Injectable } from '@nestjs/common';
+import { implement } from '@orpc/server';
+import { authentication, apiPolicy, requirePrincipal } from '../../../../../api/backend/transport/middleware.js';
+import type { ApiActor } from '../../../../../api/backend/transport/context.js';
+import type { IntegrationsContext } from '../../../operations.js';
+import { iWebhooksTestContract } from './test.contract.js';
 import ms from 'ms';
-import { WebhookTestService } from '../../../services/WebhookTestService.js';
-import { ApiError } from '@features/api/backend/transport/error.js';
 
-const contractProjection = projectEndpointContract(constantIWebhooksTestDefinition);
-
-export const meta = {
-	tags: ['webhooks'],
-
-	requireCredential: true,
-	secure: true,
-	kind: 'read:account',
-
-	limit: {
+export function createIWebhooksTestProcedure<Actor extends ApiActor>() {
+	return implement(iWebhooksTestContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<IntegrationsContext<Actor>>()
+		.use(authentication<Actor>())
+		.use(apiPolicy<Actor>({ name: 'i/webhooks/test', requireCredential: true, secure: true, kind: 'read:account', limit: {
 		duration: ms('15min'),
 		max: 60,
-	},
-
-	errors: {
-		noSuchWebhook: {
-			message: 'No such webhook.',
-			code: 'NO_SUCH_WEBHOOK',
-			id: '0c52149c-e913-18f8-5dc7-74870bfe0cf9',
-		},
-	},
-} as const;
-
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof constantIWebhooksTestInput, typeof constantIWebhooksTestOutput> {
-	constructor(
-		private webhookTestService: WebhookTestService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			try {
-				await this.webhookTestService.testUserWebhook({
-					webhookId: ps.webhookId,
-					type: ps.type,
-					override: ps.override,
-				}, me);
-			} catch (e) {
-				if (e instanceof WebhookTestService.NoSuchWebhookError) {
-					throw new ApiError(meta.errors.noSuchWebhook);
-				}
-				throw e;
-			}
-		});
-	}
+	} }))
+		.use(requirePrincipal<Actor>())
+		.handler(({ input, context }) => context.operations.integrations.iWebhooksTest(input, context.principal));
 }

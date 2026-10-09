@@ -25,8 +25,47 @@ import type { RelationshipsOperations } from '../../relationships/backend/endpoi
 
 import type { CollectionsOperations } from '../../collections/backend/api.operations.js';
 
+import type { ChatOperations } from '../../chat/backend/operations.js';
+
+import type { ChannelsOperations } from '../../channels/backend/operations.js';
+
+import type { PagesOperations } from '../../pages/backend/operations.js';
+
+import type { PlayOperations } from '../../play/backend/operations.js';
+
+import type { GamesOperations } from '../../games/backend/operations.js';
+
+import type { FederationOperations } from '../../federation/backend/operations.js';
+
+import type { OperationsApiOperations } from '../../operations/backend/operations.js';
+
+import type { IntegrationsOperations } from '../../integrations/backend/operations.js';
+
+import type { DriveManagementOperations } from '../../drive/backend/management.router.js';
+
+import type { PortabilityOperations } from '../../portability/backend/api.router.js';
+
+import type { AuthOperations } from '../../auth/backend/api.router.js';
+
+import type { ModerationOperations } from '../../moderation/backend/api.operations.js';
+
+import type { RolesOperations } from '../../roles/backend/api.operations.js';
+
 export type ApiExecutionContext<Actor extends ApiActor> = ApiContext<Actor> & {
 	operations: {
+		roles: RolesOperations<Actor>;
+		moderation: ModerationOperations<Actor>;
+		auth: AuthOperations<Actor>;
+		portability: PortabilityOperations<Actor>;
+		driveManagement: DriveManagementOperations<Actor>;
+		integrations: IntegrationsOperations<Actor>;
+		operations: OperationsApiOperations<Actor>;
+		federation: FederationOperations<Actor>;
+		games: GamesOperations<Actor>;
+		play: PlayOperations<Actor>;
+		pages: PagesOperations<Actor>;
+		channels: ChannelsOperations<Actor>;
+		chat: ChatOperations<Actor>;
 		notes: NotesOperations<Actor>;
 		users: UsersOperations<Actor>;
 		timelines: TimelinesOperations<Actor>;

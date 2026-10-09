@@ -3,6 +3,143 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { createChatOperations } from '@features/chat/backend/operations.js';
+import { ChatMessagesCreateToUserOperation } from '@features/chat/backend/endpoints/chat/messages/create-to-user.js';
+import { ChatMessagesCreateToRoomOperation } from '@features/chat/backend/endpoints/chat/messages/create-to-room.js';
+import { ChatMessagesShowOperation } from '@features/chat/backend/endpoints/chat/messages/show.js';
+import { ChatMessagesUserTimelineOperation } from '@features/chat/backend/endpoints/chat/messages/user-timeline.js';
+import { ChatMessagesRoomTimelineOperation } from '@features/chat/backend/endpoints/chat/messages/room-timeline.js';
+import { ChatMessagesSearchOperation } from '@features/chat/backend/endpoints/chat/messages/search.js';
+import { ChatRoomsCreateOperation } from '@features/chat/backend/endpoints/chat/rooms/create.js';
+import { ChatRoomsShowOperation } from '@features/chat/backend/endpoints/chat/rooms/show.js';
+import { ChatRoomsOwnedOperation } from '@features/chat/backend/endpoints/chat/rooms/owned.js';
+import { ChatRoomsJoiningOperation } from '@features/chat/backend/endpoints/chat/rooms/joining.js';
+import { ChatRoomsUpdateOperation } from '@features/chat/backend/endpoints/chat/rooms/update.js';
+import { ChatRoomsMembersOperation } from '@features/chat/backend/endpoints/chat/rooms/members.js';
+import { ChatRoomsInvitationsCreateOperation } from '@features/chat/backend/endpoints/chat/rooms/invitations/create.js';
+import { ChatRoomsInvitationsInboxOperation } from '@features/chat/backend/endpoints/chat/rooms/invitations/inbox.js';
+import { ChatRoomsInvitationsOutboxOperation } from '@features/chat/backend/endpoints/chat/rooms/invitations/outbox.js';
+import { ChatHistoryOperation } from '@features/chat/backend/endpoints/chat/history.js';
+import type { ChatCommandOperations } from '@features/chat/backend/commands.js';
+import type { MiChatRoom } from '@features/chat/backend/models/ChatRoom.js';
+import type { MiChatMessage } from '@features/chat/backend/models/ChatMessage.js';
+import { createChannelsOperations } from '@features/channels/backend/operations.js';
+import { ChannelsCreateOperation } from '@features/channels/backend/endpoints/channels/create.js';
+import { ChannelsFeaturedOperation } from '@features/channels/backend/endpoints/channels/featured.js';
+import { ChannelsFollowedOperation } from '@features/channels/backend/endpoints/channels/followed.js';
+import { ChannelsMyFavoritesOperation } from '@features/channels/backend/endpoints/channels/my-favorites.js';
+import { ChannelsOwnedOperation } from '@features/channels/backend/endpoints/channels/owned.js';
+import { ChannelsSearchOperation } from '@features/channels/backend/endpoints/channels/search.js';
+import { ChannelsShowOperation } from '@features/channels/backend/endpoints/channels/show.js';
+import { ChannelsTimelineOperation } from '@features/channels/backend/endpoints/channels/timeline.js';
+import { ChannelsUpdateOperation } from '@features/channels/backend/endpoints/channels/update.js';
+import { ChannelsMuteListOperation } from '@features/channels/backend/endpoints/channels/mute/list.js';
+import type { ChannelCommandOperations } from '@features/channels/backend/commands.js';
+import type { MiChannel } from '@features/channels/backend/models/Channel.js';
+import { createPagesOperations } from '@features/pages/backend/operations.js';
+import { IPageLikesApplicationService } from '@features/pages/backend/applications/i/page-likes.js';
+import { IPagesApplicationService } from '@features/pages/backend/applications/i/pages.js';
+import { PagePushApplicationService } from '@features/pages/backend/applications/page-push.js';
+import { PagesCreateApplicationService } from '@features/pages/backend/applications/pages/create.js';
+import { PagesDeleteApplicationService } from '@features/pages/backend/applications/pages/delete.js';
+import { PagesFeaturedApplicationService } from '@features/pages/backend/applications/pages/featured.js';
+import { PagesLikeApplicationService } from '@features/pages/backend/applications/pages/like.js';
+import { PagesShowApplicationService } from '@features/pages/backend/applications/pages/show.js';
+import { PagesUnlikeApplicationService } from '@features/pages/backend/applications/pages/unlike.js';
+import { PagesUpdateApplicationService } from '@features/pages/backend/applications/pages/update.js';
+import { UsersPagesApplicationService } from '@features/pages/backend/applications/users/pages.js';
+import { createPlayOperations } from '@features/play/backend/operations.js';
+import { FlashCreateApplicationService } from '@features/play/backend/applications/flash/create.js';
+import { FlashDeleteApplicationService } from '@features/play/backend/applications/flash/delete.js';
+import { FlashFeaturedApplicationService } from '@features/play/backend/applications/flash/featured.js';
+import { FlashLikeApplicationService } from '@features/play/backend/applications/flash/like.js';
+import { FlashMyApplicationService } from '@features/play/backend/applications/flash/my.js';
+import { FlashMyLikesApplicationService } from '@features/play/backend/applications/flash/my-likes.js';
+import { FlashShowApplicationService } from '@features/play/backend/applications/flash/show.js';
+import { FlashUnlikeApplicationService } from '@features/play/backend/applications/flash/unlike.js';
+import { FlashUpdateApplicationService } from '@features/play/backend/applications/flash/update.js';
+import { FlashSearchApplicationService } from '@features/play/backend/applications/flash/search.js';
+import { UsersFlashsApplicationService } from '@features/play/backend/applications/users/flashs.js';
+import { createGamesOperations } from '@features/games/backend/operations.js';
+import { BubbleGameRankingApplicationService } from '@features/games/backend/applications/bubble-game/ranking.js';
+import { BubbleGameRegisterApplicationService } from '@features/games/backend/applications/bubble-game/register.js';
+import { ReversiCancelMatchApplicationService } from '@features/games/backend/applications/reversi/cancel-match.js';
+import { ReversiGamesApplicationService } from '@features/games/backend/applications/reversi/games.js';
+import { ReversiInvitationsApplicationService } from '@features/games/backend/applications/reversi/invitations.js';
+import { ReversiMatchApplicationService } from '@features/games/backend/applications/reversi/match.js';
+import { ReversiShowGameApplicationService } from '@features/games/backend/applications/reversi/show-game.js';
+import { ReversiSurrenderApplicationService } from '@features/games/backend/applications/reversi/surrender.js';
+import { ReversiVerifyApplicationService } from '@features/games/backend/applications/reversi/verify.js';
+import { createFederationOperations } from '@features/federation/backend/operations.js';
+import { AdminFederationDeleteAllFilesApplicationService } from '@features/federation/backend/endpoints/admin/federation/delete-all-files.application.js';
+import { AdminFederationRefreshRemoteInstanceMetadataApplicationService } from '@features/federation/backend/endpoints/admin/federation/refresh-remote-instance-metadata.application.js';
+import { AdminFederationRemoveAllFollowingApplicationService } from '@features/federation/backend/endpoints/admin/federation/remove-all-following.application.js';
+import { AdminFederationUpdateInstanceApplicationService } from '@features/federation/backend/endpoints/admin/federation/update-instance.application.js';
+import { AdminRelaysAddApplicationService } from '@features/federation/backend/endpoints/admin/relays/add.application.js';
+import { AdminRelaysListApplicationService } from '@features/federation/backend/endpoints/admin/relays/list.application.js';
+import { AdminRelaysRemoveApplicationService } from '@features/federation/backend/endpoints/admin/relays/remove.application.js';
+import { ApGetApplicationService } from '@features/federation/backend/endpoints/ap/get.application.js';
+import { ApShowApplicationService } from '@features/federation/backend/endpoints/ap/show.application.js';
+import { FederationFollowersApplicationService } from '@features/federation/backend/endpoints/federation/followers.application.js';
+import { FederationFollowingApplicationService } from '@features/federation/backend/endpoints/federation/following.application.js';
+import { FederationInstancesApplicationService } from '@features/federation/backend/endpoints/federation/instances.application.js';
+import { FederationShowInstanceApplicationService } from '@features/federation/backend/endpoints/federation/show-instance.application.js';
+import { FederationStatsApplicationService } from '@features/federation/backend/endpoints/federation/stats.application.js';
+import { FederationUpdateRemoteUserApplicationService } from '@features/federation/backend/endpoints/federation/update-remote-user.application.js';
+import { FederationUsersApplicationService } from '@features/federation/backend/endpoints/federation/users.application.js';
+import { createOperationsApiOperations } from '@features/operations/backend/operations.js';
+import { AdminGetIndexStatsApplicationService } from '@features/operations/backend/endpoints/admin/get-index-stats.application.js';
+import { AdminGetTableStatsApplicationService } from '@features/operations/backend/endpoints/admin/get-table-stats.application.js';
+import { AdminQueueClearApplicationService } from '@features/operations/backend/endpoints/admin/queue/clear.application.js';
+import { AdminQueueDeliverDelayedApplicationService } from '@features/operations/backend/endpoints/admin/queue/deliver-delayed.application.js';
+import { AdminQueueInboxDelayedApplicationService } from '@features/operations/backend/endpoints/admin/queue/inbox-delayed.application.js';
+import { AdminQueueJobsApplicationService } from '@features/operations/backend/endpoints/admin/queue/jobs.application.js';
+import { AdminQueuePauseApplicationService } from '@features/operations/backend/endpoints/admin/queue/pause.application.js';
+import { AdminQueuePromoteJobsApplicationService } from '@features/operations/backend/endpoints/admin/queue/promote-jobs.application.js';
+import { AdminQueueQueueStatsApplicationService } from '@features/operations/backend/endpoints/admin/queue/queue-stats.application.js';
+import { AdminQueueQueuesApplicationService } from '@features/operations/backend/endpoints/admin/queue/queues.application.js';
+import { AdminQueueRemoveJobApplicationService } from '@features/operations/backend/endpoints/admin/queue/remove-job.application.js';
+import { AdminQueueResumeApplicationService } from '@features/operations/backend/endpoints/admin/queue/resume.application.js';
+import { AdminQueueRetryJobApplicationService } from '@features/operations/backend/endpoints/admin/queue/retry-job.application.js';
+import { AdminQueueShowJobLogsApplicationService } from '@features/operations/backend/endpoints/admin/queue/show-job-logs.application.js';
+import { AdminQueueShowJobApplicationService } from '@features/operations/backend/endpoints/admin/queue/show-job.application.js';
+import { AdminQueueStatsApplicationService } from '@features/operations/backend/endpoints/admin/queue/stats.application.js';
+import { ResetDbApplicationService } from '@features/operations/backend/endpoints/reset-db.application.js';
+import { createIntegrationsOperations } from '@features/integrations/backend/operations.js';
+import { AdminSendEmailApplicationService } from '@features/integrations/backend/endpoints/admin/send-email.application.js';
+import { AdminSystemWebhookCreateApplicationService } from '@features/integrations/backend/endpoints/admin/system-webhook/create.application.js';
+import { AdminSystemWebhookDeleteApplicationService } from '@features/integrations/backend/endpoints/admin/system-webhook/delete.application.js';
+import { AdminSystemWebhookListApplicationService } from '@features/integrations/backend/endpoints/admin/system-webhook/list.application.js';
+import { AdminSystemWebhookShowApplicationService } from '@features/integrations/backend/endpoints/admin/system-webhook/show.application.js';
+import { AdminSystemWebhookTestApplicationService } from '@features/integrations/backend/endpoints/admin/system-webhook/test.application.js';
+import { AdminSystemWebhookUpdateApplicationService } from '@features/integrations/backend/endpoints/admin/system-webhook/update.application.js';
+import { FetchExternalResourcesApplicationService } from '@features/integrations/backend/endpoints/fetch-external-resources.application.js';
+import { FetchRssApplicationService } from '@features/integrations/backend/endpoints/fetch-rss.application.js';
+import { IWebhooksCreateApplicationService } from '@features/integrations/backend/endpoints/i/webhooks/create.application.js';
+import { IWebhooksDeleteApplicationService } from '@features/integrations/backend/endpoints/i/webhooks/delete.application.js';
+import { IWebhooksListApplicationService } from '@features/integrations/backend/endpoints/i/webhooks/list.application.js';
+import { IWebhooksShowApplicationService } from '@features/integrations/backend/endpoints/i/webhooks/show.application.js';
+import { IWebhooksTestApplicationService } from '@features/integrations/backend/endpoints/i/webhooks/test.application.js';
+import { IWebhooksUpdateApplicationService } from '@features/integrations/backend/endpoints/i/webhooks/update.application.js';
+import { DriveManagementApplicationService } from '@features/drive/backend/management.application.js';
+import { PortabilityApplicationService } from '@features/portability/backend/api.application.js';
+import { AuthApplicationService } from '@features/auth/backend/api.application.js';
+import { createModerationOperations } from '@features/moderation/backend/api.operations.js';
+import { moderationOutputs } from '@features/moderation/backend/api.schema.js';
+import { createRolesOperations } from '@features/roles/backend/api.operations.js';
+import { rolesOutputs } from '@features/roles/backend/api.schema.js';
+import { RoleEntityService } from '@features/roles/backend/serializers/RoleEntityService.js';
+import { AbuseUserReportEntityService } from '@features/moderation/backend/serializers/AbuseUserReportEntityService.js';
+import { AbuseReportNotificationRecipientEntityService } from '@features/moderation/backend/serializers/AbuseReportNotificationRecipientEntityService.js';
+import { ModerationLogEntityService } from '@features/moderation/backend/serializers/ModerationLogEntityService.js';
+import { AbuseReportService } from '@features/moderation/backend/services/AbuseReportService.js';
+import { AbuseReportNotificationService } from '@features/moderation/backend/services/AbuseReportNotificationService.js';
+import { UserSuspendService } from '@features/moderation/backend/services/UserSuspendService.js';
+import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
+import { FanoutTimelineService } from '@features/timelines/backend/services/FanoutTimelineService.js';
+import { ChannelMutingService } from '@features/channels/backend/services/ChannelMutingService.js';
+import { toPackedUserDetailed } from '@features/users/backend/user.schema.js';
+import type { UserProfilesRepository, SigninsRepository, AbuseUserReportsRepository, UserIpsRepository, ModerationLogsRepository, RolesRepository, RoleAssignmentsRepository } from '@features/persistence/backend/repositories/models.js';
 import { randomUUID } from 'node:crypto';
 import * as os from 'node:os';
 import { UsersApplicationService } from '@features/users/backend/api.application.js';
@@ -127,7 +264,7 @@ import type { Config } from '@/config.js';
 import { GetterService } from './GetterService.js';
 import { RateLimiterService } from './RateLimiterService.js';
 import { ApiLoggerService } from './ApiLoggerService.js';
-import { ApiCallService } from './ApiCallService.js';
+import { ApiIpLoggingService } from './ApiIpLoggingService.js';
 import { apiError, internalError, normalizeError, misskeyErrorBody } from './orpc-error.js';
 import { nullSuccessToNoContent } from './no-content.js';
 import { bodyCredential, registerPilotHttp } from './pilot-http.js';
@@ -159,7 +296,7 @@ export class OrpcPilotService {
 		private readonly limiter: RateLimiterService,
 		private readonly logger: ApiLoggerService,
 		private readonly telemetry: TelemetryService,
-		private readonly apiCall: ApiCallService,
+		private readonly ipLogging: ApiIpLoggingService,
 		getter: GetterService,
 		deletion: NoteDeleteService,
 		drive: DriveService,
@@ -214,6 +351,10 @@ export class OrpcPilotService {
 		// operations on the first request so stateful application caches stay shared.
 		this.getOperations = () => {
 			if (operations) return operations;
+			const roleEntityService = moduleRef.get(RoleEntityService, { strict: false });
+			const reportEntityService = moduleRef.get(AbuseUserReportEntityService, { strict: false });
+			const recipientEntityService = moduleRef.get(AbuseReportNotificationRecipientEntityService, { strict: false });
+			const logEntityService = moduleRef.get(ModerationLogEntityService, { strict: false });
 			const clipService = moduleRef.get(ClipService, { strict: false });
 			const clipEntityService = moduleRef.get(ClipEntityService, { strict: false });
 			const noteEntityService = moduleRef.get(NoteEntityService, { strict: false });
@@ -223,6 +364,168 @@ export class OrpcPilotService {
 			const achievementService = moduleRef.get(AchievementService, { strict: false });
 			const featuredService = moduleRef.get(FeaturedService, { strict: false });
 			return operations = {
+				moderation: createModerationOperations<MiLocalUser>({
+					usersRepository: users,
+					userProfilesRepository: moduleRef.get<UserProfilesRepository>(DI.userProfilesRepository, { strict: false }),
+					signinsRepository: moduleRef.get<SigninsRepository>(DI.signinsRepository, { strict: false }),
+					abuseUserReportsRepository: moduleRef.get<AbuseUserReportsRepository>(DI.abuseUserReportsRepository, { strict: false }),
+					userIpsRepository: moduleRef.get<UserIpsRepository>(DI.userIpsRepository, { strict: false }),
+					moderationLogsRepository: moduleRef.get<ModerationLogsRepository>(DI.moderationLogsRepository, { strict: false }),
+					queryService, idService, roleService: roles, roleEntityService,
+					userEntityService: { packMany: async (rows, actor, options) => (await userEntityService.packMany(rows, actor, options)).map(toPackedUserDetailed) },
+					abuseReportNotificationRecipientEntityService: { pack: async row => v.parse(moderationOutputs.adminAbuseReportNotificationRecipientShow, await recipientEntityService.pack(row)), packMany: async rows => v.parse(moderationOutputs.adminAbuseReportNotificationRecipientList, await recipientEntityService.packMany(rows)) },
+					abuseUserReportEntityService: { packMany: async rows => v.parse(moderationOutputs.adminAbuseUserReports, await reportEntityService.packMany(rows)) },
+					moderationLogEntityService: { packMany: async rows => v.parse(moderationOutputs.adminShowModerationLogs, await logEntityService.packMany(rows)) },
+					abuseReportNotificationService: moduleRef.get(AbuseReportNotificationService, { strict: false }),
+					abuseReportService: moduleRef.get(AbuseReportService, { strict: false }),
+					getterService: getter, userSuspendService: moduleRef.get(UserSuspendService, { strict: false }), moderationLogService,
+				}),
+				roles: createRolesOperations<MiLocalUser>({
+					usersRepository: users,
+					rolesRepository: moduleRef.get<RolesRepository>(DI.rolesRepository, { strict: false }),
+					roleAssignmentsRepository: moduleRef.get<RoleAssignmentsRepository>(DI.roleAssignmentsRepository, { strict: false }),
+					notesRepository: moduleRef.get<NotesRepository>(DI.notesRepository, { strict: false }),
+					queryService, idService, roleService: roles, roleEntityService,
+					userEntityService: { pack: async (row, actor, options) => toPackedUserDetailed(await userEntityService.pack(row, actor, options)), packMany: async (rows, actor, options) => (await userEntityService.packMany(rows, actor, options)).map(toPackedUserDetailed) },
+					noteEntityService: { packMany: async (rows, actor) => v.parse(rolesOutputs.rolesNotes, await noteEntityService.packMany(rows, actor)) },
+					metaService, globalEventService: moduleRef.get(GlobalEventService, { strict: false }), moderationLogService,
+					fanoutTimelineService: moduleRef.get(FanoutTimelineService, { strict: false }), channelMutingService: moduleRef.get(ChannelMutingService, { strict: false }),
+				}),
+
+				auth: moduleRef.get(AuthApplicationService, { strict: false }),
+				portability: moduleRef.get(PortabilityApplicationService, { strict: false }),
+				driveManagement: moduleRef.get(DriveManagementApplicationService, { strict: false }),
+				integrations: createIntegrationsOperations<MiLocalUser>({
+					adminSendEmail: moduleRef.get(AdminSendEmailApplicationService, { strict: false }),
+					adminSystemWebhookCreate: moduleRef.get(AdminSystemWebhookCreateApplicationService, { strict: false }),
+					adminSystemWebhookDelete: moduleRef.get(AdminSystemWebhookDeleteApplicationService, { strict: false }),
+					adminSystemWebhookList: moduleRef.get(AdminSystemWebhookListApplicationService, { strict: false }),
+					adminSystemWebhookShow: moduleRef.get(AdminSystemWebhookShowApplicationService, { strict: false }),
+					adminSystemWebhookTest: moduleRef.get(AdminSystemWebhookTestApplicationService, { strict: false }),
+					adminSystemWebhookUpdate: moduleRef.get(AdminSystemWebhookUpdateApplicationService, { strict: false }),
+					fetchExternalResources: moduleRef.get(FetchExternalResourcesApplicationService, { strict: false }),
+					fetchRss: moduleRef.get(FetchRssApplicationService, { strict: false }),
+					iWebhooksCreate: moduleRef.get(IWebhooksCreateApplicationService, { strict: false }),
+					iWebhooksDelete: moduleRef.get(IWebhooksDeleteApplicationService, { strict: false }),
+					iWebhooksList: moduleRef.get(IWebhooksListApplicationService, { strict: false }),
+					iWebhooksShow: moduleRef.get(IWebhooksShowApplicationService, { strict: false }),
+					iWebhooksTest: moduleRef.get(IWebhooksTestApplicationService, { strict: false }),
+					iWebhooksUpdate: moduleRef.get(IWebhooksUpdateApplicationService, { strict: false }),
+				}),
+
+				operations: createOperationsApiOperations<MiLocalUser>({
+					adminGetIndexStats: moduleRef.get(AdminGetIndexStatsApplicationService, { strict: false }),
+					adminGetTableStats: moduleRef.get(AdminGetTableStatsApplicationService, { strict: false }),
+					adminQueueClear: moduleRef.get(AdminQueueClearApplicationService, { strict: false }),
+					adminQueueDeliverDelayed: moduleRef.get(AdminQueueDeliverDelayedApplicationService, { strict: false }),
+					adminQueueInboxDelayed: moduleRef.get(AdminQueueInboxDelayedApplicationService, { strict: false }),
+					adminQueueJobs: moduleRef.get(AdminQueueJobsApplicationService, { strict: false }),
+					adminQueuePause: moduleRef.get(AdminQueuePauseApplicationService, { strict: false }),
+					adminQueuePromoteJobs: moduleRef.get(AdminQueuePromoteJobsApplicationService, { strict: false }),
+					adminQueueQueueStats: moduleRef.get(AdminQueueQueueStatsApplicationService, { strict: false }),
+					adminQueueQueues: moduleRef.get(AdminQueueQueuesApplicationService, { strict: false }),
+					adminQueueRemoveJob: moduleRef.get(AdminQueueRemoveJobApplicationService, { strict: false }),
+					adminQueueResume: moduleRef.get(AdminQueueResumeApplicationService, { strict: false }),
+					adminQueueRetryJob: moduleRef.get(AdminQueueRetryJobApplicationService, { strict: false }),
+					adminQueueShowJobLogs: moduleRef.get(AdminQueueShowJobLogsApplicationService, { strict: false }),
+					adminQueueShowJob: moduleRef.get(AdminQueueShowJobApplicationService, { strict: false }),
+					adminQueueStats: moduleRef.get(AdminQueueStatsApplicationService, { strict: false }),
+					resetDb: moduleRef.get(ResetDbApplicationService, { strict: false }),
+				}),
+
+				federation: createFederationOperations<MiLocalUser>({
+					adminFederationDeleteAllFiles: moduleRef.get(AdminFederationDeleteAllFilesApplicationService, { strict: false }),
+					adminFederationRefreshRemoteInstanceMetadata: moduleRef.get(AdminFederationRefreshRemoteInstanceMetadataApplicationService, { strict: false }),
+					adminFederationRemoveAllFollowing: moduleRef.get(AdminFederationRemoveAllFollowingApplicationService, { strict: false }),
+					adminFederationUpdateInstance: moduleRef.get(AdminFederationUpdateInstanceApplicationService, { strict: false }),
+					adminRelaysAdd: moduleRef.get(AdminRelaysAddApplicationService, { strict: false }),
+					adminRelaysList: moduleRef.get(AdminRelaysListApplicationService, { strict: false }),
+					adminRelaysRemove: moduleRef.get(AdminRelaysRemoveApplicationService, { strict: false }),
+					apGet: moduleRef.get(ApGetApplicationService, { strict: false }),
+					apShow: moduleRef.get(ApShowApplicationService, { strict: false }),
+					federationFollowers: moduleRef.get(FederationFollowersApplicationService, { strict: false }),
+					federationFollowing: moduleRef.get(FederationFollowingApplicationService, { strict: false }),
+					federationInstances: moduleRef.get(FederationInstancesApplicationService, { strict: false }),
+					federationShowInstance: moduleRef.get(FederationShowInstanceApplicationService, { strict: false }),
+					federationStats: moduleRef.get(FederationStatsApplicationService, { strict: false }),
+					federationUpdateRemoteUser: moduleRef.get(FederationUpdateRemoteUserApplicationService, { strict: false }),
+					federationUsers: moduleRef.get(FederationUsersApplicationService, { strict: false }),
+				}),
+
+				games: createGamesOperations<MiLocalUser>({
+					bubbleGameRanking: moduleRef.get(BubbleGameRankingApplicationService, { strict: false }),
+					bubbleGameRegister: moduleRef.get(BubbleGameRegisterApplicationService, { strict: false }),
+					reversiCancelMatch: moduleRef.get(ReversiCancelMatchApplicationService, { strict: false }),
+					reversiGames: moduleRef.get(ReversiGamesApplicationService, { strict: false }),
+					reversiInvitations: moduleRef.get(ReversiInvitationsApplicationService, { strict: false }),
+					reversiMatch: moduleRef.get(ReversiMatchApplicationService, { strict: false }),
+					reversiShowGame: moduleRef.get(ReversiShowGameApplicationService, { strict: false }),
+					reversiSurrender: moduleRef.get(ReversiSurrenderApplicationService, { strict: false }),
+					reversiVerify: moduleRef.get(ReversiVerifyApplicationService, { strict: false }),
+				}),
+
+				play: createPlayOperations<MiLocalUser>({
+					flashCreate: moduleRef.get(FlashCreateApplicationService, { strict: false }),
+					flashDelete: moduleRef.get(FlashDeleteApplicationService, { strict: false }),
+					flashFeatured: moduleRef.get(FlashFeaturedApplicationService, { strict: false }),
+					flashLike: moduleRef.get(FlashLikeApplicationService, { strict: false }),
+					flashMy: moduleRef.get(FlashMyApplicationService, { strict: false }),
+					flashMyLikes: moduleRef.get(FlashMyLikesApplicationService, { strict: false }),
+					flashShow: moduleRef.get(FlashShowApplicationService, { strict: false }),
+					flashUnlike: moduleRef.get(FlashUnlikeApplicationService, { strict: false }),
+					flashUpdate: moduleRef.get(FlashUpdateApplicationService, { strict: false }),
+					flashSearch: moduleRef.get(FlashSearchApplicationService, { strict: false }),
+					usersFlashs: moduleRef.get(UsersFlashsApplicationService, { strict: false }),
+				}),
+
+				pages: createPagesOperations<MiLocalUser>({
+					iPageLikes: moduleRef.get(IPageLikesApplicationService, { strict: false }),
+					iPages: moduleRef.get(IPagesApplicationService, { strict: false }),
+					pagePush: moduleRef.get(PagePushApplicationService, { strict: false }),
+					pagesCreate: moduleRef.get(PagesCreateApplicationService, { strict: false }),
+					pagesDelete: moduleRef.get(PagesDeleteApplicationService, { strict: false }),
+					pagesFeatured: moduleRef.get(PagesFeaturedApplicationService, { strict: false }),
+					pagesLike: moduleRef.get(PagesLikeApplicationService, { strict: false }),
+					pagesShow: moduleRef.get(PagesShowApplicationService, { strict: false }),
+					pagesUnlike: moduleRef.get(PagesUnlikeApplicationService, { strict: false }),
+					pagesUpdate: moduleRef.get(PagesUpdateApplicationService, { strict: false }),
+					usersPages: moduleRef.get(UsersPagesApplicationService, { strict: false }),
+				}),
+
+				channels: createChannelsOperations({
+					channelsCreate: moduleRef.get(ChannelsCreateOperation, { strict: false }),
+					channelsFeatured: moduleRef.get(ChannelsFeaturedOperation, { strict: false }),
+					channelsFollowed: moduleRef.get(ChannelsFollowedOperation, { strict: false }),
+					channelsMyFavorites: moduleRef.get(ChannelsMyFavoritesOperation, { strict: false }),
+					channelsOwned: moduleRef.get(ChannelsOwnedOperation, { strict: false }),
+					channelsSearch: moduleRef.get(ChannelsSearchOperation, { strict: false }),
+					channelsShow: moduleRef.get(ChannelsShowOperation, { strict: false }),
+					channelsTimeline: moduleRef.get(ChannelsTimelineOperation, { strict: false }),
+					channelsUpdate: moduleRef.get(ChannelsUpdateOperation, { strict: false }),
+					channelsMuteList: moduleRef.get(ChannelsMuteListOperation, { strict: false }),
+					commands: moduleRef.get<ChannelCommandOperations<MiChannel, MiLocalUser>>(featureTokens.channelCommands, { strict: false }),
+				}),
+
+				chat: createChatOperations({
+					chatMessagesCreateToUser: moduleRef.get(ChatMessagesCreateToUserOperation, { strict: false }),
+					chatMessagesCreateToRoom: moduleRef.get(ChatMessagesCreateToRoomOperation, { strict: false }),
+					chatMessagesShow: moduleRef.get(ChatMessagesShowOperation, { strict: false }),
+					chatMessagesUserTimeline: moduleRef.get(ChatMessagesUserTimelineOperation, { strict: false }),
+					chatMessagesRoomTimeline: moduleRef.get(ChatMessagesRoomTimelineOperation, { strict: false }),
+					chatMessagesSearch: moduleRef.get(ChatMessagesSearchOperation, { strict: false }),
+					chatRoomsCreate: moduleRef.get(ChatRoomsCreateOperation, { strict: false }),
+					chatRoomsShow: moduleRef.get(ChatRoomsShowOperation, { strict: false }),
+					chatRoomsOwned: moduleRef.get(ChatRoomsOwnedOperation, { strict: false }),
+					chatRoomsJoining: moduleRef.get(ChatRoomsJoiningOperation, { strict: false }),
+					chatRoomsUpdate: moduleRef.get(ChatRoomsUpdateOperation, { strict: false }),
+					chatRoomsMembers: moduleRef.get(ChatRoomsMembersOperation, { strict: false }),
+					chatRoomsInvitationsCreate: moduleRef.get(ChatRoomsInvitationsCreateOperation, { strict: false }),
+					chatRoomsInvitationsInbox: moduleRef.get(ChatRoomsInvitationsInboxOperation, { strict: false }),
+					chatRoomsInvitationsOutbox: moduleRef.get(ChatRoomsInvitationsOutboxOperation, { strict: false }),
+					chatHistory: moduleRef.get(ChatHistoryOperation, { strict: false }),
+					commands: moduleRef.get<ChatCommandOperations<MiChatRoom, MiChatMessage, MiLocalUser>>(featureTokens.chatCommands, { strict: false }),
+				}),
+
 				notes: createNotesOperations({
 					adminPromoCreate: moduleRef.get(AdminPromoCreateOperation, { strict: false }),
 					iPin: moduleRef.get(IPinOperation, { strict: false }),
@@ -288,12 +591,7 @@ export class OrpcPilotService {
 																																																						serverSettings: settings, config, idService, queryService, moderationLogService, metaService,
 																																																						metaEntityService, systemAccountService, userEntityService, db, redisClient: redis,
 																																																						getOnlineUsersCount: { thresholdMs: USER_ONLINE_THRESHOLD, countSince: cutoff => users.countBy({ lastActiveDate: MoreThan(cutoff) }) },
-																																																						readEndpoints: async () => {
-																																																							const { endpoints } = await import('@features/index/backend/endpoints.js');
-																																																							const legacy = endpoints.map(endpoint => ({ name: endpoint.name,
-																																																																																																			properties: Object.fromEntries(Object.entries(endpoint.params.properties ?? {}).map(([name, value]) => [name, typeof value.type === 'string' ? { type: value.type } : {}])) }));
-																																																							return [...legacy, ...await getPilotEndpointDescriptors()].sort((a, b) => a.name.localeCompare(b.name));
-																																																						},
+																																																						readEndpoints: async () => (await getPilotEndpointDescriptors()).sort((a, b) => a.name.localeCompare(b.name)),
 				}),
 				statistics: createStatisticsOperations<MiLocalUser>({ charts: { activeUsers, apRequest, drive: driveChart,
 																																																																				federation, instance, notes, userDrive, userFollowing, userNotes, userPv, userReactions, users: usersChart },
@@ -348,7 +646,7 @@ export class OrpcPilotService {
 	}
 
 	private context(request: FastifyRequest, reply: FastifyReply, name: string, upload?: UploadResource): ApiExecutionContext<MiLocalUser> {
-		const credential = bodyCredential(request);
+		const credential = name === 'clear-browser-cache' ? undefined : bodyCredential(request);
 		return {
 			authorization: {
 				rootUserId: () => this.settings.rootUserId,
@@ -359,12 +657,13 @@ export class OrpcPilotService {
 				},
 			},
 			operations: this.getOperations(),
+			response: { header: (key, value) => { reply.header(key, value); } },
 			credential, ip: request.ip, headers: request.headers, ...(upload === undefined ? {} : { upload }),
 			services: {
 				authenticate: async token => {
 					try {
 						const principal = await this.authenticate.authenticate(token);
-						if (principal[0]) this.apiCall.logIp(request, principal[0]);
+						if (principal[0]) this.ipLogging.log(request.ip, principal[0].id);
 						return principal;
 					} catch (error) {
 						if (!(error instanceof AuthenticationError)) throw error;

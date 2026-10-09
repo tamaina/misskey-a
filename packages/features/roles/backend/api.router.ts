@@ -1,0 +1,28 @@
+/*
+ * SPDX-FileCopyrightText: syuilo and misskey-project
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
+
+import { implement } from '@orpc/server';
+import type { ApiActor, ApiContext } from '../../api/backend/transport/context.js';
+import { authentication, apiPolicy, requirePrincipal, decodeScalarInput } from '../../api/backend/transport/middleware.js';
+import { rolesContract } from './api.contract.js';
+import type { RolesOperations } from './api.operations.js';
+export type RolesContext<Actor extends ApiActor> = ApiContext<Actor> & { operations: { roles: RolesOperations<Actor> } };
+export function createRolesRouter<Actor extends ApiActor>() {
+ const native = implement(rolesContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<RolesContext<Actor>>().use(authentication<Actor>());
+ const adminRolesAssign = native.adminRolesAssign.use(apiPolicy<Actor>({ name: 'admin/roles/assign', requireCredential: true, requireModerator: true, kind: 'write:admin:roles' })).use(requirePrincipal<Actor>()).use(decodeScalarInput<Actor>({ expiresAt: 'number' })).handler(({ input, context }) => context.operations.roles.adminRolesAssign(input, context.principal));
+ const adminRolesCreate = native.adminRolesCreate.use(apiPolicy<Actor>({ name: 'admin/roles/create', requireCredential: true, requireAdmin: true, kind: 'write:admin:roles' })).use(requirePrincipal<Actor>()).use(decodeScalarInput<Actor>({ isPublic: 'boolean', isModerator: 'boolean', isAdministrator: 'boolean', isExplorable: 'boolean', asBadge: 'boolean', preserveAssignmentOnMoveAccount: 'boolean', canEditMembersByModerator: 'boolean' })).use(decodeScalarInput<Actor>({ displayOrder: 'number' })).handler(({ input, context }) => context.operations.roles.adminRolesCreate(input, context.principal));
+ const adminRolesDelete = native.adminRolesDelete.use(apiPolicy<Actor>({ name: 'admin/roles/delete', requireCredential: true, requireAdmin: true, kind: 'write:admin:roles' })).use(requirePrincipal<Actor>()).handler(({ input, context }) => context.operations.roles.adminRolesDelete(input, context.principal));
+ const adminRolesList = native.adminRolesList.use(apiPolicy<Actor>({ name: 'admin/roles/list', requireCredential: true, requireModerator: true, kind: 'read:admin:roles' })).use(requirePrincipal<Actor>()).handler(({ input, context }) => context.operations.roles.adminRolesList(input, context.principal));
+ const adminRolesShow = native.adminRolesShow.use(apiPolicy<Actor>({ name: 'admin/roles/show', requireCredential: true, requireModerator: true, kind: 'read:admin:roles' })).use(requirePrincipal<Actor>()).handler(({ input, context }) => context.operations.roles.adminRolesShow(input, context.principal));
+ const adminRolesUnassign = native.adminRolesUnassign.use(apiPolicy<Actor>({ name: 'admin/roles/unassign', requireCredential: true, requireModerator: true, kind: 'write:admin:roles' })).use(requirePrincipal<Actor>()).handler(({ input, context }) => context.operations.roles.adminRolesUnassign(input, context.principal));
+ const adminRolesUpdate = native.adminRolesUpdate.use(apiPolicy<Actor>({ name: 'admin/roles/update', requireCredential: true, requireAdmin: true, kind: 'write:admin:roles' })).use(requirePrincipal<Actor>()).use(decodeScalarInput<Actor>({ isPublic: 'boolean', isModerator: 'boolean', isAdministrator: 'boolean', isExplorable: 'boolean', asBadge: 'boolean', preserveAssignmentOnMoveAccount: 'boolean', canEditMembersByModerator: 'boolean', displayOrder: 'number' })).handler(({ input, context }) => context.operations.roles.adminRolesUpdate(input, context.principal));
+ const adminRolesUpdateDefaultPolicies = native.adminRolesUpdateDefaultPolicies.use(apiPolicy<Actor>({ name: 'admin/roles/update-default-policies', requireCredential: true, requireAdmin: true, kind: 'write:admin:roles' })).use(requirePrincipal<Actor>()).handler(({ input, context }) => context.operations.roles.adminRolesUpdateDefaultPolicies(input, context.principal));
+ const adminRolesUsers = native.adminRolesUsers.use(apiPolicy<Actor>({ name: 'admin/roles/users', requireCredential: false, requireModerator: true, kind: 'read:admin:roles' })).use(requirePrincipal<Actor>()).use(decodeScalarInput<Actor>({ sinceDate: 'number', untilDate: 'number', limit: 'number' })).handler(({ input, context }) => context.operations.roles.adminRolesUsers(input, context.principal));
+ const rolesList = native.rolesList.use(apiPolicy<Actor>({ name: 'roles/list', requireCredential: true, kind: 'read:account' })).use(requirePrincipal<Actor>()).handler(({ input, context }) => context.operations.roles.rolesList(input, context.principal));
+ const rolesNotes = native.rolesNotes.use(apiPolicy<Actor>({ name: 'roles/notes', requireCredential: true, kind: 'read:account' })).use(requirePrincipal<Actor>()).use(decodeScalarInput<Actor>({ limit: 'number', sinceDate: 'number', untilDate: 'number' })).handler(({ input, context }) => context.operations.roles.rolesNotes(input, context.principal));
+ const rolesShow = native.rolesShow.use(apiPolicy<Actor>({ name: 'roles/show', requireCredential: false })).handler(({ input, context }) => context.operations.roles.rolesShow(input, context.principal));
+ const rolesUsers = native.rolesUsers.use(apiPolicy<Actor>({ name: 'roles/users', requireCredential: false })).use(decodeScalarInput<Actor>({ sinceDate: 'number', untilDate: 'number', limit: 'number' })).handler(({ input, context }) => context.operations.roles.rolesUsers(input, context.principal));
+ return native.router({ adminRolesAssign, adminRolesCreate, adminRolesDelete, adminRolesList, adminRolesShow, adminRolesUnassign, adminRolesUpdate, adminRolesUpdateDefaultPolicies, adminRolesUsers, rolesList, rolesNotes, rolesShow, rolesUsers });
+}

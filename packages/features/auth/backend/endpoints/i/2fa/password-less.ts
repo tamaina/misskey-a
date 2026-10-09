@@ -3,17 +3,17 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { voidI2faPasswordLessDefinition, voidI2faPasswordLessInput, voidI2faPasswordLessOutput } from '../../../../contract/void-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
 
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import type { UserProfilesRepository, UserSecurityKeysRepository } from '@features/persistence/backend/repositories/models.js';
 import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
 import { DI } from '@/di-symbols.js';
-import { ApiError } from '@features/api/backend/transport/error.js';
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
 
-const contractProjection = projectEndpointContract(voidI2faPasswordLessDefinition);
+import * as v from 'valibot';
+import { voidI2faPasswordLessInput } from '../../../auth.schema.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
 
 export const meta = {
 	requireCredential: true,
@@ -29,10 +29,8 @@ export const meta = {
 	},
 } as const;
 
-export const paramDef = contractProjection.input;
-
 @Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof voidI2faPasswordLessInput, typeof voidI2faPasswordLessOutput> {
+export class I2faPasswordLessOperation {
 	constructor(
 		@Inject(DI.userProfilesRepository)
 		private userProfilesRepository: UserProfilesRepository,
@@ -42,38 +40,38 @@ export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof
 
 		private userEntityService: UserEntityService,
 		private globalEventService: GlobalEventService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			if (ps.value === true) {
-				// セキュリティキーがなければパスワードレスを有効にはできない
-				const keyCount = await this.userSecurityKeysRepository.count({
-					where: {
-						userId: me.id,
-					},
-					select: {
-						id: true,
-						name: true,
-						lastUsed: true,
-					},
-				});
+	) {}
 
-				if (keyCount === 0) {
-					await this.userProfilesRepository.update(me.id, {
-						usePasswordLessLogin: false,
-					});
-
-					throw new ApiError(meta.errors.noKey);
-				}
-			}
-
-			await this.userProfilesRepository.update(me.id, {
-				usePasswordLessLogin: ps.value,
+	async execute(ps: v.InferOutput<typeof voidI2faPasswordLessInput>, me: MiLocalUser) {
+		if (ps.value === true) {
+			// セキュリティキーがなければパスワードレスを有効にはできない
+			const keyCount = await this.userSecurityKeysRepository.count({
+				where: {
+					userId: me.id,
+				},
+				select: {
+					id: true,
+					name: true,
+					lastUsed: true,
+				},
 			});
 
-			// Publish meUpdated event
-			this.globalEventService.publishMainStream(me.id, 'meUpdated', await this.userEntityService.packSelf(me.id, {
-				includeSecrets: true,
-			}));
+			if (keyCount === 0) {
+				await this.userProfilesRepository.update(me.id, {
+					usePasswordLessLogin: false,
+				});
+
+				throw apiError(meta.errors.noKey);
+			}
+		}
+
+		await this.userProfilesRepository.update(me.id, {
+			usePasswordLessLogin: ps.value,
 		});
+
+		// Publish meUpdated event
+		this.globalEventService.publishMainStream(me.id, 'meUpdated', await this.userEntityService.packSelf(me.id, {
+			includeSecrets: true,
+		}));
 	}
 }

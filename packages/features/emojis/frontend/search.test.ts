@@ -4,7 +4,7 @@
  */
 
 import { describe, expect, test } from 'vitest';
-import type { EmojiSimple } from '../contract/index.js';
+import type { EmojiSimple } from '../backend/api.schema.js';
 import { searchEmojiCatalog } from './search.js';
 
 function emoji(name: string, aliases: string[] = []): EmojiSimple {

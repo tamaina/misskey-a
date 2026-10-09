@@ -3,19 +3,18 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { inlineI2faRegisterKeyDefinition } from '../../../../contract/endpoint-definitions.js';
 import bcrypt from 'bcryptjs';
-import { LegacyWebAuthnOptionsProducerEndpoint } from '../../../legacy-webauthn-options-producer-endpoint.js';
 import { Inject, Injectable } from '@nestjs/common';
 
 import type { UserProfilesRepository } from '@features/persistence/backend/repositories/models.js';
 import { DI } from '@/di-symbols.js';
 import { WebAuthnService } from '../../../services/WebAuthnService.js';
-import { ApiError } from '@features/api/backend/transport/error.js';
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
 import { UserAuthService } from '../../../services/UserAuthService.js';
 
-const contractProjection = projectEndpointContract(inlineI2faRegisterKeyDefinition);
+import * as v from 'valibot';
+import { inlineI2faRegisterKeyInput } from '../../../auth.schema.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
 
 export const meta = {
 	requireCredential: true,
@@ -41,61 +40,56 @@ export const meta = {
 			id: 'bf32b864-449b-47b8-974e-f9a5468546f1',
 		},
 	},
-
-	res: contractProjection.response,
 } as const;
 
-export const paramDef = contractProjection.input;
-
-// eslint-disable-next-line import/no-default-export
 @Injectable()
-export class EndpointImplementation extends LegacyWebAuthnOptionsProducerEndpoint<typeof meta> {
+export class I2faRegisterKeyOperation {
 	constructor(
 		@Inject(DI.userProfilesRepository)
 		private userProfilesRepository: UserProfilesRepository,
 
 		private webAuthnService: WebAuthnService,
 		private userAuthService: UserAuthService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			const token = ps.token;
-			const profile = await this.userProfilesRepository.findOne({
-				where: {
-					userId: me.id,
-				},
-				relations: { user: true },
-			});
+	) {}
 
-			if (profile == null) {
-				throw new ApiError(meta.errors.userNotFound);
-			}
-
-			if (profile.twoFactorEnabled) {
-				if (token == null) {
-					throw new Error('authentication failed');
-				}
-
-				try {
-					await this.userAuthService.twoFactorAuthenticate(profile, token);
-				} catch (_) {
-					throw new Error('authentication failed');
-				}
-			}
-
-			const passwordMatched = await bcrypt.compare(ps.password, profile.password ?? '');
-			if (!passwordMatched) {
-				throw new ApiError(meta.errors.incorrectPassword);
-			}
-
-			if (!profile.twoFactorEnabled) {
-				throw new ApiError(meta.errors.twoFactorNotEnabled);
-			}
-
-			return await this.webAuthnService.initiateRegistration(
-				me.id,
-				profile.user?.username ?? me.id,
-				profile.user?.name ?? undefined,
-			);
+	async execute(ps: v.InferOutput<typeof inlineI2faRegisterKeyInput>, me: MiLocalUser) {
+		const token = ps.token;
+		const profile = await this.userProfilesRepository.findOne({
+			where: {
+				userId: me.id,
+			},
+			relations: { user: true },
 		});
+
+		if (profile == null) {
+			throw apiError(meta.errors.userNotFound);
+		}
+
+		if (profile.twoFactorEnabled) {
+			if (token == null) {
+				throw new Error('authentication failed');
+			}
+
+			try {
+				await this.userAuthService.twoFactorAuthenticate(profile, token);
+			} catch (_) {
+				throw new Error('authentication failed');
+			}
+		}
+
+		const passwordMatched = await bcrypt.compare(ps.password, profile.password ?? '');
+		if (!passwordMatched) {
+			throw apiError(meta.errors.incorrectPassword);
+		}
+
+		if (!profile.twoFactorEnabled) {
+			throw apiError(meta.errors.twoFactorNotEnabled);
+		}
+
+		return await this.webAuthnService.initiateRegistration(
+			me.id,
+			profile.user?.username ?? me.id,
+			profile.user?.name ?? undefined,
+		);
 	}
 }

@@ -4,24 +4,27 @@
  */
 
 import type { InferOutput } from 'valibot';
-import type { MiSignin } from '@features/auth/backend/models/Signin.js';
-import type { adminShowUserInput, adminShowUserOutput, AdminUserEndpoints } from '@features/moderation/contract/admin-user-endpoint-definition.js';
-import type { LegacyAdminUserProducerOutput } from '@features/moderation/backend/legacy-admin-user-producer-endpoint.js';
-import { LegacyAdminUserProducerEndpoint } from '@features/moderation/backend/legacy-admin-user-producer-endpoint.js';
+import type { ApiActor } from '@features/api/backend/transport/context.js';
+import type { adminShowUserInput, adminShowUserOutput } from '@features/moderation/backend/api.schema.js';
+import type { ModerationOperations } from '@features/moderation/backend/api.operations.js';
+
 type Documented = InferOutput<typeof adminShowUserOutput>;
-declare const raw:MiSignin[];
-declare const producer:LegacyAdminUserProducerOutput;
-// @ts-expect-error Raw entities omit createdAt; the compatibility boundary cannot claim packed output.
-const signins:Documented['signins'] = raw;
-// @ts-expect-error Actual legacy producer is not the documented native response.
-const native:Documented = producer;
-const remaining:Omit<Documented, 'signins'> = producer;
-declare const documented:Documented;
-const nativeToPublic:AdminUserEndpoints['admin/show-user']['res'] = documented;
-// @ts-expect-error Exact route boundary does not accept caller-selected schema/producer type parameters.
-type GenericEscape = LegacyAdminUserProducerEndpoint<string>;
-new LegacyAdminUserProducerEndpoint(async (input, me) => {
- const nativeInput:InferOutput<typeof adminShowUserInput> = input;
- const id:string = me.id;
- return producer;
-});
+type Input = InferOutput<typeof adminShowUserInput>;
+declare const actor: ApiActor;
+declare const operations: ModerationOperations<ApiActor>;
+const input: Input = { userId: 'user123' };
+const native: Promise<Documented> = operations.adminShowUser(input, actor);
+
+// Signins expose the real producer fields; their stored headers are genuine JSON.
+const signins: Documented['signins'] = [{
+	id: 'signin123', userId: 'user123', ip: '127.0.0.1',
+	headers: { 'user-agent': 'browser', extension: [1, true, null] }, success: true,
+}];
+// @ts-expect-error Native timestamps must be converted to their public ISO string.
+const unconvertedDate: Documented['lastActiveDate'] = new Date();
+// @ts-expect-error Stored headers cannot contain native Date instances.
+const unconvertedHeaders: Documented['signins'][number]['headers'] = { receivedAt: new Date() };
+// @ts-expect-error Required credentials cannot be replaced by an anonymous principal.
+operations.adminShowUser(input, null);
+// @ts-expect-error A caller cannot substitute a numeric user selector.
+const wrongInput: Input = { userId: 42 };

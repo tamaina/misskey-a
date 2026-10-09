@@ -3,47 +3,21 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { packedDriveFoldersCreateDefinition, packedDriveFoldersCreateInput, packedDriveFoldersCreateOutput } from '../../../../contract/packed-endpoint-definitions.js';
+import type { MiDriveFolder } from '../../../models/DriveFolder.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+import type { DriveManagementInputs } from '../../../management.contract.js';
+import { driveFoldersCreateErrors } from './create.contract.js';
 import { Inject, Injectable } from '@nestjs/common';
-import ms from 'ms';
 
 import type { DriveFoldersRepository } from '@features/persistence/backend/repositories/models.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { DriveFolderEntityService } from '../../../serializers/DriveFolderEntityService.js';
 import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
 import { DI } from '@/di-symbols.js';
-import { ApiError } from '@features/api/backend/transport/error.js';
-
-const contractProjection = projectEndpointContract(packedDriveFoldersCreateDefinition);
-
-export const meta = {
-	tags: ['drive'],
-
-	requireCredential: true,
-
-	kind: 'write:drive',
-
-	limit: {
-		duration: ms('1hour'),
-		max: 10,
-	},
-
-	errors: {
-		noSuchFolder: {
-			message: 'No such folder.',
-			code: 'NO_SUCH_FOLDER',
-			id: '53326628-a00d-40a6-a3cd-8975105c0f95',
-		},
-	},
-
-	res: contractProjection.response,
-} as const;
-
-export const paramDef = contractProjection.input;
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
 
 @Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedDriveFoldersCreateInput, typeof packedDriveFoldersCreateOutput> {
+export class DriveFoldersCreateOperation {
 	constructor(
 		@Inject(DI.driveFoldersRepository)
 		private driveFoldersRepository: DriveFoldersRepository,
@@ -52,35 +26,36 @@ export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof
 		private idService: IdService,
 		private globalEventService: GlobalEventService,
 	) {
-		super(meta, contractProjection, async (ps, me) => {
-			// If the parent folder is specified
-			let parent = null;
-			if (ps.parentId) {
-				// Fetch parent folder
-				parent = await this.driveFoldersRepository.findOneBy({
-					id: ps.parentId,
-					userId: me.id,
-				});
+	}
 
-				if (parent == null) {
-					throw new ApiError(meta.errors.noSuchFolder);
-				}
-			}
-
-			// Create folder
-			const folder = await this.driveFoldersRepository.insertOne({
-				id: this.idService.gen(),
-				name: ps.name,
-				parentId: parent !== null ? parent.id : null,
+	async execute(ps: DriveManagementInputs['drive/folders/create'], me: MiLocalUser, _ip: string, _headers: Record<string, string | string[] | undefined>) {
+		// If the parent folder is specified
+		let parent: MiDriveFolder | null = null;
+		if (ps.parentId) {
+			// Fetch parent folder
+			parent = await this.driveFoldersRepository.findOneBy({
+				id: ps.parentId,
 				userId: me.id,
 			});
 
-			const folderObj = await this.driveFolderEntityService.pack(folder);
+			if (parent == null) {
+				throw apiError(driveFoldersCreateErrors.noSuchFolder);
+			}
+		}
 
-			// Publish folderCreated event
-			this.globalEventService.publishDriveStream(me.id, 'folderCreated', folderObj);
-
-			return folderObj;
+		// Create folder
+		const folder = await this.driveFoldersRepository.insertOne({
+			id: this.idService.gen(),
+			name: ps.name,
+			parentId: parent !== null ? parent.id : null,
+			userId: me.id,
 		});
+
+		const folderObj = await this.driveFolderEntityService.pack(folder);
+
+		// Publish folderCreated event
+		this.globalEventService.publishDriveStream(me.id, 'folderCreated', folderObj);
+
+		return folderObj;
 	}
 }

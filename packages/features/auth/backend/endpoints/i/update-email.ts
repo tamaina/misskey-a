@@ -3,9 +3,6 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { NativeContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { packedIUpdateEmailDefinition, packedIUpdateEmailInput, packedIUpdateEmailOutput } from '../../../contract/packed-endpoint-definitions.js';
-import { nativeMeDetailedSchema } from '@features/users/backend/serializers/native-user.js';
 import { Inject, Injectable } from '@nestjs/common';
 import ms from 'ms';
 import bcrypt from 'bcryptjs';
@@ -18,9 +15,11 @@ import { DI } from '@/di-symbols.js';
 import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
 import { L_CHARS, secureRndstr } from '../../utility/secure-rndstr.js';
 import { UserAuthService } from '../../services/UserAuthService.js';
-import { ApiError } from '@features/api/backend/transport/error.js';
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
 
-const contractProjection = projectEndpointContract(packedIUpdateEmailDefinition);
+import * as v from 'valibot';
+import { packedIUpdateEmailInput } from '../../auth.schema.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
 
 export const meta = {
 	requireCredential: true,
@@ -51,14 +50,10 @@ export const meta = {
 			id: '324c7a88-59f2-492f-903f-89134f93e47e',
 		},
 	},
-
-	res: contractProjection.response,
 } as const;
 
-export const paramDef = contractProjection.input;
-
 @Injectable()
-export class EndpointImplementation extends NativeContractEndpoint<typeof meta, typeof packedIUpdateEmailInput, typeof packedIUpdateEmailOutput, typeof nativeMeDetailedSchema> {
+export class IUpdateEmailOperation {
 	constructor(
 		@Inject(DI.config)
 		private config: Config,
@@ -73,65 +68,65 @@ export class EndpointImplementation extends NativeContractEndpoint<typeof meta, 
 		private emailService: EmailService,
 		private userAuthService: UserAuthService,
 		private globalEventService: GlobalEventService,
-	) {
-		super(meta, contractProjection, nativeMeDetailedSchema, async (ps, me) => {
-			const token = ps.token;
-			const profile = await this.userProfilesRepository.findOneByOrFail({ userId: me.id });
+	) {}
 
-			if (profile.twoFactorEnabled) {
-				if (token == null) {
-					throw new Error('authentication failed');
-				}
+	async execute(ps: v.InferOutput<typeof packedIUpdateEmailInput>, me: MiLocalUser) {
+		const token = ps.token;
+		const profile = await this.userProfilesRepository.findOneByOrFail({ userId: me.id });
 
-				try {
-					await this.userAuthService.twoFactorAuthenticate(profile, token);
-				} catch (_) {
-					throw new Error('authentication failed');
-				}
+		if (profile.twoFactorEnabled) {
+			if (token == null) {
+				throw new Error('authentication failed');
 			}
 
-			const passwordMatched = await bcrypt.compare(ps.password, profile.password!);
-			if (!passwordMatched) {
-				throw new ApiError(meta.errors.incorrectPassword);
+			try {
+				await this.userAuthService.twoFactorAuthenticate(profile, token);
+			} catch (_) {
+				throw new Error('authentication failed');
 			}
+		}
 
-			if (ps.email != null) {
-				const res = await this.emailService.validateEmailForAccount(ps.email);
-				if (!res.available) {
-					throw new ApiError(meta.errors.unavailable);
-				}
-			} else if (this.serverSettings.emailRequiredForSignup) {
-				throw new ApiError(meta.errors.emailRequired);
+		const passwordMatched = await bcrypt.compare(ps.password, profile.password!);
+		if (!passwordMatched) {
+			throw apiError(meta.errors.incorrectPassword);
+		}
+
+		if (ps.email != null) {
+			const res = await this.emailService.validateEmailForAccount(ps.email);
+			if (!res.available) {
+				throw apiError(meta.errors.unavailable);
 			}
+		} else if (this.serverSettings.emailRequiredForSignup) {
+			throw apiError(meta.errors.emailRequired);
+		}
+
+		await this.userProfilesRepository.update(me.id, {
+			email: ps.email,
+			emailVerified: false,
+			emailVerifyCode: null,
+		});
+
+		const iObj = await this.userEntityService.packSelf(me.id, {
+			includeSecrets: true,
+		});
+
+		// Publish meUpdated event
+		this.globalEventService.publishMainStream(me.id, 'meUpdated', iObj);
+
+		if (ps.email != null) {
+			const code = secureRndstr(16, { chars: L_CHARS });
 
 			await this.userProfilesRepository.update(me.id, {
-				email: ps.email,
-				emailVerified: false,
-				emailVerifyCode: null,
+				emailVerifyCode: code,
 			});
 
-			const iObj = await this.userEntityService.packSelf(me.id, {
-				includeSecrets: true,
-			});
+			const link = `${this.config.url}/verify-email/${code}`;
 
-			// Publish meUpdated event
-			this.globalEventService.publishMainStream(me.id, 'meUpdated', iObj);
+			this.emailService.sendEmail(ps.email, 'Email verification',
+				`To verify email, please click this link:<br><a href="${link}">${link}</a>`,
+				`To verify email, please click this link: ${link}`);
+		}
 
-			if (ps.email != null) {
-				const code = secureRndstr(16, { chars: L_CHARS });
-
-				await this.userProfilesRepository.update(me.id, {
-					emailVerifyCode: code,
-				});
-
-				const link = `${this.config.url}/verify-email/${code}`;
-
-				this.emailService.sendEmail(ps.email, 'Email verification',
-					`To verify email, please click this link:<br><a href="${link}">${link}</a>`,
-					`To verify email, please click this link: ${link}`);
-			}
-
-			return iObj;
-		});
+		return iObj;
 	}
 }

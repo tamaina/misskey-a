@@ -3,8 +3,6 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { inlineAuthSessionGenerateDefinition, inlineAuthSessionGenerateInput, inlineAuthSessionGenerateOutput } from '../../../../contract/endpoint-definitions.js';
 import { randomUUID } from 'node:crypto';
 import { Inject, Injectable } from '@nestjs/common';
 
@@ -12,16 +10,16 @@ import type { AppsRepository, AuthSessionsRepository } from '@features/persisten
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 import type { Config } from '@/config.js';
 import { DI } from '@/di-symbols.js';
-import { ApiError } from '@features/api/backend/transport/error.js';
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
 
-const contractProjection = projectEndpointContract(inlineAuthSessionGenerateDefinition);
+import * as v from 'valibot';
+import { inlineAuthSessionGenerateInput } from '../../../auth.schema.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
 
 export const meta = {
 	tags: ['auth'],
 
 	requireCredential: false,
-
-	res: contractProjection.response,
 
 	errors: {
 		noSuchApp: {
@@ -32,10 +30,8 @@ export const meta = {
 	},
 } as const;
 
-export const paramDef = contractProjection.input;
-
 @Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof inlineAuthSessionGenerateInput, typeof inlineAuthSessionGenerateOutput> {
+export class AuthSessionGenerateOperation {
 	constructor(
 		@Inject(DI.config)
 		private config: Config,
@@ -47,31 +43,31 @@ export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof
 		private authSessionsRepository: AuthSessionsRepository,
 
 		private idService: IdService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			// Lookup app
-			const app = await this.appsRepository.findOneBy({
-				secret: ps.appSecret,
-			});
+	) {}
 
-			if (app == null) {
-				throw new ApiError(meta.errors.noSuchApp);
-			}
-
-			// Generate token
-			const token = randomUUID();
-
-			// Create session token document
-			const doc = await this.authSessionsRepository.insertOne({
-				id: this.idService.gen(),
-				appId: app.id,
-				token: token,
-			});
-
-			return {
-				token: doc.token,
-				url: `${this.config.authUrl}/${doc.token}`,
-			};
+	async execute(ps: v.InferOutput<typeof inlineAuthSessionGenerateInput>, me: MiLocalUser | null) {
+		// Lookup app
+		const app = await this.appsRepository.findOneBy({
+			secret: ps.appSecret,
 		});
+
+		if (app == null) {
+			throw apiError(meta.errors.noSuchApp);
+		}
+
+		// Generate token
+		const token = randomUUID();
+
+		// Create session token document
+		const doc = await this.authSessionsRepository.insertOne({
+			id: this.idService.gen(),
+			appId: app.id,
+			token: token,
+		});
+
+		return {
+			token: doc.token,
+			url: `${this.config.authUrl}/${doc.token}`,
+		};
 	}
 }

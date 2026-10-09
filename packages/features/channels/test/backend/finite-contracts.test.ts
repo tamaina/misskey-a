@@ -6,19 +6,42 @@
 import { expect, expectTypeOf, test } from 'vitest';
 import * as v from 'valibot';
 import { mockDeep } from 'vitest-mock-extended';
-import { channelInputs } from '../../contract/index.js';
-import { packedEndpointDefinitions, packedChannelsShowDefinition as showDefinition, packedChannelsShowOutput as showOutput, packedChannelsCreateInput as createInput, packedChannelsUpdateInput as updateInput, packedChannelsTimelineInput as timelineInput } from '../../contract/packed-endpoint-definitions.js';
-import { packedChannelSchema } from '../../contract/packed.js';
+import { channelsApiContract } from '../../backend/api.contract.js';
+import { channelsCreateInput as createInput } from '../../backend/endpoints/channels/create.contract.js';
+import { channelsUpdateInput as updateInput } from '../../backend/endpoints/channels/update.contract.js';
+import { channelsTimelineInput as timelineInput } from '../../backend/endpoints/channels/timeline.contract.js';
+import { channelsShowInput, channelsShowOutput as showOutput } from '../../backend/endpoints/channels/show.contract.js';
+
+import { packedChannelSchema } from '../../backend/channel.schema.js';
 import { ChannelEntityService } from '../../backend/serializers/ChannelEntityService.js';
-import { EndpointImplementation as ShowEndpoint } from '../../backend/endpoints/channels/show.js';
+import { ChannelsShowOperation as ShowEndpoint } from '../../backend/endpoints/channels/show.js';
 import { MiChannel } from '../../backend/models/Channel.js';
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import type { Packed } from '@features/index/contract/packed.js';
-import { toLegacyJsonSchema } from '@features/api/backend/index.js';
+import type { Packed } from '@features/index/backend/packed.schema.js';
 import type { ChannelsRepository, ChannelFollowingsRepository, ChannelFavoritesRepository, ChannelMutingRepository } from '@features/persistence/backend/repositories/models.js';
 import type { IdService } from '@features/runtime/backend/services/IdService.js';
 import type { NoteEntityService } from '@features/notes/backend/serializers/NoteEntityService.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
+
+const packedEndpointDefinitions = {
+	'channels/create': { input: channelsApiContract.channelsCreate['~orpc'].inputSchema, output: channelsApiContract.channelsCreate['~orpc'].outputSchema },
+	'channels/featured': { input: channelsApiContract.channelsFeatured['~orpc'].inputSchema, output: channelsApiContract.channelsFeatured['~orpc'].outputSchema },
+	'channels/followed': { input: channelsApiContract.channelsFollowed['~orpc'].inputSchema, output: channelsApiContract.channelsFollowed['~orpc'].outputSchema },
+	'channels/my-favorites': { input: channelsApiContract.channelsMyFavorites['~orpc'].inputSchema, output: channelsApiContract.channelsMyFavorites['~orpc'].outputSchema },
+	'channels/owned': { input: channelsApiContract.channelsOwned['~orpc'].inputSchema, output: channelsApiContract.channelsOwned['~orpc'].outputSchema },
+	'channels/search': { input: channelsApiContract.channelsSearch['~orpc'].inputSchema, output: channelsApiContract.channelsSearch['~orpc'].outputSchema },
+	'channels/show': { input: channelsApiContract.channelsShow['~orpc'].inputSchema, output: channelsApiContract.channelsShow['~orpc'].outputSchema },
+	'channels/timeline': { input: channelsApiContract.channelsTimeline['~orpc'].inputSchema, output: channelsApiContract.channelsTimeline['~orpc'].outputSchema },
+	'channels/update': { input: channelsApiContract.channelsUpdate['~orpc'].inputSchema, output: channelsApiContract.channelsUpdate['~orpc'].outputSchema },
+	'channels/mute/list': { input: channelsApiContract.channelsMuteList['~orpc'].inputSchema, output: channelsApiContract.channelsMuteList['~orpc'].outputSchema },
+};
+const channelInputs = {
+	'channels/favorite': channelsApiContract.channelsFavorite['~orpc'].inputSchema,
+	'channels/follow': channelsApiContract.channelsFollow['~orpc'].inputSchema,
+	'channels/unfavorite': channelsApiContract.channelsUnfavorite['~orpc'].inputSchema,
+	'channels/unfollow': channelsApiContract.channelsUnfollow['~orpc'].inputSchema,
+	'channels/mute/create': channelsApiContract.channelsMuteCreate['~orpc'].inputSchema,
+	'channels/mute/delete': channelsApiContract.channelsMuteDelete['~orpc'].inputSchema,
+};
 
 const date = new Date('2026-01-01T00:00:00.000Z');
 const channel = Object.assign(new MiChannel(), { id: 'channel123', lastNotedAt: null, name: 'Channel', description: null, userId: null, bannerId: null, pinnedNoteIds: [], color: '#86b300', isArchived: false, usersCount: 0, notesCount: 0, isSensitive: false, allowRenoteToExternal: true });
@@ -48,7 +71,6 @@ test('all channel input objects discard unknown native fields and retain default
 		expect(parsed).not.toHaveProperty('i');
 		expect(parsed).not.toHaveProperty('future');
 		expect(parsed).toMatchObject(params);
-		expect(projectEndpointContract<v.GenericSchema, v.GenericSchema>(definition).input).not.toHaveProperty('additionalProperties');
 	}
 	for (const input of Object.values(channelInputs)) {
 		expect(v.parse(input, { channelId: 'channel123', future: true })).toEqual({ channelId: 'channel123' });
@@ -90,28 +112,21 @@ test('show handler runs actual detailed serializer, preserving missing-channel e
 	const { channels, serializer, notes } = fixture();
 	channels.findOneBy.mockResolvedValue(channel);
 	const endpoint = new ShowEndpoint(channels, serializer);
-	const result = await endpoint.exec({ channelId: channel.id, future: true }, mockDeep<MiLocalUser>({ id: 'user123' }), null);
+	const result = await endpoint.execute(v.parse(channelsShowInput, { channelId: channel.id, future: true }), mockDeep<MiLocalUser>({ id: 'user123' }));
 	expect(v.parse(showOutput, result)).toEqual(result);
 	expect(result).toMatchObject({ hasUnreadNote: false, pinnedNotes: [] });
 	expect(notes.packMany).toHaveBeenCalledWith([], expect.objectContaining({ id: 'user123' }));
 	channels.findOneBy.mockResolvedValue(null);
-	await expect(endpoint.exec({ channelId: channel.id }, null, null)).rejects.toMatchObject({ code: 'NO_SUCH_CHANNEL', id: '6f6c314b-7486-4897-8966-c04a66a02923' });
+	await expect(endpoint.execute({ channelId: channel.id }, null)).rejects.toMatchObject({ code: 'NO_SUCH_CHANNEL', data: { id: '6f6c314b-7486-4897-8966-c04a66a02923' } });
 });
 
-test('HTTP retains extra input/output keys and AJV errors while native strict output rejects extras', async () => {
+test('native show input strips transport keys and producer output rejects extra fields', async () => {
 	const { serializer } = fixture();
 	const result = { ...await serializer.pack(channel), future: true };
-	const params = { channelId: 'channel123', i: 'transport', future: true };
-	const endpoint = new ContractEndpoint({}, projectEndpointContract(showDefinition), async ps => { expect(ps).toBe(params); return result; });
-	expect(await endpoint.exec(params, null, null)).toBe(result);
 	expect(v.safeParse(showOutput, result).success).toBe(false);
-	expect(toLegacyJsonSchema(packedChannelSchema, { target: 'openapi-3.0', typeMode: 'output' })).toMatchObject({ additionalProperties: false, properties: { hasUnreadNote: { type: 'boolean' } } });
-	await expect(endpoint.exec({}, null, null)).rejects.toMatchObject({ code: 'INVALID_PARAM', id: '3d81ceae-475f-4600-b2a8-2bc116157532', info: { param: '#/required' } });
-	await expect(endpoint.exec({ channelId: 'bad-id' }, null, null)).rejects.toMatchObject({ code: 'INVALID_PARAM', info: { param: '#/properties/channelId/format' } });
-	const timelineParams = { channelId: 'channel123', future: true };
-	const timeline = new ContractEndpoint({}, projectEndpointContract(packedEndpointDefinitions['channels/timeline']), async () => []);
-	expect(await timeline.exec(timelineParams, null, null)).toEqual([]);
-	expect(timelineParams).toEqual({ channelId: 'channel123', future: true, limit: 10, allowPartial: false });
+	expect(v.parse(channelsShowInput, { channelId: channel.id, i: 'transport', future: true })).toEqual({ channelId: channel.id });
+	for (const input of [{}, { channelId: 'bad-id' }, []]) expect(v.safeParse(channelsShowInput, input).success).toBe(false);
+	expect(v.parse(timelineInput, { channelId: channel.id, future: true })).toEqual({ channelId: channel.id, limit: 10, allowPartial: false });
 });
 
 test('detailed Channel validates finite Notes/UserLite and dynamic reactions without parsing producer values', async () => {

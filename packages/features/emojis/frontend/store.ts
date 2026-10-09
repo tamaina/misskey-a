@@ -4,7 +4,7 @@
  */
 
 import { computed, markRaw, shallowRef, watch } from 'vue';
-import type { EmojiSimple } from '../contract/index.js';
+import type { EmojiSimple } from '../backend/api.schema.js';
 
 export type CustomEmojiStoreDependencies = {
 	now: () => number;

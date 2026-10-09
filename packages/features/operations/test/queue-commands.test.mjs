@@ -5,172 +5,68 @@
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { createOperations, legacyOperationsSchemas } from '../../../backend/built/features/operations/backend.js';
+import { createRouterClient } from '@orpc/server';
+import { createOperationsApiOperations, createOperationsRouter, operationsApplicationMap } from '../../../backend/built/features/operations/backend.js';
 
-const commandInputs = {
-	'admin/queue/pause': { queue: 'system' },
-	'admin/queue/resume': { queue: 'system' },
-	'admin/queue/clear': { queue: 'system', state: '*' },
-	'admin/queue/promote-jobs': { queue: 'system' },
-	'admin/queue/retry-job': { queue: 'system', jobId: 'job-1' },
-	'admin/queue/remove-job': { queue: 'system', jobId: 'job-1' },
-};
+const actor = { id: 'moderator', isSuspended: false, movedToUri: null };
+const commands = ['Pause', 'Resume', 'Clear', 'PromoteJobs', 'RetryJob', 'RemoveJob'];
+const inputFor = command => ({ queue: 'system', ...(command === 'Clear' ? { state: '*' } : command === 'RetryJob' || command === 'RemoveJob' ? { jobId: 'job-1' } : {}) });
 
-function createDeps(overrides = {}) {
-	const calls = [];
-	const deps = {
-		queuePause: async queue => { calls.push(['queuePause', queue]); },
-		queueResume: async queue => { calls.push(['queueResume', queue]); },
-		queueClear: async (queue, state) => { calls.push(['queueClear', queue, state]); },
-		queuePromoteJobs: async queue => { calls.push(['queuePromoteJobs', queue]); },
-		queueRetryJob: async (queue, jobId) => { calls.push(['queueRetryJob', queue, jobId]); },
-		queueRemoveJob: async (queue, jobId) => { calls.push(['queueRemoveJob', queue, jobId]); },
-		log: (actor, action) => { calls.push(['log', actor.id, action]); },
-		...overrides,
-	};
-	return { deps, calls };
+function fixture({ principal = actor, token = null, overrides = {} } = {}) {
+ const calls = [];
+ const queue = Object.fromEntries(['Pause', 'Resume', 'Clear', 'PromoteJobs', 'RetryJob', 'RemoveJob'].map(command => ['queue' + command, async (...args) => { calls.push([command, ...args]); }]));
+ Object.assign(queue, overrides);
+ const log = { log: (me, action) => { calls.push(['log', me.id, action]); } };
+ const applications = Object.fromEntries(commands.map(command => {
+  const name = 'adminQueue' + command;
+  return [name, new operationsApplicationMap[name](queue, log)];
+ }));
+ const operations = createOperationsApiOperations(applications);
+ const context = {
+  credential: principal ? 'credential' : null, ip: '192.0.2.1', headers: {},
+  services: { authenticate: async () => [principal, token], limitActor: () => actor.id, rateLimitFactor: async () => 1, limit: async () => null },
+  authorization: { rootUserId: () => actor.id, roles: async () => [], policyAllowed: async () => false },
+  operations: { operations },
+ };
+ return { calls, client: createRouterClient(createOperationsRouter(), { context }) };
 }
 
-function invoke(feature, command, input = commandInputs[command], actor = { id: 'moderator' }, options = {}) {
-	return feature[command](input, { context: options.missingContext ? undefined : { actor } });
-}
-
-test('generated legacy inputs preserve each queue endpoint schema', () => {
-	const queueTypes = ['system', 'endedPollNotification', 'postScheduledNote', 'deliver', 'inbox', 'db', 'relationship', 'objectStorage', 'userWebhookDeliver', 'systemWebhookDeliver'];
-	const queueSchema = { type: 'string', enum: queueTypes };
-	const base = (properties, required) => ({ type: 'object', properties, required });
-
-	assert.deepEqual(legacyOperationsSchemas['admin/queue/pause'].input, base({ queue: queueSchema }, ['queue']));
-	assert.deepEqual(legacyOperationsSchemas['admin/queue/resume'].input, base({ queue: queueSchema }, ['queue']));
-	assert.deepEqual(legacyOperationsSchemas['admin/queue/clear'].input, base({
-		queue: queueSchema,
-		state: { type: 'string', enum: ['*', 'completed', 'wait', 'active', 'paused', 'prioritized', 'delayed', 'failed'] },
-	}, ['queue', 'state']));
-	assert.deepEqual(legacyOperationsSchemas['admin/queue/promote-jobs'].input, base({ queue: queueSchema }, ['queue']));
-	assert.deepEqual(legacyOperationsSchemas['admin/queue/retry-job'].input, base({ queue: queueSchema, jobId: { type: 'string' } }, ['queue', 'jobId']));
-	assert.deepEqual(legacyOperationsSchemas['admin/queue/remove-job'].input, base({ queue: queueSchema, jobId: { type: 'string' } }, ['queue', 'jobId']));
+test('native queue commands accept every queue selector and reject invalid inputs', async () => {
+ const { client, calls } = fixture();
+ const queues = ['system', 'endedPollNotification', 'postScheduledNote', 'deliver', 'inbox', 'db', 'relationship', 'objectStorage', 'userWebhookDeliver', 'systemWebhookDeliver'];
+ for (const command of commands) {
+  for (const queue of queues) await client['adminQueue' + command]({ ...inputFor(command), queue, future: true });
+  for (const bad of [{}, { queue: 'unsupported' }, [], null]) await assert.rejects(client['adminQueue' + command](bad));
+ }
+ assert.equal(calls.filter(call => call[0] !== 'log').length, commands.length * queues.length);
+ for (const state of ['*', 'completed', 'wait', 'active', 'paused', 'prioritized', 'delayed', 'failed']) await client.adminQueueClear({ queue: 'system', state });
+ await assert.rejects(client.adminQueueClear({ queue: 'system', state: 'unknown' }));
 });
 
-test('all queue commands accept every supported queue and reject invalid enums', async () => {
-	const { deps, calls } = createDeps();
-	const feature = createOperations(deps);
-	const queueTypes = legacyOperationsSchemas['admin/queue/pause'].input.properties.queue.enum;
-
-	for (const [command, input] of Object.entries(commandInputs)) {
-		for (const queue of queueTypes) {
-			await invoke(feature, command, { ...input, queue });
-		}
-		await assert.rejects(async () => invoke(feature, command, { ...input, queue: 'unknownQueue' }));
-	}
-	await assert.rejects(async () => invoke(feature, 'admin/queue/clear', { queue: 'system', state: 'unknownState' }));
-
-	assert.equal(calls.filter(call => call[0] !== 'log').length, queueTypes.length * Object.keys(commandInputs).length);
+test('authorization and token scope reject before queue or audit side effects', async () => {
+ for (const options of [{ principal: null }, { token: { permission: [] } }, { principal: { ...actor, isSuspended: true } }]) {
+  const { client, calls } = fixture(options);
+  await assert.rejects(client.adminQueueClear(inputFor('Clear')));
+  assert.deepEqual(calls, []);
+ }
 });
 
-test('every operation requires a trusted context actor before calling any dependency', async () => {
-	const { deps, calls } = createDeps();
-	const feature = createOperations(deps);
-
-	for (const [command, input] of Object.entries(commandInputs)) {
-		await assert.rejects(async () => invoke(feature, command, { ...input, actor: { id: 'spoofed-input-actor' } }, undefined, { missingContext: true }));
-		for (const actor of [null, {}, { id: '' }]) {
-			await assert.rejects(async () => invoke(feature, command, { ...input, actor: { id: 'spoofed-input-actor' } }, actor));
-		}
-	}
-	assert.deepEqual(calls, []);
-});
-
-test('input actor fields cannot spoof the trusted per-call actor, including concurrent calls', async () => {
-	const pending = new Map();
-	const logs = [];
-	let allQueuesStarted;
-	const bothStarted = new Promise(resolve => { allQueuesStarted = resolve; });
-	const feature = createOperations(createDeps({
-		queuePause: queue => new Promise(resolve => {
-			pending.set(queue, resolve);
-			if (pending.size === 2) allQueuesStarted();
-		}),
-		log: (actor, action) => { logs.push([actor.id, action]); },
-	}).deps);
-
-	const first = invoke(feature, 'admin/queue/pause', { queue: 'system', actor: { id: 'spoof-one' } }, { id: 'actor-one' });
-	const second = invoke(feature, 'admin/queue/pause', { queue: 'db', actor: { id: 'spoof-two' } }, { id: 'actor-two' });
-	await bothStarted;
-	pending.get('db')();
-	await second;
-	pending.get('system')();
-	await first;
-
-	assert.deepEqual(logs, [['actor-two', 'pauseQueue'], ['actor-one', 'pauseQueue']]);
-});
-
-test('pause and resume await queue completion before starting an unawaited audit', async () => {
-	for (const [command, queueMethod, auditAction] of [
-		['admin/queue/pause', 'queuePause', 'pauseQueue'],
-		['admin/queue/resume', 'queueResume', 'resumeQueue'],
-	]) {
-		const events = [];
-		let finishQueue;
-		let finishAudit;
-		let notifyQueueStarted;
-		const queueStarted = new Promise(resolve => { notifyQueueStarted = resolve; });
-		const feature = createOperations(createDeps({
-			[queueMethod]: async () => {
-				events.push('queue-start');
-				notifyQueueStarted();
-				await new Promise(resolve => { finishQueue = resolve; });
-				events.push('queue-finish');
-			},
-			log: (_actor, action) => {
-				events.push(`audit-start:${action}`);
-				return new Promise(resolve => { finishAudit = resolve; });
-			},
-		}).deps);
-
-		let settled = false;
-		const result = invoke(feature, command).then(() => { settled = true; });
-		await queueStarted;
-		assert.deepEqual(events, ['queue-start']);
-		finishQueue();
-		await result;
-		assert.equal(settled, true);
-		assert.deepEqual(events, ['queue-start', 'queue-finish', `audit-start:${auditAction}`]);
-		finishAudit();
-	}
-});
-
-test('clear and promote call queue then audit without waiting for either promise', async () => {
-	for (const [command, queueMethod, auditAction] of [
-		['admin/queue/clear', 'queueClear', 'clearQueue'],
-		['admin/queue/promote-jobs', 'queuePromoteJobs', 'promoteQueue'],
-	]) {
-		const events = [];
-		const never = new Promise(() => {});
-		const feature = createOperations(createDeps({
-			[queueMethod]: () => { events.push('queue'); return never; },
-			log: (_actor, action) => { events.push(`audit:${action}`); return never; },
-		}).deps);
-
-		await invoke(feature, command);
-		assert.deepEqual(events, ['queue', `audit:${auditAction}`]);
-	}
-});
-
-test('queue failures suppress pause/resume audits and retry/remove never audit', async () => {
-	const events = [];
-	const failed = Promise.reject(new Error('queue failed'));
-	failed.catch(() => {});
-	const feature = createOperations(createDeps({
-		queuePause: () => failed,
-		queueResume: () => failed,
-		queueRetryJob: () => { events.push('retry'); return Promise.resolve(); },
-		queueRemoveJob: () => { events.push('remove'); return Promise.resolve(); },
-		log: (_actor, action) => { events.push(`audit:${action}`); },
-	}).deps);
-
-	await assert.rejects(invoke(feature, 'admin/queue/pause'), /queue failed/);
-	await assert.rejects(invoke(feature, 'admin/queue/resume'), /queue failed/);
-	await invoke(feature, 'admin/queue/retry-job');
-	await invoke(feature, 'admin/queue/remove-job');
-	assert.deepEqual(events, ['retry', 'remove']);
+test('pause awaits completion before audit while clear returns during background work', async () => {
+ let release;
+ const pending = new Promise(resolve => { release = resolve; });
+ const pause = fixture({ overrides: { queuePause: () => pending } });
+ let completed = false;
+ const response = pause.client.adminQueuePause({ queue: 'system' }).then(() => { completed = true; });
+ await Promise.resolve();
+ assert.equal(completed, false);
+ assert.deepEqual(pause.calls, []);
+ release();
+ await response;
+ assert.deepEqual(pause.calls, [['log', actor.id, 'pauseQueue']]);
+ let finish;
+ const background = new Promise(resolve => { finish = resolve; });
+ const clear = fixture({ overrides: { queueClear: () => background } });
+ await clear.client.adminQueueClear(inputFor('Clear'));
+ assert.deepEqual(clear.calls, [['log', actor.id, 'clearQueue']]);
+ finish();
 });

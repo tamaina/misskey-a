@@ -13,7 +13,7 @@ import { UtilityService } from '@features/federation/backend/services/UtilitySer
 import { bindThis } from '@features/runtime/backend/decorators.js';
 import { DI } from '@/di-symbols.js';
 import * as Acct from '@features/federation/backend/utility/acct.js';
-import type { Packed } from '@features/index/contract/packed.js';
+import type { Packed } from '@features/index/backend/packed.schema.js';
 import type { AntennasRepository, UserListMembershipsRepository } from '@features/persistence/backend/repositories/models.js';
 import type { MiAntenna } from '../models/Antenna.js';
 import type { MiNote } from '@features/notes/backend/models/Note.js';

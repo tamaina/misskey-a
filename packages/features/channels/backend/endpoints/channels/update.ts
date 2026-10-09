@@ -3,52 +3,32 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { packedChannelsUpdateDefinition, packedChannelsUpdateInput, packedChannelsUpdateOutput } from '../../../contract/packed-endpoint-definitions.js';
+import { implement } from '@orpc/server';
 import { Inject, Injectable } from '@nestjs/common';
+import { RoleService } from '@features/roles/backend/services/RoleService.js';
+import * as v from 'valibot';
+import { DI } from '@/di-symbols.js';
+import { authentication, apiPolicy, requirePrincipal } from '../../../../api/backend/transport/middleware.js';
+import { ChannelEntityService } from '../../serializers/ChannelEntityService.js';
+import { apiError } from '../../../../api/backend/transport/orpc-error.js';
+import { channelsUpdateContract, channelsUpdatePolicy, channelsUpdateInput, channelsUpdateOutput, channelsUpdateErrors } from './update.contract.js';
+import type { ApiActor } from '../../../../api/backend/transport/context.js';
+import type { ChannelsApiContext } from '../../operations.js';
 
 import type { DriveFilesRepository, ChannelsRepository } from '@features/persistence/backend/repositories/models.js';
-import { ChannelEntityService } from '../../serializers/ChannelEntityService.js';
-import { DI } from '@/di-symbols.js';
-import { RoleService } from '@features/roles/backend/services/RoleService.js';
-import { ApiError } from '@features/api/backend/transport/error.js';
 
-const contractProjection = projectEndpointContract(packedChannelsUpdateDefinition);
+import type { MiLocalUser } from '../../../../users/backend/models/User.js';
 
-export const meta = {
-	tags: ['channels'],
-
-	requireCredential: true,
-
-	kind: 'write:channels',
-
-	res: contractProjection.response,
-
-	errors: {
-		noSuchChannel: {
-			message: 'No such channel.',
-			code: 'NO_SUCH_CHANNEL',
-			id: 'f9c5467f-d492-4c3c-9a8d-a70dacc86512',
-		},
-
-		accessDenied: {
-			message: 'You do not have edit privilege of the channel.',
-			code: 'ACCESS_DENIED',
-			id: '1fb7cb09-d46a-4fdf-b8df-057788cce513',
-		},
-
-		noSuchFile: {
-			message: 'No such file.',
-			code: 'NO_SUCH_FILE',
-			id: 'e86c14a4-0da2-4032-8df3-e737a04c7f3b',
-		},
-	},
-} as const;
-
-export const paramDef = contractProjection.input;
+export function createChannelsUpdateProcedure<Actor extends ApiActor>() {
+	return implement(channelsUpdateContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ChannelsApiContext<Actor>>()
+		.use(authentication<Actor>())
+		.use(apiPolicy<Actor>(channelsUpdatePolicy))
+		.use(requirePrincipal<Actor>())
+		.handler(({ input, context }) => context.operations.channels.channelsUpdate(input, context.principal));
+}
 
 @Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedChannelsUpdateInput, typeof packedChannelsUpdateOutput> {
+export class ChannelsUpdateOperation {
 	constructor(
 		@Inject(DI.channelsRepository)
 		private channelsRepository: ChannelsRepository,
@@ -59,48 +39,51 @@ export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof
 		private channelEntityService: ChannelEntityService,
 
 		private roleService: RoleService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			const channel = await this.channelsRepository.findOneBy({
-				id: ps.channelId,
-			});
+	) {}
+	async execute(ps: v.InferOutput<typeof channelsUpdateInput>, me: MiLocalUser): Promise<v.InferOutput<typeof channelsUpdateOutput>> {
+		return v.parse(channelsUpdateOutput, await this.run(ps, me));
+	}
 
-			if (channel == null) {
-				throw new ApiError(meta.errors.noSuchChannel);
-			}
-
-			const iAmModerator = await this.roleService.isModerator(me);
-			if (channel.userId !== me.id && !iAmModerator) {
-				throw new ApiError(meta.errors.accessDenied);
-			}
-
-			// eslint:disable-next-line:no-unnecessary-initializer
-			let banner = undefined;
-			if (ps.bannerId != null) {
-				banner = await this.driveFilesRepository.findOneBy({
-					id: ps.bannerId,
-					userId: me.id,
-				});
-
-				if (banner == null) {
-					throw new ApiError(meta.errors.noSuchFile);
-				}
-			} else if (ps.bannerId === null) {
-				banner = null;
-			}
-
-			await this.channelsRepository.update(channel.id, {
-				...(ps.name !== undefined ? { name: ps.name } : {}),
-				...(ps.description !== undefined ? { description: ps.description } : {}),
-				...(ps.pinnedNoteIds !== undefined ? { pinnedNoteIds: ps.pinnedNoteIds } : {}),
-				...(ps.color !== undefined ? { color: ps.color } : {}),
-				...(typeof ps.isArchived === 'boolean' ? { isArchived: ps.isArchived } : {}),
-				...(banner ? { bannerId: banner.id } : {}),
-				...(typeof ps.isSensitive === 'boolean' ? { isSensitive: ps.isSensitive } : {}),
-				...(typeof ps.allowRenoteToExternal === 'boolean' ? { allowRenoteToExternal: ps.allowRenoteToExternal } : {}),
-			});
-
-			return await this.channelEntityService.pack(channel.id, me);
+	private async run(ps: v.InferOutput<typeof channelsUpdateInput>, me: MiLocalUser) {
+		const channel = await this.channelsRepository.findOneBy({
+			id: ps.channelId,
 		});
+
+		if (channel == null) {
+			throw apiError(channelsUpdateErrors.noSuchChannel);
+		}
+
+		const iAmModerator = await this.roleService.isModerator(me);
+		if (channel.userId !== me.id && !iAmModerator) {
+			throw apiError(channelsUpdateErrors.accessDenied);
+		}
+
+		// eslint:disable-next-line:no-unnecessary-initializer
+		let banner = undefined;
+		if (ps.bannerId != null) {
+			banner = await this.driveFilesRepository.findOneBy({
+				id: ps.bannerId,
+				userId: me.id,
+			});
+
+			if (banner == null) {
+				throw apiError(channelsUpdateErrors.noSuchFile);
+			}
+		} else if (ps.bannerId === null) {
+			banner = null;
+		}
+
+		await this.channelsRepository.update(channel.id, {
+			...(ps.name !== undefined ? { name: ps.name } : {}),
+			...(ps.description !== undefined ? { description: ps.description } : {}),
+			...(ps.pinnedNoteIds !== undefined ? { pinnedNoteIds: ps.pinnedNoteIds } : {}),
+			...(ps.color !== undefined ? { color: ps.color } : {}),
+			...(typeof ps.isArchived === 'boolean' ? { isArchived: ps.isArchived } : {}),
+			...(banner ? { bannerId: banner.id } : {}),
+			...(typeof ps.isSensitive === 'boolean' ? { isSensitive: ps.isSensitive } : {}),
+			...(typeof ps.allowRenoteToExternal === 'boolean' ? { allowRenoteToExternal: ps.allowRenoteToExternal } : {}),
+		});
+
+		return await this.channelEntityService.pack(channel.id, me);
 	}
 }

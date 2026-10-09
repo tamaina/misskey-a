@@ -24,7 +24,53 @@ import { relationshipsContract } from '../../relationships/backend/endpoints/rel
 
 import { collectionsContract } from '../../collections/backend/api.contract.js';
 
+import { chatApiContract } from '../../chat/backend/api.contract.js';
+
+import { channelsApiContract } from '../../channels/backend/api.contract.js';
+
+import { pagesContract } from '../../pages/backend/endpoints/pages.contract.js';
+
+import { playContract } from '../../play/backend/endpoints/play.contract.js';
+
+import { gamesContract } from '../../games/backend/endpoints/games.contract.js';
+
+import { federationContract } from '../../federation/backend/api.contract.js';
+
+import { operationsApiContract } from '../../operations/backend/api.contract.js';
+
+import { integrationsContract } from '../../integrations/backend/api.contract.js';
+
+import { testContract } from '../../api/backend/endpoints/test.contract.js';
+
+import { driveManagementContract } from '../../drive/backend/management.contract.js';
+
+import { portabilityApiContract } from '../../portability/backend/api.contract.js';
+
+import { authContract } from '../../auth/backend/api.contract.js';
+
+import { moderationContract } from '../../moderation/backend/api.contract.js';
+
+import { rolesContract } from '../../roles/backend/api.contract.js';
+
+import { clearBrowserCacheContract, clearBrowserCacheGetContract } from '../../api/backend/endpoints/clear-browser-cache.contract.js';
+
 export const pilotContract: {
+	clearBrowserCache: typeof clearBrowserCacheContract;
+	clearBrowserCacheGet: typeof clearBrowserCacheGetContract;
+	chat: typeof chatApiContract;
+	channels: typeof channelsApiContract;
+	pages: typeof pagesContract;
+	play: typeof playContract;
+	games: typeof gamesContract;
+	federation: typeof federationContract;
+	operations: typeof operationsApiContract;
+	integrations: typeof integrationsContract;
+	test: typeof testContract;
+	driveManagement: typeof driveManagementContract;
+	portability: typeof portabilityApiContract;
+	auth: typeof authContract;
+	moderation: typeof moderationContract;
+	roles: typeof rolesContract;
 	instance: typeof instanceApiContract;
 	statistics: typeof statisticsContract;
 	discovery: typeof discoveryContract;
@@ -41,6 +87,22 @@ export const pilotContract: {
 	collections: typeof collectionsContract;
 	drive: typeof drivePilotContract;
 } = {
+	clearBrowserCache: clearBrowserCacheContract,
+	clearBrowserCacheGet: clearBrowserCacheGetContract,
+	chat: chatApiContract,
+	channels: channelsApiContract,
+	pages: pagesContract,
+	play: playContract,
+	games: gamesContract,
+	federation: federationContract,
+	operations: operationsApiContract,
+	integrations: integrationsContract,
+	test: testContract,
+	driveManagement: driveManagementContract,
+	portability: portabilityApiContract,
+	auth: authContract,
+	moderation: moderationContract,
+	roles: rolesContract,
 	instance: instanceApiContract,
 	statistics: statisticsContract,
 	discovery: discoveryContract,

@@ -3,24 +3,14 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { portabilityContract } from '../../../contract/index.js';
-import ms from 'ms';
-import { legacyPortabilitySchemas } from '@features/portability/backend';
-import type { Schema } from '@features/api/backend/utility/json-schema.js';
-import { createContractTransportEndpoint } from '@features/api/backend/transport/contract-transport-endpoint.js';
-import { defineFeatureEndpoint } from '@features/api/backend/transport/feature-endpoint.js';
+import { implement } from '@orpc/server';
+import { authentication, apiPolicy, requirePrincipal } from '../../../../api/backend/transport/middleware.js';
+import { iExportMuteContract } from './export-mute.contract.js';
+import type { ApiActor } from '../../../../api/backend/transport/context.js';
+import type { PortabilityContext } from '../../api.router.js';
 
-export const meta = {
-	secure: true,
-	requireCredential: true,
-	limit: {
-		duration: ms('1hour'),
-		max: 1,
-	},
-} as const;
-
-export const paramDef = legacyPortabilitySchemas['i/export-mute'].input as Schema;
-
-export const { feature, createEndpoint } = defineFeatureEndpoint('portability', portability => createContractTransportEndpoint(meta, paramDef, portabilityContract['i/export-mute'], async (params, user) => portability['i/export-mute'](params, {
-	context: { actor: { id: user.id } },
-})));
+export function createIExportMuteProcedure<Actor extends ApiActor>() {
+	return implement(iExportMuteContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<PortabilityContext<Actor>>()
+		.use(authentication<Actor>()).use(apiPolicy<Actor>({ 'name': 'i/export-mute', 'requireCredential': true, 'secure': true, 'limit': { 'duration': 3600000, 'max': 1 } })).use(requirePrincipal<Actor>())
+		.handler(({ input, context }) => context.operations.portability['i/export-mute'](input, context.principal));
+}

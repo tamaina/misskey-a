@@ -9,7 +9,8 @@ import { endpointContract } from './endpoints/endpoint.contract.js';
 import { serverInfoContract } from './endpoints/server-info.contract.js';
 import { createServerInfoService } from './server-info.js';
 import { createGetOnlineUsersCount } from './get-online-users-count.js';
-import type { InstanceEndpoints } from '../contract/index.js';
+import type { serverInfoOutput } from './endpoints/server-info.contract.js';
+import type * as v from 'valibot';
 import type { OnlineUsersCountDependencies } from './get-online-users-count.js';
 
 /** The clock is a narrow dependency and can be replaced without a container. */
@@ -19,7 +20,7 @@ export function createPing(now: () => number = Date.now) {
 
 export interface ServerInfoDependencies {
 	enabled(): boolean;
-	read(): Promise<InstanceEndpoints['server-info']['res']>;
+	read(): Promise<v.InferOutput<typeof serverInfoOutput>>;
 }
 
 export interface EndpointDescriptor {

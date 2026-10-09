@@ -6,12 +6,12 @@
 import { expect, test } from 'vitest';
 import * as v from 'valibot';
 import { mockDeep } from 'vitest-mock-extended';
-import { inlineIRegistryScopesWithDomainInput as input, inlineIRegistryScopesWithDomainOutput as output, inlineIRegistryScopesWithDomainDefinition as definition } from '../../contract/endpoint-definitions.js';
-import { remainingIRegistryGetDetailOutput as detailOutput, remainingIRegistryKeysInput as keysInput } from '../../contract/remaining-inline-endpoint-definitions.js';
+import { registryScopesWithDomainInput as input, registryScopesWithDomainOutput as output } from '../../backend/endpoints/i/registry/scopes-with-domain.contract.js';
+import { registryGetDetailOutput as detailOutput } from '../../backend/endpoints/i/registry/get-detail.contract.js';
+import { registryKeysInput as keysInput } from '../../backend/endpoints/i/registry/keys.contract.js';
 import { MiRegistryItem } from '../../backend/models/RegistryItem.js';
 import { RegistryApiService } from '../../backend/services/RegistryApiService.js';
 import type { RegistryItemsRepository } from '@features/persistence/backend/repositories/models.js';
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
 
 const item = { domain: null, scopes: [['client']] };
 
@@ -37,10 +37,10 @@ test('real registry scope producer deduplicates scopes with explicit domain and 
 	expect(v.parse(output, result)).toEqual(result);
 });
 
-test('HTTP retains open request and unparsed response identities', async () => {
-	const request = { i: 'token', future: true };
-	const response = [{ ...item, future: true }];
-	const endpoint = new ContractEndpoint({}, projectEndpointContract(definition), async ps => { expect(ps).toBe(request); return response; });
-	expect(await endpoint.exec(request, null, null)).toBe(response);
-	expect(v.safeParse(output, response).success).toBe(false);
+test('native registry requests require objects and preserve only supported fields', () => {
+ for (const value of [null, [], 1, 'registry']) expect(v.safeParse(input, value).success).toBe(false);
+ expect(v.parse(keysInput, { scope: ['client'], domain: null, future: true })).toEqual({ scope: ['client'], domain: null });
+ const value: unknown = JSON.parse('{"__proto__":{"nested":null},"constructor":[1,true],"prototype":"saved"}');
+ expect(v.parse(detailOutput, { updatedAt: 'date', value })).toEqual({ updatedAt: 'date', value });
+ for (const invalid of [new Date(), new Map(), { invalid: undefined }]) expect(v.safeParse(detailOutput, { updatedAt: 'date', value: invalid }).success).toBe(false);
 });

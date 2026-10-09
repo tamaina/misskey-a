@@ -5,18 +5,17 @@
 
 import bcrypt from 'bcryptjs';
 import { Inject, Injectable } from '@nestjs/common';
-import { projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { inlineI2faKeyDoneDefinition } from '../../../../contract/endpoint-definitions.js';
-import { LegacyWebAuthnRegistrationConsumerEndpoint } from '../../../legacy-webauthn-registration-consumer-endpoint.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import { DI } from '@/di-symbols.js';
 import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
 import type { UserProfilesRepository, UserSecurityKeysRepository } from '@features/persistence/backend/repositories/models.js';
 import { WebAuthnService } from '../../../services/WebAuthnService.js';
-import { ApiError } from '@features/api/backend/transport/error.js';
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
 import { UserAuthService } from '../../../services/UserAuthService.js';
 
-const contractProjection = projectEndpointContract(inlineI2faKeyDoneDefinition);
+import * as v from 'valibot';
+import { inlineI2faKeyDoneInput } from '../../../auth.schema.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
 
 export const meta = {
 	requireCredential: true,
@@ -36,15 +35,10 @@ export const meta = {
 			id: '798d6847-b1ed-4f9c-b1f9-163c42655995',
 		},
 	},
-
-	res: { ...contractProjection.response, nullable: false, optional: false },
 } as const;
 
-export const paramDef = contractProjection.input;
-
-// eslint-disable-next-line import/no-default-export
 @Injectable()
-export class EndpointImplementation extends LegacyWebAuthnRegistrationConsumerEndpoint<typeof meta> {
+export class I2faKeyDoneOperation {
 	constructor(
 		@Inject(DI.userProfilesRepository)
 		private userProfilesRepository: UserProfilesRepository,
@@ -56,55 +50,55 @@ export class EndpointImplementation extends LegacyWebAuthnRegistrationConsumerEn
 		private userAuthService: UserAuthService,
 		private userEntityService: UserEntityService,
 		private globalEventService: GlobalEventService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			const token = ps.token;
-			const profile = await this.userProfilesRepository.findOneByOrFail({ userId: me.id });
+	) {}
 
-			if (profile.twoFactorEnabled) {
-				if (token == null) {
-					throw new Error('authentication failed');
-				}
+	async execute(ps: v.InferOutput<typeof inlineI2faKeyDoneInput>, me: MiLocalUser) {
+		const token = ps.token;
+		const profile = await this.userProfilesRepository.findOneByOrFail({ userId: me.id });
 
-				try {
-					await this.userAuthService.twoFactorAuthenticate(profile, token);
-				} catch (_) {
-					throw new Error('authentication failed');
-				}
+		if (profile.twoFactorEnabled) {
+			if (token == null) {
+				throw new Error('authentication failed');
 			}
 
-			const passwordMatched = await bcrypt.compare(ps.password, profile.password ?? '');
-			if (!passwordMatched) {
-				throw new ApiError(meta.errors.incorrectPassword);
+			try {
+				await this.userAuthService.twoFactorAuthenticate(profile, token);
+			} catch (_) {
+				throw new Error('authentication failed');
 			}
+		}
 
-			if (!profile.twoFactorEnabled) {
-				throw new ApiError(meta.errors.twoFactorNotEnabled);
-			}
+		const passwordMatched = await bcrypt.compare(ps.password, profile.password ?? '');
+		if (!passwordMatched) {
+			throw apiError(meta.errors.incorrectPassword);
+		}
 
-			const keyInfo = await this.webAuthnService.verifyRegistration(me.id, ps.credential);
-			const keyId = keyInfo.credentialID;
+		if (!profile.twoFactorEnabled) {
+			throw apiError(meta.errors.twoFactorNotEnabled);
+		}
 
-			await this.userSecurityKeysRepository.insert({
-				id: keyId,
-				userId: me.id,
-				name: ps.name,
-				publicKey: Buffer.from(keyInfo.credentialPublicKey).toString('base64url'),
-				counter: keyInfo.counter,
-				credentialDeviceType: keyInfo.credentialDeviceType,
-				credentialBackedUp: keyInfo.credentialBackedUp,
-				transports: keyInfo.transports,
-			});
+		const keyInfo = await this.webAuthnService.verifyRegistration(me.id, ps.credential);
+		const keyId = keyInfo.credentialID;
 
-			// Publish meUpdated event
-			this.globalEventService.publishMainStream(me.id, 'meUpdated', await this.userEntityService.packSelf(me.id, {
-				includeSecrets: true,
-			}));
-
-			return {
-				id: keyId,
-				name: ps.name,
-			};
+		await this.userSecurityKeysRepository.insert({
+			id: keyId,
+			userId: me.id,
+			name: ps.name,
+			publicKey: Buffer.from(keyInfo.credentialPublicKey).toString('base64url'),
+			counter: keyInfo.counter,
+			credentialDeviceType: keyInfo.credentialDeviceType,
+			credentialBackedUp: keyInfo.credentialBackedUp,
+			transports: keyInfo.transports,
 		});
+
+		// Publish meUpdated event
+		this.globalEventService.publishMainStream(me.id, 'meUpdated', await this.userEntityService.packSelf(me.id, {
+			includeSecrets: true,
+		}));
+
+		return {
+			id: keyId,
+			name: ps.name,
+		};
 	}
 }

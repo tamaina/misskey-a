@@ -3,79 +3,16 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { voidAdminFederationUpdateInstanceDefinition, voidAdminFederationUpdateInstanceInput, voidAdminFederationUpdateInstanceOutput } from '../../../../contract/void-endpoint-definitions.js';
-import { Inject, Injectable } from '@nestjs/common';
+import { implement } from '@orpc/server';
+import { authentication, apiPolicy, requirePrincipal } from '../../../../../api/backend/transport/middleware.js';
+import type { ApiActor } from '../../../../../api/backend/transport/context.js';
+import type { FederationContext } from '../../../operations.js';
+import { adminFederationUpdateInstanceContract } from './update-instance.contract.js';
 
-import type { InstancesRepository } from '@features/persistence/backend/repositories/models.js';
-import { UtilityService } from '../../../services/UtilityService.js';
-import { DI } from '@/di-symbols.js';
-import { FederatedInstanceService } from '../../../services/FederatedInstanceService.js';
-import { ModerationLogService } from '@features/moderation/backend/services/ModerationLogService.js';
-
-const contractProjection = projectEndpointContract(voidAdminFederationUpdateInstanceDefinition);
-
-export const meta = {
-	tags: ['admin'],
-
-	requireCredential: true,
-	requireModerator: true,
-	kind: 'write:admin:federation',
-} as const;
-
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof voidAdminFederationUpdateInstanceInput, typeof voidAdminFederationUpdateInstanceOutput> {
-	constructor(
-		@Inject(DI.instancesRepository)
-		private instancesRepository: InstancesRepository,
-
-		private utilityService: UtilityService,
-		private federatedInstanceService: FederatedInstanceService,
-		private moderationLogService: ModerationLogService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			const instance = await this.instancesRepository.findOneBy({ host: this.utilityService.toPuny(ps.host) });
-
-			if (instance == null) {
-				throw new Error('instance not found');
-			}
-
-			const isSuspendedBefore = instance.suspensionState !== 'none';
-			let suspensionState: undefined | 'manuallySuspended' | 'none';
-
-			if (ps.isSuspended != null && isSuspendedBefore !== ps.isSuspended) {
-				suspensionState = ps.isSuspended ? 'manuallySuspended' : 'none';
-			}
-
-			await this.federatedInstanceService.update(instance.id, {
-				suspensionState,
-				moderationNote: ps.moderationNote,
-			});
-
-			if (ps.isSuspended != null && isSuspendedBefore !== ps.isSuspended) {
-				if (ps.isSuspended) {
-					this.moderationLogService.log(me, 'suspendRemoteInstance', {
-						id: instance.id,
-						host: instance.host,
-					});
-				} else {
-					this.moderationLogService.log(me, 'unsuspendRemoteInstance', {
-						id: instance.id,
-						host: instance.host,
-					});
-				}
-			}
-
-			if (ps.moderationNote != null && instance.moderationNote !== ps.moderationNote) {
-				this.moderationLogService.log(me, 'updateRemoteInstanceNote', {
-					id: instance.id,
-					host: instance.host,
-					before: instance.moderationNote,
-					after: ps.moderationNote,
-				});
-			}
-		});
-	}
+export function createAdminFederationUpdateInstanceProcedure<Actor extends ApiActor>() {
+	return implement(adminFederationUpdateInstanceContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<FederationContext<Actor>>()
+		.use(authentication<Actor>())
+		.use(apiPolicy<Actor>({ name: 'admin/federation/update-instance', requireCredential: true, requireModerator: true, kind: 'write:admin:federation' }))
+		.use(requirePrincipal<Actor>())
+		.handler(({ input, context }) => context.operations.federation.adminFederationUpdateInstance(input, context.principal));
 }

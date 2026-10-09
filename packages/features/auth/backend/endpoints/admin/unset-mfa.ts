@@ -3,12 +3,10 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { voidAdminUnsetMfaDefinition, voidAdminUnsetMfaInput, voidAdminUnsetMfaOutput } from '../../../contract/void-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
 import { DataSource } from 'typeorm';
 
-import { ApiError } from '@features/api/backend/transport/error.js';
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
 import { MiUserProfile } from '@features/users/backend/models/UserProfile.js';
 import { MiUserSecurityKey } from '../../models/UserSecurityKey.js';
 import type { UsersRepository } from '@features/persistence/backend/repositories/models.js';
@@ -16,7 +14,9 @@ import { DI } from '@/di-symbols.js';
 import { RoleService } from '@features/roles/backend/services/RoleService.js';
 import { ModerationLogService } from '@features/moderation/backend/services/ModerationLogService.js';
 
-const contractProjection = projectEndpointContract(voidAdminUnsetMfaDefinition);
+import * as v from 'valibot';
+import { voidAdminUnsetMfaInput } from '../../auth.schema.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
 
 export const meta = {
 	tags: ['admin'],
@@ -39,10 +39,8 @@ export const meta = {
 	},
 } as const;
 
-export const paramDef = contractProjection.input;
-
 @Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof voidAdminUnsetMfaInput, typeof voidAdminUnsetMfaOutput> {
+export class AdminUnsetMfaOperation {
 	constructor(
 		@Inject(DI.db)
 		private db: DataSource,
@@ -52,35 +50,35 @@ export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof
 
 		private roleService: RoleService,
 		private moderationLogService: ModerationLogService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			const user = await this.usersRepository.findOneBy({ id: ps.userId });
+	) {}
 
-			if (user == null) {
-				throw new ApiError(meta.errors.noSuchUser);
-			}
+	async execute(ps: v.InferOutput<typeof voidAdminUnsetMfaInput>, me: MiLocalUser) {
+		const user = await this.usersRepository.findOneBy({ id: ps.userId });
 
-			if (await this.roleService.isAdministrator(user) && me.id !== user.id) {
-				throw new ApiError(meta.errors.accessDenied);
-			}
+		if (user == null) {
+			throw apiError(meta.errors.noSuchUser);
+		}
 
-			await this.db.transaction(async (transactionalEntityManager) => {
-				// パスキーを全て削除
-				await transactionalEntityManager.delete(MiUserSecurityKey, { userId: user.id });
+		if (await this.roleService.isAdministrator(user) && me.id !== user.id) {
+			throw apiError(meta.errors.accessDenied);
+		}
 
-				// TOTP・パスワードレスログインを無効化
-				await transactionalEntityManager.update(MiUserProfile, { userId: user.id }, {
-					twoFactorSecret: null,
-					twoFactorBackupSecret: null,
-					twoFactorEnabled: false,
-					usePasswordLessLogin: false,
-				});
-			}).then(() => {
-				this.moderationLogService.log(me, 'unsetMfa', {
-					userId: user.id,
-					userUsername: user.username,
-					userHost: user.host,
-				});
+		await this.db.transaction(async (transactionalEntityManager) => {
+			// パスキーを全て削除
+			await transactionalEntityManager.delete(MiUserSecurityKey, { userId: user.id });
+
+			// TOTP・パスワードレスログインを無効化
+			await transactionalEntityManager.update(MiUserProfile, { userId: user.id }, {
+				twoFactorSecret: null,
+				twoFactorBackupSecret: null,
+				twoFactorEnabled: false,
+				usePasswordLessLogin: false,
+			});
+		}).then(() => {
+			this.moderationLogService.log(me, 'unsetMfa', {
+				userId: user.id,
+				userUsername: user.username,
+				userHost: user.host,
 			});
 		});
 	}

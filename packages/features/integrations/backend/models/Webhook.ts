@@ -6,11 +6,11 @@
 import { PrimaryColumn, Entity, Index, JoinColumn, Column, ManyToOne } from 'typeorm';
 import { id } from '@features/persistence/backend/models/util/id.js';
 import { MiUser } from '@features/users/backend/models/User.js';
-import { webhookEventTypes } from '@features/integrations/contract';
-import type { WebhookEventTypes } from '@features/integrations/contract';
+import { webhookEventTypes } from '../webhook-events.schema.js';
+import type { WebhookEventTypes } from '../webhook-events.schema.js';
 
-export { webhookEventTypes } from '@features/integrations/contract';
-export type { WebhookEventTypes } from '@features/integrations/contract';
+export { webhookEventTypes } from '../webhook-events.schema.js';
+export type { WebhookEventTypes } from '../webhook-events.schema.js';
 
 @Entity('webhook')
 export class MiWebhook {

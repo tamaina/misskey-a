@@ -3,65 +3,59 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { packedChatMessagesRoomTimelineDefinition, packedChatMessagesRoomTimelineInput, packedChatMessagesRoomTimelineOutput } from '../../../../contract/packed-endpoint-definitions.js';
+import { implement } from '@orpc/server';
 import { Inject, Injectable } from '@nestjs/common';
-
+import { IdService } from '@features/runtime/backend/services/IdService.js';
+import * as v from 'valibot';
 import { DI } from '@/di-symbols.js';
+import { authentication, apiPolicy, requirePrincipal } from '../../../../../api/backend/transport/middleware.js';
 import { ChatService } from '../../../services/ChatService.js';
 import { ChatEntityService } from '../../../serializers/ChatEntityService.js';
-import { ApiError } from '@features/api/backend/transport/error.js';
-import { IdService } from '@features/runtime/backend/services/IdService.js';
+import { apiError } from '../../../../../api/backend/transport/orpc-error.js';
+import { chatMessagesRoomTimelineContract, chatMessagesRoomTimelinePolicy, chatMessagesRoomTimelineInput, chatMessagesRoomTimelineOutput, chatMessagesRoomTimelineErrors } from './room-timeline.contract.js';
+import type { ApiActor } from '../../../../../api/backend/transport/context.js';
+import type { ChatApiContext } from '../../../operations.js';
 
-const contractProjection = projectEndpointContract(packedChatMessagesRoomTimelineDefinition);
+import type { MiLocalUser } from '../../../../../users/backend/models/User.js';
 
-export const meta = {
-	tags: ['chat'],
-
-	requireCredential: true,
-
-	kind: 'read:chat',
-
-	res: contractProjection.response,
-
-	errors: {
-		noSuchRoom: {
-			message: 'No such room.',
-			code: 'NO_SUCH_ROOM',
-			id: 'c4d9f88c-9270-4632-b032-6ed8cee36f7f',
-		},
-	},
-} as const;
-
-export const paramDef = contractProjection.input;
+export function createChatMessagesRoomTimelineProcedure<Actor extends ApiActor>() {
+	return implement(chatMessagesRoomTimelineContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ChatApiContext<Actor>>()
+		.use(authentication<Actor>())
+		.use(apiPolicy<Actor>(chatMessagesRoomTimelinePolicy))
+		.use(requirePrincipal<Actor>())
+		.handler(({ input, context }) => context.operations.chat.chatMessagesRoomTimeline(input, context.principal));
+}
 
 @Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedChatMessagesRoomTimelineInput, typeof packedChatMessagesRoomTimelineOutput> {
+export class ChatMessagesRoomTimelineOperation {
 	constructor(
 		private chatEntityService: ChatEntityService,
 		private chatService: ChatService,
 		private idService: IdService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			const untilId = ps.untilId ?? (ps.untilDate ? this.idService.gen(ps.untilDate!) : null);
-			const sinceId = ps.sinceId ?? (ps.sinceDate ? this.idService.gen(ps.sinceDate!) : null);
+	) {}
+	async execute(ps: v.InferOutput<typeof chatMessagesRoomTimelineInput>, me: MiLocalUser): Promise<v.InferOutput<typeof chatMessagesRoomTimelineOutput>> {
+		return v.parse(chatMessagesRoomTimelineOutput, await this.run(ps, me));
+	}
 
-			await this.chatService.checkChatAvailability(me.id, 'read');
+	private async run(ps: v.InferOutput<typeof chatMessagesRoomTimelineInput>, me: MiLocalUser) {
+		const untilId = ps.untilId ?? (ps.untilDate ? this.idService.gen(ps.untilDate!) : null);
+		const sinceId = ps.sinceId ?? (ps.sinceDate ? this.idService.gen(ps.sinceDate!) : null);
 
-			const room = await this.chatService.findRoomById(ps.roomId);
-			if (room == null) {
-				throw new ApiError(meta.errors.noSuchRoom);
-			}
+		await this.chatService.checkChatAvailability(me.id, 'read');
 
-			if (!await this.chatService.hasPermissionToViewRoomTimeline(me.id, room)) {
-				throw new ApiError(meta.errors.noSuchRoom);
-			}
+		const room = await this.chatService.findRoomById(ps.roomId);
+		if (room == null) {
+			throw apiError(chatMessagesRoomTimelineErrors.noSuchRoom);
+		}
 
-			const messages = await this.chatService.roomTimeline(room.id, ps.limit, sinceId, untilId);
+		if (!await this.chatService.hasPermissionToViewRoomTimeline(me.id, room)) {
+			throw apiError(chatMessagesRoomTimelineErrors.noSuchRoom);
+		}
 
-			this.chatService.readRoomChatMessage(me.id, room.id);
+		const messages = await this.chatService.roomTimeline(room.id, ps.limit, sinceId, untilId);
 
-			return await this.chatEntityService.packMessagesLiteForRoom(messages);
-		});
+		this.chatService.readRoomChatMessage(me.id, room.id);
+
+		return await this.chatEntityService.packMessagesLiteForRoom(messages);
 	}
 }

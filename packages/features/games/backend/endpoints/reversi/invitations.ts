@@ -3,35 +3,16 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Inject, Injectable } from '@nestjs/common';
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { emptyReversiInvitationsDefinition, emptyReversiInvitationsInput, emptyReversiInvitationsOutput } from '../../../contract/empty-input-endpoint-definitions.js';
-import { DI } from '@/di-symbols.js';
-import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
-import { ReversiService } from '../../services/ReversiService.js';
+import { implement } from '@orpc/server';
+import { authentication, apiPolicy, requirePrincipal } from '../../../../api/backend/transport/middleware.js';
+import type { ApiActor } from '../../../../api/backend/transport/context.js';
+import type { GamesContext } from '../../operations.js';
+import { reversiInvitationsContract } from './invitations.contract.js';
 
-const contractProjection = projectEndpointContract(emptyReversiInvitationsDefinition);
-
-export const meta = {
-	requireCredential: true,
-
-	kind: 'read:account',
-
-	res: contractProjection.response,
-} as const;
-
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof emptyReversiInvitationsInput, typeof emptyReversiInvitationsOutput> {
-	constructor(
-		private userEntityService: UserEntityService,
-		private reversiService: ReversiService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			const invitations = await this.reversiService.getInvitations(me);
-
-			return await this.userEntityService.packMany(invitations, me);
-		});
-	}
+export function createReversiInvitationsProcedure<Actor extends ApiActor>() {
+	return implement(reversiInvitationsContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<GamesContext<Actor>>()
+		.use(authentication<Actor>())
+		.use(apiPolicy<Actor>({ name: 'reversi/invitations', requireCredential: true, kind: 'read:account' }))
+		.use(requirePrincipal<Actor>())
+		.handler(({ input, context }) => context.operations.games.reversiInvitations(input, context.principal));
 }

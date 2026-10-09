@@ -4,7 +4,7 @@
  */
 
 import * as v from 'valibot';
-import { packedUserLiteSchema, packedUserDetailedNotMeSchema, packedMeDetailedSchema, packedSelfUnreadAnnouncementSchema, packedUserSecurityKeySchema } from '../../contract/packed.js';
+import { packedUserLiteSchema, packedUserDetailedNotMeSchema, packedMeDetailedSchema, packedSelfUnreadAnnouncementSchema, packedUserSecurityKeySchema } from '../user.schema.js';
 
 // TypeORM materializes unselected class fields as own undefined properties.
 // These keys stay native-only and disappear under the existing JSON.stringify transport.

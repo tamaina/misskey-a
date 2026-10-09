@@ -3,16 +3,17 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { packedAppShowDefinition, packedAppShowInput, packedAppShowOutput } from '../../../contract/packed-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
 
 import type { AppsRepository } from '@features/persistence/backend/repositories/models.js';
 import { AppEntityService } from '../../serializers/AppEntityService.js';
 import { DI } from '@/di-symbols.js';
-import { ApiError } from '@features/api/backend/transport/error.js';
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
 
-const contractProjection = projectEndpointContract(packedAppShowDefinition);
+import * as v from 'valibot';
+import { packedAppShowInput } from '../../auth.schema.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+import type { ApiToken } from '@features/api/backend/transport/context.js';
 
 export const meta = {
 	tags: ['app'],
@@ -24,34 +25,30 @@ export const meta = {
 			id: 'dce83913-2dc6-4093-8a7b-71dbb11718a3',
 		},
 	},
-
-	res: contractProjection.response,
 } as const;
 
-export const paramDef = contractProjection.input;
-
 @Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedAppShowInput, typeof packedAppShowOutput> {
+export class AppShowOperation {
 	constructor(
 		@Inject(DI.appsRepository)
 		private appsRepository: AppsRepository,
 
 		private appEntityService: AppEntityService,
-	) {
-		super(meta, contractProjection, async (ps, user, token) => {
-			const isSecure = user != null && token == null;
+	) {}
 
-			// Lookup app
-			const ap = await this.appsRepository.findOneBy({ id: ps.appId });
+	async execute(ps: v.InferOutput<typeof packedAppShowInput>, user: MiLocalUser | null, token: ApiToken | null) {
+		const isSecure = user != null && token == null;
 
-			if (ap == null) {
-				throw new ApiError(meta.errors.noSuchApp);
-			}
+		// Lookup app
+		const ap = await this.appsRepository.findOneBy({ id: ps.appId });
 
-			return await this.appEntityService.pack(ap, user, {
-				detail: true,
-				includeSecret: isSecure && (ap.userId === user!.id),
-			});
+		if (ap == null) {
+			throw apiError(meta.errors.noSuchApp);
+		}
+
+		return await this.appEntityService.pack(ap, user, {
+			detail: true,
+			includeSecret: isSecure && (ap.userId === user!.id),
 		});
 	}
 }

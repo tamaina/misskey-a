@@ -33,8 +33,9 @@ async function fixture(t, overrides = {}, operationOverrides = {}) {
 		await api.register(multipart, { limits: { fileSize: 1024, files: 1 } });
 		registerPilotHttp(api, handler, {
 			maxFileSize: 1024, runSpan: (_name, run) => run(),
-			context: (request, _reply, _name, upload) => ({
-				credential: bodyCredential(request), ip: request.ip, headers: request.headers, upload,
+			context: (request, reply, name, upload) => ({
+				credential: name === 'clear-browser-cache' ? undefined : bodyCredential(request), ip: request.ip, headers: request.headers, upload,
+				response: { header: (key, value) => { reply.header(key, value); } },
 				operations: {
 					instance: { ping: async () => ({ pong: 123 }), onlineUsersCount: async () => ({ count: 7 }), endpoint: async input => input.endpoint === 'ping' ? { params: [] } : null },
 					emojis: { emojis: async () => ({ emojis: [] }) },
@@ -81,6 +82,32 @@ test('real HTTP and SDK preserve public JSON, auth precedence and 204/null', asy
 	assert.equal(response.statusCode, 204);
 	assert.equal(response.body, '');
 	assert.deepEqual(events.filter(event => event[0] === 'delete').map(event => event[1]), ['note1', 'note2', 'note3']);
+});
+
+test('native cache clearing preserves SDK routing, GET/POST204, the exact header and rejected verbs', async t => {
+	const { app, client, events } = await fixture(t);
+	const header = '"cache", "prefetchCache", "prerenderCache", "executionContexts"';
+	assert.equal(await client.request('clear-browser-cache'), null);
+	assert.equal(await client.orpc.clearBrowserCache({}), undefined);
+	assert.equal(await client.orpc.clearBrowserCacheGet({}), undefined);
+	for (const method of ['GET', 'POST']) {
+		const response = await app.inject({ method, url: '/api/clear-browser-cache' });
+		assert.equal(response.statusCode, 204);
+		assert.equal(response.body, '');
+		assert.equal(response.headers['clear-site-data'], header);
+	}
+	for (const payload of [null, [], { i: 42 }, 'ignored input']) {
+		const response = await app.inject({ method: 'POST', url: '/api/clear-browser-cache', headers: { 'content-type': 'application/json' }, payload: JSON.stringify(payload) });
+		assert.equal(response.statusCode, 204);
+		assert.equal(response.headers['clear-site-data'], header);
+	}
+	for (const method of ['PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS', 'TRACE']) {
+		const response = await app.inject({ method, url: '/api/clear-browser-cache' });
+		assert.equal(response.statusCode, 405);
+		assert.equal(response.body, '');
+		assert.equal(response.headers['clear-site-data'], undefined);
+	}
+	assert.equal(events.some(event => event[0] === 'credential'), false);
 });
 
 test('HTTP failures and SDK error decoding retain envelope, UUID and policy order', async t => {
@@ -153,8 +180,9 @@ test('malformed multipart requests keep the bare client-error boundary', async t
 
 test('public native introspection comes from the contract and keeps staged paths private', async () => {
 	const descriptors = await getPilotEndpointDescriptors();
-	assert.equal(descriptors.length, 209);
-	assert.equal(new Set(descriptors.map(item => item.name)).size, 209);
+	assert.equal(descriptors.length, 438);
+	assert.equal(new Set(descriptors.map(item => item.name)).size, 438);
+	assert.equal(descriptors.some(item => item.name === 'clear-browser-cache'), false);
 	assert.deepEqual(descriptors.find(item => item.name === 'notes/delete').properties, { noteId: { type: 'string' } });
 	assert.equal('file' in descriptors.find(item => item.name === 'drive/files/create').properties, false);
 	assert.equal(JSON.stringify(descriptors).includes('path'), false);

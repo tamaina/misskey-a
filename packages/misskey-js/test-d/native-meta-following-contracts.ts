@@ -9,7 +9,7 @@ import type { Following, MetaLite, MetaDetailed } from '../built/entities.js';
 import type { packedMetaLiteSchema, packedMetaDetailedSchema } from '../built/contracts/instance/backend/endpoints/meta.schema.js';
 import type { ContractEndpoints } from '../built/contract.types.js';
 import type { RelationshipsOutputs } from '../built/contracts/relationships/backend/endpoints/relationships.contract.js';
-import type { JsonValue } from '../built/contracts/api/contract/json-value.js';
+import type { PackedJsonValue as JsonValue } from '../built/contracts/users/backend/json-value.schema.js';
 
 type Equal<A, B> = (<T>() => T extends A ? 1 : 2) extends (<T>() => T extends B ? 1 : 2) ? true : false;
 type Assert<T extends true> = T;

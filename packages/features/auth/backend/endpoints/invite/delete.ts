@@ -3,16 +3,16 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { voidInviteDeleteDefinition, voidInviteDeleteInput, voidInviteDeleteOutput } from '../../../contract/void-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
 
 import type { RegistrationTicketsRepository } from '@features/persistence/backend/repositories/models.js';
 import { RoleService } from '@features/roles/backend/services/RoleService.js';
 import { DI } from '@/di-symbols.js';
-import { ApiError } from '@features/api/backend/transport/error.js';
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
 
-const contractProjection = projectEndpointContract(voidInviteDeleteDefinition);
+import * as v from 'valibot';
+import { voidInviteDeleteInput } from '../../auth.schema.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
 
 export const meta = {
 	tags: ['meta'],
@@ -42,33 +42,31 @@ export const meta = {
 	},
 } as const;
 
-export const paramDef = contractProjection.input;
-
 @Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof voidInviteDeleteInput, typeof voidInviteDeleteOutput> {
+export class InviteDeleteOperation {
 	constructor(
 		@Inject(DI.registrationTicketsRepository)
 		private registrationTicketsRepository: RegistrationTicketsRepository,
 
 		private roleService: RoleService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			const ticket = await this.registrationTicketsRepository.findOneBy({ id: ps.inviteId });
-			const isModerator = await this.roleService.isModerator(me);
+	) {}
 
-			if (ticket == null) {
-				throw new ApiError(meta.errors.noSuchCode);
-			}
+	async execute(ps: v.InferOutput<typeof voidInviteDeleteInput>, me: MiLocalUser) {
+		const ticket = await this.registrationTicketsRepository.findOneBy({ id: ps.inviteId });
+		const isModerator = await this.roleService.isModerator(me);
 
-			if (ticket.createdById !== me.id && !isModerator) {
-				throw new ApiError(meta.errors.accessDenied);
-			}
+		if (ticket == null) {
+			throw apiError(meta.errors.noSuchCode);
+		}
 
-			if (ticket.usedAt && !isModerator) {
-				throw new ApiError(meta.errors.cantDelete);
-			}
+		if (ticket.createdById !== me.id && !isModerator) {
+			throw apiError(meta.errors.accessDenied);
+		}
 
-			await this.registrationTicketsRepository.delete(ticket.id);
-		});
+		if (ticket.usedAt && !isModerator) {
+			throw apiError(meta.errors.cantDelete);
+		}
+
+		await this.registrationTicketsRepository.delete(ticket.id);
 	}
 }

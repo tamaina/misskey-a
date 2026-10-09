@@ -3,22 +3,16 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { operationsContract } from '../../../../contract/index.js';
-import { legacyOperationsSchemas } from '@features/operations/backend';
-import type { Schema } from '@features/api/backend/utility/json-schema.js';
-import { createContractTransportEndpoint } from '@features/api/backend/transport/contract-transport-endpoint.js';
-import { defineFeatureEndpoint } from '@features/api/backend/transport/feature-endpoint.js';
+import { implement } from '@orpc/server';
+import { authentication, apiPolicy, requirePrincipal } from '../../../../../api/backend/transport/middleware.js';
+import type { ApiActor } from '../../../../../api/backend/transport/context.js';
+import type { OperationsApiContext } from '../../../operations.js';
+import { adminQueuePromoteJobsContract } from './promote-jobs.contract.js';
 
-export const meta = {
-	tags: ['admin'],
-
-	requireCredential: true,
-	requireModerator: true,
-	kind: 'write:admin:queue',
-} as const;
-
-export const paramDef = legacyOperationsSchemas['admin/queue/promote-jobs'].input as Schema;
-
-export const { feature, createEndpoint } = defineFeatureEndpoint('operations', operations => createContractTransportEndpoint(meta, paramDef, operationsContract['admin/queue/promote-jobs'], async (params, user) => operations['admin/queue/promote-jobs'](params, {
-	context: { actor: { id: user.id } },
-})));
+export function createAdminQueuePromoteJobsProcedure<Actor extends ApiActor>() {
+	return implement(adminQueuePromoteJobsContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<OperationsApiContext<Actor>>()
+		.use(authentication<Actor>())
+		.use(apiPolicy<Actor>({ name: 'admin/queue/promote-jobs', requireCredential: true, requireModerator: true, kind: 'write:admin:queue' }))
+		.use(requirePrincipal<Actor>())
+		.handler(({ input, context }) => context.operations.operations.adminQueuePromoteJobs(input, context.principal));
+}

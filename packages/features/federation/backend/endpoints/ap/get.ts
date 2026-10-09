@@ -3,44 +3,20 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { inlineApGetDefinition, inlineApGetInput, inlineApGetOutput } from '../../../contract/endpoint-definitions.js';
-import { Injectable } from '@nestjs/common';
+import { implement } from '@orpc/server';
+import { authentication, apiPolicy, requirePrincipal } from '../../../../api/backend/transport/middleware.js';
+import type { ApiActor } from '../../../../api/backend/transport/context.js';
+import type { FederationContext } from '../../operations.js';
+import { apGetContract } from './get.contract.js';
 import ms from 'ms';
 
-import { ApResolverService } from '../../services/ApResolverService.js';
-
-const contractProjection = projectEndpointContract(inlineApGetDefinition);
-
-export const meta = {
-	tags: ['federation'],
-
-	requireAdmin: true,
-	requireCredential: true,
-	kind: 'read:federation',
-
-	limit: {
+export function createApGetProcedure<Actor extends ApiActor>() {
+	return implement(apGetContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<FederationContext<Actor>>()
+		.use(authentication<Actor>())
+		.use(apiPolicy<Actor>({ name: 'ap/get', requireCredential: true, requireAdmin: true, kind: 'read:federation', limit: {
 		duration: ms('1hour'),
 		max: 30,
-	},
-
-	errors: {
-	},
-
-	res: contractProjection.response,
-} as const;
-
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof inlineApGetInput, typeof inlineApGetOutput> {
-	constructor(
-		private apResolverService: ApResolverService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			const resolver = await this.apResolverService.createResolver();
-			const object = await resolver.resolve(ps.uri);
-			return object;
-		});
-	}
+	} }))
+		.use(requirePrincipal<Actor>())
+		.handler(({ input, context }) => context.operations.federation.apGet(input, context.principal));
 }

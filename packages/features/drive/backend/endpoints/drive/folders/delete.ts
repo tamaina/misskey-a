@@ -3,43 +3,18 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { voidDriveFoldersDeleteDefinition, voidDriveFoldersDeleteInput, voidDriveFoldersDeleteOutput } from '../../../../contract/void-endpoint-definitions.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+import type { DriveManagementInputs } from '../../../management.contract.js';
+import { driveFoldersDeleteErrors } from './delete.contract.js';
 import { Inject, Injectable } from '@nestjs/common';
 
 import type { DriveFoldersRepository, DriveFilesRepository } from '@features/persistence/backend/repositories/models.js';
 import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
 import { DI } from '@/di-symbols.js';
-import { ApiError } from '@features/api/backend/transport/error.js';
-
-const contractProjection = projectEndpointContract(voidDriveFoldersDeleteDefinition);
-
-export const meta = {
-	tags: ['drive'],
-
-	requireCredential: true,
-
-	kind: 'write:drive',
-
-	errors: {
-		noSuchFolder: {
-			message: 'No such folder.',
-			code: 'NO_SUCH_FOLDER',
-			id: '1069098f-c281-440f-b085-f9932edbe091',
-		},
-
-		hasChildFilesOrFolders: {
-			message: 'This folder has child files or folders.',
-			code: 'HAS_CHILD_FILES_OR_FOLDERS',
-			id: 'b0fc8a17-963c-405d-bfbc-859a487295e1',
-		},
-	},
-} as const;
-
-export const paramDef = contractProjection.input;
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
 
 @Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof voidDriveFoldersDeleteInput, typeof voidDriveFoldersDeleteOutput> {
+export class DriveFoldersDeleteOperation {
 	constructor(
 		@Inject(DI.driveFilesRepository)
 		private driveFilesRepository: DriveFilesRepository,
@@ -49,30 +24,31 @@ export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof
 
 		private globalEventService: GlobalEventService,
 	) {
-		super(meta, contractProjection, async (ps, me) => {
-			// Get folder
-			const folder = await this.driveFoldersRepository.findOneBy({
-				id: ps.folderId,
-				userId: me.id,
-			});
+	}
 
-			if (folder == null) {
-				throw new ApiError(meta.errors.noSuchFolder);
-			}
-
-			const [childFoldersCount, childFilesCount] = await Promise.all([
-				this.driveFoldersRepository.countBy({ parentId: folder.id }),
-				this.driveFilesRepository.countBy({ folderId: folder.id }),
-			]);
-
-			if (childFoldersCount !== 0 || childFilesCount !== 0) {
-				throw new ApiError(meta.errors.hasChildFilesOrFolders);
-			}
-
-			await this.driveFoldersRepository.delete(folder.id);
-
-			// Publish folderCreated event
-			this.globalEventService.publishDriveStream(me.id, 'folderDeleted', folder.id);
+	async execute(ps: DriveManagementInputs['drive/folders/delete'], me: MiLocalUser, _ip: string, _headers: Record<string, string | string[] | undefined>) {
+		// Get folder
+		const folder = await this.driveFoldersRepository.findOneBy({
+			id: ps.folderId,
+			userId: me.id,
 		});
+
+		if (folder == null) {
+			throw apiError(driveFoldersDeleteErrors.noSuchFolder);
+		}
+
+		const [childFoldersCount, childFilesCount] = await Promise.all([
+			this.driveFoldersRepository.countBy({ parentId: folder.id }),
+			this.driveFilesRepository.countBy({ folderId: folder.id }),
+		]);
+
+		if (childFoldersCount !== 0 || childFilesCount !== 0) {
+			throw apiError(driveFoldersDeleteErrors.hasChildFilesOrFolders);
+		}
+
+		await this.driveFoldersRepository.delete(folder.id);
+
+		// Publish folderCreated event
+		this.globalEventService.publishDriveStream(me.id, 'folderDeleted', folder.id);
 	}
 }

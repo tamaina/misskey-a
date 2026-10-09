@@ -22,7 +22,7 @@ import type { MiSystemWebhook } from '@features/integrations/backend/models/Syst
 import type { MiMeta } from '@features/instance/backend/models/Meta.js';
 import { MiAvatarDecoration, MiChatMessage, MiChatRoom, MiReversiGame, MiRole, MiRoleAssignment } from '@features/persistence/backend/repositories/models.js';
 import type { NativeMeDetailed } from '@features/users/backend/serializers/native-user.js';
-import type { Packed } from '@features/index/contract/packed.js';
+import type { Packed } from '@features/index/backend/packed.schema.js';
 import { DI } from '@/di-symbols.js';
 import type { Config } from '@/config.js';
 import { bindThis } from '../decorators.js';

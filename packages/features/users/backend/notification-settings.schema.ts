@@ -4,7 +4,7 @@
  */
 
 import * as v from 'valibot';
-import { packedJsonValueSchema, businessJsonObjectWithRest, type PackedJsonValue } from './json-value.schema.js';
+import { packedOptionalJsonValueSchema, packedJsonValueSchema, businessJsonObjectWithRest, type PackedJsonValue } from './json-value.schema.js';
 
 export type NotificationReceiveRule = (
 	{ type: 'all' | 'following' | 'follower' | 'mutualFollow' | 'followingOrFollower' | 'never' }
@@ -19,7 +19,7 @@ export type NotificationSettings = {
 	[Name in NotificationSettingName]?: NotificationReceiveRule | undefined;
 } & { [key: string]: PackedJsonValue | undefined };
 
-const notificationReceiveRule: v.GenericSchema<NotificationReceiveRule, NotificationReceiveRule> = v.union([
+export const notificationReceiveRule: v.GenericSchema<NotificationReceiveRule, NotificationReceiveRule> = v.union([
 	businessJsonObjectWithRest({
 		type: v.picklist(['all', 'following', 'follower', 'mutualFollow', 'followingOrFollower', 'never']),
 	}, packedJsonValueSchema),
@@ -51,7 +51,7 @@ const notificationRuleEntries = {
 	exportCompleted: v.optional(notificationReceiveRule),
 };
 export const notificationSettings: v.GenericSchema<NotificationSettings, NotificationSettings> = v.pipe(
-	businessJsonObjectWithRest(notificationRuleEntries, v.optional(packedJsonValueSchema)),
+	businessJsonObjectWithRest(notificationRuleEntries, packedOptionalJsonValueSchema),
 	v.check(settings => Object.keys(settings).every(key => Object.hasOwn(notificationRuleEntries, key) || settings[key] !== undefined), 'Notification extension values must be JSON'),
 	v.transform(settings => {
 		for (const key of Object.keys(settings)) {

@@ -3,70 +3,15 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { selectorPagesShowDefinition, selectorPagesShowInput, selectorPagesShowOutput } from '../../../contract/selector-endpoint-definitions.js';
-import { IsNull } from 'typeorm';
-import { Inject, Injectable } from '@nestjs/common';
-import type { UsersRepository, PagesRepository } from '@features/persistence/backend/repositories/models.js';
-import type { MiPage } from '../../models/Page.js';
-import { PageEntityService } from '../../serializers/PageEntityService.js';
-import { DI } from '@/di-symbols.js';
-import { ApiError } from '@features/api/backend/transport/error.js';
+import { implement } from '@orpc/server';
+import { authentication, apiPolicy } from '../../../../api/backend/transport/middleware.js';
+import type { ApiActor } from '../../../../api/backend/transport/context.js';
+import type { PagesContext } from '../../operations.js';
+import { pagesShowContract } from './show.contract.js';
 
-const contractProjection = projectEndpointContract(selectorPagesShowDefinition);
-
-export const meta = {
-	tags: ['pages'],
-
-	requireCredential: false,
-
-	res: contractProjection.response,
-
-	errors: {
-		noSuchPage: {
-			message: 'No such page.',
-			code: 'NO_SUCH_PAGE',
-			id: '222120c0-3ead-4528-811b-b96f233388d7',
-		},
-	},
-} as const;
-
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof selectorPagesShowInput, typeof selectorPagesShowOutput, 'legacy-declared'> {
-	constructor(
-		@Inject(DI.usersRepository)
-		private usersRepository: UsersRepository,
-
-		@Inject(DI.pagesRepository)
-		private pagesRepository: PagesRepository,
-
-		private pageEntityService: PageEntityService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			let page: MiPage | null = null;
-
-			if ('pageId' in ps) {
-				page = await this.pagesRepository.findOneBy({ id: ps.pageId });
-			} else {
-				const author = await this.usersRepository.findOneBy({
-					host: IsNull(),
-					usernameLower: ps.username.toLowerCase(),
-				});
-				if (author) {
-					page = await this.pagesRepository.findOneBy({
-						name: ps.name,
-						userId: author.id,
-					});
-				}
-			}
-
-			if (page == null) {
-				throw new ApiError(meta.errors.noSuchPage);
-			}
-
-			return await this.pageEntityService.pack(page, me);
-		});
-	}
+export function createPagesShowProcedure<Actor extends ApiActor>() {
+	return implement(pagesShowContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<PagesContext<Actor>>()
+		.use(authentication<Actor>())
+		.use(apiPolicy<Actor>({ name: 'pages/show' }))
+		.handler(({ input, context }) => context.operations.pages.pagesShow(input, context.principal));
 }

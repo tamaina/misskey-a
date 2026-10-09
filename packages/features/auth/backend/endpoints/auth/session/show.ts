@@ -3,16 +3,16 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { packedAuthSessionShowDefinition, packedAuthSessionShowInput, packedAuthSessionShowOutput } from '../../../../contract/packed-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
 
 import type { AuthSessionsRepository } from '@features/persistence/backend/repositories/models.js';
 import { AuthSessionEntityService } from '../../../serializers/AuthSessionEntityService.js';
 import { DI } from '@/di-symbols.js';
-import { ApiError } from '@features/api/backend/transport/error.js';
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
 
-const contractProjection = projectEndpointContract(packedAuthSessionShowDefinition);
+import * as v from 'valibot';
+import { packedAuthSessionShowInput } from '../../../auth.schema.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
 
 export const meta = {
 	tags: ['auth'],
@@ -26,31 +26,27 @@ export const meta = {
 			id: 'bd72c97d-eba7-4adb-a467-f171b8847250',
 		},
 	},
-
-	res: contractProjection.response,
 } as const;
 
-export const paramDef = contractProjection.input;
-
 @Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedAuthSessionShowInput, typeof packedAuthSessionShowOutput> {
+export class AuthSessionShowOperation {
 	constructor(
 		@Inject(DI.authSessionsRepository)
 		private authSessionsRepository: AuthSessionsRepository,
 
 		private authSessionEntityService: AuthSessionEntityService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			// Lookup session
-			const session = await this.authSessionsRepository.findOneBy({
-				token: ps.token,
-			});
+	) {}
 
-			if (session == null) {
-				throw new ApiError(meta.errors.noSuchSession);
-			}
-
-			return await this.authSessionEntityService.pack(session, me);
+	async execute(ps: v.InferOutput<typeof packedAuthSessionShowInput>, me: MiLocalUser | null) {
+		// Lookup session
+		const session = await this.authSessionsRepository.findOneBy({
+			token: ps.token,
 		});
+
+		if (session == null) {
+			throw apiError(meta.errors.noSuchSession);
+		}
+
+		return await this.authSessionEntityService.pack(session, me);
 	}
 }

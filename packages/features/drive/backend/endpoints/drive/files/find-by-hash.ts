@@ -3,45 +3,30 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { packedDriveFilesFindByHashDefinition, packedDriveFilesFindByHashInput, packedDriveFilesFindByHashOutput } from '../../../../contract/packed-endpoint-definitions.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+import type { DriveManagementInputs } from '../../../management.contract.js';
 import { Inject, Injectable } from '@nestjs/common';
 import type { DriveFilesRepository } from '@features/persistence/backend/repositories/models.js';
 
 import { DriveFileEntityService } from '../../../serializers/DriveFileEntityService.js';
 import { DI } from '@/di-symbols.js';
 
-const contractProjection = projectEndpointContract(packedDriveFilesFindByHashDefinition);
-
-export const meta = {
-	tags: ['drive'],
-
-	requireCredential: true,
-
-	kind: 'read:drive',
-
-	description: 'Search for a drive file by a hash of the contents.',
-
-	res: contractProjection.response,
-} as const;
-
-export const paramDef = contractProjection.input;
-
 @Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedDriveFilesFindByHashInput, typeof packedDriveFilesFindByHashOutput> {
+export class DriveFilesFindByHashOperation {
 	constructor(
 		@Inject(DI.driveFilesRepository)
 		private driveFilesRepository: DriveFilesRepository,
 
 		private driveFileEntityService: DriveFileEntityService,
 	) {
-		super(meta, contractProjection, async (ps, me) => {
-			const files = await this.driveFilesRepository.findBy({
-				md5: ps.md5,
-				userId: me.id,
-			});
+	}
 
-			return await this.driveFileEntityService.packMany(files, { self: true });
+	async execute(ps: DriveManagementInputs['drive/files/find-by-hash'], me: MiLocalUser, _ip: string, _headers: Record<string, string | string[] | undefined>) {
+		const files = await this.driveFilesRepository.findBy({
+			md5: ps.md5,
+			userId: me.id,
 		});
+
+		return await this.driveFileEntityService.packMany(files, { self: true });
 	}
 }

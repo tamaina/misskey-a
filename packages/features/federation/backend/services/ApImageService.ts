@@ -9,7 +9,7 @@ import type { DriveFilesRepository, MiMeta } from '@features/persistence/backend
 import type { MiRemoteUser } from '@features/users/backend/models/User.js';
 import type { MiDriveFile } from '@features/drive/backend/models/DriveFile.js';
 import { truncate } from '@features/runtime/backend/formatting/truncate.js';
-import { DB_MAX_IMAGE_COMMENT_LENGTH } from '@features/drive/contract/image-comment-limit.js';
+import { DB_MAX_IMAGE_COMMENT_LENGTH } from '@features/drive/backend/image-comment-limit.js';
 import { DriveService } from '@features/drive/backend/services/DriveService.js';
 import type { Logger } from '@features/runtime/backend/logging/logger.js';
 import { bindThis } from '@features/runtime/backend/decorators.js';

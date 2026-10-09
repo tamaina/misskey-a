@@ -6,21 +6,21 @@
 import { Inject, Injectable } from '@nestjs/common';
 import bcrypt from 'bcryptjs';
 import { IsNull, LessThanOrEqual } from 'typeorm';
-import { DI } from '@/di-symbols.js';
-import type { RegistrationTicketsRepository, UsedUsernamesRepository, UserPendingsRepository, UserProfilesRepository, UsersRepository, MiRegistrationTicket, MiMeta } from '@features/persistence/backend/repositories/models.js';
-import type { Config } from '@/config.js';
 import { CaptchaService } from '@features/auth/backend/services/CaptchaService.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { SignupService } from '@features/auth/backend/services/SignupService.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import { EmailService } from '@features/email/backend/services/EmailService.js';
-import { MiLocalUser } from '@features/users/backend/models/User.js';
 import { FastifyReplyError } from '@features/runtime/backend/http/fastify-reply-error.js';
 import { bindThis } from '@features/runtime/backend/decorators.js';
+import type { Config } from '@/config.js';
+import { DI } from '@/di-symbols.js';
+import { toSessionHeaders } from '../session.schema.js';
+import { sessionField, sessionText, sessionErrorMessage, type AuthSessionBody, type AuthSessionRequest, type AuthSessionEffects } from '../session.effects.js';
 import { L_CHARS, secureRndstr } from '../utility/secure-rndstr.js';
 import { SigninService } from './SigninService.js';
+import type { RegistrationTicketsRepository, UsedUsernamesRepository, UserPendingsRepository, UserProfilesRepository, UsersRepository, MiRegistrationTicket, MiMeta } from '@features/persistence/backend/repositories/models.js';
 import type { FindOptionsWhere } from 'typeorm';
-import type { FastifyRequest, FastifyReply } from 'fastify';
 
 const invitationCodeMailTimeoutMs = 1000 * 60 * 30;
 
@@ -40,7 +40,7 @@ export class SignupApiService {
 		private userProfilesRepository: UserProfilesRepository,
 
 		@Inject(DI.userPendingsRepository)
-		private userPendingsRepository: UserPendingsRepository,
+		private userPendingsRepository: Omit<UserPendingsRepository, 'findOneByOrFail' | 'insertOne'> & { findOneByOrFail(where: { code: import('@features/users/backend/json-value.schema.js').PackedJsonValue | undefined }): Promise<import('../models/UserPending.js').MiUserPending>; insertOne(entity: import('typeorm').QueryDeepPartialEntity<import('../models/UserPending.js').MiUserPending>): Promise<import('../models/UserPending.js').MiUserPending> },
 
 		@Inject(DI.usedUsernamesRepository)
 		private usedUsernamesRepository: UsedUsernamesRepository,
@@ -59,63 +59,49 @@ export class SignupApiService {
 
 	@bindThis
 	public async signup(
-		request: FastifyRequest<{
-			Body: {
-				username: string;
-				password: string;
-				host?: string;
-				invitationCode?: string;
-				emailAddress?: string;
-				'hcaptcha-response'?: string;
-				'g-recaptcha-response'?: string;
-				'turnstile-response'?: string;
-				'm-captcha-response'?: string;
-				'testcaptcha-response'?: string;
-			}
-		}>,
-		reply: FastifyReply,
+		body: AuthSessionBody,
+		request: AuthSessionRequest,
+		reply: AuthSessionEffects,
 	) {
-		const body = request.body;
-
 		// Verify *Captcha
 		// ただしテスト時はこの機構は障害となるため無効にする
 		if (process.env.NODE_ENV !== 'test') {
 			if (this.meta.enableHcaptcha && this.meta.hcaptchaSecretKey) {
-				await this.captchaService.verifyHcaptcha(this.meta.hcaptchaSecretKey, body['hcaptcha-response']).catch(err => {
+				await this.captchaService.verifyHcaptcha(this.meta.hcaptchaSecretKey, sessionField(body, 'hcaptcha-response')).catch(err => {
 					throw new FastifyReplyError(400, err);
 				});
 			}
 
 			if (this.meta.enableMcaptcha && this.meta.mcaptchaSecretKey && this.meta.mcaptchaSitekey && this.meta.mcaptchaInstanceUrl) {
-				await this.captchaService.verifyMcaptcha(this.meta.mcaptchaSecretKey, this.meta.mcaptchaSitekey, this.meta.mcaptchaInstanceUrl, body['m-captcha-response']).catch(err => {
+				await this.captchaService.verifyMcaptcha(this.meta.mcaptchaSecretKey, this.meta.mcaptchaSitekey, this.meta.mcaptchaInstanceUrl, sessionField(body, 'm-captcha-response')).catch(err => {
 					throw new FastifyReplyError(400, err);
 				});
 			}
 
 			if (this.meta.enableRecaptcha && this.meta.recaptchaSecretKey) {
-				await this.captchaService.verifyRecaptcha(this.meta.recaptchaSecretKey, body['g-recaptcha-response']).catch(err => {
+				await this.captchaService.verifyRecaptcha(this.meta.recaptchaSecretKey, sessionField(body, 'g-recaptcha-response')).catch(err => {
 					throw new FastifyReplyError(400, err);
 				});
 			}
 
 			if (this.meta.enableTurnstile && this.meta.turnstileSecretKey) {
-				await this.captchaService.verifyTurnstile(this.meta.turnstileSecretKey, body['turnstile-response']).catch(err => {
+				await this.captchaService.verifyTurnstile(this.meta.turnstileSecretKey, sessionField(body, 'turnstile-response')).catch(err => {
 					throw new FastifyReplyError(400, err);
 				});
 			}
 
 			if (this.meta.enableTestcaptcha) {
-				await this.captchaService.verifyTestcaptcha(body['testcaptcha-response']).catch(err => {
+				await this.captchaService.verifyTestcaptcha(sessionField(body, 'testcaptcha-response')).catch(err => {
 					throw new FastifyReplyError(400, err);
 				});
 			}
 		}
 
-		const username = body['username'];
-		const password = body['password'];
-		const host: string | null = process.env.NODE_ENV === 'test' ? (body['host'] ?? null) : null;
-		const invitationCode = body['invitationCode'];
-		const emailAddress = body['emailAddress'];
+		const username = sessionField(body, 'username');
+		const password = sessionField(body, 'password');
+		const host = process.env.NODE_ENV === 'test' ? (sessionField(body, 'host') ?? null) : null;
+		const invitationCode = sessionField(body, 'invitationCode');
+		const emailAddress = sessionField(body, 'emailAddress');
 
 		if (this.meta.emailRequiredForSignup) {
 			if (emailAddress == null || typeof emailAddress !== 'string') {
@@ -175,16 +161,16 @@ export class SignupApiService {
 		}
 
 		if (this.meta.emailRequiredForSignup) {
-			if (await this.usersRepository.exists({ where: { usernameLower: username.toLowerCase(), host: IsNull() } })) {
+			if (await this.usersRepository.exists({ where: { usernameLower: sessionText(username).toLowerCase(), host: IsNull() } })) {
 				throw new FastifyReplyError(400, 'DUPLICATED_USERNAME');
 			}
 
 			// Check deleted username duplication
-			if (await this.usedUsernamesRepository.exists({ where: { username: username.toLowerCase() } })) {
+			if (await this.usedUsernamesRepository.exists({ where: { username: sessionText(username).toLowerCase() } })) {
 				throw new FastifyReplyError(400, 'USED_USERNAME');
 			}
 
-			const isPreserved = this.meta.preservedUsernames.map(x => x.toLowerCase()).includes(username.toLowerCase());
+			const isPreserved = this.meta.preservedUsernames.map(x => x.toLowerCase()).includes(sessionText(username).toLowerCase());
 			if (isPreserved) {
 				throw new FastifyReplyError(400, 'DENIED_USERNAME');
 			}
@@ -193,7 +179,7 @@ export class SignupApiService {
 
 			// Generate hash of password
 			const salt = await bcrypt.genSalt(8);
-			const hash = await bcrypt.hash(password, salt);
+			const hash = await bcrypt.hash(sessionText(password), salt);
 
 			if (ticket && !await this.claimRegistrationTicket(ticket)) {
 				reply.code(400);
@@ -204,14 +190,14 @@ export class SignupApiService {
 				const pendingUser = await this.userPendingsRepository.insertOne({
 					id: this.idService.gen(),
 					code,
-					email: emailAddress!,
-					username: username,
+					email: sessionText(emailAddress),
+					username: sessionText(username),
 					password: hash,
 				});
 
 				const link = `${this.config.url}/signup-complete/${code}`;
 
-				this.emailService.sendEmail(emailAddress!, 'Signup',
+				this.emailService.sendEmail(sessionText(emailAddress), 'Signup',
 					`To complete signup, please click this link:<br><a href="${link}">${link}</a>`,
 					`To complete signup, please click this link: ${link}`);
 
@@ -258,7 +244,7 @@ export class SignupApiService {
 				// 確保したコードが無駄に消費されたままになるのを防ぐ
 				// (アカウントと紐付け済みの場合は release 側の条件により戻らない)
 				if (ticket) await this.releaseRegistrationTicket(ticket);
-				throw new FastifyReplyError(400, typeof err === 'string' ? err : (err as Error).toString());
+				throw new FastifyReplyError(400, typeof err === 'string' ? err : sessionErrorMessage(err));
 			}
 		}
 	}
@@ -334,10 +320,8 @@ export class SignupApiService {
 	}
 
 	@bindThis
-	public async signupPending(request: FastifyRequest<{ Body: { code: string; } }>, reply: FastifyReply) {
-		const body = request.body;
-
-		const code = body['code'];
+	public async signupPending(body: AuthSessionBody, request: AuthSessionRequest, reply: AuthSessionEffects) {
+		const code = sessionField(body, 'code');
 
 		try {
 			const pendingUser = await this.userPendingsRepository.findOneByOrFail({ code });
@@ -372,9 +356,9 @@ export class SignupApiService {
 				});
 			}
 
-			return this.signinService.signin(request, reply, account as MiLocalUser);
+			return this.signinService.signin(request, reply, account);
 		} catch (err) {
-			throw new FastifyReplyError(400, typeof err === 'string' ? err : (err as Error).toString());
+			throw new FastifyReplyError(400, typeof err === 'string' ? err : sessionErrorMessage(err));
 		}
 	}
 }

@@ -3,45 +3,48 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { packedChannelsMyFavoritesDefinition, packedChannelsMyFavoritesInput, packedChannelsMyFavoritesOutput } from '../../../contract/packed-endpoint-definitions.js';
+import { implement } from '@orpc/server';
 import { Inject, Injectable } from '@nestjs/common';
+import * as v from 'valibot';
+import { DI } from '@/di-symbols.js';
+import { authentication, apiPolicy, requirePrincipal } from '../../../../api/backend/transport/middleware.js';
+import { ChannelEntityService } from '../../serializers/ChannelEntityService.js';
+import { channelsMyFavoritesContract, channelsMyFavoritesPolicy, channelsMyFavoritesInput, channelsMyFavoritesOutput, channelsMyFavoritesErrors } from './my-favorites.contract.js';
+import type { ApiActor } from '../../../../api/backend/transport/context.js';
+import type { ChannelsApiContext } from '../../operations.js';
 
 import type { ChannelFavoritesRepository } from '@features/persistence/backend/repositories/models.js';
-import { ChannelEntityService } from '../../serializers/ChannelEntityService.js';
-import { DI } from '@/di-symbols.js';
 
-const contractProjection = projectEndpointContract(packedChannelsMyFavoritesDefinition);
+import type { MiLocalUser } from '../../../../users/backend/models/User.js';
 
-export const meta = {
-	tags: ['channels', 'account'],
-
-	requireCredential: true,
-
-	kind: 'read:channels',
-
-	res: contractProjection.response,
-} as const;
-
-export const paramDef = contractProjection.input;
+export function createChannelsMyFavoritesProcedure<Actor extends ApiActor>() {
+	return implement(channelsMyFavoritesContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ChannelsApiContext<Actor>>()
+		.use(authentication<Actor>())
+		.use(apiPolicy<Actor>(channelsMyFavoritesPolicy))
+		.use(requirePrincipal<Actor>())
+		.handler(({ input, context }) => context.operations.channels.channelsMyFavorites(input, context.principal));
+}
 
 @Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedChannelsMyFavoritesInput, typeof packedChannelsMyFavoritesOutput> {
+export class ChannelsMyFavoritesOperation {
 	constructor(
 		@Inject(DI.channelFavoritesRepository)
 		private channelFavoritesRepository: ChannelFavoritesRepository,
 
 		private channelEntityService: ChannelEntityService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			const query = this.channelFavoritesRepository.createQueryBuilder('favorite')
-				.andWhere('favorite.userId = :meId', { meId: me.id })
-				.leftJoinAndSelect('favorite.channel', 'channel');
+	) {}
+	async execute(ps: v.InferOutput<typeof channelsMyFavoritesInput>, me: MiLocalUser): Promise<v.InferOutput<typeof channelsMyFavoritesOutput>> {
+		return v.parse(channelsMyFavoritesOutput, await this.run(ps, me));
+	}
 
-			const favorites = await query
-				.getMany();
+	private async run(ps: v.InferOutput<typeof channelsMyFavoritesInput>, me: MiLocalUser) {
+		const query = this.channelFavoritesRepository.createQueryBuilder('favorite')
+			.andWhere('favorite.userId = :meId', { meId: me.id })
+			.leftJoinAndSelect('favorite.channel', 'channel');
 
-			return await Promise.all(favorites.map(x => this.channelEntityService.pack(x.channel!, me)));
-		});
+		const favorites = await query
+			.getMany();
+
+		return await Promise.all(favorites.map(x => this.channelEntityService.pack(x.channel!, me)));
 	}
 }

@@ -49,12 +49,18 @@ export const packedJsonObjectSchema: v.GenericSchema<{ [key: string]: PackedJson
 	return v.pipe(shape, v.transform(() => toPackedJsonObject(input)));
 });
 
+/** Explicit recursive wrapper types keep generated declarations compact while
+ * preserving the same finite JSON validators and optional/null runtime behavior. */
+export const packedOptionalJsonValueSchema: v.GenericSchema<PackedJsonValue | undefined> = v.optional(packedJsonValueSchema);
+export const packedOptionalJsonObjectSchema: v.GenericSchema<{ [key: string]: PackedJsonValue } | undefined> = v.optional(packedJsonObjectSchema);
+export const packedNullableJsonValueSchema: v.GenericSchema<PackedJsonValue | null> = v.nullable(packedJsonValueSchema);
+
 /** Materialize genuine stored JSON; Object.fromEntries preserves reserved names as own data keys. */
 export function toPackedJsonValue(input: unknown): PackedJsonValue {
 	if (!isJsonTree(input)) throw new TypeError('Stored JSON must contain only acyclic JSON values');
 	if (input === null || typeof input === 'string' || typeof input === 'boolean') return input;
 	if (typeof input === 'number') return input;
-	if (Array.isArray(input)) return input.map(toPackedJsonValue);
+	if (Array.isArray(input)) return input.map((value: unknown) => toPackedJsonValue(value));
 	return toPackedJsonObject(input);
 }
 
@@ -62,7 +68,7 @@ export function toPackedJsonObject(input: unknown): { [key: string]: PackedJsonV
 	if (input === null || typeof input !== 'object' || Array.isArray(input) || !isJsonTree(input)) {
 		throw new TypeError('Stored JSON must contain only acyclic JSON values');
 	}
-	return Object.fromEntries(Object.keys(input).map(key => [key, toPackedJsonValue(Object.getOwnPropertyDescriptor(input, key)?.value)]));
+	return Object.fromEntries(Object.keys(input).map((key): [string, PackedJsonValue] => [key, toPackedJsonValue(Object.getOwnPropertyDescriptor(input, key)?.value)]));
 }
 
 /** Preserve original finite JSON extensions, including keys skipped by object parsers. */
@@ -76,13 +82,14 @@ export function businessJsonObjectWithRest<const Entries extends v.ObjectEntries
 			// Explicit undefined is supported only for declared optional fields; their schema verifies optionality.
 			if (Object.hasOwn(entries, key) && value === undefined) continue;
 			if (!isJsonTree(value)) return v.never();
+			if (!Object.hasOwn(entries, key) && !v.safeParse(rest, value).success) return v.never();
 		}
 		return v.pipe(fields, v.transform(parsed => {
-			const extensions: { [key: string]: PackedJsonValue } = {};
+			const extensions: { [key: string]: v.InferOutput<Rest> } = {};
 			for (const key of Object.keys(input)) {
 				if (Object.hasOwn(entries, key)) continue;
 				Object.defineProperty(extensions, key, {
-					value: toPackedJsonValue(Object.getOwnPropertyDescriptor(input, key)?.value),
+					value: v.parse(rest, Object.getOwnPropertyDescriptor(input, key)?.value),
 					enumerable: true, configurable: true, writable: true,
 				});
 			}

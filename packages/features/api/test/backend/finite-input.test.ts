@@ -5,12 +5,14 @@
 
 import * as v from 'valibot';
 import { expect, expectTypeOf, test } from 'vitest';
-import { inlineTestInput, inlineTestOutput } from '@features/api/contract/endpoint-definitions.js';
-import type { NativeInlineEndpoints } from '@features/api/contract/endpoint-definitions.js';
-import { EndpointImplementation, paramDef } from '@features/api/backend/endpoints/test.js';
+import { testInput as inlineTestInput, testOutput as inlineTestOutput } from '../../backend/endpoints/test.contract.js';
+import { createProcedureClient } from '@orpc/server';
+import { mockDeep } from 'vitest-mock-extended';
+import type { ApiContext } from '../../backend/transport/context.js';
+import { createTestProcedure } from '../../backend/endpoints/test.js';
 
 test('native test input exposes five declared fields and strips extensions without mutating the request', () => {
-	expectTypeOf<keyof NativeInlineEndpoints['test']['req']>().toEqualTypeOf<'required' | 'string' | 'default' | 'nullableDefault' | 'id'>();
+	expectTypeOf<keyof v.InferInput<typeof inlineTestInput>>().toEqualTypeOf<'required' | 'string' | 'default' | 'nullableDefault' | 'id'>();
 	expectTypeOf<v.InferOutput<typeof inlineTestInput>['default']>().toEqualTypeOf<string>();
 	expectTypeOf<v.InferOutput<typeof inlineTestInput>['nullableDefault']>().toEqualTypeOf<string | null>();
 	const params = { required: false, future: { retained: true } };
@@ -38,32 +40,13 @@ test('native test input preserves required, optional, nullable and ID validation
 	});
 });
 
-test('HTTP test handler echoes the same request with defaults and arbitrary own extension keys', async () => {
-	const endpoint = new EndpointImplementation();
-	const extension = { nested: [null, { retained: true }] };
-	const params = { required: true, future: extension, constructor: 'own constructor', toString: 'own toString' };
-	const result = await endpoint.exec(params, null, null);
-	expect(result).toBe(params);
-	expect(result).toEqual({ ...params, default: 'hello', nullableDefault: 'hello' });
-	expect(Reflect.get(result, 'future')).toBe(extension);
-	expect(Object.hasOwn(result, 'constructor')).toBe(true);
-	expect(Object.hasOwn(result, 'toString')).toBe(true);
-	expect(Object.keys(result)).toEqual(['required', 'future', 'constructor', 'toString', 'default', 'nullableDefault']);
-	expect(paramDef.additionalProperties).not.toBe(false);
-	// Native output keeps ordinary extensions; the HTTP handler preserves raw own keys.
-	const nativeResult = { required: true, future: extension };
-	expect(v.parse(inlineTestOutput, nativeResult)).toEqual(nativeResult);
-});
-
-test('HTTP test handler retains explicit values and rejects malformed declared fields', async () => {
-	const endpoint = new EndpointImplementation();
-	const params = { required: false, string: '', default: '', nullableDefault: null, id: 'ABC123', future: [1, null] };
-	expect(await endpoint.exec(params, null, null)).toBe(params);
-	expect(params).toEqual({ required: false, string: '', default: '', nullableDefault: null, id: 'ABC123', future: [1, null] });
-	for (const invalid of [
-		{}, null, [], 'test', 1,
-		{ required: null }, { required: 'true' },
-		{ required: true, string: null }, { required: true, default: null },
-		{ required: true, nullableDefault: 1 }, { required: true, id: '' }, { required: true, id: 'bad-id' },
-	]) await expect(endpoint.exec(invalid, null, null)).rejects.toMatchObject({ code: 'INVALID_PARAM' });
+test('native test procedure validates and strips unused fields without mutating its caller', async () => {
+ const context = mockDeep<ApiContext>();
+ context.services.authenticate.mockResolvedValue([null, null]);
+ const client = createProcedureClient(createTestProcedure(), { context });
+ const params = { required: true, future: { retained: true } };
+ expect(await client(params)).toEqual({ required: true, default: 'hello', nullableDefault: 'hello' });
+ expect(params).toEqual({ required: true, future: { retained: true } });
+ expect(v.safeParse(inlineTestOutput, { required: true, default: 'hello', nullableDefault: null, future: true }).success).toBe(false);
+ await expect(client({ required: true, id: 'bad-id' })).rejects.toMatchObject({ code: 'BAD_REQUEST' });
 });

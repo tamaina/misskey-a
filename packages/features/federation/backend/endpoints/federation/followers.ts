@@ -3,57 +3,15 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { NativeContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { packedFederationFollowersDefinition, packedFederationFollowersInput, packedFederationFollowersOutput } from '../../../contract/packed-endpoint-definitions.js';
-import { Inject, Injectable } from '@nestjs/common';
+import { implement } from '@orpc/server';
+import { authentication, apiPolicy } from '../../../../api/backend/transport/middleware.js';
+import type { ApiActor } from '../../../../api/backend/transport/context.js';
+import type { FederationContext } from '../../operations.js';
+import { federationFollowersContract } from './followers.contract.js';
 
-import type { FollowingsRepository } from '@features/persistence/backend/repositories/models.js';
-import { QueryService } from '@features/notes/backend/services/QueryService.js';
-import { FollowingEntityService } from '@features/relationships/backend/serializers/FollowingEntityService.js';
-import { RoleService } from '@features/roles/backend/services/RoleService.js';
-import { DI } from '@/di-symbols.js';
-
-import * as v from 'valibot';
-import { nativeFollowingSchema } from '@features/relationships/backend/serializers/FollowingEntityService.js';
-
-export const nativeOutputSchema = v.array(nativeFollowingSchema);
-
-const contractProjection = projectEndpointContract(packedFederationFollowersDefinition);
-
-export const meta = {
-	tags: ['federation'],
-
-	requireCredential: false,
-
-	res: contractProjection.response,
-} as const;
-
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export class EndpointImplementation extends NativeContractEndpoint<typeof meta, typeof packedFederationFollowersInput, typeof packedFederationFollowersOutput, typeof nativeOutputSchema> {
-	constructor(
-		@Inject(DI.followingsRepository)
-		private followingsRepository: FollowingsRepository,
-
-		private followingEntityService: FollowingEntityService,
-		private queryService: QueryService,
-		private roleService: RoleService,
-	) {
-		super(meta, contractProjection, nativeOutputSchema, async (ps, me) => {
-			const query = this.queryService.makePaginationQuery(this.followingsRepository.createQueryBuilder('following'), ps.sinceId, ps.untilId, ps.sinceDate, ps.untilDate)
-				.andWhere('following.followeeHost = :host', { host: ps.host })
-				.andWhere('following.isFollowerSuspended = false');
-
-			if (!await this.roleService.isModerator(me)) {
-				this.queryService.generateFollowingRelationVisibilityQuery(query, 'followers', me);
-			}
-
-			const followings = await query
-				.limit(ps.limit)
-				.getMany();
-
-			return await this.followingEntityService.packMany(followings, me, { populateFollowee: true });
-		});
-	}
+export function createFederationFollowersProcedure<Actor extends ApiActor>() {
+	return implement(federationFollowersContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<FederationContext<Actor>>()
+		.use(authentication<Actor>())
+		.use(apiPolicy<Actor>({ name: 'federation/followers' }))
+		.handler(({ input, context }) => context.operations.federation.federationFollowers(input, context.principal));
 }

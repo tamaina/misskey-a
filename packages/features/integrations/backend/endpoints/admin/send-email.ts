@@ -3,31 +3,16 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { voidAdminSendEmailDefinition, voidAdminSendEmailInput, voidAdminSendEmailOutput } from '../../../contract/void-endpoint-definitions.js';
-import { Injectable } from '@nestjs/common';
+import { implement } from '@orpc/server';
+import { authentication, apiPolicy, requirePrincipal } from '../../../../api/backend/transport/middleware.js';
+import type { ApiActor } from '../../../../api/backend/transport/context.js';
+import type { IntegrationsContext } from '../../operations.js';
+import { adminSendEmailContract } from './send-email.contract.js';
 
-import { EmailService } from '@features/email/backend/services/EmailService.js';
-
-const contractProjection = projectEndpointContract(voidAdminSendEmailDefinition);
-
-export const meta = {
-	tags: ['admin'],
-
-	requireCredential: true,
-	requireModerator: true,
-	kind: 'write:admin:send-email',
-} as const;
-
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export default class extends ContractEndpoint<typeof meta, typeof voidAdminSendEmailInput, typeof voidAdminSendEmailOutput> { // eslint-disable-line import/no-default-export
-	constructor(
-		private emailService: EmailService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			await this.emailService.sendEmail(ps.to, ps.subject, ps.text, ps.text);
-		});
-	}
+export function createAdminSendEmailProcedure<Actor extends ApiActor>() {
+	return implement(adminSendEmailContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<IntegrationsContext<Actor>>()
+		.use(authentication<Actor>())
+		.use(apiPolicy<Actor>({ name: 'admin/send-email', requireCredential: true, requireModerator: true, kind: 'write:admin:send-email' }))
+		.use(requirePrincipal<Actor>())
+		.handler(({ input, context }) => context.operations.integrations.adminSendEmail(input, context.principal));
 }

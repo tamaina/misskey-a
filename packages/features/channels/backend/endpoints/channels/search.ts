@@ -3,59 +3,63 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { packedChannelsSearchDefinition, packedChannelsSearchInput, packedChannelsSearchOutput } from '../../../contract/packed-endpoint-definitions.js';
+import { implement } from '@orpc/server';
 import { Inject, Injectable } from '@nestjs/common';
 import { Brackets } from 'typeorm';
 
 import { QueryService } from '@features/notes/backend/services/QueryService.js';
-import type { ChannelsRepository } from '@features/persistence/backend/repositories/models.js';
-import { ChannelEntityService } from '../../serializers/ChannelEntityService.js';
-import { DI } from '@/di-symbols.js';
 import { sqlLikeEscape } from '@features/persistence/backend/utility/sql-like-escape.js';
 
-const contractProjection = projectEndpointContract(packedChannelsSearchDefinition);
+import * as v from 'valibot';
+import { DI } from '@/di-symbols.js';
+import { ChannelEntityService } from '../../serializers/ChannelEntityService.js';
+import { authentication, apiPolicy } from '../../../../api/backend/transport/middleware.js';
+import { channelsSearchContract, channelsSearchPolicy, channelsSearchInput, channelsSearchOutput, channelsSearchErrors } from './search.contract.js';
+import type { ChannelsRepository } from '@features/persistence/backend/repositories/models.js';
+import type { ChannelsApiContext } from '../../operations.js';
+import type { ApiActor } from '../../../../api/backend/transport/context.js';
+import type { MiLocalUser } from '../../../../users/backend/models/User.js';
 
-export const meta = {
-	tags: ['channels'],
-
-	requireCredential: false,
-
-	res: contractProjection.response,
-} as const;
-
-export const paramDef = contractProjection.input;
+export function createChannelsSearchProcedure<Actor extends ApiActor>() {
+	return implement(channelsSearchContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ChannelsApiContext<Actor>>()
+		.use(authentication<Actor>())
+		.use(apiPolicy<Actor>(channelsSearchPolicy))
+		.handler(({ input, context }) => context.operations.channels.channelsSearch(input, context.principal));
+}
 
 @Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedChannelsSearchInput, typeof packedChannelsSearchOutput> {
+export class ChannelsSearchOperation {
 	constructor(
 		@Inject(DI.channelsRepository)
 		private channelsRepository: ChannelsRepository,
 
 		private channelEntityService: ChannelEntityService,
 		private queryService: QueryService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			const query = this.queryService.makePaginationQuery(this.channelsRepository.createQueryBuilder('channel'), ps.sinceId, ps.untilId, ps.sinceDate, ps.untilDate)
-				.andWhere('channel.isArchived = FALSE');
+	) {}
+	async execute(ps: v.InferOutput<typeof channelsSearchInput>, me: MiLocalUser | null): Promise<v.InferOutput<typeof channelsSearchOutput>> {
+		return v.parse(channelsSearchOutput, await this.run(ps, me));
+	}
 
-			if (ps.query !== '') {
-				if (ps.type === 'nameAndDescription') {
-					query.andWhere(new Brackets(qb => {
-						qb
-							.where('channel.name ILIKE :q', { q: `%${ sqlLikeEscape(ps.query) }%` })
-							.orWhere('channel.description ILIKE :q', { q: `%${ sqlLikeEscape(ps.query) }%` });
-					}));
-				} else {
-					query.andWhere('channel.name ILIKE :q', { q: `%${ sqlLikeEscape(ps.query) }%` });
-				}
+	private async run(ps: v.InferOutput<typeof channelsSearchInput>, me: MiLocalUser | null) {
+		const query = this.queryService.makePaginationQuery(this.channelsRepository.createQueryBuilder('channel'), ps.sinceId, ps.untilId, ps.sinceDate, ps.untilDate)
+			.andWhere('channel.isArchived = FALSE');
+
+		if (ps.query !== '') {
+			if (ps.type === 'nameAndDescription') {
+				query.andWhere(new Brackets(qb => {
+					qb
+						.where('channel.name ILIKE :q', { q: `%${ sqlLikeEscape(ps.query) }%` })
+						.orWhere('channel.description ILIKE :q', { q: `%${ sqlLikeEscape(ps.query) }%` });
+				}));
+			} else {
+				query.andWhere('channel.name ILIKE :q', { q: `%${ sqlLikeEscape(ps.query) }%` });
 			}
+		}
 
-			const channels = await query
-				.limit(ps.limit)
-				.getMany();
+		const channels = await query
+			.limit(ps.limit)
+			.getMany();
 
-			return await Promise.all(channels.map(x => this.channelEntityService.pack(x, me)));
-		});
+		return await Promise.all(channels.map(x => this.channelEntityService.pack(x, me)));
 	}
 }

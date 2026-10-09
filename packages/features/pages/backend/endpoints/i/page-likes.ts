@@ -3,48 +3,16 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { packedIPageLikesDefinition, packedIPageLikesInput, packedIPageLikesOutput } from '../../../contract/packed-endpoint-definitions.js';
-import { Inject, Injectable } from '@nestjs/common';
+import { implement } from '@orpc/server';
+import { authentication, apiPolicy, requirePrincipal } from '../../../../api/backend/transport/middleware.js';
+import type { ApiActor } from '../../../../api/backend/transport/context.js';
+import type { PagesContext } from '../../operations.js';
+import { iPageLikesContract } from './page-likes.contract.js';
 
-import type { PageLikesRepository } from '@features/persistence/backend/repositories/models.js';
-import { QueryService } from '@features/notes/backend/services/QueryService.js';
-import { PageLikeEntityService } from '../../serializers/PageLikeEntityService.js';
-import { DI } from '@/di-symbols.js';
-
-const contractProjection = projectEndpointContract(packedIPageLikesDefinition);
-
-export const meta = {
-	tags: ['account', 'pages'],
-
-	requireCredential: true,
-
-	kind: 'read:page-likes',
-
-	res: contractProjection.response,
-} as const;
-
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedIPageLikesInput, typeof packedIPageLikesOutput> {
-	constructor(
-		@Inject(DI.pageLikesRepository)
-		private pageLikesRepository: PageLikesRepository,
-
-		private pageLikeEntityService: PageLikeEntityService,
-		private queryService: QueryService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			const query = this.queryService.makePaginationQuery(this.pageLikesRepository.createQueryBuilder('like'), ps.sinceId, ps.untilId, ps.sinceDate, ps.untilDate)
-				.andWhere('like.userId = :meId', { meId: me.id })
-				.leftJoinAndSelect('like.page', 'page');
-
-			const likes = await query
-				.limit(ps.limit)
-				.getMany();
-
-			return this.pageLikeEntityService.packMany(likes, me);
-		});
-	}
+export function createIPageLikesProcedure<Actor extends ApiActor>() {
+	return implement(iPageLikesContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<PagesContext<Actor>>()
+		.use(authentication<Actor>())
+		.use(apiPolicy<Actor>({ name: 'i/page-likes', requireCredential: true, kind: 'read:page-likes' }))
+		.use(requirePrincipal<Actor>())
+		.handler(({ input, context }) => context.operations.pages.iPageLikes(input, context.principal));
 }

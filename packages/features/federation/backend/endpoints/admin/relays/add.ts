@@ -3,49 +3,16 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { inlineAdminRelaysAddDefinition, inlineAdminRelaysAddInput, inlineAdminRelaysAddOutput } from '../../../../contract/endpoint-definitions.js';
-import { URL } from 'node:url';
-import { Injectable } from '@nestjs/common';
+import { implement } from '@orpc/server';
+import { authentication, apiPolicy, requirePrincipal } from '../../../../../api/backend/transport/middleware.js';
+import type { ApiActor } from '../../../../../api/backend/transport/context.js';
+import type { FederationContext } from '../../../operations.js';
+import { adminRelaysAddContract } from './add.contract.js';
 
-import { RelayService } from '../../../services/RelayService.js';
-import { ApiError } from '@features/api/backend/transport/error.js';
-
-const contractProjection = projectEndpointContract(inlineAdminRelaysAddDefinition);
-
-export const meta = {
-	tags: ['admin'],
-
-	requireCredential: true,
-	requireModerator: true,
-	kind: 'write:admin:relays',
-
-	errors: {
-		invalidUrl: {
-			message: 'Invalid URL',
-			code: 'INVALID_URL',
-			id: 'fb8c92d3-d4e5-44e7-b3d4-800d5cef8b2c',
-		},
-	},
-
-	res: contractProjection.response,
-} as const;
-
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof inlineAdminRelaysAddInput, typeof inlineAdminRelaysAddOutput> {
-	constructor(
-		private relayService: RelayService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			try {
-				if (new URL(ps.inbox).protocol !== 'https:') throw new Error('https only');
-			} catch {
-				throw new ApiError(meta.errors.invalidUrl);
-			}
-
-			return await this.relayService.addRelay(ps.inbox);
-		});
-	}
+export function createAdminRelaysAddProcedure<Actor extends ApiActor>() {
+	return implement(adminRelaysAddContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<FederationContext<Actor>>()
+		.use(authentication<Actor>())
+		.use(apiPolicy<Actor>({ name: 'admin/relays/add', requireCredential: true, requireModerator: true, kind: 'write:admin:relays' }))
+		.use(requirePrincipal<Actor>())
+		.handler(({ input, context }) => context.operations.federation.adminRelaysAdd(input, context.principal));
 }

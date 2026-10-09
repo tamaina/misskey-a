@@ -3,48 +3,15 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { packedReversiVerifyDefinition, packedReversiVerifyInput, packedReversiVerifyOutput } from '../../../contract/packed-endpoint-definitions.js';
-import { Injectable } from '@nestjs/common';
+import { implement } from '@orpc/server';
+import { authentication, apiPolicy } from '../../../../api/backend/transport/middleware.js';
+import type { ApiActor } from '../../../../api/backend/transport/context.js';
+import type { GamesContext } from '../../operations.js';
+import { reversiVerifyContract } from './verify.contract.js';
 
-import { ReversiService } from '../../services/ReversiService.js';
-import { ReversiGameEntityService } from '../../serializers/ReversiGameEntityService.js';
-import { ApiError } from '@features/api/backend/transport/error.js';
-
-const contractProjection = projectEndpointContract(packedReversiVerifyDefinition);
-
-export const meta = {
-	errors: {
-		noSuchGame: {
-			message: 'No such game.',
-			code: 'NO_SUCH_GAME',
-			id: '8fb05624-b525-43dd-90f7-511852bdfeee',
-		},
-	},
-
-	res: contractProjection.response,
-} as const;
-
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedReversiVerifyInput, typeof packedReversiVerifyOutput> {
-	constructor(
-		private reversiService: ReversiService,
-		private reversiGameEntityService: ReversiGameEntityService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			const game = await this.reversiService.checkCrc(ps.gameId, ps.crc32);
-			if (game) {
-				return {
-					desynced: true,
-					game: await this.reversiGameEntityService.packDetail(game),
-				};
-			} else {
-				return {
-					desynced: false,
-				};
-			}
-		});
-	}
+export function createReversiVerifyProcedure<Actor extends ApiActor>() {
+	return implement(reversiVerifyContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<GamesContext<Actor>>()
+		.use(authentication<Actor>())
+		.use(apiPolicy<Actor>({ name: 'reversi/verify' }))
+		.handler(({ input, context }) => context.operations.games.reversiVerify(input, context.principal));
 }

@@ -3,8 +3,9 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { voidDriveFilesDeleteDefinition, voidDriveFilesDeleteInput, voidDriveFilesDeleteOutput } from '../../../../contract/void-endpoint-definitions.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+import type { DriveManagementInputs } from '../../../management.contract.js';
+import { driveFilesDeleteErrors } from './delete.contract.js';
 import { Inject, Injectable } from '@nestjs/common';
 
 import type { DriveFilesRepository } from '@features/persistence/backend/repositories/models.js';
@@ -12,38 +13,10 @@ import { DriveService } from '../../../services/DriveService.js';
 import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
 import { DI } from '@/di-symbols.js';
 import { RoleService } from '@features/roles/backend/services/RoleService.js';
-import { ApiError } from '@features/api/backend/transport/error.js';
-
-const contractProjection = projectEndpointContract(voidDriveFilesDeleteDefinition);
-
-export const meta = {
-	tags: ['drive'],
-
-	requireCredential: true,
-
-	kind: 'write:drive',
-
-	description: 'Delete an existing drive file.',
-
-	errors: {
-		noSuchFile: {
-			message: 'No such file.',
-			code: 'NO_SUCH_FILE',
-			id: '908939ec-e52b-4458-b395-1025195cea58',
-		},
-
-		accessDenied: {
-			message: 'Access denied.',
-			code: 'ACCESS_DENIED',
-			id: '5eb8d909-2540-4970-90b8-dd6f86088121',
-		},
-	},
-} as const;
-
-export const paramDef = contractProjection.input;
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
 
 @Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof voidDriveFilesDeleteInput, typeof voidDriveFilesDeleteOutput> {
+export class DriveFilesDeleteOperation {
 	constructor(
 		@Inject(DI.driveFilesRepository)
 		private driveFilesRepository: DriveFilesRepository,
@@ -52,18 +25,19 @@ export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof
 		private roleService: RoleService,
 		private globalEventService: GlobalEventService,
 	) {
-		super(meta, contractProjection, async (ps, me) => {
-			const file = await this.driveFilesRepository.findOneBy({ id: ps.fileId });
+	}
 
-			if (file == null) {
-				throw new ApiError(meta.errors.noSuchFile);
-			}
+	async execute(ps: DriveManagementInputs['drive/files/delete'], me: MiLocalUser, _ip: string, _headers: Record<string, string | string[] | undefined>) {
+		const file = await this.driveFilesRepository.findOneBy({ id: ps.fileId });
 
-			if (!await this.roleService.isModerator(me) && (file.userId !== me.id)) {
-				throw new ApiError(meta.errors.accessDenied);
-			}
+		if (file == null) {
+			throw apiError(driveFilesDeleteErrors.noSuchFile);
+		}
 
-			await this.driveService.deleteFile(file, false, me);
-		});
+		if (!await this.roleService.isModerator(me) && (file.userId !== me.id)) {
+			throw apiError(driveFilesDeleteErrors.accessDenied);
+		}
+
+		await this.driveService.deleteFile(file, false, me);
 	}
 }

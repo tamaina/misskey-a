@@ -6,21 +6,41 @@
 import { expect, expectTypeOf, test } from 'vitest';
 import * as v from 'valibot';
 import { mockDeep } from 'vitest-mock-extended';
-import { inlineAdminAnnouncementsCreateDefinition as createDefinition, inlineAdminAnnouncementsCreateInput as createInput, inlineAdminAnnouncementsCreateOutput as createOutput, inlineAdminAnnouncementsListInput as listInput, inlineAdminAnnouncementsListOutput as listOutput } from '../../contract/endpoint-definitions.js';
-import { announcementCommandInputs } from '../../contract/index.js';
-import { packedAnnouncementsInput, packedAnnouncementsOutput, packedAnnouncementsShowInput, packedAnnouncementsShowOutput } from '../../contract/packed-endpoint-definitions.js';
-import { packedAnnouncementSchema } from '../../contract/packed.js';
+
+import { announcementUpdateInput, announcementDeleteInput, announcementReadInput } from '../../backend/api.schema.js';
+const announcementCommandInputs = { 'admin/announcements/update': announcementUpdateInput, 'admin/announcements/delete': announcementDeleteInput, 'i/read-announcement': announcementReadInput };
+
 import { AnnouncementEntityService } from '../../backend/serializers/AnnouncementEntityService.js';
 import { AnnouncementService } from '../../backend/services/AnnouncementService.js';
-import { EndpointImplementation as CreateEndpoint } from '../../backend/endpoints/admin/announcements/create.js';
-import { EndpointImplementation as ListEndpoint } from '../../backend/endpoints/admin/announcements/list.js';
 import { MiAnnouncement } from '../../backend/models/Announcement.js';
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { toLegacyJsonSchema } from '@features/api/backend/index.js';
-import type { AnnouncementsRepository, AnnouncementReadsRepository } from '@features/persistence/backend/repositories/models.js';
-import type { MiLocalUser } from '@features/users/backend/models/User.js';
-import type { IdService } from '@features/runtime/backend/services/IdService.js';
+
+import { packedSchemas } from '../../../index/backend/packed.schema.js';
+import { announcementsContract as nativeContract1 } from '../../backend/api.contract.js';
+import { announcementsContract as nativeContract2 } from '../../backend/api.contract.js';
+import { announcementsContract as nativeContract3 } from '../../backend/api.contract.js';
+import { announcementsContract as nativeContract4 } from '../../backend/api.contract.js';
+import { announcementsContract as nativeContract5 } from '../../backend/api.contract.js';
+import { announcementsContract as nativeContract6 } from '../../backend/api.contract.js';
+import { announcementsContract as nativeContract7 } from '../../backend/api.contract.js';
+import { announcementsContract as nativeContract8 } from '../../backend/api.contract.js';
+import { announcementsContract as nativeContract9 } from '../../backend/api.contract.js';
 import type { QueryService } from '@features/notes/backend/services/QueryService.js';
+import type { IdService } from '@features/runtime/backend/services/IdService.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+import type { AnnouncementsRepository, AnnouncementReadsRepository } from '@features/persistence/backend/repositories/models.js';
+
+function requiredSchema<S extends v.GenericSchema>(schema: S | undefined): S { if (schema === undefined) throw new Error('Missing native schema'); return schema; }
+
+const createDefinition = nativeContract1.create;
+const createInput = requiredSchema(nativeContract2.create['~orpc'].inputSchema);
+const createOutput = requiredSchema(nativeContract3.create['~orpc'].outputSchema);
+const listInput = requiredSchema(nativeContract4.adminList['~orpc'].inputSchema);
+const listOutput = requiredSchema(nativeContract5.adminList['~orpc'].outputSchema);
+const packedAnnouncementsInput = requiredSchema(nativeContract6.list['~orpc'].inputSchema);
+const packedAnnouncementsOutput = requiredSchema(nativeContract7.list['~orpc'].outputSchema);
+const packedAnnouncementsShowInput = requiredSchema(nativeContract8.show['~orpc'].inputSchema);
+const packedAnnouncementsShowOutput = requiredSchema(nativeContract9.show['~orpc'].outputSchema);
+const packedAnnouncementSchema = packedSchemas.Announcement;
 
 const date = new Date('2026-01-01T00:00:00.000Z');
 
@@ -68,55 +88,4 @@ test.each([undefined, null, false, true])('real public serializer retains option
 	const { isRead: ignored, ...withoutRead } = result;
 	expect(ignored).toBe(isRead ?? undefined);
 	expect(v.safeParse(packedAnnouncementSchema, withoutRead).success).toBe(true);
-});
-
-test('authenticated serializer resolves read state and targeted forYou; creation handler uses full real serializer output', async () => {
-	const { announcements, reads, ids, serializer } = fixture();
-	const user = mockDeep<MiLocalUser>({ id: 'user123' });
-	reads.countBy.mockResolvedValue(1);
-	const targeted = await serializer.pack({ ...announcement(), userId: user.id }, user);
-	expect(targeted).toMatchObject({ isRead: true, forYou: true });
-	expect(v.parse(packedAnnouncementSchema, targeted)).toEqual(targeted);
-	expect(reads.countBy).toHaveBeenCalledWith({ announcementId: 'announcement123', userId: user.id });
-	announcements.insertOne.mockResolvedValue(announcement());
-	const service = new AnnouncementService(announcements, reads, mockDeep(), ids, mockDeep(), mockDeep(), serializer);
-	const endpoint = new CreateEndpoint(service);
-	const params = { title: 'Title', text: 'Text', imageUrl: '', i: 'transport', future: true };
-	const result = await endpoint.exec(params, user, null);
-	expect(v.parse(createOutput, result)).toEqual(result);
-	expect(result).toMatchObject({ icon: 'info', display: 'normal', needConfirmationToRead: false, silence: false, forYou: false });
-	expect(params).toMatchObject({ icon: 'info', display: 'normal', userId: null, future: true });
-	expect(announcements.insertOne).toHaveBeenCalledWith(expect.objectContaining({ imageUrl: null, icon: 'info', display: 'normal', forExistingUsers: false, userId: null }));
-});
-
-test('admin list handler emits its distinct finite raw shape and read count', async () => {
-	const { announcements, reads, ids } = fixture();
-	const pagination = mockDeep<QueryService>();
-	const query = mockDeep<ReturnType<AnnouncementsRepository['createQueryBuilder']>>();
-	pagination.makePaginationQuery.mockReturnValue(query);
-	query.andWhere.mockReturnValue(query);
-	query.limit.mockReturnValue(query);
-	query.getMany.mockResolvedValue([announcement()]);
-	reads.countBy.mockResolvedValue(3);
-	const endpoint = new ListEndpoint(announcements, reads, pagination, ids);
-	const result = await endpoint.exec({}, mockDeep<MiLocalUser>({ id: 'user123' }), null);
-	expect(v.parse(listOutput, result)).toEqual(result);
-	expect(result[0]).toMatchObject({ reads: 3, userId: null, updatedAt: null, isActive: true });
-	expect(query.limit).toHaveBeenCalledWith(10);
-	for (const invalid of [{ ...result[0], reads: undefined }, { ...result[0], reads: '3' }, { ...result[0], future: true }]) expect(v.safeParse(listOutput, [invalid]).success).toBe(false);
-});
-
-test('HTTP projection preserves open input, AJV defaults/errors and unparsed outputs', async () => {
-	const { serializer } = fixture();
-	const result = { ...await serializer.pack(announcement()), future: true };
-	const projection = projectEndpointContract(createDefinition);
-	expect(projection.input).not.toHaveProperty('additionalProperties');
-	expect(projection.response).toMatchObject({ additionalProperties: false });
-	expect(toLegacyJsonSchema(packedAnnouncementSchema, { target: 'openapi-3.0', typeMode: 'output' })).toMatchObject({ additionalProperties: false });
-	const params = { title: 'Title', text: 'Text', imageUrl: null, i: 'transport', future: true };
-	const endpoint = new ContractEndpoint({}, projection, async ps => { expect(ps).toBe(params); return result; });
-	expect(await endpoint.exec(params, null, null)).toBe(result);
-	expect(params).toMatchObject({ icon: 'info', display: 'normal', future: true });
-	expect(v.safeParse(createOutput, result).success).toBe(false);
-	await expect(endpoint.exec({ title: 'Title', text: 'Text' }, null, null)).rejects.toMatchObject({ code: 'INVALID_PARAM', id: '3d81ceae-475f-4600-b2a8-2bc116157532', info: { param: '#/required' } });
 });

@@ -6,17 +6,21 @@
 import { expect, test } from 'vitest';
 import * as v from 'valibot';
 import { mockDeep } from 'vitest-mock-extended';
-import { packedReversiGameDetailedSchema, packedReversiGameLiteSchema } from '../../contract/packed.js';
-import { packedReversiMatchInput, packedReversiMatchOutput, packedReversiMatchDefinition, packedReversiVerifyOutput, packedBubbleGameRankingOutput } from '../../contract/packed-endpoint-definitions.js';
-import { voidBubbleGameRegisterInput } from '../../contract/void-endpoint-definitions.js';
-import { emptyReversiInvitationsInput } from '../../contract/empty-input-endpoint-definitions.js';
+import { packedReversiGameDetailedSchema } from '../../backend/reversi.schema.js';
+import { packedReversiGameLiteSchema } from '../../backend/reversi.schema.js';
+import { reversiMatchInput as packedReversiMatchInput } from '../../backend/endpoints/reversi/match.contract.js';
+import { reversiMatchOutput as packedReversiMatchOutput } from '../../backend/endpoints/reversi/match.contract.js';
+import { reversiMatchContract as packedReversiMatchDefinition } from '../../backend/endpoints/reversi/match.contract.js';
+import { reversiVerifyOutput as packedReversiVerifyOutput } from '../../backend/endpoints/reversi/verify.contract.js';
+import { bubbleGameRankingOutput as packedBubbleGameRankingOutput } from '../../backend/endpoints/bubble-game/ranking.contract.js';
+import { bubbleGameRegisterInput as voidBubbleGameRegisterInput } from '../../backend/endpoints/bubble-game/register.contract.js';
+import { reversiInvitationsInput as emptyReversiInvitationsInput } from '../../backend/endpoints/reversi/invitations.contract.js';
 import { ReversiGameEntityService } from '../../backend/serializers/ReversiGameEntityService.js';
-import { EndpointImplementation as RankingEndpoint } from '../../backend/endpoints/bubble-game/ranking.js';
-import { EndpointImplementation as VerifyEndpoint } from '../../backend/endpoints/reversi/verify.js';
+import { BubbleGameRankingApplicationService as RankingEndpoint } from '../../backend/applications/bubble-game/ranking.js';
+import { ReversiVerifyApplicationService as VerifyEndpoint } from '../../backend/applications/reversi/verify.js';
 import type { MiReversiGame } from '../../backend/models/ReversiGame.js';
 import type { MiBubbleGameRecord } from '../../backend/models/BubbleGameRecord.js';
 import type { MiUser } from '@features/users/backend/models/User.js';
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
 
 const date = new Date('2026-01-01T00:00:00Z');
 const user = { id: 'user123', name: null, username: 'alice', host: null, avatarUrl: 'https://example/avatar', avatarBlurhash: null, avatarDecorations: [], emojis: {}, onlineStatus: 'unknown' as const };
@@ -63,13 +67,12 @@ test('actual Reversi serializers retain nullable state, winner, surrender, timeo
 });
 
 // Establish each saved-form boundary independently; the other form stays null.
-// The retained loose object accepts arrays, while scalar forms fail native parsing.
-// The serializer continues to emit either saved value through the legacy HTTP path.
+// Saved forms are genuine JSON, including historical arrays and scalar values.
 test.each([
 	{ field: 'form1' as const, saved: [1, 'saved'], accepted: true },
 	{ field: 'form2' as const, saved: [1, 'saved'], accepted: true },
-	{ field: 'form1' as const, saved: 'saved scalar', accepted: false },
-	{ field: 'form2' as const, saved: 'saved scalar', accepted: false },
+	{ field: 'form1' as const, saved: 'saved scalar', accepted: true },
+	{ field: 'form2' as const, saved: 'saved scalar', accepted: true },
 ])('retained saved-form boundary for $field=$saved', async ({ field, saved, accepted }) => {
 	const { service, game } = fixture();
 	game[field] = saved;
@@ -84,7 +87,7 @@ test.each([false, true])('actual verify handler preserves desynced=%s variants',
 	const { service, game } = fixture();
 	const reversi = mockDeep<ConstructorParameters<typeof VerifyEndpoint>[0]>();
 	reversi.checkCrc.mockResolvedValue(desynced ? game : null);
-	const result = await new VerifyEndpoint(reversi, service).exec({ gameId: game.id, crc32: 'crc' }, null, null);
+	const result = await new VerifyEndpoint(reversi, service).execute({ gameId: game.id, crc32: 'crc' }, null);
 	expect(v.safeParse(packedReversiVerifyOutput, result).success).toBe(true);
 	expect(result.desynced).toBe(desynced);
 	checkClosed(packedReversiVerifyOutput, result, 'desynced', { desynced: 7 });
@@ -95,14 +98,14 @@ test.each([false, true])('actual ranking handler retains missing packed user=%s 
 	records.find.mockResolvedValue([mockDeep<MiBubbleGameRecord>({ id: 'record123', score: 9, user: mockDeep<MiUser>({ id: user.id }) })]);
 	const users = mockDeep<ConstructorParameters<typeof RankingEndpoint>[1]>();
 	users.packMany.mockResolvedValue(missingUser ? [] : [user]);
-	const result = await new RankingEndpoint(records, users).exec({ gameMode: 'normal' }, null, null);
+	const result = await new RankingEndpoint(records, users).execute({ gameMode: 'normal' }, null);
 	expect(v.safeParse(packedBubbleGameRankingOutput, result).success).toBe(true);
 	expect(result[0].user).toEqual(missingUser ? undefined : user);
 	expect(Object.hasOwn(result[0], 'user')).toBe(true);
 	for (const value of [{ ...result[0], future: true }, { score: 9 }, { ...result[0], score: '9' }]) expect(v.safeParse(packedBubbleGameRankingOutput, [value]).success).toBe(false);
 });
 
-test('native game defaults and constraints stay separate from open HTTP inputs and unparsed results', async () => {
+test('native game defaults, empty invitation JSON and finite responses retain wire semantics', async () => {
 	expect(v.parse(packedReversiMatchInput, { future: true })).toEqual({ noIrregularRules: false, multiple: false });
 	for (const value of [{ userId: 7 }, { multiple: null }]) expect(v.safeParse(packedReversiMatchInput, value).success).toBe(false);
 	const register = { score: 0, seed: 'seed', logs: [[1, 2]], gameMode: 'normal', gameVersion: 1 };
@@ -112,11 +115,6 @@ test('native game defaults and constraints stay separate from open HTTP inputs a
 	const { service, game } = fixture();
 	const response = { ...await service.packDetail(game), future: true };
 	const params = { future: true };
-	const projection = projectEndpointContract(packedReversiMatchDefinition);
-	expect(projection.input).not.toHaveProperty('additionalProperties');
-	const endpoint = new ContractEndpoint({}, projection, async ps => { expect(ps).toBe(params); return response; });
-	expect(await endpoint.exec(params, null, null)).toBe(response);
-	expect(params).toEqual({ future: true, noIrregularRules: false, multiple: false });
 	expect(v.safeParse(packedReversiMatchOutput, response).success).toBe(false);
-	await expect(endpoint.exec({ multiple: 7 }, null, null)).rejects.toMatchObject({ code: 'INVALID_PARAM', info: { param: '#/properties/multiple/type' } });
+	expect(v.safeParse(packedReversiMatchInput, { multiple: 7 }).success).toBe(false);
 });

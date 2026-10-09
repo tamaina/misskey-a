@@ -3,48 +3,16 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { voidAdminFederationRemoveAllFollowingDefinition, voidAdminFederationRemoveAllFollowingInput, voidAdminFederationRemoveAllFollowingOutput } from '../../../../contract/void-endpoint-definitions.js';
-import { Inject, Injectable } from '@nestjs/common';
+import { implement } from '@orpc/server';
+import { authentication, apiPolicy, requirePrincipal } from '../../../../../api/backend/transport/middleware.js';
+import type { ApiActor } from '../../../../../api/backend/transport/context.js';
+import type { FederationContext } from '../../../operations.js';
+import { adminFederationRemoveAllFollowingContract } from './remove-all-following.contract.js';
 
-import type { FollowingsRepository, UsersRepository } from '@features/persistence/backend/repositories/models.js';
-import { DI } from '@/di-symbols.js';
-import { QueueService } from '@features/runtime/backend/services/QueueService.js';
-
-const contractProjection = projectEndpointContract(voidAdminFederationRemoveAllFollowingDefinition);
-
-export const meta = {
-	tags: ['admin'],
-
-	requireCredential: true,
-	requireModerator: true,
-	kind: 'write:admin:federation',
-} as const;
-
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export default class extends ContractEndpoint<typeof meta, typeof voidAdminFederationRemoveAllFollowingInput, typeof voidAdminFederationRemoveAllFollowingOutput> { // eslint-disable-line import/no-default-export
-	constructor(
-		@Inject(DI.usersRepository)
-		private usersRepository: UsersRepository,
-
-		@Inject(DI.notesRepository)
-		private followingsRepository: FollowingsRepository,
-
-		private queueService: QueueService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			const followings = await this.followingsRepository.findBy({
-				followerHost: ps.host,
-			});
-
-			const pairs = await Promise.all(followings.map(f => Promise.all([
-				this.usersRepository.findOneByOrFail({ id: f.followerId }),
-				this.usersRepository.findOneByOrFail({ id: f.followeeId }),
-			]).then(([from, to]) => [{ id: from.id }, { id: to.id }])));
-
-			this.queueService.createUnfollowJob(pairs.map(p => ({ from: p[0], to: p[1], silent: true })));
-		});
-	}
+export function createAdminFederationRemoveAllFollowingProcedure<Actor extends ApiActor>() {
+	return implement(adminFederationRemoveAllFollowingContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<FederationContext<Actor>>()
+		.use(authentication<Actor>())
+		.use(apiPolicy<Actor>({ name: 'admin/federation/remove-all-following', requireCredential: true, requireModerator: true, kind: 'write:admin:federation' }))
+		.use(requirePrincipal<Actor>())
+		.handler(({ input, context }) => context.operations.federation.adminFederationRemoveAllFollowing(input, context.principal));
 }

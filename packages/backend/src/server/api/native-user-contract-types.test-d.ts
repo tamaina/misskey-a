@@ -4,20 +4,21 @@
  */
 import { expectTypeOf } from 'vitest';
 import * as v from 'valibot';
-import { packedUserLiteSchema, packedUserDetailedNotMeOnlySchema, packedMeDetailedOnlySchema, packedUserDetailedNotMeSchema, packedMeDetailedSchema, packedUserDetailedSchema, packedUserSchema } from '@features/users/contract/packed.js';
+import { packedUserLiteSchema, packedUserDetailedNotMeOnlySchema, packedMeDetailedOnlySchema, packedUserDetailedNotMeSchema, packedMeDetailedSchema, packedUserDetailedSchema, packedUserSchema, toPackedUser, toPackedUserDetailed } from '@features/users/backend/user.schema.js';
 import type { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import type { MiUser } from '@features/users/backend/models/User.js';
-import type { NativeUserLite, NativeUserDetailedNotMe, NativeUserDetailed, NativeMeDetailed } from '@features/users/backend/serializers/native-user.js';
-import type { Packed } from '@features/index/contract/packed.js';
+type NativeMeDetailed = Awaited<ReturnType<UserEntityService['packSelf']>>;
+import type { Packed } from '@features/index/backend/packed.schema.js';
 
-export function nativeUserProducerTypes(service: UserEntityService, user: MiUser) {
-	expectTypeOf(service.pack(user)).toEqualTypeOf<Promise<NativeUserLite>>();
-	expectTypeOf(service.pack(user, user, { schema: 'UserLite' })).toEqualTypeOf<Promise<NativeUserLite>>();
-	expectTypeOf(service.pack(user, null, { schema: 'UserDetailedNotMe' })).toEqualTypeOf<Promise<NativeUserDetailedNotMe>>();
-	expectTypeOf(service.pack(user, undefined, { schema: 'UserDetailed' })).toEqualTypeOf<Promise<NativeUserDetailedNotMe>>();
-	expectTypeOf(service.pack(user, user, { schema: 'UserDetailedNotMe' })).toEqualTypeOf<Promise<NativeUserDetailed>>();
-	expectTypeOf(service.packSelf(user, { includeSecrets: true })).toEqualTypeOf<Promise<NativeMeDetailed>>();
-	expectTypeOf(service.packMany([user], null, { schema: 'UserDetailed' })).toEqualTypeOf<Promise<NativeUserDetailedNotMe[]>>();
+export async function nativeUserProducerTypes(service: UserEntityService, user: MiUser) {
+	expectTypeOf(toPackedUser(await service.pack(user))).toEqualTypeOf<Packed<'UserLite'>>();
+	expectTypeOf(toPackedUser(await service.pack(user, user, { schema: 'UserLite' }))).toEqualTypeOf<Packed<'UserLite'>>();
+	expectTypeOf(toPackedUserDetailed(await service.pack(user, null, { schema: 'UserDetailedNotMe' }))).toEqualTypeOf<Packed<'UserDetailedNotMe'>>();
+	expectTypeOf(toPackedUserDetailed(await service.pack(user, undefined, { schema: 'UserDetailed' }))).toEqualTypeOf<Packed<'UserDetailedNotMe'>>();
+	expectTypeOf(toPackedUserDetailed(await service.pack(user, user, { schema: 'UserDetailedNotMe' }))).toExtend<Packed<'UserDetailed'>>();
+	expectTypeOf(toPackedUserDetailed(await service.packSelf(user, { includeSecrets: true }))).toEqualTypeOf<Packed<'MeDetailed'>>();
+	const users = await service.packMany([user], null, { schema: 'UserDetailed' });
+	expectTypeOf(users.map(user => toPackedUserDetailed(user))).toEqualTypeOf<Packed<'UserDetailedNotMe'>[]>();
 	// @ts-expect-error A general viewer is not the explicit self capability used by secret producers.
 	service.pack(user, user, { schema: 'MeDetailed', includeSecrets: true });
 	// @ts-expect-error Generic selection cannot pretend an absent detailed option was supplied.

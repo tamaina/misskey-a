@@ -5,7 +5,7 @@
 
 import type * as v from 'valibot';
 import type { Config } from '@/config.js';
-import type { packedMetaLiteSchema, packedMetaDetailedOnlySchema } from '../../contract/packed.js';
+import type { packedMetaLiteSchema, packedMetaDetailedOnlySchema } from '../endpoints/meta.schema.js';
 
 /** Native configuration declarations also allow callbacks; HTTP keeps the producer unparsed. */
 export type NativeMetaLite = Omit<v.InferOutput<typeof packedMetaLiteSchema>, 'sentryForFrontend'> & {

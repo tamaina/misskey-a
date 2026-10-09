@@ -3,19 +3,19 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { inlineAdminResetPasswordDefinition, inlineAdminResetPasswordInput, inlineAdminResetPasswordOutput } from '../../../contract/endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
 import bcrypt from 'bcryptjs';
 
-import { ApiError } from '@features/api/backend/transport/error.js';
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
 import type { UsersRepository, UserProfilesRepository, MiMeta } from '@features/persistence/backend/repositories/models.js';
 import { DI } from '@/di-symbols.js';
 import { secureRndstr } from '../../utility/secure-rndstr.js';
 import { RoleService } from '@features/roles/backend/services/RoleService.js';
 import { ModerationLogService } from '@features/moderation/backend/services/ModerationLogService.js';
 
-const contractProjection = projectEndpointContract(inlineAdminResetPasswordDefinition);
+import * as v from 'valibot';
+import { inlineAdminResetPasswordInput } from '../../auth.schema.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
 
 export const meta = {
 	tags: ['admin'],
@@ -36,14 +36,10 @@ export const meta = {
 			id: 'cda8f8ce-89a6-4f92-8055-33bbe0c1464d',
 		},
 	},
-
-	res: contractProjection.response,
 } as const;
 
-export const paramDef = contractProjection.input;
-
 @Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof inlineAdminResetPasswordInput, typeof inlineAdminResetPasswordOutput> {
+export class AdminResetPasswordOperation {
 	constructor(
 		@Inject(DI.meta)
 		private serverSettings: MiMeta,
@@ -56,38 +52,38 @@ export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof
 
 		private roleService: RoleService,
 		private moderationLogService: ModerationLogService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			const user = await this.usersRepository.findOneBy({ id: ps.userId });
+	) {}
 
-			if (user == null) {
-				throw new ApiError(meta.errors.noSuchUser);
-			}
+	async execute(ps: v.InferOutput<typeof inlineAdminResetPasswordInput>, me: MiLocalUser) {
+		const user = await this.usersRepository.findOneBy({ id: ps.userId });
 
-			if (await this.roleService.isAdministrator(user) && me.id !== user.id) {
-				throw new ApiError(meta.errors.accessDenied);
-			}
+		if (user == null) {
+			throw apiError(meta.errors.noSuchUser);
+		}
 
-			const passwd = secureRndstr(8);
+		if (await this.roleService.isAdministrator(user) && me.id !== user.id) {
+			throw apiError(meta.errors.accessDenied);
+		}
 
-			// Generate hash of password
-			const hash = bcrypt.hashSync(passwd);
+		const passwd = secureRndstr(8);
 
-			await this.userProfilesRepository.update({
-				userId: user.id,
-			}, {
-				password: hash,
-			});
+		// Generate hash of password
+		const hash = bcrypt.hashSync(passwd);
 
-			this.moderationLogService.log(me, 'resetPassword', {
-				userId: user.id,
-				userUsername: user.username,
-				userHost: user.host,
-			});
-
-			return {
-				password: passwd,
-			};
+		await this.userProfilesRepository.update({
+			userId: user.id,
+		}, {
+			password: hash,
 		});
+
+		this.moderationLogService.log(me, 'resetPassword', {
+			userId: user.id,
+			userUsername: user.username,
+			userHost: user.host,
+		});
+
+		return {
+			password: passwd,
+		};
 	}
 }

@@ -3,17 +3,16 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { voidVerifyEmailDefinition, voidVerifyEmailInput, voidVerifyEmailOutput } from '../../contract/void-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
 
 import type { UserProfilesRepository } from '@features/persistence/backend/repositories/models.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import { DI } from '@/di-symbols.js';
 import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
-import { ApiError } from '@features/api/backend/transport/error.js';
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
 
-const contractProjection = projectEndpointContract(voidVerifyEmailDefinition);
+import * as v from 'valibot';
+import { voidVerifyEmailInput } from '../auth.schema.js';
 
 export const meta = {
 	requireCredential: false,
@@ -29,34 +28,32 @@ export const meta = {
 	},
 } as const;
 
-export const paramDef = contractProjection.input;
-
 @Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof voidVerifyEmailInput, typeof voidVerifyEmailOutput> {
+export class VerifyEmailOperation {
 	constructor(
 		@Inject(DI.userProfilesRepository)
 		private userProfilesRepository: UserProfilesRepository,
 
 		private userEntityService: UserEntityService,
 		private globalEventService: GlobalEventService,
-	) {
-		super(meta, contractProjection, async (ps) => {
-			const profile = await this.userProfilesRepository.findOneBy({
-				emailVerifyCode: ps.code,
-			});
+	) {}
 
-			if (profile == null) {
-				throw new ApiError(meta.errors.noSuchCode);
-			}
-
-			await this.userProfilesRepository.update({ userId: profile.userId }, {
-				emailVerified: true,
-				emailVerifyCode: null,
-			});
-
-			this.globalEventService.publishMainStream(profile.userId, 'meUpdated', await this.userEntityService.packSelf(profile.userId, {
-				includeSecrets: true,
-			}));
+	async execute(ps: v.InferOutput<typeof voidVerifyEmailInput>) {
+		const profile = await this.userProfilesRepository.findOneBy({
+			emailVerifyCode: ps.code,
 		});
+
+		if (profile == null) {
+			throw apiError(meta.errors.noSuchCode);
+		}
+
+		await this.userProfilesRepository.update({ userId: profile.userId }, {
+			emailVerified: true,
+			emailVerifyCode: null,
+		});
+
+		this.globalEventService.publishMainStream(profile.userId, 'meUpdated', await this.userEntityService.packSelf(profile.userId, {
+			includeSecrets: true,
+		}));
 	}
 }

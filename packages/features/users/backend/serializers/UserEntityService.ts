@@ -5,12 +5,12 @@
 
 import { Inject, Injectable } from '@nestjs/common';
 import * as Redis from 'ioredis';
-import { Ajv } from 'ajv';
+import * as v from 'valibot';
 import { ModuleRef } from '@nestjs/core';
 import { In } from 'typeorm';
 import { DI } from '@/di-symbols.js';
 import type { Config } from '@/config.js';
-import type { Packed } from '@features/index/contract/packed.js';
+import type { Packed } from '@features/index/backend/packed.schema.js';
 import type { NativeUserLite, NativeUserDetailedNotMe, NativeMeDetailed, NativeUserDetailed, NativePackedUser, UserPackSchema } from './native-user.js';
 import type { MiAnnouncement } from '@features/announcements/backend/models/Announcement.js';
 import type { MiUserSecurityKey } from '@features/auth/backend/models/UserSecurityKey.js';
@@ -25,7 +25,7 @@ import {
 	locationSchema,
 	nameSchema,
 	passwordSchema,
-} from '../models/User.js';
+} from '../user-validation.schema.js';
 import type {
 	BlockingsRepository,
 	FollowingsRepository,
@@ -55,8 +55,6 @@ import type { OnModuleInit } from '@nestjs/common';
 import type { NoteEntityService } from '@features/notes/backend/serializers/NoteEntityService.js';
 import type { PageEntityService } from '@features/pages/backend/serializers/PageEntityService.js';
 import { toArray } from '@features/runtime/backend/data/array.js';
-
-const ajv = new Ajv();
 
 function isLocalUser(user: MiUser): user is MiLocalUser;
 function isLocalUser<T extends { host: MiUser['host'] }>(user: T): user is (T & { host: null; });
@@ -164,12 +162,12 @@ export class UserEntityService implements OnModuleInit {
 	}
 
 	//#region Validators
-	public validateLocalUsername = ajv.compile(localUsernameSchema);
-	public validatePassword = ajv.compile(passwordSchema);
-	public validateName = ajv.compile(nameSchema);
-	public validateDescription = ajv.compile(descriptionSchema);
-	public validateLocation = ajv.compile(locationSchema);
-	public validateBirthday = ajv.compile(birthdaySchema);
+	public validateLocalUsername = (value: unknown): boolean => v.safeParse(localUsernameSchema, value).success;
+	public validatePassword = (value: unknown): boolean => v.safeParse(passwordSchema, value).success;
+	public validateName = (value: unknown): boolean => v.safeParse(nameSchema, value).success;
+	public validateDescription = (value: unknown): boolean => v.safeParse(descriptionSchema, value).success;
+	public validateLocation = (value: unknown): boolean => v.safeParse(locationSchema, value).success;
+	public validateBirthday = (value: unknown): boolean => v.safeParse(birthdaySchema, value).success;
 	//#endregion
 
 	public isLocalUser = isLocalUser;

@@ -3,25 +3,16 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { channelContract, channelErrors } from '@features/channels/contract';
-import { legacyChannelSchemas } from '@features/channels/backend';
-import type { Schema } from '@features/api/backend/utility/json-schema.js';
-import { createContractTransportEndpoint } from '@features/api/backend/transport/contract-transport-endpoint.js';
-import { defineFeatureEndpoint } from '@features/api/backend/transport/feature-endpoint.js';
+import { implement } from '@orpc/server';
+import { channelsMuteCreateContract, channelsMuteCreatePolicy } from './create.contract.js';
+import type { ApiActor } from '../../../../../api/backend/transport/context.js';
+import { authentication, apiPolicy, requirePrincipal } from '../../../../../api/backend/transport/middleware.js';
+import type { ChannelsApiContext } from '../../../operations.js';
 
-export const meta = {
-	tags: ['channels', 'mute'],
-
-	requireCredential: true,
-	prohibitMoved: true,
-
-	kind: 'write:channels',
-
-	errors: channelErrors['channels/mute/create'],
-} as const;
-
-export const paramDef = legacyChannelSchemas['channels/mute/create'].input as Schema;
-
-export const { feature, createEndpoint } = defineFeatureEndpoint('channelCommands', commands => createContractTransportEndpoint(meta, paramDef, channelContract['channels/mute/create'], async (params, user) => commands['channels/mute/create'](params, {
-	context: { actor: user },
-})));
+export function createChannelsMuteCreateProcedure<Actor extends ApiActor>() {
+	return implement(channelsMuteCreateContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ChannelsApiContext<Actor>>()
+		.use(authentication<Actor>())
+		.use(apiPolicy<Actor>(channelsMuteCreatePolicy))
+		.use(requirePrincipal<Actor>())
+		.handler(({ input, context }) => context.operations.channels.channelsMuteCreate(input, context.principal));
+}

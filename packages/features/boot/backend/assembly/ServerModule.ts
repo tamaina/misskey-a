@@ -34,8 +34,44 @@ import { UsersAchievementsOperation } from '@features/users/backend/endpoints/us
 import { UsersShowOperation } from '@features/users/backend/endpoints/users/show.js';
 import { UsersUpdateMemoOperation } from '@features/users/backend/endpoints/users/update-memo.js';
 import { UsersApplicationService } from '@features/users/backend/api.application.js';
+import { chatOperationProviders } from '@features/chat/backend/operations.js';
+import { channelOperationProviders } from '@features/channels/backend/operations.js';
+import { pagesApplicationProviders } from '@features/pages/backend/application-providers.js';
+import { playApplicationProviders } from '@features/play/backend/application-providers.js';
+import { gamesApplicationProviders } from '@features/games/backend/application-providers.js';
+import { federationApplicationProviders } from '@features/federation/backend/application-providers.js';
+import { operationsApplicationProviders } from '@features/operations/backend/application-providers.js';
+import { integrationsApplicationProviders } from '@features/integrations/backend/application-providers.js';
+import { DriveManagementApplicationService } from '@features/drive/backend/management.application.js';
+import { AdminDeleteAllFilesOfAUserOperation } from '@features/drive/backend/endpoints/admin/delete-all-files-of-a-user.js';
+import { AdminDriveCleanRemoteFilesOperation } from '@features/drive/backend/endpoints/admin/drive/clean-remote-files.js';
+import { AdminDriveCleanupOperation } from '@features/drive/backend/endpoints/admin/drive/cleanup.js';
+import { AdminDriveFilesOperation } from '@features/drive/backend/endpoints/admin/drive/files.js';
+import { AdminDriveShowFileOperation } from '@features/drive/backend/endpoints/admin/drive/show-file.js';
+import { DriveOperation } from '@features/drive/backend/endpoints/drive.js';
+import { DriveFilesOperation } from '@features/drive/backend/endpoints/drive/files.js';
+import { DriveFilesAttachedNotesOperation } from '@features/drive/backend/endpoints/drive/files/attached-notes.js';
+import { DriveFilesAttachedChatMessagesOperation } from '@features/drive/backend/endpoints/drive/files/attached-chat-messages.js';
+import { DriveFilesCheckExistenceOperation } from '@features/drive/backend/endpoints/drive/files/check-existence.js';
+import { DriveFilesDeleteOperation } from '@features/drive/backend/endpoints/drive/files/delete.js';
+import { DriveFilesFindOperation } from '@features/drive/backend/endpoints/drive/files/find.js';
+import { DriveFilesFindByHashOperation } from '@features/drive/backend/endpoints/drive/files/find-by-hash.js';
+import { DriveFilesShowOperation } from '@features/drive/backend/endpoints/drive/files/show.js';
+import { DriveFilesUpdateOperation } from '@features/drive/backend/endpoints/drive/files/update.js';
+import { DriveFilesMoveBulkOperation } from '@features/drive/backend/endpoints/drive/files/move-bulk.js';
+import { DriveFilesUploadFromUrlOperation } from '@features/drive/backend/endpoints/drive/files/upload-from-url.js';
+import { DriveFoldersOperation } from '@features/drive/backend/endpoints/drive/folders.js';
+import { DriveFoldersCreateOperation } from '@features/drive/backend/endpoints/drive/folders/create.js';
+import { DriveFoldersDeleteOperation } from '@features/drive/backend/endpoints/drive/folders/delete.js';
+import { DriveFoldersFindOperation } from '@features/drive/backend/endpoints/drive/folders/find.js';
+import { DriveFoldersShowOperation } from '@features/drive/backend/endpoints/drive/folders/show.js';
+import { DriveFoldersUpdateOperation } from '@features/drive/backend/endpoints/drive/folders/update.js';
+import { DriveStreamOperation } from '@features/drive/backend/endpoints/drive/stream.js';
+import { PortabilityApplicationService } from '@features/portability/backend/api.application.js';
+import { authProviders } from '@features/auth/backend/api.providers.js';
+import { sessionProviders } from '@features/auth/backend/session.providers.js';
 import { Module } from '@nestjs/common';
-import { ApiCallService } from '@features/api/backend/transport/ApiCallService.js';
+import { ApiIpLoggingService } from '@features/api/backend/transport/ApiIpLoggingService.js';
 import { FileServerService } from '@features/drive/backend/http/FileServerService.js';
 import { HealthServerService } from '@features/operations/backend/http/HealthServerService.js';
 import { NodeinfoServerService } from '@features/instance/backend/http/NodeinfoServerService.js';
@@ -82,14 +118,14 @@ import { NoteStreamingHidingService } from '@features/api/backend/transport/stre
 import { SigninWithPasskeyApiService } from '@features/auth/backend/transport/SigninWithPasskeyApiService.js';
 import { ServerService } from './ServerService.mjs';
 import { CoreModule } from './CoreModule.js';
-import { EndpointsModule } from './EndpointsModule.js';
+import { featureProviders } from '@features/index/backend/feature-providers.js';
 
 @Module({
 	imports: [
-		EndpointsModule,
 		CoreModule,
 	],
 	providers: [
+		...featureProviders,
 		ClientServerService,
 		ClientLoggerService,
 		HtmlTemplateService,
@@ -103,10 +139,46 @@ import { EndpointsModule } from './EndpointsModule.js';
 		WellKnownServerService,
 		GetterService,
 		MainStreamConnection,
-		ApiCallService,
+		ApiIpLoggingService,
 		ApiLoggerService,
 		ApiServerService,
 		OrpcPilotService,
+		...chatOperationProviders,
+		...channelOperationProviders,
+		...pagesApplicationProviders,
+		...playApplicationProviders,
+		...gamesApplicationProviders,
+		...federationApplicationProviders,
+		...operationsApplicationProviders,
+		...integrationsApplicationProviders,
+		DriveManagementApplicationService,
+		AdminDeleteAllFilesOfAUserOperation,
+		AdminDriveCleanRemoteFilesOperation,
+		AdminDriveCleanupOperation,
+		AdminDriveFilesOperation,
+		AdminDriveShowFileOperation,
+		DriveOperation,
+		DriveFilesOperation,
+		DriveFilesAttachedNotesOperation,
+		DriveFilesAttachedChatMessagesOperation,
+		DriveFilesCheckExistenceOperation,
+		DriveFilesDeleteOperation,
+		DriveFilesFindOperation,
+		DriveFilesFindByHashOperation,
+		DriveFilesShowOperation,
+		DriveFilesUpdateOperation,
+		DriveFilesMoveBulkOperation,
+		DriveFilesUploadFromUrlOperation,
+		DriveFoldersOperation,
+		DriveFoldersCreateOperation,
+		DriveFoldersDeleteOperation,
+		DriveFoldersFindOperation,
+		DriveFoldersShowOperation,
+		DriveFoldersUpdateOperation,
+		DriveStreamOperation,
+		PortabilityApplicationService,
+		...authProviders,
+		...sessionProviders,
 		...notesOperationProviders,
 		...timelinesApplicationProviders,
 		...noteSearchApplicationProviders,

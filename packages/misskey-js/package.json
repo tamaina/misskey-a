@@ -66,9 +66,10 @@
 	},
 	"imports": {
 		"#api-routing": "./built/contracts/api/shared/api-routing.js",
-		"#pilot-contract": "./built/contracts/index/backend/api.contract.js",
+		"#pilot-contract": "./built/contracts/index/backend/client.contract.js",
 		"#pilot-error-data": "./built/contracts/api/backend/transport/errors.schema.js",
-		"#feature-contracts/*": "./built/contracts/*/contract/index.js",
-		"#native-json-value": "./built/contracts/users/backend/json-value.schema.js"
+		"#native-json-value": "./built/contracts/users/backend/json-value.schema.js",
+		"#packed-models": "./built/contracts/index/backend/packed.schema.js",
+		"#session-errors": "./built/contracts/auth/backend/session-errors.schema.js"
 	}
 }

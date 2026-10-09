@@ -6,7 +6,7 @@
 import { describe, expect, test } from 'vitest';
 import { h, render, toDisplayString } from 'vue';
 import * as v from 'valibot';
-import { rssCopiedXmlValueSchema } from '@features/integrations/contract/rss-feed.js';
+import { rssCopiedXmlValueSchema } from '@features/integrations/backend/rss.schema.js';
 import { isAllowedRssLink, rssDomAttribute } from '@features/web/frontend/shared/rss-value.js';
 
 // A parser-owned dynamic XML key may shadow Object.toString; validate the actual JSON fixture.

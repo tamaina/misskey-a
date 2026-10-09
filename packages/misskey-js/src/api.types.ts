@@ -1,11 +1,9 @@
 import type { ContractEndpoints } from './contract.types.js';
-import { Endpoints as Gen } from './autogen/endpoint.js';
 import { UserDetailed } from './autogen/models.js';
 import {
 	AdminRolesCreateRequest,
 	AdminRolesCreateResponse,
 	EmptyRequest,
-	EmptyResponse,
 	I2faRegisterKeyRequest,
 	I2faKeyDoneResponse,
 } from './autogen/entities.js';
@@ -67,7 +65,7 @@ export type SwitchCaseResponseType<E extends keyof Endpoints, P extends Endpoint
 /* eslint-enable @stylistic/indent */
 
 export type Endpoints = Overwrite<
-	Overwrite<Gen, ContractEndpoints>,
+	ContractEndpoints,
 	{
 		'users/show': {
 			req: ContractEndpoints['users/show']['req'];
@@ -127,7 +125,7 @@ export type Endpoints = Overwrite<
 		},
 		'clear-browser-cache': {
 			req: EmptyRequest;
-			res: EmptyResponse;
+			res: null;
 		},
 	}
 >;

@@ -3,52 +3,16 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { packedAdminSystemWebhookShowDefinition, packedAdminSystemWebhookShowInput, packedAdminSystemWebhookShowOutput } from '../../../../contract/packed-endpoint-definitions.js';
-import { Injectable } from '@nestjs/common';
+import { implement } from '@orpc/server';
+import { authentication, apiPolicy, requirePrincipal } from '../../../../../api/backend/transport/middleware.js';
+import type { ApiActor } from '../../../../../api/backend/transport/context.js';
+import type { IntegrationsContext } from '../../../operations.js';
+import { adminSystemWebhookShowContract } from './show.contract.js';
 
-import { SystemWebhookEntityService } from '../../../serializers/SystemWebhookEntityService.js';
-import { ApiError } from '@features/api/backend/transport/error.js';
-import { SystemWebhookService } from '../../../services/SystemWebhookService.js';
-
-const contractProjection = projectEndpointContract(packedAdminSystemWebhookShowDefinition);
-
-export const meta = {
-	tags: ['admin', 'system-webhook'],
-
-	requireCredential: true,
-	requireModerator: true,
-	secure: true,
-	kind: 'write:admin:system-webhook',
-
-	res: contractProjection.response,
-
-	errors: {
-		noSuchSystemWebhook: {
-			message: 'No such SystemWebhook.',
-			code: 'NO_SUCH_SYSTEM_WEBHOOK',
-			id: '38dd1ffe-04b4-6ff5-d8ba-4e6a6ae22c9d',
-			kind: 'server',
-			httpStatusCode: 404,
-		},
-	},
-} as const;
-
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedAdminSystemWebhookShowInput, typeof packedAdminSystemWebhookShowOutput> {
-	constructor(
-		private systemWebhookService: SystemWebhookService,
-		private systemWebhookEntityService: SystemWebhookEntityService,
-	) {
-		super(meta, contractProjection, async (ps) => {
-			const webhooks = await this.systemWebhookService.fetchSystemWebhooks({ ids: [ps.id] });
-			if (webhooks.length === 0) {
-				throw new ApiError(meta.errors.noSuchSystemWebhook);
-			}
-
-			return this.systemWebhookEntityService.pack(webhooks[0]);
-		});
-	}
+export function createAdminSystemWebhookShowProcedure<Actor extends ApiActor>() {
+	return implement(adminSystemWebhookShowContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<IntegrationsContext<Actor>>()
+		.use(authentication<Actor>())
+		.use(apiPolicy<Actor>({ name: 'admin/system-webhook/show', requireCredential: true, requireModerator: true, secure: true, kind: 'write:admin:system-webhook' }))
+		.use(requirePrincipal<Actor>())
+		.handler(({ input, context }) => context.operations.integrations.adminSystemWebhookShow(input, context.principal));
 }

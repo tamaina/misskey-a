@@ -3,39 +3,40 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { packedChannelsMuteListDefinition, packedChannelsMuteListInput, packedChannelsMuteListOutput } from '../../../../contract/packed-endpoint-definitions.js';
+import { implement } from '@orpc/server';
 import { Injectable } from '@nestjs/common';
-
+import * as v from 'valibot';
+import { authentication, apiPolicy, requirePrincipal } from '../../../../../api/backend/transport/middleware.js';
 import { ChannelMutingService } from '../../../services/ChannelMutingService.js';
 import { ChannelEntityService } from '../../../serializers/ChannelEntityService.js';
+import { channelsMuteListContract, channelsMuteListPolicy, channelsMuteListInput, channelsMuteListOutput, channelsMuteListErrors } from './list.contract.js';
+import type { ApiActor } from '../../../../../api/backend/transport/context.js';
+import type { ChannelsApiContext } from '../../../operations.js';
 
-const contractProjection = projectEndpointContract(packedChannelsMuteListDefinition);
+import type { MiLocalUser } from '../../../../../users/backend/models/User.js';
 
-export const meta = {
-	tags: ['channels', 'mute'],
-
-	requireCredential: true,
-	prohibitMoved: true,
-
-	kind: 'read:channels',
-
-	res: contractProjection.response,
-} as const;
-
-export const paramDef = contractProjection.input;
+export function createChannelsMuteListProcedure<Actor extends ApiActor>() {
+	return implement(channelsMuteListContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ChannelsApiContext<Actor>>()
+		.use(authentication<Actor>())
+		.use(apiPolicy<Actor>(channelsMuteListPolicy))
+		.use(requirePrincipal<Actor>())
+		.handler(({ input, context }) => context.operations.channels.channelsMuteList(input, context.principal));
+}
 
 @Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedChannelsMuteListInput, typeof packedChannelsMuteListOutput> {
+export class ChannelsMuteListOperation {
 	constructor(
 		private channelMutingService: ChannelMutingService,
 		private channelEntityService: ChannelEntityService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			const mutings = await this.channelMutingService.list({
-				requestUserId: me.id,
-			});
-			return await this.channelEntityService.packMany(mutings, me);
+	) {}
+	async execute(ps: v.InferOutput<typeof channelsMuteListInput>, me: MiLocalUser): Promise<v.InferOutput<typeof channelsMuteListOutput>> {
+		return v.parse(channelsMuteListOutput, await this.run(ps, me));
+	}
+
+	private async run(ps: v.InferOutput<typeof channelsMuteListInput>, me: MiLocalUser) {
+		const mutings = await this.channelMutingService.list({
+			requestUserId: me.id,
 		});
+		return await this.channelEntityService.packMany(mutings, me);
 	}
 }

@@ -48,6 +48,9 @@ export const rolePoliciesSchema = v.strictObject({
 	'watermarkAvailable': v.boolean(),
 });
 
+// Public metadata includes persisted custom policies alongside the known policy fields.
+export const packedMetaPoliciesSchema = v.objectWithRest(rolePoliciesSchema.entries, wireJson);
+
 export const packedAdSchema = v.strictObject({
 	'id': v.pipe(v.string(), v.metadata({ 'format': 'id', 'example': 'xxxxxxxxxx' })),
 	'expiresAt': v.pipe(v.string(), v.metadata({ 'format': 'date-time' })),
@@ -151,7 +154,7 @@ export const packedMetaLiteSchema = v.strictObject({
 	'inquiryUrl': v.nullable(v.string()),
 	'serverRules': v.array(v.string()),
 	'themeColor': v.nullable(v.string()),
-	'policies': v.lazy(() => rolePoliciesSchema),
+	'policies': v.lazy(() => packedMetaPoliciesSchema),
 	'noteSearchableScope': v.pipe(v.picklist(['local', 'global']), v.metadata({ 'default': 'local' })),
 	'maxFileSize': v.pipe(v.number(), v.finite()),
 	'federation': v.picklist(['all', 'specified', 'none']),

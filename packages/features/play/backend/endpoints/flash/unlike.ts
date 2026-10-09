@@ -3,70 +3,16 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { voidFlashUnlikeDefinition, voidFlashUnlikeInput, voidFlashUnlikeOutput } from '../../../contract/void-endpoint-definitions.js';
-import { Inject, Injectable } from '@nestjs/common';
-import type { FlashsRepository, FlashLikesRepository } from '@features/persistence/backend/repositories/models.js';
+import { implement } from '@orpc/server';
+import { authentication, apiPolicy, requirePrincipal } from '../../../../api/backend/transport/middleware.js';
+import type { ApiActor } from '../../../../api/backend/transport/context.js';
+import type { PlayContext } from '../../operations.js';
+import { flashUnlikeContract } from './unlike.contract.js';
 
-import { DI } from '@/di-symbols.js';
-import { ApiError } from '@features/api/backend/transport/error.js';
-
-const contractProjection = projectEndpointContract(voidFlashUnlikeDefinition);
-
-export const meta = {
-	tags: ['flash'],
-
-	requireCredential: true,
-
-	prohibitMoved: true,
-
-	kind: 'write:flash-likes',
-
-	errors: {
-		noSuchFlash: {
-			message: 'No such flash.',
-			code: 'NO_SUCH_FLASH',
-			id: 'afe8424a-a69e-432d-a5f2-2f0740c62410',
-		},
-
-		notLiked: {
-			message: 'You have not liked that flash.',
-			code: 'NOT_LIKED',
-			id: '755f25a7-9871-4f65-9f34-51eaad9ae0ac',
-		},
-	},
-} as const;
-
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof voidFlashUnlikeInput, typeof voidFlashUnlikeOutput> {
-	constructor(
-		@Inject(DI.flashsRepository)
-		private flashsRepository: FlashsRepository,
-
-		@Inject(DI.flashLikesRepository)
-		private flashLikesRepository: FlashLikesRepository,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			const flash = await this.flashsRepository.findOneBy({ id: ps.flashId });
-			if (flash == null) {
-				throw new ApiError(meta.errors.noSuchFlash);
-			}
-
-			const exist = await this.flashLikesRepository.findOneBy({
-				flashId: flash.id,
-				userId: me.id,
-			});
-
-			if (exist == null) {
-				throw new ApiError(meta.errors.notLiked);
-			}
-
-			// Delete like
-			await this.flashLikesRepository.delete(exist.id);
-
-			this.flashsRepository.decrement({ id: flash.id }, 'likedCount', 1);
-		});
-	}
+export function createFlashUnlikeProcedure<Actor extends ApiActor>() {
+	return implement(flashUnlikeContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<PlayContext<Actor>>()
+		.use(authentication<Actor>())
+		.use(apiPolicy<Actor>({ name: 'flash/unlike', requireCredential: true, kind: 'write:flash-likes', prohibitMoved: true }))
+		.use(requirePrincipal<Actor>())
+		.handler(({ input, context }) => context.operations.play.flashUnlike(input, context.principal));
 }

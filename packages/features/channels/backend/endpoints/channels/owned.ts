@@ -3,48 +3,51 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { packedChannelsOwnedDefinition, packedChannelsOwnedInput, packedChannelsOwnedOutput } from '../../../contract/packed-endpoint-definitions.js';
+import { implement } from '@orpc/server';
 import { Inject, Injectable } from '@nestjs/common';
+import { QueryService } from '@features/notes/backend/services/QueryService.js';
+import * as v from 'valibot';
+import { DI } from '@/di-symbols.js';
+import { authentication, apiPolicy, requirePrincipal } from '../../../../api/backend/transport/middleware.js';
+import { ChannelEntityService } from '../../serializers/ChannelEntityService.js';
+import { channelsOwnedContract, channelsOwnedPolicy, channelsOwnedInput, channelsOwnedOutput, channelsOwnedErrors } from './owned.contract.js';
+import type { ApiActor } from '../../../../api/backend/transport/context.js';
+import type { ChannelsApiContext } from '../../operations.js';
 
 import type { ChannelsRepository } from '@features/persistence/backend/repositories/models.js';
-import { QueryService } from '@features/notes/backend/services/QueryService.js';
-import { ChannelEntityService } from '../../serializers/ChannelEntityService.js';
-import { DI } from '@/di-symbols.js';
 
-const contractProjection = projectEndpointContract(packedChannelsOwnedDefinition);
+import type { MiLocalUser } from '../../../../users/backend/models/User.js';
 
-export const meta = {
-	tags: ['channels', 'account'],
-
-	requireCredential: true,
-
-	kind: 'read:channels',
-
-	res: contractProjection.response,
-} as const;
-
-export const paramDef = contractProjection.input;
+export function createChannelsOwnedProcedure<Actor extends ApiActor>() {
+	return implement(channelsOwnedContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ChannelsApiContext<Actor>>()
+		.use(authentication<Actor>())
+		.use(apiPolicy<Actor>(channelsOwnedPolicy))
+		.use(requirePrincipal<Actor>())
+		.handler(({ input, context }) => context.operations.channels.channelsOwned(input, context.principal));
+}
 
 @Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedChannelsOwnedInput, typeof packedChannelsOwnedOutput> {
+export class ChannelsOwnedOperation {
 	constructor(
 		@Inject(DI.channelsRepository)
 		private channelsRepository: ChannelsRepository,
 
 		private channelEntityService: ChannelEntityService,
 		private queryService: QueryService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			const query = this.queryService.makePaginationQuery(this.channelsRepository.createQueryBuilder('channel'), ps.sinceId, ps.untilId, ps.sinceDate, ps.untilDate)
-				.andWhere('channel.isArchived = FALSE')
-				.andWhere({ userId: me.id });
+	) {}
+	async execute(ps: v.InferOutput<typeof channelsOwnedInput>, me: MiLocalUser): Promise<v.InferOutput<typeof channelsOwnedOutput>> {
+		return v.parse(channelsOwnedOutput, await this.run(ps, me));
+	}
 
-			const channels = await query
-				.limit(ps.limit)
-				.getMany();
+	private async run(ps: v.InferOutput<typeof channelsOwnedInput>, me: MiLocalUser) {
+		const query = this.queryService.makePaginationQuery(this.channelsRepository.createQueryBuilder('channel'), ps.sinceId, ps.untilId, ps.sinceDate, ps.untilDate)
+			.andWhere('channel.isArchived = FALSE')
+			.andWhere({ userId: me.id });
 
-			return await Promise.all(channels.map(x => this.channelEntityService.pack(x, me)));
-		});
+		const channels = await query
+			.limit(ps.limit)
+			.getMany();
+
+		return await Promise.all(channels.map(x => this.channelEntityService.pack(x, me)));
 	}
 }

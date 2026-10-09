@@ -3,44 +3,36 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { packedChannelsTimelineDefinition, packedChannelsTimelineInput, packedChannelsTimelineOutput } from '../../../contract/packed-endpoint-definitions.js';
+import { implement } from '@orpc/server';
 import { Inject, Injectable } from '@nestjs/common';
 
-import type { ChannelsRepository, MiMeta, NotesRepository } from '@features/persistence/backend/repositories/models.js';
 import { QueryService } from '@features/notes/backend/services/QueryService.js';
 import { NoteEntityService } from '@features/notes/backend/serializers/NoteEntityService.js';
 import { ActiveUsersChart } from '@features/statistics/backend/charts/active-users.js';
-import { DI } from '@/di-symbols.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { FanoutTimelineEndpointService } from '@features/timelines/backend/services/FanoutTimelineEndpointService.js';
-import { MiLocalUser } from '@features/users/backend/models/User.js';
-import { ChannelMutingService } from '../../services/ChannelMutingService.js';
-import { ApiError } from '@features/api/backend/transport/error.js';
 import { Brackets } from 'typeorm';
 
-const contractProjection = projectEndpointContract(packedChannelsTimelineDefinition);
+import * as v from 'valibot';
+import { DI } from '@/di-symbols.js';
+import { ChannelMutingService } from '../../services/ChannelMutingService.js';
+import { authentication, apiPolicy } from '../../../../api/backend/transport/middleware.js';
+import { apiError } from '../../../../api/backend/transport/orpc-error.js';
+import { channelsTimelineContract, channelsTimelinePolicy, channelsTimelineInput, channelsTimelineOutput, channelsTimelineErrors } from './timeline.contract.js';
+import type { MiLocalUser } from '../../../../users/backend/models/User.js';
+import type { ChannelsRepository, MiMeta, NotesRepository } from '@features/persistence/backend/repositories/models.js';
+import type { ChannelsApiContext } from '../../operations.js';
+import type { ApiActor } from '../../../../api/backend/transport/context.js';
 
-export const meta = {
-	tags: ['notes', 'channels'],
-
-	requireCredential: false,
-
-	res: contractProjection.response,
-
-	errors: {
-		noSuchChannel: {
-			message: 'No such channel.',
-			code: 'NO_SUCH_CHANNEL',
-			id: '4d0eeeba-a02c-4c3c-9966-ef60d38d2e7f',
-		},
-	},
-} as const;
-
-export const paramDef = contractProjection.input;
+export function createChannelsTimelineProcedure<Actor extends ApiActor>() {
+	return implement(channelsTimelineContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ChannelsApiContext<Actor>>()
+		.use(authentication<Actor>())
+		.use(apiPolicy<Actor>(channelsTimelinePolicy))
+		.handler(({ input, context }) => context.operations.channels.channelsTimeline(input, context.principal));
+}
 
 @Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedChannelsTimelineInput, typeof packedChannelsTimelineOutput> {
+export class ChannelsTimelineOperation {
 	constructor(
 		@Inject(DI.meta)
 		private serverSettings: MiMeta,
@@ -57,39 +49,42 @@ export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof
 		private fanoutTimelineEndpointService: FanoutTimelineEndpointService,
 		private activeUsersChart: ActiveUsersChart,
 		private channelMutingService: ChannelMutingService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			const untilId = ps.untilId ?? (ps.untilDate ? this.idService.gen(ps.untilDate!) : null);
-			const sinceId = ps.sinceId ?? (ps.sinceDate ? this.idService.gen(ps.sinceDate!) : null);
+	) {}
+	async execute(ps: v.InferOutput<typeof channelsTimelineInput>, me: MiLocalUser | null): Promise<v.InferOutput<typeof channelsTimelineOutput>> {
+		return v.parse(channelsTimelineOutput, await this.run(ps, me));
+	}
 
-			const channel = await this.channelsRepository.findOneBy({
-				id: ps.channelId,
-			});
+	private async run(ps: v.InferOutput<typeof channelsTimelineInput>, me: MiLocalUser | null) {
+		const untilId = ps.untilId ?? (ps.untilDate ? this.idService.gen(ps.untilDate!) : null);
+		const sinceId = ps.sinceId ?? (ps.sinceDate ? this.idService.gen(ps.sinceDate!) : null);
 
-			if (channel == null) {
-				throw new ApiError(meta.errors.noSuchChannel);
-			}
+		const channel = await this.channelsRepository.findOneBy({
+			id: ps.channelId,
+		});
 
-			if (me) this.activeUsersChart.read(me);
+		if (channel == null) {
+			throw apiError(channelsTimelineErrors.noSuchChannel);
+		}
 
-			if (!this.serverSettings.enableFanoutTimeline) {
-				return await this.noteEntityService.packMany(await this.getFromDb({ untilId, sinceId, limit: ps.limit, channelId: channel.id }, me), me);
-			}
+		if (me) this.activeUsersChart.read(me);
 
-			return await this.fanoutTimelineEndpointService.timeline({
-				untilId,
-				sinceId,
-				limit: ps.limit,
-				allowPartial: ps.allowPartial,
-				me,
-				useDbFallback: true,
-				redisTimelines: [`channelTimeline:${channel.id}`],
-				excludePureRenotes: false,
-				ignoreAuthorChannelFromMute: true,
-				dbFallback: async (untilId, sinceId, limit) => {
-					return await this.getFromDb({ untilId, sinceId, limit, channelId: channel.id }, me);
-				},
-			});
+		if (!this.serverSettings.enableFanoutTimeline) {
+			return await this.noteEntityService.packMany(await this.getFromDb({ untilId, sinceId, limit: ps.limit, channelId: channel.id }, me), me);
+		}
+
+		return await this.fanoutTimelineEndpointService.timeline({
+			untilId,
+			sinceId,
+			limit: ps.limit,
+			allowPartial: ps.allowPartial,
+			me,
+			useDbFallback: true,
+			redisTimelines: [`channelTimeline:${channel.id}`],
+			excludePureRenotes: false,
+			ignoreAuthorChannelFromMute: true,
+			dbFallback: async (untilId, sinceId, limit) => {
+				return await this.getFromDb({ untilId, sinceId, limit, channelId: channel.id }, me);
+			},
 		});
 	}
 

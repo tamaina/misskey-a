@@ -6,25 +6,26 @@
 import { randomUUID } from 'crypto';
 import { Inject, Injectable } from '@nestjs/common';
 import { IsNull } from 'typeorm';
-import { DI } from '@/di-symbols.js';
-import type {
-	SigninsRepository,
-	UserProfilesRepository,
-	UsersRepository,
-} from '@features/persistence/backend/repositories/models.js';
-import type { Config } from '@/config.js';
-import { getIpHash } from '../utility/get-ip-hash.js';
-import type { MiLocalUser, MiUser } from '@features/users/backend/models/User.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { bindThis } from '@features/runtime/backend/decorators.js';
 import { WebAuthnService } from '@features/auth/backend/services/WebAuthnService.js';
 import { Logger } from '@features/runtime/backend/logging/logger.js';
 import { LoggerService } from '@features/runtime/backend/services/LoggerService.js';
-import type { IdentifiableError } from '@features/runtime/backend/errors/identifiable-error.js';
+import { IdentifiableError } from '@features/runtime/backend/errors/identifiable-error.js';
 import { RateLimiterService } from '@features/api/backend/transport/RateLimiterService.js';
+import type { Config } from '@/config.js';
+import { DI } from '@/di-symbols.js';
+import { getIpHash } from '../utility/get-ip-hash.js';
+import { toWebAuthnAuthenticationOptions } from '../webauthn.schema.js';
+import { toSessionHeaders } from '../session.schema.js';
+import { sessionField, sessionText, sessionErrorMessage, type AuthSessionBody, type AuthSessionRequest, type AuthSessionEffects } from '../session.effects.js';
 import { SigninService } from './SigninService.js';
-import type { AuthenticationResponseJSON } from '@simplewebauthn/server';
-import type { FastifyReply, FastifyRequest } from 'fastify';
+import type {
+	UserProfilesRepository,
+	UsersRepository,
+} from '@features/persistence/backend/repositories/models.js';
+import type { MiUser } from '@features/users/backend/models/User.js';
+import type { SigninHistoryRepository } from '../session-signin-repository.js';
 
 @Injectable()
 export class SigninWithPasskeyApiService {
@@ -40,7 +41,7 @@ export class SigninWithPasskeyApiService {
 		private userProfilesRepository: UserProfilesRepository,
 
 		@Inject(DI.signinsRepository)
-		private signinsRepository: SigninsRepository,
+		private signinsRepository: SigninHistoryRepository,
 
 		private idService: IdService,
 		private rateLimiterService: RateLimiterService,
@@ -53,21 +54,16 @@ export class SigninWithPasskeyApiService {
 
 	@bindThis
 	public async signin(
-		request: FastifyRequest<{
-			Body: {
-				credential?: AuthenticationResponseJSON;
-				context?: string;
-			};
-		}>,
-		reply: FastifyReply,
+		body: AuthSessionBody,
+		request: AuthSessionRequest,
+		reply: AuthSessionEffects,
 	) {
 		reply.header('Access-Control-Allow-Origin', this.config.url);
 		reply.header('Access-Control-Allow-Credentials', 'true');
 
-		const body = request.body;
-		const credential = body['credential'];
+		const credential = sessionField(body, 'credential');
 
-		function error(status: number, error: { id: string }) {
+		function error(status: number, error: { id?: string }) {
 			reply.code(status);
 			return { error };
 		}
@@ -78,7 +74,7 @@ export class SigninWithPasskeyApiService {
 				id: this.idService.gen(),
 				userId: userId,
 				ip: request.ip,
-				headers: request.headers as any,
+				headers: toSessionHeaders(request.headers),
 				success: false,
 			});
 			return error(status ?? 500, failure ?? { id: '4e30e80c-e338-45a0-8c8f-44455efa3b76' });
@@ -109,14 +105,14 @@ export class SigninWithPasskeyApiService {
 			const context = randomUUID();
 			this.logger.info(`Initiate Passkey challenge: context: ${context}`);
 			const authChallengeOptions = {
-				option: await this.webAuthnService.initiateSignInWithPasskeyAuthentication(context),
+				option: toWebAuthnAuthenticationOptions(await this.webAuthnService.initiateSignInWithPasskeyAuthentication(context)),
 				context: context,
 			};
 			reply.code(200);
 			return authChallengeOptions;
 		}
 
-		const context = body.context;
+		const context = sessionField(body, 'context');
 		// context is always generated server-side by randomUUID(), so reject anything that is not a UUID
 		if (!context || typeof context !== 'string' || !/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(context)) {
 			// If try Authentication without valid context
@@ -132,7 +128,7 @@ export class SigninWithPasskeyApiService {
 			authorizedUserId = await this.webAuthnService.verifySignInWithPasskeyAuthentication(context, credential);
 		} catch (err) {
 			this.logger.warn(`Passkey challenge Verify error! : ${err}`);
-			const errorId = (err as IdentifiableError).id;
+			const errorId = err instanceof IdentifiableError ? err.id : undefined;
 			return error(403, {
 				id: errorId,
 			});
@@ -148,7 +144,7 @@ export class SigninWithPasskeyApiService {
 		const user = await this.usersRepository.findOneBy({
 			id: authorizedUserId,
 			host: IsNull(),
-		}) as MiLocalUser | null;
+		});
 
 		if (user == null) {
 			return error(403, {

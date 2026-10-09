@@ -34,6 +34,40 @@ import type { UsersRepository, DriveFilesRepository, MiMeta, UserProfilesReposit
 import type { UsersInputs } from '../../api.contract.js';
 import type { ApiToken } from '@features/api/backend/transport/context.js';
 
+/** Exact profile columns written by i/update; JSON columns remain their stored entity types. */
+export type UserProfileUpdatePatch = Partial<Pick<MiUserProfile,
+	| 'alwaysMarkNsfw'
+	| 'autoAcceptFollowed'
+	| 'autoSensitive'
+	| 'birthday'
+	| 'carefulBot'
+	| 'description'
+	| 'emailNotificationTypes'
+	| 'enableWordMute'
+	| 'fields'
+	| 'followedMessage'
+	| 'followersVisibility'
+	| 'followingVisibility'
+	| 'hardMutedWords'
+	| 'injectFeaturedNote'
+	| 'lang'
+	| 'location'
+	| 'mutedInstances'
+	| 'mutedWords'
+	| 'noCrawle'
+	| 'notificationRecieveConfig'
+	| 'pinnedPageId'
+	| 'preventAiLearning'
+	| 'publicReactions'
+	| 'receiveAnnouncementEmail'
+	| 'verifiedLinks'
+>>;
+
+/** Preserve ordinary TypeORM calls without recursively treating stored JSON as ORM expressions. */
+export type UserProfileUpdateRepository = Omit<UserProfilesRepository, 'update'> & {
+	update(userId: string, patch: UserProfileUpdatePatch): Promise<import('typeorm').UpdateResult>;
+};
+
 @Injectable()
 export class IUpdateOperation {
 	constructor(
@@ -47,7 +81,7 @@ export class IUpdateOperation {
 		private usersRepository: UsersRepository,
 
 		@Inject(DI.userProfilesRepository)
-		private userProfilesRepository: UserProfilesRepository,
+		private userProfilesRepository: UserProfileUpdateRepository,
 
 		@Inject(DI.driveFilesRepository)
 		private driveFilesRepository: DriveFilesRepository,
@@ -77,7 +111,7 @@ export class IUpdateOperation {
 		const isSecure = token == null;
 
 		const updates: Partial<MiUser> = {};
-		const profileUpdates: Partial<MiUserProfile> = {};
+		const profileUpdates: UserProfileUpdatePatch = {};
 
 		const profile = await this.userProfilesRepository.findOneByOrFail({ userId: user.id });
 		let policies: RolePolicies | null = null;

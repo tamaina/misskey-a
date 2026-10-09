@@ -1,18 +1,39 @@
 /*
- * SPDX-FileCopyrightText: syuilo and misskey-project
- * SPDX-License-Identifier: AGPL-3.0-only
- */
+	* SPDX-FileCopyrightText: syuilo and misskey-project
+	* SPDX-License-Identifier: AGPL-3.0-only
+	*/
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import {
-	clipFavoriteErrors,
-	createClipFavoriteCommands,
-	legacyClipFavoriteSchemas,
-} from '../../../backend/built/features/collections/backend.js';
+import { createRouterClient } from '@orpc/server';
+import { createCollectionsOperations, createCollectionsRouter } from '../../../backend/built/features/collections/backend.js';
 
 const input = { clipId: 'clip0123' };
 const defaultClip = { id: input.clipId, userId: 'owner-1', isPublic: true };
+
+const clipFavoriteErrors = {
+	'clips/favorite': {
+		noSuchClip: { id: '4c2aaeae-80d8-4250-9606-26cb1fdb77a5' },
+		alreadyFavorited: { id: '92658936-c625-4273-8326-2d790129256e' },
+	},
+	'clips/unfavorite': {
+		noSuchClip: { id: '2603966e-b865-426c-94a7-af4a01241dc1' },
+		notFavorited: { id: '90c3a9e8-b321-4dae-bf57-2bf79bbcc187' },
+	},
+};
+
+function favoriteOperations(deps) {
+	return createCollectionsOperations({
+		clipsRepository: { findOneBy: ({ id }) => deps.findClipById(id) },
+		clipFavoritesRepository: {
+			exists: ({ where }) => deps.hasFavorite(where.clipId, where.userId),
+			insert: values => deps.insertFavorite(values),
+			findOneBy: ({ clipId, userId }) => deps.findFavorite(clipId, userId),
+			delete: id => deps.deleteFavorite(id),
+		},
+		idService: { gen: () => deps.generateFavoriteId() },
+	});
+}
 
 function createFeature(overrides = {}) {
 	const calls = [];
@@ -41,35 +62,25 @@ function createFeature(overrides = {}) {
 			calls.push(['deleteFavorite', id]);
 			if (overrides.deleteFavorite) return overrides.deleteFavorite(id);
 		},
-		createError: definition => {
-			if (overrides.createError) return overrides.createError(definition);
-			const error = new Error(definition.message);
-			Object.assign(error, definition);
-			return error;
-		},
+
 	};
-	return { feature: createClipFavoriteCommands(deps), calls, deps };
+	return { feature: favoriteOperations(deps), calls, deps };
 }
 
-function invoke(feature, route, params = input, actor = { id: 'owner-1' }, options = {}) {
-	return feature[route](params, { context: options.missingContext ? undefined : { actor } });
+function invoke(operations, route, params = input, actor = { id: 'owner-1' }, options = {}) {
+	const principal = options.missingContext ? null : { isSuspended: false, movedToUri: null, ...actor };
+	const client = createRouterClient(createCollectionsRouter(), { context: {
+		credential: 'session', ip: '192.0.2.1', headers: {}, operations: { collections: operations },
+		services: { authenticate: async () => [principal, null], limitActor: () => null, rateLimitFactor: async () => 1, limit: async () => null },
+	} });
+	return client[route === 'clips/favorite' ? 'clipsFavorite' : 'clipsUnfavorite'](params);
 }
-
-test('favorite legacy schemas retain the clip ID shape and loose request object', () => {
-	const schema = {
-		type: 'object',
-		properties: { clipId: { type: 'string', format: 'misskey:id' } },
-		required: ['clipId'],
-	};
-	assert.deepEqual(legacyClipFavoriteSchemas['clips/favorite'].input, schema);
-	assert.deepEqual(legacyClipFavoriteSchemas['clips/unfavorite'].input, schema);
-});
 
 test('favorite conceals missing and another user’s private clips with the legacy error', async () => {
 	for (const clip of [null, { id: input.clipId, userId: 'other-user', isPublic: false }]) {
 		const { feature, calls } = createFeature({ findClipById: async () => clip });
 		await assert.rejects(invoke(feature, 'clips/favorite'), error => error.code === 'NO_SUCH_CLIP'
-			&& error.id === clipFavoriteErrors['clips/favorite'].noSuchClip.id
+			&& error.data.id === clipFavoriteErrors['clips/favorite'].noSuchClip.id
 			&& error.message === 'No such clip.');
 		assert.deepEqual(calls, [['findClipById', input.clipId]]);
 	}
@@ -92,7 +103,7 @@ test('favorite allows its owner to favorite a private clip and a stranger to fav
 test('duplicate favorites fail before generating an ID or inserting', async () => {
 	const { feature, calls } = createFeature({ hasFavorite: async () => true });
 	await assert.rejects(invoke(feature, 'clips/favorite'), error => error.code === 'ALREADY_FAVORITED'
-		&& error.id === clipFavoriteErrors['clips/favorite'].alreadyFavorited.id
+		&& error.data.id === clipFavoriteErrors['clips/favorite'].alreadyFavorited.id
 		&& error.message === 'The clip has already been favorited.');
 	assert.deepEqual(calls.map(call => call[0]), ['findClipById', 'hasFavorite']);
 });
@@ -113,25 +124,25 @@ test('unfavorite permits deleting an existing favorite after the clip becomes pr
 test('unfavorite distinguishes missing clips from missing owned favorites', async () => {
 	const missingClip = createFeature();
 	missingClip.deps.findClipById = async id => { missingClip.calls.push(['findClipById', id]); return null; };
-	missingClip.feature = createClipFavoriteCommands(missingClip.deps);
+	missingClip.feature = favoriteOperations(missingClip.deps);
 	await assert.rejects(invoke(missingClip.feature, 'clips/unfavorite'), error => error.code === 'NO_SUCH_CLIP'
-		&& error.id === clipFavoriteErrors['clips/unfavorite'].noSuchClip.id);
+		&& error.data.id === clipFavoriteErrors['clips/unfavorite'].noSuchClip.id);
 	assert.deepEqual(missingClip.calls.map(call => call[0]), ['findClipById']);
 
 	const notFavorited = createFeature();
 	notFavorited.deps.findFavorite = async (clipId, userId) => { notFavorited.calls.push(['findFavorite', clipId, userId]); return null; };
-	notFavorited.feature = createClipFavoriteCommands(notFavorited.deps);
+	notFavorited.feature = favoriteOperations(notFavorited.deps);
 	await assert.rejects(invoke(notFavorited.feature, 'clips/unfavorite'), error => error.code === 'NOT_FAVORITED'
-		&& error.id === clipFavoriteErrors['clips/unfavorite'].notFavorited.id
+		&& error.data.id === clipFavoriteErrors['clips/unfavorite'].notFavorited.id
 		&& error.message === 'You have not favorited the clip.');
 	assert.deepEqual(notFavorited.calls.map(call => call[0]), ['findClipById', 'findFavorite']);
 });
 
-test('commands validate Misskey IDs, accept loose extra fields, and require a trusted actor', async () => {
+test('commands validate Misskey IDs, strip unused fields, and require a trusted actor', async () => {
 	const { feature, calls } = createFeature();
 	await assert.rejects(invoke(feature, 'clips/favorite', { clipId: 'bad:id' }));
 	assert.equal(calls.length, 0);
-	await assert.rejects(invoke(feature, 'clips/favorite', input, undefined, { missingContext: true }), /authenticated actor/i);
+	await assert.rejects(invoke(feature, 'clips/favorite', input, undefined, { missingContext: true }), error => error.code === 'CREDENTIAL_REQUIRED');
 	await invoke(feature, 'clips/favorite', { ...input, ignored: true });
 	assert.equal(calls.at(-1)[0], 'insertFavorite');
 });

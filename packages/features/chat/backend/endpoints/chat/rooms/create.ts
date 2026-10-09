@@ -3,54 +3,44 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { packedChatRoomsCreateDefinition, packedChatRoomsCreateInput, packedChatRoomsCreateOutput } from '../../../../contract/packed-endpoint-definitions.js';
+import { implement } from '@orpc/server';
 import { Inject, Injectable } from '@nestjs/common';
-import ms from 'ms';
-
+import * as v from 'valibot';
 import { DI } from '@/di-symbols.js';
-import { ApiError } from '@features/api/backend/transport/error.js';
+import { authentication, apiPolicy, requirePrincipal } from '../../../../../api/backend/transport/middleware.js';
 import { ChatService } from '../../../services/ChatService.js';
 import { ChatEntityService } from '../../../serializers/ChatEntityService.js';
+import { chatRoomsCreateContract, chatRoomsCreatePolicy, chatRoomsCreateInput, chatRoomsCreateOutput, chatRoomsCreateErrors } from './create.contract.js';
+import type { ApiActor } from '../../../../../api/backend/transport/context.js';
+import type { ChatApiContext } from '../../../operations.js';
 
-const contractProjection = projectEndpointContract(packedChatRoomsCreateDefinition);
+import type { MiLocalUser } from '../../../../../users/backend/models/User.js';
 
-export const meta = {
-	tags: ['chat'],
-
-	requireCredential: true,
-
-	prohibitMoved: true,
-
-	kind: 'write:chat',
-
-	limit: {
-		duration: ms('1day'),
-		max: 10,
-	},
-
-	res: contractProjection.response,
-
-	errors: {
-	},
-} as const;
-
-export const paramDef = contractProjection.input;
+export function createChatRoomsCreateProcedure<Actor extends ApiActor>() {
+	return implement(chatRoomsCreateContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ChatApiContext<Actor>>()
+		.use(authentication<Actor>())
+		.use(apiPolicy<Actor>(chatRoomsCreatePolicy))
+		.use(requirePrincipal<Actor>())
+		.handler(({ input, context }) => context.operations.chat.chatRoomsCreate(input, context.principal));
+}
 
 @Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedChatRoomsCreateInput, typeof packedChatRoomsCreateOutput> {
+export class ChatRoomsCreateOperation {
 	constructor(
 		private chatService: ChatService,
 		private chatEntityService: ChatEntityService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			await this.chatService.checkChatAvailability(me.id, 'write');
+	) {}
+	async execute(ps: v.InferOutput<typeof chatRoomsCreateInput>, me: MiLocalUser): Promise<v.InferOutput<typeof chatRoomsCreateOutput>> {
+		return v.parse(chatRoomsCreateOutput, await this.run(ps, me));
+	}
 
-			const room = await this.chatService.createRoom(me, {
-				name: ps.name,
-				description: ps.description ?? '',
-			});
-			return await this.chatEntityService.packRoom(room);
+	private async run(ps: v.InferOutput<typeof chatRoomsCreateInput>, me: MiLocalUser) {
+		await this.chatService.checkChatAvailability(me.id, 'write');
+
+		const room = await this.chatService.createRoom(me, {
+			name: ps.name,
+			description: ps.description ?? '',
 		});
+		return await this.chatEntityService.packRoom(room);
 	}
 }

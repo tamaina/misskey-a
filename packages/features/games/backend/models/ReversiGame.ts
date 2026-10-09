@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import type { PackedJsonValue } from '@features/users/backend/json-value.schema.js';
 import { PrimaryColumn, Entity, Index, JoinColumn, Column, ManyToOne } from 'typeorm';
 import { id } from '@features/persistence/backend/models/util/id.js';
 import { MiUser } from '@features/users/backend/models/User.js';
@@ -134,12 +135,12 @@ export class MiReversiGame {
 	@Column('jsonb', {
 		nullable: true, default: null,
 	})
-	public form1: any | null;
+	public form1: PackedJsonValue | null;
 
 	@Column('jsonb', {
 		nullable: true, default: null,
 	})
-	public form2: any | null;
+	public form2: PackedJsonValue | null;
 
 	@Column('varchar', {
 		length: 32, nullable: true,

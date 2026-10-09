@@ -3,43 +3,15 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { packedPagesFeaturedDefinition, packedPagesFeaturedInput, packedPagesFeaturedOutput } from '../../../contract/packed-endpoint-definitions.js';
-import { Inject, Injectable } from '@nestjs/common';
-import type { PagesRepository } from '@features/persistence/backend/repositories/models.js';
+import { implement } from '@orpc/server';
+import { authentication, apiPolicy } from '../../../../api/backend/transport/middleware.js';
+import type { ApiActor } from '../../../../api/backend/transport/context.js';
+import type { PagesContext } from '../../operations.js';
+import { pagesFeaturedContract } from './featured.contract.js';
 
-import { PageEntityService } from '../../serializers/PageEntityService.js';
-import { DI } from '@/di-symbols.js';
-
-const contractProjection = projectEndpointContract(packedPagesFeaturedDefinition);
-
-export const meta = {
-	tags: ['pages'],
-
-	requireCredential: false,
-
-	res: contractProjection.response,
-} as const;
-
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedPagesFeaturedInput, typeof packedPagesFeaturedOutput> {
-	constructor(
-		@Inject(DI.pagesRepository)
-		private pagesRepository: PagesRepository,
-
-		private pageEntityService: PageEntityService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			const query = this.pagesRepository.createQueryBuilder('page')
-				.where('page.visibility = \'public\'')
-				.andWhere('page.likedCount > 0')
-				.orderBy('page.likedCount', 'DESC');
-
-			const pages = await query.limit(10).getMany();
-
-			return await this.pageEntityService.packMany(pages, me);
-		});
-	}
+export function createPagesFeaturedProcedure<Actor extends ApiActor>() {
+	return implement(pagesFeaturedContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<PagesContext<Actor>>()
+		.use(authentication<Actor>())
+		.use(apiPolicy<Actor>({ name: 'pages/featured' }))
+		.handler(({ input, context }) => context.operations.pages.pagesFeatured(input, context.principal));
 }

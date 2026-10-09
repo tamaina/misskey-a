@@ -33,7 +33,7 @@ export class FlashLikeEntityService {
 
 	@bindThis
 	public packMany(
-		likes: any[],
+		likes: MiFlashLike[],
 		me: { id: MiUser['id'] },
 	) {
 		return Promise.all(likes.map(x => this.pack(x, me)));

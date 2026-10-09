@@ -5,6 +5,9 @@
 
 import { OpenAPIGenerator } from '@orpc/openapi';
 import { experimental_ValibotToJsonSchemaConverter } from '@orpc/valibot';
+import { packedJsonValueSchema } from '../../../../users/backend/json-value.schema.js';
+import { clientContract } from '../../../../index/backend/client.contract.js';
+import { packedSchemas } from '../../../../index/backend/packed.schema.js';
 import { pilotContract } from '../../../../index/backend/api.contract.js';
 import { rawObjectInputGuard } from '../input.schema.js';
 import { apiErrorInfoObject } from '../errors.schema.js';
@@ -39,10 +42,11 @@ export async function genPilotOpenapiSpec(config: { version: string; apiUrl: str
 			return undefined;
 		},
 	});
-	const spec = await new OpenAPIGenerator({ schemaConverters: [converter] }).generate(pilotContract, {
+	const spec = await new OpenAPIGenerator({ schemaConverters: [converter] }).generate(clientContract, {
+		commonSchemas: { ...Object.fromEntries(Object.entries(packedSchemas).map(([name, schema]) => [name, { schema, strategy: 'output' as const }])), JsonValue: { schema: packedJsonValueSchema, strategy: 'output' } },
 		info: { version: config.version, title: 'Misskey API' }, servers: [{ url: config.apiUrl }],
 		components: { securitySchemes: { bearerAuth: { type: 'http', scheme: 'bearer' } } },
-		customErrorResponseBodySchema: errors => errors.length === 0 ? undefined : {
+		customErrorResponseBodySchema: errors => errors.length === 0 ? undefined : errors.some(([code]) => code === 'SESSION_HTTP_ERROR') ? { anyOf: errors.map(([, , , dataSchema]) => dataSchema) } : {
 			type: 'object', required: ['error'], properties: {
 				error: { anyOf: errors.map(([code, _message, _required, dataSchema]) => {
 					const data = typeof dataSchema === 'boolean' ? {} : dataSchema;
@@ -91,7 +95,9 @@ export async function getPilotEndpointDescriptors() {
 		return schema;
 	}
 
+	const canonicalNames = new Set(requestRoutes(pilotContract).filter(route => route.introspection !== false).map(route => route.name));
 	return Object.entries(spec.paths ?? {}).flatMap(([path, item]) => {
+		if (!canonicalNames.has(path.slice(1))) return [];
 		const body = item?.post?.requestBody;
 		if (!body || '$ref' in body) return [];
 		const bodySchema = Object.values(body.content)[0]?.schema;

@@ -3,41 +3,15 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { packedFederationShowInstanceDefinition, packedFederationShowInstanceInput, packedFederationShowInstanceOutput } from '../../../contract/packed-endpoint-definitions.js';
-import { Inject, Injectable } from '@nestjs/common';
+import { implement } from '@orpc/server';
+import { authentication, apiPolicy } from '../../../../api/backend/transport/middleware.js';
+import type { ApiActor } from '../../../../api/backend/transport/context.js';
+import type { FederationContext } from '../../operations.js';
+import { federationShowInstanceContract } from './show-instance.contract.js';
 
-import type { InstancesRepository } from '@features/persistence/backend/repositories/models.js';
-import { InstanceEntityService } from '@features/instance/backend/serializers/InstanceEntityService.js';
-import { UtilityService } from '../../services/UtilityService.js';
-import { DI } from '@/di-symbols.js';
-
-const contractProjection = projectEndpointContract(packedFederationShowInstanceDefinition);
-
-export const meta = {
-	tags: ['federation'],
-
-	requireCredential: false,
-
-	res: contractProjection.response,
-} as const;
-
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedFederationShowInstanceInput, typeof packedFederationShowInstanceOutput> {
-	constructor(
-		@Inject(DI.instancesRepository)
-		private instancesRepository: InstancesRepository,
-
-		private utilityService: UtilityService,
-		private instanceEntityService: InstanceEntityService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			const instance = await this.instancesRepository
-				.findOneBy({ host: this.utilityService.toPuny(ps.host) });
-
-			return instance ? await this.instanceEntityService.pack(instance, me) : null;
-		});
-	}
+export function createFederationShowInstanceProcedure<Actor extends ApiActor>() {
+	return implement(federationShowInstanceContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<FederationContext<Actor>>()
+		.use(authentication<Actor>())
+		.use(apiPolicy<Actor>({ name: 'federation/show-instance' }))
+		.handler(({ input, context }) => context.operations.federation.federationShowInstance(input, context.principal));
 }

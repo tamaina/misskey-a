@@ -36,7 +36,7 @@ import type { DriveFileEntityService } from '@features/drive/backend/serializers
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 import type { MiChannel } from '@features/channels/backend/models/Channel.js';
 import type { IdService } from '@features/runtime/backend/services/IdService.js';
-import type { Packed } from '@features/index/contract/packed.js';
+import type { Packed } from '@features/index/backend/packed.schema.js';
 import type { ChannelsRepository, NoteDraftsRepository, NoteReactionsRepository } from '@features/persistence/backend/repositories/models.js';
 
 const user: Packed<'UserLite'> = {

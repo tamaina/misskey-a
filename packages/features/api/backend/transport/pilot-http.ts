@@ -36,10 +36,10 @@ export function registerPilotHttp<Actor extends ApiActor, Context extends ApiCon
 		bodyLimit: jsonBodyLimit,
 		onRequest: async (request, reply) => {
 			const reject = (status: number) => reply.header('Connection', 'close').code(status).send();
-			if (request.method === 'GET' && !route.allowGet) return reject(405);
+			if ((route.acceptedMethods !== undefined && !route.acceptedMethods.includes(request.method)) || (request.method === 'GET' && !route.allowGet)) return reject(405);
 			// HEAD/TRACE bypass Fastify parsers: inspect the header before parser side effects.
 			const mediaType = request.headers['content-type']?.split(';', 1)[0]?.trim().toLowerCase();
-			if (!route.multipart && mediaType !== undefined
+			if (!route.ignoreBody && !route.multipart && mediaType !== undefined
 				&& mediaType !== 'application/json' && !/^application\/[^/]+\+json$/.test(mediaType)) return reject(415);
 			// Preserve bodyless semantics. Never normalize a framed bodyless request into
 			// an unbounded reader; reject framing, including chunked/unknown-size bodies.
@@ -55,7 +55,7 @@ export function registerPilotHttp<Actor extends ApiActor, Context extends ApiCon
 			return payload;
 		},
 	}, async (request, reply) => {
-		if (request.method === 'GET' && !route.allowGet) return reply.code(405).send();
+		if ((route.acceptedMethods !== undefined && !route.acceptedMethods.includes(request.method)) || (request.method === 'GET' && !route.allowGet)) return reply.code(405).send();
 		const run = async (upload?: UploadResource) => {
 			const context = options.context(request, reply, route.name, upload);
 			if (route.cacheSec !== undefined && !context.credential) reply.header('Cache-Control', `public, max-age=${route.cacheSec}`);

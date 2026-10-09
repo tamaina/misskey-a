@@ -1,11 +1,31 @@
 /*
- * SPDX-FileCopyrightText: syuilo and misskey-project
- * SPDX-License-Identifier: AGPL-3.0-only
- */
+	* SPDX-FileCopyrightText: syuilo and misskey-project
+	* SPDX-License-Identifier: AGPL-3.0-only
+	*/
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { createEmojiAdministration, legacyEmojiAdministrationSchemas } from '../../../backend/built/features/emojis/backend.js';
+import { createRouterClient } from '@orpc/server';
+import { createEmojisOperations, createEmojisRouter } from '../../../backend/built/features/emojis/backend.js';
+
+const routeMethods = {
+	'admin/emoji/set-category-bulk': 'setCategoryBulk',
+	'admin/emoji/set-license-bulk': 'setLicenseBulk',
+	'admin/emoji/set-aliases-bulk': 'setAliasesBulk',
+	'admin/emoji/add-aliases-bulk': 'addAliasesBulk',
+	'admin/emoji/remove-aliases-bulk': 'removeAliasesBulk',
+};
+
+function bulkClient(deps) {
+	const actor = { id: 'admin1', isSuspended: false, movedToUri: null };
+	const operations = createEmojisOperations({ customEmojiService: deps });
+	const client = createRouterClient(createEmojisRouter(), { context: {
+		credential: 'session', ip: '192.0.2.1', headers: {}, operations: { emojis: operations },
+		services: { authenticate: async () => [actor, null], limitActor: () => null, rateLimitFactor: async () => 1, limit: async () => null },
+		authorization: { rootUserId: () => actor.id },
+	} });
+	return Object.fromEntries(Object.entries(routeMethods).map(([route, method]) => [route, client[method]]));
+}
 
 const commandInputs = {
 	'admin/emoji/set-category-bulk': { ids: ['emoji1', 'emoji2'], category: 'animals' },
@@ -28,35 +48,9 @@ function createDeps(overrides = {}) {
 	return { deps, calls };
 }
 
-test('legacy request schemas are generated from the same command input schemas', () => {
-	const ids = { type: 'array', items: { type: 'string', format: 'misskey:id' } };
-	const aliases = { type: 'array', items: { type: 'string' } };
-	assert.deepEqual(legacyEmojiAdministrationSchemas['admin/emoji/set-category-bulk'].input, {
-		type: 'object',
-		properties: { ids, category: { type: 'string', nullable: true, description: 'Use `null` to reset the category.' } },
-		required: ['ids'],
-	});
-	assert.deepEqual(legacyEmojiAdministrationSchemas['admin/emoji/set-license-bulk'].input, {
-		type: 'object',
-		properties: { ids, license: { type: 'string', nullable: true, description: 'Use `null` to reset the license.' } },
-		required: ['ids'],
-	});
-	for (const command of [
-		'admin/emoji/set-aliases-bulk',
-		'admin/emoji/add-aliases-bulk',
-		'admin/emoji/remove-aliases-bulk',
-	]) {
-		assert.deepEqual(legacyEmojiAdministrationSchemas[command].input, {
-			type: 'object',
-			properties: { ids, aliases },
-			required: ['ids', 'aliases'],
-		});
-	}
-});
-
 test('all bulk emoji commands accept empty arrays and validate Misskey identifiers', async () => {
 	const { deps, calls } = createDeps();
-	const feature = createEmojiAdministration(deps);
+	const feature = bulkClient(deps);
 
 	for (const [command, input] of Object.entries(commandInputs)) {
 		await feature[command]({ ...input, ids: [], ...(input.aliases ? { aliases: [] } : {}) });
@@ -68,7 +62,7 @@ test('all bulk emoji commands accept empty arrays and validate Misskey identifie
 
 test('category and license omission or null normalize to null; empty strings stay explicit', async () => {
 	const { deps, calls } = createDeps();
-	const feature = createEmojiAdministration(deps);
+	const feature = bulkClient(deps);
 	const ids = ['emoji1'];
 
 	await feature['admin/emoji/set-category-bulk']({ ids });
@@ -92,7 +86,7 @@ test('category and license omission or null normalize to null; empty strings sta
 
 test('set, add and remove aliases remain distinct awaited operations', async () => {
 	const calls = [];
-	const feature = createEmojiAdministration(Object.fromEntries(
+	const feature = bulkClient(Object.fromEntries(
 		['setAliasesBulk', 'addAliasesBulk', 'removeAliasesBulk'].map(name => [name, async (ids, aliases) => {
 			calls.push([name, ids, aliases]);
 		}]),
@@ -123,7 +117,7 @@ test('bulk handlers await service completion, propagate failures, and return no 
 		let start;
 		const started = new Promise(resolve => { start = resolve; });
 		let settled = false;
-		const feature = createEmojiAdministration(createDeps({
+		const feature = bulkClient(createDeps({
 			[method]: async () => {
 				start();
 				await new Promise(resolve => { finish = resolve; });
@@ -137,7 +131,7 @@ test('bulk handlers await service completion, propagate failures, and return no 
 		assert.equal(settled, true);
 
 		const failure = new Error(`${method} failed`);
-		const rejecting = createEmojiAdministration(createDeps({ [method]: async () => { throw failure; } }).deps);
+		const rejecting = bulkClient(createDeps({ [method]: async () => { throw failure; } }).deps);
 		await assert.rejects(rejecting[command](input), error => error === failure);
 	}
 });

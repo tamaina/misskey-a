@@ -28,7 +28,7 @@ import type { CustomEmojiService } from '@features/emojis/backend/services/Custo
 import type { GetterService } from '@features/api/backend/transport/GetterService.js';
 import type { HttpRequestService } from '@features/runtime/backend/services/HttpRequestService.js';
 import type { RoleService } from '@features/roles/backend/services/RoleService.js';
-import type { Packed } from '@features/index/contract/packed.js';
+import type { Packed } from '@features/index/backend/packed.schema.js';
 
 const item = { id: 'note123', reactions: { '🔥': 1 }, reactionEmojis: { 'remote@host': 'https://host/emoji.png' } };
 const translation = { sourceLang: 'JA', text: 'hello' };

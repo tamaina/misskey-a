@@ -7,8 +7,8 @@ import { Entity, Column, Index, OneToOne, JoinColumn, PrimaryColumn } from 'type
 import { id } from '@features/persistence/backend/models/util/id.js';
 import { MiDriveFile } from '@features/drive/backend/models/DriveFile.js';
 
-export { localUsernameSchema, passwordSchema } from '../../contract/user-credentials.js';
-export { descriptionSchema } from '../../contract/user-description.js';
+export { localUsernameSchema, passwordSchema } from '../user-validation.schema.js';
+export { descriptionSchema } from '../user-validation.schema.js';
 
 @Entity('user')
 @Index(['usernameLower', 'host'], { unique: true })
@@ -319,5 +319,5 @@ export type MiPartialRemoteUser = Partial<MiUser> & {
 	uri: string;
 };
 
-export { nameSchema, followedMessageSchema, locationSchema } from '../../contract/user-profile-fields.js';
-export { birthdaySchema } from '../../contract/user-birthday.js';
+export { nameSchema, followedMessageSchema, locationSchema } from '../user-validation.schema.js';
+export { birthdaySchema } from '../user-validation.schema.js';

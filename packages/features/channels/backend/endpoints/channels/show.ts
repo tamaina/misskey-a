@@ -3,53 +3,49 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { packedChannelsShowDefinition, packedChannelsShowInput, packedChannelsShowOutput } from '../../../contract/packed-endpoint-definitions.js';
+import { implement } from '@orpc/server';
 import { Inject, Injectable } from '@nestjs/common';
+import * as v from 'valibot';
+import { DI } from '@/di-symbols.js';
+import { authentication, apiPolicy } from '../../../../api/backend/transport/middleware.js';
+import { ChannelEntityService } from '../../serializers/ChannelEntityService.js';
+import { apiError } from '../../../../api/backend/transport/orpc-error.js';
+import { channelsShowContract, channelsShowPolicy, channelsShowInput, channelsShowOutput, channelsShowErrors } from './show.contract.js';
+import type { ApiActor } from '../../../../api/backend/transport/context.js';
+import type { ChannelsApiContext } from '../../operations.js';
 
 import type { ChannelsRepository } from '@features/persistence/backend/repositories/models.js';
-import { ChannelEntityService } from '../../serializers/ChannelEntityService.js';
-import { DI } from '@/di-symbols.js';
-import { ApiError } from '@features/api/backend/transport/error.js';
 
-const contractProjection = projectEndpointContract(packedChannelsShowDefinition);
+import type { MiLocalUser } from '../../../../users/backend/models/User.js';
 
-export const meta = {
-	tags: ['channels'],
-
-	requireCredential: false,
-
-	res: contractProjection.response,
-
-	errors: {
-		noSuchChannel: {
-			message: 'No such channel.',
-			code: 'NO_SUCH_CHANNEL',
-			id: '6f6c314b-7486-4897-8966-c04a66a02923',
-		},
-	},
-} as const;
-
-export const paramDef = contractProjection.input;
+export function createChannelsShowProcedure<Actor extends ApiActor>() {
+	return implement(channelsShowContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ChannelsApiContext<Actor>>()
+		.use(authentication<Actor>())
+		.use(apiPolicy<Actor>(channelsShowPolicy))
+		.handler(({ input, context }) => context.operations.channels.channelsShow(input, context.principal));
+}
 
 @Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedChannelsShowInput, typeof packedChannelsShowOutput> {
+export class ChannelsShowOperation {
 	constructor(
 		@Inject(DI.channelsRepository)
 		private channelsRepository: ChannelsRepository,
 
 		private channelEntityService: ChannelEntityService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			const channel = await this.channelsRepository.findOneBy({
-				id: ps.channelId,
-			});
+	) {}
+	async execute(ps: v.InferOutput<typeof channelsShowInput>, me: MiLocalUser | null): Promise<v.InferOutput<typeof channelsShowOutput>> {
+		return v.parse(channelsShowOutput, await this.run(ps, me));
+	}
 
-			if (channel == null) {
-				throw new ApiError(meta.errors.noSuchChannel);
-			}
-
-			return await this.channelEntityService.pack(channel, me, true);
+	private async run(ps: v.InferOutput<typeof channelsShowInput>, me: MiLocalUser | null) {
+		const channel = await this.channelsRepository.findOneBy({
+			id: ps.channelId,
 		});
+
+		if (channel == null) {
+			throw apiError(channelsShowErrors.noSuchChannel);
+		}
+
+		return await this.channelEntityService.pack(channel, me, true);
 	}
 }

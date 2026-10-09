@@ -3,96 +3,71 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { packedChatMessagesCreateToRoomDefinition, packedChatMessagesCreateToRoomInput, packedChatMessagesCreateToRoomOutput } from '../../../../contract/packed-endpoint-definitions.js';
+import { implement } from '@orpc/server';
 import { Inject, Injectable } from '@nestjs/common';
-import ms from 'ms';
-
 import { GetterService } from '@features/api/backend/transport/GetterService.js';
+import * as v from 'valibot';
 import { DI } from '@/di-symbols.js';
-import { ApiError } from '@features/api/backend/transport/error.js';
+import { authentication, apiPolicy, requirePrincipal } from '../../../../../api/backend/transport/middleware.js';
 import { ChatService } from '../../../services/ChatService.js';
+import { apiError } from '../../../../../api/backend/transport/orpc-error.js';
+import { chatMessagesCreateToRoomContract, chatMessagesCreateToRoomPolicy, chatMessagesCreateToRoomInput, chatMessagesCreateToRoomOutput, chatMessagesCreateToRoomErrors } from './create-to-room.contract.js';
+import type { ApiActor } from '../../../../../api/backend/transport/context.js';
+import type { ChatApiContext } from '../../../operations.js';
+
 import type { DriveFilesRepository, MiUser } from '@features/persistence/backend/repositories/models.js';
 
-const contractProjection = projectEndpointContract(packedChatMessagesCreateToRoomDefinition);
+import type { MiLocalUser } from '../../../../../users/backend/models/User.js';
 
-export const meta = {
-	tags: ['chat'],
-
-	requireCredential: true,
-
-	prohibitMoved: true,
-
-	kind: 'write:chat',
-
-	limit: {
-		duration: ms('1hour'),
-		max: 500,
-	},
-
-	res: contractProjection.response,
-
-	errors: {
-		noSuchRoom: {
-			message: 'No such room.',
-			code: 'NO_SUCH_ROOM',
-			id: '8098520d-2da5-4e8f-8ee1-df78b55a4ec6',
-		},
-
-		noSuchFile: {
-			message: 'No such file.',
-			code: 'NO_SUCH_FILE',
-			id: 'b6accbd3-1d7b-4d9f-bdb7-eb185bac06db',
-		},
-
-		contentRequired: {
-			message: 'Content required. You need to set text or fileId.',
-			code: 'CONTENT_REQUIRED',
-			id: '340517b7-6d04-42c0-bac1-37ee804e3594',
-		},
-	},
-} as const;
-
-export const paramDef = contractProjection.input;
+export function createChatMessagesCreateToRoomProcedure<Actor extends ApiActor>() {
+	return implement(chatMessagesCreateToRoomContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ChatApiContext<Actor>>()
+		.use(authentication<Actor>())
+		.use(apiPolicy<Actor>(chatMessagesCreateToRoomPolicy))
+		.use(requirePrincipal<Actor>())
+		.handler(({ input, context }) => context.operations.chat.chatMessagesCreateToRoom(input, context.principal));
+}
 
 @Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedChatMessagesCreateToRoomInput, typeof packedChatMessagesCreateToRoomOutput> {
+export class ChatMessagesCreateToRoomOperation {
 	constructor(
 		@Inject(DI.driveFilesRepository)
 		private driveFilesRepository: DriveFilesRepository,
 
 		private getterService: GetterService,
 		private chatService: ChatService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			await this.chatService.checkChatAvailability(me.id, 'write');
+	) {}
+	async execute(ps: v.InferOutput<typeof chatMessagesCreateToRoomInput>, me: MiLocalUser): Promise<v.InferOutput<typeof chatMessagesCreateToRoomOutput>> {
+		return v.parse(chatMessagesCreateToRoomOutput, await this.run(ps, me));
+	}
 
-			const room = await this.chatService.findRoomById(ps.toRoomId);
-			if (room == null) {
-				throw new ApiError(meta.errors.noSuchRoom);
-			}
+	private async run(ps: v.InferOutput<typeof chatMessagesCreateToRoomInput>, me: MiLocalUser) {
+		await this.chatService.checkChatAvailability(me.id, 'write');
 
-			let file = null;
-			if (ps.fileId != null) {
-				file = await this.driveFilesRepository.findOneBy({
-					id: ps.fileId,
-					userId: me.id,
-				});
+		const room = await this.chatService.findRoomById(ps.toRoomId);
+		if (room == null) {
+			throw apiError(chatMessagesCreateToRoomErrors.noSuchRoom);
+		}
 
-				if (file == null) {
-					throw new ApiError(meta.errors.noSuchFile);
-				}
-			}
-
-			// テキストが無いかつ添付ファイルも無かったらエラー
-			if (ps.text == null && file == null) {
-				throw new ApiError(meta.errors.contentRequired);
-			}
-
-			return await this.chatService.createMessageToRoom(me, room, {
-				text: ps.text,
-				file: file,
+		let file = null;
+		if (ps.fileId != null) {
+			file = await this.driveFilesRepository.findOneBy({
+				id: ps.fileId,
+				userId: me.id,
 			});
+
+			if (file == null) {
+				throw apiError(chatMessagesCreateToRoomErrors.noSuchFile);
+			}
+		}
+
+		// テキストが無いかつ添付ファイルも無かったらエラー
+		if (ps.text == null && file == null) {
+			throw apiError(chatMessagesCreateToRoomErrors.contentRequired);
+		}
+
+		return await this.chatService.createMessageToRoom(me, room, {
+			text: ps.text,
+			file: file,
 		});
 	}
 }

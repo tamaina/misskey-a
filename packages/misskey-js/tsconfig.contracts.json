@@ -10,7 +10,6 @@
 	},
 	"include": [
 		"../features/api/shared/api-routing.ts",
-		"../features/*/contract/**/*.ts",
 		"../features/**/*.contract.ts",
 		"../features/**/*.schema.ts"
 	],

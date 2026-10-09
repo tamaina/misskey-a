@@ -1,7 +1,9 @@
 import type * as v from 'valibot';
 import type { ContractEndpoints } from '../src/contract.types.js';
-import type { Packed } from '../built/contracts/index/contract/packed.js';
-import type { NativeNoteCreateEndpoints, notesCreateInput } from '../built/contracts/notes/contract/create-endpoint-definition.js';
+import type { Packed } from '../built/contracts/index/backend/packed.schema.js';
+import type { notesCreateInput } from '../built/contracts/notes/backend/endpoints/notes/create.contract.js';
+import type { InferContractRouterOutputs } from '@orpc/contract';
+import type { notesApiContract } from '../built/contracts/notes/backend/api.contract.js';
 
 type Equal<A, B> = (<T>() => T extends A ? 1 : 2) extends (<T>() => T extends B ? 1 : 2) ? true : false;
 type Assert<T extends true> = T;
@@ -12,7 +14,7 @@ type Reaction = null | 'likeOnly' | 'likeOnlyForRemote' | 'nonSensitiveOnly' | '
 type Visibility = 'public' | 'home' | 'followers' | 'specified';
 
 type Response = Assert<Equal<Flatten<ContractEndpoints['notes/create']['res']>, { createdNote: Packed<'Note'> }>>;
-type NativeResponse = Assert<Equal<Flatten<NativeNoteCreateEndpoints['notes/create']['res']>, { createdNote: Packed<'Note'> }>>;
+type NativeResponse = Assert<Equal<Flatten<InferContractRouterOutputs<typeof notesApiContract>['notesCreate']>, { createdNote: Packed<'Note'> }>>;
 type Fields = Assert<Equal<keyof Request, 'visibility' | 'visibleUserIds' | 'cw' | 'localOnly' | 'reactionAcceptance' | 'noExtractMentions' | 'noExtractHashtags' | 'noExtractEmojis' | 'replyId' | 'renoteId' | 'channelId' | 'text' | 'fileIds' | 'mediaIds' | 'poll'>>;
 type InputVisibility = Assert<Equal<Request['visibility'], Visibility | undefined>>;
 type OutputVisibility = Assert<Equal<Handler['visibility'], Visibility>>;

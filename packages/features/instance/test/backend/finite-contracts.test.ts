@@ -6,37 +6,50 @@
 import { expect, test, vi } from 'vitest';
 import * as v from 'valibot';
 import { mockDeep } from 'vitest-mock-extended';
-import type { DataSource, SelectQueryBuilder } from 'typeorm';
-import type { Redis } from 'ioredis';
 import type { Config } from '@/config.js';
-import { endpointInput, endpointResult, instanceContract, serverInfoResult, pingResult, onlineUsersCountResult } from '../../contract/index.js';
-import { inlineAdminServerInfoOutput } from '../../contract/endpoint-definitions.js';
-import { packedAdminAdListInput, packedAdminAdListDefinition } from '../../contract/packed-endpoint-definitions.js';
-import { constantAdminUpdateMetaDefinition } from '../../contract/source-constant-endpoint-definitions.js';
-import { referenceAdminMetaOutput } from '../../contract/reference-endpoint-definitions.js';
-import { packedAdSchema, packedMetaDetailedSchema, packedMetaLiteSchema } from '../../contract/packed.js';
+import { endpointContract } from '../../backend/endpoints/endpoint.contract.js';
+import { serverInfoOutput as serverInfoResult } from '../../backend/endpoints/server-info.contract.js';
+import { pingContract } from '../../backend/endpoints/ping.contract.js';
+import { onlineUsersCountOutput as onlineUsersCountResult } from '../../backend/endpoints/get-online-users-count.contract.js';
+import { adminServerInfoOutput as inlineAdminServerInfoOutput } from '../../backend/endpoints/admin/server-info.contract.js';
+
+import { adminMetaOutput as referenceAdminMetaOutput } from '../../backend/endpoints/admin/meta.contract.js';
+
 import { MiMeta } from '../../backend/models/Meta.js';
-import type { MetaService } from '../../backend/services/MetaService.js';
 import { MetaEntityService } from '../../backend/serializers/MetaEntityService.js';
+import { createInstanceOperations, type InstanceOperationDependencies } from '../../backend/operations.js';
 import { createServerInfo, createEndpoint, createPing, createGetOnlineUsersCount } from '../../backend/index.js';
-import { EndpointImplementation as AdminServerInfo } from '../../backend/endpoints/admin/server-info.js';
-import { EndpointImplementation as MetaEndpoint } from '../../backend/endpoints/meta.js';
-import { EndpointImplementation as AdminMeta } from '../../backend/endpoints/admin/meta.js';
-import { EndpointImplementation as CreateAd } from '../../backend/endpoints/admin/ad/create.js';
+import { DEFAULT_POLICIES } from '../../../roles/backend/services/RoleService.js';
+import type { MetaService } from '../../backend/services/MetaService.js';
 import type { AdsRepository } from '../../../persistence/backend/repositories/models.js';
 import type { MiLocalUser } from '../../../users/backend/models/User.js';
 import type { SystemAccountService } from '../../../users/backend/services/SystemAccountService.js';
 import type { IdService } from '../../../runtime/backend/services/IdService.js';
 import type { ModerationLogService } from '../../../moderation/backend/services/ModerationLogService.js';
 import type { MiAd } from '../../backend/models/Ad.js';
-import { DEFAULT_POLICIES } from '../../../roles/backend/services/RoleService.js';
-import { ContractEndpoint, projectEndpointContract } from '../../../api/backend/transport/contract-endpoint.js';
 
 vi.mock('../../../statistics/backend/runtime-dependencies/systeminformation.js', () => ({
 	loadSystemInformation: async () => ({ mem: async () => ({ total: 1024 }), fsSize: async () => [{ size: 512, used: 64 }], networkInterfaceDefault: async () => 'eth0' }),
 }));
 
 // The database entity fixture is explicit; response schemas do not construct producer fixtures.
+import { packedSchemas } from '../../../index/backend/packed.schema.js';
+import type { Redis } from 'ioredis';
+import type { DataSource, SelectQueryBuilder } from 'typeorm';
+
+function requiredSchema<S extends v.GenericSchema>(schema: S | undefined): S { if (schema === undefined) throw new Error('Missing native schema'); return schema; }
+
+const endpointResult = requiredSchema(endpointContract['~orpc'].outputSchema);
+const pingResult = requiredSchema(pingContract['~orpc'].outputSchema);
+
+function operations(overrides: Partial<InstanceOperationDependencies>) {
+	return createInstanceOperations<MiLocalUser>({ ...mockDeep<InstanceOperationDependencies>(), ...overrides });
+}
+
+const packedAdSchema = packedSchemas.Ad;
+const packedMetaDetailedSchema = packedSchemas.MetaDetailed;
+const packedMetaLiteSchema = packedSchemas.MetaLite;
+
 const meta = Object.assign(new MiMeta(), {
 	id: 'fixture',
 	rootUserId: null,
@@ -234,7 +247,7 @@ test('actual admin machine producer includes optional Redis version and finite n
 	const redis = mockDeep<Redis>();
 	for (const info of ['redis_version:7.2.0\r\n', 'no version']) {
 		redis.info.mockResolvedValue(info);
-		const result = await new AdminServerInfo(db, redis).exec({}, mockDeep<MiLocalUser>(), null);
+		const result = await operations({ db, redisClient: redis }).adminServerInfo({}, mockDeep<MiLocalUser>());
 		rejectsDrift(inlineAdminServerInfoOutput, result, ['redis']);
 		expect(result.redis).toBe(info.startsWith('redis_version:') ? '7.2.0' : undefined);
 		rejectsNested(inlineAdminServerInfoOutput, result, [['cpu'], ['mem'], ['fs'], ['net']]);
@@ -247,7 +260,7 @@ test('actual admin metadata and public metadata preserve nullable images, client
 	service.fetch.mockResolvedValue(meta);
 	const system = mockDeep<SystemAccountService>();
 	system.fetch.mockResolvedValue(mockDeep<MiLocalUser>({ id: 'proxy1', username: 'proxy', host: null, uri: null }));
-	const result = await new AdminMeta(config, service, system).exec({}, mockDeep<MiLocalUser>(), null);
+	const result = await operations({ config, metaService: service, systemAccountService: system }).adminMeta({}, mockDeep<MiLocalUser>());
 	rejectsDrift(referenceAdminMetaOutput, result, ['policies', 'silencedHosts', 'bannedEmailDomains']);
 	expect(result.langs).toEqual([]);
 	expect(result.logoImageUrl).toBeNull();
@@ -269,6 +282,14 @@ test('actual admin metadata and public metadata preserve nullable images, client
 	}
 	const detailed = await serializer.packDetailed();
 	expect(v.parse(packedMetaDetailedSchema, detailed)).toEqual(detailed);
+	expect(v.parse(packedMetaLiteSchema, lite).policies).toHaveProperty('customPolicy', { enabled: true });
+	expect(v.parse(packedMetaDetailedSchema, detailed).policies).toHaveProperty('customPolicy', { enabled: true });
+	for (const invalid of [new Date(), () => 1, Infinity, undefined]) {
+		const policies = { ...lite.policies, customPolicy: invalid };
+		expect(v.safeParse(packedMetaLiteSchema, { ...lite, policies }).success).toBe(false);
+		expect(v.safeParse(packedMetaDetailedSchema, { ...detailed, policies }).success).toBe(false);
+	}
+	expect(v.safeParse(packedMetaLiteSchema, { ...lite, policies: { ...lite.policies, canPublicNote: 'bad' } }).success).toBe(false);
 	expect(detailed.features?.miauth).toBe(true);
 	expect(v.safeParse(packedMetaDetailedSchema, { ...detailed, features: { ...detailed.features, future: true } }).success).toBe(false);
 	for (const features of [{ ...detailed.features, registration: undefined }, { ...detailed.features, registration: 'bad' }]) expect(v.safeParse(packedMetaDetailedSchema, { ...detailed, features }).success).toBe(false);
@@ -299,13 +320,13 @@ test('actual admin metadata and public metadata preserve nullable images, client
 		{ options: { dsn: 'https://sentry.test' }, vueIntegration: { invalid: () => 1 } },
 		{ options: { dsn: 'https://sentry.test' }, unexpected: true },
 	]) expect(v.safeParse(packedMetaLiteSchema, { ...lite, sentryForFrontend }).success).toBe(false);
-	const endpoint = new MetaEndpoint(serializer);
+	const endpoint = operations({ metaEntityService: serializer });
 	const input = { detail: false, future: 'retained' };
-	const raw = await endpoint.exec(input, null, null);
+	const raw = await endpoint.meta(input);
 	expect(input.future).toBe('retained');
-	expect(raw.sentryForFrontend).toBe(config.sentryForFrontend);
-	expect(typeof raw.sentryForFrontend?.options.beforeSend).toBe('function');
-	const rawDetailed = await endpoint.exec({ detail: true }, null, null);
+	expect(raw.sentryForFrontend?.options).toHaveProperty('extension', { retained: [null, true, 1, 'value'] });
+	expect(raw.sentryForFrontend?.options).not.toHaveProperty('beforeSend');
+	const rawDetailed = await endpoint.meta({ detail: true });
 	expect(rawDetailed).toHaveProperty('features.miauth', true);
 });
 
@@ -313,30 +334,9 @@ test('actual ad create serializer emits dates and sensitivity without response d
 	const ad = mockDeep<MiAd>({ id: 'ad1', expiresAt: new Date('2026-02-01Z'), startsAt: new Date('2026-01-01Z'), dayOfWeek: 0, isSensitive: false, url: 'https://ad.test', imageUrl: 'https://ad.test/image', memo: '', place: 'square', priority: 'high', ratio: 1 });
 	const ads = mockDeep<AdsRepository>();
 	ads.insertOne.mockResolvedValue(ad);
-	const endpoint = new CreateAd(ads, mockDeep<IdService>(), mockDeep<ModerationLogService>());
-	const result = await endpoint.exec({ url: ad.url, memo: '', place: ad.place, priority: ad.priority, ratio: ad.ratio, expiresAt: ad.expiresAt.getTime(), startsAt: ad.startsAt.getTime(), imageUrl: ad.imageUrl, dayOfWeek: ad.dayOfWeek }, mockDeep(), null);
+	const endpoint = operations({ adsRepository: ads, idService: mockDeep<IdService>(), moderationLogService: mockDeep<ModerationLogService>() });
+	const result = await endpoint.adCreate({ url: ad.url, memo: '', place: ad.place, priority: ad.priority, ratio: ad.ratio, expiresAt: ad.expiresAt.getTime(), startsAt: ad.startsAt.getTime(), imageUrl: ad.imageUrl, dayOfWeek: ad.dayOfWeek }, mockDeep<MiLocalUser>());
 	rejectsDrift(packedAdSchema, result);
 	expect(result.isSensitive).toBe(false);
 	expect(result.expiresAt).toBe(ad.expiresAt.toISOString());
-});
-
-test('finite native requests and empty guards stay distinct from HTTP AJV and unparsed response identity', async () => {
-	expect(v.parse(endpointInput, { endpoint: 'ping', future: true })).toEqual({ endpoint: 'ping' });
-	expect(v.parse(packedAdminAdListInput, { future: true })).toEqual({ limit: 10, publishing: null });
-	for (const input of [{ limit: 0 }, { publishing: 'bad' }]) expect(v.safeParse(packedAdminAdListInput, input).success).toBe(false);
-	for (const name of ['ping', 'get-online-users-count', 'server-info', 'endpoints'] as const) {
-		const schema = instanceContract[name]['~orpc'].inputSchema!;
-		expect(v.parse(schema, undefined)).toEqual({});
-		for (const input of [null, [], 'bad', 1]) expect(v.safeParse(schema, input).success).toBe(false);
-	}
-	const request = { future: true };
-	const response = [{ id: 'ad1', expiresAt: '2026-02-01T00:00:00Z', startsAt: '2026-01-01T00:00:00Z', dayOfWeek: 0, isSensitive: false, url: 'https://ad.test', imageUrl: 'https://ad.test/image', memo: '', place: 'square', priority: 'high', ratio: 1, future: true }];
-	const endpoint = new ContractEndpoint({}, projectEndpointContract(packedAdminAdListDefinition), async ps => { expect(ps).toBe(request); return response; });
-	expect(await endpoint.exec(request, null, null)).toBe(response);
-	expect(request).toEqual({ future: true, limit: 10, publishing: null });
-	await expect(endpoint.exec({ limit: 0 }, null, null)).rejects.toMatchObject({ code: 'INVALID_PARAM' });
-	const updateRequest = { clientOptions: { extension: { enabled: true } } };
-	const update = new ContractEndpoint({}, projectEndpointContract(constantAdminUpdateMetaDefinition), async ps => { expect(ps).toBe(updateRequest); expect(ps.clientOptions).toBe(updateRequest.clientOptions); });
-	await update.exec(updateRequest, null, null);
-	expect(updateRequest.clientOptions.extension).toEqual({ enabled: true });
 });

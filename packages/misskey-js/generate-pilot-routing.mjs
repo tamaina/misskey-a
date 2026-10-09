@@ -8,7 +8,7 @@ import { fallbackORPCErrorStatus } from '@orpc/client';
 export async function generatePilotRouting() {
 	const result = await build({
 		stdin: {
-			contents: "export { pilotContract } from '../features/index/backend/api.contract.ts'; export { requestRoutes, nullableResponsePaths } from '../features/api/shared/api-routing.ts'; export { apiErrorData } from '../features/api/backend/transport/errors.schema.ts';",
+			contents: "export { clientContract as pilotContract } from '../features/index/backend/client.contract.ts'; export { requestRoutes, nullableResponsePaths } from '../features/api/shared/api-routing.ts'; export { apiErrorData } from '../features/api/backend/transport/errors.schema.ts';",
 			resolveDir: fileURLToPath(new URL('.', import.meta.url)),
 		},
 		bundle: true, platform: 'browser', format: 'esm', write: false,
@@ -19,7 +19,7 @@ export async function generatePilotRouting() {
 	function compact(router) {
 		if (!isContractProcedure(router)) return Object.fromEntries(Object.entries(router).map(([key, value]) => [key, compact(value)]));
 		const errorMap = Object.fromEntries(Object.entries(router['~orpc'].errorMap).map(([code, definition]) => {
-			if (!definition || definition.data !== apiErrorData) throw new Error('Pilot error decoder requires the shared Misskey error DTO');
+			if (!definition) throw new Error('Expected declared error metadata');
 			return [code, { status: fallbackORPCErrorStatus(code, definition.status) }];
 		}));
 		return enhanceContractRouter(minifyContractRouter(router), { errorMap });

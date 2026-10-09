@@ -178,3 +178,6 @@ export const portableV2AdminEmojiListInput = objectInput({
 });
 
 export const v2EmojiListOutput = v.strictObject({ emojis: v.array(packedEmojiDetailedAdminSchema), count: v.pipe(v.number(), v.integer()), allCount: v.pipe(v.number(), v.integer()), allPages: v.pipe(v.number(), v.integer()) });
+
+export type EmojiSimple = v.InferOutput<typeof emojiSimpleResult>;
+export type EmojiDetailed = v.InferOutput<typeof emojiDetailedResult>;

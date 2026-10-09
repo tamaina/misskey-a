@@ -3,45 +3,16 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { packedFlashMyLikesDefinition, packedFlashMyLikesInput, packedFlashMyLikesOutput } from '../../../contract/packed-endpoint-definitions.js';
-import { Inject, Injectable } from '@nestjs/common';
+import { implement } from '@orpc/server';
+import { authentication, apiPolicy, requirePrincipal } from '../../../../api/backend/transport/middleware.js';
+import type { ApiActor } from '../../../../api/backend/transport/context.js';
+import type { PlayContext } from '../../operations.js';
+import { flashMyLikesContract } from './my-likes.contract.js';
 
-import { FlashLikeEntityService } from '../../serializers/FlashLikeEntityService.js';
-import { DI } from '@/di-symbols.js';
-import { FlashService } from '../../services/FlashService.js';
-
-const contractProjection = projectEndpointContract(packedFlashMyLikesDefinition);
-
-export const meta = {
-	tags: ['account', 'flash'],
-
-	requireCredential: true,
-
-	kind: 'read:flash-likes',
-
-	res: contractProjection.response,
-} as const;
-
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedFlashMyLikesInput, typeof packedFlashMyLikesOutput> {
-	constructor(
-		private flashLikeEntityService: FlashLikeEntityService,
-		private flashService: FlashService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			const likes = await this.flashService.myLikes(me.id, {
-				sinceId: ps.sinceId,
-				untilId: ps.untilId,
-				sinceDate: ps.sinceDate,
-				untilDate: ps.untilDate,
-				limit: ps.limit,
-				search: ps.search,
-			});
-
-			return this.flashLikeEntityService.packMany(likes, me);
-		});
-	}
+export function createFlashMyLikesProcedure<Actor extends ApiActor>() {
+	return implement(flashMyLikesContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<PlayContext<Actor>>()
+		.use(authentication<Actor>())
+		.use(apiPolicy<Actor>({ name: 'flash/my-likes', requireCredential: true, kind: 'read:flash-likes' }))
+		.use(requirePrincipal<Actor>())
+		.handler(({ input, context }) => context.operations.play.flashMyLikes(input, context.principal));
 }

@@ -6,17 +6,19 @@
 import { expect, test } from 'vitest';
 import * as v from 'valibot';
 import { mockDeep } from 'vitest-mock-extended';
-import { packedChatMessageSchema, packedChatMessageLiteSchema, packedChatMessageLiteFor1on1Schema, packedChatMessageLiteForRoomSchema, packedChatRoomSchema, packedChatRoomInvitationSchema, packedChatRoomMembershipSchema } from '../../contract/packed.js';
-import { packedChatHistoryInput, packedChatHistoryOutput, packedChatHistoryDefinition, packedChatMessagesCreateToUserInput } from '../../contract/packed-endpoint-definitions.js';
-import { chatInputs, chatErrors } from '../../contract/index.js';
+import { packedChatMessageSchema, packedChatMessageLiteSchema, packedChatMessageLiteFor1on1Schema, packedChatMessageLiteForRoomSchema, packedChatRoomSchema, packedChatRoomInvitationSchema, packedChatRoomMembershipSchema } from '../../backend/chat.schema.js';
+import { chatHistoryInput as packedChatHistoryInput, chatHistoryOutput as packedChatHistoryOutput } from '../../backend/endpoints/chat/history.contract.js';
+import { chatMessagesCreateToUserInput as packedChatMessagesCreateToUserInput } from '../../backend/endpoints/chat/messages/create-to-user.contract.js';
+import { chatReadAllInput } from '../../backend/endpoints/chat/read-all.contract.js';
+import { chatRoomsMuteInput } from '../../backend/endpoints/chat/rooms/mute.contract.js';
+import { chatRoomsJoinErrors } from '../../backend/endpoints/chat/rooms/join.contract.js';
 import { ChatEntityService } from '../../backend/serializers/ChatEntityService.js';
-import { EndpointImplementation as HistoryEndpoint } from '../../backend/endpoints/chat/history.js';
+import { ChatHistoryOperation as HistoryEndpoint } from '../../backend/endpoints/chat/history.js';
 import type { MiChatMessage } from '../../backend/models/ChatMessage.js';
 import type { MiChatRoom } from '../../backend/models/ChatRoom.js';
 import type { MiChatRoomInvitation } from '../../backend/models/ChatRoomInvitation.js';
 import type { MiChatRoomMembership } from '../../backend/models/ChatRoomMembership.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
 
 const date = new Date('2026-01-01T00:00:00Z');
 const user = { id: 'user123', name: null, username: 'alice', host: null, avatarUrl: 'https://example/avatar', avatarBlurhash: null, avatarDecorations: [], emojis: {}, onlineStatus: 'unknown' as const };
@@ -109,25 +111,19 @@ test.each([false, true])('actual history handler adds its read state for room=%s
 	chats.getRoomReadStateMap.mockResolvedValue({ [room.id]: true });
 	chats.getUserReadStateMap.mockResolvedValue({ other123: true });
 	const endpoint = new HistoryEndpoint(entities, chats);
-	const result = await endpoint.exec({ room: roomHistory }, mockDeep<MiLocalUser>({ id: user.id }), null);
+	const result = await endpoint.execute(v.parse(packedChatHistoryInput, { room: roomHistory }), mockDeep<MiLocalUser>({ id: user.id }));
 	expect(v.parse(packedChatHistoryOutput, result)[0].isRead).toBe(true);
 });
 
-test('native chat inputs strip extras and keep defaults while HTTP preserves parameters, errors and response identity', async () => {
+test('native chat inputs strip transport fields, keep defaults and validate closed producer responses', async () => {
 	expect(v.parse(packedChatHistoryInput, { future: true })).toEqual({ limit: 10, room: false });
 	expect(v.parse(packedChatMessagesCreateToUserInput, { toUserId: 'user123', text: null, future: true })).toEqual({ toUserId: 'user123', text: null });
 	for (const input of [{}, { toUserId: 7 }, { toUserId: 'user123', text: 7 }]) expect(v.safeParse(packedChatMessagesCreateToUserInput, input).success).toBe(false);
-	for (const input of [[], null, 7]) expect(v.safeParse(chatInputs['chat/read-all'], input).success).toBe(false);
-	expect(v.parse(chatInputs['chat/rooms/mute'], { roomId: 'room123', mute: true, future: true })).toEqual({ roomId: 'room123', mute: true });
-	expect(chatErrors['chat/rooms/join'].noSuchRoom.id).toBe('84416476-5ce8-4a2c-b568-9569f1b10733');
+	for (const input of [[], null, 7]) expect(v.safeParse(chatReadAllInput, input).success).toBe(false);
+	expect(v.parse(chatRoomsMuteInput, { roomId: 'room123', mute: true, future: true })).toEqual({ roomId: 'room123', mute: true });
+	expect(chatRoomsJoinErrors.noSuchRoom.id).toBe('84416476-5ce8-4a2c-b568-9569f1b10733');
 	const { service, message } = fixture();
 	const response = [{ ...await service.packMessageDetailed(message), future: true }];
-	const params = { future: true };
-	const projection = projectEndpointContract(packedChatHistoryDefinition);
-	expect(projection.input).not.toHaveProperty('additionalProperties');
-	const endpoint = new ContractEndpoint({}, projection, async ps => { expect(ps).toBe(params); return response; });
-	expect(await endpoint.exec(params, null, null)).toBe(response);
-	expect(params).toEqual({ future: true, limit: 10, room: false });
 	expect(v.safeParse(packedChatHistoryOutput, response).success).toBe(false);
-	await expect(endpoint.exec({ limit: 0 }, null, null)).rejects.toMatchObject({ code: 'INVALID_PARAM', info: { param: '#/properties/limit/minimum' } });
+	expect(v.safeParse(packedChatHistoryInput, { limit: 0 }).success).toBe(false);
 });

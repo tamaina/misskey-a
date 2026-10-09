@@ -4,7 +4,8 @@
  */
 
 import type { FlashLikesRepository, FlashsRepository } from '@features/persistence/backend/repositories/models.js';
-import type { Packed } from '@features/index/contract/packed.js';
+import type { PackedUserLite } from '@features/users/backend/user.schema.js';
+import type { PackedFlash } from '../flash.schema.js';
 import type { MiUser } from '@features/users/backend/models/User.js';
 import type { MiFlash } from '../models/Flash.js';
 import { bindThis } from '@features/runtime/backend/decorators.js';
@@ -25,10 +26,10 @@ export class FlashEntityService {
 		src: MiFlash['id'] | MiFlash,
 		me?: { id: MiUser['id'] } | null | undefined,
 		hint?: {
-			packedUser?: Packed<'UserLite'>,
+			packedUser?: PackedUserLite,
 			likedFlashIds?: MiFlash['id'][],
 		},
-	): Promise<Packed<'Flash'>> {
+	): Promise<PackedFlash> {
 		const meId = me ? me.id : null;
 		const flash = typeof src === 'object' ? src : await this.flashsRepository.findOneByOrFail({ id: src });
 

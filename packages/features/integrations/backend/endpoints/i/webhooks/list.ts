@@ -3,51 +3,16 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { packedIWebhooksListDefinition, packedIWebhooksListInput, packedIWebhooksListOutput } from '../../../../contract/packed-endpoint-definitions.js';
-import { Inject, Injectable } from '@nestjs/common';
+import { implement } from '@orpc/server';
+import { authentication, apiPolicy, requirePrincipal } from '../../../../../api/backend/transport/middleware.js';
+import type { ApiActor } from '../../../../../api/backend/transport/context.js';
+import type { IntegrationsContext } from '../../../operations.js';
+import { iWebhooksListContract } from './list.contract.js';
 
-import { webhookEventTypes } from '../../../models/Webhook.js';
-import type { WebhooksRepository } from '@features/persistence/backend/repositories/models.js';
-import { DI } from '@/di-symbols.js';
-
-// TODO: UserWebhook schemaの適用
-const contractProjection = projectEndpointContract(packedIWebhooksListDefinition);
-
-export const meta = {
-	tags: ['webhooks', 'account'],
-
-	requireCredential: true,
-
-	kind: 'read:account',
-
-	res: contractProjection.response,
-} as const;
-
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedIWebhooksListInput, typeof packedIWebhooksListOutput> {
-	constructor(
-		@Inject(DI.webhooksRepository)
-		private webhooksRepository: WebhooksRepository,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			const webhooks = await this.webhooksRepository.findBy({
-				userId: me.id,
-			});
-
-			return webhooks.map(webhook => ({
-				id: webhook.id,
-				userId: webhook.userId,
-				name: webhook.name,
-				on: webhook.on,
-				url: webhook.url,
-				secret: webhook.secret,
-				active: webhook.active,
-				latestSentAt: webhook.latestSentAt ? webhook.latestSentAt.toISOString() : null,
-				latestStatus: webhook.latestStatus,
-			}));
-		});
-	}
+export function createIWebhooksListProcedure<Actor extends ApiActor>() {
+	return implement(iWebhooksListContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<IntegrationsContext<Actor>>()
+		.use(authentication<Actor>())
+		.use(apiPolicy<Actor>({ name: 'i/webhooks/list', requireCredential: true, kind: 'read:account' }))
+		.use(requirePrincipal<Actor>())
+		.handler(({ input, context }) => context.operations.integrations.iWebhooksList(input, context.principal));
 }

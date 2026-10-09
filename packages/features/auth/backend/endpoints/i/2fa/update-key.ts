@@ -5,15 +5,15 @@
 
 import bcrypt from 'bcryptjs';
 import { Inject, Injectable } from '@nestjs/common';
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { emptyObjectI2faUpdateKeyDefinition, emptyObjectI2faUpdateKeyInput, emptyObjectI2faUpdateKeyOutput } from '../../../../contract/empty-object-key-endpoint-definitions.js';
 import type { UserSecurityKeysRepository } from '@features/persistence/backend/repositories/models.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
 import { DI } from '@/di-symbols.js';
-import { ApiError } from '@features/api/backend/transport/error.js';
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
 
-const contractProjection = projectEndpointContract(emptyObjectI2faUpdateKeyDefinition);
+import * as v from 'valibot';
+import { emptyObjectI2faUpdateKeyInput } from '../../../auth.schema.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
 
 export const meta = {
 	requireCredential: true,
@@ -35,40 +35,38 @@ export const meta = {
 	},
 } as const;
 
-export const paramDef = contractProjection.input;
-
 @Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof emptyObjectI2faUpdateKeyInput, typeof emptyObjectI2faUpdateKeyOutput> {
+export class I2faUpdateKeyOperation {
 	constructor(
 		@Inject(DI.userSecurityKeysRepository)
 		private userSecurityKeysRepository: UserSecurityKeysRepository,
 
 		private userEntityService: UserEntityService,
 		private globalEventService: GlobalEventService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			const key = await this.userSecurityKeysRepository.findOneBy({
-				id: ps.credentialId,
-			});
+	) {}
 
-			if (key == null) {
-				throw new ApiError(meta.errors.noSuchKey);
-			}
-
-			if (key.userId !== me.id) {
-				throw new ApiError(meta.errors.accessDenied);
-			}
-
-			await this.userSecurityKeysRepository.update(key.id, {
-				name: ps.name,
-			});
-
-			// Publish meUpdated event
-			this.globalEventService.publishMainStream(me.id, 'meUpdated', await this.userEntityService.packSelf(me.id, {
-				includeSecrets: true,
-			}));
-
-			return {};
+	async execute(ps: v.InferOutput<typeof emptyObjectI2faUpdateKeyInput>, me: MiLocalUser) {
+		const key = await this.userSecurityKeysRepository.findOneBy({
+			id: ps.credentialId,
 		});
+
+		if (key == null) {
+			throw apiError(meta.errors.noSuchKey);
+		}
+
+		if (key.userId !== me.id) {
+			throw apiError(meta.errors.accessDenied);
+		}
+
+		await this.userSecurityKeysRepository.update(key.id, {
+			name: ps.name,
+		});
+
+		// Publish meUpdated event
+		this.globalEventService.publishMainStream(me.id, 'meUpdated', await this.userEntityService.packSelf(me.id, {
+			includeSecrets: true,
+		}));
+
+		return {};
 	}
 }

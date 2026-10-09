@@ -3,63 +3,57 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { packedChatMessagesSearchDefinition, packedChatMessagesSearchInput, packedChatMessagesSearchOutput } from '../../../../contract/packed-endpoint-definitions.js';
+import { implement } from '@orpc/server';
 import { Inject, Injectable } from '@nestjs/common';
-
+import * as v from 'valibot';
 import { DI } from '@/di-symbols.js';
+import { authentication, apiPolicy, requirePrincipal } from '../../../../../api/backend/transport/middleware.js';
 import { ChatService } from '../../../services/ChatService.js';
 import { ChatEntityService } from '../../../serializers/ChatEntityService.js';
-import { ApiError } from '@features/api/backend/transport/error.js';
+import { apiError } from '../../../../../api/backend/transport/orpc-error.js';
+import { chatMessagesSearchContract, chatMessagesSearchPolicy, chatMessagesSearchInput, chatMessagesSearchOutput, chatMessagesSearchErrors } from './search.contract.js';
+import type { ApiActor } from '../../../../../api/backend/transport/context.js';
+import type { ChatApiContext } from '../../../operations.js';
 
-const contractProjection = projectEndpointContract(packedChatMessagesSearchDefinition);
+import type { MiLocalUser } from '../../../../../users/backend/models/User.js';
 
-export const meta = {
-	tags: ['chat'],
-
-	requireCredential: true,
-
-	kind: 'read:chat',
-
-	res: contractProjection.response,
-
-	errors: {
-		noSuchRoom: {
-			message: 'No such room.',
-			code: 'NO_SUCH_ROOM',
-			id: '460b3669-81b0-4dc9-a997-44442141bf83',
-		},
-	},
-} as const;
-
-export const paramDef = contractProjection.input;
+export function createChatMessagesSearchProcedure<Actor extends ApiActor>() {
+	return implement(chatMessagesSearchContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ChatApiContext<Actor>>()
+		.use(authentication<Actor>())
+		.use(apiPolicy<Actor>(chatMessagesSearchPolicy))
+		.use(requirePrincipal<Actor>())
+		.handler(({ input, context }) => context.operations.chat.chatMessagesSearch(input, context.principal));
+}
 
 @Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedChatMessagesSearchInput, typeof packedChatMessagesSearchOutput> {
+export class ChatMessagesSearchOperation {
 	constructor(
 		private chatEntityService: ChatEntityService,
 		private chatService: ChatService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			await this.chatService.checkChatAvailability(me.id, 'read');
+	) {}
+	async execute(ps: v.InferOutput<typeof chatMessagesSearchInput>, me: MiLocalUser): Promise<v.InferOutput<typeof chatMessagesSearchOutput>> {
+		return v.parse(chatMessagesSearchOutput, await this.run(ps, me));
+	}
 
-			if (ps.roomId != null) {
-				const room = await this.chatService.findRoomById(ps.roomId);
-				if (room == null) {
-					throw new ApiError(meta.errors.noSuchRoom);
-				}
+	private async run(ps: v.InferOutput<typeof chatMessagesSearchInput>, me: MiLocalUser) {
+		await this.chatService.checkChatAvailability(me.id, 'read');
 
-				if (!(await this.chatService.isRoomMember(room, me.id))) {
-					throw new ApiError(meta.errors.noSuchRoom);
-				}
+		if (ps.roomId != null) {
+			const room = await this.chatService.findRoomById(ps.roomId);
+			if (room == null) {
+				throw apiError(chatMessagesSearchErrors.noSuchRoom);
 			}
 
-			const messages = await this.chatService.searchMessages(me.id, ps.query, ps.limit, {
-				userId: ps.userId,
-				roomId: ps.roomId,
-			});
+			if (!(await this.chatService.isRoomMember(room, me.id))) {
+				throw apiError(chatMessagesSearchErrors.noSuchRoom);
+			}
+		}
 
-			return await this.chatEntityService.packMessagesDetailed(messages, me);
+		const messages = await this.chatService.searchMessages(me.id, ps.query, ps.limit, {
+			userId: ps.userId,
+			roomId: ps.roomId,
 		});
+
+		return await this.chatEntityService.packMessagesDetailed(messages, me);
 	}
 }

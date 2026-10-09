@@ -33,7 +33,7 @@ export class PageLikeEntityService {
 
 	@bindThis
 	public packMany(
-		likes: any[],
+		likes: MiPageLike[],
 		me: { id: MiUser['id'] },
 	) {
 		return Promise.all(likes.map(x => this.pack(x, me)));

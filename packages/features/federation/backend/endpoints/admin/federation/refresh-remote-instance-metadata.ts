@@ -3,44 +3,16 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { voidAdminFederationRefreshRemoteInstanceMetadataDefinition, voidAdminFederationRefreshRemoteInstanceMetadataInput, voidAdminFederationRefreshRemoteInstanceMetadataOutput } from '../../../../contract/void-endpoint-definitions.js';
-import { Inject, Injectable } from '@nestjs/common';
+import { implement } from '@orpc/server';
+import { authentication, apiPolicy, requirePrincipal } from '../../../../../api/backend/transport/middleware.js';
+import type { ApiActor } from '../../../../../api/backend/transport/context.js';
+import type { FederationContext } from '../../../operations.js';
+import { adminFederationRefreshRemoteInstanceMetadataContract } from './refresh-remote-instance-metadata.contract.js';
 
-import type { InstancesRepository } from '@features/persistence/backend/repositories/models.js';
-import { FetchInstanceMetadataService } from '../../../services/FetchInstanceMetadataService.js';
-import { UtilityService } from '../../../services/UtilityService.js';
-import { DI } from '@/di-symbols.js';
-
-const contractProjection = projectEndpointContract(voidAdminFederationRefreshRemoteInstanceMetadataDefinition);
-
-export const meta = {
-	tags: ['admin'],
-
-	requireCredential: true,
-	requireModerator: true,
-	kind: 'write:admin:federation',
-} as const;
-
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof voidAdminFederationRefreshRemoteInstanceMetadataInput, typeof voidAdminFederationRefreshRemoteInstanceMetadataOutput> {
-	constructor(
-		@Inject(DI.instancesRepository)
-		private instancesRepository: InstancesRepository,
-
-		private utilityService: UtilityService,
-		private fetchInstanceMetadataService: FetchInstanceMetadataService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			const instance = await this.instancesRepository.findOneBy({ host: this.utilityService.toPuny(ps.host) });
-
-			if (instance == null) {
-				throw new Error('instance not found');
-			}
-
-			this.fetchInstanceMetadataService.fetchInstanceMetadata(instance, true);
-		});
-	}
+export function createAdminFederationRefreshRemoteInstanceMetadataProcedure<Actor extends ApiActor>() {
+	return implement(adminFederationRefreshRemoteInstanceMetadataContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<FederationContext<Actor>>()
+		.use(authentication<Actor>())
+		.use(apiPolicy<Actor>({ name: 'admin/federation/refresh-remote-instance-metadata', requireCredential: true, requireModerator: true, kind: 'write:admin:federation' }))
+		.use(requirePrincipal<Actor>())
+		.handler(({ input, context }) => context.operations.federation.adminFederationRefreshRemoteInstanceMetadata(input, context.principal));
 }

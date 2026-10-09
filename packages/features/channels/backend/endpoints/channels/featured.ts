@@ -3,43 +3,47 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { packedChannelsFeaturedDefinition, packedChannelsFeaturedInput, packedChannelsFeaturedOutput } from '../../../contract/packed-endpoint-definitions.js';
+import { implement } from '@orpc/server';
 import { Inject, Injectable } from '@nestjs/common';
+import * as v from 'valibot';
+import { DI } from '@/di-symbols.js';
+import { authentication, apiPolicy } from '../../../../api/backend/transport/middleware.js';
+import { ChannelEntityService } from '../../serializers/ChannelEntityService.js';
+import { channelsFeaturedContract, channelsFeaturedPolicy, channelsFeaturedInput, channelsFeaturedOutput, channelsFeaturedErrors } from './featured.contract.js';
+import type { ApiActor } from '../../../../api/backend/transport/context.js';
+import type { ChannelsApiContext } from '../../operations.js';
 
 import type { ChannelsRepository } from '@features/persistence/backend/repositories/models.js';
-import { ChannelEntityService } from '../../serializers/ChannelEntityService.js';
-import { DI } from '@/di-symbols.js';
 
-const contractProjection = projectEndpointContract(packedChannelsFeaturedDefinition);
+import type { MiLocalUser } from '../../../../users/backend/models/User.js';
 
-export const meta = {
-	tags: ['channels'],
-
-	requireCredential: false,
-
-	res: contractProjection.response,
-} as const;
-
-export const paramDef = contractProjection.input;
+export function createChannelsFeaturedProcedure<Actor extends ApiActor>() {
+	return implement(channelsFeaturedContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ChannelsApiContext<Actor>>()
+		.use(authentication<Actor>())
+		.use(apiPolicy<Actor>(channelsFeaturedPolicy))
+		.handler(({ input, context }) => context.operations.channels.channelsFeatured(input, context.principal));
+}
 
 @Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedChannelsFeaturedInput, typeof packedChannelsFeaturedOutput> {
+export class ChannelsFeaturedOperation {
 	constructor(
 		@Inject(DI.channelsRepository)
 		private channelsRepository: ChannelsRepository,
 
 		private channelEntityService: ChannelEntityService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			const query = this.channelsRepository.createQueryBuilder('channel')
-				.where('channel.lastNotedAt IS NOT NULL')
-				.andWhere('channel.isArchived = FALSE')
-				.orderBy('channel.lastNotedAt', 'DESC');
+	) {}
+	async execute(ps: v.InferOutput<typeof channelsFeaturedInput>, me: MiLocalUser | null): Promise<v.InferOutput<typeof channelsFeaturedOutput>> {
+		return v.parse(channelsFeaturedOutput, await this.run(ps, me));
+	}
 
-			const channels = await query.limit(10).getMany();
+	private async run(ps: v.InferOutput<typeof channelsFeaturedInput>, me: MiLocalUser | null) {
+		const query = this.channelsRepository.createQueryBuilder('channel')
+			.where('channel.lastNotedAt IS NOT NULL')
+			.andWhere('channel.isArchived = FALSE')
+			.orderBy('channel.lastNotedAt', 'DESC');
 
-			return await Promise.all(channels.map(x => this.channelEntityService.pack(x, me)));
-		});
+		const channels = await query.limit(10).getMany();
+
+		return await Promise.all(channels.map(x => this.channelEntityService.pack(x, me)));
 	}
 }

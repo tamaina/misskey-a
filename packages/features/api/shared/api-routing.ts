@@ -5,7 +5,7 @@
 
 import { isContractProcedure } from '@orpc/contract';
 
-export interface RequestRoute { name: string; path: readonly string[]; httpPath: string; allowGet: boolean; cacheSec?: number; multipart: boolean }
+export interface RequestRoute { name: string; path: readonly string[]; httpPath: string; allowGet: boolean; cacheSec?: number; multipart: boolean; acceptedMethods?: readonly string[]; introspection?: false; ignoreBody?: true }
 
 /** Validate the compatibility aliases in a contract or its minified representation. */
 export function requestRoutes(router: unknown): RequestRoute[] {
@@ -24,9 +24,22 @@ export function requestRoutes(router: unknown): RequestRoute[] {
 			names.add(name);
 			const allowGet = meta.allowGet === true;
 			const cacheSec = meta.cacheSec;
+			const acceptedMethods: unknown = meta.acceptedMethods;
+			const methods: string[] = [];
+			if (acceptedMethods !== undefined) {
+				if (!Array.isArray(acceptedMethods) || acceptedMethods.length === 0) throw new Error('Invalid API accepted-method metadata');
+				for (const method of acceptedMethods) {
+					if (typeof method !== 'string' || !['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS', 'TRACE'].includes(method)) throw new Error('Invalid API accepted-method metadata');
+					methods.push(method);
+				}
+				if (!methods.includes('POST') || methods.includes('GET') !== allowGet) throw new Error('Inconsistent API accepted-method metadata');
+			}
 			if (cacheSec !== undefined && (typeof cacheSec !== 'number' || !Number.isFinite(cacheSec) || cacheSec < 0)) throw new Error('Invalid API cache metadata');
 			routes.push({ name, path, httpPath: route.path, allowGet, multipart: meta.multipart === true,
-																	...(typeof cacheSec === 'number' ? { cacheSec } : {}) });
+																	...(typeof cacheSec === 'number' ? { cacheSec } : {}),
+				...(acceptedMethods === undefined ? {} : { acceptedMethods: methods }),
+				...(meta.introspection === false ? { introspection: false } : {}),
+				...(meta.ignoreBody === true ? { ignoreBody: true } : {}) });
 		} else if (node !== null && typeof node === 'object' && !Array.isArray(node)) {
 			for (const [key, child] of Object.entries(node)) visit(child, [...path, key]);
 		} else {

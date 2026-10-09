@@ -3,45 +3,15 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { packedFederationUsersDefinition, packedFederationUsersInput, packedFederationUsersOutput } from '../../../contract/packed-endpoint-definitions.js';
-import { Inject, Injectable } from '@nestjs/common';
+import { implement } from '@orpc/server';
+import { authentication, apiPolicy } from '../../../../api/backend/transport/middleware.js';
+import type { ApiActor } from '../../../../api/backend/transport/context.js';
+import type { FederationContext } from '../../operations.js';
+import { federationUsersContract } from './users.contract.js';
 
-import type { UsersRepository } from '@features/persistence/backend/repositories/models.js';
-import { QueryService } from '@features/notes/backend/services/QueryService.js';
-import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
-import { DI } from '@/di-symbols.js';
-
-const contractProjection = projectEndpointContract(packedFederationUsersDefinition);
-
-export const meta = {
-	tags: ['federation'],
-
-	requireCredential: false,
-
-	res: contractProjection.response,
-} as const;
-
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedFederationUsersInput, typeof packedFederationUsersOutput> {
-	constructor(
-		@Inject(DI.usersRepository)
-		private usersRepository: UsersRepository,
-
-		private userEntityService: UserEntityService,
-		private queryService: QueryService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			const query = this.queryService.makePaginationQuery(this.usersRepository.createQueryBuilder('user'), ps.sinceId, ps.untilId, ps.sinceDate, ps.untilDate)
-				.andWhere('user.host = :host', { host: ps.host });
-
-			const users = await query
-				.limit(ps.limit)
-				.getMany();
-
-			return await this.userEntityService.packMany(users, me, { schema: 'UserDetailedNotMe' });
-		});
-	}
+export function createFederationUsersProcedure<Actor extends ApiActor>() {
+	return implement(federationUsersContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<FederationContext<Actor>>()
+		.use(authentication<Actor>())
+		.use(apiPolicy<Actor>({ name: 'federation/users' }))
+		.handler(({ input, context }) => context.operations.federation.federationUsers(input, context.principal));
 }

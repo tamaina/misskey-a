@@ -3,8 +3,6 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { packedAdminInviteCreateDefinition, packedAdminInviteCreateInput, packedAdminInviteCreateOutput } from '../../../../contract/packed-endpoint-definitions.js';
 import { Inject, Injectable } from '@nestjs/common';
 
 import type { RegistrationTicketsRepository } from '@features/persistence/backend/repositories/models.js';
@@ -13,9 +11,11 @@ import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { DI } from '@/di-symbols.js';
 import { generateInviteCode } from '../../../utility/generate-invite-code.js';
 import { ModerationLogService } from '@features/moderation/backend/services/ModerationLogService.js';
-import { ApiError } from '@features/api/backend/transport/error.js';
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
 
-const contractProjection = projectEndpointContract(packedAdminInviteCreateDefinition);
+import * as v from 'valibot';
+import { packedAdminInviteCreateInput } from '../../../auth.schema.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
 
 export const meta = {
 	tags: ['admin'],
@@ -31,14 +31,10 @@ export const meta = {
 			id: 'f1380b15-3760-4c6c-a1db-5c3aaf1cbd49',
 		},
 	},
-
-	res: contractProjection.response,
 } as const;
 
-export const paramDef = contractProjection.input;
-
 @Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedAdminInviteCreateInput, typeof packedAdminInviteCreateOutput> {
+export class AdminInviteCreateOperation {
 	constructor(
 		@Inject(DI.registrationTicketsRepository)
 		private registrationTicketsRepository: RegistrationTicketsRepository,
@@ -46,31 +42,31 @@ export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof
 		private inviteCodeEntityService: InviteCodeEntityService,
 		private idService: IdService,
 		private moderationLogService: ModerationLogService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			if (ps.expiresAt && isNaN(Date.parse(ps.expiresAt))) {
-				throw new ApiError(meta.errors.invalidDateTime);
-			}
+	) {}
 
-			const ticketsPromises = [];
+	async execute(ps: v.InferOutput<typeof packedAdminInviteCreateInput>, me: MiLocalUser) {
+		if (ps.expiresAt && isNaN(Date.parse(ps.expiresAt))) {
+			throw apiError(meta.errors.invalidDateTime);
+		}
 
-			for (let i = 0; i < ps.count; i++) {
-				ticketsPromises.push(this.registrationTicketsRepository.insertOne({
-					id: this.idService.gen(),
-					createdBy: me,
-					createdById: me.id,
-					expiresAt: ps.expiresAt ? new Date(ps.expiresAt) : null,
-					code: generateInviteCode(),
-				}));
-			}
+		const ticketsPromises = [];
 
-			const tickets = await Promise.all(ticketsPromises);
+		for (let i = 0; i < ps.count; i++) {
+			ticketsPromises.push(this.registrationTicketsRepository.insertOne({
+				id: this.idService.gen(),
+				createdBy: me,
+				createdById: me.id,
+				expiresAt: ps.expiresAt ? new Date(ps.expiresAt) : null,
+				code: generateInviteCode(),
+			}));
+		}
 
-			this.moderationLogService.log(me, 'createInvitation', {
-				invitations: tickets,
-			});
+		const tickets = await Promise.all(ticketsPromises);
 
-			return await this.inviteCodeEntityService.packMany(tickets, me);
+		this.moderationLogService.log(me, 'createInvitation', {
+			invitations: tickets,
 		});
+
+		return await this.inviteCodeEntityService.packMany(tickets, me);
 	}
 }

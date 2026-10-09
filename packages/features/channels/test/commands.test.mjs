@@ -5,7 +5,9 @@
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { createChannelCommands, legacyChannelSchemas } from '../../../backend/built/features/channels/backend.js';
+import * as v from 'valibot';
+import { createProcedureClient } from '@orpc/server';
+import { createChannelCommandOperations, channelsApiContract, createChannelsRouter } from '../../../backend/built/features/channels/backend.js';
 
 const routes = [
 	'channels/follow',
@@ -16,7 +18,7 @@ const routes = [
 	'channels/mute/delete',
 ];
 const inputs = Object.fromEntries(routes.map(route => [route, { channelId: 'channel123' }]));
-const actor = { id: 'trusted-user', extra: { retained: true } };
+const actor = { id: 'trusted-user', isSuspended: false, movedToUri: null, extra: { retained: true } };
 const channel = { id: 'channel123', ownerId: 'channel-owner', extra: { retained: true } };
 const now = 1_700_000_000_000;
 
@@ -45,32 +47,35 @@ function createFixture(overrides = {}) {
 		createError: makeError,
 		...overrides,
 	};
-	return { deps, calls, feature: createChannelCommands(deps) };
+	return { deps, calls, feature: createChannelCommandOperations(deps) };
+}
+
+function methodName(route) {
+	return route.split(/[/-]/).map((part, index) => index === 0 ? part : part.charAt(0).toUpperCase() + part.slice(1)).join('');
 }
 
 function invoke(feature, route, input = inputs[route], trustedActor = actor) {
-	return feature[route](input, { context: trustedActor === undefined ? undefined : { actor: trustedActor } });
+	const services = {
+		authenticate: async () => [trustedActor ?? null, null],
+		limitActor: () => null, rateLimitFactor: async () => 1, limit: async () => null,
+	};
+	const procedure = createChannelsRouter()[methodName(route)];
+	return createProcedureClient(procedure, { context: {
+		services, credential: trustedActor ? 'fixture' : null, ip: '127.0.0.1', headers: {},
+		operations: { channels: feature },
+	} })(input);
 }
 
-test('legacy channel schemas preserve required ID, optional nullable integer expiry, and loose objects', () => {
-	const id = { type: 'string', format: 'misskey:id' };
-	for (const route of routes.filter(route => route !== 'channels/mute/create')) {
-		assert.deepEqual(legacyChannelSchemas[route].input, {
-			type: 'object', properties: { channelId: id }, required: ['channelId'],
-		}, route);
+test('native command inputs retain required IDs and reject non-object roots', () => {
+	for (const [route, input] of Object.entries(inputs)) {
+		const schema = channelsApiContract[methodName(route)]['~orpc'].inputSchema;
+		assert.equal(v.safeParse(schema, input).success, true, route);
+		assert.equal(v.safeParse(schema, []).success, false, route);
+		assert.equal(v.safeParse(schema, {}).success, route === 'chat/read-all', route);
 	}
-	assert.deepEqual(legacyChannelSchemas['channels/mute/create'].input, {
-		type: 'object',
-		properties: {
-			channelId: id,
-			expiresAt: {
-				type: 'integer',
-				nullable: true,
-				description: 'A Unix Epoch timestamp that must lie in the future. `null` means an indefinite mute.',
-			},
-		},
-		required: ['channelId'],
-	});
+	const schema = channelsApiContract.channelsMuteCreate['~orpc'].inputSchema;
+	for (const expiresAt of [null, 0, 1]) assert.equal(v.safeParse(schema, { channelId: channel.id, expiresAt }).success, true);
+	for (const expiresAt of [1.5, Infinity, '1']) assert.equal(v.safeParse(schema, { channelId: channel.id, expiresAt }).success, false);
 });
 
 test('six commands preserve lookup order, trusted actor identity, extra fields, and void results', async () => {
@@ -95,13 +100,12 @@ test('six commands preserve lookup order, trusted actor identity, extra fields, 
 	]);
 });
 
-test('all routes require trusted actor context before calling any port', async () => {
+test('all routes require an active authenticated actor before calling any port', async () => {
 	const { calls, feature } = createFixture();
 	for (const route of routes) {
-		await assert.rejects(feature[route](inputs[route], { context: undefined }), /trusted actor/i, `${route}: missing`);
-		for (const invalidActor of [null, {}, { id: '' }]) {
-			await assert.rejects(invoke(feature, route, { ...inputs[route], actor: { id: 'spoofed' } }, invalidActor), /trusted actor/i, `${route}: ${JSON.stringify(invalidActor)}`);
-		}
+		await assert.rejects(invoke(feature, route, inputs[route], null), { code: 'CREDENTIAL_REQUIRED' });
+		await assert.rejects(invoke(feature, route, inputs[route], { ...actor, isSuspended: true }), { code: 'YOUR_ACCOUNT_SUSPENDED' });
+		await assert.rejects(invoke(feature, route, inputs[route], { ...actor, movedToUri: 'https://example.com/moved' }), { code: 'YOUR_ACCOUNT_MOVED' });
 	}
 	assert.deepEqual(calls, []);
 });

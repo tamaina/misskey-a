@@ -3,56 +3,50 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { packedChatRoomsShowDefinition, packedChatRoomsShowInput, packedChatRoomsShowOutput } from '../../../../contract/packed-endpoint-definitions.js';
+import { implement } from '@orpc/server';
 import { Inject, Injectable } from '@nestjs/common';
-
+import * as v from 'valibot';
 import { DI } from '@/di-symbols.js';
+import { authentication, apiPolicy, requirePrincipal } from '../../../../../api/backend/transport/middleware.js';
 import { ChatService } from '../../../services/ChatService.js';
-import { ApiError } from '@features/api/backend/transport/error.js';
 import { ChatEntityService } from '../../../serializers/ChatEntityService.js';
+import { apiError } from '../../../../../api/backend/transport/orpc-error.js';
+import { chatRoomsShowContract, chatRoomsShowPolicy, chatRoomsShowInput, chatRoomsShowOutput, chatRoomsShowErrors } from './show.contract.js';
+import type { ApiActor } from '../../../../../api/backend/transport/context.js';
+import type { ChatApiContext } from '../../../operations.js';
 
-const contractProjection = projectEndpointContract(packedChatRoomsShowDefinition);
+import type { MiLocalUser } from '../../../../../users/backend/models/User.js';
 
-export const meta = {
-	tags: ['chat'],
-
-	requireCredential: true,
-
-	kind: 'read:chat',
-
-	res: contractProjection.response,
-
-	errors: {
-		noSuchRoom: {
-			message: 'No such room.',
-			code: 'NO_SUCH_ROOM',
-			id: '857ae02f-8759-4d20-9adb-6e95fffe4fd7',
-		},
-	},
-} as const;
-
-export const paramDef = contractProjection.input;
+export function createChatRoomsShowProcedure<Actor extends ApiActor>() {
+	return implement(chatRoomsShowContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ChatApiContext<Actor>>()
+		.use(authentication<Actor>())
+		.use(apiPolicy<Actor>(chatRoomsShowPolicy))
+		.use(requirePrincipal<Actor>())
+		.handler(({ input, context }) => context.operations.chat.chatRoomsShow(input, context.principal));
+}
 
 @Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedChatRoomsShowInput, typeof packedChatRoomsShowOutput> {
+export class ChatRoomsShowOperation {
 	constructor(
 		private chatService: ChatService,
 		private chatEntityService: ChatEntityService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			await this.chatService.checkChatAvailability(me.id, 'read');
+	) {}
+	async execute(ps: v.InferOutput<typeof chatRoomsShowInput>, me: MiLocalUser): Promise<v.InferOutput<typeof chatRoomsShowOutput>> {
+		return v.parse(chatRoomsShowOutput, await this.run(ps, me));
+	}
 
-			const room = await this.chatService.findRoomById(ps.roomId);
-			if (room == null) {
-				throw new ApiError(meta.errors.noSuchRoom);
-			}
+	private async run(ps: v.InferOutput<typeof chatRoomsShowInput>, me: MiLocalUser) {
+		await this.chatService.checkChatAvailability(me.id, 'read');
 
-			if (!await this.chatService.hasPermissionToViewRoomInfo(me.id, room)) {
-				throw new ApiError(meta.errors.noSuchRoom);
-			}
+		const room = await this.chatService.findRoomById(ps.roomId);
+		if (room == null) {
+			throw apiError(chatRoomsShowErrors.noSuchRoom);
+		}
 
-			return this.chatEntityService.packRoom(room, me);
-		});
+		if (!await this.chatService.hasPermissionToViewRoomInfo(me.id, room)) {
+			throw apiError(chatRoomsShowErrors.noSuchRoom);
+		}
+
+		return this.chatEntityService.packRoom(room, me);
 	}
 }

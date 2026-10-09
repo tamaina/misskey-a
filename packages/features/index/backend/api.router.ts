@@ -29,12 +29,58 @@ import { pilotContract } from './api.contract.js';
 import type { ApiActor } from '../../api/backend/transport/context.js';
 import type { ApiExecutionContext } from './api.context.js';
 
+import { createChatRouter } from '../../chat/backend/api.router.js';
+
+import { createChannelsRouter } from '../../channels/backend/api.router.js';
+
+import { createPagesRouter } from '../../pages/backend/router.js';
+
+import { createPlayRouter } from '../../play/backend/router.js';
+
+import { createGamesRouter } from '../../games/backend/router.js';
+
+import { createFederationRouter } from '../../federation/backend/router.js';
+
+import { createOperationsRouter } from '../../operations/backend/router.js';
+
+import { createIntegrationsRouter } from '../../integrations/backend/router.js';
+
+import { createTestProcedure } from '../../api/backend/endpoints/test.js';
+
+import { createDriveManagementRouter } from '../../drive/backend/management.router.js';
+
+import { createPortabilityRouter } from '../../portability/backend/api.router.js';
+
+import { createAuthRouter } from '../../auth/backend/api.router.js';
+
+import { createModerationRouter } from '../../moderation/backend/api.router.js';
+
+import { createRolesRouter } from '../../roles/backend/api.router.js';
+
+import { createClearBrowserCacheProcedure, createClearBrowserCacheGetProcedure } from '../../api/backend/endpoints/clear-browser-cache.js';
+
 export function createApiRouter<Actor extends ApiActor>() {
 	const api = implement(pilotContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiExecutionContext<Actor>>()
 		.use(async ({ context, next }) => {
 			try { return await next(); } catch (error) { throw context.mapError ? context.mapError(error) : normalizeError(error); }
 		});
 	return api.router({
+		clearBrowserCache: createClearBrowserCacheProcedure<Actor>(),
+		clearBrowserCacheGet: createClearBrowserCacheGetProcedure<Actor>(),
+		roles: createRolesRouter<Actor>(),
+		moderation: createModerationRouter<Actor>(),
+		auth: createAuthRouter<Actor>(),
+		portability: createPortabilityRouter<Actor>(),
+		driveManagement: createDriveManagementRouter<Actor>(),
+		test: createTestProcedure<Actor>(),
+		integrations: createIntegrationsRouter<Actor>(),
+		operations: createOperationsRouter<Actor>(),
+		federation: createFederationRouter<Actor>(),
+		games: createGamesRouter<Actor>(),
+		play: createPlayRouter<Actor>(),
+		pages: createPagesRouter<Actor>(),
+		channels: createChannelsRouter<Actor>(),
+		chat: createChatRouter<Actor>(),
 		instance: createInstanceRouter<Actor>(),
 		statistics: createStatisticsRouter<Actor>(),
 		discovery: createDiscoveryRouter<Actor>(),

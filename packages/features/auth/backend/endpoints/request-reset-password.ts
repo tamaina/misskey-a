@@ -3,8 +3,6 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { voidRequestResetPasswordDefinition, voidRequestResetPasswordInput, voidRequestResetPasswordOutput } from '../../contract/void-endpoint-definitions.js';
 import ms from 'ms';
 import { IsNull } from 'typeorm';
 import { Inject, Injectable } from '@nestjs/common';
@@ -16,7 +14,9 @@ import { DI } from '@/di-symbols.js';
 import { EmailService } from '@features/email/backend/services/EmailService.js';
 import { L_CHARS, secureRndstr } from '../utility/secure-rndstr.js';
 
-const contractProjection = projectEndpointContract(voidRequestResetPasswordDefinition);
+import * as v from 'valibot';
+import { voidRequestResetPasswordInput } from '../auth.schema.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
 
 export const meta = {
 	tags: ['reset password'],
@@ -35,10 +35,8 @@ export const meta = {
 	},
 } as const;
 
-export const paramDef = contractProjection.input;
-
 @Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof voidRequestResetPasswordInput, typeof voidRequestResetPasswordOutput> {
+export class RequestResetPasswordOperation {
 	constructor(
 		@Inject(DI.config)
 		private config: Config,
@@ -54,43 +52,43 @@ export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof
 
 		private idService: IdService,
 		private emailService: EmailService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			const user = await this.usersRepository.findOneBy({
-				usernameLower: ps.username.toLowerCase(),
-				host: IsNull(),
-			});
+	) {}
 
-			// 合致するユーザーが登録されていなかったら無視
-			if (user == null) {
-				return;
-			}
-
-			const profile = await this.userProfilesRepository.findOneByOrFail({ userId: user.id });
-
-			// 合致するメアドが登録されていなかったら無視
-			if (profile.email !== ps.email) {
-				return;
-			}
-
-			// メアドが認証されていなかったら無視
-			if (!profile.emailVerified) {
-				return;
-			}
-
-			const token = secureRndstr(64, { chars: L_CHARS });
-
-			await this.passwordResetRequestsRepository.insert({
-				id: this.idService.gen(),
-				userId: profile.userId,
-				token,
-			});
-
-			const link = `${this.config.url}/reset-password/${token}`;
-
-			this.emailService.sendEmail(ps.email, 'Password reset requested',
-				`To reset password, please click this link:<br><a href="${link}">${link}</a>`,
-				`To reset password, please click this link: ${link}`);
+	async execute(ps: v.InferOutput<typeof voidRequestResetPasswordInput>, me: MiLocalUser | null) {
+		const user = await this.usersRepository.findOneBy({
+			usernameLower: ps.username.toLowerCase(),
+			host: IsNull(),
 		});
+
+		// 合致するユーザーが登録されていなかったら無視
+		if (user == null) {
+			return;
+		}
+
+		const profile = await this.userProfilesRepository.findOneByOrFail({ userId: user.id });
+
+		// 合致するメアドが登録されていなかったら無視
+		if (profile.email !== ps.email) {
+			return;
+		}
+
+		// メアドが認証されていなかったら無視
+		if (!profile.emailVerified) {
+			return;
+		}
+
+		const token = secureRndstr(64, { chars: L_CHARS });
+
+		await this.passwordResetRequestsRepository.insert({
+			id: this.idService.gen(),
+			userId: profile.userId,
+			token,
+		});
+
+		const link = `${this.config.url}/reset-password/${token}`;
+
+		this.emailService.sendEmail(ps.email, 'Password reset requested',
+			`To reset password, please click this link:<br><a href="${link}">${link}</a>`,
+			`To reset password, please click this link: ${link}`);
 	}
 }

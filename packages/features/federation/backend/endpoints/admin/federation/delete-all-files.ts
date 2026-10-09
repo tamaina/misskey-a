@@ -3,42 +3,16 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { voidAdminFederationDeleteAllFilesDefinition, voidAdminFederationDeleteAllFilesInput, voidAdminFederationDeleteAllFilesOutput } from '../../../../contract/void-endpoint-definitions.js';
-import { Inject, Injectable } from '@nestjs/common';
+import { implement } from '@orpc/server';
+import { authentication, apiPolicy, requirePrincipal } from '../../../../../api/backend/transport/middleware.js';
+import type { ApiActor } from '../../../../../api/backend/transport/context.js';
+import type { FederationContext } from '../../../operations.js';
+import { adminFederationDeleteAllFilesContract } from './delete-all-files.contract.js';
 
-import type { DriveFilesRepository } from '@features/persistence/backend/repositories/models.js';
-import { DriveService } from '@features/drive/backend/services/DriveService.js';
-import { DI } from '@/di-symbols.js';
-
-const contractProjection = projectEndpointContract(voidAdminFederationDeleteAllFilesDefinition);
-
-export const meta = {
-	tags: ['admin'],
-
-	requireCredential: true,
-	requireModerator: true,
-	kind: 'write:admin:federation',
-} as const;
-
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export default class extends ContractEndpoint<typeof meta, typeof voidAdminFederationDeleteAllFilesInput, typeof voidAdminFederationDeleteAllFilesOutput> { // eslint-disable-line import/no-default-export
-	constructor(
-		@Inject(DI.driveFilesRepository)
-		private driveFilesRepository: DriveFilesRepository,
-
-		private driveService: DriveService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			const files = await this.driveFilesRepository.findBy({
-				userHost: ps.host,
-			});
-
-			for (const file of files) {
-				this.driveService.deleteFile(file);
-			}
-		});
-	}
+export function createAdminFederationDeleteAllFilesProcedure<Actor extends ApiActor>() {
+	return implement(adminFederationDeleteAllFilesContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<FederationContext<Actor>>()
+		.use(authentication<Actor>())
+		.use(apiPolicy<Actor>({ name: 'admin/federation/delete-all-files', requireCredential: true, requireModerator: true, kind: 'write:admin:federation' }))
+		.use(requirePrincipal<Actor>())
+		.handler(({ input, context }) => context.operations.federation.adminFederationDeleteAllFiles(input, context.principal));
 }

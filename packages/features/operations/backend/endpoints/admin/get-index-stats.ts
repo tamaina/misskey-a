@@ -3,43 +3,16 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { inlineAdminGetIndexStatsDefinition, inlineAdminGetIndexStatsInput, inlineAdminGetIndexStatsOutput } from '../../../contract/endpoint-definitions.js';
-import { Inject, Injectable } from '@nestjs/common';
-import type * as v from 'valibot';
-import { DataSource } from 'typeorm';
+import { implement } from '@orpc/server';
+import { authentication, apiPolicy, requirePrincipal } from '../../../../api/backend/transport/middleware.js';
+import type { ApiActor } from '../../../../api/backend/transport/context.js';
+import type { OperationsApiContext } from '../../operations.js';
+import { adminGetIndexStatsContract } from './get-index-stats.contract.js';
 
-import { DI } from '@/di-symbols.js';
-
-const contractProjection = projectEndpointContract(inlineAdminGetIndexStatsDefinition);
-
-export const meta = {
-	requireCredential: true,
-	requireAdmin: true,
-	kind: 'read:admin:index-stats',
-
-	tags: ['admin'],
-	res: contractProjection.response,
-} as const;
-
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof inlineAdminGetIndexStatsInput, typeof inlineAdminGetIndexStatsOutput> {
-	constructor(
-		@Inject(DI.db)
-		private db: DataSource,
-	) {
-		super(meta, contractProjection, async () => {
-			const stats = await this.db.query<v.InferOutput<typeof inlineAdminGetIndexStatsOutput>>('SELECT * FROM pg_indexes;').then(recs => {
-				const res: v.InferOutput<typeof inlineAdminGetIndexStatsOutput> = [];
-				for (const rec of recs) {
-					res.push(rec);
-				}
-				return res;
-			});
-
-			return stats;
-		});
-	}
+export function createAdminGetIndexStatsProcedure<Actor extends ApiActor>() {
+	return implement(adminGetIndexStatsContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<OperationsApiContext<Actor>>()
+		.use(authentication<Actor>())
+		.use(apiPolicy<Actor>({ name: 'admin/get-index-stats', requireCredential: true, requireAdmin: true, kind: 'read:admin:index-stats' }))
+		.use(requirePrincipal<Actor>())
+		.handler(({ input, context }) => context.operations.operations.adminGetIndexStats(input, context.principal));
 }

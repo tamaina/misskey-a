@@ -3,10 +3,10 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import type { SigninHistoryRepository } from '../session-signin-repository.js';
 import { Inject, Injectable } from '@nestjs/common';
-import * as Misskey from 'misskey-js';
 import { DI } from '@/di-symbols.js';
-import type { SigninsRepository, UserProfilesRepository } from '@features/persistence/backend/repositories/models.js';
+import type { UserProfilesRepository } from '@features/persistence/backend/repositories/models.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
@@ -14,13 +14,14 @@ import { SigninEntityService } from '@features/auth/backend/serializers/SigninEn
 import { bindThis } from '@features/runtime/backend/decorators.js';
 import { EmailService } from '@features/email/backend/services/EmailService.js';
 import { NotificationService } from '@features/notifications/backend/services/NotificationService.js';
-import type { FastifyRequest, FastifyReply } from 'fastify';
+import type { AuthSessionRequest, AuthSessionEffects } from '../session.effects.js';
+import { toSessionHeaders } from '../session.schema.js';
 
 @Injectable()
 export class SigninService {
 	constructor(
 		@Inject(DI.signinsRepository)
-		private signinsRepository: SigninsRepository,
+		private signinsRepository: SigninHistoryRepository,
 
 		@Inject(DI.userProfilesRepository)
 		private userProfilesRepository: UserProfilesRepository,
@@ -34,7 +35,7 @@ export class SigninService {
 	}
 
 	@bindThis
-	public signin(request: FastifyRequest, reply: FastifyReply, user: MiLocalUser) {
+	public signin(request: AuthSessionRequest, reply: AuthSessionEffects, user: Pick<MiLocalUser, 'id' | 'token'>) {
 		setImmediate(async () => {
 			this.notificationService.createNotification(user.id, 'login', {});
 
@@ -42,7 +43,7 @@ export class SigninService {
 				id: this.idService.gen(),
 				userId: user.id,
 				ip: request.ip,
-				headers: request.headers as any,
+				headers: toSessionHeaders(request.headers),
 				success: true,
 			});
 
@@ -60,8 +61,8 @@ export class SigninService {
 		return {
 			finished: true,
 			id: user.id,
-			i: user.token!,
-		} satisfies Misskey.entities.SigninFlowResponse;
+			i: user.token,
+		};
 	}
 }
 

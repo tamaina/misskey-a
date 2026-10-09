@@ -6,17 +6,40 @@
 import { expect, test } from 'vitest';
 import * as v from 'valibot';
 import { mockDeep } from 'vitest-mock-extended';
-import { statsResult, statisticsContract } from '../../contract/index.js';
-import { chartInput, chartEndpointDefinitions } from '../../contract/chart-endpoint-definitions.js';
+import { statisticsContract } from '../../backend/endpoints/statistics.contract.js';
+import { chartInput } from '../../backend/endpoints/charts/chart-input.schema.js';
+const chartEndpointDefinitions = {
+	'charts/active-users': { output: statisticsContract.activeUsers['~orpc'].outputSchema },
+	'charts/ap-request': { output: statisticsContract.apRequest['~orpc'].outputSchema },
+	'charts/drive': { output: statisticsContract.drive['~orpc'].outputSchema },
+	'charts/federation': { output: statisticsContract.federation['~orpc'].outputSchema },
+	'charts/instance': { output: statisticsContract.instance['~orpc'].outputSchema },
+	'charts/notes': { output: statisticsContract.notes['~orpc'].outputSchema },
+	'charts/user/drive': { output: statisticsContract.userDrive['~orpc'].outputSchema },
+	'charts/user/following': { output: statisticsContract.userFollowing['~orpc'].outputSchema },
+	'charts/user/notes': { output: statisticsContract.userNotes['~orpc'].outputSchema },
+	'charts/user/pv': { output: statisticsContract.userPv['~orpc'].outputSchema },
+	'charts/user/reactions': { output: statisticsContract.userReactions['~orpc'].outputSchema },
+	'charts/users': { output: statisticsContract.users['~orpc'].outputSchema },
+};
 import * as descriptors from '../../shared/chart-descriptors.js';
-import { remainingRetentionOutput, remainingRetentionDefinition } from '../../contract/remaining-inline-endpoint-definitions.js';
+
 import Chart from '../../backend/charts/core.js';
-import type { ChartMetricDescriptor } from '../../shared/chart-descriptors.js';
+import { statsOutput as statsResult } from '../../backend/endpoints/stats.contract.js';
+import { createStatisticsOperations } from '../../backend/operations.js';
 import { createStats } from '../../backend/index.js';
-import type { MiRetentionAggregation } from '../../backend/models/RetentionAggregation.js';
-import { EndpointImplementation } from '../../backend/endpoints/retention.js';
+
+import { packedSchemas } from '../../../index/backend/packed.schema.js';
+import { retentionContract as nativeContract1 } from '../../backend/endpoints/retention.contract.js';
+import { retentionContract as nativeContract2 } from '../../backend/endpoints/retention.contract.js';
 import type { RetentionAggregationsRepository } from '@features/persistence/backend/repositories/models.js';
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
+import type { MiRetentionAggregation } from '../../backend/models/RetentionAggregation.js';
+import type { ChartMetricDescriptor } from '../../shared/chart-descriptors.js';
+
+function requiredSchema<S extends v.GenericSchema>(schema: S | undefined): S { if (schema === undefined) throw new Error('Missing native schema'); return schema; }
+
+const remainingRetentionOutput = requiredSchema(nativeContract1['~orpc'].outputSchema);
+const remainingRetentionDefinition = nativeContract2;
 
 const item = { createdAt: '2026-01-01T00:00:00.000Z', users: 7, data: { '0': 7, '1': 3 } };
 
@@ -72,6 +95,14 @@ test('all twelve explicit chart schemas agree with actual chart nesting and clos
 	expect(branchCount).toBe(38);
 });
 
+test('stats empty input retains its non-array JSON-object guard and missing-body default', () => {
+	const schema = statisticsContract.stats['~orpc'].inputSchema!;
+	expect(v.parse(schema, undefined)).toEqual({});
+	const request = { future: true };
+	expect(v.parse(schema, request)).toEqual({});
+	for (const value of [[], [1], null, 7, 'bad']) expect(v.safeParse(schema, value).success).toBe(false);
+});
+
 test('actual statistics and retention producers produce declared fields', async () => {
 	const stats = createStats({ readNotes: async () => ({ local: 2, remote: 3 }), readUsers: async () => ({ local: 4, remote: 5 }), countReactions: async () => 6, countInstances: async () => 7 });
 	const result = await stats({});
@@ -79,25 +110,5 @@ test('actual statistics and retention producers produce declared fields', async 
 	expect(v.safeParse(statsResult, { ...result, future: true }).success).toBe(false);
 	const repository = mockDeep<RetentionAggregationsRepository>();
 	repository.find.mockResolvedValue([mockDeep<MiRetentionAggregation>({ createdAt: new Date(item.createdAt), usersCount: item.users, data: item.data })]);
-	expect(v.parse(remainingRetentionOutput, await new EndpointImplementation(repository).exec({}, null, null))).toEqual([item]);
-});
-
-test('HTTP keeps chart AJV defaults, errors and unparsed response identity', async () => {
-	const definition = chartEndpointDefinitions['charts/ap-request'];
-	const request = { span: 'day', future: true };
-	const response = { deliverFailed: [1], deliverSucceeded: [2], inboxReceived: [3], future: true };
-	const endpoint = new ContractEndpoint({}, projectEndpointContract(definition), async ps => { expect(ps).toBe(request); return response; });
-	expect(await endpoint.exec(request, null, null)).toBe(response);
-	expect(request).toEqual({ span: 'day', future: true, limit: 30, offset: null });
-	await expect(endpoint.exec({ span: 'day', limit: 0 }, null, null)).rejects.toMatchObject({ code: 'INVALID_PARAM' });
-	const retention = new ContractEndpoint({}, projectEndpointContract(remainingRetentionDefinition), async () => [{ ...item, future: true }]);
-	expect(await retention.exec({ future: true }, null, null)).toEqual([{ ...item, future: true }]);
-});
-
-test('stats empty input retains its non-array JSON-object guard and missing-body default', () => {
-	const schema = statisticsContract.stats['~orpc'].inputSchema!;
-	expect(v.parse(schema, undefined)).toEqual({});
-	const request = { future: true };
-	expect(v.parse(schema, request)).toBe(request);
-	for (const value of [[], [1], null, 7, 'bad']) expect(v.safeParse(schema, value).success).toBe(false);
+	expect(v.parse(remainingRetentionOutput, await createStatisticsOperations({ ...mockDeep<Parameters<typeof createStatisticsOperations>[0]>(), readRetention: () => repository.find() }).retention({}, null))).toEqual([item]);
 });

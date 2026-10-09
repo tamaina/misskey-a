@@ -5,7 +5,9 @@
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { createChatCommands, legacyChatSchemas } from '../../../backend/built/features/chat/backend.js';
+import * as v from 'valibot';
+import { createProcedureClient } from '@orpc/server';
+import { createChatCommandOperations, chatApiContract, createChatRouter } from '../../../backend/built/features/chat/backend.js';
 
 const inputs = {
 	'chat/read-all': {},
@@ -48,32 +50,37 @@ function createDeps(overrides = {}) {
 	return { deps, calls };
 }
 
-function invoke(feature, key, input = inputs[key], actor = { id: 'alice' }) {
-	return feature[key](input, { context: actor == null ? undefined : { actor } });
+function methodName(route) {
+	return route.split(/[/-]/).map((part, index) => index === 0 ? part : part.charAt(0).toUpperCase() + part.slice(1)).join('');
 }
 
-test('legacy chat inputs preserve object, ID, required-field and arbitrary reaction schemas', () => {
-	const base = (properties, required = []) => ({ type: 'object', properties, ...(required.length > 0 ? { required } : {}) });
-	const id = { type: 'string', format: 'misskey:id' };
-	const string = { type: 'string' };
+function invoke(feature, key, input = inputs[key], actor = { id: 'alice', isSuspended: false, movedToUri: null }) {
+	const services = {
+		authenticate: async () => [actor ?? null, null],
+		limitActor: () => null, rateLimitFactor: async () => 1, limit: async () => null,
+	};
+	const procedure = createChatRouter()[methodName(key)];
+	return createProcedureClient(procedure, { context: {
+		services, credential: actor ? 'fixture' : null, ip: '127.0.0.1', headers: {},
+		operations: { chat: feature },
+	} })(input);
+}
 
-	assert.deepEqual(legacyChatSchemas['chat/read-all'].input, {
-		type: 'object', properties: {}, additionalProperties: true,
-	});
-	assert.deepEqual(legacyChatSchemas['chat/rooms/join'].input, base({ roomId: id }, ['roomId']));
-	assert.deepEqual(legacyChatSchemas['chat/rooms/leave'].input, base({ roomId: id }, ['roomId']));
-	assert.deepEqual(legacyChatSchemas['chat/rooms/mute'].input, base({ roomId: id, mute: { type: 'boolean' } }, ['roomId', 'mute']));
-	assert.deepEqual(legacyChatSchemas['chat/rooms/delete'].input, base({ roomId: id }, ['roomId']));
-	assert.deepEqual(legacyChatSchemas['chat/rooms/invitations/ignore'].input, base({ roomId: id }, ['roomId']));
-	assert.deepEqual(legacyChatSchemas['chat/messages/react'].input, base({ messageId: id, reaction: string }, ['messageId', 'reaction']));
-	assert.deepEqual(legacyChatSchemas['chat/messages/unreact'].input, base({ messageId: id, reaction: string }, ['messageId', 'reaction']));
-	assert.deepEqual(legacyChatSchemas['chat/messages/delete'].input, base({ messageId: id }, ['messageId']));
+test('native command inputs retain required IDs and reject non-object roots', () => {
+	for (const [route, input] of Object.entries(inputs)) {
+		const schema = chatApiContract[methodName(route)]['~orpc'].inputSchema;
+		assert.equal(v.safeParse(schema, input).success, true, route);
+		assert.equal(v.safeParse(schema, []).success, false, route);
+		assert.equal(v.safeParse(schema, {}).success, route === 'chat/read-all', route);
+	}
+	const schema = chatApiContract.chatMessagesReact['~orpc'].inputSchema;
+	assert.equal(v.safeParse(schema, { messageId: 'message1', reaction: '😀'.repeat(2048) }).success, true);
 });
 
 test('commands use the correct gate, trusted actor, and service arguments; every success is void', async () => {
 	const actor = { id: 'trusted-alice', moderator: { auditData: true } };
 	const { deps, calls } = createDeps();
-	const feature = createChatCommands(deps);
+	const feature = createChatCommandOperations(deps);
 
 	for (const [key, input] of Object.entries(inputs)) {
 		const result = await invoke(feature, key, { ...input, extraField: 'accepted', actor: { id: 'spoofed' } }, actor);
@@ -94,14 +101,11 @@ test('commands use the correct gate, trusted actor, and service arguments; every
 	]);
 });
 
-test('missing or malformed actors fail before calling any dependency', async () => {
+test('missing or suspended authenticated actors fail before calling any dependency', async () => {
 	const { deps, calls } = createDeps();
-	const feature = createChatCommands(deps);
-
+	const feature = createChatCommandOperations(deps);
 	for (const [key, input] of Object.entries(inputs)) {
-		for (const actor of [undefined, null, {}, { id: '' }]) {
-			await assert.rejects(feature[key]({ ...input, actor: { id: 'spoofed' } }, { context: actor == null ? undefined : { actor } }));
-		}
+		for (const actor of [null, { id: 'alice', isSuspended: true, movedToUri: null }]) await assert.rejects(invoke(feature, key, input, actor));
 	}
 	assert.deepEqual(calls, []);
 });
@@ -113,7 +117,7 @@ test('trusted actors stay isolated across concurrent calls, including full room-
 	let notifyBothStarted;
 	const bothStarted = new Promise(resolve => { notifyBothStarted = resolve; });
 	const deletedBy = [];
-	const feature = createChatCommands(createDeps({
+	const feature = createChatCommandOperations(createDeps({
 		findRoomById: roomId => new Promise(resolve => {
 			started.push(roomId);
 			releases.set(roomId, () => resolve({ roomId }));
@@ -152,7 +156,7 @@ test('every command waits for its availability gate before starting its work', a
 		]) {
 			deps[method] = async () => { events.push(`command:${method}`); return method === 'findRoomById' ? { roomId: 'room1' } : method === 'findMyMessageById' ? { messageId: 'message1' } : method === 'hasPermissionToDeleteRoom' ? true : undefined; };
 		}
-		const feature = createChatCommands(deps);
+		const feature = createChatCommandOperations(deps);
 		let settled = false;
 		const result = invoke(feature, key, input).then(() => { settled = true; });
 		await gateStarted;
@@ -171,7 +175,7 @@ test('react and unreact conceal only access errors and retain route-specific err
 		const denied = new Error('private reason');
 		denied.name = 'ChatMessageAccessError';
 		const { deps, calls } = createDeps({ [action]: async () => { throw denied; } });
-		const feature = createChatCommands(deps);
+		const feature = createChatCommandOperations(deps);
 		await assert.rejects(invoke(feature, key), error => {
 			assert.equal(error.definition.id, key.endsWith('/react') && !key.endsWith('/unreact')
 				? '9b5839b9-0ba0-4351-8c35-37082093d200'
@@ -182,12 +186,12 @@ test('react and unreact conceal only access errors and retain route-specific err
 		assert.equal(calls[0][0], 'gate');
 
 		const unexpected = new Error('unexpected failure');
-		const otherFeature = createChatCommands(createDeps({ [action]: async () => { throw unexpected; } }).deps);
+		const otherFeature = createChatCommandOperations(createDeps({ [action]: async () => { throw unexpected; } }).deps);
 		await assert.rejects(invoke(otherFeature, key), error => error === unexpected);
 
 		const gateError = new Error('availability denied');
 		let actionCalled = false;
-		const gatedFeature = createChatCommands(createDeps({
+		const gatedFeature = createChatCommandOperations(createDeps({
 			checkChatAvailability: async () => { throw gateError; },
 			[action]: async () => { actionCalled = true; },
 		}).deps);
@@ -197,7 +201,7 @@ test('react and unreact conceal only access errors and retain route-specific err
 });
 
 test('message deletion and room deletion conceal absence and permission failures', async () => {
-	const messageFeature = createChatCommands(createDeps({ findMyMessageById: async () => null }).deps);
+	const messageFeature = createChatCommandOperations(createDeps({ findMyMessageById: async () => null }).deps);
 	await assert.rejects(invoke(messageFeature, 'chat/messages/delete'), error => {
 		assert.equal(error.definition.id, '36b67f0e-66a6-414b-83df-992a55294f17');
 		return true;
@@ -205,7 +209,7 @@ test('message deletion and room deletion conceal absence and permission failures
 
 	for (const [room, allowed] of [[null, true], [{ id: 'room' }, false]]) {
 		let deleteCalled = false;
-		const feature = createChatCommands(createDeps({
+		const feature = createChatCommandOperations(createDeps({
 			findRoomById: async () => room,
 			hasPermissionToDeleteRoom: async () => allowed,
 			deleteRoom: async () => { deleteCalled = true; },
@@ -220,7 +224,7 @@ test('message deletion and room deletion conceal absence and permission failures
 
 test('chat inputs retain old malformed behavior and permit unrecognized object properties', async () => {
 	const { deps, calls } = createDeps();
-	const feature = createChatCommands(deps);
+	const feature = createChatCommandOperations(deps);
 
 	for (const [key, input] of Object.entries({
 		'chat/rooms/join': { roomId: 'bad id' },
@@ -257,7 +261,7 @@ test('async command methods await dependencies and resolve with undefined', asyn
 				return new Promise(resolve => { release = () => resolve(method === 'findRoomById' ? { roomId: 'room1' } : method === 'findMyMessageById' ? { messageId: 'message1' } : undefined); });
 			},
 		});
-		const feature = createChatCommands(deps);
+		const feature = createChatCommandOperations(deps);
 		let settled = false;
 		const result = invoke(feature, key).then(value => { settled = true; return value; });
 		await started;
@@ -280,7 +284,7 @@ test('async command methods await dependencies and resolve with undefined', asyn
 				return new Promise(resolve => { release = resolve; });
 			},
 		});
-		const feature = createChatCommands(deps);
+		const feature = createChatCommandOperations(deps);
 		let settled = false;
 		const result = invoke(feature, key).then(value => { settled = true; return value; });
 		await started;

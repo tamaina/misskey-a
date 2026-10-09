@@ -3,33 +3,16 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { inlineAdminRelaysListDefinition, inlineAdminRelaysListInput, inlineAdminRelaysListOutput } from '../../../../contract/endpoint-definitions.js';
-import { Injectable } from '@nestjs/common';
+import { implement } from '@orpc/server';
+import { authentication, apiPolicy, requirePrincipal } from '../../../../../api/backend/transport/middleware.js';
+import type { ApiActor } from '../../../../../api/backend/transport/context.js';
+import type { FederationContext } from '../../../operations.js';
+import { adminRelaysListContract } from './list.contract.js';
 
-import { RelayService } from '../../../services/RelayService.js';
-
-const contractProjection = projectEndpointContract(inlineAdminRelaysListDefinition);
-
-export const meta = {
-	tags: ['admin'],
-
-	requireCredential: true,
-	requireModerator: true,
-	kind: 'read:admin:relays',
-
-	res: contractProjection.response,
-} as const;
-
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof inlineAdminRelaysListInput, typeof inlineAdminRelaysListOutput> {
-	constructor(
-		private relayService: RelayService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			return await this.relayService.listRelay();
-		});
-	}
+export function createAdminRelaysListProcedure<Actor extends ApiActor>() {
+	return implement(adminRelaysListContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<FederationContext<Actor>>()
+		.use(authentication<Actor>())
+		.use(apiPolicy<Actor>({ name: 'admin/relays/list', requireCredential: true, requireModerator: true, kind: 'read:admin:relays' }))
+		.use(requirePrincipal<Actor>())
+		.handler(({ input, context }) => context.operations.federation.adminRelaysList(input, context.principal));
 }

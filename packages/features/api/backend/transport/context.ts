@@ -43,5 +43,6 @@ export interface ApiContext<Actor extends ApiActor = ApiActor> {
 	ip: string;
 	headers: Record<string, string | string[] | undefined>;
 	upload?: UploadResource;
+	response?: { header(name: string, value: string): void };
 	mapError?: (error: unknown) => ORPCError<string, unknown>;
 }

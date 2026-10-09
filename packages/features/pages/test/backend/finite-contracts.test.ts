@@ -6,21 +6,32 @@
 import { expect, test } from 'vitest';
 import * as v from 'valibot';
 import { mockDeep } from 'vitest-mock-extended';
-import type { Packed } from '@features/index/contract/packed.js';
-import type { MiDriveFile } from '@features/drive/backend/models/DriveFile.js';
-import { PageEntityService } from '../../backend/serializers/PageEntityService.js';
-import { PageLikeEntityService } from '../../backend/serializers/PageLikeEntityService.js';
+import { packedPageSchema } from '@features/users/backend/page.schema.js';
+import { packedJsonObjectSchema as packedPageBlockSchema } from '@features/users/backend/json-value.schema.js';
 import { MiPage } from '../../backend/models/Page.js';
+import { PageLikeEntityService } from '../../backend/serializers/PageLikeEntityService.js';
+import { PageEntityService } from '../../backend/serializers/PageEntityService.js';
+import { PagesShowApplicationService } from '../../backend/applications/pages/show.js';
+import { iPageLikesInput as packedIPageLikesInput } from '../../backend/endpoints/i/page-likes.contract.js';
+import { iPageLikesOutput as packedIPageLikesOutput } from '../../backend/endpoints/i/page-likes.contract.js';
+import { iPagesInput as packedIPagesInput } from '../../backend/endpoints/i/pages.contract.js';
+import { pagesFeaturedInput as packedPagesFeaturedInput } from '../../backend/endpoints/pages/featured.contract.js';
+import { usersPagesInput as packedUsersPagesInput } from '../../backend/endpoints/users/pages.contract.js';
+import { pagePushInput as voidPagePushInput } from '../../backend/endpoints/page-push.contract.js';
+import { pagesDeleteInput as voidPagesDeleteInput } from '../../backend/endpoints/pages/delete.contract.js';
+import { pagesLikeInput as voidPagesLikeInput } from '../../backend/endpoints/pages/like.contract.js';
+import { pagesUnlikeInput as voidPagesUnlikeInput } from '../../backend/endpoints/pages/unlike.contract.js';
+import { pagesCreateInput as portablePagesCreateInput } from '../../backend/endpoints/pages/create.contract.js';
+import { pagesUpdateInput as portablePagesUpdateInput } from '../../backend/endpoints/pages/update.contract.js';
+import { pagesShowInput as selectorPagesShowInput } from '../../backend/endpoints/pages/show.contract.js';
 import type { MiPageLike } from '../../backend/models/PageLike.js';
-import { packedPageSchema, packedPageBlockSchema } from '../../contract/packed.js';
-import { packedIPageLikesInput, packedIPageLikesOutput, packedIPagesInput, packedPagesFeaturedInput, packedUsersPagesInput } from '../../contract/packed-endpoint-definitions.js';
-import { voidPagePushInput, voidPagesDeleteInput, voidPagesLikeInput, voidPagesUnlikeInput } from '../../contract/void-endpoint-definitions.js';
-import { portablePagesCreateInput, portablePagesUpdateInput } from '../../contract/portable-constant-endpoint-definitions.js';
-import { selectorPagesShowInput } from '../../contract/selector-endpoint-definitions.js';
+import type { MiDriveFile } from '@features/drive/backend/models/DriveFile.js';
+import type { packedDriveFileSchema } from '@features/notes/backend/drive.schema.js';
+import type { PackedUserLite } from '@features/users/backend/user.schema.js';
 
 const date = new Date('2026-01-01T00:00:00Z');
-const user: Packed<'UserLite'> = { id: 'user123', name: null, username: 'alice', host: null, avatarUrl: 'https://example/avatar', avatarBlurhash: null, avatarDecorations: [], emojis: {}, onlineStatus: 'unknown' };
-const file: Packed<'DriveFile'> = { id: 'file123', createdAt: date.toISOString(), name: 'image.png', type: 'image/png', md5: 'hash', size: 1, isSensitive: false, blurhash: null, properties: {}, url: 'https://example/image.png', thumbnailUrl: null, comment: null, folderId: null, userId: user.id };
+const user: PackedUserLite = { id: 'user123', name: null, username: 'alice', host: null, avatarUrl: 'https://example/avatar', avatarBlurhash: null, avatarDecorations: [], emojis: {}, onlineStatus: 'unknown' };
+const file: v.InferOutput<typeof packedDriveFileSchema> = { id: 'file123', createdAt: date.toISOString(), name: 'image.png', type: 'image/png', md5: 'hash', size: 1, isSensitive: false, blurhash: null, properties: {}, url: 'https://example/image.png', thumbnailUrl: null, comment: null, folderId: null, userId: user.id };
 
 function fixture() {
 	const pages = mockDeep<ConstructorParameters<typeof PageEntityService>[0]>();
@@ -118,10 +129,10 @@ test('finite native Pages inputs strip extras and retain declared keys and defau
 		expect(v.parse(schema, { future: true })).toEqual({ limit: 10 });
 		expect(v.parse(schema, { limit: 1, sinceId: 'since123', untilId: 'until123', sinceDate: 0, untilDate: 1, future: true })).toEqual({ limit: 1, sinceId: 'since123', untilId: 'until123', sinceDate: 0, untilDate: 1 });
 		for (const input of [null, 7, { limit: 0 }, { limit: 101 }, { limit: 1.5 }, { sinceId: 'bad-id' }, { sinceDate: 1.5 }]) expect(v.safeParse(schema, input).success).toBe(false);
-		expect(v.parse(schema, [])).toEqual({ limit: 10 });
+		expect(v.safeParse(schema, []).success).toBe(false);
 	}
 	expect(v.parse(packedPagesFeaturedInput, { future: true })).toEqual({});
-	expect(v.parse(packedPagesFeaturedInput, [])).toEqual({});
+	expect(v.safeParse(packedPagesFeaturedInput, []).success).toBe(false);
 	for (const input of [null, 7]) expect(v.safeParse(packedPagesFeaturedInput, input).success).toBe(false);
 	expect(v.parse(packedUsersPagesInput, { userId: user.id, future: true })).toEqual({ userId: user.id, limit: 10 });
 	for (const input of [{}, [], { userId: 7 }]) expect(v.safeParse(packedUsersPagesInput, input).success).toBe(false);
@@ -137,10 +148,29 @@ test('finite native Pages inputs strip extras and retain declared keys and defau
 test('stored block acceptance and dynamic create, update and show inputs remain unchanged', () => {
 	for (const block of [{ id: 'text', type: 'text', text: 'hello', extension: true }, { id: 'section', type: 'section', title: 'section', children: [{ extension: true }], extension: true }, { id: 'legacy', type: 'button', children: [{ extension: true }], extension: true }]) expect(v.parse(packedPageBlockSchema, block)).toEqual(block);
 	const dynamic = { title: 'Page', name: 'page', content: [{ type: 'extension', extra: true }], variables: [{ extra: true }], script: '', extra: true };
-	expect(v.parse(portablePagesCreateInput, dynamic)).toEqual({ ...dynamic, font: 'sans-serif', alignCenter: false, hideTitleWhenPinned: false });
-	expect(v.parse(portablePagesUpdateInput, { pageId: 'page123', content: [{ extension: true }], variables: [{ extra: true }], extra: true })).toEqual({ pageId: 'page123', content: [{ extension: true }], variables: [{ extra: true }], extra: true });
-	expect(v.parse(selectorPagesShowInput, { pageId: 'page123', extra: true })).toEqual({ pageId: 'page123', extra: true });
-	expect(v.parse(selectorPagesShowInput, { name: 'page', username: 'alice', extra: true })).toEqual({ name: 'page', username: 'alice', extra: true });
+	expect(v.parse(portablePagesCreateInput, dynamic)).toEqual({ title: dynamic.title, name: dynamic.name, content: dynamic.content, variables: dynamic.variables, script: dynamic.script, font: 'sans-serif', alignCenter: false, hideTitleWhenPinned: false });
+	expect(v.parse(portablePagesUpdateInput, { pageId: 'page123', content: [{ extension: true }], variables: [{ extra: true }], extra: true })).toEqual({ pageId: 'page123', content: [{ extension: true }], variables: [{ extra: true }] });
+	expect(v.parse(selectorPagesShowInput, { pageId: 'page123', extra: true })).toEqual({ pageId: 'page123' });
+	expect(v.parse(selectorPagesShowInput, { name: 'page', username: 'alice', extra: true })).toEqual({ name: 'page', username: 'alice' });
 	for (const schema of [portablePagesCreateInput, portablePagesUpdateInput, selectorPagesShowInput]) for (const input of [[], null, 7]) expect(v.safeParse(schema, input).success).toBe(false);
 	for (const value of [null, [], 7]) expect(v.safeParse(portablePagesCreateInput, { ...dynamic, content: [value] }).success).toBe(false);
+});
+
+test.each(['bad-id', null, 42, false, ['legacy'], { legacy: true }])('competing pageId selector reaches the original repository boundary: %j', async pageId => {
+	const { service, page } = fixture();
+	const users = mockDeep<ConstructorParameters<typeof PagesShowApplicationService>[0]>();
+	const pages = mockDeep<ConstructorParameters<typeof PagesShowApplicationService>[1]>();
+	pages.findOneBy.mockResolvedValue(page);
+	const application = new PagesShowApplicationService(users, pages, service);
+	const input = v.parse(selectorPagesShowInput, { name: 'page', username: 'alice', pageId });
+	await application.execute(input, null);
+	expect(pages.findOneBy).toHaveBeenCalledWith({ id: pageId });
+	expect(users.findOneBy).not.toHaveBeenCalled();
+});
+
+test('legacy number inputs retain JSON null for an unparsable default', async () => {
+	const { service, page } = fixture();
+	page.content = [{ type: 'input', inputType: 'number', default: 'not-a-number' }];
+	const output = await service.pack(page);
+	expect(v.parse(packedPageSchema, output).content).toEqual([{ type: 'numberInput', inputType: 'number', default: null }]);
 });

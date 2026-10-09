@@ -3,73 +3,16 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { voidBubbleGameRegisterDefinition, voidBubbleGameRegisterInput, voidBubbleGameRegisterOutput } from '../../../contract/void-endpoint-definitions.js';
-import { Inject, Injectable } from '@nestjs/common';
-import ms from 'ms';
+import { implement } from '@orpc/server';
+import { authentication, apiPolicy, requirePrincipal } from '../../../../api/backend/transport/middleware.js';
+import type { ApiActor } from '../../../../api/backend/transport/context.js';
+import type { GamesContext } from '../../operations.js';
+import { bubbleGameRegisterContract } from './register.contract.js';
 
-import { IdService } from '@features/runtime/backend/services/IdService.js';
-import type { BubbleGameRecordsRepository } from '@features/persistence/backend/repositories/models.js';
-import { DI } from '@/di-symbols.js';
-import { ApiError } from '@features/api/backend/transport/error.js';
-
-const contractProjection = projectEndpointContract(voidBubbleGameRegisterDefinition);
-
-export const meta = {
-	requireCredential: true,
-
-	kind: 'write:account',
-
-	limit: {
-		duration: ms('1hour'),
-		max: 120,
-		minInterval: ms('30sec'),
-	},
-
-	errors: {
-		invalidSeed: {
-			message: 'Provided seed is invalid.',
-			code: 'INVALID_SEED',
-			id: 'eb627bc7-574b-4a52-a860-3c3eae772b88',
-		},
-	},
-} as const;
-
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof voidBubbleGameRegisterInput, typeof voidBubbleGameRegisterOutput> {
-	constructor(
-		@Inject(DI.bubbleGameRecordsRepository)
-		private bubbleGameRecordsRepository: BubbleGameRecordsRepository,
-
-		private idService: IdService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			const seedDate = new Date(parseInt(ps.seed, 10));
-			const now = new Date();
-
-			// シードが未来なのは通常のプレイではありえないので弾く
-			if (seedDate.getTime() > now.getTime()) {
-				throw new ApiError(meta.errors.invalidSeed);
-			}
-
-			// シードが古すぎる(5時間以上前)のも弾く
-			if (seedDate.getTime() < now.getTime() - 1000 * 60 * 60 * 5) {
-				throw new ApiError(meta.errors.invalidSeed);
-			}
-
-			await this.bubbleGameRecordsRepository.insert({
-				id: this.idService.gen(now.getTime()),
-				seed: ps.seed,
-				seededAt: seedDate,
-				userId: me.id,
-				score: ps.score,
-				logs: ps.logs,
-				gameMode: ps.gameMode,
-				gameVersion: ps.gameVersion,
-				isVerified: false,
-			});
-		});
-	}
+export function createBubbleGameRegisterProcedure<Actor extends ApiActor>() {
+	return implement(bubbleGameRegisterContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<GamesContext<Actor>>()
+		.use(authentication<Actor>())
+		.use(apiPolicy<Actor>({ name: 'bubble-game/register', requireCredential: true, kind: 'write:account', limit: { duration: 3_600_000, max: 120, minInterval: 30_000 } }))
+		.use(requirePrincipal<Actor>())
+		.handler(({ input, context }) => context.operations.games.bubbleGameRegister(input, context.principal));
 }

@@ -3,62 +3,16 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { packedFlashCreateDefinition, packedFlashCreateInput, packedFlashCreateOutput } from '../../../contract/packed-endpoint-definitions.js';
-import ms from 'ms';
-import { Inject, Injectable } from '@nestjs/common';
-import type { FlashsRepository } from '@features/persistence/backend/repositories/models.js';
-import { IdService } from '@features/runtime/backend/services/IdService.js';
+import { implement } from '@orpc/server';
+import { authentication, apiPolicy, requirePrincipal } from '../../../../api/backend/transport/middleware.js';
+import type { ApiActor } from '../../../../api/backend/transport/context.js';
+import type { PlayContext } from '../../operations.js';
+import { flashCreateContract } from './create.contract.js';
 
-import { DI } from '@/di-symbols.js';
-import { FlashEntityService } from '../../serializers/FlashEntityService.js';
-
-const contractProjection = projectEndpointContract(packedFlashCreateDefinition);
-
-export const meta = {
-	tags: ['flash'],
-
-	requireCredential: true,
-
-	prohibitMoved: true,
-
-	kind: 'write:flash',
-
-	limit: {
-		duration: ms('1hour'),
-		max: 10,
-	},
-
-	errors: {
-	},
-
-	res: contractProjection.response,
-} as const;
-
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedFlashCreateInput, typeof packedFlashCreateOutput> {
-	constructor(
-		@Inject(DI.flashsRepository)
-		private flashsRepository: FlashsRepository,
-
-		private flashEntityService: FlashEntityService,
-		private idService: IdService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			const flash = await this.flashsRepository.insertOne({
-				id: this.idService.gen(),
-				userId: me.id,
-				updatedAt: new Date(),
-				title: ps.title,
-				summary: ps.summary,
-				script: ps.script,
-				permissions: ps.permissions,
-				visibility: ps.visibility,
-			});
-
-			return await this.flashEntityService.pack(flash);
-		});
-	}
+export function createFlashCreateProcedure<Actor extends ApiActor>() {
+	return implement(flashCreateContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<PlayContext<Actor>>()
+		.use(authentication<Actor>())
+		.use(apiPolicy<Actor>({ name: 'flash/create', requireCredential: true, kind: 'write:flash', prohibitMoved: true, limit: { duration: 3_600_000, max: 10 } }))
+		.use(requirePrincipal<Actor>())
+		.handler(({ input, context }) => context.operations.play.flashCreate(input, context.principal));
 }

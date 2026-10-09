@@ -4,14 +4,14 @@
  */
 
 import { expect, test } from 'vitest';
-import { packedSchemas } from '@features/index/contract/packed.js';
-import { getSchemas } from '@features/api/backend/transport/openapi/schemas.js';
+import { packedSchemas } from '@features/index/backend/packed.schema.js';
+import { genPilotOpenapiSpec } from '@features/api/backend/transport/openapi/pilot-spec.js';
 
-const schemas = getSchemas(false);
+const schemas = (await genPilotOpenapiSpec({ version: 'test', apiUrl: '/api' })).components?.schemas ?? {};
 
 test('all packed models are exported as named OpenAPI components', () => {
 	const names = Object.keys(packedSchemas);
-	expect(names).toHaveLength(69);
+	expect(names).toHaveLength(70);
 	for (const name of names) {
 		expect(schemas).toHaveProperty(name);
 	}

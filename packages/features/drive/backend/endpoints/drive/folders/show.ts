@@ -3,59 +3,39 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { packedDriveFoldersShowDefinition, packedDriveFoldersShowInput, packedDriveFoldersShowOutput } from '../../../../contract/packed-endpoint-definitions.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+import type { DriveManagementInputs } from '../../../management.contract.js';
+import { driveFoldersShowErrors } from './show.contract.js';
 import { Inject, Injectable } from '@nestjs/common';
 
 import type { DriveFoldersRepository } from '@features/persistence/backend/repositories/models.js';
 import { DriveFolderEntityService } from '../../../serializers/DriveFolderEntityService.js';
 import { DI } from '@/di-symbols.js';
-import { ApiError } from '@features/api/backend/transport/error.js';
-
-const contractProjection = projectEndpointContract(packedDriveFoldersShowDefinition);
-
-export const meta = {
-	tags: ['drive'],
-
-	requireCredential: true,
-
-	kind: 'read:drive',
-
-	res: contractProjection.response,
-
-	errors: {
-		noSuchFolder: {
-			message: 'No such folder.',
-			code: 'NO_SUCH_FOLDER',
-			id: 'd74ab9eb-bb09-4bba-bf24-fb58f761e1e9',
-		},
-	},
-} as const;
-
-export const paramDef = contractProjection.input;
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
 
 @Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedDriveFoldersShowInput, typeof packedDriveFoldersShowOutput> {
+export class DriveFoldersShowOperation {
 	constructor(
 		@Inject(DI.driveFoldersRepository)
 		private driveFoldersRepository: DriveFoldersRepository,
 
 		private driveFolderEntityService: DriveFolderEntityService,
 	) {
-		super(meta, contractProjection, async (ps, me) => {
-			// Get folder
-			const folder = await this.driveFoldersRepository.findOneBy({
-				id: ps.folderId,
-				userId: me.id,
-			});
+	}
 
-			if (folder == null) {
-				throw new ApiError(meta.errors.noSuchFolder);
-			}
+	async execute(ps: DriveManagementInputs['drive/folders/show'], me: MiLocalUser, _ip: string, _headers: Record<string, string | string[] | undefined>) {
+		// Get folder
+		const folder = await this.driveFoldersRepository.findOneBy({
+			id: ps.folderId,
+			userId: me.id,
+		});
 
-			return await this.driveFolderEntityService.pack(folder, {
-				detail: true,
-			});
+		if (folder == null) {
+			throw apiError(driveFoldersShowErrors.noSuchFolder);
+		}
+
+		return await this.driveFolderEntityService.pack(folder, {
+			detail: true,
 		});
 	}
 }

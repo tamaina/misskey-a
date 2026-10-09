@@ -3,22 +3,16 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { chatContract } from '../../../../../contract/index.js';
-import { chatErrors } from '@features/chat/contract';
-import { legacyChatSchemas } from '@features/chat/backend';
-import type { Schema } from '@features/api/backend/utility/json-schema.js';
-import { createContractTransportEndpoint } from '@features/api/backend/transport/contract-transport-endpoint.js';
-import { defineFeatureEndpoint } from '@features/api/backend/transport/feature-endpoint.js';
+import { implement } from '@orpc/server';
+import { chatRoomsInvitationsIgnoreContract, chatRoomsInvitationsIgnorePolicy } from './ignore.contract.js';
+import type { ApiActor } from '../../../../../../api/backend/transport/context.js';
+import { authentication, apiPolicy, requirePrincipal } from '../../../../../../api/backend/transport/middleware.js';
+import type { ChatApiContext } from '../../../../operations.js';
 
-export const meta = {
-	tags: ['chat'],
-	requireCredential: true,
-	kind: 'write:chat',
-	errors: chatErrors['chat/rooms/invitations/ignore'],
-} as const;
-
-export const paramDef = legacyChatSchemas['chat/rooms/invitations/ignore'].input as Schema;
-
-export const { feature, createEndpoint } = defineFeatureEndpoint('chatCommands', commands => createContractTransportEndpoint(meta, paramDef, chatContract['chat/rooms/invitations/ignore'], async (params, user) => commands['chat/rooms/invitations/ignore'](params, {
-	context: { actor: user },
-})));
+export function createChatRoomsInvitationsIgnoreProcedure<Actor extends ApiActor>() {
+	return implement(chatRoomsInvitationsIgnoreContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ChatApiContext<Actor>>()
+		.use(authentication<Actor>())
+		.use(apiPolicy<Actor>(chatRoomsInvitationsIgnorePolicy))
+		.use(requirePrincipal<Actor>())
+		.handler(({ input, context }) => context.operations.chat.chatRoomsInvitationsIgnore(input, context.principal));
+}

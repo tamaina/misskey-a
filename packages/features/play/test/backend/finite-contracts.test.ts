@@ -6,14 +6,17 @@
 import { expect, test } from 'vitest';
 import * as v from 'valibot';
 import { mockDeep } from 'vitest-mock-extended';
-import { packedFlashSchema } from '../../contract/packed.js';
-import { packedFlashCreateInput, packedFlashFeaturedInput, packedFlashFeaturedDefinition, packedFlashFeaturedOutput, packedFlashMyLikesOutput } from '../../contract/packed-endpoint-definitions.js';
-import { voidFlashUpdateInput } from '../../contract/void-endpoint-definitions.js';
+import { packedFlashSchema } from '../../backend/flash.schema.js';
+import { flashCreateInput as packedFlashCreateInput } from '../../backend/endpoints/flash/create.contract.js';
+import { flashFeaturedInput as packedFlashFeaturedInput } from '../../backend/endpoints/flash/featured.contract.js';
+import { flashFeaturedContract as packedFlashFeaturedDefinition } from '../../backend/endpoints/flash/featured.contract.js';
+import { flashFeaturedOutput as packedFlashFeaturedOutput } from '../../backend/endpoints/flash/featured.contract.js';
+import { flashMyLikesOutput as packedFlashMyLikesOutput } from '../../backend/endpoints/flash/my-likes.contract.js';
+import { flashUpdateInput as voidFlashUpdateInput } from '../../backend/endpoints/flash/update.contract.js';
 import { FlashEntityService } from '../../backend/serializers/FlashEntityService.js';
 import { FlashLikeEntityService } from '../../backend/serializers/FlashLikeEntityService.js';
 import type { MiFlash } from '../../backend/models/Flash.js';
 import type { MiFlashLike } from '../../backend/models/FlashLike.js';
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
 
 const date = new Date('2026-01-01T00:00:00Z');
 const user = { id: 'user123', name: null, username: 'alice', host: null, avatarUrl: 'https://example/avatar', avatarBlurhash: null, avatarDecorations: [], emojis: {}, onlineStatus: 'unknown' as const };
@@ -56,7 +59,7 @@ test.each([false, true])('actual Flash serializer and like wrapper retain viewer
 	}
 });
 
-test('native Flash inputs strip extras and enforce fields while HTTP keeps defaults, errors and raw response identity', async () => {
+test('native Flash inputs preserve defaults and finite outputs reject extra fields', async () => {
 	const create = { title: 'play', summary: '', script: 'print(1)', permissions: [] };
 	expect(v.parse(packedFlashCreateInput, { ...create, future: true })).toEqual({ ...create, visibility: 'public' });
 	for (const value of [{}, { ...create, script: 7 }, { ...create, visibility: 'unknown' }]) expect(v.safeParse(packedFlashCreateInput, value).success).toBe(false);
@@ -65,11 +68,6 @@ test('native Flash inputs strip extras and enforce fields while HTTP keeps defau
 	const { service, flash } = fixture();
 	const response = [{ ...await service.pack(flash), future: true }];
 	const params = { future: true };
-	const projection = projectEndpointContract(packedFlashFeaturedDefinition);
-	expect(projection.input).not.toHaveProperty('additionalProperties');
-	const endpoint = new ContractEndpoint({}, projection, async ps => { expect(ps).toBe(params); return response; });
-	expect(await endpoint.exec(params, null, null)).toBe(response);
-	expect(params).toEqual({ future: true, offset: 0, limit: 10 });
 	expect(v.safeParse(packedFlashFeaturedOutput, response).success).toBe(false);
-	await expect(endpoint.exec({ limit: 0 }, null, null)).rejects.toMatchObject({ code: 'INVALID_PARAM', info: { param: '#/properties/limit/minimum' } });
+	expect(v.safeParse(packedFlashFeaturedInput, { limit: 0 }).success).toBe(false);
 });

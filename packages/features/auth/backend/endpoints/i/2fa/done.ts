@@ -3,8 +3,6 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { inlineI2faDoneDefinition, inlineI2faDoneInput, inlineI2faDoneOutput } from '../../../../contract/endpoint-definitions.js';
 import * as OTPAuth from 'otpauth';
 import { Inject, Injectable } from '@nestjs/common';
 
@@ -14,20 +12,18 @@ import { GlobalEventService } from '@features/runtime/backend/services/GlobalEve
 import { DI } from '@/di-symbols.js';
 import { UserAuthService } from "../../../services/UserAuthService.js";
 
-const contractProjection = projectEndpointContract(inlineI2faDoneDefinition);
+import * as v from 'valibot';
+import { inlineI2faDoneInput } from '../../../auth.schema.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
 
 export const meta = {
 	requireCredential: true,
 
 	secure: true,
-
-	res: contractProjection.response,
 } as const;
 
-export const paramDef = contractProjection.input;
-
 @Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof inlineI2faDoneInput, typeof inlineI2faDoneOutput> {
+export class I2faDoneOperation {
 	constructor(
 		@Inject(DI.userProfilesRepository)
 		private userProfilesRepository: UserProfilesRepository,
@@ -35,36 +31,36 @@ export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof
 		private userEntityService: UserEntityService,
 		private userAuthService: UserAuthService,
 		private globalEventService: GlobalEventService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			const token = ps.token.replace(/\s/g, '');
+	) {}
 
-			const profile = await this.userProfilesRepository.findOneByOrFail({ userId: me.id });
+	async execute(ps: v.InferOutput<typeof inlineI2faDoneInput>, me: MiLocalUser) {
+		const token = ps.token.replace(/\s/g, '');
 
-			if (profile.twoFactorTempSecret == null) {
-				throw new Error('二段階認証の設定が開始されていません');
-			}
+		const profile = await this.userProfilesRepository.findOneByOrFail({ userId: me.id });
 
-			if (!await this.userAuthService.validateOtp(profile.userId, profile.twoFactorTempSecret, token)) {
-				throw new Error('not verified');
-			}
+		if (profile.twoFactorTempSecret == null) {
+			throw new Error('二段階認証の設定が開始されていません');
+		}
 
-			const backupCodes = Array.from({ length: 5 }, () => new OTPAuth.Secret().base32);
+		if (!await this.userAuthService.validateOtp(profile.userId, profile.twoFactorTempSecret, token)) {
+			throw new Error('not verified');
+		}
 
-			await this.userProfilesRepository.update(me.id, {
-				twoFactorSecret: profile.twoFactorTempSecret,
-				twoFactorBackupSecret: backupCodes,
-				twoFactorEnabled: true,
-			});
+		const backupCodes = Array.from({ length: 5 }, () => new OTPAuth.Secret().base32);
 
-			// Publish meUpdated event
-			this.globalEventService.publishMainStream(me.id, 'meUpdated', await this.userEntityService.packSelf(me.id, {
-				includeSecrets: true,
-			}));
-
-			return {
-				backupCodes: backupCodes,
-			};
+		await this.userProfilesRepository.update(me.id, {
+			twoFactorSecret: profile.twoFactorTempSecret,
+			twoFactorBackupSecret: backupCodes,
+			twoFactorEnabled: true,
 		});
+
+		// Publish meUpdated event
+		this.globalEventService.publishMainStream(me.id, 'meUpdated', await this.userEntityService.packSelf(me.id, {
+			includeSecrets: true,
+		}));
+
+		return {
+			backupCodes: backupCodes,
+		};
 	}
 }

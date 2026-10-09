@@ -11,16 +11,19 @@ import type { IQueueBackend, Queue } from 'bullmq';
 import type { DataSource } from 'typeorm';
 import type { MiLocalUser } from '../../../users/backend/models/User.js';
 import { QueueService } from '../../../runtime/backend/services/QueueService.js';
-import { QUEUE_TYPES } from '../../../runtime/shared/queue-types.js';
-import { packedQueueCountSchema, packedQueueMetricsSchema, packedQueueJobSchema } from '../../contract/packed.js';
-import { operationsInputs } from '../../contract/index.js';
-import { referenceAdminQueueQueuesOutput, referenceAdminQueueQueueStatsOutput, referenceAdminQueueQueueStatsDefinition } from '../../contract/reference-endpoint-definitions.js';
-import { inlineAdminGetTableStatsOutput, inlineAdminGetIndexStatsOutput } from '../../contract/endpoint-definitions.js';
-import { queueStatsOutput } from '../../contract/queue-stats-endpoint-definition.js';
-import { EndpointImplementation as AggregateStats } from '../../backend/endpoints/admin/queue/stats.js';
-import { EndpointImplementation as TableStats } from '../../backend/endpoints/admin/get-table-stats.js';
-import { EndpointImplementation as IndexStats } from '../../backend/endpoints/admin/get-index-stats.js';
-import { ContractEndpoint, projectEndpointContract } from '../../../api/backend/transport/contract-endpoint.js';
+import { QUEUE_TYPES } from '../../backend/queue.schema.js';
+import { queueCounterSchema as packedQueueCountSchema, queueMetricsSchema as packedQueueMetricsSchema, queueJobSchema as packedQueueJobSchema } from '../../backend/queue.schema.js';
+import { adminQueuePauseInput, adminQueuePauseInput as queueInput } from '../../backend/endpoints/admin/queue/pause.contract.js';
+import { adminQueueClearInput } from '../../backend/endpoints/admin/queue/clear.contract.js';
+import { adminQueueRetryJobInput } from '../../backend/endpoints/admin/queue/retry-job.contract.js';
+import { adminQueueQueuesOutput as referenceAdminQueueQueuesOutput } from '../../backend/endpoints/admin/queue/queues.contract.js';
+import { adminQueueQueueStatsOutput as referenceAdminQueueQueueStatsOutput } from '../../backend/endpoints/admin/queue/queue-stats.contract.js';
+import { adminGetTableStatsOutput as inlineAdminGetTableStatsOutput } from '../../backend/endpoints/admin/get-table-stats.contract.js';
+import { adminGetIndexStatsOutput as inlineAdminGetIndexStatsOutput } from '../../backend/endpoints/admin/get-index-stats.contract.js';
+import { adminQueueStatsOutput as queueStatsOutput } from '../../backend/endpoints/admin/queue/stats.contract.js';
+import { AdminQueueStatsApplicationService as AggregateStats } from '../../backend/endpoints/admin/queue/stats.application.js';
+import { AdminGetTableStatsApplicationService as TableStats } from '../../backend/endpoints/admin/get-table-stats.application.js';
+import { AdminGetIndexStatsApplicationService as IndexStats } from '../../backend/endpoints/admin/get-index-stats.application.js';
 
 const metrics = { meta: { count: 3, prevTS: 1, prevCount: 2 }, data: [1, 2], count: 3 };
 const counts = { waiting: 1, active: 2, completed: 3, failed: 4, delayed: 5 };
@@ -94,28 +97,22 @@ test('finite queue counts, metrics, aggregate wrappers and table record values r
 	for (const value of [{ count: 2, size: 1024, future: true }, { count: 2 }, { count: 'bad', size: 1024 }]) expect(v.safeParse(inlineAdminGetTableStatsOutput, { custom_table: value }).success).toBe(false);
 });
 
-test('native queue requests strip extras while HTTP retains the original request and unparsed output', async () => {
-	for (const schema of Object.values(operationsInputs)) {
-		const request = { queue: 'system', jobId: 'job1', state: '*', future: true };
-		expect(v.parse(schema, request)).not.toHaveProperty('future');
-		for (const input of [{}, { queue: 'unsupported' }, { queue: 1 }]) expect(v.safeParse(schema, input).success).toBe(false);
-	}
-	const request = { queue: 'system', future: true };
-	const response = { name: 'system' as const, qualifiedName: 'bull:system', counts, isPaused: false, metrics: { completed: metrics, failed: metrics }, db: { version: '7.2.0', mode: 'standalone' as const, runId: 'fixture', processId: '123', port: 6379, os: 'Linux', uptime: 9, memory: { total: 1024, used: 128, fragmentationRatio: 2, peak: 256 }, clients: { connected: 3, blocked: 1 } }, future: true };
-	const endpoint = new ContractEndpoint({}, projectEndpointContract(referenceAdminQueueQueueStatsDefinition), async ps => { expect(ps).toBe(request); return response; });
-	expect(await endpoint.exec(request, null, null)).toBe(response);
-	expect(request).toEqual({ queue: 'system', future: true });
-	await expect(endpoint.exec({ queue: 'unsupported' }, null, null)).rejects.toMatchObject({ code: 'INVALID_PARAM' });
+test('native queue requests strip extras and reject invalid selectors', () => {
+ for (const schema of [adminQueuePauseInput, adminQueueClearInput, adminQueueRetryJobInput]) {
+  expect(v.parse(schema, { queue: 'system', state: '*', jobId: 'job1', future: true })).not.toHaveProperty('future');
+  for (const input of [{}, { queue: 'unsupported' }, { queue: 1 }]) expect(v.safeParse(schema, input).success).toBe(false);
+ }
+ expect(v.safeParse(queueInput, []).success).toBe(false);
 });
 
 test('finite pg_indexes wire schema preserves all five SELECT-star columns and nullable source paths', async () => {
 	const rows = [{ schemaname: 'public', tablename: 'note', indexname: 'note_pkey', tablespace: null, indexdef: 'CREATE UNIQUE INDEX ...' }];
 	const db = mockDeep<DataSource>();
 	db.query.mockResolvedValue(rows);
-	const result = await new IndexStats(db).exec({}, mockDeep<MiLocalUser>(), null);
+	const result = await new IndexStats(db).execute({}, mockDeep<MiLocalUser>());
 	expect(v.parse(inlineAdminGetIndexStatsOutput, result)).toEqual(rows);
 	expect(db.query).toHaveBeenCalledWith('SELECT * FROM pg_indexes;');
-	expect(result[0]).toBe(rows[0]);
+	expect(result[0]).toEqual(rows[0]);
 	for (const field of ['schemaname', 'tablespace', 'indexdef'] as const) {
 		const nullable = [{ ...rows[0], [field]: null }];
 		expect(v.parse(inlineAdminGetIndexStatsOutput, nullable)).toEqual(nullable);
@@ -134,11 +131,12 @@ test('finite pg_indexes wire schema preserves all five SELECT-star columns and n
 		expect(v.safeParse(inlineAdminGetIndexStatsOutput, [missing]).success).toBe(false);
 	}
 	const extended = [{ ...rows[0], future: true }];
-	db.query.mockResolvedValue(extended);
-	const unparsed = await new IndexStats(db).exec({}, mockDeep<MiLocalUser>(), null);
-	expect(unparsed[0]).toBe(extended[0]);
-	// The dynamic job schema stays a separate producer review boundary in this cohort.
-	expect(packedQueueJobSchema.type).toBe('loose_object');
+ db.query.mockResolvedValue(extended);
+ await expect(new IndexStats(db).execute({}, mockDeep<MiLocalUser>())).rejects.toThrow();
+ const json: unknown = JSON.parse('{"__proto__":{"note":true},"constructor":null}');
+ const job = { id: 'job1', name: 'deliver', data: json, opts: {}, timestamp: 1, progress: 0, attempts: 0, delay: 0, stacktrace: [], returnValue: json, isFailed: false };
+ expect(v.parse(packedQueueJobSchema, job)).toEqual(job);
+ for (const data of [new Map(), new Date(), { invalid: undefined }]) expect(v.safeParse(packedQueueJobSchema, { ...job, data }).success).toBe(false);
 });
 
 test('installed Bull default counts and metrics agree with actual aggregate/table producers', async () => {
@@ -169,11 +167,11 @@ test('installed Bull default counts and metrics agree with actual aggregate/tabl
 	const dbQueue = mockDeep<Parameters[5]>();
 	const storage = mockDeep<Parameters[6]>();
 	for (const queue of [deliver, inbox, dbQueue, storage]) queue.getJobCounts.mockResolvedValue(produced);
-	const result = await new AggregateStats(mockDeep(), mockDeep(), mockDeep(), deliver, inbox, dbQueue, storage, mockDeep(), mockDeep()).exec({}, mockDeep<MiLocalUser>(), null);
+	const result = await new AggregateStats(mockDeep(), mockDeep(), mockDeep(), deliver, inbox, dbQueue, storage, mockDeep(), mockDeep()).execute({}, mockDeep<MiLocalUser>());
 	expect(v.parse(queueStatsOutput, result)).toEqual({ deliver: produced, inbox: produced, db: produced, objectStorage: produced });
 	for (const queue of [deliver, inbox, dbQueue, storage]) expect(queue.getJobCounts).toHaveBeenCalledWith();
 	const db = mockDeep<DataSource>();
 	db.query.mockResolvedValue([{ table: 'custom_table', count: '3', size: '1024' }]);
-	const tables = await new TableStats(db).exec({}, mockDeep<MiLocalUser>(), null);
+	const tables = await new TableStats(db).execute({}, mockDeep<MiLocalUser>());
 	expect(v.parse(inlineAdminGetTableStatsOutput, tables)).toEqual({ custom_table: { count: 3, size: 1024 } });
 });
